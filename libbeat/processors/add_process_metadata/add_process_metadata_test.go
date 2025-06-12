@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
@@ -968,7 +969,7 @@ func TestUsingCache(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	proc, err := New(config)
+	proc, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1046,7 +1047,7 @@ func TestSelf(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	proc, err := New(config)
+	proc, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1080,7 +1081,7 @@ func TestBadProcess(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	proc, err := New(config)
+	proc, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
