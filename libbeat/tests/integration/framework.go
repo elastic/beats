@@ -721,9 +721,8 @@ func EnsureESIsRunning(t *testing.T) {
 	}
 }
 
-func GetESClient(t *testing.T) (*elasticsearch.Client, error) {
-	t.Helper()
-	esURL := GetESURL(t, "http")
+func GetESClient(t *testing.T, scheme string) *elasticsearch.Client {
+	esURL := GetESURL(t, scheme)
 
 	u := esURL.User.Username()
 	p, _ := esURL.User.Password()
@@ -741,10 +740,10 @@ func GetESClient(t *testing.T) (*elasticsearch.Client, error) {
 	}
 	es, err := elasticsearch.NewClient(esCfg)
 	if err != nil {
-		return nil, err
+		t.Fatalf("cannot create Elasticsearch client: %s", err)
 	}
-	return es, nil
 
+	return es
 }
 
 func (b *BeatProc) FileContains(filename string, match string) string {
