@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package template
+package template_test
 
 import (
 	"bytes"
@@ -14,6 +14,8 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
+	. "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template/tmpltest"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
 )
 
@@ -639,7 +641,7 @@ func TestTemplateEquals(t *testing.T) {
 		VariableLength: true,
 		ScopeFields:    0,
 	}
-	assert.True(t, ValidateTemplate(t, &a))
+	assert.True(t, tmpltest.ValidateTemplate(t, &a))
 	b := a
-	assert.True(t, AssertTemplateEquals(t, &a, &b))
+	assert.True(t, tmpltest.AssertTemplateEquals(t, &a, &b))
 }
