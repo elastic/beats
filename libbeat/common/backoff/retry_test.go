@@ -74,13 +74,13 @@ func TestRetryer_ContextCancelled(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	r.Retry(ctx, func() error {
+	err := r.Retry(ctx, func() error {
 		count++
 
 		// cancel on the first call - should stop further retries even though we return an error
 		cancel()
 		return fmt.Errorf("foo")
 	})
-
+	assert.Error(t, err)
 	assert.Equal(t, 1, count, "expected 1 retry before context cancellation")
 }
