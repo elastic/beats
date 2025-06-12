@@ -7,10 +7,11 @@ mapped_pages:
 # filestream input [filebeat-input-filestream]
 
 ::::{important}
-By default, Filestream will only start ingesting files **when
-their size is >= 1024 bytes**. To change this behaviour you can
-configure a different length for the fingerprint by setting
-[`prospector.scanner.fingerprint.length`](#filebeat-input-filestream-scan-fingerprint).
+By default, Filestream starts ingesting files only **when
+their size is greater than 1024 bytes**. You can configure
+a different length for the fingerprint by setting the
+[`prospector.scanner.fingerprint.length`](#filebeat-input-filestream-scan-fingerprint)
+value.
 ::::
 
 Use the `filestream` input to read lines from active log files. It is the new, improved alternative to the `log` input. It comes with various improvements to the existing input:
