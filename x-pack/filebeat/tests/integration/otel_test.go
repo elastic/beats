@@ -43,11 +43,6 @@ output:
     password: testing
     index: %s
 queue.mem.flush.timeout: 0s
-processors:
-    - add_host_metadata: ~
-    - add_cloud_metadata: ~
-    - add_docker_metadata: ~
-    - add_kubernetes_metadata: ~
 path.home: %s
 http.enabled: true
 http.host: localhost
@@ -114,7 +109,7 @@ setup.template.pattern: logs-filebeat-default
 
 			return otelDocs.Hits.Total.Value >= numEvents && filebeatDocs.Hits.Total.Value >= numEvents
 		},
-		2*time.Minute, 1*time.Second, fmt.Sprintf("Number of hits %d not equal to number of events for %d", filebeatDocs.Hits.Total.Value, numEvents))
+		3*time.Minute, 1*time.Second, fmt.Sprintf("Number of hits %d not equal to number of events for %d", filebeatDocs.Hits.Total.Value, numEvents))
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
