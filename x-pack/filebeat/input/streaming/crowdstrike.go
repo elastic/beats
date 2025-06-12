@@ -145,7 +145,6 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		io.Copy(&buf, resp.Body)
 		s.log.Errorw("unsuccessful request", "status_code", resp.StatusCode, "status", resp.Status, "body", buf.String())
 		err := fmt.Errorf("unsuccessful request: %s: %s", resp.Status, &buf)
-		s.status.UpdateStatus(status.Degraded, err.Error())
 		return nil, err
 	}
 
