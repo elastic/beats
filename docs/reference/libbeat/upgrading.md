@@ -94,7 +94,7 @@ beatname setup --dashboards
 
 ::::::{tab-item} Docker
 ```sh subs=true
-docker run --rm --net="host" docker.elastic.co/beats/beatname:9.0.0 setup --dashboards
+docker run --rm --net="host" docker.elastic.co/beats/beatname:{{stack-version}} setup --dashboards
 ```
 ::::::
 
