@@ -9,8 +9,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/status"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
@@ -74,6 +76,9 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 
 // BeatReceiver.Stop() starts the beat receiver.
 func (br *BeatReceiver) Start() error {
+	if w, ok := br.beater.(cfgfile.WithFactoryWrapper); ok {
+		w.WithFactoryWrapper(status.StatusReporterFactory())
+	}
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
 		return fmt.Errorf("beat receiver run error: %w", err)
 	}
