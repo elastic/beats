@@ -323,7 +323,11 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
 	// TODO: propagate stop signal
-	bt.stopOnce.Do(func() { close(bt.done) })
+	bt.stopOnce.Do(func() {
+		// Close active jobs before triggering shutdown
+		bt.scheduler.Stop()
+		close(bt.done)
+	})
 
 	// TODO: remove this atrocity
 	// time.Sleep(5 * time.Second)

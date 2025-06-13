@@ -232,8 +232,8 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 	}
 
 	return func() {
-		// TODO: can I handle the signal here?
 		debugf("Remove scheduler job '%v'", id)
+		// TODO: can I handle the signal here?
 		jobCtxCancel()
 	}, nil
 }
