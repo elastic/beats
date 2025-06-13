@@ -164,6 +164,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 - Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices {pull}43637[43637]
+- Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
 
 *Osquerybeat*
 
