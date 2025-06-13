@@ -79,7 +79,7 @@ func (in *s3PollerInput) Run(
 		return fmt.Errorf("failed to create S3 API: %w", err)
 	}
 
-	in.metrics = newInputMetrics(inputContext.ID, nil, in.config.NumberOfWorkers)
+	in.metrics = newInputMetrics(inputContext, in.config.NumberOfWorkers)
 	defer in.metrics.Close()
 
 	in.s3ObjectHandler = newS3ObjectProcessorFactory(

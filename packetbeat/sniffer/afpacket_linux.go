@@ -208,7 +208,7 @@ func (m *metrics) close() {
 
 func newMetrics(id, device string, interval time.Duration, handle *afpacket.TPacket, log *logp.Logger) *metrics {
 	devID := fmt.Sprintf("%s-af_packet::%s", id, device)
-	reg, unreg := inputmon.NewInputRegistry("af_packet", devID, nil)
+	reg, unreg := inputmon.NewDeprecatedMetricsRegistry("af_packet", devID, nil)
 	out := &metrics{
 		unregister:         unreg,
 		device:             monitoring.NewString(reg, "device"),
