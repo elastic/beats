@@ -167,7 +167,8 @@ func (s *LightModulesSource) ProcessorsForMetricSet(r *Register, moduleName stri
 	if !ok {
 		return nil, fmt.Errorf("unknown metricset '%s' in module '%s'", metricSetName, moduleName)
 	}
-	return processors.New(metricSet.Processors)
+	// TODO: pass a local logger to processor.New
+	return processors.New(metricSet.Processors, nil)
 }
 
 // LightModule contains the definition of a light module

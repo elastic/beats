@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type extract_field struct {
@@ -44,7 +45,7 @@ func init() {
 }
 */
 
-func NewExtractField(c *conf.C) (beat.Processor, error) {
+func NewExtractField(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := struct {
 		Field     string `config:"field"`
 		Separator string `config:"separator"`

@@ -24,14 +24,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // NewConditional returns a constructor suitable for registering when conditionals as a plugin.
 func NewConditional(
 	ruleFactory Constructor,
 ) Constructor {
-	return func(cfg *config.C) (beat.Processor, error) {
-		rule, err := ruleFactory(cfg)
+	return func(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
+		rule, err := ruleFactory(cfg, log)
 		if err != nil {
 			return nil, err
 		}
@@ -123,7 +124,7 @@ type IfThenElseProcessor struct {
 }
 
 // NewIfElseThenProcessor construct a new IfThenElseProcessor.
-func NewIfElseThenProcessor(cfg *config.C) (*IfThenElseProcessor, error) {
+func NewIfElseThenProcessor(cfg *config.C, logger *logp.Logger) (*IfThenElseProcessor, error) {
 	var c ifThenElseConfig
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, err
@@ -139,14 +140,14 @@ func NewIfElseThenProcessor(cfg *config.C) (*IfThenElseProcessor, error) {
 			return nil, nil
 		}
 		if !c.IsArray() {
-			return New([]*config.C{c})
+			return New([]*config.C{c}, logger)
 		}
 
 		var pc PluginConfig
 		if err := c.Unpack(&pc); err != nil {
 			return nil, err
 		}
-		return New(pc)
+		return New(pc, logger)
 	}
 
 	var ifProcessors, elseProcessors *Processors
