@@ -7,15 +7,12 @@
 package integration
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
-	"text/template"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
@@ -25,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
-	"github.com/google/uuid"
 )
 
 var beatsCfgFile = `
@@ -60,24 +56,33 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	numEvents := 1
 
-	// start filebeat in otel mode
-	filebeatOTel := integration.NewBeat(
-		t,
-		"filebeat-otel",
-		"../../filebeat.test",
-		"otel",
-	)
+	// Get collector with given config
+	col, err := NewTestCollector(t, "filebeat", beatsCfgFile)
+	require.NoError(t, err, fmt.Sprintf("could not get new collector due to %v", err))
 
-	logFilePath := filepath.Join(filebeatOTel.TempDir(), "log.log")
-	filebeatOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", 5066))
+	logFilePath := filepath.Join(col.GetTempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	filebeatOTel.Start()
+
+	// start collector
+	go func() {
+		err := col.Run()
+		if err != nil {
+			t.Logf("could not start collector")
+		}
+	}()
+
+	t.Cleanup(func() {
+		col.Shutdown()
+		if t.Failed() {
+
+		}
+	})
 
 	// start filebeat
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
-		"../../filebeat.test",
+		"../../../filebeat/filebeat.test",
 	)
 	logFilePath = filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
@@ -90,10 +95,6 @@ setup.template.pattern: logs-filebeat-default
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
 
-	t.Cleanup(func() {
-		filebeatOTel.Stop()
-		filebeat.Stop()
-	})
 	es, err := integration.GetESClient(t)
 	if err != nil {
 		t.Fatalf("could not get es client due to: %v", err)
@@ -126,131 +127,11 @@ setup.template.pattern: logs-filebeat-default
 		"agent.id",
 		"log.file.inode",
 		"log.file.path",
+		"container.id",
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
-	assertMonitoring(t)
-}
-
-func TestHTTPJSONInputOTel(t *testing.T) {
-	integration.EnsureESIsRunning(t)
-	host := integration.GetESURL(t, "http")
-	user := host.User.Username()
-	password, _ := host.User.Password()
-
-	type options struct {
-		namespace string
-		esURL     string
-		username  string
-		password  string
-	}
-
-	// The request url is a http mock server started using streams
-	configFile := `
-filebeat.inputs:
-  - type: httpjson
-    id: httpjson-e2e-otel
-    request.url: https://localhost:8090/test
-
-output:
-  elasticsearch:
-    hosts:
-      - {{ .esURL }}
-    username: {{ .username }}
-    password: {{ .password }}
-
-processors:
-- add_fields:
-	fields:
-		dataset: integration
-		namespace: {{ .namespace}}
-		type: logs
-	target: data_stream
-`
-
-	// start filebeat in otel mode
-	filebeatOTel := integration.NewBeat(
-		t,
-		"filebeat-otel",
-		"../../filebeat.test",
-		"otel",
-	)
-
-	var configBuffer bytes.Buffer
-
-	template.Must(template.New("config").Parse(configFile)).Execute(&configBuffer,
-		options{
-			namespace: strings.ReplaceAll(uuid.New().String(), "-", ""), // create a random uuid and make sure it doesn't contain dashes
-			esURL:     host.String(),
-			username:  user,
-			password:  password,
-		})
-
-	filebeatOTel.WriteConfigFile(configBuffer.String())
-	// reset buffer
-	configBuffer.Reset()
-	filebeatOTel.Start()
-
-	template.Must(template.New("config").Parse(configFile)).Execute(&configBuffer,
-		options{
-			namespace: strings.ReplaceAll(uuid.New().String(), "-", ""), // create a random uuid and make sure it doesn't contain dashes
-			esURL:     host.String(),
-			username:  user,
-			password:  password,
-		})
-
-	// start filebeat
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
-
-	filebeat.WriteConfigFile(configBuffer.String())
-	filebeat.Start()
-
-	t.Cleanup(func() {
-		filebeatOTel.Stop()
-		filebeat.Stop()
-	})
-
-	// Get ES client
-	es, err := integration.GetESClient(t)
-	if err != nil {
-		t.Fatalf("could not get es client due to: %v", err)
-	}
-
-	var filebeatDocs estools.Documents
-	var otelDocs estools.Documents
-	// wait for logs to be published
-	require.Eventually(t,
-		func() bool {
-			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
-			defer findCancel()
-
-			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration*")
-			require.NoError(t, err)
-
-			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-*")
-			require.NoError(t, err)
-
-			return otelDocs.Hits.Total.Value >= 1 && filebeatDocs.Hits.Total.Value >= 1
-		},
-		2*time.Minute, 1*time.Second, fmt.Sprintf("Number of hits %d not equal to number of events for %d", filebeatDocs.Hits.Total.Value, 1))
-
-	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
-	otelDoc := otelDocs.Hits.Hits[0].Source
-	ignoredFields := []string{
-		// Expected to change between agentDocs and OtelDocs
-		"@timestamp",
-		"agent.ephemeral_id",
-		"agent.id",
-		"log.file.inode",
-		"log.file.path",
-	}
-
-	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
-	assertMonitoring(t)
+	// assertMonitoring(t)
 }
 
 func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {

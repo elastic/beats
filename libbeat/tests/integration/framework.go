@@ -23,6 +23,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -42,6 +43,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 )
@@ -103,7 +105,7 @@ type Total struct {
 // `args` will be passed as CLI arguments to the Beat
 func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	require.FileExistsf(t, binary, "beat binary must exists")
-	tempDir := createTempDir(t)
+	tempDir := CreateTempDir(t)
 	configFile := filepath.Join(tempDir, beatName+".yml")
 
 	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
@@ -142,7 +144,7 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 // See `NewBeat` for options and information for the parameters.
 func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	require.FileExistsf(t, binary, "agentbeat binary must exists")
-	tempDir := createTempDir(t)
+	tempDir := CreateTempDir(t)
 	configFile := filepath.Join(tempDir, beatName+".yml")
 
 	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
@@ -648,7 +650,7 @@ func (b *BeatProc) openEventLogFile() *os.File {
 //
 // If the tests are run with -v, the temporary directory will
 // be logged.
-func createTempDir(t *testing.T) string {
+func CreateTempDir(t *testing.T) string {
 	rootDir, err := filepath.Abs("../../build/integration-tests")
 	if err != nil {
 		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
@@ -714,6 +716,31 @@ func EnsureESIsRunning(t *testing.T) {
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("unexpected HTTP status: %d, expecting 200 - OK", resp.StatusCode)
 	}
+}
+
+func GetESClient(t *testing.T) (*elasticsearch.Client, error) {
+	esURL := GetESURL(t, "http")
+
+	u := esURL.User.Username()
+	p, _ := esURL.User.Password()
+
+	// prepare to query ES
+	esCfg := elasticsearch.Config{
+		Addresses: []string{esURL.String()},
+		Username:  u,
+		Password:  p,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
+			},
+		},
+	}
+	es, err := elasticsearch.NewClient(esCfg)
+	if err != nil {
+		return nil, err
+	}
+	return es, nil
+
 }
 
 func (b *BeatProc) FileContains(filename string, match string) string {
