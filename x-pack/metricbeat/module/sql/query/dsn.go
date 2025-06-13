@@ -13,7 +13,6 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/godror/godror"
 	"github.com/godror/godror/dsn"
-	"github.com/lib/pq"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -170,13 +169,8 @@ func postgresParseDSN(config ConnectionDetails, host string) (mb.HostData, error
 
 		u.RawQuery = q.Encode()
 
-		connString, err := pq.ParseURL(u.String())
-		if err != nil {
-			return mb.HostData{}, fmt.Errorf("error parsing URL with pq: %w", err)
-		}
-
 		return mb.HostData{
-			URI:          connString,
+			URI:          u.String(),
 			SanitizedURI: u.Host,
 			Host:         u.Host,
 		}, nil
