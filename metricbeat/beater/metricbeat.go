@@ -31,6 +31,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/mitchellh/hashstructure"
 
 	// include all metricbeat specific builders
 	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
@@ -44,12 +45,12 @@ import (
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done         chan struct{}    // Channel used to initiate shutdown.
-	stopOnce     sync.Once        // wraps the Stop() method
-	runners      []cfgfile.Runner // Active list of module runners.
-	config       Config
-	registry     *mb.Register
-	autodiscover *autodiscover.Autodiscover
+	done              chan struct{} // Channel used to initiate shutdown.
+	stopOnce          sync.Once     // wraps the Stop() method
+	config            Config
+	registry          *mb.Register
+	autodiscover      *autodiscover.Autodiscover
+	dynamicCfgEnabled bool
 
 	// Options
 	moduleOptions []module.Option
@@ -150,10 +151,11 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 	}
 
 	metricbeat := &Metricbeat{
-		done:     make(chan struct{}),
-		config:   config,
-		registry: registry,
-		logger:   b.Info.Logger,
+		done:              make(chan struct{}),
+		config:            config,
+		registry:          registry,
+		logger:            b.Info.Logger,
+		dynamicCfgEnabled: dynamicCfgEnabled,
 	}
 
 	for _, applyOption := range options {
@@ -185,45 +187,6 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 				return data
 			})
 	}
-
-	moduleOptions := append(
-		[]module.Option{module.WithMaxStartDelay(config.MaxStartDelay)},
-		metricbeat.moduleOptions...)
-
-	factory := module.NewFactory(b.Info, registry, moduleOptions...)
-
-	for _, moduleCfg := range config.Modules {
-		if !moduleCfg.Enabled() {
-			continue
-		}
-
-		runner, err := factory.Create(b.Publisher, moduleCfg)
-		if err != nil {
-			return nil, err
-		}
-
-		metricbeat.runners = append(metricbeat.runners, runner)
-	}
-
-	if len(metricbeat.runners) == 0 && !dynamicCfgEnabled {
-		return nil, mb.ErrAllModulesDisabled
-	}
-
-	if config.Autodiscover != nil {
-		var err error
-		metricbeat.autodiscover, err = autodiscover.NewAutodiscover(
-			"metricbeat",
-			b.Publisher,
-			factory, autodiscover.QueryConfig(),
-			config.Autodiscover,
-			b.Keystore,
-			b.Info.Logger,
-		)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	return metricbeat, nil
 }
 
@@ -233,10 +196,59 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 // that a single unresponsive host cannot inadvertently block other hosts
 // within the same Module and MetricSet from collection.
 func (bt *Metricbeat) Run(b *beat.Beat) error {
+	moduleOptions := append(
+		[]module.Option{module.WithMaxStartDelay(bt.config.MaxStartDelay)},
+		bt.moduleOptions...)
+
+	factory := module.NewFactory(b.Info, bt.registry, moduleOptions...)
+	runners := make(map[uint64]cfgfile.Runner) // Active list of module runners.
+
+	for _, moduleCfg := range bt.config.Modules {
+		if !moduleCfg.Enabled() {
+			continue
+		}
+
+		var h map[string]interface{}
+		err := moduleCfg.Unpack(&h)
+		if err != nil {
+			return fmt.Errorf("could not unpack config: %w", err)
+		}
+		id, err := hashstructure.Hash(h, nil)
+		if err != nil {
+			return fmt.Errorf("can not compute id from configuration: %w", err)
+		}
+
+		runner, err := factory.Create(b.Publisher, moduleCfg)
+		if err != nil {
+			return err
+		}
+
+		runners[id] = runner
+	}
+
+	if len(runners) == 0 && !bt.dynamicCfgEnabled {
+		return mb.ErrAllModulesDisabled
+	}
+
+	if bt.config.Autodiscover != nil {
+		var err error
+		bt.autodiscover, err = autodiscover.NewAutodiscover(
+			"metricbeat",
+			b.Publisher,
+			factory, autodiscover.QueryConfig(),
+			bt.config.Autodiscover,
+			b.Keystore,
+			b.Info.Logger,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
 	var wg sync.WaitGroup
 
 	// Static modules (metricbeat.runners)
-	for _, r := range bt.runners {
+	for _, r := range runners {
 		r.Start()
 		wg.Add(1)
 
@@ -249,8 +261,8 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	// Centrally managed modules
-	factory := module.NewFactory(b.Info, bt.registry, bt.moduleOptions...)
-	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher, bt.logger)
+	modulesFactory := module.NewFactory(b.Info, bt.registry, bt.moduleOptions...)
+	modules := cfgfile.NewRunnerList(management.DebugK, modulesFactory, b.Publisher, bt.logger)
 	b.Registry.MustRegisterInput(modules)
 	wg.Add(1)
 	go func() {

@@ -29,6 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver"
@@ -37,6 +38,18 @@ import (
 	"go.uber.org/zap/zaptest"
 	"go.uber.org/zap/zaptest/observer"
 )
+
+type MockHost struct {
+	Evt *componentstatus.Event
+}
+
+func (*MockHost) GetExtensions() map[component.ID]component.Component {
+	return nil
+}
+
+func (h *MockHost) Report(evt *componentstatus.Event) {
+	h.Evt = evt
+}
 
 type ReceiverConfig struct {
 	Name    string
@@ -60,6 +73,8 @@ func CheckReceivers(params CheckReceiversParams) {
 
 	var logsMu sync.Mutex
 	logs := make(map[string][]mapstr.M)
+
+	host := &MockHost{}
 
 	zapCore := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
@@ -112,7 +127,7 @@ func CheckReceivers(params CheckReceiversParams) {
 	}
 
 	for i, r := range receivers {
-		err := r.Start(ctx, nil)
+		err := r.Start(ctx, host)
 		require.NoErrorf(t, err, "Error starting receiver %d", i)
 		defer func() {
 			require.NoErrorf(t, r.Shutdown(ctx), "Error shutting down receiver %d", i)
@@ -138,6 +153,9 @@ func CheckReceivers(params CheckReceiversParams) {
 			require.Equal(t, zl.ContextMap()["otelcol.signal"], "logs")
 			break
 		}
+		require.NotNil(t, host.Evt)
+		require.Nil(t, host.Evt.Err())
+		require.Equal(t, host.Evt.Status(), componentstatus.StatusOK)
 
 		params.AssertFunc(ct, logs, zapLogs)
 	}, 2*time.Minute, 100*time.Millisecond,

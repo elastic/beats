@@ -25,7 +25,7 @@ func (mb *metricbeatReceiver) Start(ctx context.Context, host component.Host) er
 	go func() {
 		defer mb.wg.Done()
 		mb.Logger.Info("starting metricbeat receiver")
-		if err := mb.BeatReceiver.Start(); err != nil {
+		if err := mb.BeatReceiver.Start(host); err != nil {
 			mb.Logger.Error("error starting metricbeat receiver", zap.Error(err))
 		}
 	}()
