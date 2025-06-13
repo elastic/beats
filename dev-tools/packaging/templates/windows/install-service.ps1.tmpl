@@ -59,9 +59,9 @@ $HomePath = "$BasePath\{{.BeatName | title}}"
 $LogsPath = "$HomePath\logs"
 $KeystorePath = "$WorkDir\data\{{.BeatName | title}}.keystore"
 
-$FullCmd = "`"$WorkDir\{{.BeatName | title}}.exe`" " +
+$FullCmd = "`"$WorkDir\{{.BeatName}}.exe`" " +
            "--environment=windows_service " +
-           "-c `"$WorkDir\{{.BeatName | title}}.yml`" " +
+           "-c `"$WorkDir\{{.BeatName}}.yml`" " +
            "--path.home `"$WorkDir`" " +
            "--path.data `"$HomePath`" " +
            "--path.logs `"$LogsPath`" " +
