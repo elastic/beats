@@ -84,7 +84,7 @@ func (t *configuredJob) Start(pubClient beat.Client) {
 		return
 	}
 
-	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ID, t.makeSchedulerTaskFunc(), t.config.Type)
+	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ParsedMainteWin, t.monitor.stdFields.ID, t.makeSchedulerTaskFunc(), t.config.Type)
 	if err != nil {
 		logp.L().Infof("could not start monitor: %v", err)
 	}
