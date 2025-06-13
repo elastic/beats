@@ -54,14 +54,8 @@ func newProspector(config config) (loginp.Prospector, error) {
 		return nil, fmt.Errorf("error while creating file identifier: %w", err)
 	}
 
-<<<<<<< HEAD
-	logp.L().
-		With("filestream_id", config.ID).
-		Debugf("file identity is set to %s", identifier.Name())
-=======
 	logger = logger.Named("input.filestream")
 	logger.Debugf("file identity is set to %s", identifier.Name())
->>>>>>> b91d8913e (Log that files are too small to ingest at warn level (#44751))
 
 	fileprospector := fileProspector{
 		filewatcher:         filewatcher,
