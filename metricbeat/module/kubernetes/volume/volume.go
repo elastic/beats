@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -39,8 +38,6 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
-
-	logger = logp.NewLogger("kubernetes.volume")
 )
 
 // init registers the MetricSet with the central registry.
@@ -95,7 +92,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return fmt.Errorf("error doing HTTP request to fetch 'volume' Metricset data: %w", err)
 	}
 
-	events, err := eventMapping(body, logger)
+	events, err := eventMapping(body, m.Logger().Named("kubernetes.volume"))
 	if err != nil {
 		return err
 	}

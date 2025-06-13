@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/kafka"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/sarama"
 )
@@ -45,8 +44,6 @@ type MetricSet struct {
 }
 
 var errFailQueryOffset = errors.New("operation failed")
-
-var debugf = logp.MakeDebug("kafka")
 
 // New creates a new instance of the partition MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -85,7 +82,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return fmt.Errorf("error getting topic metadata: %w", err)
 	}
 	if len(topics) == 0 {
-		debugf("no topic could be read, check ACLs")
+		m.Logger().Named("kafka").Debugf("no topic could be read, check ACLs")
 		return nil
 	}
 
@@ -95,7 +92,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	for _, topic := range topics {
-		debugf("fetch events for topic: ", topic.Name)
+		m.Logger().Named("kafka").Debugf("fetch events for topic: ", topic.Name)
 		evtTopic := mapstr.M{
 			"name": topic.Name,
 		}
@@ -109,7 +106,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		for _, partition := range topic.Partitions {
 			// partition offsets can be queried from leader only
 			if broker.ID() != partition.Leader {
-				debugf("broker is not leader (broker=%v, leader=%v)", broker.ID(), partition.Leader)
+				m.Logger().Named("kafka").Debugf("broker is not leader (broker=%v, leader=%v)", broker.ID(), partition.Leader)
 				continue
 			}
 

@@ -32,6 +32,7 @@ import (
 	"time"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
@@ -268,7 +269,7 @@ func TestStatusOutputs(t *testing.T) {
 		assert.NoError(t, err, "cannot open test file "+filename)
 		scanner := bufio.NewScanner(f)
 
-		_, err = eventMapping(scanner, "localhost")
+		_, err = eventMapping(scanner, "localhost", logptest.NewTestingLogger(t, ""))
 		assert.NoError(t, err, "error mapping "+filename)
 	}
 }

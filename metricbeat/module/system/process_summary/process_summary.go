@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
@@ -67,7 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		DegradeOnPartial bool `config:"degrade_on_partial"`
 	}{}
 	if err := base.Module().UnpackConfig(&degradedConf); err != nil {
-		logp.L().Warnf("Failed to unpack config; degraded mode will be disabled for partial metrics: %v", err)
+		base.Logger().Warnf("Failed to unpack config; degraded mode will be disabled for partial metrics: %v", err)
 	}
 	return &MetricSet{
 		BaseMetricSet:    base,

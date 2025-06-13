@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -90,7 +91,7 @@ token_path: "test"
 		test.event["config"] = []*conf.C{eConfig}
 		writeFile("test", "foo bar")
 
-		appender, err := NewTokenAppender(config)
+		appender, err := NewTokenAppender(config, logptest.NewTestingLogger(t, ""))
 		assert.NoError(t, err)
 		assert.NotNil(t, appender)
 

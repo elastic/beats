@@ -16,7 +16,3 @@
 // under the License.
 
 package kafka
-
-import "github.com/elastic/elastic-agent-libs/logp"
-
-var debugf = logp.MakeDebug("kafka")

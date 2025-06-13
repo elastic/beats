@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -43,8 +42,6 @@ const (
 )
 
 var (
-	debugf = logp.MakeDebug("apache-status")
-
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
 		PathConfigKey: "server_status_path",
@@ -90,7 +87,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return fmt.Errorf("error fetching data: %w", err)
 	}
 
-	data, _ := eventMapping(scanner, m.Host())
+	data, _ := eventMapping(scanner, m.Host(), m.Logger())
 	event := mb.Event{
 		MetricSetFields: data,
 	}

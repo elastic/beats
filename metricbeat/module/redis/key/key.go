@@ -103,7 +103,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 
 		for _, key := range keys {
-			keyInfo, err := redis.FetchKeyInfo(conn, key)
+			keyInfo, err := redis.FetchKeyInfo(conn, key, m.Logger())
 			if err != nil {
 				msg := fmt.Errorf("Failed to fetch key info for key %s in keyspace %d", key, keyspace)
 				m.Logger().Error(msg)

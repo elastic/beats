@@ -24,12 +24,12 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestGenerateMapStrFromEvent(t *testing.T) {
-	logger := logp.NewLogger("kubernetes.event")
+	logger := logptest.NewTestingLogger(t, "kubernetes.event")
 
 	labels := map[string]string{
 		"app.kubernetes.io/name":      "mysql",

@@ -71,13 +71,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	if config.Pid != 0 && config.Procs[0] != ".*" {
-		logp.L().Warnf("`process.pid` set to %d, but `processes` is set to a non-default value. Metricset will only report metrics for pid %d", config.Pid, config.Pid)
+		base.Logger().Warnf("`process.pid` set to %d, but `processes` is set to a non-default value. Metricset will only report metrics for pid %d", config.Pid, config.Pid)
 	}
 	degradedConf := struct {
 		DegradeOnPartial bool `config:"degrade_on_partial"`
 	}{}
 	if err := base.Module().UnpackConfig(&degradedConf); err != nil {
-		logp.L().Warnf("Failed to unpack config; degraded mode will be disabled for partial metrics: %v", err)
+		base.Logger().Warnf("Failed to unpack config; degraded mode will be disabled for partial metrics: %v", err)
 	}
 	m := &MetricSet{
 		BaseMetricSet: base,

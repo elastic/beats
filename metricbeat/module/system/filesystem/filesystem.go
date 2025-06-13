@@ -28,7 +28,6 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	fs "github.com/elastic/elastic-agent-system-metrics/metric/system/filesystem"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
@@ -67,7 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		config.IgnoreTypes = fs.DefaultIgnoredTypes(sys)
 	}
 	if len(config.IgnoreTypes) > 0 {
-		logp.Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
+		base.Logger().Infof("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
 	}
 	return &MetricSet{
 		BaseMetricSet: base,

@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/server/tcp"
 	"github.com/elastic/beats/v7/metricbeat/helper/server/udp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // init registers the MetricSet with the central registry.
@@ -81,7 +80,7 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 	// Start event watcher
 	if err := m.server.Start(); err != nil {
 		err = fmt.Errorf("failed to start graphite server: %w", err)
-		logp.Err("%v", err)
+		m.Logger().Errorf("%v", err)
 		reporter.Error(err)
 		return
 	}
