@@ -84,6 +84,8 @@ func (sj *SourceJob) StdFields() stdfields.StdMonitorFields {
 }
 
 func (sj *SourceJob) Close() error {
+	logp.L().Info("closing SourceJob")
+
 	if sj.browserCfg.Source.ActiveMemo != nil {
 		sj.browserCfg.Source.ActiveMemo.Close()
 	}

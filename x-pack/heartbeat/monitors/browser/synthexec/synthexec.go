@@ -113,6 +113,7 @@ func startCmdJob(ctx context.Context, newCmd func() *SynthCmd, stdinStr *string,
 func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich enricher) jobs.Job {
 	return func(event *beat.Event) (conts []jobs.Job, err error) {
 		se := <-synthEvents
+		logp.L().Infof("new event processed: %v", se)
 		err = enrich(event, se)
 		if se != nil {
 			return []jobs.Job{readResultsJob(ctx, synthEvents, enrich)}, err
