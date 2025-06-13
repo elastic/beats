@@ -18,12 +18,14 @@
 package now
 
 import (
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/stretchr/testify/assert"
-	"testing"
-	"time"
 )
 
 func TestNow(t *testing.T) {
