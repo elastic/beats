@@ -130,7 +130,7 @@ func postgresParseDSN(config ConnectionDetails, host string) (mb.HostData, error
 	if config.TLS.IsEnabled() {
 		u, err := url.Parse(host)
 		if err != nil {
-			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", err)
+			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", sanitizeError(err, host))
 		}
 
 		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
@@ -203,7 +203,7 @@ func mssqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
 	if config.TLS.IsEnabled() {
 		u, err := url.Parse(host)
 		if err != nil {
-			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", err)
+			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", sanitizeError(err, host))
 		}
 
 		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
