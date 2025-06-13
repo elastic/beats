@@ -162,6 +162,33 @@ func TestS3ObjectProcessor(t *testing.T) {
 		assert.True(t, errors.Is(err, errS3DownloadFailed), "expected errS3DownloadFailed")
 	})
 
+	t.Run("s3 object streaming error results in errS3DownloadFailed error", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockS3API := NewMockS3API(ctrl)
+		s3Event, getObjOut := newS3Object(t, "testdata/log.json", contentTypeJSON)
+
+		// Override Body reader to yield ErrUnexpectedEOF error
+		getObjOut.Body = &erroredReaderCloser{
+			original: getObjOut.Body,
+			err:      io.ErrUnexpectedEOF,
+		}
+
+		mockS3API.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq("us-east-1"), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
+			Return(getObjOut, nil)
+
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, nil, backupConfig{})
+
+		err := s3ObjProc.Create(ctx, s3Event).
+			ProcessS3Object(logptest.NewTestingLogger(t, inputName), func(_ beat.Event) {})
+
+		assert.ErrorIs(t, err, errS3DownloadFailed, "expected errS3DownloadFailed")
+	})
+
 	t.Run("no error empty result in download", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
 		defer cancel()
@@ -472,4 +499,24 @@ func newMockS3Pager(ctrl *gomock.Controller, pageSize int, s3Objects []types.Obj
 	})
 
 	return mockS3Pager
+}
+
+// erroredReaderCloser helps to yield custom Read errors.
+// When err set, it is return for any Read operation.
+type erroredReaderCloser struct {
+	original io.ReadCloser
+	err      error
+}
+
+func (e *erroredReaderCloser) Read(p []byte) (n int, err error) {
+	if e.err != nil {
+		return 0, e.err
+	}
+
+	return e.original.Read(p)
+}
+
+func (e *erroredReaderCloser) Close() error {
+	// no-op
+	return nil
 }
