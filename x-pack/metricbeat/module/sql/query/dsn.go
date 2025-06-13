@@ -54,6 +54,11 @@ func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 		return mssqlParseDSN(config, host)
 	}
 
+	return defaultParseDSN(config, host)
+}
+
+// defaultParseDSN is for backwards compatibility. It just passed the "host" param unchanged to the database driver
+func defaultParseDSN(_ ConnectionDetails, host string) (mb.HostData, error) {
 	sanitized := sanitize(host)
 	return mb.HostData{
 		URI:          host,
@@ -122,12 +127,12 @@ func mysqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
 }
 
 func postgresParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
-	u, err := url.Parse(host)
-	if err != nil {
-		return mb.HostData{}, fmt.Errorf("error parsing URL: %w", err)
-	}
-
 	if config.TLS.IsEnabled() {
+		u, err := url.Parse(host)
+		if err != nil {
+			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", err)
+		}
+
 		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 		if err != nil {
 			return mb.HostData{}, fmt.Errorf("could not load provided TLS configuration: %w", err)
@@ -154,18 +159,20 @@ func postgresParseDSN(config ConnectionDetails, host string) (mb.HostData, error
 		}
 
 		u.RawQuery = q.Encode()
+
+		connString, err := pq.ParseURL(u.String())
+		if err != nil {
+			return mb.HostData{}, fmt.Errorf("error parsing URL with pq: %w", err)
+		}
+
+		return mb.HostData{
+			URI:          connString,
+			SanitizedURI: u.Host,
+			Host:         u.Host,
+		}, nil
 	}
 
-	connString, err := pq.ParseURL(u.String())
-	if err != nil {
-		return mb.HostData{}, fmt.Errorf("error parsing URL with pq: %w", err)
-	}
-
-	return mb.HostData{
-		URI:          connString,
-		SanitizedURI: u.Host,
-		Host:         u.Host,
-	}, nil
+	return defaultParseDSN(config, host)
 }
 
 // rough translation of SSL modes
@@ -183,12 +190,12 @@ func postgresTranslateVerificationMode(mode tlscommon.TLSVerificationMode) (sslm
 }
 
 func mssqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
-	u, err := url.Parse(host)
-	if err != nil {
-		return mb.HostData{}, fmt.Errorf("error parsing URL: %w", err)
-	}
-
 	if config.TLS.IsEnabled() {
+		u, err := url.Parse(host)
+		if err != nil {
+			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", err)
+		}
+
 		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 		if err != nil {
 			return mb.HostData{}, fmt.Errorf("could not load provided TLS configuration: %w", err)
@@ -215,11 +222,13 @@ func mssqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
 		}
 
 		u.RawQuery = q.Encode()
+
+		return mb.HostData{
+			URI:          u.String(),
+			SanitizedURI: u.Host,
+			Host:         u.Host,
+		}, nil
 	}
 
-	return mb.HostData{
-		URI:          u.String(),
-		SanitizedURI: u.Host,
-		Host:         u.Host,
-	}, nil
+	return defaultParseDSN(config, host)
 }
