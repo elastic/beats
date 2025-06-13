@@ -214,13 +214,4 @@ if __name__ == "__main__":
     with open(fields_yml, encoding='utf-8') as f:
         fields = f.read()
 
-<<<<<<< HEAD
-    output = open(os.path.join(args.output_path, "docs/fields.asciidoc"), 'w', encoding='utf-8')
-
-    try:
-        fields_to_asciidoc(fields, output, beat_title)
-    finally:
-        output.close()
-=======
     fields_to_asciidoc(fields, args.output_path, beat_title)
->>>>>>> 00dcc0c03 ([documentation][exported-fields] update autogeneration scripts to generate markdown  (#44793))

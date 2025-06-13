@@ -31,70 +31,11 @@ type: date
 
 Contains nats connection related metrics
 
-<<<<<<< HEAD
-=======
-**`nats.connection.id`**
-:   The ID of the connection
-
-type: keyword
-
-
->>>>>>> 00dcc0c03 ([documentation][exported-fields] update autogeneration scripts to generate markdown  (#44793))
 **`nats.connection.name`**
 :   The name of the connection
 
 type: keyword
 
-<<<<<<< HEAD
-=======
-
-**`nats.connection.kind`**
-:   The kind of connection
-
-type: keyword
-
-
-**`nats.connection.type`**
-:   The type of connection
-
-type: keyword
-
-
-**`nats.connection.ip`**
-:   The IP address of the connection
-
-type: ip
-
-
-**`nats.connection.port`**
-:   The port of the connection
-
-type: integer
-
-
-**`nats.connection.lang`**
-:   The language of the client connection
-
-type: keyword
-
-
-**`nats.connection.version`**
-:   The version of the client connection
-
-type: keyword
-
-
-**`nats.connection.start`**
-:   The time the connection was started
-
-type: date
-
-
-**`nats.connection.last_activity`**
-:   The last activity time of the connection
-
-type: date
->>>>>>> 00dcc0c03 ([documentation][exported-fields] update autogeneration scripts to generate markdown  (#44793))
 
 
 **`nats.connection.subscriptions`**
@@ -127,12 +68,7 @@ type: long
 format: duration
 
 
-<<<<<<< HEAD
-
-## in [_in_2]
-=======
 ## in [_in]
->>>>>>> 00dcc0c03 ([documentation][exported-fields] update autogeneration scripts to generate markdown  (#44793))
 
 The amount of incoming data
 
@@ -150,12 +86,7 @@ type: long
 format: bytes
 
 
-<<<<<<< HEAD
-
-## out [_out_2]
-=======
 ## out [_out]
->>>>>>> 00dcc0c03 ([documentation][exported-fields] update autogeneration scripts to generate markdown  (#44793))
 
 The amount of outgoing data
 
@@ -173,12 +104,7 @@ type: long
 format: bytes
 
 
-<<<<<<< HEAD
-
-## connections [_connections_4]
-=======
 ## connections [_connections]
->>>>>>> 00dcc0c03 ([documentation][exported-fields] update autogeneration scripts to generate markdown  (#44793))
 
 Contains nats connection related metrics
 
@@ -188,8 +114,6 @@ Contains nats connection related metrics
 type: integer
 
 
-<<<<<<< HEAD
-=======
 ## jetstream [_jetstream]
 
 Information pertaining to a NATS JetStream server
@@ -747,7 +671,6 @@ type: long
 
 type: long
 
->>>>>>> 00dcc0c03 ([documentation][exported-fields] update autogeneration scripts to generate markdown  (#44793))
 
 ## route [_route]
 
@@ -783,12 +706,7 @@ type: integer
 type: ip
 
 
-<<<<<<< HEAD
-
-## in [_in_3]
-=======
 ## in [_in]
->>>>>>> 00dcc0c03 ([documentation][exported-fields] update autogeneration scripts to generate markdown  (#44793))
 
 The amount of incoming data
 
@@ -806,12 +724,7 @@ type: long
 format: bytes
 
 
-<<<<<<< HEAD
-
-## out [_out_3]
-=======
 ## out [_out]
->>>>>>> 00dcc0c03 ([documentation][exported-fields] update autogeneration scripts to generate markdown  (#44793))
 
 The amount of outgoing data
 
@@ -840,13 +753,6 @@ Contains nats route related metrics
 type: integer
 
 
-<<<<<<< HEAD
-
-## stats [_stats_9]
-
-Contains nats var related metrics
-
-=======
 ## stats [_stats]
 
 Contains nats var related metrics
@@ -863,7 +769,6 @@ type: keyword
 type: keyword
 
 
->>>>>>> 00dcc0c03 ([documentation][exported-fields] update autogeneration scripts to generate markdown  (#44793))
 **`nats.stats.uptime`**
 :   The period the server is up (sec)
 
@@ -906,12 +811,7 @@ type: long
 type: integer
 
 
-<<<<<<< HEAD
-
-## in [_in_4]
-=======
 ## in [_in]
->>>>>>> 00dcc0c03 ([documentation][exported-fields] update autogeneration scripts to generate markdown  (#44793))
 
 The amount of incoming data
 
@@ -929,12 +829,7 @@ type: long
 format: bytes
 
 
-<<<<<<< HEAD
-
-## out [_out_4]
-=======
 ## out [_out]
->>>>>>> 00dcc0c03 ([documentation][exported-fields] update autogeneration scripts to generate markdown  (#44793))
 
 The amount of outgoing data
 
@@ -958,31 +853,16 @@ format: bytes
 type: long
 
 
-<<<<<<< HEAD
-
-## http [_http_5]
-
-The http metrics of NATS server
-
-
-=======
 ## http [_http]
 
 The http metrics of NATS server
 
->>>>>>> 00dcc0c03 ([documentation][exported-fields] update autogeneration scripts to generate markdown  (#44793))
 ## req_stats [_req_stats]
 
 The requests statistics
 
-<<<<<<< HEAD
-
 ## uri [_uri]
 
-=======
-## uri [_uri]
-
->>>>>>> 00dcc0c03 ([documentation][exported-fields] update autogeneration scripts to generate markdown  (#44793))
 The request distribution on monitoring URIS
 
 **`nats.stats.http.req_stats.uri.routez`**
@@ -1014,9 +894,6 @@ type: long
 
 type: long
 
-<<<<<<< HEAD
-
-=======
 
 **`nats.stats.http.req_stats.uri.jsz`**
 :   The number of hits on jsz monitoring uri
@@ -1052,7 +929,6 @@ type: long
 :   The number of hits on leafz monitoring uri
 
 type: long
->>>>>>> 00dcc0c03 ([documentation][exported-fields] update autogeneration scripts to generate markdown  (#44793))
 
 
 ## subscriptions [_subscriptions]
