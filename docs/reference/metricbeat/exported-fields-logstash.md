@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-logstash.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Logstash fields [exported-fields-logstash]
 
 Logstash module
@@ -141,13 +143,11 @@ alias to: logstash.node.state.pipeline.hash
 :   type: keyword
 
 
-
-## node [_node_6]
+## node [_node]
 
 node
 
-
-## node [_node_7]
+## node [_node]
 
 node_stats metrics.
 
@@ -211,8 +211,7 @@ type: alias
 alias to: service.version
 
 
-
-## jvm [_jvm_3]
+## jvm [_jvm]
 
 JVM Info
 
@@ -246,8 +245,7 @@ alias to: process.pid
 :   type: long
 
 
-
-## events [_events_2]
+## events [_events]
 
 Events stats
 

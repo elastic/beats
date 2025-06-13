@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-prometheus.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Prometheus fields [exported-fields-prometheus]
 
 Stats scraped from a Prometheus endpoint.
@@ -31,11 +33,9 @@ type: object
 type: object
 
 
-
-## query [_query_3]
+## query [_query]
 
 query metricset
-
 
 ## remote_write [_remote_write]
 

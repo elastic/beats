@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-tls_detailed.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Detailed TLS fields [exported-fields-tls_detailed]
 
 Detailed TLS-specific event fields.
@@ -92,10 +94,9 @@ type: keyword
 
 
 **`tls.detailed.client_hello.supported_compression_methods`**
-:   The list of compression methods the client supports. See [https://www.iana.org/assignments/comp-meth-ids/comp-meth-ids.xhtml](https://www.iana.org/assignments/comp-meth-ids/comp-meth-ids.xhtml)
+:   The list of compression methods the client supports. See https://www.iana.org/assignments/comp-meth-ids/comp-meth-ids.xhtml
 
 type: keyword
-
 
 
 ## extensions [_extensions]
@@ -142,7 +143,6 @@ type: keyword
 :   List of Elliptic Curve (EC) point formats. Indicates the set of point formats that the client can parse.
 
 type: keyword
-
 
 
 ## status_request [_status_request]
@@ -197,8 +197,7 @@ type: keyword
 type: keyword
 
 
-
-## extensions [_extensions_2]
+## extensions [_extensions]
 
 The hello extensions provided by the server.
 
@@ -226,8 +225,7 @@ type: keyword
 type: keyword
 
 
-
-## status_request [_status_request_2]
+## status_request [_status_request]
 
 Status request made to the server.
 

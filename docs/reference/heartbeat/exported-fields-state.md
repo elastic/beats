@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-state.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Monitor state fields [exported-fields-state]
 
 state related fields
-
 
 ## state [_state]
 

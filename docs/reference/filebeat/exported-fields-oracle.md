@@ -3,15 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-oracle.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Oracle fields [exported-fields-oracle]
 
 Oracle Module
 
-
 ## oracle [_oracle]
 
 Fields from Oracle logs.
-
 
 ## database_audit [_database_audit]
 
@@ -72,7 +72,7 @@ type: keyword
 
 
 **`oracle.database_audit.entryid`**
-:   Numeric ID for each audit trail entry in the session. The entry ID is an index of a session’s audit entries that starts at 1 and increases to the number of entries that are written.
+:   Numeric ID for each audit trail entry in the session. The entry ID is an index of a session's audit entries that starts at 1 and increases to the number of entries that are written.
 
 type: integer
 
@@ -90,7 +90,7 @@ type: keyword
 
 
 **`oracle.database_audit.terminal`**
-:   Identifier of the user’s terminal.
+:   Identifier of the user's terminal.
 
 type: text
 

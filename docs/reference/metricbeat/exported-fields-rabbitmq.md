@@ -3,12 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-rabbitmq.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # RabbitMQ fields [exported-fields-rabbitmq]
 
 RabbitMQ module
 
-
 ## rabbitmq [_rabbitmq]
+
+
 
 **`rabbitmq.vhost`**
 :   Virtual host name with non-ASCII characters escaped as in C.
@@ -16,8 +19,7 @@ RabbitMQ module
 type: keyword
 
 
-
-## connection [_connection_4]
+## connection [_connection]
 
 connection
 
@@ -143,7 +145,6 @@ type: long
 type: keyword
 
 
-
 ## exchange [_exchange]
 
 exchange
@@ -212,8 +213,7 @@ type: long
 type: float
 
 
-
-## node [_node_8]
+## node [_node]
 
 node
 
@@ -451,8 +451,7 @@ type: keyword
 type: long
 
 
-
-## queue [_queue_9]
+## queue [_queue]
 
 queue
 
@@ -497,7 +496,7 @@ alias to: rabbitmq.node.name
 
 
 **`rabbitmq.queue.state`**
-:   The state of the queue. Normally *running*, but may be "{syncing, MsgCount}" if the queue is synchronising. Queues which are located on cluster nodes that are currently down will be shown with a status of *down*.
+:   The state of the queue. Normally 'running', but may be "{syncing, MsgCount}" if the queue is synchronising. Queues which are located on cluster nodes that are currently down will be shown with a status of 'down'.
 
 type: keyword
 
@@ -584,7 +583,6 @@ type: long
 type: long
 
 
-
 ## shovel [_shovel]
 
 shovel
@@ -612,13 +610,13 @@ alias to: rabbitmq.node.name
 
 
 **`rabbitmq.shovel.state`**
-:   The state of the shovel. Normally *running*, but could be *starting* or *terminated*.
+:   The state of the shovel. Normally 'running', but could be 'starting' or 'terminated'.
 
 type: keyword
 
 
 **`rabbitmq.shovel.type`**
-:   The type of the shovel. Either *static* or *dynamic*.
+:   The type of the shovel. Either 'static' or 'dynamic'.
 
 type: keyword
 

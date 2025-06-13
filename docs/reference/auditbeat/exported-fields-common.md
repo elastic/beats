@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/exported-fields-common.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Common fields [exported-fields-common]
 
 Contains common fields available in all event types.
-
 
 ## file [_file]
 
@@ -40,8 +41,7 @@ type: keyword
 type: text
 
 
-
-## selinux [_selinux_2]
+## selinux [_selinux]
 
 The SELinux identity of the file.
 
@@ -52,30 +52,28 @@ type: keyword
 
 
 **`file.selinux.role`**
-:   The object’s SELinux role.
+:   The object's SELinux role.
 
 type: keyword
 
 
 **`file.selinux.domain`**
-:   The object’s SELinux domain or type.
+:   The object's SELinux domain or type.
 
 type: keyword
 
 
 **`file.selinux.level`**
-:   The object’s SELinux level.
+:   The object's SELinux level.
 
 type: keyword
 
 example: s0
 
 
-
 ## user [_user]
 
 User information.
-
 
 ## audit [_audit]
 
@@ -91,7 +89,6 @@ type: keyword
 :   Audit user name.
 
 type: keyword
-
 
 
 ## filesystem [_filesystem]
@@ -110,7 +107,6 @@ type: keyword
 type: keyword
 
 
-
 ## group [_group]
 
 Filesystem group information.
@@ -125,7 +121,6 @@ type: keyword
 :   Filesystem group name.
 
 type: keyword
-
 
 
 ## saved [_saved]
@@ -144,8 +139,7 @@ type: keyword
 type: keyword
 
 
-
-## group [_group_2]
+## group [_group]
 
 Saved group information.
 

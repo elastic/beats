@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-docker-processor.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Docker fields [exported-fields-docker-processor]
 
 Docker stats collected from Docker.

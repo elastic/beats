@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-common.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Common heartbeat monitor fields [exported-fields-common]
 
 None
-
 
 ## monitor [_monitor]
 
@@ -38,8 +39,7 @@ type: keyword
 :   type: text
 
 
-
-## duration [_duration_2]
+## duration [_duration]
 
 Total monitoring test duration
 
@@ -95,7 +95,6 @@ type: date_range
 :   The origin of this monitor configuration, usually either "ui", or "project"
 
 type: keyword
-
 
 
 ## project [_project]

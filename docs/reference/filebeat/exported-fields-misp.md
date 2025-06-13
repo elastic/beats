@@ -3,15 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-misp.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # MISP fields [exported-fields-misp]
 
 Module for handling threat information from MISP.
 
-
 ## misp [_misp]
 
 Fields from MISP threat information.
-
 
 ## attack_pattern [_attack_pattern]
 
@@ -39,7 +39,6 @@ type: text
 :   The kill chain phase(s) to which this attack pattern corresponds.
 
 type: keyword
-
 
 
 ## campaign [_campaign]
@@ -83,10 +82,9 @@ type: date
 
 
 **`misp.campaign.objective`**
-:   This field defines the Campaign’s primary goal, objective, desired outcome, or intended effect.
+:   This field defines the Campaign's primary goal, objective, desired outcome, or intended effect.
 
 type: keyword
-
 
 
 ## course_of_action [_course_of_action]
@@ -111,8 +109,7 @@ type: keyword
 type: text
 
 
-
-## identity [_identity_2]
+## identity [_identity]
 
 Identity can represent actual individuals, organizations, or groups, as well as classes of individuals, organizations, or groups.
 
@@ -148,6 +145,7 @@ type: keyword
 example: CEO
 
 
+
 **`misp.identity.sectors`**
 :   The list of sectors that this Identity belongs to. Open Vocab - industry-sector-ov
 
@@ -158,7 +156,6 @@ type: keyword
 :   The contact information (e-mail, phone number, etc.) for this Identity.
 
 type: text
-
 
 
 ## intrusion_set [_intrusion_set]
@@ -225,10 +222,9 @@ type: text
 type: text
 
 
-
 ## malware [_malware]
 
-Malware is a type of TTP that is also known as malicious code and malicious software, refers to a program that is inserted into a system, usually covertly, with the intent of compromising the confidentiality, integrity, or availability of the victim’s data, applications, or operating system (OS) or of otherwise annoying or disrupting the victim.
+Malware is a type of TTP that is also known as malicious code and malicious software, refers to a program that is inserted into a system, usually covertly, with the intent of compromising the confidentiality, integrity, or availability of the victim's data, applications, or operating system (OS) or of otherwise annoying or disrupting the victim.
 
 **`misp.malware.id`**
 :   Identifier of the Malware.
@@ -260,7 +256,6 @@ type: keyword
 type: keyword
 
 format: string
-
 
 
 ## note [_note]
@@ -297,7 +292,6 @@ type: keyword
 type: keyword
 
 
-
 ## threat_indicator [_threat_indicator]
 
 Fields provide support for specifying information about threat indicators, and related matching patterns.
@@ -308,6 +302,7 @@ Fields provide support for specifying information about threat indicators, and r
 type: keyword
 
 example: Domain Watchlist
+
 
 
 **`misp.threat_indicator.id`**
@@ -403,7 +398,8 @@ format: string
 
 type: keyword
 
-example: [destination:ip = *91.219.29.188/32*]
+example: [destination:ip = '91.219.29.188/32']
+
 
 
 **`misp.threat_indicator.attack_pattern_kql`**
@@ -412,6 +408,7 @@ example: [destination:ip = *91.219.29.188/32*]
 type: keyword
 
 example: destination.ip: "91.219.29.188/32"
+
 
 
 **`misp.threat_indicator.negate`**
@@ -436,7 +433,6 @@ type: keyword
 :   Name of the threat actor if known.
 
 type: keyword
-
 
 
 ## observed_data [_observed_data]
@@ -471,7 +467,6 @@ type: integer
 :   A dictionary of Cyber Observable Objects that describes the single fact that was observed.
 
 type: keyword
-
 
 
 ## report [_report]
@@ -512,7 +507,6 @@ type: date
 :   Specifies the STIX Objects that are referred to by this Report.
 
 type: text
-
 
 
 ## threat_actor [_threat_actor]
@@ -591,7 +585,6 @@ type: text
 type: text
 
 
-
 ## tool [_tool]
 
 Tools are legitimate software that can be used by threat actors to perform attacks.
@@ -632,8 +625,7 @@ type: keyword
 type: text
 
 
-
-## vulnerability [_vulnerability_2]
+## vulnerability [_vulnerability]
 
 A Vulnerability is a mistake in software that can be directly used by a hacker to gain access to a system or network.
 

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-kvm.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # KVM fields [exported-fields-kvm]
 
 kvm module
@@ -19,16 +21,15 @@ type: long
 type: keyword
 
 
-
 ## kvm [_kvm]
+
 
 
 ## dommemstat [_dommemstat]
 
 dommemstat
 
-
-## stat [_stat_2]
+## stat [_stat]
 
 Memory stat
 
@@ -56,8 +57,7 @@ type: long
 type: keyword
 
 
-
-## status [_status_5]
+## status [_status]
 
 status
 

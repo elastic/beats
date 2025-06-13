@@ -3,12 +3,13 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/exported-fields-security.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Security module fields [exported-fields-security]
 
 These are the event fields specific to the module for the Security log.
 
-
-## winlog.logon [_winlog_logon]
+## winlog.logon [_winlog.logon]
 
 Data related to a Windows logon.
 

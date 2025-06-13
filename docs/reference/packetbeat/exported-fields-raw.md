@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-raw.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Raw fields [exported-fields-raw]
 
 These fields contain the raw transaction data.

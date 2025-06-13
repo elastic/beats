@@ -3,15 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-apache.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Apache fields [exported-fields-apache]
 
 Apache HTTPD server metricsets collected from the Apache web server.
 
-
 ## apache [_apache]
 
 `apache` contains the metrics that were scraped from Apache.
-
 
 ## status [_status]
 
@@ -65,8 +65,7 @@ type: long
 type: long
 
 
-
-## uptime [_uptime_2]
+## uptime [_uptime]
 
 Uptime stats.
 
@@ -82,8 +81,7 @@ type: long
 type: long
 
 
-
-## cpu [_cpu_2]
+## cpu [_cpu]
 
 CPU stats.
 
@@ -117,7 +115,6 @@ type: scaled_float
 type: scaled_float
 
 
-
 ## connections [_connections]
 
 Connection stats.
@@ -146,8 +143,7 @@ type: long
 type: long
 
 
-
-## load [_load_2]
+## load [_load]
 
 Load averages.
 
@@ -167,7 +163,6 @@ type: scaled_float
 :   Load average for the last 15 minutes.
 
 type: scaled_float
-
 
 
 ## scoreboard [_scoreboard]

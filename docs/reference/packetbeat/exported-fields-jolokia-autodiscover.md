@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-jolokia-autodiscover.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Jolokia Discovery autodiscover provider fields [exported-fields-jolokia-autodiscover]
 
 Metadata from Jolokia Discovery added by the jolokia provider.
@@ -26,7 +28,7 @@ type: keyword
 
 
 **`jolokia.server.version`**
-:   The container’s version (if detected).
+:   The container's version (if detected).
 
 type: keyword
 

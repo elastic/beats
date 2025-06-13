@@ -3,17 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-iis.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # IIS fields [exported-fields-iis]
 
 Module for parsing IIS log files.
-
 
 ## iis [_iis]
 
 Fields from IIS log files.
 
-
-## access [_access_2]
+## access [_access]
 
 Contains fields for IIS access logs.
 
@@ -191,8 +191,7 @@ alias to: source.geo.city_name
 alias to: source.geo.region_iso_code
 
 
-
-## error [_error_3]
+## error [_error]
 
 Contains fields for IIS error logs.
 

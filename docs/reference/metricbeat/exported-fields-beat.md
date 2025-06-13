@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-beat.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Beat fields [exported-fields-beat]
 
 Beat module
@@ -691,6 +693,60 @@ alias to: beat.stats.apm_server.root.response.valid.ok
 alias to: beat.stats.apm_server.root.unset
 
 
+**`beats_stats.apm-server.sampling.tail.dynamic_service_groups`**
+:   type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.dynamic_service_groups
+
+
+**`beats_stats.apm-server.sampling.tail.events.dropped`**
+:   type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.dropped
+
+
+**`beats_stats.apm-server.sampling.tail.events.failed_writes`**
+:   type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.failed_writes
+
+
+**`beats_stats.apm-server.sampling.tail.events.head_unsampled`**
+:   type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.head_unsampled
+
+
+**`beats_stats.apm-server.sampling.tail.events.processed`**
+:   type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.processed
+
+
+**`beats_stats.apm-server.sampling.tail.events.sampled`**
+:   type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.sampled
+
+
+**`beats_stats.apm-server.sampling.tail.events.stored`**
+:   type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.stored
+
+
+**`beats_stats.apm-server.sampling.tail.storage.lsm_size`**
+:   type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.storage.lsm_size
+
+
+**`beats_stats.apm-server.sampling.tail.storage.value_log_size`**
+:   type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.storage.value_log_size
+
+
 **`beats_stats.apm-server.sampling.transactions_dropped`**
 :   type: alias
 
@@ -1363,8 +1419,9 @@ alias to: beat.state.service.name
 alias to: beat.state.service.version
 
 
-
 ## beat [_beat]
+
+
 
 **`beat.id`**
 :   Beat ID.
@@ -1380,7 +1437,6 @@ type: keyword
 
 **`beat.elasticsearch.cluster.id`**
 :   type: keyword
-
 
 
 ## state [_state]
@@ -1479,8 +1535,7 @@ type: keyword
 type: keyword
 
 
-
-## stats [_stats_2]
+## stats [_stats]
 
 Beat stats
 
@@ -1940,6 +1995,42 @@ Beat stats
 :   type: long
 
 
+**`beat.stats.apm_server.sampling.tail.dynamic_service_groups`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.events.dropped`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.events.failed_writes`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.events.head_unsampled`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.events.processed`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.events.sampled`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.events.stored`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.storage.lsm_size`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.storage.value_log_size`**
+:   type: long
+
+
 **`beat.stats.apm_server.sampling.transactions_dropped`**
 :   type: long
 
@@ -2220,7 +2311,6 @@ type: long
 type: long
 
 
-
 ## libbeat [_libbeat]
 
 Fields common to all Beats
@@ -2230,11 +2320,69 @@ Fields common to all Beats
 
 
 **`beat.stats.libbeat.pipeline.queue.acked`**
-:   type: long
+:   Number of acknowledged events
+
+type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.added.bytes`**
+:   Number of bytes added to the queue
+
+type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.added.events`**
+:   Number of events added to the queue
+
+type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.consumed.bytes`**
+:   Number of bytes consumed from the queue
+
+type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.consumed.events`**
+:   Number of events consumed from the queue
+
+type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.filled.bytes`**
+:   Number of bytes filled in the queue
+
+type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.filled.events`**
+:   Number of events filled in the queue
+
+type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.filled.pct`**
+:   Percentage of the queue filled
+
+type: float
 
 
 **`beat.stats.libbeat.pipeline.queue.max_events`**
-:   type: long
+:   Maximum number of events allowed in the queue
+
+type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.removed.bytes`**
+:   Number of bytes removed from the queue
+
+type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.removed.events`**
+:   Number of events removed from the queue
+
+type: long
 
 
 **`beat.stats.libbeat.pipeline.events.active`**
@@ -2281,7 +2429,6 @@ Fields common to all Beats
 :   type: long
 
 
-
 ## output [_output]
 
 Output stats
@@ -2290,7 +2437,6 @@ Output stats
 :   Type of output
 
 type: keyword
-
 
 
 ## events [_events]
@@ -2345,8 +2491,7 @@ type: long
 type: long
 
 
-
-## read [_read_3]
+## read [_read]
 
 Read stats
 
@@ -2362,8 +2507,7 @@ type: long
 type: long
 
 
-
-## write [_write_3]
+## write [_write]
 
 Write stats
 
@@ -2377,6 +2521,26 @@ type: long
 :   Number of write errors
 
 type: long
+
+
+**`beat.stats.libbeat.output.write.latency.histogram.count`**
+:   type: long
+
+
+**`beat.stats.libbeat.output.write.latency.histogram.max`**
+:   type: float
+
+
+**`beat.stats.libbeat.output.write.latency.histogram.median`**
+:   type: long
+
+
+**`beat.stats.libbeat.output.write.latency.histogram.p95`**
+:   type: float
+
+
+**`beat.stats.libbeat.output.write.latency.histogram.p99`**
+:   type: float
 
 
 **`beat.stats.output.elasticsearch.bulk_requests.available`**

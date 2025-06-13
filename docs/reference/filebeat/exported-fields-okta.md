@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-okta.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Okta fields [exported-fields-okta]
 
 Module for handling system logs from Okta.
-
 
 ## okta [_okta]
 
@@ -42,7 +43,6 @@ type: keyword
 type: keyword
 
 
-
 ## actor [_actor]
 
 Fields that let you store information of the actor for the LogEvent.
@@ -71,8 +71,7 @@ type: keyword
 type: keyword
 
 
-
-## client [_client_4]
+## client [_client]
 
 Fields that let you store information about the client of the actor.
 
@@ -82,8 +81,7 @@ Fields that let you store information about the client of the actor.
 type: ip
 
 
-
-## user_agent [_user_agent_2]
+## user_agent [_user_agent]
 
 Fields about the user agent information of the client.
 
@@ -123,7 +121,6 @@ type: keyword
 type: keyword
 
 
-
 ## outcome [_outcome]
 
 Fields that let you store information about the outcome.
@@ -146,7 +143,6 @@ type: keyword
 type: flattened
 
 
-
 ## transaction [_transaction]
 
 Fields that let you store information about related transaction.
@@ -163,11 +159,9 @@ type: keyword
 type: keyword
 
 
-
 ## debug_context [_debug_context]
 
 Fields that let you store information about the debug context.
-
 
 ## debug_data [_debug_data]
 
@@ -231,7 +225,6 @@ type: keyword
 :   The complete debug_data object.
 
 type: flattened
-
 
 
 ## suspicious_activity [_suspicious_activity]
@@ -310,7 +303,6 @@ type: keyword
 type: date
 
 
-
 ## authentication_context [_authentication_context]
 
 Fields that let you store information about authentication context.
@@ -357,13 +349,11 @@ type: keyword
 type: keyword
 
 
-
 ## security_context [_security_context]
 
 Fields that let you store information about security context.
 
-
-## as [_as_2]
+## as [_as]
 
 The autonomous system.
 
@@ -373,8 +363,7 @@ The autonomous system.
 type: integer
 
 
-
-## organization [_organization_2]
+## organization [_organization]
 
 The organization that owns the AS number.
 
@@ -402,8 +391,7 @@ type: keyword
 type: boolean
 
 
-
-## request [_request_3]
+## request [_request]
 
 Fields that let you store information about the request, in the form of list of ip_chain.
 

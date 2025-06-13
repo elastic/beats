@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/exported-fields.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+                 
 # Exported fields [exported-fields]
 
 This document describes the fields that are exported by Winlogbeat. They are grouped in the following categories:
@@ -20,4 +22,3 @@ This document describes the fields that are exported by Winlogbeat. They are gro
 * [*Security module fields*](/reference/winlogbeat/exported-fields-security.md)
 * [*Sysmon module fields*](/reference/winlogbeat/exported-fields-sysmon.md)
 * [*Winlogbeat fields*](/reference/winlogbeat/exported-fields-winlog.md)
-

@@ -3,22 +3,21 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-linux.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Linux fields [exported-fields-linux]
 
 linux module
-
 
 ## linux [_linux]
 
 linux system metrics
 
-
 ## conntrack [_conntrack]
 
 conntrack
 
-
-## summary [_summary_5]
+## summary [_summary]
 
 summary of nf_conntrack statistics, summed across CPU cores
 
@@ -68,7 +67,6 @@ type: long
 :   table lookups which had to be restarted due to table resizes
 
 type: long
-
 
 
 ## iostat [_iostat]
@@ -157,13 +155,11 @@ type: float
 type: float
 
 
-
 ## ksm [_ksm]
 
 ksm
 
-
-## stats [_stats_6]
+## stats [_stats]
 
 KSM statistics
 
@@ -203,11 +199,9 @@ type: long
 type: long
 
 
-
-## memory [_memory_8]
+## memory [_memory]
 
 Linux memory data
-
 
 ## page_stats [_page_stats]
 
@@ -267,7 +261,6 @@ format: percent
 type: scaled_float
 
 format: percent
-
 
 
 ## hugepages [_hugepages]
@@ -330,8 +323,7 @@ type: long
 format: bytes
 
 
-
-## swap [_swap_2]
+## swap [_swap]
 
 This group contains statistics related to the swap memory usage on the system.
 
@@ -391,18 +383,15 @@ type: long
 type: long
 
 
-
 ## pageinfo [_pageinfo]
 
 pageinfo
-
 
 ## buddy_info [_buddy_info]
 
 Data from /proc/buddyinfo grouping used pages by order
 
-
-## DMA [_dma]
+## DMA [_DMA]
 
 DMA page Data
 
@@ -476,7 +465,6 @@ type: long
 :   Raw allocation info from /proc/pagetypeinfo
 
 type: object
-
 
 
 ## pressure [_pressure]
@@ -631,7 +619,6 @@ format: percent
 :   The total absolute stall time (in microseconds) in which in which all non-idle tasks were stalled on io.
 
 type: long
-
 
 
 ## rapl [_rapl]

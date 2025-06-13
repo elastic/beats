@@ -3,15 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-aws.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # AWS fields [exported-fields-aws]
 
 Module for handling logs from AWS.
 
-
 ## aws [_aws]
 
 Fields from AWS logs.
-
 
 ## cloudtrail [_cloudtrail]
 
@@ -21,7 +21,6 @@ Fields for AWS CloudTrail logs.
 :   The CloudTrail version of the log event format.
 
 type: keyword
-
 
 
 ## user_identity [_user_identity]
@@ -46,7 +45,6 @@ type: keyword
 type: keyword
 
 
-
 ## session_context [_session_context]
 
 If the request was made with temporary security credentials, an element that provides information about the session that was created for those credentials
@@ -61,7 +59,6 @@ type: keyword
 :   The date and time when the temporary security credentials were issued.
 
 type: date
-
 
 
 ## session_issuer [_session_issuer]
@@ -170,7 +167,6 @@ type: keyword
 type: keyword
 
 
-
 ## resources [_resources]
 
 A list of resources accessed in the event.
@@ -222,20 +218,14 @@ type: keyword
 
 
 **`aws.cloudtrail.event_category`**
-:   Shows the event category that is used in LookupEvents calls.
-
-* For management events, the value is management.
-* For data events, the value is data.
-* For Insights events, the value is insight.
+:   Shows the event category that is used in LookupEvents calls.  - For management events, the value is management.  - For data events, the value is data.  - For Insights events, the value is insight.
 
 type: keyword
-
 
 
 ## console_login [_console_login]
 
 Fields specific to ConsoleLogin events
-
 
 ## additional_eventdata [_additional_eventdata]
 
@@ -259,10 +249,9 @@ type: keyword
 type: boolean
 
 
-
 ## flattened [_flattened]
 
-ES flattened datatype for objects where the subfields aren’t known in advance.
+ES flattened datatype for objects where the subfields aren't known in advance.
 
 **`aws.cloudtrail.flattened.additional_eventdata`**
 :   Additional data about the event that was not part of the request or response.
@@ -286,7 +275,6 @@ type: flattened
 :   Identifies the service event, including what triggered the event and the result.
 
 type: flattened
-
 
 
 ## digest [_digest]
@@ -365,7 +353,6 @@ type: keyword
 type: flattened
 
 
-
 ## cloudwatch [_cloudwatch]
 
 Fields for AWS CloudWatch logs.
@@ -376,7 +363,6 @@ Fields for AWS CloudWatch logs.
 type: text
 
 
-
 ## ec2 [_ec2]
 
 Fields for AWS EC2 logs in CloudWatch.
@@ -385,7 +371,6 @@ Fields for AWS EC2 logs in CloudWatch.
 :   The internet address of the requester.
 
 type: keyword
-
 
 
 ## elb [_elb]
@@ -519,7 +504,7 @@ type: keyword
 
 
 **`aws.elb.action_executed`**
-:   The action executed when processing the request (forward, fixed-response, authenticate…). It can contain several values.
+:   The action executed when processing the request (forward, fixed-response, authenticate...). It can contain several values.
 
 type: keyword
 
@@ -558,7 +543,6 @@ type: keyword
 :   The classification reason code.
 
 type: keyword
-
 
 
 ## s3access [_s3access]
@@ -638,7 +622,7 @@ type: long
 
 
 **`aws.s3access.total_time`**
-:   The number of milliseconds the request was in flight from the server’s perspective.
+:   The number of milliseconds the request was in flight from the server's perspective.
 
 type: long
 
@@ -703,7 +687,6 @@ type: keyword
 type: keyword
 
 
-
 ## vpcflow [_vpcflow]
 
 Fields for AWS VPC flow logs.
@@ -739,7 +722,7 @@ type: keyword
 
 
 **`aws.vpcflow.instance_id`**
-:   The ID of the instance that’s associated with network interface for which the traffic is recorded, if the instance is owned by you.
+:   The ID of the instance that's associated with network interface for which the traffic is recorded, if the instance is owned by you.
 
 type: keyword
 
@@ -775,7 +758,7 @@ type: keyword
 
 
 **`aws.vpcflow.tcp_flags_array`**
-:   List of TCP flags: *fin, syn, rst, psh, ack, urg*
+:   List of TCP flags: 'fin, syn, rst, psh, ack, urg'
 
 type: keyword
 

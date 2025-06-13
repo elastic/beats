@@ -3,22 +3,21 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-mysql.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # MySQL fields [exported-fields-mysql]
 
 MySQL server status metrics collected from MySQL.
-
 
 ## mysql [_mysql]
 
 `mysql` contains the metrics that were obtained from MySQL query.
 
-
 ## galera_status [_galera_status]
 
 `galera_status` contains the metrics that were obtained by the status SQL query on Galera.
 
-
-## apply [_apply_2]
+## apply [_apply]
 
 Apply status fields.
 
@@ -29,7 +28,7 @@ type: double
 
 
 **`mysql.galera_status.apply.oool`**
-:   How often write-set was so slow to apply that write-set with higher seqno’s were applied earlier. Values closer to 0 refer to a greater gap between slow and fast write-sets.
+:   How often write-set was so slow to apply that write-set with higher seqno's were applied earlier. Values closer to 0 refer to a greater gap between slow and fast write-sets.
 
 type: double
 
@@ -38,7 +37,6 @@ type: double
 :   Average distance between highest and lowest concurrently applied seqno.
 
 type: double
-
 
 
 ## cert [_cert]
@@ -63,8 +61,7 @@ type: long
 type: double
 
 
-
-## cluster [_cluster_2]
+## cluster [_cluster]
 
 Cluster status fields.
 
@@ -86,8 +83,7 @@ type: long
 type: keyword
 
 
-
-## commit [_commit_3]
+## commit [_commit]
 
 Commit status fields.
 
@@ -109,13 +105,12 @@ type: long
 type: keyword
 
 
-
 ## evs [_evs]
 
 Evs Fields.
 
 **`mysql.galera_status.evs.evict`**
-:   Lists the UUID’s of all nodes evicted from the cluster. Evicted nodes cannot rejoin the cluster until you restart their mysqld processes.
+:   Lists the UUID's of all nodes evicted from the cluster. Evicted nodes cannot rejoin the cluster until you restart their mysqld processes.
 
 type: keyword
 
@@ -124,7 +119,6 @@ type: keyword
 :   Shows the internal state of the EVS Protocol.
 
 type: keyword
-
 
 
 ## flow_ctl [_flow_ctl]
@@ -161,7 +155,6 @@ type: long
 type: long
 
 
-
 ## local [_local]
 
 Node specific Cluster status fields.
@@ -182,7 +175,6 @@ type: long
 :   Total number of local transactions committed.
 
 type: long
-
 
 
 ## recv [_recv]
@@ -217,7 +209,6 @@ type: long
 :   Total number of transaction replays due to asymmetric lock granularity.
 
 type: long
-
 
 
 ## send [_send]
@@ -260,7 +251,6 @@ type: keyword
 type: keyword
 
 
-
 ## received [_received]
 
 Write-Set receive status fields.
@@ -275,7 +265,6 @@ type: long
 :   Total size of write-sets received from other nodes.
 
 type: long
-
 
 
 ## repl [_repl]
@@ -318,11 +307,9 @@ type: long
 type: long
 
 
-
-## performance [_performance_4]
+## performance [_performance]
 
 `performance` contains metrics related to the performance of a MySQL instance
-
 
 ## events_statements [_events_statements]
 
@@ -370,7 +357,6 @@ type: long
 type: keyword
 
 
-
 ## table_io_waits [_table_io_waits]
 
 Records table I/O waits by index
@@ -399,16 +385,13 @@ type: keyword
 type: long
 
 
-
-## query [_query_2]
+## query [_query]
 
 `query` metricset fetches custom queries from the user to a MySQL instance.
 
-
-## status [_status_7]
+## status [_status]
 
 `status` contains the metrics that were obtained by the status SQL query.
-
 
 ## aborted [_aborted]
 
@@ -426,11 +409,13 @@ type: long
 type: long
 
 
+## connection [_connection]
 
-## connection [_connection_2]
 
 
 ## errors [_errors]
+
+
 
 **`mysql.status.connection.errors.peer_address`**
 :   The number of errors that occurred while searching for connecting client IP addresses.
@@ -468,11 +453,11 @@ type: long
 type: long
 
 
+## cache [_cache]
 
-## cache [_cache_3]
 
 
-## ssl [_ssl_8]
+## ssl [_ssl]
 
 SSL session cache hits and misses.
 
@@ -494,11 +479,13 @@ type: long
 type: long
 
 
-
 ## table [_table]
 
 
+
 ## open_cache [_open_cache]
+
+
 
 **`mysql.status.cache.table.open_cache.hits`**
 :   The number of hits for open tables cache lookups.
@@ -518,8 +505,9 @@ type: long
 type: long
 
 
-
 ## binlog [_binlog]
+
+
 
 **`mysql.status.binlog.cache.disk_use`**
 :   type: long
@@ -527,7 +515,6 @@ type: long
 
 **`mysql.status.binlog.cache.use`**
 :   type: long
-
 
 
 ## bytes [_bytes]
@@ -550,8 +537,7 @@ type: long
 format: bytes
 
 
-
-## threads [_threads_2]
+## threads [_threads]
 
 Threads stats.
 
@@ -583,8 +569,9 @@ type: long
 :   type: long
 
 
-
 ## created [_created]
+
+
 
 **`mysql.status.created.tmp.disk_tables`**
 :   type: long
@@ -598,8 +585,9 @@ type: long
 :   type: long
 
 
-
 ## delayed [_delayed]
+
+
 
 **`mysql.status.delayed.errors`**
 :   type: long
@@ -621,8 +609,9 @@ type: long
 :   type: long
 
 
+## open [_open]
 
-## open [_open_2]
+
 
 **`mysql.status.open.files`**
 :   type: long
@@ -640,8 +629,9 @@ type: long
 :   type: long
 
 
-
 ## command [_command]
+
+
 
 **`mysql.status.command.delete`**
 :   The number of DELETE queries since startup.
@@ -679,8 +669,9 @@ type: long
 type: long
 
 
-
 ## handler [_handler]
+
+
 
 **`mysql.status.handler.commit`**
 :   The number of internal COMMIT statements.
@@ -701,7 +692,7 @@ type: long
 
 
 **`mysql.status.handler.mrr_init`**
-:   The number of times the server uses a storage engine’s own Multi-Range Read implementation for table access.
+:   The number of times the server uses a storage engine's own Multi-Range Read implementation for table access.
 
 type: long
 
@@ -712,8 +703,9 @@ type: long
 type: long
 
 
+## read [_read]
 
-## read [_read_6]
+
 
 **`mysql.status.handler.read.first`**
 :   The number of times the first entry in an index was read.
@@ -787,11 +779,13 @@ type: long
 type: long
 
 
-
 ## innodb [_innodb]
 
 
+
 ## rows [_rows]
+
+
 
 **`mysql.status.innodb.rows.reads`**
 :   The number of rows reads into InnoDB tables.
@@ -817,8 +811,9 @@ type: long
 type: long
 
 
-
 ## buffer_pool [_buffer_pool]
+
+
 
 **`mysql.status.innodb.buffer_pool.dump_status`**
 :   The progress of an operation to record the pages held in the InnoDB buffer pool, triggered by the setting of innodb_buffer_pool_dump_at_shutdown or innodb_buffer_pool_dump_now.
@@ -832,8 +827,9 @@ type: long
 type: long
 
 
+## bytes [_bytes]
 
-## bytes [_bytes_2]
+
 
 **`mysql.status.innodb.buffer_pool.bytes.data`**
 :   The total number of bytes in the InnoDB buffer pool containing data.
@@ -847,8 +843,9 @@ type: long
 type: long
 
 
-
 ## pages [_pages]
+
+
 
 **`mysql.status.innodb.buffer_pool.pages.data`**
 :   The number of pages in the InnoDB buffer pool containing data.
@@ -892,8 +889,9 @@ type: long
 type: long
 
 
+## read [_read]
 
-## read [_read_7]
+
 
 **`mysql.status.innodb.buffer_pool.read.ahead`**
 :   The number of pages read into the InnoDB buffer pool by the read-ahead background thread.
@@ -919,8 +917,9 @@ type: long
 type: long
 
 
+## pool [_pool]
 
-## pool [_pool_2]
+
 
 **`mysql.status.innodb.buffer_pool.pool.reads`**
 :   The number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from disk.

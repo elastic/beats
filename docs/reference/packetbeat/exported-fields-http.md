@@ -3,17 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-http.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # HTTP fields [exported-fields-http]
 
 HTTP-specific event fields.
 
-
-## http [_http_2]
+## http [_http]
 
 Information about the HTTP request and response.
 
-
-## request [_request_2]
+## request [_request]
 
 HTTP request
 
@@ -29,8 +29,7 @@ type: object
 alias to: url.query
 
 
-
-## response [_response_2]
+## response [_response]
 
 HTTP response
 

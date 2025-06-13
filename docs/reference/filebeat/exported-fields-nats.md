@@ -3,22 +3,21 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-nats.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # NATS fields [exported-fields-nats]
 
 Module for parsing NATS log files.
-
 
 ## nats [_nats]
 
 Fields from NATS logs.
 
-
-## log [_log_10]
+## log [_log]
 
 Nats log files
 
-
-## client [_client_3]
+## client [_client]
 
 Fields from NATS logs client.
 
@@ -26,7 +25,6 @@ Fields from NATS logs client.
 :   The id of the client
 
 type: integer
-
 
 
 ## msg [_msg]

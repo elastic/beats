@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-cassandra.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Cassandra fields [exported-fields-cassandra]
 
 Cassandra v4/3 specific event fields.
@@ -11,7 +13,6 @@ Cassandra v4/3 specific event fields.
 :   type: alias
 
 alias to: cassandra.no_request
-
 
 
 ## cassandra [_cassandra]
@@ -24,13 +25,11 @@ Information about the Cassandra request and response.
 type: boolean
 
 
-
 ## request [_request]
 
 Cassandra request.
 
-
-## headers [_headers_3]
+## headers [_headers]
 
 Cassandra request headers.
 
@@ -70,15 +69,13 @@ type: long
 type: keyword
 
 
-
 ## response [_response]
 
 Cassandra response.
 
+## headers [_headers]
 
-## headers [_headers_4]
-
-Cassandra response headers, the structure is as same as request’s header.
+Cassandra response headers, the structure is as same as request's header.
 
 **`cassandra.response.headers.version`**
 :   The version of the protocol.
@@ -110,7 +107,6 @@ type: keyword
 type: long
 
 
-
 ## result [_result]
 
 Details about the returned result.
@@ -121,7 +117,6 @@ Details about the returned result.
 type: keyword
 
 
-
 ## rows [_rows]
 
 Details about the rows.
@@ -130,7 +125,6 @@ Details about the rows.
 :   Representing the number of rows present in this result.
 
 type: long
-
 
 
 ## meta [_meta]
@@ -179,7 +173,6 @@ type: keyword
 type: keyword
 
 
-
 ## schema_change [_schema_change]
 
 The result to a schema_change message.
@@ -226,7 +219,6 @@ type: keyword
 type: keyword
 
 
-
 ## prepared [_prepared]
 
 The result to a PREPARE message.
@@ -235,7 +227,6 @@ The result to a PREPARE message.
 :   Representing the prepared query ID.
 
 type: keyword
-
 
 
 ## req_meta [_req_meta]
@@ -276,7 +267,6 @@ type: long
 :   The paging_state is a bytes value that should be used in QUERY/EXECUTE to continue paging and retrieve the remainder of the result for this query.
 
 type: keyword
-
 
 
 ## resp_meta [_resp_meta]
@@ -325,7 +315,6 @@ type: keyword
 type: object
 
 
-
 ## authentication [_authentication]
 
 Indicates that the server requires authentication, and which authentication mechanism to use.
@@ -340,7 +329,6 @@ type: keyword
 :   The text of the warnings, only occur when Warning flag was set.
 
 type: keyword
-
 
 
 ## event [_event]
@@ -371,8 +359,7 @@ type: keyword
 type: long
 
 
-
-## schema_change [_schema_change_2]
+## schema_change [_schema_change]
 
 The events details related to schema change.
 
@@ -418,7 +405,6 @@ type: keyword
 type: keyword
 
 
-
 ## error [_error]
 
 Indicates an error processing a request. The body of the message will be an  error code followed by a error message. Then, depending on the exception, more content may follow.
@@ -439,7 +425,6 @@ type: keyword
 :   The error type of the Cassandra response.
 
 type: keyword
-
 
 
 ## details [_details]

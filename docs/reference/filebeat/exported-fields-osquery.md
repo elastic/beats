@@ -3,12 +3,14 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-osquery.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Osquery fields [exported-fields-osquery]
 
 Fields exported by the `osquery` module
 
-
 ## osquery [_osquery]
+
 
 
 ## result [_result]

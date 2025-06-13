@@ -3,12 +3,13 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-o365.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Office 365 fields [exported-fields-o365]
 
 Module for handling logs from Office 365.
 
-
-## o365.audit [_o365_audit]
+## o365.audit [_o365.audit]
 
 Fields from Office 365 Management API audit logs.
 

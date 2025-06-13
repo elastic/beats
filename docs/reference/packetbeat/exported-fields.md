@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+                 
 # Exported fields [exported-fields]
 
 This document describes the fields that are exported by Packetbeat. They are grouped in the following categories:
@@ -35,4 +37,3 @@ This document describes the fields that are exported by Packetbeat. They are gro
 * [*Detailed TLS fields*](/reference/packetbeat/exported-fields-tls_detailed.md)
 * [*Transaction Event fields*](/reference/packetbeat/exported-fields-trans_event.md)
 * [*Measurements (Transactions) fields*](/reference/packetbeat/exported-fields-trans_measurements.md)
-

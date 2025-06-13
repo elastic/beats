@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-winlog.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Windows ETW fields [exported-fields-winlog]
 
 Fields from the ETW input (Event Tracing for Windows).
-
 
 ## winlog [_winlog]
 
@@ -45,7 +46,7 @@ required: False
 
 
 **`winlog.keywords`**
-:   The keywords are used to indicate an event’s membership in a set of event categories.
+:   The keywords are used to indicate an event's membership in a set of event categories.
 
 type: keyword
 

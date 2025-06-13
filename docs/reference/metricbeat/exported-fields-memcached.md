@@ -3,15 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-memcached.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Memcached fields [exported-fields-memcached]
 
 Memcached module
 
-
 ## memcached [_memcached]
 
 
-## stats [_stats_7]
+
+## stats [_stats]
 
 stats
 
@@ -82,7 +84,7 @@ type: long
 
 
 **`memcached.stats.items.current`**
-:   Number of items currently in this server’s cache.
+:   Number of items currently in this server's cache.
 
 type: long
 
@@ -94,7 +96,7 @@ type: long
 
 
 **`memcached.stats.evictions`**
-:   Number of objects removed from the cache to free up memory for new items because Memcached reached it’s maximum memory setting (limit_maxbytes).
+:   Number of objects removed from the cache to free up memory for new items because Memcached reached it's maximum memory setting (limit_maxbytes).
 
 type: long
 
@@ -109,11 +111,5 @@ type: long
 :   Number of bytes this server is allowed to use for storage.
 
 type: long
-
-
-$$$exported-fields-meraki$$$
-
-**`meraki.device.serial`**
-:   type: keyword
 
 

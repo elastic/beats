@@ -3,15 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-mssql.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # MSSQL fields [exported-fields-mssql]
 
 MS SQL module
 
-
 ## mssql [_mssql]
 
 The root field containing all MSSQL fields
-
 
 ## database [_database]
 
@@ -29,8 +29,7 @@ type: long
 type: keyword
 
 
-
-## performance [_performance_3]
+## performance [_performance]
 
 performance metricset fetches information about the Performance Counters
 
@@ -100,7 +99,6 @@ type: long
 type: long
 
 
-
 ## cache_hit [_cache_hit]
 
 Indicates the percentage of pages found in the buffer cache without having to read from disk.
@@ -109,7 +107,6 @@ Indicates the percentage of pages found in the buffer cache without having to re
 :   The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses. After a long period of time, the ratio moves very little. Because reading from the cache is much less expensive than reading from disk, you want this ratio to be high
 
 type: double
-
 
 
 ## page_life_expectancy [_page_life_expectancy]
@@ -140,16 +137,13 @@ type: long
 type: long
 
 
-
-## transaction_log [_transaction_log_2]
+## transaction_log [_transaction_log]
 
 transaction_log metricset will fetch information about the operation and transaction log of each database from a MSSQL instance
-
 
 ## space_usage [_space_usage]
 
 Space usage information for the transaction log
-
 
 ## since_last_backup [_since_last_backup]
 
@@ -161,8 +155,7 @@ The amount of space used since the last log backup
 type: long
 
 
-
-## total [_total_2]
+## total [_total]
 
 The size of the log
 
@@ -170,7 +163,6 @@ The size of the log
 :   The size of the log in bytes
 
 type: long
-
 
 
 ## used [_used]
@@ -189,11 +181,9 @@ type: long
 type: float
 
 
-
-## stats [_stats_8]
+## stats [_stats]
 
 Returns summary level attributes and information on transaction log files of databases. Use this information for monitoring and diagnostics of transaction log health.
-
 
 ## active_size [_active_size]
 
@@ -211,7 +201,6 @@ type: long
 type: date
 
 
-
 ## recovery_size [_recovery_size]
 
 Log size since log recovery log sequence number (LSN).
@@ -222,7 +211,6 @@ Log size since log recovery log sequence number (LSN).
 type: long
 
 
-
 ## since_last_checkpoint [_since_last_checkpoint]
 
 Log size since last checkpoint log sequence number (LSN).
@@ -231,7 +219,6 @@ Log size since last checkpoint log sequence number (LSN).
 :   Log size in bytes since last checkpoint log sequence number (LSN).
 
 type: long
-
 
 
 ## total_size [_total_size]

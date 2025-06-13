@@ -3,17 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-syncgateway.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # SyncGateway fields [exported-fields-syncgateway]
 
 SyncGateway metrics
-
 
 ## syncgateway [_syncgateway]
 
 `syncgateway` contains the information and statistics from SyncGateway.
 
-
-## syncgateway [_syncgateway_2]
+## syncgateway [_syncgateway]
 
 Couchbase Sync Gateway metrics.
 
@@ -23,8 +23,7 @@ Couchbase Sync Gateway metrics.
 type: keyword
 
 
-
-## metrics [_metrics_10]
+## metrics [_metrics]
 
 Metrics of all databases contained in the config file of the SyncGateway instance.
 
@@ -300,7 +299,6 @@ type: long
 :   type: double
 
 
-
 ## memstats [_memstats]
 
 Dumps a large amount of information about the memory heap and garbage collector
@@ -421,8 +419,7 @@ Dumps a large amount of information about the memory heap and garbage collector
 :   type: double
 
 
-
-## memory [_memory_11]
+## memory [_memory]
 
 SyncGateway memory metrics. It dumps a large amount of information about the memory heap and garbage collector
 
@@ -542,13 +539,11 @@ SyncGateway memory metrics. It dumps a large amount of information about the mem
 :   type: double
 
 
-
-## replication [_replication_3]
+## replication [_replication]
 
 SyncGateway per replication metrics.
 
-
-## metrics [_metrics_11]
+## metrics [_metrics]
 
 Metrics related with data replication.
 
@@ -586,7 +581,6 @@ type: long
 :   ID of the replica.
 
 type: keyword
-
 
 
 ## resources [_resources]

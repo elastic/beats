@@ -3,17 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-system.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # System fields [exported-fields-system]
 
 Module for parsing system log files.
-
 
 ## system [_system]
 
 Fields from the system log files.
 
-
-## auth [_auth_2]
+## auth [_auth]
 
 Fields from the Linux authorization logs.
 
@@ -121,7 +121,6 @@ alias to: source.geo.city_name
 alias to: source.geo.region_iso_code
 
 
-
 ## sudo [_sudo]
 
 Fields specific to events created by the `sudo` command.
@@ -148,7 +147,6 @@ example: root
 
 **`system.auth.sudo.command`**
 :   The command executed via sudo.
-
 
 
 ## useradd [_useradd]
@@ -181,7 +179,6 @@ alias to: user.id
 alias to: group.id
 
 
-
 ## groupadd [_groupadd]
 
 Fields specific to events created by the `groupadd` command.
@@ -198,8 +195,7 @@ alias to: group.name
 alias to: group.id
 
 
-
-## syslog [_syslog_3]
+## syslog [_syslog]
 
 Contains fields from the syslog system logs.
 

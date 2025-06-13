@@ -3,17 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-crowdstrike.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Crowdstrike fields [exported-fields-crowdstrike]
 
 Module for collecting Crowdstrike events.
-
 
 ## crowdstrike [_crowdstrike]
 
 Fields for Crowdstrike Falcon event and alert data.
 
-
-## metadata [_metadata_2]
+## metadata [_metadata]
 
 Meta data fields for each event that include type and timestamp.
 
@@ -45,7 +45,6 @@ type: keyword
 :   Schema version
 
 type: keyword
-
 
 
 ## event [_event]

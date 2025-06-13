@@ -3,15 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-postgresql.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # PostgreSQL fields [exported-fields-postgresql]
 
 Metrics collected from PostgreSQL servers.
 
-
 ## postgresql [_postgresql]
 
 PostgreSQL metrics.
-
 
 ## activity [_activity]
 
@@ -98,18 +98,11 @@ type: boolean
 
 
 **`postgresql.activity.state`**
-:   Current overall state of this backend. Possible values are:
-
-* active: The backend is executing a query.
-* idle: The backend is waiting for a new client command.
-* idle in transaction: The backend is in a transaction, but is not currently executing a query.
-* idle in transaction (aborted): This state is similar to idle in transaction, except one of the statements in the transaction caused an error.
-* fastpath function call: The backend is executing a fast-path function.
-* disabled: This state is reported if track_activities is disabled in this backend.
+:   Current overall state of this backend. Possible values are:   * active: The backend is executing a query.   * idle: The backend is waiting for a new client command.   * idle in transaction: The backend is in a transaction, but is not     currently executing a query.   * idle in transaction (aborted): This state is similar to idle in     transaction, except one of the statements in the transaction caused     an error.   * fastpath function call: The backend is executing a fast-path function.   * disabled: This state is reported if track_activities is disabled in this backend.
 
 
 **`postgresql.activity.query`**
-:   Text of this backend’s most recent query. If state is active this field shows the currently executing query. In all other states, it shows the last query that was executed.
+:   Text of this backend's most recent query. If state is active this field shows the currently executing query. In all other states, it shows the last query that was executed.
 
 
 **`postgresql.activity.wait_event`**
@@ -120,10 +113,9 @@ type: boolean
 :   The type of event for which the backend is waiting.
 
 
-
 ## bgwriter [_bgwriter]
 
-Statistics about the background writer process’s activity. Collected using the pg_stat_bgwriter query.
+Statistics about the background writer process's activity. Collected using the pg_stat_bgwriter query.
 
 **`postgresql.bgwriter.checkpoints.scheduled`**
 :   Number of scheduled checkpoints that have been performed.
@@ -191,8 +183,7 @@ type: long
 type: date
 
 
-
-## database [_database_2]
+## database [_database]
 
 One row per database, showing database-wide statistics. Collected by querying pg_stat_database
 
@@ -233,7 +224,7 @@ type: long
 
 
 **`postgresql.database.blocks.hit`**
-:   Number of times disk blocks were found already in the buffer cache, so that a read was not necessary (this only includes hits in the PostgreSQL buffer cache, not the operating system’s file system cache).
+:   Number of times disk blocks were found already in the buffer cache, so that a read was not necessary (this only includes hits in the PostgreSQL buffer cache, not the operating system's file system cache).
 
 type: long
 
@@ -308,7 +299,6 @@ type: long
 :   Time at which these statistics were last reset.
 
 type: date
-
 
 
 ## statement [_statement]

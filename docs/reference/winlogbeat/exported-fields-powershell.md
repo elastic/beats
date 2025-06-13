@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/exported-fields-powershell.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # PowerShell module fields [exported-fields-powershell]
 
 These are the event fields specific to the module for the Microsoft-Windows-PowerShell/Operational and Windows PowerShell logs.
@@ -47,8 +49,7 @@ type: long
 example: 10
 
 
-
-## powershell.command [_powershell_command]
+## powershell.command [_powershell.command]
 
 Data related to the executed command.
 
@@ -122,8 +123,7 @@ type: text
 example: System.IO.Compression.FileSystem
 
 
-
-## powershell.connected_user [_powershell_connected_user]
+## powershell.connected_user [_powershell.connected_user]
 
 Data related to the connected user executing the command.
 
@@ -143,8 +143,7 @@ type: keyword
 example: vagrant
 
 
-
-## powershell.engine [_powershell_engine]
+## powershell.engine [_powershell.engine]
 
 Data related to the PowerShell engine.
 
@@ -172,8 +171,7 @@ type: keyword
 example: Stopped
 
 
-
-## powershell.file [_powershell_file]
+## powershell.file [_powershell.file]
 
 Data related to the executed script file.
 
@@ -201,8 +199,7 @@ type: keyword
 example: 5.1.17763.1007
 
 
-
-## powershell.provider [_powershell_provider]
+## powershell.provider [_powershell.provider]
 
 Data related to the PowerShell engine host.
 

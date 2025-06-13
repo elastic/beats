@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-gcp.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Google Cloud Platform fields [exported-fields-gcp]
 
 GCP module
@@ -19,8 +21,7 @@ type: object
 type: object
 
 
-
-## billing [_billing_6]
+## billing [_billing]
 
 Google Cloud Billing metrics
 
@@ -79,10 +80,9 @@ type: nested
 
 
 **`gcp.billing.effective_price`**
-:   The charged price for usage of the Google Cloud SKUs and SKU tiers. Reflects contract pricing if applicable, otherwise, it’s the list price.
+:   The charged price for usage of the Google Cloud SKUs and SKU tiers. Reflects contract pricing if applicable, otherwise, it's the list price.
 
 type: float
-
 
 
 ## carbon [_carbon]
@@ -149,8 +149,7 @@ type: float
 type: float
 
 
-
-## compute [_compute_2]
+## compute [_compute]
 
 Google Cloud Compute metrics
 
@@ -266,7 +265,6 @@ type: long
 :   Elapsed time since the VM was started, in seconds. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
 
 type: long
-
 
 
 ## dataproc [_dataproc]
@@ -399,7 +397,6 @@ type: object
 type: object
 
 
-
 ## firestore [_firestore]
 
 Google Cloud Firestore metrics
@@ -422,8 +419,7 @@ type: long
 type: long
 
 
-
-## gke [_gke_2]
+## gke [_gke]
 
 `gke` contains the metrics that we scraped from GCP Stackdriver API containing monitoring metrics for GCP GKE
 
@@ -667,8 +663,7 @@ type: long
 type: double
 
 
-
-## loadbalancing [_loadbalancing_2]
+## loadbalancing [_loadbalancing]
 
 Google Cloud Load Balancing metrics
 
@@ -709,7 +704,7 @@ type: long
 
 
 **`gcp.loadbalancing.l3.external.egress.bytes`**
-:   The number of bytes sent from external TCP/UDP network load balancer backend to client of the flow. For TCP flows it’s counting bytes on application stream only.
+:   The number of bytes sent from external TCP/UDP network load balancer backend to client of the flow. For TCP flows it's counting bytes on application stream only.
 
 type: long
 
@@ -721,7 +716,7 @@ type: long
 
 
 **`gcp.loadbalancing.l3.external.ingress.bytes`**
-:   The number of bytes sent from client to external TCP/UDP network load balancer backend. For TCP flows it’s counting bytes on application stream only.
+:   The number of bytes sent from client to external TCP/UDP network load balancer backend. For TCP flows it's counting bytes on application stream only.
 
 type: long
 
@@ -733,7 +728,7 @@ type: long
 
 
 **`gcp.loadbalancing.l3.internal.egress.bytes`**
-:   The number of bytes sent from ILB backend to client (for TCP flows it’s counting bytes on application stream only).
+:   The number of bytes sent from ILB backend to client (for TCP flows it's counting bytes on application stream only).
 
 type: long
 
@@ -745,7 +740,7 @@ type: long
 
 
 **`gcp.loadbalancing.l3.internal.ingress.bytes`**
-:   The number of bytes sent from client to ILB backend (for TCP flows it’s counting bytes on application stream only).
+:   The number of bytes sent from client to ILB backend (for TCP flows it's counting bytes on application stream only).
 
 type: long
 
@@ -841,13 +836,12 @@ type: object
 
 
 **`gcp.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.value`**
-:   A distribution of the smoothed RTT (in ms) measured by the proxy’s TCP stack, each minute application layer bytes pass from proxy to client.
+:   A distribution of the smoothed RTT (in ms) measured by the proxy's TCP stack, each minute application layer bytes pass from proxy to client.
 
 type: object
 
 
-
-## pubsub [_pubsub_2]
+## pubsub [_pubsub]
 
 Google Cloud PubSub metrics
 
@@ -942,7 +936,7 @@ type: long
 
 
 **`gcp.pubsub.subscription.num_outstanding_messages.value`**
-:   Number of messages delivered to a subscription’s push endpoint, but not yet acknowledged.
+:   Number of messages delivered to a subscription's push endpoint, but not yet acknowledged.
 
 type: long
 
@@ -1145,8 +1139,7 @@ type: object
 type: object
 
 
-
-## storage [_storage_3]
+## storage [_storage]
 
 Google Cloud Storage metrics
 

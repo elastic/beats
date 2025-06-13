@@ -3,15 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-nginx.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Nginx fields [exported-fields-nginx]
 
 Nginx server status metrics collected from various modules.
 
-
 ## nginx [_nginx]
 
 `nginx` contains the metrics that were scraped from nginx.
-
 
 ## stubstatus [_stubstatus]
 

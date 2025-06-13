@@ -3,15 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-ceph.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Ceph fields [exported-fields-ceph]
 
 Ceph module
 
-
 ## ceph [_ceph]
 
 `ceph` contains the metrics that were scraped from CEPH.
-
 
 ## cluster_disk [_cluster_disk]
 
@@ -41,7 +41,6 @@ type: long
 format: bytes
 
 
-
 ## cluster_health [_cluster_health]
 
 cluster_health
@@ -68,7 +67,6 @@ type: long
 :   Status of the round
 
 type: keyword
-
 
 
 ## cluster_status [_cluster_status]
@@ -241,16 +239,13 @@ type: long
 type: long
 
 
-
 ## mgr_cluster_disk [_mgr_cluster_disk]
 
 see: cluster_disk
 
-
 ## mgr_cluster_health [_mgr_cluster_health]
 
 see: cluster_health
-
 
 ## mgr_osd_perf [_mgr_osd_perf]
 
@@ -286,7 +281,6 @@ type: long
 type: long
 
 
-
 ## mgr_osd_pool_stats [_mgr_osd_pool_stats]
 
 OSD pool stats of Ceph cluster
@@ -309,16 +303,13 @@ type: long
 type: object
 
 
-
 ## mgr_osd_tree [_mgr_osd_tree]
 
 see: osd_tree
 
-
 ## mgr_pool_disk [_mgr_pool_disk]
 
 see: pool_disk
-
 
 ## monitor_health [_monitor_health]
 
@@ -404,7 +395,6 @@ format: bytes
 type: long
 
 
-
 ## osd_df [_osd_df]
 
 ceph osd disk usage information
@@ -463,7 +453,6 @@ type: long
 type: scaled_float
 
 format: percent
-
 
 
 ## osd_tree [_osd_tree]
@@ -546,7 +535,6 @@ type: keyword
 :   the parent node of this osd or bucket node
 
 type: keyword
-
 
 
 ## pool_disk [_pool_disk]
