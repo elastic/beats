@@ -105,20 +105,20 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 		backoffSkipped: 0,
 	}
 
-	go func(ctx context.Context, qq *quark.Queue, logger *logp.Logger, p *prvdr, stats *Stats) {
+	qq = nil
+	go func(ctx context.Context, p *prvdr, stats *Stats) {
 
 		lastUpdate := time.Now()
 
-		defer qq.Close()
 		for ctx.Err() == nil {
 			p.qqMtx.Lock()
 			// We just drive quark to populate the cache, not interested in the events
-			_, ok := qq.GetEvent()
+			_, ok := p.qq.GetEvent()
 			p.qqMtx.Unlock()
 			// Is it time to update stats?
 			if time.Since(lastUpdate) > time.Second*5 {
 				p.qqMtx.Lock()
-				metrics := qq.Stats()
+				metrics := p.qq.Stats()
 				p.qqMtx.Unlock()
 
 				stats.Aggregations.Set(metrics.Aggregations)
@@ -130,14 +130,19 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 			}
 			// Quark is idle, Block for a bit
 			if !ok {
-				err = qq.Block()
+				err = p.qq.Block()
 				if err != nil {
-					logger.Errorw("quark block, no more process enrichment from this processor will be done", "error", err)
+					p.logger.Errorw("quark block, no more process enrichment from this processor will be done", "error", err)
 					break
 				}
 			}
 		}
-	}(ctx, qq, logger, p, procMetrics)
+
+		p.qqMtx.Lock()
+		p.qq.Close()
+		p.qq = nil
+		p.qqMtx.Unlock()
+	}(ctx, p, procMetrics)
 
 	bootID, err = readBootID()
 	if err != nil {
@@ -286,15 +291,19 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	return &ret, nil
 }
 
-func (p prvdr) lookupLocked(pid uint32) (quark.Process, bool) {
+func (p *prvdr) lookupLocked(pid uint32) (process quark.Process, ok bool) {
 	p.qqMtx.Lock()
 	defer p.qqMtx.Unlock()
+
+	if p.qq == nil {
+		return quark.Process{}, false
+	}
 
 	return p.qq.Lookup(int(pid))
 }
 
 // fillParent populates the parent process fields with the attributes of the process with PID `ppid`
-func (p prvdr) fillParent(process *types.Process, ppid uint32) {
+func (p *prvdr) fillParent(process *types.Process, ppid uint32) {
 	proc, found := p.lookupLocked(ppid)
 	if !found {
 		return
@@ -328,7 +337,7 @@ func (p prvdr) fillParent(process *types.Process, ppid uint32) {
 }
 
 // fillGroupLeader populates the process group leader fields with the attributes of the process with PID `pgid`
-func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
+func (p *prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 	proc, found := p.lookupLocked(pgid)
 	if !found {
 		return
@@ -363,7 +372,7 @@ func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 }
 
 // fillSessionLeader populates the session leader fields with the attributes of the process with PID `sid`
-func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
+func (p *prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 	proc, found := p.lookupLocked(sid)
 	if !found {
 		return
@@ -398,7 +407,7 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 }
 
 // fillEntryLeader populates the entry leader fields with the attributes of the process with PID `elid`
-func (p prvdr) fillEntryLeader(process *types.Process, elid uint32) {
+func (p *prvdr) fillEntryLeader(process *types.Process, elid uint32) {
 	proc, found := p.lookupLocked(elid)
 	if !found {
 		return
