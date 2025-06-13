@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -76,7 +76,7 @@ func TestReadLine(t *testing.T) {
 	source := File{File: readFile}
 
 	h := Harvester{
-		logger: logp.NewLogger("harvester"),
+		logger: logptest.NewTestingLogger(t, "harvester"),
 		config: config{
 			LogConfig: LogConfig{
 				CloseInactive: 500 * time.Millisecond,

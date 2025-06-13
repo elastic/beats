@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -115,8 +115,7 @@ func TestConversion(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			log := logp.NewLogger("test")
-			converted := NewConverter(log, nil).Convert(test.fields)
+			converted := NewConverter(logptest.NewTestingLogger(t, ""), nil).Convert(test.fields)
 			assert.Equal(t, test.want, converted)
 		})
 	}

@@ -13,12 +13,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // TestEventMapping tests that mapping a QueryResult into a list of events is accurate.
 func TestEventMapping(t *testing.T) {
-	logger := logp.NewLogger("TestEventMapping")
+	logger := logptest.NewTestingLogger(t, "TestEventMapping")
 
 	ID := "ID"
 	kind := armconsumption.UsageDetailsKindLegacy
@@ -153,7 +153,7 @@ func TestEventMapping(t *testing.T) {
 }
 
 func TestGetEventsFromQueryResult(t *testing.T) {
-	logger := logp.NewLogger("TestGetEventsFromQueryResult")
+	logger := logptest.NewTestingLogger(t, "TestGetEventsFromQueryResult")
 	subscriptionID := "sub"
 
 	columns := []*armcostmanagement.QueryColumn{

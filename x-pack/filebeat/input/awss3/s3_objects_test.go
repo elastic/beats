@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.GetObjectOutput) {
@@ -156,7 +157,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, nil, backupConfig{})
-		err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(logp.NewLogger(inputName), func(_ beat.Event) {})
+		err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(logptest.NewTestingLogger(t, inputName), func(_ beat.Event) {})
 		require.Error(t, err)
 		assert.True(t, errors.Is(err, errS3DownloadFailed), "expected errS3DownloadFailed")
 	})
@@ -176,7 +177,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 			Return(nil, nil)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, nil, backupConfig{})
-		err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(logp.NewLogger(inputName), func(_ beat.Event) {})
+		err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(logptest.NewTestingLogger(t, inputName), func(_ beat.Event) {})
 		require.Error(t, err)
 	})
 
@@ -197,7 +198,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 
 		var events []beat.Event
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, nil, backupConfig{})
-		err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(logp.NewLogger(inputName), func(event beat.Event) {
+		err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(logptest.NewTestingLogger(t, inputName), func(event beat.Event) {
 			events = append(events, event)
 		})
 		assert.Equal(t, 2, len(events))
@@ -388,7 +389,7 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int,
 
 	s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, selectors, backupConfig{})
 	err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(
-		logp.NewLogger(inputName),
+		logptest.NewTestingLogger(t, inputName),
 		func(event beat.Event) { events = append(events, event) })
 
 	if !expectErr {

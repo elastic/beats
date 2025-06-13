@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func Test_filterProvider(t *testing.T) {
@@ -26,7 +26,7 @@ func Test_filterProvider(t *testing.T) {
 		assert.Equal(t, filterStartTime, fProvider.staticFilters[0].getID())
 	})
 
-	logger := logp.NewLogger("test-logger")
+	logger := logptest.NewTestingLogger(t, "test-logger")
 
 	tests := []struct {
 		name                string
