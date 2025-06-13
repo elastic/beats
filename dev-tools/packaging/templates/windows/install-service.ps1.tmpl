@@ -26,11 +26,11 @@ Param (
 )
 
 # Delete and stop the service if it already exists.
-if (Get-Service {{.BeatName | title}} -ErrorAction SilentlyContinue) {
-  Stop-Service {{.BeatName | title}}
-  (Get-Service {{.BeatName | title}}).WaitForStatus('Stopped')
+if (Get-Service {{.BeatName}} -ErrorAction SilentlyContinue) {
+  Stop-Service {{.BeatName}}
+  (Get-Service {{.BeatName}}).WaitForStatus('Stopped')
   Start-Sleep -s 1
-  sc.exe delete {{.BeatName | title}}
+  sc.exe delete {{.BeatName}}
 }
 
 # We need to support a new default path for the data folder, ideally
@@ -75,6 +75,6 @@ New-Service -name {{.BeatName}} `
 
 # Attempt to set the service to delayed start using sc config.
 Try {
-  Start-Process -FilePath sc.exe -ArgumentList 'config {{.BeatName | title}} start= delayed-auto'
+  Start-Process -FilePath sc.exe -ArgumentList 'config {{.BeatName}} start= delayed-auto'
 }
 Catch { Write-Host -f red "An error occurred setting the service to delayed start." }
