@@ -60,12 +60,13 @@ type fileMeta struct {
 // filestream is the input for reading from files which
 // are actively written by other applications.
 type filestream struct {
-	readerConfig    readerConfig
-	encodingFactory encoding.EncodingFactory
-	closerConfig    closerConfig
-	deleterConfig   deleterConfig
-	parsers         parser.Config
-	takeOver        takeOverConfig
+	readerConfig         readerConfig
+	encodingFactory      encoding.EncodingFactory
+	closerConfig         closerConfig
+	deleterConfig        deleterConfig
+	parsers              parser.Config
+	takeOver             takeOverConfig
+	scannerCheckInterval time.Duration
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
@@ -102,13 +103,23 @@ func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
 		return nil, nil, fmt.Errorf("unknown encoding('%v')", c.Reader.Encoding)
 	}
 
+	// Read the scan interval from the prospector so we can use during the
+	// grace period of the delete
+	tmpCfg := struct {
+		CheckInterval time.Duration `config:"check_interval"`
+	}{}
+	if err := c.FileWatcher.Config().Unpack(&tmpCfg); err != nil {
+		return nil, nil, fmt.Errorf("cannot unpack 'scanner.check_interval: %s'", err)
+	}
+
 	filestream := &filestream{
-		readerConfig:    c.Reader,
-		encodingFactory: encodingFactory,
-		closerConfig:    c.Close,
-		parsers:         c.Reader.Parsers,
-		takeOver:        c.TakeOver,
-		deleterConfig:   c.Delete,
+		readerConfig:         c.Reader,
+		encodingFactory:      encodingFactory,
+		closerConfig:         c.Close,
+		parsers:              c.Reader.Parsers,
+		takeOver:             c.TakeOver,
+		deleterConfig:        c.Delete,
+		scannerCheckInterval: tmpCfg.CheckInterval,
 	}
 
 	return prospector, filestream, nil
@@ -187,6 +198,70 @@ func (inp *filestream) Run(
 	return nil
 }
 
+// waitGracePeriod waits for the delete grace period while monitoring the file
+// for any changes, if the file changes or any error is encountered, false
+// is returned. True is only returned if the grace period expires with
+// no error and no context cancellation.
+func (inp *filestream) waitGracePeriod(
+	ctx input.Context,
+	logger *logp.Logger,
+	cursor loginp.Cursor,
+	fs fileSource,
+) (bool, error) {
+	// Check if file grows during the grace period
+	// We know all events have been published because cursor.Finished is true,
+	// so we can get the offset from the cursor and compare it with the file size.
+	st := state{}
+	if err := cursor.Unpack(&st); err != nil {
+		return false, fmt.Errorf("cannot unpack cursor from '%s' to read offset: %w",
+			fs.newPath,
+			err)
+	}
+
+	graceTimer := time.NewTimer(inp.deleterConfig.GracePeriod)
+	checkIntervalTicker := time.NewTicker(inp.scannerCheckInterval)
+	// Wait for the grace period or for the context to be cancelled
+LOOP:
+	for {
+		select {
+		case <-ctx.Cancelation.Done():
+			return false, ctx.Cancelation.Err()
+		case <-checkIntervalTicker.C:
+			stat, err := os.Stat(fs.newPath)
+			if err != nil {
+				// Return the error and cause the harvester to close
+				return false, fmt.Errorf("cannot stat '%s': %w", fs.newPath, err)
+			}
+
+			if stat.Size() != st.Offset {
+				// The file has changed, close the harvester
+				// without deleting the file
+				logger.Debugf("cancelling deletion of '%s', size has changed from %d to %d",
+					fs.newPath,
+					st.Offset,
+					stat.Size())
+				return false, nil
+			}
+		case <-graceTimer.C:
+			break LOOP
+		}
+	}
+
+	stat, err := os.Stat(fs.newPath)
+	if err != nil {
+		return false, fmt.Errorf("cannot stat '%s': %w", fs.newPath, err)
+	}
+
+	// The file has been written to, close the harvester so the filewatcher
+	// can start a new one
+	if stat.Size() != st.Offset {
+		logger.Debugf("'%s' was updated, won't remove. Closing harvester", fs.newPath)
+		return false, nil
+	}
+
+	return true, nil
+}
+
 func (inp *filestream) deleteFile(
 	ctx input.Context,
 	logger *logp.Logger,
@@ -211,33 +286,12 @@ func (inp *filestream) deleteFile(
 		"all events from '%s' have been published, waiting for %s grace period",
 		fs.newPath, inp.deleterConfig.GracePeriod.String())
 
-	graceTimer := time.NewTimer(inp.deleterConfig.GracePeriod)
-	// Wait for the grace period or for the context to be cancelled
-	select {
-	case <-ctx.Cancelation.Done():
-		return ctx.Cancelation.Err()
-	case <-graceTimer.C:
-	}
-
-	// Check if file is still at EOF
-	// We know all events have been published because cursor.Finished is true,
-	// so we can get the offset from the cursor and compare it with the file size.
-	st := state{}
-	if err := cursor.Unpack(&st); err != nil {
-		return fmt.Errorf("cannot unpack cursor from '%s' to read offset: %w",
-			fs.newPath,
-			err)
-	}
-
-	stat, err := os.Stat(fs.newPath)
+	canRemove, err := inp.waitGracePeriod(ctx, logger, cursor, fs)
 	if err != nil {
-		return fmt.Errorf("cannot stat '%s': %w", fs.newPath, err)
+		return err
 	}
 
-	// The file has been written to, close the harvester so the filewatcher
-	// can start a new one
-	if stat.Size() != st.Offset {
-		logger.Debugf("'%s' was updated, won't remove. Closing harvester", fs.newPath)
+	if !canRemove {
 		return nil
 	}
 

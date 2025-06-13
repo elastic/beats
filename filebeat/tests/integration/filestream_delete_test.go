@@ -205,6 +205,26 @@ func TestFilestreamDelete(t *testing.T) {
 				}
 			}
 
+			// Grace period is set, test:
+			// - Grace period is interrupted if data is added to the file
+			// - Grace period is respected if the file does not change
+			if tc.gracePeriod != 0 {
+				gracePeriodMsg := fmt.Sprintf("all events from '%s' have been published, waiting for %s grace period", msgLogFilePath, tc.gracePeriod)
+				filebeat.WaitForLogs(gracePeriodMsg, time.Second, "did not start waiting for grace period")
+
+				// Wait 1/2 of the grace period, then add data to the file
+				time.Sleep(tc.gracePeriod / 2)
+				integration.GenerateLogFile(t, msgLogFilePath, 5, true)
+
+				// Wait for the message of file size changed
+				changedMsg := fmt.Sprintf("cancelling deletion of '%s', size has changed", msgLogFilePath)
+				filebeat.WaitForLogs(changedMsg, time.Second, "filestream did detect the file change")
+
+				// Make sure the harvester is closed
+				filebeat.WaitForLogs("Stopped harvester for file", time.Second, "harvester was not closed")
+				filebeat.WaitForLogs("Closing reader of filestream", time.Second, "reader was not closed")
+			}
+
 			msg = fmt.Sprintf("'%s' removed", msgLogFilePath)
 			filebeat.WaitForLogs(msg, 30*time.Second, "file removed log entry not found")
 			removedMsg := filebeat.GetLastLogLine(msg)
