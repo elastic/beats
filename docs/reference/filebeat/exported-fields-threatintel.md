@@ -3,18 +3,20 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-threatintel.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # threatintel fields [exported-fields-threatintel]
 
 Threat intelligence Filebeat Module.
 
 **`threat.indicator.file.hash.tlsh`**
-:   The file’s import tlsh, if available.
+:   The file's import tlsh, if available.
 
 type: keyword
 
 
 **`threat.indicator.file.hash.sha384`**
-:   The file’s sha384 hash, if available.
+:   The file's sha384 hash, if available.
 
 type: keyword
 
@@ -27,8 +29,7 @@ type: keyword
 :   type: keyword
 
 
-
-## abusech.malware [_abusech_malware]
+## abusech.malware [_abusech.malware]
 
 Fields for AbuseCH Malware Threat Intel
 
@@ -68,8 +69,7 @@ type: float
 type: keyword
 
 
-
-## abusech.url [_abusech_url]
+## abusech.url [_abusech.url]
 
 Fields for AbuseCH Malware Threat Intel
 
@@ -127,8 +127,7 @@ type: boolean
 type: keyword
 
 
-
-## anomali.limo [_anomali_limo]
+## anomali.limo [_anomali.limo]
 
 Fields for Anomali Threat Intel
 
@@ -204,8 +203,7 @@ type: keyword
 type: keyword
 
 
-
-## anomali.threatstream [_anomali_threatstream]
+## anomali.threatstream [_anomali.threatstream]
 
 Fields for Anomali ThreatStream
 
@@ -218,7 +216,7 @@ example: private
 
 
 **`anomali.threatstream.confidence`**
-:   The measure of the accuracy (from 0 to 100) assigned by ThreatStream’s predictive analytics technology to indicators.
+:   The measure of the accuracy (from 0 to 100) assigned by ThreatStream's predictive analytics technology to indicators.
 
 type: short
 
@@ -319,8 +317,7 @@ type: keyword
 type: keyword
 
 
-
-## abusech.malwarebazaar [_abusech_malwarebazaar]
+## abusech.malwarebazaar [_abusech.malwarebazaar]
 
 Fields for Malware Bazaar Threat Intel
 
@@ -378,8 +375,7 @@ type: long
 type: nested
 
 
-
-## misp [_misp_2]
+## misp [_misp]
 
 Fields for MISP Threat Intel
 
@@ -713,7 +709,6 @@ type: keyword
 type: keyword
 
 
-
 ## otx [_otx]
 
 Fields for OTX Threat Intel
@@ -752,7 +747,6 @@ type: keyword
 :   The indicator type, can for example be "domain, email, FileHash-SHA256".
 
 type: keyword
-
 
 
 ## threatq [_threatq]

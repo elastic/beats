@@ -34,13 +34,16 @@ type States struct {
 
 	// idx maps state IDs to state indexes for fast lookup and modifications.
 	idx map[string]int
+
+	logger *logp.Logger
 }
 
 // NewStates generates a new states registry.
-func NewStates() *States {
+func NewStates(logger *logp.Logger) *States {
 	return &States{
 		states: nil,
 		idx:    map[string]int{},
+		logger: logger,
 	}
 }
 
@@ -65,7 +68,7 @@ func (s *States) UpdateWithTs(newState State, ts time.Time) {
 		// No existing state found, add new one
 		s.idx[id] = len(s.states)
 		s.states = append(s.states, newState)
-		logp.Debug("input", "New state added for %s", newState.Source)
+		s.logger.Named("input").Debugf("New state added for %s", newState.Source)
 	}
 }
 
@@ -122,7 +125,7 @@ func (s *States) CleanupWith(fn func(string)) (int, int) {
 
 		if state.TTL == 0 || expired {
 			if !state.Finished {
-				logp.Err("State for %s should have been dropped, but couldn't as state is not finished.", state.Source)
+				s.logger.Errorf("State for %s should have been dropped, but couldn't as state is not finished.", state.Source)
 				i++
 				continue
 			}
@@ -131,7 +134,7 @@ func (s *States) CleanupWith(fn func(string)) (int, int) {
 			if fn != nil {
 				fn(state.Id)
 			}
-			logp.Debug("state", "State removed for %v because of older: %v", state.Source, state.TTL)
+			s.logger.Named("state").Debugf("State removed for %v because of older: %v", state.Source, state.TTL)
 
 			L--
 			if L != i {
@@ -184,7 +187,7 @@ func (s *States) SetStates(states []State) {
 
 // Copy create a new copy of the states object
 func (s *States) Copy() *States {
-	new := NewStates()
+	new := NewStates(s.logger)
 	new.SetStates(s.GetStates())
 	return new
 }

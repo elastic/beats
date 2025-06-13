@@ -73,7 +73,7 @@ type fileWatcher struct {
 	events  chan loginp.FSEvent
 }
 
-func newFileWatcher(paths []string, ns *conf.Namespace, sendNotChanged bool) (loginp.FSWatcher, error) {
+func newFileWatcher(logger *logp.Logger, paths []string, ns *conf.Namespace, sendNotChanged bool) (loginp.FSWatcher, error) {
 	var config *conf.C
 	if ns == nil {
 		config = conf.NewConfig()
@@ -81,22 +81,24 @@ func newFileWatcher(paths []string, ns *conf.Namespace, sendNotChanged bool) (lo
 		config = ns.Config()
 	}
 
-	return newScannerWatcher(paths, config, sendNotChanged)
+	return newScannerWatcher(logger, paths, config, sendNotChanged)
 }
 
-func newScannerWatcher(paths []string, c *conf.C, sendNotChanged bool) (loginp.FSWatcher, error) {
+func newScannerWatcher(logger *logp.Logger, paths []string, c *conf.C, sendNotChanged bool) (loginp.FSWatcher, error) {
 	config := defaultFileWatcherConfig()
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, err
 	}
+
 	config.SendNotChanged = sendNotChanged
-	scanner, err := newFileScanner(paths, config.Scanner)
+	scanner, err := newFileScanner(logger, paths, config.Scanner)
 	if err != nil {
 		return nil, err
 	}
+
 	return &fileWatcher{
-		log:     logp.NewLogger(watcherDebugKey),
+		log:     logger.Named(watcherDebugKey),
 		cfg:     config,
 		prev:    make(map[string]loginp.FileDescriptor, 0),
 		scanner: scanner,
@@ -311,11 +313,11 @@ type fileScanner struct {
 	readBuffer []byte
 }
 
-func newFileScanner(paths []string, config fileScannerConfig) (*fileScanner, error) {
+func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig) (*fileScanner, error) {
 	s := fileScanner{
 		paths:  paths,
 		cfg:    config,
-		log:    logp.NewLogger(scannerDebugKey),
+		log:    logger.Named(scannerDebugKey),
 		hasher: sha256.New(),
 	}
 
@@ -385,6 +387,8 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 	uniqueIDs := map[string]string{}
 	// used to filter out duplicate matches
 	uniqueFiles := map[string]struct{}{}
+
+	tooSmallFiles := 0
 	for _, path := range s.paths {
 		matches, err := filepath.Glob(path)
 		if err != nil {
@@ -407,6 +411,7 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 
 			fd, err := s.toFileDescriptor(&it)
 			if errors.Is(err, errFileTooSmall) {
+				tooSmallFiles++
 				s.log.Debugf("cannot start ingesting from file %q: %s", filename, err)
 				continue
 			}
@@ -423,6 +428,22 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 			uniqueIDs[fileID] = fd.Filename
 			fdByName[filename] = fd
 		}
+	}
+
+	if tooSmallFiles > 0 {
+		prefix := "%d files are "
+		if tooSmallFiles == 1 {
+			prefix = "%d file is "
+		}
+		s.log.Warnf(
+			prefix+"too small to be ingested, files need to be at "+
+				"least %d in size for ingestion to start. To change this "+
+				"behaviour set 'prospector.scanner.fingerprint.length' and "+
+				"'prospector.scanner.fingerprint.offset'. "+
+				"Enable debug logging to see all file names.",
+			tooSmallFiles,
+			s.cfg.Fingerprint.Offset+s.cfg.Fingerprint.Length,
+		)
 	}
 
 	return fdByName

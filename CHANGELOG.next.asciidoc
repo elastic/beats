@@ -246,10 +246,15 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix publishing Okta entity analytics enrichments. {pull}44483[44483]
 - Fix status reporting panic in GCP Pub/Sub input. {issue}44624[44624] {pull}44625[44625]
 - Fix a logging regression that ignored to_files and logged to stdout. {pull}44573[44573]
+- If a Filestream input fails to be created, its ID is removed from the list of running input IDs {pull}44697[44697]
+- Fix timeout handling by Crowdstrike streaming input. {pull}44720[44720]
+- Ensure DEPROVISIONED Okta entities are published by Okta entityanalytics provider. {issue}12658[12658] {pull}44719[44719]
+- Fix handling of cursors by the streaming input for Crowdstrike. {issue}44364[44364] {pull}44548[44548]
 
 *Heartbeat*
 
 - Added maintenance windows support for Heartbeat. {pull}41508[41508]
+- Add missing dependencies to ubi9-minimal distro. {pull}44556[44556]
 
 
 *Metricbeat*
@@ -271,6 +276,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
+- Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
 
 *Osquerybeat*
 
@@ -446,6 +452,9 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add Fleet status updating to HTTP Endpoint input. {issue}44273[44273] {pull}44508[44508]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. {issue}44349[44349] {pull}44436[44436]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
+- Added support for specifying custom content-types and encodings in azureblobstorage input. {issue}44330[44330] {pull}44402[44402]
+- Introduce lastSync start position to AWS CloudWatch input backed by state registry. {pull}43251[43251]
+- Filestream now logs at level warn the number of files that are too small to be ingested {pull}44751[44751]
 
 *Auditbeat*
 

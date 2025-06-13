@@ -25,7 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var (
@@ -1268,7 +1268,7 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
 	m.MetricSet = &aws.MetricSet{Period: 5}
-	m.logger = logp.NewLogger("test")
+	m.logger = logptest.NewTestingLogger(t, "test")
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
 	infoAPImap := make(map[string]string)
@@ -1300,7 +1300,7 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
 	m.MetricSet = &aws.MetricSet{Period: 5, MonitoringAccountID: accountID}
-	m.logger = logp.NewLogger("test")
+	m.logger = logptest.NewTestingLogger(t, "test")
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
 	mockCloudwatchSvc := &MockCloudWatchClientWithoutDim{}
@@ -1347,7 +1347,7 @@ func TestCreateEventsWithDataGranularity(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
 	m.MetricSet = &aws.MetricSet{Period: 10, MonitoringAccountID: accountID, DataGranularity: 5}
-	m.logger = logp.NewLogger("test")
+	m.logger = logptest.NewTestingLogger(t, "test")
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
 	mockCloudwatchSvc := &MockCloudWatchClientWithDataGranularity{}
@@ -1390,7 +1390,7 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
 	m.MetricSet = &aws.MetricSet{Period: 5, MonitoringAccountID: accountID}
-	m.logger = logp.NewLogger("test")
+	m.logger = logptest.NewTestingLogger(t, "test")
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
 	infoAPImap := make(map[string]string)
@@ -1551,7 +1551,7 @@ func TestConfigDimensionValueContainsWildcard(t *testing.T) {
 
 func TestCreateEventsTimestamp(t *testing.T) {
 	m := MetricSet{
-		logger:            logp.NewLogger("test"),
+		logger:            logptest.NewTestingLogger(t, "test"),
 		CloudwatchConfigs: []Config{{Statistic: []string{"Average"}}},
 		MetricSet:         &aws.MetricSet{Period: 5, MonitoringAccountID: accountID},
 	}
@@ -1589,7 +1589,7 @@ func TestGetStartTimeEndTime(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
 	m.MetricSet = &aws.MetricSet{Period: 5 * time.Minute}
-	m.logger = logp.NewLogger("test")
+	m.logger = logptest.NewTestingLogger(t, "test")
 	var previousEndTime time.Time
 	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency, previousEndTime)
 	assert.Equal(t, 5*time.Minute, endTime.Sub(startTime))

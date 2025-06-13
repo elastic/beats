@@ -145,13 +145,14 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 		defer wg.Done()
 		defer func() { _ = grp.Stop() }()
 
+		logger, _ := logp.NewDevelopmentLogger("")
 		info := beat.Info{Monitoring: beat.Monitoring{
 			Namespace: monitoring.GetNamespace("dataset")},
 		}
 		reg := inputmon.NewMetricsRegistry(
-			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logp.L())
+			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logger)
 		defer inputmon.CancelMetricsRegistry(
-			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logp.L())
+			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logger)
 
 		inputCtx := v2.Context{
 			ID:              id,
