@@ -103,23 +103,26 @@ func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
 		return nil, nil, fmt.Errorf("unknown encoding('%v')", c.Reader.Encoding)
 	}
 
-	// Read the scan interval from the prospector so we can use during the
-	// grace period of the delete
-	tmpCfg := struct {
-		CheckInterval time.Duration `config:"check_interval"`
-	}{}
-	if err := c.FileWatcher.Config().Unpack(&tmpCfg); err != nil {
-		return nil, nil, fmt.Errorf("cannot unpack 'scanner.check_interval: %s'", err)
+	filestream := &filestream{
+		readerConfig:    c.Reader,
+		encodingFactory: encodingFactory,
+		closerConfig:    c.Close,
+		parsers:         c.Reader.Parsers,
+		takeOver:        c.TakeOver,
+		deleterConfig:   c.Delete,
 	}
 
-	filestream := &filestream{
-		readerConfig:         c.Reader,
-		encodingFactory:      encodingFactory,
-		closerConfig:         c.Close,
-		parsers:              c.Reader.Parsers,
-		takeOver:             c.TakeOver,
-		deleterConfig:        c.Delete,
-		scannerCheckInterval: tmpCfg.CheckInterval,
+	// Read the scan interval from the prospector so we can use during the
+	// grace period of the delete
+	if c.FileWatcher != nil {
+		tmpCfg := struct {
+			CheckInterval time.Duration `config:"check_interval"`
+		}{}
+		if err := c.FileWatcher.Config().Unpack(&tmpCfg); err != nil {
+			return nil, nil, fmt.Errorf("cannot unpack 'scanner.check_interval: %s'", err)
+		}
+
+		filestream.scannerCheckInterval = tmpCfg.CheckInterval
 	}
 
 	return prospector, filestream, nil
