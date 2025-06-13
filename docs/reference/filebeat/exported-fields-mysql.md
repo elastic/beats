@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-mysql.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # MySQL fields [exported-fields-mysql]
 
 Module for parsing the MySQL log files.
-
 
 ## mysql [_mysql]
 
@@ -18,8 +19,7 @@ Fields from the MySQL log files.
 type: long
 
 
-
-## error [_error_4]
+## error [_error]
 
 Contains fields from the MySQL error logs.
 
@@ -41,8 +41,7 @@ alias to: log.level
 alias to: message
 
 
-
-## slowlog [_slowlog_3]
+## slowlog [_slowlog]
 
 Contains fields from the MySQL slow logs.
 
@@ -270,7 +269,6 @@ type: long
 :   The number of requests to read the next row in the data file.
 
 type: long
-
 
 
 ## innodb [_innodb]
