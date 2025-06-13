@@ -27,6 +27,10 @@ type Cache[T any] struct {
 }
 
 func (c *Cache[T]) isExpired() bool {
+	// A zero or negative interval means the cache is always considered expired.
+	if c.refreshInterval <= 0 {
+		return true
+	}
 	return time.Since(c.lastRefreshed) > c.refreshInterval
 }
 
