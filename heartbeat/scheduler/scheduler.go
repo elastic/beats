@@ -210,6 +210,7 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 		s.stats.activeJobs.Dec()
 
 		if s.runOnce {
+			logp.L().Infof("Job '%s' completed in runOnce mode, stopping scheduler", id)
 			s.runOnceWg.Done()
 		} else {
 			// Schedule the next run
