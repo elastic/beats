@@ -57,8 +57,6 @@ func newS3GetObjectResponse(filename string, data []byte, contentType string) *s
 }
 
 func TestS3ObjectProcessor(t *testing.T) {
-	logp.TestingSetup()
-
 	t.Run("download text/plain file", func(t *testing.T) {
 		testProcessS3Object(t, "testdata/log.txt", "text/plain", 2)
 	})
@@ -383,6 +381,7 @@ func TestProcessObjectMetricCollection(t *testing.T) {
 
 			// since we processed a single object, total and current process size is same
 			require.Equal(t, test.objectSize, values[0])
+			//nolint:gosec // comparing only positive values
 			require.Equal(t, uint64(test.objectSize), metricRecorder.s3BytesProcessedTotal.Get())
 		})
 	}
