@@ -147,15 +147,25 @@ func postgresParseDSN(config ConnectionDetails, host string) (mb.HostData, error
 		if len(config.TLS.CAs) > 1 {
 			return mb.HostData{}, fmt.Errorf("postgres driver supports only one CA certificate, got %d CAs", len(config.TLS.CAs))
 		} else if len(config.TLS.CAs) == 1 {
-			q.Set("sslrootcert", config.TLS.CAs[0])
+			ca := config.TLS.CAs[0]
+			if tlscommon.IsPEMString(ca) {
+				return mb.HostData{}, fmt.Errorf("postgres driver supports only certificate file path, got 'ca' as PEM formatted certificate")
+			}
+			q.Set("sslrootcert", ca)
 		}
 
-		if config.TLS.Certificate.Key != "" {
-			q.Set("sslkey", config.TLS.Certificate.Key)
+		if key := config.TLS.Certificate.Key; key != "" {
+			if tlscommon.IsPEMString(key) {
+				return mb.HostData{}, fmt.Errorf("postgres driver supports only certificate file path, got 'key' as PEM formatted certificate")
+			}
+			q.Set("sslkey", key)
 		}
 
-		if config.TLS.Certificate.Certificate != "" {
-			q.Set("sslcert", config.TLS.Certificate.Certificate)
+		if cert := config.TLS.Certificate.Certificate; cert != "" {
+			if tlscommon.IsPEMString(cert) {
+				return mb.HostData{}, fmt.Errorf("postgres driver supports only certificate file path, got 'certificate' as PEM formatted certificate")
+			}
+			q.Set("sslcert", cert)
 		}
 
 		u.RawQuery = q.Encode()
@@ -218,7 +228,11 @@ func mssqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
 		if len(config.TLS.CAs) > 1 {
 			return mb.HostData{}, fmt.Errorf("mssql driver supports only one CA certificate, but got %d CAs", len(config.TLS.CAs))
 		} else if len(config.TLS.CAs) == 1 {
-			q.Set("certificate", config.TLS.CAs[0])
+			ca := config.TLS.CAs[0]
+			if tlscommon.IsPEMString(ca) {
+				return mb.HostData{}, fmt.Errorf("mssql driver supports only certificate file path, got 'ca' as PEM formatted certificate")
+			}
+			q.Set("certificate", ca)
 		}
 
 		u.RawQuery = q.Encode()
