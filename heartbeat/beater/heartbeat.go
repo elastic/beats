@@ -325,7 +325,11 @@ func (bt *Heartbeat) Stop() {
 	// TODO: propagate stop signal
 	bt.stopOnce.Do(func() {
 		// Close active jobs before triggering shutdown
-		bt.scheduler.Stop()
+		if bt.config.RunOnce {
+			bt.scheduler.WaitForRunOnce()
+		} else {
+			bt.scheduler.Stop()
+		}
 		close(bt.done)
 	})
 
