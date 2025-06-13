@@ -40,6 +40,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/mock-es/pkg/api"
 )
 
 var logFileLines = []string{
@@ -126,6 +127,7 @@ func TestFilestreamDelete(t *testing.T) {
 			workDir := filebeat.TempDir()
 
 			logFile := filepath.Join(workDir, "log.log")
+
 			// Escape filepaths for Windows
 			msgLogFilePath := logFile
 			if runtime.GOOS == "windows" {
@@ -153,98 +155,143 @@ func TestFilestreamDelete(t *testing.T) {
 			)
 
 			if tc.resourceNotFinished {
-				// Wait a few times for the 'not finished' logs
-				notFinishedMsg := fmt.Sprintf(
-					"not all events from '%s' have been published, "+
-						"closing harvester",
-					msgLogFilePath)
-				for i := range 2 {
-					filebeat.WaitForLogs(
-						notFinishedMsg,
-						10*time.Second,
-						"[%d] Filebeat did not wait for the resource to be finished",
-						i,
-					)
-				}
-
-				if tc.dataAdded {
-					// Add more data to the log file
-					integration.GenerateLogFile(t, msgLogFilePath, 5, true)
-
-					// Wait for the "file update" log
-					filebeat.WaitForLogs(
-						fmt.Sprintf("File %s has been updated", msgLogFilePath),
-						time.Second,
-						"filewatcher did not detect the file as updated")
-
-					// Wait for the harvester to be closed
-					filebeat.WaitForLogs(
-						fmt.Sprintf("not all events from '%s' have been published, closing harvester", msgLogFilePath),
-						10*time.Second,
-						"harvester was not closed after data added to the file")
-
-					// Wait for the "not changed" log
-					filebeat.WaitForLogs(
-						fmt.Sprintf("File %s has not changed, trying to start new harvester", msgLogFilePath),
-						time.Second,
-						"Filestream did not try to start a new harvester for the unchanged file")
-
-					// Ensure harvester closes without removing the file
-					filebeat.WaitForLogs(
-						fmt.Sprintf("not all events from '%s' have been published, closing harvester", msgLogFilePath),
-						10*time.Second,
-						"Harvester was not closed because the resource is not finished")
-
-					if !fileExists(t, logFile) {
-						t.Fatalf("%q should not have been removed", logFile)
-					}
-				}
-
-				if err := es.UpdateOdds(0, 0, 0, 0); err != nil {
-					t.Fatalf("cannot update mock-es odds: %s", err)
-				}
+				testResourceNotFinished(
+					t,
+					filebeat,
+					es,
+					tc.dataAdded,
+					msgLogFilePath,
+					logFile)
 			}
 
-			// Grace period is set, test:
-			// - Grace period is interrupted if data is added to the file
-			// - Grace period is respected if the file does not change
 			if tc.gracePeriod != 0 {
-				gracePeriodMsg := fmt.Sprintf("all events from '%s' have been published, waiting for %s grace period", msgLogFilePath, tc.gracePeriod)
-				filebeat.WaitForLogs(gracePeriodMsg, time.Second, "did not start waiting for grace period")
+				testGracePeriod(t, filebeat, tc.gracePeriod, msgLogFilePath)
+			} else {
+				// Wait for the file removed message
+				msg = fmt.Sprintf("'%s' removed", msgLogFilePath)
+				filebeat.WaitForLogs(msg, 30*time.Second, "file removed log entry not found")
 
-				// Wait 1/2 of the grace period, then add data to the file
-				time.Sleep(tc.gracePeriod / 2)
-				integration.GenerateLogFile(t, msgLogFilePath, 5, true)
-
-				// Wait for the message of file size changed
-				changedMsg := fmt.Sprintf("cancelling deletion of '%s', size has changed", msgLogFilePath)
-				filebeat.WaitForLogs(changedMsg, time.Second, "filestream did detect the file change")
-
-				// Make sure the harvester is closed
-				filebeat.WaitForLogs("Stopped harvester for file", time.Second, "harvester was not closed")
-				filebeat.WaitForLogs("Closing reader of filestream", time.Second, "reader was not closed")
-			}
-
-			msg = fmt.Sprintf("'%s' removed", msgLogFilePath)
-			filebeat.WaitForLogs(msg, 30*time.Second, "file removed log entry not found")
-			removedMsg := filebeat.GetLastLogLine(msg)
-
-			gracePeriodMsg := fmt.Sprintf("all events from '%s' have been published, waiting for %s grace period", msgLogFilePath, tc.gracePeriod)
-			beforeWait := filebeat.GetLastLogLine(gracePeriodMsg)
-
-			delta := timeBetweenLogEntries(t, beforeWait, removedMsg)
-			if delta < tc.gracePeriod {
-				t.Errorf("grace period of %s was not respected", tc.gracePeriod)
-				t.Log("grace period waiting calculated based on the following log entries:")
-				t.Log("First :", beforeWait)
-				t.Log("Second:", removedMsg)
-			}
-
-			if fileExists(t, logFile) {
-				t.Fatalf("%q should have been removed", logFile)
+				if fileExists(t, logFile) {
+					t.Fatalf("%q should have been removed", logFile)
+				}
 			}
 		})
 	}
+}
+
+func testResourceNotFinished(
+	t *testing.T,
+	filebeat *integration.BeatProc,
+	es *api.APIHandler,
+	dataAdded bool,
+	msgLogFilePath, logFile string) {
+
+	t.Run("can detect events not published", func(t *testing.T) {
+		// Wait a few times for the 'not finished' logs
+		notFinishedMsg := fmt.Sprintf(
+			"not all events from '%s' have been published, "+
+				"closing harvester",
+			msgLogFilePath)
+		for i := range 2 {
+			filebeat.WaitForLogs(
+				notFinishedMsg,
+				10*time.Second,
+				"[%d] Filebeat did not wait for the resource to be finished",
+				i,
+			)
+		}
+	})
+
+	if dataAdded {
+		t.Run("can detect data added", func(t *testing.T) {
+			// Add more data to the log file
+			integration.GenerateLogFile(t, msgLogFilePath, 5, true)
+
+			// Wait for the "file update" log
+			filebeat.WaitForLogs(
+				fmt.Sprintf("File %s has been updated", msgLogFilePath),
+				time.Second,
+				"filewatcher did not detect the file as updated")
+
+			// Wait for the harvester to be closed
+			filebeat.WaitForLogs(
+				fmt.Sprintf("not all events from '%s' have been published, closing harvester", msgLogFilePath),
+				10*time.Second,
+				"harvester was not closed after data added to the file")
+
+			// Wait for the "not changed" log
+			filebeat.WaitForLogs(
+				fmt.Sprintf("File %s has not changed, trying to start new harvester", msgLogFilePath),
+				time.Second,
+				"Filestream did not try to start a new harvester for the unchanged file")
+
+			// Ensure harvester closes without removing the file
+			filebeat.WaitForLogs(
+				fmt.Sprintf("not all events from '%s' have been published, closing harvester", msgLogFilePath),
+				10*time.Second,
+				"Harvester was not closed because the resource is not finished")
+
+			if !fileExists(t, logFile) {
+				t.Fatalf("%q should not have been removed", logFile)
+			}
+		})
+	}
+
+	// Reset odds in Mock-ES
+	if err := es.UpdateOdds(0, 0, 0, 0); err != nil {
+		t.Fatalf("cannot update mock-es odds: %s", err)
+	}
+}
+
+// testGracePeriod asserts:
+// - Grace period is interrupted if data is added to the file
+// - Grace period is respected if the file does not change
+func testGracePeriod(
+	t *testing.T,
+	filebeat *integration.BeatProc,
+	gracePeriod time.Duration,
+	msgLogFilePath string) {
+
+	t.Run("grace period is interrupted when file changes", func(t *testing.T) {
+		gracePeriodMsg := fmt.Sprintf(
+			"all events from '%s' have been published, waiting for %s grace period",
+			msgLogFilePath, gracePeriod)
+		filebeat.WaitForLogs(
+			gracePeriodMsg,
+			time.Second,
+			"did not start waiting for grace period")
+
+		// Wait 1/2 of the grace period, then add data to the file
+		time.Sleep(gracePeriod / 2)
+		integration.GenerateLogFile(t, msgLogFilePath, 5, true)
+
+		// Wait for the message of file size changed
+		changedMsg := fmt.Sprintf("cancelling deletion of '%s', size has changed", msgLogFilePath)
+		filebeat.WaitForLogs(changedMsg, time.Second, "filestream did detect the file change")
+
+		// Make sure the harvester is closed
+		filebeat.WaitForLogs("Stopped harvester for file", time.Second, "harvester was not closed")
+		filebeat.WaitForLogs("Closing reader of filestream", time.Second, "reader was not closed")
+	})
+
+	t.Run("grace period is respected", func(t *testing.T) {
+		msg := fmt.Sprintf("'%s' removed", msgLogFilePath)
+		filebeat.WaitForLogs(msg, 30*time.Second, "file removed log entry not found")
+		removedMsg := filebeat.GetLastLogLine(msg)
+
+		gracePeriodMsg := fmt.Sprintf(
+			"all events from '%s' have been published, waiting for %s grace period",
+			msgLogFilePath, gracePeriod)
+		beforeWait := filebeat.GetLastLogLine(gracePeriodMsg)
+
+		delta := timeBetweenLogEntries(t, beforeWait, removedMsg)
+		if delta < gracePeriod {
+			t.Errorf("grace period of %s was not respected", gracePeriod)
+			t.Log("grace period waiting calculated based on the following log entries:")
+			t.Log("First :", beforeWait)
+			t.Log("Second:", removedMsg)
+		}
+	})
 }
 
 func TestFilestreamDeleteRestart(t *testing.T) {
