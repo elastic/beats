@@ -3,15 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-apache.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Apache fields [exported-fields-apache]
 
 Apache Module
 
-
 ## apache [_apache]
 
 Apache fields.
-
 
 ## access [_access]
 
@@ -27,7 +27,6 @@ type: keyword
 :   SSL cipher name.
 
 type: keyword
-
 
 
 ## error [_error]

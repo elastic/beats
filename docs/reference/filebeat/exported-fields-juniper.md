@@ -3,12 +3,13 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-juniper.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Juniper JUNOS fields [exported-fields-juniper]
 
 juniper fields.
 
-
-## juniper.srx [_juniper_srx]
+## juniper.srx [_juniper.srx]
 
 Module for parsing junipersrx syslog.
 

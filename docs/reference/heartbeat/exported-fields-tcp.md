@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-tcp.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # TCP layer fields [exported-fields-tcp]
 
 None
-
 
 ## tcp [_tcp]
 
@@ -20,13 +21,11 @@ type: alias
 alias to: url.port
 
 
-
-## rtt [_rtt_5]
+## rtt [_rtt]
 
 TCP layer round trip times.
 
-
-## connect [_connect_2]
+## connect [_connect]
 
 Duration required to establish a TCP connection based on already available IP address.
 
@@ -36,8 +35,7 @@ Duration required to establish a TCP connection based on already available IP ad
 type: long
 
 
-
-## validate [_validate_2]
+## validate [_validate]
 
 Duration of validation step based on existing TCP connection.
 

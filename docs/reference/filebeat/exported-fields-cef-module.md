@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-cef-module.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # CEF fields [exported-fields-cef-module]
 
 Module for receiving CEF logs over Syslog. The module adds vendor specific fields in addition to the fields the decode_cef processor provides.
-
 
 ## forcepoint [_forcepoint]
 
@@ -16,7 +17,6 @@ Fields for Forcepoint Custom String mappings
 :   Virus ID
 
 type: keyword
-
 
 
 ## checkpoint [_checkpoint]
@@ -269,8 +269,7 @@ type: keyword
 type: keyword
 
 
-
-## cef.extensions [_cef_extensions]
+## cef.extensions [_cef.extensions]
 
 Extra vendor-specific extensions.
 

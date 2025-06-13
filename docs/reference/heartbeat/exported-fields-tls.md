@@ -3,40 +3,35 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-tls.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # TLS encryption layer fields [exported-fields-tls]
 
 None
 
-
-## tls [_tls_2]
+## tls [_tls]
 
 TLS layer related fields.
 
 **`tls.certificate_not_valid_before`**
-:   :::{admonition} Deprecated in 7.8.0
-    Deprecated in favor of `tls.server.x509.not_before`.
-    :::
+:   Deprecated in favor of `tls.server.x509.not_before`. Earliest time at which the connection's certificates are valid.
 
-Earliest time at which the connection’s certificates are valid.
+{applies_to}`product: deprecated 7.8.0`
 
 type: date
 
 
 **`tls.certificate_not_valid_after`**
-:   :::{admonition} Deprecated in 7.8.0
-    Deprecated in favor of `tls.server.x509.not_after`.
-    :::
+:   Deprecated in favor of `tls.server.x509.not_after`. Latest time at which the connection's certificates are valid.
 
-Latest time at which the connection’s certificates are valid.
+{applies_to}`product: deprecated 7.8.0`
 
 type: date
 
 
-
-## rtt [_rtt_6]
+## rtt [_rtt]
 
 TLS layer round trip times.
-
 
 ## handshake [_handshake]
 
@@ -48,8 +43,7 @@ Time required to finish TLS handshake based on already available network connect
 type: long
 
 
-
-## server [_server_2]
+## server [_server]
 
 Detailed x509 certificate metadata
 
