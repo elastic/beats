@@ -14,15 +14,15 @@ Breaking changes can impact your Elastic applications, potentially disrupting no
 
 ::::{dropdown} The default data and logs path for the Windows service installation has changed.
 The base folder has changed from `C:\ProgramData\` to `C:\Program
-Files\` because the latter has more strict permissions. Now the state
-and logs are stored in `C:\Program Files\<Beat Name>-Data`.
+Files\` because the latter has stricter permissions. The state
+and logs are now stored in `C:\Program Files\<Beat Name>-Data`.
 
 When the installation script runs, it looks for the previous default
-data path, if it is found, the data is moved to the new path.
+data path. If the path is found, data is moved to the new path.
 The installation script accepts the parameter `-UseLegacyPath` to
 force using the legacy data path.
 
-In a PowerShell prompt you can use `Get-Help install-service-<Beat Name>.ps1
+In a PowerShell prompt, can use `Get-Help install-service-<Beat Name>.ps1
 -detailed` to get detailed help.
 
 ::::
