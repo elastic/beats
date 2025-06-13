@@ -280,6 +280,8 @@ func runCmd(
 			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 				timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
 				cmdError = ECSErrToSynthError(ecserr.NewCmdTimeoutStatusErr(timeout, cmd.String()))
+			} else if errors.Is(ctx.Err(), context.Canceled) {
+				cmdError = ECSErrToSynthError(ecserr.NewCmdSkippedStatusErr(ctx.Err().Error()))
 			} else {
 				cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), cmd.String()))
 			}

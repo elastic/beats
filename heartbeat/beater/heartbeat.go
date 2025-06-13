@@ -223,6 +223,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	defer waitPublished.Wait()
 
 	// Three possible events: global beat, run_once pipeline done and publish timeout
+	// TODO: Maybe control bt.done here and "skip" ongoing monitors.
 	waitPublished.AddChan(bt.done)
 	waitPublished.Add(monitors.WithLog(pipelineWrapper.Wait, "shutdown: finished publishing events."))
 	if bt.config.PublishTimeout > 0 {
@@ -321,6 +322,7 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
+	// TODO: propagate stop signal
 	bt.stopOnce.Do(func() { close(bt.done) })
 }
 
