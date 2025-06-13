@@ -65,6 +65,10 @@ type mapSelector struct {
 	to        map[string]string
 }
 
+type MockSelector struct {
+	SelFn func(evt *beat.Event) (string, error)
+}
+
 var nilSelector SelectorExpr = &emptySelector{}
 
 // MakeSelector creates a selector from a set of selector expressions.
@@ -394,4 +398,8 @@ func (s *mapSelector) sel(evt *beat.Event) (string, error) {
 		return s.otherwise, nil
 	}
 	return n, nil
+}
+
+func (m *MockSelector) sel(e *beat.Event) (string, error) {
+	return m.SelFn(e)
 }

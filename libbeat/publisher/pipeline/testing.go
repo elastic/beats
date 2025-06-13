@@ -56,9 +56,9 @@ type mockNetworkClient struct {
 
 func (c *mockNetworkClient) Connect(_ context.Context) error { return nil }
 
-type mockBatch struct {
-	mu     sync.Mutex
-	events []publisher.Event
+type MockBatch struct {
+	Mu        sync.Mutex
+	EventList []publisher.Event
 
 	onEvents    func()
 	onACK       func()
@@ -67,42 +67,42 @@ type mockBatch struct {
 	onCancelled func()
 }
 
-func (b *mockBatch) Events() []publisher.Event {
-	b.mu.Lock()
-	defer b.mu.Unlock()
+func (b *MockBatch) Events() []publisher.Event {
+	b.Mu.Lock()
+	defer b.Mu.Unlock()
 	signalFn(b.onEvents)
-	return b.events
+	return b.EventList
 }
 
-func (b *mockBatch) ACK()             { signalFn(b.onACK) }
-func (b *mockBatch) Drop()            { signalFn(b.onDrop) }
-func (b *mockBatch) Retry()           { signalFn(b.onRetry) }
-func (b *mockBatch) SplitRetry() bool { return false }
-func (b *mockBatch) Cancelled()       { signalFn(b.onCancelled) }
-func (b *mockBatch) FreeEntries()     {}
+func (b *MockBatch) ACK()             { signalFn(b.onACK) }
+func (b *MockBatch) Drop()            { signalFn(b.onDrop) }
+func (b *MockBatch) Retry()           { signalFn(b.onRetry) }
+func (b *MockBatch) SplitRetry() bool { return false }
+func (b *MockBatch) Cancelled()       { signalFn(b.onCancelled) }
+func (b *MockBatch) FreeEntries()     {}
 
-func (b *mockBatch) RetryEvents(events []publisher.Event) {
+func (b *MockBatch) RetryEvents(events []publisher.Event) {
 	b.updateEvents(events)
 	signalFn(b.onRetry)
 }
 
-func (b *mockBatch) updateEvents(events []publisher.Event) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	b.events = events
+func (b *MockBatch) updateEvents(events []publisher.Event) {
+	b.Mu.Lock()
+	defer b.Mu.Unlock()
+	b.EventList = events
 }
 
-func (b *mockBatch) Len() int {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	return len(b.events)
+func (b *MockBatch) Len() int {
+	b.Mu.Lock()
+	defer b.Mu.Unlock()
+	return len(b.EventList)
 }
 
-func (b *mockBatch) withRetryer(r standaloneRetryer) *mockBatch {
-	wrapper := &mockBatch{
-		events: b.events,
-		onACK:  b.onACK,
-		onDrop: b.onDrop,
+func (b *MockBatch) withRetryer(r standaloneRetryer) *MockBatch {
+	wrapper := &MockBatch{
+		EventList: b.EventList,
+		onACK:     b.onACK,
+		onDrop:    b.onDrop,
 	}
 	wrapper.onRetry = func() { r.retryChan <- wrapper }
 	wrapper.onCancelled = func() { r.retryChan <- wrapper }
@@ -161,9 +161,9 @@ func signalFn(fn func()) {
 	}
 }
 
-func randomBatch(min, max int) *mockBatch {
-	return &mockBatch{
-		events: make([]publisher.Event, randIntBetween(min, max)),
+func randomBatch(min, max int) *MockBatch {
+	return &MockBatch{
+		EventList: make([]publisher.Event, randIntBetween(min, max)),
 	}
 }
 
