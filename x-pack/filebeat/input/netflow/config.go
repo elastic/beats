@@ -24,6 +24,11 @@ type config struct {
 	DetectSequenceReset       bool          `config:"detect_sequence_reset"`
 	ShareTemplates            bool          `config:"share_templates"`
 	NumberOfWorkers           uint32        `config:"workers"`
+	Ipfix                     IpfixConfig   `config:"ipfix"`
+}
+
+type IpfixConfig struct {
+	Paths []string `config:"paths"`
 }
 
 var defaultConfig = config{
@@ -42,4 +47,7 @@ var defaultConfig = config{
 	DetectSequenceReset: true,
 	ShareTemplates:      false,
 	NumberOfWorkers:     1,
+	Ipfix: IpfixConfig{
+		Paths: nil,
+	},
 }
