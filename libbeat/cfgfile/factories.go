@@ -92,3 +92,9 @@ func (f multiplexedFactory) findFactory(c *config.C) (RunnerFactory, error) {
 
 	return nil, errConfigDoesNotMatch
 }
+
+type FactoryWrapper func(RunnerFactory) RunnerFactory
+
+type WithFactoryWrapper interface {
+	WithFactoryWrapper(FactoryWrapper)
+}
