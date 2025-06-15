@@ -305,7 +305,7 @@ func (msw *metricSetWrapper) String() string {
 func (msw *metricSetWrapper) Test(d testing.Driver) {
 	d.Run(msw.Name(), func(d testing.Driver) {
 		events := make(chan beat.Event, 1)
-		done := receiveOneEvent(d, events, msw.module.maxStartDelay+5*time.Second)
+		done := receiveOneEvent(d, events, time.Duration(msw.module.maxStartDelay.Seconds()+msw.module.Config().Timeout.Seconds())*time.Second)
 		msw.run(done, events)
 	})
 }
