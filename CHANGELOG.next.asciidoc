@@ -455,6 +455,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added support for specifying custom content-types and encodings in azureblobstorage input. {issue}44330[44330] {pull}44402[44402]
 - Introduce lastSync start position to AWS CloudWatch input backed by state registry. {pull}43251[43251]
 - Filestream now logs at level warn the number of files that are too small to be ingested {pull}44751[44751]
+- Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
 
 *Auditbeat*
 
