@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/mock"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -758,9 +759,10 @@ func newV2Context(t *testing.T) (v2.Context, func()) {
 		t.Fatalf("failed to generate random id: %v", err)
 	}
 	return v2.Context{
-		Logger:      logp.NewLogger("abs_test"),
-		ID:          "abs_test-" + id,
-		Cancelation: ctx,
+		Logger:          logp.NewLogger("abs_test"),
+		ID:              "abs_test-" + id,
+		Cancelation:     ctx,
+		MetricsRegistry: monitoring.NewRegistry(),
 	}, cancel
 }
 
