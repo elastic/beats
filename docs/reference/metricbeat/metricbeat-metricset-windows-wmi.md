@@ -24,7 +24,7 @@ Currently, the metricset supports queries with `SELECT`, `FROM` and
 When working with WMI queries, it is the user’s responsibility to ensure
 that queries are safe, efficient, and do not cause unintended side
 effects. A notorious example of a problematic WMI class is
-Win32\_Product. Read more in [Windows
+`Win32_Product`. Read more in [Windows
 Documentation](https://support.microsoft.com/kb/974524).
 
 ## WMI Arbitrator and Query Execution
@@ -85,6 +85,10 @@ warning is logged indicating that the query execution has exceeded the
 threshold. The default is equal to the period. See [WMI Arbitrator and
 Query Execution](#wmi-arbitrator-and-query-execution) for more details.
 
+**`wmi.include_query_class`**
+:   If set to `true` the metricset include the queried class.
+Useful if superclasses are queried. The default value is `false`.
+
 **`wmi.include_queries`**
 :   If set to `true` the metricset includes the query in the output
 document. The default value is `false`.
@@ -123,7 +127,7 @@ Documentation](https://learn.microsoft.com/en-us/windows/win32/wmisdk/where-clau
 :   The WMI Namespace for this particular query (it overwrites the
 metricset’s `namespace` value)
 
-### Example
+#### Example
 
 Example WQL Query:
 
@@ -146,19 +150,19 @@ Equivalent YAML Configuration:
 
 ## Best Practices
 
-- Test your queries in isolation using the `Get-CimInstance` PowerShell
-  cmdlet or the WMI Explorer.
+- Test your queries with in isolation using the
+  [`Get-CimInstance`](https://learn.microsoft.com/en-us/powershell/module/cimcmdlets/get-ciminstance) 
+  PowerShell cmdlet or 
+  [the WMI Explorer tool](https://github.com/vinaypamnani/wmie2).
 
 - Ensure that `wmi.warning_threshold` is **less than or equal to** the
-  module’s `period`. This prevents starting intentionally multiple
+  module's `period`. This prevents starting intentionally multiple
   executions of the same query.
 
-- Set up alerts in Metricbeat logs for timeouts and empty query results.
-  If a query frequently times out or returns no data, investigate the
-  cause to prevent missing critical information.
+- Set up alerts in Metricbeat for documents with the `error.message` field set.
 
-- \[Advanced\] Collect WMI-Activity Operational Logs to correlate with
-  Metricbeat WMI warnings.
+- [Advanced] Collect WMI-Activity Operational Logs to correlate with
+  Metricbeat WMI warnings / documents with `error.message`.
 
 ## Compatibility
 
