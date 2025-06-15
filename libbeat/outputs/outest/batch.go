@@ -45,11 +45,21 @@ const (
 )
 
 func NewBatch(in ...beat.Event) *Batch {
+	return newBatch(nil, in)
+}
+
+func newBatch(listener beat.OutputListener, in []beat.Event) *Batch {
 	events := make([]publisher.Event, len(in))
 	for i, c := range in {
-		events[i] = publisher.Event{Content: c}
+		events[i] = publisher.Event{
+			Content:        c,
+			OutputListener: publisher.OutputListener{Listener: listener}}
 	}
 	return &Batch{events: events}
+}
+
+func NewBatchWithObserver(listener beat.OutputListener, in ...beat.Event) *Batch {
+	return newBatch(listener, in)
 }
 
 func (b *Batch) Events() []publisher.Event {

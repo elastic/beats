@@ -106,7 +106,7 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 	events := batch.Events()
 	st := c.observer
 
-	st.NewBatch(len(events))
+	st.NewBatch(events)
 
 	if len(events) == 0 {
 		batch.ACK()
@@ -150,8 +150,8 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 		c.log.Debugf("%v events out of %v events sent to logstash host %s. Continue sending",
 			n, len(events), c.Host())
 
+		st.AckedEvents(events[:n])
 		events = events[n:]
-		st.AckedEvents(n)
 		deadlockListener.ack(n)
 		if err != nil {
 			// return batch to pipeline before reporting/counting error
@@ -161,8 +161,7 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 
 			c.log.Errorf("Failed to publish events caused by: %+v", err)
 
-			rest := len(events)
-			st.RetryableErrors(rest)
+			st.RetryableErrors(events)
 
 			return err
 		}

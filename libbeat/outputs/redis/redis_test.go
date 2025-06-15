@@ -18,16 +18,29 @@
 package redis
 
 import (
+	"context"
+	"errors"
 	"testing"
 
+	"github.com/gomodule/redigo/redis"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
+	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/outputs/outputtest"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type checker func(*testing.T, outputs.Group)
@@ -182,4 +195,185 @@ func TestKeySelection(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestClientOutputListener(t *testing.T) {
+	type publishCase struct {
+		assertFn func(*testing.T, error)
+		events   []beat.Event
+	}
+	type testCase struct {
+		name            string
+		publishCases    []publishCase
+		makePublishFn   func(c *client, conn redis.Conn) publishFn
+		mockSetup       func(conn *redisMock)
+		events          []beat.Event
+		expectedMetrics outputtest.Metrics
+	}
+
+	logger := logptest.NewTestingLogger(t, "",
+		// only print stacktrace for errors above ErrorLevel.
+		zap.AddStacktrace(zapcore.ErrorLevel+1))
+
+	baseCfgMap := map[string]interface{}{
+		"hosts":    []string{"localhost:6379"},
+		"key":      "test",
+		"datatype": "list",
+	}
+
+	testCases := []testCase{
+		{
+			name: "publishEventsPipeline",
+			publishCases: []publishCase{
+				{assertFn: func(t *testing.T, err error) {
+					// as not all events succeed, Publish returns an error
+					require.Error(t, err, "call to Publish return an error")
+				},
+					events: []beat.Event{
+						{Fields: mapstr.M{"message": "event 1", "outcome": "success"}},
+						{Fields: mapstr.M{"message": "event 2", "outcome": "retry"}},
+						{Fields: mapstr.M{"message": "event 3", "outcome": "key-fail"}},
+						{Fields: mapstr.M{"message": "event 4", "outcome": "encode-fail"}}},
+				},
+			},
+			makePublishFn: func(c *client, conn redis.Conn) publishFn {
+				return c.publishEventsPipeline(conn, "")
+			},
+			mockSetup: func(conn *redisMock) {
+				conn.receiveRet = []error{nil, errors.New("pipeline: 2nd event fails")}
+			},
+			expectedMetrics: outputtest.Metrics{
+				Total:     4,
+				Acked:     1,
+				Dropped:   2,
+				Retryable: 1,
+				Batches:   1,
+			},
+		},
+		{
+			name: "publishEventsBulk",
+			publishCases: []publishCase{
+				{
+					assertFn: func(t *testing.T, err error) {
+						require.NoError(t, err, "1st call to Publish should succeed")
+					},
+					events: []beat.Event{
+						{Fields: mapstr.M{"message": "event 1", "outcome": "success"}}},
+				},
+				{
+					assertFn: func(t *testing.T, err error) {
+						require.Error(t, err, "2nd call to Publish should error")
+					},
+					events: []beat.Event{
+						{Fields: mapstr.M{"message": "event 2", "outcome": "Do error"}}},
+				},
+			},
+			makePublishFn: func(c *client, conn redis.Conn) publishFn {
+				return c.publishEventsBulk(conn, "")
+			},
+			mockSetup: func(conn *redisMock) {
+				conn.doRet = []error{nil, errors.New("do error")}
+			},
+			events: []beat.Event{
+				{Fields: mapstr.M{"message": "event 1", "outcome": "success"}}},
+			expectedMetrics: outputtest.Metrics{
+				Total:     2,
+				Acked:     1,
+				Retryable: 1,
+				Batches:   2,
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg, _ := config.NewConfigFrom(baseCfgMap)
+			reg := monitoring.NewRegistry()
+			group, err := makeRedis(nil,
+				beat.Info{
+					Beat:   "TestMetricsFastPath",
+					Logger: logger},
+				outputs.NewStats(reg),
+				cfg)
+			require.NoError(t, err)
+			require.Len(t, group.Clients, 1)
+
+			counter := &beat.CountOutputListener{}
+			listener := publisher.OutputListener{Listener: counter}
+
+			bc := group.Clients[0].(*backoffClient)
+			c := bc.client
+			c.key = outil.MakeSelector(&outil.MockSelector{
+				SelFn: func(e *beat.Event) (string, error) {
+					if e.Fields["outcome"] == "key-fail" {
+						return "", errors.New("triggering key selection failure")
+					}
+					return "", nil
+				},
+			})
+			c.codec = &encoderMock{encoder: json.New("", json.Config{})}
+
+			conn := &redisMock{}
+			tc.mockSetup(conn)
+			c.publish = tc.makePublishFn(c, conn)
+
+			for _, pc := range tc.publishCases {
+				batch := outest.NewBatchWithObserver(listener, pc.events...)
+				err = bc.Publish(context.Background(), batch)
+				pc.assertFn(t, err)
+			}
+
+			outputtest.AssertOutputMetrics(t,
+				tc.expectedMetrics,
+				counter, reg)
+		})
+	}
+}
+
+type redisMock struct {
+	receiveCount int
+	receiveRet   []error
+
+	doCounter int
+	doRet     []error
+}
+
+type encoderMock struct {
+	encoder codec.Codec
+}
+
+func (r *redisMock) Err() error {
+	panic("implement me")
+}
+
+func (r *redisMock) Do(_ string, _ ...interface{}) (reply interface{}, err error) {
+	idx := r.doCounter
+	r.doCounter++
+	return nil, r.doRet[idx]
+}
+
+func (r *redisMock) Send(_ string, _ ...interface{}) error {
+	return nil
+}
+
+func (r *redisMock) Flush() error {
+	return nil
+}
+
+func (r *redisMock) Receive() (_ interface{}, err error) {
+	idx := r.receiveCount
+	r.receiveCount++
+	return nil, r.receiveRet[idx]
+}
+
+func (e encoderMock) Encode(index string, event *beat.Event) ([]byte, error) {
+	if event.Fields["outcome"] == "encode-fail" {
+		return nil, errors.New("triggering encoding failure")
+	}
+
+	return e.encoder.Encode(index, event)
+}
+
+func (r *redisMock) Close() error {
+	return nil
 }
