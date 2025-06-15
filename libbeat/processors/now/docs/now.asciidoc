@@ -1,0 +1,23 @@
+[[now]]
+=== Now
+
+++++
+<titleabbrev>now</titleabbrev>
+++++
+
+The `now` processor gets the current timestamp and updates the value of the specified `field` with it.
+
+* `field` to update with the timestamp
+
+[source,yaml]
+-------
+processors:
+  - now:
+      field: "field1"
+-------
+
+In the example above:
+
+- field1 is set to the current timestamp
+
+See <<conditions>> for a list of supported conditions.
