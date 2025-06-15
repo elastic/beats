@@ -17,6 +17,14 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 % ### Fixes [beats-versionext-fixes]
 
+## 9.1.0 [beats-9.1.0-release-notes]
+
+### Features and enhancements [beats-9.1.0-features-enhancements]
+
+**Metricbeat**
+
+- Add GCP cache for metadata collectors. [44432]({{beats-pull}}44432)
+
 ## 9.0.2 [beats-9.0.2-release-notes]
 
 ### Features and enhancements [beats-9.0.2-features-enhancements]
