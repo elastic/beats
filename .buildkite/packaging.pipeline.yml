@@ -8,8 +8,8 @@ env:
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
-  PLATFORMS: "+all linux/amd64 linux/386 linux/arm64 windows/amd64 windows/386 darwin/amd64"
-  PLATFORMS_ARM: "linux/arm64"
+  PLATFORMS: "+all linux/amd64 linux/386 windows/amd64 windows/386 darwin/amd64"
+  PLATFORMS_ARM: "+all linux/arm64"
 
 steps:
   # we use concurrency gates (https://buildkite.com/blog/concurrency-gates)
@@ -120,10 +120,9 @@ steps:
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      - label: "SNAPSHOT: {{matrix}} docker Linux/arm64"
+      - label: "SNAPSHOT: {{matrix}} Linux/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
-          PACKAGES: "docker"
           SNAPSHOT: true
           DEV: true
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
@@ -189,10 +188,9 @@ steps:
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      - label: "STAGING: {{matrix}} docker Linux/arm64"
+      - label: "STAGING: {{matrix}} Linux/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
-          PACKAGES: "docker"
           SNAPSHOT: false
           DEV: false
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
