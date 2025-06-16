@@ -29,6 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -49,7 +50,7 @@ func TestReloader(t *testing.T) {
 		},
 	})
 	// config.C{}
-	reloader := NewReloader(nil, config)
+	reloader := NewReloader(logptest.NewTestingLogger(t, ""), nil, config)
 	retryCount := 10
 
 	go reloader.Run(nil)

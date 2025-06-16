@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // ExampleWrapper demonstrates how to create a single Wrapper
@@ -46,9 +47,13 @@ func ExampleWrapper() {
 		fmt.Println("Error:", err)
 		return
 	}
-
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
 	// Create a new Wrapper based on the configuration.
-	m, err := module.NewWrapper(config, mb.Registry, module.WithMetricSetInfo())
+	m, err := module.NewWrapper(config, mb.Registry, logger, module.WithMetricSetInfo())
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
@@ -126,8 +131,14 @@ func ExampleRunner() {
 		return
 	}
 
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
 	// Create a new Wrapper based on the configuration.
-	m, err := module.NewWrapper(config, mb.Registry, module.WithMetricSetInfo())
+	m, err := module.NewWrapper(config, mb.Registry, logger, module.WithMetricSetInfo())
 	if err != nil {
 		return
 	}
