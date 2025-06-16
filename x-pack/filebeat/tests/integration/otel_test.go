@@ -98,10 +98,11 @@ setup.template.pattern: logs-filebeat-default
 
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
+
 	// wait for logs to be published
 	require.Eventually(t,
 		func() bool {
-			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
 			defer findCancel()
 
 			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
@@ -109,10 +110,10 @@ setup.template.pattern: logs-filebeat-default
 
 			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-filebeat-default*")
 			require.NoError(t, err)
-
-			return otelDocs.Hits.Total.Value >= numEvents && filebeatDocs.Hits.Total.Value >= numEvents
+			t.Logf("otel docs = %d, filebeat docs = %d", otelDocs.Hits.Total.Value, filebeatDocs.Hits.Total.Value)
+			return otelDocs.Hits.Total.Value < 0 && filebeatDocs.Hits.Total.Value >= numEvents
 		},
-		3*time.Minute, 1*time.Second, fmt.Sprintf("otel docs = %d, filebeat docs = %d", otelDocs.Hits.Total.Value, filebeatDocs.Hits.Total.Value))
+		30*time.Second, 5*time.Second, "otel docs = %d, filebeat docs = %d", otelDocs.Hits.Total.Value, filebeatDocs.Hits.Total.Value)
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
