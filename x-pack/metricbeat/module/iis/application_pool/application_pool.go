@@ -50,7 +50,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	ms := &MetricSet{
 		BaseMetricSet: base,
-		log:           logp.NewLogger("application pool"),
+		log:           base.Logger().Named("application pool"),
 		reader:        reader,
 	}
 

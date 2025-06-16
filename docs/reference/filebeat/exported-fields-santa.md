@@ -3,12 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-santa.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Google Santa fields [exported-fields-santa]
 
 Santa Module
 
-
 ## santa [_santa]
+
+
 
 **`santa.action`**
 :   Action
@@ -40,7 +43,6 @@ example: CERT
 type: keyword
 
 example: M
-
 
 
 ## disk [_disk]

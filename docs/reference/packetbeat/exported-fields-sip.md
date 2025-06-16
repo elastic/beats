@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-sip.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # SIP fields [exported-fields-sip]
 
 SIP-specific event fields.
-
 
 ## sip [_sip]
 

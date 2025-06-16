@@ -52,7 +52,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := logp.NewLogger("mssql.transaction_log").With("host", base.HostData().SanitizedURI)
+	logger := base.Logger().Named("mssql.transaction_log").With("host", base.HostData().SanitizedURI)
 
 	db, err := mssql.NewConnection(base.HostData().URI)
 	if err != nil {

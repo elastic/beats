@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-resolve.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Host lookup fields [exported-fields-resolve]
 
 None
-
 
 ## resolve [_resolve]
 
@@ -26,8 +27,7 @@ alias to: url.domain
 type: ip
 
 
-
-## rtt [_rtt_3]
+## rtt [_rtt]
 
 Duration required to resolve an IP from hostname.
 

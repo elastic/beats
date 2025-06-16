@@ -8,17 +8,13 @@ import six
 
 def collect(base_paths):
 
-    # Always use the auditbeat/docs/ directory, regardless
+    # Always use the docs/ directory, regardless
     # of where this script was called from.
-    docs_path = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir, "docs"))
+    docs_path = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir, os.pardir, "docs"))
 
     beat_name = os.path.basename(base_paths[0])
 
-    generated_note = """////
-This file is generated! See scripts/docs_collector.py
-////
-
-"""
+    generated_note = ""
 
     modules_list = {}
 
@@ -34,23 +30,11 @@ This file is generated! See scripts/docs_collector.py
     for module in sorted(module_dirs):
         module_dir = module_dirs[module]
 
-        module_doc = os.path.join(module_dir, "_meta/docs.asciidoc")
+        module_doc = os.path.join(module_dir, "_meta/docs.md")
 
-        # Only check folders where docs.asciidoc exists
+        # Only check folders where docs.md exists
         if os.path.isfile(module_doc) == False:
             continue
-
-        # Create directory for each module
-        os.mkdir(os.path.join(module_docs_path(module_dir), "modules", module))
-
-        module_file = generated_note
-
-        module_file += ":modulename: " + module + "\n\n"
-
-        module_file += "[id=\"{beatname_lc}-module-" + module + "\"]\n"
-
-        with open(module_doc) as f:
-            module_file += f.read()
 
         beat_path = os.path.join(module_dir, "_meta")
 
@@ -58,6 +42,19 @@ This file is generated! See scripts/docs_collector.py
         with open(beat_path + "/fields.yml") as f:
             fields = yaml.load(f.read(), Loader=yaml.FullLoader)
             title = fields[0]["title"]
+
+        module_file = """---
+mapped_pages:
+  - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-module-{}.html
+---
+
+% This file is generated! See scripts/docs_collector.py
+
+# {} Module [auditbeat-module-{}]
+
+""".format(module, title, module)
+        with open(module_doc) as f:
+            module_file += f.read()
 
         modules_list[module] = title
 
@@ -67,119 +64,102 @@ This file is generated! See scripts/docs_collector.py
         if os.path.isfile(config_file):
 
             module_file += """
+## Example configuration [_example_configuration]
 
-[float]
-=== Example configuration
+The {} module supports the common configuration options that are described under [configuring Auditbeat](/reference/auditbeat/configuration-auditbeat.md). Here is an example configuration:
 
-The """ + title + """ module supports the common configuration options that are
-described under <<configuration-{beatname_lc},configuring {beatname_uc}>>. Here
-is an example configuration:
-
-[source,yaml]
-----
-""" + beat_name + ".modules:\n"
+```yaml
+auditbeat.modules:
+""".format(title)
 
             # Load dataset yaml
             with open(config_file) as f:
-                # Add 2 spaces for indentation in front of each line
-                for line in f:
-                    module_file += line
+                module_file += f.read().strip()
 
-            module_file += "----\n\n"
+            module_file += "\n```\n\n"
 
         # Close modulename variable
-        module_file += "\n:modulename!:\n\n"
-
         module_links = ""
-        module_includes = ""
 
         # Iterate over all datasets
         for dataset in sorted(os.listdir(module_dir)):
 
-            dataset_docs = os.path.join(module_dir, dataset, "_meta/docs.asciidoc")
+            dataset_docs = os.path.join(module_dir, dataset, "_meta/docs.md")
 
             # Only check folders where fields.yml exists
             if not os.path.isfile(dataset_docs):
                 continue
 
-            link_name = "{beatname_lc}-dataset-" + module + "-" + dataset
-            link = "<<" + link_name + "," + dataset + ">>"
-            reference = "[id=\"" + link_name + "\"]"
+            module_links += "* [{}](/reference/auditbeat/auditbeat-dataset-{}-{}.md)\n".format(dataset, module, dataset)
 
-            module_links += "* " + link + "\n\n"
+            dataset_file = """---
+mapped_pages:
+  - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-dataset-{module}-{dataset}.html
+---
 
-            module_includes += "include::" + module + "/" + dataset + ".asciidoc[]\n\n"
+# {module_title} {dataset} dataset [auditbeat-dataset-{module}-{dataset}]
 
-            dataset_file = generated_note
+""".format(module_title=title, module=module, dataset=dataset)
 
-            # Add reference to dataset file and include file
-            dataset_file += reference + "\n"
-
-            # Create title out of module and dataset set name
-            dataset_file += "=== {} {} dataset\n\n".format(title, dataset)
-
-            dataset_file += 'include::../../../module/' + module + '/' + dataset + '/_meta/docs.asciidoc[]' + "\n"
+            with open(dataset_docs) as f:
+                dataset_file += f.read()
 
             # TODO: This should point directly to the exported fields of the dataset, not the whole module
             dataset_file += """
+## Fields [_fields]
 
-==== Fields
+For a description of each field in the dataset, see the [exported fields](/reference/auditbeat/exported-fields-{}.md) section.
 
-For a description of each field in the dataset, see the
-<<exported-fields-""" + module + """,exported fields>> section.
+Here is an example document generated by this dataset:
 
-"""
+```json
+""".format(module)
 
             data_file = os.path.join(module_dir, dataset, "_meta/data.json")
 
             # Add data.json example json document
             if os.path.isfile(data_file):
-                dataset_file += "Here is an example document generated by this dataset:"
-                dataset_file += "\n\n"
-
-                dataset_file += "[source,json]\n"
-                dataset_file += "----\n"
-                dataset_file += "include::../../../module/" + module + "/" + dataset + "/_meta/data.json[]\n"
-                dataset_file += "----\n"
+                with open(data_file) as f:
+                    dataset_file += f.read().strip()
+                dataset_file += "\n```\n"
 
             # Write dataset docs
-            with open(os.path.join(module_docs_path(module_dir), "modules", module, dataset + ".asciidoc"), 'w') as f:
+            with open(os.path.join(docs_path, "reference", "auditbeat", "auditbeat-dataset-{}-{}.md".format(module, dataset)), 'w') as f:
                 f.write(dataset_file)
 
         if len(module_links) > 0:
-            module_file += "[float]\n"
-            module_file += "=== Datasets\n\n"
-            module_file += "The following datasets are available:\n\n"
+            module_file += """## Datasets [_datasets]
+            
+The following datasets are available:\n\n"""
 
-            module_file += module_links
-            module_file += module_includes
+            module_file += module_links+"\n"
 
         # Write module docs
-        with open(os.path.join(module_docs_path(module_dir), "modules", module + ".asciidoc"), 'w') as f:
+        with open(os.path.join(docs_path, "reference", "auditbeat", "auditbeat-module-{}.md".format(module)), 'w') as f:
             f.write(module_file)
 
-    module_list_output = generated_note
-    for m, title in sorted(six.iteritems(modules_list)):
-        module_list_output += "  * <<{beatname_lc}-module-" + m + "," + title + ">>\n"
+        # TODO(@VihasMakwana): Uncomment following when all the asciidocs are converted to markdown
+        # As of now, this will not work and it will generate incomplete list.
 
-    module_list_output += "\n\n--\n\n"
-    for module_name, module_path in sorted(six.iteritems(module_dirs)):
-        rel_path_to_module_docs = os.path.relpath(module_docs_path(module_path), docs_path)
-        module_list_output += "include::" + \
-            os.path.join(rel_path_to_module_docs, "modules", module_name + ".asciidoc") + "[]\n"
+#     module_list_output = """---
+# mapped_pages:
+#   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-modules.html
+# ---
 
-    # Write module link list
-    with open(os.path.join(docs_path, "modules_list.asciidoc"), 'w') as f:
-        f.write(module_list_output)
+# # Modules [auditbeat-modules]
 
+# This section contains detailed information about the metric collecting modules contained in Auditbeat. More details about each module can be found under the links below.
 
-def module_docs_path(module_path):
-    """
-    Returns the docs path for a module.
-    E.g. modules in x-pack/auditbeat/modules are put in x-pack/auditbeat/docs
-    (but linked to from beats/auditbeat/docs/modules_list.asciidoc)
-    """
-    return os.path.abspath(os.path.join(module_path, os.pardir, os.pardir, "docs"))
+# """
+
+#     for m, title in sorted(six.iteritems(modules_list)):
+#         module_list_output += "* [{}](/reference/auditbeat/auditbeat-module-{}.md)\n".format(title, m)
+
+#     module_list_output += "\n"
+
+#     # Write module link list
+#     with open(os.path.join(docs_path, "reference", "auditbeat", "auditbeat-modules.md"), 'w') as f:
+#         f.write(module_list_output)
 
 
 if __name__ == "__main__":

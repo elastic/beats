@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-synthetics.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Synthetics types fields [exported-fields-synthetics]
 
 None
-
 
 ## synthetics [_synthetics]
 
@@ -60,8 +61,7 @@ type: keyword
 :   type: keyword
 
 
-
-## duration [_duration_3]
+## duration [_duration]
 
 Duration required to complete the step.
 
@@ -85,8 +85,7 @@ type: integer
 type: keyword
 
 
-
-## duration [_duration_4]
+## duration [_duration]
 
 Duration required to complete the journey.
 
@@ -120,10 +119,9 @@ type: integer
 type: integer
 
 
-
 ## blocks [_blocks]
 
-Attributes representing individual screenshot blocks. Only hash is indexed since it’s the only one we’d query on.
+Attributes representing individual screenshot blocks. Only hash is indexed since it's the only one we'd query on.
 
 **`synthetics.screenshot_ref.blocks.hash`**
 :   Hash that uniquely identifies this image by content. Corresponds to block document id.
