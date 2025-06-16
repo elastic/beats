@@ -324,17 +324,8 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 func (bt *Heartbeat) Stop() {
 	// TODO: propagate stop signal
 	bt.stopOnce.Do(func() {
-		// Close active jobs before triggering shutdown
-		if bt.config.RunOnce {
-			bt.scheduler.WaitForRunOnce()
-		} else {
-			bt.scheduler.Stop()
-		}
 		close(bt.done)
 	})
-
-	// TODO: remove this atrocity
-	// time.Sleep(5 * time.Second)
 }
 
 // makeESClient establishes an ES connection meant to load monitors' state
