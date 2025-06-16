@@ -19,6 +19,7 @@ package report
 
 import (
 	"sync"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -34,16 +35,16 @@ func TestSystemMetricsReport(t *testing.T) {
 	err := SetupMetrics(logger, "TestSys", "test")
 	require.NoError(t, err)
 
-	var gotCPU, gotMem, gotInfo bool
+	var gotCPU, gotMem, gotInfo atomic.Bool
 	testFunc := func(key string, val interface{}) {
 		if key == "info.uptime.ms" {
-			gotInfo = true
+			gotInfo.Store(true)
 		}
 		if key == "cpu.total.ticks" {
-			gotCPU = true
+			gotCPU.Store(true)
 		}
 		if key == "memstats.rss" {
-			gotMem = true
+			gotMem.Store(true)
 		}
 	}
 
@@ -64,7 +65,7 @@ func TestSystemMetricsReport(t *testing.T) {
 	close(ch)
 
 	wait.Wait()
-	assert.True(t, gotCPU, "Didn't find cpu.total.ticks")
-	assert.True(t, gotMem, "Didn't find memstats.rss")
-	assert.True(t, gotInfo, "Didn't find info.uptime.ms")
+	assert.True(t, gotCPU.Load(), "Didn't find cpu.total.ticks")
+	assert.True(t, gotMem.Load(), "Didn't find memstats.rss")
+	assert.True(t, gotInfo.Load(), "Didn't find info.uptime.ms")
 }
