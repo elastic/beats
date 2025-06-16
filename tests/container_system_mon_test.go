@@ -122,9 +122,10 @@ func TestProcessAllSettings(t *testing.T) {
 		FatalLogMessages:  []string{"Error fetching PID info for"},
 	}
 
-	// is it kinda cursed that we just use the system `mail` user? Yeah, but it works
+	// pick a user that has permission for its own home and GOMODCACHE dir
+	// 'nobody' has id 65534 on golang:alpine and has the same GOMODCACHE as root (/go/pkg/mod)
 	baseRunner.CreateAndRunPermissionMatrix(ctx, []container.CgroupnsMode{container.CgroupnsModeHost, container.CgroupnsModePrivate},
-		[]bool{true, false}, []string{"mail", ""})
+		[]bool{true, false}, []string{"nobody", ""})
 }
 
 func TestContainerProcess(t *testing.T) {
@@ -141,9 +142,10 @@ func TestContainerProcess(t *testing.T) {
 		FatalLogMessages: []string{"error", "Error"},
 	}
 
-	// is it kinda cursed that we just use the system `mail` user? Yeah, but it works
+	// pick a user that has permission for its own home and GOMODCACHE dir
+	// 'nobody' has id 65534 on golang:alpine and has the same GOMODCACHE as root (/go/pkg/mod)
 	baseRunner.CreateAndRunPermissionMatrix(ctx, []container.CgroupnsMode{container.CgroupnsModeHost, container.CgroupnsModePrivate},
-		[]bool{true, false}, []string{"mail", ""})
+		[]bool{true, false}, []string{"nobody", ""})
 }
 
 func TestFilesystem(t *testing.T) {

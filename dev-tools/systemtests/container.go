@@ -157,7 +157,7 @@ func (tr *DockerTestRunner) RunTestsOnDocker(ctx context.Context) {
 	}
 
 	if tr.Container == "" {
-		tr.Container = "golang:latest"
+		tr.Container = "golang:alpine"
 	}
 
 	// setup and run
@@ -216,7 +216,7 @@ func (tr *DockerTestRunner) createTestContainer(ctx context.Context, apiClient *
 	_, err = io.Copy(os.Stdout, reader)
 	require.NoError(tr.Runner, err, "error copying image")
 
-	wdCmd := exec.Command("git", "rev-parse", "--show-toplevel")
+	wdCmd := exec.Command("go", "list", "-m", "-f", "{{.Dir}}")
 	wdPath, err := wdCmd.CombinedOutput()
 	require.NoError(tr.Runner, err, "error finding root path")
 
@@ -230,7 +230,8 @@ func (tr *DockerTestRunner) createTestContainer(ctx context.Context, apiClient *
 
 	mountPath := "/hostfs"
 
-	containerEnv := []string{fmt.Sprintf("HOSTFS=%s", mountPath)}
+	// set GOCACHE to /tmp to prevent permission issues with non root users
+	containerEnv := []string{fmt.Sprintf("HOSTFS=%s", mountPath), "GOCACHE=/tmp"}
 	// used by a few vendored libaries
 	containerEnv = append(containerEnv, "HOST_PROC=%s", mountPath)
 	if tr.Privileged {
