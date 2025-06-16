@@ -8,7 +8,7 @@ env:
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
-  PLATFORMS: "+all linux/amd64 linux/arm64 linux/386 windows/amd64 windows/386 darwin/amd64"
+  PLATFORMS: "+all linux/amd64 linux/386 windows/amd64 windows/386 darwin/amd64"
   PLATFORMS_ARM: "+all linux/arm64"
 
 steps:
@@ -145,11 +145,27 @@ steps:
           - x-pack/auditbeat
           - x-pack/dockerlogbeat
           - x-pack/filebeat
-          - x-pack/functionbeat
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/osquerybeat
           - x-pack/packetbeat
+
+      - label: "SNAPSHOT: x-pack/functionbeat Linux/arm64"
+        env:
+          PLATFORMS: "linux/arm64"
+          SNAPSHOT: true
+          DEV: true
+        command: ".buildkite/scripts/packaging/package-dra.sh x-pack/functionbeat"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
+        artifact_paths:
+          - build/distributions/**/*
 
   - group: Packaging staging
     key: packaging-staging
@@ -215,11 +231,27 @@ steps:
           - x-pack/auditbeat
           - x-pack/dockerlogbeat
           - x-pack/filebeat
-          - x-pack/functionbeat
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/osquerybeat
           - x-pack/packetbeat
+
+      - label: "STAGING: x-pack/functionbeat Linux/arm64"
+        env:
+          PLATFORMS: "linux/arm64"
+          SNAPSHOT: true
+          DEV: true
+        command: ".buildkite/scripts/packaging/package-dra.sh x-pack/functionbeat"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
+        artifact_paths:
+          - build/distributions/**/*
 
   - group: DRA publish
     key: dra
