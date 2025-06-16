@@ -12,11 +12,13 @@ import (
 	"path/filepath"
 	"sync"
 	"testing"
+	"time"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
 	"go.opentelemetry.io/collector/otelcol"
 
+	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest"
@@ -98,7 +100,6 @@ func (c *TestCollector) reloadConfig(config string) error {
 
 // ReloadCollectorWithConfig reloads the collector with given config
 func (c *TestCollector) ReloadCollectorWithConfig(config string) error {
-	c.t.Helper()
 	// shutdown collector if it is running
 	c.Shutdown()
 	err := c.reloadConfig(config)
@@ -114,7 +115,6 @@ func (c *TestCollector) GetTempDir() string {
 
 // Run starts the otel collector
 func (c *TestCollector) Run() error {
-	c.t.Helper()
 
 	wg := sync.WaitGroup{}
 	var err error
@@ -136,10 +136,11 @@ func (c *TestCollector) Shutdown() {
 	c.otelcol.Shutdown()
 }
 
-// IsCollectorHealthy returns true if collector is healthy
-func (c *TestCollector) IsCollectorHealthy(config string) bool {
-	// TODO
-	return true
+// Wait waits for the collector to be ready
+func (c *TestCollector) Wait() {
+	require.Eventually(c.t, func() bool {
+		return c.observedLogs.FilterMessage("Everything is ready. Begin running and processing data.").Len() > 0
+	}, 10*time.Second, 100*time.Millisecond)
 }
 
 func getCollectorSettings(filename string) (otelcol.CollectorSettings, *observer.ObservedLogs) {

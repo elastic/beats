@@ -997,7 +997,6 @@ func reportErrors(t *testing.T, tempDir string, beatName string) {
 // GenerateLogFile writes count lines to path, each line is 50 bytes.
 // Each line contains the current time (RFC3339) and a counter
 func GenerateLogFile(t *testing.T, path string, count int, append bool) {
-	t.Helper()
 	var file *os.File
 	var err error
 	if !append {

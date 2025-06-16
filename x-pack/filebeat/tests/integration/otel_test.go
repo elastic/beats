@@ -42,6 +42,11 @@ output:
     username: admin
     password: testing
     index: %s
+processors:
+    - add_host_metadata: ~
+    - add_cloud_metadata: ~
+    - add_docker_metadata: ~
+    - add_kubernetes_metadata: ~	
 queue.mem.flush.timeout: 0s
 path.home: %s
 http.enabled: true
@@ -65,7 +70,8 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	err = col.ReloadCollectorWithConfig(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", col.GetTempDir(), 5066))
 	require.NoError(t, err)
 
-	// TODO: check if collector is healthy before proceeding
+	// wait for collector to be ready
+	col.Wait()
 
 	// start filebeat
 	filebeat := integration.NewBeat(
@@ -88,10 +94,7 @@ setup.template.pattern: logs-filebeat-default
 		filebeat.Stop()
 	})
 
-	es, err := integration.GetESClient(t)
-	if err != nil {
-		t.Fatalf("could not get es client due to: %v", err)
-	}
+	es := integration.GetESClient(t, "http")
 
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
