@@ -322,6 +322,7 @@ steps:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+          diskSizeGb: 100
         artifact_paths:
           - "x-pack/libbeat/build/*.xml"
           - "x-pack/libbeat/build/*.json"
