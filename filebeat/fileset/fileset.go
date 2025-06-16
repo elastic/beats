@@ -57,6 +57,7 @@ type Fileset struct {
 	manifest    *manifest
 	vars        map[string]interface{}
 	pipelineIDs []string
+	logger      *logp.Logger
 }
 
 type pipeline struct {
@@ -74,7 +75,9 @@ func New(
 	modulesPath string,
 	name string,
 	mname string,
-	fcfg *FilesetConfig) (*Fileset, error,
+	fcfg *FilesetConfig,
+	logger *logp.Logger,
+) (*Fileset, error,
 ) {
 	modulePath := filepath.Join(modulesPath, mname)
 	if _, err := os.Stat(modulePath); os.IsNotExist(err) {
@@ -86,6 +89,7 @@ func New(
 		mname:      mname,
 		fcfg:       fcfg,
 		modulePath: modulePath,
+		logger:     logger,
 	}, nil
 }
 
@@ -230,11 +234,11 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 				return vars, fmt.Errorf("Error parsing version %s: %w", minESVersion["version"].(string), err)
 			}
 
-			logp.Debug("fileset", "Comparing ES version %s with requirement of %s", esVersion.String(), minVersion)
+			fs.logger.Named("fileset").Debugf("Comparing ES version %s with requirement of %s", esVersion.String(), minVersion)
 
 			if esVersion.LessThan(minVersion) {
 				retVars[name] = minESVersion["value"]
-				logp.Info("Setting var %s (%s) to %v because Elasticsearch version is %s", name, fs, minESVersion["value"], esVersion.String())
+				fs.logger.Infof("Setting var %s (%s) to %v because Elasticsearch version is %s", name, fs, minESVersion["value"], esVersion.String())
 			}
 		}
 	}
