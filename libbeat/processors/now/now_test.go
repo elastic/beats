@@ -64,7 +64,7 @@ func TestNow(t *testing.T) {
 			error: false,
 		},
 		{
-			description: "Target with with existing value",
+			description: "Target with existing value",
 			config: nowConfig{
 				Field: "field1",
 			},
@@ -77,6 +77,21 @@ func TestNow(t *testing.T) {
 				"field2": "some data",
 			},
 			error: false,
+		},
+		{
+			description: "Target with dot's and leaf value along the path, causing error",
+			config: nowConfig{
+				Field: "nested.field1",
+			},
+			Input: mapstr.M{
+				"nested": "existing 'leaf' data",
+				"input":  "should equal output",
+			},
+			Output: mapstr.M{
+				"nested": "existing 'leaf' data",
+				"input":  "should equal output",
+			},
+			error: true,
 		},
 	}
 
