@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-consul.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Consul fields [exported-fields-consul]
 
 Consul module
-
 
 ## agent [_agent]
 
@@ -16,7 +17,6 @@ Agent Metricset fetches metrics information from a Consul instance running as Ag
 :   Overall health of the local server cluster
 
 type: boolean
-
 
 
 ## runtime [_runtime]
@@ -53,7 +53,6 @@ type: long
 type: long
 
 
-
 ## garbage_collector [_garbage_collector]
 
 Garbage collector metrics
@@ -62,7 +61,6 @@ Garbage collector metrics
 :   Garbage collector total executions
 
 type: long
-
 
 
 ## pause [_pause]

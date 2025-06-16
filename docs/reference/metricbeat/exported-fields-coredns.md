@@ -3,17 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-coredns.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Coredns fields [exported-fields-coredns]
 
 coredns Module
-
 
 ## coredns [_coredns]
 
 `coredns` contains statistics that were read from coreDNS
 
-
-## stats [_stats_3]
+## stats [_stats]
 
 Contains statistics related to the coreDNS service
 
