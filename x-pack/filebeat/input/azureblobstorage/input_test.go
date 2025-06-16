@@ -565,11 +565,7 @@ func Test_StorageClient(t *testing.T) {
 					var err error
 					val, err = got.Fields.GetValue("message")
 					assert.NoError(t, err)
-<<<<<<< HEAD
-					assert.True(t, tt.expected[val.(string)])
-=======
 					assert.True(t, tt.expected[strings.ReplaceAll(val.(string), "\r\n", "\n")])
->>>>>>> fba374986 ([filebeat][ABS] - Added missing "text/csv" content-type filter support (#44824))
 					assert.Equal(t, tt.expectedError, err)
 					receivedCount += 1
 					if receivedCount == len(tt.expected) {
