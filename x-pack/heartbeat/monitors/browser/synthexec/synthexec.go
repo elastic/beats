@@ -231,6 +231,7 @@ func runCmd(
 	// This use of channels for results is awkward, but required for the thread locking below
 	cmdStarted := make(chan error)
 	cmdDone := make(chan error)
+	cmdCleanUp := make(chan struct{})
 	go func() {
 		// We must idle this thread and ensure it is not killed while the external program is running
 		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
@@ -277,6 +278,7 @@ func runCmd(
 		// 	TimestampEpochMicros: float64(time.Now().UnixMicro()),
 		// })
 		// logp.L().Info("skipped event emitted")
+		cmdCleanUp <- struct{}{}
 	}()
 
 	// Close mpx after the process is done and all events have been sent / consumed
@@ -313,9 +315,11 @@ func runCmd(
 			TimestampEpochMicros: float64(time.Now().UnixMicro()),
 		})
 
+		cancel()
+		<-cmdCleanUp // Wait for the cleanup to finish before closing the multiplexer
+
 		wg.Wait()
 		mpx.Close()
-		cancel()
 	}()
 
 	return mpx, nil
