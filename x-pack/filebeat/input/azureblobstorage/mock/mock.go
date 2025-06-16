@@ -78,6 +78,8 @@ func AzureStorageFileServer() http.Handler {
 						w.Header().Set(contentType, jsonType)
 					case "log.ndjson":
 						w.Header().Set(contentType, "application/x-ndjson")
+					case "txn1.csv":
+						w.Header().Set(contentType, "text/csv")
 					}
 					w.Write(data)
 					return
