@@ -48,234 +48,217 @@ func cleanup(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestMysqlParseDSN(t *testing.T) {
-	var tlsEnabled = true
+func TestParseDSNfunctions(t *testing.T) {
+	prepare(t)
+	defer cleanup(t)
 
-	t.Run("TLS disabled", func(t *testing.T) {
-		config := ConnectionDetails{}
-		host := "root:test@tcp(localhost:3306)/"
+	tlsEnabled := true
 
-		hostData, err := mysqlParseDSN(config, host)
-		require.NoError(t, err)
+	t.Run("mysql", func(t *testing.T) {
+		t.Run("TLS disabled", func(t *testing.T) {
+			config := ConnectionDetails{}
+			host := "root:test@tcp(localhost:3306)/"
 
-		assert.Equal(t, host, hostData.URI)
-		assert.Equal(t, "localhost:3306", hostData.SanitizedURI)
-		assert.Equal(t, "localhost:3306", hostData.Host)
-	})
+			hostData, err := mysqlParseDSN(config, host)
+			require.NoError(t, err)
 
-	t.Run("TLS enabled with valid configuration", func(t *testing.T) {
-		prepare(t)
-		defer cleanup(t)
+			assert.Equal(t, host, hostData.URI)
+			assert.Equal(t, "localhost:3306", hostData.SanitizedURI)
+			assert.Equal(t, "localhost:3306", hostData.Host)
+		})
 
-		config := ConnectionDetails{
-			TLS: &tlscommon.Config{
-				Enabled:          &tlsEnabled,
-				VerificationMode: tlscommon.VerifyFull,
-				CAs:              []string{caPath},
-				Certificate: tlscommon.CertificateConfig{
-					Certificate: certPath,
-					Key:         keyPath,
+		t.Run("TLS enabled with valid configuration", func(t *testing.T) {
+			config := ConnectionDetails{
+				TLS: &tlscommon.Config{
+					Enabled:          &tlsEnabled,
+					VerificationMode: tlscommon.VerifyFull,
+					CAs:              []string{caPath},
+					Certificate: tlscommon.CertificateConfig{
+						Certificate: certPath,
+						Key:         keyPath,
+					},
 				},
-			},
-		}
-		host := "root:test@tcp(localhost:3306)/"
+			}
+			host := "root:test@tcp(localhost:3306)/"
 
-		hostData, err := mysqlParseDSN(config, host)
-		require.NoError(t, err)
+			hostData, err := mysqlParseDSN(config, host)
+			require.NoError(t, err)
 
-		assert.Equal(t, "root:test@tcp(localhost:3306)/?tls=custom", hostData.URI)
-		assert.Equal(t, "localhost:3306", hostData.SanitizedURI)
-		assert.Equal(t, "localhost:3306", hostData.Host)
-	})
+			assert.Equal(t, "root:test@tcp(localhost:3306)/?tls=custom", hostData.URI)
+			assert.Equal(t, "localhost:3306", hostData.SanitizedURI)
+			assert.Equal(t, "localhost:3306", hostData.Host)
+		})
 
-	t.Run("TLS enabled with invalid CA certificate path", func(t *testing.T) {
-		config := ConnectionDetails{
-			TLS: &tlscommon.Config{
-				Enabled: &tlsEnabled,
-				CAs:     []string{"/path/to/invalid/ca.crt"},
-			},
-		}
-		host := "root:test@tcp(localhost:3306)/"
-
-		_, err := mysqlParseDSN(config, host)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "could not load provided TLS configuration")
-	})
-
-	t.Run("TLS enabled with PEM-formatted CA certificate", func(t *testing.T) {
-		config := ConnectionDetails{
-			TLS: &tlscommon.Config{
-				Enabled: &tlsEnabled,
-				CAs:     []string{mockCA},
-			},
-		}
-		host := "root:test@tcp(localhost:3306)/"
-
-		hostData, err := mysqlParseDSN(config, host)
-		require.NoError(t, err)
-
-		assert.Equal(t, "root:test@tcp(localhost:3306)/?tls=custom", hostData.URI)
-		assert.Equal(t, "localhost:3306", hostData.SanitizedURI)
-		assert.Equal(t, "localhost:3306", hostData.Host)
-	})
-}
-
-func TestPostgresParseDSN(t *testing.T) {
-	var tlsEnabled = true
-
-	t.Run("TLS disabled", func(t *testing.T) {
-		config := ConnectionDetails{}
-		host := "postgres://localhost:5432/mydb"
-
-		hostData, err := postgresParseDSN(config, host)
-		require.NoError(t, err)
-
-		assert.Equal(t, host, hostData.URI)
-		assert.Equal(t, "localhost:5432", hostData.SanitizedURI)
-		assert.Equal(t, "localhost:5432", hostData.Host)
-	})
-
-	t.Run("TLS enabled with valid configuration", func(t *testing.T) {
-		prepare(t)
-		defer cleanup(t)
-
-		config := ConnectionDetails{
-			TLS: &tlscommon.Config{
-				Enabled:          &tlsEnabled,
-				VerificationMode: tlscommon.VerifyFull,
-				CAs:              []string{caPath},
-				Certificate: tlscommon.CertificateConfig{
-					Certificate: certPath,
-					Key:         keyPath,
+		t.Run("TLS enabled with invalid CA certificate path", func(t *testing.T) {
+			config := ConnectionDetails{
+				TLS: &tlscommon.Config{
+					Enabled: &tlsEnabled,
+					CAs:     []string{"/path/to/invalid/ca.crt"},
 				},
-			},
-		}
-		host := "postgres://localhost:5432/mydb"
+			}
+			host := "root:test@tcp(localhost:3306)/"
 
-		hostData, err := postgresParseDSN(config, host)
-		require.NoError(t, err)
+			_, err := mysqlParseDSN(config, host)
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), "could not load provided TLS configuration")
+		})
 
-		assert.Equal(t, "postgres://localhost:5432/mydb?sslcert=.%2Fcert.pem&sslkey=.%2Fkey.pem&sslmode=verify-full&sslrootcert=.%2Fca.pem", hostData.URI)
-		assert.Equal(t, "localhost:5432", hostData.SanitizedURI)
-		assert.Equal(t, "localhost:5432", hostData.Host)
-	})
-
-	t.Run("TLS enabled with multiple CA certificates", func(t *testing.T) {
-		prepare(t)
-		defer cleanup(t)
-
-		config := ConnectionDetails{
-			TLS: &tlscommon.Config{
-				Enabled: &tlsEnabled,
-				CAs:     []string{caPath, caPath},
-			},
-		}
-		host := "postgres://localhost:5432/mydb"
-
-		_, err := postgresParseDSN(config, host)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "postgres driver supports only one CA certificate")
-	})
-
-	t.Run("TLS enabled with PEM formatted CA certificate", func(t *testing.T) {
-		config := ConnectionDetails{
-			TLS: &tlscommon.Config{
-				Enabled: &tlsEnabled,
-				CAs:     []string{mockCA},
-			},
-		}
-		host := "postgres://localhost:5432/mydb"
-
-		_, err := postgresParseDSN(config, host)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "postgres driver supports only certificate file path")
-	})
-}
-
-func TestMssqlParseDSN(t *testing.T) {
-	var tlsEnabled = true
-
-	t.Run("TLS disabled", func(t *testing.T) {
-		config := ConnectionDetails{}
-		host := "sqlserver://localhost:1433?database=mydb"
-
-		hostData, err := mssqlParseDSN(config, host)
-		require.NoError(t, err)
-
-		assert.Equal(t, host, hostData.URI)
-		assert.Equal(t, "localhost:1433", hostData.SanitizedURI)
-		assert.Equal(t, "localhost:1433", hostData.Host)
-	})
-
-	t.Run("TLS enabled with valid configuration", func(t *testing.T) {
-		prepare(t)
-		defer cleanup(t)
-
-		config := ConnectionDetails{
-			TLS: &tlscommon.Config{
-				Enabled:          &tlsEnabled,
-				VerificationMode: tlscommon.VerifyFull,
-				CAs:              []string{caPath},
-			},
-		}
-		host := "sqlserver://localhost:1433?database=mydb"
-
-		hostData, err := mssqlParseDSN(config, host)
-		require.NoError(t, err)
-
-		assert.Equal(t, "sqlserver://localhost:1433?TrustServerCertificate=false&certificate=.%2Fca.pem&database=mydb&encrypt=true", hostData.URI)
-		assert.Equal(t, "localhost:1433", hostData.SanitizedURI)
-		assert.Equal(t, "localhost:1433", hostData.Host)
-	})
-
-	t.Run("TLS enabled with multiple CA certificates", func(t *testing.T) {
-		prepare(t)
-		defer cleanup(t)
-
-		config := ConnectionDetails{
-			TLS: &tlscommon.Config{
-				Enabled: &tlsEnabled,
-				CAs:     []string{caPath, caPath},
-			},
-		}
-		host := "sqlserver://localhost:1433?database=mydb"
-
-		_, err := mssqlParseDSN(config, host)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "mssql driver supports only one CA certificate")
-	})
-
-	t.Run("TLS enabled with client key and/or certificate", func(t *testing.T) {
-		prepare(t)
-		defer cleanup(t)
-
-		config := ConnectionDetails{
-			TLS: &tlscommon.Config{
-				Enabled: &tlsEnabled,
-				Certificate: tlscommon.CertificateConfig{
-					Certificate: certPath,
-					Key:         keyPath,
+		t.Run("TLS enabled with PEM-formatted CA certificate", func(t *testing.T) {
+			config := ConnectionDetails{
+				TLS: &tlscommon.Config{
+					Enabled: &tlsEnabled,
+					CAs:     []string{mockCA},
 				},
-			},
-		}
-		host := "sqlserver://localhost:1433?database=mydb"
+			}
+			host := "root:test@tcp(localhost:3306)/"
 
-		_, err := mssqlParseDSN(config, host)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "mssql driver supports only CA certificate")
+			hostData, err := mysqlParseDSN(config, host)
+			require.NoError(t, err)
+
+			assert.Equal(t, "root:test@tcp(localhost:3306)/?tls=custom", hostData.URI)
+			assert.Equal(t, "localhost:3306", hostData.SanitizedURI)
+			assert.Equal(t, "localhost:3306", hostData.Host)
+		})
 	})
 
-	t.Run("TLS enabled with PEM formatted CA certificate", func(t *testing.T) {
-		config := ConnectionDetails{
-			TLS: &tlscommon.Config{
-				Enabled: &tlsEnabled,
-				CAs:     []string{mockCA},
-			},
-		}
-		host := "sqlserver://localhost:1433?database=mydb"
+	t.Run("postgres", func(t *testing.T) {
+		t.Run("TLS disabled", func(t *testing.T) {
+			config := ConnectionDetails{}
+			host := "postgres://localhost:5432/mydb"
 
-		_, err := mssqlParseDSN(config, host)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "mssql driver supports only certificate file path")
+			hostData, err := postgresParseDSN(config, host)
+			require.NoError(t, err)
+
+			assert.Equal(t, host, hostData.URI)
+			assert.Equal(t, "localhost:5432", hostData.SanitizedURI)
+			assert.Equal(t, "localhost:5432", hostData.Host)
+		})
+
+		t.Run("TLS enabled with valid configuration", func(t *testing.T) {
+			config := ConnectionDetails{
+				TLS: &tlscommon.Config{
+					Enabled:          &tlsEnabled,
+					VerificationMode: tlscommon.VerifyFull,
+					CAs:              []string{caPath},
+					Certificate: tlscommon.CertificateConfig{
+						Certificate: certPath,
+						Key:         keyPath,
+					},
+				},
+			}
+			host := "postgres://localhost:5432/mydb"
+
+			hostData, err := postgresParseDSN(config, host)
+			require.NoError(t, err)
+
+			assert.Equal(t, "postgres://localhost:5432/mydb?sslcert=.%2Fcert.pem&sslkey=.%2Fkey.pem&sslmode=verify-full&sslrootcert=.%2Fca.pem", hostData.URI)
+			assert.Equal(t, "localhost:5432", hostData.SanitizedURI)
+			assert.Equal(t, "localhost:5432", hostData.Host)
+		})
+
+		t.Run("TLS enabled with multiple CA certificates", func(t *testing.T) {
+			config := ConnectionDetails{
+				TLS: &tlscommon.Config{
+					Enabled: &tlsEnabled,
+					CAs:     []string{caPath, caPath},
+				},
+			}
+			host := "postgres://localhost:5432/mydb"
+
+			_, err := postgresParseDSN(config, host)
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), "postgres driver supports only one CA certificate")
+		})
+
+		t.Run("TLS enabled with PEM formatted CA certificate", func(t *testing.T) {
+			config := ConnectionDetails{
+				TLS: &tlscommon.Config{
+					Enabled: &tlsEnabled,
+					CAs:     []string{mockCA},
+				},
+			}
+			host := "postgres://localhost:5432/mydb"
+
+			_, err := postgresParseDSN(config, host)
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), "postgres driver supports only certificate file path")
+		})
+	})
+
+	t.Run("mssql", func(t *testing.T) {
+		t.Run("TLS disabled", func(t *testing.T) {
+			config := ConnectionDetails{}
+			host := "sqlserver://localhost:1433?database=mydb"
+
+			hostData, err := mssqlParseDSN(config, host)
+			require.NoError(t, err)
+
+			assert.Equal(t, host, hostData.URI)
+			assert.Equal(t, "localhost:1433", hostData.SanitizedURI)
+			assert.Equal(t, "localhost:1433", hostData.Host)
+		})
+
+		t.Run("TLS enabled with valid configuration", func(t *testing.T) {
+			config := ConnectionDetails{
+				TLS: &tlscommon.Config{
+					Enabled:          &tlsEnabled,
+					VerificationMode: tlscommon.VerifyFull,
+					CAs:              []string{caPath},
+				},
+			}
+			host := "sqlserver://localhost:1433?database=mydb"
+
+			hostData, err := mssqlParseDSN(config, host)
+			require.NoError(t, err)
+
+			assert.Equal(t, "sqlserver://localhost:1433?TrustServerCertificate=false&certificate=.%2Fca.pem&database=mydb&encrypt=true", hostData.URI)
+			assert.Equal(t, "localhost:1433", hostData.SanitizedURI)
+			assert.Equal(t, "localhost:1433", hostData.Host)
+		})
+
+		t.Run("TLS enabled with multiple CA certificates", func(t *testing.T) {
+			config := ConnectionDetails{
+				TLS: &tlscommon.Config{
+					Enabled: &tlsEnabled,
+					CAs:     []string{caPath, caPath},
+				},
+			}
+			host := "sqlserver://localhost:1433?database=mydb"
+
+			_, err := mssqlParseDSN(config, host)
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), "mssql driver supports only one CA certificate")
+		})
+
+		t.Run("TLS enabled with client key and/or certificate", func(t *testing.T) {
+			config := ConnectionDetails{
+				TLS: &tlscommon.Config{
+					Enabled: &tlsEnabled,
+					Certificate: tlscommon.CertificateConfig{
+						Certificate: certPath,
+						Key:         keyPath,
+					},
+				},
+			}
+			host := "sqlserver://localhost:1433?database=mydb"
+
+			_, err := mssqlParseDSN(config, host)
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), "mssql driver supports only CA certificate")
+		})
+
+		t.Run("TLS enabled with PEM formatted CA certificate", func(t *testing.T) {
+			config := ConnectionDetails{
+				TLS: &tlscommon.Config{
+					Enabled: &tlsEnabled,
+					CAs:     []string{mockCA},
+				},
+			}
+			host := "sqlserver://localhost:1433?database=mydb"
+
+			_, err := mssqlParseDSN(config, host)
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), "mssql driver supports only certificate file path")
+		})
 	})
 }
