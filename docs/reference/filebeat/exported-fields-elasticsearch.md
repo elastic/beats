@@ -3,12 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-elasticsearch.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Elasticsearch fields [exported-fields-elasticsearch]
 
 elasticsearch Module
 
-
 ## elasticsearch [_elasticsearch]
+
+
 
 **`elasticsearch.component`**
 :   Elasticsearch component from where the log event originated
@@ -129,7 +132,7 @@ type: keyword
 
 
 **`elasticsearch.audit.user.realm`**
-:   The user’s authentication realm, if authenticated
+:   The user's authentication realm, if authenticated
 
 type: keyword
 
@@ -139,7 +142,7 @@ type: keyword
 
 type: keyword
 
-example: [*kibana_admin*, *beats_admin*]
+example: ['kibana_admin', 'beats_admin']
 
 
 **`elasticsearch.audit.user.run_as.name`**
@@ -173,7 +176,7 @@ example: {username=jacknich2}
 
 type: keyword
 
-example: [*foo-2019.01.04*, *foo-2019.01.03*, *foo-2019.01.06*]
+example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
 
 
 **`elasticsearch.audit.request.id`**
@@ -232,14 +235,13 @@ alias to: user.name
 :   type: text
 
 
-
 ## deprecation [_deprecation]
+
 
 
 ## gc [_gc]
 
 GC fileset fields.
-
 
 ## phase [_phase]
 
@@ -285,7 +287,6 @@ type: float
 :   Time spent unloading unused classes in seconds.
 
 type: float
-
 
 
 ## cpu_time [_cpu_time]
@@ -334,7 +335,6 @@ type: float
 type: keyword
 
 
-
 ## heap [_heap]
 
 Heap allocation and total size.
@@ -349,7 +349,6 @@ type: integer
 :   Used heap in kilobytes.
 
 type: integer
-
 
 
 ## old_gen [_old_gen]
@@ -368,7 +367,6 @@ type: integer
 type: integer
 
 
-
 ## young_gen [_young_gen]
 
 Young generation occupancy and total size.
@@ -385,8 +383,7 @@ type: integer
 type: integer
 
 
-
-## server [_server_2]
+## server [_server]
 
 Server log file
 
@@ -394,11 +391,9 @@ Server log file
 :   Field is not indexed.
 
 
-
-## gc [_gc_2]
+## gc [_gc]
 
 GC log
-
 
 ## young [_young]
 
@@ -407,13 +402,13 @@ Young GC
 **`elasticsearch.server.gc.young.one`**
 :   type: long
 
-example:
+example: 
 
 
 **`elasticsearch.server.gc.young.two`**
 :   type: long
 
-example:
+example: 
 
 
 **`elasticsearch.server.gc.overhead_seq`**
@@ -438,7 +433,6 @@ example: 1600
 type: float
 
 example: 1800
-
 
 
 ## slowlog [_slowlog]
@@ -466,7 +460,7 @@ example: 300ms
 
 type: keyword
 
-example:
+example: 
 
 
 **`elasticsearch.slowlog.stats`**
@@ -498,7 +492,7 @@ example: {"query":{"match_all":{"boost":1.0}}}
 
 type: keyword
 
-example:
+example: 
 
 
 **`elasticsearch.slowlog.total_hits`**
@@ -530,7 +524,7 @@ example: s01HZ2QBk9jw4gtgaFtn
 
 type: keyword
 
-example:
+example: 
 
 
 **`elasticsearch.slowlog.type`**

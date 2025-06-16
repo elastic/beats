@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-mysql.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # MySQL fields [exported-fields-mysql]
 
 MySQL-specific event fields.
@@ -26,7 +28,7 @@ type: long
 
 
 **`mysql.query`**
-:   The row mysql query as read from the transaction’s request.
+:   The row mysql query as read from the transaction's request.
 
 
 **`mysql.error_code`**
