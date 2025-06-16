@@ -593,8 +593,8 @@ type s3DownloadFailedWrappedReader struct {
 	r io.Reader
 }
 
-func (e s3DownloadFailedWrappedReader) Read(p []byte) (n int, err error) {
-	n, err = e.r.Read(p)
+func (s3r s3DownloadFailedWrappedReader) Read(p []byte) (n int, err error) {
+	n, err = s3r.r.Read(p)
 	if errors.Is(err, io.ErrUnexpectedEOF) {
 		return n, fmt.Errorf("%w: %w", errS3DownloadFailed, err)
 	}
