@@ -35,10 +35,6 @@ func float64p(x float64) *float64 {
 	return &x
 }
 
-func uint64p(x uint64) *uint64 {
-	return &x
-}
-
 func int64p(x int64) *int64 {
 	return &x
 }
