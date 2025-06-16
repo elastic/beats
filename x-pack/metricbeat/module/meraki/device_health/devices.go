@@ -94,7 +94,7 @@ func getDevicePerformanceScores(logger *logp.Logger, client *sdk.Client, devices
 
 		val, res, err := client.Appliance.GetDeviceAppliancePerformance(device.details.Serial)
 		if err != nil {
-			if res != nil && (res.StatusCode() == http.StatusBadRequest || !strings.Contains(string(res.Body()), "Feature not supported")) {
+			if res != nil && (res.StatusCode() == http.StatusBadRequest && !strings.Contains(string(res.Body()), "Feature not supported")) {
 				logger.Errorf("GetDeviceAppliancePerformance failed; [%d] %s. %v", res.StatusCode(), res.Body(), err)
 			}
 
