@@ -5,6 +5,7 @@
 package ipfix
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/binary"
 	"fmt"
@@ -20,11 +21,39 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 	v9 "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/v9"
 )
+// Copied from x-pack/filebeat/input/awss3/s3_objects.go
+//
+// isStreamGzipped determines whether the given stream of bytes (encapsulated in a buffered reader)
+// represents gzipped content or not. A buffered reader is used so the function can peek into the byte
+// stream without consuming it. This makes it convenient for code executed after this function call
+// to consume the stream if it wants.
+func isStreamGzipped(r *bufio.Reader) (bool, error) {
+	buf, err := r.Peek(3)
+	if err != nil && err != io.EOF {
+		return false, err
+	}
 
+	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
+	return bytes.HasPrefix(buf, []byte{0x1F, 0x8B, 0x08}), nil
+}
+
+func (p *netflowInput) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
+	bufReader := bufio.NewReader(body)
+
+	gzipped, err := isStreamGzipped(bufReader)
+	if err != nil {
+		return nil, err
+	}
+	if !gzipped {
+		return bufReader, nil
+	}
+
+	return gzip.NewReader(bufReader)
+}
 // BufferedReader parses ipfix inputs from io streams.
 type BufferedReader struct {
 	decoder v9.Decoder
-	data    []byte
+	reader_ *bufio.Reader
 	offset  int
 	cfg     *Config
 	logger  *logp.Logger
@@ -33,23 +62,15 @@ type BufferedReader struct {
 }
 
 // NewBufferedReader creates a new reader that can decode ipfix data from an io.Reader.
-// It will return an error if the parquet data stream cannot be read.
-// Note: As io.ReadAll is used, the entire data stream would be read into memory, so very large data streams
-// may cause memory bottleneck issues.
+// It will return an error if the ipfix data stream cannot be read.
 func NewBufferedReader(r io.Reader, cfg *Config) (*BufferedReader, error) {
 	logger := logp.L().Named("reader.ipfix")
-
-	var err error
-	data, err := io.ReadAll(r)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to read data from reader: %v", err)
-	}
 
 	decoder := NewDecoder(cfg, logger)
 
 	return &BufferedReader{
 		decoder: *decoder,
-		data:    data,
+		reader_: bufio.NewReader(r),
 		offset:  0,
 		cfg:     cfg,
 		logger:  logger,
@@ -61,24 +82,24 @@ func NewBufferedReader(r io.Reader, cfg *Config) (*BufferedReader, error) {
 // Next advances the pointer to point to the next record and returns true if the next record exists.
 // It will return false if there are no more records to read.
 func (sr *BufferedReader) Next() bool {
-
-	offset := sr.offset
-	// make sure there are at least four bytes left
-	if offset+4 > len(sr.data) {
-		sr.logger.Debugf("Not enough left for reading: %d bytes left", len(sr.data)-offset)
+	data, err := sr.reader_.Peek(4)
+	if err != nil || len(data) < 4 {
+		sr.logger.Debugf("Not enough data to read: %v", err)
 		return false
 	}
 
 	// the IPFIX packet is two bytes of version, two bytes of length
-	version := binary.BigEndian.Uint16(sr.data[offset+0 : offset+2])
-	length := binary.BigEndian.Uint16(sr.data[offset+2 : offset+4])
+	version := binary.BigEndian.Uint16(data[0:2])
+	length := binary.BigEndian.Uint16(data[2:4])
 
+	// TODO: we need to read the rest of the packet and skip the length
 	// if the version is wrong, nothing else to read
 	if version != 10 {
 		sr.logger.Debugf("incorrect version (%v)", version)
 		return false
 	}
 
+	// TODO: we should skip this one and try another
 	// if the length is says so, nothing else to read
 	if length < 4 {
 		sr.logger.Debugf("packet is too small (%v)", length)
@@ -99,29 +120,39 @@ func (sr *BufferedReader) Record() ([]beat.Event, error) {
 	// return
 	// read the next packet
 
-	// make sure there are at least four bytes left
-	if sr.offset+4 > len(sr.data) {
-		return nil, fmt.Errorf("Not enough left for reading: %d bytes left", len(sr.data)-sr.offset)
+	// read the next four bytes
+	peek, err := sr.reader_.Peek(4)
+	if err != nil {
+		return nil, fmt.Errorf("Error reading data: %v", err)
 	}
 
 	// the IPFIX packet is two bytes of version, two bytes of length
-	offset := sr.offset
-	version := binary.BigEndian.Uint16(sr.data[offset+0 : offset+2])
-	length := binary.BigEndian.Uint16(sr.data[offset+2 : offset+4])
+	version := binary.BigEndian.Uint16(peek[0:2])
+	length := binary.BigEndian.Uint16(peek[2:4])
 
 	// if the version is wrong, nothing else to read
 	if version != 10 {
+		// TODO: read the rest of the packet and skip it
+		if length >= 4 {
+			sr.reader_.Discard(int(length))
+		}
 		return nil, fmt.Errorf("incorrect version (%v)", version)
 	}
 
 	// if the length is says so, nothing else to read
-	if length < 4 {
+	if length <= 4 {
+		sr.reader_.Discard(int(length))
 		return nil, fmt.Errorf("packet is too small (%v)", length)
 	}
 
-	buf := sr.data[offset : offset+int(length)]
-	pkt := bytes.NewBuffer(buf)
-	sr.offset += int(length)
+	data := make([]byte, length)
+	n, err := io.ReadFull(sr.reader_, data)
+	if err != nil || n != int(length) {
+		// Not sure how to recover from this
+		return nil, fmt.Errorf("error with reading %d out of %d bytes of data: %w", n, length, err)
+	}
+
+	pkt := bytes.NewBuffer(data)
 
 	// read the packet header
 	header, payload, numFlowSets, err := sr.decoder.ReadPacketHeader(pkt)

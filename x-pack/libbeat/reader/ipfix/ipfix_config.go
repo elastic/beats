@@ -9,7 +9,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 )
 
-// Config contains the parquet reader config options.
+// Config contains the IPFIX reader config options.
 type Config struct {
 	// InternalNetworks defines the pre-configured networks treated as internal
 	InternalNetworks []string `config:"internal_networks"`

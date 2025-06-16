@@ -5,12 +5,9 @@
 package netflow
 
 import (
-	"bufio"
 	"bytes"
-	"compress/gzip"
 	"context"
 	"fmt"
-	"io"
 	"net"
 	"sync"
 	"time"
@@ -134,77 +131,6 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 	defer n.udpMetrics.Close()
 
 	n.metrics = newInputMetrics(n.udpMetrics.Registry())
-	var err error
-
-		err = n.setupOrig(env, connector)
-		if err != nil {
-			return err
-		}
-		n.logger.Info("Starting udp server")
-
-		udpServer := udp.New(&n.cfg.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
-			if n.ctx.Err() != nil {
-				return
-			}
-			select {
-			case <-n.ctx.Done():
-				return
-			case n.queueC <- packet{data, metadata.RemoteAddr}:
-			default:
-				if discardedEvents := n.metrics.DiscardedEvents(); discardedEvents != nil {
-					discardedEvents.Inc()
-				}
-			}
-		})
-		err = udpServer.Start()
-		if err != nil {
-			errorMsg := fmt.Sprintf("Failed to start udp server: %v", err)
-			n.logger.Errorf(errorMsg)
-			env.UpdateStatus(status.Failed, errorMsg)
-			n.stop()
-			return err
-		}
-		defer udpServer.Stop()
-
-	
-	env.UpdateStatus(status.Running, "")
-	<-n.ctx.Done()
-	n.stop()
-
-	return nil
-}
-
-// Copied from x-pack/filebeat/input/awss3/s3_objects.go
-//
-// isStreamGzipped determines whether the given stream of bytes (encapsulated in a buffered reader)
-// represents gzipped content or not. A buffered reader is used so the function can peek into the byte
-// stream without consuming it. This makes it convenient for code executed after this function call
-// to consume the stream if it wants.
-func isStreamGzipped(r *bufio.Reader) (bool, error) {
-	buf, err := r.Peek(3)
-	if err != nil && err != io.EOF {
-		return false, err
-	}
-
-	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
-	return bytes.HasPrefix(buf, []byte{0x1F, 0x8B, 0x08}), nil
-}
-
-func (p *netflowInput) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
-	bufReader := bufio.NewReader(body)
-
-	gzipped, err := isStreamGzipped(bufReader)
-	if err != nil {
-		return nil, err
-	}
-	if !gzipped {
-		return bufReader, nil
-	}
-
-	return gzip.NewReader(bufReader)
-}
-
-func (n *netflowInput) setupOrig(env v2.Context, connector beat.PipelineConnector) error {
 	var err error
 	n.decoder, err = decoder.NewDecoder(decoder.NewConfig(n.logger).
 		WithProtocols(n.cfg.Protocols...).
