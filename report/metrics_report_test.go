@@ -25,14 +25,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestSystemMetricsReport(t *testing.T) {
-	_ = logp.DevelopmentSetup()
-	logger := logp.L()
-	err := SetupMetrics(logger, "TestSys", "test")
+	err := SetupMetrics(logptest.NewTestingLogger(t, ""), "TestSys", "test")
 	require.NoError(t, err)
 
 	var gotCPU, gotMem, gotInfo atomic.Bool

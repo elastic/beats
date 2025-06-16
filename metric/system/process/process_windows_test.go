@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
@@ -72,7 +73,7 @@ func TestGetInfoForPid_numThreads(t *testing.T) {
 
 func TestLsassFound(t *testing.T) {
 	processNames := []string{"lsass.exe"}
-	m := processesToIgnore()
+	m := processesToIgnore(logptest.NewTestingLogger(t, ""))
 	require.NotEmpty(t, m)
 
 	for pid := range m {

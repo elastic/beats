@@ -39,7 +39,7 @@ func isNonFatal(err error) bool {
 		errors.Is(err, windows.ERROR_INVALID_PARAMETER) || errors.Is(err, NonFatalErr{})
 }
 
-func processesToIgnore() map[uint64]struct{} {
+func processesToIgnore(logger *logp.Logger) map[uint64]struct{} {
 	m := make(map[uint64]struct{})
 	// processesToIgnore checks if we should ignore the pid, to avoid elevated permissions
 
@@ -47,13 +47,13 @@ func processesToIgnore() map[uint64]struct{} {
 	// we can query pid for LASASS.exe from registry
 	key, err := registry.OpenKey(registry.LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\Lsa", registry.READ)
 	if err != nil {
-		logp.L().Warnw("Failed to open registry path SYSTEM\\CurrentControlSet\\Control\\Lsa", "error", err)
+		logger.Warnw("Failed to open registry path SYSTEM\\CurrentControlSet\\Control\\Lsa", "error", err)
 		return m
 	}
 	defer key.Close()
 	lsassPid, _, err := key.GetIntegerValue("LsaPid")
 	if err != nil {
-		logp.L().Warnw("Failed to read pid for lsass.exe", "error", err)
+		logger.Warnw("Failed to read pid for lsass.exe", "error", err)
 		return m
 	}
 	m[lsassPid] = struct{}{}

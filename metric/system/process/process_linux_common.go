@@ -30,7 +30,6 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
@@ -88,7 +87,6 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 	var wrappedErr error
 
 	// Iterate over the directory, fetch just enough info so we can filter based on user input.
-	logger := logp.L()
 	for _, name := range names {
 
 		if !dirIsPid(name) {
@@ -97,7 +95,7 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 		// Will this actually fail?
 		pid, err := strconv.Atoi(name)
 		if err != nil {
-			logger.Debugf("Error converting PID name %s", name)
+			procStats.logger.Debugf("Error converting PID name %s", name)
 			continue
 		}
 		procMap, plist, err = procStats.pidIter(pid, procMap, plist)

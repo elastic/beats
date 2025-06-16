@@ -208,7 +208,7 @@ func (procStats *Stats) Init() error {
 		}
 		procStats.cgroups = cgReader
 	}
-	procStats.excludedPIDs = processesToIgnore()
+	procStats.excludedPIDs = processesToIgnore(procStats.logger)
 	return nil
 }
 

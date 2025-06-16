@@ -22,6 +22,8 @@ package process
 import (
 	"errors"
 	"syscall"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func isNonFatal(err error) bool {
@@ -34,6 +36,6 @@ func isNonFatal(err error) bool {
 		errors.Is(err, NonFatalErr{}))
 }
 
-func processesToIgnore() map[uint64]struct{} {
+func processesToIgnore(*logp.Logger) map[uint64]struct{} {
 	return map[uint64]struct{}{}
 }

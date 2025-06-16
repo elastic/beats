@@ -37,6 +37,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // DockerTestRunner is a simple test framework for running a given go test inside a container.
@@ -151,7 +152,7 @@ func (tr *DockerTestRunner) RunTestsOnDocker(ctx context.Context) {
 		tr.Runner.Skip("Tests only supported on Linux.")
 	}
 
-	log := logp.L()
+	log := logptest.NewTestingLogger(tr.Runner, "")
 	if tr.Basepath == "" {
 		tr.Basepath = "./..."
 	}
@@ -172,9 +173,9 @@ func (tr *DockerTestRunner) RunTestsOnDocker(ctx context.Context) {
 	}
 
 	// create monitored process, if we need to
-	tr.createMonitoredProcess(ctx)
+	tr.createMonitoredProcess(ctx, log)
 
-	resp := tr.createTestContainer(ctx, apiClient)
+	resp := tr.createTestContainer(ctx, log, apiClient)
 
 	log.Infof("running test...")
 	result := tr.runContainerTest(ctx, apiClient, resp)
@@ -208,7 +209,7 @@ func (tr *DockerTestRunner) RunTestsOnDocker(ctx context.Context) {
 }
 
 // createTestContainer creates a container with the given test path and test name
-func (tr *DockerTestRunner) createTestContainer(ctx context.Context, apiClient *client.Client) container.CreateResponse {
+func (tr *DockerTestRunner) createTestContainer(ctx context.Context, logger *logp.Logger, apiClient *client.Client) container.CreateResponse {
 	reader, err := apiClient.ImagePull(ctx, tr.Container, image.PullOptions{})
 	require.NoError(tr.Runner, err, "error pulling image")
 	defer reader.Close()
@@ -221,7 +222,7 @@ func (tr *DockerTestRunner) createTestContainer(ctx context.Context, apiClient *
 	require.NoError(tr.Runner, err, "error finding root path")
 
 	cwd := strings.TrimSpace(string(wdPath))
-	logp.L().Infof("using cwd: %s", cwd)
+	logger.Infof("using cwd: %s", cwd)
 
 	testRunCmd := []string{"go", "test", "-v", tr.Basepath}
 	if tr.Testname != "" {
@@ -299,15 +300,14 @@ func (tr *DockerTestRunner) runContainerTest(ctx context.Context, apiClient *cli
 	return res
 }
 
-func (tr *DockerTestRunner) createMonitoredProcess(ctx context.Context) {
-	log := logp.L()
+func (tr *DockerTestRunner) createMonitoredProcess(ctx context.Context, logger *logp.Logger) {
 	// if user has specified a process to monitor, start it now
 	// skip if the process has already been created
 	if tr.CreateHostProcess != nil && tr.CreateHostProcess.Process == nil {
 		// We don't need to do this in a channel, but it prevents races between this goroutine
 		// and the rest of test framework
 		startPid := make(chan int)
-		log.Infof("Creating test Process...")
+		logger.Infof("Creating test Process...")
 		go func() {
 			err := tr.CreateHostProcess.Start()
 			// if the process fails to start up, the resulting tests will fail anyway, so just log it
@@ -320,6 +320,6 @@ func (tr *DockerTestRunner) createMonitoredProcess(ctx context.Context) {
 			tr.MonitorPID = pid
 		case <-ctx.Done():
 		}
-		log.Infof("Monitoring pid %d", tr.MonitorPID)
+		logger.Infof("Monitoring pid %d", tr.MonitorPID)
 	}
 }
