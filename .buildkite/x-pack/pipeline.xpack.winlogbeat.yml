@@ -75,7 +75,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
@@ -101,7 +101,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
@@ -127,7 +127,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
@@ -153,7 +153,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2025}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
