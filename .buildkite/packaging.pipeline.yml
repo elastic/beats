@@ -10,6 +10,7 @@ env:
 
   PLATFORMS: "+all linux/amd64 linux/386 windows/amd64 windows/386 darwin/amd64"
   PLATFORMS_ARM: "+all linux/arm64"
+  PLATFORMS_QEMU_EMULATION: "+all linux/amd64 linux/386 windows/amd64 windows/386 darwin/amd64 linux/arm64"
 
 steps:
   # we use concurrency gates (https://buildkite.com/blog/concurrency-gates)
@@ -113,12 +114,32 @@ steps:
           - x-pack/auditbeat
           - x-pack/dockerlogbeat
           - x-pack/filebeat
-          - x-pack/functionbeat
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/osquerybeat
           - x-pack/packetbeat
           - x-pack/winlogbeat
+
+      - label: "SNAPSHOT: {{matrix}} Qemu/Emulation"
+        env:
+          PLATFORMS: "${PLATFORMS_QEMU_EMULATION}"
+          SNAPSHOT: true
+          DEV: true
+        command: |
+          source .buildkite/scripts/qemu.sh
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
+        artifact_paths:
+          - build/distributions/**/*
+        matrix:
+          - x-pack/functionbeat
 
       - label: "SNAPSHOT: {{matrix}} Linux/arm64"
         env:
@@ -147,6 +168,7 @@ steps:
           - x-pack/filebeat
           - x-pack/heartbeat
           - x-pack/metricbeat
+          - x-pack/osquerybeat
           - x-pack/packetbeat
 
   - group: Packaging staging
@@ -181,12 +203,32 @@ steps:
           - x-pack/auditbeat
           - x-pack/dockerlogbeat
           - x-pack/filebeat
-          - x-pack/functionbeat
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/osquerybeat
           - x-pack/packetbeat
           - x-pack/winlogbeat
+
+      - label: "STAGING: {{matrix}} Qemu/Emulation"
+        env:
+          PLATFORMS: "${PLATFORMS_QEMU_EMULATION}"
+          SNAPSHOT: false
+          DEV: false
+        command: |
+          source .buildkite/scripts/qemu.sh
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
+        artifact_paths:
+          - build/distributions/**/*
+        matrix:
+          - x-pack/functionbeat
 
       - label: "STAGING: {{matrix}} Linux/arm64"
         env:
@@ -216,6 +258,7 @@ steps:
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/packetbeat
+          - x-pack/osquerybeat
 
   - group: DRA publish
     key: dra
