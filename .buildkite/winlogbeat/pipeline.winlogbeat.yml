@@ -81,8 +81,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "winlogbeat/build/*.xml"
           - "winlogbeat/build/*.json"
@@ -102,8 +100,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "winlogbeat/build/*.xml"
           - "winlogbeat/build/*.json"
@@ -123,8 +119,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "winlogbeat/build/*.xml"
           - "winlogbeat/build/*.json"
@@ -144,8 +138,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_2025}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "winlogbeat/build/*.xml"
           - "winlogbeat/build/*.json"
@@ -170,8 +162,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "winlogbeat/build/*.xml"
           - "winlogbeat/build/*.json"
@@ -191,8 +181,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "winlogbeat/build/*.xml"
           - "winlogbeat/build/*.json"

@@ -118,7 +118,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_type: "pd-ssd"
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
@@ -138,7 +137,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_type: "pd-ssd"
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
@@ -179,8 +177,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 200
-          disk_type: "pd-ssd"
+          diskSizeGb: 200
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
@@ -252,7 +249,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_type: "pd-ssd"
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
@@ -272,7 +268,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_type: "pd-ssd"
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
@@ -292,7 +287,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_type: "pd-ssd"
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
