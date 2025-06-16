@@ -52,6 +52,7 @@ type Metricbeat struct {
 	registry          *mb.Register
 	autodiscover      *autodiscover.Autodiscover
 	dynamicCfgEnabled bool
+	factoryWrapper    func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 
 	// Options
 	moduleOptions []module.Option
@@ -202,6 +203,11 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		bt.moduleOptions...)
 
 	factory := module.NewFactory(b.Info, bt.registry, moduleOptions...)
+
+	if bt.factoryWrapper != nil {
+		factory = bt.factoryWrapper(factory)
+	}
+
 	runners := make(map[uint64]cfgfile.Runner) // Active list of module runners.
 
 	for _, moduleCfg := range bt.config.Modules {
@@ -310,6 +316,10 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	wg.Wait()
 
 	return nil
+}
+
+func (mb *Metricbeat) WithFactoryWrapper(factoryWrapper cfgfile.FactoryWrapper) {
+	mb.factoryWrapper = factoryWrapper
 }
 
 // Stop signals to Metricbeat that it should stop. It closes the "done" channel

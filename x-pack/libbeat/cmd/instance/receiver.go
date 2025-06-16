@@ -15,8 +15,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/status"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
-	"go.opentelemetry.io/collector/component"
 
+	"go.opentelemetry.io/collector/component"
 	"go.uber.org/zap"
 )
 

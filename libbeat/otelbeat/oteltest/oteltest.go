@@ -153,9 +153,9 @@ func CheckReceivers(params CheckReceiversParams) {
 			require.Equal(t, zl.ContextMap()["otelcol.signal"], "logs")
 			break
 		}
-		require.NotNil(t, host.Evt)
-		require.Nil(t, host.Evt.Err())
-		require.Equal(t, host.Evt.Status(), componentstatus.StatusOK)
+		require.NotNilf(t, host.Evt, "expected nil, got %v", host.Evt)
+		require.Nilf(t, host.Evt.Err(), "expected nil, got %v", host.Evt.Err())
+		require.Equalf(t, host.Evt.Status(), componentstatus.StatusOK, "expected StatusOK, got %v", host.Evt.Status())
 
 		params.AssertFunc(ct, logs, zapLogs)
 	}, 2*time.Minute, 100*time.Millisecond,
