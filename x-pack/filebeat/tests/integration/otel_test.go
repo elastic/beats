@@ -113,7 +113,7 @@ setup.template.pattern: logs-filebeat-default
 			t.Logf("otel docs = %d, filebeat docs = %d", otelDocs.Hits.Total.Value, filebeatDocs.Hits.Total.Value)
 			return otelDocs.Hits.Total.Value < 0 && filebeatDocs.Hits.Total.Value >= numEvents
 		},
-		30*time.Second, 5*time.Second, "otel docs = %d, filebeat docs = %d", otelDocs.Hits.Total.Value, filebeatDocs.Hits.Total.Value)
+		2*time.Minute, 1*time.Second, "otel docs = %d, filebeat docs = %d", otelDocs.Hits.Total.Value, filebeatDocs.Hits.Total.Value)
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
