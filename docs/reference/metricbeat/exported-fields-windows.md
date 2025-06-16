@@ -3,12 +3,14 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-windows.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Windows fields [exported-fields-windows]
 
 Module for Windows
 
-
 ## windows [_windows]
+
 
 
 ## perfmon [_perfmon]
@@ -27,13 +29,12 @@ type: keyword
 type: object
 
 
-
-## service [_service_5]
+## service [_service]
 
 `service` contains the status for Windows services.
 
 **`windows.service.id`**
-:   A unique ID for the service. It is a hash of the machine’s GUID and the service name.
+:   A unique ID for the service. It is a hash of the machine's GUID and the service name.
 
 type: keyword
 
@@ -99,12 +100,11 @@ example: 1092
 
 
 **`windows.service.uptime.ms`**
-:   The service’s uptime specified in milliseconds.
+:   The service's uptime specified in milliseconds.
 
 type: long
 
 format: duration
-
 
 
 ## wmi [_wmi]
