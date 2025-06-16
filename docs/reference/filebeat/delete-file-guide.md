@@ -1,7 +1,7 @@
 # Removing files after ingestion
 
 ::::{warning}
-Enabling this feature will remove files, which could lead to data loss.
+Enabling this feature will remove files, which could lead to unintentional data loss if not configured correctly.
 ::::
 
 The Filestream input can remove files after they have been fully
