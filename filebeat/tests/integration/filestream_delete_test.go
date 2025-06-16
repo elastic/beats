@@ -47,11 +47,11 @@ var logFileLines = []string{
 	"You can't connect the panel without connecting the wireless AGP panel!",
 	"We need to back up the haptic FTP hard drive!",
 	"Indexing the array won't do anything, we need to parse the neural SMTP system!",
-	"I'Ll generate the haptic TCP pixel, that should transmitter the JBOD application!",
-	"I'Ll quantify the wireless XSS driver, that should port the HTTP driver!",
+	"I'll generate the haptic TCP pixel, that should transmitter the JBOD application!",
+	"I'll quantify the wireless XSS driver, that should port the HTTP driver!",
 	"If we connect the program, we can get to the ADP alarm through the back-end EXE pixel!",
-	"I'Ll generate the primary SSL port, that should firewall the IB firewall!",
-	"I'Ll program the digital RSS bus, that should sensor the JSON system!",
+	"I'll generate the primary SSL port, that should firewall the IB firewall!",
+	"I'll program the digital RSS bus, that should sensor the JSON system!",
 	"Hacking the feed won't do anything, we need to input the optical PNG microchip!",
 	"We need to synthesize the solid state GB port!",
 }
@@ -59,47 +59,42 @@ var logFileLines = []string{
 func TestFilestreamDelete(t *testing.T) {
 	testCases := map[string]struct {
 		configTmpl          string
-		msgs                string
+		closeCondMsg        string
 		resourceNotFinished bool
 		dataAdded           bool
 		gracePeriod         time.Duration
 	}{
 		"EOF": {
-			configTmpl: "eof.yml",
-			msgs:       "EOF has been reached. Closing. Path='%s'",
+			configTmpl:   "eof.yml",
+			closeCondMsg: "EOF has been reached. Closing. Path='%s'",
 		},
 		"EOF and resource not finished": {
 			configTmpl:          "eof.yml",
-			msgs:                "EOF has been reached. Closing. Path='%s'",
+			closeCondMsg:        "EOF has been reached. Closing. Path='%s'",
 			resourceNotFinished: true,
 		},
-		"EOF resource not finished and data added": {
+		"EOF resource not finished data added during grace priod": {
 			configTmpl:          "eof.yml",
-			msgs:                "EOF has been reached. Closing. Path='%s'",
-			resourceNotFinished: true,
-			dataAdded:           true,
-		},
-		"EOF resource not finished data added and grace priod": {
-			configTmpl:          "eof.yml",
-			msgs:                "EOF has been reached. Closing. Path='%s'",
+			closeCondMsg:        "EOF has been reached. Closing. Path='%s'",
 			resourceNotFinished: true,
 			dataAdded:           true,
 			gracePeriod:         2 * time.Second,
 		},
 		"Inactive": {
-			configTmpl: "inactive.yml",
-			msgs:       "'%s' is inactive",
+			configTmpl:   "inactive.yml",
+			closeCondMsg: "'%s' is inactive",
 		},
 		"Inactive and resource not finished": {
 			configTmpl:          "inactive.yml",
-			msgs:                "'%s' is inactive",
+			closeCondMsg:        "'%s' is inactive",
 			resourceNotFinished: true,
 		},
-		"Inactive resource not finished and data added": {
+		"Inactive resource not finished and data added during grace period": {
 			configTmpl:          "inactive.yml",
-			msgs:                "'%s' is inactive",
+			closeCondMsg:        "'%s' is inactive",
 			resourceNotFinished: true,
 			dataAdded:           true,
+			gracePeriod:         2 * time.Second,
 		},
 	}
 
@@ -146,30 +141,34 @@ func TestFilestreamDelete(t *testing.T) {
 			filebeat.WriteConfigFile(cfgYAML)
 			filebeat.Start()
 
-			msg := fmt.Sprintf(tc.msgs, msgLogFilePath)
+			closeCondMsg := fmt.Sprintf(tc.closeCondMsg, msgLogFilePath)
 			filebeat.WaitForLogs(
-				msg,
+				closeCondMsg,
 				10*time.Second,
-				"did not find '%s' in the logs",
-				msg,
+				"did not find close condition '%s' in the logs",
+				closeCondMsg,
 			)
 
 			if tc.resourceNotFinished {
-				testResourceNotFinished(
-					t,
-					filebeat,
-					es,
-					tc.dataAdded,
-					msgLogFilePath,
-					logFile)
+				testResourceNotFinished(t, filebeat, es, msgLogFilePath)
 			}
 
 			if tc.gracePeriod != 0 {
-				testGracePeriod(t, filebeat, tc.gracePeriod, msgLogFilePath)
+				// The grace period test also ensures the file has been
+				// correctly removed
+				testGracePeriod(
+					t,
+					filebeat,
+					tc.gracePeriod,
+					tc.dataAdded,
+					msgLogFilePath)
 			} else {
 				// Wait for the file removed message
-				msg = fmt.Sprintf("'%s' removed", msgLogFilePath)
-				filebeat.WaitForLogs(msg, 30*time.Second, "file removed log entry not found")
+				removedMsg := fmt.Sprintf("'%s' removed", msgLogFilePath)
+				filebeat.WaitForLogs(
+					removedMsg,
+					30*time.Second,
+					"file removed log entry not found")
 
 				if fileExists(t, logFile) {
 					t.Fatalf("%q should have been removed", logFile)
@@ -183,8 +182,7 @@ func testResourceNotFinished(
 	t *testing.T,
 	filebeat *integration.BeatProc,
 	es *api.APIHandler,
-	dataAdded bool,
-	msgLogFilePath, logFile string) {
+	msgLogFilePath string) {
 
 	t.Run("can detect events not published", func(t *testing.T) {
 		// Wait a few times for the 'not finished' logs
@@ -202,41 +200,6 @@ func testResourceNotFinished(
 		}
 	})
 
-	if dataAdded {
-		t.Run("can detect data added", func(t *testing.T) {
-			// Add more data to the log file
-			integration.GenerateLogFile(t, msgLogFilePath, 5, true)
-
-			// Wait for the "file update" log
-			filebeat.WaitForLogs(
-				fmt.Sprintf("File %s has been updated", msgLogFilePath),
-				time.Second,
-				"filewatcher did not detect the file as updated")
-
-			// Wait for the harvester to be closed
-			filebeat.WaitForLogs(
-				fmt.Sprintf("not all events from '%s' have been published, closing harvester", msgLogFilePath),
-				10*time.Second,
-				"harvester was not closed after data added to the file")
-
-			// Wait for the "not changed" log
-			filebeat.WaitForLogs(
-				fmt.Sprintf("File %s has not changed, trying to start new harvester", msgLogFilePath),
-				time.Second,
-				"Filestream did not try to start a new harvester for the unchanged file")
-
-			// Ensure harvester closes without removing the file
-			filebeat.WaitForLogs(
-				fmt.Sprintf("not all events from '%s' have been published, closing harvester", msgLogFilePath),
-				10*time.Second,
-				"Harvester was not closed because the resource is not finished")
-
-			if !fileExists(t, logFile) {
-				t.Fatalf("%q should not have been removed", logFile)
-			}
-		})
-	}
-
 	// Reset odds in Mock-ES
 	if err := es.UpdateOdds(0, 0, 0, 0); err != nil {
 		t.Fatalf("cannot update mock-es odds: %s", err)
@@ -250,29 +213,32 @@ func testGracePeriod(
 	t *testing.T,
 	filebeat *integration.BeatProc,
 	gracePeriod time.Duration,
+	dataAdded bool,
 	msgLogFilePath string) {
 
-	t.Run("grace period is interrupted when file changes", func(t *testing.T) {
-		gracePeriodMsg := fmt.Sprintf(
-			"all events from '%s' have been published, waiting for %s grace period",
-			msgLogFilePath, gracePeriod)
-		filebeat.WaitForLogs(
-			gracePeriodMsg,
-			time.Second,
-			"did not start waiting for grace period")
+	if dataAdded {
+		t.Run("grace period is interrupted when file changes", func(t *testing.T) {
+			gracePeriodMsg := fmt.Sprintf(
+				"all events from '%s' have been published, waiting for %s grace period",
+				msgLogFilePath, gracePeriod)
+			filebeat.WaitForLogs(
+				gracePeriodMsg,
+				time.Second,
+				"did not start waiting for grace period")
 
-		// Wait 1/2 of the grace period, then add data to the file
-		time.Sleep(gracePeriod / 2)
-		integration.GenerateLogFile(t, msgLogFilePath, 5, true)
+			// Wait 1/2 of the grace period, then add data to the file
+			time.Sleep(gracePeriod / 2)
+			integration.GenerateLogFile(t, msgLogFilePath, 5, true)
 
-		// Wait for the message of file size changed
-		changedMsg := fmt.Sprintf("cancelling deletion of '%s', size has changed", msgLogFilePath)
-		filebeat.WaitForLogs(changedMsg, time.Second, "filestream did detect the file change")
+			// Wait for the message of file size changed
+			changedMsg := fmt.Sprintf("cancelling deletion of '%s', size has changed", msgLogFilePath)
+			filebeat.WaitForLogs(changedMsg, time.Second, "filestream did detect the file change")
 
-		// Make sure the harvester is closed
-		filebeat.WaitForLogs("Stopped harvester for file", time.Second, "harvester was not closed")
-		filebeat.WaitForLogs("Closing reader of filestream", time.Second, "reader was not closed")
-	})
+			// Make sure the harvester is closed
+			filebeat.WaitForLogs("Stopped harvester for file", time.Second, "harvester was not closed")
+			filebeat.WaitForLogs("Closing reader of filestream", time.Second, "reader was not closed")
+		})
+	}
 
 	t.Run("grace period is respected", func(t *testing.T) {
 		msg := fmt.Sprintf("'%s' removed", msgLogFilePath)
