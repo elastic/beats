@@ -50,23 +50,6 @@ var ignoreInactiveSettings = map[string]ignoreInactiveType{
 
 var identifiersMap = map[string]fileIdentifier{}
 
-func init() {
-	for name, factory := range identifierFactories {
-		if name == inodeMarkerName {
-			// inode marker requires an specific config we cannot infer.
-			continue
-		}
-
-		identifier, err := factory(nil, logp.NewNopLogger())
-		if err != nil {
-			// Skip identifiers we cannot create. E.g: inode_marker is not
-			// supported on Windows
-			continue
-		}
-		identifiersMap[name] = identifier
-	}
-}
-
 // fileProspector implements the Prospector interface.
 // It contains a file scanner which returns file system events.
 // The FS events then trigger either new Harvester runs or updates
@@ -82,11 +65,29 @@ type fileProspector struct {
 	takeOver            takeOverConfig
 }
 
+func (p *fileProspector) init() {
+	for name, factory := range identifierFactories {
+		if name == inodeMarkerName {
+			// inode marker requires an specific config we cannot infer.
+			continue
+		}
+
+		identifier, err := factory(nil, p.logger)
+		if err != nil {
+			// Skip identifiers we cannot create. E.g: inode_marker is not
+			// supported on Windows
+			continue
+		}
+		identifiersMap[name] = identifier
+	}
+}
+
 func (p *fileProspector) Init(
 	prospectorStore,
 	globalStore loginp.StoreUpdater,
 	newID func(loginp.Source) string,
 ) error {
+	p.init()
 	files := p.filewatcher.GetFiles()
 
 	// If this fileProspector belongs to an input that did not have an ID
