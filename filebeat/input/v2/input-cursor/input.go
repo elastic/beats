@@ -30,6 +30,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -114,10 +115,11 @@ func (inp *managedInput) Run(
 	// metrics reporters that aggregate over inputs know to skip this registry
 	// and report its nested sources (instantiated below) as top-level inputs.
 	// (We need child inputs to be reported at the top level for backwards
-	// compatibility, but we want an input's metrics to be contained in its own
-	// registry passed in the context, so we don't have to expose the top-level
-	// inputs registry to every individual input.)
-	monitoring.NewString(ctx.MetricsRegistry, "input").Set("__NESTED__")
+	// compatibility, but we don't want to expose the top-level inputs registry
+	// to every individual input, so we keep nested input metrics within their
+	// parent's registry and aggregate them at the top level during the reporting
+	// stage.)
+	monitoring.NewString(ctx.MetricsRegistry, "input").Set(inputmon.InputNested)
 
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
