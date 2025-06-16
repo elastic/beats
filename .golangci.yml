@@ -12,6 +12,11 @@ issues:
   # Set to 0 to disable.
   # Default: 50
   max-issues-per-linter: 0
+  exclude-rules:
+    # Exclude some linters from running on tests files.
+    - path: _test\.go
+      linters:
+        - errcheck
 
 output:
   sort-results: true
@@ -36,7 +41,7 @@ linters:
     - asciicheck # simple linter to check that your code does not contain non-ASCII identifiers
     - bodyclose # checks whether HTTP response body is closed successfully
     - durationcheck # check for two durations multiplied together
-    - exportloopref # checks for pointers to enclosing loop variables
+    - copyloopvar # checks for pointers to enclosing loop variables
     - goimports # Goimports does everything that gofmt does. Additionally it checks unused imports
     - gosec # inspects source code for security problems
     - importas # enforces consistent import aliases
@@ -71,8 +76,6 @@ linters-settings:
     # Forbid the following identifiers
     forbid:
       - fmt.Print.* # too much log noise
-    # Exclude godoc examples from forbidigo checks.  Default is true.
-    exclude_godoc_examples: true
 
   goimports:
     local-prefixes: github.com/elastic
@@ -91,11 +94,6 @@ linters-settings:
         - github.com/elastic/beats/v7:
             reason: "There must be no Beats dependency"
 
-  gosimple:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.23.9"
-
-
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
     max-func-lines: 0
@@ -103,8 +101,6 @@ linters-settings:
   nolintlint:
     # Enable to ensure that nolint directives are all used. Default is true.
     allow-unused: true
-    # Disable to ensure that nolint directives don't have a leading space. Default is true.
-    allow-leading-space: false
     # Exclude following linters from requiring an explanation.  Default is [].
     allow-no-explanation: []
     # Enable to require an explanation of nonzero length after each nolint directive. Default is false.
@@ -113,21 +109,11 @@ linters-settings:
     require-specific: true
 
   staticcheck:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.23.9"
     checks: ["all"]
-
-  stylecheck:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.23.9"
-    checks: ["all"]
-
-  unused:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.23.9"
 
   gosec:
     excludes:
+    - G115 # Integer overflow conversion
     - G306 # Expect WriteFile permissions to be 0600 or less
     - G404 # Use of weak random number generator
     - G401 # Detect the usage of DES, RC4, MD5 or SHA1: Used in non-crypto contexts.

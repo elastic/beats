@@ -57,7 +57,7 @@ func ParseUint(value []byte) (uint64, error) {
 		intValue, intErr := strconv.ParseInt(strValue, 10, 64)
 		if intErr == nil && intValue < 0 {
 			return 0, nil
-		} else if intErr != nil && intErr.(*strconv.NumError).Err == strconv.ErrRange && intValue < 0 { //nolint: errorlint // keep old behaviour
+		} else if intErr != nil && intErr.(*strconv.NumError).Err == strconv.ErrRange && intValue < 0 { //nolint: errorlint,errcheck // keep old behaviour
 			return 0, nil
 		}
 

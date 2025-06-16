@@ -126,7 +126,7 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 	rootEvents := make([]mapstr.M, 0, len(plist))
 
 	for _, process := range plist {
-		process := process
+
 		// Add the RSS pct memory first
 		process.Memory.Rss.Pct = GetProcMemPercentage(process, totalPhyMem)
 		// Create the root event
@@ -402,7 +402,7 @@ func (procStats *Stats) includeTopProcesses(processes []ProcState) []ProcState {
 			return processes[i].Memory.Rss.Bytes.ValueOr(0) > processes[j].Memory.Rss.Bytes.ValueOr(0)
 		})
 		for _, proc := range processes[:numProcs] {
-			proc := proc
+
 			if !isProcessInSlice(result, &proc) {
 				result = append(result, proc)
 			}

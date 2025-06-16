@@ -34,10 +34,10 @@ jobs:
       - name: golangci-lint
         env:
           GOOS: ${{ matrix.GOOS }}
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v6
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
-          version: v1.55.2
+          version: v1.64.8
 
           # Give the job more time to execute.
           # Regarding `--whole-files`, the linter is supposed to support linting of changed a patch only but,
@@ -69,10 +69,10 @@ jobs:
       - name: golangci-lint
         env:
           CGO_ENABLED: 1
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v6
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
-          version: v1.55.2
+          version: v1.64.8
 
           # Give the job more time to execute.
           # Regarding `--whole-files`, the linter is supposed to support linting of changed a patch only but,
