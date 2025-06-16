@@ -31,6 +31,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
+
 	"github.com/mitchellh/hashstructure"
 
 	// include all metricbeat specific builders
