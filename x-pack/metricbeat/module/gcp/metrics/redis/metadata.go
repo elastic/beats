@@ -129,11 +129,6 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, re
 		return metadata, nil
 	}
 
-	if instance == nil {
-		s.logger.Debugf("couldn't get instance '%s' call ListInstances API", instanceID)
-		return metadata, nil
-	}
-
 	if instance.Name != "" {
 		parts := strings.Split(instance.Name, "/")
 		metadata.instanceName = parts[len(parts)-1]

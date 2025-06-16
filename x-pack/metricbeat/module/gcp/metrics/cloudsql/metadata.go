@@ -164,11 +164,6 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, re
 		return cloudsqlMetadata, nil
 	}
 
-	if instance == nil {
-		s.logger.Debugf("couldn't find instance %s, call sqladmin Instances.List", instanceID)
-		return cloudsqlMetadata, nil
-	}
-
 	if instance.DatabaseVersion != "" {
 		cloudsqlMetadata.databaseVersion = instance.DatabaseVersion
 	}

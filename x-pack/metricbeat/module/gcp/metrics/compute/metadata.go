@@ -137,11 +137,6 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 		return computeMetadata, nil
 	}
 
-	if instance == nil {
-		s.logger.Warnf("couldn't find instance %s, call Instances.AggregatedList", instanceID)
-		return computeMetadata, nil
-	}
-
 	labels := instance.GetLabels()
 	if labels != nil {
 		computeMetadata.User = labels
@@ -217,9 +212,6 @@ func (s *metadataCollector) fetchComputeInstances(ctx context.Context) (map[stri
 		pageCount++
 
 		instances := instancesScopedListPair.Value.GetInstances()
-		if instances == nil {
-			continue // Skip zones/regions with no instances
-		}
 
 		for _, instance := range instances {
 			instanceIdStr := strconv.FormatUint(instance.GetId(), 10)
