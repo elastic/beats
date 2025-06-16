@@ -24,6 +24,7 @@ import (
 	"errors"
 	"math"
 
+	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/disk"
 
 	"github.com/elastic/elastic-agent-system-metrics/metric"
@@ -52,7 +53,12 @@ func NewDiskIOStat() *IOStat {
 // OpenSampling creates current cpu sampling
 // need call as soon as get IOCounters.
 func (stat *IOStat) OpenSampling() error {
-	return stat.curCPU.Get()
+	times, err := cpu.Times(false)
+	if err != nil {
+		return err
+	}
+	stat.curCPU = times[0]
+	return nil
 }
 
 // a few of the diskio counters are actually 32-bit on the kernel side, which means they can roll over fairly easily.
@@ -89,7 +95,7 @@ func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, err
 	}
 
 	// calculate the delta ms between the CloseSampling and OpenSampling
-	deltams := 1000.0 * float64(stat.curCPU.Total()-stat.lastCPU.Total()) / float64(numcpu.NumCPU()) / float64(GetCLKTCK())
+	deltams := 1000.0 * (float64(uint64(total(stat.curCPU)) - uint64(total(stat.lastCPU)))) / float64(numcpu.NumCPU())
 	if deltams <= 0 {
 		return IOMetric{}, errors.New("the delta cpu time between close sampling and open sampling is less or equal to 0")
 	}
@@ -153,4 +159,9 @@ func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, err
 // CloseSampling closes the disk sampler
 func (stat *IOStat) CloseSampling() {
 	stat.lastCPU = stat.curCPU
+}
+
+func total(cpu cpu.TimesStat) float64 {
+	return cpu.User + cpu.Nice + cpu.System + cpu.Idle +
+		cpu.Iowait + cpu.Irq + cpu.Softirq + cpu.Steal
 }

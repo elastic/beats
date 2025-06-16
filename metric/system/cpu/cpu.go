@@ -21,25 +21,26 @@
 package cpu
 
 import (
+	"github.com/shirou/gopsutil/v4/load"
+
 	"github.com/elastic/elastic-agent-system-metrics/metric"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/numcpu"
-	sigar "github.com/elastic/gosigar"
 )
 
 // Load returns CPU load information for the previous 1, 5, and 15 minute
 // periods.
 func Load() (*LoadMetrics, error) {
-	load := &sigar.LoadAverage{}
-	if err := load.Get(); err != nil {
+	avg, err := load.Avg()
+	if err != nil {
 		return nil, err
 	}
 
-	return &LoadMetrics{load}, nil
+	return &LoadMetrics{avg}, nil
 }
 
 // LoadMetrics stores the sampled load average values of the host.
 type LoadMetrics struct {
-	sample *sigar.LoadAverage
+	sample *load.AvgStat
 }
 
 // LoadAverages stores the values of load averages of the last 1, 5 and 15 minutes.
@@ -53,9 +54,9 @@ type LoadAverages struct {
 // 0 to NumCPU.
 func (m *LoadMetrics) Averages() LoadAverages {
 	return LoadAverages{
-		OneMinute:     metric.Round(m.sample.One),
-		FiveMinute:    metric.Round(m.sample.Five),
-		FifteenMinute: metric.Round(m.sample.Fifteen),
+		OneMinute:     metric.Round(m.sample.Load1),
+		FiveMinute:    metric.Round(m.sample.Load5),
+		FifteenMinute: metric.Round(m.sample.Load15),
 	}
 }
 
@@ -64,8 +65,8 @@ func (m *LoadMetrics) Averages() LoadAverages {
 func (m *LoadMetrics) NormalizedAverages() LoadAverages {
 	cpus := numcpu.NumCPU()
 	return LoadAverages{
-		OneMinute:     metric.Round(m.sample.One / float64(cpus)),
-		FiveMinute:    metric.Round(m.sample.Five / float64(cpus)),
-		FifteenMinute: metric.Round(m.sample.Fifteen / float64(cpus)),
+		OneMinute:     metric.Round(m.sample.Load1 / float64(cpus)),
+		FiveMinute:    metric.Round(m.sample.Load5 / float64(cpus)),
+		FifteenMinute: metric.Round(m.sample.Load15 / float64(cpus)),
 	}
 }

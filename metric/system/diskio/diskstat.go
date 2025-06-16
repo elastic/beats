@@ -21,9 +21,8 @@
 package diskio
 
 import (
+	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/disk"
-
-	sigar "github.com/elastic/gosigar"
 )
 
 // IOMetric contains mapping fields which are outputted by `iostat -x` on linux
@@ -50,6 +49,6 @@ type IOMetric struct {
 // IOStat carries disk statistics for all devices
 type IOStat struct {
 	lastDiskIOCounters map[string]disk.IOCountersStat
-	lastCPU            sigar.Cpu //nolint: nolintlint,structcheck,unused // not used on windows
-	curCPU             sigar.Cpu //nolint: nolintlint,structcheck,unused // not used on windows
+	lastCPU            cpu.TimesStat
+	curCPU             cpu.TimesStat
 }

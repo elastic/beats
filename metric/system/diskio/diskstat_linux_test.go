@@ -24,11 +24,11 @@ import (
 	"math"
 	"testing"
 
+	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-system-metrics/metric"
-	sigar "github.com/elastic/gosigar"
 )
 
 func Test_GetCLKTCK(t *testing.T) {
@@ -72,8 +72,8 @@ func TestDiskIOStat_CalIOStatistics(t *testing.T) {
 				Name:       "iostat",
 			},
 		},
-		lastCPU: sigar.Cpu{Idle: 100},
-		curCPU:  sigar.Cpu{Idle: 1},
+		lastCPU: cpu.TimesStat{Idle: 1},
+		curCPU:  cpu.TimesStat{Idle: 0.01},
 	}
 
 	expected := IOMetric{

@@ -26,10 +26,10 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/cgcommon"
-	"github.com/elastic/gosigar/sys/linux"
+	"github.com/shirou/gopsutil/v4/cpu"
 )
 
-var clockTicks = uint64(linux.GetClockTicks())
+var clockTicks = uint64(cpu.ClocksPerSec)
 
 // CPUAccountingSubsystem contains metrics from the "cpuacct" subsystem.
 // Note that percentage values are not taken from cgroup metrics, but derived via FillPercentages()
