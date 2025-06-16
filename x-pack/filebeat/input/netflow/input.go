@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"os"
 	"sync"
 	"time"
 
@@ -22,13 +21,11 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/convert"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
-	ipfix_reader "github.com/elastic/beats/v7/x-pack/libbeat/reader/ipfix"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -139,13 +136,6 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 	n.metrics = newInputMetrics(n.udpMetrics.Registry())
 	var err error
 
-	// check for file paths -- only supporting one or the other
-	if len(n.cfg.Ipfix.Paths) > 0 {
-		err = n.setupFile(env, connector)
-		if err != nil {
-			return err
-		}
-	} else {
 		err = n.setupOrig(env, connector)
 		if err != nil {
 			return err
@@ -176,138 +166,12 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 		}
 		defer udpServer.Stop()
 
-	}
+	
 	env.UpdateStatus(status.Running, "")
 	<-n.ctx.Done()
 	n.stop()
 
 	return nil
-}
-
-func (n *netflowInput) setupFile(env v2.Context, connector beat.PipelineConnector) error {
-	var err error
-	n.decoder, err = decoder.NewDecoder(decoder.NewConfig(n.logger).
-		WithProtocols(n.cfg.Protocols...).
-		WithExpiration(n.cfg.ExpirationTimeout).
-		WithCustomFields(n.customFields...).
-		WithSequenceResetEnabled(n.cfg.DetectSequenceReset).
-		WithSharedTemplates(n.cfg.ShareTemplates).
-		WithActiveSessionsMetric(n.metrics.ActiveSessions()).
-		WithCache(n.cfg.NumberOfWorkers > 1))
-	if err != nil {
-		env.UpdateStatus(status.Failed, fmt.Sprintf("Failed to initialize netflow decoder: %v", err))
-		return fmt.Errorf("error initializing netflow decoder: %w", err)
-	}
-
-	// Start FSWatcher for n.cfg.Ipfix.Paths
-	// Construct FSWatcher using the public filestream export
-	watcher, err := filestream.NewFSWatcher(n.cfg.Ipfix.Paths, n.logger)
-	if err != nil {
-		env.UpdateStatus(status.Failed, fmt.Sprintf("Failed to start FSWatcher: %v", err))
-		return fmt.Errorf("error starting FSWatcher: %w", err)
-	}
-	n.filewatcher = &watcher
-
-	// Start watcher goroutine
-	n.wg.Add(1)
-	go func() {
-		defer n.wg.Done()
-		watcher.Run(n.ctx)
-	}()
-
-	client, err := connector.ConnectWith(beat.ClientConfig{
-		PublishMode: beat.DefaultGuarantees,
-		Processing: beat.ProcessingConfig{
-			EventNormalization: boolPtr(false),
-		},
-		EventListener: nil,
-	})
-	if err != nil {
-		env.UpdateStatus(status.Failed, fmt.Sprintf("Failed connecting to beat event publishing: %v", err))
-		n.logger.Errorw("Failed connecting to beat event publishing", "error", err)
-		n.stop()
-		return err
-	}
-
-	// Start event handler goroutine
-	n.wg.Add(1)
-	n.clients = append(n.clients, client)
-	go func(client beat.Client) {
-		defer n.wg.Done()
-		for {
-			if n.ctx.Err() != nil {
-				return
-			}
-			event := watcher.Event()
-			if event.Op == filestream.OpCreate || event.Op == filestream.OpWrite {
-				filename := event.Descriptor.Filename
-				// TODO: Process file as Netflow/IPFIX
-				n.logger.Infof("Detected new or changed file: %s", filename)
-				n.processFile(filename, client)
-			}
-		}
-	}(client)
-
-	return nil
-}
-
-func (n *netflowInput) processFile(fpath string, client beat.Client) {
-	if fpath == "" {
-		return
-	}
-	n.logger.Infof("processing file [%v] now", fpath)
-	start := time.Now().In(time.UTC)
-	n.metrics.ipfix.FilesOpened.Inc()
-	defer n.metrics.ipfix.FilesClosed.Inc()
-
-	// this will actually be the file to read, not the packet
-	fi, err := os.Stat(fpath)
-	if err != nil {
-		// log something
-		n.logger.Warnf("Error stat on file [%s]: %v", fpath, err)
-		return
-	}
-
-	// check for pipe?
-	if fi.Mode()&os.ModeNamedPipe != 0 {
-		n.logger.Warnf("Error on file %s: Named Pipes are not supported", fpath)
-		return
-	}
-	// check for regular file?
-
-	f, err := file.ReadOpen(fpath)
-	if err != nil {
-		n.logger.Warnf("Error ReadOpen on file %s: %v", fpath, err)
-		return
-	}
-
-	defer f.Close()
-	defer os.Remove(fpath)
-
-	reader, err := n.addGzipDecoderIfNeeded(f)
-	if err != nil {
-		n.logger.Warnf("Failed to add gzip decoder: [%v]", err)
-	}
-
-	ip := ipfix_reader.Config{}
-	decoder, err := ipfix_reader.NewBufferedReader(reader, &ip)
-	for {
-		if !decoder.Next() {
-			break
-		}
-		events, err := decoder.Record()
-		if err != nil {
-			n.logger.Warnf("Error parsing NetFlow Record")
-			if decodeErrors := n.metrics.DecodeErrors(); decodeErrors != nil {
-				decodeErrors.Inc()
-			}
-			continue
-		}
-
-		client.PublishAll(events)
-	}
-
-	n.metrics.ipfix.ProcessingTime.Update(time.Since(start).Nanoseconds())
 }
 
 // Copied from x-pack/filebeat/input/awss3/s3_objects.go
