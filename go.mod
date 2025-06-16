@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.24.3
+go 1.24.4
 
 require (
 	cloud.google.com/go/bigquery v1.65.0
@@ -210,6 +210,7 @@ require (
 	github.com/shirou/gopsutil/v4 v4.25.3
 	github.com/teambition/rrule-go v1.8.2
 	github.com/tklauser/go-sysconf v0.3.12
+	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80
 	github.com/xdg-go/scram v1.1.2
 	github.com/zyedidia/generic v1.2.1
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.6.3
