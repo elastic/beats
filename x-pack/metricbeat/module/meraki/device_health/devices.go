@@ -32,6 +32,7 @@ type Device struct {
 	performanceScore *sdk.ResponseApplianceGetDeviceAppliancePerformance
 	license          *sdk.ResponseItemOrganizationsGetOrganizationLicenses
 	bandUtilization  map[string]*sdk.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBand
+	vpnStatus        *sdk.ResponseItemApplianceGetOrganizationApplianceVpnStatuses
 
 	uplinks     []*uplink
 	switchports []*switchport
@@ -286,8 +287,67 @@ func reportDeviceMetrics(reporter mb.ReporterV2, organizationID string, devices 
 			metric["device.license.total_duration_in_days"] = device.license.TotalDurationInDays
 		}
 
+		if device.vpnStatus != nil {
+			metric["device.network_name"] = device.vpnStatus.NetworkName
+			metric["vpn"] = vpnStatusToMapStr(device.vpnStatus)
+		}
+
 		metrics = append(metrics, metric)
 	}
 
 	meraki.ReportMetricsForOrganization(reporter, organizationID, metrics)
+}
+
+func vpnStatusToMapStr(status *sdk.ResponseItemApplianceGetOrganizationApplianceVpnStatuses) mapstr.M {
+	res := mapstr.M{
+		"mode": status.VpnMode,
+	}
+
+	if status.ExportedSubnets != nil {
+		exportedSubnets := make([]mapstr.M, len(*status.ExportedSubnets))
+		for i, subnet := range *status.ExportedSubnets {
+			exportedSubnets[i] = mapstr.M{
+				"name":   subnet.Name,
+				"subnet": subnet.Subnet,
+			}
+		}
+		res["exported_subnets"] = exportedSubnets
+	}
+
+	if status.MerakiVpnpeers != nil {
+		vpnPeers := make([]mapstr.M, len(*status.MerakiVpnpeers))
+		for i, peer := range *status.MerakiVpnpeers {
+			vpnPeers[i] = mapstr.M{
+				"network_id":   peer.NetworkID,
+				"network_name": peer.NetworkName,
+				"reachability": peer.Reachability,
+			}
+			res["meraki_vpn_peers"] = vpnPeers
+		}
+	}
+
+	if status.ThirdPartyVpnpeers != nil {
+		thirdPartyVpnPeers := make([]mapstr.M, len(*status.ThirdPartyVpnpeers))
+		for i, peer := range *status.ThirdPartyVpnpeers {
+			thirdPartyVpnPeers[i] = mapstr.M{
+				"name":         peer.Name,
+				"public_ip":    peer.PublicIP,
+				"reachability": peer.Reachability,
+			}
+		}
+		res["third_party_vpn_peers"] = thirdPartyVpnPeers
+	}
+
+	if status.Uplinks != nil {
+		uplinks := make([]mapstr.M, len(*status.Uplinks))
+		for i, uplink := range *status.Uplinks {
+			uplinks[i] = mapstr.M{
+				"interface": uplink.Interface,
+				"public_ip": uplink.PublicIP,
+			}
+		}
+		res["uplinks"] = uplinks
+	}
+
+	return res
 }
