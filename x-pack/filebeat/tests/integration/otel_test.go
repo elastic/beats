@@ -101,7 +101,7 @@ setup.template.pattern: logs-filebeat-default
 	// wait for logs to be published
 	require.Eventually(t,
 		func() bool {
-			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
+			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
 			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
