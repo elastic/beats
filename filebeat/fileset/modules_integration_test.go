@@ -260,12 +260,15 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 }
 
 func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
-
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		t.Fatal(err)
+	}
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:      eslegtest.GetURL(),
 		Username: eslegtest.GetUser(),
 		Password: eslegtest.GetPass(),
-	}, logp.NewNopLogger())
+	}, logger)
 	if err != nil {
 		t.Fatal(err)
 		panic(err) // panic in case TestLogger did not stop test

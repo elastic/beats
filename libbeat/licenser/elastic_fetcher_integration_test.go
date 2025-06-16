@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -47,7 +48,7 @@ func getTestClient(t *testing.T) *eslegclient.Connection {
 		Password:         "testing",
 		CompressionLevel: 3,
 		Transport:        transport,
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("cannot get new ES connection: %s", err)
 	}
