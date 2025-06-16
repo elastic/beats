@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestCreateProspector(t *testing.T) {
@@ -47,7 +48,7 @@ func TestCreateProspector(t *testing.T) {
 				c := config{
 					IgnoreInactive: ignoreInactiveSettings[test.ignore_inactive_since],
 				}
-				p, _ := newProspector(c)
+				p, _ := newProspector(c, logptest.NewTestingLogger(t, ""))
 				fileProspector := p.(*fileProspector)
 				assert.Equal(t, fileProspector.ignoreInactiveSince, ignoreInactiveSettings[test.ignore_inactive_since])
 			})
@@ -101,7 +102,7 @@ prospector.scanner.fingerprint.enabled: false
 				err = c.Unpack(&cfg)
 				require.NoError(t, err)
 
-				_, err = newProspector(cfg)
+				_, err = newProspector(cfg, logptest.NewTestingLogger(t, ""))
 				if tc.err == "" {
 					require.NoError(t, err)
 					return

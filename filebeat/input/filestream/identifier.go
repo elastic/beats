@@ -22,6 +22,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type identifierFeature uint8
@@ -47,7 +48,7 @@ var identifierFactories = map[string]identifierFactory{
 	fingerprintName: newFingerprintIdentifier,
 }
 
-type identifierFactory func(*conf.C) (fileIdentifier, error)
+type identifierFactory func(*conf.C, *logp.Logger) (fileIdentifier, error)
 
 type fileIdentifier interface {
 	GetSource(loginp.FSEvent) fileSource
@@ -74,9 +75,9 @@ func (f fileSource) Name() string {
 }
 
 // newFileIdentifier creates a new state identifier for a log input.
-func newFileIdentifier(ns *conf.Namespace, suffix string) (fileIdentifier, error) {
+func newFileIdentifier(ns *conf.Namespace, suffix string, log *logp.Logger) (fileIdentifier, error) {
 	if ns == nil {
-		i, err := newFingerprintIdentifier(nil)
+		i, err := newFingerprintIdentifier(nil, log)
 		if err != nil {
 			return nil, err
 		}
@@ -89,7 +90,7 @@ func newFileIdentifier(ns *conf.Namespace, suffix string) (fileIdentifier, error
 		return nil, fmt.Errorf("no such file_identity generator: %s", identifierType)
 	}
 
-	i, err := f(ns.Config())
+	i, err := f(ns.Config(), log)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +101,7 @@ type inodeDeviceIdentifier struct {
 	name string
 }
 
-func newINodeDeviceIdentifier(_ *conf.C) (fileIdentifier, error) {
+func newINodeDeviceIdentifier(_ *conf.C, _ *logp.Logger) (fileIdentifier, error) {
 	return &inodeDeviceIdentifier{
 		name: nativeName,
 	}, nil
@@ -135,7 +136,7 @@ type pathIdentifier struct {
 	name string
 }
 
-func newPathIdentifier(_ *conf.C) (fileIdentifier, error) {
+func newPathIdentifier(_ *conf.C, _ *logp.Logger) (fileIdentifier, error) {
 	return &pathIdentifier{
 		name: pathName,
 	}, nil

@@ -57,7 +57,7 @@ func init() {
 			continue
 		}
 
-		identifier, err := factory(nil)
+		identifier, err := factory(nil, logp.NewNopLogger())
 		if err != nil {
 			// Skip identifiers we cannot create. E.g: inode_marker is not
 			// supported on Windows

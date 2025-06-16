@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -192,9 +193,9 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 		Fingerprint: mockFingerprint,
 	}
 
-	fingerprintIdentifier, _ := newFingerprintIdentifier(nil)
-	nativeIdentifier, _ := newINodeDeviceIdentifier(nil)
-	pathIdentifier, _ := newPathIdentifier(nil)
+	fingerprintIdentifier, _ := newFingerprintIdentifier(nil, logptest.NewTestingLogger(t, ""))
+	nativeIdentifier, _ := newINodeDeviceIdentifier(nil, logptest.NewTestingLogger(t, ""))
+	pathIdentifier, _ := newPathIdentifier(nil, logptest.NewTestingLogger(t, ""))
 	newIDFunc := func(s loginp.Source) string {
 		return mockInputPrefix + "-" + s.Name()
 	}
@@ -786,7 +787,7 @@ type renamedPathIdentifier struct {
 func (p *renamedPathIdentifier) Supports(_ identifierFeature) bool { return true }
 
 func mustPathIdentifier(renamed bool) fileIdentifier {
-	pathIdentifier, err := newPathIdentifier(nil)
+	pathIdentifier, err := newPathIdentifier(nil, logp.NewNopLogger())
 	if err != nil {
 		panic(err)
 	}
@@ -834,12 +835,12 @@ func TestOnRenameFileIdentity(t *testing.T) {
 	for k, tc := range testCases {
 		t.Run(k, func(t *testing.T) {
 			p := fileProspector{
-				logger:            logp.L(),
+				logger:            logptest.NewTestingLogger(t, ""),
 				filewatcher:       newMockFileWatcher(tc.events, len(tc.events)),
 				identifier:        mustPathIdentifier(true),
 				stateChangeCloser: stateChangeCloserConfig{Renamed: true},
 			}
-			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+			ctx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: context.Background()}
 
 			path := "/new/path/to/file"
 			expectedIdentifier := tc.identifier
