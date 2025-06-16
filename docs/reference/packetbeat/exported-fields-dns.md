@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-dns.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # DNS fields [exported-fields-dns]
 
 DNS-specific event fields.
@@ -44,7 +46,7 @@ type: boolean
 
 
 **`dns.question.etld_plus_one`**
-:   The effective top-level domain (eTLD) plus one more label. For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.". The data for determining the eTLD comes from an embedded copy of the data from [http://publicsuffix.org](http://publicsuffix.org).
+:   The effective top-level domain (eTLD) plus one more label. For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.". The data for determining the eTLD comes from an embedded copy of the data from http://publicsuffix.org.
 
 example: amazon.co.uk.
 
@@ -144,7 +146,7 @@ example: BADVERS
 
 
 **`dns.opt.udp_size`**
-:   Requestor’s UDP payload size (in bytes).
+:   Requestor's UDP payload size (in bytes).
 
 type: long
 
