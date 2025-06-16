@@ -127,7 +127,7 @@ steps:
           DEV: true
         command: |
           source .buildkite/scripts/qemu.sh
-          .buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -216,7 +216,7 @@ steps:
           DEV: false
         command: |
           source .buildkite/scripts/qemu.sh
-          .buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
