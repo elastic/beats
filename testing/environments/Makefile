@@ -1,3 +1,10 @@
+ARCH := $(shell uname -m)
+ifeq ($(ARCH),x86_64)
+    ARCH := amd64
+else ifeq ($(ARCH),aarch64)
+    ARCH := arm64
+endif
+
 ENV?=snapshot.yml
 BASE_COMMAND=docker-compose -f ${ENV} -f local.yml
 
