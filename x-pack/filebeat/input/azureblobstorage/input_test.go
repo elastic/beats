@@ -570,6 +570,8 @@ func Test_StorageClient(t *testing.T) {
 				"max_workers":                         1,
 				"poll":                                true,
 				"poll_interval":                       "10s",
+				"decoding.codec.csv.enabled":          true,
+				"decoding.codec.csv.comma":            " ",
 				"containers": []map[string]interface{}{
 					{
 						"name":                       beatsCSVContainer,
