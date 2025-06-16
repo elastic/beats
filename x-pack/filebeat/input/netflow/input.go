@@ -12,7 +12,6 @@ import (
 	"sync"
 	"time"
 
-	filestream "github.com/elastic/beats/v7/filebeat/input/filestream"
 	"github.com/elastic/beats/v7/filebeat/input/netmetrics"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
@@ -88,7 +87,6 @@ type netflowInput struct {
 	mtx              sync.Mutex
 	cfg              config
 	decoder          *decoder.Decoder
-	filewatcher      *filestream.FSWatcher
 	clients          []beat.Client
 	metrics          *netflowMetrics
 	udpMetrics       *netmetrics.UDP
