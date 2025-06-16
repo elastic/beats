@@ -3,12 +3,13 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-tomcat.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Tomcat fields [exported-fields-tomcat]
 
 Tomcat module
 
-
-## cache [_cache_5]
+## cache [_cache]
 
 Catalina Cache metrics from the WebResourceRoot
 
@@ -48,8 +49,7 @@ type: long
 type: long
 
 
-
-## memory [_memory_15]
+## memory [_memory]
 
 Memory metrics from java.lang JMX
 
@@ -107,8 +107,7 @@ type: long
 type: long
 
 
-
-## requests [_requests_2]
+## requests [_requests]
 
 Requests processor metrics from GlobalRequestProcessor JMX
 
@@ -148,10 +147,9 @@ type: long
 type: long
 
 
-
 ## threading [_threading]
 
-Threading metrics from the Catalina’s ThreadPool JMX
+Threading metrics from the Catalina's ThreadPool JMX
 
 **`tomcat.threading.busy`**
 :   Current busy threads from the ThreadPool
