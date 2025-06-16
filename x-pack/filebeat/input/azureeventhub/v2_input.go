@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -81,6 +82,9 @@ func (in *eventHubInputV2) Run(
 ) error {
 	var err error
 
+	// When the input is initializing before attempting to connect to Azure Event Hub.
+	inputContext.UpdateStatus(status.Starting, "")
+
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
 	// Setup input metrics
@@ -88,21 +92,27 @@ func (in *eventHubInputV2) Run(
 	defer inputMetrics.Close()
 	in.metrics = inputMetrics
 
+	// When setting up Azure Event Hub client and validating configuration.
+	inputContext.UpdateStatus(status.Configuring, "")
+
 	// Initialize the components needed to process events.
 	err = in.setup(ctx)
 	if err != nil {
+		inputContext.UpdateStatus(status.Failed, fmt.Sprintf("failed to setup input: %s", err))
 		return err
 	}
-	defer in.teardown(ctx)
+	defer in.teardown(inputContext, ctx)
 
 	// Store a reference to the pipeline, so we
 	// can create a new pipeline client for each
 	// partition.
 	in.pipeline = pipeline
 
-	// Start the main run loop
-	in.run(ctx)
+	// Start the main run loop (blocking call).
+	in.run(inputContext, ctx)
 
+	// When the input is stopped.
+	inputContext.UpdateStatus(status.Stopping, "")
 	return nil
 }
 
@@ -184,7 +194,7 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 }
 
 // teardown releases the resources used by the input.
-func (in *eventHubInputV2) teardown(ctx context.Context) {
+func (in *eventHubInputV2) teardown(inputContext v2.Context, ctx context.Context) {
 	if in.consumerClient == nil {
 		return
 	}
@@ -196,10 +206,13 @@ func (in *eventHubInputV2) teardown(ctx context.Context) {
 			"error", err,
 		)
 	}
+
+	// Update input status to stopped.
+	inputContext.UpdateStatus(status.Stopped, "")
 }
 
 // run starts the main loop for processing events.
-func (in *eventHubInputV2) run(ctx context.Context) {
+func (in *eventHubInputV2) run(inputContext v2.Context, ctx context.Context) {
 	if in.config.MigrateCheckpoint {
 		in.log.Infow("checkpoint migration is enabled")
 		// Check if we need to migrate the checkpoint store.
@@ -247,17 +260,21 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 		// to process events.
 		go in.workersLoop(ctx, processor)
 
-		// Run the processor to start processing events.
+		// Update input status to running.
+		inputContext.UpdateStatus(status.Running, "")
+
+		// Run the processor to start processing events (blocking call).
 		//
-		// This is a blocking call.
-		//
-		// It will return when the processor stops due to:
-		//  - an error
-		//	- when the context is cancelled.
+		// Run handles the load balancing loop, blocking until the passed in context
+		// is cancelled or it encounters an unrecoverable error.
 		//
 		// On cancellation, it will return a nil error.
 		if err := processor.Run(ctx); err != nil {
-			in.log.Errorw("processor exited with a non-nil error", "error", err)
+			// The processor encountered an unrecoverable error.
+			in.log.Errorw("processor encountered an unrecoverable error and needs to be restarted", "error", err)
+
+			// Update input status to degraded.
+			inputContext.UpdateStatus(status.Degraded, fmt.Sprintf("error: %s", err))
 
 			in.log.Infow("waiting before retrying starting the processor")
 
