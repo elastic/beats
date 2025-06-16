@@ -221,9 +221,13 @@ func testGracePeriod(
 			gracePeriodMsg := fmt.Sprintf(
 				"all events from '%s' have been published, waiting for %s grace period",
 				msgLogFilePath, gracePeriod)
+
+			// This wait always takes 6.1s, I'm not quite sure why, probably it
+			// is caused by some backoff logic. Setting the backoff.* in the
+			// output is not enough. So we wait at least 10s here
 			filebeat.WaitForLogs(
 				gracePeriodMsg,
-				time.Second,
+				10*time.Second,
 				"did not start waiting for grace period")
 
 			// Wait 1/2 of the grace period, then add data to the file

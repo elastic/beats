@@ -17,14 +17,14 @@ filebeat.inputs:
 
 path.home: {{ .homePath }}
 queue.mem:
-  flush.timeout: 0
+  flush.timeout: 0s
 
 output.elasticsearch:
   hosts:
     - http://{{ .esHost }}
   backoff:
-    init: 100ms
-    max: 100ms
+    init: 10ms
+    max: 10ms
 
 logging:
   level: debug
