@@ -39,8 +39,13 @@ import (
 )
 
 type ReceiverConfig struct {
-	Name    string
-	Config  component.Config
+	// Name is the unique identifier for the component
+	Name string
+	// Beat is the name of the Beat that is running as a receiver
+	Beat string
+	// Config is the configuration for the receiver component
+	Config component.Config
+	// Factory is the factory to instantiate the receiver
 	Factory receiver.Factory
 }
 
@@ -72,6 +77,9 @@ func CheckReceivers(params CheckReceiversParams) {
 
 	createReceiver := func(t *testing.T, rc ReceiverConfig) receiver.Logs {
 		t.Helper()
+
+		require.NotEmpty(t, rc.Name, "receiver name must not be empty")
+		require.NotEmpty(t, rc.Beat, "receiver beat must not be empty")
 
 		var receiverSettings receiver.Settings
 
@@ -127,15 +135,27 @@ func CheckReceivers(params CheckReceiversParams) {
 		}
 	})
 
+	beatForCompID := func(compID string) string {
+		for _, rec := range params.Receivers {
+			if rec.Name == compID {
+				return rec.Beat
+			}
+		}
+
+		return ""
+	}
+
 	require.EventuallyWithT(t, func(ct *assert.CollectT) {
 		logsMu.Lock()
 		defer logsMu.Unlock()
 
-		// Ensure the logger fields from the otel collector are present in the logs.
+		// Ensure the logger fields from the otel collector are present
 		for _, zl := range zapLogs.All() {
+			require.Equal(t, "receiver", zl.ContextMap()["otelcol.component.kind"])
+			require.Equal(t, "logs", zl.ContextMap()["otelcol.signal"])
 			require.Contains(t, zl.ContextMap(), "otelcol.component.id")
-			require.Equal(t, zl.ContextMap()["otelcol.component.kind"], "receiver")
-			require.Equal(t, zl.ContextMap()["otelcol.signal"], "logs")
+			compID := zl.ContextMap()["otelcol.component.id"].(string)
+			require.Equal(t, beatForCompID(compID), zl.ContextMap()["service.name"])
 			break
 		}
 
