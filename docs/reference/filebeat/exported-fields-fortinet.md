@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-fortinet.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Fortinet fields [exported-fields-fortinet]
 
 fortinet Module
-
 
 ## fortinet [_fortinet]
 
@@ -16,7 +17,6 @@ Fields from fortinet FortiOS
 :   CRC32 Hash of file
 
 type: keyword
-
 
 
 ## firewall [_firewall]

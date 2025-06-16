@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-etcd.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Etcd fields [exported-fields-etcd]
 
 etcd Module
-
 
 ## etcd [_etcd]
 
@@ -18,11 +19,9 @@ etcd Module
 type: keyword
 
 
-
 ## leader [_leader]
 
 Contains etcd leader statistics.
-
 
 ## follower [_follower]
 
@@ -32,7 +31,6 @@ Contains follower statistics.
 :   ID of follower
 
 type: keyword
-
 
 
 ## latency [_latency]
@@ -61,8 +59,7 @@ type: integer
 type: keyword
 
 
-
-## server [_server_5]
+## server [_server]
 
 Server metrics from the Etcd V3 /metrics endpoint
 
@@ -106,7 +103,6 @@ type: long
 :   Number of received gRPC requests
 
 type: long
-
 
 
 ## disk [_disk]
@@ -157,8 +153,7 @@ type: long
 type: long
 
 
-
-## memory [_memory_6]
+## memory [_memory]
 
 Memory metrics from the Etcd V3 /metrics endpoint
 
@@ -170,8 +165,7 @@ type: long
 format: bytes
 
 
-
-## network [_network_5]
+## network [_network]
 
 Network metrics from the Etcd V3 /metrics endpoint
 
@@ -189,7 +183,6 @@ format: bytes
 type: long
 
 format: bytes
-
 
 
 ## self [_self]
@@ -221,7 +214,7 @@ type: keyword
 
 
 **`etcd.self.name`**
-:   this member’s name
+:   this member's name
 
 type: keyword
 
@@ -272,7 +265,6 @@ type: keyword
 :   either leader or follower
 
 type: keyword
-
 
 
 ## store [_store]
