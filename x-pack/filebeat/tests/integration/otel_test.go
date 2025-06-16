@@ -112,7 +112,7 @@ setup.template.pattern: logs-filebeat-default
 
 			return otelDocs.Hits.Total.Value >= numEvents && filebeatDocs.Hits.Total.Value >= numEvents
 		},
-		3*time.Minute, 1*time.Second, fmt.Sprintf("Number of hits %d not equal to number of events for %d", filebeatDocs.Hits.Total.Value, numEvents))
+		3*time.Minute, 1*time.Second, fmt.Sprintf("otel docs = %d, filebeat docs = %d", otelDocs.Hits.Total.Value, filebeatDocs.Hits.Total.Value))
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
