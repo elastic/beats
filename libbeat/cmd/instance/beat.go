@@ -518,7 +518,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 			if c, ok := b.Publisher.(io.Closer); ok {
 				c.Close()
 			}
-			beater.Stop()
 		})
 	}
 	svc.HandleSignals(stopBeat, cancel)
