@@ -22,6 +22,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/go-concert/ctxtool"
@@ -54,7 +55,7 @@ type logFile struct {
 	closeRemoved  bool
 	closeRenamed  bool
 
-	isInactive bool
+	isInactive atomic.Bool
 
 	offset       int64
 	lastTimeRead time.Time
@@ -143,7 +144,7 @@ func (f *logFile) Read(buf []byte) (int, error) {
 	// for inactivity first sets `f.isInactive`, then it cancels `f.readerCtx`,
 	// once the execution comes back to this method, the for loop condition
 	// evaluates to false and the correct value from `f.isInactive` is read.
-	if f.isInactive {
+	if f.isInactive.Load() {
 		return 0, ErrInactive
 	}
 
@@ -195,7 +196,7 @@ func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
 func (f *logFile) shouldBeClosed() bool {
 	if f.closeInactive > 0 {
 		if time.Since(f.lastTimeRead) > f.closeInactive {
-			f.isInactive = true
+			f.isInactive.Store(true)
 			f.log.Debugf("'%s' is inactive", f.file.Name())
 			return true
 		}
