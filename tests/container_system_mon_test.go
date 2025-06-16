@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/client"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -85,7 +86,12 @@ func TestKernelProc(t *testing.T) {
 		Testname:         "TestSystemHostFromContainer",
 		FatalLogMessages: []string{"error", "Error"},
 	}
-	runner.RunTestsOnDocker(ctx)
+
+	apiClient, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
+	require.NoError(t, err)
+	defer apiClient.Close()
+
+	runner.RunTestsOnDocker(ctx, apiClient)
 }
 
 func TestProcessMetricsElevatedPerms(t *testing.T) {
@@ -162,5 +168,9 @@ func TestFilesystem(t *testing.T) {
 		Privileged: false,
 	}
 
-	baseRunner.RunTestsOnDocker(ctx)
+	apiClient, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
+	require.NoError(t, err)
+	defer apiClient.Close()
+
+	baseRunner.RunTestsOnDocker(ctx, apiClient)
 }

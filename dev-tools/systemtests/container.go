@@ -126,6 +126,10 @@ func (tr *DockerTestRunner) CreateAndRunPermissionMatrix(ctx context.Context,
 
 	tr.Runner.Logf("Running %d tests", len(cases))
 
+	apiClient, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
+	require.NoError(tr.Runner, err)
+	defer apiClient.Close()
+
 	baseRunner := tr.Runner // some odd recursion happens here if we just refer to tr.Runner
 	for _, tc := range cases {
 		baseRunner.Run(tc.String(), func(t *testing.T) {
@@ -134,7 +138,7 @@ func (tr *DockerTestRunner) CreateAndRunPermissionMatrix(ctx context.Context,
 			runner.CgroupNSMode = tc.nsmode
 			runner.Privileged = tc.priv
 			runner.RunAsUser = tc.user
-			runner.RunTestsOnDocker(ctx)
+			runner.RunTestsOnDocker(ctx, apiClient)
 		})
 	}
 
@@ -145,7 +149,7 @@ func (tr *DockerTestRunner) CreateAndRunPermissionMatrix(ctx context.Context,
 // This framework relies on the tests using DockerTestResolver().
 // If docker returns !0 or if there's a matching string entry from FatalLogMessages in stdout/stderr,
 // this will fail the test
-func (tr *DockerTestRunner) RunTestsOnDocker(ctx context.Context) {
+func (tr *DockerTestRunner) RunTestsOnDocker(ctx context.Context, apiClient *client.Client) {
 	// do we want to run on windows? Much of what we're testing, such as host
 	// cgroup monitoring, is invalid.
 	if runtime.GOOS != "linux" {
@@ -161,13 +165,7 @@ func (tr *DockerTestRunner) RunTestsOnDocker(ctx context.Context) {
 		tr.Container = "golang:alpine"
 	}
 
-	// setup and run
-
-	apiClient, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
-	require.NoError(tr.Runner, err)
-	defer apiClient.Close()
-
-	_, err = apiClient.ContainerList(ctx, container.ListOptions{})
+	_, err := apiClient.Ping(ctx)
 	if err != nil {
 		tr.Runner.Skipf("got error in container list, docker isn't installed or not running: %s", err)
 	}
