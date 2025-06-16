@@ -23,6 +23,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -92,7 +93,7 @@ func BenchmarkEquals(b *testing.B) {
 
 	for name, config := range cases {
 		b.Run(name, func(b *testing.B) {
-			e, err := NewEqualsCondition(config)
+			e, err := NewEqualsCondition(config, logp.NewNopLogger())
 			assert.NoError(b, err)
 
 			runtime.GC()
