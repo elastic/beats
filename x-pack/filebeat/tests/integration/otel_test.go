@@ -48,7 +48,6 @@ processors:
     - add_docker_metadata: ~
     - add_kubernetes_metadata: ~	
 queue.mem.flush.timeout: 0s
-path.home: %s
 http.enabled: true
 http.host: localhost
 http.port: %d
@@ -67,7 +66,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	writeEventsToLogFile(t, logFilePath, numEvents)
 
 	// start collector
-	err = col.ReloadCollectorWithConfig(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", col.GetTempDir(), 5066))
+	err = col.ReloadCollectorWithConfig(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", 5066))
 	require.NoError(t, err)
 
 	// wait for collector to be ready
@@ -81,7 +80,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	)
 	logFilePath = filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", filebeat.TempDir(), 5067)
+	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
 	s = s + `
 setup.template.name: logs-filebeat-default
 setup.template.pattern: logs-filebeat-default
@@ -111,7 +110,7 @@ setup.template.pattern: logs-filebeat-default
 			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-filebeat-default*")
 			require.NoError(t, err)
 			t.Logf("otel docs = %d, filebeat docs = %d", otelDocs.Hits.Total.Value, filebeatDocs.Hits.Total.Value)
-			return otelDocs.Hits.Total.Value < 0 && filebeatDocs.Hits.Total.Value >= numEvents
+			return otelDocs.Hits.Total.Value >= numEvents && filebeatDocs.Hits.Total.Value >= numEvents
 		},
 		2*time.Minute, 1*time.Second, "otel docs = %d, filebeat docs = %d", otelDocs.Hits.Total.Value, filebeatDocs.Hits.Total.Value)
 
