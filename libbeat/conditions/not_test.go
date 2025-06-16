@@ -21,12 +21,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestNOTCondition(t *testing.T) {
-	logp.TestingSetup()
 
 	configs := []Config{
 		{

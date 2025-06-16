@@ -21,6 +21,7 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -31,7 +32,7 @@ func TestEqualsCreate(t *testing.T) {
 		}},
 	}
 
-	_, err := NewCondition(&config)
+	_, err := NewCondition(&config, logptest.NewTestingLogger(t, ""))
 	assert.Error(t, err)
 }
 

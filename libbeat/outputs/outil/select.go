@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Selector is used to produce a string based on the contents of a Beats event.
@@ -306,7 +307,8 @@ func buildSingle(cfg *config.C, key string, selCase SelectorCase) (SelectorExpr,
 			return nil, err
 		}
 
-		tmp, err := conditions.NewCondition(&condConfig)
+		// TODO: use a local logger here
+		tmp, err := conditions.NewCondition(&condConfig, logp.NewLogger(""))
 		if err != nil {
 			return nil, err
 		}

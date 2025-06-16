@@ -62,7 +62,7 @@ func NewConfigMapper(
 	for _, c := range configs {
 		condMap := &ConditionMap{Configs: c.Configs}
 		if c.ConditionConfig != nil {
-			condMap.Condition, err = conditions.NewCondition(c.ConditionConfig)
+			condMap.Condition, err = conditions.NewCondition(c.ConditionConfig, logp.NewLogger(""))
 			if err != nil {
 				return Mapper{}, err
 			}
