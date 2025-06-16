@@ -156,8 +156,9 @@ func CheckReceivers(params CheckReceiversParams) {
 			require.Contains(t, zl.ContextMap(), "otelcol.signal")
 			require.Equal(t, "logs", zl.ContextMap()["otelcol.signal"])
 			require.Contains(t, zl.ContextMap(), "otelcol.component.id")
-			compID := zl.ContextMap()["otelcol.component.id"].(string)
-			require.Contains(t, "service.name", zl.ContextMap())
+			compID, ok := zl.ContextMap()["otelcol.component.id"].(string)
+			require.True(t, ok, "otelcol.component.id should be a string")
+			require.Contains(t, zl.ContextMap(), "service.name")
 			require.Equal(t, beatForCompID(compID), zl.ContextMap()["service.name"])
 			break
 		}
