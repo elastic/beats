@@ -151,10 +151,13 @@ func CheckReceivers(params CheckReceiversParams) {
 
 		// Ensure the logger fields from the otel collector are present
 		for _, zl := range zapLogs.All() {
+			require.Contains(t, zl.ContextMap(), "otelcol.component.kind")
 			require.Equal(t, "receiver", zl.ContextMap()["otelcol.component.kind"])
+			require.Contains(t, zl.ContextMap(), "otelcol.signal")
 			require.Equal(t, "logs", zl.ContextMap()["otelcol.signal"])
 			require.Contains(t, zl.ContextMap(), "otelcol.component.id")
 			compID := zl.ContextMap()["otelcol.component.id"].(string)
+			require.Contains(t, "service.name", zl.ContextMap())
 			require.Equal(t, beatForCompID(compID), zl.ContextMap()["service.name"])
 			break
 		}
