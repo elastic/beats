@@ -271,13 +271,13 @@ func runCmd(
 		}
 
 		// TODO: Maybe here is the best spot?
-		// cmdError := ECSErrToSynthError(ecserr.NewCmdSkippedStatusErr(ctx.Err().Error()))
-		// mpx.writeSynthEvent(&SynthEvent{
-		// 	Type:                 CmdStatus,
-		// 	Error:                cmdError,
-		// 	TimestampEpochMicros: float64(time.Now().UnixMicro()),
-		// })
-		// logp.L().Info("skipped event emitted")
+		cmdError := ECSErrToSynthError(ecserr.NewCmdSkippedStatusErr(ctx.Err().Error()))
+		mpx.writeSynthEvent(&SynthEvent{
+			Type:                 CmdStatus,
+			Error:                cmdError,
+			TimestampEpochMicros: float64(time.Now().UnixMicro()),
+		})
+		logp.L().Info("skipped event emitted")
 		cmdCleanUp <- struct{}{}
 	}()
 
@@ -299,9 +299,6 @@ func runCmd(
 			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 				timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
 				cmdError = ECSErrToSynthError(ecserr.NewCmdTimeoutStatusErr(timeout, cmd.String()))
-			} else if errors.Is(ctx.Err(), context.Canceled) {
-				logp.L().Infof("synthexec: context canceled, generating CmdSkippedStatusErr: %v", ctx.Err())
-				cmdError = ECSErrToSynthError(ecserr.NewCmdSkippedStatusErr(ctx.Err().Error()))
 			} else {
 				cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), cmd.String()))
 			}
@@ -315,10 +312,10 @@ func runCmd(
 			TimestampEpochMicros: float64(time.Now().UnixMicro()),
 		})
 
+		wg.Wait()
 		cancel()
 		<-cmdCleanUp // Wait for the cleanup to finish before closing the multiplexer
 
-		wg.Wait()
 		mpx.Close()
 	}()
 
