@@ -28,9 +28,10 @@ func ReportMetricsForOrganization(reporter mb.ReporterV2, organizationID string,
 			}
 
 			for k, v := range metric {
-				if !isEmpty(v) {
-					event.ModuleFields.Put(k, v)
+				if isEmpty(v) {
+					continue
 				}
+				event.ModuleFields.Put(k, v)
 			}
 
 			reporter.Event(event)

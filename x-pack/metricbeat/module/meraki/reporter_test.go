@@ -4,7 +4,13 @@
 
 package meraki
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/stretchr/testify/assert"
+)
 
 func TestIsEmpty(t *testing.T) {
 	tests := []struct {
@@ -12,6 +18,11 @@ func TestIsEmpty(t *testing.T) {
 		input    interface{}
 		expected bool
 	}{
+		{
+			name:     "Nil",
+			input:    nil,
+			expected: true,
+		},
 		{
 			name:     "Nil pointer",
 			input:    (*int)(nil),
@@ -61,5 +72,50 @@ func TestIsEmpty(t *testing.T) {
 				t.Errorf("isEmpty(%v) = %v; want %v", tt.input, result, tt.expected)
 			}
 		})
+	}
+}
+
+type fakeReporter struct {
+	events []mb.Event
+}
+
+func (f *fakeReporter) Event(e mb.Event) bool {
+	f.events = append(f.events, e)
+	return true
+}
+func (f *fakeReporter) Error(e error) bool { return true }
+
+func TestReportMetricsForOrganization(t *testing.T) {
+	reporter := &fakeReporter{}
+	metrics := []mapstr.M{
+		{"foo": "bar"},
+		{"empty": ""},
+		{"nil": (*float64)(nil)},
+		{"@timestamp": "2024-06-17T12:00:00Z", "has_timestamp": true},
+		{"@timestamp": "invalid", "invalid_timestamp": true},
+	}
+
+	ReportMetricsForOrganization(reporter, "123", metrics)
+	assert.Equal(t, 5, len(reporter.events), "expected 5 events")
+
+	for _, e := range reporter.events {
+		// Check empty fields are not included
+		assert.NotContains(t, e.MetricSetFields, "empty", "expected 'empty' field to be excluded")
+		assert.NotContains(t, e.MetricSetFields, "nil", "expected 'nil' field to be excluded")
+
+		// Check that organization_id is present
+		assert.Equal(t, "123", e.ModuleFields["organization_id"], "expected organization_id to be '123'")
+
+		// Check that @timestamp is parsed correctly
+		if ts, ok := e.MetricSetFields["has_timestamp"]; ok {
+			assert.Equal(t, ts, e.ModuleFields["@timestamp"], "expected @timestamp to be '2024-06-17T12:00:00Z'")
+		}
+
+		// Check that invalid timestamp is not added
+		if _, ok := e.MetricSetFields["invalid_timestamp"]; ok {
+			_, ok := e.MetricSetFields["@timestamp"]
+			assert.False(t, ok, "expected @timestamp to not be present for invalid timestamp")
+			assert.Equal(t, "invalid", e.MetricSetFields["@timestamp"], "expected invalid timestamp to remain in the event")
+		}
 	}
 }
