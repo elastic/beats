@@ -104,7 +104,7 @@ type namespaceDetail struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := logp.NewLogger(aws.ModuleName + "." + metricsetName)
+	logger := base.Logger().Named(aws.ModuleName + "." + metricsetName)
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, fmt.Errorf("error creating aws metricset: %w", err)

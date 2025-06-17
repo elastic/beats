@@ -119,7 +119,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		return nil, err
 	}
 
-	if err := config.FetchConfigs(); err != nil {
+	if err := config.FetchConfigs(b.Info.Logger); err != nil {
 		return nil, err
 	}
 
@@ -344,7 +344,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Setup registrar to persist state
-	registrar, err := registrar.New(stateStore, finishedLogger, config.Registry.FlushTimeout)
+	registrar, err := registrar.New(stateStore, finishedLogger, config.Registry.FlushTimeout, fb.logger)
 	if err != nil {
 		fb.logger.Errorf("Could not init registrar: %v", err)
 		return err
@@ -515,12 +515,12 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	if waitPublished {
 		// Wait for registrar to finish writing registry
 		waitEvents.Add(withLog(wgEvents.Wait,
-			"Continue shutdown: All enqueued events being published."))
+			"Continue shutdown: All enqueued events being published.", fb.logger))
 		// Wait for either timeout or all events having been ACKed by outputs.
 		if fb.config.ShutdownTimeout > 0 {
 			fb.logger.Info("Shutdown output timer started. Waiting for max %v.", timeout)
 			waitEvents.Add(withLog(waitDuration(timeout),
-				"Continue shutdown: Time out waiting for events being published."))
+				"Continue shutdown: Time out waiting for events being published.", fb.logger))
 		} else {
 			waitEvents.AddChan(fb.done)
 		}

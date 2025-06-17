@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template/tmpltest"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
 )
 
@@ -188,7 +189,7 @@ func TestDecoderV9_ReadFields(t *testing.T) {
 			assert.Equal(t, tc.expected.Length, record.Length)
 			assert.Equal(t, tc.expected.VariableLength, record.VariableLength)
 			assert.Equal(t, tc.expected.ID, record.ID)
-			template.AssertFieldsEquals(t, tc.expected.Fields, record.Fields)
+			tmpltest.AssertFieldsEquals(t, tc.expected.Fields, record.Fields)
 		})
 	}
 }
@@ -277,7 +278,7 @@ func TestReadOptionsTemplateFlowSet(t *testing.T) {
 			assert.Equal(t, tc.err, err)
 			if assert.Len(t, templates, len(tc.expected)) {
 				for idx := range tc.expected {
-					template.AssertTemplateEquals(t, tc.expected[idx], templates[idx])
+					tmpltest.AssertTemplateEquals(t, tc.expected[idx], templates[idx])
 				}
 			}
 		})
@@ -350,7 +351,7 @@ func TestReadTemplateFlowSet(t *testing.T) {
 			assert.Equal(t, tc.err, err)
 			if assert.Len(t, templates, len(tc.expected)) {
 				for idx := range tc.expected {
-					template.AssertTemplateEquals(t, tc.expected[idx], templates[idx])
+					tmpltest.AssertTemplateEquals(t, tc.expected[idx], templates[idx])
 				}
 			}
 		})
