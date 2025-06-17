@@ -22,6 +22,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -382,7 +383,7 @@ func (client *Client) Close() error { return nil }
 // GetDashboard returns the dashboard with the given id with the index pattern removed
 func (client *Client) GetDashboard(id string) ([]byte, error) {
 	if client.Version.LessThan(MinimumRequiredVersionSavedObjects) {
-		return nil, fmt.Errorf("Kibana version must be at least " + MinimumRequiredVersionSavedObjects.String())
+		return nil, errors.New("Kibana version must be at least " + MinimumRequiredVersionSavedObjects.String())
 	}
 
 	body := fmt.Sprintf(`{"objects": [{"type": "dashboard", "id": "%s" }], "includeReferencesDeep": true, "excludeExportDetails": true}`, id)
