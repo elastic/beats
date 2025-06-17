@@ -42,8 +42,6 @@ type Info struct {
 	UserAgent        string    // A string of the user-agent that can be passed to any outputs or network connections
 	FIPSDistribution bool      // If the beat was compiled as a FIPS distribution.
 
-	// Monitoring-related fields
-	//Monitoring           Monitoring
 	LogConsumer          consumer.Logs // otel log consumer
 	UseDefaultProcessors bool          // Whether to use the default processors
 	Logger               *logp.Logger
