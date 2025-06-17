@@ -184,7 +184,7 @@ steps:
         key: "x-pack-filebeat-mandatory-otel-int-test"
         command: |
           cd x-pack/filebeat
-          mage goOTelIntegTest
+          mage otelIntegTest
         retry:
           automatic:
             - limit: 1

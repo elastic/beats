@@ -172,8 +172,8 @@ func GoIntegTest(ctx context.Context) error {
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
 }
 
-// GoOTelIntegTest starts the docker containers and executes OTel integration tests.
-func GoOTelIntegTest(ctx context.Context) error {
+// OTelIntegTest starts the docker containers and executes OTel integration tests.
+func OtelIntegTest(ctx context.Context) error {
 	// build otel binary
 	devtools.BuildSystemTestOTelBinary()
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultOTelIntegrationFromHostArgs())
