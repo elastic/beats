@@ -484,9 +484,7 @@ func Test_StorageClient(t *testing.T) {
 				"decoding.codec.csv.comma":            " ",
 				"containers": []map[string]interface{}{
 					{
-						"name":                       beatsCSVContainer,
-						"decoding.codec.csv.enabled": true,
-						"decoding.codec.csv.comma":   " ",
+						"name": beatsCSVContainer,
 					},
 				},
 			},
