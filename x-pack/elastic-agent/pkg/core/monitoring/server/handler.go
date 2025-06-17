@@ -35,7 +35,10 @@ func (h *apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		writeResponse(w, unexpectedErrorWithReason(err.Error()))
+		writeResponse(w, errResponse{
+			Type:   errTypeUnexpected,
+			Reason: err.Error(),
+		})
 	}
 }
 
