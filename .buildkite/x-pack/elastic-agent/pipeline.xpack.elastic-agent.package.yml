@@ -48,7 +48,9 @@ steps:
   - group: ":Packaging Artefacts"
     key: "package"
     steps:
-      - label: "Package elastic-agent"
+      - label: "Package elastic-agent x86_64"
+        env:
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         key: package_elastic-agent
         command: |
           if [[ -z "$${MANIFEST_URL}" ]]; then
@@ -71,7 +73,7 @@ steps:
 
       - label: "Package ARM elastic-agent"
         env:
-          PLATFORMS: "+all linux/arm64"
+          PLATFORMS: "linux/arm64"
         key: package_elastic-agent-arm
         command: |
           if [[ -z "$${MANIFEST_URL}" ]]; then
