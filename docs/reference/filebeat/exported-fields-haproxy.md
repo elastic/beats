@@ -3,12 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-haproxy.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # HAProxy fields [exported-fields-haproxy]
 
 haproxy Module
 
-
 ## haproxy [_haproxy]
+
+
 
 **`haproxy.frontend_name`**
 :   Name of the frontend (or listener) which received and processed the connection.
@@ -59,7 +62,7 @@ type: long
 
 
 **`haproxy.backend_queue`**
-:   Total number of requests which were processed before this one in the backend’s global queue.
+:   Total number of requests which were processed before this one in the backend's global queue.
 
 type: long
 
@@ -88,7 +91,6 @@ type: keyword
 :   mode that the frontend is operating (TCP or HTTP)
 
 type: keyword
-
 
 
 ## connections [_connections]
@@ -125,8 +127,7 @@ type: long
 type: long
 
 
-
-## client [_client_2]
+## client [_client]
 
 Information about the client doing the request
 
@@ -154,8 +155,7 @@ alias to: process.name
 alias to: process.pid
 
 
-
-## destination [_destination_2]
+## destination [_destination]
 
 Destination information
 
@@ -169,7 +169,6 @@ alias to: destination.port
 :   type: alias
 
 alias to: destination.ip
-
 
 
 ## geoip [_geoip]
@@ -212,13 +211,11 @@ alias to: source.geo.city_name
 alias to: source.geo.region_iso_code
 
 
-
-## http [_http_2]
+## http [_http]
 
 Please add description
 
-
-## response [_response_2]
+## response [_response]
 
 Fields related to the HTTP response
 
@@ -238,8 +235,7 @@ type: keyword
 alias to: http.response.status_code
 
 
-
-## request [_request_2]
+## request [_request]
 
 Fields related to the HTTP request
 
@@ -269,7 +265,6 @@ type: long
 :   Total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
 
 type: long
-
 
 
 ## tcp [_tcp]

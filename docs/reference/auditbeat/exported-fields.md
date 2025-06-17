@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/exported-fields.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+                 
 # Exported fields [exported-fields]
 
 This document describes the fields that are exported by Auditbeat. They are grouped in the following categories:
@@ -19,4 +21,3 @@ This document describes the fields that are exported by Auditbeat. They are grou
 * [*Kubernetes fields*](/reference/auditbeat/exported-fields-kubernetes-processor.md)
 * [*Process fields*](/reference/auditbeat/exported-fields-process.md)
 * [*System fields*](/reference/auditbeat/exported-fields-system.md)
-

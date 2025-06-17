@@ -3,23 +3,23 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-aerospike.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Aerospike fields [exported-fields-aerospike]
 
 Aerospike module
 
-
 ## aerospike [_aerospike]
+
 
 
 ## namespace [_namespace]
 
 namespace
 
-
 ## client [_client]
 
 Client stats.
-
 
 ## delete [_delete]
 
@@ -47,7 +47,6 @@ type: long
 :   Number of client delete transactions that timed out.
 
 type: long
-
 
 
 ## read [_read]
@@ -78,7 +77,6 @@ type: long
 type: long
 
 
-
 ## write [_write]
 
 Client write transactions stats.
@@ -99,7 +97,6 @@ type: long
 :   Number of client write transactions that timed out.
 
 type: long
-
 
 
 ## device [_device]
@@ -139,13 +136,12 @@ format: bytes
 
 
 **`aerospike.namespace.hwm_breached`**
-:   If true, Aerospike has breached *high-water-[disk|memory]-pct* for this namespace.
+:   If true, Aerospike has breached 'high-water-[disk|memory]-pct' for this namespace.
 
 type: boolean
 
 
-
-## memory [_memory_2]
+## memory [_memory]
 
 Memory storage stats.
 
@@ -205,7 +201,6 @@ type: keyword
 :   Node name
 
 type: keyword
-
 
 
 ## objects [_objects]

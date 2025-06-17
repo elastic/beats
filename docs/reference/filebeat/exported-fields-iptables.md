@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-iptables.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # iptables fields [exported-fields-iptables]
 
 Module for handling the iptables logs.
-
 
 ## iptables [_iptables]
 
@@ -34,7 +35,6 @@ type: keyword
 :   Offset of the current IP fragment.
 
 type: long
-
 
 
 ## icmp [_icmp]
@@ -119,8 +119,7 @@ type: long
 type: keyword
 
 
-
-## tcp [_tcp_2]
+## tcp [_tcp]
 
 TCP fields.
 
@@ -160,7 +159,6 @@ type: long
 type: integer
 
 
-
 ## udp [_udp]
 
 UDP fields.
@@ -169,7 +167,6 @@ UDP fields.
 :   Length of the UDP header and payload.
 
 type: long
-
 
 
 ## ubiquiti [_ubiquiti]

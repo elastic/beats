@@ -55,7 +55,7 @@ func init() {
 	jsprocessor.RegisterPlugin("URLDecode", New)
 }
 
-func New(c *config.C) (beat.Processor, error) {
+func New(c *config.C, log *logp.Logger) (beat.Processor, error) {
 	config := urlDecodeConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -67,7 +67,7 @@ func New(c *config.C) (beat.Processor, error) {
 
 	return &urlDecode{
 		config: config,
-		log:    logp.NewLogger("urldecode"),
+		log:    log.Named("urldecode"),
 	}, nil
 
 }

@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -66,7 +66,7 @@ func TestStore_OpenClose(t *testing.T) {
 	})
 
 	t.Run("fail if persistent store can not be accessed", func(t *testing.T) {
-		_, err := openStore(logp.NewLogger("test"), testStateStore{}, "test")
+		_, err := openStore(logptest.NewTestingLogger(t, ""), testStateStore{}, "test")
 		require.Error(t, err)
 	})
 
@@ -549,7 +549,7 @@ func testOpenStore(t *testing.T, prefix string, persistentStore statestore.State
 		persistentStore = createSampleStore(t, nil)
 	}
 
-	store, err := openStore(logp.NewLogger("test"), persistentStore, prefix)
+	store, err := openStore(logptest.NewTestingLogger(t, ""), persistentStore, prefix)
 	if err != nil {
 		t.Fatalf("failed to open the store")
 	}
