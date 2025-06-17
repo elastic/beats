@@ -722,7 +722,7 @@ steps:
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
                     - DRA_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-                    - RUN_SNAPSHOT="true"
+                    - RUN_SNAPSHOT=true
 
   - label: "Trigger DRA 7.17 Elastic Agent (SNAPSHOT)"
     if: (build.pull_request.id != null && build.env('BUILDKITE_PULL_REQUEST_BASE_BRANCH') == "7.17")
@@ -746,4 +746,4 @@ steps:
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
                     - DRA_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-                    - RUN_SNAPSHOT="true"
+                    - RUN_SNAPSHOT=true
