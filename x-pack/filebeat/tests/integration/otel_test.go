@@ -20,7 +20,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	oteltest "github.com/elastic/beats/v7/x-pack/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
@@ -42,13 +41,12 @@ output:
     username: admin
     password: testing
     index: %s
+queue.mem.flush.timeout: 0s
 processors:
     - add_host_metadata: ~
     - add_cloud_metadata: ~
     - add_docker_metadata: ~
-    - add_kubernetes_metadata: ~	
-queue.mem.flush.timeout: 0s
-path.home: %s
+    - add_kubernetes_metadata: ~
 http.enabled: true
 http.host: localhost
 http.port: %d
@@ -58,20 +56,18 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	numEvents := 1
 
-	// Get collector with empty config
-	col, err := oteltest.NewTestCollector(t, "filebeat", "")
-	require.NoError(t, err, fmt.Sprintf("could not get new collector due to %v", err))
+	// start filebeat in otel mode
+	filebeatOTel := integration.NewBeat(
+		t,
+		"filebeat-otel",
+		"../../filebeat.test",
+		"otel",
+	)
 
-	// write to a log file
-	logFilePath := filepath.Join(col.GetTempDir(), "log.log")
+	logFilePath := filepath.Join(filebeatOTel.TempDir(), "log.log")
+	filebeatOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", 5066))
 	writeEventsToLogFile(t, logFilePath, numEvents)
-
-	// start collector
-	err = col.ReloadCollectorWithConfig(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", col.GetTempDir(), 5066))
-	require.NoError(t, err)
-
-	// wait for collector to be ready
-	col.Wait()
+	filebeatOTel.Start()
 
 	// start filebeat
 	filebeat := integration.NewBeat(
@@ -81,7 +77,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	)
 	logFilePath = filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", filebeat.TempDir(), 5067)
+	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
 	s = s + `
 setup.template.name: logs-filebeat-default
 setup.template.pattern: logs-filebeat-default
@@ -90,19 +86,14 @@ setup.template.pattern: logs-filebeat-default
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
 
-	t.Cleanup(func() {
-		filebeat.Stop()
-	})
-
 	es := integration.GetESClient(t, "http")
 
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
-
 	// wait for logs to be published
 	require.Eventually(t,
 		func() bool {
-			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
+			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
 			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
@@ -110,10 +101,10 @@ setup.template.pattern: logs-filebeat-default
 
 			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-filebeat-default*")
 			require.NoError(t, err)
-			t.Logf("otel docs = %d, filebeat docs = %d", otelDocs.Hits.Total.Value, filebeatDocs.Hits.Total.Value)
+
 			return otelDocs.Hits.Total.Value >= numEvents && filebeatDocs.Hits.Total.Value >= numEvents
 		},
-		2*time.Minute, 1*time.Second, "otel docs = %d, filebeat docs = %d", otelDocs.Hits.Total.Value, filebeatDocs.Hits.Total.Value)
+		2*time.Minute, 1*time.Second, fmt.Sprintf("Number of hits %d not equal to number of events for %d", filebeatDocs.Hits.Total.Value, numEvents))
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
@@ -124,7 +115,6 @@ setup.template.pattern: logs-filebeat-default
 		"agent.id",
 		"log.file.inode",
 		"log.file.path",
-		"container.id",
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
