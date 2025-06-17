@@ -15580,19 +15580,11 @@ limitations under the License.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/sarama
-<<<<<<< HEAD
-Version: v1.19.1-0.20241120141909-c7eabfcee7e5
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/elastic/sarama@v1.19.1-0.20241120141909-c7eabfcee7e5/LICENSE.md:
-=======
 Version: v1.19.1-0.20250603175145-7672917f26b6
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/elastic/sarama@v1.19.1-0.20250603175145-7672917f26b6/LICENSE.md:
->>>>>>> 4195119f0 ([Kafka] Update sarama to include error handling fix (#44622))
 
 # MIT License
 
