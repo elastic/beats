@@ -110,7 +110,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 	logpConfig := logp.Config{}
 	logpConfig.AddCaller = true
-	logpConfig.Beat = b.Info.Name
+	logpConfig.Beat = b.Info.Beat
 	logpConfig.Files.MaxSize = 1
 
 	if b.Config.Logging == nil {
@@ -121,8 +121,8 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, fmt.Errorf("error unpacking beats logging config: %w\n%v", err, b.Config.Logging)
 	}
 
-	logp.ConfigureWithCore(logpConfig, core)
-	if err != nil {
+	//nolint:staticcheck // SA1019 we still use global loggers
+	if err := logp.ConfigureWithCore(logpConfig, core); err != nil {
 		return nil, fmt.Errorf("error configuring beats logp: %w", err)
 	}
 
