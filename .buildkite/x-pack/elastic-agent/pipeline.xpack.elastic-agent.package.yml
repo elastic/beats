@@ -51,7 +51,6 @@ steps:
       - label: "Package elastic-agent x86_64"
         env:
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
-          PACKAGES: "docker"
         key: package_elastic-agent
         command: |
           if [[ -z "$${MANIFEST_URL}" ]]; then
