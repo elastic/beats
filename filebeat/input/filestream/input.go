@@ -288,7 +288,7 @@ func (inp *filestream) deleteFile(
 	//   - The output is down
 	//   - Filebeat is experiencing back pressure
 	// Either way, we wait until all events have been published.
-	if !allEventsPublished(cursor) {
+	if !cursor.AllEventsPublished() {
 		logger.Debugf(
 			"not all events from '%s' have been published, "+
 				"closing harvester",
@@ -623,23 +623,5 @@ func matchAny(matchers []match.Matcher, text string) bool {
 			return true
 		}
 	}
-	return false
-}
-
-// allEventsPublished returns true if there are no pending operations
-// and the harvester is the single 'owner' of underlying resource.
-//
-// Owners of an resource can be active inputs or pending update operations
-// not yet written to disk. The harvester locks this resource
-// (see `startHarvester`) and only releases when it is shutdown.
-//
-// So if there is only one 'owner' of this resource, it is safe
-// to assume it is the harvester, there fore there are no pending
-// operations on the underlying resource.
-func allEventsPublished(cur loginp.Cursor) bool {
-	if cur.Pending() == 1 {
-		return true
-	}
-
 	return false
 }
