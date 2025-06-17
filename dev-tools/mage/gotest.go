@@ -184,6 +184,17 @@ func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
 	return args
 }
 
+// DefaultGoTestIntegrationFromHostArgs returns a default set of arguments for running
+// all integration tests from the host system (outside the docker network).
+func DefaultOTelIntegrationFromHostArgs() GoTestArgs {
+	args := DefaultGoTestIntegrationArgs()
+	// overwrite package path
+	args.Packages = []string{"./tests/oteltest"}
+	args.Tags = append(args.Tags, "otelbeat")
+	args.Env = WithGoIntegTestHostEnv(args.Env)
+	return args
+}
+
 // FIPSOnlyGoTestIngrationFromHostArgs returns a default set of arguments for running
 // all integration tests from the host system (outside the docker network) along
 // with the GODEBUG=fips140=only arg set.
@@ -469,6 +480,13 @@ func makeCommand(ctx context.Context, env map[string]string, cmd string, args ..
 // BuildSystemTestBinary runs BuildSystemTestGoBinary with default values.
 func BuildSystemTestBinary() error {
 	return BuildSystemTestGoBinary(DefaultTestBinaryArgs())
+}
+
+// BuildSystemTestOTelBinary builds beat binary that includes otel.
+func BuildSystemTestOTelBinary() error {
+	args := DefaultTestBinaryArgs()
+	args.ExtraFlags = []string{"-tags", "otelbeat"}
+	return BuildSystemTestGoBinary(args)
 }
 
 // BuildSystemTestGoBinary build a binary for testing that is instrumented for

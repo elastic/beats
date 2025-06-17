@@ -172,6 +172,13 @@ func GoIntegTest(ctx context.Context) error {
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
 }
 
+// GoOTelIntegTest starts the docker containers and executes OTel integration tests.
+func GoOTelIntegTest(ctx context.Context) error {
+	// build otel binary
+	devtools.BuildSystemTestOTelBinary()
+	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultOTelIntegrationFromHostArgs())
+}
+
 // GoFIPSOnlyIntegTest starts the docker containers and executes the Go integration tests with GODEBUG=fips140=only set.
 func GoFIPSOnlyIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
