@@ -35,7 +35,7 @@ func (c *config) Validate() error {
 		return fmt.Errorf("apiKey is required")
 	}
 
-	if c.Organizations == nil || len(c.Organizations) == 0 {
+	if len(c.Organizations) == 0 {
 		return fmt.Errorf("organizations is required")
 	}
 
