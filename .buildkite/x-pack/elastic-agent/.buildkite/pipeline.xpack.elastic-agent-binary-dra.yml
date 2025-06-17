@@ -76,8 +76,9 @@ steps:
           image: "family/platform-ingest-beats-ubuntu-2204"
         env:
           DRA_WORKFLOW: "staging"
+          PLATFORMS: "linux/amd64 linux/386 windows/amd64 windows/386 darwin/amd64"
 
-      - label: ":beats: linux/arm64 darwin/arm64 DRA Elastic-Agent Core Staging :beats:"
+      - label: ":beats: linux/arm64 darwin/arm64 Elastic-Agent Core Staging :beats:"
         commands:
           - .buildkite/x-pack/elastic-agent/scripts/steps/build-agent-core.sh
         key: "build-dra-staging-arm"
