@@ -90,6 +90,7 @@ setup.template.pattern: logs-filebeat-default
 
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
+	var err error
 	// wait for logs to be published
 	require.Eventually(t,
 		func() bool {
