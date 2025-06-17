@@ -156,22 +156,14 @@ func TestMultipleReceivers(t *testing.T) {
 		Receivers: []oteltest.ReceiverConfig{
 			{
 				Name:    "r1",
-<<<<<<< HEAD
-				Config:  config(),
-=======
 				Beat:    "filebeat",
-				Config:  config(monitorSocket1),
->>>>>>> df3dcadbd (otel: fix service.name for beats receivers (#44831))
+				Config:  config(),
 				Factory: factory,
 			},
 			{
 				Name:    "r2",
-<<<<<<< HEAD
-				Config:  config(),
-=======
 				Beat:    "filebeat",
-				Config:  config(monitorSocket2),
->>>>>>> df3dcadbd (otel: fix service.name for beats receivers (#44831))
+				Config:  config(),
 				Factory: factory,
 			},
 		},
