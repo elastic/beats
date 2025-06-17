@@ -101,7 +101,7 @@ func (in *eventHubInputV2) Run(
 		inputContext.UpdateStatus(status.Failed, fmt.Sprintf("failed to setup input: %s", err))
 		return err
 	}
-	defer in.teardown(inputContext, ctx)
+	defer in.teardown(ctx)
 
 	// Store a reference to the pipeline, so we
 	// can create a new pipeline client for each
@@ -111,8 +111,8 @@ func (in *eventHubInputV2) Run(
 	// Start the main run loop (blocking call).
 	in.run(inputContext, ctx)
 
-	// When the input is stopped.
-	inputContext.UpdateStatus(status.Stopping, "")
+	// When the input is stopped (clean exit, no errors).
+	inputContext.UpdateStatus(status.Stopped, "")
 	return nil
 }
 
@@ -194,7 +194,7 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 }
 
 // teardown releases the resources used by the input.
-func (in *eventHubInputV2) teardown(inputContext v2.Context, ctx context.Context) {
+func (in *eventHubInputV2) teardown(ctx context.Context) {
 	if in.consumerClient == nil {
 		return
 	}
@@ -206,9 +206,6 @@ func (in *eventHubInputV2) teardown(inputContext v2.Context, ctx context.Context
 			"error", err,
 		)
 	}
-
-	// Update input status to stopped.
-	inputContext.UpdateStatus(status.Stopped, "")
 }
 
 // run starts the main loop for processing events.
