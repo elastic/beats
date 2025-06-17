@@ -128,7 +128,6 @@ func tryOverrideOrDefault(cfg config, c container) container {
 	if len(c.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
 		c.FileSelectors = cfg.FileSelectors
 	}
-
 	// If the container level ReaderConfig matches the default config ReaderConfig state,
 	// use the global ReaderConfig. Matching the default ReaderConfig state
 	// means that the container level ReaderConfig is not set, and we should use the
