@@ -168,6 +168,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/memory"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/network"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/network_summary"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system/ntp"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/process"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/process_summary"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/raid"
