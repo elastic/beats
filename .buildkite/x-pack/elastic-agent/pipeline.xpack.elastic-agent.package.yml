@@ -71,7 +71,8 @@ steps:
 
       - label: "Package ARM elastic-agent"
         env:
-          PLATFORMS: "+all linux/arm64"
+          PLATFORMS: "linux/arm64"
+          PACKAGES: "docker"
         key: package_elastic-agent-arm
         command: |
           if [[ -z "$${MANIFEST_URL}" ]]; then
