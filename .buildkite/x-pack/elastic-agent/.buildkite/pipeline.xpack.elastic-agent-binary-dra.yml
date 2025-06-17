@@ -80,7 +80,7 @@ steps:
       - label: ":beats: linux/arm64 darwin/arm64 DRA Elastic-Agent Core Staging :beats:"
         commands:
           - .buildkite/x-pack/elastic-agent/scripts/steps/build-agent-core.sh
-        key: "build-dra-snapshot-arm"
+        key: "build-dra-staging-arm"
         artifact_paths:
           - "x-pack/elastic-agent/build/distributions/**/*"
         agents:
