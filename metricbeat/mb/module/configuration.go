@@ -23,14 +23,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // ConfiguredModules returns a list of all configured modules, including anyone present under dynamic config settings.
-func ConfiguredModules(registry *mb.Register, modulesData []*conf.C, configModulesData *conf.C, moduleOptions []Option) ([]*Wrapper, error) {
+func ConfiguredModules(registry *mb.Register, modulesData []*conf.C, configModulesData *conf.C, moduleOptions []Option, logger *logp.Logger) ([]*Wrapper, error) {
 	var modules []*Wrapper //nolint:prealloc //can't be preallocated
 
 	for _, moduleCfg := range modulesData {
-		module, err := NewWrapper(moduleCfg, registry, moduleOptions...)
+		module, err := NewWrapper(moduleCfg, registry, logger, moduleOptions...)
 		if err != nil {
 			return nil, err
 		}
@@ -44,7 +45,7 @@ func ConfiguredModules(registry *mb.Register, modulesData []*conf.C, configModul
 			return nil, err
 		}
 
-		modulesManager, err := cfgfile.NewGlobManager(config.Path, ".yml", ".disabled")
+		modulesManager, err := cfgfile.NewGlobManager(config.Path, ".yml", ".disabled", logger)
 		if err != nil {
 			return nil, fmt.Errorf("initialization error: %w", err)
 		}
@@ -55,7 +56,7 @@ func ConfiguredModules(registry *mb.Register, modulesData []*conf.C, configModul
 				return nil, fmt.Errorf("error loading config files: %w", err)
 			}
 			for _, conf := range confs {
-				m, err := NewWrapper(conf, registry, moduleOptions...)
+				m, err := NewWrapper(conf, registry, logger, moduleOptions...)
 				if err != nil {
 					return nil, fmt.Errorf("module initialization error: %w", err)
 				}

@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -39,8 +40,9 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 	// available. This test verifies that Get requests that can be completely
 	// filled do not wait for the flush timer.
 
+	logger := logptest.NewTestingLogger(t, "")
 	broker := newQueue(
-		logp.NewLogger("testing"),
+		logger.Named("testing"),
 		nil,
 		Settings{
 			Events:        1000,
@@ -77,9 +79,9 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 	// The previous test confirms that Get requests are handled immediately if
 	// there are enough events. This one uses the same setup to confirm that
 	// Get requests are delayed if there aren't enough events.
-
+	logger := logptest.NewTestingLogger(t, "")
 	broker := newQueue(
-		logp.NewLogger("testing"),
+		logger.Named("testing"),
 		nil,
 		Settings{
 			Events:        1000,

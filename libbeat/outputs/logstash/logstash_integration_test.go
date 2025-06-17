@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -41,6 +42,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
@@ -68,11 +70,6 @@ type testOutputer struct {
 
 type esSource interface {
 	RefreshIndex()
-}
-
-type esValueReader interface {
-	esSource
-	Read() ([]map[string]interface{}, error)
 }
 
 type esCountReader interface {
@@ -191,8 +188,9 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 		"template.enabled": false,
 	})
 
-	info := beat.Info{Beat: "libbeat"}
-	im, err := idxmgmt.DefaultSupport(nil, info, conf.MustNewConfigFrom(
+	logger := logptest.NewTestingLogger(t, "")
+	info := beat.Info{Beat: "libbeat", Logger: logger}
+	im, err := idxmgmt.DefaultSupport(info, conf.MustNewConfigFrom(
 		map[string]interface{}{
 			"setup.ilm.enabled": false,
 		},
@@ -207,15 +205,15 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	}
 
 	es := &testOutputer{}
-	es.NetworkClient = grp.Clients[0].(outputs.NetworkClient)
+	es.NetworkClient = grp.Clients[0].(outputs.NetworkClient) //nolint:errcheck //safe to ignore in tests
 	es.esConnection = connection
 	// The Elasticsearch output requires events to be encoded
 	// before calling Publish, so create an event encoder.
 	es.encoder = grp.EncoderFactory()
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
-	es.Connect(ctx)
-
+	err = es.Connect(ctx)
+	require.NoError(t, err)
 	return es
 }
 
@@ -241,14 +239,17 @@ func (es *esConnection) Read() ([]map[string]interface{}, error) {
 
 	hits := make([]map[string]interface{}, len(resp.Hits.Hits))
 	for i, hit := range resp.Hits.Hits {
-		json.Unmarshal(hit, &hits[i])
+		json.Unmarshal(hit, &hits[i]) //nolint:errcheck //This is a test file, can ignore
 	}
 
 	return hits, err
 }
 
 func (es *esConnection) RefreshIndex() {
-	es.Refresh(es.index)
+	_, _, err := es.Refresh(es.index)
+	if err != nil {
+		es.t.Errorf("Failed to refresh: %s", err)
+	}
 }
 
 func (es *esConnection) Count() (int, error) {
@@ -286,17 +287,6 @@ func checkIndex(reader esCountReader, minValues int) func() bool {
 	}
 }
 
-func checkAll(checks ...func() bool) func() bool {
-	return func() bool {
-		for _, check := range checks {
-			if !check() {
-				return false
-			}
-		}
-		return true
-	}
-}
-
 func TestSendMessageViaLogstashTCP(t *testing.T) {
 	testSendMessageViaLogstash(t, "basic-tcp", false)
 }
@@ -306,7 +296,6 @@ func TestSendMessageViaLogstashTLS(t *testing.T) {
 }
 
 func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
-	enableLogging([]string{"*"})
 
 	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
@@ -320,7 +309,8 @@ func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
 			},
 		},
 	)
-	ls.Publish(context.Background(), batch)
+	err := ls.Publish(context.Background(), batch)
+	require.NoError(t, err)
 
 	// wait for logstash event flush + elasticsearch
 	waitUntilTrue(5*time.Second, checkIndex(ls, 1))
@@ -503,9 +493,6 @@ func TestLogstashElasticOutputPluginBulkCompatibleMessageTLS(t *testing.T) {
 }
 
 func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name string, tls bool) {
-	if testing.Verbose() {
-		enableLogging([]string{"*"})
-	}
 
 	timeout := 10 * time.Second
 
@@ -554,8 +541,10 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 }
 
 func checkEvent(t *testing.T, ls, es map[string]interface{}) {
-	lsEvent := ls["_source"].(map[string]interface{})
-	esEvent := es["_source"].(map[string]interface{})
+	lsEvent, ok := ls["_source"].(map[string]interface{})
+	assert.True(t, ok)
+	esEvent, ok := es["_source"].(map[string]interface{})
+	assert.True(t, ok)
 	commonFields := []string{"@timestamp", "host", "type", "message"}
 	for _, field := range commonFields {
 		assert.NotNil(t, lsEvent[field])
@@ -565,13 +554,13 @@ func checkEvent(t *testing.T, ls, es map[string]interface{}) {
 }
 
 func (t *testOutputer) PublishEvent(event beat.Event) {
-	batch := encodeBatch(t.encoder, outest.NewBatch(event))
-	t.Publish(context.Background(), batch)
+	batch := encodeBatch[*outest.Batch](t.encoder, outest.NewBatch(event))
+	t.Publish(context.Background(), batch) //nolint:errcheck //This is a test file
 }
 
 func (t *testOutputer) BulkPublish(events []beat.Event) bool {
 	ok := false
-	batch := encodeBatch(t.encoder, outest.NewBatch(events...))
+	batch := encodeBatch[*outest.Batch](t.encoder, outest.NewBatch(events...))
 
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -580,7 +569,7 @@ func (t *testOutputer) BulkPublish(events []beat.Event) bool {
 		wg.Done()
 	}
 
-	t.Publish(context.Background(), batch)
+	t.Publish(context.Background(), batch) //nolint:errcheck //This is a test file
 	wg.Wait()
 	return ok
 }
@@ -601,7 +590,7 @@ func encodeEvents(encoder queue.Encoder, events []publisher.Event) []publisher.E
 		// Skip encoding if there's already encoded data present
 		if events[i].EncodedEvent == nil {
 			encoded, _ := encoder.EncodeEntry(events[i])
-			event := encoded.(publisher.Event)
+			event := encoded.(publisher.Event) //nolint:errcheck //This is a test file, can ignore
 			events[i] = event
 		}
 	}

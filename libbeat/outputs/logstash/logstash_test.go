@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -32,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	v2 "github.com/elastic/go-lumber/server/v2"
 )
@@ -42,7 +44,6 @@ const (
 )
 
 func TestLogstashTCP(t *testing.T) {
-	enableLogging([]string{"*"})
 
 	timeout := 2 * time.Second
 	server := transptest.NewMockServerTCP(t, timeout, "", nil)
@@ -56,12 +57,12 @@ func TestLogstashTCP(t *testing.T) {
 }
 
 func TestLogstashTLS(t *testing.T) {
-	enableLogging([]string{"*"})
 
 	certName := "ca_test"
 
 	timeout := 2 * time.Second
-	transptest.GenCertForTestingPurpose(t, certName, "", "127.0.0.1", "127.0.1.1")
+	err := transptest.GenCertForTestingPurpose(t, certName, "", "127.0.0.1", "127.0.1.1")
+	require.NoError(t, err)
 	server := transptest.NewMockServerTLS(t, timeout, certName, nil)
 
 	// create lumberjack output client
@@ -79,7 +80,8 @@ func TestLogstashInvalidTLSInsecure(t *testing.T) {
 	ip := "1.2.3.4"
 
 	timeout := 2 * time.Second
-	transptest.GenCertForTestingPurpose(t, certName, "", ip)
+	err := transptest.GenCertForTestingPurpose(t, certName, "", ip)
+	require.NoError(t, err)
 	server := transptest.NewMockServerTLS(t, timeout, certName, nil)
 
 	config := map[string]interface{}{
@@ -145,7 +147,8 @@ func testConnectionType(
 
 		events := batch.Events
 		assert.Equal(t, 1, len(events))
-		msg := events[0].(map[string]interface{})
+		msg, ok := events[0].(map[string]interface{})
+		assert.True(t, ok)
 		assert.Equal(t, 10.0, msg["extra"])
 		assert.Equal(t, "message", msg["message"])
 	}
@@ -182,15 +185,16 @@ func newTestLumberjackOutput(
 		}
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	cfg, _ := conf.NewConfigFrom(config)
-	grp, err := outputs.Load(nil, beat.Info{}, nil, "logstash", cfg)
+	grp, err := outputs.Load(nil, beat.Info{Logger: logger}, nil, "logstash", cfg)
 	if err != nil {
 		t.Fatalf("init logstash output plugin failed: %v", err)
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	client := grp.Clients[0].(outputs.NetworkClient)
+	client := grp.Clients[0].(outputs.NetworkClient) //nolint:errcheck //safe to ignore
 	if err := client.Connect(ctx); err != nil {
 		t.Fatalf("Client failed to connected: %v", err)
 	}
