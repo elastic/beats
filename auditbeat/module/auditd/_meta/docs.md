@@ -1,12 +1,3 @@
----
-mapped_pages:
-  - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-module-auditd.html
----
-
-% This file is generated! See scripts/docs_collector.py
-
-# Auditd Module [auditbeat-module-auditd]
-
 The `auditd` module receives audit events from the Linux Audit Framework that is a part of the Linux kernel.
 
 This module is available only for Linux.
@@ -236,40 +227,3 @@ auditbeat.modules:
     -a always,exit -F arch=b64 -S open,truncate,ftruncate,creat,openat,open_by_handle_at -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
     -a always,exit -F arch=b64 -S open,truncate,ftruncate,creat,openat,open_by_handle_at -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
 ```
-
-## Example configuration [_example_configuration]
-
-The Auditd module supports the common configuration options that are described under [configuring Auditbeat](/reference/auditbeat/configuration-auditbeat.md). Here is an example configuration:
-
-```yaml
-auditbeat.modules:
-- module: auditd
-  # Load audit rules from separate files. Same format as audit.rules(7).
-  audit_rule_files: [ '${path.config}/audit.rules.d/*.conf' ]
-  audit_rules: |
-    ## Define audit rules here.
-    ## Create file watches (-w) or syscall audits (-a or -A). Uncomment these
-    ## examples or add your own rules.
-
-    ## If you are on a 64 bit platform, everything should be running
-    ## in 64 bit mode. This rule will detect any use of the 32 bit syscalls
-    ## because this might be a sign of someone exploiting a hole in the 32
-    ## bit API.
-    #-a always,exit -F arch=b32 -S all -F key=32bit-abi
-
-    ## Executions.
-    #-a always,exit -F arch=b64 -S execve,execveat -k exec
-
-    ## External access (warning: these can be expensive to audit).
-    #-a always,exit -F arch=b64 -S accept,bind,connect -F key=external-access
-
-    ## Identity changes.
-    #-w /etc/group -p wa -k identity
-    #-w /etc/passwd -p wa -k identity
-    #-w /etc/gshadow -p wa -k identity
-
-    ## Unauthorized access attempts.
-    #-a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EACCES -k access
-    #-a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
-```
-
