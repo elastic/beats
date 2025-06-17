@@ -725,7 +725,7 @@ steps:
                     - RUN_SNAPSHOT="true"
 
   - label: "Trigger DRA 7.17 Elastic Agent (SNAPSHOT)"
-    if: build.pull_request.id != null && build.env('BUILDKITE_PULL_REQUEST_BASE_BRANCH') == "7.17")
+    if: (build.pull_request.id != null && build.env('BUILDKITE_PULL_REQUEST_BASE_BRANCH') == "7.17")
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
