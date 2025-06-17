@@ -20,11 +20,13 @@ package inputmon
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
@@ -201,6 +203,62 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	if t.Failed() {
 		t.Logf("API response:\n%s\n", string(jsonBytes))
 	}
+}
+
+func TestSnapshotWithNestedInputs(t *testing.T) {
+	logger := logp.NewNopLogger()
+	inputs := monitoring.NewRegistry()
+	regA := NewMetricsRegistry("input-a", "filestream", inputs, logger)
+	monitoring.NewInt(regA, "events_pipeline_total").Set(10)
+	regB := NewMetricsRegistry("input-b", "gcp", inputs, logger)
+	monitoring.NewInt(regB, "events_pipeline_total").Set(20)
+
+	// input-b is a GCP input with two data sources, override its type with
+	// InputNested to indicate its registry contains other input registries.
+	monitoring.NewString(regB, "input").Set(InputNested)
+	regC := NewMetricsRegistry("input-b.C", "gcp", regB, logger)
+	monitoring.NewInt(regC, "events_pipeline_total").Set(30)
+	regD := NewMetricsRegistry("input-b.D", "gcp", regB, logger)
+	monitoring.NewInt(regD, "events_pipeline_total").Set(40)
+
+	jsonBytes, err := MetricSnapshotJSON(inputs)
+	require.NoError(t, err)
+
+	type Resp struct {
+		ID                  string `json:"id"`
+		Input               string `json:"input"`
+		EventsPipelineTotal int    `json:"events_pipeline_total,omitempty"`
+	}
+	// The result should have only the three leaf nodes in the input registry
+	// tree (input-b should be excluded)
+	want := []Resp{
+		{
+			ID:                  "input-a",
+			Input:               "filestream",
+			EventsPipelineTotal: 10,
+		},
+		{
+			ID:                  "input-b.C",
+			Input:               "gcp",
+			EventsPipelineTotal: 30,
+		},
+		{
+			ID:                  "input-b.D",
+			Input:               "gcp",
+			EventsPipelineTotal: 40,
+		},
+	}
+
+	var got []Resp
+
+	err = json.Unmarshal(jsonBytes, &got)
+	require.NoError(t, err, "failed to unmarshal response")
+
+	// Sort the arrays before checking equality since registry key order isn't guaranteed
+	sort.Slice(want, func(i, j int) bool { return want[i].ID < want[j].ID })
+	sort.Slice(got, func(i, j int) bool { return got[i].ID < got[j].ID })
+
+	assert.Equal(t, want, got, "Reported input metrics didn't match expected value")
 }
 
 func TestNewMetricsRegistry(t *testing.T) {
