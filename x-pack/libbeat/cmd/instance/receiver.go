@@ -33,7 +33,7 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 
 	b.RegisterMetrics()
 
-	statsReg := b.Monitoring.StatsRegistry
+	statsReg := b.Monitoring.StatsRegistry()
 
 	// stats.beat
 	processReg := statsReg.GetOrCreateRegistry("beat")
@@ -51,10 +51,10 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 		b.API, err = api.NewWithDefaultRoutes(
 			b.Info.Logger.Named("metrics.http"),
 			b.Config.HTTP,
-			b.Monitoring.InfoRegistry,
-			b.Monitoring.StateRegistry,
-			b.Monitoring.StatsRegistry,
-			b.Monitoring.InputsRegistry)
+			b.Monitoring.InfoRegistry(),
+			b.Monitoring.StateRegistry(),
+			b.Monitoring.StatsRegistry(),
+			b.Monitoring.InputsRegistry())
 
 		if err != nil {
 			return BeatReceiver{}, fmt.Errorf("could not start the HTTP server for the API: %w", err)

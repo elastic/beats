@@ -246,11 +246,11 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		}
 	}
 
-	reg := b.Monitoring.StatsRegistry.GetOrCreateRegistry("libbeat")
+	reg := b.Monitoring.StatsRegistry().GetOrCreateRegistry("libbeat")
 
 	monitors := pipeline.Monitors{
 		Metrics:   reg,
-		Telemetry: b.Monitoring.StateRegistry,
+		Telemetry: b.Monitoring.StateRegistry(),
 		Logger:    logger.Named("publisher"),
 		Tracer:    b.Instrumentation.Tracer(),
 	}

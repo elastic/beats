@@ -343,7 +343,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	b.registerClusterUUIDFetching()
 
-	reg := b.Monitoring.StatsRegistry.GetOrCreateRegistry("libbeat")
+	reg := b.Monitoring.StatsRegistry().GetOrCreateRegistry("libbeat")
 
 	err = metricreport.SetupMetrics(b.Info.Logger.Named("metrics"), b.Info.Beat, version.GetDefaultVersion())
 	if err != nil {
@@ -351,7 +351,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 
 	// Report central management state
-	mgmt := b.Monitoring.StateRegistry.NewRegistry("management")
+	mgmt := b.Monitoring.StateRegistry().NewRegistry("management")
 	monitoring.NewBool(mgmt, "enabled").Set(b.Manager.Enabled())
 
 	log.Debug("Initializing output plugins")
@@ -369,7 +369,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	var publisher *pipeline.Pipeline
 	monitors := pipeline.Monitors{
 		Metrics:   reg,
-		Telemetry: b.Monitoring.StateRegistry,
+		Telemetry: b.Monitoring.StateRegistry(),
 		Logger:    b.Info.Logger.Named("publisher"),
 		Tracer:    b.Instrumentation.Tracer(),
 	}
@@ -443,10 +443,10 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	if b.Config.HTTP.Enabled() {
 		var err error
 		b.API, err = api.NewWithDefaultRoutes(logger, b.Config.HTTP,
-			b.Monitoring.InfoRegistry,
-			b.Monitoring.StateRegistry,
-			b.Monitoring.StatsRegistry,
-			b.Monitoring.InputsRegistry)
+			b.Monitoring.InfoRegistry(),
+			b.Monitoring.StateRegistry(),
+			b.Monitoring.StatsRegistry(),
+			b.Monitoring.InputsRegistry())
 		if err != nil {
 			return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
@@ -552,7 +552,7 @@ func (b *Beat) reexec() error {
 // and/or pushed to Elasticsearch through the x-pack monitoring feature.
 func (b *Beat) RegisterMetrics() {
 	// info
-	infoRegistry := b.Monitoring.InfoRegistry
+	infoRegistry := b.Monitoring.InfoRegistry()
 	monitoring.NewString(infoRegistry, "version").Set(b.Info.Version)
 	monitoring.NewString(infoRegistry, "beat").Set(b.Info.Beat)
 	monitoring.NewString(infoRegistry, "name").Set(b.Info.Name)
@@ -578,7 +578,7 @@ func (b *Beat) RegisterMetrics() {
 	}()
 
 	// state.service
-	stateRegistry := b.Monitoring.StateRegistry
+	stateRegistry := b.Monitoring.StateRegistry()
 	monitoring.NewString(stateRegistry, "service.version").Set(b.Info.Version)
 	monitoring.NewString(stateRegistry, "service.name").Set(b.Info.Beat)
 	monitoring.NewString(stateRegistry, "service.id").Set(b.Info.ID.String())
@@ -591,10 +591,10 @@ func (b *Beat) RegisterHostname(useFQDN bool) {
 	hostname := b.Info.FQDNAwareHostname(useFQDN)
 
 	// info.hostname
-	monitoring.NewString(b.Monitoring.InfoRegistry, "hostname").Set(hostname)
+	monitoring.NewString(b.Monitoring.InfoRegistry(), "hostname").Set(hostname)
 
 	// state.host
-	monitoring.NewFunc(b.Monitoring.StateRegistry, "host", host.ReportInfo(hostname), monitoring.Report)
+	monitoring.NewFunc(b.Monitoring.StateRegistry(), "host", host.ReportInfo(hostname), monitoring.Report)
 }
 
 // TestConfig check all settings are ok and the beat can be run
@@ -913,7 +913,7 @@ func (b *Beat) configure(settings Settings) error {
 		"global_processors.txt", "text/plain", b.agentDiagnosticHook)
 	b.Manager.RegisterDiagnosticHook("beat_metrics", "Metrics from the default monitoring namespace and expvar.",
 		"beat_metrics.json", "application/json", func() []byte {
-			m := monitoring.CollectStructSnapshot(b.Monitoring.StatsRegistry, monitoring.Full, true)
+			m := monitoring.CollectStructSnapshot((b.Monitoring.StatsRegistry()), monitoring.Full, true)
 			data, err := json.MarshalIndent(m, "", "  ")
 			if err != nil {
 				logger.Warnw("Failed to collect beat metric snapshot for Agent diagnostics.", "error", err)
@@ -1281,7 +1281,7 @@ func (b *Beat) registerClusterUUIDFetching() {
 
 // Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
 func (b *Beat) clusterUUIDFetchingCallback() elasticsearch.ConnectCallback {
-	elasticsearchRegistry := b.Monitoring.StateRegistry.NewRegistry("outputs.elasticsearch")
+	elasticsearchRegistry := b.Monitoring.StateRegistry().NewRegistry("outputs.elasticsearch")
 	clusterUUIDRegVar := monitoring.NewString(elasticsearchRegistry, "cluster_uuid")
 
 	callback := func(esClient *eslegclient.Connection) error {
@@ -1318,7 +1318,7 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 
 	// Expose monitoring.cluster_uuid in state API
 	if monitoringClusterUUID != "" {
-		monitoringRegistry := b.Monitoring.StateRegistry.NewRegistry("monitoring")
+		monitoringRegistry := b.Monitoring.StateRegistry().NewRegistry("monitoring")
 		clusterUUIDRegVar := monitoring.NewString(monitoringRegistry, "cluster_uuid")
 		clusterUUIDRegVar.Set(monitoringClusterUUID)
 	}

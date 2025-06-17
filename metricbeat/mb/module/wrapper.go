@@ -163,10 +163,10 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 	for _, msw := range mw.metricSets {
 		go func(msw *metricSetWrapper) {
 			metricsPath := msw.ID()
-			registry := mw.monitoring.InputsRegistry
+			registry := mw.monitoring.InputsRegistry()
 
 			defer registry.Remove(metricsPath)
-			defer releaseStats(mw.monitoring.StatsRegistry, msw.stats)
+			defer releaseStats(mw.monitoring.StatsRegistry(), msw.stats)
 			defer wg.Done()
 			defer msw.close()
 
@@ -462,7 +462,7 @@ func getMetricSetStats(mon beat.Monitoring, module, name string) *stats {
 		return s
 	}
 
-	reg := mon.StatsRegistry.NewRegistry(key)
+	reg := mon.StatsRegistry().NewRegistry(key)
 	s := &stats{
 		key:                 key,
 		ref:                 1,

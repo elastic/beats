@@ -160,7 +160,7 @@ func makeReporter(beat beat.Info, mon beat.Monitoring, settings report.Settings,
 	pipeline, err := pipeline.New(
 		beat,
 		pipeline.Monitors{
-			Metrics: mon.StatsRegistry.GetOrCreateRegistry("monitoring"),
+			Metrics: mon.StatsRegistry().GetOrCreateRegistry("monitoring"),
 			Logger:  log,
 		},
 		queueConfig,
@@ -240,9 +240,9 @@ func (r *reporter) initLoop(c config) {
 	log.Info("Successfully connected to X-Pack Monitoring endpoint.")
 
 	// Start collector and send loop if monitoring endpoint has been found.
-	go r.snapshotLoop(r.monitoring.StateRegistry, "state", "state", c.StatePeriod, c.ClusterUUID)
+	go r.snapshotLoop(r.monitoring.StateRegistry(), "state", "state", c.StatePeriod, c.ClusterUUID)
 	// For backward compatibility stats is named to metrics.
-	go r.snapshotLoop(r.monitoring.StatsRegistry, "stats", "metrics", c.MetricsPeriod, c.ClusterUUID)
+	go r.snapshotLoop(r.monitoring.StatsRegistry(), "stats", "metrics", c.MetricsPeriod, c.ClusterUUID)
 }
 
 func (r *reporter) snapshotLoop(registry *monitoring.Registry, namespace, prefix string, period time.Duration, clusterUUID string) {
@@ -341,7 +341,7 @@ func makeMeta(beat beat.Info) mapstr.M {
 }
 
 func getClusterUUID(mon beat.Monitoring) string {
-	stateRegistry := mon.StateRegistry
+	stateRegistry := mon.StateRegistry()
 	outputsRegistry := stateRegistry.GetRegistry("outputs")
 	if outputsRegistry == nil {
 		return ""

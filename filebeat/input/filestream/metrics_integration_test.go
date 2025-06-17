@@ -188,7 +188,7 @@ type expectedMetrics struct {
 }
 
 func checkMetrics(t *testing.T, mon beat.Monitoring, id string, expected expectedMetrics) {
-	reg, ok := mon.InputsRegistry.Get(id).(*monitoring.Registry)
+	reg, ok := mon.InputsRegistry().Get(id).(*monitoring.Registry)
 	require.True(t, ok, "registry not found")
 
 	require.Equal(t, id, reg.Get("id").(*monitoring.String).Get(), "id")

@@ -322,7 +322,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 
 				t.Cleanup(func() {
 					// release stats structure across testcases
-					releaseStats(monitoring.StatsRegistry, wrappedMetricSet.stats)
+					releaseStats(monitoring.StatsRegistry(), wrappedMetricSet.stats)
 				})
 
 				for i := 0; i < tc.iterations; i++ {
@@ -552,7 +552,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 
 				t.Cleanup(func() {
 					// release stats structure across testcases
-					releaseStats(monitoring.StatsRegistry, wrappedMetricSet.stats)
+					releaseStats(monitoring.StatsRegistry(), wrappedMetricSet.stats)
 				})
 
 				for i := 0; i < tc.iterations; i++ {

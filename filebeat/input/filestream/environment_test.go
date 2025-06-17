@@ -146,9 +146,9 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 
 		logger, _ := logp.NewDevelopmentLogger("")
 		reg := inputmon.NewMetricsRegistry(
-			id, inp.Name(), e.monitoring.InputsRegistry, logger)
+			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
 		defer inputmon.CancelMetricsRegistry(
-			id, inp.Name(), e.monitoring.InputsRegistry, logger)
+			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
 
 		inputCtx := v2.Context{
 			ID:              id,

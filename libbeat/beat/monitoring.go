@@ -20,37 +20,61 @@ package beat
 import "github.com/elastic/elastic-agent-libs/monitoring"
 
 type Monitoring struct {
-	namespaces *monitoring.Namespaces
+	// Previously monitoring.GetNamespace("info")
+	infoRegistry *monitoring.Registry
 
-	InfoRegistry  *monitoring.Registry
-	StateRegistry *monitoring.Registry
+	// Previously monitoring.GetNamespace("state")
+	stateRegistry *monitoring.Registry
+
 	// Previously monitoring.Default or monitoring.GetNamespace("stats")
-	StatsRegistry *monitoring.Registry
+	statsRegistry *monitoring.Registry
 
 	// Previously monitoring.GetNamespace("dataset")
-	InputsRegistry *monitoring.Registry
+	inputsRegistry *monitoring.Registry
 }
 
 func NewGlobalMonitoring() Monitoring {
 	return Monitoring{
-		StatsRegistry: monitoring.Default,
-		StateRegistry: monitoring.GetNamespace("state").GetRegistry(),
-		InfoRegistry:  monitoring.GetNamespace("info").GetRegistry(),
+		statsRegistry: monitoring.Default,
+		stateRegistry: monitoring.GetNamespace("state").GetRegistry(),
+		infoRegistry:  monitoring.GetNamespace("info").GetRegistry(),
 
-		InputsRegistry: monitoring.GetNamespace("dataset").GetRegistry(),
+		inputsRegistry: monitoring.GetNamespace("dataset").GetRegistry(),
 	}
 }
 
 func NewMonitoring() Monitoring {
-	namespaces := monitoring.NewNamespaces()
-
 	return Monitoring{
-		namespaces: namespaces,
+		statsRegistry: monitoring.NewRegistry(),
+		stateRegistry: monitoring.NewRegistry(),
+		infoRegistry:  monitoring.NewRegistry(),
 
-		StatsRegistry: namespaces.Get("stats").GetRegistry(),
-		StateRegistry: namespaces.Get("state").GetRegistry(),
-		InfoRegistry:  namespaces.Get("info").GetRegistry(),
-
-		InputsRegistry: namespaces.Get("dataset").GetRegistry(),
+		inputsRegistry: monitoring.NewRegistry(),
 	}
+}
+
+// The top-level info registry for the Beat or Beat Receiver, formerly accessed
+// via monitoring.GetNamespace("info").
+func (m Monitoring) InfoRegistry() *monitoring.Registry {
+	return m.infoRegistry
+}
+
+// The top-level state registry for the Beat or Beat Receiver, formerly accessed
+// via monitoring.GetNamespace("state").
+func (m Monitoring) StateRegistry() *monitoring.Registry {
+	return m.stateRegistry
+}
+
+// The top-level stats / "default" registry for the Beat or Beat Receiver,
+// formerly accessed via monitoring.GetNamespace("stats") or
+// monitoring.Default. Published in internal monitoring as "metrics" for
+// compatibility with other components.
+func (m Monitoring) StatsRegistry() *monitoring.Registry {
+	return m.statsRegistry
+}
+
+// The top-level input metrics registry for the Beat or Beat Receiver, formerly
+// accessed via monitoring.GetNamespace("dataset").
+func (m Monitoring) InputsRegistry() *monitoring.Registry {
+	return m.inputsRegistry
 }
