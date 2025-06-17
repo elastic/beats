@@ -121,8 +121,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, fmt.Errorf("error unpacking beats logging config: %w\n%v", err, b.Config.Logging)
 	}
 
-	logp.ConfigureWithCore(logpConfig, core)
-	if err != nil {
+	if err := logp.ConfigureWithCore(logpConfig, core); err != nil {
 		return nil, fmt.Errorf("error configuring beats logp: %w", err)
 	}
 
