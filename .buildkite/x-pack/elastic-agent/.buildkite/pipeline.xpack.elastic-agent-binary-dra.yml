@@ -27,7 +27,7 @@ steps:
           DRA_WORKFLOW: "snapshot"
           PLATFORMS: "linux/amd64 linux/386 windows/amd64 windows/386 darwin/amd64"
 
-      - label: ":package: linux/arm64 darwin/arm64 Elastic-Agent Core Snapshot :package:"
+      - label: ":package: linux/arm64 darwin/arm64 Elastic-Agent Core Snapshot"
         commands:
           - .buildkite/x-pack/elastic-agent/scripts/steps/build-agent-core.sh
         key: "build-dra-snapshot-arm"
@@ -76,6 +76,20 @@ steps:
           image: "family/platform-ingest-beats-ubuntu-2204"
         env:
           DRA_WORKFLOW: "staging"
+
+      - label: ":beats: linux/arm64 darwin/arm64 DRA Elastic-Agent Core Staging :beats:"
+        commands:
+          - .buildkite/x-pack/elastic-agent/scripts/steps/build-agent-core.sh
+        key: "build-dra-snapshot-arm"
+        artifact_paths:
+          - "x-pack/elastic-agent/build/distributions/**/*"
+        agents:
+          provider: "aws"
+          instanceType: "m6g.xlarge"
+          imagePrefix: "platform-ingest-beats-ubuntu-2204-aarch64"
+        env:
+          DRA_WORKFLOW: "staging"
+          PLATFORMS: "linux/arm64 darwin/arm64"
 
       - wait
 
