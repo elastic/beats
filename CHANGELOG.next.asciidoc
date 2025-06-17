@@ -326,6 +326,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Publish cloud.availability_zone by add_cloud_metadata processor in azure environments {issue}42601[42601] {pull}43618[43618]
 - Disable sending telemetry to Microsoft when using their Go fork for producing FIPS-capable artifacts {pull}44865[44865]
 - The `add_cloud_metadata` processor does not support the Azure provider in FIPS-capable artifacts {pull}xxxx[xxxx]
+- The `add_cloud_metadata` processor does not support the Azure provider in FIPS-capable artifacts {pull}44891[44891]
 
 *Auditbeat*
 
