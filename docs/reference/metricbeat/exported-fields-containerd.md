@@ -3,20 +3,20 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-containerd.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Containerd fields [exported-fields-containerd]
 
 Containerd stats collected from containerd
 
-
 ## containerd [_containerd]
 
-Information and statistics about containerd’s running containers.
+Information and statistics about containerd's running containers.
 
 **`containerd.namespace`**
 :   Containerd namespace
 
 type: keyword
-
 
 
 ## blkio [_blkio]
@@ -29,8 +29,7 @@ Block I/O metrics.
 type: keyword
 
 
-
-## read [_read_4]
+## read [_read]
 
 Accumulated reads during the life of the container
 
@@ -48,8 +47,7 @@ type: long
 format: bytes
 
 
-
-## write [_write_4]
+## write [_write]
 
 Accumulated writes during the life of the container
 
@@ -67,8 +65,7 @@ type: long
 format: bytes
 
 
-
-## summary [_summary_2]
+## summary [_summary]
 
 Accumulated reads and writes during the life of the container
 
@@ -86,8 +83,7 @@ type: long
 format: bytes
 
 
-
-## cpu [_cpu_4]
+## cpu [_cpu]
 
 Containerd Runtime CPU metrics.
 
@@ -145,8 +141,7 @@ format: percent
 type: object
 
 
-
-## memory [_memory_4]
+## memory [_memory]
 
 memory
 
@@ -190,8 +185,7 @@ type: long
 format: bytes
 
 
-
-## usage [_usage_12]
+## usage [_usage]
 
 Usage memory stats.
 
@@ -233,7 +227,6 @@ type: long
 format: bytes
 
 
-
 ## kernel [_kernel]
 
 Kernel memory stats.
@@ -266,7 +259,6 @@ type: scaled_float
 type: long
 
 format: bytes
-
 
 
 ## swap [_swap]

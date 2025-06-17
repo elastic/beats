@@ -222,6 +222,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Tests reading testdata config file now set flag `strict.perms=false`. They use the new `testflag` package helper function MustSetStrictPermsFalse. {issue}42779[42779]
 - Update github.com/dgraph-io/badger/v4 package to version 4.6.0. {issue}42443[42443]
 - Added exponential backoff retry logic for vSphere client logout operation in metricbeat. {issue}43449[43449]
+- Make `x-pack/libbeat/management.BeatV2Manager.UpdateStatus` a no-op if there is no change in state. {pull}44716[44716]
 
 ==== Deprecated
 

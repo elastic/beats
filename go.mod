@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.24.3
+go 1.24.4
 
 require (
 	cloud.google.com/go/bigquery v1.65.0
@@ -153,16 +153,16 @@ require (
 	cloud.google.com/go v0.116.0
 	cloud.google.com/go/compute v1.29.0
 	cloud.google.com/go/redis v1.17.2
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.13.0
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.7.0
-	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.2.1
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.17.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.8.2
+	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.3.1
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.8.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement v1.1.1
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor v0.8.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.2.0
-	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.4.0
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.6.0
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/aerospike/aerospike-client-go/v7 v7.7.1
 	github.com/apache/arrow/go/v17 v17.0.0
@@ -176,7 +176,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.9.0
-	github.com/elastic/elastic-agent-libs v0.19.5
+	github.com/elastic/elastic-agent-libs v0.20.0
 	github.com/elastic/elastic-agent-system-metrics v0.11.11
 	github.com/elastic/go-elasticsearch/v8 v8.17.1
 	github.com/elastic/go-quark v0.3.0
@@ -214,7 +214,7 @@ require (
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.6.3
 	go.elastic.co/apm/module/apmhttp/v2 v2.6.3
 	go.elastic.co/apm/v2 v2.6.3
-	go.mongodb.org/mongo-driver v1.14.0
+	go.mongodb.org/mongo-driver v1.17.4
 	go.opentelemetry.io/collector/component v1.27.0
 	go.opentelemetry.io/collector/config/configtls v1.27.0
 	go.opentelemetry.io/collector/confmap v1.27.0
@@ -243,7 +243,7 @@ require (
 	github.com/Azure/azure-amqp-common-go/v4 v4.2.0 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.3 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.10.0 // indirect
-	github.com/Azure/go-amqp v1.0.5 // indirect
+	github.com/Azure/go-amqp v1.3.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.9.24 // indirect
 	github.com/Azure/go-autorest/autorest/to v0.4.0 // indirect
@@ -251,7 +251,7 @@ require (
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
-	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.2 // indirect
+	github.com/AzureAD/microsoft-authentication-library-for-go v1.4.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.25.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.48.1 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.48.1 // indirect
@@ -370,7 +370,7 @@ require (
 	github.com/moby/sys/userns v0.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/montanaflynn/stats v0.7.0 // indirect
+	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
@@ -391,7 +391,7 @@ require (
 	github.com/tklauser/numcpus v0.8.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
-	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
+	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.elastic.co/apm/module/apmzap/v2 v2.6.3 // indirect

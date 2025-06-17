@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-nats.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # NATS fields [exported-fields-nats]
 
 nats Module
-
 
 ## nats [_nats]
 
@@ -19,17 +20,14 @@ type: keyword
 
 
 **`nats.server.time`**
-:   :::{admonition} Deprecated in 8.0.0
-    The `nats.server.time` field was deprecated in 8.0.0.
-    :::
+:   Server time of metric creation
 
-Server time of metric creation
+{applies_to}`product: deprecated 8.0.0`
 
 type: date
 
 
-
-## connection [_connection_3]
+## connection [_connection]
 
 Contains nats connection related metrics
 
@@ -69,8 +67,7 @@ type: long
 format: duration
 
 
-
-## in [_in_2]
+## in [_in]
 
 The amount of incoming data
 
@@ -88,8 +85,7 @@ type: long
 format: bytes
 
 
-
-## out [_out_2]
+## out [_out]
 
 The amount of outgoing data
 
@@ -107,8 +103,7 @@ type: long
 format: bytes
 
 
-
-## connections [_connections_4]
+## connections [_connections]
 
 Contains nats connection related metrics
 
@@ -116,7 +111,6 @@ Contains nats connection related metrics
 :   The number of currently active clients
 
 type: integer
-
 
 
 ## route [_route]
@@ -153,8 +147,7 @@ type: integer
 type: ip
 
 
-
-## in [_in_3]
+## in [_in]
 
 The amount of incoming data
 
@@ -172,8 +165,7 @@ type: long
 format: bytes
 
 
-
-## out [_out_3]
+## out [_out]
 
 The amount of outgoing data
 
@@ -191,7 +183,6 @@ type: long
 format: bytes
 
 
-
 ## routes [_routes]
 
 Contains nats route related metrics
@@ -202,8 +193,7 @@ Contains nats route related metrics
 type: integer
 
 
-
-## stats [_stats_9]
+## stats [_stats]
 
 Contains nats var related metrics
 
@@ -249,8 +239,7 @@ type: long
 type: integer
 
 
-
-## in [_in_4]
+## in [_in]
 
 The amount of incoming data
 
@@ -268,8 +257,7 @@ type: long
 format: bytes
 
 
-
-## out [_out_4]
+## out [_out]
 
 The amount of outgoing data
 
@@ -293,16 +281,13 @@ format: bytes
 type: long
 
 
-
-## http [_http_5]
+## http [_http]
 
 The http metrics of NATS server
-
 
 ## req_stats [_req_stats]
 
 The requests statistics
-
 
 ## uri [_uri]
 
@@ -336,7 +321,6 @@ type: long
 :   The number of hits on root monitoring uri
 
 type: long
-
 
 
 ## subscriptions [_subscriptions]

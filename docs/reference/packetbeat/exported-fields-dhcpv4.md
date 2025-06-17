@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-dhcpv4.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # DHCPv4 fields [exported-fields-dhcpv4]
 
 DHCPv4 event fields
@@ -20,7 +22,7 @@ type: long
 
 
 **`dhcpv4.flags`**
-:   Flags are set by the client to indicate how the DHCP server should its reply — either unicast or broadcast.
+:   Flags are set by the client to indicate how the DHCP server should its reply -- either unicast or broadcast.
 
 type: keyword
 
@@ -50,7 +52,7 @@ type: ip
 
 
 **`dhcpv4.client_mac`**
-:   The client’s MAC address (layer two).
+:   The client's MAC address (layer two).
 
 type: keyword
 
@@ -108,7 +110,7 @@ type: ip
 
 
 **`dhcpv4.option.broadcast_address`**
-:   This option specifies the broadcast address in use on the client’s subnet.
+:   This option specifies the broadcast address in use on the client's subnet.
 
 type: ip
 
@@ -120,7 +122,7 @@ type: long
 
 
 **`dhcpv4.option.class_identifier`**
-:   This option is used by DHCP clients to optionally identify the vendor type and configuration of a DHCP client. Vendors may choose to define specific vendor class identifiers to convey particular configuration or other identification information about a client.  For example, the identifier may encode the client’s hardware configuration.
+:   This option is used by DHCP clients to optionally identify the vendor type and configuration of a DHCP client. Vendors may choose to define specific vendor class identifiers to convey particular configuration or other identification information about a client.  For example, the identifier may encode the client's hardware configuration.
 
 type: keyword
 
@@ -150,13 +152,13 @@ type: ip
 
 
 **`dhcpv4.option.utc_time_offset_sec`**
-:   The time offset field specifies the offset of the client’s subnet in seconds from Coordinated Universal Time (UTC).
+:   The time offset field specifies the offset of the client's subnet in seconds from Coordinated Universal Time (UTC).
 
 type: long
 
 
 **`dhcpv4.option.router`**
-:   The router option specifies a list of IP addresses for routers on the client’s subnet.
+:   The router option specifies a list of IP addresses for routers on the client's subnet.
 
 type: ip
 
@@ -204,7 +206,7 @@ type: long
 
 
 **`dhcpv4.option.boot_file_name`**
-:   This option is used to identify a bootfile when the *file* field in the DHCP header has been used for DHCP options.
+:   This option is used to identify a bootfile when the 'file' field in the DHCP header has been used for DHCP options.
 
 type: keyword
 

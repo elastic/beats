@@ -144,7 +144,7 @@ func (cim *InputManager) shutdown() {
 
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
-func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
+func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	if err := cim.init(); err != nil {
 		return nil, err
 	}
@@ -164,17 +164,14 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	}
 
 	metricsID := settings.ID
+	idAlreadyInUse := false
+
 	cim.idsMux.Lock()
 	if _, exists := cim.ids[settings.ID]; exists {
-		duplicatedInput := map[string]any{}
-		unpackErr := config.Unpack(&duplicatedInput)
-		if unpackErr != nil {
-			duplicatedInput["error"] = fmt.Errorf("failed to unpack duplicated input config: %w", unpackErr).Error()
-		}
-
 		// Keep old behaviour so users can upgrade to 9.0 without
 		// having their inputs not starting.
 		if settings.AllowIDDuplication {
+			idAlreadyInUse = true
 			cim.Logger.Errorf("filestream input with ID '%s' already exists, "+
 				"this will lead to data duplication, please use a different "+
 				"ID. Metrics collection has been disabled on this input. The "+
@@ -204,6 +201,16 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	// https://github.com/elastic/beats/issues/35202
 	cim.ids[settings.ID] = struct{}{}
 	cim.idsMux.Unlock()
+
+	defer func() {
+		// If there is any error creating the input, remove it from the IDs list
+		// if there wasn't any other input running with this ID.
+		if retErr != nil && !idAlreadyInUse {
+			cim.idsMux.Lock()
+			delete(cim.ids, settings.ID)
+			cim.idsMux.Unlock()
+		}
+	}()
 
 	prospector, harvester, err := cim.Configure(config)
 	if err != nil {

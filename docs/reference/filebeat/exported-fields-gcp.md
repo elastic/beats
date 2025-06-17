@@ -3,17 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-gcp.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Google Cloud Platform (GCP) fields [exported-fields-gcp]
 
 Module for handling logs from Google Cloud.
-
 
 ## gcp [_gcp]
 
 Fields from Google Cloud logs.
 
-
-## destination.instance [_destination_instance]
+## destination.instance [_destination.instance]
 
 If the destination of the connection was a VM located on the same VPC, this field is populated with VM instance details. In a Shared VPC configuration, project_id corresponds to the project that owns the instance, usually the service project.
 
@@ -35,8 +35,7 @@ type: keyword
 type: keyword
 
 
-
-## destination.vpc [_destination_vpc]
+## destination.vpc [_destination.vpc]
 
 If the destination of the connection was a VM located on the same VPC, this field is populated with VPC network details. In a Shared VPC configuration, project_id corresponds to that of the host project.
 
@@ -58,8 +57,7 @@ type: keyword
 type: keyword
 
 
-
-## source.instance [_source_instance]
+## source.instance [_source.instance]
 
 If the source of the connection was a VM located on the same VPC, this field is populated with VM instance details. In a Shared VPC configuration, project_id corresponds to the project that owns the instance, usually the service project.
 
@@ -81,8 +79,7 @@ type: keyword
 type: keyword
 
 
-
-## source.vpc [_source_vpc]
+## source.vpc [_source.vpc]
 
 If the source of the connection was a VM located on the same VPC, this field is populated with VPC network details. In a Shared VPC configuration, project_id corresponds to that of the host project.
 
@@ -104,8 +101,7 @@ type: keyword
 type: keyword
 
 
-
-## audit [_audit_3]
+## audit [_audit]
 
 Fields for Google Cloud audit logs.
 
@@ -113,7 +109,6 @@ Fields for Google Cloud audit logs.
 :   Type property.
 
 type: keyword
-
 
 
 ## authentication_info [_authentication_info]
@@ -139,7 +134,7 @@ type: array
 
 
 **`gcp.audit.method_name`**
-:   The name of the service method or operation. For API calls, this  should be the name of the API method.  For example, *google.datastore.v1.Datastore.RunQuery*.
+:   The name of the service method or operation. For API calls, this  should be the name of the API method.  For example, 'google.datastore.v1.Datastore.RunQuery'.
 
 type: keyword
 
@@ -148,7 +143,6 @@ type: keyword
 :   The number of items returned from a List or Query API method, if applicable.
 
 type: long
-
 
 
 ## request [_request]
@@ -179,7 +173,6 @@ type: keyword
 type: keyword
 
 
-
 ## request_metadata [_request_metadata]
 
 Metadata about the request.
@@ -196,7 +189,6 @@ type: ip
 type: keyword
 
 
-
 ## response [_response]
 
 The operation response.
@@ -205,7 +197,6 @@ The operation response.
 :   Type property of the response.
 
 type: keyword
-
 
 
 ## details [_details]
@@ -243,10 +234,9 @@ type: keyword
 
 
 **`gcp.audit.resource_name`**
-:   The resource or collection that is the target of the operation.  The name is a scheme-less URI, not including the API service name.  For example, *shelves/SHELF_ID/books*.
+:   The resource or collection that is the target of the operation.  The name is a scheme-less URI, not including the API service name.  For example, 'shelves/SHELF_ID/books'.
 
 type: keyword
-
 
 
 ## resource_location [_resource_location]
@@ -265,7 +255,6 @@ type: keyword
 type: keyword
 
 
-
 ## status [_status]
 
 The status of the overall operation.
@@ -282,11 +271,9 @@ type: integer
 type: keyword
 
 
-
-## firewall [_firewall_2]
+## firewall [_firewall]
 
 Fields for Google Cloud Firewall logs.
-
 
 ## rule_details [_rule_details]
 
@@ -358,13 +345,12 @@ type: keyword
 type: keyword
 
 
-
-## vpcflow [_vpcflow_2]
+## vpcflow [_vpcflow]
 
 Fields for Google Cloud VPC flow logs.
 
 **`gcp.vpcflow.reporter`**
-:   The side which reported the flow. Can be either *SRC* or *DEST*.
+:   The side which reported the flow. Can be either 'SRC' or 'DEST'.
 
 type: keyword
 
