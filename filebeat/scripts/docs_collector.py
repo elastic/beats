@@ -84,7 +84,7 @@ While {{filebeat}} modules are still supported, we recommend {{agent}} integrati
 """
 
     for m, title in sorted(six.iteritems(modules_list)):
-        module_list_output += "* [*{} module*](/reference/filebeat/filebeat-module-{}.md)\n".format(title.title(), m)
+        module_list_output += "* [*{} module*](/reference/filebeat/filebeat-module-{}.md)\n".format(title, m)
 
     module_list_output += "\n"
 
