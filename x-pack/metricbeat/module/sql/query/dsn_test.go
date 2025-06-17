@@ -116,7 +116,7 @@ func TestParseDSNfunctions(t *testing.T) {
 	t.Run("postgres", func(t *testing.T) {
 		t.Run("TLS disabled", func(t *testing.T) {
 			config := ConnectionDetails{}
-			host := "postgres://localhost:5432/mydb"
+			host := "postgres://myuser:mypassword@localhost:5432/mydb"
 
 			hostData, err := postgresParseDSN(config, host)
 			require.NoError(t, err)
@@ -139,12 +139,12 @@ func TestParseDSNfunctions(t *testing.T) {
 					},
 				},
 			}
-			host := "postgres://localhost:5432/mydb"
+			host := "postgres://myuser:mypassword@localhost:5432/mydb"
 
 			hostData, err := postgresParseDSN(config, host)
 			require.NoError(t, err)
 
-			assert.Equal(t, "postgres://localhost:5432/mydb?sslcert=.%2Fcert.pem&sslkey=.%2Fkey.pem&sslmode=verify-full&sslpassword=test&sslrootcert=.%2Fca.pem", hostData.URI)
+			assert.Equal(t, "postgres://myuser:mypassword@localhost:5432/mydb?sslcert=.%2Fcert.pem&sslkey=.%2Fkey.pem&sslmode=verify-full&sslpassword=test&sslrootcert=.%2Fca.pem", hostData.URI)
 			assert.Equal(t, "localhost:5432", hostData.SanitizedURI)
 			assert.Equal(t, "localhost:5432", hostData.Host)
 		})
@@ -156,7 +156,7 @@ func TestParseDSNfunctions(t *testing.T) {
 					CAs:     []string{caPath, caPath},
 				},
 			}
-			host := "postgres://localhost:5432/mydb"
+			host := "postgres://myuser:mypassword@localhost:5432/mydb"
 
 			_, err := postgresParseDSN(config, host)
 			require.Error(t, err)
@@ -170,7 +170,7 @@ func TestParseDSNfunctions(t *testing.T) {
 					CAs:     []string{mockCA},
 				},
 			}
-			host := "postgres://localhost:5432/mydb"
+			host := "postgres://myuser:mypassword@localhost:5432/mydb"
 
 			_, err := postgresParseDSN(config, host)
 			require.Error(t, err)
@@ -181,7 +181,7 @@ func TestParseDSNfunctions(t *testing.T) {
 	t.Run("mssql", func(t *testing.T) {
 		t.Run("TLS disabled", func(t *testing.T) {
 			config := ConnectionDetails{}
-			host := "sqlserver://localhost:1433?database=mydb"
+			host := "sqlserver://myuser:mypassword@localhost:1433?database=mydb"
 
 			hostData, err := mssqlParseDSN(config, host)
 			require.NoError(t, err)
@@ -199,12 +199,12 @@ func TestParseDSNfunctions(t *testing.T) {
 					CAs:              []string{caPath},
 				},
 			}
-			host := "sqlserver://localhost:1433?database=mydb"
+			host := "sqlserver://myuser:mypassword@localhost:1433?database=mydb"
 
 			hostData, err := mssqlParseDSN(config, host)
 			require.NoError(t, err)
 
-			assert.Equal(t, "sqlserver://localhost:1433?TrustServerCertificate=false&certificate=.%2Fca.pem&database=mydb&encrypt=true", hostData.URI)
+			assert.Equal(t, "sqlserver://myuser:mypassword@localhost:1433?TrustServerCertificate=false&certificate=.%2Fca.pem&database=mydb&encrypt=true", hostData.URI)
 			assert.Equal(t, "localhost:1433", hostData.SanitizedURI)
 			assert.Equal(t, "localhost:1433", hostData.Host)
 		})
@@ -216,7 +216,7 @@ func TestParseDSNfunctions(t *testing.T) {
 					CAs:     []string{caPath, caPath},
 				},
 			}
-			host := "sqlserver://localhost:1433?database=mydb"
+			host := "sqlserver://myuser:mypassword@localhost:1433?database=mydb"
 
 			_, err := mssqlParseDSN(config, host)
 			require.Error(t, err)
@@ -233,7 +233,7 @@ func TestParseDSNfunctions(t *testing.T) {
 					},
 				},
 			}
-			host := "sqlserver://localhost:1433?database=mydb"
+			host := "sqlserver://myuser:mypassword@localhost:1433?database=mydb"
 
 			_, err := mssqlParseDSN(config, host)
 			require.Error(t, err)
@@ -247,7 +247,7 @@ func TestParseDSNfunctions(t *testing.T) {
 					CAs:     []string{mockCA},
 				},
 			}
-			host := "sqlserver://localhost:1433?database=mydb"
+			host := "sqlserver://myuser:mypassword@localhost:1433?database=mydb"
 
 			_, err := mssqlParseDSN(config, host)
 			require.Error(t, err)
