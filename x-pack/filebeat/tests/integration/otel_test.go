@@ -21,6 +21,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	oteltest "github.com/elastic/beats/v7/x-pack/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/go-elasticsearch/v8"
@@ -43,6 +44,7 @@ output:
     username: admin
     password: testing
     index: %s
+path.home: %s
 queue.mem.flush.timeout: 0s
 processors:
     - add_host_metadata: ~
@@ -58,18 +60,19 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	numEvents := 1
 
-	// start filebeat in otel mode
-	filebeatOTel := integration.NewBeat(
-		t,
-		"filebeat-otel",
-		"../../filebeat.test",
-		"otel",
-	)
-
-	logFilePath := filepath.Join(filebeatOTel.TempDir(), "log.log")
-	filebeatOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", 5066))
+	// Get collector with empty config
+	col, err := oteltest.NewTestCollector(t, "filebeat", "")
+	require.NoError(t, err, fmt.Sprintf("could not get new collector due to %v", err))
+	// write to a log file
+	logFilePath := filepath.Join(col.GetTempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	filebeatOTel.Start()
+
+	// start collector
+	err = col.ReloadCollectorWithConfig(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", col.GetTempDir(), 5066))
+	require.NoError(t, err)
+
+	// wait for collector to be ready
+	col.Wait()
 
 	// start filebeat
 	filebeat := integration.NewBeat(
@@ -79,7 +82,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	)
 	logFilePath = filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
+	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", filebeat.TempDir(), 5067)
 	s = s + `
 setup.template.name: logs-filebeat-default
 setup.template.pattern: logs-filebeat-default
@@ -116,6 +119,7 @@ setup.template.pattern: logs-filebeat-default
 			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-filebeat-default*")
 			require.NoError(t, err)
 
+			t.Logf("otel docs = %d, filebeat docs %d", otelDocs.Hits.Total.Value, filebeatDocs.Hits.Total.Value)
 			return otelDocs.Hits.Total.Value >= numEvents && filebeatDocs.Hits.Total.Value >= numEvents
 		},
 		2*time.Minute, 1*time.Second, fmt.Sprintf("Number of hits %d not equal to number of events for %d", filebeatDocs.Hits.Total.Value, numEvents))
