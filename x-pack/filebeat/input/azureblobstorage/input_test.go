@@ -473,7 +473,7 @@ func Test_StorageClient(t *testing.T) {
 			},
 		},
 		{
-			name: "ReadCSV_",
+			name: "ReadCSV_Root",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
 				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
