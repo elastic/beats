@@ -17,16 +17,6 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 % ### Fixes [beats-versionext-fixes]
 
-## 9.0.3 [beats-9.0.3-release-notes]
-
-### Features and enhancements [beats-9.0.3-features-enhancements]
-
-### Fixes [beats-9.0.3-fixes]
-
-**Metricbeat**
-
-- Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group in Metricbeat. [#44576]({{beats-pull}}44576)
-
 ## 9.0.2 [beats-9.0.2-release-notes]
 
 ### Features and enhancements [beats-9.0.2-features-enhancements]
