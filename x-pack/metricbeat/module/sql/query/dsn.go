@@ -56,7 +56,7 @@ func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 	return defaultParseDSN(config, host)
 }
 
-// defaultParseDSN is for backwards compatibility. It just passed the "host" param unchanged to the database driver
+// defaultParseDSN is for backwards compatibility. It just passes the "host" param unchanged to the database driver
 func defaultParseDSN(_ ConnectionDetails, host string) (mb.HostData, error) {
 	sanitized := sanitize(host)
 	return mb.HostData{
