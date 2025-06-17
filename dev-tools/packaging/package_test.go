@@ -837,6 +837,7 @@ func checkFIPS(t *testing.T, beatName, path string) {
 
 	foundTags := false
 	foundExperiment := false
+	foundMSFTTelemetry := false
 	for _, setting := range info.Settings {
 		switch setting.Key {
 		case "-tags":
@@ -848,11 +849,16 @@ func checkFIPS(t *testing.T, beatName, path string) {
 			foundExperiment = true
 			require.Contains(t, setting.Value, "systemcrypto")
 			continue
+		case "MS_GOTOOLCHAIN_TELEMETRY_ENABLED":
+			foundMSFTTelemetry = true
+			require.Contains(t, setting.Value, "0")
+			continue
 		}
 	}
 
 	require.True(t, foundTags, "Did not find -tags within binary version information")
 	require.True(t, foundExperiment, "Did not find GOEXPERIMENT within binary version information")
+	require.True(t, foundMSFTTelemetry, "Did not find MS_GOTOOLCHAIN_TELEMETRY_ENABLED within binary version information")
 
 	// TODO only elf is supported at the moment, in the future we will need to use macho (darwin) and pe (windows)
 	f, err := elf.Open(binaryPath)
