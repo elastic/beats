@@ -47,7 +47,7 @@ packaging==20.4
 parameterized==0.7.0
 paramiko==3.4.0
 pluggy==0.13.1
-protobuf==3.19.5
+protobuf==4.25.8
 py==1.11.0
 pycodestyle==2.6.0
 pycparser==2.21
