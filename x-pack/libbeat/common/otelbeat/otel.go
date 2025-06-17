@@ -53,7 +53,7 @@ func OTelCmd(beatname string) *cobra.Command {
 }
 
 // Component initializes collector components
-func GetComponent() (otelcol.Factories, error) {
+func getComponent() (otelcol.Factories, error) {
 	receivers, err := otelcol.MakeFactoryMap(
 		fbreceiver.NewFactory(),
 	)
@@ -86,7 +86,7 @@ func getCollectorSettings(filename string) otelcol.CollectorSettings {
 
 	return otelcol.CollectorSettings{
 		BuildInfo: info,
-		Factories: GetComponent,
+		Factories: getComponent,
 		ConfigProviderSettings: otelcol.ConfigProviderSettings{
 			ResolverSettings: confmap.ResolverSettings{
 				URIs: []string{filename},

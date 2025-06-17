@@ -23,7 +23,6 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -45,8 +44,6 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/go-elasticsearch/v8"
 )
 
 type BeatProc struct {
@@ -106,7 +103,7 @@ type Total struct {
 // `args` will be passed as CLI arguments to the Beat
 func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	require.FileExistsf(t, binary, "beat binary must exists")
-	tempDir := CreateTempDir(t)
+	tempDir := createTempDir(t)
 	configFile := filepath.Join(tempDir, beatName+".yml")
 
 	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
@@ -145,7 +142,7 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 // See `NewBeat` for options and information for the parameters.
 func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	require.FileExistsf(t, binary, "agentbeat binary must exists")
-	tempDir := CreateTempDir(t)
+	tempDir := createTempDir(t)
 	configFile := filepath.Join(tempDir, beatName+".yml")
 
 	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
@@ -651,8 +648,7 @@ func (b *BeatProc) openEventLogFile() *os.File {
 //
 // If the tests are run with -v, the temporary directory will
 // be logged.
-func CreateTempDir(t *testing.T) string {
-	t.Helper()
+func createTempDir(t *testing.T) string {
 	rootDir, err := filepath.Abs("../../build/integration-tests")
 	if err != nil {
 		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
@@ -669,7 +665,7 @@ func CreateTempDir(t *testing.T) string {
 	cleanup := func() {
 		if !t.Failed() {
 			if err := os.RemoveAll(tempDir); err != nil {
-				// Ugly workaround Windows limitations
+				// Ungly workaround Windows limitations
 				// Windows does not support the Interrup signal, so it might
 				// happen that Filebeat is still running, keeping it's registry
 				// file open, thus preventing the temporary folder from being
@@ -694,7 +690,6 @@ func CreateTempDir(t *testing.T) string {
 // using the default test credentials or the corresponding environment
 // variables.
 func EnsureESIsRunning(t *testing.T) {
-	t.Helper()
 	esURL := GetESURL(t, "http")
 
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(500*time.Second))
@@ -719,31 +714,6 @@ func EnsureESIsRunning(t *testing.T) {
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("unexpected HTTP status: %d, expecting 200 - OK", resp.StatusCode)
 	}
-}
-
-func GetESClient(t *testing.T, scheme string) *elasticsearch.Client {
-	esURL := GetESURL(t, scheme)
-
-	u := esURL.User.Username()
-	p, _ := esURL.User.Password()
-
-	// prepare to query ES
-	esCfg := elasticsearch.Config{
-		Addresses: []string{fmt.Sprintf("%s://%s", esURL.Scheme, esURL.Host)},
-		Username:  u,
-		Password:  p,
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
-			},
-		},
-	}
-	es, err := elasticsearch.NewClient(esCfg)
-	if err != nil {
-		t.Fatalf("cannot create Elasticsearch client: %s", err)
-	}
-
-	return es
 }
 
 func (b *BeatProc) FileContains(filename string, match string) string {
