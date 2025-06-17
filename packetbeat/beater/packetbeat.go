@@ -145,7 +145,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 	}()
 
 	if b.API != nil {
-		err := inputmon.AttachHandler(b.API.Router(), nil)
+		err := inputmon.AttachHandler(b.API.Router(), b.Monitoring.InputsRegistry)
 		if err != nil {
 			return fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}

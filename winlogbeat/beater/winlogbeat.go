@@ -160,7 +160,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	// Initialize metrics.
 	initMetrics("total")
 	if b.API != nil {
-		err := inputmon.AttachHandler(b.API.Router(), nil)
+		err := inputmon.AttachHandler(b.API.Router(), b.Monitoring.InputsRegistry)
 		if err != nil {
 			return fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
