@@ -52,6 +52,7 @@ func TestKernelProc(t *testing.T) {
 
 	names, err := dir.Readdirnames(readAllDirnames)
 	require.NoError(t, err, "error reading directory names")
+	require.NoError(t, dir.Close(), "error closing /proc")
 	var testPid int64
 	for _, name := range names {
 		if name[0] < '0' || name[0] > '9' {

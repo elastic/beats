@@ -90,6 +90,7 @@ func TestFetchProcessFromOtherUser(t *testing.T) {
 
 	names, err := dir.Readdirnames(readAllDirnames)
 	require.NoError(t, err, "error reading directory names")
+	require.NoError(t, dir.Close(), "error closing /proc")
 	us, err := user.Current()
 	require.NoError(t, err, "error fetching current user")
 	var testPid int
