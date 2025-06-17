@@ -27,7 +27,7 @@ type ConnectionDetails struct {
 	TLS      *tlscommon.Config `config:"ssl"`
 }
 
-const TLSConfigKey = "custom"
+const mysqlTLSConfigKey = "custom"
 
 // ParseDSN tries to parse the host
 func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
@@ -106,14 +106,14 @@ func mysqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
 	sanitized := c.Addr
 
 	if config.TLS.IsEnabled() {
-		c.TLSConfig = TLSConfigKey
+		c.TLSConfig = mysqlTLSConfigKey
 
 		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 		if err != nil {
 			return mb.HostData{}, fmt.Errorf("could not load provided TLS configuration: %w", err)
 		}
 
-		if err := mysql.RegisterTLSConfig(TLSConfigKey, tlsConfig.ToConfig()); err != nil {
+		if err := mysql.RegisterTLSConfig(mysqlTLSConfigKey, tlsConfig.ToConfig()); err != nil {
 			return mb.HostData{}, fmt.Errorf("registering custom tls config failed: %w", err)
 		}
 	}
@@ -158,9 +158,6 @@ func postgresParseDSN(config ConnectionDetails, host string) (mb.HostData, error
 				return mb.HostData{}, fmt.Errorf("postgres driver supports only certificate file path, got 'key' as PEM formatted certificate")
 			}
 			q.Set("sslkey", key)
-			if config.TLS.Certificate.Passphrase != "" {
-				q.Set("sslpassword", config.TLS.Certificate.Passphrase)
-			}
 		}
 
 		if cert := config.TLS.Certificate.Certificate; cert != "" {

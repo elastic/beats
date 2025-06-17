@@ -18,13 +18,12 @@ import (
 
 const (
 	mockCA   = "-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIUK5BTuk98yrDnFcOM0JiBh74FEQ8wDQYJKoZIhvcNAQEL\nBQAwFDESMBAGA1UEAwwJbG9jYWxob3N0MCAXDTI1MDYxNjEzMDI0MVoYDzIxMjQw\nMTA5MTMwMjQxWjAUMRIwEAYDVQQDDAlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEB\nAQUAA4IBDwAwggEKAoIBAQCo8aaCj86L+gQuLeAbhV/VvPqKrOs21lZ1NsnRc1rV\njoany8jq4GcRiLEbbQfLQJ2gGq1KjBnfojo8yVI5JGL5yZn8PAGz9ZFJBymsfwFt\nCumh2fnWWjeg2P5+62dDR50KFjoSFkEU0Mk14g2Gq0RNmHcWuRYq18jDOomL6jbc\nkVw//1eriyZZ49K25ddGZZeSjXw8tjWDsJyok48PXKCA5mU8XLzshtoEa49z01fW\nrfMICT/lGbHUVa7xqx+oIoreCTjed0c8OS2bKCH9JAlk09Iqu6eDGkTTETpmp5qo\nHfCRoXSVRBqJub3ISGjYrMMXQfakYPDfzDj3D/GlNySZAgMBAAGjaTBnMB0GA1Ud\nDgQWBBSZsH+4+i3NgY/an9Xaa4878jw1+jAfBgNVHSMEGDAWgBSZsH+4+i3NgY/a\nn9Xaa4878jw1+jAPBgNVHRMBAf8EBTADAQH/MBQGA1UdEQQNMAuCCWxvY2FsaG9z\ndDANBgkqhkiG9w0BAQsFAAOCAQEAXPbUKy7KVnoN8/nU2qaRSy+GZRJTl9UTX8B+\nJJPGUpo/QmKZkDdZIQO2KTjtjH2j58ThSu3MWMfDA2s8rssPrCoLNmgtX+7N3F22\nCl34Tn41wFv9VUVj03eCr5q0PYnkhFMhIjsj6AkwF9uh9uISaBFYc7WXQrzhGa0y\n6oK4rp8oxrmhBF5qccwz7dmhMW9TsC0/B6e5MuOTqY+Bkr0jV5FiT0ccUJG+SQ8d\nsKgyna9L/WeIorE6QN98TOnksbeRt28tmUp1nVAD+6vGCwfea2eCqwOA7uehgXSJ\n7pOpdUBbvnalEhdR+K0q0ZaAUINePrZppa6dwLgbjAIFsDhPmA==\n-----END CERTIFICATE-----\n"
-	mockCert = "-----BEGIN CERTIFICATE-----\nMIIC/TCCAeWgAwIBAgIBATANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAlsb2Nh\nbGhvc3QwIBcNMjUwNjE3MDgwNTQzWhgPMjEyNDAxMTAwODA1NDNaMBQxEjAQBgNV\nBAMMCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAIqe\n6Qd/+4MS0vyz004fqh/rhqSodyRxHDz3HHHEI1xYB1Iz/RzkusgSqRtsa1HTL0pN\nXOq/8JFLLg4x1IrEn6Fp0dWf1qnxD7OatKe5HDgAdb5Wh1j4dU4ipnNMdfMg0VYv\nZ2KHR9TvIvpU0fzcFBmkBBRHrrsXAm4IFqSX5xW4oc2Thlhv+tOUH6kUpWGUkSRV\nqBqLMzuFtwVVOQXkgOguDoL5PC4MVXzmdx8Bwut2yj8gB2vqTuB5LDoSHu8xwx7J\nqngNroJM7jhpI0raS6Eek/gMznARXRevWLjcvJHRR2BKkPvF7g+UDVhoupgyezac\nny/OLkKeDEoWKEhnMHMCAwEAAaNYMFYwFAYDVR0RBA0wC4IJbG9jYWxob3N0MB0G\nA1UdDgQWBBRu3N763N/O3YMoEtLOeHcru8lGqTAfBgNVHSMEGDAWgBSZsH+4+i3N\ngY/an9Xaa4878jw1+jANBgkqhkiG9w0BAQsFAAOCAQEAj8CDiMZOJzL2SuD87iUo\n8nr08w0SvHm/qLB0KXJXFXPAI7GO6GRA+tNj0N31Dza4n2ex6/hwbxdpNzlvPOdz\nMCKTyV07G45kiJ34wA7YfVObdgFGvtwDnqy4aca6eG7nsBVaAmPTbGvG4Nmidcir\nqkMMb1C2OkOc03EHp7kCtgzllCG1GK89/LdtJQE2VSCtPNIwmcWNwE87w3WnoLYL\nBosa4ijRwhOx4lB8osdXgxHkC/u9F1uLUFNo4xb7fkNdfP63T3UdBkPORL2PpQA9\nr6D85scEbCi68pKLNpEXGCB9hnaXN0aPh+RjaChmZjMVam6QCYuuCvT0DsLoC/W4\nEw==\n-----END CERTIFICATE-----\n"
+	mockCert = "-----BEGIN CERTIFICATE-----\nMIIC/TCCAeWgAwIBAgIBATANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAlsb2Nh\nbGhvc3QwIBcNMjUwNjE2MTMwMzEzWhgPMjEyNDAxMDkxMzAzMTNaMBQxEjAQBgNV\nBAMMCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANg+\nvGjQ8nvHLknVzbfKJT+v5cBwpl0KeLf4FKCk/o8WUamd5Bww3+1wvep3VXj+Ik2/\nj41NQEBo1J4n6/hR6A+OEoZs+magUcwM26FiNv2OZoYb6Oy1Moj0oxJZq16js627\nVOWOOwlPtmmHvhmg5r40sQS+MZhs9oFZCH7NFwqmsi4CVWtwdwS9vR+/tOrdi/X4\nDtTGvfJk+MRDctbGrFn1NgvlKGvQm4uccfWS2V35L4pH5VMW+PsoYogHIex1hmvl\nJxZT+HAX2qA4B1HX3zNh398VMcRA7NG52B06symCEaA3Qpw3DVE1Fa3qH2dskyk/\nmuil/1wz/ObfrKJm3E0CAwEAAaNYMFYwFAYDVR0RBA0wC4IJbG9jYWxob3N0MB0G\nA1UdDgQWBBQ1DNW2Jqwxnl9PwouJo6xEX2pi8zAfBgNVHSMEGDAWgBSZsH+4+i3N\ngY/an9Xaa4878jw1+jANBgkqhkiG9w0BAQsFAAOCAQEAGBxCXhnCt1l1eHfhhlAr\nP4r+vqxM8X2SM+e/md1LbQDet4iXelsbpmVCLT6mzS2zzBubHTaSua3O4qYtIGDt\n7KiKla/jo/WEcaIq1TkFvOPoFuwNtycxODHtBe7jPTk8cjnGehM3JDQdCRRtI2aa\nc8MXXFafkWNPgJo93+7OQd3EWb8bJ8Th62BB6gcRpAVExb314CUtjRydhwQW9Xoo\nAjhf1NhxpBdvnq3UJHJsGyS70dRAnKQuq6TIcBkVZ5Z5ExmemytI1aKQWhpFAule\nnJQQz75wxkGSvX8fW7q10tJOOmAfapM7Y14dv5FyHy0b0zvdYERXng7jTsJdrLdZ\n3g==\n-----END CERTIFICATE-----\n"
 	//gitguardian:ignore
-	mockKey         = "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCKnukHf/uDEtL8\ns9NOH6of64akqHckcRw89xxxxCNcWAdSM/0c5LrIEqkbbGtR0y9KTVzqv/CRSy4O\nMdSKxJ+hadHVn9ap8Q+zmrSnuRw4AHW+VodY+HVOIqZzTHXzINFWL2dih0fU7yL6\nVNH83BQZpAQUR667FwJuCBakl+cVuKHNk4ZYb/rTlB+pFKVhlJEkVagaizM7hbcF\nVTkF5IDoLg6C+TwuDFV85ncfAcLrdso/IAdr6k7geSw6Eh7vMcMeyap4Da6CTO44\naSNK2kuhHpP4DM5wEV0Xr1i43LyR0UdgSpD7xe4PlA1YaLqYMns2nJ8vzi5CngxK\nFihIZzBzAgMBAAECggEAB5uzNIsstcP5uo7wIRCR2NCngjAQ4fonT51MfV4DhtT6\nCeP6l3RiYArOJ0grF8GcjdpzKBtCy+axb2wCu18RV92j+7KbKJangvcRxUbeqqAz\n1i+PnC1+2rwCIL/olWCOvMk7RmggZCp/4/d10wgNPl8HLknE6FXZ90oQXBZOQ53a\n7LJPbBy2mf7n1vg50tKwNSeQ6Y3STpSYmDz4isKoE/9HyT7GXzYOdHmWJzzUCUkZ\npxeO/002y2PBZEJAUlHVnDDuZae2cXWASejXu7MDeWzwukSgj3/0FFKs6RTKyu/n\n6Ilowe5V55c5PjzY1968r1KPb5K9BjI89WWZ5OtfKQKBgQDAVgdNs9Jv6g6qMPYJ\nJdMtMDIpOxqoc+ImSBI3+MfEEFp5XQmpGYT0QiLDQdFwJ/loabWmNWMf7QM5kpL1\ngQtO+3Gb8RX/r89y8TvCncirK2UxN86RqpTGWVl9Cc42JTd7A7X3HECqf6iRYbxl\nn5Tp7JkmpvoxBaLg0Ctvei2abwKBgQC4gTXP2aCxyr1W3/PaAYBo4CfnRXIeJSns\nNIDLsUnMz1TqKNBbo7F3HLpDbWGf+bZAcOhqi9iqrGS9fSz9aAS5UFs3sXLM/HwT\ne3po0nOLgScw2HyqgdaUBPQyGh5DQjRkNTNcgADT1HKmEEnBUArqvwASZTsAX9YC\nAoY1Y07cPQKBgQCej01+FVzKvl5QmAR9Dh3GBxGTRBJ6BO7POGMsmX+2dvTfUIAC\nU/NzmoImDkCnAY1vMpZ561FIpJAgCmH02umDt261bE8CduHClHT7wDAKTMAjjypQ\nlBwKWOaZWlgR8ySF2U1N5pC4/nztPXGfJawSHOc1Ijrn5wmb5IGqaULnKQKBgHUc\nHonleuge5XtE/0T6+wSWcv2KyNp1gFybHr0rtMo5N47BhS8Fgdk29MtjnDmsiI/y\nmrM2PLpoXjEgSPQ3l/gAF0YMbe/Kuv6qu5HZMtnzimqonsijTQ367vz2MwtB9Hs+\ngXFPFjdee78IS6hWI/fIcEU81+xu6CmybHlqpV2JAoGARij6b/bWgWnEYzPsBHWS\nF4vH+x2uMXWeZrPYVtge8XBinCvPOX6QgsozKIEO2Bkh9H6i6FRa6m0PHXxud/Pg\nkeUy/jJ2vWdymqRVA21E7PWzUzHyvjY9JsviPVMx8aDW9wcGBvi7CAnKUphoIvmu\nbKhz9e1dN19sx1DIYrvDSGs=\n-----END PRIVATE KEY-----\n"
-	mockKeyPassword = "test"
-	caPath          = "./ca.pem"
-	certPath        = "./cert.pem"
-	keyPath         = "./key.pem"
+	mockKey  = "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDYPrxo0PJ7xy5J\n1c23yiU/r+XAcKZdCni3+BSgpP6PFlGpneQcMN/tcL3qd1V4/iJNv4+NTUBAaNSe\nJ+v4UegPjhKGbPpmoFHMDNuhYjb9jmaGG+jstTKI9KMSWateo7Otu1TljjsJT7Zp\nh74ZoOa+NLEEvjGYbPaBWQh+zRcKprIuAlVrcHcEvb0fv7Tq3Yv1+A7Uxr3yZPjE\nQ3LWxqxZ9TYL5Shr0JuLnHH1ktld+S+KR+VTFvj7KGKIByHsdYZr5ScWU/hwF9qg\nOAdR198zYd/fFTHEQOzRudgdOrMpghGgN0KcNw1RNRWt6h9nbJMpP5ropf9cM/zm\n36yiZtxNAgMBAAECggEAM2u3obUN9CEJAMW2hV2sPdi16WzgIn+69QQo44pYfe3w\nvUSuWYXFudB1WKvHx12nCpXirNcR0D8dT/5uPj470HcYMJ75bC3zRXJJR7bzHJgg\nCQPZ/2+W9Lo3jMWF2ptSvp0tMuj/YNdzqOR+b9mzBMfC0D3pzTUb6OYi/wQF1qId\nDrFjOgE1NrujJqJsqSiTDbveA/ipmPR5h4Ivm9ibHT70p07Yk1j2t+NKszLqws5R\nxRuPRCMNrlF8BFqCcWdl/T//AUQdwH4ffh+PoNZqrCNIIQ9dOxMC5h5X60Rt1Zgl\nmisjkW+NJ9+xyNt/BRVlEgq3Nw1QITDzNV0RpEJkgQKBgQDw6lCXLHsiy3ceOTIf\n5mBr0sH17fTSY1SlaJvXrq31Y03SNOr/nigVxFX8N912NRoSlYdEyArGN3PXXtA7\nA0g6cMs6ltURke7ghRva7ahTEsM+SMyL08gEs3gHBWtfz2t2EUaE8i1+0aOB3Vrt\nfgJGvjeVe6NrTP21oU0EH8bMRwKBgQDlyPn9qh8h5F3ZvO8KDROHU9pwKkIwqFPV\nQ4tdr5VyRIzQBjrRgayQA9NL2AfzXIAnrQrv7IVVsuXJW074lnxJzUUXDm0Llryw\nkvpOBwsWVgIs0UxbH4P6oSC7Yf0sBmiwz1KNW+yrBnQ+hB6SoAMZ1PTx8nSHuxZn\nO9fuZvYgywKBgBv8TCJTg3ZWRl8Xa9Ay1c6QrAFihAcQjNuuHDRg0UppH7gkd4v8\nFlH4/bgP0UUTBBVWk2EVD9NYy7cgB3Zjejd3tNP4g4XH+wTP0Z2L7/q+ejm5ATHZ\nByosouvF4GQ/1w7fEN8OtuQ9fA3w5cgi1Cbdn91YgHJNfkdkFms9Ob2vAoGATxpl\nvQZwmzlDea6J17ryqxaZzx0tFhUMbxFGi+TjHKgulXpfizoJzrYSajyfWA7S61Wt\nuzSAHiVs52lwgTFE7h8lFq/XqDKnGF4wnuXb0j+flhAjKgdqZsBLRVaRUjOOnLdy\nYslvatzY7aCL6cv95UmjXRsrNIKaTsWSKzb0qgsCgYALNEng4BEnezblkq10Scci\nPBi4QLKAxae7s22AVvVvD+Wk1dNA4N1cGJC4MKWDZNZrJn59QjWZ0NrEcICRdjuU\nWQ8OTkBq4a2wyEfH7lv6MAIZ8E36B3jP456HbjblgUtM+Xc1Vm9YI5gv2TMViYDw\n8XSCt63jIOxnyMT4aMgRgg==\n-----END PRIVATE KEY-----\n"
+	caPath   = "./ca.pem"
+	certPath = "./cert.pem"
+	keyPath  = "./key.pem"
 )
 
 func prepare(t *testing.T) {
@@ -67,7 +66,6 @@ func TestParseDSNfunctions(t *testing.T) {
 					Certificate: tlscommon.CertificateConfig{
 						Certificate: certPath,
 						Key:         keyPath,
-						Passphrase:  mockKeyPassword,
 					},
 				},
 			}
@@ -135,7 +133,6 @@ func TestParseDSNfunctions(t *testing.T) {
 					Certificate: tlscommon.CertificateConfig{
 						Certificate: certPath,
 						Key:         keyPath,
-						Passphrase:  mockKeyPassword,
 					},
 				},
 			}
@@ -144,7 +141,7 @@ func TestParseDSNfunctions(t *testing.T) {
 			hostData, err := postgresParseDSN(config, host)
 			require.NoError(t, err)
 
-			assert.Equal(t, "postgres://myuser:mypassword@localhost:5432/mydb?sslcert=.%2Fcert.pem&sslkey=.%2Fkey.pem&sslmode=verify-full&sslpassword=test&sslrootcert=.%2Fca.pem", hostData.URI)
+			assert.Equal(t, "postgres://myuser:mypassword@localhost:5432/mydb?sslcert=.%2Fcert.pem&sslkey=.%2Fkey.pem&sslmode=verify-full&sslrootcert=.%2Fca.pem", hostData.URI)
 			assert.Equal(t, "localhost:5432", hostData.SanitizedURI)
 			assert.Equal(t, "localhost:5432", hostData.Host)
 		})
@@ -279,6 +276,5 @@ func TestParseDSNfunctions(t *testing.T) {
 			assert.Equal(t, "(redacted)", hostData.SanitizedURI)
 			assert.Equal(t, "(redacted)", hostData.Host)
 		})
-
 	})
 }
