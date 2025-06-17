@@ -20,5 +20,3 @@
   # Client certificate key file
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Client certificate key password
-  #ssl.key_passphrase: "test_password"
