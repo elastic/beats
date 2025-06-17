@@ -73,6 +73,7 @@ func TestNewReceiver(t *testing.T) {
 		Receivers: []oteltest.ReceiverConfig{
 			{
 				Name:    "r1",
+				Beat:    "metricbeat",
 				Config:  &config,
 				Factory: NewFactory(),
 			},
@@ -178,11 +179,13 @@ func TestMultipleReceivers(t *testing.T) {
 		Receivers: []oteltest.ReceiverConfig{
 			{
 				Name:    "r1",
+				Beat:    "metricbeat",
 				Config:  &config1,
 				Factory: factory,
 			},
 			{
 				Name:    "r2",
+				Beat:    "metricbeat",
 				Config:  &config2,
 				Factory: factory,
 			},
