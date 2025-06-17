@@ -64,36 +64,33 @@ For a description of each field in the module, see the [exported fields](/refere
         with open(docs_path, 'w', encoding='utf_8') as f:
             f.write(module_file)
 
-        # TODO(@VihasMakwana): Uncomment following when all the asciidocs are converted to markdown
-        # As of now, this will not work and it will generate incomplete list.
+    module_list_output = """---
+mapped_pages:
+  - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html
+---
 
-#     module_list_output = """---
-# mapped_pages:
-#   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html
-# ---
+# Modules [filebeat-modules]
 
-# # Modules [filebeat-modules]
+This section contains an [overview](/reference/filebeat/filebeat-modules-overview.md) of the Filebeat modules feature as well as details about each of the currently supported modules.
 
-# This section contains an [overview](/reference/filebeat/filebeat-modules-overview.md) of the Filebeat modules feature as well as details about each of the currently supported modules.
+Filebeat modules require Elasticsearch 5.2 or later.
 
-# Filebeat modules require Elasticsearch 5.2 or later.
-
-# ::::{note}
-# While {{filebeat}} modules are still supported, we recommend {{agent}} integrations over {{filebeat}} modules. Integrations provide a streamlined way to connect data from a variety of vendors to the {{stack}}. Refer to the [full list of integrations](https://www.elastic.co/integrations/data-integrations). For more information, please refer to the [{{beats}} vs {{agent}} comparison documentation](docs-content://reference/fleet/index.md).
-# ::::
+::::{note}
+While {{filebeat}} modules are still supported, we recommend {{agent}} integrations over {{filebeat}} modules. Integrations provide a streamlined way to connect data from a variety of vendors to the {{stack}}. Refer to the [full list of integrations](https://www.elastic.co/integrations/data-integrations). For more information, please refer to the [{{beats}} vs {{agent}} comparison documentation](docs-content://reference/fleet/index.md).
+::::
 
 
-# * [*Modules overview*](/reference/filebeat/filebeat-modules-overview.md)
-# """
+* [*Modules overview*](/reference/filebeat/filebeat-modules-overview.md)
+"""
 
-#     for m, title in sorted(six.iteritems(modules_list)):
-#         module_list_output += "* [*{} module*](/reference/filebeat/filebeat-module-{}.md)\n".format(title.title(), m)
+    for m, title in sorted(six.iteritems(modules_list)):
+        module_list_output += "* [*{} module*](/reference/filebeat/filebeat-module-{}.md)\n".format(title.title(), m)
 
-#     module_list_output += "\n"
+    module_list_output += "\n"
 
-#     # Write module link list
-#     with open(os.path.join(os.path.abspath("../docs"), "reference/filebeat", "filebeat-modules.md"), 'w', encoding='utf_8') as f:
-#         f.write(module_list_output)
+    # Write module link list
+    with open(os.path.join(os.path.abspath("../docs"), "reference/filebeat", "filebeat-modules.md"), 'w', encoding='utf_8') as f:
+        f.write(module_list_output)
 
 
 if __name__ == "__main__":
