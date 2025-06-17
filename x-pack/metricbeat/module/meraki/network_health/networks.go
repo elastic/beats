@@ -55,14 +55,11 @@ func vpnPeerToMapStr(peer *sdk.ResponseItemApplianceGetOrganizationApplianceVpnS
 	}
 
 	if peer.UsageSummary != nil {
-		recv, err := strconv.Atoi(peer.UsageSummary.ReceivedInKilobytes)
-		sent, err := strconv.Atoi(peer.UsageSummary.SentInKilobytes)
-
-		if err == nil {
-			res["usage_summary"] = mapstr.M{
-				"received.kb": recv,
-				"sent.kb":     sent,
-			}
+		if recv, err := strconv.Atoi(peer.UsageSummary.ReceivedInKilobytes); err == nil {
+		    res["usage_summary.received.kb"] = recv
+		}
+		if sent, err := strconv.Atoi(peer.UsageSummary.SentInKilobytes); err == nil {
+		    res["usage_summary.sent.kb"] = sent
 		}
 
 	}
