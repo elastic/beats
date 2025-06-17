@@ -21,6 +21,11 @@
 package report
 
 import (
+	"context"
+
+	"github.com/shirou/gopsutil/v4/common"
+	psprocess "github.com/shirou/gopsutil/v4/process"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
@@ -31,14 +36,46 @@ func SetupLinuxBSDFDMetrics(logger *logp.Logger, reg *monitoring.Registry, proce
 }
 
 func FDUsageReporter(logger *logp.Logger, processStats *process.Stats) func(_ monitoring.Mode, V monitoring.Visitor) {
+	pid, err := process.GetSelfPid(processStats.Hostfs)
+	if err != nil {
+		logger.Error("Error while retrieving pid: %v", err)
+		return func(_ monitoring.Mode, V monitoring.Visitor) {
+			V.OnRegistryStart()
+			V.OnRegistryFinished()
+		}
+	}
+	p := psprocess.Process{
+		Pid: int32(pid),
+	}
+
+	ctx := context.Background()
+	if processStats != nil && processStats.Hostfs != nil && processStats.Hostfs.IsSet() {
+		ctx = context.WithValue(context.Background(), common.EnvKey, common.EnvMap{common.HostProcEnvKey: processStats.Hostfs.ResolveHostFS("")})
+	}
+
 	return func(_ monitoring.Mode, V monitoring.Visitor) {
 		V.OnRegistryStart()
 		defer V.OnRegistryFinished()
 
-		open, hardLimit, softLimit, err := getFDUsage(processStats)
+		open, err := p.NumFDsWithContext(ctx)
 		if err != nil {
-			logger.Error("Error while retrieving FD information: %v", err)
+			logger.Error("Error while retrieving open FDs information: %v", err)
 			return
+		}
+
+		stats, err := p.RlimitWithContext(ctx)
+		if err != nil {
+			logger.Error("Error while retrieving FD stats information: %v", err)
+			return
+		}
+
+		hardLimit := 0
+		softLimit := 0
+		for _, stat := range stats {
+			if stat.Resource == psprocess.RLIMIT_NOFILE {
+				hardLimit = int(stat.Hard)
+				softLimit = int(stat.Soft)
+			}
 		}
 
 		monitoring.ReportInt(V, "open", int64(open))
@@ -47,13 +84,4 @@ func FDUsageReporter(logger *logp.Logger, processStats *process.Stats) func(_ mo
 			monitoring.ReportInt(V, "soft", int64(softLimit))
 		})
 	}
-}
-
-func getFDUsage(processStats *process.Stats) (open, hardLimit, softLimit uint64, err error) {
-	state, err := processStats.GetSelf()
-	if err != nil {
-		return 0, 0, 0, err
-	}
-
-	return state.FD.Open.ValueOr(0), state.FD.Limit.Hard.ValueOr(0), state.FD.Limit.Soft.ValueOr(0), nil
 }
