@@ -78,33 +78,51 @@ func MemStatsReporter(logger *logp.Logger, processStats *process.Stats) func(mon
 }
 
 func InstanceCPUReporter(logger *logp.Logger, processStats *process.Stats) func(monitoring.Mode, monitoring.Visitor) {
+	pid, err := process.GetSelfPid(processStats.Hostfs)
+	if err != nil {
+		logger.Error("Error while retrieving pid: %v", err)
+		return nil
+	}
+	p := psprocess.Process{
+		Pid: int32(pid),
+	}
+
+	ctx := context.Background()
+	if processStats != nil && processStats.Hostfs != nil && processStats.Hostfs.IsSet() {
+		ctx = context.WithValue(context.Background(), common.EnvKey, common.EnvMap{common.HostProcEnvKey: processStats.Hostfs.ResolveHostFS("")})
+	}
+
 	return func(_ monitoring.Mode, V monitoring.Visitor) {
 		V.OnRegistryStart()
 		defer V.OnRegistryFinished()
 
-		state, err := processStats.GetSelf()
+		stat, err := p.TimesWithContext(ctx)
 		if err != nil {
 			logger.Errorf("Error retrieving CPU percentages: %v", err)
 			return
 		}
 
+		userMs := stat.User * 1000
+		sysMs := stat.System * 1000
+		totalMs := userMs + sysMs
+
 		monitoring.ReportNamespace(V, "user", func() {
-			monitoring.ReportInt(V, "ticks", int64(state.CPU.User.Ticks.ValueOr(0)))
+			monitoring.ReportInt(V, "ticks", int64(userMs))
 			monitoring.ReportNamespace(V, "time", func() {
-				monitoring.ReportInt(V, "ms", int64(state.CPU.User.Ticks.ValueOr(0)))
+				monitoring.ReportInt(V, "ms", int64(userMs))
 			})
 		})
 		monitoring.ReportNamespace(V, "system", func() {
-			monitoring.ReportInt(V, "ticks", int64(state.CPU.System.Ticks.ValueOr(0)))
+			monitoring.ReportInt(V, "ticks", int64(sysMs))
 			monitoring.ReportNamespace(V, "time", func() {
-				monitoring.ReportInt(V, "ms", int64(state.CPU.System.Ticks.ValueOr(0)))
+				monitoring.ReportInt(V, "ms", int64(sysMs))
 			})
 		})
 		monitoring.ReportNamespace(V, "total", func() {
-			monitoring.ReportFloat(V, "value", state.CPU.Total.Value.ValueOr(0))
-			monitoring.ReportInt(V, "ticks", int64(state.CPU.Total.Ticks.ValueOr(0)))
+			monitoring.ReportFloat(V, "value", totalMs)
+			monitoring.ReportInt(V, "ticks", int64(totalMs))
 			monitoring.ReportNamespace(V, "time", func() {
-				monitoring.ReportInt(V, "ms", int64(state.CPU.Total.Ticks.ValueOr(0)))
+				monitoring.ReportInt(V, "ms", int64(totalMs))
 			})
 		})
 	}
