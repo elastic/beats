@@ -318,8 +318,8 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	return nil
 }
 
-func (mb *Metricbeat) WithFactoryWrapper(factoryWrapper cfgfile.FactoryWrapper) {
-	mb.factoryWrapper = factoryWrapper
+func (bt *Metricbeat) WithFactoryWrapper(factoryWrapper cfgfile.FactoryWrapper) {
+	bt.factoryWrapper = factoryWrapper
 }
 
 // Stop signals to Metricbeat that it should stop. It closes the "done" channel
