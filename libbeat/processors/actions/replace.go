@@ -83,7 +83,7 @@ func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
 		err := f.replaceField(field.Field, field.Pattern, field.Replacement, event.Fields)
 		if err != nil {
 			errMsg := fmt.Errorf("Failed to replace fields in processor: %s", err)
-			logp.Debug("replace", errMsg.Error())
+			logp.Debug("replace", "%s", errMsg.Error())
 			if f.config.FailOnError {
 				event.Fields = backup
 				event.PutValue("error.message", errMsg.Error())
