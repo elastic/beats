@@ -5,7 +5,7 @@
   metricsets:
     - query
   period: 10s
-  hosts: ["postgres://postgres:mysecretpassword@pg.localhost:5432"]
+  hosts: ["postgres://postgres:mysecretpassword@localhost:5432"]
 
   driver: "postgres"
   sql_query: "select now()"

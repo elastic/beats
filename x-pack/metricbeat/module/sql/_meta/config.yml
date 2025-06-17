@@ -2,21 +2,23 @@
   metricsets:
     - query
   period: 10s
-  hosts: ["postgres://myuser:mypassword@localhost:5432/mydb?sslmode=disable"]
+  hosts: ["postgres://postgres:mysecretpassword@localhost:5432"]
 
   driver: "postgres"
   sql_query: "select now()"
   sql_response_format: table
 
   # Optional SSL/TLS. By default is false.
-  #ssl.enabled: true
+  # ssl.enabled: true
 
   # List of root certificates for SSL/TLS server verification
-  #ssl.certificate_authorities: ["/etc/pki/root/ca.crt"]
+  # ssl.certificate_authorities: ["/path/to/ca.pem"]
 
   # Certificate for SSL/TLS client authentication
-  #ssl.certificate: "/etc/pki/client/cert.crt"
+  # ssl.certificate: "/path/to/client-cert.pem"
 
   # Client certificate key file
-  #ssl.key: "/etc/pki/client/cert.key"
+  # ssl.key: "/path/to/client-key.pem"
 
+  # Controls the verification of server certificate
+  # ssl.verification_mode: full
