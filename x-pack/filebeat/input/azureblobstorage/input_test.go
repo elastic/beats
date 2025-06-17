@@ -36,6 +36,7 @@ const (
 	beatsNdJSONContainer        = "beatsndjsoncontainer"
 	beatsGzJSONContainer        = "beatsgzjsoncontainer"
 	beatsJSONWithArrayContainer = "beatsjsonwitharraycontainer"
+	beatsCSVContainer           = "beatscsvcontainer"
 )
 
 func Test_StorageClient(t *testing.T) {
@@ -471,6 +472,28 @@ func Test_StorageClient(t *testing.T) {
 				mock.Beatscontainer_2_blob_data3_json:  true,
 			},
 		},
+		{
+			name: "ReadCSV",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"decoding.codec.csv.enabled":          true,
+				"decoding.codec.csv.comma":            " ",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsCSVContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_csv[0]: true,
+				mock.BeatsFilesContainer_csv[1]: true,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -540,7 +563,7 @@ func Test_StorageClient(t *testing.T) {
 					var err error
 					val, err = got.Fields.GetValue("message")
 					assert.NoError(t, err)
-					assert.True(t, tt.expected[val.(string)])
+					assert.True(t, tt.expected[strings.ReplaceAll(val.(string), "\r\n", "\n")])
 					assert.Equal(t, tt.expectedError, err)
 					receivedCount += 1
 					if receivedCount == len(tt.expected) {
