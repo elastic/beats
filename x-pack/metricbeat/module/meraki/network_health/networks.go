@@ -7,10 +7,11 @@ package network_health
 import (
 	"strconv"
 
+	sdk "github.com/meraki/dashboard-api-go/v3/sdk"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/meraki"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	sdk "github.com/meraki/dashboard-api-go/v3/sdk"
 )
 
 // ID is the unique identifier for all networks
@@ -21,11 +22,6 @@ type Network struct {
 	id       ID
 	name     string
 	vpnPeers *[]sdk.ResponseItemApplianceGetOrganizationApplianceVpnStatsMerakiVpnpeers
-}
-
-type UsageSummary struct {
-	ReceivedInKilobytes *int
-	SentInKilobytes     *int
 }
 
 func reportNetworkMetrics(reporter mb.ReporterV2, organizationID string, networks map[ID]*Network) {
