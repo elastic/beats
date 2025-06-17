@@ -13,7 +13,6 @@ This document describes the fields that are exported by Metricbeat. They are gro
 * [*Aerospike fields*](/reference/metricbeat/exported-fields-aerospike.md)
 * [*Airflow fields*](/reference/metricbeat/exported-fields-airflow.md)
 * [*Apache fields*](/reference/metricbeat/exported-fields-apache.md)
-* [*AutoOps ES fields*](/reference/metricbeat/exported-fields-autoops_es.md)
 * [*AWS fields*](/reference/metricbeat/exported-fields-aws.md)
 * [*AWS Fargate fields*](/reference/metricbeat/exported-fields-awsfargate.md)
 * [*Azure fields*](/reference/metricbeat/exported-fields-azure.md)

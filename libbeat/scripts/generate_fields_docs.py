@@ -215,4 +215,3 @@ if __name__ == "__main__":
         fields = f.read()
 
     fields_to_asciidoc(fields, args.output_path, beat_title)
-

@@ -107,7 +107,3 @@ type: long
 format: duration
 
 
-## wmi [_wmi]
-
-wmi
-

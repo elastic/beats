@@ -1711,54 +1711,6 @@ type: integer
 type: integer
 
 
-## horizontalpodautoscaler [_horizontalpodautoscaler]
-
-kubernetes horizontalpodautoscaler metrics
-
-**`kubernetes.horizontalpodautoscaler.name`**
-:   The Kubernetes Horizontal Pod Autoscaler name
-
-type: keyword
-
-
-## replicas [_replicas]
-
-Kubernetes HPA replicas metrics
-
-**`kubernetes.horizontalpodautoscaler.replicas.max`**
-:   Kubernetes HPA maximum replicas from spec
-
-type: integer
-
-
-**`kubernetes.horizontalpodautoscaler.replicas.min`**
-:   Kubernetes HPA minimum replicas from spec
-
-type: integer
-
-
-**`kubernetes.horizontalpodautoscaler.replicas.current`**
-:   Kubernetes HPA current replicas from status
-
-type: integer
-
-
-**`kubernetes.horizontalpodautoscaler.replicas.desired`**
-:   Kubernetes HPA desired replicas from status
-
-type: integer
-
-
-## status [_status]
-
-Kubernetes HPA status metrics
-
-**`kubernetes.horizontalpodautoscaler.status.condition`**
-:   Kubernetes HPA scaling condition
-
-type: keyword
-
-
 ## job [_job]
 
 Kubernetes job metrics
