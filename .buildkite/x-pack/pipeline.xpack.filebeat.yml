@@ -181,7 +181,6 @@ steps:
               context: "x-pack/filebeat: Go Integration Tests"
 
       - label: ":ubuntu: x-pack/filebeat: OTel Go Integration Tests"
-        key: "x-pack-filebeat-mandatory-otel-int-test"
         command: |
           cd x-pack/filebeat
           mage otelIntegTest
