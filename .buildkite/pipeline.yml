@@ -697,3 +697,53 @@ steps:
     trigger: "beats-agent-serverless-tests"
     build:
       branch: "main"
+
+  - label: "Trigger DRA (SNAPSHOT)"
+    if: build.pull_request.id != null
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
+          watch:
+            - path:
+                - .go-version
+                - .buildkite/packaging.pipeline.yml
+                - .buildkite/pipeline.yml
+                - .buildkite/scripts/dra.sh
+                - .buildkite/scripts/packaging/
+                - dev-tools/packaging/
+              config:
+                trigger: "beats-packaging-pipeline"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                    - DRA_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - RUN_SNAPSHOT="true"
+
+  - label: "Trigger DRA 7.17 Elastic Agent (SNAPSHOT)"
+    if: build.pull_request.id != null && build.env('BUILDKITE_PULL_REQUEST_BASE_BRANCH') == "7.17")
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
+          watch:
+            - path:
+                - .go-version
+                - .buildkite/pipeline.yml
+                - .buildkite/x-pack/elastic-agent/
+                - dev-tools/packaging/
+              config:
+                trigger: "buildkite-elastic-agent-binary-dra-7-17"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                    - DRA_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - RUN_SNAPSHOT="true"
