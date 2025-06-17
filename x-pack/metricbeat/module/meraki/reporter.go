@@ -18,7 +18,11 @@ func ReportMetricsForOrganization(reporter mb.ReporterV2, organizationID string,
 		for _, metric := range metricSlice {
 			event := mb.Event{ModuleFields: mapstr.M{"organization_id": organizationID}}
 			if ts, ok := metric["@timestamp"]; ok {
-				t, err := time.Parse(time.RFC3339, ts.(string))
+			        tsVal, tsValOk := ts.(string)
+			        if !tsValOk {
+				        continue
+			        }
+			        t, err := time.Parse(time.RFC3339, tsVal)
 				if err == nil {
 					// if the timestamp parsing fails, we just fall back to the event time
 					// (and leave the additional timestamp in the event for posterity)
