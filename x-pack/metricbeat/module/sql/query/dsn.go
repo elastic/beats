@@ -158,6 +158,9 @@ func postgresParseDSN(config ConnectionDetails, host string) (mb.HostData, error
 				return mb.HostData{}, fmt.Errorf("postgres driver supports only certificate file path, got 'key' as PEM formatted certificate")
 			}
 			q.Set("sslkey", key)
+			if config.TLS.Certificate.Passphrase != "" {
+				q.Set("sslpassword", config.TLS.Certificate.Passphrase)
+			}
 		}
 
 		if cert := config.TLS.Certificate.Certificate; cert != "" {
