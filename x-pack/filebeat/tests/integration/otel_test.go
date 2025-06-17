@@ -8,6 +8,7 @@ package integration
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"net/http"
 	"os"
@@ -22,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
+	"github.com/elastic/go-elasticsearch/v7"
 )
 
 var beatsCfgFile = `
@@ -86,7 +88,19 @@ setup.template.pattern: logs-filebeat-default
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
 
-	es := integration.GetESClient(t, "http")
+	// prepare to query ES
+	esCfg := elasticsearch.Config{
+		Addresses: []string{"http://localhost:9200"},
+		Username:  "admin",
+		Password:  "testing",
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
+			},
+		},
+	}
+	es, err := elasticsearch.NewClient(esCfg)
+	require.NoError(t, err)
 
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
