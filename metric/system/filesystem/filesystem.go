@@ -121,6 +121,7 @@ func DefaultIgnoredTypes(sys resolve.Resolver) []string {
 	types := []string{}
 	fsListFile := sys.ResolveHostFS("/proc/filesystems")
 	if f, err := os.Open(fsListFile); err == nil {
+		defer f.Close()
 		scanner := bufio.NewScanner(f)
 		for scanner.Scan() {
 			line := strings.Fields(scanner.Text())
