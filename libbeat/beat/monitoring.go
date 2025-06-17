@@ -33,6 +33,10 @@ type Monitoring struct {
 	inputsRegistry *monitoring.Registry
 }
 
+// Returns a Monitoring struct that shadows the legacy global monitoring API,
+// which can be used within standalone beats to guarantee full interoperability
+// with components that are not yet migrated to report metrics via a
+// beat.Monitoring field.
 func NewGlobalMonitoring() Monitoring {
 	return Monitoring{
 		statsRegistry: monitoring.Default,
@@ -43,6 +47,10 @@ func NewGlobalMonitoring() Monitoring {
 	}
 }
 
+// Returns a new initialized Monitoring struct for use in a Beats Receiver
+// or in unit tests. Will not reflect metrics created through the legacy
+// global API (monitoring.Default, monitoring.GetNamespace, etc); for
+// full interoperability with the global API, use NewGlobalMonitoring.
 func NewMonitoring() Monitoring {
 	return Monitoring{
 		statsRegistry: monitoring.NewRegistry(),
