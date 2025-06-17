@@ -6,13 +6,14 @@ package azureblobstorage
 
 import (
 	"errors"
-	"reflect"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // MaxWorkers, Poll, PollInterval, FileSelectors, TimeStampEpoch & ExpandEventListFromField can
@@ -134,55 +135,22 @@ type OAuth2Config struct {
 	clientOptions azcore.ClientOptions
 }
 
-// isConfigEmpty checks if the provided configuration value is empty.
-// It uses reflection to determine if the value is empty based on its kind.
-func isConfigEmpty(value any) bool {
-	return isEmpty(reflect.ValueOf(value))
-}
-
-// isEmpty checks if a reflect.Value is empty.
-// It handles various types including pointers, slices, maps, structs, arrays, and basic types.
-// It returns true if the value is empty, false otherwise.
-func isEmpty(v reflect.Value) bool {
-	// Handles cases like reflect.ValueOf(nil) where nil is untyped,
-	// or an uninitialized interface variable.
-	if !v.IsValid() {
-		return true
+// getDefaultReaderConfig is a utility function that generates a default readerConfig state
+func getDefaultReaderConfig() readerConfig {
+	emptySource := make(map[string]interface{})
+	emptyConfig, err := conf.NewConfigFrom(emptySource)
+	if err != nil {
+		logp.Warn("error generating empty template config: %v, readerConfig will default to container level specifications", err)
+		return readerConfig{}
 	}
 
-	switch v.Kind() {
-	case reflect.Ptr, reflect.Interface:
-		// v.IsNil() checks if the pointer or interface is nil.
-		// If it is nil, we consider it empty and return.
-		if v.IsNil() {
-			return true
-		}
-		return isEmpty(v.Elem())
-
-	case reflect.Slice, reflect.Map:
-		return v.IsNil() || v.Len() == 0
-
-	case reflect.Struct:
-		// Recursively check each field.
-		for i := 0; i < v.NumField(); i++ {
-			if !isEmpty(v.Field(i)) {
-				return false
-			}
-		}
-		return true
-
-	case reflect.Array:
-		for i := 0; i < v.Len(); i++ {
-			if !isEmpty(v.Index(i)) {
-				return false
-			}
-		}
-		return true
-
-	// 'default:' handles basic types like int, string, bool, float, complex etc.
-	default:
-		return v.IsZero()
+	var defaultReaderConfig readerConfig
+	err = emptyConfig.Unpack(&defaultReaderConfig)
+	if err != nil {
+		logp.Warn("failed to unpack empty template config into defaultReaderConfig: %v, readerConfig will default to container level specifications", err)
+		return readerConfig{}
 	}
+	return defaultReaderConfig
 }
 
 func defaultConfig() config {

@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"reflect"
 	"time"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -127,10 +128,13 @@ func tryOverrideOrDefault(cfg config, c container) container {
 	if len(c.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
 		c.FileSelectors = cfg.FileSelectors
 	}
-	// If the container level ReaderConfig is empty, use the root level ReaderConfig
-	// Partial definition of ReaderConfig at both the root and container level
-	// is not allowed, it's an either or scenario.
-	if isConfigEmpty(c.ReaderConfig) {
+
+	// If the container level ReaderConfig matches the default config ReaderConfig state,
+	// use the global ReaderConfig. Matching the default ReaderConfig state
+	// means that the container level ReaderConfig is not set, and we should use the
+	// global ReaderConfig. Partial definition of ReaderConfig at both the global
+	// and container level is not supported, it's an either or scenario.
+	if reflect.DeepEqual(c.ReaderConfig, getDefaultReaderConfig()) {
 		c.ReaderConfig = cfg.ReaderConfig
 	}
 
