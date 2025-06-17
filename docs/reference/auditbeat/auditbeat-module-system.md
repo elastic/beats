@@ -193,7 +193,7 @@ auditbeat.modules:
 ```
 
 ## Datasets [_datasets]
-
+            
 The following datasets are available:
 
 * [host](/reference/auditbeat/auditbeat-dataset-system-host.md)
