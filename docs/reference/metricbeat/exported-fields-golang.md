@@ -3,12 +3,14 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-golang.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Golang fields [exported-fields-golang]
 
 Golang module
 
-
 ## golang [_golang]
+
 
 
 ## expvar [_expvar]
@@ -21,7 +23,6 @@ expvar
 type: keyword
 
 
-
 ## heap [_heap]
 
 The Go program heap information exposed by expvar.
@@ -32,11 +33,9 @@ The Go program heap information exposed by expvar.
 type: keyword
 
 
-
-## gc [_gc_2]
+## gc [_gc]
 
 Garbage collector summary.
-
 
 ## total_pause [_total_pause]
 
@@ -68,8 +67,7 @@ format: bytes
 type: float
 
 
-
-## pause [_pause_2]
+## pause [_pause]
 
 Last GC pause durations during the monitoring period.
 
@@ -77,7 +75,6 @@ Last GC pause durations during the monitoring period.
 :   Count of GC pause duration during this collect period.
 
 type: long
-
 
 
 ## sum [_sum]
@@ -90,7 +87,6 @@ Total GC pause duration during this collect period.
 type: long
 
 
-
 ## max [_max]
 
 Max GC pause duration during this collect period.
@@ -99,7 +95,6 @@ Max GC pause duration during this collect period.
 :   Duration in Ns.
 
 type: long
-
 
 
 ## avg [_avg]
@@ -112,8 +107,7 @@ Average GC pause duration during this collect period.
 type: long
 
 
-
-## system [_system_2]
+## system [_system]
 
 Heap summary,which bytes was obtained from system.
 
@@ -147,7 +141,6 @@ format: bytes
 type: long
 
 format: bytes
-
 
 
 ## allocations [_allocations]
