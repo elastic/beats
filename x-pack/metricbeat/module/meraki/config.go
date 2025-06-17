@@ -42,7 +42,7 @@ func (c *config) Validate() error {
 	// the reason for this is due to restrictions imposed by some dashboard API endpoints.
 	// for example, "/api/v1/organizations/{organizationId}/devices/uplinksLossAndLatency"
 	// has a maximum 'timespan' of 5 minutes.
-	if c.Period.Seconds() > 5 * time.Minute {
+	if c.Period > 5*time.Minute {
 		return fmt.Errorf("the maximum allowed collection period is 5 minutes (300s)")
 	}
 
