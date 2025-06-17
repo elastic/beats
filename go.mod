@@ -208,12 +208,7 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.22
 	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/prometheus v0.300.1
-<<<<<<< HEAD
-	github.com/shirou/gopsutil/v4 v4.25.3
-=======
 	github.com/shirou/gopsutil/v4 v4.25.4
-	github.com/teambition/rrule-go v1.8.2
->>>>>>> 65a45456c ([chore] Update otel collector version to v1.33.0/v0.127.0 (#44862))
 	github.com/tklauser/go-sysconf v0.3.12
 	github.com/xdg-go/scram v1.1.2
 	github.com/zyedidia/generic v1.2.1
@@ -231,12 +226,7 @@ require (
 	go.opentelemetry.io/collector/pdata v1.33.0
 	go.opentelemetry.io/collector/receiver v1.33.0
 	go.uber.org/mock v0.5.0
-<<<<<<< HEAD
-	golang.org/x/term v0.31.0
-=======
-	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f
 	golang.org/x/term v0.32.0
->>>>>>> 65a45456c ([chore] Update otel collector version to v1.33.0/v0.127.0 (#44862))
 	google.golang.org/genproto/googleapis/api v0.0.0-20250218202821-56aae31c358a
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
