@@ -13,8 +13,24 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+// defaultReaderConfig is a default readerConfig state that is used to evaluate
+// if the container level ReaderConfig is explicitly configured by the user or not.
+// If it is not configured, the container level ReaderConfig is ignored and the global
+// ReaderConfig is used instead.
+var defaultReaderConfig readerConfig
+
+// This init function initializes the defaultReaderConfig with the default values.
+// Since it runs only once during package initialization, we can afford to panic
+// if the configuration cannot be unpacked.
+// A panic here is unprecedented and indicates some unexpected system or library error.
+func init() {
+	err := conf.NewConfig().Unpack(&defaultReaderConfig)
+	if err != nil {
+		panic(err)
+	}
+}
 
 // MaxWorkers, Poll, PollInterval, FileSelectors, TimeStampEpoch & ExpandEventListFromField can
 // be configured at a global level, which applies to all containers. They can also be configured at individual container levels.
@@ -133,24 +149,6 @@ type OAuth2Config struct {
 	TenantID string `config:"tenant_id"`
 	// clientOptions is used internally for testing purposes only and should not be configured by users.
 	clientOptions azcore.ClientOptions
-}
-
-// getDefaultReaderConfig is a utility function that generates a default readerConfig state
-func getDefaultReaderConfig() readerConfig {
-	emptySource := make(map[string]interface{})
-	emptyConfig, err := conf.NewConfigFrom(emptySource)
-	if err != nil {
-		logp.Warn("error generating empty template config: %v, readerConfig will default to container level specifications", err)
-		return readerConfig{}
-	}
-
-	var defaultReaderConfig readerConfig
-	err = emptyConfig.Unpack(&defaultReaderConfig)
-	if err != nil {
-		logp.Warn("failed to unpack empty template config into defaultReaderConfig: %v, readerConfig will default to container level specifications", err)
-		return readerConfig{}
-	}
-	return defaultReaderConfig
 }
 
 func defaultConfig() config {

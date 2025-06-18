@@ -133,7 +133,7 @@ func tryOverrideOrDefault(cfg config, c container) container {
 	// means that the container level ReaderConfig is not set, and we should use the
 	// global ReaderConfig. Partial definition of ReaderConfig at both the global
 	// and container level is not supported, it's an either or scenario.
-	if reflect.DeepEqual(c.ReaderConfig, getDefaultReaderConfig()) {
+	if reflect.DeepEqual(c.ReaderConfig, defaultReaderConfig) {
 		c.ReaderConfig = cfg.ReaderConfig
 	}
 
