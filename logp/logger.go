@@ -71,6 +71,7 @@ func NewProductionLogger(selector string, options ...LogOption) (*Logger, error)
 
 // NewDevelopmentLogger returns a development suitable logp.Logger
 func NewDevelopmentLogger(selector string, options ...LogOption) (*Logger, error) {
+	options = append([]LogOption{zap.AddCallerSkip(1)}, options...)
 	log, err := zap.NewDevelopment(options...)
 	log = log.Named(selector)
 	if err != nil {
