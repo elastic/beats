@@ -104,6 +104,7 @@ func filteredSnapshot(
 type inputMetricsTable struct {
 	id    string
 	input string
+	path  string // The path of this input's registry under its root metrics registry
 	data  map[string]any
 }
 
@@ -113,15 +114,15 @@ type inputMetricsTable struct {
 func inputMetricsFromRegistry(registry *monitoring.Registry) map[string]inputMetricsTable {
 	metrics := monitoring.CollectStructSnapshot(registry, monitoring.Full, false)
 	result := map[string]inputMetricsTable{}
-	addInputMetrics(result, metrics)
+	addInputMetrics(result, metrics, nil)
 	return result
 }
 
 // A helper that iterates over the entries in "from" looking for
 // valid input metrics tables, adding them to "to", and recurses on
 // any that are tagged with InputNested.
-func addInputMetrics(to map[string]inputMetricsTable, from map[string]any) {
-	for _, value := range from {
+func addInputMetrics(to map[string]inputMetricsTable, from map[string]any, pathPrefix []string) {
+	for key, value := range from {
 		// A valid input metrics table must be a string-keyed map with string
 		// values for the "id" and "input" keys. An "input" value of InputNested
 		// indicates that this is a container input and only its child registries
@@ -141,13 +142,15 @@ func addInputMetrics(to map[string]inputMetricsTable, from map[string]any) {
 			continue
 		}
 
+		inputPath := append(pathPrefix, key)
 		if input == InputNested {
 			// Add the contents of this entry recursively
-			addInputMetrics(to, data)
+			addInputMetrics(to, data, inputPath)
 		} else {
 			to[id] = inputMetricsTable{
 				id:    id,
 				input: input,
+				path:  strings.Join(inputPath, "."),
 				data:  data,
 			}
 		}
