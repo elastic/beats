@@ -5,6 +5,8 @@
 
 == Azure module
 
+WARNING: This module is not available in FIPS-capable Filebeat.
+
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 The azure module retrieves different types of log data from Azure.
