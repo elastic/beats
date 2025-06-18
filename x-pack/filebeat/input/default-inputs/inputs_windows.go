@@ -13,7 +13,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/awscloudwatch"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/awss3"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureeventhub"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/benchmark"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cel"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cloudfoundry"
@@ -29,8 +28,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States, fips bool) []v2.Plugin {
-	plugins := []v2.Plugin{
+func commonPlugins(info beat.Info, log *logp.Logger, store statestore.States) []v2.Plugin {
+	return []v2.Plugin{
 		azureblobstorage.Plugin(log, store),
 		cel.Plugin(log, store),
 		cloudfoundry.Plugin(),
@@ -47,11 +46,4 @@ func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States, fips
 		salesforce.Plugin(log, store),
 		benchmark.Plugin(),
 	}
-
-	if !fips {
-		// Add any plugins that should only be included in non-FIPS builds here.
-		plugins = append(plugins, azureeventhub.Plugin(log))
-	}
-
-	return plugins
 }
