@@ -3,17 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-docker.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Docker fields [exported-fields-docker]
 
 Docker stats collected from Docker.
 
+## docker [_docker]
 
-## docker [_docker_4]
+Information and statistics about docker's running containers.
 
-Information and statistics about docker’s running containers.
-
-
-## container [_container_3]
+## container [_container]
 
 Docker container metrics.
 
@@ -41,7 +41,6 @@ type: keyword
 type: ip
 
 
-
 ## size [_size]
 
 Container size metrics.
@@ -64,8 +63,7 @@ type: long
 type: keyword
 
 
-
-## cpu [_cpu_5]
+## cpu [_cpu]
 
 Runtime CPU metrics.
 
@@ -173,13 +171,11 @@ format: percent
 type: object
 
 
-
-## diskio [_diskio_3]
+## diskio [_diskio]
 
 Disk I/O metrics.
 
-
-## read [_read_5]
+## read [_read]
 
 Accumulated reads during the life of the container
 
@@ -221,8 +217,7 @@ type: long
 type: long
 
 
-
-## write [_write_5]
+## write [_write]
 
 Accumulated writes during the life of the container
 
@@ -264,8 +259,7 @@ type: long
 type: long
 
 
-
-## summary [_summary_3]
+## summary [_summary]
 
 Accumulated reads and writes during the life of the container
 
@@ -307,7 +301,6 @@ type: long
 type: long
 
 
-
 ## event [_event]
 
 Docker event
@@ -342,7 +335,6 @@ type: keyword
 type: keyword
 
 
-
 ## actor [_actor]
 
 Actor
@@ -359,10 +351,10 @@ type: keyword
 type: object
 
 
-
 ## healthcheck [_healthcheck]
 
-Docker healthcheck metrics. Healthcheck data will only be available from docker containers where the docker `HEALTHCHECK` instruction has been used to build the docker image.
+Docker healthcheck metrics.
+Healthcheck data will only be available from docker containers where the docker `HEALTHCHECK` instruction has been used to build the docker image.
 
 **`docker.healthcheck.failingstreak`**
 :   concurent failed check
@@ -376,8 +368,7 @@ type: integer
 type: keyword
 
 
-
-## event [_event_2]
+## event [_event]
 
 event fields.
 
@@ -405,11 +396,9 @@ type: keyword
 type: integer
 
 
-
 ## image [_image]
 
 Docker image metrics.
-
 
 ## id [_id]
 
@@ -433,8 +422,7 @@ type: keyword
 type: date
 
 
-
-## size [_size_2]
+## size [_size]
 
 Image size layers.
 
@@ -462,11 +450,9 @@ type: object
 type: keyword
 
 
+## info [_info]
 
-## info [_info_4]
-
-Info metrics based on [https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information](https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information).
-
+Info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information.
 
 ## containers [_containers]
 
@@ -508,8 +494,7 @@ type: keyword
 type: long
 
 
-
-## memory [_memory_5]
+## memory [_memory]
 
 Memory metrics.
 
@@ -519,8 +504,7 @@ Memory metrics.
 type: object
 
 
-
-## commit [_commit_2]
+## commit [_commit]
 
 Committed bytes on Windows
 
@@ -562,8 +546,7 @@ type: long
 format: bytes
 
 
-
-## rss [_rss_2]
+## rss [_rss]
 
 RSS memory stats.
 
@@ -583,8 +566,7 @@ type: scaled_float
 format: percent
 
 
-
-## usage [_usage_13]
+## usage [_usage]
 
 Usage memory stats.
 
@@ -612,8 +594,7 @@ type: long
 format: bytes
 
 
-
-## network [_network_2]
+## network [_network]
 
 Network metrics.
 
@@ -621,7 +602,6 @@ Network metrics.
 :   Network interface name.
 
 type: keyword
-
 
 
 ## in [_in]
@@ -654,7 +634,6 @@ type: long
 type: long
 
 
-
 ## out [_out]
 
 Outgoing network stats per second.
@@ -683,7 +662,6 @@ type: long
 :   Outgoing packets per second.
 
 type: long
-
 
 
 ## inbound [_inbound]
@@ -716,7 +694,6 @@ type: long
 type: long
 
 
-
 ## outbound [_outbound]
 
 Outgoing network stats since the container started.
@@ -745,7 +722,6 @@ type: long
 :   Total number of outgoing packets.
 
 type: long
-
 
 
 ## network_summary [_network_summary]

@@ -3,15 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-vsphere.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # vSphere fields [exported-fields-vsphere]
 
 vSphere module
 
-
 ## vsphere [_vsphere]
 
 
-## cluster [_cluster_4]
+
+## cluster [_cluster]
 
 Cluster information.
 
@@ -79,7 +81,6 @@ type: keyword
 :   List of all the triggered alarms.
 
 type: object
-
 
 
 ## datastore [_datastore]
@@ -212,7 +213,6 @@ type: long
 format: bytes
 
 
-
 ## datastorecluster [_datastorecluster]
 
 Datastore Cluster
@@ -263,8 +263,7 @@ type: long
 type: object
 
 
-
-## host [_host_2]
+## host [_host]
 
 Host information from vSphere environment.
 
@@ -516,8 +515,7 @@ type: keyword
 type: long
 
 
-
-## network [_network_12]
+## network [_network]
 
 Network-related information.
 
@@ -585,7 +583,6 @@ type: long
 :   List of all the triggered alarms.
 
 type: object
-
 
 
 ## resourcepool [_resourcepool]
@@ -671,7 +668,7 @@ format: bytes
 
 
 **`vsphere.resourcepool.memory.swapped.bytes`**
-:   The portion of memory, in bytes, that is granted to a virtual machine from the host’s swap space.
+:   The portion of memory, in bytes, that is granted to a virtual machine from the host's swap space.
 
 type: long
 
@@ -740,7 +737,6 @@ type: keyword
 type: object
 
 
-
 ## virtualmachine [_virtualmachine]
 
 virtualmachine
@@ -793,6 +789,12 @@ type: long
 type: long
 
 
+**`vsphere.virtualmachine.cpu.usage.percent`**
+:   CPU usage as a percentage.
+
+type: scaled_float
+
+
 **`vsphere.virtualmachine.memory.used.guest.bytes`**
 :   Used memory of Guest in bytes.
 
@@ -823,6 +825,12 @@ format: bytes
 type: long
 
 format: bytes
+
+
+**`vsphere.virtualmachine.memory.usage.percent`**
+:   Memory usage as percent of total configured or available memory.
+
+type: scaled_float
 
 
 **`vsphere.virtualmachine.custom_fields`**
@@ -889,5 +897,35 @@ type: long
 :   List of all the triggered alarms.
 
 type: object
+
+
+**`vsphere.virtualmachine.disk.average.bytes`**
+:   Aggregated disk I/O rate.
+
+type: long
+
+
+**`vsphere.virtualmachine.disk.read.average.bytes`**
+:   Rate at which data is read from each virtual disk on the virtual machine.
+
+type: long
+
+
+**`vsphere.virtualmachine.disk.write.average.bytes`**
+:   Rate at which data is written to each virtual disk on the virtual machine.
+
+type: long
+
+
+**`vsphere.virtualmachine.disk.numberRead.count`**
+:   Number of times data was read.
+
+type: long
+
+
+**`vsphere.virtualmachine.disk.numberWrite.count`**
+:   Number of disk writes.
+
+type: long
 
 

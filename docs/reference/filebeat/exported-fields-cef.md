@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-cef.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Decode CEF processor fields fields [exported-fields-cef]
 
 Common Event Format (CEF) data.
-
 
 ## cef [_cef]
 
@@ -54,7 +55,6 @@ example: Very-High
 :   Short description of the event.
 
 type: keyword
-
 
 
 ## extensions [_extensions]
@@ -200,13 +200,13 @@ type: keyword
 
 
 **`cef.extensions.destinationGeoLatitude`**
-:   The latitudinal value from which the destination’s IP address belongs.
+:   The latitudinal value from which the destination's IP address belongs.
 
 type: double
 
 
 **`cef.extensions.destinationGeoLongitude`**
-:   The longitudinal value from which the destination’s IP address belongs.
+:   The longitudinal value from which the destination's IP address belongs.
 
 type: double
 
@@ -242,7 +242,7 @@ type: long
 
 
 **`cef.extensions.destinationProcessName`**
-:   The name of the event’s destination process.
+:   The name of the event's destination process.
 
 type: keyword
 
@@ -284,13 +284,13 @@ type: keyword
 
 
 **`cef.extensions.destinationUserName`**
-:   Identifies the destination user by name. This is the user associated with the event’s destination. Email addresses are often mapped into the UserName fields. The recipient is a candidate to put into this field.
+:   Identifies the destination user by name. This is the user associated with the event's destination. Email addresses are often mapped into the UserName fields. The recipient is a candidate to put into this field.
 
 type: keyword
 
 
 **`cef.extensions.destinationUserPrivileges`**
-:   The typical values are "Administrator", "User", and "Guest". This identifies the destination user’s privileges. In UNIX, for example, activity executed on the root user would be identified with destinationUser Privileges of "Administrator".
+:   The typical values are "Administrator", "User", and "Guest". This identifies the destination user's privileges. In UNIX, for example, activity executed on the root user would be identified with destinationUser Privileges of "Administrator".
 
 type: keyword
 
@@ -704,7 +704,7 @@ type: long
 
 
 **`cef.extensions.eventOutcome`**
-:   Displays the outcome, usually as *success* or *failure*.
+:   Displays the outcome, usually as 'success' or 'failure'.
 
 type: keyword
 
@@ -932,7 +932,7 @@ type: double
 
 
 **`cef.extensions.sourceHostName`**
-:   Identifies the source that an event refers to in an IP network. The format should be a fully qualified domain name (FQDN) associated with the source node, when a mode is available. Examples: *host* or *host.domain.com*.
+:   Identifies the source that an event refers to in an IP network. The format should be a fully qualified domain name (FQDN) associated with the source node, when a mode is available. Examples: 'host' or 'host.domain.com'.
 
 type: keyword
 
@@ -964,7 +964,7 @@ type: long
 
 
 **`cef.extensions.sourceProcessName`**
-:   The name of the event’s source process.
+:   The name of the event's source process.
 
 type: keyword
 
@@ -1012,7 +1012,7 @@ type: keyword
 
 
 **`cef.extensions.sourceUserPrivileges`**
-:   The typical values are "Administrator", "User", and "Guest". It identifies the source user’s privileges. In UNIX, for example, activity executed by the root user would be identified with "Administrator".
+:   The typical values are "Administrator", "User", and "Guest". It identifies the source user's privileges. In UNIX, for example, activity executed by the root user would be identified with "Administrator".
 
 type: keyword
 
@@ -1060,7 +1060,7 @@ type: keyword
 
 
 **`cef.extensions.categoryBehavior`**
-:   Action or a behavior associated with an event. It’s what is being done to the object.
+:   Action or a behavior associated with an event. It's what is being done to the object.
 
 type: keyword
 
