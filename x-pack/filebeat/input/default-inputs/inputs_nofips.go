@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package inputs
 
 import (
@@ -14,7 +16,7 @@ import (
 
 func Init(info beat.Info, log *logp.Logger, store statestore.States) []v2.Plugin {
 	return append(
-		xpackInputs(info, log, store),
+		xpackInputs(info, log, store, false),
 		ossinputs.Init(info, log, store)...,
 	)
 }
