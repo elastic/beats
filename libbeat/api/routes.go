@@ -83,9 +83,9 @@ func makeAPIHandler(ns *monitoring.Namespace) handlerFunc {
 func prettyPrint(w http.ResponseWriter, data common.MapStr, u *url.URL) {
 	query := u.Query()
 	if _, ok := query["pretty"]; ok {
-		fmt.Fprint(w, data.StringToPrint())
+		fmt.Fprintf(w, data.StringToPrint())
 	} else {
-		fmt.Fprint(w, data.String())
+		fmt.Fprintf(w, data.String())
 	}
 }
 

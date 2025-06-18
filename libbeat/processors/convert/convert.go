@@ -372,7 +372,7 @@ func newConvertError(conversion field, cause error, tag string, message string, 
 	}
 	buf.WriteString(" failed: ")
 	fmt.Fprintf(&buf, message, params...)
-	return errors.Wrap(cause, buf.String())
+	return errors.Wrapf(cause, buf.String())
 }
 
 // cloneValue returns a shallow copy of a map. All other types are passed
