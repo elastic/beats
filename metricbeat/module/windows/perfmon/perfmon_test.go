@@ -20,6 +20,7 @@
 package perfmon
 
 import (
+	"errors"
 	"strings"
 	"testing"
 	"time"
@@ -199,6 +200,9 @@ func TestIgnoreNonExistentCounter(t *testing.T) {
 		},
 	}
 	handle, err := NewReader(config, logp.NewLogger("test"))
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	values, err := handle.Read()
 
@@ -249,7 +253,7 @@ func TestLongOutputFormat(t *testing.T) {
 	}
 	assert.NotZero(t, len(path))
 	err = query.AddCounter(path[0], "", "long", false)
-	if err != nil && err != pdh.PDH_NO_MORE_DATA {
+	if err != nil && errors.Is(err, pdh.PDH_NO_MORE_DATA) {
 		t.Fatal(err)
 	}
 
@@ -332,7 +336,7 @@ func TestWildcardQuery(t *testing.T) {
 	}
 	defer handle.Close()
 
-	values, _ := handle.Read()
+	_, _ := handle.Read()
 
 	time.Sleep(time.Millisecond * 1000)
 
@@ -368,7 +372,7 @@ func TestWildcardQueryNoInstanceName(t *testing.T) {
 	}
 	defer handle.Close()
 
-	values, _ := handle.Read()
+	_, _ := handle.Read()
 
 	time.Sleep(time.Millisecond * 1000)
 
@@ -388,7 +392,11 @@ func TestWildcardQueryNoInstanceName(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		assert.False(t, strings.Contains(instance.(string), "*"))
+		instanceStr, err := instance.(string)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.False(t, strings.Contains(instanceStr, "*"))
 	}
 
 	t.Log(values)
@@ -419,7 +427,7 @@ func TestGroupByInstance(t *testing.T) {
 	}
 	defer handle.Close()
 
-	values, _ := handle.Read()
+	_, _ := handle.Read()
 
 	time.Sleep(time.Millisecond * 1000)
 

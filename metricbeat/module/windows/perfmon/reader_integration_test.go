@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -63,6 +63,9 @@ func TestNewReaderWithValidQueryPath(t *testing.T) {
 		},
 	}
 	reader, err := NewReader(config, logp.NewLogger("test"))
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer reader.Close()
 	assert.NoError(t, err)
 	assert.NotNil(t, reader)
