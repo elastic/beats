@@ -392,9 +392,9 @@ func TestWildcardQueryNoInstanceName(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		instanceStr, err := instance.(string)
-		if err != nil {
-			t.Fatal(err)
+		instanceStr, ok := instance.(string)
+		if !ok {
+			t.Fatal("unable to type-assert instance to string")
 		}
 		assert.False(t, strings.Contains(instanceStr, "*"))
 	}
