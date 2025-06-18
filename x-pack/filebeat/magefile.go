@@ -8,6 +8,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -163,9 +164,21 @@ func Update() {
 }
 
 func includeList() error {
+	// Generate include list for non-FIPS-capable artifact
 	options := devtools.DefaultIncludeListOptions()
 	options.ImportDirs = []string{"input/*", "processors/*"}
-	return devtools.GenerateIncludeListGo(options)
+	options.BuildTags = "\n//go:build !requirefips\n"
+
+	nonFIPSErr := devtools.GenerateIncludeListGo(options)
+
+	// Generate include list for FIPS-capable artifact
+	options.ModulesToExclude = []string{"module/azure"}
+	options.Outfile = "include/list_fips.go"
+	options.BuildTags = "\n//go:build requirefips\n"
+
+	fipsErr := devtools.GenerateIncludeListGo(options)
+
+	return errors.Join(nonFIPSErr, fipsErr)
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
