@@ -29,10 +29,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States) []v2.Plugin {
-	return []v2.Plugin{
+func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States, fips bool) []v2.Plugin {
+	plugins := []v2.Plugin{
 		azureblobstorage.Plugin(log, store),
-		azureeventhub.Plugin(log),
 		cel.Plugin(log, store),
 		cloudfoundry.Plugin(),
 		entityanalytics.Plugin(log),
@@ -48,4 +47,11 @@ func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States) []v2
 		salesforce.Plugin(log, store),
 		benchmark.Plugin(),
 	}
+
+	if !fips {
+		// Add any plugins that should only be included in non-FIPS builds here.
+		plugins = append(plugins, azureeventhub.Plugin(log))
+	}
+
+	return plugins
 }
