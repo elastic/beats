@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build aix
+
 package inputs
 
 import (
@@ -18,8 +20,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States, fips bool) []v2.Plugin {
-	plugins := []v2.Plugin{
+func commonPlugins(info beat.Info, log *logp.Logger, store statestore.States) []v2.Plugin {
+	return []v2.Plugin{
 		entityanalytics.Plugin(log),
 		http_endpoint.Plugin(),
 		httpjson.Plugin(log, store),
@@ -28,11 +30,4 @@ func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States, fips
 		lumberjack.Plugin(),
 		salesforce.Plugin(log, store),
 	}
-
-	if !fips {
-		// Add any plugins that should only be included in non-FIPS builds here.
-	}
-
-	return plugins
-
 }
