@@ -102,12 +102,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	metrics := netmetrics.NewUDP("udp", ctx.ID, s.Host, uint64(s.ReadBuffer), pollInterval, log) // #nosec G115 -- ignore "overflow conversion int64 -> uint64", config validation ensures value is always positive.
 	defer metrics.Close()
 
-<<<<<<< HEAD
-	server := udp.New(&s.config.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
-=======
 	server := udp.New(&s.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
-		log.Debugw("Data received", "bytes", len(data), "remote_address", metadata.RemoteAddr.String(), "truncated", metadata.Truncated)
->>>>>>> cbe3da935 (filebeat/input/udp: add fleet input status updating (#44785))
 		evt := beat.Event{
 			Timestamp: time.Now(),
 			Meta: mapstr.M{
