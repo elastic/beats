@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/stretchr/testify/assert"
 
@@ -150,7 +151,7 @@ func TestExistingCounter(t *testing.T) {
 			Name: "% Processor Time",
 		},
 	}
-	handle, err := NewReader(config)
+	handle, err := NewReader(config, logp.NewLogger("test"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -174,7 +175,7 @@ func TestNonExistingCounter(t *testing.T) {
 			Name: "% Processor Time time",
 		},
 	}
-	handle, err := NewReader(config)
+	handle, err := NewReader(config, logp.NewLogger("test"))
 	if assert.Error(t, err) {
 		assert.EqualValues(t, pdh.PDH_CSTATUS_NO_COUNTER, err)
 	}
@@ -197,7 +198,7 @@ func TestIgnoreNonExistentCounter(t *testing.T) {
 			Name: "% Processor Time time",
 		},
 	}
-	handle, err := NewReader(config)
+	handle, err := NewReader(config, logp.NewLogger("test"))
 
 	values, err := handle.Read()
 
@@ -224,7 +225,7 @@ func TestNonExistingObject(t *testing.T) {
 			Name: "% Processor Time",
 		},
 	}
-	handle, err := NewReader(config)
+	handle, err := NewReader(config, logp.NewLogger("test"))
 	if assert.Error(t, err) {
 		assert.EqualValues(t, pdh.PDH_CSTATUS_NO_OBJECT, err)
 	}
@@ -325,7 +326,7 @@ func TestWildcardQuery(t *testing.T) {
 			Name: "% Processor Time",
 		},
 	}
-	handle, err := NewReader(config)
+	handle, err := NewReader(config, logp.NewLogger("test"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -361,7 +362,7 @@ func TestWildcardQueryNoInstanceName(t *testing.T) {
 		},
 	}
 
-	handle, err := NewReader(config)
+	handle, err := NewReader(config, logp.NewLogger("test"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -412,7 +413,7 @@ func TestGroupByInstance(t *testing.T) {
 			Name: "% Privileged Time",
 		},
 	}
-	handle, err := NewReader(config)
+	handle, err := NewReader(config, logp.NewLogger("test"))
 	if err != nil {
 		t.Fatal(err)
 	}
