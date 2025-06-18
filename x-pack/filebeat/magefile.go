@@ -172,7 +172,7 @@ func includeList() error {
 	nonFIPSErr := devtools.GenerateIncludeListGo(options)
 
 	// Generate include list for FIPS-capable artifact
-	options.ModulesToExclude = []string{"module/azure"}
+	options.ModulesToExclude = []string{"module/azure", "module/o365"}
 	options.Outfile = "include/list_fips.go"
 	options.BuildTags = "\n//go:build requirefips\n"
 
