@@ -78,12 +78,10 @@ func newAsyncClient(
 		log.Warn(`The async Logstash client does not support the "ttl" option`)
 	}
 
-	enc := makeLogstashEventEncoder(log, beat, config.EscapeHTML, config.Index)
-
 	queueSize := config.Pipelining - 1
 	timeout := config.Timeout
 	compressLvl := config.CompressionLevel
-	clientFactory := makeClientFactory(queueSize, timeout, enc, compressLvl)
+	clientFactory := makeClientFactory(queueSize, timeout, compressLvl)
 
 	var err error
 	c.client, err = clientFactory(c.Client)
@@ -105,12 +103,11 @@ func newAsyncClient(
 func makeClientFactory(
 	queueSize int,
 	timeout time.Duration,
-	enc func(interface{}) ([]byte, error),
 	compressLvl int,
 ) func(net.Conn) (*v2.AsyncClient, error) {
 	return func(conn net.Conn) (*v2.AsyncClient, error) {
 		return v2.NewAsyncClientWithConn(conn, queueSize,
-			v2.JSONEncoder(enc),
+			v2.JSONEncoder(logstashEventUnwrapper),
 			v2.Timeout(timeout),
 			v2.CompressionLevel(compressLvl),
 		)
@@ -218,7 +215,7 @@ func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
 	}
 	window := make([]interface{}, len(events))
 	for i := range events {
-		window[i] = &events[i].Content
+		window[i] = events[i].EncodedEvent
 	}
 	ref.count.Add(1)
 
