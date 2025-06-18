@@ -18,7 +18,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Replace default Ubuntu-based images with UBI-minimal-based ones {pull}42150[42150]
 - Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
 - removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
-- Removed encryption from diskqueue V2 for fips compliance {issue}4534[4534]{pull}42848[42848]
 - The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
 - Allow faccessat(2) in seccomp. {pull}43322[43322]
 
@@ -324,7 +323,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add regex pattern matching to add_kubernetes_metadata processor {pull}41903[41903]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Publish cloud.availability_zone by add_cloud_metadata processor in azure environments {issue}42601[42601] {pull}43618[43618]
-- Disable sending telemetry to Microsoft when using their Go fork for producing FIPS-capable artifacts {pull}44865[44865]
 
 *Auditbeat*
 
