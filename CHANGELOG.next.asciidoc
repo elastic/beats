@@ -279,6 +279,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
+- Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group. {pull}44576[44576]
 - Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
 
 *Osquerybeat*
@@ -456,6 +457,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
 - Added support for specifying custom content-types and encodings in azureblobstorage input. {issue}44330[44330] {pull}44402[44402]
 - Introduce lastSync start position to AWS CloudWatch input backed by state registry. {pull}43251[43251]
+- Add Fleet status update functionality to udp input. {issue}44419[44419] {pull}44785[44785]
 - Add Fleet status update functionality to tcp input. {issue}44420[44420] {pull}44786[44786]
 - Filestream now logs at level warn the number of files that are too small to be ingested {pull}44751[44751]
 
@@ -531,7 +533,11 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add new metrics to vSphere Virtual Machine dataset (CPU usage percentage, disk average usage, disk read/write rate, number of disk reads/writes, memory usage percentage). {pull}44205[44205]
 - Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
 - Add latency config option to Azure Monitor module. {pull}44366[44366]
+<<<<<<< sql-ssl-support
 - Add SSL support for sql module: drivers mysql, postgres, and mssql. {pull}44748[44748]
+=======
+- Increase default polling period for MongoDB module from 10s to 60s {pull}44781[44781]
+>>>>>>> main
 
 *Metricbeat*
 
