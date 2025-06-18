@@ -340,7 +340,7 @@ func TestWildcardQuery(t *testing.T) {
 
 	time.Sleep(time.Millisecond * 1000)
 
-	values, err = handle.Read()
+	values, err := handle.Read()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -376,7 +376,7 @@ func TestWildcardQueryNoInstanceName(t *testing.T) {
 
 	time.Sleep(time.Millisecond * 1000)
 
-	values, err = handle.Read()
+	values, err := handle.Read()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -431,7 +431,7 @@ func TestGroupByInstance(t *testing.T) {
 
 	time.Sleep(time.Millisecond * 1000)
 
-	values, err = handle.Read()
+	values, err := handle.Read()
 	if err != nil {
 		t.Fatal(err)
 	}
