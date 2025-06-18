@@ -63,7 +63,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	for _, org := range m.organizations {
 		stats, err := getNetworkVPNStats(m.client, org, collectionPeriod)
 		if err != nil {
-			return fmt.Errorf("getDeviceStatuses failed; %w", err)
+			return fmt.Errorf("getNetworkVPNStats failed; %w", err)
 		}
 
 		networks := make(map[ID]*Network)
