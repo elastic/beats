@@ -253,7 +253,7 @@ func TestLongOutputFormat(t *testing.T) {
 	}
 	assert.NotZero(t, len(path))
 	err = query.AddCounter(path[0], "", "long", false)
-	if err != nil && errors.Is(err, pdh.PDH_NO_MORE_DATA) {
+	if err != nil && !errors.Is(err, pdh.PDH_NO_MORE_DATA) {
 		t.Fatal(err)
 	}
 
@@ -292,7 +292,7 @@ func TestFloatOutputFormat(t *testing.T) {
 	}
 	assert.NotZero(t, len(path))
 	err = query.AddCounter(path[0], "", "float", false)
-	if err != nil && err != pdh.PDH_NO_MORE_DATA {
+	if err != nil && !errors.Is(err, pdh.PDH_NO_MORE_DATA) {
 		t.Fatal(err)
 	}
 
@@ -336,7 +336,10 @@ func TestWildcardQuery(t *testing.T) {
 	}
 	defer handle.Close()
 
-	handle.Read()
+	_, err = handle.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	time.Sleep(time.Millisecond * 1000)
 
@@ -372,7 +375,10 @@ func TestWildcardQueryNoInstanceName(t *testing.T) {
 	}
 	defer handle.Close()
 
-	handle.Read()
+	_, err = handle.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	time.Sleep(time.Millisecond * 1000)
 
@@ -427,7 +433,10 @@ func TestGroupByInstance(t *testing.T) {
 	}
 	defer handle.Close()
 
-	handle.Read()
+	_, err = handle.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	time.Sleep(time.Millisecond * 1000)
 
