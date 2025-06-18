@@ -111,8 +111,3 @@ func (job Job) Assign(p *os.Process) error {
 
 	return nil
 }
-
-type process struct {
-	Pid    int
-	Handle uintptr
-}
