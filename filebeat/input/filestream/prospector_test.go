@@ -193,9 +193,9 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 		Fingerprint: mockFingerprint,
 	}
 
-	fingerprintIdentifier, _ := newFingerprintIdentifier(nil, logptest.NewTestingLogger(t, ""))
-	nativeIdentifier, _ := newINodeDeviceIdentifier(nil, logptest.NewTestingLogger(t, ""))
-	pathIdentifier, _ := newPathIdentifier(nil, logptest.NewTestingLogger(t, ""))
+	fingerprintIdentifier, _ := newFingerprintIdentifier(nil, nil)
+	nativeIdentifier, _ := newINodeDeviceIdentifier(nil, nil)
+	pathIdentifier, _ := newPathIdentifier(nil, nil)
 	newIDFunc := func(s loginp.Source) string {
 		return mockInputPrefix + "-" + s.Name()
 	}
@@ -834,13 +834,14 @@ func TestOnRenameFileIdentity(t *testing.T) {
 
 	for k, tc := range testCases {
 		t.Run(k, func(t *testing.T) {
+			logger := logptest.NewTestingLogger(t, "")
 			p := fileProspector{
-				logger:            logptest.NewTestingLogger(t, ""),
+				logger:            logger,
 				filewatcher:       newMockFileWatcher(tc.events, len(tc.events)),
 				identifier:        mustPathIdentifier(true),
 				stateChangeCloser: stateChangeCloserConfig{Renamed: true},
 			}
-			ctx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: context.Background()}
+			ctx := input.Context{Logger: logger, Cancelation: context.Background()}
 
 			path := "/new/path/to/file"
 			expectedIdentifier := tc.identifier
