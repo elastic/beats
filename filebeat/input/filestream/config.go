@@ -65,6 +65,10 @@ type takeOverConfig struct {
 type deleterConfig struct {
 	Enabled     bool          `config:"enabled"`
 	GracePeriod time.Duration `config:"grace_period"`
+
+	// configurable for testing
+	retries      int           `config:"-"`
+	retryBackoff time.Duration `config:"-"`
 }
 
 type deleterReasonConfig struct {
@@ -161,7 +165,9 @@ func defaultReaderConfig() readerConfig {
 
 func defaultDeleterConfig() deleterConfig {
 	return deleterConfig{
-		GracePeriod: 30 * time.Minute,
+		GracePeriod:  30 * time.Minute,
+		retries:      5,
+		retryBackoff: 2 * time.Second,
 	}
 }
 

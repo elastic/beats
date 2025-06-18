@@ -192,7 +192,7 @@ func (inp *filestream) Run(
 		}
 
 		if inp.deleterConfig.Enabled {
-			if err := inp.deleteFile(ctx, log, cursor, fs); err != nil {
+			if err := inp.deleteFile(ctx, log, cursor, fs.newPath); err != nil {
 				return fmt.Errorf("cannot remove file '%s': %w", fs.newPath, err)
 			}
 		}
@@ -209,7 +209,7 @@ func (inp *filestream) waitGracePeriod(
 	ctx input.Context,
 	logger *logp.Logger,
 	cursor loginp.Cursor,
-	fs fileSource,
+	path string,
 ) (bool, error) {
 	// Check if file grows during the grace period
 	// We know all events have been published because cursor.Finished is true,
@@ -217,7 +217,7 @@ func (inp *filestream) waitGracePeriod(
 	st := state{}
 	if err := cursor.Unpack(&st); err != nil {
 		return false, fmt.Errorf("cannot unpack cursor from '%s' to read offset: %w",
-			fs.newPath,
+			path,
 			err)
 	}
 
@@ -230,7 +230,7 @@ LOOP:
 		case <-ctx.Cancelation.Done():
 			return false, ctx.Cancelation.Err()
 		case <-checkIntervalTicker.C:
-			stat, err := os.Stat(fs.newPath)
+			stat, err := os.Stat(path)
 			if err != nil {
 				// If the file does not exist any more, return false
 				// (do not delete) and no error.
@@ -238,14 +238,14 @@ LOOP:
 					return false, nil
 				}
 				// Return the error and cause the harvester to close
-				return false, fmt.Errorf("cannot stat '%s': %w", fs.newPath, err)
+				return false, fmt.Errorf("cannot stat '%s': %w", path, err)
 			}
 
 			if stat.Size() != st.Offset {
 				// The file has changed, close the harvester
 				// without deleting the file
 				logger.Debugf("cancelling deletion of '%s', size has changed from %d to %d",
-					fs.newPath,
+					path,
 					st.Offset,
 					stat.Size())
 				return false, nil
@@ -255,7 +255,7 @@ LOOP:
 		}
 	}
 
-	stat, err := os.Stat(fs.newPath)
+	stat, err := os.Stat(path)
 	if err != nil {
 		// If the file does not exist any more, return false
 		// (do not delete) and no error.
@@ -263,13 +263,13 @@ LOOP:
 			return false, nil
 		}
 		// Return the error and cause the harvester to close
-		return false, fmt.Errorf("cannot stat '%s': %w", fs.newPath, err)
+		return false, fmt.Errorf("cannot stat '%s': %w", path, err)
 	}
 
 	// The file has been written to, close the harvester so the filewatcher
 	// can start a new one
 	if stat.Size() != st.Offset {
-		logger.Debugf("'%s' was updated, won't remove. Closing harvester", fs.newPath)
+		logger.Debugf("'%s' was updated, won't remove. Closing harvester", path)
 		return false, nil
 	}
 
@@ -280,7 +280,7 @@ func (inp *filestream) deleteFile(
 	ctx input.Context,
 	logger *logp.Logger,
 	cursor loginp.Cursor,
-	fs fileSource,
+	path string,
 ) error {
 	// Wait until the resource is finished.
 	// The resource is finished when all events are acknowledged by the output.
@@ -292,15 +292,15 @@ func (inp *filestream) deleteFile(
 		logger.Debugf(
 			"not all events from '%s' have been published, "+
 				"closing harvester",
-			fs.newPath)
+			path)
 		// normal operation of the harvester, the file was closed.
 		return nil
 	}
 	logger.Infof(
 		"all events from '%s' have been published, waiting for %s grace period",
-		fs.newPath, inp.deleterConfig.GracePeriod.String())
+		path, inp.deleterConfig.GracePeriod.String())
 
-	canRemove, err := inp.waitGracePeriod(ctx, logger, cursor, fs)
+	canRemove, err := inp.waitGracePeriod(ctx, logger, cursor, path)
 	if err != nil {
 		return err
 	}
@@ -309,19 +309,19 @@ func (inp *filestream) deleteFile(
 		return nil
 	}
 
-	if err := os.Remove(fs.newPath); err != nil {
+	if err := os.Remove(path); err != nil {
 		// The first try at removing the file failed,
 		// retry with a constant backoff
 		lastErr := err
 
-		ticker := time.NewTicker(2 * time.Second)
+		ticker := time.NewTicker(inp.deleterConfig.retryBackoff)
 		defer ticker.Stop()
 
 		retries := 0
-		for retries < 5 {
+		for retries < inp.deleterConfig.retries {
 			logger.Errorf(
 				"could not remove '%s', retrying in 2s. Error: %s",
-				fs.newPath,
+				path,
 				lastErr,
 			)
 
@@ -331,22 +331,30 @@ func (inp *filestream) deleteFile(
 
 			case <-ticker.C:
 				retries++
-				lastErr = os.Remove(fs.newPath)
-				if lastErr == nil {
-					logger.Infof("'%s' removed", fs.newPath)
+				err := os.Remove(path)
+				if err == nil {
+					logger.Infof("'%s' removed", path)
 					return nil
+				}
+				if err != nil {
+					if errors.Is(err, os.ErrNotExist) {
+						logger.Infof("'%s' was removed by an external process", path)
+						return nil
+					}
+
+					lastErr = err
 				}
 			}
 		}
 
 		return fmt.Errorf(
 			"cannot remove '%s' after %d retries. Last error: %w",
-			fs.newPath,
+			path,
 			retries,
 			lastErr)
 	}
 
-	logger.Infof("'%s' removed", fs.newPath)
+	logger.Infof("'%s' removed", path)
 
 	return nil
 }
