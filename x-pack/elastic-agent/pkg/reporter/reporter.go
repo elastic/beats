@@ -136,7 +136,7 @@ func generateRecord(agentID string, id string, name string, s state.State) event
 	}
 
 	err := errors.New(
-		errors.New(s.Message),
+		fmt.Errorf(s.Message),
 		fmt.Sprintf("Application: %s[%s]: State changed to %s", id, agentID, subTypeText),
 		errors.TypeApplication,
 		errors.M(errors.MetaKeyAppID, id),

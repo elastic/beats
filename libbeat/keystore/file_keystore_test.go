@@ -18,7 +18,6 @@
 package keystore
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -192,7 +191,7 @@ func TestCannotDecryptKeyStoreWithWrongPassword(t *testing.T) {
 	if assert.Error(t, err, "should fail to decrypt the keystore") {
 		m := `could not decrypt the keystore: could not decrypt keystore data: ` +
 			`cipher: message authentication failed`
-		assert.Equal(t, err, errors.New(m))
+		assert.Equal(t, err, fmt.Errorf(m))
 	}
 }
 

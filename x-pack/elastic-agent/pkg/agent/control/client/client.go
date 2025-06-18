@@ -7,7 +7,8 @@ package client
 import (
 	"context"
 	"encoding/json"
-	"errors"
+	"fmt"
+
 	"sync"
 	"time"
 
@@ -185,7 +186,7 @@ func (c *client) Restart(ctx context.Context) error {
 		return err
 	}
 	if res.Status == cproto.ActionStatus_FAILURE {
-		return errors.New(res.Error)
+		return fmt.Errorf(res.Error)
 	}
 	return nil
 }
@@ -202,7 +203,7 @@ func (c *client) Upgrade(ctx context.Context, version string, sourceURI string, 
 		return "", err
 	}
 	if res.Status == cproto.ActionStatus_FAILURE {
-		return "", errors.New(res.Error)
+		return "", fmt.Errorf(res.Error)
 	}
 	return res.Version, nil
 }

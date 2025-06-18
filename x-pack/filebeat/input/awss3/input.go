@@ -6,7 +6,6 @@ package awss3
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -252,7 +251,7 @@ func getRegionFromQueueURL(queueURL string, endpoint string) (string, error) {
 	// Example: https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs
 	url, err := url.Parse(queueURL)
 	if err != nil {
-		return "", errors.New(queueURL + " is not a valid URL")
+		return "", fmt.Errorf(queueURL + " is not a valid URL")
 	}
 	if url.Scheme == "https" && url.Host != "" {
 		queueHostSplit := strings.Split(url.Host, ".")
@@ -260,7 +259,7 @@ func getRegionFromQueueURL(queueURL string, endpoint string) (string, error) {
 			return queueHostSplit[1], nil
 		}
 	}
-	return "", errors.New("QueueURL is not in format: https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
+	return "", fmt.Errorf("QueueURL is not in format: https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
 }
 
 func getRegionForBucketARN(ctx context.Context, s3Client *s3.Client, bucketARN string) (string, error) {
