@@ -6,6 +6,7 @@ package ccm
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -116,7 +117,7 @@ func registerCloudConnectedCluster(cloudApiKey string, clusterInfo *utils.Cluste
 	}
 
 	requestURL := getCloudConnectedModeAPIURL() + "/api/v1/cloud-connected/clusters"
-	req, err := http.NewRequest("POST", requestURL, bytes.NewBuffer(jsonData)) //nolint:noctx // we do not want the context
+	req, err := http.NewRequestWithContext(context.Background(), "POST", requestURL, bytes.NewBuffer(jsonData))
 
 	if err != nil {
 		return fmt.Errorf("failed to create HTTP request for Cloud Connected Mode: %w", err)
