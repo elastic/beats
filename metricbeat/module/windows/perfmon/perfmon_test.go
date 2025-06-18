@@ -336,7 +336,7 @@ func TestWildcardQuery(t *testing.T) {
 	}
 	defer handle.Close()
 
-	_, _ := handle.Read()
+	handle.Read()
 
 	time.Sleep(time.Millisecond * 1000)
 
@@ -372,7 +372,7 @@ func TestWildcardQueryNoInstanceName(t *testing.T) {
 	}
 	defer handle.Close()
 
-	_, _ := handle.Read()
+	handle.Read()
 
 	time.Sleep(time.Millisecond * 1000)
 
@@ -427,7 +427,7 @@ func TestGroupByInstance(t *testing.T) {
 	}
 	defer handle.Close()
 
-	_, _ := handle.Read()
+	handle.Read()
 
 	time.Sleep(time.Millisecond * 1000)
 
