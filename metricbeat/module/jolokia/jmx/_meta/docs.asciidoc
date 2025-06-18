@@ -1,5 +1,5 @@
 The `jmx` metricset collects metrics from
-https://jolokia.org/reference/html/agents.html[Jolokia agents].
+https://jolokia.org/agent.html[Jolokia agents].
 
 [float]
 === Features and configuration
@@ -104,7 +104,7 @@ are not allowed.
 1. All Jolokia requests have `canonicalNaming` set to `false`. See the
 https://jolokia.org/reference/html/protocol.html[Jolokia Protocol] documentation
 for more detail about this parameter.
-2. If `http_method` is set to `GET`, then https://jolokia.org/reference/html/protocol.html#protocol-proxy[Proxy requests]
+2. If `http_method` is set to `GET`, then https://jolokia.org/reference/html/manual/jolokia_protocol.html[Proxy requests]
 are not allowed. Thus, setting a value to `target` section is going to fail with an error.
 
 [float]
