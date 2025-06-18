@@ -246,7 +246,6 @@ func (b *Broker) DescribeGroups(
 		for memberID, memberDescr := range descr.Members {
 			memberDescription, err := fromSaramaGroupMemberDescription(memberDescr)
 			if err != nil {
-				b.logger.Debugf("error converting member description: %v", err)
 				continue
 			}
 			members[memberID] = memberDescription

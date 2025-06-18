@@ -22,15 +22,10 @@ import (
 	"net"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/stretchr/testify/assert"
-<<<<<<< HEAD
-=======
-
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/sarama"
->>>>>>> 91de405ef ([metricbeat][kafka] fix panic when fetching consumergroup member assignments (#44576))
 )
 
 type dummyNet struct{}
