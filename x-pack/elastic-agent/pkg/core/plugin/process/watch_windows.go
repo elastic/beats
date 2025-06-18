@@ -11,6 +11,8 @@ import (
 	"os"
 	"syscall"
 	"time"
+
+	"golang.org/x/sys/windows"
 )
 
 const (
@@ -36,16 +38,17 @@ func (a *Application) externalProcess(proc *os.Process) {
 
 func isWindowsProcessExited(pid int) bool {
 	const desiredAccess = syscall.STANDARD_RIGHTS_READ | syscall.PROCESS_QUERY_INFORMATION | syscall.SYNCHRONIZE
-	h, err := syscall.OpenProcess(desiredAccess, false, uint32(pid))
+	h, err := windows.OpenProcess(desiredAccess, false, uint32(pid)) //nolint:gosec // G115 Conversion from int to uint32 is safe here.
 	if err != nil {
 		// failed to open handle, report exited
 		return true
 	}
+	defer windows.CloseHandle(h) //nolint:errcheck // No way to handle errors returned here so safe to ignore.
 
 	// get exit code, this returns immediately in case it is still running
 	// it returns exitCodeStillActive
 	var ec uint32
-	if err := syscall.GetExitCodeProcess(h, &ec); err != nil {
+	if err := windows.GetExitCodeProcess(h, &ec); err != nil {
 		// failed to contact, report exited
 		return true
 	}
