@@ -2,18 +2,5 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build !requirefips
-
+// Package compute_vm_scaleset is for the compute_vm_scaleset metricset of the Azure module.
 package compute_vm_scaleset
-
-import (
-	"os"
-
-	"github.com/elastic/beats/v7/metricbeat/mb"
-)
-
-func init() {
-	// To be moved to some kind of helper
-	os.Setenv("BEAT_STRICT_PERMS", "false")
-	mb.Registry.SetSecondarySource(mb.NewLightModulesSource("../../../module"))
-}

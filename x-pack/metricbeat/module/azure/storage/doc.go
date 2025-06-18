@@ -2,7 +2,5 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build !requirefips
-
-// Package azure is a Metricbeat module that contains MetricSets.
-package azure
+// Package storage is for the storage metricset of the Azure module.
+package storage
