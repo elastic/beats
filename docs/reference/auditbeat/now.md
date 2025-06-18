@@ -1,7 +1,7 @@
 ---
 navigation_title: "now"
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/filebeat/current/now.html
+  - https://www.elastic.co/guide/en/beats/auditbeat/current/now.html
 ---
 
 # Now [now]
