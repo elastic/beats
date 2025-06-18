@@ -15,9 +15,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 	"github.com/elastic/elastic-agent-libs/version"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestRegisterCloudConnectedCluster(t *testing.T) {

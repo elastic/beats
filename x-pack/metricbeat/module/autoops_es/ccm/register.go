@@ -116,7 +116,7 @@ func registerCloudConnectedCluster(cloudApiKey string, clusterInfo *utils.Cluste
 	}
 
 	requestURL := getCloudConnectedModeAPIURL() + "/api/v1/cloud-connected/clusters"
-	req, err := http.NewRequest("POST", requestURL, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", requestURL, bytes.NewBuffer(jsonData)) //nolint:noctx
 
 	if err != nil {
 		return fmt.Errorf("failed to create HTTP request for Cloud Connected Mode: %w", err)
@@ -126,7 +126,7 @@ func registerCloudConnectedCluster(cloudApiKey string, clusterInfo *utils.Cluste
 	req.Header.Set("Authorization", "ApiKey "+cloudApiKey)
 	req.Header.Set("Content-Type", "application/json")
 
-	data, err := utils.HandleHTTPResponse[cloudConnectedResource](http.DefaultClient.Do(req))
+	data, err := utils.HandleHTTPResponse[cloudConnectedResource](http.DefaultClient.Do(req)) //nolint:bodyclose
 
 	if err == nil {
 		utils.SetResourceID(data.ID)
