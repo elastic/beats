@@ -750,4 +750,4 @@ steps:
                     - DRA_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - RUN_SNAPSHOT=true
                     - ELASTIC_SLACK_NOTIFICATIONS_ENABLED=false
-                    - DRY_RUN=true
+                    - DRA_DRY_RUN=true
