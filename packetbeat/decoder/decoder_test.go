@@ -212,7 +212,7 @@ func newTestDecoder(t *testing.T) (*Decoder, *TestTCPProcessor, *TestUDPProcesso
 	icmp6Layer := &TestIcmp6Processor{}
 	tcpLayer := &TestTCPProcessor{}
 	udpLayer := &TestUDPProcessor{}
-	d, err := New(nil, layers.LinkTypeEthernet, icmp4Layer, icmp6Layer, tcpLayer, udpLayer)
+	d, err := New(nil, layers.LinkTypeEthernet, icmp4Layer, icmp6Layer, tcpLayer, udpLayer, false)
 	if err != nil {
 		t.Fatalf("Error creating decoder %v", err)
 	}
