@@ -270,6 +270,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
 - Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
 - Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices {pull}43637[43637]
+- Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group. {pull}44576[44576]
 - Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
 
 *Osquerybeat*
