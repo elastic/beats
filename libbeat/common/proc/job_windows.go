@@ -21,6 +21,7 @@
 package proc
 
 import (
+	"fmt"
 	"os"
 	"unsafe"
 
@@ -90,9 +91,25 @@ func (job Job) Assign(p *os.Process) error {
 	if job == 0 || p == nil {
 		return nil
 	}
-	return windows.AssignProcessToJobObject(
-		windows.Handle(job),
-		windows.Handle((*process)(unsafe.Pointer(p)).Handle))
+
+	// To assign a process to a job, you need a handle to the process. Since os.Process provides no
+	// way to obtain it's underlying handle safely, get one with OpenProcess().
+	//   https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-openprocess
+	// This requires at least the PROCESS_SET_QUOTA and PROCESS_TERMINATE access rights.
+	//   https://learn.microsoft.com/en-us/windows/win32/api/jobapi2/nf-jobapi2-assignprocesstojobobject
+	desiredAccess := uint32(windows.PROCESS_SET_QUOTA | windows.PROCESS_TERMINATE)
+	processHandle, err := windows.OpenProcess(desiredAccess, false, uint32(p.Pid)) //nolint:gosec // G115 Conversion from int to uint32 is safe here.
+	if err != nil {
+		return fmt.Errorf("opening process handle: %w", err)
+	}
+	defer windows.CloseHandle(processHandle) //nolint:errcheck // No way to handle errors returned here so safe to ignore.
+
+	err = windows.AssignProcessToJobObject(windows.Handle(job), processHandle)
+	if err != nil {
+		return fmt.Errorf("assigning to job object: %w", err)
+	}
+
+	return nil
 }
 
 type process struct {
