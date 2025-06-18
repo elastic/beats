@@ -68,7 +68,7 @@ func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Regi
 	// We use a helper here instead of just reading the field directly because
 	// this call might be coming from a nested input that already has a registry
 	// that isn't at the top-level.
-	reg = findInputRegistryWithID(parentRegistry, registryID)
+	reg = findInputRegistryWithID(parentRegistry, inputID)
 	if reg == nil {
 		reg = parentRegistry.NewRegistry(registryID)
 	} else {
