@@ -18,7 +18,6 @@
 package filesystem
 
 import (
-	"os"
 	"runtime"
 	"testing"
 
@@ -30,9 +29,6 @@ import (
 
 func TestFileSystemList(t *testing.T) {
 	_ = logp.DevelopmentSetup()
-	if runtime.GOOS == "darwin" && os.Getenv("TRAVIS") == "true" {
-		t.Skip("FileSystem test fails on Travis/OSX with i/o error")
-	}
 	skipTypes := []string{"cdrom", "tracefs", "overlay", "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs", "vmhgfs"}
 	hostfs := systemtests.DockerTestResolver()
 	//Exclude FS types that will give us a permission error
