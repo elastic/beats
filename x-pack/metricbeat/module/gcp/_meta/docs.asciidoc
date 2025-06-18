@@ -48,6 +48,11 @@ user-defined labels from Dataproc clusters.
 * *metadata_cache*: (`true`/`false` default `false`) Enable caching of metadata.
 If set to true, metadata will be cached to improve performance.
 
+* *metadata_cache*: (`true`/`false` default `true`) Enable caching of metadata.
+If set to true, metadata will be cached to improve performance. If set to `false`,
+metadata caching will be disabled. By default, caching is enabled even if this
+option is not explicitly set.
+
 * *metadata_cache_refresh_period*: A duration specifying how often the cached
 metadata should be refreshed (e.g., `5m`, `1h`).
 
