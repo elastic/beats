@@ -70,7 +70,7 @@ func HandleHTTPResponse[T any](resp *http.Response, err error) (*T, error) {
 func FetchAPIData[T any](m *elasticsearch.MetricSet, path string) (*T, error) {
 	m.SetServiceURI(path)
 
-	return HandleHTTPResponse[T](m.FetchResponse()) //nolint:bodyclose
+	return HandleHTTPResponse[T](m.FetchResponse()) //nolint:bodyclose // the handler closes the body
 }
 
 // Deserialize the data to match the expected type, T. Note that success does not mean that fields are populated, which requires a schema
