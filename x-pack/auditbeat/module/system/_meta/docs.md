@@ -1,12 +1,3 @@
----
-mapped_pages:
-  - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-module-system.html
----
-
-% This file is generated! See scripts/docs_collector.py
-
-# System Module [auditbeat-module-system]
-
 ::::{warning}
 This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
 ::::
@@ -154,50 +145,3 @@ On the other hand, host and user information is unlikely to change frequently, s
     - socket
   period: 1s
 ```
-
-## Example configuration [_example_configuration]
-
-The System module supports the common configuration options that are described under [configuring Auditbeat](/reference/auditbeat/configuration-auditbeat.md). Here is an example configuration:
-
-```yaml
-auditbeat.modules:
-- module: system
-  datasets:
-    - package # Installed, updated, and removed packages
-
-  period: 2m # The frequency at which the datasets check for changes
-
-- module: system
-  datasets:
-    - host    # General host information, e.g. uptime, IPs
-    - login   # User logins, logouts, and system boots.
-    - process # Started and stopped processes
-    - socket  # Opened and closed sockets
-    - user    # User information
-
-  # How often datasets send state updates with the
-  # current state of the system (e.g. all currently
-  # running processes, all open sockets).
-  state.period: 12h
-
-  # Enabled by default. Auditbeat will read password fields in
-  # /etc/passwd and /etc/shadow and store a hash locally to
-  # detect any changes.
-  user.detect_password_changes: true
-
-  # File patterns of the login record files.
-  login.wtmp_file_pattern: /var/log/wtmp*
-  login.btmp_file_pattern: /var/log/btmp*
-```
-
-## Datasets [_datasets]
-            
-The following datasets are available:
-
-* [host](/reference/auditbeat/auditbeat-dataset-system-host.md)
-* [login](/reference/auditbeat/auditbeat-dataset-system-login.md)
-* [package](/reference/auditbeat/auditbeat-dataset-system-package.md)
-* [process](/reference/auditbeat/auditbeat-dataset-system-process.md)
-* [socket](/reference/auditbeat/auditbeat-dataset-system-socket.md)
-* [user](/reference/auditbeat/auditbeat-dataset-system-user.md)
-
