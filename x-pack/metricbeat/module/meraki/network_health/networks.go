@@ -56,10 +56,10 @@ func vpnPeerToMapStr(peer *sdk.ResponseItemApplianceGetOrganizationApplianceVpnS
 
 	if peer.UsageSummary != nil {
 		if recv, err := strconv.Atoi(peer.UsageSummary.ReceivedInKilobytes); err == nil {
-		    res["usage_summary.received.kb"] = recv
+			res["usage_summary.received.kb"] = recv
 		}
 		if sent, err := strconv.Atoi(peer.UsageSummary.SentInKilobytes); err == nil {
-		    res["usage_summary.sent.kb"] = sent
+			res["usage_summary.sent.kb"] = sent
 		}
 
 	}
