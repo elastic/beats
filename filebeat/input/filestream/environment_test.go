@@ -43,15 +43,24 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
 )
 
 type inputTestingEnvironment struct {
+<<<<<<< HEAD
 	t          *testing.T
 	workingDir string
 	stateStore statestore.States
 	pipeline   *mockPipelineConnector
+=======
+	logger       *logp.Logger
+	loggerBuffer *bytes.Buffer
+	t            *testing.T
+	workingDir   string
+	stateStore   statestore.States
+	pipeline     *mockPipelineConnector
+	monitoring   beat.Monitoring
+>>>>>>> 1b1a4c6f8 (Provide a consistent non-global metrics API to beats and beat receivers (#44452))
 
 	pluginInitOnce sync.Once
 	plugin         v2.Plugin
@@ -85,10 +94,20 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 	})
 
 	return &inputTestingEnvironment{
+<<<<<<< HEAD
 		t:          t,
 		workingDir: t.TempDir(),
 		stateStore: openTestStatestore(),
 		pipeline:   &mockPipelineConnector{},
+=======
+		logger:       logger,
+		loggerBuffer: buff,
+		t:            t,
+		workingDir:   t.TempDir(),
+		stateStore:   openTestStatestore(),
+		pipeline:     &mockPipelineConnector{},
+		monitoring:   beat.NewMonitoring(),
+>>>>>>> 1b1a4c6f8 (Provide a consistent non-global metrics API to beats and beat receivers (#44452))
 	}
 }
 
@@ -131,6 +150,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 		defer wg.Done()
 		defer func() { _ = grp.Stop() }()
 
+<<<<<<< HEAD
 		info := beat.Info{Monitoring: beat.Monitoring{
 			Namespace: monitoring.GetNamespace("dataset")},
 		}
@@ -138,12 +158,18 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logp.L())
 		defer inputmon.CancelMetricsRegistry(
 			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logp.L())
+=======
+		logger, _ := logp.NewDevelopmentLogger("")
+		reg := inputmon.NewMetricsRegistry(
+			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
+		defer inputmon.CancelMetricsRegistry(
+			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
+>>>>>>> 1b1a4c6f8 (Provide a consistent non-global metrics API to beats and beat receivers (#44452))
 
 		inputCtx := v2.Context{
 			ID:              id,
 			IDWithoutName:   id,
 			Name:            inp.Name(),
-			Agent:           info,
 			Cancelation:     ctx,
 			StatusReporter:  nil,
 			MetricsRegistry: reg,

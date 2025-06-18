@@ -52,7 +52,7 @@ func TestMakeReporter(t *testing.T) {
 
 	logger := logptest.NewTestingLogger(t, "")
 
-	r, err := makeReporter(beat.Info{Logger: logger}, report.Settings{}, c)
+	r, err := makeReporter(beat.Info{Logger: logger}, beat.NewMonitoring(), report.Settings{}, c)
 	require.NoError(t, err)
 	r.Stop()
 }
