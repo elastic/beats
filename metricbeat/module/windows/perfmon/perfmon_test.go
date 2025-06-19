@@ -20,11 +20,13 @@
 package perfmon
 
 import (
+	"errors"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/stretchr/testify/assert"
 
@@ -150,7 +152,7 @@ func TestExistingCounter(t *testing.T) {
 			Name: "% Processor Time",
 		},
 	}
-	handle, err := NewReader(config)
+	handle, err := NewReader(config, logp.NewLogger("test"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -174,7 +176,7 @@ func TestNonExistingCounter(t *testing.T) {
 			Name: "% Processor Time time",
 		},
 	}
-	handle, err := NewReader(config)
+	handle, err := NewReader(config, logp.NewLogger("test"))
 	if assert.Error(t, err) {
 		assert.EqualValues(t, pdh.PDH_CSTATUS_NO_COUNTER, err)
 	}
@@ -197,7 +199,10 @@ func TestIgnoreNonExistentCounter(t *testing.T) {
 			Name: "% Processor Time time",
 		},
 	}
-	handle, err := NewReader(config)
+	handle, err := NewReader(config, logp.NewLogger("test"))
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	values, err := handle.Read()
 
@@ -224,7 +229,7 @@ func TestNonExistingObject(t *testing.T) {
 			Name: "% Processor Time",
 		},
 	}
-	handle, err := NewReader(config)
+	handle, err := NewReader(config, logp.NewLogger("test"))
 	if assert.Error(t, err) {
 		assert.EqualValues(t, pdh.PDH_CSTATUS_NO_OBJECT, err)
 	}
@@ -248,7 +253,7 @@ func TestLongOutputFormat(t *testing.T) {
 	}
 	assert.NotZero(t, len(path))
 	err = query.AddCounter(path[0], "", "long", false)
-	if err != nil && err != pdh.PDH_NO_MORE_DATA {
+	if err != nil && !errors.Is(err, pdh.PDH_NO_MORE_DATA) {
 		t.Fatal(err)
 	}
 
@@ -287,7 +292,7 @@ func TestFloatOutputFormat(t *testing.T) {
 	}
 	assert.NotZero(t, len(path))
 	err = query.AddCounter(path[0], "", "float", false)
-	if err != nil && err != pdh.PDH_NO_MORE_DATA {
+	if err != nil && !errors.Is(err, pdh.PDH_NO_MORE_DATA) {
 		t.Fatal(err)
 	}
 
@@ -325,17 +330,20 @@ func TestWildcardQuery(t *testing.T) {
 			Name: "% Processor Time",
 		},
 	}
-	handle, err := NewReader(config)
+	handle, err := NewReader(config, logp.NewLogger("test"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer handle.Close()
 
-	values, _ := handle.Read()
+	_, err = handle.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	time.Sleep(time.Millisecond * 1000)
 
-	values, err = handle.Read()
+	values, err := handle.Read()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -361,17 +369,20 @@ func TestWildcardQueryNoInstanceName(t *testing.T) {
 		},
 	}
 
-	handle, err := NewReader(config)
+	handle, err := NewReader(config, logp.NewLogger("test"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer handle.Close()
 
-	values, _ := handle.Read()
+	_, err = handle.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	time.Sleep(time.Millisecond * 1000)
 
-	values, err = handle.Read()
+	values, err := handle.Read()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -387,7 +398,11 @@ func TestWildcardQueryNoInstanceName(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		assert.False(t, strings.Contains(instance.(string), "*"))
+		instanceStr, ok := instance.(string)
+		if !ok {
+			t.Fatal("unable to type-assert instance to string")
+		}
+		assert.False(t, strings.Contains(instanceStr, "*"))
 	}
 
 	t.Log(values)
@@ -412,17 +427,20 @@ func TestGroupByInstance(t *testing.T) {
 			Name: "% Privileged Time",
 		},
 	}
-	handle, err := NewReader(config)
+	handle, err := NewReader(config, logp.NewLogger("test"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer handle.Close()
 
-	values, _ := handle.Read()
+	_, err = handle.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	time.Sleep(time.Millisecond * 1000)
 
-	values, err = handle.Read()
+	values, err := handle.Read()
 	if err != nil {
 		t.Fatal(err)
 	}
