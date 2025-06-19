@@ -336,7 +336,7 @@ This options specific which URL path to accept requests on. Defaults to `/`
 [float]
 ==== `prefix`
 
-This option specifies which prefix the incoming request will be mapped to. If `prefix` is "`.`", the request will be mapped to the root of the resulting document.
+This option specifies which prefix the incoming request will be mapped to. If `prefix` is "`.`", the request will be mapped to the root of the resulting document. The default prefix is "json".
 
 [float]
 ==== `include_headers`
