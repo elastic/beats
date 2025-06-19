@@ -17,14 +17,10 @@ import (
 
 // defaultReaderConfig is a default readerConfig state that is used to evaluate
 // if the container level ReaderConfig is explicitly configured by the user or not.
-// If it is not configured, the container level ReaderConfig is ignored and the global
-// ReaderConfig is used instead.
+// It must not be mutated.
 var defaultReaderConfig readerConfig
 
 // This init function initializes the defaultReaderConfig with the default values.
-// Since it runs only once during package initialization, we can afford to panic
-// if the configuration cannot be unpacked.
-// A panic here is unprecedented and indicates some unexpected system or library error.
 func init() {
 	err := conf.NewConfig().Unpack(&defaultReaderConfig)
 	if err != nil {
