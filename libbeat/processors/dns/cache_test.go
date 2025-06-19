@@ -126,3 +126,27 @@ func TestCache(t *testing.T) {
 		assert.EqualValues(t, 4, c.stats.Miss.Get())
 	}
 }
+
+func TestDisabledCache(t *testing.T) {
+	config := defaultConfig().cacheConfig
+	config.SuccessCache.Disabled = true
+	config.FailureCache.Disabled = true
+
+	c, err := newLookupCache(
+		monitoring.NewRegistry(),
+		config,
+		&stubResolver{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Initial success query.
+	r, err := c.Lookup(gatewayIP, typePTR)
+	// Same lookup, but no cache hit
+	r, err = c.Lookup(gatewayIP, typePTR)
+	if assert.NoError(t, err) {
+		assert.EqualValues(t, []string{gatewayName}, r.Data)
+		assert.EqualValues(t, 0, c.stats.Hit.Get())
+		assert.EqualValues(t, 2, c.stats.Miss.Get())
+	}
+}
