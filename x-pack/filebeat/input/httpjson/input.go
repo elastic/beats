@@ -205,13 +205,14 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 
 	client, err := newHTTPClient(stdCtx, cfg, stat, log, reg)
 	if err != nil {
-		ctx.UpdateStatus(status.Failed, "failed to create HTTP client: "+err.Error())
+		stat.UpdateStatus(status.Failed, "failed to create HTTP client: "+err.Error())
 		return err
 	}
 
 	requestFactory, err := newRequestFactory(stdCtx, cfg, stat, log, metrics, reg)
 	if err != nil {
 		log.Errorf("Error while creating requestFactory: %v", err)
+		stat.UpdateStatus(status.Failed, "failed to create request factory: "+err.Error())
 		return err
 	}
 	var xmlDetails map[string]xml.Detail

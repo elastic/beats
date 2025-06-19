@@ -236,16 +236,12 @@ func (rf *requestFactory) collectResponse(ctx context.Context, trCtx *transformC
 	if rf.isChain && rf.chainClient != nil {
 		httpResp, err = rf.chainClient.do(ctx, req)
 		if err != nil {
-			err = fmt.Errorf("failed to execute chain http %s: %w", req.Method, err)
-			r.status.UpdateStatus(status.Degraded, err.Error())
-			return nil, err
+			return nil, fmt.Errorf("failed to execute chain http %s: %w", req.Method, err)
 		}
 	} else {
 		httpResp, err = r.client.do(ctx, req)
 		if err != nil {
-			err = fmt.Errorf("failed to execute http %s: %w", req.Method, err)
-			r.status.UpdateStatus(status.Degraded, err.Error())
-			return nil, err
+			return nil, fmt.Errorf("failed to execute http %s: %w", req.Method, err)
 		}
 	}
 
@@ -331,9 +327,7 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 			ch.Step.Auth = tryAssignAuth(config.Auth, ch.Step.Auth)
 			client, err := newChainHTTPClient(ctx, ch.Step.Auth, ch.Step.Request, stat, log, reg)
 			if err != nil {
-				err = fmt.Errorf("failed in creating chain http client with error: %w", err)
-				stat.UpdateStatus(status.Degraded, err.Error())
-				return nil, err
+				return nil, fmt.Errorf("failed in creating chain http client with error: %w", err)
 			}
 
 			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, stat, log)
@@ -360,9 +354,7 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 			ch.While.Auth = tryAssignAuth(config.Auth, ch.While.Auth)
 			client, err := newChainHTTPClient(ctx, ch.While.Auth, ch.While.Request, stat, log, reg, policy)
 			if err != nil {
-				err = fmt.Errorf("failed in creating chain http client with error: %w", err)
-				stat.UpdateStatus(status.Degraded, err.Error())
-				return nil, err
+				return nil, fmt.Errorf("failed in creating chain http client with error: %w", err)
 			}
 
 			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, stat, log)
@@ -723,7 +715,9 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 			// collect data from new urls
 			httpResp, err = rf.collectResponse(ctx, chainTrCtx, r)
 			if err != nil {
-				return -1, fmt.Errorf("failed to collect response: %w", err)
+				err = fmt.Errorf("failed to collect response: %w", err)
+				r.status.UpdateStatus(status.Degraded, err.Error())
+				return -1, err
 			}
 
 			// store data according to response type
