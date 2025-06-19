@@ -3,15 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-couchbase.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Couchbase fields [exported-fields-couchbase]
 
 Metrics collected from Couchbase servers.
 
-
 ## couchbase [_couchbase]
 
 `couchbase` contains the metrics that were scraped from Couchbase.
-
 
 ## bucket [_bucket]
 
@@ -85,7 +85,6 @@ type: double
 :   Number of items associated with the bucket.
 
 type: long
-
 
 
 ## cluster [_cluster]
@@ -204,7 +203,6 @@ format: bytes
 type: long
 
 format: bytes
-
 
 
 ## node [_node]

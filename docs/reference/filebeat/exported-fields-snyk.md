@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-snyk.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Snyk fields [exported-fields-snyk]
 
 Snyk module
-
 
 ## snyk [_snyk]
 
@@ -19,13 +20,12 @@ type: flattened
 
 
 **`snyk.related.projects`**
-:   Array of all the related project ID’s.
+:   Array of all the related project ID's.
 
 type: keyword
 
 
-
-## audit [_audit_5]
+## audit [_audit]
 
 Module for parsing Snyk audit logs.
 
@@ -45,7 +45,6 @@ type: keyword
 :   Overview of the content that was changed, both old and new values.
 
 type: flattened
-
 
 
 ## vulnerabilities [_vulnerabilities]
@@ -107,7 +106,7 @@ type: boolean
 
 
 **`snyk.vulnerabilities.language`**
-:   The package’s programming language.
+:   The package's programming language.
 
 type: keyword
 
