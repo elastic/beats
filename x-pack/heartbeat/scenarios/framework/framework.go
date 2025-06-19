@@ -285,7 +285,6 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 		FirstStart:      time.Now(),
 		StartTime:       time.Now(),
 	}
-	info.Monitoring.DefaultUsername = "test"
 
 	sched = scheduler.Create(
 		1,
