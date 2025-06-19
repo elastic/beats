@@ -141,7 +141,7 @@ func (b *Broker) Connect() error {
 	other := finder.findBroker(brokerAddress(b.broker), meta.Brokers)
 	if other == nil { // no broker found
 		closeBroker(b.broker)
-		return fmt.Errorf("No advertised broker with address %v found", b.Addr())
+		return fmt.Errorf("no advertised broker with address %v found", b.Addr())
 	}
 
 	b.logger.Named("kafka").Debugf("found matching broker %v with id %v", other.Addr(), other.ID())
@@ -247,21 +247,11 @@ func (b *Broker) DescribeGroups(
 
 		members := map[string]MemberDescription{}
 		for memberID, memberDescr := range descr.Members {
-			assignment, err := memberDescr.GetMemberAssignment()
+			memberDescription, err := fromSaramaGroupMemberDescription(memberDescr)
 			if err != nil {
-				members[memberID] = MemberDescription{
-					ClientID:   memberDescr.ClientId,
-					ClientHost: memberDescr.ClientHost,
-					Err:        err,
-				}
 				continue
 			}
-
-			members[memberID] = MemberDescription{
-				ClientID:   memberDescr.ClientId,
-				ClientHost: memberDescr.ClientHost,
-				Topics:     assignment.Topics,
-			}
+			members[memberID] = memberDescription
 		}
 		groups[descr.GroupId] = GroupDescription{Members: members}
 	}
@@ -540,6 +530,31 @@ func (m *brokerFinder) lookupHosts(ips []net.IP) []string {
 		hosts = append(hosts, host)
 	}
 	return hosts
+}
+
+func fromSaramaGroupMemberDescription(memberDescr *sarama.GroupMemberDescription) (MemberDescription, error) {
+	if memberDescr == nil {
+		return MemberDescription{}, errors.New("nil GroupMemberDescription")
+	}
+
+	assignment, err := memberDescr.GetMemberAssignment()
+	if err != nil {
+		return MemberDescription{ //nolint:nilerr // in this case we should return no error and the error is reported in MemberDescription
+			ClientID:   memberDescr.ClientId,
+			ClientHost: memberDescr.ClientHost,
+			Err:        err,
+		}, nil
+	}
+
+	assignmentTopics := make(map[string][]int32)
+	if assignment != nil {
+		assignmentTopics = assignment.Topics
+	}
+	return MemberDescription{
+		ClientID:   memberDescr.ClientId,
+		ClientHost: memberDescr.ClientHost,
+		Topics:     assignmentTopics,
+	}, nil
 }
 
 func anyIPsMatch(as, bs []net.IP) bool {
