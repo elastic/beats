@@ -3,7 +3,7 @@ name: "beats-filebeat"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  AWS_IMAGE_UBUNTU_ARM_64: "test-platform-ingest-beats-ubuntu-2204-aarch64-1750413473"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
