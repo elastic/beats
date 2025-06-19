@@ -15,21 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build integration && linux
-
 package volume
 
 import (
+	"fmt"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/test"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestFetchMetricset(t *testing.T) {
 	config := test.GetKubeletConfig(t, "volume")
+
+	fmt.Println("os.Getenv(\"NODE_NAME\"): ", os.Getenv("NODE_NAME"))
+
+	c, err := cfg.NewConfigFrom(config)
+	require.NoError(t, err, "could not create config")
+	cfg.DebugString(c, false)
+
 	metricSet := mbtest.NewFetcher(t, config)
 	events, errs := metricSet.FetchEvents()
 	if len(errs) > 0 {
