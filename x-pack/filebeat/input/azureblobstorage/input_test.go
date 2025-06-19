@@ -588,6 +588,53 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
 			},
 		},
+<<<<<<< HEAD
+=======
+		{
+			name: "ReadCSVContainerLevel",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":                       beatsCSVContainer,
+						"decoding.codec.csv.enabled": true,
+						"decoding.codec.csv.comma":   " ",
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_csv[0]: true,
+				mock.BeatsFilesContainer_csv[1]: true,
+			},
+		},
+		{
+			name: "ReadCSVRootLevel",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"decoding.codec.csv.enabled":          true,
+				"decoding.codec.csv.comma":            " ",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsCSVContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_csv[0]: true,
+				mock.BeatsFilesContainer_csv[1]: true,
+			},
+		},
+>>>>>>> 01adb89c9 ([filebeat][ABS] - Fixed issue for "Root level readerConfig no longer respected" (#44873))
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
