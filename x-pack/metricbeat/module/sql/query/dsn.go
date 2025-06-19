@@ -189,7 +189,7 @@ func postgresTranslateVerificationMode(mode tlscommon.TLSVerificationMode) (sslm
 	case tlscommon.VerifyCertificate:
 		return "verify-ca"
 	default:
-		return ""
+		return "require"
 	}
 }
 
