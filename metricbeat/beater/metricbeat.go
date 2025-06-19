@@ -173,7 +173,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 	}
 
 	if b.API != nil {
-		if err := inputmon.AttachHandler(b.API.Router(), nil); err != nil {
+		if err := inputmon.AttachHandler(b.API.Router(), b.Monitoring.InputsRegistry()); err != nil {
 			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
 	}
@@ -181,7 +181,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
-				data, err := inputmon.MetricSnapshotJSON(nil)
+				data, err := inputmon.MetricSnapshotJSON(b.Monitoring.InputsRegistry())
 				if err != nil {
 					b.Info.Logger.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
 					return []byte(err.Error())
@@ -268,8 +268,8 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	// Centrally managed modules
-	modulesFactory := module.NewFactory(b.Info, bt.registry, bt.moduleOptions...)
-	modules := cfgfile.NewRunnerList(management.DebugK, modulesFactory, b.Publisher, bt.logger)
+	factory := module.NewFactory(b.Info, b.Monitoring, bt.registry, bt.moduleOptions...)
+	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher, bt.logger)
 	b.Registry.MustRegisterInput(modules)
 	wg.Add(1)
 	go func() {

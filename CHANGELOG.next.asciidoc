@@ -18,7 +18,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Replace default Ubuntu-based images with UBI-minimal-based ones {pull}42150[42150]
 - Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
 - removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
-- Removed encryption from diskqueue V2 for fips compliance {issue}4534[4534]{pull}42848[42848]
 - The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
 - Allow faccessat(2) in seccomp. {pull}43322[43322]
 
@@ -279,6 +278,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
+- Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group. {pull}44576[44576]
 - Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
 
 *Osquerybeat*
@@ -456,6 +456,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
 - Added support for specifying custom content-types and encodings in azureblobstorage input. {issue}44330[44330] {pull}44402[44402]
 - Introduce lastSync start position to AWS CloudWatch input backed by state registry. {pull}43251[43251]
+- Add Fleet status update functionality to udp input. {issue}44419[44419] {pull}44785[44785]
 - Add Fleet status update functionality to tcp input. {issue}44420[44420] {pull}44786[44786]
 - Filestream now logs at level warn the number of files that are too small to be ingested {pull}44751[44751]
 
@@ -531,6 +532,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add new metrics to vSphere Virtual Machine dataset (CPU usage percentage, disk average usage, disk read/write rate, number of disk reads/writes, memory usage percentage). {pull}44205[44205]
 - Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
 - Add latency config option to Azure Monitor module. {pull}44366[44366]
+- Increase default polling period for MongoDB module from 10s to 60s {pull}44781[44781]
 
 *Metricbeat*
 
