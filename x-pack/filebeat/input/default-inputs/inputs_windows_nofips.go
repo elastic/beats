@@ -10,13 +10,9 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureeventhub"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States) []v2.Plugin {
-	return append(
-		commonPlugins(info, log, store),
-		azureeventhub.Plugin(log), // Only include in non-FIPS builds
-	)
+	return commonPlugins(info, log, store)
 }

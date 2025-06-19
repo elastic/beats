@@ -32,6 +32,7 @@ import (
 func commonPlugins(info beat.Info, log *logp.Logger, store statestore.States) []v2.Plugin {
 	return []v2.Plugin{
 		azureblobstorage.Plugin(log, store),
+		azureeventhub.Plugin(log),
 		cel.Plugin(log, store),
 		cloudfoundry.Plugin(),
 		entityanalytics.Plugin(log),
