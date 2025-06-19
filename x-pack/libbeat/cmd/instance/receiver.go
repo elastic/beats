@@ -75,7 +75,7 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 	}, nil
 }
 
-// BeatReceiver.Stop() starts the beat receiver.
+// BeatReceiver.Start() starts the beat receiver.
 func (br *BeatReceiver) Start(host component.Host) error {
 	if w, ok := br.beater.(cfgfile.WithFactoryWrapper); ok {
 		groupReporter := status.NewGroupStatusReporter(host)
