@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo/types"
 
@@ -51,7 +52,7 @@ func TestConfigDefault(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(map[string]interface{}{})
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	switch runtime.GOOS {
 	case "windows", "darwin", "linux":
 		assert.NoError(t, err)
@@ -98,7 +99,7 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	switch runtime.GOOS {
 	case "windows", "darwin", "linux":
 		assert.NoError(t, err)
@@ -148,7 +149,7 @@ func TestConfigName(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(config)
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
@@ -183,7 +184,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(config)
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
@@ -206,7 +207,7 @@ func TestConfigGeoDisabled(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(config)
 	require.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
@@ -224,7 +225,7 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(cfg)
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	switch runtime.GOOS {
 	case "windows", "darwin", "linux":
 		assert.NoError(t, err)
@@ -304,7 +305,7 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(cfg)
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	switch runtime.GOOS {
 	case "windows", "darwin", "linux":
 		assert.NoError(t, err)
@@ -500,7 +501,7 @@ func TestFQDNEventSync(t *testing.T) {
 	}))
 	require.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	// update
@@ -579,7 +580,7 @@ func TestFQDNLookup(t *testing.T) {
 			testConfig, err := conf.NewConfigFrom(map[string]interface{}{})
 			require.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			addHostMetadataP, ok := p.(*addHostMetadata)

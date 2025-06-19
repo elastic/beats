@@ -3,15 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-istio.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Istio fields [exported-fields-istio]
 
 istio Module
 
-
 ## istio [_istio]
 
 `istio` contains statistics that were read from Istio
-
 
 ## citadel [_citadel]
 
@@ -89,7 +89,6 @@ format: duration
 :   The response latency of gRPC, number of metrics
 
 type: long
-
 
 
 ## galley [_galley]
@@ -257,7 +256,7 @@ type: long
 
 
 **`istio.galley.runtime.strategy.on_change`**
-:   The number of times the strategy’s onChange has been called
+:   The number of times the strategy's onChange has been called
 
 type: long
 
@@ -290,7 +289,6 @@ type: long
 :   k8s webhook configuration updates
 
 type: long
-
 
 
 ## mesh [_mesh]
@@ -473,7 +471,6 @@ type: long
 type: keyword
 
 
-
 ## mixer [_mixer]
 
 Contains statistics related to the Istio mixer service
@@ -614,7 +611,6 @@ type: keyword
 :   The name of the variety
 
 type: keyword
-
 
 
 ## pilot [_pilot]

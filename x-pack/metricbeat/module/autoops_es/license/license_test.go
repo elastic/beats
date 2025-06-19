@@ -51,7 +51,7 @@ func TestFailedLicenseFetchEventsMapping(t *testing.T) {
 		// Check error event
 		require.Equal(t, 1, len(data.Reporter.GetEvents()))
 		event := data.Reporter.GetEvents()[0]
-		_, ok := event.MetricSetFields["error"].(autoopsevents.ErrEvent)
-		require.True(t, ok, "error field should be of type error.ErrEvent")
+		_, ok := event.MetricSetFields["error"].(autoopsevents.ErrorEvent)
+		require.True(t, ok, "error field should be of type error.ErrorEvent")
 	})
 }

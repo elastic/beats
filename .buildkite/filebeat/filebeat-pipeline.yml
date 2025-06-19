@@ -30,11 +30,6 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
-  # Concurrency definition
-  CONCURRENCY_GROUP: "orka-concurrency-group"
-  CONCURRENCY_COUNT: 10
-  CONCURRENCY_METHOD: eager
-
 steps:
   - group: "Check/Update"
     key: "filebeat-check-update"
@@ -178,7 +173,65 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "filebeat: Go Integration Tests"
+              context: "filebeat: Go Integration Tests / Ubuntu x86_64"
+
+      - label: ":windows: Filebeat: Go Integration Tests"
+        skip: "Skipped due to https://github.com/elastic/beats/issues/44537"
+        if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+        command: |
+          cd filebeat
+          mage goIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+          - "filebeat/build/integration-tests/*"
+          - "filebeat/build/integration-tests/Test*/*"
+          - "filebeat/build/integration-tests/Test*/data/**/*"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "filebeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "filebeat: Go Integration Tests / Windows"
+
+      - label: ":ubuntu: Filebeat: Go fips140=only Integration Tests"
+        command: |
+          cd filebeat
+          mage goFIPSOnlyIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+          - "filebeat/build/integration-tests/*"
+          - "filebeat/build/integration-tests/Test*/*"
+          - "filebeat/build/integration-tests/Test*/data/**/*"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "filebeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "filebeat: Go fips140=only Integration Tests"
 
       - label: ":ubuntu: Filebeat: Python Integration Tests"
         command: |

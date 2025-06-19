@@ -3,17 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-zookeeper.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # ZooKeeper fields [exported-fields-zookeeper]
 
 ZooKeeper metrics collected by the four-letter monitoring commands.
-
 
 ## zookeeper [_zookeeper]
 
 `zookeeper` contains the metrics reported by ZooKeeper commands.
 
-
-## connection [_connection_5]
+## connection [_connection]
 
 connections
 
@@ -39,7 +39,6 @@ type: long
 :   Connections sent
 
 type: long
-
 
 
 ## mntr [_mntr]
@@ -162,8 +161,7 @@ type: long
 type: long
 
 
-
-## server [_server_10]
+## server [_server]
 
 server contains the metrics reported by the four-letter `srvr` command.
 

@@ -51,7 +51,7 @@ func TestFailedTasksFetchEventsMapping(t *testing.T) {
 
 		// Check error event
 		event := data.Reporter.GetEvents()[0]
-		_, ok := event.MetricSetFields["error"].(auto_ops_events.ErrEvent)
-		require.True(t, ok, "expected error event to be of type auto_ops_events.ErrEvent")
+		_, ok := event.MetricSetFields["error"].(auto_ops_events.ErrorEvent)
+		require.True(t, ok, "expected error event to be of type auto_ops_events.ErrorEvent")
 	})
 }

@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package billing
 
 import (
@@ -51,7 +53,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		client:        billingClient,
-		log:           logp.NewLogger("azure billing"),
+		log:           base.Logger().Named("azure billing"),
 	}, nil
 }
 

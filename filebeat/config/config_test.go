@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestReadConfig2(t *testing.T) {
@@ -109,7 +110,7 @@ func TestMergeConfigFiles(t *testing.T) {
 	assert.Equal(t, 2, len(files))
 
 	config := &Config{}
-	err = mergeConfigFiles(files, config)
+	err = mergeConfigFiles(files, config, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 
 	assert.Equal(t, 4, len(config.Inputs))

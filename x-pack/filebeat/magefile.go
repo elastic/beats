@@ -43,6 +43,13 @@ func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
+// BuildOTel builds the Beat binary with OTel sub command
+func BuildOTel() error {
+	args := devtools.DefaultBuildArgs()
+	args.ExtraFlags = append(args.ExtraFlags, "-tags", "otelbeat")
+	return devtools.Build(args)
+}
+
 // BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
 func BuildSystemTestBinary() error {
 	return devtools.BuildSystemTestBinary()
@@ -168,8 +175,16 @@ func IntegTest() {
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
-	mg.Deps(BuildSystemTestBinary)
+	// build integration test binary with otel sub command
+	devtools.BuildSystemTestOTelBinary()
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
+}
+
+// GoFIPSOnlyIntegTest starts the docker containers and executes the Go integration tests with GODEBUG=fips140=only set.
+func GoFIPSOnlyIntegTest(ctx context.Context) error {
+	// build integration test binary with otel sub command
+	devtools.BuildSystemTestOTelBinary()
+	return devtools.GoIntegTestFromHost(ctx, devtools.FIPSOnlyGoTestIntegrationFromHostArgs())
 }
 
 // PythonIntegTest starts the docker containers and executes the Python integration tests.

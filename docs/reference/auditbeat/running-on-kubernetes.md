@@ -15,7 +15,7 @@ Running {{ecloud}} on Kubernetes? See [Run {{beats}} on ECK](docs-content://depl
 % However, version {{stack-version}} of Auditbeat has not yet been released, so no Docker image is currently available for this version.
 
 
-## Kubernetes deploy manifests [_kubernetes_deploy_manifests]
+## Kubernetes deploy manifests for Auditbeat [_kubernetes_deploy_manifests]
 
 By deploying Auditbeat as a [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) we ensure we get a running instance on each node of the cluster.
 
