@@ -57,11 +57,15 @@ func (r *reporter) updateStatusForRunner(id uint64, state status.Status, msg str
 	if r.runnerStates == nil {
 		r.runnerStates = make(map[uint64]runnerState)
 	}
-
-	// add status for the runner to the map
-	r.runnerStates[id] = runnerState{
-		state: state,
-		msg:   msg,
+	if rState, ok := r.runnerStates[id]; ok && rState.msg != msg && rState.state != state {
+		rState.msg = msg
+		rState.state = state
+	} else {
+		// add status for the runner to the map
+		r.runnerStates[id] = runnerState{
+			state: state,
+			msg:   msg,
+		}
 	}
 
 	// calculate the aggregate state of beat based on the module states
