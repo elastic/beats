@@ -62,6 +62,11 @@ type ReceiverConfig struct {
 	Factory receiver.Factory
 }
 
+type ExpectedStatus struct {
+	Status componentstatus.Status
+	Error  string
+}
+
 type CheckReceiversParams struct {
 	T *testing.T
 	// Receivers is a list of receiver configurations to create.
@@ -69,6 +74,8 @@ type CheckReceiversParams struct {
 	// AssertFunc is a function that asserts the test conditions.
 	// The function is called periodically until the assertions are met or the timeout is reached.
 	AssertFunc func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs)
+
+	Status ExpectedStatus
 }
 
 // CheckReceivers creates receivers using the provided configuration.
@@ -178,10 +185,18 @@ func CheckReceivers(params CheckReceiversParams) {
 			break
 		}
 		require.NotNilf(t, host.Evt, "expected nil, got %v", host.Evt)
-		require.Nilf(t, host.Evt.Err(), "expected nil, got %v", host.Evt.Err())
-		require.Equalf(t, host.Evt.Status(), componentstatus.StatusOK, "expected StatusOK, got %v", host.Evt.Status())
 
-		params.AssertFunc(ct, logs, zapLogs)
+		if params.Status.Error == "" {
+			require.Equalf(t, host.Evt.Status(), componentstatus.StatusOK, "expected %v, got %v", params.Status.Status, host.Evt.Status())
+			require.Nilf(t, host.Evt.Err(), "expected nil, got %v", host.Evt.Err())
+		} else {
+			require.Equalf(t, host.Evt.Status(), params.Status.Status, "expected %v, got %v", params.Status.Status, host.Evt.Status())
+			require.ErrorContainsf(t, host.Evt.Err(), params.Status.Error, "expected error to contain '%v': %v", params.Status.Error, host.Evt.Err())
+		}
+
+		if params.AssertFunc != nil {
+			params.AssertFunc(ct, logs, zapLogs)
+		}
 	}, 2*time.Minute, 100*time.Millisecond,
 		"timeout waiting for logger fields from the OTel collector are present in the logs and other assertions to be met")
 }
