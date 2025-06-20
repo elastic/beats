@@ -147,12 +147,15 @@ func ConvertIdentity(v interface{}) (interface{}, error) {
 	return v, nil
 }
 
-func GetInvalidConversion(err error) WmiConversionFunction {
+// Function that return a WmiConversionFunction that reports an error
+// Indipendently from the value in input
+func getInvalidConversion(err error) WmiConversionFunction {
 	return func(v interface{}) (interface{}, error) {
 		return nil, err
 	}
 }
 
+// Hash Function used for the LRU impementation
 func hashStringXXHASH(s string) uint32 {
 	return uint32(xxhash.Sum64String(s))
 }
@@ -165,7 +168,7 @@ func (ws WMISchema) Get(class string, property string) (WmiConversionFunction, b
 	classSchema, ok := ws.SubClassSchemas.Get(class)
 	if !ok {
 		// This case is actually unexpected, because we invoke PutClass before and we proceed sequentially
-		return GetInvalidConversion(fmt.Errorf("Could not find class %s in cache", class)), ok
+		return getInvalidConversion(fmt.Errorf("Could not find class %s in cache", class)), ok
 	}
 	val, ok := classSchema[property]
 	return val, ok
@@ -278,7 +281,7 @@ func GetConvertFunction(instance *wmi.WmiInstance, propertyName string, logger *
 		// and without further processing can cause go panic during (JSON) marshalling
 		//
 		// If you have a real-world need for this, please open a GitHub issue to discuss.
-		f = GetInvalidConversion(fmt.Errorf("the Type %s is unsupported. Consider flattening your class", "CIM Type Object"))
+		f = getInvalidConversion(fmt.Errorf("the Type %s is unsupported. Consider flattening your class", "CIM Type Object"))
 
 	default: // For all other types we return the identity function
 		f = ConvertIdentity
