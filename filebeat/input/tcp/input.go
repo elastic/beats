@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -85,7 +86,7 @@ func newServer(config config) (*server, error) {
 func (s *server) Name() string { return "tcp" }
 
 func (s *server) Test(_ input.TestContext) error {
-	l, err := net.Listen("tcp", s.config.Config.Host)
+	l, err := net.Listen("tcp", s.Host)
 	if err != nil {
 		return err
 	}
@@ -93,21 +94,25 @@ func (s *server) Test(_ input.TestContext) error {
 }
 
 func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
-	log := ctx.Logger.With("host", s.config.Config.Host)
+	log := ctx.Logger.With("host", s.Host)
 
 	log.Info("starting tcp socket input")
 	defer log.Info("tcp input stopped")
 
+	ctx.UpdateStatus(status.Starting, "")
+	ctx.UpdateStatus(status.Configuring, "")
+
 	const pollInterval = time.Minute
-	metrics := netmetrics.NewTCP("tcp", ctx.ID, s.config.Host, pollInterval, log)
+	metrics := netmetrics.NewTCP("tcp", ctx.ID, s.Host, pollInterval, log)
 	defer metrics.Close()
 
-	split, err := streaming.SplitFunc(s.config.Framing, []byte(s.config.LineDelimiter))
+	split, err := streaming.SplitFunc(s.Framing, []byte(s.LineDelimiter))
 	if err != nil {
+		ctx.UpdateStatus(status.Failed, "Failed to configure split function: "+err.Error())
 		return err
 	}
 
-	server, err := tcp.New(&s.config.Config, streaming.SplitHandlerFactory(
+	server, err := tcp.New(&s.Config, streaming.SplitHandlerFactory(
 		inputsource.FamilyTCP, log, tcp.MetadataCallback, func(data []byte, metadata inputsource.NetworkMetadata) {
 			log.Debugw("Data received", "bytes", len(data), "remote_address", metadata.RemoteAddr.String(), "truncated", metadata.Truncated)
 			evt := beat.Event{
@@ -133,15 +138,24 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 		split,
 	))
 	if err != nil {
+		ctx.UpdateStatus(status.Failed, "Failed to configure input: "+err.Error())
 		return err
 	}
 
 	log.Debug("tcp input initialized")
+	ctx.UpdateStatus(status.Running, "")
 
 	err = server.Run(ctxtool.FromCanceller(ctx.Cancelation))
 	// Ignore error from 'Run' in case shutdown was signaled.
 	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {
 		err = ctxerr
 	}
+
+	if err != nil {
+		ctx.UpdateStatus(status.Failed, "Input exited unexpectedly: "+err.Error())
+	} else {
+		ctx.UpdateStatus(status.Stopped, "")
+	}
+
 	return err
 }
