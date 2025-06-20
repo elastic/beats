@@ -4,56 +4,50 @@
 
 package cat_shards
 
-import (
-	"encoding/json"
+// func convertObjectToMap[T any](object T, logger *logp.Logger) (map[string]any, error) {
+// 	// Marshal the struct to JSON
+// 	if data, err := json.Marshal(object); err != nil {
+// 		return nil, err
+// 	} else {
+// 		// Unmarshal the JSON into a map
+// 		var result map[string]any
 
-	"github.com/elastic/elastic-agent-libs/logp"
-)
+// 		if err := json.Unmarshal(data, &result); err != nil {
+// 			return nil, err
+// 		}
 
-func convertObjectToMap[T any](object T, logger *logp.Logger) (map[string]any, error) {
-	// Marshal the struct to JSON
-	if data, err := json.Marshal(object); err != nil {
-		return nil, err
-	} else {
-		// Unmarshal the JSON into a map
-		var result map[string]any
+// 		if logger != nil {
+// 			if result["assignShards"] != nil && result["assignShards"].([]any) != nil {
+// 				switch result["assignShards"].(type) {
+// 				case []map[string]any:
+// 					logger.Infof("[ARRAY] assignShards ([]map[string]any): %v for %v\n", result["assignShards"], result["index"])
+// 				default:
+// 					logger.Infof("[ARRAY] assignShards (not []map[string]any): %v for %v\n", result["assignShards"], result["index"])
+// 				}
 
-		if err := json.Unmarshal(data, &result); err != nil {
-			return nil, err
-		}
+// 				switch result["assignShards"].([]any)[0].(type) {
+// 				case map[string]any:
+// 					logger.Infof("assignShards (map[string]any): %v for %v\n", result["assignShards"].([]any)[0], result["index"])
+// 				default:
+// 					logger.Infof("assignShards (not map[string]any): %v for %v\n", result["assignShards"].([]any)[0], result["index"])
+// 				}
+// 			}
+// 		}
 
-		if logger != nil {
-			if result["assignShards"] != nil && result["assignShards"].([]any) != nil {
-				switch result["assignShards"].(type) {
-				case []map[string]any:
-					logger.Infof("[ARRAY] assignShards ([]map[string]any): %v for %v\n", result["assignShards"], result["index"])
-				default:
-					logger.Infof("[ARRAY] assignShards (not []map[string]any): %v for %v\n", result["assignShards"], result["index"])
-				}
+// 		return result, nil
+// 	}
+// }
 
-				switch result["assignShards"].([]any)[0].(type) {
-				case map[string]any:
-					logger.Infof("assignShards (map[string]any): %v for %v\n", result["assignShards"].([]any)[0], result["index"])
-				default:
-					logger.Infof("assignShards (not map[string]any): %v for %v\n", result["assignShards"].([]any)[0], result["index"])
-				}
-			}
-		}
+// func convertObjectArrayToMapArray[T any](objects []T, logger *logp.Logger) ([]map[string]any, error) {
+// 	mapArray := make([]map[string]any, 0, len(objects))
 
-		return result, nil
-	}
-}
+// 	for _, object := range objects {
+// 		if objectMap, err := convertObjectToMap(object, logger); err != nil {
+// 			return nil, err
+// 		} else {
+// 			mapArray = append(mapArray, objectMap)
+// 		}
+// 	}
 
-func convertObjectArrayToMapArray[T any](objects []T, logger *logp.Logger) ([]map[string]any, error) {
-	mapArray := make([]map[string]any, 0, len(objects))
-
-	for _, object := range objects {
-		if objectMap, err := convertObjectToMap(object, logger); err != nil {
-			return nil, err
-		} else {
-			mapArray = append(mapArray, objectMap)
-		}
-	}
-
-	return mapArray, nil
-}
+// 	return mapArray, nil
+// }
