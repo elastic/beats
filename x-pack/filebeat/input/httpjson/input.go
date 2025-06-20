@@ -30,6 +30,7 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -175,8 +176,14 @@ func runWithMetrics(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr 
 }
 
 func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor, reg *monitoring.Registry) error {
-	log := ctx.Logger.With("input_url", cfg.Request.URL)
+	stat := ctx.StatusReporter
+	if stat == nil {
+		stat = noopReporter{}
+	}
+	stat.UpdateStatus(status.Starting, "")
+	stat.UpdateStatus(status.Configuring, "")
 
+	log := ctx.Logger.With("input_url", cfg.Request.URL)
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
 	if cfg.Request.Tracer != nil {
@@ -196,14 +203,16 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 
 	metrics := newInputMetrics(reg)
 
-	client, err := newHTTPClient(stdCtx, cfg, log, reg)
+	client, err := newHTTPClient(stdCtx, cfg, stat, log, reg)
 	if err != nil {
+		stat.UpdateStatus(status.Failed, "failed to create HTTP client: "+err.Error())
 		return err
 	}
 
-	requestFactory, err := newRequestFactory(stdCtx, cfg, log, metrics, reg)
+	requestFactory, err := newRequestFactory(stdCtx, cfg, stat, log, metrics, reg)
 	if err != nil {
 		log.Errorf("Error while creating requestFactory: %v", err)
+		stat.UpdateStatus(status.Failed, "failed to create request factory: "+err.Error())
 		return err
 	}
 	var xmlDetails map[string]xml.Detail
@@ -211,15 +220,16 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 		xmlDetails, err = xml.Details([]byte(cfg.Response.XSD))
 		if err != nil {
 			log.Errorf("error while collecting xml decoder type hints: %v", err)
+			stat.UpdateStatus(status.Failed, "error while collecting xml decoder type hints: "+err.Error())
 			return err
 		}
 	}
-	pagination := newPagination(cfg, client, log)
-	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, log)
-	requester := newRequester(client, requestFactory, responseProcessor, metrics, log)
+	pagination := newPagination(cfg, client, stat, log)
+	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, stat, log)
+	requester := newRequester(client, requestFactory, responseProcessor, metrics, stat, log)
 
 	trCtx := emptyTransformContext()
-	trCtx.cursor = newCursor(cfg.Cursor, log)
+	trCtx.cursor = newCursor(cfg.Cursor, stat, log)
 	trCtx.cursor.load(crsr)
 
 	doFunc := func() error {
@@ -241,6 +251,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 		metrics.updateIntervalMetrics(err, startTime)
 
 		if err := stdCtx.Err(); err != nil {
+			stat.UpdateStatus(status.Stopping, "")
 			return err
 		}
 
@@ -254,9 +265,13 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	}
 
 	log.Infof("Input stopped because context was cancelled with: %v", err)
-
+	stat.UpdateStatus(status.Stopped, "")
 	return nil
 }
+
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}
 
 // sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
 // The request.tracer.filename may have ":" when a httpjson input has cursor config and
@@ -267,7 +282,7 @@ func sanitizeFileName(name string) string {
 	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
-func newHTTPClient(ctx context.Context, config config, log *logp.Logger, reg *monitoring.Registry) (*httpClient, error) {
+func newHTTPClient(ctx context.Context, config config, stat status.StatusReporter, log *logp.Logger, reg *monitoring.Registry) (*httpClient, error) {
 	client, err := newNetHTTPClient(ctx, config.Request, log, reg)
 	if err != nil {
 		return nil, err
@@ -286,7 +301,7 @@ func newHTTPClient(ctx context.Context, config config, log *logp.Logger, reg *mo
 		}).StandardClient()
 	}
 
-	limiter := newRateLimiterFromConfig(config.Request.RateLimit, log)
+	limiter := newRateLimiterFromConfig(config.Request.RateLimit, stat, log)
 
 	if config.Auth.OAuth2.isEnabled() {
 		authClient, err := config.Auth.OAuth2.client(ctx, client)
@@ -356,7 +371,7 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 	return netHTTPClient, nil
 }
 
-func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, log *logp.Logger, reg *monitoring.Registry, p ...*Policy) (*httpClient, error) {
+func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, stat status.StatusReporter, log *logp.Logger, reg *monitoring.Registry, p ...*Policy) (*httpClient, error) {
 	client, err := newNetHTTPClient(ctx, requestCfg, log, reg)
 	if err != nil {
 		return nil, err
@@ -382,7 +397,7 @@ func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *re
 		}).StandardClient()
 	}
 
-	limiter := newRateLimiterFromConfig(requestCfg.RateLimit, log)
+	limiter := newRateLimiterFromConfig(requestCfg.RateLimit, stat, log)
 
 	if authCfg != nil && authCfg.OAuth2.isEnabled() {
 		authClient, err := authCfg.OAuth2.client(ctx, client)
