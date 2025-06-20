@@ -705,7 +705,7 @@ func TestSplit(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			events := &stream{t: t}
-			split, err := newSplitResponse(tc.config, logp.NewLogger(""))
+			split, err := newSplitResponse(tc.config, noopReporter{}, logp.NewLogger(""))
 			assert.NoError(t, err)
 			err = split.run(context.Background(), tc.ctx, tc.resp, events)
 			if tc.expectedErr == nil {

@@ -9,11 +9,14 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/ccm"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 )
 
 const MODULE_NAME = "autoops_es"
+
+var checkedCloudConnectedMode bool = false
 
 // This method should be invoked via any given MetricSet's init function to automatically register
 // each AutoOpsMetricSet.
@@ -57,6 +60,15 @@ func newAutoOpsMetricSet[T any](base mb.BaseMetricSet, routePath string, mapper 
 
 	if err != nil {
 		return nil, err
+	}
+
+	// metricsets are not started asynchronously, so there is no need for synchronization here
+	if !checkedCloudConnectedMode {
+		checkedCloudConnectedMode = true
+
+		if err := ccm.MaybeRegisterCloudConnectedCluster(ms, GetInfo); err != nil {
+			return nil, fmt.Errorf("failed to register Cloud Connected Mode: %w", err)
+		}
 	}
 
 	return &AutoOpsMetricSet[T]{
@@ -103,4 +115,4 @@ func (m *AutoOpsMetricSet[T]) Fetch(r mb.ReporterV2) error {
 }
 
 // ensures that the type implements the interface
-var _ mb.ReportingMetricSetV2Error = (*AutoOpsMetricSet[map[string]interface{}])(nil)
+var _ mb.ReportingMetricSetV2Error = (*AutoOpsMetricSet[map[string]any])(nil)
