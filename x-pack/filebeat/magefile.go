@@ -177,7 +177,12 @@ func IntegTest() {
 func GoIntegTest(ctx context.Context) error {
 	// build integration test binary with otel sub command
 	devtools.BuildSystemTestOTelBinary()
-	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
+	args := devtools.DefaultGoTestIntegrationFromHostArgs()
+	// ES_USER must be admin in order for the Go Integration tests to function because they require
+	// indices:data/read/search
+	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
+	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
+	return devtools.GoIntegTestFromHost(ctx, args)
 }
 
 // GoFIPSOnlyIntegTest starts the docker containers and executes the Go integration tests with GODEBUG=fips140=only set.
