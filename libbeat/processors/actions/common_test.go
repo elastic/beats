@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -47,7 +48,7 @@ func testProcessors(t *testing.T, cases map[string]testCase) {
 					t.Fatalf("Failed to create config(%v): %+v", i, err)
 				}
 
-				ps[i], err = processors.New([]*conf.C{config})
+				ps[i], err = processors.New([]*conf.C{config}, logptest.NewTestingLogger(t, ""))
 				if err != nil {
 					t.Fatalf("Failed to create add_tags processor(%v): %+v", i, err)
 				}

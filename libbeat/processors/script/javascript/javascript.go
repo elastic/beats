@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -47,7 +48,7 @@ type jsProcessor struct {
 }
 
 // New constructs a new Javascript processor.
-func New(c *config.C) (beat.Processor, error) {
+func New(c *config.C, log *logp.Logger) (beat.Processor, error) {
 	conf := defaultConfig()
 	if err := c.Unpack(&conf); err != nil {
 		return nil, err

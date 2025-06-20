@@ -51,7 +51,7 @@ func init() {
 }
 
 // NewCopyFields returns a new copy_fields processor.
-func NewCopyFields(c *conf.C) (beat.Processor, error) {
+func NewCopyFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := copyFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -63,7 +63,7 @@ func NewCopyFields(c *conf.C) (beat.Processor, error) {
 
 	f := &copyFields{
 		config: config,
-		logger: logp.NewLogger("copy_fields"),
+		logger: log.Named("copy_fields"),
 	}
 	return f, nil
 }

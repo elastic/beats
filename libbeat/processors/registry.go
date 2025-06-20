@@ -48,7 +48,7 @@ func init() {
 	})
 }
 
-type Constructor func(config *config.C) (beat.Processor, error)
+type Constructor func(config *config.C, logger *logp.Logger) (beat.Processor, error)
 
 var registry = NewNamespace()
 

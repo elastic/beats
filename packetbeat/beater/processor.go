@@ -165,7 +165,7 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 		logp.Info("Process watcher disabled when file input is used")
 	}
 
-	flows, err := setupFlows(pipeline, &watch, config)
+	flows, err := setupFlows(pipeline, &watch, config, p.beat.Info.Logger)
 	if err != nil {
 		return nil, err
 	}
@@ -179,12 +179,12 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 
 // setupFlows returns a *flows.Flows that will publish to the provided pipeline,
 // configured with cfg and process enrichment via the provided watcher.
-func setupFlows(pipeline beat.Pipeline, watch *procs.ProcessesWatcher, cfg config.Config) (*flows.Flows, error) {
+func setupFlows(pipeline beat.Pipeline, watch *procs.ProcessesWatcher, cfg config.Config, logger *logp.Logger) (*flows.Flows, error) {
 	if !cfg.Flows.IsEnabled() {
 		return nil, nil
 	}
 
-	processors, err := processors.New(cfg.Flows.Processors)
+	processors, err := processors.New(cfg.Flows.Processors, logger)
 	if err != nil {
 		return nil, err
 	}

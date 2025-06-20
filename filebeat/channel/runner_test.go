@@ -33,6 +33,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -51,7 +52,7 @@ func TestProcessorsForConfig(t *testing.T) {
 			},
 		},
 		"Index with agent info + timestamp": {
-			beatInfo:  beat.Info{Beat: "TestBeat", Version: "3.9.27"},
+			beatInfo:  beat.Info{Beat: "TestBeat", Version: "3.9.27", Logger: logptest.NewTestingLogger(t, "")},
 			configStr: "index: 'beat-%{[agent.name]}-%{[agent.version]}-%{+yyyy.MM.dd}'",
 			event:     beat.Event{Timestamp: time.Date(1999, time.December, 31, 23, 0, 0, 0, time.UTC)},
 			expectedFields: map[string]string{
@@ -236,7 +237,7 @@ index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
 	cfg, err := conf.NewConfigWithYAML([]byte(configYAML), configYAML)
 	require.NoError(t, err)
 
-	b := beat.Info{} // not important for the test
+	b := beat.Info{Logger: logptest.NewTestingLogger(t, "")} // not important for the test
 	rf := &runnerFactoryMock{
 		clientCount: 3, // we will create 3 clients from the wrapped pipeline
 	}

@@ -53,7 +53,7 @@ func init() {
 }
 
 // NewAppendProcessor returns a new append processor.
-func NewAppendProcessor(c *conf.C) (beat.Processor, error) {
+func NewAppendProcessor(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := appendProcessorConfig{
 		IgnoreMissing:     false,
 		IgnoreEmptyValues: false,
@@ -67,7 +67,7 @@ func NewAppendProcessor(c *conf.C) (beat.Processor, error) {
 
 	f := &appendProcessor{
 		config: config,
-		logger: logp.NewLogger("append"),
+		logger: log.Named("append"),
 	}
 	return f, nil
 }

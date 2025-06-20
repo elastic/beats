@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -191,7 +191,7 @@ func TestURLDecode(t *testing.T) {
 			t.Parallel()
 
 			f := &urlDecode{
-				log:    logp.NewLogger("urldecode"),
+				log:    logptest.NewTestingLogger(t, "urldecode"),
 				config: test.config,
 			}
 
@@ -221,7 +221,7 @@ func TestURLDecode(t *testing.T) {
 		}
 
 		f := &urlDecode{
-			log:    logp.NewLogger("urldecode"),
+			log:    logptest.NewTestingLogger(t, "urldecode"),
 			config: config,
 		}
 

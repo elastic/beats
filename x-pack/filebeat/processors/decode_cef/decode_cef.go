@@ -36,7 +36,7 @@ type processor struct {
 }
 
 // New constructs a new processor built from ucfg config.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the "+procName+" processor configuration: %w", err)

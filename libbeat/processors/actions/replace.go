@@ -64,7 +64,7 @@ func init() {
 }
 
 // NewReplaceString returns a new replace processor.
-func NewReplaceString(c *conf.C) (beat.Processor, error) {
+func NewReplaceString(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := replaceStringConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -76,7 +76,7 @@ func NewReplaceString(c *conf.C) (beat.Processor, error) {
 
 	f := &replaceString{
 		config: config,
-		log:    logp.NewLogger("replace"),
+		log:    log.Named("replace"),
 	}
 	return f, nil
 }
