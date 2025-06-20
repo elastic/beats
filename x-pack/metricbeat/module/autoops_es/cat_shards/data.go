@@ -93,7 +93,7 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 	maps := sendNodeIndexShardsEvent(r, info, convertToNodeIndexShards(indexToShardList, indexMetadata), transactionID)
 
 	m.Logger().Infof("%d []NodeIndexShards events sent", len(maps))
-	m.Logger().Infof("Assign Shards: %v", maps[0]["assignShards"])
+	m.Logger().Infof("Assign Shards: %#v", maps[0]["assignShards"])
 
 	return err
 }
