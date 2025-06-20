@@ -62,7 +62,7 @@ type QueryConfig struct {
 }
 
 var wmiDefaultMaxRows uint32 = 0
-var wmiDefaultCacheSize uint32 = 500
+var wmiDefaultCacheSize uint32 = 200
 
 func NewDefaultConfig() Config {
 	return Config{
