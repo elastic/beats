@@ -11,6 +11,7 @@ import (
 
 	"golang.org/x/exp/maps"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -81,7 +82,7 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 
 	transactionID := utils.NewUUIDV4()
 
-	sendNodeShardsEvent(r, info, maps.Values(nodeShards), transactionID)
+	sendNodeShardsEvent(r, info, maps.Values(nodeShards), transactionID, m.Logger())
 
 	indexMetadata, err := getResolvedIndices(m)
 
@@ -91,20 +92,20 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 		events.SendErrorEvent(err, info, r, CatShardsMetricSet, CatShardsPath, transactionID)
 	}
 
-	sendNodeIndexShardsEvent(r, info, convertToNodeIndexShards(indexToShardList, indexMetadata), transactionID)
+	sendNodeIndexShardsEvent(r, info, convertToNodeIndexShards(indexToShardList, indexMetadata), transactionID, m.Logger())
 
 	return err
 }
 
-func sendNodeShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeToShards []NodeShardCount, transactionId string) {
-	if converted, err := convertObjectArrayToMapArray(nodeToShards); err != nil {
+func sendNodeShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeToShards []NodeShardCount, transactionId string, logger *logp.Logger) {
+	if converted, err := convertObjectArrayToMapArray(nodeToShards, logger); err != nil {
 		events.SendErrorEvent(err, info, r, CatShardsMetricSet, CatShardsPath, transactionId)
 	} else {
 		r.Event(events.CreateEvent(info, mapstr.M{"node_index_shards": converted}, transactionId))
 	}
 }
 
-func sendNodeIndexShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeIndexShards []NodeIndexShards, transactionId string) {
+func sendNodeIndexShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeIndexShards []NodeIndexShards, transactionId string, logger *logp.Logger) {
 	nodeIndexShardsPerEvent := utils.GetIntEnvParam(NODE_INDEX_SHARDS_PER_EVENT_NAME, 100)
 	size := len(nodeIndexShards)
 
@@ -114,7 +115,7 @@ func sendNodeIndexShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeInde
 	for i := 0; i < size; i += nodeIndexShardsPerEvent {
 		group := nodeIndexShards[i:min(i+nodeIndexShardsPerEvent, size)]
 
-		if converted, err := convertObjectArrayToMapArray(group); err != nil {
+		if converted, err := convertObjectArrayToMapArray(group, logger); err != nil {
 			events.SendErrorEvent(err, info, r, CatShardsMetricSet, CatShardsPath, transactionId)
 		} else {
 			groups = append(groups, mapstr.M{"node_index_shards": converted})

@@ -6,10 +6,11 @@ package cat_shards
 
 import (
 	"encoding/json"
-	"fmt"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func convertObjectToMap[T any](object T) (map[string]any, error) {
+func convertObjectToMap[T any](object T, logger *logp.Logger) (map[string]any, error) {
 	// Marshal the struct to JSON
 	if data, err := json.Marshal(object); err != nil {
 		return nil, err
@@ -22,20 +23,20 @@ func convertObjectToMap[T any](object T) (map[string]any, error) {
 		}
 
 		if result["assignShards"] != nil {
-			fmt.Printf("assignShards: %v for %v\n", result["assignShards"], result["index"])
+			logger.Infof("assignShards: %v for %v\n", result["assignShards"], result["index"])
 		} else {
-			fmt.Printf("assignShards is nil for %v\n", result["index"])
+			logger.Infof("assignShards is nil for %v\n", result["index"])
 		}
 
 		return result, nil
 	}
 }
 
-func convertObjectArrayToMapArray[T any](objects []T) ([]map[string]any, error) {
+func convertObjectArrayToMapArray[T any](objects []T, logger *logp.Logger) ([]map[string]any, error) {
 	mapArray := make([]map[string]any, 0, len(objects))
 
 	for _, object := range objects {
-		if objectMap, err := convertObjectToMap(object); err != nil {
+		if objectMap, err := convertObjectToMap(object, logger); err != nil {
 			return nil, err
 		} else {
 			mapArray = append(mapArray, objectMap)
