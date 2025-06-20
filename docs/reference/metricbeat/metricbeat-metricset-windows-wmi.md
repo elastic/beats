@@ -64,7 +64,7 @@ the schema definition for each unique WMI class encountered. For queries involvi
 superclasses, such as `CIM_LogicalDevice`, the cache will populate with individual entries
 for each specific derived (leaf of the class hierarchy) class whose instances are returned by the query (e.g., `Win32_DiskDrive`, `Win32_NetworkAdapter`, etc.).
 
-::::{info}
+::::{note}
 **CIM Object Type Support:**
 The handling of properties with the `CIM_Object` type (embedded objects) is not supported.
 ::::
