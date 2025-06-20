@@ -111,7 +111,7 @@ type config struct {
 	CredentialsJSON            string        `config:"credentials_json"`
 	Endpoint                   string        `config:"endpoint"`
 	CollectDataprocUserLabels  bool          `config:"collect_dataproc_user_labels"`
-	MetadataCache              *bool         `config:"metadata_cache"`
+	MetadataCache              bool          `config:"metadata_cache"`
 	MetadataCacheRefreshPeriod time.Duration `config:"metadata_cache_refresh_period"`
 
 	opt              []option.ClientOption
@@ -189,17 +189,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	var metadataCacheRefreshPeriod time.Duration
-
-	// The cache is disabled ONLY if the user explicitly sets it to false.
-	// If it's not set (nil) or set to true, the cache is enabled.
-	if m.config.MetadataCache != nil && !*m.config.MetadataCache {
-		// Cache is always expired - essentially disabled
-		metadataCacheRefreshPeriod = 0
-	} else {
+	if m.config.MetadataCache {
 		metadataCacheRefreshPeriod = m.config.MetadataCacheRefreshPeriod
 		if metadataCacheRefreshPeriod <= 0 {
 			metadataCacheRefreshPeriod = time.Hour // Default to 1 hour if not specified
 		}
+	} else {
+		// Cache is always expired - essentially disabled
+		metadataCacheRefreshPeriod = 0
 	}
 
 	m.metadataCacheRegistry = gcp.NewCacheRegistry(m.Logger(), metadataCacheRefreshPeriod)
