@@ -224,15 +224,9 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 			return err
 		}
 	}
-<<<<<<< HEAD
-	pagination := newPagination(cfg, client, log)
-	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, log)
-	requester := newRequester(client, requestFactory, responseProcessor, log)
-=======
 	pagination := newPagination(cfg, client, stat, log)
 	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, stat, log)
-	requester := newRequester(client, requestFactory, responseProcessor, metrics, stat, log)
->>>>>>> c203b823c (x-pack/filebeat/input/httpjson: add fleet input status updating (#44365))
+	requester := newRequester(client, requestFactory, responseProcessor, stat, log)
 
 	trCtx := emptyTransformContext()
 	trCtx.cursor = newCursor(cfg.Cursor, stat, log)

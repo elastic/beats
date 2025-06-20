@@ -89,11 +89,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
-<<<<<<< HEAD
-				p := newPublisher(trCtx, publisher, true, r.log)
-=======
-				p := newPublisher(trCtx, publisher, true, r.metrics, r.status, r.log)
->>>>>>> c203b823c (x-pack/filebeat/input/httpjson: add fleet input status updating (#44365))
+				p := newPublisher(trCtx, publisher, true, r.status, r.log)
 				r.responseProcessors[i].startProcessing(ctx, trCtx, finalResps, true, p)
 				n = p.eventCount()
 				continue
@@ -130,11 +126,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 				return err
 			}
 			// we avoid unnecessary pagination here since chaining is present, thus avoiding any unexpected updates to cursor values
-<<<<<<< HEAD
-			p := newPublisher(trCtx, publisher, false, r.log)
-=======
-			p := newPublisher(trCtx, publisher, false, r.metrics, r.status, r.log)
->>>>>>> c203b823c (x-pack/filebeat/input/httpjson: add fleet input status updating (#44365))
+			p := newPublisher(trCtx, publisher, false, r.status, r.log)
 			r.responseProcessors[i].startProcessing(ctx, trCtx, finalResps, false, p)
 			n = p.eventCount()
 		} else {
@@ -210,11 +202,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 				resps = intermediateResps
 			}
 
-<<<<<<< HEAD
-			p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.log)
-=======
-			p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.metrics, r.status, r.log)
->>>>>>> c203b823c (x-pack/filebeat/input/httpjson: add fleet input status updating (#44365))
+			p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.status, r.log)
 			if rf.isChain {
 				rf.chainResponseProcessor.startProcessing(ctx, chainTrCtx, resps, true, p)
 			} else {
@@ -502,28 +490,16 @@ type requester struct {
 	client             *httpClient
 	requestFactories   []*requestFactory
 	responseProcessors []*responseProcessor
-<<<<<<< HEAD
-	log                *logp.Logger
-}
-
-func newRequester(client *httpClient, reqs []*requestFactory, resps []*responseProcessor, log *logp.Logger) *requester {
-=======
-	metrics            *inputMetrics
 	status             status.StatusReporter
 	log                *logp.Logger
 }
 
-func newRequester(client *httpClient, reqs []*requestFactory, resps []*responseProcessor, metrics *inputMetrics, stat status.StatusReporter, log *logp.Logger) *requester {
->>>>>>> c203b823c (x-pack/filebeat/input/httpjson: add fleet input status updating (#44365))
+func newRequester(client *httpClient, reqs []*requestFactory, resps []*responseProcessor, stat status.StatusReporter, log *logp.Logger) *requester {
 	return &requester{
 		client:             client,
 		requestFactories:   reqs,
 		responseProcessors: resps,
-<<<<<<< HEAD
-=======
-		metrics:            metrics,
 		status:             stat,
->>>>>>> c203b823c (x-pack/filebeat/input/httpjson: add fleet input status updating (#44365))
 		log:                log,
 	}
 }
@@ -763,11 +739,7 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 			}
 			resps = intermediateResps
 		}
-<<<<<<< HEAD
-		p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.log)
-=======
-		p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.metrics, r.status, r.log)
->>>>>>> c203b823c (x-pack/filebeat/input/httpjson: add fleet input status updating (#44365))
+		p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.status, r.log)
 		rf.chainResponseProcessor.startProcessing(ctx, chainTrCtx, resps, true, p)
 		n += p.eventCount()
 	}
@@ -803,25 +775,14 @@ func generateNewUrl(replacement, oldUrl, id string) (url.URL, error) {
 
 // publisher is an event publication handler.
 type publisher struct {
-<<<<<<< HEAD
-	trCtx *transformContext
-	pub   inputcursor.Publisher
-	n     int
-	log   *logp.Logger
+	trCtx  *transformContext
+	pub    inputcursor.Publisher
+	n      int
+	status status.StatusReporter
+	log    *logp.Logger
 }
 
-func newPublisher(trCtx *transformContext, pub inputcursor.Publisher, publish bool, log *logp.Logger) *publisher {
-=======
-	trCtx   *transformContext
-	pub     inputcursor.Publisher
-	n       int
-	status  status.StatusReporter
-	log     *logp.Logger
-	metrics *inputMetrics
-}
-
-func newPublisher(trCtx *transformContext, pub inputcursor.Publisher, publish bool, metrics *inputMetrics, stat status.StatusReporter, log *logp.Logger) *publisher {
->>>>>>> c203b823c (x-pack/filebeat/input/httpjson: add fleet input status updating (#44365))
+func newPublisher(trCtx *transformContext, pub inputcursor.Publisher, publish bool, stat status.StatusReporter, log *logp.Logger) *publisher {
 	if !publish {
 		pub = nil
 	}

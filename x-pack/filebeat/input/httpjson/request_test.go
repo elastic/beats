@@ -66,11 +66,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	pagination := newPagination(config, client, noopReporter{}, log)
 	responseProcessor := newResponseProcessor(config, pagination, nil, nil, noopReporter{}, log)
 
-<<<<<<< HEAD
-	requester := newRequester(client, requestFactory, responseProcessor, log)
-=======
-	requester := newRequester(client, requestFactory, responseProcessor, nil, noopReporter{}, log)
->>>>>>> c203b823c (x-pack/filebeat/input/httpjson: add fleet input status updating (#44365))
+	requester := newRequester(client, requestFactory, responseProcessor, noopReporter{}, log)
 
 	trCtx := emptyTransformContext()
 	trCtx.cursor = newCursor(config.Cursor, noopReporter{}, log)
