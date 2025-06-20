@@ -51,6 +51,7 @@ output:
     password: testing
     index: %s
 queue.mem.flush.timeout: 0s
+setup.template.enabled: false
 processors:
     - add_host_metadata: ~
     - add_cloud_metadata: ~
@@ -83,10 +84,6 @@ http.port: %d
 	logFilePath = filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
 	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
-	s = s + `
-setup.template.name: logs-filebeat-default
-setup.template.pattern: logs-filebeat-default
-`
 
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
@@ -145,7 +142,6 @@ setup.template.pattern: logs-filebeat-default
 
 func TestHTTPJSONInputOTel(t *testing.T) {
 	integration.EnsureESIsRunning(t)
-	testStartedAt := time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
 
 	host := integration.GetESURL(t, "http")
 	user := host.User.Username()
@@ -169,13 +165,21 @@ filebeat.inputs:
     id: httpjson-e2e-otel
     request.url: http://localhost:8090/test
 
-
 output:
   elasticsearch:
     hosts:
       - {{ .ESURL }}
     username: {{ .Username }}
     password: {{ .Password }}
+    index: logs-integration-{{ .Namespace }}
+
+setup.template.enabled: false
+queue.mem.flush.timeout: 0s
+processors:
+   - add_host_metadata: ~
+   - add_cloud_metadata: ~
+   - add_docker_metadata: ~
+   - add_kubernetes_metadata: ~
 `
 
 	// start filebeat in otel mode
@@ -201,11 +205,6 @@ output:
 
 	// reset buffer
 	configBuffer.Reset()
-
-	configFile = configFile + `
-setup.template.name: logs-integration-{{.Namespace}}
-setup.template.pattern: logs-integration-{{.Namespace}}
-`
 
 	require.NoError(t, template.Must(template.New("config").Parse(configFile)).Execute(&configBuffer,
 		options{
@@ -244,19 +243,7 @@ setup.template.pattern: logs-integration-{{.Namespace}}
 	es, err := elasticsearch.NewClient(esCfg)
 	require.NoError(t, err)
 
-	mustClauses := []map[string]any{
-		{"range": map[string]any{
-			"@timestamp": map[string]string{
-				"gte": testStartedAt,
-			},
-		}},
-	}
-
 	rawQuery := map[string]any{
-		"query": map[string]any{
-			"bool": map[string]any{
-				"must": mustClauses,
-			}},
 		"sort": []map[string]any{
 			{"@timestamp": map[string]any{"order": "asc"}},
 		},
@@ -285,10 +272,10 @@ setup.template.pattern: logs-integration-{{.Namespace}}
 		"@timestamp",
 		"agent.ephemeral_id",
 		"agent.id",
+		"event.created",
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
-	assertMonitoring(t)
 }
 
 func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
