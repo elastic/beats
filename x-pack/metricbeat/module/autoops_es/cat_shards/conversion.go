@@ -22,10 +22,12 @@ func convertObjectToMap[T any](object T, logger *logp.Logger) (map[string]any, e
 			return nil, err
 		}
 
-		if result["assignShards"] != nil {
-			logger.Infof("assignShards: %v for %v\n", result["assignShards"], result["index"])
-		} else {
-			logger.Infof("assignShards is nil for %v\n", result["index"])
+		if logger != nil {
+			if result["assignShards"] != nil {
+				logger.Infof("assignShards: %v for %v\n", result["assignShards"], result["index"])
+			} else {
+				logger.Infof("assignShards is nil for %v\n", result["index"])
+			}
 		}
 
 		return result, nil

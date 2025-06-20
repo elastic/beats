@@ -6,7 +6,6 @@ package cat_shards
 
 import (
 	"encoding/json"
-	"fmt"
 	"math"
 
 	"golang.org/x/exp/maps"
@@ -82,23 +81,24 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 
 	transactionID := utils.NewUUIDV4()
 
-	sendNodeShardsEvent(r, info, maps.Values(nodeShards), transactionID, m.Logger())
+	sendNodeShardsEvent(r, info, maps.Values(nodeShards), transactionID)
 
-	indexMetadata, err := getResolvedIndices(m)
+	// indexMetadata, err := getResolvedIndices(m)
 
-	if err != nil {
-		indexMetadata = map[string]IndexMetadata{}
-		err = fmt.Errorf("failed to load resolved index details %w", err)
-		events.SendErrorEvent(err, info, r, CatShardsMetricSet, CatShardsPath, transactionID)
-	}
+	// if err != nil {
+	// 	indexMetadata = map[string]IndexMetadata{}
+	// 	err = fmt.Errorf("failed to load resolved index details %w", err)
+	// 	events.SendErrorEvent(err, info, r, CatShardsMetricSet, CatShardsPath, transactionID)
+	// }
 
-	sendNodeIndexShardsEvent(r, info, convertToNodeIndexShards(indexToShardList, indexMetadata), transactionID, m.Logger())
+	// sendNodeIndexShardsEvent(r, info, convertToNodeIndexShards(indexToShardList, indexMetadata), transactionID, m.Logger())
 
-	return err
+	// return err
+	return nil
 }
 
-func sendNodeShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeToShards []NodeShardCount, transactionId string, logger *logp.Logger) {
-	if converted, err := convertObjectArrayToMapArray(nodeToShards, logger); err != nil {
+func sendNodeShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeToShards []NodeShardCount, transactionId string) {
+	if converted, err := convertObjectArrayToMapArray(nodeToShards, nil); err != nil {
 		events.SendErrorEvent(err, info, r, CatShardsMetricSet, CatShardsPath, transactionId)
 	} else {
 		r.Event(events.CreateEvent(info, mapstr.M{"node_index_shards": converted}, transactionId))
