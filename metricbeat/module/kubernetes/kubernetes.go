@@ -35,6 +35,7 @@ func init() {
 	if err := mb.Registry.AddModule("kubernetes", ModuleBuilder()); err != nil {
 		panic(err)
 	}
+	// test
 }
 
 type Module interface {
