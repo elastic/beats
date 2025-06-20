@@ -49,9 +49,14 @@ type node struct {
 }
 
 // NewNodeEventer creates an eventer that can discover and process node objects
-func NewNodeEventer(uuid uuid.UUID, cfg *config.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
-	logger := logp.NewLogger("autodiscover.node")
+func NewNodeEventer(
+	uuid uuid.UUID,
+	cfg *config.C,
+	client k8s.Interface,
+	publish func(event []bus.Event),
+	logger *logp.Logger) (Eventer, error) {
 
+	logger = logger.Named("node")
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 	if err != nil {

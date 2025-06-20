@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/testing/testutils"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
@@ -446,7 +447,7 @@ func TestTest(t *testing.T) {
 	}
 
 	err = inp.Test(v2.TestContext{
-		Logger: logp.NewLogger("kafka_test"),
+		Logger: logptest.NewTestingLogger(t, "kafka_test"),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -618,8 +619,9 @@ func run(t *testing.T, cfg *conf.C, client *beattest.ChanClient) (*kafkaInput, f
 
 func newV2Context() (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
+	logger, _ := logp.NewDevelopmentLogger("kafka_test")
 	return v2.Context{
-		Logger:      logp.NewLogger("kafka_test"),
+		Logger:      logger,
 		ID:          "test_id",
 		Cancelation: ctx,
 	}, cancel

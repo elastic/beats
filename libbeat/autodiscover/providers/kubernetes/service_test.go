@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -515,7 +516,7 @@ func TestServiceEventer_NamespaceWatcher(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			config := conf.MustNewConfigFrom(&test.cfg)
 
-			eventer, err := NewServiceEventer(uuid, config, client, nil)
+			eventer, err := NewServiceEventer(uuid, config, client, nil, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatal(err)
 			}

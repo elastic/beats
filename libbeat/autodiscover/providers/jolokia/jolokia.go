@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -48,6 +49,7 @@ type Provider struct {
 	appenders autodiscover.Appenders
 	templates template.Mapper
 	discovery DiscoveryProber
+	logger    *logp.Logger
 }
 
 // AutodiscoverBuilder builds a Jolokia Discovery autodiscover provider, it fails if
@@ -58,6 +60,7 @@ func AutodiscoverBuilder(
 	uuid uuid.UUID,
 	c *config.C,
 	keystore keystore.Keystore,
+	logger *logp.Logger,
 ) (autodiscover.Provider, error) {
 	errWrap := func(err error) error {
 		return fmt.Errorf("error setting up jolokia autodiscover provider: %w", err)
@@ -98,6 +101,7 @@ func AutodiscoverBuilder(
 		builders:  builders,
 		appenders: appenders,
 		discovery: discovery,
+		logger:    logger.Named("jolokia"),
 	}, nil
 }
 

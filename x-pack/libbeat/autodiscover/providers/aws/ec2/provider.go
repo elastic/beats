@@ -44,6 +44,7 @@ func AutodiscoverBuilder(
 	uuid uuid.UUID,
 	c *conf.C,
 	keystore keystore.Keystore,
+	_ *logp.Logger,
 ) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("aws_ec2 autodiscover is experimental")
 

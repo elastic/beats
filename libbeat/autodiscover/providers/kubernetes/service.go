@@ -48,8 +48,14 @@ type service struct {
 }
 
 // NewServiceEventer creates an eventer that can discover and process service objects
-func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
-	logger := logp.NewLogger("autodiscover.service")
+func NewServiceEventer(
+	uuid uuid.UUID,
+	cfg *conf.C,
+	client k8s.Interface,
+	publish func(event []bus.Event),
+	logger *logp.Logger,
+) (Eventer, error) {
+	logger = logger.Named("service")
 
 	config := defaultConfig()
 	err := cfg.Unpack(&config)

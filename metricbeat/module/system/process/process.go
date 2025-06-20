@@ -27,13 +27,10 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
-
-var debugf = logp.NewLogger("system.process").Debugf
 
 func init() {
 	mb.Registry.MustAddMetricSet("system", "process", New,
@@ -66,7 +63,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if runtime.GOOS == "linux" {
 		if config.Cgroups == nil || *config.Cgroups {
 			enableCgroups = true
-			debugf("process cgroup data collection is enabled, using hostfs='%v'", sys.ResolveHostFS(""))
+			base.Logger().Named("system.process").Debugf("process cgroup data collection is enabled, using hostfs='%v'", sys.ResolveHostFS(""))
 		}
 	}
 

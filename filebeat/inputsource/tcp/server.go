@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -35,12 +36,14 @@ type Server struct {
 
 	config    *Config
 	tlsConfig *tlscommon.TLSConfig
+	logger    *logp.Logger
 }
 
 // New creates a new tcp server
 func New(
 	config *Config,
 	factory streaming.HandlerFactory,
+	logger *logp.Logger,
 ) (*Server, error) {
 	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS)
 	if err != nil {
@@ -54,12 +57,13 @@ func New(
 	server := &Server{
 		config:    config,
 		tlsConfig: tlsConfig,
+		logger:    logger,
 	}
 	server.Listener = streaming.NewListener(inputsource.FamilyTCP, config.Host, factory, server.createServer, &streaming.ListenerConfig{
 		Timeout:        config.Timeout,
 		MaxMessageSize: config.MaxMessageSize,
 		MaxConnections: config.MaxConnections,
-	})
+	}, logger)
 
 	return server, nil
 }
