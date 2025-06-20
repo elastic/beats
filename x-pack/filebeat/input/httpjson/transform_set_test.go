@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -174,7 +174,7 @@ func TestDifferentSetValueTypes(t *testing.T) {
 	cfg, err := conf.NewConfigFrom(c1)
 	require.NoError(t, err)
 
-	transform, err := newSetResponse(cfg, logp.NewLogger("test"))
+	transform, err := newSetResponse(cfg, logptest.NewTestingLogger(t, "test"))
 	require.NoError(t, err)
 
 	testAppend := transform.(*set)
@@ -202,7 +202,7 @@ func TestDifferentSetValueTypes(t *testing.T) {
 	cfg, err = conf.NewConfigFrom(c2)
 	require.NoError(t, err)
 
-	transform, err = newSetResponse(cfg, logp.NewLogger("test"))
+	transform, err = newSetResponse(cfg, logptest.NewTestingLogger(t, "test"))
 	require.NoError(t, err)
 
 	testAppend = transform.(*set)
@@ -223,7 +223,7 @@ func TestDifferentSetValueTypes(t *testing.T) {
 	cfg, err = conf.NewConfigFrom(c2)
 	require.NoError(t, err)
 
-	transform, err = newSetResponse(cfg, logp.NewLogger("test"))
+	transform, err = newSetResponse(cfg, logptest.NewTestingLogger(t, "test"))
 	require.NoError(t, err)
 
 	testAppend = transform.(*set)

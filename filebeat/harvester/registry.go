@@ -71,7 +71,7 @@ func (r *Registry) WaitForCompletion() {
 }
 
 // Start starts the given harvester and add its to the registry
-func (r *Registry) Start(h Harvester) error {
+func (r *Registry) Start(h Harvester, logger *logp.Logger) error {
 	// Make sure stop is not called during starting a harvester
 	r.Lock()
 	defer r.Unlock()
@@ -95,7 +95,7 @@ func (r *Registry) Start(h Harvester) error {
 		// Starts harvester and picks the right type. In case type is not set, set it to default (log)
 		err := h.Run()
 		if err != nil {
-			logp.Err("Error running input: %v", err)
+			logger.Errorf("Error running input: %v", err)
 		}
 	}()
 	return nil
