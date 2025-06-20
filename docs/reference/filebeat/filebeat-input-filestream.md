@@ -391,8 +391,8 @@ Setting `close.on_state_change.inactive` to a lower value means that file handle
 
 The timestamp for closing a file does not depend on the modification time of the file. Instead, Filebeat uses an internal timestamp that reflects when the file was last harvested. For example, if `close.on_state_change.inactive` is set to 5 minutes, the countdown for the 5 minutes starts after the harvester reads the last line of the file.
 
-You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 5m.
-
+You can use time strings like 2h (2 hours) and 5m (5 minutes). The
+default is 5m.
 
 #### `close.on_state_change.renamed` [filebeat-input-filestream-close-renamed]
 
@@ -595,6 +595,38 @@ file_identity.path: ~
 file_identity.inode_marker.path: /logs/.filebeat-marker
 ```
 
+## Removing fully ingested files [filebeat-input-filestream-delete-options]
+Filebeat can delete files after the reader is closed.
+Regardless of the reader close configuration, a file can only be
+deleted if EOF has been reached and all events from the file have
+been published.
+
+If there are events pending publishing or there is an issue while
+deleting the file, the harvester is closed and it will be re-opened at
+the next scan, then the remove operation is retried. The scan for
+changes in files can be configured by setting
+[`prospector.scanner.check_interval`](#filebeat-input-filestream-scan-frequency).
+
+If you enabled removing files, it is recommended to keep
+`clean_removed` enabled.
+
+Removing files is disabled by default.
+
+### `delete.enabled` [filebeat-input-filestream-delete-enabled]
+When set to `true`, files will be removed after EOF the reader is
+closed (the default is 5 minutes of inactivity). Files are only
+removed if all events have been ingested by the output.
+
+### `delete.grace_period` [filebeat-input-filestream-delete-grace-period]
+An interval to wait after the reader is closed and all events have
+been published before trying to remove the file. The harvester for the
+file will stay open while waiting for the grace period. Once the grace
+period expires, Filestream checks if the file is at EOF, if is not,
+then the harvester is closed, otherwise the file is removed. The
+default is 30 minutes.
+
+For examples on how to use this feature read our [Removing files after
+ingestion](/reference/filebeat/delete-file-guide.md) guide.
 
 ## Log rotation [filestream-log-rotation-support]
 

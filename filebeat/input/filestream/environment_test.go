@@ -76,9 +76,11 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 
 	t.Cleanup(func() {
 		if t.Failed() {
-			f, err := os.CreateTemp("", t.Name()+"-*")
+			folderName := strings.ReplaceAll(t.Name()+"-*", "/", "_")
+			f, err := os.CreateTemp("", folderName)
 			if err != nil {
 				t.Errorf("cannot create temp file for logs: %s", err)
+				return
 			}
 
 			defer f.Close()
@@ -167,12 +169,14 @@ func (e *inputTestingEnvironment) waitUntilInputStops() {
 	e.wg.Wait()
 }
 
-func (e *inputTestingEnvironment) mustWriteToFile(filename string, data []byte) {
+func (e *inputTestingEnvironment) mustWriteToFile(filename string, data []byte) string {
 	path := e.abspath(filename)
 	err := os.WriteFile(path, data, 0o644)
 	if err != nil {
 		e.t.Fatalf("failed to write file '%s': %+v", path, err)
 	}
+
+	return path
 }
 
 func (e *inputTestingEnvironment) mustAppendToFile(filename string, data []byte) {

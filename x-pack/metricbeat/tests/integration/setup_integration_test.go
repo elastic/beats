@@ -65,10 +65,10 @@ metricbeat.config.modules:
 		"-E", "setup.kibana.port="+kURL.Port(),
 		"-E", "output.elasticsearch.protocol=http",
 		"-E", "output.elasticsearch.hosts=['"+esURL.String()+"']")
-	procState, err := metricbeat.Process.Wait()
+	err = metricbeat.Cmd.Wait()
 	require.NoError(t, err, "metricbeat setup failed")
-	require.Equalf(t, 0, procState.ExitCode(),
-		"metricbeat setup failed: incorrect exit code: %d", procState.ExitCode())
+	require.Equalf(t, 0, metricbeat.Cmd.ProcessState.ExitCode(),
+		"metricbeat setup failed: incorrect exit code: %d", metricbeat.Cmd.ProcessState.ExitCode())
 
 	// generate an event with dynamically mapped fields
 	fields := map[string]string{}

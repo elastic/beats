@@ -333,6 +333,7 @@ toc:
           - file: filebeat/migrate-to-filestream.md
           - file: filebeat/file-identity.md
           - file: filebeat/migrate-from-deprecated-module.md
+          - file: filebeat/delete-file-guide.md
       - file: filebeat/filebeat-modules.md
         children:
           - file: filebeat/filebeat-modules-overview.md
