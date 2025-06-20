@@ -1,9 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-benchmark.html
-  # That link will 404 until 8.18 is current
-  # (see https://www.elastic.co/guide/en/beats/metricbeat/8.18/metricbeat-module-benchmark.html)
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Benchmark module [metricbeat-module-benchmark]
 
@@ -51,9 +51,9 @@ A metric that includes a `counter` field which is used to keep the metric unique
 :   number, the number of metrics to emit per fetch.
 
 
-### Example configuration [_example_configuration_9]
+## Example configuration [_example_configuration]
 
-The Benchmark module supports the standard configuration options that are described in [Modules](configuration-metricbeat.md). Here is an example configuration:
+The Benchmark module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
 ```yaml
 metricbeat.modules:
@@ -65,10 +65,8 @@ metricbeat.modules:
 ```
 
 
-### Metricsets [_metricsets_14]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
-* [info](metricbeat-metricset-benchmark-info.md)
-
-
+* [info](/reference/metricbeat/metricbeat-metricset-benchmark-info.md)

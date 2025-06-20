@@ -1,0 +1,1 @@
+The `node` metricset interrogates the [Cluster API endpoint](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-nodes-info) of Elasticsearch to get cluster nodes information. This metricset only fetches the data from the `_local` node so it must run on each Elasticsearch node.

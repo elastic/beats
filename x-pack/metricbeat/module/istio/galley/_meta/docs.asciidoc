@@ -1,1 +1,0 @@
-This is the galley metricset of the module istio. This metricset collects Galley-specific metrics.

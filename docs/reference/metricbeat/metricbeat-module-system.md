@@ -3,19 +3,9 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-system.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # System module [metricbeat-module-system]
-
-:::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/system/index.md).
-
-::::{dropdown} Learn more
-{{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
-
-::::
-
-
-:::::
-
 
 The System module allows you to monitor your servers. Because the System module always applies to the local server, the `hosts` config option is not needed.
 
@@ -34,41 +24,43 @@ Note that in some cases a field like this may be missing from the System module 
 
 
 
-## Dashboard [_dashboard_42]
+## Dashboard [_dashboard_42] 
 
 The System module comes with a predefined dashboard. For example:
 
-![metricbeat system dashboard](images/metricbeat_system_dashboard.png)
+:::{image} images/metricbeat_system_dashboard.png
+:alt: metricbeat system dashboard
+:::
 
 
-## Required permissions [_required_permissions]
+## Required permissions [_required_permissions] 
 
 The System metricsets collect different kinds of metric data, which may require dedicated permissions to be fetched. For security reasons it’s advised to grant the lowest possible permissions. This section justifies which permissions must be present for particular metricsets.
 
 Please notice that modern Linux implementations divide the privileges traditionally associated with superuser into distinct units, known as capabilities, which can be independently enabled and disabled. Capabilities are a per-thread attribute.
 
 
-### cpu [_cpu]
+### cpu [_cpu] 
 
 CPU statistics (idle, irq, user, system, iowait, softirq, cores, nice, steal, total) should be available without elevated permissions.
 
 
-### load [_load]
+### load [_load] 
 
 CPU load data (1 min, 5 min, 15 min, cores) should be available without elevated permissions.
 
 
-### memory [_memory]
+### memory [_memory] 
 
 Memory statistics (swap, total, used, free, actual) should be available without elevated permissions.
 
 
-### network [_network]
+### network [_network] 
 
 Network metrics for interfaces (in, out, errors, dropped, bytes, packets) should be available without elevated permissions.
 
 
-### process [_process]
+### process [_process] 
 
 Process execution data (state, memory, cpu, cmdline) should be available for an authorized user.
 
@@ -79,39 +71,39 @@ If the beats process is running as less privileged user, it may not be able to r
 ```
 
 
-### process_summary [_process_summary]
+### process_summary [_process_summary] 
 
 General process summary (unknown, dead, total, sleeping, running, idle, stopped, zombie) should be available without elevated permissions. Please notice that if the process data belongs to the other users, it will be counted as unknown value (no error will be reported in application logs).
 
 
-### socket_summary [_socket_summary]
+### socket_summary [_socket_summary] 
 
 Used sockets summary (TCP, UDP, count, listening, established, wait, etc.) should be available without elevated permissions.
 
 
-### entropy [_entropy]
+### entropy [_entropy] 
 
 Entropy data (available, pool size) requires access to the `/proc/sys/kernel/random` path. Otherwise an error will be reported.
 
 
-### core [_core]
+### core [_core] 
 
 Usage statistics for each CPU core (idle, irq, user, system, iowait, softirq, cores, nice, steal, total) should be available without elevated permissions.
 
 
-### diskio [_diskio]
+### diskio [_diskio] 
 
 Disk IO metrics (io, read, write) should be available without elevated permissions.
 
 
-### socket [_socket]
+### socket [_socket] 
 
 Events for each new TCP socket should be available for an authorized user.
 
 If the beats process is running as less privileged user, it may not be able to view socket data belonging to other users.
 
 
-### service [_service]
+### service [_service] 
 
 Systemd service data (memory, tasks, states) should be available for an authorized user.
 
@@ -122,27 +114,27 @@ If the beats process is running as less privileged user, it may not be able to r
 ```
 
 
-### filesystem [_filesystem_2]
+### filesystem [_filesystem_2] 
 
 Filesystem metrics data (total, available, type, mount point, files, free, used) should be available without elevated permissions.
 
 
-### fsstat [_fsstat]
+### fsstat [_fsstat] 
 
 Fsstat metrics data (total size, free, total, used count) should be available without elevated permissions.
 
 
-### uptime [_uptime]
+### uptime [_uptime] 
 
 Uptime metrics data (duration) should be available without elevated permissions.
 
 
-### raid [_raid]
+### raid [_raid] 
 
 RAID metrics data (block, disks) requires access to the `/sys/block` mount point and all referenced devices. Otherwise an error will be reported.
 
 
-## Example configuration [_example_configuration_63]
+## Example configuration [_example_configuration]
 
 The System module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -239,7 +231,7 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_73]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
@@ -261,22 +253,3 @@ The following metricsets are available:
 * [socket_summary](/reference/metricbeat/metricbeat-metricset-system-socket_summary.md)
 * [uptime](/reference/metricbeat/metricbeat-metricset-system-uptime.md)
 * [users](/reference/metricbeat/metricbeat-metricset-system-users.md)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
