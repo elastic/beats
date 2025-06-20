@@ -6,6 +6,7 @@ package cat_shards
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 func convertObjectToMap[T any](object T) (map[string]any, error) {
@@ -18,6 +19,12 @@ func convertObjectToMap[T any](object T) (map[string]any, error) {
 
 		if err := json.Unmarshal(data, &result); err != nil {
 			return nil, err
+		}
+
+		if result["assignShards"] != nil {
+			fmt.Printf("assignShards: %v for %v\n", result["assignShards"], result["index"])
+		} else {
+			fmt.Printf("assignShards is nil for %v\n", result["index"])
 		}
 
 		return result, nil
