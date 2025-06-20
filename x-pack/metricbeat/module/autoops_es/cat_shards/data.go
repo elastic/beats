@@ -101,7 +101,7 @@ func sendNodeShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeToShards 
 	if converted, err := convertObjectArrayToMapArray(nodeToShards, nil); err != nil {
 		events.SendErrorEvent(err, info, r, CatShardsMetricSet, CatShardsPath, transactionId)
 	} else {
-		r.Event(events.CreateEvent(info, mapstr.M{"node_index_shards": converted}, transactionId))
+		r.Event(events.CreateEvent(info, mapstr.M{"node_shards_count": converted}, transactionId))
 	}
 }
 
