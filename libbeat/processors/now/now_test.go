@@ -22,8 +22,10 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -38,6 +40,7 @@ func TestNow(t *testing.T) {
 		Input       mapstr.M
 		Output      mapstr.M
 		error       bool
+		badConfig   bool
 	}{
 		{
 			description: "Single target field now",
@@ -47,7 +50,8 @@ func TestNow(t *testing.T) {
 			Output: mapstr.M{
 				"field1": es9ReleaseDate,
 			},
-			error: false,
+			error:     false,
+			badConfig: false,
 		},
 		{
 			description: "Target field with now plus existing field",
@@ -61,7 +65,8 @@ func TestNow(t *testing.T) {
 				"field1": es9ReleaseDate,
 				"field2": "some data",
 			},
-			error: false,
+			error:     false,
+			badConfig: false,
 		},
 		{
 			description: "Target with existing value",
@@ -76,7 +81,25 @@ func TestNow(t *testing.T) {
 				"field1": es9ReleaseDate,
 				"field2": "some data",
 			},
-			error: false,
+			error:     false,
+			badConfig: false,
+		},
+		{
+			description: "Target with dot's (nested field)",
+			config: nowConfig{
+				Field: "nested.field1",
+			},
+			Input: mapstr.M{
+				"input": "should equal output",
+			},
+			Output: mapstr.M{
+				"nested": mapstr.M{
+					"field1": es9ReleaseDate,
+				},
+				"input": "should equal output",
+			},
+			error:     false,
+			badConfig: false,
 		},
 		{
 			description: "Target with dot's and leaf value along the path, causing error",
@@ -91,7 +114,14 @@ func TestNow(t *testing.T) {
 				"nested": "existing 'leaf' data",
 				"input":  "should equal output",
 			},
-			error: true,
+			error:     true,
+			badConfig: false,
+		},
+		{
+			description: "Bad config, no field set",
+			config:      nowConfig{},
+			error:       true,
+			badConfig:   true,
 		},
 	}
 
@@ -100,9 +130,19 @@ func TestNow(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			t.Parallel()
 
+			configInput, err := config.NewConfigFrom(test.config)
+			require.NoError(t, err, "Failed to create config from test case")
+			testConfig := nowConfig{}
+			err = configInput.Unpack(&testConfig)
+			if test.badConfig {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
 			processor := &now{
 				log:    logptest.NewTestingLogger(t, "now"),
-				config: test.config,
+				config: testConfig,
 			}
 
 			inputEvent := &beat.Event{
@@ -116,9 +156,7 @@ func TestNow(t *testing.T) {
 				assert.Error(t, err)
 			}
 
-			assert.Equal(t, test.Output, outputEvent.Fields)
+			assert.Equal(t, test.Output, outputEvent.Fields, "Output event does not match expected")
 		})
-
 	}
-
 }
