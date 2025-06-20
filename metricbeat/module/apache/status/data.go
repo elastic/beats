@@ -24,7 +24,6 @@ import (
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -108,7 +107,7 @@ func applySchema(event mapstr.M, fullEvent map[string]interface{}) error {
 }
 
 // Map body to MapStr
-func eventMapping(scanner *bufio.Scanner, hostname string, logger *logp.Logger) (mapstr.M, error) {
+func eventMapping(scanner *bufio.Scanner, hostname string) (mapstr.M, error) {
 	var (
 		totalS          int
 		totalR          int
@@ -173,7 +172,7 @@ func eventMapping(scanner *bufio.Scanner, hostname string, logger *logp.Logger) 
 			totalDot = strings.Count(match[2], ".")
 			totalAll = totalUnderscore + totalS + totalR + totalW + totalK + totalD + totalC + totalL + totalG + totalI + totalDot
 		} else {
-			logger.Named("apache-status").Debugf("Unexpected line in apache server-status output: %s", scanner.Text())
+			debugf("Unexpected line in apache server-status output: %s", scanner.Text())
 		}
 	}
 
