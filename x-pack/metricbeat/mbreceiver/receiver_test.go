@@ -27,6 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/receiver"
 
 	"go.uber.org/zap"
@@ -346,5 +347,65 @@ func BenchmarkFactory(b *testing.B) {
 	for b.Loop() {
 		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
 		require.NoError(b, err)
+	}
+}
+
+func TestReceiverDegraded(t *testing.T) {
+	testCases := []struct {
+		name    string
+		status  oteltest.ExpectedStatus
+		degrade bool
+	}{
+		{
+			name: "degraded input",
+			status: oteltest.ExpectedStatus{
+				Status: componentstatus.StatusRecoverableError,
+				Error:  "benchmark input degraded",
+			},
+			degrade: true,
+		},
+		{
+			name: "running input",
+			status: oteltest.ExpectedStatus{
+				Status: componentstatus.StatusOK,
+				Error:  "",
+			},
+		},
+	}
+
+	for _, test := range testCases {
+		t.Run("", func(t *testing.T) {
+			config := Config{
+				Beatconfig: map[string]any{
+					"metricbeat": map[string]any{
+						"modules": []map[string]any{
+							{
+								"module":     "benchmark",
+								"enabled":    true,
+								"period":     "1s",
+								"degrade":    test.degrade,
+								"metricsets": []string{"info"},
+							},
+						},
+					},
+					"output": map[string]any{
+						"otelconsumer": map[string]any{},
+					},
+					"path.home": t.TempDir(),
+				},
+			}
+			oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+				T: t,
+				Receivers: []oteltest.ReceiverConfig{
+					{
+						Name:    "r1",
+						Beat:    "metricbeat",
+						Config:  &config,
+						Factory: NewFactory(),
+					},
+				},
+				Status: test.status,
+			})
+		})
 	}
 }

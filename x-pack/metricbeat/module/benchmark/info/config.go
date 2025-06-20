@@ -9,7 +9,8 @@ import (
 )
 
 type infoConfig struct {
-	Count uint `config:"count"`
+	Count   uint `config:"count"`
+	Degrade bool `config:"degrade"`
 }
 
 var defaultConfig = infoConfig{

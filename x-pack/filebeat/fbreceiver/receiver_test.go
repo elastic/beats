@@ -27,6 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -249,6 +250,80 @@ func TestMultipleReceivers(t *testing.T) {
 			}, "failed to connect to monitoring socket2, inputs endpoint, last error was: %s", &lastError)
 		},
 	})
+}
+
+func TestReceiverDegraded(t *testing.T) {
+	testCases := []struct {
+		name            string
+		status          oteltest.ExpectedStatus
+		benchmarkStatus string
+	}{
+		{
+			name: "failed input",
+			status: oteltest.ExpectedStatus{
+				Status: componentstatus.StatusPermanentError,
+				Error:  "benchmark input failed",
+			},
+			benchmarkStatus: "failed",
+		},
+		{
+			name: "degraded input",
+			status: oteltest.ExpectedStatus{
+				Status: componentstatus.StatusRecoverableError,
+				Error:  "benchmark input degraded",
+			},
+			benchmarkStatus: "degraded",
+		},
+		{
+			name: "running input",
+			status: oteltest.ExpectedStatus{
+				Status: componentstatus.StatusOK,
+				Error:  "",
+			},
+		},
+	}
+
+	for _, test := range testCases {
+		t.Run("", func(t *testing.T) {
+			config := Config{
+				Beatconfig: map[string]any{
+					"filebeat": map[string]any{
+						"inputs": []map[string]any{
+							{
+								"type":    "benchmark",
+								"enabled": true,
+								"message": "test",
+								"count":   1,
+								"status":  test.benchmarkStatus,
+							},
+						},
+					},
+					"output": map[string]any{
+						"otelconsumer": map[string]any{},
+					},
+					"logging": map[string]any{
+						"level": "debug",
+						"selectors": []string{
+							"*",
+						},
+					},
+					"path.home": t.TempDir(),
+				},
+			}
+			oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+				T: t,
+				Receivers: []oteltest.ReceiverConfig{
+					{
+						Name:    "r1",
+						Beat:    "filebeat",
+						Config:  &config,
+						Factory: NewFactory(),
+					},
+				},
+				Status: test.status,
+			})
+		})
+	}
 }
 
 func genSocketPath() string {
