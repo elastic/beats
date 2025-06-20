@@ -58,7 +58,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	err := config.ValidateConnectionParameters()
+	err := config.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	err = config.ValidateConnectionParameters()
 	if err != nil {
 		return nil, err
 	}
@@ -172,28 +177,38 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				m.reportError(report, fmt.Errorf("%s", message))
 			}
 
-			for _, instance := range rows {
-				event := mb.Event{
-					MetricSetFields: mapstr.M{
-						"class":     instance.GetClassName(),
-						"namespace": namespace,
-						// Remote WMI is intentionally hidden, this will always be localhost
-						// "host":      m.config.Host,
-					},
-				}
+			rowsToReport := len(rows)
 
-				// Remote WMI is intentionally hidden, this will always be the empty string
-				// if m.config.Domain != "" {
-				// 	event.MetricSetFields.Put("domain", m.config.Domain)
-				// }
+			if m.config.MaxRowsPerQuery >= 0 && rowsToReport > int(m.config.MaxRowsPerQuery) {
+				m.Logger().Warnf("Got %d results, that exceeds the configured limit %d.", len(rows), (m.config.MaxRowsPerQuery))
+				rowsToReport = int(m.config.MaxRowsPerQuery)
+			}
 
-				if m.config.IncludeQueryClass {
-					event.MetricSetFields.Put("query_class", queryConfig.Class)
-				}
+			baseEvent := mb.Event{
+				MetricSetFields: mapstr.M{
+					"namespace": namespace,
+					// Remote WMI is intentionally hidden, this will always be localhost
+					// "host":      m.config.Host,
+				},
+			}
 
-				if m.config.IncludeQueries {
-					event.MetricSetFields.Put("query", query)
-				}
+			if m.config.IncludeQueryClass {
+				baseEvent.MetricSetFields.Put("query_class", queryConfig.Class)
+			}
+
+			if m.config.IncludeQueries {
+				baseEvent.MetricSetFields.Put("query", query)
+			}
+			// Remote WMI is intentionally hidden, this will always be the empty string
+			// if m.config.Domain != "" {
+			// 	event.MetricSetFields.Put("domain", m.config.Domain)
+			// }
+
+			for _, instance := range rows[0:rowsToReport] {
+				event := mb.Event{MetricSetFields: baseEvent.MetricSetFields.Clone()}
+
+				// Add the instance class
+				event.MetricSetFields.Put("class", instance.GetClassName())
 
 				// Get only the required properties
 				properties := queryConfig.Properties
@@ -203,6 +218,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				if len(queryConfig.Properties) == 0 {
 					properties = instance.GetClass().GetPropertiesNames()
 				}
+
+				queryConfig.WmiSchema.PutClass(instance.GetClassName())
 
 				for _, propertyName := range properties {
 					propertyValue, err := instance.GetProperty(propertyName)
@@ -234,13 +251,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 						}
 						queryConfig.WmiSchema.Put(instance.GetClassName(), propertyName, convertFun)
 					}
-
 					finalValue, err := convertFun(propertyValue)
 					if err != nil {
 						m.Logger().Warnf("Skipping addition of property %s. Error during conversion: %v", propertyName, err)
 						continue
 					}
-
 					event.MetricSetFields.Put(propertyName, finalValue)
 				}
 				report.Event(event)
@@ -255,9 +270,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 //
 // To improve troubleshooting, we rule out the two most common causes early by validating
 // the existence of the class and its required properties during the initial query.
-//
-// Since we already fetch the meta_class table, we also build the schema for the requested base class.
-// Subclasses may extend this schema as needed.
 func (m *MetricSet) initQuery(session WmiQueryInterface, queryConfig *QueryConfig) error {
 	query := fmt.Sprintf("SELECT * FROM meta_class WHERE __Class = '%s'", queryConfig.Class)
 	rows, err := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold, m.Logger())
@@ -282,16 +294,11 @@ func (m *MetricSet) initQuery(session WmiQueryInterface, queryConfig *QueryConfi
 		return err
 	}
 
-	BaseClassSchema := make(map[string]WmiConversionFunction)
-	for _, property := range rows[0].GetClass().GetPropertiesNames() {
-		convertFunction, err := GetConvertFunction(instance, property, m.Logger())
-		if err != nil {
-			return fmt.Errorf("could not fetch convert function for property %s: %w", property, err)
-		}
-		BaseClassSchema[property] = convertFunction
+	wmiSchema, err := NewWMISchema(m.config.SchemaCacheSize)
+	if err != nil {
+		return fmt.Errorf("Could not initialize wmi schema: %w", err)
 	}
-
-	queryConfig.WmiSchema = *NewWMISchema(BaseClassSchema)
+	queryConfig.WmiSchema = wmiSchema
 	queryConfig.compileQuery()
 
 	return nil
