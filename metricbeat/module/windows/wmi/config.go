@@ -37,6 +37,7 @@ type Config struct {
 	IncludeEmptyStringProperties bool                     `config:"wmi.include_empty_string_properties"` // Specifies whether to include properties with empty string values in the final document
 	Namespace                    string                   `config:"wmi.namespace"`                       // Default WMI namespace for executing queries, used if not overridden by individual query configurations
 	Queries                      []QueryConfig            `config:"wmi.queries"`                         // List of WMI query configurations
+	MaxRowsPerQuery              int32                    `config:"wmi.max_rows_per_query"`              // Max number of rows to return in a single query to safeguard from an unexpected number of results.
 	WarningThreshold             time.Duration            `config:"wmi.warning_threshold"`               // Maximum duration to wait for query results before logging a warning. The query will continue running in WMI but will no longer be awaited
 	NamespaceQueryIndex          map[string][]QueryConfig // Internal structure indexing queries by namespace to reduce the number of WMI connections required per execution
 	// Remote WMI Parameters
@@ -58,6 +59,8 @@ type QueryConfig struct {
 	Namespace          string    `config:"namespace"`  // WMI namespace for the query. This takes precedence over the globally configured namespace
 }
 
+var DEFAULT_MAX_ROWS int32 = -1
+
 func NewDefaultConfig() Config {
 	return Config{
 		IncludeQueryClass:            false,
@@ -66,6 +69,7 @@ func NewDefaultConfig() Config {
 		IncludeEmptyStringProperties: false,
 		Host:                         "localhost",
 		Namespace:                    WMIDefaultNamespace,
+		MaxRowsPerQuery:              DEFAULT_MAX_ROWS,
 	}
 }
 

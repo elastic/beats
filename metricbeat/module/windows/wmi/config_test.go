@@ -20,6 +20,7 @@
 package wmi
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -35,6 +36,7 @@ func TestNewDefaultConfig(t *testing.T) {
 	assert.False(t, cfg.IncludeEmptyStringProperties, "IncludeEmptyStringProperties should default to false")
 	assert.Equal(t, WMIDefaultNamespace, cfg.Namespace, "Namespace should default to WMIDefaultNamespace")
 	assert.Empty(t, cfg.Queries, "Queries should default to an empty slice")
+	assert.Equal(t, cfg.MaxRowsPerQuery, DEFAULT_MAX_ROWS, fmt.Sprintf("Max rows per query is bounded to %s", DEFAULT_MAX_ROWS))
 }
 
 // TestValidateConnectionParameters checks the validation logic for user and password.

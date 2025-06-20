@@ -121,7 +121,7 @@ func GenericWmiConversionFunction[T any](v interface{}, convert internalWmiConve
 		}
 		return results, nil
 	default:
-		return nil, fmt.Errorf("expected string or []string, got %T", v)
+		return nil, fmt.Errorf("expected string or an array of strings, got %T", v)
 	}
 }
 
