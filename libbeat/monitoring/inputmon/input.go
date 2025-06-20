@@ -73,7 +73,10 @@ func NewDeprecatedMetricsRegistry(inputType, inputID string, optionalParent *mon
 	// the monitoring registry, and we want a consistent flat level of nesting
 	registryID := sanitizeID(inputID)
 
-	reg = parentRegistry.GetRegistry(registryID)
+	// We use a helper here instead of just reading the field directly because
+	// this call might be coming from a nested input that already has a registry
+	// that isn't at the top-level.
+	reg = findInputRegistryWithID(parentRegistry, inputID)
 	if reg == nil {
 		reg = parentRegistry.NewRegistry(registryID)
 	} else {
@@ -111,6 +114,16 @@ func sanitizeID(id string) string {
 // Deprecated: There is a v1 input registering metrics
 func globalRegistry() *monitoring.Registry {
 	return monitoring.GetNamespace("dataset").GetRegistry()
+}
+
+func findInputRegistryWithID(reg *monitoring.Registry, inputID string) *monitoring.Registry {
+	inputs := inputMetricsFromRegistry(reg)
+	for _, input := range inputs {
+		if input.id == inputID {
+			return reg.GetRegistry(input.path)
+		}
+	}
+	return nil
 }
 
 // MetricSnapshotJSON returns a snapshot of the input metric values from the
