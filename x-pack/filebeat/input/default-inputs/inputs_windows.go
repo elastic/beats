@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States) []v2.Plugin {
+func commonPlugins(info beat.Info, log *logp.Logger, store statestore.States) []v2.Plugin {
 	return []v2.Plugin{
 		azureblobstorage.Plugin(log, store),
 		azureeventhub.Plugin(log),
