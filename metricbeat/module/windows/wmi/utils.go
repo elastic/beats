@@ -147,8 +147,8 @@ func ConvertIdentity(v interface{}) (interface{}, error) {
 	return v, nil
 }
 
-// Function that return a WmiConversionFunction that reports an error
-// Indipendently from the value in input
+// Function that returns a WmiConversionFunction that reports an error
+// independently of the input value.
 func getInvalidConversion(err error) WmiConversionFunction {
 	return func(v interface{}) (interface{}, error) {
 		return nil, err
@@ -168,7 +168,7 @@ func (ws WMISchema) Get(class string, property string) (WmiConversionFunction, b
 	classSchema, ok := ws.SubClassSchemas.Get(class)
 	if !ok {
 		// This case is actually unexpected, because we invoke PutClass before and we proceed sequentially
-		return getInvalidConversion(fmt.Errorf("Could not find class %s in cache", class)), ok
+		return getInvalidConversion(fmt.Errorf("could not find class %s in cache", class)), ok
 	}
 	val, ok := classSchema[property]
 	return val, ok

@@ -145,10 +145,10 @@ func (c *Config) BuildNamespaceQueryIndex() {
 
 func (c *Config) Validate() error {
 	if c.SchemaCacheSize <= 0 {
-		return fmt.Errorf("Cache size should be greater than 0")
+		return fmt.Errorf("cache size should be greater than 0")
 	}
 	if c.MaxRowsPerQuery < 0 {
-		return fmt.Errorf("Max rows per query should be greater than 0")
+		return fmt.Errorf("max rows per query should be greater than 0")
 	}
 	return nil
 }
