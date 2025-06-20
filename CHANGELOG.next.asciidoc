@@ -232,6 +232,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix handling of cursors by the streaming input for Crowdstrike. {issue}44364[44364] {pull}44548[44548]
 - Added missing "text/csv" content-type filter support in azureblobsortorage input. {issue}44596[44596] {pull}44824[44824]
 - Fix unexpected EOF detection and improve memory usage. {pull}44813[44813]
+- Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
 
 *Heartbeat*
 

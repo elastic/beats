@@ -10,6 +10,7 @@ const (
 	beatsNdJSONBucket        = "beatsndjsonbucket"
 	beatsGzJSONBucket        = "beatsgzjsonbucket"
 	beatsJSONWithArrayBucket = "beatsjsonwitharraybucket"
+	beatsCSVBucket           = "beatscsvbucket"
 )
 
 var fileBuckets = map[string]bool{
@@ -18,6 +19,7 @@ var fileBuckets = map[string]bool{
 	beatsNdJSONBucket:        true,
 	beatsGzJSONBucket:        true,
 	beatsJSONWithArrayBucket: true,
+	beatsCSVBucket:           true,
 }
 
 var availableFileObjects = map[string]map[string]bool{
@@ -38,6 +40,9 @@ var availableFileObjects = map[string]map[string]bool{
 	},
 	beatsGzJSONBucket: {
 		"multiline.json.gz": true,
+	},
+	beatsCSVBucket: {
+		"txn1.csv": true,
 	},
 }
 
@@ -147,6 +152,31 @@ var fetchFileBuckets = map[string]string{
 		"selfLink": "https://www.googleapis.com/storage/v1/b/beatsgzjsonbucket",
 		"id": "beatsgzjsonbucket",
 		"name": "beatsgzjsonbucket",
+		"projectNumber": "1059491012611",
+		"metageneration": "1",
+		"location": "ASIA-SOUTH1",
+		"storageClass": "STANDARD",
+		"etag": "CAD=",
+		"timeCreated": "2022-08-24T12:20:04.723Z",
+		"updated": "2022-08-24T12:20:04.723Z",
+		"iamConfiguration": {
+		  "bucketPolicyOnly": {
+			"enabled": true,
+			"lockedTime": "2022-11-22T12:20:04.723Z"
+		  },
+		  "uniformBucketLevelAccess": {
+			"enabled": true,
+			"lockedTime": "2022-11-22T12:20:04.723Z"
+		  },
+		  "publicAccessPrevention": "enforced"
+		},
+		"locationType": "region"
+	  }`,
+	beatsCSVBucket: `{
+		"kind": "storage#bucket",
+		"selfLink": "https://www.googleapis.com/storage/v1/b/beatscsvbucket",
+		"id": "beatscsvbucket",
+		"name": "beatscsvbucket",
 		"projectNumber": "1059491012611",
 		"metageneration": "1",
 		"location": "ASIA-SOUTH1",
@@ -328,6 +358,30 @@ var objectFileList = map[string]string{
 			}
 		]
 	  }`,
+	beatsCSVBucket: `{
+		"kind": "storage#objects",
+		"items": [
+			{
+				"kind": "storage#object",
+				"id": "beatscsvbucket/txn1.csv/1661343636712270",
+				"selfLink": "https://www.googleapis.com/storage/v1/b/beatscsvbucket/o/txn1.csv",
+				"mediaLink": "https://content-storage.googleapis.com/download/storage/v1/b/beatscsvbucket/o/txn1.csv?generation=1661343636712270&alt=media",
+				"name": "txn1.csv",
+				"bucket": "beatscsvbucket",
+				"generation": "1661343636712270",
+				"metageneration": "1",
+				"contentType": "text/csv",
+				"storageClass": "STANDARD",
+				"size": "434",
+				"md5Hash": "eOXjYygu6k6687Uf3vPtKQ==",
+				"crc32c": "hHW/Qw==",
+				"etag": "CM7Ww6q73/kCEAE=",
+				"timeCreated": "2022-08-24T12:20:36.713Z",
+				"updated": "2022-08-24T12:20:36.713Z",
+				"timeStorageClassUpdated": "2022-08-24T12:20:36.713Z"
+			}
+		]
+	  }`,
 }
 
 // These variables are intentionally indented like this to match the output of certain tests
@@ -343,12 +397,14 @@ var BeatsFilesBucket_log_json = []string{
 	`{"@timestamp":"2021-05-25T17:25:51.391Z","log.level":"info","message":"available disk space 44.3gb"}`,
 	"{\n    \"Events\": [\n        {\n            \"time\": \"2021-05-25 18:20:58 UTC\",\n            \"msg\": \"hello\"\n        },\n        {\n            \"time\": \"2021-05-26 22:21:40 UTC\",\n            \"msg\": \"world\"\n        }\n    ]\n}",
 }
+
 var BeatsFilesBucket_json_array = []string{
 	"{\n        \"time\": \"2021-05-25 18:20:58 UTC\",\n        \"msg\": \"hello\"\n    }",
 	"{\n        \"time\": \"2021-05-26 22:21:40 UTC\",\n        \"msg\": \"world\"\n    }",
 	"[\n        {\n            \"time\": \"2021-05-25 18:20:58 UTC\",\n            \"msg\": \"hello\"\n        },\n        {\n            \"time\": \"2021-05-26 22:21:40 UTC\",\n            \"msg\": \"world\"\n        }\n    ]",
 	"[\n        {\n            \"time\": \"2021-05-25 18:20:58 UTC\",\n            \"msg\": \"hi\"\n        },\n        {\n            \"time\": \"2021-05-26 22:21:40 UTC\",\n            \"msg\": \"seoul\"\n        }\n    ]",
 }
+
 var BeatsFilesBucket_log_ndjson = []string{
 	`{"@timestamp":"2021-05-25T17:25:42.806Z","log.level":"error","message":"error in http request"}`,
 	`{"@timestamp":"2021-05-25T17:25:51.391Z","log.level":"info","message":"available space is 44.3gb"}`,
@@ -358,7 +414,13 @@ var BeatsFilesBucket_multiline_json_gz = []string{
 	"{\n    \"@timestamp\": \"2021-05-25T17:25:42.806Z\",\n    \"log.level\": \"error\",\n    \"message\": \"error making http request\"\n}",
 	"{\n    \"@timestamp\": \"2021-05-25T17:25:51.391Z\",\n    \"log.level\": \"info\",\n    \"message\": \"available disk space 44.3gb\"\n}",
 }
+
 var BeatsFilesBucket_events_array_json = []string{
 	"{\n            \"time\": \"2021-05-25 18:20:58 UTC\",\n            \"msg\": \"hello\"\n        }",
 	"{\n            \"time\": \"2021-05-26 22:21:40 UTC\",\n            \"msg\": \"world\"\n        }",
+}
+
+var BeatsFilesBucket_csv = []string{
+	"{\"id\":\"1\",\"name\":\"Alice\",\"email\":\"alice@example.com\",\"status\":\"active\"}",
+	"{\"id\":\"2\",\"name\":\"Bob\",\"email\":\"bob@example.com\",\"status\":\"inactive\"}",
 }

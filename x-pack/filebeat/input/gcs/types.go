@@ -34,6 +34,7 @@ const (
 	ndJsonType   = "application/x-ndjson"
 	gzType       = "application/x-gzip"
 	encodingGzip = "gzip"
+	csvType      = "text/csv"
 )
 
 var allowedContentTypes = map[string]bool{
@@ -41,4 +42,5 @@ var allowedContentTypes = map[string]bool{
 	octetType:  true,
 	ndJsonType: true,
 	gzType:     true,
+	csvType:    true,
 }
