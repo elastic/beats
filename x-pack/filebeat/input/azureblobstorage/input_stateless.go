@@ -83,7 +83,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			return err
 		}
 
-		scheduler := newScheduler(pub, containerClient, credential, currentSource, &in.config, st, in.serviceURL, metrics, log)
+		scheduler := newScheduler(pub, containerClient, credential, currentSource, &in.config, st, in.serviceURL, noopReporter{}, metrics, log)
 		// allows multiple containers to be scheduled concurrently while testing
 		// the stateless input is triggered only while testing and till now it did not mimic
 		// the real world concurrent execution of multiple containers. This fix allows it to do so.

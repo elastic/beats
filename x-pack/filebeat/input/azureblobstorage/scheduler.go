@@ -16,6 +16,7 @@ import (
 	azcontainer "github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/timed"
 )
@@ -54,13 +55,14 @@ type scheduler struct {
 	log        *logp.Logger
 	limiter    *limiter
 	serviceURL string
+	status     status.StatusReporter
 	metrics    *inputMetrics
 }
 
 // newScheduler, returns a new scheduler instance
 func newScheduler(publisher cursor.Publisher, client *azcontainer.Client,
 	credential *serviceCredentials, src *Source, cfg *config,
-	state *state, serviceURL string, metrics *inputMetrics, log *logp.Logger,
+	state *state, serviceURL string, stat status.StatusReporter, metrics *inputMetrics, log *logp.Logger,
 ) *scheduler {
 	if metrics == nil {
 		// metrics are optional, initialize a stub if not provided
@@ -76,6 +78,7 @@ func newScheduler(publisher cursor.Publisher, client *azcontainer.Client,
 		log:        log,
 		limiter:    &limiter{limit: make(chan struct{}, src.MaxWorkers)},
 		serviceURL: serviceURL,
+		status:     stat,
 		metrics:    metrics,
 	}
 }
@@ -110,6 +113,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 		resp, err := pager.NextPage(ctx)
 		if err != nil {
 			s.metrics.errorsTotal.Inc()
+			s.status.UpdateStatus(status.Failed, "failed to fetch next page during pagination: "+err.Error())
 			return err
 		}
 
@@ -138,10 +142,11 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
 				s.log.Errorf("Job creation failed for container %s with error %v", s.src.ContainerName, err)
+				s.status.UpdateStatus(status.Failed, "failed to fetch blob client while scheduling jobs: "+err.Error())
 				return err
 			}
 
-			job := newJob(blobClient, v, blobURL, s.state, s.src, s.publisher, s.metrics, s.log)
+			job := newJob(blobClient, v, blobURL, s.state, s.src, s.publisher, s.status, s.metrics, s.log)
 			jobs = append(jobs, job)
 		}
 
