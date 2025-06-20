@@ -45,8 +45,8 @@ func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 		return nil, err
 	}
 
+	// TODO(anderson): it needs to know if if it should process GZIP properly
 	filewatcher, err := newFileWatcher(logger, config.Paths, config.FileWatcher, config.Delete.Enabled)
-
 	if err != nil {
 		return nil, fmt.Errorf("error while creating filewatcher %w", err)
 	}
@@ -105,10 +105,15 @@ func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 				return nil, fmt.Errorf("invalid suffix regex for copytruncate rotation")
 			}
 			fileprospector.stateChangeCloser.Renamed = false
+			rFilestreams, err := newRotatedFilestreams(cpCfg)
+			if err != nil {
+				return nil, fmt.Errorf("failed to create rotated filestreams: %w",
+					err)
+			}
 			return &copyTruncateFileProspector{
-				fileprospector,
-				suffix,
-				newRotatedFilestreams(cpCfg),
+				fileProspector: fileprospector,
+				rotatedSuffix:  suffix,
+				rotatedFiles:   rFilestreams,
 			}, nil
 		default:
 		}
@@ -120,6 +125,7 @@ func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 }
 
 func checkConfigCompatibility(fileWatcher, fileIdentifier *conf.Namespace) error {
+	// TODO(anderson): GZIP check?
 	var fwCfg struct {
 		Fingerprint struct {
 			Enabled bool `config:"enabled"`

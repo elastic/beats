@@ -19,6 +19,7 @@ package filestream
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"regexp"
 	"sort"
@@ -38,6 +39,7 @@ const (
 )
 
 var numericSuffixRegexp = regexp.MustCompile(`\d*$`)
+var numbersFromSuffixRegexp = regexp.MustCompile(`\d+`)
 
 // sorter is required for ordering rotated log files
 // The slice is ordered so the newest rotated file comes first.
@@ -65,16 +67,29 @@ type rotatedFilestream struct {
 	rotated     []rotatedFileInfo
 }
 
-func newRotatedFilestreams(cfg *copyTruncateConfig) *rotatedFilestreams {
-	var sorter sorter
-	sorter = newNumericSorter()
+func newRotatedFilestreams(cfg *copyTruncateConfig) (*rotatedFilestreams, error) {
+	var s sorter
+	var err error
+
 	if cfg.DateFormat != "" {
-		sorter = &dateSorter{cfg.DateFormat}
+		s, err = newDateSorter(
+			cfg.DateFormat,
+			cfg.DateRegex,
+			cfg.DateRegex)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create date sorter: %w", err)
+		}
+	} else {
+		s, err = newNumericSorter(cfg.SuffixRegex)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create numeric sorter: %w", err)
+		}
 	}
+
 	return &rotatedFilestreams{
 		table:  make(map[string]*rotatedFilestream, 0),
-		sorter: sorter,
-	}
+		sorter: s,
+	}, nil
 }
 
 // numericSorter sorts rotated log files that have a numeric suffix.
@@ -83,10 +98,23 @@ type numericSorter struct {
 	suffix *regexp.Regexp
 }
 
-func newNumericSorter() sorter {
-	return &numericSorter{
-		suffix: numericSuffixRegexp,
+// TODO(AndersonQ): update user-facing docs
+func newNumericSorter(suffixRegex string) (*numericSorter, error) {
+	suffix := numericSuffixRegexp
+
+	if suffixRegex != "" {
+		var err error
+		suffix, err = regexp.Compile(suffixRegex)
+		if err != nil {
+			return nil,
+				fmt.Errorf("numeric sorter: failed to compile numeric suffix regex: %w",
+					err)
+		}
 	}
+
+	return &numericSorter{
+		suffix: suffix,
+	}, nil
 }
 
 func (s *numericSorter) sort(files []rotatedFileInfo) {
@@ -103,10 +131,16 @@ func (s *numericSorter) GetIdx(fi *rotatedFileInfo) int {
 		return fi.idx
 	}
 
-	idxStr := s.suffix.FindString(fi.path)
+	suffix := s.suffix.FindString(fi.path)
+	if suffix == "" {
+		return -1
+	}
+
+	idxStr := numbersFromSuffixRegexp.FindString(suffix)
 	if idxStr == "" {
 		return -1
 	}
+
 	idx, err := strconv.Atoi(idxStr)
 	if err != nil {
 		return -1
@@ -120,7 +154,39 @@ func (s *numericSorter) GetIdx(fi *rotatedFileInfo) int {
 // based on the configured format.
 // Example: apache.log-21210526, apache.log-20210527
 type dateSorter struct {
-	format string
+	format    string
+	dateRegex *regexp.Regexp
+	suffix    *regexp.Regexp
+}
+
+// TODO(AndersonQ): update user-facing docs
+func newDateSorter(
+	format,
+	dateRegex,
+	suffixRegex string) (*dateSorter, error) {
+	if suffixRegex == "" {
+		return nil, errors.New("date sorter: no suffix regex specified")
+	}
+	dateReg, err := regexp.Compile(dateRegex)
+	if err != nil {
+		return nil,
+			fmt.Errorf(
+				"date sorter: failed to compile 'date_regex': %w",
+				err)
+	}
+
+	suffix, err := regexp.Compile(suffixRegex)
+	if err != nil {
+		return nil,
+			fmt.Errorf("date sorter: failed to compile numeric suffix regex: %w",
+				err)
+	}
+
+	return &dateSorter{
+		format:    format,
+		dateRegex: dateReg,
+		suffix:    suffix,
+	}, nil
 }
 
 func (s *dateSorter) sort(files []rotatedFileInfo) {
@@ -136,9 +202,27 @@ func (s *dateSorter) GetTs(fi *rotatedFileInfo) time.Time {
 	if !fi.ts.IsZero() {
 		return fi.ts
 	}
-	fileTs := fi.path[len(fi.path)-len(s.format):]
 
-	ts, err := time.Parse(s.format, fileTs)
+	suffix := s.suffix.FindString(fi.path)
+	if suffix == "" {
+		return time.Time{}
+	}
+
+	// TODO(AndersonQ): decide the rule for the regex. Either:
+	//   - it matches the 1st or the 2nd match. CURRENT behaviour
+	//   - it matches the last match
+	matches := s.dateRegex.FindStringSubmatch(suffix)
+	var dateStr string
+	switch {
+	case len(matches) == 0:
+		return time.Time{}
+	case len(matches) == 1:
+		dateStr = matches[0]
+	case len(matches) >= 2:
+		dateStr = matches[1]
+	}
+
+	ts, err := time.Parse(s.format, dateStr)
 	if err != nil {
 		return time.Time{}
 	}
@@ -177,7 +261,9 @@ func (r rotatedFilestreams) addRotatedFile(original, rotated string, src loginp.
 		}
 	}
 
-	r.table[original].rotated = append(r.table[original].rotated, rotatedFileInfo{rotated, src, time.Time{}, 0})
+	r.table[original].rotated = append(
+		r.table[original].rotated,
+		rotatedFileInfo{path: rotated, src: src, ts: time.Time{}, idx: 0})
 	r.sorter.sort(r.table[original].rotated)
 
 	for idx, fi := range r.table[original].rotated {
@@ -242,11 +328,18 @@ func (p *copyTruncateFileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
+	// TODO(anderson): update to handle GZIP file
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
-		if event.Op == loginp.OpCreate {
+		switch event.Op {
+		case loginp.OpCreate:
 			log.Debugf("A new file %s has been found", event.NewPath)
-		} else if event.Op == loginp.OpWrite {
+		case loginp.OpWrite:
+			if event.Descriptor.GZIP {
+				log.Debugf("GZIP file %s has been updated, stop ingesting it it", event.NewPath)
+				group.Stop(src)
+				return
+			}
 			log.Debugf("File %s has been updated", event.NewPath)
 		}
 
@@ -261,6 +354,8 @@ func (p *copyTruncateFileProspector) onFSEvent(
 			}
 		}
 
+		// TODO(anderson): handle GZIP file
+		// needs test plain file -> gzip
 		// check if the event belongs to a rotated file
 		if p.isRotated(event) {
 			log.Debugf("File %s is rotated", event.NewPath)
@@ -276,11 +371,17 @@ func (p *copyTruncateFileProspector) onFSEvent(
 		}
 
 	case loginp.OpTruncate:
+		if event.Descriptor.GZIP {
+			// TODO(anderson): how to mark the file as done?
+			log.Debugf("GZIP file %s has been truncated, stop ingesting it", event.NewPath)
+			group.Stop(src)
+			return
+		}
 		log.Debugf("File %s has been truncated", event.NewPath)
 
 		err := updater.ResetCursor(src, state{Offset: 0})
 		if err != nil {
-			log.Errorf("failed to reset file cursor: %w", err)
+			log.Errorf("failed to reset file cursor: %v", err)
 		}
 		group.Restart(ctx, src)
 
@@ -292,10 +393,8 @@ func (p *copyTruncateFileProspector) onFSEvent(
 	case loginp.OpRename:
 		log.Debugf("File %s has been renamed to %s", event.OldPath, event.NewPath)
 
-		// check if the event belongs to a rotated file
 		if p.isRotated(event) {
 			log.Debugf("File %s is rotated", event.NewPath)
-
 			p.onRotatedFile(log, ctx, event, src, group)
 		}
 
@@ -340,7 +439,7 @@ func (p *copyTruncateFileProspector) onRotatedFile(
 
 	idx := p.rotatedFiles.addRotatedFile(originalPath, fe.NewPath, src)
 	if idx == copiedFileIdx {
-		// if a file is the most fresh rotated file, continue reading from
+		// if a file is the freshest rotated file, continue reading from
 		// where we have left off with the active file.
 		previousSrc := p.rotatedFiles.table[originalPath].originalSrc
 		hg.Continue(ctx, previousSrc, src)
