@@ -719,15 +719,16 @@ func EnsureESIsRunning(t *testing.T) {
 	}
 }
 
-func GetESClient(t *testing.T) (*elasticsearch.Client, error) {
-	esURL := GetESURL(t, "http")
+func GetESClient(t *testing.T, scheme string) *elasticsearch.Client {
+	t.Helper()
+	esURL := GetESURL(t, scheme)
 
 	u := esURL.User.Username()
 	p, _ := esURL.User.Password()
 
 	// prepare to query ES
 	esCfg := elasticsearch.Config{
-		Addresses: []string{esURL.String()},
+		Addresses: []string{fmt.Sprintf("%s://%s", host.Scheme, host.Host)},
 		Username:  u,
 		Password:  p,
 		Transport: &http.Transport{
@@ -738,9 +739,9 @@ func GetESClient(t *testing.T) (*elasticsearch.Client, error) {
 	}
 	es, err := elasticsearch.NewClient(esCfg)
 	if err != nil {
-		return nil, err
+		t.Fatalf("could not get elasticsearch client due to: %v", err)
 	}
-	return es, nil
+	return es
 
 }
 

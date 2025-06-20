@@ -9,7 +9,6 @@ package integration
 import (
 	"bytes"
 	"context"
-	"crypto/tls"
 	"fmt"
 	"net/http"
 	"os"
@@ -28,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
-	"github.com/elastic/go-elasticsearch/v8"
 )
 
 func TestFilebeatOTelE2E(t *testing.T) {
@@ -90,21 +88,12 @@ http.port: %d
 	filebeat.Start()
 
 	// prepare to query ES
-	esCfg := elasticsearch.Config{
-		Addresses: []string{"http://localhost:9200"},
-		Username:  "admin",
-		Password:  "testing",
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
-			},
-		},
-	}
-	es, err := elasticsearch.NewClient(esCfg)
-	require.NoError(t, err)
+	es := integration.GetESClient(t, "http")
 
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
+	var err error
+
 	// wait for logs to be published
 	require.Eventually(t,
 		func() bool {
@@ -221,18 +210,7 @@ processors:
 	filebeat.Start()
 
 	// prepare to query ES
-	esCfg := elasticsearch.Config{
-		Addresses: []string{"http://localhost:9200"},
-		Username:  "admin",
-		Password:  "testing",
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
-			},
-		},
-	}
-	es, err := elasticsearch.NewClient(esCfg)
-	require.NoError(t, err)
+	es := integration.GetESClient(t, "http")
 
 	rawQuery := map[string]any{
 		"sort": []map[string]any{
@@ -242,6 +220,8 @@ processors:
 
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
+	var err error
+
 	// wait for logs to be published
 	require.Eventually(t,
 		func() bool {
