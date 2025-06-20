@@ -20,16 +20,30 @@
 package volume
 
 import (
+	"fmt"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/test"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestFetchMetricset(t *testing.T) {
 	config := test.GetKubeletConfig(t, "volume")
+
+	// anderson: debug
+	fmt.Println("os.Getenv(\"NODE_NAME\"): ", os.Getenv("NODE_NAME"))
+
+	c, err := cfg.NewConfigFrom(config)
+	require.NoError(t, err, "could not create config")
+	printcfg := map[string]any{}
+	err = c.Unpack(&printcfg)
+	require.NoError(t, err, "could not unpack config")
+
 	metricSet := mbtest.NewFetcher(t, config)
 	events, errs := metricSet.FetchEvents()
 	if len(errs) > 0 {

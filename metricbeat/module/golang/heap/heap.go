@@ -24,10 +24,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
-
-var logger = logp.NewLogger("golang.heap")
 
 const (
 	defaultScheme = "http"

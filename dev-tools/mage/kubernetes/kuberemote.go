@@ -143,7 +143,7 @@ func (r *KubeRemote) Run(env map[string]string, stdout io.Writer, stderr io.Writ
 	close(stopChannel)
 
 	// wait for exec container to be running
-	_, err = r.waitForPod(5*time.Minute, containerRunning("exec"))
+	pod, err := r.waitForPod(5*time.Minute, containerRunning("exec"))
 	if err != nil {
 		return fmt.Errorf("execute pod container never started: %w", err)
 	}
@@ -154,8 +154,16 @@ func (r *KubeRemote) Run(env map[string]string, stdout io.Writer, stderr io.Writ
 		return fmt.Errorf("failed to stream the logs: %w", err)
 	}
 
+	fmt.Println("anderson")
+	fmt.Println("\n🔍 Environment variables in the pod Spec:")
+	for _, c := range pod.Spec.Containers {
+		fmt.Println(c.Name)
+		fmt.Println(c.Env)
+		fmt.Println("")
+	}
+	fmt.Println("\nEND 🔍 Environment variables in the pod Spec:")
 	// wait for exec container to be completely done
-	pod, err := r.waitForPod(30*time.Second, podDone)
+	pod, err = r.waitForPod(30*time.Second, podDone)
 	if err != nil {
 		return fmt.Errorf("execute pod didn't terminate after 30 seconds of log stream: %w", err)
 	}

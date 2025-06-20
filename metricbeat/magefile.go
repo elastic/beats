@@ -221,6 +221,13 @@ func GoIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
+
+	fmt.Println("anderson")
+	fmt.Println("====================================================")
+	fmt.Println("mage GoIntegTest env")
+	fmt.Println(os.Environ())
+	fmt.Println("====================================================")
+
 	return devtools.GoTestIntegrationForModule(ctx)
 }
 

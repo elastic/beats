@@ -20,9 +20,9 @@
 package cluster_stats
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -45,7 +45,7 @@ func createEsMuxer(license string) *http.ServeMux {
 			http.NotFound(w, r)
 		}
 
-		input, _ := ioutil.ReadFile("./_meta/test/root.710.json")
+		input, _ := os.ReadFile("./_meta/test/root.710.json")
 		w.Write(input)
 	}
 	licenseHandler := func(w http.ResponseWriter, r *http.Request) {
@@ -61,25 +61,25 @@ func createEsMuxer(license string) *http.ServeMux {
 
 	mux.Handle("/_xpack/usage", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/xpack-usage.710.json")
+			input, _ := os.ReadFile("./_meta/test/xpack-usage.710.json")
 			w.Write(input)
 		}))
 
 	mux.Handle("/_cluster/settings", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/cluster-settings.710.json")
+			input, _ := os.ReadFile("./_meta/test/cluster-settings.710.json")
 			w.Write(input)
 		}))
 
 	mux.Handle("/_cluster/stats", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/cluster_stats.710.json")
+			input, _ := os.ReadFile("./_meta/test/cluster_stats.710.json")
 			w.Write(input)
 		}))
 
 	mux.Handle("/_cluster/state/version,master_node,nodes,routing_table", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/cluster_state.710.json")
+			input, _ := os.ReadFile("./_meta/test/cluster_state.710.json")
 			w.Write(input)
 		}))
 

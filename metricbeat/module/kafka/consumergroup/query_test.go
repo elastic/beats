@@ -25,6 +25,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -219,7 +220,7 @@ func TestFetchGroupInfo(t *testing.T) {
 
 		groups := makeNameSet(test.groups...).pred()
 		topics := makeNameSet(test.topics...).pred()
-		err := fetchGroupInfo(collectEvents, test.client, groups, topics)
+		err := fetchGroupInfo(collectEvents, test.client, groups, topics, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			switch {
 			case test.err == nil:
