@@ -11,6 +11,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -38,7 +40,7 @@ func TestWatchTicks(t *testing.T) {
 			defer lock.Unlock()
 
 			stopUUIDs = append(stopUUIDs, uuid)
-		})
+		}, logptest.NewTestingLogger(t, ""))
 	defer watcher.stop()
 
 	// Run through 10 ticks

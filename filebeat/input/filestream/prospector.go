@@ -53,11 +53,13 @@ var identifiersMap = map[string]fileIdentifier{}
 func init() {
 	for name, factory := range identifierFactories {
 		if name == inodeMarkerName {
-			// inode marker requires an specific config we cannot infer.
+			// inode marker requires a specific config we cannot infer.
 			continue
 		}
 
-		identifier, err := factory(nil)
+		// only inode marker requires an active logger
+		// passing nil logger for other identifier
+		identifier, err := factory(nil, nil)
 		if err != nil {
 			// Skip identifiers we cannot create. E.g: inode_marker is not
 			// supported on Windows
