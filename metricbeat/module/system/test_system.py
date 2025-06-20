@@ -3,6 +3,7 @@ Metricbeat system module tests
 """
 import getpass
 import os
+import platform
 import re
 import sys
 import unittest
@@ -36,6 +37,13 @@ SYSTEM_CPU_ALL[metricbeat.P_LINUX] = SYSTEM_CPU[metricbeat.P_LINUX] + ["idle.tic
                                                                        "system.norm.pct", "user.norm.pct",
                                                                        "total.norm.pct", "total.value"]
 
+# metrics from /proc/cpuinfo are platform dependent and only
+# reliably available on Linux x86-like platforms
+def is_cpuinfo_supported():
+    return platform.machine() in {'i386', 'i686', 'x86_64', 'amd64'}
+
+SYSTEM_CORE_CPUINFO_FIELDS = ["model_name", "model_number", "mhz",
+                              "core_id", "physical_id"]
 
 SYSTEM_CORE = {
     metricbeat.P_WIN: ["id", "idle.pct",
@@ -43,9 +51,10 @@ SYSTEM_CORE = {
 }
 SYSTEM_CORE[metricbeat.P_DARWIN] = SYSTEM_CORE[metricbeat.P_WIN] + ["nice.pct"]
 SYSTEM_CORE[metricbeat.P_LINUX] = SYSTEM_CORE[metricbeat.P_DARWIN] + \
-    ["iowait.pct", "irq.pct", "softirq.pct", "steal.pct",
-     "model_name", "model_number", "mhz",
-     "core_id", "physical_id"]
+    ["iowait.pct", "irq.pct", "softirq.pct", "steal.pct"]
+
+if is_cpuinfo_supported():
+    SYSTEM_CORE[metricbeat.P_LINUX].extend(SYSTEM_CORE_CPUINFO_FIELDS)
 
 SYSTEM_CORE_ALL = {
     metricbeat.P_WIN: SYSTEM_CORE[metricbeat.P_WIN] + ["idle.ticks", "system.ticks", "user.ticks",
@@ -187,6 +196,9 @@ class Test(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             core_stats = evt["system"]["core"]
+            if sys.platform == metricbeat.P_LINUX and not is_cpuinfo_supported():
+                for f in SYSTEM_CORE_CPUINFO_FIELDS:
+                    core_stats.pop(f, None)
             self.assert_fields_for_platform(SYSTEM_CORE, core_stats)
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
@@ -210,6 +222,9 @@ class Test(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             core_stats = evt["system"]["core"]
+            if sys.platform == metricbeat.P_LINUX and not is_cpuinfo_supported():
+                for f in SYSTEM_CORE_CPUINFO_FIELDS:
+                    core_stats.pop(f, None)
             self.assert_fields_for_platform(SYSTEM_CORE_ALL, core_stats)
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd|openbsd", sys.platform), "os")
