@@ -108,6 +108,7 @@ The supported processors are:
 * [`fingerprint`](/reference/auditbeat/fingerprint.md)
 * [`include_fields`](/reference/auditbeat/include-fields.md)
 * [`move-fields`](/reference/auditbeat/move-fields.md)
+* [`now`](/reference/auditbeat/now.md)
 * [`rate_limit`](/reference/auditbeat/rate-limit.md)
 * [`registered_domain`](/reference/auditbeat/processor-registered-domain.md)
 * [`rename`](/reference/auditbeat/rename-fields.md)
