@@ -128,7 +128,7 @@ func (w *fileWatcher) Run(ctx unison.Canceler) {
 	})
 }
 
-// 3 - watch the file system by scanning with intervals and comparing the diffs
+// AndersonQ: 3 - watch the file system by scanning with intervals and comparing the diffs
 func (w *fileWatcher) watch(ctx unison.Canceler) {
 	w.log.Debug("Start next scan")
 
@@ -199,6 +199,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	// remaining files in the prev map are the ones that are missing
 	// either because they have been deleted or renamed
 	for remainingPath, remainingDesc := range w.prev {
+		// TODO:(anderson): handle GZIP files?
 		var e loginp.FSEvent
 
 		id := remainingDesc.FileID()
@@ -529,6 +530,13 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 			return fd, fmt.Errorf("failed to open %q for fingerprinting: %w", it.originalFilename, err)
 		}
 		defer file.Close()
+
+		isGZIP, err := IsGZIP(file)
+		if err != nil {
+			return fd, fmt.Errorf("failed to check if %q is gzip: %w",
+				it.originalFilename, err)
+		}
+		fd.GZIP = isGZIP
 
 		if s.cfg.Fingerprint.Offset != 0 {
 			_, err = file.Seek(s.cfg.Fingerprint.Offset, io.SeekStart)
