@@ -45,6 +45,9 @@ and metadata information from metricsets and fetch metrics only. At the moment,
 * *collect_dataproc_user_labels*: (`true`/`false` default `false`) Retrieve additional
 user-defined labels from Dataproc clusters.
 
+* *metadata_cache*: (`true`/`false` default `false`) Enable caching of metadata.
+If set to true, metadata will be cached to improve performance.
+
 * *metadata_cache*: (`true`/`false` default `true`) Enable caching of metadata.
 If set to true, metadata will be cached to improve performance. If set to `false`,
 metadata caching will be disabled. By default, caching is enabled even if this
