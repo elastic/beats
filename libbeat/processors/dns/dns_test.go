@@ -39,7 +39,7 @@ func TestDNSProcessorRun(t *testing.T) {
 		resolver: &stubResolver{},
 		log:      logptest.NewTestingLogger(t, logName),
 	}
-	p.config.reverseFlat = map[string]string{
+	p.reverseFlat = map[string]string{
 		"source.ip": "source.domain",
 	}
 	t.Log(p.String())
@@ -60,7 +60,7 @@ func TestDNSProcessorRun(t *testing.T) {
 
 	const forwardDomain = "www." + gatewayName
 	t.Run("append", func(t *testing.T) {
-		p.config.Action = actionAppend
+		p.Action = actionAppend
 
 		event, err := p.Run(&beat.Event{
 			Fields: mapstr.M{
@@ -79,7 +79,7 @@ func TestDNSProcessorRun(t *testing.T) {
 	})
 
 	t.Run("replace", func(t *testing.T) {
-		p.config.Action = actionReplace
+		p.Action = actionReplace
 
 		event, err := p.Run(&beat.Event{
 			Fields: mapstr.M{
@@ -132,8 +132,8 @@ func TestDNSProcessorTagOnFailure(t *testing.T) {
 		resolver: &stubResolver{},
 		log:      logptest.NewTestingLogger(t, logName),
 	}
-	p.config.TagOnFailure = []string{"_lookup_failed"}
-	p.config.reverseFlat = map[string]string{
+	p.TagOnFailure = []string{"_lookup_failed"}
+	p.reverseFlat = map[string]string{
 		"source.ip":      "source.domain",
 		"destination.ip": "destination.domain",
 	}
@@ -151,7 +151,7 @@ func TestDNSProcessorTagOnFailure(t *testing.T) {
 
 	v, _ := event.GetValue("tags")
 	if assert.Len(t, v, 1) {
-		assert.ElementsMatch(t, v, p.config.TagOnFailure)
+		assert.ElementsMatch(t, v, p.TagOnFailure)
 	}
 }
 
@@ -165,7 +165,7 @@ func TestDNSProcessorDisabledCache(t *testing.T) {
 		resolver: &stubResolver{},
 		log:      logptest.NewTestingLogger(t, logName),
 	}
-	p.config.reverseFlat = map[string]string{
+	p.reverseFlat = map[string]string{
 		"source.ip": "source.domain",
 	}
 	t.Log(p.String())
@@ -196,7 +196,7 @@ func TestDNSProcessorRunInParallel(t *testing.T) {
 		t.Fatal(err)
 	}
 	p := &processor{config: conf, resolver: cache, log: logptest.NewTestingLogger(t, logName)}
-	p.config.reverseFlat = map[string]string{"source.ip": "source.domain"}
+	p.reverseFlat = map[string]string{"source.ip": "source.domain"}
 
 	const numGoroutines = 10
 	const numEvents = 500

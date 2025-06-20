@@ -101,7 +101,7 @@ func TestCache(t *testing.T) {
 		assert.EqualValues(t, 3, c.stats.Miss.Get()) // Cache miss.
 	}
 
-	minTTL := defaultConfig().cacheConfig.SuccessCache.MinTTL
+	minTTL := defaultConfig().SuccessCache.MinTTL
 	// Initial success returned TTL=0 with MinTTL.
 	r, err = c.Lookup(gatewayIP+"2", typePTR)
 	if assert.NoError(t, err) {
@@ -141,8 +141,11 @@ func TestDisabledCache(t *testing.T) {
 	}
 
 	// Initial success query.
-	r, err := c.Lookup(gatewayIP, typePTR)
-	// Same lookup, but no cache hit
+	var r *result
+	r, err = c.Lookup(gatewayIP, typePTR)
+	if assert.NoError(t, err) {
+		assert.EqualValues(t, []string{gatewayName}, r.Data)
+	}
 	r, err = c.Lookup(gatewayIP, typePTR)
 	if assert.NoError(t, err) {
 		assert.EqualValues(t, []string{gatewayName}, r.Data)
