@@ -18,6 +18,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/gofrs/uuid/v5"
@@ -43,6 +44,7 @@ const (
 	defaultGroupsQuery  = "displayName,members"
 	defaultUsersQuery   = "accountEnabled,userPrincipalName,mail,displayName,givenName,surname,jobTitle,officeLocation,mobilePhone,businessPhones"
 	defaultDevicesQuery = "accountEnabled,deviceId,displayName,operatingSystem,operatingSystemVersion,physicalIds,extensionAttributes,alternativeSecurityIds"
+	expandName          = "$expand"
 
 	apiGroupType  = "#microsoft.graph.group"
 	apiUserType   = "#microsoft.graph.user"
@@ -110,6 +112,7 @@ type removed struct {
 type graphConf struct {
 	APIEndpoint string    `config:"api_endpoint"`
 	Select      selection `config:"select"`
+	Expand      expansion `config:"expand"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 
@@ -130,6 +133,12 @@ type selection struct {
 	UserQuery   []string `config:"users"`
 	GroupQuery  []string `config:"groups"`
 	DeviceQuery []string `config:"devices"`
+}
+
+type expansion struct {
+	UserExpansion   map[string][]string `config:"users"`
+	GroupExpansion  map[string][]string `config:"groups"`
+	DeviceExpansion map[string][]string `config:"devices"`
 }
 
 // graph implements the fetcher.Fetcher interface.
@@ -380,21 +389,30 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 	if err != nil {
 		return nil, fmt.Errorf("invalid groups URL endpoint: %w", err)
 	}
-	groupsURL.RawQuery = formatQuery(queryName, c.Select.GroupQuery, defaultGroupsQuery)
+	groupsURL.RawQuery, err = formatQuery(queryName, c.Select.GroupQuery, defaultGroupsQuery, c.Expand.GroupExpansion)
+	if err != nil {
+		return nil, fmt.Errorf("failed to format group query: %w", err)
+	}
 	f.groupsURL = groupsURL.String()
 
 	usersURL, err := url.Parse(f.conf.APIEndpoint + "/users/delta")
 	if err != nil {
 		return nil, fmt.Errorf("invalid users URL endpoint: %w", err)
 	}
-	usersURL.RawQuery = formatQuery(queryName, c.Select.UserQuery, defaultUsersQuery)
+	usersURL.RawQuery, err = formatQuery(queryName, c.Select.UserQuery, defaultUsersQuery, c.Expand.UserExpansion)
+	if err != nil {
+		return nil, fmt.Errorf("failed to format user query: %w", err)
+	}
 	f.usersURL = usersURL.String()
 
 	devicesURL, err := url.Parse(f.conf.APIEndpoint + "/devices/delta")
 	if err != nil {
 		return nil, fmt.Errorf("invalid devices URL endpoint: %w", err)
 	}
-	devicesURL.RawQuery = formatQuery(queryName, c.Select.DeviceQuery, defaultDevicesQuery)
+	devicesURL.RawQuery, err = formatQuery(queryName, c.Select.DeviceQuery, defaultDevicesQuery, c.Expand.DeviceExpansion)
+	if err != nil {
+		return nil, fmt.Errorf("failed to format device query: %w", err)
+	}
 	f.devicesURL = devicesURL.String()
 
 	// The API takes a departure from the query approach here, so we
@@ -470,12 +488,28 @@ func sanitizeFileName(name string) string {
 	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
-func formatQuery(name string, query []string, dflt string) string {
+func formatQuery(name string, query []string, dflt string, expand map[string][]string) (string, error) {
 	q := dflt
 	if len(query) != 0 {
 		q = strings.Join(query, ",")
 	}
-	return url.Values{name: []string{q}}.Encode()
+	vals := url.Values{name: []string{q}}
+	if len(expand) != 0 {
+		exp := make([]string, 0, len(expand))
+		for k := range expand {
+			exp = append(exp, k)
+		}
+		sort.Strings(exp)
+		for i, k := range exp {
+			v, err := formatQuery(name, expand[k], q, nil)
+			if err != nil {
+				return "", err
+			}
+			exp[i] = fmt.Sprintf("%s(%s)", k, v)
+		}
+		vals.Add(expandName, strings.Join(exp, ","))
+	}
+	return url.QueryUnescape(vals.Encode())
 }
 
 // newUserFromAPI translates an API-representation of a user to a fetcher.User.
