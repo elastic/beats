@@ -6,7 +6,6 @@ package cat_shards
 
 import (
 	"encoding/json"
-	"reflect"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -25,11 +24,19 @@ func convertObjectToMap[T any](object T, logger *logp.Logger) (map[string]any, e
 
 		if logger != nil {
 			if result["assignShards"] != nil && result["assignShards"].([]any) != nil {
-				val := reflect.ValueOf(result["assignShards"].([]any)[0])
+				switch result["assignShards"].(type) {
+				case []map[string]any:
+					logger.Infof("[ARRAY] assignShards ([]map[string]any): %v for %v\n", result["assignShards"], result["index"])
+				default:
+					logger.Infof("[ARRAY] assignShards (not []map[string]any): %v for %v\n", result["assignShards"], result["index"])
+				}
 
-				logger.Infof("assignShards: %v for %v\n", val.Type(), result["index"])
-			} else {
-				logger.Infof("assignShards is nil for %v\n", result["index"])
+				switch result["assignShards"].([]any)[0].(type) {
+				case map[string]any:
+					logger.Infof("assignShards (map[string]any): %v for %v\n", result["assignShards"].([]any)[0], result["index"])
+				default:
+					logger.Infof("assignShards (not map[string]any): %v for %v\n", result["assignShards"].([]any)[0], result["index"])
+				}
 			}
 		}
 
