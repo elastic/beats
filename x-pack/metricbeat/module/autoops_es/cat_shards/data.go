@@ -6,9 +6,8 @@ package cat_shards
 
 import (
 	"encoding/json"
+	"fmt"
 	"math"
-
-	"golang.org/x/exp/maps"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -81,20 +80,19 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 
 	transactionID := utils.NewUUIDV4()
 
-	sendNodeShardsEvent(r, info, maps.Values(nodeShards), transactionID)
+	// sendNodeShardsEvent(r, info, maps.Values(nodeShards), transactionID)
 
-	// indexMetadata, err := getResolvedIndices(m)
+	indexMetadata, err := getResolvedIndices(m)
 
-	// if err != nil {
-	// 	indexMetadata = map[string]IndexMetadata{}
-	// 	err = fmt.Errorf("failed to load resolved index details %w", err)
-	// 	events.SendErrorEvent(err, info, r, CatShardsMetricSet, CatShardsPath, transactionID)
-	// }
+	if err != nil {
+		indexMetadata = map[string]IndexMetadata{}
+		err = fmt.Errorf("failed to load resolved index details %w", err)
+		events.SendErrorEvent(err, info, r, CatShardsMetricSet, CatShardsPath, transactionID)
+	}
 
-	// sendNodeIndexShardsEvent(r, info, convertToNodeIndexShards(indexToShardList, indexMetadata), transactionID, m.Logger())
+	sendNodeIndexShardsEvent(r, info, convertToNodeIndexShards(indexToShardList, indexMetadata), transactionID, m.Logger())
 
-	// return err
-	return nil
+	return err
 }
 
 func sendNodeShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeToShards []NodeShardCount, transactionId string) {
