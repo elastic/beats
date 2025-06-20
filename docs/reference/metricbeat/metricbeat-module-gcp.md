@@ -36,7 +36,7 @@ This is a list of the possible module parameters you can tune:
 * **exclude_labels**: (`true`/`false` default `false`) Do not extract extra labels and metadata information from metricsets and fetch metrics only. At the moment, **labels and metadata extraction is only supported** in `compute` metricset.
 * **period**: A single time duration specified for this module collection frequency.
 * **endpoint**: A custom endpoint to use for the GCP API calls. If not specified, the default endpoint will be used.
-* **metadata_cache**: (`true`/`false` default `true`) Enable caching of metadata. If set to true, metadata will be cached to improve performance. If set to `false`, metadata caching will be disabled. By default set to `true` if this option is not explicitly set. {applies_to}`product: ga 9.1.0`
+* **metadata_cache**: (`true`/`false` default `true`) Enable caching of metadata. If set to true, metadata will be cached to improve performance. If set to `false`, metadata caching will be disabled. By default, caching is enabled even if this option is not explicitly set. {applies_to}`product: ga 9.1.0`
 * **metadata_cache_refresh_period**: A duration specifying how often the cached metadata should be refreshed (e.g., `5m`, `1h`). {applies_to}`product: ga 9.1.0`
 
 
