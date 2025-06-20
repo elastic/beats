@@ -20,6 +20,7 @@
 package file_integrity
 
 import (
+<<<<<<< HEAD:auditbeat/module/file_integrity/fileinfo_linux.go
 	"syscall"
 	"time"
 )
@@ -28,4 +29,22 @@ func fileTimes(stat *syscall.Stat_t) (atime, mtime, ctime time.Time) {
 	return time.Unix(0, stat.Atim.Nano()).UTC(),
 		time.Unix(0, stat.Mtim.Nano()).UTC(),
 		time.Unix(0, stat.Ctim.Nano()).UTC()
+=======
+	"context"
+	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
+)
+
+type Logouter interface {
+	Logout(ctx context.Context) error
+}
+
+// Logout performs log out on vSphere API client with backoff retry.
+func Logout(ctx context.Context, client Logouter) error {
+	r := backoff.NewRetryer(3, 500*time.Millisecond, 1*time.Minute)
+	return r.Retry(ctx, func() error {
+		return client.Logout(ctx)
+	})
+>>>>>>> 6b6941eed ([gcp] Add metadata cache (#44432)):metricbeat/module/vsphere/client/logout.go
 }
