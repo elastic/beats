@@ -3,7 +3,9 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-zeek.html
 ---
 
-# Zeek (Bro) Module [filebeat-module-zeek]
+% This file is generated! See scripts/docs_collector.py
+
+# Zeek module [filebeat-module-zeek]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/zeek/index.md).
@@ -506,8 +508,6 @@ This module comes with a sample dashboard. For example:
 % TO DO: Use `:class: screenshot`
 ![kibana zeek](images/kibana-zeek.png)
 
-
-## Fields [_fields_55]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-zeek.md) section.
-

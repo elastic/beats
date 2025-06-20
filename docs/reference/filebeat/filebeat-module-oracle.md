@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-oracle.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Oracle module [filebeat-module-oracle]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -80,7 +82,6 @@ Oracle Database fields are mapped to the current ECS Fields:
 | userhost | client.ip/domain |
 | database_user | server.user.name |
 
-
-## Fields [_fields_40]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-oracle.md) section.

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-o365.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Office 365 module [filebeat-module-o365]
 
 ::::{warning}
@@ -187,7 +189,6 @@ This module comes with a sample dashboard:
 % TO DO: Use `:class: screenshot`
 ![filebeat o365 audit](images/filebeat-o365-audit.png)
 
-
-## Fields [_fields_38]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-o365.md) section.

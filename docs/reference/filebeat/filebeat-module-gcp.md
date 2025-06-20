@@ -3,7 +3,9 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-gcp.html
 ---
 
-# Google Cloud module [filebeat-module-gcp]
+% This file is generated! See scripts/docs_collector.py
+
+# Google Cloud Platform (GCP) module [filebeat-module-gcp]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/gcp/index.md).
@@ -154,7 +156,6 @@ Example config:
 **`var.keep_original_message`**
 :   Flag to control whether the original message is stored in the `log.original` field. Defaults to `false`, meaning the original message is not saved.
 
-
-## Fields [_fields_18]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-gcp.md) section.
