@@ -90,7 +90,10 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 		events.SendErrorEvent(err, info, r, CatShardsMetricSet, CatShardsPath, transactionID)
 	}
 
-	sendNodeIndexShardsEvent(r, info, convertToNodeIndexShards(indexToShardList, indexMetadata), transactionID)
+	maps := sendNodeIndexShardsEvent(r, info, convertToNodeIndexShards(indexToShardList, indexMetadata), transactionID)
+
+	m.Logger().Infof("%d []NodeIndexShards events sent", len(maps))
+	m.Logger().Infof("Assign Shards: %v", maps[0]["assignShards"])
 
 	return err
 }
@@ -99,18 +102,25 @@ func sendNodeShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeToShards 
 	r.Event(events.CreateEvent(info, mapstr.M{"node_shards_count": convertStructArrayToMapArray(nodeToShards)}, transactionId))
 }
 
-func sendNodeIndexShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeIndexShards []NodeIndexShards, transactionId string) {
+func sendNodeIndexShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeIndexShards []NodeIndexShards, transactionId string) []map[string]any {
 	nodeIndexShardsPerEvent := utils.GetIntEnvParam(NODE_INDEX_SHARDS_PER_EVENT_NAME, 100)
 	size := len(nodeIndexShards)
 
 	// group node_index_shards documents into batches for efficiency
 	groups := make([]mapstr.M, 0, int(math.Ceil(float64(size)/float64(nodeIndexShardsPerEvent))))
 
+	maps := make([]map[string]any, 0, size)
+
 	for i := 0; i < size; i += nodeIndexShardsPerEvent {
 		group := nodeIndexShards[i:min(i+nodeIndexShardsPerEvent, size)]
+		converted := convertStructArrayToMapArray(group)
 
-		groups = append(groups, mapstr.M{"node_index_shards": convertStructArrayToMapArray(group)})
+		groups = append(groups, mapstr.M{"node_index_shards": converted})
+
+		maps = append(maps, converted...)
 	}
 
 	events.CreateAndReportEvents(r, info, groups, transactionId)
+
+	return maps
 }

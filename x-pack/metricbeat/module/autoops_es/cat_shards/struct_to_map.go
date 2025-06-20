@@ -42,17 +42,9 @@ func structToMap(val reflect.Value) map[string]any {
 		}
 
 		// Get JSON tag
-		jsonTag := fieldType.Tag.Get("json")
-		tagName, opts := parseJSONTag(jsonTag)
-		if tagName == "-" {
-			continue
-		}
-		if tagName == "" {
-			tagName = fieldType.Name
-		}
+		tagName := parseJSONTag(fieldType.Tag.Get("json"))
 
-		// Handle omitempty
-		if opts["omitempty"] && isZeroValue(fieldVal) {
+		if tagName == "-" || tagName == "" {
 			continue
 		}
 
@@ -125,15 +117,9 @@ func isZeroValue(v reflect.Value) bool {
 	}
 }
 
-func parseJSONTag(tag string) (name string, opts map[string]bool) {
-	opts = map[string]bool{}
+func parseJSONTag(tag string) string {
 	if tag == "" {
-		return "", opts
+		return ""
 	}
-	parts := strings.Split(tag, ",")
-	name = parts[0]
-	for _, opt := range parts[1:] {
-		opts[opt] = true
-	}
-	return name, opts
+	return strings.Split(tag, ",")[0]
 }
