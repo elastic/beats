@@ -23,11 +23,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/google/uuid"
+
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/go-elasticsearch/v8"
-	"github.com/google/uuid"
 )
 
 func TestFilebeatOTelE2E(t *testing.T) {
@@ -87,11 +88,6 @@ http.port: %d
 
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
-
-	t.Cleanup(func() {
-		filebeatOTel.Stop()
-		filebeat.Stop()
-	})
 
 	// prepare to query ES
 	esCfg := elasticsearch.Config{
@@ -223,11 +219,6 @@ processors:
 
 	filebeat.WriteConfigFile(configBuffer.String())
 	filebeat.Start()
-
-	t.Cleanup(func() {
-		filebeatOTel.Stop()
-		filebeat.Stop()
-	})
 
 	// prepare to query ES
 	esCfg := elasticsearch.Config{
