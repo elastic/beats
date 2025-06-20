@@ -462,6 +462,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add Fleet status update functionality to tcp input. {issue}44420[44420] {pull}44786[44786]
 - Filestream now logs at level warn the number of files that are too small to be ingested {pull}44751[44751]
 - Add proxy support to GCP Pub/Sub input. {pull}44892[44892]
+- Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
 
 *Auditbeat*
 
