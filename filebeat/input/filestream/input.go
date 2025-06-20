@@ -67,6 +67,7 @@ type filestream struct {
 	parsers              parser.Config
 	takeOver             loginp.TakeOverConfig
 	scannerCheckInterval time.Duration
+	gzipExperimental     bool
 
 	// Function references for testing
 	waitGracePeriodFn func(
@@ -124,6 +125,7 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 		closerConfig:      c.Close,
 		parsers:           c.Reader.Parsers,
 		takeOver:          c.TakeOver,
+		gzipExperimental:  c.GZIPExperimental,
 		deleterConfig:     c.Delete,
 		waitGracePeriodFn: waitGracePeriod,
 		tickFn:            time.Tick,
@@ -398,7 +400,7 @@ func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
 	return state
 }
 
-// 5 - open files
+// AndersonQ: 5 - open files
 func (inp *filestream) open(
 	log *logp.Logger,
 	canceler input.Canceler,
@@ -481,12 +483,12 @@ func (inp *filestream) open(
 //
 // openFile will also detect and handle file truncation. If a file is truncated
 // then the 3rd return value is true.
-// here - opens a file
+// AndersonQ: here - opens a file
 func (inp *filestream) openFile(
 	log *logp.Logger,
 	path string,
 	offset int64,
-) (*os.File, encoding.Encoding, bool, error) {
+) (File, encoding.Encoding, bool, error) {
 	fi, err := os.Stat(path)
 	if err != nil {
 		return nil, nil, false, fmt.Errorf("failed to stat source file %s: %w", path, err)
@@ -498,10 +500,17 @@ func (inp *filestream) openFile(
 		return nil, nil, false, fmt.Errorf("failed to open file %s, named pipes are not supported", fi.Name())
 	}
 
-	f, err := file.ReadOpen(path)
+	rawFile, err := file.ReadOpen(path)
 	if err != nil {
 		return nil, nil, false, fmt.Errorf("failed opening %s: %w", path, err)
 	}
+
+	f, err := inp.newFile(rawFile)
+	if err != nil {
+		return nil, nil, false,
+			fmt.Errorf("failed to create a File from a os.File: %w", err)
+	}
+
 	ok := false
 	defer cleanup.IfNot(&ok, cleanup.IgnoreError(f.Close))
 
@@ -516,6 +525,9 @@ func (inp *filestream) openFile(
 	}
 
 	truncated := false
+	// TODO(anderson): GZIP file cannot be truncated
+	// it could seek to offset on gzip, if there is less data -> truncated, stop
+	//
 	if fi.Size() < offset {
 		// if the file was truncated we need to reset the offset and notify
 		// all callers so they can also reset their offsets
@@ -523,12 +535,13 @@ func (inp *filestream) openFile(
 		log.Infof("File was truncated. Reading file from offset 0. Path=%s", path)
 		offset = 0
 	}
+
 	err = inp.initFileOffset(f, offset)
 	if err != nil {
 		return nil, nil, truncated, err
 	}
 
-	encoding, err := inp.encodingFactory(f)
+	enc, err := inp.encodingFactory(f)
 	if err != nil {
 		if errors.Is(err, transform.ErrShortSrc) {
 			return nil, nil, truncated, fmt.Errorf("initialising encoding for '%v' failed due to file being too short", f)
@@ -537,7 +550,42 @@ func (inp *filestream) openFile(
 	}
 
 	ok = true // no need to close the file
-	return f, encoding, truncated, nil
+	return f, enc, truncated, nil
+}
+
+// newFile wraps the given os.File into an appropriate File interface implementation.
+//
+// If the 'gzip_experimental' flag is false, it returns a plain file reader
+// (plainFile).
+//
+// If the 'gzip_experimental' flag is true, it attempts to detect if the
+// underlying file is GZIP compressed. If it is, it returns a GZIP-aware file
+// reader (gzipSeekerReader). If the file is not GZIP compressed, it returns a
+// plain file reader (plainFile).
+//
+// It returns an error if any happens.
+// TODO(anderson): ADD TESTS!
+func (inp *filestream) newFile(rawFile *os.File) (File, error) {
+	if !inp.gzipExperimental {
+		return newPlainFile(rawFile), nil
+	}
+
+	isGZIP, err := IsGZIP(rawFile)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"gzip detection error on %s: %w", rawFile.Name(), err)
+	}
+
+	if !isGZIP {
+		return newPlainFile(rawFile), nil
+	}
+
+	f, err := newGzipSeekerReader(rawFile, inp.readerConfig.BufferSize)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed create gzip seeker reader %s: %w", rawFile.Name(), err)
+	}
+	return f, nil
 }
 
 func checkFileBeforeOpening(fi os.FileInfo) error {
@@ -548,7 +596,7 @@ func checkFileBeforeOpening(fi os.FileInfo) error {
 	return nil
 }
 
-func (inp *filestream) initFileOffset(file *os.File, offset int64) error {
+func (inp *filestream) initFileOffset(file File, offset int64) error {
 	if offset > 0 {
 		_, err := file.Seek(offset, io.SeekCurrent)
 		return err

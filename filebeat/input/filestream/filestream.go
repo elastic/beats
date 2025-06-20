@@ -43,7 +43,7 @@ var (
 
 // logFile contains all log related data
 type logFile struct {
-	file      *os.File
+	file      File
 	log       *logp.Logger
 	readerCtx ctxtool.CancelContext
 
@@ -67,7 +67,7 @@ type logFile struct {
 func newFileReader(
 	log *logp.Logger,
 	canceler input.Canceler,
-	f *os.File,
+	f File,
 	config readerConfig,
 	closerConfig closerConfig,
 ) (*logFile, error) {
@@ -105,7 +105,7 @@ func newFileReader(
 // If the file is inactive, ErrInactive is returned
 // If f.readerCtx is cancelled for any reason, then
 // ErrClosed is returned
-// 6 - actually read the files
+// AndersonQ: 6 - actually read the files
 func (f *logFile) Read(buf []byte) (int, error) {
 	totalN := 0
 
@@ -152,6 +152,7 @@ func (f *logFile) Read(buf []byte) (int, error) {
 	return 0, ErrClosed
 }
 
+// AndersonQ: need to see what needs to be done here
 func (f *logFile) startFileMonitoringIfNeeded() {
 	if f.closeInactive > 0 || f.closeRemoved || f.closeRenamed {
 		err := f.tg.Go(func(ctx context.Context) error {
@@ -175,6 +176,7 @@ func (f *logFile) startFileMonitoringIfNeeded() {
 }
 
 func (f *logFile) closeIfTimeout(ctx unison.Canceler) {
+	// AndersonQ: close after interval
 	if err := timed.Wait(ctx, f.closeAfterInterval); err == nil {
 		f.readerCtx.Cancel()
 	}
@@ -196,6 +198,7 @@ func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
 
 func (f *logFile) shouldBeClosed() bool {
 	if f.closeInactive > 0 {
+		// AndersonQ: close after inactive
 		if time.Since(f.lastTimeRead) > f.closeInactive {
 			f.isInactive.Store(true)
 			f.log.Debugf("'%s' is inactive", f.file.Name())
@@ -230,7 +233,7 @@ func (f *logFile) shouldBeClosed() bool {
 
 	if f.closeRemoved {
 		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
-		if file.IsRemoved(f.file) {
+		if file.IsRemoved(f.file.OSFile()) {
 			f.log.Debugf("close.on_state_change.removed is enabled and file %s has been removed", f.file.Name())
 			return true
 		}
@@ -260,7 +263,7 @@ func (f *logFile) errorChecks(err error) error {
 }
 
 func (f *logFile) handleEOF() error {
-	if f.closeOnEOF {
+	if f.closeOnEOF || f.file.IsGZIP() {
 		return io.EOF
 	}
 
@@ -273,6 +276,7 @@ func (f *logFile) handleEOF() error {
 		return statErr
 	}
 
+	// AndersonQ: can we detect a gzip file was truncated?
 	// check if file was truncated
 	if info.Size() < f.offset {
 		f.log.Debugf("File was truncated as offset (%d) > size (%d): %s", f.offset, info.Size(), f.file.Name())
