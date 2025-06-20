@@ -494,7 +494,7 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 }
 
 func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescriptor, err error) {
-	s.log.Debug("this should not be here")
+	
 	fd.Filename = it.filename
 	fd.Info = it.info
 
