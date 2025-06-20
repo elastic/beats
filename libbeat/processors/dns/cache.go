@@ -18,6 +18,7 @@
 package dns
 
 import (
+	"math"
 	"sync"
 	"time"
 
@@ -77,7 +78,7 @@ func (c *successCache) get(now time.Time, key string) *result {
 
 	r, found := c.data[key]
 	if found && !r.IsExpired(now) {
-		return &result{r.data, uint32(r.expires.Sub(now) / time.Second)}
+		return &result{r.data, safeUint32(r.expires.Sub(now).Seconds())}
 	}
 	return nil
 }
@@ -216,7 +217,7 @@ func (c lookupCache) Lookup(q string, qt queryType) (*result, error) {
 	}
 
 	// We set the result TTL to the minimum TTL in case it is less than that.
-	r.TTL = max(r.TTL, uint32(c.success.minSuccessTTL/time.Second))
+	r.TTL = max(r.TTL, safeUint32(c.success.minSuccessTTL.Seconds()))
 
 	c.success.set(now, q, r)
 	return r, nil
@@ -227,4 +228,9 @@ func max(a, b uint32) uint32 {
 		return a
 	}
 	return b
+}
+
+// bounds check / satisfy G115
+func safeUint32(float float64) uint32 {
+	return uint32(math.Min(math.Abs(float), float64(math.MaxUint32)))
 }
