@@ -37,7 +37,7 @@ type Config struct {
 	IncludeEmptyStringProperties bool                     `config:"wmi.include_empty_string_properties"` // Specifies whether to include properties with empty string values in the final document
 	Namespace                    string                   `config:"wmi.namespace"`                       // Default WMI namespace for executing queries, used if not overridden by individual query configurations
 	Queries                      []QueryConfig            `config:"wmi.queries"`                         // List of WMI query configurations
-	MaxRowsPerQuery              int32                    `config:"wmi.max_rows_per_query"`              // Max number of rows to return in a single query to safeguard from an unexpected number of results.
+	MaxRowsPerQuery              uint32                   `config:"wmi.max_rows_per_query"`              // Max number of rows to return in a single query to safeguard from an unexpected number of results.
 	SchemaCacheSize              uint32                   `config:"wmi.schema_cache_size"`               // Max size of the class schema size
 	WarningThreshold             time.Duration            `config:"wmi.warning_threshold"`               // Maximum duration to wait for query results before logging a warning. The query will continue running in WMI but will no longer be awaited
 	NamespaceQueryIndex          map[string][]QueryConfig // Internal structure indexing queries by namespace to reduce the number of WMI connections required per execution
@@ -61,7 +61,7 @@ type QueryConfig struct {
 	Namespace          string     `config:"namespace"`  // WMI namespace for the query. This takes precedence over the globally configured namespace
 }
 
-var wmiDefaultMaxRows int32 = -1
+var wmiDefaultMaxRows uint32 = 0
 var wmiDefaultCacheSize uint32 = 500
 
 func NewDefaultConfig() Config {
@@ -147,7 +147,7 @@ func (c *Config) Validate() error {
 	if c.SchemaCacheSize <= 0 {
 		return fmt.Errorf("Cache size should be greater than 0")
 	}
-	if c.MaxRowsPerQuery <= 0 {
+	if c.MaxRowsPerQuery < 0 {
 		return fmt.Errorf("Max rows per query should be greater than 0")
 	}
 	return nil

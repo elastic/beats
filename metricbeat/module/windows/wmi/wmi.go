@@ -179,7 +179,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			rowsToReport := len(rows)
 
-			if m.config.MaxRowsPerQuery >= 0 && rowsToReport > int(m.config.MaxRowsPerQuery) {
+			if m.config.MaxRowsPerQuery > 0 && rowsToReport > int(m.config.MaxRowsPerQuery) {
 				m.Logger().Warnf("Got %d results, that exceeds the configured limit %d.", len(rows), (m.config.MaxRowsPerQuery))
 				rowsToReport = int(m.config.MaxRowsPerQuery)
 			}
