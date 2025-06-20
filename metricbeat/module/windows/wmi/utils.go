@@ -25,10 +25,13 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/cespare/xxhash/v2"
 	"github.com/go-ole/go-ole"
 	"github.com/go-ole/go-ole/oleutil"
 	base "github.com/microsoft/wmi/go/wmi"
 	wmi "github.com/microsoft/wmi/pkg/wmiinstance"
+
+	"github.com/elastic/go-freelru"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -103,6 +106,9 @@ type WmiConversionFunction func(interface{}) (interface{}, error)
 // General-purpose function that invokes the internal WMI conversion on
 // both strings and arrays to avoid code duplication.
 func GenericWmiConversionFunction[T any](v interface{}, convert internalWmiConversionFunction[T]) (interface{}, error) {
+	if v == nil {
+		return nil, nil
+	}
 	switch value := v.(type) {
 	case string:
 		return convert(value)
@@ -141,37 +147,53 @@ func ConvertIdentity(v interface{}) (interface{}, error) {
 	return v, nil
 }
 
-type WMISchema struct {
-	BaseClassSchema map[string]WmiConversionFunction
-	SubClassSchemas map[string]map[string]WmiConversionFunction
+func GetInvalidConversion(err error) WmiConversionFunction {
+	return func(v interface{}) (interface{}, error) {
+		return nil, err
+	}
 }
 
-func (ws WMISchema) Get(class string, key string) (WmiConversionFunction, bool) {
-	if val, ok := ws.BaseClassSchema[key]; ok {
-		return val, true
+func hashStringXXHASH(s string) uint32 {
+	return uint32(xxhash.Sum64String(s))
+}
+
+type WMISchema struct {
+	SubClassSchemas *freelru.LRU[string, map[string]WmiConversionFunction]
+}
+
+func (ws WMISchema) Get(class string, property string) (WmiConversionFunction, bool) {
+	classSchema, ok := ws.SubClassSchemas.Get(class)
+	if !ok {
+		// This case is actually unexpected, because we invoke PutClass before and we proceed sequentially
+		return GetInvalidConversion(fmt.Errorf("Could not find class %s in cache", class)), ok
 	}
-	val, ok := ws.SubClassSchemas[class][key]
+	val, ok := classSchema[property]
 	return val, ok
 }
 
-func (ws *WMISchema) Put(class string, key string, wcf WmiConversionFunction) {
-	// If no subclass map exists for this class, create it
-	if ws.SubClassSchemas == nil {
-		ws.SubClassSchemas = make(map[string]map[string]WmiConversionFunction)
+func (ws *WMISchema) PutClass(class string) map[string]WmiConversionFunction {
+	v, ok := ws.SubClassSchemas.Get(class)
+	if !ok {
+		v = make(map[string]WmiConversionFunction)
+		ws.SubClassSchemas.Add(class, v)
 	}
-
-	if _, ok := ws.SubClassSchemas[class]; !ok {
-		ws.SubClassSchemas[class] = make(map[string]WmiConversionFunction)
-	}
-
-	ws.SubClassSchemas[class][key] = wcf
+	return v
 }
 
-func NewWMISchema(base map[string]WmiConversionFunction) *WMISchema {
-	return &WMISchema{
-		BaseClassSchema: base,
-		SubClassSchemas: make(map[string]map[string]WmiConversionFunction),
+func (ws *WMISchema) Put(class string, key string, wcf WmiConversionFunction) {
+	classSchema := ws.PutClass(class)
+	classSchema[key] = wcf
+}
+
+func NewWMISchema(size uint32) (*WMISchema, error) {
+	flu, err := freelru.New[string, map[string]WmiConversionFunction](size, hashStringXXHASH)
+	if err != nil {
+		return nil, err
 	}
+
+	return &WMISchema{
+		SubClassSchemas: flu,
+	}, nil
 }
 
 // Given a Property it returns its CIM Type Qualifier
@@ -256,9 +278,8 @@ func GetConvertFunction(instance *wmi.WmiInstance, propertyName string, logger *
 		// and without further processing can cause go panic during (JSON) marshalling
 		//
 		// If you have a real-world need for this, please open a GitHub issue to discuss.
-		f = func(v interface{}) (interface{}, error) {
-			return nil, fmt.Errorf("the Type %s is unsupported. Consider flattening your class", "CIM Type Object")
-		}
+		f = GetInvalidConversion(fmt.Errorf("the Type %s is unsupported. Consider flattening your class", "CIM Type Object"))
+
 	default: // For all other types we return the identity function
 		f = ConvertIdentity
 	}
