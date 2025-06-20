@@ -6,8 +6,9 @@ mapped_pages:
 
 # Now [now]
 
-
 The `now` processor sets the current timestamp to the specified field of the event. The `now` processor will overwrite the target field if it already exists.
+
+The specified target field can be a nested field. This processor will throw an error and leave the original event unchanged if the target nested field has an existing non-object as a parent.
 
 `field`
 :   The target field.
@@ -30,4 +31,17 @@ Results in the following event:
 }
 ```
 
+The event will be unchanged if the target nested field has an existing non-object as a parent, given:
+```yaml
+processors:
+  - now:
+      field: event.created
+```
 
+The following event will not be altered:
+
+```json
+{
+  "event": "foo"
+}
+```
