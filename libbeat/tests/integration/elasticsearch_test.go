@@ -20,6 +20,7 @@
 package integration
 
 import (
+	"context"
 	"errors"
 	"io"
 	"net/http"
@@ -27,8 +28,9 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/rcrowley/go-metrics"
 	"github.com/stretchr/testify/require"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 
 	"github.com/elastic/mock-es/pkg/api"
 )
@@ -94,10 +96,22 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 	s.Close()
 }
 
-func startMockES(t *testing.T, addr string) (*http.Server, metrics.Registry) {
+func startMockES(t *testing.T, addr string) (*http.Server, *sdkmetric.ManualReader) {
 	uid := uuid.Must(uuid.NewV4())
-	mr := metrics.NewRegistry()
-	es := api.NewAPIHandler(uid, "foo2", mr, time.Now().Add(24*time.Hour), 0, 0, 0, 0, 0)
+	rdr := sdkmetric.NewManualReader()
+	provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(rdr))
+
+	es := api.NewAPIHandler(
+		uid,
+		"foo2",
+		provider,
+		time.Now().Add(24*time.Hour),
+		0,
+		0,
+		0,
+		0,
+		0,
+		0)
 
 	s := http.Server{Addr: addr, Handler: es, ReadHeaderTimeout: time.Second}
 	go func() {
@@ -118,7 +132,7 @@ func startMockES(t *testing.T, addr string) (*http.Server, metrics.Registry) {
 	},
 		time.Second, time.Millisecond, "mock-es server did not start on '%s'", addr)
 
-	return &s, mr
+	return &s, rdr
 }
 
 // waitForEventToBePublished waits for at least one event published
@@ -126,22 +140,27 @@ func startMockES(t *testing.T, addr string) (*http.Server, metrics.Registry) {
 // the counter is > 1, waitForEventToBePublished returns. If that
 // does not happen within 10min, then the test fails with a call to
 // t.Fatal.
-func waitForEventToBePublished(t *testing.T, mr metrics.Registry) {
+func waitForEventToBePublished(t *testing.T, reader *sdkmetric.ManualReader) {
 	t.Helper()
 	require.Eventually(t, func() bool {
-		total := mr.Get("bulk.create.total")
-		if total == nil {
+		rm := metricdata.ResourceMetrics{}
+		if err := reader.Collect(context.Background(), &rm); err != nil {
 			return false
 		}
-
-		sc, ok := total.(*metrics.StandardCounter)
-		if !ok {
-			t.Fatalf("expecting 'bulk.create.total' to be *metrics.StandardCounter, but got '%T' instead",
-				total,
-			)
+		var total int64
+		for _, sm := range rm.ScopeMetrics {
+			for _, m := range sm.Metrics {
+				if m.Name != "bulk.create.total" {
+					continue
+				}
+				switch d := m.Data.(type) {
+				case metricdata.Sum[int64]:
+					total = d.DataPoints[0].Value
+				}
+			}
 		}
 
-		return sc.Count() > 1
+		return total > 1
 	},
 		10*time.Second, 100*time.Millisecond,
 		"at least one bulk request must be made")

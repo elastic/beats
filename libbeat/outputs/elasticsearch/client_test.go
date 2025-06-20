@@ -28,12 +28,15 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	e "github.com/elastic/beats/v7/libbeat/beat/events"
@@ -53,7 +56,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	libversion "github.com/elastic/elastic-agent-libs/version"
+	"github.com/elastic/mock-es/pkg/api"
 )
+
+var _ beat.OutputListener = (*beat.CountOutputListener)(nil)
 
 type batchMock struct {
 	events      []publisher.Event
@@ -280,6 +286,130 @@ func TestPublish(t *testing.T) {
 		assertRegistryUint(t, reg, "events.failed", 3, "Split batches should retry 3 events before dropping them")
 		assertRegistryUint(t, reg, "events.active", 0, "Active events should be zero when Publish returns")
 	})
+
+	t.Run("metrics", func(t *testing.T) {
+		rdr := sdkmetric.NewManualReader()
+		provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(rdr))
+		mockESHandler := api.NewDeterministicAPIHandler(
+			uuid.Must(uuid.NewV4()),
+			"",
+			provider,
+			time.Now().Add(24*time.Hour),
+			0,
+			100,
+			func(action api.Action, event []byte) int {
+				ev := map[string]string{}
+				err := json.Unmarshal(event, &ev)
+				if err != nil {
+					t.Errorf("failed to unmarshal event: %v", err)
+					return http.StatusInternalServerError
+				}
+
+				t.Logf("\naction: %v\n\tmeta: %s\n\tevent: %s", action.Action, action.Meta, string(event))
+
+				httpStatus, err := strconv.Atoi(ev["http_status"])
+				if err != nil {
+					t.Errorf("failed to parse %s to int: %v", ev["http_status"], err)
+					return http.StatusInternalServerError
+				}
+				return httpStatus
+			})
+
+		esMock := httptest.NewServer(mockESHandler)
+		client, reg := makePublishTestClient(t, esMock.URL)
+
+		counter := &beat.CountOutputListener{}
+		observer := publisher.OutputListener{Listener: counter}
+		evs := []publisher.Event{
+			{
+				OutputListener: observer,
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg":         "message 1",
+						"http_status": strconv.Itoa(http.StatusOK)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+			{
+				OutputListener: observer,
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg": "message 2",
+						// dropped
+						"http_status": strconv.Itoa(http.StatusNotAcceptable)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+			{
+				OutputListener: observer,
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg": "message 3",
+						// toomany
+						"http_status": strconv.Itoa(http.StatusTooManyRequests)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+			{
+				OutputListener: observer,
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg": "message 4",
+						// duplicated
+						"http_status": strconv.Itoa(http.StatusConflict)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+		}
+
+		// Try publishing a batch that can be split
+		batch := encodeBatch(client, &batchMock{
+			events: evs,
+		})
+		err := client.Publish(context.Background(), batch)
+		require.NoError(t, err, "could not publish events")
+
+		snapshot := monitoring.CollectStructSnapshot(reg, monitoring.Full, false)
+		events := snapshot["events"].(map[string]any)
+
+		evAcked := events["acked"].(int64)
+		evNew := events["total"].(int64)
+		evDropped := events["dropped"].(int64)
+		evDeadLetter := events["dead_letter"].(int64)
+		evDuplicated := events["duplicates"].(int64)
+		evTooMany := events["toomany"].(int64)
+		evRetrieable := events["failed"].(int64)
+
+		assert.Equal(t, evNew, counter.NewLoad())
+		assert.Equal(t, evAcked, counter.AckedLoad())
+		assert.Equal(t, evDropped, counter.DroppedLoad())
+		assert.Equal(t, evDeadLetter, counter.DeadLetterLoad())
+		assert.Equal(t, evDuplicated, counter.DuplicateEventsLoad())
+		assert.Equal(t, evTooMany, counter.ErrTooManyLoad())
+		assert.Equal(t, evRetrieable, counter.RetryableErrorsLoad())
+
+		if t.Failed() {
+			t.Log("OutputListener metrics: ", counter)
+
+			snapshotJson, err := json.Marshal(snapshot)
+			require.NoErrorf(t, err,
+				"could not marshal metrics snapshot. Raw metrics snapshot: %v",
+				snapshot)
+			t.Logf("metrics registry snapshot: %s", snapshotJson)
+		}
+	})
 }
 
 func assertRegistryUint(t *testing.T, reg *monitoring.Registry, key string, expected uint64, message string) {
@@ -337,9 +467,9 @@ func TestCollectPublishFailMiddle(t *testing.T) {
     ]}
   `)
 
-	event1 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}})
-	event2 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}})
-	eventFail := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 3}}})
+	event1 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": "success 1"}}})
+	event2 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": "success 2"}}})
+	eventFail := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": "fail: tooMany"}}})
 	events := []publisher.Event{event1, eventFail, event2}
 
 	res, stats := client.bulkCollectPublishFails(bulkResult{
@@ -351,7 +481,12 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 	if len(res) == 1 {
 		assert.Equal(t, eventFail, res[0])
 	}
-	assert.Equal(t, bulkResultStats{acked: 2, fails: 1, tooMany: 1}, stats)
+	assert.Equal(t, bulkResultStats{
+		acked:   []publisher.Event{event1, event2},
+		fails:   []publisher.Event{eventFail},
+		tooMany: []publisher.Event{eventFail},
+	},
+		stats)
 }
 
 func TestCollectPublishFailDeadLetterSuccess(t *testing.T) {
@@ -382,7 +517,7 @@ func TestCollectPublishFailDeadLetterSuccess(t *testing.T) {
 		status:   200,
 		response: response,
 	})
-	assert.Equal(t, bulkResultStats{acked: 0, deadLetter: 1}, stats)
+	assert.Equal(t, bulkResultStats{deadLetter: events}, stats)
 	assert.Equal(t, 0, len(res))
 }
 
@@ -416,7 +551,7 @@ func TestCollectPublishFailFatalErrorNotRetried(t *testing.T) {
 		status:   200,
 		response: response,
 	})
-	assert.Equal(t, bulkResultStats{acked: 0, nonIndexable: 1}, stats)
+	assert.Equal(t, bulkResultStats{nonIndexable: events}, stats)
 	assert.Equal(t, 0, len(res))
 }
 
@@ -444,7 +579,7 @@ func TestCollectPublishFailInvalidBulkIndexResponse(t *testing.T) {
 	})
 	// The event should be returned for retry, and should appear in aggregated
 	// stats as failed (retryable error)
-	assert.Equal(t, bulkResultStats{acked: 0, fails: 1}, stats)
+	assert.Equal(t, bulkResultStats{fails: events}, stats)
 	assert.Equal(t, 1, len(res))
 	if len(res) > 0 {
 		assert.Equal(t, event1, res[0])
@@ -489,7 +624,7 @@ func TestCollectPublishFailDeadLetterIndex(t *testing.T) {
 		status:   200,
 		response: response,
 	})
-	assert.Equal(t, bulkResultStats{acked: 2, fails: 1, nonIndexable: 0}, stats)
+	assert.Equal(t, bulkResultStats{acked: []publisher.Event{event1, event2}, fails: []publisher.Event{eventFail}}, stats)
 	assert.Equal(t, 1, len(res))
 	if len(res) == 1 {
 		assert.Equalf(t, eventFail, res[0], "bulkCollectPublishFails should return failed event")
@@ -548,7 +683,11 @@ func TestCollectPublishFailDrop(t *testing.T) {
 		response: response,
 	})
 	assert.Equal(t, 0, len(res))
-	assert.Equal(t, bulkResultStats{acked: 2, fails: 0, nonIndexable: 1}, stats)
+	assert.Equal(t, bulkResultStats{
+		acked:        encodeEvents(client, []publisher.Event{event, event}),
+		nonIndexable: encodeEvents(client, []publisher.Event{eventFail}),
+	},
+		stats)
 }
 
 func TestCollectPublishFailAll(t *testing.T) {
@@ -580,7 +719,10 @@ func TestCollectPublishFailAll(t *testing.T) {
 	})
 	assert.Equal(t, 3, len(res))
 	assert.Equal(t, events, res)
-	assert.Equal(t, stats, bulkResultStats{fails: 3, tooMany: 3})
+	assert.Equal(t, stats, bulkResultStats{
+		fails:   events,
+		tooMany: events,
+	})
 }
 
 func TestCollectPipelinePublishFail(t *testing.T) {

@@ -59,7 +59,6 @@ func makeDiscard(
 	return outputs.Success(doConfig.Queue, -1, 0, nil, out)
 }
 
-// Implement Outputer
 func (out *discardOutput) Close() error {
 	return nil
 }
@@ -69,8 +68,8 @@ func (out *discardOutput) Publish(_ context.Context, batch publisher.Batch) erro
 
 	st := out.observer
 	events := batch.Events()
-	st.NewBatch(len(events))
-	st.AckedEvents(len(events))
+	st.NewBatch(events)
+	st.AckedEvents(events)
 	return nil
 }
 

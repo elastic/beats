@@ -82,12 +82,12 @@ type clientSettings struct {
 }
 
 type bulkResultStats struct {
-	acked        int // number of events ACKed by Elasticsearch
-	duplicates   int // number of events failed with `create` due to ID already being indexed
-	fails        int // number of events with retryable failures.
-	nonIndexable int // number of events with permanent failures.
-	deadLetter   int // number of failed events ingested to the dead letter index.
-	tooMany      int // number of events receiving HTTP 429 Too Many Requests
+	acked        []publisher.Event // number of events ACKed by Elasticsearch
+	duplicates   []publisher.Event // number of events failed with `create` due to ID already being indexed
+	fails        []publisher.Event // number of events with retryable failures.
+	nonIndexable []publisher.Event // number of events with permanent failures.
+	deadLetter   []publisher.Event // number of failed events ingested to the dead letter index.
+	tooMany      []publisher.Event // number of events receiving HTTP 429 Too Many Requests
 }
 
 type bulkResult struct {
@@ -246,7 +246,7 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 	span, ctx := apm.StartSpan(ctx, "publishEvents", "output")
 	defer span.End()
 	span.Context.SetLabel("events_original", len(batch.Events()))
-	client.observer.NewBatch(len(batch.Events()))
+	client.observer.NewBatch(batch.Events())
 
 	// Create and send the bulk request.
 	bulkResult := client.doBulkRequest(ctx, batch)
@@ -290,7 +290,6 @@ func (client *Client) doBulkRequest(
 	// events slice
 	resultEvents, bulkItems := client.bulkEncodePublishRequest(client.conn.GetVersion(), rawEvents)
 	result.events = resultEvents
-	client.observer.PermanentErrors(len(rawEvents) - len(resultEvents))
 
 	// If we encoded any events, send the network request.
 	if len(result.events) > 0 {
@@ -316,12 +315,12 @@ func (client *Client) handleBulkResultError(
 		if batch.SplitRetry() {
 			// Report that we split a batch
 			client.observer.BatchSplit()
-			client.observer.RetryableErrors(len(bulkResult.events))
+			client.observer.RetryableErrors(bulkResult.events)
 		} else {
 			// If the batch could not be split, there is no option left but
 			// to drop it and log the error state.
 			batch.Drop()
-			client.observer.PermanentErrors(len(bulkResult.events))
+			client.observer.PermanentErrors(bulkResult.events)
 			client.log.Error(errPayloadTooLarge)
 		}
 		// Don't propagate a too-large error since it doesn't indicate a problem
@@ -339,15 +338,17 @@ func (client *Client) handleBulkResultError(
 		// All events were sent successfully
 		batch.ACK()
 	}
-	client.observer.RetryableErrors(len(bulkResult.events))
+	client.observer.RetryableErrors(bulkResult.events)
 	return bulkResult.connErr
 }
 
 // bulkEncodePublishRequest encodes all bulk requests and returns slice of events
 // successfully added to the list of bulk items and the list of bulk items.
+// It also calls the observer to report any permanent errors encountered while
+// encoding.
 func (client *Client) bulkEncodePublishRequest(version version.V, data []publisher.Event) ([]publisher.Event, []interface{}) {
 	okEvents := data[:0]
-	bulkItems := []interface{}{}
+	var bulkItems []interface{}
 	for i := range data {
 		if data[i].EncodedEvent == nil {
 			client.log.Error("Elasticsearch output received unencoded publisher.Event")
@@ -358,11 +359,13 @@ func (client *Client) bulkEncodePublishRequest(version version.V, data []publish
 			// This means there was an error when encoding the event and it isn't
 			// ingestable, so report the error and continue.
 			client.log.Error(event.err)
+			client.observer.PermanentError(data[i])
 			continue
 		}
 		meta, err := client.createEventBulkMeta(version, event)
 		if err != nil {
 			client.log.Errorf("Failed to encode event meta data: %+v", err)
+			client.observer.PermanentError(data[i])
 			continue
 		}
 		if event.opType == events.OpTypeDelete {
@@ -440,12 +443,12 @@ func (client *Client) bulkCollectPublishFails(bulkResult bulkResult) ([]publishe
 		return nil, bulkResultStats{}
 	}
 	if bulkResult.status != 200 {
-		return events, bulkResultStats{fails: len(events)}
+		return events, bulkResultStats{fails: events}
 	}
 	reader := newJSONReader(bulkResult.response)
 	if err := bulkReadToItems(reader); err != nil {
 		client.log.Errorf("failed to parse bulk response: %v", err.Error())
-		return events, bulkResultStats{fails: len(events)}
+		return events, bulkResultStats{fails: events}
 	}
 
 	count := len(events)
@@ -455,8 +458,8 @@ func (client *Client) bulkCollectPublishFails(bulkResult bulkResult) ([]publishe
 		itemStatus, itemMessage, err := bulkReadItemStatus(client.log, reader)
 		if err != nil {
 			// The response json is invalid, mark the remaining events for retry.
-			stats.fails += count - i
 			eventsToRetry = append(eventsToRetry, events[i:]...)
+			stats.fails = append(stats.fails, eventsToRetry...)
 			break
 		}
 
@@ -483,9 +486,9 @@ func (client *Client) applyItemStatus(
 	if itemStatus < 300 {
 		if encodedEvent.deadLetter {
 			// This was ingested into the dead letter index, not the original target
-			stats.deadLetter++
+			stats.deadLetter = append(stats.deadLetter, event)
 		} else {
-			stats.acked++
+			stats.acked = append(stats.acked, event)
 		}
 		return false // no retry needed
 	}
@@ -493,13 +496,13 @@ func (client *Client) applyItemStatus(
 	if itemStatus == 409 {
 		// 409 is used to indicate there is already an event with the same ID, or
 		// with identical Time Series Data Stream dimensions when TSDS is active.
-		stats.duplicates++
+		stats.duplicates = append(stats.duplicates, event)
 		return false // no retry needed
 	}
 
 	if itemStatus == http.StatusTooManyRequests {
-		stats.fails++
-		stats.tooMany++
+		stats.fails = append(stats.fails, event)
+		stats.tooMany = append(stats.tooMany, event)
 		return true
 	}
 
@@ -510,14 +513,14 @@ func (client *Client) applyItemStatus(
 			// index, drop.
 			client.pLogDeadLetter.Add()
 			client.log.Errorw(fmt.Sprintf("Can't deliver to dead letter index event '%s' (status=%v): %s", encodedEvent, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
-			stats.nonIndexable++
+			stats.nonIndexable = append(stats.nonIndexable, event)
 			return false
 		}
 		if client.deadLetterIndex == "" {
 			// Fatal error and no dead letter index, drop.
 			client.pLogIndex.Add()
 			client.log.Warnw(fmt.Sprintf("Cannot index event '%s' (status=%v): %s, dropping event!", encodedEvent, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
-			stats.nonIndexable++
+			stats.nonIndexable = append(stats.nonIndexable, event)
 			return false
 		}
 		// Send this failure to the dead letter index and "retry".
@@ -530,7 +533,7 @@ func (client *Client) applyItemStatus(
 	}
 
 	// Everything else gets retried.
-	stats.fails++
+	stats.fails = append(stats.fails, event)
 	return true
 }
 
