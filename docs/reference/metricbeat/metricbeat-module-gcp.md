@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-gcp.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Google Cloud Platform module [metricbeat-module-gcp]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -265,7 +267,7 @@ The `storage` metricset comes with a predefined dashboard:
 ![metricbeat gcp storage overview](images/metricbeat-gcp-storage-overview.png)
 
 
-### Example configuration [_example_configuration_25]
+## Example configuration [_example_configuration]
 
 The Google Cloud Platform module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -285,7 +287,6 @@ metricbeat.modules:
     - pubsub
     - loadbalancing
     - firestore
-    - dataproc
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -344,10 +345,20 @@ metricbeat.modules:
   endpoint: http://your-endpoint
   dataset_id: "dataset id"
   table_pattern: "table pattern"
+
+- module: gcp
+  metricsets:
+    - dataproc
+  zone: "us-central1-a"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
+  collect_dataproc_user_labels: true
 ```
 
 
-### Metricsets [_metricsets_31]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
@@ -361,14 +372,3 @@ The following metricsets are available:
 * [metrics](/reference/metricbeat/metricbeat-metricset-gcp-metrics.md)
 * [pubsub](/reference/metricbeat/metricbeat-metricset-gcp-pubsub.md)
 * [storage](/reference/metricbeat/metricbeat-metricset-gcp-storage.md)
-
-
-
-
-
-
-
-
-
-
-

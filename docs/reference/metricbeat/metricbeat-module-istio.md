@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-istio.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Istio module [metricbeat-module-istio]
 
 ::::{warning}
@@ -36,7 +38,7 @@ These dashboards are only compatible with versions of Istio after `1.5` which sh
 ![metricbeat istio traffic](images/metricbeat-istio-traffic.png)
 
 
-## Example configuration [_example_configuration_33]
+## Example configuration [_example_configuration]
 
 The Istio module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -95,7 +97,7 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_39]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
@@ -106,11 +108,3 @@ The following metricsets are available:
 * [mixer](/reference/metricbeat/metricbeat-metricset-istio-mixer.md)
 * [pilot](/reference/metricbeat/metricbeat-metricset-istio-pilot.md)
 * [proxy](/reference/metricbeat/metricbeat-metricset-istio-proxy.md)
-
-
-
-
-
-
-
-

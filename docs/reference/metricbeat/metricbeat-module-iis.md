@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-iis.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # IIS module [metricbeat-module-iis]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -65,7 +67,7 @@ This metricset will collect metrics of specific application pools, users can con
 :   []string, users can specify the application pools they would like to monitor.
 
 
-### Example configuration [_example_configuration_32]
+## Example configuration [_example_configuration]
 
 The IIS module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -84,14 +86,10 @@ metricbeat.modules:
 ```
 
 
-### Metricsets [_metricsets_38]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [application_pool](/reference/metricbeat/metricbeat-metricset-iis-application_pool.md)
 * [webserver](/reference/metricbeat/metricbeat-metricset-iis-webserver.md)
 * [website](/reference/metricbeat/metricbeat-metricset-iis-website.md)
-
-
-
-

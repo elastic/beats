@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-gcp-gke.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Google Cloud Platform gke metricset [metricbeat-metricset-gcp-gke]
 
 `gke` metricset is designed for collecting metrics from [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine). Google Cloud Monitoring supports Google Kubernetes Engine metrics, as listed in [Google Cloud Monitoring Kubernetes metrics](https://cloud.google.com/monitoring/api/metrics_kubernetes).
@@ -31,8 +33,7 @@ None
 
 This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
 
-## Fields [_fields_104]
+## Fields [_fields]
 
 For a description of each field in the metricset, see the [exported fields](/reference/metricbeat/exported-fields-gcp.md) section.
-
 

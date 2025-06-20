@@ -8,7 +8,7 @@
   #  - collstats
   #  - metrics
   #  - replstatus
-  period: 60s
+  period: 10s
 
   # The hosts must be passed as MongoDB URLs in the format:
   # [mongodb://][user:pass@]host[:port].
