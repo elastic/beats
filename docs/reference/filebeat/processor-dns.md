@@ -84,7 +84,7 @@ The `dns` processor has the following configuration settings:
 
 ::::{note}
 Disabling the cache has throughput implications, requiring for each event to perform a round trip to the DNS server. For example, if a DNS lookup takes 1 ms, serial throughput is limited to a maximum of 1000 events per second.
-:::
+::::
 
 `failure_cache.capacity.initial`
 :   The initial number of items that the failure cache will be allocated to hold. When initialized the processor will allocate the memory for this number of items. Default value is `1000`.
@@ -100,7 +100,7 @@ Disabling the cache has throughput implications, requiring for each event to per
 
 ::::{note}
 Disabling the cache has throughput implications, requiring for each event to perform a round trip to the DNS server. For example, if a DNS lookup takes 1 ms, serial throughput is limited to a maximum of 1000 events per second. Additionally, if the failure occurs because the server is overloaded, retrying immediately might have compounding effects.
-:::
+::::
 
 `nameservers`
 :   A list of nameservers to query. If there are multiple servers, the resolver queries them in the order listed. If none are specified then it will read the nameservers listed in `/etc/resolv.conf` once at initialization. On Windows you must always supply at least one nameserver.
