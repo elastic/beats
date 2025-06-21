@@ -129,8 +129,8 @@ func TestCache(t *testing.T) {
 
 func TestDisabledCache(t *testing.T) {
 	config := defaultConfig().cacheConfig
-	config.SuccessCache.Disabled = true
-	config.FailureCache.Disabled = true
+	config.SuccessCache.Enabled = false
+	config.FailureCache.Enabled = false
 
 	c, err := newLookupCache(
 		monitoring.NewRegistry(),

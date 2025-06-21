@@ -121,7 +121,7 @@ type cacheConfig struct {
 // cacheSettings define the caching behavior for an individual cache.
 type cacheSettings struct {
 	// Disable the use of the cache.
-	Disabled bool `config:"disabled" default:"false"`
+	Enabled bool `config:"enabled" default:"true"`
 
 	// TTL value for items in cache. Not used for success because we use TTL
 	// from the DNS record.
@@ -192,13 +192,13 @@ func defaultConfig() config {
 	return config{
 		cacheConfig: cacheConfig{
 			SuccessCache: cacheSettings{
-				Disabled:        false,
+				Enabled:         true,
 				MinTTL:          time.Minute,
 				InitialCapacity: 1000,
 				MaxCapacity:     10000,
 			},
 			FailureCache: cacheSettings{
-				Disabled:        false,
+				Enabled:         true,
 				MinTTL:          time.Minute,
 				TTL:             time.Minute,
 				InitialCapacity: 1000,

@@ -35,7 +35,7 @@ func (r successRecord) IsExpired(now time.Time) bool {
 }
 
 type successCache struct {
-	disabled bool
+	enabled bool
 	sync.RWMutex
 	data          map[string]successRecord
 	maxSize       int
@@ -43,7 +43,7 @@ type successCache struct {
 }
 
 func (c *successCache) set(now time.Time, key string, result *result) {
-	if c.disabled {
+	if !c.enabled {
 		return
 	}
 	c.Lock()
@@ -70,7 +70,7 @@ func (c *successCache) evict() {
 }
 
 func (c *successCache) get(now time.Time, key string) *result {
-	if c.disabled {
+	if !c.enabled {
 		return nil
 	}
 	c.RLock()
@@ -93,7 +93,7 @@ func (r failureRecord) IsExpired(now time.Time) bool {
 }
 
 type failureCache struct {
-	disabled bool
+	enabled bool
 	sync.RWMutex
 	data       map[string]failureRecord
 	maxSize    int
@@ -101,7 +101,7 @@ type failureCache struct {
 }
 
 func (c *failureCache) set(now time.Time, key string, err error) {
-	if c.disabled {
+	if !c.enabled {
 		return
 	}
 	c.Lock()
@@ -127,7 +127,7 @@ func (c *failureCache) evict() {
 }
 
 func (c *failureCache) get(now time.Time, key string) error {
-	if c.disabled {
+	if !c.enabled {
 		return nil
 	}
 	c.RLock()
@@ -170,13 +170,13 @@ func newLookupCache(reg *monitoring.Registry, conf cacheConfig, resolver resolve
 
 	c := &lookupCache{
 		success: &successCache{
-			disabled:      conf.FailureCache.Disabled,
+			enabled:       conf.FailureCache.Enabled,
 			data:          make(map[string]successRecord, conf.SuccessCache.InitialCapacity),
 			maxSize:       conf.SuccessCache.MaxCapacity,
 			minSuccessTTL: conf.SuccessCache.MinTTL,
 		},
 		failure: &failureCache{
-			disabled:   conf.FailureCache.Disabled,
+			enabled:    conf.FailureCache.Enabled,
 			data:       make(map[string]failureRecord, conf.FailureCache.InitialCapacity),
 			maxSize:    conf.FailureCache.MaxCapacity,
 			failureTTL: conf.FailureCache.TTL,

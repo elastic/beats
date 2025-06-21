@@ -158,8 +158,8 @@ func TestDNSProcessorTagOnFailure(t *testing.T) {
 func TestDNSProcessorDisabledCache(t *testing.T) {
 	c := defaultConfig()
 	c.Type = typePTR
-	c.SuccessCache.Disabled = true
-	c.FailureCache.Disabled = true
+	c.SuccessCache.Enabled = true
+	c.FailureCache.Enabled = true
 	p := &processor{
 		config:   c,
 		resolver: &stubResolver{},
