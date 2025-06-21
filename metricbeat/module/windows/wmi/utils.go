@@ -158,8 +158,8 @@ func getInvalidConversion(err error) WmiConversionFunction {
 // Hash Function used for the LRU impementation
 func hashStringXXHASH(s string) uint32 {
 	// Code taken from the freelru main: https://github.com/elastic/go-freelru/tree/main
-	// nolint:gosec
-	return uint32(xxhash.Sum64String(s)) //nolint:gosec
+	//nolint:gosec // G115: Intentional truncation of uint64 hash to uint32 using modulo for LRU key.
+	return uint32(xxhash.Sum64String(s))
 }
 
 type WMISchema struct {
