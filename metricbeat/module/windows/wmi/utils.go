@@ -157,7 +157,10 @@ func getInvalidConversion(err error) WmiConversionFunction {
 
 // Hash Function used for the LRU impementation
 func hashStringXXHASH(s string) uint32 {
-	return uint32(xxhash.Sum64String(s))
+	// Slight adaptation of https://github.com/elastic/go-freelru/tree/main
+	// That truncates the 64-bit hash explicitely to get rid of the security warning:
+	// G115: integer overflow conversion uint64 -> uint32 (gosec)
+	return uint32(xxhash.Sum64String(s) & 0xFFFFFFFF)
 }
 
 type WMISchema struct {

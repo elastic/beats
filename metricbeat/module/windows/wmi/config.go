@@ -77,6 +77,14 @@ func NewDefaultConfig() Config {
 	}
 }
 
+// Function that verifies existence conditions
+func (c *Config) Validate() error {
+	if c.SchemaCacheSize == 0 {
+		return fmt.Errorf("cache size should be greater than 0")
+	}
+	return nil
+}
+
 func (c *Config) ValidateConnectionParameters() error {
 	if c.User != "" && c.Password == "" {
 		return fmt.Errorf("if user is set, password should be set")
@@ -141,14 +149,4 @@ func (c *Config) BuildNamespaceQueryIndex() {
 		}
 		c.NamespaceQueryIndex[namespace] = append(c.NamespaceQueryIndex[namespace], q)
 	}
-}
-
-func (c *Config) Validate() error {
-	if c.SchemaCacheSize <= 0 {
-		return fmt.Errorf("cache size should be greater than 0")
-	}
-	if c.MaxRowsPerQuery < 0 {
-		return fmt.Errorf("max rows per query should be greater than 0")
-	}
-	return nil
 }

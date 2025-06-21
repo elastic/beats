@@ -240,7 +240,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 					// FreePhysicalMemory is a string, but it should be an uint64
 
 					// We explicitly decide to perform a conversion on all fields because we do not support
-					// the object type
+					// the CIM_Object type as well
 					convertFun, ok := queryConfig.WmiSchema.Get(instance.GetClassName(), propertyName)
 
 					if !ok {
