@@ -296,7 +296,7 @@ func (m *MetricSet) initQuery(session WmiQueryInterface, queryConfig *QueryConfi
 
 	wmiSchema, err := NewWMISchema(m.config.SchemaCacheSize)
 	if err != nil {
-		return fmt.Errorf("Could not initialize wmi schema: %w", err)
+		return fmt.Errorf("could not initialize wmi schema: %w", err)
 	}
 	queryConfig.WmiSchema = wmiSchema
 	queryConfig.compileQuery()
