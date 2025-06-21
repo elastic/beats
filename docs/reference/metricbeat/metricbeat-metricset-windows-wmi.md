@@ -65,8 +65,7 @@ superclasses, such as `CIM_LogicalDevice`, the cache will populate with individu
 for each specific derived (leaf of the class hierarchy) class whose instances are returned by the query (e.g., `Win32_DiskDrive`, `Win32_NetworkAdapter`, etc.).
 
 ::::{note}
-**CIM Object Type Support:**
-The handling of properties with the `CIM_Object` type (embedded objects) is not supported.
+The properties of type `CIM_Object` (embedded objects) are not yet supported and ignored.
 ::::
 
 ## Configuration
@@ -187,15 +186,15 @@ Equivalent YAML Configuration:
 
 - Test your WMI queries in isolation using the [`Get-CimInstance`](https://learn.microsoft.com/en-us/powershell/module/cimcmdlets/get-ciminstance) PowerShell cmdlet or [the WMI Explorer tool](https://github.com/vinaypamnani/wmie2).
 
-- Ensure that `wmi.warning_threshold` is **less than or equal to** the module's `period`. This configuration prevents Metricbeat from attempting to start multiple concurrent executions of the same query if a previous one is running slowly.
+- Ensure that `wmi.warning_threshold` is less than or equal to the module's `period`. This configuration prevents Metricbeat from attempting to start multiple concurrent executions of the same query if a previous one is running slowly.
 
-- Set a `max_rows_per_query` to safeguard against queries with a high number of results
+- Set a `max_rows_per_query` to safeguard against queries with a high number of results.
 
-- When possible, try querying **concrete (leaf) classes** or classes closer to the leaves of the WMI inheritance hierarchy. Querying abstract superclasses may require fetching and caching the schema definitions for numerous derived classes, which can lead to increased memory usage and potential cache misses.
+- When possible, try querying concrete (leaf) classes or classes closer to the leaves of the WMI inheritance hierarchy. Querying abstract superclasses may require fetching and caching the schema definitions for numerous derived classes, which can lead to increased memory usage and potential performance penalties due to cache misses.
 
 - Set up alerts in Metricbeat for documents with the `error.message` field set.
 
-- [Advanced] Configure collection of **WMI-Activity Operational Logs** (found in Event Viewer under `Applications and Services Logs/Microsoft/Windows/WMI-Activity/Operational`). These logs can be invaluable for correlating issues with Metricbeat WMI warnings or documents containing `error.message`.
+- [Advanced] Configure collection of WMI-Activity Operational Logs (found in Event Viewer under `Applications and Services Logs/Microsoft/Windows/WMI-Activity/Operational`). These logs can be invaluable for correlating issues with Metricbeat WMI warnings or documents containing `error.message`.
 
 ## Compatibility
 
