@@ -174,11 +174,7 @@ func TestDifferentSetValueTypes(t *testing.T) {
 	cfg, err := conf.NewConfigFrom(c1)
 	require.NoError(t, err)
 
-<<<<<<< HEAD
-	transform, err := newSetResponse(cfg, logp.NewLogger("test"))
-=======
-	transform, err := newSetResponse(cfg, noopReporter{}, logptest.NewTestingLogger(t, "test"))
->>>>>>> c203b823c (x-pack/filebeat/input/httpjson: add fleet input status updating (#44365))
+	transform, err := newSetResponse(cfg, noopReporter{}, logp.NewLogger("test"))
 	require.NoError(t, err)
 
 	testAppend := transform.(*set)
@@ -206,11 +202,7 @@ func TestDifferentSetValueTypes(t *testing.T) {
 	cfg, err = conf.NewConfigFrom(c2)
 	require.NoError(t, err)
 
-<<<<<<< HEAD
-	transform, err = newSetResponse(cfg, logp.NewLogger("test"))
-=======
-	transform, err = newSetResponse(cfg, noopReporter{}, logptest.NewTestingLogger(t, "test"))
->>>>>>> c203b823c (x-pack/filebeat/input/httpjson: add fleet input status updating (#44365))
+	transform, err = newSetResponse(cfg, noopReporter{}, logp.NewLogger("test"))
 	require.NoError(t, err)
 
 	testAppend = transform.(*set)
@@ -231,11 +223,7 @@ func TestDifferentSetValueTypes(t *testing.T) {
 	cfg, err = conf.NewConfigFrom(c2)
 	require.NoError(t, err)
 
-<<<<<<< HEAD
-	transform, err = newSetResponse(cfg, logp.NewLogger("test"))
-=======
-	transform, err = newSetResponse(cfg, noopReporter{}, logptest.NewTestingLogger(t, "test"))
->>>>>>> c203b823c (x-pack/filebeat/input/httpjson: add fleet input status updating (#44365))
+	transform, err = newSetResponse(cfg, noopReporter{}, logp.NewLogger("test"))
 	require.NoError(t, err)
 
 	testAppend = transform.(*set)
