@@ -374,7 +374,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add evaluation state dump debugging option to CEL input. {pull}41335[41335]
 - Added support for retry configuration in GCS input. {issue}11580[11580] {pull}41862[41862]
 - Improve S3 polling mode states registry when using list prefix option. {pull}41869[41869]
-- Add support for SSL and Proxy configurations for websoket type in streaming input. {pull}41934[41934]
+- Add support for SSL and Proxy configurations for websocket type in streaming input. {pull}41934[41934]
 - AWS S3 input registry cleanup for untracked s3 objects. {pull}41694[41694]
 - The environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true` enables internal logs tracer for the azure-eventhub input. {issue}41931[41931] {pull}41932[41932]
 - Add support for SSL and Proxy configurations for websoket type in streaming input. {pull}41934[41934]
@@ -411,6 +411,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Introduce lastSync start position to AWS CloudWatch input backed by state registry. {pull}43251[43251]
 - Add Fleet status update functionality to udp input. {issue}44419[44419] {pull}44785[44785]
 - Filestream now logs at level warn the number of files that are too small to be ingested {pull}44751[44751]
+- Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
+- Add proxy support to GCP Pub/Sub input. {pull}44892[44892]
 
 *Auditbeat*
 
