@@ -1666,6 +1666,9 @@ metricbeat.modules:
     - query
   period: 10s
   hosts: ["postgres://postgres:mysecretpassword@localhost:5432"]
+  # Example of using SSL parameters manually in the connection string (with ssl.enabled set to false):
+  # hosts: ["postgres://postgres:mysecretpassword@localhost:5432?sslmode=verify-full&sslcert=%2Fpath%2Fto%2Fcert.pem&sslkey=%2Fpath%2Fto%2Fkey.pem&sslrootcert=%2Fpath%2Fto%2Fca.pem"]
+  # SSL parameters "sslmode", "sslcert", "sslkey", and "sslrootcert" are passed in the connection string with slashes "/" being url-encoded to "%2F"
 
   driver: "postgres"
   sql_query: "select now()"
