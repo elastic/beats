@@ -171,205 +171,6 @@ func TestFilestreamDeleteFile(t *testing.T) {
 	}
 }
 
-func TestFilestreamWaitGracePeriod(t *testing.T) {
-	testCases := map[string]struct {
-		data         []byte
-		cursorOffset int64
-		realSize     bool
-		expectError  bool
-		expected     bool
-		gracePeriod  time.Duration
-		doesNotExist bool
-	}{
-		"happy path": {
-			data:     []byte("foo bar\n"),
-			realSize: true,
-			expected: true,
-		},
-		"different size from cursor": {
-			data:         []byte("foo bar\n"),
-			cursorOffset: 42,
-			expected:     false,
-		},
-		"file does not exist": {
-			expected:     false,
-			doesNotExist: true,
-		},
-		"happy path with grace period": {
-			data:        []byte("foo bar\n"),
-			realSize:    true,
-			expected:    true,
-			gracePeriod: 200 * time.Millisecond,
-		},
-		"grace period and different file size": {
-			data:         []byte("foo bar\n"),
-			cursorOffset: 42,
-			expected:     false,
-			gracePeriod:  200 * time.Millisecond,
-		},
-		"grace period and file does not exist": {
-			doesNotExist: true,
-			expected:     false,
-			gracePeriod:  200 * time.Millisecond,
-		},
-	}
-
-	for name, tc := range testCases {
-		t.Run(name, func(t *testing.T) {
-			env := newInputTestingEnvironment(t)
-			var logFile string
-
-			if tc.doesNotExist {
-				logFile = "foo-bar"
-			} else {
-				logFile = env.mustWriteToFile("logfile.log", tc.data)
-			}
-
-			offset := tc.cursorOffset
-			if tc.realSize {
-				st, err := os.Stat(logFile)
-				if err != nil {
-					t.Fatalf("cannot stat %q: %s", logFile, err)
-				}
-				offset = st.Size()
-			}
-
-			cur := loginp.NewCursorForTest("foo-bar", offset, -1)
-			v2Ctx := v2.Context{
-				ID:          t.Name(),
-				Cancelation: t.Context(),
-				Logger:      env.logger,
-			}
-
-			start := time.Now()
-			got, err := waitGracePeriod(
-				v2Ctx,
-				env.logger,
-				cur,
-				logFile,
-				tc.gracePeriod,
-				10*time.Millisecond,
-				os.Stat,
-			)
-			delta := time.Now().Sub(start)
-			if !tc.expectError && err != nil {
-				t.Fatalf("did not expect an error from 'deleteFile': %s", err)
-			} else if tc.expectError && err == nil {
-				t.Fatal("expecting an error deleteFile")
-			}
-
-			if tc.gracePeriod != 0 && tc.expected {
-				if delta < tc.gracePeriod {
-					t.Errorf("grace period was not respected, 'waitGracePeriod' returned in %s", delta)
-				}
-			}
-			if got != tc.expected {
-				t.Fatalf("expecting '%t' when calling waitGracePeriod, got '%t'", tc.expected, got)
-			}
-		})
-	}
-}
-
-func TestFilestreamWaitGracePeriodContextCancelled(t *testing.T) {
-	env := newInputTestingEnvironment(t)
-
-	logFile := env.mustWriteToFile("logfile.log", []byte("foo bar"))
-	st, err := os.Stat(logFile)
-	if err != nil {
-		t.Fatalf("cannot stat %q: %s", logFile, err)
-	}
-	offset := st.Size()
-
-	cur := loginp.NewCursorForTest("foo-bar", offset, -1)
-	gracePeriod := 500 * time.Millisecond
-
-	ctx, cancel := context.WithCancel(t.Context())
-	v2Ctx := v2.Context{
-		ID:          t.Name(),
-		Cancelation: ctx,
-		Logger:      env.logger,
-	}
-
-	cancel()
-	start := time.Now()
-	got, err := waitGracePeriod(
-		v2Ctx,
-		env.logger,
-		cur,
-		logFile,
-		gracePeriod,
-		10*time.Millisecond,
-		os.Stat,
-	)
-	if got != false {
-		t.Fatal("expecting false when calling waitGracePeriod because the context is cancelled")
-	}
-	delta := time.Now().Sub(start)
-	if delta >= gracePeriod {
-		t.Fatal("waitGracePeriod did not return before the grace period")
-	}
-}
-
-func TestTestFilestreamWaitGracePeriodStatError(t *testing.T) {
-	env := newInputTestingEnvironment(t)
-
-	logFile := env.mustWriteToFile("logfile.log", []byte("foo bar"))
-	st, err := os.Stat(logFile)
-	if err != nil {
-		t.Fatalf("cannot stat %q: %s", logFile, err)
-	}
-	offset := st.Size()
-
-	cur := loginp.NewCursorForTest("foo-bar", offset, -1)
-
-	v2Ctx := v2.Context{
-		ID:          t.Name(),
-		Cancelation: t.Context(),
-		Logger:      env.logger,
-	}
-
-	statErr := errors.New("Oops")
-	statFn := func(string) (os.FileInfo, error) {
-		return nil, statErr
-	}
-
-	testCases := map[string]struct {
-		gracePeriod  time.Duration
-		scanInterval time.Duration
-	}{
-		"stat returns error while waiting grace period": {
-			gracePeriod:  time.Second,
-			scanInterval: time.Millisecond,
-		},
-		"stat returns error after grace period": {
-			gracePeriod:  time.Millisecond,
-			scanInterval: time.Second,
-		},
-	}
-
-	for name, tc := range testCases {
-		t.Run(name, func(t *testing.T) {
-			canDelete, err := waitGracePeriod(
-				v2Ctx,
-				env.logger,
-				cur,
-				logFile,
-				tc.gracePeriod,
-				tc.scanInterval,
-				statFn,
-			)
-			errMsg := fmt.Sprintf("cannot stat '%s': %s", logFile, statErr)
-			if errMsg != err.Error() {
-				t.Fatalf("expecting error message %q, got %q", errMsg, err.Error())
-			}
-
-			if canDelete {
-				t.Fatal("waitGracePeriod must return false")
-			}
-		})
-	}
-}
-
 func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 	removeErr := errors.New("oops")
 	env := newInputTestingEnvironment(t)
@@ -584,6 +385,205 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 			t.Fatalf("expecting error message to be %q, got %q", expectedErrMsg, gotErr.Error())
 		}
 	})
+}
+
+func TestFilestreamWaitGracePeriod(t *testing.T) {
+	testCases := map[string]struct {
+		data         []byte
+		cursorOffset int64
+		realSize     bool
+		expectError  bool
+		expected     bool
+		gracePeriod  time.Duration
+		doesNotExist bool
+	}{
+		"happy path": {
+			data:     []byte("foo bar\n"),
+			realSize: true,
+			expected: true,
+		},
+		"different size from cursor": {
+			data:         []byte("foo bar\n"),
+			cursorOffset: 42,
+			expected:     false,
+		},
+		"file does not exist": {
+			expected:     false,
+			doesNotExist: true,
+		},
+		"happy path with grace period": {
+			data:        []byte("foo bar\n"),
+			realSize:    true,
+			expected:    true,
+			gracePeriod: 200 * time.Millisecond,
+		},
+		"grace period and different file size": {
+			data:         []byte("foo bar\n"),
+			cursorOffset: 42,
+			expected:     false,
+			gracePeriod:  200 * time.Millisecond,
+		},
+		"grace period and file does not exist": {
+			doesNotExist: true,
+			expected:     false,
+			gracePeriod:  200 * time.Millisecond,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			env := newInputTestingEnvironment(t)
+			var logFile string
+
+			if tc.doesNotExist {
+				logFile = "foo-bar"
+			} else {
+				logFile = env.mustWriteToFile("logfile.log", tc.data)
+			}
+
+			offset := tc.cursorOffset
+			if tc.realSize {
+				st, err := os.Stat(logFile)
+				if err != nil {
+					t.Fatalf("cannot stat %q: %s", logFile, err)
+				}
+				offset = st.Size()
+			}
+
+			cur := loginp.NewCursorForTest("foo-bar", offset, -1)
+			v2Ctx := v2.Context{
+				ID:          t.Name(),
+				Cancelation: t.Context(),
+				Logger:      env.logger,
+			}
+
+			start := time.Now()
+			got, err := waitGracePeriod(
+				v2Ctx,
+				env.logger,
+				cur,
+				logFile,
+				tc.gracePeriod,
+				10*time.Millisecond,
+				os.Stat,
+			)
+			delta := time.Now().Sub(start)
+			if !tc.expectError && err != nil {
+				t.Fatalf("did not expect an error from 'deleteFile': %s", err)
+			} else if tc.expectError && err == nil {
+				t.Fatal("expecting an error deleteFile")
+			}
+
+			if tc.gracePeriod != 0 && tc.expected {
+				if delta < tc.gracePeriod {
+					t.Errorf("grace period was not respected, 'waitGracePeriod' returned in %s", delta)
+				}
+			}
+			if got != tc.expected {
+				t.Fatalf("expecting '%t' when calling waitGracePeriod, got '%t'", tc.expected, got)
+			}
+		})
+	}
+}
+
+func TestFilestreamWaitGracePeriodContextCancelled(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	logFile := env.mustWriteToFile("logfile.log", []byte("foo bar"))
+	st, err := os.Stat(logFile)
+	if err != nil {
+		t.Fatalf("cannot stat %q: %s", logFile, err)
+	}
+	offset := st.Size()
+
+	cur := loginp.NewCursorForTest("foo-bar", offset, -1)
+	gracePeriod := 500 * time.Millisecond
+
+	ctx, cancel := context.WithCancel(t.Context())
+	v2Ctx := v2.Context{
+		ID:          t.Name(),
+		Cancelation: ctx,
+		Logger:      env.logger,
+	}
+
+	cancel()
+	start := time.Now()
+	got, err := waitGracePeriod(
+		v2Ctx,
+		env.logger,
+		cur,
+		logFile,
+		gracePeriod,
+		10*time.Millisecond,
+		os.Stat,
+	)
+	if got != false {
+		t.Fatal("expecting false when calling waitGracePeriod because the context is cancelled")
+	}
+	delta := time.Now().Sub(start)
+	if delta >= gracePeriod {
+		t.Fatal("waitGracePeriod did not return before the grace period")
+	}
+}
+
+func TestFilestreamWaitGracePeriodStatError(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	logFile := env.mustWriteToFile("logfile.log", []byte("foo bar"))
+	st, err := os.Stat(logFile)
+	if err != nil {
+		t.Fatalf("cannot stat %q: %s", logFile, err)
+	}
+	offset := st.Size()
+
+	cur := loginp.NewCursorForTest("foo-bar", offset, -1)
+
+	v2Ctx := v2.Context{
+		ID:          t.Name(),
+		Cancelation: t.Context(),
+		Logger:      env.logger,
+	}
+
+	statErr := errors.New("Oops")
+	statFn := func(string) (os.FileInfo, error) {
+		return nil, statErr
+	}
+
+	testCases := map[string]struct {
+		gracePeriod  time.Duration
+		scanInterval time.Duration
+	}{
+		"stat returns error while waiting grace period": {
+			gracePeriod:  time.Second,
+			scanInterval: time.Millisecond,
+		},
+		"stat returns error after grace period": {
+			gracePeriod:  time.Millisecond,
+			scanInterval: time.Second,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			canDelete, err := waitGracePeriod(
+				v2Ctx,
+				env.logger,
+				cur,
+				logFile,
+				tc.gracePeriod,
+				tc.scanInterval,
+				statFn,
+			)
+			errMsg := fmt.Sprintf("cannot stat '%s': %s", logFile, statErr)
+			if errMsg != err.Error() {
+				t.Fatalf("expecting error message %q, got %q", errMsg, err.Error())
+			}
+
+			if canDelete {
+				t.Fatal("waitGracePeriod must return false")
+			}
+		})
+	}
 }
 
 func requireFileDeleted(t *testing.T, path string, expectDeleted bool) {
