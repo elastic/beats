@@ -391,6 +391,120 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	})
 }
 
+func TestCursorAllEventsPublished(t *testing.T) {
+	fieldKey := "foo bar"
+	var wg sync.WaitGroup
+	source := &testSource{name: "/path/to/fake/file"}
+
+	cursorCh := make(chan Cursor)
+	publishLock := make(chan struct{})
+	donePublishing := make(chan struct{})
+	runFn := func(ctx input.Context, s Source, c Cursor, p Publisher) error {
+		// Once the harvester is started, we send the cursor on the channel
+		// so the test has access to it and can it proceed
+		cursorCh <- c
+		<-publishLock
+		p.Publish(
+			beat.Event{
+				Timestamp: time.Now(),
+				Fields: mapstr.M{
+					// Add a known field so we can identify this event later on
+					fieldKey: t.Name(),
+				},
+			}, c)
+		donePublishing <- struct{}{}
+		return nil
+	}
+
+	var cursor Cursor
+	mockHarvester := &mockHarvester{onRun: runFn, wg: &wg}
+	hg := testDefaultHarvesterGroup(t, mockHarvester)
+	hg.pipeline = &MockPipeline{
+		// Define the call back that will be called before each event is
+		// published/acknowledged, when this callback is called, the
+		// resource is still 'pending' on this acknowledgement.
+		// So resource.pending must be 2, the input 'lock' and this pending
+		// acknowledgement.
+		//
+		// This callback runs on a different goroutine, therefore we cannot
+		// call t.Fatal/t.FailNow and friends
+		publishCallback: func(e beat.Event) {
+			// Ensure we have the correct event
+			if ok, _ := e.Fields.HasKey(fieldKey); ok {
+				uop, ok := e.Private.(*updateOp)
+				if !ok {
+					return
+				}
+				evtResource := uop.resource.key
+				cursorKey := cursor.resource.key
+
+				// Just to be on the safe side, ensure the event belongs to
+				// the resource we're testing.
+				if evtResource != cursorKey {
+					t.Errorf(
+						"cursor key %q and event resource key %q must be the same.",
+						cursorKey, logp.EventType)
+				}
+				// cursor.resource.pending bust be 2 here
+				if cursor.AllEventsPublished() {
+					t.Errorf(
+						"not all events have been published, pending events: %d",
+						cursor.resource.pending.Load(),
+					)
+				}
+			}
+		}}
+
+	wg.Add(1)
+	hg.Start(
+		input.Context{
+			Logger:      logp.NewNopLogger(),
+			Cancelation: t.Context(),
+		},
+		source)
+
+	// Wait for the harvester to start and send us its resource
+	cursor = <-cursorCh
+
+	// As soon as the harvester starts, 'pending' must be 1
+	// because the harvester locked the resource and no events
+	// have been published yet.
+	require.True(
+		t,
+		cursor.AllEventsPublished(),
+		"All events must be published")
+
+	// Ensure the harvester has the resource locked
+	require.EqualValues(
+		t,
+		1,
+		cursor.resource.pending.Load(),
+		"While the harvester is running the resource must be locked, 'pending' must be 1")
+
+	// Let the harvester call publish
+	publishLock <- struct{}{}
+
+	// Wait the harvester to finish publishing
+	<-donePublishing
+
+	// Then wait for it to be fully closed
+	wg.Wait()
+
+	// Once the harvester is closed, cursor.AllEventsPublished() must still
+	// return true
+	require.True(
+		t,
+		cursor.AllEventsPublished(),
+		"cursor.AllEventsPublished() must return true when the harvester is closed.")
+
+	// Ensure the harvester has released the resource
+	require.EqualValues(
+		t,
+		0,
+		cursor.resource.pending.Load(),
+		"once the harvester is done, the resource must be unlocked, 'pending' must be 0")
+}
+
 func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester) *defaultHarvesterGroup {
 	return &defaultHarvesterGroup{
 		readers:    newReaderGroup(),
@@ -549,104 +663,4 @@ func (mp *MockPipeline) ConnectWith(config beat.ClientConfig) (beat.Client, erro
 // Connect connects the mock pipeline with a client using the default configuration.
 func (mp *MockPipeline) Connect() (beat.Client, error) {
 	return mp.ConnectWith(beat.ClientConfig{})
-}
-
-func TestCursorAllEventsPublished(t *testing.T) {
-	fieldKey := "foo bar"
-	var wg sync.WaitGroup
-	source := &testSource{name: "/path/to/fake/file"}
-
-	cursorCh := make(chan Cursor)
-	publishLock := make(chan struct{})
-	donePublishing := make(chan struct{})
-	runFn := func(ctx input.Context, s Source, c Cursor, p Publisher) error {
-		// Once the harvester is started, we send the cursor on the channel
-		// so the test has access to it and can it proceed
-		cursorCh <- c
-		<-publishLock
-		p.Publish(
-			beat.Event{
-				Timestamp: time.Now(),
-				Fields: mapstr.M{
-					// Add a known field so we can identify this event later on
-					fieldKey: t.Name(),
-				},
-			}, c)
-		donePublishing <- struct{}{}
-		return nil
-	}
-
-	var cursor Cursor
-	mockHarvester := &mockHarvester{onRun: runFn, wg: &wg}
-	hg := testDefaultHarvesterGroup(t, mockHarvester)
-	hg.pipeline = &MockPipeline{
-		// Define the call back that will be called before each event is
-		// published/acknowledged, when this callback is called, the
-		// resource is still 'pending' on this acknowledgement.
-		// So resource.pending must be 2, the input 'lock' and this pending
-		// acknowledgement.
-		//
-		// This callback runs on a different goroutine, therefore we cannot
-		// call t.Fatal/t.FailNow and friends
-		publishCallback: func(e beat.Event) {
-			// Ensure we have the correct event
-			if ok, _ := e.Fields.HasKey(fieldKey); ok {
-				uop, ok := e.Private.(*updateOp)
-				if !ok {
-					return
-				}
-				evtResource := uop.resource.key
-				cursorKey := cursor.resource.key
-
-				// Just to be on the safe side, ensure the event belongs to
-				// the resource we're testing.
-				if evtResource != cursorKey {
-					t.Errorf(
-						"cursor key %q and event resource key %q must be the same.",
-						cursorKey, logp.EventType)
-				}
-				// cursor.resource.pending bust be 2 here
-				if cursor.AllEventsPublished() {
-					t.Errorf(
-						"not all events have been published, pending events: %d",
-						cursor.resource.pending.Load(),
-					)
-				}
-			}
-		}}
-
-	wg.Add(1)
-	hg.Start(
-		input.Context{
-			Logger:      logp.NewNopLogger(),
-			Cancelation: t.Context(),
-		},
-		source)
-
-	// Wait for the harvester to start and send us its resource
-	cursor = <-cursorCh
-
-	// As soon as the harvester starts, 'pending' must be 1
-	// because the harvester locked the resource and no events
-	// have been published yet.
-	require.True(
-		t,
-		cursor.AllEventsPublished(),
-		"All events must be published")
-
-	// Let the harvester call publish
-	publishLock <- struct{}{}
-
-	// Wait the harvester to finish publishing
-	<-donePublishing
-
-	// Then wait for it to be fully closed
-	wg.Wait()
-
-	// Once the harvester is closed, cursor.AllEventsPublished() must still
-	// return true
-	require.True(
-		t,
-		cursor.AllEventsPublished(),
-		"foo")
 }
