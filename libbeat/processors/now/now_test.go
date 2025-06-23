@@ -132,18 +132,13 @@ func TestNow(t *testing.T) {
 
 			configInput, err := config.NewConfigFrom(test.config)
 			require.NoError(t, err, "Failed to create config from test case")
-			testConfig := nowConfig{}
-			err = configInput.Unpack(&testConfig)
+
+			processor, err := New(configInput, logptest.NewTestingLogger(t, "now"))
 			if test.badConfig {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
-
-			processor := &now{
-				log:    logptest.NewTestingLogger(t, "now"),
-				config: testConfig,
-			}
 
 			inputEvent := &beat.Event{
 				Fields: test.Input,
@@ -159,4 +154,22 @@ func TestNow(t *testing.T) {
 			assert.Equal(t, test.Output, outputEvent.Fields, "Output event does not match expected")
 		})
 	}
+}
+
+func TestEffectiveEventRendering(t *testing.T) {
+	es9ReleaseDate := time.Date(2025, 04, 8, 12, 0, 0, 42, time.UTC)
+	currentTime = func() time.Time { return es9ReleaseDate }
+
+	configInput, err := config.NewConfigFrom(nowConfig{
+		Field: "target",
+	})
+	require.NoError(t, err)
+
+	processor, err := New(configInput, logptest.NewTestingLogger(t, "now"))
+	require.NoError(t, err)
+
+	outputEvent, err := processor.Run(&beat.Event{})
+	require.NoError(t, err)
+
+	assert.Equal(t, "{\"target\":\"2025-04-08T12:00:00.000000042Z\"}", outputEvent.Fields.String(), "Date is not rendered as expected")
 }
