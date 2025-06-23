@@ -39,8 +39,11 @@ SYSTEM_CPU_ALL[metricbeat.P_LINUX] = SYSTEM_CPU[metricbeat.P_LINUX] + ["idle.tic
 
 # metrics from /proc/cpuinfo are platform dependent and only
 # reliably available on Linux x86-like platforms
+
+
 def is_cpuinfo_supported():
     return platform.machine() in {'i386', 'i686', 'x86_64', 'amd64'}
+
 
 SYSTEM_CORE_CPUINFO_FIELDS = ["model_name", "model_number", "mhz",
                               "core_id", "physical_id"]
