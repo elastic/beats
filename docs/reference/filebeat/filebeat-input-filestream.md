@@ -148,7 +148,7 @@ A list of glob-based paths that will be crawled and fetched. All patterns suppor
 Filebeat starts a harvester for each file that it finds under the specified paths. You can specify one path per line. Each line begins with a dash (-).
 
 
-### Scanner options [_scanner_options]
+## Scanner options [_scanner_options]
 
 The scanner watches the configured paths. It scans the file system periodically and returns the file system events to the Prospector.
 
