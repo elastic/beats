@@ -60,6 +60,10 @@ type Plugin struct {
 
 	// Manager MUST be configured. The manager is used to create the inputs.
 	Manager InputManager
+
+	// ExcludeForFIPS marks the plugin as being excluded in FIPS-capable artifacts. If
+	// a plugin sets this to true and that plugin is configured, a message is logged.
+	ExcludeForFIPS bool
 }
 
 func (p Plugin) validate() error {
@@ -75,5 +79,9 @@ func (p Plugin) validate() error {
 	if p.Manager == nil {
 		return fmt.Errorf("invalid plugin (%v) structure detected", p.Name)
 	}
+	if p.ExcludeForFIPS {
+		return fmt.Errorf("plugin [%s] is not available as it is not FIPS-capable", p.Name)
+	}
+
 	return nil
 }
