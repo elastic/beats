@@ -1040,6 +1040,7 @@ toc:
           - file: metricbeat/metricbeat-module-meraki.md
             children:
               - file: metricbeat/metricbeat-metricset-meraki-device_health.md
+              - file: metricbeat/metricbeat-metricset-meraki-network_health.md
           - file: metricbeat/metricbeat-module-mongodb.md
             children:
               - file: metricbeat/metricbeat-metricset-mongodb-collstats.md
