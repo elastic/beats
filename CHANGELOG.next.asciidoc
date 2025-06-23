@@ -39,9 +39,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
 - Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
-- Add check for http error codes in the Metricbeat's Prometheus query submodule {pull}44493[44493]
-- Fix the function to determine CPU cores on windows {issue}42593[42593] {pull}43409[43409]
-- Sanitize error messages in Fetch method of SQL module {pull}44577[44577]
 
 *Osquerybeat*
 
@@ -83,9 +80,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 - 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
-- Fix `dns` processor to handle IPv6 server addresses properly. {pull}44526[44526]
-- Fix an issue where the Kafka output could get stuck if a proxied connection to the Kafka cluster was reset. {issue}44606[44606]
-- Use Debian 11 to build linux/arm to match linux/amd64. Upgrades linux/arm64's statically linked glibc from 2.28 to 2.31. {issue}44816[44816]
 
 *Auditbeat*
 
@@ -119,25 +113,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix request trace filename handling in http_endpoint input. {pull}39410[39410]
 - Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
 - Prevent panic in CEL and salesforce inputs when github.com/hashicorp/go-retryablehttp exceeds maximum retries. {pull}40144[40144]
-- Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
-- [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
-- Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
-- Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
-- Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
 - Fix publishing Okta entity analytics enrichments. {pull}44483[44483]
-- Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
-- Fix status reporting panic in GCP Pub/Sub input. {issue}44624[44624] {pull}44625[44625]
-- If a Filestream input fails to be created, its ID is removed from the list of running input IDs {pull}44697[44697]
-- Fix timeout handling by Crowdstrike streaming input. {pull}44720[44720]
-- Ensure DEPROVISIONED Okta entities are published by Okta entityanalytics provider. {issue}12658[12658] {pull}44719[44719]
-- Fix handling of cursors by the streaming input for Crowdstrike. {issue}44364[44364] {pull}44548[44548]
-- Added missing "text/csv" content-type filter support in azureblobsortorage input. {issue}44596[44596] {pull}44824[44824]
-- Fix unexpected EOF detection and improve memory usage. {pull}44813[44813]
 - Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
 
 *Heartbeat*
 
-- Add missing dependencies to ubi9-minimal distro. {pull}44556[44556]
 
 
 *Metricbeat*
@@ -156,8 +136,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
 - Remove excessive info-level logs in cgroups setup {pull}40491[40491]
 - Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
-- Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group. {pull}44576[44576]
-- Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
 
 *Osquerybeat*
 
@@ -188,7 +166,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
-- Update to Go 1.24.4. {pull}44696[44696]
 
 *Auditbeat*
 
@@ -236,18 +213,14 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update CEL mito extensions to v1.12.2. {pull}39755[39755]
 - Allow cross-region bucket configuration in s3 input. {issue}22161[22161] {pull}40309[40309]
 - Disable event normalization for netflow input {pull}40635[40635]
-- Add support to the Active Directory entity analytics provider for device entities. {pull}44309[44309]
 - Add support for OPTIONS request to HTTP Endpoint input. {issue}43930[43930] {pull}44387[44387]
 - Add Fleet status update functionality to lumberjack input. {issue}44283[44283] {pull}44339[44339]
 - Add Fleet status updating to HTTP Endpoint input. {issue}44281[44281] {pull}44310[44310]
 - Add Fleet status updating to streaming input. {issue}44284[44284] {pull}44340[44340]
 - Add Fleet status update functionality to gcppubsub input. {issue}44272[44272] {pull}44507[44507]
 - Add Fleet status updating to GCS input. {issue}44273[44273] {pull}44508[44508]
-- Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. {issue}44349[44349] {pull}44436[44436]
-- Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
 - Add Fleet status update functionality to udp input. {issue}44419[44419] {pull}44785[44785]
 - Add Fleet status update functionality to tcp input. {issue}44420[44420] {pull}44786[44786]
-- Filestream now logs at level warn the number of files that are too small to be ingested {pull}44751[44751]
 - Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
 
 *Auditbeat*
@@ -276,11 +249,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add SSL support for aerospike module {pull}38126[38126]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
-- Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
 - Add new metrics to vSphere Virtual Machine dataset (CPU usage percentage, disk average usage, disk read/write rate, number of disk reads/writes, memory usage percentage). {pull}44205[44205]
-- Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
-- Add latency config option to Azure Monitor module. {pull}44366[44366]
-- Increase default polling period for MongoDB module from 10s to 60s {pull}44781[44781]
 
 *Metricbeat*
 
@@ -331,6 +300,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
