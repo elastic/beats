@@ -21,6 +21,7 @@ package status
 
 import (
 	"bufio"
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -75,6 +76,7 @@ Scoreboard: ____________________________________________________________________
 // TestFetchEventContents verifies the contents of the returned event against
 // the raw Apache response.
 func TestFetchEventContents(t *testing.T) {
+	fmt.Println("this is a test message from aapache")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "text/plain; charset=ISO-8859-1")
