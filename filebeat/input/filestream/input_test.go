@@ -18,6 +18,8 @@
 package filestream
 
 import (
+	"bytes"
+	"compress/gzip"
 	"context"
 	"fmt"
 	"os"
@@ -26,6 +28,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -305,4 +308,96 @@ func (c *testClient) PublishAll(events []beat.Event) {
 }
 func (c *testClient) Close() error {
 	return nil
+}
+
+func TestNewFile(t *testing.T) {
+	tempDir := t.TempDir()
+
+	plainFileContent := "this is a plain file"
+	plainFilePath := filepath.Join(tempDir, "plain.txt")
+	err := os.WriteFile(plainFilePath, []byte(plainFileContent), 0644)
+	require.NoError(t, err, "could not write plain file")
+
+	gzipFileContent := "this is a gzipped file"
+	var gzipBuf bytes.Buffer
+	gzipWriter := gzip.NewWriter(&gzipBuf)
+	_, err = gzipWriter.Write([]byte(gzipFileContent))
+	require.NoError(t, err)
+	err = gzipWriter.Close()
+	require.NoError(t, err)
+	gzippedFilePath := filepath.Join(tempDir, "test.gz")
+	err = os.WriteFile(gzippedFilePath, gzipBuf.Bytes(), 0644)
+	require.NoError(t, err)
+
+	testCases := map[string]struct {
+		gzipEnabled   bool
+		filePath      string
+		expectedType  interface{}
+		expectError   bool
+		errorContains string
+		setup         func(t *testing.T, filePath string) *os.File
+	}{
+		"gzip_disabled_returns_plain_file": {
+			gzipEnabled:  false,
+			filePath:     plainFilePath,
+			expectedType: &plainFile{},
+		},
+		"gzip_enabled_with_plain_file_returns_plain_file": {
+			gzipEnabled:  true,
+			filePath:     plainFilePath,
+			expectedType: &plainFile{},
+		},
+		"gzip_enabled_with_gzip_file_returns_gzip_reader": {
+			gzipEnabled:  true,
+			filePath:     gzippedFilePath,
+			expectedType: &gzipSeekerReader{},
+		},
+		"gzip_enabled_with_unreadable_file_returns_error": {
+			gzipEnabled: true,
+			filePath:    plainFilePath, // content doesn't matter
+			setup: func(t *testing.T, filePath string) *os.File {
+				// Return a file that is already closed to trigger a read error
+				// in IsGZIP
+				f, err := os.Open(filePath)
+				require.NoError(t, err)
+				f.Close()
+				return f
+			},
+			expectError:   true,
+			errorContains: "gzip detection error",
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			inp := &filestream{
+				gzipExperimental: tc.gzipEnabled,
+				readerConfig:     defaultReaderConfig(),
+			}
+
+			var rawFile *os.File
+			if tc.setup != nil {
+				rawFile = tc.setup(t, tc.filePath)
+			} else {
+				var err error
+				rawFile, err = os.Open(tc.filePath)
+				require.NoError(t, err)
+			}
+			defer rawFile.Close()
+
+			file, err := inp.newFile(rawFile)
+
+			if tc.expectError {
+				require.Error(t, err)
+				if tc.errorContains != "" {
+					assert.Contains(t, err.Error(), tc.errorContains)
+				}
+				assert.Nil(t, file)
+			} else {
+				require.NoError(t, err)
+				assert.NotNil(t, file)
+				assert.IsType(t, tc.expectedType, file)
+			}
+		})
+	}
 }

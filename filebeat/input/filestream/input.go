@@ -564,7 +564,6 @@ func (inp *filestream) openFile(
 // plain file reader (plainFile).
 //
 // It returns an error if any happens.
-// TODO(AndersonQ): ADD TESTS!
 func (inp *filestream) newFile(rawFile *os.File) (File, error) {
 	if !inp.gzipExperimental {
 		return newPlainFile(rawFile), nil
