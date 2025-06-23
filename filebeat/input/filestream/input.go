@@ -67,13 +67,19 @@ type filestream struct {
 	parsers              parser.Config
 	takeOver             takeOverConfig
 	scannerCheckInterval time.Duration
-	waitGracePeriodFn    func(
+
+	// Function references for testing
+	waitGracePeriodFn func(
 		ctx input.Context,
 		logger *logp.Logger,
 		cursor loginp.Cursor,
 		path string,
 		gracePeriod, checkInterval time.Duration,
+		statFn func(string) (os.FileInfo, error),
 	) (bool, error)
+	tickFn   func(time.Duration) <-chan time.Time
+	removeFn func(string) error
+	statFn   func(string) (os.FileInfo, error)
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
@@ -118,6 +124,9 @@ func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
 		takeOver:          c.TakeOver,
 		deleterConfig:     c.Delete,
 		waitGracePeriodFn: waitGracePeriod,
+		tickFn:            time.Tick,
+		removeFn:          os.Remove,
+		statFn:            os.Stat,
 	}
 
 	// Read the scan interval from the prospector so we can use during the
@@ -219,6 +228,7 @@ func waitGracePeriod(
 	cursor loginp.Cursor,
 	path string,
 	gracePeriod, checkInterval time.Duration,
+	statFn func(string) (os.FileInfo, error),
 ) (bool, error) {
 	// Check if file grows during the grace period
 	// We know all events have been published because cursor.Finished is true,
@@ -231,16 +241,16 @@ func waitGracePeriod(
 	}
 
 	if gracePeriod > 0 {
-		graceTimer := time.NewTimer(gracePeriod)
-		checkIntervalTicker := time.NewTicker(gracePeriod)
+		graceTimerChan := time.After(gracePeriod)
+		checkIntervalTickerChan := time.Tick(checkInterval)
 		// Wait for the grace period or for the context to be cancelled
 	LOOP:
 		for {
 			select {
 			case <-ctx.Cancelation.Done():
 				return false, ctx.Cancelation.Err()
-			case <-checkIntervalTicker.C:
-				stat, err := os.Stat(path)
+			case <-checkIntervalTickerChan:
+				stat, err := statFn(path)
 				if err != nil {
 					// If the file does not exist any more, return false
 					// (do not delete) and no error.
@@ -260,13 +270,13 @@ func waitGracePeriod(
 						stat.Size())
 					return false, nil
 				}
-			case <-graceTimer.C:
+			case <-graceTimerChan:
 				break LOOP
 			}
 		}
 	}
 
-	stat, err := os.Stat(path)
+	stat, err := statFn(path)
 	if err != nil {
 		// If the file does not exist any more, return false
 		// (do not delete) and no error.
@@ -317,7 +327,9 @@ func (inp *filestream) deleteFile(
 		cursor,
 		path,
 		inp.deleterConfig.GracePeriod,
-		inp.scannerCheckInterval)
+		inp.scannerCheckInterval,
+		inp.statFn,
+	)
 	if err != nil {
 		return err
 	}
@@ -326,13 +338,12 @@ func (inp *filestream) deleteFile(
 		return nil
 	}
 
-	if err := os.Remove(path); err != nil {
+	if err := inp.removeFn(path); err != nil {
 		// The first try at removing the file failed,
 		// retry with a constant backoff
 		lastErr := err
 
-		ticker := time.NewTicker(inp.deleterConfig.retryBackoff)
-		defer ticker.Stop()
+		tickerChan := inp.tickFn(inp.deleterConfig.retryBackoff)
 
 		retries := 0
 		for retries < inp.deleterConfig.retries {
@@ -346,9 +357,9 @@ func (inp *filestream) deleteFile(
 			case <-ctx.Cancelation.Done():
 				return ctx.Cancelation.Err()
 
-			case <-ticker.C:
+			case <-tickerChan:
 				retries++
-				err := os.Remove(path)
+				err := inp.removeFn(path)
 				if err == nil {
 					logger.Infof("'%s' removed", path)
 					return nil

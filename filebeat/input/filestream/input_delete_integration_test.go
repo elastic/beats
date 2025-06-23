@@ -25,8 +25,9 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -101,14 +102,24 @@ func TestFilestreamDeleteFile(t *testing.T) {
 			expectFileDeleted: true,
 			canDelete:         true,
 		},
+
 		"pending events": {
 			cursorPending:     2,
 			expectFileDeleted: false,
 			canDelete:         true,
 		},
+
 		"waitGracePeriod returns false": {
 			cursorPending:     -1,
 			expectFileDeleted: false,
+		},
+
+		"waitGracePeriod returns error": {
+			cursorPending:     -1,
+			expectFileDeleted: false,
+			expectError:       true,
+			canDelete:         true,
+			gracePeriodErr:    errors.New("any error"),
 		},
 	}
 
@@ -120,14 +131,16 @@ func TestFilestreamDeleteFile(t *testing.T) {
 				retryBackoff: 10 * time.Millisecond,
 			},
 			scannerCheckInterval: 10 * time.Millisecond,
+			removeFn:             os.Remove,
 			waitGracePeriodFn: func(
 				ctx v2.Context,
 				logger *logp.Logger,
 				cursor loginp.Cursor,
 				path string,
 				gracePeriod time.Duration,
-				checkInterval time.Duration) (bool, error) {
-
+				checkInterval time.Duration,
+				statFn func(string) (os.FileInfo, error),
+			) (bool, error) {
 				return tc.canDelete, tc.gracePeriodErr
 			},
 		}
@@ -155,26 +168,6 @@ func TestFilestreamDeleteFile(t *testing.T) {
 
 			requireFileDeleted(t, logFile, tc.expectFileDeleted)
 		})
-	}
-
-}
-
-func requireFileDeleted(t *testing.T, path string, expectDeleted bool) {
-	t.Helper()
-	_, err := os.Stat(path)
-	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			if !expectDeleted {
-				t.Fatalf("%q was deleted", path)
-			}
-			return
-		}
-
-		t.Fatalf("cannot stat file: %s", err)
-	}
-
-	if expectDeleted {
-		t.Fatalf("%q was not deleted", path)
 	}
 }
 
@@ -249,7 +242,15 @@ func TestFilestreamWaitGracePeriod(t *testing.T) {
 			}
 
 			start := time.Now()
-			got, err := waitGracePeriod(v2Ctx, env.logger, cur, logFile, tc.gracePeriod, 10*time.Millisecond)
+			got, err := waitGracePeriod(
+				v2Ctx,
+				env.logger,
+				cur,
+				logFile,
+				tc.gracePeriod,
+				10*time.Millisecond,
+				os.Stat,
+			)
 			delta := time.Now().Sub(start)
 			if !tc.expectError && err != nil {
 				t.Fatalf("did not expect an error from 'deleteFile': %s", err)
@@ -291,12 +292,315 @@ func TestFilestreamWaitGracePeriodContextCancelled(t *testing.T) {
 
 	cancel()
 	start := time.Now()
-	got, err := waitGracePeriod(v2Ctx, env.logger, cur, logFile, gracePeriod, 10*time.Millisecond)
+	got, err := waitGracePeriod(
+		v2Ctx,
+		env.logger,
+		cur,
+		logFile,
+		gracePeriod,
+		10*time.Millisecond,
+		os.Stat,
+	)
 	if got != false {
 		t.Fatal("expecting false when calling waitGracePeriod because the context is cancelled")
 	}
 	delta := time.Now().Sub(start)
 	if delta >= gracePeriod {
 		t.Fatal("waitGracePeriod did not return before the grace period")
+	}
+}
+
+func TestTestFilestreamWaitGracePeriodStatError(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	logFile := env.mustWriteToFile("logfile.log", []byte("foo bar"))
+	st, err := os.Stat(logFile)
+	if err != nil {
+		t.Fatalf("cannot stat %q: %s", logFile, err)
+	}
+	offset := st.Size()
+
+	cur := loginp.NewCursorForTest("foo-bar", offset, -1)
+
+	v2Ctx := v2.Context{
+		ID:          t.Name(),
+		Cancelation: t.Context(),
+		Logger:      env.logger,
+	}
+
+	statErr := errors.New("Oops")
+	statFn := func(string) (os.FileInfo, error) {
+		return nil, statErr
+	}
+
+	testCases := map[string]struct {
+		gracePeriod  time.Duration
+		scanInterval time.Duration
+	}{
+		"stat returns error while waiting grace period": {
+			gracePeriod:  time.Second,
+			scanInterval: time.Millisecond,
+		},
+		"stat returns error after grace period": {
+			gracePeriod:  time.Millisecond,
+			scanInterval: time.Second,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			canDelete, err := waitGracePeriod(
+				v2Ctx,
+				env.logger,
+				cur,
+				logFile,
+				tc.gracePeriod,
+				tc.scanInterval,
+				statFn,
+			)
+			errMsg := fmt.Sprintf("cannot stat '%s': %s", logFile, statErr)
+			if errMsg != err.Error() {
+				t.Fatalf("expecting error message %q, got %q", errMsg, err.Error())
+			}
+
+			if canDelete {
+				t.Fatal("waitGracePeriod must return false")
+			}
+		})
+	}
+}
+
+func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
+	removeErr := errors.New("oops")
+	env := newInputTestingEnvironment(t)
+	tickChan := make(chan time.Time)
+
+	f := filestream{
+		deleterConfig: deleterConfig{
+			retries:      2,
+			retryBackoff: 10 * time.Millisecond,
+		},
+		scannerCheckInterval: time.Millisecond,
+		waitGracePeriodFn: func(
+			ctx v2.Context,
+			logger *logp.Logger,
+			cursor loginp.Cursor,
+			path string,
+			gracePeriod time.Duration,
+			checkInterval time.Duration,
+			statFn func(string) (os.FileInfo, error),
+		) (bool, error) {
+			return true, nil
+		},
+		removeFn: func(string) error { return removeErr },
+	}
+
+	tickFn := func(d time.Duration) <-chan time.Time {
+		if d != f.deleterConfig.retryBackoff {
+			t.Errorf(
+				"'tickFn' called with %q, expecting %q",
+				d.String(),
+				f.deleterConfig.retryBackoff.String())
+		}
+
+		return tickChan
+	}
+
+	f.tickFn = tickFn
+
+	data := []byte("foo bar")
+	logFile := env.mustWriteToFile("log.log", data)
+	cur := loginp.NewCursorForTest(
+		t.Name()+":"+logFile,
+		int64(len(data)),
+		-1)
+
+	// 1. Test we return when the context is cancelled
+	t.Run("retry stops when context is cancelled", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(t.Context())
+		v2Ctx := v2.Context{
+			ID:          t.Name(),
+			Cancelation: ctx,
+			Logger:      env.logger,
+		}
+
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+		var deleteErr error
+		go func() {
+			defer wg.Done()
+			deleteErr = f.deleteFile(v2Ctx, env.logger, cur, logFile)
+		}()
+
+		cancel()
+		wg.Wait()
+
+		if !errors.Is(context.Canceled, deleteErr) {
+			t.Fatalf("expecting 'context cancelled' when the context is cancelled, got: %v", deleteErr)
+		}
+	})
+
+	t.Run("file is externally removed during retries", func(t *testing.T) {
+		v2Ctx := v2.Context{
+			ID:          t.Name(),
+			Cancelation: t.Context(),
+			Logger:      env.logger,
+		}
+
+		count := atomic.Int32{}
+		removeFn := func(string) error {
+			count.Add(1)
+			return removeErr
+		}
+
+		f.removeFn = removeFn
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+		var deleteErr error
+		deleteDone := atomic.Bool{}
+		go func() {
+			defer wg.Done()
+			defer deleteDone.Store(true)
+			deleteErr = f.deleteFile(v2Ctx, env.logger, cur, logFile)
+		}()
+
+		tickChan <- time.Now()
+		if count.Load() != 2 {
+			t.Fatalf("removeFn must have been called twice, but it was called %d", count.Load())
+		}
+
+		if deleteDone.Load() {
+			t.Fatal("deleteFile must still be running")
+		}
+
+		fileRemoved := atomic.Bool{}
+		f.removeFn = func(s string) error {
+			count.Add(1)
+			fileRemoved.Store(true)
+			return nil
+		}
+
+		// Run the retry loop
+		tickChan <- time.Now()
+		wg.Wait()
+
+		if deleteErr != nil {
+			t.Fatalf("expecting no error, got %v", deleteErr)
+		}
+	})
+
+	t.Run("file removed externally is a success", func(t *testing.T) {
+		v2Ctx := v2.Context{
+			ID:          t.Name(),
+			Cancelation: t.Context(),
+			Logger:      env.logger,
+		}
+
+		count := atomic.Int32{}
+		removeFn := func(string) error {
+			count.Add(1)
+			if count.Load() == 2 {
+				return os.ErrNotExist
+			}
+
+			return removeErr
+		}
+
+		f.removeFn = removeFn
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+		var gotErr error
+		go func() {
+			defer wg.Done()
+			gotErr = f.deleteFile(v2Ctx, env.logger, cur, logFile)
+		}()
+
+		// Run the retry loop
+		tickChan <- time.Now()
+		wg.Wait()
+
+		if gotErr != nil {
+			t.Fatalf("expecting no error, got %v", gotErr)
+		}
+
+		env.logContains(fmt.Sprintf("could not remove '%s', retrying in 2s. Error: %s", logFile, removeErr))
+	})
+
+	t.Run("exhausted retries returns error", func(t *testing.T) {
+		v2Ctx := v2.Context{
+			ID:          t.Name(),
+			Cancelation: t.Context(),
+			Logger:      env.logger,
+		}
+
+		count := atomic.Int32{}
+		removeFn := func(string) error {
+			count.Add(1)
+			return removeErr
+		}
+
+		f.removeFn = removeFn
+		f.deleterConfig.retries = 10
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+		var gotErr error
+		deleteDone := atomic.Bool{}
+		go func() {
+			defer wg.Done()
+			defer deleteDone.Store(true)
+			gotErr = f.deleteFile(v2Ctx, env.logger, cur, logFile)
+		}()
+
+		for i := range 9 {
+			tickChan <- time.Now()
+
+			// Wait for removeFn to be called
+			require.Eventually(t,
+				func() bool {
+					return count.Load() == int32(i+2)
+				},
+				time.Second,
+				time.Millisecond,
+				"removeFn was not called")
+
+			if deleteDone.Load() {
+				t.Fatalf("delete cannot be done while retrying")
+			}
+		}
+
+		// Last retry
+		tickChan <- time.Now()
+
+		wg.Wait()
+		expectedErrMsg := fmt.Sprintf(
+			"cannot remove '%s' after %d retries. Last error: %s",
+			logFile,
+			f.deleterConfig.retries,
+			removeErr)
+		if gotErr == nil {
+			t.Fatal("expecting error from deleteFile")
+		}
+		if gotErr.Error() != expectedErrMsg {
+			t.Fatalf("expecting error message to be %q, got %q", expectedErrMsg, gotErr.Error())
+		}
+	})
+}
+
+func requireFileDeleted(t *testing.T, path string, expectDeleted bool) {
+	t.Helper()
+	_, err := os.Stat(path)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			if !expectDeleted {
+				t.Fatalf("%q was deleted", path)
+			}
+			return
+		}
+
+		t.Fatalf("cannot stat file: %s", err)
+	}
+
+	if expectDeleted {
+		t.Fatalf("%q was not deleted", path)
 	}
 }

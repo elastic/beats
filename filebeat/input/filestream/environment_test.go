@@ -577,6 +577,17 @@ func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
 	require.True(e.t, selectedEvent.Timestamp.Equal(tm), "got: %s, expected: %s", selectedEvent.Timestamp.String(), tm.String())
 }
 
+func (e *inputTestingEnvironment) logContains(s string) {
+	logs := e.loggerBuffer.String()
+	for _, line := range strings.Split(logs, "\n") {
+		if strings.Contains(line, s) {
+			return
+		}
+	}
+
+	e.t.Fatalf("%q not found in logs", s)
+}
+
 var _ statestore.States = (*testInputStore)(nil)
 
 type testInputStore struct {
