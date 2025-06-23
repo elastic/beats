@@ -133,6 +133,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of cursors by the streaming input for Crowdstrike. {issue}44364[44364] {pull}44548[44548]
 - Added missing "text/csv" content-type filter support in azureblobsortorage input. {issue}44596[44596] {pull}44824[44824]
 - Fix unexpected EOF detection and improve memory usage. {pull}44813[44813]
+- Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
 
 *Heartbeat*
 
@@ -155,6 +156,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
 - Remove excessive info-level logs in cgroups setup {pull}40491[40491]
 - Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
+- Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group. {pull}44576[44576]
 - Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
 
 *Osquerybeat*
@@ -240,11 +242,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add Fleet status updating to HTTP Endpoint input. {issue}44281[44281] {pull}44310[44310]
 - Add Fleet status updating to streaming input. {issue}44284[44284] {pull}44340[44340]
 - Add Fleet status update functionality to gcppubsub input. {issue}44272[44272] {pull}44507[44507]
-- Add Fleet status updating to HTTP Endpoint input. {issue}44273[44273] {pull}44508[44508]
+- Add Fleet status updating to GCS input. {issue}44273[44273] {pull}44508[44508]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. {issue}44349[44349] {pull}44436[44436]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
 - Add Fleet status update functionality to udp input. {issue}44419[44419] {pull}44785[44785]
 - Filestream now logs at level warn the number of files that are too small to be ingested {pull}44751[44751]
+- Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
 
 *Auditbeat*
 
