@@ -16,13 +16,13 @@
 ## Milestones
 
 ### Milestone 0 – Analysis
-- [ ] Analyse existing filestream harvester code paths for decompression insertion point  
-      files: `filebeat/input/filestream/internal/input-logfile/harvester.go`, 
-      `filebeat/input/filestream/internal/input-logfile/prospector.go`, 
+- [ ] Analyse existing filestream harvester code paths for decompression insertion point
+      files: `filebeat/input/filestream/internal/input-logfile/harvester.go`,
+      `filebeat/input/filestream/internal/input-logfile/prospector.go`,
       `filebeat/input/filestream/prospector.go`
 
 ### Milestone 1 – Configuration & Validation
-- [x] Add new config flag `gzip_experimental` with validation (enforce fingerprint identity)  
+- [x] Add new config flag `gzip_experimental` with validation (enforce fingerprint identity)
       files: `filebeat/input/filestream/config.go`,
       `filebeat/input/filestream/input.go`
   - [x] Add new config
@@ -31,33 +31,27 @@
   - [x] Register metrics tags for tech preview
 
 ### Milestone 2 – Core GZIP Reader
-- [x] Implement GZIP detection by magic bytes (reader sniffing)  
+- [x] Implement GZIP detection by magic bytes (reader sniffing)
       files: `filebeat/input/filestream/file.go` (see `IsGZIP` and `gzipSeekerReader`)
-- [ ] Integrate streaming GZIP reader into harvester
-      Relevant files: `filebeat/input/filestream/input.go` (primary integration point),
-      `filebeat/input/filestream/file.go` (provides `File` interface, `plainFile`, `gzipSeekerReader`),
-      `filebeat/input/filestream/internal/input-logfile/harvester.go` (consumes the reader),
-      `filebeat/input/file/state.go` (for offset management)
+- [ ] Integrate GZIP reader
   - [x] Update `input.go` to use `File` interface and switch between `plainFile` and `gzipSeekerReader` based on GZIP detection and `gzip_experimental` flag.
   - [x] Chunked read using existing buffer_size (handled by harvester, ensure compatibility)
   - [x] Maintain decompressed offset (ensure `file.State` and logic in `input.go` handle this)
-  - [ ] Ensure GZIP resume logic re-reads stream from start to reach last known decompressed offset (primarily in `input.go` when handling existing state/offset for GZIP files). This needs review after recent changes to truncation logic in `input.go`.
-- [ ] Implement integrity verification at EOF (CRC32 & ISIZE)  
+  - [ ] Ensure (test) GZIP resume logic re-reads stream from start to reach last known decompressed offset (primarily in `input.go` when handling existing state/offset for GZIP files).
+- [ ] add Test integrity verification at EOF (CRC32 & ISIZE)
       files: `filebeat/input/filestream/file.go` (within `gzipSeekerReader`)
-- [ ] Implement modification detection: abort ingestion on append/truncate during read  
+- [ ] Implement modification detection: abort ingestion on append/truncate during read
       files: `filebeat/input/filestream/internal/input-logfile/harvester.go`,
       `filebeat/input/file/state.go`
-- [ ] Instrument GZIP-specific metrics (`gzip_validation_errors_total`, `gzip_bytes_compressed_total`, `gzip_bytes_decompressed_total`)  
+- [ ] Instrument GZIP-specific metrics (`gzip_validation_errors_total`, `gzip_bytes_compressed_total`, `gzip_bytes_decompressed_total`)
       files: `filebeat/input/filestream/internal/input-logfile/metrics.go`,
       `filebeat/input/filestream/input.go`
-- [ ] Enhance copytruncate rotation path to handle .gz  
-      files: `filebeat/input/filestream/copytruncate_prospector.go`,
-      `filebeat/input/filestream/internal/input-logfile/manager.go`
-  - [ ] Add GZIP-awareness to `onFSEvent` in `copytruncate_prospector.go` (user has started this).
-  - [ ] Implement logic in `isRotated` and `onRotatedFile` to correctly handle GZIP files and plain-to-GZIP rotations.
+- [x] Enhance rotation handle .gz
+  - [ ] Add GZIP-awareness to `onFSEvent` in `copytruncate_prospector.go`
+  - [ ] Add GZIP-awareness to `onFSEvent` in `prospector.go`
 
 ### Milestone 3 – Testing
-- [ ] Add integration tests  
+- [ ] Add integration tests
       files: `filebeat/input/filestream/input_integration_test.go`,
       `filebeat/input/filestream/testdata/**`
   - [ ] detection
@@ -68,7 +62,7 @@
   - [ ] Extend `copytruncate_prospector_test.go` to cover GZIP rotation scenarios (e.g., plain file rotates to GZIP, new GZIP file, operations on GZIP like write/truncate are ignored, GZIP rename).
 
 ### Milestone 4 – Benchmarking
-- [ ] Add benchmarks using benchbuilder  
+- [ ] Add benchmarks using benchbuilder
       files: `filebeat/input/filestream/gzip_reader_bench_test.go`,
       `benchbuilder/**`
   - [ ] Measure performance overhead vs plain text
@@ -77,12 +71,12 @@
   - [ ] Benchmark Kubernetes integration with mixed plain/GZIP & rotation
 
 ### Milestone 5 – Integrations
-- [ ] Update Kubernetes integration & Custom Logs config schemas  
+- [ ] Update Kubernetes integration & Custom Logs config schemas
       files: `x-pack/filebeat/input/kubernetes/...`,
       `module/customlogs/config.yml`
 
 ### Milestone 6 – Documentation
-- [ ] Update Filebeat docs for filestream input, add GZIP-tech-preview section  
+- [ ] Update Filebeat docs for filestream input, add GZIP-tech-preview section
       files: `docs/filestream-gzip.asciidoc`
   - [ ] Provide example configs and usage notes
 
