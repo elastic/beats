@@ -10,11 +10,11 @@ package cat_shards
 import (
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
 	autoopsevents "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 
 	"github.com/stretchr/testify/require"
 
@@ -170,7 +170,11 @@ func TestFailedCatShardsFetch(t *testing.T) {
 // Integration tests to check the error handling when the server returns different error types
 // TestElasticSearchError tests the error handling when an Elasticsearch simple error is returned
 func Test500FailedToResolveIndexesWhileFetching(t *testing.T) {
-	os.Setenv("DEPLOYMENT_ID", "test-resource-id")
+	t.Setenv("DEPLOYMENT_ID", "test-resource-id")
+	utils.GetAndSetResourceID()
+
+	t.Cleanup(utils.ClearResourceID)
+
 	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/cat_shards.*.json", setupResolveErrorServer, useNamedMetricSet, func(t *testing.T, data metricset.FetcherData[[]JSONShard]) {
 		require.Error(t, data.Error)
 
@@ -184,16 +188,20 @@ func Test500FailedToResolveIndexesWhileFetching(t *testing.T) {
 		require.Equal(t, "/_cat/shards", errorField.URLPath)
 		require.Equal(t, "s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json", errorField.Query)
 		require.Equal(t, "cat_shards", errorField.MetricSet)
-		require.Equal(t, "test-resource-id", errorField.ResourceID)
 		require.Equal(t, "GET", errorField.HTTPMethod)
 		require.Equal(t, 500, errorField.HTTPStatusCode)
 		require.Equal(t, "Server Error", errorField.HTTPResponse) // checking the HTTP response body
+		require.Equal(t, "test-resource-id", event.RootFields["orchestrator.resource.id"])
 	})
 }
 
 // TestElasticSearchError tests the error handling when an elasticsearch is returned
 func Test404FailedToResolveIndexesWhileFetching(t *testing.T) {
-	os.Setenv("DEPLOYMENT_ID", "test-resource-id")
+	t.Setenv("RESOURCE_ID", "test-resource-id")
+	utils.GetAndSetResourceID()
+
+	t.Cleanup(utils.ClearResourceID)
+
 	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/cat_shards.*.json", setupResolve404ElasticSearchError, useNamedMetricSet, func(t *testing.T, data metricset.FetcherData[[]JSONShard]) {
 		require.Error(t, data.Error)
 
@@ -207,16 +215,20 @@ func Test404FailedToResolveIndexesWhileFetching(t *testing.T) {
 		require.Equal(t, "/_cat/shards", errorField.URLPath)
 		require.Equal(t, "s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json", errorField.Query)
 		require.Equal(t, "cat_shards", errorField.MetricSet)
-		require.Equal(t, "test-resource-id", errorField.ResourceID)
 		require.Equal(t, "GET", errorField.HTTPMethod)
 		require.Equal(t, 404, errorField.HTTPStatusCode)
+		require.Equal(t, "test-resource-id", event.RootFields["orchestrator.resource.id"])
 		// avoiding the HTTP response body check on purpose, as the error response is a JSON string, and it's already tested
 	})
 }
 
 // TestElasticSearchError tests the error handling when an elasticsearch is returned
 func Test405FailedToResolveIndexesWhileFetching(t *testing.T) {
-	os.Setenv("DEPLOYMENT_ID", "test-resource-id")
+	t.Setenv("PROJECT_ID", "test-resource-id")
+	utils.GetAndSetResourceID()
+
+	t.Cleanup(utils.ClearResourceID)
+
 	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/cat_shards.*.json", setupResolve405ElasticSearchError, useNamedMetricSet, func(t *testing.T, data metricset.FetcherData[[]JSONShard]) {
 		require.Error(t, data.Error)
 
@@ -226,20 +238,24 @@ func Test405FailedToResolveIndexesWhileFetching(t *testing.T) {
 		require.True(t, ok, "error field should be of type error.ErrorEvent")
 		require.Equal(t, "HTTP_405", errorField.ErrorCode)
 		require.Equal(t, "failed to load resolved index details failed to fetch data: HTTP error 405 Method Not Allowed", errorField.ErrorMessage)
-		require.Equal(t, "test-resource-id", errorField.ResourceID)
 		require.Equal(t, "GZbSUUMQQI-A7UcGS6vCMa", errorField.ClusterID)
 		require.Equal(t, "/_cat/shards", errorField.URLPath)
 		require.Equal(t, "s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json", errorField.Query)
 		require.Equal(t, "cat_shards", errorField.MetricSet)
 		require.Equal(t, "GET", errorField.HTTPMethod)
 		require.Equal(t, 405, errorField.HTTPStatusCode)
+		require.Equal(t, "test-resource-id", event.RootFields["orchestrator.resource.id"])
 		// avoiding the HTTP response body check on purpose, as the error response is a JSON string, and it's already tested
 	})
 }
 
 // TestElasticSearchError tests the error handling when an error different from Elasticsearch is returned (proxy error, etc.)
 func Test500FailedToResolveIndexesWhileFetchingEmptyResponse(t *testing.T) {
-	os.Setenv("DEPLOYMENT_ID", "test-resource-id")
+	t.Setenv("DEPLOYMENT_ID", "test-resource-id")
+	utils.GetAndSetResourceID()
+
+	t.Cleanup(utils.ClearResourceID)
+
 	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/cat_shards.*.json", setupResolveEmptyErrorServer, useNamedMetricSet, func(t *testing.T, data metricset.FetcherData[[]JSONShard]) {
 		require.Error(t, data.Error)
 
@@ -249,13 +265,13 @@ func Test500FailedToResolveIndexesWhileFetchingEmptyResponse(t *testing.T) {
 		require.True(t, ok, "error field should be of type error.ErrorEvent")
 		require.Equal(t, "HTTP_500", errorField.ErrorCode)
 		require.Equal(t, "failed to load resolved index details failed to fetch data: HTTP error 500 Internal Server Error", errorField.ErrorMessage)
-		require.Equal(t, "test-resource-id", errorField.ResourceID)
 		require.Equal(t, "GZbSUUMQQI-A7UcGS6vCMa", errorField.ClusterID)
 		require.Equal(t, "/_cat/shards", errorField.URLPath)
 		require.Equal(t, "s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json", errorField.Query)
 		require.Equal(t, "cat_shards", errorField.MetricSet)
 		require.Equal(t, "GET", errorField.HTTPMethod)
 		require.Equal(t, 500, errorField.HTTPStatusCode)
+		require.Equal(t, "test-resource-id", event.RootFields["orchestrator.resource.id"])
 		// avoiding the HTTP response body check on purpose, as the error response is a JSON string, and it's already tested
 	})
 }
