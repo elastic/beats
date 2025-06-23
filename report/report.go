@@ -165,40 +165,39 @@ func ReportRuntime(_ monitoring.Mode, V monitoring.Visitor) {
 }
 
 func InstanceCroupsReporter(logger *logp.Logger, override string) func(monitoring.Mode, monitoring.Visitor) {
+	// PID shouldn't use hostfs, at least for now.
+	// containerization schemes should provide their own /proc/ that will serve containerized processess
+	pid := os.Getpid()
+
+	cgroups, err := cgroup.NewReaderOptions(cgroup.ReaderOptions{
+		RootfsMountpoint:         resolve.NewTestResolver("/"),
+		IgnoreRootCgroups:        true,
+		CgroupsHierarchyOverride: os.Getenv(override),
+	})
+	if err != nil {
+		if errors.Is(err, cgroup.ErrCgroupsMissing) {
+			logger.Warnf("cgroup data collection disabled in internal monitoring: %v", err)
+		} else {
+			logger.Errorf("cgroup data collection disabled in internal monitoring: %v", err)
+		}
+		return func(m monitoring.Mode, v monitoring.Visitor) {}
+	}
+
+	cgv, err := cgroups.CgroupsVersion(pid)
+	if err != nil {
+		logger.Errorf("error determining cgroups version for internal monitoring: %v", err)
+		return func(m monitoring.Mode, v monitoring.Visitor) {}
+	}
+
 	return func(_ monitoring.Mode, V monitoring.Visitor) {
 		V.OnRegistryStart()
 		defer V.OnRegistryFinished()
-
-		// PID shouldn't use hostfs, at least for now.
-		// containerization schemes should provide their own /proc/ that will serve containerized processess
-		pid := os.Getpid()
-
-		cgroups, err := cgroup.NewReaderOptions(cgroup.ReaderOptions{
-			RootfsMountpoint:         resolve.NewTestResolver("/"),
-			IgnoreRootCgroups:        true,
-			CgroupsHierarchyOverride: os.Getenv(override),
-		})
-		if err != nil {
-			if errors.Is(err, cgroup.ErrCgroupsMissing) {
-				logger.Warnf("cgroup data collection disabled in internal monitoring: %v", err)
-			} else {
-				logger.Errorf("cgroup data collection disabled in internal monitoring: %v", err)
-			}
-			return
-		}
-
-		cgv, err := cgroups.CgroupsVersion(pid)
-		if err != nil {
-			logger.Errorf("error determining cgroups version for internal monitoring: %v", err)
-			return
-		}
 
 		if cgv == cgroup.CgroupsV1 {
 			ReportMetricsCGV1(logger, pid, cgroups, V)
 		} else {
 			ReportMetricsCGV2(logger, pid, cgroups, V)
 		}
-
 	}
 }
 
