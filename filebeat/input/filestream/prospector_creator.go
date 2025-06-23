@@ -24,7 +24,6 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -40,7 +39,7 @@ var experimentalWarning sync.Once
 // AndersonQ: 1 - it all starts with the prospector creator
 func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 	logger := log.With("filestream_id", config.ID)
-	err := checkConfigCompatibility(config.FileWatcher, config.FileIdentity)
+	err := checkConfigCompatibility(config)
 	if err != nil {
 		return nil, err
 	}
@@ -124,21 +123,44 @@ func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 	return nil, fmt.Errorf("no such rotation method: %s", rotationMethod)
 }
 
-func checkConfigCompatibility(fileWatcher, fileIdentifier *conf.Namespace) error {
-	// TODO(AndersonQ): GZIP check?
+func checkConfigCompatibility(config config) error {
 	var fwCfg struct {
 		Fingerprint struct {
 			Enabled bool `config:"enabled"`
 		} `config:"fingerprint"`
 	}
 
-	if fileWatcher != nil && fileIdentifier != nil && fileIdentifier.Name() == fingerprintName {
-		err := fileWatcher.Config().Unpack(&fwCfg)
+	if config.FileWatcher != nil &&
+		config.FileIdentity != nil &&
+		config.FileIdentity.Name() == fingerprintName {
+		err := config.FileWatcher.Config().Unpack(&fwCfg)
 		if err != nil {
 			return fmt.Errorf("failed to parse file watcher configuration: %w", err)
 		}
 		if !fwCfg.Fingerprint.Enabled {
 			return fmt.Errorf("fingerprint file identity can be used only when fingerprint is enabled in the scanner")
+		}
+	}
+
+	if config.GZIPExperimental {
+		if config.FileIdentity != nil &&
+			config.FileIdentity.Name() != fingerprintName {
+			return fmt.Errorf(
+				"gzip_experimental=true requires file_identity to be 'fingerprint'")
+		}
+		if config.Rotation == nil || !config.Rotation.IsSet() {
+			return fmt.Errorf(
+				"gzip_experimental=true requires external rotation to be set")
+		}
+
+		externalConfig := config.Rotation.Config()
+		cfg := rotationConfig{}
+		err := externalConfig.Unpack(&cfg)
+		if err != nil {
+			return fmt.Errorf("failed to unpack configuration of external rotation: %w", err)
+		}
+		if cfg.Strategy.Name() != copytruncateStrategy {
+			return fmt.Errorf("gzip_experimental=true requires external rotation strategy to be 'copytruncate'")
 		}
 	}
 
