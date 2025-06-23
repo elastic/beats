@@ -120,16 +120,20 @@ func fetchGroupInfo(
 					continue
 				}
 				consumerLag := partitionOffset - info.Offset
+
 				event := mapstr.M{
-					"id":           ret.group,
-					"topic":        topic,
-					"partition":    partition,
-					"offset":       info.Offset,
-					"meta":         info.Metadata,
-					"consumer_lag": consumerLag,
+					"id":        ret.group,
+					"topic":     topic,
+					"partition": partition,
+					"meta":      info.Metadata,
 					"error": mapstr.M{
 						"code": info.Err,
 					},
+				}
+
+				if info.Offset > 0 && partitionOffset > 0 {
+					event["offset"] = info.Offset
+					event["consumer_lag"] = consumerLag
 				}
 
 				if asgnTopic, ok := ret.assign[topic]; ok {
