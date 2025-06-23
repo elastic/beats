@@ -15,23 +15,31 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package client
+package backoff
 
 import (
 	"context"
 	"time"
-
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
 )
 
-const maxRetries = 3
-const initialInterval = 500 * time.Millisecond
-const maxInterval = 1 * time.Minute
+type Retryer struct {
+	maxRetries      int
+	initialInterval time.Duration
+	maxInterval     time.Duration
+}
+
+func NewRetryer(maxRetries int, initialInterval, maxInterval time.Duration) *Retryer {
+	return &Retryer{
+		maxRetries:      maxRetries,
+		initialInterval: initialInterval,
+		maxInterval:     maxInterval,
+	}
+}
 
 // Retry attempts to execute the provided function `fn` with a retry mechanism.
 // It uses an exponential backoff strategy and retries up to a maximum number of attempts.
-func Retry(ctx context.Context, fn func() error) (err error) {
-	expBackoff := backoff.NewExpBackoff(ctx.Done(), initialInterval, maxInterval)
+func (r *Retryer) Retry(ctx context.Context, fn func() error) (err error) {
+	backoff := NewExpBackoff(ctx.Done(), r.initialInterval, r.maxInterval)
 
 	for numTries := 0; ; numTries++ {
 		err = fn()
@@ -40,12 +48,12 @@ func Retry(ctx context.Context, fn func() error) (err error) {
 			break
 		}
 
-		if numTries >= maxRetries {
+		if numTries >= r.maxRetries {
 			// maxRetries hit
 			break
 		}
 
-		if !expBackoff.Wait() {
+		if !backoff.Wait() {
 			// context cancelled
 			break
 		}
