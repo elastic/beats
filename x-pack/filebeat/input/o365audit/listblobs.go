@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"sort"
 	"time"
@@ -45,23 +45,23 @@ func (l listBlob) WithStartTime(start time.Time) listBlob {
 }
 
 func (l listBlob) adjustTimes(since time.Time) listBlob {
-	now := l.env.Clock()
+	now := l.env.clock()
 	// Can't query more than <retention limit> in the past.
-	fromLimit := now.Add(-l.env.Config.MaxRetention)
+	fromLimit := now.Add(-l.env.config.MaxRetention)
 	if since.Before(fromLimit) {
 		since = fromLimit
 	}
 
-	to := since.Add(l.env.Config.MaxQuerySize)
+	to := since.Add(l.env.config.MaxQuerySize)
 	// Can't query into the future. Polling for new events every interval.
 	var delay time.Duration
 	if to.After(now) {
-		since = now.Add(-l.env.Config.MaxQuerySize)
+		since = now.Add(-l.env.config.MaxQuerySize)
 		if since.Before(l.cursor.Timestamp) {
 			since = l.cursor.Timestamp
 		}
 		to = now
-		delay = l.env.Config.PollInterval
+		delay = l.env.config.PollInterval
 	}
 	l.startTime = since.UTC()
 	l.endTime = to.UTC()
@@ -82,13 +82,13 @@ func (l listBlob) String() string {
 // RequestDecorators returns the decorators used to perform a request.
 func (l listBlob) RequestDecorators() []autorest.PrepareDecorator {
 	return []autorest.PrepareDecorator{
-		autorest.WithBaseURL(l.env.Config.Resource),
+		autorest.WithBaseURL(l.env.config.Resource),
 		autorest.WithPath("api/v1.0"),
-		autorest.WithPath(l.env.TenantID),
+		autorest.WithPath(l.env.tenantID),
 		autorest.WithPath("activity/feed/subscriptions/content"),
 		autorest.WithQueryParameters(
 			map[string]interface{}{
-				"contentType": l.env.ContentType,
+				"contentType": l.env.contentType,
 				"startTime":   l.startTime.Format(apiDateFormat),
 				"endTime":     l.endTime.Format(apiDateFormat),
 			}),
@@ -101,8 +101,8 @@ func (l listBlob) OnResponse(response *http.Response) (actions []poll.Action) {
 		return l.handleError(response)
 	}
 
-	if delta := getServerTimeDelta(response); l.env.Config.AdjustClockWarn && !inRange(delta, l.env.Config.AdjustClockMinDifference) {
-		l.env.Logger.Warnf("Server clock is offset by %v: Check system clock to avoid event loss.", delta)
+	if delta := getServerTimeDelta(response); l.env.config.AdjustClockWarn && !inRange(delta, l.env.config.AdjustClockMinDifference) {
+		l.env.logger.Warnf("Server clock is offset by %v: Check system clock to avoid event loss.", delta)
 	}
 
 	var list []content
@@ -126,19 +126,19 @@ func (l listBlob) OnResponse(response *http.Response) (actions []poll.Action) {
 	for _, entry := range list {
 		// Only fetch blobs that advance the cursor.
 		if l.cursor.TryAdvance(entry) {
-			l.env.Logger.Debugf("+ fetch blob date:%v id:%s", entry.Created.UTC(), entry.ID)
+			l.env.logger.Debugf("+ fetch blob date:%v id:%s", entry.Created.UTC(), entry.ID)
 			actions = append(actions, poll.Fetch(
 				ContentBlob(entry.URI, l.cursor, l.env).
 					WithID(entry.ID).
 					WithSkipLines(l.cursor.Line)))
 		} else {
-			l.env.Logger.Debugf("- skip blob date:%v id:%s", entry.Created.UTC(), entry.ID)
+			l.env.logger.Debugf("- skip blob date:%v id:%s", entry.Created.UTC(), entry.ID)
 		}
 		if entry.Created.Before(l.startTime) {
-			l.env.Logger.Errorf("! Event created before query")
+			l.env.logger.Errorf("! Event created before query")
 		}
 		if entry.Created.After(l.endTime) {
-			l.env.Logger.Errorf("! Event created after query")
+			l.env.logger.Errorf("! Event created after query")
 		}
 	}
 	// Fetch the next page if a NextPageUri header is found.
@@ -178,13 +178,13 @@ var fatalErrors = map[string]struct{}{
 func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 	var msg apiError
 	readJSONBody(response, &msg)
-	l.env.Logger.Warnf("Got error %s: %+v", response.Status, msg)
-	l.delay = l.env.Config.ErrorRetryInterval
+	l.env.logger.Warnf("Got error %s: %+v", response.Status, msg)
+	l.delay = l.env.config.ErrorRetryInterval
 
 	switch response.StatusCode {
 	case 401:
 		// Authentication error. Repeat this op.
-		l.delay = l.env.Config.PollInterval
+		l.delay = l.env.config.PollInterval
 		return []poll.Action{
 			poll.Fetch(l),
 		}
@@ -225,28 +225,28 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 		// First check if this is caused by a request close to the max retention
 		// period that's been queued for hours because of server being down.
 		// Repeat the request with updated times.
-		now := l.env.Clock()
+		now := l.env.clock()
 		delta := now.Sub(l.startTime)
-		if delta > (l.env.Config.MaxRetention + 30*time.Minute) {
-			l.delay = l.env.Config.PollInterval
+		if delta > (l.env.config.MaxRetention + 30*time.Minute) {
+			l.delay = l.env.config.PollInterval
 			return []poll.Action{
 				poll.Fetch(l.adjustTimes(l.startTime)),
 			}
 		}
 
 		delta = getServerTimeDelta(response)
-		l.env.Logger.Errorf("Server is complaining about query interval. "+
+		l.env.logger.Errorf("Server is complaining about query interval. "+
 			"This is usually a problem with the local clock and the server's clock "+
 			"being out of sync. Time difference with server is %v.", delta)
-		if l.env.Config.AdjustClock && !inRange(delta, l.env.Config.AdjustClockMinDifference) {
-			l.env.Clock = func() time.Time {
+		if l.env.config.AdjustClock && !inRange(delta, l.env.config.AdjustClockMinDifference) {
+			l.env.clock = func() time.Time {
 				return time.Now().Add(delta)
 			}
-			l.env.Logger.Info("Compensating for time difference")
+			l.env.logger.Info("Compensating for time difference")
 		} else {
-			l.env.Logger.Infow("Not adjusting for time offset.",
-				"api.adjust_clock", l.env.Config.AdjustClock,
-				"api.adjust_clock_min_difference", l.env.Config.AdjustClockMinDifference,
+			l.env.logger.Infow("Not adjusting for time offset.",
+				"api.adjust_clock", l.env.config.AdjustClock,
+				"api.adjust_clock_min_difference", l.env.config.AdjustClockMinDifference,
 				"difference", delta)
 		}
 		return []poll.Action{
@@ -277,7 +277,7 @@ func readJSONBody(response *http.Response, dest interface{}) error {
 	defer autorest.Respond(response,
 		autorest.ByDiscardingBody(),
 		autorest.ByClosing())
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return fmt.Errorf("reading body failed: %w", err)
 	}

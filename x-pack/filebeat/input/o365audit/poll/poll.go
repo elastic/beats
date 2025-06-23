@@ -13,6 +13,7 @@ import (
 
 	"github.com/Azure/go-autorest/autorest"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/auth"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -38,6 +39,7 @@ type Transaction interface {
 // and executes actions in response.
 type Poller struct {
 	decorators []autorest.PrepareDecorator // Fixed decorators to apply to each request.
+	status     status.StatusReporter
 	log        *logp.Logger
 	tp         auth.TokenProvider
 	list       transactionList // List of pending transactions.
@@ -117,6 +119,7 @@ func (r *Poller) fetchWithDelay(item Transaction, minDelay time.Duration) error 
 
 	for _, act := range acts {
 		if err = act(r); err != nil {
+			r.status.UpdateStatus(status.Degraded, err.Error())
 			return fmt.Errorf("error acting on %+v: %w", act, err)
 		}
 	}
@@ -149,6 +152,14 @@ func WithTokenProvider(tp auth.TokenProvider) PollerOption {
 			return errors.New("tried to set more than one token provider")
 		}
 		r.tp = tp
+		return nil
+	}
+}
+
+// WithLogger sets the logger to use.
+func WithStatusReporter(stat status.StatusReporter) PollerOption {
+	return func(r *Poller) error {
+		r.status = stat
 		return nil
 	}
 }
@@ -243,11 +254,4 @@ func Fetch(item Transaction) Action {
 	return func(q Enqueuer) error {
 		return q.Enqueue(item)
 	}
-}
-
-func max(a, b time.Duration) time.Duration {
-	if a < b {
-		return b
-	}
-	return a
 }
