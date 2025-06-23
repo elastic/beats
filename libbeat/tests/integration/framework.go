@@ -728,7 +728,7 @@ func GetESClient(t *testing.T, scheme string) *elasticsearch.Client {
 
 	// prepare to query ES
 	esCfg := elasticsearch.Config{
-		Addresses: []string{fmt.Sprintf("%s://%s", host.Scheme, host.Host)},
+		Addresses: []string{fmt.Sprintf("%s://%s", esURL.Scheme, esURL.Host)},
 		Username:  u,
 		Password:  p,
 		Transport: &http.Transport{
