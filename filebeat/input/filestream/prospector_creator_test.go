@@ -91,6 +91,34 @@ prospector.scanner.fingerprint.enabled: false
 `,
 				err: "fingerprint file identity can be used only when fingerprint is enabled in the scanner",
 			},
+			{
+				name: "valid config with copytruncate strategy and fingerprint identity",
+				cfgStr: `
+paths: ['some']
+gzip_experimental: true
+file_identity.fingerprint: ~
+rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
+`,
+			},
+			{
+				name: "error when rotation is not configured",
+				cfgStr: `
+paths: ['some']
+gzip_experimental: true
+file_identity.fingerprint: ~
+`,
+				err: "gzip_experimental=true requires external rotation to be set",
+			},
+			{
+				name: "error when rotation strategy is not copytruncate",
+				cfgStr: `
+paths: ['some']
+gzip_experimental: true
+file_identity.fingerprint: ~
+rotation.external.strategy.other.suffix_regex: '\\.+$'
+`,
+				err: "gzip_experimental=true requires external rotation strategy to be 'copytruncate'",
+			},
 		}
 
 		for _, tc := range cases {

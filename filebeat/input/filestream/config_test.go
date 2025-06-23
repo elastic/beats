@@ -56,6 +56,48 @@ func TestConfigValidate(t *testing.T) {
 		err := c.Validate()
 		assert.NoError(t, err)
 	})
+
+	t.Run("take_over does works with AllowIDDuplication", func(t *testing.T) {
+		c := config{
+			Paths:              []string{"/foo/bar"},
+			ID:                 "some id",
+			AllowIDDuplication: true,
+			TakeOver:           takeOverConfig{Enabled: true},
+		}
+		err := c.Validate()
+		assert.Error(t, err)
+	})
+
+	t.Run("gzip_experimental works with file_identity.fingerprint", func(t *testing.T) {
+		c, err := conf.NewConfigFrom(`
+id: 'some id'
+paths: [/foo/bar*]
+gzip_experimental: true
+file_identity.fingerprint: ~
+`)
+		require.NoError(t, err, "could not create config from string")
+		got := defaultConfig()
+		err = c.Unpack(&got)
+		require.NoError(t, err, "could not unpack config")
+
+		err = got.Validate()
+		assert.NoError(t, err)
+	})
+
+	t.Run("gzip_experimental requires file_identity.fingerprint", func(t *testing.T) {
+		c, err := conf.NewConfigFrom(`
+id: 'some id'
+paths: [/foo/bar*]
+gzip_experimental: true
+file_identity.path: ~
+`)
+		require.NoError(t, err, "could not create config from string")
+		got := defaultConfig()
+		err = c.Unpack(&got)
+		assert.ErrorContains(t,
+			err,
+			"gzip_experimental=true requires file_identity to be 'fingerprint")
+	})
 }
 
 func TestValidateInputIDs(t *testing.T) {

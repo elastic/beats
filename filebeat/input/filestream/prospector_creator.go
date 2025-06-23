@@ -143,11 +143,14 @@ func checkConfigCompatibility(config config) error {
 	}
 
 	if config.GZIPExperimental {
+		// Just for the sake of checking all requirements as it's checked on
+		// config.Validate.
 		if config.FileIdentity != nil &&
 			config.FileIdentity.Name() != fingerprintName {
 			return fmt.Errorf(
 				"gzip_experimental=true requires file_identity to be 'fingerprint'")
 		}
+
 		if config.Rotation == nil || !config.Rotation.IsSet() {
 			return fmt.Errorf(
 				"gzip_experimental=true requires external rotation to be set")
