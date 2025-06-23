@@ -3,15 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-suricata.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Suricata fields [exported-fields-suricata]
 
 Module for handling the EVE JSON logs produced by Suricata.
 
-
 ## suricata [_suricata]
 
 Fields from the Suricata EVE log file.
-
 
 ## eve [_eve]
 

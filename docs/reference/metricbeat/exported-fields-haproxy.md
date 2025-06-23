@@ -3,17 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-haproxy.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # HAProxy fields [exported-fields-haproxy]
 
 HAProxy Module
-
 
 ## haproxy [_haproxy]
 
 HAProxy metrics.
 
-
-## info [_info_5]
+## info [_info]
 
 General information about HAProxy processes.
 
@@ -100,7 +100,7 @@ type: long
 
 
 **`haproxy.info.memory.max.bytes`**
-:   Maximum amount of memory usage in bytes (the *Memmax_MB* value converted to bytes).
+:   Maximum amount of memory usage in bytes (the 'Memmax_MB' value converted to bytes).
 
 type: long
 
@@ -155,11 +155,13 @@ type: long
 type: long
 
 
-
 ## compress [_compress]
 
 
+
 ## bps [_bps]
+
+
 
 **`haproxy.info.compress.bps.in`**
 :   Incoming compressed data in bits per second.
@@ -179,11 +181,13 @@ type: long
 type: long
 
 
-
 ## connection [_connection]
 
 
+
 ## rate [_rate]
+
+
 
 **`haproxy.info.connection.rate.value`**
 :   Number of connections in the last second.
@@ -261,8 +265,9 @@ type: long
 type: long
 
 
-
 ## pipes [_pipes]
+
+
 
 **`haproxy.info.pipes.used`**
 :   Number of used pipes during kernel-based tcp splicing.
@@ -280,7 +285,6 @@ type: integer
 :   Maximum number of used pipes.
 
 type: integer
-
 
 
 ## session [_session]
@@ -305,8 +309,7 @@ type: integer
 type: integer
 
 
-
-## ssl [_ssl_7]
+## ssl [_ssl]
 
 None
 
@@ -326,7 +329,6 @@ type: integer
 :   Maximum rate of SSL requests.
 
 type: integer
-
 
 
 ## frontend [_frontend]
@@ -351,7 +353,6 @@ type: integer
 type: scaled_float
 
 format: percent
-
 
 
 ## backend [_backend]
@@ -382,8 +383,9 @@ type: long
 type: long
 
 
-
 ## zlib_mem_usage [_zlib_mem_usage]
+
+
 
 **`haproxy.info.zlib_mem_usage.value`**
 :   Memory usage of zlib.
@@ -405,13 +407,12 @@ type: scaled_float
 format: percent
 
 
-
 ## stat [_stat]
 
 Stats collected from HAProxy processes.
 
 **`haproxy.stat.status`**
-:   Status (UP, DOWN, NOLB, MAINT, or MAINT(via)…).
+:   Status (UP, DOWN, NOLB, MAINT, or MAINT(via)...).
 
 type: keyword
 
@@ -465,7 +466,7 @@ format: bytes
 
 
 **`haproxy.stat.last_change`**
-:   Number of seconds since the last UP→DOWN or DOWN→UP transition.
+:   Number of seconds since the last UP->DOWN or DOWN->UP transition.
 
 type: integer
 
@@ -569,10 +570,7 @@ type: long
 
 
 **`haproxy.stat.request.denied`**
-:   Requests denied because of security concerns.
-
-* For TCP this is because of a matched tcp-request content rule.
-* For HTTP this is because of a matched http-request or tarpit rule.
+:   Requests denied because of security concerns.   * For TCP this is because of a matched tcp-request content rule.   * For HTTP this is because of a matched http-request or tarpit rule.
 
 type: long
 
@@ -602,14 +600,7 @@ type: long
 
 
 **`haproxy.stat.request.errors`**
-:   Request errors. Some of the possible causes are:
-
-* early termination from the client, before the request has been sent
-* read error from the client
-* client timeout
-* client closed connection
-* various bad requests from the client.
-* request was tarpitted.
+:   Request errors. Some of the possible causes are:   * early termination from the client, before the request has been sent   * read error from the client   * client timeout   * client closed connection   * various bad requests from the client.   * request was tarpitted.
 
 type: long
 
@@ -626,8 +617,9 @@ type: long
 type: long
 
 
+## rate [_rate]
 
-## rate [_rate_2]
+
 
 **`haproxy.stat.request.rate.value`**
 :   Number of HTTP requests per second over the last elapsed second.
@@ -654,7 +646,7 @@ type: long
 
 
 **`haproxy.stat.response.errors`**
-:   Number of response errors. This value includes the number of data transfers aborted by the server (haproxy.stat.server.aborted). Some other errors are: * write errors on the client socket (won’t be counted for the server stat) * failure applying filters to the response
+:   Number of response errors. This value includes the number of data transfers aborted by the server (haproxy.stat.server.aborted). Some other errors are: * write errors on the client socket (won't be counted for the server stat) * failure applying filters to the response
 
 type: long
 
@@ -671,8 +663,9 @@ type: long
 type: integer
 
 
+## http [_http]
 
-## http [_http_3]
+
 
 **`haproxy.stat.response.http.1xx`**
 :   HTTP responses with 1xx code.
@@ -758,30 +751,13 @@ type: integer
 type: integer
 
 
-
 ## check [_check]
 
-**`haproxy.stat.check.status`**
-:   Status of the last health check. One of:
 
-```
-UNK     -> unknown
-INI     -> initializing
-SOCKERR -> socket error
-L4OK    -> check passed on layer 4, no upper layers testing enabled
-L4TOUT  -> layer 1-4 timeout
-L4CON   -> layer 1-4 connection problem, for example
-          "Connection refused" (tcp rst) or "No route to host" (icmp)
-L6OK    -> check passed on layer 6
-L6TOUT  -> layer 6 (SSL) timeout
-L6RSP   -> layer 6 invalid response - protocol error
-L7OK    -> check passed on layer 7
-L7OKC   -> check conditionally passed on layer 7, for example 404 with
-          disable-on-404
-L7TOUT  -> layer 7 (HTTP/SMTP) timeout
-L7RSP   -> layer 7 invalid response - protocol error
-L7STS   -> layer 7 response error, for example HTTP 5xx
-```
+
+**`haproxy.stat.check.status`**
+:   Status of the last health check. One of:   UNK     -> unknown   INI     -> initializing   SOCKERR -> socket error   L4OK    -> check passed on layer 4, no upper layers testing enabled   L4TOUT  -> layer 1-4 timeout   L4CON   -> layer 1-4 connection problem, for example             "Connection refused" (tcp rst) or "No route to host" (icmp)   L6OK    -> check passed on layer 6   L6TOUT  -> layer 6 (SSL) timeout   L6RSP   -> layer 6 invalid response - protocol error   L7OK    -> check passed on layer 7   L7OKC   -> check conditionally passed on layer 7, for example 404 with             disable-on-404   L7TOUT  -> layer 7 (HTTP/SMTP) timeout   L7RSP   -> layer 7 invalid response - protocol error   L7STS   -> layer 7 response error, for example HTTP 5xx
+
 type: keyword
 
 
@@ -820,7 +796,7 @@ type: long
 
 
 **`haproxy.stat.check.down`**
-:   Number of UP→DOWN transitions. For backends, this value is the number of transitions to the whole backend being down, rather than the sum of the transitions for each server.
+:   Number of UP->DOWN transitions. For backends, this value is the number of transitions to the whole backend being down, rather than the sum of the transitions for each server.
 
 type: long
 
@@ -831,8 +807,9 @@ type: long
 type: integer
 
 
+## server [_server]
 
-## server [_server_7]
+
 
 **`haproxy.stat.server.id`**
 :   Server ID (unique inside a proxy).
@@ -858,8 +835,9 @@ type: integer
 type: integer
 
 
-
 ## compressor [_compressor]
+
+
 
 **`haproxy.stat.compressor.in.bytes`**
 :   Number of HTTP response bytes fed to the compressor.
@@ -893,8 +871,9 @@ type: long
 format: bytes
 
 
+## proxy [_proxy]
 
-## proxy [_proxy_2]
+
 
 **`haproxy.stat.proxy.id`**
 :   Unique proxy ID.
@@ -914,8 +893,9 @@ type: keyword
 type: keyword
 
 
+## queue [_queue]
 
-## queue [_queue_8]
+
 
 **`haproxy.stat.queue.limit`**
 :   Configured queue limit (maxqueue) for the server, or nothing if the value of maxqueue is 0 (meaning no limit).
@@ -929,23 +909,13 @@ type: integer
 type: integer
 
 
+## agent [_agent]
 
-## agent [_agent_3]
+
 
 **`haproxy.stat.agent.status`**
-:   Status of the last health check. One of:
+:   Status of the last health check. One of:   UNK     -> unknown   INI     -> initializing   SOCKERR -> socket error   L4OK    -> check passed on layer 4, no upper layers enabled   L4TOUT  -> layer 1-4 timeout   L4CON   -> layer 1-4 connection problem, for example             "Connection refused" (tcp rst) or "No route to host" (icmp)   L7OK    -> agent reported "up"   L7STS   -> agent reported "fail", "stop" or "down"
 
-```
-UNK     -> unknown
-INI     -> initializing
-SOCKERR -> socket error
-L4OK    -> check passed on layer 4, no upper layers enabled
-L4TOUT  -> layer 1-4 timeout
-L4CON   -> layer 1-4 connection problem, for example
-          "Connection refused" (tcp rst) or "No route to host" (icmp)
-L7OK    -> agent reported "up"
-L7STS   -> agent reported "fail", "stop" or "down"
-```
 type: keyword
 
 

@@ -50,7 +50,7 @@ type processor struct {
 }
 
 // New constructs a new DNS processor.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the dns configuration: %w", err)
@@ -59,10 +59,10 @@ func New(cfg *conf.C) (beat.Processor, error) {
 	// Logging and metrics (each processor instance has a unique ID).
 	var (
 		id      = int(instanceID.Add(1))
-		log     = logp.NewLogger(logName).With("instance_id", id)
 		metrics = monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
 	)
 
+	log = log.Named(logName).With("instance_id", id)
 	log.Debugf("DNS processor config: %+v", c)
 	resolver, err := newMiekgResolver(metrics, c.Timeout, c.Transport, c.Nameservers...)
 	if err != nil {

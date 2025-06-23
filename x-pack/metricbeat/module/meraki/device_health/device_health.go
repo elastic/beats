@@ -48,7 +48,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The meraki device_health metricset is beta.")
 
-	logger := logp.NewLogger(base.FullyQualifiedName())
+	logger := base.Logger().Named(base.FullyQualifiedName())
 
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(config); err != nil {

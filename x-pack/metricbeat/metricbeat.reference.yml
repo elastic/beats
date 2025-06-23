@@ -620,6 +620,8 @@ metricbeat.modules:
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
+  metadata_cache: true
+  metadata_cache_refresh_period: 1h
 
 - module: gcp
   metricsets:
@@ -1183,7 +1185,7 @@ metricbeat.modules:
 #------------------------------- MongoDB Module -------------------------------
 - module: mongodb
   metricsets: ["dbstats", "status", "collstats", "metrics", "replstatus"]
-  period: 10s
+  period: 60s
   enabled: true
 
   # The hosts must be passed as MongoDB URLs in the format:

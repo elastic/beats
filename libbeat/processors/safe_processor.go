@@ -62,8 +62,8 @@ func (p *SafeProcessor) Close() (err error) {
 // We make it easer for processor developers and take care of it
 // in the processor registry instead.
 func SafeWrap(constructor Constructor) Constructor {
-	return func(config *config.C) (beat.Processor, error) {
-		processor, err := constructor(config)
+	return func(config *config.C, log *logp.Logger) (beat.Processor, error) {
+		processor, err := constructor(config, log)
 		if err != nil {
 			return nil, err
 		}
