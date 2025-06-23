@@ -40,7 +40,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("config validation failed: %w", err)
 	}
 
-	logger.Debugf("loaded config: %v", config)
+	logger.Debugf("loaded config: BaseURL=%s, DebugMode=%s, Organizations=%v, Period=%s", config.BaseURL, config.DebugMode, config.Organizations, config.Period)
 	client, err := sdk.NewClientWithOptions(config.BaseURL, config.ApiKey, config.DebugMode, "Metricbeat Elastic")
 	if err != nil {
 		logger.Error("creating Meraki dashboard API client failed: %w", err)
