@@ -311,7 +311,7 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoin
 
 		if len(data) <= 0 {
 			sb.Reset()
-			sb.WriteString("json array didn't have any entries")
+			fmt.Fprintf(sb, "json array didn't have any entries\nbody was: %v", body)
 			return false
 		}
 	} else {
