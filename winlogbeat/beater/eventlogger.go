@@ -153,7 +153,7 @@ func (e *eventLogger) run(
 func processorsForConfig(
 	beatInfo beat.Info, config eventLoggerConfig,
 ) (*processors.Processors, error) {
-	procs := processors.NewList(nil)
+	procs := processors.NewList(beatInfo.Logger)
 
 	// Processor order is important! The index processor, if present, must be
 	// added before the user processors.
@@ -167,7 +167,7 @@ func processorsForConfig(
 		procs.AddProcessor(indexProcessor)
 	}
 
-	userProcs, err := processors.New(config.Processors)
+	userProcs, err := processors.New(config.Processors, beatInfo.Logger)
 	if err != nil {
 		return nil, err
 	}

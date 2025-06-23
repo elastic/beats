@@ -65,7 +65,10 @@ func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Regi
 	// the monitoring registry, and we want a consistent flat level of nesting
 	registryID := sanitizeID(inputID)
 
-	reg = parentRegistry.GetRegistry(registryID)
+	// We use a helper here instead of just reading the field directly because
+	// this call might be coming from a nested input that already has a registry
+	// that isn't at the top-level.
+	reg = findInputRegistryWithID(parentRegistry, inputID)
 	if reg == nil {
 		reg = parentRegistry.NewRegistry(registryID)
 	} else {
@@ -102,6 +105,16 @@ func globalRegistry() *monitoring.Registry {
 	return monitoring.GetNamespace("dataset").GetRegistry()
 }
 
+func findInputRegistryWithID(reg *monitoring.Registry, inputID string) *monitoring.Registry {
+	inputs := inputMetricsFromRegistry(reg)
+	for _, input := range inputs {
+		if input.id == inputID {
+			return reg.GetRegistry(input.path)
+		}
+	}
+	return nil
+}
+
 // MetricSnapshotJSON returns a snapshot of the input metric values from the
 // global 'dataset' monitoring namespace and from the reg parameter
 // encoded as a JSON array (pretty formatted). It's safe to pass in a nil
@@ -116,6 +129,9 @@ func MetricSnapshotJSON(reg *monitoring.Registry) ([]byte, error) {
 // any '.' is replaced by '_'. The new registry is initialized with
 // 'id: inputID' and 'input: inputType'.
 //
+// If there is already a registry with the same name on parent, a new registry
+// not associated with parent will be returned.
+//
 // Call CancelMetricsRegistry to remove it from the parent registry and free up
 // the associated resources.
 func NewMetricsRegistry(
@@ -129,8 +145,10 @@ func NewMetricsRegistry(
 	if reg == nil {
 		reg = parent.NewRegistry(registryID)
 	} else {
+		// Null route metrics for duplicated ID.
+		reg = monitoring.NewRegistry()
 		log.Warnw(fmt.Sprintf(
-			"parent metrics registry already contains a %q registry, reusing it",
+			"parent metrics registry already contains a %q registry, returning an unregistered registry. Metrics won't be available for this input instance",
 			registryID),
 			"registry_id", registryID,
 			"input_type", inputType,

@@ -708,7 +708,7 @@ func NewResourceMetadataEnricher(
 	metricsRepo *MetricsRepo,
 	resourceWatchers *Watchers,
 	nodeScope bool) Enricher {
-	log := logp.NewLogger(selector)
+	log := base.Logger().Named(selector)
 
 	// metricset configuration
 	config, err := GetValidatedConfig(base)
@@ -831,7 +831,7 @@ func NewContainerMetadataEnricher(
 	resourceWatchers *Watchers,
 	nodeScope bool) Enricher {
 
-	log := logp.NewLogger(selector)
+	log := base.Logger().Named(selector)
 
 	config, err := GetValidatedConfig(base)
 	if err != nil {
@@ -925,7 +925,7 @@ func NewContainerMetadataEnricher(
 		ids := make([]string, 0)
 		pod, ok := r.(*kubernetes.Pod)
 		if !ok {
-			base.Logger().Debugf("Error while casting event: %s", ok)
+			log.Debugf("Error while casting event: %s", ok)
 		}
 
 		for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
@@ -957,13 +957,13 @@ func NewContainerMetadataEnricher(
 func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
 	config, err := GetConfig(base)
 	if err != nil {
-		logp.Err("Error while getting config: %v", err)
+		base.Logger().Errorf("Error while getting config: %v", err)
 		return nil, err
 	}
 
 	config, err = validateConfig(config)
 	if err != nil {
-		logp.Err("Error while validating config: %v", err)
+		base.Logger().Errorf("Error while validating config: %v", err)
 		return nil, err
 	}
 	return config, nil
@@ -1147,7 +1147,7 @@ func (e *enricher) Enrich(events []mapstr.M) {
 			ecsMeta := meta
 			err = ecsMeta.Delete("kubernetes")
 			if err != nil {
-				logp.Debug("kubernetes", "Failed to delete field '%s': %s", "kubernetes", err)
+				e.log.Named("kubernetes").Debugf("Failed to delete field '%s': %s", "kubernetes", err)
 			}
 
 			event.DeepUpdate(mapstr.M{
@@ -1253,18 +1253,18 @@ func GetClusterECSMeta(cfg *conf.C, client k8sclient.Interface, logger *logp.Log
 func AddClusterECSMeta(base mb.BaseMetricSet) mapstr.M {
 	config, err := GetValidatedConfig(base)
 	if err != nil {
-		logp.Info("could not retrieve validated config")
+		base.Logger().Info("could not retrieve validated config")
 		return mapstr.M{}
 	}
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
-		logp.Err("fail to get kubernetes client: %s", err)
+		base.Logger().Errorf("fail to get kubernetes client: %s", err)
 		return mapstr.M{}
 	}
 	cfg, _ := conf.NewConfigFrom(&config)
 	ecsClusterMeta, err := GetClusterECSMeta(cfg, client, base.Logger())
 	if err != nil {
-		logp.Info("could not retrieve cluster metadata: %s", err)
+		base.Logger().Infof("could not retrieve cluster metadata: %s", err)
 		return mapstr.M{}
 	}
 	return ecsClusterMeta

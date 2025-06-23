@@ -1,0 +1,531 @@
+- name: cluster_settings
+  type: group
+  description: >
+    cluster_settings
+  release: beta
+  fields:
+    - name: defaults
+      type: group
+      description: >
+        default settings
+      fields:
+        - name: discovery
+          type: group
+          description: >
+            discovery settings
+          fields:
+            - name: zen
+              type: group
+              description: >
+                zen discovery settings
+              fields:
+                - name: minimum_master_nodes
+                  type: keyword
+                  description: >
+                    minimum_master_nodes
+        - name: cluster
+          type: group
+          description: >
+            cluster settings
+          fields:
+            - name: max_shards_per_node
+              type: keyword
+              description: >
+                max_shards_per_node
+            - name: routing
+              type: group
+              description: >
+                routing settings
+              fields:
+                - name: allocation
+                  type: group
+                  description: >
+                    allocation settings
+                  fields:
+                    - name: disk
+                      type: group
+                      description: >
+                        disk settings
+                      fields:
+                        - name: watermark
+                          type: group
+                          description: >
+                            watermark settings
+                          fields:
+                            - name: low
+                              type: keyword
+                              description: >
+                                low watermark settings
+                            - name: high
+                              type: keyword
+                              description: >
+                                high watermark settings
+                            - name: flood_stage
+                              type: keyword
+                              description: >
+                                flood_stage watermark settings
+                    - name: node_concurrent_outgoing_recoveries
+                      type: keyword
+                      description: >
+                        node_concurrent_outgoing_recoveries
+                    - name: cluster_concurrent_rebalance
+                      type: keyword
+                      description: >
+                        cluster_concurrent_rebalance
+                    - name: node_concurrent_recoveries
+                      type: keyword
+                      description: >
+                        node_concurrent_recoveries
+                    - name: total_shards_per_node
+                      type: keyword
+                      description: >
+                        total_shards_per_node
+            - name: blocks
+              type: group
+              description: >
+                blocks settings
+              fields:
+                - name: read_only
+                  type: keyword
+                  description: >
+                    read_only settings
+                - name: create_index
+                  type: keyword
+                  description: >
+                    create_index settings
+                - name: read_only_allow_delete
+                  type: keyword
+                  description: >
+                    read_only_allow_delete settings
+        - name: bootstrap
+          type: group
+          description: >
+            bootstrap settings
+          fields:
+            - name: memory_lock
+              type: keyword
+              description: >
+                memory_lock settings
+        - name: search
+          type: group
+          description: >
+            search settings
+          fields:
+            - name: default_search_timeout
+              type: keyword
+              description: >
+                default_search_timeout
+            - name: max_buckets
+              type: keyword
+              description: >
+                max_buckets
+        - name: indices
+          type: group
+          description: >
+            indices settings
+          fields:
+            - name: recovery
+              type: group
+              description: >
+                recovery settings
+              fields:
+                - name: max_bytes_per_sec
+                  type: keyword
+                  description: >
+                    max_bytes_per_sec settings
+            - name: breaker
+              type: group
+              description: >
+                breaker settings
+              fields:
+                - name: request
+                  type: group
+                  description: >
+                    request breaker settings
+                  fields:
+                    - name: limit
+                      type: keyword
+                      description: >
+                        limit settings
+                - name: total
+                  type: group
+                  description: >
+                    total breaker settings
+                  fields:
+                    - name: limit
+                      type: keyword
+                      description: >
+                        limit settings
+            - name: query
+              type: group
+              description: >
+                query settings
+              fields:
+                - name: query_string
+                  type: group
+                  description: >
+                    query_string settings
+                  fields:
+                    - name: allowLeadingWildcard
+                      type: keyword
+                      description: >
+                        allowLeadingWildcard settings
+        - name: action
+          type: group
+          description: >
+            action settings
+          fields:
+            - name: destructive_requires_name
+              type: keyword
+              description: >
+                destructive_requires_name settings
+    - name: persistent
+      type: group
+      description: >
+        persistent settings
+      fields:
+        - name: discovery
+          type: group
+          description: >
+            discovery settings
+          fields:
+            - name: zen
+              type: group
+              description: >
+                zen discovery settings
+              fields:
+                - name: minimum_master_nodes
+                  type: keyword
+                  description: >
+                    minimum_master_nodes
+        - name: cluster
+          type: group
+          description: >
+            cluster settings
+          fields:
+            - name: max_shards_per_node
+              type: keyword
+              description: >
+                max_shards_per_node
+            - name: routing
+              type: group
+              description: >
+                routing settings
+              fields:
+                - name: allocation
+                  type: group
+                  description: >
+                    allocation settings
+                  fields:
+                    - name: disk
+                      type: group
+                      description: >
+                        disk settings
+                      fields:
+                        - name: watermark
+                          type: group
+                          description: >
+                            watermark settings
+                          fields:
+                            - name: low
+                              type: keyword
+                              description: >
+                                low watermark settings
+                            - name: high
+                              type: keyword
+                              description: >
+                                high watermark settings
+                            - name: flood_stage
+                              type: keyword
+                              description: >
+                                flood_stage watermark settings
+                    - name: node_concurrent_outgoing_recoveries
+                      type: keyword
+                      description: >
+                        node_concurrent_outgoing_recoveries
+                    - name: cluster_concurrent_rebalance
+                      type: keyword
+                      description: >
+                        cluster_concurrent_rebalance
+                    - name: node_concurrent_recoveries
+                      type: keyword
+                      description: >
+                        node_concurrent_recoveries
+                    - name: total_shards_per_node
+                      type: keyword
+                      description: >
+                        total_shards_per_node
+            - name: blocks
+              type: group
+              description: >
+                blocks settings
+              fields:
+                - name: read_only
+                  type: keyword
+                  description: >
+                    read_only settings
+                - name: create_index
+                  type: keyword
+                  description: >
+                    create_index settings
+                - name: read_only_allow_delete
+                  type: keyword
+                  description: >
+                    read_only_allow_delete settings
+        - name: bootstrap
+          type: group
+          description: >
+            bootstrap settings
+          fields:
+            - name: memory_lock
+              type: keyword
+              description: >
+                memory_lock settings
+        - name: search
+          type: group
+          description: >
+            search settings
+          fields:
+            - name: default_search_timeout
+              type: keyword
+              description: >
+                default_search_timeout
+            - name: max_buckets
+              type: keyword
+              description: >
+                max_buckets
+        - name: indices
+          type: group
+          description: >
+            indices settings
+          fields:
+            - name: recovery
+              type: group
+              description: >
+                recovery settings
+              fields:
+                - name: max_bytes_per_sec
+                  type: keyword
+                  description: >
+                    max_bytes_per_sec settings
+            - name: breaker
+              type: group
+              description: >
+                breaker settings
+              fields:
+                - name: request
+                  type: group
+                  description: >
+                    request breaker settings
+                  fields:
+                    - name: limit
+                      type: keyword
+                      description: >
+                        limit settings
+                - name: total
+                  type: group
+                  description: >
+                    total breaker settings
+                  fields:
+                    - name: limit
+                      type: keyword
+                      description: >
+                        limit settings
+            - name: query
+              type: group
+              description: >
+                query settings
+              fields:
+                - name: query_string
+                  type: group
+                  description: >
+                    query_string settings
+                  fields:
+                    - name: allowLeadingWildcard
+                      type: keyword
+                      description: >
+                        allowLeadingWildcard settings
+        - name: action
+          type: group
+          description: >
+            action settings
+          fields:
+            - name: destructive_requires_name
+              type: keyword
+              description: >
+                destructive_requires_name settings
+    - name: transient
+      type: group
+      description: >
+        transient settings
+      fields:
+        - name: discovery
+          type: group
+          description: >
+            discovery settings
+          fields:
+            - name: zen
+              type: group
+              description: >
+                zen discovery settings
+              fields:
+                - name: minimum_master_nodes
+                  type: keyword
+                  description: >
+                    minimum_master_nodes
+        - name: cluster
+          type: group
+          description: >
+            cluster settings
+          fields:
+            - name: max_shards_per_node
+              type: keyword
+              description: >
+                max_shards_per_node
+            - name: routing
+              type: group
+              description: >
+                routing settings
+              fields:
+                - name: allocation
+                  type: group
+                  description: >
+                    allocation settings
+                  fields:
+                    - name: disk
+                      type: group
+                      description: >
+                        disk settings
+                      fields:
+                        - name: watermark
+                          type: group
+                          description: >
+                            watermark settings
+                          fields:
+                            - name: low
+                              type: keyword
+                              description: >
+                                low watermark settings
+                            - name: high
+                              type: keyword
+                              description: >
+                                high watermark settings
+                            - name: flood_stage
+                              type: keyword
+                              description: >
+                                flood_stage watermark settings
+                    - name: node_concurrent_outgoing_recoveries
+                      type: keyword
+                      description: >
+                        node_concurrent_outgoing_recoveries
+                    - name: cluster_concurrent_rebalance
+                      type: keyword
+                      description: >
+                        cluster_concurrent_rebalance
+                    - name: node_concurrent_recoveries
+                      type: keyword
+                      description: >
+                        node_concurrent_recoveries
+                    - name: total_shards_per_node
+                      type: keyword
+                      description: >
+                        total_shards_per_node
+            - name: blocks
+              type: group
+              description: >
+                blocks settings
+              fields:
+                - name: read_only
+                  type: keyword
+                  description: >
+                    read_only settings
+                - name: create_index
+                  type: keyword
+                  description: >
+                    create_index settings
+                - name: read_only_allow_delete
+                  type: keyword
+                  description: >
+                    read_only_allow_delete settings
+        - name: bootstrap
+          type: group
+          description: >
+            bootstrap settings
+          fields:
+            - name: memory_lock
+              type: keyword
+              description: >
+                memory_lock settings
+        - name: search
+          type: group
+          description: >
+            search settings
+          fields:
+            - name: default_search_timeout
+              type: keyword
+              description: >
+                default_search_timeout
+            - name: max_buckets
+              type: keyword
+              description: >
+                max_buckets
+        - name: indices
+          type: group
+          description: >
+            indices settings
+          fields:
+            - name: recovery
+              type: group
+              description: >
+                recovery settings
+              fields:
+                - name: max_bytes_per_sec
+                  type: keyword
+                  description: >
+                    max_bytes_per_sec settings
+            - name: breaker
+              type: group
+              description: >
+                breaker settings
+              fields:
+                - name: request
+                  type: group
+                  description: >
+                    request breaker settings
+                  fields:
+                    - name: limit
+                      type: keyword
+                      description: >
+                        limit settings
+                - name: total
+                  type: group
+                  description: >
+                    total breaker settings
+                  fields:
+                    - name: limit
+                      type: keyword
+                      description: >
+                        limit settings
+            - name: query
+              type: group
+              description: >
+                query settings
+              fields:
+                - name: query_string
+                  type: group
+                  description: >
+                    query_string settings
+                  fields:
+                    - name: allowLeadingWildcard
+                      type: keyword
+                      description: >
+                        allowLeadingWildcard settings
+        - name: action
+          type: group
+          description: >
+            action settings
+          fields:
+            - name: destructive_requires_name
+              type: keyword
+              description: >
+                destructive_requires_name settings                

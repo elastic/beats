@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-awsfargate.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # AWS Fargate fields [exported-fields-awsfargate]
 
 `awsfargate` module collects AWS fargate metrics from task metadata endpoint.
@@ -37,8 +39,7 @@ type: keyword
 type: keyword
 
 
-
-## task_stats [_task_stats_2]
+## task_stats [_task_stats]
 
 `task_stats` contains the metrics that were scraped from AWS fargate task stats ${ECS_CONTAINER_METADATA_URI_V4}/task/stats metadata endpoint.
 
@@ -55,7 +56,7 @@ type: keyword
 
 
 **`awsfargate.task_stats.identifier`**
-:   Container identifier across tasks and clusters, which equals to container.name + */* + container.id.
+:   Container identifier across tasks and clusters, which equals to container.name + '/' + container.id.
 
 type: keyword
 
@@ -78,8 +79,7 @@ type: keyword
 type: scaled_float
 
 
-
-## cpu [_cpu_3]
+## cpu [_cpu]
 
 Runtime CPU metrics.
 
@@ -165,13 +165,11 @@ type: scaled_float
 format: percent
 
 
-
-## diskio [_diskio_2]
+## diskio [_diskio]
 
 Disk I/O metrics.
 
-
-## read [_read_2]
+## read [_read]
 
 Accumulated reads during the life of the container
 
@@ -214,15 +212,14 @@ type: long
 
 
 **`awsfargate.task_stats.diskio.reads`**
-:   [6.4]
+:   Number of current reads per second
 
-Number of current reads per second
+{applies_to}`product: deprecated 6.4`
 
 type: scaled_float
 
 
-
-## write [_write_2]
+## write [_write]
 
 Accumulated writes during the life of the container
 
@@ -265,12 +262,11 @@ type: long
 
 
 **`awsfargate.task_stats.diskio.writes`**
-:   [6.4]
+:   Number of current writes per second
 
-Number of current writes per second
+{applies_to}`product: deprecated 6.4`
 
 type: scaled_float
-
 
 
 ## summary [_summary]
@@ -316,15 +312,14 @@ type: long
 
 
 **`awsfargate.task_stats.diskio.total`**
-:   [6.4]
+:   Number of reads and writes per second
 
-Number of reads and writes per second
+{applies_to}`product: deprecated 6.4`
 
 type: scaled_float
 
 
-
-## memory [_memory_3]
+## memory [_memory]
 
 Memory metrics.
 
@@ -332,7 +327,6 @@ Memory metrics.
 :   Raw memory stats from the cgroups memory.stat interface
 
 type: object
-
 
 
 ## commit [_commit]
@@ -377,7 +371,6 @@ type: long
 format: bytes
 
 
-
 ## rss [_rss]
 
 RSS memory stats.
@@ -398,8 +391,7 @@ type: scaled_float
 format: percent
 
 
-
-## usage [_usage_11]
+## usage [_usage]
 
 Usage memory stats.
 

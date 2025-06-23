@@ -112,8 +112,9 @@ func NewInput(
 	cfg *conf.C,
 	outlet channel.Connector,
 	context input.Context,
+	logger *logp.Logger,
 ) (input.Input, error) {
-	log := logp.NewLogger("syslog")
+	log := logger.Named("syslog")
 
 	deprecatedNotificationOnce.Do(func() {
 		cfgwarn.Deprecate("", "Syslog input. Use Syslog processor instead.")
@@ -131,7 +132,7 @@ func NewInput(
 
 	forwarder := harvester.NewForwarder(out)
 	cb := GetCbByConfig(config, forwarder, log)
-	server, err := factory(cb, config.Protocol)
+	server, err := factory(cb, config.Protocol, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +188,7 @@ func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger)
 	case syslogFormatRFC5424:
 		return func(data []byte, metadata inputsource.NetworkMetadata) {
 			ev := parseAndCreateEvent5424(data, metadata, cfg.Timezone.Location(), log)
-			_ = forwarder.Send(ev)
+			_ = forwarder.Send(ev, log)
 		}
 
 	case syslogFormatAuto:
@@ -198,7 +199,7 @@ func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger)
 			} else {
 				ev = parseAndCreateEvent3164(data, metadata, cfg.Timezone.Location(), log)
 			}
-			_ = forwarder.Send(ev)
+			_ = forwarder.Send(ev, log)
 		}
 	case syslogFormatRFC3164:
 		break
@@ -206,7 +207,7 @@ func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger)
 
 	return func(data []byte, metadata inputsource.NetworkMetadata) {
 		ev := parseAndCreateEvent3164(data, metadata, cfg.Timezone.Location(), log)
-		_ = forwarder.Send(ev)
+		_ = forwarder.Send(ev, log)
 	}
 }
 
@@ -268,7 +269,7 @@ func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time
 		syslog["version"] = ev.Version()
 	}
 
-	if ev.data != nil && len(ev.data) > 0 {
+	if len(ev.data) > 0 {
 		syslog["data"] = ev.data
 	}
 

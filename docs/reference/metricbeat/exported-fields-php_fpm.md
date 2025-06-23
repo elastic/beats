@@ -3,17 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-php_fpm.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # PHP_FPM fields [exported-fields-php_fpm]
 
 PHP-FPM server status metrics collected from PHP-FPM.
-
 
 ## php_fpm [_php_fpm]
 
 `php_fpm` contains the metrics that were obtained from PHP-FPM status page call.
 
-
-## pool [_pool_3]
+## pool [_pool]
 
 `pool` contains the metrics that were obtained from the PHP-FPM process pool.
 
@@ -23,8 +23,7 @@ PHP-FPM server status metrics collected from PHP-FPM.
 type: keyword
 
 
-
-## pool [_pool_4]
+## pool [_pool]
 
 `pool` contains the metrics that were obtained from the PHP-FPM process pool.
 
@@ -34,8 +33,7 @@ type: keyword
 type: keyword
 
 
-
-## connections [_connections_5]
+## connections [_connections]
 
 Connection state specific statistics.
 
@@ -61,7 +59,6 @@ type: long
 :   The size of the socket queue of pending connections.
 
 type: long
-
 
 
 ## processes [_processes]
@@ -93,7 +90,7 @@ type: long
 
 
 **`php_fpm.pool.processes.max_children_reached`**
-:   Number of times, the process limit has been reached, when pm tries to start more children (works only for pm *dynamic* and *ondemand*).
+:   Number of times, the process limit has been reached, when pm tries to start more children (works only for pm 'dynamic' and 'ondemand').
 
 type: long
 
@@ -116,8 +113,7 @@ type: long
 type: date
 
 
-
-## process [_process_7]
+## process [_process]
 
 process contains the metrics that were obtained from the PHP-FPM process.
 
@@ -198,13 +194,13 @@ type: keyword
 
 
 **`php_fpm.process.last_request_cpu`**
-:   The CPU percentage the last request consumed. It’s always 0 if the process is not in Idle state because CPU calculation is done when the request processing has terminated
+:   The CPU percentage the last request consumed. It's always 0 if the process is not in Idle state because CPU calculation is done when the request processing has terminated
 
 type: long
 
 
 **`php_fpm.process.last_request_memory`**
-:   The max amount of memory the last request consumed. It’s always 0 if the process is not in Idle state because memory calculation is done when the request processing has terminated
+:   The max amount of memory the last request consumed. It's always 0 if the process is not in Idle state because memory calculation is done when the request processing has terminated
 
 type: integer
 

@@ -29,9 +29,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
@@ -51,7 +52,7 @@ func TestGenerateProcessorList(t *testing.T) {
 	plugins, err := processors.NewPluginConfigFromList(inputCfg)
 	require.NoError(t, err)
 
-	processors, err := processors.New(plugins)
+	processors, err := processors.New(plugins, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	// make sure the processor init got the config formatted in a way it expected
 	require.Equal(t, 4, len(processors.List))
@@ -189,7 +190,7 @@ func TestProcessorsConfigs(t *testing.T) {
 			local: beat.ProcessingConfig{
 				Processor: func() beat.ProcessorList {
 					g := newGroup("test", logp.L())
-					g.add(actions.NewAddFields(mapstr.M{"custom": "value"}, true, true))
+					g.add(addfields.NewAddFields(mapstr.M{"custom": "value"}, true, true))
 					return g
 				}(),
 			},
@@ -327,7 +328,8 @@ func TestEventNormalizationOverride(t *testing.T) {
 
 		processor, err := builder.Create(beat.ProcessingConfig{EventNormalization: tc.normalizeOverride}, false)
 		require.NoError(t, err)
-		group := processor.(*group)
+		group, ok := processor.(*group)
+		require.True(t, ok)
 
 		if tc.hasGeneralizeProcessor {
 			if assert.NotEmpty(t, group.list) {
@@ -443,7 +445,8 @@ func TestProcessingClose(t *testing.T) {
 
 	// Inject a processor in the builder that we can check if has been closed.
 	factoryProcessor := &processorWithClose{}
-	b := factory.(*builder)
+	b, ok := factory.(*builder)
+	require.True(t, ok)
 	if b.processors == nil {
 		b.processors = newGroup("global", logp.L())
 	}

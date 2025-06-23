@@ -1065,6 +1065,7 @@ toc:
             children:
               - file: metricbeat/metricbeat-metricset-nats-connection.md
               - file: metricbeat/metricbeat-metricset-nats-connections.md
+              - file: metricbeat/metricbeat-metricset-nats-jetstream.md
               - file: metricbeat/metricbeat-metricset-nats-route.md
               - file: metricbeat/metricbeat-metricset-nats-routes.md
               - file: metricbeat/metricbeat-metricset-nats-stats.md
@@ -1196,6 +1197,7 @@ toc:
           - file: metricbeat/exported-fields-aerospike.md
           - file: metricbeat/exported-fields-airflow.md
           - file: metricbeat/exported-fields-apache.md
+          - file: metricbeat/exported-fields-autoops_es.md
           - file: metricbeat/exported-fields-aws.md
           - file: metricbeat/exported-fields-awsfargate.md
           - file: metricbeat/exported-fields-azure.md
@@ -1238,6 +1240,7 @@ toc:
           - file: metricbeat/exported-fields-linux.md
           - file: metricbeat/exported-fields-logstash.md
           - file: metricbeat/exported-fields-memcached.md
+          - file: metricbeat/exported-fields-meraki.md
           - file: metricbeat/exported-fields-mongodb.md
           - file: metricbeat/exported-fields-mssql.md
           - file: metricbeat/exported-fields-munin.md

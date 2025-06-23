@@ -31,17 +31,17 @@ To add the Beats repository for APT:
     sudo apt-get install apt-transport-https
     ```
 
-3. Save the repository definition to `/etc/apt/sources.list.d/elastic-{{major-version}}.list`:
+3. Save the repository definition to _/etc/apt/sources.list.d/elastic-{{major-release}}.list_:
 
     ```shell subs=true
-    echo "deb https://artifacts.elastic.co/packages/{{major-version}}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{major-version}}.list
+    echo "deb https://artifacts.elastic.co/packages/{{major-release}}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{major-release}}.list
     ```
 
     :::{note}
     The package is free to use under the Elastic license. An alternative package which contains only features that are available under the Apache 2.0 license is also available. To install it, use the following sources list:
 
     ```shell subs=true
-    echo "deb https://artifacts.elastic.co/packages/oss-{{major-version}}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{major-version}}.list
+    echo "deb https://artifacts.elastic.co/packages/oss-{{major-release}}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{major-release}}.list
     ```
     :::
 
@@ -83,9 +83,9 @@ To add the Beats repository for YUM:
 2. Create a file with a `.repo` extension (for example, `elastic.repo`) in your `/etc/yum.repos.d/` directory and add the following lines:
 
     ```shell subs=true
-    [elastic-{{major-version}}]
-    name=Elastic repository for {{major-version}} packages
-    baseurl=https://artifacts.elastic.co/packages/{{major-version}}/yum
+    [elastic-{{major-release}}]
+    name=Elastic repository for {{major-release}} packages
+    baseurl=https://artifacts.elastic.co/packages/{{major-release}}/yum
     gpgcheck=1
     gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
     enabled=1
@@ -97,7 +97,7 @@ To add the Beats repository for YUM:
     The package is free to use under the Elastic license. An alternative package which contains only features that are available under the Apache 2.0 license is also available. To install it, use the following `baseurl` in your `.repo` file:
 
     ```shell subs=true
-    baseurl=https://artifacts.elastic.co/packages/oss-{{major-version}}/yum
+    baseurl=https://artifacts.elastic.co/packages/oss-{{major-release}}/yum
     ```
     :::
 

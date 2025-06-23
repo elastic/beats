@@ -33,7 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	v2 "github.com/elastic/go-lumber/server/v2"
 )
@@ -185,7 +185,7 @@ func newTestLumberjackOutput(
 		}
 	}
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	cfg, _ := conf.NewConfigFrom(config)
 	grp, err := outputs.Load(nil, beat.Info{Logger: logger}, nil, "logstash", cfg)
 	if err != nil {

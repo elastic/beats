@@ -95,18 +95,19 @@ func NewInput(
 	cfg *conf.C,
 	outlet channel.Connector,
 	context input.Context,
+	logger *logp.Logger,
 ) (input.Input, error) {
 	// we still allow the deprecated log input running under integrations and
 	// modules until they are all migrated to filestream
 	if !AllowDeprecatedUse(cfg) {
-		return nil, fmt.Errorf("Found log input configuration: %w\n%s", errDeprecated, conf.DebugString(cfg, true))
+		return nil, fmt.Errorf("Found log input configuration: %w\n%s", errDeprecated, conf.DebugString(cfg, true)) //nolint:staticcheck //Keep old behavior
 	}
 
 	cleanupNeeded := true
 	cleanupIfNeeded := func(f func() error) {
 		if cleanupNeeded {
 			if err := f(); err != nil {
-				logp.L().Named("input.log").Errorf("clean up function returned an error: %w", err)
+				logger.Named("input.log").Errorf("clean up function returned an error: %w", err)
 			}
 		}
 	}
@@ -116,18 +117,18 @@ func NewInput(
 	if err := cfg.Unpack(&inputConfig); err != nil {
 		return nil, err
 	}
-	if err := inputConfig.resolveRecursiveGlobs(); err != nil {
-		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %w", err)
+	if err := inputConfig.resolveRecursiveGlobs(logger); err != nil {
+		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %w", err) //nolint:staticcheck //Keep old behavior
 	}
 	if err := inputConfig.normalizeGlobPatterns(); err != nil {
-		return nil, fmt.Errorf("Failed to normalize globs patterns: %w", err)
+		return nil, fmt.Errorf("Failed to normalize globs patterns: %w", err) //nolint:staticcheck //Keep old behavior
 	}
 
 	if len(inputConfig.Paths) == 0 {
 		return nil, fmt.Errorf("each input must have at least one path defined")
 	}
 
-	identifier, err := file.NewStateIdentifier(inputConfig.FileIdentity)
+	identifier, err := file.NewStateIdentifier(inputConfig.FileIdentity, logger)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize file identity generator: %w", err)
 	}
@@ -156,16 +157,16 @@ func NewInput(
 	}
 
 	uuid, _ := uuid.NewV4()
-	logger := logp.NewLogger("input").With("input_id", uuid)
+	inputlogger := logger.Named("input").With("input_id", uuid)
 
 	p := &Input{
-		logger:              logger,
+		logger:              inputlogger,
 		config:              inputConfig,
 		cfg:                 cfg,
 		harvesters:          harvester.NewRegistry(),
 		outlet:              out,
 		stateOutlet:         stateOut,
-		states:              file.NewStates(),
+		states:              file.NewStates(logger),
 		done:                context.Done,
 		meta:                meta,
 		fileStateIdentifier: identifier,
@@ -176,7 +177,7 @@ func NewInput(
 
 	// Create empty harvester to check if configs are fine
 	// TODO: Do config validation instead
-	_, err = p.createHarvester(logger, file.State{}, nil)
+	_, err = p.createHarvester(inputlogger, file.State{}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +187,7 @@ func NewInput(
 		return nil, err
 	}
 
-	logger.Infof("Configured paths: %v", p.config.Paths)
+	inputlogger.Infof("Configured paths: %v", p.config.Paths)
 
 	cleanupNeeded = false
 	go p.stopWhenDone()
@@ -460,7 +461,7 @@ func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo)
 				return sortInfos[i].info.ModTime().After(sortInfos[j].info.ModTime())
 			}
 		default:
-			return nil, fmt.Errorf("Unexpected value for scan.order: %v", scanOrder)
+			return nil, fmt.Errorf("Unexpected value for scan.order: %v", scanOrder) //nolint:staticcheck //Keep old behavior
 		}
 	case "filename":
 		switch scanOrder {
@@ -473,10 +474,10 @@ func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo)
 				return strings.Compare(sortInfos[i].info.Name(), sortInfos[j].info.Name()) > 0
 			}
 		default:
-			return nil, fmt.Errorf("Unexpected value for scan.order: %v", scanOrder)
+			return nil, fmt.Errorf("Unexpected value for scan.order: %v", scanOrder) //nolint:staticcheck //Keep old behavior
 		}
 	default:
-		return nil, fmt.Errorf("Unexpected value for scan.sort: %v", scanSort)
+		return nil, fmt.Errorf("Unexpected value for scan.sort: %v", scanSort) //nolint:staticcheck //Keep old behavior
 	}
 
 	sort.Slice(sortInfos, sortFunc)
@@ -774,7 +775,7 @@ func (p *Input) startHarvester(logger *logp.Logger, state file.State, offset int
 	// This is synchronous state update as part of the scan
 	h.SendStateUpdate()
 
-	if err = p.harvesters.Start(h); err != nil {
+	if err = p.harvesters.Start(h, p.logger); err != nil {
 		p.numHarvesters.Add(^uint32(0))
 	}
 	return err

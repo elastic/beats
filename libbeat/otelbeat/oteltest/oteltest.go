@@ -39,8 +39,13 @@ import (
 )
 
 type ReceiverConfig struct {
-	Name    string
-	Config  component.Config
+	// Name is the unique identifier for the component
+	Name string
+	// Beat is the name of the Beat that is running as a receiver
+	Beat string
+	// Config is the configuration for the receiver component
+	Config component.Config
+	// Factory is the factory to instantiate the receiver
 	Factory receiver.Factory
 }
 
@@ -73,28 +78,28 @@ func CheckReceivers(params CheckReceiversParams) {
 	createReceiver := func(t *testing.T, rc ReceiverConfig) receiver.Logs {
 		t.Helper()
 
+		require.NotEmpty(t, rc.Name, "receiver name must not be empty")
+		require.NotEmpty(t, rc.Beat, "receiver beat must not be empty")
+
 		var receiverSettings receiver.Settings
 
 		// Replicate the behavior of the collector logger
 		receiverCore := core.
 			With([]zapcore.Field{
 				zap.String("otelcol.component.id", rc.Name),
-				zap.String("otelcol.component.kind", "Receiver"),
-				zap.String("otelcol.signals", "logs"),
+				zap.String("otelcol.component.kind", "receiver"),
+				zap.String("otelcol.signal", "logs"),
 			})
 
 		receiverSettings.Logger = zap.New(receiverCore)
 		receiverSettings.ID = component.NewIDWithName(rc.Factory.Type(), rc.Name)
 
 		logConsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
-			for i := 0; i < ld.ResourceLogs().Len(); i++ {
-				rl := ld.ResourceLogs().At(i)
-				for j := 0; j < rl.ScopeLogs().Len(); j++ {
-					sl := rl.ScopeLogs().At(j)
-					for k := 0; k < sl.LogRecords().Len(); k++ {
-						log := sl.LogRecords().At(k)
+			for _, rl := range ld.ResourceLogs().All() {
+				for _, sl := range rl.ScopeLogs().All() {
+					for _, lr := range sl.LogRecords().All() {
 						logsMu.Lock()
-						logs[rc.Name] = append(logs[rc.Name], log.Body().Map().AsRaw())
+						logs[rc.Name] = append(logs[rc.Name], lr.Body().Map().AsRaw())
 						logsMu.Unlock()
 					}
 				}
@@ -122,16 +127,39 @@ func CheckReceivers(params CheckReceiversParams) {
 		}()
 	}
 
+	t.Cleanup(func() {
+		if t.Failed() {
+			logsMu.Lock()
+			defer logsMu.Unlock()
+			t.Logf("Ingested Logs: %v", logs)
+		}
+	})
+
+	beatForCompID := func(compID string) string {
+		for _, rec := range params.Receivers {
+			if rec.Name == compID {
+				return rec.Beat
+			}
+		}
+
+		return ""
+	}
+
 	require.EventuallyWithT(t, func(ct *assert.CollectT) {
 		logsMu.Lock()
 		defer logsMu.Unlock()
 
-		// Ensure the logger fields from the otel collector are present in the logs.
-
+		// Ensure the logger fields from the otel collector are present
 		for _, zl := range zapLogs.All() {
+			require.Contains(t, zl.ContextMap(), "otelcol.component.kind")
+			require.Equal(t, "receiver", zl.ContextMap()["otelcol.component.kind"])
+			require.Contains(t, zl.ContextMap(), "otelcol.signal")
+			require.Equal(t, "logs", zl.ContextMap()["otelcol.signal"])
 			require.Contains(t, zl.ContextMap(), "otelcol.component.id")
-			require.Equal(t, zl.ContextMap()["otelcol.component.kind"], "Receiver")
-			require.Equal(t, zl.ContextMap()["otelcol.signals"], "logs")
+			compID, ok := zl.ContextMap()["otelcol.component.id"].(string)
+			require.True(t, ok, "otelcol.component.id should be a string")
+			require.Contains(t, zl.ContextMap(), "service.name")
+			require.Equal(t, beatForCompID(compID), zl.ContextMap()["service.name"])
 			break
 		}
 

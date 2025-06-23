@@ -15,7 +15,7 @@ Running {{ecloud}} on Kubernetes? See [Run {{beats}} on ECK](docs-content://depl
 % However, version {{stack-version}} of Filebeat has not yet been released, so no Docker image is currently available for this version.
 
 
-## Kubernetes deploy manifests [_kubernetes_deploy_manifests]
+## Kubernetes deploy manifests for Filebeat [_kubernetes_deploy_manifests]
 
 You deploy Filebeat as a [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) to ensure there’s a running instance on each node of the cluster.
 
@@ -25,8 +25,8 @@ Everything is deployed under the `kube-system` namespace by default. To change t
 
 To download the manifest file, run:
 
-```sh
-curl -L -O https://raw.githubusercontent.com/elastic/beats/master/deploy/kubernetes/filebeat-kubernetes.yaml
+```sh subs=true
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/kubernetes/filebeat-kubernetes.yaml
 ```
 
 ::::{warning}

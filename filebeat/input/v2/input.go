@@ -23,11 +23,19 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/go-concert/unison"
+)
+
+const (
+	metricEventsPipelineTotal     = "events_pipeline_total"
+	metricEventsPipelineFiltered  = "events_pipeline_filtered_total"
+	metricEventsPipelinePublished = "events_pipeline_published_total"
 )
 
 // InputManager creates and maintains actions and background processes for an
@@ -110,31 +118,54 @@ func (c *Context) UpdateStatus(status status.Status, msg string) {
 	}
 }
 
-// NewPipelineClientListener returns a new beat.ClientListener which might be
-// the PipelineClientListener or a beat.CombinedClientListener. It's the latter
-// when clientListener is non-nil.
+// NewPipelineClientListener returns a new beat.ClientListener.
 // The PipelineClientListener collects pipeline metrics for an input. The
 // metrics are created on reg.
-func NewPipelineClientListener(
-	reg *monitoring.Registry,
-	clientListener beat.ClientListener) beat.ClientListener {
-
-	var pcl beat.ClientListener = &PipelineClientListener{
-		eventsTotal: monitoring.NewUint(
-			reg, "events_pipeline_total"),
-		eventsFiltered: monitoring.NewUint(
-			reg, "events_pipeline_filtered_total"),
-		eventsPublished: monitoring.NewUint(
-			reg, "events_pipeline_published_total"),
+func NewPipelineClientListener(reg *monitoring.Registry) *PipelineClientListener {
+	return &PipelineClientListener{
+		eventsTotal:     monitoring.NewUint(reg, metricEventsPipelineTotal),
+		eventsFiltered:  monitoring.NewUint(reg, metricEventsPipelineFiltered),
+		eventsPublished: monitoring.NewUint(reg, metricEventsPipelinePublished),
 	}
+}
 
-	if clientListener != nil {
-		pcl = &beat.CombinedClientListener{
-			A: clientListener,
-			B: pcl,
-		}
+// PrepareInputMetrics creates a new monitoring.Registry on parent for the given
+// inputID and a PipelineClientListener using the new monitoring.Registry.
+// Then it wrappers the given beat.PipelineConnector to add the newly created
+// PipelineClientListener to the beat.ClientConfig.
+//
+// It returns the new monitoring.Registry and the wrapped beat.PipelineConnector
+// and a function to unregister the new monitoring.Registry from parent.
+func PrepareInputMetrics(
+	inputID,
+	name string,
+	parent *monitoring.Registry,
+	pconnector beat.PipelineConnector,
+	log *logp.Logger) (*monitoring.Registry, beat.PipelineConnector, func()) {
+
+	reg := inputmon.NewMetricsRegistry(
+		inputID, name, parent, log)
+	listener := NewPipelineClientListener(reg)
+
+	pc := pipetool.WithClientConfigEdit(pconnector,
+		func(orig beat.ClientConfig) (beat.ClientConfig, error) {
+			var pcl beat.ClientListener = listener
+			if orig.ClientListener != nil {
+				pcl = &beat.CombinedClientListener{
+					A: orig.ClientListener,
+					B: listener,
+				}
+			}
+
+			orig.ClientListener = pcl
+			return orig, nil
+		})
+
+	return reg, pc, func() {
+		// Unregister the metrics when the input finishes running.
+		defer inputmon.CancelMetricsRegistry(
+			inputID, name, parent, log)
 	}
-	return pcl
 }
 
 // PipelineClientListener implements beat.ClientListener to collect pipeline

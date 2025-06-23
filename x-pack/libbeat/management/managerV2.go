@@ -249,7 +249,9 @@ func (cm *BeatV2Manager) RegisterDiagnosticHook(name string, description string,
 func (cm *BeatV2Manager) UpdateStatus(status status.Status, msg string) {
 	cm.mx.Lock()
 	defer cm.mx.Unlock()
-
+	if cm.status == status && cm.message == msg {
+		return
+	}
 	cm.status = status
 	cm.message = msg
 	cm.updateStatuses()
@@ -832,7 +834,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 	}
 
 	if err := obj.Reload(inputBeatCfgs); err != nil {
-		realErrors := []error{}
+		var errs []error
 
 		// At the moment this logic is tightly bound to the current RunnerList
 		// implementation from libbeat/cfgfile/list.go and Input.loadStates from
@@ -861,12 +863,12 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 				}
 
 				// This is an error that cannot be ignored, so we report it
-				realErrors = append(realErrors, err)
+				errs = append(errs, err)
 			}
 		}
 
-		if len(realErrors) != 0 {
-			return fmt.Errorf("failed to reload inputs: %w", errors.Join(realErrors...))
+		if len(errs) != 0 {
+			return fmt.Errorf("failed to reload inputs: %w", errors.Join(errs...))
 		}
 	} else {
 		// If there was no error reloading input and forceReload was

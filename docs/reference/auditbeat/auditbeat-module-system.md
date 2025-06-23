@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-module-system.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # System Module [auditbeat-module-system]
 
 ::::{warning}
@@ -28,7 +30,7 @@ Event information is sent as the events occur (e.g. a process starts or stops). 
 
 ### Entity IDs [_entity_ids]
 
-This module populates `entity_id` fields to uniquely identify entities (users, packages, processes…​) within a host. This requires Auditbeat to obtain a unique identifier for the host:
+This module populates `entity_id` fields to uniquely identify entities (users, packages, processes…) within a host. This requires Auditbeat to obtain a unique identifier for the host:
 
 * Windows: Uses the `HKLM\Software\Microsoft\Cryptography\MachineGuid` registry key.
 * macOS: Uses the value returned by `gethostuuid(2)` system call.
@@ -49,10 +51,8 @@ Under CentOS 6.x, it’s possible that none of the files above exist. In that ca
 
 The module comes with a sample dashboard:
 
-:::{image} images/auditbeat-system-overview-dashboard.png
-:alt: Auditbeat System Overview Dashboard
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Auditbeat System Overview Dashboard](images/auditbeat-system-overview-dashboard.png)
 
 
 ## Configuration options [_configuration_options_19]
@@ -155,8 +155,7 @@ On the other hand, host and user information is unlikely to change frequently, s
   period: 1s
 ```
 
-
-## Example configuration [_example_configuration_3]
+## Example configuration [_example_configuration]
 
 The System module supports the common configuration options that are described under [configuring Auditbeat](/reference/auditbeat/configuration-auditbeat.md). Here is an example configuration:
 
@@ -191,9 +190,8 @@ auditbeat.modules:
   login.btmp_file_pattern: /var/log/btmp*
 ```
 
-
 ## Datasets [_datasets]
-
+            
 The following datasets are available:
 
 * [host](/reference/auditbeat/auditbeat-dataset-system-host.md)
@@ -202,10 +200,4 @@ The following datasets are available:
 * [process](/reference/auditbeat/auditbeat-dataset-system-process.md)
 * [socket](/reference/auditbeat/auditbeat-dataset-system-socket.md)
 * [user](/reference/auditbeat/auditbeat-dataset-system-user.md)
-
-
-
-
-
-
 

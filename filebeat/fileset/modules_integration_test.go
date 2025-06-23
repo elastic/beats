@@ -32,12 +32,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func makeTestInfo(version string) beat.Info {
+	logger, _ := logp.NewDevelopmentLogger("")
 	return beat.Info{
 		IndexPrefix: "filebeat",
 		Version:     version,
+		Logger:      logger,
 	}
 }
 
@@ -61,7 +64,7 @@ func TestLoadPipeline(t *testing.T) {
 		},
 	}
 
-	log := logp.NewLogger(logName)
+	log := logptest.NewTestingLogger(t, logName)
 	err := LoadPipeline(client, "my-pipeline-id", content, false, log)
 	require.NoError(t, err)
 
@@ -89,7 +92,7 @@ func checkUploadedPipeline(t *testing.T, client *eslegclient.Connection, expecte
 	var res map[string]interface{}
 	err = json.Unmarshal(response, &res)
 	if assert.NoError(t, err) {
-		assert.Equal(t, expectedDescription, res["my-pipeline-id"].(map[string]interface{})["description"], string(response))
+		assert.Equal(t, expectedDescription, res["my-pipeline-id"].(map[string]interface{})["description"], string(response)) //nolint:errcheck // Safe to ignore
 	}
 }
 

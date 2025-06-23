@@ -1,6 +1,21 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 steps:
+
+  - label: "Validate catalog-info"
+    if: build.pull_request.id != null
+    plugins:
+      monorepo-diff#v1.3.0:
+        diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+        wait: true
+        watch:
+          # if our catalog-info.yaml is changed, make sure it's well-formed according to our internal standards as well as Backstage's validation
+          - path: "catalog-info.yaml"
+            config:
+              command: "/agent/check-catalog-info.sh"
+              agents:
+                image: "docker.elastic.co/ci-agent-images/pipelib:0.13.0@sha256:190464950de81cb3390bd5e07bb1cc171dd4a765c1ce5de58ebca476f9a6839f"
+
   - label: "Trigger Auditbeat"
     if: build.pull_request.id != null
     plugins:
@@ -9,6 +24,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - auditbeat/
                 - .buildkite/auditbeat/
                 - .buildkite/scripts
@@ -44,6 +60,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - heartbeat/
                 - .buildkite/heartbeat/
                 - .buildkite/scripts
@@ -79,6 +96,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - filebeat/
                 - .buildkite/filebeat/
                 # CI related scripts
@@ -115,6 +133,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - filebeat/
                 - x-pack/filebeat/
                 - x-pack/libbeat/
@@ -153,6 +172,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - x-pack/dockerlogbeat/
                 - .buildkite/x-pack/pipeline.xpack.dockerlogbeat.yml
                 - .buildkite/hooks/
@@ -188,6 +208,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - metricbeat/
                 - .buildkite/metricbeat/
                 - .buildkite/scripts
@@ -223,6 +244,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - metricbeat/
                 - x-pack/metricbeat/
                 - x-pack/libbeat/common/aws
@@ -261,6 +283,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - x-pack/osquerybeat/**
                 - .buildkite/x-pack/pipeline.xpack.osquerybeat.yml
                 - .buildkite/scripts/**
@@ -299,6 +322,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - winlogbeat/
                 - x-pack/winlogbeat/
                 - .buildkite/x-pack/pipeline.xpack.winlogbeat.yml
@@ -335,6 +359,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - .buildkite/deploy/kubernetes/**
                 - .buildkite/hooks/
                 - .buildkite/scripts
@@ -366,6 +391,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - libbeat/
                 - .buildkite/libbeat/pipeline.libbeat.yml
                 - .buildkite/scripts
@@ -400,6 +426,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - libbeat/
                 - x-pack/libbeat/
                 - .buildkite/x-pack/pipeline.xpack.libbeat.yml
@@ -436,6 +463,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - auditbeat/
                 - x-pack/auditbeat/
                 - .buildkite/x-pack/pipeline.xpack.auditbeat.yml
@@ -473,6 +501,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - heartbeat/
                 - x-pack/heartbeat/
                 - .buildkite/x-pack/pipeline.xpack.heartbeat.yml
@@ -510,6 +539,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - packetbeat/
                 - x-pack/packetbeat/
                 - .buildkite/x-pack/pipeline.xpack.packetbeat.yml
@@ -547,6 +577,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - winlogbeat/
                 - .buildkite/winlogbeat/pipeline.winlogbeat.yml
                 - .buildkite/scripts
@@ -582,6 +613,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - packetbeat/
                 - .buildkite/packetbeat/pipeline.packetbeat.yml
                 - .buildkite/scripts/
@@ -617,6 +649,7 @@ steps:
           interpolation: false
           watch:
             - path:
+                - .go-version
                 - auditbeat/
                 - filebeat/
                 - heartbeat/

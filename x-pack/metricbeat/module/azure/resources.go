@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package azure
 
 import (
@@ -39,7 +41,9 @@ type Metric struct {
 	TimeGrain    string
 	ResourceId   string
 	// ResourceSubId is used for the metric values api as namespaces can apply to sub resources ex. storage account: container, blob, vm scaleset: vms
-	ResourceSubId string
+	ResourceSubId  string
+	Location       string
+	SubscriptionId string
 }
 
 // Dimension represents the azure metric dimension details
@@ -60,6 +64,23 @@ type MetricValue struct {
 	dimensions []Dimension
 }
 
+type MetricDefinitions struct {
+	Update  bool
+	Metrics map[string][]Metric
+}
+
+// ConcurrentResourceConfig represents the resource related configuration entered by the user
+type ConcurrentResourceConfig struct {
+	MetricDefinitions MetricDefinitions
+	RefreshInterval   time.Duration
+	lastUpdate        struct {
+		time.Time
+		sync.Mutex
+	}
+	MetricDefinitionsChan chan []Metric
+	ErrorChan             chan error
+}
+
 // ResourceConfiguration represents the resource related configuration entered by the user
 type ResourceConfiguration struct {
 	Metrics         []Metric
@@ -72,6 +93,20 @@ type ResourceConfiguration struct {
 
 // Expired will check for an expiration time and assign a new one
 func (p *ResourceConfiguration) Expired() bool {
+	if p.RefreshInterval <= 0 {
+		return true
+	}
+	p.lastUpdate.Lock()
+	defer p.lastUpdate.Unlock()
+	if p.lastUpdate.Add(p.RefreshInterval).After(time.Now()) {
+		return false
+	}
+	p.lastUpdate.Time = time.Now()
+	return true
+}
+
+// Expired will check for an expiration time and assign a new one
+func (p *ConcurrentResourceConfig) Expired() bool {
 	if p.RefreshInterval <= 0 {
 		return true
 	}

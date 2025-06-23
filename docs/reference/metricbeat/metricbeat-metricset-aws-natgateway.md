@@ -31,9 +31,7 @@ iam:ListAccountAliases
 
 The aws natgateway metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-natgateway-overview.png
-:alt: metricbeat aws natgateway overview
-:::
+![metricbeat aws natgateway overview](images/metricbeat-aws-natgateway-overview.png)
 
 
 ## Configuration example [_configuration_example_9]
@@ -52,9 +50,8 @@ The aws natgateway metricset comes with a predefined dashboard. For example:
 
 Metrics:
 
-|     |     |     |
-| --- | --- | --- |
 | Metric Name | Statistic Method | Description |
+| --- | --- | --- |
 | ActiveConnectionCount | Max | The total number of concurrent active TCP connections through the NAT gateway. |
 | BytesInFromDestination | Sum | The number of bytes received by the NAT gateway from the destination. |
 | BytesInFromSource | Sum | The number of bytes received by the NAT gateway from clients in your VPC. |
@@ -72,9 +69,8 @@ Metrics:
 
 Dimensions:
 
-|     |     |
-| --- | --- |
 | Dimension Name | Description |
+| --- | --- |
 | NatGatewayId | Filter the metric data by the NAT gateway ID. |
 
 Please see [NAT Gateway CloudWatch Metrics](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway-cloudwatch.html) for more details.

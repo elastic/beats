@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/require"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -114,6 +115,81 @@ var serverPoolTests = []struct {
 			{"json": mapstr.M{"b": int64(2)}},
 			{"json": mapstr.M{"c": int64(3)}},
 		},
+	},
+	{
+		name:   "options_with_headers",
+		method: http.MethodOptions,
+		cfgs: []*httpEndpoint{{
+			addr: "127.0.0.1:9001",
+			config: config{
+				ResponseCode:   http.StatusOK,
+				ResponseBody:   `{"message": "success"}`,
+				OptionsStatus:  http.StatusOK,
+				OptionsHeaders: http.Header{"option-header": {"options-header-value"}},
+				ListenAddress:  "127.0.0.1",
+				ListenPort:     "9001",
+				URL:            "/",
+				Prefix:         "json",
+				ContentType:    "application/json",
+			},
+		}},
+		events: []target{
+			{
+				url: "http://127.0.0.1:9001/", wantHeader: http.Header{
+					"Content-Length": {"0"},
+					"Option-Header":  {"options-header-value"},
+				},
+			},
+		},
+		wantStatus: http.StatusOK,
+	},
+	{
+		name:   "options_empty_headers",
+		method: http.MethodOptions,
+		cfgs: []*httpEndpoint{{
+			addr: "127.0.0.1:9001",
+			config: config{
+				ResponseCode:   http.StatusOK,
+				ResponseBody:   `{"message": "success"}`,
+				OptionsStatus:  http.StatusOK,
+				OptionsHeaders: http.Header{},
+				ListenAddress:  "127.0.0.1",
+				ListenPort:     "9001",
+				URL:            "/",
+				Prefix:         "json",
+				ContentType:    "application/json",
+			},
+		}},
+		events: []target{
+			{
+				url: "http://127.0.0.1:9001/", wantHeader: http.Header{
+					"Content-Length": {"0"},
+				},
+			},
+		},
+		wantStatus: http.StatusOK,
+	},
+	{
+		name:   "options_no_headers",
+		method: http.MethodOptions,
+		cfgs: []*httpEndpoint{{
+			addr: "127.0.0.1:9001",
+			config: config{
+				ResponseCode:   http.StatusOK,
+				ResponseBody:   `{"message": "success"}`,
+				OptionsStatus:  http.StatusOK,
+				OptionsHeaders: nil,
+				ListenAddress:  "127.0.0.1",
+				ListenPort:     "9001",
+				URL:            "/",
+				Prefix:         "json",
+				ContentType:    "application/json",
+			},
+		}},
+		events: []target{
+			{url: "http://127.0.0.1:9001/", wantBody: `{"message":"OPTIONS requests are only allowed with options_headers set"}` + "\n"},
+		},
+		wantStatus: http.StatusBadRequest,
 	},
 	{
 		name: "distinct_ports",
@@ -430,6 +506,18 @@ func TestServerPool(t *testing.T) {
 			wg.Wait()
 		})
 	}
+}
+
+func TestNewHTTPEndpoint(t *testing.T) {
+	cfg := config{
+		ListenAddress: "0:0:0:0:0:0:0:1",
+		ListenPort:    "9200",
+		ResponseBody:  "{}",
+		Method:        http.MethodPost,
+	}
+	h, err := newHTTPEndpoint(cfg)
+	require.NoError(t, err)
+	require.Equal(t, "[0:0:0:0:0:0:0:1]:9200", h.addr)
 }
 
 func doRequest(method, url, contentType string, body io.Reader) (*http.Response, error) {

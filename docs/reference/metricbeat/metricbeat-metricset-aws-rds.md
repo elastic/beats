@@ -26,9 +26,7 @@ iam:ListAccountAliases
 
 The aws rds metricset comes with a predefined dashboard.
 
-:::{image} images/metricbeat-aws-rds-overview.png
-:alt: metricbeat aws rds overview
-:::
+![metricbeat aws rds overview](images/metricbeat-aws-rds-overview.png)
 
 
 ## Configuration example [_configuration_example_10]

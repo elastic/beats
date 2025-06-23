@@ -6,6 +6,7 @@ package streaming
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"flag"
 	"net/url"
@@ -19,8 +20,9 @@ import (
 )
 
 var (
-	timeout = flag.Duration("crowdstrike_timeout", time.Minute, "time to allow Crowdstrike FalconHose test to run")
-	offset  = flag.Int("crowdstrike_offset", -1, "offset into stream (negative to ignore)")
+	timeout    = flag.Duration("crowdstrike_timeout", time.Minute, "time to allow Crowdstrike FalconHose test to run")
+	offset     = flag.Int("crowdstrike_offset", -1, "offset into stream (negative to ignore)")
+	cursorText = flag.String("cursor", "", "cursor JSON to inject into test")
 )
 
 func TestCrowdstrikeFalconHose(t *testing.T) {
@@ -29,23 +31,33 @@ func TestCrowdstrikeFalconHose(t *testing.T) {
 
 	feedURL, ok := os.LookupEnv("CROWDSTRIKE_URL")
 	if !ok {
-		t.Skip("okta tests require ${CROWDSTRIKE_URL} to be set")
+		t.Skip("crowdstrike tests require ${CROWDSTRIKE_URL} to be set")
 	}
 	tokenURL, ok := os.LookupEnv("CROWDSTRIKE_TOKEN_URL")
 	if !ok {
-		t.Skip("okta tests require ${CROWDSTRIKE_TOKEN_URL} to be set")
+		t.Skip("crowdstrike tests require ${CROWDSTRIKE_TOKEN_URL} to be set")
 	}
 	clientID, ok := os.LookupEnv("CROWDSTRIKE_CLIENT_ID")
 	if !ok {
-		t.Skip("okta tests require ${CROWDSTRIKE_CLIENT_ID} to be set")
+		t.Skip("crowdstrike tests require ${CROWDSTRIKE_CLIENT_ID} to be set")
 	}
 	clientSecret, ok := os.LookupEnv("CROWDSTRIKE_CLIENT_SECRET")
 	if !ok {
-		t.Skip("okta tests require ${CROWDSTRIKE_CLIENT_SECRET} to be set")
+		t.Skip("crowdstrike tests require ${CROWDSTRIKE_CLIENT_SECRET} to be set")
 	}
 	appID, ok := os.LookupEnv("CROWDSTRIKE_APPID")
 	if !ok {
-		t.Skip("okta tests require ${CROWDSTRIKE_APPID} to be set")
+		t.Skip("crowdstrike tests require ${CROWDSTRIKE_APPID} to be set")
+	}
+
+	var state map[string]any
+	if *cursorText != "" {
+		var crsr any
+		err := json.Unmarshal([]byte(*cursorText), &crsr)
+		if err != nil {
+			t.Fatalf("failed to parse cursor text: %v", err)
+		}
+		state = map[string]any{"cursor": crsr}
 	}
 
 	u, err := url.Parse(feedURL)
@@ -58,10 +70,9 @@ func TestCrowdstrikeFalconHose(t *testing.T) {
 		Program: `
 				state.response.decode_json().as(body,{
 					"events": [body],
-					?"cursor": has(body.?metadata.offset) ?
-						optional.of({"offset": body.metadata.offset})
-					:
-						optional.none(),
+					"cursor": state.cursor.with({
+						?state.feed: body.?metadata.optMap(m, {"offset": m.offset}),
+					}),
 				})`,
 		Auth: authConfig{
 			OAuth2: oAuth2Config{
@@ -71,6 +82,7 @@ func TestCrowdstrikeFalconHose(t *testing.T) {
 			},
 		},
 		CrowdstrikeAppID: appID,
+		State:            state,
 	}
 
 	err = cfg.Validate()
@@ -83,7 +95,7 @@ func TestCrowdstrikeFalconHose(t *testing.T) {
 	if *offset >= 0 {
 		cursor = map[string]any{"offset": *offset}
 	}
-	s, err := NewFalconHoseFollower(ctx, "crowdstrike_testing", cfg, cursor, &testPublisher{logger}, logger, time.Now)
+	s, err := NewFalconHoseFollower(ctx, "crowdstrike_testing", cfg, cursor, &testPublisher{logger}, nil, logger, time.Now)
 	if err != nil {
 		t.Fatalf("unexpected error constructing follower: %v", err)
 	}

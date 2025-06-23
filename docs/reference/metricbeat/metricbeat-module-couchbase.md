@@ -17,9 +17,7 @@ The Couchbase module is tested with Couchbase 6.5.1.
 
 The Couchbase module comes with a predefined dashboard for Couchbase cluster, node, bucket specific stats. For example:
 
-:::{image} images/metricbeat-couchbase-overview.png
-:alt: metricbeat couchbase overview
-:::
+![metricbeat couchbase overview](images/metricbeat-couchbase-overview.png)
 
 
 ## Example configuration [_example_configuration_16]

@@ -18,9 +18,7 @@ The `net_clr` object which returns ASP.NET error rate counter values. Users can 
 
 ### Dashboard [_dashboard_27]
 
-:::{image} images/metricbeat-iis-application-pool-overview.png
-:alt: metricbeat iis application pool overview
-:::
+![metricbeat iis application pool overview](images/metricbeat-iis-application-pool-overview.png)
 
 ## Fields [_fields_117]
 

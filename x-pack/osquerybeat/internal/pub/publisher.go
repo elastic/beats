@@ -190,7 +190,7 @@ func actionResultToEvent(req, res map[string]interface{}) map[string]interface{}
 }
 
 func (p *Publisher) processorsForInputConfig(inCfg config.InputConfig, defaultDataset string) (procs *processors.Processors, err error) {
-	procs = processors.NewList(nil)
+	procs = processors.NewList(p.log)
 
 	// Use only first input processor
 	// Every input will have a processor that adds the elastic_agent info, we need only one
@@ -215,7 +215,7 @@ func (p *Publisher) processorsForInputConfig(inCfg config.InputConfig, defaultDa
 
 		procs.AddProcessor(add_data_stream.New(ds))
 
-		userProcs, err := processors.New(inCfg.Processors)
+		userProcs, err := processors.New(inCfg.Processors, p.log)
 		if err != nil {
 			return nil, err
 		}

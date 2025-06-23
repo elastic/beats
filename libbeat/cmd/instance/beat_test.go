@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-ucfg/yaml"
 
 	"github.com/gofrs/uuid/v5"
@@ -62,7 +63,6 @@ func TestNewInstance(t *testing.T) {
 	}
 	assert.Equal(t, "testbeat", b.Info.Beat)
 	assert.Equal(t, "testbeat", b.Info.IndexPrefix)
-
 }
 
 func TestNewInstanceUUID(t *testing.T) {
@@ -124,7 +124,7 @@ func TestInitKibanaConfig(t *testing.T) {
 
 func TestEmptyMetaJson(t *testing.T) {
 	b, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	b.Info.Logger = logger
 	if err != nil {
 		panic(err)
@@ -139,7 +139,7 @@ func TestEmptyMetaJson(t *testing.T) {
 	defer os.Remove(metaPath)
 
 	// load metadata
-	err = b.loadMeta(metaPath)
+	err = b.LoadMeta(metaPath)
 
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
 	assert.NotEqual(t, uuid.Nil, b.Info.ID, "Beats UUID is not set")
@@ -147,7 +147,7 @@ func TestEmptyMetaJson(t *testing.T) {
 
 func TestMetaJsonWithTimestamp(t *testing.T) {
 	firstBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	firstBeat.Info.Logger = logger
 	if err != nil {
 		panic(err)
@@ -161,7 +161,7 @@ func TestMetaJsonWithTimestamp(t *testing.T) {
 	metaFile.Close()
 	defer os.Remove(metaPath)
 
-	err = firstBeat.loadMeta(metaPath)
+	err = firstBeat.LoadMeta(metaPath)
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
 
 	secondBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
@@ -170,7 +170,7 @@ func TestMetaJsonWithTimestamp(t *testing.T) {
 	}
 	secondBeat.Info.Logger = logger
 	assert.False(t, firstStart.Equal(secondBeat.Info.FirstStart), "Before meta.json is loaded, first start must be different")
-	err = secondBeat.loadMeta(metaPath)
+	err = secondBeat.LoadMeta(metaPath)
 	require.NoError(t, err)
 
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
@@ -257,7 +257,7 @@ elasticsearch:
 
 		update := &reload.ConfigWithMeta{Config: c}
 		m := &outputReloaderMock{}
-		reloader := b.makeOutputReloader(m)
+		reloader := b.MakeOutputReloader(m)
 
 		require.False(t, b.Config.Output.IsSet(), "the output should not be set yet")
 		require.True(t, b.isConnectionToOlderVersionAllowed(), "allow_older_versions flag should be true from 8.11")
@@ -337,7 +337,7 @@ output:
 			err = cfg.Unpack(&config)
 			require.NoError(t, err)
 
-			logger := logp.NewTestingLogger(t, "")
+			logger := logptest.NewTestingLogger(t, "")
 
 			b := &Beat{Config: config, Beat: beat.Beat{
 				Info: beat.Info{
@@ -345,7 +345,7 @@ output:
 				},
 			}}
 
-			err = promoteOutputQueueSettings(b)
+			err = PromoteOutputQueueSettings(b)
 			require.NoError(t, err)
 
 			ms, err := memqueue.SettingsForUserConfig(b.Config.Pipeline.Queue.Config())

@@ -27,7 +27,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -37,7 +37,7 @@ import (
 
 func TestRunnerFactory_CheckConfig(t *testing.T) {
 	t.Run("does not run or test configured input", func(t *testing.T) {
-		log := logp.NewLogger("test")
+		log := logptest.NewTestingLogger(t, "")
 		var countConfigure, countTest, countRun int
 
 		// setup
@@ -51,7 +51,7 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 			},
 		})
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
-		factory := RunnerFactory(log, beat.Info{}, loader.Loader)
+		factory := RunnerFactory(log, beat.Info{}, monitoring.NewRegistry(), loader.Loader)
 
 		// run
 		err := factory.CheckConfig(conf.NewConfig())
@@ -66,7 +66,7 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 	})
 
 	t.Run("does not cause input ID duplication", func(t *testing.T) {
-		log := logp.NewLogger("test")
+		log := logptest.NewTestingLogger(t, "")
 		var countConfigure, countTest, countRun int
 		var runWG sync.WaitGroup
 		var ids = map[string]int{}
@@ -96,9 +96,8 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
 		factory := RunnerFactory(
 			log,
-			beat.Info{Monitoring: beat.Monitoring{
-				Namespace: monitoring.GetNamespace("TestRunnerFactory_CheckConfig")},
-				Logger: log},
+			beat.Info{Logger: log},
+			monitoring.NewRegistry(),
 			loader.Loader)
 
 		inputID := "filestream-kubernetes-pod-aee2af1c6365ecdd72416f44aab49cd8bdc7522ab008c39784b7fd9d46f794a4"
@@ -137,14 +136,13 @@ type: test
 	})
 
 	t.Run("fail if input type is unknown to loader", func(t *testing.T) {
-		log := logp.NewLogger("test")
+		log := logptest.NewTestingLogger(t, "")
 		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(nil))
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "")
 		factory := RunnerFactory(
 			log,
-			beat.Info{Monitoring: beat.Monitoring{
-				Namespace: monitoring.GetNamespace("TestRunnerFactory_CheckConfig")},
-				Logger: log},
+			beat.Info{Logger: log},
+			monitoring.NewRegistry(),
 			loader.Loader)
 
 		// run
@@ -157,7 +155,7 @@ type: test
 
 func TestRunnerFactory_CreateAndRun(t *testing.T) {
 	t.Run("runner can correctly start and stop inputs", func(t *testing.T) {
-		log := logp.NewLogger("test")
+		log := logptest.NewTestingLogger(t, "")
 		var countRun int
 		var wg sync.WaitGroup
 		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(&inputest.MockInput{
@@ -171,9 +169,8 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
 		factory := RunnerFactory(
 			log,
-			beat.Info{Monitoring: beat.Monitoring{
-				Namespace: monitoring.GetNamespace("TestRunnerFactory_CheckConfig")},
-				Logger: log},
+			beat.Info{Logger: log},
+			monitoring.NewRegistry(),
 			loader.Loader)
 
 		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
@@ -189,10 +186,10 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 	})
 
 	t.Run("fail if input type is unknown to loader", func(t *testing.T) {
-		log := logp.NewLogger("test")
+		log := logptest.NewTestingLogger(t, "")
 		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(nil))
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "")
-		factory := RunnerFactory(log, beat.Info{}, loader.Loader)
+		factory := RunnerFactory(log, beat.Info{}, monitoring.NewRegistry(), loader.Loader)
 
 		// run
 		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{

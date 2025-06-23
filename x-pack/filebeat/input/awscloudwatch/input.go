@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-concert/unison"
@@ -27,17 +28,18 @@ const (
 	inputName = "aws-cloudwatch"
 )
 
-func Plugin() v2.Plugin {
+func Plugin(store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "Collect logs from cloudwatch",
-		Manager:    &cloudwatchInputManager{},
+		Manager:    &cloudwatchInputManager{store: store},
 	}
 }
 
 type cloudwatchInputManager struct {
+	store statestore.States
 }
 
 func (im *cloudwatchInputManager) Init(grp unison.Group) error {
@@ -50,17 +52,18 @@ func (im *cloudwatchInputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	return newInput(config)
+	return newInput(config, im.store)
 }
 
 // cloudwatchInput is an input for reading logs from CloudWatch periodically.
 type cloudwatchInput struct {
 	config    config
 	awsConfig awssdk.Config
+	store     statestore.States
 	metrics   *inputMetrics
 }
 
-func newInput(config config) (*cloudwatchInput, error) {
+func newInput(config config, store statestore.States) (*cloudwatchInput, error) {
 	cfgwarn.Beta("aws-cloudwatch input type is used")
 
 	// perform AWS configuration validation
@@ -71,6 +74,7 @@ func newInput(config config) (*cloudwatchInput, error) {
 
 	return &cloudwatchInput{
 		config:    config,
+		store:     store,
 		awsConfig: awsConfig,
 	}, nil
 }
@@ -83,13 +87,13 @@ func (in *cloudwatchInput) Test(ctx v2.TestContext) error {
 
 func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+	log := inputContext.Logger
 
-	// Create client for publishing events and receive notification of their ACKs.
-	client, err := pipeline.ConnectWith(beat.ClientConfig{})
+	handler, err := newStateHandler(log, in.config, in.store)
 	if err != nil {
-		return fmt.Errorf("failed to create pipeline client: %w", err)
+		return fmt.Errorf("failed to create state handler: %w", err)
 	}
-	defer client.Close()
+	defer handler.Close()
 
 	var logGroupIDs []string
 	logGroupIDs, region, err := fromConfig(in.config, in.awsConfig)
@@ -113,17 +117,21 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		}
 	}
 
-	log := inputContext.Logger
 	in.metrics = newInputMetrics(inputContext.ID, nil)
 	defer in.metrics.Close()
 	cwPoller := newCloudwatchPoller(
 		log.Named("cloudwatch_poller"),
 		in.metrics,
 		region,
-		in.config)
-	logProcessor := newLogProcessor(log.Named("log_processor"), in.metrics, client, ctx)
+		in.config,
+		handler)
+
 	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupIDs)))
-	cwPoller.startWorkers(ctx, svc, logProcessor)
+	cwPoller.startWorkers(ctx, svc, pipeline)
+
+	log.Debugf("Config latency = %f", cwPoller.config.Latency)
+	log.Debugf("Config scan_frequency = %f", cwPoller.config.ScanFrequency)
+	log.Debugf("Config api_sleep = %f", cwPoller.config.APISleep)
 	cwPoller.receive(ctx, logGroupIDs, time.Now)
 	return nil
 }

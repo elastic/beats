@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-auditd.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Auditd fields [exported-fields-auditd]
 
 Module for parsing auditd logs.
@@ -117,13 +119,11 @@ type: keyword
 type: keyword
 
 
-
 ## auditd [_auditd]
 
 Fields from the auditd logs.
 
-
-## log [_log_2]
+## log [_log]
 
 Fields from the Linux audit log. Not all fields are documented here because they are dynamic and vary by audit event type.
 

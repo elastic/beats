@@ -34,7 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
@@ -234,7 +234,7 @@ func newCommonPublishConfigs(info beat.Info, beatLocation *config.LocationWithID
 		return nil, err
 	}
 
-	userProcessors, err := processors.New(settings.Processors)
+	userProcessors, err := processors.New(settings.Processors, info.Logger)
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +247,7 @@ func newCommonPublishConfigs(info beat.Info, beatLocation *config.LocationWithID
 			_, _ = meta.Put("pipeline", settings.Pipeline)
 		}
 
-		procs := processors.NewList(nil)
+		procs := processors.NewList(info.Logger)
 
 		if lst := clientCfg.Processing.Processor; lst != nil {
 			procs.AddProcessor(lst)
@@ -272,7 +272,7 @@ var geoErrOnce = &sync.Once{}
 
 // preProcessors sets up the required geo, event.dataset, data_stream.*, and write index processors for future event publishes.
 func preProcessors(info beat.Info, location *config.LocationWithID, settings publishSettings, monitorType string) (procs *processors.Processors, err error) {
-	procs = processors.NewList(nil)
+	procs = processors.NewList(info.Logger)
 
 	var dataset string
 	if settings.DataStream != nil && settings.DataStream.Dataset != "" {
@@ -282,7 +282,7 @@ func preProcessors(info beat.Info, location *config.LocationWithID, settings pub
 	}
 
 	// Always set event.dataset
-	procs.AddProcessor(actions.NewAddFields(mapstr.M{"event": mapstr.M{"dataset": dataset}}, true, true))
+	procs.AddProcessor(addfields.NewAddFields(mapstr.M{"event": mapstr.M{"dataset": dataset}}, true, true))
 
 	// If we have a location to add, use the add_observer_metadata processor
 	if location != nil {
@@ -302,7 +302,7 @@ func preProcessors(info beat.Info, location *config.LocationWithID, settings pub
 			},
 		}
 
-		procs.AddProcessor(actions.NewAddFields(obsFields, true, true))
+		procs.AddProcessor(addfields.NewAddFields(obsFields, true, true))
 	}
 
 	// always use synthetics data streams for browser monitors, there is no good reason not to

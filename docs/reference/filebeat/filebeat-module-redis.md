@@ -66,7 +66,7 @@ The following example shows how to set paths in the `modules.d/redis.yml` file t
   slowlog:
     enabled: true
     var.hosts: ["localhost:6378"]
-    var.password: "{pwd}"
+    var.password: "YOUR_PASSWORD"
 ```
 
 To specify the same settings at the command line, you use:
@@ -107,10 +107,8 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 This module comes with a sample dashboard. For example:
 
-:::{image} images/kibana-redis.png
-:alt: kibana redis
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana redis](images/kibana-redis.png)
 
 
 ## Fields [_fields_46]

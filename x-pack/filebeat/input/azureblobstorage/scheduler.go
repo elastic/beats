@@ -54,13 +54,18 @@ type scheduler struct {
 	log        *logp.Logger
 	limiter    *limiter
 	serviceURL string
+	metrics    *inputMetrics
 }
 
 // newScheduler, returns a new scheduler instance
 func newScheduler(publisher cursor.Publisher, client *azcontainer.Client,
 	credential *serviceCredentials, src *Source, cfg *config,
-	state *state, serviceURL string, log *logp.Logger,
+	state *state, serviceURL string, metrics *inputMetrics, log *logp.Logger,
 ) *scheduler {
+	if metrics == nil {
+		// metrics are optional, initialize a stub if not provided
+		metrics = newInputMetrics("", nil)
+	}
 	return &scheduler{
 		publisher:  publisher,
 		client:     client,
@@ -71,6 +76,7 @@ func newScheduler(publisher cursor.Publisher, client *azcontainer.Client,
 		log:        log,
 		limiter:    &limiter{limit: make(chan struct{}, src.MaxWorkers)},
 		serviceURL: serviceURL,
+		metrics:    metrics,
 	}
 }
 
@@ -88,6 +94,7 @@ func (s *scheduler) schedule(ctx context.Context) error {
 
 		err = timed.Wait(ctx, s.src.PollInterval)
 		if err != nil {
+			s.metrics.errorsTotal.Inc()
 			return err
 		}
 	}
@@ -102,11 +109,13 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 	for pager.More() {
 		resp, err := pager.NextPage(ctx)
 		if err != nil {
+			s.metrics.errorsTotal.Inc()
 			return err
 		}
 
 		numBlobs += len(resp.Segment.BlobItems)
 		s.log.Debugf("scheduler: %d blobs fetched for current batch", len(resp.Segment.BlobItems))
+		s.metrics.absBlobsListedTotal.Add(uint64(len(resp.Segment.BlobItems)))
 
 		var jobs []*job
 		for _, v := range resp.Segment.BlobItems {
@@ -127,11 +136,12 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 
 			blobClient, err := fetchBlobClient(blobURL, blobCreds, *s.cfg, s.log)
 			if err != nil {
+				s.metrics.errorsTotal.Inc()
 				s.log.Errorf("Job creation failed for container %s with error %v", s.src.ContainerName, err)
 				return err
 			}
 
-			job := newJob(blobClient, v, blobURL, s.state, s.src, s.publisher, s.log)
+			job := newJob(blobClient, v, blobURL, s.state, s.src, s.publisher, s.metrics, s.log)
 			jobs = append(jobs, job)
 		}
 
@@ -141,11 +151,29 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 		}
 
 		s.log.Debugf("scheduler: %d jobs scheduled for current batch", len(jobs))
+		s.metrics.absJobsScheduledAfterValidation.Update(int64(len(jobs)))
+		numJobs += len(jobs)
 
 		// distributes jobs among workers with the help of a limiter
 		for i, job := range jobs {
 			id := fetchJobID(i, s.src.ContainerName, job.name())
 			job := job
+			// sets the content type and encoding for the job blob properties based on the reader configuration.
+			// If the override flags are set, it will use the provided content type and encoding. If not,
+			// it will only set them if they are not already defined.
+			readerCfg := s.src.ReaderConfig
+			if readerCfg.ContentType != "" {
+				if readerCfg.OverrideContentType || isStringUnset(job.blob.Properties.ContentType) {
+					job.blob.Properties.ContentType = &readerCfg.ContentType
+				}
+			}
+			if readerCfg.Encoding != "" {
+				if readerCfg.OverrideEncoding || isStringUnset(job.blob.Properties.ContentEncoding) {
+					job.blob.Properties.ContentEncoding = &readerCfg.Encoding
+				}
+			}
+			// acquire a worker thread from the limiter, and schedule the job
+			// to be executed in a goroutine.
 			s.limiter.acquire()
 			go func() {
 				defer s.limiter.release()
@@ -214,4 +242,8 @@ func (s *scheduler) isFileSelected(name string) bool {
 		}
 	}
 	return false
+}
+
+func isStringUnset(s *string) bool {
+	return s == nil || *s == ""
 }

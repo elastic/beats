@@ -5,7 +5,6 @@
 package awscloudwatch
 
 import (
-	"context"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
@@ -21,7 +20,7 @@ type logProcessor struct {
 	publisher beat.Client
 }
 
-func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Client, ctx context.Context) *logProcessor {
+func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Client) *logProcessor {
 	if metrics == nil {
 		metrics = newInputMetrics("", nil)
 	}
@@ -42,7 +41,7 @@ func (p *logProcessor) processLogEvents(logEvents []types.FilteredLogEvent, logG
 
 func createEvent(logEvent types.FilteredLogEvent, logGroupId string, regionName string) beat.Event {
 	event := beat.Event{
-		Timestamp: time.Unix(*logEvent.Timestamp/1000, 0).UTC(),
+		Timestamp: time.UnixMilli(*logEvent.Timestamp).UTC(),
 		Fields: mapstr.M{
 			"message": *logEvent.Message,
 			"log": mapstr.M{
@@ -57,7 +56,7 @@ func createEvent(logEvent types.FilteredLogEvent, logGroupId string, regionName 
 			"aws.cloudwatch": mapstr.M{
 				"log_group":      logGroupId,
 				"log_stream":     *logEvent.LogStreamName,
-				"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
+				"ingestion_time": time.UnixMilli(*logEvent.IngestionTime),
 			},
 			"cloud": mapstr.M{
 				"provider": "aws",

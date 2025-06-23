@@ -158,9 +158,6 @@ func TestOktaDoFetch(t *testing.T) {
 				}
 				status := states[n%len(states)]
 				state := Discovered
-				if status == "DEPROVISIONED" {
-					state = Deleted
-				}
 				wantStates[id] = state
 
 				replacer := strings.NewReplacer(

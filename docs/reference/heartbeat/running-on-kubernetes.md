@@ -15,7 +15,7 @@ Running {{ecloud}} on Kubernetes? See [Run {{beats}} on ECK](docs-content://depl
 % However, version {{stack-version}} of Heartbeat has not yet been released, so no Docker image is currently available for this version.
 
 
-## Kubernetes deploy manifests [_kubernetes_deploy_manifests]
+## Kubernetes deploy manifests for Heartbeat [_kubernetes_deploy_manifests]
 
 A single Heartbeat can check for uptime of the whole cluster.
 
@@ -23,8 +23,8 @@ Everything is deployed under `kube-system` namespace, you can change that by upd
 
 To get the manifests just run:
 
-```sh
-curl -L -O https://raw.githubusercontent.com/elastic/beats/master/deploy/kubernetes/heartbeat-kubernetes.yaml
+```sh subs=true
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/kubernetes/heartbeat-kubernetes.yaml
 ```
 
 ::::{warning}

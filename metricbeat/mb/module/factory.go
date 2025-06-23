@@ -27,9 +27,10 @@ import (
 // Factory creates new Runner instances from configuration objects.
 // It is used to register and reload modules.
 type Factory struct {
-	beatInfo beat.Info
-	options  []Option
-	registry *mb.Register
+	beatInfo   beat.Info
+	monitoring beat.Monitoring
+	options    []Option
+	registry   *mb.Register
 }
 
 // metricSetWithProcessors is an interface to check if a MetricSet has directly attached Processors
@@ -41,24 +42,25 @@ type metricSetWithProcessors interface {
 }
 
 // NewFactory creates new Reloader instance for the given config
-func NewFactory(beatInfo beat.Info, registry *mb.Register, options ...Option) *Factory {
+func NewFactory(beatInfo beat.Info, monitoring beat.Monitoring, registry *mb.Register, options ...Option) *Factory {
 	return &Factory{
-		beatInfo: beatInfo,
-		options:  options,
-		registry: registry,
+		beatInfo:   beatInfo,
+		monitoring: monitoring,
+		options:    options,
+		registry:   registry,
 	}
 }
 
 // Create creates a new metricbeat module runner reporting events to the passed pipeline.
 func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, error) {
-	module, metricSets, err := mb.NewModule(c, r.registry)
+	module, metricSets, err := mb.NewModule(c, r.registry, r.beatInfo.Logger)
 	if err != nil {
 		return nil, err
 	}
 
 	runners := make([]cfgfile.Runner, 0, len(metricSets))
 	for _, metricSet := range metricSets {
-		wrapper, err := NewWrapperForMetricSet(module, metricSet, r.options...)
+		wrapper, err := NewWrapperForMetricSet(module, metricSet, r.monitoring, r.options...)
 		if err != nil {
 			return nil, err
 		}
@@ -89,7 +91,7 @@ func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, e
 
 // CheckConfig checks if a config is valid or not
 func (r *Factory) CheckConfig(config *conf.C) error {
-	_, err := NewWrapper(config, r.registry, r.options...)
+	_, err := NewWrapper(config, r.registry, r.beatInfo.Logger, r.monitoring, r.options...)
 	if err != nil {
 		return err
 	}

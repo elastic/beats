@@ -28,10 +28,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -50,7 +53,7 @@ func TestProcessorsForConfig(t *testing.T) {
 			},
 		},
 		"Index with agent info + timestamp": {
-			beatInfo:  beat.Info{Beat: "TestBeat", Version: "3.9.27"},
+			beatInfo:  beat.Info{Beat: "TestBeat", Version: "3.9.27", Logger: logptest.NewTestingLogger(t, "")},
 			configStr: "index: 'beat-%{[agent.name]}-%{[agent.version]}-%{+yyyy.MM.dd}'",
 			event:     beat.Event{Timestamp: time.Date(1999, time.December, 31, 23, 0, 0, 0, time.UTC)},
 			expectedFields: map[string]string{
@@ -87,7 +90,7 @@ func TestProcessorsForConfig(t *testing.T) {
 		"Set field in ClientConfig": {
 			clientCfg: beat.ClientConfig{
 				Processing: beat.ProcessingConfig{
-					Processor: makeProcessors(actions.NewAddFields(mapstr.M{
+					Processor: makeProcessors(addfields.NewAddFields(mapstr.M{
 						"fields": mapstr.M{"testField": "clientConfig"},
 					}, false, true)),
 				},
@@ -100,7 +103,7 @@ func TestProcessorsForConfig(t *testing.T) {
 			configStr: `processors: [add_fields: {fields: {testField: inputConfig}}]`,
 			clientCfg: beat.ClientConfig{
 				Processing: beat.ProcessingConfig{
-					Processor: makeProcessors(actions.NewAddFields(mapstr.M{
+					Processor: makeProcessors(addfields.NewAddFields(mapstr.M{
 						"fields": mapstr.M{"testField": "clientConfig"},
 					}, false, true)),
 				},
@@ -185,7 +188,7 @@ func TestProcessorsForConfigIsFlat(t *testing.T) {
 	require.NoError(t, err)
 
 	lst := clientCfg.Processing.Processor
-	assert.Equal(t, 2, len(lst.(*processors.Processors).List))
+	assert.Equal(t, 2, len(lst.(*processors.Processors).List)) //nolint:errcheck //Safe to ignore in tests
 }
 
 // setRawIndex is a bare-bones processor to set the raw_index field to a
@@ -209,7 +212,8 @@ func (p *setRawIndex) String() string {
 
 // makeProcessors wraps one or more bare Processor objects in Processors.
 func makeProcessors(procs ...beat.Processor) *processors.Processors {
-	procList := processors.NewList(nil)
+	logger, _ := logp.NewDevelopmentLogger("")
+	procList := processors.NewList(logger)
 	procList.List = procs
 	return procList
 }
@@ -234,7 +238,7 @@ index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
 	cfg, err := conf.NewConfigWithYAML([]byte(configYAML), configYAML)
 	require.NoError(t, err)
 
-	b := beat.Info{} // not important for the test
+	b := beat.Info{Logger: logptest.NewTestingLogger(t, "")} // not important for the test
 	rf := &runnerFactoryMock{
 		clientCount: 3, // we will create 3 clients from the wrapped pipeline
 	}

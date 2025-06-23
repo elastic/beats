@@ -111,6 +111,20 @@ var inputTests = []struct {
 		}},
 	},
 	{
+		name: "hello_world_bytes",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":string(hex_decode("68656c6c6f20776f726c64"))}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{{
+			"message": "hello world",
+		}},
+	},
+	{
 		name: "hello_world_front_and_tail_2",
 		config: map[string]interface{}{
 			"interval": 1,
@@ -2205,7 +2219,7 @@ func digestAuthHandler(user, pass, realm, nonce string, handle http.HandlerFunc)
 	chal := &digest.Challenge{
 		Realm:     realm,
 		Nonce:     nonce,
-		Algorithm: "MD5",
+		Algorithm: "SHA-256",
 		QOP:       []string{"auth"},
 	}
 	return func(w http.ResponseWriter, r *http.Request) {

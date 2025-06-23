@@ -37,6 +37,7 @@ const (
 	beatsNdJSONBucket        = "beatsndjsonbucket"
 	beatsGzJSONBucket        = "beatsgzjsonbucket"
 	beatsJSONWithArrayBucket = "beatsjsonwitharraybucket"
+	beatsCSVBucket           = "beatscsvbucket"
 )
 
 func Test_StorageClient(t *testing.T) {
@@ -592,6 +593,72 @@ func Test_StorageClient(t *testing.T) {
 			mockHandler: mock.GCSRetryServer,
 			expected:    map[string]bool{},
 			isError:     errors.New("requires value >= 1.1 accessing 'retry.backoff_multiplier'"),
+		},
+		{
+			name: "BatchSizeGlobal",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"batch_size":                 3,
+				"max_workers":                2,
+				"poll":                       true,
+				"poll_interval":              "5s",
+				"buckets": []map[string]interface{}{
+					{
+						"name": "gcs-test-new",
+					},
+				},
+			},
+			mockHandler: mock.GCSServer,
+			expected: map[string]bool{
+				mock.Gcs_test_new_object_ata_json:      true,
+				mock.Gcs_test_new_object_data3_json:    true,
+				mock.Gcs_test_new_object_docs_ata_json: true,
+			},
+		},
+		{
+			name: "BatchSizeBucketLevel",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"max_workers":                2,
+				"poll":                       true,
+				"poll_interval":              "5s",
+				"buckets": []map[string]interface{}{
+					{
+						"name":       "gcs-test-new",
+						"batch_size": 3,
+					},
+				},
+			},
+			mockHandler: mock.GCSServer,
+			expected: map[string]bool{
+				mock.Gcs_test_new_object_ata_json:      true,
+				mock.Gcs_test_new_object_data3_json:    true,
+				mock.Gcs_test_new_object_docs_ata_json: true,
+			},
+		},
+		{
+			name: "ReadCSV",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "10s",
+				"decoding.codec.csv.enabled": true,
+				"decoding.codec.csv.comma":   " ",
+				"buckets": []map[string]interface{}{
+					{
+						"name": beatsCSVBucket,
+					},
+				},
+			},
+			mockHandler: mock.GCSFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesBucket_csv[0]: true,
+				mock.BeatsFilesBucket_csv[1]: true,
+			},
 		},
 	}
 	for _, tt := range tests {
