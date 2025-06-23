@@ -41,7 +41,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -56,7 +56,6 @@ type eventInfo struct {
 }
 
 func TestKafkaPublish(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("kafka"))
 
 	id := strconv.Itoa(rand.Int())
 	testTopic := fmt.Sprintf("test-libbeat-%s", id)
@@ -274,7 +273,8 @@ func TestKafkaPublish(t *testing.T) {
 		}
 
 		t.Run(name, func(t *testing.T) {
-			grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat"}, outputs.NewNilObserver(), cfg)
+			logger := logptest.NewTestingLogger(t, "")
+			grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat", Logger: logger}, outputs.NewNilObserver(), cfg)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -319,7 +319,7 @@ func TestKafkaPublish(t *testing.T) {
 
 			validate := validateJSON
 			if fmt, exists := test.config["codec.format.string"]; exists {
-				validate = makeValidateFmtStr(fmt.(string))
+				validate = makeValidateFmtStr(fmt.(string)) //nolint:errcheck //This is a test file
 			}
 
 			cfgHeaders, headersSet := test.config["headers"]
