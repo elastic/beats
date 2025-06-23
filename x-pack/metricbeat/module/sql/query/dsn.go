@@ -176,6 +176,9 @@ func postgresParseDSN(config ConnectionDetails, host string) (mb.HostData, error
 		}, nil
 	}
 
+	// If ssl.enabled param is false (default) we choose to maintain backward compatibility
+	// by calling defaultParseDSN which passes the unchanged and unparsed connection string `host`
+	// to the database driver (to support database-specific formats of DSN, not just URLs)
 	return defaultParseDSN(config, host)
 }
 
@@ -238,5 +241,8 @@ func mssqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
 		}, nil
 	}
 
+	// If ssl.enabled param is false (default) we choose to maintain backward compatibility
+	// by calling defaultParseDSN which passes the unchanged and unparsed connection string `host`
+	// to the database driver (to support database-specific formats of DSN, not just URLs)
 	return defaultParseDSN(config, host)
 }
