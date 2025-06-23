@@ -7,6 +7,7 @@ package ipfix
 import (
 	"bufio"
 	"bytes"
+	"compress/gzip"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -16,11 +17,13 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 
+	libbeat_reader "github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/convert"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 	v9 "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/v9"
 )
+
 // Copied from x-pack/filebeat/input/awss3/s3_objects.go
 //
 // isStreamGzipped determines whether the given stream of bytes (encapsulated in a buffered reader)
@@ -50,6 +53,19 @@ func (p *netflowInput) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error)
 
 	return gzip.NewReader(bufReader)
 }
+
+type IPFIXReader struct {
+	cfg    *Config
+	reader libbeat_reader.Reader
+	logger *logp.Logger
+}
+
+func (r *IPFIXReader) Next() (libbeat_reader.Message, error) {
+	// need to handle reading things
+	// r.reader
+	return libbeat_reader.Message{}, nil
+}
+
 // BufferedReader parses ipfix inputs from io streams.
 type BufferedReader struct {
 	decoder v9.Decoder
@@ -133,9 +149,7 @@ func (sr *BufferedReader) Record() ([]beat.Event, error) {
 	// if the version is wrong, nothing else to read
 	if version != 10 {
 		// TODO: read the rest of the packet and skip it
-		if length >= 4 {
-			sr.reader_.Discard(int(length))
-		}
+		sr.reader_.Discard(int(length))
 		return nil, fmt.Errorf("incorrect version (%v)", version)
 	}
 
