@@ -182,7 +182,7 @@ filebeat.inputs:
 
 See [Regular expression support](/reference/filebeat/regexp-support.md) for a list of supported regexp patterns.
 
-### `prospector.scanner.include_files` [_prospector_scanner_include_files]
+#### `prospector.scanner.include_files` [_prospector_scanner_include_files]
 
 A list of regular expressions to match the files that you want Filebeat to include. If a list of regexes is provided, only the files that are allowed by the patterns are harvested.
 
@@ -205,7 +205,7 @@ Patterns should start with `^` in case of absolute paths.
 See [Regular expression support](/reference/filebeat/regexp-support.md) for a list of supported regexp patterns.
 
 
-### `prospector.scanner.symlinks` [filebeat-input-filestream-prospector-scanner-symlinks]
+#### `prospector.scanner.symlinks` [filebeat-input-filestream-prospector-scanner-symlinks]
 
 The `symlinks` option allows Filebeat to harvest symlinks in addition to regular files. When harvesting symlinks, Filebeat opens and reads the original file even though it reports the path of the symlink.
 
@@ -216,7 +216,7 @@ The `symlinks` option can be useful if symlinks to the log files have additional
 Because this option may lead to data loss, it is disabled by default.
 
 
-### `prospector.scanner.resend_on_touch` [_prospector_scanner_resend_on_touch]
+#### `prospector.scanner.resend_on_touch` [_prospector_scanner_resend_on_touch]
 
 If this option is enabled a file is resent if its size has not changed but its modification time has changed to a later time than before. It is disabled by default to avoid accidentally resending files.
 
