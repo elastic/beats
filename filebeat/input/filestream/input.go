@@ -525,7 +525,7 @@ func (inp *filestream) openFile(
 	}
 
 	truncated := false
-	// TODO(anderson): GZIP file cannot be truncated
+	// TODO(AndersonQ): GZIP file cannot be truncated
 	// it could seek to offset on gzip, if there is less data -> truncated, stop
 	//
 	if fi.Size() < offset {
@@ -564,7 +564,7 @@ func (inp *filestream) openFile(
 // plain file reader (plainFile).
 //
 // It returns an error if any happens.
-// TODO(anderson): ADD TESTS!
+// TODO(AndersonQ): ADD TESTS!
 func (inp *filestream) newFile(rawFile *os.File) (File, error) {
 	if !inp.gzipExperimental {
 		return newPlainFile(rawFile), nil

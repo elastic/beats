@@ -125,7 +125,7 @@ func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 }
 
 func checkConfigCompatibility(fileWatcher, fileIdentifier *conf.Namespace) error {
-	// TODO(anderson): GZIP check?
+	// TODO(AndersonQ): GZIP check?
 	var fwCfg struct {
 		Fingerprint struct {
 			Enabled bool `config:"enabled"`

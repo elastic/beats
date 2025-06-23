@@ -328,7 +328,7 @@ func (p *copyTruncateFileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
-	// TODO(anderson): update to handle GZIP file
+	// TODO(AndersonQ): update to handle GZIP file
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
 		switch event.Op {
@@ -354,7 +354,7 @@ func (p *copyTruncateFileProspector) onFSEvent(
 			}
 		}
 
-		// TODO(anderson): handle GZIP file
+		// TODO(AndersonQ): handle GZIP file
 		// needs test plain file -> gzip
 		// check if the event belongs to a rotated file
 		if p.isRotated(event) {
@@ -372,7 +372,7 @@ func (p *copyTruncateFileProspector) onFSEvent(
 
 	case loginp.OpTruncate:
 		if event.Descriptor.GZIP {
-			// TODO(anderson): how to mark the file as done?
+			// TODO(AndersonQ): how to mark the file as done?
 			log.Debugf("GZIP file %s has been truncated, stop ingesting it", event.NewPath)
 			group.Stop(src)
 			return
