@@ -25,6 +25,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -89,6 +90,7 @@ func TestFilestreamDelete(t *testing.T) {
 func TestFilestreamDeleteFile(t *testing.T) {
 	testCases := map[string]struct {
 		cursorPending     int
+		cursorSizeDelta   int
 		expectFileDeleted bool
 		expectError       bool
 	}{
@@ -98,6 +100,11 @@ func TestFilestreamDeleteFile(t *testing.T) {
 		},
 		"pending events": {
 			cursorPending:     2,
+			expectFileDeleted: false,
+		},
+		"size changed when waiting for graced period": {
+			cursorPending:     -1,
+			cursorSizeDelta:   42,
 			expectFileDeleted: false,
 		},
 	}
@@ -114,7 +121,10 @@ func TestFilestreamDeleteFile(t *testing.T) {
 
 		data := []byte("foo bar\n")
 		logFile := env.mustWriteToFile("logfile.log", data)
-		cur := loginp.NewCursorForTest(t.Name()+":"+logFile, int64(len(data)), tc.cursorPending)
+		cur := loginp.NewCursorForTest(
+			t.Name()+":"+logFile,
+			int64(len(data))+int64(tc.cursorSizeDelta),
+			tc.cursorPending)
 
 		t.Run(name, func(t *testing.T) {
 			v2Ctx := v2.Context{
