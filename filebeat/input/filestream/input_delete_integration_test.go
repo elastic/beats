@@ -35,6 +35,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestFilestreamDelete(t *testing.T) {
@@ -90,21 +91,23 @@ func TestFilestreamDelete(t *testing.T) {
 func TestFilestreamDeleteFile(t *testing.T) {
 	testCases := map[string]struct {
 		cursorPending     int
-		cursorSizeDelta   int
 		expectFileDeleted bool
 		expectError       bool
+		canDelete         bool
+		gracePeriodErr    error
 	}{
 		"happy path": {
 			cursorPending:     -1,
 			expectFileDeleted: true,
+			canDelete:         true,
 		},
 		"pending events": {
 			cursorPending:     2,
 			expectFileDeleted: false,
+			canDelete:         true,
 		},
-		"size changed when waiting for graced period": {
+		"waitGracePeriod returns false": {
 			cursorPending:     -1,
-			cursorSizeDelta:   42,
 			expectFileDeleted: false,
 		},
 	}
@@ -117,13 +120,23 @@ func TestFilestreamDeleteFile(t *testing.T) {
 				retryBackoff: 10 * time.Millisecond,
 			},
 			scannerCheckInterval: 10 * time.Millisecond,
+			waitGracePeriodFn: func(
+				ctx v2.Context,
+				logger *logp.Logger,
+				cursor loginp.Cursor,
+				path string,
+				gracePeriod time.Duration,
+				checkInterval time.Duration) (bool, error) {
+
+				return tc.canDelete, tc.gracePeriodErr
+			},
 		}
 
 		data := []byte("foo bar\n")
 		logFile := env.mustWriteToFile("logfile.log", data)
 		cur := loginp.NewCursorForTest(
 			t.Name()+":"+logFile,
-			int64(len(data))+int64(tc.cursorSizeDelta),
+			int64(len(data)),
 			tc.cursorPending)
 
 		t.Run(name, func(t *testing.T) {
