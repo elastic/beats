@@ -266,8 +266,6 @@ Following are some scenarios where this can happen:
 
 **Configuration**
 
-Fingerprint mode is disabled by default.
-
 ::::{warning}
 Enabling fingerprint mode delays ingesting new files until they grow to at least `offset`+`length` bytes in size, so they can be fingerprinted. Until then these files are ignored.
 ::::
