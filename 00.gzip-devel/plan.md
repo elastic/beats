@@ -47,8 +47,16 @@
       files: `filebeat/input/filestream/internal/input-logfile/metrics.go`,
       `filebeat/input/filestream/input.go`
 - [x] Enhance rotation handle .gz
-  - [ ] Add GZIP-awareness to `onFSEvent` in `copytruncate_prospector.go`
-  - [ ] Add GZIP-awareness to `onFSEvent` in `prospector.go`
+  - [x] Add GZIP-awareness to `onFSEvent` in `copytruncate_prospector.go`
+  - [x] Add GZIP-awareness to `onFSEvent` in `prospector.go`
+- [ ] run BenchmarkToFileDescriptor to check overhead of checking a file is GZIP
+
+#### Open questions:
+ - [ ] can a file me marked as "complete", a.k.a do not read it again?
+    file: `input/filestream/copytruncate_prospector.go:373`
+ - [ ] `openFile` attempts to detect the file was truncated. For GZIP it'd need
+to know the previous file size.
+    file: `filebeat/input/filestream/input.go:314-324`
 
 ### Milestone 3 – Testing
 - [ ] Add integration tests
