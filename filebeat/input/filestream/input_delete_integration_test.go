@@ -219,12 +219,6 @@ func TestFilestreamWaitGracePeriod(t *testing.T) {
 			}
 
 			cur := loginp.NewCursorForTest("foo-bar", offset, -1)
-			f := filestream{
-				scannerCheckInterval: 10 * time.Millisecond,
-				deleterConfig: deleterConfig{
-					GracePeriod: tc.gracePeriod,
-				},
-			}
 			v2Ctx := v2.Context{
 				ID:          t.Name(),
 				Cancelation: t.Context(),
@@ -232,7 +226,7 @@ func TestFilestreamWaitGracePeriod(t *testing.T) {
 			}
 
 			start := time.Now()
-			got, err := f.waitGracePeriod(v2Ctx, env.logger, cur, logFile)
+			got, err := waitGracePeriod(v2Ctx, env.logger, cur, logFile, tc.gracePeriod, 10*time.Millisecond)
 			delta := time.Now().Sub(start)
 			if !tc.expectError && err != nil {
 				t.Fatalf("did not expect an error from 'deleteFile': %s", err)
@@ -264,14 +258,6 @@ func TestFilestreamWaitGracePeriodContextCancelled(t *testing.T) {
 
 	cur := loginp.NewCursorForTest("foo-bar", offset, -1)
 	gracePeriod := 500 * time.Millisecond
-	f := filestream{
-		scannerCheckInterval: 10 * time.Millisecond,
-		deleterConfig: deleterConfig{
-			retries:      42,
-			retryBackoff: 42 * time.Second,
-			GracePeriod:  gracePeriod,
-		},
-	}
 
 	ctx, cancel := context.WithCancel(t.Context())
 	v2Ctx := v2.Context{
@@ -282,7 +268,7 @@ func TestFilestreamWaitGracePeriodContextCancelled(t *testing.T) {
 
 	cancel()
 	start := time.Now()
-	got, err := f.waitGracePeriod(v2Ctx, env.logger, cur, logFile)
+	got, err := waitGracePeriod(v2Ctx, env.logger, cur, logFile, gracePeriod, 10*time.Millisecond)
 	if got != false {
 		t.Fatal("expecting false when calling waitGracePeriod because the context is cancelled")
 	}

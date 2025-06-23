@@ -67,6 +67,13 @@ type filestream struct {
 	parsers              parser.Config
 	takeOver             takeOverConfig
 	scannerCheckInterval time.Duration
+	waitGracePeriodFn    func(
+		ctx input.Context,
+		logger *logp.Logger,
+		cursor loginp.Cursor,
+		path string,
+		gracePeriod, checkInterval time.Duration,
+	) (bool, error)
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
@@ -104,12 +111,13 @@ func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
 	}
 
 	filestream := &filestream{
-		readerConfig:    c.Reader,
-		encodingFactory: encodingFactory,
-		closerConfig:    c.Close,
-		parsers:         c.Reader.Parsers,
-		takeOver:        c.TakeOver,
-		deleterConfig:   c.Delete,
+		readerConfig:      c.Reader,
+		encodingFactory:   encodingFactory,
+		closerConfig:      c.Close,
+		parsers:           c.Reader.Parsers,
+		takeOver:          c.TakeOver,
+		deleterConfig:     c.Delete,
+		waitGracePeriodFn: waitGracePeriod,
 	}
 
 	// Read the scan interval from the prospector so we can use during the
@@ -205,11 +213,12 @@ func (inp *filestream) Run(
 // for any changes, if the file changes or any error is encountered, false
 // is returned. True is only returned if the grace period expires with
 // no error and no context cancellation.
-func (inp *filestream) waitGracePeriod(
+func waitGracePeriod(
 	ctx input.Context,
 	logger *logp.Logger,
 	cursor loginp.Cursor,
 	path string,
+	gracePeriod, checkInterval time.Duration,
 ) (bool, error) {
 	// Check if file grows during the grace period
 	// We know all events have been published because cursor.Finished is true,
@@ -221,37 +230,39 @@ func (inp *filestream) waitGracePeriod(
 			err)
 	}
 
-	graceTimer := time.NewTimer(inp.deleterConfig.GracePeriod)
-	checkIntervalTicker := time.NewTicker(inp.scannerCheckInterval)
-	// Wait for the grace period or for the context to be cancelled
-LOOP:
-	for {
-		select {
-		case <-ctx.Cancelation.Done():
-			return false, ctx.Cancelation.Err()
-		case <-checkIntervalTicker.C:
-			stat, err := os.Stat(path)
-			if err != nil {
-				// If the file does not exist any more, return false
-				// (do not delete) and no error.
-				if errors.Is(err, os.ErrNotExist) {
+	if gracePeriod > 0 {
+		graceTimer := time.NewTimer(gracePeriod)
+		checkIntervalTicker := time.NewTicker(gracePeriod)
+		// Wait for the grace period or for the context to be cancelled
+	LOOP:
+		for {
+			select {
+			case <-ctx.Cancelation.Done():
+				return false, ctx.Cancelation.Err()
+			case <-checkIntervalTicker.C:
+				stat, err := os.Stat(path)
+				if err != nil {
+					// If the file does not exist any more, return false
+					// (do not delete) and no error.
+					if errors.Is(err, os.ErrNotExist) {
+						return false, nil
+					}
+					// Return the error and cause the harvester to close
+					return false, fmt.Errorf("cannot stat '%s': %w", path, err)
+				}
+
+				if stat.Size() != st.Offset {
+					// The file has changed, close the harvester
+					// without deleting the file
+					logger.Debugf("cancelling deletion of '%s', size has changed from %d to %d",
+						path,
+						st.Offset,
+						stat.Size())
 					return false, nil
 				}
-				// Return the error and cause the harvester to close
-				return false, fmt.Errorf("cannot stat '%s': %w", path, err)
+			case <-graceTimer.C:
+				break LOOP
 			}
-
-			if stat.Size() != st.Offset {
-				// The file has changed, close the harvester
-				// without deleting the file
-				logger.Debugf("cancelling deletion of '%s', size has changed from %d to %d",
-					path,
-					st.Offset,
-					stat.Size())
-				return false, nil
-			}
-		case <-graceTimer.C:
-			break LOOP
 		}
 	}
 
@@ -300,7 +311,13 @@ func (inp *filestream) deleteFile(
 		"all events from '%s' have been published, waiting for %s grace period",
 		path, inp.deleterConfig.GracePeriod.String())
 
-	canRemove, err := inp.waitGracePeriod(ctx, logger, cursor, path)
+	canRemove, err := inp.waitGracePeriodFn(
+		ctx,
+		logger,
+		cursor,
+		path,
+		inp.deleterConfig.GracePeriod,
+		inp.scannerCheckInterval)
 	if err != nil {
 		return err
 	}
