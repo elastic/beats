@@ -354,8 +354,6 @@ func (p *copyTruncateFileProspector) onFSEvent(
 			}
 		}
 
-		// TODO(AndersonQ): handle GZIP file
-		// needs test plain file -> gzip
 		// check if the event belongs to a rotated file
 		if p.isRotated(event) {
 			log.Debugf("File %s is rotated", event.NewPath)
