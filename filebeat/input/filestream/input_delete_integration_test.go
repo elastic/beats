@@ -251,3 +251,43 @@ func TestFilestreamWaitGracePeriod(t *testing.T) {
 		})
 	}
 }
+
+func TestFilestreamWaitGracePeriodContextCancelled(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	logFile := env.mustWriteToFile("logfile.log", []byte("foo bar"))
+	st, err := os.Stat(logFile)
+	if err != nil {
+		t.Fatalf("cannot stat %q: %s", logFile, err)
+	}
+	offset := st.Size()
+
+	cur := loginp.NewCursorForTest("foo-bar", offset, -1)
+	gracePeriod := 500 * time.Millisecond
+	f := filestream{
+		scannerCheckInterval: 10 * time.Millisecond,
+		deleterConfig: deleterConfig{
+			retries:      42,
+			retryBackoff: 42 * time.Second,
+			GracePeriod:  gracePeriod,
+		},
+	}
+
+	ctx, cancel := context.WithCancel(t.Context())
+	v2Ctx := v2.Context{
+		ID:          t.Name(),
+		Cancelation: ctx,
+		Logger:      env.logger,
+	}
+
+	cancel()
+	start := time.Now()
+	got, err := f.waitGracePeriod(v2Ctx, env.logger, cur, logFile)
+	if got != false {
+		t.Fatal("expecting false when calling waitGracePeriod because the context is cancelled")
+	}
+	delta := time.Now().Sub(start)
+	if delta >= gracePeriod {
+		t.Fatal("waitGracePeriod did not return before the grace period")
+	}
+}
