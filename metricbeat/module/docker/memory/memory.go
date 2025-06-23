@@ -49,7 +49,7 @@ type MetricSet struct {
 
 // New creates a new instance of the docker memory MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := base.Logger().Named("docker.memory")
+	logger := logp.NewLogger("docker.memory")
 	config := docker.DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
