@@ -284,7 +284,7 @@ func TestReceiverDegraded(t *testing.T) {
 	}
 
 	for _, test := range testCases {
-		t.Run("", func(t *testing.T) {
+		t.Run(test.name, func(t *testing.T) {
 			config := Config{
 				Beatconfig: map[string]any{
 					"filebeat": map[string]any{

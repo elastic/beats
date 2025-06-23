@@ -374,10 +374,11 @@ func TestReceiverDegraded(t *testing.T) {
 	}
 
 	for _, test := range testCases {
-		t.Run("", func(t *testing.T) {
+		t.Run(test.name, func(t *testing.T) {
 			config := Config{
 				Beatconfig: map[string]any{
 					"metricbeat": map[string]any{
+						"max_start_delay": "0s",
 						"modules": []map[string]any{
 							{
 								"module":     "benchmark",

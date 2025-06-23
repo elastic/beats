@@ -26,7 +26,7 @@ type RunnerReporter interface {
 }
 
 type reporter struct {
-	runnerStates map[uint64]runnerState
+	runnerStates map[uint64]*runnerState
 	host         component.Host
 	mtx          sync.Mutex
 }
@@ -38,7 +38,7 @@ type reporter struct {
 func NewGroupStatusReporter(host component.Host) RunnerReporter {
 	return &reporter{
 		host:         host,
-		runnerStates: make(map[uint64]runnerState),
+		runnerStates: make(map[uint64]*runnerState),
 	}
 }
 
@@ -55,14 +55,14 @@ func (r *reporter) updateStatusForRunner(id uint64, state status.Status, msg str
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 	if r.runnerStates == nil {
-		r.runnerStates = make(map[uint64]runnerState)
+		r.runnerStates = make(map[uint64]*runnerState)
 	}
-	if rState, ok := r.runnerStates[id]; ok && rState.msg != msg && rState.state != state {
+	if rState, ok := r.runnerStates[id]; ok {
 		rState.msg = msg
 		rState.state = state
 	} else {
-		// add status for the runner to the map
-		r.runnerStates[id] = runnerState{
+		// add status for the runner to the map, if not preset
+		r.runnerStates[id] = &runnerState{
 			state: state,
 			msg:   msg,
 		}
