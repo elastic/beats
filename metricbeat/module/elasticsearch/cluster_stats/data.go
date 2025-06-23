@@ -222,7 +222,7 @@ func eventMapping(
 	info elasticsearch.Info,
 	content []byte,
 	isXpack bool,
-	log *logp.Logger) error {
+	_ *logp.Logger) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
