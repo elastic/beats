@@ -103,7 +103,7 @@ query. The default is `root\cimv2`.
 :   The time threshold after which Metricbeat will stop waiting for the
 query result and return control to the main flow of the program. A
 warning is logged indicating that the query execution has exceeded the
-threshold. The default is equal to the period. See [WMI Arbitrator and
+threshold. The default is equal to the module's period. See [WMI Arbitrator and
 Query Execution](#wmi-arbitrator-and-query-execution) for more details.
 
 **`wmi.include_query_class`**
@@ -116,16 +116,14 @@ document. The default value is `false`.
 
 **`wmi.include_null_properties`**
 :   If set to `true` the metricset includes the properties that have null
-value in the output document. properties that have a `null` value in the
-output document. The default value is `false`.
+value in the output document. The default value is `false`.
 
 **`wmi.include_empty_string_properties`**
 :   A boolean option that causes the metricset to include the properties
 that are empty string. The default value is `false`.
 
 **`wmi.max_rows_per_query`**
-:   A safeguard option to limit the number of rows returned by a single WMI query.
-This helps prevent the production of an unexpectedly large amount of data.
+:   Option to limit the number of rows returned by a single WMI query.
 The default value is `0`, which is a special value indicating that all fetched
 results should be returned without a row limit.
 
@@ -141,10 +139,10 @@ Configuration](#query-configuration) for the format of the queries.
 
 ### Query Configuration
 
-Each item in the `queries` list specifies a wmi query to perform.
+Each item in the `queries` list specifies a WMI query to perform.
 
 **`class`**
-:    The wmi class. In the query it specifies the `FROM` clause. Required
+:    The WMI class. In the query it specifies the `FROM` clause. Required
 
 **`properties`**
 :    List of properties to return. In the query it specifies the `SELECT`
@@ -186,8 +184,6 @@ Equivalent YAML Configuration:
 - Test your WMI queries in isolation using the [`Get-CimInstance`](https://learn.microsoft.com/en-us/powershell/module/cimcmdlets/get-ciminstance) PowerShell cmdlet or [the WMI Explorer tool](https://github.com/vinaypamnani/wmie2).
 
 - Ensure that `wmi.warning_threshold` is less than or equal to the module's `period`. This configuration prevents Metricbeat from attempting to start multiple concurrent executions of the same query if a previous one is running slowly.
-
-- Set a `max_rows_per_query` to safeguard against queries with a high number of results.
 
 - When possible, try querying concrete (leaf) classes or classes closer to the leaves of the WMI inheritance hierarchy. Querying abstract superclasses may require fetching and caching the schema definitions for numerous derived classes, which can lead to increased memory usage and potential performance penalties due to cache misses.
 
