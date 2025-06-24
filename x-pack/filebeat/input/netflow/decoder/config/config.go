@@ -26,7 +26,6 @@ type Config struct {
 	sharedTemplates      bool
 	withCache            bool
 	activeSessionsMetric ActiveSessionsMetric
-	inputFromFile        bool
 }
 
 // Defaults returns a configuration object with defaults settings:
@@ -154,14 +153,3 @@ func (c *Config) ActiveSessionsMetric() ActiveSessionsMetric {
 	return c.activeSessionsMetric
 }
 
-// WithFileSupport adds support for processing IPFIX from on-disc storage.
-func (c *Config) WithFileSupport(enabled bool) *Config {
-	c.inputFromFile = enabled
-	return c
-}
-
-// FileSupport returns if the decoder supports file-on-disc-based IPFIX records.
-// This should only affect IPFIX decoding.
-func (c *Config) FileSupport() bool {
-	return c.inputFromFile
-}
