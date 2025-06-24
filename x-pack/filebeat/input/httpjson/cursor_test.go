@@ -110,7 +110,7 @@ func TestCursorUpdate(t *testing.T) {
 			conf := cursorConfig{}
 			require.NoError(t, cfg.Unpack(&conf))
 
-			c := newCursor(conf, logp.NewLogger("cursor-test"))
+			c := newCursor(conf, noopReporter{}, logp.NewLogger("cursor-test"))
 			c.state = tc.initialState
 			c.update(tc.trCtx)
 			assert.Equal(t, tc.expectedState, c.state)

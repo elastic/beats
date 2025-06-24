@@ -18,7 +18,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Replace default Ubuntu-based images with UBI-minimal-based ones {pull}42150[42150]
 - Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
 - removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
-- Removed encryption from diskqueue V2 for fips compliance {issue}4534[4534]{pull}42848[42848]
 - The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
 - Allow faccessat(2) in seccomp. {pull}43322[43322]
 
@@ -253,6 +252,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix handling of cursors by the streaming input for Crowdstrike. {issue}44364[44364] {pull}44548[44548]
 - Added missing "text/csv" content-type filter support in azureblobsortorage input. {issue}44596[44596] {pull}44824[44824]
 - Fix unexpected EOF detection and improve memory usage. {pull}44813[44813]
+- Fixed issue for "Root level readerConfig no longer respected" in azureblobstorage input. {issue}44812[44812] {pull}44873[44873]
+- Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
 
 *Heartbeat*
 
@@ -417,7 +418,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add evaluation state dump debugging option to CEL input. {pull}41335[41335]
 - Added support for retry configuration in GCS input. {issue}11580[11580] {pull}41862[41862]
 - Improve S3 polling mode states registry when using list prefix option. {pull}41869[41869]
-- Add support for SSL and Proxy configurations for websoket type in streaming input. {pull}41934[41934]
+- Add support for SSL and Proxy configurations for websocket type in streaming input. {pull}41934[41934]
 - AWS S3 input registry cleanup for untracked s3 objects. {pull}41694[41694]
 - The environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true` enables internal logs tracer for the azure-eventhub input. {issue}41931[41931] {pull}41932[41932]
 - The Filestream input now uses the `fingerprint` file identity by default. The state from files are automatically migrated if the previous file identity was `native` (the default) or `path`. If the `file_identity` is explicitly set, there is no change in behaviour. {issue}40197[40197] {pull}41762[41762]
@@ -452,7 +453,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add Fleet status updating to HTTP Endpoint input. {issue}44281[44281] {pull}44310[44310]
 - Add Fleet status updating to streaming input. {issue}44284[44284] {pull}44340[44340]
 - Add Fleet status update functionality to gcppubsub input. {issue}44272[44272] {pull}44507[44507]
-- Add Fleet status updating to HTTP Endpoint input. {issue}44273[44273] {pull}44508[44508]
+- Add Fleet status updating to GCS input. {issue}44273[44273] {pull}44508[44508]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. {issue}44349[44349] {pull}44436[44436]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
 - Added support for specifying custom content-types and encodings in azureblobstorage input. {issue}44330[44330] {pull}44402[44402]
@@ -460,6 +461,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add Fleet status update functionality to udp input. {issue}44419[44419] {pull}44785[44785]
 - Add Fleet status update functionality to tcp input. {issue}44420[44420] {pull}44786[44786]
 - Filestream now logs at level warn the number of files that are too small to be ingested {pull}44751[44751]
+- Add proxy support to GCP Pub/Sub input. {pull}44892[44892]
+- Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
 
 *Auditbeat*
 

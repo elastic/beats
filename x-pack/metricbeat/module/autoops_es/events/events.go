@@ -29,9 +29,10 @@ func CreateEvent(info *utils.ClusterInfo, metricSetFields mapstr.M, transactionI
 			"transactionId": transactionId,
 		},
 		RootFields: mapstr.M{
-			"service.name":      "autoops_es",
-			"metricbeatVersion": version.GetDefaultVersion(),
-			"commit":            version.Commit(),
+			"service.name":             "autoops_es",
+			"metricbeatVersion":        version.GetDefaultVersion(),
+			"commit":                   version.Commit(),
+			"orchestrator.resource.id": utils.GetResourceID(),
 		},
 	}
 }
