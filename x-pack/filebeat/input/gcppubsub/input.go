@@ -12,6 +12,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"net/http"
 	"sync"
 	"time"
 
@@ -32,6 +33,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
@@ -140,6 +142,7 @@ func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Conte
 
 	in := &pubsubInput{
 		config:       conf,
+		status:       stat,
 		log:          logger,
 		inputCtx:     inputCtx,
 		workerCtx:    workerCtx,
@@ -347,7 +350,7 @@ func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubs
 }
 
 func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, error) {
-	opts := []option.ClientOption{option.WithUserAgent(useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String()))}
+	opts := make([]option.ClientOption, 0, 4)
 
 	if in.AlternativeHost != "" {
 		// This will be typically set because we want to point the input to a testing pubsub emulator.
@@ -364,7 +367,34 @@ func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, err
 		opts = append(opts, option.WithCredentialsJSON(in.CredentialsJSON))
 	}
 
+	userAgent := useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
+	if !in.config.Transport.Proxy.Disable && in.config.Transport.Proxy.URL != nil {
+		c, err := httpcommon.HTTPTransportSettings{Proxy: in.config.Transport.Proxy}.Client()
+		if err != nil {
+			return nil, err
+		}
+		c.Transport = userAgentDecorator{
+			UserAgent: userAgent,
+			Transport: c.Transport,
+		}
+		opts = append(opts, option.WithHTTPClient(c))
+	} else {
+		opts = append(opts, option.WithUserAgent(userAgent))
+	}
+
 	return pubsub.NewClient(ctx, in.ProjectID, opts...)
+}
+
+type userAgentDecorator struct {
+	UserAgent string
+	Transport http.RoundTripper
+}
+
+func (t userAgentDecorator) RoundTrip(r *http.Request) (*http.Response, error) {
+	if _, ok := r.Header["User-Agent"]; !ok {
+		r.Header.Set("User-Agent", t.UserAgent)
+	}
+	return t.Transport.RoundTrip(r)
 }
 
 // boolPtr returns a pointer to b.

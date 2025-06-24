@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
@@ -128,7 +129,7 @@ func TestAdaptPipelineForCompatibility(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -314,7 +315,7 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -526,7 +527,7 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -656,7 +657,7 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -796,7 +797,7 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -979,7 +980,7 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -1104,7 +1105,7 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -1365,7 +1366,7 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -1483,7 +1484,7 @@ func TestRemoveDescription(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {

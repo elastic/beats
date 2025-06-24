@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+                 
 # Exported fields [exported-fields]
 
 This document describes the fields that are exported by Filebeat. They are grouped in the following categories:
@@ -76,4 +78,3 @@ This document describes the fields that are exported by Filebeat. They are group
 * [*Zeek fields*](/reference/filebeat/exported-fields-zeek.md)
 * [*ZooKeeper fields*](/reference/filebeat/exported-fields-zookeeper.md)
 * [*Zoom fields*](/reference/filebeat/exported-fields-zoom.md)
-
