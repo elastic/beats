@@ -7,7 +7,6 @@ package azureblobstorage
 import (
 	"bufio"
 	"bytes"
-	"compress/gzip"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -24,6 +23,7 @@ import (
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -176,7 +176,7 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 }
 
 func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
-	r, err := j.addGzipDecoderIfNeeded(bufio.NewReader(r))
+	r, err := reader.AddGzipDecoderIfNeeded(r)
 	if err != nil {
 		return fmt.Errorf("failed to add gzip decoder to blob: %s, with error: %w", *j.blob.Name, err)
 	}
@@ -333,32 +333,6 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, id s
 	}
 
 	return eventsPerObject, nil
-}
-
-// addGzipDecoderIfNeeded determines whether the given stream of bytes (encapsulated in a buffered reader)
-// represents gzipped content or not and adds gzipped decoder if needed. A buffered reader is used
-// so the function can peek into the byte  stream without consuming it. This makes it convenient for
-// code executed after this function call to consume the stream if it wants.
-func (j *job) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
-	bufReader := bufio.NewReader(body)
-	isStreamGzipped := false
-	// check if stream is gziped or not
-	buf, err := bufReader.Peek(3)
-	if err != nil {
-		if err == io.EOF {
-			err = nil
-		}
-		return bufReader, err
-	}
-
-	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
-	isStreamGzipped = bytes.Equal(buf, []byte{0x1F, 0x8B, 0x08})
-
-	if !isStreamGzipped {
-		return bufReader, nil
-	}
-
-	return gzip.NewReader(bufReader)
 }
 
 // evaluateJSON uses a bufio.NewReader & reader.Peek to evaluate if the
