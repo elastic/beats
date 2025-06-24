@@ -102,7 +102,9 @@ func ConvertNonPrimitive[T mapstrOrMap](m T) {
 				for i := 0; i < ref.Len(); i++ {
 					elem := ref.Index(i)
 					if elem.Kind() == reflect.Map && elem.Type().Key().Kind() == reflect.String && elem.Type().Elem().Kind() == reflect.Interface {
-						ConvertNonPrimitive(elem.Interface().(map[string]any))
+						if m, ok := elem.Interface().(map[string]any); ok {
+							ConvertNonPrimitive(m)
+						}
 					}
 					s[i] = elem.Interface()
 				}
