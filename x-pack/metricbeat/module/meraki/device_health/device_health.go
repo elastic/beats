@@ -6,42 +6,23 @@ package device_health
 
 import (
 	"fmt"
-	"reflect"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/meraki"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	meraki "github.com/meraki/dashboard-api-go/v3/sdk"
+	sdk "github.com/meraki/dashboard-api-go/v3/sdk"
 )
 
 func init() {
 	mb.Registry.MustAddMetricSet("meraki", "device_health", New)
 }
 
-type config struct {
-	BaseURL       string        `config:"apiBaseURL"`
-	ApiKey        string        `config:"apiKey"`
-	DebugMode     string        `config:"apiDebugMode"`
-	Organizations []string      `config:"organizations"`
-	Period        time.Duration `config:"period"`
-	// todo: device filtering?
-}
-
-func defaultConfig() *config {
-	return &config{
-		BaseURL:   "https://api.meraki.com",
-		DebugMode: "false",
-		Period:    time.Second * 300,
-	}
-}
-
 type MetricSet struct {
 	mb.BaseMetricSet
 	logger        *logp.Logger
-	client        *meraki.Client
+	client        *sdk.Client
 	organizations []string
 }
 
@@ -50,20 +31,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	logger := logp.NewLogger(base.FullyQualifiedName())
 
-	config := defaultConfig()
+	config := meraki.DefaultConfig()
 	if err := base.Module().UnpackConfig(config); err != nil {
 		return nil, err
 	}
 
-	// the reason for this is due to restrictions imposed by some dashboard API endpoints.
-	// for example, "/api/v1/organizations/{organizationId}/devices/uplinksLossAndLatency"
-	// has a maximum 'timespan' of 5 minutes.
-	if config.Period.Seconds() > 300 {
-		return nil, fmt.Errorf("the maximum allowed collection period is 5 minutes (300s)")
+	if err := config.Validate(); err != nil {
+		return nil, fmt.Errorf("config validation failed: %w", err)
 	}
 
-	logger.Debugf("loaded config: %v", config)
-	client, err := meraki.NewClientWithOptions(config.BaseURL, config.ApiKey, config.DebugMode, "Metricbeat Elastic")
+	logger.Debugf("loaded config: BaseURL=%s, DebugMode=%s, Organizations=%v, Period=%s", config.BaseURL, config.DebugMode, config.Organizations, config.Period)
+	client, err := sdk.NewClientWithOptions(config.BaseURL, config.ApiKey, config.DebugMode, "Metricbeat Elastic")
 	if err != nil {
 		logger.Error("creating Meraki dashboard API client failed: %w", err)
 		return nil, err
@@ -124,6 +102,12 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			return fmt.Errorf("getDeviceSwitchports failed; %w", err)
 		}
 
+		err = getDeviceVPNStatuses(m.client, org, devices)
+		if err != nil {
+			m.logger.Errorf("GetVPNStatuses failed; %w", err)
+			// continue so we still report the rest of the device health metrics
+		}
+
 		// Once we have collected _all_ the data and associated it with the correct device
 		// we can report the various device health metrics. These functions are split up
 		// in this way primarily to allow better separation of the code, but also because
@@ -137,6 +121,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	return nil
 }
+<<<<<<< HEAD
 
 func reportMetricsForOrganization(reporter mb.ReporterV2, organizationID string, metrics ...[]mapstr.M) {
 	for _, metricSlice := range metrics {
@@ -187,3 +172,5 @@ func isEmpty(value interface{}) bool {
 
 	return false
 }
+=======
+>>>>>>> 7761543dd ([metricbeat] [meraki] add VPN metrics (#44851))

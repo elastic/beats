@@ -2,7 +2,7 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.19/metricbeat-module-meraki.html
 
 - module: meraki
-  metricsets: ["device_health"]
+  metricsets: ["device_health", "network_health"]
   enabled: true
   period: 300s
   apiKey: "Meraki dashboard API key"
