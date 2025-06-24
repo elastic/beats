@@ -53,7 +53,6 @@ type apiEnvironment struct {
 }
 
 func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
-	fmt.Println("in o365audit plugin")
 	return v2.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Experimental,
