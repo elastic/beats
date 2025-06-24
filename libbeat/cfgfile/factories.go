@@ -95,6 +95,6 @@ func (f multiplexedFactory) findFactory(c *config.C) (RunnerFactory, error) {
 
 type FactoryWrapper func(RunnerFactory) RunnerFactory
 
-type WithFactoryWrapper interface {
-	WithFactoryWrapper(FactoryWrapper)
+type WithOtelFactoryWrapper interface {
+	WithOtelFactoryWrapper(FactoryWrapper)
 }

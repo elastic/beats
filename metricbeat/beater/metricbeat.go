@@ -46,13 +46,13 @@ import (
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done              chan struct{} // Channel used to initiate shutdown.
-	stopOnce          sync.Once     // wraps the Stop() method
-	config            Config
-	registry          *mb.Register
-	autodiscover      *autodiscover.Autodiscover
-	dynamicCfgEnabled bool
-	factoryWrapper    func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
+	done                     chan struct{} // Channel used to initiate shutdown.
+	stopOnce                 sync.Once     // wraps the Stop() method
+	config                   Config
+	registry                 *mb.Register
+	autodiscover             *autodiscover.Autodiscover
+	dynamicCfgEnabled        bool
+	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 
 	// Options
 	moduleOptions []module.Option
@@ -204,8 +204,8 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 	factory := module.NewFactory(b.Info, b.Monitoring, bt.registry, moduleOptions...)
 
-	if bt.factoryWrapper != nil {
-		factory = bt.factoryWrapper(factory)
+	if bt.otelStatusFactoryWrapper != nil {
+		factory = bt.otelStatusFactoryWrapper(factory)
 	}
 
 	runners := make(map[uint64]cfgfile.Runner) // Active list of module runners.
@@ -318,8 +318,8 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	return nil
 }
 
-func (bt *Metricbeat) WithFactoryWrapper(factoryWrapper cfgfile.FactoryWrapper) {
-	bt.factoryWrapper = factoryWrapper
+func (bt *Metricbeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
+	bt.otelStatusFactoryWrapper = wrapper
 }
 
 // Stop signals to Metricbeat that it should stop. It closes the "done" channel
