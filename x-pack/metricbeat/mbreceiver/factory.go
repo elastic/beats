@@ -61,6 +61,7 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
+
 	return &metricbeatReceiver{BeatReceiver: br}, nil
 }
 
