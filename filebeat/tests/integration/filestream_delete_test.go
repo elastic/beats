@@ -355,6 +355,12 @@ func TestFilestreamDeleteRestart(t *testing.T) {
 	}
 }
 
+// TestFilestreamDeleteRealESFSAndNotify aims to simulate some real-world usage
+// and test from the users' perspective. It is not an exhaustive test, nor does
+// it aim to cover all scenarios. There are already extensive unit-tests.
+//
+// It uses a real Elasticsearch and queries data to ensure full ingestion
+// while using fsnotify to monitor the target file for deletion.
 func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	gracePeriod := 5 * time.Second
