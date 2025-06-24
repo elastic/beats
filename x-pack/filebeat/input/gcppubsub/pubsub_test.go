@@ -8,6 +8,7 @@ package gcppubsub
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
@@ -34,6 +35,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
+	"github.com/elastic/go-elasticsearch/v8"
 )
 
 const (
@@ -526,7 +528,19 @@ processors:
 	filebeatOTel.Start()
 
 	// prepare to query ES
-	es := integration.GetESClient(t, "http")
+	// prepare to query ES
+	esCfg := elasticsearch.Config{
+		Addresses: []string{"http://localhost:9200"},
+		Username:  "admin",
+		Password:  "testing",
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
+			},
+		},
+	}
+	es, err := elasticsearch.NewClient(esCfg)
+	require.NoError(t, err)
 
 	rawQuery := map[string]any{
 		"query": map[string]any{
@@ -540,7 +554,6 @@ processors:
 	}
 
 	var otelDocs estools.Documents
-	var err error
 
 	// wait for logs to be published
 	require.Eventually(t,
