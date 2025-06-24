@@ -80,10 +80,10 @@ The `dns` processor has the following configuration settings:
 :   The duration of the minimum alternative cache TTL for successful DNS responses. Ensures that `TTL=0` successful reverse DNS responses can be cached. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". Default value is `1m`.
 
 `success_cache.enabled`
-:  Sets if the success cache should be enabled. The default value is True, meaning the cache is used by default.
+:  Whether the success cache should be enabled. The default value is `true`, meaning the cache is used by default.
 
 ::::{note}
-Disabling the cache has throughput implications, requiring for each event to perform a round trip to the DNS server. For example, if a DNS lookup takes 1 ms, serial throughput is limited to a maximum of 1000 events per second.
+Disabling the cache has throughput implications, requiring each event to perform a round trip to the DNS server. For example, if a DNS lookup takes 1 ms, serial throughput is limited to a maximum of 1,000 events per second.
 ::::
 
 `failure_cache.capacity.initial`
@@ -96,10 +96,10 @@ Disabling the cache has throughput implications, requiring for each event to per
 :   The duration for which failures are cached. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". Default value is `1m`.
 
 `failure_cache.enabled`
-:  Sets if the failure cache should be enabled. The default value is True, meaning the cache is used by default.
+:  Whether the failure cache should be enabled. The default value is `true`, meaning the cache is used by default.
 
 ::::{note}
-Disabling the cache has throughput implications, requiring for each event to perform a round trip to the DNS server. For example, if a DNS lookup takes 1 ms, serial throughput is limited to a maximum of 1000 events per second. Additionally, if the failure occurs because the server is overloaded, retrying immediately might have compounding effects.
+Disabling the cache has throughput implications, requiring each event to perform a round trip to the DNS server. For example, if a DNS lookup takes 1 ms, serial throughput is limited to a maximum of 1,000 events per second. Additionally, if the failure occurs because the server is overloaded, retrying immediately might have compounding effects.
 ::::
 
 `nameservers`
