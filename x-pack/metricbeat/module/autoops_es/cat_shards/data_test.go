@@ -29,8 +29,8 @@ var (
 func TestSendNodeShardsEvent(t *testing.T) {
 	reporter := &mbtest.CapturingReporterV2{}
 	info := auto_ops_testing.CreateClusterInfo("8.15.3")
-	nodeToShards := []NodeShardCount{
-		{
+	nodeToShards := map[string]NodeShardCount{
+		"node1": {
 			NodeId:                    "node1",
 			NodeName:                  "name1",
 			Shards:                    100,
@@ -43,7 +43,7 @@ func TestSendNodeShardsEvent(t *testing.T) {
 			RelocatingPrimaryShards:   1,
 			RelocatingReplicaShards:   2,
 		},
-		{
+		"node2": {
 			NodeId:                    "node2",
 			NodeName:                  "name2",
 			Shards:                    99,
@@ -59,7 +59,7 @@ func TestSendNodeShardsEvent(t *testing.T) {
 	}
 	transactionId := "xyz"
 
-	sendNodeShardsEvent(reporter, &info, nodeToShards, transactionId)
+	sendNodeShardsEvent(reporter, &info, nodeShardCountToMapArray(nodeToShards), transactionId)
 
 	require.Equal(t, 0, len(reporter.GetErrors()))
 	require.Equal(t, 1, len(reporter.GetEvents()))
@@ -68,7 +68,7 @@ func TestSendNodeShardsEvent(t *testing.T) {
 
 	auto_ops_testing.CheckEventWithTransactionId(t, event, info, transactionId)
 
-	require.ElementsMatch(t, convertObjectArrayToMapArray(nodeToShards), auto_ops_testing.GetObjectValue(event.MetricSetFields, "node_shards_count"))
+	require.ElementsMatch(t, maps.Values(nodeToShards), mapArrayToType[NodeShardCount](auto_ops_testing.GetObjectValue(event.MetricSetFields, "node_shards_count").([]map[string]any)))
 }
 
 func TestSendNodeIndexShardsEventInBatch(t *testing.T) {
@@ -174,10 +174,11 @@ func expectValidParsedDetailedShards(t *testing.T, data metricset.FetcherData[[]
 
 	myIndexNode2 := nodeIndexShards[slices.IndexFunc(nodeIndexShards, func(node NodeIndexShards) bool { return node.IndexNode == "my-index-node_id-node2" })]
 
-	if data.Version == "7.17.0" {
+	switch data.Version {
+	case "7.17.0":
 		require.Equal(t, 14, len(nodeIndexShards))
 		require.EqualValues(t, 14, myIndexNode2.TotalFractions)
-	} else if data.Version == "8.15.3" {
+	case "8.15.3":
 		require.Equal(t, 35, len(nodeIndexShards))
 		require.EqualValues(t, 35, myIndexNode2.TotalFractions)
 	}
