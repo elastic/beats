@@ -93,6 +93,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
 - Add check for http error codes in the Metricbeat's Prometheus query submodule {pull}44493[44493]
 - Sanitize error messages in Fetch method of SQL module {pull}44577[44577]
+- Add VPN metrics to meraki module {pull}44851[44851]
 
 *Osquerybeat*
 
@@ -325,6 +326,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add regex pattern matching to add_kubernetes_metadata processor {pull}41903[41903]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Publish cloud.availability_zone by add_cloud_metadata processor in azure environments {issue}42601[42601] {pull}43618[43618]
+- Added the `now` processor, which will populate the specified target field with the current timestamp. {pull}44795[44795]
 
 *Auditbeat*
 
@@ -453,7 +455,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add Fleet status updating to HTTP Endpoint input. {issue}44281[44281] {pull}44310[44310]
 - Add Fleet status updating to streaming input. {issue}44284[44284] {pull}44340[44340]
 - Add Fleet status update functionality to gcppubsub input. {issue}44272[44272] {pull}44507[44507]
-- Add Fleet status updating to HTTP Endpoint input. {issue}44273[44273] {pull}44508[44508]
+- Add Fleet status updating to GCS input. {issue}44273[44273] {pull}44508[44508]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. {issue}44349[44349] {pull}44436[44436]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
 - Added support for specifying custom content-types and encodings in azureblobstorage input. {issue}44330[44330] {pull}44402[44402]
@@ -537,6 +539,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
 - Add latency config option to Azure Monitor module. {pull}44366[44366]
 - Increase default polling period for MongoDB module from 10s to 60s {pull}44781[44781]
+- Upgrade github.com/microsoft/go-mssqldb from v1.7.2 to v1.8.2 {pull}44990[44990]
+- Add SSL support for sql module: drivers mysql, postgres, and mssql. {pull}44748[44748]
 
 *Metricbeat*
 
