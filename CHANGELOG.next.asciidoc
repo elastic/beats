@@ -463,7 +463,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Filestream now logs at level warn the number of files that are too small to be ingested {pull}44751[44751]
 - Add proxy support to GCP Pub/Sub input. {pull}44892[44892]
 - Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
-- Segregated `max_workers`` from `batch_size` in the azure-blob-storage input. {issue}44491[44491] {pull}44992[44992]
+- Segregated `max_workers` from `batch_size` in the azure-blob-storage input. {issue}44491[44491] {pull}44992[44992]
 
 *Auditbeat*
 
