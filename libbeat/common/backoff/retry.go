@@ -15,25 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-<<<<<<<< HEAD:auditbeat/module/file_integrity/fileinfo_bsd.go
-//go:build freebsd || openbsd || netbsd || darwin
-
-package file_integrity
-========
 package backoff
->>>>>>>> 6b6941eed ([gcp] Add metadata cache (#44432)):libbeat/common/backoff/retry.go
 
 import (
-	"syscall"
+	"context"
 	"time"
 )
 
-<<<<<<<< HEAD:auditbeat/module/file_integrity/fileinfo_bsd.go
-func fileTimes(stat *syscall.Stat_t) (atime, mtime, ctime time.Time) {
-	return time.Unix(0, stat.Atimespec.Nano()).UTC(),
-		time.Unix(0, stat.Mtimespec.Nano()).UTC(),
-		time.Unix(0, stat.Mtimespec.Nano()).UTC()
-========
 type Retryer struct {
 	maxRetries      int
 	initialInterval time.Duration
@@ -72,5 +60,4 @@ func (r *Retryer) Retry(ctx context.Context, fn func() error) (err error) {
 	}
 
 	return err
->>>>>>>> 6b6941eed ([gcp] Add metadata cache (#44432)):libbeat/common/backoff/retry.go
 }

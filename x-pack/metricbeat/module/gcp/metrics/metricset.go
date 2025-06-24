@@ -101,17 +101,6 @@ type metricMeta struct {
 }
 
 type config struct {
-<<<<<<< HEAD
-	Zone                string   `config:"zone"`
-	Region              string   `config:"region"`
-	Regions             []string `config:"regions"`
-	LocationLabel       string   `config:"location_label"`
-	ProjectID           string   `config:"project_id" validate:"required"`
-	ExcludeLabels       bool     `config:"exclude_labels"`
-	CredentialsFilePath string   `config:"credentials_file_path"`
-	CredentialsJSON     string   `config:"credentials_json"`
-	Endpoint            string   `config:"endpoint"`
-=======
 	Zone                       string        `config:"zone"`
 	Region                     string        `config:"region"`
 	Regions                    []string      `config:"regions"`
@@ -124,7 +113,6 @@ type config struct {
 	CollectDataprocUserLabels  bool          `config:"collect_dataproc_user_labels"`
 	MetadataCache              bool          `config:"metadata_cache"`
 	MetadataCacheRefreshPeriod time.Duration `config:"metadata_cache_refresh_period"`
->>>>>>> 6b6941eed ([gcp] Add metadata cache (#44432))
 
 	opt              []option.ClientOption
 	period           *durationpb.Duration

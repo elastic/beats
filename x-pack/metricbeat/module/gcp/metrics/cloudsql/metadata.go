@@ -21,13 +21,8 @@ import (
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP CloudSQL resource.
-<<<<<<< HEAD
-func NewMetadataService(projectID, zone string, region string, regions []string, organizationID, organizationName, projectName string, opt ...option.ClientOption) (gcp.MetadataService, error) {
-	return &metadataCollector{
-=======
 func NewMetadataService(ctx context.Context, projectID, zone string, region string, regions []string, organizationID, organizationName string, projectName string, cacheRegistry *gcp.CacheRegistry, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	mc := &metadataCollector{
->>>>>>> 6b6941eed ([gcp] Add metadata cache (#44432))
 		projectID:        projectID,
 		projectName:      projectName,
 		organizationID:   organizationID,
