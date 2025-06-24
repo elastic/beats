@@ -33,7 +33,7 @@ func TestFetchMetricset(t *testing.T) {
 	metricSet := mbtest.NewFetcher(t, config)
 	events, errs := metricSet.FetchEvents()
 	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+		t.Fatalf("Expected 0 error, but had %d. %v\n", len(errs), errs)
 	}
 	assert.NotEmpty(t, events)
 }
