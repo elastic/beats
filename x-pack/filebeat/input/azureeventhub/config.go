@@ -23,6 +23,8 @@ type azureInputConfig struct {
 	EventHubName string `config:"eventhub" validate:"required"`
 	// ConnectionString is the connection string to connect to the event hub.
 	ConnectionString string `config:"connection_string" validate:"required"`
+	// ConnectionStringProperties contains the parsed version of the connection string.
+	ConnectionStringProperties ConnectionStringProperties
 	// ConsumerGroup is the name of the consumer group to use.
 	ConsumerGroup string `config:"consumer_group"`
 	// Azure Storage container to store leases and checkpoints
@@ -32,6 +34,7 @@ type azureInputConfig struct {
 	// SAConnectionString is used to connect to the storage account (processor v2 only)
 	SAConnectionString string `config:"storage_account_connection_string"`
 	// SAContainer is the name of the storage account container to store
+
 	// partition ownership and checkpoint information.
 	SAContainer string `config:"storage_account_container"`
 	// by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
@@ -117,9 +120,24 @@ func defaultConfig() azureInputConfig {
 // Validate validates the config.
 func (conf *azureInputConfig) Validate() error {
 	logger := logp.NewLogger("azureeventhub.config")
-	if conf.ConnectionString == "" {
-		return errors.New("no connection string configured")
+
+	connectionStringProperties, err := parseConnectionString(conf.ConnectionString)
+	if err != nil {
+		return fmt.Errorf("invalid connection string: %w", err)
 	}
+	// Store the parsed connection string, so we can use it
+	// later in the input, when needed.
+	conf.ConnectionStringProperties = connectionStringProperties
+	// If the connection string contains an entity path, we need to double
+	// check that it matches the event hub name.
+	if conf.ConnectionStringProperties.EntityPath != nil && *conf.ConnectionStringProperties.EntityPath != conf.EventHubName {
+		return fmt.Errorf(
+			"invalid config: the entity path (%s) in the connection string does not match event hub name (%s)",
+			*conf.ConnectionStringProperties.EntityPath,
+			conf.EventHubName,
+		)
+	}
+
 	if conf.EventHubName == "" {
 		return errors.New("no event hub name configured")
 	}
@@ -143,8 +161,7 @@ func (conf *azureInputConfig) Validate() error {
 		conf.SAContainer = strings.ReplaceAll(conf.SAContainer, "_", "-")
 		logger.Warnf("replaced underscores (_) with hyphens (-) in the storage account container name (before: %s, now: %s", originalValue, conf.SAContainer)
 	}
-	err := storageContainerValidate(conf.SAContainer)
-	if err != nil {
+	if err := storageContainerValidate(conf.SAContainer); err != nil {
 		return err
 	}
 
@@ -220,13 +237,14 @@ func storageContainerValidate(name string) error {
 		return fmt.Errorf("storage_account_container (%s) must end with a lowercase letter or number", name)
 	}
 	for i := 0; i < length; i++ {
-		if !unicode.IsLower(runes[i]) && !unicode.IsNumber(runes[i]) && !(runes[i] == '-') {
-			return fmt.Errorf("rune %d of storage_account_container (%s) is not a lowercase letter, number or dash", i, name)
+		if !unicode.IsLower(runes[i]) && !unicode.IsNumber(runes[i]) && runes[i] != '-' {
+			return fmt.Errorf("rune (%d) of storage_account_container (%s) is not a lowercase letter, number or dash", i, name)
 		}
 		if runes[i] == '-' && previousRune == runes[i] {
 			return fmt.Errorf("consecutive dashes ('-') are not permitted in storage_account_container (%s)", name)
 		}
 		previousRune = runes[i]
 	}
+
 	return nil
 }
