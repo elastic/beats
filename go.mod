@@ -177,6 +177,7 @@ require (
 	github.com/elastic/elastic-agent-libs v0.19.4
 	github.com/elastic/elastic-agent-system-metrics v0.11.11
 	github.com/elastic/go-elasticsearch/v8 v8.17.1
+	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.3.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.19.0
@@ -293,7 +294,6 @@ require (
 	github.com/ebitengine/purego v0.9.0-alpha.3.0.20250507171635-5047c08daa38 // indirect
 	github.com/elastic/elastic-transport-go/v8 v8.6.1 // indirect
 	github.com/elastic/go-docappender/v2 v2.6.0 // indirect
-	github.com/elastic/go-freelru v0.16.0 // indirect
 	github.com/elastic/go-windows v1.0.2 // indirect
 	github.com/elastic/pkcs8 v1.0.0 // indirect
 	github.com/elazarl/goproxy v0.0.0-20240909085733-6741dbfc16a1 // indirect
