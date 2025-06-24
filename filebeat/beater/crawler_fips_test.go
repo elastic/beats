@@ -20,9 +20,11 @@
 package beater
 
 import (
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 )
 
 type fipsUnawareInput struct{}
