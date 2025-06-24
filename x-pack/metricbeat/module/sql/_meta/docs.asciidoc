@@ -39,7 +39,7 @@ Use `sql_queries` or `sql_query` depending on the use-case.
 
 `sql_query` (`Backward Compatibility`):: Single query you want to run. Also, provide corresponding `sql_response_format` (value: `variables` or `table`) similar to `sql_queries`'s `response_format`.
 
-`ssl` configuration:: Use `ssl.enabled`, `ssl.certificate_authorities`, `ssl.certificate`, `ssl.key`, and `ssl.verification_mode` params. See SSL configuration section. Supported drivers are `mysql`, `postgres`, and `mssql`.
+`ssl` configuration:: Use `ssl.certificate_authorities`, `ssl.certificate`, `ssl.key`, and `ssl.verification_mode` params. See SSL configuration section. Supported drivers are `mysql`, `postgres`, and `mssql`.
 
 [float]
 == Example
