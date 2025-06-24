@@ -222,6 +222,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add Fleet status update functionality to udp input. {issue}44419[44419] {pull}44785[44785]
 - Add Fleet status update functionality to tcp input. {issue}44420[44420] {pull}44786[44786]
 - Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
+- Add support for relationship expansion to EntraID entity analytics provider. {issue}43324[43324] {pull}44761[44761]
 
 *Auditbeat*
 
