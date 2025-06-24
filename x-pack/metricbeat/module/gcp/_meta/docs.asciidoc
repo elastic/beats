@@ -42,8 +42,6 @@ and metadata information from metricsets and fetch metrics only. At the moment,
 
 * *endpoint*: A custom endpoint to use for the GCP API calls. If not specified, the default endpoint will be used.
 
-<<<<<<< HEAD
-=======
 * *collect_dataproc_user_labels*: (`true`/`false` default `false`) Retrieve additional
 user-defined labels from Dataproc clusters.
 
@@ -55,7 +53,6 @@ cause temporary visibility gaps.
 * *metadata_cache_refresh_period*: A duration specifying how often the cached
 metadata should be refreshed (e.g., `5m`, `1h`).
 
->>>>>>> 6b6941eed ([gcp] Add metadata cache (#44432))
 [float]
 == Example configuration
 * `compute` metricset is enabled to collect metrics from `us-central1-a` zone
