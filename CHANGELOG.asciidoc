@@ -7,179 +7,49 @@
 === Beats version 8.18.3
 https://github.com/elastic/beats/compare/v8.18.2\...v8.18.3[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-- Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
-- Add check for http error codes in the Metricbeat's Prometheus query submodule {pull}44493[44493]
-- Sanitize error messages in Fetch method of SQL module {pull}44577[44577]
-
-*Osquerybeat*
-
-
-
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
 ==== Bugfixes
 
 *Affecting all Beats*
 
 - Fix `dns` processor to handle IPv6 server addresses properly. {pull}44526[44526]
 - Fix an issue where the Kafka output could get stuck if a proxied connection to the Kafka cluster was reset. {issue}44606[44606]
-- Use Debian 11 to build linux/arm to match linux/amd64. Upgrades linux/arm64's statically linked glibc from 2.28 to 2.31. {issue}44816[44816]
-
-*Auditbeat*
-
+- Use Debian 11 to build linux/arm to match linux/amd64. Upgrades linux/arm64's statically linked glibc version from 2.28 to 2.31. {issue}44816[44816]
 
 *Filebeat*
 
 - Journald input now works on Docker containers, all image variants except Wolfi. {issue}41278[41278] {issue}44040[44040] {pull}44295[44295]
 - Fix publishing Okta entity analytics enrichments. {pull}44483[44483]
-- If a Filestream input fails to be created, its ID is removed from the list of running input IDs {pull}44697[44697]
+- If a Filestream input fails to be created, its ID is removed from the list of running input IDs. {pull}44697[44697]
 - Fix timeout handling by Crowdstrike streaming input. {pull}44720[44720]
 - Ensure DEPROVISIONED Okta entities are published by Okta entityanalytics provider. {issue}12658[12658] {pull}44719[44719]
 - Fix handling of cursors by the streaming input for Crowdstrike. {issue}44364[44364] {pull}44548[44548]
 - Added missing "text/csv" content-type filter support in azureblobsortorage input. {issue}44596[44596] {pull}44824[44824]
 - Fix unexpected EOF detection and improve memory usage. {pull}44813[44813]
-
-*Heartbeat*
-
-
+- Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. {issue}44349[44349] {pull}44436[44436]
+- Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
 
 *Metricbeat*
 
 - Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group. {pull}44576[44576]
-- Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-
-*Elastic Logging Plugin*
-
+- Upgrade `go.mongodb.org/mongo-driver` from version `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module. {pull}44769[44769]
+- Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
 
 ==== Added
 
 *Affecting all Beats*
 
-- Update to Go 1.24.4. {pull}44696[44696]
-
-*Auditbeat*
-
-
-*Auditbeat*
-
-
-
-*Auditbeat*
-
+- Update Go version to 1.24.4. {pull}44696[44696]
 
 *Filebeat*
 
-- Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. {issue}44349[44349] {pull}44436[44436]
-- Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
-- Filestream now logs at level warn the number of files that are too small to be ingested {pull}44751[44751]
-
-*Auditbeat*
-
-
-*Libbeat*
-
-
-
-*Heartbeat*
-
+- Filestream now logs at level warn the number of files that are too small to be ingested. {pull}44751[44751]
 
 *Metricbeat*
 
 - Add new metrics to vSphere Virtual Machine dataset (CPU usage percentage, disk average usage, disk read/write rate, number of disk reads/writes, memory usage percentage). {pull}44205[44205]
-- Increase default polling period for MongoDB module from 10s to 60s {pull}44781[44781]
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-
-*Functionbeat*
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
-
+- Increase default polling period for MongoDB module from 10s to 60s. {pull}44781[44781]
+- Add check for http error codes in the Metricbeat's Prometheus query submodule. {pull}44493[44493]
+- Sanitize error messages in Fetch method of SQL module. {pull}44577[44577]
 
 
 [[release-notes-8.18.2]]
