@@ -78,6 +78,13 @@ type Input interface {
 	Run(Context, beat.PipelineConnector) error
 }
 
+// FIPSAwareInput is able to report if it is FIPS capable or not.
+type FIPSAwareInput interface {
+	// IsFIPSCapable returns true if the input is capable of running with
+	// FIPS-compliant algorithms; false, otherwise.
+	IsFIPSCapable() bool
+}
+
 // Context provides the Input Run function with common environmental
 // information and services.
 type Context struct {

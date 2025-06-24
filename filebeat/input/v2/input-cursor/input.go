@@ -87,6 +87,13 @@ func (inp *managedInput) Test(ctx input.TestContext) error {
 	return nil
 }
 
+func (inp *managedInput) IsFIPSCapable() bool {
+	if fipsAware, ok := inp.input.(input.FIPSAwareInput); ok {
+		return fipsAware.IsFIPSCapable()
+	}
+	return true
+}
+
 func (inp *managedInput) testSource(ctx input.TestContext, source Source) (err error) {
 	defer func() {
 		if v := recover(); v != nil {

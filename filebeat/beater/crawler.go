@@ -140,6 +140,10 @@ func (c *crawler) startInput(
 		inputRunner.Once = c.once
 	}
 
+	if err := checkFIPSCapability(runner); err != nil {
+		return err
+	}
+
 	c.inputs[id] = runner
 
 	c.log.Infof("Starting input (ID: %d)", id)
