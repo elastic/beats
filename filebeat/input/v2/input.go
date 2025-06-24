@@ -78,7 +78,8 @@ type Input interface {
 	Run(Context, beat.PipelineConnector) error
 }
 
-// FIPSAwareInput is able to report if it is FIPS capable or not.
+// FIPSAwareInput is able to report if it is FIPS capable or not. If a type does
+// not implement this interface, that type will be considered to be FIPS capable.
 type FIPSAwareInput interface {
 	// IsFIPSCapable returns true if the input is capable of running with
 	// FIPS-compliant algorithms; false, otherwise.
