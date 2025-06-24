@@ -10488,12 +10488,12 @@ Apache License
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/denisenkom/go-mssqldb
+Dependency : github.com/microsoft/go-mssqldb
 Version: v0.12.3
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/denisenkom/go-mssqldb@v0.12.3/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/microsoft/go-mssqldb@v0.12.3/LICENSE.txt:
 
 Copyright (c) 2012 The Go Authors. All rights reserved.
 
