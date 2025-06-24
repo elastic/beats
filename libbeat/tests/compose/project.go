@@ -195,12 +195,12 @@ func (c *Project) HostInformation(service string) (ServiceInfo, error) {
 	}
 
 	if len(servicesStatus) == 0 {
-		return nil, errors.New("no container running for service")
+		return nil, errors.New(fmt.Sprintf("no container running for service: %s", service))
 	}
 
 	status, ok := servicesStatus[service]
 	if !ok || status.Host() == "" {
-		return nil, errors.New("unknown host:port for service")
+		return nil, errors.New(fmt.Sprintf("unknown host:port for service: %s", service))
 	}
 
 	return status, nil

@@ -9,6 +9,7 @@ package gcppubsub
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -20,6 +21,7 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/iterator"
 
@@ -27,9 +29,11 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
 
 const (
@@ -474,4 +478,81 @@ func TestEndToEndACK(t *testing.T) {
 			t.Fatal(err)
 		}
 	})
+}
+
+func TestGCPInputOTelE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	gcpConfig := `filebeat.inputs:
+- type: gcp-pubsub
+  project_id: test-project-id
+  topic: test-topic-foo
+  subscription.name: test-subscription-bar
+  credentials_file: "testdata/fake.json"
+
+output:
+  elasticsearch:
+    hosts:
+      - localhost:9200
+    username: admin
+    password: testing
+
+queue.mem.flush.timeout: 0s
+setup.template.enabled: false
+processors:
+    - add_host_metadata: ~
+    - add_cloud_metadata: ~
+    - add_docker_metadata: ~
+    - add_kubernetes_metadata: ~
+`
+
+	// start filebeat in otel mode
+	filebeatOTel := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	filebeatOTel.WriteConfigFile(gcpConfig)
+	// Create pubsub client for setting up and communicating to emulator.
+	client, clientCancel := testSetup(t)
+	defer clientCancel()
+	defer client.Close()
+
+	createTopic(t, client)
+	const numMsgs = 10
+	publishMessages(t, client, numMsgs)
+
+	filebeatOTel.Start()
+
+	// prepare to query ES
+	es := integration.GetESClient(t, "http")
+
+	rawQuery := map[string]any{
+		"query": map[string]any{
+			"match_phrase": map[string]any{
+				"input.type": "gcppubsub",
+			},
+		},
+		"sort": []map[string]any{
+			{"@timestamp": map[string]any{"order": "asc"}},
+		},
+	}
+
+	var otelDocs estools.Documents
+	var err error
+
+	// wait for logs to be published
+	require.Eventually(t,
+		func() bool {
+			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, "filebeat-9.1.0*", es)
+			assert.NoError(t, err)
+
+			return otelDocs.Hits.Total.Value >= 1
+		},
+		3*time.Minute, 1*time.Second, fmt.Sprintf("Number of hits %d not equal to number of events %d", otelDocs.Hits.Total.Value, 1))
+
 }
