@@ -39,5 +39,5 @@ func checkFIPSCapability(runner cfgfile.Runner) error {
 		return nil
 	}
 
-	return fmt.Errorf("running a FIPS-capable distribution but input %s is not FIPS capable", runner.String())
+	return fmt.Errorf("running a FIPS-capable distribution but input [%s] is not FIPS capable", runner.String())
 }
