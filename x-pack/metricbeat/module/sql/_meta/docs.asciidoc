@@ -904,25 +904,25 @@ The SSL configuration is driver-specific. Different drivers interpret parameters
 
 Currently, there are two ways to make SSL connections to the databases:
 
-- Keep `ssl.enabled` flag disabled and supply all SSL parameters in the connection string in `hosts`.
+- Set `ssl.*` configuration parameters.
 
-- Enable `ssl.enabled` and use `ssl.*` configuration parameters.
+- Don't set any `ssl.*` configuration parameters and supply all SSL parameters in the connection string in `hosts`. Example: `postgres://postgres:mysecretpassword@localhost:5432?sslmode=verify-full&sslcert=%2Fpath%2Fto%2Fcert.pem&sslkey=%2Fpath%2Fto%2Fkey.pem&sslrootcert=%2Fpath%2Fto%2Fca.pem`
 
 ==== Limitations
 
 The module supports SSL with `mysql`, `mssql`, and `postgres` drivers. 
 
-When SSL is enabled with `ssl.enabled` parameter, only URL-formatted connection strings are accepted, like `"postgres://myuser:mypassword@localhost:5432/mydb"`, not like `"user=myuser password=mypassword dbname=mydb"`.
+When any `ssl.*` parameters are set, only URL-formatted connection strings are accepted, like `"postgres://myuser:mypassword@localhost:5432/mydb"`, not like `"user=myuser password=mypassword dbname=mydb"`.
 
 ===== `mysql` driver
 
-Params supported: `ssl.enabled`, `ssl.verification_mode`, `ssl.certificate`, `ssl.key`, `ssl.certificate_authorities`.
+Params supported: `ssl.verification_mode`, `ssl.certificate`, `ssl.key`, `ssl.certificate_authorities`.
 
 The certificates can be passed both as file paths and as certificate content (https://www.elastic.co/docs/reference/beats/metricbeat/configuration-ssl#client-certificate-authorities[embedding certificate example]).
 
 ===== `postgres` driver
 
-Params supported: `ssl.enabled`, `ssl.verification_mode`, `ssl.certificate`, `ssl.key`, `ssl.certificate_authorities`.
+Params supported: `ssl.verification_mode`, `ssl.certificate`, `ssl.key`, `ssl.certificate_authorities`.
 
 Only one certificate can be passed to `ssl.certificate_authorities` parameter.
 The certificates can be passed only as file paths. The files have to be present in the environment where the metricbeat is running.
@@ -935,11 +935,13 @@ The `ssl.verification_mode` is translated as following:
 
 - `certificate` -> `verify-ca`
 
+- `none` -> `require`
+
 ===== `mssql` driver
 
-Params supported: `ssl.enabled`, `ssl.verification_mode`, `ssl.certificate_authorities`.
+Params supported: `ssl.verification_mode`, `ssl.certificate_authorities`.
 
 Only one certificate can be passed to `ssl.certificate_authorities` parameter.
 The certificates can be passed only as file paths. The files have to be present in the environment where the metricbeat is running.
 
-If `ssl.verification_mode` is set to None, `TrustServerCertificate` will be set to `true`, otherwise it is `false`
+If `ssl.verification_mode` is set to `None`, `TrustServerCertificate` will be set to `true`, otherwise it is `false`

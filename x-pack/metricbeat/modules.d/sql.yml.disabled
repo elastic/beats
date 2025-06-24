@@ -6,15 +6,15 @@
     - query
   period: 10s
   hosts: ["postgres://postgres:mysecretpassword@localhost:5432"]
-  # Example of using SSL parameters manually in the connection string (with ssl.enabled set to false (default)). The SSL parameters "sslmode", "sslcert", "sslkey", and "sslrootcert" are passed in the connection string with slashes "/" being url-encoded to "%2F"
+  # Example of using SSL parameters manually in the Postgres connection string (with ssl.* parameters unset). The Postgres SSL parameters "sslmode", "sslcert", "sslkey", and "sslrootcert" are passed in the connection string with slashes "/" being url-encoded to "%2F"
   # hosts: ["postgres://postgres:mysecretpassword@localhost:5432?sslmode=verify-full&sslcert=%2Fpath%2Fto%2Fcert.pem&sslkey=%2Fpath%2Fto%2Fkey.pem&sslrootcert=%2Fpath%2Fto%2Fca.pem"]
+  # Example for SQL server
+  # hosts: ["sqlserver://myuser:mypassword@localhost:1433?TrustServerCertificate=false&certificate=%2Fpath%2Fto%2Fca.pem&database=mydb&encrypt=true"]
+
 
   driver: "postgres"
   sql_query: "select now()"
   sql_response_format: table
-
-  # Optional SSL/TLS. By default is false.
-  # ssl.enabled: true
 
   # List of root certificates for SSL/TLS server verification
   # ssl.certificate_authorities: ["/path/to/ca.pem"]
