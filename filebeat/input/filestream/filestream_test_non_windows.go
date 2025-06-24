@@ -27,7 +27,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // these tests are separated as one cannot delete/rename files
@@ -39,7 +39,7 @@ func TestLogFileRenamed(t *testing.T) {
 	renamedFile := f.Name() + ".renamed"
 
 	reader, err := newFileReader(
-		logp.L(),
+		logptest.NewTestingLogger(t, ""),
 		context.TODO(),
 		f,
 		readerConfig{},
@@ -74,7 +74,7 @@ func TestLogFileRemoved(t *testing.T) {
 	defer f.Close()
 
 	reader, err := newFileReader(
-		logp.L(),
+		logptest.NewTestingLogger(t, ""),
 		context.TODO(),
 		f,
 		readerConfig{},

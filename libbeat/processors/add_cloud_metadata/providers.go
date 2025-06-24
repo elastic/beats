@@ -58,7 +58,6 @@ type result struct {
 var cloudMetaProviders = map[string]provider{
 	"alibaba":       alibabaCloudMetadataFetcher,
 	"ecs":           alibabaCloudMetadataFetcher,
-	"azure":         azureVMMetadataFetcher,
 	"digitalocean":  doMetadataFetcher,
 	"aws":           ec2MetadataFetcher,
 	"ec2":           ec2MetadataFetcher,
@@ -78,7 +77,7 @@ var cloudMetaProviders = map[string]provider{
 // or other common endpoints. For example, Openstack supports EC2 compliant metadata endpoint. Thus adding possibility to
 // conflict metadata between EC2/AWS and Openstack.
 var priorityProviders = []string{
-	"aws", "ec2", "azure",
+	"aws", "ec2",
 }
 
 func selectProviders(configList providerList, providers map[string]provider) map[string]provider {
@@ -189,54 +188,49 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 		}()
 	}
 
-	var responses []result
+	return acceptFirstPriorityResult(ctx, p.logger, start, results)
+}
 
-	for ctx.Err() == nil {
+func acceptFirstPriorityResult(
+	ctx context.Context,
+	logger *logp.Logger,
+	startTime time.Time,
+	results chan result,
+) *result {
+	var response *result
+
+	done := false
+	for !done {
 		select {
 		case result := <-results:
-			p.logger.Debugf("add_cloud_metadata: received disposition for %v after %v. %v",
-				result.provider, time.Since(start), result)
+			logger.Debugf("add_cloud_metadata: received disposition for %v after %v. %v",
+				result.provider, time.Since(startTime), result)
 
 			if result.err == nil && result.metadata != nil {
-				responses = append(responses, result)
+				if slices.Contains(priorityProviders, result.provider) {
+					// We got a valid response from a priority provider, we don't need
+					// to wait for the rest.
+					response = &result
+					done = true
+				} else if response == nil {
+					// For non-priority providers, only set the response if it's currently
+					// empty.
+					response = &result
+				}
 			}
 
 			if result.err != nil {
-				p.logger.Debugf("add_cloud_metadata: received error for provider %s: %v", result.provider, result.err)
+				logger.Debugf("add_cloud_metadata: received error for provider %s: %v", result.provider, result.err)
 			}
 		case <-ctx.Done():
-			p.logger.Debugf("add_cloud_metadata: timed-out waiting for responses")
+			done = true
 		}
 	}
 
-	return priorityResult(responses, p.logger)
-}
-
-// priorityResult is a helper to extract correct result (if multiple exist) based on priorityProviders
-func priorityResult(responses []result, logger *logp.Logger) *result {
-	if len(responses) == 0 {
-		return nil
+	if response != nil {
+		logger.Debugf("add_cloud_metadata: using provider %s metadata based on priority", response.provider)
+	} else {
+		logger.Debugf("add_cloud_metadata: timed-out waiting for responses")
 	}
-
-	if len(responses) == 1 {
-		return &responses[0]
-	}
-
-	logger.Debugf("add_cloud_metadata: multiple responses were received, filtering based on priority")
-	var prioritizedResponses []result
-	for _, r := range responses {
-		if slices.Contains(priorityProviders, r.provider) {
-			prioritizedResponses = append(prioritizedResponses, r)
-		}
-	}
-
-	// simply send the first entry of prioritized response
-	if len(prioritizedResponses) != 0 {
-		pr := prioritizedResponses[0]
-		logger.Debugf("add_cloud_metadata: using provider %s metadata based on priority", pr.provider)
-		return &pr
-	}
-
-	// else send the first from bulk of response
-	return &responses[0]
+	return response
 }

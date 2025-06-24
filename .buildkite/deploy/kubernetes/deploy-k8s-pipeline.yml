@@ -41,6 +41,7 @@ steps:
 
     - label: "K8S Test/K8S version: {{matrix}}"
       matrix:
+        - "v1.33.0"
         - "v1.32.0"
         - "v1.31.0"
         - "v1.30.4"

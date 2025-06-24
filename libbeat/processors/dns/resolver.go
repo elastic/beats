@@ -21,6 +21,7 @@ import (
 	"errors"
 	"math"
 	"net"
+	"net/netip"
 	"strconv"
 	"strings"
 	"sync"
@@ -77,6 +78,9 @@ func newMiekgResolver(reg *monitoring.Registry, timeout time.Duration, transport
 
 	// Add port if one was not specified.
 	for i, s := range servers {
+		if isIPv6Address(s) {
+			s = "[" + s + "]" // Add brackets for IPv6 addresses.
+		}
 		if _, _, err := net.SplitHostPort(s); err != nil {
 			var withPort string
 			switch transport {
@@ -257,4 +261,12 @@ func min(a, b uint32) uint32 {
 		return a
 	}
 	return b
+}
+
+func isIPv6Address(addr string) bool {
+	ip, err := netip.ParseAddr(addr)
+	if err != nil {
+		return false
+	}
+	return ip.Is6()
 }

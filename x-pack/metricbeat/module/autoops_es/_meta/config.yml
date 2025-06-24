@@ -1,0 +1,21 @@
+- module: autoops_es
+  metricsets:
+    - cat_shards
+    - cluster_health
+    - cluster_settings
+    - hot_threads
+    - license
+    - node_stats
+    - tasks_management
+  period: 10s
+  enabled: true
+  hosts: ["http://localhost:9200"]
+
+- module: autoops_es
+  metricsets:
+    - cat_template
+    - component_template
+    - index_template
+  period: 1d
+  enabled: true
+  hosts: ["http://localhost:9200"]

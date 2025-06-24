@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-zeek.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Zeek fields [exported-fields-zeek]
 
 Module for handling logs produced by Zeek/Bro
-
 
 ## zeek [_zeek]
 
@@ -16,7 +17,6 @@ Fields from Zeek/Bro logs after normalization
 :   A unique identifier of the session
 
 type: keyword
-
 
 
 ## capture_loss [_capture_loss]
@@ -48,10 +48,9 @@ type: integer
 
 
 **`zeek.capture_loss.percent_lost`**
-:   Percentage of ACKs seen where the data being ACKed wasn’t seen.
+:   Percentage of ACKs seen where the data being ACKed wasn't seen.
 
 type: double
-
 
 
 ## connection [_connection]
@@ -118,13 +117,12 @@ type: integer
 type: integer
 
 
-
 ## dce_rpc [_dce_rpc]
 
 Fields exported by the Zeek DCE_RPC log
 
 **`zeek.dce_rpc.rtt`**
-:   Round trip time from the request to the response. If either the request or response wasn’t seen, this will be null.
+:   Round trip time from the request to the response. If either the request or response wasn't seen, this will be null.
 
 type: integer
 
@@ -145,7 +143,6 @@ type: keyword
 :   Operation seen in the call.
 
 type: keyword
-
 
 
 ## dhcp [_dhcp]
@@ -182,7 +179,6 @@ type: keyword
 type: integer
 
 
-
 ## address [_address]
 
 Addresses seen in this DHCP exchange.
@@ -200,7 +196,7 @@ type: ip
 
 
 **`zeek.dhcp.address.mac`**
-:   Client’s hardware address.
+:   Client's hardware address.
 
 type: keyword
 
@@ -266,10 +262,9 @@ type: keyword
 
 
 **`zeek.dhcp.id.subscriber`**
-:   (present if policy/protocols/dhcp/sub-opts.bro is loaded) The subscriber ID is a value independent of the physical network configuration so that a customer’s DHCP configuration can be given to them correctly no matter where they are physically connected.
+:   (present if policy/protocols/dhcp/sub-opts.bro is loaded) The subscriber ID is a value independent of the physical network configuration so that a customer's DHCP configuration can be given to them correctly no matter where they are physically connected.
 
 type: keyword
-
 
 
 ## dnp3 [_dnp3]
@@ -289,13 +284,12 @@ type: keyword
 
 
 **`zeek.dnp3.id`**
-:   The response’s internal indication number.
+:   The response's internal indication number.
 
 type: integer
 
 
-
-## dns [_dns_2]
+## dns [_dns]
 
 Fields exported by the Zeek DNS log
 
@@ -419,7 +413,6 @@ type: boolean
 type: boolean
 
 
-
 ## dpd [_dpd]
 
 Fields exported by the Zeek DPD log
@@ -440,7 +433,6 @@ type: keyword
 :   (present if policy/frameworks/dpd/packet-segment-logging.bro is loaded) A chunk of the payload that most likely resulted in the protocol violation.
 
 type: keyword
-
 
 
 ## files [_files]
@@ -538,7 +530,7 @@ type: long
 
 
 **`zeek.files.overflow_bytes`**
-:   The number of bytes in the file stream that were not delivered to stream file analyzers. This could be overlapping bytes or bytes that couldn’t be reassembled.
+:   The number of bytes in the file stream that were not delivered to stream file analyzers. This could be overlapping bytes or bytes that couldn't be reassembled.
 
 type: long
 
@@ -595,7 +587,6 @@ type: long
 :   The information density of the contents of the file.
 
 type: double
-
 
 
 ## ftp [_ftp]
@@ -656,7 +647,6 @@ type: integer
 type: keyword
 
 
-
 ## data_channel [_data_channel]
 
 Expected FTP data channel.
@@ -686,10 +676,9 @@ type: integer
 
 
 **`zeek.ftp.cwd`**
-:   Current working directory that this session is in. By making the default value *.*, we can indicate that unless something more concrete is discovered that the existing but unknown directory is ok to use.
+:   Current working directory that this session is in. By making the default value '.', we can indicate that unless something more concrete is discovered that the existing but unknown directory is ok to use.
 
 type: keyword
-
 
 
 ## cmdarg [_cmdarg]
@@ -738,8 +727,7 @@ type: boolean
 type: keyword
 
 
-
-## http [_http_3]
+## http [_http]
 
 Fields exported by the Zeek HTTP log
 
@@ -857,7 +845,6 @@ type: integer
 type: integer
 
 
-
 ## intel [_intel]
 
 Fields exported by the Zeek Intel log.
@@ -946,7 +933,6 @@ type: keyword
 type: keyword
 
 
-
 ## irc [_irc]
 
 Fields exported by the Zeek IRC log
@@ -1005,8 +991,7 @@ type: keyword
 type: keyword
 
 
-
-## kerberos [_kerberos_3]
+## kerberos [_kerberos]
 
 Fields exported by the Zeek Kerberos log
 
@@ -1130,7 +1115,6 @@ type: keyword
 type: keyword
 
 
-
 ## modbus [_modbus]
 
 Fields exported by the Zeek modbus log.
@@ -1153,8 +1137,7 @@ type: keyword
 type: integer
 
 
-
-## mysql [_mysql_2]
+## mysql [_mysql]
 
 Fields exported by the Zeek MySQL log.
 
@@ -1186,7 +1169,6 @@ type: integer
 :   Server message, if any.
 
 type: keyword
-
 
 
 ## notice [_notice]
@@ -1254,7 +1236,7 @@ type: long
 
 
 **`zeek.notice.file.overflow_bytes`**
-:   The number of bytes in the file stream that were not delivered to stream file analyzers. This could be overlapping bytes or bytes that couldn’t be reassembled.
+:   The number of bytes in the file stream that were not delivered to stream file analyzers. This could be overlapping bytes or bytes that couldn't be reassembled.
 
 type: long
 
@@ -1337,7 +1319,6 @@ type: double
 type: boolean
 
 
-
 ## ntlm [_ntlm]
 
 Fields exported by the Zeek NTLM log.
@@ -1382,7 +1363,6 @@ type: keyword
 :   Tree name given by the server in a CHALLENGE.
 
 type: keyword
-
 
 
 ## ntp [_ntp]
@@ -1467,10 +1447,10 @@ type: date
 type: integer
 
 
-
 ## ocsp [_ocsp]
 
-Fields exported by the Zeek OCSP log Online Certificate Status Protocol (OCSP). Only created if policy script is loaded.
+Fields exported by the Zeek OCSP log
+Online Certificate Status Protocol (OCSP). Only created if policy script is loaded.
 
 **`zeek.ocsp.file_id`**
 :   File id of the OCSP reply.
@@ -1485,13 +1465,13 @@ type: keyword
 
 
 **`zeek.ocsp.hash.issuer.name`**
-:   Hash of the issuer’s distingueshed name.
+:   Hash of the issuer's distingueshed name.
 
 type: keyword
 
 
 **`zeek.ocsp.hash.issuer.key`**
-:   Hash of the issuer’s public key.
+:   Hash of the issuer's public key.
 
 type: keyword
 
@@ -1532,13 +1512,12 @@ type: date
 type: date
 
 
-
-## pe [_pe_2]
+## pe [_pe]
 
 Fields exported by the Zeek pe log.
 
 **`zeek.pe.client`**
-:   The client’s version string.
+:   The client's version string.
 
 type: keyword
 
@@ -1639,7 +1618,6 @@ type: boolean
 type: keyword
 
 
-
 ## radius [_radius]
 
 Fields exported by the Zeek Radius log.
@@ -1698,7 +1676,6 @@ type: integer
 type: boolean
 
 
-
 ## rdp [_rdp]
 
 Fields exported by the Zeek RDP log.
@@ -1710,7 +1687,7 @@ type: keyword
 
 
 **`zeek.rdp.result`**
-:   Status result for the connection. It’s a mix between RDP negotation failure messages and GCC server create response messages.
+:   Status result for the connection. It's a mix between RDP negotation failure messages and GCC server create response messages.
 
 type: keyword
 
@@ -1805,7 +1782,6 @@ type: boolean
 type: boolean
 
 
-
 ## rfb [_rfb]
 
 Fields exported by the Zeek RFB log.
@@ -1870,7 +1846,6 @@ type: integer
 type: integer
 
 
-
 ## signature [_signature]
 
 Fields exported by the Zeek Signature log.
@@ -1911,7 +1886,6 @@ type: integer
 type: integer
 
 
-
 ## sip [_sip]
 
 Fields exported by the Zeek SIP log.
@@ -1947,7 +1921,7 @@ type: keyword
 
 
 **`zeek.sip.request.from`**
-:   Contents of the request From: header Note: The tag= value that’s usually appended to the sender is stripped off and not logged.
+:   Contents of the request From: header Note: The tag= value that's usually appended to the sender is stripped off and not logged.
 
 type: keyword
 
@@ -1971,7 +1945,7 @@ type: long
 
 
 **`zeek.sip.response.from`**
-:   Contents of the response From: header Note: The tag= value that’s usually appended to the sender is stripped off and not logged.
+:   Contents of the response From: header Note: The tag= value that's usually appended to the sender is stripped off and not logged.
 
 type: keyword
 
@@ -2042,7 +2016,6 @@ type: keyword
 type: keyword
 
 
-
 ## smb_cmd [_smb_cmd]
 
 Fields exported by the Zeek smb_cmd log.
@@ -2066,7 +2039,7 @@ type: keyword
 
 
 **`zeek.smb_cmd.status`**
-:   Server reply to the client’s command.
+:   Server reply to the client's command.
 
 type: keyword
 
@@ -2101,8 +2074,7 @@ type: keyword
 type: keyword
 
 
-
-## file [_file_4]
+## file [_file]
 
 If the command referenced a file, store it here.
 
@@ -2148,7 +2120,6 @@ type: keyword
 type: integer
 
 
-
 ## smb_files [_smb_files]
 
 Fields exported by the Zeek SMB Files log.
@@ -2178,7 +2149,7 @@ type: keyword
 
 
 **`zeek.smb_files.previous_name`**
-:   If the rename action was seen, this will be the file’s previous name.
+:   If the rename action was seen, this will be the file's previous name.
 
 type: keyword
 
@@ -2189,31 +2160,30 @@ type: keyword
 type: long
 
 
-
 ## times [_times]
 
 Timestamps of the file.
 
 **`zeek.smb_files.times.accessed`**
-:   The file’s access time.
+:   The file's access time.
 
 type: date
 
 
 **`zeek.smb_files.times.changed`**
-:   The file’s change time.
+:   The file's change time.
 
 type: date
 
 
 **`zeek.smb_files.times.created`**
-:   The file’s create time.
+:   The file's create time.
 
 type: date
 
 
 **`zeek.smb_files.times.modified`**
-:   The file’s modify time.
+:   The file's modify time.
 
 type: date
 
@@ -2222,7 +2192,6 @@ type: date
 :   UUID referencing this file if DCE/RPC.
 
 type: keyword
-
 
 
 ## smb_mapping [_smb_mapping]
@@ -2251,7 +2220,6 @@ type: keyword
 :   If this is SMB2, a share type will be included. For SMB1, the type of share will be deduced and included as well.
 
 type: keyword
-
 
 
 ## smtp [_smtp]
@@ -2396,7 +2364,6 @@ type: keyword
 type: boolean
 
 
-
 ## snmp [_snmp]
 
 Fields exported by the Zeek SNMP log.
@@ -2414,7 +2381,7 @@ type: keyword
 
 
 **`zeek.snmp.community`**
-:   The community string of the first SNMP packet associated with the session. This is used as part of SNMP’s (v1 and v2c) administrative/security framework. See RFC 1157 or RFC 1901.
+:   The community string of the first SNMP packet associated with the session. This is used as part of SNMP's (v1 and v2c) administrative/security framework. See RFC 1157 or RFC 1901.
 
 type: keyword
 
@@ -2450,10 +2417,9 @@ type: keyword
 
 
 **`zeek.snmp.up_since`**
-:   The time at which the SNMP responder endpoint claims it’s been up since.
+:   The time at which the SNMP responder endpoint claims it's been up since.
 
 type: date
-
 
 
 ## socks [_socks]
@@ -2514,13 +2480,12 @@ type: integer
 type: boolean
 
 
-
 ## ssh [_ssh]
 
 Fields exported by the Zeek SSH log.
 
 **`zeek.ssh.client`**
-:   The client’s version string.
+:   The client's version string.
 
 type: keyword
 
@@ -2532,13 +2497,13 @@ type: keyword
 
 
 **`zeek.ssh.host_key`**
-:   The server’s key thumbprint.
+:   The server's key thumbprint.
 
 type: keyword
 
 
 **`zeek.ssh.server`**
-:   The server’s version string.
+:   The server's version string.
 
 type: keyword
 
@@ -2547,7 +2512,6 @@ type: keyword
 :   SSH major version (1 or 2).
 
 type: integer
-
 
 
 ## algorithm [_algorithm]
@@ -2567,7 +2531,7 @@ type: keyword
 
 
 **`zeek.ssh.algorithm.host_key`**
-:   The server host key’s algorithm.
+:   The server host key's algorithm.
 
 type: keyword
 
@@ -2585,7 +2549,7 @@ type: keyword
 
 
 **`zeek.ssh.auth.attempts`**
-:   The number of authentication attemps we observed. There’s always at least one, since some servers might support no authentication at all. It’s important to note that not all of these are failures, since some servers require two-factor auth (e.g. password AND pubkey).
+:   The number of authentication attemps we observed. There's always at least one, since some servers might support no authentication at all. It's important to note that not all of these are failures, since some servers require two-factor auth (e.g. password AND pubkey).
 
 type: integer
 
@@ -2596,8 +2560,7 @@ type: integer
 type: boolean
 
 
-
-## ssl [_ssl_8]
+## ssl [_ssl]
 
 Fields exported by the Zeek SSL log.
 
@@ -2673,7 +2636,6 @@ type: keyword
 type: keyword
 
 
-
 ## issuer [_issuer]
 
 Subject of the signer of the X.509 certificate offered by the server.
@@ -2712,7 +2674,6 @@ type: keyword
 :   State or province name of the signer of the X.509 certificate offered by the server.
 
 type: keyword
-
 
 
 ## subject [_subject]
@@ -2767,8 +2728,7 @@ type: keyword
 type: keyword
 
 
-
-## issuer [_issuer_2]
+## issuer [_issuer]
 
 Subject of the signer of the X.509 certificate offered by the client.
 
@@ -2808,8 +2768,7 @@ type: keyword
 type: keyword
 
 
-
-## subject [_subject_2]
+## subject [_subject]
 
 Subject of the X.509 certificate offered by the client.
 
@@ -2849,8 +2808,7 @@ type: keyword
 type: keyword
 
 
-
-## stats [_stats_2]
+## stats [_stats]
 
 Fields exported by the Zeek stats log.
 
@@ -3004,8 +2962,7 @@ type: integer
 type: integer
 
 
-
-## syslog [_syslog_4]
+## syslog [_syslog]
 
 Fields exported by the Zeek syslog log.
 
@@ -3027,7 +2984,6 @@ type: keyword
 type: keyword
 
 
-
 ## tunnel [_tunnel]
 
 Fields exported by the Zeek SSH log.
@@ -3042,7 +2998,6 @@ type: keyword
 :   The type of activity that occurred.
 
 type: keyword
-
 
 
 ## weird [_weird]
@@ -3079,8 +3034,7 @@ type: keyword
 type: keyword
 
 
-
-## x509 [_x509_2]
+## x509 [_x509]
 
 Fields exported by the Zeek x509 log.
 
@@ -3090,8 +3044,7 @@ Fields exported by the Zeek x509 log.
 type: keyword
 
 
-
-## certificate [_certificate_2]
+## certificate [_certificate]
 
 Basic information about the certificate.
 
@@ -3107,8 +3060,7 @@ type: integer
 type: keyword
 
 
-
-## subject [_subject_3]
+## subject [_subject]
 
 Subject.
 
@@ -3148,8 +3100,7 @@ type: keyword
 type: keyword
 
 
-
-## issuer [_issuer_3]
+## issuer [_issuer]
 
 Issuer.
 
@@ -3193,7 +3144,6 @@ type: keyword
 :   Last (most specific) common name.
 
 type: keyword
-
 
 
 ## valid [_valid]
@@ -3248,7 +3198,6 @@ type: keyword
 type: keyword
 
 
-
 ## san [_san]
 
 Subject alternative name extension of the certificate.
@@ -3281,7 +3230,6 @@ type: ip
 :   True if the certificate contained other, not recognized or parsed name fields.
 
 type: boolean
-
 
 
 ## basic_constraints [_basic_constraints]

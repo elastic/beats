@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-log.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Log file content fields [exported-fields-log]
 
 Contains log file lines.
@@ -24,7 +26,7 @@ required: False
 
 
 **`stream`**
-:   Log stream when reading container logs, can be *stdout* or *stderr*
+:   Log stream when reading container logs, can be 'stdout' or 'stderr'
 
 type: keyword
 
@@ -110,7 +112,7 @@ alias to: event.created
 
 
 **`docker.attrs`**
-:   docker.attrs contains labels and environment variables written by docker’s JSON File logging driver. These fields are only available when they are configured in the logging driver options.
+:   docker.attrs contains labels and environment variables written by docker's JSON File logging driver. These fields are only available when they are configured in the logging driver options.
 
 type: object
 

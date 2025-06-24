@@ -111,6 +111,7 @@ The supported processors are:
 * [`fingerprint`](/reference/filebeat/fingerprint.md)
 * [`include_fields`](/reference/filebeat/include-fields.md)
 * [`move-fields`](/reference/filebeat/move-fields.md)
+* [`now`](/reference/filebeat/now.md)
 * [`parse_aws_vpc_flow_log`](/reference/filebeat/processor-parse-aws-vpc-flow-log.md)
 * [`rate_limit`](/reference/filebeat/rate-limit.md)
 * [`registered_domain`](/reference/filebeat/processor-registered-domain.md)

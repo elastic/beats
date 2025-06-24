@@ -61,8 +61,13 @@ func newEventCaptor(events chan beat.Event) channel.Outleter {
 }
 
 func (ec *eventCaptor) OnEvent(event beat.Event) bool {
-	ec.events <- event
-	return true
+	select {
+	case ec.events <- event:
+		return true
+	case <-ec.c:
+		// captor has been closed
+		return false
+	}
 }
 
 func (ec *eventCaptor) Close() error {
@@ -99,11 +104,6 @@ func TestInput(t *testing.T) {
 
 	captor := newEventCaptor(eventsCh)
 
-	t.Cleanup(func() {
-		close(eventsCh)
-		captor.Close()
-	})
-
 	connector := channel.ConnectorFunc(func(_ *conf.C, _ beat.ClientConfig) (channel.Outleter, error) {
 		return channel.SubOutlet(captor), nil
 	})
@@ -121,6 +121,11 @@ func TestInput(t *testing.T) {
 	require.NotNil(t, input)
 
 	t.Cleanup(func() {
+		// Captor must close before input during cleanup, otherwise it can keep
+		// trying to send to eventsCh after we stop reading it, which blocks
+		// and prevents input.Stop() from returning since it waits for the
+		// harvester to close.
+		captor.Close()
 		input.Stop()
 	})
 

@@ -925,7 +925,7 @@ func NewContainerMetadataEnricher(
 		ids := make([]string, 0)
 		pod, ok := r.(*kubernetes.Pod)
 		if !ok {
-			base.Logger().Debugf("Error while casting event: %s", ok)
+			log.Debugf("Error while casting event: %s", ok)
 		}
 
 		for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
@@ -957,13 +957,13 @@ func NewContainerMetadataEnricher(
 func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
 	config, err := GetConfig(base)
 	if err != nil {
-		logp.Err("Error while getting config: %v", err)
+		base.Logger().Errorf("Error while getting config: %v", err)
 		return nil, err
 	}
 
 	config, err = validateConfig(config)
 	if err != nil {
-		logp.Err("Error while validating config: %v", err)
+		base.Logger().Errorf("Error while validating config: %v", err)
 		return nil, err
 	}
 	return config, nil
@@ -1147,7 +1147,7 @@ func (e *enricher) Enrich(events []mapstr.M) {
 			ecsMeta := meta
 			err = ecsMeta.Delete("kubernetes")
 			if err != nil {
-				logp.Debug("kubernetes", "Failed to delete field '%s': %s", "kubernetes", err)
+				e.log.Named("kubernetes").Debugf("Failed to delete field '%s': %s", "kubernetes", err)
 			}
 
 			event.DeepUpdate(mapstr.M{

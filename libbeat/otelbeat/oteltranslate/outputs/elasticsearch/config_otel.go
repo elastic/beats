@@ -64,7 +64,7 @@ type esToOTelOptions struct {
 var defaultOptions = esToOTelOptions{
 	ElasticsearchConfig: elasticsearch.DefaultConfig(),
 
-	Index:    "filebeat-9.0.0", // TODO. Default value should be filebeat-%{[agent.version]}
+	Index:    "", // Dynamic routing is disabled if index is set
 	Pipeline: "",
 	ProxyURL: "",
 	Preset:   "custom", // default is custom if not set
@@ -126,8 +126,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	}
 
 	otelYAMLCfg := map[string]any{
-		"logs_index": escfg.Index, // index
-		"endpoints":  hosts,       // hosts, protocol, path, port
+		"endpoints": hosts, // hosts, protocol, path, port
 
 		// ClientConfig
 		"timeout":           escfg.Transport.Timeout,         // timeout
@@ -163,6 +162,8 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	setIfNotNil(otelYAMLCfg, "tls", otelTLSConfg)         // tls config
 	setIfNotNil(otelYAMLCfg, "proxy_url", escfg.ProxyURL) // proxy_url
 	setIfNotNil(otelYAMLCfg, "pipeline", escfg.Pipeline)  // pipeline
+	// Dynamic routing is disabled if output.elasticsearch.index is set
+	setIfNotNil(otelYAMLCfg, "logs_index", escfg.Index) // index
 
 	if err := typeSafetyCheck(otelYAMLCfg); err != nil {
 		return nil, err

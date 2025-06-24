@@ -51,13 +51,13 @@ The following patterns are supported:
 | `x*` | zero or more `x` |
 | `x+` | one or more `x` |
 | `x?` | zero or one `x` |
-| `x{n,m}` | `n` or `n+1` or …​ or `m` `x`, prefer more |
+| `x{n,m}` | `n` or `n+1` or … or `m` `x`, prefer more |
 | `x{n,}` | `n` or more `x`, prefer more |
 | `x{{n}}` | exactly `n` `x` |
 | `x*?` | zero or more `x`, prefer fewer |
 | `x+?` | one or more `x`, prefer fewer |
 | `x??` | zero or one `x`, prefer zero |
-| `x{n,m}?` | `n` or `n+1` or …​ or `m` `x`, prefer fewer |
+| `x{n,m}?` | `n` or `n+1` or … or `m` `x`, prefer fewer |
 | `x{n,}?` | `n` or more `x`, prefer fewer |
 | `x{{n}}?` | exactly `n` `x` |
 | $$$grouping$$$**Grouping** |  |

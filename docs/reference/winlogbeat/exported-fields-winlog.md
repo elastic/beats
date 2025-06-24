@@ -3,13 +3,14 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/exported-fields-winlog.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Winlogbeat fields [exported-fields-winlog]
 
 Fields from the Windows Event Log.
 
 **`event.original`**
 :   The raw XML representation of the event obtained from Windows. This field is only available on operating systems supporting the Windows Event Log API (Microsoft Windows Vista and newer). This field is not included by default and must be enabled by setting `include_xml: true` as a configuration option for an individual event log. The XML representation of the event is useful for troubleshooting purposes. The data in the fields reported by Winlogbeat can be compared to the data in the XML to diagnose problems.
-
 
 
 ## winlog [_winlog]
@@ -62,7 +63,6 @@ required: False
 type: object
 
 required: False
-
 
 
 ## event_data [_event_data]
@@ -610,7 +610,7 @@ required: True
 
 
 **`winlog.record_id`**
-:   The record ID of the event log record. The first record written to an event log is record number 1, and other records are numbered sequentially. If the record number reaches the maximum value (232 for the Event Logging API and 264 for the Windows Event Log API), the next record number will be 0.
+:   The record ID of the event log record. The first record written to an event log is record number 1, and other records are numbered sequentially. If the record number reaches the maximum value (2^32^ for the Event Logging API and 2^64^ for the Windows Event Log API), the next record number will be 0.
 
 type: keyword
 
@@ -744,7 +744,7 @@ required: False
 
 
 **`winlog.version`**
-:   The version number of the event’s definition.
+:   The version number of the event's definition.
 
 type: long
 

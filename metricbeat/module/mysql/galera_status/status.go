@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 /*
 Package galera_status fetches MySQL Galera server status metrics.
 

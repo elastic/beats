@@ -245,6 +245,24 @@ func GoIntegTest(ctx context.Context) error {
 	return devtools.GoTestIntegrationForModule(ctx)
 }
 
+// GoFIPSOnlyIntegTest executes the Go integration tests.
+// Sets GODEBUG=fips140=only.
+// Use TEST_COVERAGE=true to enable code coverage profiling if not running on Windows 7 32bit.
+// Use RACE_DETECTOR=true to enable the race detector.
+// Use TEST_TAGS=tag1,tag2 to add additional build tags.
+// Use MODULE=module to run only tests for `module`.
+func GoFIPSOnlyIntegTest(ctx context.Context) error {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
+	if !devtools.IsInIntegTestEnv() {
+		mg.SerialDeps(Fields, Dashboards)
+	}
+	os.Setenv("GODEBUG", "fips140=only")
+	return devtools.GoTestIntegrationForModule(ctx)
+}
+
 // PythonIntegTest executes the python system tests in the integration
 // environment (Docker).
 // Use MODULE=module to run only tests for `module`.

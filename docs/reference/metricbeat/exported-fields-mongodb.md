@@ -3,15 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-mongodb.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # MongoDB fields [exported-fields-mongodb]
 
 Metrics collected from MongoDB servers.
 
-
 ## mongodb [_mongodb]
 
 MongoDB metrics.
-
 
 ## collstats [_collstats]
 
@@ -191,7 +191,6 @@ type: long
 type: long
 
 
-
 ## dbstats [_dbstats]
 
 dbstats provides an overview of a particular mongo database. This document is most concerned with data volumes of a database.
@@ -268,15 +267,14 @@ format: bytes
 format: bytes
 
 
+## metrics [_metrics]
 
-## metrics [_metrics_9]
-
-Statistics that reflect the current use and state of a running `mongod` instance for more information, take a look at [https://docs.mongodb.com/manual/reference/command/serverStatus/#serverstatus.metrics](https://docs.mongodb.com/manual/reference/command/serverStatus/#serverstatus.metrics)
-
+Statistics that reflect the current use and state of a running `mongod` instance for more information, take a look at https://docs.mongodb.com/manual/reference/command/serverStatus/#serverstatus.metrics
 
 ## commands [_commands]
 
-Reports on the use of database commands. The fields in metrics.commands are the names of database commands and each value is a document that reports the total number of commands executed as well as the number of failed executions. metrics.commands.<command>.failed shows the number of times <command> failed on this mongod. metrics.commands.<command>.total shows the number of times <command> executed on this mongod.
+Reports on the use of database commands. The fields in metrics.commands are the names of database commands and each value is a document that reports the total number of commands executed as well as the number of failed executions.
+metrics.commands.<command>.failed shows the number of times <command> failed on this mongod. metrics.commands.<command>.total shows the number of times <command> executed on this mongod.
 
 **`mongodb.metrics.commands.is_self.failed`**
 :   type: long
@@ -518,7 +516,6 @@ Reports on the use of database commands. The fields in metrics.commands are the 
 :   type: long
 
 
-
 ## cursor [_cursor]
 
 Contains data regarding cursor state and use.
@@ -527,7 +524,6 @@ Contains data regarding cursor state and use.
 :   The total number of cursors that have timed out since the server process started.
 
 type: long
-
 
 
 ## open [_open]
@@ -550,7 +546,6 @@ type: long
 :   The number of cursors that MongoDB is maintaining for clients.
 
 type: long
-
 
 
 ## document [_document]
@@ -581,7 +576,6 @@ type: long
 type: long
 
 
-
 ## get_last_error [_get_last_error]
 
 Returns the error status of the preceding write operation on the current connection.
@@ -604,7 +598,6 @@ type: long
 type: long
 
 
-
 ## operation [_operation]
 
 Holds counters for several types of update and query operations that MongoDB handles using special operation types.
@@ -619,7 +612,6 @@ type: long
 :   The total number of queries that encountered write conflicts.
 
 type: long
-
 
 
 ## query_executor [_query_executor]
@@ -638,11 +630,9 @@ type: long
 type: long
 
 
-
 ## replication [_replication]
 
-Reports metrics related to the replication process. metrics.replication appears on all mongod instances, even those that aren’t members of replica sets.
-
+Reports metrics related to the replication process. metrics.replication appears on all mongod instances, even those that aren't members of replica sets.
 
 ## executor [_executor]
 
@@ -728,14 +718,12 @@ Reports on various statistics for the replication executor.
 :   type: keyword
 
 
-
 ## apply [_apply]
 
 Reports on the application of operations from the replication oplog.
 
 **`mongodb.metrics.replication.apply.attempts_to_become_secondary`**
 :   type: long
-
 
 
 ## batches [_batches]
@@ -760,7 +748,6 @@ type: long
 type: long
 
 
-
 ## buffer [_buffer]
 
 MongoDB buffers oplog operations from the replication sync source buffer before applying oplog entries in a batch. metrics.replication.buffer provides a way to track the oplog buffer.
@@ -783,7 +770,6 @@ type: long
 type: long
 
 
-
 ## initial_sync [_initial_sync]
 
 Report initial sync status
@@ -800,8 +786,7 @@ Report initial sync status
 :   type: long
 
 
-
-## network [_network_8]
+## network [_network]
 
 Reports network use by the replication process.
 
@@ -809,7 +794,6 @@ Reports network use by the replication process.
 :   The total amount of data read from the replication sync source.
 
 type: long
-
 
 
 ## getmores [_getmores]
@@ -840,11 +824,9 @@ type: long
 type: long
 
 
-
 ## preload [_preload]
 
 Reports on the `pre-fetch` stage, where MongoDB loads documents and indexes into RAM to improve replication throughput.
-
 
 ## docs [_docs]
 
@@ -858,7 +840,6 @@ type: long
 
 **`mongodb.metrics.replication.preload.docs.time.ms`**
 :   type: long
-
 
 
 ## indexes [_indexes]
@@ -895,8 +876,7 @@ type: long
 type: long
 
 
-
-## ttl [_ttl_2]
+## ttl [_ttl]
 
 Reports on the operation of the resource use of the ttl index process.
 
@@ -912,11 +892,9 @@ type: long
 type: long
 
 
-
 ## replstatus [_replstatus]
 
 replstatus provides an overview of replica set status.
-
 
 ## oplog [_oplog]
 
@@ -986,7 +964,6 @@ type: long
 type: long
 
 
-
 ## lag [_lag]
 
 Delay between a write operation on the primary and its copy to a secondary
@@ -1007,13 +984,12 @@ type: long
 format: duration
 
 
-
 ## headroom [_headroom]
 
-Difference between the primary’s oplog window and the replication lag of the secondary
+Difference between the primary's oplog window and the replication lag of the secondary
 
 **`mongodb.replstatus.headroom.max`**
-:   Difference between primary’s oplog window and the replication lag of the fastest secondary
+:   Difference between primary's oplog window and the replication lag of the fastest secondary
 
 type: long
 
@@ -1021,12 +997,11 @@ format: duration
 
 
 **`mongodb.replstatus.headroom.min`**
-:   Difference between primary’s oplog window and the replication lag of the slowest secondary
+:   Difference between primary's oplog window and the replication lag of the slowest secondary
 
 type: long
 
 format: duration
-
 
 
 ## members [_members]
@@ -1145,8 +1120,7 @@ type: keyword
 type: long
 
 
-
-## status [_status_6]
+## status [_status]
 
 MongoDB server status metrics.
 
@@ -1208,8 +1182,7 @@ type: long
 type: long
 
 
-
-## connections [_connections_3]
+## connections [_connections]
 
 Data regarding the current status of incoming connections and availability of the database server.
 
@@ -1231,7 +1204,6 @@ type: long
 type: long
 
 
-
 ## extra_info [_extra_info]
 
 Platform specific data.
@@ -1245,10 +1217,9 @@ format: bytes
 
 
 **`mongodb.status.extra_info.page_faults`**
-:   The total number of page faults that require disk operations. Page faults refer to operations that require the database server to access data that isn’t available in active memory.
+:   The total number of page faults that require disk operations. Page faults refer to operations that require the database server to access data that isn't available in active memory.
 
 type: long
-
 
 
 ## global_lock [_global_lock]
@@ -1259,7 +1230,6 @@ Reports on lock state of the database.
 :   The time, in microseconds, since the database last started and created the globalLock. This is roughly equivalent to total server uptime.
 
 type: long
-
 
 
 ## current_queue [_current_queue]
@@ -1284,7 +1254,6 @@ type: long
 type: long
 
 
-
 ## active_clients [_active_clients]
 
 The number of connected clients and the read and write operations performed by these clients.
@@ -1307,10 +1276,10 @@ type: long
 type: long
 
 
-
 ## locks [_locks]
 
-A document that reports for each lock <type>, data on lock <mode>s. The possible lock <type>s are global, database, collection, metadata and oplog. The possible <mode>s are r, w, R and W which respresent shared, exclusive, intent shared and intent exclusive. locks.<type>.acquire.count.<mode> shows the number of times the lock was acquired in the specified mode. locks.<type>.wait.count.<mode> shows the number of times the locks.acquireCount lock acquisitions encountered waits because the locks were held in a conflicting mode. locks.<type>.wait.us.<mode> shows the cumulative wait time in microseconds for the lock acquisitions. locks.<type>.deadlock.count.<mode> shows the number of times the lock acquisitions encountered deadlocks.
+A document that reports for each lock <type>, data on lock <mode>s. The possible lock <type>s are global, database, collection, metadata and oplog. The possible <mode>s are r, w, R and W which respresent shared, exclusive, intent shared and intent exclusive.
+locks.<type>.acquire.count.<mode> shows the number of times the lock was acquired in the specified mode. locks.<type>.wait.count.<mode> shows the number of times the locks.acquireCount lock acquisitions encountered waits because the locks were held in a conflicting mode. locks.<type>.wait.us.<mode> shows the cumulative wait time in microseconds for the lock acquisitions. locks.<type>.deadlock.count.<mode> shows the number of times the lock acquisitions encountered deadlocks.
 
 **`mongodb.status.locks.global.acquire.count.r`**
 :   type: long
@@ -1632,8 +1601,7 @@ A document that reports for each lock <type>, data on lock <mode>s. The possible
 :   type: long
 
 
-
-## network [_network_9]
+## network [_network]
 
 Platform specific data.
 
@@ -1659,8 +1627,7 @@ format: bytes
 type: long
 
 
-
-## ops.latencies [_ops_latencies]
+## ops.latencies [_ops.latencies]
 
 Operation latencies for the database as a whole. Only mongod instances report this metric.
 
@@ -1700,8 +1667,7 @@ type: long
 type: long
 
 
-
-## ops.counters [_ops_counters]
+## ops.counters [_ops.counters]
 
 An overview of database operations by type.
 
@@ -1741,8 +1707,7 @@ type: long
 type: long
 
 
-
-## ops.replicated [_ops_replicated]
+## ops.replicated [_ops.replicated]
 
 An overview of database replication operations by type.
 
@@ -1782,8 +1747,7 @@ type: long
 type: long
 
 
-
-## memory [_memory_9]
+## memory [_memory]
 
 Data about the current memory usage of the mongod server.
 
@@ -1829,11 +1793,9 @@ type: boolean
 type: keyword
 
 
-
 ## wired_tiger [_wired_tiger]
 
 Statistics about the WiredTiger storage engine.
-
 
 ## concurrent_transactions [_concurrent_transactions]
 
@@ -1875,8 +1837,7 @@ type: long
 type: long
 
 
-
-## cache [_cache_2]
+## cache [_cache]
 
 Statistics about the cache and page evictions from the cache.
 
@@ -1922,8 +1883,7 @@ type: long
 type: long
 
 
-
-## log [_log_2]
+## log [_log]
 
 Statistics about the write ahead log used by WiredTiger.
 
@@ -1975,7 +1935,6 @@ type: long
 type: long
 
 
-
 ## background_flushing [_background_flushing]
 
 Data about the process MongoDB uses to write data to disk. This data is only available for instances that use the MMAPv1 storage engine.
@@ -2008,7 +1967,6 @@ type: long
 :   A timestamp of the last completed flush operation.
 
 type: date
-
 
 
 ## journaling [_journaling]
@@ -2049,7 +2007,6 @@ type: long
 :   The number of times MongoDB requested a commit before the scheduled journal group commit interval.
 
 type: long
-
 
 
 ## times [_times]

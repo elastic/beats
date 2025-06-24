@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package azure
 
 import (
@@ -150,12 +152,8 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 	var result []Metric
 	for criteria, metricsDefinitions := range groupedMetrics {
 		// Same end time for all metrics in the same batch.
-		interval := client.Config.Period
+		startTime, endTime := calculateTimespan(referenceTime, criteria.TimeGrain, client.Config)
 
-		// // Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
-		endTime := referenceTime
-		timespanDuration := max(asDuration(criteria.TimeGrain), interval)
-		startTime := endTime.Add(timespanDuration * -1)
 		// Limit batch size to 50 resources (if you have more, you can split the batch)
 		filter := ""
 		if len(metricsDefinitions[0].Dimensions) > 0 {

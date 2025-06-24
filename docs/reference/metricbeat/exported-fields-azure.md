@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-azure.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Azure fields [exported-fields-azure]
 
 azure module
@@ -11,7 +13,6 @@ azure module
 :   The Azure metric timegrain
 
 type: keyword
-
 
 
 ## resource [_resource]
@@ -78,8 +79,7 @@ type: object
 type: object
 
 
-
-## app_insights [_app_insights_2]
+## app_insights [_app_insights]
 
 application insights
 
@@ -101,8 +101,7 @@ type: date
 type: object
 
 
-
-## app_state [_app_state_2]
+## app_state [_app_state]
 
 application state
 
@@ -226,8 +225,7 @@ type: float
 type: float
 
 
-
-## billing [_billing_5]
+## billing [_billing]
 
 billing and usage details
 
@@ -351,8 +349,7 @@ type: object
 type: object
 
 
-
-## monitor [_monitor_2]
+## monitor [_monitor]
 
 monitor
 

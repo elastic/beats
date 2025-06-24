@@ -90,11 +90,11 @@ func (f *FramingType) Unpack(value string) error {
 }
 
 // NewListener creates a new Listener
-func NewListener(family inputsource.Family, location string, handlerFactory HandlerFactory, listenerFactory ListenerFactory, config *ListenerConfig) *Listener {
+func NewListener(family inputsource.Family, location string, handlerFactory HandlerFactory, listenerFactory ListenerFactory, config *ListenerConfig, logger *logp.Logger) *Listener {
 	return &Listener{
 		config:          config,
 		family:          family,
-		log:             logp.NewLogger(string(family)).With("address", location),
+		log:             logger.Named(string(family)).With("address", location),
 		handlerFactory:  handlerFactory,
 		listenerFactory: listenerFactory,
 	}

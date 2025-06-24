@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -222,7 +222,7 @@ func TestReplaceRun(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
 			f := &replaceString{
-				log: logp.NewLogger("replace"),
+				log: logptest.NewTestingLogger(t, "replace"),
 				config: replaceStringConfig{
 					Fields:        test.Fields,
 					IgnoreMissing: test.IgnoreMissing,

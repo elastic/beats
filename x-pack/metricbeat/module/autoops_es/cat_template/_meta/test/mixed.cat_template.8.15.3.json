@@ -1,0 +1,14 @@
+[
+    {
+        "n": "simple-response",
+        "c": ""
+    },
+    {
+        "n": "broken-response",
+        "c": ""
+    },
+    {
+        "n": "failed-response",
+        "c": ""
+    }
+]

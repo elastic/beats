@@ -3,13 +3,14 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-kibana.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # kibana fields [exported-fields-kibana]
 
 kibana Module
 
 **`service.node.roles`**
 :   type: keyword
-
 
 
 ## kibana [_kibana]
@@ -61,7 +62,7 @@ example: my-saved-object
 
 type: keyword
 
-example: [*default*, *marketing*]
+example: ['default', 'marketing']
 
 
 **`kibana.delete_from_spaces`**
@@ -69,7 +70,7 @@ example: [*default*, *marketing*]
 
 type: keyword
 
-example: [*default*, *marketing*]
+example: ['default', 'marketing']
 
 
 **`kibana.authentication_provider`**
@@ -104,8 +105,7 @@ type: keyword
 example: native
 
 
-
-## log [_log_6]
+## log [_log]
 
 Kibana log lines.
 

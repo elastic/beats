@@ -249,7 +249,9 @@ func (cm *BeatV2Manager) RegisterDiagnosticHook(name string, description string,
 func (cm *BeatV2Manager) UpdateStatus(status status.Status, msg string) {
 	cm.mx.Lock()
 	defer cm.mx.Unlock()
-
+	if cm.status == status && cm.message == msg {
+		return
+	}
 	cm.status = status
 	cm.message = msg
 	cm.updateStatuses()

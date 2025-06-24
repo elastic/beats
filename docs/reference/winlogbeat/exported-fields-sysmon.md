@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/exported-fields-sysmon.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Sysmon module fields [exported-fields-sysmon]
 
 These are the event fields specific to the Sysmon module.

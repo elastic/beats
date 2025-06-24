@@ -34,7 +34,7 @@ func init() {
 }
 
 // New constructs a new add_nomad_metadata processor.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	cfgwarn.Experimental("The add_nomad_metadata processor is experimental")
 
 	config := defaultNomadAnnotatorConfig()

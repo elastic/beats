@@ -2,12 +2,15 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package query
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -209,7 +212,11 @@ func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.Rep
 // of an error set the Error field of mb.Event or simply call report.Error().
 // It calls m.fetchTableMode() or m.fetchVariableMode() depending on the response
 // format of the query.
-func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
+func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (fetchErr error) {
+	defer func() {
+		fetchErr = sanitizeError(fetchErr, m.HostData().URI)
+	}()
+
 	db, err := sql.NewDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
 	if err != nil {
 		return fmt.Errorf("cannot open connection: %w", err)
@@ -382,4 +389,21 @@ func inferTypeFromMetrics(ms mapstr.M) mapstr.M {
 	}
 
 	return ret
+}
+
+// sanitizeError replaces all occurrences of 'sensitive' parameter in err.Error() with "(redacted)"
+func sanitizeError(err error, sensitive string) error {
+	if err == nil {
+		return nil
+	}
+
+	sensitive = strings.TrimSpace(sensitive)
+
+	if sensitive == "" {
+		return err
+	}
+
+	sanitizedMessage := strings.ReplaceAll(err.Error(), sensitive, "(redacted)")
+
+	return errors.New(sanitizedMessage)
 }
