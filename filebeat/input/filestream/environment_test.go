@@ -47,20 +47,11 @@ import (
 )
 
 type inputTestingEnvironment struct {
-<<<<<<< HEAD
 	t          *testing.T
 	workingDir string
 	stateStore statestore.States
 	pipeline   *mockPipelineConnector
-=======
-	logger       *logp.Logger
-	loggerBuffer *bytes.Buffer
-	t            *testing.T
-	workingDir   string
-	stateStore   statestore.States
-	pipeline     *mockPipelineConnector
-	monitoring   beat.Monitoring
->>>>>>> 1b1a4c6f8 (Provide a consistent non-global metrics API to beats and beat receivers (#44452))
+	monitoring beat.Monitoring
 
 	pluginInitOnce sync.Once
 	plugin         v2.Plugin
@@ -94,20 +85,11 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 	})
 
 	return &inputTestingEnvironment{
-<<<<<<< HEAD
 		t:          t,
 		workingDir: t.TempDir(),
 		stateStore: openTestStatestore(),
 		pipeline:   &mockPipelineConnector{},
-=======
-		logger:       logger,
-		loggerBuffer: buff,
-		t:            t,
-		workingDir:   t.TempDir(),
-		stateStore:   openTestStatestore(),
-		pipeline:     &mockPipelineConnector{},
-		monitoring:   beat.NewMonitoring(),
->>>>>>> 1b1a4c6f8 (Provide a consistent non-global metrics API to beats and beat receivers (#44452))
+		monitoring: beat.NewMonitoring(),
 	}
 }
 
@@ -150,21 +132,10 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 		defer wg.Done()
 		defer func() { _ = grp.Stop() }()
 
-<<<<<<< HEAD
-		info := beat.Info{Monitoring: beat.Monitoring{
-			Namespace: monitoring.GetNamespace("dataset")},
-		}
 		reg := inputmon.NewMetricsRegistry(
-			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logp.L())
+			id, inp.Name(), e.monitoring.InputsRegistry(), logp.L())
 		defer inputmon.CancelMetricsRegistry(
-			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logp.L())
-=======
-		logger, _ := logp.NewDevelopmentLogger("")
-		reg := inputmon.NewMetricsRegistry(
-			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
-		defer inputmon.CancelMetricsRegistry(
-			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
->>>>>>> 1b1a4c6f8 (Provide a consistent non-global metrics API to beats and beat receivers (#44452))
+			id, inp.Name(), e.monitoring.InputsRegistry(), logp.L())
 
 		inputCtx := v2.Context{
 			ID:              id,

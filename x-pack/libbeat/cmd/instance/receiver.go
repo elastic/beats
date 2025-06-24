@@ -49,18 +49,14 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 
 	if b.Config.HTTP.Enabled() {
 		var err error
-<<<<<<< HEAD
-		b.API, err = api.NewWithDefaultRoutes(logp.L().Named("metrics.http"), b.Config.HTTP, api.RegistryLookupFunc(b.Info.Monitoring.Namespace))
-=======
 		b.API, err = api.NewWithDefaultRoutes(
-			b.Info.Logger.Named("metrics.http"),
+			logp.L().Named("metrics.http"),
 			b.Config.HTTP,
 			b.Monitoring.InfoRegistry(),
 			b.Monitoring.StateRegistry(),
 			b.Monitoring.StatsRegistry(),
 			b.Monitoring.InputsRegistry())
 
->>>>>>> 1b1a4c6f8 (Provide a consistent non-global metrics API to beats and beat receivers (#44452))
 		if err != nil {
 			return BeatReceiver{}, fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
