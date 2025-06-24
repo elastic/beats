@@ -16,16 +16,6 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 % ### Fixes [beats-versionext-fixes]
 
-<<<<<<< HEAD
-=======
-## 9.1.0 [beats-9.1.0-release-notes]
-
-### Features and enhancements [beats-9.1.0-features-enhancements]
-
-**Metricbeat**
-
-- Add GCP cache for metadata collectors. [44432]({{beats-pull}}44432)
-
 ## 9.0.3 [beats-9.0.3-release-notes]
 
 ### Features and enhancements [beats-9.0.3-features-enhancements]
@@ -74,7 +64,6 @@ To check for security updates, go to [Security announcements for the Elastic sta
 - Sanitize error messages in Fetch method of SQL module [44577]({{beats-pull}}44577)
 - Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module [44769]({{beats-pull}}44769)
 
->>>>>>> a80b60a81 (port https://github.com/elastic/beats/pull/44971 to markdown (#44975))
 ## 9.0.2 [beats-9.0.2-release-notes]
 
 ### Features and enhancements [beats-9.0.2-features-enhancements]
