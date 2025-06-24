@@ -93,6 +93,11 @@ func (s *stream) Name() string {
 
 func (inp *o365input) Name() string { return pluginName }
 
+// IsFIPSCapable returns false because the o365 input indirectly does
+// not use FIPS-compliant algorithms. Specifically, the input depends on
+// the github.com/Azure/azure-sdk-for-go/sdk/azidentity package which, in
+// turn, depends on the golang.org/x/crypto/pkcs12 package, which is not
+// FIPS-compliant
 func (inp *o365input) IsFIPSCapable() bool {
 	return false
 }
