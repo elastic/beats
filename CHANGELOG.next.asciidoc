@@ -250,6 +250,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
 - Add new metrics to vSphere Virtual Machine dataset (CPU usage percentage, disk average usage, disk read/write rate, number of disk reads/writes, memory usage percentage). {pull}44205[44205]
+- Upgrade github.com/microsoft/go-mssqldb from v1.7.2 to v1.8.2 {pull}44990[44990]
 
 *Metricbeat*
 
