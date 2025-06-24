@@ -87,6 +87,7 @@ toc:
               - file: auditbeat/fingerprint.md
               - file: auditbeat/include-fields.md
               - file: auditbeat/move-fields.md
+              - file: auditbeat/now.md
               - file: auditbeat/rate-limit.md
               - file: auditbeat/processor-registered-domain.md
               - file: auditbeat/rename-fields.md
@@ -295,6 +296,7 @@ toc:
               - file: filebeat/fingerprint.md
               - file: filebeat/include-fields.md
               - file: filebeat/move-fields.md
+              - file: filebeat/now.md
               - file: filebeat/processor-parse-aws-vpc-flow-log.md
               - file: filebeat/rate-limit.md
               - file: filebeat/processor-registered-domain.md
@@ -590,6 +592,7 @@ toc:
               - file: heartbeat/fingerprint.md
               - file: heartbeat/include-fields.md
               - file: heartbeat/move-fields.md
+              - file: heartbeat/now.md
               - file: heartbeat/rate-limit.md
               - file: heartbeat/processor-registered-domain.md
               - file: heartbeat/rename-fields.md
@@ -761,6 +764,7 @@ toc:
               - file: metricbeat/fingerprint.md
               - file: metricbeat/include-fields.md
               - file: metricbeat/move-fields.md
+              - file: metricbeat/now.md
               - file: metricbeat/rate-limit.md
               - file: metricbeat/processor-registered-domain.md
               - file: metricbeat/rename-fields.md
@@ -1398,6 +1402,7 @@ toc:
               - file: packetbeat/fingerprint.md
               - file: packetbeat/include-fields.md
               - file: packetbeat/move-fields.md
+              - file: packetbeat/now.md
               - file: packetbeat/rate-limit.md
               - file: packetbeat/processor-registered-domain.md
               - file: packetbeat/rename-fields.md
@@ -1573,6 +1578,7 @@ toc:
               - file: winlogbeat/fingerprint.md
               - file: winlogbeat/include-fields.md
               - file: winlogbeat/move-fields.md
+              - file: winlogbeat/now.md
               - file: winlogbeat/rate-limit.md
               - file: winlogbeat/processor-registered-domain.md
               - file: winlogbeat/rename-fields.md
