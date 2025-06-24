@@ -59,6 +59,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/istio/pilot"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/meraki"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/meraki/device_health"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/meraki/network_health"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql/performance"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql/transaction_log"
