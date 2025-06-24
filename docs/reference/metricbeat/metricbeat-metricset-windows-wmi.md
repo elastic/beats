@@ -130,11 +130,10 @@ The default value is `0`, which is a special value indicating that all fetched
 results should be returned without a row limit.
 
 **`wmi.schema_cache_size`**
-:   The maximum number of WMI class definitions that can be cached per single query.
-Every query keeps its own separate cache.  This cache helps improve performance when dealing with queries that involve inheritance hierarchies. Read more in [WMI Type Support](#wmi-type-support).
+:   The maximum number of WMI class definitions that can be cached per single query. Every query keeps its own separate cache.  This cache helps improve performance when dealing with queries that involve inheritance hierarchies. Read more in [WMI Type Support](#wmi-type-support).
 For example, if a superclass is queried, the cache
 might store all its derived (leaf) classes to optimize subsequent operations.
-The default value is `200`.
+The default value is `1000`.
 
 **`wmi.queries`**
 :   The list of queries to execute. The list cannot be empty. See [Query
