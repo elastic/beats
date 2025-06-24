@@ -15,41 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package client
+//go:build !requirefips
 
-import (
-	"context"
-	"time"
+package add_cloud_metadata
 
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
-)
-
-const maxRetries = 3
-const initialInterval = 500 * time.Millisecond
-const maxInterval = 1 * time.Minute
-
-// Retry attempts to execute the provided function `fn` with a retry mechanism.
-// It uses an exponential backoff strategy and retries up to a maximum number of attempts.
-func Retry(ctx context.Context, fn func() error) (err error) {
-	expBackoff := backoff.NewExpBackoff(ctx.Done(), initialInterval, maxInterval)
-
-	for numTries := 0; ; numTries++ {
-		err = fn()
-		if err == nil {
-			// function succeeded
-			break
-		}
-
-		if numTries >= maxRetries {
-			// maxRetries hit
-			break
-		}
-
-		if !expBackoff.Wait() {
-			// context cancelled
-			break
-		}
-	}
-
-	return err
+func init() {
+	// Include the Azure provider ONLY in non-FIPS builds, as the Azure provider depends on
+	// the Azure SDK which, in turn, depends on the golang.org/x/crypto/pkcs12 package, which
+	// is not FIPS-compliant, and the SDK doesn't plan to offer a way to disable the use of
+	// this package at compile time (see https://github.com/Azure/azure-sdk-for-go/issues/24336).
+	cloudMetaProviders["azure"] = azureVMMetadataFetcher
+	priorityProviders = append(priorityProviders, "azure")
 }
