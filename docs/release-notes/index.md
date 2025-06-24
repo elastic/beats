@@ -24,6 +24,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 **Metricbeat**
 
 - Add GCP cache for metadata collectors. [44432]({{beats-pull}}44432)
+- Upgrade github.com/microsoft/go-mssqldb from v1.7.2 to v1.8.2 [44990]({{beats-pull}}44990)
 
 ## 9.0.2 [beats-9.0.2-release-notes]
 
