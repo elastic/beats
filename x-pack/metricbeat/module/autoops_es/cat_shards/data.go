@@ -98,7 +98,7 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 }
 
 func sendNodeShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeToShards []NodeShardCount, transactionId string) {
-	r.Event(events.CreateEvent(info, mapstr.M{"node_shards_count": nodeToShards}, transactionId))
+	r.Event(events.CreateEvent(info, mapstr.M{"node_shards_count": convertObjectArrayToMapArray(nodeToShards)}, transactionId))
 }
 
 func sendNodeIndexShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeIndexShards []NodeIndexShards, transactionId string) {
@@ -111,7 +111,7 @@ func sendNodeIndexShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeInde
 	for i := 0; i < size; i += nodeIndexShardsPerEvent {
 		group := nodeIndexShards[i:min(i+nodeIndexShardsPerEvent, size)]
 
-		groups = append(groups, mapstr.M{"node_index_shards": group})
+		groups = append(groups, mapstr.M{"node_index_shards": convertObjectArrayToMapArray(group)})
 	}
 
 	events.CreateAndReportEvents(r, info, groups, transactionId)
