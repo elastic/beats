@@ -8,7 +8,7 @@ mapped_pages:
 
 The `now` processor sets the current timestamp to the specified field of the event. The `now` processor will overwrite the target field if it already exists.
 
-The specified target field can be a nested field. This processor will throw an error and leave the original event unchanged if the target nested field has an existing non-object as a parent.
+The specified target field can be a nested field. The `now` processor will throw an error and leave the original event unchanged if the target nested field has an existing non-object as a parent.
 
 `field`
 :   The target field.
