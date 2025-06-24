@@ -105,6 +105,8 @@ type oAuth2Config struct {
 	OktaJWKFile string          `config:"okta.jwk_file"`
 	OktaJWKJSON common.JSONBlob `config:"okta.jwk_json"`
 	OktaJWKPEM  string          `config:"okta.jwk_pem"`
+
+	prepared *http.Client
 }
 
 // IsEnabled returns true if the `enable` field is set to true in the yaml.
