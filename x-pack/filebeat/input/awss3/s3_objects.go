@@ -143,15 +143,11 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 	p.s3Metadata = s3Obj.metadata
 
 	mReader := newMonitoredReader(s3Obj.body, p.metrics.s3BytesProcessedTotal)
-<<<<<<< HEAD
-	reader, err := x_reader.AddGzipDecoderIfNeeded(mReader)
-=======
 
 	// Wrap to detect S3 body streaming errors so we can retry them
 	wrappedReader := s3DownloadFailedWrappedReader{r: mReader}
 
-	streamReader, err := p.addGzipDecoderIfNeeded(wrappedReader)
->>>>>>> a80b60a811aa1243bce4fb73885a941d7d546893
+	streamReader, err := x_reader.AddGzipDecoderIfNeeded(wrappedReader)
 	if err != nil {
 		return fmt.Errorf("failed checking for gzip content: %w", err)
 	}
