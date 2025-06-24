@@ -156,48 +156,32 @@ func getInvalidConversion(err error) WmiConversionFunction {
 }
 
 // Hash Function used for the LRU impementation
-func hashStringXXHASH(s string) uint32 {
+func getConverterCacheKey(class string, property string) uint32 {
 	// Code taken from the freelru main: https://github.com/elastic/go-freelru/tree/main
 	//nolint:gosec // G115: Intentional truncation of uint64 hash to uint32 using modulo for LRU key.
-	return uint32(xxhash.Sum64String(s))
+	return uint32(xxhash.Sum64String(class + ":" + property))
 }
 
 type WMISchema struct {
-	SubClassSchemas *freelru.LRU[string, map[string]WmiConversionFunction]
+	subClassSchemas *freelru.LRU[uint32, WmiConversionFunction]
 }
 
 func (ws WMISchema) Get(class string, property string) (WmiConversionFunction, bool) {
-	classSchema, ok := ws.SubClassSchemas.Get(class)
-	if !ok {
-		// This case is actually unexpected, because we invoke PutClass before and we proceed sequentially
-		return getInvalidConversion(fmt.Errorf("could not find class %s in cache", class)), ok
-	}
-	val, ok := classSchema[property]
-	return val, ok
+	return ws.subClassSchemas.Get(getConverterCacheKey(class, property))
 }
 
-func (ws *WMISchema) PutClass(class string) map[string]WmiConversionFunction {
-	v, ok := ws.SubClassSchemas.Get(class)
-	if !ok {
-		v = make(map[string]WmiConversionFunction)
-		ws.SubClassSchemas.Add(class, v)
-	}
-	return v
-}
-
-func (ws *WMISchema) Put(class string, key string, wcf WmiConversionFunction) {
-	classSchema := ws.PutClass(class)
-	classSchema[key] = wcf
+func (ws *WMISchema) Add(class string, property string, wcf WmiConversionFunction) {
+	ws.subClassSchemas.Add(getConverterCacheKey(class, property), wcf)
 }
 
 func NewWMISchema(size uint32) (*WMISchema, error) {
-	flu, err := freelru.New[string, map[string]WmiConversionFunction](size, hashStringXXHASH)
+	flu, err := freelru.New[uint32, WmiConversionFunction](size, func(k uint32) uint32 { return k })
 	if err != nil {
 		return nil, err
 	}
 
 	return &WMISchema{
-		SubClassSchemas: flu,
+		subClassSchemas: flu,
 	}, nil
 }
 

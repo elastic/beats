@@ -127,7 +127,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 		_, err = session.Connect()
 		if err != nil {
-			return fmt.Errorf("could not connect session %w", err)
+			return fmt.Errorf("could not connect session in namespace '%s': %w", namespace, err)
 		}
 		defer session.Dispose()
 
@@ -219,8 +219,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 					properties = instance.GetClass().GetPropertiesNames()
 				}
 
-				queryConfig.WmiSchema.PutClass(instance.GetClassName())
-
 				for _, propertyName := range properties {
 					propertyValue, err := instance.GetProperty(propertyName)
 					if err != nil {
@@ -249,7 +247,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 							m.Logger().Warnf("Skipping addition of property '%s'. Cannot fetch conversion function: '%v'", propertyName, err)
 							continue
 						}
-						queryConfig.WmiSchema.Put(instance.GetClassName(), propertyName, convertFun)
+						queryConfig.WmiSchema.Add(instance.GetClassName(), propertyName, convertFun)
 					}
 					finalValue, err := convertFun(propertyValue)
 					if err != nil {
