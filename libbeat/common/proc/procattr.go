@@ -23,7 +23,7 @@ import (
 	"syscall"
 )
 
-// GetSysProcAttr returns an emtpy syscall.SysProcAttr
+// GetSysProcAttr returns an empty syscall.SysProcAttr
 func GetSysProcAttr() *syscall.SysProcAttr {
 	return &syscall.SysProcAttr{}
 }
