@@ -208,6 +208,9 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 		stat.UpdateStatus(status.Failed, "failed to create HTTP client: "+err.Error())
 		return err
 	}
+	if cfg.Auth != nil && cfg.Auth.OAuth2 != nil {
+		cfg.Auth.OAuth2.prepared = client.client
+	}
 
 	requestFactory, err := newRequestFactory(stdCtx, cfg, stat, log, metrics, reg)
 	if err != nil {
@@ -283,13 +286,24 @@ func sanitizeFileName(name string) string {
 }
 
 func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, stat status.StatusReporter, log *logp.Logger, reg *monitoring.Registry, p *Policy) (*httpClient, error) {
-	client, err := newNetHTTPClient(ctx, requestCfg, log, reg)
-	if err != nil {
-		return nil, err
-	}
-
-	if authCfg != nil && authCfg.OAuth2.isEnabled() {
-		client, err = authCfg.OAuth2.client(ctx, client)
+	var (
+		client *http.Client
+		err    error
+	)
+	if authCfg.OAuth2.isEnabled() {
+		client = authCfg.OAuth2.prepared
+		if client == nil {
+			client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
+			if err != nil {
+				return nil, err
+			}
+			client, err = authCfg.OAuth2.client(ctx, client)
+			if err != nil {
+				return nil, err
+			}
+		}
+	} else {
+		client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
 		if err != nil {
 			return nil, err
 		}
