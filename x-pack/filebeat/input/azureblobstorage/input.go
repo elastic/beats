@@ -59,6 +59,10 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 
 	//nolint:prealloc // No need to preallocate the slice here
 	var sources []cursor.Source
+	// This is to maintain backward compatibility with the old config.
+	if config.BatchSize == 0 {
+		config.BatchSize = *config.MaxWorkers
+	}
 	for _, c := range config.Containers {
 		container := tryOverrideOrDefault(config, c)
 		if container.TimeStampEpoch != nil && !isValidUnixTimestamp(*container.TimeStampEpoch) {
@@ -67,6 +71,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		sources = append(sources, &Source{
 			AccountName:              config.AccountName,
 			ContainerName:            c.Name,
+			BatchSize:                *container.BatchSize,
 			MaxWorkers:               *container.MaxWorkers,
 			Poll:                     *container.Poll,
 			PollInterval:             *container.PollInterval,
@@ -99,6 +104,18 @@ func tryOverrideOrDefault(cfg config, c container) container {
 			maxWorkers = *cfg.MaxWorkers
 		}
 		c.MaxWorkers = &maxWorkers
+	}
+
+	if c.BatchSize == nil {
+		if cfg.BatchSize != 0 {
+			// If the global batch size is set, use it
+			c.BatchSize = &cfg.BatchSize
+		} else {
+			// If the global batch size is not set, use the local max_workers as the batch size
+			// since at this point we know `c.MaxWorkers` will be set to a non-nil value.
+			// This is to maintain backward compatibility with the old config.
+			c.BatchSize = c.MaxWorkers
+		}
 	}
 
 	if c.Poll == nil {

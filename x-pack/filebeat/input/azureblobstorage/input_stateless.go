@@ -51,6 +51,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		source = &Source{
 			AccountName:              in.config.AccountName,
 			ContainerName:            c.Name,
+			BatchSize:                *container.BatchSize,
 			MaxWorkers:               *container.MaxWorkers,
 			Poll:                     *container.Poll,
 			PollInterval:             *container.PollInterval,

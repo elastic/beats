@@ -102,7 +102,7 @@ func (s *scheduler) schedule(ctx context.Context) error {
 
 func (s *scheduler) scheduleOnce(ctx context.Context) error {
 	defer s.limiter.wait()
-	pager := s.fetchBlobPager(int32(s.src.MaxWorkers))
+	pager := s.fetchBlobPager(int32(s.src.BatchSize))
 	fileSelectorLen := len(s.src.FileSelectors)
 	var numBlobs, numJobs int
 
