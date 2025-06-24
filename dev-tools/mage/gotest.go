@@ -471,6 +471,13 @@ func BuildSystemTestBinary() error {
 	return BuildSystemTestGoBinary(DefaultTestBinaryArgs())
 }
 
+// BuildSystemTestOTelBinary builds beat binary that includes otel.
+func BuildSystemTestOTelBinary() error {
+	args := DefaultTestBinaryArgs()
+	args.ExtraFlags = []string{"-tags", "otelbeat"}
+	return BuildSystemTestGoBinary(args)
+}
+
 // BuildSystemTestGoBinary build a binary for testing that is instrumented for
 // testing and measuring code coverage. The binary is only instrumented for
 // coverage when TEST_COVERAGE=true (default is false).
