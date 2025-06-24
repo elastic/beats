@@ -25,10 +25,8 @@ import (
 	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	"github.com/elastic/beats/v7/libbeat/reader/syslog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -123,7 +121,7 @@ func New(c *conf.C) (beat.Processor, error) {
 // message could not be parsed. If an error occurs and the configuration is set to not ignore errors,
 // the 'error.message' field will be set with error that was encountered.
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
-	if err := p.run(event); err != nil && !p.IgnoreFailure {
+	if err := p.run(event); err != nil { // && !p.IgnoreFailure {
 		err = fmt.Errorf(procName+" failed to process field %q: %w", p.Field, err)
 		appendStringField(event.Fields, "error.message", err.Error())
 		return event, err
@@ -137,34 +135,34 @@ func (p *processor) run(event *beat.Event) error {
 	value, err := event.GetValue(p.Field)
 	if err != nil {
 		if errors.Is(err, mapstr.ErrKeyNotFound) {
-			if p.IgnoreMissing {
-				return nil
-			}
+			// if p.IgnoreMissing {
+			// 	return nil
+			// }
 			p.stats.Missing.Inc()
 		}
-		if !p.IgnoreFailure {
-			p.stats.Failure.Inc()
-		}
+		// if !p.IgnoreFailure {
+		// 	p.stats.Failure.Inc()
+		// }
 		return err
 	}
 
-	data, ok := value.(string)
+	_, ok := value.(string)
 	if !ok {
 		p.stats.Failure.Inc()
 		return fmt.Errorf("type of field %q is not a string", p.Field)
 	}
 
-	fields, ts, err := syslog.ParseMessage(data, p.Format, p.TimeZone.Location())
-	if err != nil {
-		p.stats.Failure.Inc()
-	} else {
-		p.stats.Success.Inc()
-	}
+	// fields, ts, err := syslog.ParseMessage(data, p.Format, p.TimeZone.Location())
+	// if err != nil {
+	// 	p.stats.Failure.Inc()
+	// } else {
+	// 	p.stats.Success.Inc()
+	// }
 
-	jsontransform.WriteJSONKeys(event, fields, false, p.OverwriteKeys, !p.IgnoreFailure)
-	if !ts.IsZero() {
-		event.Timestamp = ts
-	}
+	// jsontransform.WriteJSONKeys(event, fields, false, p.OverwriteKeys, !p.IgnoreFailure)
+	// if !ts.IsZero() {
+	// 	event.Timestamp = ts
+	// }
 
 	return err
 }
