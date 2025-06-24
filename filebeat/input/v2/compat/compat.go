@@ -230,6 +230,8 @@ func (f *factory) generateCheckConfig(config *conf.C) (*conf.C, error) {
 	return testCfg, nil
 }
 
+// IsFIPSCapable returns true if the input is capable of running with
+// FIPS-compliant algorithms; false, otherwise.
 func (r *runner) IsFIPSCapable() bool {
 	if fipsAwareInput, ok := r.input.(v2.FIPSAwareInput); ok {
 		return fipsAwareInput.IsFIPSCapable()

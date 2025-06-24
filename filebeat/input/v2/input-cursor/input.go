@@ -87,6 +87,8 @@ func (inp *managedInput) Test(ctx input.TestContext) error {
 	return nil
 }
 
+// IsFIPSCapable returns true if the input is capable of running with
+// FIPS-compliant algorithms; false, otherwise.
 func (inp *managedInput) IsFIPSCapable() bool {
 	if fipsAware, ok := inp.input.(input.FIPSAwareInput); ok {
 		return fipsAware.IsFIPSCapable()
