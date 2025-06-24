@@ -94,6 +94,10 @@ func (s *stream) Name() string {
 
 func (inp *o365input) Name() string { return pluginName }
 
+func (inp *o365input) IsFIPSCapable() bool {
+	return false
+}
+
 func (inp *o365input) Test(src cursor.Source, ctx v2.TestContext) error {
 	tenantID := src.(*stream).tenantID
 	auth, err := inp.config.NewTokenProvider(tenantID)
