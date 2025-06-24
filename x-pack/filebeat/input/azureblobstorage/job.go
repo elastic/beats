@@ -202,7 +202,8 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 				if err == io.EOF {
 					return nil
 				}
-				break
+				j.status.UpdateStatus(status.Degraded, err.Error())
+				return err
 			}
 			evt := j.createEvent(string(msg), evtOffset)
 			j.publish(evt, !dec.more(), id)
@@ -215,11 +216,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 		}
 	}
 
-	if err != nil {
-		j.status.UpdateStatus(status.Degraded, err.Error())
-	}
-
-	return err
+	return nil
 }
 
 func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) error {
@@ -393,7 +390,6 @@ func (j *job) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
 
 	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
 	isStreamGzipped = bytes.Equal(buf, []byte{0x1F, 0x8B, 0x08})
-
 	if !isStreamGzipped {
 		return bufReader, nil
 	}
