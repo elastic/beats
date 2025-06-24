@@ -8,11 +8,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"math/rand/v2"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -85,8 +87,11 @@ func TestNewReceiver(t *testing.T) {
 			}, "expected at least one ingest log, got logs: %v", logs["r1"])
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
-				return getFromSocket(t, &lastError, monitorSocket)
-			}, "failed to connect to monitoring socket, last error was: %s", &lastError)
+				return getFromSocket(t, &lastError, monitorSocket, "stats")
+			}, "failed to connect to monitoring socket stats endpoint, last error was: %s", &lastError)
+			assert.Conditionf(c, func() bool {
+				return getFromSocket(t, &lastError, monitorSocket, "inputs")
+			}, "failed to connect to monitoring socket inputs endpoint, last error was: %s", &lastError)
 			assert.Condition(c, func() bool {
 				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
 					FilterMessageSnippet("add_host_metadata").
@@ -199,7 +204,10 @@ func TestMultipleReceivers(t *testing.T) {
 			assert.Conditionf(c, func() bool {
 				tests := []string{monitorSocket1, monitorSocket2}
 				for _, tc := range tests {
-					if ret := getFromSocket(t, &lastError, tc); ret == false {
+					if ret := getFromSocket(t, &lastError, tc, "stats"); ret == false {
+						return false
+					}
+					if ret := getFromSocket(t, &lastError, tc, "inputs"); ret == false {
 						return false
 					}
 				}
@@ -219,7 +227,7 @@ func genSocketPath() string {
 	return filepath.Join(socketDir, socketName)
 }
 
-func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
+func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoint string) bool {
 	// skip windows for now
 	if runtime.GOOS == "windows" {
 		return true
@@ -231,7 +239,13 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
 			},
 		},
 	}
-	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://unix/stats", nil)
+	url, err := url.JoinPath("http://unix", endpoint)
+	if err != nil {
+		sb.Reset()
+		fmt.Fprintf(sb, "JoinPath failed: %s", err)
+		return false
+	}
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, url, nil)
 	if err != nil {
 		sb.Reset()
 		fmt.Fprintf(sb, "error creating request: %s", err)
@@ -254,6 +268,35 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
 		sb.Reset()
 		sb.WriteString("body too short")
 		return false
+	}
+	if endpoint == "inputs" {
+		var data []any
+		if err := json.Unmarshal(body, &data); err != nil {
+			sb.Reset()
+			fmt.Fprintf(sb, "json unmarshal of body failed: %s\n", err)
+			fmt.Fprintf(sb, "body was %v\n", body)
+			return false
+		}
+
+		if len(data) <= 0 {
+			sb.Reset()
+			sb.WriteString("json array didn't have any entries")
+			return false
+		}
+	} else {
+		var data map[string]any
+		if err := json.Unmarshal(body, &data); err != nil {
+			sb.Reset()
+			fmt.Fprintf(sb, "json unmarshal of body failed: %s\n", err)
+			fmt.Fprintf(sb, "body was %v\n", body)
+			return false
+		}
+
+		if len(data) <= 0 {
+			sb.Reset()
+			sb.WriteString("json didn't have any keys")
+			return false
+		}
 	}
 	return true
 }
@@ -300,7 +343,7 @@ func BenchmarkFactory(b *testing.B) {
 	receiverSettings.ID = component.NewIDWithName(factory.Type(), "r1")
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
 		require.NoError(b, err)
 	}
