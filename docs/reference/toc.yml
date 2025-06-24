@@ -1006,6 +1006,7 @@ toc:
               - file: metricbeat/metricbeat-metricset-kubernetes-state_cronjob.md
               - file: metricbeat/metricbeat-metricset-kubernetes-state_daemonset.md
               - file: metricbeat/metricbeat-metricset-kubernetes-state_deployment.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-state_horizontalpodautoscaler.md
               - file: metricbeat/metricbeat-metricset-kubernetes-state_job.md
               - file: metricbeat/metricbeat-metricset-kubernetes-state_node.md
               - file: metricbeat/metricbeat-metricset-kubernetes-state_persistentvolumeclaim.md
