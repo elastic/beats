@@ -34,21 +34,23 @@ filebeat.inputs:
   auth.shared_credentials.account_key: some_key
   containers:
   - name: container_1
+    batch_size: 100
     max_workers: 3
     poll: true
     poll_interval: 10s
   - name: container_2
+    batch_size: 50
     max_workers: 3
     poll: true
     poll_interval: 10s
 ```
 
-**Explanation :** This `configuration` given above describes a basic blob storage config having two containers named `container_1` and `container_2`. Each of these containers have their own attributes such as `name`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes). For now lets try to understand how this config works.
+**Explanation :** This `configuration` given above describes a basic blob storage config having two containers named `container_1` and `container_2`. Each of these containers have their own attributes such as `name`, `batch_size`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes). For now lets try to understand how this config works.
 
-For azure blob storage input to identify the files it needs to read and process, it will require the container names to be specified. We can have as many containers as we deem fit. We are also able to configure the attributes `max_workers`, `poll` and `poll_interval` at the root level, which will then be applied to all containers which do not specify any of these attributes explicitly.
+For azure blob storage input to identify the files it needs to read and process, it will require the container names to be specified. We can have as many containers as we deem fit. We are also able to configure the attributes `batch_size`, `max_workers`, `poll` and `poll_interval` at the root level, which will then be applied to all containers which do not specify any of these attributes explicitly.
 
 ::::{note}
-If the attributes `max_workers`, `poll` and `poll_interval` are specified at the root level, these can still be overridden at the container level with different values, thus offering extensive flexibility and customization. Examples [below](#container-overrides) show this behaviour.
+If the attributes `batch_size`, `max_workers`, `poll` and `poll_interval` are specified at the root level, these can still be overridden at the container level with different values, thus offering extensive flexibility and customization. Examples [below](#container-overrides) show this behaviour.
 ::::
 
 
@@ -122,13 +124,14 @@ $$$supported-attributes$$$
 5. [storage_url](#attrib-storage-url)
 6. [containers](#attrib-containers)
 7. [name](#attrib-container-name)
-8. [max_workers](#attrib-max_workers)
-9. [poll](#attrib-poll)
-10. [poll_interval](#attrib-poll_interval)
-11. [file_selectors](#attrib-file_selectors)
-12. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
-13. [timestamp_epoch](#attrib-timestamp_epoch)
-14. [custom_properties](#attrib-custom-properties)
+8. [batch_size](#attrib-batch_size-abs)
+9. [max_workers](#attrib-max_workers)
+10. [poll](#attrib-poll)
+11. [poll_interval](#attrib-poll_interval)
+13. [file_selectors](#attrib-file_selectors)
+14. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
+15. [timestamp_epoch](#attrib-timestamp_epoch)
+16. [custom_properties](#attrib-custom-properties)
 
 ## `account_name` [attrib-account-name]
 
@@ -199,18 +202,17 @@ This attribute contains the details about a specific container like `name`, `max
 
 This is a specific subfield of a container. It specifies the container name.
 
+## `batch_size` [attrib-batch_size-abs]
+
+This attribute specifies the `page size` for the response. In earlier versions, this value was derived from `max_workers`, but with the latest update, `batch_size` is now an independent setting. For backward compatibility, if `batch_size` is not explicitly defined, it will default to a value based on `max_workers`. This attribute can be configured at both the root and container levels. When defined at both levels, the container-level setting takes precedence.
 
 ## `max_workers` [attrib-max_workers]
 
 This attribute defines the maximum number of workers allocated to the worker pool for processing jobs which read file contents. It can be specified both at the root level of the configuration, and at the container level. Container level values override root level values if both are specified. Larger number of workers do not necessarily improve throughput, and this should be carefully tuned based on the number of files, the size of the files being processed and resources available. Increasing `max_workers` to very high values may cause resource utilization problems and may lead to bottlenecks in processing. Usually a maximum of `2000` workers is recommended. A very low `max_worker` count will drastically increase the number of network calls required to fetch the blobs, which may cause a bottleneck in processing.
 
-The batch size for workload distribution is calculated by the input to ensure that there is an even workload across all workers. This means that for a given `max_workers` parameter value, the input will calculate the optimal batch size for that setting. The `max_workers` value should be configured based on factors such as the total number of files to be processed, available system resources and network bandwidth.
-
-Example:
-
-* Setting `max_workers=3` would result in each request fetching `3 blobs` (batch size = 3), which are then distributed among `3 workers`.
-* Setting `max_workers=100` would fetch `100 blobs` (batch size = 100) per request, distributed among `100 workers`.
-
+::::{note}
+The `batch_size` and `max_workers` attributes are decoupled but functionally related. `batch_size` determines how many blobs are fetched in a single API call (i.e., the pagination size), while `max_workers` controls the number of concurrent goroutines used to process the fetched blobs. Although these values are independent, they should be configured thoughtfully to ensure efficient workload distribution and optimal performance. For example, setting `batch_size=100` and `max_workers=10` means each pagination request fetches `100` blobs, which are then processed by `10` concurrent goroutines. The appropriate value for `max_workers` depends on factors such as the number of files to be processed, available system resources, and network bandwidth.
+::::
 
 ## `poll` [attrib-poll]
 
