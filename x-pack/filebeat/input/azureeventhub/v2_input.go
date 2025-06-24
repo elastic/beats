@@ -70,6 +70,15 @@ func (in *eventHubInputV2) Name() string {
 	return inputName
 }
 
+// IsFIPSCapable returns false because the azure-eventhub input indirectly does
+// not use FIPS-compliant algorithms. Specifically, the input depends on
+// the github.com/Azure/azure-sdk-for-go/sdk/azidentity package which, in
+// turn, depends on the golang.org/x/crypto/pkcs12 package, which is not
+// FIPS-compliant
+func (in *eventHubInputV2) IsFIPSCapable() bool {
+	return false
+}
+
 func (in *eventHubInputV2) Test(v2.TestContext) error {
 	return nil
 }
