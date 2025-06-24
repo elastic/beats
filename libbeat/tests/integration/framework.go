@@ -842,12 +842,12 @@ func GetESURL(t *testing.T, scheme string) url.URL {
 		}
 	}
 
-	user := os.Getenv("ES_SUPERUSER_USER")
+	user := os.Getenv("ES_USER_USER")
 	if user == "" {
 		user = "admin"
 	}
 
-	pass := os.Getenv("ES_SUPERUSER_PASS")
+	pass := os.Getenv("ES_USER_PASS")
 	if pass == "" {
 		pass = "testing"
 	}
