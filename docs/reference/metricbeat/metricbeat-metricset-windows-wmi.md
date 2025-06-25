@@ -123,7 +123,7 @@ value in the output document. The default value is `false`.
 that are empty string. The default value is `false`.
 
 **`wmi.max_rows_per_query`**
-:   Option to limit the number of rows returned by a single WMI query.
+:   Limits the number of rows returned by a single WMI query.
 The default value is `0`, which is a special value indicating that all fetched
 results should be returned without a row limit.
 
