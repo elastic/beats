@@ -19,6 +19,8 @@ package v2
 
 import (
 	"errors"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/stretchr/testify/require"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/feature"
@@ -178,6 +180,33 @@ func TestLoader_Configure(t *testing.T) {
 			test.check(t, input, err)
 		})
 	}
+}
+
+func TestLoader_ConfigureFIPS(t *testing.T) {
+	loaderCfg := loaderConfig{
+		Plugins: []Plugin{
+			{
+				Name:      "a",
+				Stability: feature.Stable,
+				Manager: ConfigureWith(func(_ *conf.C) (Input, error) {
+					return nil, nil
+				}),
+				ExcludeFromFIPS: true,
+			},
+		},
+		TypeField: "type",
+	}
+
+	loader := loaderCfg.MustNewLoader()
+	input, err := loader.Configure(conf.MustNewConfigFrom(map[string]any{"type": "a"}))
+	require.Nil(t, input)
+
+	if common.FIPSMode {
+		require.Error(t, err)
+	} else {
+		require.NoError(t, err)
+	}
+	t.Logf("FIPS mode = %v; err = %v", common.FIPSMode, err)
 }
 
 func (b loaderConfig) MustNewLoader() *Loader {
