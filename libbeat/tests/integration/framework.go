@@ -47,6 +47,7 @@ import (
 	"github.com/stretchr/testify/require"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 
+	"github.com/elastic/beats/v7/libbeat/common/proc"
 	"github.com/elastic/mock-es/pkg/api"
 )
 
@@ -68,7 +69,7 @@ type BeatProc struct {
 	stdout              *os.File
 	stderr              *os.File
 	cleanUpOnce         sync.Once
-	jobObject           Job
+	jobObject           proc.Job
 	stopOnce            sync.Once
 	Cmd                 *exec.Cmd
 }
@@ -117,7 +118,7 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	stderrFile, err := os.Create(filepath.Join(tempDir, "stderr"))
 	require.NoError(t, err, "error creating stderr file")
 
-	jobObject, err := CreateJobObject()
+	jobObject, err := proc.CreateJobObject()
 	require.NoError(t, err, "creating job object")
 
 	p := BeatProc{
@@ -260,7 +261,7 @@ func (b *BeatProc) startBeat() {
 		Stdout: b.stdout,
 		Stderr: b.stderr,
 		// OS dependant attributes to allow gracefully terminating process on Windows
-		SysProcAttr: getSysProcAttr(),
+		SysProcAttr: proc.GetSysProcAttr(),
 	}
 
 	var err error
@@ -324,7 +325,7 @@ func (b *BeatProc) stopNonsynced() {
 			return
 		}
 
-		if err := stopCmd(b.Cmd.Process); err != nil {
+		if err := proc.StopCmd(b.Cmd.Process); err != nil {
 			b.t.Fatalf("cannot stop process: %s", err)
 		}
 
