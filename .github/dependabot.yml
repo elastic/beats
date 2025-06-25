@@ -47,6 +47,11 @@ updates:
       - dependency-name: github.com/Azure/go-autorest/*
       # GCP SDK dependencies
       - dependency-name: cloud.google.com/go/*
+      # SQL database drivers
+      - dependency-name: github.com/go-sql-driver/mysql
+      - dependency-name: github.com/microsoft/go-mssqldb
+      - dependency-name: github.com/lib/pq
+      - dependency-name: github.com/godror/godror
     groups:
       # Cloud providers' SDK dependencies
       aws-sdks:
@@ -59,10 +64,17 @@ updates:
       gcp-sdks:
         patterns:
           - "cloud.google.com/go/*"
+      # SQL database drivers
+      sql-libraries:
+        patterns:
+          - "github.com/go-sql-driver/mysql"
+          - "github.com/microsoft/go-mssqldb"
+          - "github.com/lib/pq"
+          - "github.com/godror/godror"
     ignore:
       # Skip github.com/elastic/mito because it requires documentation updates.
       - dependency-name: github.com/elastic/mito
-    open-pull-requests-limit: 2
+    open-pull-requests-limit: 3
 
   # GitHub actions
   - package-ecosystem: "github-actions"
