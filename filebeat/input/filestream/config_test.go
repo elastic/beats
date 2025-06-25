@@ -62,7 +62,7 @@ func TestConfigValidate(t *testing.T) {
 			Paths:              []string{"/foo/bar"},
 			ID:                 "some id",
 			AllowIDDuplication: true,
-			TakeOver:           takeOverConfig{Enabled: true},
+			TakeOver:           loginp.TakeOverConfig{Enabled: true},
 		}
 		err := c.Validate()
 		assert.Error(t, err)

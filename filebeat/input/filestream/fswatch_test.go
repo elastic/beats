@@ -890,7 +890,7 @@ scanner:
 		require.NoError(t, err)
 
 		logger := logptest.NewTestingLogger(t, "log-selector")
-		_, err = newFileWatcher(logger, paths, ns, false)
+		_, err = newFileWatcher(logger, paths, ns, false, false)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
 	})
@@ -949,8 +949,7 @@ func BenchmarkGetFiles(b *testing.B) {
 		},
 	}
 
-	logger := logp.NewNopLogger()
-	s, err := newFileScanner(logger, paths, cfg)
+	s, err := newFileScanner(logp.NewNopLogger(), paths, cfg, false)
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
@@ -978,8 +977,7 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 		},
 	}
 
-	logger := logp.NewNopLogger()
-	s, err := newFileScanner(logger, paths, cfg)
+	s, err := newFileScanner(logp.NewNopLogger(), paths, cfg, false)
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
@@ -996,7 +994,7 @@ func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, 
 	err = ns.Unpack(cfg)
 	require.NoError(t, err)
 
-	fw, err := newFileWatcher(logger, paths, ns, false)
+	fw, err := newFileWatcher(logger, paths, ns, false, false)
 	require.NoError(t, err)
 
 	return fw
@@ -1014,7 +1012,7 @@ func createScannerWithConfig(t *testing.T, logger *logp.Logger, paths []string, 
 	err = ns.Config().Unpack(&config)
 	require.NoError(t, err)
 
-	scanner, err := newFileScanner(logger, paths, config.Scanner)
+	scanner, err := newFileScanner(logger, paths, config.Scanner, false)
 	require.NoError(t, err)
 
 	return scanner
@@ -1054,7 +1052,6 @@ func filenames(m map[string]loginp.FileDescriptor) (result string) {
 	return result
 }
 
-// TODO(AndersonQ): check benchmark
 func BenchmarkToFileDescriptor(b *testing.B) {
 	dir := b.TempDir()
 	basename := "created.log"
@@ -1071,8 +1068,7 @@ func BenchmarkToFileDescriptor(b *testing.B) {
 		},
 	}
 
-	logger := logp.NewNopLogger()
-	s, err := newFileScanner(logger, paths, cfg)
+	s, err := newFileScanner(logp.NewNopLogger(), paths, cfg, false)
 	require.NoError(b, err)
 
 	it, err := s.getIngestTarget(filename)

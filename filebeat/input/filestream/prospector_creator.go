@@ -44,8 +44,8 @@ func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 		return nil, err
 	}
 
-	// TODO(anderson): it needs to know if if it should process GZIP properly
-	filewatcher, err := newFileWatcher(logger, config.Paths, config.FileWatcher, config.Delete.Enabled)
+	filewatcher, err := newFileWatcher(
+		logger, config.Paths, config.FileWatcher, config.GZIPExperimental, config.Delete.Enabled)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating filewatcher %w", err)
 	}

@@ -73,7 +73,7 @@ type fileWatcher struct {
 	events  chan loginp.FSEvent
 }
 
-func newFileWatcher(logger *logp.Logger, paths []string, ns *conf.Namespace, sendNotChanged bool) (loginp.FSWatcher, error) {
+func newFileWatcher(logger *logp.Logger, paths []string, ns *conf.Namespace, gzipAllowed bool, sendNotChanged bool) (loginp.FSWatcher, error) {
 	var config *conf.C
 	if ns == nil {
 		config = conf.NewConfig()
@@ -81,10 +81,10 @@ func newFileWatcher(logger *logp.Logger, paths []string, ns *conf.Namespace, sen
 		config = ns.Config()
 	}
 
-	return newScannerWatcher(logger, paths, config, sendNotChanged)
+	return newScannerWatcher(logger, paths, config, gzipAllowed, sendNotChanged)
 }
 
-func newScannerWatcher(logger *logp.Logger, paths []string, c *conf.C, sendNotChanged bool) (loginp.FSWatcher, error) {
+func newScannerWatcher(logger *logp.Logger, paths []string, c *conf.C, gzipAllowed bool, sendNotChanged bool) (loginp.FSWatcher, error) {
 	config := defaultFileWatcherConfig()
 	err := c.Unpack(&config)
 	if err != nil {
@@ -92,7 +92,7 @@ func newScannerWatcher(logger *logp.Logger, paths []string, c *conf.C, sendNotCh
 	}
 
 	config.SendNotChanged = sendNotChanged
-	scanner, err := newFileScanner(logger, paths, config.Scanner)
+	scanner, err := newFileScanner(logger, paths, config.Scanner, gzipAllowed)
 	if err != nil {
 		return nil, err
 	}
@@ -308,19 +308,21 @@ func defaultFileScannerConfig() fileScannerConfig {
 // fileScanner looks for files which match the patterns in paths.
 // It is able to exclude files and symlinks.
 type fileScanner struct {
-	paths      []string
-	cfg        fileScannerConfig
-	log        *logp.Logger
-	hasher     hash.Hash
-	readBuffer []byte
+	paths       []string
+	cfg         fileScannerConfig
+	log         *logp.Logger
+	hasher      hash.Hash
+	readBuffer  []byte
+	gzipAllowed bool
 }
 
-func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig) (*fileScanner, error) {
+func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, gzipAllowed bool) (*fileScanner, error) {
 	s := fileScanner{
-		paths:  paths,
-		cfg:    config,
-		log:    logger.Named(scannerDebugKey),
-		hasher: sha256.New(),
+		paths:       paths,
+		cfg:         config,
+		log:         logger.Named(scannerDebugKey),
+		hasher:      sha256.New(),
+		gzipAllowed: gzipAllowed,
 	}
 
 	if s.cfg.Fingerprint.Enabled {
@@ -516,37 +518,68 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 
 	fd.Filename = it.filename
 	fd.Info = it.info
+	var f *os.File
 
 	if s.cfg.Fingerprint.Enabled {
-		fileSize := it.info.Size()
-		// we should not open the file if we know it's too small
 		minSize := s.cfg.Fingerprint.Offset + s.cfg.Fingerprint.Length
-		if fileSize < minSize {
-			return fd, fmt.Errorf("filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w", fd.Filename, fileSize, minSize, errFileTooSmall)
+
+		if s.gzipAllowed {
+			f, err = os.Open(it.originalFilename)
+			if err != nil {
+				return fd, fmt.Errorf("failed to open %q for gzip verification: %w", it.originalFilename, err)
+			}
+
+			isGZIP, err := IsGZIP(f)
+			if err != nil {
+				return fd, fmt.Errorf("failed to check if %q is gzip: %w",
+					it.originalFilename, err)
+			}
+			fd.GZIP = isGZIP
+
+			// Check if there is enough *decompressed* data for fingerprint
+			seeker, err := newGzipSeekerReader(f, int(minSize))
+			if err != nil {
+				return fd, fmt.Errorf("failed to create gzip seeker for %q: %w", it.originalFilename, err)
+			}
+			n, err := seeker.Seek(minSize, io.SeekStart)
+			if errors.Is(err, io.EOF) {
+				return fd, fmt.Errorf(
+					"filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w",
+					fd.Filename, n, minSize, errFileTooSmall)
+			}
+
+			// reset offset
+			_, err = seeker.Seek(0, io.SeekStart)
+			if err != nil {
+				return fd, fmt.Errorf("failed to reset file offset to calculate fingerprint %q: %w",
+					it.originalFilename, err)
+			}
+		} else {
+			fileSize := it.info.Size()
+			// we should not open the file if we know it's too small
+			if fileSize < minSize {
+				return fd, fmt.Errorf("filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w", fd.Filename, fileSize, minSize, errFileTooSmall)
+			}
 		}
 
-		file, err := os.Open(it.originalFilename)
-		if err != nil {
-			return fd, fmt.Errorf("failed to open %q for fingerprinting: %w", it.originalFilename, err)
+		if f == nil {
+			f, err = os.Open(it.originalFilename)
+			if err != nil {
+				return fd, fmt.Errorf("failed to open %q for fingerprinting: %w", it.originalFilename, err)
+			}
 		}
-		defer file.Close()
 
-		isGZIP, err := IsGZIP(file)
-		if err != nil {
-			return fd, fmt.Errorf("failed to check if %q is gzip: %w",
-				it.originalFilename, err)
-		}
-		fd.GZIP = isGZIP
+		defer f.Close()
 
 		if s.cfg.Fingerprint.Offset != 0 {
-			_, err = file.Seek(s.cfg.Fingerprint.Offset, io.SeekStart)
+			_, err = f.Seek(s.cfg.Fingerprint.Offset, io.SeekStart)
 			if err != nil {
 				return fd, fmt.Errorf("failed to seek %q for fingerprinting: %w", fd.Filename, err)
 			}
 		}
 
 		s.hasher.Reset()
-		lr := io.LimitReader(file, s.cfg.Fingerprint.Length)
+		lr := io.LimitReader(f, s.cfg.Fingerprint.Length)
 		written, err := io.CopyBuffer(s.hasher, lr, s.readBuffer)
 		if err != nil {
 			return fd, fmt.Errorf("failed to compute hash for first %d bytes of %q: %w", s.cfg.Fingerprint.Length, fd.Filename, err)
