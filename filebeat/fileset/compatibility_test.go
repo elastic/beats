@@ -1116,7 +1116,6 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 }
 
 func TestReplaceAlternativeFlowProcessors(t *testing.T) {
-	logp.TestingSetup()
 	cases := []struct {
 		name          string
 		esVersion     *version.V

@@ -114,7 +114,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
-			esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Packetbeat")
+			esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Packetbeat", b.Info.Logger)
 			if err != nil {
 				return err
 			}

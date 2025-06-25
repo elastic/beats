@@ -354,7 +354,8 @@ func makeESClient(ctx context.Context, cfg *conf.C, attempts int, wait time.Dura
 	}
 
 	for i := 0; i < attempts; i++ {
-		esClient, err = eslegclient.NewConnectedClient(ctx, newCfg, "Heartbeat")
+		// TODO: use local logger here
+		esClient, err = eslegclient.NewConnectedClient(ctx, newCfg, "Heartbeat", logp.NewLogger(""))
 		if err == nil {
 			connectDelay.Reset()
 			return esClient, nil

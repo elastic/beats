@@ -191,7 +191,7 @@ func TestInputManager_Create(t *testing.T) {
 			cim := &InputManager{
 				Logger:     log,
 				StateStore: testStateStore{Store: testStore},
-				Configure: func(_ *config.C) (Prospector, Harvester, error) {
+				Configure: func(_ *config.C, _ *logp.Logger) (Prospector, Harvester, error) {
 					return nil, nil, nil
 				}}
 			cfg, err := config.NewConfigFrom("id: my-id")
@@ -215,6 +215,70 @@ func TestInputManager_Create(t *testing.T) {
 				"already exists")
 		})
 
+<<<<<<< HEAD
+=======
+	t.Run("does not start an input with duplicated ID", func(t *testing.T) {
+		tcs := []struct {
+			name string
+			id   string
+		}{
+			{name: "ID is empty", id: ""},
+			{name: "non-empty ID", id: "non-empty-ID"},
+		}
+
+		for _, tc := range tcs {
+			t.Run(tc.name, func(t *testing.T) {
+				storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+				testStore, err := storeReg.Get("test")
+				require.NoError(t, err)
+
+				log, buff := newBufferLogger()
+
+				cim := &InputManager{
+					Logger:     log,
+					StateStore: testStateStore{Store: testStore},
+					Configure: func(_ *config.C, _ *logp.Logger) (Prospector, Harvester, error) {
+						var wg sync.WaitGroup
+
+						return &noopProspector{}, &mockHarvester{onRun: correctOnRun, wg: &wg}, nil
+					}}
+				cfg1 := config.MustNewConfigFrom(fmt.Sprintf(`
+type: filestream
+id: %s
+paths:
+  - /var/log/foo
+`, tc.id))
+
+				// Create a different 2nd config with duplicated ID to ensure
+				// the ID itself is the only requirement to prevent the 2nd input
+				// from being created.
+				cfg2 := config.MustNewConfigFrom(fmt.Sprintf(`
+type: filestream
+id: %s
+paths:
+  - /var/log/bar
+`, tc.id))
+
+				_, err = cim.Create(cfg1)
+				require.NoError(t, err, "1st input should have been created")
+
+				// Attempt to create an input with a duplicated ID
+				_, err = cim.Create(cfg2)
+				require.Error(t, err, "filestream should not have created an input with a duplicated ID")
+
+				logs := buff.String()
+				// Assert the logs contain the correct log message
+				assert.Contains(t, logs,
+					fmt.Sprintf("filestream input ID '%s' is duplicated:", tc.id))
+
+				// Assert the error contains the correct text
+				assert.Contains(t, err.Error(),
+					fmt.Sprintf("filestream input with ID '%s' already exists", tc.id))
+			})
+		}
+	})
+
+>>>>>>> f11ccf465 ([Chore] Replace global logger with local logger #9 (#44675))
 	t.Run("failed input has its ID removed from the IDs list", func(t *testing.T) {
 		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
 		testStore, err := storeReg.Get("test")
@@ -225,7 +289,7 @@ func TestInputManager_Create(t *testing.T) {
 		cim := &InputManager{
 			Logger:     log,
 			StateStore: testStateStore{Store: testStore},
-			Configure: func(cfg *config.C) (Prospector, Harvester, error) {
+			Configure: func(cfg *config.C, _ *logp.Logger) (Prospector, Harvester, error) {
 				var wg sync.WaitGroup
 
 				settings := struct {
@@ -312,6 +376,57 @@ paths:
 				"only 't-wing' must be present in cim.ids")
 		})
 	})
+<<<<<<< HEAD
+=======
+
+	t.Run("allow duplicated IDs setting", func(t *testing.T) {
+		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+		testStore, err := storeReg.Get("test")
+		require.NoError(t, err)
+
+		log, buff := newBufferLogger()
+
+		cim := &InputManager{
+			Logger:     log,
+			StateStore: testStateStore{Store: testStore},
+			Configure: func(_ *config.C, _ *logp.Logger) (Prospector, Harvester, error) {
+				var wg sync.WaitGroup
+
+				return &noopProspector{}, &mockHarvester{onRun: correctOnRun, wg: &wg}, nil
+			}}
+		cfg1 := config.MustNewConfigFrom(`
+type: filestream
+id: duplicated-id
+allow_deprecated_id_duplication: true
+paths:
+  - /var/log/foo
+`)
+
+		// Create a different 2nd config with duplicated ID to ensure
+		// the ID itself is the only requirement to prevent the 2nd input
+		// from being created.
+		cfg2 := config.MustNewConfigFrom(`
+type: filestream
+id: duplicated-id
+allow_deprecated_id_duplication: true
+paths:
+  - /var/log/bar
+`)
+		_, err = cim.Create(cfg1)
+		require.NoError(t, err, "1st input should have been created")
+		// Create an input with a duplicated ID
+		_, err = cim.Create(cfg2)
+		require.NoError(t, err, "filestream should not have created an input with a duplicated ID")
+
+		logs := buff.String()
+		// Assert the logs contain the correct log message
+		assert.Contains(t, logs,
+			"filestream input with ID 'duplicated-id' already exists, this "+
+				"will lead to data duplication, please use a different ID. Metrics "+
+				"collection has been disabled on this input.",
+			"did not find the expected message about the duplicated input ID")
+	})
+>>>>>>> f11ccf465 ([Chore] Replace global logger with local logger #9 (#44675))
 }
 
 func newBufferLogger() (*logp.Logger, *bytes.Buffer) {

@@ -27,10 +27,15 @@ type fingerprintIdentifier struct {
 	log *logp.Logger
 }
 
+<<<<<<< HEAD
 func newFingerprintIdentifier(cfg *conf.C) (fileIdentifier, error) {
 	return &fingerprintIdentifier{
 		log: logp.NewLogger("fingerprint_identifier"),
 	}, nil
+=======
+func newFingerprintIdentifier(cfg *conf.C, _ *logp.Logger) (fileIdentifier, error) {
+	return &fingerprintIdentifier{}, nil
+>>>>>>> f11ccf465 ([Chore] Replace global logger with local logger #9 (#44675))
 }
 
 func (i *fingerprintIdentifier) GetSource(e loginp.FSEvent) fileSource {

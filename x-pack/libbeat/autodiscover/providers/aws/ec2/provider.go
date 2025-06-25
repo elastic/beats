@@ -44,6 +44,10 @@ func AutodiscoverBuilder(
 	uuid uuid.UUID,
 	c *conf.C,
 	keystore keystore.Keystore,
+<<<<<<< HEAD
+=======
+	log *logp.Logger,
+>>>>>>> f11ccf465 ([Chore] Replace global logger with local logger #9 (#44675))
 ) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("aws_ec2 autodiscover is experimental")
 
@@ -92,12 +96,18 @@ func AutodiscoverBuilder(
 		}))
 	}
 
-	return internalBuilder(uuid, bus, config, newAPIFetcher(clients), keystore)
+	return internalBuilder(uuid, bus, config, newAPIFetcher(clients, log), keystore, log)
 }
 
 // internalBuilder is mainly intended for testing via mocks and stubs.
 // it can be configured to use a fetcher that doesn't actually hit the AWS API.
-func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetcher fetcher, keystore keystore.Keystore) (*Provider, error) {
+func internalBuilder(
+	uuid uuid.UUID,
+	bus bus.Bus,
+	config *awsauto.Config,
+	fetcher fetcher,
+	keystore keystore.Keystore,
+	log *logp.Logger) (*Provider, error) {
 	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
 	if err != nil {
 		return nil, err
@@ -115,6 +125,7 @@ func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetche
 		config.Period,
 		p.onWatcherStart,
 		p.onWatcherStop,
+		log,
 	)
 
 	return p, nil
