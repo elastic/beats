@@ -20,7 +20,6 @@
 package volume
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,7 +30,8 @@ import (
 
 func TestFetchMetricset(t *testing.T) {
 	config := test.GetKubeletConfig(t, "volume")
-	fmt.Println("this is a test message from TestFetchMetricset")
+
+	t.Log("this is a test message from TestFetchMetricset")
 	metricSet := mbtest.NewFetcher(t, config)
 	events, errs := metricSet.FetchEvents()
 	if len(errs) > 0 {
