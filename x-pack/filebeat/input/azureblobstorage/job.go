@@ -378,7 +378,6 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, id s
 // code executed after this function call to consume the stream if it wants.
 func (j *job) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
 	bufReader := bufio.NewReader(body)
-	isStreamGzipped := false
 	// check if stream is gziped or not
 	buf, err := bufReader.Peek(3)
 	if err != nil {
@@ -389,7 +388,7 @@ func (j *job) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
 	}
 
 	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
-	isStreamGzipped = bytes.Equal(buf, []byte{0x1F, 0x8B, 0x08})
+	isStreamGzipped := bytes.Equal(buf, []byte{0x1F, 0x8B, 0x08})
 	if !isStreamGzipped {
 		return bufReader, nil
 	}
