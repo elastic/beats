@@ -19,5 +19,5 @@
 
 package common
 
-// FIPSMode = true indicates that this is a FIPS-capable distribution.const FIPSMode = true
+// FIPSMode = true indicates that this is a FIPS-capable distribution.
 const FIPSMode = true
