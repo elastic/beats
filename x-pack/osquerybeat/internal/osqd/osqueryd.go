@@ -44,8 +44,6 @@ const (
 
 var defaultDisabledTables = []string{"carves", "curl"}
 
-var JobObject proc.Job
-
 type OSQueryD struct {
 	socketPath string
 	binPath    string
