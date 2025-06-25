@@ -1,19 +1,19 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-openai.html
-  # That link will 404 until 8.18 is current
-  # (see https://www.elastic.co/guide/en/beats/metricbeat/8.18/exported-fields-openai.html)
 ---
+
+% This file is generated! See scripts/generate_fields_docs.py
 
 # openai fields [exported-fields-openai]
 
 openai module
 
-
 ## openai [_openai]
 
 
-## usage [_usage_14]
+
+## usage [_usage]
 
 OpenAI API usage metrics and statistics
 
@@ -65,8 +65,7 @@ type: keyword
 type: keyword
 
 
-
-## data [_data_2]
+## data [_data]
 
 General usage data metrics
 
@@ -118,7 +117,6 @@ type: keyword
 type: keyword
 
 
-
 ## dalle [_dalle]
 
 DALL-E API usage metrics
@@ -159,7 +157,6 @@ type: keyword
 type: keyword
 
 
-
 ## whisper [_whisper]
 
 Whisper API usage metrics
@@ -186,7 +183,6 @@ type: long
 :   User identifier
 
 type: keyword
-
 
 
 ## tts [_tts]
@@ -217,7 +213,6 @@ type: long
 type: keyword
 
 
-
 ## ft_data [_ft_data]
 
 Fine-tuning data metrics
@@ -228,7 +223,6 @@ Fine-tuning data metrics
 type: object
 
 
-
 ## assistant_code_interpreter [_assistant_code_interpreter]
 
 Assistant Code Interpreter usage metrics
@@ -237,7 +231,6 @@ Assistant Code Interpreter usage metrics
 :   Raw assistant code interpreter data
 
 type: object
-
 
 
 ## retrieval_storage [_retrieval_storage]

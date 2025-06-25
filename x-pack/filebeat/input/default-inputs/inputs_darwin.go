@@ -42,7 +42,7 @@ func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States) []v2
 		httpjson.Plugin(log, store),
 		o365audit.Plugin(log, store),
 		awss3.Plugin(store),
-		awscloudwatch.Plugin(),
+		awscloudwatch.Plugin(store),
 		lumberjack.Plugin(),
 		salesforce.Plugin(log, store),
 		streaming.Plugin(log, store),

@@ -6,7 +6,6 @@ package events
 
 import (
 	"errors"
-	"os"
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
@@ -159,19 +158,16 @@ func TestGetResourceID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Set environment variables
 			for key, value := range tt.envVars {
-				os.Setenv(key, value)
+				t.Setenv(key, value)
 			}
 
 			// Call the function
-			result := getResourceID()
+			result := utils.GetAndSetResourceID()
+
+			t.Cleanup(utils.ClearResourceID)
 
 			// Assert the result
 			assert.Equal(t, tt.expectedValue, result)
-
-			// Clean up environment variables
-			for key := range tt.envVars {
-				os.Unsetenv(key)
-			}
 		})
 	}
 }

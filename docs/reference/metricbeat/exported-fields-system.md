@@ -3,12 +3,13 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-system.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # System fields [exported-fields-system]
 
 System status metrics, like CPU and memory usage, that are collected from the operating system.
 
-
-## process [_process_8]
+## process [_process]
 
 Process metrics.
 
@@ -40,13 +41,11 @@ type: scaled_float
 format: percent
 
 
-
-## system [_system_4]
+## system [_system]
 
 `system` contains local system metrics.
 
-
-## core [_core_2]
+## core [_core]
 
 `system-core` contains CPU metrics for a single core of a multi-core system.
 
@@ -206,8 +205,7 @@ type: keyword
 type: keyword
 
 
-
-## cpu [_cpu_11]
+## cpu [_cpu]
 
 `cpu` contains local CPU stats.
 
@@ -409,8 +407,7 @@ type: long
 type: long
 
 
-
-## diskio [_diskio_4]
+## diskio [_diskio]
 
 `disk` contains disk IO metrics collected from the operating system.
 
@@ -423,7 +420,7 @@ example: sda1
 
 
 **`system.diskio.serial_number`**
-:   The disk’s serial number. This may not be provided by all operating systems.
+:   The disk's serial number. This may not be provided by all operating systems.
 
 type: keyword
 
@@ -480,8 +477,7 @@ type: long
 type: long
 
 
-
-## entropy [_entropy_2]
+## entropy [_entropy]
 
 Available system entropy
 
@@ -499,8 +495,7 @@ type: scaled_float
 format: percent
 
 
-
-## filesystem [_filesystem_3]
+## filesystem [_filesystem]
 
 `filesystem` contains local filesystem stats.
 
@@ -580,8 +575,7 @@ type: scaled_float
 format: percent
 
 
-
-## fsstat [_fsstat_2]
+## fsstat [_fsstat]
 
 `system.fsstat` contains filesystem metrics aggregated from all mounted filesystems.
 
@@ -597,8 +591,7 @@ type: long
 type: long
 
 
-
-## total_size [_total_size_2]
+## total_size [_total_size]
 
 Nested file system docs.
 
@@ -626,8 +619,7 @@ type: long
 format: bytes
 
 
-
-## load [_load_3]
+## load [_load]
 
 CPU load averages.
 
@@ -673,8 +665,7 @@ type: scaled_float
 type: long
 
 
-
-## memory [_memory_12]
+## memory [_memory]
 
 `memory` contains local memory stats.
 
@@ -718,7 +709,6 @@ type: scaled_float
 format: percent
 
 
-
 ## actual [_actual]
 
 Actual memory used and free.
@@ -747,8 +737,7 @@ type: scaled_float
 format: percent
 
 
-
-## swap [_swap_3]
+## swap [_swap]
 
 This group contains statistics related to the swap memory usage on the system.
 
@@ -784,8 +773,7 @@ type: scaled_float
 format: percent
 
 
-
-## network [_network_10]
+## network [_network]
 
 `network` contains network IO metrics for a single network interface.
 
@@ -849,8 +837,7 @@ type: long
 type: long
 
 
-
-## network_summary [_network_summary_2]
+## network_summary [_network_summary]
 
 Metrics relating to global network activity
 
@@ -884,8 +871,7 @@ type: object
 type: object
 
 
-
-## process [_process_9]
+## process [_process]
 
 `process` contains process metadata, CPU metrics, and memory metrics.
 
@@ -949,8 +935,7 @@ alias to: process.working_directory
 type: object
 
 
-
-## cpu [_cpu_12]
+## cpu [_cpu]
 
 CPU-specific statistics per process.
 
@@ -1000,8 +985,7 @@ type: long
 type: date
 
 
-
-## memory [_memory_13]
+## memory [_memory]
 
 Memory-specific statistics per process.
 
@@ -1035,7 +1019,6 @@ format: percent
 type: long
 
 format: bytes
-
 
 
 ## io [_io]
@@ -1084,7 +1067,6 @@ type: long
 type: long
 
 
-
 ## fd [_fd]
 
 File descriptor usage metrics. This set of metrics is available for Linux and FreeBSD.
@@ -1107,19 +1089,18 @@ type: long
 type: long
 
 
-
 ## cgroup [_cgroup]
 
 Metrics and limits from the cgroup of which the task is a member. cgroup metrics are reported when the process has membership in a non-root cgroup. These metrics are only available on Linux.
 
 **`system.process.cgroup.id`**
-:   The ID common to all cgroups associated with this task. If there isn’t a common ID used by all cgroups this field will be absent.
+:   The ID common to all cgroups associated with this task. If there isn't a common ID used by all cgroups this field will be absent.
 
 type: keyword
 
 
 **`system.process.cgroup.path`**
-:   The path to the cgroup relative to the cgroup subsystem’s mountpoint. If there isn’t a common path used by all cgroups this field will be absent.
+:   The path to the cgroup relative to the cgroup subsystem's mountpoint. If there isn't a common path used by all cgroups this field will be absent.
 
 type: keyword
 
@@ -1130,8 +1111,7 @@ type: keyword
 type: long
 
 
-
-## cpu [_cpu_13]
+## cpu [_cpu]
 
 The cpu subsystem schedules CPU access for tasks in the cgroup. Access can be controlled by two separate schedulers, CFS and RT. CFS stands for completely fair scheduler which proportionally divides the CPU time between cgroups based on weight. RT stands for real time scheduler which sets a maximum amount of CPU time that processes in the cgroup can consume during a given period. In CPU under cgroups V2, the cgroup is merged with many of the metrics from cpuacct. In addition, per-scheduler metrics are gone in V2.
 
@@ -1142,13 +1122,12 @@ type: keyword
 
 
 **`system.process.cgroup.cpu.path`**
-:   Path to the cgroup relative to the cgroup subsystem’s mountpoint.
+:   Path to the cgroup relative to the cgroup subsystem's mountpoint.
 
 type: keyword
 
 
-
-## stats [_stats_12]
+## stats [_stats]
 
 cgroupv2 stats
 
@@ -1207,7 +1186,7 @@ type: float
 
 
 **`system.process.cgroup.cpu.cfs.period.us`**
-:   Period of time in microseconds for how regularly a cgroup’s access to CPU resources should be reallocated.
+:   Period of time in microseconds for how regularly a cgroup's access to CPU resources should be reallocated.
 
 type: long
 
@@ -1225,7 +1204,7 @@ type: long
 
 
 **`system.process.cgroup.cpu.rt.period.us`**
-:   Period of time in microseconds for how regularly a cgroup’s access to CPU resources is reallocated.
+:   Period of time in microseconds for how regularly a cgroup's access to CPU resources is reallocated.
 
 type: long
 
@@ -1260,11 +1239,9 @@ type: long
 type: long
 
 
-
-## pressure [_pressure_2]
+## pressure [_pressure]
 
 Pressure (resource contention) stats.
-
 
 ## some [_some]
 
@@ -1302,7 +1279,6 @@ type: long
 format: percent
 
 
-
 ## full [_full]
 
 Share of time in which all non-idle tasks are stalled on a given resource simultaneously
@@ -1337,7 +1313,6 @@ format: percent
 type: long
 
 
-
 ## cpuacct [_cpuacct]
 
 CPU accounting metrics.
@@ -1349,7 +1324,7 @@ type: keyword
 
 
 **`system.process.cgroup.cpuacct.path`**
-:   Path to the cgroup relative to the cgroup subsystem’s mountpoint.
+:   Path to the cgroup relative to the cgroup subsystem's mountpoint.
 
 type: keyword
 
@@ -1414,8 +1389,7 @@ type: scaled_float
 type: object
 
 
-
-## memory [_memory_14]
+## memory [_memory]
 
 Memory limits and metrics.
 
@@ -1426,7 +1400,7 @@ type: keyword
 
 
 **`system.process.cgroup.memory.path`**
-:   Path to the cgroup relative to the cgroup subsystem’s mountpoint.
+:   Path to the cgroup relative to the cgroup subsystem's mountpoint.
 
 type: keyword
 
@@ -1485,8 +1459,7 @@ type: long
 format: bytes
 
 
-
-## mem.events [_mem_events]
+## mem.events [_mem.events]
 
 number of times the controller tripped a given usage level
 
@@ -1580,8 +1553,7 @@ format: bytes
 type: long
 
 
-
-## memsw.events [_memsw_events]
+## memsw.events [_memsw.events]
 
 number of times the controller tripped a given usage level
 
@@ -1813,8 +1785,7 @@ type: long
 format: bytes
 
 
-
-## blkio [_blkio_2]
+## blkio [_blkio]
 
 Block IO metrics.
 
@@ -1844,8 +1815,7 @@ format: bytes
 type: long
 
 
-
-## io [_io_2]
+## io [_io]
 
 cgroup V2 IO Metrics, replacing blkio.
 
@@ -1883,13 +1853,11 @@ type: object
 type: object
 
 
-
-## pressure [_pressure_3]
+## pressure [_pressure]
 
 Pressure (resource contention) stats.
 
-
-## full [_full_2]
+## full [_full]
 
 Share of time in which at least some tasks are stalled on a given resource
 
@@ -1923,8 +1891,7 @@ format: percent
 type: long
 
 
-
-## some [_some_2]
+## some [_some]
 
 Share of time in which all tasks are stalled on a given resource
 
@@ -1956,8 +1923,7 @@ type: float
 type: long
 
 
-
-## process.summary [_process_summary_2]
+## process.summary [_process.summary]
 
 Summary metrics for the processes running on the host.
 
@@ -1998,7 +1964,7 @@ type: long
 
 
 **`system.process.summary.dead`**
-:   Number of dead processes on this host. It’s very unlikely that it will appear but in some special situations it may happen.
+:   Number of dead processes on this host. It's very unlikely that it will appear but in some special situations it may happen.
 
 type: long
 
@@ -2022,13 +1988,12 @@ type: long
 
 
 **`system.process.summary.unknown`**
-:   Number of processes for which the state couldn’t be retrieved or is unknown.
+:   Number of processes for which the state couldn't be retrieved or is unknown.
 
 type: long
 
 
-
-## threads [_threads_3]
+## threads [_threads]
 
 Counts of individual threads on a system.
 
@@ -2044,8 +2009,7 @@ type: long
 type: long
 
 
-
-## raid [_raid_2]
+## raid [_raid]
 
 raid
 
@@ -2115,8 +2079,7 @@ type: long
 type: long
 
 
-
-## service [_service_4]
+## service [_service]
 
 metrics for system services
 
@@ -2151,7 +2114,7 @@ type: date
 
 
 **`system.service.exec_code`**
-:   The SIGCHLD code from the service’s main process
+:   The SIGCHLD code from the service's main process
 
 type: keyword
 
@@ -2168,8 +2131,7 @@ type: keyword
 type: keyword
 
 
-
-## resources [_resources_2]
+## resources [_resources]
 
 system metrics associated with the service
 
@@ -2191,8 +2153,7 @@ type: long
 type: long
 
 
-
-## network [_network_11]
+## network [_network]
 
 network resource usage
 
@@ -2224,8 +2185,7 @@ type: long
 type: long
 
 
-
-## socket [_socket_2]
+## socket [_socket]
 
 TCP sockets that are active.
 
@@ -2282,7 +2242,7 @@ example: 76-211-117-36.nw.example.com.
 
 
 **`system.socket.remote.etld_plus_one`**
-:   The effective top-level domain (eTLD) of the remote host plus one more label. For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.". The data for determining the eTLD comes from an embedded copy of the data from [http://publicsuffix.org](http://publicsuffix.org).
+:   The effective top-level domain (eTLD) of the remote host plus one more label. For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.". The data for determining the eTLD comes from an embedded copy of the data from http://publicsuffix.org.
 
 type: keyword
 
@@ -2331,11 +2291,9 @@ alias to: user.id
 alias to: user.full_name
 
 
-
-## socket.summary [_socket_summary_2]
+## socket.summary [_socket.summary]
 
 Summary metrics of open sockets in the host system
-
 
 ## all [_all]
 
@@ -2353,7 +2311,6 @@ type: integer
 type: integer
 
 
-
 ## tcp [_tcp]
 
 All TCP connections
@@ -2366,8 +2323,7 @@ type: integer
 format: bytes
 
 
-
-## all [_all_2]
+## all [_all]
 
 All TCP connections
 
@@ -2396,52 +2352,51 @@ type: integer
 
 
 **`system.socket.summary.tcp.all.close_wait`**
-:   Number of TCP connections in *close_wait* state
+:   Number of TCP connections in _close_wait_ state
 
 type: integer
 
 
 **`system.socket.summary.tcp.all.time_wait`**
-:   Number of TCP connections in *time_wait* state
+:   Number of TCP connections in _time_wait_ state
 
 type: integer
 
 
 **`system.socket.summary.tcp.all.syn_sent`**
-:   Number of TCP connections in *syn_sent* state
+:   Number of TCP connections in _syn_sent_ state
 
 type: integer
 
 
 **`system.socket.summary.tcp.all.syn_recv`**
-:   Number of TCP connections in *syn_recv* state
+:   Number of TCP connections in _syn_recv_ state
 
 type: integer
 
 
 **`system.socket.summary.tcp.all.fin_wait1`**
-:   Number of TCP connections in *fin_wait1* state
+:   Number of TCP connections in _fin_wait1_ state
 
 type: integer
 
 
 **`system.socket.summary.tcp.all.fin_wait2`**
-:   Number of TCP connections in *fin_wait2* state
+:   Number of TCP connections in _fin_wait2_ state
 
 type: integer
 
 
 **`system.socket.summary.tcp.all.last_ack`**
-:   Number of TCP connections in *last_ack* state
+:   Number of TCP connections in _last_ack_ state
 
 type: integer
 
 
 **`system.socket.summary.tcp.all.closing`**
-:   Number of TCP connections in *closing* state
+:   Number of TCP connections in _closing_ state
 
 type: integer
-
 
 
 ## udp [_udp]
@@ -2456,8 +2411,7 @@ type: integer
 format: bytes
 
 
-
-## all [_all_3]
+## all [_all]
 
 All UDP connections
 
@@ -2467,8 +2421,7 @@ All UDP connections
 type: integer
 
 
-
-## uptime [_uptime_3]
+## uptime [_uptime]
 
 `uptime` contains the operating system uptime metric.
 
@@ -2478,7 +2431,6 @@ type: integer
 type: long
 
 format: duration
-
 
 
 ## users [_users]

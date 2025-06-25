@@ -3,18 +3,20 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-cloudfoundry.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Cloudfoundry fields [exported-fields-cloudfoundry]
 
 Cloud Foundry module
 
-
 ## cloudfoundry [_cloudfoundry]
 
+
+
 **`cloudfoundry.type`**
-:   The type of event from Cloud Foundry. Possible values include *container*, *counter* and *value*.
+:   The type of event from Cloud Foundry. Possible values include 'container', 'counter' and 'value'.
 
 type: keyword
-
 
 
 ## app [_app]
@@ -27,8 +29,7 @@ The application the metric is associated with.
 type: keyword
 
 
-
-## container [_container_2]
+## container [_container]
 
 `container` contains container metrics from Cloud Foundry.
 
@@ -68,8 +69,7 @@ type: long
 type: long
 
 
-
-## counter [_counter_2]
+## counter [_counter]
 
 `counter` contains counter metrics from Cloud Foundry.
 
@@ -91,8 +91,7 @@ type: long
 type: long
 
 
-
-## value [_value_2]
+## value [_value]
 
 `value` contains counter metrics from Cloud Foundry.
 

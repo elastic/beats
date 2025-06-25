@@ -3,15 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-logstash.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # logstash fields [exported-fields-logstash]
 
 logstash Module
 
-
 ## logstash [_logstash]
 
 
-## log [_log_7]
+
+## log [_log]
 
 Fields from the Logstash logs.
 
@@ -61,8 +63,7 @@ alias to: message
 alias to: log.level
 
 
-
-## slowlog [_slowlog_2]
+## slowlog [_slowlog]
 
 slowlog
 
@@ -121,7 +122,7 @@ type: keyword
 
 
 **`logstash.slowlog.plugin_params_object`**
-:   key → value of the configuration used by the plugin.
+:   key -> value of the configuration used by the plugin.
 
 type: object
 

@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var mockEvent = &beat.Event{}
@@ -53,17 +54,17 @@ func (p *mockCloserProcessor) Close() error {
 
 func newMockCloserConstructor() (Constructor, *mockCloserProcessor) {
 	p := mockCloserProcessor{}
-	constructor := func(config *config.C) (beat.Processor, error) {
+	constructor := func(config *config.C, _ *logp.Logger) (beat.Processor, error) {
 		return &p, nil
 	}
 	return constructor, &p
 }
 
-func mockConstructor(config *config.C) (beat.Processor, error) {
+func mockConstructor(config *config.C, log *logp.Logger) (beat.Processor, error) {
 	return &mockProcessor{}, nil
 }
 
-func mockCloserConstructor(config *config.C) (beat.Processor, error) {
+func mockCloserConstructor(config *config.C, log *logp.Logger) (beat.Processor, error) {
 	return &mockCloserProcessor{}, nil
 }
 
@@ -71,7 +72,7 @@ func TestSafeWrap(t *testing.T) {
 	t.Run("does not wrap a non-closer processor", func(t *testing.T) {
 		nonCloser := mockConstructor
 		wrappedNonCloser := SafeWrap(nonCloser)
-		wp, err := wrappedNonCloser(nil)
+		wp, err := wrappedNonCloser(nil, nil)
 		require.NoError(t, err)
 		require.IsType(t, &mockProcessor{}, wp)
 	})
@@ -79,7 +80,7 @@ func TestSafeWrap(t *testing.T) {
 	t.Run("wraps a closer processor", func(t *testing.T) {
 		closer := mockCloserConstructor
 		wrappedCloser := SafeWrap(closer)
-		wcp, err := wrappedCloser(nil)
+		wcp, err := wrappedCloser(nil, nil)
 		require.NoError(t, err)
 		require.IsType(t, &SafeProcessor{}, wcp)
 	})
@@ -93,7 +94,7 @@ func TestSafeProcessor(t *testing.T) {
 	)
 	t.Run("creates a wrapped processor", func(t *testing.T) {
 		sw := SafeWrap(cons)
-		sp, err = sw(nil)
+		sp, err = sw(nil, nil)
 		require.NoError(t, err)
 	})
 

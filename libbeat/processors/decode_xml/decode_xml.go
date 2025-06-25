@@ -63,7 +63,7 @@ func init() {
 }
 
 // New constructs a new decode_xml processor.
-func New(c *config.C) (beat.Processor, error) {
+func New(c *config.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig()
 
 	if err := c.Unpack(&config); err != nil {

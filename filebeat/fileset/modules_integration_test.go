@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func makeTestInfo(version string) beat.Info {
@@ -63,7 +64,7 @@ func TestLoadPipeline(t *testing.T) {
 		},
 	}
 
-	log := logp.NewLogger(logName)
+	log := logptest.NewTestingLogger(t, logName)
 	err := LoadPipeline(client, "my-pipeline-id", content, false, log)
 	require.NoError(t, err)
 
@@ -259,11 +260,15 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 }
 
 func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		t.Fatal(err)
+	}
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:      eslegtest.GetURL(),
 		Username: eslegtest.GetUser(),
 		Password: eslegtest.GetPass(),
-	})
+	}, logger)
 	if err != nil {
 		t.Fatal(err)
 		panic(err) // panic in case TestLogger did not stop test

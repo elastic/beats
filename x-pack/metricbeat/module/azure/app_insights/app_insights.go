@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package app_insights
 
 import (
@@ -59,7 +61,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
-		log:           logp.NewLogger(metricsetName),
+		log:           base.Logger().Named(metricsetName),
 		client:        client,
 	}, nil
 }

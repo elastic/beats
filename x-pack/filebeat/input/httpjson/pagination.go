@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/mito/lib/xml"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -23,11 +24,12 @@ type pagination struct {
 	client         *httpClient
 	requestFactory *requestFactory
 	decoder        decoderFunc
+	status         status.StatusReporter
 	log            *logp.Logger
 }
 
-func newPagination(config config, client *httpClient, log *logp.Logger) *pagination {
-	pagination := &pagination{client: client, log: log}
+func newPagination(config config, client *httpClient, stat status.StatusReporter, log *logp.Logger) *pagination {
+	pagination := &pagination{client: client, status: stat, log: log}
 	if config.Response == nil {
 		return pagination
 	}
@@ -38,8 +40,8 @@ func newPagination(config config, client *httpClient, log *logp.Logger) *paginat
 		return pagination
 	}
 
-	rts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Request.Transforms, requestNamespace, log)
-	pts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Response.Pagination, paginationNamespace, log)
+	rts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Request.Transforms, requestNamespace, stat, log)
+	pts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Response.Pagination, paginationNamespace, stat, log)
 
 	body := func() *mapstr.M {
 		if config.Response.RequestBodyOnPagination {
@@ -55,13 +57,14 @@ func newPagination(config config, client *httpClient, log *logp.Logger) *paginat
 		body,
 		append(rts, pts...),
 		config.Auth,
+		stat,
 		log,
 	)
 	pagination.requestFactory = requestFactory
 	return pagination
 }
 
-func newPaginationRequestFactory(method, encodeAs string, url url.URL, body *mapstr.M, ts []basicTransform, authConfig *authConfig, log *logp.Logger) *requestFactory {
+func newPaginationRequestFactory(method, encodeAs string, url url.URL, body *mapstr.M, ts []basicTransform, authConfig *authConfig, stat status.StatusReporter, log *logp.Logger) *requestFactory {
 	// config validation already checked for errors here
 	rf := &requestFactory{
 		url:        url,
@@ -92,9 +95,11 @@ type pageIterator struct {
 	done    bool
 
 	n int64
+
+	status status.StatusReporter
 }
 
-func (p *pagination) newPageIterator(stdCtx context.Context, trCtx *transformContext, resp *http.Response, xmlDetails map[string]xml.Detail) *pageIterator {
+func (p *pagination) newPageIterator(stdCtx context.Context, trCtx *transformContext, resp *http.Response, xmlDetails map[string]xml.Detail, stat status.StatusReporter) *pageIterator {
 	return &pageIterator{
 		pagination: p,
 		stdCtx:     stdCtx,
@@ -102,6 +107,7 @@ func (p *pagination) newPageIterator(stdCtx context.Context, trCtx *transformCon
 		resp:       resp,
 		xmlDetails: xmlDetails,
 		isFirst:    true,
+		status:     stat,
 	}
 }
 
@@ -161,6 +167,7 @@ func (iter *pageIterator) next() (*response, bool, error) {
 func (iter *pageIterator) getPage() (*response, error) {
 	bodyBytes, err := io.ReadAll(iter.resp.Body)
 	if err != nil {
+		iter.status.UpdateStatus(status.Degraded, "failed to read page body: "+err.Error())
 		return nil, err
 	}
 	iter.resp.Body.Close()
@@ -182,6 +189,7 @@ func (iter *pageIterator) getPage() (*response, error) {
 			err = decode(iter.resp.Header.Get("Content-Type"), bodyBytes, &r)
 		}
 		if err != nil {
+			iter.status.UpdateStatus(status.Degraded, "failed to decode page: "+err.Error())
 			return nil, err
 		}
 	}

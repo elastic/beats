@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-memcache.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Memcache fields [exported-fields-memcache]
 
 Memcached-specific event fields
@@ -174,25 +176,25 @@ type: long
 
 
 **`memcache.request.raw_args`**
-:   The text protocol raw arguments for the "stats …" and "lru crawl …" commands.
+:   The text protocol raw arguments for the "stats ..." and "lru crawl ..." commands.
 
 type: keyword
 
 
 **`memcache.request.source_class`**
-:   The source class id in *slab reassign* command.
+:   The source class id in 'slab reassign' command.
 
 type: long
 
 
 **`memcache.request.dest_class`**
-:   The destination class id in *slab reassign* command.
+:   The destination class id in 'slab reassign' command.
 
 type: long
 
 
 **`memcache.request.automove`**
-:   The automove mode in the *slab automove* command expressed as a string. This value can be "standby"(=0), "slow"(=1), "aggressive"(=2), or the raw value if the value is unknown.
+:   The automove mode in the 'slab automove' command expressed as a string. This value can be "standby"(=0), "slow"(=1), "aggressive"(=2), or the raw value if the value is unknown.
 
 type: keyword
 
@@ -216,7 +218,7 @@ type: long
 
 
 **`memcache.request.sleep_us`**
-:   The sleep setting in microseconds for the *lru_crawler sleep* command.
+:   The sleep setting in microseconds for the 'lru_crawler sleep' command.
 
 type: long
 

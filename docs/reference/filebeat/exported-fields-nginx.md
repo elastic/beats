@@ -3,17 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-nginx.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Nginx fields [exported-fields-nginx]
 
 Module for parsing the Nginx log files.
-
 
 ## nginx [_nginx]
 
 Fields from the Nginx log files.
 
-
-## access [_access_3]
+## access [_access]
 
 Contains fields for the Nginx access logs.
 
@@ -137,8 +137,7 @@ alias to: source.geo.city_name
 alias to: source.geo.region_iso_code
 
 
-
-## error [_error_5]
+## error [_error]
 
 Contains fields for the Nginx error logs.
 
@@ -170,7 +169,6 @@ alias to: process.thread.id
 :   type: alias
 
 alias to: message
-
 
 
 ## ingress_controller [_ingress_controller]

@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -414,7 +415,7 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 			if err != nil {
 				t.Fatalf("error creating config from map: %s", err.Error())
 			}
-			cmp, err := New(config)
+			cmp, err := New(config, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatalf("error creating new metadata processor: %s", err.Error())
 			}
@@ -431,7 +432,7 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 func Test_getTags(t *testing.T) {
 	ctx := context.Background()
 	instanceId := "ami-abcd1234"
-	logger := logp.NewLogger("add_cloud_metadata test logger")
+	logger := logptest.NewTestingLogger(t, "add_cloud_metadata test logger")
 
 	tests := []struct {
 		name       string

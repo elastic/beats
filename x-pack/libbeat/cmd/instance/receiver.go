@@ -33,19 +33,13 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 
 	b.RegisterMetrics()
 
-	statsReg := b.Info.Monitoring.StatsRegistry
+	statsReg := b.Monitoring.StatsRegistry()
 
 	// stats.beat
-	processReg := statsReg.GetRegistry("beat")
-	if processReg == nil {
-		processReg = statsReg.NewRegistry("beat")
-	}
+	processReg := statsReg.GetOrCreateRegistry("beat")
 
 	// stats.system
-	systemReg := statsReg.GetRegistry("system")
-	if systemReg == nil {
-		systemReg = statsReg.NewRegistry("system")
-	}
+	systemReg := statsReg.GetOrCreateRegistry("system")
 
 	err = metricreport.SetupMetrics(b.Info.Logger.Named("metrics"), b.Info.Beat, version.GetDefaultVersion(), metricreport.WithProcessRegistry(processReg), metricreport.WithSystemRegistry(systemReg))
 	if err != nil {
@@ -54,7 +48,14 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 
 	if b.Config.HTTP.Enabled() {
 		var err error
-		b.API, err = api.NewWithDefaultRoutes(b.Info.Logger.Named("metrics.http"), b.Config.HTTP, api.RegistryLookupFunc(b.Info.Monitoring.Namespace))
+		b.API, err = api.NewWithDefaultRoutes(
+			b.Info.Logger.Named("metrics.http"),
+			b.Config.HTTP,
+			b.Monitoring.InfoRegistry(),
+			b.Monitoring.StateRegistry(),
+			b.Monitoring.StatsRegistry(),
+			b.Monitoring.InputsRegistry())
+
 		if err != nil {
 			return BeatReceiver{}, fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}

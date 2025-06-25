@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -738,7 +739,7 @@ func TestEventMapping(t *testing.T) {
 	} {
 		t.Run(test.metricName, func(t *testing.T) {
 			builtMappings, _ := buildMappings(mappings)
-			ms := eventMapping(test.metricName, test.metricValue, builtMappings)
+			ms := eventMapping(test.metricName, test.metricValue, builtMappings, logptest.NewTestingLogger(t, ""))
 			assert.Equal(t, test.expected, ms)
 		})
 	}
@@ -1046,11 +1047,12 @@ func TestParseMetrics(t *testing.T) {
 			expected: []statsdMetric{},
 		},
 	} {
-		actual, err := parse([]byte(test.input))
+		logger := logptest.NewTestingLogger(t, "")
+		actual, err := parse([]byte(test.input), logger)
 		assert.Equal(t, test.err, err, test.input)
 		assert.Equal(t, test.expected, actual, test.input)
 
-		processor := newMetricProcessor(time.Second)
+		processor := newMetricProcessor(time.Second, logger)
 		for _, e := range actual {
 			err := processor.processSingle(e)
 
@@ -1104,7 +1106,7 @@ func TestParseSingle(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			got, err := parseSingle([]byte(tc.input))
+			got, err := parseSingle([]byte(tc.input), logptest.NewTestingLogger(t, ""))
 			assert.Equal(t, tc.err, err)
 			assert.Equal(t, tc.want, got)
 		})
