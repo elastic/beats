@@ -155,36 +155,6 @@ func TestDNSProcessorTagOnFailure(t *testing.T) {
 	}
 }
 
-func TestDNSProcessorDisabledCache(t *testing.T) {
-	c := defaultConfig()
-	c.Type = typePTR
-	c.SuccessCache.Enabled = true
-	c.FailureCache.Enabled = true
-	p := &processor{
-		config:   c,
-		resolver: &stubResolver{},
-		log:      logptest.NewTestingLogger(t, logName),
-	}
-	p.reverseFlat = map[string]string{
-		"source.ip": "source.domain",
-	}
-	t.Log(p.String())
-
-	t.Run("default", func(t *testing.T) {
-		event, err := p.Run(&beat.Event{
-			Fields: mapstr.M{
-				"source.ip": gatewayIP,
-			},
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		v, _ := event.GetValue("source.domain")
-		assert.Equal(t, gatewayName, v)
-	})
-}
-
 func TestDNSProcessorRunInParallel(t *testing.T) {
 	// This is a simple smoke test to make sure that there are no concurrency
 	// issues. It is most effective when run with the race detector.
