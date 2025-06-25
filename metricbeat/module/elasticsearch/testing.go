@@ -29,6 +29,8 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
@@ -107,7 +109,7 @@ func TestMapperWithMetricSetAndInfo(t *testing.T, glob string, ms MetricSetAPI, 
 
 // TestMapperWithMetricSetAndInfo tests mapping methods with Info fields
 func TestMapperWithHttpHelper(t *testing.T, glob string, httpClient *helper.HTTP,
-	mapper func(mb.ReporterV2, *helper.HTTP, Info, []byte, bool) error) {
+	mapper func(mb.ReporterV2, *helper.HTTP, Info, []byte, bool, *logp.Logger) error) {
 	files, err := filepath.Glob(glob)
 	require.NoError(t, err)
 	// Makes sure glob matches at least 1 file
@@ -129,7 +131,7 @@ func TestMapperWithHttpHelper(t *testing.T, glob string, httpClient *helper.HTTP
 			require.NoError(t, err)
 
 			reporter := &mbtest.CapturingReporterV2{}
-			err = mapper(reporter, httpClient, info, input, true)
+			err = mapper(reporter, httpClient, info, input, true, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 			require.True(t, len(reporter.GetEvents()) >= 1)
 			require.Equal(t, 0, len(reporter.GetErrors()))

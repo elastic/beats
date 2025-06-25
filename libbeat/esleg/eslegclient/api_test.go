@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func GetValidQueryResult() QueryResult {
@@ -177,7 +178,7 @@ func TestReadSearchResult_invalid(t *testing.T) {
 func newTestConnection(t *testing.T, url string) *Connection {
 	conn, _ := NewConnection(ConnectionSettings{
 		URL: url,
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	conn.Encoder = NewJSONEncoder(nil, false)
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
