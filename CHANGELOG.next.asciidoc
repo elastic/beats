@@ -126,6 +126,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Restore the Streaming input on Windows. {pull}46031[46031]
 - Fix termination of input on API errors. {pull}45999[45999]
 - Fix filestream registry entries being prematurely removed, which could cause files to be re-ingested after Filebeat restarts. {issue}46007[46007] {pull}46032[46032]
+- Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
 
 *Heartbeat*
 
@@ -244,6 +245,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
 - Add mechanism to allow HTTP JSON templates to terminate without logging an error. {issue}45664[45664] {pull}45810[45810]
+- Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
 
 *Auditbeat*
 
@@ -342,6 +344,46 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
