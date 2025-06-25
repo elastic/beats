@@ -184,7 +184,7 @@ func CheckReceivers(params CheckReceiversParams) {
 			require.Equal(t, beatForCompID(compID), zl.ContextMap()["service.name"])
 			break
 		}
-		require.NotNilf(t, host.Evt, "expected nil, got %v", host.Evt)
+		require.NotNilf(t, host.Evt, "expected not nil nil, got %v", host.Evt)
 
 		if params.Status.Error == "" {
 			require.Equalf(t, host.Evt.Status(), componentstatus.StatusOK, "expected %v, got %v", params.Status.Status, host.Evt.Status())
