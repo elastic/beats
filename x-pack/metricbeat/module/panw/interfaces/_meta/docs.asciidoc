@@ -1,1 +1,0 @@
-This is the interfaces metricset of the module panw.

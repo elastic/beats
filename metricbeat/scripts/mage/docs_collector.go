@@ -20,6 +20,7 @@ package mage
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -92,6 +93,16 @@ func checkXpack(path string) bool {
 
 }
 
+// setupDirectory clears and re-creates the docs/modules directory.
+func setupDirectory() error {
+	docpath := mage.OSSBeatDir("docs/modules")
+	err := os.RemoveAll(docpath)
+	if err != nil {
+		return err
+	}
+	return os.MkdirAll(docpath, 0755)
+}
+
 // getRelease gets the release tag, and errors out if one doesn't exist.
 func getRelease(rel string) (string, error) {
 	switch rel {
@@ -102,6 +113,11 @@ func getRelease(rel string) (string, error) {
 	default:
 		return "", fmt.Errorf("unknown release tag %s", rel)
 	}
+}
+
+// createDocsPath creates the path for the entire docs/ folder
+func createDocsPath(module string) error {
+	return os.MkdirAll(mage.OSSBeatDir("docs/modules", module), 0755)
 }
 
 // testIfDocsInDir tests for a `_meta/docs.md` in a given directory
@@ -217,7 +233,7 @@ func getConfigfile(modulePath string) (string, error) {
 		return "", fmt.Errorf("could not find a config file in %s", modulePath)
 	}
 
-	raw, err := os.ReadFile(goodPath)
+	raw, err := ioutil.ReadFile(goodPath)
 	return strings.TrimSpace(string(raw)), err
 
 }
@@ -294,7 +310,7 @@ func gatherData(modules []string) ([]moduleData, error) {
 		return nil, fmt.Errorf("error getting default metricsets: %w", err)
 	}
 	moduleList := make([]moduleData, 0)
-	// iterate over all the modules, checking to make sure we have a docs.md file
+	//iterate over all the modules, checking to make sure we have a docs.md file
 	for _, module := range modules {
 
 		isModule := testIfDocsInDir(module)
@@ -302,6 +318,11 @@ func gatherData(modules []string) ([]moduleData, error) {
 			continue
 		}
 		moduleName := filepath.Base(module)
+
+		err := createDocsPath(moduleName)
+		if err != nil {
+			return moduleList, err
+		}
 
 		fieldsm, err := loadModuleFields(filepath.Join(module, "_meta/fields.yml"))
 		if err != nil {
@@ -318,7 +339,7 @@ func gatherData(modules []string) ([]moduleData, error) {
 			return moduleList, err
 		}
 
-		// dump the contents of the module markdown
+		//dump the contents of the module markdown
 		moduleDoc, err := os.ReadFile(filepath.Join(module, "_meta/docs.md"))
 		if err != nil {
 			return moduleList, err
@@ -408,13 +429,10 @@ func writeDocs(modules []moduleData) error {
 		return fmt.Errorf("error writing metricset docs: %w", err)
 	}
 
-	// TODO: Uncomment following when all the asciidocs are converted to markdown
-	// As of now, this will not work and it will generate incomplete list.
-
-	// err = writeModuleList(modules, tmplList)
-	// if err != nil {
-	// 	return fmt.Errorf("error writing module list: %w", err)
-	// }
+	err = writeModuleList(modules, tmplList)
+	if err != nil {
+		return fmt.Errorf("error writing module list: %w", err)
+	}
 
 	return nil
 }
@@ -425,6 +443,12 @@ func writeDocs(modules []moduleData) error {
 // Generate the metricset-level docs
 // All these are 'collected' from the docs.md files under _meta/ in each module & metricset
 func CollectDocs() error {
+
+	//create the docs/modules dir
+	err := setupDirectory()
+	if err != nil {
+		return err
+	}
 	// collect modules that have an asciidoc file
 	beatsModuleGlob := mage.OSSBeatDir("module", "/*/")
 	modules, err := filepath.Glob(beatsModuleGlob)

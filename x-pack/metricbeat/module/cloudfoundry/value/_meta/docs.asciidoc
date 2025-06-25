@@ -1,2 +1,0 @@
-The value metricset of Cloud Foundry module allows you to collect value metrics that the
-loggregator sends to metricbeat.

@@ -1,3 +1,0 @@
-The `component_template` metricset.
-
-Main API: https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-cluster-get-component-template

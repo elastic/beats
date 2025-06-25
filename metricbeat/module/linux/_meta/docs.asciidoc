@@ -1,5 +1,0 @@
-include::{libbeat-dir}/shared/integration-link.asciidoc[]
-
-:modulename!:
-
-The Linux module reports on metrics exclusive to the Linux kernel and GNU/Linux OS.

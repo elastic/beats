@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-beat.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Beat module [metricbeat-module-beat]
 
 The `beat` module collects metrics about any Beat or other software based on libbeat.
@@ -22,8 +24,7 @@ When this module is used for {{stack}} Monitoring, it sends metrics to the monit
 ::::
 
 
-
-## Example configuration [_example_configuration_8]
+## Example configuration [_example_configuration]
 
 The Beat module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -45,12 +46,9 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_12]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [state](/reference/metricbeat/metricbeat-metricset-beat-state.md)
 * [stats](/reference/metricbeat/metricbeat-metricset-beat-stats.md)
-
-
-

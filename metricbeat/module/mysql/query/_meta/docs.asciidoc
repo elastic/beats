@@ -1,1 +1,0 @@
-`query` metricset allows for custom execution of metric related queries in MySQL

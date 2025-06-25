@@ -1,1 +1,0 @@
-This is the `collector` metricset of the Openmetrics module. It collects metrics from endpoints that follow Openmetrics format.

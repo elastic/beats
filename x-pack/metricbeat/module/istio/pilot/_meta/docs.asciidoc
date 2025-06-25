@@ -1,1 +1,0 @@
-This is the pilot metricset of the module istio. This metricset collects all Pilot-generated metrics.

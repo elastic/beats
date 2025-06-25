@@ -1,3 +1,0 @@
-The memory metricset extends system/memory and adds linux-specific memory metrics, including Huge Pages and overall paging statistics.
-
-NOTE: as of now, this data is part of system/memory on Metricbeat, but can only be found in the Linux integration in Fleet. In the future, this data will be removed from system/memory.

@@ -1,9 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-openai.html
-  # That link will 404 until 8.18 is current
-  # (see https://www.elastic.co/guide/en/beats/metricbeat/8.18/metricbeat-module-openai.html)
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # openai module [metricbeat-module-openai]
 
@@ -15,9 +15,9 @@ This functionality is in beta and is subject to change. The design and code is l
 This is the openai module.
 
 
-## Example configuration [_example_configuration_49]
+## Example configuration [_example_configuration]
 
-The openai module supports the standard configuration options that are described in [Modules](configuration-metricbeat.md). Here is an example configuration:
+The openai module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
 ```yaml
 metricbeat.modules:
@@ -58,10 +58,8 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_56]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
-* [usage](metricbeat-metricset-openai-usage.md)
-
-
+* [usage](/reference/metricbeat/metricbeat-metricset-openai-usage.md)

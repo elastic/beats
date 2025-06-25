@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-sql.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # SQL module [metricbeat-module-sql]
 
 The SQL module allows you to execute custom queries against an SQL database and store the results in {{es}}. It also enables the development of various SQL metrics integrations, using SQL query as input.
@@ -48,6 +50,9 @@ Use `sql_queries` or `sql_query` depending on the use-case.
 
         `table`
         :   Expects any number of columns. This mode generates a single event for each row.
+  
+`ssl` configuration
+:   Use `ssl.certificate_authorities`, `ssl.certificate`, `ssl.key`, and `ssl.verification_mode` params. See SSL configuration section. Supported drivers are `mysql`, `postgres`, and `mssql`.
 
 
 `sql_query` (`Backward Compatibility`)
@@ -795,5 +800,175 @@ For an mssql instance, by default only four databases are present namely — `ma
 }
 ```
 
+### Host Setup
+
+Some drivers require additional configuration to work. Find here instructions for these drivers.
+
+### Oracle Database Connection Pre-requisites
+
+To get connected with the Oracle Database `ORACLE_SID`, `ORACLE_BASE`, `ORACLE_HOME` environment variables should be set.
+
+For example: Let us consider Oracle Database 21c installation using RPM manually by following [this](https://docs.oracle.com/en/database/oracle/oracle-database/21/ladbi/running-rpm-packages-to-install-oracle-database.html) link, environment variables should be set as follows:
+
+```bash
+export ORACLE_BASE=/opt/oracle/oradata
+export ORACLE_HOME=/opt/oracle/product/21c/dbhome_1
+```
+
+Also, add `ORACLE_HOME/bin` to the `PATH` environment variable. 
+
+#### Oracle Instant Client Installation
+
+Oracle Instant Client enables the development and deployment of applications that connect to the Oracle Database. The Instant Client libraries provide the necessary network connectivity and advanced data features to make full use of the Oracle Database. If you have an OCI Oracle server which comes with these libraries pre-installed, you don't need a separate client installation.
+
+The OCI library installs a few Client Shared Libraries that must be referenced on the machine where Metricbeat is installed. Please follow [this](https://docs.oracle.com/en/database/oracle/oracle-database/21/lacli/install-instant-client-using-zip.html#GUID-D3DCB4FB-D3CA-4C25-BE48-3A1FB5A22E84) link for OCI Instant Client set up. The OCI Instant Client is available with the Oracle Universal Installer, RPM file or ZIP file. Download links can be found at here(https://www.oracle.com/database/technologies/instant-client/downloads.html).
+
+##### Enable Oracle Listener
+
+The Oracle listener is a service that runs on the database host and receives requests from Oracle clients. Make sure that [listener](https://docs.oracle.com/cd/B19306_01/network.102/b14213/lsnrctl.htm) should be running. 
+To check if the listener is running or not, run: 
+
+```bash
+lsnrctl STATUS
+```
+
+If the listener is not running, use the command to start:
+
+```bash
+lsnrctl START
+```
+
+Then, Metricbeat can be launched.
+
+##### Host Configuration for Oracle
+
+The following types of host configuration are supported:
+
+1. An old-style Oracle connection string, for backwards compatibility:
+
+    a. `hosts: ["user/pass@0.0.0.0:1521/ORCLPDB1.localdomain"]`
+
+    b. `hosts: ["user/password@0.0.0.0:1521/ORCLPDB1.localdomain as sysdba"]`
+
+2. DSN configuration as a URL:
+
+    a. `hosts: ["oracle://user:pass@0.0.0.0:1521/ORCLPDB1.localdomain?sysdba=1"]`
+
+3. DSN configuration as a logfmt-encoded parameter list:
+
+    a. `hosts: ['user="user" password="pass" connectString="0.0.0.0:1521/ORCLPDB1.localdomain"']`
+    
+    b. `hosts: ['user="user" password="password" connectString="host:port/service_name" sysdba=true']`
+
+DSN host configuration is the recommended configuration type as it supports the use of special characters in the password.
+
+In a URL any special characters should be URL encoded.
+
+In the logfmt-encoded DSN format, if the password contains a backslash character (`\`), it must be escaped with another backslash. For example, if the password is `my\_password`, it must be written as `my\\_password`.
+
+The username and password to connect to the database can be provided as values to the `username` and `password` keys of `sql.yml`.
+
+```yaml
+- module: sql
+  metricsets:
+    - query
+  period: 10s
+  driver: "oracle"
+  enabled: true
+  hosts: ['user="" password="" connectString="0.0.0.0:1521/ORCLCDB.localdomain" sysdba=true']
+  username: sys
+  password: password
+  sql_queries: 
+  - query: SELECT METRIC_NAME, VALUE FROM V$SYSMETRIC WHERE GROUP_ID = 2 and METRIC_NAME LIKE '%'
+    response_format: variables 
+```
+----
+
+### SSL Setup
+
+The SSL configuration is driver-specific. Different drivers interpret parameters not in the same way. Subset of the [params](https://www.elastic.co/docs/reference/beats/metricbeat/configuration-ssl#ssl-client-config) is supported.
+
+Currently, there are two ways to make SSL connections to the databases:
+
+- Set `ssl.*` configuration parameters.
+- Don't set any `ssl.*` configuration parameters and supply all SSL parameters in the connection string in `hosts`. Example: `postgres://postgres:mysecretpassword@localhost:5432?sslmode=verify-full&sslcert=%2Fpath%2Fto%2Fcert.pem&sslkey=%2Fpath%2Fto%2Fkey.pem&sslrootcert=%2Fpath%2Fto%2Fca.pem`
+
+#### Limitations
+
+The module supports SSL with `mysql`, `mssql`, and `postgres` drivers. 
+
+When any `ssl.*` parameters are set, only URL-formatted connection strings are accepted, like `"postgres://myuser:mypassword@localhost:5432/mydb"`, not like `"user=myuser password=mypassword dbname=mydb"`.
+
+##### `mysql` driver
+
+Params supported: `ssl.verification_mode`, `ssl.certificate`, `ssl.key`, `ssl.certificate_authorities`.
+
+The certificates can be passed both as file paths and as certificate content ([embedding certificate example](https://www.elastic.co/docs/reference/beats/metricbeat/configuration-ssl#client-certificate-authorities)).
+
+##### `postgres` driver
+
+Params supported: `ssl.verification_mode`, `ssl.certificate`, `ssl.key`, `ssl.certificate_authorities`.
+
+Only one certificate can be passed to `ssl.certificate_authorities` parameter.
+The certificates can be passed only as file paths. The files have to be present in the environment where the metricbeat is running.
+
+The `ssl.verification_mode` is translated as following:
+
+- `full` -> `verify-full`
+
+- `strict` -> `verify-full`
+
+- `certificate` -> `verify-ca`
+
+- `none` -> `require`
+
+##### `mssql` driver
+
+Params supported: `ssl.verification_mode`, `ssl.certificate_authorities`.
+
+Only one certificate can be passed to `ssl.certificate_authorities` parameter.
+The certificates can be passed only as file paths. The files have to be present in the environment where the metricbeat is running.
+
+If `ssl.verification_mode` is set to `None`, `TrustServerCertificate` will be set to `true`, otherwise it is `false`
 
 
+## Example configuration [_example_configuration]
+
+The SQL module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
+
+```yaml
+metricbeat.modules:
+- module: sql
+  metricsets:
+    - query
+  period: 10s
+  hosts: ["postgres://postgres:mysecretpassword@localhost:5432"]
+  # Example of using SSL parameters manually in the Postgres connection string (with ssl.* parameters unset). The Postgres SSL parameters "sslmode", "sslcert", "sslkey", and "sslrootcert" are passed in the connection string with slashes "/" being url-encoded to "%2F"
+  # hosts: ["postgres://postgres:mysecretpassword@localhost:5432?sslmode=verify-full&sslcert=%2Fpath%2Fto%2Fcert.pem&sslkey=%2Fpath%2Fto%2Fkey.pem&sslrootcert=%2Fpath%2Fto%2Fca.pem"]
+  # Example for SQL server
+  # hosts: ["sqlserver://myuser:mypassword@localhost:1433?TrustServerCertificate=false&certificate=%2Fpath%2Fto%2Fca.pem&database=mydb&encrypt=true"]
+
+
+  driver: "postgres"
+  sql_query: "select now()"
+  sql_response_format: table
+
+  # List of root certificates for SSL/TLS server verification
+  # ssl.certificate_authorities: ["/path/to/ca.pem"]
+
+  # Certificate for SSL/TLS client authentication
+  # ssl.certificate: "/path/to/client-cert.pem"
+
+  # Client certificate key file
+  # ssl.key: "/path/to/client-key.pem"
+
+  # Controls the verification of server certificate
+  # ssl.verification_mode: full
+```
+
+
+## Metricsets [_metricsets]
+
+The following metricsets are available:
+
+* [query](/reference/metricbeat/metricbeat-metricset-sql-query.md)

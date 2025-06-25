@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-consul.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Consul module [metricbeat-module-consul]
 
 ::::{warning}
@@ -25,7 +27,7 @@ The Consul module comes with a predefined dashboard:
 ![metricbeat consul](images/metricbeat-consul.png)
 
 
-## Example configuration [_example_configuration_13]
+## Example configuration [_example_configuration]
 
 The Consul module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -42,10 +44,8 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_19]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [agent](/reference/metricbeat/metricbeat-metricset-consul-agent.md)
-
-
