@@ -130,7 +130,7 @@ results should be returned without a row limit.
 **`wmi.schema_cache_size`**
 :   The maximum number of WMI class definitions that can be cached per single query. Every query keeps its own separate cache.  This cache helps improve performance when dealing with queries that involve inheritance hierarchies. Read more in [WMI Type Support](#wmi-type-support).
 For example, if a superclass is queried, the cache
-might store all its derived (leaf) classes to optimize subsequent operations.
+might store all its derived classes (leaves of the class hierarchy) to optimize subsequent operations.
 The default value is `1000`.
 
 **`wmi.queries`**
