@@ -8,9 +8,14 @@ This section summarizes the changes in each release. Also read
 <<breaking-changes>> for more detail about changes that affect
 upgrade.
 
+<<<<<<< HEAD
 * <<release-notes-8.19.2>>
 * <<release-notes-8.19.1>>
 * <<release-notes-8.19.0>>
+=======
+* <<release-notes-8.18.3>>
+* <<release-notes-8.18.2>>
+>>>>>>> ef151e3db (docs: Prepare Changelog for 8.18.3 (#44985))
 * <<release-notes-8.18.1>>
 * <<release-notes-8.18.0>>
 * <<release-notes-8.17.6>>
