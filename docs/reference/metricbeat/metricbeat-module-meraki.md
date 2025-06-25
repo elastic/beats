@@ -36,4 +36,3 @@ The following metricsets are available:
 
 * [device_health](/reference/metricbeat/metricbeat-metricset-meraki-device_health.md)
 * [network_health](/reference/metricbeat/metricbeat-metricset-meraki-network_health.md)
-
