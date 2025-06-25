@@ -148,12 +148,15 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			for _, instance := range rows {
 				event := mb.Event{
 					MetricSetFields: mapstr.M{
-						"class":     queryConfig.Class,
-						"namespace": namespace,
+						"query_class": queryConfig.Class,
+						"namespace":   namespace,
 						// Remote WMI is intentionally hidden, this will always be localhost
 						// "host":      m.config.Host,
 					},
 				}
+
+				// Add the instance class
+				event.MetricSetFields.Put("class", instance.GetClassName())
 
 				// Remote WMI is intentionally hidden, this will always be the empty string
 				// if m.config.Domain != "" {

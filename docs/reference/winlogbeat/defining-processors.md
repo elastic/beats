@@ -107,6 +107,7 @@ The supported processors are:
 * [`fingerprint`](/reference/winlogbeat/fingerprint.md)
 * [`include_fields`](/reference/winlogbeat/include-fields.md)
 * [`move-fields`](/reference/winlogbeat/move-fields.md)
+* [`now`](/reference/winlogbeat/now.md)
 * [`rate_limit`](/reference/winlogbeat/rate-limit.md)
 * [`registered_domain`](/reference/winlogbeat/processor-registered-domain.md)
 * [`rename`](/reference/winlogbeat/rename-fields.md)

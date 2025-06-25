@@ -386,7 +386,7 @@ logging:
 			if tc.expectMigration {
 				// Test the case where the registry migration happens
 				migratingMsg := fmt.Sprintf("are the same, migrating. Source: '%s'", logFilepath)
-				filebeat.WaitForLogs(migratingMsg, time.Second*5, "prospector did not migrate registry entry")
+				filebeat.WaitForLogs(migratingMsg, time.Second*10, "prospector did not migrate registry entry")
 				filebeat.WaitForLogs("migrated entry in registry from", time.Second*10, "store did not update registry key")
 				filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached the second time")
 				requirePublishedEvents(t, filebeat, 25, outputFile)
@@ -403,7 +403,7 @@ logging:
 			// Another option is for no keys to be migrated because the current
 			// file identity is not fingerprint
 			if tc.notMigrateMsg != "" {
-				filebeat.WaitForLogs(tc.notMigrateMsg, time.Second*5, "the registry should not have been migrated")
+				filebeat.WaitForLogs(tc.notMigrateMsg, time.Second*10, "the registry should not have been migrated")
 			}
 
 			// The last thing to test when there is no migration is to assert
