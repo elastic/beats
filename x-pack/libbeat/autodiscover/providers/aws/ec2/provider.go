@@ -44,10 +44,7 @@ func AutodiscoverBuilder(
 	uuid uuid.UUID,
 	c *conf.C,
 	keystore keystore.Keystore,
-<<<<<<< HEAD
-=======
 	log *logp.Logger,
->>>>>>> f11ccf465 ([Chore] Replace global logger with local logger #9 (#44675))
 ) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("aws_ec2 autodiscover is experimental")
 

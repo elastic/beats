@@ -77,11 +77,7 @@ func (f fileSource) Name() string {
 // newFileIdentifier creates a new state identifier for a log input.
 func newFileIdentifier(ns *conf.Namespace, suffix string, log *logp.Logger) (fileIdentifier, error) {
 	if ns == nil {
-<<<<<<< HEAD
-		i, err := newINodeDeviceIdentifier(nil)
-=======
 		i, err := newFingerprintIdentifier(nil, log)
->>>>>>> f11ccf465 ([Chore] Replace global logger with local logger #9 (#44675))
 		if err != nil {
 			return nil, err
 		}
