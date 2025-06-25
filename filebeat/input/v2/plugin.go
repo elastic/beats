@@ -80,9 +80,5 @@ func (p Plugin) validate() error {
 	if p.Manager == nil {
 		return fmt.Errorf("invalid plugin (%v) structure detected", p.Name)
 	}
-	if p.ExcludeForFIPS {
-		return fmt.Errorf("plugin [%s] is not available as it is not FIPS-capable", p.Name)
-	}
-
 	return nil
 }
