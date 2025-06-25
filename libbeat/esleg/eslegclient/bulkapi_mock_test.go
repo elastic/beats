@@ -33,6 +33,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestOneHostSuccessResp_Bulk(t *testing.T) {
@@ -225,7 +226,7 @@ func TestEnforceParameters(t *testing.T) {
 			client, _ := NewConnection(ConnectionSettings{
 				Parameters: test.preconfigured,
 				URL:        "http://localhost",
-			})
+			}, logptest.NewTestingLogger(t, ""))
 
 			client.Encoder = NewJSONEncoder(nil, false)
 
