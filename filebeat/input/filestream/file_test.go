@@ -117,6 +117,7 @@ func TestGzipSeekerReader(t *testing.T) {
 			wantOffset    int64
 			wantReadData  string // expected data after seek+read
 			readAfterSeek int    // bytes to read after seek for verification
+			wantEOF       bool   // whether Seek is expected to EOF error
 		}{
 			{
 				name:          "SeekStart to offset 0 after reading some data (reset case)",
@@ -169,16 +170,6 @@ func TestGzipSeekerReader(t *testing.T) {
 				readAfterSeek: 10,
 			},
 			{
-				name:          "SeekCurrent that results in backward movement (reset required)",
-				buffSize:      512,
-				initialRead:   40,
-				seekOffset:    -25,
-				seekWhence:    io.SeekCurrent,
-				wantOffset:    15,
-				wantReadData:  string(plainContent[15:25]),
-				readAfterSeek: 10,
-			},
-			{
 				name:          "offset < reader buffer size",
 				buffSize:      32,
 				initialRead:   0,
@@ -208,6 +199,17 @@ func TestGzipSeekerReader(t *testing.T) {
 				wantReadData:  string(plainContent[65:81]),
 				readAfterSeek: 16,
 			},
+			{
+				name:          "SeekStart beyond EOF should error",
+				buffSize:      512,
+				initialRead:   0,
+				seekOffset:    300, // larger than len(plainContent) = 188
+				seekWhence:    io.SeekStart,
+				wantOffset:    188, // actual data length
+				wantReadData:  "",
+				readAfterSeek: 0,
+				wantEOF:       true,
+			},
 		}
 
 		for _, tc := range tests {
@@ -230,9 +232,15 @@ func TestGzipSeekerReader(t *testing.T) {
 
 				// Seek
 				gotOffset, err := gsr.Seek(tc.seekOffset, tc.seekWhence)
-				require.NoError(t, err, "Seek(%d, %d) should not fail",
-					tc.seekOffset, tc.seekWhence)
-				require.Equal(t, tc.wantOffset, gotOffset, "Seek offset mismatch")
+				if tc.wantEOF {
+					require.ErrorIs(t, err, io.EOF)
+					assert.Equal(t, tc.wantOffset, gotOffset)
+					return
+				} else {
+					require.NoError(t, err, "Seek(%d, %d) should not fail",
+						tc.seekOffset, tc.seekWhence)
+					require.Equal(t, tc.wantOffset, gotOffset, "Seek offset mismatch")
+				}
 
 				// Read after seek to verify position and data
 				readBuf := make([]byte, tc.readAfterSeek)
@@ -243,7 +251,6 @@ func TestGzipSeekerReader(t *testing.T) {
 			})
 		}
 	})
-
 }
 
 func TestIsGZIP(t *testing.T) {

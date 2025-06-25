@@ -51,7 +51,10 @@ type gzipSeekerReader struct {
 	f        *os.File     // underlying gzip-compressed file
 	gzr      *gzip.Reader // reader that yields uncompressed bytes
 	buffSize int64        // buffer size used when emulating seeks
-	offset   int64        // current offset in the *decompressed* stream
+
+	// offset is the current offset in the *decompressed* stream. It's updated
+	// by read.
+	offset int64
 }
 
 func newGzipSeekerReader(f *os.File, buffSize int) (*gzipSeekerReader, error) {
@@ -168,7 +171,7 @@ func (r *gzipSeekerReader) Seek(offset int64, whence int) (int64, error) {
 	if bytesToAdvance <= r.buffSize {
 		n, err = r.Read(make([]byte, bytesToAdvance))
 		if err != nil {
-			return r.offset + int64(n), fmt.Errorf(
+			return r.offset, fmt.Errorf(
 				"gzipSeekerReader: could read bytesToAdvance=%d: %w", bytesToAdvance, err)
 		}
 		return finalOffset, nil
@@ -182,7 +185,7 @@ func (r *gzipSeekerReader) Seek(offset int64, whence int) (int64, error) {
 		n, err = r.gzr.Read(buff)
 		read += n
 		if err != nil {
-			return r.offset + int64(read), fmt.Errorf(
+			return r.offset, fmt.Errorf(
 				"gzipSeekerReader: could read chunk %d: %w", i, err)
 		}
 	}
@@ -191,7 +194,7 @@ func (r *gzipSeekerReader) Seek(offset int64, whence int) (int64, error) {
 		n, err = r.Read(make([]byte, leftover))
 		read += n
 		if err != nil && err != io.EOF {
-			return r.offset + int64(read), fmt.Errorf(
+			return r.offset, fmt.Errorf(
 				"gzipSeekerReader: could read leftover %d: %w", leftover, err)
 		}
 	}
