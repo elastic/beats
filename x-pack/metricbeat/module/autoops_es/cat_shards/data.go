@@ -11,8 +11,6 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
 
-	"golang.org/x/exp/maps"
-
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -82,7 +80,7 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 
 	transactionID := utils.NewUUIDV4()
 
-	sendNodeShardsEvent(r, info, maps.Values(nodeShards), transactionID)
+	sendNodeShardsEvent(r, info, nodeShardCountToMapArray(nodeShards), transactionID)
 
 	indexMetadata, err := getResolvedIndices(m)
 
@@ -97,7 +95,7 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 	return err
 }
 
-func sendNodeShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeToShards []NodeShardCount, transactionId string) {
+func sendNodeShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeToShards []map[string]any, transactionId string) {
 	r.Event(events.CreateEvent(info, mapstr.M{"node_shards_count": nodeToShards}, transactionId))
 }
 
@@ -111,7 +109,7 @@ func sendNodeIndexShardsEvent(r mb.ReporterV2, info *utils.ClusterInfo, nodeInde
 	for i := 0; i < size; i += nodeIndexShardsPerEvent {
 		group := nodeIndexShards[i:min(i+nodeIndexShardsPerEvent, size)]
 
-		groups = append(groups, mapstr.M{"node_index_shards": group})
+		groups = append(groups, mapstr.M{"node_index_shards": convertObjectArrayToMapArray(group)})
 	}
 
 	events.CreateAndReportEvents(r, info, groups, transactionId)
