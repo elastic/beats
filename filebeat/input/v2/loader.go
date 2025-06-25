@@ -19,8 +19,8 @@ package v2
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/common"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
