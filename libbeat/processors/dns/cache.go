@@ -230,7 +230,11 @@ func max(a, b uint32) uint32 {
 	return b
 }
 
-// bounds check / satisfy G115
+// safeUint32 converts a float64 to a uint32, protecting against out-of-bounds
+// values. It takes the absolute value to prevent negative numbers and caps the
+// result at math.MaxUint32 to avoid integer overflows.
+//
+// This function is used to satisfy the gosec security scanner rule G115.
 func safeUint32(float float64) uint32 {
 	return uint32(math.Min(math.Abs(float), float64(math.MaxUint32)))
 }
