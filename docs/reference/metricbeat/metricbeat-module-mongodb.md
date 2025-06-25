@@ -120,7 +120,7 @@ The MongoDB module supports the standard configuration options that are describe
 metricbeat.modules:
 - module: mongodb
   metricsets: ["dbstats", "status", "collstats", "metrics", "replstatus"]
-  period: 10s
+  period: 60s
   enabled: true
 
   # The hosts must be passed as MongoDB URLs in the format:
