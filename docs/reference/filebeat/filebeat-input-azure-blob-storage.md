@@ -128,10 +128,10 @@ $$$supported-attributes$$$
 9. [max_workers](#attrib-max_workers)
 10. [poll](#attrib-poll)
 11. [poll_interval](#attrib-poll_interval)
-13. [file_selectors](#attrib-file_selectors)
-14. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
-15. [timestamp_epoch](#attrib-timestamp_epoch)
-16. [custom_properties](#attrib-custom-properties)
+12. [file_selectors](#attrib-file_selectors)
+13. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
+14. [timestamp_epoch](#attrib-timestamp_epoch)
+15. [custom_properties](#attrib-custom-properties)
 
 ## `account_name` [attrib-account-name]
 
@@ -204,14 +204,14 @@ This is a specific subfield of a container. It specifies the container name.
 
 ## `batch_size` [attrib-batch_size-abs]
 
-This attribute specifies the `page size` for the response. In earlier versions, this value was derived from `max_workers`, but with the latest update, `batch_size` is now an independent setting. For backward compatibility, if `batch_size` is not explicitly defined, it will default to a value based on `max_workers`. This attribute can be configured at both the root and container levels. When defined at both levels, the container-level setting takes precedence.
+This attribute specifies the "page size" for the response. In earlier versions, this value was derived from `max_workers`, but with the latest update, `batch_size` is now an independent setting. For backward compatibility, if `batch_size` is not explicitly defined, it will default to a value based on `max_workers`. This attribute can be configured at both the root and container levels. When defined at both levels, the container-level setting takes precedence.
 
 ## `max_workers` [attrib-max_workers]
 
 This attribute defines the maximum number of workers allocated to the worker pool for processing jobs which read file contents. It can be specified both at the root level of the configuration, and at the container level. Container level values override root level values if both are specified. Larger number of workers do not necessarily improve throughput, and this should be carefully tuned based on the number of files, the size of the files being processed and resources available. Increasing `max_workers` to very high values may cause resource utilization problems and may lead to bottlenecks in processing. Usually a maximum of `2000` workers is recommended. A very low `max_worker` count will drastically increase the number of network calls required to fetch the blobs, which may cause a bottleneck in processing.
 
 ::::{note}
-The `batch_size` and `max_workers` attributes are decoupled but functionally related. `batch_size` determines how many blobs are fetched in a single API call (i.e., the pagination size), while `max_workers` controls the number of concurrent goroutines used to process the fetched blobs. Although these values are independent, they should be configured thoughtfully to ensure efficient workload distribution and optimal performance. For example, setting `batch_size=100` and `max_workers=10` means each pagination request fetches `100` blobs, which are then processed by `10` concurrent goroutines. The appropriate value for `max_workers` depends on factors such as the number of files to be processed, available system resources, and network bandwidth.
+The `batch_size` and `max_workers` attributes are decoupled but functionally related. `batch_size` determines how many blobs are fetched in a single API call (that is, the pagination size), while `max_workers` controls the number of concurrent goroutines used to process the fetched blobs. Although these values are independent, they should be configured thoughtfully to ensure efficient workload distribution and optimal performance. For example, setting `batch_size=100` and `max_workers=10` means each pagination request fetches `100` blobs, which are then processed by `10` concurrent goroutines. The appropriate value for `max_workers` depends on factors such as the number of files to be processed, available system resources, and network bandwidth.
 ::::
 
 ## `poll` [attrib-poll]
