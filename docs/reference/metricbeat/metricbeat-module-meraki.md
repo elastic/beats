@@ -22,7 +22,7 @@ The Cisco Meraki module supports the standard configuration options that are des
 ```yaml
 metricbeat.modules:
 - module: meraki
-  metricsets: ["device_health"]
+  metricsets: ["device_health", "network_health"]
   enabled: true
   period: 300s
   apiKey: "Meraki dashboard API key"
@@ -35,3 +35,5 @@ metricbeat.modules:
 The following metricsets are available:
 
 * [device_health](/reference/metricbeat/metricbeat-metricset-meraki-device_health.md)
+* [network_health](/reference/metricbeat/metricbeat-metricset-meraki-network_health.md)
+
