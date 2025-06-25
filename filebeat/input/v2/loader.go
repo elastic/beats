@@ -19,7 +19,6 @@ package v2
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"

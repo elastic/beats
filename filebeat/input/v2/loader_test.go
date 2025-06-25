@@ -19,8 +19,6 @@ package v2
 
 import (
 	"errors"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/stretchr/testify/require"
 	"testing"
 
 	"github.com/stretchr/testify/require"
