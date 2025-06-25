@@ -65,7 +65,7 @@ superclasses, such as `CIM_LogicalDevice`, the cache will populate with individu
 for each specific derived class (leaf of the class hierarchy) whose instances are returned by the query (for example, `Win32_DiskDrive` or `Win32_NetworkAdapter`).
 
 ::::{note}
-The properties of type `CIM_Object` (embedded objects) are not yet supported and ignored.
+The properties of type `CIM_Object` (embedded objects) are not yet supported and are ignored.
 ::::
 
 ## Configuration
