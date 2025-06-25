@@ -121,7 +121,7 @@ type cacheConfig struct {
 // cacheSettings define the caching behavior for an individual cache.
 type cacheSettings struct {
 	// Disable the use of the cache.
-	Enabled bool `config:"enabled" default:"true"`
+	Enabled bool `config:"enabled"`
 
 	// TTL value for items in cache. Not used for success because we use TTL
 	// from the DNS record.
