@@ -268,13 +268,17 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 	if len(eventsToRetry) > 0 {
 		span.Context.SetLabel("events_failed", len(eventsToRetry))
 		batch.RetryEvents(eventsToRetry)
-		if stats.tooMany > 0 {
-			// We're being throttled by Elasticsearch, return an error so we
-			// retry the connection with exponential backoff
-			return errTooMany
-		}
 	} else {
 		batch.ACK()
+	}
+	return publishResultForStats(stats)
+}
+
+func publishResultForStats(stats bulkResultStats) error {
+	if stats.tooMany > 0 {
+		// We're being throttled by Elasticsearch, return an error so we
+		// retry the connection with exponential backoff
+		return errTooMany
 	}
 	return nil
 }
