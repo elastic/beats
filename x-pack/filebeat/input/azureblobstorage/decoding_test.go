@@ -91,7 +91,11 @@ func TestDecoding(t *testing.T) {
 					LastModified: &time.Time{},
 				},
 			}
+<<<<<<< HEAD
 			j := newJob(&blob.Client{}, item, "https://foo.blob.core.windows.net/", newState(), &Source{}, p, log)
+=======
+			j := newJob(&blob.Client{}, item, "https://foo.blob.core.windows.net/", newState(), &Source{}, p, noopReporter{}, nil, log)
+>>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 			j.src.ReaderConfig.Decoding = tc.config
 			err = j.decode(context.Background(), f, "test")
 			if err != nil {
