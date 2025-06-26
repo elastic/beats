@@ -1,5 +1,5 @@
 # Module: autoops_es
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/9.1/metricbeat-module-autoops_es.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-autoops_es.html
 
 - module: autoops_es
   metricsets:
