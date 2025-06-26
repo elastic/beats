@@ -34,7 +34,11 @@ func TestFilebeat(t *testing.T) {
 	defer cancel()
 	EnsureCompiled(ctx, t)
 
-	messagePrefix := "sample test message"
+	messagePrefix :=
+		"sample test message long enough for fingerprint to work. 'Nothing is " +
+			"sad until it’s over. Then everything is', 'That's why I keep moving" +
+			" on, to see the next thing, and the next, and the next. And " +
+			"sometimes... It looks even better through your eyes.'"
 	fileCount := 5
 	lineCount := 128
 
@@ -44,12 +48,27 @@ func TestFilebeat(t *testing.T) {
 	}
 
 	t.Run("Filebeat starts and ingests files", func(t *testing.T) {
-		configTemplate := `
+		configPlainTemplate := `
 filebeat.inputs:
   - type: filestream
     id: "test-filestream"
     paths:
       - %s
+# we want to check that all messages are ingested
+# without using an external service, this is an easy way
+output.console:
+  enabled: true
+`
+		_ = configPlainTemplate
+		configGZIPTemplate := `
+filebeat.inputs:
+  - type: filestream
+    id: test-filestream
+    paths:
+      - %s
+    gzip_experimental: true
+    rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
+
 # we want to check that all messages are ingested
 # without using an external service, this is an easy way
 output.console:
@@ -67,54 +86,71 @@ output.console:
 			}
 		}
 
-		t.Run("plain text files", func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
-			defer cancel()
+		tcs := map[string]struct {
+			configTemplate     string
+			GenerateLogFilesFn func(t *testing.T, files, lines int, generator LogGenerator) (path string, filenames []string)
+		}{
+			"plain": {
+				configTemplate:     configPlainTemplate,
+				GenerateLogFilesFn: GenerateLogFiles,
+			},
+			"GZIP": {
+				configTemplate:     configGZIPTemplate,
+				GenerateLogFilesFn: GenerateGZIPLogFiles,
+			},
+		}
+		for name, tc := range tcs {
+			t.Run(name, func(t *testing.T) {
 
-			generator := NewPlainTextGenerator(messagePrefix)
-			path, files := GenerateLogFiles(t, fileCount, lineCount, generator)
-			config := fmt.Sprintf(configTemplate, path)
-			test := NewTest(t, TestOptions{
-				Config: config,
+				t.Run("plain text logs - unstructured log files", func(t *testing.T) {
+					ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+					defer cancel()
+
+					generator := NewPlainTextGenerator(messagePrefix)
+					path, files := tc.GenerateLogFilesFn(t, fileCount, lineCount, generator)
+					config := fmt.Sprintf(tc.configTemplate, path)
+					test := NewTest(t, TestOptions{
+						Config: config,
+					})
+
+					expectIngestedFiles(test, files)
+
+					test.
+						// we expect to read all generated files to EOF
+						ExpectEOF(files...).
+						WithReportOptions(reportOptions).
+						// we should observe the start message of the Beat
+						ExpectStart().
+						// check that the first and the last line of the file get ingested
+						Start(ctx).
+						// wait until all the expectations are met
+						// or we hit the timeout set by the context
+						Wait()
+				})
+
+				t.Run("JSON logs - structured log files", func(t *testing.T) {
+					ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+					defer cancel()
+
+					generator := NewJSONGenerator(messagePrefix)
+					path, files := tc.GenerateLogFilesFn(t, fileCount, lineCount, generator)
+					config := fmt.Sprintf(tc.configTemplate, path)
+					test := NewTest(t, TestOptions{
+						Config: config,
+					})
+
+					expectIngestedFiles(test, files)
+
+					test.
+						ExpectEOF(files...).
+						WithReportOptions(reportOptions).
+						ExpectStart().
+						Start(ctx).
+						Wait()
+				})
 			})
-
-			expectIngestedFiles(test, files)
-
-			test.
-				// we expect to read all generated files to EOF
-				ExpectEOF(files...).
-				WithReportOptions(reportOptions).
-				// we should observe the start message of the Beat
-				ExpectStart().
-				// check that the first and the last line of the file get ingested
-				Start(ctx).
-				// wait until all the expectations are met
-				// or we hit the timeout set by the context
-				Wait()
-		})
-
-		t.Run("JSON files", func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
-			defer cancel()
-
-			generator := NewJSONGenerator(messagePrefix)
-			path, files := GenerateLogFiles(t, fileCount, lineCount, generator)
-			config := fmt.Sprintf(configTemplate, path)
-			test := NewTest(t, TestOptions{
-				Config: config,
-			})
-
-			expectIngestedFiles(test, files)
-
-			test.
-				ExpectEOF(files...).
-				WithReportOptions(reportOptions).
-				ExpectStart().
-				Start(ctx).
-				Wait()
-		})
+		}
 	})
-
 	t.Run("Filebeat crashes due to incorrect config", func(t *testing.T) {
 		t.Skip("Flaky test: https://github.com/elastic/beats/issues/42778")
 
