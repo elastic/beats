@@ -96,7 +96,6 @@ func testLargeScaleFilestreamDelete(t *testing.T, timeout time.Duration, nFiles,
 }
 
 func generateLogFilesScale(t *testing.T, tempDir string, files, lines int) string {
-	fmt.Println("Temp dir:", tempDir)
 	basePath := filepath.Join(tempDir, "logs")
 	if err := os.MkdirAll(basePath, 0777); err != nil {
 		t.Fatalf("cannot create folder to store logs: %s", err)
