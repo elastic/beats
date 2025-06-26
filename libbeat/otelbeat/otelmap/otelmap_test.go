@@ -198,7 +198,7 @@ func TestFromMapstrMapstr(t *testing.T) {
 }
 
 func TestFromMapstrSliceMapstr(t *testing.T) {
-	inputSlice := []mapstr.M{mapstr.M{"item": 1}, mapstr.M{"item": 1}, mapstr.M{"item": 1}}
+	inputSlice := []mapstr.M{{"item": 1}, {"item": 1}, {"item": 1}}
 	inputMap := mapstr.M{
 		"slice": inputSlice,
 	}
@@ -292,6 +292,7 @@ func TestFromMapstrWithNestedData(t *testing.T) {
 				"inner_int": 43,
 				"inner_map_slice": []any{
 					map[string]any{"string": "string3"},
+					mapstr.M{"number": 12.4},
 				},
 				"inner_slice": [2]map[string]any{ // array -> slice
 					{"string": "string2"},
@@ -318,6 +319,7 @@ func TestFromMapstrWithNestedData(t *testing.T) {
 				"inner_int": 43,
 				"inner_map_slice": []any{
 					map[string]any{"string": "string3"},
+					map[string]any{"number": 12.4},
 				},
 				"inner_slice": []any{
 					map[string]any{"string": "string2"},
