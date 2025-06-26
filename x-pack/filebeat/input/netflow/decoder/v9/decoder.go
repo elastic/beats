@@ -125,6 +125,7 @@ func ReadFields(d Decoder, buf *bytes.Buffer, count int) (record template.Templa
 			if length == template.VariableLength || min <= field.Length && field.Length <= max {
 				field.Info = fieldInfo
 			} else if logger != nil {
+				field.Info = fieldInfo
 				logger.Debugf("Size of field %s in template is out of bounds (size=%d, min=%d, max=%d)", fieldInfo.Name, field.Length, min, max)
 			}
 		} else if logger != nil {
