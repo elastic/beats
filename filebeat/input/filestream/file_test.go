@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -130,7 +131,7 @@ func TestGzipSeekerReader(t *testing.T) {
 				readAfterSeek: 10,
 			},
 			{
-				name:          "SeekStart when current offset > target offset (backward seek requiring reset)",
+				name:          "SeekStart when current offset > target offset (seek requiring reset)",
 				buffSize:      512,
 				initialRead:   50,
 				seekOffset:    20,
@@ -200,13 +201,24 @@ func TestGzipSeekerReader(t *testing.T) {
 				readAfterSeek: 16,
 			},
 			{
-				name:          "SeekStart beyond EOF should error",
+				name:          "SeekStart beyond EOF does not error",
 				buffSize:      512,
 				initialRead:   0,
 				seekOffset:    300, // larger than len(plainContent) = 188
 				seekWhence:    io.SeekStart,
-				wantOffset:    188, // actual data length
-				wantReadData:  "",
+				wantOffset:    300, // mimics os.File.Seek
+				wantReadData:  "",  // No data to read as data < offset
+				readAfterSeek: 0,
+				wantEOF:       true,
+			},
+			{
+				name:          "SeekCurrent beyond EOF does not error",
+				buffSize:      512,
+				initialRead:   42,
+				seekOffset:    300, // larger than len(plainContent) = 188
+				seekWhence:    io.SeekCurrent,
+				wantOffset:    342, // mimics os.File.Seek
+				wantReadData:  "",  // No data to read as data < offset
 				readAfterSeek: 0,
 				wantEOF:       true,
 			},
@@ -232,24 +244,120 @@ func TestGzipSeekerReader(t *testing.T) {
 
 				// Seek
 				gotOffset, err := gsr.Seek(tc.seekOffset, tc.seekWhence)
-				if tc.wantEOF {
-					require.ErrorIs(t, err, io.EOF)
-					assert.Equal(t, tc.wantOffset, gotOffset)
-					return
-				} else {
-					require.NoError(t, err, "Seek(%d, %d) should not fail",
-						tc.seekOffset, tc.seekWhence)
-					require.Equal(t, tc.wantOffset, gotOffset, "Seek offset mismatch")
-				}
+				require.NoError(t, err, "Seek(%d, %d) should not fail",
+					tc.seekOffset, tc.seekWhence)
+				assert.Equal(t, tc.wantOffset, gotOffset, "Seek offset mismatch")
 
 				// Read after seek to verify position and data
 				readBuf := make([]byte, tc.readAfterSeek)
 				n, err := gsr.Read(readBuf)
-				require.NoError(t, err, "Read after seek should not fail")
+				if tc.wantEOF {
+					assert.ErrorIs(t, err, io.EOF, "unexpected error")
+				} else {
+					assert.NoError(t, err, "Read after seek should not fail")
+				}
 				assert.Equal(t, tc.readAfterSeek, n, "Read count mismatch after seek")
 				assert.Equal(t, tc.wantReadData, string(readBuf), "Content mismatch after seek")
 			})
 		}
+	})
+}
+
+// TestFileImplementations_SeekAtEOF ensures that both plain and gzip File
+// implementations behave consistently when seeking to or beyond EOF.
+func TestFileImplementations_SeekAtEOF(t *testing.T) {
+	tempDir := t.TempDir()
+
+	// Setup plain file
+	plainFilename := filepath.Join(tempDir, "plain.txt")
+	err := os.WriteFile(plainFilename, plainContent, 0644)
+	require.NoError(t, err, "could not write plain file")
+
+	// Setup gzip file
+	gzipFilename := filepath.Join(tempDir, "plain.txt.gz")
+	gzipFile, err := os.Create(gzipFilename)
+	require.NoError(t, err, "could not create gzip file")
+	gzWriter := gzip.NewWriter(gzipFile)
+	_, err = gzWriter.Write(plainContent)
+	require.NoError(t, err)
+	require.NoError(t, gzWriter.Close())
+	require.NoError(t, gzipFile.Close())
+
+	contentLen := int64(len(plainContent))
+
+	// buffer size chosen to hit all code dealing with advancing offset on
+	// gzipSeekerReader.
+	readBuffSize := 64
+	t.Run("seek to exactly the end of the file", func(t *testing.T) {
+		plainOSFile, err := os.Open(plainFilename)
+		require.NoError(t, err)
+		defer plainOSFile.Close()
+		plainF := newPlainFile(plainOSFile)
+
+		gzipOSFile, err := os.Open(gzipFilename)
+		require.NoError(t, err)
+		defer gzipOSFile.Close()
+		gzipF, err := newGzipSeekerReader(gzipOSFile, readBuffSize)
+		require.NoError(t, err)
+
+		// Seek to EOF
+		plainOffset, plainErr := plainF.Seek(contentLen, io.SeekStart)
+		gzipOffset, gzipErr := gzipF.Seek(contentLen, io.SeekStart)
+
+		assert.Equal(t, plainOffset, gzipOffset,
+			"offsets should be equal when seeking to EOF")
+		assert.NoError(t, plainErr,
+			"no error expected when seeking to EOF")
+		assert.NoError(t, gzipErr,
+			"no error expected when when seeking to EOF")
+		assert.Equal(t, contentLen, plainOffset, "offset should be at EOF")
+
+		// Reading at EOF should return n=0, err=io.EOF
+		p := make([]byte, 1)
+		plainN, plainReadErr := plainF.Read(p)
+		gzipN, gzipReadErr := gzipF.Read(p)
+
+		assert.Equal(t, plainN, gzipN, "bytes read should be equal at EOF")
+		assert.Equal(t, 0, plainN, "read should return 0 bytes at EOF")
+		assert.ErrorIs(t, plainReadErr, io.EOF,
+			"error should EOF")
+		assert.ErrorIs(t, gzipReadErr, io.EOF,
+			"error should EOF")
+	})
+
+	t.Run("seek past the end of the file", func(t *testing.T) {
+		plainOSFile, err := os.Open(plainFilename)
+		require.NoError(t, err)
+		defer plainOSFile.Close()
+		plainF := newPlainFile(plainOSFile)
+
+		gzipOSFile, err := os.Open(gzipFilename)
+		require.NoError(t, err)
+		defer gzipOSFile.Close()
+		gzipF, err := newGzipSeekerReader(gzipOSFile, readBuffSize)
+		require.NoError(t, err)
+
+		seekTo := contentLen + 42
+		plainOffset, plainErr := plainF.Seek(seekTo, io.SeekStart)
+		gzipOffset, gzipErr := gzipF.Seek(seekTo, io.SeekStart)
+
+		assert.Equal(t, plainOffset, gzipOffset, "offsets should be equal when seeking past EOF")
+		assert.Equal(t, seekTo, plainOffset, "offset should be past EOF")
+		assert.NoError(t, plainErr, "no error expected when seeking past EOF")
+		assert.NoError(t, gzipErr, "no error expected when seeking past EOF")
+
+		// Reading past EOF should return n=0, err=io.EOF
+		p := make([]byte, 1)
+		plainN, plainReadErr := plainF.Read(p)
+		gzipN, gzipReadErr := gzipF.Read(p)
+
+		assert.Equal(t, plainN, gzipN,
+			"bytes read should be equal when reading past EOF")
+		assert.Equal(t, 0, plainN, "read should return 0 bytes past EOF")
+		assert.ErrorIs(t, plainReadErr, io.EOF,
+			"error should be EOF when reading after EOF")
+		assert.ErrorIs(t, gzipReadErr, io.EOF,
+			"error should be EOF when reading after EOF")
 	})
 }
 

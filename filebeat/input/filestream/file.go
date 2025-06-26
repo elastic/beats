@@ -170,11 +170,14 @@ func (r *gzipSeekerReader) Seek(offset int64, whence int) (int64, error) {
 	var err error
 	if bytesToAdvance <= r.buffSize {
 		n, err = r.Read(make([]byte, bytesToAdvance))
-		if err != nil {
+		if err != nil && !errors.Is(err, io.EOF) {
 			return r.offset, fmt.Errorf(
-				"gzipSeekerReader: could read bytesToAdvance=%d: %w", bytesToAdvance, err)
+				"gzipSeekerReader: could read bytesToAdvance=%d: %w",
+				bytesToAdvance, err)
 		}
-		return finalOffset, nil
+
+		r.offset = finalOffset
+		return r.offset, nil
 	}
 
 	chunks := bytesToAdvance / r.buffSize
@@ -184,7 +187,7 @@ func (r *gzipSeekerReader) Seek(offset int64, whence int) (int64, error) {
 	for i := range chunks {
 		n, err = r.gzr.Read(buff)
 		read += n
-		if err != nil {
+		if err != nil && !errors.Is(err, io.EOF) {
 			return r.offset, fmt.Errorf(
 				"gzipSeekerReader: could read chunk %d: %w", i, err)
 		}
