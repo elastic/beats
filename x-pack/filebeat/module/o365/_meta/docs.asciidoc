@@ -5,6 +5,8 @@
 
 == Office 365 module
 
+WARNING: This module is not available in FIPS-capable Filebeat.
+
 beta[]
 
 include::{libbeat-dir}/shared/integration-link.asciidoc[]

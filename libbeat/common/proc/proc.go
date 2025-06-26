@@ -15,14 +15,42 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !requirefips
+//go:build !windows
 
-package beater
+package proc
 
-import "github.com/elastic/beats/v7/libbeat/cfgfile"
+import (
+	"os"
+	"syscall"
+)
 
-func checkFIPSCapability(_ cfgfile.Runner) error {
-	// In non-FIPS builds, we assume all inputs are FIPS capable
-	// and proceed without error
+// Job is noop on Unix
+type Job int
+
+// JobObject is a global instance of Job. noop on Unix
+var JobObject Job
+
+// StopCmd sends SIGINT to the process
+func StopCmd(p *os.Process) error {
+	return p.Signal(syscall.SIGINT)
+}
+
+// CreateJobObject returns a job object.
+func CreateJobObject() (pj Job, err error) {
+	return pj, err
+}
+
+// NewJob is noop on unix
+func NewJob() (Job, error) {
+	return 0, nil
+}
+
+// Close is noop on unix
+func (job Job) Close() error {
+	return nil
+}
+
+// Assign is noop on unix
+func (job Job) Assign(p *os.Process) error {
 	return nil
 }
