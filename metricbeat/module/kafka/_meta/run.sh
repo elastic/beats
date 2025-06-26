@@ -51,13 +51,13 @@ mkdir -p ${KAFKA_LOGS_DIR}
 touch ${KAFKA_LOGS_DIR}/meta.properties
 cat << EOF > ${KAFKA_LOGS_DIR}/meta.properties
 cluster.id=${KAFKA_CLUSTER_ID}
-node.id=1
+node.id=0
 version=1
 EOF
 
 export KAFKA_OPTS="-Djava.security.auth.login.config=/etc/kafka/server_jaas.conf -javaagent:/opt/jolokia-jvm-1.5.0-agent.jar=port=8779,host=0.0.0.0"
 ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
-    --override node.id=1 \
+    --override node.id=0 \
     --override authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer \
     --override super.users=User:admin \
     --override security.protocol=SASL_PLAINTEXT \
@@ -70,7 +70,7 @@ ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override advertised.listeners=INSIDE://localhost:9091,OUTSIDE://${KAFKA_ADVERTISED_HOST} \
     --override controller.listener.names=CONTROLLER \
     --override process.roles=broker,controller \
-    --override controller.quorum.voters=1@127.0.0.1:9093 \
+    --override controller.quorum.voters=0@127.0.0.1:9093 \
     --override delete.topic.enable=true \
     --override log.dirs=${KAFKA_LOGS_DIR} &
 
