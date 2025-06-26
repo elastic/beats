@@ -151,6 +151,24 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	return &p
 }
 
+// NewRealBeat returns a *BeatProc to be used with a real Beat binary.
+// The difference from NewBeat is that it does not add the `--systemTest` argument.
+//
+// For more details see `NewBeat`
+func NewRealBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
+	b := NewBeat(t, beatName, binary, args...)
+	cleanArgs := []string{}
+	for _, arg := range b.baseArgs {
+		if arg == "--systemTest" {
+			continue
+		}
+		cleanArgs = append(cleanArgs, arg)
+	}
+
+	b.baseArgs = cleanArgs
+	return b
+}
+
 // NewAgentBeat creates a new agentbeat process that runs the beatName as a subcommand.
 // See `NewBeat` for options and information for the parameters.
 func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {

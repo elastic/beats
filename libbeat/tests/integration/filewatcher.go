@@ -22,6 +22,7 @@
 package integration
 
 import (
+	"os"
 	"path/filepath"
 	"sync"
 	"testing"
@@ -31,34 +32,47 @@ import (
 
 type FileWatcher struct {
 	watcher       *fsnotify.Watcher
-	targetFile    string
+	target        string
+	watchDir      bool
 	mu            sync.Mutex
 	stopChan      chan struct{}
 	eventCallback func(event fsnotify.Event)
 	t             testing.TB
 }
 
-// NewFileWatcher creates a new FileWatcher instance.
-func NewFileWatcher(t testing.TB, targetFile string) *FileWatcher {
+// NewFileWatcher creates a new FileWatcher instance, if `target` is a file
+// it will watch only that file, if it is a directory, all files in the
+// directory will be watched.
+func NewFileWatcher(t testing.TB, target string) *FileWatcher {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		t.Fatalf("failed to create watcher: %s", err)
 	}
 
 	return &FileWatcher{
-		watcher:    watcher,
-		targetFile: targetFile,
-		stopChan:   make(chan struct{}),
-		t:          t,
+		watcher:  watcher,
+		target:   target,
+		stopChan: make(chan struct{}),
+		t:        t,
 	}
 }
 
 // Start begins watching the file's directory for changes.
 func (f *FileWatcher) Start() {
-	dir := filepath.Dir(f.targetFile)
-
-	err := f.watcher.Add(dir)
+	st, err := os.Stat(f.target)
 	if err != nil {
+		f.t.Fatalf("cannot stat file: %s", err)
+	}
+
+	var dir string
+	if st.IsDir() {
+		f.watchDir = true
+		dir = f.target
+	} else {
+		dir = filepath.Dir(f.target)
+	}
+
+	if err := f.watcher.Add(dir); err != nil {
 		f.t.Fatalf("failed to add directory to watcher: %s", err)
 	}
 
@@ -88,7 +102,7 @@ func (f *FileWatcher) watch() {
 				return
 			}
 
-			if event.Name == f.targetFile {
+			if event.Name == f.target || f.watchDir {
 				f.mu.Lock()
 				if f.eventCallback != nil {
 					f.eventCallback(event)
