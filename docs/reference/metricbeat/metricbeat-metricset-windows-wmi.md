@@ -193,11 +193,13 @@ Equivalent YAML Configuration:
 
 ## Compatibility
 
-This module has been tested on the following platform:
+This module has been tested on the following platforms:
 
-- Operating System: Microsoft Windows Server 2019 Datacenter
+| Operating System                            | Architecture |
+|---------------------------------------------|--------------|
+| Microsoft Windows Server 2019 Datacenter    | x64          |
+| Microsoft Windows 11 Pro                    | x64          |
 
-- Architecture: x64
 
 Other Windows versions and architectures may also work but have not been
 explicitly tested.
