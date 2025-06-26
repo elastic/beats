@@ -253,7 +253,7 @@ func TestMultipleReceivers(t *testing.T) {
 }
 
 func TestReceiverDegraded(t *testing.T) {
-	t.Skip("Flaky on CIm but works locally: https://github.com/elastic/beats/issues/45057")
+	t.Skip("Flaky on CI but works locally: https://github.com/elastic/beats/issues/45057")
 	testCases := []struct {
 		name            string
 		status          oteltest.ExpectedStatus
