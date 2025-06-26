@@ -77,7 +77,8 @@ func (fbt *test) ExpectEOF(files ...string) Test {
 		line2 := fmt.Sprintf("EOF has been reached. Closing. Path='%s'", filename)
 
 		fbt.ExpectOutputRegex(regexp.MustCompile(
-			fmt.Sprintf(`(%s|%s)`, line1, line2)))
+			fmt.Sprintf(`(%s|%s)`,
+				regexp.QuoteMeta(line1), regexp.QuoteMeta(line2))))
 	}
 
 	return fbt
