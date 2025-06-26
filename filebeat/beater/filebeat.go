@@ -67,13 +67,14 @@ var once = flag.Bool("once", false, "Run filebeat only once until all harvesters
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
 type Filebeat struct {
-	config         *cfg.Config
-	moduleRegistry *fileset.ModuleRegistry
-	pluginFactory  PluginFactory
-	done           chan struct{}
-	stopOnce       sync.Once // wraps the Stop() method
-	pipeline       beat.PipelineConnector
-	logger         *logp.Logger
+	config                   *cfg.Config
+	moduleRegistry           *fileset.ModuleRegistry
+	pluginFactory            PluginFactory
+	done                     chan struct{}
+	stopOnce                 sync.Once // wraps the Stop() method
+	pipeline                 beat.PipelineConnector
+	logger                   *logp.Logger
+	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 }
 
 type PluginFactory func(beat.Info, *logp.Logger, statestore.States) []v2.Plugin
@@ -234,6 +235,10 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 	return nil
 }
 
+func (fb *Filebeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
+	fb.otelStatusFactoryWrapper = wrapper
+}
+
 // loadModulesPipelines is called when modules are configured to do the initial
 // setup.
 func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
@@ -381,6 +386,10 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		compat.RunnerFactory(inputsLogger, b.Info, b.Monitoring.InputsRegistry(), v2InputLoader),
 		input.NewRunnerFactory(pipelineConnector, registrar, fb.done, fb.logger),
 	))
+
+	if fb.otelStatusFactoryWrapper != nil {
+		inputLoader = fb.otelStatusFactoryWrapper(inputLoader)
+	}
 
 	// Create a ES connection factory for dynamic modules pipeline loading
 	var pipelineLoaderFactory fileset.PipelineLoaderFactory
