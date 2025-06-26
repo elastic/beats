@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
 	autoopsevents "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 
 	"github.com/stretchr/testify/require"
 )
@@ -38,7 +39,11 @@ func setupClusterInfoFromFile(filename string) auto_ops_testing.SetupServerCallb
 }
 
 func TestNestedFailedClusterInfoNoId(t *testing.T) {
-	os.Setenv("DEPLOYMENT_ID", "test-resource-id")
+	t.Setenv("DEPLOYMENT_ID", "test-resource-id")
+	utils.GetAndSetResourceID()
+
+	t.Cleanup(utils.ClearResourceID)
+
 	RunTestsForFetcherWithGlobFiles(t, "./_meta/test/success.7.17.0.json", setupClusterInfoFromFile("./_meta/test/no_id.cluster_info.7.17.0.json"), useNestedTestMetricSet, func(t *testing.T, data FetcherData[testObjectType]) {
 		require.ErrorContains(t, data.Error, "failed to get cluster info from cluster, "+NESTED_NAME+" metricset")
 		require.ErrorContains(t, data.Error, "cluster ID is unset, which means the cluster is not ready")
@@ -52,14 +57,18 @@ func TestNestedFailedClusterInfoNoId(t *testing.T) {
 		require.Equal(t, "", errorField.ClusterID)
 		require.Equal(t, "/", errorField.URLPath)
 		require.Equal(t, "test_nested_metricset", errorField.MetricSet)
-		require.Equal(t, "test-resource-id", errorField.ResourceID)
 		require.Equal(t, http.MethodGet, errorField.HTTPMethod)
 		require.Equal(t, 0, errorField.HTTPStatusCode) // status code vary based on the server response for cluster not ready
+		require.Equal(t, "test-resource-id", event.RootFields["orchestrator.resource.id"])
 	})
 }
 
 func TestNestedFailedClusterInfoNAId(t *testing.T) {
-	os.Setenv("DEPLOYMENT_ID", "test-resource-id")
+	t.Setenv("RESOURCE_ID", "test-resource-id")
+	utils.GetAndSetResourceID()
+
+	t.Cleanup(utils.ClearResourceID)
+
 	RunTestsForFetcherWithGlobFiles(t, "./_meta/test/success.8.15.3.json", setupClusterInfoFromFile("./_meta/test/na_id.cluster_info.8.15.3.json"), useTestMetricSet, func(t *testing.T, data FetcherData[testObjectType]) {
 		require.ErrorContains(t, data.Error, "failed to get cluster info from cluster, "+NAME+" metricset")
 		require.ErrorContains(t, data.Error, "cluster ID is unset, which means the cluster is not ready")
@@ -73,6 +82,6 @@ func TestNestedFailedClusterInfoNAId(t *testing.T) {
 		require.Equal(t, "", errorField.ClusterID)
 		require.Equal(t, "/", errorField.URLPath)
 		require.Equal(t, "test_metricset", errorField.MetricSet)
-		require.Equal(t, "test-resource-id", errorField.ResourceID)
+		require.Equal(t, "test-resource-id", event.RootFields["orchestrator.resource.id"])
 	})
 }

@@ -29,6 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver"
@@ -38,10 +39,32 @@ import (
 	"go.uber.org/zap/zaptest/observer"
 )
 
+type MockHost struct {
+	Evt *componentstatus.Event
+}
+
+func (*MockHost) GetExtensions() map[component.ID]component.Component {
+	return nil
+}
+
+func (h *MockHost) Report(evt *componentstatus.Event) {
+	h.Evt = evt
+}
+
 type ReceiverConfig struct {
-	Name    string
-	Config  component.Config
+	// Name is the unique identifier for the component
+	Name string
+	// Beat is the name of the Beat that is running as a receiver
+	Beat string
+	// Config is the configuration for the receiver component
+	Config component.Config
+	// Factory is the factory to instantiate the receiver
 	Factory receiver.Factory
+}
+
+type ExpectedStatus struct {
+	Status componentstatus.Status
+	Error  string
 }
 
 type CheckReceiversParams struct {
@@ -51,6 +74,8 @@ type CheckReceiversParams struct {
 	// AssertFunc is a function that asserts the test conditions.
 	// The function is called periodically until the assertions are met or the timeout is reached.
 	AssertFunc func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs)
+
+	Status ExpectedStatus
 }
 
 // CheckReceivers creates receivers using the provided configuration.
@@ -60,6 +85,8 @@ func CheckReceivers(params CheckReceiversParams) {
 
 	var logsMu sync.Mutex
 	logs := make(map[string][]mapstr.M)
+
+	host := &MockHost{}
 
 	zapCore := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
@@ -72,6 +99,9 @@ func CheckReceivers(params CheckReceiversParams) {
 
 	createReceiver := func(t *testing.T, rc ReceiverConfig) receiver.Logs {
 		t.Helper()
+
+		require.NotEmpty(t, rc.Name, "receiver name must not be empty")
+		require.NotEmpty(t, rc.Beat, "receiver beat must not be empty")
 
 		var receiverSettings receiver.Settings
 
@@ -112,7 +142,7 @@ func CheckReceivers(params CheckReceiversParams) {
 	}
 
 	for i, r := range receivers {
-		err := r.Start(ctx, nil)
+		err := r.Start(ctx, host)
 		require.NoErrorf(t, err, "Error starting receiver %d", i)
 		defer func() {
 			require.NoErrorf(t, r.Shutdown(ctx), "Error shutting down receiver %d", i)
@@ -127,19 +157,46 @@ func CheckReceivers(params CheckReceiversParams) {
 		}
 	})
 
+	beatForCompID := func(compID string) string {
+		for _, rec := range params.Receivers {
+			if rec.Name == compID {
+				return rec.Beat
+			}
+		}
+
+		return ""
+	}
+
 	require.EventuallyWithT(t, func(ct *assert.CollectT) {
 		logsMu.Lock()
 		defer logsMu.Unlock()
 
-		// Ensure the logger fields from the otel collector are present in the logs.
+		// Ensure the logger fields from the otel collector are present
 		for _, zl := range zapLogs.All() {
+			require.Contains(t, zl.ContextMap(), "otelcol.component.kind")
+			require.Equal(t, "receiver", zl.ContextMap()["otelcol.component.kind"])
+			require.Contains(t, zl.ContextMap(), "otelcol.signal")
+			require.Equal(t, "logs", zl.ContextMap()["otelcol.signal"])
 			require.Contains(t, zl.ContextMap(), "otelcol.component.id")
-			require.Equal(t, zl.ContextMap()["otelcol.component.kind"], "receiver")
-			require.Equal(t, zl.ContextMap()["otelcol.signal"], "logs")
+			compID, ok := zl.ContextMap()["otelcol.component.id"].(string)
+			require.True(t, ok, "otelcol.component.id should be a string")
+			require.Contains(t, zl.ContextMap(), "service.name")
+			require.Equal(t, beatForCompID(compID), zl.ContextMap()["service.name"])
 			break
 		}
+		require.NotNilf(t, host.Evt, "expected not nil nil, got %v", host.Evt)
 
-		params.AssertFunc(ct, logs, zapLogs)
+		if params.Status.Error == "" {
+			require.Equalf(t, host.Evt.Status(), componentstatus.StatusOK, "expected %v, got %v", params.Status.Status, host.Evt.Status())
+			require.Nilf(t, host.Evt.Err(), "expected nil, got %v", host.Evt.Err())
+		} else {
+			require.Equalf(t, host.Evt.Status(), params.Status.Status, "expected %v, got %v", params.Status.Status, host.Evt.Status())
+			require.ErrorContainsf(t, host.Evt.Err(), params.Status.Error, "expected error to contain '%v': %v", params.Status.Error, host.Evt.Err())
+		}
+
+		if params.AssertFunc != nil {
+			params.AssertFunc(ct, logs, zapLogs)
+		}
 	}, 2*time.Minute, 100*time.Millisecond,
 		"timeout waiting for logger fields from the OTel collector are present in the logs and other assertions to be met")
 }

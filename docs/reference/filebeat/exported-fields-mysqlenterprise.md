@@ -3,17 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-mysqlenterprise.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # MySQL Enterprise fields [exported-fields-mysqlenterprise]
 
 MySQL Enterprise Audit module
-
 
 ## mysqlenterprise [_mysqlenterprise]
 
 Fields from MySQL Enterprise Logs
 
-
-## audit [_audit_4]
+## audit [_audit]
 
 Module for parsing MySQL Enterprise Audit Logs
 

@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-stan.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Stan fields [exported-fields-stan]
 
 stan Module
-
 
 ## stan [_stan]
 
@@ -22,7 +23,6 @@ type: keyword
 :   The cluster ID
 
 type: keyword
-
 
 
 ## channels [_channels]
@@ -65,8 +65,7 @@ type: long
 type: long
 
 
-
-## stats [_stats_11]
+## stats [_stats]
 
 Contains only high-level stan / nats streaming server related metrics
 
@@ -112,8 +111,7 @@ type: long
 type: long
 
 
-
-## subscriptions [_subscriptions_2]
+## subscriptions [_subscriptions]
 
 Contains stan / nats streaming/serverz endpoint subscription metrics
 

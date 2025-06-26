@@ -26,6 +26,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/useragent"
@@ -94,20 +95,23 @@ func (t *valueTpl) Unpack(in string) error {
 	return nil
 }
 
-func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName string, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
+func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName string, defaultVal *valueTpl, stat status.StatusReporter, log *logp.Logger) (val string, err error) {
 	fallback := func(err error) (string, error) {
 		if defaultVal != nil {
 			log.Debugw("template execution: falling back to default value", "target", targetName)
-			return defaultVal.Execute(emptyTransformContext(), transformable{}, targetName, nil, log)
+			return defaultVal.Execute(emptyTransformContext(), transformable{}, targetName, nil, stat, log)
 		}
 		return "", err
 	}
 
 	defer func() {
 		if r := recover(); r != nil {
+			// Let's make this slightly less awful than it currently is.
+			log.Debugw("panicked in template", "target", targetName, "error", r)
 			val, err = fallback(errExecutingTemplate)
 		}
 		if err != nil {
+			stat.UpdateStatus(status.Degraded, fmt.Sprintf("failed to execute template %s: %v", targetName, err))
 			log.Debugw("template execution failed", "target", targetName, "error", err)
 		}
 		tryDebugTemplateValue(targetName, val, log)

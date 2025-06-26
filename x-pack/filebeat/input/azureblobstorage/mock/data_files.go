@@ -10,6 +10,7 @@ const (
 	beatsNdJSONContainer        = "beatsndjsoncontainer"
 	beatsGzJSONContainer        = "beatsgzjsoncontainer"
 	beatsJSONWithArrayContainer = "beatsjsonwitharraycontainer"
+	beatsCSVContainer           = "beatscsvcontainer"
 )
 
 var fileContainers = map[string]bool{
@@ -18,6 +19,7 @@ var fileContainers = map[string]bool{
 	beatsNdJSONContainer:        true,
 	beatsGzJSONContainer:        true,
 	beatsJSONWithArrayContainer: true,
+	beatsCSVContainer:           true,
 }
 
 var availableFileBlobs = map[string]map[string]bool{
@@ -37,6 +39,9 @@ var availableFileBlobs = map[string]map[string]bool{
 	beatsJSONWithArrayContainer: {
 		"array-at-root.json": true,
 		"nested-arrays.json": true,
+	},
+	beatsCSVContainer: {
+		"txn1.csv": true,
 	},
 }
 
@@ -197,6 +202,30 @@ var fetchFilesContainer = map[string]string{
 						</Blobs>
 						<NextMarker />
 					</EnumerationResults>`,
+	beatsCSVContainer: `<?xml version="1.0" encoding="utf-8"?>
+	<EnumerationResults ServiceEndpoint="https://127.0.0.1/" ContainerName="beatscsvcontainer">
+		<Blobs>
+			<Blob>
+				<Name>txn1.csv</Name>
+				<Properties>
+					<Last-Modified>Wed, 14 Sep 2022 12:12:28 GMT</Last-Modified>
+					<Etag>0x8DA964A64516C82</Etag>
+					<Content-Length>643</Content-Length>
+					<Content-Type>text/csv</Content-Type>
+					<Content-Encoding />
+					<Content-Language />
+					<Content-MD5>UjQX73kQRTHx+UyXZDvVkg==</Content-MD5>
+					<Cache-Control />
+					<Content-Disposition />
+					<BlobType>BlockBlob</BlobType>
+					<LeaseStatus>unlocked</LeaseStatus>
+					<LeaseState>available</LeaseState>
+				</Properties>
+				<Metadata />
+			</Blob>
+		</Blobs>
+		<NextMarker />
+	</EnumerationResults>`,
 }
 
 var BeatsFilesContainer_multiline_json = []string{
@@ -230,4 +259,9 @@ var BeatsFilesContainer_json_array = []string{
 var BeatsFilesContainer_multiline_json_gz = []string{
 	"{\n    \"@timestamp\": \"2021-05-25T17:25:42.806Z\",\n    \"log.level\": \"error\",\n    \"message\": \"error making http request\"\n}",
 	"{\n    \"@timestamp\": \"2021-05-25T17:25:51.391Z\",\n    \"log.level\": \"info\",\n    \"message\": \"available disk space 44.3gb\"\n}",
+}
+
+var BeatsFilesContainer_csv = []string{
+	"{\"id\":\"1\",\"name\":\"Alice\",\"email\":\"alice@example.com\",\"status\":\"active\"}",
+	"{\"id\":\"2\",\"name\":\"Bob\",\"email\":\"bob@example.com\",\"status\":\"inactive\"}",
 }

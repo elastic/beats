@@ -58,12 +58,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	err := config.ValidateConnectionParameters()
+	err := config.Validate()
 	if err != nil {
 		return nil, err
 	}
 
-	err = config.CompileQueries()
+	err = config.ValidateConnectionParameters()
 	if err != nil {
 		return nil, err
 	}
@@ -101,6 +101,13 @@ func (m *MetricSet) shouldSkipNilOrEmptyValue(propertyValue interface{}) bool {
 	return false
 }
 
+func (m *MetricSet) reportError(report mb.ReporterV2, err error) {
+	event := mb.Event{
+		Error: err,
+	}
+	report.Event(event)
+}
+
 // Fetch method implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
@@ -111,7 +118,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// To optimize performance and reduce overhead, we create a single session
 	// for each unique WMI namespace. This minimizes the number of session creations
-	for namespace, queries := range m.config.NamespaceQueryIndex {
+	for namespace := range m.config.NamespaceQueryIndex {
 
 		session, err := sm.GetSession(namespace, m.config.Host, m.config.Domain, m.config.User, m.config.Password)
 
@@ -120,54 +127,94 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 		_, err = session.Connect()
 		if err != nil {
-			return fmt.Errorf("could not connect session %w", err)
+			return fmt.Errorf("could not connect session in namespace '%s': %w", namespace, err)
 		}
 		defer session.Dispose()
 
-		for _, queryConfig := range queries {
+		for i := range m.config.NamespaceQueryIndex[namespace] {
 
-			// We create a shared conversion table for entries with the same schema.
-			// This avoids repeatedly fetching the schema for each individual entry, improving efficiency.
-			conversionTable := make(map[string]WmiStringConversionFunction)
+			// Get the queryConfig by reference to allow the initialization
+			queryConfig := &m.config.NamespaceQueryIndex[namespace][i]
+
+			// If we encountered an unrecoverable error before we do not attempt to perform the query again
+			// We report the same error as in the first iteration
+			if queryConfig.UnrecoverableError != nil {
+				m.reportError(report, queryConfig.UnrecoverableError)
+				continue
+			}
+
+			// We initialize the query lazily if not yet initialized
+			if queryConfig.QueryStr == "" {
+				err = m.initQuery(session, queryConfig)
+				if err != nil {
+					m.reportError(report, err)
+					continue
+				}
+			}
 
 			query := queryConfig.QueryStr
 
 			rows, err := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold, m.Logger())
 
 			if err != nil {
-				m.Logger().Warn("Could not execute query: %v", err)
+				m.reportError(report, err)
 				continue
-			}
-
-			if len(rows) == 0 {
-				m.Logger().Warnf("The query '%s' did not return any results. While this can be expected in case of a too strict WHERE clause, it may also indicate an invalid query. Ensure the query is correct or check the WMI-Activity Operational Log for further details.", query)
 			}
 
 			defer wmi.CloseAllInstances(rows)
 
-			for _, instance := range rows {
-				event := mb.Event{
-					MetricSetFields: mapstr.M{
-						"class":     queryConfig.Class,
-						"namespace": namespace,
-						// Remote WMI is intentionally hidden, this will always be localhost
-						// "host":      m.config.Host,
-					},
-				}
+			if len(rows) == 0 {
+				message := fmt.Sprintf(
+					"The query '%s' did not return any results. "+
+						"This can happen if the where clause is too restrictive, "+
+						"but it might also indicate an invalid query. "+
+						"Note: the class and property names are validated, but the where clause is not. "+
+						"Ensure the full query is valid (e.g., using `Get-CimInstance -Query \"%s\" -Namespace \"%s\"`), "+
+						"and check the WMI-Activity Operational Log for further details.",
+					query, query, namespace,
+				)
+				m.Logger().Warn(message)
+				m.reportError(report, fmt.Errorf("%s", message))
+			}
 
-				// Remote WMI is intentionally hidden, this will always be the empty string
-				// if m.config.Domain != "" {
-				// 	event.MetricSetFields.Put("domain", m.config.Domain)
-				// }
+			rowsToReport := len(rows)
 
-				if m.config.IncludeQueries {
-					event.MetricSetFields.Put("query", query)
-				}
+			if m.config.MaxRowsPerQuery > 0 && rowsToReport > int(m.config.MaxRowsPerQuery) {
+				m.Logger().Warnf("Got %d results, that exceeds the configured limit %d.", len(rows), (m.config.MaxRowsPerQuery))
+				rowsToReport = int(m.config.MaxRowsPerQuery)
+			}
+
+			baseEvent := mb.Event{
+				MetricSetFields: mapstr.M{
+					"namespace": namespace,
+					// Remote WMI is intentionally hidden, this will always be localhost
+					// "host":      m.config.Host,
+				},
+			}
+
+			if m.config.IncludeQueryClass {
+				baseEvent.MetricSetFields.Put("query_class", queryConfig.Class)
+			}
+
+			if m.config.IncludeQueries {
+				baseEvent.MetricSetFields.Put("query", query)
+			}
+			// Remote WMI is intentionally hidden, this will always be the empty string
+			// if m.config.Domain != "" {
+			// 	event.MetricSetFields.Put("domain", m.config.Domain)
+			// }
+
+			for _, instance := range rows[0:rowsToReport] {
+				event := mb.Event{MetricSetFields: baseEvent.MetricSetFields.Clone()}
+
+				// Add the instance class
+				event.MetricSetFields.Put("class", instance.GetClassName())
 
 				// Get only the required properties
 				properties := queryConfig.Properties
 
-				// If the Properties array is empty we retrieve all properties available in the class
+				// If the Properties array is empty, we retrieve all available properties from the instance's class.
+				// Note: due to inheritance, the instance's actual class may differ from the queried class
 				if len(queryConfig.Properties) == 0 {
 					properties = instance.GetClass().GetPropertiesNames()
 				}
@@ -183,38 +230,29 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 						continue
 					}
 
-					// The default case, we simply return what we got
-					finalValue := propertyValue
-
 					// The script API of WMI returns strings for uint64, sint64, datetime
 					// Link: https://learn.microsoft.com/en-us/windows/win32/wmisdk/querying-wmi
 					// As a user, I want to have the right CIM_TYPE in the final document
 					//
 					// Example: in the query: SELECT * FROM Win32_OperatingSystem
 					// FreePhysicalMemory is a string, but it should be an uint64
-					if RequiresExtraConversion(propertyValue) {
-						convertFun, ok := conversionTable[propertyName]
-						// If the function is not found let us fetch it and cache it
-						if !ok {
-							convertFun, err = GetConvertFunction(instance, propertyName, m.Logger())
-							if err != nil {
-								m.Logger().Warn("Skipping addition of property %s: Unable to retrieve the conversion function: %v", propertyName, err)
-								continue
-							}
-							conversionTable[propertyName] = convertFun
-						}
-						// Perform the conversion at this point it's safe to cast to string.
-						propertyValueString, ok := propertyValue.(string)
-						if !ok {
-							m.Logger().Warn("Skipping addition of property %s: expected a string found %v", propertyName, propertyValue)
-							continue
-						}
-						convertedValue, err := convertFun(propertyValueString)
+
+					// We explicitly decide to perform a conversion on all fields because we do not support
+					// the CIM_Object type as well
+					convertFun, ok := queryConfig.WmiSchema.Get(instance.GetClassName(), propertyName)
+
+					if !ok {
+						convertFun, err = GetConvertFunction(instance, propertyName, m.Logger())
 						if err != nil {
-							m.Logger().Warn("Skipping addition of property %s. Cannot convert: %v", propertyName, err)
+							m.Logger().Warnf("Skipping addition of property '%s'. Cannot fetch conversion function: '%v'", propertyName, err)
 							continue
 						}
-						finalValue = convertedValue
+						queryConfig.WmiSchema.Add(instance.GetClassName(), propertyName, convertFun)
+					}
+					finalValue, err := convertFun(propertyValue)
+					if err != nil {
+						m.Logger().Warnf("Skipping addition of property %s. Error during conversion: %v", propertyName, err)
+						continue
 					}
 					event.MetricSetFields.Put(propertyName, finalValue)
 				}
@@ -222,5 +260,44 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			}
 		}
 	}
+	return nil
+}
+
+// The WMI library does not differentiate between a genuinely empty result set and actual query errors.
+// See this issue for more context: https://github.com/microsoft/wmi/issues/156
+//
+// To improve troubleshooting, we rule out the two most common causes early by validating
+// the existence of the class and its required properties during the initial query.
+func (m *MetricSet) initQuery(session WmiQueryInterface, queryConfig *QueryConfig) error {
+	query := fmt.Sprintf("SELECT * FROM meta_class WHERE __Class = '%s'", queryConfig.Class)
+	rows, err := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold, m.Logger())
+
+	if err != nil {
+		return fmt.Errorf("could not execute the meta_class query '%s' with the error: '%w'. We will try in the next iteration", query, err)
+	}
+
+	defer wmi.CloseAllInstances(rows)
+
+	err = errorOnClassDoesNotExist(rows, queryConfig.Class, queryConfig.Namespace)
+	if err != nil {
+		queryConfig.UnrecoverableError = err
+		return err
+	}
+
+	instance := rows[0]
+
+	err = validateQueryFields(instance, queryConfig, m.Logger())
+	if err != nil {
+		queryConfig.UnrecoverableError = err
+		return err
+	}
+
+	wmiSchema, err := NewWMISchema(m.config.SchemaCacheSize)
+	if err != nil {
+		return fmt.Errorf("could not initialize wmi schema: %w", err)
+	}
+	queryConfig.WmiSchema = wmiSchema
+	queryConfig.compileQuery()
+
 	return nil
 }

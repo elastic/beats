@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+                 
 # Exported fields [exported-fields]
 
 This document describes the fields that are exported by Heartbeat. They are grouped in the following categories:
@@ -27,4 +29,3 @@ This document describes the fields that are exported by Heartbeat. They are grou
 * [*Synthetics types fields*](/reference/heartbeat/exported-fields-synthetics.md)
 * [*TCP layer fields*](/reference/heartbeat/exported-fields-tcp.md)
 * [*TLS encryption layer fields*](/reference/heartbeat/exported-fields-tls.md)
-

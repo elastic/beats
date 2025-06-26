@@ -37,23 +37,24 @@ const (
 
 var experimentalWarning sync.Once
 
-func newProspector(config config) (loginp.Prospector, error) {
+func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
+	logger := log.With("filestream_id", config.ID)
 	err := checkConfigCompatibility(config.FileWatcher, config.FileIdentity)
 	if err != nil {
 		return nil, err
 	}
 
-	filewatcher, err := newFileWatcher(config.Paths, config.FileWatcher)
+	filewatcher, err := newFileWatcher(logger, config.Paths, config.FileWatcher)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating filewatcher %w", err)
 	}
 
-	identifier, err := newFileIdentifier(config.FileIdentity, config.Reader.Parsers.Suffix)
+	identifier, err := newFileIdentifier(config.FileIdentity, config.Reader.Parsers.Suffix, log)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating file identifier: %w", err)
 	}
 
-	logger := logp.L().Named("input.filestream").With("filestream_id", config.ID)
+	logger = logger.Named("filestream")
 	logger.Debugf("file identity is set to %s", identifier.Name())
 
 	fileprospector := fileProspector{

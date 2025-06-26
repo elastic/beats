@@ -27,10 +27,10 @@ You can specify the following options in the `winlogbeat` section of the `winlog
 
 ### `registry_file` [_registry_file]
 
-The name of the file where Winlogbeat stores information that it uses to resume monitoring after a restart. By default the file is stored as `.winlogbeat.yml` in the directory where the Beat was started. When you run the process as a Windows service, it’s recommended that you set the value to `C:/ProgramData/winlogbeat/.winlogbeat.yml`.
+The name of the file where Winlogbeat stores information that it uses to resume monitoring after a restart. By default, the file is stored as `.winlogbeat.yml` in the directory where Beat was started. When you run the process as a Windows service, set the value to `C:/Program Files/Winlogbeat-Data/.winlogbeat.yml`.
 
 ```yaml
-winlogbeat.registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yml
+winlogbeat.registry_file: C:/Program Files/Winlogbeat-Data/.winlogbeat.yml
 ```
 
 ::::{note}

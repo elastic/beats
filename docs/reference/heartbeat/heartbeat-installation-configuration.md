@@ -360,9 +360,11 @@ sudo ./heartbeat -e
 PS C:\Program Files\heartbeat> Start-Service heartbeat
 ```
 
-By default, Windows log files are stored in `C:\ProgramData\heartbeat\Logs`.
 ::::::
 :::::::
+
+By default, Windows log files are stored under `C:\Program Files\Heartbeat-Data\logs`.
+For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\heartbeat\Logs`.
 
 Heartbeat is now ready to check the status of your services and send events to your defined output.
 

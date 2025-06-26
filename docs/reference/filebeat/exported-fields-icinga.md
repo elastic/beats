@@ -3,15 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-icinga.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Icinga fields [exported-fields-icinga]
 
 Icinga Module
 
-
 ## icinga [_icinga]
 
 
-## debug [_debug_2]
+
+## debug [_debug]
 
 Contains fields for the Icinga debug logs.
 
@@ -31,7 +33,6 @@ alias to: log.level
 :   type: alias
 
 alias to: message
-
 
 
 ## main [_main]
@@ -54,7 +55,6 @@ alias to: log.level
 :   type: alias
 
 alias to: message
-
 
 
 ## startup [_startup]

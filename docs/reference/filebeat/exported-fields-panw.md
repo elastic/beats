@@ -3,15 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-panw.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # panw fields [exported-fields-panw]
 
 Module for Palo Alto Networks (PAN-OS)
 
-
 ## panw [_panw]
 
 Fields from the panw module.
-
 
 ## panos [_panos]
 
@@ -23,8 +23,7 @@ Fields for the Palo Alto Networks PAN-OS logs.
 type: keyword
 
 
-
-## source [_source_3]
+## source [_source]
 
 Fields to extend the top-level source object.
 
@@ -38,7 +37,6 @@ type: keyword
 :   Source interface for this session.
 
 type: keyword
-
 
 
 ## nat [_nat]
@@ -57,8 +55,7 @@ type: ip
 type: long
 
 
-
-## destination [_destination_3]
+## destination [_destination]
 
 Fields to extend the top-level destination object.
 
@@ -74,8 +71,7 @@ type: keyword
 type: keyword
 
 
-
-## nat [_nat_2]
+## nat [_nat]
 
 Post-NAT destination address, if destination NAT is performed.
 
@@ -97,8 +93,7 @@ type: long
 type: keyword
 
 
-
-## network [_network_2]
+## network [_network]
 
 Fields to extend the top-level network object.
 
@@ -114,8 +109,7 @@ type: keyword
 type: keyword
 
 
-
-## file [_file_3]
+## file [_file]
 
 Fields to extend the top-level file object.
 
@@ -125,13 +119,12 @@ Fields to extend the top-level file object.
 type: keyword
 
 
-
-## url [_url_4]
+## url [_url]
 
 Fields to extend the top-level url object.
 
 **`panw.panos.url.category`**
-:   For threat URLs, it’s the URL category. For WildFire, the verdict on the file and is either *malicious*, *grayware*, or *benign*.
+:   For threat URLs, it's the URL category. For WildFire, the verdict on the file and is either 'malicious', 'grayware', or 'benign'.
 
 type: keyword
 
@@ -290,7 +283,6 @@ type: date
 :   Displays whether the user group that was found during user group mapping. Supported values are: User Group Found—Indicates whether the user could be mapped to a group. Duplicate User—Indicates whether duplicate users were found in a user group. Displays N/A if no user group is found.
 
 type: keyword
-
 
 
 ## device_group_hierarchy [_device_group_hierarchy]

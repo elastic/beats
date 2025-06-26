@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"os"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
@@ -18,10 +17,11 @@ import (
 )
 
 // ErrorEvent represents an error event in the system.
+// These events are used to report errors that occur during the execution of metricsets as a metricset field.
+// Because how metricbeat works, at the end errors become mb.BeatEvent and another event sent as side effect containing error.message.
 type ErrorEvent struct {
 	ErrorCode      string `json:"error.code"`                 // Code identifying the specific error type
 	ErrorMessage   string `json:"error.message"`              // Full error message
-	ResourceID     string `json:"orchestrator.resource.id"`   // Cloud Resource ID (deployment, project, or cloud connected resource)
 	ClusterID      string `json:"orchestrator.cluster.id"`    // Optional cluster identifier (can be unknown for authentication errors)
 	URLPath        string `json:"url.path"`                   // API path of the request (without DNS/host portion)
 	Query          string `json:"url.query"`                  // Query parameters of the HTTP request
@@ -40,12 +40,10 @@ func SendErrorEventWithRandomTransactionId(err error, clusterInfo *utils.Cluster
 func SendErrorEvent(err error, clusterInfo *utils.ClusterInfo, r mb.ReporterV2, metricSetName string, path string, transactionID string) {
 	path, query := extractPathAndQuery(path)
 	status, errorCode, body := getHTTPResponseBodyInfo(err)
-	resourceId := getResourceID()
 
 	errEvent := ErrorEvent{
 		ErrorCode:      errorCode,
 		ErrorMessage:   err.Error(),
-		ResourceID:     resourceId,
 		ClusterID:      clusterInfo.ClusterID,
 		URLPath:        path,
 		Query:          query,
@@ -61,7 +59,6 @@ func SendErrorEvent(err error, clusterInfo *utils.ClusterInfo, r mb.ReporterV2, 
 // SendErrorEventWithoutClusterInfo sends an error event without cluster info to the reporter with the provided details.
 func SendErrorEventWithoutClusterInfo(err error, r mb.ReporterV2, metricSetName string) {
 	status, errorCode, body := getHTTPResponseBodyInfo(err)
-	resourceId := getResourceID()
 
 	emptyClusterInfo := &utils.ClusterInfo{
 		ClusterName: "",
@@ -75,7 +72,6 @@ func SendErrorEventWithoutClusterInfo(err error, r mb.ReporterV2, metricSetName 
 	errEvent := ErrorEvent{
 		ErrorCode:      errorCode,
 		ErrorMessage:   err.Error(),
-		ResourceID:     resourceId,
 		ClusterID:      emptyClusterInfo.ClusterID,
 		URLPath:        "/",
 		Query:          "",
@@ -111,16 +107,4 @@ func getHTTPResponseBodyInfo(err error) (int, string, string) {
 	}
 
 	return 0, "UNKNOWN_ERROR", ""
-}
-
-func getResourceID() string {
-	if deploymentID := os.Getenv("DEPLOYMENT_ID"); deploymentID != "" {
-		return deploymentID
-	} else if projectID := os.Getenv("PROJECT_ID"); projectID != "" {
-		return projectID
-	} else if resourceID := os.Getenv("RESOURCE_ID"); resourceID != "" {
-		return resourceID
-	}
-
-	return ""
 }

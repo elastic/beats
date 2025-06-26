@@ -3,12 +3,13 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-cisco.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Cisco fields [exported-fields-cisco]
 
 Module for handling Cisco network device logs.
 
-
-## cisco.amp [_cisco_amp]
+## cisco.amp [_cisco.amp]
 
 Module for parsing Cisco AMP logs.
 
@@ -325,7 +326,7 @@ type: flattened
 
 
 **`cisco.amp.mitre_tactics`**
-:   Array of all related mitre tactic ID’s
+:   Array of all related mitre tactic ID's
 
 type: keyword
 
@@ -337,7 +338,7 @@ type: flattened
 
 
 **`cisco.amp.mitre_techniques`**
-:   Array of all related mitre technique ID’s
+:   Array of all related mitre technique ID's
 
 type: keyword
 
@@ -354,8 +355,7 @@ type: keyword
 type: flattened
 
 
-
-## cisco.asa [_cisco_asa]
+## cisco.asa [_cisco.asa]
 
 Fields for Cisco ASA Firewall.
 
@@ -589,8 +589,7 @@ type: keyword
 type: keyword
 
 
-
-## cisco.ftd [_cisco_ftd]
+## cisco.ftd [_cisco.ftd]
 
 Fields for Cisco Firepower Threat Defense Firewall.
 
@@ -740,8 +739,7 @@ type: keyword
 type: keyword
 
 
-
-## cisco.ios [_cisco_ios]
+## cisco.ios [_cisco.ios]
 
 Fields for Cisco IOS logs.
 
@@ -759,8 +757,7 @@ type: keyword
 example: SEC
 
 
-
-## cisco.umbrella [_cisco_umbrella]
+## cisco.umbrella [_cisco.umbrella]
 
 Fields for Cisco Umbrella.
 

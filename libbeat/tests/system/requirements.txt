@@ -1,4 +1,4 @@
-requests==2.32.3
+requests==2.32.4
 urllib3==1.26.19
 docker==7.1.0
 docker-compose @ git+https://github.com/pkoutsovasilis/compose@2c4d825881a624bd87c390a13f362ae76dcd6180
@@ -29,7 +29,7 @@ idna==3.7
 importlib-metadata==1.7.0
 iniconfig==1.0.1
 ipaddress==1.0.19
-Jinja2==3.1.5
+Jinja2==3.1.6
 jsondiff==1.1.2
 jsonschema==3.2.0
 kafka-python==1.4.3
