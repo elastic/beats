@@ -41,7 +41,11 @@ type metricSetWithProcessors interface {
 }
 
 // NewFactory creates new Reloader instance for the given config
+<<<<<<< HEAD
 func NewFactory(beatInfo beat.Info, registry *mb.Register, options ...Option) *Factory {
+=======
+func NewFactory(beatInfo beat.Info, monitoring beat.Monitoring, registry *mb.Register, options ...Option) cfgfile.RunnerFactory {
+>>>>>>> d71266c00 ([beatreceiver] - Add status reporting (#44782))
 	return &Factory{
 		beatInfo: beatInfo,
 		options:  options,
