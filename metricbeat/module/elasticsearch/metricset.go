@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -29,16 +30,13 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
-const (
-	defaultScheme = "http"
-	pathConfigKey = "path"
-)
-
 var (
 	// HostParser parses host urls for RabbitMQ management plugin
 	HostParser = parse.URLHostParserBuilder{
-		DefaultScheme: defaultScheme,
-		PathConfigKey: pathConfigKey,
+		DefaultScheme:   "http",
+		DefaultUsername: os.Getenv("ELASTICSEARCH_READ_USERNAME"),
+		DefaultPassword: os.Getenv("ELASTICSEARCH_READ_PASSWORD"),
+		PathConfigKey:   "path",
 	}.Build()
 )
 
@@ -98,7 +96,7 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 	}{
 		Scope:        ScopeNode,
 		XPackEnabled: false,
-		ApiKey:       "",
+		ApiKey:       os.Getenv("ELASTICSEARCH_READ_API_KEY"),
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
