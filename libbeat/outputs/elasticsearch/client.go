@@ -45,7 +45,7 @@ var (
 
 	ErrTooOld = errors.New("Elasticsearch is too old. Please upgrade the instance. If you would like to connect to older instances set output.elasticsearch.allow_older_versions to true") //nolint:staticcheck //false positive
 
-	errTooMany = errors.New("Elasticsearch returned error 429 Too Many Requests, throttling connection.")
+	errTooMany = errors.New("Elasticsearch returned error 429 Too Many Requests, throttling connection")
 )
 
 // Client is an elasticsearch client.
