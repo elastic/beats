@@ -281,7 +281,8 @@ func TestFromMapstrWithNestedData(t *testing.T) {
 		"bool_slice": []bool{false, true},
 		"inner": []mapstr.M{
 			{
-				"inner_int": 42,
+				"inner_int":       42,
+				"inner_map_slice": [1]any{nil},
 				"inner_slice": []map[string]any{ // slice -> slice
 					{"string": "string"},
 					{"number": 12.3},
@@ -289,6 +290,9 @@ func TestFromMapstrWithNestedData(t *testing.T) {
 			},
 			{
 				"inner_int": 43,
+				"inner_map_slice": []any{
+					map[string]any{"string": "string3"},
+				},
 				"inner_slice": [2]map[string]any{ // array -> slice
 					{"string": "string2"},
 					{"number": 12.4},
@@ -303,7 +307,8 @@ func TestFromMapstrWithNestedData(t *testing.T) {
 		"bool_slice": []any{false, true},
 		"inner": []any{
 			map[string]any{
-				"inner_int": 42,
+				"inner_int":       42,
+				"inner_map_slice": []any{nil},
 				"inner_slice": []any{
 					map[string]any{"string": "string"},
 					map[string]any{"number": 12.3},
@@ -311,6 +316,9 @@ func TestFromMapstrWithNestedData(t *testing.T) {
 			},
 			map[string]any{
 				"inner_int": 43,
+				"inner_map_slice": []any{
+					map[string]any{"string": "string3"},
+				},
 				"inner_slice": []any{
 					map[string]any{"string": "string2"},
 					map[string]any{"number": 12.4},

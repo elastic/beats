@@ -20,6 +20,7 @@ package v2
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -94,6 +95,10 @@ func (l *Loader) Configure(cfg *conf.C) (Input, error) {
 	}
 	if p.Deprecated {
 		log.Warnf("DEPRECATED: The %v input is deprecated", name)
+	}
+
+	if common.FIPSMode && p.ExcludeFromFIPS {
+		return nil, fmt.Errorf("running a FIPS-capable distribution but input [%s] is not FIPS capable", name)
 	}
 
 	return p.Manager.Create(cfg)
