@@ -90,6 +90,7 @@ func NewCursorForTest(key string, offset int64, pending int) Cursor {
 	if pending == -1 {
 		res.Retain()
 	} else {
+		//nolint:gosec // 'pending' is always positive
 		res.pending.Store(uint64(pending))
 	}
 

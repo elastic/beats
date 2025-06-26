@@ -56,7 +56,7 @@ func TestDisablingProxy(t *testing.T) {
 func checkStatusCodeAndBody(t *testing.T, srvURL, body string, statusCode int) {
 	t.Helper()
 
-	resp, err := http.Get(srvURL) //nolint:gosec // It's a test
+	resp, err := http.Get(srvURL) //nolint:gosec,noctx // It's a test
 	if err != nil {
 		t.Fatalf("could not call proxy: %s", err)
 	}

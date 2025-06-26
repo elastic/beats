@@ -374,6 +374,7 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 			// Wait for removeFn to be called
 			require.Eventually(t,
 				func() bool {
+					//nolint:gosec // It's a test, i is always very small
 					return count.Load() == int32(i+2)
 				},
 				time.Second,
@@ -568,7 +569,7 @@ func TestFilestreamWaitGracePeriod(t *testing.T) {
 				10*time.Millisecond,
 				os.Stat,
 			)
-			delta := time.Now().Sub(start)
+			delta := time.Since(start)
 			if !tc.expectError && err != nil {
 				t.Fatalf("did not expect an error from 'deleteFile': %s", err)
 			} else if tc.expectError && err == nil {
@@ -618,10 +619,13 @@ func TestFilestreamWaitGracePeriodContextCancelled(t *testing.T) {
 		10*time.Millisecond,
 		os.Stat,
 	)
+	if !errors.Is(err, context.Canceled) {
+		t.Fatalf("expecting context cancelled error, got: %s", err)
+	}
 	if got != false {
 		t.Fatal("expecting false when calling waitGracePeriod because the context is cancelled")
 	}
-	delta := time.Now().Sub(start)
+	delta := time.Since(start)
 	if delta >= gracePeriod {
 		t.Fatal("waitGracePeriod did not return before the grace period")
 	}
