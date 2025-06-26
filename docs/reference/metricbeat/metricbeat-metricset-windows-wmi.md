@@ -71,7 +71,7 @@ for each specific derived class (leaf of the class hierarchy) whose instances ar
 The properties of type `CIM_Object` (embedded objects) are not yet supported and are ignored.
 ::::
 
-::::{info}
+::::{note}
 The properties of type `CIM_Reference` (references) used in [WMI Association Classes](https://learn.microsoft.com/en-us/windows/win32/wmisdk/declaring-an-association-class) are currently returned as strings as reported by the microsoft/wmi library.
 ::::
 
