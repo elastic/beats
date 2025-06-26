@@ -24,6 +24,7 @@ import (
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -51,12 +52,29 @@ type job struct {
 	publisher cursor.Publisher
 	// custom logger
 	log *logp.Logger
+<<<<<<< HEAD
+=======
+	// job status reporter
+	status status.StatusReporter
+	// metrics is used to track the input's metrics
+	metrics *inputMetrics
+>>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 }
 
 // newJob, returns an instance of a job, which is a unit of work that can be assigned to a go routine
 func newJob(client *blob.Client, blob *azcontainer.BlobItem, blobURL string,
+<<<<<<< HEAD
 	state *state, src *Source, publisher cursor.Publisher, log *logp.Logger,
 ) *job {
+=======
+	state *state, src *Source, publisher cursor.Publisher, stat status.StatusReporter, metrics *inputMetrics, log *logp.Logger,
+) *job {
+	if metrics == nil {
+		// metrics are optional, initialize a stub if not provided
+		metrics = newInputMetrics("", nil)
+	}
+
+>>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 	return &job{
 		client:    client,
 		blob:      blob,
@@ -66,6 +84,11 @@ func newJob(client *blob.Client, blob *azcontainer.BlobItem, blobURL string,
 		src:       src,
 		publisher: publisher,
 		log:       log,
+<<<<<<< HEAD
+=======
+		status:    stat,
+		metrics:   metrics,
+>>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 	}
 }
 
@@ -92,6 +115,7 @@ func (j *job) do(ctx context.Context, id string) {
 
 	} else {
 		err := fmt.Errorf("job with jobId %s encountered an error: content-type %s not supported", id, *j.blob.Properties.ContentType)
+		j.status.UpdateStatus(status.Degraded, fmt.Sprintf("found unsupported content-type: %s", *j.blob.Properties.ContentType))
 		fields = mapstr.M{
 			"message": err.Error(),
 		}
@@ -102,8 +126,15 @@ func (j *job) do(ctx context.Context, id string) {
 		event.SetID(objectID(j.hash, 0))
 		// locks while data is being saved to avoid concurrent map read/writes
 		cp, done := j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
+<<<<<<< HEAD
 		if err := j.publisher.Publish(event, cp); err != nil {
+=======
+		err = j.publisher.Publish(event, cp)
+		if err != nil {
+			j.metrics.errorsTotal.Inc()
+>>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 			j.log.Errorf(jobErrString, id, err)
+			j.status.UpdateStatus(status.Degraded, "failed to publish unsupported content-type event: "+err.Error())
 		}
 		// unlocks after data is saved
 		done()
@@ -121,6 +152,7 @@ func (j *job) timestamp() *time.Time {
 func (j *job) processAndPublishData(ctx context.Context, id string) error {
 	get, err := j.client.DownloadStream(ctx, &blob.DownloadStreamOptions{})
 	if err != nil {
+		j.status.UpdateStatus(status.Degraded, "failed to create a download stream: "+err.Error())
 		return fmt.Errorf("failed to download data from blob with error: %w", err)
 	}
 	const maxRetries = 3
@@ -157,7 +189,8 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 				if err == io.EOF {
 					return nil
 				}
-				break
+				j.status.UpdateStatus(status.Degraded, err.Error())
+				return err
 			}
 			evt := j.createEvent(string(msg), evtOffset)
 			j.publish(evt, !dec.more(), id)
@@ -170,7 +203,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 		}
 	}
 
-	return err
+	return nil
 }
 
 func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) error {
@@ -187,7 +220,9 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 	if j.isRootArray {
 		_, err := dec.Token()
 		if err != nil {
-			return fmt.Errorf("failed to read JSON token for object: %s, with error: %w", *j.blob.Name, err)
+			err = fmt.Errorf("failed to read JSON token for object: %s, with error: %w", *j.blob.Name, err)
+			j.status.UpdateStatus(status.Degraded, err.Error())
+			return err
 		}
 	}
 
@@ -195,8 +230,11 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		var item json.RawMessage
 		offset := dec.InputOffset()
 		if err := dec.Decode(&item); err != nil {
-			return fmt.Errorf("failed to decode json: %w", err)
+			err = fmt.Errorf("failed to decode json: %w", err)
+			j.status.UpdateStatus(status.Degraded, err.Error())
+			return err
 		}
+
 		// if expand_event_list_from_field is set, then split the event list
 		if j.src.ExpandEventListFromField != "" {
 			if err := j.splitEventList(j.src.ExpandEventListFromField, item, offset, j.hash, id); err != nil {
@@ -219,15 +257,33 @@ func (j *job) publish(evt beat.Event, last bool, id string) {
 	if last {
 		// if this is the last object, then perform a complete state save
 		cp, done := j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
+<<<<<<< HEAD
 		if err := j.publisher.Publish(evt, cp); err != nil {
+=======
+		err := j.publisher.Publish(evt, cp)
+		if err != nil {
+			j.metrics.errorsTotal.Inc()
+			j.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
+>>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 			j.log.Errorf(jobErrString, id, err)
+		} else {
+			j.status.UpdateStatus(status.Running, "")
 		}
 		done()
 		return
 	}
 	// since we don't update the cursor checkpoint, lack of a lock here should be fine
+<<<<<<< HEAD
 	if err := j.publisher.Publish(evt, nil); err != nil {
+=======
+	err := j.publisher.Publish(evt, nil)
+	if err != nil {
+		j.metrics.errorsTotal.Inc()
+		j.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
+>>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 		j.log.Errorf(jobErrString, id, err)
+	} else {
+		j.status.UpdateStatus(status.Running, "")
 	}
 }
 
@@ -235,12 +291,23 @@ func (j *job) publish(evt beat.Event, last bool, id string) {
 func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objHash string, id string) error {
 	var jsonObject map[string]json.RawMessage
 	if err := json.Unmarshal(raw, &jsonObject); err != nil {
+<<<<<<< HEAD
 		return err
+=======
+		j.status.UpdateStatus(status.Degraded, "failed to unmarshal JSON: "+err.Error())
+		return eventsPerObject, err
+>>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 	}
 
 	raw, found := jsonObject[key]
 	if !found {
+<<<<<<< HEAD
 		return fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
+=======
+		err := fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
+		j.status.UpdateStatus(status.Degraded, "possible configuration issue: "+err.Error())
+		return eventsPerObject, err
+>>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 	}
 
 	dec := json.NewDecoder(bytes.NewReader(raw))
@@ -248,11 +315,22 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objH
 
 	tok, err := dec.Token()
 	if err != nil {
+<<<<<<< HEAD
 		return err
 	}
 	delim, ok := tok.(json.Delim)
 	if !ok || delim != '[' {
 		return fmt.Errorf("expand_event_list_from_field <%v> is not an array", key)
+=======
+		j.status.UpdateStatus(status.Degraded, "failed to unmarshal JSON: "+err.Error())
+		return eventsPerObject, err
+	}
+	delim, ok := tok.(json.Delim)
+	if !ok || delim != '[' {
+		err := fmt.Errorf("expand_event_list_from_field <%v> is not an array", key)
+		j.status.UpdateStatus(status.Degraded, "possible configuration issue: "+err.Error())
+		return eventsPerObject, err
+>>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 	}
 
 	for dec.More() {
@@ -260,26 +338,54 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objH
 
 		var item json.RawMessage
 		if err := dec.Decode(&item); err != nil {
+<<<<<<< HEAD
 			return fmt.Errorf("failed to decode array item at offset %d: %w", offset+arrayOffset, err)
+=======
+			j.status.UpdateStatus(status.Degraded, "failed to unmarshal JSON: "+err.Error())
+			return eventsPerObject, fmt.Errorf("failed to decode array item at offset %d: %w", offset+arrayOffset, err)
+>>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 		}
 
 		data, err := item.MarshalJSON()
 		if err != nil {
+<<<<<<< HEAD
 			return err
+=======
+			j.status.UpdateStatus(status.Degraded, "failed to re-marshal JSON: "+err.Error())
+			return eventsPerObject, err
+>>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 		}
 		evt := j.createEvent(string(data), offset+arrayOffset)
 
 		if !dec.More() {
 			// if this is the last object, then save checkpoint
 			cp, done := j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
+<<<<<<< HEAD
 			if err := j.publisher.Publish(evt, cp); err != nil {
+=======
+			err := j.publisher.Publish(evt, cp)
+			if err != nil {
+				j.metrics.errorsTotal.Inc()
+>>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 				j.log.Errorf(jobErrString, id, err)
+				j.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
+			} else {
+				j.status.UpdateStatus(status.Running, "")
 			}
 			done()
 		} else {
 			// since we don't update the cursor checkpoint, lack of a lock here should be fine
+<<<<<<< HEAD
 			if err := j.publisher.Publish(evt, nil); err != nil {
+=======
+			err := j.publisher.Publish(evt, nil)
+			if err != nil {
+				j.metrics.errorsTotal.Inc()
+>>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 				j.log.Errorf(jobErrString, id, err)
+				j.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
+			} else {
+				j.status.UpdateStatus(status.Running, "")
 			}
 		}
 	}
@@ -293,7 +399,6 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objH
 // code executed after this function call to consume the stream if it wants.
 func (j *job) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
 	bufReader := bufio.NewReader(body)
-	isStreamGzipped := false
 	// check if stream is gziped or not
 	buf, err := bufReader.Peek(3)
 	if err != nil {
@@ -304,8 +409,7 @@ func (j *job) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
 	}
 
 	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
-	isStreamGzipped = bytes.Equal(buf, []byte{0x1F, 0x8B, 0x08})
-
+	isStreamGzipped := bytes.Equal(buf, []byte{0x1F, 0x8B, 0x08})
 	if !isStreamGzipped {
 		return bufReader, nil
 	}
