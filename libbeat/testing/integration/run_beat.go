@@ -67,21 +67,31 @@ func (b *RunningBeat) CollectOutput(limit int, pretty bool) string {
 		output = output[len(output)-limit:]
 	}
 
-	m := make(map[string]any)
-	for i, l := range output {
-		err := json.Unmarshal([]byte(l), &m)
-		if err != nil {
-			builder.WriteString(l)
-		} else {
-			var data []byte
-			if pretty {
-				data, _ = json.MarshalIndent(m, "", "  ")
-			} else {
-				data, _ = json.Marshal(m)
+	writeLine := func(l string) {
+		builder.WriteString(l)
+	}
+	if pretty {
+		m := make(map[string]any)
+		writeLine = func(l string) {
+			err := json.Unmarshal([]byte(l), &m)
+			if err != nil {
+				builder.WriteString(l)
+				return
+			}
+
+			data, err := json.MarshalIndent(m, "", "  ")
+			if err != nil {
+				builder.WriteString(l)
+				return
 			}
 
 			builder.Write(data)
 		}
+	}
+
+	for i, l := range output {
+		writeLine(l)
+
 		if i < len(output)-1 {
 			builder.WriteByte('\n')
 		}
