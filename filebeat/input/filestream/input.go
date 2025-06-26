@@ -136,7 +136,7 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 			CheckInterval time.Duration `config:"check_interval"`
 		}{}
 		if err := c.FileWatcher.Config().Unpack(&tmpCfg); err != nil {
-			return nil, nil, fmt.Errorf("cannot unpack 'scanner.check_interval: %s'", err)
+			return nil, nil, fmt.Errorf("cannot unpack 'scanner.check_interval: %w'", err)
 		}
 
 		filestream.scannerCheckInterval = tmpCfg.CheckInterval
@@ -218,6 +218,93 @@ func (inp *filestream) Run(
 	return nil
 }
 
+func (inp *filestream) deleteFile(
+	ctx input.Context,
+	logger *logp.Logger,
+	cursor loginp.Cursor,
+	path string,
+) error {
+	// We can only try deleting the file if all events have been published.
+	// There are some cases when not all events have been published:
+	//   - The output is a little behind the input
+	//   - Filebeat is experiencing back pressure
+	//   - The output is down
+	// If not all events have been published, return so the harvester
+	// can close and be recreated in the next scan.
+	if !cursor.AllEventsPublished() {
+		logger.Debugf(
+			"not all events from '%s' have been published, "+
+				"closing harvester",
+			path)
+		return nil
+	}
+	logger.Infof(
+		"all events from '%s' have been published, waiting for %s grace period",
+		path, inp.deleterConfig.GracePeriod.String())
+
+	canRemove, err := inp.waitGracePeriodFn(
+		ctx,
+		logger,
+		cursor,
+		path,
+		inp.deleterConfig.GracePeriod,
+		inp.scannerCheckInterval,
+		inp.statFn,
+	)
+	if err != nil {
+		return err
+	}
+
+	if !canRemove {
+		return nil
+	}
+
+	if err := inp.removeFn(path); err != nil {
+		// The first try at removing the file failed,
+		// retry with a constant backoff
+		lastErr := err
+
+		tickerChan := inp.tickFn(inp.deleterConfig.retryBackoff)
+
+		retries := 0
+		for retries < inp.deleterConfig.retries {
+			logger.Errorf(
+				"could not remove '%s', retrying in 2s. Error: %s",
+				path,
+				lastErr,
+			)
+
+			select {
+			case <-ctx.Cancelation.Done():
+				return ctx.Cancelation.Err()
+
+			case <-tickerChan:
+				retries++
+				err := inp.removeFn(path)
+				if err == nil {
+					logger.Infof("'%s' removed", path)
+					return nil
+				}
+				if errors.Is(err, os.ErrNotExist) {
+					logger.Infof("'%s' was removed by an external process", path)
+					return nil
+				}
+
+				lastErr = err
+			}
+		}
+
+		return fmt.Errorf(
+			"cannot remove '%s' after %d retries. Last error: %w",
+			path,
+			retries,
+			lastErr)
+	}
+
+	logger.Infof("'%s' removed", path)
+	return nil
+}
+
 // waitGracePeriod waits for the delete grace period while monitoring the file
 // for any changes, if the file changes or any error is encountered, false
 // is returned. True is only returned if the grace period expires with
@@ -231,8 +318,9 @@ func waitGracePeriod(
 	statFn func(string) (os.FileInfo, error),
 ) (bool, error) {
 	// Check if file grows during the grace period
-	// We know all events have been published because cursor.Finished is true,
-	// so we can get the offset from the cursor and compare it with the file size.
+	// We know all events have been published because cursor.AllEventsPublished
+	// returns is true (it is called by deleteFile), so we can get the offset
+	// from the cursor and compare it with the file size.
 	st := state{}
 	if err := cursor.Unpack(&st); err != nil {
 		return false, fmt.Errorf("cannot unpack cursor from '%s' to read offset: %w",
@@ -287,7 +375,7 @@ func waitGracePeriod(
 		return false, fmt.Errorf("cannot stat '%s': %w", path, err)
 	}
 
-	// The file has been written to, close the harvester so the filewatcher
+	// If the file has been written to, close the harvester so the filewatcher
 	// can start a new one
 	if stat.Size() != st.Offset {
 		logger.Debugf("'%s' was updated, won't remove. Closing harvester", path)
@@ -295,96 +383,6 @@ func waitGracePeriod(
 	}
 
 	return true, nil
-}
-
-func (inp *filestream) deleteFile(
-	ctx input.Context,
-	logger *logp.Logger,
-	cursor loginp.Cursor,
-	path string,
-) error {
-	// Wait until the resource is finished.
-	// The resource is finished when all events are acknowledged by the output.
-	// If it is not finished, this usually means one of two things:
-	//   - The output is down
-	//   - Filebeat is experiencing back pressure
-	// Either way, we wait until all events have been published.
-	if !cursor.AllEventsPublished() {
-		logger.Debugf(
-			"not all events from '%s' have been published, "+
-				"closing harvester",
-			path)
-		// normal operation of the harvester, the file was closed.
-		return nil
-	}
-	logger.Infof(
-		"all events from '%s' have been published, waiting for %s grace period",
-		path, inp.deleterConfig.GracePeriod.String())
-
-	canRemove, err := inp.waitGracePeriodFn(
-		ctx,
-		logger,
-		cursor,
-		path,
-		inp.deleterConfig.GracePeriod,
-		inp.scannerCheckInterval,
-		inp.statFn,
-	)
-	if err != nil {
-		return err
-	}
-
-	if !canRemove {
-		return nil
-	}
-
-	if err := inp.removeFn(path); err != nil {
-		// The first try at removing the file failed,
-		// retry with a constant backoff
-		lastErr := err
-
-		tickerChan := inp.tickFn(inp.deleterConfig.retryBackoff)
-
-		retries := 0
-		for retries < inp.deleterConfig.retries {
-			logger.Errorf(
-				"could not remove '%s', retrying in 2s. Error: %s",
-				path,
-				lastErr,
-			)
-
-			select {
-			case <-ctx.Cancelation.Done():
-				return ctx.Cancelation.Err()
-
-			case <-tickerChan:
-				retries++
-				err := inp.removeFn(path)
-				if err == nil {
-					logger.Infof("'%s' removed", path)
-					return nil
-				}
-				if err != nil {
-					if errors.Is(err, os.ErrNotExist) {
-						logger.Infof("'%s' was removed by an external process", path)
-						return nil
-					}
-
-					lastErr = err
-				}
-			}
-		}
-
-		return fmt.Errorf(
-			"cannot remove '%s' after %d retries. Last error: %w",
-			path,
-			retries,
-			lastErr)
-	}
-
-	logger.Infof("'%s' removed", path)
-
-	return nil
 }
 
 func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {

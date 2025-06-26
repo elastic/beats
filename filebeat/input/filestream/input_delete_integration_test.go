@@ -199,6 +199,7 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 	}
 
 	tickFn := func(d time.Duration) <-chan time.Time {
+		// Ensure tickFn is called with the correct parameter
 		if d != f.deleterConfig.retryBackoff {
 			t.Errorf(
 				"'tickFn' called with %q, expecting %q",
@@ -220,6 +221,8 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 
 	// 1. Test we return when the context is cancelled
 	t.Run("retry stops when context is cancelled", func(t *testing.T) {
+		// Ensure we get errors reported as part of the correct sub test
+		env.t = t
 		ctx, cancel := context.WithCancel(t.Context())
 		v2Ctx := v2.Context{
 			ID:          t.Name(),
@@ -238,12 +241,14 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 		cancel()
 		wg.Wait()
 
-		if !errors.Is(context.Canceled, deleteErr) {
+		if !errors.Is(deleteErr, context.Canceled) {
 			t.Fatalf("expecting 'context cancelled' when the context is cancelled, got: %v", deleteErr)
 		}
 	})
 
-	t.Run("file is externally removed during retries", func(t *testing.T) {
+	t.Run("file is externally removed", func(t *testing.T) {
+		// Ensure we get errors reported as part of the correct sub test
+		env.t = t
 		v2Ctx := v2.Context{
 			ID:          t.Name(),
 			Cancelation: t.Context(),
@@ -290,9 +295,16 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 		if deleteErr != nil {
 			t.Fatalf("expecting no error, got %v", deleteErr)
 		}
+		if !fileRemoved.Load() {
+			t.Fatal("expecting 'removeFn' to be called")
+		}
+
+		env.logContains(fmt.Sprintf("'%s' removed", logFile))
 	})
 
 	t.Run("file removed externally is a success", func(t *testing.T) {
+		// Ensure we get errors reported as part of the correct sub test
+		env.t = t
 		v2Ctx := v2.Context{
 			ID:          t.Name(),
 			Cancelation: t.Context(),
@@ -330,6 +342,8 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 	})
 
 	t.Run("exhausted retries returns error", func(t *testing.T) {
+		// Ensure we get errors reported as part of the correct sub test
+		env.t = t
 		v2Ctx := v2.Context{
 			ID:          t.Name(),
 			Cancelation: t.Context(),

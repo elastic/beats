@@ -420,14 +420,14 @@ func TestCursorAllEventsPublished(t *testing.T) {
 	mockHarvester := &mockHarvester{onRun: runFn, wg: &wg}
 	hg := testDefaultHarvesterGroup(t, mockHarvester)
 	hg.pipeline = &MockPipeline{
-		// Define the call back that will be called before each event is
+		// Define the callback that will be called before each event is
 		// published/acknowledged, when this callback is called, the
 		// resource is still 'pending' on this acknowledgement.
 		// So resource.pending must be 2, the input 'lock' and this pending
 		// acknowledgement.
 		//
 		// This callback runs on a different goroutine, therefore we cannot
-		// call t.Fatal/t.FailNow and friends
+		// call t.FailNow and friends.
 		publishCallback: func(e beat.Event) {
 			// Ensure we have the correct event
 			if ok, _ := e.Fields.HasKey(fieldKey); ok {
@@ -445,7 +445,8 @@ func TestCursorAllEventsPublished(t *testing.T) {
 						"cursor key %q and event resource key %q must be the same.",
 						cursorKey, logp.EventType)
 				}
-				// cursor.resource.pending bust be 2 here
+				// cursor.resource.pending bust be 2 here and
+				// cursor.AllEventsPublished must return false
 				if cursor.AllEventsPublished() {
 					t.Errorf(
 						"not all events have been published, pending events: %d",

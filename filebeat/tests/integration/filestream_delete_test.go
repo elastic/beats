@@ -397,7 +397,8 @@ func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
 	fileWatcher.Start()
 	defer fileWatcher.Stop()
 
-	esURL := integration.GetESURL(t, "http")
+	// We need the admin URL to create our custom index
+	esURL := integration.GetESAdminURL(t, "http")
 
 	// Create and start the proxy server
 	proxy := integration.NewDisabledProxy(t, esURL.String())
@@ -628,8 +629,8 @@ func waitForDidNotChange(t *testing.T, filebeat *integration.BeatProc, files []s
 // nil is returned. `size` sets the number of documents returned
 func getEventsMsgFromES(t *testing.T, index string, size int) []string {
 	t.Helper()
-	// Step 1: Get the Elasticsearch URL
-	esURL := integration.GetESURL(t, "http")
+	// Step 1: Get the Elasticsearch Admin URL so we can query any index
+	esURL := integration.GetESAdminURL(t, "http")
 
 	// Step 2: Format the search URL for the `foo` datastream
 	searchURL, err := integration.FormatDataStreamSearchURL(t, esURL, index)

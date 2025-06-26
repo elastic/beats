@@ -260,7 +260,8 @@ func (b *BeatProc) startBeat() {
 		Args:   b.Args,
 		Stdout: b.stdout,
 		Stderr: b.stderr,
-		// OS dependant attributes to allow gracefully terminating process on Windows
+		// OS dependant attributes to allow gracefully terminating process
+		// on Linux and Windows
 		SysProcAttr: proc.GetSysProcAttr(),
 	}
 
@@ -823,7 +824,22 @@ func (b *BeatProc) Stdin() io.WriteCloser {
 	return b.stdin
 }
 
+// GetESURL Returns the ES URL with username and password set,
+// it uses ES_USER and ES_PASS that on our mage automation defaults
+// to user 'beats' and pass 'testing'. This user/role has limited
+// privileges, it cannot create arbitrary indexes.
 func GetESURL(t *testing.T, scheme string) url.URL {
+	return getESURL(t, scheme, "ES_USER", "ES_PASS")
+}
+
+// GetESURL Returns the ES URL with admin username and password set,
+// it uses ES_SUPERUSER_USER and ES_SUPERUSER_PASS that on our mage
+// automation defaults to user 'admin' and pass 'testing'.
+func GetESAdminURL(t *testing.T, scheme string) url.URL {
+	return getESURL(t, scheme, "ES_SUPERUSER_USER", "ES_SUPERUSER_PASS")
+}
+
+func getESURL(t *testing.T, scheme string, userEnvVar, passEnvVar string) url.URL {
 	t.Helper()
 
 	esHost := os.Getenv("ES_HOST")
@@ -843,12 +859,12 @@ func GetESURL(t *testing.T, scheme string) url.URL {
 		}
 	}
 
-	user := os.Getenv("ES_USER_USER")
+	user := os.Getenv(userEnvVar)
 	if user == "" {
 		user = "admin"
 	}
 
-	pass := os.Getenv("ES_USER_PASS")
+	pass := os.Getenv(passEnvVar)
 	if pass == "" {
 		pass = "testing"
 	}

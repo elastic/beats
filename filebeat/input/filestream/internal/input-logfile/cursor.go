@@ -48,16 +48,15 @@ func (c Cursor) Unpack(to interface{}) error {
 // AllEventsPublished returns true if there are no pending operations
 // on this cursor, which means all events have been published.
 //
-// The harvester might be the single 'owner' of the resource, if this is
-// true, AllEventsPublished still returns true.
-//
 // Owners of an resource can be active inputs or pending update operations
-// not yet written to disk. The harvester locks this resource
-// (see `startHarvester`) and only releases when it is shutdown.
+// (not yet written to disk).
 //
-// So if there is only one 'owner' of this resource, it is safe
-// to assume it is the harvester, there fore there are no pending
-// operations on the underlying resource.
+// The harvester locks this resource (see `startHarvester`) and only releases
+// when it is shutdown. So if there is only one 'owner' of this resource, it
+// is safe to assume it is the harvester, therefore all events have been
+// published.
+//
+// There is a test ensuring this behaviour, see TestCursorAllEventsPublished
 func (c Cursor) AllEventsPublished() bool {
 	pending := c.resource.pending.Load()
 	if pending == 1 || pending == 0 {

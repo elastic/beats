@@ -33,7 +33,7 @@ func TestDisablingProxy(t *testing.T) {
 	server := httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusTeapot)
-			w.Write([]byte(teapotMsg))
+			_, _ = w.Write([]byte(teapotMsg))
 		}))
 
 	proxy := integration.NewDisabledProxy(t, server.URL)
@@ -56,7 +56,7 @@ func TestDisablingProxy(t *testing.T) {
 func checkStatusCodeAndBody(t *testing.T, srvURL, body string, statusCode int) {
 	t.Helper()
 
-	resp, err := http.Get(srvURL)
+	resp, err := http.Get(srvURL) //nolint:gosec // It's a test
 	if err != nil {
 		t.Fatalf("could not call proxy: %s", err)
 	}

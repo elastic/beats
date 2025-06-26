@@ -169,6 +169,7 @@ func (e *inputTestingEnvironment) waitUntilInputStops() {
 	e.wg.Wait()
 }
 
+// mustWriteToFile writes data to file and returns the full path
 func (e *inputTestingEnvironment) mustWriteToFile(filename string, data []byte) string {
 	path := e.abspath(filename)
 	err := os.WriteFile(path, data, 0o644)
@@ -574,6 +575,8 @@ func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
 	require.True(e.t, selectedEvent.Timestamp.Equal(tm), "got: %s, expected: %s", selectedEvent.Timestamp.String(), tm.String())
 }
 
+// logContains ensures s is a sub string on any log line.
+// If s is not found, the test fails
 func (e *inputTestingEnvironment) logContains(s string) {
 	logs := e.loggerBuffer.String()
 	for _, line := range strings.Split(logs, "\n") {

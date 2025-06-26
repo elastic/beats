@@ -71,11 +71,6 @@ type deleterConfig struct {
 	retryBackoff time.Duration `config:"-"`
 }
 
-type deleterReasonConfig struct {
-	EOF      bool `config:"eof"`
-	Inactive bool `config:"inactive"`
-}
-
 type closerConfig struct {
 	OnStateChange stateChangeCloserConfig `config:"on_state_change"`
 	Reader        readerCloserConfig      `config:"reader"`
