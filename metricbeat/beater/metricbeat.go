@@ -152,17 +152,10 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 	}
 
 	metricbeat := &Metricbeat{
-<<<<<<< HEAD
-		done:     make(chan struct{}),
-		config:   config,
-		registry: registry,
-=======
 		done:              make(chan struct{}),
 		config:            config,
 		registry:          registry,
-		logger:            b.Info.Logger,
 		dynamicCfgEnabled: dynamicCfgEnabled,
->>>>>>> d71266c00 ([beatreceiver] - Add status reporting (#44782))
 	}
 	for _, applyOption := range options {
 		applyOption(metricbeat)
@@ -193,47 +186,6 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 				return data
 			})
 	}
-<<<<<<< HEAD
-
-	moduleOptions := append(
-		[]module.Option{module.WithMaxStartDelay(config.MaxStartDelay)},
-		metricbeat.moduleOptions...)
-
-	factory := module.NewFactory(b.Info, registry, moduleOptions...)
-
-	for _, moduleCfg := range config.Modules {
-		if !moduleCfg.Enabled() {
-			continue
-		}
-
-		runner, err := factory.Create(b.Publisher, moduleCfg)
-		if err != nil {
-			return nil, err
-		}
-
-		metricbeat.runners = append(metricbeat.runners, runner)
-	}
-
-	if len(metricbeat.runners) == 0 && !dynamicCfgEnabled {
-		return nil, mb.ErrAllModulesDisabled
-	}
-
-	if config.Autodiscover != nil {
-		var err error
-		metricbeat.autodiscover, err = autodiscover.NewAutodiscover(
-			"metricbeat",
-			b.Publisher,
-			factory, autodiscover.QueryConfig(),
-			config.Autodiscover,
-			b.Keystore,
-		)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-=======
->>>>>>> d71266c00 ([beatreceiver] - Add status reporting (#44782))
 	return metricbeat, nil
 }
 
@@ -247,7 +199,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		[]module.Option{module.WithMaxStartDelay(bt.config.MaxStartDelay)},
 		bt.moduleOptions...)
 
-	factory := module.NewFactory(b.Info, b.Monitoring, bt.registry, moduleOptions...)
+	factory := module.NewFactory(b.Info, bt.registry, moduleOptions...)
 
 	if bt.otelStatusFactoryWrapper != nil {
 		factory = bt.otelStatusFactoryWrapper(factory)
@@ -290,7 +242,6 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 			factory, autodiscover.QueryConfig(),
 			bt.config.Autodiscover,
 			b.Keystore,
-			b.Info.Logger,
 		)
 		if err != nil {
 			return err
@@ -313,13 +264,8 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	// Centrally managed modules
-<<<<<<< HEAD
-	factory := module.NewFactory(b.Info, bt.registry, bt.moduleOptions...)
+	factory = module.NewFactory(b.Info, bt.registry, bt.moduleOptions...)
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher)
-=======
-	factory = module.NewFactory(b.Info, b.Monitoring, bt.registry, bt.moduleOptions...)
-	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher, bt.logger)
->>>>>>> d71266c00 ([beatreceiver] - Add status reporting (#44782))
 	b.Registry.MustRegisterInput(modules)
 	wg.Add(1)
 	go func() {

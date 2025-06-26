@@ -70,23 +70,13 @@ var once = flag.Bool("once", false, "Run filebeat only once until all harvesters
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
 type Filebeat struct {
-<<<<<<< HEAD
-	config         *cfg.Config
-	moduleRegistry *fileset.ModuleRegistry
-	pluginFactory  PluginFactory
-	done           chan struct{}
-	stopOnce       sync.Once // wraps the Stop() method
-	pipeline       beat.PipelineConnector
-=======
 	config                   *cfg.Config
 	moduleRegistry           *fileset.ModuleRegistry
 	pluginFactory            PluginFactory
 	done                     chan struct{}
 	stopOnce                 sync.Once // wraps the Stop() method
 	pipeline                 beat.PipelineConnector
-	logger                   *logp.Logger
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
->>>>>>> d71266c00 ([beatreceiver] - Add status reporting (#44782))
 }
 
 type PluginFactory func(beat.Info, *logp.Logger, statestore.States) []v2.Plugin
