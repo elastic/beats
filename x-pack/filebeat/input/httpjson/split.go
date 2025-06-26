@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -36,17 +37,18 @@ type split struct {
 	keyField         string
 	isRoot           bool
 	delimiter        string
+	status           status.StatusReporter
 	log              *logp.Logger
 }
 
 // newSplitResponse returns a new split based on the provided config and
 // logging to the provided logger, tagging the split as the root of the chain.
-func newSplitResponse(cfg *splitConfig, log *logp.Logger) (*split, error) {
+func newSplitResponse(cfg *splitConfig, stat status.StatusReporter, log *logp.Logger) (*split, error) {
 	if cfg == nil {
 		return nil, nil
 	}
 
-	split, err := newSplit(cfg, log)
+	split, err := newSplit(cfg, stat, log)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +59,7 @@ func newSplitResponse(cfg *splitConfig, log *logp.Logger) (*split, error) {
 
 // newSplit returns a new split based on the provided config and
 // logging to the provided logger.
-func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
+func newSplit(c *splitConfig, stat status.StatusReporter, log *logp.Logger) (*split, error) {
 	ti, err := getTargetInfo(c.Target)
 	if err != nil {
 		return nil, err
@@ -67,14 +69,14 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 		return nil, fmt.Errorf("invalid target type: %s", ti.Type)
 	}
 
-	ts, err := newBasicTransformsFromConfig(registeredTransforms, c.Transforms, responseNamespace, log)
+	ts, err := newBasicTransformsFromConfig(registeredTransforms, c.Transforms, responseNamespace, stat, log)
 	if err != nil {
 		return nil, err
 	}
 
 	var s *split
 	if c.Split != nil {
-		s, err = newSplit(c.Split, log)
+		s, err = newSplit(c.Split, stat, log)
 		if err != nil {
 			return nil, err
 		}
@@ -89,6 +91,7 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 		delimiter:        c.DelimiterString,
 		transforms:       ts,
 		child:            s,
+		status:           stat,
 		log:              log,
 	}, nil
 }

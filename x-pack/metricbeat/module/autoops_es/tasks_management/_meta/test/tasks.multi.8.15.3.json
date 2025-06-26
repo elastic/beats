@@ -1,0 +1,46 @@
+{
+    "tasks": {
+        "node1:45": {
+            "node": "node1",
+            "id": 45,
+            "type": "transport",
+            "action": "indices:data/read/search",
+            "description": "async_search{indices[my-fake-search], search_type[QUERY_THEN_FETCH], source[{\"size\":1,\"query\":{\"match_all\":{}}}], preference[123]}",
+            "start_time_in_millis": 1513823752749,
+            "running_time_in_nanos": 60000293139,
+            "cancellable": true,
+            "headers": {
+                "X-Opaque-Id": "123456"
+            },
+            "children": [{ "node": "node1" }, { "node": "node2" }],
+            "ignored_field": true
+        },
+        "node2:501": {
+            "node": "node2",
+            "id": 501,
+            "type": "transport",
+            "action": "indices:data/write/bulk",
+            "description": "requests[1], indices[my-fake-index]",
+            "start_time_in_millis": 1513823752456,
+            "running_time_in_nanos": 60000293456,
+            "cancellable": false,
+            "headers": {
+                "X-Opaque-Id": "456"
+            },
+            "children": [{ "node": "node3" }, { "node": "node2" }],
+            "ignored_field": {}
+        },
+        "not-long-running:47": {
+            "node": "not-long-running",
+            "id": 48,
+            "type": "transport",
+            "action": "cluster:fake",
+            "start_time_in_millis": 1513823752749,
+            "running_time_in_nanos": 1,
+            "cancellable": false,
+            "headers": {
+                "X-Opaque-Id": "456789"
+            }
+        }
+    }
+}

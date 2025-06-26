@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"reflect"
 	"time"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -99,6 +100,7 @@ func tryOverrideOrDefault(cfg config, c container) container {
 		}
 		c.MaxWorkers = &maxWorkers
 	}
+
 	if c.Poll == nil {
 		var poll bool
 		if cfg.Poll != nil {
@@ -106,6 +108,7 @@ func tryOverrideOrDefault(cfg config, c container) container {
 		}
 		c.Poll = &poll
 	}
+
 	if c.PollInterval == nil {
 		interval := time.Second * 300
 		if cfg.PollInterval != nil {
@@ -113,16 +116,27 @@ func tryOverrideOrDefault(cfg config, c container) container {
 		}
 		c.PollInterval = &interval
 	}
+
 	if c.TimeStampEpoch == nil {
 		c.TimeStampEpoch = cfg.TimeStampEpoch
 	}
+
 	if c.ExpandEventListFromField == "" {
 		c.ExpandEventListFromField = cfg.ExpandEventListFromField
 	}
+
 	if len(c.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
 		c.FileSelectors = cfg.FileSelectors
 	}
-	c.ReaderConfig = cfg.ReaderConfig
+	// If the container level ReaderConfig matches the default config ReaderConfig state,
+	// use the global ReaderConfig. Matching the default ReaderConfig state
+	// means that the container level ReaderConfig is not set, and we should use the
+	// global ReaderConfig. Partial definition of ReaderConfig at both the global
+	// and container level is not supported, it's an either or scenario.
+	if reflect.DeepEqual(c.ReaderConfig, defaultReaderConfig) {
+		c.ReaderConfig = cfg.ReaderConfig
+	}
+
 	return c
 }
 

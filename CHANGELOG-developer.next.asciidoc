@@ -72,9 +72,11 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Journald input now calls `journalctl` instead of using `github.com/coreos/go-systemd/v22@v22.5.0/sdjournal`, the CGO dependency has been removed from Filebeat {pull}40061[40061]
 - System module events now contain `input.type: systemlogs` instead of `input.type: log` when harvesting log files, however the ingest pipeline sets it back to the original input (log or journald). {pull}41246[41246]
 - The system-logs input is removed because it's not used anymore {pull}42328[42328]
+- `x-pack/libbeat/common/proc` moved to `libbeat/common/proc` {pull}44996[44996]
 
 ==== Bugfixes
 
+- Handle conversion of `map[string]any` and `[]map[string]any` for `otelconsumer`.{pull}45008[45008]
 - Handle the starting of namespace and node watchers for metadata enrichment according to `add_resource_metadata` configuration.{pull}38762[38762]
 - Fix multiple metricbeat instances reporting same metrics when using autodiscover with provider kubernetes, and ensure leader elector is always running in autodiscover mode.{pull}38471[38471]
 - Fix how Prometheus histograms are calculated when percentiles are provide.{pull}36537[36537]
@@ -112,6 +114,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fix flaky test in filebeat Okta entity analytics provider. {issue}42059[42059] {pull}42123[42123]
 - Fix IIS module logging errors in case application pool PDH counter is not found. {pull}42274[42274]
 - Removed direct dependency on Azure/go-autorest/autorest/adal, which is deprecated. {issue}41463[41463] {pull}42959[42959]
+- Fixed flaky zookeeper integration tests. {pull}43638[43638]
 
 ==== Added
 
@@ -220,6 +223,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add CEL input program evaluation coverage collection support. {pull}41884[41884]
 - Fix test framework and python tests saving config file with wrong permission. {issue}42779[42779]
 - Tests reading testdata config file now set flag `strict.perms=false`. They use the new `testflag` package helper function MustSetStrictPermsFalse. {issue}42779[42779]
+- Update github.com/dgraph-io/badger/v4 package to version 4.6.0. {issue}42443[42443]
 - Add a metric registry to Filebeat's v2.Context. This should be the registry
 used by inputs to publish metrics. This registry is then passed to the pipeline
 client by the input/v2. When receiving a non-nil metrics registry the pipeline
@@ -229,6 +233,9 @@ client will aggregate metrics by input on this registry. It'll collect
 - Add new API to libbeat/monitoring/inputmon. The API allows to register and
 unregister input metrics without relaying on the global 'dataset' namespace.{pull}42618[42618] {issue}42761[42761]
 - Added exponential backoff retry logic for vSphere client logout operation in metricbeat. {issue}43449[43449]
+- Improved Filebeat Websocket input exponential backoff logic to produce a smoother backoff curve. {pull}44069[44069]
+- Added `autoops_es` module to x-pack/metricbeat. {pull}44565[44565]
+- Make `x-pack/libbeat/management.BeatV2Manager.UpdateStatus` a no-op if there is no change in state. {pull}44716[44716]
 
 ==== Deprecated
 

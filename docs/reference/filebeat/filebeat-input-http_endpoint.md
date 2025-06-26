@@ -20,7 +20,7 @@ These are the possible response codes from the server.
 | HTTP Response Code | Name | Reason |
 | --- | --- | --- |
 | 200 | OK | Returned on success. |
-| 400 | Bad Request | Returned if JSON body decoding fails or if `wait_for_completion_timeout` query validation fails. |
+| 400 | Bad Request | Returned if JSON body decoding fails, if an OPTIONS request is made and `options_headers` has not been set in the config, or if `wait_for_completion_timeout` query validation fails. |
 | 401 | Unauthorized | Returned when basic auth, secret header, or HMAC validation fails. |
 | 405 | Method Not Allowed | Returned if methods other than POST are used. |
 | 406 | Not Acceptable | Returned if the POST request does not contain a body. |
@@ -53,6 +53,21 @@ filebeat.inputs:
   listen_port: 8080
   response_code: 200
   response_body: '{"message": "success"}'
+  url: "/"
+  prefix: "json"
+```
+
+OPTIONS request-aware example:
+
+```yaml
+filebeat.inputs:
+- type: http_endpoint
+  enabled: true
+  listen_address: 192.168.1.1
+  listen_port: 8080
+  response_code: 200
+  options_headers:
+    Custom-Options-Header: [custom-options-header-value]
   url: "/"
   prefix: "json"
 ```
@@ -283,6 +298,16 @@ The HTTP response code returned upon success. Should be in the 2XX range.
 ### `response_body` [_response_body]
 
 The response body returned upon success.
+
+
+### `options_headers` [_options_headers]
+
+A set of response headers to add to the response for OPTIONS requests. Headers with the same canonical MIME header name will be replaced with the values in this configuration.
+
+
+### `options_response_code` [_options_response_code]
+
+The HTTP response code to return for OPTIONS requests. Defaults to `200` (OK).
 
 
 ### `listen_address` [_listen_address]

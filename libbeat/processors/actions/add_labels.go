@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -38,7 +39,7 @@ func init() {
 			checks.AllowedFields(LabelsKey, "when")))
 }
 
-func createAddLabels(c *conf.C) (beat.Processor, error) {
+func createAddLabels(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := struct {
 		Labels mapstr.M `config:"labels" validate:"required"`
 	}{}

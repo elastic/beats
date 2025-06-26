@@ -35,20 +35,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// TODO: add  following unuspported params to below struct
-// indices
-// pipelines
-// parameters
 // setup.ilm.* -> supported but the logic is not in place yet
-// proxy_disable -> supported but the logic is not in place yet
-// proxy_headers
 type unsupportedConfig struct {
 	CompressionLevel   int               `config:"compression_level" `
 	LoadBalance        bool              `config:"loadbalance"`
 	NonIndexablePolicy *config.Namespace `config:"non_indexable_policy"`
-	AllowOlderVersion  bool              `config:"allow_older_versions"`
 	EscapeHTML         bool              `config:"escape_html"`
 	Kerberos           *kerberos.Config  `config:"kerberos"`
+	ProxyDisable       bool              `config:"proxy_disable"`
 }
 
 type esToOTelOptions struct {
@@ -64,7 +58,7 @@ type esToOTelOptions struct {
 var defaultOptions = esToOTelOptions{
 	ElasticsearchConfig: elasticsearch.DefaultConfig(),
 
-	Index:    "filebeat-9.0.0", // TODO. Default value should be filebeat-%{[agent.version]}
+	Index:    "", // Dynamic routing is disabled if index is set
 	Pipeline: "",
 	ProxyURL: "",
 	Preset:   "custom", // default is custom if not set
@@ -75,13 +69,11 @@ var defaultOptions = esToOTelOptions{
 // Note: This method may override output queue settings defined by user.
 func ToOTelConfig(output *config.C) (map[string]any, error) {
 	escfg := defaultOptions
-	// check if unsupported configuration is provided
-	temp := unsupportedConfig{}
-	if err := output.Unpack(&temp); err != nil {
+
+	// check for unsupported config
+	err := checkUnsupportedConfig(output)
+	if err != nil {
 		return nil, err
-	}
-	if !isStructEmpty(temp) {
-		return nil, fmt.Errorf("these configuration parameters are not supported %+v", temp)
 	}
 
 	// apply preset here
@@ -126,8 +118,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	}
 
 	otelYAMLCfg := map[string]any{
-		"logs_index": escfg.Index, // index
-		"endpoints":  hosts,       // hosts, protocol, path, port
+		"endpoints": hosts, // hosts, protocol, path, port
 
 		// ClientConfig
 		"timeout":           escfg.Transport.Timeout,         // timeout
@@ -163,12 +154,43 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	setIfNotNil(otelYAMLCfg, "tls", otelTLSConfg)         // tls config
 	setIfNotNil(otelYAMLCfg, "proxy_url", escfg.ProxyURL) // proxy_url
 	setIfNotNil(otelYAMLCfg, "pipeline", escfg.Pipeline)  // pipeline
+	// Dynamic routing is disabled if output.elasticsearch.index is set
+	setIfNotNil(otelYAMLCfg, "logs_index", escfg.Index) // index
 
 	if err := typeSafetyCheck(otelYAMLCfg); err != nil {
 		return nil, err
 	}
 
 	return otelYAMLCfg, nil
+}
+
+// log warning for unsupported config
+func checkUnsupportedConfig(cfg *config.C) error {
+	// check if unsupported configuration is provided
+	temp := unsupportedConfig{}
+	if err := cfg.Unpack(&temp); err != nil {
+		return err
+	}
+
+	if !isStructEmpty(temp) {
+		logp.Warn("these configuration parameters are not supported %+v", temp)
+		return nil
+	}
+
+	// check for dictionary like parameters that we do not support yet
+	if cfg.HasField("indices") {
+		logp.Warn("indices is currently not supported")
+	} else if cfg.HasField("pipelines") {
+		logp.Warn("pipelines is currently not supported")
+	} else if cfg.HasField("parameters") {
+		logp.Warn("parameters is currently not supported")
+	} else if cfg.HasField("proxy_headers") {
+		logp.Warn("proxy_headers is currently not supported")
+	} else if value, _ := cfg.Bool("allow_older_versions", -1); !value {
+		logp.Warn("allow_older_versions:false is currently not supported")
+	}
+
+	return nil
 }
 
 // For type safety check

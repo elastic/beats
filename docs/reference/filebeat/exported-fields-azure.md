@@ -3,12 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-azure.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Azure fields [exported-fields-azure]
 
 Azure Module
 
-
 ## azure [_azure]
+
+
 
 **`azure.subscription_id`**
 :   Azure subscription ID
@@ -26,7 +29,6 @@ type: keyword
 :   tenant ID
 
 type: keyword
-
 
 
 ## resource [_resource]
@@ -69,7 +71,6 @@ type: keyword
 type: keyword
 
 
-
 ## activitylogs [_activitylogs]
 
 Fields for Azure activity logs.
@@ -80,11 +81,9 @@ Fields for Azure activity logs.
 type: keyword
 
 
-
 ## identity [_identity]
 
 Identity
-
 
 ## claims_initiated_by_user [_claims_initiated_by_user]
 
@@ -126,7 +125,6 @@ type: keyword
 type: object
 
 
-
 ## authorization [_authorization]
 
 Authorization
@@ -141,7 +139,6 @@ type: keyword
 :   Action
 
 type: keyword
-
 
 
 ## evidence [_evidence]
@@ -238,7 +235,6 @@ type: keyword
 type: flattened
 
 
-
 ## auditlogs [_auditlogs]
 
 Fields for Azure audit logs.
@@ -277,7 +273,6 @@ type: keyword
 :   Result signature
 
 type: keyword
-
 
 
 ## properties [_properties]
@@ -338,8 +333,7 @@ type: date
 type: keyword
 
 
-
-## target_resources.* [_target_resources]
+## target_resources.* [_target_resources.*]
 
 Target resources
 
@@ -373,8 +367,7 @@ type: keyword
 type: keyword
 
 
-
-## modified_properties.* [_modified_properties]
+## modified_properties.* [_modified_properties.*]
 
 Modified properties
 
@@ -396,11 +389,9 @@ type: keyword
 type: keyword
 
 
-
 ## initiated_by [_initiated_by]
 
 Information regarding the initiator
-
 
 ## app [_app]
 
@@ -430,7 +421,6 @@ type: keyword
 type: keyword
 
 
-
 ## user [_user]
 
 User
@@ -457,7 +447,6 @@ type: keyword
 :   ip Address
 
 type: keyword
-
 
 
 ## platformlogs [_platformlogs]
@@ -552,7 +541,6 @@ type: keyword
 :   Event inner properties
 
 type: flattened
-
 
 
 ## signinlogs [_signinlogs]

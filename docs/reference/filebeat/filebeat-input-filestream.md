@@ -6,17 +6,25 @@ mapped_pages:
 
 # filestream input [filebeat-input-filestream]
 
+::::{important}
+By default, Filestream starts ingesting files **only when
+their size is greater than 1024 bytes**. You can configure
+a different length for the fingerprint by setting the
+[`prospector.scanner.fingerprint.length`](#filebeat-input-filestream-scan-fingerprint)
+value.
+::::
 
 Use the `filestream` input to read lines from active log files. It is the new, improved alternative to the `log` input. It comes with various improvements to the existing input:
 
-1. Checking of `close.on_state_change.*` options happens out of band. Thus, if an output is blocked, Filebeat can close the reader and avoid keeping too many files open.
-2. Detailed metrics are available for all files that match the `paths` configuration regardless of the `harvester_limit`. This way, you can keep track of all files, even ones that are not actively read.
-3. The order of `parsers` is configurable. So it is possible to parse JSON lines and then aggregate the contents into a multiline event.
-4. Some position updates and metadata changes no longer depend on the publishing pipeline. If the pipeline is blocked some changes are still applied to the registry.
-5. Only the most recent updates are serialized to the registry. In contrast, the `log` input has to serialize the complete registry on each ACK from the outputs. This makes the registry updates much quicker with this input.
-6. The input ensures that only offsets updates are written to the registry append only log. The `log` writes the complete file state.
-7. Stale entries can be removed from the registry, even if there is no active input.
-8. The default behaviour is to identify files based on their contents using the [`fingerprint`](#filebeat-input-filestream-file-identity-fingerprint) [`file_identity`](#filebeat-input-filestream-file-identity) This solves data duplication caused by inode reuse.
+* The default behavior is to identify files based on their contents using [`fingerprint`](#filebeat-input-filestream-file-identity-fingerprint) [`file_identity`](#filebeat-input-filestream-file-identity). This solves data duplication caused by inode reuse.
+* Validation of `close.on_state_change.*` options happens out of band. If an output is blocked, Filebeat can close the reader and avoid keeping too many files open.
+* Detailed metrics are available for all files that match the `paths` configuration regardless of the `harvester_limit`. This way, you can keep track of all files, even ones that are not actively read.
+* The order of `parsers` is configurable. You can parse JSON lines and then aggregate the contents into a multiline event.
+* Some position updates and metadata changes no longer depend on the publishing pipeline. If the pipeline is blocked, some changes are still applied to the registry.
+* Only the most recent updates are serialized to the registry. In contrast, the `log` input has to serialize the complete registry on each ACK from the outputs. This makes the registry updates much quicker with this input.
+* The input ensures that only offsets updates are written to the registry append only log. The `log` writes the complete file state.
+* Stale entries can be removed from the registry, even if there is no active input.
+
 
 To configure this input, specify a list of glob-based [`paths`](#filestream-input-paths) that must be crawled to locate and fetch the log lines.
 
@@ -175,7 +183,7 @@ filebeat.inputs:
 
 See [Regular expression support](/reference/filebeat/regexp-support.md) for a list of supported regexp patterns.
 
-### `prospector.scanner.include_files` [_prospector_scanner_include_files]
+#### `prospector.scanner.include_files` [_prospector_scanner_include_files]
 
 A list of regular expressions to match the files that you want Filebeat to include. If a list of regexes is provided, only the files that are allowed by the patterns are harvested.
 
@@ -198,7 +206,7 @@ Patterns should start with `^` in case of absolute paths.
 See [Regular expression support](/reference/filebeat/regexp-support.md) for a list of supported regexp patterns.
 
 
-### `prospector.scanner.symlinks` [filebeat-input-filestream-prospector-scanner-symlinks]
+#### `prospector.scanner.symlinks` [filebeat-input-filestream-prospector-scanner-symlinks]
 
 The `symlinks` option allows Filebeat to harvest symlinks in addition to regular files. When harvesting symlinks, Filebeat opens and reads the original file even though it reports the path of the symlink.
 
@@ -209,7 +217,7 @@ The `symlinks` option can be useful if symlinks to the log files have additional
 Because this option may lead to data loss, it is disabled by default.
 
 
-### `prospector.scanner.resend_on_touch` [_prospector_scanner_resend_on_touch]
+#### `prospector.scanner.resend_on_touch` [_prospector_scanner_resend_on_touch]
 
 If this option is enabled a file is resent if its size has not changed but its modification time has changed to a later time than before. It is disabled by default to avoid accidentally resending files.
 
@@ -257,8 +265,6 @@ Following are some scenarios where this can happen:
 
 
 **Configuration**
-
-Fingerprint mode is disabled by default.
 
 ::::{warning}
 Enabling fingerprint mode delays ingesting new files until they grow to at least `offset`+`length` bytes in size, so they can be fingerprinted. Until then these files are ignored.

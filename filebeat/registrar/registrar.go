@@ -67,19 +67,19 @@ const fileStatePrefix = "filebeat::logs::"
 
 // New creates a new Registrar instance, updating the registry file on
 // `file.State` updates. New fails if the file can not be opened or created.
-func New(stateStore statestore.States, out successLogger, flushTimeout time.Duration) (*Registrar, error) {
+func New(stateStore statestore.States, out successLogger, flushTimeout time.Duration, logger *logp.Logger) (*Registrar, error) {
 	store, err := stateStore.StoreFor("")
 	if err != nil {
 		return nil, err
 	}
 
 	r := &Registrar{
-		log:          logp.NewLogger("registrar"),
+		log:          logger.Named("registrar"),
 		Channel:      make(chan []file.State, 1),
 		out:          out,
 		done:         make(chan struct{}),
 		wg:           sync.WaitGroup{},
-		states:       file.NewStates(),
+		states:       file.NewStates(logger),
 		store:        store,
 		flushTimeout: flushTimeout,
 	}
@@ -94,7 +94,7 @@ func (r *Registrar) GetStates() []file.State {
 // loadStates fetches the previous reading state from the configure RegistryFile file
 // The default file is `registry` in the data path.
 func (r *Registrar) loadStates() error {
-	states, err := readStatesFrom(r.store)
+	states, err := readStatesFrom(r.store, r.log)
 	if err != nil {
 		return fmt.Errorf("can not load filebeat registry state: %w", err)
 	}
@@ -263,7 +263,7 @@ func (r *Registrar) processEventStates(states []file.State) {
 	}
 }
 
-func readStatesFrom(store *statestore.Store) ([]file.State, error) {
+func readStatesFrom(store *statestore.Store, logger *logp.Logger) ([]file.State, error) {
 	var states []file.State
 
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
@@ -288,7 +288,7 @@ func readStatesFrom(store *statestore.Store) ([]file.State, error) {
 		return nil, err
 	}
 
-	states = fixStates(states)
+	states = fixStates(states, logger)
 	states = resetStates(states)
 	return states, nil
 }

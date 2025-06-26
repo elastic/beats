@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Provider for autodiscover
@@ -35,7 +36,7 @@ type Provider interface {
 }
 
 // ProviderBuilder creates a new provider based on the given config and returns it
-type ProviderBuilder func(string, bus.Bus, uuid.UUID, *config.C, keystore.Keystore) (Provider, error)
+type ProviderBuilder func(string, bus.Bus, uuid.UUID, *config.C, keystore.Keystore, *logp.Logger) (Provider, error)
 
 // AddProvider registers a new ProviderBuilder
 func (r *registry) AddProvider(name string, provider ProviderBuilder) error {
@@ -87,5 +88,5 @@ func (r *registry) BuildProvider(beatName string, bus bus.Bus, c *config.C, keys
 		return nil, err
 	}
 
-	return builder(beatName, bus, uuid, c, keystore)
+	return builder(beatName, bus, uuid, c, keystore, r.logger)
 }

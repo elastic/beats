@@ -3,12 +3,13 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-cyberarkpas.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # CyberArk PAS fields [exported-fields-cyberarkpas]
 
 cyberarkpas fields.
 
-
-## audit [_audit_2]
+## audit [_audit]
 
 Cyberark Privileged Access Security Audit fields.
 
@@ -16,7 +17,6 @@ Cyberark Privileged Access Security Audit fields.
 :   A description of the audit record.
 
 type: keyword
-
 
 
 ## ca_properties [_ca_properties]
@@ -149,7 +149,6 @@ type: keyword
 :   A static value that displays a description of the audit codes.
 
 type: keyword
-
 
 
 ## extra_details [_extra_details]

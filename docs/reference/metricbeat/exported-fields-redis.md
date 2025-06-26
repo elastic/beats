@@ -3,20 +3,19 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-redis.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Redis fields [exported-fields-redis]
 
 Redis metrics collected from Redis.
-
 
 ## redis [_redis]
 
 `redis` contains the information and statistics from Redis.
 
-
-## info [_info_6]
+## info [_info]
 
 `info` contains the information and statistics returned by the `INFO` command.
-
 
 ## clients [_clients]
 
@@ -46,8 +45,7 @@ type: long
 type: long
 
 
-
-## cluster [_cluster_3]
+## cluster [_cluster]
 
 Redis cluster information.
 
@@ -57,8 +55,7 @@ Redis cluster information.
 type: boolean
 
 
-
-## cpu [_cpu_10]
+## cpu [_cpu]
 
 Redis CPU stats
 
@@ -86,8 +83,7 @@ type: scaled_float
 type: scaled_float
 
 
-
-## memory [_memory_10]
+## memory [_memory]
 
 Redis memory stats.
 
@@ -223,7 +219,6 @@ type: long
 format: bytes
 
 
-
 ## persistence [_persistence]
 
 Redis CPU stats.
@@ -232,7 +227,6 @@ Redis CPU stats.
 :   Flag indicating if the load of a dump file is on-going
 
 type: boolean
-
 
 
 ## rdb [_rdb]
@@ -285,7 +279,6 @@ format: duration
 type: long
 
 format: bytes
-
 
 
 ## aof [_aof]
@@ -390,8 +383,7 @@ type: long
 type: long
 
 
-
-## replication [_replication_2]
+## replication [_replication]
 
 Replication
 
@@ -434,7 +426,7 @@ type: long
 
 
 **`redis.info.replication.master.offset`**
-:   The server’s current replication offset
+:   The server's current replication offset
 
 type: long
 
@@ -499,8 +491,7 @@ type: long
 type: boolean
 
 
-
-## server [_server_9]
+## server [_server]
 
 Server info
 
@@ -606,8 +597,7 @@ type: long
 type: keyword
 
 
-
-## stats [_stats_10]
+## stats [_stats]
 
 Redis stats.
 
@@ -648,13 +638,13 @@ type: long
 
 
 **`redis.info.stats.instantaneous.input_kbps`**
-:   The network’s read rate per second in KB/sec
+:   The network's read rate per second in KB/sec
 
 type: scaled_float
 
 
 **`redis.info.stats.instantaneous.output_kbps`**
-:   The network’s write rate per second in KB/sec
+:   The network's write rate per second in KB/sec
 
 type: scaled_float
 
@@ -761,7 +751,6 @@ type: long
 type: long
 
 
-
 ## commandstats [_commandstats]
 
 Redis command statistics
@@ -796,8 +785,7 @@ type: long
 type: long
 
 
-
-## key [_key_2]
+## key [_key]
 
 `key` contains information about keys.
 
@@ -829,7 +817,6 @@ type: long
 :   Seconds to expire.
 
 type: long
-
 
 
 ## keyspace [_keyspace]

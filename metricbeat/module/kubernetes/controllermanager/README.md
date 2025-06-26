@@ -101,7 +101,7 @@ Save the metrics output from `https://localhost:10257/metrics` to a new `_meta/t
 curl -k https://localhost:10257/metrics > _meta/test/metrics.x.xx
 ```
 
-After that, you need to add the new expectation file to `controllermanager_test.go` and then run the following commands to generate and test the expected files:
+Run the following commands to generate and test the expected files:
 
 ```bash
 cd metricbeat/module/kubernetes/controllermanager

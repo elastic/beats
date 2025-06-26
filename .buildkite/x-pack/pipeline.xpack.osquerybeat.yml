@@ -25,11 +25,6 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
-  # Concurrency definition
-  CONCURRENCY_GROUP: "orka-concurrency-group"
-  CONCURRENCY_COUNT: 10
-  CONCURRENCY_METHOD: eager
-
 steps:
   - group: "Check/Update"
     key: "x-pack-osquerybeat-check-update"
@@ -93,7 +88,6 @@ steps:
               context: "x-pack/osquerybeat: Ubuntu x86_64 Unit Tests"
 
       - label: ":ubuntu: x-pack/osquerybeat: Go Integration Tests"
-        key: "mandatory-int-test"
         command: |
           cd x-pack/osquerybeat
           mage goIntegTest
@@ -112,7 +106,28 @@ steps:
           - "x-pack/osquerybeat/build/integration-tests/Test*/data/**/*"
         notify:
           - github_commit_status:
-              context: "x-pack/osquerybeat: Go Integration Tests"
+              context: "x-pack/osquerybeat: Go Integration Tests / Ubuntu x86_64"
+
+      - label: ":windows: x-pack/osquerybeat: Go Integration Tests"
+        command: |
+          cd x-pack/osquerybeat
+          mage goIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/osquerybeat/build/*.xml"
+          - "x-pack/osquerybeat/build/*.json"
+          - "x-pack/osquerybeat/build/integration-tests/*"
+          - "x-pack/osquerybeat/build/integration-tests/Test*/*"
+          - "x-pack/osquerybeat/build/integration-tests/Test*/data/**/*"
+        notify:
+          - github_commit_status:
+              context: "x-pack/osquerybeat: Go Integration Tests / Windows"
 
       - label: ":windows: x-pack/osquerybeat: Win 2016 Unit Tests"
         command: |

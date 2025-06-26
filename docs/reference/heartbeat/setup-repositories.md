@@ -31,17 +31,17 @@ To add the Beats repository for APT:
     sudo apt-get install apt-transport-https
     ```
 
-3. Save the repository definition to _/etc/apt/sources.list.d/elastic-{{major-version}}.list_:
+3. Save the repository definition to _/etc/apt/sources.list.d/elastic-{{major-release}}.list_:
 
     ```shell subs=true
-    echo "deb https://artifacts.elastic.co/packages/{{major-version}}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{major-version}}.list
+    echo "deb https://artifacts.elastic.co/packages/{{major-release}}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{major-release}}.list
     ```
 
     :::{note}
     The package is free to use under the Elastic license. An alternative package which contains only features that are available under the Apache 2.0 license is also available. To install it, use the following sources list:
 
     ```shell subs=true
-    echo "deb https://artifacts.elastic.co/packages/oss-{{major-version}}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{major-version}}.list
+    echo "deb https://artifacts.elastic.co/packages/oss-{{major-release}}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{major-release}}.list
     ```
     :::
 
@@ -58,13 +58,13 @@ To add the Beats repository for APT:
 4.  Run `apt-get update`, and the repository is ready for use. For example, you can install Heartbeat by running:
 
     ```shell
-    sudo apt-get update && sudo apt-get install heartbeat
+    sudo apt-get update && sudo apt-get install heartbeat-elastic
     ```
 
 5. To configure Heartbeat to start automatically during boot, run:
 
     ```
-    sudo systemctl enable heartbeat
+    sudo systemctl enable heartbeat-elastic
     ```
 
 
@@ -104,13 +104,13 @@ To add the Beats repository for YUM:
     Your repository is ready to use. For example, you can install Heartbeat by running:
 
     ```shell subs=true
-    sudo yum install heartbeat
+    sudo yum install heartbeat-elastic
     ```
 
 4. To configure Heartbeat to start automatically during boot, run:
 
     ```
-    sudo systemctl enable heartbeat
+    sudo systemctl enable heartbeat-elastic
     ```
 
 

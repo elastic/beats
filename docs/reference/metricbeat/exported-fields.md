@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+                 
 # Exported fields [exported-fields]
 
 This document describes the fields that are exported by Metricbeat. They are grouped in the following categories:
@@ -11,6 +13,7 @@ This document describes the fields that are exported by Metricbeat. They are gro
 * [*Aerospike fields*](/reference/metricbeat/exported-fields-aerospike.md)
 * [*Airflow fields*](/reference/metricbeat/exported-fields-airflow.md)
 * [*Apache fields*](/reference/metricbeat/exported-fields-apache.md)
+* [*AutoOps ES fields*](/reference/metricbeat/exported-fields-autoops_es.md)
 * [*AWS fields*](/reference/metricbeat/exported-fields-aws.md)
 * [*AWS Fargate fields*](/reference/metricbeat/exported-fields-awsfargate.md)
 * [*Azure fields*](/reference/metricbeat/exported-fields-azure.md)
@@ -53,7 +56,7 @@ This document describes the fields that are exported by Metricbeat. They are gro
 * [*Linux fields*](/reference/metricbeat/exported-fields-linux.md)
 * [*Logstash fields*](/reference/metricbeat/exported-fields-logstash.md)
 * [*Memcached fields*](/reference/metricbeat/exported-fields-memcached.md)
-* [Memcached fields](/reference/metricbeat/exported-fields-memcached.md#exported-fields-meraki)
+* [*Cisco Meraki fields*](/reference/metricbeat/exported-fields-meraki.md)
 * [*MongoDB fields*](/reference/metricbeat/exported-fields-mongodb.md)
 * [*MSSQL fields*](/reference/metricbeat/exported-fields-mssql.md)
 * [*Munin fields*](/reference/metricbeat/exported-fields-munin.md)
@@ -83,4 +86,3 @@ This document describes the fields that are exported by Metricbeat. They are gro
 * [*vSphere fields*](/reference/metricbeat/exported-fields-vsphere.md)
 * [*Windows fields*](/reference/metricbeat/exported-fields-windows.md)
 * [*ZooKeeper fields*](/reference/metricbeat/exported-fields-zookeeper.md)
-

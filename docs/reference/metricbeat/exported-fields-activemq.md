@@ -3,12 +3,14 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-activemq.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # ActiveMQ fields [exported-fields-activemq]
 
 activemq module
 
-
 ## activemq [_activemq]
+
 
 
 ## broker [_broker]
@@ -87,10 +89,9 @@ type: long
 type: long
 
 
+## queue [_queue]
 
-## queue [_queue_7]
-
-Queue metrics from org.apache.activemq:brokerName=**,destinationName=**,destinationType=Queue,type=Broker
+Queue metrics from org.apache.activemq:brokerName=*,destinationName=*,destinationType=Queue,type=Broker
 
 **`activemq.queue.mbean`**
 :   Mbean that this event is related to
@@ -184,10 +185,9 @@ type: long
 type: long
 
 
-
 ## topic [_topic]
 
-Topic metrics from org.apache.activemq:brokerName=**,destinationName=**,destinationType=Topic,type=Broker
+Topic metrics from org.apache.activemq:brokerName=*,destinationName=*,destinationType=Topic,type=Broker
 
 **`activemq.topic.mbean`**
 :   Mbean that this event is related to

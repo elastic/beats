@@ -21,7 +21,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
@@ -30,7 +30,7 @@ import (
 )
 
 func TestRenameRun(t *testing.T) {
-	log := logp.NewLogger("rename_test")
+	log := logptest.NewTestingLogger(t, "rename_test")
 	var tests = []struct {
 		description   string
 		Fields        []fromTo

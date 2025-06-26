@@ -1,0 +1,22 @@
+{
+    "name": "$name",
+    "index_template": {
+        "index_patterns": ["$name"],
+        "template": {
+            "settings": {
+                "index": {
+                    "lifecycle": {
+                        "name": "my-lifecycle"
+                    }
+                }
+            }
+        },
+        "composed_of": ["composed-1", "composed-2"],
+        "priority": 1,
+        "data_stream": {
+            "hidden": false,
+            "allow_custom_routing": false
+        },
+        "ignored_field": {}
+    }
+}

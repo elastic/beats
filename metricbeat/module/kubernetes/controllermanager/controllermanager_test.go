@@ -28,18 +28,9 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
-var files = []string{
-	"./_meta/test/metrics.1.28",
-	"./_meta/test/metrics.1.29",
-	"./_meta/test/metrics.1.30",
-	"./_meta/test/metrics.1.31",
-	"./_meta/test/metrics.1.32",
-	"./_meta/test/metrics.1.33",
-}
-
 func TestEventMapping(t *testing.T) {
 	var testCases ptest.TestCases
-	for _, file := range files {
+	for _, file := range k.GetMetricInputFiles(t, ".") {
 		testCases = append(testCases, ptest.TestCase{
 			MetricsFile:  file,
 			ExpectedFile: file + ".expected",
@@ -53,5 +44,5 @@ func TestData(t *testing.T) {
 }
 
 func TestMetricsFamily(t *testing.T) {
-	k.TestMetricsFamilyFromFiles(t, files, mapping)
+	k.TestMetricsFamilyFromFiles(t, k.GetMetricInputFiles(t, "."), mapping)
 }
