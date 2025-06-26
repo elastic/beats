@@ -44,28 +44,35 @@ fail, Metricbeat has a timeout mechanism that stops waiting for query
 results after a specified timeout. This is controlled by the
 `wmi.warning_threshold` setting.
 
+::::{note}
 While Metricbeat stops waiting for the result, the underlying WMI query
 may continue running until the WMI Arbitrator decides to stop execution.
+::::
 
 ## WMI Type support
 
 The `microsoft/wmi` library internally uses the WMI Scripting API. This API, as per the
 [official WMI Documentation](https://learn.microsoft.com/en-us/windows/win32/wmisdk/querying-wmi),
-does not provide direct type conversion for `uint64`, `sint64`, and `datetime` CIM types;
+does not provide direct type conversion for `uint64`, `sint64`, and `datetime`
+[Common Information Model](https://learn.microsoft.com/en-us/windows/win32/wmisdk/common-information-model) (CIM) types;
 instead, these values are returned as strings.
 
 To ensure the correct data type is reported, Metricbeat dynamically fetches the
-CIM type definitions for the properties of the WMI instance classes involved in the query,
+CIM type definitions for the properties of the WMI instance classes returned by the query,
 and then performs the necessary data type conversions.
 
 To optimize performance and avoid repeatedly fetching these schema definitions
 for every row and every request, an LRU cache is utilized. This cache stores
-the schema definition for each unique WMI class encountered. For queries involving
+the schema definition for each WMI class, property pair encountered. For queries involving
 superclasses, such as `CIM_LogicalDevice`, the cache will populate with individual entries
 for each specific derived class (leaf of the class hierarchy) whose instances are returned by the query (for example, `Win32_DiskDrive` or `Win32_NetworkAdapter`).
 
 ::::{note}
 The properties of type `CIM_Object` (embedded objects) are not yet supported and are ignored.
+::::
+
+::::{info}
+The properties of type `CIM_Reference` (references) used in [WMI Association Classes](https://learn.microsoft.com/en-us/windows/win32/wmisdk/declaring-an-association-class) are currently returned as strings as reported by the microsoft/wmi library.
 ::::
 
 ## Configuration
@@ -97,7 +104,7 @@ The properties of type `CIM_Object` (embedded objects) are not yet supported and
 
 **`wmi.namespace`**
 :   The default WMI namespace used for queries. This can be overridden per
-query. The default is `root\cimv2`.
+query. The default is `"root\\cimv2"`.
 
 **`wmi.warning_threshold`**
 :   The time threshold after which Metricbeat will stop waiting for the
@@ -128,9 +135,8 @@ The default value is `0`, which is a special value indicating that all fetched
 results should be returned without a row limit.
 
 **`wmi.schema_cache_size`**
-:   The maximum number of WMI class definitions that can be cached per single query. Every query keeps its own separate cache.  This cache helps improve performance when dealing with queries that involve inheritance hierarchies. Read more in [WMI Type Support](#wmi-type-support).
-For example, if a superclass is queried, the cache
-might store all its derived classes (leaves of the class hierarchy) to optimize subsequent operations.
+:   The maximum number of WMI class x properties pairs that can be cached per single query. Every query keeps its own separate cache.  This cache helps improve performance when dealing with queries that involve inheritance hierarchies. Read more in [WMI Type Support](#wmi-type-support). For example, if a superclass is queried, the cache
+might store one entry for each WMI concrete instance class (leaves of the class hierarchy) and properties to optimize subsequent operations.
 The default value is `1000`.
 
 **`wmi.queries`**
