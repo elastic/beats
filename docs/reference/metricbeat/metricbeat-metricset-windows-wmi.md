@@ -20,11 +20,13 @@ namespaces.
 Currently, the metricset supports queries with `SELECT`, `FROM` and
 `WHERE` clauses.
 
+::::{warning}
 When working with WMI queries, it is the user’s responsibility to ensure
 that queries are safe, efficient, and do not cause unintended side
 effects. A notorious example of a problematic WMI class is
 `Win32_Product`. Read more in [Windows
-Documentation](https://support.microsoft.com/kb/974524).
+Documentation](https://learn.microsoft.com/en-us/troubleshoot/windows-server/admin-development/windows-installer-reconfigured-all-applications#more-information).
+::::
 
 ## WMI Arbitrator and Query Execution
 
