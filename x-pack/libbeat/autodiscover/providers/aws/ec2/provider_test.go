@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -35,7 +36,7 @@ func Test_internalBuilder(t *testing.T) {
 
 	uuid, _ := uuid.NewV4()
 	k, _ := keystore.NewFileKeystore("test")
-	provider, err := internalBuilder(uuid, pBus, cfg, fetcher, k)
+	provider, err := internalBuilder(uuid, pBus, cfg, fetcher, k, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	startListener := pBus.Subscribe("start")

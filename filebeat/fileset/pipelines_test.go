@@ -99,7 +99,7 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 				Transport: httpcommon.HTTPTransportSettings{
 					Timeout: 90 * time.Second,
 				},
-			})
+			}, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			ctx, cancel := context.WithCancel(context.Background())
