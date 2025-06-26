@@ -20,9 +20,10 @@
 package index_summary
 
 import (
-	"io/ioutil"
+	"github.com/elastic/elastic-agent-libs/version"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -48,7 +49,7 @@ func createEsMuxer(license string) *http.ServeMux {
 			http.NotFound(w, r)
 		}
 
-		input, _ := ioutil.ReadFile("../index/_meta/test/root.710.json")
+		input, _ := os.ReadFile("../index/_meta/test/root.710.json")
 		w.Write(input)
 	}
 	licenseHandler := func(w http.ResponseWriter, r *http.Request) {
@@ -62,11 +63,42 @@ func createEsMuxer(license string) *http.ServeMux {
 	mux.Handle("/_xpack/license", http.HandlerFunc(licenseHandler)) // for before 7.0
 	mux.Handle("/", http.HandlerFunc(rootHandler))
 	mux.Handle("/_stats", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		content, _ := ioutil.ReadFile("../index/_meta/test/stats.700-alpha1.json")
+		content, _ := os.ReadFile("../index/_meta/test/stats.700-alpha1.json")
 		w.Write(content)
 	}))
 
 	return mux
+}
+
+func TestGetServicePath(t *testing.T) {
+	tests := []struct {
+		name         string
+		version      version.V
+		expectedPath string
+	}{
+		{
+			name:         "version < BulkStatsAvailableVersion",
+			version:      version.V{Major: 7, Minor: 9, Bugfix: 0},
+			expectedPath: "/_stats?level=cluster",
+		},
+		{
+			name:         "version >= BulkStatsAvailableVersion",
+			version:      version.V{Major: 8, Minor: 17, Bugfix: 0},
+			expectedPath: "/_stats?level=cluster&forbid_closed_indices=false",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			path, err := getServicePath(tt.version)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if path != tt.expectedPath {
+				t.Errorf("expected path %q, got %q", tt.expectedPath, path)
+			}
+		})
+	}
 }
 
 func TestData(t *testing.T) {
@@ -85,8 +117,38 @@ func TestMapper(t *testing.T) {
 	elasticsearch.TestMapperWithInfo(t, "../index/_meta/test/stats.*.json", eventMapping)
 }
 
+func TestMapperWithExpectedEventsV817(t *testing.T) {
+	elasticsearch.TestMapperWithExpectedEvents(
+		t,
+		"../index/_meta/test/stats.8.17.0.json",
+		[]string{
+			"_meta/test/expected_event_8.17.json",
+		},
+		elasticsearch.Info{
+			ClusterID:   "1234",
+			ClusterName: "helloworld",
+		},
+		eventMapping,
+	)
+}
+
+func TestMapperWithExpectedEventsV717(t *testing.T) {
+	elasticsearch.TestMapperWithExpectedEvents(
+		t,
+		"../index/_meta/test/stats.7.17.27.json",
+		[]string{
+			"_meta/test/expected_event_7.17.json",
+		},
+		elasticsearch.Info{
+			ClusterID:   "1234",
+			ClusterName: "helloworld",
+		},
+		eventMapping,
+	)
+}
+
 func TestEmpty(t *testing.T) {
-	input, err := ioutil.ReadFile("../index/_meta/test/empty.512.json")
+	input, err := os.ReadFile("../index/_meta/test/empty.512.json")
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
