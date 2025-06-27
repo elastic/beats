@@ -3,7 +3,9 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-cyberarkpas.html
 ---
 
-# Cyberark PAS module [filebeat-module-cyberarkpas]
+% This file is generated! See scripts/docs_collector.py
+
+# CyberArk PAS module [filebeat-module-cyberarkpas]
 
 ::::{warning}
 This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
@@ -167,7 +169,6 @@ This module comes with a sample dashboard:
 % TO DO: Use `:class: screenshot`
 ![filebeat cyberarkpas overview](images/filebeat-cyberarkpas-overview.png)
 
-
-## Fields [_fields_14]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-cyberarkpas.md) section.
