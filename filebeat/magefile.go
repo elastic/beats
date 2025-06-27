@@ -196,6 +196,7 @@ func IntegTest() {
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
+	mg.Deps(Build())
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
 }
 
