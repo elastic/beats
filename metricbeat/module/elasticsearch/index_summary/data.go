@@ -20,7 +20,6 @@ package index_summary
 import (
 	"encoding/json"
 	"fmt"
-
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -93,6 +92,129 @@ var bulkStatsDict = c.Dict("bulk", s.Schema{
 	},
 }, c.DictOptional)
 
+type nodeStatsWrapper struct {
+	Nodes map[string]interface{} `json:"nodes"`
+}
+
+var nodeItemSchema = s.Schema{
+	"indices": c.Dict("indices", s.Schema{
+		"docs": c.Dict("docs", s.Schema{
+			"count":   c.Int("count"),
+			"deleted": c.Int("deleted"),
+		}),
+		"store": c.Dict("store", s.Schema{
+			"size": s.Object{
+				"bytes": c.Int("size_in_bytes"),
+			},
+			"total_data_set_size": s.Object{
+				"bytes": c.Int("total_data_set_size_in_bytes"),
+			},
+		}),
+		"indexing": c.Dict("indexing", s.Schema{
+			"index": s.Object{
+				"count": c.Int("index_total"),
+				"time": s.Object{
+					"ms": c.Int("index_time_in_millis"),
+				},
+			},
+		}),
+		"search": c.Dict("search", s.Schema{
+			"query": s.Object{
+				"count": c.Int("query_total"),
+				"time": s.Object{
+					"ms": c.Int("query_time_in_millis"),
+				},
+			},
+		}),
+		"segments": c.Dict("segments", s.Schema{
+			"count": c.Int("count"),
+			"memory": s.Object{
+				"bytes": c.Int("memory_in_bytes"),
+			},
+		}),
+		"bulk": c.Dict("bulk", s.Schema{
+			"operations": s.Object{
+				"count": c.Int("total_operations"),
+			},
+			"time": s.Object{
+				"avg": s.Object{
+					"bytes": c.Int("avg_size_in_bytes"),
+				},
+			},
+			"size": s.Object{
+				"bytes": c.Int("total_size_in_bytes"),
+			},
+		}, c.DictOptional),
+	}),
+}
+
+type IndexSummaryMetricSet struct {
+	Primaries IndexSummary `json:"primaries"`
+	Total     IndexSummary `json:"total"`
+}
+
+type IndexSummary struct {
+	Docs     DocsSection     `json:"docs"`
+	Store    StoreSection    `json:"store"`
+	Indexing IndexingSection `json:"indexing"`
+	Search   SearchSection   `json:"search"`
+	Segments SegmentSection  `json:"segments"`
+	Bulk     BulkSection     `json:"bulk"`
+}
+
+type DocsSection struct {
+	Count   int64 `json:"count"`
+	Deleted int64 `json:"deleted"`
+}
+
+type StoreSection struct {
+	Size struct {
+		Bytes int64 `json:"bytes"`
+	} `json:"size"`
+	TotalDataSetSize struct {
+		Bytes int64 `json:"bytes"`
+	} `json:"total_data_set_size"`
+}
+
+type IndexingSection struct {
+	Index struct {
+		Count int64 `json:"count"`
+		Time  struct {
+			Ms int64 `json:"ms"`
+		} `json:"time"`
+	} `json:"index"`
+}
+
+type SearchSection struct {
+	Query struct {
+		Count int64 `json:"count"`
+		Time  struct {
+			Ms int64 `json:"ms"`
+		} `json:"time"`
+	} `json:"query"`
+}
+
+type SegmentSection struct {
+	Count  int64 `json:"count"`
+	Memory struct {
+		Bytes int64 `json:"bytes"`
+	} `json:"memory"`
+}
+
+type BulkSection struct {
+	Operations struct {
+		Count int64 `json:"count"`
+	} `json:"operations"`
+	Time struct {
+		Avg struct {
+			Bytes int64 `json:"bytes"`
+		} `json:"avg"`
+	} `json:"time"`
+	Size struct {
+		Bytes int64 `json:"bytes"`
+	} `json:"size"`
+}
+
 func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
 	var all struct {
 		Data map[string]interface{} `json:"_all"`
@@ -121,6 +243,97 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXp
 	// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
 	// When using Agent, the index name is overwritten anyways.
 	if isXpack {
+		index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+		event.Index = index
+	}
+
+	r.Event(event)
+
+	return nil
+}
+
+func eventMappingNewEndpoint(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXPack bool) error {
+	var nodesWrapper nodeStatsWrapper
+
+	err := json.Unmarshal(content, &nodesWrapper)
+	if err != nil {
+		return fmt.Errorf("failure parsing Elasticsearch NodeStats API response: %w", err)
+	}
+
+	if len(nodesWrapper.Nodes) == 0 {
+		return fmt.Errorf("no nodes found in NodeStats response")
+	}
+
+	var aggregations IndexSummary
+
+	for _, rawNode := range nodesWrapper.Nodes {
+		validated, err := nodeItemSchema.Apply(rawNode.(map[string]interface{}), s.FailOnRequired)
+		if err != nil {
+			return fmt.Errorf("schema validation failed for node: %w", err)
+		}
+
+		indices := validated["indices"].(mapstr.M)
+
+		// Docs
+		docs := indices["docs"].(mapstr.M)
+		aggregations.Docs.Count += docs["count"].(int64)
+		aggregations.Docs.Deleted += docs["deleted"].(int64)
+
+		// Store
+		store := indices["store"].(mapstr.M)
+		size := store["size"].(mapstr.M)
+		aggregations.Store.Size.Bytes += size["bytes"].(int64)
+
+		if tds, ok := store["total_data_set_size"].(mapstr.M); ok {
+			aggregations.Store.TotalDataSetSize.Bytes += tds["bytes"].(int64)
+		}
+
+		// Indexing
+		indexing := indices["indexing"].(mapstr.M)
+		index := indexing["index"].(mapstr.M)
+		aggregations.Indexing.Index.Count += index["count"].(int64)
+		aggregations.Indexing.Index.Time.Ms += index["time"].(mapstr.M)["ms"].(int64)
+
+		// Search
+		search := indices["search"].(mapstr.M)
+		query := search["query"].(mapstr.M)
+		aggregations.Search.Query.Count += query["count"].(int64)
+		aggregations.Search.Query.Time.Ms += query["time"].(mapstr.M)["ms"].(int64)
+
+		// Segments
+		segments := indices["segments"].(mapstr.M)
+		aggregations.Segments.Count += segments["count"].(int64)
+		aggregations.Segments.Memory.Bytes += segments["memory"].(mapstr.M)["bytes"].(int64)
+
+		// Bulk (optional)
+		bulkRaw, exists := indices["bulk"].(mapstr.M)
+		if exists {
+			aggregations.Bulk.Operations.Count += bulkRaw["operations"].(mapstr.M)["count"].(int64)
+
+			bulkTime := bulkRaw["time"].(mapstr.M)
+			aggregations.Bulk.Time.Avg.Bytes += bulkTime["avg"].(mapstr.M)["bytes"].(int64)
+
+			bulkSize := bulkRaw["size"].(mapstr.M)
+			aggregations.Bulk.Size.Bytes += bulkSize["bytes"].(int64)
+		}
+	}
+
+	eventNew := map[string]interface{}{
+		"primaries": aggregations,
+		"total":     aggregations,
+	}
+
+	var event mb.Event
+	event.RootFields = mapstr.M{}
+	_, _ = event.RootFields.Put("service.name", elasticsearch.ModuleName)
+
+	event.ModuleFields = mapstr.M{}
+	_, _ = event.ModuleFields.Put("cluster.name", info.ClusterName)
+	_, _ = event.ModuleFields.Put("cluster.id", info.ClusterID)
+
+	event.MetricSetFields = eventNew
+
+	if isXPack {
 		index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 		event.Index = index
 	}

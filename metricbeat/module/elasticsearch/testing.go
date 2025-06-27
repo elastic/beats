@@ -23,7 +23,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -47,7 +46,7 @@ func TestMapper(t *testing.T, glob string, mapper func(mb.ReporterV2, []byte) er
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			input, err := ioutil.ReadFile(f)
+			input, err := os.ReadFile(f)
 			require.NoError(t, err)
 
 			reporter := &mbtest.CapturingReporterV2{}
@@ -92,13 +91,14 @@ func TestMapperWithExpectedEvents(
 	inputPath string,
 	expectedFiles []string,
 	info Info,
+	isXPack bool,
 	mapper func(mb.ReporterV2, Info, []byte, bool) error,
 ) {
 	input, err := os.ReadFile(inputPath)
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = mapper(reporter, info, input, true)
+	err = mapper(reporter, info, input, isXPack)
 	require.NoError(t, err)
 
 	events := reporter.GetEvents()
@@ -107,7 +107,6 @@ func TestMapperWithExpectedEvents(
 	require.Equal(t, len(expected), len(events), "Number of events mismatch")
 
 	for i, ev := range events {
-
 		actualBytes, err := json.Marshal(ev)
 		require.NoError(t, err)
 
@@ -180,7 +179,7 @@ func TestMapperWithHttpHelper(t *testing.T, glob string, httpClient *helper.HTTP
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			input, err := ioutil.ReadFile(f)
+			input, err := os.ReadFile(f)
 			require.NoError(t, err)
 
 			reporter := &mbtest.CapturingReporterV2{}

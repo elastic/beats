@@ -117,6 +117,70 @@ func TestMapper(t *testing.T) {
 	elasticsearch.TestMapperWithInfo(t, "../index/_meta/test/stats.*.json", eventMapping)
 }
 
+func TestSummaryFromNodeStatsWithExpectedEventsV817(t *testing.T) {
+	elasticsearch.TestMapperWithExpectedEvents(
+		t,
+		"_meta/test/node_stats_v817.json",
+		[]string{
+			"_meta/test/expected_event_8.17_v2.json",
+		},
+		elasticsearch.Info{
+			ClusterID:   "1234",
+			ClusterName: "helloworld",
+		},
+		true,
+		eventMappingNewEndpoint,
+	)
+}
+
+func TestSummaryFromNodeStatsWithExpectedEventsV717(t *testing.T) {
+	elasticsearch.TestMapperWithExpectedEvents(
+		t,
+		"_meta/test/node_stats_v717.json",
+		[]string{
+			"_meta/test/expected_event_7.17_v2.json",
+		},
+		elasticsearch.Info{
+			ClusterID:   "1234",
+			ClusterName: "helloworld",
+		},
+		true,
+		eventMappingNewEndpoint,
+	)
+}
+
+func TestSummaryFromNodeStatsWithExpectedEventsXPackV817(t *testing.T) {
+	elasticsearch.TestMapperWithExpectedEvents(
+		t,
+		"_meta/test/node_stats_v817.json",
+		[]string{
+			"_meta/test/expected_event_xpack_8.17_v2.json",
+		},
+		elasticsearch.Info{
+			ClusterID:   "1234",
+			ClusterName: "helloworld",
+		},
+		false,
+		eventMappingNewEndpoint,
+	)
+}
+
+func TestSummaryFromNodeStatsWithExpectedEventsXPackV717(t *testing.T) {
+	elasticsearch.TestMapperWithExpectedEvents(
+		t,
+		"_meta/test/node_stats_v717.json",
+		[]string{
+			"_meta/test/expected_event_xpack_7.17_v2.json",
+		},
+		elasticsearch.Info{
+			ClusterID:   "1234",
+			ClusterName: "helloworld",
+		},
+		false,
+		eventMappingNewEndpoint,
+	)
+}
+
 func TestMapperWithExpectedEventsV817(t *testing.T) {
 	elasticsearch.TestMapperWithExpectedEvents(
 		t,
@@ -128,6 +192,7 @@ func TestMapperWithExpectedEventsV817(t *testing.T) {
 			ClusterID:   "1234",
 			ClusterName: "helloworld",
 		},
+		true,
 		eventMapping,
 	)
 }
@@ -143,6 +208,7 @@ func TestMapperWithExpectedEventsV717(t *testing.T) {
 			ClusterID:   "1234",
 			ClusterName: "helloworld",
 		},
+		true,
 		eventMapping,
 	)
 }
