@@ -87,6 +87,7 @@ updates:
 
   # Team:obs-infraobs-integrations only
   - package-ecosystem: gomod
+    target-branch: main # workaround to "Update configs must have a unique combination of 'package-ecosystem', 'directory', and 'target-branch'". See: https://github.com/dependabot/dependabot-core/issues/1778#issuecomment-1988140219
     directory: /
     schedule:
       interval: weekly
