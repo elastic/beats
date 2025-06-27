@@ -173,3 +173,7 @@ func runSimpleCommand(cmd *exec.Cmd, dir string) error {
 	logp.L().Infof("Ran %s (%d) got '%s': (%s) as (%d/%d)", cmd, cmd.ProcessState.ExitCode(), string(output), err, syscall.Getuid(), syscall.Geteuid())
 	return err
 }
+
+func (p *ProjectSource) Decode() error {
+	return nil
+}

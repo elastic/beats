@@ -44,6 +44,10 @@ func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
 	if err != nil {
 		return nil, ErrBadConfig(err)
 	}
+	err = s.browserCfg.Source.Active().Decode()
+	if err != nil {
+		return nil, ErrBadConfig(err)
+	}
 
 	return s, nil
 }
@@ -54,6 +58,10 @@ func ErrBadConfig(err error) error {
 
 func (sj *SourceJob) String() string {
 	panic("implement me")
+}
+
+func (sj *SourceJob) Decode() error {
+	return sj.browserCfg.Source.Active().Decode()
 }
 
 func (sj *SourceJob) Fetch() error {
