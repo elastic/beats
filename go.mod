@@ -222,6 +222,7 @@ require (
 	go.opentelemetry.io/collector/component/componentstatus v0.127.0
 	go.opentelemetry.io/collector/config/configtls v1.33.0
 	go.opentelemetry.io/collector/confmap v1.33.0
+	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.33.0
 	go.opentelemetry.io/collector/consumer v1.33.0
 	go.opentelemetry.io/collector/consumer/consumererror v0.127.0
 	go.opentelemetry.io/collector/exporter/debugexporter v0.127.0

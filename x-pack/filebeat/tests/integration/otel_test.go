@@ -188,3 +188,130 @@ func assertMonitoring(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }
+
+func TestFilebeatReceiverE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+	numEvents := 1
+
+	// start filebeat in otel mode
+	filebeatOTel := integration.NewBeat(
+		t,
+		"filebeat-otel",
+		"../../filebeat.test",
+		"otel",
+	)
+
+	logFilePath := filepath.Join(filebeatOTel.TempDir(), "log.log")
+	cfg := `receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-fbreceiver
+          enabled: true
+          paths:
+            - %s
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    output:
+      otelconsumer:
+    logging:
+      level: info
+      selectors:
+        - '*'
+    queue.mem.flush.timeout: 0s
+    http.enabled: true
+    http.host: localhost
+    http.port: %d
+exporters:
+  debug:
+    use_internal_logger: false
+    verbosity: detailed
+  elasticsearch/log:
+    endpoints:
+      - http://localhost:9200
+    compression: none
+    user: admin
+    password: testing
+    logs_index: %s
+    batcher:
+      enabled: true
+      flush_timeout: 1s
+    mapping:
+      mode: bodymap
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - elasticsearch/log
+        - debug
+`
+	filebeatOTel.WriteConfigFile(fmt.Sprintf(cfg, logFilePath, 5066, "logs-integration-default"))
+	writeEventsToLogFile(t, logFilePath, numEvents)
+	filebeatOTel.Start()
+
+	// start filebeat
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	logFilePath = filepath.Join(filebeat.TempDir(), "log.log")
+	writeEventsToLogFile(t, logFilePath, numEvents)
+	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
+	s = s + `
+setup.template.name: logs-filebeat-default
+setup.template.pattern: logs-filebeat-default
+`
+
+	filebeat.WriteConfigFile(s)
+	filebeat.Start()
+
+	// prepare to query ES
+	esCfg := elasticsearch.Config{
+		Addresses: []string{"http://localhost:9200"},
+		Username:  "admin",
+		Password:  "testing",
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
+			},
+		},
+	}
+	es, err := elasticsearch.NewClient(esCfg)
+	require.NoError(t, err)
+
+	var filebeatDocs estools.Documents
+	var otelDocs estools.Documents
+	// wait for logs to be published
+	require.Eventually(t,
+		func() bool {
+			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
+			require.NoError(t, err)
+
+			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-filebeat-default*")
+			require.NoError(t, err)
+
+			return otelDocs.Hits.Total.Value >= numEvents && filebeatDocs.Hits.Total.Value >= numEvents
+		},
+		2*time.Minute, 1*time.Second, fmt.Sprintf("Number of hits %d not equal to number of events for %d", filebeatDocs.Hits.Total.Value, numEvents))
+
+	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
+	otelDoc := otelDocs.Hits.Hits[0].Source
+	ignoredFields := []string{
+		// Expected to change between agentDocs and OtelDocs
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+		"log.file.inode",
+		"log.file.path",
+	}
+
+	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+	assertMonitoring(t)
+}

@@ -64,10 +64,6 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 		receiverCfg, _ := conf.Sub(beatReceiverConfigKey)
 		output, _ := receiverCfg.Sub("output")
 
-		if len(output.ToStringMap()) > 1 {
-			return fmt.Errorf("multiple outputs are not supported")
-		}
-
 		for key, output := range output.ToStringMap() {
 			switch key {
 			case "elasticsearch":
@@ -94,6 +90,8 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 				if err != nil {
 					return err
 				}
+			// noop, it will get replaced by otelconsumer below
+			case "otelconsumer":
 			default:
 				return fmt.Errorf("output type %q is unsupported in OTel mode", key)
 			}
