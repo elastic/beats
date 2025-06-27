@@ -45,7 +45,7 @@ func testSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 
 	var host string
 	if isInDockerIntegTestEnv() {
-		// We're running inside out integration test environment so
+		// We're running inside of integration test environment so
 		// make sure that that googlepubsub container is running.
 		host = compose.EnsureUp(t, "googlepubsub").Host()
 		os.Setenv("PUBSUB_EMULATOR_HOST", host)
