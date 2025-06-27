@@ -253,6 +253,139 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXp
 }
 
 func eventMappingNewEndpoint(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXPack bool) error {
+	var wrapper nodeStatsWrapper
+	if err := json.Unmarshal(content, &wrapper); err != nil {
+		return fmt.Errorf("failure parsing NodeStats API response: %w", err)
+	}
+
+	if len(wrapper.Nodes) == 0 {
+		return fmt.Errorf("no nodes found in NodeStats response")
+	}
+
+	var total IndexSummary
+	for nodeKey, raw := range wrapper.Nodes {
+		summary, err := processNode(raw)
+		if err != nil {
+			return fmt.Errorf("error processing node %q: %w", nodeKey, err)
+		}
+		total.merge(&summary)
+	}
+
+	event := buildEvent(&info, &total, isXPack)
+	r.Event(event)
+	return nil
+}
+
+func processNode(rawNode interface{}) (IndexSummary, error) {
+	var summary IndexSummary
+
+	nodeMap, ok := rawNode.(map[string]interface{})
+	if !ok {
+		return summary, fmt.Errorf("node is not a map")
+	}
+
+	validated, err := nodeItemSchema.Apply(nodeMap, s.FailOnRequired)
+	if err != nil {
+		return summary, err
+	}
+
+	getM := func(m mapstr.M, key string) mapstr.M {
+		return m[key].(mapstr.M)
+	}
+
+	indices := getM(validated, "indices")
+	docs := getM(indices, "docs")
+	store := getM(indices, "store")
+	indexing := getM(indices, "indexing")
+	search := getM(indices, "search")
+	segments := getM(indices, "segments")
+
+	// Docs
+	summary.Docs.Count = docs["count"].(int64)
+	summary.Docs.Deleted = docs["deleted"].(int64)
+
+	// Store
+	summary.Store.Size.Bytes = getM(store, "size")["bytes"].(int64)
+	if tds, ok := store["total_data_set_size"].(mapstr.M); ok {
+		summary.Store.TotalDataSetSize.Bytes = tds["bytes"].(int64)
+	}
+
+	// Indexing
+	index := getM(indexing, "index")
+	summary.Indexing.Index.Count = index["count"].(int64)
+	summary.Indexing.Index.Time.Ms = getM(index, "time")["ms"].(int64)
+
+	// Search
+	query := getM(getM(search, "query"), "time")
+	summary.Search.Query.Count = getM(search, "query")["count"].(int64)
+	summary.Search.Query.Time.Ms = query["ms"].(int64)
+
+	// Segments
+	summary.Segments.Count = segments["count"].(int64)
+	summary.Segments.Memory.Bytes = getM(segments, "memory")["bytes"].(int64)
+
+	// Bulk (optional)
+	if bulkRaw, ok := indices["bulk"].(mapstr.M); ok {
+		ops := getM(bulkRaw, "operations")
+		time := getM(getM(bulkRaw, "time"), "avg")
+		size := getM(bulkRaw, "size")
+
+		summary.Bulk.Operations.Count = ops["count"].(int64)
+		summary.Bulk.Size.Bytes = size["bytes"].(int64)
+
+		summary.Bulk.Time.Avg.Bytes = time["bytes"].(int64)
+
+	}
+
+	return summary, nil
+}
+
+func (dst *IndexSummary) merge(src *IndexSummary) {
+	dst.Docs.Count += src.Docs.Count
+	dst.Docs.Deleted += src.Docs.Deleted
+
+	dst.Store.Size.Bytes += src.Store.Size.Bytes
+	dst.Store.TotalDataSetSize.Bytes += src.Store.TotalDataSetSize.Bytes
+
+	dst.Indexing.Index.Count += src.Indexing.Index.Count
+	dst.Indexing.Index.Time.Ms += src.Indexing.Index.Time.Ms
+
+	dst.Search.Query.Count += src.Search.Query.Count
+	dst.Search.Query.Time.Ms += src.Search.Query.Time.Ms
+
+	dst.Segments.Count += src.Segments.Count
+	dst.Segments.Memory.Bytes += src.Segments.Memory.Bytes
+
+	dst.Bulk.Operations.Count += src.Bulk.Operations.Count
+	dst.Bulk.Size.Bytes += src.Bulk.Size.Bytes
+	dst.Bulk.Time.Avg.Bytes += src.Bulk.Time.Avg.Bytes
+}
+
+func buildEvent(info *elasticsearch.Info, summary *IndexSummary, isXPack bool) mb.Event {
+	eventNew := map[string]interface{}{
+		"primaries": summary,
+		"total":     summary,
+	}
+
+	var event mb.Event
+	event.RootFields = mapstr.M{}
+	_, _ = event.RootFields.Put("service.name", elasticsearch.ModuleName)
+
+	event.ModuleFields = mapstr.M{}
+	_, _ = event.ModuleFields.Put("cluster.name", info.ClusterName)
+	_, _ = event.ModuleFields.Put("cluster.id", info.ClusterID)
+
+	event.MetricSetFields = eventNew
+
+	if isXPack {
+		index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+		event.Index = index
+	}
+
+	return event
+}
+
+func eventMappingNewEndpoint2(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXPack bool) error {
 	var nodesWrapper nodeStatsWrapper
 
 	err := json.Unmarshal(content, &nodesWrapper)
