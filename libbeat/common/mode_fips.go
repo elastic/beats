@@ -15,14 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !requirefips
+//go:build requirefips
 
-package beater
+package common
 
-import "github.com/elastic/beats/v7/libbeat/cfgfile"
-
-func checkFIPSCapability(_ cfgfile.Runner) error {
-	// In non-FIPS builds, we assume all inputs are FIPS capable
-	// and proceed without error
-	return nil
-}
+// FIPSMode = true indicates that this is a FIPS-capable distribution.
+const FIPSMode = true
