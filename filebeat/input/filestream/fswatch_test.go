@@ -275,10 +275,8 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
-		//nolint:staticcheck // It's a test
-		logp.DevelopmentSetup(logp.ToObserverOutput())
-
-		fw := createWatcherWithConfig(t, logp.L(), paths, cfgStr)
+		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
+		fw := createWatcherWithConfig(t, inMemoryLog, paths, cfgStr)
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -289,16 +287,7 @@ scanner:
 		t.Run("issues a debug message in logs", func(t *testing.T) {
 			expLogMsg := fmt.Sprintf("file %q has no content yet, skipping", filename)
 			require.Eventually(t, func() bool {
-				logs := logp.ObserverLogs().FilterLevelExact(logp.DebugLevel.ZapLevel()).TakeAll()
-				if len(logs) == 0 {
-					return false
-				}
-				for _, l := range logs {
-					if strings.Contains(l.Message, expLogMsg) {
-						return true
-					}
-				}
-				return false
+				return strings.Contains(buff.String(), expLogMsg)
 			}, time.Second, 10*time.Millisecond, "required a debug message %q but never found", expLogMsg)
 		})
 
@@ -387,10 +376,8 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		//nolint:staticcheck // It's a test
-		logp.DevelopmentSetup(logp.ToObserverOutput())
-
-		fw := createWatcherWithConfig(t, logger, paths, cfgStr)
+		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
+		fw := createWatcherWithConfig(t, inMemoryLog, paths, cfgStr)
 
 		go fw.Run(ctx)
 
@@ -430,8 +417,8 @@ scanner:
 			requireEqualEvents(t, expectedEvents[i], actualEvent)
 		}
 
-		logs := logp.ObserverLogs().FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
-		require.Lenf(t, logs, 0, "must be no warning messages, got: %v", logs)
+		require.NotContainsf(t, buff.String(), "WARN",
+			"must be no warning messages")
 	})
 }
 
