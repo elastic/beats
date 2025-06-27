@@ -175,27 +175,12 @@ func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state
 
 	serviceClient, credential, err := fetchServiceClientAndCreds(input.config, input.serviceURL, log)
 	if err != nil {
-<<<<<<< HEAD
-=======
 		metrics.errorsTotal.Inc()
 		stat.UpdateStatus(status.Failed, "failed to get service client: "+err.Error())
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 		return err
 	}
 	containerClient, err := fetchContainerClient(serviceClient, currentSource.ContainerName, log)
 	if err != nil {
-<<<<<<< HEAD
-		return err
-	}
-
-	scheduler := newScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, log)
-	err = scheduler.schedule(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
-=======
 		metrics.errorsTotal.Inc()
 		stat.UpdateStatus(status.Failed, "failed to get container client: "+err.Error())
 		return err
@@ -203,7 +188,6 @@ func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state
 
 	scheduler := newScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, stat, metrics, log)
 	return scheduler.schedule(ctx)
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 }
 
 type noopReporter struct{}

@@ -52,21 +52,14 @@ type job struct {
 	publisher cursor.Publisher
 	// custom logger
 	log *logp.Logger
-<<<<<<< HEAD
-=======
 	// job status reporter
 	status status.StatusReporter
 	// metrics is used to track the input's metrics
 	metrics *inputMetrics
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 }
 
 // newJob, returns an instance of a job, which is a unit of work that can be assigned to a go routine
 func newJob(client *blob.Client, blob *azcontainer.BlobItem, blobURL string,
-<<<<<<< HEAD
-	state *state, src *Source, publisher cursor.Publisher, log *logp.Logger,
-) *job {
-=======
 	state *state, src *Source, publisher cursor.Publisher, stat status.StatusReporter, metrics *inputMetrics, log *logp.Logger,
 ) *job {
 	if metrics == nil {
@@ -74,7 +67,6 @@ func newJob(client *blob.Client, blob *azcontainer.BlobItem, blobURL string,
 		metrics = newInputMetrics("", nil)
 	}
 
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 	return &job{
 		client:    client,
 		blob:      blob,
@@ -84,11 +76,8 @@ func newJob(client *blob.Client, blob *azcontainer.BlobItem, blobURL string,
 		src:       src,
 		publisher: publisher,
 		log:       log,
-<<<<<<< HEAD
-=======
 		status:    stat,
 		metrics:   metrics,
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 	}
 }
 
@@ -126,13 +115,9 @@ func (j *job) do(ctx context.Context, id string) {
 		event.SetID(objectID(j.hash, 0))
 		// locks while data is being saved to avoid concurrent map read/writes
 		cp, done := j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
-<<<<<<< HEAD
-		if err := j.publisher.Publish(event, cp); err != nil {
-=======
 		err = j.publisher.Publish(event, cp)
 		if err != nil {
 			j.metrics.errorsTotal.Inc()
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 			j.log.Errorf(jobErrString, id, err)
 			j.status.UpdateStatus(status.Degraded, "failed to publish unsupported content-type event: "+err.Error())
 		}
@@ -257,14 +242,10 @@ func (j *job) publish(evt beat.Event, last bool, id string) {
 	if last {
 		// if this is the last object, then perform a complete state save
 		cp, done := j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
-<<<<<<< HEAD
-		if err := j.publisher.Publish(evt, cp); err != nil {
-=======
 		err := j.publisher.Publish(evt, cp)
 		if err != nil {
 			j.metrics.errorsTotal.Inc()
 			j.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 			j.log.Errorf(jobErrString, id, err)
 		} else {
 			j.status.UpdateStatus(status.Running, "")
@@ -273,14 +254,10 @@ func (j *job) publish(evt beat.Event, last bool, id string) {
 		return
 	}
 	// since we don't update the cursor checkpoint, lack of a lock here should be fine
-<<<<<<< HEAD
-	if err := j.publisher.Publish(evt, nil); err != nil {
-=======
 	err := j.publisher.Publish(evt, nil)
 	if err != nil {
 		j.metrics.errorsTotal.Inc()
 		j.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 		j.log.Errorf(jobErrString, id, err)
 	} else {
 		j.status.UpdateStatus(status.Running, "")
@@ -291,23 +268,15 @@ func (j *job) publish(evt beat.Event, last bool, id string) {
 func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objHash string, id string) error {
 	var jsonObject map[string]json.RawMessage
 	if err := json.Unmarshal(raw, &jsonObject); err != nil {
-<<<<<<< HEAD
-		return err
-=======
 		j.status.UpdateStatus(status.Degraded, "failed to unmarshal JSON: "+err.Error())
 		return eventsPerObject, err
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 	}
 
 	raw, found := jsonObject[key]
 	if !found {
-<<<<<<< HEAD
-		return fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
-=======
 		err := fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
 		j.status.UpdateStatus(status.Degraded, "possible configuration issue: "+err.Error())
 		return eventsPerObject, err
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 	}
 
 	dec := json.NewDecoder(bytes.NewReader(raw))
@@ -315,13 +284,6 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objH
 
 	tok, err := dec.Token()
 	if err != nil {
-<<<<<<< HEAD
-		return err
-	}
-	delim, ok := tok.(json.Delim)
-	if !ok || delim != '[' {
-		return fmt.Errorf("expand_event_list_from_field <%v> is not an array", key)
-=======
 		j.status.UpdateStatus(status.Degraded, "failed to unmarshal JSON: "+err.Error())
 		return eventsPerObject, err
 	}
@@ -330,7 +292,6 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objH
 		err := fmt.Errorf("expand_event_list_from_field <%v> is not an array", key)
 		j.status.UpdateStatus(status.Degraded, "possible configuration issue: "+err.Error())
 		return eventsPerObject, err
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 	}
 
 	for dec.More() {
@@ -338,35 +299,23 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objH
 
 		var item json.RawMessage
 		if err := dec.Decode(&item); err != nil {
-<<<<<<< HEAD
-			return fmt.Errorf("failed to decode array item at offset %d: %w", offset+arrayOffset, err)
-=======
 			j.status.UpdateStatus(status.Degraded, "failed to unmarshal JSON: "+err.Error())
 			return eventsPerObject, fmt.Errorf("failed to decode array item at offset %d: %w", offset+arrayOffset, err)
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 		}
 
 		data, err := item.MarshalJSON()
 		if err != nil {
-<<<<<<< HEAD
-			return err
-=======
 			j.status.UpdateStatus(status.Degraded, "failed to re-marshal JSON: "+err.Error())
 			return eventsPerObject, err
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 		}
 		evt := j.createEvent(string(data), offset+arrayOffset)
 
 		if !dec.More() {
 			// if this is the last object, then save checkpoint
 			cp, done := j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
-<<<<<<< HEAD
-			if err := j.publisher.Publish(evt, cp); err != nil {
-=======
 			err := j.publisher.Publish(evt, cp)
 			if err != nil {
 				j.metrics.errorsTotal.Inc()
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 				j.log.Errorf(jobErrString, id, err)
 				j.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
 			} else {
@@ -375,13 +324,9 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objH
 			done()
 		} else {
 			// since we don't update the cursor checkpoint, lack of a lock here should be fine
-<<<<<<< HEAD
-			if err := j.publisher.Publish(evt, nil); err != nil {
-=======
 			err := j.publisher.Publish(evt, nil)
 			if err != nil {
 				j.metrics.errorsTotal.Inc()
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 				j.log.Errorf(jobErrString, id, err)
 				j.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
 			} else {
