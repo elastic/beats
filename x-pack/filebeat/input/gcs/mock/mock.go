@@ -101,6 +101,41 @@ func GCSFileServer() http.Handler {
 	})
 }
 
+//nolint:errcheck // We can ignore as response writer errors cannot be handled in this scenario
+func GCSFileServerNoContentType() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path := strings.Split(strings.TrimLeft(r.URL.Path, "/"), "/")
+		if r.Method == http.MethodGet {
+			switch len(path) {
+			case 2:
+				if path[0] == "b" {
+					if fileBuckets[path[1]] {
+						w.Write([]byte(fetchFileBuckets[path[1]]))
+						return
+					}
+				} else if fileBuckets[path[0]] && availableFileObjects[path[0]][path[1]] {
+					absPath, _ := filepath.Abs("testdata/" + path[1])
+					data, _ := os.ReadFile(absPath)
+					w.Write(data)
+					return
+				}
+			case 3:
+				if path[0] == "b" && path[2] == "o" {
+					if fileBuckets[path[1]] {
+						w.Write([]byte(objectFileList[path[1]]))
+						return
+					}
+				}
+			default:
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+		}
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("resource not found"))
+	})
+}
+
 //nolint:errcheck // We can ignore errors here, as this is just for testing
 func GCSRetryServer() http.Handler {
 	retries := 0
