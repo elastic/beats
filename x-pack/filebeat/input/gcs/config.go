@@ -42,25 +42,35 @@ type config struct {
 	// Auth - Defines the authentication mechanism to be used for accessing the gcs bucket.
 	Auth authConfig `config:"auth"`
 	// BatchSize - Defines the maximum number of objects that will be fetched from the bucket in a single request.
+	// This value can be set globally or overridden at the bucket level.
 	BatchSize int `config:"batch_size"`
 	// MaxWorkers - Defines the maximum number of go routines that will be spawned.
+	// This value can be set globally or overridden at the bucket level.
 	MaxWorkers int `config:"max_workers" validate:"max=5000"`
 	// Poll - Defines if polling should be performed on the input bucket source.
+	// It can be set globally or overridden at the bucket level.
 	Poll bool `config:"poll"`
 	// PollInterval - Defines the maximum amount of time to wait before polling for the next batch of objects from the bucket.
+	// It can be set globally or overridden at the bucket level.
 	PollInterval time.Duration `config:"poll_interval"`
 	// ParseJSON - Informs the publisher whether to parse & objectify json data or not. By default this is set to
 	// false, since it can get expensive dealing with highly nested json data.
+	// This value can be set globally or overridden at the bucket level.
 	ParseJSON bool `config:"parse_json"`
 	// Buckets - Defines a list of buckets that will be polled for objects.
+	// Each bucket can have its own configuration, which will override the global settings.
 	Buckets []bucket `config:"buckets" validate:"required"`
 	// FileSelectors - Defines a list of regex patterns that can be used to filter out objects from the bucket.
 	FileSelectors []fileSelectorConfig `config:"file_selectors"`
 	// ReaderConfig is the default parser and decoder configuration.
+	// It can be overridden at the bucket level.
 	ReaderConfig readerConfig `config:",inline"`
 	// TimeStampEpoch - Defines the epoch time in seconds, which is used to filter out objects that are older than the specified timestamp.
+	// This value can be set globally or overridden at the bucket level.
 	TimeStampEpoch *int64 `config:"timestamp_epoch"`
 	// ExpandEventListFromField - Defines the field name that will be used to expand the event into separate events.
+	// This is useful when the event is a list of events, and you want to expand it into separate events.
+	// This value can be set globally or overridden at the bucket level.
 	ExpandEventListFromField string `config:"expand_event_list_from_field"`
 	// This field is only used for system test purposes, to override the HTTP endpoint.
 	AlternativeHost string `config:"alternative_host"`
@@ -70,34 +80,60 @@ type config struct {
 
 // bucket contains the config for each specific object storage bucket in the root account
 type bucket struct {
-	Name                     string               `config:"name" validate:"required"`
-	BatchSize                *int                 `config:"batch_size"`
-	MaxWorkers               *int                 `config:"max_workers" validate:"max=5000"`
-	Poll                     *bool                `config:"poll"`
-	PollInterval             *time.Duration       `config:"poll_interval"`
-	ParseJSON                *bool                `config:"parse_json"`
-	FileSelectors            []fileSelectorConfig `config:"file_selectors"`
-	ReaderConfig             readerConfig         `config:",inline"`
-	TimeStampEpoch           *int64               `config:"timestamp_epoch"`
-	ExpandEventListFromField string               `config:"expand_event_list_from_field"`
+	// Name - Defines the name of the bucket in Google Cloud Storage.
+	Name string `config:"name" validate:"required"`
+	// BatchSize - Defines the maximum number of objects that will be fetched from the bucket in a single request.
+	// This value overrides the global BatchSize setting.
+	BatchSize *int `config:"batch_size"`
+	// MaxWorkers - Defines the maximum number of go routines that will be spawned.
+	// This value overrides the global MaxWorkers setting.
+	MaxWorkers *int `config:"max_workers" validate:"max=5000"`
+	// Poll - Defines if polling should be performed on the input bucket source.
+	// This value overrides the global Poll setting.
+	Poll *bool `config:"poll"`
+	// PollInterval - Defines the maximum amount of time to wait before polling for the next batch of objects from the bucket.
+	// This value overrides the global PollInterval setting.
+	PollInterval *time.Duration `config:"poll_interval"`
+	// ParseJSON - Informs the publisher whether to parse & objectify json data or not. By default this is set to
+	// false, since it can get expensive dealing with highly nested json data.
+	// This value overrides the global ParseJSON setting.
+	ParseJSON *bool `config:"parse_json"`
+	// FileSelectors - Defines a list of regex patterns that can be used to filter out objects from the bucket.
+	// This value overrides the global FileSelectors setting.
+	FileSelectors []fileSelectorConfig `config:"file_selectors"`
+	// ReaderConfig defines options for how object content is read and parsed for this specific bucket.
+	// This configuration overrides global ReaderConfig settings.
+	ReaderConfig readerConfig `config:",inline"`
+	// TimeStampEpoch - Defines the epoch time in seconds, which is used to filter out objects that are older than the specified timestamp.
+	// This value overrides the global TimeStampEpoch setting.
+	TimeStampEpoch *int64 `config:"timestamp_epoch"`
+	// ExpandEventListFromField - Defines the field name that will be used to expand the event into separate events.
+	// This is useful when the event is a list of events, and you want to expand it into separate events.
+	// This value overrides the global ExpandEventListFromField setting.
+	ExpandEventListFromField string `config:"expand_event_list_from_field"`
 }
 
-// fileSelectorConfig helps filter out gcs objects based on a regex pattern
+// fileSelectorConfig helps filter out GCS objects based on a regex pattern.
 type fileSelectorConfig struct {
+	// Regex is the regular expression pattern used to match object names.
 	Regex *match.Matcher `config:"regex" validate:"required"`
 	// TODO: Add support for reader config in future
 }
 
 // readerConfig defines the options for reading the content of an GCS object.
 type readerConfig struct {
-	Parsers  parser.Config `config:",inline"`
+	// Parsers contains the configuration for different content parsers (e.g., JSON, XML, CSV).
+	Parsers parser.Config `config:",inline"`
+	// Decoding specifies options for decoding the content, such as compression.
 	Decoding decoderConfig `config:"decoding"`
 }
 
-// authConfig defines the authentication mechanism to be used for accessing the gcs bucket.
+// authConfig defines the authentication mechanism to be used for accessing the GCS bucket.
 // If either is configured the 'omitempty' tag will prevent the other option from being serialized in the config.
 type authConfig struct {
+	// CredentialsJSON allows authentication using a JSON sting.
 	CredentialsJSON *jsonCredentialsConfig `config:"credentials_json,omitempty"`
+	// CredentialsFile allows authentication using a file path to a JSON credentials file.
 	CredentialsFile *fileCredentialsConfig `config:"credentials_file,omitempty"`
 }
 
