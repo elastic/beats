@@ -101,10 +101,15 @@ func ConvertNonPrimitive[T mapstrOrMap](m T) {
 				s := make([]any, ref.Len())
 				for i := 0; i < ref.Len(); i++ {
 					elem := ref.Index(i).Interface()
-					if m, ok := elem.(map[string]any); ok {
-						ConvertNonPrimitive(m)
+					if mi, ok := elem.(map[string]any); ok {
+						ConvertNonPrimitive(mi)
+						s[i] = mi
+					} else if mi, ok := elem.(mapstr.M); ok {
+						ConvertNonPrimitive(mi)
+						s[i] = map[string]any(mi)
+					} else {
+						s[i] = elem
 					}
-					s[i] = elem
 				}
 				m[key] = s
 				break // we figured out the type, so we don't need the unknown type case
