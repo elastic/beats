@@ -55,21 +55,14 @@ type scheduler struct {
 	log        *logp.Logger
 	limiter    *limiter
 	serviceURL string
-<<<<<<< HEAD
-=======
 	status     status.StatusReporter
 	metrics    *inputMetrics
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 }
 
 // newScheduler, returns a new scheduler instance
 func newScheduler(publisher cursor.Publisher, client *azcontainer.Client,
 	credential *serviceCredentials, src *Source, cfg *config,
-<<<<<<< HEAD
-	state *state, serviceURL string, log *logp.Logger,
-=======
 	state *state, serviceURL string, stat status.StatusReporter, metrics *inputMetrics, log *logp.Logger,
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 ) *scheduler {
 	return &scheduler{
 		publisher:  publisher,
@@ -81,11 +74,8 @@ func newScheduler(publisher cursor.Publisher, client *azcontainer.Client,
 		log:        log,
 		limiter:    &limiter{limit: make(chan struct{}, src.MaxWorkers)},
 		serviceURL: serviceURL,
-<<<<<<< HEAD
-=======
 		status:     stat,
 		metrics:    metrics,
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 	}
 }
 
@@ -117,11 +107,8 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 	for pager.More() {
 		resp, err := pager.NextPage(ctx)
 		if err != nil {
-<<<<<<< HEAD
-=======
 			s.metrics.errorsTotal.Inc()
 			s.status.UpdateStatus(status.Failed, "failed to fetch next page during pagination: "+err.Error())
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 			return err
 		}
 
@@ -152,11 +139,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 				return err
 			}
 
-<<<<<<< HEAD
-			job := newJob(blobClient, v, blobURL, s.state, s.src, s.publisher, s.log)
-=======
 			job := newJob(blobClient, v, blobURL, s.state, s.src, s.publisher, s.status, s.metrics, s.log)
->>>>>>> eef963348 ([filebeat][ABS] - Added health status checks (#44945))
 			jobs = append(jobs, job)
 		}
 
