@@ -90,6 +90,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    reviewers:
+      - "elastic/obs-infraobs-integrations"
     labels:
       - automation
       - dependabot
