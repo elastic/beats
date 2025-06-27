@@ -32,6 +32,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 
+	"github.com/mitchellh/hashstructure"
+
 	// include all metricbeat specific builders
 	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
 
@@ -44,12 +46,13 @@ import (
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done         chan struct{}    // Channel used to initiate shutdown.
-	stopOnce     sync.Once        // wraps the Stop() method
-	runners      []cfgfile.Runner // Active list of module runners.
-	config       Config
-	registry     *mb.Register
-	autodiscover *autodiscover.Autodiscover
+	done                     chan struct{} // Channel used to initiate shutdown.
+	stopOnce                 sync.Once     // wraps the Stop() method
+	config                   Config
+	registry                 *mb.Register
+	autodiscover             *autodiscover.Autodiscover
+	dynamicCfgEnabled        bool
+	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 
 	// Options
 	moduleOptions []module.Option
@@ -149,9 +152,17 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 	}
 
 	metricbeat := &Metricbeat{
+<<<<<<< HEAD
 		done:     make(chan struct{}),
 		config:   config,
 		registry: registry,
+=======
+		done:              make(chan struct{}),
+		config:            config,
+		registry:          registry,
+		logger:            b.Info.Logger,
+		dynamicCfgEnabled: dynamicCfgEnabled,
+>>>>>>> d71266c00 ([beatreceiver] - Add status reporting (#44782))
 	}
 	for _, applyOption := range options {
 		applyOption(metricbeat)
@@ -182,6 +193,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 				return data
 			})
 	}
+<<<<<<< HEAD
 
 	moduleOptions := append(
 		[]module.Option{module.WithMaxStartDelay(config.MaxStartDelay)},
@@ -220,6 +232,8 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 		}
 	}
 
+=======
+>>>>>>> d71266c00 ([beatreceiver] - Add status reporting (#44782))
 	return metricbeat, nil
 }
 
@@ -229,10 +243,64 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 // that a single unresponsive host cannot inadvertently block other hosts
 // within the same Module and MetricSet from collection.
 func (bt *Metricbeat) Run(b *beat.Beat) error {
+	moduleOptions := append(
+		[]module.Option{module.WithMaxStartDelay(bt.config.MaxStartDelay)},
+		bt.moduleOptions...)
+
+	factory := module.NewFactory(b.Info, b.Monitoring, bt.registry, moduleOptions...)
+
+	if bt.otelStatusFactoryWrapper != nil {
+		factory = bt.otelStatusFactoryWrapper(factory)
+	}
+
+	runners := make(map[uint64]cfgfile.Runner) // Active list of module runners.
+
+	for _, moduleCfg := range bt.config.Modules {
+		if !moduleCfg.Enabled() {
+			continue
+		}
+
+		var h map[string]interface{}
+		err := moduleCfg.Unpack(&h)
+		if err != nil {
+			return fmt.Errorf("could not unpack config: %w", err)
+		}
+		id, err := hashstructure.Hash(h, nil)
+		if err != nil {
+			return fmt.Errorf("can not compute id from configuration: %w", err)
+		}
+
+		runner, err := factory.Create(b.Publisher, moduleCfg)
+		if err != nil {
+			return err
+		}
+
+		runners[id] = runner
+	}
+
+	if len(runners) == 0 && !bt.dynamicCfgEnabled {
+		return mb.ErrAllModulesDisabled
+	}
+
+	if bt.config.Autodiscover != nil {
+		var err error
+		bt.autodiscover, err = autodiscover.NewAutodiscover(
+			"metricbeat",
+			b.Publisher,
+			factory, autodiscover.QueryConfig(),
+			bt.config.Autodiscover,
+			b.Keystore,
+			b.Info.Logger,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
 	var wg sync.WaitGroup
 
 	// Static modules (metricbeat.runners)
-	for _, r := range bt.runners {
+	for _, r := range runners {
 		r.Start()
 		wg.Add(1)
 
@@ -245,8 +313,13 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	// Centrally managed modules
+<<<<<<< HEAD
 	factory := module.NewFactory(b.Info, bt.registry, bt.moduleOptions...)
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher)
+=======
+	factory = module.NewFactory(b.Info, b.Monitoring, bt.registry, bt.moduleOptions...)
+	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher, bt.logger)
+>>>>>>> d71266c00 ([beatreceiver] - Add status reporting (#44782))
 	b.Registry.MustRegisterInput(modules)
 	wg.Add(1)
 	go func() {
@@ -293,6 +366,10 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	wg.Wait()
 
 	return nil
+}
+
+func (bt *Metricbeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
+	bt.otelStatusFactoryWrapper = wrapper
 }
 
 // Stop signals to Metricbeat that it should stop. It closes the "done" channel

@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -182,3 +183,166 @@ func TestMultipleReceivers(t *testing.T) {
 		},
 	})
 }
+<<<<<<< HEAD
+=======
+
+func TestReceiverDegraded(t *testing.T) {
+	testCases := []struct {
+		name            string
+		status          oteltest.ExpectedStatus
+		benchmarkStatus string
+	}{
+		{
+			name: "failed input",
+			status: oteltest.ExpectedStatus{
+				Status: componentstatus.StatusPermanentError,
+				Error:  "benchmark input failed",
+			},
+			benchmarkStatus: "failed",
+		},
+		{
+			name: "degraded input",
+			status: oteltest.ExpectedStatus{
+				Status: componentstatus.StatusRecoverableError,
+				Error:  "benchmark input degraded",
+			},
+			benchmarkStatus: "degraded",
+		},
+		{
+			name: "running input",
+			status: oteltest.ExpectedStatus{
+				Status: componentstatus.StatusOK,
+				Error:  "",
+			},
+		},
+	}
+
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+			config := Config{
+				Beatconfig: map[string]any{
+					"filebeat": map[string]any{
+						"inputs": []map[string]any{
+							{
+								"type":    "benchmark",
+								"enabled": true,
+								"message": "test",
+								"count":   1,
+								"status":  test.benchmarkStatus,
+							},
+						},
+					},
+					"output": map[string]any{
+						"otelconsumer": map[string]any{},
+					},
+					"logging": map[string]any{
+						"level": "debug",
+						"selectors": []string{
+							"*",
+						},
+					},
+					"path.home": t.TempDir(),
+				},
+			}
+			oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+				T: t,
+				Receivers: []oteltest.ReceiverConfig{
+					{
+						Name:    "r1",
+						Beat:    "filebeat",
+						Config:  &config,
+						Factory: NewFactory(),
+					},
+				},
+				Status: test.status,
+			})
+		})
+	}
+}
+
+func genSocketPath() string {
+	randData := make([]byte, 16)
+	for i := range len(randData) {
+		randData[i] = uint8(rand.UintN(255)) //nolint:gosec // 0-255 fits in a uint8
+	}
+	socketName := base64.URLEncoding.EncodeToString(randData) + ".sock"
+	socketDir := os.TempDir()
+	return filepath.Join(socketDir, socketName)
+}
+
+func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoint string) bool {
+	// skip windows for now
+	if runtime.GOOS == "windows" {
+		return true
+	}
+	client := http.Client{
+		Transport: &http.Transport{
+			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
+				return net.Dial("unix", socketPath)
+			},
+		},
+	}
+	url, err := url.JoinPath("http://unix", endpoint)
+	if err != nil {
+		sb.Reset()
+		fmt.Fprintf(sb, "JoinPath failed: %s", err)
+		return false
+	}
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, url, nil)
+	if err != nil {
+		sb.Reset()
+		fmt.Fprintf(sb, "error creating request: %s", err)
+		return false
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		sb.Reset()
+		fmt.Fprintf(sb, "client.Get failed: %s", err)
+		return false
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		sb.Reset()
+		fmt.Fprintf(sb, "io.ReadAll of body failed: %s", err)
+		return false
+	}
+	if len(body) <= 0 {
+		sb.Reset()
+		sb.WriteString("body too short")
+		return false
+	}
+
+	if endpoint == "inputs" {
+		var data []any
+		if err := json.Unmarshal(body, &data); err != nil {
+			sb.Reset()
+			fmt.Fprintf(sb, "json unmarshal of body failed: %s\n", err)
+			fmt.Fprintf(sb, "body was %v\n", body)
+			return false
+		}
+
+		if len(data) <= 0 {
+			sb.Reset()
+			sb.WriteString("json array didn't have any entries")
+			return false
+		}
+	} else {
+		var data map[string]any
+		if err := json.Unmarshal(body, &data); err != nil {
+			sb.Reset()
+			fmt.Fprintf(sb, "json unmarshal of body failed: %s\n", err)
+			fmt.Fprintf(sb, "body was %v\n", body)
+			return false
+		}
+
+		if len(data) <= 0 {
+			sb.Reset()
+			sb.WriteString("json didn't have any keys")
+			return false
+		}
+	}
+
+	return true
+}
+>>>>>>> d71266c00 ([beatreceiver] - Add status reporting (#44782))

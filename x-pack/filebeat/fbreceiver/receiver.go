@@ -25,7 +25,7 @@ func (fb *filebeatReceiver) Start(ctx context.Context, host component.Host) erro
 	go func() {
 		defer fb.wg.Done()
 		fb.Logger.Info("starting filebeat receiver")
-		if err := fb.BeatReceiver.Start(); err != nil {
+		if err := fb.BeatReceiver.Start(host); err != nil {
 			fb.Logger.Error("error starting filebeat receiver", zap.Error(err))
 		}
 	}()

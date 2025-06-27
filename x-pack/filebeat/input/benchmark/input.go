@@ -14,7 +14,11 @@ import (
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+=======
+	"github.com/elastic/beats/v7/libbeat/management/status"
+>>>>>>> d71266c00 ([beatreceiver] - Add status reporting (#44782))
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -61,6 +65,15 @@ func (bi *benchmarkInput) Test(ctx v2.TestContext) error {
 func (bi *benchmarkInput) Run(ctx v2.Context, publisher stateless.Publisher) error {
 	var wg sync.WaitGroup
 	metrics := newInputMetrics(ctx)
+
+	switch bi.cfg.Status {
+	case "degraded":
+		ctx.UpdateStatus(status.Degraded, "benchmark input degraded")
+	case "failed":
+		ctx.UpdateStatus(status.Failed, "benchmark input failed")
+	default:
+		ctx.UpdateStatus(status.Running, "")
+	}
 
 	for i := uint8(0); i < bi.cfg.Threads; i++ {
 		wg.Add(1)
