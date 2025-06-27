@@ -99,50 +99,50 @@ type nodeStatsWrapper struct {
 var nodeItemSchema = s.Schema{
 	"indices": c.Dict("indices", s.Schema{
 		"docs": c.Dict("docs", s.Schema{
-			"count":   c.Int("count"),
-			"deleted": c.Int("deleted"),
-		}),
+			"count":   c.Int("count", s.Required),
+			"deleted": c.Int("deleted", s.Required),
+		}, c.DictRequired),
 		"store": c.Dict("store", s.Schema{
 			"size": s.Object{
-				"bytes": c.Int("size_in_bytes"),
+				"bytes": c.Int("size_in_bytes", s.Required),
 			},
 			"total_data_set_size": s.Object{
-				"bytes": c.Int("total_data_set_size_in_bytes"),
+				"bytes": c.Int("total_data_set_size_in_bytes", s.Required),
 			},
-		}),
+		}, c.DictRequired),
 		"indexing": c.Dict("indexing", s.Schema{
 			"index": s.Object{
-				"count": c.Int("index_total"),
+				"count": c.Int("index_total", s.Required),
 				"time": s.Object{
-					"ms": c.Int("index_time_in_millis"),
+					"ms": c.Int("index_time_in_millis", s.Required),
 				},
 			},
-		}),
+		}, c.DictRequired),
 		"search": c.Dict("search", s.Schema{
 			"query": s.Object{
-				"count": c.Int("query_total"),
+				"count": c.Int("query_total", s.Required),
 				"time": s.Object{
-					"ms": c.Int("query_time_in_millis"),
+					"ms": c.Int("query_time_in_millis", s.Required),
 				},
 			},
-		}),
+		}, c.DictRequired),
 		"segments": c.Dict("segments", s.Schema{
-			"count": c.Int("count"),
+			"count": c.Int("count", s.Required),
 			"memory": s.Object{
-				"bytes": c.Int("memory_in_bytes"),
+				"bytes": c.Int("memory_in_bytes", s.Required),
 			},
-		}),
+		}, c.DictRequired),
 		"bulk": c.Dict("bulk", s.Schema{
 			"operations": s.Object{
-				"count": c.Int("total_operations"),
+				"count": c.Int("total_operations", s.Required),
 			},
 			"time": s.Object{
 				"avg": s.Object{
-					"bytes": c.Int("avg_size_in_bytes"),
+					"bytes": c.Int("avg_size_in_bytes", s.Required),
 				},
 			},
 			"size": s.Object{
-				"bytes": c.Int("total_size_in_bytes"),
+				"bytes": c.Int("total_size_in_bytes", s.Required),
 			},
 		}, c.DictOptional),
 	}),

@@ -133,6 +133,48 @@ func TestSummaryFromNodeStatsWithExpectedEventsV817(t *testing.T) {
 	)
 }
 
+func TestSummaryMissingField(t *testing.T) {
+	elasticsearch.TestMapperExpectingError(
+		t,
+		"_meta/test/node_stats_v817_missing_fields.json",
+		elasticsearch.Info{
+			ClusterID:   "1234",
+			ClusterName: "helloworld",
+		},
+		true,
+		"error processing node \"Hwq8Kg1eRNaFnFJKrKoqjA\": key `indices.docs.count` not found",
+		eventMappingNewEndpoint,
+	)
+}
+
+func TestSummaryMissingBlock(t *testing.T) {
+	elasticsearch.TestMapperExpectingError(
+		t,
+		"_meta/test/node_stats_v817_missing_block.json",
+		elasticsearch.Info{
+			ClusterID:   "1234",
+			ClusterName: "helloworld",
+		},
+		true,
+		"error processing node \"Hwq8Kg1eRNaFnFJKrKoqjA\": key `indices.segments` not found",
+		eventMappingNewEndpoint,
+	)
+}
+
+func TestSummaryWrongFieldType_String(t *testing.T) {
+	elasticsearch.TestMapperExpectingError(
+		t,
+		"_meta/test/node_stats_v717_field_as_string.json",
+		elasticsearch.Info{
+			ClusterID:   "1234",
+			ClusterName: "helloworld",
+		},
+		true,
+		"error processing node \"vF3ak-83RKu_020pnVZJ_w\": wrong format in `indices.store.size_in_bytes`: expected integer, found string",
+		eventMappingNewEndpoint,
+	)
+}
+
 func TestSummaryFromNodeStatsWithExpectedEventsV717(t *testing.T) {
 	elasticsearch.TestMapperWithExpectedEvents(
 		t,

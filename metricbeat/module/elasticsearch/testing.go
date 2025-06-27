@@ -119,6 +119,25 @@ func TestMapperWithExpectedEvents(
 	}
 }
 
+func TestMapperExpectingError(
+	t *testing.T,
+	inputPath string,
+	info Info,
+	isXPack bool,
+	errorMessage string,
+	mapper func(mb.ReporterV2, Info, []byte, bool) error,
+) {
+	input, err := os.ReadFile(inputPath)
+	require.NoError(t, err)
+
+	reporter := &mbtest.CapturingReporterV2{}
+	err = mapper(reporter, info, input, isXPack)
+	require.ErrorContains(t, err, errorMessage)
+
+	events := reporter.GetEvents()
+	require.Equal(t, 0, len(events), "Number of events mismatch")
+}
+
 func loadExpectedEventsFromFiles(t *testing.T, files []string) []map[string]interface{} {
 	expected := make([]map[string]interface{}, 0, len(files))
 	for _, f := range files {
