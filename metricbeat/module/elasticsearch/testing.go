@@ -79,9 +79,8 @@ func TestMapperWithInfo(t *testing.T, glob string, mapper func(mb.ReporterV2, In
 			reporter := &mbtest.CapturingReporterV2{}
 			err = mapper(reporter, info, input, true)
 			require.NoError(t, err)
-			events := reporter.GetEvents()
-			fmt.Printf("%#v\n", events[0])
-			require.True(t, len(events) >= 1)
+
+			require.True(t, len(reporter.GetEvents()) >= 1)
 			require.Equal(t, 0, len(reporter.GetErrors()))
 		})
 	}
