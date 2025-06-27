@@ -63,6 +63,10 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		st := newState()
 		currentSource := source.(*Source)
 		log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container", currentSource.ContainerName)
+		// create a new inputMetrics instance
+		metrics := newInputMetrics(inputCtx.ID+":"+currentSource.ContainerName, nil)
+		metrics.url.Set(in.serviceURL + currentSource.ContainerName)
+		defer metrics.Close()
 
 		ctx, cancel := context.WithCancel(context.Background())
 		go func() {

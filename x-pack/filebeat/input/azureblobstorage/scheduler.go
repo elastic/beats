@@ -64,6 +64,10 @@ func newScheduler(publisher cursor.Publisher, client *azcontainer.Client,
 	credential *serviceCredentials, src *Source, cfg *config,
 	state *state, serviceURL string, stat status.StatusReporter, metrics *inputMetrics, log *logp.Logger,
 ) *scheduler {
+	if metrics == nil {
+		// metrics are optional, initialize a stub if not provided
+		metrics = newInputMetrics("", nil)
+	}
 	return &scheduler{
 		publisher:  publisher,
 		client:     client,
@@ -93,6 +97,7 @@ func (s *scheduler) schedule(ctx context.Context) error {
 
 		err = timed.Wait(ctx, s.src.PollInterval)
 		if err != nil {
+			s.metrics.errorsTotal.Inc()
 			return err
 		}
 	}
@@ -114,6 +119,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 
 		numBlobs += len(resp.Segment.BlobItems)
 		s.log.Debugf("scheduler: %d blobs fetched for current batch", len(resp.Segment.BlobItems))
+		s.metrics.absBlobsListedTotal.Add(uint64(len(resp.Segment.BlobItems)))
 
 		var jobs []*job
 		for _, v := range resp.Segment.BlobItems {
@@ -134,6 +140,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 
 			blobClient, err := fetchBlobClient(blobURL, blobCreds, *s.cfg, s.log)
 			if err != nil {
+				s.metrics.errorsTotal.Inc()
 				s.log.Errorf("Job creation failed for container %s with error %v", s.src.ContainerName, err)
 				s.status.UpdateStatus(status.Failed, "failed to fetch blob client while scheduling jobs: "+err.Error())
 				return err
@@ -149,6 +156,8 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 		}
 
 		s.log.Debugf("scheduler: %d jobs scheduled for current batch", len(jobs))
+		s.metrics.absJobsScheduledAfterValidation.Update(int64(len(jobs)))
+		numJobs += len(jobs)
 
 		// distributes jobs among workers with the help of a limiter
 		for i, job := range jobs {

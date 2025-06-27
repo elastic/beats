@@ -418,6 +418,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
 - Add proxy support to GCP Pub/Sub input. {pull}44892[44892]
 - Add support for relationship expansion to EntraID entity analytics provider. {issue}43324[43324] {pull}44761[44761]
+- Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
 
 *Auditbeat*
 

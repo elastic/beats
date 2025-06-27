@@ -92,16 +92,34 @@ func azureObjectHash(src *Source, blob *azcontainer.BlobItem) string {
 
 func (j *job) do(ctx context.Context, id string) {
 	var fields mapstr.M
+	// metrics & logging
+	j.log.Debug("begin abs blob processing.")
+	j.metrics.absBlobsRequestedTotal.Inc()
+	j.metrics.absBlobsInflight.Inc()
+	start := time.Now()
+	defer func() {
+		elapsed := time.Since(start)
+		j.metrics.absBlobsInflight.Dec()
+		j.metrics.absBlobProcessingTime.Update(elapsed.Nanoseconds())
+		j.log.Debugw("end abs blob processing.", "elapsed_time_ns", elapsed)
+	}()
+
 	if allowedContentTypes[*j.blob.Properties.ContentType] {
 		if *j.blob.Properties.ContentType == gzType || (j.blob.Properties.ContentEncoding != nil && *j.blob.Properties.ContentEncoding == encodingGzip) {
 			j.isCompressed = true
 		}
 		err := j.processAndPublishData(ctx, id)
 		if err != nil {
+			j.metrics.errorsTotal.Inc()
 			j.log.Errorf(jobErrString, id, err)
 			return
 		}
-
+		j.metrics.absBlobsPublishedTotal.Inc()
+		if j.blob.Properties.ContentLength != nil {
+			// this is an approximate value as there is no guarantee that the content length is not nil
+			j.metrics.absBytesProcessedTotal.Add(uint64(*j.blob.Properties.ContentLength))
+			j.metrics.absBlobSizeInBytes.Update(*j.blob.Properties.ContentLength)
+		}
 	} else {
 		err := fmt.Errorf("job with jobId %s encountered an error: content-type %s not supported", id, *j.blob.Properties.ContentType)
 		j.status.UpdateStatus(status.Degraded, fmt.Sprintf("found unsupported content-type: %s", *j.blob.Properties.ContentType))
@@ -147,11 +165,21 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 	defer func() {
 		err = reader.Close()
 		if err != nil {
-			err = fmt.Errorf("failed to close blob reader with error: %w", err)
+			j.metrics.errorsTotal.Inc()
+			j.log.Errorw("failed to close blob reader with error:", "blobName", *j.blob.Name, "error", err)
 		}
 	}()
 
-	return j.decode(ctx, reader, id)
+	// update the source lag time metric. LastModified time will always be present for a blob.
+	j.metrics.sourceLagTime.Update(time.Since(*j.blob.Properties.LastModified).Nanoseconds())
+
+	// calculate number of decode errors
+	if err := j.decode(ctx, reader, id); err != nil {
+		j.metrics.decodeErrorsTotal.Inc()
+		return fmt.Errorf("failed to decode blob: %s, with error: %w", *j.blob.Name, err)
+	}
+
+	return nil
 }
 
 func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
@@ -222,10 +250,14 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 
 		// if expand_event_list_from_field is set, then split the event list
 		if j.src.ExpandEventListFromField != "" {
-			if err := j.splitEventList(j.src.ExpandEventListFromField, item, offset, j.hash, id); err != nil {
+			if numEvents, err := j.splitEventList(j.src.ExpandEventListFromField, item, offset, id); err != nil {
 				return err
+			} else {
+				j.metrics.absEventsPerBlob.Update(int64(numEvents))
 			}
 			continue
+		} else {
+			j.metrics.absEventsPerBlob.Update(1)
 		}
 
 		data, err := item.MarshalJSON()
@@ -265,8 +297,9 @@ func (j *job) publish(evt beat.Event, last bool, id string) {
 }
 
 // splitEventList splits the event list into individual events and publishes them
-func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objHash string, id string) error {
+func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, id string) (int, error) {
 	var jsonObject map[string]json.RawMessage
+	var eventsPerObject int
 	if err := json.Unmarshal(raw, &jsonObject); err != nil {
 		j.status.UpdateStatus(status.Degraded, "failed to unmarshal JSON: "+err.Error())
 		return eventsPerObject, err
@@ -333,9 +366,10 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objH
 				j.status.UpdateStatus(status.Running, "")
 			}
 		}
+		eventsPerObject++
 	}
 
-	return nil
+	return eventsPerObject, nil
 }
 
 // addGzipDecoderIfNeeded determines whether the given stream of bytes (encapsulated in a buffered reader)
@@ -424,7 +458,7 @@ func (j *job) createEvent(message string, offset int64) beat.Event {
 		},
 	}
 	event.SetID(objectID(j.hash, offset))
-
+	j.metrics.absEventsCreatedTotal.Inc()
 	return event
 }
 
