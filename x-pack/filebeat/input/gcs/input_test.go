@@ -639,7 +639,7 @@ func Test_StorageClient(t *testing.T) {
 			},
 		},
 		{
-			name: "ReadCSV",
+			name: "ReadCSVRootLevel",
 			baseConfig: map[string]interface{}{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
@@ -651,6 +651,28 @@ func Test_StorageClient(t *testing.T) {
 				"buckets": []map[string]interface{}{
 					{
 						"name": beatsCSVBucket,
+					},
+				},
+			},
+			mockHandler: mock.GCSFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesBucket_csv[0]: true,
+				mock.BeatsFilesBucket_csv[1]: true,
+			},
+		},
+		{
+			name: "ReadCSVBucketLevel",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "10s",
+				"buckets": []map[string]interface{}{
+					{
+						"name":                       beatsCSVBucket,
+						"decoding.codec.csv.enabled": true,
+						"decoding.codec.csv.comma":   " ",
 					},
 				},
 			},

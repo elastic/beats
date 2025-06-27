@@ -17,7 +17,21 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
+
+// defaultReaderConfig is a default readerConfig state that is used to evaluate
+// if the bucket level ReaderConfig is explicitly configured by the user or not.
+// It must not be mutated.
+var defaultReaderConfig readerConfig
+
+// This init function initializes the defaultReaderConfig with the default values.
+func init() {
+	err := conf.NewConfig().Unpack(&defaultReaderConfig)
+	if err != nil {
+		panic(err)
+	}
+}
 
 // MaxWorkers, Poll, PollInterval, BucketTimeOut, ParseJSON, FileSelectors, TimeStampEpoch & ExpandEventListFromField
 // can be configured at a global level, which applies to all buckets, as well as at the bucket level.
