@@ -156,6 +156,9 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 //
 // For more details see `NewBeat`
 func NewRealBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
+	if runtime.GOOS == "windows" {
+		binary += ".exe"
+	}
 	b := NewBeat(t, beatName, binary, args...)
 	cleanArgs := []string{}
 	for _, arg := range b.baseArgs {
