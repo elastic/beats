@@ -215,7 +215,7 @@ type BulkSection struct {
 	} `json:"size"`
 }
 
-func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
+func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXPack bool) error {
 	var all struct {
 		Data map[string]interface{} `json:"_all"`
 	}
@@ -242,7 +242,7 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXp
 
 	// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
 	// When using Agent, the index name is overwritten anyways.
-	if isXpack {
+	if isXPack {
 		index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 		event.Index = index
 	}
@@ -264,7 +264,7 @@ func eventMappingNewEndpoint(r mb.ReporterV2, info elasticsearch.Info, content [
 
 	var total IndexSummary
 	for nodeKey, raw := range wrapper.Nodes {
-		summary, err := processNode(raw)
+		summary, err := extractNodeMetrics(raw)
 		if err != nil {
 			return fmt.Errorf("error processing node %q: %w", nodeKey, err)
 		}
@@ -276,7 +276,7 @@ func eventMappingNewEndpoint(r mb.ReporterV2, info elasticsearch.Info, content [
 	return nil
 }
 
-func processNode(rawNode interface{}) (IndexSummary, error) {
+func extractNodeMetrics(rawNode interface{}) (IndexSummary, error) {
 	var summary IndexSummary
 
 	nodeMap, ok := rawNode.(map[string]interface{})
