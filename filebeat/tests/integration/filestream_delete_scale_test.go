@@ -35,6 +35,17 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
+// TestLargeScaleFilestreamDelete is a single case of 'scale testing' for the
+// delete feature we want running on CI. On a dev machine, this test runs in
+// less than a minute.
+func TestLargeScaleFilestreamDelete(t *testing.T) {
+	nFiles := 10_000
+	lines := 100
+	t.Run(fmt.Sprintf("%d files %d lines each", nFiles, lines), func(t *testing.T) {
+		testLargeScaleFilestreamDelete(t, 2*time.Minute, nFiles, lines)
+	})
+}
+
 // TestLargeScaleFilestreamDelete tests Filestream's delete feature
 // at different scales, this should not be running on CI, hence the
 // actual test function is commented out.

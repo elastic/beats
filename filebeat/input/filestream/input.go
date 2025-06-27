@@ -338,31 +338,28 @@ func waitGracePeriod(
 			case <-ctx.Cancelation.Done():
 				return false, ctx.Cancelation.Err()
 			case <-checkIntervalTickerChan:
-				stat, err := statFn(path)
-				if err != nil {
-					// If the file does not exist any more, return false
-					// (do not delete) and no error.
-					if errors.Is(err, os.ErrNotExist) {
-						return false, nil
-					}
-					// Return the error and cause the harvester to close
-					return false, fmt.Errorf("cannot stat '%s': %w", path, err)
-				}
-
-				if stat.Size() != st.Offset {
-					// The file has changed, close the harvester
-					// without deleting the file
-					logger.Debugf("cancelling deletion of '%s', size has changed from %d to %d",
-						path,
-						st.Offset,
-						stat.Size())
-					return false, nil
+				canDelete, err := canDeleteFile(logger, path, st.Offset, statFn)
+				if err != nil && !canDelete {
+					return false, err
 				}
 			case <-graceTimerChan:
 				break LOOP
 			}
 		}
 	}
+
+	return canDeleteFile(logger, path, st.Offset, statFn)
+}
+
+// canDeleteFile returns true if the file size has not changed and
+// the file can be removed. If the file does not exist, false is returned.
+// If there is an error reading the file size, false and an error are returned.
+func canDeleteFile(
+	logger *logp.Logger,
+	path string,
+	expectedSize int64,
+	statFn func(string) (os.FileInfo, error),
+) (bool, error) {
 
 	stat, err := statFn(path)
 	if err != nil {
@@ -377,7 +374,7 @@ func waitGracePeriod(
 
 	// If the file has been written to, close the harvester so the filewatcher
 	// can start a new one
-	if stat.Size() != st.Offset {
+	if stat.Size() != expectedSize {
 		logger.Debugf("'%s' was updated, won't remove. Closing harvester", path)
 		return false, nil
 	}

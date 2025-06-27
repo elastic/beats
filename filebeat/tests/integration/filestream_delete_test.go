@@ -235,7 +235,7 @@ func testGracePeriod(
 			integration.GenerateLogFile(t, msgLogFilePath, 5, true)
 
 			// Wait for the message of file size changed
-			changedMsg := fmt.Sprintf("cancelling deletion of '%s', size has changed", msgLogFilePath)
+			changedMsg := fmt.Sprintf("'%s' was updated, won't remove. Closing harvester", msgLogFilePath)
 			filebeat.WaitForLogs(changedMsg, time.Second, "filestream did detect the file change")
 
 			// Make sure the harvester is closed

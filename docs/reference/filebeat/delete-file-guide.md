@@ -27,6 +27,12 @@ then it will try to remove the file. During the grace period Filebeat
 monitors the file for changes and will close the harvester on any
 change.
 
+A published event is an event that has been acknowledged by the
+output, an output always acknowledges a successfully written event,
+however it will also acknowledge dropped events. Each output has
+different conditions for dropping an event, refer the output's
+documentation for more details.
+
 If any of the checks fail, the harvester is closed. Once the next
 file system scan happens, a new harvester will be
 started, once the close condition (EOF or inactivity) is met, then the

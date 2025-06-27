@@ -605,6 +605,12 @@ the next scan, then the remove operation is retried. The scan for
 changes in files can be configured by setting
 [`prospector.scanner.check_interval`](#filebeat-input-filestream-scan-frequency).
 
+A published event is an event that has been acknowledged by the
+output, an output always acknowledges a successfully written event,
+however it will also acknowledge dropped events. Each output has
+different conditions for dropping an event, refer the output's
+documentation for more details.
+
 If Filebeat fails to remove the file, it will retry up to 5 times with
 a constant backoff of 2 seconds. If all attempts fail, the harvester
 is closed and a new harvester will be started in the next scan.
