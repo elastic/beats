@@ -156,6 +156,8 @@ $$$supported-attributes-gcs$$$
 12. [expand_event_list_from_field](#attrib-expand_event_list_from_field-gcs)
 13. [timestamp_epoch](#attrib-timestamp_epoch-gcs)
 14. [retry](#attrib-retry-gcs)
+15. [custom_properties](#attrib-custom-properties)
+
 
 
 ### `project_id` [attrib-project-id]
@@ -251,7 +253,7 @@ An example config is shown below:
 
 ### `file_selectors` [attrib-file_selectors-gcs]
 
-If the GCS buckets have objects that correspond to files that Filebeat shouldn’t process, `file_selectors` can be used to limit the files that are downloaded. This is a list of selectors which are based on a regular expression pattern. The regular expression should match the object name or should be a part of the object name (ideally a prefix). The regular expression syntax used is [RE2](https://github.com/google/re2/wiki/Syntax). Files that don’t match any configured expression won’t be processed.This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+If the GCS buckets have objects that correspond to files that Filebeat shouldn’t process, `file_selectors` can be used to limit the files that are downloaded. This is a list of selectors which are based on a regular expression pattern. The regular expression should match the object name or should be a part of the object name (ideally a prefix). The regular expression syntax used is [RE2](https://github.com/google/re2/wiki/Syntax). Files that don’t match any configured expression won’t be processed.This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority and override the root level values if both are specified.
 
 ```yaml
 filebeat.inputs:
@@ -274,7 +276,7 @@ The `file_selectors` operation is performed within the agent locally, hence usin
 
 ### `expand_event_list_from_field` [attrib-expand_event_list_from_field-gcs]
 
-If the file-set using this input expects to receive multiple messages bundled under a specific field or an array of objects then the config option for `expand_event_list_from_field` can be specified. This setting will be able to split the messages under the group value into separate events. For example, if you have logs that are in JSON format and events are found under the JSON object "Records". To split the events into separate events, the config option `expand_event_list_from_field` can be set to "Records". This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+If the file-set using this input expects to receive multiple messages bundled under a specific field or an array of objects then the config option for `expand_event_list_from_field` can be specified. This setting will be able to split the messages under the group value into separate events. For example, if you have logs that are in JSON format and events are found under the JSON object "Records". To split the events into separate events, the config option `expand_event_list_from_field` can be set to "Records". This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority and override the root level values if both are specified.
 
 ```json
 {
@@ -316,7 +318,7 @@ The `parse_json` setting is incompatible with `expand_event_list_from_field`. If
 
 ### `timestamp_epoch` [attrib-timestamp_epoch-gcs]
 
-This attribute can be used to filter out files and objects that have a timestamp older than the specified value. The value of this attribute should be in unix `epoch` (seconds) format. The timestamp value is compared with the `object.Updated` field obtained from the object metadata. This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+This attribute can be used to filter out files and objects that have a timestamp older than the specified value. The value of this attribute should be in unix `epoch` (seconds) format. The timestamp value is compared with the `object.Updated` field obtained from the object metadata. This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority and override the root level values if both are specified.
 
 ```yaml
 filebeat.inputs:
@@ -368,6 +370,95 @@ filebeat.inputs:
     poll: true
     poll_interval: 11m
 ```
+
+### Custom properties [attrib-custom-properties]
+
+Some object properties can be `set` or `overridden` at the input level with the help of certain configuration options. Allowing users to set or override custom object properties provides more flexibility when reading objects from a remote storage where the user might only have read access.
+
+**The supported custom properties are:**
+
+1. [`content_type`](#attrib-content-type)
+2. [`encoding`](#attrib-encoding)
+
+### `content_type` [attrib-content-type]
+
+Use the `content_type` configuration attribute to set a user-defined content type for the object property. Setting a custom content type only sets the `content-type` property of a object if it's missing or empty. If you want to override an already existing `content-type` value, set the `override_content_type` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Container level definitions always take precedence.
+
+### Example configuration
+
+This is a sample configuration at root level:
+
+```yaml
+filebeat.inputs:
+- type: gcs
+  project_id: my_project_id
+  auth.credentials_file.path: {{file_path}}/{{creds_file_name}}.json
+  max_workers: 3
+  poll: true
+  poll_interval: 5m
+  content_type: `application/x-gzip`
+  override_content_type: true
+  buckets:
+  - name: obs-bucket
+```
+
+This is a sample configuration at bucket level:
+
+```yaml
+filebeat.inputs:
+- type: gcs
+  project_id: my_project_id
+  auth.credentials_file.path: {{file_path}}/{{creds_file_name}}.json
+  max_workers: 3
+  poll: true
+  poll_interval: 5m
+  buckets:
+  - name: obs-bucket
+    content_type: `application/x-gzip`
+    override_content_type: true
+```
+
+### `encoding` [attrib-encoding]
+
+Use the `encoding` configuration attribute to set a user-defined encoding for the object property. Setting a custom encoding only sets the `encoding` property of a object if it's missing or empty. If you want to override an already existing encoding value, set the `override_encoding` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Container level definitions always take precedence.
+
+### Example configuration
+
+This is a sample configuration at root level:
+
+```yaml
+filebeat.inputs:
+- type: gcs
+  project_id: my_project_id
+  auth.credentials_file.path: {{file_path}}/{{creds_file_name}}.json
+  max_workers: 3
+  poll: true
+  poll_interval: 5m
+  encoding: `gzip`
+  override_encoding: true
+  buckets:
+  - name: obs-bucket
+```
+
+This is a sample configuration at bucket level:
+
+```yaml
+filebeat.inputs:
+- type: gcs
+  project_id: my_project_id
+  auth.credentials_file.path: {{file_path}}/{{creds_file_name}}.json
+  max_workers: 3
+  poll: true
+  poll_interval: 5m
+  buckets:
+  - name: obs-bucket
+    encoding: `gzip`
+    override_encoding: true
+```
+
+::::{note}
+Custom property configurations are affected by input restrictions. For example, you can set an unsupported content-type or encoding but the input will reject it and report an error.
+::::
 
 $$$bucket-overrides$$$
 **The sample configs below will explain the bucket level overriding of attributes a bit further :-**
