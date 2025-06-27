@@ -115,6 +115,9 @@ type ReportOptions struct {
 	// It uses `PrintOutput`, see its documentation for details.
 	PrintLinesOnFail int
 
+	// PrintLinesPretty sets PrintLinesOnFail to pretty print the output.
+	PrintLinesPretty bool
+
 	// PrintConfig defines if the test prints out the entire configuration file
 	// in case of failure.
 	PrintConfigOnFail bool
@@ -302,7 +305,8 @@ func (b *beatTest) PrintOutput(lineCount int) {
 		return
 	}
 
-	b.t.Logf("\n\nLast %d lines of the output:\n\n%s\n\n", lineCount, b.beat.CollectOutput(lineCount))
+	b.t.Logf("\n\nLast %d lines of the output:\n\n%s\n\n",
+		lineCount, b.beat.CollectOutput(lineCount, b.reportOpts.PrintLinesPretty))
 }
 
 // PrintConfig prints the entire configuration file the Beat test ran with
