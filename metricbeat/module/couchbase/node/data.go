@@ -73,11 +73,11 @@ type Data struct {
 	Nodes []Node `json:"nodes"`
 }
 
-func eventsMapping(content []byte) []mapstr.M {
+func eventsMapping(content []byte, logger *logp.Logger) []mapstr.M {
 	var d Data
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		logp.Err("Error: %+v", err)
+		logger.Errorf("Error: %+v", err)
 	}
 
 	events := []mapstr.M{}
