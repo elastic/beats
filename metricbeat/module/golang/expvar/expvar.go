@@ -90,7 +90,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	//flatten cmdline
-	json["cmdline"] = golang.GetCmdStr(json["cmdline"])
+	json["cmdline"] = golang.GetCmdStr(json["cmdline"], m.Logger())
 
 	reporter.Event(mb.Event{
 		MetricSetFields: json,
