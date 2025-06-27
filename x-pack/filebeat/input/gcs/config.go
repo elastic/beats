@@ -126,6 +126,14 @@ type readerConfig struct {
 	Parsers parser.Config `config:",inline"`
 	// Decoding specifies options for decoding the content, such as compression.
 	Decoding decoderConfig `config:"decoding"`
+	// ContentType suggests the MIME type of the blob content, aiding in parsing.
+	ContentType string `config:"content_type"`
+	// Encoding specifies the character encoding of the blob content (e.g., "UTF-8", "gzip").
+	Encoding string `config:"encoding"`
+	// OverrideContentType indicates whether to force the ContentType rather than inferring it.
+	OverrideContentType bool `config:"override_content_type"`
+	// OverrideEncoding indicates whether to force the Encoding rather than inferring it.
+	OverrideEncoding bool `config:"override_encoding"`
 }
 
 // authConfig defines the authentication mechanism to be used for accessing the GCS bucket.
