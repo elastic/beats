@@ -16,6 +16,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -27,13 +28,14 @@ func mockConcurrentMapResourceMetrics(client *BatchClient, resources []*armresou
 }
 
 func TestInitResourcesForBatch(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	t.Run("return error when no resource options defined", func(t *testing.T) {
-		client := NewMockBatchClient()
+		client := NewMockBatchClient(logger)
 		err := client.InitResources(mockConcurrentMapResourceMetrics)
 		assert.Error(t, err, "no resource options defined")
 	})
 	t.Run("return error failed to retrieve resources", func(t *testing.T) {
-		client := NewMockBatchClient()
+		client := NewMockBatchClient(logger)
 		client.Config = resourceQueryConfig
 		m := &MockService{}
 		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]*armresources.GenericResourceExpanded{}, errors.New("invalid resource query"))
@@ -47,7 +49,8 @@ func TestInitResourcesForBatch(t *testing.T) {
 }
 
 func TestGetMetricsInBatch(t *testing.T) {
-	client := NewMockBatchClient()
+	logger := logptest.NewTestingLogger(t, "")
+	client := NewMockBatchClient(logger)
 	client.Config = resourceIDConfig
 
 	t.Run("return no error when no metric values are returned but log and send event", func(t *testing.T) {
@@ -100,7 +103,7 @@ func TestGetMetricsInBatch(t *testing.T) {
 	})
 
 	t.Run("multiple aggregation types", func(t *testing.T) {
-		client := NewMockBatchClient()
+		client := NewMockBatchClient(logger)
 		criteria := ResDefGroupingCriteria{
 			Namespace:      "Microsoft.EventHub/Namespaces",
 			SubscriptionID: "subscription",

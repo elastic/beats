@@ -14,6 +14,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -47,13 +48,14 @@ func mockMapResourceMetrics(client *Client, resources []*armresources.GenericRes
 }
 
 func TestInitResources(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	t.Run("return error when no resource options were configured", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logger)
 		err := client.InitResources(mockMapResourceMetrics)
 		assert.Error(t, err, "no resource options were configured")
 	})
 	t.Run("return error no resources were found", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logger)
 		client.Config = resourceQueryConfig
 		m := &MockService{}
 		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]*armresources.GenericResourceExpanded{}, errors.New("invalid resource query"))
@@ -68,7 +70,8 @@ func TestInitResources(t *testing.T) {
 }
 
 func TestGetMetricValues(t *testing.T) {
-	client := NewMockClient()
+	logger := logptest.NewTestingLogger(t, "")
+	client := NewMockClient(logger)
 	client.Config = resourceIDConfig
 
 	t.Run("return no error when no metric values are returned but log and send event", func(t *testing.T) {
@@ -119,7 +122,7 @@ func TestGetMetricValues(t *testing.T) {
 	})
 
 	t.Run("multiple aggregation types", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logger)
 		referenceTime := time.Now().UTC()
 		client.ResourceConfigurations = ResourceConfiguration{
 			Metrics: []Metric{
@@ -184,7 +187,7 @@ func TestGetMetricValues(t *testing.T) {
 	})
 
 	t.Run("single aggregation types", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logger)
 		referenceTime := time.Now().UTC()
 		timestamp := time.Now().UTC()
 		client.ResourceConfigurations = ResourceConfiguration{

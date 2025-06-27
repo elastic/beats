@@ -82,14 +82,14 @@ var appPoolCounters = map[string]string{
 }
 
 // newReader creates a new instance of Reader.
-func newReader(config Config) (*Reader, error) {
+func newReader(config Config, logger *logp.Logger) (*Reader, error) {
 	var query pdh.Query
 	if err := query.Open(); err != nil {
 		return nil, err
 	}
 	r := &Reader{
 		query:           query,
-		log:             logp.NewLogger("application_pool"),
+		log:             logger.Named("application_pool"),
 		config:          config,
 		workerProcesses: make(map[string]string),
 	}

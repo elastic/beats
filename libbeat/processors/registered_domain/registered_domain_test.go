@@ -23,10 +23,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestProcessorRun(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	var testCases = []struct {
 		Error            bool
 		Domain           string
@@ -52,7 +54,7 @@ func TestProcessorRun(t *testing.T) {
 	c.TargetField = "registered_domain"
 	c.TargetSubdomainField = "subdomain"
 	c.TargetETLDField = "etld"
-	p, err := newRegisteredDomain(c)
+	p, err := newRegisteredDomain(c, logger)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +102,7 @@ func TestProcessorRun(t *testing.T) {
 		c.TargetField = "@metadata.registered_domain"
 		c.TargetSubdomainField = "@metadata.subdomain"
 		c.TargetETLDField = "@metadata.etld"
-		p, err := newRegisteredDomain(c)
+		p, err := newRegisteredDomain(c, logger)
 
 		evt := &beat.Event{
 			Meta: mapstr.M{

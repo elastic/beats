@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
 )
@@ -61,6 +62,7 @@ func TestPaginatorGetAllPages(t *testing.T) {
 		doRequest,
 		onError,
 		onSuccess,
+		logptest.NewTestingLogger(t, ""),
 	).GetAllPages()
 
 	assert.NoError(t, err)
@@ -88,6 +90,7 @@ func TestPaginatorGetAllPagesWithMaxPageLimit(t *testing.T) {
 		doRequest,
 		onError,
 		onSuccess,
+		logptest.NewTestingLogger(t, ""),
 	).GetAllPages()
 
 	assert.NoError(t, err)
@@ -116,6 +119,7 @@ func TestPaginatorGetAllPagesWithError(t *testing.T) {
 		doRequest,
 		onError,
 		onSuccess,
+		logptest.NewTestingLogger(t, ""),
 	).GetAllPages()
 
 	assert.Error(t, err)
@@ -143,6 +147,7 @@ func TestPaginatorGetAllPagesWithMalformedLinkHeader(t *testing.T) {
 		doRequest,
 		onError,
 		onSuccess,
+		logptest.NewTestingLogger(t, ""),
 	).GetAllPages()
 
 	assert.Error(t, err)
@@ -168,6 +173,7 @@ func TestPaginatorGetAllPagesWithLinkHeaderURLWithoutStartingAfter(t *testing.T)
 		doRequest,
 		onError,
 		onSuccess,
+		logptest.NewTestingLogger(t, ""),
 	).GetAllPages()
 
 	assert.Error(t, err)
@@ -194,6 +200,7 @@ func TestPaginatorGetAllPagesWithMissingLinkHeader(t *testing.T) {
 		doRequest,
 		onError,
 		onSuccess,
+		logptest.NewTestingLogger(t, ""),
 	).GetAllPages()
 
 	assert.NoError(t, err)
@@ -219,6 +226,7 @@ func TestPaginatorGetAllPagesWithErrorOnSuccess(t *testing.T) {
 		doRequest,
 		onError,
 		onSuccess,
+		logptest.NewTestingLogger(t, ""),
 	).GetAllPages()
 
 	assert.Error(t, err)

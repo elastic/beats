@@ -31,6 +31,7 @@ func promEventsGeneratorFactory(base mb.BaseMetricSet) (collector.PromEventsGene
 		g := typedGenerator{
 			counterCache: counters,
 			rateCounters: config.RateCounters,
+			logger:       base.Logger(),
 		}
 
 		return &g, nil
@@ -42,6 +43,7 @@ func promEventsGeneratorFactory(base mb.BaseMetricSet) (collector.PromEventsGene
 type typedGenerator struct {
 	counterCache CounterCache
 	rateCounters bool
+	logger       *logp.Logger
 }
 
 func (g *typedGenerator) Start() {
@@ -55,7 +57,7 @@ func (g *typedGenerator) Start() {
 }
 
 func (g *typedGenerator) Stop() {
-	logp.Debug("prometheus.collector.cache", "stopping counterCache")
+	g.logger.Named("prometheus.collector.cache").Debug("stopping counterCache")
 	g.counterCache.Stop()
 }
 
