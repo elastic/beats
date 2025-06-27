@@ -69,7 +69,8 @@ type Decoder struct {
 	flowID              *flows.FlowID // buffer flowID among many calls
 	flowIDBufferBacking [flows.SizeFlowIDMax]byte
 
-	logger *logp.Logger
+	allowMismatchedEth bool
+	logger             *logp.Logger
 }
 
 const (
@@ -80,13 +81,14 @@ const (
 )
 
 // New creates and initializes a new packet decoder.
-func New(f *flows.Flows, datalink layers.LinkType, icmp4 icmp.ICMPv4Processor, icmp6 icmp.ICMPv6Processor, tcp tcp.Processor, udp udp.Processor) (*Decoder, error) {
+func New(f *flows.Flows, datalink layers.LinkType, icmp4 icmp.ICMPv4Processor, icmp6 icmp.ICMPv6Processor, tcp tcp.Processor, udp udp.Processor, allowMismatchedEth bool) (*Decoder, error) {
 	d := Decoder{
 		flows:     f,
 		decoders:  make(map[gopacket.LayerType]gopacket.DecodingLayer),
 		icmp4Proc: icmp4, icmp6Proc: icmp6, tcpProc: tcp, udpProc: udp,
-		fragments: fragmentCache{collected: make(map[uint16]fragments)},
-		logger:    logp.NewLogger("decoder"),
+		fragments:          fragmentCache{collected: make(map[uint16]fragments)},
+		allowMismatchedEth: allowMismatchedEth,
+		logger:             logp.NewLogger("decoder"),
 	}
 	d.stD1Q.init(&d.d1q[0], &d.d1q[1])
 	d.stIP4.init(&d.ip4[0], &d.ip4[1])
@@ -370,7 +372,7 @@ func (d *Decoder) process(packet *protos.Packet, layerType gopacket.LayerType) (
 
 	switch layerType {
 	case layers.LayerTypeEthernet:
-		if withFlow {
+		if withFlow && !d.allowMismatchedEth {
 			d.flowID.AddEth(d.eth.SrcMAC, d.eth.DstMAC)
 		}
 
