@@ -20,7 +20,7 @@ package leader
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -59,9 +59,8 @@ func init() {
 // MetricSet for etcd.leader
 type MetricSet struct {
 	mb.BaseMetricSet
-	http         *helper.HTTP
-	logger       *logp.Logger
-	debugEnabled bool
+	http   *helper.HTTP
+	logger *logp.Logger
 }
 
 // New etcd.leader metricset object
@@ -78,8 +77,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		base,
 		http,
-		logp.NewLogger(logSelector),
-		logp.IsDebug(logSelector),
+		base.Logger().Named(logSelector),
 	}, nil
 }
 
@@ -93,7 +91,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 	defer res.Body.Close()
 
-	content, err := ioutil.ReadAll(res.Body)
+	content, err := io.ReadAll(res.Body)
 	if err != nil {
 		return fmt.Errorf("error reading body response: %w", err)
 	}
@@ -115,9 +113,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			// do not report events since this is not a leader
 			if res.StatusCode == http.StatusForbidden &&
 				retMessage == msgValueNonLeader {
-				if m.debugEnabled {
-					m.logger.Debugf("skipping event for non leader member %q", m.Host())
-				}
+				m.logger.Debugf("skipping event for non leader member %q", m.Host())
 				return nil
 			}
 
