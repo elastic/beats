@@ -163,26 +163,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			defer wmi.CloseAllInstances(rows)
 
-<<<<<<< HEAD
-			for _, instance := range rows {
-				event := mb.Event{
-					MetricSetFields: mapstr.M{
-						"class":     queryConfig.Class,
-						"namespace": namespace,
-						// Remote WMI is intentionally hidden, this will always be localhost
-						// "host":      m.config.Host,
-					},
-				}
-
-				// Remote WMI is intentionally hidden, this will always be the empty string
-				// if m.config.Domain != "" {
-				// 	event.MetricSetFields.Put("domain", m.config.Domain)
-				// }
-
-				if m.config.IncludeQueries {
-					event.MetricSetFields.Put("query", query)
-				}
-=======
 			if len(rows) == 0 {
 				message := fmt.Sprintf(
 					"The query '%s' did not return any results. "+
@@ -229,7 +209,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 				// Add the instance class
 				event.MetricSetFields.Put("class", instance.GetClassName())
->>>>>>> c63e539cf ([Metricbeat][WMI]Add query class and validation (#44579))
 
 				// Get only the required properties
 				properties := queryConfig.Properties
