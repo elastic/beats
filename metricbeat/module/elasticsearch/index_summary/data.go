@@ -288,56 +288,55 @@ func processNode(rawNode interface{}) (IndexSummary, error) {
 	if err != nil {
 		return summary, err
 	}
-
-	getM := func(m mapstr.M, key string) mapstr.M {
-		return m[key].(mapstr.M)
-	}
-
-	indices := getM(validated, "indices")
-	docs := getM(indices, "docs")
-	store := getM(indices, "store")
-	indexing := getM(indices, "indexing")
-	search := getM(indices, "search")
-	segments := getM(indices, "segments")
-
 	// Docs
-	summary.Docs.Count = docs["count"].(int64)
-	summary.Docs.Deleted = docs["deleted"].(int64)
+	summary.Docs.Count, _ = getInt64(validated, "indices", "docs", "count")
+	summary.Docs.Deleted, _ = getInt64(validated, "indices", "docs", "deleted")
 
 	// Store
-	summary.Store.Size.Bytes = getM(store, "size")["bytes"].(int64)
-	if tds, ok := store["total_data_set_size"].(mapstr.M); ok {
-		summary.Store.TotalDataSetSize.Bytes = tds["bytes"].(int64)
-	}
+	summary.Store.Size.Bytes, _ = getInt64(validated, "indices", "store", "size", "bytes")
+	summary.Store.TotalDataSetSize.Bytes, _ = getInt64(validated, "indices", "store", "total_data_set_size", "bytes")
 
 	// Indexing
-	index := getM(indexing, "index")
-	summary.Indexing.Index.Count = index["count"].(int64)
-	summary.Indexing.Index.Time.Ms = getM(index, "time")["ms"].(int64)
+	summary.Indexing.Index.Count, _ = getInt64(validated, "indices", "indexing", "index", "count")
+	summary.Indexing.Index.Time.Ms, _ = getInt64(validated, "indices", "indexing", "index", "time", "ms")
 
 	// Search
-	query := getM(getM(search, "query"), "time")
-	summary.Search.Query.Count = getM(search, "query")["count"].(int64)
-	summary.Search.Query.Time.Ms = query["ms"].(int64)
+	summary.Search.Query.Count, _ = getInt64(validated, "indices", "search", "query", "count")
+	summary.Search.Query.Time.Ms, _ = getInt64(validated, "indices", "search", "query", "time", "ms")
 
 	// Segments
-	summary.Segments.Count = segments["count"].(int64)
-	summary.Segments.Memory.Bytes = getM(segments, "memory")["bytes"].(int64)
+	summary.Segments.Count, _ = getInt64(validated, "indices", "segments", "count")
+	summary.Segments.Memory.Bytes, _ = getInt64(validated, "indices", "segments", "memory", "bytes")
 
 	// Bulk (optional)
-	if bulkRaw, ok := indices["bulk"].(mapstr.M); ok {
-		ops := getM(bulkRaw, "operations")
-		time := getM(getM(bulkRaw, "time"), "avg")
-		size := getM(bulkRaw, "size")
+	bulkOperations, err := getInt64(validated, "indices", "bulk", "operations", "count")
+	if err == nil {
+		summary.Bulk.Operations.Count = bulkOperations
+		summary.Bulk.Size.Bytes, _ = getInt64(validated, "indices", "bulk", "size", "bytes")
+		summary.Bulk.Time.Avg.Bytes, _ = getInt64(validated, "indices", "bulk", "time", "avg", "bytes")
+	}
+	return summary, nil
+}
 
-		summary.Bulk.Operations.Count = ops["count"].(int64)
-		summary.Bulk.Size.Bytes = size["bytes"].(int64)
-
-		summary.Bulk.Time.Avg.Bytes = time["bytes"].(int64)
-
+func getInt64(m mapstr.M, path ...string) (int64, error) {
+	current := interface{}(m)
+	for _, key := range path {
+		mm, ok := current.(mapstr.M)
+		if !ok {
+			return 0, fmt.Errorf("expected mapstr.M at %q, got %T", key, current)
+		}
+		val, ok := mm[key]
+		if !ok {
+			return 0, fmt.Errorf("missing key: %q", key)
+		}
+		current = val
 	}
 
-	return summary, nil
+	i, ok := current.(int64)
+	if !ok {
+		return 0, fmt.Errorf("expected int64 at path %v, got %T", path, current)
+	}
+	return i, nil
 }
 
 func (dst *IndexSummary) merge(src *IndexSummary) {
