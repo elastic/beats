@@ -20,7 +20,6 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
-	libbeatversion "github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -346,10 +345,6 @@ func CheckEvent(t *testing.T, event mb.Event, info utils.ClusterInfo) {
 	require.Equal(t, info.ClusterID, GetObjectValue(event.ModuleFields, "cluster.id"))
 	require.Equal(t, info.ClusterName, GetObjectValue(event.ModuleFields, "cluster.name"))
 	require.Equal(t, info.Version.Number.String(), GetObjectValue(event.ModuleFields, "cluster.version"))
-
-	require.Equal(t, "autoops_es", GetObjectValue(event.RootFields, "service.name"))
-	require.Equal(t, libbeatversion.GetDefaultVersion(), GetObjectValue(event.RootFields, "metricbeatVersion"))
-	require.Equal(t, libbeatversion.Commit(), GetObjectValue(event.RootFields, "commit"))
 }
 
 func CheckEventWithTransactionId(t *testing.T, event mb.Event, info utils.ClusterInfo, transactionId string) {

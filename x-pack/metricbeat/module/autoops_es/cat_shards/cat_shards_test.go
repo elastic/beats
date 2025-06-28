@@ -191,7 +191,7 @@ func Test500FailedToResolveIndexesWhileFetching(t *testing.T) {
 		require.Equal(t, "GET", errorField.HTTPMethod)
 		require.Equal(t, 500, errorField.HTTPStatusCode)
 		require.Equal(t, "Server Error", errorField.HTTPResponse) // checking the HTTP response body
-		require.Equal(t, "test-resource-id", event.RootFields["orchestrator.resource.id"])
+		require.Equal(t, "test-resource-id", auto_ops_testing.GetObjectValue(event.RootFields, "orchestrator.resource.id"))
 	})
 }
 
@@ -217,7 +217,7 @@ func Test404FailedToResolveIndexesWhileFetching(t *testing.T) {
 		require.Equal(t, "cat_shards", errorField.MetricSet)
 		require.Equal(t, "GET", errorField.HTTPMethod)
 		require.Equal(t, 404, errorField.HTTPStatusCode)
-		require.Equal(t, "test-resource-id", event.RootFields["orchestrator.resource.id"])
+		require.Equal(t, "test-resource-id", auto_ops_testing.GetObjectValue(event.RootFields, "orchestrator.resource.id"))
 		// avoiding the HTTP response body check on purpose, as the error response is a JSON string, and it's already tested
 	})
 }
@@ -244,7 +244,7 @@ func Test405FailedToResolveIndexesWhileFetching(t *testing.T) {
 		require.Equal(t, "cat_shards", errorField.MetricSet)
 		require.Equal(t, "GET", errorField.HTTPMethod)
 		require.Equal(t, 405, errorField.HTTPStatusCode)
-		require.Equal(t, "test-resource-id", event.RootFields["orchestrator.resource.id"])
+		require.Equal(t, "test-resource-id", auto_ops_testing.GetObjectValue(event.RootFields, "orchestrator.resource.id"))
 		// avoiding the HTTP response body check on purpose, as the error response is a JSON string, and it's already tested
 	})
 }
@@ -271,7 +271,7 @@ func Test500FailedToResolveIndexesWhileFetchingEmptyResponse(t *testing.T) {
 		require.Equal(t, "cat_shards", errorField.MetricSet)
 		require.Equal(t, "GET", errorField.HTTPMethod)
 		require.Equal(t, 500, errorField.HTTPStatusCode)
-		require.Equal(t, "test-resource-id", event.RootFields["orchestrator.resource.id"])
+		require.Equal(t, "test-resource-id", auto_ops_testing.GetObjectValue(event.RootFields, "orchestrator.resource.id"))
 		// avoiding the HTTP response body check on purpose, as the error response is a JSON string, and it's already tested
 	})
 }

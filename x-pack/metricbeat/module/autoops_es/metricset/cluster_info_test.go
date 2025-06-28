@@ -59,7 +59,7 @@ func TestNestedFailedClusterInfoNoId(t *testing.T) {
 		require.Equal(t, "test_nested_metricset", errorField.MetricSet)
 		require.Equal(t, http.MethodGet, errorField.HTTPMethod)
 		require.Equal(t, 0, errorField.HTTPStatusCode) // status code vary based on the server response for cluster not ready
-		require.Equal(t, "test-resource-id", event.RootFields["orchestrator.resource.id"])
+		require.Equal(t, "test-resource-id", auto_ops_testing.GetObjectValue(event.RootFields, "orchestrator.resource.id"))
 	})
 }
 
@@ -82,6 +82,6 @@ func TestNestedFailedClusterInfoNAId(t *testing.T) {
 		require.Equal(t, "", errorField.ClusterID)
 		require.Equal(t, "/", errorField.URLPath)
 		require.Equal(t, "test_metricset", errorField.MetricSet)
-		require.Equal(t, "test-resource-id", event.RootFields["orchestrator.resource.id"])
+		require.Equal(t, "test-resource-id", auto_ops_testing.GetObjectValue(event.RootFields, "orchestrator.resource.id"))
 	})
 }
