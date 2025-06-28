@@ -264,11 +264,10 @@ func eventMappingNewEndpoint(r mb.ReporterV2, info elasticsearch.Info, content [
 
 	var total IndexSummary
 	for nodeKey, raw := range wrapper.Nodes {
-		summary, err := extractNodeMetrics(raw)
+		err := addNodeMetrics(raw, &total)
 		if err != nil {
 			return fmt.Errorf("error processing node %q: %w", nodeKey, err)
 		}
-		total.merge(&summary)
 	}
 
 	event := buildEvent(&info, &total, isXPack)
@@ -276,46 +275,51 @@ func eventMappingNewEndpoint(r mb.ReporterV2, info elasticsearch.Info, content [
 	return nil
 }
 
-func extractNodeMetrics(rawNode interface{}) (IndexSummary, error) {
-	var summary IndexSummary
-
+func addNodeMetrics(rawNode interface{}, summary *IndexSummary) error {
 	nodeMap, ok := rawNode.(map[string]interface{})
 	if !ok {
-		return summary, fmt.Errorf("node is not a map")
+		return fmt.Errorf("node is not a map")
 	}
 
 	validated, err := nodeItemSchema.Apply(nodeMap, s.FailOnRequired)
 	if err != nil {
-		return summary, err
+		return err
 	}
+
+	incrementValue := func(dst *int64, path ...string) {
+		if v, err := getInt64(validated, path...); err == nil {
+			*dst += v
+		}
+	}
+
 	// Docs
-	summary.Docs.Count, _ = getInt64(validated, "indices", "docs", "count")
-	summary.Docs.Deleted, _ = getInt64(validated, "indices", "docs", "deleted")
+	incrementValue(&summary.Docs.Count, "indices", "docs", "count")
+	incrementValue(&summary.Docs.Deleted, "indices", "docs", "deleted")
 
 	// Store
-	summary.Store.Size.Bytes, _ = getInt64(validated, "indices", "store", "size", "bytes")
-	summary.Store.TotalDataSetSize.Bytes, _ = getInt64(validated, "indices", "store", "total_data_set_size", "bytes")
+	incrementValue(&summary.Store.Size.Bytes, "indices", "store", "size", "bytes")
+	incrementValue(&summary.Store.TotalDataSetSize.Bytes, "indices", "store", "total_data_set_size", "bytes")
 
 	// Indexing
-	summary.Indexing.Index.Count, _ = getInt64(validated, "indices", "indexing", "index", "count")
-	summary.Indexing.Index.Time.Ms, _ = getInt64(validated, "indices", "indexing", "index", "time", "ms")
+	incrementValue(&summary.Indexing.Index.Count, "indices", "indexing", "index", "count")
+	incrementValue(&summary.Indexing.Index.Time.Ms, "indices", "indexing", "index", "time", "ms")
 
 	// Search
-	summary.Search.Query.Count, _ = getInt64(validated, "indices", "search", "query", "count")
-	summary.Search.Query.Time.Ms, _ = getInt64(validated, "indices", "search", "query", "time", "ms")
+	incrementValue(&summary.Search.Query.Count, "indices", "search", "query", "count")
+	incrementValue(&summary.Search.Query.Time.Ms, "indices", "search", "query", "time", "ms")
 
 	// Segments
-	summary.Segments.Count, _ = getInt64(validated, "indices", "segments", "count")
-	summary.Segments.Memory.Bytes, _ = getInt64(validated, "indices", "segments", "memory", "bytes")
+	incrementValue(&summary.Segments.Count, "indices", "segments", "count")
+	incrementValue(&summary.Segments.Memory.Bytes, "indices", "segments", "memory", "bytes")
 
 	// Bulk (optional)
-	bulkOperations, err := getInt64(validated, "indices", "bulk", "operations", "count")
-	if err == nil {
-		summary.Bulk.Operations.Count = bulkOperations
-		summary.Bulk.Size.Bytes, _ = getInt64(validated, "indices", "bulk", "size", "bytes")
-		summary.Bulk.Time.Avg.Bytes, _ = getInt64(validated, "indices", "bulk", "time", "avg", "bytes")
+	if _, err := getInt64(validated, "indices", "bulk", "operations", "count"); err == nil {
+		incrementValue(&summary.Bulk.Operations.Count, "indices", "bulk", "operations", "count")
+		incrementValue(&summary.Bulk.Size.Bytes, "indices", "bulk", "size", "bytes")
+		incrementValue(&summary.Bulk.Time.Avg.Bytes, "indices", "bulk", "time", "avg", "bytes")
 	}
-	return summary, nil
+
+	return nil
 }
 
 func getInt64(m mapstr.M, path ...string) (int64, error) {
@@ -337,27 +341,6 @@ func getInt64(m mapstr.M, path ...string) (int64, error) {
 		return 0, fmt.Errorf("expected int64 at path %v, got %T", path, current)
 	}
 	return i, nil
-}
-
-func (dst *IndexSummary) merge(src *IndexSummary) {
-	dst.Docs.Count += src.Docs.Count
-	dst.Docs.Deleted += src.Docs.Deleted
-
-	dst.Store.Size.Bytes += src.Store.Size.Bytes
-	dst.Store.TotalDataSetSize.Bytes += src.Store.TotalDataSetSize.Bytes
-
-	dst.Indexing.Index.Count += src.Indexing.Index.Count
-	dst.Indexing.Index.Time.Ms += src.Indexing.Index.Time.Ms
-
-	dst.Search.Query.Count += src.Search.Query.Count
-	dst.Search.Query.Time.Ms += src.Search.Query.Time.Ms
-
-	dst.Segments.Count += src.Segments.Count
-	dst.Segments.Memory.Bytes += src.Segments.Memory.Bytes
-
-	dst.Bulk.Operations.Count += src.Bulk.Operations.Count
-	dst.Bulk.Size.Bytes += src.Bulk.Size.Bytes
-	dst.Bulk.Time.Avg.Bytes += src.Bulk.Time.Avg.Bytes
 }
 
 func buildEvent(info *elasticsearch.Info, summary *IndexSummary, isXPack bool) mb.Event {
