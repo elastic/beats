@@ -210,28 +210,6 @@ func appendNodeShards(nodeShards map[string]NodeShardCount, shard *Shard) {
 	nodeShards[shard.node_id] = node
 }
 
-func nodeShardCountToMapArray(nodeShards map[string]NodeShardCount) []map[string]any {
-	mapArray := make([]map[string]any, 0, len(nodeShards))
-
-	for _, nodeShard := range nodeShards {
-		mapArray = append(mapArray, map[string]any{
-			"node_id":                     nodeShard.NodeId,
-			"node_name":                   nodeShard.NodeName,
-			"shards_count":                nodeShard.Shards,
-			"primary_shards":              nodeShard.PrimaryShards,
-			"replica_shards":              nodeShard.ReplicaShards,
-			"initializing_shards":         nodeShard.InitializingShards,
-			"initializing_primary_shards": nodeShard.InitializingPrimaryShards,
-			"initializing_replica_shards": nodeShard.InitializingReplicaShards,
-			"relocating_shards":           nodeShard.RelocatingShards,
-			"relocating_primary_shards":   nodeShard.RelocatingPrimaryShards,
-			"relocating_replica_shards":   nodeShard.RelocatingReplicaShards,
-		})
-	}
-
-	return mapArray
-}
-
 func indexShardsToNodeIndexShards(nodeIndexShardsMap map[string]NodeIndexShards, index string, shards []Shard) {
 	status := GREEN
 	indexStatus := &status
