@@ -636,6 +636,26 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 	assert.Equal(t, events, res)
 }
 
+func TestPublishResultForStats(t *testing.T) {
+	// publishResultForStats should return errTooMany if it is given
+	// stats with tooMany > 0, and nil otherwise (all other errors are
+	// either caused by encoding or connection failures, or are
+	// immediately retryable).
+	stats := bulkResultStats{
+		acked:        1,
+		duplicates:   2,
+		fails:        3,
+		nonIndexable: 4,
+		deadLetter:   5,
+		tooMany:      1,
+	}
+
+	assert.Equal(t, errTooMany, publishResultForStats(stats), "publishResultForStats should return errTooMany if tooMany > 0")
+
+	stats.tooMany = 0
+	assert.Nil(t, publishResultForStats(stats), "publishResultForStats should return nil if tooMany == 0")
+}
+
 func BenchmarkCollectPublishFailsNone(b *testing.B) {
 	logger, err := logp.NewDevelopmentLogger("")
 	require.NoError(b, err)
