@@ -20,6 +20,7 @@ package mage
 import (
 	_ "embed"
 	"fmt"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -64,11 +65,6 @@ func moduleDocs() error {
 		}
 	}
 
-	// TODO(@VihasMakwana): Uncomment following when all the asciidocs are converted to markdown
-	// As of now, this will not work and it will generate incomplete list.
-
-	// fmt.Printf(">> update:moduleDocs: Collecting module documentation for %v.\n", strings.Join(names, ", "))
-	// return ioutil.WriteFile(filepath.Join(mage.DocsDir(), "reference", "winlogbeat", "winlogbeat-modules.md"), []byte(modulesListTmpl), 0o644)
-
-	return nil
+	fmt.Printf(">> update:moduleDocs: Collecting module documentation for %v.\n", strings.Join(names, ", "))
+	return os.WriteFile(filepath.Join(mage.DocsDir(), "reference", "winlogbeat", "winlogbeat-modules.md"), []byte(modulesListTmpl), 0o644)
 }
