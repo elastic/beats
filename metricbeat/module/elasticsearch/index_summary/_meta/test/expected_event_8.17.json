@@ -1,0 +1,123 @@
+{
+    "RootFields": {
+        "service": {
+            "name": "elasticsearch"
+        }
+    },
+    "ModuleFields": {
+        "cluster": {
+            "id": "1234",
+            "name": "helloworld"
+        }
+    },
+    "MetricSetFields": {
+        "primaries": {
+            "bulk": {
+                "operations": {
+                    "count": 212
+                },
+                "size": {
+                    "bytes": 691652
+                },
+                "time": {
+                    "avg": {
+                        "bytes": 1725
+                    }
+                }
+            },
+            "docs": {
+                "count": 468,
+                "deleted": 0
+            },
+            "indexing": {
+                "index": {
+                    "count": 472,
+                    "time": {
+                        "ms": 274
+                    }
+                }
+            },
+            "search": {
+                "query": {
+                    "count": 15,
+                    "time": {
+                        "ms": 1
+                    }
+                }
+            },
+            "segments": {
+                "count": 74,
+                "memory": {
+                    "bytes": 0
+                }
+            },
+            "store": {
+                "size": {
+                    "bytes": 1454527
+                },
+                "total_data_set_size": {
+                    "bytes": 1454527
+                }
+            }
+        },
+        "total": {
+            "bulk": {
+                "operations": {
+                    "count": 212
+                },
+                "size": {
+                    "bytes": 691652
+                },
+                "time": {
+                    "avg": {
+                        "bytes": 1725
+                    }
+                }
+            },
+            "docs": {
+                "count": 468,
+                "deleted": 0
+            },
+            "indexing": {
+                "index": {
+                    "count": 472,
+                    "time": {
+                        "ms": 274
+                    }
+                }
+            },
+            "search": {
+                "query": {
+                    "count": 15,
+                    "time": {
+                        "ms": 1
+                    }
+                }
+            },
+            "segments": {
+                "count": 74,
+                "memory": {
+                    "bytes": 0
+                }
+            },
+            "store": {
+                "size": {
+                    "bytes": 1454527
+                },
+                "total_data_set_size": {
+                    "bytes": 1454527
+                }
+            }
+        }
+    },
+    "Index": ".monitoring-es-8-mb",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "0001-01-01T00:00:00Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 0,
+    "Period": 0,
+    "DisableTimeSeries": false
+}

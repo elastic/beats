@@ -1,0 +1,76 @@
+{
+    "nodes" : {
+        "iyBjmE-eSviHPDdmjKXyeQ" : {
+            "indices" : {
+                "docs" : {
+                    "count" : 18,
+                    "deleted" : 119
+                },
+                "store" : {
+                    "size_in_bytes" : 120986,
+                    "total_data_set_size_in_bytes" : 120986
+                },
+                "indexing" : {
+                    "index_total" : 135,
+                    "index_time_in_millis" : 181
+                },
+                "search" : {
+                    "query_total" : 28,
+                    "query_time_in_millis" : 440
+                },
+                "segments" : {
+                    "count" : 49,
+                    "memory_in_bytes" : 32540
+                }
+            }
+        },
+        "vF3ak-83RKu_020pnVZJ_w" : {
+            "indices" : {
+                "docs" : {
+                    "count" : 365,
+                    "deleted" : 14
+                },
+                "store" : {
+                    "size_in_bytes" : "42727990",
+                    "total_data_set_size_in_bytes" : 42727990
+                },
+                "indexing" : {
+                    "index_total" : 65,
+                    "index_time_in_millis" : 959
+                },
+                "search" : {
+                    "query_total" : 83,
+                    "query_time_in_millis" : 95
+                },
+                "segments" : {
+                    "count" : 12,
+                    "memory_in_bytes" : 31024
+                }
+            }
+        },
+        "7-qiV2KLSSyZ74aKfCe6bg" : {
+            "indices" : {
+                "docs" : {
+                    "count" : 81,
+                    "deleted" : 119
+                },
+                "store" : {
+                    "size_in_bytes" : 42772958,
+                    "total_data_set_size_in_bytes" : 42772958
+                },
+                "indexing" : {
+                    "index_total" : 190,
+                    "index_time_in_millis" : 675
+                },
+                "search" : {
+                    "query_total" : 202,
+                    "query_time_in_millis" : 271
+                },
+                "segments" : {
+                    "count" : 19,
+                    "memory_in_bytes" : 50460
+                }
+            }
+        }
+    }
+}
