@@ -86,7 +86,7 @@ filebeat.inputs:
 
 ==== Execution
 
-The execution environment provided for the input includes includes the functions, macros, and global variables provided by the mito library.
+The execution environment provided for the input includes the functions, macros, and global variables provided by the mito library.
 A single JSON object is provided as an input accessible through a `state` variable.
 `state` contains a string `url` field and may contain arbitrary other fields configured via the input's `state` configuration.
 If the CEL program saves cursor states between executions of the program, the configured `state.cursor` value will be replaced by the saved cursor prior to execution.
