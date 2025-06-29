@@ -43,13 +43,9 @@ import (
 var (
 	errPayloadTooLarge = errors.New("the bulk payload is too large for the server. Consider to adjust `http.max_content_length` parameter in Elasticsearch or `bulk_max_size` in the beat. The batch has been dropped")
 
-<<<<<<< HEAD
-	ErrTooOld = errors.New("Elasticsearch is too old. Please upgrade the instance. If you would like to connect to older instances set output.elasticsearch.allow_older_versions to true.")
-=======
-	ErrTooOld = errors.New("Elasticsearch is too old. Please upgrade the instance. If you would like to connect to older instances set output.elasticsearch.allow_older_versions to true") //nolint:staticcheck //false positive (Elasticsearch should be capitalized)
+	ErrTooOld = errors.New("Elasticsearch is too old. Please upgrade the instance. If you would like to connect to older instances set output.elasticsearch.allow_older_versions to true.") //nolint:staticcheck //false positive (Elasticsearch should be capitalized)
 
 	errTooMany = errors.New("Elasticsearch returned error 429 Too Many Requests, throttling connection") //nolint:staticcheck //false positive (Elasticsearch should be capitalized)
->>>>>>> 8b25d5b14 (Fix Elasticsearch output retry backoff when receiving 429s (#45073))
 )
 
 // Client is an elasticsearch client.
