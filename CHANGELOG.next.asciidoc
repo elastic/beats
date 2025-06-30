@@ -93,6 +93,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
 - Add check for http error codes in the Metricbeat's Prometheus query submodule {pull}44493[44493]
 - Sanitize error messages in Fetch method of SQL module {pull}44577[44577]
+- Add VPN metrics to meraki module {pull}44851[44851]
 
 *Osquerybeat*
 
@@ -140,6 +141,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix `dns` processor to handle IPv6 server addresses properly. {pull}44526[44526]
 - Fix an issue where the Kafka output could get stuck if a proxied connection to the Kafka cluster was reset. {issue}44606[44606]
 - Use Debian 11 to build linux/arm to match linux/amd64. Upgrades linux/arm64's statically linked glibc from 2.28 to 2.31. {issue}44816[44816]
+- The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
 
 *Auditbeat*
 
@@ -325,6 +327,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add regex pattern matching to add_kubernetes_metadata processor {pull}41903[41903]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Publish cloud.availability_zone by add_cloud_metadata processor in azure environments {issue}42601[42601] {pull}43618[43618]
+- Added the `now` processor, which will populate the specified target field with the current timestamp. {pull}44795[44795]
 
 *Auditbeat*
 
@@ -462,7 +465,10 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add Fleet status update functionality to tcp input. {issue}44420[44420] {pull}44786[44786]
 - Filestream now logs at level warn the number of files that are too small to be ingested {pull}44751[44751]
 - Add proxy support to GCP Pub/Sub input. {pull}44892[44892]
+- Add Fleet status updating to Azure Blob Storage input. {issue}44268[44268] {pull}44945[44945]
 - Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
+- Segregated `max_workers` from `batch_size` in the azure-blob-storage input. {issue}44491[44491] {pull}44992[44992]
+- Add support for relationship expansion to EntraID entity analytics provider. {issue}43324[43324] {pull}44761[44761]
 
 *Auditbeat*
 
@@ -537,6 +543,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
 - Add latency config option to Azure Monitor module. {pull}44366[44366]
 - Increase default polling period for MongoDB module from 10s to 60s {pull}44781[44781]
+- Upgrade github.com/microsoft/go-mssqldb from v1.7.2 to v1.8.2 {pull}44990[44990]
+- Add SSL support for sql module: drivers mysql, postgres, and mssql. {pull}44748[44748]
 
 *Metricbeat*
 
