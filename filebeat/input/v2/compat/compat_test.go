@@ -27,7 +27,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -37,7 +37,7 @@ import (
 
 func TestRunnerFactory_CheckConfig(t *testing.T) {
 	t.Run("does not run or test configured input", func(t *testing.T) {
-		log := logp.NewLogger("test")
+		log := logptest.NewTestingLogger(t, "")
 		var countConfigure, countTest, countRun int
 
 		// setup
@@ -66,7 +66,7 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 	})
 
 	t.Run("does not cause input ID duplication", func(t *testing.T) {
-		log := logp.NewLogger("test")
+		log := logptest.NewTestingLogger(t, "")
 		var countConfigure, countTest, countRun int
 		var runWG sync.WaitGroup
 		var ids = map[string]int{}
@@ -136,7 +136,7 @@ type: test
 	})
 
 	t.Run("fail if input type is unknown to loader", func(t *testing.T) {
-		log := logp.NewLogger("test")
+		log := logptest.NewTestingLogger(t, "")
 		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(nil))
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "")
 		factory := RunnerFactory(
@@ -155,7 +155,7 @@ type: test
 
 func TestRunnerFactory_CreateAndRun(t *testing.T) {
 	t.Run("runner can correctly start and stop inputs", func(t *testing.T) {
-		log := logp.NewLogger("test")
+		log := logptest.NewTestingLogger(t, "")
 		var countRun int
 		var wg sync.WaitGroup
 		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(&inputest.MockInput{
@@ -186,7 +186,7 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 	})
 
 	t.Run("fail if input type is unknown to loader", func(t *testing.T) {
-		log := logp.NewLogger("test")
+		log := logptest.NewTestingLogger(t, "")
 		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(nil))
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "")
 		factory := RunnerFactory(log, beat.Info{}, monitoring.NewRegistry(), loader.Loader)

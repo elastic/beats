@@ -52,10 +52,10 @@ func cleanupStaleSocket(path string) error {
 	return nil
 }
 
-func setSocketOwnership(path string, group *string) error {
+func setSocketOwnership(path string, group *string, logger *logp.Logger) error {
 	if group != nil {
 		if runtime.GOOS == "windows" {
-			logp.NewLogger("unix").Warn("windows does not support the 'group' configuration option, ignoring")
+			logger.Named("unix").Warn("windows does not support the 'group' configuration option, ignoring")
 			return nil
 		}
 		g, err := user.LookupGroup(*group)
