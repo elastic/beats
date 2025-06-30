@@ -67,21 +67,19 @@ func parseKeyspaceStats(keyspaceMap map[string]string) map[string]mapstr.M {
 	for k, v := range keyspaceMap {
 
 		// Extract out the overloaded values for db keyspace
-		// fmt: info[db0] = keys=795341,expires=0,avg_ttl=0
+		// fmt: info[db0] = keys=795341,expires=0,avg_ttl=0,subexpiry=0
 		dbInfo := redis.ParseRedisLine(v, ",")
 
-		if len(dbInfo) == 3 {
-			db := map[string]interface{}{}
-			for _, dbEntry := range dbInfo {
-				stats := redis.ParseRedisLine(dbEntry, "=")
+		db := map[string]interface{}{}
+		for _, dbEntry := range dbInfo {
+			stats := redis.ParseRedisLine(dbEntry, "=")
 
-				if len(stats) == 2 {
-					db[stats[0]] = stats[1]
-				}
+			if len(stats) == 2 {
+				db[stats[0]] = stats[1]
 			}
-			data, _ := schema.Apply(db)
-			keyspace[k] = data
 		}
+		data, _ := schema.Apply(db)
+		keyspace[k] = data
 	}
 	return keyspace
 }
