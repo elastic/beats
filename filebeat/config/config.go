@@ -100,9 +100,9 @@ func getConfigFiles(path string) (configFiles []string, err error) {
 }
 
 // mergeConfigFiles reads in all config files given by list configFiles and merges them into config
-func mergeConfigFiles(configFiles []string, config *Config) error {
+func mergeConfigFiles(configFiles []string, config *Config, logger *logp.Logger) error {
 	for _, file := range configFiles {
-		logp.Info("Additional configs loaded from: %s", file)
+		logger.Infof("Additional configs loaded from: %s", file)
 
 		tmpConfig := struct {
 			Filebeat Config
@@ -120,7 +120,7 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 }
 
 // FetchConfigs fetches and merges all config files given by configDir. All are put into one config object
-func (config *Config) FetchConfigs() error {
+func (config *Config) FetchConfigs(logger *logp.Logger) error {
 	configDir := config.ConfigDir
 
 	// If option not set, do nothing
@@ -134,7 +134,7 @@ func (config *Config) FetchConfigs() error {
 	configDir = paths.Resolve(paths.Config, configDir)
 
 	// Check if optional configDir is set to fetch additional config files
-	logp.Info("Additional config files are fetched from: %s", configDir)
+	logger.Infof("Additional config files are fetched from: %s", configDir)
 
 	configFiles, err := getConfigFiles(configDir)
 	if err != nil {
@@ -142,7 +142,7 @@ func (config *Config) FetchConfigs() error {
 		return err
 	}
 
-	err = mergeConfigFiles(configFiles, config)
+	err = mergeConfigFiles(configFiles, config, logger)
 	if err != nil {
 		log.Fatal("Error merging config files: ", err)
 		return err

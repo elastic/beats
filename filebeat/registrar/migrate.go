@@ -207,7 +207,7 @@ func (m *Migrator) updateToVersion1(regHome string) error {
 		return err
 	}
 
-	states = resetStates(fixStates(states))
+	states = resetStates(fixStates(states, m.logger))
 
 	registryBackend, err := memlog.New(m.logger.Named("migration"), memlog.Settings{
 		Root:               m.dataPath,
@@ -317,7 +317,7 @@ func safeWriteFile(path string, data []byte, perm os.FileMode) error {
 
 // fixStates cleans up the registry states when updating from an older version
 // of filebeat potentially writing invalid entries.
-func fixStates(states []file.State) []file.State {
+func fixStates(states []file.State, logger *logp.Logger) []file.State {
 	if len(states) == 0 {
 		return states
 	}
@@ -326,7 +326,7 @@ func fixStates(states []file.State) []file.State {
 	idx := map[string]*file.State{}
 	for i := range states {
 		state := &states[i]
-		fixState(state)
+		fixState(state, logger)
 
 		old, exists := idx[state.Id]
 		if !exists {
@@ -352,13 +352,13 @@ func fixStates(states []file.State) []file.State {
 // fixState updates a read state to fullfil required invariantes:
 // - "Meta" must be nil if len(Meta) == 0
 // - "Id" must be initialized
-func fixState(st *file.State) {
+func fixState(st *file.State, logger *logp.Logger) {
 	if len(st.Meta) == 0 {
 		st.Meta = nil
 	}
 
 	if len(st.IdentifierName) == 0 {
-		identifier, _ := file.NewStateIdentifier(nil)
+		identifier, _ := file.NewStateIdentifier(nil, logger)
 		st.Id, st.IdentifierName = identifier.GenerateID(*st)
 	}
 }

@@ -33,8 +33,6 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
-var debugf = logp.NewLogger("system.process").Debugf
-
 func init() {
 	mb.Registry.MustAddMetricSet("system", "process", New,
 		mb.WithHostParser(parse.EmptyHostParser),
@@ -66,7 +64,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if runtime.GOOS == "linux" {
 		if config.Cgroups == nil || *config.Cgroups {
 			enableCgroups = true
-			debugf("process cgroup data collection is enabled, using hostfs='%v'", sys.ResolveHostFS(""))
+			base.Logger().Named("system.process").Debugf("process cgroup data collection is enabled, using hostfs='%v'", sys.ResolveHostFS(""))
 		}
 	}
 

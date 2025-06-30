@@ -64,7 +64,6 @@ func TestFetchDegradeOnPartial(t *testing.T) {
 		t.Skip("Skip: running as root on non-windows, but the test requires to run as non-root")
 	}
 
-	logp.DevelopmentSetup()
 	config := getConfig()
 	config["degrade_on_partial"] = true
 
@@ -81,7 +80,6 @@ func TestFetchDegradeOnPartial(t *testing.T) {
 }
 
 func TestFetchSinglePid(t *testing.T) {
-	logp.DevelopmentSetup()
 
 	cfg := getConfig()
 	cfg["process.pid"] = os.Getpid()
