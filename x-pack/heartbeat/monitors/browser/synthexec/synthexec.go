@@ -43,7 +43,7 @@ type FilterJourneyConfig struct {
 // where these are unsupported
 var platformCmdMutate func(*SynthCmd) = func(*SynthCmd) {}
 
-var SynthexecTimeout struct{}
+var SynthexecTimeout = "synthexec_timeout"
 
 // ProjectJob will run a single journey by name from the given project.
 func ProjectJob(ctx context.Context, projectPath string, params mapstr.M, filterJourneys FilterJourneyConfig, fields stdfields.StdMonitorFields, extraArgs ...string) (jobs.Job, error) {
