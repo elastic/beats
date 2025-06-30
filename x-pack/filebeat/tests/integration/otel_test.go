@@ -339,7 +339,7 @@ setup.template.pattern: logs-filebeat-default
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
-	assertMonitoring(t, 5066) // otel
+	assertMonitoring(t, otelConfig.MonitoringPort)
 	assertMonitoring(t, 5067) // filebeat
 }
 
@@ -374,16 +374,15 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 		Receiver1: receiverConfig{
 			MonitoringPort: 5066,
 			InputFile:      filepath.Join(filebeatOTel.TempDir(), "log.log"),
-			PathHome:       t.TempDir(),
+			PathHome:       filebeatOTel.TempDir(),
 		},
 		Receiver2: receiverConfig{
 			MonitoringPort: 5067,
 			InputFile:      filepath.Join(filebeatOTel.TempDir(), "log.log"),
-			PathHome:       t.TempDir(),
+			PathHome:       filebeatOTel.TempDir(),
 		},
 	}
 
-	// create the config for two filebeat receivers
 	cfg := `receivers:
   filebeatreceiver/1:
     filebeat:
@@ -479,6 +478,6 @@ service:
 			return otelDocs.Hits.Total.Value >= wantEvents*2 // two receivers
 		},
 		2*time.Minute, 100*time.Millisecond, "expected %d events, got %d", wantEvents*2, otelDocs.Hits.Total.Value)
-	assertMonitoring(t, 5066) // otel receiver 1
-	assertMonitoring(t, 5067) // otel receiver 2
+	assertMonitoring(t, otelConfig.Receiver1.MonitoringPort)
+	assertMonitoring(t, otelConfig.Receiver2.MonitoringPort)
 }
