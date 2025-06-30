@@ -304,26 +304,16 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 					return err
 				}
 				s.log.Debugw("websocket connection encountered an error, attempting to reconnect...", "error", err)
-<<<<<<< HEAD
 				s.status.UpdateStatus(status.Degraded, "websocket connection encountered an error: "+err.Error())
 				// close the old connection and reconnect
-				if err := c.Close(); err != nil {
-					s.metrics.errorsTotal.Inc()
-					s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
-				}
-				// since c is already a pointer, we can reassign it to the new connection and the defer func will still handle it
-				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.status, s.log)
-=======
 				if c != nil {
 					if err := c.Close(); err != nil {
 						s.metrics.errorsTotal.Inc()
 						s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
 					}
 				}
-				// Since c is already a pointer, we can reassign it to the new connection
-				// and the defer func will still handle it.
-				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
->>>>>>> 73eed8ba7 ([filebeat][streaming] - Added support for websocket keep_alive heartbeat, updated metrics & docs (#44204))
+				// since c is already a pointer, we can reassign it to the new connection and the defer func will still handle it
+				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.status, s.log)
 				handleConnectionResponse(resp, s.metrics, s.log)
 				if err != nil {
 					s.metrics.errorsTotal.Inc()
