@@ -343,10 +343,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	b.registerClusterUUIDFetching()
 
-	reg := monitoring.Default.GetRegistry("libbeat")
-	if reg == nil {
-		reg = monitoring.Default.NewRegistry("libbeat")
-	}
+	reg := b.Monitoring.StatsRegistry().GetOrCreateRegistry("libbeat")
 
 	err = metricreport.SetupMetrics(b.Info.Logger.Named("metrics"), b.Info.Beat, version.GetDefaultVersion())
 	if err != nil {
@@ -354,7 +351,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 
 	// Report central management state
-	mgmt := b.Info.Monitoring.StateRegistry.NewRegistry("management")
+	mgmt := b.Monitoring.StateRegistry().NewRegistry("management")
 	monitoring.NewBool(mgmt, "enabled").Set(b.Manager.Enabled())
 
 	log.Debug("Initializing output plugins")
@@ -372,7 +369,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	var publisher *pipeline.Pipeline
 	monitors := pipeline.Monitors{
 		Metrics:   reg,
-		Telemetry: b.Info.Monitoring.StateRegistry,
+		Telemetry: b.Monitoring.StateRegistry(),
 		Logger:    b.Info.Logger.Named("publisher"),
 		Tracer:    b.Instrumentation.Tracer(),
 	}
@@ -445,7 +442,11 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// that would be set at runtime.
 	if b.Config.HTTP.Enabled() {
 		var err error
-		b.API, err = api.NewWithDefaultRoutes(logger, b.Config.HTTP, api.NamespaceLookupFunc())
+		b.API, err = api.NewWithDefaultRoutes(logger, b.Config.HTTP,
+			b.Monitoring.InfoRegistry(),
+			b.Monitoring.StateRegistry(),
+			b.Monitoring.StatsRegistry(),
+			b.Monitoring.InputsRegistry())
 		if err != nil {
 			return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
@@ -551,49 +552,49 @@ func (b *Beat) reexec() error {
 // and/or pushed to Elasticsearch through the x-pack monitoring feature.
 func (b *Beat) RegisterMetrics() {
 	// info
-	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "version").Set(b.Info.Version)
-	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "beat").Set(b.Info.Beat)
-	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "name").Set(b.Info.Name)
-	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "uuid").Set(b.Info.ID.String())
-	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
-	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "binary_arch").Set(runtime.GOARCH)
-	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "build_commit").Set(version.Commit())
-	monitoring.NewTimestamp(b.Info.Monitoring.InfoRegistry, "build_time").Set(version.BuildTime())
-	monitoring.NewBool(b.Info.Monitoring.InfoRegistry, "elastic_licensed").Set(b.Info.ElasticLicensed)
+	infoRegistry := b.Monitoring.InfoRegistry()
+	monitoring.NewString(infoRegistry, "version").Set(b.Info.Version)
+	monitoring.NewString(infoRegistry, "beat").Set(b.Info.Beat)
+	monitoring.NewString(infoRegistry, "name").Set(b.Info.Name)
+	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())
+	monitoring.NewString(infoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
+	monitoring.NewString(infoRegistry, "binary_arch").Set(runtime.GOARCH)
+	monitoring.NewString(infoRegistry, "build_commit").Set(version.Commit())
+	monitoring.NewTimestamp(infoRegistry, "build_time").Set(version.BuildTime())
+	monitoring.NewBool(infoRegistry, "elastic_licensed").Set(b.Info.ElasticLicensed)
 
 	// Add user metadata data asynchronously (on Windows the lookup can take up to 60s).
 	go func() {
 		if u, err := user.Current(); err != nil {
 			// This usually happens if the user UID does not exist in /etc/passwd. It might be the case on K8S
 			// if the user set securityContext.runAsUser to an arbitrary value.
-			monitoring.NewString(b.Info.Monitoring.InfoRegistry, "uid").Set(strconv.Itoa(os.Getuid()))
-			monitoring.NewString(b.Info.Monitoring.InfoRegistry, "gid").Set(strconv.Itoa(os.Getgid()))
+			monitoring.NewString(infoRegistry, "uid").Set(strconv.Itoa(os.Getuid()))
+			monitoring.NewString(infoRegistry, "gid").Set(strconv.Itoa(os.Getgid()))
 		} else {
-			monitoring.NewString(b.Info.Monitoring.InfoRegistry, "username").Set(u.Username)
-			monitoring.NewString(b.Info.Monitoring.InfoRegistry, "uid").Set(u.Uid)
-			monitoring.NewString(b.Info.Monitoring.InfoRegistry, "gid").Set(u.Gid)
+			monitoring.NewString(infoRegistry, "username").Set(u.Username)
+			monitoring.NewString(infoRegistry, "uid").Set(u.Uid)
+			monitoring.NewString(infoRegistry, "gid").Set(u.Gid)
 		}
 	}()
 
 	// state.service
-	serviceRegistry := b.Info.Monitoring.StateRegistry.NewRegistry("service")
-	monitoring.NewString(serviceRegistry, "version").Set(b.Info.Version)
-	monitoring.NewString(serviceRegistry, "name").Set(b.Info.Beat)
-	monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
+	stateRegistry := b.Monitoring.StateRegistry()
+	monitoring.NewString(stateRegistry, "service.version").Set(b.Info.Version)
+	monitoring.NewString(stateRegistry, "service.name").Set(b.Info.Beat)
+	monitoring.NewString(stateRegistry, "service.id").Set(b.Info.ID.String())
 
 	// state.beat
-	beatRegistry := b.Info.Monitoring.StateRegistry.NewRegistry("beat")
-	monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
+	monitoring.NewString(stateRegistry, "beat.name").Set(b.Info.Name)
 }
 
 func (b *Beat) RegisterHostname(useFQDN bool) {
 	hostname := b.Info.FQDNAwareHostname(useFQDN)
 
 	// info.hostname
-	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "hostname").Set(hostname)
+	monitoring.NewString(b.Monitoring.InfoRegistry(), "hostname").Set(hostname)
 
 	// state.host
-	monitoring.NewFunc(b.Info.Monitoring.StateRegistry, "host", host.ReportInfo(hostname), monitoring.Report)
+	monitoring.NewFunc(b.Monitoring.StateRegistry(), "host", host.ReportInfo(hostname), monitoring.Report)
 }
 
 // TestConfig check all settings are ok and the beat can be run
@@ -754,7 +755,7 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error loading config file: %w", err)
 	}
 
-	b.Info.Monitoring.SetupRegistries()
+	b.Monitoring = beat.NewGlobalMonitoring()
 
 	if err := InitPaths(cfg); err != nil {
 		return err
@@ -888,8 +889,6 @@ func (b *Beat) configure(settings Settings) error {
 		debug.SetGCPercent(gcPercent)
 	}
 
-	b.Info.Monitoring.Namespace = monitoring.GetNamespace("dataset")
-
 	b.Beat.BeatConfig, err = b.BeatConfig()
 	if err != nil {
 		return err
@@ -914,7 +913,7 @@ func (b *Beat) configure(settings Settings) error {
 		"global_processors.txt", "text/plain", b.agentDiagnosticHook)
 	b.Manager.RegisterDiagnosticHook("beat_metrics", "Metrics from the default monitoring namespace and expvar.",
 		"beat_metrics.json", "application/json", func() []byte {
-			m := monitoring.CollectStructSnapshot(monitoring.Default, monitoring.Full, true)
+			m := monitoring.CollectStructSnapshot((b.Monitoring.StatsRegistry()), monitoring.Full, true)
 			data, err := json.MarshalIndent(m, "", "  ")
 			if err != nil {
 				logger.Warnw("Failed to collect beat metric snapshot for Agent diagnostics.", "error", err)
@@ -1282,7 +1281,7 @@ func (b *Beat) registerClusterUUIDFetching() {
 
 // Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
 func (b *Beat) clusterUUIDFetchingCallback() elasticsearch.ConnectCallback {
-	elasticsearchRegistry := b.Info.Monitoring.StateRegistry.NewRegistry("outputs.elasticsearch")
+	elasticsearchRegistry := b.Monitoring.StateRegistry().NewRegistry("outputs.elasticsearch")
 	clusterUUIDRegVar := monitoring.NewString(elasticsearchRegistry, "cluster_uuid")
 
 	callback := func(esClient *eslegclient.Connection) error {
@@ -1319,7 +1318,7 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 
 	// Expose monitoring.cluster_uuid in state API
 	if monitoringClusterUUID != "" {
-		monitoringRegistry := b.Info.Monitoring.StateRegistry.NewRegistry("monitoring")
+		monitoringRegistry := b.Monitoring.StateRegistry().NewRegistry("monitoring")
 		clusterUUIDRegVar := monitoring.NewString(monitoringRegistry, "cluster_uuid")
 		clusterUUIDRegVar.Set(monitoringClusterUUID)
 	}
@@ -1334,7 +1333,7 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 			DefaultUsername: settings.Monitoring.DefaultUsername,
 			ClusterUUID:     monitoringClusterUUID,
 		}
-		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
+		reporter, err := report.New(b.Info, b.Monitoring, settings, monitoringCfg, b.Config.Output)
 		if err != nil {
 			return nil, err
 		}
