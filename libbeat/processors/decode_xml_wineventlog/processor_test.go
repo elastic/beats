@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -130,7 +131,7 @@ func TestProcessor(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			t.Parallel()
 
-			f, err := newProcessor(test.config)
+			f, err := newProcessor(test.config, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			event := &beat.Event{
@@ -155,7 +156,7 @@ func TestProcessor(t *testing.T) {
 		config.Field = "@metadata.message"
 		config.Target = "@metadata.target"
 
-		f, err := newProcessor(config)
+		f, err := newProcessor(config, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 
 		event := &beat.Event{

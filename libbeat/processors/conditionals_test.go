@@ -26,6 +26,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -91,9 +93,9 @@ func TestWhenProcessor(t *testing.T) {
 		}
 
 		cf := &countFilter{}
-		filter, err := NewConditional(func(_ *conf.C) (beat.Processor, error) {
+		filter, err := NewConditional(func(_ *conf.C, log *logp.Logger) (beat.Processor, error) {
 			return cf, nil
-		})(config)
+		})(config, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Error(err)
 			continue
@@ -116,9 +118,9 @@ func TestWhenProcessor(t *testing.T) {
 
 func TestConditionRuleInitErrorPropagates(t *testing.T) {
 	testErr := errors.New("test")
-	filter, err := NewConditional(func(_ *conf.C) (beat.Processor, error) {
+	filter, err := NewConditional(func(_ *conf.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, testErr
-	})(conf.NewConfig())
+	})(conf.NewConfig(), logptest.NewTestingLogger(t, ""))
 
 	assert.Equal(t, testErr, err)
 	assert.Nil(t, filter)
@@ -144,7 +146,7 @@ func testProcessors(t *testing.T, cases map[string]testCase) {
 				t.Fatal(err)
 			}
 
-			processor, err := New(pluginConfig)
+			processor, err := New(pluginConfig, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatal(err)
 			}

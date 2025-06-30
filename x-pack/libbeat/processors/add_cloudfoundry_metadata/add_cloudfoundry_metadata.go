@@ -35,7 +35,7 @@ type addCloudFoundryMetadata struct {
 const selector = "add_cloudfoundry_metadata"
 
 // New constructs a new add_cloudfoundry_metadata processor.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	var config cloudfoundry.Config
 
 	// ShardID is required in cloudfoundry config to consume from the firehose,
@@ -46,7 +46,7 @@ func New(cfg *conf.C) (beat.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
-	log := logp.NewLogger(selector)
+	log = logp.NewLogger(selector)
 	hub := cloudfoundry.NewHub(&config, "add_cloudfoundry_metadata", log)
 	client, err := hub.ClientWithCache()
 	if err != nil {

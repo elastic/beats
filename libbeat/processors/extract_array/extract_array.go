@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -89,7 +90,7 @@ func (f *extractArrayProcessor) Unpack(from *conf.C) error {
 }
 
 // New builds a new extract_array processor.
-func New(c *conf.C) (beat.Processor, error) {
+func New(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	p := &extractArrayProcessor{}
 	err := c.Unpack(p)
 	if err != nil {

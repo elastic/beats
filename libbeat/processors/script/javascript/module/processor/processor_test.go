@@ -150,7 +150,7 @@ type mockProcessor struct {
 	fields mapstr.M
 }
 
-func newMock(c *config.C) (beat.Processor, error) {
+func newMock(c *config.C, log *logp.Logger) (beat.Processor, error) {
 	config := struct {
 		Fields mapstr.M `config:"fields" validate:"required"`
 	}{}
@@ -176,7 +176,7 @@ func (m *mockProcessor) String() string {
 
 type mockProcessorWithCloser struct{}
 
-func newMockWithCloser(c *config.C) (beat.Processor, error) {
+func newMockWithCloser(c *config.C, log *logp.Logger) (beat.Processor, error) {
 	return &mockProcessorWithCloser{}, nil
 }
 

@@ -29,6 +29,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -70,7 +72,7 @@ func TestWithConfig(t *testing.T) {
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
 			config := config.MustNewConfigFrom(test.config)
-			p, err := New(config)
+			p, err := New(config, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			testEvent := &beat.Event{
@@ -90,7 +92,7 @@ func TestWithConfig(t *testing.T) {
 			"fields":       []string{"@metadata.message"},
 			"target_field": "@metadata.fingerprint",
 		})
-		p, err := New(config)
+		p, err := New(config, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 
 		testEvent := &beat.Event{
@@ -137,7 +139,7 @@ func TestHashMethods(t *testing.T) {
 			})
 			assert.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			assert.NoError(t, err)
 
 			testEvent := &beat.Event{
@@ -182,7 +184,7 @@ func TestSourceFields(t *testing.T) {
 			})
 			assert.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			assert.NoError(t, err)
 
 			testEvent := &beat.Event{
@@ -226,7 +228,7 @@ func TestEncoding(t *testing.T) {
 			})
 			assert.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			assert.NoError(t, err)
 
 			testEvent := &beat.Event{
@@ -277,7 +279,7 @@ func TestConsistentHashingTimeFields(t *testing.T) {
 			})
 			assert.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			assert.NoError(t, err)
 
 			testEvent := &beat.Event{
@@ -318,7 +320,7 @@ func TestTargetField(t *testing.T) {
 			})
 			assert.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			assert.NoError(t, err)
 
 			testEvent := &beat.Event{
@@ -367,7 +369,7 @@ func TestSourceFieldErrors(t *testing.T) {
 			})
 			assert.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			assert.NoError(t, err)
 
 			testEvent := &beat.Event{
@@ -409,7 +411,7 @@ func TestInvalidConfig(t *testing.T) {
 			testConfig, err := config.NewConfigFrom(test.config)
 			assert.NoError(t, err)
 
-			_, err = New(testConfig)
+			_, err = New(testConfig, logptest.NewTestingLogger(t, ""))
 			assert.IsType(t, errConfigUnpack{}, err)
 		})
 	}
@@ -442,7 +444,7 @@ func TestIgnoreMissing(t *testing.T) {
 			})
 			assert.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			assert.NoError(t, err)
 
 			testEvent := &beat.Event{
@@ -468,7 +470,7 @@ func TestProcessorStringer(t *testing.T) {
 		"method":   "sha256",
 	})
 	require.NoError(t, err)
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	require.Equal(t, `fingerprint={"Method":"sha256","Encoding":"hex","Fields":["field1"],"TargetField":"fingerprint","IgnoreMissing":false}`, fmt.Sprint(p))
 }
@@ -482,7 +484,8 @@ func BenchmarkHashMethods(b *testing.B) {
 			"method": method,
 		})
 
-		p, _ := New(testConfig)
+		logger, _ := logp.NewDevelopmentLogger(" ")
+		p, _ := New(testConfig, logger)
 
 		b.Run(method, func(b *testing.B) {
 			b.ResetTimer()

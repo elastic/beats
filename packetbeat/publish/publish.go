@@ -96,7 +96,7 @@ func (p *TransactionPublisher) CreateReporter(
 		return nil, err
 	}
 
-	processors, err := processors.New(meta.Processors)
+	processors, err := processors.New(meta.Processors, nil)
 	if err != nil {
 		return nil, err
 	}

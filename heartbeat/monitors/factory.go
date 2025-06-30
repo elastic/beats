@@ -234,7 +234,7 @@ func newCommonPublishConfigs(info beat.Info, beatLocation *config.LocationWithID
 		return nil, err
 	}
 
-	userProcessors, err := processors.New(settings.Processors)
+	userProcessors, err := processors.New(settings.Processors, info.Logger)
 	if err != nil {
 		return nil, err
 	}

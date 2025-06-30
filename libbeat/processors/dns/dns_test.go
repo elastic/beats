@@ -26,7 +26,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -37,7 +37,7 @@ func TestDNSProcessorRun(t *testing.T) {
 	p := &processor{
 		config:   c,
 		resolver: &stubResolver{},
-		log:      logp.NewLogger(logName),
+		log:      logptest.NewTestingLogger(t, logName),
 	}
 	p.config.reverseFlat = map[string]string{
 		"source.ip": "source.domain",
@@ -105,7 +105,7 @@ func TestDNSProcessorRun(t *testing.T) {
 		p := &processor{
 			config:   config,
 			resolver: &stubResolver{},
-			log:      logp.NewLogger(logName),
+			log:      logptest.NewTestingLogger(t, logName),
 		}
 
 		event := &beat.Event{
@@ -130,7 +130,7 @@ func TestDNSProcessorTagOnFailure(t *testing.T) {
 	p := &processor{
 		config:   defaultConfig(),
 		resolver: &stubResolver{},
-		log:      logp.NewLogger(logName),
+		log:      logptest.NewTestingLogger(t, logName),
 	}
 	p.config.TagOnFailure = []string{"_lookup_failed"}
 	p.config.reverseFlat = map[string]string{
@@ -165,7 +165,7 @@ func TestDNSProcessorRunInParallel(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	p := &processor{config: conf, resolver: cache, log: logp.NewLogger(logName)}
+	p := &processor{config: conf, resolver: cache, log: logptest.NewTestingLogger(t, logName)}
 	p.config.reverseFlat = map[string]string{"source.ip": "source.domain"}
 
 	const numGoroutines = 10

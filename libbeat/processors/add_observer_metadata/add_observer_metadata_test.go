@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -37,7 +38,7 @@ func TestConfigDefault(t *testing.T) {
 	testConfig, err := cfg.NewConfigFrom(map[string]interface{}{})
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 
 	newEvent, err := p.Run(event)
 	assert.NoError(t, err)
@@ -59,7 +60,7 @@ func TestOverwriteFalse(t *testing.T) {
 	testConfig, err := cfg.NewConfigFrom(map[string]interface{}{})
 	require.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 
 	newEvent, err := p.Run(event)
 	require.NoError(t, err)
@@ -77,7 +78,7 @@ func TestOverwriteTrue(t *testing.T) {
 	testConfig, err := cfg.NewConfigFrom(map[string]interface{}{"overwrite": true})
 	require.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 
 	newEvent, err := p.Run(event)
 	require.NoError(t, err)
@@ -97,7 +98,7 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 
 	newEvent, err := p.Run(event)
 	assert.NoError(t, err)
@@ -131,7 +132,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 	testConfig, err := cfg.NewConfigFrom(config)
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
@@ -154,7 +155,7 @@ func TestConfigGeoDisabled(t *testing.T) {
 	testConfig, err := cfg.NewConfigFrom(config)
 	require.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)

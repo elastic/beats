@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -320,7 +321,7 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := New(config)
+	p, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -369,7 +370,7 @@ func TestRetrieveGCEMetadataInK8s(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := New(config)
+	p, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -424,7 +425,7 @@ func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := New(config)
+	p, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -490,7 +491,7 @@ func TestRetrieveGCEMetadataInK8sPartial(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := New(config)
+	p, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

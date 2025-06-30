@@ -48,17 +48,17 @@ type processor struct {
 }
 
 // New constructs a new convert processor.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the convert processor configuration: %w", err)
 	}
 
-	return newConvert(c)
+	return newConvert(c, log)
 }
 
-func newConvert(c config) (*processor, error) {
-	log := logp.NewLogger(logName)
+func newConvert(c config, log *logp.Logger) (*processor, error) {
+	log = log.Named(logName)
 	if c.Tag != "" {
 		log = log.With("instance_id", c.Tag)
 	}

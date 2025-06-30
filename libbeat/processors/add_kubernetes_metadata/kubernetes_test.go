@@ -26,7 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -41,7 +41,7 @@ func TestAnnotatorSkipped(t *testing.T) {
 	}
 
 	processor := kubernetesAnnotator{
-		log:   logp.NewLogger(selector),
+		log:   logptest.NewTestingLogger(t, selector),
 		cache: newCache(10 * time.Second),
 		matchers: &Matchers{
 			matchers: []Matcher{matcher},

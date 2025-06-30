@@ -139,7 +139,7 @@ func processorsForConfig(
 		procs.AddProcessor(indexProcessor)
 	}
 
-	userProcs, err := processors.New(config.Processors)
+	userProcs, err := processors.New(config.Processors, beatInfo.Logger)
 	if err != nil {
 		return nil, err
 	}

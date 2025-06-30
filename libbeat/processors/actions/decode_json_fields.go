@@ -76,9 +76,9 @@ func init() {
 }
 
 // NewDecodeJSONFields construct a new decode_json_fields processor.
-func NewDecodeJSONFields(c *cfg.C) (beat.Processor, error) {
+func NewDecodeJSONFields(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig
-	logger := logp.NewLogger("truncate_fields")
+	logger := log.Named("truncate_fields")
 
 	err := c.Unpack(&config)
 	if err != nil {

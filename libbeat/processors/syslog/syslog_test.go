@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -137,7 +138,7 @@ func TestSyslog(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			p, err := New(tc.cfg)
+			p, err := New(tc.cfg, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				panic(err)
 			}
@@ -164,7 +165,7 @@ func BenchmarkSyslog(b *testing.B) {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
 
-				p, _ := New(bc.cfg)
+				p, _ := New(bc.cfg, logptest.NewTestingLogger(b, ""))
 				event := &beat.Event{
 					Fields: bc.in,
 				}

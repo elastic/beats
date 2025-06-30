@@ -107,7 +107,7 @@ func defaultConfig() config {
 }
 
 // New creates a new processor from the provided configuration, or an error if the configuration is invalid.
-func New(c *conf.C) (beat.Processor, error) {
+func New(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	cfg := defaultConfig()
 
 	if err := c.Unpack(&cfg); err != nil {
@@ -115,7 +115,7 @@ func New(c *conf.C) (beat.Processor, error) {
 	}
 
 	id := int(instanceID.Add(1))
-	log := logp.NewLogger(logName).With("instance_id", id)
+	log = log.Named(logName).With("instance_id", id)
 	registryName := logName + "." + strconv.Itoa(id)
 
 	if cfg.Tag != "" {

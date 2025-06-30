@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -132,7 +133,7 @@ func TestProcessor(t *testing.T) {
 				return
 			}
 
-			processor, err := NewProcessor(c)
+			processor, err := NewProcessor(c, logptest.NewTestingLogger(t, ""))
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -173,7 +174,7 @@ func TestProcessor(t *testing.T) {
 		cfg, err := conf.NewConfigFrom(c)
 		assert.NoError(t, err)
 
-		processor, err := NewProcessor(cfg)
+		processor, err := NewProcessor(cfg, logptest.NewTestingLogger(t, ""))
 		assert.NoError(t, err)
 
 		newEvent, err := processor.Run(e)
@@ -189,7 +190,7 @@ func TestFieldDoesntExist(t *testing.T) {
 		return
 	}
 
-	processor, err := NewProcessor(c)
+	processor, err := NewProcessor(c, logptest.NewTestingLogger(t, ""))
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -239,7 +240,7 @@ func TestFieldAlreadyExist(t *testing.T) {
 				return
 			}
 
-			processor, err := NewProcessor(c)
+			processor, err := NewProcessor(c, logptest.NewTestingLogger(t, ""))
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -263,7 +264,7 @@ func TestErrorFlagging(t *testing.T) {
 			return
 		}
 
-		processor, err := NewProcessor(c)
+		processor, err := NewProcessor(c, logptest.NewTestingLogger(t, ""))
 		if !assert.NoError(t, err) {
 			return
 		}
@@ -292,7 +293,7 @@ func TestErrorFlagging(t *testing.T) {
 			return
 		}
 
-		processor, err := NewProcessor(c)
+		processor, err := NewProcessor(c, logptest.NewTestingLogger(t, ""))
 		if !assert.NoError(t, err) {
 			return
 		}
@@ -344,7 +345,7 @@ func TestIgnoreFailure(t *testing.T) {
 				return
 			}
 
-			processor, err := NewProcessor(c)
+			processor, err := NewProcessor(c, logptest.NewTestingLogger(t, ""))
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -411,7 +412,7 @@ func TestOverwriteKeys(t *testing.T) {
 				return
 			}
 
-			processor, err := NewProcessor(c)
+			processor, err := NewProcessor(c, logptest.NewTestingLogger(t, ""))
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -462,7 +463,7 @@ func TestProcessorConvert(t *testing.T) {
 				return
 			}
 
-			processor, err := NewProcessor(c)
+			processor, err := NewProcessor(c, logptest.NewTestingLogger(t, ""))
 			if !assert.NoError(t, err) {
 				return
 			}

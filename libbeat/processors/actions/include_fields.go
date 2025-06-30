@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -40,7 +41,7 @@ func init() {
 			checks.AllowedFields("fields", "when")))
 }
 
-func newIncludeFields(c *conf.C) (beat.Processor, error) {
+func newIncludeFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := struct {
 		Fields []string `config:"fields"`
 	}{}
