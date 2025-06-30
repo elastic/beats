@@ -61,7 +61,6 @@ func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 		FirstStart:      time.Now(),
 		StartTime:       time.Now(),
 	}
-	info.Monitoring.DefaultUsername = "test"
 
 	sched = scheduler.Create(
 		1,

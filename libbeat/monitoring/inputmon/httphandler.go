@@ -29,6 +29,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
+// A sentinel value that can be set on the "input" (type) field of nested
+// inputs, to indicate that the registry contains additional inputs that
+// should be reported at the top level.
+const InputNested = "__NESTED__"
+
 const (
 	route           = "/inputs"
 	contentType     = "Content-Type"
@@ -79,64 +84,77 @@ func filteredSnapshot(
 	global *monitoring.Registry,
 	local *monitoring.Registry,
 	requestedType string) []map[string]any {
-
-	selected := make([]map[string]any, 0)
-
 	// 1st collect all input metrics.
-	selectedLocal := filterMetrics(local, requestedType)
-	selectedGlobal := filterMetrics(global, requestedType)
-
-	// All registries from the local registry takes priority over the global
-	// ones.
-	for _, r := range selectedLocal {
-		selected = append(selected, r)
+	inputs := inputMetricsFromRegistry(global)
+	// If there is an id collision, metrics in the local registry take precedence
+	for id, value := range inputMetricsFromRegistry(local) {
+		inputs[id] = value
 	}
-	for _, g := range selectedGlobal {
-		if _, ok := selectedLocal[g["id"].(string)]; ok {
-			// if the local registry has this ID, it takes precedence.
-			continue
+
+	// Now collect all that match the requested type
+	selected := make([]map[string]any, 0)
+	for _, table := range inputs {
+		if requestedType == "" || strings.EqualFold(table.input, requestedType) {
+			selected = append(selected, table.data)
 		}
-
-		selected = append(selected, g)
 	}
-
 	return selected
 }
 
-func filterMetrics(r *monitoring.Registry, requestedType string) map[string]map[string]any {
-	selected := map[string]map[string]any{}
-	metrics := monitoring.CollectStructSnapshot(r, monitoring.Full, false)
-	for _, ifc := range metrics {
-		m, ok := ifc.(map[string]any)
+type inputMetricsTable struct {
+	id    string
+	input string
+	path  string // The path of this input's registry under its root metrics registry
+	data  map[string]any
+}
+
+// Finds all valid input sub-registries within the given registry (including
+// nested ones) and returns them as a map keyed by input id, with all inputs
+// at the top level.
+func inputMetricsFromRegistry(registry *monitoring.Registry) map[string]inputMetricsTable {
+	metrics := monitoring.CollectStructSnapshot(registry, monitoring.Full, false)
+	result := map[string]inputMetricsTable{}
+	addInputMetrics(result, metrics, nil)
+	return result
+}
+
+// A helper that iterates over the entries in "from" looking for
+// valid input metrics tables, adding them to "to", and recurses on
+// any that are tagged with InputNested.
+func addInputMetrics(to map[string]inputMetricsTable, from map[string]any, pathPrefix []string) {
+	for key, value := range from {
+		// A valid input metrics table must be a string-keyed map with string
+		// values for the "id" and "input" keys. An "input" value of InputNested
+		// indicates that this is a container input and only its child registries
+		// should be included.
+		data, ok := value.(map[string]any)
 		if !ok {
 			continue
 		}
 
-		// Require all entries to have an 'input' and 'id' to be accessed through this API.
-		id, ok := m["id"].(string)
+		id, ok := data["id"].(string)
 		if !ok || id == "" {
 			continue
 		}
 
-		if !requestedInput(m["input"], requestedType) {
+		input, ok := data["input"].(string)
+		if !ok || input == "" {
 			continue
 		}
 
-		selected[id] = m
+		inputPath := append(pathPrefix, key)
+		if input == InputNested {
+			// Add the contents of this entry recursively
+			addInputMetrics(to, data, inputPath)
+		} else {
+			to[id] = inputMetricsTable{
+				id:    id,
+				input: input,
+				path:  strings.Join(inputPath, "."),
+				data:  data,
+			}
+		}
 	}
-
-	return selected
-}
-
-func requestedInput(input any, requestedType string) bool {
-	inputType, ok := input.(string)
-	if !ok ||
-		(requestedType != "" &&
-			!strings.EqualFold(inputType, requestedType)) {
-		return false
-	}
-
-	return true
 }
 
 func serveJSON(w http.ResponseWriter, value any, pretty bool) {
