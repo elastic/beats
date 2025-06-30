@@ -1,0 +1,60 @@
+package gziptest
+
+import (
+	"bytes"
+	"encoding/binary"
+	"testing"
+
+	"github.com/klauspost/compress/gzip"
+	"github.com/stretchr/testify/require"
+)
+
+type Corruption int
+
+const (
+	CorruptCRC Corruption = 1 << iota
+	CorruptSize
+)
+
+// CraftCorruptedGzip takes input data, compresses it using gzip,
+// and then intentionally corrupts parts of the footer (CRC32 and/or ISIZE)
+// to simulate checksum/length errors upon decompression.
+// It returns the corrupted, compressed GZIP data.
+// Check the RFC1 952 for details https://www.rfc-editor.org/rfc/rfc1952.html.
+func CraftCorruptedGzip(t *testing.T, data []byte, corruption Corruption) []byte {
+	var gzBuff bytes.Buffer
+	gw := gzip.NewWriter(&gzBuff)
+
+	wrote, err := gw.Write(data)
+	require.NoError(t, err, "failed to write data to gzip writer")
+	// sanity check
+	require.Equal(t, len(data), wrote, "written data is not equal to input data")
+	require.NoError(t, gw.Close(), "failed to close gzip writer")
+
+	compressedBytes := gzBuff.Bytes()
+
+	// get the footer start index
+	footerStartIndex := len(compressedBytes) - 8
+
+	if corruption&CorruptCRC != 0 {
+		// CRC32 - first 4 bytes of footer
+		originalCRC32 := binary.LittleEndian.Uint32(
+			compressedBytes[footerStartIndex : footerStartIndex+4])
+		// corrupted the CRC32, anything will do.
+		corruptedCRC32 := originalCRC32 + 1
+		binary.LittleEndian.PutUint32(
+			compressedBytes[footerStartIndex:footerStartIndex+4], corruptedCRC32)
+	}
+
+	if corruption&CorruptSize != 0 {
+		// ISIZE - last 4 bytes of footer
+		originalISIZE := binary.LittleEndian.Uint32(
+			compressedBytes[footerStartIndex+4 : footerStartIndex+8])
+		// corrupted the ISIZE, anything will do
+		corruptedISIZE := originalISIZE + 1
+		binary.LittleEndian.PutUint32(
+			compressedBytes[footerStartIndex+4:footerStartIndex+8], corruptedISIZE)
+	}
+
+	return compressedBytes
+}

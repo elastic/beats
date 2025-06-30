@@ -34,11 +34,7 @@ func TestFilebeat(t *testing.T) {
 	defer cancel()
 	EnsureCompiled(ctx, t)
 
-	messagePrefix :=
-		"sample test message long enough for fingerprint to work. 'Nothing is " +
-			"sad until it’s over. Then everything is', 'That's why I keep moving" +
-			" on, to see the next thing, and the next, and the next. And " +
-			"sometimes... It looks even better through your eyes.'"
+	messagePrefix := "sample test message"
 	fileCount := 5
 	lineCount := 128
 
@@ -59,7 +55,6 @@ filebeat.inputs:
 output.console:
   enabled: true
 `
-		_ = configPlainTemplate
 		configGZIPTemplate := `
 filebeat.inputs:
   - type: filestream
@@ -80,7 +75,7 @@ output.console:
 			// ensuring we ingest every line from every file
 			for _, filename := range files {
 				for i := 1; i <= lineCount; i++ {
-					line := fmt.Sprintf("%s %s:%d", messagePrefix, filepath.Base(filename), i)
+					line := fmt.Sprintf("%s:%d", filepath.Base(filename), i)
 					test.ExpectOutput(line)
 				}
 			}

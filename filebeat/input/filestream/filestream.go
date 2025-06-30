@@ -18,6 +18,7 @@
 package filestream
 
 import (
+	"compress/gzip"
 	"context"
 	"errors"
 	"io"
@@ -255,7 +256,14 @@ func isSameFile(path string, info os.FileInfo) bool {
 // based on the config options.
 func (f *logFile) errorChecks(err error) error {
 	if !errors.Is(err, io.EOF) {
-		f.log.Errorf("Unexpected state reading from %s; error: %s", f.file.Name(), err)
+		f.log.Errorf("Unexpected state reading from %s; error: %s",
+			f.file.Name(), err)
+
+		// gzip.ErrChecksum happens after all data is read from a GZIP file, and
+		// it's recoverable, nothing else to do. Thus, we return EOF.
+		if errors.Is(err, gzip.ErrChecksum) {
+			return io.EOF
+		}
 		return err
 	}
 
@@ -276,8 +284,6 @@ func (f *logFile) handleEOF() error {
 		return statErr
 	}
 
-	// AndersonQ: can we detect a gzip file was truncated?
-	// check if file was truncated
 	if info.Size() < f.offset {
 		f.log.Debugf("File was truncated as offset (%d) > size (%d): %s", f.offset, info.Size(), f.file.Name())
 		return ErrFileTruncate

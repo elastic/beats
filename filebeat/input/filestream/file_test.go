@@ -12,11 +12,16 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/filebeat/testing/gziptest"
 )
 
 var (
 	magicBytes   = []byte(magicHeader)
-	plainContent = []byte("People assume that time is a strict progression of cause to effect, but actually from a non-linear, non-subjective viewpoint, it's more like a big ball of wibbly-wobbly, timey-wimey stuff.")
+	plainContent = []byte(
+		"People assume that time is a strict progression of cause to effect, " +
+			"but actually from a non-linear, non-subjective viewpoint, it's " +
+			"more like a big ball of wibbly-wobbly, timey-wimey stuff.")
 )
 
 var _ File = (*plainFile)(nil)
@@ -106,6 +111,42 @@ func TestGzipSeekerReader(t *testing.T) {
 
 		assert.Equal(t, len(plainContent), n)
 		assert.Equal(t, string(plainContent), string(readBuf))
+	})
+
+	t.Run("Read all data on integrity validation (CRC/size) error", func(t *testing.T) {
+		var content []byte
+		nl := []byte("\n")
+		buffSize := len(plainContent) + len(nl)
+
+		content = append(content, plainContent...)
+		content = append(content, nl...)
+		content = append(content, plainContent...)
+		content = append(content, nl...)
+		corrupted := gziptest.CraftCorruptedGzip(
+			t,
+			content,
+			gziptest.CorruptCRC)
+		osFile := createAndOpenFile(t, corrupted)
+		gsr, err := newGzipSeekerReader(osFile, buffSize)
+		require.NoError(t, err, "could not create gzip seeker reader")
+
+		buff := make([]byte, buffSize)
+
+		n, err := gsr.Read(buff)
+		assert.Equal(t, buffSize, n, "read data should match line size")
+		assert.Equal(t, buff, append(plainContent, nl...),
+			"1st read should read the whole first line")
+		assert.NoError(t, err, "1st read should not return error")
+
+		n, err = gsr.Read(buff)
+		assert.Equal(t, buffSize, n, "read data should match line size")
+		assert.Equal(t, buff, append(plainContent, nl...),
+			"2nd read should read the whole second line")
+		assert.ErrorIs(t, err, gzip.ErrChecksum, "2nd read: unexpected error")
+
+		n, err = gsr.Read(buff)
+		assert.Equal(t, 0, n, "3rd read should not read any data")
+		assert.ErrorIs(t, err, gzip.ErrChecksum, "3rd read: unexpected error")
 	})
 
 	t.Run("Seek", func(t *testing.T) {

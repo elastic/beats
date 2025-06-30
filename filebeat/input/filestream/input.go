@@ -525,10 +525,15 @@ func (inp *filestream) openFile(
 	}
 
 	truncated := false
-	// TODO(AndersonQ): GZIP file cannot be truncated
-	// it could seek to offset on gzip, if there is less data -> truncated, stop
-	//
-	if fi.Size() < offset {
+	// GZIP files are considered static, they're not supposed to change or be
+	// truncated. Also:
+	//  - as the offset is tracked on the decompressed data, it's
+	// expected to see offset > fi.Size()
+	//  - it should not start reading GZIP files from the beginning if it
+	//  already started ingesting the file.
+	// Therefore, only check truncation for plain files.
+	// TODO(AndersonQ): add test?
+	if !f.IsGZIP() && fi.Size() < offset {
 		// if the file was truncated we need to reset the offset and notify
 		// all callers so they can also reset their offsets
 		truncated = true
