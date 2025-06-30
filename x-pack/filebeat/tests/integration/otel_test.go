@@ -290,7 +290,7 @@ func assertMapsEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg 
 
 func assertMonitoring(t *testing.T, port int) {
 	address := fmt.Sprintf("http://localhost:%d", port)
-	r, err := http.Get(address) //nolint:noctx,bodyclose // fine for tests
+	r, err := http.Get(address) //nolint:noctx,bodyclose,gosec // fine for tests
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
 
