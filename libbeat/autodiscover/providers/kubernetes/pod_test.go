@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -1959,7 +1960,7 @@ func TestPod_EmitEvent(t *testing.T) {
 			metaGen := metadata.NewPodMetadataGenerator(conf.NewConfig(), nil, client, nil, nil, nil, nil, addResourceMetadata)
 			p := &Provider{
 				config:    defaultConfig(),
-				bus:       bus.New(logp.NewLogger("bus"), "test"),
+				bus:       bus.New(logptest.NewTestingLogger(t, "bus"), "test"),
 				templates: mapper,
 				logger:    logp.NewLogger("kubernetes"),
 			}
@@ -1970,7 +1971,7 @@ func TestPod_EmitEvent(t *testing.T) {
 				config:      defaultConfig(),
 				publishFunc: pub.publish,
 				uuid:        UUID,
-				logger:      logp.NewLogger("kubernetes.pod"),
+				logger:      logptest.NewTestingLogger(t, "kubernetes.pod"),
 			}
 
 			p.eventManager = NewMockPodEventerManager(pod)
@@ -2214,7 +2215,7 @@ func TestPodEventer_Namespace_Node_Watcher(t *testing.T) {
 			err = config.Unpack(&c)
 			assert.NoError(t, err)
 
-			eventer, err := NewPodEventer(uuid, config, client, nil)
+			eventer, err := NewPodEventer(uuid, config, client, nil, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatal(err)
 			}
