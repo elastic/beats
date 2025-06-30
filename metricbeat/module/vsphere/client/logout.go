@@ -19,6 +19,9 @@ package client
 
 import (
 	"context"
+	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 )
 
 type Logouter interface {
@@ -27,7 +30,8 @@ type Logouter interface {
 
 // Logout performs log out on vSphere API client with backoff retry.
 func Logout(ctx context.Context, client Logouter) error {
-	return Retry(ctx, func() error {
+	r := backoff.NewRetryer(3, 500*time.Millisecond, 1*time.Minute)
+	return r.Retry(ctx, func() error {
 		return client.Logout(ctx)
 	})
 }
