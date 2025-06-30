@@ -64,6 +64,10 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 		receiverCfg, _ := conf.Sub(beatReceiverConfigKey)
 		output, _ := receiverCfg.Sub("output")
 
+		if len(output.ToStringMap()) > 1 {
+			return fmt.Errorf("multiple outputs are not supported")
+		}
+
 		for key, output := range output.ToStringMap() {
 			switch key {
 			case "elasticsearch":
