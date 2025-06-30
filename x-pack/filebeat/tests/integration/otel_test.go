@@ -132,9 +132,9 @@ func TestHTTPJSONInputOTel(t *testing.T) {
 	user := host.User.Username()
 	password, _ := host.User.Password()
 
-	// create a random uuid and make sure it doesn't contain dashes
-	otelNamespace := strings.ReplaceAll(uuid.New().String(), "-", "")
-	fbNameSpace := strings.ReplaceAll(uuid.New().String(), "-", "")
+	// create a random uuid and make sure it doesn't contain dashes/
+	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbNameSpace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 
 	type options struct {
 		Namespace string
