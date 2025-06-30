@@ -23,15 +23,10 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/haproxy"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
 	statsMethod = "info"
-)
-
-var (
-	debugf = logp.MakeDebug("haproxy-info")
 )
 
 // init registers the haproxy info MetricSet.

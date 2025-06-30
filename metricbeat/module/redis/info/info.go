@@ -59,7 +59,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}()
 
 	// Fetch all INFO.
-	info, err := redis.FetchRedisInfo("all", conn)
+	info, err := redis.FetchRedisInfo("all", conn, m.Logger())
 	if err != nil {
 		return fmt.Errorf("failed to fetch redis info: %w", err)
 	}
@@ -78,7 +78,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 	}
 
-	slowLogLength, err := redis.FetchSlowLogLength(conn)
+	slowLogLength, err := redis.FetchSlowLogLength(conn, m.Logger())
 	if err != nil {
 		return fmt.Errorf("failed to fetch slow log length: %w", err)
 

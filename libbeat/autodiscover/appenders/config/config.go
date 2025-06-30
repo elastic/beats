@@ -42,10 +42,11 @@ type config struct {
 type configAppender struct {
 	condition conditions.Condition
 	config    mapstr.M
+	logger    *logp.Logger
 }
 
 // NewConfigAppender creates a configAppender that can append templatized configs into built configs
-func NewConfigAppender(cfg *conf.C) (autodiscover.Appender, error) {
+func NewConfigAppender(cfg *conf.C, logger *logp.Logger) (autodiscover.Appender, error) {
 	cfgwarn.Beta("The config appender is beta")
 
 	config := config{}
@@ -70,7 +71,7 @@ func NewConfigAppender(cfg *conf.C) (autodiscover.Appender, error) {
 		return nil, fmt.Errorf("unable to unpack config due to error: %w", err)
 	}
 
-	return &configAppender{condition: cond, config: cf}, nil
+	return &configAppender{condition: cond, config: cf, logger: logger}, nil
 }
 
 // Append adds configuration into configs built by builds/templates. It applies conditions to filter out
@@ -93,12 +94,12 @@ func (c *configAppender) Append(event bus.Event) {
 			cf := mapstr.M{}
 			err := cfg.Unpack(&cf)
 			if err != nil {
-				logp.Debug("config", "unable to unpack config due to error: %v", err)
+				c.logger.Named("config").Debugf("unable to unpack config due to error: %v", err)
 				continue
 			}
 			err = cfg.Merge(&c.config)
 			if err != nil {
-				logp.Debug("config", "unable to merge configs due to error: %v", err)
+				c.logger.Named("config").Debugf("unable to merge configs due to error: %v", err)
 			}
 		}
 

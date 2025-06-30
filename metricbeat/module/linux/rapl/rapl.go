@@ -36,7 +36,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
@@ -176,7 +175,7 @@ func (m *MetricSet) updatePower() map[int]map[rapl.RAPLDomain]energyUsage {
 				continue
 			}
 			if err != nil {
-				logp.L().Infof("Error reading MSR from domain %s: %s skipping.", domain, err)
+				m.Logger().Infof("Error reading MSR from domain %s: %s skipping.", domain, err)
 				continue
 			}
 			domainList[domain] = energyTrack{joules: joules, time: time.Now()}
