@@ -40,7 +40,7 @@
                         "line_width": 1,
                         "metrics": [
                             {
-                                "field": "aws.ec2.cpu.total.pct",
+                                "field": "host.cpu.usage",
                                 "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "type": "avg"
                             }
