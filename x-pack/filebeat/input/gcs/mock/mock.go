@@ -67,7 +67,7 @@ func GCSFileServer() http.Handler {
 						return
 					}
 				} else if fileBuckets[path[0]] && availableFileObjects[path[0]][path[1]] {
-					absPath, _ := filepath.Abs("testdata/" + path[1])
+					absPath := filepath.Join("testdata/" + path[1])
 					data, _ := os.ReadFile(absPath)
 					switch path[1] {
 					case "multiline.json":
@@ -114,7 +114,7 @@ func GCSFileServerNoContentType() http.Handler {
 						return
 					}
 				} else if fileBuckets[path[0]] && availableFileObjects[path[0]][path[1]] {
-					absPath, _ := filepath.Abs("testdata/" + path[1])
+					absPath := filepath.Join("testdata/" + path[1])
 					data, _ := os.ReadFile(absPath)
 					w.Write(data)
 					return

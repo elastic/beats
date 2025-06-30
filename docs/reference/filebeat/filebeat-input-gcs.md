@@ -159,7 +159,6 @@ $$$supported-attributes-gcs$$$
 15. [custom_properties](#attrib-custom-properties)
 
 
-
 ### `project_id` [attrib-project-id]
 
 This attribute is required for various internal operations with respect to authentication, creating storage clients and logging which are used internally for various processing purposes.
@@ -373,12 +372,12 @@ filebeat.inputs:
 
 ### Custom properties [attrib-custom-properties]
 
-Some object properties can be `set` or `overridden` at the input level with the help of certain configuration options. Allowing users to set or override custom object properties provides more flexibility when reading objects from a remote storage where the user might only have read access.
+Some object properties can be **set** or **overridden** at the input level with the help of certain configuration options. Allowing users to set or override custom object properties provides more flexibility when reading objects from a remote storage where the user might only have read access.
 
 **The supported custom properties are:**
 
-1. [`content_type`](#attrib-content-type)
-2. [`encoding`](#attrib-encoding)
+- [`content_type`](#attrib-content-type)
+- [`encoding`](#attrib-encoding)
 
 ### `content_type` [attrib-content-type]
 

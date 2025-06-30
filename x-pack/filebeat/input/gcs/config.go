@@ -126,7 +126,7 @@ type readerConfig struct {
 	Parsers parser.Config `config:",inline"`
 	// Decoding specifies options for decoding the content, such as compression.
 	Decoding decoderConfig `config:"decoding"`
-	// ContentType suggests the MIME type of the object content, aiding in parsing.
+	// ContentType hints the MIME type of the object content, aiding in parsing.
 	ContentType string `config:"content_type"`
 	// Encoding specifies the character encoding of the object content (e.g., "UTF-8", "gzip").
 	Encoding string `config:"encoding"`
