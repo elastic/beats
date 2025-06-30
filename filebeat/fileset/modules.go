@@ -120,7 +120,7 @@ func newModuleRegistry(modulesPath string,
 				return nil, fmt.Errorf("fileset %s/%s is configured but doesn't exist", mcfg.Module, filesetName)
 			}
 
-			fileset, err := New(modulesPath, filesetName, mcfg.Module, fcfg)
+			fileset, err := New(modulesPath, filesetName, mcfg.Module, fcfg, beatInfo.Logger)
 			if err != nil {
 				return nil, err
 			}

@@ -75,7 +75,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	m := &MetricSet{
 		BaseMetricSet: base,
-		logger:        logp.NewLogger(metricsetName),
+		logger:        base.Logger().Named(metricsetName),
 	}
 
 	if err := base.Module().UnpackConfig(&m.config); err != nil {

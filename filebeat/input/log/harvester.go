@@ -427,7 +427,7 @@ func (h *Harvester) onMessage(
 		// No data or event is filtered out -> send empty event with state update
 		// only. The call can fail on filebeat shutdown.
 		// The event will be filtered out, but forwarded to the registry as is.
-		err := forwarder.Send(beat.Event{Private: state})
+		err := forwarder.Send(beat.Event{Private: state}, h.logger)
 		return err == nil
 	}
 
@@ -471,7 +471,7 @@ func (h *Harvester) onMessage(
 		Fields:    fields,
 		Meta:      meta,
 		Private:   state,
-	})
+	}, h.logger)
 	return err == nil
 }
 

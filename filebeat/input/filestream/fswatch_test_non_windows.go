@@ -33,7 +33,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestFileScannerSymlinks(t *testing.T) {
@@ -145,7 +145,7 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	w := fileWatcher{
-		log:          logp.L(),
+		log:          logptest.NewTestingLogger(t, ""),
 		scanner:      scanner,
 		events:       make(chan loginp.FSEvent),
 		sameFileFunc: testSameFile,
@@ -181,7 +181,7 @@ func TestFileWatcherRenamedTruncated(t *testing.T) {
 		t.Fatal(err)
 	}
 	w := fileWatcher{
-		log:          logp.L(),
+		log:          logptest.NewTestingLogger(t, ""),
 		scanner:      fs,
 		events:       make(chan loginp.FSEvent),
 		sameFileFunc: os.SameFile,

@@ -83,7 +83,7 @@ type Config struct {
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
-	logger := logp.NewLogger(metricsetName)
+	logger := base.Logger().Named(metricsetName)
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, fmt.Errorf("error creating aws metricset: %w", err)
