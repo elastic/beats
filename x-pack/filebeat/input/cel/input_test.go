@@ -469,6 +469,28 @@ var inputTests = []struct {
 			{"message": "not present"},
 		},
 	},
+	{
+		// This test exists purely to demonstrate that the lib is available.
+		name: "aws_signing_static",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `{"events": [{
+				"message": post_request("http://www.example.com/", "text/plain", "request data").sign_aws_from_static(
+					"id", "long_enough_secret", "token", // secret must be longer than 112 bits for FIPS140 tests to pass.
+					"service", "region",
+					timestamp("2009-11-10T23:00:00Z"),
+					false, false, false
+				).Header.Authorization[?0].orValue("nope")
+			}]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "AWS4-HMAC-SHA256 Credential=id/20091110/region/service/aws4_request, SignedHeaders=content-type;host;x-amz-date;x-amz-security-token, Signature=a68c4c7af5322d9fa8cc0661f7e2a5bb75fa2a712ee8842a1fe6efea41555e83"},
+		},
+	},
 
 	// FS-based tests.
 	{

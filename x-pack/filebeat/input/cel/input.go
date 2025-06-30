@@ -1062,6 +1062,7 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 	opts := []cel.EnvOption{
 		cel.Declarations(decls.NewVar(root, decls.Dyn)),
 		cel.OptionalTypes(cel.OptionalTypesVersion(lib.OptionalTypesVersion)),
+		lib.AWS(),
 		lib.Collections(),
 		lib.Crypto(),
 		lib.JSON(nil),
