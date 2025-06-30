@@ -713,19 +713,19 @@ func TestNewJolokiaHTTPClient(t *testing.T) {
 
 		{
 			httpMethod: "GET",
-			expected:   &JolokiaHTTPGetFetcher{},
+			expected:   &JolokiaHTTPGetFetcher{logp.NewNopLogger()},
 		},
 		{
 			httpMethod: "",
-			expected:   &JolokiaHTTPPostFetcher{},
+			expected:   &JolokiaHTTPPostFetcher{logp.NewNopLogger()},
 		},
 		{
 			httpMethod: "GET",
-			expected:   &JolokiaHTTPGetFetcher{},
+			expected:   &JolokiaHTTPGetFetcher{logp.NewNopLogger()},
 		},
 		{
 			httpMethod: "POST",
-			expected:   &JolokiaHTTPPostFetcher{},
+			expected:   &JolokiaHTTPPostFetcher{logp.NewNopLogger()},
 		},
 	}
 

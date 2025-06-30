@@ -9,9 +9,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type requestConfig struct {
