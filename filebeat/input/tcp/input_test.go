@@ -21,6 +21,7 @@ package tcp
 
 import (
 	"context"
+	"errors"
 	"net"
 	"sync"
 	"sync/atomic"
@@ -35,8 +36,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func TestTCPInput(t *testing.T) {
-	serverAddr := "localhost:9000"
+func TestInput(t *testing.T) {
+	serverAddr := "localhost:9042"
 	wg := sync.WaitGroup{}
 	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
 		"host": serverAddr,
@@ -58,7 +59,58 @@ func TestTCPInput(t *testing.T) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		inp.Run(v2Ctx, publisher)
+		if err := inp.Run(v2Ctx, publisher); err != nil {
+			if !errors.Is(err, context.Canceled) {
+				t.Errorf("input exited with error: %s", err)
+			}
+		}
+	}()
+
+	require.Eventually(
+		t,
+		func() bool {
+			return publisher.count.Load() == 2
+		},
+		5*time.Second,
+		100*time.Millisecond,
+		"not all events published")
+
+	// Stop the input
+	cancel()
+
+	// Ensure the input Run method returns
+	wg.Wait()
+}
+
+func TestInputCanReadWithoutPublishing(t *testing.T) {
+	serverAddr := "localhost:9042"
+	wg := sync.WaitGroup{}
+	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
+		"host": serverAddr,
+	}))
+	if err != nil {
+		t.Fatalf("cannot create input: %s", err)
+	}
+
+	publisher := newMockPublisher(t)
+	publisher.blocked.Store(true)
+	startTCPClient(t, 2*time.Second, serverAddr, []string{"foo", "bar"})
+
+	ctx, cancel := context.WithCancel(t.Context())
+	v2Ctx := v2.Context{
+		ID:          t.Name(),
+		Cancelation: ctx,
+		Logger:      logp.NewNopLogger(),
+	}
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := inp.Run(v2Ctx, publisher); err != nil {
+			if !errors.Is(err, context.Canceled) {
+				t.Errorf("input exited with error: %s", err)
+			}
+		}
 	}()
 
 	require.Eventually(
@@ -79,17 +131,23 @@ func TestTCPInput(t *testing.T) {
 
 func newMockPublisher(t *testing.T) *mockPublisher {
 	return &mockPublisher{
-		t:     t,
-		count: atomic.Uint64{},
+		t:       t,
+		count:   atomic.Uint64{},
+		blocked: atomic.Bool{},
 	}
 }
 
 type mockPublisher struct {
-	t     *testing.T
-	count atomic.Uint64
+	t       *testing.T
+	count   atomic.Uint64
+	blocked atomic.Bool
 }
 
-func (m *mockPublisher) Publish(beat.Event) {
+func (m *mockPublisher) Publish(evt beat.Event) {
+	for m.blocked.Load() {
+		time.Sleep(10 * time.Millisecond)
+	}
+
 	m.count.Add(1)
 }
 
