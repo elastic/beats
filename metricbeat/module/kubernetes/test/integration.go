@@ -18,17 +18,23 @@
 package test
 
 import (
+	"fmt"
+	"os"
 	"testing"
 )
 
 // GetAPIServerConfig function returns configuration for talking to Kubernetes API server.
 func GetAPIServerConfig(t *testing.T, metricSetName string) map[string]interface{} {
 	t.Helper()
+	host := os.Getenv("KUBERNETES_SERVICE_HOST")
+	port := os.Getenv("KUBERNETES_SERVICE_PORT")
+	nodeName := os.Getenv("NODE_NAME")
+	fullHost := fmt.Sprintf("https://%s:%s", host, port)
 	return map[string]interface{}{
 		"module":            "kubernetes",
 		"metricsets":        []string{metricSetName},
-		"host":              "${NODE_NAME}",
-		"hosts":             []string{"https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"},
+		"host":              nodeName,
+		"hosts":             []string{fullHost},
 		"bearer_token_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
 		"ssl": map[string]interface{}{
 			"certificate_authorities": []string{
