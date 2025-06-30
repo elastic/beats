@@ -43,7 +43,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -134,13 +133,10 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 		defer func() { _ = grp.Stop() }()
 
 		logger, _ := logp.NewDevelopmentLogger("")
-		info := beat.Info{Monitoring: beat.Monitoring{
-			Namespace: monitoring.GetNamespace("dataset")},
-		}
 		reg := inputmon.NewMetricsRegistry(
-			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logger)
+			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
 		defer inputmon.CancelMetricsRegistry(
-			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logger)
+			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
 
 		inputCtx := v2.Context{
 			ID:              id,
