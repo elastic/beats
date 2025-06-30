@@ -255,7 +255,7 @@ func isSameFile(path string, info os.FileInfo) bool {
 // based on the config options.
 func (f *logFile) errorChecks(err error) error {
 	if !errors.Is(err, io.EOF) {
-		f.log.Error("Unexpected state reading from %s; error: %s", f.file.Name(), err)
+		f.log.Errorf("Unexpected state reading from %s; error: %s", f.file.Name(), err)
 		return err
 	}
 

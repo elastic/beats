@@ -13,6 +13,16 @@
 - Exposes monitoring metric `gzip_tech_preview_enabled` when flag enabled.
 - Follow Effective Go guidelines and maintain 80-char width.
 
+#### Open questions:
+- [ ] can a file me marked as "complete", a.k.a do not read it again?
+  file: `input/filestream/copytruncate_prospector.go:373`
+- [ ] `openFile` attempts to detect the file was truncated. For GZIP it'd need
+  to know the previous file size.
+  file: `filebeat/input/filestream/input.go:314-324`
+- [ ] if there is a gzip error when opening the file to create the file
+descriptor (filebeat/input/filestream/fswatch.go:406), it happened in the file
+scanner, the error will happen every scan as long as the file is still there.
+
 ## Milestones
 
 ### Milestone 0 – Analysis
@@ -50,13 +60,6 @@
   - [x] Add GZIP-awareness to `onFSEvent` in `copytruncate_prospector.go`
   - [x] Add GZIP-awareness to `onFSEvent` in `prospector.go`
 - [ ] run BenchmarkToFileDescriptor to check overhead of checking a file is GZIP
-
-#### Open questions:
- - [ ] can a file me marked as "complete", a.k.a do not read it again?
-    file: `input/filestream/copytruncate_prospector.go:373`
- - [ ] `openFile` attempts to detect the file was truncated. For GZIP it'd need
-to know the previous file size.
-    file: `filebeat/input/filestream/input.go:314-324`
 
 ### Milestone 3 – Testing
 - [ ] Add integration tests
