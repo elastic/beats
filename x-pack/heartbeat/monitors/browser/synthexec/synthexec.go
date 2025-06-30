@@ -43,7 +43,9 @@ type FilterJourneyConfig struct {
 // where these are unsupported
 var platformCmdMutate func(*SynthCmd) = func(*SynthCmd) {}
 
-var SynthexecTimeout = "synthexec_timeout"
+type SynthexecTimeout string
+
+var SynthexecTimeoutKey = SynthexecTimeout("synthexec_timeout")
 
 // ProjectJob will run a single journey by name from the given project.
 func ProjectJob(ctx context.Context, projectPath string, params mapstr.M, filterJourneys FilterJourneyConfig, fields stdfields.StdMonitorFields, extraArgs ...string) (jobs.Job, error) {
@@ -249,7 +251,7 @@ func runCmd(
 	}
 
 	// Get timeout from parent ctx
-	timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
+	timeout, _ := ctx.Value(SynthexecTimeoutKey).(time.Duration)
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	go func() {
 		<-ctx.Done()
@@ -278,7 +280,7 @@ func runCmd(
 			logp.L().Warn("Error executing command '%s' (%d): %s", cmd, cmd.ProcessState.ExitCode(), err)
 
 			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-				timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
+				timeout, _ := ctx.Value(SynthexecTimeoutKey).(time.Duration)
 				cmdError = ECSErrToSynthError(ecserr.NewCmdTimeoutStatusErr(timeout, cmd.String()))
 			} else {
 				cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), cmd.String()))

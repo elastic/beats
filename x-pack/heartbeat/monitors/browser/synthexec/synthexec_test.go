@@ -182,7 +182,7 @@ func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string, cmdTimeout time
 	cwd, err := os.Getwd()
 	require.NoError(t, err)
 	cmd.Dir = filepath.Join(cwd, "testcmd")
-	ctx := context.WithValue(context.TODO(), SynthexecTimeout, cmdTimeout)
+	ctx := context.WithValue(context.TODO(), SynthexecTimeoutKey, cmdTimeout)
 
 	mpx, err := runCmd(ctx, &SynthCmd{cmd}, &stdinStr, nil, FilterJourneyConfig{})
 	require.NoError(t, err)
