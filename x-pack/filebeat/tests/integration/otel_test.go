@@ -22,7 +22,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -175,15 +175,15 @@ processors:
 		"otel",
 	)
 
-	var configBuffer bytes.Buffer
+	optionsValue := options{
+		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username: user,
+		Password: password,
+	}
 
-	require.NoError(t, template.Must(template.New("config").Parse(configFile)).Execute(&configBuffer,
-		options{
-			Namespace: otelNamespace,
-			ESURL:     fmt.Sprintf("%s://%s", host.Scheme, host.Host),
-			Username:  user,
-			Password:  password,
-		}))
+	var configBuffer bytes.Buffer
+	optionsValue.Namespace = otelNamespace
+	require.NoError(t, template.Must(template.New("config").Parse(configFile)).Execute(&configBuffer, optionsValue))
 
 	filebeatOTel.WriteConfigFile(configBuffer.String())
 	filebeatOTel.Start()
@@ -191,13 +191,8 @@ processors:
 	// reset buffer
 	configBuffer.Reset()
 
-	require.NoError(t, template.Must(template.New("config").Parse(configFile)).Execute(&configBuffer,
-		options{
-			Namespace: fbNameSpace,
-			ESURL:     fmt.Sprintf("%s://%s", host.Scheme, host.Host),
-			Username:  user,
-			Password:  password,
-		}))
+	optionsValue.Namespace = fbNameSpace
+	require.NoError(t, template.Must(template.New("config").Parse(configFile)).Execute(&configBuffer, optionsValue))
 
 	// start filebeat
 	filebeat := integration.NewBeat(
