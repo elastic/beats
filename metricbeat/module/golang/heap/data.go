@@ -32,7 +32,7 @@ type Stats struct {
 
 func eventMapping(stats Stats, m *MetricSet) mapstr.M {
 	var event = mapstr.M{
-		"cmdline": golang.GetCmdStr(stats.Cmdline),
+		"cmdline": golang.GetCmdStr(stats.Cmdline, m.Logger()),
 	}
 	//currentNumGC
 	ms := &stats.MemStats
@@ -64,7 +64,7 @@ func eventMapping(stats Stats, m *MetricSet) mapstr.M {
 		delta := ms.NumGC - m.lastNumGC
 		start := m.lastNumGC
 		if delta > 256 {
-			logger.Debug("golang", "Missing %v gc cycles", delta-256)
+			m.Logger().Named("golang").Debugf("Missing %v gc cycles", delta-256)
 			start = ms.NumGC - 256
 			delta = 256
 		}

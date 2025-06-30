@@ -52,6 +52,7 @@ type inputTestingEnvironment struct {
 	workingDir string
 	stateStore statestore.States
 	pipeline   *mockPipelineConnector
+	monitoring beat.Monitoring
 
 	pluginInitOnce sync.Once
 	plugin         v2.Plugin
@@ -89,6 +90,7 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 		workingDir: t.TempDir(),
 		stateStore: openTestStatestore(),
 		pipeline:   &mockPipelineConnector{},
+		monitoring: beat.NewMonitoring(),
 	}
 }
 
@@ -144,7 +146,6 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 			ID:              id,
 			IDWithoutName:   id,
 			Name:            inp.Name(),
-			Agent:           info,
 			Cancelation:     ctx,
 			StatusReporter:  nil,
 			MetricsRegistry: reg,
