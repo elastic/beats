@@ -38,6 +38,7 @@ type Harvester struct {
 	done      chan struct{}
 	conn      rd.Conn
 	forwarder *harvester.Forwarder
+	logger    *logp.Logger
 }
 
 // log contains all data related to one slowlog entry
@@ -59,16 +60,17 @@ type log struct {
 }
 
 // NewHarvester creates a new harvester with the given connection
-func NewHarvester(conn rd.Conn) (*Harvester, error) {
+func NewHarvester(conn rd.Conn, logger *logp.Logger) (*Harvester, error) {
 	id, err := uuid.NewV4()
 	if err != nil {
 		return nil, err
 	}
 
 	return &Harvester{
-		id:   id,
-		done: make(chan struct{}),
-		conn: conn,
+		id:     id,
+		done:   make(chan struct{}),
+		conn:   conn,
+		logger: logger,
 	}, nil
 }
 
@@ -153,7 +155,7 @@ func (h *Harvester) Run() error {
 		}
 		entry, err := rd.Values(item, nil)
 		if err != nil {
-			logp.Err("Error loading slowlog values: %s", err)
+			h.logger.Errorf("Error loading slowlog values: %s", err)
 			continue
 		}
 
@@ -161,7 +163,7 @@ func (h *Harvester) Run() error {
 		var args []string
 		_, err = rd.Scan(entry, &log.id, &log.timestamp, &log.duration, &args)
 		if err != nil {
-			logp.Err("Error scanning slowlog entry: %s", err)
+			h.logger.Errorf("Error scanning slowlog entry: %s", err)
 			continue
 		}
 
@@ -204,9 +206,9 @@ func (h *Harvester) Run() error {
 					"created": time.Now(),
 				},
 			},
-		})
+		}, h.logger)
 		if err != nil {
-			logp.Err("Error sending beat event: %s", err)
+			h.logger.Errorf("Error sending beat event: %s", err)
 			continue
 		}
 	}
