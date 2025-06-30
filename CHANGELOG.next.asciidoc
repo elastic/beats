@@ -141,6 +141,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix `dns` processor to handle IPv6 server addresses properly. {pull}44526[44526]
 - Fix an issue where the Kafka output could get stuck if a proxied connection to the Kafka cluster was reset. {issue}44606[44606]
 - Use Debian 11 to build linux/arm to match linux/amd64. Upgrades linux/arm64's statically linked glibc from 2.28 to 2.31. {issue}44816[44816]
+- The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
 
 *Auditbeat*
 
@@ -483,6 +484,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
 - Add support for RFC7231 methods to http monitors. {pull}41975[41975]
 - Upgrade node to latest LTS v18.20.7. {pull}43511[43511]
+- Upgrade node to latest LTS v20.19.3. {pull}45087[45087]
 
 *Metricbeat*
 

@@ -9,11 +9,11 @@ package integration
 import (
 	"bytes"
 	"context"
-	"crypto/tls"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"text/template"
 	"time"
@@ -22,13 +22,18 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/gofrs/uuid/v5"
+
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
-	"github.com/elastic/go-elasticsearch/v8"
 )
 
-var beatsCfgFile = `
+func TestFilebeatOTelE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+	numEvents := 1
+
+	var beatsCfgFile = `
 filebeat.inputs:
   - type: filestream
     id: filestream-input-id
@@ -41,11 +46,11 @@ output:
   elasticsearch:
     hosts:
       - localhost:9200
-    protocol: http
     username: admin
     password: testing
     index: %s
 queue.mem.flush.timeout: 0s
+setup.template.enabled: false
 processors:
     - add_host_metadata: ~
     - add_cloud_metadata: ~
@@ -55,10 +60,6 @@ http.enabled: true
 http.host: localhost
 http.port: %d
 `
-
-func TestFilebeatOTelE2E(t *testing.T) {
-	integration.EnsureESIsRunning(t)
-	numEvents := 1
 
 	// start filebeat in otel mode
 	filebeatOTel := integration.NewBeat(
@@ -83,16 +84,13 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	logFilePath = filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
 	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
-	s = s + `
-setup.template.name: logs-filebeat-default
-setup.template.pattern: logs-filebeat-default
-`
 
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
 	defer filebeat.Stop()
 
-	es := newESClient(t)
+	// prepare to query ES
+	es := integration.GetESClient(t, "http")
 
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
@@ -112,7 +110,7 @@ setup.template.pattern: logs-filebeat-default
 
 			return otelDocs.Hits.Total.Value >= numEvents && filebeatDocs.Hits.Total.Value >= numEvents
 		},
-		2*time.Minute, 1*time.Second, fmt.Sprintf("Number of hits %d not equal to number of events for %d", filebeatDocs.Hits.Total.Value, numEvents))
+		2*time.Minute, 1*time.Second, fmt.Sprintf("Number of hits %d not equal to number of events %d", filebeatDocs.Hits.Total.Value, numEvents))
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
@@ -129,21 +127,125 @@ setup.template.pattern: logs-filebeat-default
 	assertMonitoring(t, 5066)
 }
 
-func newESClient(t *testing.T) *elasticsearch.Client {
-	t.Helper()
-	esCfg := elasticsearch.Config{
-		Addresses: []string{"http://localhost:9200"},
-		Username:  "admin",
-		Password:  "testing",
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true, //nolint:gosec // this is only for
-			},
+func TestHTTPJSONInputOTel(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	host := integration.GetESURL(t, "http")
+	user := host.User.Username()
+	password, _ := host.User.Password()
+
+	// create a random uuid and make sure it doesn't contain dashes/
+	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbNameSpace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+
+	type options struct {
+		Namespace string
+		ESURL     string
+		Username  string
+		Password  string
+	}
+
+	// The request url is a http mock server started using streams
+	configFile := `
+filebeat.inputs:
+  - type: httpjson
+    id: httpjson-e2e-otel
+    request.url: http://localhost:8090/test
+
+output:
+  elasticsearch:
+    hosts:
+      - {{ .ESURL }}
+    username: {{ .Username }}
+    password: {{ .Password }}
+    index: logs-integration-{{ .Namespace }}
+
+setup.template.enabled: false
+queue.mem.flush.timeout: 0s
+processors:
+   - add_host_metadata: ~
+   - add_cloud_metadata: ~
+   - add_docker_metadata: ~
+   - add_kubernetes_metadata: ~
+`
+
+	// start filebeat in otel mode
+	filebeatOTel := integration.NewBeat(
+		t,
+		"filebeat-otel",
+		"../../filebeat.test",
+		"otel",
+	)
+
+	optionsValue := options{
+		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username: user,
+		Password: password,
+	}
+
+	var configBuffer bytes.Buffer
+	optionsValue.Namespace = otelNamespace
+	require.NoError(t, template.Must(template.New("config").Parse(configFile)).Execute(&configBuffer, optionsValue))
+
+	filebeatOTel.WriteConfigFile(configBuffer.String())
+	filebeatOTel.Start()
+
+	// reset buffer
+	configBuffer.Reset()
+
+	optionsValue.Namespace = fbNameSpace
+	require.NoError(t, template.Must(template.New("config").Parse(configFile)).Execute(&configBuffer, optionsValue))
+
+	// start filebeat
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	filebeat.WriteConfigFile(configBuffer.String())
+	filebeat.Start()
+
+	// prepare to query ES
+	es := integration.GetESClient(t, "http")
+
+	rawQuery := map[string]any{
+		"sort": []map[string]any{
+			{"@timestamp": map[string]any{"order": "asc"}},
 		},
 	}
-	es, err := elasticsearch.NewClient(esCfg)
-	require.NoError(t, err, "failed to create ES client")
-	return es
+
+	var filebeatDocs estools.Documents
+	var otelDocs estools.Documents
+	var err error
+
+	// wait for logs to be published
+	require.Eventually(t,
+		func() bool {
+			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-logs-integration-"+otelNamespace+"*", es)
+			assert.NoError(t, err)
+
+			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-logs-integration-"+fbNameSpace+"*", es)
+			assert.NoError(t, err)
+
+			return otelDocs.Hits.Total.Value >= 1 && filebeatDocs.Hits.Total.Value >= 1
+		},
+		2*time.Minute, 1*time.Second, fmt.Sprintf("Number of hits %d not equal to number of events %d", filebeatDocs.Hits.Total.Value, 1))
+
+	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
+	otelDoc := otelDocs.Hits.Hits[0].Source
+	ignoredFields := []string{
+		// Expected to change between agentDocs and OtelDocs
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+		"event.created",
+	}
+
+	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 }
 
 func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
@@ -293,19 +395,44 @@ service:
 		"filebeat",
 		"../../filebeat.test",
 	)
+
+	beatsCfgFile := `
+filebeat.inputs:
+  - type: filestream
+    id: filestream-input-id
+    enabled: true
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
+    paths:
+      - %s
+output:
+  elasticsearch:
+    hosts:
+      - localhost:9200
+    username: admin
+    password: testing
+    index: %s
+queue.mem.flush.timeout: 0s
+setup.template.enabled: false
+processors:
+    - add_host_metadata: ~
+    - add_cloud_metadata: ~
+    - add_docker_metadata: ~
+    - add_kubernetes_metadata: ~
+setup.template.name: logs-filebeat-default
+setup.template.pattern: logs-filebeat-default
+http.enabled: true
+http.host: localhost
+http.port: %d
+`
 	logFilePath := filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, wantEvents)
 	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
-	s = s + `
-setup.template.name: logs-filebeat-default
-setup.template.pattern: logs-filebeat-default
-`
-
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
 	defer filebeat.Stop()
 
-	es := newESClient(t)
+	es := integration.GetESClient(t, "http")
 
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
@@ -453,7 +580,7 @@ service:
 	filebeatOTel.Start()
 	defer filebeatOTel.Stop()
 
-	es := newESClient(t)
+	es := integration.GetESClient(t, "http")
 
 	var otelDocs estools.Documents
 	var err error

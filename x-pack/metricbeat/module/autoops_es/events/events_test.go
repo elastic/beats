@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 
 	"github.com/stretchr/testify/require"
 
@@ -37,6 +38,10 @@ func TestCreateEventWithRandomTransactionId(t *testing.T) {
 }
 
 func TestCreateEvent(t *testing.T) {
+	t.Cleanup(utils.ClearResourceID)
+
+	utils.SetResourceID("resource-id")
+
 	info := auto_ops_testing.CreateClusterInfo("8.15.3")
 	metricSetFields := mapstr.M{
 		"field1":      "value1",
@@ -54,4 +59,7 @@ func TestCreateEvent(t *testing.T) {
 	require.Equal(t, "value1", auto_ops_testing.GetObjectValue(event.MetricSetFields, "field1"))
 	require.Equal(t, "value2", auto_ops_testing.GetObjectValue(event.MetricSetFields, "obj1.field1"))
 	require.Equal(t, "value3", auto_ops_testing.GetObjectValue(event.MetricSetFields, "obj2.field1"))
+
+	// orchestrator
+	require.Equal(t, "resource-id", auto_ops_testing.GetObjectValue(event.RootFields, "orchestrator.resource.id"))
 }
