@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -134,7 +135,7 @@ func TestConvertNestedMapStr(t *testing.T) {
 		},
 	}
 
-	g := NewGenericEventConverter(false)
+	g := NewGenericEventConverter(false, logptest.NewTestingLogger(t, ""))
 	for i, test := range tests {
 		assert.Equal(t, test.Output, g.Convert(test.Input), "Test case %d", i)
 	}
@@ -192,7 +193,7 @@ func TestConvertNestedStruct(t *testing.T) {
 		},
 	}
 
-	g := NewGenericEventConverter(false)
+	g := NewGenericEventConverter(false, logptest.NewTestingLogger(t, ""))
 	for i, test := range tests {
 		assert.EqualValues(t, test.Output, g.Convert(test.Input), "Test case %v", i)
 	}
@@ -236,7 +237,7 @@ func TestConvertWithNullEmission(t *testing.T) {
 			},
 		}}
 
-	g := NewGenericEventConverter(true)
+	g := NewGenericEventConverter(true, logptest.NewTestingLogger(t, ""))
 	for i, test := range tests {
 		assert.EqualValues(t, test.Output, g.Convert(test.Input), "Test case %v", i)
 	}
@@ -248,7 +249,7 @@ func TestNormalizeValue(t *testing.T) {
 	type testCase struct{ in, out interface{} }
 
 	runTests := func(check func(t *testing.T, a, b interface{}), tests map[string]testCase) {
-		g := NewGenericEventConverter(false)
+		g := NewGenericEventConverter(false, logptest.NewTestingLogger(t, ""))
 		for name, test := range tests {
 			test := test
 			t.Run(name, func(t *testing.T) {
@@ -339,7 +340,7 @@ func TestNormalizeMapError(t *testing.T) {
 		{"uintptr": uintptr(123)},
 	}
 
-	g := NewGenericEventConverter(false)
+	g := NewGenericEventConverter(false, logptest.NewTestingLogger(t, ""))
 	for i, in := range badInputs {
 		_, errs := g.normalizeMap(in, "bad.type")
 		if assert.Len(t, errs, 1) {
@@ -403,7 +404,7 @@ func TestNormalizeTime(t *testing.T) {
 	}
 
 	now := time.Now().In(ny)
-	g := NewGenericEventConverter(false)
+	g := NewGenericEventConverter(false, logptest.NewTestingLogger(t, ""))
 	v, errs := g.normalizeValue(now, "@timestamp")
 	if len(errs) > 0 {
 		t.Fatal(errs)
@@ -420,7 +421,7 @@ func TestNormalizeTime(t *testing.T) {
 
 // Uses TextMarshaler interface.
 func BenchmarkConvertToGenericEventNetString(b *testing.B) {
-	g := NewGenericEventConverter(false)
+	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
 	for i := 0; i < b.N; i++ {
 		g.Convert(mapstr.M{"key": NetString("hola")})
 	}
@@ -428,7 +429,7 @@ func BenchmarkConvertToGenericEventNetString(b *testing.B) {
 
 // Uses reflection.
 func BenchmarkConvertToGenericEventMapStringString(b *testing.B) {
-	g := NewGenericEventConverter(false)
+	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
 	for i := 0; i < b.N; i++ {
 		g.Convert(mapstr.M{"key": map[string]string{"greeting": "hola"}})
 	}
@@ -436,7 +437,7 @@ func BenchmarkConvertToGenericEventMapStringString(b *testing.B) {
 
 // Uses recursion to step into the nested mapstr.M.
 func BenchmarkConvertToGenericEventMapStr(b *testing.B) {
-	g := NewGenericEventConverter(false)
+	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
 	for i := 0; i < b.N; i++ {
 		g.Convert(mapstr.M{"key": map[string]interface{}{"greeting": "hola"}})
 	}
@@ -444,7 +445,7 @@ func BenchmarkConvertToGenericEventMapStr(b *testing.B) {
 
 // No reflection required.
 func BenchmarkConvertToGenericEventStringSlice(b *testing.B) {
-	g := NewGenericEventConverter(false)
+	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
 	for i := 0; i < b.N; i++ {
 		g.Convert(mapstr.M{"key": []string{"foo", "bar"}})
 	}
@@ -452,7 +453,7 @@ func BenchmarkConvertToGenericEventStringSlice(b *testing.B) {
 
 // Uses reflection to convert the string array.
 func BenchmarkConvertToGenericEventCustomStringSlice(b *testing.B) {
-	g := NewGenericEventConverter(false)
+	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
 	type myString string
 	for i := 0; i < b.N; i++ {
 		g.Convert(mapstr.M{"key": []myString{"foo", "bar"}})
@@ -461,7 +462,7 @@ func BenchmarkConvertToGenericEventCustomStringSlice(b *testing.B) {
 
 // Pointers require reflection to generically dereference.
 func BenchmarkConvertToGenericEventStringPointer(b *testing.B) {
-	g := NewGenericEventConverter(false)
+	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
 	val := "foo"
 	for i := 0; i < b.N; i++ {
 		g.Convert(mapstr.M{"key": &val})

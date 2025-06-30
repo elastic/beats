@@ -316,7 +316,7 @@ func makeClient(host string, params map[string]string, config *config, beat beat
 		CompressionLevel: config.CompressionLevel,
 		Transport:        config.Transport,
 		UserAgent:        beat.UserAgent,
-	})
+	}, beat.Logger)
 	if err != nil {
 		return nil, err
 	}

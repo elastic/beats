@@ -33,6 +33,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestAPIKeyEncoding(t *testing.T) {
@@ -41,7 +42,7 @@ func TestAPIKeyEncoding(t *testing.T) {
 
 	conn, err := NewConnection(ConnectionSettings{
 		APIKey: apiKey,
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	httpClient := newMockClient()
@@ -102,7 +103,7 @@ func TestHeaders(t *testing.T) {
 	} {
 		conn, err := NewConnection(ConnectionSettings{
 			Headers: td.input,
-		})
+		}, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 
 		httpClient := newMockClient()
@@ -160,7 +161,7 @@ func TestUserAgentHeader(t *testing.T) {
 			}))
 			defer server.Close()
 			testCase.connSettings.URL = server.URL
-			conn, err := NewConnection(testCase.connSettings)
+			conn, err := NewConnection(testCase.connSettings, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
@@ -208,7 +209,7 @@ func BenchmarkExecHTTPRequest(b *testing.B) {
 							"Accept":       "application/vnd.elasticsearch+json;compatible-with=7",
 							"Content-Type": "application/vnd.elasticsearch+json;compatible-with=7",
 						},
-					})
+					}, logptest.NewTestingLogger(b, ""))
 					require.NoError(b, err)
 
 					httpClient := newMockClient()

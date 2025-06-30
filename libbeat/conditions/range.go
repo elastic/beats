@@ -32,19 +32,22 @@ type rangeValue struct {
 }
 
 // Range is a Condition type for checking against ranges.
-type Range map[string]rangeValue
+type Range struct {
+	rangemap map[string]rangeValue
+	logger   *logp.Logger
+}
 
 // NewRangeCondition builds a new Range from a map of ranges.
-func NewRangeCondition(config map[string]interface{}) (c Range, err error) {
-	c = Range{}
+func NewRangeCondition(config map[string]interface{}, log *logp.Logger) (c Range, err error) {
+	c = Range{logger: log, rangemap: make(map[string]rangeValue)}
 
 	updateRangeValue := func(key string, op string, value float64) error {
 		field := strings.TrimSuffix(key, "."+op)
-		_, exists := c[field]
+		_, exists := c.rangemap[field]
 		if !exists {
-			c[field] = rangeValue{}
+			c.rangemap[field] = rangeValue{}
 		}
-		rv := c[field]
+		rv := c.rangemap[field]
 		switch op {
 		case "gte":
 			rv.gte = &value
@@ -57,7 +60,7 @@ func NewRangeCondition(config map[string]interface{}) (c Range, err error) {
 		default:
 			return fmt.Errorf("unexpected range operator %s", op)
 		}
-		c[field] = rv
+		c.rangemap[field] = rv
 		return nil
 	}
 
@@ -105,7 +108,7 @@ func (c Range) Check(event ValuesMap) bool {
 		return true
 	}
 
-	for field, rangeValue := range c {
+	for field, rangeValue := range c.rangemap {
 
 		value, err := event.GetValue(field)
 		if err != nil {
@@ -114,7 +117,7 @@ func (c Range) Check(event ValuesMap) bool {
 
 		floatValue, err := ExtractFloat(value)
 		if err != nil {
-			logp.L().Named(logName).Warnf(err.Error())
+			c.logger.Named(logName).Warnf(err.Error())
 			return false
 		}
 
@@ -127,5 +130,5 @@ func (c Range) Check(event ValuesMap) bool {
 }
 
 func (c Range) String() string {
-	return fmt.Sprintf("range: %v", map[string]rangeValue(c))
+	return fmt.Sprintf("range: %v", map[string]rangeValue(c.rangemap))
 }

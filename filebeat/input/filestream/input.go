@@ -85,13 +85,13 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	}
 }
 
-func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
+func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvester, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
 	}
 
-	prospector, err := newProspector(config)
+	prospector, err := newProspector(config, log)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}

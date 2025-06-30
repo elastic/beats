@@ -26,6 +26,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -118,7 +120,7 @@ func TestNetworkCreate(t *testing.T) {
 				"private_ip":                   "private",
 				"public_ip":                    "public",
 			},
-		})
+		}, logptest.NewTestingLogger(t, ""))
 		if assert.NoError(t, err) {
 			t.Log(c)
 		}
@@ -129,7 +131,7 @@ func TestNetworkCreate(t *testing.T) {
 			Network: map[string]interface{}{
 				"invalid": "loop-back",
 			},
-		})
+		}, logptest.NewTestingLogger(t, ""))
 		assert.Error(t, err)
 	})
 
@@ -138,7 +140,7 @@ func TestNetworkCreate(t *testing.T) {
 			Network: map[string]interface{}{
 				"bad_cidr": "127.0/8",
 			},
-		})
+		}, logptest.NewTestingLogger(t, ""))
 		assert.Error(t, err)
 	})
 
@@ -147,7 +149,7 @@ func TestNetworkCreate(t *testing.T) {
 			Network: map[string]interface{}{
 				"bad_type": 1,
 			},
-		})
+		}, logptest.NewTestingLogger(t, ""))
 		assert.Error(t, err)
 	})
 }
@@ -301,7 +303,7 @@ func BenchmarkNetworkCondition(b *testing.B) {
 		Network: map[string]interface{}{
 			"ip": "192.168.0.1/16",
 		},
-	})
+	}, logp.NewNopLogger())
 	if err != nil {
 		b.Fatal(err)
 	}

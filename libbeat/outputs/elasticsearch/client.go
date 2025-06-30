@@ -129,7 +129,7 @@ func NewClient(
 		pipeline = nil
 	}
 
-	conn, err := eslegclient.NewConnection(s.connection)
+	conn, err := eslegclient.NewConnection(s.connection, logger)
 	if err != nil {
 		return nil, err
 	}

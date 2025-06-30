@@ -27,6 +27,7 @@ type registry struct {
 	metrics    map[string]map[string]*metric
 	ttl        time.Duration
 	lastReport time.Time
+	logger     *logp.Logger
 }
 
 type setMetric struct {
@@ -316,7 +317,7 @@ func (r *registry) clearTypeChanged(name string, tags map[string]string) {
 	// type was changed
 	// we can try to support the situation where a new version of the app has changed a type in
 	// a metric by deleting the old one and creating a new one
-	logger.With("name", name).Warn("metric changed type")
+	r.logger.With("name", name).Warn("metric changed type")
 	r.Delete(name, tags)
 }
 
