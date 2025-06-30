@@ -64,12 +64,14 @@ func defaultConfig() config {
 			MaxMessageSize: 20 * humanize.MiByte,
 		},
 		LineDelimiter: "\n",
+		BufferSize:    1000,
 	}
 }
 
 type server struct {
 	tcp.Server
 	config
+	evtChan chan evtWithSize
 }
 
 type config struct {
@@ -77,10 +79,21 @@ type config struct {
 
 	LineDelimiter string                `config:"line_delimiter" validate:"nonzero"`
 	Framing       streaming.FramingType `config:"framing"`
+	BufferSize    int                   `config:"buffer_size"`
+}
+
+type evtWithSize struct {
+	beat.Event
+	size int
 }
 
 func newServer(config config) (*server, error) {
-	return &server{config: config}, nil
+	s := server{
+		config:  config,
+		evtChan: make(chan evtWithSize, config.BufferSize),
+	}
+
+	return &s, nil
 }
 
 func (s *server) Name() string { return "tcp" }
@@ -91,6 +104,24 @@ func (s *server) Test(_ input.TestContext) error {
 		return err
 	}
 	return l.Close()
+}
+
+func (s *server) publishLoop(ctx input.Context, publisher stateless.Publisher, metrics *netmetrics.TCP) {
+	logger := ctx.Logger
+	logger.Debug("starting publish loop")
+	defer logger.Debug("finished publish loop")
+	for {
+		select {
+		case <-ctx.Cancelation.Done():
+			logger.Debug("Context cancelled, closing publish Loop")
+			return
+		case evt := <-s.evtChan:
+			start := time.Now()
+			publisher.Publish(evt.Event)
+			metrics.Log(evt.size, start)
+			metrics.IncEventsPublished()
+		}
+	}
 }
 
 func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
@@ -106,37 +137,48 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	metrics := netmetrics.NewTCP("tcp", ctx.ID, s.Host, pollInterval, log)
 	defer metrics.Close()
 
+	go s.publishLoop(ctx, publisher, metrics)
+
 	split, err := streaming.SplitFunc(s.Framing, []byte(s.LineDelimiter))
 	if err != nil {
 		ctx.UpdateStatus(status.Failed, "Failed to configure split function: "+err.Error())
 		return err
 	}
 
-	server, err := tcp.New(&s.Config, streaming.SplitHandlerFactory(
-		inputsource.FamilyTCP, log, tcp.MetadataCallback, func(data []byte, metadata inputsource.NetworkMetadata) {
-			log.Debugw("Data received", "bytes", len(data), "remote_address", metadata.RemoteAddr.String(), "truncated", metadata.Truncated)
-			evt := beat.Event{
-				Timestamp: time.Now(),
-				Fields: mapstr.M{
-					"message": string(data),
-				},
-			}
-			if metadata.RemoteAddr != nil {
-				evt.Fields["log"] = mapstr.M{
-					"source": mapstr.M{
-						"address": metadata.RemoteAddr.String(),
+	server, err := tcp.New(
+		&s.Config,
+		streaming.SplitHandlerFactory(
+			inputsource.FamilyTCP,
+			log,
+			tcp.MetadataCallback,
+			func(data []byte, metadata inputsource.NetworkMetadata) {
+				metrics.IncEventRead()
+				log.Debugw(
+					"Data received",
+					"bytes", len(data),
+					"remote_address", metadata.RemoteAddr.String(),
+					"truncated", metadata.Truncated)
+
+				evt := beat.Event{
+					Timestamp: time.Now(),
+					Fields: mapstr.M{
+						"message": string(data),
 					},
 				}
-			}
+				if metadata.RemoteAddr != nil {
+					evt.Fields["log"] = mapstr.M{
+						"source": mapstr.M{
+							"address": metadata.RemoteAddr.String(),
+						},
+					}
+				}
 
-			publisher.Publish(evt)
-
-			// This must be called after publisher.Publish to measure
-			// the processing time metric.
-			metrics.Log(data, evt.Timestamp)
-		},
-		split,
-	), log)
+				s.evtChan <- evtWithSize{evt, len(data)}
+			},
+			split,
+		),
+		log,
+	)
 	if err != nil {
 		ctx.UpdateStatus(status.Failed, "Failed to configure input: "+err.Error())
 		return err

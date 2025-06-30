@@ -21,6 +21,7 @@ package tcp
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net"
 	"sync"
@@ -32,6 +33,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -75,7 +77,17 @@ func TestInput(t *testing.T) {
 		100*time.Millisecond,
 		"not all events published")
 
-	// Stop the input
+	// Assert metrics
+	m := getEventMetrics(t)
+	if got, want := m.EventsPublished, 2; got != want {
+		t.Errorf("expecting %d events published, got %d", want, got)
+	}
+
+	if got, want := m.EventsRead, 2; got != want {
+		t.Errorf("expecting %d events read, got %d", want, got)
+	}
+
+	// Stop the input, this removes all metrics
 	cancel()
 
 	// Ensure the input Run method returns
@@ -116,11 +128,12 @@ func TestInputCanReadWithoutPublishing(t *testing.T) {
 	require.Eventually(
 		t,
 		func() bool {
-			return publisher.count.Load() == 2
+			m := getEventMetrics(t)
+			return m.EventsRead == 2 && m.EventsPublished == 0
 		},
-		5*time.Second,
+		time.Second,
 		100*time.Millisecond,
-		"not all events published")
+		"did not find 2 events read and 0 published")
 
 	// Stop the input
 	cancel()
@@ -185,4 +198,28 @@ func startTCPClient(t *testing.T, timeout time.Duration, address string, dataToS
 			time.Sleep(100 * time.Millisecond) // Simulate delay between messages
 		}
 	}()
+}
+
+type eventMetrics struct {
+	EventsPublished int `json:"events_published"`
+	EventsRead      int `json:"events_read"`
+}
+
+func getEventMetrics(t *testing.T) eventMetrics {
+	data, err := inputmon.MetricSnapshotJSON(nil)
+	if err != nil {
+		t.Fatalf("cannot get metrics snapshot: %s", err)
+	}
+
+	metrics := []eventMetrics{}
+
+	if err := json.Unmarshal(data, &metrics); err != nil {
+		t.Fatalf("cannot read metrics: %s", err)
+	}
+
+	if len(metrics) == 0 {
+		return eventMetrics{}
+	}
+
+	return metrics[0]
 }
