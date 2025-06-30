@@ -102,11 +102,9 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 
 		id := uuid.Must(uuid.NewV4()).String()
 		inputCtx := v2.Context{
-			ID:            id,
-			IDWithoutName: id,
-			Name:          inp.Name(),
-			Agent: beat.Info{Monitoring: beat.Monitoring{
-				Namespace: monitoring.GetNamespace("dataset")}},
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
 			Cancelation:     ctx,
 			StatusReporter:  e.statusReporter,
 			MetricsRegistry: monitoring.NewRegistry(),
