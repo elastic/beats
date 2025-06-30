@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build freebsd || linux
+//go:build freebsd || linux || solaris
 
 package process
 

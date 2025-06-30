@@ -15,8 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build aix || darwin || freebsd || linux
-// +build aix darwin freebsd linux
+//go:build aix || darwin || freebsd || linux || solaris
+// +build aix darwin freebsd linux solaris
 
 package filesystem
 

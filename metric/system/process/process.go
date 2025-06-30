@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build (darwin && cgo) || freebsd || linux || windows || aix
+//go:build (darwin && cgo) || freebsd || linux || windows || aix || solaris
 
 package process
 
