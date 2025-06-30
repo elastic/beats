@@ -2643,7 +2643,7 @@ filebeat.inputs:
   #delete.enabled: false
 
   # Grace period to wait before trying to remove a file.
-  # If data is added during the grace, the harvester is closed.
+  # If data is added during the grace, deletion is cancelled.
   # The grace period will re-start next time the close condition
   # is reached.
   #delete.grace_period: 30m

@@ -199,8 +199,8 @@ func (inp *filestream) Run(
 	})
 	defer streamCancel()
 
-	// The caller of Run already reports the error and filters out errors that
-	// must not be reported, like 'context cancelled'.
+	// The caller of Run already reports the error and filters out
+	// 'context cancelled'.
 	err = inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
 	if err != nil {
 		// First handle actual errors
@@ -230,7 +230,7 @@ func (inp *filestream) deleteFile(
 	//   - Filebeat is experiencing back pressure
 	//   - The output is down
 	// If not all events have been published, return so the harvester
-	// can close and be recreated in the next scan.
+	// can close. It will be recreated in the next scan.
 	if !cursor.AllEventsPublished() {
 		logger.Debugf(
 			"not all events from '%s' have been published, "+

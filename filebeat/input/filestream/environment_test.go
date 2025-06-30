@@ -76,8 +76,8 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 
 	t.Cleanup(func() {
 		if t.Failed() {
-			folderName := strings.ReplaceAll(t.Name()+"-*", "/", "_")
-			f, err := os.CreateTemp("", folderName)
+			pattern := strings.ReplaceAll(t.Name()+"-*", "/", "_")
+			f, err := os.CreateTemp("", pattern)
 			if err != nil {
 				t.Errorf("cannot create temp file for logs: %s", err)
 				return

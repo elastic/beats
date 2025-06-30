@@ -5,7 +5,7 @@ Enabling this feature will remove files, which could lead to unintentional data 
 ::::
 
 The Filestream input can remove files after they have been fully
-ingested, three requirements need to be met before the Filestream
+ingested. Three requirements need to be met before the Filestream
 input can remove a file:
 1. Filestream has closed the file due to inactivity or because EOF has
    been reached. This is controlled by:
@@ -20,7 +20,7 @@ input can remove a file:
 ## How it works
 Once a reader for a file is closed, either by reaching EOF (end of
 file) or due to inactivity, Filestream will check if all events have
-been published, if this is true, then it will wait for the configured
+been published. If this is true, then it will wait for the configured
 grace period, check if no new data has been added to the file, by
 comparing its current size with the size when the last event was read,
 then it will try to remove the file. During the grace period Filebeat
@@ -51,9 +51,11 @@ and inactivity, each one has a different purpose:
    rotation.
  
 ::::{note}
-Even for short lived process that write their own log file within a
-few seconds, avoid using EOF because Filestream might read until EOF
-before the last entries are written to the file.
+When using close on EOF for files from short lived process that write
+their logs within a few seconds, make sure to set an appropriate grace
+period (default: 30 minutes) because even immutable copied files may
+still "change" while being copied, especially across volumes or
+network shares.
 ::::
 
 ## Examples
