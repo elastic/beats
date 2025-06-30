@@ -19,12 +19,13 @@ package readjson
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"

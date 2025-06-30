@@ -8,13 +8,14 @@ import (
 	"archive/zip"
 	"bytes"
 	"encoding/csv"
-	"encoding/json"
 	stdxml "encoding/xml"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"unicode"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/mito/lib/xml"

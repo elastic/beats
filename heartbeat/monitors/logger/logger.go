@@ -18,10 +18,11 @@
 package logger
 
 import (
-	"encoding/json"
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/libbeat/beat"

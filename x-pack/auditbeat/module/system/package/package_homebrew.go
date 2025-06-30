@@ -8,11 +8,12 @@ package pkg
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 )
 
 // InstallReceiptSource represents the "source" object in Homebrew's INSTALL_RECEIPT.json.

@@ -19,10 +19,11 @@ package elasticsearch
 
 import (
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/metricbeat/helper"

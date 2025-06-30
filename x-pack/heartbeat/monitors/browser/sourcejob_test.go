@@ -6,13 +6,14 @@
 package browser
 
 import (
-	"encoding/json"
 	"fmt"
 	"path"
 	"path/filepath"
 	"reflect"
 	"runtime"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/require"
 

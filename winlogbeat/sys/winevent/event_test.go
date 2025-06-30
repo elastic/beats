@@ -18,11 +18,12 @@
 package winevent
 
 import (
-	"encoding/json"
 	"encoding/xml"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 

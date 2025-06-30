@@ -19,7 +19,6 @@ package sniffer
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -27,6 +26,8 @@ import (
 	"strings"
 	"sync/atomic"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"

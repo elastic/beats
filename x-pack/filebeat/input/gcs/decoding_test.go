@@ -6,12 +6,13 @@ package gcs
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"cloud.google.com/go/storage"
 	"github.com/google/go-cmp/cmp"

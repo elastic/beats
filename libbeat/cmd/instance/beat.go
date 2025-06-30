@@ -19,7 +19,6 @@ package instance
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -33,6 +32,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/gofrs/uuid/v5"
 	"go.uber.org/zap"

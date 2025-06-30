@@ -20,7 +20,6 @@ package cache
 import (
 	"container/heap"
 	"context"
-	"encoding/json"
 	"errors"
 	"io"
 	"io/fs"
@@ -29,6 +28,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"

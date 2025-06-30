@@ -20,7 +20,6 @@ package dashboards
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -28,6 +27,8 @@ import (
 	"path"
 	"path/filepath"
 	"strconv"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"gopkg.in/yaml.v2"
 

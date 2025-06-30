@@ -20,9 +20,10 @@
 package collstats
 
 import (
-	"encoding/json"
 	"os"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 

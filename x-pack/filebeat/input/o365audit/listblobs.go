@@ -5,13 +5,14 @@
 package o365audit
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"sort"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/Azure/go-autorest/autorest"
 

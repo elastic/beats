@@ -19,12 +19,13 @@ package instance_test
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"net/http"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"

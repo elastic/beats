@@ -5,8 +5,9 @@
 package channels
 
 import (
-	"encoding/json"
 	"fmt"
+
+	"github.com/go-json-experiment/json/v1"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"

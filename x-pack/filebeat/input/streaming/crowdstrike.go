@@ -7,7 +7,6 @@ package streaming
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -15,6 +14,8 @@ import (
 	"net/url"
 	"strconv"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"golang.org/x/oauth2/clientcredentials"
 

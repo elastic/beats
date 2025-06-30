@@ -22,11 +22,12 @@ package journalctl
 import (
 	"context"
 	_ "embed"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"sync/atomic"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"

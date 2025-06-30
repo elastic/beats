@@ -20,7 +20,6 @@
 package filestream
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -28,6 +27,8 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 

@@ -6,12 +6,13 @@ package task_stats
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	dcontainer "github.com/docker/docker/api/types/container"
 

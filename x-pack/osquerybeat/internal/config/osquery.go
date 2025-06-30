@@ -5,7 +5,7 @@
 package config
 
 import (
-	"encoding/json"
+	"github.com/go-json-experiment/json/v1"
 )
 
 type Query struct {

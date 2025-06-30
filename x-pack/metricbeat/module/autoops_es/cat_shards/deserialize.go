@@ -5,7 +5,7 @@
 package cat_shards
 
 import (
-	"encoding/json"
+	"github.com/go-json-experiment/json/v1"
 )
 
 func toInt32(num json.Number) *int32 {

@@ -18,10 +18,11 @@
 package mongodb
 
 import (
-	"encoding/json"
 	"errors"
 	"strings"
 	"sync"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"go.mongodb.org/mongo-driver/bson"
 

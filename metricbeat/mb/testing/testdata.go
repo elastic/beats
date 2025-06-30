@@ -18,7 +18,6 @@
 package testing
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -28,6 +27,8 @@ import (
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/mitchellh/hashstructure"
 	"gopkg.in/yaml.v2"

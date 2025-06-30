@@ -5,11 +5,12 @@
 package pipelinemanager
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/gofrs/uuid/v5"
 

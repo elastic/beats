@@ -6,7 +6,6 @@ package httpjson
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -18,6 +17,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
 	"go.elastic.co/ecszap"

@@ -19,10 +19,11 @@ package http
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/PaesslerAG/gval"
 	"github.com/PaesslerAG/jsonpath"

@@ -23,13 +23,14 @@ import (
 	"compress/gzip"
 	"context"
 	_ "embed"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/require"
 

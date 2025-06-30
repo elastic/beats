@@ -18,9 +18,10 @@
 package ccr
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"

@@ -19,13 +19,14 @@ package integration
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os/exec"
 	"regexp"
 	"sync"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 )
 
 const (

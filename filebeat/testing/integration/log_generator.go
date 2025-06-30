@@ -18,11 +18,12 @@
 package integration
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	uuid "github.com/gofrs/uuid/v5"
 )

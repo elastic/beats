@@ -20,11 +20,12 @@ package eslegclient
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	apmHttpV2 "go.elastic.co/apm/module/apmhttp/v2"
 	"go.elastic.co/apm/v2"

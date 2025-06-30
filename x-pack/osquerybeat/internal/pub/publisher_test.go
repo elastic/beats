@@ -5,9 +5,10 @@
 package pub
 
 import (
-	"encoding/json"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"

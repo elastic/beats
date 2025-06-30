@@ -5,12 +5,13 @@
 package http_endpoint
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/textproto"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"gopkg.in/natefinch/lumberjack.v2"
 

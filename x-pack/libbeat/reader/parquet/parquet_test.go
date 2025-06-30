@@ -6,13 +6,14 @@ package parquet
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"math/rand"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/apache/arrow/go/v17/arrow"
 	"github.com/apache/arrow/go/v17/arrow/array"

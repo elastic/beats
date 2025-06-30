@@ -18,7 +18,6 @@
 package cache
 
 import (
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -28,6 +27,8 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"

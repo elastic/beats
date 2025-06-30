@@ -5,12 +5,13 @@
 package aws_vpcflow
 
 import (
-	"encoding/json"
 	"flag"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"

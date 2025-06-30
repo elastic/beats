@@ -10,7 +10,6 @@ import (
 	"bufio"
 	"crypto/tls"
 	"crypto/x509"
-	"encoding/json"
 	"fmt"
 	"io"
 	"math"
@@ -24,6 +23,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"

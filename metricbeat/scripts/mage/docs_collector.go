@@ -18,7 +18,6 @@
 package mage
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"path"
@@ -26,6 +25,8 @@ import (
 	"sort"
 	"strings"
 	"text/template"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/magefile/mage/sh"
 	"gopkg.in/yaml.v2"

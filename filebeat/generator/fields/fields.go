@@ -18,13 +18,14 @@
 package fields
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"reflect"
 	"regexp"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	yaml "gopkg.in/yaml.v2"
 )

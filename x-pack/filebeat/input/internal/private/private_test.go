@@ -6,12 +6,13 @@ package private
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"net/url"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/google/go-cmp/cmp"
 )

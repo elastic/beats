@@ -6,7 +6,6 @@ package o365audit
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -15,6 +14,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/stretchr/testify/assert"

@@ -29,7 +29,6 @@ import (
 	"context"
 	"debug/buildinfo"
 	"debug/elf"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -41,6 +40,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/blakesmith/ar"
 	rpm "github.com/cavaliergopher/rpm"

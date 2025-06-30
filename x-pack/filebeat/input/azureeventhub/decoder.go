@@ -7,8 +7,9 @@
 package azureeventhub
 
 import (
-	"encoding/json"
 	"fmt"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )

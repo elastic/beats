@@ -18,8 +18,9 @@
 package mgr
 
 import (
-	"encoding/json"
 	"fmt"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"errors"
 )

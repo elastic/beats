@@ -5,8 +5,9 @@
 package o365audit
 
 import (
-	"encoding/json"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

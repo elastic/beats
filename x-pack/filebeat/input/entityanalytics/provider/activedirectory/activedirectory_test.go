@@ -6,12 +6,13 @@ package activedirectory
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"os"
 	"sort"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/go-ldap/ldap/v3"
 

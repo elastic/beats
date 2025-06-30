@@ -5,9 +5,10 @@
 package cat_shards
 
 import (
-	"encoding/json"
 	"fmt"
 	"math"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
 

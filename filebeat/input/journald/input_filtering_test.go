@@ -21,10 +21,11 @@ package journald
 
 import (
 	"context"
-	"encoding/json"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

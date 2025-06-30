@@ -12,7 +12,7 @@ package wintest_test
 
 import (
 	"context"
-	"encoding/json"
+	"github.com/go-json-experiment/json/v1"
 	"fmt"
 	"os"
 	"path/filepath"

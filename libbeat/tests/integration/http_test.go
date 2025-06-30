@@ -20,11 +20,12 @@
 package integration
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/require"
 )

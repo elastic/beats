@@ -18,13 +18,14 @@
 package ptest
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"sort"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/mitchellh/hashstructure"
 

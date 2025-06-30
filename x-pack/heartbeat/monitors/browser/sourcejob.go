@@ -7,11 +7,12 @@ package browser
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"math"
 	"strings"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"

@@ -17,7 +17,7 @@
 
 package fingerprint
 
-import "encoding/json"
+import "github.com/go-json-experiment/json/v1"
 
 // Config for fingerprint processor.
 type Config struct {

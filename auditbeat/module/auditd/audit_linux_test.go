@@ -18,7 +18,6 @@
 package auditd
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -28,6 +27,8 @@ import (
 	"syscall"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

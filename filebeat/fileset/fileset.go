@@ -21,7 +21,6 @@ package fileset
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -30,6 +29,8 @@ import (
 	"runtime"
 	"strings"
 	"text/template"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/go-ucfg"
 

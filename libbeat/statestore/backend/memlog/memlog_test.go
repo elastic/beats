@@ -18,12 +18,13 @@
 package memlog
 
 import (
-	"encoding/json"
 	"io"
 	"math"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

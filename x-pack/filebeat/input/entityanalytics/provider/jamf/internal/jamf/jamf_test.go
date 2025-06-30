@@ -6,7 +6,6 @@ package jamf
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"net/http"
@@ -15,6 +14,8 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	_ "embed"
 

@@ -19,11 +19,12 @@ package elasticsearch
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"go.elastic.co/apm/v2"
 

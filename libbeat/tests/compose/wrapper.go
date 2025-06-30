@@ -21,7 +21,6 @@ import (
 	"archive/tar"
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net"
 	"os"
@@ -32,6 +31,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"

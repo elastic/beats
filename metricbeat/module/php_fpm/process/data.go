@@ -18,8 +18,9 @@
 package process
 
 import (
-	"encoding/json"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"

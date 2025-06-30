@@ -20,10 +20,11 @@
 package mongodb
 
 import (
-	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 )

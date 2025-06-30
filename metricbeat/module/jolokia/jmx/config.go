@@ -18,12 +18,13 @@
 package jmx
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"regexp"
 	"sort"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

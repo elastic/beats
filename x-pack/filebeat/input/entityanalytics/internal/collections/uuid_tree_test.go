@@ -5,9 +5,10 @@
 package collections
 
 import (
-	"encoding/json"
 	"fmt"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"

@@ -20,11 +20,12 @@
 package journalctl
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"

@@ -20,7 +20,6 @@ package mage
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -30,6 +29,8 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"errors"
 

@@ -19,9 +19,10 @@ package esutil
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 )

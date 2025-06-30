@@ -6,7 +6,8 @@ package config
 
 import (
 	"context"
-	"encoding/json"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/elastic-agent-libs/logp"

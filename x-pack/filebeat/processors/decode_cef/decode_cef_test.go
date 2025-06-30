@@ -6,11 +6,12 @@ package decode_cef
 
 import (
 	"bufio"
-	"encoding/json"
 	"flag"
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"

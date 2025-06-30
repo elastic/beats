@@ -6,12 +6,13 @@ package device_health
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/go-resty/resty/v2"
 	meraki "github.com/meraki/dashboard-api-go/v3/sdk"

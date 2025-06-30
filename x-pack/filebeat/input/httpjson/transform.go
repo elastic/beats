@@ -5,11 +5,12 @@
 package httpjson
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/management/status"
