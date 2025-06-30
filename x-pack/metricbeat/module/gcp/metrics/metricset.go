@@ -22,7 +22,6 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -185,7 +184,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	m.requester = &metricsRequester{
 		config: m.config,
 		client: client,
-		logger: logp.NewLogger(MetricsetName),
+		logger: base.Logger().Named(MetricsetName),
 	}
 
 	var metadataCacheRefreshPeriod time.Duration
