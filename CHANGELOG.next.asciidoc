@@ -419,6 +419,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add proxy support to GCP Pub/Sub input. {pull}44892[44892]
 - Add support for relationship expansion to EntraID entity analytics provider. {issue}43324[43324] {pull}44761[44761]
 - Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
+- Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
 
 *Auditbeat*
 
