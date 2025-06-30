@@ -72,6 +72,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	filebeatOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", 5066))
 	writeEventsToLogFile(t, logFilePath, numEvents)
 	filebeatOTel.Start()
+	defer filebeatOTel.Stop()
 
 	// start filebeat
 	filebeat := integration.NewBeat(
@@ -89,23 +90,14 @@ setup.template.pattern: logs-filebeat-default
 
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
+	defer filebeat.Stop()
 
-	// prepare to query ES
-	esCfg := elasticsearch.Config{
-		Addresses: []string{"http://localhost:9200"},
-		Username:  "admin",
-		Password:  "testing",
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
-			},
-		},
-	}
-	es, err := elasticsearch.NewClient(esCfg)
-	require.NoError(t, err)
+	es := newESClient(t)
 
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
+	var err error
+
 	// wait for logs to be published
 	require.Eventually(t,
 		func() bool {
@@ -284,9 +276,16 @@ service:
 	require.NoError(t,
 		template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, otelConfig))
 	configContents := configBuffer.Bytes()
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Config contents:\n%s", configContents)
+		}
+	})
+
 	filebeatOTel.WriteConfigFile(string(configContents))
 	writeEventsToLogFile(t, otelConfig.InputFile, wantEvents)
 	filebeatOTel.Start()
+	defer filebeatOTel.Stop()
 
 	// start filebeat
 	filebeat := integration.NewBeat(
@@ -304,6 +303,7 @@ setup.template.pattern: logs-filebeat-default
 
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
+	defer filebeat.Stop()
 
 	es := newESClient(t)
 
@@ -367,31 +367,33 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 
 	otelConfig := struct {
 		Index     string
-		Receiver1 receiverConfig
-		Receiver2 receiverConfig
+		Receivers []receiverConfig
 	}{
 		Index: "logs-integration-default",
-		Receiver1: receiverConfig{
-			MonitoringPort: 5066,
-			InputFile:      filepath.Join(filebeatOTel.TempDir(), "log.log"),
-			PathHome:       filebeatOTel.TempDir(),
-		},
-		Receiver2: receiverConfig{
-			MonitoringPort: 5067,
-			InputFile:      filepath.Join(filebeatOTel.TempDir(), "log.log"),
-			PathHome:       filebeatOTel.TempDir(),
+		Receivers: []receiverConfig{
+			{
+				MonitoringPort: 5066,
+				InputFile:      logFilePath,
+				PathHome:       filebeatOTel.TempDir(),
+			},
+			{
+				MonitoringPort: 5067,
+				InputFile:      logFilePath,
+				PathHome:       filebeatOTel.TempDir(),
+			},
 		},
 	}
 
 	cfg := `receivers:
-  filebeatreceiver/1:
+{{range $i, $receiver := .Receivers}}
+  filebeatreceiver/{{$i}}:
     filebeat:
       inputs:
         - type: filestream
           id: filestream-fbreceiver
           enabled: true
           paths:
-            - {{.Receiver1.InputFile}}
+            - {{$receiver.InputFile}}
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
     output:
@@ -401,31 +403,13 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
       selectors:
         - '*'
     queue.mem.flush.timeout: 0s
-    path.home: {{.Receiver1.PathHome}}
+    path.home: {{$receiver.PathHome}}
+{{if $receiver.MonitoringPort}}
     http.enabled: true
     http.host: localhost
-    http.port: {{.Receiver1.MonitoringPort}}
-  filebeatreceiver/2:
-    filebeat:
-      inputs:
-        - type: filestream
-          id: filestream-fbreceiver
-          enabled: true
-          paths:
-            - {{.Receiver2.InputFile}}
-          prospector.scanner.fingerprint.enabled: false
-          file_identity.native: ~
-    output:
-      otelconsumer:
-    logging:
-      level: info
-      selectors:
-        - '*'
-    queue.mem.flush.timeout: 0s
-    path.home: {{.Receiver2.PathHome}}
-    http.enabled: true
-    http.host: localhost
-    http.port: {{.Receiver2.MonitoringPort}}
+    http.port: {{$receiver.MonitoringPort}}
+{{end}}
+{{end}}
 exporters:
   debug:
     use_internal_logger: false
@@ -446,8 +430,9 @@ service:
   pipelines:
     logs:
       receivers:
-        - filebeatreceiver/1
-        - filebeatreceiver/2
+{{range $i, $receiver := .Receivers}}
+        - filebeatreceiver/{{$i}}
+{{end}}
       exporters:
         - debug
         - elasticsearch/log
@@ -457,9 +442,16 @@ service:
 		template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, otelConfig))
 	configContents := configBuffer.Bytes()
 
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Config contents:\n%s", configContents)
+		}
+	})
+
 	filebeatOTel.WriteConfigFile(string(configContents))
-	writeEventsToLogFile(t, otelConfig.Receiver1.InputFile, wantEvents)
+	writeEventsToLogFile(t, logFilePath, wantEvents)
 	filebeatOTel.Start()
+	defer filebeatOTel.Stop()
 
 	es := newESClient(t)
 
@@ -467,6 +459,7 @@ service:
 	var err error
 
 	// wait for logs to be published
+	wantTotalLogs := wantEvents * len(otelConfig.Receivers)
 	require.Eventuallyf(t,
 		func() bool {
 			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
@@ -475,9 +468,10 @@ service:
 			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
 			require.NoError(t, err)
 
-			return otelDocs.Hits.Total.Value >= wantEvents*2 // two receivers
+			return otelDocs.Hits.Total.Value >= wantTotalLogs
 		},
-		2*time.Minute, 100*time.Millisecond, "expected %d events, got %d", wantEvents*2, otelDocs.Hits.Total.Value)
-	assertMonitoring(t, otelConfig.Receiver1.MonitoringPort)
-	assertMonitoring(t, otelConfig.Receiver2.MonitoringPort)
+		2*time.Minute, 100*time.Millisecond, "expected at least %d events, got %d", wantTotalLogs, otelDocs.Hits.Total.Value)
+	for _, rec := range otelConfig.Receivers {
+		assertMonitoring(t, rec.MonitoringPort)
+	}
 }
