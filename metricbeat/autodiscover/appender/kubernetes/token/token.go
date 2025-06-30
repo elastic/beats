@@ -58,7 +58,7 @@ func NewTokenAppender(cfg *conf.C, logger *logp.Logger) (autodiscover.Appender, 
 	var cond conditions.Condition
 	if conf.ConditionConfig != nil {
 		// Attempt to create a condition. If fails then report error
-		cond, err = conditions.NewCondition(conf.ConditionConfig)
+		cond, err = conditions.NewCondition(conf.ConditionConfig, logger)
 		if err != nil {
 			return nil, fmt.Errorf("unable to create condition due to error: %v", err)
 		}

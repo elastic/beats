@@ -107,6 +107,7 @@ The supported processors are:
 * [`fingerprint`](/reference/heartbeat/fingerprint.md)
 * [`include_fields`](/reference/heartbeat/include-fields.md)
 * [`move-fields`](/reference/heartbeat/move-fields.md)
+* [`now`](/reference/heartbeat/now.md)
 * [`rate_limit`](/reference/heartbeat/rate-limit.md)
 * [`registered_domain`](/reference/heartbeat/processor-registered-domain.md)
 * [`rename`](/reference/heartbeat/rename-fields.md)

@@ -118,6 +118,7 @@ The supported processors are:
 * [`fingerprint`](/reference/packetbeat/fingerprint.md)
 * [`include_fields`](/reference/packetbeat/include-fields.md)
 * [`move-fields`](/reference/packetbeat/move-fields.md)
+* [`now`](/reference/packetbeat/now.md)
 * [`rate_limit`](/reference/packetbeat/rate-limit.md)
 * [`registered_domain`](/reference/packetbeat/processor-registered-domain.md)
 * [`rename`](/reference/packetbeat/rename-fields.md)

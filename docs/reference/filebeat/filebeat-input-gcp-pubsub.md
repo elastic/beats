@@ -69,6 +69,18 @@ Path to a JSON file containing the credentials and key used to subscribe. As an 
 JSON blob containing the credentials and key used to subscribe. This can be as an alternative to `credentials_file` if you want to embed the credential data within your config file or put the information into a keystore. You may also use [Google Application Default Credentials](https://cloud.google.com/docs/authentication/production) (ADC).
 
 
+### `proxy_url` [_proxy_url]
+
+This specifies proxy configuration in the form of `http[s]://<user>:<password>@<server name/ip>:<port>`. Proxy headers may be configured using the `resource.proxy_headers` field which accepts a set of key/value pairs.
+
+```yaml
+filebeat.inputs:
+- type: gcp-pubsub
+  . . .
+  proxy_url: http://proxy.example:8080
+```
+
+
 ## Common options [filebeat-input-gcp-pubsub-common-options]
 
 The following configuration options are supported by all inputs.

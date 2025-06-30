@@ -15,41 +15,42 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package client
+//go:build !windows
+
+package proc
 
 import (
-	"context"
-	"time"
-
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"os"
+	"syscall"
 )
 
-const maxRetries = 3
-const initialInterval = 500 * time.Millisecond
-const maxInterval = 1 * time.Minute
+// Job is noop on Unix
+type Job int
 
-// Retry attempts to execute the provided function `fn` with a retry mechanism.
-// It uses an exponential backoff strategy and retries up to a maximum number of attempts.
-func Retry(ctx context.Context, fn func() error) (err error) {
-	expBackoff := backoff.NewExpBackoff(ctx.Done(), initialInterval, maxInterval)
+// JobObject is a global instance of Job. noop on Unix
+var JobObject Job
 
-	for numTries := 0; ; numTries++ {
-		err = fn()
-		if err == nil {
-			// function succeeded
-			break
-		}
+// StopCmd sends SIGINT to the process
+func StopCmd(p *os.Process) error {
+	return p.Signal(syscall.SIGINT)
+}
 
-		if numTries >= maxRetries {
-			// maxRetries hit
-			break
-		}
+// CreateJobObject returns a job object.
+func CreateJobObject() (pj Job, err error) {
+	return pj, err
+}
 
-		if !expBackoff.Wait() {
-			// context cancelled
-			break
-		}
-	}
+// NewJob is noop on unix
+func NewJob() (Job, error) {
+	return 0, nil
+}
 
-	return err
+// Close is noop on unix
+func (job Job) Close() error {
+	return nil
+}
+
+// Assign is noop on unix
+func (job Job) Assign(p *os.Process) error {
+	return nil
 }
