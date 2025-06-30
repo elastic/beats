@@ -114,7 +114,7 @@ type eventKey struct {
 	mbean, event string
 }
 
-func eventMapping(entries []Entry, mapping AttributeMapping) ([]mapstr.M, error) {
+func eventMapping(entries []Entry, mapping AttributeMapping, logger *logp.Logger) ([]mapstr.M, error) {
 
 	// Generate a different event for each wildcard mbean, and and additional one
 	// for non-wildcard requested mbeans, group them by event name if defined
@@ -130,17 +130,17 @@ func eventMapping(entries []Entry, mapping AttributeMapping) ([]mapstr.M, error)
 		case string:
 			switch entryValues := v.Value.(type) {
 			case float64:
-				err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, entryValues, mbeanEvents, mapping)
+				err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, entryValues, mbeanEvents, mapping, logger)
 				if err != nil {
 					errs = append(errs, err)
 				}
 			case map[string]interface{}:
-				errs = constructEvents(entryValues, v, mbeanEvents, mapping, errs)
+				errs = constructEvents(entryValues, v, mbeanEvents, mapping, errs, logger)
 			}
 		case []interface{}:
 			entryValues, ok := v.Value.(map[string]interface{})
 			if ok {
-				errs = constructEvents(entryValues, v, mbeanEvents, mapping, errs)
+				errs = constructEvents(entryValues, v, mbeanEvents, mapping, errs, logger)
 			}
 		}
 	}
@@ -153,11 +153,11 @@ func eventMapping(entries []Entry, mapping AttributeMapping) ([]mapstr.M, error)
 	return events, errors.Join(errs...)
 }
 
-func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents map[eventKey]mapstr.M, mapping AttributeMapping, errs []error) []error {
+func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents map[eventKey]mapstr.M, mapping AttributeMapping, errs []error, logger *logp.Logger) []error {
 	hasWildcard := strings.Contains(v.Request.Mbean, "*")
 	for attribute, value := range entryValues {
 		if !hasWildcard {
-			err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, value, mbeanEvents, mapping)
+			err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, value, mbeanEvents, mapping, logger)
 			if err != nil {
 				errs = append(errs, err)
 			}
@@ -175,7 +175,7 @@ func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents ma
 
 		responseMbean := attribute
 		for attribute, value := range values {
-			err := parseResponseEntry(v.Request.Mbean, responseMbean, attribute, value, mbeanEvents, mapping)
+			err := parseResponseEntry(v.Request.Mbean, responseMbean, attribute, value, mbeanEvents, mapping, logger)
 			if err != nil {
 				errs = append(errs, err)
 			}
@@ -203,12 +203,13 @@ func parseResponseEntry(
 	attributeValue interface{},
 	events map[eventKey]mapstr.M,
 	mapping AttributeMapping,
+	logger *logp.Logger,
 ) error {
 	field, exists := mapping.Get(requestMbeanName, attributeName)
 	if !exists {
 		// This shouldn't ever happen, if it does it is probably that some of our
 		// assumptions when building the request and the mapping is wrong.
-		logp.Debug("jolokia.jmx", "mapping: %+v", mapping)
+		logger.Named("jolokia.jmx").Debugf("mapping: %+v", mapping)
 		return fmt.Errorf("metric key '%v' for mbean '%s' not found in mapping", attributeName, requestMbeanName)
 	}
 

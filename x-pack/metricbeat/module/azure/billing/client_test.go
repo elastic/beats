@@ -18,6 +18,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var (
@@ -35,7 +36,7 @@ func TestClient(t *testing.T) {
 	}
 
 	t.Run("return error not valid query", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logptest.NewTestingLogger(t, ""))
 		client.Config = config
 		m := &MockService{}
 		m.On("GetForecast", mock.Anything, mock.Anything, mock.Anything).Return(armcostmanagement.QueryResult{}, errors.New("invalid query"))
@@ -49,7 +50,7 @@ func TestClient(t *testing.T) {
 		m.AssertExpectations(t)
 	})
 	t.Run("return results", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logptest.NewTestingLogger(t, ""))
 		client.Config = config
 		m := &MockService{}
 		forecasts := armcostmanagement.QueryResult{}

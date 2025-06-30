@@ -83,7 +83,7 @@ func newProcessor(config config, log *logp.Logger) (beat.Processor, error) {
 
 	return &processor{
 		config:  config,
-		decoder: newDecoder(config.Language),
+		decoder: newDecoder(config.Language, log),
 		log:     log.Named(logName),
 	}, nil
 }

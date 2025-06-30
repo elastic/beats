@@ -24,6 +24,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -33,6 +34,7 @@ func cpuUsageFor(stats container.StatsResponse) *CPUUsage {
 	u := CPUUsage{
 		Stat:        &docker.Stat{Stats: stats},
 		systemDelta: 1000000000, // Nanoseconds in a second
+		logger:      logp.NewNopLogger(),
 	}
 	return &u
 }

@@ -102,7 +102,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			return fmt.Errorf("getDeviceSwitchports failed; %w", err)
 		}
 
-		err = getDeviceVPNStatuses(m.client, org, devices)
+		err = getDeviceVPNStatuses(m.client, org, devices, m.logger)
 		if err != nil {
 			m.logger.Errorf("GetVPNStatuses failed; %w", err)
 			// continue so we still report the rest of the device health metrics

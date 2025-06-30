@@ -60,7 +60,7 @@ func newScriptFromConfig(log *logp.Logger, c *scriptConfig) (*script, error) {
 		return nil, err
 	}
 
-	pool, err := newSessionPool(prog, *c)
+	pool, err := newSessionPool(prog, *c, log)
 	if err != nil {
 		return nil, err
 	}
