@@ -217,7 +217,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-memcached,Memcached>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-memcached-stats,stats>>   
 |<<metricbeat-module-meraki,Cisco Meraki>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-meraki-device_health,device_health>> beta[]  
+.2+| .2+|  |<<metricbeat-metricset-meraki-device_health,device_health>> beta[]  
+|<<metricbeat-metricset-meraki-network_health,network_health>> beta[]  
 |<<metricbeat-module-mongodb,MongoDB>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .5+| .5+|  |<<metricbeat-metricset-mongodb-collstats,collstats>>   
 |<<metricbeat-metricset-mongodb-dbstats,dbstats>>   

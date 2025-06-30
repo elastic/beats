@@ -54,6 +54,17 @@ and metadata information from metricsets and fetch metrics only. At the moment,
 
 * *endpoint*: A custom endpoint to use for the GCP API calls. If not specified, the default endpoint will be used.
 
+* *collect_dataproc_user_labels*: (`true`/`false` default `false`) Retrieve additional
+user-defined labels from Dataproc clusters.
+
+* *metadata_cache*: (`true`/`false` default `false`) Enable caching of metadata.
+If set to true, metadata will be cached to improve performance. Newly created
+resources may not appear in the cache until the next refresh cycle, which can
+cause temporary visibility gaps.
+
+* *metadata_cache_refresh_period*: A duration specifying how often the cached
+metadata should be refreshed (e.g., `5m`, `1h`).
+
 [float]
 == Example configuration
 * `compute` metricset is enabled to collect metrics from `us-central1-a` zone
@@ -318,6 +329,8 @@ metricbeat.modules:
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
+  metadata_cache: true
+  metadata_cache_refresh_period: 1h
 
 - module: gcp
   metricsets:

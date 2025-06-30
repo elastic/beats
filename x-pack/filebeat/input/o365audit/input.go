@@ -65,6 +65,13 @@ func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 			Type:       pluginName,
 			Configure:  configure,
 		},
+
+		// ExcludeFromFIPS = true to prevent this input from being used in FIPS-capable
+		// Filebeat distributions.  This input indirectly uses algorithms that are not
+		// FIPS-compliant. Specifically, the input depends on the
+		// github.com/Azure/azure-sdk-for-go/sdk/azidentity package which, in turn,
+		// depends on the golang.org/x/crypto/pkcs12 package, which is not FIPS-compliant.
+		ExcludeFromFIPS: true,
 	}
 }
 
