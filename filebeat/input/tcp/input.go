@@ -18,13 +18,16 @@
 package tcp
 
 import (
+	"fmt"
 	"net"
+	"runtime/debug"
 	"time"
 
 	"github.com/dustin/go-humanize"
 
 	"github.com/elastic/beats/v7/filebeat/input/netmetrics"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
@@ -44,11 +47,11 @@ func Plugin() input.Plugin {
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "tcp packet server",
-		Manager:    stateless.NewInputManager(configure),
+		Manager:    v2.ConfigureWith(configure),
 	}
 }
 
-func configure(cfg *conf.C) (stateless.Input, error) {
+func configure(cfg *conf.C) (v2.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -77,9 +80,10 @@ type server struct {
 type config struct {
 	tcp.Config `config:",inline"`
 
-	LineDelimiter string                `config:"line_delimiter" validate:"nonzero"`
-	Framing       streaming.FramingType `config:"framing"`
-	BufferSize    int                   `config:"buffer_size"`
+	LineDelimiter      string                `config:"line_delimiter" validate:"nonzero"`
+	Framing            streaming.FramingType `config:"framing"`
+	BufferSize         int                   `config:"buffer_size"`
+	numPipelineWorkers int
 }
 
 type evtWithSize struct {
@@ -124,14 +128,34 @@ func (s *server) publishLoop(ctx input.Context, publisher stateless.Publisher, m
 	}
 }
 
-func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
+func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err error) {
 	log := ctx.Logger.With("host", s.Host)
+
+	defer func() {
+		if v := recover(); v != nil {
+			if e, ok := v.(error); ok {
+				err = e
+			} else {
+				err = fmt.Errorf("TCP input panic with: %+v\n%s", v, debug.Stack())
+			}
+			log.Errorw("TCP input panic", err)
+		}
+	}()
 
 	log.Info("starting tcp socket input")
 	defer log.Info("tcp input stopped")
 
 	ctx.UpdateStatus(status.Starting, "")
 	ctx.UpdateStatus(status.Configuring, "")
+
+	publisher, err := pipeline.ConnectWith(beat.ClientConfig{
+		PublishMode: beat.DefaultGuarantees,
+	})
+	if err != nil {
+		return fmt.Errorf("cannot connect to publishing pipeline: %w", err)
+	}
+
+	defer publisher.Close()
 
 	const pollInterval = time.Minute
 	metrics := netmetrics.NewTCP("tcp", ctx.ID, s.Host, pollInterval, log)

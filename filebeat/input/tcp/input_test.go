@@ -23,16 +23,17 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net"
+	"strings"
 	"sync"
-	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/filebeat/input/v2/testpipeline"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -48,7 +49,8 @@ func TestInput(t *testing.T) {
 		t.Fatalf("cannot create input: %s", err)
 	}
 
-	publisher := newMockPublisher(t)
+	pipeline := testpipeline.NewPipelineConnector()
+
 	startTCPClient(t, 2*time.Second, serverAddr, []string{"foo", "bar"})
 
 	ctx, cancel := context.WithCancel(t.Context())
@@ -61,29 +63,22 @@ func TestInput(t *testing.T) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := inp.Run(v2Ctx, publisher); err != nil {
+		if err := inp.Run(v2Ctx, pipeline); err != nil {
 			if !errors.Is(err, context.Canceled) {
 				t.Errorf("input exited with error: %s", err)
 			}
 		}
 	}()
 
-	require.Eventually(
-		t,
-		func() bool {
-			return publisher.count.Load() == 2
-		},
-		5*time.Second,
-		100*time.Millisecond,
-		"not all events published")
+	requireEventMetrics(t, time.Second, eventMetrics{Read: 2, Published: 2})
 
 	// Assert metrics
 	m := getEventMetrics(t)
-	if got, want := m.EventsPublished, 2; got != want {
+	if got, want := m.Published, 2; got != want {
 		t.Errorf("expecting %d events published, got %d", want, got)
 	}
 
-	if got, want := m.EventsRead, 2; got != want {
+	if got, want := m.Read, 2; got != want {
 		t.Errorf("expecting %d events read, got %d", want, got)
 	}
 
@@ -104,8 +99,8 @@ func TestInputCanReadWithoutPublishing(t *testing.T) {
 		t.Fatalf("cannot create input: %s", err)
 	}
 
-	publisher := newMockPublisher(t)
-	publisher.blocked.Store(true)
+	pipeline := testpipeline.NewPipelineConnector()
+	pipeline.Block()
 	startTCPClient(t, 2*time.Second, serverAddr, []string{"foo", "bar"})
 
 	ctx, cancel := context.WithCancel(t.Context())
@@ -118,23 +113,14 @@ func TestInputCanReadWithoutPublishing(t *testing.T) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := inp.Run(v2Ctx, publisher); err != nil {
+		if err := inp.Run(v2Ctx, pipeline); err != nil {
 			if !errors.Is(err, context.Canceled) {
 				t.Errorf("input exited with error: %s", err)
 			}
 		}
 	}()
 
-	require.Eventually(
-		t,
-		func() bool {
-			m := getEventMetrics(t)
-			return m.EventsRead == 2 && m.EventsPublished == 0
-		},
-		time.Second,
-		100*time.Millisecond,
-		"did not find 2 events read and 0 published")
-
+	requireEventMetrics(t, time.Second, eventMetrics{Read: 2, Published: 0})
 	// Stop the input
 	cancel()
 
@@ -142,26 +128,26 @@ func TestInputCanReadWithoutPublishing(t *testing.T) {
 	wg.Wait()
 }
 
-func newMockPublisher(t *testing.T) *mockPublisher {
-	return &mockPublisher{
-		t:       t,
-		count:   atomic.Uint64{},
-		blocked: atomic.Bool{},
-	}
-}
-
-type mockPublisher struct {
-	t       *testing.T
-	count   atomic.Uint64
-	blocked atomic.Bool
-}
-
-func (m *mockPublisher) Publish(evt beat.Event) {
-	for m.blocked.Load() {
-		time.Sleep(10 * time.Millisecond)
-	}
-
-	m.count.Add(1)
+func requireEventMetrics(t *testing.T, timeout time.Duration, want eventMetrics) {
+	msg := &strings.Builder{}
+	require.Eventuallyf(
+		t,
+		func() bool {
+			msg.Reset()
+			got := getEventMetrics(t)
+			fmt.Fprintf(
+				msg,
+				"%d events read, %d events published",
+				got.Read,
+				got.Published)
+			return got.Read == want.Read && got.Published == want.Published
+		},
+		timeout,
+		100*time.Millisecond,
+		"expecting %d evens read, %d published. Got %s",
+		want.Read,
+		want.Published,
+		msg)
 }
 
 func startTCPClient(t *testing.T, timeout time.Duration, address string, dataToSend []string) {
@@ -201,8 +187,8 @@ func startTCPClient(t *testing.T, timeout time.Duration, address string, dataToS
 }
 
 type eventMetrics struct {
-	EventsPublished int `json:"events_published"`
-	EventsRead      int `json:"events_read"`
+	Published int `json:"events_published"`
+	Read      int `json:"events_read"`
 }
 
 func getEventMetrics(t *testing.T) eventMetrics {
