@@ -215,29 +215,16 @@ require (
 	go.elastic.co/apm/module/apmhttp/v2 v2.6.3
 	go.elastic.co/apm/v2 v2.6.3
 	go.mongodb.org/mongo-driver v1.17.4
-<<<<<<< HEAD
 	go.opentelemetry.io/collector/component v1.27.0
 	go.opentelemetry.io/collector/config/configtls v1.27.0
 	go.opentelemetry.io/collector/confmap v1.27.0
+	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.27.0
 	go.opentelemetry.io/collector/consumer v1.28.0
 	go.opentelemetry.io/collector/consumer/consumererror v0.121.0
 	go.opentelemetry.io/collector/exporter/debugexporter v0.121.0
 	go.opentelemetry.io/collector/otelcol v0.121.0
 	go.opentelemetry.io/collector/pdata v1.28.0
 	go.opentelemetry.io/collector/receiver v0.121.0
-=======
-	go.opentelemetry.io/collector/component v1.33.0
-	go.opentelemetry.io/collector/component/componentstatus v0.127.0
-	go.opentelemetry.io/collector/config/configtls v1.33.0
-	go.opentelemetry.io/collector/confmap v1.33.0
-	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.33.0
-	go.opentelemetry.io/collector/consumer v1.33.0
-	go.opentelemetry.io/collector/consumer/consumererror v0.127.0
-	go.opentelemetry.io/collector/exporter/debugexporter v0.127.0
-	go.opentelemetry.io/collector/otelcol v0.127.0
-	go.opentelemetry.io/collector/pdata v1.33.0
-	go.opentelemetry.io/collector/receiver v1.33.0
->>>>>>> 46e855e22 (otel: allow filebeat otel to load otel config files (#45093))
 	go.uber.org/mock v0.5.0
 	golang.org/x/term v0.32.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250115164207-1a7da9e5054f
