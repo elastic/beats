@@ -27,8 +27,13 @@ updates:
       - dependency-name: go.elastic.co/apm/*
       - dependency-name: go.elastic.co/ecszap
       - dependency-name: go.elastic.co/go-licence-detector
-      # Team:Service-Integrations
+      # Team:Service-Integrations, Team:obs-infraobs-integrations
       - dependency-name: github.com/elastic/bayeux
+      - dependency-name: github.com/go-sql-driver/mysql
+      - dependency-name: github.com/lib/pq
+      - dependency-name: github.com/godror/godror
+      - dependency-name: github.com/microsoft/go-mssqldb
+      - dependency-name: github.com/rcrowley/go-metrics
       # Team:Security-Linux Platform
       - dependency-name: github.com/elastic/go-libaudit/*
       - dependency-name: github.com/elastic/go-perf
