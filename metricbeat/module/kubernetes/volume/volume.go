@@ -121,12 +121,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	body, err := m.mod.GetKubeletStats(m.http)
+	summary, err := m.mod.GetKubeletSummary(m.http)
 	if err != nil {
 		return fmt.Errorf("error doing HTTP request to fetch 'volume' Metricset data: %w", err)
 	}
 
-	events, err := eventMapping(body, logger, mapping)
+	events, err := eventMapping(summary, logger, mapping)
 	if err != nil {
 		return err
 	}

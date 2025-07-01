@@ -18,6 +18,7 @@
 package kubernetes
 
 import (
+	"encoding/json"
 	"fmt"
 	"sync"
 	"time"
@@ -42,6 +43,7 @@ type Module interface {
 	mb.Module
 	GetStateMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error)
 	GetKubeletStats(http *helper.HTTP) ([]byte, error)
+	GetKubeletSummary(http *helper.HTTP) (*Summary, error)
 	GetMetricsRepo() *util.MetricsRepo
 }
 
@@ -64,7 +66,7 @@ func (c *kubeStateMetricsCache) getCacheMapEntry(hash uint64) *familiesCache {
 }
 
 type statsCache struct {
-	sharedStats        []byte
+	sharedSummary      *Summary
 	lastFetchErr       error
 	lastFetchTimestamp time.Time
 }
@@ -134,26 +136,80 @@ func (m *module) GetStateMetricsFamilies(prometheus p.Prometheus) ([]*dto.Metric
 }
 
 func (m *module) GetKubeletStats(http *helper.HTTP) ([]byte, error) {
+	summary, err := m.GetKubeletSummary(http)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert Summary back to JSON for backward compatibility
+	return json.Marshal(summary)
+}
+
+// GetKubeletSummary returns the parsed kubernetes.Summary from kubelet stats endpoint
+func (m *module) GetKubeletSummary(http *helper.HTTP) (*Summary, error) {
 	m.kubeletStatsCache.lock.Lock()
 	defer m.kubeletStatsCache.lock.Unlock()
 
 	now := time.Now()
 
+	// Generate cache key based on both module hash and HTTP URL to ensure
+	// different URLs have different cache entries
+	url := http.GetURI()
+	cacheKey, err := generateURLCacheHash(m.cacheHash, url)
+	if err != nil {
+		return nil, fmt.Errorf("error generating cache key for URL %s: %w", url, err)
+	}
+
 	// NOTE: These entries will be never removed, this can be a leak if
 	// metricbeat is used to monitor clusters dynamically created.
 	// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
-	statsCache := m.kubeletStatsCache.getCacheMapEntry(m.cacheHash)
+	statsCache := m.kubeletStatsCache.getCacheMapEntry(cacheKey)
 
 	if statsCache.lastFetchTimestamp.IsZero() || now.Sub(statsCache.lastFetchTimestamp) > m.Config().Period {
-		statsCache.sharedStats, statsCache.lastFetchErr = http.FetchContent()
+		// Fetch raw data from HTTP endpoint
+		rawData, fetchErr := http.FetchContent()
+		if fetchErr != nil {
+			statsCache.lastFetchErr = fetchErr
+			statsCache.lastFetchTimestamp = now
+			return nil, fetchErr
+		}
+
+		// Parse JSON into Summary structure
+		var summary Summary
+		if parseErr := json.Unmarshal(rawData, &summary); parseErr != nil {
+			statsCache.lastFetchErr = fmt.Errorf("cannot unmarshal json response: %w", parseErr)
+			statsCache.lastFetchTimestamp = now
+			return nil, statsCache.lastFetchErr
+		}
+
+		// Cache the parsed structure
+		statsCache.sharedSummary = &summary
+		statsCache.lastFetchErr = nil
 		statsCache.lastFetchTimestamp = now
 	}
 
-	return statsCache.sharedStats, statsCache.lastFetchErr
+	return statsCache.sharedSummary, statsCache.lastFetchErr
 }
 
 func generateCacheHash(host []string) (uint64, error) {
 	id, err := hashstructure.Hash(host, nil)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
+
+// generateURLCacheHash generates a cache key based on module hash and HTTP URL
+func generateURLCacheHash(moduleHash uint64, url string) (uint64, error) {
+	cacheData := struct {
+		ModuleHash uint64
+		URL        string
+	}{
+		ModuleHash: moduleHash,
+		URL:        url,
+	}
+
+	id, err := hashstructure.Hash(cacheData, nil)
 	if err != nil {
 		return 0, err
 	}

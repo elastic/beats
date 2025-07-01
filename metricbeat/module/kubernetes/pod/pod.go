@@ -100,14 +100,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Start()
 
-	body, err := m.mod.GetKubeletStats(m.http)
+	summary, err := m.mod.GetKubeletSummary(m.http)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
 		return
 	}
 
-	events, err := eventMapping(body, m.mod.GetMetricsRepo(), m.Logger(), mapping)
+	events, err := eventMapping(summary, m.mod.GetMetricsRepo(), m.Logger(), mapping)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)

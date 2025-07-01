@@ -18,9 +18,6 @@
 package node
 
 import (
-	"encoding/json"
-	"fmt"
-
 	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/helper/easyops"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
@@ -29,13 +26,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventMapping(content []byte, logger *logp.Logger, mapping *prometheus.MetricsMapping) ([]mapstr.M, error) {
-	var summary kubernetes.Summary
-	err := json.Unmarshal(content, &summary)
-	if err != nil {
-		return nil, fmt.Errorf("cannot unmarshal json response: %w", err)
-	}
-
+func eventMapping(summary *kubernetes.Summary, logger *logp.Logger, mapping *prometheus.MetricsMapping) ([]mapstr.M, error) {
 	node := summary.Node
 	nodeEvent := mapstr.M{
 		"name": node.NodeName,
