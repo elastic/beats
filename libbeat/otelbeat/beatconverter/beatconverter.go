@@ -94,6 +94,8 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 				if err != nil {
 					return err
 				}
+			// noop, it will get replaced by otelconsumer below
+			case "otelconsumer":
 			default:
 				return fmt.Errorf("output type %q is unsupported in OTel mode", key)
 			}
