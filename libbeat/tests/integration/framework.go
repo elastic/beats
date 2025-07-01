@@ -43,6 +43,7 @@ import (
 	"time"
 
 	"github.com/elastic/go-elasticsearch/v8"
+
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 )
