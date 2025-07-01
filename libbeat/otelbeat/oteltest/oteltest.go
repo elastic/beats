@@ -184,14 +184,14 @@ func CheckReceivers(params CheckReceiversParams) {
 			require.Equal(t, beatForCompID(compID), zl.ContextMap()["service.name"])
 			break
 		}
-		require.NotNilf(t, host.Evt, "expected not nil nil, got %v", host.Evt)
+		require.NotNil(ct, host.Evt, "expected not nil, got nil")
 
 		if params.Status.Error == "" {
-			require.Equalf(t, host.Evt.Status(), componentstatus.StatusOK, "expected %v, got %v", params.Status.Status, host.Evt.Status())
-			require.Nilf(t, host.Evt.Err(), "expected nil, got %v", host.Evt.Err())
+			require.Equalf(ct, host.Evt.Status(), componentstatus.StatusOK, "expected %v, got %v", params.Status.Status, host.Evt.Status())
+			require.Nilf(ct, host.Evt.Err(), "expected nil, got %v", host.Evt.Err())
 		} else {
-			require.Equalf(t, host.Evt.Status(), params.Status.Status, "expected %v, got %v", params.Status.Status, host.Evt.Status())
-			require.ErrorContainsf(t, host.Evt.Err(), params.Status.Error, "expected error to contain '%v': %v", params.Status.Error, host.Evt.Err())
+			require.Equalf(ct, host.Evt.Status(), params.Status.Status, "expected %v, got %v", params.Status.Status, host.Evt.Status())
+			require.ErrorContainsf(ct, host.Evt.Err(), params.Status.Error, "expected error to contain '%v': %v", params.Status.Error, host.Evt.Err())
 		}
 
 		if params.AssertFunc != nil {
