@@ -35,10 +35,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/go-concert/ctxtool"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 func Plugin() input.Plugin {
@@ -66,8 +66,8 @@ func defaultConfig() config {
 			Timeout:        time.Minute * 5,
 			MaxMessageSize: 20 * humanize.MiByte,
 		},
-		LineDelimiter: "\n",
-		BufferSize:    1000,
+		LineDelimiter:      "\n",
+		numPipelineWorkers: 2,
 	}
 }
 
@@ -128,8 +128,36 @@ func (s *server) publishLoop(ctx input.Context, publisher stateless.Publisher, m
 	}
 }
 
+func (s *server) initWorkers(ctx input.Context, pipeline beat.Pipeline, metrics *netmetrics.TCP) error {
+	clients := []beat.Client{}
+	for range s.numPipelineWorkers {
+		client, err := pipeline.ConnectWith(beat.ClientConfig{
+			PublishMode: beat.DefaultGuarantees,
+		})
+		if err != nil {
+			return fmt.Errorf("cannot connect to publishing pipeline: %w", err)
+		}
+
+		clients = append(clients, client)
+		go s.publishLoop(ctx, client, metrics)
+	}
+
+	// Close all clients when the input is closed
+	go func() {
+		select {
+		case <-ctx.Cancelation.Done():
+		}
+		for _, c := range clients {
+			c.Close()
+		}
+	}()
+
+	return nil
+}
+
 func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err error) {
 	log := ctx.Logger.With("host", s.Host)
+	ctx.Logger = log
 
 	defer func() {
 		if v := recover(); v != nil {
@@ -148,20 +176,27 @@ func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err er
 	ctx.UpdateStatus(status.Starting, "")
 	ctx.UpdateStatus(status.Configuring, "")
 
-	publisher, err := pipeline.ConnectWith(beat.ClientConfig{
-		PublishMode: beat.DefaultGuarantees,
-	})
-	if err != nil {
-		return fmt.Errorf("cannot connect to publishing pipeline: %w", err)
-	}
-
-	defer publisher.Close()
-
 	const pollInterval = time.Minute
 	metrics := netmetrics.NewTCP("tcp", ctx.ID, s.Host, pollInterval, log)
 	defer metrics.Close()
 
-	go s.publishLoop(ctx, publisher, metrics)
+	// s.initAndRunServer(ctx, metrics)
+	s.initWorkers(ctx, pipeline, metrics)
+
+	err = s.initAndRunServer(ctx, metrics)
+	if err != nil {
+		ctx.UpdateStatus(status.Failed, "Input exited unexpectedly: "+err.Error())
+	} else {
+		ctx.UpdateStatus(status.Stopped, "")
+	}
+
+	return err
+}
+
+// initAndRunServer initialises and runs the TCP server.
+// It updates the input status to Running.
+func (s *server) initAndRunServer(ctx input.Context, metrics *netmetrics.TCP) error {
+	log := ctx.Logger
 
 	split, err := streaming.SplitFunc(s.Framing, []byte(s.LineDelimiter))
 	if err != nil {
@@ -216,12 +251,5 @@ func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err er
 	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {
 		err = ctxerr
 	}
-
-	if err != nil {
-		ctx.UpdateStatus(status.Failed, "Input exited unexpectedly: "+err.Error())
-	} else {
-		ctx.UpdateStatus(status.Stopped, "")
-	}
-
-	return err
+	return nil
 }
