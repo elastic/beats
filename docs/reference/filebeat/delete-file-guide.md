@@ -24,8 +24,9 @@ been published. If this is true, then it will wait for the configured
 grace period, check if no new data has been added to the file, by
 comparing its current size with the size when the last event was read,
 then it will try to remove the file. During the grace period Filebeat
-monitors the file for changes and will close the harvester on any
-change.
+monitors the file. If the file size changes, the grace period is
+interrupted and the file will resume ingesting after the next file
+system scan.
 
 A published event is an event that has been acknowledged by the
 output, an output always acknowledges a successfully written event,
@@ -165,6 +166,6 @@ has been closed and all events published, if new data is added to the
 file, the harvester will be closed, then only on the next scan from
 the file system new data will be picked up. While waiting for the
 grace period to expire the harvesters checks the file for new data at
-the same interval as the prospector, which is configured using (configured by
-[`prospector.scanner.check_interval`](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-scan-frequency)).
+the same interval as the prospector, which is configured using
+[`prospector.scanner.check_interval`](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-scan-frequency).
 ::::
