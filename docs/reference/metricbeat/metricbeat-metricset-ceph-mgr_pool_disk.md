@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-ceph-mgr_pool_disk.html
 ---
 
-<!-- This file is generated! See scripts/docs_collector.py -->
+% This file is generated! See scripts/docs_collector.py
 
 # Ceph mgr_pool_disk metricset [metricbeat-metricset-ceph-mgr_pool_disk]
 

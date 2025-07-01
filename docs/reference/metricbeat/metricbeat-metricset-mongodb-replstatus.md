@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-mongodb-replstatus.html
 ---
 
-<!-- This file is generated! See scripts/docs_collector.py -->
+% This file is generated! See scripts/docs_collector.py
 
 # MongoDB replstatus metricset [metricbeat-metricset-mongodb-replstatus]
 

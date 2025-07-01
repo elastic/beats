@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-state_statefulset.html
 ---
 
-<!-- This file is generated! See scripts/docs_collector.py -->
+% This file is generated! See scripts/docs_collector.py
 
 # Kubernetes state_statefulset metricset [metricbeat-metricset-kubernetes-state_statefulset]
 

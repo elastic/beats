@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-couchbase-node.html
 ---
 
-<!-- This file is generated! See scripts/docs_collector.py -->
+% This file is generated! See scripts/docs_collector.py
 
 # Couchbase node metricset [metricbeat-metricset-couchbase-node]
 
