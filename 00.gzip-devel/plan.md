@@ -16,20 +16,12 @@
 #### Open questions:
 - [ ] can a file me marked as "complete", a.k.a do not read it again?
   file: `input/filestream/copytruncate_prospector.go:373`
-- [ ] `openFile` attempts to detect the file was truncated. For GZIP it'd need
-  to know the previous file size.
-  file: `filebeat/input/filestream/input.go:314-324`
 - [ ] if there is a gzip error when opening the file to create the file
 descriptor (filebeat/input/filestream/fswatch.go:406), it happened in the file
 scanner, the error will happen every scan as long as the file is still there.
+- [ ] add GZIP support for tests on `input_integration_test.go`?
 
 ## Milestones
-
-### Milestone 0 – Analysis
-- [ ] Analyse existing filestream harvester code paths for decompression insertion point
-      files: `filebeat/input/filestream/internal/input-logfile/harvester.go`,
-      `filebeat/input/filestream/internal/input-logfile/prospector.go`,
-      `filebeat/input/filestream/prospector.go`
 
 ### Milestone 1 – Configuration & Validation
 - [x] Add new config flag `gzip_experimental` with validation (enforce fingerprint identity)
@@ -43,22 +35,29 @@ scanner, the error will happen every scan as long as the file is still there.
 ### Milestone 2 – Core GZIP Reader
 - [x] Implement GZIP detection by magic bytes (reader sniffing)
       files: `filebeat/input/filestream/file.go` (see `IsGZIP` and `gzipSeekerReader`)
-- [ ] Integrate GZIP reader
+- [x] Integrate GZIP reader
   - [x] Update `input.go` to use `File` interface and switch between `plainFile` and `gzipSeekerReader` based on GZIP detection and `gzip_experimental` flag.
   - [x] Chunked read using existing buffer_size (handled by harvester, ensure compatibility)
   - [x] Maintain decompressed offset (ensure `file.State` and logic in `input.go` handle this)
-  - [ ] Ensure (test) GZIP resume logic re-reads stream from start to reach last known decompressed offset (primarily in `input.go` when handling existing state/offset for GZIP files).
-- [ ] add Test integrity verification at EOF (CRC32 & ISIZE)
+- [x] add Test integrity verification at EOF (CRC32 & ISIZE)
       files: `filebeat/input/filestream/file.go` (within `gzipSeekerReader`)
 - [ ] Implement modification detection: abort ingestion on append/truncate during read
       files: `filebeat/input/filestream/internal/input-logfile/harvester.go`,
       `filebeat/input/file/state.go`
-- [ ] Instrument GZIP-specific metrics (`gzip_validation_errors_total`, `gzip_bytes_compressed_total`, `gzip_bytes_decompressed_total`)
+- [ ] Instrument GZIP-specific metrics:
+  - `gzip_validation_errors_total`
+  - `gzip_bytes_compressed_total`
+  - `gzip_bytes_decompressed_total`
       files: `filebeat/input/filestream/internal/input-logfile/metrics.go`,
       `filebeat/input/filestream/input.go`
 - [x] Enhance rotation handle .gz
   - [x] Add GZIP-awareness to `onFSEvent` in `copytruncate_prospector.go`
   - [x] Add GZIP-awareness to `onFSEvent` in `prospector.go`
+- [ ] save GZIP file was fully ingested so filestream won't open and seek to offset
+- [ ] Ensure (test) GZIP resume logic re-reads stream from start to reach last known decompressed offset (primarily in `input.go` when handling existing state/offset for GZIP files).
+- [ ] test for a corrupted file, which at the beginning some lines succeed, then
+it fails.
+- [ ] test for a file with multiple GZIP files
 - [ ] run BenchmarkToFileDescriptor to check overhead of checking a file is GZIP
 
 ### Milestone 3 – Testing

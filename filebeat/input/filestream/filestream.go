@@ -153,7 +153,6 @@ func (f *logFile) Read(buf []byte) (int, error) {
 	return 0, ErrClosed
 }
 
-// AndersonQ: need to see what needs to be done here
 func (f *logFile) startFileMonitoringIfNeeded() {
 	if f.closeInactive > 0 || f.closeRemoved || f.closeRenamed {
 		err := f.tg.Go(func(ctx context.Context) error {
@@ -183,6 +182,7 @@ func (f *logFile) closeIfTimeout(ctx unison.Canceler) {
 	}
 }
 
+// TODO(AndersonQ): double check the test
 func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
 	err := timed.Periodic(ctx, f.checkInterval, func() error {
 		if f.shouldBeClosed() {

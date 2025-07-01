@@ -160,6 +160,7 @@ type dateSorter struct {
 }
 
 // TODO(AndersonQ): update user-facing docs
+//   - it matches the 1st then tries to match the 2nd.
 func newDateSorter(
 	format,
 	dateRegex,
@@ -208,9 +209,6 @@ func (s *dateSorter) GetTs(fi *rotatedFileInfo) time.Time {
 		return time.Time{}
 	}
 
-	// TODO(AndersonQ): decide the rule for the regex. Either:
-	//   - it matches the 1st or the 2nd match. CURRENT behaviour
-	//   - it matches the last match
 	matches := s.dateRegex.FindStringSubmatch(suffix)
 	var dateStr string
 	switch {
