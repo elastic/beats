@@ -309,14 +309,8 @@ require (
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-openapi/jsonpointer v0.20.2 // indirect
 	github.com/go-openapi/jsonreference v0.20.4 // indirect
-<<<<<<< HEAD
 	github.com/go-openapi/swag v0.22.9 // indirect
-	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
-=======
-	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
-	github.com/gobwas/glob v0.2.3 // indirect
->>>>>>> 113b5a572 (Bump up github.com/go-viper/mapstructure/v2 dependency (#45129))
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/godror/knownpb v0.1.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
