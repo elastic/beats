@@ -8,7 +8,6 @@
 package cat_shards
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -18,24 +17,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 )
-
-func objectToType[T any](content any) T {
-	data, err := json.Marshal(content)
-
-	if err == nil {
-		var result T
-
-		if err = json.Unmarshal(data, &result); err == nil {
-			return result
-		}
-	}
-
-	panic(err)
-}
-
-func mapArrayToType[T any](content []map[string]any) []T {
-	return objectToType[[]T](content)
-}
 
 func SetupSuccessfulServerWithResolvedIndexes(resolvedIndexes []byte) auto_ops_testing.SetupServerCallback {
 	return func(t *testing.T, clusterInfo []byte, data []byte, _ string) *httptest.Server {
