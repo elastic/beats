@@ -469,6 +469,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
 - Segregated `max_workers` from `batch_size` in the azure-blob-storage input. {issue}44491[44491] {pull}44992[44992]
 - Add support for relationship expansion to EntraID entity analytics provider. {issue}43324[43324] {pull}44761[44761]
+- Added support for specifying custom content-types and encodings in gcs input. {issue}44628[44628] {pull}45088[45088]
 
 *Auditbeat*
 
@@ -484,6 +485,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
 - Add support for RFC7231 methods to http monitors. {pull}41975[41975]
 - Upgrade node to latest LTS v18.20.7. {pull}43511[43511]
+- Upgrade node to latest LTS v20.19.3. {pull}45087[45087]
 
 *Metricbeat*
 
