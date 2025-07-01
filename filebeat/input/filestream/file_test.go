@@ -122,7 +122,7 @@ func TestGzipSeekerReader(t *testing.T) {
 		content = append(content, nl...)
 		content = append(content, plainContent...)
 		content = append(content, nl...)
-		corrupted := gziptest.CraftCorruptedGzip(
+		corrupted := gziptest.Compress(
 			t,
 			content,
 			gziptest.CorruptCRC)

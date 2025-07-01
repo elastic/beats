@@ -61,7 +61,7 @@ func TestGZIP(t *testing.T) {
 				outputFilename := "output-file"
 				logPath := filepath.Join(tempDir, "input.log.gz")
 
-				corruptedGZIP := gziptest.CraftCorruptedGzip(t, content, tc.corruption)
+				corruptedGZIP := gziptest.Compress(t, content, tc.corruption)
 				err := os.WriteFile(logPath, corruptedGZIP, 0644)
 				require.NoError(t, err)
 

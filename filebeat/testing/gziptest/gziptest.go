@@ -12,21 +12,23 @@ import (
 type Corruption int
 
 const (
-	CorruptCRC Corruption = 1 << iota
+	CorruptNone Corruption = 0
+	CorruptCRC  Corruption = 1 << iota
 	CorruptSize
 )
 
-// CraftCorruptedGzip takes input data, compresses it using gzip,
-// and then intentionally corrupts parts of the footer (CRC32 and/or ISIZE)
-// to simulate checksum/length errors upon decompression.
-// It returns the corrupted, compressed GZIP data.
+// Compress takes input data, compresses it using gzip, and then, if specified,
+// intentionally corrupts parts of the footer (CRC32 and/or ISIZE) to simulate
+// checksum/length errors upon decompression.
+// It returns the compressed GZIP data.
 // Check the RFC1 952 for details https://www.rfc-editor.org/rfc/rfc1952.html.
-func CraftCorruptedGzip(t *testing.T, data []byte, corruption Corruption) []byte {
+func Compress(t *testing.T, data []byte, corruption Corruption) []byte {
 	var gzBuff bytes.Buffer
 	gw := gzip.NewWriter(&gzBuff)
 
 	wrote, err := gw.Write(data)
 	require.NoError(t, err, "failed to write data to gzip writer")
+
 	// sanity check
 	require.Equal(t, len(data), wrote, "written data is not equal to input data")
 	require.NoError(t, gw.Close(), "failed to close gzip writer")
