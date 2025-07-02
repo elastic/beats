@@ -20,8 +20,9 @@ package mbprovider
 import (
 	"context"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/providers"
 	"go.opentelemetry.io/collector/confmap"
+
+	"github.com/elastic/beats/v7/libbeat/otelbeat/providers"
 )
 
 const schemeName = "mb"

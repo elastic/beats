@@ -22,8 +22,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"go.opentelemetry.io/collector/confmap"
+
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 )
 
 var schemeMap = map[string]string{
