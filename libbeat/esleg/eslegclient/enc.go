@@ -19,6 +19,7 @@ package eslegclient
 
 import (
 	"bytes"
+	"strconv"
 
 	"io"
 	"net/http"
@@ -31,6 +32,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-structform/gotype"
 	"github.com/elastic/go-structform/json"
+)
+
+var (
+	headerContentType        = "Content-Type"
+	HeaderUncompressedLength = "Uncompressed-Request-Length"
+	HeaderEventCount         = "Event-Count"
 )
 
 type BodyEncoder interface {
@@ -56,6 +63,7 @@ type jsonEncoder struct {
 	folder *gotype.Iterator
 
 	escapeHTML bool
+	eventCount int
 }
 
 type gzipEncoder struct {
@@ -63,7 +71,9 @@ type gzipEncoder struct {
 	gzip   *gzip.Writer
 	folder *gotype.Iterator
 
-	escapeHTML bool
+	escapeHTML         bool
+	eventCount         int
+	uncompressedLength int
 }
 
 type event struct {
@@ -99,7 +109,10 @@ func (b *jsonEncoder) resetState() {
 }
 
 func (b *jsonEncoder) AddHeader(header *http.Header) {
-	header.Add("Content-Type", "application/json; charset=UTF-8")
+	header.Add(headerContentType, "application/json; charset=UTF-8")
+	l := strconv.Itoa(b.buf.Len())
+	header.Add(HeaderUncompressedLength, l)
+	header.Add(HeaderEventCount, strconv.Itoa(b.eventCount))
 }
 
 func (b *jsonEncoder) Reader() io.Reader {
@@ -126,6 +139,7 @@ func (b *jsonEncoder) AddRaw(obj interface{}) error {
 	case *beat.Event:
 		err = b.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
 	case RawEncoding:
+		b.eventCount++
 		_, err = b.buf.Write(v.Encoding)
 	default:
 		err = b.folder.Fold(obj)
@@ -136,7 +150,6 @@ func (b *jsonEncoder) AddRaw(obj interface{}) error {
 	}
 
 	b.buf.WriteByte('\n')
-
 	return err
 }
 
@@ -194,6 +207,9 @@ func (g *gzipEncoder) Reader() io.Reader {
 func (g *gzipEncoder) AddHeader(header *http.Header) {
 	header.Add("Content-Type", "application/json; charset=UTF-8")
 	header.Add("Content-Encoding", "gzip")
+	header.Add(HeaderUncompressedLength, strconv.Itoa(g.uncompressedLength))
+	header.Add(HeaderEventCount, strconv.Itoa(g.eventCount))
+
 }
 
 func (g *gzipEncoder) Marshal(obj interface{}) error {
@@ -212,6 +228,8 @@ func (g *gzipEncoder) AddRaw(obj interface{}) error {
 		err = g.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
 	case RawEncoding:
 		_, err = g.gzip.Write(v.Encoding)
+		g.uncompressedLength += len(v.Encoding)
+		g.eventCount++
 	default:
 		err = g.folder.Fold(obj)
 	}

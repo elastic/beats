@@ -28,7 +28,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -102,7 +104,23 @@ func TestPublish(t *testing.T) {
 		require.NoError(t, err)
 		return client, reg
 	}
-
+	makePublishGzipTestClient := func(t *testing.T, url string, compressionLevel int) (*Client, *monitoring.Registry) {
+		reg := monitoring.NewRegistry()
+		client, err := NewClient(
+			clientSettings{
+				observer: outputs.NewStats(reg),
+				connection: eslegclient.ConnectionSettings{
+					URL:              url,
+					CompressionLevel: compressionLevel,
+				},
+				indexSelector: testIndexSelector{},
+			},
+			nil,
+			logger,
+		)
+		require.NoError(t, err)
+		return client, reg
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -279,6 +297,80 @@ func TestPublish(t *testing.T) {
 		assertRegistryUint(t, reg, "events.dropped", 1, "One event should be dropped")
 		assertRegistryUint(t, reg, "events.failed", 3, "Split batches should retry 3 events before dropping them")
 		assertRegistryUint(t, reg, "events.active", 0, "Active events should be zero when Publish returns")
+	})
+
+	t.Run("sends telemetry headers", func(t *testing.T) {
+		var requestCount, uncompressedLength, eventCount atomic.Int64
+
+		esMock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			requestCount.Add(1)
+
+			ul := r.Header.Get(eslegclient.HeaderUncompressedLength)
+			if ul != "" {
+				l, _ := strconv.ParseInt(ul, 10, 64)
+				uncompressedLength.Store(l)
+			}
+			ec := r.Header.Get(eslegclient.HeaderEventCount)
+			if ec != "" {
+				c, _ := strconv.ParseInt(ec, 10, 64)
+				eventCount.Store(c)
+			}
+
+			w.WriteHeader(http.StatusOK)
+		}))
+		defer esMock.Close()
+		client, _ := makePublishTestClient(t, esMock.URL)
+		gzipClient, _ := makePublishGzipTestClient(t, esMock.URL, 5)
+
+		cases := []struct {
+			name                  string
+			client                *Client
+			batch                 *batchMock
+			expRequestCount       int64
+			expContentLength      int64
+			expUncompressedLength int64
+			expEventCount         int64
+		}{
+			{
+				name:   "uncompressed",
+				client: client,
+				batch: &batchMock{
+					events: []publisher.Event{event1, event2, event3},
+				},
+				expRequestCount:       1,
+				expContentLength:      285,
+				expUncompressedLength: 285,
+				expEventCount:         3,
+			},
+			{
+				name:   "compressed",
+				client: gzipClient,
+				batch: &batchMock{
+					events: []publisher.Event{event1, event2, event3, event1, event2, event3},
+				},
+				expRequestCount:       1,
+				expContentLength:      285,
+				expUncompressedLength: 312,
+				expEventCount:         6,
+			},
+		}
+
+		for _, tc := range cases {
+			t.Run(tc.name, func(t *testing.T) {
+				requestCount.Store(0)
+				// set to -1 to assert the assignment later
+				uncompressedLength.Store(-1)
+				eventCount.Store(-1)
+
+				batch := encodeBatch(tc.client, tc.batch)
+				err := tc.client.Publish(ctx, batch)
+
+				assert.NoError(t, err, "Publish should drop the batch without error")
+				assert.Equal(t, tc.expRequestCount, requestCount.Load(), "Should have at least %d processed request", tc.expRequestCount)
+				assert.Equal(t, tc.expUncompressedLength, uncompressedLength.Load(), "Should have the correct %s header", eslegclient.HeaderUncompressedLength)
+				assert.Equal(t, tc.expEventCount, eventCount.Load(), "Should have the correct %s header", eslegclient.HeaderEventCount)
+			})
+		}
 	})
 }
 
