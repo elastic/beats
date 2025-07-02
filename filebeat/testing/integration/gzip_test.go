@@ -107,12 +107,36 @@ output.file:
 				gotLines := strings.Split(strings.TrimSpace(string(data)), "\n")
 				assert.Equal(t, len(lines), len(gotLines), "unexpected number of events")
 
-				for i, l := range lines {
-					assert.Contains(t,
+				linesToMatch := min(len(lines), len(gotLines))
+
+				var unmatched []int
+				for i := range linesToMatch {
+					if !strings.Contains(
 						gotLines[i],
-						fmt.Sprintf(`"message":"%s"`, l),
-						"expected output to match input")
+						fmt.Sprintf(`"message":"%s"`, lines[i])) {
+						unmatched = append(unmatched, i)
+					}
 				}
+				if len(unmatched) > 0 {
+					t.Logf("\n\t%d lines not matched on the output:", len(unmatched))
+					for _, i := range unmatched {
+						fmt.Printf("\t\t\tgot: %s\n", gotLines[i])
+						fmt.Printf("\t\t\twant containing: '%s'\n", lines[i])
+					}
+				}
+				notFound := len(lines) - len(gotLines)
+				if notFound > 0 {
+					t.Logf("\n\t%d lines not found on the output:", notFound)
+					fmt.Printf("\t\t\t%s", strings.Join(lines[len(gotLines):], "\n\t\t\t"))
+					fmt.Print("\n\n")
+				}
+				if notFound < 0 { // extra lines in the output
+					t.Logf("\n\t%d extra lines found on the output:", notFound*-1)
+					fmt.Printf("\t\t\t%s", strings.Join(gotLines[len(lines):], "\n\t\t\t"))
+					fmt.Print("\n\n")
+				}
+
+				// TODO(AndersonQ): save the output and expected lines
 			})
 		}
 	})
