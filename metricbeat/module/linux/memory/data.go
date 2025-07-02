@@ -24,10 +24,7 @@ import (
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/transform/typeconv"
 	util "github.com/elastic/elastic-agent-system-metrics/metric"
-	"github.com/elastic/elastic-agent-system-metrics/metric/memory"
-	metrics "github.com/elastic/elastic-agent-system-metrics/metric/memory"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
@@ -67,14 +64,21 @@ func FetchLinuxMemStats(baseMap mapstr.M, hostfs resolve.Resolver) error {
 
 	// This is largely for convenience, and allows the swap.* metrics to more closely emulate how they're reported on system/memory
 	// This way very similar metrics aren't split across different modules, even though Linux reports them in different places.
-	eventRaw, err := metrics.Get(hostfs)
+	table, err := parseMeminfo(hostfs)
 	if err != nil {
 		return fmt.Errorf("error fetching memory metrics: %w", err)
 	}
 	swap := mapstr.M{}
-	err = typeconv.Convert(&swap, &eventRaw.Swap)
-	if err != nil {
-		return fmt.Errorf("error converting raw event: %w", err)
+	swapTotal, okST := table["SwapTotal"]
+	if okST {
+		swap["total"] = swapTotal
+	}
+	swapFree, okSF := table["SwapFree"]
+	if okSF {
+		swap["free"] = swapFree
+	}
+	if okSF && okST {
+		swap["used.bytes"] = swapTotal - swapFree
 	}
 
 	baseMap["swap"] = swap
@@ -118,7 +122,7 @@ func computeEfficiency(scanName string, stealName string, fieldName string, raw 
 
 func getHugePages(hostfs resolve.Resolver) (mapstr.M, error) {
 	// see https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt
-	table, err := memory.ParseMeminfo(hostfs)
+	table, err := parseMeminfo(hostfs)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing meminfo: %w", err)
 	}
@@ -159,6 +163,34 @@ func getHugePages(hostfs resolve.Resolver) (mapstr.M, error) {
 	}
 
 	return thp, nil
+}
+
+func parseMeminfo(rootfs resolve.Resolver) (map[string]uint64, error) {
+	meminfoFile := rootfs.ResolveHostFS("/proc/meminfo")
+	content, err := os.ReadFile(meminfoFile)
+	if err != nil {
+		return nil, fmt.Errorf("error reading meminfo from %s: %w", meminfoFile, err)
+	}
+
+	table := map[string]uint64{}
+	for line := range strings.SplitSeq(string(content), "\n") {
+		fields := strings.Split(line, ":")
+		if len(fields) != 2 {
+			continue
+		}
+
+		valueUnit := strings.Fields(fields[1])
+		value, err := strconv.ParseUint(valueUnit[0], 10, 64)
+		if err != nil {
+			continue
+		}
+
+		if len(valueUnit) > 1 && valueUnit[1] == "kB" {
+			value *= 1024
+		}
+		table[fields[0]] = value
+	}
+	return table, err
 }
 
 // GetVMStat gets linux vmstat metrics
