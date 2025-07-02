@@ -393,7 +393,7 @@ func (r *msgRef) fail(msg *message, err error) {
 		r.client.observer.PermanentErrors(1)
 
 	case strings.Contains(err.Error(), "kafka: invalid configuration"):
-		r.client.log.Errorf("Kafka (topic=%v): dropping message due to invalid configuration %v", msg.topic)
+		r.client.log.Errorf("Kafka (topic=%v): dropping message due to invalid configuration: %v", msg.topic, err)
 		r.client.observer.PermanentErrors(1)
 
 	case isAuthError(err):
