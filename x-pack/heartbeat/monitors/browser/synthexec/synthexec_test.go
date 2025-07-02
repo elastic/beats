@@ -8,10 +8,12 @@ package synthexec
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"testing"
 	"time"
@@ -96,6 +98,29 @@ func TestJsonToSynthEvent(t *testing.T) {
 			}
 		})
 	}
+}
+
+var emptyStringRegexp = regexp.MustCompile(`^\s*$`)
+
+// jsonToSynthEvent can take a line from the scanner and transform it into a *SynthEvent. Will return
+// nil res on empty lines.
+func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
+	// Skip empty lines
+	if emptyStringRegexp.Match(bytes) {
+		return nil, nil
+	}
+
+	res = &SynthEvent{}
+	err = json.Unmarshal(bytes, res)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if res.Type == "" {
+		return nil, fmt.Errorf("unmarshal succeeded, but no type found for: %s", text)
+	}
+	return res, err
 }
 
 func goCmd(args ...string) *exec.Cmd {
