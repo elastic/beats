@@ -1,62 +1,61 @@
 # Removing files after ingestion
 
 ::::{warning}
-Enabling this feature will remove files, which could lead to unintentional data loss if not configured correctly.
+This feature might lead to unintentional data loss if not configured correctly.
 ::::
 
 The Filestream input can remove files after they have been fully
 ingested. Three requirements need to be met before the Filestream
 input can remove a file:
-1. Filestream has closed the file due to inactivity or because EOF has
+1. Filestream has closed the file due to inactivity or because end-of-file (EOF) has
    been reached. This is controlled by:
      - `close.on_state_change.inactive`
      - `close.reader.on_eof`
 2. Events from the file have been received by the configured output
-   without error. (example the Elasticsearch output has indexed all
-   events or logstash has written event to persistent queue).
+   without error. For example, the Elasticsearch output has indexed all
+   events or logstash has written event to persistent queue.
 3. The `delete.grace_period` has expired and the file has not changed
    during the grace period.
 
 ## How it works
-Once a reader for a file is closed, either by reaching EOF (end of
-file) or due to inactivity, Filestream will check if all events have
-been published. If this is true, then it will wait for the configured
-grace period, check if no new data has been added to the file, by
-comparing its current size with the size when the last event was read,
-then it will try to remove the file. During the grace period Filebeat
-monitors the file. If the file size changes, the grace period is
-interrupted and the file will resume ingesting after the next file
-system scan.
+After a reader for a file is closed, either by reaching EOF or due
+to inactivity, Filestream checks if all events have been published.
+If this is true, then Filestream waits for the configured grace period,
+checks if no new data has been added to the file by
+comparing its current size to the size when the last event was read,
+then tries to remove the file. 
+
+During the grace period, Filebeat monitors the file. If the file size
+changes, the grace period is interrupted and the file resumes 
+ingesting after the next file system scan.
 
 A published event is an event that has been acknowledged by the
-output, an output always acknowledges a successfully written event,
-however it will also acknowledge dropped events. Each output has
-different conditions for dropping an event, refer the output's
+output. An output always acknowledges a successfully written event,
+however it also acknowledges dropped events. Each output has
+different conditions for dropping an event. Refer the output's
 documentation for more details.
 
-If any of the checks fail, the harvester is closed. Once the next
-file system scan happens, a new harvester will be
-started, once the close condition (EOF or inactivity) is met, then the
-remove process will start again.
+If any of the checks fail, the harvester is closed. After the next
+file system scan happens, a new harvester starts. If the close 
+condition (EOF or inactivity) is met, the remove process restarts.
 
-Once all checks are successful the file is removed.
+After all checks are successful the file is removed.
 
-## EOF x Inactivity
+## EOF and inactivity
+
 Filestream's reader can be configured to close on two conditions: EOF
-and inactivity, each one has a different purpose:
- - EOF: it is recommended for files that do not have data appended to
-   them, like a cronjob that when it is done copies the file to a
-   folder where Filestream can read it;
- - Inactivity: it is recommended for files that have data appended to
-   them, like a long running process that does not performs its own log
-   rotation.
- 
+and inactivity. Each one has a different purpose:
+
+ - EOF:  Recommended for files that don't have data appended to
+   them, like a cronjob that copies the file to a folder.
+ - Inactivity: Recommended for files that have data appended to
+   them, like a long running process that does not rotate logs.
+
 ::::{note}
-When using close on EOF for files from short lived process that write
+When using close on EOF for files from short lived processes that write
 their logs within a few seconds, make sure to set an appropriate grace
-period (default: 30 minutes) because even immutable copied files may
-still "change" while being copied, especially across volumes or
-network shares.
+period. Even immutable copied files might still change while being copied,
+especially across volumes or network shares.
 ::::
 
 ## Examples
@@ -107,29 +106,27 @@ a constant backoff of 2 seconds. If all attempts fail, the harvester
 is closed and a new harvester will be started in the next scan.
 
 ### Removing log files from long running tasks
-Filebeat will be used to collect logs from long-running tasks that
+
+In this example, Filebeat collects logs from long-running tasks that
 continuously add information to their log files. While these tasks are
 active, new log entries appear in their respective files located at
 `/var/log/long-tasks/*.log` every few seconds. Filebeat monitors these
-files, and once a log file hasn't been updated for several minutes, it
+files, and when a log file hasn't been updated for several minutes, it
 indicates that the corresponding task has likely finished, making it
-safe to remove the log file. Once Filebeat closes the file, it will
-wait for the grace period (30min by default), if the file has not
-changed during the grace period, then the file is removed.
+safe to remove the log file. After Filebeat closes the file, it will
+wait for the grace period (30 minutes by default): if the file has not
+changed during the grace period, the file is removed.
 
-For this case Filestream can be configured to remove files after a
-period of inactivity, the simplest configuration is:
+This is the input configuration:
 
 ```yaml
   - type: filestream
     id: long-tasks-logs
     paths:
       - /var/log/long-tasks/*.log
-    close.on_state_change.inactive: 5m # That's the default, it can be omitted
+    close.on_state_change.inactive: 5m # That's the default, it can be omitted.
     delete:
       enabled: true
-```
-
 ### Waiting before removing log files
 
 You can also configure a grace period to wait after the
