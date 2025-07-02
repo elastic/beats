@@ -131,16 +131,18 @@ period of inactivity, the simplest configuration is:
 ```
 
 ### Waiting before removing log files
-It is also possible to configure a grace period to wait after the
+
+You can also configure a grace period to wait after the
 file has been closed and all events have been published before
-removing the file. Note that this is different than the 'close on
-inactive' because the inactivity timeout for the reader does not
-consider if an event has been published, this means that a file can be
+removing the file. This is different than the 'close on
+inactive' because the inactivity timeout for the reader doesn't
+consider if an event has been published. This means that a file can be
 closed due to inactivity (no more data read from it) even if some of
-its events are still in Filebeat's publishing queue. In this example
-we want to remove files 5 minutes after all events have been published
-and we know the files never have data appended to them. For that we
-can use the EOF condition and configure a grace period.
+its events are still in Filebeat's publishing queue.
+
+In this example, files are removed 5 minutes after all events have been
+published. We know the files never have data appended to them. so the
+example uses the EOF condition and configures a grace period.
 
 ```yaml
   - type: filestream
@@ -153,7 +155,7 @@ can use the EOF condition and configure a grace period.
       grace_period: 5m
 ```
 
-The grace period will be counted after the harvester ensured all
+The grace period is counted after the harvester ensured all
 events from the file have been published.
 
 ::::{tip}

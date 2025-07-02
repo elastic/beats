@@ -594,53 +594,57 @@ file_identity.inode_marker.path: /logs/.filebeat-marker
 ```
 
 ## Removing fully ingested files [filebeat-input-filestream-delete-options]
-Filebeat can delete files after the reader is closed.
-Regardless of the reader close configuration, a file can only be
+
+Filebeat can delete files after the reader is closed. A file can only be
 deleted if EOF has been reached and all events from the file have
 been published.
 
 If there are events pending publishing or there is an issue while
-deleting the file, the harvester is closed and it will be re-opened at
-the next scan, then the remove operation is retried. The scan for
-changes in files can be configured by setting
-[`prospector.scanner.check_interval`](#filebeat-input-filestream-scan-frequency).
+deleting the file, the harvester reopens at the next scan and the
+remove operation is retried. You can configure the scan for changes
+in files by setting the
+[`prospector.scanner.check_interval`](#filebeat-input-filestream-scan-frequency)
+property.
 
 A published event is an event that has been acknowledged by the
-output, an output always acknowledges a successfully written event,
-however it will also acknowledge dropped events. Each output has
-different conditions for dropping an event, refer the output's
+output. An output always acknowledges a successfully written event.
+However, it also acknowledges dropped events. Each output has
+different conditions for dropping an event. Refer the output's
 documentation for more details.
 
-If Filebeat fails to remove the file, it will retry up to 5 times with
+If Filebeat fails to remove the file, it retries up to 5 times with
 a constant backoff of 2 seconds. If all attempts fail, the harvester
-is closed and a new harvester will be started in the next scan.
+is closed and a new harvester starts in the next scan.
 
-If you enabled removing files, it is recommended to keep
-`clean_removed` enabled.
-
-Removing files is disabled by default.
+If you turned on removing files, keep `clean_removed` enabled.
+Removing files is turned off by default.
 
 ### `delete.enabled` [filebeat-input-filestream-delete-enabled]
-When set to `true`, files will be removed the reader is
-closed (the default is 5 minutes of inactivity) and EOF has been
-reached. Files are only removed if all events have been ingested by
-the output.
+
+When set to `true`, files are removed when the following conditions
+are met:
+ - The reader is closed. The default is 5 minutes of inactivity.
+ - EOF has been reached.
+ - All events have been acknowledged by the output.
 
 ### `delete.grace_period` [filebeat-input-filestream-delete-grace-period]
+
 An interval to wait after the reader is closed and all events have
-been published before trying to remove the file. The harvester for the
-file will stay open while waiting for the grace period. If the file
-size changes while waiting the grace period, the harvester is closed
-and the process restarts from the beginning. Once the grace
-period expires, Filestream checks if the file is at EOF, if is not,
+been published before trying to remove the file.
+
+
+The harvester for the file stays open while waiting for the grace period.
+If the file size changes while waiting the grace period, the harvester is closed
+and the process restarts from the beginning. After the grace
+period expires, Filestream checks if the file is at EOF. If it's not,
 then the harvester is closed, otherwise the file is removed. During
 the grace period Filebeat periodically checks the file for changes
-using the same interval as the prospector (configured by
-[`prospector.scanner.check_interval`](#filebeat-input-filestream-scan-frequency)). The
-default is 30 minutes.
+using the same interval as the prospector, configured by
+[`prospector.scanner.check_interval`](#filebeat-input-filestream-scan-frequency).
+The default value is 30 minutes.
 
-For examples on how to use this feature read our [Removing files after
-ingestion](/reference/filebeat/delete-file-guide.md) guide.
+For examples on how to use this feature, refer to [Removing files after
+ingestion](/reference/filebeat/delete-file-guide.md).
 
 ## Log rotation [filestream-log-rotation-support]
 
