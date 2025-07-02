@@ -32,10 +32,11 @@ import (
 func InitMatchers(exprs ...string) ([]match.Matcher, error) {
 	result := []match.Matcher{}
 
+	logger, _ := logp.NewDevelopmentLogger("")
 	for _, exp := range exprs {
 		rexp, err := match.Compile(exp)
 		if err != nil {
-			logp.Err("Fail to compile the regexp %s: %s", exp, err)
+			logger.Errorf("Fail to compile the regexp %s: %s", exp, err)
 			return nil, err
 		}
 		result = append(result, rexp)

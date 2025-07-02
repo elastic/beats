@@ -132,10 +132,11 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 		defer wg.Done()
 		defer func() { _ = grp.Stop() }()
 
+		logger, _ := logp.NewDevelopmentLogger("")
 		reg := inputmon.NewMetricsRegistry(
-			id, inp.Name(), e.monitoring.InputsRegistry(), logp.L())
+			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
 		defer inputmon.CancelMetricsRegistry(
-			id, inp.Name(), e.monitoring.InputsRegistry(), logp.L())
+			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
 
 		inputCtx := v2.Context{
 			ID:              id,

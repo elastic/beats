@@ -136,6 +136,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix `dns` processor to handle IPv6 server addresses properly. {pull}44526[44526]
 - Fix an issue where the Kafka output could get stuck if a proxied connection to the Kafka cluster was reset. {issue}44606[44606]
 - Use Debian 11 to build linux/arm to match linux/amd64. Upgrades linux/arm64's statically linked glibc from 2.28 to 2.31. {issue}44816[44816]
+- The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
 
 *Auditbeat*
 
@@ -414,9 +415,12 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add Fleet status update functionality to tcp input. {issue}44420[44420] {pull}44786[44786]
 - Add Fleet status update functionality to udp input. {issue}44419[44419] {pull}44785[44785]
 - Filestream now logs at level warn the number of files that are too small to be ingested {pull}44751[44751]
+- Add Fleet status updating to Azure Blob Storage input. {issue}44268[44268] {pull}44945[44945]
 - Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
 - Add proxy support to GCP Pub/Sub input. {pull}44892[44892]
 - Add support for relationship expansion to EntraID entity analytics provider. {issue}43324[43324] {pull}44761[44761]
+- Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
+- Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
 
 *Auditbeat*
 
@@ -430,6 +434,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added status to monitor run log report.
 - Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
 - Upgrade node to latest LTS v18.20.7. {pull}43511[43511]
+- Upgrade node to latest LTS v20.19.3. {pull}45087[45087]
 
 *Metricbeat*
 
