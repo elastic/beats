@@ -23,10 +23,12 @@ This module supports TLS connections when using `ssl` config field, as described
 {{- if $added}}
 {{end}}
 
-### Metricsets [_metricsets]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 {{range $metricset := .Metricsets -}}
 * [{{$metricset.Title}}](/reference/metricbeat/metricbeat-metricset-{{$.Base}}-{{$metricset.Title}}.md)
 {{end -}}
+
+

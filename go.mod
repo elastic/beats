@@ -124,15 +124,15 @@ require (
 	go.etcd.io/bbolt v1.4.0
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.38.0
-	golang.org/x/mod v0.24.0
+	golang.org/x/crypto v0.39.0
+	golang.org/x/mod v0.25.0
 	golang.org/x/net v0.40.0
 	golang.org/x/oauth2 v0.27.0
-	golang.org/x/sync v0.14.0
+	golang.org/x/sync v0.15.0
 	golang.org/x/sys v0.33.0
-	golang.org/x/text v0.25.0
+	golang.org/x/text v0.26.0
 	golang.org/x/time v0.8.0
-	golang.org/x/tools v0.30.0
+	golang.org/x/tools v0.33.0
 	google.golang.org/api v0.214.0
 	google.golang.org/genproto v0.0.0-20241118233622-e639e219e697 // indirect
 	google.golang.org/grpc v1.72.1
@@ -177,6 +177,7 @@ require (
 	github.com/elastic/elastic-agent-libs v0.20.0
 	github.com/elastic/elastic-agent-system-metrics v0.11.11
 	github.com/elastic/go-elasticsearch/v8 v8.18.0
+	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.3.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.19.0
@@ -200,7 +201,7 @@ require (
 	github.com/jcmturner/gokrb5/v8 v8.4.4
 	github.com/klauspost/compress v1.18.0
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
-	github.com/microsoft/go-mssqldb v1.7.2
+	github.com/microsoft/go-mssqldb v1.8.2
 	github.com/microsoft/wmi v0.25.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.127.0
 	github.com/otiai10/copy v1.12.0
@@ -218,8 +219,10 @@ require (
 	go.elastic.co/apm/v2 v2.7.0
 	go.mongodb.org/mongo-driver v1.17.4
 	go.opentelemetry.io/collector/component v1.33.0
+	go.opentelemetry.io/collector/component/componentstatus v0.127.0
 	go.opentelemetry.io/collector/config/configtls v1.33.0
 	go.opentelemetry.io/collector/confmap v1.33.0
+	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.33.0
 	go.opentelemetry.io/collector/consumer v1.33.0
 	go.opentelemetry.io/collector/consumer/consumererror v0.127.0
 	go.opentelemetry.io/collector/exporter/debugexporter v0.127.0
@@ -297,7 +300,6 @@ require (
 	github.com/ebitengine/purego v0.9.0-alpha.3.0.20250507171635-5047c08daa38 // indirect
 	github.com/elastic/elastic-transport-go/v8 v8.7.0 // indirect
 	github.com/elastic/go-docappender/v2 v2.9.0 // indirect
-	github.com/elastic/go-freelru v0.16.0 // indirect
 	github.com/elastic/go-windows v1.0.2 // indirect
 	github.com/elastic/pkcs8 v1.0.0 // indirect
 	github.com/elazarl/goproxy v0.0.0-20240909085733-6741dbfc16a1 // indirect
@@ -317,7 +319,7 @@ require (
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.20.4 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
-	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
+	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/godror/knownpb v0.1.0 // indirect
@@ -412,7 +414,6 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/collector/client v1.33.0 // indirect
-	go.opentelemetry.io/collector/component/componentstatus v0.127.0 // indirect
 	go.opentelemetry.io/collector/component/componenttest v0.127.0 // indirect
 	go.opentelemetry.io/collector/config/configauth v0.127.0 // indirect
 	go.opentelemetry.io/collector/config/configcompression v1.33.0 // indirect
