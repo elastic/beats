@@ -884,53 +884,6 @@ The username and password to connect to the database can be provided as values t
 ```
 ----
 
-### SSL Setup
-
-The SSL configuration is driver-specific. Different drivers interpret parameters not in the same way. Subset of the [params](https://www.elastic.co/docs/reference/beats/metricbeat/configuration-ssl#ssl-client-config) is supported.
-
-Currently, there are two ways to make SSL connections to the databases:
-
-- Set `ssl.*` configuration parameters.
-- Don't set any `ssl.*` configuration parameters and supply all SSL parameters in the connection string in `hosts`. Example: `postgres://postgres:mysecretpassword@localhost:5432?sslmode=verify-full&sslcert=%2Fpath%2Fto%2Fcert.pem&sslkey=%2Fpath%2Fto%2Fkey.pem&sslrootcert=%2Fpath%2Fto%2Fca.pem`
-
-#### Limitations
-
-The module supports SSL with `mysql`, `mssql`, and `postgres` drivers. 
-
-When any `ssl.*` parameters are set, only URL-formatted connection strings are accepted, like `"postgres://myuser:mypassword@localhost:5432/mydb"`, not like `"user=myuser password=mypassword dbname=mydb"`.
-
-##### `mysql` driver
-
-Params supported: `ssl.verification_mode`, `ssl.certificate`, `ssl.key`, `ssl.certificate_authorities`.
-
-The certificates can be passed both as file paths and as certificate content ([embedding certificate example](https://www.elastic.co/docs/reference/beats/metricbeat/configuration-ssl#client-certificate-authorities)).
-
-##### `postgres` driver
-
-Params supported: `ssl.verification_mode`, `ssl.certificate`, `ssl.key`, `ssl.certificate_authorities`.
-
-Only one certificate can be passed to `ssl.certificate_authorities` parameter.
-The certificates can be passed only as file paths. The files have to be present in the environment where the metricbeat is running.
-
-The `ssl.verification_mode` is translated as following:
-
-- `full` -> `verify-full`
-
-- `strict` -> `verify-full`
-
-- `certificate` -> `verify-ca`
-
-- `none` -> `require`
-
-##### `mssql` driver
-
-Params supported: `ssl.verification_mode`, `ssl.certificate_authorities`.
-
-Only one certificate can be passed to `ssl.certificate_authorities` parameter.
-The certificates can be passed only as file paths. The files have to be present in the environment where the metricbeat is running.
-
-If `ssl.verification_mode` is set to `None`, `TrustServerCertificate` will be set to `true`, otherwise it is `false`
-
 
 ## Example configuration [_example_configuration]
 
@@ -942,28 +895,11 @@ metricbeat.modules:
   metricsets:
     - query
   period: 10s
-  hosts: ["postgres://postgres:mysecretpassword@localhost:5432"]
-  # Example of using SSL parameters manually in the Postgres connection string (with ssl.* parameters unset). The Postgres SSL parameters "sslmode", "sslcert", "sslkey", and "sslrootcert" are passed in the connection string with slashes "/" being url-encoded to "%2F"
-  # hosts: ["postgres://postgres:mysecretpassword@localhost:5432?sslmode=verify-full&sslcert=%2Fpath%2Fto%2Fcert.pem&sslkey=%2Fpath%2Fto%2Fkey.pem&sslrootcert=%2Fpath%2Fto%2Fca.pem"]
-  # Example for SQL server
-  # hosts: ["sqlserver://myuser:mypassword@localhost:1433?TrustServerCertificate=false&certificate=%2Fpath%2Fto%2Fca.pem&database=mydb&encrypt=true"]
-
+  hosts: ["user=myuser password=mypassword dbname=mydb sslmode=disable"]
 
   driver: "postgres"
   sql_query: "select now()"
   sql_response_format: table
-
-  # List of root certificates for SSL/TLS server verification
-  # ssl.certificate_authorities: ["/path/to/ca.pem"]
-
-  # Certificate for SSL/TLS client authentication
-  # ssl.certificate: "/path/to/client-cert.pem"
-
-  # Client certificate key file
-  # ssl.key: "/path/to/client-key.pem"
-
-  # Controls the verification of server certificate
-  # ssl.verification_mode: full
 ```
 
 

@@ -35,9 +35,3 @@ metricbeat.modules:
 The following metricsets are available:
 
 * [device_health](/reference/metricbeat/metricbeat-metricset-meraki-device_health.md)
-<<<<<<< HEAD
-
-
-=======
-* [network_health](/reference/metricbeat/metricbeat-metricset-meraki-network_health.md)
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))

@@ -12,7 +12,7 @@ Refer to the [Elastic Integrations documentation](integration-docs://reference/n
 
 The Nats module uses [Nats monitoring server APIs](https://docs.nats.io/running-a-nats-service/nats_admin/monitoring) to collect metrics.
 
-The default metricsets are `stats`, `connections`, `routes` and `subscriptions`. The `connection`, `route`, and `jetstream` metricsets can be enabled to collect additional metrics.
+The default metricsets are `stats`, `connections`, `routes` and `subscriptions` while `connection` and `route` metricsets can be enabled to collect detailed metrics per connection/route.
 
 ## Compatibility [_compatibility_39]
 

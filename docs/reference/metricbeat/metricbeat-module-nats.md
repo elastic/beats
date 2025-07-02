@@ -19,14 +19,13 @@ Refer to the [Elastic Integrations documentation](integration-docs://reference/n
 :::::
 
 
-The Nats module uses [Nats monitoring server APIs](https://nats.io/documentation/managing_the_server/monitoring/) to collect metrics.
+The Nats module uses [Nats monitoring server APIs](https://docs.nats.io/running-a-nats-service/nats_admin/monitoring) to collect metrics.
 
 The default metricsets are `stats`, `connections`, `routes` and `subscriptions` while `connection` and `route` metricsets can be enabled to collect detailed metrics per connection/route.
 
-
 ## Compatibility [_compatibility_39]
 
-The Nats module is tested with Nats 1.3.0, 2.0.4 and 2.1.4
+The NATS module is tested with NATS 2.2.6 and 2.11.x. Versions in between are expected to be compatible as well.
 
 
 ## Dashboard [_dashboard_34]

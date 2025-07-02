@@ -39,17 +39,12 @@ Use `sql_queries` or `sql_query` depending on the use-case.
         `variables`
         :   Expects a two-column table that looks like a key-value result. The left column is considered a key and the right column is the value. This mode generates a single event on each fetch operation.
 
-<<<<<<< HEAD:x-pack/metricbeat/module/sql/_meta/docs.asciidoc
-[float]
-== Example
-=======
         `table`
         :   Expects any number of columns. This mode generates a single event for each row.
   
 `ssl` configuration
 :   Use `ssl.certificate_authorities`, `ssl.certificate`, `ssl.key`, and `ssl.verification_mode` params. See SSL configuration section. Supported drivers are `mysql`, `postgres`, and `mssql`.
 
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947)):x-pack/metricbeat/module/sql/_meta/docs.md
 
 `sql_query` (`Backward Compatibility`)
 :   Single query you want to run. Also, provide corresponding `sql_response_format` (value: `variables` or `table`) similar to `sql_queries`'s `response_format`.
@@ -879,53 +874,3 @@ The username and password to connect to the database can be provided as values t
     response_format: variables 
 ```
 ----
-<<<<<<< HEAD:x-pack/metricbeat/module/sql/_meta/docs.asciidoc
-=======
-
-### SSL Setup
-
-The SSL configuration is driver-specific. Different drivers interpret parameters not in the same way. Subset of the [params](https://www.elastic.co/docs/reference/beats/metricbeat/configuration-ssl#ssl-client-config) is supported.
-
-Currently, there are two ways to make SSL connections to the databases:
-
-- Set `ssl.*` configuration parameters.
-- Don't set any `ssl.*` configuration parameters and supply all SSL parameters in the connection string in `hosts`. Example: `postgres://postgres:mysecretpassword@localhost:5432?sslmode=verify-full&sslcert=%2Fpath%2Fto%2Fcert.pem&sslkey=%2Fpath%2Fto%2Fkey.pem&sslrootcert=%2Fpath%2Fto%2Fca.pem`
-
-#### Limitations
-
-The module supports SSL with `mysql`, `mssql`, and `postgres` drivers. 
-
-When any `ssl.*` parameters are set, only URL-formatted connection strings are accepted, like `"postgres://myuser:mypassword@localhost:5432/mydb"`, not like `"user=myuser password=mypassword dbname=mydb"`.
-
-##### `mysql` driver
-
-Params supported: `ssl.verification_mode`, `ssl.certificate`, `ssl.key`, `ssl.certificate_authorities`.
-
-The certificates can be passed both as file paths and as certificate content ([embedding certificate example](https://www.elastic.co/docs/reference/beats/metricbeat/configuration-ssl#client-certificate-authorities)).
-
-##### `postgres` driver
-
-Params supported: `ssl.verification_mode`, `ssl.certificate`, `ssl.key`, `ssl.certificate_authorities`.
-
-Only one certificate can be passed to `ssl.certificate_authorities` parameter.
-The certificates can be passed only as file paths. The files have to be present in the environment where the metricbeat is running.
-
-The `ssl.verification_mode` is translated as following:
-
-- `full` -> `verify-full`
-
-- `strict` -> `verify-full`
-
-- `certificate` -> `verify-ca`
-
-- `none` -> `require`
-
-##### `mssql` driver
-
-Params supported: `ssl.verification_mode`, `ssl.certificate_authorities`.
-
-Only one certificate can be passed to `ssl.certificate_authorities` parameter.
-The certificates can be passed only as file paths. The files have to be present in the environment where the metricbeat is running.
-
-If `ssl.verification_mode` is set to `None`, `TrustServerCertificate` will be set to `true`, otherwise it is `false`
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947)):x-pack/metricbeat/module/sql/_meta/docs.md

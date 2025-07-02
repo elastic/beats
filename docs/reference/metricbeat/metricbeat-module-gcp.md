@@ -38,14 +38,7 @@ This is a list of the possible module parameters you can tune:
 * **exclude_labels**: (`true`/`false` default `false`) Do not extract extra labels and metadata information from metricsets and fetch metrics only. At the moment, **labels and metadata extraction is only supported** in `compute` metricset.
 * **period**: A single time duration specified for this module collection frequency.
 * **endpoint**: A custom endpoint to use for the GCP API calls. If not specified, the default endpoint will be used.
-<<<<<<< HEAD
-=======
-* **collect_dataproc_user_labels**: (`true`/`false` default `false`) Retrieve additional
-user-defined labels from Dataproc clusters.
-* **metadata_cache**: (`true`/`false` default `false`) Enable caching of metadata. If set to true, metadata will be cached to improve performance. Newly created resources may not appear in the cache until the next refresh cycle, which can cause temporary visibility gaps. {applies_to}`product: ga 9.1.0`
-* **metadata_cache_refresh_period**: A duration specifying how often the cached metadata should be refreshed (e.g., `5m`, `1h`). {applies_to}`product: ga 9.1.0`
 
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))
 
 ## Example configuration [_example_configuration_24]
 
@@ -288,14 +281,13 @@ metricbeat.modules:
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
-  metadata_cache: true
-  metadata_cache_refresh_period: 1h
 
 - module: gcp
   metricsets:
     - pubsub
     - loadbalancing
     - firestore
+    - dataproc
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -354,16 +346,6 @@ metricbeat.modules:
   endpoint: http://your-endpoint
   dataset_id: "dataset id"
   table_pattern: "table pattern"
-
-- module: gcp
-  metricsets:
-    - dataproc
-  zone: "us-central1-a"
-  project_id: "your project id"
-  credentials_file_path: "your JSON credentials file path"
-  exclude_labels: false
-  period: 1m
-  collect_dataproc_user_labels: true
 ```
 
 
