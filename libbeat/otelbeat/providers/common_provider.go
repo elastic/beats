@@ -36,7 +36,7 @@ func LoadConfig(uri string, schemeName string) (*confmap.Retrieved, error) {
 		return nil, fmt.Errorf("%q uri is not supported by %q provider", uri, schemeName)
 	}
 
-	// Load filebeat config file
+	// Load beat config file
 	cfg, err := cfgfile.Load(filepath.Clean(uri[len(schemeName)+1:]), nil)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func LoadConfig(uri string, schemeName string) (*confmap.Retrieved, error) {
 	}
 
 	receiverName := schemeMap[schemeName]
-	// filebeat specific configuration is defined here
+	// beat specific configuration is defined here
 	cfgMap := map[string]any{
 		"receivers": map[string]any{
 			receiverName: receiverMap,
