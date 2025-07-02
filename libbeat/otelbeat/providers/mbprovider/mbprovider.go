@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package fbprovider
+package mbprovider
 
 import (
 	"context"
@@ -24,7 +24,7 @@ import (
 	"go.opentelemetry.io/collector/confmap"
 )
 
-const schemeName = "fb"
+const schemeName = "mb"
 
 type provider struct{}
 

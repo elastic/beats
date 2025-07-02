@@ -52,6 +52,13 @@ func Build() error {
 	return devtools.Build(args)
 }
 
+// BuildOTel builds the Beat binary with OTel sub command
+func BuildOTel() error {
+	args := devtools.DefaultBuildArgs()
+	args.ExtraFlags = append(args.ExtraFlags, "-tags", "otelbeat")
+	return devtools.Build(args)
+}
+
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {

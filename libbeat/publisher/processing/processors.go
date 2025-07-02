@@ -205,12 +205,14 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 		mux.Lock()
 		defer mux.Unlock()
 
-		b, err := encoder.Encode(info.Beat, event)
+		_, err := encoder.Encode(info.Beat, event)
 		if err != nil {
 			return event, nil
 		}
 
-		log.Debugw(fmt.Sprintf("Publish event: %s", b), logp.TypeKey, logp.EventType)
+		// fmt.Println("publish event works")
+
+		log.Debugw(fmt.Sprintf("Publish event: %+v", event), logp.TypeKey, logp.EventType)
 		return event, nil
 	})
 }
