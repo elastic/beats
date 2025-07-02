@@ -19,6 +19,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory/internal/activedirectory"
@@ -115,6 +116,7 @@ func (*adInput) Test(v2.TestContext) error { return nil }
 
 // Run will start data collection on this provider.
 func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
+	inputCtx.UpdateStatus(status.Starting, "")
 	p.logger = inputCtx.Logger.With("provider", Name, "domain", p.cfg.URL)
 	p.metrics = newMetrics(inputCtx.ID, nil)
 	defer p.metrics.Close()
@@ -130,6 +132,7 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 	p.cfg.UserAttrs = withMandatory(p.cfg.UserAttrs, "distinguishedName", "whenChanged")
 	p.cfg.GrpAttrs = withMandatory(p.cfg.GrpAttrs, "distinguishedName", "whenChanged")
 
+	inputCtx.UpdateStatus(status.Running, "")
 	var (
 		last time.Time
 		err  error
@@ -138,14 +141,21 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 		select {
 		case <-inputCtx.Cancelation.Done():
 			if !errors.Is(inputCtx.Cancelation.Err(), context.Canceled) {
-				return inputCtx.Cancelation.Err()
+				err := inputCtx.Cancelation.Err()
+				inputCtx.UpdateStatus(status.Stopping, err.Error())
+				return err
 			}
+			inputCtx.UpdateStatus(status.Stopping, "Deadline passed")
 			return nil
 		case start := <-syncTimer.C:
 			last, err = p.runFullSync(inputCtx, store, client)
 			if err != nil {
-				p.logger.Errorw("Error running full sync", "error", err)
+				msg := "Error running full sync"
+				p.logger.Errorw(msg, "error", err)
+				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.syncError.Inc()
+			} else {
+				inputCtx.UpdateStatus(status.Running, "Successful full sync")
 			}
 			p.metrics.syncTotal.Inc()
 			p.metrics.syncProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -164,8 +174,12 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 		case start := <-updateTimer.C:
 			last, err = p.runIncrementalUpdate(inputCtx, store, last, client)
 			if err != nil {
-				p.logger.Errorw("Error running incremental update", "error", err)
+				msg := "Error running incremental update"
+				p.logger.Errorw(msg, "error", err)
+				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.updateError.Inc()
+			} else {
+				inputCtx.UpdateStatus(status.Running, "Successful incremental update")
 			}
 			p.metrics.updateTotal.Inc()
 			p.metrics.updateProcessingTime.Update(time.Since(start).Nanoseconds())
