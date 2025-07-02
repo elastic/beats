@@ -56,9 +56,9 @@ queue.mem:
 		"-E", "output.elasticsearch.username=admin",
 		"-E", "output.elasticsearch.password=testing",
 		"-E", "output.file.enabled=false")
-	procState, err := mockbeat.Process.Wait()
+	err := mockbeat.Cmd.Wait()
 	require.NoError(t, err)
-	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitStdOutContains("Skipping loading dashboards", 10*time.Second)
 }
 
@@ -90,9 +90,9 @@ queue.mem:
 		"-E", "output.elasticsearch.username=admin",
 		"-E", "output.elasticsearch.password=testing",
 		"-E", "output.file.enabled=false")
-	procState, err := mockbeat.Process.Wait()
+	err := mockbeat.Cmd.Wait()
 	require.NoError(t, err)
-	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitForLogs("Kibana dashboards successfully loaded", 30*time.Second)
 }
 
@@ -125,9 +125,9 @@ queue.mem:
 		"-E", "output.elasticsearch.username=admin",
 		"-E", "output.elasticsearch.password=testing",
 		"-E", "output.file.enabled=false")
-	procState, err := mockbeat.Process.Wait()
+	err := mockbeat.Cmd.Wait()
 	require.NoError(t, err)
-	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitForLogs("Kibana dashboards successfully loaded", 30*time.Second)
 }
 
@@ -160,9 +160,9 @@ queue.mem:
 		"-E", "output.elasticsearch.username=admin",
 		"-E", "output.elasticsearch.password=testing",
 		"-E", "output.file.enabled=false")
-	procState, err := mockbeat.Process.Wait()
+	err := mockbeat.Cmd.Wait()
 	require.NoError(t, err)
-	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitForLogs("Kibana dashboards successfully loaded", 30*time.Second)
 
 	mockbeat.Start("export",
@@ -174,9 +174,9 @@ queue.mem:
 		"-E", "setup.kibana.password=testing",
 		"--id", "Metricbeat-system-overview",
 		"--folder", filepath.Join(mockbeat.TempDir(), "system-overview"))
-	procState, err = mockbeat.Process.Wait()
+	err = mockbeat.Cmd.Wait()
 	require.NoError(t, err)
-	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	dbPath := filepath.Join(mockbeat.TempDir(), "system-overview", "_meta", "kibana", "9", "dashboard", "Metricbeat-system-overview.json")
 	require.FileExists(t, dbPath, "dashboard file not exported")
 	b, err := os.ReadFile(dbPath)
@@ -207,7 +207,7 @@ queue.mem:
 		"-E", "setup.kibana.password=testing",
 		"--id", "No-such-dashboard",
 		"--folder", filepath.Join(mockbeat.TempDir(), "system-overview"))
-	procState, err := mockbeat.Process.Wait()
-	require.NoError(t, err)
-	require.Equal(t, 1, procState.ExitCode(), "incorrect exit code")
+	err := mockbeat.Cmd.Wait()
+	require.Error(t, err, "mockbeat must exit with an error")
+	require.Equal(t, 1, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 }

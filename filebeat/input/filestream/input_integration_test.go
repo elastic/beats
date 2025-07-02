@@ -356,7 +356,7 @@ func TestFilestreamUTF16BOMs(t *testing.T) {
 			line := []byte("first line\n")
 			buf := bytes.NewBuffer(nil)
 			writer := transform.NewWriter(buf, encoder)
-			writer.Write(line)
+			_, _ = writer.Write(line)
 			writer.Close()
 
 			env.mustWriteToFile(testlogName, buf.Bytes())
@@ -1106,7 +1106,7 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 		}
 		n := 0
 		for n <= iterations {
-			f.Write([]byte(fmt.Sprintf("hello world %d\n", r*iterations+n)))
+			fmt.Fprintf(f, "hello world %d\n", r*iterations+n)
 			n += 1
 			time.Sleep(100 * time.Millisecond)
 		}

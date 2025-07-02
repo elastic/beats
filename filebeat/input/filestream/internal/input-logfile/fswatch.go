@@ -31,23 +31,25 @@ const (
 	OpRename
 	OpTruncate
 	OpArchived
+	OpNotChanged
 )
 
 var operationNames = map[Operation]string{
-	OpDone:     "done",
-	OpCreate:   "create",
-	OpWrite:    "write",
-	OpDelete:   "delete",
-	OpRename:   "rename",
-	OpTruncate: "truncate",
-	OpArchived: "archive",
+	OpDone:       "done",
+	OpCreate:     "create",
+	OpWrite:      "write",
+	OpDelete:     "delete",
+	OpRename:     "rename",
+	OpTruncate:   "truncate",
+	OpArchived:   "archive",
+	OpNotChanged: "not changed",
 }
 
 // Operation describes what happened to a file.
 type Operation uint8
 
-func (o *Operation) String() string {
-	name, ok := operationNames[*o]
+func (o Operation) String() string {
+	name, ok := operationNames[o]
 	if !ok {
 		return ""
 	}
