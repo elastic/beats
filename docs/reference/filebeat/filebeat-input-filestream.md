@@ -595,22 +595,24 @@ file_identity.inode_marker.path: /logs/.filebeat-marker
 
 ## Removing fully ingested files [filebeat-input-filestream-delete-options]
 
-Filebeat can delete files after the reader is closed. A file can only be
-deleted if EOF has been reached and all events from the file have
-been published.
+By default, Filestream input doesn't delete files. If option is turned
+on, Filestream input can delete files when those conditions are met:
+ - The reader is closed.
+ - EOF has been reached.
+ - All events have been acknowledged by the output.
 
-If there are events pending publishing or there is an issue while
+If there are events pending acknowledgement or there is an issue while
 deleting the file, the harvester reopens at the next scan and the
 remove operation is retried. You can configure the scan for changes
 in files by setting the
 [`prospector.scanner.check_interval`](#filebeat-input-filestream-scan-frequency)
 property.
 
-A published event is an event that has been acknowledged by the
-output. An output always acknowledges a successfully written event.
+An output always acknowledges a successfully written event.
 However, it also acknowledges dropped events. Each output has
-different conditions for dropping an event. Refer the output's
-documentation for more details.
+different conditions for dropping an event. Refer the
+[output's](/reference/filebeat/configuring-output.md) documentation for
+more details.
 
 If Filebeat fails to remove the file, it retries up to 5 times with
 a constant backoff of 2 seconds. If all attempts fail, the harvester
@@ -630,8 +632,7 @@ are met:
 ### `delete.grace_period` [filebeat-input-filestream-delete-grace-period]
 
 An interval to wait after the reader is closed and all events have
-been published before trying to remove the file.
-
+been acknowledged before trying to remove the file.
 
 The harvester for the file stays open while waiting for the grace period.
 If the file size changes while waiting the grace period, the harvester is closed
