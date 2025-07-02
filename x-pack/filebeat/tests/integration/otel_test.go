@@ -408,7 +408,7 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
     filebeat:
       inputs:
         - type: filestream
-          id: filestream-fbreceiver
+          id: filestream-fbreceiver{{$i}}
           enabled: true
           paths:
             - {{$receiver.InputFile}}
