@@ -60,10 +60,6 @@ func (sj *SourceJob) String() string {
 	panic("implement me")
 }
 
-func (sj *SourceJob) Decode() error {
-	return sj.browserCfg.Source.Active().Decode()
-}
-
 func (sj *SourceJob) Fetch() error {
 	return sj.browserCfg.Source.Active().Fetch()
 }
