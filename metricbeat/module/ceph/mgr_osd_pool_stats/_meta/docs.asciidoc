@@ -1,1 +1,0 @@
-This is the `mgr_osd_pool_stats` metricset of the Ceph module.

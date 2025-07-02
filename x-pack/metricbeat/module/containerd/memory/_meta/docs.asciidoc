@@ -1,1 +1,0 @@
-This is the memory metricset of the module containerd.
