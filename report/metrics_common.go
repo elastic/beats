@@ -27,14 +27,12 @@ import (
 )
 
 var (
-	ephemeralID    uuid.UUID
-	processMetrics *monitoring.Registry
-	startTime      time.Time
+	ephemeralID uuid.UUID
+	startTime   time.Time
 )
 
 func init() {
 	startTime = time.Now()
-	processMetrics = monitoring.Default.NewRegistry("beat")
 
 	var err error
 	ephemeralID, err = uuid.NewV4()

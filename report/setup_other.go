@@ -23,9 +23,12 @@
 
 package report
 
-import "github.com/elastic/elastic-agent-libs/logp"
+import (
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+)
 
-func SetupMetrics(logger *logp.Logger, name, version string) error {
+func SetupMetrics(logger *logp.Logger, name, version string, systemMetrics *monitoring.Registry, processMetrics *monitoring.Registry) error {
 	logp.Warn("Metrics not implemented for this OS.")
 	return nil
 }
