@@ -97,7 +97,11 @@ func (*jamfInput) Test(v2.TestContext) error { return nil }
 
 // Run will start data collection on this provider.
 func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
-	inputCtx.UpdateStatus(status.Starting, "")
+	stat := inputCtx.StatusReporter
+	if stat == nil {
+		stat = noopReporter{}
+	}
+	stat.UpdateStatus(status.Starting, "")
 	p.logger = inputCtx.Logger.With("provider", Name, "tenant", p.cfg.JamfTenant)
 	p.metrics = newMetrics(inputCtx.ID, nil)
 	defer p.metrics.Close()
@@ -121,26 +125,26 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		return err
 	}
 
-	inputCtx.UpdateStatus(status.Running, "")
+	stat.UpdateStatus(status.Running, "")
 	for {
 		select {
 		case <-inputCtx.Cancelation.Done():
 			if !errors.Is(inputCtx.Cancelation.Err(), context.Canceled) {
 				err := inputCtx.Cancelation.Err()
-				inputCtx.UpdateStatus(status.Stopping, err.Error())
+				stat.UpdateStatus(status.Stopping, err.Error())
 				return err
 			}
-			inputCtx.UpdateStatus(status.Stopping, "Deadline passed")
+			stat.UpdateStatus(status.Stopping, "Deadline passed")
 			return nil
 		case <-syncTimer.C:
 			start := time.Now()
 			if err := p.runFullSync(inputCtx, store, client); err != nil {
 				msg := "Error running full sync"
 				p.logger.Errorw(msg, "error", err)
-				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				stat.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.syncError.Inc()
 			} else {
-				inputCtx.UpdateStatus(status.Running, "Successful full sync")
+				stat.UpdateStatus(status.Running, "Successful full sync")
 			}
 			p.metrics.syncTotal.Inc()
 			p.metrics.syncProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -161,10 +165,10 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
 				msg := "Error running incremental update"
 				p.logger.Errorw(msg, "error", err)
-				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				stat.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.updateError.Inc()
 			} else {
-				inputCtx.UpdateStatus(status.Running, "Successful incremental update")
+				stat.UpdateStatus(status.Running, "Successful incremental update")
 			}
 			p.metrics.updateTotal.Inc()
 			p.metrics.updateProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -173,6 +177,10 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		}
 	}
 }
+
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}
 
 func newClient(ctx context.Context, cfg conf, log *logp.Logger) (*http.Client, error) {
 	c, err := cfg.Request.Transport.Client(clientOptions(cfg.Request.KeepAlive.settings())...)

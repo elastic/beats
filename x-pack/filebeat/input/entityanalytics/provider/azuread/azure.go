@@ -74,7 +74,11 @@ func (p *azure) Test(testCtx v2.TestContext) error {
 
 // Run will start data collection on this provider.
 func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
-	inputCtx.UpdateStatus(status.Starting, "")
+	stat := inputCtx.StatusReporter
+	if stat == nil {
+		stat = noopReporter{}
+	}
+	stat.UpdateStatus(status.Starting, "")
 	p.logger = inputCtx.Logger.With("tenant_id", p.conf.TenantID, "provider", Name)
 	p.ctx = inputCtx
 
@@ -102,26 +106,26 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 	syncTimer := time.NewTimer(syncWaitTime)
 	updateTimer := time.NewTimer(updateWaitTime)
 
-	inputCtx.UpdateStatus(status.Running, "")
+	stat.UpdateStatus(status.Running, "")
 	for {
 		select {
 		case <-inputCtx.Cancelation.Done():
 			if !errors.Is(inputCtx.Cancelation.Err(), context.Canceled) {
 				err := inputCtx.Cancelation.Err()
-				inputCtx.UpdateStatus(status.Stopping, err.Error())
+				stat.UpdateStatus(status.Stopping, err.Error())
 				return err
 			}
-			inputCtx.UpdateStatus(status.Stopping, "Deadline passed")
+			stat.UpdateStatus(status.Stopping, "Deadline passed")
 			return nil
 		case <-syncTimer.C:
 			start := time.Now()
 			if err := p.runFullSync(inputCtx, store, client); err != nil {
 				msg := "Error running full sync"
 				p.logger.Errorw(msg, "error", err)
-				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				stat.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.syncError.Inc()
 			} else {
-				inputCtx.UpdateStatus(status.Running, "Successful full sync")
+				stat.UpdateStatus(status.Running, "Successful full sync")
 			}
 			p.metrics.syncTotal.Inc()
 			p.metrics.syncProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -142,10 +146,10 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
 				msg := "Error running incremental update"
 				p.logger.Errorw(msg, "error", err)
-				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				stat.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.updateError.Inc()
 			} else {
-				inputCtx.UpdateStatus(status.Running, "Successful incremental update")
+				stat.UpdateStatus(status.Running, "Successful incremental update")
 			}
 			p.metrics.updateTotal.Inc()
 			p.metrics.updateProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -154,6 +158,10 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 		}
 	}
 }
+
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}
 
 // runFullSync performs a full synchronization. It will fetch user and group
 // identities from Azure Active Directory, enrich users with group memberships,
