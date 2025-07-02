@@ -170,7 +170,6 @@ func (inp *o365input) run(v2ctx v2.Context, stream *stream, cursor cursor.Cursor
 		poll.WithTokenProvider(tokenProvider),
 		poll.WithMinRequestInterval(delay),
 		poll.WithLogger(log),
-		poll.WithStatusReporter(stat),
 		poll.WithContext(ctx),
 		poll.WithRequestDecorator(
 			autorest.WithUserAgent(useragent.UserAgent("Filebeat-"+pluginName, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())),
