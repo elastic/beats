@@ -66,7 +66,7 @@ updates:
     directory: /
     # Workaround to satisfy Dependabot's unique constraint (needs unique 'package-ecosystem', 'directory', 'target-branch' tuples) 
     # for duplicate package-ecosystem configurations: https://github.com/dependabot/dependabot-core/issues/1778#issuecomment-1988140219
-    target-branch: main 
+    target-branch: main
     schedule:
       interval: daily
     cooldown:
