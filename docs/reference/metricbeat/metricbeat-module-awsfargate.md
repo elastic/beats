@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-awsfargate.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # AWS Fargate module [metricbeat-module-awsfargate]
 
 ::::{warning}
@@ -52,7 +54,7 @@ Currently, we have `task_stats` metricset in `awsfargate` module.
 This metricset collects runtime CPU metrics, disk I/O metrics, memory metrics, network metrics and container metadata from both endpoint `${ECS_CONTAINER_METADATA_URI_V4}/task/stats` and `${ECS_CONTAINER_METADATA_URI_V4}/task`.
 
 
-### Example configuration [_example_configuration_6]
+## Example configuration [_example_configuration]
 
 The AWS Fargate module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -65,8 +67,12 @@ metricbeat.modules:
 ```
 
 
-### Metricsets [_metricsets_9]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
+<<<<<<< HEAD
 * [task_stats](/reference/metricbeat/metricbeat-metricset-awsfargate-task_stats.md)  {applies_to}`stack: beta`
+=======
+* [task_stats](/reference/metricbeat/metricbeat-metricset-awsfargate-task_stats.md)
+>>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-tomcat.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Tomcat module [metricbeat-module-tomcat]
 
 ::::{warning}
@@ -42,7 +44,7 @@ An overview dashboard for Kibana is already included:
 The Tomcat module requires [Jolokia](/reference/metricbeat/metricbeat-module-jolokia.md)to fetch JMX metrics. Refer to the link for instructions about how to use Jolokia.
 
 
-### Example configuration [_example_configuration_64]
+## Example configuration [_example_configuration]
 
 The Tomcat module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -56,11 +58,18 @@ metricbeat.modules:
 ```
 
 
-### Metricsets [_metricsets_74]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
+<<<<<<< HEAD
 * [cache](/reference/metricbeat/metricbeat-metricset-tomcat-cache.md)  {applies_to}`stack: beta`
 * [memory](/reference/metricbeat/metricbeat-metricset-tomcat-memory.md)  {applies_to}`stack: beta`
 * [requests](/reference/metricbeat/metricbeat-metricset-tomcat-requests.md)  {applies_to}`stack: beta`
 * [threading](/reference/metricbeat/metricbeat-metricset-tomcat-threading.md)  {applies_to}`stack: beta`
+=======
+* [cache](/reference/metricbeat/metricbeat-metricset-tomcat-cache.md)
+* [memory](/reference/metricbeat/metricbeat-metricset-tomcat-memory.md)
+* [requests](/reference/metricbeat/metricbeat-metricset-tomcat-requests.md)
+* [threading](/reference/metricbeat/metricbeat-metricset-tomcat-threading.md)
+>>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))

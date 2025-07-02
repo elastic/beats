@@ -1,1 +1,0 @@
-This is the mixer metricset of the module istio. This metricset collects Mixer-specific metrics and can be used to monitor Mixer itself.

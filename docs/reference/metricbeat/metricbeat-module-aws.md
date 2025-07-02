@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-aws.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # AWS module [metricbeat-module-aws]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -571,7 +573,7 @@ In order to enable WebIdentity authentication flow you need to add a trust relat
 In this case there’s no need to add `role_arn` to modules config.
 
 
-### Example configuration [_example_configuration_5]
+## Example configuration [_example_configuration]
 
 The AWS module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -641,7 +643,7 @@ metricbeat.modules:
 ```
 
 
-### Metricsets [_metricsets_7]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
@@ -660,6 +662,12 @@ The following metricsets are available:
 * [s3_request](/reference/metricbeat/metricbeat-metricset-aws-s3_request.md)
 * [sns](/reference/metricbeat/metricbeat-metricset-aws-sns.md)  {applies_to}`stack: beta`
 * [sqs](/reference/metricbeat/metricbeat-metricset-aws-sqs.md)
+<<<<<<< HEAD
 * [transitgateway](/reference/metricbeat/metricbeat-metricset-aws-transitgateway.md)  {applies_to}`stack: beta`
 * [usage](/reference/metricbeat/metricbeat-metricset-aws-usage.md)  {applies_to}`stack: beta`
 * [vpn](/reference/metricbeat/metricbeat-metricset-aws-vpn.md)  {applies_to}`stack: beta`
+=======
+* [transitgateway](/reference/metricbeat/metricbeat-metricset-aws-transitgateway.md)
+* [usage](/reference/metricbeat/metricbeat-metricset-aws-usage.md)
+* [vpn](/reference/metricbeat/metricbeat-metricset-aws-vpn.md)
+>>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))

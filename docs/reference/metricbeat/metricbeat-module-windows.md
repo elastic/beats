@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-windows.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Windows module [metricbeat-module-windows]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -20,7 +22,7 @@ Refer to the [Elastic Integrations documentation](integration-docs://reference/w
 This is the `windows` module which collects metrics from Windows systems. The module contains the `service` metricset, which is set up by default when the `windows` module is enabled. The `service` metricset will retrieve status information of the services on the Windows machines. The second `windows` metricset is `perfmon` which collects Windows performance counter values.
 
 
-## Example configuration [_example_configuration_68]
+## Example configuration [_example_configuration]
 
 The Windows module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -76,10 +78,14 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_78]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [perfmon](/reference/metricbeat/metricbeat-metricset-windows-perfmon.md)
 * [service](/reference/metricbeat/metricbeat-metricset-windows-service.md)
+<<<<<<< HEAD
 * [wmi](/reference/metricbeat/metricbeat-metricset-windows-wmi.md)  {applies_to}`stack: beta 9.1.0`
+=======
+* [wmi](/reference/metricbeat/metricbeat-metricset-windows-wmi.md)
+>>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))
