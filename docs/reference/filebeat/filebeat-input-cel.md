@@ -306,9 +306,12 @@ other parts of the ingest pipeline render floating point values with E-notation 
 points to numbers that are expected to be integers. This is is most likely to happen when numbers
 are large (not within ±10^7^). Above the maximum exact integer representation threshold for double
 precision floating point values, within ±2^53^ (±9×10^15^), integer values will lose precision when
-they are returned from the CEL evaluation environment. To avoid these issues, when you have large
-integer values as part of an evaluation result, convert the field value to a string before returning
-it, and convert input numbers to integers explicitly at the start of a CEL program.
+they are returned from the CEL evaluation environment. The CEL input will automatically convert
+integers outside of the ±2^53^ range to strings in order to prevent loss of precision in these
+values, but potentially leading to a situation where some numbers received by the ingest pipeline
+are numbers and some are strings. To avoid these issues, when you have large integer values as part
+of an evaluation result, convert the field value to a string before returning it, and convert input
+numbers to integers explicitly at the start of a CEL program.
 
 
 ## Configuration options [_configuration_options_3]
