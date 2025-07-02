@@ -264,6 +264,11 @@ func (f *logFile) errorChecks(err error) error {
 		if errors.Is(err, gzip.ErrChecksum) {
 			return io.EOF
 		}
+
+		// TODO(AndersonQ): if the we read a gzip file before it's fully read?
+		//  it might return io.ErrUnexpectedEOF on:
+		//    - error while reading file header
+		//    - error when reading file footer/validating checksum and size
 		return err
 	}
 

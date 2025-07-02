@@ -92,6 +92,11 @@ func (r *LineReader) Next() (b []byte, n int, err error) {
 	// This loop is need in case advance detects an line ending which turns out
 	// not to be one when decoded. If that is the case, reading continues.
 	for {
+		// TODO(AndersonQ): for GZIP returns data+EOF and EOF is returned when the
+		//   last byte is read, not after that. gzip default behaviour
+		//   another option a GZIP line reader that reads ahead so it returns an
+		//   event and if it's the last event.
+		//  the EOF boolean needs to go together with the offset
 		// read next 'potential' line from input buffer/reader
 		err := r.advance()
 		if err != nil {
