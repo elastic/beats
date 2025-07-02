@@ -108,7 +108,7 @@ func (sr *BufferedReader) Record() ([]beat.Event, error) {
 	// read the next four bytes
 	peek, err := sr.reader_.Peek(4)
 	if err != nil {
-		return nil, fmt.Errorf("Error reading data: %v", err)
+		return nil, fmt.Errorf("Error reading data: %w", err)
 	}
 
 	// the IPFIX packet is two bytes of version, two bytes of length
@@ -118,13 +118,13 @@ func (sr *BufferedReader) Record() ([]beat.Event, error) {
 	// if the version is wrong, nothing else to read
 	if version != 10 {
 		// TODO: read the rest of the packet and skip it
-		sr.reader_.Discard(int(length))
+		_, _ = sr.reader_.Discard(int(length))
 		return nil, fmt.Errorf("incorrect version (%v)", version)
 	}
 
 	// if the length is says so, nothing else to read
 	if length <= 4 {
-		sr.reader_.Discard(int(length))
+		_, _ = sr.reader_.Discard(int(length))
 		return nil, fmt.Errorf("packet is too small (%v)", length)
 	}
 

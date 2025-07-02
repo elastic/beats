@@ -203,7 +203,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 				var v mapstr.M
 				msg, v, err = dec.decodeValue()
 				if err != nil {
-					if err == io.EOF {
+					if errors.Is(err, io.EOF) {
 						return nil
 					}
 					break
@@ -212,7 +212,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 			} else {
 				msg, err = dec.decode()
 				if err != nil {
-					if err == io.EOF {
+					if errors.Is(err, io.EOF) {
 						return nil
 					}
 					break
@@ -228,7 +228,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 		for dec.next() {
 			msg, err := dec.decode()
 			if err != nil {
-				if err == io.EOF {
+				if errors.Is(err, io.EOF) {
 					return nil
 				}
 				break
