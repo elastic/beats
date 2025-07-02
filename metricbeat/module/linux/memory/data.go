@@ -79,7 +79,7 @@ func FetchLinuxMemStats(baseMap mapstr.M, hostfs resolve.Resolver) error {
 	}
 	if okSF && okST {
 		swap["used.bytes"] = swapTotal - swapFree
-		perc := float64(swapTotal - swapFree) / float64(swapTotal)
+		perc := float64(swapTotal-swapFree) / float64(swapTotal)
 		swap["used.pct"] = util.Round(perc)
 	}
 
@@ -112,7 +112,7 @@ func insertPagesChild(field string, raw map[string]uint64, evt mapstr.M) {
 }
 
 func computeEfficiency(scanName string, stealName string, fieldName string, raw map[string]uint64, inMap mapstr.M) {
-	scanVal, _ := raw[scanName]
+	scanVal := raw[scanName]
 	stealVal, stealOk := raw[stealName]
 	if scanVal != 0 && stealOk {
 		inMap[fieldName] = mapstr.M{
@@ -211,7 +211,7 @@ func GetVMStat(hostfs resolve.Resolver) (map[string]uint64, error) {
 			continue
 		}
 
-		num, err := strconv.ParseUint(string(parts[1]), 10, 64)
+		num, err := strconv.ParseUint(parts[1], 10, 64)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse value %s: %w", parts[1], err)
 		}
