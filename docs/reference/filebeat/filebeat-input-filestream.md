@@ -597,7 +597,7 @@ file_identity.inode_marker.path: /logs/.filebeat-marker
 
 By default, Filestream input doesn't delete files. If option is turned
 on, Filestream input can delete files when those conditions are met:
- - The reader is closed.
+ - The reader is closed. The default is 5 minutes of inactivity.
  - EOF has been reached.
  - All events have been acknowledged by the output.
 
@@ -625,7 +625,7 @@ Removing files is turned off by default.
 
 When set to `true`, files are removed when the following conditions
 are met:
- - The reader is closed. The default is 5 minutes of inactivity.
+ - The reader is closed.
  - EOF has been reached.
  - All events have been acknowledged by the output.
 

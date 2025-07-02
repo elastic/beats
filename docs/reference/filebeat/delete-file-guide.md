@@ -11,7 +11,7 @@ conditions are met:
    been reached. This is controlled by:
      - `close.on_state_change.inactive`
      - `close.reader.on_eof`
-2. Events from the file have been received by the configured output
+2. Events from the file have been received by the output
    without error. For example, the Elasticsearch output has indexed all
    events or logstash has written event to persistent queue.
 3. The `delete.grace_period` has expired and the file has not changed
@@ -29,8 +29,7 @@ During the grace period, {{filebeat}} monitors the file. If the file size
 changes, the grace period is interrupted and the file resumes 
 ingesting after the next file system scan.
 
-A acknowledged event is an event that has been acknowledged by the
-output. An output always acknowledges a successfully written event,
+An output always acknowledges a successfully written event,
 however it also acknowledges dropped events. Each output has
 different conditions for dropping an event. Refer the
 [output's](/reference/filebeat/configuring-output.md) documentation
@@ -61,14 +60,13 @@ especially across volumes or network shares.
 
 ## Examples
 ### Removing log files from old cronjobs
-{{filebeat}} will be used to ingest log files from old cronjobs, all files
+{{filebeat}} is ingesting log files from old cronjobs, all files
 have been fully written and {{filebeat}} should remove them once it
 finishes publishing all data. The log files are located at
 `/var/log/cronjobs/*.log`. Once {{filebeat}} finishes reading each file,
 it will wait for 30min (the default), then delete them.
 
-For that the {{filestream}} with delete on EOF will be used, the input
-configuration is:
+For that close on EOF is used, the input configuration is:
 ```yaml
   - type: filestream
     id: cronjobs-logs
@@ -111,10 +109,10 @@ is closed and a new harvester will be started in the next scan.
 In this example, {{filebeat}} collects logs from long-running tasks that
 continuously add information to their log files. While these tasks are
 active, new log entries appear in their respective files located at
-`/var/log/long-tasks/*.log` every few seconds. {{filebeat}} monitors these
+`/var/log/long-tasks/*.log` every few seconds. {{filestream}} monitors these
 files, and when a log file hasn't been updated for several minutes, it
 indicates that the corresponding task has likely finished, making it
-safe to remove the log file. After {{filebeat}} closes the file, it will
+safe to remove the log file. After {{filestream}} closes the file, it will
 wait for the grace period (30 minutes by default): if the file has not
 changed during the grace period, the file is removed.
 
@@ -141,8 +139,8 @@ closed due to inactivity (no more data read from it) even if some of
 its events are still in {{filebeat}}'s publishing queue.
 
 In this example, files are removed 5 minutes after all events have been
-acknowledged. We know the files never have data appended to them. so the
-example uses the EOF condition and configures a grace period.
+acknowledged. We know the files never have data appended to them, so the
+example uses close on EOF and configures a grace period.
 
 ```yaml
   - type: filestream
