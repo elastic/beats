@@ -140,10 +140,8 @@ func (r *gzipSeekerReader) Seek(offset int64, whence int) (int64, error) {
 				"gzipSeekerReader: could not seek to 0: %w", err)
 		}
 
-		if err = r.gzr.Close(); err != nil {
-			return n, fmt.Errorf(
-				"gzipSeekerReader: could not close gzip reader before creating a new one: %w", err)
-		}
+		// it'll create a new reader, so this error can be safely ignored
+		_ = r.gzr.Close()
 
 		r.gzr, err = gzip.NewReader(r.f)
 		if err != nil {

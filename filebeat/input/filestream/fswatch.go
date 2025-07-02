@@ -546,15 +546,15 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		// Check if there is enough *decompressed* data for fingerprint
 		file, err = newGzipSeekerReader(osFile, int(minSize))
 		if err != nil {
-			return fd, fmt.Errorf("failed to create gzip seeker for %q: %w", it.originalFilename, err)
+			return fd, fmt.Errorf("failed to create gzip seeker: %w", err)
 		}
 		defer file.Close()
 
 		dataSize, err = file.Seek(minSize, io.SeekStart)
 		if errors.Is(err, io.EOF) {
 			return fd, fmt.Errorf(
-				"filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w",
-				fd.Filename, dataSize, minSize, errFileTooSmall)
+				"filesize is %d bytes, expected at least %d bytes for fingerprinting: %w",
+				dataSize, minSize, errFileTooSmall)
 		}
 		// all good, reset the offset
 		_, err = file.Seek(0, io.SeekStart)

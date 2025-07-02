@@ -141,7 +141,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 				},
 			},
 		},
-		"write to GZIP file is ignored": {
+		"write to GZIP file": {
 			events: []loginp.FSEvent{
 				{Op: loginp.OpCreate, NewPath: "/path/to/archive.log.gz",
 					Descriptor: loginp.FileDescriptor{GZIP: true}},
@@ -150,7 +150,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/archive.log.gz"),
-				harvesterStop("path::/path/to/archive.log.gz"),
+				harvesterStart("path::/path/to/archive.log.gz"),
 				harvesterGroupStop{},
 			},
 			expectedRotatedFiles: map[string][]string{},

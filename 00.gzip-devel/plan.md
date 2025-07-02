@@ -21,7 +21,8 @@ descriptor (filebeat/input/filestream/fswatch.go:406), it happened in the file
 scanner, the error will happen every scan as long as the file is still there.
 - [ ] add GZIP support for tests on `input_integration_test.go`?
 
-## Milestones
+### Changes to the RFC:
+ - allow data append: it might happen filebeat pickup the gzip file before it's fully written to disk.
 
 ### Milestone 1 – Configuration & Validation
 - [x] Add new config flag `gzip_experimental` with validation (enforce fingerprint identity)
@@ -44,12 +45,7 @@ scanner, the error will happen every scan as long as the file is still there.
 - [ ] Implement modification detection: abort ingestion on append/truncate during read
       files: `filebeat/input/filestream/internal/input-logfile/harvester.go`,
       `filebeat/input/file/state.go`
-- [ ] Instrument GZIP-specific metrics:
-  - `gzip_validation_errors_total`
-  - `gzip_bytes_compressed_total`
-  - `gzip_bytes_decompressed_total`
-      files: `filebeat/input/filestream/internal/input-logfile/metrics.go`,
-      `filebeat/input/filestream/input.go`
+- [x] Instrument GZIP-specific metrics: all metrics have a GZIP version
 - [x] Enhance rotation handle .gz
   - [x] Add GZIP-awareness to `onFSEvent` in `copytruncate_prospector.go`
   - [x] Add GZIP-awareness to `onFSEvent` in `prospector.go`
@@ -58,6 +54,8 @@ scanner, the error will happen every scan as long as the file is still there.
 - [ ] test for a corrupted file, which at the beginning some lines succeed, then
 it fails.
 - [ ] test for a file with multiple GZIP files
+- [ ] test a gzip and plain file with the same decompressed data have the same
+fingerprint
 - [ ] run BenchmarkToFileDescriptor to check overhead of checking a file is GZIP
 
 ### Milestone 3 – Testing

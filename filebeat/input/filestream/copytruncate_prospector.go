@@ -333,11 +333,6 @@ func (p *copyTruncateFileProspector) onFSEvent(
 		case loginp.OpCreate:
 			log.Debugf("A new file %s has been found", event.NewPath)
 		case loginp.OpWrite:
-			if event.Descriptor.GZIP {
-				log.Debugf("GZIP file %s has been updated, stop ingesting it it", event.NewPath)
-				group.Stop(src)
-				return
-			}
 			log.Debugf("File %s has been updated", event.NewPath)
 		}
 
@@ -368,7 +363,7 @@ func (p *copyTruncateFileProspector) onFSEvent(
 
 	case loginp.OpTruncate:
 		if event.Descriptor.GZIP {
-			// TODO(AndersonQ): how to mark the file as done?
+			// TODO(AndersonQ): will we keep this behaviour?
 			log.Debugf("GZIP file %s has been truncated, stop ingesting it", event.NewPath)
 			group.Stop(src)
 			return
