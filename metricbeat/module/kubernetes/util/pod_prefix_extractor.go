@@ -11,7 +11,7 @@ import (
 func ExtractWorkloadName(podName string) string {
 	// 匹配 Deployment/ReplicaSet 生成的 Pod 名称
 	// 格式：<工作负载名称>-<副本集哈希>-<Pod 随机后缀>
-	deployPattern := regexp.MustCompile(`^(.*)-[a-z0-9]{1,10}-[a-z0-9]{5}$`)
+	deployPattern := regexp.MustCompile(`^(.*)-[a-z0-9]{8,10}-[a-z0-9]{5}$`)
 	if m := deployPattern.FindStringSubmatch(podName); m != nil {
 		return m[1]
 	}
