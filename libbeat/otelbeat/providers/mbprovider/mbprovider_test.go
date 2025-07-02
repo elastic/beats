@@ -31,12 +31,15 @@ import (
 )
 
 var beatsConfig = `
-filebeat.inputs:
-  - type: filestream
-    id: filestream-input-id
+metricbeat.modules:
+  - module: system
+    metricsets:
+      - cpu             # CPU usage
+      - load            # CPU load averages
     enabled: true
-    paths:
-      - /tmp/flog.log
+    period: 10s
+    processes: ['.*']
+
 
 output:
   elasticsearch:
@@ -45,28 +48,25 @@ output:
     password: changeme
     index: form-otel-exporter
     ssl.enabled: false
-
-setup.template.name: form-otel-exporter
-setup.template.pattern: form-otel-exporter
-setup.dashboards.index: "form-otel-exporter*"
-
-setup.kibana:
-  host: https://localhost:5601
-  username: elastic
-  password: changeme
-  ssl.verification_mode: none
 `
 
 var expectedOutput = `
 receivers:
-  filebeatreceiver:
-    filebeat:
-      inputs:
-        - enabled: true
-          id: filestream-input-id
-          paths:
-            - /tmp/flog.log
-          type: filestream
+  metricbeatreceiver:
+    metricbeat:
+      modules:
+      - module: system
+        enabled: true
+        metricsets:
+        - cpu
+        - load 
+        processes: ['.*']
+        period: 10s
+    path:
+      config: .
+      data: ./data
+      home: .
+      logs: ./logs           
     output:
       elasticsearch:
         hosts: ["https://localhost:9200"]
@@ -75,37 +75,20 @@ receivers:
         index: form-otel-exporter
         ssl:
           enabled: false
-    path:
-      config: .
-      data: ./data
-      home: .
-      logs: ./logs
-    setup:
-      dashboards:
-        index: form-otel-exporter*
-      kibana:
-        host: https://localhost:5601
-        password: changeme
-        ssl:
-          verification_mode: none
-        username: elastic
-      template:
-        name: form-otel-exporter
-        pattern: form-otel-exporter
 
 service:
   pipelines:
     logs:
       receivers:
-        - "filebeatreceiver"
+        - "metricbeatreceiver"
 `
 
-func TestFileBeatProvider(t *testing.T) {
+func TestMetricbeatProvider(t *testing.T) {
 	p := provider{}
 
-	t.Run("test filebeat provider", func(t *testing.T) {
+	t.Run("test metricbeat provider", func(t *testing.T) {
 
-		tempFile, err := os.CreateTemp("", "filebeat.yml")
+		tempFile, err := os.CreateTemp("", "metricbeat.yml")
 		require.NoError(t, err, "error creating temp file")
 		defer os.Remove(tempFile.Name()) // Clean up the file after we're done
 		defer tempFile.Close()
@@ -115,7 +98,7 @@ func TestFileBeatProvider(t *testing.T) {
 		require.NoError(t, err, "error creating temp file")
 
 		// prefix file path with fb:
-		ret, err := p.Retrieve(context.Background(), "fb:"+tempFile.Name(), nil)
+		ret, err := p.Retrieve(context.Background(), "mb:"+tempFile.Name(), nil)
 		require.NoError(t, err)
 
 		retValue, err := ret.AsRaw()
