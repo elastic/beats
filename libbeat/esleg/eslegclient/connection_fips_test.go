@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build requirefips
-
 package eslegclient
 
 import (
@@ -24,8 +22,9 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	_ "embed"
-	"fmt"
+	"github.com/elastic/beats/v7/libbeat/version"
 	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/stretchr/testify/require"
 	"log"
@@ -36,12 +35,17 @@ import (
 	"testing"
 )
 
-// TestConnectionTLS tries to connect to an Elasticsearch cluster
-// (a test HTTPS server) that presents TLS options that are not
-// FIPS-compliant. The client, being FIPS-capable, is expected to
-// fail the TLS handshake.
+// TestConnectionTLS tries to connect to a test HTTPS server (pretending
+// to be an Elasticsearch cluster), that deliberately presents TLS options
+// that are not FIPS-compliant.
+// - If the test is running with a FIPS-capable build, the client, being FIPS-
+// capable, should fail the TLS handshake. Concretely, the conn.Connect() method
+// should return an error.
+// - If the test is not running with a FIPS-capable build, the client should
+// complete the TLS handshake successfully. Concretely, the conn.Connect() method
+// should not return an error.
 func TestConnectionTLS(t *testing.T) {
-	server, _ := startTLSServer(t)
+	server := startTLSServer(t)
 	defer server.Close()
 
 	transportSettings := `
@@ -55,28 +59,26 @@ ssl:
 
 	transport.TLS.CAs = []string{string(caCertPEM)}
 
+	log := logptest.NewTestingLogger(t, "TestConnectionTLS")
 	conn, err := NewConnection(ConnectionSettings{
 		URL:       server.URL,
 		Transport: transport,
-	})
+	}, log)
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	err = conn.Connect(ctx)
-	require.NoError(t, err)
-	// TODO: assert that error is returned and it's related
-	// to FIPS-incompatible TLS handshake
+
+	if version.FIPSDistribution {
+		require.ErrorContains(t, err, "tls: internal error")
+	} else {
+		require.NoError(t, err)
+	}
 }
 
 //go:embed testdata/ca.crt
 var caCertPEM []byte
-
-////go:embed testdata/server.crt
-//var serverCertPEM []byte
-
-////go:embed testdata/server.key
-//var serverKeyPEM []byte // RSA key with length = 2048 bits
 
 //go:embed testdata/fips_invalid.key
 var serverKeyPEM []byte // RSA key with length = 1024 bits
@@ -101,16 +103,18 @@ func (s *serverLog) String() string {
 	return s.log.String()
 }
 
-func startTLSServer(t *testing.T) (*httptest.Server, *serverLog) {
+//go:embed testdata/es_ping_response.json
+var esPingResponse []byte
+
+func startTLSServer(t *testing.T) *httptest.Server {
 	// Configure server and start it
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(caCertPEM)
 
 	// Create HTTPS server
-	const successResp = `{"message":"hello"}`
 	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, successResp)
+		w.Write(esPingResponse)
 	}))
 
 	serverCert, err := tls.X509KeyPair(serverCertPEM, serverKeyPEM)
@@ -123,10 +127,10 @@ func startTLSServer(t *testing.T) (*httptest.Server, *serverLog) {
 		ClientAuth:   tls.NoClientCert,
 	}
 
-	logger := new(serverLog)
-	server.Config.ErrorLog = log.New(logger, "", 0)
+	serverLogger := new(serverLog)
+	server.Config.ErrorLog = log.New(serverLogger, "", 0)
 
 	server.StartTLS()
 
-	return server, logger
+	return server
 }
