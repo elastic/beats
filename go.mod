@@ -218,30 +218,16 @@ require (
 	go.elastic.co/apm/module/apmhttp/v2 v2.6.3
 	go.elastic.co/apm/v2 v2.7.0
 	go.mongodb.org/mongo-driver v1.17.4
-<<<<<<< HEAD
-	go.opentelemetry.io/collector/component v1.33.0
-	go.opentelemetry.io/collector/component/componentstatus v0.127.0
-	go.opentelemetry.io/collector/config/configtls v1.33.0
-	go.opentelemetry.io/collector/confmap v1.33.0
-	go.opentelemetry.io/collector/consumer v1.33.0
-	go.opentelemetry.io/collector/consumer/consumererror v0.127.0
-	go.opentelemetry.io/collector/exporter/debugexporter v0.127.0
-	go.opentelemetry.io/collector/otelcol v0.127.0
-	go.opentelemetry.io/collector/pdata v1.33.0
-	go.opentelemetry.io/collector/receiver v1.33.0
-=======
 	go.opentelemetry.io/collector/component v1.35.0
 	go.opentelemetry.io/collector/component/componentstatus v0.129.0
 	go.opentelemetry.io/collector/config/configtls v1.35.0
 	go.opentelemetry.io/collector/confmap v1.35.0
-	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.35.0
 	go.opentelemetry.io/collector/consumer v1.35.0
 	go.opentelemetry.io/collector/consumer/consumererror v0.129.0
 	go.opentelemetry.io/collector/exporter/debugexporter v0.129.0
 	go.opentelemetry.io/collector/otelcol v0.129.0
 	go.opentelemetry.io/collector/pdata v1.35.0
 	go.opentelemetry.io/collector/receiver v1.35.0
->>>>>>> 0b1170f2f ([chore] update OTel Collector libraries to v1.35.0/v0.129.0 (#45149))
 	go.uber.org/mock v0.5.0
 	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f
 	golang.org/x/term v0.32.0
