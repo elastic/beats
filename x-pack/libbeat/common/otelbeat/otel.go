@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/fbprovider"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/mbprovider"
+	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
 	"github.com/elastic/elastic-agent-libs/mapstr"
