@@ -119,7 +119,7 @@ func getCollectorSettings(filename string) otelcol.CollectorSettings {
 	info := component.BuildInfo{
 		Command:     "otel",
 		Description: "Beats OTel",
-		Version:     "9.2.0",
+		Version:     version.GetDefaultVersion(),
 	}
 
 	return otelcol.CollectorSettings{
