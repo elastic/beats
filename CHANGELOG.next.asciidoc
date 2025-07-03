@@ -284,6 +284,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 - Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group. {pull}44576[44576]
 - Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
+- Fix histogram values of zero are filtered out on non-amd64 platforms for openmetrics and prometheus {pull}44750[44750]
 
 *Osquerybeat*
 
@@ -472,6 +473,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added support for specifying custom content-types and encodings in gcs input. {issue}44628[44628] {pull}45088[45088]
 - Update CEL mito extensions to v1.21.0. {issue}40762[40762] {pull}45107[45107]
 - Add Fleet health status reporting to the entity analytics input. {issue}44269[44269] {pull}45152[45152]
+- Add Fleet status updating to o356audit input. {issue}44651[44651] {pull}44957[44957]
 
 *Auditbeat*
 
