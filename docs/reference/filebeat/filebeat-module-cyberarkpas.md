@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/docs_collector.py
 
-# CyberArk PAS module [filebeat-module-cyberarkpas]
+# Cyberark PAS module [filebeat-module-cyberarkpas]
 
 ::::{warning}
 This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.

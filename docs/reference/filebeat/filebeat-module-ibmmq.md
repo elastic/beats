@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/docs_collector.py
 
-# ibmmq module [filebeat-module-ibmmq]
+# IBM MQ module [filebeat-module-ibmmq]
 
 The `ibmmq` module collects and parses the queue manager error logs from IBM MQ in the standard format.
 

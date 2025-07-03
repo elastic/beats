@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/docs_collector.py
 
-# threatintel module [filebeat-module-threatintel]
+# Threat Intel module [filebeat-module-threatintel]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/ti_abusech/index.md).

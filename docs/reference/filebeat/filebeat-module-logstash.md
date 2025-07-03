@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/docs_collector.py
 
-# logstash module [filebeat-module-logstash]
+# Logstash module [filebeat-module-logstash]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/logstash/index.md).

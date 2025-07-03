@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/docs_collector.py
 
-# sophos module [filebeat-module-sophos]
+# Sophos module [filebeat-module-sophos]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/sophos/index.md).

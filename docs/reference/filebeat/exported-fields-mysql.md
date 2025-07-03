@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# MySQL fields [exported-fields-mysql]
+# MSSQL fields [exported-fields-mysql]
 
 Module for parsing the MySQL log files.
 

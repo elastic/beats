@@ -243,7 +243,7 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#------------------------------- Mongodb Module -------------------------------
+#------------------------------- MongoDB Module -------------------------------
 #- module: mongodb
   # Logs
   #log:
@@ -257,7 +257,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#-------------------------------- MySQL Module --------------------------------
+#-------------------------------- MSSQL Module --------------------------------
 #- module: mysql
   # Error logs
   #error:

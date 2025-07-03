@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/docs_collector.py
 
-# Crowdstrike module [filebeat-module-crowdstrike]
+# CrowdStrike module [filebeat-module-crowdstrike]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/crowdstrike/index.md).

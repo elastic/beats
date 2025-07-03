@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/docs_collector.py
 
-# Coredns module [filebeat-module-coredns]
+# CoreDNS module [filebeat-module-coredns]
 
 This is a filebeat module for CoreDNS. It supports both standalone CoreDNS deployment and CoreDNS deployment in Kubernetes.
 

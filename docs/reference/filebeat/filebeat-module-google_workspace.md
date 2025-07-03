@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/docs_collector.py
 
-# google_workspace module [filebeat-module-google_workspace]
+# Google Workspace module [filebeat-module-google_workspace]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/google_workspace/index.md).

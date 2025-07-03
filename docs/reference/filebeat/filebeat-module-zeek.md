@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/docs_collector.py
 
-# Zeek module [filebeat-module-zeek]
+# Zeek (Bro) module [filebeat-module-zeek]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/zeek/index.md).

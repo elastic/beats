@@ -1,5 +1,5 @@
 - key: panw
-  title: "Panw"
+  title: Palo Alto Networks
   description: PAN-OS module
   release: beta
   fields:

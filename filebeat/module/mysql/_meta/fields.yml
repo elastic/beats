@@ -1,5 +1,5 @@
 - key: mysql
-  title: "MySQL"
+  title: MSSQL
   description: >
     Module for parsing the MySQL log files.
   short_config: true

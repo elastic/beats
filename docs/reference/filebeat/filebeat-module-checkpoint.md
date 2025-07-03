@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/docs_collector.py
 
-# Checkpoint module [filebeat-module-checkpoint]
+# Check Point module [filebeat-module-checkpoint]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/checkpoint/index.md).
