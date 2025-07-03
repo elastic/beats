@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // chainBuilder builds a new processor chain.
@@ -151,7 +152,8 @@ func newNativeProcessor(constructor processors.Constructor, call gojaCall) (proc
 		cfg = config.NewConfig()
 	}
 
-	p, err := constructor(cfg)
+	// TODO: use a local logger here instead
+	p, err := constructor(cfg, logp.NewLogger(""))
 	if err != nil {
 		return nil, err
 	}

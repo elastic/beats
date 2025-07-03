@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -40,7 +41,7 @@ func init() {
 }
 
 // NewProcessor constructs a new dissect processor.
-func NewProcessor(c *cfg.C) (beat.Processor, error) {
+func NewProcessor(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig
 	err := c.Unpack(&config)
 	if err != nil {
