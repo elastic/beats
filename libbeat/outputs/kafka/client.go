@@ -385,17 +385,10 @@ func (r *msgRef) fail(msg *message, err error) {
 	case errors.Is(err, sarama.ErrInvalidMessage):
 		r.client.log.Errorf("Kafka (topic=%v): dropping invalid message", msg.topic)
 		r.client.observer.PermanentErrors(1)
-
-	case errors.Is(err, sarama.ErrMessageSizeTooLarge) || errors.Is(err, sarama.ErrInvalidMessageSize):
-		r.client.log.Errorf("Kafka (topic=%v): dropping too large message of size %v.",
-			msg.topic,
-			len(msg.key)+len(msg.value))
+	// drop event if it exceeds size larger than max_message_bytes
+	case strings.Contains(err.Error(), "Attempt to produce message larger than configured Producer.MaxMessageBytes"):
+		r.client.log.Errorf("Kafka (topic=%v): dropping message as it exceeds max_mesage_bytes: configure `output.kafka.max_message_bytes` to change this behavior", msg.topic)
 		r.client.observer.PermanentErrors(1)
-
-	case strings.Contains(err.Error(), "kafka: invalid configuration"):
-		r.client.log.Errorf("Kafka (topic=%v): dropping message due to invalid configuration: %v", msg.topic, err)
-		r.client.observer.PermanentErrors(1)
-
 	case isAuthError(err):
 		r.client.log.Errorf("Kafka (topic=%v): authorisation error: %s", msg.topic, err)
 		r.client.observer.PermanentErrors(1)
