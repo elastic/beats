@@ -242,6 +242,19 @@ func IntegTest() {
 // Use TEST_TAGS=tag1,tag2 to add additional build tags.
 // Use MODULE=module to run only tests for `module`.
 func GoIntegTest(ctx context.Context) error {
+
+	// build integration test binary with otel sub command
+	devtools.BuildSystemTestOTelBinary()
+	args := devtools.DefaultGoTestIntegrationFromHostArgs()
+	// ES_USER must be admin in order for the Go Integration tests to function because they require
+	// indices:data/read/search
+	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
+	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
+	// run integration test from home directory
+	args.Packages = []string{"./tests/integration/"}
+	devtools.GoIntegTestFromHost(ctx, args)
+
+	// run module integration test
 	if os.Getenv("CI") == "true" {
 		mg.Deps(devtools.DefineModules)
 	}
@@ -259,6 +272,18 @@ func GoIntegTest(ctx context.Context) error {
 // Use TEST_TAGS=tag1,tag2 to add additional build tags.
 // Use MODULE=module to run only tests for `module`.
 func GoFIPSOnlyIntegTest(ctx context.Context) error {
+	// build integration test binary with otel sub command
+	devtools.BuildSystemTestOTelBinary()
+	args := devtools.DefaultGoTestIntegrationFromHostArgs()
+	// ES_USER must be admin in order for the Go Integration tests to function because they require
+	// indices:data/read/search
+	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
+	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
+	// run integration test from home directory
+	args.Packages = []string{"./tests/integration/"}
+	devtools.GoIntegTestFromHost(ctx, args)
+
+	// run module integration test
 	if os.Getenv("CI") == "true" {
 		mg.Deps(devtools.DefineModules)
 	}
