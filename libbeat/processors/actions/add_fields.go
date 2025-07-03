@@ -18,97 +18,17 @@
 package actions
 
 import (
-	"encoding/json"
-	"fmt"
-
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
-
-type addFields struct {
-	fields    mapstr.M
-	shared    bool
-	overwrite bool
-}
-
-// FieldsKey is the default target key for the add_fields processor.
-const FieldsKey = "fields"
 
 func init() {
 	processors.RegisterPlugin("add_fields",
-		checks.ConfigChecked(CreateAddFields,
-			checks.RequireFields(FieldsKey),
-			checks.AllowedFields(FieldsKey, "target", "when")))
+		checks.ConfigChecked(addfields.CreateAddFields,
+			checks.RequireFields(addfields.FieldsKey),
+			checks.AllowedFields(addfields.FieldsKey, "target", "when")))
 
-	jsprocessor.RegisterPlugin("AddFields", CreateAddFields)
-}
-
-// CreateAddFields constructs an add_fields processor from config.
-func CreateAddFields(c *conf.C) (beat.Processor, error) {
-	config := struct {
-		Fields mapstr.M `config:"fields" validate:"required"`
-		Target *string  `config:"target"`
-	}{}
-	err := c.Unpack(&config)
-	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the add_fields configuration: %w", err)
-	}
-
-	return makeFieldsProcessor(
-		optTarget(config.Target, FieldsKey),
-		config.Fields,
-		true,
-	), nil
-}
-
-// NewAddFields creates a new processor adding the given fields to events.
-// Set `shared` true if there is the chance of labels being changed/modified by
-// subsequent processors.
-func NewAddFields(fields mapstr.M, shared bool, overwrite bool) beat.Processor {
-	return &addFields{fields: fields, shared: shared, overwrite: overwrite}
-}
-
-func (af *addFields) Run(event *beat.Event) (*beat.Event, error) {
-	if event == nil || len(af.fields) == 0 {
-		return event, nil
-	}
-
-	fields := af.fields
-	if af.shared {
-		fields = fields.Clone()
-	}
-
-	if af.overwrite {
-		event.DeepUpdate(fields)
-	} else {
-		event.DeepUpdateNoOverwrite(fields)
-	}
-
-	return event, nil
-}
-
-func (af *addFields) String() string {
-	s, _ := json.Marshal(af.fields)
-	return fmt.Sprintf("add_fields=%s", s)
-}
-
-func optTarget(opt *string, def string) string {
-	if opt == nil {
-		return def
-	}
-	return *opt
-}
-
-func makeFieldsProcessor(target string, fields mapstr.M, shared bool) beat.Processor {
-	if target != "" {
-		fields = mapstr.M{
-			target: fields,
-		}
-	}
-
-	return NewAddFields(fields, shared, true)
+	jsprocessor.RegisterPlugin("AddFields", addfields.CreateAddFields)
 }

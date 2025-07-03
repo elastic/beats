@@ -88,7 +88,7 @@ func newInput(
 	}
 
 	logger = logger.Named("mqtt input").With("hosts", config.Hosts)
-	setupLibraryLogging()
+	setupLibraryLogging(logger)
 
 	clientDisconnected := new(sync.WaitGroup)
 	inflightMessages := new(sync.WaitGroup)
