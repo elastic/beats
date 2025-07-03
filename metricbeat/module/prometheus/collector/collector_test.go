@@ -110,7 +110,7 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 				Metric: []*p.OpenMetric{
 					{
 						Summary: &p.Summary{
-							SampleCount: proto.Uint64(10),
+							SampleCount: proto.Float64(10),
 							SampleSum:   proto.Float64(10),
 							Quantile: []*p.Quantile{
 								{
@@ -152,12 +152,12 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 				Metric: []*p.OpenMetric{
 					{
 						Histogram: &p.Histogram{
-							SampleCount: proto.Uint64(10),
+							SampleCount: proto.Float64(10),
 							SampleSum:   proto.Float64(10),
 							Bucket: []*p.Bucket{
 								{
 									UpperBound:      proto.Float64(0.99),
-									CumulativeCount: proto.Uint64(10),
+									CumulativeCount: proto.Float64(10),
 								},
 							},
 						},
@@ -280,7 +280,7 @@ func TestSkipMetricFamily(t *testing.T) {
 			Metric: []*p.OpenMetric{
 				{
 					Summary: &p.Summary{
-						SampleCount: proto.Uint64(10),
+						SampleCount: proto.Float64(10),
 						SampleSum:   proto.Float64(10),
 						Quantile: []*p.Quantile{
 							{
@@ -299,12 +299,12 @@ func TestSkipMetricFamily(t *testing.T) {
 			Metric: []*p.OpenMetric{
 				{
 					Histogram: &p.Histogram{
-						SampleCount: proto.Uint64(10),
+						SampleCount: proto.Float64(10),
 						SampleSum:   proto.Float64(10),
 						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.99),
-								CumulativeCount: proto.Uint64(10),
+								CumulativeCount: proto.Float64(10),
 							},
 						},
 					},
@@ -408,7 +408,7 @@ func TestFetchEventForCountingMetrics(t *testing.T) {
 		"metrics_count": true,
 	}
 
-	expectedEvents := 11
+	expectedEvents := 12
 
 	testCases := []struct {
 		name                string
@@ -416,6 +416,7 @@ func TestFetchEventForCountingMetrics(t *testing.T) {
 		expectedMetricCount int
 	}{
 		{"Prod API Inf", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "le": "+Inf", "service": "api"}, 1},
+		{"Prod API 0.1", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "le": "0.1", "service": "api"}, 1},
 		{"Prod API 0.5", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "le": "0.5", "service": "api"}, 1},
 		{"Prod API 1", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "le": "1", "service": "api"}, 1},
 		{"Prod API Quantile 0.5", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "quantile": "0.5", "service": "api"}, 1},
@@ -458,26 +459,6 @@ func validateEvent(t *testing.T, event mb.Event, expectedLabels mapstr.M, expect
 	assert.Equal(t, expectedMetricsCount, metricsCount, "Metrics count does not match expected")
 }
 
-// NOTE(shmsr): If "test_histogram_bucket{environment="prod",service="api",le="0.1"} 0"
-// is added to:
-// # HELP test_histogram A test histogram metric
-// # TYPE test_histogram histogram
-// Then a bug occurs for arm64 i.e., uint64(math.NaN()) evaluates to 0 whereas in amd64 it evaluates to 9223372036854775808.
-// So in data.go:
-//
-//	for _, bucket := range histogram.GetBucket() {
-//		if bucket.GetCumulativeCount() == uint64(math.NaN()) || bucket.GetCumulativeCount() == uint64(math.Inf(0)) {
-//
-// and some other similar areas have this issue.
-// So, currently "test_histogram_bucket{environment="prod",service="api",le="0.1"} 0" being ignored when I run my tests
-// darwin/arm64 but works fine on linux/amd64.
-//
-// Related: https://github.com/elastic/beats/issues/34235
-// Also see: https://github.com/golang/go/issues/67756#issuecomment-2142850931
-//
-// TODO(shmsr): We have to handle this properly.
-//
-// For now, I am skipping the test case so that tests passes on both darwin/arm64 and linux/amd64.
 func initServer(endpoint string) *httptest.Server {
 	data := []byte(`# HELP test_gauge A test gauge metric
 # TYPE test_gauge gauge
@@ -495,6 +476,7 @@ test_counter{environment="staging",service="db"} 98
 
 # HELP test_histogram A test histogram metric
 # TYPE test_histogram histogram
+test_histogram_bucket{environment="prod",service="api",le="0.1"} 0
 test_histogram_bucket{environment="prod",service="api",le="0.5"} 1
 test_histogram_bucket{environment="prod",service="api",le="1.0"} 2
 test_histogram_bucket{environment="prod",service="api",le="+Inf"} 3

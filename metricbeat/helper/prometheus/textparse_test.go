@@ -606,7 +606,7 @@ summary_metric_impossible 123
 					Label: []*labels.Label{},
 					Name:  new("summary_metric"),
 					Summary: &Summary{
-						SampleCount: new(uint64(44000)),
+						SampleCount: new(float64(44000)),
 						SampleSum:   new(float64(234892394)),
 						Quantile: []*Quantile{
 							{
@@ -658,7 +658,7 @@ summary_metric_impossible 123
 					Label: []*labels.Label{},
 					Name:  new("summary_metric"),
 					Summary: &Summary{
-						SampleCount: new(uint64(44000)),
+						SampleCount: new(float64(44000)),
 						SampleSum:   new(float64(234892394)),
 						Quantile: []*Quantile{
 							{
@@ -723,15 +723,15 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 					Name: new("http_server_requests_seconds"),
 					Histogram: &Histogram{
 						IsGaugeHistogram: false,
-						SampleCount:      new(uint64(1.0)),
+						SampleCount:      new(float64(1.0)),
 						SampleSum:        new(0.046745444),
 						Bucket: []*Bucket{
 							{
-								CumulativeCount: new(uint64(0)),
+								CumulativeCount: new(float64(0)),
 								UpperBound:      new(0.001),
 							},
 							{
-								CumulativeCount: new(uint64(0)),
+								CumulativeCount: new(float64(0)),
 								UpperBound:      new(0.001048576),
 							},
 						},
@@ -782,15 +782,15 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 					Name: new("http_server_requests_seconds"),
 					Histogram: &Histogram{
 						IsGaugeHistogram: false,
-						SampleCount:      new(uint64(1.0)),
+						SampleCount:      new(float64(1.0)),
 						SampleSum:        new(0.046745444),
 						Bucket: []*Bucket{
 							{
-								CumulativeCount: new(uint64(0)),
+								CumulativeCount: new(float64(0)),
 								UpperBound:      new(0.001),
 							},
 							{
-								CumulativeCount: new(uint64(0)),
+								CumulativeCount: new(float64(0)),
 								UpperBound:      new(0.001048576),
 							},
 						},
@@ -829,11 +829,11 @@ ggh 99
 					Name:  new("ggh"),
 					Histogram: &Histogram{
 						IsGaugeHistogram: true,
-						SampleCount:      new(uint64(2.0)),
+						SampleCount:      new(float64(2.0)),
 						SampleSum:        new(float64(1)),
 						Bucket: []*Bucket{
 							{
-								CumulativeCount: new(uint64(2)),
+								CumulativeCount: new(float64(2)),
 								UpperBound:      new(0.9),
 							},
 						},
