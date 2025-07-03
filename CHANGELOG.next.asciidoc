@@ -423,6 +423,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
 - Update CEL mito extensions to v1.21.0. {issue}40762[40762] {pull}45107[45107]
 - Add Fleet health status reporting to the entity analytics input. {issue}44269[44269] {pull}45152[45152]
+- Add Fleet status updating to o356audit input. {issue}44651[44651] {pull}44957[44957]
 
 *Auditbeat*
 
