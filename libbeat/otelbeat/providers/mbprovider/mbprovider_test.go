@@ -21,6 +21,7 @@ import (
 	"context"
 	_ "embed"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -84,21 +85,18 @@ service:
 `
 
 func TestMetricbeatProvider(t *testing.T) {
-	p := provider{}
+	p := mbProvider{}
 
 	t.Run("test metricbeat provider", func(t *testing.T) {
 
-		tempFile, err := os.CreateTemp("", "metricbeat.yml")
-		require.NoError(t, err, "error creating temp file")
-		defer os.Remove(tempFile.Name()) // Clean up the file after we're done
-		defer tempFile.Close()
+		tempDir := t.TempDir()
 
-		content := []byte(beatsConfig)
-		_, err = tempFile.Write(content)
-		require.NoError(t, err, "error creating temp file")
+		tempFileName := filepath.Join(tempDir, "metricbeat.yml")
+		err := os.WriteFile(tempFileName, []byte(beatsConfig), 0666)
+		require.NoError(t, err, "error writing to temp file")
 
-		// prefix file path with fb:
-		ret, err := p.Retrieve(context.Background(), "mb:"+tempFile.Name(), nil)
+		// prefix file path with mb:
+		ret, err := p.Retrieve(context.Background(), "mb:"+tempFileName, nil)
 		require.NoError(t, err)
 
 		retValue, err := ret.AsRaw()

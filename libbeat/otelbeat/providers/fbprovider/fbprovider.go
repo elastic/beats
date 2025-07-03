@@ -27,26 +27,27 @@ import (
 
 const schemeName = "fb"
 
-type provider struct{}
+type fbProvider struct{}
 
-// The Provider provides configuration, and allows to watch/monitor for changes.
+// NewFactory returns a provider factory that loads filebeat configuration
 func NewFactory() confmap.ProviderFactory {
 	return confmap.NewProviderFactory(newProvider)
 }
 
 func newProvider(confmap.ProviderSettings) confmap.Provider {
-	return &provider{}
+	return &fbProvider{}
 }
 
 // Retrieve retrieves the beat configuration file and constructs otel config
-func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFunc) (*confmap.Retrieved, error) {
+// uri here is the filepath of the beat config
+func (*fbProvider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFunc) (*confmap.Retrieved, error) {
 	return providers.LoadConfig(uri, schemeName)
 }
 
-func (*provider) Scheme() string {
+func (*fbProvider) Scheme() string {
 	return schemeName
 }
 
-func (*provider) Shutdown(context.Context) error {
+func (*fbProvider) Shutdown(context.Context) error {
 	return nil
 }

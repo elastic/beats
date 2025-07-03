@@ -27,26 +27,29 @@ import (
 
 const schemeName = "mb"
 
-type provider struct{}
+type mbProvider struct{}
 
-// The Provider provides configuration, and allows to watch/monitor for changes.
+// NewFactory returns a provider factory that loads metricbeat configuration
 func NewFactory() confmap.ProviderFactory {
 	return confmap.NewProviderFactory(newProvider)
 }
 
 func newProvider(confmap.ProviderSettings) confmap.Provider {
-	return &provider{}
+	return &mbProvider{}
 }
 
 // Retrieve retrieves the beat configuration file and constructs otel config
-func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFunc) (*confmap.Retrieved, error) {
+// uri here is the filepath of the beat config
+func (*mbProvider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFunc) (*confmap.Retrieved, error) {
 	return providers.LoadConfig(uri, schemeName)
 }
 
-func (*provider) Scheme() string {
+// Scheme returns the scheme name
+func (*mbProvider) Scheme() string {
 	return schemeName
 }
 
-func (*provider) Shutdown(context.Context) error {
+// Shutdown is a noop, it always returns nil
+func (*mbProvider) Shutdown(context.Context) error {
 	return nil
 }

@@ -32,6 +32,7 @@ var schemeMap = map[string]string{
 	"mb": "metricbeatreceiver",
 }
 
+// LoadConfig loads beat configuration based on provided scheme-name and uri path
 func LoadConfig(uri string, schemeName string) (*confmap.Retrieved, error) {
 	if !strings.HasPrefix(uri, schemeName+":") {
 		return nil, fmt.Errorf("%q uri is not supported by %q provider", uri, schemeName)
