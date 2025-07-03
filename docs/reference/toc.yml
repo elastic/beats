@@ -1184,7 +1184,6 @@ toc:
             children:
               - file: metricbeat/metricbeat-metricset-windows-perfmon.md
               - file: metricbeat/metricbeat-metricset-windows-service.md
-              - file: metricbeat/metricbeat-metricset-windows-wmi.md
           - file: metricbeat/metricbeat-module-zookeeper.md
             children:
               - file: metricbeat/metricbeat-metricset-zookeeper-connection.md

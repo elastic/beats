@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-gcp.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Google Cloud Platform module [metricbeat-module-gcp]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -265,7 +267,7 @@ The `storage` metricset comes with a predefined dashboard:
 ![metricbeat gcp storage overview](images/metricbeat-gcp-storage-overview.png)
 
 
-### Example configuration [_example_configuration_25]
+## Example configuration [_example_configuration]
 
 The Google Cloud Platform module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -347,7 +349,7 @@ metricbeat.modules:
 ```
 
 
-### Metricsets [_metricsets_31]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
@@ -361,14 +363,3 @@ The following metricsets are available:
 * [metrics](/reference/metricbeat/metricbeat-metricset-gcp-metrics.md)
 * [pubsub](/reference/metricbeat/metricbeat-metricset-gcp-pubsub.md)
 * [storage](/reference/metricbeat/metricbeat-metricset-gcp-storage.md)
-
-
-
-
-
-
-
-
-
-
-
