@@ -567,12 +567,8 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		t := defTime
 		_, tp, v := parser.Series()
 
-		var (
-			lset labels.Labels
-			mets string
-		)
-
-		mets = parser.Metric(&lset)
+		var lset labels.Labels
+		parser.Labels(&lset)
 
 		if !lset.Has(labels.MetricName) {
 			// missing metric name from labels.MetricName, skip.
@@ -580,7 +576,6 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		}
 
 		var lbls strings.Builder
-		lbls.Grow(len(mets))
 		var labelPairs = []*labels.Label{}
 		var qv string // value of le or quantile label
 		for _, l := range lset.Copy() {
