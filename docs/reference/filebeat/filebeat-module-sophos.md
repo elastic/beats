@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-sophos.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Sophos module [filebeat-module-sophos]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -152,7 +154,6 @@ This is a list of SophosXG fields that are mapped to ECS.
 | user_name | source.user.name |
 | ws_protocol | http.version |
 
-
-## Fields [_fields_50]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-sophos.md) section.
