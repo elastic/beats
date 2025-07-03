@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !aix && !solaris
+//go:build linux || darwin || windows
 
 package kubernetes
 
