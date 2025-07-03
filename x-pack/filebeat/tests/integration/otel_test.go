@@ -11,6 +11,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -194,6 +195,15 @@ func assertMonitoring(t *testing.T, port int) {
 	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }
 
+func randomString(l int) string {
+	charsets := []byte("abcdefghijklmnopqrstuvwzyz0123456789")
+	message := make([]byte, l)
+	for i := range message {
+		message[i] = charsets[rand.Intn(len(charsets))]
+	}
+	return string(message)
+}
+
 func TestFilebeatOTelReceiverE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	wantEvents := 1
@@ -206,13 +216,16 @@ func TestFilebeatOTelReceiverE2E(t *testing.T) {
 		"otel",
 	)
 
+	fbReceiverIndex := "logs-integration-" + randomString(5)
+	filebeatIndex := "logs-filebeat-" + randomString(5)
+
 	otelConfig := struct {
 		Index          string
 		MonitoringPort int
 		InputFile      string
 		PathHome       string
 	}{
-		Index:          "logs-integration-default",
+		Index:          fbReceiverIndex,
 		MonitoringPort: 5066,
 		InputFile:      filepath.Join(filebeatOTel.TempDir(), "log.log"),
 		PathHome:       filebeatOTel.TempDir(),
@@ -318,7 +331,7 @@ http.port: %d
 `
 	logFilePath := filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, wantEvents)
-	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
+	s := fmt.Sprintf(beatsCfgFile, logFilePath, filebeatIndex, 5067)
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
 	defer filebeat.Stop()
@@ -335,10 +348,10 @@ http.port: %d
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
-			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+fbReceiverIndex+"*")
 			require.NoError(t, err)
 
-			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-filebeat-default*")
+			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+filebeatIndex+"*")
 			require.NoError(t, err)
 
 			return otelDocs.Hits.Total.Value >= wantEvents && filebeatDocs.Hits.Total.Value >= wantEvents
@@ -387,17 +400,17 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 		Index     string
 		Receivers []receiverConfig
 	}{
-		Index: "logs-integration-default",
+		Index: "logs-integration-multiple-receivers",
 		Receivers: []receiverConfig{
 			{
 				MonitoringPort: 5066,
 				InputFile:      logFilePath,
-				PathHome:       filebeatOTel.TempDir(),
+				PathHome:       filepath.Join(filebeatOTel.TempDir(), "r1"),
 			},
 			{
 				MonitoringPort: 5067,
 				InputFile:      logFilePath,
-				PathHome:       filebeatOTel.TempDir(),
+				PathHome:       filepath.Join(filebeatOTel.TempDir(), "r2"),
 			},
 		},
 	}
@@ -483,7 +496,7 @@ service:
 			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
 			defer findCancel()
 
-			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+otelConfig.Index+"*")
 			require.NoError(t, err)
 
 			return otelDocs.Hits.Total.Value >= wantTotalLogs
