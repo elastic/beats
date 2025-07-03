@@ -39,7 +39,7 @@ func init() {
 
 const (
 	statsPath     = "/_stats"
-	nodeStatsPath = "/_stats"
+	nodeStatsPath = "/_nodes/stats"
 
 	onlyClusterLevel    = "level=cluster"
 	allowClosedIndices  = "&forbid_closed_indices=false"

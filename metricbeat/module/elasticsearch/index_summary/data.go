@@ -29,69 +29,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
-var (
-	schema = s.Schema{
-		"primaries": c.Dict("primaries", indexSummaryDict),
-		"total":     c.Dict("total", indexSummaryDict),
-	}
-)
-
-var indexSummaryDict = s.Schema{
-	"docs": c.Dict("docs", s.Schema{
-		"count":   c.Int("count"),
-		"deleted": c.Int("deleted"),
-	}),
-	"store": c.Dict("store", s.Schema{
-		"size": s.Object{
-			"bytes": c.Int("size_in_bytes"),
-		},
-		"total_data_set_size": s.Object{
-			"bytes": c.Int("total_data_set_size_in_bytes", s.Optional),
-		},
-	}),
-	"segments": c.Dict("segments", s.Schema{
-		"count": c.Int("count"),
-		"memory": s.Object{
-			"bytes": c.Int("memory_in_bytes"),
-		},
-	}),
-	"indexing": indexingDict,
-	"bulk":     bulkStatsDict,
-	"search":   searchDict,
-}
-
-var indexingDict = c.Dict("indexing", s.Schema{
-	"index": s.Object{
-		"count": c.Int("index_total"),
-		"time": s.Object{
-			"ms": c.Int("index_time_in_millis"),
-		},
-	},
-})
-
-var searchDict = c.Dict("search", s.Schema{
-	"query": s.Object{
-		"count": c.Int("query_total"),
-		"time": s.Object{
-			"ms": c.Int("query_time_in_millis"),
-		},
-	},
-})
-
-var bulkStatsDict = c.Dict("bulk", s.Schema{
-	"operations": s.Object{
-		"count": c.Int("total_operations"),
-	},
-	"time": s.Object{
-		"avg": s.Object{
-			"bytes": c.Int("avg_size_in_bytes"),
-		},
-	},
-	"size": s.Object{
-		"bytes": c.Int("total_size_in_bytes"),
-	},
-}, c.DictOptional)
-
 type nodeStatsWrapper struct {
 	Nodes map[string]interface{} `json:"nodes"`
 }
@@ -216,43 +153,6 @@ type BulkSection struct {
 }
 
 func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXPack bool) error {
-	var all struct {
-		Data map[string]interface{} `json:"_all"`
-	}
-
-	err := json.Unmarshal(content, &all)
-	if err != nil {
-		return fmt.Errorf("failure parsing Elasticsearch Stats API response: %w", err)
-	}
-
-	fields, err := schema.Apply(all.Data, s.FailOnRequired)
-	if err != nil {
-		return fmt.Errorf("failure applying stats schema: %w", err)
-	}
-
-	var event mb.Event
-	event.RootFields = mapstr.M{}
-	_, _ = event.RootFields.Put("service.name", elasticsearch.ModuleName)
-
-	event.ModuleFields = mapstr.M{}
-	_, _ = event.ModuleFields.Put("cluster.name", info.ClusterName)
-	_, _ = event.ModuleFields.Put("cluster.id", info.ClusterID)
-
-	event.MetricSetFields = fields
-
-	// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
-	// When using Agent, the index name is overwritten anyways.
-	if isXPack {
-		index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
-		event.Index = index
-	}
-
-	r.Event(event)
-
-	return nil
-}
-
-func eventMappingNewEndpoint(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXPack bool) error {
 	var wrapper nodeStatsWrapper
 	if err := json.Unmarshal(content, &wrapper); err != nil {
 		return fmt.Errorf("failure parsing NodeStats API response: %w", err)

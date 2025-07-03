@@ -129,7 +129,7 @@ func TestSummaryFromNodeStatsWithExpectedEventsV817(t *testing.T) {
 			ClusterName: "helloworld",
 		},
 		true,
-		eventMappingNewEndpoint,
+		eventMapping,
 	)
 }
 
@@ -143,7 +143,7 @@ func TestSummaryMissingField(t *testing.T) {
 		},
 		true,
 		"error processing node \"Hwq8Kg1eRNaFnFJKrKoqjA\": key `indices.docs.count` not found",
-		eventMappingNewEndpoint,
+		eventMapping,
 	)
 }
 
@@ -157,7 +157,7 @@ func TestSummaryMissingBlock(t *testing.T) {
 		},
 		true,
 		"error processing node \"Hwq8Kg1eRNaFnFJKrKoqjA\": key `indices.segments` not found",
-		eventMappingNewEndpoint,
+		eventMapping,
 	)
 }
 
@@ -171,7 +171,7 @@ func TestSummaryWrongFieldType_String(t *testing.T) {
 		},
 		true,
 		"error processing node \"vF3ak-83RKu_020pnVZJ_w\": wrong format in `indices.store.size_in_bytes`: expected integer, found string",
-		eventMappingNewEndpoint,
+		eventMapping,
 	)
 }
 
@@ -187,7 +187,7 @@ func TestSummaryFromNodeStatsWithExpectedEventsV717(t *testing.T) {
 			ClusterName: "helloworld",
 		},
 		true,
-		eventMappingNewEndpoint,
+		eventMapping,
 	)
 }
 
@@ -203,7 +203,7 @@ func TestSummaryFromNodeStatsWithExpectedEventsXPackV817(t *testing.T) {
 			ClusterName: "helloworld",
 		},
 		false,
-		eventMappingNewEndpoint,
+		eventMapping,
 	)
 }
 
@@ -219,38 +219,6 @@ func TestSummaryFromNodeStatsWithExpectedEventsXPackV717(t *testing.T) {
 			ClusterName: "helloworld",
 		},
 		false,
-		eventMappingNewEndpoint,
-	)
-}
-
-func TestMapperWithExpectedEventsV817(t *testing.T) {
-	elasticsearch.TestMapperWithExpectedEvents(
-		t,
-		"../index/_meta/test/stats.8.17.0.json",
-		[]string{
-			"_meta/test/expected_event_8.17.json",
-		},
-		elasticsearch.Info{
-			ClusterID:   "1234",
-			ClusterName: "helloworld",
-		},
-		true,
-		eventMapping,
-	)
-}
-
-func TestMapperWithExpectedEventsV717(t *testing.T) {
-	elasticsearch.TestMapperWithExpectedEvents(
-		t,
-		"../index/_meta/test/stats.7.17.27.json",
-		[]string{
-			"_meta/test/expected_event_7.17.json",
-		},
-		elasticsearch.Info{
-			ClusterID:   "1234",
-			ClusterName: "helloworld",
-		},
-		true,
 		eventMapping,
 	)
 }
