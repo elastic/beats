@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-logstash.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Logstash module [filebeat-module-logstash]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -121,7 +123,6 @@ This module comes with two sample dashboards.
 
 When using the `log` fileset to parse plaintext logs, if a multiline plaintext log contains an embedded JSON object such that the JSON object starts on a new line, the fileset may not parse the multiline plaintext log event correctly.
 
-
-## Fields [_fields_28]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-logstash.md) section.
