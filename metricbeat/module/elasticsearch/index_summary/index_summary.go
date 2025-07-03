@@ -110,6 +110,6 @@ func getServicePath(esVersion version.V) (string, error) {
 	}
 
 	u.RawQuery += nodeStatsParameters
-	
+
 	return u.String(), nil
 }
