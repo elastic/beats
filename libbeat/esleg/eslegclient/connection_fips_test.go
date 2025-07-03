@@ -22,17 +22,19 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	_ "embed"
-	"github.com/elastic/beats/v7/libbeat/version"
-	cfg "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/stretchr/testify/require"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"sync"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/version"
+	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 // TestConnectionTLS tries to connect to a test HTTPS server (pretending
