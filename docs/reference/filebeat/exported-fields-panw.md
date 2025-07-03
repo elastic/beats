@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# panw fields [exported-fields-panw]
+# Palo Alto Networks fields [exported-fields-panw]
 
 Module for Palo Alto Networks (PAN-OS)
 

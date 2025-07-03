@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# kibana fields [exported-fields-kibana]
+# Kibana fields [exported-fields-kibana]
 
 kibana Module
 
