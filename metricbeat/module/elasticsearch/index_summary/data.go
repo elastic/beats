@@ -97,7 +97,7 @@ type IndexSummary struct {
 	Indexing IndexingSection `json:"indexing"`
 	Search   SearchSection   `json:"search"`
 	Segments SegmentSection  `json:"segments"`
-	Bulk     BulkSection     `json:"bulk"`
+	Bulk     *BulkSection    `json:"bulk,omitempty"`
 }
 
 type DocsSection struct {
@@ -215,6 +215,9 @@ func addNodeMetrics(rawNode interface{}, summary *IndexSummary) error {
 
 	// Bulk (optional)
 	if _, err := getInt64(validated, "indices", "bulk", "operations", "count"); err == nil {
+		if summary.Bulk == nil {
+			summary.Bulk = &BulkSection{}
+		}
 		incrementValue(&summary.Bulk.Operations.Count, "indices", "bulk", "operations", "count")
 		incrementValue(&summary.Bulk.Size.Bytes, "indices", "bulk", "size", "bytes")
 		incrementValue(&summary.Bulk.Time.Avg.Bytes, "indices", "bulk", "time", "avg", "bytes")

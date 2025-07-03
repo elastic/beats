@@ -45,19 +45,6 @@
                 "memory": {
                     "bytes": 114024
                 }
-            },
-            "bulk": {
-                "operations": {
-                    "count": 0
-                },
-                "time": {
-                    "avg": {
-                        "bytes": 0
-                    }
-                },
-                "size": {
-                    "bytes": 0
-                }
             }
         },
         "total": {
@@ -93,19 +80,6 @@
                 "count": 80,
                 "memory": {
                     "bytes": 114024
-                }
-            },
-            "bulk": {
-                "operations": {
-                    "count": 0
-                },
-                "time": {
-                    "avg": {
-                        "bytes": 0
-                    }
-                },
-                "size": {
-                    "bytes": 0
                 }
             }
         }
