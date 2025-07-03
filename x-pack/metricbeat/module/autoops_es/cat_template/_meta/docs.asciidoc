@@ -1,5 +1,0 @@
-The `cat_template` metricset.
-
-Main API: https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-indices-get-template-1
-
-This API is used after `_cat/templates` is used to list relevant legacy templates.
