@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-ibmmq.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # IBM MQ module [filebeat-module-ibmmq]
 
 The `ibmmq` module collects and parses the queue manager error logs from IBM MQ in the standard format.
@@ -65,7 +67,6 @@ This module comes with a sample dashboard. For example:
 % TO DO: Use `:class: screenshot`
 ![filebeat ibmmq](images/filebeat-ibmmq.png)
 
-
-## Fields [_fields_21]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-ibmmq.md) section.
