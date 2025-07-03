@@ -1,7 +1,7 @@
 [role="xpack"]
 
 :type: cel
-:mito_version: v1.19.0
+:mito_version: v1.21.0
 :mito_docs: https://pkg.go.dev/github.com/elastic/mito@{mito_version}
 
 [id="{beatname_lc}-input-{type}"]
@@ -154,6 +154,11 @@ See <<cel-state-redact,`redact`>> configuration parameters for settings to exclu
 ==== CEL extension libraries
 
 As noted above the `cel` input provides functions, macros, and global variables to extend the language.
+
+* {mito_docs}/lib#AWS[AWS v4 request signing]
+** {mito_docs}/lib#hdr-Sign_AWS_from_env-AWS[Sign AWS from env]
+** {mito_docs}/lib#hdr-Sign_AWS_from_shared_credentials-AWS[Sign AWS from shared credentials]
+** {mito_docs}/lib#hdr-Sign_AWS_from_static_credentials-AWS[Sign AWS from static credentials]
 
 * {mito_docs}/lib#Collections[Collections]
 ** {mito_docs}/lib#hdr-Collate-Collections[Collate]

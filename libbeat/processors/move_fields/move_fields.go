@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -99,7 +100,7 @@ func (u moveFields) String() string {
 	return "move_fields"
 }
 
-func NewMoveFields(c *config.C) (beat.Processor, error) {
+func NewMoveFields(c *config.C, log *logp.Logger) (beat.Processor, error) {
 	fc := moveFieldsConfig{}
 	err := c.Unpack(&fc)
 	if err != nil {

@@ -55,7 +55,7 @@ func init() {
 }
 
 // NewRenameFields returns a new rename processor.
-func NewRenameFields(c *conf.C) (beat.Processor, error) {
+func NewRenameFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := renameFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -67,7 +67,7 @@ func NewRenameFields(c *conf.C) (beat.Processor, error) {
 
 	f := &renameFields{
 		config: config,
-		logger: logp.NewLogger("rename"),
+		logger: log.Named("rename"),
 	}
 	return f, nil
 }
