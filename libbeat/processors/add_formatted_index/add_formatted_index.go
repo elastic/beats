@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -47,7 +48,7 @@ func New(formatString *fmtstr.TimestampFormatString) *AddFormattedIndex {
 }
 
 // NewC constructs a new AddFormattedIndex processor from configuration
-func NewC(cfg *conf.C) (beat.Processor, error) {
+func NewC(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	var c config
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, err

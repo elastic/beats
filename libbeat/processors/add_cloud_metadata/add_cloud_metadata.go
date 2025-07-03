@@ -58,7 +58,7 @@ type initData struct {
 }
 
 // New constructs a new add_cloud_metadata processor.
-func New(c *cfg.C) (beat.Processor, error) {
+func New(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := c.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("failed to unpack add_cloud_metadata config: %w", err)
@@ -81,7 +81,7 @@ func New(c *cfg.C) (beat.Processor, error) {
 			tlsConfig: tlsConfig,
 			overwrite: config.Overwrite,
 		},
-		logger: logp.NewLogger("add_cloud_metadata"),
+		logger: log.Named("add_cloud_metadata"),
 	}
 
 	go p.init()
