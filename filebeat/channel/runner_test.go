@@ -19,8 +19,8 @@ package channel
 
 import (
 	"fmt"
-        "runtime"
-        "strings"
+	"runtime"
+	"strings"
 	"testing"
 	"time"
 
@@ -237,11 +237,11 @@ service.type: "module"
 pipeline: "test"
 index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
 `
-        // illumos: this specific test requires add_kubernetes_metadata for side-effects
-        //   in this test which trigger issues for the stubbed version provided for 
-        //   illumos (see prior comment about the side-effects being the purpose).
-        if runtime.GOOS == "illumos"  {
-           configYAML = strings.ReplaceAll(configYAML, "\n  - add_kubernetes_metadata: ~","")
+	// illumos: this specific test requires add_kubernetes_metadata for side-effects
+	//   in this test which trigger issues for the stubbed version provided for
+	//   illumos (see prior comment about the side-effects being the purpose).
+	if runtime.GOOS == "illumos" {
+		configYAML = strings.ReplaceAll(configYAML, "\n  - add_kubernetes_metadata: ~", "")
 	}
 	cfg, err := conf.NewConfigWithYAML([]byte(configYAML), configYAML)
 	require.NoError(t, err)
