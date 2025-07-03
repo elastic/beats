@@ -122,14 +122,11 @@ func BenchmarkFactory(b *testing.B) {
 }
 
 func TestMultipleReceivers(t *testing.T) {
-<<<<<<< HEAD
-=======
 	t.Skip("flaky test, see https://github.com/elastic/beats/issues/43832")
 	// This test verifies that multiple receivers can be instantiated
 	// in isolation, started, and can ingest logs without interfering
 	// with each other.
 
->>>>>>> 5069a00b5 ([oteltest][fbreceiver]: skip TestMultipleReceivers (#45147))
 	// Receivers need distinct home directories so wrap the config in a function.
 	config := func() *Config {
 		return &Config{
