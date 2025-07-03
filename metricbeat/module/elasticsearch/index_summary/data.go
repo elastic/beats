@@ -20,6 +20,7 @@ package index_summary
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 

@@ -64,7 +64,7 @@ func TestMapperWithInfo(t *testing.T, glob string, mapper func(mb.ReporterV2, In
 	files, err := filepath.Glob(glob)
 	require.NoError(t, err)
 	// Makes sure glob matches at least 1 file
-	require.True(t, len(files) > 0)
+	require.True(t, len(files) > 0, "Glob should match at least one file")
 
 	info := Info{
 		ClusterID:   "1234",

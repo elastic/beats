@@ -79,12 +79,12 @@ func TestGetServicePath(t *testing.T) {
 		{
 			name:         "version < BulkStatsAvailableVersion",
 			version:      version.V{Major: 7, Minor: 9, Bugfix: 0},
-			expectedPath: "/_stats?level=cluster",
+			expectedPath: "/_nodes/stats?level=node&filter_path=nodes.*.indices.docs,nodes.*.indices.indexing.index_total,nodes.*.indices.indexing.index_time_in_millis,nodes.*.indices.search.query_total,nodes.*.indices.search.query_time_in_millis,nodes.*.indices.segments.count,nodes.*.indices.segments.memory_in_bytes,nodes.*.indices.store.size_in_bytes,nodes.*.indices.store.total_data_set_size_in_bytes,nodes.*.indices.bulk.*",
 		},
 		{
 			name:         "version >= BulkStatsAvailableVersion",
 			version:      version.V{Major: 8, Minor: 17, Bugfix: 0},
-			expectedPath: "/_stats?level=cluster&forbid_closed_indices=false",
+			expectedPath: "/_nodes/stats?level=node&filter_path=nodes.*.indices.docs,nodes.*.indices.indexing.index_total,nodes.*.indices.indexing.index_time_in_millis,nodes.*.indices.search.query_total,nodes.*.indices.search.query_time_in_millis,nodes.*.indices.segments.count,nodes.*.indices.segments.memory_in_bytes,nodes.*.indices.store.size_in_bytes,nodes.*.indices.store.total_data_set_size_in_bytes,nodes.*.indices.bulk.*",
 		},
 	}
 
@@ -114,7 +114,7 @@ func TestData(t *testing.T) {
 }
 
 func TestMapper(t *testing.T) {
-	elasticsearch.TestMapperWithInfo(t, "../index/_meta/test/stats.*.json", eventMapping)
+	elasticsearch.TestMapperWithInfo(t, "_meta/test/node_stats_v*17.json", eventMapping)
 }
 
 func TestSummaryFromNodeStatsWithExpectedEventsV817(t *testing.T) {
@@ -224,13 +224,14 @@ func TestSummaryFromNodeStatsWithExpectedEventsXPackV717(t *testing.T) {
 }
 
 func TestEmpty(t *testing.T) {
-	input, err := os.ReadFile("../index/_meta/test/empty.512.json")
-	require.NoError(t, err)
+	input, errReading := os.ReadFile("_meta/test/node_stats_empty.json")
+	require.NoError(t, errReading)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	eventMapping(reporter, info, input, true)
-	require.Empty(t, reporter.GetErrors())
-	require.Equal(t, 1, len(reporter.GetEvents()))
+	err := eventMapping(reporter, info, input, true)
+	// require.Empty(t, reporter.GetErrors())
+	require.ErrorContains(t, err, "no nodes found in NodeStats response")
+	require.Equal(t, 0, len(reporter.GetEvents()))
 }
 
 func getConfig(host string) map[string]interface{} {
