@@ -22,11 +22,8 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	_ "embed"
-	"log"
 	"net/http"
 	"net/http/httptest"
-	"strings"
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -88,23 +85,6 @@ var serverKeyPEM []byte // RSA key with length = 1024 bits
 //go:embed testdata/fips_invalid.crt
 var serverCertPEM []byte
 
-type serverLog struct {
-	log strings.Builder
-	mu  sync.Mutex
-}
-
-func (s *serverLog) Write(data []byte) (int, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.log.Write(data)
-}
-
-func (s *serverLog) String() string {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.log.String()
-}
-
 //go:embed testdata/es_ping_response.json
 var esPingResponse []byte
 
@@ -128,9 +108,6 @@ func startTLSServer(t *testing.T) *httptest.Server {
 		ClientCAs:    caCertPool,
 		ClientAuth:   tls.NoClientCert,
 	}
-
-	serverLogger := new(serverLog)
-	server.Config.ErrorLog = log.New(serverLogger, "", 0)
 
 	server.StartTLS()
 
