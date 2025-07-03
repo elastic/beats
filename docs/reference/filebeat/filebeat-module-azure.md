@@ -7,10 +7,6 @@ mapped_pages:
 
 # Azure module [filebeat-module-azure]
 
-::::{warning}
-This module is not available in FIPS-capable Filebeat.
-::::
-
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/azure/index.md).
 
