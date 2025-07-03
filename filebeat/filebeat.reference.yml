@@ -257,7 +257,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#-------------------------------- MSSQL Module --------------------------------
+#-------------------------------- MySQL Module --------------------------------
 #- module: mysql
   # Error logs
   #error:

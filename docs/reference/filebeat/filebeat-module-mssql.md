@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/docs_collector.py
 
-# mssql module [filebeat-module-mssql]
+# MSSQL module [filebeat-module-mssql]
 
 The `mssql` module parses error logs created by MSSQL.
 
