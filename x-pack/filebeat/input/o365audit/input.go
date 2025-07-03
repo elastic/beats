@@ -7,6 +7,7 @@ package o365audit
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -121,19 +122,11 @@ func (inp *o365input) Run(ctx v2.Context, src cursor.Source, cursor cursor.Curso
 	}
 
 	for ctx.Cancelation.Err() == nil {
-<<<<<<< HEAD
-		err := inp.runOnce(ctx, src, cursor, publisher)
-		if err == nil {
-			break
-		}
-		if ctx.Cancelation.Err() != err && err != context.Canceled {
-=======
 		err := inp.run(ctx, stream, cursor, pub, stat)
 		switch {
 		case err == nil, errors.Is(err, context.Canceled):
 			return nil
 		case err != ctx.Cancelation.Err():
->>>>>>> afb987045 (x-pack/filebeat/input/o365audit: add fleet health status reporting (#44957))
 			msg := mapstr.M{}
 			msg.Put("error.message", err.Error())
 			msg.Put("event.kind", "pipeline_error")
@@ -141,15 +134,11 @@ func (inp *o365input) Run(ctx v2.Context, src cursor.Source, cursor cursor.Curso
 				Timestamp: time.Now(),
 				Fields:    msg,
 			}
-<<<<<<< HEAD
-			publisher.Publish(event, nil)
-=======
 			if err := pub.Publish(event, nil); err != nil {
 				stat.UpdateStatus(status.Degraded, "failed to publish error: "+err.Error())
 				ctx.Logger.Errorf("publisher.Publish failed: %v", err)
 			}
 			stat.UpdateStatus(status.Degraded, err.Error())
->>>>>>> afb987045 (x-pack/filebeat/input/o365audit: add fleet health status reporting (#44957))
 			ctx.Logger.Errorf("Input failed: %v", err)
 			ctx.Logger.Infof("Restarting in %v", inp.config.API.ErrorRetryInterval)
 			timed.Wait(ctx.Cancelation, inp.config.API.ErrorRetryInterval)
@@ -159,17 +148,7 @@ func (inp *o365input) Run(ctx v2.Context, src cursor.Source, cursor cursor.Curso
 	return nil
 }
 
-<<<<<<< HEAD
-func (inp *o365input) runOnce(
-	v2ctx v2.Context,
-	src cursor.Source,
-	cursor cursor.Cursor,
-	publisher cursor.Publisher,
-) error {
-	stream := src.(*stream)
-=======
 func (inp *o365input) run(v2ctx v2.Context, stream *stream, cursor cursor.Cursor, pub cursor.Publisher, stat status.StatusReporter) error {
->>>>>>> afb987045 (x-pack/filebeat/input/o365audit: add fleet health status reporting (#44957))
 	tenantID, contentType := stream.tenantID, stream.contentType
 	log := v2ctx.Logger.With("tenantID", tenantID, "contentType", contentType)
 	ctx := ctxtool.FromCanceller(v2ctx.Cancelation)
@@ -309,12 +288,8 @@ func (env apiEnvironment) toBeatEvent(raw json.RawMessage, doc mapstr.M) beat.Ev
 			b.SetID(id)
 		}
 	}
-<<<<<<< HEAD
-	if env.Config.PreserveOriginalEvent {
-=======
 	if env.config.PreserveOriginalEvent {
 		//nolint:errcheck // ignore
->>>>>>> afb987045 (x-pack/filebeat/input/o365audit: add fleet health status reporting (#44957))
 		b.PutValue("event.original", string(raw))
 	}
 	if len(errs) > 0 {
