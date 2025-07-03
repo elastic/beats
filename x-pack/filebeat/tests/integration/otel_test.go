@@ -11,14 +11,15 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"text/template"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -61,6 +62,9 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	numEvents := 1
 
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbOtelIndex := "logs-integration-" + namespace
+	fbIndex := "logs-filebeat-" + namespace
 	// start filebeat in otel mode
 	filebeatOTel := integration.NewBeat(
 		t,
@@ -70,7 +74,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	)
 
 	logFilePath := filepath.Join(filebeatOTel.TempDir(), "log.log")
-	filebeatOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", 5066))
+	filebeatOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, logFilePath, fbOtelIndex, 5066))
 	writeEventsToLogFile(t, logFilePath, numEvents)
 	filebeatOTel.Start()
 	defer filebeatOTel.Stop()
@@ -83,7 +87,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	)
 	logFilePath = filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
+	s := fmt.Sprintf(beatsCfgFile, logFilePath, fbIndex, 5067)
 	s = s + `
 setup.template.name: logs-filebeat-default
 setup.template.pattern: logs-filebeat-default
@@ -115,10 +119,10 @@ setup.template.pattern: logs-filebeat-default
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
-			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+fbOtelIndex+"*")
 			require.NoError(t, err)
 
-			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-filebeat-default*")
+			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+fbIndex+"*")
 			require.NoError(t, err)
 
 			return otelDocs.Hits.Total.Value >= numEvents && filebeatDocs.Hits.Total.Value >= numEvents
@@ -195,15 +199,6 @@ func assertMonitoring(t *testing.T, port int) {
 	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }
 
-func randomString(l int) string {
-	charsets := []byte("abcdefghijklmnopqrstuvwzyz0123456789")
-	message := make([]byte, l)
-	for i := range message {
-		message[i] = charsets[rand.Intn(len(charsets))]
-	}
-	return string(message)
-}
-
 func TestFilebeatOTelReceiverE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	wantEvents := 1
@@ -216,8 +211,9 @@ func TestFilebeatOTelReceiverE2E(t *testing.T) {
 		"otel",
 	)
 
-	fbReceiverIndex := "logs-integration-" + randomString(5)
-	filebeatIndex := "logs-filebeat-" + randomString(5)
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbReceiverIndex := "logs-integration-" + namespace
+	filebeatIndex := "logs-filebeat-" + namespace
 
 	otelConfig := struct {
 		Index          string
@@ -396,21 +392,22 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 		PathHome       string
 	}
 
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	otelConfig := struct {
 		Index     string
 		Receivers []receiverConfig
 	}{
-		Index: "logs-integration-multiple-receivers",
+		Index: "logs-integration-" + namespace,
 		Receivers: []receiverConfig{
 			{
 				MonitoringPort: 5066,
 				InputFile:      logFilePath,
-				PathHome:       filepath.Join(filebeatOTel.TempDir(), "r1"),
+				PathHome:       filebeatOTel.TempDir(),
 			},
 			{
 				MonitoringPort: 5067,
 				InputFile:      logFilePath,
-				PathHome:       filepath.Join(filebeatOTel.TempDir(), "r2"),
+				PathHome:       filebeatOTel.TempDir(),
 			},
 		},
 	}

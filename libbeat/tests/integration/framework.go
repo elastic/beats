@@ -942,7 +942,7 @@ func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
 }
 
 func reportErrors(t *testing.T, tempDir string, beatName string) {
-	var maxlen int64 = 2048
+	var maxlen int64 = 100 * 1024 // 100KB
 	stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
 	if err != nil {
 		t.Logf("error reading stderr: %s", err)
