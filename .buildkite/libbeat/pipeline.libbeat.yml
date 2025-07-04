@@ -104,6 +104,7 @@ steps:
           instanceType: "m5.2xlarge"
         env:
           FIPS: "true"
+          GOEXPERIMENT: "systemcrypto"
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
@@ -132,6 +133,7 @@ steps:
           instanceType: "m5.2xlarge"
         env:
           FIPS: "true"
+          GOEXPERIMENT: "systemcrypto"
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
