@@ -37,7 +37,6 @@ import (
 
 // setup.ilm.* -> supported but the logic is not in place yet
 type unsupportedConfig struct {
-	CompressionLevel   int               `config:"compression_level" `
 	LoadBalance        bool              `config:"loadbalance"`
 	NonIndexablePolicy *config.Namespace `config:"non_indexable_policy"`
 	EscapeHTML         bool              `config:"escape_html"`
@@ -71,10 +70,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	escfg := defaultOptions
 
 	// check for unsupported config
-	err := checkUnsupportedConfig(output)
-	if err != nil {
-		return nil, err
-	}
+	checkUnsupportedConfig(output)
 
 	// apply preset here
 	// It is important to apply preset before unpacking the config, as preset can override output fields
@@ -156,6 +152,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	setIfNotNil(otelYAMLCfg, "pipeline", escfg.Pipeline)  // pipeline
 	// Dynamic routing is disabled if output.elasticsearch.index is set
 	setIfNotNil(otelYAMLCfg, "logs_index", escfg.Index) // index
+	setIfNotNil(otelYAMLCfg, "compression_level::level", escfg.CompressionLevel)
 
 	if err := typeSafetyCheck(otelYAMLCfg); err != nil {
 		return nil, err
@@ -165,16 +162,15 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 }
 
 // log warning for unsupported config
-func checkUnsupportedConfig(cfg *config.C) error {
+func checkUnsupportedConfig(cfg *config.C) {
 	// check if unsupported configuration is provided
 	temp := unsupportedConfig{}
 	if err := cfg.Unpack(&temp); err != nil {
-		return err
+		logp.Warn("failed to unpack configuration %+v", err)
 	}
 
 	if !isStructEmpty(temp) {
 		logp.Warn("these configuration parameters are not supported %+v", temp)
-		return nil
 	}
 
 	// check for dictionary like parameters that we do not support yet
@@ -189,8 +185,6 @@ func checkUnsupportedConfig(cfg *config.C) error {
 	} else if value, _ := cfg.Bool("allow_older_versions", -1); !value {
 		logp.Warn("allow_older_versions:false is currently not supported")
 	}
-
-	return nil
 }
 
 // For type safety check
