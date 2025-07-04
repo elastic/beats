@@ -220,6 +220,7 @@ require (
 	go.elastic.co/apm/v2 v2.7.0
 	go.mongodb.org/mongo-driver v1.17.4
 	go.opentelemetry.io/collector/component v1.35.0
+	go.opentelemetry.io/collector/component/componentstatus v0.129.0
 	go.opentelemetry.io/collector/config/configtls v1.35.0
 	go.opentelemetry.io/collector/confmap v1.35.0
 	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.35.0
@@ -413,7 +414,6 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/collector/client v1.35.0 // indirect
-	go.opentelemetry.io/collector/component/componentstatus v0.129.0 // indirect
 	go.opentelemetry.io/collector/component/componenttest v0.129.0 // indirect
 	go.opentelemetry.io/collector/config/configauth v0.129.0 // indirect
 	go.opentelemetry.io/collector/config/configcompression v1.35.0 // indirect
