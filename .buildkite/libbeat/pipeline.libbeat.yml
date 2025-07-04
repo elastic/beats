@@ -9,6 +9,7 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+  IMAGE_UBUNTU_X86_64_FIPS: "platform-ingest-elastic-agent-ubuntu-2204-fips-1750467641"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -88,7 +89,7 @@ steps:
           - github_commit_status:
               context: "libbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: Libbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+      - label: ":ubuntu: Libbeat: Ubuntu x86_64 Unit Tests with fips provider and requirefips build tag"
         key: "mandatory-linux-unit-test-fips-tag"
         command: |
           set -euo pipefail
@@ -98,9 +99,9 @@ steps:
           automatic:
             - limit: 1
         agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+          provider: "aws"
+          image: "${IMAGE_UBUNTU_X86_64_FIPS}"
+          instanceType: "m5.2xlarge"
         env:
           FIPS: "true"
         artifact_paths:
@@ -114,9 +115,9 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "libbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+              context: "libbeat: Ubuntu x86_64 Unit Tests with fips provider and requirefipsbuild tag"
 
-      - label: ":ubuntu: Libbeat: Ubuntu x86_64 fips140=only Unit Tests"
+      - label: ":ubuntu: Libbeat: Ubuntu x86_64 with fips provider and fips140=only Unit Tests"
         key: "mandatory-linux-unit-test-fips-only"
         command: |
           set -euo pipefail
@@ -126,9 +127,9 @@ steps:
           automatic:
             - limit: 1
         agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+          provider: "aws"
+          image: "${IMAGE_UBUNTU_X86_64_FIPS}"
+          instanceType: "m5.2xlarge"
         env:
           FIPS: "true"
         artifact_paths:
@@ -142,7 +143,7 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "libbeat: Ubuntu x86_64 fips140=only Unit Tests"
+              context: "libbeat: Ubuntu x86_64 with fips provider and fips140=only Unit Tests"
 
       - label: ":ubuntu: Libbeat: Go Integration Tests"
         command: |
