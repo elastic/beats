@@ -14,98 +14,98 @@
         "primaries": {
             "bulk": {
                 "operations": {
-                    "count": 212
+                    "count": 96584783
                 },
                 "size": {
-                    "bytes": 691652
+                    "bytes": 92666422321295
                 },
                 "time": {
                     "avg": {
-                        "bytes": 1725
+                        "bytes": 2830677
                     }
                 }
             },
             "docs": {
-                "count": 468,
-                "deleted": 0
+                "count": 8030785507,
+                "deleted": 23527
             },
             "indexing": {
                 "index": {
-                    "count": 472,
+                    "count": 56600767530,
                     "time": {
-                        "ms": 274
+                        "ms": 5360597433
                     }
                 }
             },
             "search": {
                 "query": {
-                    "count": 15,
+                    "count": 7898882196,
                     "time": {
-                        "ms": 1
+                        "ms": 5848049597
                     }
                 }
             },
             "segments": {
-                "count": 74,
+                "count": 11284,
                 "memory": {
                     "bytes": 0
                 }
             },
             "store": {
                 "size": {
-                    "bytes": 1454527
+                    "bytes": 1686972455265
                 },
                 "total_data_set_size": {
-                    "bytes": 1454527
+                    "bytes": 1686972455265
                 }
             }
         },
         "total": {
             "bulk": {
                 "operations": {
-                    "count": 212
+                    "count": 96584783
                 },
                 "size": {
-                    "bytes": 691652
+                    "bytes": 92666422321295
                 },
                 "time": {
                     "avg": {
-                        "bytes": 1725
+                        "bytes": 2830677
                     }
                 }
             },
             "docs": {
-                "count": 468,
-                "deleted": 0
+                "count": 8030785507,
+                "deleted": 23527
             },
             "indexing": {
                 "index": {
-                    "count": 472,
+                    "count": 56600767530,
                     "time": {
-                        "ms": 274
+                        "ms": 5360597433
                     }
                 }
             },
             "search": {
                 "query": {
-                    "count": 15,
+                    "count": 7898882196,
                     "time": {
-                        "ms": 1
+                        "ms": 5848049597
                     }
                 }
             },
             "segments": {
-                "count": 74,
+                "count": 11284,
                 "memory": {
                     "bytes": 0
                 }
             },
             "store": {
                 "size": {
-                    "bytes": 1454527
+                    "bytes": 1686972455265
                 },
                 "total_data_set_size": {
-                    "bytes": 1454527
+                    "bytes": 1686972455265
                 }
             }
         }

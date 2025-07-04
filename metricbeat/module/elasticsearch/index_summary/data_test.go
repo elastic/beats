@@ -122,7 +122,7 @@ func TestSummaryFromNodeStatsWithExpectedEventsV817(t *testing.T) {
 		t,
 		"_meta/test/node_stats_v817.json",
 		[]string{
-			"_meta/test/expected_event_8.17_v2.json",
+			"_meta/test/expected_event_8.17.json",
 		},
 		elasticsearch.Info{
 			ClusterID:   "1234",
@@ -180,7 +180,7 @@ func TestSummaryFromNodeStatsWithExpectedEventsV717(t *testing.T) {
 		t,
 		"_meta/test/node_stats_v717.json",
 		[]string{
-			"_meta/test/expected_event_7.17_v2.json",
+			"_meta/test/expected_event_7.17.json",
 		},
 		elasticsearch.Info{
 			ClusterID:   "1234",
@@ -196,7 +196,7 @@ func TestSummaryFromNodeStatsWithExpectedEventsXPackV817(t *testing.T) {
 		t,
 		"_meta/test/node_stats_v817.json",
 		[]string{
-			"_meta/test/expected_event_xpack_8.17_v2.json",
+			"_meta/test/expected_event_xpack_8.17.json",
 		},
 		elasticsearch.Info{
 			ClusterID:   "1234",
@@ -212,7 +212,7 @@ func TestSummaryFromNodeStatsWithExpectedEventsXPackV717(t *testing.T) {
 		t,
 		"_meta/test/node_stats_v717.json",
 		[]string{
-			"_meta/test/expected_event_xpack_7.17_v2.json",
+			"_meta/test/expected_event_xpack_7.17.json",
 		},
 		elasticsearch.Info{
 			ClusterID:   "1234",
@@ -229,7 +229,7 @@ func TestEmpty(t *testing.T) {
 
 	reporter := &mbtest.CapturingReporterV2{}
 	err := eventMapping(reporter, info, input, true)
-	// require.Empty(t, reporter.GetErrors())
+
 	require.ErrorContains(t, err, "no nodes found in NodeStats response")
 	require.Equal(t, 0, len(reporter.GetEvents()))
 }

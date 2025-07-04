@@ -13,73 +13,73 @@
     "MetricSetFields": {
         "primaries": {
             "docs": {
-                "count": 156,
-                "deleted": 98
+                "count": 464,
+                "deleted": 252
+            },
+            "store": {
+                "size": {
+                    "bytes": 85621934
+                },
+                "total_data_set_size": {
+                    "bytes": 85621934
+                }
             },
             "indexing": {
                 "index": {
-                    "count": 251,
+                    "count": 390,
                     "time": {
-                        "ms": 1419
+                        "ms": 1815
                     }
                 }
             },
             "search": {
                 "query": {
-                    "count": 178,
+                    "count": 313,
                     "time": {
-                        "ms": 283
+                        "ms": 806
                     }
                 }
             },
             "segments": {
-                "count": 32,
+                "count": 80,
                 "memory": {
-                    "bytes": 63888
-                }
-            },
-            "store": {
-                "size": {
-                    "bytes": 40202053
-                },
-                "total_data_set_size": {
-                    "bytes": 40202053
+                    "bytes": 114024
                 }
             }
         },
         "total": {
             "docs": {
-                "count": 156,
-                "deleted": 98
+                "count": 464,
+                "deleted": 252
+            },
+            "store": {
+                "size": {
+                    "bytes": 85621934
+                },
+                "total_data_set_size": {
+                    "bytes": 85621934
+                }
             },
             "indexing": {
                 "index": {
-                    "count": 251,
+                    "count": 390,
                     "time": {
-                        "ms": 1419
+                        "ms": 1815
                     }
                 }
             },
             "search": {
                 "query": {
-                    "count": 178,
+                    "count": 313,
                     "time": {
-                        "ms": 283
+                        "ms": 806
                     }
                 }
             },
             "segments": {
-                "count": 32,
+                "count": 80,
                 "memory": {
-                    "bytes": 63888
-                }
-            },
-            "store": {
-                "size": {
-                    "bytes": 40202053
-                },
-                "total_data_set_size": {
-                    "bytes": 40202053
+                    "bytes": 114024
                 }
             }
         }
