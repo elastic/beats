@@ -79,7 +79,7 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.4.0
 	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 	github.com/godbus/dbus/v5 v5.1.0
-	github.com/godror/godror v0.33.2
+	github.com/godror/godror v0.49.0
 	github.com/gofrs/flock v0.8.1
 	github.com/gogo/protobuf v1.3.2
 	github.com/gohugoio/hashstructure v0.5.0
@@ -230,7 +230,23 @@ require (
 	go.opentelemetry.io/collector/receiver v1.38.0
 	go.uber.org/mock v0.5.0
 	golang.org/x/term v0.34.0
+<<<<<<< HEAD
 	google.golang.org/genproto/googleapis/api v0.0.0-20250707201910-8d1bb00bc6a7
+||||||| parent of ac568cdf33 (build(deps): bump github.com/godror/godror from 0.33.2 to 0.49.0)
+	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822
+=======
+	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822
+<<<<<<< HEAD
+	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6
+	golang.org/x/term v0.32.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20250519155744-55703ea1f237
+>>>>>>> ac568cdf33 (build(deps): bump github.com/godror/godror from 0.33.2 to 0.49.0)
+||||||| parent of c15ce78ff1 (Resolve conflicts)
+	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6
+	golang.org/x/term v0.32.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20250519155744-55703ea1f237
+=======
+>>>>>>> c15ce78ff1 (Resolve conflicts)
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -274,11 +290,28 @@ require (
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.4.2 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect
+<<<<<<< HEAD
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.29.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.51.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.51.0 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
+||||||| parent of ac568cdf33 (build(deps): bump github.com/godror/godror from 0.33.2 to 0.49.0)
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.27.0 // indirect
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.50.0 // indirect
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.50.0 // indirect
+	github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c // indirect
+	github.com/andybalholm/brotli v1.1.0 // indirect
+	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
+=======
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.27.0 // indirect
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.50.0 // indirect
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.50.0 // indirect
+	github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c // indirect
+	github.com/VictoriaMetrics/easyproto v0.1.4 // indirect
+	github.com/andybalholm/brotli v1.1.0 // indirect
+	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
+>>>>>>> ac568cdf33 (build(deps): bump github.com/godror/godror from 0.33.2 to 0.49.0)
 	github.com/apache/arrow/go/v15 v15.0.2 // indirect
 	github.com/apache/thrift v0.22.0 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
@@ -335,8 +368,16 @@ require (
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
+<<<<<<< HEAD
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/godror/knownpb v0.1.0 // indirect
+||||||| parent of ac568cdf33 (build(deps): bump github.com/godror/godror from 0.33.2 to 0.49.0)
+	github.com/goccy/go-json v0.10.3 // indirect
+	github.com/godror/knownpb v0.1.0 // indirect
+=======
+	github.com/goccy/go-json v0.10.3 // indirect
+	github.com/godror/knownpb v0.3.0 // indirect
+>>>>>>> ac568cdf33 (build(deps): bump github.com/godror/godror from 0.33.2 to 0.49.0)
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
