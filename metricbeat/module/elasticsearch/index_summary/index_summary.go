@@ -38,11 +38,7 @@ func init() {
 const (
 	nodeStatsPath = "/_nodes/stats"
 
-<<<<<<< HEAD
-	allowClosedIndices = "forbid_closed_indices=false"
-=======
 	nodeStatsParameters = "level=node&filter_path=nodes.*.indices.docs,nodes.*.indices.indexing.index_total,nodes.*.indices.indexing.index_time_in_millis,nodes.*.indices.search.query_total,nodes.*.indices.search.query_time_in_millis,nodes.*.indices.segments.count,nodes.*.indices.segments.memory_in_bytes,nodes.*.indices.store.size_in_bytes,nodes.*.indices.store.total_data_set_size_in_bytes"
->>>>>>> 63a537a17 ([MetricBeat][StackMonitoring] fetching index summary from node/_stats endpoint (#45049))
 )
 
 var (
@@ -111,13 +107,7 @@ func getServicePath() (string, error) {
 		return "", err
 	}
 
-<<<<<<< HEAD
-	if !esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
-		u.RawQuery += allowClosedIndices
-	}
-=======
 	u.RawQuery += nodeStatsParameters
->>>>>>> 63a537a17 ([MetricBeat][StackMonitoring] fetching index summary from node/_stats endpoint (#45049))
 
 	return u.String(), nil
 }
