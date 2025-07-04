@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type bufferSource struct{ buf *bytes.Buffer }
@@ -385,7 +386,7 @@ func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg Config) reade
 		t.Fatalf("Failed to initialize line reader: %v", err)
 	}
 
-	r, err = New(readfile.NewStripNewline(r, readfile.LineFeed), "\n", 1<<20, &cfg)
+	r, err = New(readfile.NewStripNewline(r, readfile.LineFeed), "\n", 1<<20, &cfg, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("failed to initialize reader: %v", err)
 	}

@@ -24,11 +24,11 @@ type MockService struct {
 }
 
 // NewMockClient instantiates a new client with the mock billing service
-func NewMockClient() *Client {
+func NewMockClient(logger *logp.Logger) *Client {
 	return &Client{
 		new(MockService),
 		Config{},
-		logp.NewLogger("test azure appinsights"),
+		logger.Named("test azure appinsights"),
 	}
 }
 

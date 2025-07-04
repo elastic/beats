@@ -53,10 +53,10 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the translate_ldap_attribute configuration: %w", err)
 	}
 
-	return newFromConfig(c)
+	return newFromConfig(c, log)
 }
 
-func newFromConfig(c config) (*processor, error) {
+func newFromConfig(c config, logger *logp.Logger) (*processor, error) {
 	ldapConfig := &ldapConfig{
 		address:         c.LDAPAddress,
 		baseDN:          c.LDAPBaseDN,
@@ -80,7 +80,7 @@ func newFromConfig(c config) (*processor, error) {
 	return &processor{
 		config: c,
 		client: client,
-		log:    logp.NewLogger(logName),
+		log:    logger.Named(logName),
 	}, nil
 }
 

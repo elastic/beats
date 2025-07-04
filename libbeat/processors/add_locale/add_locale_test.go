@@ -103,8 +103,7 @@ func BenchmarkConstruct(b *testing.B) {
 
 	input := mapstr.M{}
 
-	logger, _ := logp.NewDevelopmentLogger(" ")
-	p, err := New(testConfig, logger)
+	p, err := New(testConfig, logp.NewNopLogger())
 	if err != nil {
 		b.Fatal(err)
 	}

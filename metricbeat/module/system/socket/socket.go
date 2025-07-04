@@ -30,7 +30,6 @@ import (
 	sock "github.com/elastic/beats/v7/metricbeat/helper/socket"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 	"github.com/elastic/gosigar/sys/linux"
@@ -76,8 +75,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	if !ptable.Privileged() {
-		logp.Info("socket process info will only be available for processes owned by the %v user "+
-			"because this Beat is not running with enough privileges", os.Geteuid())
+		base.Logger().Infof("socket process info will only be available for processes owned by the %v user because this Beat is not running with enough privileges", os.Geteuid())
 	}
 
 	m := &MetricSet{

@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -303,6 +304,7 @@ func TestParsersConfigAndReading(t *testing.T) {
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
@@ -318,7 +320,7 @@ func TestParsersConfigAndReading(t *testing.T) {
 				return
 			}
 
-			p := c.Create(testReader(test.lines))
+			p := c.Create(testReader(test.lines), logger)
 
 			i := 0
 			msg, err := p.Next()
@@ -597,6 +599,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
@@ -606,7 +609,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 			require.NoError(t, err)
 			c, err := NewConfig(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
 			require.NoError(t, err)
-			p := c.Create(msgReader(test.message))
+			p := c.Create(msgReader(test.message), logger)
 
 			msg, _ := p.Next()
 			require.Equal(t, test.expectedMessage, msg)
@@ -711,6 +714,7 @@ func TestContainerParser(t *testing.T) {
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
@@ -720,7 +724,7 @@ func TestContainerParser(t *testing.T) {
 			require.NoError(t, err)
 			c, err := NewConfig(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
 			require.NoError(t, err)
-			p := c.Create(testReader(test.lines))
+			p := c.Create(testReader(test.lines), logger)
 
 			i := 0
 			msg, err := p.Next()
@@ -756,7 +760,8 @@ func TestParserIncludeMessages(t *testing.T) {
 	err := cfg.Unpack(&c)
 	require.NoError(t, err)
 
-	p := c.Parsers.Create(testReader(lines))
+	logger := logptest.NewTestingLogger(t, "")
+	p := c.Parsers.Create(testReader(lines), logger)
 
 	readMsgs := []string{}
 	msg, err := p.Next()

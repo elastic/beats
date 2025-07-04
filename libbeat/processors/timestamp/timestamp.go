@@ -53,13 +53,13 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, fmt.Errorf("failed to unpack the timestamp configuration: %w", err)
 	}
 
-	return newFromConfig(c)
+	return newFromConfig(c, log)
 }
 
-func newFromConfig(c config) (*processor, error) {
+func newFromConfig(c config, logger *logp.Logger) (*processor, error) {
 	p := &processor{
 		config:  c,
-		log:     logp.NewLogger(logName),
+		log:     logger.Named(logName),
 		isDebug: logp.IsDebug(logName),
 		tz:      c.Timezone.Location(),
 	}

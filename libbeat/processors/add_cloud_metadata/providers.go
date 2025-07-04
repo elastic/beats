@@ -45,7 +45,7 @@ type provider struct {
 }
 
 type metadataFetcher interface {
-	fetchMetadata(context.Context, http.Client) result
+	fetchMetadata(context.Context, http.Client, *logp.Logger) result
 }
 
 // result is the result of a query for a specific hosting provider's metadata.
@@ -183,7 +183,7 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 		go func() {
 			select {
 			case <-ctx.Done():
-			case results <- fetcher.fetchMetadata(ctx, client):
+			case results <- fetcher.fetchMetadata(ctx, client, p.logger):
 			}
 		}()
 	}

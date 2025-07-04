@@ -685,17 +685,17 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 
 	if h.config.DockerJSON != nil {
 		// Docker json-file format, add custom parsing to the pipeline
-		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.Format, h.config.DockerJSON.CRIFlags)
+		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.Format, h.config.DockerJSON.CRIFlags, h.logger)
 	}
 
 	if h.config.JSON != nil {
-		r = readjson.NewJSONReader(r, h.config.JSON)
+		r = readjson.NewJSONReader(r, h.config.JSON, h.logger)
 	}
 
 	r = readfile.NewStripNewline(r, h.config.LineTerminator)
 
 	if h.config.Multiline != nil {
-		r, err = multiline.New(r, "\n", h.config.MaxBytes, h.config.Multiline)
+		r, err = multiline.New(r, "\n", h.config.MaxBytes, h.config.Multiline, h.logger)
 		if err != nil {
 			return nil, err
 		}

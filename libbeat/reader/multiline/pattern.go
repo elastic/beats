@@ -70,6 +70,7 @@ func newMultilinePatternReader(
 	separator string,
 	maxBytes int,
 	config *Config,
+	logger *logp.Logger,
 ) (reader.Reader, error) {
 
 	matcher, err := setupPatternMatcher(config)
@@ -97,7 +98,7 @@ func newMultilinePatternReader(
 		flushMatcher: config.FlushPattern,
 		state:        (*patternReader).readFirst,
 		msgBuffer:    newMessageBuffer(maxBytes, maxLines, []byte(separator), config.SkipNewLine),
-		logger:       logp.NewLogger("reader_multiline"),
+		logger:       logger.Named("reader_multiline"),
 	}
 	return pr, nil
 }

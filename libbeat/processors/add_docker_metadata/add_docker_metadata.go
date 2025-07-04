@@ -74,7 +74,7 @@ const selector = "add_docker_metadata"
 
 // New constructs a new add_docker_metadata processor.
 func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
-	return buildDockerMetadataProcessor(logp.NewLogger(selector), cfg, docker.NewWatcher)
+	return buildDockerMetadataProcessor(log.Named(selector), cfg, docker.NewWatcher)
 }
 
 func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstructor docker.WatcherConstructor) (beat.Processor, error) {

@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
@@ -184,11 +184,12 @@ func TestDecodeJSON(t *testing.T) {
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "json_test")
 	for _, test := range tests {
 
 		var p JSONReader
 		p.cfg = &test.Config
-		p.logger = logp.NewLogger("json_test")
+		p.logger = logger
 		text, M := p.decode([]byte(test.Text))
 		assert.Equal(t, test.ExpectedText, string(text))
 		assert.Equal(t, test.ExpectedMap, M)

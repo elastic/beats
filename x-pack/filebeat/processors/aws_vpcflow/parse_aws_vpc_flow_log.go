@@ -47,11 +47,11 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the "+procName+" processor configuration: %w", err)
 	}
 
-	return newParseAWSVPCFlowLog(c)
+	return newParseAWSVPCFlowLog(c, log)
 }
 
-func newParseAWSVPCFlowLog(c config) (*processor, error) {
-	log := logp.NewLogger(logName)
+func newParseAWSVPCFlowLog(c config, logger *logp.Logger) (*processor, error) {
+	log := logger.Named(logName)
 	if c.ID != "" {
 		log = log.With("instance_id", c.ID)
 	}

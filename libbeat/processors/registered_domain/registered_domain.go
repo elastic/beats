@@ -54,13 +54,13 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the %v processor configuration: %w", procName, err)
 	}
 
-	return newRegisteredDomain(c)
+	return newRegisteredDomain(c, log)
 }
 
-func newRegisteredDomain(c config) (*processor, error) {
+func newRegisteredDomain(c config, logger *logp.Logger) (*processor, error) {
 	cfgwarn.Beta("The " + procName + " processor is beta.")
 
-	log := logp.NewLogger(logName)
+	log := logger.Named(logName)
 	if c.ID != "" {
 		log = log.With("instance_id", c.ID)
 	}

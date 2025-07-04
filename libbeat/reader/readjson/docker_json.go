@@ -60,13 +60,13 @@ type logLine struct {
 }
 
 // New creates a new reader renaming a field
-func New(r reader.Reader, stream string, partial bool, format string, CRIFlags bool) *DockerJSONReader {
+func New(r reader.Reader, stream string, partial bool, format string, CRIFlags bool, logger *logp.Logger) *DockerJSONReader {
 	reader := DockerJSONReader{
 		stream:   stream,
 		partial:  partial,
 		reader:   r,
 		criflags: CRIFlags,
-		logger:   logp.NewLogger("reader_docker_json"),
+		logger:   logger.Named("reader_docker_json"),
 	}
 
 	switch strings.ToLower(format) {
@@ -87,13 +87,13 @@ func New(r reader.Reader, stream string, partial bool, format string, CRIFlags b
 	return &reader
 }
 
-func NewContainerParser(r reader.Reader, config *ContainerJSONConfig) *DockerJSONReader {
+func NewContainerParser(r reader.Reader, config *ContainerJSONConfig, logger *logp.Logger) *DockerJSONReader {
 	reader := DockerJSONReader{
 		stream:   config.Stream.String(),
 		partial:  true,
 		reader:   r,
 		criflags: true,
-		logger:   logp.NewLogger("parser_container"),
+		logger:   logger.Named("parser_container"),
 	}
 
 	switch config.Format {

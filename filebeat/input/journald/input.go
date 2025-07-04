@@ -191,7 +191,7 @@ func (inp *journald) Run(
 			converter:          journalfield.NewConverter(ctx.Logger, nil),
 			canceler:           ctx.Cancelation,
 			saveRemoteHostname: inp.SaveRemoteHostname,
-		})
+		}, logger)
 
 	ctx.UpdateStatus(status.Running, "Running")
 	for {

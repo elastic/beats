@@ -67,7 +67,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		dockerClient:  client,
-		cpuService:    &CPUService{Cores: cpuConfig.Cores},
+		cpuService:    &CPUService{Cores: cpuConfig.Cores, logger: base.Logger()},
 		dedot:         config.DeDot,
 		podman:        config.Podman,
 	}, nil

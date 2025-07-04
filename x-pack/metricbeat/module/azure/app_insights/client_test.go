@@ -13,6 +13,8 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var (
@@ -28,8 +30,9 @@ var (
 )
 
 func TestClient(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	t.Run("return error not valid query", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logger)
 		client.Config = config
 		m := &MockService{}
 		m.On("GetMetricValues", mock.Anything, mock.Anything).Return(insights.ListMetricsResultsItem{}, errors.New("invalid query"))
@@ -40,7 +43,7 @@ func TestClient(t *testing.T) {
 		m.AssertExpectations(t)
 	})
 	t.Run("return results", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logger)
 		client.Config = config
 		m := &MockService{}
 		metrics := []insights.MetricsResultsItem{{}, {}}

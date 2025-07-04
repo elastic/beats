@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestParser(t *testing.T) {
@@ -85,13 +86,14 @@ func TestParser(t *testing.T) {
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			var c Config
 			cfg := config.MustNewConfigFrom(test.config)
 			err := cfg.Unpack(&c)
 			require.NoError(t, err)
-			r := NewParser(newTestReader(test.input), &c)
+			r := NewParser(newTestReader(test.input), &c, logger)
 
 			contents := make([][]byte, 0)
 			msg, err := r.Next()

@@ -14,8 +14,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-var logger = logp.NewLogger("statd")
-
 type metric struct {
 	name     string
 	tags     map[string]string
