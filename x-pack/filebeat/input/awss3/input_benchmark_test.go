@@ -18,6 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -224,7 +225,7 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 		sqsReader := newSQSReaderInput(config, aws.Config{})
 		sqsReader.log = log.Named("sqs")
 		sqsReader.pipeline = newFakePipeline()
-		sqsReader.metrics = newInputMetrics("test_id", monitoring.NewRegistry(), workerCount)
+		sqsReader.metrics = newInputMetrics(v2.Context{MetricsRegistry: monitoring.NewRegistry()}, workerCount)
 		sqsReader.sqs, err = newConstantSQS()
 		require.NoError(t, err)
 		sqsReader.s3 = newConstantS3(t)
@@ -308,8 +309,8 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		log := logp.NewLogger(inputName)
 		log.Infof("benchmark with %d number of workers", numberOfWorkers)
 
-		metricRegistry := monitoring.NewRegistry()
-		metrics := newInputMetrics("test_id", metricRegistry, numberOfWorkers)
+		metrics := newInputMetrics(
+			v2.Context{MetricsRegistry: monitoring.NewRegistry()}, numberOfWorkers)
 		pipeline := newFakePipeline()
 
 		config := makeBenchmarkConfig(t)

@@ -114,7 +114,8 @@ func TestPrepareInputMetrics(t *testing.T) {
 		assert.NotNil(t, c, "client should not be nil")
 	}
 }
-func TestPrepareInputMetrics_reusedReg_deprecatedNewInputRegistry(t *testing.T) {
+
+func TestPrepareInputMetrics_reusedReg_deprecatedDeprecatedMetricsRegistry(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "TestPrepareInputMetrics")
 	inputID := "test_input_id"
 	inputType := "test_input_type"
@@ -129,7 +130,7 @@ func TestPrepareInputMetrics_reusedReg_deprecatedNewInputRegistry(t *testing.T) 
 	require.NotNil(t, reg, "input metrics registry should not be nil")
 	require.NotNil(t, wrappedconnector, "wrapped connector should not be nil")
 
-	got, cancel := inputmon.NewInputRegistry(inputType, inputID, parent)
+	got, cancel := inputmon.NewDeprecatedMetricsRegistry(inputType, inputID, parent)
 	defer cancel()
 	assert.Equal(t, reg, got, "metrics registry should be the same")
 }
@@ -176,6 +177,61 @@ func TestPrepareInputMetrics_safeConcurrentPipelineClientCreation(t *testing.T) 
 				}()
 			}
 			wg.Wait()
+		})
+	}
+}
+
+func TestContextMetricsRegistryOverride(t *testing.T) {
+	tcs := []struct {
+		name       string
+		field      string
+		overrideFn func(ctx Context, val string) *monitoring.Registry
+		value      string
+	}{
+		{
+			name:  "MetricsRegistryOverrideID",
+			field: inputmon.MetricNameID,
+			overrideFn: func(ctx Context, val string) *monitoring.Registry {
+				return ctx.MetricsRegistryOverrideID(val)
+			},
+			value: "new-id",
+		},
+		{
+			name:  "MetricsRegistryOverrideInput",
+			field: inputmon.MetricNameInput,
+			overrideFn: func(ctx Context, val string) *monitoring.Registry {
+				return ctx.MetricsRegistryOverrideInput(val)
+			},
+			value: "new-input-name",
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			parentReg := monitoring.NewRegistry()
+			monitoring.NewString(parentReg, tc.field).Set("old-" + tc.field)
+
+			ctx := Context{
+				Logger:          logptest.NewTestingLogger(t, tc.name),
+				MetricsRegistry: parentReg,
+			}
+
+			modifiedReg := tc.overrideFn(ctx, tc.value)
+			require.NotNil(t, modifiedReg)
+			assert.Equal(t, parentReg, modifiedReg)
+
+			var got string
+			modifiedReg.Visit(
+				monitoring.Full,
+				monitoring.NewKeyValueVisitor(func(key string, value any) {
+					if key == tc.field {
+						if s, ok := value.(string); ok {
+							got = s
+						}
+					}
+				}))
+			assert.Equal(t, tc.value, got,
+				"The %q variable in MetricsRegistry was not set correctly", tc.field)
 		})
 	}
 }

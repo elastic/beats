@@ -11,30 +11,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
-
-// TestInputMetricsClose asserts that metrics registered by this input are
-// removed after Close() is called. This is important because an input with
-// the same ID could be re-registered, and that ID cannot exist in the
-// monitoring registry.
-func TestInputMetricsClose(t *testing.T) {
-	reg := monitoring.NewRegistry()
-
-	metrics := newInputMetrics("aws-s3-aws.cloudfront_logs-8b312b5f-9f99-492c-b035-3dff354a1f01", reg, 1)
-	metrics.Close()
-
-	reg.Do(monitoring.Full, func(s string, _ interface{}) {
-		t.Errorf("registry should be empty, but found %v", s)
-	})
-}
 
 // TestNewInputMetricsInstance asserts that all the metrics are initialized
 // when a newInputMetrics method is invoked. This avoids nil hit panics when
 // a getter is invoked on any uninitialized metric.
 func TestNewInputMetricsInstance(t *testing.T) {
-	reg := monitoring.NewRegistry()
-	metrics := newInputMetrics("some-new-metric-test", reg, 1)
+	metrics := newInputMetrics(v2.Context{MetricsRegistry: monitoring.NewRegistry()}, 1)
 
 	assert.NotNil(t, metrics.sqsMessagesWaiting,
 		metrics.sqsMaxMessagesInflight,
@@ -68,8 +53,7 @@ func TestInputMetricsSQSWorkerUtilization(t *testing.T) {
 		fakeTimeMs.Store(0)
 		defer useFakeCurrentTimeThenReset()()
 
-		reg := monitoring.NewRegistry()
-		metrics := newInputMetrics("test", reg, 1)
+		metrics := newInputMetrics(v2.Context{MetricsRegistry: monitoring.NewRegistry()}, 1)
 		metrics.Close()
 
 		id := metrics.beginSQSWorker()
@@ -84,8 +68,7 @@ func TestInputMetricsSQSWorkerUtilization(t *testing.T) {
 		fakeTimeMs.Store(0)
 		defer useFakeCurrentTimeThenReset()()
 
-		reg := monitoring.NewRegistry()
-		metrics := newInputMetrics("test", reg, 1)
+		metrics := newInputMetrics(v2.Context{MetricsRegistry: monitoring.NewRegistry()}, 1)
 		metrics.Close()
 
 		fakeTimeMs.Add(4000)
@@ -105,8 +88,7 @@ func TestInputMetricsSQSWorkerUtilization(t *testing.T) {
 		fakeTimeMs.Store(0)
 		defer useFakeCurrentTimeThenReset()()
 
-		reg := monitoring.NewRegistry()
-		metrics := newInputMetrics("test", reg, 1)
+		metrics := newInputMetrics(v2.Context{MetricsRegistry: monitoring.NewRegistry()}, 1)
 		metrics.Close()
 
 		id := metrics.beginSQSWorker()

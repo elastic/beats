@@ -11,8 +11,10 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type cloudwatchPoller struct {
@@ -44,7 +46,8 @@ type workResponse struct {
 func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
 	awsRegion string, config config, stateHandler *stateHandler) *cloudwatchPoller {
 	if metrics == nil {
-		metrics = newInputMetrics("", nil)
+		metrics = newInputMetrics(
+			v2.Context{MetricsRegistry: monitoring.NewRegistry()})
 	}
 
 	return &cloudwatchPoller{

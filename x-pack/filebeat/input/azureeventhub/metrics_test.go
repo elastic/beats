@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package azureeventhub
 
@@ -16,6 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -125,8 +125,8 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 			LegacySanitizeOptions: tc.sanitizationOption,
 		}
 
-		reg := monitoring.NewRegistry()
-		metrics := newInputMetrics("test", reg)
+		metrics := newInputMetrics(
+			v2.Context{MetricsRegistry: monitoring.NewRegistry()})
 
 		fakeClient := fakeClient{}
 
@@ -181,7 +181,5 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 
 		// Processor
 		assert.Equal(t, tc.processorRestarts, metrics.processorRestarts.Get())
-
-		metrics.Close() // Stop the metrics collection.
 	}
 }
