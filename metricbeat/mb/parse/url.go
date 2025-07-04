@@ -46,8 +46,12 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 	return func(module mb.Module, host string) (mb.HostData, error) {
 		conf := map[string]interface{}{}
 		err := module.UnpackConfig(conf)
+		// anderson: how to log the config here?
 		if err != nil {
-			return mb.HostData{}, err
+			// anderson: is the error coming from here?
+			// if there is an error conf is most likely nil, but let's try anyay
+			return mb.HostData{}, fmt.Errorf(
+				"anderson: URLHostParserBuilder: error unpacking config: config: %v: %s", conf, err)
 		}
 
 		query, ok := conf["query"]
@@ -272,7 +276,7 @@ func getURL(
 		u.Path = path
 	}
 
-	//Adds the query params in the url
+	// Adds the query params in the url
 	u, err = SetQueryParams(u, query)
 	return u, t, err
 }

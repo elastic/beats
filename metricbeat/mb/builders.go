@@ -130,8 +130,9 @@ func initMetricSets(r *Register, m Module, logger *logp.Logger) ([]MetricSet, er
 		if registration.HostParser != nil {
 			bm.hostData, err = registration.HostParser(bm.Module(), bm.host)
 			if err != nil {
-				errs = append(errs, fmt.Errorf("host parsing failed for %v-%v: %w",
-					bm.Module().Name(), bm.Name(), err))
+				// anderson: error comes from here
+				errs = append(errs, fmt.Errorf("host parsing failed for %v-%v: %w. anderson: bm.host=%s",
+					bm.Module().Name(), bm.Name(), err, bm.host))
 				continue
 			}
 			bm.host = bm.hostData.Host
