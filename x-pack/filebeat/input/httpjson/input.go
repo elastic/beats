@@ -203,10 +203,13 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 
 	metrics := newInputMetrics(reg)
 
-	client, err := newHTTPClient(stdCtx, cfg, stat, log, reg)
+	client, err := newHTTPClient(stdCtx, cfg.Auth, cfg.Request, stat, log, reg, nil)
 	if err != nil {
 		stat.UpdateStatus(status.Failed, "failed to create HTTP client: "+err.Error())
 		return err
+	}
+	if cfg.Auth != nil && cfg.Auth.OAuth2 != nil {
+		cfg.Auth.OAuth2.prepared = client.client
 	}
 
 	requestFactory, err := newRequestFactory(stdCtx, cfg, stat, log, metrics, reg)
@@ -282,34 +285,48 @@ func sanitizeFileName(name string) string {
 	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
-func newHTTPClient(ctx context.Context, config config, stat status.StatusReporter, log *logp.Logger, reg *monitoring.Registry) (*httpClient, error) {
-	client, err := newNetHTTPClient(ctx, config.Request, log, reg)
-	if err != nil {
-		return nil, err
+func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, stat status.StatusReporter, log *logp.Logger, reg *monitoring.Registry, p *Policy) (*httpClient, error) {
+	var (
+		client *http.Client
+		err    error
+	)
+	if authCfg.OAuth2.isEnabled() {
+		client = authCfg.OAuth2.prepared
+		if client == nil {
+			client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
+			if err != nil {
+				return nil, err
+			}
+			client, err = authCfg.OAuth2.client(ctx, client)
+			if err != nil {
+				return nil, err
+			}
+		}
+	} else {
+		client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	if config.Request.Retry.getMaxAttempts() > 1 {
+	if requestCfg.Retry.getMaxAttempts() > 1 {
+		retryPolicy := retryablehttp.DefaultRetryPolicy
+		if p != nil {
+			retryPolicy = p.CustomRetryPolicy
+		}
 		// Make retryable HTTP client if needed.
 		client = (&retryablehttp.Client{
 			HTTPClient:   client,
 			Logger:       newRetryLogger(log),
-			RetryWaitMin: config.Request.Retry.getWaitMin(),
-			RetryWaitMax: config.Request.Retry.getWaitMax(),
-			RetryMax:     config.Request.Retry.getMaxAttempts(),
-			CheckRetry:   retryablehttp.DefaultRetryPolicy,
+			RetryWaitMin: requestCfg.Retry.getWaitMin(),
+			RetryWaitMax: requestCfg.Retry.getWaitMax(),
+			RetryMax:     requestCfg.Retry.getMaxAttempts(),
+			CheckRetry:   retryPolicy,
 			Backoff:      retryablehttp.DefaultBackoff,
 		}).StandardClient()
 	}
 
-	limiter := newRateLimiterFromConfig(config.Request.RateLimit, stat, log)
-
-	if config.Auth.OAuth2.isEnabled() {
-		authClient, err := config.Auth.OAuth2.client(ctx, client)
-		if err != nil {
-			return nil, err
-		}
-		return &httpClient{client: authClient, limiter: limiter}, nil
-	}
+	limiter := newRateLimiterFromConfig(requestCfg.RateLimit, stat, log)
 
 	return &httpClient{client: client, limiter: limiter}, nil
 }
@@ -369,45 +386,6 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 	netHTTPClient.CheckRedirect = checkRedirect(cfg, log)
 
 	return netHTTPClient, nil
-}
-
-func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, stat status.StatusReporter, log *logp.Logger, reg *monitoring.Registry, p ...*Policy) (*httpClient, error) {
-	client, err := newNetHTTPClient(ctx, requestCfg, log, reg)
-	if err != nil {
-		return nil, err
-	}
-
-	var retryPolicyFunc retryablehttp.CheckRetry
-	if len(p) != 0 {
-		retryPolicyFunc = p[0].CustomRetryPolicy
-	} else {
-		retryPolicyFunc = retryablehttp.DefaultRetryPolicy
-	}
-
-	if requestCfg.Retry.getMaxAttempts() > 1 {
-		// Make retryable HTTP client if needed.
-		client = (&retryablehttp.Client{
-			HTTPClient:   client,
-			Logger:       newRetryLogger(log),
-			RetryWaitMin: requestCfg.Retry.getWaitMin(),
-			RetryWaitMax: requestCfg.Retry.getWaitMax(),
-			RetryMax:     requestCfg.Retry.getMaxAttempts(),
-			CheckRetry:   retryPolicyFunc,
-			Backoff:      retryablehttp.DefaultBackoff,
-		}).StandardClient()
-	}
-
-	limiter := newRateLimiterFromConfig(requestCfg.RateLimit, stat, log)
-
-	if authCfg != nil && authCfg.OAuth2.isEnabled() {
-		authClient, err := authCfg.OAuth2.client(ctx, client)
-		if err != nil {
-			return nil, err
-		}
-		return &httpClient{client: authClient, limiter: limiter}, nil
-	}
-
-	return &httpClient{client: client, limiter: limiter}, nil
 }
 
 // clientOption returns constructed client configuration options, including
