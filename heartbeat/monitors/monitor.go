@@ -20,6 +20,7 @@ package monitors
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 
@@ -27,6 +28,7 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
@@ -279,4 +281,39 @@ func (m *Monitor) updateStatus(status status.Status, msg string) {
 	if m.statusReporter != nil {
 		m.statusReporter.UpdateStatus(status, msg)
 	}
+}
+
+func (m *Monitor) SkipMonitor(client beat.Client) error {
+	// Check if the monitor is already stopped
+	if m.state == MON_STOPPED {
+		return nil
+	}
+
+	// Stop the monitor
+	m.Stop()
+
+	// Publish a skipped events for unfinished monitors
+	logp.L().Infof("=== skipping monitor %s === ", m.stdFields.Name)
+	event := beat.Event{
+		Timestamp: time.Now(),
+		Fields: mapstr.M{
+			"monitor": mapstr.M{
+				"status": "skipped",
+				"id":     m.stdFields.ID,
+				"type":   "browser",
+			},
+			"event": mapstr.M{
+				"type":    "heartbeat/summary",
+				"dataset": "browser",
+			},
+			"synthetics": mapstr.M{
+				"type":   "heartbeat/summary",
+				"status": "skipped",
+				"reason": "Heartbeat shutting down",
+			},
+		},
+	}
+
+	client.Publish(event)
+	return nil
 }
