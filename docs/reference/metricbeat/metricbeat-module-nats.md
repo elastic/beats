@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-nats.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # NATS module [metricbeat-module-nats]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -17,14 +19,13 @@ Refer to the [Elastic Integrations documentation](integration-docs://reference/n
 :::::
 
 
-The Nats module uses [Nats monitoring server APIs](https://nats.io/documentation/managing_the_server/monitoring/) to collect metrics.
+The Nats module uses [Nats monitoring server APIs](https://docs.nats.io/running-a-nats-service/nats_admin/monitoring) to collect metrics.
 
 The default metricsets are `stats`, `connections`, `routes` and `subscriptions` while `connection` and `route` metricsets can be enabled to collect detailed metrics per connection/route.
 
-
 ## Compatibility [_compatibility_39]
 
-The Nats module is tested with Nats 1.3.0, 2.0.4 and 2.1.4
+The NATS module is tested with NATS 2.2.6 and 2.11.x. Versions in between are expected to be compatible as well.
 
 
 ## Dashboard [_dashboard_34]
@@ -34,7 +35,7 @@ The Nats module comes with a predefined dashboard. For example:
 ![metricbeat nats dashboard](images/metricbeat_nats_dashboard.png)
 
 
-## Example configuration [_example_configuration_47]
+## Example configuration [_example_configuration]
 
 The NATS module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -61,7 +62,7 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_54]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
@@ -71,10 +72,3 @@ The following metricsets are available:
 * [routes](/reference/metricbeat/metricbeat-metricset-nats-routes.md)
 * [stats](/reference/metricbeat/metricbeat-metricset-nats-stats.md)
 * [subscriptions](/reference/metricbeat/metricbeat-metricset-nats-subscriptions.md)
-
-
-
-
-
-
-
