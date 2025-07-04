@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -280,7 +281,7 @@ func TestTimezone(t *testing.T) {
 				"layouts":  []string{time.ANSIC},
 			})
 
-			processor, err := New(config)
+			processor, err := New(config, logptest.NewTestingLogger(t, ""))
 			if c.Error {
 				require.Error(t, err)
 				return

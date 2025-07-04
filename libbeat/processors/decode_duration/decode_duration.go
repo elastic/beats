@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -82,7 +83,7 @@ func (u decodeDuration) String() string {
 	return "decode_duration"
 }
 
-func NewDecodeDuration(c *config.C) (beat.Processor, error) {
+func NewDecodeDuration(c *config.C, log *logp.Logger) (beat.Processor, error) {
 	fc := decodeDurationConfig{}
 	err := c.Unpack(&fc)
 	if err != nil {

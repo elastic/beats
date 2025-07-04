@@ -158,6 +158,11 @@ func BenchmarkFactory(b *testing.B) {
 }
 
 func TestMultipleReceivers(t *testing.T) {
+	t.Skip("flaky test, see https://github.com/elastic/beats/issues/43832")
+	// This test verifies that multiple receivers can be instantiated
+	// in isolation, started, and can ingest logs without interfering
+	// with each other.
+
 	// Receivers need distinct home directories so wrap the config in a function.
 	config := func(monitorSocket string) *Config {
 		var monitorHost string

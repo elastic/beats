@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -86,8 +87,8 @@ func TestTimezoneFormat(t *testing.T) {
 }
 
 func getActualValue(t *testing.T, config *config.C, input mapstr.M) mapstr.M {
-	log := logp.NewLogger("add_locale_test")
-	p, err := New(config)
+	log := logptest.NewTestingLogger(t, "add_locale_test")
+	p, err := New(config, log)
 	if err != nil {
 		log.Error("Error initializing add_locale")
 		t.Fatal(err)
@@ -102,7 +103,8 @@ func BenchmarkConstruct(b *testing.B) {
 
 	input := mapstr.M{}
 
-	p, err := New(testConfig)
+	logger, _ := logp.NewDevelopmentLogger(" ")
+	p, err := New(testConfig, logger)
 	if err != nil {
 		b.Fatal(err)
 	}
