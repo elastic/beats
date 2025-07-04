@@ -191,6 +191,8 @@ func WithGoIntegTestHostEnv(env map[string]string) map[string]string {
 	// images for the next release after a feature freeze, which causes temporary test failures.
 	env["TESTING_FILEBEAT_ALLOW_OLDER"] = "1"
 
+	env["PUBSUB_EMULATOR_HOST"] = "localhost:8432"
+
 	return env
 }
 
