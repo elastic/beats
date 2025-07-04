@@ -194,6 +194,18 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 	return monitor, nil
 }
 
+// GetAllMonitors returns a slice of all monitors currently managed by this factory.
+func (f *RunnerFactory) GetAllMonitors() []*Monitor {
+	f.mtx.Lock()
+	defer f.mtx.Unlock()
+
+	monitors := make([]*Monitor, 0, len(f.byId))
+	for _, monitor := range f.byId {
+		monitors = append(monitors, monitor)
+	}
+	return monitors
+}
+
 // CheckConfig checks to see if the given monitor config is valid.
 func (f *RunnerFactory) CheckConfig(config *conf.C) error {
 	if !config.Enabled() {
