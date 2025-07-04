@@ -22,7 +22,8 @@ CHANGELOG*
 # Sub-directories/files ownership. Remember that order matters; the last matching pattern takes the most precedence.
 /.buildkite @elastic/observablt-ci @elastic/observablt-ci-contractors
 /.ci/ @elastic/elastic-agent-data-plane @elastic/observablt-ci @elastic/observablt-ci-contractors
-/.github/ @elastic/observablt-ci @elastic/observablt-ci-contractors
+/.github/actions @elastic/observablt-ci @elastic/observablt-ci-contractors
+/.github/workflows @elastic/observablt-ci @elastic/observablt-ci-contractors
 /.github/CODEOWNERS @elastic/beats-tech-leads
 /auditbeat/ @elastic/sec-linux-platform
 /deploy/ @elastic/elastic-agent-data-plane
