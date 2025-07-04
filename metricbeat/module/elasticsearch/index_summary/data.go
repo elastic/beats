@@ -97,7 +97,6 @@ type IndexSummary struct {
 	Indexing IndexingSection `json:"indexing"`
 	Search   SearchSection   `json:"search"`
 	Segments SegmentSection  `json:"segments"`
-	Bulk     *BulkSection    `json:"bulk,omitempty"`
 }
 
 type DocsSection struct {
@@ -137,20 +136,6 @@ type SegmentSection struct {
 	Memory struct {
 		Bytes int64 `json:"bytes"`
 	} `json:"memory"`
-}
-
-type BulkSection struct {
-	Operations struct {
-		Count int64 `json:"count"`
-	} `json:"operations"`
-	Time struct {
-		Avg struct {
-			Bytes int64 `json:"bytes"`
-		} `json:"avg"`
-	} `json:"time"`
-	Size struct {
-		Bytes int64 `json:"bytes"`
-	} `json:"size"`
 }
 
 func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXPack bool) error {
@@ -212,16 +197,6 @@ func addNodeMetrics(rawNode interface{}, summary *IndexSummary) error {
 	// Segments
 	incrementValue(&summary.Segments.Count, "indices", "segments", "count")
 	incrementValue(&summary.Segments.Memory.Bytes, "indices", "segments", "memory", "bytes")
-
-	// Bulk (optional)
-	if _, err := getInt64(validated, "indices", "bulk", "operations", "count"); err == nil {
-		if summary.Bulk == nil {
-			summary.Bulk = &BulkSection{}
-		}
-		incrementValue(&summary.Bulk.Operations.Count, "indices", "bulk", "operations", "count")
-		incrementValue(&summary.Bulk.Size.Bytes, "indices", "bulk", "size", "bytes")
-		incrementValue(&summary.Bulk.Time.Avg.Bytes, "indices", "bulk", "time", "avg", "bytes")
-	}
 
 	return nil
 }

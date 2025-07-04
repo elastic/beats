@@ -20,7 +20,6 @@
 package index_summary
 
 import (
-	"github.com/elastic/elastic-agent-libs/version"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -68,37 +67,6 @@ func createEsMuxer(license string) *http.ServeMux {
 	}))
 
 	return mux
-}
-
-func TestGetServicePath(t *testing.T) {
-	tests := []struct {
-		name         string
-		version      version.V
-		expectedPath string
-	}{
-		{
-			name:         "version < BulkStatsAvailableVersion",
-			version:      version.V{Major: 7, Minor: 9, Bugfix: 0},
-			expectedPath: "/_nodes/stats?level=node&filter_path=nodes.*.indices.docs,nodes.*.indices.indexing.index_total,nodes.*.indices.indexing.index_time_in_millis,nodes.*.indices.search.query_total,nodes.*.indices.search.query_time_in_millis,nodes.*.indices.segments.count,nodes.*.indices.segments.memory_in_bytes,nodes.*.indices.store.size_in_bytes,nodes.*.indices.store.total_data_set_size_in_bytes,nodes.*.indices.bulk.*",
-		},
-		{
-			name:         "version >= BulkStatsAvailableVersion",
-			version:      version.V{Major: 8, Minor: 17, Bugfix: 0},
-			expectedPath: "/_nodes/stats?level=node&filter_path=nodes.*.indices.docs,nodes.*.indices.indexing.index_total,nodes.*.indices.indexing.index_time_in_millis,nodes.*.indices.search.query_total,nodes.*.indices.search.query_time_in_millis,nodes.*.indices.segments.count,nodes.*.indices.segments.memory_in_bytes,nodes.*.indices.store.size_in_bytes,nodes.*.indices.store.total_data_set_size_in_bytes,nodes.*.indices.bulk.*",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			path, err := getServicePath(tt.version)
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-			if path != tt.expectedPath {
-				t.Errorf("expected path %q, got %q", tt.expectedPath, path)
-			}
-		})
-	}
 }
 
 func TestData(t *testing.T) {

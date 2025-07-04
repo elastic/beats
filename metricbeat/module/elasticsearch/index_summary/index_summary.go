@@ -24,8 +24,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
-
-	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // init registers the MetricSet with the central registry.
@@ -40,7 +38,7 @@ func init() {
 const (
 	nodeStatsPath = "/_nodes/stats"
 
-	nodeStatsParameters = "level=node&filter_path=nodes.*.indices.docs,nodes.*.indices.indexing.index_total,nodes.*.indices.indexing.index_time_in_millis,nodes.*.indices.search.query_total,nodes.*.indices.search.query_time_in_millis,nodes.*.indices.segments.count,nodes.*.indices.segments.memory_in_bytes,nodes.*.indices.store.size_in_bytes,nodes.*.indices.store.total_data_set_size_in_bytes,nodes.*.indices.bulk.*"
+	nodeStatsParameters = "level=node&filter_path=nodes.*.indices.docs,nodes.*.indices.indexing.index_total,nodes.*.indices.indexing.index_time_in_millis,nodes.*.indices.search.query_total,nodes.*.indices.search.query_time_in_millis,nodes.*.indices.segments.count,nodes.*.indices.segments.memory_in_bytes,nodes.*.indices.store.size_in_bytes,nodes.*.indices.store.total_data_set_size_in_bytes"
 )
 
 var (
@@ -80,7 +78,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return fmt.Errorf("failed to get info from Elasticsearch: %w", err)
 	}
 
-	if err := m.updateServicePath(*info.Version.Number); err != nil {
+	if err := m.updateServicePath(); err != nil {
 		return err
 	}
 
@@ -92,8 +90,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	return eventMapping(r, info, content, m.XPackEnabled)
 }
 
-func (m *MetricSet) updateServicePath(esVersion version.V) error {
-	p, err := getServicePath(esVersion)
+func (m *MetricSet) updateServicePath() error {
+	p, err := getServicePath()
 	if err != nil {
 		return err
 	}
@@ -102,7 +100,7 @@ func (m *MetricSet) updateServicePath(esVersion version.V) error {
 	return nil
 }
 
-func getServicePath(esVersion version.V) (string, error) {
+func getServicePath() (string, error) {
 	currPath := nodeStatsPath
 	u, err := url.Parse(currPath)
 	if err != nil {
