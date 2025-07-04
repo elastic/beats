@@ -1,0 +1,26 @@
+metricbeat.modules:
+- module: system
+  metricsets:
+    - cpu             # CPU usage
+    - load            # CPU load averages
+    - memory          # Memory usage
+    - network         # Network IO
+    - process         # Per process metrics
+    - process_summary # Process summary
+    - uptime          # System Uptime
+    - socket_summary  # Socket summary
+  enabled: true
+  period: 10s
+  processes: ['.*']
+
+
+output:
+  elasticsearch:
+    hosts: ["https://localhost:9200"]
+    username: elastic
+    password: changeme
+
+setup.kibana:
+  host: https://localhost:5601
+  username: elastic
+  password: changeme

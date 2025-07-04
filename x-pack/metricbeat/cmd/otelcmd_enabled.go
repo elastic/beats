@@ -12,5 +12,6 @@ import (
 )
 
 func addOTelCommand(command *cmd.BeatsRootCmd) {
+	// Name here is the name of the beat
 	command.AddCommand(otelbeat.OTelCmd(Name))
 }
