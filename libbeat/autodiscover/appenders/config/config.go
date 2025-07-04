@@ -57,7 +57,7 @@ func NewConfigAppender(cfg *conf.C) (autodiscover.Appender, error) {
 	var cond conditions.Condition
 
 	if config.ConditionConfig != nil {
-		cond, err = conditions.NewCondition(config.ConditionConfig)
+		cond, err = conditions.NewCondition(config.ConditionConfig, logger)
 		if err != nil {
 			return nil, fmt.Errorf("unable to create condition due to error: %w", err)
 		}

@@ -109,8 +109,8 @@ type ESVersionData struct {
 }
 
 // NewConnection returns a new Elasticsearch client.
-func NewConnection(s ConnectionSettings) (*Connection, error) {
-	logger := logp.NewLogger("esclientleg")
+func NewConnection(s ConnectionSettings, log *logp.Logger) (*Connection, error) {
+	logger := log.Named("esclientleg")
 
 	if s.IdleConnTimeout == 0 {
 		s.IdleConnTimeout = 1 * time.Minute
@@ -203,15 +203,15 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 // output, except for the output specific configuration options.  If multiple hosts
 // are defined in the configuration, a client is returned for each of them.
 // The returned Connection is a non-thread-safe connection.
-func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
+func NewClients(cfg *cfg.C, beatname string, log *logp.Logger) ([]Connection, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
 	if proxyURL := config.Transport.Proxy.URL; proxyURL != nil {
-		logp.Debug("breaking down proxy URL. Scheme: '%s', host[:port]: '%s', path: '%s'", proxyURL.Scheme, proxyURL.Host, proxyURL.Path)
-		logp.Info("using proxy URL: %s", proxyURL.URI().String())
+		log.Debugf("breaking down proxy URL. Scheme: '%s', host[:port]: '%s', path: '%s'", proxyURL.Scheme, proxyURL.Host, proxyURL.Path)
+		log.Infof("using proxy URL: %s", proxyURL.URI().String())
 	}
 
 	params := config.Params
@@ -223,10 +223,11 @@ func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 	for _, host := range config.Hosts {
 		esURL, err := common.MakeURL(config.Protocol, config.Path, host, 9200)
 		if err != nil {
-			logp.Err("invalid host param set: %s, Error: %v", host, err)
+			log.Errorf("invalid host param set: %s, Error: %v", host, err)
 			return nil, err
 		}
 
+		// TODO: use local logger here
 		client, err := NewConnection(ConnectionSettings{
 			URL:              esURL,
 			Beatname:         beatname,
@@ -238,7 +239,7 @@ func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 			Headers:          config.Headers,
 			CompressionLevel: config.CompressionLevel,
 			Transport:        config.Transport,
-		})
+		}, log)
 		if err != nil {
 			return clients, err
 		}
@@ -251,8 +252,8 @@ func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 }
 
 // NewConnectedClient returns a non-thread-safe connection. Make sure for each goroutine you initialize a new connection.
-func NewConnectedClient(ctx context.Context, cfg *cfg.C, beatname string) (*Connection, error) {
-	clients, err := NewClients(cfg, beatname)
+func NewConnectedClient(ctx context.Context, cfg *cfg.C, beatname string, log *logp.Logger) (*Connection, error) {
+	clients, err := NewClients(cfg, beatname, log)
 	if err != nil {
 		return nil, err
 	}

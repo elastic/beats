@@ -37,22 +37,8 @@ func NewConditional(
 			return nil, err
 		}
 
-		return addCondition(cfg, rule)
+		return addCondition(cfg, rule, log)
 	}
-}
-
-// NewConditionList takes a slice of Config objects and turns them into real Condition objects.
-func NewConditionList(configs []conditions.Config) ([]conditions.Condition, error) {
-	out := make([]conditions.Condition, len(configs))
-	for i := range configs {
-		cond, err := conditions.NewCondition(&configs[i])
-		if err != nil {
-			return nil, err
-		}
-
-		out[i] = cond
-	}
-	return out, nil
 }
 
 // WhenProcessor is a tuple of condition plus a Processor.
@@ -65,8 +51,9 @@ type WhenProcessor struct {
 func NewConditionRule(
 	c conditions.Config,
 	p beat.Processor,
+	log *logp.Logger,
 ) (beat.Processor, error) {
-	cond, err := conditions.NewCondition(&c)
+	cond, err := conditions.NewCondition(&c, log)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize condition: %w", err)
 	}
@@ -92,6 +79,7 @@ func (r *WhenProcessor) String() string {
 func addCondition(
 	cfg *config.C,
 	p beat.Processor,
+	log *logp.Logger,
 ) (beat.Processor, error) {
 	if !cfg.HasField("when") {
 		return p, nil
@@ -106,7 +94,7 @@ func addCondition(
 		return nil, err
 	}
 
-	return NewConditionRule(condConfig, p)
+	return NewConditionRule(condConfig, p, log)
 }
 
 type ifThenElseConfig struct {
@@ -130,7 +118,7 @@ func NewIfElseThenProcessor(cfg *config.C, logger *logp.Logger) (*IfThenElseProc
 		return nil, err
 	}
 
-	cond, err := conditions.NewCondition(&c.Cond)
+	cond, err := conditions.NewCondition(&c.Cond, logger)
 	if err != nil {
 		return nil, err
 	}
