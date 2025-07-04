@@ -23,6 +23,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -40,6 +41,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/elastic/go-elasticsearch/v8"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
@@ -692,6 +695,32 @@ func EnsureESIsRunning(t *testing.T) {
 	}
 }
 
+func GetESClient(t *testing.T, scheme string) *elasticsearch.Client {
+	t.Helper()
+	esURL := GetESURL(t, scheme)
+
+	u := esURL.User.Username()
+	p, _ := esURL.User.Password()
+
+	// prepare to query ES
+	esCfg := elasticsearch.Config{
+		Addresses: []string{fmt.Sprintf("%s://%s", esURL.Scheme, esURL.Host)},
+		Username:  u,
+		Password:  p,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
+			},
+		},
+	}
+	es, err := elasticsearch.NewClient(esCfg)
+	if err != nil {
+		t.Fatalf("could not get elasticsearch client due to: %v", err)
+	}
+	return es
+
+}
+
 func (b *BeatProc) FileContains(filename string, match string) string {
 	file, err := os.Open(filename)
 	require.NoErrorf(b.t, err, "error opening: %s", filename)
@@ -913,7 +942,7 @@ func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
 }
 
 func reportErrors(t *testing.T, tempDir string, beatName string) {
-	var maxlen int64 = 2048
+	var maxlen int64 = 100 * 1024 // 100KB
 	stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
 	if err != nil {
 		t.Logf("error reading stderr: %s", err)
