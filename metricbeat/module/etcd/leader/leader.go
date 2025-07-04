@@ -18,10 +18,11 @@
 package leader
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 

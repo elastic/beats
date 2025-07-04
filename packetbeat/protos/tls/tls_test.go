@@ -21,10 +21,11 @@ package tls
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"net"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

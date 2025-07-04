@@ -5,10 +5,11 @@
 package activedirectory
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory/internal/activedirectory"

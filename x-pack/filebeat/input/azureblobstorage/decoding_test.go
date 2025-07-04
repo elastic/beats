@@ -6,13 +6,14 @@ package azureblobstorage
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/blob"
 	azcontainer "github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"

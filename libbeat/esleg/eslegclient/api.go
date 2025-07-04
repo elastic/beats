@@ -18,9 +18,10 @@
 package eslegclient
 
 import (
-	"encoding/json"
 	"fmt"
 	"strconv"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/elastic-agent-libs/version"
 )

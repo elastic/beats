@@ -21,13 +21,14 @@ package eslegclient
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )

@@ -18,10 +18,11 @@
 package fingerprint
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"

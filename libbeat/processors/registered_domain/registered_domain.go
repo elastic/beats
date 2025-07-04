@@ -18,9 +18,10 @@
 package registered_domain
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"golang.org/x/net/publicsuffix"
 

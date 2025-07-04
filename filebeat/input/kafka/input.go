@@ -19,7 +19,6 @@ package kafka
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -27,6 +26,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 

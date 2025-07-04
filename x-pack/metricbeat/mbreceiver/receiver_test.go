@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"io"
 	"math/rand/v2"
@@ -20,6 +19,8 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/elastic-agent-libs/mapstr"

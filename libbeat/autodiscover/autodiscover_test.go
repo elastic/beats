@@ -19,7 +19,6 @@ package autodiscover
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"path/filepath"
@@ -28,6 +27,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"

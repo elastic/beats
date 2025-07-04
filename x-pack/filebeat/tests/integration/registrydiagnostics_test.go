@@ -11,7 +11,6 @@ import (
 	"bufio"
 	"bytes"
 	"compress/gzip"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -19,6 +18,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 

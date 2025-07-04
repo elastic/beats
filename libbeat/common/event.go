@@ -19,12 +19,13 @@ package common
 
 import (
 	"encoding"
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"

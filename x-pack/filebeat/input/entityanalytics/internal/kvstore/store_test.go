@@ -5,10 +5,11 @@
 package kvstore
 
 import (
-	"encoding/json"
 	"errors"
 	"os"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/require"
 	"go.etcd.io/bbolt"

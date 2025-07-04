@@ -18,9 +18,10 @@
 package licenser
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 )
 
 // License represents the license of this beat, the license is fetched and returned from

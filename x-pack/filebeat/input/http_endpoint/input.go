@@ -10,7 +10,6 @@ import (
 	"crypto/tls"
 	"encoding/base32"
 	"encoding/binary"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -23,6 +22,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/rcrowley/go-metrics"
 	"go.elastic.co/ecszap"

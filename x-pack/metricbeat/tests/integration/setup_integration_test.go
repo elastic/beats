@@ -9,13 +9,14 @@ package integration
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

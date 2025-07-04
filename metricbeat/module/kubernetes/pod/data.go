@@ -18,8 +18,9 @@
 package pod
 
 import (
-	"encoding/json"
 	"fmt"
+
+	"github.com/go-json-experiment/json/v1"
 
 	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/mb"

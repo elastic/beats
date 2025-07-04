@@ -19,13 +19,14 @@ package es
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 	"sync"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"

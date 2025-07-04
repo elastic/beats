@@ -18,11 +18,12 @@
 package flows
 
 import (
-	"encoding/json"
 	"flag"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 

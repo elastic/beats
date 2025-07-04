@@ -6,13 +6,14 @@ package streaming
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"flag"
 	"net/url"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"

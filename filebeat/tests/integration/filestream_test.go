@@ -21,7 +21,6 @@ package integration
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -32,6 +31,8 @@ import (
 	"testing"
 	"text/template"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

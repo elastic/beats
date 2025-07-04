@@ -18,11 +18,12 @@
 package syslog
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
 	"sync/atomic"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"

@@ -8,7 +8,6 @@ package okta
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -16,6 +15,8 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )

@@ -28,7 +28,6 @@ import (
 	"crypto/sha512"
 	"debug/elf"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -46,6 +45,8 @@ import (
 	"text/template"
 	"time"
 	"unicode"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/blakesmith/ar"
 	"github.com/magefile/mage/mg"

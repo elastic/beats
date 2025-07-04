@@ -6,11 +6,12 @@ package gcs
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/elastic-agent-libs/mapstr"

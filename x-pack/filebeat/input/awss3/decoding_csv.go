@@ -6,10 +6,11 @@ package awss3
 
 import (
 	"encoding/csv"
-	"encoding/json"
 	"fmt"
 	"io"
 	"slices"
+
+	"github.com/go-json-experiment/json/v1"
 )
 
 // csvDecoder is a decoder for CSV data.

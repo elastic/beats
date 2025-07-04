@@ -18,11 +18,12 @@
 package actions
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"

@@ -20,7 +20,6 @@
 package integration
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -28,6 +27,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/require"
 )

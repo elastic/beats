@@ -18,9 +18,10 @@
 package diskio
 
 import (
-	"encoding/json"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/docker/docker/api/types/container"
 

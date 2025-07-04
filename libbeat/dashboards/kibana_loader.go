@@ -19,13 +19,14 @@ package dashboards
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	beatversion "github.com/elastic/beats/v7/libbeat/version"

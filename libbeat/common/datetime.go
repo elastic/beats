@@ -19,11 +19,12 @@ package common
 
 import (
 	"encoding/binary"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"hash"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/common/dtfmt"
 	conf "github.com/elastic/elastic-agent-libs/config"

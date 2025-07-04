@@ -7,7 +7,6 @@ package http_endpoint
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -21,6 +20,8 @@ import (
 	"strings"
 	"sync/atomic"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"

@@ -7,10 +7,11 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
 	"flag"
 	"log"
 	"os"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef/cef"
 )

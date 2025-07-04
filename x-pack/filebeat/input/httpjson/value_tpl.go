@@ -11,7 +11,6 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"hash"
@@ -23,6 +22,8 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/gofrs/uuid/v5"
 

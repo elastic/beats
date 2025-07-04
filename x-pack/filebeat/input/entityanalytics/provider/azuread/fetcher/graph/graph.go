@@ -9,7 +9,6 @@ package graph
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -20,6 +19,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/gofrs/uuid/v5"
 	"go.elastic.co/ecszap"

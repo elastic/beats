@@ -7,10 +7,11 @@ package awss3
 import (
 	"context"
 	"crypto/sha256"
-	"encoding/json"
 	"errors"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"

@@ -5,9 +5,10 @@
 package aws_vpcflow
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
+
+	"github.com/go-json-experiment/json/v1"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"

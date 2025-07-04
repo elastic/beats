@@ -18,9 +18,10 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
+
+	"github.com/go-json-experiment/json/v1"
 
 	_ "github.com/elastic/beats/v7/metricbeat/include"
 	"github.com/elastic/beats/v7/metricbeat/mb"

@@ -18,12 +18,13 @@
 package mgr_cluster_health
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/require"
 

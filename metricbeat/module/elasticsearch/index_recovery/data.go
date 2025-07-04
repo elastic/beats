@@ -18,8 +18,9 @@
 package index_recovery
 
 import (
-	"encoding/json"
 	"errors"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"fmt"
 

@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/csv"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -16,6 +15,8 @@ import (
 	"os"
 	"slices"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/hashicorp/go-retryablehttp"

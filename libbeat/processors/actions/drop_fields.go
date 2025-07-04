@@ -18,9 +18,10 @@
 package actions
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"errors"
 

@@ -20,10 +20,11 @@ package add_cloud_metadata
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/go-json-experiment/json/v1"
 
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"

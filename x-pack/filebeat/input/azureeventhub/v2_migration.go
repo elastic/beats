@@ -8,12 +8,13 @@ package azureeventhub
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/blob"

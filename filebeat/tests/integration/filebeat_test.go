@@ -21,13 +21,14 @@ package integration
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/require"
 

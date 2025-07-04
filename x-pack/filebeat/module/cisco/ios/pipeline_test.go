@@ -5,9 +5,10 @@
 package ios_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"

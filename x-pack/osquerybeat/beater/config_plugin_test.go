@@ -6,10 +6,11 @@ package beater
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"strings"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/google/go-cmp/cmp"
 

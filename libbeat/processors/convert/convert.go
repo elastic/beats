@@ -18,12 +18,13 @@
 package convert
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
 	"strconv"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"

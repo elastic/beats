@@ -21,7 +21,6 @@ package kafka
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"math/rand/v2"
 	"os"
@@ -29,6 +28,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 

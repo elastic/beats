@@ -22,7 +22,6 @@ package auditd
 import (
 	"bufio"
 	"context"
-	"encoding/json"
 	"flag"
 	"os"
 	"os/user"
@@ -30,6 +29,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 

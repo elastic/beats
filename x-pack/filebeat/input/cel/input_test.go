@@ -7,7 +7,6 @@ package cel
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -21,6 +20,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/icholy/digest"

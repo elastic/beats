@@ -22,7 +22,6 @@ package elasticsearch_test
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -32,6 +31,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/require"
 

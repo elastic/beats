@@ -6,8 +6,9 @@ package collections
 
 import (
 	"bytes"
-	"encoding/json"
 	"sort"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/gofrs/uuid/v5"
 )

@@ -6,11 +6,12 @@ package activedirectory
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/google/go-cmp/cmp"
 

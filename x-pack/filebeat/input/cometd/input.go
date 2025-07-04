@@ -6,12 +6,13 @@ package cometd
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"golang.org/x/time/rate"
 

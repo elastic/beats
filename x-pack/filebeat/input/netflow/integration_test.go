@@ -9,7 +9,6 @@ package netflow_test
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -20,6 +19,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"golang.org/x/time/rate"
 

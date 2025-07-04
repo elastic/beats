@@ -5,11 +5,12 @@
 package mock
 
 import (
-	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"math/rand"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 )
 
 const (

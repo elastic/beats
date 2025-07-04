@@ -71,10 +71,11 @@ Note that this allows for converting, renaming, and restructuring the data.
 package mapstriface
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/schema"

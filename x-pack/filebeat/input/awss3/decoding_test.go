@@ -5,12 +5,13 @@
 package awss3
 
 import (
-	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"

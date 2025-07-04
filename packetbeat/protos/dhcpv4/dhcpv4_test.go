@@ -18,10 +18,11 @@
 package dhcpv4
 
 import (
-	"encoding/json"
 	"net"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/stretchr/testify/assert"

@@ -18,12 +18,13 @@
 package jolokia
 
 import (
-	"encoding/json"
 	"fmt"
 	"net"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/gofrs/uuid/v5"
 

@@ -18,10 +18,11 @@
 package mapstriface
 
 import (
-	"encoding/json"
 	"errors"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 

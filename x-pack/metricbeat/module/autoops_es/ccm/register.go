@@ -7,10 +7,11 @@ package ccm
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"slices"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"

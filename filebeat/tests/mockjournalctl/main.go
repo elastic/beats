@@ -18,11 +18,12 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"math/rand/v2"
 	"os"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 )
 
 // This simple mock for journalclt that can be used to test error conditions.

@@ -18,8 +18,9 @@
 package common
 
 import (
-	"encoding/json"
 	"errors"
+
+	"github.com/go-json-experiment/json/v1"
 )
 
 // JSONBlob is a custom type that can unpack raw JSON strings or objects into

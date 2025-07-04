@@ -20,11 +20,12 @@
 package eslegclient
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 

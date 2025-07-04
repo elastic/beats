@@ -5,11 +5,12 @@
 package azuread
 
 import (
-	"encoding/json"
 	"errors"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"

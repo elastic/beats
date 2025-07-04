@@ -19,7 +19,6 @@ package memlog
 
 import (
 	"bufio"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -27,6 +26,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/elastic-agent-libs/logp"

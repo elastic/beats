@@ -21,7 +21,6 @@ import (
 	"bufio"
 	"context"
 	"crypto/sha256"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -32,6 +31,8 @@ import (
 	"strings"
 	"sync"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 )
 
 var (

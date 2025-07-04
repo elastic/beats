@@ -5,10 +5,11 @@
 package decode_cef
 
 import (
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"go.uber.org/multierr"
 

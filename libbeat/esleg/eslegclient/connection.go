@@ -21,12 +21,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"go.elastic.co/apm/module/apmelasticsearch/v2"
 

@@ -18,10 +18,11 @@
 package inputmon
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"

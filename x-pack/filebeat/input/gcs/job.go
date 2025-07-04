@@ -11,12 +11,13 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"time"
 	"unicode"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"cloud.google.com/go/storage"
 

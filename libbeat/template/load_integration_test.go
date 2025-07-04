@@ -21,7 +21,6 @@ package template
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"math/rand/v2"
 	"net/http"
@@ -32,6 +31,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

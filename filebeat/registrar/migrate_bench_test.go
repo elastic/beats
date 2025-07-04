@@ -20,13 +20,14 @@
 package registrar
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	libfile "github.com/elastic/beats/v7/libbeat/common/file"

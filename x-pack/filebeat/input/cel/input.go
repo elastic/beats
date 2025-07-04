@@ -10,7 +10,6 @@ package cel
 import (
 	"compress/gzip"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -26,6 +25,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/icholy/digest"

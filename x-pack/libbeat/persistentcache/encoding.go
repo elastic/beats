@@ -6,7 +6,8 @@ package persistentcache
 
 import (
 	"bytes"
-	"encoding/json"
+
+	"github.com/go-json-experiment/json/v1"
 
 	ugorjicodec "github.com/ugorji/go/codec"
 )

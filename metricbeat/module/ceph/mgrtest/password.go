@@ -18,10 +18,11 @@
 package mgrtest
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/stretchr/testify/require"
 )

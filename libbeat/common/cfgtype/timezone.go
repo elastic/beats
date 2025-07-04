@@ -18,9 +18,10 @@
 package cfgtype
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	// Embed the timezone database so this code works across platforms.
 	_ "time/tzdata"

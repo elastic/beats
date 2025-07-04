@@ -22,13 +22,14 @@ package integration
 import (
 	"context"
 	_ "embed"
-	"encoding/json"
 	"fmt"
 	"os/exec"
 	"path/filepath"
 	"syscall"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/gofrs/uuid/v5"
 

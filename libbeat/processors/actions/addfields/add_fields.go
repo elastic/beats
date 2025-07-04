@@ -18,8 +18,9 @@
 package addfields
 
 import (
-	"encoding/json"
 	"fmt"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"

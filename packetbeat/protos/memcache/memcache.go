@@ -20,10 +20,11 @@ package memcache
 // Memcache plugin initialization, message/transaction types and transaction initialization/publishing.
 
 import (
-	"encoding/json"
 	"math"
 	"strings"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"

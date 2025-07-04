@@ -18,10 +18,11 @@
 package mime
 
 import (
-	"encoding/json"
 	"encoding/xml"
 	"net/http"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/h2non/filetype"
 )

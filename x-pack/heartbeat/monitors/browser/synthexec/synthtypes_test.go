@@ -6,10 +6,11 @@
 package synthexec
 
 import (
-	"encoding/json"
 	"net/url"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"

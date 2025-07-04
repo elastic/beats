@@ -6,13 +6,14 @@ package usage
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"path"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/time/rate"

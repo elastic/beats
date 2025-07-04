@@ -18,10 +18,11 @@
 package registrar
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/input/file"

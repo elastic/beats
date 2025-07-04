@@ -18,8 +18,9 @@
 package validate
 
 import (
-	"encoding/json"
 	"fmt"
+
+	"github.com/go-json-experiment/json/v1"
 )
 
 // Document takes a document from Elasticsearch in JSON format

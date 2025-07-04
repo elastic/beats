@@ -19,13 +19,14 @@ package module
 
 import (
 	"embed"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"gopkg.in/yaml.v2"
 

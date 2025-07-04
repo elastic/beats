@@ -18,11 +18,12 @@
 package kibana
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/elastic-agent-libs/mapstr"

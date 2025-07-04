@@ -7,7 +7,6 @@ package httpjson
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -16,6 +15,8 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/PaesslerAG/jsonpath"
 

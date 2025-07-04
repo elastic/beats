@@ -5,9 +5,10 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/metricbeat/scripts/msetlists"
 

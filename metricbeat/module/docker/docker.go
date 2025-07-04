@@ -21,10 +21,11 @@ package docker
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	dcontainer "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"

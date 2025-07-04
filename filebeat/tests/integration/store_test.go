@@ -21,13 +21,14 @@ package integration
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )

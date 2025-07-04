@@ -21,12 +21,13 @@ package redis
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/stretchr/testify/assert"

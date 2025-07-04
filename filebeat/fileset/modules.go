@@ -18,12 +18,13 @@
 package fileset
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/go-json-experiment/json/v1"
 
 	"gopkg.in/yaml.v2"
 
