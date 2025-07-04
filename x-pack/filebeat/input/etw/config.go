@@ -51,7 +51,8 @@ type config struct {
 	MatchAllKeyword uint64 `config:"match_all_keyword"`
 	// Session is the name of an existing session to read from.
 	// Run 'logman query -ets' to list existing sessions.
-	Session string `config:"session"`
+	Session        string   `config:"session"`
+	EnableProperty []string `config:"enable_property"`
 }
 
 func convertConfig(cfg config) etw.Config {
@@ -64,6 +65,7 @@ func convertConfig(cfg config) etw.Config {
 		MatchAnyKeyword: cfg.MatchAnyKeyword,
 		MatchAllKeyword: cfg.MatchAllKeyword,
 		Session:         cfg.Session,
+		EnableProperty:  cfg.EnableProperty,
 	}
 }
 
