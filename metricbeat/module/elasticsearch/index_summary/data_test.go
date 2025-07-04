@@ -110,7 +110,7 @@ func TestSummaryMissingField(t *testing.T) {
 			ClusterName: "helloworld",
 		},
 		true,
-		"error processing node \"Hwq8Kg1eRNaFnFJKrKoqjA\": key `indices.docs.count` not found",
+		"error processing node \"Hwq8Kg1eRNaFnFJKrKoqjA\": 1 error: key `indices.docs.count` not found",
 		eventMapping,
 	)
 }
@@ -124,7 +124,7 @@ func TestSummaryMissingBlock(t *testing.T) {
 			ClusterName: "helloworld",
 		},
 		true,
-		"error processing node \"Hwq8Kg1eRNaFnFJKrKoqjA\": key `indices.segments` not found",
+		"error processing node \"Hwq8Kg1eRNaFnFJKrKoqjA\": 1 error: key `indices.segments` not found",
 		eventMapping,
 	)
 }
@@ -138,7 +138,7 @@ func TestSummaryWrongFieldType_String(t *testing.T) {
 			ClusterName: "helloworld",
 		},
 		true,
-		"error processing node \"vF3ak-83RKu_020pnVZJ_w\": wrong format in `indices.store.size_in_bytes`: expected integer, found string",
+		"error processing node \"vF3ak-83RKu_020pnVZJ_w\": 1 error: wrong format in `indices.store.size_in_bytes`: expected integer, found string",
 		eventMapping,
 	)
 }
