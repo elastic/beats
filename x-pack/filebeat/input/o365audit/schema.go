@@ -36,8 +36,8 @@ func (e apiError) String() string {
 	return fmt.Sprintf("api error:%s %s", code, msg)
 }
 
-// ToBeatEvent returns a beat.Event representing the API error.
-func (e apiError) ToBeatEvent() beat.Event {
+// toBeatEvent returns a beat.Event representing the API error.
+func (e apiError) toBeatEvent() beat.Event {
 	code, msg := e.getErrorStrings()
 	return beat.Event{
 		Timestamp: time.Now(),

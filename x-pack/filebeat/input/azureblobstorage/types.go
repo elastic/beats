@@ -16,6 +16,7 @@ import (
 type Source struct {
 	ContainerName            string
 	AccountName              string
+	BatchSize                int
 	MaxWorkers               int
 	Poll                     bool
 	PollInterval             time.Duration
