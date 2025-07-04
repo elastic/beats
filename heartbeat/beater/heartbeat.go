@@ -154,6 +154,9 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	pipeline := b.Publisher
 	var pipelineWrapper monitors.PipelineWrapper = &monitors.NoopPipelineWrapper{}
 	if bt.config.RunOnce {
+		// Wrap publisher using a monitor skipper
+		b.Publisher = monitors.WithSkipMonitorPipeline(pipeline, bt)
+
 		sync := &monitors.SyncPipelineWrapper{}
 
 		pipeline = monitors.WithSyncPipelineWrapper(pipeline, sync)
@@ -322,6 +325,21 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
 	bt.stopOnce.Do(func() { close(bt.done) })
+}
+
+func (bt *Heartbeat) SkipRunningMonitors(client beat.Client) error {
+	logp.L().Info("=== Skipping running monitors ===")
+
+	// Get all monitors from the monitor factory
+	allMonitors := bt.monitorFactory.GetAllMonitors()
+
+	for _, m := range allMonitors {
+		// Close the monitor
+		m.SkipMonitor(client)
+	}
+
+	logp.L().Info("=== Finished publishing skipped events ===")
+	return nil
 }
 
 // makeESClient establishes an ES connection meant to load monitors' state
