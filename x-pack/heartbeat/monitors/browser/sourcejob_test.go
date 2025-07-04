@@ -6,6 +6,7 @@
 package browser
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"path"
@@ -354,4 +355,53 @@ func TestFilterDevFlags(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSourceDecoding(t *testing.T) {
+	script := "a script"
+	encoded := base64.StdEncoding.EncodeToString([]byte(script))
+	timeout := 30
+	cfg := conf.MustNewConfigFrom(mapstr.M{
+		"name": "My Name",
+		"id":   "myId",
+		"source": mapstr.M{
+			"inline": mapstr.M{
+				"script":   encoded,
+				"encoding": "base64",
+			},
+		},
+		"timeout": timeout,
+	})
+	s, e := NewSourceJob(cfg)
+	require.NoError(t, e)
+	require.NotNil(t, s)
+	require.Equal(t, script, s.browserCfg.Source.Inline.Script)
+	require.Equal(t, "", s.Workdir())
+
+	e = s.Close()
+	require.NoError(t, e)
+}
+
+func TestDisabledSourceDecoding(t *testing.T) {
+	script := "a script"
+	encoded := base64.StdEncoding.EncodeToString([]byte(script))
+	timeout := 30
+	cfg := conf.MustNewConfigFrom(mapstr.M{
+		"name": "My Name",
+		"id":   "myId",
+		"source": mapstr.M{
+			"inline": mapstr.M{
+				"script": encoded,
+			},
+		},
+		"timeout": timeout,
+	})
+	s, e := NewSourceJob(cfg)
+	require.NoError(t, e)
+	require.NotNil(t, s)
+	require.Equal(t, encoded, s.browserCfg.Source.Inline.Script)
+	require.Equal(t, "", s.Workdir())
+
+	e = s.Close()
+	require.NoError(t, e)
 }

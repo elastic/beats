@@ -15,7 +15,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"strings"
 	"sync"
@@ -43,7 +42,9 @@ type FilterJourneyConfig struct {
 // where these are unsupported
 var platformCmdMutate func(*SynthCmd) = func(*SynthCmd) {}
 
-var SynthexecTimeout struct{}
+type SynthexecTimeout string
+
+var SynthexecTimeoutKey = SynthexecTimeout("synthexec_timeout")
 
 // ProjectJob will run a single journey by name from the given project.
 func ProjectJob(ctx context.Context, projectPath string, params mapstr.M, filterJourneys FilterJourneyConfig, fields stdfields.StdMonitorFields, extraArgs ...string) (jobs.Job, error) {
@@ -249,7 +250,7 @@ func runCmd(
 	}
 
 	// Get timeout from parent ctx
-	timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
+	timeout, _ := ctx.Value(SynthexecTimeoutKey).(time.Duration)
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	go func() {
 		<-ctx.Done()
@@ -278,7 +279,7 @@ func runCmd(
 			logp.L().Warn("Error executing command '%s' (%d): %s", cmd, cmd.ProcessState.ExitCode(), err)
 
 			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-				timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
+				timeout, _ := ctx.Value(SynthexecTimeoutKey).(time.Duration)
 				cmdError = ECSErrToSynthError(ecserr.NewCmdTimeoutStatusErr(timeout, cmd.String()))
 			} else {
 				cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), cmd.String()))
@@ -343,29 +344,6 @@ func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *S
 			},
 		}, nil
 	}
-}
-
-var emptyStringRegexp = regexp.MustCompile(`^\s*$`)
-
-// jsonToSynthEvent can take a line from the scanner and transform it into a *SynthEvent. Will return
-// nil res on empty lines.
-func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
-	// Skip empty lines
-	if emptyStringRegexp.Match(bytes) {
-		return nil, nil
-	}
-
-	res = &SynthEvent{}
-	err = json.Unmarshal(bytes, res)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if res.Type == "" {
-		return nil, fmt.Errorf("unmarshal succeeded, but no type found for: %s", text)
-	}
-	return res, err
 }
 
 // getNpmRoot gets the closest ancestor path that contains package.json.
