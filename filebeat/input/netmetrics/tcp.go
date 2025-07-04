@@ -43,12 +43,14 @@ type TCP struct {
 
 	lastPacket time.Time
 
-	device         *monitoring.String // name of the device being monitored
-	packets        *monitoring.Uint   // number of packets processed
-	bytes          *monitoring.Uint   // number of bytes processed
-	rxQueue        *monitoring.Uint   // value of the rx_queue field from /proc/net/tcp{,6} (only on linux systems)
-	arrivalPeriod  metrics.Sample     // histogram of the elapsed time between packet arrivals
-	processingTime metrics.Sample     // histogram of the elapsed time between packet receipt and publication
+	device          *monitoring.String // name of the device being monitored
+	packets         *monitoring.Uint   // number of packets processed
+	bytes           *monitoring.Uint   // number of bytes processed
+	rxQueue         *monitoring.Uint   // value of the rx_queue field from /proc/net/tcp{,6} (only on linux systems)
+	arrivalPeriod   metrics.Sample     // histogram of the elapsed time between packet arrivals
+	processingTime  metrics.Sample     // histogram of the elapsed time between packet receipt and publication
+	eventsRead      *monitoring.Uint   // number of events read from the TCP socket
+	eventsPublished *monitoring.Uint   // number of events published
 }
 
 // NewTCP returns a new TCP input metricset. Note that if the id is empty then a nil TCP metricset is returned.
@@ -66,6 +68,9 @@ func NewTCP(inputName string, id string, device string, poll time.Duration, log 
 		rxQueue:         monitoring.NewUint(reg, "receive_queue_length"),
 		arrivalPeriod:   metrics.NewUniformSample(1024),
 		processingTime:  metrics.NewUniformSample(1024),
+
+		eventsRead:      monitoring.NewUint(reg, "events_read"),
+		eventsPublished: monitoring.NewUint(reg, "events_published"),
 	}
 	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
@@ -88,17 +93,27 @@ func NewTCP(inputName string, id string, device string, poll time.Duration, log 
 }
 
 // Log logs metric for the given packet.
-func (m *TCP) Log(data []byte, timestamp time.Time) {
+func (m *TCP) Log(len int, timestamp time.Time) {
 	if m == nil {
 		return
 	}
 	m.processingTime.Update(time.Since(timestamp).Nanoseconds())
 	m.packets.Add(1)
-	m.bytes.Add(uint64(len(data)))
+	m.bytes.Add(uint64(len))
 	if !m.lastPacket.IsZero() {
 		m.arrivalPeriod.Update(timestamp.Sub(m.lastPacket).Nanoseconds())
 	}
 	m.lastPacket = timestamp
+}
+
+// IncEventRead increments the number of events read
+func (m *TCP) IncEventRead() {
+	m.eventsRead.Inc()
+}
+
+// IncEventsPublished increments the number of events published
+func (m *TCP) IncEventsPublished() {
+	m.eventsPublished.Inc()
 }
 
 // poll periodically gets TCP buffer stats from the OS.
