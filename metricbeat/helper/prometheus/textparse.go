@@ -487,6 +487,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		histogramsByName     = map[string]map[string]*OpenMetric{}
 		fam                  *MetricFamily
 		// metricTypes stores the metric type for each metric name.
+		// fake line
 		metricTypes = make(map[string]model.MetricType)
 	)
 
