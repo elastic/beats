@@ -20,9 +20,16 @@ CHANGELOG*
 /NOTICE.txt @elastic/beats-tech-leads
 
 # Sub-directories/files ownership. Remember that order matters; the last matching pattern takes the most precedence.
+<<<<<<< HEAD
 /.buildkite @elastic/ingest-eng-prod
 /.ci/ @elastic/elastic-agent-data-plane @elastic/ingest-eng-prod
 /.github/ @elastic/ingest-eng-prod
+=======
+/.buildkite @elastic/observablt-ci @elastic/observablt-ci-contractors
+/.ci/ @elastic/elastic-agent-data-plane @elastic/observablt-ci @elastic/observablt-ci-contractors
+/.github/actions @elastic/observablt-ci @elastic/observablt-ci-contractors
+/.github/workflows @elastic/observablt-ci @elastic/observablt-ci-contractors
+>>>>>>> 77cd2393e (codeowners: update .github folder (#45186))
 /.github/CODEOWNERS @elastic/beats-tech-leads
 /auditbeat/ @elastic/sec-linux-platform
 /deploy/ @elastic/elastic-agent-data-plane
