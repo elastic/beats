@@ -91,6 +91,13 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 		return nil, nil, err
 	}
 
+	takeOverEnabled, fromIDs, err := loginp.GetTakeOverConfig(cfg)
+	if err != nil {
+		return nil, nil, err
+	}
+	config.TakeOver.Enabled = takeOverEnabled
+	config.TakeOver.FromIDs = fromIDs
+
 	prospector, err := newProspector(config, log)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)

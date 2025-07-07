@@ -239,3 +239,87 @@ id: unique-id-3
 		})
 	}
 }
+
+func TestTakeOverCfg(t *testing.T) {
+	testCases := map[string]struct {
+		cfgYAML     string
+		takeOverCfg takeOverConfig
+		expectErr   bool
+	}{
+		"legacy mode enabled": {
+			cfgYAML: `
+              take_over: true`,
+			takeOverCfg: takeOverConfig{
+				Enabled: true,
+			},
+		},
+		"legacy mode disabled": {
+			cfgYAML: `
+              take_over: false`,
+			takeOverCfg: takeOverConfig{
+				Enabled: false,
+			},
+		},
+		"new mode enabled": {
+			cfgYAML: `
+              take_over:
+                enabled: true`,
+			takeOverCfg: takeOverConfig{
+				Enabled: true,
+			},
+		},
+		"new mode disabled": {
+			cfgYAML: `
+              take_over:
+                enabled: false`,
+			takeOverCfg: takeOverConfig{
+				Enabled: false,
+			},
+		},
+		"new mode with IDs": {
+			cfgYAML: `
+              take_over:
+                enabled: false
+                from_ids: ["foo", "bar"]`,
+			takeOverCfg: takeOverConfig{
+				Enabled: false,
+				FromIDs: []string{"foo", "bar"},
+			},
+		},
+		"take_over not defined": {
+			cfgYAML:   "",
+			expectErr: false,
+		},
+		"invalid config": {
+			cfgYAML:   "take_over.enabled: 42",
+			expectErr: true,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			// It is required to have 'paths' set, so set it here for all tests
+			cfg := conf.MustNewConfigFrom(tc.cfgYAML)
+			err := cfg.SetChild("paths", -1, conf.MustNewConfigFrom(`["foo"]`))
+			if err != nil {
+				t.Fatalf("cannot set 'paths' in config: %s", err)
+			}
+
+			_, inp, err := configure(cfg, logp.NewNopLogger())
+			if tc.expectErr {
+				require.Error(t, err, "expecting error when parsing config")
+				require.Nil(t, inp, "returned filestream must be nil on error")
+				return
+			} else {
+				require.NoError(t, err, "expecting the config to be successfully parsed")
+			}
+
+			f, ok := inp.(*filestream)
+			if !ok {
+				t.Fatalf("expecting type filestream, got %T", inp)
+			}
+
+			assert.Equal(t, tc.takeOverCfg, f.takeOver, "take over config does not match")
+		})
+	}
+}

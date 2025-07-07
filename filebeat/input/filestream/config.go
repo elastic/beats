@@ -49,8 +49,10 @@ type config struct {
 	IgnoreOlder    time.Duration      `config:"ignore_older"`
 	IgnoreInactive ignoreInactiveType `config:"ignore_inactive"`
 	Rotation       *conf.Namespace    `config:"rotation"`
-	TakeOver       takeOverConfig     `config:"take_over"`
 
+	// TakeOver is parsed independently from the rest of this struct, see
+	// 'GetTakeOverConfig' on internal/input-logfile/manager.go
+	TakeOver takeOverConfig `config:"-"`
 	// AllowIDDuplication is used by InputManager.Create
 	// (see internal/input-logfile/manager.go).
 	AllowIDDuplication bool `config:"allow_deprecated_id_duplication"`

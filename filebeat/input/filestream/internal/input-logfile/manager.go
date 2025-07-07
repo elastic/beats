@@ -156,9 +156,9 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		HarvesterLimit     uint64        `config:"harvester_limit"`
 		AllowIDDuplication bool          `config:"allow_deprecated_id_duplication"`
 		TakeOver           struct {
-			Enabled bool     `config:"enabled"`
-			FromIDs []string `config:"from_ids"`
-		} `config:"take_over"`
+			Enabled bool
+			FromIDs []string
+		} `config:"-"`
 	}{
 		CleanInactive: cim.DefaultCleanTimeout,
 	}
@@ -166,6 +166,13 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
 	}
+
+	takeOverEnabled, fromIDs, err := GetTakeOverConfig(config)
+	if err != nil {
+		return nil, err
+	}
+	settings.TakeOver.Enabled = takeOverEnabled
+	settings.TakeOver.FromIDs = fromIDs
 
 	if settings.ID == "" {
 		cim.Logger.Warn("filestream input without ID is discouraged, please add an ID and restart Filebeat")
@@ -324,4 +331,44 @@ func (i *sourceIdentifier) ID(s Source) string {
 
 func (i *sourceIdentifier) MatchesInput(id string) bool {
 	return strings.HasPrefix(id, i.prefix)
+}
+
+// GetTakeOverConfig returns the take over configuration as two independent
+// values. In the YAML they're defined as 'take_over.enabled' and
+// 'take_over.from_ids', respectively.
+// It can handle both formats: the single boolean (`take_over: true|false`) and
+// the object (show above). On error false, nil and the error are returned
+func GetTakeOverConfig(cfg *conf.C) (bool, []string, error) {
+	// This is never going to return an error because the config path
+	// is a single element. Anyways, we still handle it.
+	hasTakeOver, err := cfg.Has("take_over", -1)
+	if err != nil {
+		return false, nil, fmt.Errorf("cannot assert if 'take_over' is present: %w", err)
+	}
+	if hasTakeOver {
+		legacyEnabled, legacyErr := cfg.Bool("take_over", -1)
+		if legacyErr != nil {
+			// Try again with the new type
+			takeOverCfg, err := cfg.Child("take_over", -1)
+			// if there is an error now, then the config is definitely invalid
+			if err != nil {
+				return false, nil, errors.New("cannot parse the 'take_over' field")
+			}
+
+			// This is copied from filebeat/input/filestream/config.go
+			takeOver := struct {
+				Enabled bool     `config:"enabled"`
+				FromIDs []string `config:"from_ids"`
+			}{}
+			if err := takeOverCfg.Unpack(&takeOver); err != nil {
+				return false, nil, err
+			}
+
+			return takeOver.Enabled, takeOver.FromIDs, nil
+		} else {
+			return legacyEnabled, nil, nil
+		}
+	}
+
+	return false, nil, nil
 }
