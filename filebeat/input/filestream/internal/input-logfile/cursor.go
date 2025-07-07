@@ -74,7 +74,7 @@ func (c Cursor) AllEventsPublished() bool {
 // same state that `filestream.Run` expects.
 //
 // The resource associated with this cursor is created with the same
-// and logic `states.unsafeFind` uses.
+// logic `states.unsafeFind` uses.
 func NewCursorForTest(key string, offset int64, pending int) Cursor {
 	res := resource{
 		stored: false,
