@@ -211,7 +211,7 @@ func (inp *filestream) Run(
 		log.Debug("Closing reader of filestream")
 		err := r.Close()
 		if err != nil {
-			log.Errorf("Error stopping filestream reader %v", err)
+			log.Errorf("Error stopping filestream reader: %v", err)
 		}
 	})
 	defer streamCancel()
