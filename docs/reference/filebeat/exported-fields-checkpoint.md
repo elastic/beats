@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# Checkpoint fields [exported-fields-checkpoint]
+# Check Point fields [exported-fields-checkpoint]
 
 Some checkpoint module
 
