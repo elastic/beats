@@ -27,8 +27,6 @@ updates:
       - dependency-name: go.elastic.co/apm/*
       - dependency-name: go.elastic.co/ecszap
       - dependency-name: go.elastic.co/go-licence-detector
-      # Team:Service-Integrations
-      - dependency-name: github.com/elastic/bayeux
       # Team:Security-Linux Platform
       - dependency-name: github.com/elastic/go-libaudit/*
       - dependency-name: github.com/elastic/go-perf
@@ -64,6 +62,32 @@ updates:
       - dependency-name: github.com/elastic/mito
     open-pull-requests-limit: 2
 
+  - package-ecosystem: gomod
+    directory: /
+    # Workaround to satisfy Dependabot's unique constraint (needs unique 'package-ecosystem', 'directory', 'target-branch' tuples) 
+    # for duplicate package-ecosystem configurations: https://github.com/dependabot/dependabot-core/issues/1778#issuecomment-1988140219
+    target-branch: main
+    schedule:
+      interval: daily
+    cooldown:
+      semver-major-days: 30
+      semver-minor-days: 3
+      semver-patch-days: 1
+    labels:
+      - automation
+      - dependabot
+      - Team:Obs-InfraObs
+    allow:
+      # Team:Obs-InfraObs
+      # Protocol dependencies
+      - dependency-name: github.com/elastic/bayeux
+      # Database driver dependencies
+      - dependency-name: github.com/go-sql-driver/mysql
+      - dependency-name: github.com/lib/pq
+      - dependency-name: github.com/godror/godror
+      - dependency-name: github.com/microsoft/go-mssqldb
+    open-pull-requests-limit: 5
+
   # GitHub actions
   - package-ecosystem: "github-actions"
     directories:
@@ -73,9 +97,6 @@ updates:
       interval: "weekly"
       day: "sunday"
       time: "22:00"
-    reviewers:
-      - "elastic/observablt-ci"
-      - "elastic/observablt-ci-contractors"
     labels:
       - automation
       - dependabot

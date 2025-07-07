@@ -100,13 +100,16 @@ func ConvertNonPrimitive[T mapstrOrMap](m T) {
 			if ref.Kind() == reflect.Slice || ref.Kind() == reflect.Array {
 				s := make([]any, ref.Len())
 				for i := 0; i < ref.Len(); i++ {
-					elem := ref.Index(i)
-					if elem.Kind() == reflect.Map && elem.Type().Key().Kind() == reflect.String && elem.Type().Elem().Kind() == reflect.Interface {
-						if m, ok := elem.Interface().(map[string]any); ok {
-							ConvertNonPrimitive(m)
-						}
+					elem := ref.Index(i).Interface()
+					if mi, ok := elem.(map[string]any); ok {
+						ConvertNonPrimitive(mi)
+						s[i] = mi
+					} else if mi, ok := elem.(mapstr.M); ok {
+						ConvertNonPrimitive(mi)
+						s[i] = map[string]any(mi)
+					} else {
+						s[i] = elem
 					}
-					s[i] = elem.Interface()
 				}
 				m[key] = s
 				break // we figured out the type, so we don't need the unknown type case
