@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-checkpoint.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Check Point module [filebeat-module-checkpoint]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -193,7 +195,6 @@ Check Point Syslog extensions are mapped as follows to ECS:
 | xlatesport | source.nat.port |
 | xlatedport | destination.nat.port |
 
-
-## Fields [_fields_10]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-checkpoint.md) section.
