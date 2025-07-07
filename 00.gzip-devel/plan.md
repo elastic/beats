@@ -42,9 +42,8 @@ scanner, the error will happen every scan as long as the file is still there.
   - [x] Maintain decompressed offset (ensure `file.State` and logic in `input.go` handle this)
 - [x] add Test integrity verification at EOF (CRC32 & ISIZE)
       files: `filebeat/input/filestream/file.go` (within `gzipSeekerReader`)
-- [ ] Implement modification detection: abort ingestion on append/truncate during read
-      files: `filebeat/input/filestream/internal/input-logfile/harvester.go`,
-      `filebeat/input/file/state.go`
+- [ ] ~Implement modification detection: abort ingestion on append/truncate during read~
+      we need to read gzip files after append as filestream might start reading the file before it's fully written to disk
 - [x] Instrument GZIP-specific metrics: all metrics have a GZIP version
 - [x] Enhance rotation handle .gz
   - [x] Add GZIP-awareness to `onFSEvent` in `copytruncate_prospector.go`

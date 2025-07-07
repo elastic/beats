@@ -120,14 +120,14 @@ func TestLogFileTruncated(t *testing.T) {
 		truncateFn func(t *testing.T, f File) error
 		wantErr    error
 	}{
-		{name: "plain",
+		{name: "plain: ErrFileTruncate",
 			createFile: createTestPlainLogFile,
 			truncateFn: func(t *testing.T, f File) error {
 				return f.OSFile().Truncate(0)
 			},
 			wantErr: ErrFileTruncate,
 		},
-		{name: "gzip",
+		{name: "gzip: io.EOF",
 			createFile: createTestGzipLogFile,
 			truncateFn: func(t *testing.T, f File) error {
 				osf := f.OSFile()

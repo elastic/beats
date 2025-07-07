@@ -265,10 +265,6 @@ func (f *logFile) errorChecks(err error) error {
 			return io.EOF
 		}
 
-		// TODO(AndersonQ): if the we read a gzip file before it's fully read?
-		//  it might return io.ErrUnexpectedEOF on:
-		//    - error while reading file header
-		//    - error when reading file footer/validating checksum and size
 		return err
 	}
 
@@ -280,7 +276,7 @@ func (f *logFile) handleEOF() error {
 		return io.EOF
 	}
 
-	// Refetch fileinfo to check if the file was truncated.
+	// Re-fetch fileinfo to check if the file was truncated.
 	// Errors if the file was removed/rotated after reading and before
 	// calling the stat function
 	info, statErr := f.file.Stat()
