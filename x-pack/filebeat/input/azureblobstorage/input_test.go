@@ -650,6 +650,45 @@ func Test_StorageClient(t *testing.T) {
 				mock.Beatscontainer_blob_docs_ata_json: true,
 			},
 		},
+		{
+			name: "FilterByPathPrefix_NotFoundErr",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"path_prefix":                         "docs/",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer2,
+					},
+				},
+			},
+			mockHandler:   mock.AzureStorageServer,
+			expected:      map[string]bool{},
+			expectedError: mock.NotFoundErr,
+		},
+		{
+			name: "FilterByPathPrefix_Success",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"path_prefix":                         "docs/",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -732,7 +771,7 @@ func Test_StorageClient(t *testing.T) {
 	}
 }
 
-func Test_Concurrency(t *testing.T) {
+func TestConcurrency(t *testing.T) {
 	for _, workers := range []int{100, 1000, 2000} {
 		t.Run(fmt.Sprintf("TestConcurrency_%d_Workers", workers), func(t *testing.T) {
 			const expectedLen = mock.TotalRandomDataSets
