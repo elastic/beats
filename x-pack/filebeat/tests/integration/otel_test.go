@@ -25,7 +25,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/testing"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
 
