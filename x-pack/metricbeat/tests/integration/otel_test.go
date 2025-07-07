@@ -16,9 +16,11 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
 
@@ -30,13 +32,13 @@ func TestMetricbeatOTelE2E(t *testing.T) {
 	password, _ := host.User.Password()
 
 	// create a random uuid and make sure it doesn't contain dashes/
-	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 
 	type options struct {
-		Namespace string
-		ESURL     string
-		Username  string
-		Password  string
+		Index    string
+		ESURL    string
+		Username string
+		Password string
 	}
 
 	var beatsCfgFile = `
@@ -55,7 +57,7 @@ output:
       - {{ .ESURL }}
     username: {{ .Username }}
     password: {{ .Password }}
-    index: logs-integration-{{ .Namespace }}
+    index: {{ .Index }}
 queue.mem.flush.timeout: 0s
 setup.template.enabled: false
 processors:
@@ -75,35 +77,73 @@ processors:
 
 	var configBuffer bytes.Buffer
 	require.NoError(t, template.Must(template.New("config").Parse(beatsCfgFile)).Execute(&configBuffer, options{
-		Namespace: otelNamespace,
-		ESURL:     fmt.Sprintf("%s://%s", host.Scheme, host.Host),
-		Username:  user,
-		Password:  password,
+		Index:    "logs-integration-mbreceiver-" + namespace,
+		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username: user,
+		Password: password,
 	}))
 
 	metricbeatOTel.WriteConfigFile(configBuffer.String())
 	metricbeatOTel.Start()
 	defer metricbeatOTel.Stop()
 
+	var mbConfigBuffer bytes.Buffer
+	require.NoError(t, template.Must(template.New("config").Parse(beatsCfgFile)).Execute(&mbConfigBuffer, options{
+		Index:    "logs-filebeat-mb-" + namespace,
+		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username: user,
+		Password: password,
+	}))
+	metricbeat := integration.NewBeat(t, "metricbeat", "../../metricbeat.test")
+	metricbeat.WriteConfigFile(mbConfigBuffer.String())
+	metricbeat.Start()
+	defer metricbeat.Stop()
+
 	// prepare to query ES
 	es := integration.GetESClient(t, "http")
 
 	// Make sure find the logs
-	actualHits := &struct{ Hits int }{}
+	var metricbeatDocs estools.Documents
+	var otelDocs estools.Documents
+	var err error
 	require.Eventually(t,
 		func() bool {
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
-			otelDocs, err := estools.GetLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-"+otelNamespace+"*", map[string]interface{}{
-				"metricset.name": "cpu",
-			})
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-mbreceiver*")
 			require.NoError(t, err)
 
-			actualHits.Hits = otelDocs.Hits.Total.Value
-			return actualHits.Hits >= 1
-		},
-		2*time.Minute, 1*time.Second,
-		"Expected at least %d logs, got %v", 1, actualHits)
+			metricbeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-mb*")
+			require.NoError(t, err)
 
+			return otelDocs.Hits.Total.Value >= 1 && metricbeatDocs.Hits.Total.Value >= 1
+		},
+		2*time.Minute, 1*time.Second, "Expected at least one ingested metric event, got metricbeat: %d, otel: %d", metricbeatDocs.Hits.Total.Value, otelDocs.Hits.Total.Value)
+
+	otelDoc := otelDocs.Hits.Hits[0]
+	metricbeatDoc := metricbeatDocs.Hits.Hits[0]
+	assertMapstrKeysEqual(t, otelDoc.Source, metricbeatDoc.Source, []string{}, "expected documents keys to be equal")
+
+}
+
+func assertMapstrKeysEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg string) {
+	t.Helper()
+	// Delete all ignored fields.
+	for _, f := range ignoredFields {
+		_ = m1.Delete(f)
+		_ = m2.Delete(f)
+	}
+
+	flatM1 := m1.Flatten()
+	flatM2 := m2.Flatten()
+
+	for k := range flatM1 {
+		flatM1[k] = ""
+	}
+	for k := range flatM2 {
+		flatM2[k] = ""
+	}
+
+	require.Zero(t, cmp.Diff(flatM1, flatM2), msg)
 }
