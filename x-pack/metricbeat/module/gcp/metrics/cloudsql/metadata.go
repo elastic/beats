@@ -21,7 +21,15 @@ import (
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP CloudSQL resource.
-func NewMetadataService(ctx context.Context, projectID, zone string, region string, regions []string, organizationID, organizationName string, projectName string, cacheRegistry *gcp.CacheRegistry, opt ...option.ClientOption) (gcp.MetadataService, error) {
+func NewMetadataService(
+	ctx context.Context,
+	projectID, zone string,
+	region string,
+	regions []string,
+	organizationID, organizationName, projectName string,
+	cacheRegistry *gcp.CacheRegistry,
+	logger *logp.Logger,
+	opt ...option.ClientOption) (gcp.MetadataService, error) {
 	mc := &metadataCollector{
 		projectID:        projectID,
 		projectName:      projectName,
@@ -32,7 +40,7 @@ func NewMetadataService(ctx context.Context, projectID, zone string, region stri
 		regions:          regions,
 		opt:              opt,
 		instanceCache:    cacheRegistry.CloudSQL,
-		logger:           logp.NewLogger("metrics-cloudsql"),
+		logger:           logger.Named("metrics-cloudsql"),
 	}
 
 	// Freshen up the cache, later all we have to do is look up the instance
