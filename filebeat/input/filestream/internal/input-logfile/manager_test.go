@@ -476,8 +476,12 @@ func TestGetTakeOverConfig(t *testing.T) {
 			cfgYAML:   "",
 			expectErr: false,
 		},
-		"invalid config": {
+		"invalid new config": {
 			cfgYAML:   "take_over.enabled: 42",
+			expectErr: true,
+		},
+		"invalid legacy config": {
+			cfgYAML:   "take_over: 42",
 			expectErr: true,
 		},
 	}

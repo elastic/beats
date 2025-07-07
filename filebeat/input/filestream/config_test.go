@@ -279,10 +279,10 @@ func TestTakeOverCfg(t *testing.T) {
 		"new mode with IDs": {
 			cfgYAML: `
               take_over:
-                enabled: false
+                enabled: true
                 from_ids: ["foo", "bar"]`,
 			takeOverCfg: takeOverConfig{
-				Enabled: false,
+				Enabled: true,
 				FromIDs: []string{"foo", "bar"},
 			},
 		},
@@ -290,8 +290,12 @@ func TestTakeOverCfg(t *testing.T) {
 			cfgYAML:   "",
 			expectErr: false,
 		},
-		"invalid config": {
+		"invalid new config": {
 			cfgYAML:   "take_over.enabled: 42",
+			expectErr: true,
+		},
+		"invalid legacy config": {
+			cfgYAML:   "take_over: 42",
 			expectErr: true,
 		},
 	}
