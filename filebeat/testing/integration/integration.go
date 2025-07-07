@@ -20,6 +20,7 @@ package integration
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/testing/integration"
@@ -69,8 +70,15 @@ type test struct {
 func (fbt *test) ExpectEOF(files ...string) Test {
 	// Ensuring we completely ingest every file
 	for _, filename := range files {
-		line := fmt.Sprintf("End of file reached: %s; Backoff now.", filename)
-		fbt.ExpectOutput(line)
+		// accounts for reaching EOF, but still ingesting if more data is added
+		// to the file.
+		line1 := fmt.Sprintf("End of file reached: %s; Backoff now.", filename)
+		// accounts for closing the file on EOF.
+		line2 := fmt.Sprintf("EOF has been reached. Closing. Path='%s'", filename)
+
+		fbt.ExpectOutputRegex(regexp.MustCompile(
+			fmt.Sprintf(`(%s|%s)`,
+				regexp.QuoteMeta(line1), regexp.QuoteMeta(line2))))
 	}
 
 	return fbt

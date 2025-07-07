@@ -115,6 +115,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fix IIS module logging errors in case application pool PDH counter is not found. {pull}42274[42274]
 - Removed direct dependency on Azure/go-autorest/autorest/adal, which is deprecated. {issue}41463[41463] {pull}42959[42959]
 - Fixed flaky zookeeper integration tests. {pull}43638[43638]
+- Fixed Fileebat GCP Pub/Sub input integration tests. {pull}45150[45150]
 
 ==== Added
 
@@ -236,6 +237,7 @@ unregister input metrics without relaying on the global 'dataset' namespace.{pul
 - Improved Filebeat Websocket input exponential backoff logic to produce a smoother backoff curve. {pull}44069[44069]
 - Added `autoops_es` module to x-pack/metricbeat. {pull}44565[44565]
 - Make `x-pack/libbeat/management.BeatV2Manager.UpdateStatus` a no-op if there is no change in state. {pull}44716[44716]
+- Filebeat filebeat/testing/integration test framework ExpectEOF accounts for closed files and allows to choose to pretty print or not the output. {pull}45023[45023]
 
 ==== Deprecated
 

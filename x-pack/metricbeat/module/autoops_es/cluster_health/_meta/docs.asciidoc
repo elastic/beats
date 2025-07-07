@@ -1,3 +1,0 @@
-The `cluster_health` metricset.
-
-Main API: https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-cluster-health
