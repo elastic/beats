@@ -104,7 +104,7 @@ The following tables explain the meaning of the most important fields under `.mo
 | `.cpu.system.time.ms` | Integer | CPU time spent in kernel mode, in milliseconds. | |
 | `.cpu.user.time.ms` | Integer | CPU time spent in user mode, in milliseconds. | |
 | `.cpu.total.time.ms` | Integer | Total CPU time (`system` + `user`), in milliseconds. | |
-| `.cpu.ticks` | Integer | The raw CPU time reported by the OS. The `time.ms` values are calculated from the difference in tick values between reports. | |
+| `.cpu.ticks` | Integer | The arbitrary unit of time reported by the OS. The `time.ms` values are calculated from the difference in tick values between reports. | |
 | `.memstats.gc_next` | Integer | The target heap size for the next garbage collection cycle, in bytes. | |
 | `.memstats.memory_alloc` | Integer | Bytes of allocated heap objects. | A constantly growing value may indicate a memory leak. |
 | `.memstats.memory_total` | Integer | Cumulative bytes allocated for heap objects. | A sustained, high rate of increase can indicate a memory leak or high memory churn. |
