@@ -484,7 +484,7 @@ func TestGetTakeOverConfig(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			enabled, fromIDs, err := GetTakeOverConfig(config.MustNewConfigFrom(tc.cfgYAML))
+			enabled, fromIDs, err := GetTakeOverConfig(config.MustNewConfigFrom(tc.cfgYAML), logp.NewNopLogger())
 			if tc.expectErr {
 				require.Error(t, err)
 			} else {

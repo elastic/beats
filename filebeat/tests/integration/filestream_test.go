@@ -589,6 +589,11 @@ func TestFilestreamTakeOverFromFilestream(t *testing.T) {
 			"expected-registry-happy-path.json"),
 		"Entries in the registry are different from the expectation",
 	)
+
+	deprecationLog := "using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'"
+	if filebeat.LogContains(deprecationLog) {
+		t.Fatalf("deprecation log %q must not be present when using the new syntax", deprecationLog)
+	}
 }
 
 func TestFilestreamTakeOverFromLogInput(t *testing.T) {
@@ -655,6 +660,11 @@ func TestFilestreamTakeOverFromLogInput(t *testing.T) {
 			"expected-registry-happy-path-log-input.json"),
 		"Entries in the registry are different from the expectation",
 	)
+
+	deprecationLog := "using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'"
+	if !filebeat.LogContains(deprecationLog) {
+		t.Fatalf("did not find the deprecation log %q", deprecationLog)
+	}
 }
 
 func requireRegistryEntryRemoved(t *testing.T, workDir, identity string) {

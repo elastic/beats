@@ -91,7 +91,7 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 		return nil, nil, err
 	}
 
-	takeOverEnabled, fromIDs, err := loginp.GetTakeOverConfig(cfg)
+	takeOverEnabled, fromIDs, err := loginp.GetTakeOverConfig(cfg, log)
 	if err != nil {
 		return nil, nil, err
 	}

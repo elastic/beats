@@ -167,7 +167,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		return nil, err
 	}
 
-	takeOverEnabled, fromIDs, err := GetTakeOverConfig(config)
+	takeOverEnabled, fromIDs, err := GetTakeOverConfig(config, cim.Logger)
 	if err != nil {
 		return nil, err
 	}
@@ -338,7 +338,7 @@ func (i *sourceIdentifier) MatchesInput(id string) bool {
 // 'take_over.from_ids', respectively.
 // It can handle both formats: the single boolean (`take_over: true|false`) and
 // the object (show above). On error false, nil and the error are returned
-func GetTakeOverConfig(cfg *conf.C) (bool, []string, error) {
+func GetTakeOverConfig(cfg *conf.C, logger *logp.Logger) (bool, []string, error) {
 	// This is never going to return an error because the config path
 	// is a single element. Anyways, we still handle it.
 	hasTakeOver, err := cfg.Has("take_over", -1)
@@ -366,6 +366,9 @@ func GetTakeOverConfig(cfg *conf.C) (bool, []string, error) {
 
 			return takeOver.Enabled, takeOver.FromIDs, nil
 		} else {
+			if legacyEnabled {
+				logger.Warn("using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'")
+			}
 			return legacyEnabled, nil, nil
 		}
 	}
