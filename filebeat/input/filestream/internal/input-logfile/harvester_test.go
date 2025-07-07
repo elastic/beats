@@ -445,7 +445,7 @@ func TestCursorAllEventsPublished(t *testing.T) {
 						"cursor key %q and event resource key %q must be the same.",
 						cursorKey, logp.EventType)
 				}
-				// cursor.resource.pending bust be 2 here and
+				// cursor.resource.pending must be 2 here and
 				// cursor.AllEventsPublished must return false
 				if cursor.AllEventsPublished() {
 					t.Errorf(
@@ -485,7 +485,7 @@ func TestCursorAllEventsPublished(t *testing.T) {
 	// Let the harvester call publish
 	publishLock <- struct{}{}
 
-	// Wait the harvester to finish publishing
+	// Wait for the harvester to finish publishing
 	<-donePublishing
 
 	// Then wait for it to be fully closed
