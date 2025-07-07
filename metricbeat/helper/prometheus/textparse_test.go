@@ -35,10 +35,6 @@ func float64p(x float64) *float64 {
 	return &x
 }
 
-func uint64p(x uint64) *uint64 {
-	return &x
-}
-
 func int64p(x int64) *int64 {
 	return &x
 }
@@ -587,7 +583,7 @@ summary_metric_impossible 123
 					Label: []*labels.Label{},
 					Name:  stringp("summary_metric"),
 					Summary: &Summary{
-						SampleCount: uint64p(44000),
+						SampleCount: float64p(44000),
 						SampleSum:   float64p(234892394),
 						Quantile: []*Quantile{
 							{
@@ -639,7 +635,7 @@ summary_metric_impossible 123
 					Label: []*labels.Label{},
 					Name:  stringp("summary_metric"),
 					Summary: &Summary{
-						SampleCount: uint64p(44000),
+						SampleCount: float64p(44000),
 						SampleSum:   float64p(234892394),
 						Quantile: []*Quantile{
 							{
@@ -704,15 +700,15 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 					Name: stringp("http_server_requests_seconds"),
 					Histogram: &Histogram{
 						IsGaugeHistogram: false,
-						SampleCount:      uint64p(1.0),
+						SampleCount:      float64p(1.0),
 						SampleSum:        float64p(0.046745444),
 						Bucket: []*Bucket{
 							{
-								CumulativeCount: uint64p(0),
+								CumulativeCount: float64p(0),
 								UpperBound:      float64p(0.001),
 							},
 							{
-								CumulativeCount: uint64p(0),
+								CumulativeCount: float64p(0),
 								UpperBound:      float64p(0.001048576),
 							},
 						},
@@ -763,15 +759,15 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 					Name: stringp("http_server_requests_seconds"),
 					Histogram: &Histogram{
 						IsGaugeHistogram: false,
-						SampleCount:      uint64p(1.0),
+						SampleCount:      float64p(1.0),
 						SampleSum:        float64p(0.046745444),
 						Bucket: []*Bucket{
 							{
-								CumulativeCount: uint64p(0),
+								CumulativeCount: float64p(0),
 								UpperBound:      float64p(0.001),
 							},
 							{
-								CumulativeCount: uint64p(0),
+								CumulativeCount: float64p(0),
 								UpperBound:      float64p(0.001048576),
 							},
 						},
@@ -810,11 +806,11 @@ ggh 99
 					Name:  stringp("ggh"),
 					Histogram: &Histogram{
 						IsGaugeHistogram: true,
-						SampleCount:      uint64p(2.0),
+						SampleCount:      float64p(2.0),
 						SampleSum:        float64p(1),
 						Bucket: []*Bucket{
 							{
-								CumulativeCount: uint64p(2),
+								CumulativeCount: float64p(2),
 								UpperBound:      float64p(0.9),
 							},
 						},
