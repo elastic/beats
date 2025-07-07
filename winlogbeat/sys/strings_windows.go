@@ -19,7 +19,7 @@ package sys
 
 import (
 	"bytes"
-	"sync"	
+	"sync"
 
 	"golang.org/x/sys/windows"
 	"golang.org/x/text/encoding"
