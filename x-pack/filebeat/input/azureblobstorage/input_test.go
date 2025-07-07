@@ -670,7 +670,7 @@ func Test_StorageClient(t *testing.T) {
 			expectedError: mock.NotFoundErr,
 		},
 		{
-			name: "FilterByPathPrefix_Success",
+			name: "FilterByPathPrefix_RootLevel",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
 				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
@@ -681,6 +681,26 @@ func Test_StorageClient(t *testing.T) {
 				"containers": []map[string]interface{}{
 					{
 						"name": beatsContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
+		{
+			name: "FilterByPathPrefix_ContainerLevel",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":        beatsContainer,
+						"path_prefix": "docs/",
 					},
 				},
 			},
