@@ -53,6 +53,7 @@ func TestFilestreamDelete(t *testing.T) {
 		"on Inactive": {
 			"prospector.scanner.check_interval":     "1s",
 			"close.on_state_change.inactive":        "1s",
+			"close.reader.on_eof":                   false,
 			"delete.enabled":                        true,
 			"prospector.scanner.fingerprint.length": 64,
 			"delete.grace_period":                   0,
