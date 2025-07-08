@@ -273,12 +273,28 @@ func TestFromMapstrSliceCommonTime(t *testing.T) {
 	assert.Equal(t, want, inputMap)
 }
 
+type structWithTextMarshaler struct {
+	Value string `json:"value"`
+}
+
+func (s *structWithTextMarshaler) MarshalText() ([]byte, error) {
+	return []byte("marshalled:" + s.Value), nil
+}
+
 func TestFromMapstrWithNestedData(t *testing.T) {
 	input := mapstr.M{
 		"any_array":  [3]any{1, "string", 3},
 		"any_slice":  []any{5.1, 6.2},
 		"bool_array": [2]bool{true, false},
 		"bool_slice": []bool{false, true},
+		"struct": struct {
+			Value string `json:"value"`
+		}{
+			Value: "string",
+		},
+		"struct_with_text_marshaler": &structWithTextMarshaler{
+			Value: "string",
+		},
 		"inner": []mapstr.M{
 			{
 				"inner_int":       42,
@@ -286,6 +302,14 @@ func TestFromMapstrWithNestedData(t *testing.T) {
 				"inner_slice": []map[string]any{ // slice -> slice
 					{"string": "string"},
 					{"number": 12.3},
+				},
+				"inner_struct": struct {
+					Value string `json:"value"`
+				}{
+					Value: "string",
+				},
+				"inner_struct_with_text_marshaler": &structWithTextMarshaler{
+					Value: "string",
 				},
 			},
 			{
@@ -306,6 +330,10 @@ func TestFromMapstrWithNestedData(t *testing.T) {
 		"any_slice":  []any{5.1, 6.2},
 		"bool_array": []any{true, false},
 		"bool_slice": []any{false, true},
+		"struct": map[string]any{
+			"value": "string",
+		},
+		"struct_with_text_marshaler": "marshalled:string",
 		"inner": []any{
 			map[string]any{
 				"inner_int":       42,
@@ -314,6 +342,10 @@ func TestFromMapstrWithNestedData(t *testing.T) {
 					map[string]any{"string": "string"},
 					map[string]any{"number": 12.3},
 				},
+				"inner_struct": map[string]any{
+					"value": "string",
+				},
+				"inner_struct_with_text_marshaler": "marshalled:string",
 			},
 			map[string]any{
 				"inner_int": 43,
@@ -363,24 +395,12 @@ func TestToMapstr(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
-type unknown struct {
-	Value int `json:"value"`
-}
-
 func TestUnknownType(t *testing.T) {
 	inputMap := mapstr.M{
-		"unknown": unknown{42},
-		"nested": mapstr.M{
-			"unknown": unknown{43},
-		},
 		"unknown_map": map[string]int{"key": 42},
 	}
 
 	expected := mapstr.M{
-		"unknown": "unknown type: otelmap.unknown",
-		"nested": map[string]any{
-			"unknown": "unknown type: otelmap.unknown",
-		},
 		"unknown_map": "unknown type: map[string]int",
 	}
 
