@@ -53,8 +53,8 @@ scanner, the error will happen every scan as long as the file is still there.
   - [x] test files with EOF: true on its state isn't opened.
 - [ ] Integration tests
   - [x] Ensure (test) GZIP resume logic re-reads stream from start to reach last known decompressed offset
-  - [ ] test for a file with multiple GZIP files
-  - [ ] test for a corrupted file, which at the beginning some lines succeed, then
+  - [x] test for a file with multiple GZIP files
+  - [x] test for a corrupted file, which at the beginning some lines succeed, then
     it fails.
   - [ ] test a gzip and plain file with the same decompressed data have the same
   fingerprint

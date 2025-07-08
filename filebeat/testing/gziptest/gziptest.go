@@ -52,7 +52,6 @@ func Compress(t *testing.T, data []byte, corruption Corruption) []byte {
 
 	compressedBytes := gzBuff.Bytes()
 
-	// get the footer start index
 	footerStartIndex := len(compressedBytes) - 8
 
 	if corruption&CorruptCRC != 0 {

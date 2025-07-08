@@ -20,6 +20,8 @@
 package integration
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -198,16 +200,8 @@ logging.level: debug
 
 			filebeat.Stop()
 
-			pattern := filepath.Join(tempDir, outputFilename) + "-*.ndjson"
-			files, err := filepath.Glob(pattern)
-			require.NoError(t, err, "could not glob output file pattern")
-			require.Len(t, files, 1, "expected only 1 output file")
-
-			got, err := os.ReadFile(files[0])
-			require.NoError(t, err, "could not open output file")
-
-			// check that all lines have been published
-			matchPublishedLines(t, got, lines)
+			matchPublishedLinesFromFile(t,
+				filepath.Join(tempDir, outputFilename), lines)
 		})
 	}
 }
@@ -296,6 +290,163 @@ logging.level: debug
 		"expected the last entry of the registry to be the same as previous entry")
 }
 
+// TestFilestreamGZIPConcatenatedFiles verifies that filestream can read a
+// gzip file produced by appending multiple gzip-compressed files. Per the gzip
+// spec, decompressing this concatenation must yield the same bytes as first
+// concatenating the plain data of both files and then gzipping the result.
+func TestFilestreamGZIPConcatenatedFiles(t *testing.T) {
+	lines := make([]string, 0, 200)
+	var content []byte
+	for i := range 100 {
+		l := fmt.Sprintf("%d: 1st file log line", i)
+		lines = append(lines, l)
+		content = append(content, []byte(l+"\n")...)
+	}
+	gzData1 := gziptest.Compress(t, content, gziptest.CorruptNone)
+
+	content = nil
+	for i := range 100 {
+		l := fmt.Sprintf("%d: 2nd file log line", i)
+		lines = append(lines, l)
+		content = append(content, []byte(l+"\n")...)
+	}
+	gzData2 := gziptest.Compress(t, content, gziptest.CorruptNone)
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	tempDir := filebeat.TempDir()
+	logPath := filepath.Join(tempDir, "2gzipFilesConcatenated.gz")
+	outputFilename := "output-file"
+
+	err := os.WriteFile(
+		logPath,
+		append(gzData1, gzData2...), 0644)
+	require.NoError(t, err, "could nto write gzip file to disk")
+
+	cfg := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: "test-filestream"
+    paths:
+      - %s
+    gzip_experimental: true
+    rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
+output.file:
+  enabled: true
+  path: %s
+  filename: "%s"
+logging.level: debug
+`, logPath, filebeat.TempDir(), outputFilename)
+
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	filebeat.WaitForLogs(
+		fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPath),
+		10*time.Second,
+		"Filebeat did not reach EOF. Did not find log '%s'",
+		logPath,
+	)
+	filebeat.Stop()
+
+	matchPublishedLinesFromFile(t,
+		filepath.Join(tempDir, outputFilename), lines)
+}
+
+func TestFilestreamGZIPReadsCorruptedFileUntilEOF(t *testing.T) {
+	// For future reference, this is the code used to generate
+	// testdata/gzip/corrupted.gz
+	// lines := make([]string, 0, 200)
+	// var content []byte
+	// for i := range 100 {
+	// 	l := fmt.Sprintf("%d: 1st file log line", i)
+	// 	lines = append(lines, l)
+	// 	content = append(content, []byte(l+"\n")...)
+	// }
+	// gzData := gziptest.Compress(t, content, gziptest.CorruptNone)
+	// gzData[50] = ^gzData[50]
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	logPath := filepath.Join("testdata", "gzip", "corrupted.gz")
+	logPath, err := filepath.Abs(logPath)
+	require.NoError(t, err, "could not find absolute path for log file")
+	outputFilePattern := "output-file"
+
+	workDir := filebeat.TempDir()
+	cfg := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: "test-filestream"
+    paths:
+      - %s
+    gzip_experimental: true
+    rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
+output.file:
+  enabled: true
+  path: %s
+  filename: "%s"
+logging.level: debug
+`, logPath, workDir, outputFilePattern)
+
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	eofLog := fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPath)
+	filebeat.WaitForLogs(
+		eofLog,
+		10*time.Second,
+		"Filebeat did not reach EOF. Did not find log '%s'",
+		eofLog,
+	)
+	filebeat.Stop()
+
+	// assert EOF is set on registry
+	registryLogFile := filepath.Join(workDir,
+		"data", "registry", "filebeat", "log.json")
+	entries, _ := readFilestreamRegistryLog(t, registryLogFile)
+	var lastEntry *registryEntry
+	for i := range entries {
+		entry := &entries[i]
+		if entry.Filename == logPath {
+			lastEntry = entry
+		}
+	}
+	require.NotNil(t, lastEntry,
+		"state for log file not found in registry for %s", logPath)
+	assert.True(t, lastEntry.EOF, "EOF is not true")
+
+	pattern := outputFilePattern + "-*.ndjson"
+	files, err := filepath.Glob(filepath.Join(workDir, pattern))
+	require.NoError(t, err, "could not glob output file pattern")
+	require.Len(t, files, 1, "expected only 1 output file, file glob pattern: '%s'",
+		pattern)
+
+	assertLogFieldsEqual(t,
+		filepath.Join("testdata", "gzip", "output-file-for-corrupted.gz.ndjson"),
+		files[0],
+	)
+}
+
+func matchPublishedLinesFromFile(t *testing.T, outputFilePattern string, lines []string) {
+	pattern := outputFilePattern + "-*.ndjson"
+	files, err := filepath.Glob(pattern)
+	require.NoError(t, err, "could not glob output file pattern")
+	require.Len(t, files, 1, "expected only 1 output file")
+
+	got, err := os.ReadFile(files[0])
+	require.NoError(t, err, "could not open output file")
+
+	// check that all lines have been published
+	matchPublishedLines(t, got, lines)
+}
+
 func matchPublishedLines(t *testing.T, got []byte, want []string) {
 	gotLines := strings.Split(strings.TrimSpace(string(got)), "\n")
 	assert.Equal(t, len(want), len(gotLines), "unexpected number of events")
@@ -327,5 +478,55 @@ func matchPublishedLines(t *testing.T, got []byte, want []string) {
 		t.Logf("\n\t%d extra lines found on the output:", notFound*-1)
 		fmt.Printf("\t\t\t%s", strings.Join(gotLines[len(want):], "\n\t\t\t"))
 		fmt.Print("\n\n")
+	}
+}
+
+func assertLogFieldsEqual(t *testing.T, wantPath, gotPath string) {
+	t.Helper()
+
+	type event struct {
+		Message string `json:"message"`
+		Log     struct {
+			Offset int64 `json:"offset"`
+		} `json:"log"`
+	}
+
+	open := func(path string) *bufio.Scanner {
+		f, err := os.Open(path)
+		require.NoError(t, err, "opening file %s", path)
+		t.Cleanup(func() { _ = f.Close() })
+		return bufio.NewScanner(f)
+	}
+
+	wantScanner := open(wantPath)
+	gotScanner := open(gotPath)
+
+	line := 1
+	for {
+		wantOK := wantScanner.Scan()
+		gotOK := gotScanner.Scan()
+
+		if !wantOK || !gotOK {
+			assert.Equal(t, wantOK, gotOK,
+				"different number of lines: want EOF=%v, got EOF=%v at line %d",
+				!wantOK, !gotOK, line,
+			)
+			return
+		}
+
+		var wantEv, gotEv event
+		if err := json.Unmarshal(wantScanner.Bytes(), &wantEv); err != nil {
+			t.Fatalf("failed to unmarshal want JSON at line %d: %v", line, err)
+		}
+		if err := json.Unmarshal(gotScanner.Bytes(), &gotEv); err != nil {
+			t.Fatalf("failed to unmarshal got JSON at line %d: %v", line, err)
+		}
+
+		if wantEv.Message != gotEv.Message ||
+			wantEv.Log.Offset != gotEv.Log.Offset {
+			t.Errorf("line %d mismatch:\n\tmessage: want '%q got %q\n\toffset:  want %d got %d",
+				line, wantEv.Message, gotEv.Message, wantEv.Log.Offset, gotEv.Log.Offset)
+		}
+		line++
 	}
 }
