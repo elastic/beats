@@ -25,9 +25,11 @@ import (
 )
 
 const (
-	v         = "9.9.9"
-	commit    = "1234abcd"
-	buildTime = "20001212"
+	v            = "10.10.11"
+	commit       = "a408c834fe3674b21546885890da17be05c91a51"
+	buildTime    = "2024-11-21 16:41:00 +0000"
+	mode         = AgentManagementModeManaged
+	unprivileged = AgentUnprivilegedModeUnprivileged
 )
 
 func TestUserAgent(t *testing.T) {
@@ -36,4 +38,12 @@ func TestUserAgent(t *testing.T) {
 
 	ua2 := UserAgent("FakeBeat", v, commit, buildTime, "integration_name/1.2.3")
 	assert.Regexp(t, regexp.MustCompile(`; integration_name\/1\.2\.3\)$`), ua2)
+}
+
+func TestUserAgentWithBeatTelemetry(t *testing.T) {
+	ua2, err := UserAgentWithBeatTelemetry("FakeBeat", v, mode, unprivileged)
+	assert.Regexp(t, regexp.MustCompile(`^Elastic-FakeBeat`), ua2)
+	assert.Regexp(t, regexp.MustCompile(`; Managed; Unprivileged\)$`), ua2)
+	assert.LessOrEqual(t, len(ua2), 100, "User agent string should be less than 100 characters")
+	assert.NoError(t, err)
 }
