@@ -35,6 +35,7 @@ import (
 )
 
 var (
+	headerContentEncoding    = "Content-Encoding"
 	headerContentType        = "Content-Type"
 	HeaderUncompressedLength = "X-Elastic-Uncompressed-Request-Length"
 	HeaderEventCount         = "X-Elastic-Event-Count"
@@ -205,8 +206,8 @@ func (g *gzipEncoder) Reader() io.Reader {
 }
 
 func (g *gzipEncoder) AddHeader(header *http.Header) {
-	header.Add("Content-Type", "application/json; charset=UTF-8")
-	header.Add("Content-Encoding", "gzip")
+	header.Add(headerContentType, "application/json; charset=UTF-8")
+	header.Add(headerContentEncoding, "gzip")
 	header.Add(HeaderUncompressedLength, strconv.Itoa(g.uncompressedLength))
 	header.Add(HeaderEventCount, strconv.Itoa(g.eventCount))
 
