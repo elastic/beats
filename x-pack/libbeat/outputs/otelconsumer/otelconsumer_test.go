@@ -230,4 +230,31 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 	})
+	t.Run("sets otel specific-fields", func(t *testing.T) {
+		for _, wantCompID := range []string{"", "filebeatreceiver/1"} {
+			event1 := beat.Event{Fields: mapstr.M{"field": 1}}
+			batch := outest.NewBatch(event1)
+			var countLogs int
+			otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+				countLogs = countLogs + ld.LogRecordCount()
+				return nil
+			})
+			otelConsumer.beatInfo.ComponentID = wantCompID
+
+			err := otelConsumer.Publish(ctx, batch)
+			assert.NoError(t, err)
+			assert.Len(t, batch.Signals, 1)
+			assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+			assert.Equal(t, len(batch.Events()), countLogs, "all events should be consumed")
+
+			for _, event := range batch.Events() {
+				beatEvent := event.Content.Fields
+				if wantCompID == "" {
+					assert.NotContains(t, event.Content.Fields, otelComponentIDAttribute, otelComponentIDAttribute+" should not be set")
+				} else {
+					assert.Equal(t, otelConsumer.beatInfo.ComponentID, beatEvent[otelComponentIDAttribute], otelComponentIDAttribute+" should be set")
+				}
+			}
+		}
+	})
 }

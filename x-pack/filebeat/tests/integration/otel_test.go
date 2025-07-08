@@ -124,6 +124,7 @@ http.port: %d
 		"agent.id",
 		"log.file.inode",
 		"log.file.path",
+		"otelcol.component.id", // only present in beats receivers
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
@@ -246,6 +247,7 @@ processors:
 		"agent.ephemeral_id",
 		"agent.id",
 		"event.created",
+		"otelcol.component.id", // only present in beats receivers
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
@@ -470,6 +472,7 @@ http.port: %d
 		"agent.id",
 		"log.file.inode",
 		"log.file.path",
+		"otelcol.component.id", // only present in beats receivers
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
