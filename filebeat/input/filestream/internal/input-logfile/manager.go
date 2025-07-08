@@ -340,7 +340,7 @@ func (i *sourceIdentifier) MatchesInput(id string) bool {
 // the object (show above). On error false, nil and the error are returned
 func GetTakeOverConfig(cfg *conf.C, logger *logp.Logger) (bool, []string, error) {
 	// This is never going to return an error because the config path
-	// is a single element. Anyways, we still handle it.
+	// is a single element. Anyway, we still handle it.
 	hasTakeOver, err := cfg.Has("take_over", -1)
 	if err != nil {
 		return false, nil, fmt.Errorf("cannot assert if 'take_over' is present: %w", err)
