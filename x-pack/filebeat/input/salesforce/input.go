@@ -30,6 +30,7 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -75,18 +76,26 @@ func (s *salesforceInput) Test(_ inputcursor.Source, _ v2.TestContext) error {
 // Run starts the input and blocks until it ends completes. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
 func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inputcursor.Cursor, pub inputcursor.Publisher) (err error) {
+	//status start
+	env.UpdateStatus(status.Starting, "Initializing Salesforce input.")
 	st := &state{}
 	if !cursor.IsNew() {
 		if err = cursor.Unpack(&st); err != nil {
+			//status failed
+			env.UpdateStatus(status.Failed, fmt.Sprintf("Failed to set up Salesforce input: %v", err))
 			return err
 		}
 	}
+	//status configuring
 
 	if err = s.Setup(env, src, st, pub); err != nil {
+		//status failed
+		env.UpdateStatus(status.Failed, fmt.Sprintf("Failed to set up Salesforce input: %v", err))
 		return err
 	}
-
-	return s.run()
+	//status healthy
+	env.UpdateStatus(status.Healthy, "Salesforce input setup complete. Monitoring events.")
+	return s.run(env)
 }
 
 // Setup sets up the input. It will create a new SOQL resource and all other
@@ -119,11 +128,13 @@ func (s *salesforceInput) Setup(env v2.Context, src inputcursor.Source, cursor *
 // run is the main loop of the input. It will run until the context is cancelled
 // and based on the configuration, it will run the different methods -- EventLogFile
 // or Object to collect events at defined intervals.
-func (s *salesforceInput) run() error {
+func (s *salesforceInput) run(env v2.Context) error {
 	s.log.Info("Starting Salesforce input run")
 	if s.srcConfig.EventMonitoringMethod.EventLogFile.isEnabled() {
 		err := s.RunEventLogFile()
 		if err != nil {
+			//status degraded
+			env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running EventLogFile collection: %v", err))
 			s.log.Errorf("Problem running EventLogFile collection: %s", err)
 		}
 	}
@@ -131,6 +142,8 @@ func (s *salesforceInput) run() error {
 	if s.srcConfig.EventMonitoringMethod.Object.isEnabled() {
 		err := s.RunObject()
 		if err != nil {
+			//status degraded
+			env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running Object collection: %v", err))
 			s.log.Errorf("Problem running Object collection: %s", err)
 		}
 	}
@@ -164,15 +177,23 @@ func (s *salesforceInput) run() error {
 		case <-eventLogFileTicker.C:
 			s.log.Info("Running EventLogFile collection")
 			if err := s.RunEventLogFile(); err != nil {
+				//status degraded
+				env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running EventLogFile collection: %v", err))
 				s.log.Errorf("Problem running EventLogFile collection: %s", err)
 			} else {
+				//status healthy
+				env.UpdateStatus(status.Healthy, "EventLogFile collection completed successfully")
 				s.log.Info("EventLogFile collection completed successfully")
 			}
 		case <-objectMethodTicker.C:
+			//status degraded
 			s.log.Info("Running Object collection")
 			if err := s.RunObject(); err != nil {
+				env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running Object collection: %v", err))
 				s.log.Errorf("Problem running Object collection: %s", err)
 			} else {
+				// status healthy
+				env.UpdateStatus(status.Healthy, "Object collection completed successfully.")
 				s.log.Info("Object collection completed successfully")
 			}
 		}

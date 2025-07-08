@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/go-sfdc"
 	"github.com/elastic/go-sfdc/soql"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
@@ -333,6 +334,10 @@ func TestInput(t *testing.T) {
 			if tc.timeout != 0 {
 				timeout = tc.timeout
 			}
+			inputCtx := v2.Context{
+				Logger: logp.NewLogger("salesforce"),
+				ID:     "test_id",
+			}
 
 			ctx, cancel := context.WithTimeout(context.Background(), timeout)
 			defer cancel()
@@ -370,7 +375,7 @@ func TestInput(t *testing.T) {
 				return
 			}
 
-			err = salesforceInput.run()
+			err = salesforceInput.run(inputCtx)
 			if err != nil && !tc.wantErr {
 				t.Errorf("unexpected error from running input: %v", err)
 			}
