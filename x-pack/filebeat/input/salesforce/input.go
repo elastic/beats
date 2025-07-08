@@ -368,7 +368,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 				return fmt.Errorf("LogFile field not found or not a string in Salesforce event log file: %v", rec.Record().Fields())
 			}
 
-			req, err := http.NewRequestWithContext(s.ctx, http.MethodGet, s.config.URL+logfile, nil)
+			req, err := http.NewRequestWithContext(s.ctx, http.MethodGet, s.URL+logfile, nil)
 			if err != nil {
 				return fmt.Errorf("error creating request for log file: %w", err)
 			}
@@ -404,7 +404,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 				return fmt.Errorf("error decoding CSV: %w", err)
 			}
 
-			if timestamp, ok := rec.Record().Fields()[s.config.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
+			if timestamp, ok := rec.Record().Fields()[s.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
 				if firstEvent {
 					s.cursor.EventLogFile.FirstEventTime = timestamp
 				}
