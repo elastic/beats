@@ -43,7 +43,7 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, opts ...rw.RemoteW
 	}
 
 	if config.UseTypes {
-		logp.Debug("prometheus.remote_write.cache", "Period for counter cache for remote_write: %v", config.Period.String())
+		base.Logger().Named("prometheus.remote_write.cache").Debugf("Period for counter cache for remote_write: %v", config.Period.String())
 		// use a counter cache with a timeout of 5x the period, as a safe value
 		// to make sure that all counters are available between fetches
 		counters := collector.NewCounterCache(config.Period * 5)
@@ -52,6 +52,7 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, opts ...rw.RemoteW
 			counterCache: counters,
 			rateCounters: config.RateCounters,
 			metricsCount: config.MetricsCount,
+			logger:       base.Logger(),
 		}
 
 		var err error
@@ -76,6 +77,7 @@ type remoteWriteTypedGenerator struct {
 	rateCounters      bool
 	counterPatterns   []*regexp.Regexp
 	histogramPatterns []*regexp.Regexp
+	logger            *logp.Logger
 }
 
 func (g *remoteWriteTypedGenerator) Start() {
@@ -89,7 +91,7 @@ func (g *remoteWriteTypedGenerator) Start() {
 }
 
 func (g *remoteWriteTypedGenerator) Stop() {
-	logp.Debug("prometheus.remote_write.cache", "stopping counterCache")
+	g.logger.Debugf("prometheus.remote_write.cache", "stopping counterCache")
 	g.counterCache.Stop()
 }
 

@@ -104,7 +104,7 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
-	return newProcessMetadataProcessorWithProvider(config, &procCache, false)
+	return newProcessMetadataProcessorWithProvider(config, &procCache, false, log)
 }
 
 // NewWithCache construct a new add_process_metadata processor with cache for container IDs.
@@ -115,24 +115,24 @@ func NewWithCache(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
-	return newProcessMetadataProcessorWithProvider(config, &procCache, true)
+	return newProcessMetadataProcessorWithProvider(config, &procCache, true, log)
 }
 
-func NewWithConfig(opts ...ConfigOption) (beat.Processor, error) {
+func NewWithConfig(logger *logp.Logger, opts ...ConfigOption) (beat.Processor, error) {
 	cfg := defaultConfig()
 
 	for _, o := range opts {
 		o(&cfg)
 	}
 
-	return newProcessMetadataProcessorWithProvider(cfg, &procCache, true)
+	return newProcessMetadataProcessorWithProvider(cfg, &procCache, true, logger)
 }
 
-func newProcessMetadataProcessorWithProvider(config config, provider processMetadataProvider, withCache bool) (proc beat.Processor, err error) {
+func newProcessMetadataProcessorWithProvider(config config, provider processMetadataProvider, withCache bool, logger *logp.Logger) (proc beat.Processor, err error) {
 	// Logging (each processor instance has a unique ID).
 	var (
 		id  = int(instanceID.Add(1))
-		log = logp.NewLogger(processorName).With("instance_id", id)
+		log = logger.Named(processorName).With("instance_id", id)
 	)
 
 	// If neither option is configured, then add a default. A default cgroup_regex
@@ -180,9 +180,9 @@ func newProcessMetadataProcessorWithProvider(config config, provider processMeta
 
 			p.cgroupsCache = common.NewCacheWithRemovalListener(config.CgroupCacheExpireTime, 100, evictionListener)
 			p.cgroupsCache.StartJanitor(config.CgroupCacheExpireTime)
-			p.cidProvider = newCidProvider(config.CgroupPrefixes, config.CgroupRegex, reader, p.cgroupsCache)
+			p.cidProvider = newCidProvider(config.CgroupPrefixes, config.CgroupRegex, reader, p.cgroupsCache, logger)
 		} else {
-			p.cidProvider = newCidProvider(config.CgroupPrefixes, config.CgroupRegex, reader, nil)
+			p.cidProvider = newCidProvider(config.CgroupPrefixes, config.CgroupRegex, reader, nil, logger)
 		}
 	}
 
