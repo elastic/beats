@@ -62,7 +62,7 @@ func TestLargeScaleFilestreamDelete(t *testing.T) {
 // }
 
 func testLargeScaleFilestreamDelete(t *testing.T, timeout time.Duration, nFiles, lines int) {
-	fb := integration.NewRealBeat(t, "filebeat", "../../filebeat")
+	fb := integration.NewBeat(t, "filebeat", "../../filebeat.test")
 	start := time.Now()
 
 	dir := generateLogFilesScale(t, fb.TempDir(), nFiles, lines)
