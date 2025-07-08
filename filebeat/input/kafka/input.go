@@ -308,7 +308,7 @@ func (h *groupHandler) ack(message *sarama.ConsumerMessage) {
 
 func (h *groupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	reader := h.createReader(claim)
-	parser := h.parsers.Create(reader)
+	parser := h.parsers.Create(reader, h.log)
 	for h.session.Context().Err() == nil {
 		message, err := parser.Next()
 		if errors.Is(err, io.EOF) {

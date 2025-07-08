@@ -1,2 +1,0 @@
-The counter metricset of Cloud Foundry module allows you to collect counter metrics that the
-loggregator sends to metricbeat.

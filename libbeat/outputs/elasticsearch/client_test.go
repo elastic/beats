@@ -749,8 +749,6 @@ func TestPublishResultForStats(t *testing.T) {
 }
 
 func BenchmarkCollectPublishFailsNone(b *testing.B) {
-	logger, err := logp.NewDevelopmentLogger("")
-	require.NoError(b, err)
 
 	client, err := NewClient(
 		clientSettings{
@@ -758,7 +756,7 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
 			deadLetterIndex: "",
 		},
 		nil,
-		logger,
+		logp.NewNopLogger(), // we use no-op logger so that it does not skew benchmark results
 	)
 	assert.NoError(b, err)
 
@@ -786,14 +784,12 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
 }
 
 func BenchmarkCollectPublishFailMiddle(b *testing.B) {
-	logger, err := logp.NewDevelopmentLogger("")
-	require.NoError(b, err)
 	client, err := NewClient(
 		clientSettings{
 			observer: outputs.NewNilObserver(),
 		},
 		nil,
-		logger,
+		logp.NewNopLogger(),
 	)
 	assert.NoError(b, err)
 
@@ -822,14 +818,12 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 }
 
 func BenchmarkCollectPublishFailAll(b *testing.B) {
-	logger, err := logp.NewDevelopmentLogger("")
-	require.NoError(b, err)
 	client, err := NewClient(
 		clientSettings{
 			observer: outputs.NewNilObserver(),
 		},
 		nil,
-		logger,
+		logp.NewNopLogger(),
 	)
 	assert.NoError(b, err)
 
@@ -902,8 +896,6 @@ func BenchmarkPublish(b *testing.B) {
 	// Indexing to _bulk api
 	for _, test := range tests {
 		for _, l := range levels {
-			logger, err := logp.NewDevelopmentLogger("")
-			require.NoError(b, err)
 			b.Run(fmt.Sprintf("%s with compression level %d", test.Name, l), func(b *testing.B) {
 				client, err := NewClient(
 					clientSettings{
@@ -917,7 +909,7 @@ func BenchmarkPublish(b *testing.B) {
 						},
 					},
 					nil,
-					logger,
+					logp.NewNopLogger(),
 				)
 				assert.NoError(b, err)
 				batch := encodeBatch(client, outest.NewBatch(test.Events...))

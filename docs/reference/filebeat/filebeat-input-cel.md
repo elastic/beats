@@ -117,7 +117,7 @@ After completion of a program’s execution it should return a single object wit
 
 1. The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements. The field should be an array, but in the case of an error condition in the CEL program it is acceptable to return a single object instead of an array; this will will be wrapped as an array for publication and an error will be logged. If the single object contains a key, "error", the error value will be used to update the status of the input to report to Elastic Agent. This can be used to more rapidly respond to API failures.
 2. If `cursor` is present it must be either be a single object or an array with the same length as events; each element *i* of the `cursor` will be the details for obtaining the events at and beyond event *i* in the `events` array. If the `cursor` is a single object it is will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array.
-3. If `rate_limit` is present it must be a map with numeric fields `rate` and `burst`. The `rate_limit` field may also have a string `error` field and other fields which will be logged. If it has an `error` field, the `rate` and `burst` will not be used to set rate limit behavior. The [Limit](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Limit), and [Okta Rate Limit policy](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#OktaRateLimit) and [Draft Rate Limit policy](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#DraftRateLimit) documentation show how to construct this field.
+3. If `rate_limit` is present it must be a map with numeric fields `rate` and `burst`. The `rate_limit` field may also have a string `error` field and other fields which will be logged. If it has an `error` field, the `rate` and `burst` will not be used to set rate limit behavior. The [Limit](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#Limit), and [Okta Rate Limit policy](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#OktaRateLimit) and [Draft Rate Limit policy](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#DraftRateLimit) documentation show how to construct this field.
 4. The evaluation is repeated with the new state, after removing the events field, if the "want_more" field is present and true, and a non-zero events array is returned. If the "want_more" field is present after a failed evaluation, it is set to false.
 
 
@@ -133,116 +133,122 @@ The CEL input will log the complete state after evaluation when logging at the D
 
 As noted above the `cel` input provides functions, macros, and global variables to extend the language.
 
-* [Collections](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Collections)
+* [AWS v4 request signing](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#AWS)
 
-    * [Collate](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Collate-Collections)
-    * [Drop](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Drop-Collections)
-    * [Drop Empty](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Drop_Empty-Collections)
-    * [Flatten](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Flatten-Collections)
-    * [Front](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Front-Collections)
-    * [Keys](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Keys-Collections)
-    * [Max](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Max-Collections)
-    * [Min](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Min-Collections)
-    * [Sum](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Sum-Collections)
-    * [Tail](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Tail-Collections)
-    * [Values](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Values-Collections)
-    * [With](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-With-Collections)
-    * [With Replace](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-With_Replace-Collections)
-    * [With Update](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-With_Update-Collections)
-    * [Zip](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Zip-Collections)
+    * [Sign AWS from env](https://pkg.go.dev/github.com/elastic/mito/lib#hdr-Sign_AWS_from_env-AWS)
+    * [Sign AWS from shared credentials](https://pkg.go.dev/github.com/elastic/mito/lib#hdr-Sign_AWS_from_shared_credentials-AWS)
+    * [Sign AWS from static credentials](https://pkg.go.dev/github.com/elastic/mito/lib#hdr-Sign_AWS_from_static_credentials-AWS)
 
-* [Crypto](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Crypto)
+* [Collections](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#Collections)
 
-    * [Base64](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Base64-Crypto)
-    * [Base64 Decode](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Base64_Decode-Crypto)
-    * [Base64 Raw](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Base64_Raw-Crypto)
-    * [Base64 Raw Decode](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Base64_Raw_Decode-Crypto)
-    * [Hex](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Hex-Crypto)
-    * [Hex Decode](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Hex_Decode-Crypto)
-    * [MD5](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-MD5-Crypto)
-    * [SHA-1](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-SHA_1-Crypto)
-    * [SHA-256](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-SHA_256-Crypto)
-    * [HMAC](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-HMAC-Crypto)
-    * [UUID](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-UUID-Crypto)
+    * [Collate](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Collate-Collections)
+    * [Drop](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Drop-Collections)
+    * [Drop Empty](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Drop_Empty-Collections)
+    * [Flatten](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Flatten-Collections)
+    * [Front](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Front-Collections)
+    * [Keys](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Keys-Collections)
+    * [Max](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Max-Collections)
+    * [Min](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Min-Collections)
+    * [Sum](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Sum-Collections)
+    * [Tail](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Tail-Collections)
+    * [Values](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Values-Collections)
+    * [With](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-With-Collections)
+    * [With Replace](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-With_Replace-Collections)
+    * [With Update](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-With_Update-Collections)
+    * [Zip](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Zip-Collections)
 
-* [File](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#File) — the file extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#NDJSON), ["application/zip"](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Zip), ["text/csv; header=absent"](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#CSVNoHeader), and ["text/csv; header=present"](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#CSVHeader).
+* [Crypto](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#Crypto)
 
-    * [Dir](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Dir-File)
-    * [File](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-File-File)
+    * [Base64](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Base64-Crypto)
+    * [Base64 Decode](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Base64_Decode-Crypto)
+    * [Base64 Raw](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Base64_Raw-Crypto)
+    * [Base64 Raw Decode](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Base64_Raw_Decode-Crypto)
+    * [Hex](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Hex-Crypto)
+    * [Hex Decode](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Hex_Decode-Crypto)
+    * [MD5](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-MD5-Crypto)
+    * [SHA-1](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-SHA_1-Crypto)
+    * [SHA-256](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-SHA_256-Crypto)
+    * [HMAC](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-HMAC-Crypto)
+    * [UUID](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-UUID-Crypto)
 
-* [HTTP](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#HTTP)
+* [File](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#File) — the file extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#NDJSON), ["application/zip"](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#Zip), ["text/csv; header=absent"](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#CSVNoHeader), and ["text/csv; header=present"](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#CSVHeader).
 
-    * [HEAD](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-HEAD-HTTP)
-    * [GET](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-GET-HTTP)
-    * [GET Request](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-GET_Request-HTTP)
-    * [POST](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-POST-HTTP)
-    * [POST Request](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-POST_Request-HTTP)
-    * [Request](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Request-HTTP)
-    * [Basic Authentication](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Basic_Authentication-HTTP)
-    * [Do Request](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Do_Request-HTTP)
-    * [Parse URL](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Parse_URL-HTTP)
-    * [Format URL](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Format_URL-HTTP)
-    * [Parse Query](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Parse_Query-HTTP)
-    * [Format Query](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Format_Query-HTTP)
+    * [Dir](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Dir-File)
+    * [File](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-File-File)
 
-* [JSON](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#JSON)
+* [HTTP](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#HTTP)
 
-    * [Encode JSON](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Encode_JSON-JSON)
-    * [Decode JSON](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Decode_JSON-JSON)
-    * [Decode JSON Stream](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Decode_JSON_Stream-JSON)
+    * [HEAD](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-HEAD-HTTP)
+    * [GET](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-GET-HTTP)
+    * [GET Request](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-GET_Request-HTTP)
+    * [POST](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-POST-HTTP)
+    * [POST Request](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-POST_Request-HTTP)
+    * [Request](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Request-HTTP)
+    * [Basic Authentication](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Basic_Authentication-HTTP)
+    * [Do Request](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Do_Request-HTTP)
+    * [Parse URL](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Parse_URL-HTTP)
+    * [Format URL](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Format_URL-HTTP)
+    * [Parse Query](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Parse_Query-HTTP)
+    * [Format Query](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Format_Query-HTTP)
 
-* [XML](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#XML) — the XML extension is initialized with XML schema definitions provided via the `xsd` configuration option.
+* [JSON](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#JSON)
 
-    * [Decode XML](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Decode_XML-XML)
+    * [Encode JSON](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Encode_JSON-JSON)
+    * [Decode JSON](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Decode_JSON-JSON)
+    * [Decode JSON Stream](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Decode_JSON_Stream-JSON)
 
-* [Limit](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Limit) — the rate limit extension is initialized with [Okta (as "okta")](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#OktaRateLimit) and the [Draft Rate Limit (as "draft")](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#DraftRateLimit) policies.
+* [XML](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#XML) — the XML extension is initialized with XML schema definitions provided via the `xsd` configuration option.
 
-    * [Rate Limit](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Rate_Limit-Limit)
+    * [Decode XML](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Decode_XML-XML)
 
-* [MIME](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#MIME) — the MIME extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#NDJSON), ["application/zip"](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Zip), ["text/csv; header=absent"](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#CSVNoHeader), and ["text/csv; header=present"](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#CSVHeader).
+* [Limit](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#Limit) — the rate limit extension is initialized with [Okta (as "okta")](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#OktaRateLimit) and the [Draft Rate Limit (as "draft")](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#DraftRateLimit) policies.
 
-    * [MIME](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-MIME-MIME)
+    * [Rate Limit](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Rate_Limit-Limit)
 
-* [Regexp](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Regexp) — the regular expression extension is initialized with the patterns specified in the user input configuration via the `regexp` field.
+* [MIME](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#MIME) — the MIME extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#NDJSON), ["application/zip"](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#Zip), ["text/csv; header=absent"](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#CSVNoHeader), and ["text/csv; header=present"](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#CSVHeader).
 
-    * [RE Match](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-RE_Match)
-    * [RE Find](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-RE_Find)
-    * [RE Find All](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-RE_Find_All)
-    * [RE Find Submatch](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-RE_Find_Submatch)
-    * [RE Find All Submatch](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-RE_Find_All_Submatch)
-    * [RE Replace All](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-RE_Replace_All)
+    * [MIME](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-MIME-MIME)
 
-* [Printf](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Printf)
+* [Regexp](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#Regexp) — the regular expression extension is initialized with the patterns specified in the user input configuration via the `regexp` field.
 
-    * [Sprintf](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Sprintf-Printf)
+    * [RE Match](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-RE_Match)
+    * [RE Find](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-RE_Find)
+    * [RE Find All](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-RE_Find_All)
+    * [RE Find Submatch](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-RE_Find_Submatch)
+    * [RE Find All Submatch](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-RE_Find_All_Submatch)
+    * [RE Replace All](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-RE_Replace_All)
 
-* [Strings](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Strings)
+* [Printf](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#Printf)
 
-    * [String Methods](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-String_Methods-Strings)
-    * [String List Methods](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-String_List_Methods-Strings)
-    * [Bytes Methods](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Bytes_Methods-Strings)
+    * [Sprintf](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Sprintf-Printf)
 
-* [Time](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Time)
+* [Strings](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#Strings)
 
-    * [Format](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Format-Time)
-    * [Parse Time](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Parse_Time-Time)
-    * [Global Variables](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Global_Variables-Time)
+    * [String Methods](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-String_Methods-Strings)
+    * [String List Methods](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-String_List_Methods-Strings)
+    * [Bytes Methods](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Bytes_Methods-Strings)
 
-* [Try](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Try)
+* [Time](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#Time)
 
-    * [Try](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Try-Try)
-    * [Is Error](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Is_Error-Try)
+    * [Format](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Format-Time)
+    * [Parse Time](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Parse_Time-Time)
+    * [Global Variables](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Global_Variables-Time)
 
-* [Debug](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Debug) — the debug handler registers a logger with the name extension `cel_debug` and calls to the CEL `debug` function are emitted to that logger.
+* [Try](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#Try)
 
-    * [Debug](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Debug)
+    * [Try](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Try-Try)
+    * [Is Error](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Is_Error-Try)
+
+* [Debug](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#Debug) — the debug handler registers a logger with the name extension `cel_debug` and calls to the CEL `debug` function are emitted to that logger.
+
+    * [Debug](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#hdr-Debug)
 
 
 In addition to the extensions provided in the packages listed above, a global variable `useragent` is also provided which gives the user CEL program access to the filebeat user-agent string. By default, this value is assigned to all requests' user-agent headers unless the CEL program has already set the user-agent header value. Programs wishing to not provide a user-agent, should set this header to the empty string, `""`.
 
 Host environment variables are made available via the global map `env`. Only environment variables that have been allow listed via the `allowed_environment` configuration list are visible to the CEL program.
 
-The CEL environment enables the [optional types](https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes) library using the version defined [here](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#OptionalTypesVersion).
+The CEL environment enables the [optional types](https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes) library using the version defined [here](https://pkg.go.dev/github.com/elastic/mito@v1.21.0/lib#OptionalTypesVersion).
 
 Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2.
 
@@ -288,7 +294,6 @@ filebeat.inputs:
   resource.url: http://localhost
 ```
 
-
 ## Input state [input-state-cel]
 
 The `cel` input keeps a runtime state between requests. This state can be accessed by the CEL program and may contain arbitrary objects.
@@ -296,6 +301,23 @@ The `cel` input keeps a runtime state between requests. This state can be access
 The state must contain a `url` string and may contain any object the user wishes to store in it.
 
 All objects are stored at runtime, except `cursor`, which has values that are persisted between restarts.
+
+
+## CEL input and handling numbers [_cel_input_and_numbers]
+
+Numeric values passed in to and out of a CEL evaluation environment are passed as floating point
+values. This can sometimes cause issues when the numbers in the input state are expected to be
+integers, and may result in unexpected field values being ingested into Elasticsearch documents when
+other parts of the ingest pipeline render floating point values with E-notation or add decimal
+points to numbers that are expected to be integers. This is most likely to happen when numbers are
+large (not within ±10^7^). Above the maximum exact integer representation threshold for double
+precision floating point values, within ±2^53^ (±9×10^15^), integer values will lose precision when
+they are returned from the CEL evaluation environment. The CEL input will automatically convert
+integers outside of the ±2^53^ range to strings in order to prevent loss of precision in these
+values, but potentially leading to a situation where some numbers received by the ingest pipeline
+are numbers and some are strings. To avoid these issues, when you have large integer values as part
+of an evaluation result, convert the field value to a string before returning it, and convert input
+numbers to integers explicitly at the start of a CEL program.
 
 
 ## Configuration options [_configuration_options_3]
