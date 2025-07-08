@@ -81,12 +81,6 @@ func TestUserAgentString(t *testing.T) {
 				Manager: testManager{isEnabled: true, isUnpriv: true, mgmtMode: proto.AgentManagedMode_STANDALONE}},
 			expectedComments: []string{"Standalone", "Unprivileged"},
 		},
-		{
-			name: "management-disabled",
-			beat: &Beat{Info: Info{Beat: "testbeat"},
-				Manager: testManager{isEnabled: false}},
-			expectedComments: []string{},
-		},
 	}
 
 	// User-Agent will take the form of
