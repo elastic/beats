@@ -90,8 +90,15 @@ type Beat struct {
 	Registry *reload.Registry // input, & output registry for configuration manager, should be instantiated in NewBeat
 }
 
-// GenerateUserAgent populates the UserAgent field on the beat.Info struct
-func (beat *Beat) GenerateUserAgent() {
+func (beat *Beat) userAgentProduct() string {
+	if beat.Info.Beat != "" {
+		return beat.Info.Beat
+	}
+	return "Libbeat"
+}
+
+// fallbackUserAgent returns the user agent string for the beat.
+func (beat *Beat) fallbackUserAgent() string {
 	// if we're in fleet mode, construct some additional elements for the UA comment field
 	comments := []string{}
 	if beat.Manager != nil && beat.Manager.Enabled() {
@@ -107,14 +114,38 @@ func (beat *Beat) GenerateUserAgent() {
 		}
 	}
 
-	UserAgentProduct := beat.Info.Beat
-	if UserAgentProduct == "" {
-		UserAgentProduct = "Libbeat"
+	return useragent.UserAgent(beat.userAgentProduct(), version.GetDefaultVersion(),
+		version.Commit(), version.BuildTime().String(), comments...)
+}
+
+// generateUserAgent returns the user agent string for the beat.
+func (beat *Beat) generateUserAgent() (string, error) {
+	var mode useragent.AgentManagementMode
+
+	info := beat.Manager.AgentInfo()
+	switch info.ManagedMode {
+	case proto.AgentManagedMode_MANAGED:
+		mode = useragent.AgentManagementModeManaged
+	case proto.AgentManagedMode_STANDALONE:
+		mode = useragent.AgentManagementModeStandalone
 	}
 
-	finalUserAgent := useragent.UserAgent(UserAgentProduct, version.GetDefaultVersion(),
-		version.Commit(), version.BuildTime().String(), comments...)
-	beat.Info.UserAgent = finalUserAgent
+	privileged := useragent.AgentUnprivilegedModePrivileged
+	if info.Unprivileged {
+		privileged = useragent.AgentUnprivilegedModeUnprivileged
+	}
+
+	return useragent.UserAgentWithBeatTelemetry(beat.userAgentProduct(), version.GetDefaultVersion(),
+		mode, privileged)
+}
+
+// GenerateUserAgent populates the UserAgent field on the beat.Info struct
+func (beat *Beat) GenerateUserAgent() {
+	ua, err := beat.generateUserAgent()
+	if err != nil {
+		ua = beat.fallbackUserAgent()
+	}
+	beat.Info.UserAgent = ua
 }
 
 // BeatConfig struct contains the basic configuration of every beat

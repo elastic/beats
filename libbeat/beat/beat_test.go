@@ -84,7 +84,7 @@ func TestUserAgentString(t *testing.T) {
 	}
 
 	// User-Agent will take the form of
-	// Elastic-testbeat/8.15.0 (linux; amd64; unknown; 0001-01-01 00:00:00 +0000 UTC; Standalone; Unprivileged)
+	// Elastic-testbeat/9.2.0 (linux; arm64; Managed; Unprivileged)
 	// the RFC (https://www.rfc-editor.org/rfc/rfc9110#name-user-agent) says the comment field can basically be anything,
 	// but we put metadata in it, delimited by '; '
 	uaReg := regexp.MustCompile(`Elastic-testbeat/([\d.]+) \(([\w-:+; ]+)\)`)
@@ -107,4 +107,11 @@ func TestUserAgentString(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGenerateUserAgentNilManagerPanics(t *testing.T) {
+    b := &Beat{Info: Info{Beat: "testbeat"}, Manager: nil}
+    require.Panics(t, func() {
+        b.GenerateUserAgent()
+    })
 }
