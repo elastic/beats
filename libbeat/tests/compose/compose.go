@@ -175,7 +175,7 @@ func findComposePath() (string, error) {
 		return "", err
 	}
 	for {
-		if path == "/" {
+		if path == "/" { //nolint:QF1006
 			break
 		}
 

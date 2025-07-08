@@ -107,6 +107,7 @@ func (c *wrapperContainer) Old() bool {
 // running from the hoist network if the docker daemon runs natively.
 func (c *wrapperContainer) privateHost(port int) string {
 	var ip string
+	var shortPort uint16
 	for _, net := range c.info.NetworkSettings.Networks {
 		if len(net.IPAddress) > 0 {
 			ip = net.IPAddress
@@ -117,6 +118,11 @@ func (c *wrapperContainer) privateHost(port int) string {
 		return ""
 	}
 
+        if port >= 0 && port <= math.MaxUint16 {
+		shortPort = uint16(port)
+	} else {
+		return ""
+	}
 	for _, info := range c.info.Ports {
 		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == uint16(port)) {
 			return net.JoinHostPort(ip, strconv.Itoa(int(info.PrivatePort)))
@@ -128,6 +134,13 @@ func (c *wrapperContainer) privateHost(port int) string {
 // exposedHost returns the exposed address in the host, can be used when the
 // test is run from the host network. Recommended when using docker machines.
 func (c *wrapperContainer) exposedHost(port int) string {
+	var shortPort uint16
+
+        if port >= 0 && port <= math.MaxUint16 {
+		shortPort = uint16(port)
+	} else {
+		return ""
+	}
 	for _, info := range c.info.Ports {
 		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == uint16(port)) {
 			return net.JoinHostPort("localhost", strconv.Itoa(int(info.PublicPort)))

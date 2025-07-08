@@ -23,7 +23,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 
 	"github.com/elastic/elastic-agent-autodiscover/docker"
 
@@ -70,7 +69,7 @@ func (c Client) ContainerStart(image string, cmd []string, labels map[string]str
 // imagePull pulls an image
 func (c Client) imagePull(img string) (err error) {
 	ctx := context.Background()
-	_, _, err = c.cli.ImageInspectWithRaw(ctx, img)
+	_, _, err = c.cli.ImageInspect(ctx, img)
 	if err == nil {
 		// Image already available, do nothing
 		return nil
@@ -84,7 +83,7 @@ func (c Client) imagePull(img string) (err error) {
 			defer respBody.Close()
 
 			// Read all the response, to be sure that the pull has finished before returning.
-			_, err = io.Copy(ioutil.Discard, respBody)
+			_, err = io.Copy(io.Discard, respBody)
 			if err != nil {
 				return fmt.Errorf("reading response for image %s: %w", img, err)
 			}
