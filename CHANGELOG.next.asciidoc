@@ -149,6 +149,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Fix EvtVarTypeAnsiString conversion {pull}44026[44026]
 
 
 *Elastic Logging Plugin*
