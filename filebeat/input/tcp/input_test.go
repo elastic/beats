@@ -91,9 +91,11 @@ func TestInput(t *testing.T) {
 
 func TestInputCanReadWithoutPublishing(t *testing.T) {
 	serverAddr := "localhost:9042"
+	numberOfWorkers := 42
 	wg := sync.WaitGroup{}
 	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
-		"host": serverAddr,
+		"host":              serverAddr,
+		"number_of_workers": numberOfWorkers,
 	}))
 	if err != nil {
 		t.Fatalf("cannot create input: %s", err)
@@ -126,6 +128,10 @@ func TestInputCanReadWithoutPublishing(t *testing.T) {
 
 	// Ensure the input Run method returns
 	wg.Wait()
+
+	if got, want := pipeline.NumClients(), numberOfWorkers; got != want {
+		t.Fatalf("did not create the expected number of clients, expecting %d, got %d", want, got)
+	}
 }
 
 func requireEventMetrics(t *testing.T, timeout time.Duration, want eventMetrics) {

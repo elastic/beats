@@ -67,7 +67,7 @@ func defaultConfig() config {
 			MaxMessageSize: 20 * humanize.MiByte,
 		},
 		LineDelimiter:      "\n",
-		numPipelineWorkers: 2,
+		NumPipelineWorkers: 1,
 	}
 }
 
@@ -82,19 +82,18 @@ type config struct {
 
 	LineDelimiter      string                `config:"line_delimiter" validate:"nonzero"`
 	Framing            streaming.FramingType `config:"framing"`
-	BufferSize         int                   `config:"buffer_size"`
-	numPipelineWorkers int
+	NumPipelineWorkers int                   `config:"number_of_workers"`
 }
 
 type evtWithSize struct {
-	beat.Event
-	size int
+	Event beat.Event
+	size  int
 }
 
 func newServer(config config) (*server, error) {
 	s := server{
 		config:  config,
-		evtChan: make(chan evtWithSize, config.BufferSize),
+		evtChan: make(chan evtWithSize),
 	}
 
 	return &s, nil
@@ -130,7 +129,7 @@ func (s *server) publishLoop(ctx input.Context, publisher stateless.Publisher, m
 
 func (s *server) initWorkers(ctx input.Context, pipeline beat.Pipeline, metrics *netmetrics.TCP) error {
 	clients := []beat.Client{}
-	for range s.numPipelineWorkers {
+	for range s.NumPipelineWorkers {
 		client, err := pipeline.ConnectWith(beat.ClientConfig{
 			PublishMode: beat.DefaultGuarantees,
 		})
@@ -196,7 +195,7 @@ func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err er
 // initAndRunServer initialises and runs the TCP server.
 // It updates the input status to Running.
 func (s *server) initAndRunServer(ctx input.Context, metrics *netmetrics.TCP) error {
-	log := ctx.Logger
+	logger := ctx.Logger
 
 	split, err := streaming.SplitFunc(s.Framing, []byte(s.LineDelimiter))
 	if err != nil {
@@ -208,11 +207,11 @@ func (s *server) initAndRunServer(ctx input.Context, metrics *netmetrics.TCP) er
 		&s.Config,
 		streaming.SplitHandlerFactory(
 			inputsource.FamilyTCP,
-			log,
+			logger,
 			tcp.MetadataCallback,
 			func(data []byte, metadata inputsource.NetworkMetadata) {
 				metrics.IncEventRead()
-				log.Debugw(
+				logger.Debugw(
 					"Data received",
 					"bytes", len(data),
 					"remote_address", metadata.RemoteAddr.String(),
@@ -236,14 +235,14 @@ func (s *server) initAndRunServer(ctx input.Context, metrics *netmetrics.TCP) er
 			},
 			split,
 		),
-		log,
+		logger,
 	)
 	if err != nil {
 		ctx.UpdateStatus(status.Failed, "Failed to configure input: "+err.Error())
 		return err
 	}
 
-	log.Debug("tcp input initialized")
+	logger.Debug("tcp input initialized")
 	ctx.UpdateStatus(status.Running, "")
 
 	err = server.Run(ctxtool.FromCanceller(ctx.Cancelation))

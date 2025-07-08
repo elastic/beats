@@ -2,6 +2,8 @@
 navigation_title: "TCP"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-tcp.html
+applies_to:
+  stack: ga
 ---
 
 # TCP input [filebeat-input-tcp]
@@ -18,6 +20,10 @@ filebeat.inputs:
   host: "localhost:9000"
 ```
 
+Starting from `9.2.0` the TCP input reads the message in a different
+goroutine than the publishing of messages, this increases the
+performance of the input.
+
 ## Configuration options [_configuration_options_19]
 
 The `tcp` input supports the following configuration options plus the [Common options](#filebeat-input-tcp-common-options) described later.
@@ -31,6 +37,13 @@ The maximum size of the message received over TCP. The default is `20MiB`.
 ### `host` [filebeat-input-tcp-tcp-host]
 
 The host and TCP port to listen on for event streams.
+
+### `number_of_workers` [filebeat-input-tcp-number-of-workers]
+```{applies_to}
+stack: ga 9.2.0
+```
+
+The number of pipeline workers to create for each host. Default: 1
 
 
 ### `network` [filebeat-input-tcp-tcp-network]
