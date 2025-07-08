@@ -264,7 +264,10 @@ func testGracePeriod(
 	})
 }
 
-func TestFilestreamDeleteRestart(t *testing.T) {
+// TestFilestreamDeleteEnabledOnExistingFiles tests the flow where Filestream
+// has already ingested some files, then it is restarted with the delete
+// feature enabled.
+func TestFilestreamDeleteEnabledOnExistingFiles(t *testing.T) {
 	testCases := map[string]struct {
 		configTmpl          string
 		msg                 string
@@ -273,12 +276,12 @@ func TestFilestreamDeleteRestart(t *testing.T) {
 		gracePeriod         time.Duration
 	}{
 		"EOF and grace priod": {
-			configTmpl:  "eof.yml",
+			configTmpl:  "restart-eof.yml",
 			msg:         "EOF has been reached. Closing. Path='%s'",
 			gracePeriod: 5 * time.Second,
 		},
 		"Inactive and grace period": {
-			configTmpl:  "inactive.yml",
+			configTmpl:  "restart-inactive.yml",
 			msg:         "'%s' is inactive",
 			gracePeriod: 5 * time.Second,
 		},
@@ -328,12 +331,6 @@ func TestFilestreamDeleteRestart(t *testing.T) {
 				msg,
 			)
 
-			gracePeriodMsg := fmt.Sprintf(
-				"all events from '%s' have been published, waiting for %s grace period",
-				msgLogFilePath,
-				tc.gracePeriod)
-			filebeat.WaitForLogs(gracePeriodMsg, 10*time.Second, "waiting for grace period log not found")
-
 			filebeat.Stop()
 			filebeat.WaitForLogs("filebeat stopped.", 2*time.Second, "Filebeat did not stop successfully")
 			filebeat.RemoveLogFiles()
@@ -342,7 +339,16 @@ func TestFilestreamDeleteRestart(t *testing.T) {
 				t.Fatalf("%q should not have been removed", logFile)
 			}
 
+			vars["deleteEnabled"] = true
+			cfgYAML = getConfig(t, vars, "delete", tc.configTmpl)
+			filebeat.WriteConfigFile(cfgYAML)
+
 			filebeat.Start()
+
+			gracePeriodMsg := fmt.Sprintf(
+				"all events from '%s' have been published, waiting for %s grace period",
+				msgLogFilePath,
+				tc.gracePeriod)
 			filebeat.WaitForLogs(gracePeriodMsg, 10*time.Second, "waiting for grace period log not found")
 
 			msg = fmt.Sprintf("'%s' removed", msgLogFilePath)
