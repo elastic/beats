@@ -402,12 +402,12 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 			{
 				MonitoringPort: 5066,
 				InputFile:      logFilePath,
-				PathHome:       filebeatOTel.TempDir(),
+				PathHome:       filepath.Join(filebeatOTel.TempDir(), "r1"),
 			},
 			{
 				MonitoringPort: 5067,
 				InputFile:      logFilePath,
-				PathHome:       filebeatOTel.TempDir(),
+				PathHome:       filepath.Join(filebeatOTel.TempDir(), "r2"),
 			},
 		},
 	}
