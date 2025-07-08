@@ -647,6 +647,13 @@ The default value is 30 minutes.
 For examples on how to use this feature, refer to [Removing files after
 ingestion](/reference/filebeat/delete-file-guide.md).
 
+:::{warning}
+When delete is enabled, do not use log rotation tools/strategies that
+might replace/move the files {{filebeat}} will delete after
+ingestion. This can cause files not fully ingested to be accidentally
+removed.
+:::
+
 ## Log rotation [filestream-log-rotation-support]
 
 As log files are constantly written, they must be rotated and purged to prevent the logger application from filling up the disk. Rotation is done by an external application, thus, Filebeat needs information how to cooperate with it.
