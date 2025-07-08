@@ -54,7 +54,7 @@
                         "steps": 0,
                         "terms_field": "cloud.instance.id",
                         "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
-                        "terms_size": "5"
+                        "terms_size": "10"
                     }
                 ],
                 "show_grid": 1,
