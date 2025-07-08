@@ -250,9 +250,9 @@ func TestPublish(t *testing.T) {
 			for _, event := range batch.Events() {
 				beatEvent := event.Content.Fields
 				if wantCompID == "" {
-					assert.NotContains(t, event.Content.Fields, otelComponentIDAttribute, otelComponentIDAttribute+" should not be set")
+					assert.NotContains(t, event.Content.Fields, otelComponentIDKey, otelComponentIDKey+" should not be set")
 				} else {
-					assert.Equal(t, otelConsumer.beatInfo.ComponentID, beatEvent[otelComponentIDAttribute], otelComponentIDAttribute+" should be set")
+					assert.Equal(t, otelConsumer.beatInfo.ComponentID, beatEvent[otelComponentIDKey], otelComponentIDKey+" should be set")
 				}
 			}
 		}
