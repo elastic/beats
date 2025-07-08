@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/multiline"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -151,6 +152,10 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 
 	r = readfile.NewStripNewline(r, readfile.LineFeed)
 
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		return nil, err
+	}
 	if conf.multiPattern != "" {
 		p, err := match.Compile(conf.multiPattern)
 		if err != nil {
@@ -162,7 +167,7 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 			Match:   conf.matchMode,
 			Pattern: &p,
 		}
-		r, err = multiline.New(r, "\n", 1<<20, &c)
+		r, err = multiline.New(r, "\n", 1<<20, &c, logger)
 		if err != nil {
 			return nil, err
 		}
