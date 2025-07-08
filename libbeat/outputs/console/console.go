@@ -121,6 +121,7 @@ func (c *console) Publish(_ context.Context, batch publisher.Batch) error {
 var nl = []byte("\n")
 
 func (c *console) publishEvent(event *publisher.Event) bool {
+	logp.L().Infof("=== publishing event to console: %+v ===", *event)
 	serializedEvent, err := c.codec.Encode(c.index, &event.Content)
 	if err != nil {
 		if !event.Guaranteed() {

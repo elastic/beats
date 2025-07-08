@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"sync"
 
 	"syscall"
@@ -154,13 +155,19 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	pipeline := b.Publisher
 	var pipelineWrapper monitors.PipelineWrapper = &monitors.NoopPipelineWrapper{}
 	if bt.config.RunOnce {
-		// Wrap publisher using a monitor skipper
-		b.Publisher = monitors.WithSkipMonitorPipeline(pipeline, bt)
+		// TODO: find a better way to update the publisher from the beats
+		// Investigate:
+		// - Pipeline interface and callbacks -> Nope
+		// - Beater methods to update the pipeline -> Nope
+		// - ASK FOR HELP.
+		b.Publisher = monitors.WithDelayedPipelineStop(pipeline)
 
+		// Wrap publisher using a monitor skipper
 		sync := &monitors.SyncPipelineWrapper{}
 
 		pipeline = monitors.WithSyncPipelineWrapper(pipeline, sync)
 		pipelineWrapper = sync
+
 	}
 
 	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
@@ -227,7 +234,13 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	// Three possible events: global beat, run_once pipeline done and publish timeout
 	waitPublished.AddChan(bt.done)
-	waitPublished.Add(monitors.WithLog(pipelineWrapper.Wait, "shutdown: finished publishing events."))
+	waitPublished.Add(monitors.WithLog(func() {
+		pipelineWrapper.Wait()
+		// TODO: change this please! Ideally, we should add this as a wait condition
+		if closer, ok := b.Publisher.(io.Closer); ok {
+			closer.Close()
+		}
+	}, "shutdown: finished publishing events."))
 	if bt.config.PublishTimeout > 0 {
 		logp.L().Infof("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout)
 		waitPublished.Add(monitors.WithLog(monitors.WaitDuration(bt.config.PublishTimeout),
@@ -324,22 +337,11 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
-	bt.stopOnce.Do(func() { close(bt.done) })
-}
-
-func (bt *Heartbeat) SkipRunningMonitors(client beat.Client) error {
-	logp.L().Info("=== Skipping running monitors ===")
-
-	// Get all monitors from the monitor factory
-	allMonitors := bt.monitorFactory.GetAllMonitors()
-
-	for _, m := range allMonitors {
-		// Close the monitor
-		m.SkipMonitor(client)
-	}
-
-	logp.L().Info("=== Finished publishing skipped events ===")
-	return nil
+	bt.stopOnce.Do(func() {
+		logp.L().Info("=== waiting before closing the beater channel ===")
+		close(bt.done)
+		time.Sleep(5 * time.Second)
+	})
 }
 
 // makeESClient establishes an ES connection meant to load monitors' state
