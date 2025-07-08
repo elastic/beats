@@ -64,7 +64,7 @@ type filestream struct {
 	encodingFactory encoding.EncodingFactory
 	closerConfig    closerConfig
 	parsers         parser.Config
-	takeOver        takeOverConfig
+	takeOver        loginp.TakeOverConfig
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
@@ -90,13 +90,6 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
 	}
-
-	takeOverEnabled, fromIDs, err := loginp.GetTakeOverConfig(cfg, log)
-	if err != nil {
-		return nil, nil, err
-	}
-	config.TakeOver.Enabled = takeOverEnabled
-	config.TakeOver.FromIDs = fromIDs
 
 	prospector, err := newProspector(config, log)
 	if err != nil {

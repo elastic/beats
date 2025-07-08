@@ -151,14 +151,11 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 
 	settings := struct {
 		// All those values are duplicated from the Filestream configuration
-		ID                 string        `config:"id"`
-		CleanInactive      time.Duration `config:"clean_inactive"`
-		HarvesterLimit     uint64        `config:"harvester_limit"`
-		AllowIDDuplication bool          `config:"allow_deprecated_id_duplication"`
-		TakeOver           struct {
-			Enabled bool
-			FromIDs []string
-		} `config:"-"`
+		ID                 string         `config:"id"`
+		CleanInactive      time.Duration  `config:"clean_inactive"`
+		HarvesterLimit     uint64         `config:"harvester_limit"`
+		AllowIDDuplication bool           `config:"allow_deprecated_id_duplication"`
+		TakeOver           TakeOverConfig `config:"take_over"`
 	}{
 		CleanInactive: cim.DefaultCleanTimeout,
 	}
@@ -166,13 +163,6 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
 	}
-
-	takeOverEnabled, fromIDs, err := GetTakeOverConfig(config, cim.Logger)
-	if err != nil {
-		return nil, err
-	}
-	settings.TakeOver.Enabled = takeOverEnabled
-	settings.TakeOver.FromIDs = fromIDs
 
 	if settings.ID == "" {
 		cim.Logger.Warn("filestream input without ID is discouraged, please add an ID and restart Filebeat")
@@ -333,45 +323,48 @@ func (i *sourceIdentifier) MatchesInput(id string) bool {
 	return strings.HasPrefix(id, i.prefix)
 }
 
-// GetTakeOverConfig returns the take over configuration as two independent
-// values. In the YAML they're defined as 'take_over.enabled' and
-// 'take_over.from_ids', respectively.
-// It can handle both formats: the single boolean (`take_over: true|false`) and
-// the object (show above). On error false, nil and the error are returned
-func GetTakeOverConfig(cfg *conf.C, logger *logp.Logger) (bool, []string, error) {
-	// This is never going to return an error because the config path
-	// is a single element. Anyways, we still handle it.
-	hasTakeOver, err := cfg.Has("take_over", -1)
-	if err != nil {
-		return false, nil, fmt.Errorf("cannot assert if 'take_over' is present: %w", err)
-	}
-	if hasTakeOver {
-		legacyEnabled, legacyErr := cfg.Bool("take_over", -1)
-		if legacyErr != nil {
-			// Try again with the new type
-			takeOverCfg, err := cfg.Child("take_over", -1)
-			// if there is an error now, then the config is definitely invalid
-			if err != nil {
-				return false, nil, errors.New("cannot parse the 'take_over' field")
-			}
+// TakeOverConfig is the configuration for the take over mode.
+// It allows the Filestream input to take over states from the log
+// input or other Filestream inputs
+type TakeOverConfig struct {
+	Enabled bool `config:"enabled"`
+	// Filestream IDs to take over states
+	FromIDs []string `config:"from_ids"`
+}
 
-			// This is copied from filebeat/input/filestream/config.go
-			takeOver := struct {
-				Enabled bool     `config:"enabled"`
-				FromIDs []string `config:"from_ids"`
-			}{}
-			if err := takeOverCfg.Unpack(&takeOver); err != nil {
-				return false, nil, err
-			}
-
-			return takeOver.Enabled, takeOver.FromIDs, nil
-		} else {
-			if legacyEnabled {
-				logger.Warn("using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'")
-			}
-			return legacyEnabled, nil, nil
+func (t *TakeOverConfig) Unpack(value any) error {
+	switch v := value.(type) {
+	case bool:
+		t.Enabled = v
+		logp.L().Warn("using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'")
+	case map[string]any:
+		rawEnabled := v["enabled"]
+		enabled, ok := rawEnabled.(bool)
+		if !ok {
+			return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as bool", rawEnabled)
 		}
+		t.Enabled = enabled
+
+		rawFromIDs, exists := v["from_ids"]
+		if !exists {
+			return nil
+		}
+
+		fromIDs, ok := rawFromIDs.([]any)
+		if !ok {
+			return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as []any", rawFromIDs)
+		}
+		for _, el := range fromIDs {
+			strEl, ok := el.(string)
+			if !ok {
+				return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as string", el)
+			}
+			t.FromIDs = append(t.FromIDs, strEl)
+		}
+
+	default:
+		return fmt.Errorf("cannot parse '%[1]v' (type %[1]T)", value)
 	}
 
-	return false, nil, nil
+	return nil
 }

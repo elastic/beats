@@ -435,42 +435,49 @@ func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
 	return log, buf
 }
 
-func TestGetTakeOverConfig(t *testing.T) {
+func TestTakeOverConfigUnpack(t *testing.T) {
 	testCases := map[string]struct {
 		cfgYAML   string
-		enabled   bool
-		fromIDs   []string
+		expected  TakeOverConfig
 		expectErr bool
 	}{
 		"legacy mode enabled": {
-			cfgYAML: `
-              take_over: true`,
-			enabled: true,
+			cfgYAML: `take_over: true`,
+			expected: TakeOverConfig{
+				Enabled: true,
+			},
 		},
 		"legacy mode disabled": {
-			cfgYAML: `
-              take_over: false`,
-			enabled: false,
+			cfgYAML: `take_over: false`,
+			expected: TakeOverConfig{
+				Enabled: false,
+			},
 		},
 		"new mode enabled": {
 			cfgYAML: `
-              take_over:
-                enabled: true`,
-			enabled: true,
+take_over:
+  enabled: true`,
+			expected: TakeOverConfig{
+				Enabled: true,
+			},
 		},
 		"new mode disabled": {
 			cfgYAML: `
-              take_over:
-                enabled: false`,
-			enabled: false,
+take_over:
+  enabled: false`,
+			expected: TakeOverConfig{
+				Enabled: false,
+			},
 		},
 		"new mode with IDs": {
 			cfgYAML: `
-              take_over:
-                enabled: true
-                from_ids: ["foo", "bar"]`,
-			enabled: true,
-			fromIDs: []string{"foo", "bar"},
+take_over:
+  enabled: true
+  from_ids: ["foo", "bar"]`,
+			expected: TakeOverConfig{
+				Enabled: true,
+				FromIDs: []string{"foo", "bar"},
+			},
 		},
 		"take_over not defined": {
 			cfgYAML:   "",
@@ -478,6 +485,14 @@ func TestGetTakeOverConfig(t *testing.T) {
 		},
 		"invalid new config": {
 			cfgYAML:   "take_over.enabled: 42",
+			expectErr: true,
+		},
+		"invalid from_ids elements ": {
+			cfgYAML:   "take_over.from_ids: [\"foo\", 42]",
+			expectErr: true,
+		},
+		"invalid from_ids type ": {
+			cfgYAML:   "take_over.from_ids: false",
 			expectErr: true,
 		},
 		"invalid legacy config": {
@@ -488,15 +503,18 @@ func TestGetTakeOverConfig(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			enabled, fromIDs, err := GetTakeOverConfig(config.MustNewConfigFrom(tc.cfgYAML), logp.NewNopLogger())
+			cfg := config.MustNewConfigFrom(tc.cfgYAML)
+			outer := struct {
+				TakeOver TakeOverConfig `config:"take_over"`
+			}{}
+			err := cfg.Unpack(&outer)
 			if tc.expectErr {
-				require.Error(t, err)
+				require.Error(t, err, "Unpack must fail")
 			} else {
-				require.NoError(t, err)
+				require.NoError(t, err, "Unpack must succeed")
 			}
 
-			assert.Equal(t, tc.enabled, enabled, "wrong value for enabled")
-			assert.Equal(t, tc.fromIDs, fromIDs, "wrong value for from_ids")
+			assert.Equal(t, tc.expected, outer.TakeOver, "TakeOverConfig was not parsed correctly")
 		})
 	}
 }

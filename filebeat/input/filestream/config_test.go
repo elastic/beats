@@ -22,12 +22,12 @@ import (
 	"strings"
 	"testing"
 
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest/observer"
-
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestConfigValidate(t *testing.T) {
@@ -40,7 +40,7 @@ func TestConfigValidate(t *testing.T) {
 	t.Run("take_over requires ID", func(t *testing.T) {
 		c := config{
 			Paths:    []string{"/foo/bar"},
-			TakeOver: takeOverConfig{Enabled: true},
+			TakeOver: loginp.TakeOverConfig{Enabled: true},
 		}
 		err := c.Validate()
 		assert.Error(t, err, "take_over.enabled can only be true if ID is set")
@@ -50,7 +50,7 @@ func TestConfigValidate(t *testing.T) {
 		c := config{
 			Paths:    []string{"/foo/bar"},
 			ID:       "some id",
-			TakeOver: takeOverConfig{Enabled: true},
+			TakeOver: loginp.TakeOverConfig{Enabled: true},
 		}
 		err := c.Validate()
 		assert.NoError(t, err)
@@ -236,94 +236,6 @@ id: unique-id-3
 			if tc.assertLogs != nil {
 				tc.assertLogs(t, logp.ObserverLogs())
 			}
-		})
-	}
-}
-
-func TestTakeOverCfg(t *testing.T) {
-	testCases := map[string]struct {
-		cfgYAML     string
-		takeOverCfg takeOverConfig
-		expectErr   bool
-	}{
-		"legacy mode enabled": {
-			cfgYAML: `
-              take_over: true`,
-			takeOverCfg: takeOverConfig{
-				Enabled: true,
-			},
-		},
-		"legacy mode disabled": {
-			cfgYAML: `
-              take_over: false`,
-			takeOverCfg: takeOverConfig{
-				Enabled: false,
-			},
-		},
-		"new mode enabled": {
-			cfgYAML: `
-              take_over:
-                enabled: true`,
-			takeOverCfg: takeOverConfig{
-				Enabled: true,
-			},
-		},
-		"new mode disabled": {
-			cfgYAML: `
-              take_over:
-                enabled: false`,
-			takeOverCfg: takeOverConfig{
-				Enabled: false,
-			},
-		},
-		"new mode with IDs": {
-			cfgYAML: `
-              take_over:
-                enabled: true
-                from_ids: ["foo", "bar"]`,
-			takeOverCfg: takeOverConfig{
-				Enabled: true,
-				FromIDs: []string{"foo", "bar"},
-			},
-		},
-		"take_over not defined": {
-			cfgYAML:   "",
-			expectErr: false,
-		},
-		"invalid new config": {
-			cfgYAML:   "take_over.enabled: 42",
-			expectErr: true,
-		},
-		"invalid legacy config": {
-			cfgYAML:   "take_over: 42",
-			expectErr: true,
-		},
-	}
-
-	for name, tc := range testCases {
-		t.Run(name, func(t *testing.T) {
-			// It is required to have 'paths' set, so set it here for all tests
-			cfg := conf.MustNewConfigFrom(tc.cfgYAML)
-			err := cfg.SetChild("paths", -1, conf.MustNewConfigFrom(`["foo"]`))
-			if err != nil {
-				t.Fatalf("cannot set 'paths' in config: %s", err)
-			}
-
-			_, inp, err := configure(cfg, logp.NewNopLogger())
-			if tc.expectErr {
-				require.Error(t, err, "expecting error when parsing config")
-				require.Nil(t, inp, "returned filestream must be nil on error")
-				return
-			} else {
-				require.NoError(t, err, "expecting the config to be successfully parsed")
-			}
-
-			f, ok := inp.(*filestream)
-			if !ok {
-				t.Fatalf("expecting type filestream, got %T", inp)
-			}
-
-			assert.Equal(t, tc.takeOverCfg, f.takeOver, "take over config does not match")
 		})
 	}
 }
