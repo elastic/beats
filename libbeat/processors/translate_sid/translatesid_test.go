@@ -30,10 +30,13 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestTranslateSID(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	var tests = []struct {
 		SID         string
 		Account     string
@@ -58,7 +61,7 @@ func TestTranslateSID(t *testing.T) {
 				DomainTarget:      "domain",
 				AccountNameTarget: "account",
 				AccountTypeTarget: "type",
-			})
+			}, logger)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -90,7 +93,7 @@ func TestTranslateSID(t *testing.T) {
 			DomainTarget:      "@metadata.domain",
 			AccountNameTarget: "@metadata.account",
 			AccountTypeTarget: "@metadata.type",
-		})
+		}, logger)
 		assert.NoError(t, err)
 		evt := &beat.Event{
 			Meta: mapstr.M{
@@ -113,6 +116,7 @@ func TestTranslateSID(t *testing.T) {
 }
 
 func TestTranslateSIDEmptyTarget(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	c := defaultConfig()
 	c.Field = "sid"
 
@@ -132,7 +136,7 @@ func TestTranslateSIDEmptyTarget(t *testing.T) {
 	for _, tc := range tests {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
-			p, err := newFromConfig(tc.Config)
+			p, err := newFromConfig(tc.Config, logger)
 			require.NoError(t, err)
 
 			evt, err := p.Run(&beat.Event{Fields: evt.Fields.Clone()})
@@ -152,7 +156,7 @@ func BenchmarkProcessor_Run(b *testing.B) {
 		Field:             "sid",
 		DomainTarget:      "domain",
 		AccountNameTarget: "account",
-	})
+	}, logp.NewNopLogger())
 	if err != nil {
 		b.Fatal(err)
 	}

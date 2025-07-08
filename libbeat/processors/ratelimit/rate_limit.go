@@ -72,7 +72,7 @@ func new(cfg *c.C, log *logp.Logger) (beat.Processor, error) {
 		limit:  config.Limit,
 		config: *config.Algorithm.Config(),
 	}
-	algo, err := factory(config.Algorithm.Name(), algoConfig)
+	algo, err := factory(config.Algorithm.Name(), algoConfig, log)
 	if err != nil {
 		return nil, fmt.Errorf("could not construct rate limiting algorithm: %w", err)
 	}
