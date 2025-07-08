@@ -56,7 +56,7 @@ scanner, the error will happen every scan as long as the file is still there.
   - [x] test for a file with multiple GZIP files
   - [x] test for a corrupted file, which at the beginning some lines succeed, then
     it fails.
-  - [ ] test a gzip and plain file with the same decompressed data have the same
+  - [x] test a gzip and plain file with the same decompressed data have the same
   fingerprint
   - [ ] test file rotation
   - [ ] run BenchmarkToFileDescriptor to check overhead of checking a file is GZIP

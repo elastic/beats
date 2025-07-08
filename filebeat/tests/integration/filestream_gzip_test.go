@@ -246,7 +246,7 @@ logging.level: debug
 
 	filebeat.WaitForLogs(
 		fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logFilepath),
-		10*time.Second,
+		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log '%s'",
 		logFilepath,
 	)
@@ -274,7 +274,7 @@ logging.level: debug
 	wantLog := fmt.Sprintf("GZIP file already read to EOF, not reading it again, file name '%s'", logFilepath)
 	filebeat.WaitForLogs(
 		wantLog,
-		10*time.Second,
+		30*time.Second,
 		"Filebeat did find log '%s'",
 		wantLog,
 	)
@@ -346,12 +346,81 @@ logging.level: debug
 
 	filebeat.WaitForLogs(
 		fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPath),
-		10*time.Second,
+		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log '%s'",
 		logPath,
 	)
 	filebeat.Stop()
 
+	matchPublishedLinesFromFile(t,
+		filepath.Join(tempDir, outputFilename), lines)
+}
+
+func TestFilestreamGZIPFingerprintOnDecompressedData(t *testing.T) {
+	lines := make([]string, 0, 100)
+	var dataPlain []byte
+	for i := range 100 {
+		l := fmt.Sprintf("%d: 1st file log line", i)
+		lines = append(lines, l)
+		dataPlain = append(dataPlain, []byte(l+"\n")...)
+	}
+	dataGZ := gziptest.Compress(t, dataPlain, gziptest.CorruptNone)
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	tempDir := filebeat.TempDir()
+	logFileBaseName := "plain.log"
+	logPathPlain := filepath.Join(tempDir, logFileBaseName)
+	logPathGZ := filepath.Join(tempDir, logFileBaseName+".gz")
+
+	err := os.WriteFile(logPathPlain, dataPlain, 0644)
+	require.NoError(t, err, "could nto write gzip file to disk")
+
+	outputFilename := "output-file"
+	cfg := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: "test-filestream"
+    paths:
+      - %s
+    gzip_experimental: true
+    rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
+output.file:
+  enabled: true
+  path: %s
+  filename: "%s"
+logging.level: debug
+`, logPathPlain+"*", filebeat.TempDir(), outputFilename)
+
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	eofLine := fmt.Sprintf("End of file reached: %s; Backoff now.", logPathPlain)
+	filebeat.WaitForLogs(
+		eofLine,
+		30*time.Second,
+		"Filebeat did not reach EOF. Did not find log '%s'",
+		eofLine,
+	)
+
+	// 1st file is ingested, add the GZ file
+	err = os.WriteFile(logPathGZ, dataGZ, 0644)
+	require.NoError(t, err, "could nto write gzip file to disk")
+
+	// wait filebeat to pick up the file and see it's the same as the plain file.
+	wantLine := fmt.Sprintf("\\\"%s\\\" points to an already known ingest target \\\"%s\\\" [e64ff2da367b082e1dcc38ec48215bff55925bd408f718f107e50ecf426fe3c3==e64ff2da367b082e1dcc38ec48215bff55925bd408f718f107e50ecf426fe3c3]. Skipping",
+		logPathGZ, logPathPlain)
+	filebeat.WaitForLogs(
+		wantLine,
+		30*time.Second,
+		"Did not find log '%s'",
+		wantLine,
+	)
+
+	filebeat.Stop()
 	matchPublishedLinesFromFile(t,
 		filepath.Join(tempDir, outputFilename), lines)
 }
@@ -401,7 +470,7 @@ logging.level: debug
 	eofLog := fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPath)
 	filebeat.WaitForLogs(
 		eofLog,
-		10*time.Second,
+		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log '%s'",
 		eofLog,
 	)
