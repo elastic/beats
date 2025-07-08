@@ -330,13 +330,18 @@ type TakeOverConfig struct {
 	Enabled bool `config:"enabled"`
 	// Filestream IDs to take over states
 	FromIDs []string `config:"from_ids"`
+
+	// legacyFormat is set to true when `Unpack` detects
+	// the legacy configuration format. It is used by
+	// `LogWarnings` to log warnings
+	legacyFormat bool
 }
 
 func (t *TakeOverConfig) Unpack(value any) error {
 	switch v := value.(type) {
 	case bool:
 		t.Enabled = v
-		logp.L().Warn("using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'")
+		t.legacyFormat = true
 	case map[string]any:
 		rawEnabled := v["enabled"]
 		enabled, ok := rawEnabled.(bool)
@@ -367,4 +372,10 @@ func (t *TakeOverConfig) Unpack(value any) error {
 	}
 
 	return nil
+}
+
+func (t *TakeOverConfig) LogWarnings(logger *logp.Logger) {
+	if t.legacyFormat {
+		logger.Warn("using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'")
+	}
 }

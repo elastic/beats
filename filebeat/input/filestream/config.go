@@ -50,8 +50,8 @@ type config struct {
 	IgnoreInactive ignoreInactiveType `config:"ignore_inactive"`
 	Rotation       *conf.Namespace    `config:"rotation"`
 
-	// TakeOver is parsed independently from the rest of this struct, see
-	// 'GetTakeOverConfig' on internal/input-logfile/manager.go
+	// TakeOver is also independently parsed by InputManager.Create
+	// (see internal/input-logfile/manager.go).
 	TakeOver loginp.TakeOverConfig `config:"take_over"`
 	// AllowIDDuplication is used by InputManager.Create
 	// (see internal/input-logfile/manager.go).

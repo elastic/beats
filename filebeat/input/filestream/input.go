@@ -91,6 +91,8 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 		return nil, nil, err
 	}
 
+	config.TakeOver.LogWarnings(log)
+
 	prospector, err := newProspector(config, log)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
