@@ -46,10 +46,10 @@ type FilterParser struct {
 	matchers []match.Matcher
 }
 
-func NewParser(r reader.Reader, c *Config) *FilterParser {
+func NewParser(r reader.Reader, c *Config, logger *logp.Logger) *FilterParser {
 	return &FilterParser{
 		ctx:      ctxtool.WithCancelContext(context.Background()),
-		logger:   logp.NewLogger("filter_parser"),
+		logger:   logger.Named("filter_parser"),
 		r:        r,
 		matchers: c.Patterns,
 	}

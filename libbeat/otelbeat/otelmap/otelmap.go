@@ -19,6 +19,8 @@
 package otelmap
 
 import (
+	"encoding"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"time"
@@ -86,6 +88,13 @@ func ConvertNonPrimitive[T mapstrOrMap](m T) {
 				s = append(s, time.Time(i).UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
 			m[key] = s
+		case encoding.TextMarshaler:
+			text, err := x.MarshalText()
+			if err != nil {
+				m[key] = fmt.Sprintf("error converting %T to string: %s", x, err)
+				continue
+			}
+			m[key] = string(text)
 		case []bool, []string, []float32, []float64, []int, []int8, []int16, []int32, []int64,
 			[]uint, []uint8, []uint16, []uint32, []uint64:
 			ref := reflect.ValueOf(x)
@@ -97,6 +106,17 @@ func ConvertNonPrimitive[T mapstrOrMap](m T) {
 		case nil, string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, bool:
 		default:
 			ref := reflect.ValueOf(x)
+			if ref.Kind() == reflect.Struct {
+				var im map[string]any
+				err := marshalUnmarshal(x, &im)
+				if err != nil {
+					m[key] = fmt.Sprintf("error encoding struct to map: %s", err)
+					continue
+				}
+				ConvertNonPrimitive(im)
+				m[key] = im
+				break
+			}
 			if ref.Kind() == reflect.Slice || ref.Kind() == reflect.Array {
 				s := make([]any, ref.Len())
 				for i := 0; i < ref.Len(); i++ {
@@ -114,8 +134,24 @@ func ConvertNonPrimitive[T mapstrOrMap](m T) {
 				m[key] = s
 				break // we figured out the type, so we don't need the unknown type case
 			}
-
 			m[key] = fmt.Sprintf("unknown type: %T", x)
 		}
 	}
+}
+
+// marshalUnmarshal converts an interface to a mapstr.M by marshalling to JSON
+// then unmarshalling the JSON object into a mapstr.M.
+// Copied from libbeat/common/event.go
+func marshalUnmarshal(in interface{}, out interface{}) error {
+	// Decode and encode as JSON to normalize the types.
+	marshaled, err := json.Marshal(in)
+	if err != nil {
+		return fmt.Errorf("error marshalling to JSON: %w", err)
+	}
+	err = json.Unmarshal(marshaled, out)
+	if err != nil {
+		return fmt.Errorf("error unmarshalling from JSON: %w", err)
+	}
+
+	return nil
 }
