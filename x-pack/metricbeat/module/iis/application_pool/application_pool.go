@@ -44,7 +44,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	// instantiate reader object
-	reader, err := newReader(config)
+	reader, err := newReader(config, base.Logger())
 	if err != nil {
 		return nil, err
 	}
