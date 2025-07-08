@@ -36,8 +36,8 @@ import (
 
 var (
 	headerContentType        = "Content-Type"
-	HeaderUncompressedLength = "Uncompressed-Request-Length"
-	HeaderEventCount         = "Event-Count"
+	HeaderUncompressedLength = "X-Elastic-Uncompressed-Request-Length"
+	HeaderEventCount         = "X-Elastic-Event-Count"
 )
 
 type BodyEncoder interface {
