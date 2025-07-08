@@ -87,7 +87,7 @@ func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inp
 		}
 	}
 	//status configuring
-
+	env.UpdateStatus(status.Configuring, "Salesforce input configuring")
 	if err = s.Setup(env, src, st, pub); err != nil {
 		//status failed
 		env.UpdateStatus(status.Failed, fmt.Sprintf("Failed to set up Salesforce input: %v", err))
@@ -101,7 +101,12 @@ func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inp
 // Setup sets up the input. It will create a new SOQL resource and all other
 // necessary configurations.
 func (s *salesforceInput) Setup(env v2.Context, src inputcursor.Source, cursor *state, pub inputcursor.Publisher) (err error) {
-	cfg := src.(*source).cfg
+	srcSource, ok := src.(*source)
+	if !ok {
+		return fmt.Errorf("failed to assert src as *source")
+	}
+
+	cfg := srcSource.cfg
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 	childCtx, cancel := context.WithCancelCause(ctx)
@@ -254,7 +259,7 @@ func (s *salesforceInput) RunObject() error {
 	s.log.Infof("Running Object collection with interval: %s", s.srcConfig.EventMonitoringMethod.Object.Interval)
 
 	var cursor mapstr.M
-	if !(isZero(s.cursor.Object.FirstEventTime) && isZero(s.cursor.Object.LastEventTime)) {
+	if !isZero(s.cursor.Object.FirstEventTime) || !isZero(s.cursor.Object.LastEventTime) {
 		object := make(mapstr.M)
 		if !isZero(s.cursor.Object.FirstEventTime) {
 			object.Put("first_event_time", s.cursor.Object.FirstEventTime)
@@ -265,7 +270,8 @@ func (s *salesforceInput) RunObject() error {
 		cursor = mapstr.M{"object": object}
 	}
 
-	query, err := s.FormQueryWithCursor(s.config.EventMonitoringMethod.Object.Query, cursor)
+	//query, err := s.FormQueryWithCursor(s.config.EventMonitoringMethod.Object.Query, cursor)
+	query, err := s.FormQueryWithCursor(s.EventMonitoringMethod.Object.Query, cursor)
 	if err != nil {
 		return fmt.Errorf("error forming query based on cursor: %w", err)
 	}
@@ -289,7 +295,7 @@ func (s *salesforceInput) RunObject() error {
 				return err
 			}
 
-			if timestamp, ok := val[s.config.EventMonitoringMethod.Object.Cursor.Field].(string); ok {
+			if timestamp, ok := val[s.EventMonitoringMethod.Object.Cursor.Field].(string); ok {
 				if firstEvent {
 					s.cursor.Object.FirstEventTime = timestamp
 				}
@@ -324,7 +330,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 	s.log.Infof("Running EventLogFile collection with interval: %s", s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
 
 	var cursor mapstr.M
-	if !(isZero(s.cursor.EventLogFile.FirstEventTime) && isZero(s.cursor.EventLogFile.LastEventTime)) {
+	if !isZero(s.cursor.EventLogFile.FirstEventTime) || !isZero(s.cursor.EventLogFile.LastEventTime) {
 		eventLogFile := make(mapstr.M)
 		if !isZero(s.cursor.EventLogFile.FirstEventTime) {
 			eventLogFile.Put("first_event_time", s.cursor.EventLogFile.FirstEventTime)
@@ -335,7 +341,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 		cursor = mapstr.M{"event_log_file": eventLogFile}
 	}
 
-	query, err := s.FormQueryWithCursor(s.config.EventMonitoringMethod.EventLogFile.Query, cursor)
+	query, err := s.FormQueryWithCursor(s.EventMonitoringMethod.EventLogFile.Query, cursor)
 	if err != nil {
 		return fmt.Errorf("error forming query based on cursor: %w", err)
 	}

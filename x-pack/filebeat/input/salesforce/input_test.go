@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
@@ -65,7 +66,7 @@ const (
 )
 
 func TestFormQueryWithCursor(t *testing.T) {
-	logp.TestingSetup()
+	logptest.NewTestingLogger(t, "")
 
 	mockTimeNow(time.Date(2023, time.May, 18, 12, 0, 0, 0, time.UTC))
 	t.Cleanup(resetTimeNow)
@@ -212,7 +213,7 @@ var (
 )
 
 func TestInput(t *testing.T) {
-	logp.TestingSetup()
+	logptest.NewTestingLogger(t, "")
 
 	tests := []struct {
 		setupServer      func(testing.TB, http.HandlerFunc, map[string]interface{})
@@ -434,7 +435,9 @@ func newTestServer(newServer func(http.Handler) *httptest.Server) func(testing.T
 	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 		server := newServer(h)
 		config["url"] = server.URL
-		config["auth.oauth2"].(map[string]interface{})["user_password_flow"].(map[string]interface{})["token_url"] = server.URL
+		authOAuth2, _ := config["auth.oauth2"].(map[string]interface{})
+		userPasswordFlow, _ := authOAuth2["user_password_flow"].(map[string]interface{})
+		userPasswordFlow["token_url"] = server.URL
 		t.Cleanup(server.Close)
 	}
 }
