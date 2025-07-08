@@ -124,7 +124,7 @@ func (c *wrapperContainer) privateHost(port int) string {
 		return ""
 	}
 	for _, info := range c.info.Ports {
-		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == uint16(port)) {
+		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == shortPort) {
 			return net.JoinHostPort(ip, strconv.Itoa(int(info.PrivatePort)))
 		}
 	}
@@ -142,7 +142,7 @@ func (c *wrapperContainer) exposedHost(port int) string {
 		return ""
 	}
 	for _, info := range c.info.Ports {
-		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == uint16(port)) {
+		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == shortPort) {
 			return net.JoinHostPort("localhost", strconv.Itoa(int(info.PublicPort)))
 		}
 	}
