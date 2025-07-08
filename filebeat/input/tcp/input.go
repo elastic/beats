@@ -179,7 +179,6 @@ func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err er
 	metrics := netmetrics.NewTCP("tcp", ctx.ID, s.Host, pollInterval, log)
 	defer metrics.Close()
 
-	// s.initAndRunServer(ctx, metrics)
 	s.initWorkers(ctx, pipeline, metrics)
 
 	err = s.initAndRunServer(ctx, metrics)
