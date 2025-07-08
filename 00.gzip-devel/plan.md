@@ -48,14 +48,18 @@ scanner, the error will happen every scan as long as the file is still there.
 - [x] Enhance rotation handle .gz
   - [x] Add GZIP-awareness to `onFSEvent` in `copytruncate_prospector.go`
   - [x] Add GZIP-awareness to `onFSEvent` in `prospector.go`
-- [ ] save GZIP file was fully ingested so filestream won't open and seek to offset
-- [ ] Ensure (test) GZIP resume logic re-reads stream from start to reach last known decompressed offset (primarily in `input.go` when handling existing state/offset for GZIP files).
-- [ ] test for a corrupted file, which at the beginning some lines succeed, then
-it fails.
-- [ ] test for a file with multiple GZIP files
-- [ ] test a gzip and plain file with the same decompressed data have the same
-fingerprint
-- [ ] run BenchmarkToFileDescriptor to check overhead of checking a file is GZIP
+- [x] save GZIP file was fully ingested so filestream won't open and seek to offset
+  - [x] test EOF state is saved to disk - it should be with tests that check the offset is saved
+  - [x] test files with EOF: true on its state isn't opened.
+- [ ] Integration tests
+  - [x] Ensure (test) GZIP resume logic re-reads stream from start to reach last known decompressed offset
+  - [ ] test for a file with multiple GZIP files
+  - [ ] test for a corrupted file, which at the beginning some lines succeed, then
+    it fails.
+  - [ ] test a gzip and plain file with the same decompressed data have the same
+  fingerprint
+  - [ ] test file rotation
+  - [ ] run BenchmarkToFileDescriptor to check overhead of checking a file is GZIP
 
 ### Milestone 3 – Testing
 - [ ] Add integration tests

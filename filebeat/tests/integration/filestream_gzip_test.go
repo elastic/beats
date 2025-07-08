@@ -34,6 +34,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
+// TestFilestreamGZIPIncompleteFilesAreFullyRead ensures filestream correctly
+// handles GZIP files if it finds the file while the file is being written to
+// disks.
 func TestFilestreamGZIPIncompleteFilesAreFullyRead(t *testing.T) {
 	lines := make([]string, 0, 100)
 	var content []byte
@@ -50,6 +53,7 @@ func TestFilestreamGZIPIncompleteFilesAreFullyRead(t *testing.T) {
 		restData    []byte
 		initialLogs func(lofFile string) []string
 		furtherLogs []string
+		withStop    bool
 	}{
 		{
 			name:     "incomplete header",
@@ -77,6 +81,32 @@ func TestFilestreamGZIPIncompleteFilesAreFullyRead(t *testing.T) {
 			furtherLogs: []string{
 				"File %s has been updated",
 			},
+		},
+		{
+			// This test verifies that Filebeat can stop, update its registry,
+			// and later resume reading a GZIP file from the correct offset.
+			//
+			// Stopping Filebeat while it is still reading a file is hard to do
+			// deterministically: once Filebeat reaches the end of a
+			// fully-written GZIP file it hits EOF and stops reading, so we
+			// would have to rely on timing tricks that make the test
+			// flaky, especially in CI.
+			//
+			// Instead, we omit the GZIP footer. The missing footer prevents
+			// Filebeat from marking the file as fully ingested. We stop
+			// Filebeat, append the footer (completing the file), restart
+			// Filebeat, and assert that it resumes reading from the previous
+			// offset.
+			name:     "full header and incomplete data: stop filebeat in the middle",
+			data:     gzData[:len(gzData)-20],
+			restData: gzData[len(gzData)-20:],
+			initialLogs: func(lofFile string) []string {
+				return []string{
+					fmt.Sprintf("Unexpected state reading from %s; error: unexpected EOF", lofFile),
+					"Error stopping filestream reader: could not close gzip reader: unexpected EOF",
+				}
+			},
+			withStop: true,
 		},
 		{
 			name:     "incomplete footer",
@@ -136,6 +166,9 @@ logging.level: debug
 				)
 			}
 
+			if tc.withStop {
+				filebeat.Stop()
+			}
 			// Write the rest of the file.
 			f, err := os.OpenFile(logPath, os.O_APPEND|os.O_WRONLY, 0644)
 			require.NoError(t, err)
@@ -143,6 +176,9 @@ logging.level: debug
 			require.NoError(t, err)
 			require.NoError(t, f.Close())
 
+			if tc.withStop {
+				filebeat.Start()
+			}
 			// Wait for filebeat to continue reading the file now it's fully
 			// written.
 			for _, log := range tc.furtherLogs {
@@ -174,6 +210,90 @@ logging.level: debug
 			matchPublishedLines(t, got, lines)
 		})
 	}
+}
+
+// TestFilestreamGZIPEOF ensures, for GZIP files, filestream:
+//   - sets EOF on the registry when it reached the end of the file
+//   - if EOF is set, it does not read the file again.
+func TestFilestreamGZIPEOF(t *testing.T) {
+	var content []byte
+	for i := range 100 {
+		content = append(content, []byte(fmt.Sprintf("%d: a log line\n", i))...)
+	}
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	workDir := filebeat.TempDir()
+
+	logFilepath := filepath.Join(workDir, "log.gz")
+	cfg := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: "test-gzip-eof"
+    paths:
+      - %s
+    gzip_experimental: true
+    rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
+path.home: %s
+filebeat.registry.flush: 1s
+output.discard:
+  enabled: true
+logging.level: debug
+`, logFilepath, workDir)
+
+	compressedContent := gziptest.Compress(t, content, gziptest.CorruptNone)
+	require.NoError(t, os.WriteFile(logFilepath, compressedContent, 0644))
+
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	filebeat.WaitForLogs(
+		fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logFilepath),
+		10*time.Second,
+		"Filebeat did not reach EOF. Did not find log '%s'",
+		logFilepath,
+	)
+	filebeat.Stop()
+
+	registryLogFile := filepath.Join(workDir,
+		"data", "registry", "filebeat", "log.json")
+	entries, _ := readFilestreamRegistryLog(t, registryLogFile)
+
+	var lastEntry *registryEntry
+	for i := range entries {
+		entry := &entries[i]
+		if entry.Filename == logFilepath {
+			lastEntry = entry
+		}
+	}
+	require.NotNil(t, lastEntry,
+		"state for log file not found in registry for %s", logFilepath)
+
+	// ================ Verify offset and EOF are correctly set ================
+	assert.Equal(t, len(content), lastEntry.Offset, "offset is not correct")
+	assert.True(t, lastEntry.EOF, "EOF is not true")
+
+	filebeat.Start()
+	wantLog := fmt.Sprintf("GZIP file already read to EOF, not reading it again, file name '%s'", logFilepath)
+	filebeat.WaitForLogs(
+		wantLog,
+		10*time.Second,
+		"Filebeat did find log '%s'",
+		wantLog,
+	)
+
+	// =============== Verify file read to EOF isn't read again ================
+	gotEntries, _ := readFilestreamRegistryLog(t, registryLogFile)
+	// when the harvester starts, before attempting to open the log file, it
+	// updates the registry, thus reading it again will bring one more entry
+	assert.Equal(t, entries, gotEntries[:len(gotEntries)-1],
+		"the registry for should not have changed")
+	// ensure the new entry is the same as the previous.
+	assert.Equal(t, entries[len(entries)-1], gotEntries[len(gotEntries)-1],
+		"expected the last entry of the registry to be the same as previous entry")
 }
 
 func matchPublishedLines(t *testing.T, got []byte, want []string) {

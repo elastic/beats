@@ -35,7 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/testing/integration"
 )
 
-func TestGZIP(t *testing.T) {
+func TestFilestreamGZIP(t *testing.T) {
 	lines := make([]string, 0, 100)
 	var content []byte
 	for i := range 100 {
