@@ -58,7 +58,7 @@ scanner, the error will happen every scan as long as the file is still there.
     it fails.
   - [x] test a gzip and plain file with the same decompressed data have the same
   fingerprint
-  - [ ] test file rotation
+  - [x] test file rotation
   - [ ] run BenchmarkToFileDescriptor to check overhead of checking a file is GZIP
 
 ### Milestone 3 – Testing

@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -324,7 +325,7 @@ func TestFilestreamGZIPConcatenatedFiles(t *testing.T) {
 	err := os.WriteFile(
 		logPath,
 		append(gzData1, gzData2...), 0644)
-	require.NoError(t, err, "could nto write gzip file to disk")
+	require.NoError(t, err, "could not write gzip file to disk")
 
 	cfg := fmt.Sprintf(`
 filebeat.inputs:
@@ -377,7 +378,7 @@ func TestFilestreamGZIPFingerprintOnDecompressedData(t *testing.T) {
 	logPathGZ := filepath.Join(tempDir, logFileBaseName+".gz")
 
 	err := os.WriteFile(logPathPlain, dataPlain, 0644)
-	require.NoError(t, err, "could nto write gzip file to disk")
+	require.NoError(t, err, "could not write gzip file to disk")
 
 	outputFilename := "output-file"
 	cfg := fmt.Sprintf(`
@@ -408,7 +409,7 @@ logging.level: debug
 
 	// 1st file is ingested, add the GZ file
 	err = os.WriteFile(logPathGZ, dataGZ, 0644)
-	require.NoError(t, err, "could nto write gzip file to disk")
+	require.NoError(t, err, "could not write gzip file to disk")
 
 	// wait filebeat to pick up the file and see it's the same as the plain file.
 	wantLine := fmt.Sprintf("\\\"%s\\\" points to an already known ingest target \\\"%s\\\" [e64ff2da367b082e1dcc38ec48215bff55925bd408f718f107e50ecf426fe3c3==e64ff2da367b082e1dcc38ec48215bff55925bd408f718f107e50ecf426fe3c3]. Skipping",
@@ -423,6 +424,137 @@ logging.level: debug
 	filebeat.Stop()
 	matchPublishedLinesFromFile(t,
 		filepath.Join(tempDir, outputFilename), lines)
+}
+
+func TestFilestreamGZIPLogRotation(t *testing.T) {
+	want1stLines := make([]string, 0, 100)
+	want2ndLines := make([]string, 0, 150)
+	var dataPlain1stHalf []byte
+	for i := range 100 {
+		l := fmt.Sprintf("%d: 1st 1/2 file before roration log line", i)
+		want1stLines = append(want1stLines, l)
+		dataPlain1stHalf = append(dataPlain1stHalf, []byte(l+"\n")...)
+	}
+	var dataPlain2ndHalf []byte
+	for i := range 100 {
+		l := fmt.Sprintf("%d: 2nd 1/2 file after roration log line", i)
+		want2ndLines = append(want2ndLines, l)
+		dataPlain2ndHalf = append(dataPlain2ndHalf, []byte(l+"\n")...)
+	}
+	dataGZ := gziptest.Compress(t,
+		append(dataPlain1stHalf, dataPlain2ndHalf...), gziptest.CorruptNone)
+
+	var dataPlainAfterRotation []byte
+	for i := range 50 { // ensure it's smaller than the original
+		l := fmt.Sprintf("%d: new logs after rotation", i)
+		want2ndLines = append(want2ndLines, l)
+		dataPlainAfterRotation = append(dataPlainAfterRotation, []byte(l+"\n")...)
+	}
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	tempDir := filebeat.TempDir()
+	logFileBaseName := "plain.log"
+	logPathPlain := filepath.Join(tempDir, logFileBaseName)
+	logPathGZ := filepath.Join(tempDir, logFileBaseName+"1.gz")
+
+	// 1st half of the file to simulate the rotation before filebeat finishes
+	// reading the file
+	err := os.WriteFile(logPathPlain, dataPlain1stHalf, 0644)
+	require.NoError(t, err, "could not write gzip file to disk")
+
+	outputFilePattern := "output-file"
+	cfg := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: "test-filestream"
+    paths:
+      - %s
+    gzip_experimental: true
+    rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
+output.file:
+  enabled: true
+  path: %s
+  filename: "%s"
+logging.level: debug
+`, logPathPlain+"*", filebeat.TempDir(), outputFilePattern)
+
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	eofLine := fmt.Sprintf("End of file reached: %s; Backoff now.", logPathPlain)
+	filebeat.WaitForLogs(
+		eofLine,
+		30*time.Second,
+		"Filebeat did not reach EOF. Did not find log '%s'",
+		eofLine,
+	)
+	// 1st file is ingested, stop filebeat and do the log rotation
+	filebeat.Stop()
+
+	// rotate the plain file "with data not yet read"
+	err = os.WriteFile(logPathGZ, dataGZ, 0644)
+	require.NoError(t, err, "could not write gzip file to disk")
+
+	// truncate the original file and add new data
+	err = os.WriteFile(logPathPlain, dataPlainAfterRotation, 0644)
+	require.NoError(t, err, "could not truncate original log file and add new data")
+
+	filebeat.Start()
+
+	// Wait filebeat to finish the gzipped file
+	eofLog := fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPathGZ)
+	filebeat.WaitForLogs(
+		eofLog,
+		30*time.Second,
+		"Filebeat did not reach EOF. Did not find log '%s'",
+		eofLog,
+	)
+
+	// Wait filebeat to finish the original file with new content
+	eofLine = fmt.Sprintf("End of file reached: %s; Backoff now.", logPathPlain)
+	filebeat.WaitForLogs(
+		eofLine,
+		30*time.Second,
+		"Filebeat did not reach EOF. Did not find log '%s'",
+		eofLine,
+	)
+
+	filebeat.Stop()
+
+	// So far so good. Now check the output
+
+	globPattern := outputFilePattern + "-*.ndjson"
+	files, err := filepath.Glob(filepath.Join(tempDir, globPattern))
+	require.NoError(t, err, "could not glob output file pattern")
+	require.Lenf(t, files, 2,
+		"expected only 2 output files. Glob pattern '%s'", globPattern)
+
+	slices.SortFunc(files, func(a, b string) int {
+		if len(a) < len(b) {
+			return -1
+		}
+		if len(a) > len(b) {
+			return 1
+		}
+		if len(a) == len(b) {
+			return 0
+		}
+
+		panic("unreachable")
+	})
+
+	got, err := os.ReadFile(files[0])
+	require.NoError(t, err, "could not open output file")
+	// 1st file: check that all lines have been published
+	matchPublishedLines(t, got, want1stLines)
+
+	got, err = os.ReadFile(files[1])
+	require.NoError(t, err, "could not open output file")
+	matchPublishedLines(t, got, want2ndLines)
 }
 
 func TestFilestreamGZIPReadsCorruptedFileUntilEOF(t *testing.T) {
@@ -517,37 +649,24 @@ func matchPublishedLinesFromFile(t *testing.T, outputFilePattern string, lines [
 }
 
 func matchPublishedLines(t *testing.T, got []byte, want []string) {
-	gotLines := strings.Split(strings.TrimSpace(string(got)), "\n")
-	assert.Equal(t, len(want), len(gotLines), "unexpected number of events")
+	gotLinesJSON := strings.Split(strings.TrimSpace(string(got)), "\n")
+	assert.Equal(t, len(want), len(gotLinesJSON), "unexpected number of events")
 
-	linesToMatch := min(len(want), len(gotLines))
+	gotLines := make([]string, len(gotLinesJSON))
 
-	var unmatched []int
-	for i := range linesToMatch {
-		if !strings.Contains(
-			gotLines[i],
-			fmt.Sprintf(`"message":"%s"`, want[i])) {
-			unmatched = append(unmatched, i)
-		}
+	logLine := struct {
+		Message string `json:"message"`
+	}{}
+	for i, line := range gotLinesJSON {
+		err := json.Unmarshal([]byte(line), &logLine)
+		require.NoError(t, err, "could not Unmarshal log line")
+		gotLines[i] = logLine.Message
 	}
-	if len(unmatched) > 0 {
-		t.Logf("\n\t%d lines not matched on the output:", len(unmatched))
-		for _, i := range unmatched {
-			fmt.Printf("\t\t\tgot: %s\n", gotLines[i])
-			fmt.Printf("\t\t\twant containing: '%s'\n", want[i])
-		}
-	}
-	notFound := len(want) - len(gotLines)
-	if notFound > 0 {
-		t.Logf("\n\t%d lines not found on the output:", notFound)
-		fmt.Printf("\t\t\t%s", strings.Join(want[len(gotLines):], "\n\t\t\t"))
-		fmt.Print("\n\n")
-	}
-	if notFound < 0 { // extra lines in the output
-		t.Logf("\n\t%d extra lines found on the output:", notFound*-1)
-		fmt.Printf("\t\t\t%s", strings.Join(gotLines[len(want):], "\n\t\t\t"))
-		fmt.Print("\n\n")
-	}
+
+	slices.Sort(gotLines)
+	slices.Sort(want)
+
+	assert.Equal(t, want, gotLines, "not all lines match")
 }
 
 func assertLogFieldsEqual(t *testing.T, wantPath, gotPath string) {
