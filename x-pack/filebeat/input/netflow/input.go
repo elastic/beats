@@ -196,7 +196,8 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 						}
 						client.PublishAll(evs)
 					}
-					n.udpMetrics.Log(pkt.data, pktStartTime)
+					n.udpMetrics.EventReceived(len(pkt.data), pktStartTime)
+					n.udpMetrics.EventPublished(pktStartTime)
 				}
 			}
 		}(client)
