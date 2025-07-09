@@ -82,7 +82,7 @@ type config struct {
 
 	LineDelimiter      string                `config:"line_delimiter" validate:"nonzero"`
 	Framing            streaming.FramingType `config:"framing"`
-	NumPipelineWorkers int                   `config:"number_of_workers"`
+	NumPipelineWorkers int                   `config:"number_of_workers" validate:"positive,nonzero"`
 }
 
 type evtWithSize struct {
@@ -248,5 +248,6 @@ func (s *server) initAndRunServer(ctx input.Context, metrics *netmetrics.TCP) er
 	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {
 		err = ctxerr
 	}
-	return nil
+
+	return err
 }
