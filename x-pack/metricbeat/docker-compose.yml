@@ -1,6 +1,14 @@
 version: '2.3'
 
 services:
+  # This is a proxy used to block "docker-compose up" until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy_dep:
+    image: busybox
+    depends_on:
+      elasticsearch: { condition: service_healthy }
+      kibana:        { condition: service_healthy }
+
   beat:
     build: ../../metricbeat
     environment:
@@ -17,14 +25,8 @@ services:
   # Used by base tests
   elasticsearch:
     extends:
-      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      file: ../../metricbeat/docker-compose.yml
       service: elasticsearch
-    healthcheck:
-      test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
-      retries: 300
-      interval: 1s
-    ports:
-      - 9200:9200
 
   # Used by base tests
   kibana:
