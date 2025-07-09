@@ -444,13 +444,15 @@ func TestTakeOverConfigUnpack(t *testing.T) {
 		"legacy mode enabled": {
 			cfgYAML: `take_over: true`,
 			expected: TakeOverConfig{
-				Enabled: true,
+				Enabled:      true,
+				legacyFormat: true,
 			},
 		},
 		"legacy mode disabled": {
 			cfgYAML: `take_over: false`,
 			expected: TakeOverConfig{
-				Enabled: false,
+				Enabled:      false,
+				legacyFormat: true,
 			},
 		},
 		"new mode enabled": {
