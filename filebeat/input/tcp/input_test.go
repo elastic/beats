@@ -21,20 +21,15 @@ package tcp
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"net"
-	"strings"
 	"sync"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-
+	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/input/v2/testpipeline"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -70,10 +65,10 @@ func TestInput(t *testing.T) {
 		}
 	}()
 
-	requireEventMetrics(t, time.Second, eventMetrics{Read: 2, Published: 2})
+	inputtest.RequireNetInputMetrics(t, time.Second, inputtest.NetInputMetrics{Read: 2, Published: 2, Packets: 2})
 
 	// Assert metrics
-	m := getEventMetrics(t)
+	m := inputtest.GetNetInputMetrics(t)
 	if got, want := m.Published, 2; got != want {
 		t.Errorf("expecting %d events published, got %d", want, got)
 	}
@@ -122,7 +117,7 @@ func TestInputCanReadWithoutPublishing(t *testing.T) {
 		}
 	}()
 
-	requireEventMetrics(t, time.Second, eventMetrics{Read: 2, Published: 0})
+	inputtest.RequireNetInputMetrics(t, time.Second, inputtest.NetInputMetrics{Read: 2, Published: 0})
 	// Stop the input
 	cancel()
 
@@ -132,28 +127,6 @@ func TestInputCanReadWithoutPublishing(t *testing.T) {
 	if got, want := pipeline.NumClients(), numberOfWorkers; got != want {
 		t.Fatalf("did not create the expected number of clients, expecting %d, got %d", want, got)
 	}
-}
-
-func requireEventMetrics(t *testing.T, timeout time.Duration, want eventMetrics) {
-	msg := &strings.Builder{}
-	require.Eventuallyf(
-		t,
-		func() bool {
-			msg.Reset()
-			got := getEventMetrics(t)
-			fmt.Fprintf(
-				msg,
-				"%d events read, %d events published",
-				got.Read,
-				got.Published)
-			return got.Read == want.Read && got.Published == want.Published
-		},
-		timeout,
-		100*time.Millisecond,
-		"expecting %d evens read, %d published. Got %s",
-		want.Read,
-		want.Published,
-		msg)
 }
 
 func startTCPClient(t *testing.T, timeout time.Duration, address string, dataToSend []string) {
@@ -190,28 +163,4 @@ func startTCPClient(t *testing.T, timeout time.Duration, address string, dataToS
 			time.Sleep(100 * time.Millisecond) // Simulate delay between messages
 		}
 	}()
-}
-
-type eventMetrics struct {
-	Published int `json:"events_published"`
-	Read      int `json:"events_read"`
-}
-
-func getEventMetrics(t *testing.T) eventMetrics {
-	data, err := inputmon.MetricSnapshotJSON(nil)
-	if err != nil {
-		t.Fatalf("cannot get metrics snapshot: %s", err)
-	}
-
-	metrics := []eventMetrics{}
-
-	if err := json.Unmarshal(data, &metrics); err != nil {
-		t.Fatalf("cannot read metrics: %s", err)
-	}
-
-	if len(metrics) == 0 {
-		return eventMetrics{}
-	}
-
-	return metrics[0]
 }
