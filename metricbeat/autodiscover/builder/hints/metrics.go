@@ -61,19 +61,15 @@ type metricHints struct {
 	logger *logp.Logger
 }
 
-// InitializeModule initializes this module.
-func InitializeModule() {
-	err := autodiscover.Registry.AddBuilder("hints", NewMetricHints)
-	if err != nil {
-		logp.Error(fmt.Errorf("could not add `hints` builder"))
-	}
+// Setup initializes this module.
+func Setup(reg *autodiscover.Registry) error {
+	return reg.AddBuilder("hints", NewMetricHints)
 }
 
 // NewMetricHints builds a new metrics builder based on hints
 func NewMetricHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
-
 	if err != nil {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
@@ -327,7 +323,6 @@ func (m *metricHints) getModuleConfigs(hints mapstr.M) []mapstr.M {
 
 func (m *metricHints) getProcessors(hints mapstr.M) []mapstr.M {
 	return utils.GetProcessors(hints, m.Key, m.logger)
-
 }
 
 func (m *metricHints) getModules(hints mapstr.M) []mapstr.M {

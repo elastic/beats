@@ -107,9 +107,7 @@ func createModule(r *Register, bm BaseModule) (Module, error) {
 }
 
 func initMetricSets(r *Register, m Module, logger *logp.Logger) ([]MetricSet, error) {
-	var (
-		errs []error
-	)
+	var errs []error
 
 	bms, err := newBaseMetricSets(r, m, logger)
 	if err != nil {

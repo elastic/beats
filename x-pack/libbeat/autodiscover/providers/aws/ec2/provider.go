@@ -24,9 +24,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func init() {
-	_ = autodiscover.Registry.AddProvider("aws_ec2", AutodiscoverBuilder)
-}
+// ProviderName is the name that should be used when Get/Set the provider in a registry
+const ProviderName = "aws_ec2"
 
 // Provider implements autodiscover provider for aws EC2s.
 type Provider struct {
@@ -45,6 +44,7 @@ func AutodiscoverBuilder(
 	c *conf.C,
 	keystore keystore.Keystore,
 	log *logp.Logger,
+	_ *autodiscover.Registry,
 ) (autodiscover.Provider, error) {
 	log.Warn(cfgwarn.Experimental("aws_ec2 autodiscover is experimental"))
 
@@ -104,7 +104,8 @@ func internalBuilder(
 	config *awsauto.Config,
 	fetcher fetcher,
 	keystore keystore.Keystore,
-	log *logp.Logger) (*Provider, error) {
+	log *logp.Logger,
+) (*Provider, error) {
 	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil, log)
 	if err != nil {
 		return nil, err

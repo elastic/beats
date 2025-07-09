@@ -30,10 +30,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func init() {
-	//nolint:errcheck // init function
-	autodiscover.Registry.AddProvider("jolokia", AutodiscoverBuilder)
-}
+// ProviderName is the name that should be used when Get/Set the provider in a registry
+const ProviderName = "jolokia"
 
 // DiscoveryProber implements discovery probes
 type DiscoveryProber interface {
@@ -61,6 +59,7 @@ func AutodiscoverBuilder(
 	c *config.C,
 	keystore keystore.Keystore,
 	logger *logp.Logger,
+	r *autodiscover.Registry,
 ) (autodiscover.Provider, error) {
 	errWrap := func(err error) error {
 		return fmt.Errorf("error setting up jolokia autodiscover provider: %w", err)
@@ -86,12 +85,12 @@ func AutodiscoverBuilder(
 		return nil, errWrap(fmt.Errorf("no configs defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, nil, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, nil, nil, r)
 	if err != nil {
 		return nil, errWrap(err)
 	}
 
-	appenders, err := autodiscover.NewAppenders(config.Appenders)
+	appenders, err := autodiscover.NewAppenders(config.Appenders, r)
 	if err != nil {
 		return nil, errWrap(err)
 	}

@@ -16,6 +16,8 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	mbcmd "github.com/elastic/beats/v7/metricbeat/cmd"
 	"github.com/elastic/beats/v7/metricbeat/cmd/test"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/module"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -48,9 +50,17 @@ func Initialize() *cmd.BeatsRootCmd {
 	settings := mbcmd.MetricbeatSettings("")
 	settings.ElasticLicensed = true
 	settings.Processing = processing.MakeDefaultSupport(true, globalProcs, withECSVersion, processing.WithHost, processing.WithAgentMeta())
-	rootCmd := cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
+	rootCmd := cmd.GenRootCmdWithSettings(beater.Creator(mb.Registry,
+		beater.MetricbeatAutodiscoverSetup,
+		beater.WithLightModules(),
+		beater.WithModuleOptions(module.WithMetricSetInfo(), module.WithServiceName()),
+	), settings)
 	rootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))
-	rootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
+	rootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.Creator(mb.Registry,
+		beater.MetricbeatAutodiscoverSetup,
+		beater.WithLightModules(),
+		beater.WithModuleOptions(module.WithMetricSetInfo(), module.WithMaxStartDelay(0)),
+	)))
 	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
 		management.ConfigTransform.SetTransform(metricbeatCfg)
 	}

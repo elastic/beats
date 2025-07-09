@@ -18,20 +18,29 @@
 package token
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestMain(m *testing.M) {
-	InitializeModule()
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		os.Exit(1)
+	}
+	reg := autodiscover.NewRegistry(logger)
+	if err := Setup(reg); err != nil {
+		os.Exit(1)
+	}
 
 	os.Exit(m.Run())
 }
@@ -48,7 +57,7 @@ func TestTokenAppender(t *testing.T) {
 		{
 			event: bus.Event{},
 			result: mapstr.M{
-				"headers": map[string]interface{}{
+				"headers": map[string]any{
 					"Authorization": "Bearer foo bar",
 				},
 			},
@@ -62,8 +71,8 @@ token_path: "test"
 			event: bus.Event{},
 			result: mapstr.M{
 				"module": "prometheus",
-				"hosts":  []interface{}{"1.2.3.4:8080"},
-				"headers": map[string]interface{}{
+				"hosts":  []any{"1.2.3.4:8080"},
+				"headers": map[string]any{
 					"Authorization": "Bearer foo bar",
 				},
 			},
@@ -89,7 +98,8 @@ token_path: "test"
 		}
 
 		test.event["config"] = []*conf.C{eConfig}
-		writeFile("test", "foo bar")
+		err = writeFile("test", "foo bar")
+		require.NoError(t, err)
 
 		appender, err := NewTokenAppender(config, logptest.NewTestingLogger(t, ""))
 		assert.NoError(t, err)
@@ -100,15 +110,16 @@ token_path: "test"
 		assert.Equal(t, len(cfgs), 1)
 
 		out := mapstr.M{}
-		cfgs[0].Unpack(&out)
+		err = cfgs[0].Unpack(&out)
+		require.NoError(t, err)
 
 		assert.Equal(t, out, test.result)
 		deleteFile("test")
 	}
 }
 
-func writeFile(name, message string) {
-	ioutil.WriteFile(name, []byte(message), os.ModePerm)
+func writeFile(name, message string) error {
+	return os.WriteFile(name, []byte(message), os.ModePerm)
 }
 
 func deleteFile(name string) {

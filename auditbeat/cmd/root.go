@@ -71,8 +71,9 @@ func AuditbeatSettings(globals processors.PluginConfig) instance.Settings {
 
 // Initialize initializes the entrypoint commands for auditbeat
 func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
-	create := beater.CreatorWithRegistry(
+	create := beater.Creator(
 		ab.Registry,
+		beater.MetricbeatAutodiscoverSetup,
 		beater.WithModuleOptions(
 			module.WithEventModifier(core.AddDatasetToEvent),
 		),
