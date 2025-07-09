@@ -36,52 +36,84 @@ import (
 
 func TestInput(t *testing.T) {
 	serverAddr := "127.0.0.1:9042"
-	wg := sync.WaitGroup{}
-	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
-		"host": serverAddr,
-	}))
-	if err != nil {
-		t.Fatalf("cannot create input: %s", err)
+	testCases := map[string]struct {
+		numWorkers int
+		events     []string
+		published  int
+		read       int
+		bytesRead  int
+		blocked    bool
+	}{
+		"one worker": {
+			events:     []string{"foo", "bar"},
+			numWorkers: 1,
+			published:  2,
+			read:       2,
+			bytesRead:  8,
+		},
+		"blocked output": {
+			events:     []string{"foo", "bar"},
+			numWorkers: 42,
+			blocked:    true,
+			published:  0,
+			read:       2,
+			bytesRead:  8,
+		},
 	}
 
-	pipeline := testpipeline.NewPipelineConnector()
-
-	ctx, cancel := context.WithCancel(t.Context())
-	v2Ctx := v2.Context{
-		ID:          t.Name(),
-		Cancelation: ctx,
-		Logger:      logp.NewNopLogger(),
-	}
-	// v2Ctx.Logger = logptest.NewTestingLogger(t, "")
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := inp.Run(v2Ctx, pipeline); err != nil {
-			if !errors.Is(err, context.Canceled) {
-				t.Errorf("input exited with error: %s", err)
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			wg := sync.WaitGroup{}
+			inp, err := configure(conf.MustNewConfigFrom(map[string]any{
+				"host":              serverAddr,
+				"number_of_workers": tc.numWorkers,
+			}))
+			if err != nil {
+				t.Fatalf("cannot create input: %s", err)
 			}
-		}
-	}()
 
-	// Give the input to start running. Because it's UDP we cannot know from
-	// the client side if the server is up and running.
-	time.Sleep(time.Second)
+			pipeline := testpipeline.NewPipelineConnector()
+			if tc.blocked {
+				pipeline.Block()
+			}
 
-	runUDPClient(t, serverAddr, []string{"foo", "bar"})
-	inputtest.RequireNetMetricsCount(
-		t,
-		3*time.Second,
-		2,
-		2,
-		8,
-	)
+			ctx, cancel := context.WithCancel(t.Context())
+			v2Ctx := v2.Context{
+				ID:          t.Name(),
+				Cancelation: ctx,
+				Logger:      logp.NewNopLogger(),
+			}
 
-	// Stop the input, this removes all metrics
-	cancel()
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				if err := inp.Run(v2Ctx, pipeline); err != nil {
+					if !errors.Is(err, context.Canceled) {
+						t.Errorf("input exited with error: %s", err)
+					}
+				}
+			}()
 
-	// Ensure the input Run method returns
-	wg.Wait()
+			// Give the input to start running. Because it's UDP we cannot know from
+			// the client side if the server is up and running.
+			time.Sleep(500 * time.Millisecond)
+
+			runUDPClient(t, serverAddr, []string{"foo", "bar"})
+			inputtest.RequireNetMetricsCount(
+				t,
+				3*time.Second,
+				tc.read,
+				tc.published,
+				tc.bytesRead,
+			)
+
+			// Stop the input, this removes all metrics
+			cancel()
+
+			// Ensure the input Run method returns
+			wg.Wait()
+		})
+	}
 }
 
 func runUDPClient(t *testing.T, address string, dataToSend []string) {

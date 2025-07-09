@@ -66,6 +66,7 @@ func defaultConfig() config {
 			Host:           "localhost:8080",
 			Timeout:        time.Minute * 5,
 		},
+		NumPipelineWorkers: 1,
 	}
 }
 
@@ -76,7 +77,8 @@ type server struct {
 }
 
 type config struct {
-	udp.Config `config:",inline"`
+	udp.Config         `config:",inline"`
+	NumPipelineWorkers int `config:"number_of_workers" validate:"positive,nonzero"`
 }
 
 func newServer(config config) (*server, error) {
@@ -113,8 +115,35 @@ func (s *server) publishLoop(ctx input.Context, publisher stateless.Publisher, m
 	}
 }
 
+func (s *server) initWorkers(ctx input.Context, pipeline beat.Pipeline, metrics *netmetrics.UDP) error {
+	clients := []beat.Client{}
+	for range s.NumPipelineWorkers {
+		client, err := pipeline.ConnectWith(beat.ClientConfig{
+			PublishMode: beat.DefaultGuarantees,
+		})
+		if err != nil {
+			return fmt.Errorf("cannot connect to publishing pipeline: %w", err)
+		}
+
+		clients = append(clients, client)
+		go s.publishLoop(ctx, client, metrics)
+	}
+
+	// Close all clients when the input is closed
+	go func() {
+		select {
+		case <-ctx.Cancelation.Done():
+		}
+		for _, c := range clients {
+			c.Close()
+		}
+	}()
+
+	return nil
+}
+
 func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err error) {
-	log := ctx.Logger.With("host", s.Host)
+	logger := ctx.Logger.With("host", s.Host)
 
 	defer func() {
 		if v := recover(); v != nil {
@@ -123,29 +152,40 @@ func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err er
 			} else {
 				err = fmt.Errorf("UDP input panic with: %+v\n%s", v, debug.Stack())
 			}
-			log.Errorw("UDP input panic", err)
+			logger.Errorw("UDP input panic", err)
 		}
 	}()
 
-	publisher, _ := pipeline.Connect()
-
-	log.Info("starting udp socket input")
-	defer log.Info("udp input stopped")
+	logger.Info("starting udp socket input")
+	defer logger.Info("udp input stopped")
 
 	ctx.UpdateStatus(status.Starting, "")
 	ctx.UpdateStatus(status.Configuring, "")
 
 	const pollInterval = time.Minute
 	// #nosec G115 -- ignore "overflow conversion int64 -> uint64", config validation ensures value is always positive.
-	metrics := netmetrics.NewUDP("udp", ctx.ID, s.Host, uint64(s.ReadBuffer), pollInterval, log)
+	metrics := netmetrics.NewUDP("udp", ctx.ID, s.Host, uint64(s.ReadBuffer), pollInterval, logger)
 	defer metrics.Close()
 
-	go s.publishLoop(ctx, publisher, metrics)
+	s.initWorkers(ctx, pipeline, metrics)
+
+	err = s.initAndRunServer(ctx, metrics)
+	if err != nil {
+		ctx.UpdateStatus(status.Failed, "Input exited unexpectedly: "+err.Error())
+	} else {
+		ctx.UpdateStatus(status.Stopped, "")
+	}
+
+	return err
+}
+
+func (s *server) initAndRunServer(ctx input.Context, metrics *netmetrics.UDP) error {
+	logger := ctx.Logger
 
 	server := udp.New(&s.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
 		now := time.Now()
 		metrics.EventReceived(len(data), now)
-		log.Debugw(
+		logger.Debugw(
 			"Data received",
 			"bytes", len(data),
 			"remote_address", metadata.RemoteAddr.String(),
@@ -157,8 +197,7 @@ func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err er
 				"truncated": metadata.Truncated,
 			},
 			Fields: mapstr.M{
-				"message": string(data),
-			},
+				"message": string(data)},
 		}
 		if metadata.RemoteAddr != nil {
 			evt.Fields["log"] = mapstr.M{
@@ -168,21 +207,15 @@ func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err er
 			}
 		}
 		s.evtChan <- evt
-	}, log)
+	}, logger)
 
-	log.Debug("udp input initialized")
+	logger.Debug("udp input initialized")
 	ctx.UpdateStatus(status.Running, "")
 
-	err = server.Run(ctxtool.FromCanceller(ctx.Cancelation))
+	err := server.Run(ctxtool.FromCanceller(ctx.Cancelation))
 	// Ignore error from 'Run' in case shutdown was signaled.
 	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {
 		err = ctxerr
-	}
-
-	if err != nil {
-		ctx.UpdateStatus(status.Failed, "Input exited unexpectedly: "+err.Error())
-	} else {
-		ctx.UpdateStatus(status.Stopped, "")
 	}
 
 	return err
