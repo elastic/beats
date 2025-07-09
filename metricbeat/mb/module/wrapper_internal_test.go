@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -314,7 +315,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 				// Set the mock status reporter
 				aModule.SetStatusReporter(msr)
 
-				moduleWrapper, err := NewWrapperForMetricSet(aModule, metricSets[0], monitoring, WithMetricSetInfo())
+				moduleWrapper, err := NewWrapperForMetricSet(aModule, metricSets[0], monitoring, logp.NewNopLogger(), WithMetricSetInfo())
 				require.NoError(t, err)
 
 				// run metricset synchronously
@@ -544,7 +545,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 				// Set the mock status reporter
 				aModule.SetStatusReporter(msr)
 
-				moduleWrapper, err := NewWrapperForMetricSet(aModule, metricSets[0], monitoring, WithMetricSetInfo())
+				moduleWrapper, err := NewWrapperForMetricSet(aModule, metricSets[0], monitoring, logp.NewNopLogger(), WithMetricSetInfo())
 				require.NoError(t, err)
 
 				// run metricset synchronously

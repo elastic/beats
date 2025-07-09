@@ -45,11 +45,8 @@ type CPUStats struct {
 
 // CPUService is a helper to collect docker CPU metrics
 type CPUService struct {
-	Cores bool
-}
-
-func NewCpuService() *CPUService {
-	return &CPUService{}
+	Cores  bool
+	logger *logp.Logger
 }
 
 func (c *CPUService) getCPUStatsList(rawStats []docker.Stat, dedot bool) []CPUStats {
@@ -63,7 +60,7 @@ func (c *CPUService) getCPUStatsList(rawStats []docker.Stat, dedot bool) []CPUSt
 }
 
 func (c *CPUService) getCPUStats(myRawStat *docker.Stat, dedot bool) CPUStats {
-	usage := CPUUsage{Stat: myRawStat}
+	usage := CPUUsage{Stat: myRawStat, logger: c.logger}
 
 	stats := CPUStats{
 		Time:                                  common.Time(myRawStat.Stats.Read),
@@ -95,6 +92,7 @@ type CPUUsage struct {
 
 	cpus        uint32
 	systemDelta uint64
+	logger      *logp.Logger
 }
 
 // CPUS returns the number of cpus. If number of cpus is equal to zero, the field will
@@ -197,7 +195,7 @@ func (u *CPUUsage) SystemNormalized() float64 {
 // The main goal is to expose the %, in the same way, it's displayed by docker Client.
 func (u *CPUUsage) calculatePercentage(newValue uint64, oldValue uint64, numCPUS uint32) float64 {
 	if newValue < oldValue {
-		logp.Err("Error calculating CPU time change for docker module: new stats value (%v) is lower than the old one(%v)", newValue, oldValue)
+		u.logger.Errorf("Error calculating CPU time change for docker module: new stats value (%v) is lower than the old one(%v)", newValue, oldValue)
 		return -1
 	}
 	value := newValue - oldValue
