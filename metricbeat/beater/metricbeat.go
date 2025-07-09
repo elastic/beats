@@ -22,10 +22,13 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/initialization"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/beats/v7/metricbeat/autodiscover/appender/kubernetes/token"
+	"github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -33,12 +36,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 
 	"github.com/gohugoio/hashstructure"
-
-	// include all metricbeat specific builders
-	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
-
-	// include all metricbeat specific appenders
-	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/appender/kubernetes/token"
 
 	// Add metricbeat default processors
 	_ "github.com/elastic/beats/v7/metricbeat/processor/add_kubernetes_metadata"
@@ -51,12 +48,14 @@ type Metricbeat struct {
 	config                   Config
 	registry                 *mb.Register
 	autodiscover             *autodiscover.Autodiscover
+	autodiscoverRegistry     *autodiscover.Registry
 	dynamicCfgEnabled        bool
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 
 	// Options
 	moduleOptions []module.Option
 	logger        *logp.Logger
+	adSetup       autodiscover.RegistrySetup
 }
 
 // Option specifies some optional arguments used for configuring the behavior
@@ -80,68 +79,15 @@ func WithLightModules() Option {
 }
 
 // Creator returns a beat.Creator for instantiating a new instance of the
-// Metricbeat framework with the given options.
-func Creator(options ...Option) beat.Creator {
+// Metricbeat framework with a specific registry, autodiscover setup  and the given options.
+func Creator(registry *mb.Register, adSetup autodiscover.RegistrySetup, options ...Option) beat.Creator {
 	return func(b *beat.Beat, c *conf.C) (beat.Beater, error) {
-		return newMetricbeat(b, c, mb.Registry, options...)
+		return newMetricbeat(b, c, registry, adSetup, options...)
 	}
-}
-
-// CreatorWithRegistry returns a beat.Creator for instantiating a new instance of the
-// Metricbeat framework with a specific registry and the given options.
-func CreatorWithRegistry(registry *mb.Register, options ...Option) beat.Creator {
-	return func(b *beat.Beat, c *conf.C) (beat.Beater, error) {
-		return newMetricbeat(b, c, registry, options...)
-	}
-}
-
-// DefaultCreator returns a beat.Creator for instantiating a new instance of
-// Metricbeat framework with the traditional Metricbeat module option of
-// module.WithMetricSetInfo.
-//
-// This is equivalent to calling
-//
-//	beater.Creator(
-//	    beater.WithModuleOptions(
-//	        module.WithMetricSetInfo(),
-//	    ),
-//	)
-func DefaultCreator() beat.Creator {
-	return Creator(
-		WithLightModules(),
-		WithModuleOptions(
-			module.WithMetricSetInfo(),
-			module.WithServiceName(),
-		),
-	)
-}
-
-// DefaultTestModulesCreator returns a customized instance of Metricbeat
-// where startup delay has been disabled to workaround the fact that
-// Modules() will return the static modules (not the dynamic ones)
-// with a start delay.
-//
-// This is equivalent to calling
-//
-//	 beater.Creator(
-//			beater.WithLightModules(),
-//			beater.WithModuleOptions(
-//				module.WithMetricSetInfo(),
-//				module.WithMaxStartDelay(0),
-//			),
-//		)
-func DefaultTestModulesCreator() beat.Creator {
-	return Creator(
-		WithLightModules(),
-		WithModuleOptions(
-			module.WithMetricSetInfo(),
-			module.WithMaxStartDelay(0),
-		),
-	)
 }
 
 // newMetricbeat creates and returns a new Metricbeat instance.
-func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Option) (*Metricbeat, error) {
+func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, adSetup autodiscover.RegistrySetup, options ...Option) (*Metricbeat, error) {
 	config := defaultConfig
 	if err := c.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("error reading configuration file: %w", err)
@@ -153,11 +99,13 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 	}
 
 	metricbeat := &Metricbeat{
-		done:              make(chan struct{}),
-		config:            config,
-		registry:          registry,
-		logger:            b.Info.Logger,
-		dynamicCfgEnabled: dynamicCfgEnabled,
+		done:                 make(chan struct{}),
+		config:               config,
+		registry:             registry,
+		logger:               b.Info.Logger,
+		dynamicCfgEnabled:    dynamicCfgEnabled,
+		autodiscoverRegistry: autodiscover.NewRegistry(b.Info.Logger.Named("autodiscover")),
+		adSetup:              adSetup,
 	}
 
 	for _, applyOption := range options {
@@ -239,6 +187,12 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 	if bt.config.Autodiscover != nil {
 		var err error
+		if bt.adSetup != nil {
+			err = bt.adSetup(bt.autodiscoverRegistry)
+			if err != nil {
+				return fmt.Errorf("error setting up autodiscover: %w", err)
+			}
+		}
 		bt.autodiscover, err = autodiscover.NewAutodiscover(
 			"metricbeat",
 			b.Publisher,
@@ -246,6 +200,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 			bt.config.Autodiscover,
 			b.Keystore,
 			b.Info.Logger,
+			bt.autodiscoverRegistry,
 		)
 		if err != nil {
 			return err
@@ -334,4 +289,17 @@ func (bt *Metricbeat) Stop() {
 // Modules return a list of all configured modules.
 func (bt *Metricbeat) Modules() ([]*module.Wrapper, error) {
 	return module.ConfiguredModules(bt.registry, bt.config.Modules, bt.config.ConfigModules, bt.moduleOptions, bt.logger)
+}
+
+func MetricbeatAutodiscoverSetup(reg *autodiscover.Registry) error {
+	if err := initialization.Setup(reg); err != nil {
+		return fmt.Errorf("autodiscover initialization error: %w", err)
+	}
+	if err := hints.Setup(reg); err != nil {
+		return fmt.Errorf("error adding metricbeat autodiscover hints: %w", err)
+	}
+	if err := token.Setup(reg); err != nil {
+		return fmt.Errorf("error adding kubernetes tokens to autodiscover: %w", err)
+	}
+	return nil
 }

@@ -42,12 +42,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func init() {
-	err := autodiscover.Registry.AddProvider("kubernetes", AutodiscoverBuilder)
-	if err != nil {
-		logp.Error(fmt.Errorf("could not add `hints` builder"))
-	}
-}
+// ProviderName is the name that should be used when Get/Set the provider in a registry
+const ProviderName = "kubernetes"
 
 // Eventer allows defining ways in which kubernetes resource events are observed and processed
 type Eventer interface {
@@ -96,6 +92,7 @@ func AutodiscoverBuilder(
 	c *config.C,
 	keystore keystore.Keystore,
 	logger *logp.Logger,
+	r *autodiscover.Registry,
 ) (autodiscover.Provider, error) {
 	logger = logger.Named("kubernetes")
 
@@ -125,12 +122,12 @@ func AutodiscoverBuilder(
 		return nil, errWrap(err)
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, k8sKeystoreProvider)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, k8sKeystoreProvider, r)
 	if err != nil {
 		return nil, errWrap(err)
 	}
 
-	appenders, err := autodiscover.NewAppenders(config.Appenders)
+	appenders, err := autodiscover.NewAppenders(config.Appenders, r)
 	if err != nil {
 		return nil, errWrap(err)
 	}

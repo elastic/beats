@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	"github.com/elastic/beats/v7/filebeat/include"
 	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 
@@ -63,8 +64,8 @@ func FilebeatSettings(moduleNameSpace string) instance.Settings {
 }
 
 // Filebeat build the beat root command for executing filebeat and it's subcommands.
-func Filebeat(inputs beater.PluginFactory, settings instance.Settings) *cmd.BeatsRootCmd {
-	command := cmd.GenRootCmdWithSettings(beater.New(inputs), settings)
+func Filebeat(inputs beater.PluginFactory, adSetup autodiscover.RegistrySetup, settings instance.Settings) *cmd.BeatsRootCmd {
+	command := cmd.GenRootCmdWithSettings(beater.New(inputs, adSetup), settings)
 	command.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("M"))
 	command.TestCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
 	command.SetupCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))

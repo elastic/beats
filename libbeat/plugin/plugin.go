@@ -21,7 +21,10 @@ import "fmt"
 
 type PluginLoader func(p interface{}) error
 
-var registry = map[string]PluginLoader{}
+var (
+	registry                   = map[string]PluginLoader{}
+	ErrLoaderAlreadyRegistered = fmt.Errorf("already registered")
+)
 
 func Bundle(
 	bundles ...map[string][]interface{},
@@ -52,7 +55,7 @@ func MustRegisterLoader(name string, l PluginLoader) {
 
 func RegisterLoader(name string, l PluginLoader) error {
 	if l := registry[name]; l != nil {
-		return fmt.Errorf("plugin loader '%v' already registered", name)
+		return fmt.Errorf("plugin loader '%v' %w", name, ErrLoaderAlreadyRegistered)
 	}
 
 	registry[name] = l

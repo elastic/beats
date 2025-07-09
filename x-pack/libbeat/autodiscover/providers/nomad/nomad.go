@@ -24,15 +24,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// ProviderName is the name that should be used when Get/Set the provider in a registry
+const ProviderName = "nomad"
+
 // NomadEventKey is the key under which custom metadata is going
 const NomadEventKey = "nomad"
-
-func init() {
-	err := autodiscover.Registry.AddProvider("nomad", AutodiscoverBuilder)
-	if err != nil {
-		logp.Error(fmt.Errorf("could not add `hints` builder"))
-	}
-}
 
 // Provider implements autodiscover provider for docker containers
 type Provider struct {
@@ -55,6 +51,7 @@ func AutodiscoverBuilder(
 	c *conf.C,
 	keystore keystore.Keystore,
 	logger *logp.Logger,
+	r *autodiscover.Registry,
 ) (autodiscover.Provider, error) {
 	logger.Warn(cfgwarn.Experimental("The nomad autodiscover provider is experimental."))
 
@@ -79,12 +76,12 @@ func AutodiscoverBuilder(
 		return nil, err
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil, r)
 	if err != nil {
 		return nil, err
 	}
 
-	appenders, err := autodiscover.NewAppenders(config.Appenders)
+	appenders, err := autodiscover.NewAppenders(config.Appenders, r)
 	if err != nil {
 		return nil, err
 	}
@@ -243,19 +240,29 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 
 	rawMeta, ok := event["meta"]
 	if ok {
-		meta = rawMeta.(mapstr.M)
+		meta, ok = rawMeta.(mapstr.M)
+		if !ok {
+			goto postMeta
+		}
 		if nomadMeta, ok := meta["nomad"]; ok {
-			meta = nomadMeta.(mapstr.M)
+			meta, ok = nomadMeta.(mapstr.M)
+			if !ok {
+				goto postMeta
+			}
 		}
 
 		// The builder base config can configure any of the field values of nomad if need be.
 		e["nomad"] = meta
 		if rawAnn, ok := meta["tags"]; ok {
-			tags = rawAnn.(mapstr.M)
+			tags, ok = rawAnn.(mapstr.M)
+			if !ok {
+				goto postMeta
+			}
 
 			e["tags"] = tags
 		}
 	}
+postMeta:
 
 	if host, ok := event["host"]; ok {
 		e["host"] = host
@@ -264,8 +271,10 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	// Nomad supports different runtimes, so it will not always be _container_ info, but we could add
 	// metadata about the runtime driver.
 	if rawCont, ok := meta["container"]; ok {
-		container = rawCont.(mapstr.M)
-		e["container"] = container
+		container, ok = rawCont.(mapstr.M)
+		if ok {
+			e["container"] = container
+		}
 	}
 
 	// for hints we look at the aggregated task's meta
