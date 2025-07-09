@@ -341,7 +341,7 @@ The Azure Blob Storage APIs don’t provide a direct way to filter files based o
 
 ## `path_prefix` [attrib-path_prefix]
 
-This attribute can be used to filter out files/blobs which have a prefix string different from the specified value. This allows you to efficiently retrieve a subset of blobs that are organized in a virtual folder-like structure. This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+This attribute can be used to filter out files or blobs that have a prefix string that is different from the specified value. This allows you to efficiently retrieve a subset of blobs that are organized in a virtual folder-like structure. This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority over the root level values if both are specified.
 
 ### Example configuration
 
@@ -357,7 +357,7 @@ filebeat.inputs:
     path_prefix: "cloudTrail/"
 ```
 
-**Explanation :** The configuration given above will fetch blobs present in specified container from the virtual **cloudTrail** directory. This operation occurs via the SDK in the blob-storage server, hence impact on memory is negligible.
+The example configuration above will fetch blobs present in specified container from the virtual `cloudTrail` directory. This operation occurs via the SDK in the blob-storage server so the impact on memory is negligible.
 
 ## Custom properties [attrib-custom-properties]
 
