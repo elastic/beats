@@ -37,7 +37,8 @@ var (
 				"count": c.Int("count", s.IgnoreAllErrors),
 			}, c.DictOptional),
 			"store": c.Dict("store", s.Schema{
-				"size_in_bytes": c.Int("size_in_bytes", s.IgnoreAllErrors),
+				"size_in_bytes":                c.Int("size_in_bytes", s.IgnoreAllErrors),
+				"total_data_set_size_in_bytes": c.Int("total_data_set_size_in_bytes", s.IgnoreAllErrors),
 			}, c.DictOptional),
 			"indexing": c.Dict("indexing", s.Schema{
 				"index_total":             c.Int("index_total", s.IgnoreAllErrors),
