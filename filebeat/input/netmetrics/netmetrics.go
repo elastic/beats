@@ -26,8 +26,11 @@ import (
 	"net"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/rcrowley/go-metrics"
 )
 
 // addrs returns the linux /proc/net/tcp or /proc/net/udp addresses for the
@@ -117,4 +120,108 @@ func containsUnspecifiedAddr(addr []string) (yes bool, which []bool, bad []strin
 		}
 	}
 	return yes, which, bad
+}
+
+type netMetrics struct {
+	unregister func()
+	done       chan struct{}
+
+	monitorRegistry *monitoring.Registry
+
+	device          *monitoring.String // name of the device being monitored
+	packets         *monitoring.Uint   // number of packets processed
+	bytes           *monitoring.Uint   // number of bytes processed
+	rxQueue         *monitoring.Uint   // value of the rx_queue field from /proc/net/udp{,6} (only on linux systems)
+	arrivalPeriod   metrics.Sample     // histogram of the elapsed time between packet arrivals
+	processingTime  metrics.Sample     // histogram of the elapsed time between packet receipt and publication
+	eventsPublished *monitoring.Uint   // number of events published
+	lastPacket      time.Time
+}
+
+func newNetMetrics(reg *monitoring.Registry, unreg func()) netMetrics {
+	return netMetrics{
+		monitorRegistry: reg,
+		unregister:      unreg,
+
+		device:          monitoring.NewString(reg, "device"),
+		packets:         monitoring.NewUint(reg, "received_events_total"),
+		bytes:           monitoring.NewUint(reg, "received_bytes_total"),
+		rxQueue:         monitoring.NewUint(reg, "receive_queue_length"),
+		eventsPublished: monitoring.NewUint(reg, "published_events_total"),
+		arrivalPeriod:   metrics.NewUniformSample(1024),
+		processingTime:  metrics.NewUniformSample(1024),
+	}
+}
+
+// EventReceived update all metrics related to receiving events.
+// The metrics are:
+//   - Events (packets) count
+//   - Processing time
+//   - Bytes read/processed
+func (n *netMetrics) EventReceived(len int, timestamp time.Time) {
+	if n == nil {
+		return
+	}
+
+	if !n.lastPacket.IsZero() {
+		n.arrivalPeriod.Update(timestamp.Sub(n.lastPacket).Nanoseconds())
+	}
+
+	n.lastPacket = timestamp
+
+	n.packets.Add(1)
+	n.bytes.Add(uint64(len))
+}
+
+// EventPublished updates all metrics related to published events.
+// The metrics are:
+//   - Published events count
+//   - Event processing (publishing) time
+func (n *netMetrics) EventPublished(start time.Time) {
+	if n == nil {
+		return
+	}
+	n.processingTime.Update(time.Since(start).Nanoseconds())
+	n.eventsPublished.Inc()
+}
+
+// Log logs metric for the given packet.
+func (n *netMetrics) Log(data []byte, timestamp time.Time) {
+	if n == nil {
+		return
+	}
+	n.processingTime.Update(time.Since(timestamp).Nanoseconds())
+	n.packets.Add(1)
+	n.bytes.Add(uint64(len(data)))
+	if !n.lastPacket.IsZero() {
+		n.arrivalPeriod.Update(timestamp.Sub(n.lastPacket).Nanoseconds())
+	}
+	n.lastPacket = timestamp
+}
+
+// Registry returns the monitoring registry of the metricset.
+func (m *netMetrics) Registry() *monitoring.Registry {
+	if m == nil {
+		return nil
+	}
+
+	return m.monitorRegistry
+}
+
+// Close closes the metricset and unregister the metrics.
+func (m *netMetrics) Close() {
+	if m == nil {
+		return
+	}
+	if m.done != nil {
+		// Shut down poller and wait until done before unregistering metrics.
+		m.done <- struct{}{}
+	}
+
+	if m.unregister != nil {
+		m.unregister()
+		m.unregister = nil
+	}
+
+	m.monitorRegistry = nil
 }
