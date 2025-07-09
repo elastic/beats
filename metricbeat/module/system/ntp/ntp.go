@@ -20,9 +20,10 @@ package ntp
 import (
 	"fmt"
 
-	"github.com/beevik/ntp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/beevik/ntp"
 )
 
 // MetricSet holds any configuration or state for the metricset
@@ -32,9 +33,20 @@ var (
 	_ mb.ReportingMetricSetV2Error = (*MetricSet)(nil)
 )
 
+type ntpQueryProvider interface {
+	query(host string, options ntp.QueryOptions) (*ntp.Response, error)
+}
+
+type beevikNTPQueryProvider struct{}
+
+func (n *beevikNTPQueryProvider) query(host string, options ntp.QueryOptions) (*ntp.Response, error) {
+	return ntp.QueryWithOptions(host, options)
+}
+
 type MetricSet struct {
 	mb.BaseMetricSet
-	config config
+	config        config
+	queryProvider ntpQueryProvider
 }
 
 func init() {
@@ -50,12 +62,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := validateConfig(&cfg); err != nil {
 		return nil, err
 	}
-	return &MetricSet{BaseMetricSet: base, config: cfg}, nil
+	return &MetricSet{BaseMetricSet: base, config: cfg, queryProvider: &beevikNTPQueryProvider{}}, nil
 }
 
 // Fetch fetches the offset from the configured NTP server
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	response, err := ntpQueryWithOptions(m.config.Host, ntp.QueryOptions{
+	response, err := m.queryProvider.query(m.config.Host, ntp.QueryOptions{
 		Timeout: m.config.Timeout,
 		Version: m.config.Version,
 	})

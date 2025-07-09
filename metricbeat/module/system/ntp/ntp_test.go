@@ -23,9 +23,17 @@ import (
 	"time"
 
 	"github.com/beevik/ntp"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
+
+type ntpSuccess struct{}
+
+func (n *ntpSuccess) query(host string, opt ntp.QueryOptions) (*ntp.Response, error) {
+	return &ntp.Response{ClockOffset: time.Duration(1.23 * float64(time.Second))}, nil
+}
 
 func getTestConfig() map[string]interface{} {
 	return map[string]interface{}{
@@ -36,15 +44,15 @@ func getTestConfig() map[string]interface{} {
 }
 
 func TestFetchOffset_Success(t *testing.T) {
-	ntpQueryOrig := ntpQueryWithOptions
-	ntpQueryWithOptions = func(host string, opt ntp.QueryOptions) (*ntp.Response, error) {
-		return &ntp.Response{ClockOffset: time.Duration(1.23 * float64(time.Second))}, nil
-	}
-	defer func() { ntpQueryWithOptions = ntpQueryOrig }()
-
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, getTestConfig())
-	events, errs := mbtest.ReportingFetchV2Error(metricSet)
-	assert.Empty(t, errs, "expected no errors, got: %v", errs)
+	ntpMetricSet, ok := metricSet.(*MetricSet)
+	require.True(t, ok, "metricSet is not of type *MetricSet")
+
+	ntpMetricSet.queryProvider = &ntpSuccess{}
+
+	events, errs := mbtest.ReportingFetchV2Error(ntpMetricSet)
+	require.Empty(t, errs, "expected no errors, got: %v", errs)
+
 	assert.Len(t, events, 1, "expected 1 event")
 	msFields := events[0].MetricSetFields
 	offset, ok := msFields["offset"]
@@ -56,14 +64,18 @@ func TestFetchOffset_Success(t *testing.T) {
 	assert.Equal(t, "localhost:123", host, "host should match configured host")
 }
 
-func TestFetchOffset_Error(t *testing.T) {
-	ntpQueryOrig := ntpQueryWithOptions
-	ntpQueryWithOptions = func(host string, opt ntp.QueryOptions) (*ntp.Response, error) {
-		return nil, errors.New("ntp error")
-	}
-	defer func() { ntpQueryWithOptions = ntpQueryOrig }()
+type ntpError struct{}
 
+func (n *ntpError) query(host string, opt ntp.QueryOptions) (*ntp.Response, error) {
+	return nil, errors.New("ntp error")
+}
+
+func TestFetchOffset_Error(t *testing.T) {
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, getTestConfig())
+	ntpMetricSet, ok := metricSet.(*MetricSet)
+	require.True(t, ok, "metricSet is not of type *MetricSet")
+
+	ntpMetricSet.queryProvider = &ntpError{}
 	_, errs := mbtest.ReportingFetchV2Error(metricSet)
 	assert.NotEmpty(t, errs, "expected error, got none")
 }
