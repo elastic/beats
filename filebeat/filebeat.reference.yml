@@ -982,6 +982,9 @@ filebeat.inputs:
 #- type: udp
   #enabled: false
 
+  # Number of pipeline workers to create for each host
+  #number_of_workers: 1
+
   # Maximum size of the message received over UDP
   #max_message_size: 10KiB
 
@@ -999,6 +1002,9 @@ filebeat.inputs:
 
   # Character used to split new message
   #line_delimiter: "\n"
+
+  # Number of pipeline workers to create for each host
+  #number_of_workers: 1
 
   # Maximum size in bytes of the message received over TCP
   #max_message_size: 20MiB
