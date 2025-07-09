@@ -47,7 +47,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	logger := logp.NewLogger(base.FullyQualifiedName())
+	logger := base.Logger().Named(base.FullyQualifiedName())
 
 	client, err := panw.GetPanwClient(config)
 	if err != nil {

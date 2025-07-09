@@ -46,7 +46,7 @@ func NewModuleWithHubFactory(base mb.BaseModule, hubFactory hubFactory) (mb.Modu
 		return nil, err
 	}
 
-	log := logp.NewLogger("cloudfoundry")
+	log := base.Logger.Named("cloudfoundry")
 	hub := hubFactory(&cfg, "metricbeat", log)
 
 	switch cfg.Version {

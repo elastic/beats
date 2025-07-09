@@ -221,6 +221,7 @@ func GoIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
+
 	return devtools.GoTestIntegrationForModule(ctx)
 }
 

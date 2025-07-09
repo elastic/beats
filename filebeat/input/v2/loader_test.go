@@ -23,8 +23,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -202,12 +202,12 @@ func TestLoader_ConfigureFIPS(t *testing.T) {
 	input, err := loader.Configure(conf.MustNewConfigFrom(map[string]any{"type": "a"}))
 	require.Nil(t, input)
 
-	if common.FIPSMode {
+	if version.FIPSDistribution {
 		require.Error(t, err)
 	} else {
 		require.NoError(t, err)
 	}
-	t.Logf("FIPS mode = %v; err = %v", common.FIPSMode, err)
+	t.Logf("FIPS distribution = %v; err = %v", version.FIPSDistribution, err)
 }
 
 func (b loaderConfig) MustNewLoader() *Loader {
@@ -219,7 +219,8 @@ func (b loaderConfig) MustNewLoader() *Loader {
 }
 
 func (b loaderConfig) NewLoader() (*Loader, error) {
-	return NewLoader(logp.NewLogger("test"), b.Plugins, b.TypeField, b.DefaultType)
+	logger, _ := logp.NewDevelopmentLogger("")
+	return NewLoader(logger, b.Plugins, b.TypeField, b.DefaultType)
 }
 func (b loaderConfig) WithPlugins(p ...Plugin) loaderConfig     { b.Plugins = p; return b }
 func (b loaderConfig) WithTypeField(name string) loaderConfig   { b.TypeField = name; return b }

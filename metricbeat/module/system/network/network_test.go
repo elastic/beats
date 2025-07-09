@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestFetch(t *testing.T) {
@@ -169,17 +170,18 @@ func TestGauge(t *testing.T) {
 	var prevu32 uint64 = math.MaxUint32 - 10
 	var currentu32 uint64 = 10
 
-	resultu32 := createGaugeWithRollover(currentu32, prevu32)
+	logger := logptest.NewTestingLogger(t, "")
+	resultu32 := createGaugeWithRollover(currentu32, prevu32, logger)
 	require.Equal(t, uint64(21), resultu32)
 
 	var prevNoRollover uint64 = 347458374592
 	var currentNoRollover = prevNoRollover + 3452
-	resultNoRollover := createGaugeWithRollover(currentNoRollover, prevNoRollover)
+	resultNoRollover := createGaugeWithRollover(currentNoRollover, prevNoRollover, logger)
 	require.Equal(t, uint64(3452), resultNoRollover)
 
 	var prevu64 uint64 = math.MaxUint64 - 5000
 	var currentu64 uint64 = 32
-	resultu64 := createGaugeWithRollover(currentu64, prevu64)
+	resultu64 := createGaugeWithRollover(currentu64, prevu64, logger)
 	require.Equal(t, uint64(5033), resultu64)
 }
 
@@ -189,7 +191,7 @@ func TestGaugeRolloverIncrement(t *testing.T) {
 	var prevU64 uint64 = math.MaxUint64
 	current := uint64(0)
 
-	resultu32 := createGaugeWithRollover(current, prevU64)
+	resultu32 := createGaugeWithRollover(current, prevU64, logptest.NewTestingLogger(t, ""))
 	require.Equal(t, uint64(1), resultu32)
 }
 

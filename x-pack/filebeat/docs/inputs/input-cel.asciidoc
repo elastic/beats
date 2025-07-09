@@ -1,7 +1,7 @@
 [role="xpack"]
 
 :type: cel
-:mito_version: v1.19.0
+:mito_version: v1.21.0
 :mito_docs: https://pkg.go.dev/github.com/elastic/mito@{mito_version}
 
 [id="{beatname_lc}-input-{type}"]
@@ -155,6 +155,11 @@ See <<cel-state-redact,`redact`>> configuration parameters for settings to exclu
 
 As noted above the `cel` input provides functions, macros, and global variables to extend the language.
 
+* {mito_docs}/lib#AWS[AWS v4 request signing]
+** {mito_docs}/lib#hdr-Sign_AWS_from_env-AWS[Sign AWS from env]
+** {mito_docs}/lib#hdr-Sign_AWS_from_shared_credentials-AWS[Sign AWS from shared credentials]
+** {mito_docs}/lib#hdr-Sign_AWS_from_static_credentials-AWS[Sign AWS from static credentials]
+
 * {mito_docs}/lib#Collections[Collections]
 ** {mito_docs}/lib#hdr-Collate-Collections[Collate]
 ** {mito_docs}/lib#hdr-Drop-Collections[Drop]
@@ -307,6 +312,23 @@ The `cel` input keeps a runtime state between requests. This state can be access
 The state must contain a `url` string and may contain any object the user wishes to store in it.
 
 All objects are stored at runtime, except `cursor`, which has values that are persisted between restarts.
+
+[[cel-input-and-numbers]]
+==== CEL input and handling numbers
+
+Numeric values passed in to and out of a CEL evaluation environment are passed as floating point
+values. This can sometimes cause issues when the numbers in the input state are expected to be
+integers, and may result in unexpected field values being ingested into Elasticsearch documents when
+other parts of the ingest pipeline render floating point values with E-notation or add decimal
+points to numbers that are expected to be integers. This is most likely to happen when numbers are
+large (not within ±10^7^). Above the maximum exact integer representation threshold for double
+precision floating point values, within ±2^53^ (±9×10^15^), integer values will lose precision when
+they are returned from the CEL evaluation environment. The CEL input will automatically convert
+integers outside of the ±2^53^ range to strings in order to prevent loss of precision in these
+values, but potentially leading to a situation where some numbers received by the ingest pipeline
+are numbers and some are strings. To avoid these issues, when you have large integer values as part
+of an evaluation result, convert the field value to a string before returning it, and convert input
+numbers to integers explicitly at the start of a CEL program.
 
 ==== Configuration options
 

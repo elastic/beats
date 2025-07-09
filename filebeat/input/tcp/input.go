@@ -135,7 +135,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 			metrics.Log(data, evt.Timestamp)
 		},
 		split,
-	))
+	), log)
 	if err != nil {
 		ctx.UpdateStatus(status.Failed, "Failed to configure input: "+err.Error())
 		return err

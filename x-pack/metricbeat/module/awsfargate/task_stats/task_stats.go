@@ -8,7 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -91,7 +91,7 @@ type Limits struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := logp.NewLogger(metricsetName)
+	logger := base.Logger().Named(metricsetName)
 	metricSet, err := awsfargate.NewMetricSet(base)
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s metricset: %w", metricsetName, err)
@@ -165,7 +165,7 @@ func (m *MetricSet) queryTaskMetadataEndpoints() ([]Stats, error) {
 }
 
 func getTaskStats(taskStatsResp *http.Response) (map[string]dcontainer.StatsResponse, error) {
-	taskStatsBody, err := ioutil.ReadAll(taskStatsResp.Body)
+	taskStatsBody, err := io.ReadAll(taskStatsResp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("ioutil.ReadAll failed: %w", err)
 	}
@@ -179,7 +179,7 @@ func getTaskStats(taskStatsResp *http.Response) (map[string]dcontainer.StatsResp
 }
 
 func getTask(taskResp *http.Response) (TaskMetadata, error) {
-	taskBody, err := ioutil.ReadAll(taskResp.Body)
+	taskBody, err := io.ReadAll(taskResp.Body)
 	if err != nil {
 		return TaskMetadata{}, fmt.Errorf("ioutil.ReadAll failed: %w", err)
 	}

@@ -66,13 +66,14 @@ var once = flag.Bool("once", false, "Run filebeat only once until all harvesters
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
 type Filebeat struct {
-	config         *cfg.Config
-	moduleRegistry *fileset.ModuleRegistry
-	pluginFactory  PluginFactory
-	done           chan struct{}
-	stopOnce       sync.Once // wraps the Stop() method
-	pipeline       beat.PipelineConnector
-	logger         *logp.Logger
+	config                   *cfg.Config
+	moduleRegistry           *fileset.ModuleRegistry
+	pluginFactory            PluginFactory
+	done                     chan struct{}
+	stopOnce                 sync.Once // wraps the Stop() method
+	pipeline                 beat.PipelineConnector
+	logger                   *logp.Logger
+	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 }
 
 type PluginFactory func(beat.Info, *logp.Logger, statestore.States) []v2.Plugin
@@ -117,7 +118,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		return nil, err
 	}
 
-	if err := config.FetchConfigs(); err != nil {
+	if err := config.FetchConfigs(b.Info.Logger); err != nil {
 		return nil, err
 	}
 
@@ -233,6 +234,10 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 	return nil
 }
 
+func (fb *Filebeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
+	fb.otelStatusFactoryWrapper = wrapper
+}
+
 // loadModulesPipelines is called when modules are configured to do the initial
 // setup.
 func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
@@ -325,7 +330,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Setup registrar to persist state
-	registrar, err := registrar.New(stateStore, finishedLogger, config.Registry.FlushTimeout)
+	registrar, err := registrar.New(stateStore, finishedLogger, config.Registry.FlushTimeout, fb.logger)
 	if err != nil {
 		fb.logger.Errorf("Could not init registrar: %v", err)
 		return err
@@ -374,6 +379,10 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		compat.RunnerFactory(inputsLogger, b.Info, b.Monitoring.InputsRegistry(), v2InputLoader),
 		input.NewRunnerFactory(pipelineConnector, registrar, fb.done, fb.logger),
 	))
+
+	if fb.otelStatusFactoryWrapper != nil {
+		inputLoader = fb.otelStatusFactoryWrapper(inputLoader)
+	}
 
 	// Create a ES connection factory for dynamic modules pipeline loading
 	var pipelineLoaderFactory fileset.PipelineLoaderFactory
@@ -492,12 +501,12 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	if waitPublished {
 		// Wait for registrar to finish writing registry
 		waitEvents.Add(withLog(wgEvents.Wait,
-			"Continue shutdown: All enqueued events being published."))
+			"Continue shutdown: All enqueued events being published.", fb.logger))
 		// Wait for either timeout or all events having been ACKed by outputs.
 		if fb.config.ShutdownTimeout > 0 {
 			fb.logger.Info("Shutdown output timer started. Waiting for max %v.", timeout)
 			waitEvents.Add(withLog(waitDuration(timeout),
-				"Continue shutdown: Time out waiting for events being published."))
+				"Continue shutdown: Time out waiting for events being published.", fb.logger))
 		} else {
 			waitEvents.AddChan(fb.done)
 		}
