@@ -20,14 +20,10 @@ package rabbitmq
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/rabbitmq/mtest"
 )
-
-var logger = logp.NewLogger("rabbitmq")
 
 func init() {
 	mb.Registry.MustAddMetricSet("rabbitmq", "test", newTestMetricSet,
@@ -51,7 +47,7 @@ func newTestMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *testMetricSet) Fetch(reporter mb.ReporterV2) {
 	_, err := m.HTTP.FetchContent()
 	if err != nil {
-		logger.Error(err)
+		m.Logger().Named("rabbitmq").Error(err)
 		reporter.Error(err)
 	}
 }

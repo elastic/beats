@@ -62,6 +62,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 *Metricbeat*
 
+- Change index summary metricset to use `_nodes/stats` API instead of `_stats` API to avoid data gaps. {pull}45049[45049]
 - Add support for `_nodes/stats` URIs that work with legacy versions of Elasticsearch {pull}44307[44307]
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
@@ -291,6 +292,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Reset EventLog if error EOF is encountered. {pull}42826[42826]
 - Implement backoff on error retrial. {pull}42826[42826]
 - Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
+- Fix EvtVarTypeAnsiString conversion {pull}44026[44026]
 
 
 *Elastic Logging Plugin*
