@@ -8,12 +8,14 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"reflect"
 	"time"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -58,6 +60,10 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 
 	//nolint:prealloc // No need to preallocate the slice here
 	var sources []cursor.Source
+	// This is to maintain backward compatibility with the old config.
+	if config.BatchSize == 0 {
+		config.BatchSize = *config.MaxWorkers
+	}
 	for _, c := range config.Containers {
 		container := tryOverrideOrDefault(config, c)
 		if container.TimeStampEpoch != nil && !isValidUnixTimestamp(*container.TimeStampEpoch) {
@@ -66,6 +72,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		sources = append(sources, &Source{
 			AccountName:              config.AccountName,
 			ContainerName:            c.Name,
+			BatchSize:                *container.BatchSize,
 			MaxWorkers:               *container.MaxWorkers,
 			Poll:                     *container.Poll,
 			PollInterval:             *container.PollInterval,
@@ -100,6 +107,18 @@ func tryOverrideOrDefault(cfg config, c container) container {
 		c.MaxWorkers = &maxWorkers
 	}
 
+	if c.BatchSize == nil {
+		if cfg.BatchSize != 0 {
+			// If the global batch size is set, use it
+			c.BatchSize = &cfg.BatchSize
+		} else {
+			// If the global batch size is not set, use the local max_workers as the batch size
+			// since at this point we know `c.MaxWorkers` will be set to a non-nil value.
+			// This is to maintain backward compatibility with the old config.
+			c.BatchSize = c.MaxWorkers
+		}
+	}
+
 	if c.Poll == nil {
 		var poll bool
 		if cfg.Poll != nil {
@@ -127,10 +146,12 @@ func tryOverrideOrDefault(cfg config, c container) container {
 	if len(c.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
 		c.FileSelectors = cfg.FileSelectors
 	}
-	// If the container level ReaderConfig is empty, use the root level ReaderConfig
-	// Partial definition of ReaderConfig at both the root and container level
-	// is not allowed, it's an either or scenario.
-	if isConfigEmpty(c.ReaderConfig) {
+	// If the container level ReaderConfig matches the default config ReaderConfig state,
+	// use the global ReaderConfig. Matching the default ReaderConfig state
+	// means that the container level ReaderConfig is not set, and we should use the
+	// global ReaderConfig. Partial definition of ReaderConfig at both the global
+	// and container level is not supported, it's an either or scenario.
+	if reflect.DeepEqual(c.ReaderConfig, defaultReaderConfig) {
 		c.ReaderConfig = cfg.ReaderConfig
 	}
 
@@ -166,6 +187,13 @@ func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cu
 func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state, publisher cursor.Publisher) error {
 	currentSource := src.(*Source)
 
+	stat := inputCtx.StatusReporter
+	if stat == nil {
+		stat = noopReporter{}
+	}
+	stat.UpdateStatus(status.Starting, "")
+	stat.UpdateStatus(status.Configuring, "")
+
 	log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container_name", currentSource.ContainerName)
 	log.Infof("Running azure blob storage for account: %s", input.config.AccountName)
 	// create a new inputMetrics instance
@@ -176,20 +204,27 @@ func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		<-inputCtx.Cancelation.Done()
+		stat.UpdateStatus(status.Stopping, "")
 		cancel()
 	}()
 
 	serviceClient, credential, err := fetchServiceClientAndCreds(input.config, input.serviceURL, log)
 	if err != nil {
 		metrics.errorsTotal.Inc()
+		stat.UpdateStatus(status.Failed, "failed to get service client: "+err.Error())
 		return err
 	}
 	containerClient, err := fetchContainerClient(serviceClient, currentSource.ContainerName, log)
 	if err != nil {
 		metrics.errorsTotal.Inc()
+		stat.UpdateStatus(status.Failed, "failed to get container client: "+err.Error())
 		return err
 	}
 
-	scheduler := newScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, metrics, log)
+	scheduler := newScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, stat, metrics, log)
 	return scheduler.schedule(ctx)
 }
+
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}

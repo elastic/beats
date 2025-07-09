@@ -12,6 +12,7 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.uber.org/zap/zapcore"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -26,7 +27,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-ucfg"
@@ -91,9 +91,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		})
 	}
 
-	b.Info.Monitoring.Namespace = monitoring.GetNamespace(b.Info.Beat + "-" + b.Info.ID.String())
-
-	b.Info.Monitoring.SetupRegistries()
+	b.Monitoring = beat.NewMonitoring()
 
 	b.SetKeystore(store)
 	b.Beat.Keystore = store
@@ -248,14 +246,11 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		}
 	}
 
-	reg := b.Info.Monitoring.StatsRegistry.GetRegistry("libbeat")
-	if reg == nil {
-		reg = b.Info.Monitoring.StatsRegistry.NewRegistry("libbeat")
-	}
+	reg := b.Monitoring.StatsRegistry().GetOrCreateRegistry("libbeat")
 
 	monitors := pipeline.Monitors{
 		Metrics:   reg,
-		Telemetry: b.Info.Monitoring.StateRegistry,
+		Telemetry: b.Monitoring.StateRegistry(),
 		Logger:    logger.Named("publisher"),
 		Tracer:    b.Instrumentation.Tracer(),
 	}

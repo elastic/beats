@@ -545,6 +545,11 @@ Under the default behavior, Requests will continue while the `remaining` value i
 It is not set by default (by default the rate-limiting as specified in the Response is followed).
 
 
+### `request.rate_limit.max_non_degraded` [_request_rate_limit_max_non_degraded]
+
+The maximum number of consecutive 429 rate limit responses from the endpoint to accept before making an input health status update. If this is not set, rate limit responses will not be reported as health updates. Default behavior is to not report rate limiting responses.
+
+
 ### `request.transforms` [request-transforms]
 
 List of transforms to apply to the request before each execution.

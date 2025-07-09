@@ -118,7 +118,7 @@ func TestNewAppend(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(tc.config)
-			gotAppend, gotErr := tc.constructor(cfg, nil)
+			gotAppend, gotErr := tc.constructor(cfg, noopReporter{}, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)
 				assert.Equal(t, tc.expectedTarget, (gotAppend.(*appendt)).targetInfo)
@@ -208,7 +208,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 	cfg, err := conf.NewConfigFrom(c1)
 	require.NoError(t, err)
 
-	transform, err := newAppendResponse(cfg, logp.NewLogger("test"))
+	transform, err := newAppendResponse(cfg, noopReporter{}, logp.NewLogger("test"))
 	require.NoError(t, err)
 
 	testAppend := transform.(*appendt)
@@ -238,7 +238,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 	cfg, err = conf.NewConfigFrom(c2)
 	require.NoError(t, err)
 
-	transform, err = newAppendResponse(cfg, logp.NewLogger("test"))
+	transform, err = newAppendResponse(cfg, noopReporter{}, logp.NewLogger("test"))
 	require.NoError(t, err)
 
 	testAppend = transform.(*appendt)
@@ -259,7 +259,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 	cfg, err = conf.NewConfigFrom(c2)
 	require.NoError(t, err)
 
-	transform, err = newAppendResponse(cfg, logp.NewLogger("test"))
+	transform, err = newAppendResponse(cfg, noopReporter{}, logp.NewLogger("test"))
 	require.NoError(t, err)
 
 	testAppend = transform.(*appendt)

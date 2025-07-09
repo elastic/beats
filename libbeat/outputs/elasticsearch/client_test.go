@@ -636,9 +636,27 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 	assert.Equal(t, events, res)
 }
 
+func TestPublishResultForStats(t *testing.T) {
+	// publishResultForStats should return errTooMany if it is given
+	// stats with tooMany > 0, and nil otherwise (all other errors are
+	// either caused by encoding or connection failures, or are
+	// immediately retryable).
+	stats := bulkResultStats{
+		acked:        1,
+		duplicates:   2,
+		fails:        3,
+		nonIndexable: 4,
+		deadLetter:   5,
+		tooMany:      1,
+	}
+
+	assert.Equal(t, errTooMany, publishResultForStats(stats), "publishResultForStats should return errTooMany if tooMany > 0")
+
+	stats.tooMany = 0
+	assert.Nil(t, publishResultForStats(stats), "publishResultForStats should return nil if tooMany == 0")
+}
+
 func BenchmarkCollectPublishFailsNone(b *testing.B) {
-	logger, err := logp.NewDevelopmentLogger("")
-	require.NoError(b, err)
 
 	client, err := NewClient(
 		clientSettings{
@@ -646,7 +664,7 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
 			deadLetterIndex: "",
 		},
 		nil,
-		logger,
+		logp.NewNopLogger(), // we use no-op logger so that it does not skew benchmark results
 	)
 	assert.NoError(b, err)
 
@@ -674,14 +692,12 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
 }
 
 func BenchmarkCollectPublishFailMiddle(b *testing.B) {
-	logger, err := logp.NewDevelopmentLogger("")
-	require.NoError(b, err)
 	client, err := NewClient(
 		clientSettings{
 			observer: outputs.NewNilObserver(),
 		},
 		nil,
-		logger,
+		logp.NewNopLogger(),
 	)
 	assert.NoError(b, err)
 
@@ -710,14 +726,12 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 }
 
 func BenchmarkCollectPublishFailAll(b *testing.B) {
-	logger, err := logp.NewDevelopmentLogger("")
-	require.NoError(b, err)
 	client, err := NewClient(
 		clientSettings{
 			observer: outputs.NewNilObserver(),
 		},
 		nil,
-		logger,
+		logp.NewNopLogger(),
 	)
 	assert.NoError(b, err)
 
@@ -790,8 +804,6 @@ func BenchmarkPublish(b *testing.B) {
 	// Indexing to _bulk api
 	for _, test := range tests {
 		for _, l := range levels {
-			logger, err := logp.NewDevelopmentLogger("")
-			require.NoError(b, err)
 			b.Run(fmt.Sprintf("%s with compression level %d", test.Name, l), func(b *testing.B) {
 				client, err := NewClient(
 					clientSettings{
@@ -805,7 +817,7 @@ func BenchmarkPublish(b *testing.B) {
 						},
 					},
 					nil,
-					logger,
+					logp.NewNopLogger(),
 				)
 				assert.NoError(b, err)
 				batch := encodeBatch(client, outest.NewBatch(test.Events...))

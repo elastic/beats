@@ -43,7 +43,9 @@ import (
 var (
 	errPayloadTooLarge = errors.New("the bulk payload is too large for the server. Consider to adjust `http.max_content_length` parameter in Elasticsearch or `bulk_max_size` in the beat. The batch has been dropped")
 
-	ErrTooOld = errors.New("Elasticsearch is too old. Please upgrade the instance. If you would like to connect to older instances set output.elasticsearch.allow_older_versions to true") //nolint:staticcheck //false positive
+	ErrTooOld = errors.New("Elasticsearch is too old. Please upgrade the instance. If you would like to connect to older instances set output.elasticsearch.allow_older_versions to true") //nolint:staticcheck //false positive (Elasticsearch should be capitalized)
+
+	errTooMany = errors.New("Elasticsearch returned error 429 Too Many Requests, throttling connection") //nolint:staticcheck //false positive (Elasticsearch should be capitalized)
 )
 
 // Client is an elasticsearch client.
@@ -129,7 +131,7 @@ func NewClient(
 		pipeline = nil
 	}
 
-	conn, err := eslegclient.NewConnection(s.connection)
+	conn, err := eslegclient.NewConnection(s.connection, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -165,20 +167,18 @@ func NewClient(
 		observer = outputs.NewNilObserver()
 	}
 
-	log := logger.Named("elasticsearch")
-
 	pLogDeadLetter := periodic.NewDoer(10*time.Second,
 		func(count uint64, d time.Duration) {
-			log.Errorf(
+			logger.Errorf(
 				"Failed to deliver to dead letter index %d events in last %s. Look at the event log to view the event and cause.", count, d)
 		})
 	pLogIndex := periodic.NewDoer(10*time.Second, func(count uint64, d time.Duration) {
-		log.Warnf(
+		logger.Warnf(
 			"Failed to index %d events in last %s: events were dropped! Look at the event log to view the event and cause.",
 			count, d)
 	})
 	pLogIndexTryDeadLetter := periodic.NewDoer(10*time.Second, func(count uint64, d time.Duration) {
-		log.Warnf(
+		logger.Warnf(
 			"Failed to index %d events in last %s: tried dead letter index. Look at the event log to view the event and cause.",
 			count, d)
 	})
@@ -193,7 +193,7 @@ func NewClient(
 		observer:         observer,
 		deadLetterIndex:  s.deadLetterIndex,
 
-		log:                    log,
+		log:                    logger,
 		pLogDeadLetter:         pLogDeadLetter,
 		pLogIndex:              pLogIndex,
 		pLogIndexTryDeadLetter: pLogIndexTryDeadLetter,
@@ -268,6 +268,15 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 		batch.RetryEvents(eventsToRetry)
 	} else {
 		batch.ACK()
+	}
+	return publishResultForStats(stats)
+}
+
+func publishResultForStats(stats bulkResultStats) error {
+	if stats.tooMany > 0 {
+		// We're being throttled by Elasticsearch, return an error so we
+		// retry the connection with exponential backoff
+		return errTooMany
 	}
 	return nil
 }

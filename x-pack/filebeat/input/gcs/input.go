@@ -7,6 +7,7 @@ package gcs
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -90,6 +91,7 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	if b.MaxWorkers == nil {
 		b.MaxWorkers = &cfg.MaxWorkers
 	}
+
 	if b.BatchSize == nil && cfg.BatchSize != 0 {
 		// If the global batch size is set, use it
 		b.BatchSize = &cfg.BatchSize
@@ -99,25 +101,39 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 		// This is to maintain backward compatibility with the old config.
 		b.BatchSize = b.MaxWorkers
 	}
+
 	if b.Poll == nil {
 		b.Poll = &cfg.Poll
 	}
+
 	if b.PollInterval == nil {
 		b.PollInterval = &cfg.PollInterval
 	}
+
 	if b.ParseJSON == nil {
 		b.ParseJSON = &cfg.ParseJSON
 	}
+
 	if b.TimeStampEpoch == nil {
 		b.TimeStampEpoch = cfg.TimeStampEpoch
 	}
+
 	if b.ExpandEventListFromField == "" {
 		b.ExpandEventListFromField = cfg.ExpandEventListFromField
 	}
+
 	if len(b.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
 		b.FileSelectors = cfg.FileSelectors
 	}
-	b.ReaderConfig = cfg.ReaderConfig
+
+	// If the bucket level ReaderConfig matches the default config ReaderConfig state,
+	// use the global ReaderConfig. Matching the default ReaderConfig state
+	// means that the bucket level ReaderConfig is not set, and we should use the
+	// global ReaderConfig. Partial definition of ReaderConfig at both the global
+	// and bucket level is not supported, it's an either or scenario.
+	if reflect.DeepEqual(b.ReaderConfig, defaultReaderConfig) {
+		b.ReaderConfig = cfg.ReaderConfig
+	}
 
 	return b
 }

@@ -60,6 +60,11 @@ type Plugin struct {
 
 	// Manager MUST be configured. The manager is used to create the inputs.
 	Manager InputManager
+
+	// ExcludeFromFIPS indicates whether this plugin should not be usable in
+	// FIPS-capable Filebeat distributions. If set to true, FIPS-capable Filebeat
+	// distributions will exit with an error if this plugin is configured for use.
+	ExcludeFromFIPS bool
 }
 
 func (p Plugin) validate() error {
