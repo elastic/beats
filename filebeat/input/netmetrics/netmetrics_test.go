@@ -19,7 +19,11 @@ package netmetrics
 
 import (
 	"testing"
+	"time"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -49,4 +53,23 @@ func TestAddrs(t *testing.T) {
 			t.Errorf("expected addrs in addr6 for IPv6 address: addr4 is %v", addr4)
 		}
 	})
+}
+
+func TestUDPMetrics(t *testing.T) {
+	m := NewUDP("udp", t.Name(), "localhost:4242", 1000, time.Second, logp.NewNopLogger())
+
+	data := make([]byte, 42, 42)
+	start := time.Now()
+	now := start
+
+	numEvents := 100
+	for range 100 {
+		now = start.Add(100 * time.Millisecond)
+		m.Log(data, now)
+	}
+
+	assert.EqualValues(t, len(data)*numEvents, m.bytes.Get(), "wrong value for bytes received")
+	assert.EqualValues(t, numEvents, m.packets.Get(), "wrong value for packets received")
+	assert.EqualValues(t, numEvents, m.processingTime.Count(), "wrong number of events for processing time calculation")
+	assert.EqualValues(t, numEvents-1, m.arrivalPeriod.Count(), "wrong number of events for processing time calculation")
 }
