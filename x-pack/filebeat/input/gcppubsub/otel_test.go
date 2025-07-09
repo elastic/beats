@@ -44,8 +44,8 @@ func TestGCPInputOTelE2E(t *testing.T) {
 	password, _ := host.User.Password()
 
 	// create a random uuid and make sure it doesn't contain dashes/
-	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	fbNameSpace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	otelNamespace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
+	fbNameSpace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
 
 	type options struct {
 		Namespace    string
