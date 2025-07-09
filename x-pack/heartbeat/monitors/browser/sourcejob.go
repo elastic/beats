@@ -44,6 +44,10 @@ func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
 	if err != nil {
 		return nil, ErrBadConfig(err)
 	}
+	err = s.browserCfg.Source.Active().Decode()
+	if err != nil {
+		return nil, ErrBadConfig(err)
+	}
 
 	return s, nil
 }
@@ -164,7 +168,7 @@ func (sj *SourceJob) jobs() []jobs.Job {
 	var j jobs.Job
 
 	isScript := sj.browserCfg.Source.Inline != nil
-	ctx := context.WithValue(sj.ctx, synthexec.SynthexecTimeout, sj.browserCfg.Timeout+30*time.Second)
+	ctx := context.WithValue(sj.ctx, synthexec.SynthexecTimeoutKey, sj.browserCfg.Timeout+30*time.Second)
 	sFields := sj.StdFields()
 
 	if isScript {
