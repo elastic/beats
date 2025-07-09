@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/netmetrics"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -71,6 +72,7 @@ func defaultConfig() config {
 type server struct {
 	udp.Server
 	config
+	evtChan chan beat.Event
 }
 
 type config struct {
@@ -78,7 +80,10 @@ type config struct {
 }
 
 func newServer(config config) (*server, error) {
-	return &server{config: config}, nil
+	return &server{
+		config:  config,
+		evtChan: make(chan beat.Event),
+	}, nil
 }
 
 func (s *server) Name() string { return "udp" }
@@ -89,6 +94,23 @@ func (s *server) Test(_ input.TestContext) error {
 		return err
 	}
 	return l.Close()
+}
+
+func (s *server) publishLoop(ctx input.Context, publisher stateless.Publisher, metrics *netmetrics.UDP) {
+	logger := ctx.Logger
+	logger.Debug("starting publish loop")
+	defer logger.Debug("finished publish loop")
+	for {
+		select {
+		case <-ctx.Cancelation.Done():
+			logger.Debug("Context cancelled, closing publish Loop")
+			return
+		case evt := <-s.evtChan:
+			start := time.Now()
+			publisher.Publish(evt)
+			metrics.EventPublished(start)
+		}
+	}
 }
 
 func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err error) {
@@ -118,7 +140,11 @@ func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err er
 	metrics := netmetrics.NewUDP("udp", ctx.ID, s.Host, uint64(s.ReadBuffer), pollInterval, log)
 	defer metrics.Close()
 
+	go s.publishLoop(ctx, publisher, metrics)
+
 	server := udp.New(&s.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
+		now := time.Now()
+		metrics.EventReceived(len(data), now)
 		log.Debugw(
 			"Data received",
 			"bytes", len(data),
@@ -126,7 +152,7 @@ func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err er
 			"truncated", metadata.Truncated,
 		)
 		evt := beat.Event{
-			Timestamp: time.Now(),
+			Timestamp: now,
 			Meta: mapstr.M{
 				"truncated": metadata.Truncated,
 			},
@@ -141,13 +167,7 @@ func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err er
 				},
 			}
 		}
-
-		publisher.Publish(evt)
-
-		// This must be called after publisher.Publish to measure
-		// the processing time metric.
-		metrics.EventPublished(evt.Timestamp)
-		metrics.EventReceived(len(data), evt.Timestamp)
+		s.evtChan <- evt
 	}, log)
 
 	log.Debug("udp input initialized")

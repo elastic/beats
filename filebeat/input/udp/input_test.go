@@ -52,6 +52,7 @@ func TestInput(t *testing.T) {
 		Cancelation: ctx,
 		Logger:      logp.NewNopLogger(),
 	}
+	// v2Ctx.Logger = logptest.NewTestingLogger(t, "")
 
 	wg.Add(1)
 	go func() {
