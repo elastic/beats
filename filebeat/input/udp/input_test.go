@@ -69,10 +69,12 @@ func TestInput(t *testing.T) {
 	time.Sleep(time.Second)
 
 	runUDPClient(t, serverAddr, []string{"foo", "bar"})
-	inputtest.RequireNetInputMetrics(
+	inputtest.RequireNetMetricsCount(
 		t,
 		3*time.Second,
-		inputtest.NetInputMetrics{Packets: 2})
+		2,
+		2,
+	)
 
 	// Stop the input, this removes all metrics
 	cancel()
