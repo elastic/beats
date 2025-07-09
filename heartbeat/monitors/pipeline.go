@@ -68,19 +68,16 @@ func WithSyncPipelineWrapper(pipeline beat.Pipeline, pw *SyncPipelineWrapper) be
 }
 
 func (c *wrappedClient) Publish(event beat.Event) {
-	logp.L().Infof("=== Publishing event: %+s ===", event)
 	c.wg.Add(1)
 	c.client.Publish(event)
 }
 
 func (c *wrappedClient) PublishAll(events []beat.Event) {
-	logp.L().Infof("=== Publishing events: %+s ===", events)
 	c.wg.Add(len(events))
 	c.client.PublishAll(events)
 }
 
 func (c *wrappedClient) Close() error {
-	logp.L().Info("=== Closing wrapped client ===")
 	return c.client.Close()
 }
 
