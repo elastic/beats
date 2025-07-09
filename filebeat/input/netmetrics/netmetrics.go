@@ -185,20 +185,6 @@ func (n *netMetrics) EventPublished(start time.Time) {
 	n.eventsPublished.Inc()
 }
 
-// Log logs metric for the given packet.
-func (n *netMetrics) Log(data []byte, timestamp time.Time) {
-	if n == nil {
-		return
-	}
-	n.processingTime.Update(time.Since(timestamp).Nanoseconds())
-	n.packets.Add(1)
-	n.bytes.Add(uint64(len(data)))
-	if !n.lastPacket.IsZero() {
-		n.arrivalPeriod.Update(timestamp.Sub(n.lastPacket).Nanoseconds())
-	}
-	n.lastPacket = timestamp
-}
-
 // Registry returns the monitoring registry of the metricset.
 func (m *netMetrics) Registry() *monitoring.Registry {
 	if m == nil {
