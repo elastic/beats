@@ -19,49 +19,43 @@ package monitors
 
 import (
 	"io"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func WithDelayedPipelineStop(pipeline beat.Pipeline) beat.Pipeline {
-	return &delayedPipelineStop{
+func WithDelayedPipelineStop(pipeline beat.Pipeline, closeCh chan struct{}) beat.Pipeline {
+	p := &delayedPipelineStop{
 		pipeline: pipeline,
 	}
+
+	go func() {
+		<-closeCh
+		p.closePipeline()
+	}()
+	return p
 }
 
 type delayedPipelineStop struct {
 	pipeline beat.Pipeline
 }
 
-func (hw *delayedPipelineStop) ConnectWith(c beat.ClientConfig) (beat.Client, error) {
-	return hw.pipeline.ConnectWith(c)
+func (ps *delayedPipelineStop) ConnectWith(c beat.ClientConfig) (beat.Client, error) {
+	return ps.pipeline.ConnectWith(c)
 }
 
-func (hw *delayedPipelineStop) Connect() (beat.Client, error) {
-	return hw.pipeline.Connect()
+func (ps *delayedPipelineStop) Connect() (beat.Client, error) {
+	return ps.pipeline.Connect()
 }
 
-func (hw *delayedPipelineStop) Close() error {
-	logp.L().Info("=== close pipeline: record skipped monitors ===")
+func (ps *delayedPipelineStop) Close() error {
+	// Do not close the underlying pipeline immediately.
+	// Manually close it by listening to the channel in the constructor.
+	return nil
+}
 
-	close := func() {
-		if closer, ok := hw.pipeline.(io.Closer); ok {
-			logp.L().Info("=== closing original publisher ===")
-			closer.Close()
-			return
-		}
-		logp.L().Info("=== original publisher is not a closer ===")
+func (ps *delayedPipelineStop) closePipeline() error {
+	if closer, ok := ps.pipeline.(io.Closer); ok {
+		return closer.Close()
 	}
-
-	go func() {
-		logp.L().Info("=== close pipeline: wait until closing the original pipeline ===")
-		select {
-		case <-time.After(5 * time.Second):
-			close()
-		}
-	}()
-
 	return nil
 }

@@ -21,7 +21,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"sync"
 
 	"syscall"
@@ -154,20 +153,18 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	// Adapt local pipeline to synchronized mode if run_once is enabled
 	pipeline := b.Publisher
 	var pipelineWrapper monitors.PipelineWrapper = &monitors.NoopPipelineWrapper{}
-	if bt.config.RunOnce {
-		// TODO: find a better way to update the publisher from the beats
-		// Investigate:
-		// - Pipeline interface and callbacks -> Nope
-		// - Beater methods to update the pipeline -> Nope
-		// - ASK FOR HELP.
-		b.Publisher = monitors.WithDelayedPipelineStop(pipeline)
 
+	// Trigger the close of the pipeline
+	pipelineCloser := make(chan struct{})
+	if bt.config.RunOnce {
 		// Wrap publisher using a monitor skipper
 		sync := &monitors.SyncPipelineWrapper{}
 
 		pipeline = monitors.WithSyncPipelineWrapper(pipeline, sync)
 		pipelineWrapper = sync
 
+		// TODO: find a better way to update beats' publisher
+		b.Publisher = monitors.WithDelayedPipelineStop(pipeline, pipelineCloser)
 	}
 
 	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
@@ -236,10 +233,8 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	waitPublished.AddChan(bt.done)
 	waitPublished.Add(monitors.WithLog(func() {
 		pipelineWrapper.Wait()
-		// TODO: change this please! Ideally, we should add this as a wait condition
-		if closer, ok := b.Publisher.(io.Closer); ok {
-			closer.Close()
-		}
+		// TODO: find a better way to do this
+		close(pipelineCloser)
 	}, "shutdown: finished publishing events."))
 	if bt.config.PublishTimeout > 0 {
 		logp.L().Infof("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout)
@@ -338,9 +333,9 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
 	bt.stopOnce.Do(func() {
-		logp.L().Info("=== waiting before closing the beater channel ===")
 		close(bt.done)
-		time.Sleep(5 * time.Second)
+		// Give the shutdown process some time to process all the events.
+		time.Sleep(10 * time.Second)
 	})
 }
 
