@@ -10,6 +10,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"net/http"
 	"strings"
 	"testing"
 	"text/template"
@@ -35,10 +36,11 @@ func TestMetricbeatOTelE2E(t *testing.T) {
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 
 	type options struct {
-		Index    string
-		ESURL    string
-		Username string
-		Password string
+		Index          string
+		ESURL          string
+		Username       string
+		Password       string
+		MonitoringPort int
 	}
 
 	var beatsCfgFile = `
@@ -65,6 +67,8 @@ processors:
     - add_cloud_metadata: ~
     - add_docker_metadata: ~
     - add_kubernetes_metadata: ~
+http.host: localhost
+http.port: {{.MonitoringPort}}	
 `
 
 	// start metricbeat in otel mode
@@ -75,25 +79,25 @@ processors:
 		"otel",
 	)
 
+	optionsValue := options{
+		ESURL:          fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username:       user,
+		Password:       password,
+		MonitoringPort: 5078,
+	}
+
 	var configBuffer bytes.Buffer
-	require.NoError(t, template.Must(template.New("config").Parse(beatsCfgFile)).Execute(&configBuffer, options{
-		Index:    "logs-integration-mbreceiver-" + namespace,
-		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
-		Username: user,
-		Password: password,
-	}))
+	optionsValue.Index = "logs-integration-mbreceiver-" + namespace
+	require.NoError(t, template.Must(template.New("config").Parse(beatsCfgFile)).Execute(&configBuffer, optionsValue))
 
 	metricbeatOTel.WriteConfigFile(configBuffer.String())
 	metricbeatOTel.Start()
 	defer metricbeatOTel.Stop()
 
 	var mbConfigBuffer bytes.Buffer
-	require.NoError(t, template.Must(template.New("config").Parse(beatsCfgFile)).Execute(&mbConfigBuffer, options{
-		Index:    "logs-filebeat-mb-" + namespace,
-		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
-		Username: user,
-		Password: password,
-	}))
+	optionsValue.Index = "logs-integration-mb-" + namespace
+	optionsValue.MonitoringPort = 5079
+	require.NoError(t, template.Must(template.New("config").Parse(beatsCfgFile)).Execute(&mbConfigBuffer, optionsValue))
 	metricbeat := integration.NewBeat(t, "metricbeat", "../../metricbeat.test")
 	metricbeat.WriteConfigFile(mbConfigBuffer.String())
 	metricbeat.Start()
@@ -111,10 +115,10 @@ processors:
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
-			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-mbreceiver*")
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-mbreceiver-"+namespace+"*")
 			require.NoError(t, err)
 
-			metricbeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-mb*")
+			metricbeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-mb-"+namespace+"*")
 			require.NoError(t, err)
 
 			return otelDocs.Hits.Total.Value >= 1 && metricbeatDocs.Hits.Total.Value >= 1
@@ -124,7 +128,22 @@ processors:
 	otelDoc := otelDocs.Hits.Hits[0]
 	metricbeatDoc := metricbeatDocs.Hits.Hits[0]
 	assertMapstrKeysEqual(t, otelDoc.Source, metricbeatDoc.Source, []string{}, "expected documents keys to be equal")
+	assertMonitoring(t, optionsValue.MonitoringPort)
+}
 
+func assertMonitoring(t *testing.T, port int) {
+	address := fmt.Sprintf("http://localhost:%d", port)
+	r, err := http.Get(address) //nolint:noctx,bodyclose,gosec // fine for tests
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
+
+	r, err = http.Get(address + "/stats") //nolint:noctx,bodyclose // fine for tests
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
+
+	r, err = http.Get(address + "/not-exist") //nolint:noctx,bodyclose // fine for tests
+	require.NoError(t, err)
+	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }
 
 func assertMapstrKeysEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg string) {

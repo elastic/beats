@@ -17,8 +17,14 @@ services:
   # Used by base tests
   elasticsearch:
     extends:
-      file: ../../metricbeat/docker-compose.yml
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+      retries: 300
+      interval: 1s
+    ports:
+      - 9200:9200
 
   # Used by base tests
   kibana:
