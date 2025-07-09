@@ -45,7 +45,6 @@ func TestInput(t *testing.T) {
 	}
 
 	pipeline := testpipeline.NewPipelineConnector()
-	client, _ := pipeline.Connect()
 
 	ctx, cancel := context.WithCancel(t.Context())
 	v2Ctx := v2.Context{
@@ -57,7 +56,7 @@ func TestInput(t *testing.T) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := inp.Run(v2Ctx, client); err != nil {
+		if err := inp.Run(v2Ctx, pipeline); err != nil {
 			if !errors.Is(err, context.Canceled) {
 				t.Errorf("input exited with error: %s", err)
 			}

@@ -18,14 +18,16 @@
 package udp
 
 import (
+	"fmt"
 	"net"
+	"runtime/debug"
 	"time"
 
 	"github.com/dustin/go-humanize"
 
 	"github.com/elastic/beats/v7/filebeat/input/netmetrics"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -43,11 +45,11 @@ func Plugin() input.Plugin {
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "udp packet server",
-		Manager:    stateless.NewInputManager(configure),
+		Manager:    v2.ConfigureWith(configure),
 	}
 }
 
-func configure(cfg *conf.C) (stateless.Input, error) {
+func configure(cfg *conf.C) (v2.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -89,8 +91,21 @@ func (s *server) Test(_ input.TestContext) error {
 	return l.Close()
 }
 
-func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
+func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err error) {
 	log := ctx.Logger.With("host", s.Host)
+
+	defer func() {
+		if v := recover(); v != nil {
+			if e, ok := v.(error); ok {
+				err = e
+			} else {
+				err = fmt.Errorf("UDP input panic with: %+v\n%s", v, debug.Stack())
+			}
+			log.Errorw("UDP input panic", err)
+		}
+	}()
+
+	publisher, _ := pipeline.Connect()
 
 	log.Info("starting udp socket input")
 	defer log.Info("udp input stopped")
@@ -138,7 +153,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	log.Debug("udp input initialized")
 	ctx.UpdateStatus(status.Running, "")
 
-	err := server.Run(ctxtool.FromCanceller(ctx.Cancelation))
+	err = server.Run(ctxtool.FromCanceller(ctx.Cancelation))
 	// Ignore error from 'Run' in case shutdown was signaled.
 	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {
 		err = ctxerr
