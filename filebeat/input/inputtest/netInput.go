@@ -47,19 +47,21 @@ func GetNetInputMetrics(t *testing.T) NetInputMetrics {
 	return metrics[0]
 }
 
-// RequireNetMetricsCount uses require.Eventually to ensure the received and
-// published counts are the same.
-// It assets the following values:
+// RequireNetMetricsCount uses require.Eventually to assert
+// the following values:
 //   - received_bytes_total
 //   - published_events_total
 //   - processing_time count
 //   - arrival_period count
-func RequireNetMetricsCount(t *testing.T, timeout time.Duration, received, published int) {
+//   - received_bytes_total
+func RequireNetMetricsCount(t *testing.T, timeout time.Duration, received, published, bytes int) {
+	t.Helper()
 	want := NetInputMetrics{
 		ReceivedEventsTotal:  received,
 		PublishedEventsTotal: published,
 		ArrivalPeriod:        ArrivalPeriod{Histogram: Histogram{Count: received - 1}},
 		ProcessingTime:       ProcessingTime{Histogram: Histogram{Count: published}},
+		ReceivedBytesTotal:   bytes,
 	}
 
 	msg := &strings.Builder{}
@@ -70,25 +72,30 @@ func RequireNetMetricsCount(t *testing.T, timeout time.Duration, received, publi
 			got := GetNetInputMetrics(t)
 			fmt.Fprintf(
 				msg,
-				"received: %d, published: %d, arrival_period count: %d, processing_time count: %d",
+				"received: %d, published: %d, arrival_period count: %d, "+
+					"processing_time count: %d, bytes: %d",
 				got.ReceivedEventsTotal,
 				got.PublishedEventsTotal,
 				got.ArrivalPeriod.Histogram.Count,
 				got.ProcessingTime.Histogram.Count,
+				got.ReceivedBytesTotal,
 			)
 
 			return got.PublishedEventsTotal == want.PublishedEventsTotal &&
 				got.ReceivedEventsTotal == want.ReceivedEventsTotal &&
 				got.ArrivalPeriod.Histogram.Count == want.ArrivalPeriod.Histogram.Count &&
-				got.ProcessingTime.Histogram.Count == want.ProcessingTime.Histogram.Count
+				got.ProcessingTime.Histogram.Count == want.ProcessingTime.Histogram.Count &&
+				got.ReceivedBytesTotal == want.ReceivedBytesTotal
 		},
 		timeout,
 		100*time.Millisecond,
-		"expecting received: %d, published: %d, arrival_period count: %d, processing_time count: %d. Got %s",
+		"expecting received: %d, published: %d, arrival_period count: %d, "+
+			"processing_time count: %d, bytes: %d. Got %s",
 		want.ReceivedEventsTotal,
 		want.PublishedEventsTotal,
 		want.ArrivalPeriod.Histogram.Count,
 		want.ProcessingTime.Histogram.Count,
+		want.ReceivedBytesTotal,
 		msg)
 }
 

@@ -74,6 +74,7 @@ func TestInput(t *testing.T) {
 		3*time.Second,
 		2,
 		2,
+		8,
 	)
 
 	// Stop the input, this removes all metrics

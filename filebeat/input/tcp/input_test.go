@@ -65,7 +65,7 @@ func TestInput(t *testing.T) {
 		}
 	}()
 
-	inputtest.RequireNetMetricsCount(t, time.Second, 2, 2)
+	inputtest.RequireNetMetricsCount(t, time.Second, 2, 2, 6)
 
 	// Stop the input, this removes all metrics
 	cancel()
@@ -107,7 +107,7 @@ func TestInputCanReadWithoutPublishing(t *testing.T) {
 		}
 	}()
 
-	inputtest.RequireNetMetricsCount(t, time.Second, 2, 0)
+	inputtest.RequireNetMetricsCount(t, time.Second, 2, 0, 6)
 	// Stop the input
 	cancel()
 
