@@ -30,9 +30,8 @@ import (
 )
 
 type NetInputMetrics struct {
-	Published int `json:"events_published"`
-	Read      int `json:"events_read"`
 	Packets   int `json:"received_events_total"`
+	Published int `json:"published_events_total"`
 }
 
 func GetNetInputMetrics(t *testing.T) NetInputMetrics {
@@ -63,18 +62,16 @@ func RequireNetInputMetrics(t *testing.T, timeout time.Duration, want NetInputMe
 			got := GetNetInputMetrics(t)
 			fmt.Fprintf(
 				msg,
-				"%d events read, %d events published, packets %d",
-				got.Read,
-				got.Published,
+				"%d packets (events), %d events published",
 				got.Packets,
+				got.Published,
 			)
-			return got.Read == want.Read && got.Published == want.Published && got.Packets == want.Packets
+			return got.Published == want.Published && got.Packets == want.Packets
 		},
 		timeout,
 		100*time.Millisecond,
-		"expecting %d evens read, %d published, %d packets. Got %s",
-		want.Read,
-		want.Published,
+		"expecting %d packets (events) read, %d published. Got %s",
 		want.Packets,
+		want.Published,
 		msg)
 }

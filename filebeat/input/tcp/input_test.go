@@ -65,7 +65,7 @@ func TestInput(t *testing.T) {
 		}
 	}()
 
-	inputtest.RequireNetInputMetrics(t, time.Second, inputtest.NetInputMetrics{Read: 2, Published: 2, Packets: 2})
+	inputtest.RequireNetInputMetrics(t, time.Second, inputtest.NetInputMetrics{Packets: 2, Published: 2})
 
 	// Assert metrics
 	m := inputtest.GetNetInputMetrics(t)
@@ -73,7 +73,7 @@ func TestInput(t *testing.T) {
 		t.Errorf("expecting %d events published, got %d", want, got)
 	}
 
-	if got, want := m.Read, 2; got != want {
+	if got, want := m.Packets, 2; got != want {
 		t.Errorf("expecting %d events read, got %d", want, got)
 	}
 
@@ -117,7 +117,7 @@ func TestInputCanReadWithoutPublishing(t *testing.T) {
 		}
 	}()
 
-	inputtest.RequireNetInputMetrics(t, time.Second, inputtest.NetInputMetrics{Read: 2, Published: 0})
+	inputtest.RequireNetInputMetrics(t, time.Second, inputtest.NetInputMetrics{Packets: 2, Published: 0})
 	// Stop the input
 	cancel()
 

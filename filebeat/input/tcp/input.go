@@ -121,8 +121,7 @@ func (s *server) publishLoop(ctx input.Context, publisher stateless.Publisher, m
 		case evt := <-s.evtChan:
 			start := time.Now()
 			publisher.Publish(evt.Event)
-			metrics.Log(evt.size, start)
-			metrics.IncEventsPublished()
+			metrics.EventPublished(start)
 		}
 	}
 }
@@ -209,7 +208,7 @@ func (s *server) initAndRunServer(ctx input.Context, metrics *netmetrics.TCP) er
 			logger,
 			tcp.MetadataCallback,
 			func(data []byte, metadata inputsource.NetworkMetadata) {
-				metrics.IncEventRead()
+				metrics.EventReceived(len(data), time.Now())
 				logger.Debugw(
 					"Data received",
 					"bytes", len(data),
