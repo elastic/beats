@@ -49,6 +49,7 @@ import (
 // Heartbeat represents the root datastructure of this beat.
 type Heartbeat struct {
 	done     chan struct{}
+	stopping chan struct{}
 	stopOnce sync.Once
 	// config is used for iterating over elements of the config.
 	config             *config.Config
@@ -122,6 +123,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 
 	bt := &Heartbeat{
 		done:               make(chan struct{}),
+		stopping:           make(chan struct{}),
 		config:             parsedConfig,
 		scheduler:          sched,
 		replaceStateLoader: replaceStateLoader,
@@ -150,12 +152,13 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	bt.trace.Start()
 	defer bt.trace.Close()
 
+	defer close(bt.done)
+
 	// Adapt local pipeline to synchronized mode if run_once is enabled
 	pipeline := b.Publisher
 	var pipelineWrapper monitors.PipelineWrapper = &monitors.NoopPipelineWrapper{}
 
 	// Trigger the close of the pipeline
-	pipelineCloser := make(chan struct{})
 	if bt.config.RunOnce {
 		// Wrap publisher using a monitor skipper
 		sync := &monitors.SyncPipelineWrapper{}
@@ -164,7 +167,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		pipelineWrapper = sync
 
 		// TODO: find a better way to update beats' publisher
-		b.Publisher = monitors.WithDelayedPipelineStop(pipeline, pipelineCloser)
+		b.Publisher = monitors.WithDelayedPipelineStop(pipeline, bt.done)
 	}
 
 	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
@@ -219,7 +222,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	defer bt.scheduler.Stop()
 
 	// Wait until run_once ends or bt is being shut down
-	waitMonitors.AddChan(bt.done)
+	waitMonitors.AddChan(bt.stopping)
 	waitMonitors.Wait()
 
 	logp.L().Info("Shutting down, waiting for output to complete")
@@ -230,12 +233,8 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	defer waitPublished.Wait()
 
 	// Three possible events: global beat, run_once pipeline done and publish timeout
-	waitPublished.AddChan(bt.done)
-	waitPublished.Add(monitors.WithLog(func() {
-		pipelineWrapper.Wait()
-		// TODO: find a better way to do this
-		close(pipelineCloser)
-	}, "shutdown: finished publishing events."))
+	waitPublished.AddChan(bt.stopping)
+	waitPublished.Add(monitors.WithLog(pipelineWrapper.Wait, "shutdown: finished publishing events."))
 	if bt.config.PublishTimeout > 0 {
 		logp.L().Infof("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout)
 		waitPublished.Add(monitors.WithLog(monitors.WaitDuration(bt.config.PublishTimeout),
@@ -333,9 +332,14 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
 	bt.stopOnce.Do(func() {
-		close(bt.done)
+		waitDone := monitors.NewSignalWait()
+		waitDone.AddChan(bt.done)
+		waitDone.Add(monitors.WithLog(monitors.WaitDuration(bt.config.PublishTimeout),
+			"heartbeat did not exit in a timely manner"))
+
+		close(bt.stopping)
 		// Give the shutdown process some time to process all the events.
-		time.Sleep(10 * time.Second)
+		waitDone.Wait()
 	})
 }
 
