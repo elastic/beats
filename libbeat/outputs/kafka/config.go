@@ -185,6 +185,10 @@ func (c *kafkaConfig) Validate() error {
 		return errors.New("either 'topic' or 'topics' must be defined")
 	}
 
+	if len(c.Headers) != 0 && c.Version < kafka.Version("0.11") {
+		return errors.New("including headers is not supported for kafka versions < 0.11")
+	}
+
 	// When running under Elastic-Agent we do not support dynamic topic
 	// selection, so `topics` is not supported and `topic` is treated as an
 	// plain string
