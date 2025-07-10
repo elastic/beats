@@ -32,6 +32,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var seed int64
@@ -228,8 +229,8 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 }
 
 func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
-	return func(_ *testing.T) queue.Queue {
-		return NewQueue(nil, nil, Settings{
+	return func(t *testing.T) queue.Queue {
+		return NewQueue(logptest.NewTestingLogger(t, ""), nil, Settings{
 			Events:        sz,
 			MaxGetRequest: minEvents,
 			FlushTimeout:  flushTimeout,
