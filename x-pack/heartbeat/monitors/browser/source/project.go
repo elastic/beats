@@ -11,7 +11,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -55,7 +54,7 @@ func (p *ProjectSource) Fetch() error {
 		return err
 	}
 
-	tf, err := ioutil.TempFile(os.TempDir(), "elastic-synthetics-zip-")
+	tf, err := os.CreateTemp(os.TempDir(), "elastic-synthetics-zip-")
 	if err != nil {
 		return fmt.Errorf("could not create tmpfile for project monitor source: %w", err)
 	}
@@ -67,7 +66,7 @@ func (p *ProjectSource) Fetch() error {
 		return err
 	}
 
-	p.TargetDirectory, err = ioutil.TempDir(os.TempDir(), "elastic-synthetics-unzip-")
+	p.TargetDirectory, err = os.MkdirTemp(os.TempDir(), "elastic-synthetics-unzip-")
 	if err != nil {
 		return fmt.Errorf("could not make temp dir for unzipping project source: %w", err)
 	}
@@ -132,7 +131,7 @@ func setupProjectDir(workdir string) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(filepath.Join(workdir, "package.json"), pkgJsonContent, defaultMod)
+	err = os.WriteFile(filepath.Join(workdir, "package.json"), pkgJsonContent, defaultMod)
 	if err != nil {
 		return err
 	}
@@ -172,4 +171,8 @@ func runSimpleCommand(cmd *exec.Cmd, dir string) error {
 	output, err := cmd.CombinedOutput()
 	logp.L().Infof("Ran %s (%d) got '%s': (%s) as (%d/%d)", cmd, cmd.ProcessState.ExitCode(), string(output), err, syscall.Getuid(), syscall.Geteuid())
 	return err
+}
+
+func (p *ProjectSource) Decode() error {
+	return nil
 }
