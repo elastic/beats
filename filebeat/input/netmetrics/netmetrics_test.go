@@ -65,7 +65,8 @@ func TestUDPMetrics(t *testing.T) {
 	numEvents := 100
 	for range 100 {
 		now = start.Add(100 * time.Millisecond)
-		m.Log(data, now)
+		m.EventReceived(len(data), now)
+		m.EventPublished(now)
 	}
 
 	assert.EqualValues(t, len(data)*numEvents, m.bytes.Get(), "wrong value for bytes received")
