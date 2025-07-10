@@ -230,7 +230,6 @@ require (
 	go.opentelemetry.io/collector/pdata v1.35.0
 	go.opentelemetry.io/collector/receiver v1.35.0
 	go.uber.org/mock v0.5.0
-	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8
 	golang.org/x/term v0.32.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250519155744-55703ea1f237
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
@@ -480,6 +479,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.36.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.6.0 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
+	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	gonum.org/v1/gonum v0.16.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250519155744-55703ea1f237 // indirect
