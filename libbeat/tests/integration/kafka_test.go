@@ -87,3 +87,42 @@ func TestKafkaOutputCanConnectAndPublish(t *testing.T) {
 		10*time.Second,
 		"did not find finished batch log")
 }
+
+func TestAuthorisationErrors(t *testing.T) {
+	leader := sarama.NewMockBroker(t, 1)
+	defer leader.Close()
+
+	// The mock broker must respond to a single metadata request.
+	metadataResponse := new(sarama.MetadataResponse)
+	metadataResponse.AddBroker(leader.Addr(), leader.BrokerID())
+	metadataResponse.AddTopicPartition(kafkaTopic, 0, leader.BrokerID(), nil, nil, nil, sarama.ErrNoError)
+	leader.Returns(metadataResponse)
+
+	authErrors := []sarama.KError{
+		sarama.ErrTopicAuthorizationFailed,
+		sarama.ErrGroupAuthorizationFailed,
+		sarama.ErrClusterAuthorizationFailed,
+	}
+
+	// The mock broker must return one produce response per error we want
+	// to test. If less calls are made, the test will fail
+	for _, err := range authErrors {
+		producerResponse := new(sarama.ProduceResponse)
+		producerResponse.AddTopicPartition(kafkaTopic, 0, err)
+		leader.Returns(producerResponse)
+	}
+
+	// Start mockbeat with the appropriate configuration.
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	mockbeat.WriteConfigFile(fmt.Sprintf(kafkaCfg, kafkaTopic, kafkaVersion, leader.Addr()))
+	mockbeat.Start()
+
+	// Wait for mockbeat to log each of the errors.
+	for _, err := range authErrors {
+		t.Log("waiting for:", err)
+		mockbeat.WaitForLogs(
+			fmt.Sprintf("Kafka (topic=test_topic): authorisation error: %s", err),
+			10*time.Second,
+			"did not find error log: %s", err)
+	}
+}
