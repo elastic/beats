@@ -616,12 +616,11 @@ func (b *BeatProc) WriteConfigFile(cfg string) {
 }
 
 // openGlobFile opens a file defined by glob. The glob must resolve to a single
-// file otherwise the test fails. It returns a *os.File and a boolean indicating
-// whether a file was found.
+// file otherwise the test fails. It returns a *os.File or nil if none is found.
 //
 // If `waitForFile` is true, it will wait up to 5 seconds for the file to
-// be created. The test will fail if the file is not found. If it is false
-// and no file is found, nil and false are returned.
+// be created. The test will fail if the file is not found. If waitForFile is
+// false and no file is found, nil and false are returned.
 func (b *BeatProc) openGlobFile(glob string, waitForFile bool) *os.File {
 	t := b.t
 

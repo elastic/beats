@@ -248,7 +248,7 @@ logging.level: debug
 	filebeat.WaitForLogs(
 		fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logFilepath),
 		30*time.Second,
-		"Filebeat did not reach EOF. Did not find log '%s'",
+		"Filebeat did not reach EOF. Did not find log [%s]",
 		logFilepath,
 	)
 	filebeat.Stop()
@@ -348,7 +348,7 @@ logging.level: debug
 	filebeat.WaitForLogs(
 		fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPath),
 		30*time.Second,
-		"Filebeat did not reach EOF. Did not find log '%s'",
+		"Filebeat did not reach EOF. Did not find log [%s]",
 		logPath,
 	)
 	filebeat.Stop()
@@ -403,7 +403,7 @@ logging.level: debug
 	filebeat.WaitForLogs(
 		eofLine,
 		30*time.Second,
-		"Filebeat did not reach EOF. Did not find log '%s'",
+		"Filebeat did not reach EOF. Did not find log [%s]",
 		eofLine,
 	)
 
@@ -426,18 +426,18 @@ logging.level: debug
 		filepath.Join(tempDir, outputFilename), lines)
 }
 
-func TestFilestreamGZIPLogRotation(t *testing.T) {
+func TestFilestreamGZIPLogRotation_1_rotated_file(t *testing.T) {
 	want1stLines := make([]string, 0, 100)
 	want2ndLines := make([]string, 0, 150)
 	var dataPlain1stHalf []byte
 	for i := range 100 {
-		l := fmt.Sprintf("%d: 1st 1/2 file before roration log line", i)
+		l := fmt.Sprintf("%d: 1st 1/2 file before rotation log line", i)
 		want1stLines = append(want1stLines, l)
 		dataPlain1stHalf = append(dataPlain1stHalf, []byte(l+"\n")...)
 	}
 	var dataPlain2ndHalf []byte
 	for i := range 100 {
-		l := fmt.Sprintf("%d: 2nd 1/2 file after roration log line", i)
+		l := fmt.Sprintf("%d: 2nd 1/2 file after rotation log line", i)
 		want2ndLines = append(want2ndLines, l)
 		dataPlain2ndHalf = append(dataPlain2ndHalf, []byte(l+"\n")...)
 	}
@@ -489,7 +489,7 @@ logging.level: debug
 	filebeat.WaitForLogs(
 		eofLine,
 		30*time.Second,
-		"Filebeat did not reach EOF. Did not find log '%s'",
+		"Filebeat did not reach EOF. Did not find log [%s]",
 		eofLine,
 	)
 	// 1st file is ingested, stop filebeat and do the log rotation
@@ -510,7 +510,7 @@ logging.level: debug
 	filebeat.WaitForLogs(
 		eofLog,
 		30*time.Second,
-		"Filebeat did not reach EOF. Did not find log '%s'",
+		"Filebeat did not reach EOF. Did not find log [%s]",
 		eofLog,
 	)
 
@@ -519,7 +519,7 @@ logging.level: debug
 	filebeat.WaitForLogs(
 		eofLine,
 		30*time.Second,
-		"Filebeat did not reach EOF. Did not find log '%s'",
+		"Filebeat did not reach EOF. Did not find log [%s]",
 		eofLine,
 	)
 
@@ -557,9 +557,355 @@ logging.level: debug
 	matchPublishedLines(t, got, want2ndLines)
 }
 
+func TestFilestreamGZIPLogRotation_2_rotated_files(t *testing.T) {
+	want1stLines := make([]string, 0, 100)
+	want2ndLines := make([]string, 0, 150)
+	var dataPlain1stHalf []byte
+	for i := range 100 {
+		l := fmt.Sprintf("%d: 1st 1/2 file before rotation log line", i)
+		want1stLines = append(want1stLines, l)
+		dataPlain1stHalf = append(dataPlain1stHalf, []byte(l+"\n")...)
+	}
+	var dataPlain2ndHalf []byte
+	for i := range 100 {
+		l := fmt.Sprintf("%d: 2nd 1/2 file after rotation log line", i)
+		want2ndLines = append(want2ndLines, l)
+		dataPlain2ndHalf = append(dataPlain2ndHalf, []byte(l+"\n")...)
+	}
+
+	var dataPlainLatestRotation []byte
+	for i := range 50 { // ensure it's smaller than the original
+		l := fmt.Sprintf("%d: latest rotated file", i)
+		want2ndLines = append(want2ndLines, l)
+		dataPlainLatestRotation = append(dataPlainLatestRotation, []byte(l+"\n")...)
+	}
+
+	var dataPlainNewActive []byte
+	for i := range 50 { // ensure it's smaller than the original
+		l := fmt.Sprintf("%d: new plain file after truncation", i)
+		want2ndLines = append(want2ndLines, l)
+		dataPlainNewActive = append(dataPlainNewActive, []byte(l+"\n")...)
+	}
+
+	dataGZOldestRotation := gziptest.Compress(t,
+		append(dataPlain1stHalf, dataPlain2ndHalf...), gziptest.CorruptNone)
+	dataGZLatestRotation := gziptest.Compress(t, dataPlainLatestRotation, gziptest.CorruptNone)
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	tempDir := filebeat.TempDir()
+	logFileBaseName := "plain.log"
+	logPathActive := filepath.Join(tempDir, logFileBaseName)
+	logPathLatestRotation := filepath.Join(tempDir, logFileBaseName+".1.gz")
+	logPathGZOldestRotation := filepath.Join(tempDir, logFileBaseName+".2.gz")
+
+	// 1st half of the file to simulate the rotation before filebeat finishes
+	// reading the file
+	err := os.WriteFile(logPathActive, dataPlain1stHalf, 0644)
+	require.NoError(t, err, "could not write gzip file to disk")
+
+	outputFilePattern := "output-file"
+	cfg := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: "test-filestream"
+    paths:
+      - %s
+    gzip_experimental: true
+    #rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
+output.file:
+  enabled: true
+  path: %s
+  filename: "%s"
+logging.level: debug
+`, logPathActive+"*", filebeat.TempDir(), outputFilePattern)
+
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	eofLine := fmt.Sprintf("End of file reached: %s; Backoff now.", logPathActive)
+	filebeat.WaitForLogs(
+		eofLine,
+		30*time.Second,
+		"Filebeat did not reach EOF. Did not find log [%s]",
+		eofLine,
+	)
+	// 1st file is ingested, stop filebeat and do the log rotation
+	filebeat.Stop()
+
+	// rotate the plain file "with data not yet read"
+	err = os.WriteFile(logPathGZOldestRotation, dataGZOldestRotation, 0644)
+	require.NoError(t, err, "could not write gzip file to disk")
+
+	// add new rotated file never seen by filebeat
+	err = os.WriteFile(logPathLatestRotation, dataGZLatestRotation, 0644)
+	require.NoError(t, err, "could not write gzip file to disk")
+
+	// truncate the original file and add new data
+	err = os.WriteFile(logPathActive, dataPlainNewActive, 0644)
+	require.NoError(t, err, "could not truncate original log file and add new data")
+
+	filebeat.Start()
+
+	// Wait filebeat to finish the gzipped files
+	eofLog := fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPathLatestRotation)
+	filebeat.WaitForLogs(
+		eofLog,
+		30*time.Second,
+		"Filebeat did not reach EOF. Did not find log [%s]",
+		eofLog,
+	)
+
+	eofLog = fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPathGZOldestRotation)
+	filebeat.WaitForLogs(
+		eofLog,
+		30*time.Second,
+		"Filebeat did not reach EOF. Did not find log [%s]",
+		eofLog,
+	)
+
+	// Wait filebeat to finish the original file with new content
+	eofLine = fmt.Sprintf("End of file reached: %s; Backoff now.", logPathActive)
+	filebeat.WaitForLogs(
+		eofLine,
+		30*time.Second,
+		"Filebeat did not reach EOF. Did not find log [%s]",
+		eofLine,
+	)
+
+	filebeat.Stop()
+
+	// So far so good. Now check the output
+
+	globPattern := outputFilePattern + "-*.ndjson"
+	files, err := filepath.Glob(filepath.Join(tempDir, globPattern))
+	require.NoError(t, err, "could not glob output file pattern")
+	require.Lenf(t, files, 2,
+		"expected only 2 output files. Glob pattern '%s'", globPattern)
+
+	slices.SortFunc(files, func(a, b string) int {
+		if len(a) < len(b) {
+			return -1
+		}
+		if len(a) > len(b) {
+			return 1
+		}
+		if len(a) == len(b) {
+			return 0
+		}
+
+		panic("unreachable")
+	})
+
+	got, err := os.ReadFile(files[0])
+	require.NoError(t, err, "could not open output file")
+	// 1st file: check that all lines have been published
+	matchPublishedLines(t, got, want1stLines)
+
+	got, err = os.ReadFile(files[1])
+	require.NoError(t, err, "could not open output file")
+	matchPublishedLines(t, got, want2ndLines)
+}
+
+// TestFilestreamGZIPLogRotation_2_rotations test filebeat experiencing 2 file
+// rotations. It simulates 3 log files, 2 of them will be rotated:
+//   - 1st: 'a' content
+//   - 2nd: 'b' content
+//   - 3rd: 'c' content
+//
+// Filebeat will "see the files" in 3 different moments, by "see" it means,
+// filebeat will start with the files written to disk, read then until their end
+// and then stop. While filebeat is stopped, the logs are rotated, then filebeat
+// is started again.
+// This test simulates the following moments:
+//   - 1st: only one active log file, 1/2 of the content
+//   - active file: 'a' content, only 1/2 of the logs
+//   - 2nd: 1st log rotation
+//   - active file: 'b' content
+//   - *.1.gz file: 'a' content. Full content
+//   - 3rd: 2nd log rotation
+//   - active file: 'c' content
+//   - *.1.gz file: 'b' content
+//   - *.2.gz file: 'a' content
+func TestFilestreamGZIPLogRotation_2_rotations(t *testing.T) {
+	want1stRunLines := make([]string, 0, 50)
+	want2ndRunLines := make([]string, 0, 150)
+	want3rdRunLines := make([]string, 0, 100)
+
+	var dataPlainA1stHalf []byte
+	for i := range 50 {
+		l := fmt.Sprintf("%d: 1st 1/2 aaaaaaaaaaaaaaaaaaaaaaaaa", i)
+		want1stRunLines = append(want1stRunLines, l)
+		dataPlainA1stHalf = append(dataPlainA1stHalf, []byte(l+"\n")...)
+	}
+
+	var dataPlainA2ndHalf []byte
+	for i := range 50 {
+		l := fmt.Sprintf("%d: 2nd 1/2 aaaaaaaaaaaaaaaaaaaaaaaaa", i)
+		want2ndRunLines = append(want2ndRunLines, l)
+		dataPlainA2ndHalf = append(dataPlainA2ndHalf, []byte(l+"\n")...)
+	}
+
+	var dataPlainB []byte
+	for i := range 100 {
+		l := fmt.Sprintf("%d: bbbbbbbbbbbbbbbbbbbbbbbb", i)
+		want2ndRunLines = append(want2ndRunLines, l)
+		dataPlainB = append(dataPlainB, []byte(l+"\n")...)
+	}
+
+	var dataPlainC []byte
+	for i := range 100 {
+		l := fmt.Sprintf("%d: cccccccccccccccccccccccccccc", i)
+		want3rdRunLines = append(want3rdRunLines, l)
+		dataPlainC = append(dataPlainC, []byte(l+"\n")...)
+	}
+
+	dataGZA := gziptest.Compress(t,
+		append(dataPlainA1stHalf, dataPlainA2ndHalf...), gziptest.CorruptNone)
+	dataGZB := gziptest.Compress(t, dataPlainB, gziptest.CorruptNone)
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	tempDir := filebeat.TempDir()
+	t.Log("temp dir:", tempDir)
+
+	logFileBaseName := "plain.log"
+	logPathActive := filepath.Join(tempDir, logFileBaseName)
+	logPath1stRotation := filepath.Join(tempDir, logFileBaseName+".1.gz")
+	logPath2ndRotation := filepath.Join(tempDir, logFileBaseName+".2.gz")
+
+	outputFilePattern := "output-file"
+	cfg := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: "test-filestream"
+    paths:
+      - %s
+    gzip_experimental: true
+    #rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
+output.file:
+  enabled: true
+  path: %s
+  filename: "%s"
+logging.level: debug
+`, logPathActive+"*", filebeat.TempDir(), outputFilePattern)
+	filebeat.WriteConfigFile(cfg)
+
+	// 1st: only one active log file, 1/2 of the content
+	err := os.WriteFile(logPathActive, dataPlainA1stHalf, 0644)
+	require.NoError(t, err, "could not write 'a' file to disk")
+
+	filebeat.Start()
+	eofLine := fmt.Sprintf("End of file reached: %s; Backoff now.", logPathActive)
+	filebeat.WaitForLogs(
+		eofLine,
+		30*time.Second,
+		"Filebeat did not reach EOF. Did not find log [%s]",
+		eofLine,
+	)
+	filebeat.Stop()
+
+	// 2nd: 1st log rotation
+	// finish writing the 'a' file
+	f, err := os.OpenFile(logPathActive, os.O_APPEND|os.O_WRONLY, 0644)
+	require.NoError(t, err, "could not open 'a' file to append")
+	_, err = f.Write(dataPlainA2ndHalf)
+	require.NoError(t, err, "could not append to 'a' file")
+	require.NoError(t, f.Close(), "could not close 'a' file after appending")
+
+	// "copy" and gzip the 'a' file
+	err = os.WriteFile(logPath1stRotation, dataGZA, 0644)
+	require.NoError(t, err, "could not write gzipped 'a' file")
+
+	// truncate active and write 'b' file
+	err = os.WriteFile(logPathActive, dataPlainB, 0644)
+	require.NoError(t, err, "could not write 'b' file")
+
+	// at this point there is:
+	// - an active file with 'b' content
+	// - a '.1.gz' file with the full 'a' content
+
+	filebeat.Start()
+
+	waitForLatestOutput(t, outputFilePattern, tempDir, len(want2ndRunLines))
+	// check the output
+	files := getOutputFilesSorted(t, outputFilePattern, tempDir)
+	require.Len(t, files, 2, "expected 2 output files")
+	got, err := os.ReadFile(files[1])
+	require.NoError(t, err, "could not open output file")
+	matchPublishedLines(t, got, want2ndRunLines)
+
+	filebeat.Stop()
+
+	// 3rd: 2nd log rotation
+	// move '.1.gz' to '.2.gz'
+	err = os.Rename(logPath1stRotation, logPath2ndRotation)
+	require.NoError(t, err, "could not move 'a' gzipped file")
+
+	// "copy" and gzip the 'b' file
+	err = os.WriteFile(logPath1stRotation, dataGZB, 0644)
+	require.NoError(t, err, "could not write gzipped 'b' file")
+
+	// truncate active and write 'c' file
+	err = os.WriteFile(logPathActive, dataPlainC, 0644)
+	require.NoError(t, err, "could not write 'c' file")
+
+	// at this point there is:
+	// - an active file with 'c' content
+	// - a '.1.gz' file with 'b' content
+	// - a '.2.gz' file with 'a' content
+
+	filebeat.Start()
+	waitForLatestOutput(t, outputFilePattern, tempDir, len(want3rdRunLines))
+	filebeat.Stop()
+
+	// So far so good. Now check all the output files
+	files = getOutputFilesSorted(t, outputFilePattern, tempDir)
+
+	got, err = os.ReadFile(files[0])
+	require.NoError(t, err, "could not open output file")
+	matchPublishedLines(t, got, want1stRunLines)
+
+	got, err = os.ReadFile(files[1])
+	require.NoError(t, err, "could not open output file")
+	matchPublishedLines(t, got, want2ndRunLines)
+
+	got, err = os.ReadFile(files[2])
+	require.NoError(t, err, "could not open output file")
+	matchPublishedLines(t, got, want3rdRunLines)
+}
+
+func getOutputFilesSorted(t *testing.T, outputFilePattern string, tempDir string) []string {
+	globPattern := outputFilePattern + "-*.ndjson"
+	files, err := filepath.Glob(filepath.Join(tempDir, globPattern))
+	require.NoError(t, err, "could not glob output file pattern")
+
+	slices.SortFunc(files, func(a, b string) int {
+		if len(a) < len(b) {
+			return -1
+		}
+		if len(a) > len(b) {
+			return 1
+		}
+		if len(a) == len(b) {
+			return strings.Compare(a, b)
+		}
+
+		panic("unreachable")
+	})
+	return files
+}
+
 func TestFilestreamGZIPReadsCorruptedFileUntilEOF(t *testing.T) {
 	// For future reference, this is the code used to generate
 	// testdata/gzip/corrupted.gz
+	//
 	// lines := make([]string, 0, 200)
 	// var content []byte
 	// for i := range 100 {
@@ -603,7 +949,7 @@ logging.level: debug
 	filebeat.WaitForLogs(
 		eofLog,
 		30*time.Second,
-		"Filebeat did not reach EOF. Did not find log '%s'",
+		"Filebeat did not reach EOF. Did not find log [%s]",
 		eofLog,
 	)
 	filebeat.Stop()
@@ -716,5 +1062,45 @@ func assertLogFieldsEqual(t *testing.T, wantPath, gotPath string) {
 				line, wantEv.Message, gotEv.Message, wantEv.Log.Offset, gotEv.Log.Offset)
 		}
 		line++
+	}
+}
+
+func waitForLatestOutput(t *testing.T, outputFilePattern string, tempDir string, want int) {
+	// wait for all lines in the output
+	msg := &strings.Builder{}
+	var files []string
+	condition := func() bool {
+		// writeMsg was intended to avoid the message being reset, the function
+		// being executed, and before the function completes and writes the new
+		// message, the timeout elapses and the error message is written with an
+		// empty msg. But it fails too often, so the whole `waitForLatestOutput`
+		// is the real fix. It duplicates the error, but bette that than
+		// missing information :/
+		writeMsg := func(format string, a ...any) {
+			msg.Reset()
+			msg.WriteString(fmt.Sprintf(format, a...))
+		}
+		msg.Reset()
+		files = getOutputFilesSorted(t, outputFilePattern, tempDir)
+
+		got, _ := os.ReadFile(files[len(files)-1])
+		lines := strings.Split(strings.TrimSuffix(string(got), "\n"), "\n")
+
+		if len(lines) != want {
+			writeMsg("want %d lines, got %d",
+				want, len(lines))
+			return false
+		}
+
+		return true
+	}
+
+	if !assert.Eventuallyf(t, condition, 45*time.Second, 500*time.Millisecond,
+		"output file isn't what we expect: %s", msg) {
+		// call the condition one last time to ensure the msg isn't reset and not
+		// yet written when it's called as part of the eventually message
+		condition()
+		require.Failf(t, "condition never satisfied",
+			"output file isn't what we expect: %s", msg)
 	}
 }
