@@ -137,30 +137,5 @@ func checkConfigCompatibility(config config) error {
 		}
 	}
 
-	if config.GZIPExperimental {
-		// Just for the sake of checking all requirements as it's checked on
-		// config.Validate.
-		if config.FileIdentity != nil &&
-			config.FileIdentity.Name() != fingerprintName {
-			return fmt.Errorf(
-				"gzip_experimental=true requires file_identity to be 'fingerprint'")
-		}
-
-		if config.Rotation == nil || !config.Rotation.IsSet() {
-			return fmt.Errorf(
-				"gzip_experimental=true requires external rotation to be set")
-		}
-
-		externalConfig := config.Rotation.Config()
-		cfg := rotationConfig{}
-		err := externalConfig.Unpack(&cfg)
-		if err != nil {
-			return fmt.Errorf("failed to unpack configuration of external rotation: %w", err)
-		}
-		if cfg.Strategy.Name() != copytruncateStrategy {
-			return fmt.Errorf("gzip_experimental=true requires external rotation strategy to be 'copytruncate'")
-		}
-	}
-
 	return nil
 }
