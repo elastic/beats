@@ -722,14 +722,14 @@ logging.level: debug
 // is started again.
 // This test simulates the following moments:
 //   - 1st: only one active log file, 1/2 of the content
-//   - active file: 'a' content, only 1/2 of the logs
+//     active file: 'a' content, only 1/2 of the logs
 //   - 2nd: 1st log rotation
-//   - active file: 'b' content
-//   - *.1.gz file: 'a' content. Full content
+//     active file: 'b' content
+//     *.1.gz file: 'a' content. Full content
 //   - 3rd: 2nd log rotation
-//   - active file: 'c' content
-//   - *.1.gz file: 'b' content
-//   - *.2.gz file: 'a' content
+//     active file: 'c' content
+//     *.1.gz file: 'b' content
+//     *.2.gz file: 'a' content
 func TestFilestreamGZIPLogRotation_2_rotations(t *testing.T) {
 	want1stRunLines := make([]string, 0, 50)
 	want2ndRunLines := make([]string, 0, 150)
