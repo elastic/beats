@@ -72,12 +72,14 @@ For that close on EOF is used, the input configuration is:
     id: cronjobs-logs
     paths:
       - /var/log/cronjobs/*.log
-    close.reader.on_eof: true
+    close.reader.on_eof: true # Close the file on EOF
     delete:
       enabled: true
 ```
 
-#### Step-by-Step
+Here is a step by step of what happens within Filebeat when using the
+previous configuration:
+
 1. {{filebeat}} is configured with the above input and the Elasticsearch
    output.
 2. {{filebeat}} is started.
