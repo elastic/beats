@@ -252,7 +252,7 @@ func (inp *filestream) open(
 
 	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, fs.desc.Fingerprint, offset)
 
-	r = inp.parsers.Create(r)
+	r = inp.parsers.Create(r, log)
 
 	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
 
