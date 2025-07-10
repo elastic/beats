@@ -38,7 +38,7 @@ jobs:
           slack-channel-id: "#ingest-notifications"
           slack-message: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, @robots-ci please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
           slack-send-when: "failure"
-          version-file: .tool-versions
+          version-file: .update-version
         env:
           BRANCH: ${{ matrix.branch }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
