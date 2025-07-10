@@ -266,7 +266,7 @@ func checkDashboardForErrors(file string, d []byte) bool {
 		fmt.Println("  ", err)
 	}
 
-	// we pass nil logger here as we don't have access to a logger instance here
+	// this logger is only used to log error messages.
 	logger, err := logp.NewDevelopmentLogger("")
 	if err != nil {
 		return true

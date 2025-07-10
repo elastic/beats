@@ -170,7 +170,7 @@ func ReplaceIndexInDashboardObject(index string, content []byte, logger *logp.Lo
 
 	attributes, ok := objectMap["attributes"].(map[string]interface{})
 	if !ok {
-		logger.Errorf("Object does not have attributes key")
+		logger.Error("Object does not have attributes key")
 		return content
 	}
 
@@ -202,7 +202,7 @@ func ReplaceIndexInDashboardObject(index string, content []byte, logger *logp.Lo
 
 	b, err := json.Marshal(objectMap)
 	if err != nil {
-		logger.Error("Error marshaling modified dashboard: %+v", err)
+		logger.Errorf("Error marshaling modified dashboard: %+v", err)
 		return content
 	}
 

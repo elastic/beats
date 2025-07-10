@@ -26,8 +26,9 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"golang.org/x/text/encoding"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func BenchmarkEncoderReader(b *testing.B) {
