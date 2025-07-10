@@ -104,15 +104,10 @@ func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 				return nil, fmt.Errorf("invalid suffix regex for copytruncate rotation")
 			}
 			fileprospector.stateChangeCloser.Renamed = false
-			rFilestreams, err := newRotatedFilestreams(cpCfg)
-			if err != nil {
-				return nil, fmt.Errorf("failed to create rotated filestreams: %w",
-					err)
-			}
 			return &copyTruncateFileProspector{
-				fileProspector: fileprospector,
-				rotatedSuffix:  suffix,
-				rotatedFiles:   rFilestreams,
+				fileprospector,
+				suffix,
+				newRotatedFilestreams(cpCfg),
 			}, nil
 		default:
 		}
