@@ -133,7 +133,6 @@ steps:
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
-          GOEXPERIMENT: "systemcrypto"
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
