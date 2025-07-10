@@ -75,9 +75,10 @@ func AutodiscoverBuilder(
 	discovery := &Discovery{
 		ProviderUUID: uuid,
 		Interfaces:   config.Interfaces,
+		log:          logger,
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil, logger)
 	if err != nil {
 		return nil, errWrap(err)
 	}
