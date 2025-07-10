@@ -151,14 +151,11 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 
 	settings := struct {
 		// All those values are duplicated from the Filestream configuration
-		ID                 string        `config:"id"`
-		CleanInactive      time.Duration `config:"clean_inactive"`
-		HarvesterLimit     uint64        `config:"harvester_limit"`
-		AllowIDDuplication bool          `config:"allow_deprecated_id_duplication"`
-		TakeOver           struct {
-			Enabled bool     `config:"enabled"`
-			FromIDs []string `config:"from_ids"`
-		} `config:"take_over"`
+		ID                 string         `config:"id"`
+		CleanInactive      time.Duration  `config:"clean_inactive"`
+		HarvesterLimit     uint64         `config:"harvester_limit"`
+		AllowIDDuplication bool           `config:"allow_deprecated_id_duplication"`
+		TakeOver           TakeOverConfig `config:"take_over"`
 	}{
 		CleanInactive: cim.DefaultCleanTimeout,
 	}
@@ -324,4 +321,61 @@ func (i *sourceIdentifier) ID(s Source) string {
 
 func (i *sourceIdentifier) MatchesInput(id string) bool {
 	return strings.HasPrefix(id, i.prefix)
+}
+
+// TakeOverConfig is the configuration for the take over mode.
+// It allows the Filestream input to take over states from the log
+// input or other Filestream inputs
+type TakeOverConfig struct {
+	Enabled bool `config:"enabled"`
+	// Filestream IDs to take over states
+	FromIDs []string `config:"from_ids"`
+
+	// legacyFormat is set to true when `Unpack` detects
+	// the legacy configuration format. It is used by
+	// `LogWarnings` to log warnings
+	legacyFormat bool
+}
+
+func (t *TakeOverConfig) Unpack(value any) error {
+	switch v := value.(type) {
+	case bool:
+		t.Enabled = v
+		t.legacyFormat = true
+	case map[string]any:
+		rawEnabled := v["enabled"]
+		enabled, ok := rawEnabled.(bool)
+		if !ok {
+			return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as bool", rawEnabled)
+		}
+		t.Enabled = enabled
+
+		rawFromIDs, exists := v["from_ids"]
+		if !exists {
+			return nil
+		}
+
+		fromIDs, ok := rawFromIDs.([]any)
+		if !ok {
+			return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as []any", rawFromIDs)
+		}
+		for _, el := range fromIDs {
+			strEl, ok := el.(string)
+			if !ok {
+				return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as string", el)
+			}
+			t.FromIDs = append(t.FromIDs, strEl)
+		}
+
+	default:
+		return fmt.Errorf("cannot parse '%[1]v' (type %[1]T)", value)
+	}
+
+	return nil
+}
+
+func (t *TakeOverConfig) LogWarnings(logger *logp.Logger) {
+	if t.legacyFormat {
+		logger.Warn("using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'")
+	}
 }
