@@ -3,10 +3,9 @@
 package cef
 
 import (
+    "errors"
     "fmt"
     "strconv"
-
-    "go.uber.org/multierr"
 )
 
 %%{
@@ -58,14 +57,14 @@ func (e *Event) unpack(data string) error {
         // Reached an early end.
         if p == pe {
             if complete {
-                return multierr.Append(multierr.Combine(recoveredErrs...), errUnexpectedEndOfEvent)
+                return errors.Join(errors.Join(recoveredErrs...), errUnexpectedEndOfEvent)
             }
-            return multierr.Append(multierr.Combine(recoveredErrs...), multierr.Combine(errUnexpectedEndOfEvent, errIncompleteHeader))
+            return errors.Join(errors.Join(recoveredErrs...), errors.Join(errUnexpectedEndOfEvent, errIncompleteHeader))
         }
 
         // Encountered invalid input.
-        return multierr.Append(multierr.Combine(recoveredErrs...), fmt.Errorf("error in CEF event at pos %d", p+1))
+        return errors.Join(errors.Join(recoveredErrs...), fmt.Errorf("error in CEF event at pos %d", p+1))
     }
 
-    return multierr.Combine(recoveredErrs...)
+    return errors.Join(recoveredErrs...)
 }

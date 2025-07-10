@@ -8,13 +8,12 @@
 package cef
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
-
-	"go.uber.org/multierr"
 )
 
-//line parser.go:14
+//line parser.go:13
 var _cef_eof_actions []byte = []byte{
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0,
@@ -34,7 +33,7 @@ const cef_en_main_cef_extensions int = 29
 
 // unpack unpacks a CEF message.
 //
-//line parser.rl:17
+//line parser.rl:16
 func (e *Event) unpack(data string) error {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	mark, mark_slash := 0, 0
@@ -51,12 +50,12 @@ func (e *Event) unpack(data string) error {
 
 	e.init(data)
 
-//line parser.go:52
+//line parser.go:51
 	{
 		cs = cef_start
 	}
 
-//line parser.go:56
+//line parser.go:55
 	{
 		if (p) == (pe) {
 			goto _test_eof
@@ -1362,7 +1361,7 @@ func (e *Event) unpack(data string) error {
 					state.reset()
 				}
 
-//line parser.go:1155
+//line parser.go:1154
 			}
 		}
 
@@ -1371,21 +1370,21 @@ func (e *Event) unpack(data string) error {
 		}
 	}
 
-//line parser.rl:54
+//line parser.rl:53
 
 	// Check if state machine completed.
 	if cs < cef_first_final {
 		// Reached an early end.
 		if p == pe {
 			if complete {
-				return multierr.Append(multierr.Combine(recoveredErrs...), errUnexpectedEndOfEvent)
+				return errors.Join(errors.Join(recoveredErrs...), errUnexpectedEndOfEvent)
 			}
-			return multierr.Append(multierr.Combine(recoveredErrs...), multierr.Combine(errUnexpectedEndOfEvent, errIncompleteHeader))
+			return errors.Join(errors.Join(recoveredErrs...), errors.Join(errUnexpectedEndOfEvent, errIncompleteHeader))
 		}
 
 		// Encountered invalid input.
-		return multierr.Append(multierr.Combine(recoveredErrs...), fmt.Errorf("error in CEF event at pos %d", p+1))
+		return errors.Join(errors.Join(recoveredErrs...), fmt.Errorf("error in CEF event at pos %d", p+1))
 	}
 
-	return multierr.Combine(recoveredErrs...)
+	return errors.Join(recoveredErrs...)
 }

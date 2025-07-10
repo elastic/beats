@@ -122,7 +122,7 @@ require (
 	go.elastic.co/ecszap v1.0.2
 	go.elastic.co/go-licence-detector v0.7.0
 	go.etcd.io/bbolt v1.4.0
-	go.uber.org/multierr v1.11.0
+	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.39.0
 	golang.org/x/mod v0.25.0

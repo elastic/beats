@@ -8,8 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-
-	"go.uber.org/multierr"
 )
 
 // Parser is generated from a ragel state machine using the following command:
@@ -174,7 +172,7 @@ func (e *Event) Unpack(data string, opts ...Option) error {
 		}
 	}
 
-	return multierr.Combine(errs...)
+	return errors.Join(errs...)
 }
 
 type escapePosition struct {

@@ -8,13 +8,12 @@
 package cef
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
-
-	"go.uber.org/multierr"
 )
 
-//line parser_recover.go:14
+//line parser_recover.go:13
 var _cef_recover_eof_actions []byte = []byte{
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0,
@@ -48,7 +47,7 @@ const cef_recover_en_main_cef_extensions int = 28
 
 // recoverExtensions unpacks a CEF message's extensions from messages with incomplete headers.
 //
-//line parser_recover.rl:17
+//line parser_recover.rl:16
 func (e *Event) recoverExtensions(data string) error {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	mark, mark_slash := 0, 0
@@ -65,12 +64,12 @@ func (e *Event) recoverExtensions(data string) error {
 	// e was already initialised by the call to unpack.
 	t := *e
 
-//line parser_recover.go:66
+//line parser_recover.go:65
 	{
 		cs = cef_recover_start
 	}
 
-//line parser_recover.go:70
+//line parser_recover.go:69
 	{
 		if (p) == (pe) {
 			goto _test_eof
@@ -4828,7 +4827,7 @@ func (e *Event) recoverExtensions(data string) error {
 					state.reset()
 				}
 
-//line parser_recover.go:4105
+//line parser_recover.go:4104
 			}
 		}
 
@@ -4837,11 +4836,11 @@ func (e *Event) recoverExtensions(data string) error {
 		}
 	}
 
-//line parser_recover.rl:55
+//line parser_recover.rl:54
 
 	// Copy back the extensions.
 	t.Extensions = e.Extensions
 	*e = t
 
-	return multierr.Combine(recoveredErrs...)
+	return errors.Join(recoveredErrs...)
 }

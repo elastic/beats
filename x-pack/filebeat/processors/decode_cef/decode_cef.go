@@ -10,8 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"go.uber.org/multierr"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef/cef"
@@ -97,7 +95,15 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, err
 	}
 
-	cefErrors := multierr.Errors(err)
+	var cefErrors []error
+	if u, ok := err.(interface {
+		Unwrap() []error
+	}); ok {
+		cefErrors = u.Unwrap()
+	} else {
+		cefErrors = []error{err}
+	}
+
 	cefObject := toCEFObject(&ce)
 	_, _ = event.PutValue(p.TargetField, cefObject)
 

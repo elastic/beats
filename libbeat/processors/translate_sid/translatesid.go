@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"strings"
 
-	"go.uber.org/multierr"
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -127,5 +126,5 @@ func (p *processor) translateSID(event *beat.Event) error {
 			errs = append(errs, err)
 		}
 	}
-	return multierr.Combine(errs...)
+	return errors.Join(errs...)
 }

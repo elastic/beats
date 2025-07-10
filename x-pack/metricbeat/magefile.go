@@ -8,14 +8,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"runtime"
 	"strings"
 	"time"
-
-	"go.uber.org/multierr"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -60,7 +59,7 @@ func GolangCrossBuild() error {
 	if isWindows32bitRunner() {
 		args.LDFlags = append(args.LDFlags, "-w")
 	}
-	return multierr.Combine(
+	return errors.Join(
 		devtools.GolangCrossBuild(args),
 		devtools.TestLinuxForCentosGLIBC(),
 	)

@@ -3,10 +3,9 @@
 package cef
 
 import (
+    "errors"
     "fmt"
     "strconv"
-
-    "go.uber.org/multierr"
 )
 
 %%{
@@ -58,5 +57,5 @@ func (e *Event) recoverExtensions(data string) error {
     t.Extensions = e.Extensions
     *e = t
 
-    return multierr.Combine(recoveredErrs...)
+    return errors.Join(recoveredErrs...)
 }

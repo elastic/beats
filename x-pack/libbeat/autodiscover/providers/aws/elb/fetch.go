@@ -6,12 +6,12 @@ package elb
 
 import (
 	"context"
+	"errors"
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
-	"go.uber.org/multierr"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -55,7 +55,7 @@ func (amf *apiMultiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 		}
 	}
 
-	return results, multierr.Combine(errs...)
+	return results, errors.Join(errs...)
 }
 
 // apiFetcher is a concrete implementation of fetcher that hits the real AWS API.
@@ -134,7 +134,7 @@ func (p *fetchRequest) fetch() ([]*lbListener, error) {
 
 	// Since everything is async we have to retrieve any errors that occurred from here
 	if len(p.errs) > 0 {
-		return nil, multierr.Combine(p.errs...)
+		return nil, errors.Join(p.errs...)
 	}
 
 	return p.lbListeners, nil
