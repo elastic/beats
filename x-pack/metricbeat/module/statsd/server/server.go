@@ -91,7 +91,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	processor := newMetricProcessor(config.TTL)
+	processor := newMetricProcessor(config.TTL, base.Logger())
 
 	mappings, err := buildMappings(config.Mappings)
 	if err != nil {
@@ -182,7 +182,7 @@ func (m *MetricSet) getEvents() []*mb.Event {
 
 		for k, v := range tagGroup.metrics {
 			// Apply event mapping to the metric and get MetricSetFields.
-			ms := eventMapping(k, v, m.mappings)
+			ms := eventMapping(k, v, m.mappings, m.Logger())
 
 			// If no MetricSetFields were generated, continue to the next metric.
 			if len(ms) == 0 {
