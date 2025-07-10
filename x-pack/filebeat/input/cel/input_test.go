@@ -496,6 +496,40 @@ var inputTests = []struct {
 			{"message": "AWS4-HMAC-SHA256 Credential=id/20091110/region/service/aws4_request, SignedHeaders=content-length;content-type;host;x-amz-date;x-amz-security-token, Signature=ad27046c0009e06c6626e6009ba2af96027f4893b7a190ab67aaec85becb25cd"},
 		},
 	},
+	{
+		// This test exists purely to demonstrate that the lib is available.
+		name: "optional_types_v2",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `{"events": [{
+				"message": optional.unwrap([optional.of(42), optional.none()]).encode_json(),
+			}]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "[42]"},
+		},
+	},
+	{
+		// This test exists purely to demonstrate that the lib is available.
+		name: "two_var_comprehension_v2",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `{"events": [{
+				"message": {'hello': 'world'}.transformMap(k, v, v + '!').encode_json(),
+			}]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": `{"hello":"world!"}`},
+		},
+	},
 
 	// FS-based tests.
 	{
