@@ -22,11 +22,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+<<<<<<< HEAD
       - name: Install Updatecli in the runner
         uses: updatecli/updatecli-action@4aca518a70708e38063453d8de9c551af7f48ac3 # v0.76.1
 
       - name: Run Updatecli in Apply mode
         run: updatecli --experimental apply --config .github/workflows/updatecli.d/${{ matrix.file }} --values .github/workflows/updatecli.d/values.d/scm.yml
+=======
+      - uses: elastic/oblt-actions/updatecli/run-and-notify@v1
+        with:
+          command: --experimental apply --config .github/workflows/updatecli.d/${{ matrix.file }} --values .github/workflows/updatecli.d/values.d/scm.yml
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          slack-channel-id: "#ingest-notifications"
+          slack-message: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, @robots-ci please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
+          slack-send-when: "failure"
+          version-file: .updatecli-version
+>>>>>>> 68600b701 (fix: asdf issues with updatecli in the tool-versions (#45286))
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
