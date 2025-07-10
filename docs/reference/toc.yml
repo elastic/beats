@@ -1166,6 +1166,7 @@ toc:
               - file: metricbeat/metricbeat-metricset-system-socket_summary.md
               - file: metricbeat/metricbeat-metricset-system-uptime.md
               - file: metricbeat/metricbeat-metricset-system-users.md
+              - file: metricbeat/metricbeat-metricset-system-ntp.md
           - file: metricbeat/metricbeat-module-tomcat.md
             children:
               - file: metricbeat/metricbeat-metricset-tomcat-cache.md
