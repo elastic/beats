@@ -231,7 +231,7 @@ func TestPublish(t *testing.T) {
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 	})
 	t.Run("sets otel specific-fields", func(t *testing.T) {
-		for _, wantCompID := range []string{"", "filebeatreceiver/1"} {
+		for _, wantCompName := range []string{"", "filebeatreceiver/1"} {
 			event1 := beat.Event{Fields: mapstr.M{"field": 1}}
 			batch := outest.NewBatch(event1)
 			var countLogs int
@@ -239,7 +239,7 @@ func TestPublish(t *testing.T) {
 				countLogs = countLogs + ld.LogRecordCount()
 				return nil
 			})
-			otelConsumer.beatInfo.ComponentID = wantCompID
+			otelConsumer.beatInfo.ComponentName = wantCompName
 
 			err := otelConsumer.Publish(ctx, batch)
 			assert.NoError(t, err)
@@ -249,10 +249,10 @@ func TestPublish(t *testing.T) {
 
 			for _, event := range batch.Events() {
 				beatEvent := event.Content.Fields
-				if wantCompID == "" {
-					assert.NotContains(t, event.Content.Fields, otelComponentIDKey, otelComponentIDKey+" should not be set")
+				if wantCompName == "" {
+					assert.NotContains(t, event.Content.Fields, otelComponentNameKey, otelComponentNameKey+" should not be set")
 				} else {
-					assert.Equal(t, otelConsumer.beatInfo.ComponentID, beatEvent[otelComponentIDKey], otelComponentIDKey+" should be set")
+					assert.Equal(t, otelConsumer.beatInfo.ComponentName, beatEvent[otelComponentNameKey], otelComponentNameKey+" should be set")
 				}
 			}
 		}
