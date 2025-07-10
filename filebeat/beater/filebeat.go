@@ -254,7 +254,7 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 
 	// register pipeline loading to happen every time a new ES connection is
 	// established
-	callback := func(esClient *eslegclient.Connection) error {
+	callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
 		return fb.moduleRegistry.LoadPipelines(esClient, overwritePipelines)
 	}
 	_, err := elasticsearch.RegisterConnectCallback(callback)
