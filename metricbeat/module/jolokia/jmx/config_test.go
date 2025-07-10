@@ -21,6 +21,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestBuildJolokiaGETUri(t *testing.T) {
@@ -711,24 +713,24 @@ func TestNewJolokiaHTTPClient(t *testing.T) {
 
 		{
 			httpMethod: "GET",
-			expected:   &JolokiaHTTPGetFetcher{},
+			expected:   &JolokiaHTTPGetFetcher{logp.NewNopLogger()},
 		},
 		{
 			httpMethod: "",
-			expected:   &JolokiaHTTPPostFetcher{},
+			expected:   &JolokiaHTTPPostFetcher{logp.NewNopLogger()},
 		},
 		{
 			httpMethod: "GET",
-			expected:   &JolokiaHTTPGetFetcher{},
+			expected:   &JolokiaHTTPGetFetcher{logp.NewNopLogger()},
 		},
 		{
 			httpMethod: "POST",
-			expected:   &JolokiaHTTPPostFetcher{},
+			expected:   &JolokiaHTTPPostFetcher{logp.NewNopLogger()},
 		},
 	}
 
 	for _, c := range cases {
-		jolokiaGETClient := NewJolokiaHTTPRequestFetcher(c.httpMethod)
+		jolokiaGETClient := NewJolokiaHTTPRequestFetcher(c.httpMethod, logp.NewNopLogger())
 
 		assert.Equal(t, c.expected, jolokiaGETClient, "httpMethod: "+c.httpMethod)
 	}
