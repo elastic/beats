@@ -25,13 +25,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConnectCallbacksManagement(t *testing.T) {
-	f0 := func(client *eslegclient.Connection) error { return nil }
-	f1 := func(client *eslegclient.Connection) error { return nil }
-	f2 := func(client *eslegclient.Connection) error { return nil }
+	f0 := func(client *eslegclient.Connection, _ *logp.Logger) error { return nil }
+	f1 := func(client *eslegclient.Connection, _ *logp.Logger) error { return nil }
+	f2 := func(client *eslegclient.Connection, _ *logp.Logger) error { return nil }
 
 	_, err := RegisterConnectCallback(f0)
 	if err != nil {
@@ -54,9 +55,9 @@ func TestConnectCallbacksManagement(t *testing.T) {
 }
 
 func TestGlobalConnectCallbacksManagement(t *testing.T) {
-	f0 := func(client *eslegclient.Connection) error { return nil }
-	f1 := func(client *eslegclient.Connection) error { return nil }
-	f2 := func(client *eslegclient.Connection) error { return nil }
+	f0 := func(client *eslegclient.Connection, _ *logp.Logger) error { return nil }
+	f1 := func(client *eslegclient.Connection, _ *logp.Logger) error { return nil }
+	f2 := func(client *eslegclient.Connection, _ *logp.Logger) error { return nil }
 
 	_, err := RegisterGlobalCallback(f0)
 	if err != nil {

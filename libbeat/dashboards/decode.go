@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -89,8 +88,6 @@ func decodeObject(o mapstr.M) mapstr.M {
 		// All fields are optional, so errors are not caught
 		err := decodeValue(o, key)
 		if err != nil {
-			logger := logp.NewLogger("dashboards")
-			logger.Debugf("Error while decoding dashboard objects: %+v", err)
 			continue
 		}
 	}

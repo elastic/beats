@@ -53,8 +53,7 @@ func validateUnsupportedConfig(tlscfg *tlscommon.Config) error {
 }
 
 // TLSCommonToOTel converts a tlscommon.Config into the OTel configtls.ClientConfig
-func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
-	logger := logp.L().Named("tls-to-otel")
+func TLSCommonToOTel(tlscfg *tlscommon.Config, logger *logp.Logger) (map[string]any, error) {
 	insecureSkipVerify := false
 
 	if tlscfg == nil {

@@ -205,9 +205,7 @@ func newQueue(
 		settings.MaxGetRequest = settings.Events
 	}
 
-	if logger == nil {
-		logger = logp.NewLogger("memqueue")
-	}
+	logger = logger.Named("memqueue")
 
 	b := &broker{
 		settings: settings,

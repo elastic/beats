@@ -151,8 +151,8 @@ func ReplaceIndexInVisState(logger *logp.Logger, index string, visState map[stri
 }
 
 // ReplaceIndexInDashboardObject replaces references to the index pattern in dashboard objects
-func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
-	logger := logp.NewLogger("dashboards")
+func ReplaceIndexInDashboardObject(index string, content []byte, logger *logp.Logger) []byte {
+	logger = logger.Named("dashboards")
 	if index == "" {
 		return content
 	}
@@ -324,8 +324,8 @@ func replaceIndexInReferences(index string, references []interface{}) []interfac
 	return references
 }
 
-func EncodeJSONObjects(content []byte) []byte {
-	logger := logp.NewLogger("dashboards")
+func EncodeJSONObjects(content []byte, logger *logp.Logger) []byte {
+	logger = logger.Named("dashboards")
 
 	if len(bytes.TrimSpace(content)) == 0 {
 		return content

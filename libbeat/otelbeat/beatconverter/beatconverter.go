@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	elasticsearchtranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate/outputs/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // list of supported beatreceivers
@@ -72,7 +73,9 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 			switch key {
 			case "elasticsearch":
 				esConfig := config.MustNewConfigFrom(output)
-				esOTelConfig, err := elasticsearchtranslate.ToOTelConfig(esConfig)
+				// we use development logger here as this method is part of dev-only otel command
+				logger, _ := logp.NewDevelopmentLogger("")
+				esOTelConfig, err := elasticsearchtranslate.ToOTelConfig(esConfig, logger)
 				if err != nil {
 					return fmt.Errorf("cannot convert elasticsearch config: %w", err)
 				}
