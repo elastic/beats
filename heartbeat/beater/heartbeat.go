@@ -235,11 +235,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	// Three possible events: global beat, run_once pipeline done and publish timeout
 	waitPublished.AddChan(bt.stopping)
 	waitPublished.Add(monitors.WithLog(pipelineWrapper.Wait, "shutdown: finished publishing events."))
-	if bt.config.PublishTimeout > 0 {
-		logp.L().Infof("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout)
-		waitPublished.Add(monitors.WithLog(monitors.WaitDuration(bt.config.PublishTimeout),
-			"shutdown: timed out waiting for pipeline to publish events."))
-	}
 
 	return nil
 }
@@ -332,12 +327,15 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
 	bt.stopOnce.Do(func() {
+		// Add some extra seconds to ensure there is enough time to publish all events
+		waitDuration := bt.config.PublishTimeout + 5*time.Second
 		waitDone := monitors.NewSignalWait()
 		waitDone.AddChan(bt.done)
-		waitDone.Add(monitors.WithLog(monitors.WaitDuration(bt.config.PublishTimeout),
-			"heartbeat did not exit in a timely manner"))
+		waitDone.Add(monitors.WithLog(monitors.WaitDuration(waitDuration),
+			fmt.Sprintf("shutdown: output timer started. Waiting for max %v.", waitDuration)))
 
 		close(bt.stopping)
+
 		// Give the shutdown process some time to process all the events.
 		waitDone.Wait()
 	})
