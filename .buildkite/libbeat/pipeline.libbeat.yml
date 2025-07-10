@@ -101,7 +101,7 @@ steps:
         agents:
           provider: "aws"
           image: "${IMAGE_UBUNTU_X86_64_FIPS}"
-          instanceType: "m5.2xlarge"
+          instanceType: "m5.xlarge"
         env:
           FIPS: "true"
           GOEXPERIMENT: "systemcrypto"
@@ -130,7 +130,9 @@ steps:
         agents:
           provider: "aws"
           image: "${IMAGE_UBUNTU_X86_64_FIPS}"
-          instanceType: "m5.2xlarge"
+          provider: "aws"
+          image: "${IMAGE_UBUNTU_X86_64_FIPS}"
+          instanceType: "m5.xlarge"
         env:
           FIPS: "true"
           GOEXPERIMENT: "systemcrypto"
