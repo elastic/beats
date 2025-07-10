@@ -354,12 +354,15 @@ The `take over` mode can work correctly only if the source (taken from) inputs a
 `take_over.enabled: true` requires the `filestream` to have a unique ID.
 ::::
 
-
 This `take over` mode was created to enable smooth migration from
 deprecated `log` inputs to the new `filestream` inputs and to allow
 changing `filestream` input IDs without data re-ingestion.
 
 See [*Migrate `log` input configurations to `filestream`*](/reference/filebeat/migrate-to-filestream.md) for more details about the migration process.
+
+The previous configuration format `take_over: true`, while
+deprecated, is still supported to migrate state from the `log` input
+to `filestream`.
 
 ::::{warning}
 The `take over` mode is still in beta, however, it should be generally safe to use.

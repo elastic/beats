@@ -65,7 +65,7 @@ type filestream struct {
 	closerConfig         closerConfig
 	deleterConfig        deleterConfig
 	parsers              parser.Config
-	takeOver             takeOverConfig
+	takeOver             loginp.TakeOverConfig
 	scannerCheckInterval time.Duration
 
 	// Function references for testing
@@ -105,6 +105,8 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, nil, err
 	}
+
+	c.TakeOver.LogWarnings(log)
 
 	prospector, err := newProspector(c, log)
 	if err != nil {
