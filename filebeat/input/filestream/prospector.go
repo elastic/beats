@@ -81,7 +81,7 @@ type fileProspector struct {
 	ignoreInactiveSince ignoreInactiveType
 	cleanRemoved        bool
 	stateChangeCloser   stateChangeCloserConfig
-	takeOver            takeOverConfig
+	takeOver            loginp.TakeOverConfig
 }
 
 func (p *fileProspector) Init(
