@@ -39,7 +39,7 @@ func getTestConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "system",
 		"metricsets": []string{"ntp"},
-		"host":       "localhost:123",
+		"hosts":      []string{"localhost:123"},
 	}
 }
 
@@ -57,7 +57,7 @@ func TestFetchOffset_Success(t *testing.T) {
 	msFields := events[0].MetricSetFields
 	offset, ok := msFields["offset"]
 	assert.True(t, ok, "offset not found in event")
-	assert.Equal(t, 1.23, offset, "offset should be 1.23 seconds")
+	assert.Equal(t, int64(1230000000), offset, "offset should be 1230000000 nanoseconds")
 
 	host, ok := msFields["host"]
 	assert.True(t, ok, "host not found in event")
