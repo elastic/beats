@@ -28,8 +28,6 @@ This metricset is available on:
 **`ntp.version`**
 : Version of the NTP protocol to use. Must be one of "3" or "4". Defaults to "4".
 
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
-
 ## Fields [_fields]
 
 For a description of each field in the metricset, see the [exported fields](/reference/metricbeat/exported-fields-system.md) section.

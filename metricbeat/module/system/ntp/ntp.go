@@ -50,7 +50,7 @@ type MetricSet struct {
 }
 
 func init() {
-	mb.Registry.MustAddMetricSet("system", "ntp", New, mb.DefaultMetricSet())
+	mb.Registry.MustAddMetricSet("system", "ntp", New)
 }
 
 // New creates a new instance of the MetricSet (used for both production and test construction)
