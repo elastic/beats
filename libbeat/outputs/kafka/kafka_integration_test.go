@@ -44,10 +44,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-<<<<<<< HEAD
-=======
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
->>>>>>> 23f4491cc ([kafka] Handle configuration errors (#45128))
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
