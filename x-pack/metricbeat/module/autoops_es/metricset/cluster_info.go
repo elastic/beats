@@ -5,7 +5,6 @@
 package metricset
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -46,7 +45,10 @@ func GetInfo(m *elasticsearch.MetricSet) (*utils.ClusterInfo, error) {
 func checkEsVersion(esVersion *libversion.V, errChan chan error) error {
 	if esVersion.LessThan(minVersion) {
 		isVersionChecked = true
-		err := fmt.Errorf("version %s is less than the minimum required version %s", esVersion.String(), minVersion)
+		err := &utils.VersionMismatchError{
+			ExpectedVersion: minVersion.String(),
+			ActualVersion:   esVersion.String(),
+		}
 		errChan <- err
 		return err
 	}
