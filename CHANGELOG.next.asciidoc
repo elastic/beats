@@ -119,6 +119,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Heartbeat*
 
+- Add base64 encoding option to inline monitors. {pull}45100[45100]
 
 
 *Metricbeat*
