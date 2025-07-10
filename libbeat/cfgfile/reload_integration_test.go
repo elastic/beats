@@ -30,7 +30,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -58,7 +58,8 @@ func TestReloader(t *testing.T) {
 		},
 	})
 	// config.C{}
-	reloader := NewReloader(logp.L().Named("cfgfile-test.reload"), nil, config)
+
+	reloader := NewReloader(logptest.NewTestingLogger("cfgfile-test.reload"), nil, config)
 	retryCount := 10
 
 	go reloader.Run(nil)

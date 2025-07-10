@@ -28,9 +28,11 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestToOtelConfig(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 
 	t.Run("basic config translation", func(t *testing.T) {
 		beatCfg := `
@@ -80,7 +82,7 @@ mapping:
  `
 		input := newFromYamlString(t, beatCfg)
 		cfg := config.MustNewConfigFrom(input.ToStringMap())
-		got, err := ToOTelConfig(cfg)
+		got, err := ToOTelConfig(cfg, logger)
 		require.NoError(t, err, "error translating elasticsearch output to ES exporter config")
 		expOutput := newFromYamlString(t, OTelCfg)
 		compareAndAssert(t, expOutput, confmap.NewFromStringMap(got))
@@ -116,7 +118,7 @@ api_key: VGlOQUdHNEJhYU1kYUgxdFJmdVU6S25SNnlFNDFSclNvd2Iwa1EwSFdvQQ==
  `
 		input := newFromYamlString(t, beatCfg)
 		cfg := config.MustNewConfigFrom(input.ToStringMap())
-		got, err := ToOTelConfig(cfg)
+		got, err := ToOTelConfig(cfg, logger)
 		require.NoError(t, err, "error translating elasticsearch output to ES exporter config ")
 		expOutput := newFromYamlString(t, OTelCfg)
 		compareAndAssert(t, expOutput, confmap.NewFromStringMap(got))
@@ -224,7 +226,7 @@ batcher:
 			t.Run("config translation w/"+test.presetName, func(t *testing.T) {
 				input := newFromYamlString(t, fmt.Sprintf(commonBeatCfg, test.presetName))
 				cfg := config.MustNewConfigFrom(input.ToStringMap())
-				got, err := ToOTelConfig(cfg)
+				got, err := ToOTelConfig(cfg, logger)
 				require.NoError(t, err, "error translating elasticsearch output to OTel ES exporter type")
 				expOutput := newFromYamlString(t, test.output)
 				compareAndAssert(t, expOutput, confmap.NewFromStringMap(got))
