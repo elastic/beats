@@ -361,7 +361,7 @@ changing `filestream` input IDs without data re-ingestion.
 See [*Migrate `log` input configurations to `filestream`*](/reference/filebeat/migrate-to-filestream.md) for more details about the migration process.
 
 The previous configuration format `take_over: true`, while
-discouraged, is still supported to migrate state from the `log` input
+deprecated, is still supported to migrate state from the `log` input
 to `filestream`.
 
 ::::{warning}
