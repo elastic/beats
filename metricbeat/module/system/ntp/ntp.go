@@ -67,19 +67,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches the offset from the configured NTP server
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	response, err := m.queryProvider.query(m.config.Host, ntp.QueryOptions{
+	response, err := m.queryProvider.query(m.Host(), ntp.QueryOptions{
 		Timeout: m.config.Timeout,
 		Version: m.config.Version,
 	})
 
 	if err != nil {
-		err := fmt.Errorf("error querying NTP server %s: %w", m.config.Host, err)
+		err := fmt.Errorf("error querying NTP server %s: %w", m.Host(), err)
 		reporter.Error(err)
 		return err
 	}
 
 	reporter.Event(mb.Event{MetricSetFields: mapstr.M{
-		"host":   m.config.Host,
+		"host":   m.Host(),
 		"offset": response.ClockOffset.Seconds(),
 	}})
 

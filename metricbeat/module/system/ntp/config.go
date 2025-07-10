@@ -23,21 +23,22 @@ import (
 )
 
 type config struct {
-	Host    string        `config:"host"`
+	Hosts   []string      `config:"hosts,replace"`
 	Timeout time.Duration `config:"timeout"`
 	Version int           `config:"version"`
 }
 
 func defaultConfig() config {
 	return config{
+		Hosts:   []string{"pool.ntp.org"},
 		Timeout: 5 * time.Second,
 		Version: 4,
 	}
 }
 
 func validateConfig(cfg *config) error {
-	if cfg.Host == "" {
-		return fmt.Errorf("NTP host must be set in config")
+	if len(cfg.Hosts) == 0 {
+		return fmt.Errorf("at least one NTP host must be set")
 	}
 	if cfg.Timeout <= 0 {
 		return fmt.Errorf("invalid NTP timeout: %s", cfg.Timeout.String())

@@ -21,6 +21,8 @@ import (
 	"testing"
 	"time"
 
+	ucfg "github.com/elastic/elastic-agent-libs/config"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -32,11 +34,26 @@ func TestDefaultConfig(t *testing.T) {
 
 func TestValidateConfig_Valid(t *testing.T) {
 	cfg := config{
-		Host:    "localhost:123",
+		Hosts:   []string{"localhost:123"},
 		Timeout: 5 * time.Second,
 		Version: 4,
 	}
 	assert.NoError(t, validateConfig(&cfg))
+}
+
+func TestUnpackConfigReplacesHosts(t *testing.T) {
+	cfg := config{
+		Hosts:   []string{"0.time.tom.com", "1.time.tom.com", "2.time.tom.com"},
+		Timeout: 5 * time.Second,
+		Version: 4,
+	}
+
+	userCfg := ucfg.MustNewConfigFrom(map[string]interface{}{
+		"hosts": []string{"custom.ntp.org"},
+	})
+
+	userCfg.Unpack(&cfg)
+	assert.Equal(t, []string{"custom.ntp.org"}, cfg.Hosts)
 }
 
 func TestValidateConfig_MissingHost(t *testing.T) {
@@ -46,12 +63,12 @@ func TestValidateConfig_MissingHost(t *testing.T) {
 	}
 	err := validateConfig(&cfg)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "NTP host must be set in config")
+	assert.Contains(t, err.Error(), "at least one NTP host must be set")
 }
 
 func TestValidateConfig_InvalidVersion(t *testing.T) {
 	cfg := config{
-		Host:    "localhost:123",
+		Hosts:   []string{"localhost:123"},
 		Timeout: 5 * time.Second,
 		Version: 2,
 	}
@@ -62,7 +79,7 @@ func TestValidateConfig_InvalidVersion(t *testing.T) {
 
 func TestValidateConfig_InvalidTimeout(t *testing.T) {
 	cfg := config{
-		Host:    "localhost:123",
+		Hosts:   []string{"localhost:123"},
 		Timeout: 0,
 		Version: 2,
 	}
