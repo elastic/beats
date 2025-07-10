@@ -95,7 +95,7 @@ func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
 		return useragent.AgentManagementModeUnknown
 	}
 	if !beat.Manager.Enabled() {
-		return useragent.AgentManagementModeUnmanaged
+		return useragent.AgentManagementModeStandalone
 	}
 
 	info := beat.Manager.AgentInfo()
@@ -103,7 +103,7 @@ func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
 	case proto.AgentManagedMode_MANAGED:
 		return useragent.AgentManagementModeManaged
 	case proto.AgentManagedMode_STANDALONE:
-		return useragent.AgentManagementModeStandalone
+		return useragent.AgentManagementModeUnmanaged
 	}
 	// this is probably not reachable
 	return useragent.AgentManagementModeUnknown
