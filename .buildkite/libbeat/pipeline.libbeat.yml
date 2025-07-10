@@ -105,6 +105,7 @@ steps:
         env:
           FIPS: "true"
           GOEXPERIMENT: "systemcrypto"
+          ASDF_PYTHON_VERSION: "3.10.9"
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
