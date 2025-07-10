@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"unsafe"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"golang.org/x/sys/windows"
 )
 
@@ -20,6 +21,17 @@ import (
 var (
 	guidFromProviderNameFunc = guidFromProviderName
 	setSessionGUIDFunc       = setSessionGUID
+
+	// EventTraceGuid is the well-known GUID for ETW trace header events.
+	// {68FDD900-4A3E-11D1-84F4-0000F80464E3}
+	// We need this GUID to identify the event trace session and be able to
+	// ignore it when reading an ETL file.
+	eventTraceGUID = windows.GUID{
+		Data1: 0x68fdd900,
+		Data2: 0x4a3e,
+		Data3: 0x11d1,
+		Data4: [8]byte{0x84, 0xf4, 0x00, 0x00, 0xf8, 0x04, 0x64, 0xe3},
+	}
 )
 
 type Session struct {
@@ -31,12 +43,14 @@ type Session struct {
 	// properties of the session that are initialized in newSessionProperties()
 	// See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-event_trace_properties for more information
 	properties *EventTraceProperties
+	// Enable properties for the session
+	enableProperty []string
 	// handler of the event tracing session for which the provider is being configured.
 	// It is obtained from StartTrace when a new trace is started.
 	// This handler is needed to enable, query or stop the trace.
 	handler uintptr
 	// Realtime is a flag to know if the consumer reads from a logfile or real-time session.
-	Realtime bool // Real-time flag
+	Realtime bool
 	// NewSession is a flag to indicate whether a new session has been created or attached to an existing one.
 	NewSession bool
 	// TraceLevel sets the maximum level of events that we want the provider to write.
@@ -56,6 +70,8 @@ type Session struct {
 	Callback func(*EventRecord) uintptr
 	// BufferCallback is the pointer to BufferCallback which processes retrieved metadata about the ETW buffers (optional).
 	BufferCallback func(*EventTraceLogfile) uintptr
+
+	metadataCache *metadataCache
 
 	// Pointers to functions that make calls to the Windows API.
 	// In tests, these pointers can be replaced with mock functions to simulate API behavior without making actual calls to the Windows API.
@@ -157,7 +173,9 @@ func newSessionProperties(sessionName string) *EventTraceProperties {
 
 // NewSession initializes and returns a new ETW Session based on the provided configuration.
 func NewSession(conf Config) (*Session, error) {
-	session := &Session{}
+	session := &Session{
+		enableProperty: conf.EnableProperty,
+	}
 
 	// Assign ETW Windows API functions
 	session.startTrace = _StartTrace
@@ -167,6 +185,7 @@ func NewSession(conf Config) (*Session, error) {
 	session.processTrace = _ProcessTrace
 	session.closeTrace = _CloseTrace
 
+	session.metadataCache = newMetadataCache(logp.NewLogger("etw_session"))
 	session.Name = setSessionName(conf)
 	session.Realtime = true
 
@@ -245,4 +264,31 @@ func (s *Session) StartConsumer() error {
 		return fmt.Errorf("failed to process trace: %w", err)
 	}
 	return nil
+}
+
+var ErrUnprocessableEvent = errors.New("unprocessable event")
+
+// GetEventProperties extracts and returns properties from an ETW event record.
+func (s *Session) RenderEvent(r *EventRecord) (e RenderedEtwEvent, err error) {
+	if !s.Realtime {
+		if r.EventHeader.ProviderId == eventTraceGUID {
+			// Ignore event trace session events when reading from a logfile.
+			return RenderedEtwEvent{}, ErrUnprocessableEvent
+		}
+	}
+	providerCache, err := s.metadataCache.getProviderCache(r.EventHeader.ProviderId)
+	if err != nil {
+		return RenderedEtwEvent{}, fmt.Errorf("failed to get provider cache: %w", err)
+	}
+	// Initialize a new property parser for the event record.
+	p := newEventRenderer(providerCache, r)
+	event, err := p.render()
+	if err != nil {
+		return RenderedEtwEvent{}, fmt.Errorf("failed to parse event properties: %w", err)
+	}
+	return event, nil
+}
+
+func uintptrToBytes(ptr uintptr, length uint16) []byte {
+	return unsafe.Slice((*byte)(unsafe.Pointer(ptr)), length)
 }

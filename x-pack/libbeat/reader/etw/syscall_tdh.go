@@ -7,6 +7,7 @@
 package etw
 
 import (
+	"fmt"
 	"syscall"
 	"unsafe"
 
@@ -14,12 +15,14 @@ import (
 )
 
 var (
-	tdh                       = windows.NewLazySystemDLL("tdh.dll")
-	tdhEnumerateProviders     = tdh.NewProc("TdhEnumerateProviders")
-	tdhGetEventInformation    = tdh.NewProc("TdhGetEventInformation")
-	tdhGetEventMapInformation = tdh.NewProc("TdhGetEventMapInformation")
-	tdhFormatProperty         = tdh.NewProc("TdhFormatProperty")
-	tdhGetProperty            = tdh.NewProc("TdhGetProperty")
+	tdh                                  = windows.NewLazySystemDLL("tdh.dll")
+	tdhEnumerateProviders                = tdh.NewProc("TdhEnumerateProviders")
+	tdhEnumerateManifestProviderEvents   = tdh.NewProc("TdhEnumerateManifestProviderEvents")
+	tdhEnumerateProviderFieldInformation = tdh.NewProc("TdhEnumerateProviderFieldInformation")
+	tdhGetEventInformation               = tdh.NewProc("TdhGetEventInformation")
+	tdhGetEventMapInformation            = tdh.NewProc("TdhGetEventMapInformation")
+	tdhFormatProperty                    = tdh.NewProc("TdhFormatProperty")
+	tdhGetProperty                       = tdh.NewProc("TdhGetProperty")
 )
 
 const anysizeArray = 1
@@ -105,6 +108,43 @@ type EventHeaderExtendedDataItem struct {
 	DataPtr        uint64
 }
 
+func parseGUID(item *EventHeaderExtendedDataItem) any {
+	guid := (*windows.GUID)(unsafe.Pointer(uintptr(item.DataPtr)))
+	return guid.String()
+}
+
+func parseSID(item *EventHeaderExtendedDataItem) any {
+	sid := (*windows.SID)(unsafe.Pointer(uintptr(item.DataPtr)))
+	if sid != nil {
+		account, domain, _, err := sid.LookupAccount("")
+		if err == nil {
+			return fmt.Sprintf("%s\\%s", domain, account)
+		}
+		return fmt.Sprintf("SID lookup failed: %v", err)
+	}
+	return "SID is nil"
+}
+
+func parseUint32(item *EventHeaderExtendedDataItem) any {
+	return *(*uint32)(unsafe.Pointer(uintptr(item.DataPtr)))
+}
+
+func parseUint64(item *EventHeaderExtendedDataItem) any {
+	return *(*uint64)(unsafe.Pointer(uintptr(item.DataPtr)))
+}
+
+func parseUint32Slice(item *EventHeaderExtendedDataItem) any {
+	return unsafe.Slice((*uint32)(unsafe.Pointer(uintptr(item.DataPtr))), int(item.DataSize/4))
+}
+
+func parseUint64Slice(item *EventHeaderExtendedDataItem) any {
+	return unsafe.Slice((*uint64)(unsafe.Pointer(uintptr(item.DataPtr))), int(item.DataSize/8))
+}
+
+func parseByteSlice(item *EventHeaderExtendedDataItem) any {
+	return unsafe.Slice((*byte)(unsafe.Pointer(uintptr(item.DataPtr))), int(item.DataSize))
+}
+
 // https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-tdh_context
 type TdhContext struct {
 	ParameterValue uint32
@@ -134,6 +174,41 @@ type TraceEventInfo struct {
 	TopLevelPropertyCount       uint32
 	Flags                       TemplateFlags
 	EventPropertyInfoArray      [anysizeArray]EventPropertyInfo
+}
+
+func (info *TraceEventInfo) getEventPropertyInfoAtIndex(i uint32) *EventPropertyInfo {
+	if i >= info.PropertyCount {
+		return nil
+	}
+
+	// Compute the pointer to the i-th EventPropertyInfo safely,
+	// simulating C-style flexible array access using offset arithmetic.
+	eventPropertyInfoPtr := uintptr(unsafe.Pointer(info)) +
+		uintptr(unsafe.Offsetof(info.EventPropertyInfoArray)) +
+		uintptr(i)*unsafe.Sizeof(EventPropertyInfo{})
+
+	return (*EventPropertyInfo)(unsafe.Pointer(eventPropertyInfoPtr))
+}
+
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-provider_event_info
+type ProviderEventInfo struct {
+	NumberOfEvents        uint32
+	Reserved              uint32
+	EventDescriptorsArray [anysizeArray]EventDescriptor
+}
+
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-provider_field_info
+type ProviderFieldInfo struct {
+	NameOffset        uint32
+	DescriptionOffset uint32
+	Value             uint64
+}
+
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-provider_field_infoarray
+type ProviderFieldInfoArray struct {
+	NumberOfElements uint32
+	FieldType        EventFieldType
+	FieldInfoArray   [anysizeArray]ProviderFieldInfo
 }
 
 // https://learn.microsoft.com/en-us/windows/desktop/api/tdh/ns-tdh-event_property_info
@@ -178,21 +253,125 @@ func (i *EventPropertyInfo) mapNameOffset() uint32 {
 	return i.TypeUnion.u3
 }
 
+func (i *EventPropertyInfo) customSchemaOffset() uint32 {
+	return i.mapNameOffset()
+}
+
+// TDH Input Types
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/ne-tdh-_tdh_in_type
 const (
-	TdhIntypeBinary = 14
-	TdhOuttypeIpv6  = 24
+	TdhIntypeNull                        = 0
+	TdhIntypeUnicodeString               = 1
+	TdhIntypeAnsiString                  = 2
+	TdhIntypeInt8                        = 3
+	TdhIntypeUint8                       = 4
+	TdhIntypeInt16                       = 5
+	TdhIntypeUint16                      = 6
+	TdhIntypeInt32                       = 7
+	TdhIntypeUint32                      = 8
+	TdhIntypeInt64                       = 9
+	TdhIntypeUint64                      = 10
+	TdhIntypeFloat                       = 11
+	TdhIntypeDouble                      = 12
+	TdhIntypeBoolean                     = 13
+	TdhIntypeBinary                      = 14
+	TdhIntypeGuid                        = 15
+	TdhIntypePointer                     = 16
+	TdhIntypeFileTime                    = 17
+	TdhIntypeSystemTime                  = 18
+	TdhIntypeSid                         = 19
+	TdhIntypeHexInt32                    = 20
+	TdhIntypeHexInt64                    = 21
+	TdhIntypeCountedString               = 300
+	TdhIntypeCountedAnsiString           = 301
+	TdhIntypeReversedCountedString       = 302
+	TdhIntypeReversedCountedAnsiString   = 303
+	TdhIntypeNonNullTerminatedString     = 304
+	TdhIntypeNonNullTerminatedAnsiString = 305
+	TdhIntypeUnicodeChar                 = 306
+	TdhIntypeAnsiChar                    = 307
+	TdhIntypeSizeT                       = 308
+	TdhIntypeHexDump                     = 309
+	TdhIntypeWbemsid                     = 310
+)
+
+// TDH Output Types
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/ne-tdh-_tdh_out_type
+const (
+	TdhOuttypeNull                       = 0
+	TdhOuttypeString                     = 1
+	TdhOuttypeDatetime                   = 2
+	TdhOuttypeByte                       = 3
+	TdhOuttypeUnsignedByte               = 4
+	TdhOuttypeShort                      = 5
+	TdhOuttypeUnsignedShort              = 6
+	TdhOuttypeInt                        = 7
+	TdhOuttypeUnsignedInt                = 8
+	TdhOuttypeLong                       = 9
+	TdhOuttypeUnsignedLong               = 10
+	TdhOuttypeFloat                      = 11
+	TdhOuttypeDouble                     = 12
+	TdhOuttypeBoolean                    = 13
+	TdhOuttypeGuid                       = 14
+	TdhOuttypeHexBinary                  = 15
+	TdhOuttypeHexInt8                    = 16
+	TdhOuttypeHexInt16                   = 17
+	TdhOuttypeHexInt32                   = 18
+	TdhOuttypeHexInt64                   = 19
+	TdhOuttypePid                        = 20
+	TdhOuttypeTid                        = 21
+	TdhOuttypePort                       = 22
+	TdhOuttypeIpv4                       = 23
+	TdhOuttypeIpv6                       = 24
+	TdhOuttypeSocketAddress              = 25
+	TdhOuttypeCimDatetime                = 26
+	TdhOuttypeEtwTime                    = 27
+	TdhOuttypeXml                        = 28
+	TdhOuttypeErrorCode                  = 29
+	TdhOuttypeWin32Error                 = 30
+	TdhOuttypeNtstatus                   = 31
+	TdhOuttypeHresult                    = 32
+	TdhOuttypeCultureInsensitiveDatetime = 33
+	TdhOuttypeJson                       = 34
+	TdhOuttypeUtf8                       = 35
+	TdhOuttypePkcs7WithTypeInfo          = 36
+	TdhOuttypeCodePointer                = 37
+	TdhOuttypeDatetimeUtc                = 38
+	TdhOuttypeReducedString              = 300
+	TdhOuttypeNoPrint                    = 301
 )
 
 type DecodingSource int32
+
+const (
+	DecodingSourceXMLFile DecodingSource = 0
+	DecodingSourceWbem    DecodingSource = 1
+	DecodingSourceWPP     DecodingSource = 2
+	DecodingSourceTlg     DecodingSource = 3
+	DecodingSourceMax     DecodingSource = 4
+)
+
 type TemplateFlags int32
+
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/ne-tdh-template_flags
+const (
+	TemplateEventData   = TemplateFlags(1)
+	TemplateUserData    = TemplateFlags(2)
+	TemplateControlGUID = TemplateFlags(4)
+)
 
 type PropertyFlags int32
 
 // https://learn.microsoft.com/en-us/windows/win32/api/tdh/ne-tdh-property_flags
 const (
-	PropertyStruct      = PropertyFlags(0x1)
-	PropertyParamLength = PropertyFlags(0x2)
-	PropertyParamCount  = PropertyFlags(0x4)
+	PropertyStruct           = PropertyFlags(0x1)
+	PropertyParamLength      = PropertyFlags(0x2)
+	PropertyParamCount       = PropertyFlags(0x4)
+	PropertyWBEMXmlFragment  = PropertyFlags(0x8)
+	PropertyParamFixedLength = PropertyFlags(0x10)
+	PropertyParamFixedCount  = PropertyFlags(0x20)
+	PropertyHasTags          = PropertyFlags(0x40)
+	PropertyHasCustomSchema  = PropertyFlags(0x80)
 )
 
 // https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-event_map_info
@@ -204,12 +383,57 @@ type EventMapInfo struct {
 	MapEntryArray [anysizeArray]EventMapEntry
 }
 
-type MapFlags int32
+func (mi *EventMapInfo) mapEntryValueType() MapValueType {
+	return MapValueType(mi.Union)
+}
+
+func (mi *EventMapInfo) formatStringOffset() uint32 {
+	return mi.Union
+}
+
+type MapValueType uint32
+
+const (
+	EventMapEntryValueTypeUlong MapValueType = iota
+	EventMapEntryValueTypeString
+)
+
+type MapFlags uint32
+
+const (
+	EventMapInfoFlagManifestValueMap   = MapFlags(0x1)
+	EventMapInfoFlagManifestBitMap     = MapFlags(0x2)
+	EventMapInfoFlagManifestPatternMap = MapFlags(0x4)
+	EventMapInfoFlagWBEMValueMap       = MapFlags(0x8)
+	EventMapInfoFlagWBEMBitMap         = MapFlags(0x10)
+	EventMapInfoFlagWBEMFlag           = MapFlags(0x20)
+	EventMapInfoFlagWBEMNoMap          = MapFlags(0x40)
+)
+
+type EventFieldType uint32
+
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/ne-tdh-event_field_type
+const (
+	EventKeywordInformation EventFieldType = iota
+	EventLevelInformation
+	EventChannelInformation
+	EventTaskInformation
+	EventOpcodeInformation
+	EventInformationMax
+)
 
 // https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-event_map_entry
 type EventMapEntry struct {
 	OutputOffset uint32
 	Union        uint32
+}
+
+func (me *EventMapEntry) value() uint32 {
+	return me.Union
+}
+
+func (me *EventMapEntry) inputOffset() uint32 {
+	return me.Union
 }
 
 // https://learn.microsoft.com/en-us/windows/desktop/api/tdh/ns-tdh-property_data_descriptor
@@ -227,6 +451,38 @@ func _TdhEnumerateProviders(
 	pBuffer *ProviderEnumerationInfo,
 	pBufferSize *uint32) error {
 	r0, _, _ := tdhEnumerateProviders.Call(
+		uintptr(unsafe.Pointer(pBuffer)),
+		uintptr(unsafe.Pointer(pBufferSize)))
+	if r0 == 0 {
+		return nil
+	}
+	return syscall.Errno(r0)
+}
+
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhenumeratemanifestproviderevents
+func _TdhEnumerateManifestProviderEvents(
+	providerGUID *windows.GUID,
+	pBuffer *ProviderEventInfo,
+	pBufferSize *uint32) error {
+	r0, _, _ := tdhEnumerateManifestProviderEvents.Call(
+		uintptr(unsafe.Pointer(providerGUID)),
+		uintptr(unsafe.Pointer(pBuffer)),
+		uintptr(unsafe.Pointer(pBufferSize)))
+	if r0 == 0 {
+		return nil
+	}
+	return syscall.Errno(r0)
+}
+
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhenumerateproviderfieldinformation
+func _TdhEnumerateProviderFieldInformation(
+	providerGUID *windows.GUID,
+	eventFieldType EventFieldType,
+	pBuffer *ProviderFieldInfoArray,
+	pBufferSize *uint32) error {
+	r0, _, _ := tdhEnumerateProviderFieldInformation.Call(
+		uintptr(unsafe.Pointer(providerGUID)),
+		uintptr(eventFieldType),
 		uintptr(unsafe.Pointer(pBuffer)),
 		uintptr(unsafe.Pointer(pBufferSize)))
 	if r0 == 0 {
@@ -320,4 +576,25 @@ func _TdhGetEventMapInformation(pEvent *EventRecord,
 		return nil
 	}
 	return syscall.Errno(r0)
+}
+
+// String returns a human-readable representation of the EventRecord
+func (r *EventRecord) String() string {
+	if r == nil {
+		return "<nil EventRecord>"
+	}
+
+	return fmt.Sprintf("EventRecord{Provider: %s, ID: %d, Version: %d, Level: %d, Task: %d, Opcode: %d, Keyword: 0x%X, ProcessID: %d, ThreadID: %d, Timestamp: %d, UserDataLength: %d}",
+		r.EventHeader.ProviderId.String(),
+		r.EventHeader.EventDescriptor.Id,
+		r.EventHeader.EventDescriptor.Version,
+		r.EventHeader.EventDescriptor.Level,
+		r.EventHeader.EventDescriptor.Task,
+		r.EventHeader.EventDescriptor.Opcode,
+		r.EventHeader.EventDescriptor.Keyword,
+		r.EventHeader.ProcessId,
+		r.EventHeader.ThreadId,
+		r.EventHeader.TimeStamp,
+		r.UserDataLength,
+	)
 }

@@ -1,0 +1,340 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+//go:build windows
+
+package etw
+
+import (
+	"errors"
+	"fmt"
+	"math"
+	"time"
+	"unsafe"
+
+	"golang.org/x/sys/windows"
+)
+
+type eventRenderer struct {
+	cache   *providerCache
+	r       *EventRecord
+	data    []byte
+	ptrSize uint32
+}
+
+// newEventRenderer initializes a new property parser for a given event record.
+func newEventRenderer(cache *providerCache, r *EventRecord) *eventRenderer {
+	ptrSize := r.pointerSize()
+
+	// Return a new propertyParser instance initialized with event record data and metadata.
+	return &eventRenderer{
+		r:       r,
+		cache:   cache,
+		ptrSize: ptrSize,
+		data:    unsafe.Slice((*uint8)(unsafe.Pointer(r.UserData)), r.UserDataLength),
+	}
+}
+
+func (p *eventRenderer) render() (RenderedEtwEvent, error) {
+	eventInfo, err := p.cache.getEventInfo(p.r)
+	if err != nil {
+		return RenderedEtwEvent{}, fmt.Errorf("failed to get event info: %w", err)
+	}
+
+	event := RenderedEtwEvent{
+		ProviderGUID:      eventInfo.ParsedInfo.ProviderGUID,
+		ProviderName:      eventInfo.ProviderName,
+		EventID:           p.r.EventHeader.EventDescriptor.Id,
+		Version:           p.r.EventHeader.EventDescriptor.Version,
+		Level:             eventInfo.LevelName,
+		LevelRaw:          p.r.EventHeader.EventDescriptor.Level,
+		Task:              eventInfo.TaskName,
+		TaskRaw:           p.r.EventHeader.EventDescriptor.Task,
+		Opcode:            eventInfo.OpcodeName,
+		OpcodeRaw:         p.r.EventHeader.EventDescriptor.Opcode,
+		KeywordsRaw:       p.r.EventHeader.EventDescriptor.Keyword,
+		Channel:           eventInfo.ChannelName,
+		Timestamp:         convertFileTimeToGoTime(uint64(p.r.EventHeader.TimeStamp)),
+		ProcessID:         p.r.EventHeader.ProcessId,
+		ThreadID:          p.r.EventHeader.ThreadId,
+		ActivityID:        eventInfo.ActivityIDName,
+		RelatedActivityID: eventInfo.RelatedActivityIDName,
+		ProviderMessage:   eventInfo.ProviderMessage,
+		Properties:        make([]RenderedProperty, len(eventInfo.Properties)),
+	}
+
+	// Set Active Keywords
+	if event.KeywordsRaw != 0 {
+		for keywordBitValue, cachedKw := range p.cache.keywords {
+			if (event.KeywordsRaw&keywordBitValue) == keywordBitValue && keywordBitValue != 0 { // Check if bit is set
+				event.Keywords = append(event.Keywords, cachedKw.Name)
+			}
+		}
+	}
+
+	// Parse ExtendedData if present
+	extendedData := make([]RenderedExtendedData, int(p.r.ExtendedDataCount))
+	if p.r.ExtendedDataCount > 0 && p.r.ExtendedData != nil {
+		for i := 0; i < int(p.r.ExtendedDataCount); i++ {
+			item := (*EventHeaderExtendedDataItem)(unsafe.Pointer(
+				uintptr(unsafe.Pointer(p.r.ExtendedData)) + uintptr(i)*unsafe.Sizeof(*p.r.ExtendedData),
+			))
+			extendedData[i] = renderExtendedData(item)
+		}
+		event.ExtendedData = extendedData
+	}
+
+	// Handle the case where the event only contains a string.
+	if p.r.EventHeader.Flags == EVENT_HEADER_FLAG_STRING_ONLY {
+		userDataBuf := uintptrToBytes(p.r.UserData, p.r.UserDataLength)
+		event.EventMessage = getStringFromBufferOffset(userDataBuf, 0) // Convert the user data from UTF16 to string.
+		return event, nil
+	}
+
+	for i, prop := range eventInfo.Properties {
+		value, err := renderPropertyValue(p.cache, eventInfo, prop, p.r, p.ptrSize, &p.data)
+		if err != nil {
+			return RenderedEtwEvent{}, fmt.Errorf("failed to render property '%s': %w", prop.Name, err)
+		}
+		event.Properties[i] = RenderedProperty{
+			Name:  prop.Name,
+			Value: value,
+		}
+	}
+
+	event.EventMessage = eventInfo.renderEventMessage(event.Properties)
+
+	return event, nil
+}
+
+func renderPropertyValue(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte) (any, error) {
+	var arraySize int = 1
+	if propInfo.IsArray {
+		arraySize = int(propInfo.Count)
+	}
+
+	// Initialize a slice to hold the property values.
+	result := make([]any, arraySize)
+	for j := range arraySize {
+		var (
+			value any
+			err   error
+		)
+		if propInfo.IsStruct {
+			value, err = renderStruct(cache, eventInfo, propInfo, r, ptrSize, buf)
+		} else {
+			value, err = renderSimpleType(cache, eventInfo, propInfo, r, ptrSize, buf)
+		}
+		if err != nil {
+			// Fallback: If parsing fails, try to describe the complex/unsupported property
+			value = describeComplexProperty(propInfo)
+		}
+		result[j] = value
+	}
+
+	if len(result) == 1 {
+		return result[0], nil
+	}
+	return result, nil
+}
+
+// getLengthFromProperty retrieves the length of a property from an event record.
+func getLengthFromProperty(r *EventRecord, dataDescriptor *PropertyDataDescriptor) (uint32, error) {
+	var length uint32
+	// Call TdhGetProperty to get the length of the property specified by the dataDescriptor.
+	err := _TdhGetProperty(
+		r,
+		0,
+		nil,
+		1,
+		dataDescriptor,
+		uint32(unsafe.Sizeof(length)),
+		(*byte)(unsafe.Pointer(&length)),
+	)
+	if err != nil {
+		return 0, err
+	}
+	return length, nil
+}
+
+func renderStruct(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte) (map[string]any, error) {
+	structure := make(map[string]any)
+	for _, sm := range propInfo.StructMembers {
+		value, err := renderPropertyValue(cache, eventInfo, sm, r, ptrSize, buf)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse struct member '%s': %w", sm.Name, err)
+		}
+		structure[sm.Name] = value
+	}
+	return structure, nil
+}
+
+func renderSimpleType(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte) (string, error) {
+	var mapInfo *EventMapInfo
+	if propInfo.MapName != "" {
+		if cachedMapInfo, found := cache.propertyMapsCache[propInfo.MapName]; found {
+			mapInfo = cachedMapInfo.ParsedInfo
+		}
+		// TODO: Use the cached mapInfo to format the property value when possible.
+	}
+
+	// Get the length of the property.
+	propertyLength, err := getPropertyLength(eventInfo, propInfo, r)
+	if err != nil {
+		return "", fmt.Errorf("failed to get property length due to: %w", err)
+	}
+
+	var userDataConsumed uint16
+
+	// Set a default buffer size for formatted data.
+	formattedDataSize := uint32(DEFAULT_PROPERTY_BUFFER_SIZE)
+	formattedData := make([]byte, formattedDataSize)
+
+	// Retry loop to handle buffer size adjustments.
+retryLoop:
+	for {
+		var dataPtr *uint8
+		if len(*buf) > 0 {
+			dataPtr = &(*buf)[0]
+		}
+		err := _TdhFormatProperty(
+			eventInfo.ParsedInfo,
+			mapInfo,
+			ptrSize,
+			propInfo.InType,
+			propInfo.OutType,
+			uint16(propertyLength),
+			uint16(len(*buf)),
+			dataPtr,
+			&formattedDataSize,
+			&formattedData[0],
+			&userDataConsumed,
+		)
+
+		switch {
+		case err == nil:
+			// If formatting is successful, break out of the loop.
+			break retryLoop
+		case errors.Is(err, ERROR_INSUFFICIENT_BUFFER):
+			// Increase the buffer size if it's insufficient.
+			formattedData = make([]byte, len(formattedData)*2)
+			continue
+		case errors.Is(err, ERROR_EVT_INVALID_EVENT_DATA):
+			// Handle invalid event data error.
+			// Discarding MapInfo allows us to access
+			// at least the non-interpreted data.
+			if mapInfo != nil {
+				mapInfo = nil
+				continue
+			}
+			fallthrough
+		default:
+			// Fallback: describe the complex/unsupported property
+			return describeComplexProperty(propInfo), nil
+		}
+	}
+	// Update the data slice to account for consumed data.
+	*buf = (*buf)[userDataConsumed:]
+
+	// Convert the formatted data to string and return.
+	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(&formattedData[0]))), nil
+}
+
+func getPropertyLength(eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord) (uint32, error) {
+	// Check if the length of the property is defined by another property.
+	if propInfo.hasLengthFromOtherProperty() {
+		// Length is specified by another property - use the property index
+		var dataDescriptor PropertyDataDescriptor
+		lengthPropIndex := propInfo.getLengthPropertyIndex()
+		nameProp := eventInfo.ParsedInfo.getEventPropertyInfoAtIndex(uint32(lengthPropIndex))
+		if nameProp == nil {
+			return 0, fmt.Errorf("property length is defined by another property, but no property found at index %d", lengthPropIndex)
+		}
+		// Read the property name that contains the length information.
+		dataDescriptor.PropertyName = unsafe.Pointer(windows.StringToUTF16Ptr(getStringFromBufferOffset(eventInfo.InfoBuf, nameProp.NameOffset)))
+		dataDescriptor.ArrayIndex = 0xFFFFFFFF
+		// Retrieve the length from the specified property.
+		return getLengthFromProperty(r, &dataDescriptor)
+	}
+
+	// Check if this is a fixed length property
+	if propInfo.IsFixedLen {
+		return propInfo.getFixedLength(), nil
+	}
+
+	// Variable length property without explicit length reference
+	// For null-terminated strings, return 0 to indicate length should be determined by null terminator
+	if propInfo.isVariableLengthString() {
+		return 0, nil // 0 indicates null-terminated string
+	}
+
+	// For other variable-length types, we might need to determine length dynamically
+	// This is a fallback case that might need specific handling based on the data type
+	return 0, nil
+}
+
+func renderExtendedData(item *EventHeaderExtendedDataItem) RenderedExtendedData {
+	data := RenderedExtendedData{
+		ExtType:    extTypeToStr(item.ExtType),
+		ExtTypeRaw: item.ExtType,
+		DataSize:   item.DataSize,
+	}
+
+	handlers := map[uint16]func(*EventHeaderExtendedDataItem) any{
+		EVENT_HEADER_EXT_TYPE_RELATED_ACTIVITYID: parseGUID,
+		EVENT_HEADER_EXT_TYPE_SID:                parseSID,
+		EVENT_HEADER_EXT_TYPE_TS_ID:              parseUint32,
+		EVENT_HEADER_EXT_TYPE_INSTANCE_INFO:      parseUint64,
+		EVENT_HEADER_EXT_TYPE_STACK_TRACE32:      parseUint32Slice,
+		EVENT_HEADER_EXT_TYPE_STACK_TRACE64:      parseUint64Slice,
+		EVENT_HEADER_EXT_TYPE_PEBS_INDEX:         parseUint64,
+		EVENT_HEADER_EXT_TYPE_PMC_COUNTERS:       parseUint64Slice,
+		EVENT_HEADER_EXT_TYPE_PSM_KEY:            parseUint64,
+		EVENT_HEADER_EXT_TYPE_EVENT_KEY:          parseUint64,
+		EVENT_HEADER_EXT_TYPE_EVENT_SCHEMA_TL:    parseByteSlice,
+		EVENT_HEADER_EXT_TYPE_PROV_TRAITS:        parseByteSlice,
+		EVENT_HEADER_EXT_TYPE_PROCESS_START_KEY:  parseUint64,
+		EVENT_HEADER_EXT_TYPE_QPC_DELTA:          parseUint64,
+		EVENT_HEADER_EXT_TYPE_CONTAINER_ID:       parseGUID,
+	}
+
+	if handler, ok := handlers[item.ExtType]; ok {
+		data.Data = handler(item)
+	} else {
+		data.Data = fmt.Sprintf("Unknown ExtType: %d", item.ExtType)
+	}
+
+	return data
+}
+
+// convertFileTimeToGoTime converts a Windows FileTime to a Go time.Time structure.
+func convertFileTimeToGoTime(fileTime64 uint64) time.Time {
+	// Define the offset between Windows epoch (1601) and Unix epoch (1970)
+	const epochDifference = 116444736000000000
+	if fileTime64 < epochDifference {
+		// Time is before the Unix epoch, adjust accordingly
+		return time.Time{}
+	}
+
+	fileTime := windows.Filetime{
+		HighDateTime: uint32(fileTime64 >> 32),
+		LowDateTime:  uint32(fileTime64 & math.MaxUint32),
+	}
+
+	return time.Unix(0, fileTime.Nanoseconds()).UTC()
+}
+
+// DescribeComplexProperty provides a string description of a complex or unsupported property type.
+func describeComplexProperty(info *cachedPropertyInfo) string {
+	return fmt.Sprintf(
+		"Complex/Unsupported property: Name=%q Flags=0x%X InType=%d OutType=%d Count=%d Length=%d MapNameOffset=0x%X",
+		info.Name,
+		info.ParsedInfo.Flags,
+		info.InType,
+		info.OutType,
+		info.Count,
+		info.Length,
+		info.ParsedInfo.mapNameOffset(),
+	)
+}
