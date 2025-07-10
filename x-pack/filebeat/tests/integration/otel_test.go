@@ -130,6 +130,8 @@ http.port: %d
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+	assert.Equal(t, "filebeatreceiver", otelDoc["otel.component.name"], "expected otel.component.name field in log record")
+	assert.Equal(t, "filebeatreceiver", otelDoc["otel.component.type"], "expected otel.component.type field in log record")
 	assertMonitoring(t, 5066)
 }
 
@@ -341,7 +343,7 @@ func TestFilebeatOTelReceiverE2E(t *testing.T) {
 	}
 
 	cfg := `receivers:
-  filebeatreceiver:
+  filebeatreceiver/1:
     filebeat:
       inputs:
         - type: filestream
@@ -484,6 +486,9 @@ http.port: %d
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 	assertMonitoring(t, otelConfig.MonitoringPort)
 	assertMonitoring(t, 5067) // filebeat
+
+	assert.Equal(t, "filebeatreceiver/1", otelDoc["otel.component.name"], "expected otel.component.name field in log record")
+	assert.Equal(t, "filebeatreceiver", otelDoc["otel.component.type"], "expected otel.component.type field in log record")
 }
 
 func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
