@@ -106,5 +106,10 @@ func getHTTPResponseBodyInfo(err error) (int, string, string) {
 		return 0, "CLUSTER_NOT_READY", clusterErr.Message
 	}
 
+	var versionErr *utils.VersionMismatchError
+	if errors.As(err, &versionErr) {
+		return 0, "VERSION_MISMATCH", fmt.Sprintf("expected %s, got %s", versionErr.ExpectedVersion, versionErr.ActualVersion)
+	}
+
 	return 0, "UNKNOWN_ERROR", ""
 }
