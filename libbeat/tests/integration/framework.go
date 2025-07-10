@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//This file was contributed to by generative AI
+
 //go:build integration
 
 package integration
@@ -44,6 +46,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/go-elasticsearch/v8"
@@ -556,6 +559,64 @@ func (b *BeatProc) WaitForLogs(s string, timeout time.Duration, msgAndArgs ...an
 	require.Eventually(b.t, func() bool {
 		return b.LogContains(s)
 	}, timeout, 100*time.Millisecond, msgAndArgs...)
+}
+
+// WaitForLogsAnyOrder waits for all strings in the msgs slice to appear in the logs.
+// The strings can appear in any order. The function will return once all strings
+// have been found or the timeout has been reached.
+// If the timeout is reached before all strings are found, the test will fail with
+// the provided error message and arguments (msgAndArgs).
+func (b *BeatProc) WaitForLogsAnyOrder(msgs []string, timeout time.Duration, failMsg string) {
+	b.t.Helper()
+
+	if len(msgs) == 0 {
+		return
+	}
+
+	// Create a map to track which messages have been found
+	found := make(map[string]bool, len(msgs))
+	for _, msg := range msgs {
+		found[msg] = false
+	}
+
+	msg := &strings.Builder{}
+
+	assert.Eventually(
+		b.t,
+		func() bool {
+			// Check for each unfound message
+			allFound := true
+
+			for msgToFind := range found {
+				if !found[msgToFind] {
+					if b.GetLogLine(msgToFind) != "" {
+						found[msgToFind] = true
+					} else {
+						allFound = false
+					}
+				}
+			}
+
+			// Prepare message for potential failure
+			if !allFound {
+				msg.Reset()
+				fmt.Fprintf(msg, "%s\nwaiting for log messages: ", failMsg)
+				for msgToFind, wasFound := range found {
+					if !wasFound {
+						fmt.Fprintf(msg, "\n- %q (not found)", msgToFind)
+					} else {
+						fmt.Fprintf(msg, "\n- %q (✓)", msgToFind)
+					}
+				}
+			}
+
+			// b.t.Log(msg.String())
+			return allFound
+		},
+		timeout,
+		100*time.Millisecond,
+		msg,
+	)
 }
 
 // TempDir returns the temporary directory

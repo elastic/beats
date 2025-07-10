@@ -1,0 +1,106 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+//go:build integration
+
+package integration
+
+import (
+	_ "embed"
+	"fmt"
+	"path/filepath"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/filebeat/input/inputtest"
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
+)
+
+func TestNetInputs(t *testing.T) {
+	testCases := map[string]struct {
+		cfgFile     string
+		data        []string
+		runClientFn func(t *testing.T, addr string, data []string)
+	}{
+		"TCP": {
+			cfgFile:     "tcp.yml",
+			data:        []string{"foo", "bar"},
+			runClientFn: inputtest.RunTCPClient,
+		},
+		"UDP": {
+			cfgFile:     "udp.yml",
+			data:        []string{"foo", "bar"},
+			runClientFn: inputtest.RunUDPClient,
+		},
+	}
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			filebeat := integration.NewBeat(
+				t,
+				"filebeat",
+				"../../filebeat.test",
+			)
+
+			// DO NOT USE 'localhost', the UDP client does work when using it.
+			addr := "127.0.0.1:4242"
+			cfg := getConfig(t, map[string]any{"addr": addr}, "netInputs", tc.cfgFile)
+
+			filebeat.WriteConfigFile(cfg)
+			filebeat.Start()
+			filebeat.WaitForLogsAnyOrder(
+				[]string{
+					"[Worker 0] starting publish loop",
+					"[Worker 1] starting publish loop",
+				},
+				20*time.Second,
+				"not all workers have started",
+			)
+
+			tc.runClientFn(t, addr, tc.data)
+
+			WaitPublishedEvents(t, filebeat, 3*time.Second, len(tc.data))
+			filebeat.Stop()
+			filebeat.WaitForLogsAnyOrder(
+				[]string{
+					"[Worker 0] finished publish loop",
+					"[Worker 1] finished publish loop",
+				},
+				5*time.Second,
+				"not all workers have started",
+			)
+		})
+	}
+}
+
+// WaitPublishedEvents waits until the desired number of events
+// have been published. It assumes the file output is used, the filename
+// for the output is 'output' and 'path' is set to the TempDir.
+func WaitPublishedEvents(t *testing.T, filebeat *integration.BeatProc, timeout time.Duration, events int) {
+	t.Helper()
+
+	msg := strings.Builder{}
+	path := filepath.Join(filebeat.TempDir(), "output-*.ndjson")
+	assert.Eventually(t, func() bool {
+		got := filebeat.CountFileLines(path)
+		msg.Reset()
+		fmt.Fprintf(&msg, "expecting %d events, got %d", events, got)
+		return got == events
+	}, timeout, 200*time.Millisecond, &msg)
+}

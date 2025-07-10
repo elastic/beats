@@ -98,10 +98,10 @@ func (s *server) Test(_ input.TestContext) error {
 	return l.Close()
 }
 
-func (s *server) publishLoop(ctx input.Context, publisher stateless.Publisher, metrics *netmetrics.UDP) {
+func (s *server) publishLoop(ctx input.Context, id int, publisher stateless.Publisher, metrics *netmetrics.UDP) {
 	logger := ctx.Logger
-	logger.Debug("starting publish loop")
-	defer logger.Debug("finished publish loop")
+	logger.Debugf("[Worker %d] starting publish loop", id)
+	defer logger.Debugf("[Worker %d] finished publish loop", id)
 	for {
 		select {
 		case <-ctx.Cancelation.Done():
@@ -117,7 +117,7 @@ func (s *server) publishLoop(ctx input.Context, publisher stateless.Publisher, m
 
 func (s *server) initWorkers(ctx input.Context, pipeline beat.Pipeline, metrics *netmetrics.UDP) error {
 	clients := []beat.Client{}
-	for range s.NumPipelineWorkers {
+	for id := range s.NumPipelineWorkers {
 		client, err := pipeline.ConnectWith(beat.ClientConfig{
 			PublishMode: beat.DefaultGuarantees,
 		})
@@ -126,7 +126,7 @@ func (s *server) initWorkers(ctx input.Context, pipeline beat.Pipeline, metrics 
 		}
 
 		clients = append(clients, client)
-		go s.publishLoop(ctx, client, metrics)
+		go s.publishLoop(ctx, id, client, metrics)
 	}
 
 	// Close all clients when the input is closed

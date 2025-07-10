@@ -44,23 +44,23 @@ func RunUDPClient(t *testing.T, address string, data []string) {
 	for _, data := range data {
 		_, err = conn.Write([]byte(data + "\n"))
 		if err != nil {
-			t.Logf("Error sending data: %s, retrying in 100ms", err)
+			t.Logf("Error sending data: %s, skipping to next entry", err)
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
 }
 
 // RunTCPClient sends each string in `data` to address using a TCP connection.
-// It re-tries opening the connection until timeout is expired with 100ms delay.
+// It re-tries opening the connection for 5 seconds with 100ms delay.
 // A new line ('\n') is added at the end of each entry.
 // There is a 100ms delay between sends. Failing to send will fail the test
-func RunTCPClient(t *testing.T, timeout time.Duration, address string, data []string) {
+func RunTCPClient(t *testing.T, address string, data []string) {
 	var conn net.Conn
 	var err error
 
 	// Keep trying to connect to the server with a timeout
 	ticker := time.Tick(100 * time.Millisecond)
-	timer := time.After(timeout)
+	timer := time.After(5 * time.Second)
 FOR:
 	for {
 		select {
@@ -70,7 +70,7 @@ FOR:
 				break FOR
 			}
 		case <-timer:
-			t.Errorf("could not connect to %s after %s", address, timeout)
+			t.Errorf("could not connect to %s after 5s", address)
 			return
 		}
 	}

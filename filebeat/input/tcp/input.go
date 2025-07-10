@@ -109,14 +109,14 @@ func (s *server) Test(_ input.TestContext) error {
 	return l.Close()
 }
 
-func (s *server) publishLoop(ctx input.Context, publisher stateless.Publisher, metrics *netmetrics.TCP) {
+func (s *server) publishLoop(ctx input.Context, id int, publisher stateless.Publisher, metrics *netmetrics.TCP) {
 	logger := ctx.Logger
-	logger.Debug("starting publish loop")
-	defer logger.Debug("finished publish loop")
+	logger.Debugf("[Worker %d] starting publish loop", id)
+	defer logger.Debugf("[Worker %d] finished publish loop", id)
 	for {
 		select {
 		case <-ctx.Cancelation.Done():
-			logger.Debug("Context cancelled, closing publish Loop")
+			logger.Debugf("[Worker %d] Context cancelled, closing publish Loop", id)
 			return
 		case evt := <-s.evtChan:
 			start := time.Now()
@@ -128,16 +128,16 @@ func (s *server) publishLoop(ctx input.Context, publisher stateless.Publisher, m
 
 func (s *server) initWorkers(ctx input.Context, pipeline beat.Pipeline, metrics *netmetrics.TCP) error {
 	clients := []beat.Client{}
-	for range s.NumPipelineWorkers {
+	for id := range s.NumPipelineWorkers {
 		client, err := pipeline.ConnectWith(beat.ClientConfig{
 			PublishMode: beat.DefaultGuarantees,
 		})
 		if err != nil {
-			return fmt.Errorf("cannot connect to publishing pipeline: %w", err)
+			return fmt.Errorf("[worker %0d] cannot connect to publishing pipeline: %w", id, err)
 		}
 
 		clients = append(clients, client)
-		go s.publishLoop(ctx, client, metrics)
+		go s.publishLoop(ctx, id, client, metrics)
 	}
 
 	// Close all clients when the input is closed
