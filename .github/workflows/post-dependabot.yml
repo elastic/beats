@@ -17,6 +17,8 @@ jobs:
     permissions:
       # Allow job to write to the branch.
       contents: write
+      # Allow job to add reviewers to PRs
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -41,3 +43,26 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git commit -m "Update NOTICE.txt"
           git push
+
+      - name: Get PR number
+        id: get-pr
+        run: |
+          PR_NUMBER=$(gh pr list --head ${{ github.ref_name }} --json number --jq '.[0].number')
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if PR has Team:Obs-InfraObs label
+        id: check-label
+        run: |
+          HAS_LABEL=$(gh pr view ${{ steps.get-pr.outputs.pr_number }} --json labels --jq '.labels[] | select(.name == "Team:Obs-InfraObs") | .name')
+          echo "has_obs_infraobs_label=$(if [ -n "$HAS_LABEL" ]; then echo "true"; else echo "false"; fi)" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add obs-infraobs-integrations team as reviewers
+        if: steps.check-label.outputs.has_obs_infraobs_label == 'true'
+        run: |
+          gh pr edit ${{ steps.get-pr.outputs.pr_number }} --add-reviewer obs-infraobs-integrations
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
