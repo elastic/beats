@@ -90,6 +90,16 @@ func TestGetHTTPResponseBodyInfo(t *testing.T) {
 			expectedBody:   "Cluster not ready",
 		},
 		{
+			name: "Error is of type VersionMismatchError",
+			inputError: &utils.VersionMismatchError{
+				ExpectedVersion: "7.10.0",
+				ActualVersion:   "7.9.3",
+			},
+			expectedStatus: 0,
+			expectedCode:   "VERSION_MISMATCH",
+			expectedBody:   "expected 7.10.0, got 7.9.3",
+		},
+		{
 			name:           "Error is not of a known type",
 			inputError:     errors.New("some other error"),
 			expectedStatus: 0,
