@@ -773,7 +773,6 @@ func TestFilestreamGZIPLogRotation_2_rotations(t *testing.T) {
 		"../../filebeat.test",
 	)
 	tempDir := filebeat.TempDir()
-	t.Log("temp dir:", tempDir)
 
 	logFileBaseName := "plain.log"
 	logPathActive := filepath.Join(tempDir, logFileBaseName)
