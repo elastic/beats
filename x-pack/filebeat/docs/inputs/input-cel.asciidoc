@@ -1,7 +1,7 @@
 [role="xpack"]
 
 :type: cel
-:mito_version: v1.21.0
+:mito_version: v1.22.0
 :mito_docs: https://pkg.go.dev/github.com/elastic/mito@{mito_version}
 
 [id="{beatname_lc}-input-{type}"]
@@ -254,7 +254,7 @@ In addition to the extensions provided in the packages listed above, a global va
 
 Host environment variables are made available via the global map `env`. Only environment variables that have been allow listed via the `allowed_environment` configuration list are visible to the CEL program.
 
-The CEL environment enables the https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes[optional types] library using the version defined {mito_docs}/lib#OptionalTypesVersion[here].
+The CEL environment enables the https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes[optional types] library using the version defined {mito_docs}/lib#OptionalTypesVersion[here] and the https://pkg.go.dev/github.com/google/cel-go/ext#TwoVarComprehensions[two-variable comprehensions extensions] library using the version defined {mito_docs}/lib#TwoVarComprehensionVersion[here].
 
 Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2.
 
