@@ -70,6 +70,20 @@ type msgRef struct {
 
 var (
 	errNoTopicsSelected = errors.New("no topic could be selected")
+
+	// authErrors are authentication/authorisation errors that will cause
+	// the event to be dropped
+	authErrors = []error{
+		sarama.ErrTopicAuthorizationFailed,
+		sarama.ErrGroupAuthorizationFailed,
+		sarama.ErrClusterAuthorizationFailed,
+		// I believe those are handled before the connection is
+		// stabilised, however we also handle them here just in
+		// case
+		sarama.ErrUnsupportedSASLMechanism,
+		sarama.ErrIllegalSASLState,
+		sarama.ErrSASLAuthenticationFailed,
+	}
 )
 
 func newKafkaClient(
@@ -368,8 +382,6 @@ func (r *msgRef) fail(msg *message, err error) {
 			len(msg.key)+len(msg.value))
 		r.client.observer.PermanentErrors(1)
 
-<<<<<<< HEAD
-=======
 	// drop event if it exceeds size larger than max_message_bytes
 	case strings.Contains(err.Error(), "Attempt to produce message larger than configured Producer.MaxMessageBytes"):
 		r.client.log.Errorf("Kafka (topic=%v): dropping message as it exceeds max_mesage_bytes:", msg.topic)
@@ -379,7 +391,6 @@ func (r *msgRef) fail(msg *message, err error) {
 		r.client.log.Errorf("Kafka (topic=%v): authorisation error: %s", msg.topic, err)
 		r.client.observer.PermanentErrors(1)
 
->>>>>>> 23f4491cc ([kafka] Handle configuration errors (#45128))
 	case errors.Is(err, breaker.ErrBreakerOpen):
 		// Add this message to the failed list, but don't overwrite r.err since
 		// all the breaker error means is "there were a lot of other errors".
@@ -436,4 +447,14 @@ func (c *client) Test(d testing.Driver) {
 		})
 	}
 
+}
+
+func isAuthError(err error) bool {
+	for _, e := range authErrors {
+		if errors.Is(err, e) {
+			return true
+		}
+	}
+
+	return false
 }
