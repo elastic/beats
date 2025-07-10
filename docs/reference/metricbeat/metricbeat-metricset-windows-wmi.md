@@ -8,7 +8,7 @@ The `wmi` metricset of the Windows module reads metrics via Windows Management I
 
 By leveraging WMI Query Language (WQL), this metricset allows you to extract detailed system information and metrics to monitor the health and performance of Windows Systems.
 
-This metricset leverages the [Microsoft WMI](https://github.com/microsoft/wmi), library a convenient wrapper around the [GO-OLE](https://github.com/go-ole) library which allows to invoke the WMI Api.
+This metricset leverages the [Microsoft WMI](https://github.com/microsoft/wmi) library, a convenient wrapper around the [GO-OLE](https://github.com/go-ole) library which allows to invoke the WMI Api.
 
 ## WMI Query Language (WQL) Support
 
