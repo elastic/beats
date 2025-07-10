@@ -143,7 +143,11 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 	p.s3Metadata = s3Obj.metadata
 
 	mReader := newMonitoredReader(s3Obj.body, p.metrics.s3BytesProcessedTotal)
-	reader, err := p.addGzipDecoderIfNeeded(mReader)
+
+	// Wrap to detect S3 body streaming errors so we can retry them
+	wrappedReader := s3DownloadFailedWrappedReader{r: mReader}
+
+	streamReader, err := p.addGzipDecoderIfNeeded(wrappedReader)
 	if err != nil {
 		return fmt.Errorf("failed checking for gzip content: %w", err)
 	}
@@ -154,7 +158,7 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 	}
 
 	// try to create a dec from the using the codec config
-	dec, err := newDecoder(p.readerConfig.Decoding, reader)
+	dec, err := newDecoder(p.readerConfig.Decoding, streamReader)
 	if err != nil {
 		return err
 	}
@@ -202,9 +206,9 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 		// Process object content stream.
 		switch {
 		case strings.HasPrefix(s3Obj.contentType, contentTypeJSON) || strings.HasPrefix(s3Obj.contentType, contentTypeNDJSON):
-			err = p.readJSON(reader)
+			err = p.readJSON(streamReader)
 		default:
-			err = p.readFile(reader)
+			err = p.readFile(streamReader)
 		}
 	}
 	if err != nil {
@@ -265,12 +269,7 @@ func (p *s3ObjectProcessor) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, e
 }
 
 func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
-	var buf bytes.Buffer
-	if _, err := io.Copy(&buf, r); err != nil {
-		// If an error occurs during the download, handle it here
-		return fmt.Errorf("%w: %w", errS3DownloadFailed, err)
-	}
-	dec := json.NewDecoder(&buf)
+	dec := json.NewDecoder(r)
 	dec.UseNumber()
 
 	for dec.More() && p.ctx.Err() == nil {
@@ -585,4 +584,19 @@ func s3Metadata(resp *s3.GetObjectOutput, keys ...string) mapstr.M {
 	}
 
 	return metadata
+}
+
+// s3DownloadFailedWrappedReader implements io.Reader interface.
+// Internally, it validates Read errors for io.ErrUnexpectedEOF and wraps them with errS3DownloadFailed.
+type s3DownloadFailedWrappedReader struct {
+	r io.Reader
+}
+
+func (s3r s3DownloadFailedWrappedReader) Read(p []byte) (n int, err error) {
+	n, err = s3r.r.Read(p)
+	if errors.Is(err, io.ErrUnexpectedEOF) {
+		return n, fmt.Errorf("%w: %w", errS3DownloadFailed, err)
+	}
+
+	return n, err
 }

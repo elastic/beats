@@ -6,6 +6,7 @@ package device_health
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -77,9 +78,10 @@ func TestIsEmpty(t *testing.T) {
 }
 
 func TestGetDeviceChannelUtilization(t *testing.T) {
+	orgs := []string{"123"}
 	tests := []struct {
 		name     string
-		client   NetworkHealthService
+		client   DeviceService
 		devices  map[Serial]*Device
 		wantErr  bool
 		validate func(t *testing.T, devices map[Serial]*Device)
@@ -88,63 +90,29 @@ func TestGetDeviceChannelUtilization(t *testing.T) {
 			name:   "successful data retrieval",
 			client: &SuccessfulMockNetworkHealthService{},
 			devices: map[Serial]*Device{
-				"serial-1": {
+				"ABC123": {
 					details: &meraki.ResponseItemOrganizationsGetOrganizationDevices{
 						ProductType: "wireless",
 						NetworkID:   "network-1",
 					},
 				},
-				"serial-2": {
-					details: &meraki.ResponseItemOrganizationsGetOrganizationDevices{
-						ProductType: "wireless",
-						NetworkID:   "network-2",
-					},
-				},
 			},
 			validate: func(t *testing.T, devices map[Serial]*Device) {
-				assert.NotNil(t, devices["serial-1"].wifi0)
-				assert.Equal(t, 1.0, *devices["serial-1"].wifi0.Utilization80211)
-				assert.Equal(t, 1.1, *devices["serial-1"].wifi0.UtilizationNon80211)
-				assert.Equal(t, 1.2, *devices["serial-1"].wifi0.UtilizationTotal)
-				assert.NotNil(t, devices["serial-2"].wifi1)
-				assert.Equal(t, 2.0, *devices["serial-2"].wifi1.Utilization80211)
-				assert.Equal(t, 2.1, *devices["serial-2"].wifi1.UtilizationNon80211)
-				assert.Equal(t, 2.2, *devices["serial-2"].wifi1.UtilizationTotal)
-			},
-		},
-		{
-			name:   "multiple buckets use first entry",
-			client: &MultipleBucketsMockNetworkHealthService{},
-			devices: map[Serial]*Device{
-				"serial-3": {
-					details: &meraki.ResponseItemOrganizationsGetOrganizationDevices{
-						ProductType: "wireless",
-						NetworkID:   "network-3",
-					},
-				},
-			},
-			validate: func(t *testing.T, devices map[Serial]*Device) {
-				assert.NotNil(t, devices["serial-3"].wifi0)
-				assert.Equal(t, 3.0, *devices["serial-3"].wifi0.Utilization80211)
-				assert.Equal(t, 3.1, *devices["serial-3"].wifi0.UtilizationNon80211)
-				assert.Equal(t, 3.2, *devices["serial-3"].wifi0.UtilizationTotal)
-				assert.Nil(t, devices["serial-3"].wifi1)
-			},
-		},
-		{
-			name:   "MR 27.0 error skips network",
-			client: &MR27ErrorMockNetworkHealthService{},
-			devices: map[Serial]*Device{
-				"serial-4": {
-					details: &meraki.ResponseItemOrganizationsGetOrganizationDevices{
-						ProductType: "wireless",
-						NetworkID:   "network-4",
-					},
-				},
-			},
-			validate: func(t *testing.T, devices map[Serial]*Device) {
-				assert.Nil(t, devices["serial-4"].wifi0)
-				assert.Nil(t, devices["serial-4"].wifi1)
+				assert.NotNil(t, devices["ABC123"].bandUtilization)
+
+				band1, ok := devices["ABC123"].bandUtilization["2.4"]
+				assert.NotNil(t, band1)
+				assert.True(t, ok)
+				assert.Equal(t, 45.0, *band1.Wifi.Percentage)
+				assert.Equal(t, 10.0, *band1.NonWifi.Percentage)
+				assert.Equal(t, 55.0, *band1.Total.Percentage)
+
+				band2, ok := devices["ABC123"].bandUtilization["5"]
+				assert.NotNil(t, band2)
+				assert.True(t, ok)
+				assert.Equal(t, 10.0, *band2.Wifi.Percentage)
+				assert.Equal(t, 45.0, *band2.NonWifi.Percentage)
+				assert.Equal(t, 55.0, *band2.Total.Percentage)
 			},
 		},
 		{
@@ -167,13 +135,12 @@ func TestGetDeviceChannelUtilization(t *testing.T) {
 			devicesCopy := make(map[Serial]*Device, len(tt.devices))
 			for k, v := range tt.devices {
 				devicesCopy[k] = &Device{
-					details: v.details,
-					wifi0:   v.wifi0,
-					wifi1:   v.wifi1,
+					details:         v.details,
+					bandUtilization: v.bandUtilization,
 				}
 			}
 
-			err := getDeviceChannelUtilization(tt.client, devicesCopy, time.Second)
+			err := getDeviceChannelUtilization(tt.client, devicesCopy, time.Second, orgs)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
@@ -190,102 +157,74 @@ func TestGetDeviceChannelUtilization(t *testing.T) {
 // SuccessfulMockNetworkHealthService returns valid utilization data
 type SuccessfulMockNetworkHealthService struct{}
 
-func (m *SuccessfulMockNetworkHealthService) GetNetworkNetworkHealthChannelUtilization(networkID string, params *meraki.GetNetworkNetworkHealthChannelUtilizationQueryParams) (*meraki.ResponseNetworksGetNetworkNetworkHealthChannelUtilization, *resty.Response, error) {
-	wifi0utilization80211 := 1.0
-	wifi0utilizationNon80211 := 1.1
-	wifi0utilizationTotal := 1.2
+func (m *SuccessfulMockNetworkHealthService) GetOrganizationWirelessDevicesChannelUtilizationByDevice(organizationID string, getOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams *meraki.GetOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams) (*resty.Response, error) {
+	percentage45 := 45.0
+	percentage10 := 10.0
+	percentage55 := 55.0
 
-	wifi1utilization80211 := 2.0
-	wifi1utilizationNon80211 := 2.1
-	wifi1utilizationTotal := 2.2
-
-	return &meraki.ResponseNetworksGetNetworkNetworkHealthChannelUtilization{
-		meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilization{
-			Serial: "serial-1",
-			Wifi0: &[]meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilizationWifi0{
+	dummyData := &meraki.ResponseOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDevice{
+		meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDevice{
+			ByBand: &[]meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBand{
 				{
-					Utilization80211:    &wifi0utilization80211,
-					UtilizationNon80211: &wifi0utilizationNon80211,
-					UtilizationTotal:    &wifi0utilizationTotal,
+					Band: "2.4",
+					Wifi: &meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBandWifi{
+						Percentage: &percentage45,
+					},
+					NonWifi: &meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBandNonWifi{
+						Percentage: &percentage10,
+					},
+					Total: &meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBandTotal{
+						Percentage: &percentage55,
+					},
+				},
+				{
+					Band: "5",
+					Wifi: &meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBandWifi{
+						Percentage: &percentage10,
+					},
+					NonWifi: &meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBandNonWifi{
+						Percentage: &percentage45,
+					},
+					Total: &meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBandTotal{
+						Percentage: &percentage55,
+					},
 				},
 			},
-			Wifi1: &[]meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilizationWifi1{
-				{
-					Utilization80211:    &wifi1utilization80211,
-					UtilizationNon80211: &wifi1utilizationNon80211,
-					UtilizationTotal:    &wifi1utilizationTotal,
-				},
+			Mac: "00:11:22:33:44:55",
+			Network: &meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceNetwork{
+				ID: "network-1",
 			},
+			Serial: "ABC123",
 		},
-		meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilization{
-			Serial: "serial-2",
-			Wifi0: &[]meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilizationWifi0{
-				{
-					Utilization80211:    &wifi0utilization80211,
-					UtilizationNon80211: &wifi0utilizationNon80211,
-					UtilizationTotal:    &wifi0utilizationTotal,
-				},
-			},
-			Wifi1: &[]meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilizationWifi1{
-				{
-					Utilization80211:    &wifi1utilization80211,
-					UtilizationNon80211: &wifi1utilizationNon80211,
-					UtilizationTotal:    &wifi1utilizationTotal,
-				},
-			},
-		},
-	}, &resty.Response{}, nil
-}
-
-// MultipleBucketsMockNetworkHealthService returns multiple utilization buckets
-type MultipleBucketsMockNetworkHealthService struct{}
-
-func (m *MultipleBucketsMockNetworkHealthService) GetNetworkNetworkHealthChannelUtilization(networkID string, params *meraki.GetNetworkNetworkHealthChannelUtilizationQueryParams) (*meraki.ResponseNetworksGetNetworkNetworkHealthChannelUtilization, *resty.Response, error) {
-	wifi0util_80211 := 3.0
-	wifi0util_non80211 := 3.1
-	wifi0util_total := 3.2
-
-	return &meraki.ResponseNetworksGetNetworkNetworkHealthChannelUtilization{
-		meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilization{
-			Serial: "serial-3",
-			Wifi0: &[]meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilizationWifi0{
-				{ // First bucket will be used
-					Utilization80211:    &wifi0util_80211,
-					UtilizationNon80211: &wifi0util_non80211,
-					UtilizationTotal:    &wifi0util_total,
-				},
-				{ // Second bucket will be ignored
-					Utilization80211:    &wifi0util_80211,
-					UtilizationNon80211: &wifi0util_non80211,
-					UtilizationTotal:    &wifi0util_total,
-				},
-			},
-		},
-	}, &resty.Response{}, nil
-}
-
-// MR27ErrorMockNetworkHealthService simulates the MR 27.0 version error
-type MR27ErrorMockNetworkHealthService struct{}
-
-func (m *MR27ErrorMockNetworkHealthService) GetNetworkNetworkHealthChannelUtilization(networkID string, params *meraki.GetNetworkNetworkHealthChannelUtilizationQueryParams) (*meraki.ResponseNetworksGetNetworkNetworkHealthChannelUtilization, *resty.Response, error) {
-	r := &resty.Response{}
-	bodyContent := []byte("This endpoint is only available for networks on MR 27.0 or above.")
-	r.SetBody(bodyContent)
-	r.RawResponse = &http.Response{
-		Body: io.NopCloser(bytes.NewBuffer(bodyContent)),
 	}
-	return nil, r, fmt.Errorf("MR 27.0 error")
+
+	r := &resty.Response{}
+
+	bodyBytes, err := json.Marshal(dummyData)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal dummy data: %w", err)
+	}
+
+	r.SetBody(bodyBytes)
+	r.RawResponse = &http.Response{
+		Body: io.NopCloser(bytes.NewBuffer(bodyBytes)),
+	}
+	r.Request = &resty.Request{
+		Result: dummyData,
+	}
+
+	return r, nil
 }
 
 // GenericErrorMockNetworkHealthService simulates generic errors
 type GenericErrorMockNetworkHealthService struct{}
 
-func (m *GenericErrorMockNetworkHealthService) GetNetworkNetworkHealthChannelUtilization(networkID string, params *meraki.GetNetworkNetworkHealthChannelUtilizationQueryParams) (*meraki.ResponseNetworksGetNetworkNetworkHealthChannelUtilization, *resty.Response, error) {
+func (m *GenericErrorMockNetworkHealthService) GetOrganizationWirelessDevicesChannelUtilizationByDevice(organizationID string, getOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams *meraki.GetOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams) (*resty.Response, error) {
 	r := &resty.Response{}
 	bodyContent := []byte("Internal Server Error")
 	r.SetBody(bodyContent)
 	r.RawResponse = &http.Response{
 		Body: io.NopCloser(bytes.NewBuffer(bodyContent)),
 	}
-	return nil, r, fmt.Errorf("mock API error")
+	return r, fmt.Errorf("mock API error")
 }

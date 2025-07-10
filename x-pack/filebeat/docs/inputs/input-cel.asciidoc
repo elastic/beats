@@ -40,7 +40,7 @@ filebeat.inputs:
   interval: 1m
   resource.url: https://api.ipify.org/?format=json
   program: |
-    bytes(get(state.url).Body).as(body, {
+    get(state.url).Body.as(body, {
         "events": [body.decode_json()]
     })
 ----
@@ -77,7 +77,7 @@ filebeat.inputs:
                 "application/json",
                 {"scroll": state.scroll}.encode_json()
             )
-    ).as(resp, bytes(resp.Body).decode_json().as(body, {
+    ).as(resp, resp.Body.decode_json().as(body, {
             "events": body.hits.hits,
             "cursor": {"scroll_id": body._scroll_id},
     }))
@@ -306,6 +306,23 @@ The state must contain a `url` string and may contain any object the user wishes
 
 All objects are stored at runtime, except `cursor`, which has values that are persisted between restarts.
 
+[[cel-input-and-numbers]]
+==== CEL input and handling numbers
+
+Numeric values passed in to and out of a CEL evaluation environment are passed as floating point
+values. This can sometimes cause issues when the numbers in the input state are expected to be
+integers, and may result in unexpected field values being ingested into Elasticsearch documents when
+other parts of the ingest pipeline render floating point values with E-notation or add decimal
+points to numbers that are expected to be integers. This is most likely to happen when numbers are
+large (not within ±10^7^). Above the maximum exact integer representation threshold for double
+precision floating point values, within ±2^53^ (±9×10^15^), integer values will lose precision when
+they are returned from the CEL evaluation environment. The CEL input will automatically convert
+integers outside of the ±2^53^ range to strings in order to prevent loss of precision in these
+values, but potentially leading to a situation where some numbers received by the ingest pipeline
+are numbers and some are strings. To avoid these issues, when you have large integer values as part
+of an evaluation result, convert the field value to a string before returning it, and convert input
+numbers to integers explicitly at the start of a CEL program.
+
 ==== Configuration options
 
 The `cel` input supports the following configuration options plus the
@@ -348,7 +365,7 @@ filebeat.inputs:
   interval: 1m
   resource.url: https://api.ipify.org/?format=json
   program: |
-    bytes(get(state.url).Body).as(body, {
+    get(state.url).Body.as(body, {
         "events": [body.decode_json().with({
             "last_requested_at": has(state.cursor) && has(state.cursor.last_requested_at) ?
                 state.cursor.last_requested_at
@@ -641,6 +658,25 @@ Duration before declaring that the HTTP client connection has timed out. Valid t
 This specifies SSL/TLS configuration. If the ssl section is missing, the host's
 CAs are used for HTTPS connections. See <<configuration-ssl>> for more
 information.
+
+[float]
+==== `resource.proxy_url`
+
+This specifies proxy configuration in the form of `http[s]://<user>:<password>@<server name/ip>:<port>`. Proxy headers may be configured using the `resource.proxy_headers` field which accepts a set of key/value pairs.
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+# Fetch your public IP every minute.
+- type: cel
+  interval: 1m
+  resource.url: https://api.ipify.org/?format=text
+  resource.proxy_url: http://proxy.example:8080
+  program: |
+    {
+        "events": [{"ip": string(get(state.url).Body)}]
+    }
+----
 
 [float]
 ==== `resource.keep_alive.disable`

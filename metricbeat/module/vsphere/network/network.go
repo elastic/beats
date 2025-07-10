@@ -28,6 +28,10 @@ import (
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
 
+	vSphereClientUtil "github.com/elastic/beats/v7/metricbeat/module/vsphere/client"
+
+	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
@@ -55,6 +59,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create vSphere metricset: %w", err)
 	}
+
+	security.WarnIfInsecure(ms.Logger(), "network", ms.Insecure)
 	return &NetworkMetricSet{ms}, nil
 }
 
@@ -90,7 +96,9 @@ func (m *NetworkMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 	}
 
 	defer func() {
-		if err := client.Logout(ctx); err != nil {
+		err := vSphereClientUtil.Logout(ctx, client)
+
+		if err != nil {
 			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()

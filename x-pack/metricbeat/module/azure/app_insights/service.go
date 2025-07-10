@@ -16,7 +16,6 @@ import (
 // AppInsightsService service wrapper to the azure sdk for go
 type AppInsightsService struct {
 	metricsClient *insights.MetricsClient
-	eventClient   *insights.EventsClient
 	context       context.Context
 	log           *logp.Logger
 }

@@ -3,6 +3,179 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.17.8]]
+=== Beats version 8.17.8
+https://github.com/elastic/beats/compare/v8.17.7\...v8.17.8[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix `dns` processor to handle IPv6 server addresses properly. {pull}44526[44526]
+- Use Debian 11 to build linux/arm to match linux/amd64. Upgrades linux/arm64's statically linked glibc from 2.28 to 2.31. {issue}44816[44816]
+
+*Filebeat*
+
+- If a Filestream input fails to be created, its ID is removed from the list of running input IDs {pull}44697[44697]
+- Ensure DEPROVISIONED Okta entities are published by Okta entityanalytics provider. {issue}12658[12658] {pull}44719[44719]
+- Added missing "text/csv" content-type filter support in azureblobsortorage input. {issue}44596[44596] {pull}44824[44824]
+- Fix unexpected EOF detection and improve memory usage. {pull}44813[44813]
+- Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. {issue}44349[44349] {pull}44436[44436]
+- Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
+
+*Metricbeat*
+
+- Upgrade `go.mongodb.org/mongo-driver` version from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module. {pull}44769[44769]
+- Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.24.4. {pull}44696[44696]
+
+*Filebeat*
+
+- Filestream now logs at level warn the number of files that are too small to be ingested. {pull}44751[44751]
+
+*Metricbeat*
+
+- Add check for HTTP error codes in the Metricbeat's Prometheus query submodule. {pull}44493[44493]
+- Sanitize error messages in Fetch method of SQL module. {pull}44577[44577]
+
+
+[[release-notes-8.17.7]]
+=== Beats version 8.17.7
+https://github.com/elastic/beats/compare/v8.17.6\...v8.17.7[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix the 'add_cloud_metadata' processor to better support custom certificate bundles by improving how the AWS provider HTTP client is overridden. {pull}44189[44189]
+
+*Auditbeat*
+
+- Fix a potential error in the system/package component that could occur during internal package database schema migration. {issue}44294[44294] {pull}44296[44296]
+
+*Filebeat*
+
+- Fix a WebSocket panic scenario that occured after exhausting the maximum number of retries. {pull}44342[44342]
+
+==== Added
+
+*Metricbeat*
+
+- Add checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
+- Add `enable_batch_api` option in the Azure monitor module to allow metrics collection of multiple resources using Azure batch API. {pull}41790[41790]
+- Add support for `_nodes/stats` URIs compatible with legacy Elasticsearch versions. {pull}44307[44307]
+- Add a latency configuration option to the Azure Monitor module. {pull}44366[44366]
+
+
+[[release-notes-8.17.6]]
+=== Beats version 8.17.6
+https://github.com/elastic/beats/compare/v8.17.5\...v8.17.6[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Journald input is again usable in the Filebeat Docker container (except Wolfi) by including journalctl by default. The included version of journalctl must be compatible with the one on that wrote the journal files being ingested. The Wolfi container remains distroless and does not contain journalctl or any part of systemd. {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
+- Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
+
+==== Added
+
+*Filebeat*
+
+- Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
+
+
+[[release-notes-8.17.5]]
+=== Beats version 8.17.5
+https://github.com/elastic/beats/compare/v8.17.4\...v8.17.5[View commits]
+
+==== Breaking changes
+
+*Metricbeat*
+
+- Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected service. {issue}40765[40765] {pull}43665[43665]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Restore `maintainer` label for container images. {pull}43683[43683]
+
+*Metricbeat*
+
+- Fix the function to determine CPU cores on windows. {issue}42593[42593] {pull}43409[43409]
+- Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices. {pull}43637[43637]
+
+==== Added
+
+*Filebeat*
+
+- Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
+
+*Heartbeat*
+
+- Upgrade node version to latest LTS v18.20.7. {pull}43511[43511]
+
+*Metricbeat*
+
+- Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
+- Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
+
+*Packetbeat*
+- Add `tls.server.ja3s` tls fingerprint. {pull}43284[43284]
+
+
+[[release-notes-8.17.4]]
+=== Beats version 8.17.4
+https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
+- Allow faccessat(2) in seccomp. {pull}43322[43322]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Prevent computer details being returned for user queries by Active Directory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
+- Handle unexpectedEOF error in `aws-s3` input and enforce retrying using download failed error. {pull}42420[42420]
+- Prevent `azureblobstorage` input from logging key details during blob fetch operations. {pull}43169[43169]
+- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
+
+*Metricbeat*
+
+- Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
+- Remove `hostname` field from Zookeeper's `mntr` data stream. {pull}41887[41887]
+- Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
+
+*Winlogbeat*
+
+- Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.23.6. {pull}42705[42705]
+- Update Go version to 1.23.8. {pull}43780[43780]
+
+*Filebeat*
+
+- Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
+
+*Osquerybeat*
+
+- Increase maximum query timeout to 24 hours. {pull}42356[42356]
+
+
 [[release-notes-8.17.3]]
 === Beats version 8.17.3
 https://github.com/elastic/beats/compare/v8.17.2\...v8.17.3[View commits]
@@ -51,18 +224,6 @@ https://github.com/elastic/beats/compare/v8.17.2\...v8.17.3[View commits]
 https://github.com/elastic/beats/compare/v8.17.1\...v8.17.2[View commits]
 
 ==== Bugfixes
-
-*Affecting all Beats*
-
-- Fix incorrect cloud provider identification in `add_cloud_metadata` processor using provider priority mechanism. {pull}41636[41636]
-- Prevent panic if Libbeat processors are loaded more than once. {issue}41475[41475] {pull}41857[51857]
-- Allow network condition to handle field values that are arrays of IP addresses. {pull}41918[41918]
-- Fix a bug where log files are rotated on startup when interval is configured and rotateonstartup is disabled. {issue}41894[41894] {pull}41895[41895]
-- Fix setting unique registry for non Beat receivers. {issue}42288[42288] {pull}42292[42292]
-- The Kafka output now drops events when there is an authorization error. {issue}42343[42343] {pull}42401[42401]
-- Fix autodiscovery memory leak related to metadata of start events. {pull}41748[41748]
-- All standard queue metrics are now included in metrics monitoring, including: `added.{events, bytes}`, `consumed.{events, bytes}`, `removed.{events, bytes}`, and `filled.{events, bytes, pct}`. {pull}42439[42439]
-- The following output latency metrics are now included in metrics monitoring: `output.latency.{count, max, median, p99}`. {pull}42439[42439]
 
 *Filebeat*
 
@@ -155,9 +316,6 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.17.0[View commits]
 
 *Affecting all Beats*
 
-- Ensure Elasticsearch output can always recover from network errors. {pull}40794[40794]
-- Add `translate_ldap_attribute` processor. {pull}41472[41472]
-- Remove unnecessary debug logs during idle connection teardown. {issue}40824[40824]
 - Remove unnecessary reload for Elastic Agent managed beats when APM tracing config changes from nil to nil. {pull}41794[41794]
 
 *Auditbeat*
@@ -328,7 +486,6 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.16.2[View commits]
 
 *Affecting all Beats*
 
-- Remove unnecessary reload for Elastic Agent managed beats when apm tracing config changes from nil to nil. {pull}41794[41794]
 - Fix incorrect cloud provider identification in add_cloud_metadata processor using provider priority mechanism. {pull}41636[41636]
 
 *Auditbeat*
@@ -544,10 +701,6 @@ https://github.com/elastic/beats/compare/v8.15.3\...v8.15.4[View commits]
 
 ==== Bugfixes
 
-*Affecting all Beats*
-
-- Fix issue where old data could be saved in the memory queue after acknowledgment, increasing memory use. {pull}41356[41356]
-
 *Filebeat*
 
 - Log bad handshake details when websocket connection fails. {pull}41300[41300]
@@ -753,6 +906,7 @@ filebeat.inputs:
 - Fix statistic methods for metrics collected for SQS. {pull}40207[40207]
 - Update beat module with apm-server monitoring metrics fields. {pull}40127[40127]
 - Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics. {issue}40376[40376] {pull}40367[40367]
+- Fix behavior of `pagetypeinfo` metrics. {pull}39985[39985]
 
 ==== Added
 
@@ -821,7 +975,6 @@ https://github.com/elastic/beats/compare/v8.14.2\...v8.14.3[View commits]
 - Fix for MySQL/Performance - Query failure for MySQL versions below v8.0.1, for performance metric `quantile_95`. {pull}38710[38710]
 - Fix Prometheus helper text parser to store each metric family type. {pull}39743[39743]
 - Normalize AWS RDS CPU utilization values before making the metadata API call. {pull}39664[39664]
-- Fix behavior of `pagetypeinfo` metrics. {pull}39985[39985]
 - Fix query logic for temp and non-temp tablespaces in Oracle module. {issue}38051[38051] {pull}39787[39787]
 - Fix missing metrics from CloudWatch when include_linked_accounts set to false. {issue}40071[40071] {pull}40135[40135]
 

@@ -141,6 +141,10 @@ class Test(BaseTest):
     def test_fileset_file(self, module, fileset, test_file):
         self.init()
 
+        if module == 'threatintel' and fileset == 'misp':
+            self.skipTest(
+                "Skipping test for module='threatintel' and fileset='misp'. It needs https://github.com/elastic/elasticsearch/pull/126417 to get merged and published in the SNAPSHOT")
+
         # generate a minimal configuration
         cfgfile = os.path.join(self.working_dir, "filebeat.yml")
         self.render_config_template(

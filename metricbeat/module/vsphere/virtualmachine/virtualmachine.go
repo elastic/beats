@@ -26,6 +26,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	vSphereClientUtil "github.com/elastic/beats/v7/metricbeat/module/vsphere/client"
+	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/vmware/govmomi"
@@ -94,6 +96,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
+
+	security.WarnIfInsecure(ms.Logger(), "virtualmachine", ms.Insecure)
 	return &MetricSet{
 		MetricSet:       ms,
 		GetCustomFields: config.GetCustomFields,
@@ -113,7 +117,9 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 
 	defer func() {
-		if err := client.Logout(ctx); err != nil {
+		err := vSphereClientUtil.Logout(ctx, client)
+
+		if err != nil {
 			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
@@ -231,11 +237,11 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 func getCustomFields(customFields []types.BaseCustomFieldValue, customFieldsMap map[int32]string) mapstr.M {
 	outputFields := mapstr.M{}
 	for _, v := range customFields {
-		customFieldString := v.(*types.CustomFieldStringValue)
+		customFieldString, customFieldCastOk := v.(*types.CustomFieldStringValue)
 		key, ok := customFieldsMap[v.GetCustomFieldValue().Key]
-		if ok {
+		if customFieldCastOk && ok {
 			// If key has '.', is replaced with '_' to be compatible with ES2.x.
-			fmtKey := strings.Replace(key, ".", "_", -1)
+			fmtKey := strings.ReplaceAll(key, ".", "_")
 			outputFields.Put(fmtKey, customFieldString.Value)
 		}
 	}
@@ -265,7 +271,7 @@ func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObje
 	}
 	outputNetworkNames := make([]string, 0, len(nets))
 	for _, net := range nets {
-		name := strings.Replace(net.Name, ".", "_", -1)
+		name := strings.ReplaceAll(net.Name, ".", "_")
 		outputNetworkNames = append(outputNetworkNames, name)
 	}
 

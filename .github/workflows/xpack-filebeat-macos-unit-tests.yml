@@ -1,0 +1,73 @@
+name: xpack-filebeat-macos-unit-tests
+
+env:
+  BEAT: "x-pack/filebeat"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - filebeat/**
+      - x-pack/filebeat/**
+      - x-pack/libbeat/**
+      # OSS
+      - go.mod
+      - pytest.ini
+      - dev-tools/**
+      - libbeat/**
+      # Workflow
+      - .github/workflows/xpack-filebeat-macos-unit-tests.yml
+      - .github/actions/unit-test/action.yml
+  push:
+    branches:
+      - main
+    paths:
+      - filebeat/**
+      - x-pack/filebeat/**
+      - x-pack/libbeat/**
+      # OSS
+      - go.mod
+      - pytest.ini
+      - dev-tools/**
+      - libbeat/**
+      # Workflow
+      - .github/workflows/xpack-filebeat-macos-unit-tests.yml
+      - .github/actions/unit-test/action.yml
+
+permissions:
+  contents: read
+
+## Concurrency only allowed in the main branch.
+## So old builds running for old commits within the same Pull Request are cancelled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  unit-tests-push:
+    name: Unit tests ${{ matrix.os }}
+    if: github.event_name == 'push'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-13, macos-14]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/unit-test
+        with:
+          beat:  ${{ env.BEAT }}
+
+  unit-tests-pr:
+    name: Unit tests macOS 15
+    if: github.event_name == 'pull_request'
+    runs-on: [macos-15]
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/unit-test
+        with:
+          beat: ${{ env.BEAT }}

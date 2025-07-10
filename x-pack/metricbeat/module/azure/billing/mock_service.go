@@ -5,6 +5,7 @@
 package billing
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/stretchr/testify/mock"
@@ -37,7 +38,10 @@ func (service *MockService) GetForecast(
 	endTime time.Time,
 ) (armcostmanagement.QueryResult, error) {
 	args := service.Called(scope, startTime, endTime)
-	return args.Get(0).(armcostmanagement.QueryResult), args.Error(1)
+	if res, ok := args.Get(0).(armcostmanagement.QueryResult); ok {
+		return res, args.Error(1)
+	}
+	return armcostmanagement.QueryResult{}, fmt.Errorf("error casting to armcostmanagement.QueryResult")
 }
 
 // GetUsageDetails is a mock function for the billing service
@@ -50,5 +54,8 @@ func (service *MockService) GetUsageDetails(
 	endDate string,
 ) (armconsumption.UsageDetailsListResult, error) {
 	args := service.Called(scope, expand, filter, metricType, startDate, endDate)
-	return args.Get(0).(armconsumption.UsageDetailsListResult), args.Error(1)
+	if res, ok := args.Get(0).(armconsumption.UsageDetailsListResult); ok {
+		return res, args.Error(1)
+	}
+	return armconsumption.UsageDetailsListResult{}, fmt.Errorf("error casting to armconsumption.UsageDetailsListResult")
 }

@@ -43,9 +43,9 @@ type Index struct {
 
 	Index          string     `json:"index"`
 	Status         string     `json:"status"`
-	TierPreference string     `json:"tier_preference"`
-	CreationDate   string     `json:"creation_date"`
-	Version        string     `json:"version"`
+	TierPreference string     `json:"tier_preference,omitempty"`
+	CreationDate   string     `json:"creation_date,omitempty"`
+	Version        string     `json:"version,omitempty"`
 	Shards         shardStats `json:"shards"`
 }
 

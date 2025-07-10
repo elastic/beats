@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
 	awscfg "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials/ec2rolecreds"
 	"github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
@@ -94,8 +95,19 @@ func fetchRawProviderMetadata(
 ) {
 	logger := logp.NewLogger("add_cloud_metadata")
 
+	// generate AWS specific client with overriding requirements
+	var awsHTTPClient awshttp.BuildableClient
+	awsHTTPClient = *awsHTTPClient.WithTimeout(client.Timeout).WithTransportOptions(func(tr *http.Transport) {
+		transport, ok := client.Transport.(*http.Transport)
+		if ok {
+			tr.TLSClientConfig = transport.TLSClientConfig
+		}
+
+		tr.DisableKeepAlives = true
+	})
+
 	// LoadDefaultConfig loads the EC2 role credentials
-	awsConfig, err := awscfg.LoadDefaultConfig(context.TODO(), awscfg.WithHTTPClient(&client))
+	awsConfig, err := awscfg.LoadDefaultConfig(context.TODO(), awscfg.WithHTTPClient(&awsHTTPClient))
 	if err != nil {
 		result.err = fmt.Errorf("failed loading AWS default configuration: %w", err)
 		return
@@ -108,16 +120,16 @@ func fetchRawProviderMetadata(
 		return
 	}
 
-	awsRegion := instanceIdentity.InstanceIdentityDocument.Region
-	accountID := instanceIdentity.InstanceIdentityDocument.AccountID
-	instanceID := instanceIdentity.InstanceIdentityDocument.InstanceID
+	awsRegion := instanceIdentity.Region
+	accountID := instanceIdentity.AccountID
+	instanceID := instanceIdentity.InstanceID
 
-	_, _ = result.metadata.Put("cloud.instance.id", instanceIdentity.InstanceIdentityDocument.InstanceID)
-	_, _ = result.metadata.Put("cloud.machine.type", instanceIdentity.InstanceIdentityDocument.InstanceType)
+	_, _ = result.metadata.Put("cloud.instance.id", instanceIdentity.InstanceID)
+	_, _ = result.metadata.Put("cloud.machine.type", instanceIdentity.InstanceType)
 	_, _ = result.metadata.Put("cloud.region", awsRegion)
-	_, _ = result.metadata.Put("cloud.availability_zone", instanceIdentity.InstanceIdentityDocument.AvailabilityZone)
+	_, _ = result.metadata.Put("cloud.availability_zone", instanceIdentity.AvailabilityZone)
 	_, _ = result.metadata.Put("cloud.account.id", accountID)
-	_, _ = result.metadata.Put("cloud.image.id", instanceIdentity.InstanceIdentityDocument.ImageID)
+	_, _ = result.metadata.Put("cloud.image.id", instanceIdentity.ImageID)
 
 	// AWS Region must be set to be able to get EC2 Tags
 	awsConfig.Region = awsRegion

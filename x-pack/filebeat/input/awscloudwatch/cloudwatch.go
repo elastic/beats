@@ -102,6 +102,7 @@ func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc *cloudwatchlogs.Client
 }
 
 func (p *cloudwatchPoller) constructFilterLogEventsInput(startTime, endTime time.Time, logGroupId string) *cloudwatchlogs.FilterLogEventsInput {
+	p.log.Debugf("FilterLogEventsInput for log group: '%s' with startTime = '%v' and endTime = '%v'", logGroupId, unixMsFromTime(startTime), unixMsFromTime(endTime))
 	filterLogEventsInput := &cloudwatchlogs.FilterLogEventsInput{
 		LogGroupIdentifier: awssdk.String(logGroupId),
 		StartTime:          awssdk.Int64(unixMsFromTime(startTime)),

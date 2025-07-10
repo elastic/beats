@@ -42,29 +42,39 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	var baseClient *azure.BaseClient
+	if ms.BatchClient != nil {
+		baseClient = ms.BatchClient.BaseClient
+	} else {
+		baseClient = ms.Client.BaseClient
+	}
+
 	// set default resource type to indicate this is not the generic monitor metricset
-	ms.Client.Config.DefaultResourceType = defaultStorageAccountNamespace
+	baseClient.Config.DefaultResourceType = defaultStorageAccountNamespace
 	// if no options are entered we will retrieve all the vm's from the entire subscription
-	if len(ms.Client.Config.Resources) == 0 {
-		ms.Client.Config.Resources = []azure.ResourceConfig{
+	if len(baseClient.Config.Resources) == 0 {
+		baseClient.Config.Resources = []azure.ResourceConfig{
 			{
 				Query: fmt.Sprintf("resourceType eq '%s'", defaultStorageAccountNamespace),
 			},
 		}
 	}
-	for index := range ms.Client.Config.Resources {
+	for index := range baseClient.Config.Resources {
 		// if any resource groups were configured the resource type should be added
-		if len(ms.Client.Config.Resources[index].Group) > 0 {
-			ms.Client.Config.Resources[index].Type = defaultStorageAccountNamespace
+		if len(baseClient.Config.Resources[index].Group) > 0 {
+			baseClient.Config.Resources[index].Type = defaultStorageAccountNamespace
 		}
 		// one metric configuration will be added containing all metrics names
-		ms.Client.Config.Resources[index].Metrics = []azure.MetricConfig{
+		baseClient.Config.Resources[index].Metrics = []azure.MetricConfig{
 			{
 				Name: []string{"*"},
 			},
 		}
 	}
+
 	ms.MapMetrics = mapMetrics
+	ms.ConcMapMetrics = concurrentMapMetrics
 	return &MetricSet{
 		MetricSet: ms,
 	}, nil

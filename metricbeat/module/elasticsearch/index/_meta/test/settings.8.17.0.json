@@ -1136,7 +1136,6 @@
         },
         "provided_name" : ".ds-metrics-elastic_agent.elastic_agent-default-2025.01.25-000001",
         "final_pipeline" : ".fleet_final_pipeline-1",
-        "creation_date" : "1737763568506",
         "number_of_replicas" : "1",
         "routing_path" : [
           "agent.id",
@@ -1144,20 +1143,10 @@
           "metricset.name"
         ],
         "uuid" : "v8Oz8cazQg6RC8s8JCMgxA",
-        "version" : {
-          "created" : "8521000"
-        },
         "lifecycle" : {
           "name" : "metrics"
         },
         "mode" : "time_series",
-        "routing" : {
-          "allocation" : {
-            "include" : {
-              "_tier_preference" : "data_hot"
-            }
-          }
-        },
         "number_of_shards" : "1",
         "default_pipeline" : "metrics-elastic_agent.elastic_agent-2.0.3"
       }
