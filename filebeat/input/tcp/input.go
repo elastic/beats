@@ -18,17 +18,14 @@
 package tcp
 
 import (
-	"fmt"
 	"net"
-	"runtime/debug"
 	"time"
 
 	"github.com/dustin/go-humanize"
 
 	"github.com/elastic/beats/v7/filebeat/input/netmetrics"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
+	concurrent "github.com/elastic/beats/v7/filebeat/input/v2/input-concurrent"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
@@ -38,6 +35,7 @@ import (
 	"github.com/elastic/go-concert/ctxtool"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -47,11 +45,11 @@ func Plugin() input.Plugin {
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "tcp packet server",
-		Manager:    v2.ConfigureWith(configure),
+		Manager:    concurrent.New(configure),
 	}
 }
 
-func configure(cfg *conf.C) (v2.Input, error) {
+func configure(cfg *conf.C) (concurrent.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -66,36 +64,27 @@ func defaultConfig() config {
 			Timeout:        time.Minute * 5,
 			MaxMessageSize: 20 * humanize.MiByte,
 		},
-		LineDelimiter:      "\n",
-		NumPipelineWorkers: 1,
+		LineDelimiter: "\n",
 	}
 }
 
 type server struct {
 	tcp.Server
 	config
-	evtChan chan evtWithSize
+	metrics *netmetrics.TCP
 }
 
 type config struct {
 	tcp.Config `config:",inline"`
 
-	LineDelimiter      string                `config:"line_delimiter" validate:"nonzero"`
-	Framing            streaming.FramingType `config:"framing"`
-	NumPipelineWorkers int                   `config:"number_of_workers" validate:"positive,nonzero"`
-}
-
-type evtWithSize struct {
-	Event beat.Event
-	size  int
+	LineDelimiter string                `config:"line_delimiter" validate:"nonzero"`
+	Framing       streaming.FramingType `config:"framing"`
 }
 
 func newServer(config config) (*server, error) {
 	s := server{
-		config:  config,
-		evtChan: make(chan evtWithSize),
+		config: config,
 	}
-
 	return &s, nil
 }
 
@@ -109,78 +98,15 @@ func (s *server) Test(_ input.TestContext) error {
 	return l.Close()
 }
 
-func (s *server) publishLoop(ctx input.Context, id int, publisher stateless.Publisher, metrics *netmetrics.TCP) {
-	logger := ctx.Logger
-	logger.Debugf("[Worker %d] starting publish loop", id)
-	defer logger.Debugf("[Worker %d] finished publish loop", id)
-	for {
-		select {
-		case <-ctx.Cancelation.Done():
-			logger.Debugf("[Worker %d] Context cancelled, closing publish Loop", id)
-			return
-		case evt := <-s.evtChan:
-			start := time.Now()
-			publisher.Publish(evt.Event)
-			metrics.EventPublished(start)
-		}
-	}
+func (s *server) InitMetrics(id string, logger *logp.Logger) concurrent.Metrics {
+	s.metrics = netmetrics.NewTCP("tcp", id, s.Host, time.Minute, logger)
+	return s.metrics
 }
 
-func (s *server) initWorkers(ctx input.Context, pipeline beat.Pipeline, metrics *netmetrics.TCP) error {
-	clients := []beat.Client{}
-	for id := range s.NumPipelineWorkers {
-		client, err := pipeline.ConnectWith(beat.ClientConfig{
-			PublishMode: beat.DefaultGuarantees,
-		})
-		if err != nil {
-			return fmt.Errorf("[worker %0d] cannot connect to publishing pipeline: %w", id, err)
-		}
+func (s *server) Run(ctx input.Context, evtChan chan<- beat.Event, m concurrent.Metrics) (err error) {
+	defer s.metrics.Close()
 
-		clients = append(clients, client)
-		go s.publishLoop(ctx, id, client, metrics)
-	}
-
-	// Close all clients when the input is closed
-	go func() {
-		select {
-		case <-ctx.Cancelation.Done():
-		}
-		for _, c := range clients {
-			c.Close()
-		}
-	}()
-
-	return nil
-}
-
-func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err error) {
-	log := ctx.Logger.With("host", s.Host)
-	ctx.Logger = log
-
-	defer func() {
-		if v := recover(); v != nil {
-			if e, ok := v.(error); ok {
-				err = e
-			} else {
-				err = fmt.Errorf("TCP input panic with: %+v\n%s", v, debug.Stack())
-			}
-			log.Errorw("TCP input panic", err)
-		}
-	}()
-
-	log.Info("starting tcp socket input")
-	defer log.Info("tcp input stopped")
-
-	ctx.UpdateStatus(status.Starting, "")
-	ctx.UpdateStatus(status.Configuring, "")
-
-	const pollInterval = time.Minute
-	metrics := netmetrics.NewTCP("tcp", ctx.ID, s.Host, pollInterval, log)
-	defer metrics.Close()
-
-	s.initWorkers(ctx, pipeline, metrics)
-
-	err = s.initAndRunServer(ctx, metrics)
+	err = s.initAndRunServer(ctx, s.metrics, evtChan)
 	if err != nil {
 		ctx.UpdateStatus(status.Failed, "Input exited unexpectedly: "+err.Error())
 	} else {
@@ -192,7 +118,7 @@ func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err er
 
 // initAndRunServer initialises and runs the TCP server.
 // It updates the input status to Running.
-func (s *server) initAndRunServer(ctx input.Context, metrics *netmetrics.TCP) error {
+func (s *server) initAndRunServer(ctx input.Context, metrics *netmetrics.TCP, evtChan chan<- beat.Event) error {
 	logger := ctx.Logger
 
 	split, err := streaming.SplitFunc(s.Framing, []byte(s.LineDelimiter))
@@ -229,14 +155,14 @@ func (s *server) initAndRunServer(ctx input.Context, metrics *netmetrics.TCP) er
 					}
 				}
 
-				s.evtChan <- evtWithSize{evt, len(data)}
+				evtChan <- evt
 			},
 			split,
 		),
 		logger,
 	)
 	if err != nil {
-		ctx.UpdateStatus(status.Failed, "Failed to configure input: "+err.Error())
+		ctx.UpdateStatus(status.Failed, "Failed to start TCP server: "+err.Error())
 		return err
 	}
 
