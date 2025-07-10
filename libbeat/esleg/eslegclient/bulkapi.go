@@ -82,7 +82,7 @@ func (conn *Connection) Bulk(
 		return 0, nil, err
 	}
 
-	mergedParams := mergeParams(conn.ConnectionSettings.Parameters, params)
+	mergedParams := mergeParams(conn.Parameters, params)
 
 	requ, err := newBulkRequest(conn.URL, index, docType, mergedParams, enc)
 	if err != nil {

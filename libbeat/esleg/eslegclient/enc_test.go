@@ -109,8 +109,10 @@ func TestEncoderHeaders(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Run("before reset", func(t *testing.T) {
-				tc.encoder.AddRaw(metadata)
-				tc.encoder.AddRaw(RawEncoding{eventRaw})
+				err := tc.encoder.AddRaw(metadata)
+				require.NoError(t, err)
+				err = tc.encoder.AddRaw(RawEncoding{eventRaw})
+				require.NoError(t, err)
 
 				actualHeader := make(http.Header)
 				tc.encoder.AddHeader(&actualHeader)
@@ -136,8 +138,10 @@ func TestEncoderHeaders(t *testing.T) {
 			})
 
 			t.Run("after re-write", func(t *testing.T) {
-				tc.encoder.AddRaw(metadata)
-				tc.encoder.AddRaw(RawEncoding{eventRaw})
+				err := tc.encoder.AddRaw(metadata)
+				require.NoError(t, err)
+				err = tc.encoder.AddRaw(RawEncoding{eventRaw})
+				require.NoError(t, err)
 
 				errFormat := "wrong %q header after re-write"
 				actualHeader := make(http.Header)
