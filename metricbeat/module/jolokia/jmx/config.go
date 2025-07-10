@@ -25,6 +25,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

@@ -136,21 +136,11 @@ func eventMapping(entries []Entry, mapping AttributeMapping, logger *logp.Logger
 					errs = append(errs, err)
 				}
 			case map[string]interface{}:
-<<<<<<< HEAD
-				constructEvents(entryValues, v, mbeanEvents, mapping, errs)
+				constructEvents(entryValues, v, mbeanEvents, mapping, errs, logger)
 			}
 		case []interface{}:
 			entryValues := v.Value.(map[string]interface{})
-			constructEvents(entryValues, v, mbeanEvents, mapping, errs)
-=======
-				errs = constructEvents(entryValues, v, mbeanEvents, mapping, errs, logger)
-			}
-		case []interface{}:
-			entryValues, ok := v.Value.(map[string]interface{})
-			if ok {
-				errs = constructEvents(entryValues, v, mbeanEvents, mapping, errs, logger)
-			}
->>>>>>> 4350d4ee2 ([Chore] Replace global logger with local logger #10 (#45086))
+			constructEvents(entryValues, v, mbeanEvents, mapping, errs, logger)
 		}
 	}
 
@@ -162,11 +152,7 @@ func eventMapping(entries []Entry, mapping AttributeMapping, logger *logp.Logger
 	return events, errs.Err()
 }
 
-<<<<<<< HEAD
-func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents map[eventKey]mapstr.M, mapping AttributeMapping, errs multierror.Errors) {
-=======
-func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents map[eventKey]mapstr.M, mapping AttributeMapping, errs []error, logger *logp.Logger) []error {
->>>>>>> 4350d4ee2 ([Chore] Replace global logger with local logger #10 (#45086))
+func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents map[eventKey]mapstr.M, mapping AttributeMapping, errs multierror.Errors, logger *logp.Logger) {
 	hasWildcard := strings.Contains(v.Request.Mbean, "*")
 	for attribute, value := range entryValues {
 		if !hasWildcard {
