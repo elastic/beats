@@ -25,7 +25,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
 
 	// Register postgresql database/sql driver
 	_ "github.com/lib/pq"
@@ -90,7 +89,7 @@ func (ms *MetricSet) QueryStats(ctx context.Context, query string) ([]map[string
 			result[col] = string(vals[i])
 		}
 
-		logp.Debug("postgresql", "Result: %v", result)
+		ms.Logger().Named("postgresql").Debugf("Result: %v", result)
 		results = append(results, result)
 	}
 	return results, nil
