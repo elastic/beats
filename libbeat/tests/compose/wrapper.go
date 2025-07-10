@@ -25,6 +25,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"net"
 	"os"
 	"os/exec"
@@ -118,7 +119,7 @@ func (c *wrapperContainer) privateHost(port int) string {
 		return ""
 	}
 
-        if port >= 0 && port <= math.MaxUint16 {
+	if port >= 0 && port <= math.MaxUint16 {
 		shortPort = uint16(port)
 	} else {
 		return ""
@@ -136,7 +137,7 @@ func (c *wrapperContainer) privateHost(port int) string {
 func (c *wrapperContainer) exposedHost(port int) string {
 	var shortPort uint16
 
-        if port >= 0 && port <= math.MaxUint16 {
+	if port >= 0 && port <= math.MaxUint16 {
 		shortPort = uint16(port)
 	} else {
 		return ""

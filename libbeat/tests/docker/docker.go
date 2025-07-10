@@ -69,7 +69,7 @@ func (c Client) ContainerStart(image string, cmd []string, labels map[string]str
 // imagePull pulls an image
 func (c Client) imagePull(img string) (err error) {
 	ctx := context.Background()
-	_, _, err = c.cli.ImageInspect(ctx, img)
+	_, err = c.cli.ImageInspect(ctx, img)
 	if err == nil {
 		// Image already available, do nothing
 		return nil

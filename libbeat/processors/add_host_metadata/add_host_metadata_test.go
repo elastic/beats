@@ -291,7 +291,7 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 			v, err := newEvent.GetValue("host")
 			assert.NoError(t, err)
 			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1) //nolint:errcheck // already checked
-			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1) //nolint:errcheck // already checked
+			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)  //nolint:errcheck // already checked
 			if c.expectedHostFieldLength != -1 {
 				assert.Equal(t, c.expectedHostFieldLength, len(v.(mapstr.M))) //nolint:errcheck // already checked
 			}

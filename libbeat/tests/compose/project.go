@@ -303,7 +303,7 @@ func stalledLock(path string) bool {
 	defer file.Close()
 
 	var pid int
-	_,err := fmt.Fscanf(file, "%d", &pid)
+	_, err = fmt.Fscanf(file, "%d", &pid)
 	if err != nil {
 		return false
 	}
