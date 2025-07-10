@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package fbprovider
+package mbprovider
 
 import (
 	"context"
@@ -25,29 +25,31 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otelbeat/providers"
 )
 
-const schemeName = "fb"
+const schemeName = "mb"
 
-type fbProvider struct{}
+type mbProvider struct{}
 
-// NewFactory returns a provider factory that loads filebeat configuration
+// NewFactory returns a provider factory that loads metricbeat configuration
 func NewFactory() confmap.ProviderFactory {
 	return confmap.NewProviderFactory(newProvider)
 }
 
 func newProvider(confmap.ProviderSettings) confmap.Provider {
-	return &fbProvider{}
+	return &mbProvider{}
 }
 
 // Retrieve retrieves the beat configuration file and constructs otel config
 // uri here is the filepath of the beat config
-func (*fbProvider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFunc) (*confmap.Retrieved, error) {
+func (*mbProvider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFunc) (*confmap.Retrieved, error) {
 	return providers.LoadConfig(uri, schemeName)
 }
 
-func (*fbProvider) Scheme() string {
+// Scheme returns the scheme name
+func (*mbProvider) Scheme() string {
 	return schemeName
 }
 
-func (*fbProvider) Shutdown(context.Context) error {
+// Shutdown is a noop, it always returns nil
+func (*mbProvider) Shutdown(context.Context) error {
 	return nil
 }
