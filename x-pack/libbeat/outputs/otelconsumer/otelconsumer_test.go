@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -240,6 +241,7 @@ func TestPublish(t *testing.T) {
 				return nil
 			})
 			otelConsumer.beatInfo.ComponentName = wantCompName
+			otelConsumer.beatInfo.ComponentType = strings.Split(wantCompName, "/")[0]
 
 			err := otelConsumer.Publish(ctx, batch)
 			assert.NoError(t, err)
@@ -251,8 +253,10 @@ func TestPublish(t *testing.T) {
 				beatEvent := event.Content.Fields
 				if wantCompName == "" {
 					assert.NotContains(t, event.Content.Fields, otelComponentNameKey, otelComponentNameKey+" should not be set")
+					assert.NotContains(t, event.Content.Fields, otelComponentTypeKey, otelComponentTypeKey+" should not be set")
 				} else {
 					assert.Equal(t, otelConsumer.beatInfo.ComponentName, beatEvent[otelComponentNameKey], otelComponentNameKey+" should be set")
+					assert.Equal(t, otelConsumer.beatInfo.ComponentType, beatEvent[otelComponentTypeKey], otelComponentTypeKey+" should be set")
 				}
 			}
 		}

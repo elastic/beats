@@ -30,6 +30,8 @@ const (
 	esDocumentIDAttribute = "elasticsearch.document_id"
 	// otelComponentNameKey is the key used to store the Beat receiver's component name in the beat event.
 	otelComponentNameKey = "otel.component.name"
+	// otelComponentTypeKey is the key used to store the Beat receiver's component type in the beat event.
+	otelComponentTypeKey = "otel.component.type"
 )
 
 func init() {
@@ -132,6 +134,9 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 		if out.beatInfo.ComponentName != "" {
 			beatEvent[otelComponentNameKey] = out.beatInfo.ComponentName
+		}
+		if out.beatInfo.ComponentType != "" {
+			beatEvent[otelComponentTypeKey] = out.beatInfo.ComponentType
 		}
 
 		otelmap.ConvertNonPrimitive(beatEvent)

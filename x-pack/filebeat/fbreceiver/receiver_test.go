@@ -89,6 +89,7 @@ func TestNewReceiver(t *testing.T) {
 			_ = zapLogs
 			require.Lenf(c, logs["r1"], 1, "expected 1 log, got %d", len(logs["r1"]))
 			assert.Equal(c, "filebeatreceiver/r1", logs["r1"][0].Flatten()["otel.component.name"], "expected otel.component.name field in log record")
+			assert.Equal(c, "filebeatreceiver", logs["r1"][0].Flatten()["otel.component.type"], "expected otel.component.type field in log record")
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket, "stats")
@@ -230,7 +231,9 @@ func TestMultipleReceivers(t *testing.T) {
 			require.Greater(c, len(logs["r2"]), 0, "receiver r2 does not have any logs")
 
 			assert.Equal(c, "filebeatreceiver/r1", logs["r1"][0].Flatten()["otel.component.name"], "expected otel.component.name field in r1 log record")
+			assert.Equal(c, "filebeatreceiver", logs["r1"][0].Flatten()["otel.component.type"], "expected otel.component.type field in r1 log record")
 			assert.Equal(c, "filebeatreceiver/r2", logs["r2"][0].Flatten()["otel.component.name"], "expected otel.component.name field in r2 log record")
+			assert.Equal(c, "filebeatreceiver", logs["r2"][0].Flatten()["otel.component.type"], "expected otel.component.type field in r2 log record")
 
 			// Make sure that each receiver has a separate logger
 			// instance and does not interfere with others. Previously, the

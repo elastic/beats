@@ -44,6 +44,7 @@ type Info struct {
 
 	LogConsumer          consumer.Logs // otel log consumer
 	ComponentName        string        // otel component name
+	ComponentType        string        // otel component type
 	UseDefaultProcessors bool          // Whether to use the default processors
 	Logger               *logp.Logger
 }
