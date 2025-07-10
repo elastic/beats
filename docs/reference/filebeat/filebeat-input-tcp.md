@@ -43,7 +43,7 @@ The host and TCP port to listen on for event streams.
 stack: ga 9.2.0
 ```
 
-The number of pipeline workers to create for each host. Default: 1
+The number of pipeline workers. Default: 1
 
 
 ### `network` [filebeat-input-tcp-tcp-network]
@@ -88,6 +88,7 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `received_events_total` | Total number of packets (events) that have been received. |
 | `received_bytes_total` | Total number of bytes received. |
 | `receive_queue_length` | Aggregated size of the system receive queues (IPv4 and IPv6) (linux only) (gauge). |
+| `published_events_total`  {applies_to}`stack: ga 9.2.0`| Total number of packets (events) published. | 
 | `arrival_period` | Histogram of the time between successive packets in nanoseconds. |
 | `processing_time` | Histogram of the time taken to process packets in nanoseconds. |
 
