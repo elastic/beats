@@ -45,7 +45,7 @@ func TestInput(t *testing.T) {
 
 	pipeline := testpipeline.NewPipelineConnector()
 
-	go inputtest.RunTCPClient(t, 2*time.Second, serverAddr, []string{"foo", "bar"})
+	go inputtest.RunTCPClient(t, serverAddr, []string{"foo", "bar"})
 
 	ctx, cancel := context.WithCancel(t.Context())
 	v2Ctx := v2.Context{
@@ -88,7 +88,7 @@ func TestInputCanReadWithoutPublishing(t *testing.T) {
 	pipeline := testpipeline.NewPipelineConnector()
 	pipeline.Block()
 
-	go inputtest.RunTCPClient(t, 2*time.Second, serverAddr, []string{"foo", "bar"})
+	go inputtest.RunTCPClient(t, serverAddr, []string{"foo", "bar"})
 
 	ctx, cancel := context.WithCancel(t.Context())
 	v2Ctx := v2.Context{
