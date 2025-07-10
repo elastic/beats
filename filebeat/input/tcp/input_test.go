@@ -22,7 +22,6 @@ package tcp
 import (
 	"context"
 	"errors"
-	"net"
 	"sync"
 	"testing"
 	"time"
@@ -46,7 +45,7 @@ func TestInput(t *testing.T) {
 
 	pipeline := testpipeline.NewPipelineConnector()
 
-	startTCPClient(t, 2*time.Second, serverAddr, []string{"foo", "bar"})
+	go inputtest.RunTCPClient(t, 2*time.Second, serverAddr, []string{"foo", "bar"})
 
 	ctx, cancel := context.WithCancel(t.Context())
 	v2Ctx := v2.Context{
@@ -88,7 +87,8 @@ func TestInputCanReadWithoutPublishing(t *testing.T) {
 
 	pipeline := testpipeline.NewPipelineConnector()
 	pipeline.Block()
-	startTCPClient(t, 2*time.Second, serverAddr, []string{"foo", "bar"})
+
+	go inputtest.RunTCPClient(t, 2*time.Second, serverAddr, []string{"foo", "bar"})
 
 	ctx, cancel := context.WithCancel(t.Context())
 	v2Ctx := v2.Context{
@@ -117,40 +117,4 @@ func TestInputCanReadWithoutPublishing(t *testing.T) {
 	if got, want := pipeline.NumClients(), numberOfWorkers; got != want {
 		t.Fatalf("did not create the expected number of clients, expecting %d, got %d", want, got)
 	}
-}
-
-func startTCPClient(t *testing.T, timeout time.Duration, address string, dataToSend []string) {
-	go func() {
-		var conn net.Conn
-		var err error
-
-		// Keep trying to connect to the server with a timeout
-		ticker := time.Tick(100 * time.Millisecond)
-		timer := time.After(timeout)
-	FOR:
-		for {
-			select {
-			case <-ticker:
-				conn, err = net.Dial("tcp", address)
-				if err == nil {
-					break FOR
-				}
-			case <-timer:
-				t.Errorf("could not connect to %s after %s", address, timeout)
-				return
-			}
-		}
-
-		defer conn.Close()
-
-		// Send data to the server
-		for _, data := range dataToSend {
-			_, err := conn.Write([]byte(data + "\n"))
-			if err != nil {
-				t.Errorf("Failed to send data: %s", err)
-				return
-			}
-			time.Sleep(100 * time.Millisecond) // Simulate delay between messages
-		}
-	}()
 }

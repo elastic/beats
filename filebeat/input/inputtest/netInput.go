@@ -20,6 +20,7 @@ package inputtest
 import (
 	"encoding/json"
 	"fmt"
+	"net"
 	"strings"
 	"testing"
 	"time"
@@ -28,6 +29,64 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 )
+
+// RunUDPClient sends each string in `data` to address using a UDP connection.
+// A new line ('\n') is added at the end of each entry.
+// There is a 100ms delay between sends, errors are logged, but not retried.
+func RunUDPClient(t *testing.T, address string, data []string) {
+	conn, err := net.Dial("udp", address)
+	if err != nil {
+		t.Errorf("cannot create connection: %s", err)
+	}
+	defer conn.Close()
+
+	// Send data to the server
+	for _, data := range data {
+		_, err = conn.Write([]byte(data + "\n"))
+		if err != nil {
+			t.Logf("Error sending data: %s, retrying in 100ms", err)
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+}
+
+// RunTCPClient sends each string in `data` to address using a TCP connection.
+// It re-tries opening the connection until timeout is expired with 100ms delay.
+// A new line ('\n') is added at the end of each entry.
+// There is a 100ms delay between sends. Failing to send will fail the test
+func RunTCPClient(t *testing.T, timeout time.Duration, address string, data []string) {
+	var conn net.Conn
+	var err error
+
+	// Keep trying to connect to the server with a timeout
+	ticker := time.Tick(100 * time.Millisecond)
+	timer := time.After(timeout)
+FOR:
+	for {
+		select {
+		case <-ticker:
+			conn, err = net.Dial("tcp", address)
+			if err == nil {
+				break FOR
+			}
+		case <-timer:
+			t.Errorf("could not connect to %s after %s", address, timeout)
+			return
+		}
+	}
+
+	defer conn.Close()
+
+	// Send data to the server
+	for _, data := range data {
+		_, err := conn.Write([]byte(data + "\n"))
+		if err != nil {
+			t.Errorf("Failed to send data: %s", err)
+			return
+		}
+		time.Sleep(100 * time.Millisecond) // Simulate delay between messages
+	}
+}
 
 func GetNetInputMetrics(t *testing.T) NetInputMetrics {
 	data, err := inputmon.MetricSnapshotJSON(nil)

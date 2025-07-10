@@ -22,7 +22,6 @@ package udp
 import (
 	"context"
 	"errors"
-	"net"
 	"sync"
 	"testing"
 	"time"
@@ -98,7 +97,7 @@ func TestInput(t *testing.T) {
 			// the client side if the server is up and running.
 			time.Sleep(500 * time.Millisecond)
 
-			runUDPClient(t, serverAddr, []string{"foo", "bar"})
+			inputtest.RunUDPClient(t, serverAddr, []string{"foo", "bar"})
 			inputtest.RequireNetMetricsCount(
 				t,
 				3*time.Second,
@@ -113,22 +112,5 @@ func TestInput(t *testing.T) {
 			// Ensure the input Run method returns
 			wg.Wait()
 		})
-	}
-}
-
-func runUDPClient(t *testing.T, address string, dataToSend []string) {
-	conn, err := net.Dial("udp", address)
-	if err != nil {
-		t.Fatalf("cannot create connection: %s", err)
-	}
-	defer conn.Close()
-
-	// Send data to the server
-	for _, data := range dataToSend {
-		_, err = conn.Write([]byte(data + "\n"))
-		if err != nil {
-			t.Logf("Error sending data: %s, retrying in 100ms", err)
-		}
-		time.Sleep(100 * time.Millisecond)
 	}
 }
