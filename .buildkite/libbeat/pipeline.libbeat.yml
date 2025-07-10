@@ -118,7 +118,7 @@ steps:
           - github_commit_status:
               context: "libbeat: Ubuntu x86_64 Unit Tests with fips provider and requirefipsbuild tag"
 
-      - label: ":ubuntu: Libbeat: Ubuntu x86_64 with fips provider and fips140=only Unit Tests"
+      - label: ":ubuntu: Libbeat: Ubuntu x86_64 fips140=only Unit Tests"
         key: "mandatory-linux-unit-test-fips-only"
         command: |
           set -euo pipefail
@@ -128,11 +128,9 @@ steps:
           automatic:
             - limit: 1
         agents:
-          provider: "aws"
-          image: "${IMAGE_UBUNTU_X86_64_FIPS}"
-          provider: "aws"
-          image: "${IMAGE_UBUNTU_X86_64_FIPS}"
-          instanceType: "m5.xlarge"
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
           GOEXPERIMENT: "systemcrypto"
@@ -147,7 +145,7 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "libbeat: Ubuntu x86_64 with fips provider and fips140=only Unit Tests"
+              context: "libbeat: Ubuntu x86_64 fips140=only Unit Tests"
 
       - label: ":ubuntu: Libbeat: Go Integration Tests"
         command: |
