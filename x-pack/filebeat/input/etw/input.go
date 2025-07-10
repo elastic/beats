@@ -9,7 +9,6 @@ package etw
 import (
 	"errors"
 	"fmt"
-	"math"
 	"strconv"
 	"sync"
 	"time"
@@ -174,7 +173,9 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 
 var (
 	// levelToSeverity maps ETW trace levels to names for use in ECS log.level.
+	// Based on Microsoft ETW documentation and Windows Event Log conventions.
 	levelToSeverity = map[uint8]string{
+		0: "information", // Catch-all/unknown level, treated as information
 		1: "critical",    // Abnormal exit or termination events
 		2: "error",       // Severe error events
 		3: "warning",     // Warning events such as allocation failures
@@ -186,25 +187,96 @@ var (
 	zeroGUID = windows.GUID{}
 )
 
-// buildEvent builds the final beat.Event emitted by this input.
-func buildEvent(data map[string]any, h etw.EventHeader, session *etw.Session, cfg config) beat.Event {
-	winlog := map[string]any{
-		"activity_id":   h.ActivityId.String(),
-		"channel":       strconv.FormatUint(uint64(h.EventDescriptor.Channel), 10),
-		"event_data":    data,
-		"flags":         strconv.FormatUint(uint64(h.Flags), 10),
-		"keywords":      strconv.FormatUint(h.EventDescriptor.Keyword, 10),
-		"opcode":        strconv.FormatUint(uint64(h.EventDescriptor.Opcode), 10),
-		"process_id":    strconv.FormatUint(uint64(h.ProcessId), 10),
-		"provider_guid": h.ProviderId.String(),
-		"session":       session.Name,
-		"task":          strconv.FormatUint(uint64(h.EventDescriptor.Task), 10),
-		"thread_id":     strconv.FormatUint(uint64(h.ThreadId), 10),
-		"version":       h.EventDescriptor.Version,
+// isValidValue checks if a value should be included in the event (not empty).
+func isValidValue(value any) bool {
+	switch v := value.(type) {
+	case string:
+		return v != ""
+	case []string:
+		return len(v) > 0
+	case []byte:
+		return len(v) > 0
+	case windows.GUID:
+		return v != zeroGUID
+	case nil:
+		return false
+	default:
+		return true
 	}
-	// Fallback to the session GUID if there is no provider GUID.
-	if h.ProviderId == zeroGUID {
+}
+
+// setIfValid sets a field in the map only if the value is valid (not empty).
+func setIfValid(m map[string]any, key string, value any) {
+	if isValidValue(value) {
+		m[key] = value
+	}
+}
+
+// buildEvent builds the final beat.Event emitted by this input.
+func buildEvent(etwEvent etw.RenderedEtwEvent, h etw.EventHeader, session *etw.Session, cfg config) beat.Event {
+	winlog := map[string]any{
+		"flags_raw":    fmt.Sprintf("0x%X", h.Flags),
+		"keywords_raw": fmt.Sprintf("0x%X", etwEvent.KeywordsRaw),
+		"opcode_raw":   etwEvent.OpcodeRaw,
+		"process_id":   strconv.FormatUint(uint64(etwEvent.ProcessID), 10),
+		"session":      session.Name,
+		"task_raw":     etwEvent.TaskRaw,
+		"level_raw":    etwEvent.LevelRaw,
+		"thread_id":    strconv.FormatUint(uint64(etwEvent.ThreadID), 10),
+		"version":      etwEvent.Version,
+	}
+
+	// Only set fields that have valid (non-empty) values
+	if h.ActivityId != zeroGUID {
+		winlog["activity_id"] = h.ActivityId.String()
+	}
+	setIfValid(winlog, "activity_id_name", etwEvent.ActivityID)
+	setIfValid(winlog, "related_activity_id_name", etwEvent.RelatedActivityID)
+	setIfValid(winlog, "channel", etwEvent.Channel)
+	setIfValid(winlog, "keywords", etwEvent.Keywords)
+	setIfValid(winlog, "opcode", etwEvent.Opcode)
+	setIfValid(winlog, "task", etwEvent.Task)
+	setIfValid(winlog, "level", etwEvent.Level)
+
+	// Handle provider GUID with fallback to session GUID
+	if etwEvent.ProviderGUID != zeroGUID {
+		winlog["provider_guid"] = etwEvent.ProviderGUID.String()
+	} else if session.GUID != zeroGUID {
 		winlog["provider_guid"] = session.GUID.String()
+	}
+
+	eventData := mapstr.M{}
+	for _, prop := range etwEvent.Properties {
+		if !isValidValue(prop.Value) {
+			continue
+		}
+		switch v := prop.Value.(type) {
+		case []byte:
+			eventData.Put(prop.Name, fmt.Sprintf("0x%X", v))
+		default:
+			eventData.Put(prop.Name, v)
+		}
+	}
+
+	extended := mapstr.M{}
+	for _, ext := range etwEvent.ExtendedData {
+		if !isValidValue(ext.Data) {
+			continue
+		}
+		switch v := ext.Data.(type) {
+		case []byte:
+			extended.Put(ext.ExtType, fmt.Sprintf("0x%X", v))
+		default:
+			extended.Put(ext.ExtType, v)
+		}
+	}
+
+	if len(extended) > 0 {
+		eventData.Put("extended_data", extended)
+	}
+
+	if len(eventData) > 0 {
+		winlog["event_data"] = eventData
 	}
 
 	event := mapstr.M{
@@ -213,7 +285,9 @@ func buildEvent(data map[string]any, h etw.EventHeader, session *etw.Session, cf
 		"kind":     "event",
 		"severity": h.EventDescriptor.Level,
 	}
-	if cfg.ProviderName != "" {
+	if etwEvent.ProviderName != "" {
+		event["provider"] = etwEvent.ProviderName
+	} else if cfg.ProviderName != "" {
 		event["provider"] = cfg.ProviderName
 	}
 
@@ -221,7 +295,13 @@ func buildEvent(data map[string]any, h etw.EventHeader, session *etw.Session, cf
 		"event":  event,
 		"winlog": winlog,
 	}
-	if level, found := levelToSeverity[h.EventDescriptor.Level]; found {
+
+	// Only set message if it's not empty
+	if etwEvent.EventMessage != "" {
+		fields["message"] = etwEvent.EventMessage
+	}
+
+	if level, found := levelToSeverity[etwEvent.LevelRaw]; found {
 		fields.Put("log.level", level)
 	}
 	if cfg.Logfile != "" {
@@ -229,26 +309,9 @@ func buildEvent(data map[string]any, h etw.EventHeader, session *etw.Session, cf
 	}
 
 	return beat.Event{
-		Timestamp: convertFileTimeToGoTime(uint64(h.TimeStamp)),
+		Timestamp: etwEvent.Timestamp,
 		Fields:    fields,
 	}
-}
-
-// convertFileTimeToGoTime converts a Windows FileTime to a Go time.Time structure.
-func convertFileTimeToGoTime(fileTime64 uint64) time.Time {
-	// Define the offset between Windows epoch (1601) and Unix epoch (1970)
-	const epochDifference = 116444736000000000
-	if fileTime64 < epochDifference {
-		// Time is before the Unix epoch, adjust accordingly
-		return time.Time{}
-	}
-
-	fileTime := windows.Filetime{
-		HighDateTime: uint32(fileTime64 >> 32),
-		LowDateTime:  uint32(fileTime64 & math.MaxUint32),
-	}
-
-	return time.Unix(0, fileTime.Nanoseconds()).UTC()
 }
 
 func (e *etwInput) consumeEvent(record *etw.EventRecord) uintptr {
@@ -264,15 +327,17 @@ func (e *etwInput) consumeEvent(record *etw.EventRecord) uintptr {
 		e.metrics.processingTime.Update(elapsed.Nanoseconds())
 	}()
 
-	data, err := etw.GetEventProperties(record)
+	etwEvent, err := e.etwSession.RenderEvent(record)
 	if err != nil {
-		e.log.Errorw("failed to read event properties", "error", err)
-		e.metrics.errors.Inc()
-		e.metrics.dropped.Inc()
+		if !errors.Is(err, etw.ErrUnprocessableEvent) {
+			e.log.Errorw("failed to read event properties", "error", err)
+			e.metrics.errors.Inc()
+			e.metrics.dropped.Inc()
+		}
 		return 1
 	}
 
-	evt := buildEvent(data, record.EventHeader, e.etwSession, e.config)
+	evt := buildEvent(etwEvent, record.EventHeader, e.etwSession, e.config)
 	e.publisher.Publish(evt)
 
 	e.metrics.events.Inc()
