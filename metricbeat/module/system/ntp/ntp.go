@@ -80,7 +80,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	reporter.Event(mb.Event{MetricSetFields: mapstr.M{
 		"host":   m.Host(),
-		"offset": response.ClockOffset.Seconds(),
+		"offset": response.ClockOffset.Nanoseconds(),
 	}})
 
 	return nil

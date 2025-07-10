@@ -9,6 +9,6 @@
     description: >
       The remote NTP server address.
   - name: offset
-    type: float
+    type: long
     description: >
-      The estimated offset of the local host's system clock relative to the server's clock.
+      The estimated offset of the local host's system clock relative to the server's clock (in ns).

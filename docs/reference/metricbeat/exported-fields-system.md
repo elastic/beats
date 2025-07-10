@@ -882,9 +882,9 @@ type: keyword
 
 
 **`system.ntp.offset`**
-:   The estimated offset of the local host's system clock relative to the server's clock.
+:   The estimated offset of the local host's system clock relative to the server's clock (in ns).
 
-type: float
+type: long
 
 
 ## process [_process]

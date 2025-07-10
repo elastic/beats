@@ -52,7 +52,8 @@ func TestUnpackConfigReplacesHosts(t *testing.T) {
 		"hosts": []string{"custom.ntp.org"},
 	})
 
-	userCfg.Unpack(&cfg)
+	err := userCfg.Unpack(&cfg)
+	assert.NoError(t, err)
 	assert.Equal(t, []string{"custom.ntp.org"}, cfg.Hosts)
 }
 

@@ -18,7 +18,7 @@
     "system": {
         "ntp": {
             "host": "0.pool.ntp.org",
-            "offset": 3.589
+            "offset": 127140000
         }
     }
 }
