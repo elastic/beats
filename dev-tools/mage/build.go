@@ -198,6 +198,12 @@ func GolangCrossBuild(params BuildArgs) error {
 	return Build(params)
 }
 
+func BuildOTel() error {
+	args := DefaultBuildArgs()
+	args.ExtraFlags = append(args.ExtraFlags, "-tags", "otelbeat")
+	return Build(args)
+}
+
 // Build invokes "go build" to produce a binary.
 func Build(params BuildArgs) error {
 	fmt.Println(">> build: Building", params.Name)
