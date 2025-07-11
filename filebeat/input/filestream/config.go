@@ -150,13 +150,6 @@ func (c *config) Validate() error {
 		return fmt.Errorf("no path is configured")
 	}
 
-	if c.AllowIDDuplication {
-		logp.L().Named("input.filestream").Warn(
-			"setting `allow_deprecated_id_duplication` will lead to data " +
-				"duplication and incomplete input metrics, it's use is " +
-				"highly discouraged.")
-	}
-
 	if c.AllowIDDuplication && c.TakeOver.Enabled {
 		return errors.New("allow_deprecated_id_duplication and take_over " +
 			"cannot be enabled at the same time")
@@ -167,6 +160,16 @@ func (c *config) Validate() error {
 	}
 
 	return nil
+}
+
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+func (c *config) checkUnsupportedParams(logger *logp.Logger) {
+	if c.AllowIDDuplication {
+		logger.Named("input.filestream").Warn(
+			"setting `allow_deprecated_id_duplication` will lead to data " +
+				"duplication and incomplete input metrics, it's use is " +
+				"highly discouraged.")
+	}
 }
 
 // ValidateInputIDs checks all filestream inputs to ensure all input IDs are

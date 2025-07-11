@@ -58,10 +58,7 @@ type logHints struct {
 
 // InitializeModule initializes this module.
 func InitializeModule() {
-	err := autodiscover.Registry.AddBuilder("hints", NewLogHints)
-	if err != nil {
-		logp.Error(fmt.Errorf("could not add `hints` builder"))
-	}
+	_ = autodiscover.Registry.AddBuilder("hints", NewLogHints)
 }
 
 // NewLogHints builds a log hints builder
