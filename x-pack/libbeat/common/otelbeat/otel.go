@@ -25,12 +25,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/mbprovider"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
-<<<<<<< HEAD
 	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
-=======
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
->>>>>>> 46e855e22 (otel: allow filebeat otel to load otel config files (#45093))
 )
 
 var schemeMap = map[string]string{
