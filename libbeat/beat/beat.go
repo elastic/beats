@@ -119,8 +119,8 @@ func (beat *Beat) userAgentUnprivilegedMode() useragent.AgentUnprivilegedMode {
 	return useragent.AgentUnprivilegedModePrivileged
 }
 
-// generateUserAgent returns the user agent string for the beat.
-func (beat *Beat) generateUserAgent() string {
+// GenerateUserAgent populates the UserAgent field on the beat.Info struct
+func (beat *Beat) GenerateUserAgent() {
 	userAgentProduct := "Libbeat"
 	if beat.Info.Beat != "" {
 		userAgentProduct = beat.Info.Beat
@@ -129,13 +129,8 @@ func (beat *Beat) generateUserAgent() string {
 	mode := beat.userAgentMode()
 	unprivileged := beat.userAgentUnprivilegedMode()
 
-	return useragent.UserAgentWithBeatTelemetry(userAgentProduct, version.GetDefaultVersion(),
+	beat.Info.UserAgent = useragent.UserAgentWithBeatTelemetry(userAgentProduct, version.GetDefaultVersion(),
 		mode, unprivileged)
-}
-
-// GenerateUserAgent populates the UserAgent field on the beat.Info struct
-func (beat *Beat) GenerateUserAgent() {
-	beat.Info.UserAgent = beat.generateUserAgent()
 }
 
 // BeatConfig struct contains the basic configuration of every beat
