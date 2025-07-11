@@ -89,6 +89,104 @@ func TestNetInputs(t *testing.T) {
 	}
 }
 
+func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
+	testCases := map[string]struct {
+		cfgFile     string
+		input       string
+		events      int
+		expectedInQ int
+		numWorkers  int
+		runClientFn func(t *testing.T, addr string, data []string)
+	}{
+		"TCP": {
+			cfgFile:     "es.yml",
+			input:       "tcp",
+			events:      50, // That needs to be more than can be published
+			numWorkers:  5,
+			runClientFn: inputtest.RunTCPClient,
+		},
+		"UDP": {
+			cfgFile:     "es.yml",
+			input:       "udp",
+			events:      50, // That needs to be more than can be published
+			numWorkers:  5,
+			runClientFn: inputtest.RunUDPClient,
+		},
+	}
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			filebeat := integration.NewBeat(
+				t,
+				"filebeat",
+				"../../filebeat.test",
+			)
+
+			data := []string{}
+			for range tc.events {
+				data = append(data, strings.Repeat("FooBar", 50))
+			}
+			workerStartedMsgs := []string{}
+			workerDoneMsgs := []string{}
+			for i := range tc.numWorkers {
+				workerStartedMsgs = append(workerStartedMsgs, fmt.Sprintf("[Worker %d] starting publish loop", i))
+				workerDoneMsgs = append(workerDoneMsgs, fmt.Sprintf("[Worker %d] finished publish loop", i))
+			}
+
+			esServer, esAddr, _, _ := integration.StartMockES(t, "", 0, 0, 0, 0, 0)
+			defer esServer.Close()
+			proxy, proxyURL := integration.NewDisablingProxy(t, esAddr)
+			proxy.Disable()
+
+			// DO NOT USE 'localhost', the UDP client does work when using it.
+			addr := "127.0.0.1:4242"
+			cfg := getConfig(t, map[string]any{
+				"input":      tc.input,
+				"addr":       addr,
+				"esHost":     proxyURL,
+				"numWorkers": tc.numWorkers,
+			}, "netInputs", tc.cfgFile)
+
+			filebeat.WriteConfigFile(cfg)
+			filebeat.Start()
+			filebeat.WaitForLogsAnyOrder(
+				workerStartedMsgs,
+				// []string{
+				// 	"[Worker 0] starting publish loop",
+				// 	"[Worker 1] starting publish loop",
+				// },
+				5*time.Second,
+				"not all workers have started",
+			)
+
+			tc.runClientFn(t, addr, data)
+
+			// Ensure the events are in the publishing pipeline.
+			// The events are logged when they enter the publishing pipeline.
+			// the events in the publishing pipeline are the queue size + the
+			// number of pipeline workers
+			expectedEvents := 32 + tc.numWorkers
+			filebeat.WaitEventsInLogFile(expectedEvents, 3*time.Second)
+
+			// Ensure the output is not accepting events
+			filebeat.WaitForLogs(
+				"Ping request failed with: 503 Service Unavailable: Proxy is disabled",
+				time.Second,
+				"cannot find output error in the logs")
+
+			filebeat.Stop()
+			filebeat.WaitForLogsAnyOrder(
+				workerDoneMsgs,
+				// []string{
+				// 	"[Worker 0] finished publish loop",
+				// 	"[Worker 1] finished publish loop",
+				// },
+				5*time.Second,
+				"not all workers have started",
+			)
+		})
+	}
+}
+
 // WaitPublishedEvents waits until the desired number of events
 // have been published. It assumes the file output is used, the filename
 // for the output is 'output' and 'path' is set to the TempDir.

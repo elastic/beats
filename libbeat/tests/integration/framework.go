@@ -734,13 +734,16 @@ func (b *BeatProc) openLogFile() *os.File {
 // If the events log file does not exist, nil is returned
 // It's the caller's responsibility to close the file.
 func (b *BeatProc) openEventLogFile() *os.File {
+	return b.openGlobFile(b.getEventLogFileGlob(), false)
+}
+
+func (b *BeatProc) getEventLogFileGlob() string {
 	// Beats can produce two different log files, to make sure we're
 	// reading the normal one we add the year to the glob. The default
 	// log file name looks like: filebeat-20240116.ndjson
 	year := time.Now().Year()
 	glob := fmt.Sprintf("%s-events-data-%d*.ndjson", filepath.Join(b.tempDir, b.beatName), year)
-
-	return b.openGlobFile(glob, false)
+	return glob
 }
 
 // createTempDir creates a temporary directory that will be
@@ -1162,6 +1165,17 @@ func (b *BeatProc) CountFileLines(glob string) int {
 	return bytes.Count(data, []byte{'\n'})
 }
 
+func (b *BeatProc) WaitEventsInLogFile(events int, timeout time.Duration) {
+	msg := strings.Builder{}
+
+	require.Eventually(b.t, func() bool {
+		msg.Reset()
+		got := b.CountFileLines(b.getEventLogFileGlob())
+		fmt.Fprintf(&msg, "expecting %d events, got %d", events, got)
+		return events == got
+	}, timeout, 100*time.Millisecond, &msg)
+}
+
 // ConfigFilePath returns the config file path
 func (b *BeatProc) ConfigFilePath() string {
 	return b.configFile
@@ -1205,7 +1219,7 @@ func StartMockES(
 	)
 
 	if addr == "" {
-		addr = ":0"
+		addr = "localhost:0"
 	}
 
 	l, err := net.Listen("tcp", addr)
@@ -1223,11 +1237,12 @@ func StartMockES(
 		}
 	}()
 
+	sererURL := "http://" + addr
 	// Ensure the Server is up and running before returning
 	require.Eventually(
 		t,
 		func() bool {
-			resp, err := http.Get("http://" + addr) //nolint: noctx // It's just a test
+			resp, err := http.Get(sererURL) //nolint: noctx // It's just a test
 			if err != nil {
 				return false
 			}
@@ -1240,5 +1255,5 @@ func StartMockES(
 		time.Millisecond,
 		"mock-es server did not start on '%s'", addr)
 
-	return &s, addr, es, rdr
+	return &s, sererURL, es, rdr
 }
