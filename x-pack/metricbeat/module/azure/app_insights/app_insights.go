@@ -55,7 +55,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-	client, err := NewClient(config)
+	client, err := NewClient(config, base.Logger())
 	if err != nil {
 		return nil, fmt.Errorf("error initializing the monitor client: module azure - %s metricset: %w", metricsetName, err)
 	}

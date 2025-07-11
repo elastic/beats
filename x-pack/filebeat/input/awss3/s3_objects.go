@@ -210,7 +210,7 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 		case strings.HasPrefix(s3Obj.contentType, contentTypeJSON) || strings.HasPrefix(s3Obj.contentType, contentTypeNDJSON):
 			err = p.readJSON(streamReader)
 		default:
-			err = p.readFile(streamReader)
+			err = p.readFile(streamReader, log)
 		}
 	}
 	if err != nil {
@@ -377,7 +377,7 @@ func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offs
 	return nil
 }
 
-func (p *s3ObjectProcessor) readFile(r io.Reader) error {
+func (p *s3ObjectProcessor) readFile(r io.Reader, logger *logp.Logger) error {
 	encodingFactory, ok := encoding.FindEncoding(p.readerConfig.Encoding)
 	if !ok || encodingFactory == nil {
 		return fmt.Errorf("failed to find '%v' encoding", p.readerConfig.Encoding)
@@ -401,7 +401,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	}
 
 	reader = readfile.NewStripNewline(reader, p.readerConfig.LineTerminator)
-	reader = p.readerConfig.Parsers.Create(reader)
+	reader = p.readerConfig.Parsers.Create(reader, logger)
 	reader = readfile.NewLimitReader(reader, int(p.readerConfig.MaxBytes))
 
 	var offset int64

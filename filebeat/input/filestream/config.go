@@ -25,6 +25,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
@@ -49,16 +50,13 @@ type config struct {
 	IgnoreOlder    time.Duration      `config:"ignore_older"`
 	IgnoreInactive ignoreInactiveType `config:"ignore_inactive"`
 	Rotation       *conf.Namespace    `config:"rotation"`
-	TakeOver       takeOverConfig     `config:"take_over"`
 
+	// TakeOver is also independently parsed by InputManager.Create
+	// (see internal/input-logfile/manager.go).
+	TakeOver loginp.TakeOverConfig `config:"take_over"`
 	// AllowIDDuplication is used by InputManager.Create
 	// (see internal/input-logfile/manager.go).
 	AllowIDDuplication bool `config:"allow_deprecated_id_duplication"`
-}
-
-type takeOverConfig struct {
-	Enabled bool     `config:"enabled"`
-	FromIDs []string `config:"from_ids"`
 }
 
 type closerConfig struct {

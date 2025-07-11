@@ -244,10 +244,3 @@ func Fetch(item Transaction) Action {
 		return q.Enqueue(item)
 	}
 }
-
-func max(a, b time.Duration) time.Duration {
-	if a < b {
-		return b
-	}
-	return a
-}

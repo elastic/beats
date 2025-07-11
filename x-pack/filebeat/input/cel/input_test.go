@@ -470,6 +470,67 @@ var inputTests = []struct {
 			{"message": "not present"},
 		},
 	},
+	{
+		// This test exists purely to demonstrate that the lib is available.
+		name: "aws_signing_static",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `{"events": [{
+				"message": post_request("http://www.example.com/", "text/plain", "request data").sign_aws_from_static(
+					"id", "long_enough_secret", "token", // secret must be longer than 112 bits for FIPS140 tests to pass.
+					{
+						"service": "service",
+						"region": "region",
+						"sign_time": timestamp("2009-11-10T23:00:00Z"),
+						"no_hoist": false,
+						"no_escape": false,
+						"disable_session_token": false,
+					}
+				).Header.Authorization[?0].orValue("nope")
+			}]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "AWS4-HMAC-SHA256 Credential=id/20091110/region/service/aws4_request, SignedHeaders=content-length;content-type;host;x-amz-date;x-amz-security-token, Signature=ad27046c0009e06c6626e6009ba2af96027f4893b7a190ab67aaec85becb25cd"},
+		},
+	},
+	{
+		// This test exists purely to demonstrate that the lib is available.
+		name: "optional_types_v2",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `{"events": [{
+				"message": optional.unwrap([optional.of(42), optional.none()]).encode_json(),
+			}]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "[42]"},
+		},
+	},
+	{
+		// This test exists purely to demonstrate that the lib is available.
+		name: "two_var_comprehension_v2",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `{"events": [{
+				"message": {'hello': 'world'}.transformMap(k, v, v + '!').encode_json(),
+			}]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": `{"hello":"world!"}`},
+		},
+	},
 
 	// FS-based tests.
 	{
@@ -815,7 +876,9 @@ var inputTests = []struct {
 		want: []map[string]interface{}{
 			{
 				"error": map[string]any{
-					"message": string("failed eval: ERROR: <input>:2:16: response body too big\n |  get(state.url).Body.as(body, {\n | ...............^"),
+					"message": `failed eval: ERROR: <input>:3:21: response body too big
+ |   "events": [string(body)]
+ | ....................^`,
 				},
 			},
 		},
@@ -1753,11 +1816,13 @@ var inputTests = []struct {
 		},
 		handler: defaultHandler(http.MethodGet, ""),
 		want: []map[string]interface{}{
+			// Loss of location information here is a result of changes in the runtime.
+			// We no longer look into macros at all. This is a huge loss for debugging.
 			{
 				"error": map[string]interface{}{
-					"message": `failed eval: ERROR: <input>:3:26: no such overload
- |   get(state.url+'/'+r.id).Body.decode_json()).as(events, {
- | .........................^`,
+					"message": `failed eval: ERROR: <input>:5:14: no such overload
+ |    "events": events,
+ | .............^`,
 				},
 			},
 		},

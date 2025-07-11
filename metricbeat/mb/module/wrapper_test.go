@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -236,10 +237,10 @@ func TestNewWrapperForMetricSet(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""))
+	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t), logp.NewNopLogger())
 	require.NoError(t, err)
 
-	m, err := module.NewWrapperForMetricSet(aModule, metricSets[0], beat.NewMonitoring(), module.WithMetricSetInfo())
+	m, err := module.NewWrapperForMetricSet(aModule, metricSets[0], beat.NewMonitoring(), logp.NewNopLogger(), module.WithMetricSetInfo())
 	require.NoError(t, err)
 
 	done := make(chan struct{})
