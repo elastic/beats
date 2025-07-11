@@ -228,6 +228,8 @@ require (
 	go.opentelemetry.io/collector/exporter/debugexporter v0.129.0
 	go.opentelemetry.io/collector/otelcol v0.129.0
 	go.opentelemetry.io/collector/pdata v1.35.0
+	go.opentelemetry.io/collector/processor v1.35.0
+	go.opentelemetry.io/collector/processor/processorhelper v0.129.0
 	go.opentelemetry.io/collector/receiver v1.35.0
 	go.uber.org/mock v0.5.0
 	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8
@@ -446,7 +448,6 @@ require (
 	go.opentelemetry.io/collector/pdata/xpdata v0.129.0 // indirect
 	go.opentelemetry.io/collector/pipeline v0.129.0 // indirect
 	go.opentelemetry.io/collector/pipeline/xpipeline v0.129.0 // indirect
-	go.opentelemetry.io/collector/processor v1.35.0 // indirect
 	go.opentelemetry.io/collector/processor/processortest v0.129.0 // indirect
 	go.opentelemetry.io/collector/processor/xprocessor v0.129.0 // indirect
 	go.opentelemetry.io/collector/receiver/receivertest v0.129.0 // indirect
