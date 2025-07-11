@@ -89,6 +89,8 @@ func TestNetInputs(t *testing.T) {
 	}
 }
 
+// TODO: Check if this test is testing the correct things.
+// Reading the packets read metric might be enough
 func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 	testCases := map[string]struct {
 		cfgFile     string

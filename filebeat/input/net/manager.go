@@ -41,15 +41,13 @@ type config struct {
 	Host               string `config:"host"`
 }
 
-// ConfigureWith creates an InputManager that provides no extra logic and
-// allows each input to fully control event collection and publishing in
-// isolation. The function fn will be called for every input to be configured.
+// New creates a v2.InputManager for net inputs
+// TODO: improve it
 func New(fn func(*conf.C) (Input, error)) v2.InputManager {
 	return &manager{configure: fn}
 }
 
-// Init is required to fulfil the input.InputManager interface.
-// For the kafka input no special initialization is required.
+// Init is required to fulfil the input.InputManager interface. Noop
 func (*manager) Init(grp unison.Group) error { return nil }
 
 // Create builds a new Input instance from the given configuration, or returns
@@ -95,10 +93,6 @@ type wrapper struct {
 }
 
 // Name reports the input name.
-//
-// XXX: check if/how we can remove this method. Currently it is required for
-// compatibility reasons with existing interfaces in libbeat, autodiscovery
-// and filebeat.
 func (w wrapper) Name() string { return w.inp.Name() }
 
 // Test checks the configuration and runs additional checks if the Input can
