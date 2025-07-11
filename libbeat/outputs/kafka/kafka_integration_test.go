@@ -31,9 +31,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"go.uber.org/zap/zapcore"
-	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/sarama"
 
@@ -391,11 +388,9 @@ func TestKafkaErrors(t *testing.T) {
 			}
 		}
 
-		observed, zapLogs := observer.New(zapcore.DebugLevel)
-		logger, err := logp.ConfigureWithCoreLocal(logp.Config{}, observed)
-		require.NoError(t, err)
+		logp.DevelopmentSetup(logp.ToObserverOutput())
 
-		grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat", Logger: logger}, outputs.NewNilObserver(), cfg)
+		grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat"}, outputs.NewNilObserver(), cfg)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -429,7 +424,7 @@ func TestKafkaErrors(t *testing.T) {
 		t.Cleanup(func() {
 			if t.Failed() {
 				t.Logf("Debug Logs:\n")
-				for _, log := range zapLogs.TakeAll() {
+				for _, log := range logp.ObserverLogs().TakeAll() {
 					data, err := json.Marshal(log)
 					if err != nil {
 						t.Errorf("failed encoding log as JSON: %s", err)
@@ -439,7 +434,7 @@ func TestKafkaErrors(t *testing.T) {
 				return
 			}
 		})
-		assert.GreaterOrEqual(t, zapLogs.FilterMessageSnippet(test.errorMessage).Len(), 1)
+		assert.GreaterOrEqual(t, logp.ObserverLogs().FilterMessageSnippet(test.errorMessage).Len(), 1)
 	}
 
 }
