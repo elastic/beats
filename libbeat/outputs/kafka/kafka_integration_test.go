@@ -347,6 +347,98 @@ func TestKafkaPublish(t *testing.T) {
 	}
 }
 
+func TestKafkaErrors(t *testing.T) {
+	id := strconv.Itoa(rand.Int())
+	testTopic := fmt.Sprintf("test-libbeat-%s", id)
+
+	tests := []struct {
+		title        string
+		config       map[string]interface{}
+		topic        string
+		events       []eventInfo
+		errorMessage string
+	}{
+		{
+			"message of size large than `max_message_bytes` must be dropped",
+			map[string]interface{}{
+				"max_message_bytes": "10",
+			},
+			testTopic,
+			single(mapstr.M{
+				"host":    "test-host-random-message-which-is-long-enough",
+				"message": id,
+			}),
+			"dropping message as it exceeds max_mesage_bytes",
+		},
+	}
+
+	defaultConfig := map[string]interface{}{
+		"hosts":   []string{getTestKafkaHost()},
+		"topic":   testTopic,
+		"timeout": "1s",
+	}
+
+	for _, test := range tests {
+
+		cfg := makeConfig(t, defaultConfig)
+		if test.config != nil {
+			err := cfg.Merge(makeConfig(t, test.config))
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+
+		logp.DevelopmentSetup(logp.ToObserverOutput())
+
+		grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat"}, outputs.NewNilObserver(), cfg)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		output, ok := grp.Clients[0].(*client)
+		assert.True(t, ok, "grp.Clients[0] didn't contain a ptr to client")
+		if err := output.Connect(context.Background()); err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, output.index, "testbeat")
+		defer output.Close()
+
+		// publish test events
+		var wg sync.WaitGroup
+		for i := range test.events {
+			batch := outest.NewBatch(test.events[i].events...)
+			batch.OnSignal = func(_ outest.BatchSignal) {
+				wg.Done()
+			}
+
+			wg.Add(1)
+			err := output.Publish(context.Background(), batch)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+
+		// wait for all published batches to be ACKed
+		wg.Wait()
+
+		t.Cleanup(func() {
+			if t.Failed() {
+				t.Logf("Debug Logs:\n")
+				for _, log := range logp.ObserverLogs().TakeAll() {
+					data, err := json.Marshal(log)
+					if err != nil {
+						t.Errorf("failed encoding log as JSON: %s", err)
+					}
+					t.Logf("%s", string(data))
+				}
+				return
+			}
+		})
+		assert.GreaterOrEqual(t, logp.ObserverLogs().FilterMessageSnippet(test.errorMessage).Len(), 1)
+	}
+
+}
+
 func validateJSON(t *testing.T, value []byte, events []beat.Event) string {
 	var decoded map[string]interface{}
 	err := json.Unmarshal(value, &decoded)
