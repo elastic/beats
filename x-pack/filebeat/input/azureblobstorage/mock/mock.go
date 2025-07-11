@@ -17,10 +17,9 @@ const (
 	xmlType     = "application/xml"
 )
 
-var pathPrefix string
-
 //nolint:errcheck // We can ignore as response writer errors cannot be handled in this scenario
 func AzureStorageServer() http.Handler {
+	var pathPrefix string
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := strings.Split(strings.TrimLeft(r.URL.Path, "/"), "/")
 		if r.URL.RawQuery != "" {

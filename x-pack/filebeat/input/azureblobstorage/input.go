@@ -156,7 +156,7 @@ func tryOverrideOrDefault(cfg config, c container) container {
 		c.ReaderConfig = cfg.ReaderConfig
 	}
 
-	// If the container level PathPrefix is nil, use the global PathPrefix.
+	// If the container level PathPrefix is empty, use the global PathPrefix.
 	if c.PathPrefix == "" {
 		c.PathPrefix = cfg.PathPrefix
 	}
