@@ -43,25 +43,25 @@ func (p *eventRenderer) render() (RenderedEtwEvent, error) {
 	}
 
 	event := RenderedEtwEvent{
-		ProviderGUID:      eventInfo.ParsedInfo.ProviderGUID,
-		ProviderName:      eventInfo.ProviderName,
-		EventID:           p.r.EventHeader.EventDescriptor.Id,
-		Version:           p.r.EventHeader.EventDescriptor.Version,
-		Level:             eventInfo.LevelName,
-		LevelRaw:          p.r.EventHeader.EventDescriptor.Level,
-		Task:              eventInfo.TaskName,
-		TaskRaw:           p.r.EventHeader.EventDescriptor.Task,
-		Opcode:            eventInfo.OpcodeName,
-		OpcodeRaw:         p.r.EventHeader.EventDescriptor.Opcode,
-		KeywordsRaw:       p.r.EventHeader.EventDescriptor.Keyword,
-		Channel:           eventInfo.ChannelName,
-		Timestamp:         convertFileTimeToGoTime(uint64(p.r.EventHeader.TimeStamp)),
-		ProcessID:         p.r.EventHeader.ProcessId,
-		ThreadID:          p.r.EventHeader.ThreadId,
-		ActivityID:        eventInfo.ActivityIDName,
-		RelatedActivityID: eventInfo.RelatedActivityIDName,
-		ProviderMessage:   eventInfo.ProviderMessage,
-		Properties:        make([]RenderedProperty, len(eventInfo.Properties)),
+		ProviderGUID:          eventInfo.ParsedInfo.ProviderGUID,
+		ProviderName:          eventInfo.ProviderName,
+		EventID:               p.r.EventHeader.EventDescriptor.Id,
+		Version:               p.r.EventHeader.EventDescriptor.Version,
+		Level:                 eventInfo.LevelName,
+		LevelRaw:              p.r.EventHeader.EventDescriptor.Level,
+		Task:                  eventInfo.TaskName,
+		TaskRaw:               p.r.EventHeader.EventDescriptor.Task,
+		Opcode:                eventInfo.OpcodeName,
+		OpcodeRaw:             p.r.EventHeader.EventDescriptor.Opcode,
+		KeywordsRaw:           p.r.EventHeader.EventDescriptor.Keyword,
+		Channel:               eventInfo.ChannelName,
+		Timestamp:             convertFileTimeToGoTime(uint64(p.r.EventHeader.TimeStamp)),
+		ProcessID:             p.r.EventHeader.ProcessId,
+		ThreadID:              p.r.EventHeader.ThreadId,
+		ActivityIDName:        eventInfo.ActivityIDName,
+		RelatedActivityIDName: eventInfo.RelatedActivityIDName,
+		ProviderMessage:       eventInfo.ProviderMessage,
+		Properties:            make([]RenderedProperty, len(eventInfo.Properties)),
 	}
 
 	// Set Active Keywords
@@ -172,17 +172,26 @@ func renderStruct(cache *providerCache, eventInfo *cachedEventInfo, propInfo *ca
 
 func renderSimpleType(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte) (string, error) {
 	var mapInfo *EventMapInfo
+	var cachedMapInfo *cachedEventMapInfo
 	if propInfo.MapName != "" {
-		if cachedMapInfo, found := cache.propertyMapsCache[propInfo.MapName]; found {
-			mapInfo = cachedMapInfo.ParsedInfo
+		if cached, found := cache.propertyMapsCache[propInfo.MapName]; found {
+			mapInfo = cached.ParsedInfo
+			cachedMapInfo = cached
 		}
-		// TODO: Use the cached mapInfo to format the property value when possible.
 	}
 
 	// Get the length of the property.
 	propertyLength, err := getPropertyLength(eventInfo, propInfo, r)
 	if err != nil {
 		return "", fmt.Errorf("failed to get property length due to: %w", err)
+	}
+
+	// If we have a cached map, try to use it directly for simple numeric types
+	if cachedMapInfo != nil && propertyLength > 0 && len(*buf) > 0 {
+		if mappedValue, consumed, ok := cachedMapInfo.getFormattedMapEntry(propInfo, *buf, int(propertyLength)); ok {
+			*buf = (*buf)[consumed:]
+			return mappedValue, nil
+		}
 	}
 
 	var userDataConsumed uint16
@@ -234,11 +243,19 @@ retryLoop:
 			return describeComplexProperty(propInfo), nil
 		}
 	}
+
+	// Convert the formatted data to string
+	result := windows.UTF16PtrToString((*uint16)(unsafe.Pointer(&formattedData[0])))
+
+	// Cache the result if we have a map and successfully consumed data
+	if cachedMapInfo != nil && userDataConsumed > 0 {
+		cachedMapInfo.cacheFormattedMapEntry(propInfo, (*buf)[:userDataConsumed], result, int(userDataConsumed))
+	}
+
 	// Update the data slice to account for consumed data.
 	*buf = (*buf)[userDataConsumed:]
 
-	// Convert the formatted data to string and return.
-	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(&formattedData[0]))), nil
+	return result, nil
 }
 
 func getPropertyLength(eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord) (uint32, error) {

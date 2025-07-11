@@ -24,6 +24,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strings"
 	"sync"
 	"text/template"
 	"unsafe"
@@ -276,19 +277,19 @@ func compileEventMessageTemplate(eventMessage string) (*template.Template, error
 		return nil, nil
 	}
 
-	// We want to replace all occurrences of %N with [[{{params $ N}}]]
+	// We want to replace all occurrences of %N with [[{{. $ N}}]]
 	// where N is the parameter index.
 	replacer := func(message string) string {
-		return dataIdxRegexp.ReplaceAllString(message, `[[{{params $ $1}}]]`)
+		return dataIdxRegexp.ReplaceAllString(message, `[[{{index . $1}}]]`)
 	}
 
 	processedMessage := replacer(eventMessage)
 
-	tmpl, err := template.New("eventMessage").Parse(processedMessage)
+	// Set custom delimiters to avoid conflicts with Windows event message format
+	tmpl, err := template.New("eventMessage").Delims("[[{{", "}}]]").Parse(processedMessage)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse event message template: %w", err)
 	}
-	tmpl.Delims("[[{{", "}}]]") // Set custom delimiters to avoid conflicts with Windows event message format
 	return tmpl, nil
 }
 
@@ -425,6 +426,37 @@ type cachedEventMapInfo struct {
 	// For BitMap: key is the bit value (e.g., 0x1, 0x2, 0x4) from EVENT_MAP_ENTRY.Value
 	// For PatternMap: key is the pattern value from EVENT_MAP_ENTRY.InputOffset as a string
 	Entries map[any]*cachedMapEntry
+
+	// Lazy cache for TdhFormatProperty results
+	// Key is hex string of the raw buffer bytes, Value is the formatted result
+	formattedCachedEntries map[string]formattedMapCacheEntry
+	m                      sync.RWMutex
+}
+
+type formattedMapCacheEntry struct {
+	Result   string
+	Consumed int
+}
+
+func (mi *cachedEventMapInfo) getFormattedMapEntry(propInfo *cachedPropertyInfo, rawBuf []byte, length int) (string, int, bool) {
+	key := fmt.Sprintf("%x", rawBuf[:length])
+	mi.m.RLock()
+	value, found := mi.formattedCachedEntries[key]
+	mi.m.RUnlock()
+	if found {
+		return value.Result, value.Consumed, true
+	}
+	return "", 0, false
+}
+
+func (mi *cachedEventMapInfo) cacheFormattedMapEntry(propInfo *cachedPropertyInfo, rawBuf []byte, value string, length int) {
+	key := fmt.Sprintf("%x", rawBuf[:length])
+	mi.m.Lock()
+	defer mi.m.Unlock()
+	mi.formattedCachedEntries[key] = formattedMapCacheEntry{
+		Result:   value,
+		Consumed: length,
+	}
 }
 
 func getStringFromBufferOffset(buf []byte, offset uint32) string {
@@ -432,7 +464,7 @@ func getStringFromBufferOffset(buf []byte, offset uint32) string {
 		return ""
 	}
 	ptr := unsafe.Add(unsafe.Pointer(&buf[0]), offset)
-	return windows.UTF16PtrToString((*uint16)(ptr))
+	return strings.TrimSpace(windows.UTF16PtrToString((*uint16)(ptr)))
 }
 
 func getEventInfoBinaryXML(info *TraceEventInfo) string {
@@ -463,7 +495,7 @@ func getMultiStringFromBufferOffset(buf []byte, offset uint32) []string {
 		if str == "" {
 			break
 		}
-		results = append(results, str)
+		results = append(results, strings.TrimSpace(str))
 
 		utf16Chars, _ := windows.UTF16FromString(str)
 		advanceByBytes := (len(utf16Chars) + 1) * 2 // +1 for the null terminator, *2 for bytes
@@ -607,13 +639,14 @@ func initEventInfoMaps(cache map[string]*cachedEventMapInfo, props []*cachedProp
 
 func parseEventMapBuffer(mapName string, buf []byte, mapInfo *EventMapInfo) *cachedEventMapInfo {
 	parsed := &cachedEventMapInfo{
-		InfoBuf:    buf,
-		ParsedInfo: mapInfo,
-		Name:       mapName,
-		IsValue:    (mapInfo.Flag&EventMapInfoFlagManifestValueMap) != 0 || (mapInfo.Flag&EventMapInfoFlagWBEMValueMap) != 0,
-		IsBitmap:   (mapInfo.Flag&EventMapInfoFlagManifestBitMap) != 0 || (mapInfo.Flag&EventMapInfoFlagWBEMBitMap) != 0,
-		IsPattern:  (mapInfo.Flag & EventMapInfoFlagManifestPatternMap) != 0,
-		Entries:    make(map[any]*cachedMapEntry),
+		InfoBuf:                buf,
+		ParsedInfo:             mapInfo,
+		Name:                   mapName,
+		IsValue:                (mapInfo.Flag&EventMapInfoFlagManifestValueMap) != 0 || (mapInfo.Flag&EventMapInfoFlagWBEMValueMap) != 0,
+		IsBitmap:               (mapInfo.Flag&EventMapInfoFlagManifestBitMap) != 0 || (mapInfo.Flag&EventMapInfoFlagWBEMBitMap) != 0,
+		IsPattern:              (mapInfo.Flag & EventMapInfoFlagManifestPatternMap) != 0,
+		Entries:                make(map[any]*cachedMapEntry),
+		formattedCachedEntries: make(map[string]formattedMapCacheEntry),
 	}
 
 	if mapInfo.EntryCount == 0 {

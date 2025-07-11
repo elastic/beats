@@ -17,28 +17,28 @@ import (
 )
 
 type RenderedEtwEvent struct {
-	ProviderGUID      windows.GUID
-	ProviderName      string
-	EventID           uint16
-	Version           uint8
-	Level             string
-	LevelRaw          uint8
-	Task              string
-	TaskRaw           uint16
-	Opcode            string
-	OpcodeRaw         uint8
-	Keywords          []string
-	KeywordsRaw       uint64
-	Channel           string
-	Timestamp         time.Time
-	ProcessID         uint32
-	ThreadID          uint32
-	ActivityID        string
-	RelatedActivityID string
-	EventMessage      string
-	ProviderMessage   string
-	Properties        []RenderedProperty
-	ExtendedData      []RenderedExtendedData
+	ProviderGUID          windows.GUID
+	ProviderName          string
+	EventID               uint16
+	Version               uint8
+	Level                 string
+	LevelRaw              uint8
+	Task                  string
+	TaskRaw               uint16
+	Opcode                string
+	OpcodeRaw             uint8
+	Keywords              []string
+	KeywordsRaw           uint64
+	Channel               string
+	Timestamp             time.Time
+	ProcessID             uint32
+	ThreadID              uint32
+	ActivityIDName        string
+	RelatedActivityIDName string
+	EventMessage          string
+	ProviderMessage       string
+	Properties            []RenderedProperty
+	ExtendedData          []RenderedExtendedData
 }
 
 type RenderedProperty struct {

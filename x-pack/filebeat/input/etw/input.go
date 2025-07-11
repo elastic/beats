@@ -230,13 +230,15 @@ func buildEvent(etwEvent etw.RenderedEtwEvent, h etw.EventHeader, session *etw.S
 	if h.ActivityId != zeroGUID {
 		winlog["activity_id"] = h.ActivityId.String()
 	}
-	setIfValid(winlog, "activity_id_name", etwEvent.ActivityID)
-	setIfValid(winlog, "related_activity_id_name", etwEvent.RelatedActivityID)
+	setIfValid(winlog, "activity_id_name", etwEvent.ActivityIDName)
+	setIfValid(winlog, "related_activity_id_name", etwEvent.RelatedActivityIDName)
 	setIfValid(winlog, "channel", etwEvent.Channel)
 	setIfValid(winlog, "keywords", etwEvent.Keywords)
 	setIfValid(winlog, "opcode", etwEvent.Opcode)
 	setIfValid(winlog, "task", etwEvent.Task)
 	setIfValid(winlog, "level", etwEvent.Level)
+	setIfValid(winlog, "flags", h.FlagsAsStrings())
+	setIfValid(winlog, "provider_message", etwEvent.ProviderMessage)
 
 	// Handle provider GUID with fallback to session GUID
 	if etwEvent.ProviderGUID != zeroGUID {

@@ -8,6 +8,7 @@ package etw
 
 import (
 	"fmt"
+	"sort"
 	"syscall"
 	"unsafe"
 
@@ -55,10 +56,30 @@ type EventRecord struct {
 
 // https://learn.microsoft.com/en-us/windows/win32/api/relogger/ns-relogger-event_header
 const (
-	EVENT_HEADER_FLAG_STRING_ONLY   = 0x0004
-	EVENT_HEADER_FLAG_32_BIT_HEADER = 0x0020
-	EVENT_HEADER_FLAG_64_BIT_HEADER = 0x0040
+	EVENT_HEADER_FLAG_EXTENDED_INFO   = 0x0001
+	EVENT_HEADER_FLAG_PRIVATE_SESSION = 0x0002
+	EVENT_HEADER_FLAG_STRING_ONLY     = 0x0004
+	EVENT_HEADER_FLAG_TRACE_MESSAGE   = 0x0008
+	EVENT_HEADER_FLAG_NO_CPUTIME      = 0x0010
+	EVENT_HEADER_FLAG_32_BIT_HEADER   = 0x0020
+	EVENT_HEADER_FLAG_64_BIT_HEADER   = 0x0040
+	EVENT_HEADER_FLAG_DECODE_GUID     = 0x0080
+	EVENT_HEADER_FLAG_CLASSIC_HEADER  = 0x0100
+	EVENT_HEADER_FLAG_PROCESSOR_INDEX = 0x0200
 )
+
+var flagMap = map[uint16]string{
+	EVENT_HEADER_FLAG_EXTENDED_INFO:   "EXTENDED_INFO",
+	EVENT_HEADER_FLAG_PRIVATE_SESSION: "PRIVATE_SESSION",
+	EVENT_HEADER_FLAG_STRING_ONLY:     "STRING_ONLY",
+	EVENT_HEADER_FLAG_TRACE_MESSAGE:   "TRACE_MESSAGE",
+	EVENT_HEADER_FLAG_NO_CPUTIME:      "NO_CPUTIME",
+	EVENT_HEADER_FLAG_32_BIT_HEADER:   "32_BIT_HEADER",
+	EVENT_HEADER_FLAG_64_BIT_HEADER:   "64_BIT_HEADER",
+	EVENT_HEADER_FLAG_DECODE_GUID:     "DECODE_GUID",
+	EVENT_HEADER_FLAG_CLASSIC_HEADER:  "CLASSIC_HEADER",
+	EVENT_HEADER_FLAG_PROCESSOR_INDEX: "PROCESSOR_INDEX",
+}
 
 // https://learn.microsoft.com/en-us/windows/win32/api/relogger/ns-relogger-event_header
 type EventHeader struct {
@@ -597,4 +618,30 @@ func (r *EventRecord) String() string {
 		r.EventHeader.TimeStamp,
 		r.UserDataLength,
 	)
+}
+
+// FlagsAsStrings returns a human-readable representation of EventHeader flags
+func (h *EventHeader) FlagsAsStrings() []string {
+	if h.Flags == 0 {
+		return nil
+	}
+
+	var flags []string
+	remainingFlags := h.Flags
+
+	// Check each known flag
+	for flagValue, flagName := range flagMap {
+		if h.Flags&flagValue != 0 {
+			flags = append(flags, flagName)
+			remainingFlags &^= flagValue // Remove this flag from remaining
+		}
+	}
+
+	// Add any unknown flags as hex
+	if remainingFlags != 0 {
+		flags = append(flags, fmt.Sprintf("UNKNOWN(0x%04X)", remainingFlags))
+	}
+
+	sort.Strings(flags)
+	return flags
 }
