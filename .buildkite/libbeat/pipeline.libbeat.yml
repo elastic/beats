@@ -9,7 +9,7 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
-  IMAGE_UBUNTU_X86_64_FIPS: "platform-ingest-beats-ubuntu-2204-fips-1752148343"
+  IMAGE_UBUNTU_X86_64_FIPS: "family/platform-ingest-beats-ubuntu-2204-fips"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -105,7 +105,7 @@ steps:
         env:
           FIPS: "true"
           GOEXPERIMENT: "systemcrypto"
-          ASDF_PYTHON_VERSION: "3.10.9"
+          ASDF_PYTHON_VERSION: "3.9.13"
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
