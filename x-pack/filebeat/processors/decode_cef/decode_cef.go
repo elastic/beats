@@ -96,12 +96,14 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	var cefErrors []error
-	if u, ok := err.(interface {
-		Unwrap() []error
-	}); ok {
-		cefErrors = u.Unwrap()
-	} else {
-		cefErrors = []error{err}
+	if err != nil {
+		if u, ok := err.(interface {
+			Unwrap() []error
+		}); ok {
+			cefErrors = u.Unwrap()
+		} else {
+			cefErrors = []error{err}
+		}
 	}
 
 	cefObject := toCEFObject(&ce)
