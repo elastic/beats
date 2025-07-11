@@ -84,7 +84,7 @@ func (in *eventHubInputV2) Run(
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
 	// Setup input metrics
-	inputMetrics := newInputMetrics(inputContext)
+	inputMetrics := newInputMetrics(inputContext.MetricsRegistry)
 	in.metrics = inputMetrics
 
 	// Initialize the components needed to process events.

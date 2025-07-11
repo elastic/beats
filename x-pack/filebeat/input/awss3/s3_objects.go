@@ -21,7 +21,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
@@ -70,7 +69,7 @@ var errS3DownloadFailed = errors.New("S3 download failure")
 func newS3ObjectProcessorFactory(metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
-		metrics = newInputMetrics(v2.Context{MetricsRegistry: monitoring.NewRegistry()}, 0)
+		metrics = newInputMetrics(monitoring.NewRegistry(), 0)
 	}
 	if len(sel) == 0 {
 		sel = []fileSelectorConfig{

@@ -22,7 +22,7 @@ func TestNewInputMetricsInstance(t *testing.T) {
 		ID:              "streaming-metric-test",
 		MetricsRegistry: reg,
 	}
-	metrics := newInputMetrics(env)
+	metrics := newInputMetrics(env.MetricsRegistry)
 
 	assert.NotNil(t,
 		metrics.errorsTotal,

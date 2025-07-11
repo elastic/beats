@@ -9,14 +9,12 @@ package azureeventhub
 import (
 	"github.com/rcrowley/go-metrics"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
 // newInputMetrics creates a new `*inputMetrics` to track input metrics.
-func newInputMetrics(ctx v2.Context) *inputMetrics {
-	reg := ctx.MetricsRegistry
+func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 	inputMetrics := inputMetrics{
 		// Messages
 		receivedMessages:    monitoring.NewUint(reg, "received_messages_total"),

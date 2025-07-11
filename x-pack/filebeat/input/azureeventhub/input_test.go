@@ -14,7 +14,6 @@ import (
 
 	"github.com/Azure/go-autorest/autorest/azure"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -54,8 +53,7 @@ func TestGetAzureEnvironment(t *testing.T) {
 func TestProcessEvents(t *testing.T) {
 	log := logp.NewLogger(fmt.Sprintf("%s test for input", inputName))
 
-	metrics := newInputMetrics(
-		v2.Context{MetricsRegistry: monitoring.NewRegistry()})
+	metrics := newInputMetrics(monitoring.NewRegistry())
 
 	fakePipelineClient := fakeClient{}
 

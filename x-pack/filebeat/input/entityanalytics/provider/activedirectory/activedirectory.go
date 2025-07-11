@@ -116,7 +116,7 @@ func (*adInput) Test(v2.TestContext) error { return nil }
 // Run will start data collection on this provider.
 func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
 	p.logger = inputCtx.Logger.With("provider", Name, "domain", p.cfg.URL)
-	p.metrics = newMetrics(inputCtx)
+	p.metrics = newMetrics(inputCtx.MetricsRegistry)
 
 	lastSyncTime, _ := getLastSync(store)
 	syncWaitTime := time.Until(lastSyncTime.Add(p.cfg.SyncInterval))

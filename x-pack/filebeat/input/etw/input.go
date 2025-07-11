@@ -114,7 +114,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	}
 	e.etwSession.Callback = e.consumeEvent
 	e.publisher = publisher
-	e.metrics = newInputMetrics(e.etwSession.Name, ctx)
+	e.metrics = newInputMetrics(e.etwSession.Name, ctx.MetricsRegistry)
 
 	// Set up logger with session information
 	e.log = ctx.Logger.With("session", e.etwSession.Name)
@@ -308,8 +308,7 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for windows ETW.
 // If id is empty, a nil inputMetric is returned.
-func newInputMetrics(session string, ctx input.Context) *inputMetrics {
-	reg := ctx.MetricsRegistry
+func newInputMetrics(session string, reg *monitoring.Registry) *inputMetrics {
 	out := &inputMetrics{
 		name:           monitoring.NewString(reg, "session"),
 		events:         monitoring.NewUint(reg, "received_events_total"),

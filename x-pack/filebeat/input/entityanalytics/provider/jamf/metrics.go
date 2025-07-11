@@ -7,7 +7,6 @@ package jamf
 import (
 	"github.com/rcrowley/go-metrics"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -23,9 +22,7 @@ type inputMetrics struct {
 }
 
 // newMetrics creates a new instance for gathering metrics.
-func newMetrics(ctx v2.Context, optionalParent *monitoring.Registry) *inputMetrics {
-	reg := ctx.MetricsRegistry
-
+func newMetrics(reg *monitoring.Registry) *inputMetrics {
 	out := inputMetrics{
 		syncTotal:            monitoring.NewUint(reg, "sync_total"),
 		syncError:            monitoring.NewUint(reg, "sync_error"),

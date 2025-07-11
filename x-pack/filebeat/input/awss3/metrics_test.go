@@ -11,7 +11,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -19,7 +18,7 @@ import (
 // when a newInputMetrics method is invoked. This avoids nil hit panics when
 // a getter is invoked on any uninitialized metric.
 func TestNewInputMetricsInstance(t *testing.T) {
-	metrics := newInputMetrics(v2.Context{MetricsRegistry: monitoring.NewRegistry()}, 1)
+	metrics := newInputMetrics(monitoring.NewRegistry(), 1)
 
 	assert.NotNil(t, metrics.sqsMessagesWaiting,
 		metrics.sqsMaxMessagesInflight,
@@ -53,7 +52,7 @@ func TestInputMetricsSQSWorkerUtilization(t *testing.T) {
 		fakeTimeMs.Store(0)
 		defer useFakeCurrentTimeThenReset()()
 
-		metrics := newInputMetrics(v2.Context{MetricsRegistry: monitoring.NewRegistry()}, 1)
+		metrics := newInputMetrics(monitoring.NewRegistry(), 1)
 		metrics.Close()
 
 		id := metrics.beginSQSWorker()
@@ -68,7 +67,7 @@ func TestInputMetricsSQSWorkerUtilization(t *testing.T) {
 		fakeTimeMs.Store(0)
 		defer useFakeCurrentTimeThenReset()()
 
-		metrics := newInputMetrics(v2.Context{MetricsRegistry: monitoring.NewRegistry()}, 1)
+		metrics := newInputMetrics(monitoring.NewRegistry(), 1)
 		metrics.Close()
 
 		fakeTimeMs.Add(4000)
@@ -88,7 +87,7 @@ func TestInputMetricsSQSWorkerUtilization(t *testing.T) {
 		fakeTimeMs.Store(0)
 		defer useFakeCurrentTimeThenReset()()
 
-		metrics := newInputMetrics(v2.Context{MetricsRegistry: monitoring.NewRegistry()}, 1)
+		metrics := newInputMetrics(monitoring.NewRegistry(), 1)
 		metrics.Close()
 
 		id := metrics.beginSQSWorker()

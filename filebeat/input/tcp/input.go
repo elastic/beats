@@ -103,7 +103,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	ctx.UpdateStatus(status.Configuring, "")
 
 	const pollInterval = time.Minute
-	metrics := netmetrics.NewTCP(ctx, s.config.Host, pollInterval, log)
+	metrics := netmetrics.NewTCP(ctx.ID, ctx.MetricsRegistry, s.config.Host, pollInterval, log)
 	defer metrics.Close()
 
 	split, err := streaming.SplitFunc(s.Framing, []byte(s.LineDelimiter))

@@ -13,7 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -23,10 +22,9 @@ func TestDecodeRecords(t *testing.T) {
 	log := logp.NewLogger(fmt.Sprintf("%s test for input", inputName))
 
 	decoder := messageDecoder{
-		config: config,
-		log:    log,
-		metrics: newInputMetrics(
-			v2.Context{MetricsRegistry: monitoring.NewRegistry()}),
+		config:  config,
+		log:     log,
+		metrics: newInputMetrics(monitoring.NewRegistry()),
 	}
 
 	msgs := []string{
@@ -94,8 +92,7 @@ func TestDecodeRecordsWithSanitization(t *testing.T) {
 	config := defaultConfig()
 	config.LegacySanitizeOptions = []string{"SINGLE_QUOTES", "NEW_LINES"}
 	log := logp.NewLogger(fmt.Sprintf("%s test for input", inputName))
-	metrics := newInputMetrics(
-		v2.Context{MetricsRegistry: monitoring.NewRegistry()})
+	metrics := newInputMetrics(monitoring.NewRegistry())
 
 	sanitizers, err := newSanitizers(config.Sanitizers, config.LegacySanitizeOptions)
 	require.NoError(t, err)

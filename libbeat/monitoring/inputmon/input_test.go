@@ -106,8 +106,8 @@ func TestMetricSnapshotJSON(t *testing.T) {
 
 	// simulate a duplicated ID in the local and global namespace.
 	reg = globalRegistry().NewRegistry(inputID)
-	monitoring.NewString(reg, MetricNameID).Set(inputID)
-	monitoring.NewString(reg, MetricNameInput).Set(inputType)
+	monitoring.NewString(reg, MetricKeyID).Set(inputID)
+	monitoring.NewString(reg, MetricKeyInput).Set(inputType)
 	monitoring.NewBool(reg, "should_be_overwritten").Set(true)
 
 	// =========== Input using new API and legacy, global namespace ===========
@@ -145,7 +145,7 @@ func TestMetricSnapshotJSON(t *testing.T) {
 
 	// another input registry missing required information.
 	reg = globalRegistry().NewRegistry("yet-another-registry")
-	monitoring.NewString(reg, MetricNameID).Set("some-id")
+	monitoring.NewString(reg, MetricKeyID).Set("some-id")
 	monitoring.NewInt(reg, "foo3_total").Set(100)
 	defer globalRegistry().Remove("yet-another-registry")
 
@@ -275,8 +275,8 @@ func TestNewMetricsRegistry(t *testing.T) {
 	assert.Equal(t, parent.GetRegistry(inputID), got)
 
 	vals := monitoring.CollectFlatSnapshot(got, monitoring.Full, false)
-	assert.Equal(t, inputID, vals.Strings[MetricNameID])
-	assert.Equal(t, inputType, vals.Strings[MetricNameInput])
+	assert.Equal(t, inputID, vals.Strings[MetricKeyID])
+	assert.Equal(t, inputType, vals.Strings[MetricKeyInput])
 }
 
 func TestNewMetricsRegistry_duplicatedInputID(t *testing.T) {

@@ -122,15 +122,15 @@ func (c *Context) UpdateStatus(status status.Status, msg string) {
 // MetricsRegistry and returns the modified registry. This is required as some
 // inputs do not use their input ID as the identifier for their metrics.
 func (c *Context) MetricsRegistryOverrideID(id string) *monitoring.Registry {
-	monitoring.NewString(c.MetricsRegistry, inputmon.MetricNameID).Set(id)
+	monitoring.NewString(c.MetricsRegistry, inputmon.MetricKeyID).Set(id)
 	return c.MetricsRegistry
 }
 
 // MetricsRegistryOverrideInput sets the "input" variable in the Context's
 // MetricsRegistry and returns the modified registry. This is required as some
-// inputs do not use their input ID as name identifier for their metrics.
+// inputs do not use their input name for their metrics.
 func (c *Context) MetricsRegistryOverrideInput(inputName string) *monitoring.Registry {
-	monitoring.NewString(c.MetricsRegistry, inputmon.MetricNameInput).Set(inputName)
+	monitoring.NewString(c.MetricsRegistry, inputmon.MetricKeyInput).Set(inputName)
 	return c.MetricsRegistry
 }
 

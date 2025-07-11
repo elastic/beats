@@ -19,7 +19,6 @@ import (
 	"github.com/aws/smithy-go"
 	"go.uber.org/multierr"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -140,7 +139,7 @@ func newSQSS3EventProcessor(
 ) *sqsS3EventProcessor {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
-		metrics = newInputMetrics(v2.Context{MetricsRegistry: monitoring.NewRegistry()}, 0)
+		metrics = newInputMetrics(monitoring.NewRegistry(), 0)
 	}
 	return &sqsS3EventProcessor{
 		s3HandlerFactory:     s3,

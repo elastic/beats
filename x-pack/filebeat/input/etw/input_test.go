@@ -94,7 +94,7 @@ func Test_RunEtwInput_NewSessionError(t *testing.T) {
 		},
 		operator: mockOperator,
 		metrics: newInputMetrics(
-			"test", inputCtx),
+			"test", inputCtx.MetricsRegistry),
 	}
 
 	// Run test

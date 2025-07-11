@@ -149,7 +149,7 @@ func TestS3Poller(t *testing.T) {
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",
-			metrics:         newInputMetrics(v2.Context{MetricsRegistry: monitoring.NewRegistry()}, 0),
+			metrics:         newInputMetrics(monitoring.NewRegistry(), 0),
 			filterProvider:  newFilterProvider(&cfg),
 		}
 		poller.runPoll(ctx)
@@ -298,7 +298,7 @@ func TestS3Poller(t *testing.T) {
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",
-			metrics:         newInputMetrics(v2ctx, 0),
+			metrics:         newInputMetrics(monitoring.NewRegistry(), 0),
 			filterProvider:  newFilterProvider(&cfg),
 		}
 		poller.run(ctx)
@@ -529,7 +529,7 @@ func Test_S3StateHandling(t *testing.T) {
 				pipeline:        newFakePipeline(),
 				s3ObjectHandler: mockObjHandler,
 				states:          s3States,
-				metrics:         newInputMetrics(v2ctx, 0),
+				metrics:         newInputMetrics(monitoring.NewRegistry(), 0),
 				filterProvider:  newFilterProvider(test.config),
 			}
 

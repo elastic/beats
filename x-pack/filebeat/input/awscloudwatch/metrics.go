@@ -5,7 +5,6 @@
 package awscloudwatch
 
 import (
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -16,14 +15,11 @@ type inputMetrics struct {
 	apiCallsTotal                *monitoring.Uint // Number of API calls made total.
 }
 
-func newInputMetrics(ctx v2.Context) *inputMetrics {
-	reg := ctx.MetricsRegistry
-
-	out := &inputMetrics{
+func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
+	return &inputMetrics{
 		logEventsReceivedTotal:       monitoring.NewUint(reg, "log_events_received_total"),
 		logGroupsTotal:               monitoring.NewUint(reg, "log_groups_total"),
 		cloudwatchEventsCreatedTotal: monitoring.NewUint(reg, "cloudwatch_events_created_total"),
 		apiCallsTotal:                monitoring.NewUint(reg, "api_calls_total"),
 	}
-	return out
 }

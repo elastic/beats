@@ -133,7 +133,7 @@ func NewWebsocketFollower(ctx context.Context, env v2.Context, cfg config, curso
 			pub:     pub,
 			log:     log,
 			redact:  cfg.Redact,
-			metrics: newInputMetrics(env),
+			metrics: newInputMetrics(env.MetricsRegistry),
 		},
 		// the token expiry handler will never trigger unless a valid expiry time is assigned
 		tokenExpiry: nil,

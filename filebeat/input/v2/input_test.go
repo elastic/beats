@@ -190,7 +190,7 @@ func TestContextMetricsRegistryOverride(t *testing.T) {
 	}{
 		{
 			name:  "MetricsRegistryOverrideID",
-			field: inputmon.MetricNameID,
+			field: inputmon.MetricKeyID,
 			overrideFn: func(ctx Context, val string) *monitoring.Registry {
 				return ctx.MetricsRegistryOverrideID(val)
 			},
@@ -198,7 +198,7 @@ func TestContextMetricsRegistryOverride(t *testing.T) {
 		},
 		{
 			name:  "MetricsRegistryOverrideInput",
-			field: inputmon.MetricNameInput,
+			field: inputmon.MetricKeyInput,
 			overrideFn: func(ctx Context, val string) *monitoring.Registry {
 				return ctx.MetricsRegistryOverrideInput(val)
 			},

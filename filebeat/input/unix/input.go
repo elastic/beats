@@ -96,7 +96,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	log.Info("Starting Unix socket input")
 	defer log.Info("Unix socket input stopped")
 
-	metrics := newInputMetrics(ctx, s.config.Path)
+	metrics := newInputMetrics(ctx.ID, ctx.MetricsRegistry, s.config.Path)
 
 	server, err := unix.New(log, &s.config.Config, func(data []byte, _ inputsource.NetworkMetadata) {
 		log.Debugw("Data received", "bytes", len(data))
@@ -140,11 +140,10 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for the unix socket processor. If id is empty
 // a nil inputMetric is returned.
-func newInputMetrics(ctx input.Context, path string) *inputMetrics {
-	if ctx.ID == "" {
+func newInputMetrics(id string, reg *monitoring.Registry, path string) *inputMetrics {
+	if id == "" {
 		return nil
 	}
-	reg := ctx.MetricsRegistry
 	out := &inputMetrics{
 		path:           monitoring.NewString(reg, "path"),
 		packets:        monitoring.NewUint(reg, "received_events_total"),

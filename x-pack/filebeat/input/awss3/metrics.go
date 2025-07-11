@@ -14,7 +14,6 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/go-concert/timed"
@@ -145,8 +144,7 @@ func (m *inputMetrics) updateSqsWorkerUtilization() {
 	m.sqsWorkerUtilizationLastUpdate = now
 }
 
-func newInputMetrics(v2ctx v2.Context, maxWorkers int) *inputMetrics {
-	reg := v2ctx.MetricsRegistry
+func newInputMetrics(reg *monitoring.Registry, maxWorkers int) *inputMetrics {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	out := &inputMetrics{

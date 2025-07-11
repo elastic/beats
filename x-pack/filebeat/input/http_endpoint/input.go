@@ -107,7 +107,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	ctx.UpdateStatus(status.Starting, "")
 	ctx.UpdateStatus(status.Configuring, "")
 
-	metrics := newInputMetrics(ctx)
+	metrics := newInputMetrics(ctx.MetricsRegistry)
 
 	if e.config.Tracer != nil {
 		id := sanitizeFileName(ctx.IDWithoutName)
@@ -464,8 +464,7 @@ type inputMetrics struct {
 	batchACKTime        metrics.Sample     // histogram of the elapsed successful batch acking times in nanoseconds (time of handler start to time of ACK for non-empty batches).
 }
 
-func newInputMetrics(ctx v2.Context) *inputMetrics {
-	reg := ctx.MetricsRegistry
+func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 	out := &inputMetrics{
 		bindAddr:            monitoring.NewString(reg, "bind_address"),
 		route:               monitoring.NewString(reg, "route"),

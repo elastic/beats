@@ -27,8 +27,8 @@ import (
 )
 
 const (
-	MetricNameID    = "id"
-	MetricNameInput = "input"
+	MetricKeyID    = "id"
+	MetricKeyInput = "input"
 )
 
 // NewDeprecatedMetricsRegistry is deprecated and exists only for backwards
@@ -88,8 +88,8 @@ func NewDeprecatedMetricsRegistry(inputType, inputID string, optionalParent *mon
 			"registry_id", registryID)
 	}
 
-	monitoring.NewString(reg, MetricNameInput).Set(inputType)
-	monitoring.NewString(reg, MetricNameID).Set(inputID)
+	monitoring.NewString(reg, MetricKeyInput).Set(inputType)
+	monitoring.NewString(reg, MetricKeyID).Set(inputID)
 
 	log.Infow("registering",
 		"input_type", inputType,
@@ -168,8 +168,8 @@ func NewMetricsRegistry(
 
 	// add the necessary information so the registry can be published by the
 	// HTTP monitoring endpoint.
-	monitoring.NewString(reg, MetricNameInput).Set(inputType)
-	monitoring.NewString(reg, MetricNameID).Set(inputID)
+	monitoring.NewString(reg, MetricKeyInput).Set(inputType)
+	monitoring.NewString(reg, MetricKeyID).Set(inputID)
 
 	log.Named("metric_registry").Infow("registering",
 		"registry_id", registryID,

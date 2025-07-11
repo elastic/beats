@@ -60,7 +60,7 @@ func (bi *benchmarkInput) Test(ctx v2.TestContext) error {
 // Run starts the data generation.
 func (bi *benchmarkInput) Run(ctx v2.Context, publisher stateless.Publisher) error {
 	var wg sync.WaitGroup
-	metrics := newInputMetrics(ctx)
+	metrics := newInputMetrics(ctx.MetricsRegistry)
 
 	switch bi.cfg.Status {
 	case "degraded":
@@ -164,8 +164,7 @@ type inputMetrics struct {
 }
 
 // newInputMetrics returns an input metric for the benchmark processor.
-func newInputMetrics(ctx v2.Context) *inputMetrics {
-	reg := ctx.MetricsRegistry
+func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 	out := &inputMetrics{
 		eventsPublished: monitoring.NewUint(reg, "events_published_total"),
 		publishingTime:  metrics.NewUniformSample(1024),

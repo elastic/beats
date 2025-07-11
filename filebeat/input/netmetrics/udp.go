@@ -28,7 +28,6 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
@@ -53,12 +52,11 @@ type UDP struct {
 }
 
 // NewUDP returns a new UDP input metricset. Note that if the id is empty then a nil UDP metricset is returned.
-func NewUDP(ctx v2.Context, device string, buflen uint64, poll time.Duration, log *logp.Logger) *UDP {
-	if ctx.ID == "" {
+func NewUDP(id string, reg *monitoring.Registry, device string, buflen uint64, poll time.Duration, log *logp.Logger) *UDP {
+	if id == "" {
 		return nil
 	}
 
-	reg := ctx.MetricsRegistry
 	out := &UDP{
 		monitorRegistry: reg,
 		bufferLen:       monitoring.NewUint(reg, "udp_read_buffer_length_gauge"),

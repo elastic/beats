@@ -97,7 +97,7 @@ func (*jamfInput) Test(v2.TestContext) error { return nil }
 // Run will start data collection on this provider.
 func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
 	p.logger = inputCtx.Logger.With("provider", Name, "tenant", p.cfg.JamfTenant)
-	p.metrics = newMetrics(inputCtx, nil)
+	p.metrics = newMetrics(inputCtx.MetricsRegistry)
 
 	lastSyncTime, _ := getLastSync(store)
 	syncWaitTime := time.Until(lastSyncTime.Add(p.cfg.SyncInterval))

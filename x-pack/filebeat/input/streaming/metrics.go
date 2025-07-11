@@ -7,7 +7,6 @@ package streaming
 import (
 	"github.com/rcrowley/go-metrics"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -29,8 +28,7 @@ type inputMetrics struct {
 	pongMessageReceivedTime metrics.Sample     // histogram of the elapsed successful pong message receive times in nanoseconds
 }
 
-func newInputMetrics(env v2.Context) *inputMetrics {
-	reg := env.MetricsRegistry
+func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 	out := &inputMetrics{
 		url:                     monitoring.NewString(reg, "url"),
 		celEvalErrors:           monitoring.NewUint(reg, "cel_eval_errors"),

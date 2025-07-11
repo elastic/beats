@@ -22,7 +22,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -365,7 +364,7 @@ func TestProcessObjectMetricCollection(t *testing.T) {
 			)
 
 			// metric recorder with zero workers
-			metricRecorder := newInputMetrics(v2.Context{MetricsRegistry: monitoring.NewRegistry()}, 0)
+			metricRecorder := newInputMetrics(monitoring.NewRegistry(), 0)
 			objFactory := newS3ObjectProcessorFactory(metricRecorder, mockS3API, nil, backupConfig{})
 			objHandler := objFactory.Create(ctx, s3Event)
 
