@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest/observer"
 
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -40,7 +41,7 @@ func TestConfigValidate(t *testing.T) {
 	t.Run("take_over requires ID", func(t *testing.T) {
 		c := config{
 			Paths:    []string{"/foo/bar"},
-			TakeOver: takeOverConfig{Enabled: true},
+			TakeOver: loginp.TakeOverConfig{Enabled: true},
 		}
 		err := c.Validate()
 		assert.Error(t, err, "take_over.enabled can only be true if ID is set")
@@ -50,7 +51,7 @@ func TestConfigValidate(t *testing.T) {
 		c := config{
 			Paths:    []string{"/foo/bar"},
 			ID:       "some id",
-			TakeOver: takeOverConfig{Enabled: true},
+			TakeOver: loginp.TakeOverConfig{Enabled: true},
 		}
 		err := c.Validate()
 		assert.NoError(t, err)

@@ -693,6 +693,7 @@ func createTempDir(t *testing.T) string {
 // using the default test credentials or the corresponding environment
 // variables.
 func EnsureESIsRunning(t *testing.T) {
+	t.Helper()
 	esURL := GetESURL(t, "http")
 
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(500*time.Second))
