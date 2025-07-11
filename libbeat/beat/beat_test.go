@@ -73,19 +73,19 @@ func TestUserAgentString(t *testing.T) {
 			name: "unmanaged-privileged",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
 				Manager: testManager{isEnabled: true, isUnpriv: false, mgmtMode: proto.AgentManagedMode_STANDALONE}},
-			expectedComments: []string{"Standalone"},
+			expectedComments: []string{"Unmanaged"},
 		},
 		{
 			name: "unmanaged-unprivileged",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
 				Manager: testManager{isEnabled: true, isUnpriv: true, mgmtMode: proto.AgentManagedMode_STANDALONE}},
-			expectedComments: []string{"Standalone", "Unprivileged"},
+			expectedComments: []string{"Unmanaged", "Unprivileged"},
 		},
 		{
 			name: "management-disabled",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
 				Manager: testManager{isEnabled: false}},
-			expectedComments: []string{"Unmanaged"},
+			expectedComments: []string{"Standalone"},
 		},
 		{
 			name: "no-management",
