@@ -262,6 +262,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 - Added maintenance windows support for Heartbeat. {pull}41508[41508]
 - Add missing dependencies to ubi9-minimal distro. {pull}44556[44556]
+- Add base64 encoding option to inline monitors. {pull}45100[45100]
 
 
 *Metricbeat*
@@ -439,7 +440,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Journald `include_matches.match` now accepts `+` to represent a logical disjunction (OR) {issue}40185[40185] {pull}42517[42517]
 - The journald input is now generally available. {pull}42107[42107]
 - Add metrics for number of events and pages published by HTTPJSON input. {issue}42340[42340] {pull}42442[42442]
-- Filestram take over now supports taking over states from other Filestream inputs and dynamic loading of inputs (autodiscover and Elastic-Agent). {issue}42472[42472] {issue}42884[42884] {pull}42624[42624]
+- Filestream take over now supports taking over states from other Filestream inputs and dynamic loading of inputs (autodiscover and Elastic Agent). There is a new syntax for the configuration, but the previous one can still be used. {issue}42472[42472] {issue}42884[42884] {pull}42624[42624]
 - Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
 - Update CEL mito extensions to v1.17.0. {pull}42851[42851]
 - Winlog input now can report its status to Elastic-Agent {pull}43089[43089]
@@ -477,6 +478,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add Fleet health status reporting to the entity analytics input. {issue}44269[44269] {pull}45152[45152]
 - Add Fleet status updating to o356audit input. {issue}44651[44651] {pull}44957[44957]
 - Add support for blob filtering using path_prefix in azureblobstorage input. {issue}35186[35186] {pull}45214[45214]
+- Update CEL mito extensions to v1.22.0. {pull}45245[45245]
 
 *Auditbeat*
 
