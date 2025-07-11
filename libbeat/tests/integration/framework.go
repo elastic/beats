@@ -587,10 +587,22 @@ func (b *BeatProc) searchStrInLogsReversed(logFile *os.File, s string) (bool, st
 
 // WaitForLogs waits for the specified string s to be present in the logs within
 // the given timeout duration and fails the test if s is not found.
+// It keep tracks if the offset of the log file, reading only new lines. Each
+// subsequent call to WaitForLogs will only check the logs not yet evaluated.
 // msgAndArgs should be a format string and arguments that will be printed
 // if the logs are not found, providing additional context for debugging.
 func (b *BeatProc) WaitForLogs(s string, timeout time.Duration, msgAndArgs ...any) {
 	b.t.Helper()
+	require.Eventually(b.t, func() bool {
+		return b.LogContains(s)
+	}, timeout, 100*time.Millisecond, msgAndArgs...)
+}
+
+// WaitForLogsFromBeginning has the same behaviour as WaitForLogs, but it first
+// resets the log offset.
+func (b *BeatProc) WaitForLogsFromBeginning(s string, timeout time.Duration, msgAndArgs ...any) {
+	b.t.Helper()
+	b.logFileOffset = 0
 	require.Eventually(b.t, func() bool {
 		return b.LogContains(s)
 	}, timeout, 100*time.Millisecond, msgAndArgs...)

@@ -36,6 +36,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/testing/gziptest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/elastic-agent-libs/iobuf"
 )
 
 // TestFilestreamGZIPIncompleteFilesAreFullyRead ensures filestream correctly
@@ -162,7 +163,7 @@ logging.level: debug
 			// wait for filebeat read the incomplete GZIP file and reach the
 			// error.
 			for _, want := range tc.initialLogs(logPath) {
-				filebeat.WaitForLogs(
+				filebeat.WaitForLogsFromBeginning(
 					want,
 					30*time.Second,
 					"Filebeat did not log: '%s'", want,
@@ -186,7 +187,7 @@ logging.level: debug
 			// written.
 			for _, log := range tc.furtherLogs {
 				want := fmt.Sprintf(log, logPath)
-				filebeat.WaitForLogs(
+				filebeat.WaitForLogsFromBeginning(
 					fmt.Sprintf(log, logPath),
 					30*time.Second,
 					"Filebeat did not log: '%s'", want,
@@ -194,7 +195,7 @@ logging.level: debug
 			}
 
 			// Ensure the file is fully read
-			filebeat.WaitForLogs(fmt.Sprintf(
+			filebeat.WaitForLogsFromBeginning(fmt.Sprintf(
 				"EOF has been reached. Closing. Path='%s'", logPath),
 				30*time.Second,
 				"Filebeat did not finish reading the log file")
@@ -244,7 +245,7 @@ logging.level: debug
 	filebeat.WriteConfigFile(cfg)
 	filebeat.Start()
 
-	filebeat.WaitForLogs(
+	filebeat.WaitForLogsFromBeginning(
 		fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logFilepath),
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -272,7 +273,7 @@ logging.level: debug
 
 	filebeat.Start()
 	wantLog := fmt.Sprintf("GZIP file already read to EOF, not reading it again, file name '%s'", logFilepath)
-	filebeat.WaitForLogs(
+	filebeat.WaitForLogsFromBeginning(
 		wantLog,
 		30*time.Second,
 		"Filebeat did find log '%s'",
@@ -343,7 +344,7 @@ logging.level: debug
 	filebeat.WriteConfigFile(cfg)
 	filebeat.Start()
 
-	filebeat.WaitForLogs(
+	filebeat.WaitForLogsFromBeginning(
 		fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPath),
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -382,10 +383,11 @@ func TestFilestreamGZIPMetrics(t *testing.T) {
 		"../../filebeat.test",
 	)
 	tempDir := filebeat.TempDir()
+	t.Log("tempdir:", tempDir)
 	logPathBase := filepath.Join(tempDir, "log")
 	logPathPlain := logPathBase
 	logPathGZ := logPathBase + ".gz"
-	outputFilename := "output-file"
+	outputFilePattern := "output-file"
 
 	err := os.WriteFile(
 		logPathGZ, dataGZ, 0644)
@@ -395,7 +397,9 @@ func TestFilestreamGZIPMetrics(t *testing.T) {
 	require.NoError(t, err, "could not write plain file to disk")
 
 	cfg := fmt.Sprintf(`
-http.enabled: true
+http:
+  enabled: true
+  port: 4242
 filebeat.inputs:
   - type: filestream
     id: "test-filestream"
@@ -407,34 +411,35 @@ output.file:
   path: %s
   filename: "%s"
 logging.level: debug
-`, logPathBase+"*", filebeat.TempDir(), outputFilename)
+`, logPathBase+"*", filebeat.TempDir(), outputFilePattern)
 
 	filebeat.WriteConfigFile(cfg)
 	filebeat.Start()
 
 	eofLine := fmt.Sprintf("End of file reached: %s; Backoff now.", logPathPlain)
-	filebeat.WaitForLogs(
-		eofLine,
-		30*time.Second,
-		"Filebeat did not reach EOF. Did not find log [%s]",
-		eofLine,
-	)
-	eofLine = fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPathGZ)
-	filebeat.WaitForLogs(
+	filebeat.WaitForLogsFromBeginning(
 		eofLine,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
 		eofLine,
 	)
 
-	resp, err := http.Get("http://localhost:5066/inputs/")
+	eofLine = fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPathGZ)
+	filebeat.WaitForLogsFromBeginning(
+		eofLine,
+		time.Minute,
+		"Filebeat did not reach EOF. Did not find log [%s]",
+		eofLine,
+	)
+
+	resp, err := http.Get("http://localhost:4242/inputs/")
 	require.NoError(t, err, "failed to get input metrics")
 	defer resp.Body.Close()
 
 	filebeat.Stop()
 
 	matchPublishedLinesFromFile(t,
-		filepath.Join(tempDir, outputFilename), lines)
+		filepath.Join(tempDir, outputFilePattern), lines)
 
 	// ============================ assert metrics =============================
 
@@ -469,8 +474,15 @@ logging.level: debug
 	}
 
 	var metrics []InputMetrics
-	err = json.NewDecoder(resp.Body).Decode(&metrics)
-	require.NoError(t, err, "failed to decode JSON response")
+	body, err := iobuf.ReadAll(resp.Body)
+	require.NoError(t, err, "could not read response body")
+	err = json.Unmarshal(body, &metrics)
+	require.NoError(t, err, "failed to Unmarshal JSON response")
+	defer func() {
+		if t.Failed() {
+			t.Log("raw input metrics response:", string(body))
+		}
+	}()
 	require.Len(t, metrics, 1, "expected exactly one input metric")
 	metric := metrics[0]
 	totalHist := metric.ProcessingTime.Histogram
@@ -586,7 +598,7 @@ logging.level: debug
 	filebeat.Start()
 
 	eofLine := fmt.Sprintf("End of file reached: %s; Backoff now.", logPathPlain)
-	filebeat.WaitForLogs(
+	filebeat.WaitForLogsFromBeginning(
 		eofLine,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -600,7 +612,7 @@ logging.level: debug
 	// wait filebeat to pick up the file and see it's the same as the plain file.
 	wantLine := fmt.Sprintf("\\\"%s\\\" points to an already known ingest target \\\"%s\\\" [e64ff2da367b082e1dcc38ec48215bff55925bd408f718f107e50ecf426fe3c3==e64ff2da367b082e1dcc38ec48215bff55925bd408f718f107e50ecf426fe3c3]. Skipping",
 		logPathGZ, logPathPlain)
-	filebeat.WaitForLogs(
+	filebeat.WaitForLogsFromBeginning(
 		wantLine,
 		30*time.Second,
 		"Did not find log '%s'",
@@ -671,7 +683,7 @@ logging.level: debug
 	filebeat.Start()
 
 	eofLine := fmt.Sprintf("End of file reached: %s; Backoff now.", logPathPlain)
-	filebeat.WaitForLogs(
+	filebeat.WaitForLogsFromBeginning(
 		eofLine,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -692,7 +704,7 @@ logging.level: debug
 
 	// Wait filebeat to finish the gzipped file
 	eofLog := fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPathGZ)
-	filebeat.WaitForLogs(
+	filebeat.WaitForLogsFromBeginning(
 		eofLog,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -701,7 +713,7 @@ logging.level: debug
 
 	// Wait filebeat to finish the original file with new content
 	eofLine = fmt.Sprintf("End of file reached: %s; Backoff now.", logPathPlain)
-	filebeat.WaitForLogs(
+	filebeat.WaitForLogsFromBeginning(
 		eofLine,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -812,7 +824,7 @@ logging.level: debug
 	filebeat.Start()
 
 	eofLine := fmt.Sprintf("End of file reached: %s; Backoff now.", logPathActive)
-	filebeat.WaitForLogs(
+	filebeat.WaitForLogsFromBeginning(
 		eofLine,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -837,7 +849,7 @@ logging.level: debug
 
 	// Wait filebeat to finish the gzipped files
 	eofLog := fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPathLatestRotation)
-	filebeat.WaitForLogs(
+	filebeat.WaitForLogsFromBeginning(
 		eofLog,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -845,7 +857,7 @@ logging.level: debug
 	)
 
 	eofLog = fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPathGZOldestRotation)
-	filebeat.WaitForLogs(
+	filebeat.WaitForLogsFromBeginning(
 		eofLog,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -854,7 +866,7 @@ logging.level: debug
 
 	// Wait filebeat to finish the original file with new content
 	eofLine = fmt.Sprintf("End of file reached: %s; Backoff now.", logPathActive)
-	filebeat.WaitForLogs(
+	filebeat.WaitForLogsFromBeginning(
 		eofLine,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -986,7 +998,7 @@ logging.level: debug
 
 	filebeat.Start()
 	eofLine := fmt.Sprintf("End of file reached: %s; Backoff now.", logPathActive)
-	filebeat.WaitForLogs(
+	filebeat.WaitForLogsFromBeginning(
 		eofLine,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -1107,7 +1119,7 @@ logging.level: debug
 	filebeat.Start()
 
 	eofLog := fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPath)
-	filebeat.WaitForLogs(
+	filebeat.WaitForLogsFromBeginning(
 		eofLog,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -1248,6 +1260,8 @@ func assertLogFieldsEqual(t *testing.T, wantPath, gotPath string) {
 }
 
 func waitForLatestOutput(t *testing.T, outputFilePattern string, tempDir string, want int) {
+	t.Helper()
+
 	// wait for all lines in the output
 	msg := &strings.Builder{}
 	var files []string
@@ -1263,7 +1277,12 @@ func waitForLatestOutput(t *testing.T, outputFilePattern string, tempDir string,
 			msg.WriteString(fmt.Sprintf(format, a...))
 		}
 		msg.Reset()
+
 		files = getOutputFilesSorted(t, outputFilePattern, tempDir)
+		if len(files) == 0 {
+			writeMsg("no output file")
+			return false
+		}
 
 		got, _ := os.ReadFile(files[len(files)-1])
 		lines := strings.Split(strings.TrimSuffix(string(got), "\n"), "\n")
