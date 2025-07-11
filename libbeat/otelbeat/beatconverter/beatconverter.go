@@ -30,7 +30,7 @@ import (
 )
 
 // list of supported beatreceivers
-var supportedReceivers = []string{"filebeatreceiver"} // Add more beat receivers to this list when we add support
+var supportedReceivers = []string{"filebeatreceiver", "metricbeatreceiver"} // Add more beat receivers to this list when we add support
 
 type converter struct{}
 
