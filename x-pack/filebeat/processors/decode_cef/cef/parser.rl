@@ -57,13 +57,13 @@ func (e *Event) unpack(data string) error {
         // Reached an early end.
         if p == pe {
             if complete {
-                return errors.Join(errors.Join(recoveredErrs...), errUnexpectedEndOfEvent)
+                return errors.Join(append(recoveredErrs, errUnexpectedEndOfEvent)...)
             }
-            return errors.Join(errors.Join(recoveredErrs...), errors.Join(errUnexpectedEndOfEvent, errIncompleteHeader))
+            return errors.Join(append(recoveredErrs, errUnexpectedEndOfEvent, errIncompleteHeader)...)
         }
 
         // Encountered invalid input.
-        return errors.Join(errors.Join(recoveredErrs...), fmt.Errorf("error in CEF event at pos %d", p+1))
+        return errors.Join(append(recoveredErrs, fmt.Errorf("error in CEF event at pos %d", p+1)))
     }
 
     return errors.Join(recoveredErrs...)
