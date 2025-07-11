@@ -3,7 +3,6 @@
 package cef
 
 import (
-    "errors"
     "fmt"
     "strconv"
 )
@@ -16,7 +15,7 @@ import (
 }%%
 
 // recoverExtensions unpacks a CEF message's extensions from messages with incomplete headers.
-func (e *Event) recoverExtensions(data string) error {
+func (e *Event) recoverExtensions(data string) []error {
     cs, p, pe, eof := 0, 0, len(data), len(data)
     mark, mark_slash := 0, 0
 
@@ -57,5 +56,5 @@ func (e *Event) recoverExtensions(data string) error {
     t.Extensions = e.Extensions
     *e = t
 
-    return errors.Join(recoveredErrs...)
+    return recoveredErrs
 }

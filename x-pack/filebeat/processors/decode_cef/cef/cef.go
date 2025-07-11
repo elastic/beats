@@ -135,9 +135,9 @@ func (e *Event) Unpack(data string, opts ...Option) error {
 		if len(e.Extensions) == 0 {
 			// We must have failed in the headers,
 			// so go back for the extensions.
-			err = e.recoverExtensions(data)
-			if err != nil {
-				errs = append(errs, err)
+			recoveredErrs := e.recoverExtensions(data)
+			if len(recoveredErrs) != 0 {
+				errs = append(errs, recoveredErrs...)
 			}
 		}
 	}
