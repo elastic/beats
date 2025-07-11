@@ -20,12 +20,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/mbprovider"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
-<<<<<<< HEAD
-	"github.com/elastic/elastic-agent-libs/logp"
-=======
 	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
-	"github.com/elastic/elastic-agent-libs/mapstr"
->>>>>>> f0b0f2a91 ([beatreceivers] Introduce otel mode for metricbeat (#45145))
 )
 
 var schemeMap = map[string]string{
