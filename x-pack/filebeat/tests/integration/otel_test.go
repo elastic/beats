@@ -7,15 +7,19 @@
 package integration
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
+	"text/template"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -26,7 +30,11 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 )
 
-var beatsCfgFile = `
+func TestFilebeatOTelE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+	numEvents := 1
+
+	var beatsCfgFile = `
 filebeat.inputs:
   - type: filestream
     id: filestream-input-id
@@ -54,16 +62,9 @@ http.host: localhost
 http.port: %d
 `
 
-<<<<<<< HEAD
-func TestFilebeatOTelE2E(t *testing.T) {
-	integration.EnsureESIsRunning(t)
-	numEvents := 1
-
-=======
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	fbOtelIndex := "logs-integration-" + namespace
 	fbIndex := "logs-filebeat-" + namespace
->>>>>>> ea98564a4 (otel: update filebeat integration tests to run in isolation (#45314))
 	// start filebeat in otel mode
 	filebeatOTel := integration.NewBeat(
 		t,
@@ -85,15 +86,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	)
 	logFilePath = filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-<<<<<<< HEAD
-	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
-	s = s + `
-setup.template.name: logs-filebeat-default
-setup.template.pattern: logs-filebeat-default
-`
-=======
 	s := fmt.Sprintf(beatsCfgFile, logFilePath, fbIndex, 5067)
->>>>>>> ea98564a4 (otel: update filebeat integration tests to run in isolation (#45314))
 
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
@@ -185,21 +178,20 @@ func assertMapsEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg 
 	require.Equal(t, "", cmp.Diff(flatM1, flatM2), "expected maps to be equal")
 }
 
-func assertMonitoring(t *testing.T) {
-	r, err := http.Get("http://localhost:5066") //nolint:noctx,bodyclose // fine for tests
+func assertMonitoring(t *testing.T, port int) {
+	address := fmt.Sprintf("http://localhost:%d", port)
+	r, err := http.Get(address) //nolint:noctx,bodyclose,gosec // fine for tests
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
 
-	r, err = http.Get("http://localhost:5066/stats") //nolint:noctx,bodyclose // fine for tests
+	r, err = http.Get(address + "/stats") //nolint:noctx,bodyclose // fine for tests
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
 
-	r, err = http.Get("http://localhost:5066/not-exist") //nolint:noctx,bodyclose // fine for tests
+	r, err = http.Get(address + "/not-exist") //nolint:noctx,bodyclose // fine for tests
 	require.NoError(t, err)
 	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }
-<<<<<<< HEAD
-=======
 
 func TestFilebeatOTelReceiverE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
@@ -505,4 +497,3 @@ service:
 		assertMonitoring(t, rec.MonitoringPort)
 	}
 }
->>>>>>> ea98564a4 (otel: update filebeat integration tests to run in isolation (#45314))
