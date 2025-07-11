@@ -111,5 +111,5 @@ func TestParseChildNodesIgnoresEmptyNodeId(t *testing.T) {
 		},
 	}
 
-	require.ElementsMatch(t, []string{"node1", "node2", "node3", "node4"}, maps.Keys(parseChildNodes(children, true)))
+	require.ElementsMatch(t, []string{"node1", "node2", "node3", "node4"}, slices.Collect(maps.Keys(parseChildNodes(children, true))))
 }
