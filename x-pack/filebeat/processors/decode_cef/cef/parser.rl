@@ -3,7 +3,6 @@
 package cef
 
 import (
-    "errors"
     "fmt"
     "strconv"
 )
@@ -16,7 +15,7 @@ import (
 }%%
 
 // unpack unpacks a CEF message.
-func (e *Event) unpack(data string) error {
+func (e *Event) unpack(data string) []error {
     cs, p, pe, eof := 0, 0, len(data), len(data)
     mark, mark_slash := 0, 0
 
@@ -57,14 +56,14 @@ func (e *Event) unpack(data string) error {
         // Reached an early end.
         if p == pe {
             if complete {
-                return errors.Join(append(recoveredErrs, errUnexpectedEndOfEvent)...)
+                return append(recoveredErrs, errUnexpectedEndOfEvent)
             }
-            return errors.Join(append(recoveredErrs, errUnexpectedEndOfEvent, errIncompleteHeader)...)
+            return append(recoveredErrs, errUnexpectedEndOfEvent, errIncompleteHeader)
         }
 
         // Encountered invalid input.
-        return errors.Join(append(recoveredErrs, fmt.Errorf("error in CEF event at pos %d", p+1))...)
+        return append(recoveredErrs, fmt.Errorf("error in CEF event at pos %d", p+1))
     }
 
-    return errors.Join(recoveredErrs...)
+    return recoveredErrs
 }
