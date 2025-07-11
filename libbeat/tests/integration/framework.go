@@ -30,6 +30,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -48,8 +49,11 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 
+	"github.com/elastic/beats/v7/libbeat/common/proc"
 	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/elastic/mock-es/pkg/api"
 )
 
 type BeatProc struct {
@@ -69,8 +73,10 @@ type BeatProc struct {
 	stdin               io.WriteCloser
 	stdout              *os.File
 	stderr              *os.File
-	Process             *os.Process
 	cleanUpOnce         sync.Once
+	jobObject           proc.Job
+	stopOnce            sync.Once
+	Cmd                 *exec.Cmd
 }
 
 type Meta struct {
@@ -117,6 +123,9 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	stderrFile, err := os.Create(filepath.Join(tempDir, "stderr"))
 	require.NoError(t, err, "error creating stderr file")
 
+	jobObject, err := proc.CreateJobObject()
+	require.NoError(t, err, "creating job object")
+
 	p := BeatProc{
 		Binary: binary,
 		baseArgs: append([]string{
@@ -134,13 +143,16 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 		t:          t,
 		stdout:     stdoutFile,
 		stderr:     stderrFile,
+		jobObject:  jobObject,
 	}
+
 	t.Cleanup(func() {
 		if !t.Failed() {
 			return
 		}
 		reportErrors(t, tempDir, beatName)
 	})
+
 	return &p
 }
 
@@ -248,29 +260,38 @@ func (b *BeatProc) startBeat() {
 	_, _ = b.stderr.Seek(0, 0)
 	_ = b.stderr.Truncate(0)
 
-	cmd := exec.Cmd{
+	b.Cmd = &exec.Cmd{
 		Path:   b.fullPath,
 		Args:   b.Args,
 		Stdout: b.stdout,
 		Stderr: b.stderr,
+		// OS dependant attributes to allow gracefully terminating process
+		// on Linux and Windows
+		SysProcAttr: proc.GetSysProcAttr(),
 	}
 
 	var err error
-	b.stdin, err = cmd.StdinPipe()
+	b.stdin, err = b.Cmd.StdinPipe()
 	require.NoError(b.t, err, "could not get cmd StdinPipe")
 
-	err = cmd.Start()
+	err = b.Cmd.Start()
 	require.NoError(b.t, err, "error starting beat process")
 
-	b.Process = cmd.Process
+	if err := b.jobObject.Assign(b.Cmd.Process); err != nil {
+		_ = b.Cmd.Process.Kill()
+		b.t.Fatalf("failed job assignment: %s", err)
+	}
 
 	b.t.Cleanup(func() {
 		// If the test failed, print the whole cmd line to help debugging
 		if b.t.Failed() {
-			args := strings.Join(cmd.Args, " ")
-			b.t.Log("CMD line to execute Beat:", cmd.Path, args)
+			args := strings.Join(b.Cmd.Args, " ")
+			b.t.Log("CMD line to execute Beat:", b.Cmd.Path, args)
 		}
 	})
+
+	// Every time we start a process, we can stop it again
+	b.stopOnce = sync.Once{}
 }
 
 // waitBeatToExit blocks until the Beat exits.
@@ -282,11 +303,10 @@ func (b *BeatProc) waitBeatToExit() {
 	}
 	defer b.waitingMutex.Unlock()
 
-	processState, err := b.Process.Wait()
-	if err != nil {
+	if err := b.Cmd.Wait(); err != nil {
 		exitCode := "unknown"
-		if processState != nil {
-			exitCode = strconv.Itoa(processState.ExitCode())
+		if b.Cmd.ProcessState != nil {
+			exitCode = strconv.Itoa(b.Cmd.ProcessState.ExitCode())
 		}
 
 		b.t.Fatalf("error waiting for %q to finish: %s. Exit code: %s",
@@ -305,36 +325,30 @@ func (b *BeatProc) Stop() {
 // stopNonsynced is the actual stop code, but without locking so it can be reused
 // by methods that have already acquired the lock.
 func (b *BeatProc) stopNonsynced() {
-	// Windows does not support interrupt
-	if runtime.GOOS == "windows" {
-		if err := b.Process.Kill(); err != nil {
-			b.t.Logf("[WARN] could not send kill signal to process with PID: %d, err: %s",
-				b.Process.Pid, err)
+	b.stopOnce.Do(func() {
+		// If the test/caller has already stopped the process, do nothing.
+		if b.Cmd.ProcessState != nil {
+			return
 		}
-	} else {
-		if err := b.Process.Signal(os.Interrupt); err != nil {
-			if errors.Is(err, os.ErrProcessDone) {
-				return
-			}
 
-			b.t.Fatalf("could not send interrupt signal to process with PID: %d, err: %s",
-				b.Process.Pid, err)
+		if err := proc.StopCmd(b.Cmd.Process); err != nil {
+			b.t.Fatalf("cannot stop process: %s", err)
 		}
-	}
 
-	if !b.waitingMutex.TryLock() {
-		// b.waitBeatToExit must be waiting on the process already. Nothing to do.
-		return
-	}
-	defer b.waitingMutex.Unlock()
-	ps, err := b.Process.Wait()
-	if err != nil {
-		b.t.Logf("[WARN] got an error waiting %s to stop: %v", b.beatName, err)
-		return
-	}
-	if !ps.Success() {
-		b.t.Logf("[WARN] %s did not stopped successfully: %v", b.beatName, ps.String())
-	}
+		if !b.waitingMutex.TryLock() {
+			// b.waitBeatToExit must be waiting on the process already. Nothing to do.
+			return
+		}
+		defer b.waitingMutex.Unlock()
+		err := b.Cmd.Wait()
+		if err != nil {
+			b.t.Logf("[WARN] got an error waiting %s to stop: %v", b.beatName, err)
+			return
+		}
+		if !b.Cmd.ProcessState.Success() {
+			b.t.Logf("[WARN] %s did not stop successfully: %v", b.beatName, b.Cmd.ProcessState.String())
+		}
+	})
 }
 
 // LogMatch tests each line of the logfile to see if contains any
@@ -423,6 +437,30 @@ func (b *BeatProc) LogContains(s string) bool {
 	found, b.eventLogFileOffset, _ = b.searchStrInLogs(eventLogFile, s, b.eventLogFileOffset)
 
 	return found
+}
+
+func (b *BeatProc) RemoveLogFiles() {
+	year := time.Now().Year()
+	tmpls := []string{"%s-events-data-%d*.ndjson", "%s-%d*.ndjson"}
+
+	files := []string{}
+	for _, tmpl := range tmpls {
+		glob := fmt.Sprintf(tmpl, filepath.Join(b.tempDir, b.beatName), year)
+		foundFiles, err := filepath.Glob(glob)
+		if err != nil {
+			b.t.Fatalf("cannot resolve glob: %s", err)
+		}
+		files = append(files, foundFiles...)
+	}
+
+	for _, file := range files {
+		if err := os.Remove(file); err != nil {
+			b.t.Fatalf("cannot remove file: %s", err)
+		}
+	}
+
+	b.eventLogFileOffset = 0
+	b.logFileOffset = 0
 }
 
 // GetLogLine search for the string s starting at the beginning
@@ -876,7 +914,22 @@ func (b *BeatProc) Stdin() io.WriteCloser {
 	return b.stdin
 }
 
+// GetESURL Returns the ES URL with username and password set,
+// it uses ES_USER and ES_PASS that on our mage automation defaults
+// to user 'beats' and pass 'testing'. This user/role has limited
+// privileges, it cannot create arbitrary indexes.
 func GetESURL(t *testing.T, scheme string) url.URL {
+	return getESURL(t, scheme, "ES_USER", "ES_PASS")
+}
+
+// GetESURL Returns the ES URL with admin username and password set,
+// it uses ES_SUPERUSER_USER and ES_SUPERUSER_PASS that on our mage
+// automation defaults to user 'admin' and pass 'testing'.
+func GetESAdminURL(t *testing.T, scheme string) url.URL {
+	return getESURL(t, scheme, "ES_SUPERUSER_USER", "ES_SUPERUSER_PASS")
+}
+
+func getESURL(t *testing.T, scheme string, userEnvVar, passEnvVar string) url.URL {
 	t.Helper()
 
 	esHost := os.Getenv("ES_HOST")
@@ -896,12 +949,12 @@ func GetESURL(t *testing.T, scheme string) url.URL {
 		}
 	}
 
-	user := os.Getenv("ES_USER")
+	user := os.Getenv(userEnvVar)
 	if user == "" {
 		user = "admin"
 	}
 
-	pass := os.Getenv("ES_PASS")
+	pass := os.Getenv(passEnvVar)
 	if pass == "" {
 		pass = "testing"
 	}
@@ -1112,4 +1165,80 @@ func (b *BeatProc) CountFileLines(glob string) int {
 // ConfigFilePath returns the config file path
 func (b *BeatProc) ConfigFilePath() string {
 	return b.configFile
+}
+
+// StartMockES starts mock-es on the specified address.
+// If add is an empty string a random local port is used.
+// The return values are:
+//   - The HTTP server
+//   - The server address in the form ip:port
+//   - The mock-es API handler
+//   - The ManualReader for accessing the metrics
+func StartMockES(
+	t *testing.T,
+	addr string,
+	percentDuplicate,
+	percentTooMany,
+	percentNonIndex,
+	percentTooLarge,
+	historyCap uint,
+) (*http.Server, string, *api.APIHandler, *sdkmetric.ManualReader) {
+
+	uid := uuid.Must(uuid.NewV4())
+
+	rdr := sdkmetric.NewManualReader()
+	provider := sdkmetric.NewMeterProvider(
+		sdkmetric.WithReader(rdr),
+	)
+
+	es := api.NewAPIHandler(
+		uid,
+		t.Name(),
+		provider,
+		time.Now().Add(24*time.Hour),
+		0,
+		percentDuplicate,
+		percentTooMany,
+		percentNonIndex,
+		percentTooLarge,
+		historyCap,
+	)
+
+	if addr == "" {
+		addr = ":0"
+	}
+
+	l, err := net.Listen("tcp", addr)
+	if err != nil {
+		if l, err = net.Listen("tcp6", addr); err != nil {
+			t.Fatalf("failed to listen on a port: %v", err)
+		}
+	}
+
+	addr = l.Addr().String()
+	s := http.Server{Handler: es, ReadHeaderTimeout: time.Second}
+	go func() {
+		if err := s.Serve(l); !errors.Is(err, http.ErrServerClosed) {
+			t.Errorf("could not start mock-es server: %s", err)
+		}
+	}()
+
+	// Ensure the Server is up and running before returning
+	require.Eventually(
+		t,
+		func() bool {
+			resp, err := http.Get("http://" + addr) //nolint: noctx // It's just a test
+			if err != nil {
+				return false
+			}
+			//nolint: errcheck // We're just draining the body, we can ignore the error
+			io.Copy(io.Discard, resp.Body)
+			resp.Body.Close()
+			return true
+		},
+		time.Second,
+		time.Millisecond,
+		"mock-es server did not start on '%s'", addr)
+
+	return &s, addr, es, rdr
 }
