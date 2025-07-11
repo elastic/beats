@@ -10,7 +10,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"strings"
 	"testing"
 	"text/template"
 	"time"
@@ -30,8 +29,10 @@ func TestGCPInputOTelE2E(t *testing.T) {
 
 	// Create pubsub client for setting up and communicating to emulator.
 	client, clientCancel := testSetup(t)
-	defer clientCancel()
-	defer client.Close()
+	defer func() {
+		clientCancel()
+		client.Close()
+	}()
 
 	createTopic(t, client)
 	createSubscription(t, "test-subscription-otel", client)
