@@ -89,6 +89,7 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 		require.ElementsMatch(t, []string{"data_content", "data_hot", "ingest", "master", "remote_cluster_client", "transform"}, node1MetricSet["roles"])
 		require.EqualValues(t, 2337, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.docs.count"))
 		require.EqualValues(t, 45203023, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.store.size_in_bytes"))
+		require.EqualValues(t, 45203023, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.store.total_data_set_size_in_bytes"))
 		require.EqualValues(t, 1390859, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.indexing.index_total"))
 		require.EqualValues(t, 942011, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.indexing.index_time_in_millis"))
 		require.EqualValues(t, 164, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.indexing.index_failed"))
@@ -128,7 +129,6 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 
 	// some ignored values
 	require.Nil(t, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.shard_stats"))
-	require.Nil(t, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.store.total_data_set_size_in_bytes"))
 }
 
 func expectValidParsedDetailedWithNoCache(t *testing.T, data metricset.FetcherData[NodesStats]) {
