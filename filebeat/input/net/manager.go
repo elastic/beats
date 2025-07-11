@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package inputconcurrent
+package net
 
 import (
 	"fmt"
@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
-type concurrentInputManager struct {
+type manager struct {
 	inputType string
 	configure func(*conf.C) (Input, error)
 }
@@ -45,22 +45,22 @@ type config struct {
 // allows each input to fully control event collection and publishing in
 // isolation. The function fn will be called for every input to be configured.
 func New(fn func(*conf.C) (Input, error)) v2.InputManager {
-	return &concurrentInputManager{configure: fn}
+	return &manager{configure: fn}
 }
 
 // Init is required to fulfil the input.InputManager interface.
 // For the kafka input no special initialization is required.
-func (*concurrentInputManager) Init(grp unison.Group) error { return nil }
+func (*manager) Init(grp unison.Group) error { return nil }
 
 // Create builds a new Input instance from the given configuration, or returns
 // an error if the configuration is invalid.
-func (manager *concurrentInputManager) Create(cfg *conf.C) (v2.Input, error) {
+func (m *manager) Create(cfg *conf.C) (v2.Input, error) {
 	wrapperCfg := config{NumPipelineWorkers: 1}
 	if err := cfg.Unpack(&wrapperCfg); err != nil {
 		return nil, err
 	}
 
-	inp, err := manager.configure(cfg)
+	inp, err := m.configure(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -136,9 +136,9 @@ func (w wrapper) Run(ctx v2.Context, pipeline beat.PipelineConnector) (err error
 	return nil
 }
 
-func (s wrapper) initWorkers(ctx v2.Context, pipeline beat.Pipeline, metrics Metrics) error {
+func (w wrapper) initWorkers(ctx v2.Context, pipeline beat.Pipeline, metrics Metrics) error {
 	clients := []beat.Client{}
-	for id := range s.NumPipelineWorkers {
+	for id := range w.NumPipelineWorkers {
 		client, err := pipeline.ConnectWith(beat.ClientConfig{
 			PublishMode: beat.DefaultGuarantees,
 		})
@@ -147,7 +147,7 @@ func (s wrapper) initWorkers(ctx v2.Context, pipeline beat.Pipeline, metrics Met
 		}
 
 		clients = append(clients, client)
-		go s.publishLoop(ctx, id, client, metrics)
+		go w.publishLoop(ctx, id, client, metrics)
 	}
 
 	// Close all clients when the input is closed
@@ -163,7 +163,7 @@ func (s wrapper) initWorkers(ctx v2.Context, pipeline beat.Pipeline, metrics Met
 	return nil
 }
 
-func (s wrapper) publishLoop(ctx v2.Context, id int, publisher stateless.Publisher, metrics Metrics) {
+func (w wrapper) publishLoop(ctx v2.Context, id int, publisher stateless.Publisher, metrics Metrics) {
 	logger := ctx.Logger
 	logger.Debugf("[Worker %d] starting publish loop", id)
 	defer logger.Debugf("[Worker %d] finished publish loop", id)
@@ -172,7 +172,7 @@ func (s wrapper) publishLoop(ctx v2.Context, id int, publisher stateless.Publish
 		case <-ctx.Cancelation.Done():
 			logger.Debugf("[Worker %d] Context cancelled, closing publish Loop", id)
 			return
-		case evt := <-s.evtChan:
+		case evt := <-w.evtChan:
 			start := time.Now()
 			publisher.Publish(evt)
 			metrics.EventPublished(start)

@@ -23,9 +23,9 @@ import (
 
 	"github.com/dustin/go-humanize"
 
+	netinput "github.com/elastic/beats/v7/filebeat/input/net"
 	"github.com/elastic/beats/v7/filebeat/input/netmetrics"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	concurrent "github.com/elastic/beats/v7/filebeat/input/v2/input-concurrent"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
@@ -45,11 +45,11 @@ func Plugin() input.Plugin {
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "tcp packet server",
-		Manager:    concurrent.New(configure),
+		Manager:    netinput.New(configure),
 	}
 }
 
-func configure(cfg *conf.C) (concurrent.Input, error) {
+func configure(cfg *conf.C) (netinput.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -98,12 +98,12 @@ func (s *server) Test(_ input.TestContext) error {
 	return l.Close()
 }
 
-func (s *server) InitMetrics(id string, logger *logp.Logger) concurrent.Metrics {
+func (s *server) InitMetrics(id string, logger *logp.Logger) netinput.Metrics {
 	s.metrics = netmetrics.NewTCP("tcp", id, s.Host, time.Minute, logger)
 	return s.metrics
 }
 
-func (s *server) Run(ctx input.Context, evtChan chan<- beat.Event, m concurrent.Metrics) (err error) {
+func (s *server) Run(ctx input.Context, evtChan chan<- beat.Event, m netinput.Metrics) (err error) {
 	defer s.metrics.Close()
 
 	err = s.initAndRunServer(ctx, s.metrics, evtChan)
