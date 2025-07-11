@@ -23,6 +23,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"slices"
@@ -352,6 +353,195 @@ logging.level: debug
 
 	matchPublishedLinesFromFile(t,
 		filepath.Join(tempDir, outputFilename), lines)
+}
+
+func TestFilestreamGZIPMetrics(t *testing.T) {
+	lines := make([]string, 0, 200)
+	var dataPlain []byte
+	for i := range 100 {
+		l := fmt.Sprintf("%d: %s", i, strings.Repeat("a", 100))
+		lines = append(lines, l)
+		dataPlain = append(dataPlain, []byte(l+"\n")...)
+	}
+
+	var gzPlainData []byte
+	for i := range 100 {
+		l := fmt.Sprintf("%d: %s", i, strings.Repeat("b", 100))
+		lines = append(lines, l)
+		gzPlainData = append(gzPlainData, []byte(l+"\n")...)
+	}
+	dataGZ := gziptest.Compress(t, gzPlainData, gziptest.CorruptNone)
+
+	// sanity check
+	require.Equal(t, len(dataPlain), len(gzPlainData),
+		"data for both plain and gzip file should have the same size")
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	tempDir := filebeat.TempDir()
+	logPathBase := filepath.Join(tempDir, "log")
+	logPathPlain := logPathBase
+	logPathGZ := logPathBase + ".gz"
+	outputFilename := "output-file"
+
+	err := os.WriteFile(
+		logPathGZ, dataGZ, 0644)
+	require.NoError(t, err, "could not write gzip file to disk")
+	err = os.WriteFile(
+		logPathPlain, dataPlain, 0644)
+	require.NoError(t, err, "could not write plain file to disk")
+
+	cfg := fmt.Sprintf(`
+http.enabled: true
+filebeat.inputs:
+  - type: filestream
+    id: "test-filestream"
+    paths:
+      - %s
+    gzip_experimental: true
+output.file:
+  enabled: true
+  path: %s
+  filename: "%s"
+logging.level: debug
+`, logPathBase+"*", filebeat.TempDir(), outputFilename)
+
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	eofLine := fmt.Sprintf("End of file reached: %s; Backoff now.", logPathPlain)
+	filebeat.WaitForLogs(
+		eofLine,
+		30*time.Second,
+		"Filebeat did not reach EOF. Did not find log [%s]",
+		eofLine,
+	)
+	eofLine = fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPathGZ)
+	filebeat.WaitForLogs(
+		eofLine,
+		30*time.Second,
+		"Filebeat did not reach EOF. Did not find log [%s]",
+		eofLine,
+	)
+
+	resp, err := http.Get("http://localhost:5066/inputs/")
+	require.NoError(t, err, "failed to get input metrics")
+	defer resp.Body.Close()
+
+	filebeat.Stop()
+
+	matchPublishedLinesFromFile(t,
+		filepath.Join(tempDir, outputFilename), lines)
+
+	// ============================ assert metrics =============================
+
+	type Histogram struct {
+		Count  int     `json:"count"`
+		Max    float64 `json:"max"`
+		Mean   float64 `json:"mean"`
+		Median float64 `json:"median"`
+		Min    float64 `json:"min"`
+		P75    float64 `json:"p75"`
+		P95    float64 `json:"p95"`
+		P99    float64 `json:"p99"`
+		P999   float64 `json:"p999"`
+		Stddev float64 `json:"stddev"`
+	}
+
+	type ProcessingTime struct {
+		Histogram Histogram `json:"histogram"`
+	}
+
+	type InputMetrics struct {
+		BytesProcessedTotal      int            `json:"bytes_processed_total"`
+		EventsProcessedTotal     int            `json:"events_processed_total"`
+		FilesClosedTotal         int            `json:"files_closed_total"`
+		FilesOpenedTotal         int            `json:"files_opened_total"`
+		ProcessingTime           ProcessingTime `json:"processing_time"`
+		GzipBytesProcessedTotal  int            `json:"gzip_bytes_processed_total"`
+		GzipEventsProcessedTotal int            `json:"gzip_events_processed_total"`
+		GzipFilesClosedTotal     int            `json:"gzip_files_closed_total"`
+		GzipFilesOpenedTotal     int            `json:"gzip_files_opened_total"`
+		GzipProcessingTime       ProcessingTime `json:"gzip_processing_time"`
+	}
+
+	var metrics []InputMetrics
+	err = json.NewDecoder(resp.Body).Decode(&metrics)
+	require.NoError(t, err, "failed to decode JSON response")
+	require.Len(t, metrics, 1, "expected exactly one input metric")
+	metric := metrics[0]
+	totalHist := metric.ProcessingTime.Histogram
+
+	// Assert GZIP metrics
+	assert.Equal(t, 100, metric.GzipEventsProcessedTotal,
+		"gzip events processed should be 100")
+	assert.Equal(t, len(gzPlainData), metric.GzipBytesProcessedTotal,
+		"gzip bytes processed should be greater than 0")
+	assert.Equal(t, 1, metric.GzipFilesClosedTotal,
+		"gzip files closed should be 1")
+	assert.Equal(t, 1, metric.GzipFilesOpenedTotal,
+		"gzip files opened should be 1")
+	assert.Equal(t, 100, metric.GzipProcessingTime.Histogram.Count,
+		"gzip processing time histogram count should be 100")
+
+	// Assert GZIP metrics are half of total metrics
+	// (since we have 100 lines in gzip file vs 200 total lines)
+	assert.Equal(t, metric.EventsProcessedTotal/2, metric.GzipEventsProcessedTotal,
+		"gzip events should be half of total events")
+	assert.Equal(t, totalHist.Count/2, metric.GzipProcessingTime.Histogram.Count,
+		"gzip processing count should be half of total processing count")
+
+	// Assert GZIP bytes processed are half of total
+	assert.Equal(t, metric.BytesProcessedTotal/2, metric.GzipBytesProcessedTotal,
+		"gzip bytes processed should be greater than 0")
+
+	// File counts: we have 1 gzip file + 1 plain file = 2 total files opened
+	assert.Equal(t, metric.FilesOpenedTotal, metric.GzipFilesOpenedTotal+1,
+		"total files opened should be gzip files + 1 plain file")
+
+	// =================== Assert histogram has valid values ===================
+	assert.Equal(t, 200, totalHist.Count,
+		"total processing time histogram count should be 200")
+	assert.Greater(t, totalHist.Max, float64(0),
+		"total processing time max should be greater than 0")
+	assert.Greater(t, totalHist.Mean, float64(0),
+		"total processing time mean should be greater than 0")
+	assert.Greater(t, totalHist.Median, float64(0),
+		"total processing time median should be greater than 0")
+	assert.Greater(t, totalHist.Min, float64(0),
+		"total processing time min should be greater than 0")
+	assert.Greater(t, totalHist.P75, float64(0),
+		"total processing time p75 should be greater than 0")
+	assert.Greater(t, totalHist.P95, float64(0),
+		"total processing time p95 should be greater than 0")
+	assert.Greater(t, totalHist.P99, float64(0),
+		"total processing time p99 should be greater than 0")
+	assert.Greater(t, totalHist.P999, float64(0),
+		"total processing time p999 should be greater than 0")
+	assert.Greater(t, totalHist.Stddev, float64(0),
+		"total processing time stddev should be greater than 0")
+
+	assert.Greater(t, metric.GzipProcessingTime.Histogram.Max, float64(0),
+		"gzip processing time max should be greater than 0")
+	assert.Greater(t, metric.GzipProcessingTime.Histogram.Mean, float64(0),
+		"gzip processing time mean should be greater than 0")
+	assert.Greater(t, metric.GzipProcessingTime.Histogram.Median, float64(0),
+		"gzip processing time median should be greater than 0")
+	assert.Greater(t, metric.GzipProcessingTime.Histogram.Min, float64(0),
+		"gzip processing time min should be greater than 0")
+	assert.Greater(t, metric.GzipProcessingTime.Histogram.P75, float64(0),
+		"gzip processing time p75 should be greater than 0")
+	assert.Greater(t, metric.GzipProcessingTime.Histogram.P95, float64(0),
+		"gzip processing time p95 should be greater than 0")
+	assert.Greater(t, metric.GzipProcessingTime.Histogram.P99, float64(0),
+		"gzip processing time p99 should be greater than 0")
+	assert.Greater(t, metric.GzipProcessingTime.Histogram.P999, float64(0),
+		"gzip processing time p999 should be greater than 0")
+	assert.Greater(t, metric.GzipProcessingTime.Histogram.Stddev, float64(0),
+		"gzip processing time stddev should be greater than 0")
 }
 
 func TestFilestreamGZIPFingerprintOnDecompressedData(t *testing.T) {
@@ -874,27 +1064,6 @@ logging.level: debug
 	matchPublishedLines(t, got, want3rdRunLines)
 }
 
-func getOutputFilesSorted(t *testing.T, outputFilePattern string, tempDir string) []string {
-	globPattern := outputFilePattern + "-*.ndjson"
-	files, err := filepath.Glob(filepath.Join(tempDir, globPattern))
-	require.NoError(t, err, "could not glob output file pattern")
-
-	slices.SortFunc(files, func(a, b string) int {
-		if len(a) < len(b) {
-			return -1
-		}
-		if len(a) > len(b) {
-			return 1
-		}
-		if len(a) == len(b) {
-			return strings.Compare(a, b)
-		}
-
-		panic("unreachable")
-	})
-	return files
-}
-
 func TestFilestreamGZIPReadsCorruptedFileUntilEOF(t *testing.T) {
 	// For future reference, this is the code used to generate
 	// testdata/gzip/corrupted.gz
@@ -971,6 +1140,27 @@ logging.level: debug
 		filepath.Join("testdata", "gzip", "output-file-for-corrupted.gz.ndjson"),
 		files[0],
 	)
+}
+
+func getOutputFilesSorted(t *testing.T, outputFilePattern string, tempDir string) []string {
+	globPattern := outputFilePattern + "-*.ndjson"
+	files, err := filepath.Glob(filepath.Join(tempDir, globPattern))
+	require.NoError(t, err, "could not glob output file pattern")
+
+	slices.SortFunc(files, func(a, b string) int {
+		if len(a) < len(b) {
+			return -1
+		}
+		if len(a) > len(b) {
+			return 1
+		}
+		if len(a) == len(b) {
+			return strings.Compare(a, b)
+		}
+
+		panic("unreachable")
+	})
+	return files
 }
 
 func matchPublishedLinesFromFile(t *testing.T, outputFilePattern string, lines []string) {
