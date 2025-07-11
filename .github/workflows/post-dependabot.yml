@@ -49,17 +49,16 @@ jobs:
     steps:
       - name: Add reviewers (obs-infraobs-integrations) if PR has Team:Obs-InfraObs label
         run: |
-          PR_NUMBER=$(gh pr list --head ${{ github.ref_name }} --json number --jq '.[0].number')
+          PR_NUMBER=$(gh pr list --repo ${{ github.repository }} --head ${{ github.ref_name }} --json number --jq '.[0].number')
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
           
           if [ -n "$PR_NUMBER" ] && [ "$PR_NUMBER" != "null" ]; then
-            HAS_LABEL=$(gh pr view $PR_NUMBER --json labels --jq '.labels[] | select(.name == "Team:Obs-InfraObs") | .name')
+            HAS_LABEL=$(gh pr view $PR_NUMBER --repo ${{ github.repository }} --json labels --jq '.labels[] | select(.name == "Team:Obs-InfraObs") | .name')
             
             if [ -n "$HAS_LABEL" ]; then
               echo "PR #$PR_NUMBER has Team:Obs-InfraObs label, adding reviewer obs-infraobs-integrations" >> $GITHUB_OUTPUT
-              gh pr edit $PR_NUMBER --add-reviewer obs-infraobs-integrations
+              gh pr edit $PR_NUMBER --repo ${{ github.repository }} --add-reviewer obs-infraobs-integrations
             fi
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
