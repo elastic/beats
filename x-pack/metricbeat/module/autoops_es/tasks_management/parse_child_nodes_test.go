@@ -84,7 +84,7 @@ func TestParseChildNodesReturnsRecursiveNodeIds(t *testing.T) {
 		},
 	}
 
-	require.ElementsMatch(t, []string{"node1", "node2", "node3", "node4", "node5"}, maps.Keys(parseChildNodes(children, true)))
+	require.ElementsMatch(t, []string{"node1", "node2", "node3", "node4", "node5"}, slices.Collect(maps.Keys(parseChildNodes(children, true))))
 }
 
 // Expect an empty array to returns node IDs with recursion and ignores unspecified node IDs.
