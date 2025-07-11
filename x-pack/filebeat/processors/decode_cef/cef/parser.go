@@ -1383,7 +1383,7 @@ func (e *Event) unpack(data string) error {
 		}
 
 		// Encountered invalid input.
-		return errors.Join(append(recoveredErrs, fmt.Errorf("error in CEF event at pos %d", p+1)))
+		return errors.Join(append(recoveredErrs, fmt.Errorf("error in CEF event at pos %d", p+1))...)
 	}
 
 	return errors.Join(recoveredErrs...)
