@@ -80,6 +80,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 			ExpandEventListFromField: container.ExpandEventListFromField,
 			FileSelectors:            container.FileSelectors,
 			ReaderConfig:             container.ReaderConfig,
+			PathPrefix:               container.PathPrefix,
 		})
 	}
 
@@ -153,6 +154,11 @@ func tryOverrideOrDefault(cfg config, c container) container {
 	// and container level is not supported, it's an either or scenario.
 	if reflect.DeepEqual(c.ReaderConfig, defaultReaderConfig) {
 		c.ReaderConfig = cfg.ReaderConfig
+	}
+
+	// If the container level PathPrefix is empty, use the global PathPrefix.
+	if c.PathPrefix == "" {
+		c.PathPrefix = cfg.PathPrefix
 	}
 
 	return c
