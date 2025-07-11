@@ -24,13 +24,9 @@ import (
 	"fmt"
 	"os"
 	"testing"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestBulk(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	client := getTestingElasticsearch(t)
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
@@ -77,8 +73,6 @@ func TestBulk(t *testing.T) {
 }
 
 func TestEmptyBulk(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	client := getTestingElasticsearch(t)
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
@@ -97,8 +91,6 @@ func TestEmptyBulk(t *testing.T) {
 }
 
 func TestBulkMoreOperations(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	client := getTestingElasticsearch(t)
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
