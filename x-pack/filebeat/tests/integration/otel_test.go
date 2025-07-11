@@ -135,7 +135,7 @@ http.port: %d
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
-	assertMonitoring(t)
+	assertMonitoring(t, 5067)
 }
 
 func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
