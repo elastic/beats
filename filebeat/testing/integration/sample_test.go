@@ -62,7 +62,6 @@ filebeat.inputs:
     paths:
       - %s
     gzip_experimental: true
-    rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
 
 # we want to check that all messages are ingested
 # without using an external service, this is an easy way

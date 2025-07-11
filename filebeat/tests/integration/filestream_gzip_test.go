@@ -148,7 +148,6 @@ filebeat.inputs:
       - %s
     prospector.scanner.check_interval: 1s
     gzip_experimental: true
-    rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
 output.file:
   enabled: true
   path: %s
@@ -231,7 +230,6 @@ filebeat.inputs:
     paths:
       - %s
     gzip_experimental: true
-    rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
 path.home: %s
 filebeat.registry.flush: 1s
 output.discard:
@@ -334,7 +332,6 @@ filebeat.inputs:
     paths:
       - %s
     gzip_experimental: true
-    rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
 output.file:
   enabled: true
   path: %s
@@ -388,7 +385,6 @@ filebeat.inputs:
     paths:
       - %s
     gzip_experimental: true
-    rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
 output.file:
   enabled: true
   path: %s
@@ -474,7 +470,6 @@ filebeat.inputs:
     paths:
       - %s
     gzip_experimental: true
-    rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
 output.file:
   enabled: true
   path: %s
@@ -787,7 +782,6 @@ filebeat.inputs:
     paths:
       - %s
     gzip_experimental: true
-    #rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
 output.file:
   enabled: true
   path: %s
@@ -933,7 +927,6 @@ filebeat.inputs:
     paths:
       - %s
     gzip_experimental: true
-    rotation.external.strategy.copytruncate.suffix_regex: \.\d+(\.gz)?$
 output.file:
   enabled: true
   path: %s
