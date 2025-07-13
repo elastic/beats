@@ -9,40 +9,9 @@ https://github.com/elastic/beats/compare/v8.18.3\...v8.18.4[View commits]
 
 ==== Breaking changes
 
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-
-*Heartbeat*
-
-
 *Metricbeat*
 
 - Change index summary metricset to use `_nodes/stats` API instead of `_stats` API to avoid data gaps. {pull}45049[45049]
-- Add support for `_nodes/stats` URIs that work with legacy versions of Elasticsearch {pull}44307[44307]
-
-*Osquerybeat*
-
-
-
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
 
 ==== Bugfixes
 
@@ -50,127 +19,29 @@ https://github.com/elastic/beats/compare/v8.18.3\...v8.18.4[View commits]
 
 - The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
 
-*Auditbeat*
-
-
 *Filebeat*
 
 - Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
 
-*Heartbeat*
-
-- Add base64 encoding option to inline monitors. {pull}45100[45100]
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
 *Winlogbeat*
 
-- Fix EvtVarTypeAnsiString conversion {pull}44026[44026]
-
-
-*Elastic Logging Plugin*
-
+- Fix EvtVarTypeAnsiString conversion. {pull}44026[44026]
 
 ==== Added
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Auditbeat*
-
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
 
-*Auditbeat*
-
-
-*Libbeat*
-
-
-
 *Heartbeat*
 
-- Upgrade node to latest LTS v18.20.7. {pull}43511[43511]
-- Upgrade node to latest LTS v20.19.3. {pull}45087[45087]
-
-*Metricbeat*
-
-- Upgrade github.com/microsoft/go-mssqldb from v1.7.2 to v1.8.2 {pull}44990[44990]
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-
-*Functionbeat*
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
+- Upgrade Node version to latest LTS v20.19.3. {pull}45087[45087]
+- Add base64 encoding option to inline monitors. {pull}45100[45100]
 
 
 *Metricbeat*
 
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
-
-
-
-
+- Upgrade github.com/microsoft/go-mssqldb version from v1.7.2 to v1.8.2 {pull}44990[44990]
 
 
 [[release-notes-8.18.3]]
