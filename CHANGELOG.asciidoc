@@ -9,38 +9,9 @@ https://github.com/elastic/beats/compare/v8.17.8\...v8.17.9[View commits]
 
 ==== Breaking changes
 
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
 *Metricbeat*
 
 - Change index summary metricset to use `_nodes/stats` API instead of `_stats` API to avoid data gaps. {pull}45049[45049]
-- Add support for `_nodes/stats` URIs that work with legacy versions of Elasticsearch {pull}44307[44307]
-
-*Osquerybeat*
-
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
 
 ==== Bugfixes
 
@@ -48,160 +19,23 @@ https://github.com/elastic/beats/compare/v8.17.8\...v8.17.9[View commits]
 
 - The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
 
-*Auditbeat*
-
-
 *Filebeat*
 
 - Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
 
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
 *Winlogbeat*
 
-- Fix EvtVarTypeAnsiString conversion {pull}44026[44026]
-
-
-*Elastic Logging Plugin*
-
+- Fix EvtVarTypeAnsiString conversion. {pull}44026[44026]
 
 ==== Added
 
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Auditbeat*
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Auditbeat*
-
-
-*Libbeat*
-
-
-
 *Heartbeat*
 
-- Upgrade node to latest LTS v20.19.3. {pull}45087[45087]
+- Upgrade Node version to latest LTS v20.19.3. {pull}45087[45087]
 
 *Metricbeat*
 
-- Increase default polling period for MongoDB module from 10s to 60s {pull}44781[44781]
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-
-*Functionbeat*
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- Increase default polling period for MongoDB module from 10s to 60s. {pull}44781[44781]
 
 
 [[release-notes-8.17.8]]
