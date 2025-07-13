@@ -34,8 +34,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Change index summary metricset to use `_nodes/stats` API instead of `_stats` API to avoid data gaps. {pull}45049[45049]
-- Add support for `_nodes/stats` URIs that work with legacy versions of Elasticsearch {pull}44307[44307]
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
@@ -82,7 +80,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 - 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
-- The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
 
 *Auditbeat*
 
@@ -117,11 +114,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
 - Prevent panic in CEL and salesforce inputs when github.com/hashicorp/go-retryablehttp exceeds maximum retries. {pull}40144[40144]
 - Fix publishing Okta entity analytics enrichments. {pull}44483[44483]
-- Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
 
 *Heartbeat*
 
-- Add base64 encoding option to inline monitors. {pull}45100[45100]
 
 
 *Metricbeat*
@@ -151,7 +146,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
-- Fix EvtVarTypeAnsiString conversion {pull}44026[44026]
 
 
 *Elastic Logging Plugin*
@@ -223,13 +217,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add Fleet status updating to HTTP Endpoint input. {issue}44281[44281] {pull}44310[44310]
 - Add Fleet status updating to streaming input. {issue}44284[44284] {pull}44340[44340]
 - Add Fleet status update functionality to gcppubsub input. {issue}44272[44272] {pull}44507[44507]
-- Add Fleet status updating to GCS input. {issue}44273[44273] {pull}44508[44508]
-- Add Fleet status update functionality to udp input. {issue}44419[44419] {pull}44785[44785]
-- Add Fleet status update functionality to tcp input. {issue}44420[44420] {pull}44786[44786]
-- Add Fleet status updating to Azure Blob Storage input. {issue}44268[44268] {pull}44945[44945]
-- Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
-- Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
-- Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
 
 *Auditbeat*
 
@@ -242,7 +229,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Added status to monitor run log report.
 - Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
-- Upgrade node to latest LTS v20.19.3. {pull}45087[45087]
 
 *Metricbeat*
 
@@ -259,7 +245,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
 - Add new metrics to vSphere Virtual Machine dataset (CPU usage percentage, disk average usage, disk read/write rate, number of disk reads/writes, memory usage percentage). {pull}44205[44205]
-- Upgrade github.com/microsoft/go-mssqldb from v1.7.2 to v1.8.2 {pull}44990[44990]
 
 *Metricbeat*
 
@@ -310,6 +295,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
