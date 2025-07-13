@@ -25,6 +25,7 @@ import (
 
 type authConfig struct {
 	Basic  *basicAuthConfig  `config:"basic"`
+	Token  *tokenAuthConfig  `config:"token"`
 	Digest *digestAuthConfig `config:"digest"`
 	OAuth2 *oAuth2Config     `config:"oauth2"`
 }
@@ -32,6 +33,9 @@ type authConfig struct {
 func (c authConfig) Validate() error {
 	var n int
 	if c.Basic.isEnabled() {
+		n++
+	}
+	if c.Token.isEnabled() {
 		n++
 	}
 	if c.Digest.isEnabled() {
@@ -65,6 +69,30 @@ func (b *basicAuthConfig) Validate() error {
 
 	if b.User == "" || b.Password == "" {
 		return errors.New("both user and password must be set")
+	}
+
+	return nil
+}
+
+type tokenAuthConfig struct {
+	Enabled *bool  `config:"enabled"`
+	Type    string `config:"type"`
+	Value   string `config:"value"`
+}
+
+// isEnabled returns true if the `enable` field is set to true in the yaml.
+func (b *tokenAuthConfig) isEnabled() bool {
+	return b != nil && (b.Enabled == nil || *b.Enabled)
+}
+
+// Validate checks if oauth2 config is valid.
+func (b *tokenAuthConfig) Validate() error {
+	if !b.isEnabled() {
+		return nil
+	}
+
+	if b.Type == "" || b.Value == "" {
+		return errors.New("both type and value must be set")
 	}
 
 	return nil
