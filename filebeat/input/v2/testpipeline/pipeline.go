@@ -25,29 +25,38 @@ import (
 )
 
 type PipelineConnector struct {
-	count   atomic.Uint64
-	blocked atomic.Bool
-	clients []beat.Client
+	errorOnConnect error
+	count          atomic.Uint64
+	blocked        atomic.Bool
+	clients        []beat.Client
 }
 
 func NewPipelineConnector() *PipelineConnector {
 	return &PipelineConnector{}
 }
 
-// ConnectWith returns a client that publishes to this pipeline,
-// the client config is ignored
-func (p *PipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, error) {
-	client := &client{
-		publisher: p.publish,
+func NewPipelineConnectorWithError(err error) *PipelineConnector {
+	return &PipelineConnector{
+		errorOnConnect: err,
 	}
-	p.clients = append(p.clients, client)
-
-	return client, nil
 }
 
-// ConnectWith returns a client that publishes to this pipeline.
+// ConnectWith returns a client that publishes to this pipeline,
+// the client config is ignored. If NewPipelineConnectorWithError was used to
+// to create this connector, then a nil client and the error are returned
+func (p *PipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, error) {
+	return p.Connect()
+}
+
+// Connect returns a client that publishes to this pipeline.
+// If NewPipelineConnectorWithError was used to
+// to create this connector, then a nil client and the error are returned
 func (p *PipelineConnector) Connect() (beat.Client, error) {
-	client := &client{
+	if p.errorOnConnect != nil {
+		return nil, p.errorOnConnect
+	}
+
+	client := &Client{
 		publisher: p.publish,
 	}
 	p.clients = append(p.clients, client)
@@ -87,21 +96,31 @@ func (p *PipelineConnector) EventsPublished() uint64 {
 	return p.count.Load()
 }
 
-type client struct {
+type Client struct {
 	publisher func(beat.Event)
+	closed    bool
 }
 
 // Publish calls the publisher function on the event
-func (c *client) Publish(evt beat.Event) {
+func (c *Client) Publish(evt beat.Event) {
 	c.publisher(evt)
 }
 
 // PublishAll calls the publisher function on each event
-func (c *client) PublishAll(events []beat.Event) {
+func (c *Client) PublishAll(events []beat.Event) {
 	for _, evt := range events {
 		c.Publish(evt)
 	}
 }
 
-// Close noop
-func (c *client) Close() error { return nil }
+// Close sets the closed flag to true
+func (c *Client) Close() error {
+	c.closed = true
+	return nil
+}
+
+// Closed returns true if the Client's Close method
+// has been called at lest once
+func (c *Client) Closed() bool {
+	return c.closed
+}
