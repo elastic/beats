@@ -18,6 +18,7 @@
 package tcp
 
 import (
+	"fmt"
 	"net"
 	"time"
 
@@ -162,18 +163,11 @@ func (s *server) initAndRunServer(ctx input.Context, metrics *netmetrics.TCP, ev
 		logger,
 	)
 	if err != nil {
-		ctx.UpdateStatus(status.Failed, "Failed to start TCP server: "+err.Error())
-		return err
+		return fmt.Errorf("Failed to start TCP server: %w", err)
 	}
 
 	logger.Debug("tcp input initialized")
 	ctx.UpdateStatus(status.Running, "")
 
-	err = server.Run(ctxtool.FromCanceller(ctx.Cancelation))
-	// Ignore error from 'Run' in case shutdown was signaled.
-	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {
-		err = ctxerr
-	}
-
-	return err
+	return server.Run(ctxtool.FromCanceller(ctx.Cancelation))
 }

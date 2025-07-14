@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 package net
 
 import (
@@ -33,9 +35,55 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/input/v2/testpipeline"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+func TestCreate(t *testing.T) {
+	testCases := map[string]struct {
+		config    *conf.C
+		expectErr string
+	}{
+		"happy path": {
+			config: conf.MustNewConfigFrom(map[string]any{
+				"number_of_workers": 42,
+			}),
+		},
+		"unpack error": {
+			config: conf.MustNewConfigFrom(map[string]any{
+				"number_of_workers": -1,
+			}),
+			expectErr: "negative value accessing 'number_of_workers'",
+		},
+		"configure error": {
+			config: conf.MustNewConfigFrom(map[string]any{
+				"number_of_workers": 42,
+			}),
+			expectErr: "oops",
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			m := New(func(c *conf.C) (Input, error) {
+				if tc.expectErr != "" {
+					return nil, errors.New(tc.expectErr)
+				}
+
+				return &inputMock{}, nil
+			})
+
+			inp, err := m.Create(tc.config)
+			if tc.expectErr != "" && !strings.Contains(err.Error(), tc.expectErr) {
+				t.Errorf("expecting Create to return error containing %q, got %q instead", tc.expectErr, err)
+				if inp != nil {
+					t.Error("on error the returned input must be nil")
+				}
+			}
+		})
+	}
+}
 
 func TestPublishLoop(t *testing.T) {
 	ctx, cancel := context.WithCancel(t.Context())
@@ -241,5 +289,77 @@ func TestRunReturnsInitWokersError(t *testing.T) {
 	err := w.Run(v2Ctx, publisher)
 	if !errors.Is(err, expectedErr) {
 		t.Fatalf("expecting error containing %q to be returned, got %q", expectedErr, err)
+	}
+}
+
+func TestNameReturnsInputName(t *testing.T) {
+	inpName := "foo bar"
+	inp := &inputMock{
+		NameFunc: func() string { return inpName },
+	}
+	w := wrapper{
+		inp: inp,
+	}
+
+	got := w.Name()
+	if got != inpName {
+		t.Fatalf("expecting wrapper.Name to return w.inp.Name. Got %q instead of %q ", got, inpName)
+	}
+}
+
+func TestWrapperTest(t *testing.T) {
+	testCases := []struct {
+		name      string
+		testError error
+	}{
+		{
+			name:      "successful test",
+			testError: nil,
+		},
+		{
+			name:      "test with error",
+			testError: errors.New("oops"),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			mockInput := &inputMock{
+				TestFunc: func(testContext v2.TestContext) error {
+					return tc.testError
+				},
+			}
+
+			w := wrapper{
+				inp: mockInput,
+			}
+
+			v2Ctx := v2.TestContext{
+				Agent: beat.Info{
+					Beat: "something to compare"},
+			}
+
+			err := w.Test(v2Ctx)
+			if tc.testError != nil {
+				if err == nil {
+					t.Errorf("Expected error %v, got nil", tc.testError)
+				} else if err.Error() != tc.testError.Error() {
+					t.Errorf("Expected error %v, got %v", tc.testError, err)
+				}
+			} else if err != nil {
+				t.Errorf("Expected no error, got %v", err)
+			}
+
+			if calls := len(mockInput.TestCalls()); calls != 1 {
+				t.Errorf("Expected TestFunc to be called exactly once, got %d calls", calls)
+			}
+
+			// Verify the test context was passed correctly
+			if len(mockInput.TestCalls()) > 0 {
+				if v2Ctx != mockInput.TestCalls()[0].TestContext {
+					t.Fatal("wrong v2 context passed when calling Test")
+				}
+			}
+		})
 	}
 }

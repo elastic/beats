@@ -212,11 +212,5 @@ func (s *server) initAndRunServer(ctx input.Context, metrics *netmetrics.UDP) er
 	logger.Debug("udp input initialized")
 	ctx.UpdateStatus(status.Running, "")
 
-	err := server.Run(ctxtool.FromCanceller(ctx.Cancelation))
-	// Ignore error from 'Run' in case shutdown was signaled.
-	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {
-		err = ctxerr
-	}
-
-	return err
+	return server.Run(ctxtool.FromCanceller(ctx.Cancelation))
 }

@@ -18,6 +18,7 @@
 package net
 
 import (
+	"errors"
 	"fmt"
 	"runtime/debug"
 	"time"
@@ -30,6 +31,30 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
+// Input is the interface for net inputs
+type Input interface {
+	// Returns the input name
+	Name() string
+	// Tests the input, if possible it should ensure the input can
+	// start a server at the configured address and port
+	Test(v2.TestContext) error
+	// InitMetrics initialised the metrics for the input.
+	InitMetrics(string, *logp.Logger) Metrics
+	// Runs the input. Events sent to the channel will be
+	// published by any of the pipeline workers.
+	// Run must call EventReceived on Metrics once the
+	// event is received passing the event size and the
+	// current time.
+	Run(v2.Context, chan<- beat.Event, Metrics) error
+}
+
+// Metrics is an interface to abstract the metrics
+// from input/netmetrics
+type Metrics interface {
+	EventPublished(start time.Time)
+	EventReceived(len int, timestamp time.Time)
+}
+
 type manager struct {
 	inputType string
 	configure func(*conf.C) (Input, error)
@@ -40,16 +65,30 @@ type config struct {
 	Host               string `config:"host"`
 }
 
-// New creates a v2.InputManager for net inputs
-// TODO: improve it
+type wrapper struct {
+	inp                Input
+	NumPipelineWorkers int
+	evtChan            chan beat.Event
+	host               string // used for the logger
+}
+
+// New creates a v2.InputManager for net inputs.
+// The returned manager and the input wrapper it uses are responsible for:
+//   - Handling the pipeline workers (including parsing 'number_of_workers')
+//   - Adding the 'host' field to the logger
+//   - Updating the input status (Configuring, Starting, Failed).
+//     The input must update the status to 'Running'
+//   - Handling context cancellation errors
+//   - Recovering from panic
 func New(fn func(*conf.C) (Input, error)) v2.InputManager {
 	return &manager{configure: fn}
 }
 
-// Init is required to fulfil the input.InputManager interface. Noop
+// Init is required to fulfil the v2.InputManager interface. Noop
 func (*manager) Init(grp unison.Group) error { return nil }
 
-// Create builds a new Input instance from the given configuration, or returns
+// Create builds a new Input instance from the given configuration
+// by calling the manager's configure callback, or returns
 // an error if the configuration is invalid.
 func (m *manager) Create(cfg *conf.C) (v2.Input, error) {
 	wrapperCfg := config{NumPipelineWorkers: 1}
@@ -72,35 +111,15 @@ func (m *manager) Create(cfg *conf.C) (v2.Input, error) {
 	return w, nil
 }
 
-type Input interface {
-	Name() string
-	Test(v2.TestContext) error
-	InitMetrics(string, *logp.Logger) Metrics
-	Run(v2.Context, chan<- beat.Event, Metrics) error
-}
-
-type Metrics interface {
-	EventPublished(start time.Time)
-	EventReceived(len int, timestamp time.Time)
-}
-
-type wrapper struct {
-	inp                Input
-	NumPipelineWorkers int
-	evtChan            chan beat.Event
-	host               string // used for metrics
-}
-
-// Name reports the input name.
+// Name proxies the call to the input
 func (w wrapper) Name() string { return w.inp.Name() }
 
-// Test checks the configuration and runs additional checks if the Input can
-// actually collect data for the given configuration (e.g. check if host/port or files are
-// accessible).
+// Test proxies the call to the input instance
 func (w wrapper) Test(ctx v2.TestContext) error { return w.inp.Test(ctx) }
 
-// Run starts the data collection. Run must return an error only if the
-// error is fatal making it impossible for the input to recover.
+// Run initialise the metrics, starts the worker, updates the status
+// to 'Configuring', then 'Starting', finally it calls the input's Run method.
+// Run recovers from panic and logs the reason for the panic.
 func (w wrapper) Run(ctx v2.Context, pipeline beat.PipelineConnector) (err error) {
 	logger := ctx.Logger.With("host", w.host)
 	ctx.Logger = logger
@@ -128,7 +147,17 @@ func (w wrapper) Run(ctx v2.Context, pipeline beat.PipelineConnector) (err error
 		return fmt.Errorf("cannot initialise pipeline workers: %w", err)
 	}
 
-	return w.inp.Run(ctx, w.evtChan, m)
+	err = w.inp.Run(ctx, w.evtChan, m)
+	if errors.Is(err, ctx.Cancelation.Err()) {
+		ctx.UpdateStatus(status.Stopped, "Stopped")
+		return nil
+	}
+
+	if err != nil {
+		ctx.UpdateStatus(status.Failed, err.Error())
+	}
+
+	return nil
 }
 
 func (w wrapper) initWorkers(ctx v2.Context, pipeline beat.Pipeline, metrics Metrics) error {
