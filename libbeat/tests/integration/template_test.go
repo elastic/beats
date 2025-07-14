@@ -43,9 +43,9 @@ output:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(mockbeatConfigWithIndex)
 	mockbeat.Start()
-	procState, err := mockbeat.Process.Wait()
-	require.NoError(t, err, "error waiting for mockbeat to exit")
-	require.Equal(t, 1, procState.ExitCode(), "incorrect exit code")
+	err := mockbeat.Cmd.Wait()
+	require.Error(t, err, "mockbeat must exit with an error")
+	require.Equal(t, 1, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitStdErrContains("setup.template.name and setup.template.pattern have to be set if index name is modified", 60*time.Second)
 }
 
@@ -79,9 +79,9 @@ setup.template:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	procState, err := mockbeat.Process.Wait()
-	require.NoError(t, err, "error waiting for mockbeat to exit")
-	require.Equal(t, 1, procState.ExitCode(), "incorrect exit code")
+	err := mockbeat.Cmd.Wait()
+	require.Error(t, err, "mockbeat must exit with an error")
+	require.Equal(t, 1, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitStdErrContains("setup.template.name and setup.template.pattern have to be set if index name is modified", 60*time.Second)
 }
 
@@ -98,9 +98,9 @@ setup.template:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	procState, err := mockbeat.Process.Wait()
-	require.NoError(t, err, "error waiting for mockbeat to exit")
-	require.Equal(t, 1, procState.ExitCode(), "incorrect exit code")
+	err := mockbeat.Cmd.Wait()
+	require.Error(t, err, "mockbeat must exit with an error")
+	require.Equal(t, 1, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitStdErrContains("setup.template.name and setup.template.pattern have to be set if index name is modified", 60*time.Second)
 }
 
@@ -348,9 +348,9 @@ logging:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.String(), user, pass))
 	mockbeat.Start("setup", "--index-management")
-	procState, err := mockbeat.Process.Wait()
+	err = mockbeat.Cmd.Wait()
 	require.NoError(t, err)
-	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 
 	// check template loaded
 	status, body, err := HttpDo(t, http.MethodGet, templateURL)
@@ -424,9 +424,9 @@ setup:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.String(), user, pass))
 	mockbeat.Start("setup", "--index-management")
-	procState, err := mockbeat.Process.Wait()
+	err = mockbeat.Cmd.Wait()
 	require.NoError(t, err)
-	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 
 	// check template didn't load
 	status, body, err := HttpDo(t, http.MethodGet, templateURL)
@@ -486,9 +486,9 @@ logging:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.String(), user, pass))
 	mockbeat.Start("setup", "--index-management", "-E", "setup.ilm.enabled=false", "-E", "setup.template.settings.index.number_of_shards=2")
-	procState, err := mockbeat.Process.Wait()
+	err = mockbeat.Cmd.Wait()
 	require.NoError(t, err)
-	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 
 	// check template loaded
 	status, body, err := HttpDo(t, http.MethodGet, templateURL)
@@ -541,9 +541,9 @@ logging:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.String(), user, pass))
 	mockbeat.Start("setup", "--index-management", "-E", "setup.ilm.enabled=false")
-	procState, err := mockbeat.Process.Wait()
+	err = mockbeat.Cmd.Wait()
 	require.NoError(t, err)
-	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 
 	// check template loaded
 	status, body, err := HttpDo(t, http.MethodGet, templateURL)
@@ -567,9 +567,9 @@ logging:
 	require.Equalf(t, http.StatusNotFound, status, "incorrect status code for: %s", policyURL.String())
 
 	mockbeat.Start("setup", "--index-management", "-E", "setup.template.overwrite=false", "-E", "setup.template.settings.index.number_of_shards=2")
-	procState, err = mockbeat.Process.Wait()
+	err = mockbeat.Cmd.Wait()
 	require.NoError(t, err)
-	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 
 	// check policy created
 	status, body, err = HttpDo(t, http.MethodGet, policyURL)
@@ -594,9 +594,9 @@ logging:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start("export", "template")
-	procState, err := mockbeat.Process.Wait()
+	err := mockbeat.Cmd.Wait()
 	require.NoError(t, err)
-	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitStdOutContains("mockbeat-9.9.9", 5*time.Second)
 }
 
@@ -613,9 +613,9 @@ logging:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start("export", "template", "-E", "setup.template.enabled=false")
-	procState, err := mockbeat.Process.Wait()
+	err := mockbeat.Cmd.Wait()
 	require.NoError(t, err)
-	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitStdOutContains("mockbeat-9.9.9", 5*time.Second)
 }
 
@@ -636,9 +636,10 @@ logging:
 	})
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start("export", "template", "--dir", mockbeat.TempDir())
-	procState, err := mockbeat.Process.Wait()
+
+	err := mockbeat.Cmd.Wait()
 	require.NoError(t, err)
-	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitStdOutContains("Writing to", 5*time.Second)
 	mockbeat.WaitFileContains(output, "mockbeat-9.9.9", 5*time.Second)
 }
