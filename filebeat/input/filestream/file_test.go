@@ -530,7 +530,6 @@ func TestIsGZIP(t *testing.T) {
 				// For simplicity, if seekErr is nil, always check offset.
 				require.Equal(t, originalFileOffset, currentOffset, "File offset mismatch in potentially erroring test case")
 			}
-			f.Close()
 		})
 	}
 
@@ -553,7 +552,10 @@ func TestIsGZIP(t *testing.T) {
 		tempDir := t.TempDir()
 		f, err := os.Open(tempDir) // Open the directory as a file
 		require.NoError(t, err, "Failed to open directory as file")
-
+		t.Cleanup(func() {
+			f.Close()
+		})
+		
 		isGzip, err := IsGZIP(f)
 		wantErrMsg := "GZIP: failed to read magic bytes:"
 
