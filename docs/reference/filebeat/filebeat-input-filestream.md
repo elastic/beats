@@ -354,12 +354,15 @@ The `take over` mode can work correctly only if the source (taken from) inputs a
 `take_over.enabled: true` requires the `filestream` to have a unique ID.
 ::::
 
-
 This `take over` mode was created to enable smooth migration from
 deprecated `log` inputs to the new `filestream` inputs and to allow
 changing `filestream` input IDs without data re-ingestion.
 
 See [*Migrate `log` input configurations to `filestream`*](/reference/filebeat/migrate-to-filestream.md) for more details about the migration process.
+
+The previous configuration format `take_over: true`, while
+deprecated, is still supported to migrate state from the `log` input
+to `filestream`.
 
 ::::{warning}
 The `take over` mode is still in beta, however, it should be generally safe to use.
@@ -389,8 +392,8 @@ Setting `close.on_state_change.inactive` to a lower value means that file handle
 
 The timestamp for closing a file does not depend on the modification time of the file. Instead, Filebeat uses an internal timestamp that reflects when the file was last harvested. For example, if `close.on_state_change.inactive` is set to 5 minutes, the countdown for the 5 minutes starts after the harvester reads the last line of the file.
 
-You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 5m.
-
+You can use time strings like `2h` (2 hours) and `5m` (5 minutes). The
+default is `5m`.
 
 #### `close.on_state_change.renamed` [filebeat-input-filestream-close-renamed]
 
@@ -593,6 +596,66 @@ file_identity.path: ~
 file_identity.inode_marker.path: /logs/.filebeat-marker
 ```
 
+## Removing fully ingested files [filebeat-input-filestream-delete-options]
+
+By default, Filestream input doesn't delete files. If option is turned
+on, Filestream input can delete files when those conditions are met:
+ - The reader is closed. The default is 5 minutes of inactivity.
+ - EOF has been reached.
+ - All events have been acknowledged by the output.
+
+If there are events pending acknowledgement or there is an issue while
+deleting the file, the harvester reopens at the next scan and the
+remove operation is retried. You can configure the scan for changes
+in files by setting the
+[`prospector.scanner.check_interval`](#filebeat-input-filestream-scan-frequency)
+property.
+
+An output always acknowledges a successfully written event.
+However, it also acknowledges dropped events. Each output has
+different conditions for dropping an event. Refer the
+[output's](/reference/filebeat/configuring-output.md) documentation for
+more details.
+
+If Filebeat fails to remove the file, it retries up to 5 times with
+a constant backoff of 2 seconds. If all attempts fail, the harvester
+is closed and a new harvester starts in the next scan.
+
+If you turned on removing files, keep `clean_removed` enabled.
+Removing files is turned off by default.
+
+### `delete.enabled` [filebeat-input-filestream-delete-enabled]
+
+When set to `true`, files are removed when the following conditions
+are met:
+ - The reader is closed.
+ - EOF has been reached.
+ - All events have been acknowledged by the output.
+
+### `delete.grace_period` [filebeat-input-filestream-delete-grace-period]
+
+An interval to wait after the reader is closed and all events have
+been acknowledged before trying to remove the file.
+
+The harvester for the file stays open while waiting for the grace period.
+If the file size changes while waiting the grace period, the harvester is closed
+and the process restarts from the beginning. After the grace
+period expires, Filestream checks if the file is at EOF. If it's not,
+then the harvester is closed, otherwise the file is removed. During
+the grace period Filebeat periodically checks the file for changes
+using the same interval as the prospector, configured by
+[`prospector.scanner.check_interval`](#filebeat-input-filestream-scan-frequency).
+The default value is 30 minutes.
+
+For examples on how to use this feature, refer to [Removing files after
+ingestion](/reference/filebeat/delete-file-guide.md).
+
+:::{warning}
+When delete is enabled, do not use log rotation tools/strategies that
+might replace/move the files {{filebeat}} will delete after
+ingestion. This can cause files not fully ingested to be accidentally
+removed.
+:::
 
 ## Log rotation [filestream-log-rotation-support]
 
