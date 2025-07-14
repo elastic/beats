@@ -256,7 +256,10 @@ func GoIntegTest(ctx context.Context) error {
 		args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
 		// run integration test from home directory
 		args.Packages = []string{"./tests/integration/"}
-		devtools.GoIntegTestFromHost(ctx, args)
+		err := devtools.GoIntegTestFromHost(ctx, args)
+		if err != nil {
+			return err
+		}
 
 		mg.SerialDeps(Fields, Dashboards)
 	}
