@@ -7,8 +7,8 @@ RUN \
 	    apt-transport-https \
 	    ca-certificates \
 	    curl \
-		python \
-		openjdk-8-jre \
+		python-is-python3 \
+		openjdk-17-jre \
 		gnupg2 \
 	&& rm -rf /var/lib/apt/lists/*
 
