@@ -85,7 +85,7 @@ func (b *tokenAuthConfig) isEnabled() bool {
 	return b != nil && (b.Enabled == nil || *b.Enabled)
 }
 
-// Validate checks if oauth2 config is valid.
+// Validate checks if token authentication config is valid.
 func (b *tokenAuthConfig) Validate() error {
 	if !b.isEnabled() {
 		return nil
