@@ -18,7 +18,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -225,7 +224,7 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 		sqsReader := newSQSReaderInput(config, aws.Config{})
 		sqsReader.log = log.Named("sqs")
 		sqsReader.pipeline = newFakePipeline()
-		sqsReader.metrics = newInputMetrics(v2ctx.MetricsRegistry, workerCount)
+		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), workerCount)
 		sqsReader.sqs, err = newConstantSQS()
 		require.NoError(t, err)
 		sqsReader.s3 = newConstantS3(t)
