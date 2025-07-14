@@ -23,7 +23,6 @@ import (
 	"time"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -111,9 +110,9 @@ func (w wrapper) Run(ctx v2.Context, pipeline beat.PipelineConnector) (err error
 			if e, ok := v.(error); ok {
 				err = e
 			} else {
-				err = fmt.Errorf("TCP input panic with: %+v\n%s", v, debug.Stack())
+				err = fmt.Errorf("%s input panic with: %+v\n%s", w.inp.Name(), v, debug.Stack())
 			}
-			logger.Errorw("TCP input panic", err)
+			logger.Errorw("%s input panic", w.inp.Name(), err)
 		}
 	}()
 
@@ -124,10 +123,12 @@ func (w wrapper) Run(ctx v2.Context, pipeline beat.PipelineConnector) (err error
 	ctx.UpdateStatus(status.Configuring, "")
 
 	m := w.inp.InitMetrics(ctx.ID, ctx.Logger)
-	w.initWorkers(ctx, pipeline, m)
-	w.inp.Run(ctx, w.evtChan, m)
+	if err := w.initWorkers(ctx, pipeline, m); err != nil {
+		logger.Errorf("cannot initialise pipeline workers: %s", err)
+		return fmt.Errorf("cannot initialise pipeline workers: %w", err)
+	}
 
-	return nil
+	return w.inp.Run(ctx, w.evtChan, m)
 }
 
 func (w wrapper) initWorkers(ctx v2.Context, pipeline beat.Pipeline, metrics Metrics) error {
@@ -144,23 +145,21 @@ func (w wrapper) initWorkers(ctx v2.Context, pipeline beat.Pipeline, metrics Met
 		go w.publishLoop(ctx, id, client, metrics)
 	}
 
-	// Close all clients when the input is closed
-	go func() {
-		select {
-		case <-ctx.Cancelation.Done():
-		}
-		for _, c := range clients {
-			c.Close()
-		}
-	}()
-
 	return nil
 }
 
-func (w wrapper) publishLoop(ctx v2.Context, id int, publisher stateless.Publisher, metrics Metrics) {
+// publishLoop reads events from w.evtChan and publishes them to the client.
+// If ctx is cancelled publishLoop closes the client and returns
+func (w wrapper) publishLoop(ctx v2.Context, id int, client beat.Client, metrics Metrics) {
 	logger := ctx.Logger
 	logger.Debugf("[Worker %d] starting publish loop", id)
 	defer logger.Debugf("[Worker %d] finished publish loop", id)
+	defer func() {
+		if err := client.Close(); err != nil {
+			logger.Errorf("[Worker %d] cannot close pipeline client: %s", id, err)
+		}
+	}()
+
 	for {
 		select {
 		case <-ctx.Cancelation.Done():
@@ -168,7 +167,7 @@ func (w wrapper) publishLoop(ctx v2.Context, id int, publisher stateless.Publish
 			return
 		case evt := <-w.evtChan:
 			start := time.Now()
-			publisher.Publish(evt)
+			client.Publish(evt)
 			metrics.EventPublished(start)
 		}
 	}
