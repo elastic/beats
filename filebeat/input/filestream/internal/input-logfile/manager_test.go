@@ -434,3 +434,89 @@ func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
 	}))
 	return log, buf
 }
+
+func TestTakeOverConfigUnpack(t *testing.T) {
+	testCases := map[string]struct {
+		cfgYAML   string
+		expected  TakeOverConfig
+		expectErr bool
+	}{
+		"legacy mode enabled": {
+			cfgYAML: `take_over: true`,
+			expected: TakeOverConfig{
+				Enabled:      true,
+				legacyFormat: true,
+			},
+		},
+		"legacy mode disabled": {
+			cfgYAML: `take_over: false`,
+			expected: TakeOverConfig{
+				Enabled:      false,
+				legacyFormat: true,
+			},
+		},
+		"new mode enabled": {
+			cfgYAML: `
+take_over:
+  enabled: true`,
+			expected: TakeOverConfig{
+				Enabled: true,
+			},
+		},
+		"new mode disabled": {
+			cfgYAML: `
+take_over:
+  enabled: false`,
+			expected: TakeOverConfig{
+				Enabled: false,
+			},
+		},
+		"new mode with IDs": {
+			cfgYAML: `
+take_over:
+  enabled: true
+  from_ids: ["foo", "bar"]`,
+			expected: TakeOverConfig{
+				Enabled: true,
+				FromIDs: []string{"foo", "bar"},
+			},
+		},
+		"take_over not defined": {
+			cfgYAML:   "",
+			expectErr: false,
+		},
+		"invalid new config": {
+			cfgYAML:   "take_over.enabled: 42",
+			expectErr: true,
+		},
+		"invalid from_ids elements ": {
+			cfgYAML:   "take_over.from_ids: [\"foo\", 42]",
+			expectErr: true,
+		},
+		"invalid from_ids type ": {
+			cfgYAML:   "take_over.from_ids: false",
+			expectErr: true,
+		},
+		"invalid legacy config": {
+			cfgYAML:   "take_over: 42",
+			expectErr: true,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			cfg := config.MustNewConfigFrom(tc.cfgYAML)
+			outer := struct {
+				TakeOver TakeOverConfig `config:"take_over"`
+			}{}
+			err := cfg.Unpack(&outer)
+			if tc.expectErr {
+				require.Error(t, err, "Unpack must fail")
+			} else {
+				require.NoError(t, err, "Unpack must succeed")
+			}
+
+			assert.Equal(t, tc.expected, outer.TakeOver, "TakeOverConfig was not parsed correctly")
+		})
+	}
+}

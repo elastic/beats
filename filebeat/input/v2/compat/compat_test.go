@@ -110,7 +110,6 @@ paths:
 prospector:
   scanner:
     symlinks: true
-take_over: true
 type: test
 `, inputID)
 
