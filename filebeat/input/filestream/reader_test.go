@@ -46,7 +46,7 @@ func (r *mockReader) Next() (reader.Message, error) {
 	r.pos++
 
 	return reader.Message{
-		Content: []byte(resp.msg), Private: resp.private}, resp.err
+		Content: []byte(resp.msg), Bytes: len(resp.msg), Private: resp.private}, resp.err
 }
 
 func (r *mockReader) Close() error {
@@ -61,6 +61,17 @@ func TestLookaheadReader(t *testing.T) {
 	}{
 		"empty_reader": {
 			wantResults: []readerResponse{{err: io.EOF}},
+		},
+		"eof_on_constructor": {
+			responses:   []readerResponse{{err: io.EOF}},
+			wantResults: []readerResponse{{err: io.EOF}},
+		},
+		"custom_eof_on_constructor": {
+			responses: []readerResponse{{msg: "1st msg", err: gzip.ErrChecksum}},
+			wantResults: []readerResponse{
+				{msg: "1st msg", private: io.EOF, err: gzip.ErrChecksum},
+				{err: io.EOF}},
+			eofErr: gzip.ErrChecksum,
 		},
 		"single_message": {
 			responses: []readerResponse{
@@ -94,8 +105,7 @@ func TestLookaheadReader(t *testing.T) {
 			wantResults: []readerResponse{
 				{msg: "1st msg"},
 				{msg: "2nd msg", err: errors.New("partial read")},
-				{msg: "3rd msg",
-					private: io.EOF},
+				{msg: "3rd msg", private: io.EOF},
 				{err: io.EOF},
 			},
 		},
@@ -113,15 +123,13 @@ func TestLookaheadReader(t *testing.T) {
 			responses: []readerResponse{
 				{msg: "1st msg"},
 				{msg: "2nd msg", err: errors.New("partial read")},
-				{msg: "3rd msg", private: io.EOF, err: gzip.ErrChecksum},
+				{msg: "3rd msg", err: gzip.ErrChecksum},
 				{err: io.EOF},
 			},
 			wantResults: []readerResponse{
 				{msg: "1st msg"},
-				{msg: "2nd msg",
-					err: errors.New("partial read")},
-				{msg: "3rd msg", private: io.EOF,
-					err: gzip.ErrChecksum},
+				{msg: "2nd msg", err: errors.New("partial read")},
+				{msg: "3rd msg", private: io.EOF, err: gzip.ErrChecksum},
 				{err: io.EOF},
 			},
 			eofErr: gzip.ErrChecksum,
@@ -135,6 +143,7 @@ func TestLookaheadReader(t *testing.T) {
 			}
 
 			r := NewEOFLookaheadReader(mock, tc.eofErr)
+			defer r.Close()
 
 			var got []readerResponse
 			for i := 0; i < len(tc.wantResults); i++ {
