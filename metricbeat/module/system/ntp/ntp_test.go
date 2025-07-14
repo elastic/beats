@@ -63,7 +63,8 @@ func TestFetchOffset_Success(t *testing.T) {
 
 		host, ok := msFields["host"]
 		assert.True(t, ok, "host not found in event")
-		assert.True(t, strings.HasSuffix(host.(string), "time.tom.com"), "host should match configured host")
+		hostStr, _ := host.(string)
+		assert.True(t, strings.HasSuffix(hostStr, "time.tom.com"), "host should match configured host")
 	}
 }
 
