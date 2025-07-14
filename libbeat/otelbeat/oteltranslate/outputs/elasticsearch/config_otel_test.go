@@ -76,7 +76,10 @@ batcher:
   max_size: 1600
   min_size: 0
 mapping:
-  mode: bodymap  
+  mode: bodymap
+compression: gzip
+compression_params:
+  level: 1
  `
 		input := newFromYamlString(t, beatCfg)
 		cfg := config.MustNewConfigFrom(input.ToStringMap())
@@ -113,6 +116,9 @@ batcher:
 mapping:
   mode: bodymap  
 api_key: VGlOQUdHNEJhYU1kYUgxdFJmdVU6S25SNnlFNDFSclNvd2Iwa1EwSFdvQQ==
+compression: gzip
+compression_params:
+  level: 1
  `
 		input := newFromYamlString(t, beatCfg)
 		cfg := config.MustNewConfigFrom(input.ToStringMap())
@@ -149,6 +155,9 @@ user: elastic
 timeout: 1m30s
 mapping:
   mode: bodymap 
+compression: gzip
+compression_params:
+  level: 1
 `
 
 		tests := []struct {
@@ -196,6 +205,9 @@ batcher:
   min_size: 0
 mapping:
   mode: bodymap    
+compression: gzip
+compression_params:
+  level: 1
  `,
 			},
 			{
