@@ -130,7 +130,7 @@ type netMetrics struct {
 	monitorRegistry *monitoring.Registry
 
 	device          *monitoring.String // name of the device being monitored
-	packets         *monitoring.Uint   // number of packets processed
+	packets         *monitoring.Uint   // number of packets (events) processed (read)
 	bytes           *monitoring.Uint   // number of bytes processed
 	rxQueue         *monitoring.Uint   // value of the rx_queue field from /proc/net/udp{,6} (only on linux systems)
 	arrivalPeriod   metrics.Sample     // histogram of the elapsed time between packet arrivals
@@ -157,7 +157,7 @@ func newNetMetrics(reg *monitoring.Registry, unreg func()) netMetrics {
 // EventReceived update all metrics related to receiving events.
 // The metrics are:
 //   - Events (packets) count
-//   - Processing time
+//   - Arrival period
 //   - Bytes read/processed
 func (n *netMetrics) EventReceived(len int, timestamp time.Time) {
 	if n == nil {
@@ -171,7 +171,7 @@ func (n *netMetrics) EventReceived(len int, timestamp time.Time) {
 	n.lastPacket = timestamp
 
 	n.packets.Add(1)
-	n.bytes.Add(uint64(len))
+	n.bytes.Add(uint64(len)) // noling:gosec // length is never negative
 }
 
 // EventPublished updates all metrics related to published events.

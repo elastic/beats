@@ -18,6 +18,7 @@
 package net
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"runtime/debug"
@@ -38,7 +39,7 @@ type Input interface {
 	// Tests the input, if possible it should ensure the input can
 	// start a server at the configured address and port
 	Test(v2.TestContext) error
-	// InitMetrics initialised the metrics for the input.
+	// InitMetrics initialises the metrics for the input.
 	InitMetrics(string, *logp.Logger) Metrics
 	// Runs the input. Events sent to the channel will be
 	// published by any of the pipeline workers.
@@ -84,7 +85,7 @@ func New(fn func(*conf.C) (Input, error)) v2.InputManager {
 	return &manager{configure: fn}
 }
 
-// Init is required to fulfil the v2.InputManager interface. Noop
+// Init Noop, it is required to fulfil the v2.InputManager interface.
 func (*manager) Init(grp unison.Group) error { return nil }
 
 // Create builds a new Input instance from the given configuration
@@ -148,20 +149,21 @@ func (w wrapper) Run(ctx v2.Context, pipeline beat.PipelineConnector) (err error
 	}
 
 	err = w.inp.Run(ctx, w.evtChan, m)
-	if errors.Is(err, ctx.Cancelation.Err()) {
-		ctx.UpdateStatus(status.Stopped, "Stopped")
+	if errors.Is(err, context.Canceled) {
+		ctx.UpdateStatus(status.Stopped, "")
 		return nil
 	}
 
 	if err != nil {
-		ctx.UpdateStatus(status.Failed, err.Error())
+		ctx.UpdateStatus(status.Failed, "Input exited unexpectedly: "+err.Error())
+		return nil
 	}
 
+	ctx.UpdateStatus(status.Stopped, "")
 	return nil
 }
 
 func (w wrapper) initWorkers(ctx v2.Context, pipeline beat.Pipeline, metrics Metrics) error {
-	clients := []beat.Client{}
 	for id := range w.NumPipelineWorkers {
 		client, err := pipeline.ConnectWith(beat.ClientConfig{
 			PublishMode: beat.DefaultGuarantees,
@@ -170,7 +172,6 @@ func (w wrapper) initWorkers(ctx v2.Context, pipeline beat.Pipeline, metrics Met
 			return fmt.Errorf("[worker %0d] cannot connect to publishing pipeline: %w", id, err)
 		}
 
-		clients = append(clients, client)
 		go w.publishLoop(ctx, id, client, metrics)
 	}
 

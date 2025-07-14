@@ -83,10 +83,7 @@ type config struct {
 }
 
 func newServer(config config) (*server, error) {
-	s := server{
-		config: config,
-	}
-	return &s, nil
+	return &server{config: config}, nil
 }
 
 func (s *server) Name() string { return "tcp" }
@@ -99,28 +96,16 @@ func (s *server) Test(_ input.TestContext) error {
 	return l.Close()
 }
 
+// InitMetrics initalises and returns an netmetrics.TCP
 func (s *server) InitMetrics(id string, logger *logp.Logger) netinput.Metrics {
 	s.metrics = netmetrics.NewTCP("tcp", id, s.Host, time.Minute, logger)
 	return s.metrics
 }
 
+// Run runs the input
 func (s *server) Run(ctx input.Context, evtChan chan<- beat.Event, m netinput.Metrics) (err error) {
-	defer s.metrics.Close()
-
-	err = s.initAndRunServer(ctx, s.metrics, evtChan)
-	if err != nil {
-		ctx.UpdateStatus(status.Failed, "Input exited unexpectedly: "+err.Error())
-	} else {
-		ctx.UpdateStatus(status.Stopped, "")
-	}
-
-	return err
-}
-
-// initAndRunServer initialises and runs the TCP server.
-// It updates the input status to Running.
-func (s *server) initAndRunServer(ctx input.Context, metrics *netmetrics.TCP, evtChan chan<- beat.Event) error {
 	logger := ctx.Logger
+	defer s.metrics.Close()
 
 	split, err := streaming.SplitFunc(s.Framing, []byte(s.LineDelimiter))
 	if err != nil {
@@ -135,7 +120,7 @@ func (s *server) initAndRunServer(ctx input.Context, metrics *netmetrics.TCP, ev
 			logger,
 			tcp.MetadataCallback,
 			func(data []byte, metadata inputsource.NetworkMetadata) {
-				metrics.EventReceived(len(data), time.Now())
+				m.EventReceived(len(data), time.Now())
 				logger.Debugw(
 					"Data received",
 					"bytes", len(data),

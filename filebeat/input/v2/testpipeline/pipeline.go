@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
+// PipelineConnector is a mock for beat.PipelineConnector
 type PipelineConnector struct {
 	errorOnConnect error
 	count          atomic.Uint64
@@ -31,10 +32,13 @@ type PipelineConnector struct {
 	clients        []beat.Client
 }
 
+// NewPipelineConnector returns a PipelineConnector that always succeeds
 func NewPipelineConnector() *PipelineConnector {
 	return &PipelineConnector{}
 }
 
+// NewPipelineConnectorWithError returns a PipelineConnector that always
+// fails with err
 func NewPipelineConnectorWithError(err error) *PipelineConnector {
 	return &PipelineConnector{
 		errorOnConnect: err,
@@ -92,10 +96,12 @@ func (p *PipelineConnector) publish(evt beat.Event) {
 	p.count.Add(1)
 }
 
+// EventsPublished returns the number of published events
 func (p *PipelineConnector) EventsPublished() uint64 {
 	return p.count.Load()
 }
 
+// Client is a mock for beat.Client
 type Client struct {
 	publisher func(beat.Event)
 	closed    bool

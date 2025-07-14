@@ -120,6 +120,7 @@ func TestPublishLoop(t *testing.T) {
 	}
 
 	assert.Eventuallyf(t, func() bool {
+		// nolint:gosec // it is a test, there is no risk of overflow
 		return int(publisher.EventsPublished()) == len(events)
 	},
 		time.Second,
@@ -195,10 +196,9 @@ func TestRun(t *testing.T) {
 			RunFunc: func(context v2.Context, eventCh chan<- beat.Event, metrics Metrics) error {
 				runCalled.Store(true)
 				defer wg.Done()
-				select {
-				case <-context.Cancelation.Done():
-					return nil
-				}
+				// Block until the context is cancelled
+				<-context.Cancelation.Done()
+				return nil
 			},
 		},
 	}

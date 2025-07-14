@@ -26,7 +26,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/input/inputtest"
+	"github.com/elastic/beats/v7/filebeat/input/net/nettest"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -44,7 +44,7 @@ func TestInput(t *testing.T) {
 	}
 
 	data := []string{"foo", "bar"}
-	go inputtest.RunTCPClient(t, serverAddr, data)
+	go nettest.RunTCPClient(t, serverAddr, data)
 
 	ctx, cancel := context.WithCancel(t.Context())
 	v2Ctx := v2.Context{
@@ -66,7 +66,7 @@ func TestInput(t *testing.T) {
 		}
 	}()
 
-	inputtest.RequireNetMetricsCount(t, time.Second, 2, 0, 6)
+	nettest.RequireNetMetricsCount(t, time.Second, 2, 0, 6)
 
 	// Stop the input, this removes all metrics
 	cancel()
@@ -92,49 +92,3 @@ func TestInput(t *testing.T) {
 		// No more events on the channel, test passed
 	}
 }
-
-// func TestInputCanReadWithoutPublishing(t *testing.T) {
-// 	serverAddr := "localhost:9042"
-// 	numberOfWorkers := 42
-// 	wg := sync.WaitGroup{}
-// 	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
-// 		"host":              serverAddr,
-// 		"number_of_workers": numberOfWorkers,
-// 	}))
-// 	if err != nil {
-// 		t.Fatalf("cannot create input: %s", err)
-// 	}
-
-// 	pipeline := testpipeline.NewPipelineConnector()
-// 	pipeline.Block()
-
-// 	go inputtest.RunTCPClient(t, serverAddr, []string{"foo", "bar"})
-
-// 	ctx, cancel := context.WithCancel(t.Context())
-// 	v2Ctx := v2.Context{
-// 		ID:          t.Name(),
-// 		Cancelation: ctx,
-// 		Logger:      logp.NewNopLogger(),
-// 	}
-
-// 	wg.Add(1)
-// 	go func() {
-// 		defer wg.Done()
-// 		if err := inp.Run(v2Ctx, pipeline); err != nil {
-// 			if !errors.Is(err, context.Canceled) {
-// 				t.Errorf("input exited with error: %s", err)
-// 			}
-// 		}
-// 	}()
-
-// 	inputtest.RequireNetMetricsCount(t, time.Second, 2, 0, 6)
-// 	// Stop the input
-// 	cancel()
-
-// 	// Ensure the input Run method returns
-// 	wg.Wait()
-
-// 	if got, want := pipeline.NumClients(), numberOfWorkers; got != want {
-// 		t.Fatalf("did not create the expected number of clients, expecting %d, got %d", want, got)
-// 	}
-// }
