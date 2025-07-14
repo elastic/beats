@@ -495,6 +495,7 @@ func TestFileScanner(t *testing.T) {
 
 		sizes[basename] = fi.Size()
 		require.NoError(t, err)
+		require.NoError(t, f.Close(), "could not close gzip file")
 	}
 
 	// this is to test that a symlink for a known file does not add the file twice

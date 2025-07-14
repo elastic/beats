@@ -530,7 +530,6 @@ func TestIsGZIP(t *testing.T) {
 				// For simplicity, if seekErr is nil, always check offset.
 				require.Equal(t, originalFileOffset, currentOffset, "File offset mismatch in potentially erroring test case")
 			}
-
 		})
 	}
 
