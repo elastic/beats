@@ -19,6 +19,7 @@ package ntp
 
 import (
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -37,9 +38,9 @@ func (n *ntpSuccess) query(host string, opt ntp.QueryOptions) (*ntp.Response, er
 
 func getTestConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "system",
-		"metricsets": []string{"ntp"},
-		"hosts":      []string{"localhost:123"},
+		"module":      "system",
+		"metricsets":  []string{"ntp"},
+		"ntp.servers": []string{"0.time.tom.com", "1.time.tom.com"},
 	}
 }
 
@@ -53,15 +54,17 @@ func TestFetchOffset_Success(t *testing.T) {
 	events, errs := mbtest.ReportingFetchV2Error(ntpMetricSet)
 	require.Empty(t, errs, "expected no errors, got: %v", errs)
 
-	assert.Len(t, events, 1, "expected 1 event")
-	msFields := events[0].MetricSetFields
-	offset, ok := msFields["offset"]
-	assert.True(t, ok, "offset not found in event")
-	assert.Equal(t, int64(1230000000), offset, "offset should be 1230000000 nanoseconds")
+	assert.Len(t, events, 2, "expected 2 events")
+	for _, event := range events {
+		msFields := event.MetricSetFields
+		offset, ok := msFields["offset"]
+		assert.True(t, ok, "offset not found in event")
+		assert.Equal(t, int64(1230000000), offset, "offset should be 1230000000 nanoseconds")
 
-	host, ok := msFields["host"]
-	assert.True(t, ok, "host not found in event")
-	assert.Equal(t, "localhost:123", host, "host should match configured host")
+		host, ok := msFields["host"]
+		assert.True(t, ok, "host not found in event")
+		assert.True(t, strings.HasSuffix(host.(string), "time.tom.com"), "host should match configured host")
+	}
 }
 
 type ntpError struct{}
@@ -76,6 +79,7 @@ func TestFetchOffset_Error(t *testing.T) {
 	require.True(t, ok, "metricSet is not of type *MetricSet")
 
 	ntpMetricSet.queryProvider = &ntpError{}
-	_, errs := mbtest.ReportingFetchV2Error(metricSet)
+
+	_, errs := mbtest.ReportingFetchV2Error(ntpMetricSet)
 	assert.NotEmpty(t, errs, "expected error, got none")
 }

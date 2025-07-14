@@ -18,7 +18,9 @@
 package ntp
 
 import (
+	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -53,7 +55,7 @@ func init() {
 	mb.Registry.MustAddMetricSet("system", "ntp", New)
 }
 
-// New creates a new instance of the MetricSet (used for both production and test construction)
+// New creates a new instance of the NTP MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfg := defaultConfig()
 	if err := base.Module().UnpackConfig(&cfg); err != nil {
@@ -67,21 +69,38 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches the offset from the configured NTP server
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	response, err := m.queryProvider.query(m.Host(), ntp.QueryOptions{
-		Timeout: m.config.Timeout,
-		Version: m.config.Version,
-	})
+	var wg sync.WaitGroup
+	fetchErrors := make(chan error, len(m.config.Servers))
+	wg.Add(len(m.config.Servers))
 
-	if err != nil {
-		err := fmt.Errorf("error querying NTP server %s: %w", m.Host(), err)
-		reporter.Error(err)
-		return err
+	for _, server := range m.config.Servers {
+		go func() {
+			defer wg.Done()
+
+			response, err := m.queryProvider.query(server, ntp.QueryOptions{
+				Timeout: m.config.Timeout,
+				Version: m.config.Version,
+			})
+			if err != nil {
+				err := fmt.Errorf("error querying NTP server %s: %w", server, err)
+				reporter.Error(err)
+				fetchErrors <- err
+				return
+			}
+
+			reporter.Event(mb.Event{MetricSetFields: mapstr.M{
+				"host":   server,
+				"offset": response.ClockOffset.Nanoseconds(),
+			}})
+		}()
 	}
 
-	reporter.Event(mb.Event{MetricSetFields: mapstr.M{
-		"host":   m.Host(),
-		"offset": response.ClockOffset.Nanoseconds(),
-	}})
+	wg.Wait()
+	close(fetchErrors)
 
-	return nil
+	var errs []error
+	for err := range fetchErrors {
+		errs = append(errs, err)
+	}
+	return errors.Join(errs...)
 }

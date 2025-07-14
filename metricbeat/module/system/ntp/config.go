@@ -23,28 +23,28 @@ import (
 )
 
 type config struct {
-	Hosts   []string      `config:"hosts,replace"`
-	Timeout time.Duration `config:"timeout"`
-	Version int           `config:"version"`
+	Servers []string      `config:"ntp.servers,replace"`
+	Timeout time.Duration `config:"ntp.timeout"`
+	Version int           `config:"ntp.version"`
 }
 
 func defaultConfig() config {
 	return config{
-		Hosts:   []string{"pool.ntp.org"},
+		Servers: []string{"pool.ntp.org"},
 		Timeout: 5 * time.Second,
 		Version: 4,
 	}
 }
 
 func validateConfig(cfg *config) error {
-	if len(cfg.Hosts) == 0 {
-		return fmt.Errorf("at least one NTP host must be set")
+	if len(cfg.Servers) == 0 {
+		return fmt.Errorf("at least one NTP server must be set")
 	}
 	if cfg.Timeout <= 0 {
 		return fmt.Errorf("invalid NTP timeout: %s", cfg.Timeout.String())
 	}
 	if cfg.Version != 3 && cfg.Version != 4 {
-		return fmt.Errorf("NTP version must be 3 or 4")
+		return fmt.Errorf("invalid NTP version (must be 3 or 4): %d", cfg.Version)
 	}
 	return nil
 }
