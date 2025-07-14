@@ -247,6 +247,63 @@ batcher:
 
 }
 
+func TestCompressionConfig(t *testing.T) {
+	compressionConfig := `
+hosts:
+  - localhost:9200
+  - localhost:9300
+protocol: http
+path: /foo/bar
+username: elastic
+password: changeme
+index: "some-index"
+compression_level: %d`
+
+	otelConfig := `
+endpoints:
+  - http://localhost:9200/foo/bar
+  - http://localhost:9300/foo/bar
+idle_conn_timeout: 3s
+logs_index: some-index
+password: changeme
+retry:
+  enabled: true
+  initial_interval: 1s
+  max_interval: 1m0s
+  max_retries: 3
+timeout: 1m30s
+user: elastic
+batcher:
+  enabled: true
+  max_size: 1600
+  min_size: 0
+mapping:
+  mode: bodymap
+compression: gzip
+compression_params:
+  level: %d`
+
+	for level := range 9 {
+		t.Run(fmt.Sprintf("compression-level-%d", level), func(t *testing.T) {
+			input := newFromYamlString(t, fmt.Sprintf(compressionConfig, level))
+			cfg := config.MustNewConfigFrom(input.ToStringMap())
+			got, err := ToOTelConfig(cfg)
+			require.NoError(t, err, "error translating elasticsearch output to ES exporter config")
+			expOutput := newFromYamlString(t, fmt.Sprintf(otelConfig, level))
+			compareAndAssert(t, expOutput, confmap.NewFromStringMap(got))
+		})
+	}
+
+	t.Run("invalid-compression-level", func(t *testing.T) {
+		input := newFromYamlString(t, fmt.Sprintf(compressionConfig, 10))
+		cfg := config.MustNewConfigFrom(input.ToStringMap())
+		got, err := ToOTelConfig(cfg)
+		require.ErrorContains(t, err, "failed unpacking config. requires value <= 9 accessing 'compression_level'")
+		require.Nil(t, got)
+	})
+
+}
+
 func newFromYamlString(t *testing.T, input string) *confmap.Conf {
 	t.Helper()
 	var rawConf map[string]any
