@@ -555,7 +555,7 @@ func TestIsGZIP(t *testing.T) {
 		t.Cleanup(func() {
 			f.Close()
 		})
-		
+
 		isGzip, err := IsGZIP(f)
 		wantErrMsg := "GZIP: failed to read magic bytes:"
 

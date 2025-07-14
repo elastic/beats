@@ -106,7 +106,6 @@ func newFileReader(
 // If the file is inactive, ErrInactive is returned
 // If f.readerCtx is cancelled for any reason, then
 // ErrClosed is returned
-// AndersonQ: 6 - actually read the files
 func (f *logFile) Read(buf []byte) (int, error) {
 	totalN := 0
 
@@ -176,13 +175,11 @@ func (f *logFile) startFileMonitoringIfNeeded() {
 }
 
 func (f *logFile) closeIfTimeout(ctx unison.Canceler) {
-	// AndersonQ: close after interval
 	if err := timed.Wait(ctx, f.closeAfterInterval); err == nil {
 		f.readerCtx.Cancel()
 	}
 }
 
-// TODO(AndersonQ): double check the test
 func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
 	err := timed.Periodic(ctx, f.checkInterval, func() error {
 		if f.shouldBeClosed() {
@@ -199,7 +196,6 @@ func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
 
 func (f *logFile) shouldBeClosed() bool {
 	if f.closeInactive > 0 {
-		// AndersonQ: close after inactive
 		if time.Since(f.lastTimeRead) > f.closeInactive {
 			f.isInactive.Store(true)
 			f.log.Debugf("'%s' is inactive", f.file.Name())

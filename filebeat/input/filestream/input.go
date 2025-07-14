@@ -414,7 +414,6 @@ func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
 	return state
 }
 
-// AndersonQ: 5 - open files
 func (inp *filestream) open(
 	log *logp.Logger,
 	canceler input.Canceler,
@@ -501,7 +500,6 @@ func (inp *filestream) open(
 //
 // openFile will also detect and handle file truncation. If a file is truncated
 // then the 3rd return value is true.
-// AndersonQ: here - opens a file
 func (inp *filestream) openFile(
 	log *logp.Logger,
 	path string,

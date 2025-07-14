@@ -36,7 +36,6 @@ const (
 
 var experimentalWarning sync.Once
 
-// AndersonQ: 1 - it all starts with the prospector creator
 func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 	logger := log.With("filestream_id", config.ID)
 	err := checkConfigCompatibility(config)
