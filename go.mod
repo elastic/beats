@@ -82,6 +82,7 @@ require (
 	github.com/godror/godror v0.33.2
 	github.com/gofrs/flock v0.8.1
 	github.com/gogo/protobuf v1.3.2
+	github.com/gohugoio/hashstructure v0.5.0
 	github.com/golang/snappy v1.0.0
 	github.com/gomodule/redigo v1.8.3
 	github.com/google/flatbuffers v25.2.10+incompatible
@@ -102,7 +103,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13
 	github.com/miekg/dns v1.1.65
 	github.com/mitchellh/gox v1.0.1
-	github.com/mitchellh/hashstructure v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/osquery/osquery-go v0.0.0-20231108163517-e3cde127e724
 	github.com/pkg/errors v0.9.1
