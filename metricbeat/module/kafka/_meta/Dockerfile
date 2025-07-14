@@ -1,4 +1,4 @@
-FROM debian:stretch
+FROM debian:12
 
 ARG KAFKA_VERSION
 
