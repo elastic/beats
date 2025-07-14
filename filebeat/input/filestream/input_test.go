@@ -307,9 +307,10 @@ func TestOpenFile_GZIPNeverTruncated(t *testing.T) {
 			readerConfig:     readerConfig{BufferSize: 32},
 		}
 
-		_, _, truncated, err := inp.openFile(
+		f, _, truncated, err := inp.openFile(
 			log, tc.path, int64(len(plainData)*2))
 		require.NoError(t, err, "unexpected error")
+		f.Close()
 
 		assert.Equal(t, tc.want, truncated, tc.errMsg)
 	}
