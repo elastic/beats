@@ -289,7 +289,7 @@ func TestOpenFile_GZIPNeverTruncated(t *testing.T) {
 			gzipExperimental: false,
 			path:             plainPath,
 			want:             true,
-			errMsg:           "plain file should dbe considered truncated",
+			errMsg:           "plain file should be considered truncated",
 		},
 		{
 			name:             "GZIP file is never truncated",
