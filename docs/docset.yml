@@ -40,6 +40,7 @@ subs:
   metricbeat:   "Metricbeat"
   packetbeat:   "Packetbeat"
   winlogbeat:   "Winlogbeat"
+  filestream: "Filestream"
   security-features:   "security features"
   es-security-features:   "Elasticsearch security features"
   elastic-sec:   "Elastic Security"

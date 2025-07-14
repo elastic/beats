@@ -60,6 +60,9 @@ http.host: localhost
 http.port: %d
 `
 
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbOtelIndex := "logs-integration-" + namespace
+	fbIndex := "logs-filebeat-" + namespace
 	// start filebeat in otel mode
 	filebeatOTel := integration.NewBeat(
 		t,
@@ -69,7 +72,7 @@ http.port: %d
 	)
 
 	logFilePath := filepath.Join(filebeatOTel.TempDir(), "log.log")
-	filebeatOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", 5066))
+	filebeatOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, logFilePath, fbOtelIndex, 5066))
 	writeEventsToLogFile(t, logFilePath, numEvents)
 	filebeatOTel.Start()
 	defer filebeatOTel.Stop()
@@ -82,7 +85,7 @@ http.port: %d
 	)
 	logFilePath = filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
+	s := fmt.Sprintf(beatsCfgFile, logFilePath, fbIndex, 5067)
 
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
@@ -101,10 +104,10 @@ http.port: %d
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
-			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+fbOtelIndex+"*")
 			require.NoError(t, err)
 
-			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-filebeat-default*")
+			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+fbIndex+"*")
 			require.NoError(t, err)
 
 			return otelDocs.Hits.Total.Value >= numEvents && filebeatDocs.Hits.Total.Value >= numEvents
@@ -295,13 +298,17 @@ func TestFilebeatOTelReceiverE2E(t *testing.T) {
 		"otel",
 	)
 
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbReceiverIndex := "logs-integration-" + namespace
+	filebeatIndex := "logs-filebeat-" + namespace
+
 	otelConfig := struct {
 		Index          string
 		MonitoringPort int
 		InputFile      string
 		PathHome       string
 	}{
-		Index:          "logs-integration-default",
+		Index:          fbReceiverIndex,
 		MonitoringPort: 5066,
 		InputFile:      filepath.Join(filebeatOTel.TempDir(), "log.log"),
 		PathHome:       filebeatOTel.TempDir(),
@@ -407,7 +414,7 @@ http.port: %d
 `
 	logFilePath := filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, wantEvents)
-	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
+	s := fmt.Sprintf(beatsCfgFile, logFilePath, filebeatIndex, 5067)
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
 	defer filebeat.Stop()
@@ -424,10 +431,10 @@ http.port: %d
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
-			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+fbReceiverIndex+"*")
 			require.NoError(t, err)
 
-			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-filebeat-default*")
+			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+filebeatIndex+"*")
 			require.NoError(t, err)
 
 			return otelDocs.Hits.Total.Value >= wantEvents && filebeatDocs.Hits.Total.Value >= wantEvents
@@ -472,21 +479,22 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 		PathHome       string
 	}
 
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	otelConfig := struct {
 		Index     string
 		Receivers []receiverConfig
 	}{
-		Index: "logs-integration-default",
+		Index: "logs-integration-" + namespace,
 		Receivers: []receiverConfig{
 			{
 				MonitoringPort: 5066,
 				InputFile:      logFilePath,
-				PathHome:       filebeatOTel.TempDir(),
+				PathHome:       filepath.Join(filebeatOTel.TempDir(), "r1"),
 			},
 			{
 				MonitoringPort: 5067,
 				InputFile:      logFilePath,
-				PathHome:       filebeatOTel.TempDir(),
+				PathHome:       filepath.Join(filebeatOTel.TempDir(), "r2"),
 			},
 		},
 	}
@@ -572,7 +580,7 @@ service:
 			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
 			defer findCancel()
 
-			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+otelConfig.Index+"*")
 			require.NoError(t, err)
 
 			return otelDocs.Hits.Total.Value >= wantTotalLogs
