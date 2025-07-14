@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM debian:12
 
 ENV KAFKA_HOME=/kafka
 # Controls the hostname advertised within the Docker network, should generally match the container
