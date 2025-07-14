@@ -1185,7 +1185,7 @@ func (b *BeatProc) ConfigFilePath() string {
 // If add is an empty string a random local port is used.
 // The return values are:
 //   - The HTTP server
-//   - The server address in the form ip:port
+//   - The server address in the form http://ip:port
 //   - The mock-es API handler
 //   - The ManualReader for accessing the metrics
 func StartMockES(
