@@ -141,7 +141,7 @@ processors:
 	var err error
 
 	// wait for logs to be published
-	require.Eventually(t,
+	require.Eventuallyf(t,
 		func() bool {
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
@@ -154,7 +154,7 @@ processors:
 
 			return otelDocs.Hits.Total.Value >= 1 && filebeatDocs.Hits.Total.Value >= 1
 		},
-		3*time.Minute, 1*time.Second, fmt.Sprintf("Number of hits %d not equal to number of events %d", otelDocs.Hits.Total.Value, 1))
+		3*time.Minute, 1*time.Second, "document indexed by fb-otel: %d, and by fb-classic: %d: expected atleast one document by both modes", otelDocs.Hits.Total.Value, filebeatDocs.Hits.Total.Value)
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source

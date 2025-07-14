@@ -22,7 +22,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -45,5 +44,7 @@ func AssertMapsEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg 
 		flatM1.Delete(f)
 		flatM2.Delete(f)
 	}
-	require.Equal(t, "", cmp.Diff(flatM1, flatM2), "expected maps to be equal")
+	if !cmp.Equal(flatM1, flatM2) {
+		t.Error(cmp.Diff(flatM1, flatM2))
+	}
 }
