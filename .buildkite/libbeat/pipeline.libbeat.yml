@@ -89,12 +89,12 @@ steps:
           - github_commit_status:
               context: "libbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: Libbeat: Ubuntu x86_64 Unit Tests with fips provider and requirefips build tag"
+      - label: ":ubuntu: Libbeat: Ubuntu x86_64 Go Unit Tests with fips provider and requirefips build tag"
         key: "mandatory-linux-unit-test-fips-tag"
         command: |
           set -euo pipefail
           cd libbeat
-          mage unitTest
+          mage goUnitTest
         retry:
           automatic:
             - limit: 1
@@ -117,7 +117,7 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "libbeat: Ubuntu x86_64 Unit Tests with fips provider and requirefipsbuild tag"
+              context: "libbeat: Ubuntu x86_64 Go Unit Tests with fips provider and requirefipsbuild tag"
 
       - label: ":ubuntu: Libbeat: Ubuntu x86_64 fips140=only Unit Tests"
         key: "mandatory-linux-unit-test-fips-only"
