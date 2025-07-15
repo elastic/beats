@@ -480,6 +480,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add Fleet status updating to o356audit input. {issue}44651[44651] {pull}44957[44957]
 - Add support for blob filtering using path_prefix in azureblobstorage input. {issue}35186[35186] {pull}45214[45214]
 - Update CEL mito extensions to v1.22.0. {pull}45245[45245]
+- TCP and UDP inputs now support multiple pipeline workers. This improves performance by decoupling reading from the network connection and publishing {issue}43674[43674] {pull}45124[45124]
 
 *Auditbeat*
 
