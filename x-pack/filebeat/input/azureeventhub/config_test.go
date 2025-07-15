@@ -9,6 +9,7 @@ package azureeventhub
 import (
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -43,9 +44,7 @@ func TestValidate(t *testing.T) {
 		config.SAKey = "secret"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 
-		if err := config.Validate(); err != nil {
-			t.Fatalf("unexpected validation error: %v", err)
-		}
+		config.checkUnsupportedParams(logptest.NewTestingLogger(t, ""))
 
 		assert.Equal(
 			t,

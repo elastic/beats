@@ -174,7 +174,7 @@ func (conf *azureInputConfig) Validate() error {
 }
 
 // checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
-func (c azureInputConfig) checkUnsupportedParams(logger *logp.Logger) {
+func (c *azureInputConfig) checkUnsupportedParams(logger *logp.Logger) {
 	logger = logger.Named("azureeventhub.config")
 
 	if strings.Contains(c.SAContainer, "_") {
