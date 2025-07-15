@@ -114,7 +114,6 @@ func TestPublish(t *testing.T) {
 				indexSelector: testIndexSelector{},
 			},
 			nil,
-			logger,
 		)
 		require.NoError(t, err)
 		return client, reg
