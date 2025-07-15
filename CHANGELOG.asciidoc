@@ -21,7 +21,7 @@ https://github.com/elastic/beats/compare/v8.17.8\...v8.17.9[View commits]
 
 *Filebeat*
 
-- Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
+- Add missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
 
 *Winlogbeat*
 
