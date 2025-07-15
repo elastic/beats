@@ -58,6 +58,9 @@ type fileWatcherConfig struct {
 	ResendOnModTime bool `config:"resend_on_touch"`
 	// Scanner is the configuration of the scanner.
 	Scanner fileScannerConfig `config:",inline"`
+	// SendNotChanged sends an event even when the file has not changed
+	// This setting is for internal use only
+	SendNotChanged bool `config:"-"`
 }
 
 // fileWatcher gets the list of files from a FSWatcher and creates events by
@@ -70,7 +73,7 @@ type fileWatcher struct {
 	events  chan loginp.FSEvent
 }
 
-func newFileWatcher(logger *logp.Logger, paths []string, ns *conf.Namespace) (loginp.FSWatcher, error) {
+func newFileWatcher(logger *logp.Logger, paths []string, ns *conf.Namespace, sendNotChanged bool) (loginp.FSWatcher, error) {
 	var config *conf.C
 	if ns == nil {
 		config = conf.NewConfig()
@@ -78,15 +81,17 @@ func newFileWatcher(logger *logp.Logger, paths []string, ns *conf.Namespace) (lo
 		config = ns.Config()
 	}
 
-	return newScannerWatcher(logger, paths, config)
+	return newScannerWatcher(logger, paths, config, sendNotChanged)
 }
 
-func newScannerWatcher(logger *logp.Logger, paths []string, c *conf.C) (loginp.FSWatcher, error) {
+func newScannerWatcher(logger *logp.Logger, paths []string, c *conf.C, sendNotChanged bool) (loginp.FSWatcher, error) {
 	config := defaultFileWatcherConfig()
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, err
 	}
+
+	config.SendNotChanged = sendNotChanged
 	scanner, err := newFileScanner(logger, paths, config.Scanner)
 	if err != nil {
 		return nil, err
@@ -106,6 +111,7 @@ func defaultFileWatcherConfig() fileWatcherConfig {
 		Interval:        10 * time.Second,
 		ResendOnModTime: false,
 		Scanner:         defaultFileScannerConfig(),
+		SendNotChanged:  false,
 	}
 }
 
@@ -167,6 +173,13 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		case prevDesc.Info.Size() < fd.Info.Size():
 			e = writeEvent(path, fd)
 			writtenCount++
+
+		default:
+			// For the delete feature we need to run the harvester for
+			// files that have not changed until they're deleted.
+			if w.cfg.SendNotChanged {
+				e = notChangedEvent(path, fd)
+			}
 		}
 
 		// if none of the conditions were true, the file remained unchanged and we don't need to create an event
@@ -250,6 +263,10 @@ func renamedEvent(oldPath, path string, fd loginp.FileDescriptor) loginp.FSEvent
 
 func deleteEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
 	return loginp.FSEvent{Op: loginp.OpDelete, OldPath: path, NewPath: "", Descriptor: fd}
+}
+
+func notChangedEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpNotChanged, OldPath: path, NewPath: path, Descriptor: fd}
 }
 
 func (w *fileWatcher) Event() loginp.FSEvent {
