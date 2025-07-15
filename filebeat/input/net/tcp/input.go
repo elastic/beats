@@ -46,7 +46,7 @@ func Plugin() input.Plugin {
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "tcp packet server",
-		Manager:    netinput.New(configure),
+		Manager:    netinput.NewManager(configure),
 	}
 }
 

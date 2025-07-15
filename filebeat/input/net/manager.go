@@ -79,7 +79,7 @@ type wrapper struct {
 	host               string // used for the logger
 }
 
-// New creates a v2.InputManager for net inputs.
+// NewManager creates a v2.InputManager for net inputs.
 // The returned manager and the input wrapper it uses are responsible for:
 //   - Handling the pipeline workers (including parsing 'number_of_workers')
 //   - Adding the 'host' field to the logger
@@ -87,7 +87,7 @@ type wrapper struct {
 //     The input must update the status to 'Running'
 //   - Handling context cancellation errors
 //   - Recovering from panic
-func New(fn func(*conf.C) (Input, error)) v2.InputManager {
+func NewManager(fn func(*conf.C) (Input, error)) v2.InputManager {
 	return &manager{configure: fn}
 }
 

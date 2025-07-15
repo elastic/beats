@@ -66,7 +66,7 @@ func TestCreate(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			m := New(func(c *conf.C) (Input, error) {
+			m := NewManager(func(c *conf.C) (Input, error) {
 				if tc.expectErr != "" {
 					return nil, errors.New(tc.expectErr)
 				}
