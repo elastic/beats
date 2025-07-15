@@ -1,6 +1,6 @@
 filebeat.inputs:
   - type: {{.input}}
-    id: "tcp-1"
+    id: "{{.id}}"
     host: "{{.addr}}"
     number_of_workers: {{.numWorkers}}
 

@@ -21,6 +21,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"net/http"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -104,6 +106,34 @@ func GetNetInputMetrics(t *testing.T) NetInputMetrics {
 	}
 
 	return metrics[0]
+}
+
+func GetHTTPInputMetrics(t *testing.T, inputID, addr string) NetInputMetrics {
+	fullURL, err := url.JoinPath(addr, "/inputs/")
+	if err != nil {
+		t.Fatalf("cannot parse URL: %s", err)
+	}
+
+	data, err := http.Get(fullURL)
+	if err != nil {
+		t.Fatalf("cannot fetch metrics: %s", err)
+	}
+	defer data.Body.Close()
+
+	metrics := []NetInputMetrics{}
+
+	if err := json.NewDecoder(data.Body).Decode(&metrics); err != nil {
+		t.Fatalf("cannot unmarshal metrics: %s", err)
+	}
+
+	for _, m := range metrics {
+		if inputID == m.ID {
+			return m
+		}
+	}
+
+	t.Fatalf("no metrics found for %q", inputID)
+	return NetInputMetrics{}
 }
 
 // RequireNetMetricsCount uses require.Eventually to assert

@@ -27,6 +27,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
@@ -89,8 +90,6 @@ func TestNetInputs(t *testing.T) {
 	}
 }
 
-// TODO: Check if this test is testing the correct things.
-// Reading the packets read metric might be enough
 func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 	testCases := map[string]struct {
 		cfgFile     string
@@ -123,6 +122,7 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 				"../../filebeat.test",
 			)
 
+			id := uuid.Must(uuid.NewUUID())
 			data := []string{}
 			for range tc.events {
 				data = append(data, strings.Repeat("FooBar", 50))
@@ -142,6 +142,7 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 			// DO NOT USE 'localhost', the UDP client does work when using it.
 			addr := "127.0.0.1:4242"
 			cfg := getConfig(t, map[string]any{
+				"id":         id,
 				"input":      tc.input,
 				"addr":       addr,
 				"esHost":     proxyURL,
@@ -152,10 +153,6 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 			filebeat.Start()
 			filebeat.WaitForLogsAnyOrder(
 				workerStartedMsgs,
-				// []string{
-				// 	"[Worker 0] starting publish loop",
-				// 	"[Worker 1] starting publish loop",
-				// },
 				5*time.Second,
 				"not all workers have started",
 			)
@@ -175,13 +172,33 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 				time.Second,
 				"cannot find output error in the logs")
 
+			m := inputtest.GetHTTPInputMetrics(t, id.String(), "http://127.0.0.1:5066")
+
+			// The number of events published is equal to the queue size
+			expectPublished := 32
+			// The number of events read by the input is:
+			// queue size + 1 event per pipeline worker + 1 for the input goroutine
+			expectedEventsRead := 32 + tc.numWorkers + 1
+
+			if m.PublishedEventsTotal != expectPublished {
+				t.Errorf(
+					"expecting input metric 'published_events_total' to be %d, but got %d",
+					expectPublished,
+					m.PublishedEventsTotal)
+			}
+
+			if m.ReceivedEventsTotal != expectedEventsRead {
+				t.Errorf(
+					"expecting input metric 'received_events_total' to be %d, but got %d",
+					expectedEventsRead,
+					m.ReceivedEventsTotal)
+			}
+
 			filebeat.Stop()
+
+			// Ensure all workers are finished, no goroutine leak
 			filebeat.WaitForLogsAnyOrder(
 				workerDoneMsgs,
-				// []string{
-				// 	"[Worker 0] finished publish loop",
-				// 	"[Worker 1] finished publish loop",
-				// },
 				5*time.Second,
 				"not all workers have started",
 			)
