@@ -144,6 +144,7 @@ processors:
 	// wait for logs to be published
 	require.Eventuallyf(t,
 		func() bool {
+		msg.Reset()
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
