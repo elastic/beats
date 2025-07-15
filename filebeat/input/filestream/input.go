@@ -60,11 +60,26 @@ type fileMeta struct {
 // filestream is the input for reading from files which
 // are actively written by other applications.
 type filestream struct {
-	readerConfig    readerConfig
-	encodingFactory encoding.EncodingFactory
-	closerConfig    closerConfig
-	parsers         parser.Config
-	takeOver        loginp.TakeOverConfig
+	readerConfig         readerConfig
+	encodingFactory      encoding.EncodingFactory
+	closerConfig         closerConfig
+	deleterConfig        deleterConfig
+	parsers              parser.Config
+	takeOver             loginp.TakeOverConfig
+	scannerCheckInterval time.Duration
+
+	// Function references for testing
+	waitGracePeriodFn func(
+		ctx input.Context,
+		logger *logp.Logger,
+		cursor loginp.Cursor,
+		path string,
+		gracePeriod, checkInterval time.Duration,
+		statFn func(string) (os.FileInfo, error),
+	) (bool, error)
+	tickFn   func(time.Duration) <-chan time.Time
+	removeFn func(string) error
+	statFn   func(string) (os.FileInfo, error)
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
@@ -86,32 +101,53 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 }
 
 func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvester, error) {
-	config := defaultConfig()
-	if err := cfg.Unpack(&config); err != nil {
+	c := defaultConfig()
+	if err := cfg.Unpack(&c); err != nil {
 		return nil, nil, err
 	}
 
 	// log warning if deprecated params are set
 	config.checkUnsupportedParams(log)
 
-	config.TakeOver.LogWarnings(log)
+	// log warning if deprecated params are set
+	c.checkUnsupportedParams(log)
 
-	prospector, err := newProspector(config, log)
+	c.TakeOver.LogWarnings(log)
+
+	prospector, err := newProspector(c, log)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
 
-	encodingFactory, ok := encoding.FindEncoding(config.Reader.Encoding)
+	encodingFactory, ok := encoding.FindEncoding(c.Reader.Encoding)
 	if !ok || encodingFactory == nil {
-		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Reader.Encoding)
+		return nil, nil, fmt.Errorf("unknown encoding('%v')", c.Reader.Encoding)
 	}
 
 	filestream := &filestream{
-		readerConfig:    config.Reader,
-		encodingFactory: encodingFactory,
-		closerConfig:    config.Close,
-		parsers:         config.Reader.Parsers,
-		takeOver:        config.TakeOver,
+		readerConfig:      c.Reader,
+		encodingFactory:   encodingFactory,
+		closerConfig:      c.Close,
+		parsers:           c.Reader.Parsers,
+		takeOver:          c.TakeOver,
+		deleterConfig:     c.Delete,
+		waitGracePeriodFn: waitGracePeriod,
+		tickFn:            time.Tick,
+		removeFn:          os.Remove,
+		statFn:            os.Stat,
+	}
+
+	// Read the scan interval from the prospector so we can use during the
+	// grace period of the delete
+	if c.FileWatcher != nil {
+		tmpCfg := struct {
+			CheckInterval time.Duration `config:"check_interval"`
+		}{}
+		if err := c.FileWatcher.Config().Unpack(&tmpCfg); err != nil {
+			return nil, nil, fmt.Errorf("cannot unpack 'scanner.check_interval: %w'", err)
+		}
+
+		filestream.scannerCheckInterval = tmpCfg.CheckInterval
 	}
 
 	return prospector, filestream, nil
@@ -171,9 +207,187 @@ func (inp *filestream) Run(
 	})
 	defer streamCancel()
 
-	// The caller of Run already reports the error and filters out errors that
-	// must not be reported, like 'context cancelled'.
-	return inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
+	// The caller of Run already reports the error and filters out
+	// 'context cancelled'.
+	err = inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
+	if err != nil {
+		// First handle actual errors
+		if !errors.Is(err, io.EOF) && !errors.Is(err, ErrInactive) {
+			return fmt.Errorf("error reading from source: %w", err)
+		}
+
+		if inp.deleterConfig.Enabled {
+			if err := inp.deleteFile(ctx, log, cursor, fs.newPath); err != nil {
+				return fmt.Errorf("cannot remove file '%s': %w", fs.newPath, err)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (inp *filestream) deleteFile(
+	ctx input.Context,
+	logger *logp.Logger,
+	cursor loginp.Cursor,
+	path string,
+) error {
+	// We can only try deleting the file if all events have been published.
+	// There are some cases when not all events have been published:
+	//   - The output is a little behind the input
+	//   - Filebeat is experiencing back pressure
+	//   - The output is down
+	// If not all events have been published, return so the harvester
+	// can close. It will be recreated in the next scan.
+	if !cursor.AllEventsPublished() {
+		logger.Debugf(
+			"not all events from '%s' have been published, "+
+				"closing harvester",
+			path)
+		return nil
+	}
+	logger.Infof(
+		"all events from '%s' have been published, waiting for %s grace period",
+		path, inp.deleterConfig.GracePeriod.String())
+
+	canRemove, err := inp.waitGracePeriodFn(
+		ctx,
+		logger,
+		cursor,
+		path,
+		inp.deleterConfig.GracePeriod,
+		inp.scannerCheckInterval,
+		inp.statFn,
+	)
+	if err != nil {
+		return err
+	}
+
+	if !canRemove {
+		return nil
+	}
+
+	if err := inp.removeFn(path); err != nil {
+		// The first try at removing the file failed,
+		// retry with a constant backoff
+		lastErr := err
+
+		tickerChan := inp.tickFn(inp.deleterConfig.retryBackoff)
+
+		retries := 0
+		for retries < inp.deleterConfig.retries {
+			logger.Errorf(
+				"could not remove '%s', retrying in 2s. Error: %s",
+				path,
+				lastErr,
+			)
+
+			select {
+			case <-ctx.Cancelation.Done():
+				return ctx.Cancelation.Err()
+
+			case <-tickerChan:
+				retries++
+				err := inp.removeFn(path)
+				if err == nil {
+					logger.Infof("'%s' removed", path)
+					return nil
+				}
+				if errors.Is(err, os.ErrNotExist) {
+					logger.Infof("'%s' was removed by an external process", path)
+					return nil
+				}
+
+				lastErr = err
+			}
+		}
+
+		return fmt.Errorf(
+			"cannot remove '%s' after %d retries. Last error: %w",
+			path,
+			retries,
+			lastErr)
+	}
+
+	logger.Infof("'%s' removed", path)
+	return nil
+}
+
+// waitGracePeriod waits for the delete grace period while monitoring the file
+// for any changes, if the file changes or any error is encountered, false
+// is returned. True is only returned if the grace period expires with
+// no error and no context cancellation.
+func waitGracePeriod(
+	ctx input.Context,
+	logger *logp.Logger,
+	cursor loginp.Cursor,
+	path string,
+	gracePeriod, checkInterval time.Duration,
+	statFn func(string) (os.FileInfo, error),
+) (bool, error) {
+	// Check if file grows during the grace period
+	// We know all events have been published because cursor.AllEventsPublished
+	// returns is true (it is called by deleteFile), so we can get the offset
+	// from the cursor and compare it with the file size.
+	st := state{}
+	if err := cursor.Unpack(&st); err != nil {
+		return false, fmt.Errorf("cannot unpack cursor from '%s' to read offset: %w",
+			path,
+			err)
+	}
+
+	if gracePeriod > 0 {
+		graceTimerChan := time.After(gracePeriod)
+		checkIntervalTickerChan := time.Tick(checkInterval)
+		// Wait for the grace period or for the context to be cancelled
+	LOOP:
+		for {
+			select {
+			case <-ctx.Cancelation.Done():
+				return false, ctx.Cancelation.Err()
+			case <-checkIntervalTickerChan:
+				canDelete, err := canDeleteFile(logger, path, st.Offset, statFn)
+				if err != nil && !canDelete {
+					return false, err
+				}
+			case <-graceTimerChan:
+				break LOOP
+			}
+		}
+	}
+
+	return canDeleteFile(logger, path, st.Offset, statFn)
+}
+
+// canDeleteFile returns true if the file size has not changed and
+// the file can be removed. If the file does not exist, false is returned.
+// If there is an error reading the file size, false and an error are returned.
+func canDeleteFile(
+	logger *logp.Logger,
+	path string,
+	expectedSize int64,
+	statFn func(string) (os.FileInfo, error),
+) (bool, error) {
+
+	stat, err := statFn(path)
+	if err != nil {
+		// If the file does not exist any more, return false
+		// (do not delete) and no error.
+		if errors.Is(err, os.ErrNotExist) {
+			return false, nil
+		}
+		// Return the error and cause the harvester to close
+		return false, fmt.Errorf("cannot stat '%s': %w", path, err)
+	}
+
+	// If the file has been written to, close the harvester so the filewatcher
+	// can start a new one
+	if stat.Size() != expectedSize {
+		logger.Debugf("'%s' was updated, won't remove. Closing harvester", path)
+		return false, nil
+	}
+
+	return true, nil
 }
 
 func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
@@ -374,6 +588,12 @@ func (inp *filestream) readFromSource(
 				log.Debugf("Reader was closed. Closing. Path='%s'", path)
 			} else if errors.Is(err, io.EOF) {
 				log.Debugf("EOF has been reached. Closing. Path='%s'", path)
+				if inp.deleterConfig.Enabled {
+					return err
+				}
+			} else if errors.Is(err, ErrInactive) {
+				log.Debugf("File is inactive. Closing. Path='%s'", path)
+				return err
 			} else {
 				log.Errorf("Read line error: %v", err)
 				metrics.ProcessingErrors.Inc()
@@ -398,6 +618,7 @@ func (inp *filestream) readFromSource(
 			continue
 		}
 
+		//nolint:gosec // message.Bytes is always positive
 		metrics.BytesProcessed.Add(uint64(message.Bytes))
 
 		// add "take_over" tag if `take_over` is set to true
