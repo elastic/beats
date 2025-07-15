@@ -325,7 +325,7 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 		if ch.Step != nil {
 			ts, _ := newBasicTransformsFromConfig(registeredTransforms, ch.Step.Request.Transforms, requestNamespace, stat, log)
 			ch.Step.Auth = tryAssignAuth(config.Auth, ch.Step.Auth)
-			client, err := newChainHTTPClient(ctx, ch.Step.Auth, ch.Step.Request, stat, log, reg)
+			client, err := newHTTPClient(ctx, ch.Step.Auth, ch.Step.Request, stat, log, reg, nil)
 			if err != nil {
 				return nil, fmt.Errorf("failed in creating chain http client with error: %w", err)
 			}
@@ -352,7 +352,7 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 			ts, _ := newBasicTransformsFromConfig(registeredTransforms, ch.While.Request.Transforms, requestNamespace, stat, log)
 			policy := newHTTPPolicy(evaluateResponse, ch.While.Until, stat, log)
 			ch.While.Auth = tryAssignAuth(config.Auth, ch.While.Auth)
-			client, err := newChainHTTPClient(ctx, ch.While.Auth, ch.While.Request, stat, log, reg, policy)
+			client, err := newHTTPClient(ctx, ch.While.Auth, ch.While.Request, stat, log, reg, policy)
 			if err != nil {
 				return nil, fmt.Errorf("failed in creating chain http client with error: %w", err)
 			}
