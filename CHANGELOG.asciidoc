@@ -31,7 +31,7 @@ https://github.com/elastic/beats/compare/v8.18.3\...v8.18.4[View commits]
 
 *Filebeat*
 
-- Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
+- Add input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
 
 *Heartbeat*
 
