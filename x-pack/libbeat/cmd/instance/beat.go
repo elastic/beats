@@ -33,7 +33,7 @@ import (
 )
 
 // NewBeatForReceiver creates a Beat that will be used in the context of an otel receiver
-func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, useDefaultProcessors bool, consumer consumer.Logs, componentName string, componentType string, core zapcore.Core) (*instance.Beat, error) {
+func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, useDefaultProcessors bool, consumer consumer.Logs, componentName string, core zapcore.Core) (*instance.Beat, error) {
 	b, err := instance.NewBeat(settings.Name,
 		settings.IndexPrefix,
 		settings.Version,
@@ -43,8 +43,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, err
 	}
 
-	b.Info.ComponentName = componentName
-	b.Info.ComponentType = componentType
+	b.Info.ComponentID = componentName
 	b.Info.LogConsumer = consumer
 
 	// begin code similar to configure

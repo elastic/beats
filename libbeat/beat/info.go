@@ -43,8 +43,7 @@ type Info struct {
 	FIPSDistribution bool      // If the beat was compiled as a FIPS distribution.
 
 	LogConsumer          consumer.Logs // otel log consumer
-	ComponentName        string        // otel component name
-	ComponentType        string        // otel component type
+	ComponentID          string        // otel component id from the collector config e.g. "filebeatreceiver/logs"
 	UseDefaultProcessors bool          // Whether to use the default processors
 	Logger               *logp.Logger
 }

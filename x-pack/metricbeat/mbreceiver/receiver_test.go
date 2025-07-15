@@ -86,8 +86,8 @@ func TestNewReceiver(t *testing.T) {
 			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0
 			}, "expected at least one ingest log, got logs: %v", logs["r1"])
-			assert.Equal(c, "metricbeatreceiver/r1", logs["r1"][0].Flatten()["otel.component.name"], "expected otel.component.name field in log record")
-			assert.Equal(c, "metricbeatreceiver", logs["r1"][0].Flatten()["otel.component.type"], "expected otel.component.type field in log record")
+			assert.Equal(c, "metricbeatreceiver/r1", logs["r1"][0].Flatten()["otelcol.component.id"], "expected otelcol.component.id field in log record")
+			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["otelcol.component.kind"], "expected otelcol.component.kind field in log record")
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket, "stats")
@@ -203,10 +203,10 @@ func TestMultipleReceivers(t *testing.T) {
 			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
 			}, "expected at least one ingest log for each receiver, got logs: %v", logs)
-			assert.Equal(c, "metricbeatreceiver/r1", logs["r1"][0].Flatten()["otel.component.name"], "expected otel.component.name field in r1 log record")
-			assert.Equal(c, "metricbeatreceiver", logs["r1"][0].Flatten()["otel.component.type"], "expected otel.component.type field in r1 log record")
-			assert.Equal(c, "metricbeatreceiver/r2", logs["r2"][0].Flatten()["otel.component.name"], "expected otel.component.name field in r2 log record")
-			assert.Equal(c, "metricbeatreceiver", logs["r2"][0].Flatten()["otel.component.type"], "expected otel.component.type field in r2 log record")
+			assert.Equal(c, "metricbeatreceiver/r1", logs["r1"][0].Flatten()["otelcol.component.id"], "expected otelcol.component.id field in r1 log record")
+			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["otelcol.component.kind"], "expected otelcol.component.kind field in r1 log record")
+			assert.Equal(c, "metricbeatreceiver/r2", logs["r2"][0].Flatten()["otelcol.component.id"], "expected otelcol.component.id field in r2 log record")
+			assert.Equal(c, "receiver", logs["r2"][0].Flatten()["otelcol.component.kind"], "expected otelcol.component.kind field in r2 log record")
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				tests := []string{monitorSocket1, monitorSocket2}

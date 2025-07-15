@@ -125,13 +125,13 @@ http.port: %d
 		"log.file.inode",
 		"log.file.path",
 		// only present in beats receivers
-		"otel.component.name",
-		"otel.component.type",
+		"otelcol.component.id",
+		"otelcol.component.kind",
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
-	assert.Equal(t, "filebeatreceiver", otelDoc["otel.component.name"], "expected otel.component.name field in log record")
-	assert.Equal(t, "filebeatreceiver", otelDoc["otel.component.type"], "expected otel.component.type field in log record")
+	assert.Equal(t, "filebeatreceiver", otelDoc["otelcol.component.id"], "expected otelcol.component.id field in log record")
+	assert.Equal(t, "receiver", otelDoc["otelcol.component.kind"], "expected otelcol.component.kind field in log record")
 	assertMonitoring(t, 5066)
 }
 
@@ -252,8 +252,8 @@ processors:
 		"agent.id",
 		"event.created",
 		// only present in beats receivers
-		"otel.component.name",
-		"otel.component.type",
+		"otelcol.component.id",
+		"otelcol.component.kind",
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
@@ -479,16 +479,16 @@ http.port: %d
 		"log.file.inode",
 		"log.file.path",
 		// only present in beats receivers
-		"otel.component.name",
-		"otel.component.type",
+		"otelcol.component.id",
+		"otelcol.component.kind",
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 	assertMonitoring(t, otelConfig.MonitoringPort)
 	assertMonitoring(t, 5067) // filebeat
 
-	assert.Equal(t, "filebeatreceiver/filestream", otelDoc["otel.component.name"], "expected otel.component.name field in log record")
-	assert.Equal(t, "filebeatreceiver", otelDoc["otel.component.type"], "expected otel.component.type field in log record")
+	assert.Equal(t, "filebeatreceiver/filestream", otelDoc["otelcol.component.id"], "expected otelcol.component.id field in log record")
+	assert.Equal(t, "filebeatreceiver", otelDoc["otelcol.component.kind"], "expected otelcol.component.kind field in log record")
 }
 
 func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
