@@ -3,6 +3,49 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-9.0.4]]
+=== Beats version 9.0.4
+https://github.com/elastic/beats/compare/v9.0.3\...v9.0.4[View commits]
+
+==== Breaking changes
+
+*Metricbeat*
+
+- Change index summary metricset to use `_nodes/stats` API instead of `_stats` API to avoid data gaps. {pull}45049[45049]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
+
+*Winlogbeat*
+
+- Fix EvtVarTypeAnsiString conversion. {pull}44026[44026]
+
+==== Added
+
+*Filebeat*
+
+- Add Fleet status updating to GCS input. {issue}44273[44273] {pull}44508[44508]
+- Add Fleet status update functionality to udp input. {issue}44419[44419] {pull}44785[44785]
+- Add Fleet status update functionality to tcp input. {issue}44420[44420] {pull}44786[44786]
+- Add Fleet status updating to Azure Blob Storage input. {issue}44268[44268] {pull}44945[44945]
+- Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
+- Add input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
+- Add support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
+- Add missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
+
+*Heartbeat*
+
+- Upgrade Node version to latest LTS v20.19.3. {pull}45087[45087]
+- Add base64 encoding option to inline monitors. {pull}45100[45100]
+
+*Metricbeat*
+
+- Upgrade github.com/microsoft/go-mssqldb version from v1.7.2 to v1.8.2. {pull}44990[44990]
+
+
 [[release-notes-9.0.3]]
 === Beats version 9.0.3
 https://github.com/elastic/beats/compare/v9.0.2\...v9.0.3[View commits]
