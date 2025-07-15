@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -94,7 +95,7 @@ func TestConfig(t *testing.T) {
 	} {
 		t.Run(name, func(t *testing.T) {
 			isWindowsPath = test.useWindowsPath
-			cfg, err := readConfig(test.config)
+			cfg, err := readConfig(test.config, logptest.NewTestingLogger(t, ""))
 			test.assertion(t, cfg, err)
 		})
 	}
