@@ -120,7 +120,7 @@ func TestPublishLoop(t *testing.T) {
 	}
 
 	assert.Eventuallyf(t, func() bool {
-		// nolint:gosec // it is a test, there is no risk of overflow
+		//nolint:gosec // it is a test, there is no risk of overflow
 		return int(publisher.EventsPublished()) == len(events)
 	},
 		time.Second,
@@ -145,10 +145,9 @@ func TestPublishLoop(t *testing.T) {
 
 func TestInitWorkers(t *testing.T) {
 	expectedClients := 2
-	ctx, cancel := context.WithCancel(t.Context())
 	v2Ctx := v2.Context{
 		Logger:      logp.NewNopLogger(),
-		Cancelation: ctx,
+		Cancelation: t.Context(),
 	}
 
 	w := wrapper{
@@ -169,8 +168,6 @@ func TestInitWorkers(t *testing.T) {
 	if want, got := expectedClients, publisher.NumClients(); want != got {
 		t.Fatalf("not all clients have been started. Want %d got %d", want, got)
 	}
-
-	cancel()
 }
 
 func TestRun(t *testing.T) {

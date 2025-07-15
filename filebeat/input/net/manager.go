@@ -36,11 +36,15 @@ import (
 type Input interface {
 	// Returns the input name
 	Name() string
+
 	// Tests the input, if possible it should ensure the input can
 	// start a server at the configured address and port
 	Test(v2.TestContext) error
+
 	// InitMetrics initialises the metrics for the input.
-	InitMetrics(string, *logp.Logger) Metrics
+	// The 'id' argument is the input ID to be used in the metrics
+	InitMetrics(id string, logger *logp.Logger) Metrics
+
 	// Runs the input. Events sent to the channel will be
 	// published by any of the pipeline workers.
 	// Run must call EventReceived on Metrics once the
@@ -52,7 +56,9 @@ type Input interface {
 // Metrics is an interface to abstract the metrics
 // from input/netmetrics
 type Metrics interface {
+	// EventPublished updates all metrics related to published events.
 	EventPublished(start time.Time)
+	// EventReceived update all metrics related to receiving events.
 	EventReceived(len int, timestamp time.Time)
 }
 
@@ -179,7 +185,8 @@ func (w wrapper) initWorkers(ctx v2.Context, pipeline beat.Pipeline, metrics Met
 }
 
 // publishLoop reads events from w.evtChan and publishes them to the client.
-// If ctx is cancelled publishLoop closes the client and returns
+// If ctx is cancelled publishLoop returns. The client is always closed by
+// publishLoop.
 func (w wrapper) publishLoop(ctx v2.Context, id int, client beat.Client, metrics Metrics) {
 	logger := ctx.Logger
 	logger.Debugf("[Worker %d] starting publish loop", id)

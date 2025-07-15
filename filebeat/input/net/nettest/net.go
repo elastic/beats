@@ -159,30 +159,16 @@ func RequireNetMetricsCount(t *testing.T, timeout time.Duration, received, publi
 }
 
 type NetInputMetrics struct {
-	ArrivalPeriod            ArrivalPeriod  `json:"arrival_period"`
-	Device                   string         `json:"device"`
-	ID                       string         `json:"id"`
-	Input                    string         `json:"input"`
-	ProcessingTime           ProcessingTime `json:"processing_time"`
-	PublishedEventsTotal     int            `json:"published_events_total"`
-	ReceiveQueueLength       int            `json:"receive_queue_length"`
-	ReceivedBytesTotal       int            `json:"received_bytes_total"`
-	ReceivedEventsTotal      int            `json:"received_events_total"`
-	SystemPacketDrops        int            `json:"system_packet_drops"`
-	UDPReadBufferLengthGauge int            `json:"udp_read_buffer_length_gauge"`
+	ArrivalPeriod        ArrivalPeriod  `json:"arrival_period"`
+	ID                   string         `json:"id"`
+	ProcessingTime       ProcessingTime `json:"processing_time"`
+	PublishedEventsTotal int            `json:"published_events_total"`
+	ReceivedBytesTotal   int            `json:"received_bytes_total"`
+	ReceivedEventsTotal  int            `json:"received_events_total"`
 }
 
 type Histogram struct {
-	Count  int     `json:"count"`
-	Max    float64 `json:"max"`
-	Mean   float64 `json:"mean"`
-	Median float64 `json:"median"`
-	Min    float64 `json:"min"`
-	P75    float64 `json:"p75"`
-	P95    float64 `json:"p95"`
-	P99    float64 `json:"p99"`
-	P999   float64 `json:"p999"`
-	Stddev float64 `json:"stddev"`
+	Count int `json:"count"`
 }
 
 type ArrivalPeriod struct {
