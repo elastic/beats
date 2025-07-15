@@ -22,95 +22,77 @@ package udp
 import (
 	"context"
 	"errors"
+	"runtime"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/input/net/nettest"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/filebeat/input/v2/testpipeline"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestInput(t *testing.T) {
 	serverAddr := "127.0.0.1:9042"
-	testCases := map[string]struct {
-		numWorkers int
-		events     []string
-		published  int
-		read       int
-		bytesRead  int
-		blocked    bool
-	}{
-		"one worker": {
-			events:     []string{"foo", "bar"},
-			numWorkers: 1,
-			published:  2,
-			read:       2,
-			bytesRead:  8,
-		},
-		"blocked output": {
-			events:     []string{"foo", "bar"},
-			numWorkers: 42,
-			blocked:    true,
-			published:  0,
-			read:       2,
-			bytesRead:  8,
-		},
+	wg := sync.WaitGroup{}
+	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
+		"host": serverAddr,
+	}))
+	if err != nil {
+		t.Fatalf("cannot create input: %s", err)
 	}
 
-	for name, tc := range testCases {
-		t.Run(name, func(t *testing.T) {
-			wg := sync.WaitGroup{}
-			inp, err := configure(conf.MustNewConfigFrom(map[string]any{
-				"host":              serverAddr,
-				"number_of_workers": tc.numWorkers,
-			}))
-			if err != nil {
-				t.Fatalf("cannot create input: %s", err)
+	data := []string{"foo", "bar"}
+
+	ctx, cancel := context.WithCancel(t.Context())
+	v2Ctx := v2.Context{
+		ID:          t.Name(),
+		Cancelation: ctx,
+		Logger:      logp.NewNopLogger(),
+	}
+
+	metrics := inp.InitMetrics("tcp", v2Ctx.Logger)
+	c := make(chan beat.Event, 2)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := inp.Run(v2Ctx, c, metrics); err != nil {
+			if !errors.Is(err, context.Canceled) {
+				t.Errorf("input exited with error: %s", err)
 			}
+		}
+	}()
 
-			pipeline := testpipeline.NewPipelineConnector()
-			if tc.blocked {
-				pipeline.Block()
-			}
+	// Allow the UDP server to start
+	runtime.Gosched()
+	nettest.RunUDPClient(t, serverAddr, data)
 
-			ctx, cancel := context.WithCancel(t.Context())
-			v2Ctx := v2.Context{
-				ID:          t.Name(),
-				Cancelation: ctx,
-				Logger:      logp.NewNopLogger(),
-			}
+	nettest.RequireNetMetricsCount(t, time.Second, 2, 0, 8)
 
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				if err := inp.Run(v2Ctx, pipeline); err != nil {
-					if !errors.Is(err, context.Canceled) {
-						t.Errorf("input exited with error: %s", err)
-					}
-				}
-			}()
+	// Stop the input, this removes all metrics
+	cancel()
 
-			// Give the input to start running. Because it's UDP we cannot know from
-			// the client side if the server is up and running.
-			time.Sleep(500 * time.Millisecond)
+	// Ensure the input Run method returns
+	wg.Wait()
 
-			nettest.RunUDPClient(t, serverAddr, []string{"foo", "bar"})
-			nettest.RequireNetMetricsCount(
-				t,
-				3*time.Second,
-				tc.read,
-				tc.published,
-				tc.bytesRead,
-			)
+	// Make sure all events have been written to the channel
+	evtCount := 0
+	for range len(data) {
+		select {
+		case <-c:
+			evtCount++
+		default:
+			t.Fatalf("only %d events have been written to the channel, expecting %d", evtCount, len(data))
+		}
+	}
 
-			// Stop the input, this removes all metrics
-			cancel()
-
-			// Ensure the input Run method returns
-			wg.Wait()
-		})
+	select {
+	case <-c:
+		t.Fatalf("expecting %d events on the channel, got at least %d", len(data), evtCount+1)
+	default:
+		// No more events on the channel, test passed
 	}
 }

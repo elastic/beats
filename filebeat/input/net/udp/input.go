@@ -18,24 +18,21 @@
 package udp
 
 import (
-	"fmt"
 	"net"
-	"runtime/debug"
 	"time"
 
 	"github.com/dustin/go-humanize"
 
+	netinput "github.com/elastic/beats/v7/filebeat/input/net"
 	"github.com/elastic/beats/v7/filebeat/input/netmetrics"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -46,11 +43,11 @@ func Plugin() input.Plugin {
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "udp packet server",
-		Manager:    v2.ConfigureWith(configure),
+		Manager:    netinput.New(configure),
 	}
 }
 
-func configure(cfg *conf.C) (v2.Input, error) {
+func configure(cfg *conf.C) (netinput.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -66,25 +63,22 @@ func defaultConfig() config {
 			Host:           "localhost:8080",
 			Timeout:        time.Minute * 5,
 		},
-		NumPipelineWorkers: 1,
 	}
 }
 
 type server struct {
 	udp.Server
 	config
-	evtChan chan beat.Event
+	metrics *netmetrics.UDP
 }
 
 type config struct {
-	udp.Config         `config:",inline"`
-	NumPipelineWorkers int `config:"number_of_workers" validate:"positive,nonzero"`
+	udp.Config `config:",inline"`
 }
 
 func newServer(config config) (*server, error) {
 	return &server{
-		config:  config,
-		evtChan: make(chan beat.Event),
+		config: config,
 	}, nil
 }
 
@@ -98,89 +92,14 @@ func (s *server) Test(_ input.TestContext) error {
 	return l.Close()
 }
 
-func (s *server) publishLoop(ctx input.Context, id int, publisher stateless.Publisher, metrics *netmetrics.UDP) {
+func (s *server) InitMetrics(id string, logger *logp.Logger) netinput.Metrics {
+	s.metrics = netmetrics.NewUDP("udp", id, s.Host, uint64(s.ReadBuffer), time.Second, logger)
+	return s.metrics
+}
+
+func (s *server) Run(ctx input.Context, evtChan chan<- beat.Event, metrics netinput.Metrics) (err error) {
 	logger := ctx.Logger
-	logger.Debugf("[Worker %d] starting publish loop", id)
-	defer logger.Debugf("[Worker %d] finished publish loop", id)
-	for {
-		select {
-		case <-ctx.Cancelation.Done():
-			logger.Debug("Context cancelled, closing publish Loop")
-			return
-		case evt := <-s.evtChan:
-			start := time.Now()
-			publisher.Publish(evt)
-			metrics.EventPublished(start)
-		}
-	}
-}
-
-func (s *server) initWorkers(ctx input.Context, pipeline beat.Pipeline, metrics *netmetrics.UDP) error {
-	clients := []beat.Client{}
-	for id := range s.NumPipelineWorkers {
-		client, err := pipeline.ConnectWith(beat.ClientConfig{
-			PublishMode: beat.DefaultGuarantees,
-		})
-		if err != nil {
-			return fmt.Errorf("cannot connect to publishing pipeline: %w", err)
-		}
-
-		clients = append(clients, client)
-		go s.publishLoop(ctx, id, client, metrics)
-	}
-
-	// Close all clients when the input is closed
-	go func() {
-		select {
-		case <-ctx.Cancelation.Done():
-		}
-		for _, c := range clients {
-			c.Close()
-		}
-	}()
-
-	return nil
-}
-
-func (s *server) Run(ctx input.Context, pipeline beat.PipelineConnector) (err error) {
-	logger := ctx.Logger.With("host", s.Host)
-
-	defer func() {
-		if v := recover(); v != nil {
-			if e, ok := v.(error); ok {
-				err = e
-			} else {
-				err = fmt.Errorf("UDP input panic with: %+v\n%s", v, debug.Stack())
-			}
-			logger.Errorw("UDP input panic", err)
-		}
-	}()
-
-	logger.Info("starting udp socket input")
-	defer logger.Info("udp input stopped")
-
-	ctx.UpdateStatus(status.Starting, "")
-	ctx.UpdateStatus(status.Configuring, "")
-
-	const pollInterval = time.Minute
-	// #nosec G115 -- ignore "overflow conversion int64 -> uint64", config validation ensures value is always positive.
-	metrics := netmetrics.NewUDP("udp", ctx.ID, s.Host, uint64(s.ReadBuffer), pollInterval, logger)
-	defer metrics.Close()
-
-	s.initWorkers(ctx, pipeline, metrics)
-
-	err = s.initAndRunServer(ctx, metrics)
-	if err != nil {
-		ctx.UpdateStatus(status.Failed, "Input exited unexpectedly: "+err.Error())
-	} else {
-		ctx.UpdateStatus(status.Stopped, "")
-	}
-
-	return err
-}
-
-func (s *server) initAndRunServer(ctx input.Context, metrics *netmetrics.UDP) error {
-	logger := ctx.Logger
+	defer s.metrics.Close()
 
 	server := udp.New(&s.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
 		now := time.Now()
@@ -206,7 +125,7 @@ func (s *server) initAndRunServer(ctx input.Context, metrics *netmetrics.UDP) er
 				},
 			}
 		}
-		s.evtChan <- evt
+		evtChan <- evt
 	}, logger)
 
 	logger.Debug("udp input initialized")
