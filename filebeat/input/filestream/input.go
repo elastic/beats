@@ -107,9 +107,6 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 	}
 
 	// log warning if deprecated params are set
-	config.checkUnsupportedParams(log)
-
-	// log warning if deprecated params are set
 	c.checkUnsupportedParams(log)
 
 	c.TakeOver.LogWarnings(log)

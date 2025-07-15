@@ -182,7 +182,7 @@ func (c *config) Validate() error {
 }
 
 // checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
-func (c *config) checkUnsupportedParams(logger *logp.Logger) {
+func (c config) checkUnsupportedParams(logger *logp.Logger) {
 	if c.AllowIDDuplication {
 		logger.Named("input.filestream").Warn(
 			"setting `allow_deprecated_id_duplication` will lead to data " +
