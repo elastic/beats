@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -60,7 +61,7 @@ func TestConfigAcceptValidKerberos(t *testing.T) {
 			if err := c.SetString("hosts", 0, "localhost"); err != nil {
 				t.Fatalf("could not set 'hosts' on config: %s", err)
 			}
-			cfg, err := readConfig(c)
+			cfg, err := readConfig(c, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatalf("Can not create test configuration: %v", err)
 			}

@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -90,7 +91,7 @@ func makeRedis(
 		return outputs.Fail(errors.New("Bad Redis data type")) //nolint:staticcheck //Keep old behavior
 	}
 
-	key, err := buildKeySelector(cfg)
+	key, err := buildKeySelector(cfg, beat.Logger)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -168,12 +169,12 @@ func makeRedis(
 	return outputs.SuccessNet(rConfig.Queue, rConfig.LoadBalance, rConfig.BulkMaxSize, rConfig.MaxRetries, nil, clients)
 }
 
-func buildKeySelector(cfg *config.C) (outil.Selector, error) {
+func buildKeySelector(cfg *config.C, logger *logp.Logger) (outil.Selector, error) {
 	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
 		Key:              "key",
 		MultiKey:         "keys",
 		EnableSingleOnly: true,
 		FailEmpty:        true,
 		Case:             outil.SelectorKeepCase,
-	})
+	}, logger)
 }

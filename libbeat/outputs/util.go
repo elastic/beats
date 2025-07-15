@@ -47,10 +47,6 @@ func Success(cfg config.Namespace, batchSize, retry int, encoderFactory queue.En
 			}
 			q = memqueue.FactoryForSettings(settings)
 		case diskqueue.QueueType:
-			if management.UnderAgent() {
-				logger := logp.NewLogger("output")
-				logger.Warn("Disk queue configuration found while running under agent: this configuration is unsupported and in technical preview.")
-			}
 			settings, err := diskqueue.SettingsForUserConfig(cfg.Config())
 			if err != nil {
 				return Group{}, fmt.Errorf("unable to get disk queue settings: %w", err)
@@ -67,6 +63,14 @@ func Success(cfg config.Namespace, batchSize, retry int, encoderFactory queue.En
 		QueueFactory:   q,
 		EncoderFactory: encoderFactory,
 	}, nil
+}
+
+// checkQueueType checks queue type and logs a warning if
+// queue is of disk type under elastic-agent
+func CheckQueueType(cfg config.Namespace, logger *logp.Logger) {
+	if cfg.Name() == diskqueue.QueueType && management.UnderAgent() {
+		logger.Warn("Disk queue configuration found while running under agent: this configuration is unsupported and in technical preview.")
+	}
 }
 
 // NetworkClients converts a list of NetworkClient instances into []Client.

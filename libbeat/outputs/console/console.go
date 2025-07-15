@@ -54,6 +54,8 @@ func makeConsole(
 ) (outputs.Group, error) {
 	config := defaultConfig
 	err := cfg.Unpack(&config)
+	outputs.CheckQueueType(config.Queue, beat.Logger)
+
 	if err != nil {
 		return outputs.Fail(err)
 	}

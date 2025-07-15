@@ -53,7 +53,7 @@ func TestConfigAcceptValid(t *testing.T) {
 			if err := c.SetString("hosts", 0, "localhost"); err != nil {
 				t.Fatalf("could not set 'hosts' on config: %s", err)
 			}
-			cfg, err := readConfig(c)
+			cfg, err := readConfig(c, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatalf("Can not create test configuration: %v", err)
 			}
@@ -85,7 +85,7 @@ func TestConfigInvalid(t *testing.T) {
 			if err := c.SetString("hosts", 0, "localhost"); err != nil {
 				t.Fatalf("could not set 'hosts' on config: %s", err)
 			}
-			_, err := readConfig(c)
+			_, err := readConfig(c, logptest.NewTestingLogger(t, ""))
 			if err == nil {
 				t.Fatalf("Can create test configuration from invalid input")
 			}
@@ -143,7 +143,7 @@ func TestConfigUnderElasticAgent(t *testing.T) {
 				t.Fatalf("could not set 'hosts' on config: %s", err)
 			}
 
-			_, err := readConfig(c)
+			_, err := readConfig(c, logptest.NewTestingLogger(t, ""))
 
 			if test.expectError && err == nil {
 				t.Fatalf("invalid configuration must not be created")
@@ -231,7 +231,7 @@ func TestTopicSelection(t *testing.T) {
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
 			test := test
-			selector, err := buildTopicSelector(config.MustNewConfigFrom(test.cfg))
+			selector, err := buildTopicSelector(config.MustNewConfigFrom(test.cfg), logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatalf("Failed to parse configuration: %v", err)
 			}

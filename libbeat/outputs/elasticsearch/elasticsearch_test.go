@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -120,7 +121,7 @@ func TestPipelineSelection(t *testing.T) {
 		// de-alias loop variable
 		test := _test
 		t.Run(name, func(t *testing.T) {
-			selector, err := buildPipelineSelector(config.MustNewConfigFrom(test.cfg))
+			selector, err := buildPipelineSelector(config.MustNewConfigFrom(test.cfg), logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			if err != nil {

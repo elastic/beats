@@ -53,7 +53,7 @@ func makeFileout(
 	observer outputs.Observer,
 	cfg *c.C,
 ) (outputs.Group, error) {
-	foConfig, err := readConfig(cfg)
+	foConfig, err := readConfig(cfg, beat.Logger)
 	if err != nil {
 		return outputs.Fail(err)
 	}

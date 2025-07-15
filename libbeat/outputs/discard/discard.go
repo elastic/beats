@@ -52,6 +52,7 @@ func makeDiscard(
 	if err := cfg.Unpack(&doConfig); err != nil {
 		return outputs.Fail(err)
 	}
+	outputs.CheckQueueType(doConfig.Queue, beat.Logger)
 
 	// disable bulk support in publisher pipeline
 	_ = cfg.SetInt("bulk_max_size", -1, -1)
