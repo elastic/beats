@@ -97,6 +97,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	if m.isFleetMode {
 		event = adjustFleetEvent(event)
+		m.Logger().Info("running in fleet")
 	}
 
 	if reported := reporter.Event(event); !reported {
