@@ -35,17 +35,6 @@ kafka-acls --authorizer-properties zookeeper.connect=localhost:2181 --add --allo
 kafka-acls --authorizer-properties zookeeper.connect=localhost:2181 --add --allow-principal User:stats --operation Describe --group '*'
 ```
 
-[float]
-=== Compatibility
-
-This module is tested with Kafka 0.10.2.1, 1.1.0, 2.1.1, 2.2.2 and 3.6.0.
-
-The Broker, Producer, Consumer metricsets require <<metricbeat-module-jolokia,Jolokia>> to fetch JMX metrics. Refer to the link for Jolokia's compatibility notes.
-
-[float]
-=== Usage
-The Broker, Producer, Consumer metricsets require <<metricbeat-module-jolokia,Jolokia>> to fetch JMX metrics. Refer to those Metricsets' documentation about how to use Jolokia.
-
 
 ## Compatibility [_compatibility_26]
 
