@@ -27,7 +27,6 @@ func GetAPIServerConfig(t *testing.T, metricSetName string) map[string]interface
 	return map[string]interface{}{
 		"module":            "kubernetes",
 		"metricsets":        []string{metricSetName},
-		"host":              "${NODE_NAME}",
 		"hosts":             []string{"https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"},
 		"bearer_token_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
 		"ssl": map[string]interface{}{
@@ -44,7 +43,6 @@ func GetKubeStateMetricsConfig(t *testing.T, metricSetName string) map[string]in
 	return map[string]interface{}{
 		"module":     "kubernetes",
 		"metricsets": []string{metricSetName},
-		"host":       "${NODE_NAME}",
 		"hosts":      []string{"kube-state-metrics:8080"},
 	}
 }
@@ -55,7 +53,6 @@ func GetKubeletConfig(t *testing.T, metricSetName string) map[string]interface{}
 	return map[string]interface{}{
 		"module":            "kubernetes",
 		"metricsets":        []string{metricSetName},
-		"host":              "${NODE_NAME}",
 		"hosts":             []string{"https://localhost:10250"},
 		"bearer_token_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
 		"ssl": map[string]interface{}{
@@ -70,7 +67,6 @@ func GetKubeProxyConfig(t *testing.T, metricSetName string) map[string]interface
 	return map[string]interface{}{
 		"module":     "kubernetes",
 		"metricsets": []string{metricSetName},
-		"host":       "${NODE_NAME}",
 		"hosts":      []string{"localhost:10249"},
 	}
 }
@@ -81,7 +77,6 @@ func GetSchedulerConfig(t *testing.T, metricSetName string) map[string]interface
 	return map[string]interface{}{
 		"module":                "kubernetes",
 		"metricsets":            []string{metricSetName},
-		"host":                  "${NODE_NAME}",
 		"hosts":                 []string{"https://0.0.0.0:10259"},
 		"bearer_token_file":     "/var/run/secrets/kubernetes.io/serviceaccount/token",
 		"ssl.verification_mode": "none",
@@ -94,7 +89,6 @@ func GetControllerManagerConfig(t *testing.T, metricSetName string) map[string]i
 	return map[string]interface{}{
 		"module":                "kubernetes",
 		"metricsets":            []string{metricSetName},
-		"host":                  "${NODE_NAME}",
 		"hosts":                 []string{"https://0.0.0.0:10257"},
 		"bearer_token_file":     "/var/run/secrets/kubernetes.io/serviceaccount/token",
 		"ssl.verification_mode": "none",
