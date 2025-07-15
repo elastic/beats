@@ -208,9 +208,6 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 		stat.UpdateStatus(status.Failed, "failed to create HTTP client: "+err.Error())
 		return err
 	}
-	if cfg.Auth != nil && cfg.Auth.OAuth2 != nil {
-		cfg.Auth.OAuth2.prepared = client.client
-	}
 
 	requestFactory, err := newRequestFactory(stdCtx, cfg, stat, log, metrics, reg)
 	if err != nil {
@@ -285,6 +282,10 @@ func sanitizeFileName(name string) string {
 	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
+// newHTTPClient returns a new httpClient based on the provided configuration values and
+// sharing common OAuth2 client if it is configured. If authCfg.OAuth2.isEnabled() is true
+// and there is no prepared OAuth2 client, one will be constructed and cached in the
+// authCfg.OAuth2.prepared field, otherwise the existing cached client will be used.
 func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, stat status.StatusReporter, log *logp.Logger, reg *monitoring.Registry, p *Policy) (*httpClient, error) {
 	var (
 		client *http.Client
@@ -301,6 +302,7 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 			if err != nil {
 				return nil, err
 			}
+			authCfg.OAuth2.prepared = client
 		}
 	} else {
 		client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
