@@ -20,6 +20,19 @@ services:
     ports:
       - 9200:9200
 
+<<<<<<< HEAD
+=======
+  googlepubsub:
+    image: docker.elastic.co/integrations-ci/beats-googlepubsub:emulator-${SDK_VERSION:-467.0.0-0}-1
+    build:
+      context: ${ES_BEATS}/testing/environments/docker/googlepubsub
+      args:
+        SDK_VERSION: ${SDK_VERSION:-467.0.0-0}
+    hostname: googlepubsub
+    ports:
+      - 8432:8432
+
+>>>>>>> 58f44bb27 (Use debian bookworm for docker images (#45363))
   cometd:
     build: ${ES_BEATS}/testing/environments/docker/cometd
     hostname: cometd
