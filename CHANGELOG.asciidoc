@@ -32,9 +32,9 @@ https://github.com/elastic/beats/compare/v9.0.3\...v9.0.4[View commits]
 - Add Fleet status update functionality to tcp input. {issue}44420[44420] {pull}44786[44786]
 - Add Fleet status updating to Azure Blob Storage input. {issue}44268[44268] {pull}44945[44945]
 - Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
-- Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
-- Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
-- Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
+- Add input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
+- Add support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
+- Add missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
 
 *Heartbeat*
 
