@@ -152,7 +152,7 @@ require (
 	cloud.google.com/go/compute v1.29.0
 	cloud.google.com/go/redis v1.17.2
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.18.0
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.9.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.10.1
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.3.1
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
@@ -202,7 +202,7 @@ require (
 	github.com/jcmturner/gokrb5/v8 v8.4.4
 	github.com/klauspost/compress v1.18.0
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
-	github.com/microsoft/go-mssqldb v1.8.2
+	github.com/microsoft/go-mssqldb v1.9.2
 	github.com/microsoft/wmi v0.25.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.129.0
 	github.com/otiai10/copy v1.12.0
