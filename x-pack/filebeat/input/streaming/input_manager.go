@@ -34,7 +34,7 @@ func NewInputManager(log *logp.Logger, store statestore.States) InputManager {
 	}
 }
 
-func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
+func cursorConfigure(cfg *conf.C, logger *logp.Logger) ([]inputcursor.Source, inputcursor.Input, error) {
 	dc := defaultConfig()
 	// set readControlDeadline to 3x the writeControlDeadline
 	dc.KeepAlive.readControlDeadline = 3 * dc.KeepAlive.WriteControlDeadline
@@ -42,6 +42,8 @@ func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, erro
 	if err := cfg.Unpack(&src.cfg); err != nil {
 		return nil, nil, err
 	}
+
+	src.cfg.checkUnsupportedParams(logger)
 	if src.cfg.Program == "" {
 		// set default program
 		src.cfg.Program = `

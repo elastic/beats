@@ -91,14 +91,6 @@ func (t *dumpConfig) enabled() bool {
 }
 
 func (c config) Validate() error {
-	if c.RecordCoverage {
-		logp.L().Named("input.cel").Warn("execution coverage enabled: " +
-			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-record-coverage")
-	}
-	if c.Redact == nil {
-		logp.L().Named("input.cel").Warn("missing recommended 'redact' configuration: " +
-			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-state-redact")
-	}
 	if c.Interval <= 0 {
 		return errors.New("interval must be greater than 0")
 	}
@@ -120,6 +112,18 @@ func (c config) Validate() error {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
 	return nil
+}
+
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+func (c config) checkUnsupportedParams(logger *logp.Logger) {
+	if c.RecordCoverage {
+		logp.L().Named("cel").Warn("execution coverage enabled: " +
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-record-coverage")
+	}
+	if c.Redact == nil {
+		logp.L().Named("cel").Warn("missing recommended 'redact' configuration: " +
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-state-redact")
+	}
 }
 
 func defaultConfig() config {

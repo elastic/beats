@@ -116,7 +116,6 @@ func defaultConfig() azureInputConfig {
 
 // Validate validates the config.
 func (conf *azureInputConfig) Validate() error {
-	logger := logp.NewLogger("azureeventhub.config")
 	if conf.ConnectionString == "" {
 		return errors.New("no connection string configured")
 	}
@@ -129,32 +128,10 @@ func (conf *azureInputConfig) Validate() error {
 	if conf.SAContainer == "" {
 		conf.SAContainer = fmt.Sprintf("%s-%s", ephContainerName, conf.EventHubName)
 	}
-	if strings.Contains(conf.SAContainer, "_") {
-		originalValue := conf.SAContainer
-		// When a user specifies an event hub name in the input settings,
-		// the configuration uses it to compose the storage account (SA) container
-		// name (for example, `filebeat-<DATA-STREAM>-<EVENTHUB>`).
-		//
-		// The event hub allows names with underscores (_) characters, but unfortunately,
-		// the SA container does not permit them.
-		//
-		// So instead of throwing an error to the user, we decided to replace
-		// underscores (_) characters with hyphens (-).
-		conf.SAContainer = strings.ReplaceAll(conf.SAContainer, "_", "-")
-		logger.Warnf("replaced underscores (_) with hyphens (-) in the storage account container name (before: %s, now: %s", originalValue, conf.SAContainer)
-	}
+
 	err := storageContainerValidate(conf.SAContainer)
 	if err != nil {
 		return err
-	}
-
-	// log a warning for each sanitization option not supported
-	for _, opt := range conf.LegacySanitizeOptions {
-		logger.Warnw("legacy sanitization `sanitize_options` options are deprecated and will be removed in the 9.0 release; use the `sanitizers` option instead", "option", opt)
-		err := sanitizeOptionsValidate(opt)
-		if err != nil {
-			logger.Warnf("%s: %v", opt, err)
-		}
 	}
 
 	if conf.ProcessorUpdateInterval < 1*time.Second {
@@ -181,9 +158,6 @@ func (conf *azureInputConfig) Validate() error {
 			return errors.New("no storage account key configured (config: storage_account_key)")
 		}
 	case processorV2:
-		if conf.SAKey != "" {
-			logger.Warnf("storage_account_key is not used in processor v2, please remove it from the configuration (config: storage_account_key)")
-		}
 		if conf.SAConnectionString == "" {
 			return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
 		}
@@ -197,6 +171,40 @@ func (conf *azureInputConfig) Validate() error {
 	}
 
 	return nil
+}
+
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+func (c azureInputConfig) checkUnsupportedParams(logger *logp.Logger) {
+	logger = logger.Named("azureeventhub.config")
+
+	if strings.Contains(c.SAContainer, "_") {
+		originalValue := c.SAContainer
+		// When a user specifies an event hub name in the input settings,
+		// the configuration uses it to compose the storage account (SA) container
+		// name (for example, `filebeat-<DATA-STREAM>-<EVENTHUB>`).
+		//
+		// The event hub allows names with underscores (_) characters, but unfortunately,
+		// the SA container does not permit them.
+		//
+		// So instead of throwing an error to the user, we decided to replace
+		// underscores (_) characters with hyphens (-).
+		c.SAContainer = strings.ReplaceAll(c.SAContainer, "_", "-")
+		logger.Warnf("replaced underscores (_) with hyphens (-) in the storage account container name (before: %s, now: %s", originalValue, c.SAContainer)
+	}
+
+	// log a warning for each sanitization option not supported
+	for _, opt := range c.LegacySanitizeOptions {
+		logger.Warnw("legacy sanitization `sanitize_options` options are deprecated and will be removed in the 9.0 release; use the `sanitizers` option instead", "option", opt)
+		err := sanitizeOptionsValidate(opt)
+		if err != nil {
+			logger.Warnf("%s: %v", opt, err)
+		}
+	}
+	if c.ProcessorVersion == processorV2 {
+		if c.SAKey != "" {
+			logger.Warnf("storage_account_key is not used in processor v2, please remove it from the configuration (config: storage_account_key)")
+		}
+	}
 }
 
 // storageContainerValidate validated the storage_account_container to make sure it is conforming to all the Azure

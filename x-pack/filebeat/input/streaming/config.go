@@ -154,10 +154,6 @@ func (c config) Validate() error {
 		return fmt.Errorf("unknown stream type: %s", c.Type)
 	}
 
-	if c.Redact == nil {
-		logp.L().Named("input.websocket").Warn("missing recommended 'redact' configuration: " +
-			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-websocket.html#_redact")
-	}
 	_, err := regexpsFromConfig(c)
 	if err != nil {
 		return fmt.Errorf("failed to check regular expressions: %w", err)
@@ -193,6 +189,14 @@ func (c config) Validate() error {
 		}
 	}
 	return nil
+}
+
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+func (c config) checkUnsupportedParams(logger *logp.Logger) {
+	if c.Redact == nil {
+		logger.Named("websocket").Warn("missing recommended 'redact' configuration: " +
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-websocket.html#_redact")
+	}
 }
 
 func checkURLScheme(c config) error {

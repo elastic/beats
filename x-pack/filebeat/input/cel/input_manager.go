@@ -34,11 +34,12 @@ func NewInputManager(log *logp.Logger, store statestore.States) InputManager {
 	}
 }
 
-func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
+func cursorConfigure(cfg *conf.C, logger *logp.Logger) ([]inputcursor.Source, inputcursor.Input, error) {
 	src := &source{cfg: defaultConfig()}
 	if err := cfg.Unpack(&src.cfg); err != nil {
 		return nil, nil, err
 	}
+	src.cfg.checkUnsupportedParams(logger)
 	return []inputcursor.Source{src}, input{}, nil
 }
 
