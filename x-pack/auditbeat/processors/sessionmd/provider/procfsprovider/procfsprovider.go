@@ -84,7 +84,7 @@ func (p prvdr) Sync(ev *beat.Event, pid uint32) error {
 			if i, ok = intr.(int); !ok {
 				goto out
 			}
-			pe.PIDs.Ppid = uint32(i)
+			pe.PIDs.Ppid = uint32(i) //nolint: gosec // Pids are 32bit
 
 			parent, err = p.db.GetProcess(pe.PIDs.Ppid)
 			if err != nil {

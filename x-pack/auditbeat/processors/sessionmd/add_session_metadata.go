@@ -9,6 +9,7 @@ package sessionmd
 import (
 	"context"
 	"fmt"
+	"math"
 	"reflect"
 	"strconv"
 	"sync/atomic"
@@ -223,7 +224,7 @@ func pidToUInt32(value interface{}) (pid uint32, err error) {
 	switch v := value.(type) {
 	case string:
 		nr, err := strconv.Atoi(v)
-		if err != nil {
+		if err != nil || nr < 0 || nr > math.MaxUint32 {
 			return 0, fmt.Errorf("error converting string to integer: %w", err)
 		}
 		pid = uint32(nr)
@@ -231,14 +232,16 @@ func pidToUInt32(value interface{}) (pid uint32, err error) {
 		pid = v
 	case int, int8, int16, int32, int64:
 		pid64 := reflect.ValueOf(v).Int()
-		if pid = uint32(pid64); int64(pid) != pid64 {
+		if pid64 < 0 || pid64 > math.MaxUint32 {
 			return 0, fmt.Errorf("integer out of range: %d", pid64)
 		}
+		pid = uint32(pid64)
 	case uint, uintptr, uint8, uint16, uint64:
 		pidu64 := reflect.ValueOf(v).Uint()
-		if pid = uint32(pidu64); uint64(pid) != pidu64 {
+		if pidu64 > math.MaxUint32 {
 			return 0, fmt.Errorf("integer out of range: %d", pidu64)
 		}
+		pid = uint32(pidu64)
 	default:
 		return 0, fmt.Errorf("not an integer or string, but %T", v)
 	}

@@ -74,7 +74,7 @@ func credsFromProc(proc procfs.Proc) (types.CredInfo, error) {
 	// procfs library doesn't grab CapEff or CapPrm, make the direct syscall
 	hdr := unix.CapUserHeader{
 		Version: unix.LINUX_CAPABILITY_VERSION_3,
-		Pid:     int32(proc.PID),
+		Pid:     int32(proc.PID), //nolint: gosec // Pids are 32bit
 	}
 	var data [2]unix.CapUserData
 	err = unix.Capget(&hdr, &data[0])
@@ -87,19 +87,20 @@ func credsFromProc(proc procfs.Proc) (types.CredInfo, error) {
 	effective += uint64(data[0].Effective)
 
 	return types.CredInfo{
-		Ruid:         uint32(ruid),
-		Euid:         uint32(euid),
-		Suid:         uint32(suid),
-		Rgid:         uint32(rgid),
-		Egid:         uint32(egid),
-		Sgid:         uint32(sgid),
+		Ruid:         uint32(ruid), //nolint: gosec // *ids are 32bit
+		Euid:         uint32(euid), //nolint: gosec // *ids are 32bit
+		Suid:         uint32(suid), //nolint: gosec // *ids are 32bit
+		Rgid:         uint32(rgid), //nolint: gosec // *ids are 32bit
+		Egid:         uint32(egid), //nolint: gosec // *ids are 32bit
+		Sgid:         uint32(sgid), //nolint: gosec // *ids are 32bit
 		CapPermitted: permitted,
 		CapEffective: effective,
 	}, nil
 }
 
 func (r ProcfsReader) getProcessInfo(proc procfs.Proc) (ProcessInfo, error) {
-	pid := uint32(proc.PID)
+	pid := uint32(proc.PID) //nolint: gosec // Pids are 32bit
+
 	// All other info can be best effort, but failing to get pid info and
 	// start time is needed to register the process in the database
 	stat, err := proc.Stat()
@@ -162,14 +163,14 @@ func (r ProcfsReader) getProcessInfo(proc procfs.Proc) (ProcessInfo, error) {
 			StartTimeNS: startTimeNs,
 			Tid:         pid,
 			Tgid:        pid,
-			Ppid:        uint32(stat.PPID),
-			Pgid:        uint32(stat.PGRP),
-			Sid:         uint32(stat.Session),
+			Ppid:        uint32(stat.PPID),    //nolint: gosec // Pids are 32bit
+			Pgid:        uint32(stat.PGRP),    //nolint: gosec // Pids are 32bit
+			Sid:         uint32(stat.Session), //nolint: gosec // *ids are 32bit
 		},
 		Creds: creds,
 		CTTY: tty.TTYDev{
-			Major: MajorTTY(uint32(stat.TTY)),
-			Minor: MinorTTY(uint32(stat.TTY)),
+			Major: MajorTTY(uint32(stat.TTY)), //nolint: gosec // Major fits in 16bit actually
+			Minor: MinorTTY(uint32(stat.TTY)), //nolint: gosec // Minor fits in 16bit actually
 		},
 		Cwd:        cwd,
 		Argv:       argv,
