@@ -18,6 +18,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
@@ -125,9 +126,11 @@ http.port: {{.MonitoringPort}}
 		},
 		2*time.Minute, 1*time.Second, "Expected at least one ingested metric event, got metricbeat: %d, otel: %d", metricbeatDocs.Hits.Total.Value, otelDocs.Hits.Total.Value)
 
-	otelDoc := otelDocs.Hits.Hits[0]
-	metricbeatDoc := metricbeatDocs.Hits.Hits[0]
-	assertMapstrKeysEqual(t, otelDoc.Source, metricbeatDoc.Source, []string{}, "expected documents keys to be equal")
+	otelDoc := otelDocs.Hits.Hits[0].Source
+	metricbeatDoc := metricbeatDocs.Hits.Hits[0].Source
+	assertMapstrKeysEqual(t, otelDoc, metricbeatDoc, []string{}, "expected documents keys to be equal")
+	assert.Equal(t, "metricbeatreceiver", otelDoc["otelcol.component.id"], "expected otelcol.component.id field in log record")
+	assert.Equal(t, "receiver", otelDoc["otelcol.component.kind"], "expected otelcol.component.kind field in log record")
 	assertMonitoring(t, optionsValue.MonitoringPort)
 }
 

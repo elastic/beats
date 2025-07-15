@@ -488,7 +488,7 @@ http.port: %d
 	assertMonitoring(t, 5067) // filebeat
 
 	assert.Equal(t, "filebeatreceiver/filestream", otelDoc["otelcol.component.id"], "expected otelcol.component.id field in log record")
-	assert.Equal(t, "filebeatreceiver", otelDoc["otelcol.component.kind"], "expected otelcol.component.kind field in log record")
+	assert.Equal(t, "receiver", otelDoc["otelcol.component.kind"], "expected otelcol.component.kind field in log record")
 }
 
 func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
