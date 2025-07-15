@@ -56,8 +56,8 @@ jobs:
             HAS_LABEL=$(gh pr view $PR_NUMBER --repo ${{ github.repository }} --json labels --jq '.labels[] | select(.name == "Team:Obs-InfraObs") | .name')
             
             if [ -n "$HAS_LABEL" ]; then
-              echo "PR #$PR_NUMBER has Team:Obs-InfraObs label, adding reviewer obs-infraobs-integrations"
-              gh pr edit $PR_NUMBER --repo ${{ github.repository }} --add-reviewer obs-infraobs-integrations
+              echo "PR #$PR_NUMBER has Team:Obs-InfraObs label, adding reviewer elastic/obs-infraobs-integrations"
+              gh pr edit $PR_NUMBER --repo ${{ github.repository }} --add-reviewer elastic/obs-infraobs-integrations
             fi
           fi
         env:
