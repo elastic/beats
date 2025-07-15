@@ -42,12 +42,14 @@ func RunUDPClient(t *testing.T, address string, data []string) {
 	}
 	defer conn.Close()
 
-	// Send data to the server
-	for _, data := range data {
-		_, err = conn.Write([]byte(data + "\n"))
+	for i := 0; i < len(data); {
+		_, err = conn.Write([]byte(data[i] + "\n"))
 		if err != nil {
-			t.Logf("Error sending data: %s, skipping to next entry", err)
+			t.Logf("Error sending data: %s, waiting 1s", err)
+			time.Sleep(time.Second)
+			continue
 		}
+		i++
 		time.Sleep(100 * time.Millisecond)
 	}
 }
