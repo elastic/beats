@@ -177,6 +177,7 @@ func TestGzipSeekerReader(t *testing.T) {
 			wantReadData  string // expected data after seek+read
 			readAfterSeek int    // bytes to read after seek for verification
 			wantEOF       bool   // whether Seek is expected to EOF error
+			wantErr       string // want see to return an error
 		}{
 			{
 				name:          "SeekStart to offset 0 after reading some data (reset case)",
@@ -270,6 +271,17 @@ func TestGzipSeekerReader(t *testing.T) {
 				wantEOF:       true,
 			},
 			{
+				name:          "final offset is negative",
+				buffSize:      512,
+				initialRead:   0,
+				seekOffset:    -200,
+				seekWhence:    io.SeekStart,
+				wantOffset:    0,
+				wantReadData:  "",
+				readAfterSeek: 0,
+				wantErr:       "final offset must be non-negative",
+			},
+			{
 				name:          "SeekCurrent beyond EOF does not error",
 				buffSize:      512,
 				initialRead:   42,
@@ -302,8 +314,12 @@ func TestGzipSeekerReader(t *testing.T) {
 
 				// Seek
 				gotOffset, err := gsr.Seek(tc.seekOffset, tc.seekWhence)
-				require.NoError(t, err, "Seek(%d, %d) should not fail",
-					tc.seekOffset, tc.seekWhence)
+				if tc.wantErr != "" {
+					assert.ErrorContains(t, err, tc.wantErr)
+				} else {
+					require.NoError(t, err, "Seek(%d, %d) should not fail",
+						tc.seekOffset, tc.seekWhence)
+				}
 				assert.Equal(t, tc.wantOffset, gotOffset, "Seek offset mismatch")
 
 				// Read after seek to verify position and data

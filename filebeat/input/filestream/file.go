@@ -181,10 +181,9 @@ func (r *gzipSeekerReader) Seek(offset int64, whence int) (int64, error) {
 	// Calculate how many bytes we need to advance from current position
 	bytesToAdvance := finalOffset - r.offset
 
-	var n int
 	var err error
 	if bytesToAdvance <= r.buffSize {
-		n, err = r.Read(make([]byte, bytesToAdvance))
+		_, err = r.Read(make([]byte, bytesToAdvance))
 		if err != nil && !errors.Is(err, io.EOF) {
 			return r.offset, fmt.Errorf(
 				"gzipSeekerReader: could read bytesToAdvance=%d: %w",
@@ -198,10 +197,8 @@ func (r *gzipSeekerReader) Seek(offset int64, whence int) (int64, error) {
 	chunks := bytesToAdvance / r.buffSize
 	leftover := bytesToAdvance % r.buffSize
 	buff := make([]byte, r.buffSize)
-	read := 0
 	for i := range chunks {
-		n, err = r.gzr.Read(buff)
-		read += n
+		_, err = r.gzr.Read(buff)
 		if err != nil && !errors.Is(err, io.EOF) {
 			return r.offset, fmt.Errorf(
 				"gzipSeekerReader: could read chunk %d: %w", i, err)
@@ -209,9 +206,8 @@ func (r *gzipSeekerReader) Seek(offset int64, whence int) (int64, error) {
 	}
 
 	if leftover > 0 {
-		n, err = r.Read(make([]byte, leftover))
-		read += n
-		if err != nil && err != io.EOF {
+		_, err = r.Read(make([]byte, leftover))
+		if err != nil && !errors.Is(err, io.EOF) {
 			return r.offset, fmt.Errorf(
 				"gzipSeekerReader: could read leftover %d: %w", leftover, err)
 		}

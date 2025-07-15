@@ -587,8 +587,8 @@ func (b *BeatProc) searchStrInLogsReversed(logFile *os.File, s string) (bool, st
 
 // WaitForLogs waits for the specified string s to be present in the logs within
 // the given timeout duration and fails the test if s is not found.
-// It keep tracks if the offset of the log file, reading only new lines. Each
-// subsequent call to WaitForLogs will only check the logs not yet evaluated.
+// It keeps track of the log file offset, reading only new lines. Each
+// subsequent call to WaitForLogs will only check logs not yet evaluated.
 // msgAndArgs should be a format string and arguments that will be printed
 // if the logs are not found, providing additional context for debugging.
 func (b *BeatProc) WaitForLogs(s string, timeout time.Duration, msgAndArgs ...any) {
@@ -1177,11 +1177,11 @@ func StartMockES(
 	require.Eventually(
 		t,
 		func() bool {
-			resp, err := http.Get("http://" + addr) //nolint: noctx // It's just a test
+			resp, err := http.Get("http://" + addr) // nolint: noctx // It's just a test
 			if err != nil {
 				return false
 			}
-			//nolint: errcheck // We're just draining the body, we can ignore the error
+			// nolint: errcheck // We're just draining the body, we can ignore the error
 			io.Copy(io.Discard, resp.Body)
 			resp.Body.Close()
 			return true

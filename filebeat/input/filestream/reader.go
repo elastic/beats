@@ -35,7 +35,7 @@ type EOFLookaheadReader struct {
 }
 
 // NewEOFLookaheadReader creates a new EOFLookaheadReader.
-// If eofErr is not nil and r reruns it, it's considered EOF.
+// If eofErr is not nil and r returns it, it's considered EOF.
 // The call to Next will return the error and set Message.Private to io.EOF.
 // It immediately reads the first message to prime the buffer.
 func NewEOFLookaheadReader(r reader.Reader, eofErr error) *EOFLookaheadReader {

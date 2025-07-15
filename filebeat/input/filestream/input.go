@@ -547,6 +547,9 @@ func (inp *filestream) openFile(
 	// expected to see offset > fi.Size()
 	//  - it should not start reading GZIP files from the beginning if it
 	//  already started ingesting the file.
+	// The only situation a GZIP file should change is if it's still been
+	// written to disk when filebeat picks it up. It should only grow, not
+	// shrink.
 	// Therefore, only check truncation for plain files.
 	if !f.IsGZIP() && fi.Size() < offset {
 		// if the file was truncated we need to reset the offset and notify
@@ -688,6 +691,9 @@ func (inp *filestream) readFromSource(
 				if slices.Contains(flags, "truncated") { //nolint:typecheck,nolintlint // linter fails to infer generics
 					metrics.MessagesTruncated.Add(1)
 					if isGZIP {
+						// Truncation shouldn't happen for GZIP files, but as
+						// there it the overall metric for filestream, this case
+						// is handled for completeness.
 						metrics.MessagesGZIPTruncated.Add(1)
 					}
 				}
