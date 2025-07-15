@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build integration
-
 package query
 
 import (
@@ -229,6 +227,10 @@ func TestPostgreSQL(t *testing.T) {
 func TestOracle(t *testing.T) {
 	service := compose.EnsureUp(t, "oracle")
 	host, port, _ := net.SplitHostPort(service.Host())
+
+	// Wait for Oracle to be ready instead of sleeping for 300 seconds
+	waitForOracleConnection(t, host, port)
+
 	cfg := testFetchConfig{
 		config: config{
 			Driver:         "oracle",
@@ -302,9 +304,10 @@ func assertFieldContainsFloat64(field string, limit float64) func(t *testing.T, 
 }
 
 func GetOracleConnectionDetails(t *testing.T, host string, port string) string {
-	params, err := godror.ParseDSN(GetOracleConnectString(host, port))
-	require.Empty(t, err)
-	return params.StringWithPassword()
+	connectString := GetOracleConnectString(host, port)
+	params, err := godror.ParseDSN(connectString)
+	require.NoError(t, err, "Failed to parse Oracle DSN: %s", connectString)
+	return params.ConnectString
 }
 
 // GetOracleEnvServiceName returns the service name to use with Oracle testing server or the value of the environment variable ORACLE_SERVICE_NAME if not empty
@@ -325,7 +328,7 @@ func GetOracleEnvUsername() string {
 	return username
 }
 
-// GetOracleEnvUsername returns the port of the Oracle server or the value of the environment variable ORACLE_PASSWORD if not empty
+// GetOracleEnvPassword returns the password to use with Oracle testing server or the value of the environment variable ORACLE_PASSWORD if not empty
 func GetOracleEnvPassword() string {
 	password := os.Getenv("ORACLE_PASSWORD")
 	if len(password) == 0 {
@@ -334,11 +337,49 @@ func GetOracleEnvPassword() string {
 	return password
 }
 
+// GetOracleConnectString builds the Oracle connection string with proper format
 func GetOracleConnectString(host string, port string) string {
-	time.Sleep(300 * time.Second)
 	connectString := os.Getenv("ORACLE_CONNECT_STRING")
 	if len(connectString) == 0 {
-		connectString = fmt.Sprintf("%s/%s@%s:%s/%s as sysdba", GetOracleEnvUsername(), GetOracleEnvPassword(), host, port, GetOracleEnvServiceName())
+		// Use the recommended connection string format from godror documentation
+		// Format: user/password@host:port/service_name
+		connectString = fmt.Sprintf("%s/%s@%s:%s/%s",
+			GetOracleEnvUsername(),
+			GetOracleEnvPassword(),
+			host,
+			port,
+			GetOracleEnvServiceName())
+
+		// Add SYSDBA privilege if username is 'sys'
+		if GetOracleEnvUsername() == "sys" {
+			connectString += " as sysdba"
+		}
 	}
 	return connectString
+}
+
+// waitForOracleConnection waits for Oracle service to be ready with exponential backoff
+func waitForOracleConnection(t *testing.T, host string, port string) {
+	maxRetries := 10
+	baseDelay := 1 * time.Second
+
+	for i := 0; i < maxRetries; i++ {
+		conn, err := net.DialTimeout("tcp", net.JoinHostPort(host, port), 5*time.Second)
+		if err == nil {
+			conn.Close()
+			// Give Oracle a bit more time to fully initialize
+			time.Sleep(2 * time.Second)
+			return
+		}
+
+		delay := time.Duration(1<<uint(i)) * baseDelay
+		if delay > 30*time.Second {
+			delay = 30 * time.Second
+		}
+
+		t.Logf("Oracle not ready yet (attempt %d/%d), waiting %v: %v", i+1, maxRetries, delay, err)
+		time.Sleep(delay)
+	}
+
+	t.Fatalf("Oracle service did not become ready after %d attempts", maxRetries)
 }
