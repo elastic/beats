@@ -10,12 +10,12 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"strings"
 	"testing"
 	"text/template"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
@@ -139,6 +139,7 @@ processors:
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
 	var err error
+	msg := &strings.Builder{}
 
 	// wait for logs to be published
 	require.Eventuallyf(t,
@@ -147,14 +148,14 @@ processors:
 			defer findCancel()
 
 			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-logs-integration-"+otelNamespace+"*", es)
-			assert.NoError(t, err)
+			msg.WriteString(fmt.Sprintf("failed to query ES for beat documents: %w", err))
 
 			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-logs-integration-"+fbNameSpace+"*", es)
-			assert.NoError(t, err)
+			msg.WriteString(fmt.Sprint("failed to query ES for beat documents: %w", err))
 
 			return otelDocs.Hits.Total.Value >= 1 && filebeatDocs.Hits.Total.Value >= 1
 		},
-		3*time.Minute, 1*time.Second, "document indexed by fb-otel: %d, and by fb-classic: %d: expected atleast one document by both modes", otelDocs.Hits.Total.Value, filebeatDocs.Hits.Total.Value)
+		3*time.Minute, 1*time.Second, "document indexed by fb-otel: %d, by fb-classic: %d: expected atleast one document by both modes: %s", otelDocs.Hits.Total.Value, filebeatDocs.Hits.Total.Value, msg)
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
