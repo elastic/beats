@@ -296,7 +296,7 @@ func TestEnforceHeaders(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client, _ := NewConnection(ConnectionSettings{
 				URL: "http://localhost",
-			}, logptest.NewTestingLogger(t, ""))
+			})
 
 			expErr := errors.New("canceled")
 			client.Encoder = NewJSONEncoder(nil, false)
