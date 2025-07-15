@@ -21,11 +21,11 @@ services:
       - 9200:9200
 
   googlepubsub:
-    image: docker.elastic.co/integrations-ci/beats-googlepubsub:emulator-${SDK_VERSION:-398.0.0-0}-1
+    image: docker.elastic.co/integrations-ci/beats-googlepubsub:emulator-${SDK_VERSION:-467.0.0-0}-1
     build:
       context: ${ES_BEATS}/testing/environments/docker/googlepubsub
       args:
-        SDK_VERSION: ${SDK_VERSION:-398.0.0-0}
+        SDK_VERSION: ${SDK_VERSION:-467.0.0-0}
     hostname: googlepubsub
     ports:
       - 8432:8432
@@ -43,3 +43,21 @@ services:
     healthcheck:
       test: [ "CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'" ]
       retries: 600
+<<<<<<< HEAD
+=======
+
+## stream is a mock http service - required for integration testing
+  beatStreams:
+    image: docker.elastic.co/observability/stream:v0.15.0
+    hostname: testStreams
+    ports:
+      - 8090:8090
+    volumes:
+      - ./tests/integration/testdata/:/files:ro
+    environment:
+      PORT: '8090'
+    command:
+      - http-server
+      - --addr=:8090
+      - --config=/files/config.yaml
+>>>>>>> 58f44bb27 (Use debian bookworm for docker images (#45363))
