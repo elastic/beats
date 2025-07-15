@@ -25,11 +25,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestCheckNilDoesntPanic(t *testing.T) {
 	newCfg := config.NewConfig()
-	handler, err := readConfig(newCfg)
+	handler, err := readConfig(newCfg, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	_, err = handler.Path.Run(time.Now())
 	require.Error(t, err)
