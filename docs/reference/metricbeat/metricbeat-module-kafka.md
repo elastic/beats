@@ -33,10 +33,7 @@ For example, if the `stats` user is being used for Metricbeat, to monitor all to
 ```shell
 kafka-acls --authorizer-properties zookeeper.connect=localhost:2181 --add --allow-principal User:stats --operation Read --topic '*'
 kafka-acls --authorizer-properties zookeeper.connect=localhost:2181 --add --allow-principal User:stats --operation Describe --group '*'
-<<<<<<< HEAD:docs/reference/metricbeat/metricbeat-module-kafka.md
 ```
-=======
------
 
 [float]
 === Compatibility
@@ -48,7 +45,6 @@ The Broker, Producer, Consumer metricsets require <<metricbeat-module-jolokia,Jo
 [float]
 === Usage
 The Broker, Producer, Consumer metricsets require <<metricbeat-module-jolokia,Jolokia>> to fetch JMX metrics. Refer to those Metricsets' documentation about how to use Jolokia.
->>>>>>> fb79d4957 (update kafka version used in testing to 3.6.0 (#42286)):metricbeat/docs/modules/kafka.asciidoc
 
 
 ## Compatibility [_compatibility_26]
