@@ -9,8 +9,9 @@ package azureeventhub
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestStorageContainerValidate(t *testing.T) {
