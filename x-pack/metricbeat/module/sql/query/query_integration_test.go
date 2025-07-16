@@ -316,7 +316,7 @@ func GetOracleConnectionDetails(t *testing.T, host string, port string) string {
 func GetOracleEnvServiceName() string {
 	serviceName := os.Getenv("ORACLE_SERVICE_NAME")
 	if len(serviceName) == 0 {
-		serviceName = "ORCLPDB1.localdomain"
+		serviceName = "ORCLPDB1"
 	}
 	return serviceName
 }
