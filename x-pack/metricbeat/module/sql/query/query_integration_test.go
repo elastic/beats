@@ -309,7 +309,7 @@ func GetOracleConnectionDetails(t *testing.T, host string, port string) string {
 	connectString := GetOracleConnectString(host, port)
 	params, err := godror.ParseDSN(connectString)
 	require.NoError(t, err, "Failed to parse Oracle DSN: %s", connectString)
-	return params.ConnectString
+	return params.StringWithPassword()
 }
 
 // GetOracleEnvServiceName returns the service name to use with Oracle testing server or the value of the environment variable ORACLE_SERVICE_NAME if not empty
@@ -344,8 +344,8 @@ func GetOracleConnectString(host string, port string) string {
 	connectString := os.Getenv("ORACLE_CONNECT_STRING")
 	if len(connectString) == 0 {
 		// Use the recommended connection string format from godror documentation
-		// Format: user/password@host:port/service_name
-		connectString = fmt.Sprintf("%s/%s@%s:%s/%s",
+		// Format: oracle://user/password@host:port/service_name
+		connectString = fmt.Sprintf("oracle://%s:%s@%s:%s/%s",
 			GetOracleEnvUsername(),
 			GetOracleEnvPassword(),
 			host,
@@ -354,7 +354,7 @@ func GetOracleConnectString(host string, port string) string {
 
 		// Add SYSDBA privilege if username is 'sys'
 		if GetOracleEnvUsername() == "sys" {
-			connectString += " as sysdba"
+			connectString += "?sysdba=1"
 		}
 	}
 	return connectString
