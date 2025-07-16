@@ -1,3 +1,15 @@
-FROM docker.elastic.co/observability-ci/database-enterprise:12.2.0.1
+FROM gvenzl/oracle-xe:18-slim
 
-HEALTHCHECK --interval=1s --retries=90 CMD /usr/bin/echo 'select 1' | /u01/app/oracle/product/12.2.0/dbhome_1/bin/sqlplus sys/Oradoc_db1@localhost:1521/ORCLPDB1.localdomain AS SYSDBA
+# Set environment variables
+ENV ORACLE_PASSWORD=Oradoc_db1
+ENV ORACLE_DATABASE=XE
+
+# Expose Oracle port
+EXPOSE 1521
+
+# Set working directory
+WORKDIR /opt/oracle
+
+# Improved healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD echo "SELECT 1 FROM DUAL;" | sqlplus -S system/${ORACLE_PASSWORD}@//localhost:1521/XE | grep -q "^1$" || exit 1
