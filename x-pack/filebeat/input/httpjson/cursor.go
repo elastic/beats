@@ -53,12 +53,23 @@ func (c *cursor) update(trCtx *transformContext) {
 	}
 
 	for k, cfg := range c.cfg {
-		v, _ := cfg.Value.Execute(trCtx, transformable{}, k, cfg.Default, c.status, c.log)
+		stat := c.status
+		if cfg.mustIgnoreEmptyValue() {
+			stat = ignoreEmptyValueReporter{stat}
+		}
+		v, _ := cfg.Value.Execute(trCtx, transformable{}, k, cfg.Default, stat, c.log)
 		if v != "" || !cfg.mustIgnoreEmptyValue() {
 			_, _ = c.state.Put(k, v)
 			c.log.Debugf("cursor.%s stored with %s", k, v)
 		}
 	}
+}
+
+// ignoreEmptyValueReporter is an abuse of the type system to allow the cursor
+// update mechanism to signal to valueTpl.Execute not to report empty values
+// as health degraded.
+type ignoreEmptyValueReporter struct {
+	status.StatusReporter
 }
 
 func (c *cursor) clone() mapstr.M {
