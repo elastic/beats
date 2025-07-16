@@ -9,8 +9,10 @@ package sessionmd
 import (
 	"context"
 	"fmt"
+	"math"
 	"reflect"
 	"strconv"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -23,6 +25,7 @@ import (
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -36,6 +39,9 @@ const (
 func InitializeModule() {
 	processors.RegisterPlugin(processorName, New)
 }
+
+// instanceID assigns a uniqueID to every instance of the metrics handler for the procfs DB
+var instanceID atomic.Uint32
 
 type addSessionMetadata struct {
 	ctx          context.Context
@@ -56,9 +62,17 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 
 	logger := logp.NewLogger(logName)
 
+	id := int(instanceID.Add(1))
+	regName := "processor.add_session_metadata.processdb"
+	// if more than one instance of the DB is running, start to increment the metrics keys.
+	if id > 1 {
+		regName = fmt.Sprintf("%s.%d", regName, id)
+	}
+	metricsReg := monitoring.Default.NewRegistry(regName)
+
 	ctx, cancel := context.WithCancel(context.Background())
 	reader := procfs.NewProcfsReader(*logger)
-	db, err := processdb.NewDB(reader, *logger)
+	db, err := processdb.NewDB(ctx, metricsReg, reader, logger, c.DBReaperPeriod, c.ReapProcesses)
 	if err != nil {
 		cancel()
 		return nil, fmt.Errorf("failed to create DB: %w", err)
@@ -182,7 +196,7 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 		fullProcess, err = p.db.GetProcess(pid)
 		if err != nil {
 			e := fmt.Errorf("pid %v not found in db: %w", pid, err)
-			p.logger.Debugw("PID not found in provider", "pid", pid, "error", err)
+			p.logger.Debugf("PID %d not found in provider: %s", pid, err)
 			return nil, e
 		}
 	}
@@ -210,7 +224,7 @@ func pidToUInt32(value interface{}) (pid uint32, err error) {
 	switch v := value.(type) {
 	case string:
 		nr, err := strconv.Atoi(v)
-		if err != nil {
+		if err != nil || nr < 0 || nr > math.MaxUint32 {
 			return 0, fmt.Errorf("error converting string to integer: %w", err)
 		}
 		pid = uint32(nr)
@@ -218,14 +232,16 @@ func pidToUInt32(value interface{}) (pid uint32, err error) {
 		pid = v
 	case int, int8, int16, int32, int64:
 		pid64 := reflect.ValueOf(v).Int()
-		if pid = uint32(pid64); int64(pid) != pid64 {
+		if pid64 < 0 || pid64 > math.MaxUint32 {
 			return 0, fmt.Errorf("integer out of range: %d", pid64)
 		}
+		pid = uint32(pid64)
 	case uint, uintptr, uint8, uint16, uint64:
 		pidu64 := reflect.ValueOf(v).Uint()
-		if pid = uint32(pidu64); uint64(pid) != pidu64 {
+		if pidu64 > math.MaxUint32 {
 			return 0, fmt.Errorf("integer out of range: %d", pidu64)
 		}
+		pid = uint32(pidu64)
 	default:
 		return 0, fmt.Errorf("not an integer or string, but %T", v)
 	}

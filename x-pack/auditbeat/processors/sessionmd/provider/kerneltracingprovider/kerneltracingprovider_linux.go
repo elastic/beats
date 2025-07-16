@@ -230,7 +230,7 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 		Minor: proc.Proc.TtyMinor,
 	})
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint: gosec // 292 billion years is enough
 
 	ret := types.Process{
 		PID:              proc.Pid,
@@ -254,10 +254,10 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	if ok {
 		ret.Group.Name = groupname
 	}
-	ret.TTY.CharDevice.Major = uint16(proc.Proc.TtyMajor)
-	ret.TTY.CharDevice.Minor = uint16(proc.Proc.TtyMinor)
+	ret.TTY.CharDevice.Major = proc.Proc.TtyMajor
+	ret.TTY.CharDevice.Minor = proc.Proc.TtyMinor
 	if proc.Exit.Valid {
-		end := time.Unix(0, int64(proc.Exit.ExitTimeProcess))
+		end := time.Unix(0, int64(proc.Exit.ExitTimeProcess)) //nolint: gosec // 292 billion years is enough
 		ret.ExitCode = proc.Exit.ExitCode
 		ret.End = &end
 	}
@@ -286,7 +286,7 @@ func (p prvdr) fillParent(process *types.Process, ppid uint32) {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint: gosec // 292 billion years is enough
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
 		Minor: proc.Proc.TtyMinor,
@@ -320,7 +320,7 @@ func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint: gosec // 292 billion years is enough
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
@@ -355,7 +355,7 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint: gosec // 292 billion years is enough
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
@@ -390,7 +390,7 @@ func (p prvdr) fillEntryLeader(process *types.Process, elid uint32) {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint: gosec // 292 billion years is enough
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
@@ -468,7 +468,7 @@ func calculateEntityIDv1(pid uint32, startTime time.Time) string {
 				pidNsInode,
 				bootID,
 				uint64(pid),
-				uint64(startTime.Unix()),
+				uint64(startTime.Unix()), //nolint: gosec // 292 billion years is enough
 			),
 		),
 	)
