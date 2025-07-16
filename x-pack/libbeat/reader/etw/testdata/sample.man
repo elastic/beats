@@ -1,0 +1,202 @@
+<instrumentationManifest
+    xmlns="http://schemas.microsoft.com/win/2004/08/events"
+    xmlns:win="http://manifests.microsoft.com/win/2004/08/windows/events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+    <instrumentation>
+        <events>
+            <provider name="Beats-ETW-TestProvider"
+                guid="{06f0e00e-422a-4987-922b-2ec13e281ea4}"
+                symbol="PROVIDER_GUID"
+                resourceFileName="sample.dll"
+                messageFileName="sample.dll"
+                message="$(string.Provider.Name)">
+
+                <channels>
+                    <channel chid="c1"
+                        name="Beats-ETW-TestProvider/Operational"
+                        type="Operational"
+                        enabled="true"
+                        symbol="CHANNEL_OPERATIONAL"
+                    />
+                </channels>                <levels>
+                    <level name="Critical"
+                        value="16"
+                        symbol="LEVEL_CRITICAL"
+                        message="$(string.Level.Critical)" />
+                    
+                    <level name="Error"
+                        value="17"
+                        symbol="LEVEL_ERROR"
+                        message="$(string.Level.Error)" />
+                    
+                    <level name="Warning"
+                        value="18"
+                        symbol="LEVEL_WARNING"
+                        message="$(string.Level.Warning)" />
+                    
+                    <level name="Information"
+                        value="19"
+                        symbol="LEVEL_INFORMATION"
+                        message="$(string.Level.Information)" />
+                    
+                    <level name="Verbose"
+                        value="20"
+                        symbol="LEVEL_VERBOSE"
+                        message="$(string.Level.Verbose)" />
+                    
+                    <level name="NotValid"
+                        value="21"
+                        symbol="LEVEL_SAMPLEPROVIDER_NOTVALID"
+                        message="$(string.Level.NotValid)" />
+                    
+                    <level name="Valid"
+                        value="22"
+                        symbol="LEVEL_SAMPLEPROVIDER_VALID"
+                        message="$(string.Level.Valid)" />
+                </levels>
+
+                <tasks>
+                    <task name="Connect"
+                        symbol="TASK_CONNECT"
+                        value="2"
+                        message="$(string.Task.Connect)" />
+
+                    <task name="Disconnect"
+                        symbol="TASK_DISCONNECT"
+                        value="1"
+                        message="$(string.Task.Disconnect)" />
+                </tasks>
+
+                <opcodes>
+                    <opcode name="Stop"
+                        symbol="OPCODE_STOP"
+                        value="20"
+                        message="$(string.Opcode.Stop)" />
+
+                    <opcode name="Initialize"
+                        symbol="OPCODE_INITIALIZE"
+                        value="12"
+                        message="$(string.Opcode.Initialize)" />
+                </opcodes>
+
+                <keywords>
+                    <keyword name="Read" mask="0x1" symbol="READ_KEYWORD" />
+                    <keyword name="Write" mask="0x2" symbol="WRITE_KEYWORD" />
+                    <keyword name="Local" mask="0x4" symbol="LOCAL_KEYWORD" />
+                    <keyword name="Remote" mask="0x8" symbol="REMOTE_KEYWORD" />
+                </keywords>
+
+                <templates>
+                    <!-- Basic data types template -->
+                    <template tid="t1">
+                        <data name="StringValue" inType="win:UnicodeString" />
+                        <data name="AnsiStringValue" inType="win:AnsiString" />
+                        <data name="Int8Value" inType="win:Int8" />
+                        <data name="UInt8Value" inType="win:UInt8" />
+                        <data name="Int16Value" inType="win:Int16" />
+                        <data name="UInt16Value" inType="win:UInt16" />
+                        <data name="Int32Value" inType="win:Int32" />
+                        <data name="UInt32Value" inType="win:UInt32" />
+                        <data name="Int64Value" inType="win:Int64" />
+                        <data name="UInt64Value" inType="win:UInt64" />
+                        <data name="FloatValue" inType="win:Float" />
+                        <data name="DoubleValue" inType="win:Double" />
+                        <data name="BooleanValue" inType="win:Boolean" />
+                        <data name="BinarySize" inType="win:UInt32" />
+                        <data name="BinaryValue" inType="win:Binary" length="BinarySize" />
+                        <data name="GuidValue" inType="win:GUID" />
+                        <data name="PointerValue" inType="win:Pointer" />
+                        <data name="FileTimeValue" inType="win:FILETIME" />
+                        <data name="SystemTimeValue" inType="win:SYSTEMTIME" />
+                        <data name="SidValue" inType="win:SID" />
+                        <data name="HexInt32Value" inType="win:HexInt32" />
+                        <data name="HexInt64Value" inType="win:HexInt64" />
+                    </template>
+
+                    <!-- Complex data types template -->
+                    <template tid="t3">
+                        <data name="TransferName" inType="win:UnicodeString" />
+                        <data name="ErrorCode" inType="win:Int32" outType="win:HResult" />
+                        <data name="FilesCount" inType="win:UInt16" />
+                        <data name="Files" inType="win:UnicodeString" count="FilesCount" />
+                        <data name="BufferSize" inType="win:UInt32" />
+                        <data name="Buffer" inType="win:Binary" length="BufferSize" />
+                        <data name="Certificate" inType="win:Binary" length="11" />
+                        <data name="IsLocal" inType="win:Boolean" />
+                        <data name="Path" inType="win:UnicodeString" />
+                        <data name="ValuesCount" inType="win:UInt16" />
+                        <struct name="Values" count="ValuesCount">
+                            <data name="Value" inType="win:UInt16" />
+                            <data name="Name" inType="win:UnicodeString" />
+                        </struct>
+                    </template>
+                </templates>
+
+                <events>
+                    <!-- Comprehensive data types event - covers all basic and complex types -->
+                    <event value="1"
+                        level="win:Informational"
+                        keywords="Local Read"
+                        task="Connect"
+                        opcode="Stop"
+                        template="t1"
+                        channel="c1"
+                        symbol="ALL_DATA_TYPES_EVENT"
+                        message="$(string.Event.AllDataTypes)" />
+
+                    <!-- Complex structures and arrays event - covers nested structures, arrays, and Win32 types -->
+                    <event value="2"
+                        level="win:Error"
+                        keywords="Remote Write"
+                        task="Disconnect"
+                        opcode="Initialize"
+                        template="t3"
+                        channel="c1"
+                        symbol="COMPLEX_DATA_EVENT"
+                        message="$(string.Event.ComplexData)" />
+                </events>
+            </provider>
+        </events>
+    </instrumentation>
+
+    <localization>
+        <resources culture="en-US">
+            <stringTable>
+                <string id="Provider.Name" value="Beats ETW Test Provider" />
+                <string id="Level.Critical" value="Critical" />
+                <string id="Level.Error" value="Error" />
+                <string id="Level.Warning" value="Warning" />
+                <string id="Level.Information" value="Information" />
+                <string id="Level.Verbose" value="Verbose" />
+                <string id="Level.Valid" value="Valid" />
+                <string id="Level.NotValid" value="Not Valid" />
+                <string id="Task.Connect" value="Connect" />
+                <string id="Task.Disconnect" value="Disconnect" />
+                <string id="Opcode.Stop" value="Stop" />
+                <string id="Opcode.Initialize" value="Initialize" />
+                <string id="Event.AllDataTypes" value="All data types event with comprehensive field coverage." />
+                <string id="Event.ComplexData" value="Complex data event with nested structures and arrays." />
+            </stringTable>
+        </resources>
+        
+        <resources culture="es-ES">
+            <stringTable>
+                <string id="Provider.Name" value="Proveedor de Prueba ETW Beats" />
+                <string id="Level.Critical" value="Crítico" />
+                <string id="Level.Error" value="Error" />
+                <string id="Level.Warning" value="Advertencia" />
+                <string id="Level.Information" value="Información" />
+                <string id="Level.Verbose" value="Detallado" />
+                <string id="Level.Valid" value="Válido" />
+                <string id="Level.NotValid" value="No Válido" />
+                <string id="Task.Connect" value="Conectar" />
+                <string id="Task.Disconnect" value="Desconectar" />
+                <string id="Opcode.Stop" value="Detener" />
+                <string id="Opcode.Initialize" value="Inicializar" />
+                <string id="Event.AllDataTypes" value="Evento de todos los tipos de datos con cobertura completa de campos." />
+                <string id="Event.ComplexData" value="Evento de datos complejos con estructuras anidadas y arreglos." />
+            </stringTable>
+        </resources>
+    </localization>
+</instrumentationManifest>
