@@ -237,7 +237,6 @@ func (m *MetricSet) getEventDetails(
 		if err != nil {
 			var opErr *smithy.OperationError
 			if errors.As(err, &opErr) {
-				// Log detailed AWS operation error
 				m.Logger().Errorf("[AWS Health] DescribeEventDetails failed with: Operation=%s, UnderlyingError=%v",
 					opErr.Operation(), opErr.Err)
 			} else {
