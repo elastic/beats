@@ -49,7 +49,10 @@ exporters:
       max_size: 1600
       min_size: 0
     mapping:
-      mode: bodymap       
+      mode: bodymap
+    compression: gzip
+    compression_params:
+      level: 1       
 `
 
 func TestConverter(t *testing.T) {
@@ -191,7 +194,10 @@ exporters:
       max_size: 1600
       min_size: 0
     mapping:
-      mode: bodymap       
+      mode: bodymap   
+    compression: gzip
+    compression_params:
+      level: 1    
 receivers:
   filebeatreceiver:
     filebeat:

@@ -43,7 +43,6 @@ import (
 // proxy_disable -> supported but the logic is not in place yet
 // proxy_headers
 type unsupportedConfig struct {
-	CompressionLevel   int               `config:"compression_level" `
 	LoadBalance        bool              `config:"loadbalance"`
 	NonIndexablePolicy *config.Namespace `config:"non_indexable_policy"`
 	AllowOlderVersion  bool              `config:"allow_older_versions"`
@@ -158,6 +157,11 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 		"mapping": map[string]any{
 			"mode": "bodymap",
 		},
+
+		"compression": "gzip",
+		"compression_params": map[string]any{
+			"level": escfg.CompressionLevel,
+		},
 	}
 
 	// Authentication
@@ -177,6 +181,37 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	return otelYAMLCfg, nil
 }
 
+<<<<<<< HEAD
+=======
+// log warning for unsupported config
+func checkUnsupportedConfig(cfg *config.C) error {
+	// check if unsupported configuration is provided
+	temp := unsupportedConfig{}
+	if err := cfg.Unpack(&temp); err != nil {
+		return err
+	}
+
+	if !isStructEmpty(temp) {
+		logp.Warn("these configuration parameters are not supported %+v", temp)
+		return nil
+	}
+
+	// check for dictionary like parameters that we do not support yet
+	if cfg.HasField("indices") {
+		logp.Warn("indices is currently not supported")
+	} else if cfg.HasField("pipelines") {
+		logp.Warn("pipelines is currently not supported")
+	} else if cfg.HasField("parameters") {
+		logp.Warn("parameters is currently not supported")
+	} else if cfg.HasField("proxy_headers") {
+		logp.Warn("proxy_headers is currently not supported")
+	} else if value, _ := cfg.Bool("allow_older_versions", -1); !value {
+		logp.Warn("allow_older_versions:false is currently not supported")
+	}
+	return nil
+}
+
+>>>>>>> 41413003d ([beatreceiver] add support for compression params while doing config translation (#45198))
 // For type safety check
 func typeSafetyCheck(value map[string]any) error {
 	// the  value should match `elasticsearchexporter.Config` type.
