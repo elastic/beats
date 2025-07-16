@@ -59,7 +59,7 @@ func TestReloader(t *testing.T) {
 	})
 	// config.C{}
 
-	reloader := NewReloader(logptest.NewTestingLogger("cfgfile-test.reload"), nil, config)
+	reloader := NewReloader(logptest.NewTestingLogger(t, "cfgfile-test.reload"), nil, config)
 	retryCount := 10
 
 	go reloader.Run(nil)

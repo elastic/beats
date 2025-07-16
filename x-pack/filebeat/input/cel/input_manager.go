@@ -43,6 +43,18 @@ func cursorConfigure(cfg *conf.C, logger *logp.Logger) ([]inputcursor.Source, in
 	return []inputcursor.Source{src}, input{}, nil
 }
 
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+func (c config) checkUnsupportedParams(logger *logp.Logger) {
+	if c.RecordCoverage {
+		logger.Named("cel").Warn("execution coverage enabled: " +
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-record-coverage")
+	}
+	if c.Redact == nil {
+		logger.Named("cel").Warn("missing recommended 'redact' configuration: " +
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-state-redact")
+	}
+}
+
 type source struct{ cfg config }
 
 func (s *source) Name() string { return s.cfg.Resource.URL.String() }
