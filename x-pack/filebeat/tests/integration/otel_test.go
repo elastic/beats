@@ -16,12 +16,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+<<<<<<< HEAD
+=======
+	"github.com/gofrs/uuid/v5"
+
+	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+>>>>>>> 09693acb5 ([beatreceivers] Add otel e2e test for gcp pub-sub input (#44991))
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/go-elasticsearch/v8"
 )
@@ -131,8 +135,134 @@ setup.template.pattern: logs-filebeat-default
 		"log.file.path",
 	}
 
+<<<<<<< HEAD
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 	assertMonitoring(t)
+=======
+	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+	assertMonitoring(t, 5066)
+}
+
+func TestHTTPJSONInputOTel(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	host := integration.GetESURL(t, "http")
+	user := host.User.Username()
+	password, _ := host.User.Password()
+
+	// create a random uuid and make sure it doesn't contain dashes/
+	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbNameSpace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+
+	type options struct {
+		Namespace string
+		ESURL     string
+		Username  string
+		Password  string
+	}
+
+	// The request url is a http mock server started using streams
+	configFile := `
+filebeat.inputs:
+  - type: httpjson
+    id: httpjson-e2e-otel
+    request.url: http://localhost:8090/test
+
+output:
+  elasticsearch:
+    hosts:
+      - {{ .ESURL }}
+    username: {{ .Username }}
+    password: {{ .Password }}
+    index: logs-integration-{{ .Namespace }}
+
+setup.template.enabled: false
+queue.mem.flush.timeout: 0s
+processors:
+   - add_host_metadata: ~
+   - add_cloud_metadata: ~
+   - add_docker_metadata: ~
+   - add_kubernetes_metadata: ~
+`
+
+	// start filebeat in otel mode
+	filebeatOTel := integration.NewBeat(
+		t,
+		"filebeat-otel",
+		"../../filebeat.test",
+		"otel",
+	)
+
+	optionsValue := options{
+		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username: user,
+		Password: password,
+	}
+
+	var configBuffer bytes.Buffer
+	optionsValue.Namespace = otelNamespace
+	require.NoError(t, template.Must(template.New("config").Parse(configFile)).Execute(&configBuffer, optionsValue))
+
+	filebeatOTel.WriteConfigFile(configBuffer.String())
+	filebeatOTel.Start()
+
+	// reset buffer
+	configBuffer.Reset()
+
+	optionsValue.Namespace = fbNameSpace
+	require.NoError(t, template.Must(template.New("config").Parse(configFile)).Execute(&configBuffer, optionsValue))
+
+	// start filebeat
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	filebeat.WriteConfigFile(configBuffer.String())
+	filebeat.Start()
+
+	// prepare to query ES
+	es := integration.GetESClient(t, "http")
+
+	rawQuery := map[string]any{
+		"sort": []map[string]any{
+			{"@timestamp": map[string]any{"order": "asc"}},
+		},
+	}
+
+	var filebeatDocs estools.Documents
+	var otelDocs estools.Documents
+	var err error
+
+	// wait for logs to be published
+	require.Eventually(t,
+		func() bool {
+			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-logs-integration-"+otelNamespace+"*", es)
+			assert.NoError(t, err)
+
+			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-logs-integration-"+fbNameSpace+"*", es)
+			assert.NoError(t, err)
+
+			return otelDocs.Hits.Total.Value >= 1 && filebeatDocs.Hits.Total.Value >= 1
+		},
+		2*time.Minute, 1*time.Second, fmt.Sprintf("Number of hits %d not equal to number of events %d", filebeatDocs.Hits.Total.Value, 1))
+
+	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
+	otelDoc := otelDocs.Hits.Hits[0].Source
+	ignoredFields := []string{
+		// Expected to change between agentDocs and OtelDocs
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+		"event.created",
+	}
+
+	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+>>>>>>> 09693acb5 ([beatreceivers] Add otel e2e test for gcp pub-sub input (#44991))
 }
 
 func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
@@ -156,6 +286,7 @@ func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
 	}
 }
 
+<<<<<<< HEAD
 func assertMapsEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg string) {
 	t.Helper()
 
@@ -177,6 +308,11 @@ func assertMapsEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg 
 
 func assertMonitoring(t *testing.T) {
 	r, err := http.Get("http://localhost:5066") //nolint:noctx,bodyclose // fine for tests
+=======
+func assertMonitoring(t *testing.T, port int) {
+	address := fmt.Sprintf("http://localhost:%d", port)
+	r, err := http.Get(address) //nolint:noctx,bodyclose,gosec // fine for tests
+>>>>>>> 09693acb5 ([beatreceivers] Add otel e2e test for gcp pub-sub input (#44991))
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
 
@@ -188,3 +324,311 @@ func assertMonitoring(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }
+<<<<<<< HEAD
+=======
+
+func TestFilebeatOTelReceiverE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+	wantEvents := 1
+
+	// start filebeat in otel mode
+	filebeatOTel := integration.NewBeat(
+		t,
+		"filebeat-otel",
+		"../../filebeat.test",
+		"otel",
+	)
+
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbReceiverIndex := "logs-integration-" + namespace
+	filebeatIndex := "logs-filebeat-" + namespace
+
+	otelConfig := struct {
+		Index          string
+		MonitoringPort int
+		InputFile      string
+		PathHome       string
+	}{
+		Index:          fbReceiverIndex,
+		MonitoringPort: 5066,
+		InputFile:      filepath.Join(filebeatOTel.TempDir(), "log.log"),
+		PathHome:       filebeatOTel.TempDir(),
+	}
+
+	cfg := `receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-fbreceiver
+          enabled: true
+          paths:
+            - {{.InputFile}}
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    output:
+      otelconsumer:
+    logging:
+      level: info
+      selectors:
+        - '*'
+    queue.mem.flush.timeout: 0s
+    path.home: {{.PathHome}}
+    http.enabled: true
+    http.host: localhost
+    http.port: {{.MonitoringPort}}
+exporters:
+  debug:
+    use_internal_logger: false
+    verbosity: detailed
+  elasticsearch/log:
+    endpoints:
+      - http://localhost:9200
+    compression: none
+    user: admin
+    password: testing
+    logs_index: {{.Index}}
+    batcher:
+      enabled: true
+      flush_timeout: 1s
+    mapping:
+      mode: bodymap
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - elasticsearch/log
+        - debug
+`
+	var configBuffer bytes.Buffer
+	require.NoError(t,
+		template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, otelConfig))
+	configContents := configBuffer.Bytes()
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Config contents:\n%s", configContents)
+		}
+	})
+
+	filebeatOTel.WriteConfigFile(string(configContents))
+	writeEventsToLogFile(t, otelConfig.InputFile, wantEvents)
+	filebeatOTel.Start()
+	defer filebeatOTel.Stop()
+
+	// start filebeat
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	beatsCfgFile := `
+filebeat.inputs:
+  - type: filestream
+    id: filestream-input-id
+    enabled: true
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
+    paths:
+      - %s
+output:
+  elasticsearch:
+    hosts:
+      - localhost:9200
+    username: admin
+    password: testing
+    index: %s
+queue.mem.flush.timeout: 0s
+setup.template.enabled: false
+processors:
+    - add_host_metadata: ~
+    - add_cloud_metadata: ~
+    - add_docker_metadata: ~
+    - add_kubernetes_metadata: ~
+setup.template.name: logs-filebeat-default
+setup.template.pattern: logs-filebeat-default
+http.enabled: true
+http.host: localhost
+http.port: %d
+`
+	logFilePath := filepath.Join(filebeat.TempDir(), "log.log")
+	writeEventsToLogFile(t, logFilePath, wantEvents)
+	s := fmt.Sprintf(beatsCfgFile, logFilePath, filebeatIndex, 5067)
+	filebeat.WriteConfigFile(s)
+	filebeat.Start()
+	defer filebeat.Stop()
+
+	es := integration.GetESClient(t, "http")
+
+	var filebeatDocs estools.Documents
+	var otelDocs estools.Documents
+	var err error
+
+	// wait for logs to be published
+	require.Eventuallyf(t,
+		func() bool {
+			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+fbReceiverIndex+"*")
+			require.NoError(t, err)
+
+			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+filebeatIndex+"*")
+			require.NoError(t, err)
+
+			return otelDocs.Hits.Total.Value >= wantEvents && filebeatDocs.Hits.Total.Value >= wantEvents
+		},
+		2*time.Minute, 1*time.Second, "expected at least %d events, got filebeat: %d and otel: %d", wantEvents, filebeatDocs.Hits.Total.Value, otelDocs.Hits.Total.Value)
+
+	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
+	otelDoc := otelDocs.Hits.Hits[0].Source
+	ignoredFields := []string{
+		// Expected to change between agentDocs and OtelDocs
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+		"log.file.inode",
+		"log.file.path",
+	}
+
+	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+	assertMonitoring(t, otelConfig.MonitoringPort)
+	assertMonitoring(t, 5067) // filebeat
+}
+
+func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+	wantEvents := 100
+
+	// start filebeat in otel mode
+	filebeatOTel := integration.NewBeat(
+		t,
+		"filebeat-otel",
+		"../../filebeat.test",
+		"otel",
+	)
+
+	// write events to log file
+	logFilePath := filepath.Join(filebeatOTel.TempDir(), "log.log")
+	writeEventsToLogFile(t, logFilePath, wantEvents)
+
+	type receiverConfig struct {
+		MonitoringPort int
+		InputFile      string
+		PathHome       string
+	}
+
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	otelConfig := struct {
+		Index     string
+		Receivers []receiverConfig
+	}{
+		Index: "logs-integration-" + namespace,
+		Receivers: []receiverConfig{
+			{
+				MonitoringPort: 5066,
+				InputFile:      logFilePath,
+				PathHome:       filepath.Join(filebeatOTel.TempDir(), "r1"),
+			},
+			{
+				MonitoringPort: 5067,
+				InputFile:      logFilePath,
+				PathHome:       filepath.Join(filebeatOTel.TempDir(), "r2"),
+			},
+		},
+	}
+
+	cfg := `receivers:
+{{range $i, $receiver := .Receivers}}
+  filebeatreceiver/{{$i}}:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-fbreceiver
+          enabled: true
+          paths:
+            - {{$receiver.InputFile}}
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    output:
+      otelconsumer:
+    logging:
+      level: info
+      selectors:
+        - '*'
+    queue.mem.flush.timeout: 0s
+    path.home: {{$receiver.PathHome}}
+{{if $receiver.MonitoringPort}}
+    http.enabled: true
+    http.host: localhost
+    http.port: {{$receiver.MonitoringPort}}
+{{end}}
+{{end}}
+exporters:
+  debug:
+    use_internal_logger: false
+    verbosity: detailed
+  elasticsearch/log:
+    endpoints:
+      - http://localhost:9200
+    compression: none
+    user: admin
+    password: testing
+    logs_index: {{.Index}}
+    batcher:
+      enabled: true
+      flush_timeout: 1s
+    mapping:
+      mode: bodymap
+service:
+  pipelines:
+    logs:
+      receivers:
+{{range $i, $receiver := .Receivers}}
+        - filebeatreceiver/{{$i}}
+{{end}}
+      exporters:
+        - debug
+        - elasticsearch/log
+`
+	var configBuffer bytes.Buffer
+	require.NoError(t,
+		template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, otelConfig))
+	configContents := configBuffer.Bytes()
+
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Config contents:\n%s", configContents)
+		}
+	})
+
+	filebeatOTel.WriteConfigFile(string(configContents))
+	writeEventsToLogFile(t, logFilePath, wantEvents)
+	filebeatOTel.Start()
+	defer filebeatOTel.Stop()
+
+	es := integration.GetESClient(t, "http")
+
+	var otelDocs estools.Documents
+	var err error
+
+	// wait for logs to be published
+	wantTotalLogs := wantEvents * len(otelConfig.Receivers)
+	require.Eventuallyf(t,
+		func() bool {
+			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+otelConfig.Index+"*")
+			require.NoError(t, err)
+
+			return otelDocs.Hits.Total.Value >= wantTotalLogs
+		},
+		2*time.Minute, 100*time.Millisecond, "expected at least %d events, got %d", wantTotalLogs, otelDocs.Hits.Total.Value)
+	for _, rec := range otelConfig.Receivers {
+		assertMonitoring(t, rec.MonitoringPort)
+	}
+}
+>>>>>>> 09693acb5 ([beatreceivers] Add otel e2e test for gcp pub-sub input (#44991))
