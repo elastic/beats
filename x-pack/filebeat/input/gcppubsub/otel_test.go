@@ -149,10 +149,10 @@ processors:
 			defer findCancel()
 
 			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-logs-integration-"+otelNamespace+"*", es)
-			msg.WriteString(fmt.Sprintf("failed to query ES for beat documents: %v", err))
+			fmt.Fprintf(msg, "failed to query ES for otel documents: %v\n", err)
 
 			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-logs-integration-"+fbNameSpace+"*", es)
-			msg.WriteString(fmt.Sprintf("failed to query ES for beat documents: %v", err))
+			fmt.Fprintf(msg, "failed to query ES for filebeat documents: %v\n", err)
 
 			return otelDocs.Hits.Total.Value >= 1 && filebeatDocs.Hits.Total.Value >= 1
 		},
