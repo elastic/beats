@@ -191,14 +191,6 @@ func (c config) Validate() error {
 	return nil
 }
 
-// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
-func (c config) checkUnsupportedParams(logger *logp.Logger) {
-	if c.Redact == nil {
-		logger.Named("websocket").Warn("missing recommended 'redact' configuration: " +
-			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-websocket.html#_redact")
-	}
-}
-
 func checkURLScheme(c config) error {
 	switch c.Type {
 	case "", "websocket":
