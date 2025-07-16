@@ -376,7 +376,7 @@ func waitForOracleConnection(t *testing.T, host, port string) {
 			return
 		}
 
-		// (1<<uint(i)) == 2^i (doubles the delay each time) * baseDelay
+		// (1<<uint(i)) == 2^i, which doubles the delay at each iteration, then multiply by baseDelay
 		delay := time.Duration(1<<uint(i)) * baseDelay
 		// But don't let the delay get too long; max out at 30 seconds
 		if delay > 30*time.Second {
