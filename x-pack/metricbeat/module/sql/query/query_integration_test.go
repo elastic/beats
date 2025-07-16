@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build integration
-
 package query
 
 import (
@@ -228,7 +226,8 @@ func TestPostgreSQL(t *testing.T) {
 
 func TestOracle(t *testing.T) {
 	service := compose.EnsureUp(t, "oracle")
-	host, port, _ := net.SplitHostPort(service.Host())
+	_, port, _ := net.SplitHostPort(service.Host())
+	host := "127.0.0.1"
 
 	// Wait for Oracle to be ready instead of sleeping for 300 seconds
 	waitForOracleConnection(t, host, port)
@@ -316,7 +315,7 @@ func GetOracleConnectionDetails(t *testing.T, host string, port string) string {
 func GetOracleEnvServiceName() string {
 	serviceName := os.Getenv("ORACLE_SERVICE_NAME")
 	if len(serviceName) == 0 {
-		serviceName = "ORCLPDB1"
+		serviceName = "XE"
 	}
 	return serviceName
 }
@@ -352,7 +351,7 @@ func GetOracleConnectString(host string, port string) string {
 			port,
 			GetOracleEnvServiceName())
 
-		// Add SYSDBA privilege if username is 'sys'
+		// Only add SYSDBA if explicitly using 'sys' user
 		if GetOracleEnvUsername() == "sys" {
 			connectString += "?sysdba=1"
 		}
@@ -361,12 +360,13 @@ func GetOracleConnectString(host string, port string) string {
 }
 
 // waitForOracleConnection waits for Oracle service to be ready with exponential backoff
-func waitForOracleConnection(t *testing.T, host string, port string) {
-	maxRetries := 10
-	baseDelay := 1 * time.Second
+func waitForOracleConnection(t *testing.T, host, port string) {
+	maxRetries := 15
+	baseDelay := 2 * time.Second
 
 	for i := 0; i < maxRetries; i++ {
-		conn, err := net.DialTimeout("tcp", net.JoinHostPort(host, port), 5*time.Second)
+		// First check if the port is open
+		conn, err := net.DialTimeout("tcp", net.JoinHostPort(host, port), 10*time.Second)
 		if err == nil {
 			conn.Close()
 			// Give Oracle a bit more time to fully initialize
