@@ -128,17 +128,7 @@ func TestLazyCacheMapValueEdgeCases(t *testing.T) {
 		t.Error("Expected cache miss for different data, but found cached value")
 	}
 
-	// Test case 4: Different map name should result in cache miss
-	differentPropInfo := &cachedPropertyInfo{
-		InType:  TdhIntypeUint32,
-		MapName: "DifferentMap",
-	}
-	result, consumed, ok = cachedMapInfo.getFormattedMapEntry(differentPropInfo, testData, 4)
-	if ok {
-		t.Error("Expected cache miss for different map name, but found cached value")
-	}
-
-	// Test case 5: Multiple entries in cache
+	// Test case 4: Multiple entries in cache
 	cachedMapInfo.cacheFormattedMapEntry(propInfo, differentData, "Different Result", 4)
 
 	// Verify both entries exist

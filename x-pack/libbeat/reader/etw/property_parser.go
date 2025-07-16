@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"strings"
 	"time"
 	"unsafe"
 
@@ -109,34 +110,17 @@ func (p *eventRenderer) render() (RenderedEtwEvent, error) {
 }
 
 func renderPropertyValue(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte) (any, error) {
-	var arraySize int = 1
-	if propInfo.IsArray {
-		arraySize = int(propInfo.Count)
+	// Determine the rendering strategy based on property type
+	switch {
+	case propInfo.IsStruct && propInfo.IsArray:
+		return renderStructArray(cache, eventInfo, propInfo, r, ptrSize, buf)
+	case propInfo.IsStruct && !propInfo.IsArray:
+		return renderStruct(cache, eventInfo, propInfo, r, ptrSize, buf)
+	case !propInfo.IsStruct && propInfo.IsArray:
+		return renderSimpleArray(cache, eventInfo, propInfo, r, ptrSize, buf)
+	default: // !propInfo.IsStruct && !propInfo.IsArray
+		return renderSingleSimpleProperty(cache, eventInfo, propInfo, r, ptrSize, buf)
 	}
-
-	// Initialize a slice to hold the property values.
-	result := make([]any, arraySize)
-	for j := range arraySize {
-		var (
-			value any
-			err   error
-		)
-		if propInfo.IsStruct {
-			value, err = renderStruct(cache, eventInfo, propInfo, r, ptrSize, buf)
-		} else {
-			value, err = renderSimpleType(cache, eventInfo, propInfo, r, ptrSize, buf)
-		}
-		if err != nil {
-			// Fallback: If parsing fails, try to describe the complex/unsupported property
-			value = describeComplexProperty(propInfo)
-		}
-		result[j] = value
-	}
-
-	if len(result) == 1 {
-		return result[0], nil
-	}
-	return result, nil
 }
 
 // getLengthFromProperty retrieves the length of a property from an event record.
@@ -159,7 +143,10 @@ func getLengthFromProperty(r *EventRecord, dataDescriptor *PropertyDataDescripto
 }
 
 func renderStruct(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte) (map[string]any, error) {
-	structure := make(map[string]any)
+	// Pre-allocate map with estimated capacity to reduce reallocations
+	memberCount := len(propInfo.StructMembers)
+	structure := make(map[string]any, memberCount)
+
 	for _, sm := range propInfo.StructMembers {
 		value, err := renderPropertyValue(cache, eventInfo, sm, r, ptrSize, buf)
 		if err != nil {
@@ -170,7 +157,42 @@ func renderStruct(cache *providerCache, eventInfo *cachedEventInfo, propInfo *ca
 	return structure, nil
 }
 
-func renderSimpleType(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte) (string, error) {
+// renderStructArray handles arrays of structs
+func renderStructArray(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte) (any, error) {
+	count, err := getPropertyLength(eventInfo, propInfo, r)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get array count: %w", err)
+	}
+	arraySize := int(count)
+
+	if arraySize == 0 {
+		return []any{}, nil
+	}
+
+	result := make([]any, arraySize)
+	for j := 0; j < arraySize; j++ {
+		value, err := renderStruct(cache, eventInfo, propInfo, r, ptrSize, buf)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse struct member %d: %w", j, err)
+		}
+		result[j] = value
+	}
+	return result, nil
+}
+
+// renderSimpleArray handles arrays of simple types (strings, integers, etc.)
+func renderSimpleArray(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte) (any, error) {
+	// Get the count for the array
+	count, err := getPropertyLength(eventInfo, propInfo, r)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get array count: %w", err)
+	}
+
+	if count == 0 {
+		return []any{}, nil
+	}
+
+	// Set up map info for the array elements
 	var mapInfo *EventMapInfo
 	var cachedMapInfo *cachedEventMapInfo
 	if propInfo.MapName != "" {
@@ -180,85 +202,88 @@ func renderSimpleType(cache *providerCache, eventInfo *cachedEventInfo, propInfo
 		}
 	}
 
-	// Get the length of the property.
-	propertyLength, err := getPropertyLength(eventInfo, propInfo, r)
-	if err != nil {
-		return "", fmt.Errorf("failed to get property length due to: %w", err)
-	}
-
-	// If we have a cached map, try to use it directly for simple numeric types
-	if cachedMapInfo != nil && propertyLength > 0 && len(*buf) > 0 {
-		if mappedValue, consumed, ok := cachedMapInfo.getFormattedMapEntry(propInfo, *buf, int(propertyLength)); ok {
-			*buf = (*buf)[consumed:]
-			return mappedValue, nil
+	result := make([]any, count)
+	for i := uint32(0); i < count; i++ {
+		// For each array element, process it as a single property
+		value, err := renderSingleProperty(cache, eventInfo, propInfo, r, ptrSize, buf, mapInfo, cachedMapInfo)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse array element %d: %w", i, err)
 		}
+		result[i] = value
 	}
-
-	var userDataConsumed uint16
-
-	// Set a default buffer size for formatted data.
-	formattedDataSize := uint32(DEFAULT_PROPERTY_BUFFER_SIZE)
-	formattedData := make([]byte, formattedDataSize)
-
-	// Retry loop to handle buffer size adjustments.
-retryLoop:
-	for {
-		var dataPtr *uint8
-		if len(*buf) > 0 {
-			dataPtr = &(*buf)[0]
-		}
-		err := _TdhFormatProperty(
-			eventInfo.ParsedInfo,
-			mapInfo,
-			ptrSize,
-			propInfo.InType,
-			propInfo.OutType,
-			uint16(propertyLength),
-			uint16(len(*buf)),
-			dataPtr,
-			&formattedDataSize,
-			&formattedData[0],
-			&userDataConsumed,
-		)
-
-		switch {
-		case err == nil:
-			// If formatting is successful, break out of the loop.
-			break retryLoop
-		case errors.Is(err, ERROR_INSUFFICIENT_BUFFER):
-			// Increase the buffer size if it's insufficient.
-			formattedData = make([]byte, len(formattedData)*2)
-			continue
-		case errors.Is(err, ERROR_EVT_INVALID_EVENT_DATA):
-			// Handle invalid event data error.
-			// Discarding MapInfo allows us to access
-			// at least the non-interpreted data.
-			if mapInfo != nil {
-				mapInfo = nil
-				continue
-			}
-			fallthrough
-		default:
-			// Fallback: describe the complex/unsupported property
-			return describeComplexProperty(propInfo), nil
-		}
-	}
-
-	// Convert the formatted data to string
-	result := windows.UTF16PtrToString((*uint16)(unsafe.Pointer(&formattedData[0])))
-
-	// Cache the result if we have a map and successfully consumed data
-	if cachedMapInfo != nil && userDataConsumed > 0 {
-		cachedMapInfo.cacheFormattedMapEntry(propInfo, (*buf)[:userDataConsumed], result, int(userDataConsumed))
-	}
-
-	// Update the data slice to account for consumed data.
-	*buf = (*buf)[userDataConsumed:]
-
 	return result, nil
 }
 
+// renderSingleSimpleProperty handles a single simple property (not an array, not a struct)
+func renderSingleSimpleProperty(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte) (any, error) {
+	// Set up map info for the property
+	var mapInfo *EventMapInfo
+	var cachedMapInfo *cachedEventMapInfo
+	if propInfo.MapName != "" {
+		if cached, found := cache.propertyMapsCache[propInfo.MapName]; found {
+			mapInfo = cached.ParsedInfo
+			cachedMapInfo = cached
+		}
+	}
+
+	return renderSingleProperty(cache, eventInfo, propInfo, r, ptrSize, buf, mapInfo, cachedMapInfo)
+}
+
 func getPropertyLength(eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord) (uint32, error) {
+	// Check if the length of the property is defined by another property.
+	if propInfo.hasLengthFromOtherProperty() {
+		// Length is specified by another property - use the property index
+		var dataDescriptor PropertyDataDescriptor
+		lengthPropIndex := propInfo.getLengthPropertyIndex()
+		nameProp := eventInfo.ParsedInfo.getEventPropertyInfoAtIndex(uint32(lengthPropIndex))
+		if nameProp == nil {
+			return 0, fmt.Errorf("property length is defined by another property, but no property found at index %d", lengthPropIndex)
+		}
+		// Read the property name that contains the length information.
+		dataDescriptor.PropertyName = unsafe.Pointer(windows.StringToUTF16Ptr(getStringFromBufferOffset(eventInfo.InfoBuf, nameProp.NameOffset)))
+		dataDescriptor.ArrayIndex = 0xFFFFFFFF
+		// Retrieve the length from the specified property.
+		return getLengthFromProperty(r, &dataDescriptor)
+	}
+
+	// Check if the count of the property is defined by another property.
+	if propInfo.hasCountFromOtherProperty() {
+		// Count is specified by another property - use the property index
+		var dataDescriptor PropertyDataDescriptor
+		countPropIndex := propInfo.getCountPropertyIndex()
+		nameProp := eventInfo.ParsedInfo.getEventPropertyInfoAtIndex(uint32(countPropIndex))
+		if nameProp == nil {
+			return 0, fmt.Errorf("property count is defined by another property, but no property found at index %d", countPropIndex)
+		}
+		// Read the property name that contains the count information.
+		dataDescriptor.PropertyName = unsafe.Pointer(windows.StringToUTF16Ptr(getStringFromBufferOffset(eventInfo.InfoBuf, nameProp.NameOffset)))
+		dataDescriptor.ArrayIndex = 0xFFFFFFFF
+		// Retrieve the count from the specified property.
+		return getLengthFromProperty(r, &dataDescriptor)
+	}
+
+	// Check if this is a fixed length property
+	if propInfo.IsFixedLen {
+		return propInfo.getFixedLength(), nil
+	}
+
+	// Variable length property without explicit length reference
+	// For null-terminated strings, return 0 to indicate length should be determined by null terminator
+	if propInfo.isVariableLengthString() {
+		return 0, nil // 0 indicates null-terminated string
+	}
+
+	// For other variable-length types, we might need to determine length dynamically
+	// This is a fallback case that might need specific handling based on the data type
+	return 0, nil
+}
+
+// getElementLength gets the length of an individual property element (not the array count)
+// This is used when parsing individual elements within an array
+func getElementLength(eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord) (uint32, error) {
+	// For array elements, we should NOT check for count from other properties
+	// because that would give us the array count, not the element length
+
 	// Check if the length of the property is defined by another property.
 	if propInfo.hasLengthFromOtherProperty() {
 		// Length is specified by another property - use the property index
@@ -354,4 +379,124 @@ func describeComplexProperty(info *cachedPropertyInfo) string {
 		info.Length,
 		info.ParsedInfo.mapNameOffset(),
 	)
+}
+
+// cleanUnicodeFormattingChars removes Unicode formatting characters that
+// Windows APIs sometimes insert for display purposes
+func cleanUnicodeFormattingChars(s string) string {
+	// Remove common Unicode formatting characters:
+	// U+200E (Left-to-Right Mark)
+	// U+200F (Right-to-Left Mark)
+	// U+202A (Left-to-Right Embedding)
+	// U+202B (Right-to-Left Embedding)
+	// U+202C (Pop Directional Formatting)
+	// U+202D (Left-to-Right Override)
+	// U+202E (Right-to-Left Override)
+	// U+2060 (Word Joiner)
+	// U+FEFF (Zero Width No-Break Space)
+	replacer := strings.NewReplacer(
+		"\u200E", "", // Left-to-Right Mark
+		"\u200F", "", // Right-to-Left Mark
+		"\u202A", "", // Left-to-Right Embedding
+		"\u202B", "", // Right-to-Left Embedding
+		"\u202C", "", // Pop Directional Formatting
+		"\u202D", "", // Left-to-Right Override
+		"\u202E", "", // Right-to-Left Override
+		"\u2060", "", // Word Joiner
+		"\uFEFF", "", // Zero Width No-Break Space
+	)
+	return replacer.Replace(s)
+}
+
+func renderSingleProperty(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte, mapInfo *EventMapInfo, cachedMapInfo *cachedEventMapInfo) (any, error) {
+	// Get the length of the individual property element (not the array count).
+	propertyLength, err := getElementLength(eventInfo, propInfo, r)
+	if err != nil {
+		return "", fmt.Errorf("failed to get property length due to: %w", err)
+	}
+
+	// If we have a cached map, try to use it directly for simple numeric types
+	if cachedMapInfo != nil && propertyLength > 0 && len(*buf) > 0 {
+		if mappedValue, consumed, ok := cachedMapInfo.getFormattedMapEntry(propInfo, *buf, int(propertyLength)); ok {
+			*buf = (*buf)[consumed:]
+			return mappedValue, nil
+		}
+	}
+
+	var userDataConsumed uint16
+
+	// Set a default buffer size for formatted data.
+	formattedDataSize := uint32(DEFAULT_PROPERTY_BUFFER_SIZE)
+
+	// Get buffer from pool and memory manager
+	mm := cache.bufferPools
+	formattedDataPtr := mm.getBuffer(formattedDataSize)
+	defer mm.putBuffer(formattedDataPtr, formattedDataSize)
+
+	formattedData := *formattedDataPtr
+
+	// Retry loop to handle buffer size adjustments.
+retryLoop:
+	for {
+		var dataPtr *uint8
+		if len(*buf) > 0 {
+			dataPtr = &(*buf)[0]
+		}
+
+		// Ensure buffer is large enough
+		if uint32(len(formattedData)) < formattedDataSize {
+			formattedData = make([]byte, formattedDataSize)
+		}
+
+		err := _TdhFormatProperty(
+			eventInfo.ParsedInfo,
+			mapInfo,
+			ptrSize,
+			propInfo.InType,
+			propInfo.OutType,
+			uint16(propertyLength),
+			uint16(len(*buf)),
+			dataPtr,
+			&formattedDataSize,
+			&formattedData[0],
+			&userDataConsumed,
+		)
+
+		switch {
+		case err == nil:
+			// If formatting is successful, break out of the loop.
+			break retryLoop
+		case errors.Is(err, ERROR_INSUFFICIENT_BUFFER):
+			// For very large properties, we need to allocate a new buffer
+			// Don't use the pool for these exceptional cases to avoid memory bloat
+			formattedData = make([]byte, formattedDataSize*2)
+			formattedDataSize = uint32(len(formattedData))
+			continue
+		case errors.Is(err, ERROR_EVT_INVALID_EVENT_DATA):
+			// Handle invalid event data error.
+			// Discarding MapInfo allows us to access
+			// at least the non-interpreted data.
+			if mapInfo != nil {
+				mapInfo = nil
+				continue
+			}
+			fallthrough
+		default:
+			// Fallback: describe the complex/unsupported property
+			return describeComplexProperty(propInfo), nil
+		}
+	}
+
+	// Convert the formatted data to string
+	result := windows.UTF16PtrToString((*uint16)(unsafe.Pointer(&formattedData[0])))
+
+	// Cache the result if we have a map and successfully consumed data
+	if cachedMapInfo != nil && userDataConsumed > 0 {
+		cachedMapInfo.cacheFormattedMapEntry(propInfo, (*buf)[:userDataConsumed], result, int(userDataConsumed))
+	}
+
+	// Update the data slice to account for consumed data.
+	*buf = (*buf)[userDataConsumed:]
+
+	return cleanUnicodeFormattingChars(result), nil
 }

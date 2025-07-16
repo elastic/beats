@@ -37,6 +37,40 @@ type metadataCache struct {
 	mutex         sync.RWMutex
 	providerCache map[windows.GUID]*providerCache
 	log           *logp.Logger
+	bufferPools   *bufferPools
+}
+
+// bufferPools provides centralized memory management for ETW event processing.
+// It handles buffer pooling to optimize memory usage and reduce garbage collection pressure.
+type bufferPools struct {
+	// Buffer pools for different size categories
+	smallBufferPool  sync.Pool // <= 256 bytes
+	mediumBufferPool sync.Pool // <= 1024 bytes
+	largeBufferPool  sync.Pool // <= 4096 bytes
+}
+
+// newBufferPools creates a new memory manager with properly initialized pools.
+func newBufferPools() *bufferPools {
+	return &bufferPools{
+		smallBufferPool: sync.Pool{
+			New: func() interface{} {
+				buf := make([]byte, 256)
+				return &buf
+			},
+		},
+		mediumBufferPool: sync.Pool{
+			New: func() interface{} {
+				buf := make([]byte, 1024)
+				return &buf
+			},
+		},
+		largeBufferPool: sync.Pool{
+			New: func() interface{} {
+				buf := make([]byte, 4096)
+				return &buf
+			},
+		},
+	}
 }
 
 func newMetadataCache(log *logp.Logger) *metadataCache {
@@ -44,6 +78,7 @@ func newMetadataCache(log *logp.Logger) *metadataCache {
 	return &metadataCache{
 		providerCache: make(map[windows.GUID]*providerCache),
 		log:           log,
+		bufferPools:   newBufferPools(),
 	}
 }
 
@@ -62,7 +97,7 @@ func (cache *metadataCache) getProviderCache(guid windows.GUID) (*providerCache,
 		return provider, nil
 	}
 	// If not found, create a new provider cache
-	provider, err := newProviderCache(effectiveGUID, cache.log)
+	provider, err := newProviderCache(effectiveGUID, cache.log, cache.bufferPools)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create provider cache for %s: %w", effectiveGUID, err)
 	}
@@ -81,9 +116,11 @@ type providerCache struct {
 	keywords          map[uint64]*cachedProviderKeyword
 	propertyMapsCache map[string]*cachedEventMapInfo
 	failedDescriptors map[EventDescriptor]struct{}
+
+	bufferPools *bufferPools
 }
 
-func newProviderCache(guid windows.GUID, log *logp.Logger) (*providerCache, error) {
+func newProviderCache(guid windows.GUID, log *logp.Logger, bufferPools *bufferPools) (*providerCache, error) {
 	log = log.Named("provider_cache").With("guid", guid)
 	cache := &providerCache{
 		guid:              guid,
@@ -92,6 +129,7 @@ func newProviderCache(guid windows.GUID, log *logp.Logger) (*providerCache, erro
 		keywords:          make(map[uint64]*cachedProviderKeyword),
 		propertyMapsCache: make(map[string]*cachedEventMapInfo),
 		failedDescriptors: make(map[EventDescriptor]struct{}),
+		bufferPools:       bufferPools,
 	}
 	if err := cache.init(); err != nil {
 		return nil, fmt.Errorf("failed to initialize provider cache for %s: %w", guid, err)
@@ -358,6 +396,17 @@ func (info *cachedPropertyInfo) hasLengthFromOtherProperty() bool {
 	return (info.ParsedInfo.Flags & PropertyParamLength) != 0
 }
 
+// hasCountFromOtherProperty returns true if this property's count is specified by another property
+func (info *cachedPropertyInfo) hasCountFromOtherProperty() bool {
+	return (info.ParsedInfo.Flags & PropertyParamCount) != 0
+}
+
+// getCountPropertyIndex returns the index of the property that contains the count for this property
+// Only valid when hasCountFromOtherProperty() returns true
+func (info *cachedPropertyInfo) getCountPropertyIndex() uint16 {
+	return info.Count
+}
+
 // getLengthPropertyIndex returns the index of the property that contains the length for this property
 // Only valid when hasLengthFromOtherProperty() returns true
 func (info *cachedPropertyInfo) getLengthPropertyIndex() uint16 {
@@ -392,24 +441,6 @@ type cachedProviderKeyword struct {
 type cachedMapEntry struct {
 	Value   any
 	IsUlong bool // true if the value is a uint64, false if it's a string
-}
-
-func (e *cachedMapEntry) getStringValue() string {
-	if e.IsUlong {
-		return fmt.Sprintf("%d", e.Value)
-	}
-	if str, ok := e.Value.(string); ok {
-		return str
-	}
-	return fmt.Sprintf("%v", e.Value)
-}
-
-func (e *cachedMapEntry) getUlongValue() uint32 {
-	v, ok := e.Value.(uint32)
-	if !e.IsUlong || !ok {
-		return 0
-	}
-	return v
 }
 
 type cachedEventMapInfo struct {
@@ -687,4 +718,34 @@ func isPrintable(data []byte) bool {
 		}
 	}
 	return true
+}
+
+// getBuffer retrieves a buffer from the appropriate pool based on the requested size.
+// The returned buffer should be returned to the pool using putBuffer.
+func (mm *bufferPools) getBuffer(size uint32) *[]byte {
+	switch {
+	case size <= 256:
+		return mm.smallBufferPool.Get().(*[]byte)
+	case size <= 1024:
+		return mm.mediumBufferPool.Get().(*[]byte)
+	default:
+		return mm.largeBufferPool.Get().(*[]byte)
+	}
+}
+
+// putBuffer returns a buffer to the appropriate pool after clearing it.
+func (mm *bufferPools) putBuffer(buf *[]byte, size uint32) {
+	// Clear the buffer for reuse
+	for i := range *buf {
+		(*buf)[i] = 0
+	}
+
+	switch {
+	case size <= 256:
+		mm.smallBufferPool.Put(buf)
+	case size <= 1024:
+		mm.mediumBufferPool.Put(buf)
+	default:
+		mm.largeBufferPool.Put(buf)
+	}
 }
