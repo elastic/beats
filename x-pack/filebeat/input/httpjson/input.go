@@ -169,7 +169,7 @@ func test(url *url.URL) error {
 }
 
 func runWithMetrics(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor) error {
-	ctx.MetricsRegistryOverrideInput("httpjson")
+	v2.MetricsRegistryOverrideInput(ctx.MetricsRegistry, "httpjson")
 	return run(ctx, cfg, pub, crsr, ctx.MetricsRegistry)
 }
 

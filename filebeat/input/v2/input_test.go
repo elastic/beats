@@ -185,43 +185,34 @@ func TestContextMetricsRegistryOverride(t *testing.T) {
 	tcs := []struct {
 		name       string
 		field      string
-		overrideFn func(ctx Context, val string) *monitoring.Registry
+		overrideFn func(reg *monitoring.Registry, val string)
 		value      string
 	}{
 		{
-			name:  "MetricsRegistryOverrideID",
-			field: inputmon.MetricKeyID,
-			overrideFn: func(ctx Context, val string) *monitoring.Registry {
-				return ctx.MetricsRegistryOverrideID(val)
-			},
-			value: "new-id",
+			name:       "MetricsRegistryOverrideID",
+			field:      inputmon.MetricKeyID,
+			overrideFn: MetricsRegistryOverrideID,
+			value:      "new-id",
 		},
 		{
-			name:  "MetricsRegistryOverrideInput",
-			field: inputmon.MetricKeyInput,
-			overrideFn: func(ctx Context, val string) *monitoring.Registry {
-				return ctx.MetricsRegistryOverrideInput(val)
-			},
-			value: "new-input-name",
+			name:       "MetricsRegistryOverrideInput",
+			field:      inputmon.MetricKeyInput,
+			overrideFn: MetricsRegistryOverrideInput,
+			value:      "new-input-name",
 		},
 	}
 
 	for _, tc := range tcs {
 		t.Run(tc.name, func(t *testing.T) {
-			parentReg := monitoring.NewRegistry()
-			monitoring.NewString(parentReg, tc.field).Set("old-" + tc.field)
+			reg := monitoring.NewRegistry()
+			monitoring.NewString(reg, tc.field).Set("old-" + tc.field)
 
-			ctx := Context{
-				Logger:          logptest.NewTestingLogger(t, tc.name),
-				MetricsRegistry: parentReg,
-			}
-
-			modifiedReg := tc.overrideFn(ctx, tc.value)
-			require.NotNil(t, modifiedReg)
-			assert.Equal(t, parentReg, modifiedReg)
+			tc.overrideFn(reg, tc.value)
+			require.NotNil(t, reg)
+			assert.Equal(t, reg, reg)
 
 			var got string
-			modifiedReg.Visit(
+			reg.Visit(
 				monitoring.Full,
 				monitoring.NewKeyValueVisitor(func(key string, value any) {
 					if key == tc.field {
