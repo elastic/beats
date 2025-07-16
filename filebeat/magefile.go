@@ -210,3 +210,12 @@ func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(Fields, Dashboards, devtools.BuildSystemTestBinary)
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
 }
+
+// FipsECH test runs a smoke test using the FIPS enabled binary targetting an ECH deployment.
+func FipsECHTest(ctx context.Context) error {
+	mg.Deps(Build)
+	args := devtools.DefaultGoTestIntegrationArgs()
+	args.Packages = []string{"testing/fips-ech"} // TODO does this work or should we change the working directory?
+	return devtools.GoTest(ctx, args)
+	return nil
+}
