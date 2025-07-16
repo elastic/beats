@@ -26,8 +26,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// AssertMapsEqual takes two documents and asserts if they are equal.
-// Pass a list of ignoredFields if you expect some fields to differ
+// AssertMapsEqual asserts that documents m1 and m2 are equal under name
+// flattening. Fields in ignoredFields are ignored unless they are missing
+// from both documents, in which case the assertion fails.
 func AssertMapsEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg string) {
 	t.Helper()
 
