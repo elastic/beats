@@ -19,20 +19,45 @@ const (
 
 //nolint:errcheck // We can ignore as response writer errors cannot be handled in this scenario
 func AzureStorageServer() http.Handler {
+	var pathPrefix string
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := strings.Split(strings.TrimLeft(r.URL.Path, "/"), "/")
+		if r.URL.RawQuery != "" {
+			pathPrefix = r.URL.Query().Get("prefix")
+		}
+
 		w.Header().Set(contentType, jsonType)
 		if r.Method == http.MethodGet {
 			switch len(path) {
 			case 1:
-				if Containers[path[0]] {
-					w.Header().Set(contentType, xmlType)
-					w.Write([]byte(fetchContainer[path[0]]))
-					return
+				containerName := path[0]
+				if !Containers[containerName] {
+					// This case was implicitly handled by doing nothing.
+					// Breaking is clear and maintains that behavior.
+					break
 				}
+
+				// If a prefix is given but is not valid, return a 404 error.
+				if pathPrefix != "" {
+					containerBlobs := availableBlobs[containerName]
+					if !hasKeyWithPrefix(containerBlobs, pathPrefix) {
+						w.WriteHeader(http.StatusNotFound)
+						w.Write([]byte("resource not found"))
+						return
+					}
+				}
+
+				w.Header().Set(contentType, xmlType)
+				w.Write([]byte(fetchContainer[containerName]))
+				return
 			case 2:
 				if Containers[path[0]] && availableBlobs[path[0]][path[1]] {
-					w.Write([]byte(blobs[path[0]][path[1]]))
+					if pathPrefix != "" && !strings.HasPrefix(path[1], pathPrefix) {
+						w.WriteHeader(http.StatusNotFound)
+						w.Write([]byte("resource not found"))
+					} else {
+						w.Write([]byte(blobs[path[0]][path[1]]))
+					}
 					return
 				}
 			case 3:
@@ -148,4 +173,14 @@ func AzureConcurrencyServer() http.Handler {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("resource not found"))
 	})
+}
+
+// hasKeyWithPrefix checks if any key in a map starts with the given prefix.
+func hasKeyWithPrefix(data map[string]bool, prefix string) bool {
+	for key := range data {
+		if strings.HasPrefix(key, prefix) {
+			return true
+		}
+	}
+	return false
 }

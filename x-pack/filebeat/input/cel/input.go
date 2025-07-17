@@ -36,7 +36,9 @@ import (
 	"golang.org/x/time/rate"
 
 	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/checker/decls"
+	"github.com/google/cel-go/common/decls"
+	"github.com/google/cel-go/common/types"
+	"github.com/google/cel-go/ext"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -1060,8 +1062,10 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 		return nil, nil, nil, fmt.Errorf("failed to build xml type hints: %w", err)
 	}
 	opts := []cel.EnvOption{
-		cel.Declarations(decls.NewVar(root, decls.Dyn)),
+		cel.VariableDecls(decls.NewVariable(root, types.DynType)),
 		cel.OptionalTypes(cel.OptionalTypesVersion(lib.OptionalTypesVersion)),
+		ext.TwoVarComprehensions(ext.TwoVarComprehensionsVersion(lib.OptionalTypesVersion)),
+		lib.AWS(),
 		lib.Collections(),
 		lib.Crypto(),
 		lib.JSON(nil),
