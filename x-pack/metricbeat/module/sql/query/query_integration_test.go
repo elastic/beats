@@ -371,7 +371,7 @@ func waitForOracleConnection(t *testing.T, host, port string) {
 		if err == nil {
 			conn.Close()
 			// Give Oracle a bit more time to fully initialize
-			time.Sleep(60 * time.Second)
+			time.Sleep(120 * time.Second)
 			return
 		}
 
