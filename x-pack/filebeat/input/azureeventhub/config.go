@@ -142,7 +142,7 @@ func (conf *azureInputConfig) Validate() error {
 		// So instead of throwing an error to the user, we decided to replace
 		// underscores (_) characters with hyphens (-).
 		conf.SAContainer = strings.ReplaceAll(conf.SAContainer, "_", "-")
-		logger.Warnf("replaced underscores (_) with hyphens (-) in the storage account container name (before: %s, now: %s", originalValue, c.SAContainer)
+		logger.Warnf("replaced underscores (_) with hyphens (-) in the storage account container name (before: %s, now: %s", originalValue, conf.SAContainer)
 	}
 	err := storageContainerValidate(conf.SAContainer)
 	if err != nil {
