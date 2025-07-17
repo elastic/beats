@@ -319,6 +319,8 @@ steps:
               context: "filebeat: Win 2022 Unit Tests"
 
       - label: ":ubuntu: Filebeat: FIPS ECH Integration Tests"
+        env:
+          TERRAFORM_VERSION: "1.12.2"
         command: |
           .buildkite/scripts/custom_fips_ech_test.sh filebeat
         retry:

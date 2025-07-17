@@ -215,7 +215,8 @@ func PythonIntegTest(ctx context.Context) error {
 func FipsECHTest(ctx context.Context) error {
 	mg.Deps(Build)
 	args := devtools.DefaultGoTestIntegrationArgs()
-	args.Packages = []string{"testing/fips-ech"} // TODO does this work or should we change the working directory?
+	args.Dir = "testing/fips-ech"
+	args.OutputFile = "../../" + args.OutputFile
+	args.JUnitReportFile = "../../" + args.JUnitReportFile
 	return devtools.GoTest(ctx, args)
-	return nil
 }
