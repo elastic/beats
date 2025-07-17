@@ -101,14 +101,13 @@ func startConsumer(t *testing.T, host string, groupID string) (io.Closer, error)
 	config.Net.SASL.Enable = true
 	config.Net.SASL.User = kafkaSASLConsumerUsername
 	config.Net.SASL.Password = kafkaSASLConsumerPassword
-
 	config.Consumer.Offsets.AutoCommit.Enable = true
 	config.Consumer.Offsets.AutoCommit.Interval = 1 * time.Second
 
 	// Create a new consumer group
 	consumerGroup, err := sarama.NewConsumerGroup(brokers, groupID, config)
 	if err != nil {
-		t.Fatalf("Error creating consumer group: %v", err)
+		t.Fatalf("Error creating consumer group: %v, brokers: %s", err, brokers)
 		return nil, err
 	}
 
