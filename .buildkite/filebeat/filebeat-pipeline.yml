@@ -320,7 +320,7 @@ steps:
 
       - label: ":ubuntu: Filebeat: FIPS ECH Integration Tests"
         env:
-          TERRAFORM_VERSION: "1.12.2"
+          ASDF_TERRAFORM_VERSION: "1.9.3"
         command: |
           .buildkite/scripts/custom_fips_ech_test.sh filebeat
         retry:

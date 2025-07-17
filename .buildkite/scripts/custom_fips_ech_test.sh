@@ -11,14 +11,7 @@ if [ -z "$BEAT_PATH" ]; then
     exit 1
 fi
 
-add_bin_path
-with_Terraform
-
-cleanup() {
-    ech_down
-    clean_workspace
-}
-trap cleanup EXIT
+trap 'ech_down' EXIT
 
 STACK_VERSION="$(./dev-tools/get_version)-SNAPSHOT"
 
