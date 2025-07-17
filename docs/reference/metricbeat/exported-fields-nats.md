@@ -19,10 +19,8 @@ nats Module
 type: keyword
 
 
-**`nats.server.time`**
+**`nats.server.time`** {applies_to}`product: deprecated 8.0.0`
 :   Server time of metric creation
-
-{applies_to}`product: deprecated 8.0.0`
 
 type: date
 
@@ -168,6 +166,10 @@ type: integer
 
 
 ## jetstream [_jetstream]
+
+```{applies_to}
+stack: beta 9.1.0
+```
 
 Information pertaining to a NATS JetStream server
 
@@ -809,13 +811,13 @@ type: integer
 
 Contains nats var related metrics
 
-**`nats.stats.server_name`**
+**`nats.stats.server_name`** {applies_to}`stack: ga 9.1.0`
 :   The name of the NATS server
 
 type: keyword
 
 
-**`nats.stats.version`**
+**`nats.stats.version`** {applies_to}`stack: ga 9.1.0`
 :   The version of the NATS server
 
 type: keyword
@@ -947,37 +949,37 @@ type: long
 type: long
 
 
-**`nats.stats.http.req_stats.uri.jsz`**
+**`nats.stats.http.req_stats.uri.jsz`** {applies_to}`stack: ga 9.1.0`
 :   The number of hits on jsz monitoring uri
 
 type: long
 
 
-**`nats.stats.http.req_stats.uri.accountz`**
+**`nats.stats.http.req_stats.uri.accountz`** {applies_to}`stack: ga 9.1.0`
 :   The number of hits on accountz monitoring uri
 
 type: long
 
 
-**`nats.stats.http.req_stats.uri.accstatz`**
+**`nats.stats.http.req_stats.uri.accstatz`** {applies_to}`stack: ga 9.1.0`
 :   The number of hits on accstatz monitoring uri
 
 type: long
 
 
-**`nats.stats.http.req_stats.uri.gatewayz`**
+**`nats.stats.http.req_stats.uri.gatewayz`** {applies_to}`stack: ga 9.1.0`
 :   The number of hits on gatewayz monitoring uri
 
 type: long
 
 
-**`nats.stats.http.req_stats.uri.healthz`**
+**`nats.stats.http.req_stats.uri.healthz`** {applies_to}`stack: ga 9.1.0`
 :   The number of hits on healthz monitoring uri
 
 type: long
 
 
-**`nats.stats.http.req_stats.uri.leafz`**
+**`nats.stats.http.req_stats.uri.leafz`** {applies_to}`stack: ga 9.1.0`
 :   The number of hits on leafz monitoring uri
 
 type: long
