@@ -3,9 +3,15 @@ filebeat.inputs:
     id: filestream-input-id
     enabled: true
     paths:
-      - /home/ainsoph/tmp/log.log
+      - /tmp/flog.log
 
 output:
-  console:
+  elasticsearch:
+    hosts: ["https://localhost:9200"]
+    username: elastic
+    password: changeme
 
-logging.level: warn
+setup.kibana:
+  host: https://localhost:5601
+  username: elastic
+  password: changeme
