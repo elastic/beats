@@ -409,7 +409,11 @@ filebeat.inputs:
 ```
 
 
-### `allowed_environment` {applies_to}`stack: ga 8.16.0` [environ-cel]
+### `allowed_environment` [environ-cel]
+
+```{applies_to}
+stack: ga 8.16.0
+```
 
 A list of host environment variable that will be made visible to the CEL execution environment. By default, no environment variables are visible.
 
@@ -448,7 +452,11 @@ filebeat.inputs:
 ```
 
 
-### `xsd` {applies_to}`stack: ga 8.9.0` [xsd-cel]
+### `xsd` [xsd-cel]
+
+```{applies_to}
+stack: ga 8.9.0
+```
 
 XML documents may require additional type information to enable correct parsing and ingestion. This information can be provided as an XML Schema Definitions (XSD) for XML documents using the `xsd` option. The key under which the XSD information is provided is accessed via the `decode_xml` CEL extension.
 
@@ -493,7 +501,11 @@ The user to authenticate with.
 The password to use.
 
 
-### `auth.digest.enabled` {applies_to}`stack: ga 8.12.0` [_auth_digest_enabled]
+### `auth.digest.enabled` [_auth_digest_enabled]
+
+```{applies_to}
+stack: ga 8.12.0
+```
 
 When set to `false`, disables the digest auth configuration. Default: `true`.
 
@@ -503,17 +515,29 @@ digest auth settings are disabled if either `enabled` is set to `false` or the `
 
 
 
-### `auth.digest.user` {applies_to}`stack: ga 8.12.0` [_auth_digest_user]
+### `auth.digest.user` [_auth_digest_user]
+
+```{applies_to}
+stack: ga 8.12.0
+```
 
 The user to authenticate with.
 
 
-### `auth.digest.password` {applies_to}`stack: ga 8.12.0` [_auth_digest_password]
+### `auth.digest.password` [_auth_digest_password]
+
+```{applies_to}
+stack: ga 8.12.0
+```
 
 The password to use.
 
 
-### `auth.digest.no_reuse` {applies_to}`stack: ga 8.12.0` [_auth_digest_no_reuse]
+### `auth.digest.no_reuse` [_auth_digest_no_reuse]
+
+```{applies_to}
+stack: ga 8.12.0
+```
 
 When set to `true`, Digest Authentication challenges are not reused.
 
@@ -704,7 +728,11 @@ The URL of the HTTP API. Required.
 The API endpoint may be accessed via unix socket and Windows named pipes by adding  `+unix` or `+npipe` to the URL scheme, for example, `http+unix:///var/socket/`.
 
 
-### `resource.headers` {applies_to}`stack: ga 8.18.1` [_resource_headers]
+### `resource.headers` [_resource_headers]
+
+```{applies_to}
+stack: ga 8.18.1
+```
 
 Headers to be added to all requests. Headers are added before authentication headers, so any collision between headers in this configuration and authentication headers will result in the colliding headers here not being included in requests. Header values must be provided as an array.
 
@@ -804,7 +832,11 @@ When `redirect.forward_headers` is set to `true`, all headers *except* the ones 
 The maximum number of redirects to follow for a request. Default: `10`.
 
 
-### `resource.max_body_size` {applies_to}`stack: ga 8.18.1` [_resource_max_body_size]
+### `resource.max_body_size` [_resource_max_body_size]
+
+```{applies_to}
+stack: ga 8.18.1
+```
 
 The maximum size of a response body that will be accepted by the client if non-zero. Bodies that are too large will result in an error, "response body too big". Default: `0`.
 
@@ -858,7 +890,11 @@ Whether to use the host’s local time rather that UTC for timestamping rotated 
 This determines whether rotated logs should be gzip compressed.
 
 
-### `redact` {applies_to}`stack: ga 8.7.0` [cel-state-redact]
+### `redact` [cel-state-redact]
+
+```{applies_to}
+stack: ga 8.7.0
+```
 
 During debug level logging, the `state` object and the resulting evaluation result are included in logs. This may result in leaking of secrets. In order to prevent this, fields may be redacted or deleted from the logged `state`. The `redact` configuration allows users to configure this field redaction behavior. For safety reasons if the `redact` configuration is missing a warning is logged.
 
@@ -898,19 +934,31 @@ This specifies fields in the `state` to be redacted prior to debug logging. Fiel
 This specifies whether fields should be replaced with a `*` or deleted entirely from messages sent to debug logs. If delete is `true`, fields will be deleted rather than replaced.
 
 
-### `failure_dump.enabled` {applies_to}`stack: ga 8.18.0` [_failure_dump_enabled]
+### `failure_dump.enabled` [_failure_dump_enabled]
+
+```{applies_to}
+stack: ga 8.18.0
+```
 
 It is possible to log CEL program evaluation failures to a local file-system for debugging configurations. This option is enabled by setting `failure_dump.enabled` to true and setting the `failure_dump.filename` value. To delete existing failure dumps, set `failure_dump.enabled` to false without unsetting the filename option.
 
 Enabling this option compromises security and should only be used for debugging.
 
 
-### `failure_dump.filename` {applies_to}`stack: ga 8.18.0` [_failure_dump_filename]
+### `failure_dump.filename` [_failure_dump_filename]
+
+```{applies_to}
+stack: ga 8.18.0
+```
 
 This specifies a directory path to write failure dumps to. If it is not empty and a CEL program evaluation fails, the complete set of states for the CEL program’s evaluation will be written as a JSON file, along with the error that was reported. This option should only be used when debugging a failure as it imposes a significant performance impact on the input and may potentially use large quantities of memory to hold the full set of states. If a failure dump is configured, it is recommended that data input sizes be reduced to avoid excessive memory consumption, and making dumps that are intractable to analysis. To delete existing failure dumps, set `failure_dump.enabled` to false without unsetting the filename option.
 
 
-### `record_coverage` {applies_to}`stack: ga 8.18.0` [cel-record-coverage]
+### `record_coverage` [cel-record-coverage]
+
+```{applies_to}
+stack: ga 8.18.0
+```
 
 This specifies that CEL code evaluation coverage should be recorded and logged in debug logs. This is a developer-only option.
 
