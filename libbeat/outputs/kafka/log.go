@@ -18,9 +18,8 @@
 package kafka
 
 import (
-	"github.com/Shopify/sarama"
-
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/sarama"
 )
 
 type kafkaLogger struct {
