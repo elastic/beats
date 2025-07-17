@@ -232,28 +232,33 @@ func TestPublish(t *testing.T) {
 	})
 	t.Run("sets otel specific-fields", func(t *testing.T) {
 		testCases := []struct {
-			name                         string
-			componentID                  string
-			existingBeatEventComponentID string
-			expectedComponentID          string
+			name                           string
+			componentID                    string
+			componentKind                  string
+			existingBeatEventComponentID   string
+			existingBeatEventComponentKind string
+			expectedComponentID            string
+			expectedComponentKind          string
 		}{
 			{
-				name:                         "beat component ID is set",
-				componentID:                  "filebeatreceiver/1",
-				existingBeatEventComponentID: "",
-				expectedComponentID:          "filebeatreceiver/1",
+				name:                  "sets beat component ID",
+				componentID:           "filebeatreceiver/1",
+				expectedComponentID:   "filebeatreceiver/1",
+				expectedComponentKind: "receiver",
 			},
 			{
-				name:                         "beat component ID is set, but already exists in the event",
+				name:                         "reuse existing component id and kind in beat event",
 				componentID:                  "filebeatreceiver/1",
-				existingBeatEventComponentID: "existingComponentID",
-				expectedComponentID:          "existingComponentID",
+				existingBeatEventComponentID: "metricbeatreceiver/_agent-component/system/metrics-default",
+				expectedComponentID:          "metricbeatreceiver/_agent-component/system/metrics-default",
+				expectedComponentKind:        "receiver",
 			},
 			{
-				name:                         "reuse existing component ID from beat event",
-				componentID:                  "newComponentID",
-				existingBeatEventComponentID: "existingComponentID",
-				expectedComponentID:          "existingComponentID",
+				name:                           "reuse existing component kind from beat event",
+				componentID:                    "filebeatreceiver/1",
+				expectedComponentID:            "filebeatreceiver/1",
+				existingBeatEventComponentKind: "exporter",
+				expectedComponentKind:          "exporter",
 			},
 		}
 
@@ -270,6 +275,9 @@ func TestPublish(t *testing.T) {
 				if tc.existingBeatEventComponentID != "" {
 					event.Fields[otelComponentIDKey] = tc.existingBeatEventComponentID
 				}
+				if tc.existingBeatEventComponentKind != "" {
+					event.Fields[otelComponentKindKey] = tc.existingBeatEventComponentKind
+				}
 				batch := outest.NewBatch(event)
 				var countLogs int
 				otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
@@ -285,7 +293,7 @@ func TestPublish(t *testing.T) {
 				for _, event := range batch.Events() {
 					beatEvent := event.Content.Fields
 					assert.Equal(t, tc.expectedComponentID, beatEvent[otelComponentIDKey], "expected otelcol.component.id field in log record")
-					assert.Equal(t, "receiver", beatEvent[otelComponentKindKey], "expected otelcol.component.kind field in log record")
+					assert.Equal(t, tc.expectedComponentKind, beatEvent[otelComponentKindKey], "expected otelcol.component.kind field in log record")
 				}
 			})
 		}

@@ -135,7 +135,9 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		if _, exists := beatEvent[otelComponentIDKey]; !exists {
 			beatEvent[otelComponentIDKey] = out.beatInfo.ComponentID
 		}
-		beatEvent[otelComponentKindKey] = "receiver"
+		if _, exists := beatEvent[otelComponentKindKey]; !exists {
+			beatEvent[otelComponentKindKey] = "receiver"
+		}
 
 		otelmap.ConvertNonPrimitive(beatEvent)
 
