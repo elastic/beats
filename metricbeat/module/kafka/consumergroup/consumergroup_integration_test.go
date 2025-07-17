@@ -46,11 +46,7 @@ func TestData(t *testing.T) {
 	)
 	host := service.HostForPort(9092)
 
-<<<<<<< HEAD
-	c, err := startConsumer(t, host, "test-group")
-=======
 	c, err := startConsumer(t, service.HostForPort(9092), "test-group")
->>>>>>> 4942592a8 (Update Beats to the current Sarama fork (#41655))
 	if err != nil {
 		t.Fatal(fmt.Errorf("starting kafka consumer: %w", err))
 	}
