@@ -517,10 +517,7 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 func DefaultECHTestArgs() GoTestArgs {
 	args := makeGoTestArgs("ECH")
 	args.Tags = append(args.Tags, "ech", "integration")
-	if FIPSBuild {
-		args.Tags = append(args.Tags, "requirefips", "ms_tls13kdf")
-	}
-	args.Dir = "testing/fips-ech"
+	args.Dir = "testing/ech"
 
 	// attempt to use absolute paths for filenames
 	path, err := os.Getwd()
