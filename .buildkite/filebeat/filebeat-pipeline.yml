@@ -321,6 +321,7 @@ steps:
       - label: ":ubuntu: Filebeat: FIPS ECH Integration Tests"
         env:
           ASDF_TERRAFORM_VERSION: "1.9.3"
+          ASDF_PYTHON_VERSION: "3.9.13" # Not needed by ECH tests, but needed by VM
         command: |
           .buildkite/scripts/custom_fips_ech_test.sh filebeat
         retry:
