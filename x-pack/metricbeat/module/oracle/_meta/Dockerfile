@@ -1,15 +1,3 @@
-FROM gvenzl/oracle-xe:18-slim
+FROM docker.elastic.co/observability-ci/database-enterprise:12.2.0.1
 
-# Set environment variables
-ENV ORACLE_USERNAME=sys
-ENV ORACLE_PASSWORD=Oradoc_db1
-ENV ORACLE_DATABASE=XE
-
-# Expose Oracle port
-EXPOSE 1521
-
-# Set working directory
-WORKDIR /opt/oracle
-
-HEALTHCHECK --interval=30s --timeout=15s --start-period=60s --retries=5 \
-  CMD echo "SELECT 1 FROM DUAL;" | sqlplus -S ${ORACLE_USERNAME}/${ORACLE_PASSWORD}@//localhost:1521/XE | grep -q "1" || exit 1
+HEALTHCHECK --interval=30s --timeout=15s --start-period=60s --retries=5 CMD /usr/bin/echo 'select 1' | /u01/app/oracle/product/12.2.0/dbhome_1/bin/sqlplus sys/Oradoc_db1@localhost:1521/ORCLPDB1.localdomain AS SYSDBA
