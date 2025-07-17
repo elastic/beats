@@ -9,6 +9,9 @@ sub:
 
 # Common Expression Language input [filebeat-input-cel]
 
+```{applies_to}
+stack: ga 8.6.0
+```
 
 Use the `cel` input to read messages from a file path or HTTP API with a variety of payloads using the [Common Expression Language (CEL)](https://opensource.google.com/projects/cel) and the [mito]({{mito_docs}}/lib) CEL extension libraries.
 
@@ -136,50 +139,56 @@ The CEL input will log the complete state after evaluation when logging at the D
 
 As noted above the `cel` input provides functions, macros, and global variables to extend the language.
 
-* [AWS v4 request signing]({{mito_docs}}@{{mito_version}}/lib#AWS)
+* [AWS v4 request signing]({{mito_docs}}@{{mito_version}}/lib#AWS) {applies_to}`stack: ga 8.19.0`
 
     * [Sign AWS from env]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_env-AWS)
     * [Sign AWS from shared credentials]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_shared_credentials-AWS)
     * [Sign AWS from static credentials]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_static_credentials-AWS)
 
-* [Collections]({{mito_docs}}@{{mito_version}}/lib#Collections)
+* [Collections]({{mito_docs}}@{{mito_version}}/lib#Collections) {applies_to}`stack: ga 8.6.0`
 
     * [Collate]({{mito_docs}}@{{mito_version}}/lib#hdr-Collate-Collections)
     * [Drop]({{mito_docs}}@{{mito_version}}/lib#hdr-Drop-Collections)
     * [Drop Empty]({{mito_docs}}@{{mito_version}}/lib#hdr-Drop_Empty-Collections)
     * [Flatten]({{mito_docs}}@{{mito_version}}/lib#hdr-Flatten-Collections)
-    * [Front]({{mito_docs}}@{{mito_version}}/lib#hdr-Front-Collections)
-    * [Keys]({{mito_docs}}@{{mito_version}}/lib#hdr-Keys-Collections)
+    * [Front]({{mito_docs}}@{{mito_version}}/lib#hdr-Front-Collections) {applies_to}`stack: ga 8.18.0`
+    * [Keys]({{mito_docs}}@{{mito_version}}/lib#hdr-Keys-Collections) {applies_to}`stack: ga 8.13.0`
     * [Max]({{mito_docs}}@{{mito_version}}/lib#hdr-Max-Collections)
+        * list maximum
+        * pair maximum {applies_to}`stack: ga 8.18.0`
     * [Min]({{mito_docs}}@{{mito_version}}/lib#hdr-Min-Collections)
-    * [Sum]({{mito_docs}}@{{mito_version}}/lib#hdr-Sum-Collections)
+        * list minimum
+        * pair minimum {applies_to}`stack: ga 8.18.0`
+    * [Sum]({{mito_docs}}@{{mito_version}}/lib#hdr-Sum-Collections) {applies_to}`stack: ga 8.18.0`
     * [Tail]({{mito_docs}}@{{mito_version}}/lib#hdr-Tail-Collections)
-    * [Values]({{mito_docs}}@{{mito_version}}/lib#hdr-Values-Collections)
+        * one parameter {applies_to}`stack: ga 8.15.0`
+        * two parameter {applies_to}`stack: ga 8.18.0`
+    * [Values]({{mito_docs}}@{{mito_version}}/lib#hdr-Values-Collections) {applies_to}`stack: ga 8.13.0`
     * [With]({{mito_docs}}@{{mito_version}}/lib#hdr-With-Collections)
     * [With Replace]({{mito_docs}}@{{mito_version}}/lib#hdr-With_Replace-Collections)
     * [With Update]({{mito_docs}}@{{mito_version}}/lib#hdr-With_Update-Collections)
-    * [Zip]({{mito_docs}}@{{mito_version}}/lib#hdr-Zip-Collections)
+    * [Zip]({{mito_docs}}@{{mito_version}}/lib#hdr-Zip-Collections) {applies_to}`stack: ga 8.9.2`
 
-* [Crypto]({{mito_docs}}@{{mito_version}}/lib#Crypto)
+* [Crypto]({{mito_docs}}@{{mito_version}}/lib#Crypto) {applies_to}`stack: ga 8.6.0`
 
     * [Base64]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64-Crypto)
-    * [Base64 Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Decode-Crypto)
+    * [Base64 Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Decode-Crypto) {applies_to}`stack: ga 8.14.0`
     * [Base64 Raw]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Raw-Crypto)
-    * [Base64 Raw Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Raw_Decode-Crypto)
+    * [Base64 Raw Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Raw_Decode-Crypto) {applies_to}`stack: ga 8.14.0`
     * [Hex]({{mito_docs}}@{{mito_version}}/lib#hdr-Hex-Crypto)
-    * [Hex Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Hex_Decode-Crypto)
+    * [Hex Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Hex_Decode-Crypto) {applies_to}`stack: ga 8.18.1`
     * [MD5]({{mito_docs}}@{{mito_version}}/lib#hdr-MD5-Crypto)
     * [SHA-1]({{mito_docs}}@{{mito_version}}/lib#hdr-SHA_1-Crypto)
     * [SHA-256]({{mito_docs}}@{{mito_version}}/lib#hdr-SHA_256-Crypto)
     * [HMAC]({{mito_docs}}@{{mito_version}}/lib#hdr-HMAC-Crypto)
     * [UUID]({{mito_docs}}@{{mito_version}}/lib#hdr-UUID-Crypto)
 
-* [File]({{mito_docs}}@{{mito_version}}/lib#File) — the file extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader).
+* [File]({{mito_docs}}@{{mito_version}}/lib#File) — the file extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader). {applies_to}`stack: ga 8.6.0`
 
     * [Dir]({{mito_docs}}@{{mito_version}}/lib#hdr-Dir-File)
     * [File]({{mito_docs}}@{{mito_version}}/lib#hdr-File-File)
 
-* [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP)
+* [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) {applies_to}`stack: ga 8.6.0`
 
     * [HEAD]({{mito_docs}}@{{mito_version}}/lib#hdr-HEAD-HTTP)
     * [GET]({{mito_docs}}@{{mito_version}}/lib#hdr-GET-HTTP)
@@ -187,32 +196,33 @@ As noted above the `cel` input provides functions, macros, and global variables 
     * [POST]({{mito_docs}}@{{mito_version}}/lib#hdr-POST-HTTP)
     * [POST Request]({{mito_docs}}@{{mito_version}}/lib#hdr-POST_Request-HTTP)
     * [Request]({{mito_docs}}@{{mito_version}}/lib#hdr-Request-HTTP)
-    * [Basic Authentication]({{mito_docs}}@{{mito_version}}/lib#hdr-Basic_Authentication-HTTP)
+    * [Basic Authentication]({{mito_docs}}@{{mito_version}}/lib#hdr-Basic_Authentication-HTTP) {applies_to}`stack: ga 8.7.0`
     * [Do Request]({{mito_docs}}@{{mito_version}}/lib#hdr-Do_Request-HTTP)
     * [Parse URL]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_URL-HTTP)
     * [Format URL]({{mito_docs}}@{{mito_version}}/lib#hdr-Format_URL-HTTP)
     * [Parse Query]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_Query-HTTP)
     * [Format Query]({{mito_docs}}@{{mito_version}}/lib#hdr-Format_Query-HTTP)
 
-* [JSON]({{mito_docs}}@{{mito_version}}/lib#JSON)
+* [JSON]({{mito_docs}}@{{mito_version}}/lib#JSON) {applies_to}`stack: ga 8.6.0`
 
     * [Encode JSON]({{mito_docs}}@{{mito_version}}/lib#hdr-Encode_JSON-JSON)
     * [Decode JSON]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_JSON-JSON)
     * [Decode JSON Stream]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_JSON_Stream-JSON)
 
-* [XML]({{mito_docs}}@{{mito_version}}/lib#XML) — the XML extension is initialized with XML schema definitions provided via the `xsd` configuration option.
+* [XML]({{mito_docs}}@{{mito_version}}/lib#XML) — the XML extension is initialized with XML schema definitions provided via the `xsd` configuration option.  {applies_to}`stack: ga 8.9.0`
 
     * [Decode XML]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_XML-XML)
+        * Optional XSD definition in one-parameter form. {applies_to}`stack: ga 8.18.1`
 
-* [Limit]({{mito_docs}}@{{mito_version}}/lib#Limit) — the rate limit extension is initialized with [Okta (as "okta")]({{mito_docs}}@{{mito_version}}/lib#OktaRateLimit) and the [Draft Rate Limit (as "draft")]({{mito_docs}}@{{mito_version}}/lib#DraftRateLimit) policies.
+* [Limit]({{mito_docs}}@{{mito_version}}/lib#Limit) — the rate limit extension is initialized with [Okta (as "okta")]({{mito_docs}}@{{mito_version}}/lib#OktaRateLimit) and the [Draft Rate Limit (as "draft")]({{mito_docs}}@{{mito_version}}/lib#DraftRateLimit) policies. {applies_to}`stack: ga 8.6.0`
 
     * [Rate Limit]({{mito_docs}}@{{mito_version}}/lib#hdr-Rate_Limit-Limit)
 
-* [MIME]({{mito_docs}}@{{mito_version}}/lib#MIME) — the MIME extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader).
+* [MIME]({{mito_docs}}@{{mito_version}}/lib#MIME) — the MIME extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader). {applies_to}`stack: ga 8.6.0`
 
     * [MIME]({{mito_docs}}@{{mito_version}}/lib#hdr-MIME-MIME)
 
-* [Regexp]({{mito_docs}}@{{mito_version}}/lib#Regexp) — the regular expression extension is initialized with the patterns specified in the user input configuration via the `regexp` field.
+* [Regexp]({{mito_docs}}@{{mito_version}}/lib#Regexp) — the regular expression extension is initialized with the patterns specified in the user input configuration via the `regexp` field. {applies_to}`stack: ga 8.6.0`
 
     * [RE Match]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Match)
     * [RE Find]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Find)
@@ -225,24 +235,26 @@ As noted above the `cel` input provides functions, macros, and global variables 
 
     * [Sprintf]({{mito_docs}}@{{mito_version}}/lib#hdr-Sprintf-Printf)
 
-* [Strings]({{mito_docs}}@{{mito_version}}/lib#Strings)
+* [Strings]({{mito_docs}}@{{mito_version}}/lib#Strings) {applies_to}`stack: ga 8.7.0`
 
     * [String Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-String_Methods-Strings)
     * [String List Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-String_List_Methods-Strings)
-    * [Bytes Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-Bytes_Methods-Strings)
+    * [Bytes Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-Bytes_Methods-Strings) {applies_to}`stack: ga 8.15.0`
 
-* [Time]({{mito_docs}}@{{mito_version}}/lib#Time)
+* [Time]({{mito_docs}}@{{mito_version}}/lib#Time) {applies_to}`stack: ga 8.6.0`
 
     * [Format]({{mito_docs}}@{{mito_version}}/lib#hdr-Format-Time)
     * [Parse Time]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_Time-Time)
+    * [Round]({{mito_docs}}@{{mito_version}}/lib#hdr-Round-Time) {applies_to}`stack: ga 8.19.0`
     * [Global Variables]({{mito_docs}}@{{mito_version}}/lib#hdr-Global_Variables-Time)
+        * Support for [`DateOnly`](https://pkg.go.dev/time#DateOnly), [`DateTime`](https://pkg.go.dev/time#DateTime) and [`TimeOnly`](https://pkg.go.dev/time#TimeOnly) time formats. {applies_to}`stack: ga 8.15.0`
 
-* [Try]({{mito_docs}}@{{mito_version}}/lib#Try)
+* [Try]({{mito_docs}}@{{mito_version}}/lib#Try) {applies_to}`stack: ga 8.6.0`
 
     * [Try]({{mito_docs}}@{{mito_version}}/lib#hdr-Try-Try)
     * [Is Error]({{mito_docs}}@{{mito_version}}/lib#hdr-Is_Error-Try)
 
-* [Debug]({{mito_docs}}@{{mito_version}}/lib#Debug) — the debug handler registers a logger with the name extension `cel_debug` and calls to the CEL `debug` function are emitted to that logger.
+* [Debug]({{mito_docs}}@{{mito_version}}/lib#Debug) — the debug handler registers a logger with the name extension `cel_debug` and calls to the CEL `debug` function are emitted to that logger. {applies_to}`stack: ga 8.10.3`
 
     * [Debug]({{mito_docs}}@{{mito_version}}/lib#hdr-Debug)
 
@@ -253,7 +265,15 @@ Host environment variables are made available via the global map `env`. Only env
 
 The CEL environment enables the [optional types](https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#OptionalTypesVersion) and the [two-variable comprehensions extensions](https://pkg.go.dev/github.com/google/cel-go/ext#TwoVarComprehensions) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#TwoVarComprehensionVersion).
 
-Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2, or token authentication.
+* Optional types {applies_to}`stack: ga 8.12.0`
+* Two-variable comprehensions {applies_to}`stack: ga 8.19.0`
+
+Additionally, it supports authentication via:
+
+* Basic Authentication
+* Digest Authentication {applies_to}`stack: ga 8.12.0`
+* OAuth2
+* token authentication
 
 Example configurations with authentication:
 
@@ -389,7 +409,7 @@ filebeat.inputs:
 ```
 
 
-## `allowed_environment` [environ-cel]
+### `allowed_environment` {applies_to}`stack: ga 8.16.0` [environ-cel]
 
 A list of host environment variable that will be made visible to the CEL execution environment. By default, no environment variables are visible.
 
@@ -428,7 +448,7 @@ filebeat.inputs:
 ```
 
 
-### `xsd` [xsd-cel]
+### `xsd` {applies_to}`stack: ga 8.9.0` [xsd-cel]
 
 XML documents may require additional type information to enable correct parsing and ingestion. This information can be provided as an XML Schema Definitions (XSD) for XML documents using the `xsd` option. The key under which the XSD information is provided is accessed via the `decode_xml` CEL extension.
 
@@ -449,6 +469,8 @@ filebeat.inputs:
                      <xs:element name="name" type="xs:string"/>
                      <xs:element name="company" type="xs:string"/>
 ```
+
+The `xsd` for an XML document structure may be omitted. {applies_to}`stack: ga 8.18.1`
 
 
 ### `auth.basic.enabled` [_auth_basic_enabled]
@@ -471,7 +493,7 @@ The user to authenticate with.
 The password to use.
 
 
-### `auth.digest.enabled` [_auth_digest_enabled]
+### `auth.digest.enabled` {applies_to}`stack: ga 8.12.0` [_auth_digest_enabled]
 
 When set to `false`, disables the digest auth configuration. Default: `true`.
 
@@ -481,17 +503,17 @@ digest auth settings are disabled if either `enabled` is set to `false` or the `
 
 
 
-### `auth.digest.user` [_auth_digest_user]
+### `auth.digest.user` {applies_to}`stack: ga 8.12.0` [_auth_digest_user]
 
 The user to authenticate with.
 
 
-### `auth.digest.password` [_auth_digest_password]
+### `auth.digest.password` {applies_to}`stack: ga 8.12.0` [_auth_digest_password]
 
 The password to use.
 
 
-### `auth.digest.no_reuse` [_auth_digest_no_reuse]
+### `auth.digest.no_reuse` {applies_to}`stack: ga 8.12.0` [_auth_digest_no_reuse]
 
 When set to `true`, Digest Authentication challenges are not reused.
 
@@ -682,7 +704,7 @@ The URL of the HTTP API. Required.
 The API endpoint may be accessed via unix socket and Windows named pipes by adding  `+unix` or `+npipe` to the URL scheme, for example, `http+unix:///var/socket/`.
 
 
-### `resource.headers` [_resource_headers]
+### `resource.headers` {applies_to}`stack: ga 8.18.1` [_resource_headers]
 
 Headers to be added to all requests. Headers are added before authentication headers, so any collision between headers in this configuration and authentication headers will result in the colliding headers here not being included in requests. Header values must be provided as an array.
 
@@ -782,7 +804,7 @@ When `redirect.forward_headers` is set to `true`, all headers *except* the ones 
 The maximum number of redirects to follow for a request. Default: `10`.
 
 
-### `resource.max_body_size` [_resource_max_body_size]
+### `resource.max_body_size` {applies_to}`stack: ga 8.18.1` [_resource_max_body_size]
 
 The maximum size of a response body that will be accepted by the client if non-zero. Bodies that are too large will result in an error, "response body too big". Default: `0`.
 
@@ -801,12 +823,14 @@ The maximum burst size. Burst is the maximum number of resource requests that ca
 
 It is possible to log HTTP requests and responses in a CEL program to a local file-system for debugging configurations. This option is enabled by setting `resource.tracer.enabled` to true and setting the `resource.tracer.filename` value. Additional options are available to tune log rotation behavior. To delete existing logs, set `resource.tracer.enabled` to false without unsetting the filename option.
 
-Enabling this option compromises security and should only be used for debugging.
+Enabling this option compromises security and should only be used for debugging. {applies_to}`stack: ga 8.15.0`
 
 
 ### `resource.tracer.filename` [_resource_tracer_filename]
 
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. Setting `resource.tracer.filename` with `resource.tracer.enable` set to false will cause any existing trace logs matching the filename option to be deleted.
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+
+Setting `resource.tracer.filename` with `resource.tracer.enable` set to false will cause any existing trace logs matching the filename option to be deleted. {applies_to}`stack: ga 8.15.0`
 
 
 ### `resource.tracer.maxsize` [_resource_tracer_maxsize]
@@ -834,7 +858,7 @@ Whether to use the host’s local time rather that UTC for timestamping rotated 
 This determines whether rotated logs should be gzip compressed.
 
 
-### `redact` [cel-state-redact]
+### `redact` {applies_to}`stack: ga 8.7.0` [cel-state-redact]
 
 During debug level logging, the `state` object and the resulting evaluation result are included in logs. This may result in leaking of secrets. In order to prevent this, fields may be redacted or deleted from the logged `state`. The `redact` configuration allows users to configure this field redaction behavior. For safety reasons if the `redact` configuration is missing a warning is logged.
 
@@ -874,19 +898,19 @@ This specifies fields in the `state` to be redacted prior to debug logging. Fiel
 This specifies whether fields should be replaced with a `*` or deleted entirely from messages sent to debug logs. If delete is `true`, fields will be deleted rather than replaced.
 
 
-### `failure_dump.enabled` [_failure_dump_enabled]
+### `failure_dump.enabled` {applies_to}`stack: ga 8.18.0` [_failure_dump_enabled]
 
 It is possible to log CEL program evaluation failures to a local file-system for debugging configurations. This option is enabled by setting `failure_dump.enabled` to true and setting the `failure_dump.filename` value. To delete existing failure dumps, set `failure_dump.enabled` to false without unsetting the filename option.
 
 Enabling this option compromises security and should only be used for debugging.
 
 
-### `failure_dump.filename` [_failure_dump_filename]
+### `failure_dump.filename` {applies_to}`stack: ga 8.18.0` [_failure_dump_filename]
 
 This specifies a directory path to write failure dumps to. If it is not empty and a CEL program evaluation fails, the complete set of states for the CEL program’s evaluation will be written as a JSON file, along with the error that was reported. This option should only be used when debugging a failure as it imposes a significant performance impact on the input and may potentially use large quantities of memory to hold the full set of states. If a failure dump is configured, it is recommended that data input sizes be reduced to avoid excessive memory consumption, and making dumps that are intractable to analysis. To delete existing failure dumps, set `failure_dump.enabled` to false without unsetting the filename option.
 
 
-### `record_coverage` [cel-record-coverage]
+### `record_coverage` {applies_to}`stack: ga 8.18.0` [cel-record-coverage]
 
 This specifies that CEL code evaluation coverage should be recorded and logged in debug logs. This is a developer-only option.
 
