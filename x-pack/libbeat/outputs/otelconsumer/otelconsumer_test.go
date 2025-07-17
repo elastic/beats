@@ -231,32 +231,63 @@ func TestPublish(t *testing.T) {
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 	})
 	t.Run("sets otel specific-fields", func(t *testing.T) {
-		for _, wantCompID := range []string{"", "filebeatreceiver/1"} {
-			event1 := beat.Event{Fields: mapstr.M{"field": 1}}
-			batch := outest.NewBatch(event1)
-			var countLogs int
-			otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
-				countLogs = countLogs + ld.LogRecordCount()
-				return nil
-			})
-			otelConsumer.beatInfo.ComponentID = wantCompID
+		testCases := []struct {
+			name                         string
+			componentID                  string
+			existingBeatEventComponentID string
+			expectedComponentID          string
+		}{
+			{
+				name:                         "beat component ID is set",
+				componentID:                  "filebeatreceiver/1",
+				existingBeatEventComponentID: "",
+				expectedComponentID:          "filebeatreceiver/1",
+			},
+			{
+				name:                         "beat component ID is set, but already exists in the event",
+				componentID:                  "filebeatreceiver/1",
+				existingBeatEventComponentID: "existingComponentID",
+				expectedComponentID:          "existingComponentID",
+			},
+			{
+				name:                         "reuse existing component ID from beat event",
+				componentID:                  "newComponentID",
+				existingBeatEventComponentID: "existingComponentID",
+				expectedComponentID:          "existingComponentID",
+			},
+		}
 
-			err := otelConsumer.Publish(ctx, batch)
-			assert.NoError(t, err)
-			assert.Len(t, batch.Signals, 1)
-			assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
-			assert.Equal(t, len(batch.Events()), countLogs, "all events should be consumed")
-
-			for _, event := range batch.Events() {
-				beatEvent := event.Content.Fields
-				if wantCompID == "" {
-					assert.NotContains(t, event.Content.Fields, otelComponentIDKey, otelComponentIDKey+" should not be set")
-					assert.NotContains(t, event.Content.Fields, otelComponentKindKey, otelComponentKindKey+" should not be set")
-				} else {
-					assert.Equal(t, otelConsumer.beatInfo.ComponentID, beatEvent[otelComponentIDKey], otelComponentIDKey+" should be set")
-					assert.Equal(t, "receiver", beatEvent[otelComponentKindKey], otelComponentKindKey+" should be set")
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				event := beat.Event{
+					Fields: mapstr.M{
+						"field": 1,
+					},
+					Meta: mapstr.M{
+						"_id": "abc123",
+					},
 				}
-			}
+				if tc.existingBeatEventComponentID != "" {
+					event.Fields[otelComponentIDKey] = tc.existingBeatEventComponentID
+				}
+				batch := outest.NewBatch(event)
+				var countLogs int
+				otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+					countLogs = countLogs + ld.LogRecordCount()
+					return nil
+				})
+				otelConsumer.beatInfo.ComponentID = tc.componentID
+				err := otelConsumer.Publish(ctx, batch)
+				assert.NoError(t, err)
+				assert.Len(t, batch.Signals, 1)
+				assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+				assert.Equal(t, len(batch.Events()), countLogs, "all events should be consumed")
+				for _, event := range batch.Events() {
+					beatEvent := event.Content.Fields
+					assert.Equal(t, tc.expectedComponentID, beatEvent[otelComponentIDKey], "expected otelcol.component.id field in log record")
+					assert.Equal(t, "receiver", beatEvent[otelComponentKindKey], "expected otelcol.component.kind field in log record")
+				}
+			})
 		}
 	})
 }
