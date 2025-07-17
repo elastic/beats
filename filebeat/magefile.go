@@ -214,10 +214,5 @@ func PythonIntegTest(ctx context.Context) error {
 // FipsECH test runs a smoke test using the FIPS enabled binary targetting an ECH deployment.
 func FipsECHTest(ctx context.Context) error {
 	mg.Deps(Build)
-	args := devtools.DefaultGoTestIntegrationArgs()
-	args.Tags = []string{"ech", "requirefips"} // set to just the tags the tests need
-	args.Dir = "testing/fips-ech"
-	args.OutputFile = "../../" + args.OutputFile
-	args.JUnitReportFile = "../../" + args.JUnitReportFile
-	return devtools.GoTest(ctx, args)
+	return devtools.GoTest(ctx, devtools.DefaultECHTestArgs())
 }

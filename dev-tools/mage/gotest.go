@@ -513,3 +513,26 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 	}()
 	return sh.RunV("go", args...)
 }
+
+func DefaultECHTestArgs() GoTestArgs {
+	args := makeGoTestArgs("ECH")
+	args.Tags = append(args.Tags, "ech", "integration")
+	if FIPSBuild {
+		args.Tags = append(args.Tags, "requirefips", "ms_tls13kdf")
+	}
+	args.Dir = "testing/fips-ech"
+
+	// attempt to use absolute paths for filenames
+	path, err := os.Getwd()
+	if err != nil {
+		log.Printf("Unable to get working dir, using value: .")
+		path = "."
+	}
+	fileName := path + "/build/TEST-go-ech"
+	args.OutputFile = fileName + ".out"
+	args.JUnitReportFile = fileName + ".xml"
+	if TestCoverage {
+		args.CoverageProfileFile = fileName + ".cov"
+	}
+	return args
+}

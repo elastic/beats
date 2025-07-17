@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source .buildkite/scripts/common.sh
 source .buildkite/scripts/ech.sh
 
 BEAT_PATH=$1
