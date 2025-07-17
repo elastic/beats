@@ -228,8 +228,7 @@ func TestPostgreSQL(t *testing.T) {
 
 func TestOracle(t *testing.T) {
 	service := compose.EnsureUp(t, "oracle")
-	_, port, _ := net.SplitHostPort(service.Host())
-	host := "127.0.0.1"
+	host, port, _ := net.SplitHostPort(service.Host())
 
 	// Wait for Oracle to be ready instead of sleeping for 300 seconds
 	waitForOracleConnection(t, host, port)
