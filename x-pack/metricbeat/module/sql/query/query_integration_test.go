@@ -362,7 +362,7 @@ func GetOracleConnectString(host string, port string) string {
 
 // waitForOracleConnection waits for Oracle service to be ready with exponential backoff
 func waitForOracleConnection(t *testing.T, host, port string) {
-	maxRetries := 15
+	maxRetries := 30
 	baseDelay := 2 * time.Second
 
 	for i := 0; i < maxRetries; i++ {
@@ -371,7 +371,7 @@ func waitForOracleConnection(t *testing.T, host, port string) {
 		if err == nil {
 			conn.Close()
 			// Give Oracle a bit more time to fully initialize
-			time.Sleep(2 * time.Second)
+			time.Sleep(120 * time.Second)
 			return
 		}
 
