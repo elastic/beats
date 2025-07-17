@@ -21396,11 +21396,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/pierrec/lz4/v4
-Version: v4.1.18
+Version: v4.1.21
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/pierrec/lz4/v4@v4.1.18/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/pierrec/lz4/v4@v4.1.21/LICENSE:
 
 Copyright (c) 2015, Pierre Curto
 All rights reserved.
@@ -45451,11 +45451,13 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 --------------------------------------------------------------------------------
 Dependency : github.com/hashicorp/go-uuid
-Version: v1.0.2
+Version: v1.0.3
 Licence type (autodetected): MPL-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/hashicorp/go-uuid@v1.0.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/hashicorp/go-uuid@v1.0.3/LICENSE:
+
+Copyright © 2015-2022 HashiCorp, Inc.
 
 Mozilla Public License, version 2.0
 
@@ -46890,11 +46892,11 @@ Contents of probable licence file $GOMODCACHE/github.com/jcmturner/dnsutils/v2@v
 
 --------------------------------------------------------------------------------
 Dependency : github.com/jcmturner/gofork
-Version: v1.0.0
+Version: v1.7.6
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/jcmturner/gofork@v1.0.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/jcmturner/gofork@v1.7.6/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -47138,11 +47140,11 @@ Contents of probable licence file $GOMODCACHE/github.com/jcmturner/goidentity/v6
 
 --------------------------------------------------------------------------------
 Dependency : github.com/jcmturner/gokrb5/v8
-Version: v8.4.2
+Version: v8.4.4
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/jcmturner/gokrb5/v8@v8.4.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/jcmturner/gokrb5/v8@v8.4.4/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
