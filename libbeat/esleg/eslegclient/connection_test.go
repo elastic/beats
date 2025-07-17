@@ -302,13 +302,14 @@ func startTLSServer(t *testing.T) *httptest.Server {
 	// Create HTTPS server
 	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write(esPingResponse)
+		w.Write(esPingResponse) //nolint:errcheck // used in tests
 	}))
 
 	serverCert, err := tls.X509KeyPair(serverCertPEM, serverKeyPEM)
 	require.NoError(t, err)
 
 	server.TLS = &tls.Config{
+		MinVersion:   tls.VersionTLS12,
 		RootCAs:      caCertPool,
 		Certificates: []tls.Certificate{serverCert},
 		ClientCAs:    caCertPool,
