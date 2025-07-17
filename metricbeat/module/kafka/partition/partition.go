@@ -21,13 +21,12 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Shopify/sarama"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/kafka"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/sarama"
 )
 
 // init registers the partition MetricSet with the central registry.
@@ -125,7 +124,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 						err = errFailQueryOffset
 					}
 
-					msg := fmt.Errorf("Failed to query kafka partition (%v:%v) offsets: %v",
+					msg := fmt.Errorf("failed to query kafka partition (%v:%v) offsets: %w",
 						topic.Name, partition.ID, err)
 					m.Logger().Warn(msg)
 					r.Error(msg)

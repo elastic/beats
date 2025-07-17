@@ -25,7 +25,7 @@ import (
 	"testing"
 	"time"
 
-	saramacluster "github.com/bsm/sarama-cluster"
+	"github.com/elastic/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -46,7 +46,7 @@ func TestData(t *testing.T) {
 	)
 	host := service.HostForPort(9092)
 
-	c, err := startConsumer(t, host, "test-group")
+	c, err := startConsumer(t, service.HostForPort(9092), "test-group")
 	if err != nil {
 		t.Fatal(fmt.Errorf("starting kafka consumer: %w", err))
 	}
@@ -69,7 +69,7 @@ func TestFetch(t *testing.T) {
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
 
-	c, err := startConsumer(t, service.HostForPort(9092), "metricbeat-test")
+	c, err := startConsumer(t, service.HostForPort(9092), "test-group")
 	if err != nil {
 		t.Fatal(fmt.Errorf("starting kafka consumer: %w", err))
 	}
@@ -94,10 +94,10 @@ func TestFetch(t *testing.T) {
 	}
 }
 
-func startConsumer(t *testing.T, host string, topic string) (io.Closer, error) {
+func startConsumer(t *testing.T, host string, groupID string) (io.Closer, error) {
 	brokers := []string{host}
-	topics := []string{topic}
-	config := saramacluster.NewConfig()
+
+	config := sarama.NewConfig()
 	config.Net.SASL.Enable = true
 	config.Net.SASL.User = kafkaSASLConsumerUsername
 	config.Net.SASL.Password = kafkaSASLConsumerPassword
