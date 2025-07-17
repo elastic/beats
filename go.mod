@@ -70,12 +70,12 @@ require (
 	github.com/elastic/go-sysinfo v1.15.3
 	github.com/elastic/go-ucfg v0.8.8
 	github.com/elastic/gosigar v0.14.3
-	github.com/fatih/color v1.16.0
+	github.com/fatih/color v1.16.0 // indirect
 	github.com/fearful-symmetry/gorapl v0.0.4
 	github.com/fsnotify/fsevents v0.1.1
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
-	github.com/go-sql-driver/mysql v1.6.0
+	github.com/go-sql-driver/mysql v1.9.3
 	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 	github.com/godbus/dbus/v5 v5.1.0
 	github.com/godror/godror v0.33.2
@@ -98,7 +98,7 @@ require (
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/lib/pq v1.10.3
 	github.com/magefile/mage v1.15.0
-	github.com/mattn/go-colorable v0.1.13
+	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/miekg/dns v1.1.65
 	github.com/mitchellh/gox v1.0.1
 	github.com/mitchellh/hashstructure v1.1.0
@@ -152,7 +152,7 @@ require (
 	cloud.google.com/go/compute v1.29.0
 	cloud.google.com/go/redis v1.17.2
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.18.0
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.9.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.10.1
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.3.1
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
@@ -202,7 +202,7 @@ require (
 	github.com/jcmturner/gokrb5/v8 v8.4.4
 	github.com/klauspost/compress v1.18.0
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
-	github.com/microsoft/go-mssqldb v1.8.2
+	github.com/microsoft/go-mssqldb v1.9.2
 	github.com/microsoft/wmi v0.25.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.129.0
 	github.com/otiai10/copy v1.12.0
@@ -251,6 +251,7 @@ require (
 	cloud.google.com/go/iam v1.2.2 // indirect
 	cloud.google.com/go/longrunning v0.6.2 // indirect
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/Azure/azure-amqp-common-go/v4 v4.2.0 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.3 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.11.1 // indirect
