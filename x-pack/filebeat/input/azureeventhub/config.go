@@ -116,6 +116,7 @@ func defaultConfig() azureInputConfig {
 
 // Validate validates the config.
 func (conf *azureInputConfig) Validate() error {
+	logger := logp.NewLogger("azureeventhub.config")
 	if conf.ConnectionString == "" {
 		return errors.New("no connection string configured")
 	}
@@ -129,6 +130,20 @@ func (conf *azureInputConfig) Validate() error {
 		conf.SAContainer = fmt.Sprintf("%s-%s", ephContainerName, conf.EventHubName)
 	}
 
+	if strings.Contains(conf.SAContainer, "_") {
+		originalValue := conf.SAContainer
+		// When a user specifies an event hub name in the input settings,
+		// the configuration uses it to compose the storage account (SA) container
+		// name (for example, `filebeat-<DATA-STREAM>-<EVENTHUB>`).
+		//
+		// The event hub allows names with underscores (_) characters, but unfortunately,
+		// the SA container does not permit them.
+		//
+		// So instead of throwing an error to the user, we decided to replace
+		// underscores (_) characters with hyphens (-).
+		conf.SAContainer = strings.ReplaceAll(conf.SAContainer, "_", "-")
+		logger.Warnf("replaced underscores (_) with hyphens (-) in the storage account container name (before: %s, now: %s", originalValue, c.SAContainer)
+	}
 	err := storageContainerValidate(conf.SAContainer)
 	if err != nil {
 		return err
@@ -176,21 +191,6 @@ func (conf *azureInputConfig) Validate() error {
 // checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
 func (c *azureInputConfig) checkUnsupportedParams(logger *logp.Logger) {
 	logger = logger.Named("azureeventhub.config")
-
-	if strings.Contains(c.SAContainer, "_") {
-		originalValue := c.SAContainer
-		// When a user specifies an event hub name in the input settings,
-		// the configuration uses it to compose the storage account (SA) container
-		// name (for example, `filebeat-<DATA-STREAM>-<EVENTHUB>`).
-		//
-		// The event hub allows names with underscores (_) characters, but unfortunately,
-		// the SA container does not permit them.
-		//
-		// So instead of throwing an error to the user, we decided to replace
-		// underscores (_) characters with hyphens (-).
-		c.SAContainer = strings.ReplaceAll(c.SAContainer, "_", "-")
-		logger.Warnf("replaced underscores (_) with hyphens (-) in the storage account container name (before: %s, now: %s", originalValue, c.SAContainer)
-	}
 
 	// log a warning for each sanitization option not supported
 	for _, opt := range c.LegacySanitizeOptions {
