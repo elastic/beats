@@ -18,11 +18,10 @@
 package consumergroup
 
 import (
-	"github.com/Shopify/sarama"
-
 	"github.com/elastic/beats/v7/metricbeat/module/kafka"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/sarama"
 )
 
 type client interface {
