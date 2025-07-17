@@ -60,6 +60,14 @@ retry() {
     return 0
 }
 
+with_mage() {
+    create_workspace
+    go install github.com/magefile/mage # uses go.mod implicitly
+    mage -clean
+    mage -version
+    which mage
+}
+
 with_Terraform() {
     echo "Setting up the Terraform environment..."
     local path_to_file="${WORKSPACE}/terraform.zip"

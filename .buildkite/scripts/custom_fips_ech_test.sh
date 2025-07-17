@@ -12,6 +12,7 @@ if [ -z "$BEAT_PATH" ]; then
 fi
 
 add_bin_path
+with_mage
 with_Terraform
 
 cleanup() {

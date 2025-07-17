@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build integration && requirefips
+//go:build ech && requirefips
 
 package fips
 
