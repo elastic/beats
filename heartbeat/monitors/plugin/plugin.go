@@ -18,6 +18,7 @@
 package plugin
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sort"
@@ -41,7 +42,7 @@ type PluginFactory struct {
 	Stats   RegistryRecorder
 }
 
-type PluginMake func(string, *conf.C) (p Plugin, err error)
+type PluginMake func(string, context.Context, *conf.C) (p Plugin, err error)
 
 // Plugin describes a configured instance of a plug-in with its jobs already instantiated.
 type Plugin struct {
@@ -204,6 +205,6 @@ func (r *PluginsReg) MonitorNames() []string {
 	return names
 }
 
-func (e *PluginFactory) Create(cfg *conf.C) (p Plugin, err error) {
-	return e.Make(e.Name, cfg)
+func (e *PluginFactory) Create(ctx context.Context, cfg *conf.C) (p Plugin, err error) {
+	return e.Make(e.Name, ctx, cfg)
 }

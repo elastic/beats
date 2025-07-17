@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -86,7 +87,7 @@ func (m *Monitor) String() string {
 }
 
 func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg) error {
-	_, err := newMonitor(config, registrar, nil, nil, monitorstate.NilStateLoader, nil)
+	_, err := newMonitor(context.TODO(), config, registrar, nil, nil, monitorstate.NilStateLoader, nil)
 
 	return err
 }
@@ -94,6 +95,7 @@ func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg) error {
 // newMonitor creates a new monitor, without leaking resources in the event of an error.
 // you do not need to call Stop(), it will be safely garbage collected unless Start is called.
 func newMonitor(
+	ctx context.Context,
 	config *conf.C,
 	registrar *plugin.PluginsReg,
 	pubClient beat.Client,
@@ -101,7 +103,7 @@ func newMonitor(
 	stateLoader monitorstate.StateLoader,
 	onStop func(*Monitor),
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, stateLoader, onStop)
+	m, err := newMonitorUnsafe(ctx, config, registrar, pubClient, taskAdder, stateLoader, onStop)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -111,6 +113,7 @@ func newMonitor(
 // newMonitorUnsafe is the unsafe way of creating a new monitor because it may return a monitor instance along with an
 // error without freeing monitor resources. m.Stop() must always be called on a non-nil monitor to free resources.
 func newMonitorUnsafe(
+	ctx context.Context,
 	config *conf.C,
 	registrar *plugin.PluginsReg,
 	pubClient beat.Client,
@@ -153,7 +156,7 @@ func newMonitorUnsafe(
 		m.stdFields.ID = fmt.Sprintf("auto-%s-%#X", m.stdFields.Type, hash)
 	}
 
-	p, err := pluginFactory.Create(config)
+	p, err := pluginFactory.Create(ctx, config)
 
 	m.close = func() error {
 		if onStop != nil {

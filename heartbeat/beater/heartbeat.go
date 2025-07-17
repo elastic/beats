@@ -48,9 +48,10 @@ import (
 
 // Heartbeat represents the root datastructure of this beat.
 type Heartbeat struct {
-	done     chan struct{}
-	stopping chan struct{}
-	stopOnce sync.Once
+	done       chan struct{}
+	stopping   chan struct{}
+	cancelJobs context.CancelFunc
+	stopOnce   sync.Once
 	// config is used for iterating over elements of the config.
 	config             *config.Config
 	scheduler          *scheduler.Scheduler
@@ -121,9 +122,12 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		return p.Connect()
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+
 	bt := &Heartbeat{
 		done:               make(chan struct{}),
 		stopping:           make(chan struct{}),
+		cancelJobs:         cancel,
 		config:             parsedConfig,
 		scheduler:          sched,
 		replaceStateLoader: replaceStateLoader,
@@ -136,6 +140,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 			PluginsReg:            plugin.GlobalPluginsReg,
 			PipelineClientFactory: pipelineClientFactory,
 			BeatRunFrom:           parsedConfig.RunFrom,
+			MonitorsContext:       ctx,
 		}),
 		trace: trace,
 	}
@@ -327,6 +332,9 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
 	bt.stopOnce.Do(func() {
+		// Cancel jobs context
+		bt.cancelJobs()
+
 		// Add some extra seconds to ensure there is enough time to publish all events
 		waitDuration := bt.config.PublishTimeout + 5*time.Second
 		waitDone := monitors.NewSignalWait()

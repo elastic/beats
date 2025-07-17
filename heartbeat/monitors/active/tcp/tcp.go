@@ -18,6 +18,7 @@
 package tcp
 
 import (
+	"context"
 	"crypto/x509"
 	"errors"
 	"net"
@@ -49,6 +50,7 @@ var debugf = logp.MakeDebug("tcp")
 
 func create(
 	name string,
+	_ context.Context,
 	cfg *conf.C,
 ) (p plugin.Plugin, err error) {
 	return createWithResolver(cfg, monitors.NewStdResolver())

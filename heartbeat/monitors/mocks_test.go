@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 	"sync"
@@ -220,7 +221,7 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int64, *atomic.Int64) {
 	return plugin.PluginFactory{
 			Name:    "test",
 			Aliases: []string{"testAlias"},
-			Make: func(s string, config *config.C) (plugin.Plugin, error) {
+			Make: func(s string, _ context.Context, config *config.C) (plugin.Plugin, error) {
 				built.Add(1)
 				// Declare a real config block with a required attr so we can see what happens when it doesn't work
 				unpacked := struct {

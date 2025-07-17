@@ -19,6 +19,7 @@ package http
 
 import (
 	"bytes"
+	"context"
 	"net/http"
 	"net/url"
 
@@ -42,6 +43,7 @@ var userAgent = useragent.UserAgent("Heartbeat", version.GetDefaultVersion(), ve
 // Create makes a new HTTP monitor
 func create(
 	name string,
+	_ context.Context,
 	cfg *conf.C,
 ) (p plugin.Plugin, err error) {
 	config := defaultConfig()

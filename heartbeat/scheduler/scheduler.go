@@ -47,6 +47,7 @@ type Scheduler struct {
 	timerQueue  *timerqueue.TimerQueue
 	ctx         context.Context
 	cancelCtx   context.CancelFunc
+	stopChannel chan struct{}
 	stats       schedulerStats
 	jobLimitSem map[string]*semaphore.Weighted
 	runOnce     bool

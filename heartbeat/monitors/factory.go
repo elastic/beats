@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -53,6 +54,7 @@ type RunnerFactory struct {
 	logger                *logp.Logger
 	pipelineClientFactory PipelineClientFactory
 	beatLocation          *config.LocationWithID
+	ctx                   context.Context
 }
 
 type PipelineClientFactory func(pipeline beat.Pipeline) (beat.Client, error)
@@ -83,6 +85,7 @@ type FactoryParams struct {
 	PluginsReg            *plugin.PluginsReg
 	PipelineClientFactory PipelineClientFactory
 	BeatRunFrom           *config.LocationWithID
+	MonitorsContext       context.Context
 }
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
@@ -97,6 +100,7 @@ func NewFactory(fp FactoryParams) *RunnerFactory {
 		pipelineClientFactory: fp.PipelineClientFactory,
 		beatLocation:          fp.BeatRunFrom,
 		stateLoader:           fp.StateLoader,
+		ctx:                   fp.MonitorsContext,
 	}
 }
 
@@ -178,7 +182,7 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 		}
 	}
 
-	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, safeStop)
+	monitor, err := newMonitor(f.ctx, c, f.pluginsReg, pc, f.addTask, f.stateLoader, safeStop)
 	if err != nil {
 		return nil, fmt.Errorf("factory could not create monitor: %w", err)
 	}

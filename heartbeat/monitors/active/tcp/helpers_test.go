@@ -18,6 +18,7 @@
 package tcp
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -41,7 +42,7 @@ func testTCPConfigCheck(t *testing.T, configMap mapstr.M) *beat.Event {
 	config, err := conf.NewConfigFrom(configMap)
 	require.NoError(t, err)
 
-	p, err := create("tcp", config)
+	p, err := create("tcp", context.TODO(), config)
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
