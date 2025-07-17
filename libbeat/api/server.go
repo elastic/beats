@@ -23,6 +23,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"sync"
 
 	"github.com/gorilla/mux"
 
@@ -37,6 +38,7 @@ type Server struct {
 	mux    *mux.Router
 	l      net.Listener
 	config Config
+	wg     sync.WaitGroup
 }
 
 // New creates a new API Server with no routes attached.
@@ -63,7 +65,9 @@ func New(log *logp.Logger, config *config.C) (*Server, error) {
 // Start starts the HTTP server and accepting new connection.
 func (s *Server) Start() {
 	s.log.Info("Starting stats endpoint")
+	s.wg.Add(1)
 	go func(l net.Listener) {
+		defer s.wg.Done()
 		s.log.Infof("Metrics endpoint listening on: %s (configured: %s)", l.Addr().String(), s.config.Host)
 		err := http.Serve(l, s.mux)
 		s.log.Infof("Stats endpoint (%s) finished: %v", l.Addr().String(), err)
@@ -72,7 +76,12 @@ func (s *Server) Start() {
 
 // Stop stops the API server and free any resource associated with the process like unix sockets.
 func (s *Server) Stop() error {
-	return s.l.Close()
+	err := s.l.Close()
+	if err != nil {
+		return fmt.Errorf("error stopping monitoring server: %w", err)
+	}
+	s.wg.Wait()
+	return nil
 }
 
 // AttachHandler will attach a handler at the specified route. Routes are
