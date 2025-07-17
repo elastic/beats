@@ -12,7 +12,7 @@ sub:
 
 Use the `cel` input to read messages from a file path or HTTP API with a variety of payloads using the [Common Expression Language (CEL)](https://opensource.google.com/projects/cel) and the [mito]({{mito_docs}}/lib) CEL extension libraries.
 
-CEL is a non-Turing complete language that can perform evaluation of expression in inputs, which can include file and API endpoints using the mito extension library. The `cel` input periodically runs a CEL program that is given an execution environment that may be configured by the user, and publishes the set of events that result from the program evaluation. Optionally the CEL program may return cursor states that will be provided to the next execution of the CEL program. The cursor states may be used to control the behaviour of the program.
+CEL is a non-Turing complete language that can perform evaluation of expression in inputs, which can include file and API endpoints using the mito extension library. The `cel` input periodically runs a CEL program that is given an execution environment that may be configured by the user, and publishes the set of events that result from the program evaluation. Optionally the CEL program may return cursor states that will be provided to the next execution of the CEL program. The cursor states may be used to control the behavior of the program.
 
 This input supports:
 
@@ -836,7 +836,7 @@ This determines whether rotated logs should be gzip compressed.
 
 ### `redact` [cel-state-redact]
 
-During debug level logging, the `state` object and the resulting evaluation result are included in logs. This may result in leaking of secrets. In order to prevent this, fields may be redacted or deleted from the logged `state`. The `redact` configuration allows users to configure this field redaction behaviour. For safety reasons if the `redact` configuration is missing a warning is logged.
+During debug level logging, the `state` object and the resulting evaluation result are included in logs. This may result in leaking of secrets. In order to prevent this, fields may be redacted or deleted from the logged `state`. The `redact` configuration allows users to configure this field redaction behavior. For safety reasons if the `redact` configuration is missing a warning is logged.
 
 In the case of no-required redaction an empty `redact.fields` configuration should be used to silence the logged warning.
 
