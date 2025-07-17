@@ -146,6 +146,152 @@ func assertMonitoring(t *testing.T, port int) {
 	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }
 
+func TestMetricbeatOTelReceiverE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	host := integration.GetESURL(t, "http")
+	user := host.User.Username()
+	password, _ := host.User.Password()
+
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+
+	mbReceiverIndex := "logs-integration-mbreceiver-" + namespace
+	mbIndex := "logs-metricbeat-mb-" + namespace
+
+	type options struct {
+		Index    string
+		ESURL    string
+		Username string
+		Password string
+	}
+
+	cfg := `receivers:
+  metricbeatreceiver:
+    metricbeat:
+      modules:
+       - module: system
+         enabled: true
+         period: 1s
+         processes:
+          - '.*'
+         metricsets:
+          - cpu
+    output:
+      otelconsumer:
+    logging:
+      level: info
+      selectors:
+        - '*'
+    queue.mem.flush.timeout: 0s
+exporters:
+  debug:
+    use_internal_logger: false
+    verbosity: detailed
+  elasticsearch/log:
+    endpoints:
+      - {{.ESURL}}
+    compression: none
+    user: admin
+    password: testing
+    logs_index: {{.Index}}
+    batcher:
+      enabled: true
+      flush_timeout: 1s
+    mapping:
+      mode: bodymap
+service:
+  pipelines:
+    logs:
+      receivers:
+        - metricbeatreceiver
+      exporters:
+        - elasticsearch/log
+        - debug
+`
+
+	// start metricbeat in otel mode
+	metricbeatOTel := integration.NewBeat(
+		t,
+		"metricbeat-otel",
+		"../../metricbeat.test",
+		"otel",
+	)
+
+	var configBuffer bytes.Buffer
+	require.NoError(t, template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, options{
+		Index:    mbReceiverIndex,
+		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username: user,
+		Password: password,
+	}))
+
+	metricbeatOTel.WriteConfigFile(configBuffer.String())
+	metricbeatOTel.Start()
+	defer metricbeatOTel.Stop()
+
+	var beatsCfgFile = `receivers:
+metricbeat:
+   modules:
+   - module: system
+     enabled: true
+     period: 1s
+     processes:
+      - '.*'
+     metricsets:
+      - cpu
+output:
+  elasticsearch:
+    hosts:
+      - {{ .ESURL }}
+    username: {{ .Username }}
+    password: {{ .Password }}
+    index: {{ .Index }}
+queue.mem.flush.timeout: 0s
+setup.template.enabled: false
+processors:
+    - add_host_metadata: ~
+    - add_cloud_metadata: ~
+    - add_docker_metadata: ~
+    - add_kubernetes_metadata: ~
+`
+	var mbConfigBuffer bytes.Buffer
+	require.NoError(t, template.Must(template.New("config").Parse(beatsCfgFile)).Execute(&mbConfigBuffer, options{
+		Index:    mbIndex,
+		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username: user,
+		Password: password,
+	}))
+	metricbeat := integration.NewBeat(t, "metricbeat", "../../metricbeat.test")
+	metricbeat.WriteConfigFile(mbConfigBuffer.String())
+	metricbeat.Start()
+	defer metricbeat.Stop()
+
+	// prepare to query ES
+	es := integration.GetESClient(t, "http")
+
+	var metricbeatDocs estools.Documents
+	var otelDocs estools.Documents
+	var err error
+
+	require.Eventuallyf(t,
+		func() bool {
+			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+mbReceiverIndex+"*")
+			require.NoError(t, err)
+
+			metricbeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+mbIndex+"*")
+			require.NoError(t, err)
+
+			return otelDocs.Hits.Total.Value >= 1 && metricbeatDocs.Hits.Total.Value >= 1
+		},
+		2*time.Minute, 1*time.Second, "Expected at least one ingested metric event, got metricbeat: %d, otel: %d", metricbeatDocs.Hits.Total.Value, otelDocs.Hits.Total.Value)
+	otelDoc := otelDocs.Hits.Hits[0]
+	metricbeatDoc := metricbeatDocs.Hits.Hits[0]
+	assertMapstrKeysEqual(t, otelDoc.Source, metricbeatDoc.Source, []string{}, "expected documents keys to be equal")
+}
+
 func assertMapstrKeysEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg string) {
 	t.Helper()
 	// Delete all ignored fields.
