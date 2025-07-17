@@ -137,9 +137,9 @@ As noted above the `cel` input provides functions, macros, and global variables 
 
 * [AWS v4 request signing](https://pkg.go.dev/github.com/elastic/mito@{{mito_version}}/lib#AWS)
 
-    * [Sign AWS from env](https://pkg.go.dev/github.com/elastic/mito/lib#hdr-Sign_AWS_from_env-AWS)
-    * [Sign AWS from shared credentials](https://pkg.go.dev/github.com/elastic/mito/lib#hdr-Sign_AWS_from_shared_credentials-AWS)
-    * [Sign AWS from static credentials](https://pkg.go.dev/github.com/elastic/mito/lib#hdr-Sign_AWS_from_static_credentials-AWS)
+    * [Sign AWS from env](https://pkg.go.dev/github.com/elastic/mito@{{mito_version}}/lib#hdr-Sign_AWS_from_env-AWS)
+    * [Sign AWS from shared credentials](https://pkg.go.dev/github.com/elastic/mito@{{mito_version}}/lib#hdr-Sign_AWS_from_shared_credentials-AWS)
+    * [Sign AWS from static credentials](https://pkg.go.dev/github.com/elastic/mito@{{mito_version}}/lib#hdr-Sign_AWS_from_static_credentials-AWS)
 
 * [Collections](https://pkg.go.dev/github.com/elastic/mito@{{mito_version}}/lib#Collections)
 
