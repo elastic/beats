@@ -88,7 +88,7 @@ func TestFilebeatFIPSSmoke(t *testing.T) {
 		cancel()
 		err := cmd.Wait()
 		if t.Failed() {
-			t.Errorf("filebeat exited. err: %v\nstdout: %s\nstderr: %s\n", err, stdout.String(), stderr.String())
+			t.Logf("filebeat exited. err: %v\nstdout: %s\nstderr: %s\n", err, stdout.String(), stderr.String())
 		}
 	}()
 
