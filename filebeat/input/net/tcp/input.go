@@ -30,14 +30,12 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/go-concert/ctxtool"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func Plugin() input.Plugin {
@@ -78,8 +76,9 @@ type server struct {
 type config struct {
 	tcp.Config `config:",inline"`
 
-	LineDelimiter string                `config:"line_delimiter" validate:"nonzero"`
-	Framing       streaming.FramingType `config:"framing"`
+	LineDelimiter      string                `config:"line_delimiter" validate:"nonzero"`
+	Framing            streaming.FramingType `config:"framing"`
+	NumPipelineWorkers int                   `config:"number_of_workers" validate:"positive,nonzero"`
 }
 
 func newServer(config config) (*server, error) {
@@ -103,7 +102,7 @@ func (s *server) InitMetrics(id string, logger *logp.Logger) netinput.Metrics {
 }
 
 // Run runs the input
-func (s *server) Run(ctx input.Context, evtChan chan<- beat.Event, m netinput.Metrics) (err error) {
+func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetaData, m netinput.Metrics) (err error) {
 	logger := ctx.Logger
 	defer s.metrics.Close()
 
@@ -127,21 +126,11 @@ func (s *server) Run(ctx input.Context, evtChan chan<- beat.Event, m netinput.Me
 					"remote_address", metadata.RemoteAddr.String(),
 					"truncated", metadata.Truncated)
 
-				evt := beat.Event{
+				evtChan <- netinput.DataMetaData{
+					Data:      data,
+					Metadata:  metadata,
 					Timestamp: time.Now(),
-					Fields: mapstr.M{
-						"message": string(data),
-					},
 				}
-				if metadata.RemoteAddr != nil {
-					evt.Fields["log"] = mapstr.M{
-						"source": mapstr.M{
-							"address": metadata.RemoteAddr.String(),
-						},
-					}
-				}
-
-				evtChan <- evt
 			},
 			split,
 		),

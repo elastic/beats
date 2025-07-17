@@ -25,10 +25,12 @@ import (
 	"time"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -50,7 +52,7 @@ type Input interface {
 	// Run must call EventReceived on Metrics once the
 	// event is received passing the event size and the
 	// current time.
-	Run(v2.Context, chan<- beat.Event, Metrics) error
+	Run(v2.Context, chan<- DataMetaData, Metrics) error
 }
 
 // Metrics is an interface to abstract the metrics
@@ -72,10 +74,16 @@ type config struct {
 	Host               string `config:"host"`
 }
 
+type DataMetaData struct {
+	Timestamp time.Time
+	Data      []byte
+	Metadata  inputsource.NetworkMetadata
+}
+
 type wrapper struct {
 	inp                Input
 	NumPipelineWorkers int
-	evtChan            chan beat.Event
+	evtChan            chan DataMetaData
 	host               string // used for the logger
 }
 
@@ -112,7 +120,7 @@ func (m *manager) Create(cfg *conf.C) (v2.Input, error) {
 		inp:                inp,
 		NumPipelineWorkers: wrapperCfg.NumPipelineWorkers,
 		host:               wrapperCfg.Host,
-		evtChan:            make(chan beat.Event),
+		evtChan:            make(chan DataMetaData, wrapperCfg.NumPipelineWorkers*5),
 	}
 
 	return w, nil
@@ -171,7 +179,7 @@ func (w wrapper) Run(ctx v2.Context, pipeline beat.PipelineConnector) (err error
 
 func (w wrapper) initWorkers(ctx v2.Context, pipeline beat.Pipeline, metrics Metrics) error {
 	for id := range w.NumPipelineWorkers {
-		client, err := pipeline.ConnectWith(beat.ClientConfig{
+		client, err := pipeline.ConnectWith(beat.ClientConfig{ // pipetool/pipetool.go:42,
 			PublishMode: beat.DefaultGuarantees,
 		})
 		if err != nil {
@@ -189,8 +197,8 @@ func (w wrapper) initWorkers(ctx v2.Context, pipeline beat.Pipeline, metrics Met
 // publishLoop.
 func (w wrapper) publishLoop(ctx v2.Context, id int, client beat.Client, metrics Metrics) {
 	logger := ctx.Logger
-	logger.Debugf("[Worker %d] starting publish loop", id)
-	defer logger.Debugf("[Worker %d] finished publish loop", id)
+	logger.Infof("[Worker %d] starting publish loop", id)
+	defer logger.Infof("[Worker %d] finished publish loop", id)
 	defer func() {
 		if err := client.Close(); err != nil {
 			logger.Errorf("[Worker %d] cannot close pipeline client: %s", id, err)
@@ -202,8 +210,22 @@ func (w wrapper) publishLoop(ctx v2.Context, id int, client beat.Client, metrics
 		case <-ctx.Cancelation.Done():
 			logger.Debugf("[Worker %d] Context cancelled, closing publish Loop", id)
 			return
-		case evt := <-w.evtChan:
+		case d := <-w.evtChan:
 			start := time.Now()
+			evt := beat.Event{
+				Timestamp: time.Now(),
+				Fields: mapstr.M{
+					"message": string(d.Data),
+				},
+			}
+			if d.Metadata.RemoteAddr != nil {
+				evt.Fields["log"] = mapstr.M{
+					"source": mapstr.M{
+						"address": d.Metadata.RemoteAddr.String(),
+					},
+				}
+			}
+
 			client.Publish(evt)
 			metrics.EventPublished(start)
 		}

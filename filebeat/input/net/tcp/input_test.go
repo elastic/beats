@@ -26,9 +26,9 @@ import (
 	"testing"
 	"time"
 
+	netinput "github.com/elastic/beats/v7/filebeat/input/net"
 	"github.com/elastic/beats/v7/filebeat/input/net/nettest"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -37,7 +37,8 @@ func TestInput(t *testing.T) {
 	serverAddr := "localhost:9042"
 	wg := sync.WaitGroup{}
 	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
-		"host": serverAddr,
+		"host":              serverAddr,
+		"number_of_workers": 2,
 	}))
 	if err != nil {
 		t.Fatalf("cannot create input: %s", err)
@@ -54,7 +55,7 @@ func TestInput(t *testing.T) {
 	}
 
 	metrics := inp.InitMetrics("tcp", v2Ctx.Logger)
-	c := make(chan beat.Event, 2)
+	c := make(chan netinput.DataMetaData, 2)
 
 	wg.Add(1)
 	go func() {
