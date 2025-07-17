@@ -109,7 +109,7 @@ func NewNodeEventer(
 // OnAdd ensures processing of node objects that are newly created
 func (n *node) OnAdd(obj interface{}) {
 	n.logger.Debugf("Watcher Node add: %+v", obj)
-	n.emit(obj.(*kubernetes.Node), "start")  //nolint // existing check
+	n.emit(obj.(*kubernetes.Node), "start") //nolint // existing check
 }
 
 // OnUpdate ensures processing of node objects that are updated
