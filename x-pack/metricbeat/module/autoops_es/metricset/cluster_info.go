@@ -5,7 +5,6 @@
 package metricset
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -33,7 +32,7 @@ func GetInfo(m *elasticsearch.MetricSet) (*utils.ClusterInfo, error) {
 	if !isVersionChecked {
 		// for some reason log.Fatal() isn't working properly so we need to handle the error in a goroutine
 		errChan := make(chan error)
-		go handleErrors(errChan)
+		go handleErrors(m.Logger(), errChan)
 
 		if err := checkEsVersion(info.Version.Number, errChan); err != nil {
 			return nil, err
@@ -46,7 +45,10 @@ func GetInfo(m *elasticsearch.MetricSet) (*utils.ClusterInfo, error) {
 func checkEsVersion(esVersion *libversion.V, errChan chan error) error {
 	if esVersion.LessThan(minVersion) {
 		isVersionChecked = true
-		err := fmt.Errorf("version %s is less than the minimum required version %s", esVersion.String(), minVersion)
+		err := &utils.VersionMismatchError{
+			ExpectedVersion: minVersion.String(),
+			ActualVersion:   esVersion.String(),
+		}
 		errChan <- err
 		return err
 	}
@@ -54,9 +56,9 @@ func checkEsVersion(esVersion *libversion.V, errChan chan error) error {
 	return nil
 }
 
-func handleErrors(errChan chan error) {
+func handleErrors(logger *logp.Logger, errChan chan error) {
 	for err := range errChan {
-		logp.Error(err)
+		logger.Error(err)
 		// sleep is needed to make sure the error is logged and error event is sent before exiting
 		time.Sleep(time.Second * 5)
 		os.Exit(1)

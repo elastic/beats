@@ -111,7 +111,7 @@ func esConnect(t *testing.T, index string) *esConnection {
 		Username:  username,
 		Password:  password,
 		Transport: transport,
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 	if err := client.Connect(ctx); err != nil {

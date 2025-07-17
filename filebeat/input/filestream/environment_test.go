@@ -43,7 +43,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -54,6 +53,7 @@ type inputTestingEnvironment struct {
 	workingDir   string
 	stateStore   statestore.States
 	pipeline     *mockPipelineConnector
+	monitoring   beat.Monitoring
 
 	pluginInitOnce sync.Once
 	plugin         v2.Plugin
@@ -76,9 +76,11 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 
 	t.Cleanup(func() {
 		if t.Failed() {
-			f, err := os.CreateTemp("", t.Name()+"-*")
+			pattern := strings.ReplaceAll(t.Name()+"-*", "/", "_")
+			f, err := os.CreateTemp("", pattern)
 			if err != nil {
 				t.Errorf("cannot create temp file for logs: %s", err)
+				return
 			}
 
 			defer f.Close()
@@ -101,6 +103,7 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 		workingDir:   t.TempDir(),
 		stateStore:   openTestStatestore(),
 		pipeline:     &mockPipelineConnector{},
+		monitoring:   beat.NewMonitoring(),
 	}
 }
 
@@ -144,19 +147,15 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 		defer func() { _ = grp.Stop() }()
 
 		logger, _ := logp.NewDevelopmentLogger("")
-		info := beat.Info{Monitoring: beat.Monitoring{
-			Namespace: monitoring.GetNamespace("dataset")},
-		}
 		reg := inputmon.NewMetricsRegistry(
-			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logger)
+			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
 		defer inputmon.CancelMetricsRegistry(
-			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logger)
+			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
 
 		inputCtx := v2.Context{
 			ID:              id,
 			IDWithoutName:   id,
 			Name:            inp.Name(),
-			Agent:           info,
 			Cancelation:     ctx,
 			StatusReporter:  nil,
 			MetricsRegistry: reg,
@@ -170,12 +169,15 @@ func (e *inputTestingEnvironment) waitUntilInputStops() {
 	e.wg.Wait()
 }
 
-func (e *inputTestingEnvironment) mustWriteToFile(filename string, data []byte) {
+// mustWriteToFile writes data to file and returns the full path
+func (e *inputTestingEnvironment) mustWriteToFile(filename string, data []byte) string {
 	path := e.abspath(filename)
 	err := os.WriteFile(path, data, 0o644)
 	if err != nil {
 		e.t.Fatalf("failed to write file '%s': %+v", path, err)
 	}
+
+	return path
 }
 
 func (e *inputTestingEnvironment) mustAppendToFile(filename string, data []byte) {
@@ -406,7 +408,7 @@ func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, e
 }
 
 func getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
-	identifier, _ := newINodeDeviceIdentifier(nil)
+	identifier, _ := newINodeDeviceIdentifier(nil, nil)
 	src := identifier.GetSource(loginp.FSEvent{
 		Descriptor: loginp.FileDescriptor{
 			Info: file.ExtendFileInfo(fi),
@@ -571,6 +573,19 @@ func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
 
 	selectedEvent := events[nr]
 	require.True(e.t, selectedEvent.Timestamp.Equal(tm), "got: %s, expected: %s", selectedEvent.Timestamp.String(), tm.String())
+}
+
+// logContains ensures s is a sub string on any log line.
+// If s is not found, the test fails
+func (e *inputTestingEnvironment) logContains(s string) {
+	logs := e.loggerBuffer.String()
+	for _, line := range strings.Split(logs, "\n") {
+		if strings.Contains(line, s) {
+			return
+		}
+	}
+
+	e.t.Fatalf("%q not found in logs", s)
 }
 
 var _ statestore.States = (*testInputStore)(nil)

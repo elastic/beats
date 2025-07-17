@@ -26,6 +26,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -67,7 +68,7 @@ func TestFilestreamMetrics(t *testing.T) {
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 	env.waitUntilHarvesterIsDone()
 
-	checkMetrics(t, id, expectedMetrics{
+	checkMetrics(t, env.monitoring, id, expectedMetrics{
 		FilesOpened:       1,
 		FilesClosed:       1,
 		FilesActive:       0,
@@ -108,7 +109,7 @@ func TestFilestreamMessageMaxBytesTruncatedMetric(t *testing.T) {
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 	env.waitUntilHarvesterIsDone()
 
-	checkMetrics(t, id, expectedMetrics{
+	checkMetrics(t, env.monitoring, id, expectedMetrics{
 		FilesOpened:       1,
 		FilesClosed:       1,
 		FilesActive:       0,
@@ -160,7 +161,7 @@ func TestFilestreamMultilineMaxLinesTruncatedMetric(t *testing.T) {
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 	env.waitUntilHarvesterIsDone()
 
-	checkMetrics(t, id, expectedMetrics{
+	checkMetrics(t, env.monitoring, id, expectedMetrics{
 		FilesOpened:       1,
 		FilesClosed:       1,
 		FilesActive:       0,
@@ -186,8 +187,8 @@ type expectedMetrics struct {
 	ProcessingErrors  uint64
 }
 
-func checkMetrics(t *testing.T, id string, expected expectedMetrics) {
-	reg, ok := monitoring.GetNamespace("dataset").GetRegistry().Get(id).(*monitoring.Registry)
+func checkMetrics(t *testing.T, mon beat.Monitoring, id string, expected expectedMetrics) {
+	reg, ok := mon.InputsRegistry().Get(id).(*monitoring.Registry)
 	require.True(t, ok, "registry not found")
 
 	require.Equal(t, id, reg.Get("id").(*monitoring.String).Get(), "id")

@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package azure
 
 import (
@@ -49,7 +51,7 @@ const (
 )
 
 // NewService instantiates the Azure monitoring service
-func NewService(config Config) (*MonitorService, error) {
+func NewService(config Config, logger *logp.Logger) (*MonitorService, error) {
 	cloudServicesConfig := cloud.AzurePublic.Services
 
 	resourceManagerConfig := cloudServicesConfig[cloud.ResourceManager]
@@ -119,7 +121,7 @@ func NewService(config Config) (*MonitorService, error) {
 		resourceClient:            resourceClient,
 		queryResourceClientConfig: queryResourceClientConfig,
 		context:                   context.Background(),
-		log:                       logp.NewLogger("azure monitor service"),
+		log:                       logger.Named("azure monitor service"),
 	}
 
 	return service, nil

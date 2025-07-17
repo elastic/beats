@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package azure
 
 import (
@@ -115,13 +117,13 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	// check wether metricset is part of supported metricsets and if BatchApi is enabled
 	if slices.Contains(supportedMonitorMetricsets, metricsetName) && config.EnableBatchApi {
 		// instantiate Batch Client which enables fetching metric values for multiple resources using azure batch api
-		monitorBatchClient, err = NewBatchClient(config)
+		monitorBatchClient, err = NewBatchClient(config, base.Logger())
 		if err != nil {
 			return nil, fmt.Errorf("error initializing the monitor batch client: module azure - %s metricset: %w", metricsetName, err)
 		}
 	} else {
 		// default case
-		monitorClient, err = NewClient(config)
+		monitorClient, err = NewClient(config, base.Logger())
 		if err != nil {
 			return nil, fmt.Errorf("error initializing the monitor client: module azure - %s metricset: %w", metricsetName, err)
 		}

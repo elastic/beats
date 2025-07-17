@@ -97,6 +97,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-dataset-{module}-{dataset}.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # {module_title} {dataset} dataset [auditbeat-dataset-{module}-{dataset}]
 
 """.format(module_title=title, module=module, dataset=dataset)
@@ -138,28 +140,27 @@ The following datasets are available:\n\n"""
         with open(os.path.join(docs_path, "reference", "auditbeat", "auditbeat-module-{}.md".format(module)), 'w') as f:
             f.write(module_file)
 
-        # TODO(@VihasMakwana): Uncomment following when all the asciidocs are converted to markdown
-        # As of now, this will not work and it will generate incomplete list.
+    module_list_output = """---
+mapped_pages:
+  - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-modules.html
+---
 
-#     module_list_output = """---
-# mapped_pages:
-#   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-modules.html
-# ---
+% This file is generated! See scripts/docs_collector.py
 
-# # Modules [auditbeat-modules]
+# Modules [auditbeat-modules]
 
-# This section contains detailed information about the metric collecting modules contained in Auditbeat. More details about each module can be found under the links below.
+This section contains detailed information about the metric collecting modules contained in Auditbeat. More details about each module can be found under the links below.
 
-# """
+"""
 
-#     for m, title in sorted(six.iteritems(modules_list)):
-#         module_list_output += "* [{}](/reference/auditbeat/auditbeat-module-{}.md)\n".format(title, m)
+    for m, title in sorted(six.iteritems(modules_list)):
+        module_list_output += "* [{}](/reference/auditbeat/auditbeat-module-{}.md)\n".format(title, m)
 
-#     module_list_output += "\n"
+    module_list_output += "\n"
 
-#     # Write module link list
-#     with open(os.path.join(docs_path, "reference", "auditbeat", "auditbeat-modules.md"), 'w') as f:
-#         f.write(module_list_output)
+    # Write module link list
+    with open(os.path.join(docs_path, "reference", "auditbeat", "auditbeat-modules.md"), 'w') as f:
+        f.write(module_list_output)
 
 
 if __name__ == "__main__":

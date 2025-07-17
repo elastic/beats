@@ -6,7 +6,6 @@ package events
 
 import (
 	"errors"
-	"os"
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
@@ -91,6 +90,16 @@ func TestGetHTTPResponseBodyInfo(t *testing.T) {
 			expectedBody:   "Cluster not ready",
 		},
 		{
+			name: "Error is of type VersionMismatchError",
+			inputError: &utils.VersionMismatchError{
+				ExpectedVersion: "7.10.0",
+				ActualVersion:   "7.9.3",
+			},
+			expectedStatus: 0,
+			expectedCode:   "VERSION_MISMATCH",
+			expectedBody:   "expected 7.10.0, got 7.9.3",
+		},
+		{
 			name:           "Error is not of a known type",
 			inputError:     errors.New("some other error"),
 			expectedStatus: 0,
@@ -159,19 +168,16 @@ func TestGetResourceID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Set environment variables
 			for key, value := range tt.envVars {
-				os.Setenv(key, value)
+				t.Setenv(key, value)
 			}
 
 			// Call the function
-			result := getResourceID()
+			result := utils.GetAndSetResourceID()
+
+			t.Cleanup(utils.ClearResourceID)
 
 			// Assert the result
 			assert.Equal(t, tt.expectedValue, result)
-
-			// Clean up environment variables
-			for key := range tt.envVars {
-				os.Unsetenv(key)
-			}
 		})
 	}
 }

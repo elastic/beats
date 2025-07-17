@@ -17,7 +17,7 @@ The following cloud providers are supported:
 - https://www.qcloud.com/?lang=en[Tencent Cloud] (QCloud)
 - Alibaba Cloud (ECS)
 - Huawei Cloud (ECS)
-- Azure Virtual Machine
+- Azure Virtual Machine (*not supported in FIPS-capable artifacts*)
 - Openstack Nova
 - Hetzner Cloud
 
