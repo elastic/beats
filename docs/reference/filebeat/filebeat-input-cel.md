@@ -139,7 +139,7 @@ The CEL input will log the complete state after evaluation when logging at the D
 
 As noted above the `cel` input provides functions, macros, and global variables to extend the language.
 
-* [AWS v4 request signing]({{mito_docs}}@{{mito_version}}/lib#AWS) {applies_to}`stack: ga 8.19.0`
+* [AWS v4 request signing]({{mito_docs}}@{{mito_version}}/lib#AWS) {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
 
     * [Sign AWS from env]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_env-AWS)
     * [Sign AWS from shared credentials]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_shared_credentials-AWS)
@@ -245,7 +245,7 @@ As noted above the `cel` input provides functions, macros, and global variables 
 
     * [Format]({{mito_docs}}@{{mito_version}}/lib#hdr-Format-Time)
     * [Parse Time]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_Time-Time)
-    * [Round]({{mito_docs}}@{{mito_version}}/lib#hdr-Round-Time) {applies_to}`stack: ga 8.19.0`
+    * [Round]({{mito_docs}}@{{mito_version}}/lib#hdr-Round-Time) {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
     * [Global Variables]({{mito_docs}}@{{mito_version}}/lib#hdr-Global_Variables-Time)
         * Support for [`DateOnly`](https://pkg.go.dev/time#DateOnly), [`DateTime`](https://pkg.go.dev/time#DateTime) and [`TimeOnly`](https://pkg.go.dev/time#TimeOnly) time formats. {applies_to}`stack: ga 8.15.0`
 
@@ -266,14 +266,14 @@ Host environment variables are made available via the global map `env`. Only env
 The CEL environment enables the [optional types](https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#OptionalTypesVersion) and the [two-variable comprehensions extensions](https://pkg.go.dev/github.com/google/cel-go/ext#TwoVarComprehensions) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#TwoVarComprehensionVersion).
 
 * Optional types {applies_to}`stack: ga 8.12.0`
-* Two-variable comprehensions {applies_to}`stack: ga 8.19.0`
+* Two-variable comprehensions {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
 
 Additionally, it supports authentication via:
 
 * Basic Authentication
 * Digest Authentication {applies_to}`stack: ga 8.12.0`
 * OAuth2
-* token authentication
+* token authentication {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
 
 Example configurations with authentication:
 
