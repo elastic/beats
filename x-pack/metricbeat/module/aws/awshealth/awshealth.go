@@ -149,6 +149,7 @@ func (m *MetricSet) getEventDetails(
 ) []mb.Event {
 	// Define event filter to fetch only upcoming and open events
 	eventFilter := types.EventFilter{
+		Regions: m.RegionsList,
 		EventStatusCodes: []types.EventStatusCode{
 			types.EventStatusCodeUpcoming,
 			types.EventStatusCodeOpen,
