@@ -250,7 +250,7 @@ Host environment variables are made available via the global map `env`. Only env
 
 The CEL environment enables the [optional types](https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes) library using the version defined [here](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#OptionalTypesVersion) and the [two-variable comprehensions extensions](https://pkg.go.dev/github.com/google/cel-go/ext#TwoVarComprehensions) library using the version defined [here](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#TwoVarComprehensionVersion).
 
-Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2.
+Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2, or token authentication.
 
 Example configurations with authentication:
 
@@ -294,6 +294,23 @@ filebeat.inputs:
   resource.url: http://localhost
 ```
 
+```yaml
+filebeat.inputs:
+- type: cel
+  auth.token:
+    type: Bearer
+    value: supersecret_bearer_token
+  resource.url: http://localhost
+```
+
+```yaml
+filebeat.inputs:
+- type: cel
+  auth.token:
+    type: Token
+    value: supersecret_token
+  resource.url: http://localhost
+```
 
 ## Input state [input-state-cel]
 
@@ -614,6 +631,27 @@ The RSA JWK private key PEM block for your Okta Service App which is used for in
 ::::{note}
 Only one of the credentials settings can be set at once. For more information please refer to [https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/](https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/)
 ::::
+
+
+
+### `auth.token.enabled` [_auth_token_enabled]
+
+When set to `false`, disables the token authentication configuration. Default: `true`.
+
+::::{note}
+Token authentication settings are disabled if either `enabled` is set to `false` or the `auth.token` section is missing.
+::::
+
+
+
+### `auth.token.type` [_auth_token_type]
+
+The type of token to authenticate with, for example "Token" or "Bearer".
+
+
+### `auth.token.value` [_auth_token_value]
+
+The token value to use.
 
 
 
