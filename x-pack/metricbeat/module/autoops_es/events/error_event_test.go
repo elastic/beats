@@ -133,32 +133,32 @@ func TestGetResourceID(t *testing.T) {
 		expectedValue string
 	}{
 		{
-			name: "DEPLOYMENT_ID is set",
+			name: "AUTOOPS_DEPLOYMENT_ID is set",
 			envVars: map[string]string{
-				"DEPLOYMENT_ID": "deployment-123",
+				"AUTOOPS_DEPLOYMENT_ID": "deployment-123",
 			},
 			expectedValue: "deployment-123",
 		},
 		{
-			name: "PROJECT_ID is set",
+			name: "AUTOOPS_PROJECT_ID is set",
 			envVars: map[string]string{
-				"PROJECT_ID": "project-456",
+				"AUTOOPS_PROJECT_ID": "project-456",
 			},
 			expectedValue: "project-456",
 		},
 		{
-			name: "RESOURCE_ID is set",
+			name: "AUTOOPS_RESOURCE_ID is set",
 			envVars: map[string]string{
-				"RESOURCE_ID": "resource-789",
+				"AUTOOPS_RESOURCE_ID": "resource-789",
 			},
 			expectedValue: "resource-789",
 		},
 		{
 			name: "No environment variables are set",
 			envVars: map[string]string{
-				"DEPLOYMENT_ID": "",
-				"PROJECT_ID":    "",
-				"RESOURCE_ID":   "",
+				"AUTOOPS_DEPLOYMENT_ID": "",
+				"AUTOOPS_PROJECT_ID":    "",
+				"AUTOOPS_RESOURCE_ID":   "",
 			},
 			expectedValue: "",
 		},
