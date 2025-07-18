@@ -11,6 +11,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"strings"
 	"testing"
 	"text/template"
@@ -191,8 +192,8 @@ exporters:
     endpoints:
       - {{.ESURL}}
     compression: none
-    user: admin
-    password: testing
+    user: {{.Username}}
+    password: {{.Password}}
     logs_index: {{.Index}}
     batcher:
       enabled: true
@@ -290,6 +291,158 @@ processors:
 	otelDoc := otelDocs.Hits.Hits[0]
 	metricbeatDoc := metricbeatDocs.Hits.Hits[0]
 	assertMapstrKeysEqual(t, otelDoc.Source, metricbeatDoc.Source, []string{}, "expected documents keys to be equal")
+}
+
+func TestMetricbeatOTelMultipleReceiversE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	host := integration.GetESURL(t, "http")
+	user := host.User.Username()
+	password, _ := host.User.Password()
+
+	metricbeatOTel := integration.NewBeat(
+		t,
+		"metricbeat-otel",
+		"../../metricbeat.test",
+		"otel",
+	)
+
+	type receiverConfig struct {
+		MonitoringPort int
+		InputFile      string
+		PathHome       string
+	}
+
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	otelConfig := struct {
+		Index     string
+		Username  string
+		Password  string
+		Receivers []receiverConfig
+	}{
+		Index:    "logs-integration-" + namespace,
+		Username: user,
+		Password: password,
+		Receivers: []receiverConfig{
+			{
+				MonitoringPort: 5066,
+				PathHome:       filepath.Join(metricbeatOTel.TempDir(), "r1"),
+			},
+			{
+				MonitoringPort: 5067,
+				PathHome:       filepath.Join(metricbeatOTel.TempDir(), "r2"),
+			},
+		},
+	}
+
+	cfg := `receivers:
+{{range $i, $receiver := .Receivers}}
+  metricbeatreceiver/{{$i}}:
+    metricbeat:
+      modules:
+       - module: system
+         enabled: true
+         period: 1s
+         processes:
+          - '.*'
+         metricsets:
+          - cpu
+    processors:
+      - add_fields:
+          target: ''
+          fields:
+            receiverid: "{{$i}}"
+    output:
+      otelconsumer:
+    logging:
+      level: info
+      selectors:
+        - '*'
+    queue.mem.flush.timeout: 0s
+    path.home: {{$receiver.PathHome}}
+{{if $receiver.MonitoringPort}}
+    http.enabled: true
+    http.host: localhost
+    http.port: {{$receiver.MonitoringPort}}
+{{end}}
+{{end}}
+exporters:
+  debug:
+    use_internal_logger: false
+    verbosity: detailed
+  elasticsearch/log:
+    endpoints:
+      - http://localhost:9200
+    compression: none
+    user: {{.Username}}
+    password: {{.Password}}
+    logs_index: {{.Index}}
+    batcher:
+      enabled: true
+      flush_timeout: 1s
+    mapping:
+      mode: bodymap
+service:
+  pipelines:
+    logs:
+      receivers:
+{{range $i, $receiver := .Receivers}}
+        - metricbeatreceiver/{{$i}}
+{{end}}
+      exporters:
+        - debug
+        - elasticsearch/log
+`
+	var configBuffer bytes.Buffer
+	require.NoError(t,
+		template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, otelConfig))
+	configContents := configBuffer.Bytes()
+
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Config contents:\n%s", configContents)
+		}
+	})
+
+	metricbeatOTel.WriteConfigFile(string(configContents))
+	metricbeatOTel.Start()
+	defer metricbeatOTel.Stop()
+
+	es := integration.GetESClient(t, "http")
+
+	var r0Docs, r1Docs estools.Documents
+	var err error
+
+	require.Eventuallyf(t,
+		func() bool {
+			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
+			defer findCancel()
+
+			r0Docs, err = estools.PerformQueryForRawQuery(findCtx, map[string]any{
+				"query": map[string]any{
+					"match": map[string]any{
+						"receiverid": "0",
+					},
+				},
+			}, ".ds-"+otelConfig.Index+"*", es)
+			require.NoError(t, err)
+
+			r1Docs, err = estools.PerformQueryForRawQuery(findCtx, map[string]any{
+				"query": map[string]any{
+					"match": map[string]any{
+						"receiverid": "1",
+					},
+				},
+			}, ".ds-"+otelConfig.Index+"*", es)
+			require.NoError(t, err)
+
+			return r0Docs.Hits.Total.Value >= 1 && r1Docs.Hits.Total.Value >= 1
+		},
+		1*time.Minute, 100*time.Millisecond, "expected at least 1 log for each receiver")
+	assertMapstrKeysEqual(t, r0Docs.Hits.Hits[0].Source, r1Docs.Hits.Hits[0].Source, []string{}, "expected documents keys to be equal")
+	for _, rec := range otelConfig.Receivers {
+		assertMonitoring(t, rec.MonitoringPort)
+	}
 }
 
 func assertMapstrKeysEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg string) {
