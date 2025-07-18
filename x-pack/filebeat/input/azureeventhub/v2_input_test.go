@@ -47,9 +47,10 @@ func TestRunUpdatesStatusToStartingAndFailed(t *testing.T) {
 	require.Error(t, err, "setup failure")
 
 	// Verify that the status was updated to Starting and then to Failed.
-	assert.Len(t, statusReporter.statuses, 2)
+	assert.Len(t, statusReporter.statuses, 3)
 	assert.Equal(t, status.Starting, statusReporter.statuses[0])
-	assert.Equal(t, status.Failed, statusReporter.statuses[1])
+	assert.Equal(t, status.Configuring, statusReporter.statuses[1])
+	assert.Equal(t, status.Failed, statusReporter.statuses[2])
 }
 
 // mockStatusReporter is a mock implementation of the status.Reporter interface.
