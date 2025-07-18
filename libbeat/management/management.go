@@ -93,7 +93,7 @@ var managerFactoryLock sync.Mutex
 // it returns a placeholder.
 // Tests can call SetManagerFactory to instead use a mocked manager,
 // see x-pack/libbeat/management/tests/init.go.
-func NewManager(cfg *config.C, registry *reload.Registry) (Manager, error) {
+func NewManager(cfg *config.C, registry *reload.Registry, logger *logp.Logger) (Manager, error) {
 	if cfg.Enabled() {
 		managerFactoryLock.Lock()
 		defer managerFactoryLock.Unlock()
@@ -102,7 +102,7 @@ func NewManager(cfg *config.C, registry *reload.Registry) (Manager, error) {
 		}
 	}
 	return &fallbackManager{
-		logger: logp.NewLogger("mgmt"),
+		logger: logger.Named("mgmt"),
 		status: status.Unknown,
 		msg:    "",
 	}, nil

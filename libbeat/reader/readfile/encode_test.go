@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestEncodeLines(t *testing.T) {
@@ -56,7 +57,7 @@ func TestEncodeLines(t *testing.T) {
 				BufferSize: bufferSize,
 				Terminator: LineFeed,
 			}
-			er, err := NewEncodeReader(r, config)
+			er, err := NewEncodeReader(r, config, logptest.NewTestingLogger(t, ""))
 			assert.Nil(t, err, "failed to create new encoder: %v", err)
 
 			var output []string

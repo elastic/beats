@@ -52,7 +52,7 @@ type LogPathMatcher struct {
 	logger       *logp.Logger
 }
 
-func newLogsPathMatcher(cfg conf.C) (add_kubernetes_metadata.Matcher, error) {
+func newLogsPathMatcher(cfg conf.C, log *logp.Logger) (add_kubernetes_metadata.Matcher, error) {
 	config := struct {
 		LogsPath     string `config:"logs_path"`
 		ResourceType string `config:"resource_type"`
@@ -72,7 +72,6 @@ func newLogsPathMatcher(cfg conf.C) (add_kubernetes_metadata.Matcher, error) {
 	}
 	resourceType := config.ResourceType
 
-	log := logp.NewLogger("kubernetes")
 	log.Debugf("logs_path matcher log path: %s", logPath)
 	log.Debugf("logs_path matcher resource type: %s", resourceType)
 

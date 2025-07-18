@@ -70,7 +70,7 @@ func New(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 	}
 
 	initProviders := selectProviders(config.Providers, cloudMetaProviders)
-	fetchers, err := setupFetchers(initProviders, c)
+	fetchers, err := setupFetchers(initProviders, c, log)
 	if err != nil {
 		return nil, err
 	}

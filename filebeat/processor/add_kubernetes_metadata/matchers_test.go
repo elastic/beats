@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -191,7 +192,7 @@ func executeTestWithResourceType(t *testing.T, cfgLogsPath string, cfgResourceTy
 		testConfig.SetString("resource_type", -1, cfgResourceType)
 	}
 
-	logMatcher, err := newLogsPathMatcher(*testConfig)
+	logMatcher, err := newLogsPathMatcher(*testConfig, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 
 	input := mapstr.M{

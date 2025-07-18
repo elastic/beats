@@ -61,7 +61,7 @@ type InputManager struct {
 
 	// Configure returns an array of Sources, and a configured Input instances
 	// that will be used to collect events from each source.
-	Configure func(cfg *conf.C) ([]Source, Input, error)
+	Configure func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error)
 
 	initedFull bool
 	initErr    error
@@ -162,7 +162,7 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	sources, inp, err := cim.Configure(config)
+	sources, inp, err := cim.Configure(config, cim.Logger)
 	if err != nil {
 		return nil, err
 	}

@@ -174,7 +174,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			return
 		}
 
-		matchers := NewMatchers(config.Matchers)
+		matchers := NewMatchers(config.Matchers, k.log)
 
 		if matchers.Empty() {
 			k.log.Debugf("Could not initialize kubernetes plugin with zero matcher plugins")

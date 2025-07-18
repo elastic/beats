@@ -123,9 +123,8 @@ func (d *Discovery) Start() {
 	d.instances = make(map[string]*Instance)
 	d.events = make(chan Event)
 	d.stop = make(chan struct{})
-	if d.log == nil {
-		d.log = logp.NewLogger("jolokia")
-	}
+	d.log = d.log.Named("jolokia")
+
 	go d.run()
 }
 

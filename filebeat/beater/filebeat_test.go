@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/config"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/require"
 )
@@ -132,6 +133,7 @@ output.console:
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			rawConfig, err := conf.NewConfigFrom(tc.configFile)
@@ -145,7 +147,7 @@ output.console:
 			err = rawConfig.Unpack(&cfg)
 			require.NoError(t, err)
 
-			inputs, err := fetchInputConfiguration(&cfg.Filebeat)
+			inputs, err := fetchInputConfiguration(&cfg.Filebeat, logger)
 			require.NoError(t, err)
 
 			actual := []inputEntry{}
