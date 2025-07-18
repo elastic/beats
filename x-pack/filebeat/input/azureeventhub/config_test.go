@@ -10,8 +10,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestStorageContainerValidate(t *testing.T) {
@@ -45,7 +43,7 @@ func TestValidate(t *testing.T) {
 		config.SAKey = "secret"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 
-		config.checkUnsupportedParams(logptest.NewTestingLogger(t, ""))
+		config.Validate()
 
 		assert.Equal(
 			t,
