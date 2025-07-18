@@ -18,6 +18,7 @@
 package filestream
 
 import (
+	"compress/gzip"
 	"context"
 	"errors"
 	"io"
@@ -43,7 +44,7 @@ var (
 
 // logFile contains all log related data
 type logFile struct {
-	file      *os.File
+	file      File
 	log       *logp.Logger
 	readerCtx ctxtool.CancelContext
 
@@ -67,7 +68,7 @@ type logFile struct {
 func newFileReader(
 	log *logp.Logger,
 	canceler input.Canceler,
-	f *os.File,
+	f File,
 	config readerConfig,
 	closerConfig closerConfig,
 ) (*logFile, error) {
@@ -229,7 +230,7 @@ func (f *logFile) shouldBeClosed() bool {
 
 	if f.closeRemoved {
 		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
-		if file.IsRemoved(f.file) {
+		if file.IsRemoved(f.file.OSFile()) {
 			f.log.Debugf("close.on_state_change.removed is enabled and file %s has been removed", f.file.Name())
 			return true
 		}
@@ -251,7 +252,15 @@ func isSameFile(path string, info os.FileInfo) bool {
 // based on the config options.
 func (f *logFile) errorChecks(err error) error {
 	if !errors.Is(err, io.EOF) {
-		f.log.Error("Unexpected state reading from %s; error: %s", f.file.Name(), err)
+		f.log.Errorf("Unexpected state reading from %s; error: %s",
+			f.file.Name(), err)
+
+		// gzip.ErrChecksum happens after all data is read from a GZIP file, and
+		// it's recoverable, nothing else to do. Thus, we return EOF.
+		if errors.Is(err, gzip.ErrChecksum) {
+			return io.EOF
+		}
+
 		return err
 	}
 
@@ -259,11 +268,11 @@ func (f *logFile) errorChecks(err error) error {
 }
 
 func (f *logFile) handleEOF() error {
-	if f.closeOnEOF {
+	if f.closeOnEOF || f.file.IsGZIP() {
 		return io.EOF
 	}
 
-	// Refetch fileinfo to check if the file was truncated.
+	// Re-fetch fileinfo to check if the file was truncated.
 	// Errors if the file was removed/rotated after reading and before
 	// calling the stat function
 	info, statErr := f.file.Stat()
@@ -272,7 +281,6 @@ func (f *logFile) handleEOF() error {
 		return statErr
 	}
 
-	// check if file was truncated
 	if info.Size() < f.offset {
 		f.log.Debugf("File was truncated as offset (%d) > size (%d): %s", f.offset, info.Size(), f.file.Name())
 		return ErrFileTruncate
