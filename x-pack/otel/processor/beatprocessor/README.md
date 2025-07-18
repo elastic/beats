@@ -11,8 +11,8 @@
 > Including it in a pipeline is a no-op.
 > The documentation describes the intended state after the functionality is implemented.
 
-The Beat processor (`beat`) makes the functionality of [Beat processors] available in an OpenTelemetry Collector's processor.
-This allows users to configure Beat processors anywhere in the OpenTelemetry Collector's pipeline, independently of Beat receivers.
+The Beat processor (`beat`) is an OpenTelemetry Collector processor that wraps the [Beat processors].
+This allows you to use Beat processorss like e.g. [add_host_metadata] anywhere in the OpenTelemetry Collector's pipeline, independently of Beat receivers.
 
 > [!NOTE]
 > This component is only expected to work correctly with data from the Beat receivers: [Filebeat receiver], [Metricbeat receiver].
@@ -61,3 +61,4 @@ processors:
 [Beat processors]: https://www.elastic.co/docs/reference/beats/filebeat/filtering-enhancing-data#using-processors
 [Filebeat receiver]: https://github.com/elastic/beats/tree/main/x-pack/filebeat/fbreceiver
 [Metricbeat receiver]: https://github.com/elastic/beats/tree/main/x-pack/metricbeat/mbreceiver
+[add_host_metadata]: https://www.elastic.co/docs/reference/beats/filebeat/add-host-metadata
