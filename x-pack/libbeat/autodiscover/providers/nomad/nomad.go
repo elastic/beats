@@ -74,7 +74,7 @@ func AutodiscoverBuilder(
 		return nil, fmt.Errorf("failed to initialize nomad API client: %w", err)
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil, logger)
 	if err != nil {
 		return nil, err
 	}

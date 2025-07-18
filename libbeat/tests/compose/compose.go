@@ -28,6 +28,9 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // HostInfo exposes information about started scenario
@@ -52,7 +55,7 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 		return hostInfo
 	}
 
-	compose, err := getComposeProject(os.Getenv("DOCKER_COMPOSE_PROJECT_NAME"))
+	compose, err := getComposeProject(os.Getenv("DOCKER_COMPOSE_PROJECT_NAME"), logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -189,7 +192,7 @@ func findComposePath() (string, error) {
 	return "", errors.New("docker-compose.yml not found")
 }
 
-func getComposeProject(name string) (*Project, error) {
+func getComposeProject(name string, logger *logp.Logger) (*Project, error) {
 	path, err := findComposePath()
 	if err != nil {
 		return nil, err
@@ -200,5 +203,6 @@ func getComposeProject(name string) (*Project, error) {
 		[]string{
 			path,
 		},
+		logger,
 	)
 }
