@@ -42,7 +42,7 @@ func expectValidParsedDataSkippingComposedOfCheck(t *testing.T, data metricset.F
 		// metrics exist
 		require.NotNil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "template.priority"))
 		require.NotNil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "template.index_patterns"))
-		templateName := auto_ops_testing.GetObjectValue(event.MetricSetFields, "template.templateName")
+		templateName := auto_ops_testing.GetObjectValue(event.MetricSetFields, "template.template_name")
 		if nameStr, ok := templateName.(string); ok {
 			if _, skip := skipComposedOfCheckFor[nameStr]; !skip {
 				require.NotNil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "template.composed_of"))
@@ -73,7 +73,7 @@ func expectValidParsedDataWithTemplateNames(t *testing.T, data metricset.Fetcher
 
 	var actualTemplateNames []string
 	for _, event := range events {
-		name := auto_ops_testing.GetObjectAsString(t, event.MetricSetFields, "template.templateName")
+		name := auto_ops_testing.GetObjectAsString(t, event.MetricSetFields, "template.template_name")
 		actualTemplateNames = append(actualTemplateNames, name)
 	}
 	require.Equal(t, len(templateNames), len(actualTemplateNames), "Wrong number of template names %s", actualTemplateNames)
@@ -88,7 +88,7 @@ func expectValidParsedDataWithTemplateNames(t *testing.T, data metricset.Fetcher
 		require.NotNil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "template.index_patterns"))
 		require.NotNil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "template.composed_of"))
 		require.NotNil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "template.template"))
-		templateName := auto_ops_testing.GetObjectAsString(t, event.MetricSetFields, "template.templateName")
+		templateName := auto_ops_testing.GetObjectAsString(t, event.MetricSetFields, "template.template_name")
 		require.True(t, slices.Contains(templateNames, templateName), "template '%s' is not in the expected values", templateName)
 
 		// mapper is expected to drop this field if it appears
@@ -122,8 +122,8 @@ func expectValidParsedDetailedTemplatesCommon(t *testing.T, data metricset.Fetch
 
 	require.Equal(t, 2, len(events))
 
-	event1 := auto_ops_testing.GetEventByName(t, events, "template.templateName", "simple-response")
-	event2 := auto_ops_testing.GetEventByName(t, events, "template.templateName", "detailed-response")
+	event1 := auto_ops_testing.GetEventByName(t, events, "template.template_name", "simple-response")
+	event2 := auto_ops_testing.GetEventByName(t, events, "template.template_name", "detailed-response")
 
 	auto_ops_testing.CheckEventWithRandomTransactionId(t, event2, data.ClusterInfo)
 
@@ -144,7 +144,7 @@ func expectValidParsedDetailedTemplatesCommon(t *testing.T, data metricset.Fetch
 	// metrics exist
 
 	// event 1 (simple-response)
-	require.Equal(t, "simple-response", auto_ops_testing.GetObjectValue(event1.MetricSetFields, "template.templateName"))
+	require.Equal(t, "simple-response", auto_ops_testing.GetObjectValue(event1.MetricSetFields, "template.template_name"))
 	require.EqualValues(t, 1, auto_ops_testing.GetObjectValue(event1.MetricSetFields, "template.priority"))
 	require.Nil(t, auto_ops_testing.GetObjectValue(event1.MetricSetFields, "template.version"))
 	require.Nil(t, auto_ops_testing.GetObjectValue(event1.MetricSetFields, "template.allow_auto_create"))
@@ -156,7 +156,7 @@ func expectValidParsedDetailedTemplatesCommon(t *testing.T, data metricset.Fetch
 	require.Nil(t, auto_ops_testing.GetObjectValue(event1.MetricSetFields, "template._meta"))
 
 	// event 2 (detailed-response)
-	require.Equal(t, "detailed-response", auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template.templateName"))
+	require.Equal(t, "detailed-response", auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template.template_name"))
 	require.EqualValues(t, 789, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template.priority"))
 	require.EqualValues(t, 123456, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template.version"))
 	require.Equal(t, true, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template.allow_auto_create"))
@@ -179,7 +179,7 @@ func expectValidParsedDetailedTemplatesCommon(t *testing.T, data metricset.Fetch
 func expectValidParsedDetailedTemplatesOptional(t *testing.T, data metricset.FetcherData[IndexTemplates]) {
 	events := data.Reporter.GetEvents()
 
-	event2 := auto_ops_testing.GetEventByName(t, events, "template.templateName", "detailed-response")
+	event2 := auto_ops_testing.GetEventByName(t, events, "template.template_name", "detailed-response")
 
 	require.ElementsMatch(t, []string{"composed-1", "composed-2"}, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template.composed_of"))
 }
@@ -187,7 +187,7 @@ func expectValidParsedDetailedTemplatesOptional(t *testing.T, data metricset.Fet
 func expectComposedOfIsMissing(t *testing.T, data metricset.FetcherData[IndexTemplates]) {
 	events := data.Reporter.GetEvents()
 
-	event2 := auto_ops_testing.GetEventByName(t, events, "template.templateName", "detailed-response")
+	event2 := auto_ops_testing.GetEventByName(t, events, "template.template_name", "detailed-response")
 
 	require.Nil(t, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template.composed_of"))
 }

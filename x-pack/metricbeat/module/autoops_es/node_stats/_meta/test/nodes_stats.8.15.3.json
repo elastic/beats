@@ -2,9 +2,9 @@
     "nodes": {
         "oGi95SP4TpizlP6O-vmFow": {
             "name": "instance-0000000123",
-            "transport_address": "172.22.245.90:19294",
-            "host": "172.22.245.90",
-            "ip": "172.22.245.90:19294",
+            "transport_address": "10.42.0.2:19052",
+            "host": "10.42.0.2",
+            "ip": "10.42.0.2:19052",
             "roles": ["master", "remote_cluster_client"],
             "indices": {
                 "docs": {
