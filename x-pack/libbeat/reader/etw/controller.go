@@ -67,7 +67,8 @@ func (s *Session) CreateRealtimeSession() error {
 	// Set additional parameters for trace enabling.
 	// See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-enable_trace_parameters#members
 	params := EnableTraceParameters{
-		Version: 2, // ENABLE_TRACE_PARAMETERS_VERSION_2
+		EnableProperty: computeStringEnableProperty(s.enableProperty),
+		Version:        2, // ENABLE_TRACE_PARAMETERS_VERSION_2
 	}
 
 	// Zero timeout means asynchronous enablement
