@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
+
 package compose
 
 import (
@@ -176,7 +178,7 @@ func findComposePath() (string, error) {
 		return "", err
 	}
 	for {
-		if path == "/" {
+		if path == "/" { //nolint:all // need path to be checked each time
 			break
 		}
 

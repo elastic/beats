@@ -19,6 +19,7 @@ package readfile
 
 import (
 	"bytes"
+	"compress/gzip"
 	"errors"
 	"fmt"
 	"io"
@@ -184,8 +185,9 @@ func (r *LineReader) advance() error {
 		// Try to read more bytes into buffer
 		n, err := r.reader.Read(r.tempBuffer)
 
-		if errors.Is(err, io.EOF) && n > 0 {
-			// Continue processing the returned bytes. The next call will yield EOF with 0 bytes.
+		if (errors.Is(err, io.EOF) || errors.Is(err, gzip.ErrChecksum)) && n > 0 {
+			// Continue processing the returned bytes. The next call will yield
+			// EOF with 0 bytes.
 			err = nil
 		}
 
