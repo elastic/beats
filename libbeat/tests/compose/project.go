@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
+
 package compose
 
 import (
@@ -148,7 +150,7 @@ func (c *Project) Start(service string, options UpOptions) error {
 	c.Lock()
 	defer c.Unlock()
 
-	return c.Driver.Up(context.Background(), options, service)
+	return c.Up(context.Background(), options, service)
 }
 
 // Wait ensures all wanted services are healthy. Wait loop (60s timeout)
@@ -195,12 +197,12 @@ func (c *Project) HostInformation(service string) (ServiceInfo, error) {
 	}
 
 	if len(servicesStatus) == 0 {
-		return nil, errors.New("no container running for service")
+		return nil, fmt.Errorf("no container running for service: %s", service)
 	}
 
 	status, ok := servicesStatus[service]
 	if !ok || status.Host() == "" {
-		return nil, errors.New("unknown host:port for service")
+		return nil, fmt.Errorf("unknown host:port for service: %s", service)
 	}
 
 	return status, nil
@@ -301,7 +303,10 @@ func stalledLock(path string) bool {
 	defer file.Close()
 
 	var pid int
-	fmt.Fscanf(file, "%d", &pid)
+	_, err = fmt.Fscanf(file, "%d", &pid)
+	if err != nil {
+		return false
+	}
 
 	return !processExists(pid)
 }
@@ -338,7 +343,7 @@ func (c *Project) getServices(filter ...string) (map[string]ServiceInfo, error) 
 	defer c.Unlock()
 
 	result := make(map[string]ServiceInfo)
-	services, err := c.Driver.Ps(context.Background(), filter...)
+	services, err := c.Ps(context.Background(), filter...)
 	if err != nil {
 		return nil, err
 	}
@@ -364,7 +369,7 @@ type containerServiceInfo struct {
 }
 
 func (i *containerServiceInfo) Name() string {
-	return i.ContainerStatus.ServiceName()
+	return i.ServiceName()
 }
 
 func contains(list []string, item string) bool {

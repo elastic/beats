@@ -68,6 +68,7 @@ already present as `container.id` and `container.log.tag` is dropped because it 
 otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 - Fixed password authentication for ACL users in the Redis input of Filebeat. {pull}44137[44137]
+- Add experimental GZIP file ingestion in filestream. {pull}45301[45301]
 
 
 *Heartbeat*
@@ -482,6 +483,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Update CEL mito extensions to v1.22.0. {pull}45245[45245]
 - Allow empty HTTPJSON cursor template value evaluations to be ignored by Fleet health status updates. {pull}45361[45361]
 - Reuse OAuth2 clients in HTTP JSON input where possible. {issue}34834[34834] {pull}44976[44976]
+- Add support for generalized token authentication to CEL input. {pull}45359[45359]
 - Add status update functionality to Salesforce input. {issue}44653[44653] {pull}45227[45227]
 
 *Auditbeat*

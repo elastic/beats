@@ -45,7 +45,7 @@ func testSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 
 	var host string
 	if isInDockerIntegTestEnv() {
-		// We're running inside out integration test environment so
+		// We're running inside of integration test environment so
 		// make sure that that googlepubsub container is running.
 		host = compose.EnsureUp(t, "googlepubsub").Host()
 		os.Setenv("PUBSUB_EMULATOR_HOST", host)
@@ -167,11 +167,11 @@ func publishMessages(t *testing.T, client *pubsub.Client, numMsgs int) []string 
 	return messageIDs
 }
 
-func createSubscription(t *testing.T, client *pubsub.Client) {
+func createSubscription(t *testing.T, subscription string, client *pubsub.Client) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	sub := client.Subscription(emulatorSubscription)
+	sub := client.Subscription(subscription)
 	exists, err := sub.Exists(ctx)
 	if err != nil {
 		t.Fatalf("failed to check if sub exists: %v", err)
@@ -180,7 +180,7 @@ func createSubscription(t *testing.T, client *pubsub.Client) {
 		return
 	}
 
-	sub, err = client.CreateSubscription(ctx, emulatorSubscription, pubsub.SubscriptionConfig{
+	sub, err = client.CreateSubscription(ctx, subscription, pubsub.SubscriptionConfig{
 		Topic: client.Topic(emulatorTopic),
 	})
 	if err != nil {
@@ -369,7 +369,7 @@ func TestSubscriptionExists(t *testing.T) {
 
 	runTest(t, cfg, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
 		createTopic(t, client)
-		createSubscription(t, client)
+		createSubscription(t, emulatorSubscription, client)
 		publishMessages(t, client, 5)
 
 		var group errgroup.Group
@@ -443,7 +443,7 @@ func TestEndToEndACK(t *testing.T) {
 
 	runTestWithACKer(t, cfg, halfAcker, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
 		createTopic(t, client)
-		createSubscription(t, client)
+		createSubscription(t, emulatorSubscription, client)
 
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
