@@ -256,7 +256,7 @@ Host environment variables are made available via the global map `env`. Only env
 
 The CEL environment enables the https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes[optional types] library using the version defined {mito_docs}/lib#OptionalTypesVersion[here] and the https://pkg.go.dev/github.com/google/cel-go/ext#TwoVarComprehensions[two-variable comprehensions extensions] library using the version defined {mito_docs}/lib#TwoVarComprehensionVersion[here].
 
-Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2.
+Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2, or token authentication.
 
 Example configurations with authentication:
 
@@ -301,6 +301,26 @@ filebeat.inputs:
     token_url: http://localhost/oauth2/token
     user: user@domain.tld
     password: P@$$W0₹D
+  resource.url: http://localhost
+----
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: cel
+  auth.token:
+    type: Bearer
+    value: supersecret_bearer_token
+  resource.url: http://localhost
+----
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: cel
+  auth.token:
+    type: Token
+    value: supersecret_token
   resource.url: http://localhost
 ----
 
@@ -644,6 +664,23 @@ NOTE: Only one of the credentials settings can be set at once. For more informat
 The RSA JWK private key PEM block for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
 
 NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
+
+[float]
+==== `auth.token.enabled`
+
+When set to `false`, disables the token authentication configuration. Default: `true`.
+
+NOTE: Token authentication settings are disabled if either `enabled` is set to `false` or the `auth.token` section is missing.
+
+[float]
+==== `auth.token.type`
+
+The type of token to authenticate with, for example "Token" or "Bearer".
+
+[float]
+==== `auth.token.value`
+
+The token value to use.
 
 [[resource-parameters]]
 [float]
