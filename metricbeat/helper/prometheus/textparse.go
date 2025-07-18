@@ -574,9 +574,9 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		var lbls strings.Builder
 		var labelPairs = []*labels.Label{}
 		var qv string // value of le or quantile label
-		for _, l := range lset.Copy() {
+		lset.Copy().Range(func(l labels.Label) {
 			if l.Name == labels.MetricName {
-				continue
+				return
 			}
 
 			switch l.Name {
@@ -596,7 +596,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 				Name:  n,
 				Value: v,
 			})
-		}
+		})
 
 		var metric *OpenMetric
 
