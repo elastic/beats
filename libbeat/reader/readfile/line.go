@@ -54,7 +54,7 @@ type LineReader struct {
 }
 
 // NewLineReader creates a new reader object
-func NewLineReader(input io.ReadCloser, config Config) (*LineReader, error) {
+func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*LineReader, error) {
 	encoder := config.Codec.NewEncoder()
 
 	// Create newline char based on encoding
@@ -78,7 +78,7 @@ func NewLineReader(input io.ReadCloser, config Config) (*LineReader, error) {
 		inBuffer:     streambuf.New(nil),
 		outBuffer:    streambuf.New(nil),
 		tempBuffer:   make([]byte, config.BufferSize),
-		logger:       logp.NewLogger("reader_line"),
+		logger:       logger.Named("reader_line"),
 	}, nil
 }
 

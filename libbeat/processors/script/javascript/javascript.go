@@ -54,12 +54,12 @@ func New(c *config.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, err
 	}
 
-	return NewFromConfig(conf, monitoring.Default)
+	return NewFromConfig(conf, monitoring.Default, log)
 }
 
 // NewFromConfig constructs a new Javascript processor from the given config
 // object. It loads the sources, compiles them, and validates the entry point.
-func NewFromConfig(c Config, reg *monitoring.Registry) (beat.Processor, error) {
+func NewFromConfig(c Config, reg *monitoring.Registry, logger *logp.Logger) (beat.Processor, error) {
 	err := c.Validate()
 	if err != nil {
 		return nil, err
@@ -87,7 +87,7 @@ func NewFromConfig(c Config, reg *monitoring.Registry) (beat.Processor, error) {
 		return nil, err
 	}
 
-	pool, err := newSessionPool(prog, c)
+	pool, err := newSessionPool(prog, c, logger)
 	if err != nil {
 		return nil, annotateError(c.Tag, err)
 	}

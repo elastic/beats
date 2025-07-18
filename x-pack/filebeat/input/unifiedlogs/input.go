@@ -83,7 +83,7 @@ type input struct {
 	metrics *inputMetrics
 }
 
-func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
+func cursorConfigure(cfg *conf.C, _ *logp.Logger) ([]inputcursor.Source, inputcursor.Input, error) {
 	conf := defaultConfig()
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, nil, err
