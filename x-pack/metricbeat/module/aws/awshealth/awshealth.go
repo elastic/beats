@@ -128,7 +128,7 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 		config.AWSConfig.FIPSEnabled = true
 	}
 
-	awsConfig := m.MetricSet.AwsConfig.Copy()
+	awsConfig := m.AwsConfig.Copy()
 
 	health_client := health.NewFromConfig(awsConfig, func(o *health.Options) {
 		if config.AWSConfig.FIPSEnabled {
