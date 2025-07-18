@@ -140,5 +140,97 @@ func (c *config) Validate() error {
 		return fmt.Errorf("no path is configured")
 	}
 
+<<<<<<< HEAD
 	return nil
 }
+=======
+	if c.AllowIDDuplication && c.TakeOver.Enabled {
+		return errors.New("allow_deprecated_id_duplication and take_over " +
+			"cannot be enabled at the same time")
+	}
+
+	if c.GZIPExperimental {
+		// Validate file_identity must be fingerprint when gzip support is enabled.
+		if c.FileIdentity != nil && c.FileIdentity.Name() != fingerprintName {
+			return fmt.Errorf(
+				"gzip_experimental=true requires file_identity to be 'fingerprint'")
+		}
+
+		cfgwarn.Experimental(
+			"filestream: experimental gzip support enabled")
+	}
+
+	if c.ID == "" && c.TakeOver.Enabled {
+		return errors.New("'take_over' mode is only allowed if an input ID is set")
+	}
+
+	return nil
+}
+
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+func (c config) checkUnsupportedParams(logger *logp.Logger) {
+	if c.AllowIDDuplication {
+		logger.Named("input.filestream").Warn(
+			"setting `allow_deprecated_id_duplication` will lead to data " +
+				"duplication and incomplete input metrics, it's use is " +
+				"highly discouraged.")
+	}
+}
+
+// ValidateInputIDs checks all filestream inputs to ensure all input IDs are
+// unique. If there is a duplicated ID, it logs an error containing the offending
+// input configurations and returns an error containing the duplicated IDs.
+// A single empty ID is a valid ID as it's unique, however multiple empty IDs
+// are not unique and are therefore are treated as any other duplicated ID.
+func ValidateInputIDs(inputs []*conf.C, logger *logp.Logger) error {
+	duplicatedConfigs := make(map[string][]*conf.C)
+	var duplicates []string
+	for _, input := range inputs {
+		fsInput := struct {
+			ID   string `config:"id"`
+			Type string `config:"type"`
+		}{}
+		err := input.Unpack(&fsInput)
+		if err != nil {
+			return fmt.Errorf("failed to unpack filestream input configuration: %w", err)
+		}
+		if fsInput.Type == "filestream" {
+			duplicatedConfigs[fsInput.ID] = append(duplicatedConfigs[fsInput.ID], input)
+			// we just need to collect the duplicated IDs once, therefore collect
+			// it only the first time we see a duplicated ID.
+			if len(duplicatedConfigs[fsInput.ID]) == 2 {
+				duplicates = append(duplicates, fsInput.ID)
+			}
+		}
+	}
+
+	if len(duplicates) != 0 {
+		jsonDupCfg := collectOffendingInputs(duplicates, duplicatedConfigs)
+		logger.Errorw("filestream inputs with duplicated IDs", "inputs", jsonDupCfg)
+		var quotedDuplicates []string
+		for _, dup := range duplicates {
+			quotedDuplicates = append(quotedDuplicates, fmt.Sprintf("%q", dup))
+		}
+		return fmt.Errorf("filestream inputs validation error: filestream inputs with duplicated IDs: %v", strings.Join(quotedDuplicates, ","))
+	}
+
+	return nil
+}
+
+func collectOffendingInputs(duplicates []string, ids map[string][]*conf.C) []map[string]interface{} {
+	var cfgs []map[string]interface{}
+
+	for _, id := range duplicates {
+		for _, dupcfgs := range ids[id] {
+			toJson := map[string]interface{}{}
+			err := dupcfgs.Unpack(&toJson)
+			if err != nil {
+				toJson[id] = fmt.Sprintf("failed to unpack config: %v", err)
+			}
+			cfgs = append(cfgs, toJson)
+		}
+	}
+
+	return cfgs
+}
+>>>>>>> 1a9498d07 ([Chore] Replace global logger with local logger #11 (#45285))

@@ -103,7 +103,7 @@ func internalBuilder(
 	fetcher fetcher,
 	keystore keystore.Keystore,
 	log *logp.Logger) (*Provider, error) {
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil, log)
 	if err != nil {
 		return nil, err
 	}
