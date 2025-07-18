@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -150,13 +149,11 @@ func defaultConfig() kafkaConfig {
 	}
 }
 
-func readConfig(cfg *config.C, log *logp.Logger) (*kafkaConfig, error) {
+func readConfig(cfg *config.C) (*kafkaConfig, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, err
 	}
-	outputs.CheckQueueType(c.Queue, log)
-
 	return &c, nil
 }
 

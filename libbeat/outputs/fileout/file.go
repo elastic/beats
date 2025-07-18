@@ -53,7 +53,7 @@ func makeFileout(
 	observer outputs.Observer,
 	cfg *c.C,
 ) (outputs.Group, error) {
-	foConfig, err := readConfig(cfg, beat.Logger)
+	foConfig, err := readConfig(cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -67,7 +67,7 @@ func makeFileout(
 		return outputs.Fail(err)
 	}
 
-	return outputs.Success(foConfig.Queue, -1, 0, nil, fo)
+	return outputs.Success(foConfig.Queue, -1, 0, nil, beat.Logger, fo)
 }
 
 func (out *fileOutput) init(beat beat.Info, c fileOutConfig) error {

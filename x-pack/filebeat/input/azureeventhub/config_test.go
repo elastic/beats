@@ -43,7 +43,9 @@ func TestValidate(t *testing.T) {
 		config.SAKey = "secret"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 
-		config.Validate()
+		if err := config.Validate(); err != nil {
+			t.Fatalf("unexpected validation error: %v", err)
+		}
 
 		assert.Equal(
 			t,

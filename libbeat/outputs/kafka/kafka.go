@@ -48,7 +48,7 @@ func makeKafka(
 	log := beat.Logger.Named(logSelector)
 	log.Debug("initialize kafka output")
 
-	kConfig, err := readConfig(cfg, log)
+	kConfig, err := readConfig(cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -82,7 +82,7 @@ func makeKafka(
 	if kConfig.MaxRetries < 0 {
 		retry = -1
 	}
-	return outputs.Success(kConfig.Queue, kConfig.BulkMaxSize, retry, nil, client)
+	return outputs.Success(kConfig.Queue, kConfig.BulkMaxSize, retry, nil, beat.Logger, client)
 }
 
 // buildTopicSelector builds the topic selector for standalone Beat and when

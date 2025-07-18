@@ -20,11 +20,9 @@ package fileout
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type fileOutConfig struct {
@@ -48,13 +46,11 @@ func defaultConfig() fileOutConfig {
 	}
 }
 
-func readConfig(cfg *config.C, logger *logp.Logger) (*fileOutConfig, error) {
+func readConfig(cfg *config.C) (*fileOutConfig, error) {
 	foConfig := defaultConfig()
 	if err := cfg.Unpack(&foConfig); err != nil {
 		return nil, err
 	}
-
-	outputs.CheckQueueType(foConfig.Queue, logger)
 
 	// disable bulk support in publisher pipeline
 	_ = cfg.SetInt("bulk_max_size", -1, -1)

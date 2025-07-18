@@ -54,7 +54,6 @@ func makeConsole(
 ) (outputs.Group, error) {
 	config := defaultConfig
 	err := cfg.Unpack(&config)
-	outputs.CheckQueueType(config.Queue, beat.Logger)
 
 	if err != nil {
 		return outputs.Fail(err)
@@ -87,7 +86,7 @@ func makeConsole(
 		}
 	}
 
-	return outputs.Success(config.Queue, config.BatchSize, 0, nil, c)
+	return outputs.Success(config.Queue, config.BatchSize, 0, nil, beat.Logger, c)
 }
 
 func newConsole(index string, observer outputs.Observer, codec codec.Codec, logger *logp.Logger) (*console, error) {

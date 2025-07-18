@@ -32,6 +32,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -87,7 +88,7 @@ func TestProduceConsumer(t *testing.T) {
 // than 2 events to it, p.Publish will block, once we call q.Close,
 // we ensure the 3rd event was not successfully published.
 func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
-	q := NewQueue(nil, nil,
+	q := NewQueue(logp.NewNopLogger(), nil,
 		Settings{
 			Events:        2, // Queue size
 			MaxGetRequest: 1, // make sure the queue won't buffer events
@@ -157,7 +158,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 
 	var activeEvents atomic.Int64
 
-	q := NewQueue(nil, nil,
+	q := NewQueue(logp.NewNopLogger(), nil,
 		Settings{
 			Events:        3, // Queue size
 			MaxGetRequest: 2,
@@ -273,7 +274,7 @@ func TestBatchFreeEntries(t *testing.T) {
 	// 4. Make sure only events 6-10 are nil
 	// 5. Call FreeEntries on the first batch
 	// 6. Make sure all events are nil
-	testQueue := NewQueue(nil, nil, Settings{Events: queueSize, MaxGetRequest: batchSize, FlushTimeout: time.Second}, 0, nil)
+	testQueue := NewQueue(logp.NewNopLogger(), nil, Settings{Events: queueSize, MaxGetRequest: batchSize, FlushTimeout: time.Second}, 0, nil)
 	producer := testQueue.Producer(queue.ProducerConfig{})
 	for i := 0; i < queueSize; i++ {
 		_, ok := producer.Publish(i)

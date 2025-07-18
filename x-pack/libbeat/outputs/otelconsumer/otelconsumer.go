@@ -46,7 +46,6 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 	if err := cfg.Unpack(&ocConfig); err != nil {
 		return outputs.Fail(err)
 	}
-	outputs.CheckQueueType(ocConfig.Queue, beat.Logger)
 
 	// Default to runtime.NumCPU() workers
 	clients := make([]outputs.Client, 0, runtime.NumCPU())
@@ -59,7 +58,7 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		})
 	}
 
-	return outputs.Success(ocConfig.Queue, -1, 0, nil, clients...)
+	return outputs.Success(ocConfig.Queue, -1, 0, nil, beat.Logger, clients...)
 }
 
 // Close is a noop for otelconsumer
