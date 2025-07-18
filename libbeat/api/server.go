@@ -69,7 +69,7 @@ func (s *Server) Start() {
 	go func(l net.Listener) {
 		defer s.wg.Done()
 		s.log.Infof("Metrics endpoint listening on: %s (configured: %s)", l.Addr().String(), s.config.Host)
-		err := http.Serve(l, s.mux)
+		err := http.Serve(l, s.mux) //nolint:gosec // Keep original behavior
 		s.log.Infof("Stats endpoint (%s) finished: %v", l.Addr().String(), err)
 	}(s.l)
 }
