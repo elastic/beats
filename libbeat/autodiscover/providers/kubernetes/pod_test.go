@@ -40,7 +40,6 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -344,10 +343,10 @@ func TestGenerateHints(t *testing.T) {
 	}
 
 	cfg := defaultConfig()
-
+	logger := logptest.NewTestingLogger(t, "")
 	p := pod{
 		config: cfg,
-		logger: logp.NewLogger("kubernetes.pod"),
+		logger: logger.Named("kubernetes.pod"),
 	}
 	for _, test := range tests {
 		test := test
@@ -1952,9 +1951,10 @@ func TestPod_EmitEvent(t *testing.T) {
 
 	client := k8sfake.NewSimpleClientset()
 	addResourceMetadata := metadata.GetDefaultResourceMetadataConfig()
+	logger := logptest.NewTestingLogger(t, "")
 	for _, test := range tests {
 		t.Run(test.Message, func(t *testing.T) {
-			mapper, err := template.NewConfigMapper(nil, nil, nil)
+			mapper, err := template.NewConfigMapper(nil, nil, nil, logger)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -1964,7 +1964,7 @@ func TestPod_EmitEvent(t *testing.T) {
 				config:    defaultConfig(),
 				bus:       bus.New(logptest.NewTestingLogger(t, "bus"), "test"),
 				templates: mapper,
-				logger:    logp.NewLogger("kubernetes"),
+				logger:    logger.Named("kubernetes"),
 			}
 
 			pub := &publisher{b: p.bus}
@@ -1973,7 +1973,7 @@ func TestPod_EmitEvent(t *testing.T) {
 				config:      defaultConfig(),
 				publishFunc: pub.publish,
 				uuid:        UUID,
-				logger:      logptest.NewTestingLogger(t, "kubernetes.pod"),
+				logger:      logger.Named("kubernetes.pod"),
 			}
 
 			p.eventManager = NewMockPodEventerManager(pod)

@@ -250,7 +250,7 @@ func (b *templateBuilder) template(config TemplateConfig, info beat.Info, esVers
 		b.log.Info("template config not enabled")
 		return nil, nil
 	}
-	tmpl, err := New(b.isServerless, info.Version, info.IndexPrefix, info.ElasticLicensed, esVersion, config, migration)
+	tmpl, err := New(b.isServerless, info.Version, info.IndexPrefix, info.ElasticLicensed, esVersion, config, migration, b.log)
 	if err != nil {
 		return nil, fmt.Errorf("error creating template instance: %w", err)
 	}

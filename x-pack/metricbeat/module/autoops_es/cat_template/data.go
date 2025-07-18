@@ -43,7 +43,7 @@ func getNamedTemplates(transactionId string, info *utils.ClusterInfo, templates 
 		} else if template, err := templateSchema.Apply(data); err != nil {
 			errs = append(errs, fmt.Errorf("failed applying template schema for %v: %w", name, err))
 		} else {
-			template["templateName"] = name
+			template["template_name"] = name
 			reporter(transactionId, info, template)
 		}
 	}

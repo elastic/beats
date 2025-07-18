@@ -170,7 +170,7 @@ func TestFailedCatShardsFetch(t *testing.T) {
 // Integration tests to check the error handling when the server returns different error types
 // TestElasticSearchError tests the error handling when an Elasticsearch simple error is returned
 func Test500FailedToResolveIndexesWhileFetching(t *testing.T) {
-	t.Setenv("DEPLOYMENT_ID", "test-resource-id")
+	t.Setenv("AUTOOPS_DEPLOYMENT_ID", "test-resource-id")
 	utils.GetAndSetResourceID()
 
 	t.Cleanup(utils.ClearResourceID)
@@ -197,7 +197,7 @@ func Test500FailedToResolveIndexesWhileFetching(t *testing.T) {
 
 // TestElasticSearchError tests the error handling when an elasticsearch is returned
 func Test404FailedToResolveIndexesWhileFetching(t *testing.T) {
-	t.Setenv("RESOURCE_ID", "test-resource-id")
+	t.Setenv("AUTOOPS_RESOURCE_ID", "test-resource-id")
 	utils.GetAndSetResourceID()
 
 	t.Cleanup(utils.ClearResourceID)
@@ -224,7 +224,7 @@ func Test404FailedToResolveIndexesWhileFetching(t *testing.T) {
 
 // TestElasticSearchError tests the error handling when an elasticsearch is returned
 func Test405FailedToResolveIndexesWhileFetching(t *testing.T) {
-	t.Setenv("PROJECT_ID", "test-resource-id")
+	t.Setenv("AUTOOPS_PROJECT_ID", "test-resource-id")
 	utils.GetAndSetResourceID()
 
 	t.Cleanup(utils.ClearResourceID)
@@ -251,7 +251,7 @@ func Test405FailedToResolveIndexesWhileFetching(t *testing.T) {
 
 // TestElasticSearchError tests the error handling when an error different from Elasticsearch is returned (proxy error, etc.)
 func Test500FailedToResolveIndexesWhileFetchingEmptyResponse(t *testing.T) {
-	t.Setenv("DEPLOYMENT_ID", "test-resource-id")
+	t.Setenv("AUTOOPS_DEPLOYMENT_ID", "test-resource-id")
 	utils.GetAndSetResourceID()
 
 	t.Cleanup(utils.ClearResourceID)

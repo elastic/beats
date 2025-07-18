@@ -56,14 +56,15 @@ type wrapperDriver struct {
 	Environment []string
 
 	client *client.Client
+	logger *logp.Logger
 }
 
-func newWrapperDriver() (*wrapperDriver, error) {
+func newWrapperDriver(logger *logp.Logger) (*wrapperDriver, error) {
 	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
 	if err != nil {
 		return nil, err
 	}
-	return &wrapperDriver{client: c}, nil
+	return &wrapperDriver{client: c, logger: logger}, nil
 }
 
 type wrapperContainer struct {
@@ -408,7 +409,7 @@ func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
 		if container.Running() && container.Old() {
 			err = d.client.ContainerRemove(ctx, container.info.ID, rmOpts)
 			if err != nil {
-				logp.Err("container remove: %v", err)
+				d.logger.Errorf("container remove: %v", err)
 			}
 		}
 	}
