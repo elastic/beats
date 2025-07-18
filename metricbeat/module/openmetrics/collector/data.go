@@ -22,14 +22,12 @@ import (
 	"strconv"
 
 	"github.com/prometheus/common/model"
-
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	l "github.com/prometheus/prometheus/model/labels"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	l "github.com/prometheus/prometheus/model/labels"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // OpenMetricEvent stores a set of one or more metrics with the same labels
