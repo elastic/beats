@@ -91,16 +91,7 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 		return nil, nil, err
 	}
 
-<<<<<<< HEAD
 	prospector, err := newProspector(config, log)
-=======
-	// log warning if deprecated params are set
-	c.checkUnsupportedParams(log)
-
-	c.TakeOver.LogWarnings(log)
-
-	prospector, err := newProspector(c, log)
->>>>>>> 1a9498d07 ([Chore] Replace global logger with local logger #11 (#45285))
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}

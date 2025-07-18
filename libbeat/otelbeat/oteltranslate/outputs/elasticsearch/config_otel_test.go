@@ -237,8 +237,6 @@ batcher:
 
 }
 
-<<<<<<< HEAD
-=======
 func TestCompressionConfig(t *testing.T) {
 	compressionConfig := `
 hosts:
@@ -296,7 +294,6 @@ compression_params:
 
 }
 
->>>>>>> 1a9498d07 ([Chore] Replace global logger with local logger #11 (#45285))
 func newFromYamlString(t *testing.T, input string) *confmap.Conf {
 	t.Helper()
 	var rawConf map[string]any

@@ -7,6 +7,7 @@ package otelconsumer
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -53,9 +54,6 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 	if err := cfg.Unpack(&ocConfig); err != nil {
 		return outputs.Fail(err)
 	}
-<<<<<<< HEAD
-	return outputs.Success(ocConfig.Queue, -1, 0, nil, out)
-=======
 
 	// Default to runtime.NumCPU() workers
 	clients := make([]outputs.Client, 0, runtime.NumCPU())
@@ -69,7 +67,6 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 	}
 
 	return outputs.Success(ocConfig.Queue, -1, 0, nil, beat.Logger, clients...)
->>>>>>> 1a9498d07 ([Chore] Replace global logger with local logger #11 (#45285))
 }
 
 // Close is a noop for otelconsumer

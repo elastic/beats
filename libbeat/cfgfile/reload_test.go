@@ -50,12 +50,7 @@ func TestReloader(t *testing.T) {
 		},
 	})
 	// config.C{}
-<<<<<<< HEAD:libbeat/cfgfile/reload_test.go
 	reloader := NewReloader(logptest.NewTestingLogger(t, ""), nil, config)
-=======
-
-	reloader := NewReloader(logptest.NewTestingLogger(t, "cfgfile-test.reload"), nil, config)
->>>>>>> 1a9498d07 ([Chore] Replace global logger with local logger #11 (#45285)):libbeat/cfgfile/reload_integration_test.go
 	retryCount := 10
 
 	go reloader.Run(nil)
