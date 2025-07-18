@@ -287,7 +287,7 @@ processors:
 
 			return otelDocs.Hits.Total.Value >= 1 && metricbeatDocs.Hits.Total.Value >= 1
 		},
-		2*time.Minute, 1*time.Second, "Expected at least one ingested metric event, got metricbeat: %d, otel: %d", metricbeatDocs.Hits.Total.Value, otelDocs.Hits.Total.Value)
+		2*time.Minute, 1*time.Second, "expected at least 1 log")
 	otelDoc := otelDocs.Hits.Hits[0]
 	metricbeatDoc := metricbeatDocs.Hits.Hits[0]
 	assertMapstrKeysEqual(t, otelDoc.Source, metricbeatDoc.Source, []string{}, "expected documents keys to be equal")
