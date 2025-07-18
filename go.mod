@@ -364,6 +364,7 @@ replace (
 	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20211202005954-d412fca7f83a
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/tonistiigi/fifo => github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
+	github.com/vmware/govmomi => github.com/easyops-cn/govmomi v1.0.0
 )
 
 // Exclude this version because the version has an invalid checksum.
