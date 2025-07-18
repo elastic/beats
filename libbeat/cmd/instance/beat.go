@@ -853,7 +853,7 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	// initialize config manager
-	m, err := management.NewManager(b.Config.Management, b.Registry)
+	m, err := management.NewManager(b.Config.Management, b.Registry, logger)
 	if err != nil {
 		return err
 	}

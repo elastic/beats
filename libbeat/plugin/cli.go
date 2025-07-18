@@ -57,7 +57,8 @@ func init() {
 
 func Initialize() error {
 	if len(plugins.paths) > 0 {
-		cfgwarn.Experimental("loadable plugin support is experimental")
+		// This is never logged
+		logp.NewNopLogger().Warn(cfgwarn.Experimental("loadable plugin support is experimental"))
 	}
 
 	for _, path := range plugins.paths {

@@ -125,8 +125,7 @@ func MakeDefaultSupport(
 			rawProcessors = cfg.Processors
 		}
 
-		// TODO: pass a local logger to processor.New
-		processors, err := processors.New(rawProcessors, nil)
+		processors, err := processors.New(rawProcessors, log)
 		if err != nil {
 			return nil, fmt.Errorf("error initializing processors: %w", err)
 		}
@@ -390,7 +389,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	// setup 9: time series metadata
 	if b.timeSeries {
-		processors.add(timeseries.NewTimeSeriesProcessor(b.timeseriesFields))
+		processors.add(timeseries.NewTimeSeriesProcessor(b.timeseriesFields, b.log))
 	}
 
 	// setup 10: debug print final event (P)

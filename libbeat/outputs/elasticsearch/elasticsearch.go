@@ -66,7 +66,7 @@ func makeES(
 		return outputs.Fail(err)
 	}
 
-	deadLetterIndex, err := deadLetterIndexForPolicy(esConfig.NonIndexablePolicy)
+	deadLetterIndex, err := deadLetterIndexForPolicy(esConfig.NonIndexablePolicy, log)
 	if err != nil {
 		log.Errorf("error in non_indexable_policy: %v", err)
 		return outputs.Fail(err)

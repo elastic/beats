@@ -19,31 +19,25 @@ package cfgwarn
 
 import (
 	"fmt"
-
-	"go.uber.org/zap"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-const selector = "cfgwarn"
-
-// Beta logs the usage of an beta feature.
-func Beta(format string, v ...interface{}) {
-	logp.NewLogger(selector, zap.AddCallerSkip(1)).Warnf("BETA: "+format, v...)
+// Beta returns a string suitable to log beta feature.
+func Beta(format string, v ...interface{}) string {
+	return fmt.Sprintf("BETA: "+format, v...)
 }
 
-// Deprecate logs a deprecation message.
+// Deprecate returns a deprecation message.
 // The version string contains the version when the future will be removed.
 // If version is empty, the message  will not mention the removal of the feature.
-func Deprecate(version string, format string, v ...interface{}) {
+func Deprecate(version string, format string, v ...interface{}) string {
 	var postfix string
 	if version != "" {
 		postfix = fmt.Sprintf(" Will be removed in version: %s", version)
 	}
-	logp.NewLogger(selector, zap.AddCallerSkip(1)).Warnf("DEPRECATED: "+format+postfix, v...)
+	return fmt.Sprintf("DEPRECATED: "+format+postfix, v...)
 }
 
 // Experimental logs the usage of an experimental feature.
-func Experimental(format string, v ...interface{}) {
-	logp.NewLogger(selector, zap.AddCallerSkip(1)).Warnf("EXPERIMENTAL: "+format, v...)
+func Experimental(format string, v ...interface{}) string {
+	return fmt.Sprintf("EXPERIMENTAL: "+format, v...)
 }
