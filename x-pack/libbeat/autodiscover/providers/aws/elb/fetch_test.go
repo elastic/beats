@@ -7,11 +7,12 @@ package elb
 import (
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_newAPIFetcher(t *testing.T) {
 	client := newMockELBClient(0)
-	fetcher := newAPIFetcher([]autodiscoverElbClient{client})
+	fetcher := newAPIFetcher([]autodiscoverElbClient{client}, logptest.NewTestingLogger(t, ""))
 	require.NotNil(t, fetcher)
 }
