@@ -294,8 +294,6 @@ filebeat.inputs:
   resource.url: http://localhost
 ```
 
-<<<<<<< HEAD
-=======
 ```yaml
 filebeat.inputs:
 - type: cel
@@ -313,7 +311,6 @@ filebeat.inputs:
     value: supersecret_token
   resource.url: http://localhost
 ```
->>>>>>> 5c91c960d (x-pack/filebeat/input/cel: add support for token authentication (#45359))
 
 ## Input state [input-state-cel]
 
