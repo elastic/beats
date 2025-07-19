@@ -25,7 +25,6 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -108,8 +107,7 @@ func (input input) Test(src inputcursor.Source, _ v2.TestContext) error {
 
 // Run starts the input and blocks until it ends the execution.
 func (input *input) Run(ctxt v2.Context, src inputcursor.Source, resumeCursor inputcursor.Cursor, pub inputcursor.Publisher) error {
-	reg, unreg := inputmon.NewInputRegistry(input.Name(), ctxt.ID, nil)
-	defer unreg()
+	reg := ctxt.MetricsRegistry
 
 	stdCtx := ctxtool.FromCanceller(ctxt.Cancelation)
 	log := ctxt.Logger.With("source", src.Name())

@@ -18,6 +18,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -66,7 +67,7 @@ func newScheduler(publisher cursor.Publisher, client *azcontainer.Client,
 ) *scheduler {
 	if metrics == nil {
 		// metrics are optional, initialize a stub if not provided
-		metrics = newInputMetrics("", nil)
+		metrics = newInputMetrics(monitoring.NewRegistry())
 	}
 	return &scheduler{
 		publisher:  publisher,
