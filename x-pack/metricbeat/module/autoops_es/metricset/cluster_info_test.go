@@ -39,7 +39,7 @@ func setupClusterInfoFromFile(filename string) auto_ops_testing.SetupServerCallb
 }
 
 func TestNestedFailedClusterInfoNoId(t *testing.T) {
-	t.Setenv("DEPLOYMENT_ID", "test-resource-id")
+	t.Setenv("AUTOOPS_DEPLOYMENT_ID", "test-resource-id")
 	utils.GetAndSetResourceID()
 
 	t.Cleanup(utils.ClearResourceID)
@@ -64,7 +64,7 @@ func TestNestedFailedClusterInfoNoId(t *testing.T) {
 }
 
 func TestNestedFailedClusterInfoNAId(t *testing.T) {
-	t.Setenv("RESOURCE_ID", "test-resource-id")
+	t.Setenv("AUTOOPS_RESOURCE_ID", "test-resource-id")
 	utils.GetAndSetResourceID()
 
 	t.Cleanup(utils.ClearResourceID)

@@ -30,7 +30,7 @@ func expectValidParsedData(t *testing.T, data metricset.FetcherData[NodesStats])
 
 	auto_ops_testing.CheckAllEventsUseSameTransactionId(t, events)
 
-	nodeList := auto_ops_testing.GetEventsWithField(t, events, "subType")
+	nodeList := auto_ops_testing.GetEventsWithField(t, events, "nodes")
 
 	require.Equal(t, 1, len(nodeList))
 	require.LessOrEqual(t, 1, len(auto_ops_testing.GetObjectValue(nodeList[0].MetricSetFields, "nodes").(map[string]string)))
@@ -45,13 +45,9 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 
 	events := data.Reporter.GetEvents()
 
-	nodeListEvents := auto_ops_testing.GetEventsWithField(t, events, "subType")
+	nodeListEvents := auto_ops_testing.GetEventsWithField(t, events, "nodes")
 	nodeListEvent := nodeListEvents[0]
 	nodeList := auto_ops_testing.GetObjectValue(nodeListEvent.MetricSetFields, "nodes").(map[string]string)
-
-	// TODO: Update the indexer to use these from the metricset and remove this from being checked
-	require.Equal(t, "list", nodeListEvent.RootFields["subType"])
-	require.Equal(t, nodeList, nodeListEvent.ModuleFields["nodes"])
 
 	if data.Version == "7.17.0" {
 		require.Equal(t, 1, len(nodeList))
@@ -69,19 +65,9 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 	require.Equal(t, "deX3GDaCSQSINcDCm-AtDw", node1MetricSet["id"])
 	require.Equal(t, "instance-0000000001", node1MetricSet["name"])
 
-	// TODO: Update the indexer and remove these from the module fields (and thus stop checking they're there)
-	node1ModuleFields := node1.ModuleFields
-	require.Equal(t, "deX3GDaCSQSINcDCm-AtDw", auto_ops_testing.GetObjectValue(node1ModuleFields, "node.id"))
-	require.Equal(t, "instance-0000000001", auto_ops_testing.GetObjectValue(node1ModuleFields, "node.name"))
-
 	if data.Version == "7.17.0" {
 		require.Equal(t, 1, len(nodeStatsEvents))
-		require.EqualValues(t, 1, nodeStatsEvents[0].ModuleFields["totalAmountOfFractions"])
-
-		// TODO: Remove module fields
-		require.Equal(t, "10.42.0.2", auto_ops_testing.GetObjectValue(node1ModuleFields, "node.host"))
-		require.Equal(t, true, auto_ops_testing.GetObjectValue(node1ModuleFields, "node.is_elected_master"))
-		require.ElementsMatch(t, []string{"data_content", "data_hot", "ingest", "master", "remote_cluster_client", "transform"}, auto_ops_testing.GetObjectValue(node1ModuleFields, "node.roles"))
+		require.EqualValues(t, 1, nodeStatsEvents[0].ModuleFields["total_amount_of_fractions"])
 
 		// metricset fields
 		require.Equal(t, "10.42.0.2", node1MetricSet["host"])
@@ -102,12 +88,7 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 		require.EqualValues(t, 1777, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.write.completed"))
 	} else if data.Version == "8.15.3" {
 		require.Equal(t, 59, len(nodeStatsEvents))
-		require.EqualValues(t, 59, nodeStatsEvents[0].ModuleFields["totalAmountOfFractions"])
-
-		// TODO: Remove module fields
-		require.Equal(t, "172.22.238.181", auto_ops_testing.GetObjectValue(node1ModuleFields, "node.host"))
-		require.Equal(t, false, auto_ops_testing.GetObjectValue(node1ModuleFields, "node.is_elected_master"))
-		require.ElementsMatch(t, []string{"data_content", "data_hot", "ingest", "remote_cluster_client", "transform"}, auto_ops_testing.GetObjectValue(node1ModuleFields, "node.roles"))
+		require.EqualValues(t, 59, nodeStatsEvents[0].ModuleFields["total_amount_of_fractions"])
 
 		// metricset fields
 		require.Equal(t, "172.22.238.181", node1MetricSet["host"])
@@ -115,6 +96,7 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 		require.ElementsMatch(t, []string{"data_content", "data_hot", "ingest", "remote_cluster_client", "transform"}, node1MetricSet["roles"])
 		require.EqualValues(t, 3836668558, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.docs.count"))
 		require.EqualValues(t, 814301334447, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.store.size_in_bytes"))
+		require.EqualValues(t, 814301334447, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.store.total_data_set_size_in_bytes"))
 		require.EqualValues(t, 187857964532, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.indexing.index_total"))
 		require.EqualValues(t, 23116646135, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.indexing.index_time_in_millis"))
 		require.EqualValues(t, 266, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.indexing.index_failed"))

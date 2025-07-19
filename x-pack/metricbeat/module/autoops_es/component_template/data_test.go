@@ -56,7 +56,7 @@ func expectValidParsedDataWithTemplateNames(t *testing.T, data metricset.Fetcher
 
 	var actualTemplateNames []string
 	for _, event := range events {
-		name := auto_ops_testing.GetObjectAsString(t, event.MetricSetFields, "template.templateName")
+		name := auto_ops_testing.GetObjectAsString(t, event.MetricSetFields, "template.template_name")
 		actualTemplateNames = append(actualTemplateNames, name)
 	}
 	require.Equal(t, len(templateNames), len(actualTemplateNames), "Wrong number of template names %s", actualTemplateNames)
@@ -82,8 +82,8 @@ func expectValidParsedDetailedTemplates(t *testing.T, data metricset.FetcherData
 
 	require.Equal(t, 2, len(events))
 
-	event1 := auto_ops_testing.GetEventByName(t, events, "template.templateName", "simple-response")
-	event2 := auto_ops_testing.GetEventByName(t, events, "template.templateName", "detailed-response")
+	event1 := auto_ops_testing.GetEventByName(t, events, "template.template_name", "simple-response")
+	event2 := auto_ops_testing.GetEventByName(t, events, "template.template_name", "detailed-response")
 
 	auto_ops_testing.CheckEventWithRandomTransactionId(t, event2, data.ClusterInfo)
 
@@ -104,13 +104,13 @@ func expectValidParsedDetailedTemplates(t *testing.T, data metricset.FetcherData
 	// metrics exist
 
 	// event 1 (simple-response)
-	require.Equal(t, "simple-response", auto_ops_testing.GetObjectValue(event1.MetricSetFields, "template.templateName"))
+	require.Equal(t, "simple-response", auto_ops_testing.GetObjectValue(event1.MetricSetFields, "template.template_name"))
 	require.Nil(t, auto_ops_testing.GetObjectValue(event1.MetricSetFields, "template.version"))
 	require.Equal(t, auto_ops_testing.GetObjectAsJson(simpleTemplate, "template.template.settings"), auto_ops_testing.GetObjectAsJson(event1.MetricSetFields, "template.template.settings"))
 	require.Nil(t, auto_ops_testing.GetObjectValue(event1.MetricSetFields, "template._meta"))
 
 	// event 2 (detailed-response)
-	require.Equal(t, "detailed-response", auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template.templateName"))
+	require.Equal(t, "detailed-response", auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template.template_name"))
 	require.EqualValues(t, 123456, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template.version"))
 	require.Equal(t, auto_ops_testing.GetObjectAsJson(detailedTemplate, "template.template"), auto_ops_testing.GetObjectAsJson(event2.MetricSetFields, "template.template"))
 	require.EqualValues(t, 456, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template._meta.property1"))

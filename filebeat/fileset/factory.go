@@ -168,7 +168,7 @@ func (p *inputsRunner) Start() {
 		}
 
 		// Register callback to try to load pipelines when connecting to ES.
-		callback := func(esClient *eslegclient.Connection) error {
+		callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
 			return p.moduleRegistry.LoadPipelines(esClient, p.overwritePipelines)
 		}
 		p.pipelineCallbackID, err = elasticsearch.RegisterConnectCallback(callback)

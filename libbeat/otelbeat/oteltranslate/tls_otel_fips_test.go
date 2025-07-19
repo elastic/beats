@@ -26,6 +26,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -58,7 +59,7 @@ sxSmbIUfc2SGJGCJD4I=
 			Passphrase:  "changeme",
 		},
 		CipherSuites: []tlscommon.CipherSuite{tlscommon.CipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256)},
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	require.Error(t, err)
 	require.ErrorIs(t, err, errors.ErrUnsupported)
 }

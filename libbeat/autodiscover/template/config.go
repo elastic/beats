@@ -39,6 +39,7 @@ type Mapper struct {
 	ConditionMaps    []*ConditionMap
 	keystore         keystore.Keystore
 	keystoreProvider bus.KeystoreProvider
+	logger           *logp.Logger
 }
 
 // ConditionMap maps a condition to the configs to use when it's triggered
@@ -58,12 +59,12 @@ func NewConfigMapper(
 	configs MapperSettings,
 	keystore keystore.Keystore,
 	keystoreProvider bus.KeystoreProvider,
+	logger *logp.Logger,
 ) (mapper Mapper, err error) {
 	for _, c := range configs {
 		condMap := &ConditionMap{Configs: c.Configs}
 		if c.ConditionConfig != nil {
-			// TODO: use local logger here
-			condMap.Condition, err = conditions.NewCondition(c.ConditionConfig, logp.NewLogger(""))
+			condMap.Condition, err = conditions.NewCondition(c.ConditionConfig, logger)
 			if err != nil {
 				return Mapper{}, err
 			}
@@ -73,6 +74,7 @@ func NewConfigMapper(
 
 	mapper.keystore = keystore
 	mapper.keystoreProvider = keystoreProvider
+	mapper.logger = logger
 	return mapper, nil
 }
 
@@ -110,7 +112,7 @@ func (c Mapper) GetConfig(event bus.Event) []*conf.C {
 			continue
 		}
 
-		configs := ApplyConfigTemplate(event, mapping.Configs, opts...)
+		configs := ApplyConfigTemplate(event, mapping.Configs, c.logger, opts...)
 		if configs != nil {
 			result = append(result, configs...)
 		}
@@ -119,14 +121,14 @@ func (c Mapper) GetConfig(event bus.Event) []*conf.C {
 }
 
 // ApplyConfigTemplate takes a set of templated configs and applys information in an event map
-func ApplyConfigTemplate(event bus.Event, configs []*conf.C, options ...ucfg.Option) []*conf.C {
+func ApplyConfigTemplate(event bus.Event, configs []*conf.C, logger *logp.Logger, options ...ucfg.Option) []*conf.C {
 	var result []*conf.C
 	// unpack input
 	vars, err := ucfg.NewFrom(map[string]interface{}{
 		"data": event,
 	})
 	if err != nil {
-		logp.Err("Error building config: %v", err)
+		logger.Errorf("Error building config: %v", err)
 	}
 
 	opts := []ucfg.Option{
@@ -148,20 +150,20 @@ func ApplyConfigTemplate(event bus.Event, configs []*conf.C, options ...ucfg.Opt
 	for _, cfg := range configs {
 		c, err := ucfg.NewFrom(cfg, opts...)
 		if err != nil {
-			logp.Err("Error parsing config: %v", err)
+			logger.Errorf("Error parsing config: %v", err)
 			continue
 		}
 		// Unpack config to process any vars in the template:
 		var unpacked map[string]interface{}
 		err = c.Unpack(&unpacked, opts...)
 		if err != nil {
-			logp.Debug("autodiscover", "Configuration template cannot be resolved: %v", err)
+			logger.Debugf("autodiscover", "Configuration template cannot be resolved: %v", err)
 			continue
 		}
 		// Repack again:
 		res, err := conf.NewConfigFrom(unpacked)
 		if err != nil {
-			logp.Err("Error creating config from unpack: %v", err)
+			logger.Errorf("Error creating config from unpack: %v", err)
 			continue
 		}
 		result = append(result, res)

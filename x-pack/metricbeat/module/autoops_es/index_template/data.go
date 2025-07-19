@@ -53,7 +53,7 @@ func getNamedTemplates(transactionId string, info *utils.ClusterInfo, templates 
 			continue
 		}
 
-		template["templateName"] = templateData.Name
+		template["template_name"] = templateData.Name
 
 		reporter(transactionId, info, template)
 	}

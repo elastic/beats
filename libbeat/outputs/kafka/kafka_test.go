@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -68,7 +69,7 @@ func TestBuildTopicSelector(t *testing.T) {
 				defer management.SetUnderAgent(previous)
 			}
 
-			selector, err := buildTopicSelector(configC)
+			selector, err := buildTopicSelector(configC, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatalf("could not build topic selector: %s", err)
 			}
@@ -86,7 +87,7 @@ func TestBuildTopicSelector(t *testing.T) {
 	}
 
 	t.Run("fail unpacking config", func(t *testing.T) {
-		_, err := buildTopicSelector(nil)
+		_, err := buildTopicSelector(nil, logptest.NewTestingLogger(t, ""))
 		if err == nil {
 			t.Error("unpack must fail with a nil *config.C")
 		}

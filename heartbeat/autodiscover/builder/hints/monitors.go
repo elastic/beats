@@ -105,7 +105,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 		}
 		hb.logger.Debugf("generated config %+v", configs)
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs)
+		return template.ApplyConfigTemplate(event, configs, hb.logger)
 	}
 
 	tempCfg := mapstr.M{}
@@ -140,7 +140,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 	}
 
 	// Apply information in event to the template to generate the final config
-	return template.ApplyConfigTemplate(event, configs)
+	return template.ApplyConfigTemplate(event, configs, hb.logger)
 }
 
 func (hb *heartbeatHints) getRawConfigs(hints mapstr.M) []mapstr.M {

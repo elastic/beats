@@ -20,11 +20,13 @@ package integration
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"testing"
 
-	uuid "github.com/gofrs/uuid/v5"
+	"github.com/gofrs/uuid/v5"
+	"github.com/klauspost/compress/gzip"
 )
 
 // LogGenerator used for generating log files
@@ -59,7 +61,7 @@ func (g plainTextGenerator) FileExtension() string {
 	return ".log"
 }
 
-// JSONLineGenerator creates a JSON log line generator.
+// NewJSONGenerator creates a JSON log line generator.
 // Forms a JSON object with a message
 // prefixed by the given prefix and followed by the filename
 // and the line number, e.g. `filename:128`
@@ -91,6 +93,25 @@ func (g jsonGenerator) FileExtension() string {
 // Returns the path value to put in the Filebeat configuration and
 // filenames for all created files.
 func GenerateLogFiles(t *testing.T, files, lines int, generator LogGenerator) (path string, filenames []string) {
+	return generateLogFiles(
+		t, files, lines, generator, filenames, GenerateLogFile)
+}
+
+// GenerateGZIPLogFiles is the same as GenerateLogFiles, but the files produced
+// are GZIP files.
+func GenerateGZIPLogFiles(t *testing.T, files, lines int, generator LogGenerator) (path string, filenames []string) {
+	return generateLogFiles(
+		t, files, lines, generator, filenames, GenerateGZIPLogFile)
+}
+
+func generateLogFiles(
+	t *testing.T,
+	files int,
+	lines int,
+	generator LogGenerator,
+	filenames []string,
+	gen func(t *testing.T, filename string, lines int, generator LogGenerator)) (string, []string) {
+
 	t.Logf("generating %d log files with %d lines each...", files, lines)
 	logsPath := filepath.Join(t.TempDir(), "logs")
 	err := os.MkdirAll(logsPath, 0777)
@@ -108,7 +129,7 @@ func GenerateLogFiles(t *testing.T, files, lines int, generator LogGenerator) (p
 		}
 		filename := filepath.Join(logsPath, id.String()+generator.FileExtension())
 		filenames = append(filenames, filename)
-		GenerateLogFile(t, filename, lines, generator)
+		gen(t, filename, lines, generator)
 	}
 
 	t.Logf("finished generating %d log files with %d lines each", files, lines)
@@ -126,11 +147,35 @@ func GenerateLogFile(t *testing.T, filename string, lines int, generator LogGene
 		return
 	}
 	defer file.Close()
+
+	writeLines(t, file, filename, lines, generator)
+}
+
+// GenerateGZIPLogFile generates a single gzip-compressed log file with the
+// given filename, lines, and generator. The file content is identical to the
+// one produced by GenerateLogFile, but compressed using gzip.
+func GenerateGZIPLogFile(t *testing.T, filename string, lines int, generator LogGenerator) {
+	file, err := os.Create(filename)
+	if err != nil {
+		t.Fatalf("failed to create a gzip log file: %q", filename)
+		return
+	}
+	defer file.Close()
+
+	gw := gzip.NewWriter(file)
+	defer gw.Close()
+
+	writeLines(t, gw, filename, lines, generator)
+}
+
+// writeLines writes generated lines to the provided writer.
+// It is shared between GenerateLogFile and GenerateGZIPLogFile to
+// avoid duplicating the core writing logic.
+func writeLines(t *testing.T, w io.Writer, filename string, lines int, generator LogGenerator) {
 	for i := 1; i <= lines; i++ {
 		line := generator.GenerateLine(filename, i) + "\n"
-		_, err := file.WriteString(line)
-		if err != nil {
-			t.Fatalf("cannot write a generated log line to %s", filename)
+		if _, err := w.Write([]byte(line)); err != nil {
+			t.Fatalf("cannot write a generated log line to %s: %s", filename, err)
 			return
 		}
 	}

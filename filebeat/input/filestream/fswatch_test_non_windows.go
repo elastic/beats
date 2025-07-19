@@ -107,7 +107,7 @@ func TestFileScannerSymlinks(t *testing.T) {
 				Symlinks:      true,
 				RecursiveGlob: false,
 			}
-			fs, err := newFileScanner(test.paths, cfg)
+			fs, err := newFileScanner(test.paths, cfg, false)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -140,7 +140,7 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 		Symlinks:      false,
 		RecursiveGlob: false,
 	}
-	scanner, err := newFileScanner([]string{testPath, renamedPath}, cfg)
+	scanner, err := newFileScanner([]string{testPath, renamedPath}, cfg, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -176,7 +176,7 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 func TestFileWatcherRenamedTruncated(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	fs, err := newFileScanner([]string{filepath.Join(tmpDir, "app.log*")}, fileScannerConfig{})
+	fs, err := newFileScanner([]string{filepath.Join(tmpDir, "app.log*")}, fileScannerConfig{}, false)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -33,19 +33,19 @@ type Shard struct {
 }
 
 type AssignedShard struct {
-	ShardNum      int32  `json:"shardNum"`
+	ShardNum      int32  `json:"shard_num"`
 	Primary       bool   `json:"primary"`
-	SizeInBytes   *int64 `json:"sizeInBytes"`
-	DocsCount     *int64 `json:"docsCount"`
-	SegmentsCount *int64 `json:"segmentsCount"`
+	SizeInBytes   *int64 `json:"size_in_bytes"`
+	DocsCount     *int64 `json:"docs_count"`
+	SegmentsCount *int64 `json:"segments_count"`
 	State         string `json:"state"`
 }
 
 type UnassignedShard struct {
-	ShardNum          int32   `json:"shardNum"`
+	ShardNum          int32   `json:"shard_num"`
 	Primary           bool    `json:"primary"`
-	UnassignedReason  *string `json:"unassignedReason"`
-	UnassignedDetails *string `json:"unassignedDetails"`
+	UnassignedReason  *string `json:"unassigned_reason"`
+	UnassignedDetails *string `json:"unassigned_details"`
 }
 
 type IndexMetadata struct {
@@ -58,63 +58,63 @@ type IndexMetadata struct {
 }
 
 type NodeIndexShards struct {
-	TotalFractions int32 `json:"totalFractions"`
+	TotalFractions int32 `json:"total_fractions"`
 
 	Index                    string            `json:"index"`
-	IndexNode                string            `json:"indexNode"`
-	IndexStatus              *string           `json:"indexStatus"`
-	IndexType                *string           `json:"indexType"`
+	IndexNode                string            `json:"index_node"`
+	IndexStatus              *string           `json:"index_status"`
+	IndexType                *string           `json:"index_type"`
 	Aliases                  []string          `json:"aliases"`
 	Attributes               []string          `json:"attributes"`
-	IsHidden                 *bool             `json:"isHidden"`
-	IsOpen                   *bool             `json:"isOpen"`
-	IsSystem                 *bool             `json:"isSystem"`
-	NodeId                   string            `json:"nodeId"`
-	NodeName                 string            `json:"nodeName"`
-	AssignShards             []AssignedShard   `json:"assignShards"`
-	InitializingShards       []AssignedShard   `json:"initializingShards"`
-	RelocatingShards         []AssignedShard   `json:"relocatingShards"`
-	UnassignedShards         []UnassignedShard `json:"unAssignShards"`
-	Shards                   int32             `json:"shardsCount"`
-	PrimaryShards            int32             `json:"primaryShardsCount"`
-	ReplicaShards            int32             `json:"replicaShardsCount"`
-	Initializing             int32             `json:"initializingShardsCount"`
-	Relocating               int32             `json:"relocatingShardsCount"`
-	Unassigned               int32             `json:"unassignedShardsCount"`
-	UnassignedPrimaryShards  int32             `json:"totalUnAssignedPrimaryShards"`
-	UnassignedReplicasShards int32             `json:"totalUnAssignedReplicasShards"`
-	SegmentsCount            *int64            `json:"segmentsCount"`
-	SizeInBytes              *int64            `json:"sizeInBytes"`
-	TotalSegmentsCount       *int64            `json:"totalSegmentsCount"` // includes replicas
-	TotalSizeInBytes         *int64            `json:"totalSizeInBytes"`   // includes replicas
-	MaxShardSizeInBytes      *int64            `json:"maxShardSizeInBytes"`
-	MinShardSizeInBytes      *int64            `json:"minShardSizeInBytes"`
-	TotalMaxShardSizeInBytes *int64            `json:"totalMaxShardSizeInBytes"` // includes replicas
-	TotalMinShardSizeInBytes *int64            `json:"totalMinShardSizeInBytes"` // includes replicas
+	IsHidden                 *bool             `json:"is_hidden"`
+	IsOpen                   *bool             `json:"is_open"`
+	IsSystem                 *bool             `json:"is_system"`
+	NodeId                   string            `json:"node_id"`
+	NodeName                 string            `json:"node_name"`
+	AssignShards             []AssignedShard   `json:"assign_shards"`
+	InitializingShards       []AssignedShard   `json:"initializing_shards"`
+	RelocatingShards         []AssignedShard   `json:"relocating_shards"`
+	UnassignedShards         []UnassignedShard `json:"unassign_shards"`
+	Shards                   int32             `json:"shards_count"`
+	PrimaryShards            int32             `json:"primary_shards_count"`
+	ReplicaShards            int32             `json:"replica_shards_count"`
+	Initializing             int32             `json:"initializing_shards_count"`
+	Relocating               int32             `json:"relocating_shards_count"`
+	Unassigned               int32             `json:"unassigned_shards_count"`
+	UnassignedPrimaryShards  int32             `json:"total_unassigned_primary_shards"`
+	UnassignedReplicasShards int32             `json:"total_unassigned_replicas_shards"`
+	SegmentsCount            *int64            `json:"segments_count"`
+	SizeInBytes              *int64            `json:"size_in_bytes"`
+	TotalSegmentsCount       *int64            `json:"total_segments_count"` // includes replicas
+	TotalSizeInBytes         *int64            `json:"total_size_in_bytes"`  // includes replicas
+	MaxShardSizeInBytes      *int64            `json:"max_shard_size_in_bytes"`
+	MinShardSizeInBytes      *int64            `json:"min_shard_size_in_bytes"`
+	TotalMaxShardSizeInBytes *int64            `json:"total_max_shard_size_in_bytes"` // includes replicas
+	TotalMinShardSizeInBytes *int64            `json:"total_min_shard_size_in_bytes"` // includes replicas
 
 	// indexing metrics only consider primary shards!
 
-	DocsCount                  *int64   `json:"docsCount"`
-	IndexFailedRatePerSecond   *float64 `json:"indexFailedRatePerSecond"`
-	IndexLatencyInMillis       *float64 `json:"indexLatencyInMillis"`
-	IndexRatePerSecond         *float64 `json:"indexRatePerSecond"`
-	IndexingFailedIndexTotal   *int64   `json:"indexingFailedIndexTotal"`
-	IndexingIndexTotal         *int64   `json:"indexingIndexTotal"`
-	IndexingIndexTotalTime     *int64   `json:"indexingTotalTime"`
-	GetMissingDocTotal         *int64   `json:"getMissingDocTotal"`         // includes replicas
-	GetMissingDocTotalTime     *int64   `json:"getMissingDocTotalTime"`     // includes replicas
-	GetMissingDocRatePerSecond *float64 `json:"getDocMissingRatePerSecond"` // includes replicas
-	MergeLatencyInMillis       *float64 `json:"mergeLatencyInMillis"`
-	MergeRatePerSecond         *float64 `json:"mergeRatePerSecond"`
-	MergesTotal                *int64   `json:"mergesTotal"`
-	MergesTotalTime            *int64   `json:"mergesTotalTime"`
-	SearchLatencyInMillis      *float64 `json:"searchLatencyInMillis"` // includes replicas
-	SearchQueryTime            *int64   `json:"searchQueryTime"`       // includes replicas
-	SearchQueryTotal           *int64   `json:"searchQueryTotal"`      // includes replicas
-	SearchRatePerSecond        *float64 `json:"searchRatePerSecond"`   // includes replicas
-	TotalMergesTotal           *int64   `json:"totalMergesTotal"`      // includes replicas
-	TotalMergesTotalTime       *int64   `json:"totalMergesTotalTime"`  // includes replicas
-	TimestampDiff              *int64   `json:"timestampDiff"`
+	DocsCount                  *int64   `json:"docs_count"`
+	IndexFailedRatePerSecond   *float64 `json:"index_failed_rate_per_second"`
+	IndexLatencyInMillis       *float64 `json:"index_latency_in_millis"`
+	IndexRatePerSecond         *float64 `json:"index_rate_per_second"`
+	IndexingFailedIndexTotal   *int64   `json:"indexing_failed_index_total"`
+	IndexingIndexTotal         *int64   `json:"indexing_index_total"`
+	IndexingIndexTotalTime     *int64   `json:"indexing_index_total_time"`
+	GetMissingDocTotal         *int64   `json:"get_missing_doc_total"`           // includes replicas
+	GetMissingDocTotalTime     *int64   `json:"get_missing_doc_total_time"`      // includes replicas
+	GetMissingDocRatePerSecond *float64 `json:"get_missing_doc_rate_per_second"` // includes replicas
+	MergeLatencyInMillis       *float64 `json:"merge_latency_in_millis"`
+	MergeRatePerSecond         *float64 `json:"merge_rate_per_second"`
+	MergesTotal                *int64   `json:"merges_total"`
+	MergesTotalTime            *int64   `json:"merges_total_time"`
+	SearchLatencyInMillis      *float64 `json:"search_latency_in_millis"` // includes replicas
+	SearchQueryTime            *int64   `json:"search_query_time"`        // includes replicas
+	SearchQueryTotal           *int64   `json:"search_query_total"`       // includes replicas
+	SearchRatePerSecond        *float64 `json:"search_rate_per_second"`   // includes replicas
+	TotalMergesTotal           *int64   `json:"total_merges_total"`       // includes replicas
+	TotalMergesTotalTime       *int64   `json:"total_merges_total_time"`  // includes replicas
+	TimestampDiff              *int64   `json:"timestamp_diff"`
 }
 
 type NodeShardCount struct {
@@ -132,13 +132,13 @@ type NodeShardCount struct {
 }
 
 type ShardInfo struct {
-	ShardNum          string `json:"shardNum"`
-	ShardId           string `json:"shardId"`
+	ShardNum          string `json:"shard_num"`
+	ShardId           string `json:"shard_id"`
 	Primary           bool   `json:"primary"`
-	SizeInBytes       uint64 `json:"sizeInBytes"`
-	DocsCount         uint64 `json:"docsCount"`
-	UnAssignedReason  string `json:"unassignedReason"`
-	UnAssignedDetails string `json:"unassignedDetails"`
+	SizeInBytes       uint64 `json:"size_in_bytes"`
+	DocsCount         uint64 `json:"docs_count"`
+	UnAssignedReason  string `json:"unassigned_reason"`
+	UnAssignedDetails string `json:"unassigned_details"`
 }
 
 func toAssignedShard(shard Shard) AssignedShard {

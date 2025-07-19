@@ -55,9 +55,6 @@ func Close(p beat.Processor) error {
 // NewList creates a new empty processor list.
 // Additional processors can be added to the List field.
 func NewList(log *logp.Logger) *Processors {
-	if log == nil {
-		log = logp.NewLogger(logName)
-	}
 	return &Processors{log: log}
 }
 

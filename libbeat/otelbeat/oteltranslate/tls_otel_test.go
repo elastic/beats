@@ -23,17 +23,19 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 func TestTLSCommonToOTel(t *testing.T) {
 
+	logger := logptest.NewTestingLogger(t, "")
 	t.Run("when ssl.enabled = false", func(t *testing.T) {
 		b := false
 		input := &tlscommon.Config{
 			Enabled: &b,
 		}
-		got, err := TLSCommonToOTel(input)
+		got, err := TLSCommonToOTel(input, logger)
 		require.NoError(t, err)
 		want := map[string]any{
 			"insecure": true,
@@ -71,7 +73,7 @@ func TestTLSCommonToOTel(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := TLSCommonToOTel(test.input)
+			got, err := TLSCommonToOTel(test.input, logger)
 			if test.err {
 				require.Error(t, err)
 			} else {

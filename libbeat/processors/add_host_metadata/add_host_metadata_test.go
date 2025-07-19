@@ -54,7 +54,7 @@ func TestConfigDefault(t *testing.T) {
 
 	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	switch runtime.GOOS {
-	case "windows", "darwin", "linux":
+	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
@@ -101,7 +101,7 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 
 	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	switch runtime.GOOS {
-	case "windows", "darwin", "linux":
+	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
@@ -227,7 +227,7 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 
 	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	switch runtime.GOOS {
-	case "windows", "darwin", "linux":
+	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
@@ -290,10 +290,10 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 
 			v, err := newEvent.GetValue("host")
 			assert.NoError(t, err)
-			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1)
-			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)
+			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1) //nolint:errcheck // already checked
+			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)  //nolint:errcheck // already checked
 			if c.expectedHostFieldLength != -1 {
-				assert.Equal(t, c.expectedHostFieldLength, len(v.(mapstr.M)))
+				assert.Equal(t, c.expectedHostFieldLength, len(v.(mapstr.M))) //nolint:errcheck // already checked
 			}
 		})
 	}
@@ -307,7 +307,7 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 
 	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	switch runtime.GOOS {
-	case "windows", "darwin", "linux":
+	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
@@ -366,8 +366,8 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 
 			v, err := newEvent.GetValue("host")
 			assert.NoError(t, err)
-			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1)
-			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)
+			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1) //nolint:errcheck // already checked
+			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)  //nolint:errcheck // already checked
 		})
 	}
 }

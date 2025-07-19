@@ -21,13 +21,13 @@ func GetAndSetResourceID() string {
 		return resourceID
 	}
 
-	if deploymentID := os.Getenv("DEPLOYMENT_ID"); deploymentID != "" {
+	if deploymentID := os.Getenv("AUTOOPS_DEPLOYMENT_ID"); deploymentID != "" {
 		SetResourceID(deploymentID)
 		return deploymentID
-	} else if projectID := os.Getenv("PROJECT_ID"); projectID != "" {
+	} else if projectID := os.Getenv("AUTOOPS_PROJECT_ID"); projectID != "" {
 		SetResourceID(projectID)
 		return projectID
-	} else if resourceID := os.Getenv("RESOURCE_ID"); resourceID != "" {
+	} else if resourceID := os.Getenv("AUTOOPS_RESOURCE_ID"); resourceID != "" {
 		SetResourceID(resourceID)
 		return resourceID
 	}

@@ -46,34 +46,34 @@ func expectValidParsedMultiTasks(t *testing.T, data metricset.FetcherData[Groupe
 
 	require.LessOrEqual(t, 2, len(events))
 
-	event1 := auto_ops_testing.GetEventByName(t, events, "task.taskId", "node1:45")
-	event2 := auto_ops_testing.GetEventByName(t, events, "task.taskId", "node2:501")
+	event1 := auto_ops_testing.GetEventByName(t, events, "task.task_id", "node1:45")
+	event2 := auto_ops_testing.GetEventByName(t, events, "task.task_id", "node2:501")
 
 	auto_ops_testing.CheckEventWithRandomTransactionId(t, event2, data.ClusterInfo)
 
 	// metrics exist
 
 	// event 1 (search)
-	require.Equal(t, "node1:45", auto_ops_testing.GetObjectValue(event1.MetricSetFields, "task.taskId"))
+	require.Equal(t, "node1:45", auto_ops_testing.GetObjectValue(event1.MetricSetFields, "task.task_id"))
 	require.ElementsMatch(t, []string{"node1", "node2"}, auto_ops_testing.GetObjectValue(event1.MetricSetFields, "task.node"))
 	require.EqualValues(t, 45, auto_ops_testing.GetObjectValue(event1.MetricSetFields, "task.id"))
-	require.Equal(t, "transport", auto_ops_testing.GetObjectValue(event1.MetricSetFields, "task.taskType"))
+	require.Equal(t, "transport", auto_ops_testing.GetObjectValue(event1.MetricSetFields, "task.task_type"))
 	require.Equal(t, "indices:data/read/search", auto_ops_testing.GetObjectValue(event1.MetricSetFields, "task.action"))
 	require.Equal(t, "async_search{indices[my-fake-search], search_type[QUERY_THEN_FETCH], source[{\"size\":1,\"query\":{\"match_all\":{}}}], preference[123]}", auto_ops_testing.GetObjectValue(event1.MetricSetFields, "task.description"))
-	require.EqualValues(t, 1513823752749, auto_ops_testing.GetObjectValue(event1.MetricSetFields, "task.startTimeInMillis"))
-	require.EqualValues(t, 60000293139, auto_ops_testing.GetObjectValue(event1.MetricSetFields, "task.runningTimeInNanos"))
+	require.EqualValues(t, 1513823752749, auto_ops_testing.GetObjectValue(event1.MetricSetFields, "task.start_time_in_millis"))
+	require.EqualValues(t, 60000293139, auto_ops_testing.GetObjectValue(event1.MetricSetFields, "task.running_time_in_nanos"))
 	require.Equal(t, true, auto_ops_testing.GetObjectValue(event1.MetricSetFields, "task.cancellable"))
 	require.Equal(t, "123456", auto_ops_testing.GetObjectValue(event1.MetricSetFields, "task.headers.X-Opaque-Id"))
 
 	// event 2 (index)
-	require.Equal(t, "node2:501", auto_ops_testing.GetObjectValue(event2.MetricSetFields, "task.taskId"))
+	require.Equal(t, "node2:501", auto_ops_testing.GetObjectValue(event2.MetricSetFields, "task.task_id"))
 	require.ElementsMatch(t, []string{"node2", "node3"}, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "task.node"))
 	require.EqualValues(t, 501, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "task.id"))
-	require.Equal(t, "transport", auto_ops_testing.GetObjectValue(event2.MetricSetFields, "task.taskType"))
+	require.Equal(t, "transport", auto_ops_testing.GetObjectValue(event2.MetricSetFields, "task.task_type"))
 	require.Equal(t, "indices:data/write/bulk", auto_ops_testing.GetObjectValue(event2.MetricSetFields, "task.action"))
 	require.Equal(t, "requests[1], indices[my-fake-index]", auto_ops_testing.GetObjectValue(event2.MetricSetFields, "task.description"))
-	require.EqualValues(t, 1513823752456, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "task.startTimeInMillis"))
-	require.EqualValues(t, 60000293456, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "task.runningTimeInNanos"))
+	require.EqualValues(t, 1513823752456, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "task.start_time_in_millis"))
+	require.EqualValues(t, 60000293456, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "task.running_time_in_nanos"))
 	require.Equal(t, false, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "task.cancellable"))
 	require.Equal(t, "456", auto_ops_testing.GetObjectValue(event2.MetricSetFields, "task.headers.X-Opaque-Id"))
 
@@ -97,13 +97,13 @@ func expectMixedValidParsedData(t *testing.T, data metricset.FetcherData[Grouped
 
 	auto_ops_testing.CheckAllEventsUseSameTransactionId(t, events)
 
-	event := auto_ops_testing.GetEventByName(t, events, "task.taskId", "node1:45")
+	event := auto_ops_testing.GetEventByName(t, events, "task.task_id", "node1:45")
 
 	auto_ops_testing.CheckEventWithRandomTransactionId(t, event, data.ClusterInfo)
 
 	// metrics exist
 	require.True(t, len(*event.MetricSetFields.FlattenKeys()) > 2)
-	require.Equal(t, "node1:45", auto_ops_testing.GetObjectValue(event.MetricSetFields, "task.taskId"))
+	require.Equal(t, "node1:45", auto_ops_testing.GetObjectValue(event.MetricSetFields, "task.task_id"))
 
 	// mapper is expected to drop this field if it appears
 	require.Nil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "task.children"))

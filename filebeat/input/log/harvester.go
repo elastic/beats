@@ -678,7 +678,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		BufferSize: h.config.BufferSize,
 		Terminator: h.config.LineTerminator,
 		MaxBytes:   encReaderMaxBytes,
-	})
+	}, h.logger)
 	if err != nil {
 		return nil, err
 	}

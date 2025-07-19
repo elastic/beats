@@ -66,6 +66,8 @@ type FileDescriptor struct {
 	Info file.ExtendedFileInfo
 	// Fingerprint is a computed hash of the file header
 	Fingerprint string
+	// GZIP indicates if the file is compressed with GZIP.
+	GZIP bool
 }
 
 // FileID returns a unique file ID

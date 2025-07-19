@@ -254,7 +254,7 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 
 	// register pipeline loading to happen every time a new ES connection is
 	// established
-	callback := func(esClient *eslegclient.Connection) error {
+	callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
 		return fb.moduleRegistry.LoadPipelines(esClient, overwritePipelines)
 	}
 	_, err := elasticsearch.RegisterConnectCallback(callback)
@@ -556,7 +556,7 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, logger *log
 }
 
 // fetches all the defined input configuration available at Filebeat startup including external files.
-func fetchInputConfiguration(config *cfg.Config) (inputs []*conf.C, err error) {
+func fetchInputConfiguration(config *cfg.Config, logger *logp.Logger) (inputs []*conf.C, err error) {
 	if len(config.Inputs) == 0 {
 		inputs = []*conf.C{}
 	} else {
@@ -589,7 +589,7 @@ func fetchInputConfiguration(config *cfg.Config) (inputs []*conf.C, err error) {
 	copy(inputs, config.Inputs)
 
 	for _, p := range cfgPaths {
-		externalInputs, err := cfgfile.LoadList(p)
+		externalInputs, err := cfgfile.LoadList(p, logger)
 		if err != nil {
 			return nil, fmt.Errorf("failed to load external input configuration: %w", err)
 		}

@@ -587,10 +587,22 @@ func (b *BeatProc) searchStrInLogsReversed(logFile *os.File, s string) (bool, st
 
 // WaitForLogs waits for the specified string s to be present in the logs within
 // the given timeout duration and fails the test if s is not found.
+// It keeps track of the log file offset, reading only new lines. Each
+// subsequent call to WaitForLogs will only check logs not yet evaluated.
 // msgAndArgs should be a format string and arguments that will be printed
 // if the logs are not found, providing additional context for debugging.
 func (b *BeatProc) WaitForLogs(s string, timeout time.Duration, msgAndArgs ...any) {
 	b.t.Helper()
+	require.Eventually(b.t, func() bool {
+		return b.LogContains(s)
+	}, timeout, 100*time.Millisecond, msgAndArgs...)
+}
+
+// WaitForLogsFromBeginning has the same behaviour as WaitForLogs, but it first
+// resets the log offset.
+func (b *BeatProc) WaitForLogsFromBeginning(s string, timeout time.Duration, msgAndArgs ...any) {
+	b.t.Helper()
+	b.logFileOffset = 0
 	require.Eventually(b.t, func() bool {
 		return b.LogContains(s)
 	}, timeout, 100*time.Millisecond, msgAndArgs...)
@@ -616,12 +628,11 @@ func (b *BeatProc) WriteConfigFile(cfg string) {
 }
 
 // openGlobFile opens a file defined by glob. The glob must resolve to a single
-// file otherwise the test fails. It returns a *os.File and a boolean indicating
-// whether a file was found.
+// file otherwise the test fails. It returns a *os.File or nil if none is found.
 //
 // If `waitForFile` is true, it will wait up to 5 seconds for the file to
-// be created. The test will fail if the file is not found. If it is false
-// and no file is found, nil and false are returned.
+// be created. The test will fail if the file is not found. If waitForFile is
+// false and no file is found, nil and false are returned.
 func (b *BeatProc) openGlobFile(glob string, waitForFile bool) *os.File {
 	t := b.t
 
@@ -1166,11 +1177,11 @@ func StartMockES(
 	require.Eventually(
 		t,
 		func() bool {
-			resp, err := http.Get("http://" + addr) //nolint: noctx // It's just a test
+			resp, err := http.Get("http://" + addr) // nolint: noctx // It's just a test
 			if err != nil {
 				return false
 			}
-			//nolint: errcheck // We're just draining the body, we can ignore the error
+			// nolint: errcheck // We're just draining the body, we can ignore the error
 			io.Copy(io.Discard, resp.Body)
 			resp.Body.Close()
 			return true

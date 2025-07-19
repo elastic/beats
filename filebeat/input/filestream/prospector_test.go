@@ -36,7 +36,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -834,14 +833,13 @@ func TestOnRenameFileIdentity(t *testing.T) {
 
 	for k, tc := range testCases {
 		t.Run(k, func(t *testing.T) {
-			logger := logptest.NewTestingLogger(t, "")
 			p := fileProspector{
-				logger:            logger,
+				logger:            logp.NewNopLogger(),
 				filewatcher:       newMockFileWatcher(tc.events, len(tc.events)),
 				identifier:        mustPathIdentifier(true),
 				stateChangeCloser: stateChangeCloserConfig{Renamed: true},
 			}
-			ctx := input.Context{Logger: logger, Cancelation: context.Background()}
+			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
 
 			path := "/new/path/to/file"
 			expectedIdentifier := tc.identifier

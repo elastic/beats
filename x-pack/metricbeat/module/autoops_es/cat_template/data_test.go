@@ -46,7 +46,7 @@ func expectValidParsedDataCheckingTemplateNames(t *testing.T, data metricset.Fet
 		require.NotNil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "template.settings"))
 		require.NotNil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "template.mappings"))
 		require.NotNil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "template.aliases"))
-		templateName := auto_ops_testing.GetObjectAsString(t, event.MetricSetFields, "template.templateName")
+		templateName := auto_ops_testing.GetObjectAsString(t, event.MetricSetFields, "template.template_name")
 		require.True(t, slices.Contains(templateNames, templateName), "template '%s' is not in the expected values", templateName)
 
 		// mapper is expected to drop this field if it appears
@@ -87,8 +87,8 @@ func expectValidParsedDetailedTemplates(t *testing.T, data metricset.FetcherData
 
 	require.Equal(t, 2, len(events))
 
-	event1 := auto_ops_testing.GetEventByName(t, events, "template.templateName", "simple-response")
-	event2 := auto_ops_testing.GetEventByName(t, events, "template.templateName", "detailed-response")
+	event1 := auto_ops_testing.GetEventByName(t, events, "template.template_name", "simple-response")
+	event2 := auto_ops_testing.GetEventByName(t, events, "template.template_name", "detailed-response")
 
 	auto_ops_testing.CheckEventWithRandomTransactionId(t, event2, data.ClusterInfo)
 
@@ -109,7 +109,7 @@ func expectValidParsedDetailedTemplates(t *testing.T, data metricset.FetcherData
 	// metrics exist
 
 	// event 1 (simple-response)
-	require.Equal(t, "simple-response", auto_ops_testing.GetObjectValue(event1.MetricSetFields, "template.templateName"))
+	require.Equal(t, "simple-response", auto_ops_testing.GetObjectValue(event1.MetricSetFields, "template.template_name"))
 	require.EqualValues(t, 1, auto_ops_testing.GetObjectValue(event1.MetricSetFields, "template.order"))
 	require.Nil(t, auto_ops_testing.GetObjectValue(event1.MetricSetFields, "template.version"))
 	require.ElementsMatch(t, []string{"*"}, auto_ops_testing.GetObjectValue(event1.MetricSetFields, "template.index_patterns"))
@@ -118,7 +118,7 @@ func expectValidParsedDetailedTemplates(t *testing.T, data metricset.FetcherData
 	require.Equal(t, auto_ops_testing.GetObjectAsJson(simpleTemplate, "template.aliases"), auto_ops_testing.GetObjectAsJson(event1.MetricSetFields, "template.aliases"))
 
 	// event 2 (detailed-response)
-	require.Equal(t, "detailed-response", auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template.templateName"))
+	require.Equal(t, "detailed-response", auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template.template_name"))
 	require.EqualValues(t, 789, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template.order"))
 	require.EqualValues(t, 123456, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template.version"))
 	require.ElementsMatch(t, []string{"a", "b", "c", "d*"}, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template.index_patterns"))

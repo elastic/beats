@@ -176,6 +176,7 @@ func assertLastOffset(t *testing.T, path string, offset int) {
 type registryEntry struct {
 	Key      string
 	Offset   int
+	EOF      bool
 	Filename string
 	TTL      time.Duration
 	Op       string
@@ -188,7 +189,7 @@ func readFilestreamRegistryLog(t *testing.T, path string) ([]registryEntry, map[
 		t.Fatalf("could not open file '%s': %s", path, err)
 	}
 
-	entries := []registryEntry{}
+	var entries []registryEntry
 	fileNameToNative := map[string]string{}
 	s := bufio.NewScanner(file)
 
@@ -211,6 +212,7 @@ func readFilestreamRegistryLog(t *testing.T, path string) ([]registryEntry, map[
 		et := registryEntry{
 			Key:      e.Key,
 			Offset:   e.Value.Cursor.Offset,
+			EOF:      e.Value.Cursor.EOF,
 			TTL:      e.Value.TTL,
 			Filename: e.Value.Meta.Source,
 			Removed:  lastOperation == "remove",
@@ -244,7 +246,8 @@ type entry struct {
 	Value struct {
 		// Filestream fields
 		Cursor struct {
-			Offset int `json:"offset"`
+			Offset int  `json:"offset"`
+			EOF    bool `json:"eof"`
 		} `json:"cursor"`
 		Meta struct {
 			Source string `json:"source"`

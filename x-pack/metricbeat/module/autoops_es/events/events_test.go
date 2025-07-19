@@ -60,6 +60,9 @@ func TestCreateEvent(t *testing.T) {
 	require.Equal(t, "value2", auto_ops_testing.GetObjectValue(event.MetricSetFields, "obj1.field1"))
 	require.Equal(t, "value3", auto_ops_testing.GetObjectValue(event.MetricSetFields, "obj2.field1"))
 
+	// event
+	require.Equal(t, "metric", auto_ops_testing.GetObjectValue(event.RootFields, "event.kind"))
+
 	// orchestrator
 	require.Equal(t, "resource-id", auto_ops_testing.GetObjectValue(event.RootFields, "orchestrator.resource.id"))
 }
