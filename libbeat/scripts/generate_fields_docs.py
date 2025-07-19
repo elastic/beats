@@ -43,6 +43,26 @@ See the [ECS reference](ecs://reference/index.md) for more information.
             output.write("{}\n\n".format(section["description"].strip()))
         else:
             output.write("## {} [_{}]\n\n".format(section["name"], section["name"]))
+            # If there's a `version` in the YAML file, add an `applies_to` tag to the
+            # heading. A lifecycle type (ga, beta, etc) is required when using `applies_to`
+            # with a specific version. Use `release` if one exists or use `ga` if no `release`
+            # exists.
+            if "version" in section:
+              output.write(
+                "```{{applies_to}}\nstack: {} {}\n```\n\n".format(
+                  section["release"] or "ga",
+                  section["version"]
+                )
+              )
+            # If there's no version, but there is a `release` in the YAML file AND
+            # it's not `ga`, then add an `applies_to`` tag to the heading that includes
+            # the release type but no version.
+            elif "release" in section and section["release"] != "ga":
+              output.write(
+                "```{{applies_to}}\nstack: {}\n```\n\n".format(
+                  section["release"]
+                )
+              )
             output.write("{}\n\n".format(section["description"].strip()))
 
     if "fields" not in section or not section["fields"]:
@@ -71,14 +91,38 @@ def document_field(output, field, field_path):
     if "field_path" not in field:
         field["field_path"] = field_path
 
-    output.write("**`{}`**\n".format(field["field_path"]))
-    output.write(":   ")
+    # TO DO: We could do something similar that we did for
+    # sections here for individual fields.
+    output.write("**`{}`**".format(field["field_path"]))
+    if "deprecated" in field:
+        output.write(
+          " {{applies_to}}`product: deprecated {}`".format(
+            field["deprecated"]
+          )
+        )
+    # If there's a `version` in the YAML file, add an `applies_to` tag to the
+    # heading. A lifecycle type (ga, beta, etc) is required when using `applies_to`
+    # with a specific version. Use `release` if one exists or use `ga` if no `release`
+    # exists.
+    elif "version" in field:
+      output.write(
+        " {{applies_to}}`stack: ga {}`".format(
+          field["version"]
+        )
+      )
+    # If there's no version, but there is a `release` in the YAML file AND
+    # it's not `ga`, then add an `applies_to`` tag to the heading that includes
+    # the release type but no version.
+    elif "release" in field and field["release"] != "ga":
+      output.write(
+        " {{applies_to}}`stack: {}`".format(
+          field["release"]
+        )
+      )
+    output.write("\n:   ")
 
     if "description" in field and field["description"] is not None and len(field["description"].strip()) > 0:
         output.write("{}".format(" ".join(x for x in field["description"].split("\n") if x)).strip()+"\n\n")
-
-    if "deprecated" in field:
-        output.write("{{applies_to}}`product: deprecated {}`\n\n".format(field["deprecated"]))
 
     if "type" in field:
         output.write("type: {}\n\n".format(field["type"]))
@@ -137,7 +181,7 @@ mapped_pages:
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
-                 
+
 # Exported fields [exported-fields]
 
 This document describes the fields that are exported by {title}. They are grouped in the following categories:
