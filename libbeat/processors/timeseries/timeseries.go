@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/mitchellh/hashstructure"
+	"github.com/gohugoio/hashstructure"
 )
 
 type timeseriesProcessor struct {

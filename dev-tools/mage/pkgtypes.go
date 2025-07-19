@@ -33,9 +33,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gohugoio/hashstructure"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/mitchellh/hashstructure"
 )
 
 const (

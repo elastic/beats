@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 
-	"github.com/mitchellh/hashstructure"
+	"github.com/gohugoio/hashstructure"
 
 	// include all metricbeat specific builders
 	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
