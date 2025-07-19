@@ -91,7 +91,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("error creating aws metricset: %w", err)
 	}
 
-	cfgwarn.Beta("The aws:awshealth metricset is beta.")
+	logger.Warn(cfgwarn.Beta("The aws:awshealth metricset is beta."))
 
 	config := struct {
 		Config Config `config:"aws_health_config"`

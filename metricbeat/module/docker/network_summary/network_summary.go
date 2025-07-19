@@ -54,7 +54,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The docker network_summary metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The docker network_summary metricset is beta."))
 
 	config := DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {

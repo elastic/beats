@@ -47,7 +47,7 @@ type configAppender struct {
 
 // NewConfigAppender creates a configAppender that can append templatized configs into built configs
 func NewConfigAppender(cfg *conf.C, logger *logp.Logger) (autodiscover.Appender, error) {
-	cfgwarn.Beta("The config appender is beta")
+	logger.Warnf(cfgwarn.Beta("The config appender is beta"))
 
 	config := config{}
 	err := cfg.Unpack(&config)
