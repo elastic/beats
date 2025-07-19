@@ -84,7 +84,7 @@ func oracleParseDSN(config ConnectionDetails, host string) (mb.HostData, error) 
 		params.Username = config.Username
 	}
 	if params.Password.Secret() == "" {
-		params.StandaloneConnection = true
+		params.StandaloneConnection = godror.Bool(true)
 		params.Password = dsn.NewPassword(config.Password)
 	}
 	return mb.HostData{
