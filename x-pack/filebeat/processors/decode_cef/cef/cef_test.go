@@ -7,6 +7,7 @@ package cef
 import (
 	"crypto/sha1"
 	"encoding/hex"
+	"errors"
 	"flag"
 	"os"
 	"path/filepath"
@@ -14,7 +15,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/multierr"
 )
 
 var generateCorpus = flag.Bool("corpus", false, "generate fuzz corpus from test cases")
@@ -464,7 +464,7 @@ func TestEventUnpack(t *testing.T) {
 	t.Run("truncatedHeader", func(t *testing.T) {
 		var e Event
 		err := e.Unpack(truncatedHeader)
-		assert.Equal(t, multierr.Combine(errUnexpectedEndOfEvent, errIncompleteHeader), err)
+		assert.Equal(t, errors.Join(errUnexpectedEndOfEvent, errIncompleteHeader), err)
 		assert.Equal(t, 0, e.Version)
 		assert.Equal(t, "SentinelOne", e.DeviceVendor)
 		assert.Equal(t, "Mgmt", e.DeviceProduct)

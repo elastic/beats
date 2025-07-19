@@ -79,6 +79,10 @@ linters:
                 - errors
                 - fmt
               reason: This package is deprecated, use `fmt.Errorf` with `%w` instead
+          - go.uber.org/multierr:
+              recommendations:
+                - errors
+              reason: This package is deprecated, use `errors.Join` instead
           - gotest.tools/v3:
               recommendations:
                 - github.com/stretchr/testify

@@ -33,7 +33,6 @@ import (
 	"unsafe"
 
 	"github.com/cespare/xxhash/v2"
-	"go.uber.org/multierr"
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/winlogbeat/sys"
@@ -88,7 +87,7 @@ func (r *Renderer) Close() error {
 	if r == nil {
 		return errors.New("closing nil renderer")
 	}
-	return multierr.Combine(
+	return errors.Join(
 		r.metadataCache.close(),
 		r.systemContext.Close(),
 		r.userContext.Close(),
@@ -135,10 +134,7 @@ func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, string, error) {
 		errs = append(errs, fmt.Errorf("failed to get the event message string: %w", err))
 	}
 
-	if len(errs) > 0 {
-		return event, "", multierr.Combine(errs...)
-	}
-	return event, "", nil
+	return event, "", errors.Join(errs...)
 }
 
 // renderSystem writes all the system context properties into the event.
@@ -478,10 +474,7 @@ func (r *XMLRenderer) Render(handle EvtHandle) (*winevent.Event, string, error) 
 		}
 	}
 
-	if len(errs) > 0 {
-		return event, string(outBytes), multierr.Combine(errs...)
-	}
-	return event, string(outBytes), nil
+	return event, string(outBytes), errors.Join(errs...)
 }
 
 func (r *XMLRenderer) buildEventFromXML(x []byte, recoveredErr error) *winevent.Event {
