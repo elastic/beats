@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"maps"
 	"net"
 	"net/http"
 	"net/url"
@@ -421,7 +422,21 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if e == nil {
 					return nil
 				}
-				log.Errorw("single event object returned by evaluation", "event", e)
+				if _, ok := e["error"]; ok {
+					// If we have an error, log the complete object on the basis
+					// that it is ECS-conformant.
+					if log.Core().Enabled(zapcore.ErrorLevel) {
+						kv := make([]any, 0, 2*len(e))
+						for k := range maps.Keys(e) {
+							kv = append(kv, k, e[k])
+						}
+						log.Errorw("single event object returned by evaluation", kv...)
+					}
+				} else {
+					// Otherwise, be consistent with the existing documented
+					// behaviour and log the entire object as the error.
+					log.Errorw("single event object returned by evaluation", "error", e)
+				}
 				if err, ok := e["error"]; ok {
 					env.UpdateStatus(status.Degraded, fmt.Sprintf("single event error object returned by evaluation: %s", mapstr.M{"error": err}))
 				} else {
