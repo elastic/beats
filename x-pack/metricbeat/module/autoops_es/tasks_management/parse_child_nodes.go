@@ -4,10 +4,6 @@
 
 package tasks_management
 
-import (
-	"golang.org/x/exp/maps"
-)
-
 // Extract the Node ID from each child task and add it to the map (treated as a Set).
 func parseChildNodes(children []any, ok bool) map[string]bool {
 	nodeMap := map[string]bool{}
@@ -37,7 +33,7 @@ func parseChildNodes(children []any, ok bool) map[string]bool {
 			if ok && innerChildren != nil {
 				innerChildren, ok := innerChildren.([]any)
 
-				for _, node := range maps.Keys(parseChildNodes(innerChildren, ok)) {
+				for node := range parseChildNodes(innerChildren, ok) {
 					nodeMap[node] = true
 				}
 			}

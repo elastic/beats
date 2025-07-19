@@ -5,11 +5,10 @@
 package utils
 
 import (
+	"maps"
 	"net/url"
-	"sort"
+	"slices"
 	"strings"
-
-	"golang.org/x/exp/maps"
 )
 
 type Supplier[T any, R any] func(T) R
@@ -98,8 +97,8 @@ func PartitionByMaxValue[T any](limit int, items []T, valueExtractor func(T) int
 		itemKey := valueExtractor(item)
 		sortedValues[itemKey] = append(sortedValues[itemKey], item)
 	}
-	allKeys := maps.Keys(sortedValues)
-	sort.Ints(allKeys)
+	allKeys := slices.Collect(maps.Keys(sortedValues))
+	slices.Sort(allKeys)
 	var sortedItems = make(map[int][]T)
 	currentCapacity := 0
 	cursor := 0
