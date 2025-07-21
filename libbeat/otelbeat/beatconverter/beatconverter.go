@@ -26,10 +26,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	elasticsearchtranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate/outputs/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // list of supported beatreceivers
-var supportedReceivers = []string{"filebeatreceiver"} // Add more beat receivers to this list when we add support
+var supportedReceivers = []string{"filebeatreceiver", "metricbeatreceiver"} // Add more beat receivers to this list when we add support
 
 type converter struct{}
 
@@ -72,7 +73,9 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 			switch key {
 			case "elasticsearch":
 				esConfig := config.MustNewConfigFrom(output)
-				esOTelConfig, err := elasticsearchtranslate.ToOTelConfig(esConfig)
+				// we use development logger here as this method is part of dev-only otel command
+				logger, _ := logp.NewDevelopmentLogger("")
+				esOTelConfig, err := elasticsearchtranslate.ToOTelConfig(esConfig, logger)
 				if err != nil {
 					return fmt.Errorf("cannot convert elasticsearch config: %w", err)
 				}
@@ -94,6 +97,8 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 				if err != nil {
 					return err
 				}
+			// noop, it will get replaced by otelconsumer below
+			case "otelconsumer":
 			default:
 				return fmt.Errorf("output type %q is unsupported in OTel mode", key)
 			}

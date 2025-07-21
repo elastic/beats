@@ -8,11 +8,13 @@ package gcppubsub
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 
 	"cloud.google.com/go/pubsub"
 	"golang.org/x/oauth2/google"
@@ -42,9 +44,22 @@ type config struct {
 
 	// Overrides the default Pub/Sub service address and disables TLS. For testing.
 	AlternativeHost string `config:"alternative_host"`
+
+	Transport httpTransportSettings `config:",inline"`
+}
+
+// httpTransportSettings is the proxy configuration subset of httpcommon.HTTPTransportSettings.
+// It is used to allow configuration of proxies without promising other configuration
+// options from that type.
+type httpTransportSettings struct {
+	Proxy httpcommon.HTTPClientProxySettings `config:",inline" yaml:",inline"`
 }
 
 func (c *config) Validate() error {
+	if c.AlternativeHost != "" && !c.Transport.Proxy.Disable && c.Transport.Proxy.URL != nil {
+		return errors.New("alternative_host may not be configured with a proxy")
+	}
+
 	// credentials_file
 	if c.CredentialsFile != "" {
 		if _, err := os.Stat(c.CredentialsFile); os.IsNotExist(err) {
@@ -79,5 +94,6 @@ func defaultConfig() config {
 	// Hence max_outstanding_message has to be at least flush.min_events to avoid this blockage.
 	c.Subscription.MaxOutstandingMessages = 1600
 	c.Subscription.Create = true
+	c.Transport.Proxy = httpcommon.DefaultHTTPClientProxySettings()
 	return c
 }

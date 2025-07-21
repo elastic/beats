@@ -5,7 +5,6 @@
 package events
 
 import (
-	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -26,20 +25,25 @@ func CreateEvent(info *utils.ClusterInfo, metricSetFields mapstr.M, transactionI
 				"name":    info.ClusterName,
 				"version": info.Version.Number.String(),
 			},
-			"transactionId": transactionId,
+			"transaction_id": transactionId,
 		},
 		RootFields: mapstr.M{
-			"service.name":      "autoops_es",
-			"metricbeatVersion": version.GetDefaultVersion(),
-			"commit":            version.Commit(),
+			"event": mapstr.M{
+				"kind": "metric",
+			},
+			"orchestrator": mapstr.M{
+				"resource": mapstr.M{
+					"id": utils.GetResourceID(),
+				},
+			},
 		},
 	}
 }
 
 // Report an event and mark the fraction and total fractions consistently
 func ReportEvent(r mb.ReporterV2, event mb.Event, index int, total int) {
-	event.ModuleFields["fractionId"] = index
-	event.ModuleFields["totalAmountOfFractions"] = total
+	event.ModuleFields["fraction_id"] = index
+	event.ModuleFields["total_amount_of_fractions"] = total
 
 	r.Event(event)
 }

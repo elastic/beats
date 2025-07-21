@@ -6,6 +6,7 @@ package httpjson
 
 import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -15,11 +16,12 @@ type cursor struct {
 
 	state mapstr.M
 
-	log *logp.Logger
+	status status.StatusReporter
+	log    *logp.Logger
 }
 
-func newCursor(cfg cursorConfig, log *logp.Logger) *cursor {
-	return &cursor{cfg: cfg, log: log}
+func newCursor(cfg cursorConfig, stat status.StatusReporter, log *logp.Logger) *cursor {
+	return &cursor{cfg: cfg, status: stat, log: log}
 }
 
 func (c *cursor) load(cursor *inputcursor.Cursor) {
@@ -34,6 +36,7 @@ func (c *cursor) load(cursor *inputcursor.Cursor) {
 
 	if err := cursor.Unpack(&c.state); err != nil {
 		c.log.Errorf("Reset cursor state. Failed to read from registry: %v", err)
+		c.status.UpdateStatus(status.Degraded, "failed to load cursor: "+err.Error())
 		return
 	}
 
@@ -50,12 +53,23 @@ func (c *cursor) update(trCtx *transformContext) {
 	}
 
 	for k, cfg := range c.cfg {
-		v, _ := cfg.Value.Execute(trCtx, transformable{}, k, cfg.Default, c.log)
+		stat := c.status
+		if cfg.mustIgnoreEmptyValue() {
+			stat = ignoreEmptyValueReporter{stat}
+		}
+		v, _ := cfg.Value.Execute(trCtx, transformable{}, k, cfg.Default, stat, c.log)
 		if v != "" || !cfg.mustIgnoreEmptyValue() {
 			_, _ = c.state.Put(k, v)
 			c.log.Debugf("cursor.%s stored with %s", k, v)
 		}
 	}
+}
+
+// ignoreEmptyValueReporter is an abuse of the type system to allow the cursor
+// update mechanism to signal to valueTpl.Execute not to report empty values
+// as health degraded.
+type ignoreEmptyValueReporter struct {
+	status.StatusReporter
 }
 
 func (c *cursor) clone() mapstr.M {

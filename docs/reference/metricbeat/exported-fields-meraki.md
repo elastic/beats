@@ -13,3 +13,7 @@ meraki
 :   type: keyword
 
 
+**`meraki.network.id`**
+:   type: keyword
+
+

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-mssql.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # MSSQL module [metricbeat-module-mssql]
 
 This is the [Microsoft SQL 2017](https://www.microsoft.com/en-us/sql-server/sql-server-2017) Metricbeat module. It is still under active development to add new Metricsets and introduce enhancements.
@@ -48,7 +50,7 @@ The following Metricsets are already included:
 When configuring the `hosts` option, you can specify native user credentials as part of the host string with the following format:
 
 ```
-hosts: ["sqlserver://sa@localhost"]]
+hosts: ["sqlserver://sa@localhost"]
 ```
 
 To use Active Directory domain credentials, you can separately specify the username and password using the respective configuration options to allow the domain to be included in the username:
@@ -68,7 +70,7 @@ metricbeat.modules:
 Store sensitive values like passwords in the [secrets keystore](/reference/metricbeat/keystore.md).
 
 
-## Example configuration [_example_configuration_44]
+## Example configuration [_example_configuration]
 
 The MSSQL module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -85,12 +87,9 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_51]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [performance](/reference/metricbeat/metricbeat-metricset-mssql-performance.md)
 * [transaction_log](/reference/metricbeat/metricbeat-metricset-mssql-transaction_log.md)
-
-
-

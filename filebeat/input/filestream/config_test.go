@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest/observer"
 
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -40,7 +41,7 @@ func TestConfigValidate(t *testing.T) {
 	t.Run("take_over requires ID", func(t *testing.T) {
 		c := config{
 			Paths:    []string{"/foo/bar"},
-			TakeOver: takeOverConfig{Enabled: true},
+			TakeOver: loginp.TakeOverConfig{Enabled: true},
 		}
 		err := c.Validate()
 		assert.Error(t, err, "take_over.enabled can only be true if ID is set")
@@ -50,10 +51,52 @@ func TestConfigValidate(t *testing.T) {
 		c := config{
 			Paths:    []string{"/foo/bar"},
 			ID:       "some id",
-			TakeOver: takeOverConfig{Enabled: true},
+			TakeOver: loginp.TakeOverConfig{Enabled: true},
 		}
 		err := c.Validate()
 		assert.NoError(t, err)
+	})
+
+	t.Run("take_over does works with AllowIDDuplication", func(t *testing.T) {
+		c := config{
+			Paths:              []string{"/foo/bar"},
+			ID:                 "some id",
+			AllowIDDuplication: true,
+			TakeOver:           loginp.TakeOverConfig{Enabled: true},
+		}
+		err := c.Validate()
+		assert.Error(t, err)
+	})
+
+	t.Run("gzip_experimental works with file_identity.fingerprint", func(t *testing.T) {
+		c, err := conf.NewConfigFrom(`
+id: 'some id'
+paths: [/foo/bar*]
+gzip_experimental: true
+file_identity.fingerprint: ~
+`)
+		require.NoError(t, err, "could not create config from string")
+		got := defaultConfig()
+		err = c.Unpack(&got)
+		require.NoError(t, err, "could not unpack config")
+
+		err = got.Validate()
+		assert.NoError(t, err)
+	})
+
+	t.Run("gzip_experimental requires file_identity.fingerprint", func(t *testing.T) {
+		c, err := conf.NewConfigFrom(`
+id: 'some id'
+paths: [/foo/bar*]
+gzip_experimental: true
+file_identity.path: ~
+`)
+		require.NoError(t, err, "could not create config from string")
+		got := defaultConfig()
+		err = c.Unpack(&got)
+		assert.ErrorContains(t,
+			err,
+			"gzip_experimental=true requires file_identity to be 'fingerprint")
 	})
 }
 

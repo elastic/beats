@@ -22,29 +22,32 @@ import (
 	"net/http"
 
 	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+type fetchMetadata func(context.Context, http.Client, *result, *logp.Logger)
 
 type genericFetcher struct {
 	provider                 string
 	schema                   schemaConv
-	fetchRawProviderMetadata func(context.Context, http.Client, *result)
+	fetchRawProviderMetadata fetchMetadata
 }
 
 func newGenericMetadataFetcher(
 	c *cfg.C,
 	provider string,
 	conv schemaConv,
-	genericFetcherMeta func(context.Context, http.Client, *result),
+	genericFetcherMeta fetchMetadata,
 ) (*genericFetcher, error) {
 
 	gFetcher := &genericFetcher{provider, conv, genericFetcherMeta}
 	return gFetcher, nil
 }
 
-func (g *genericFetcher) fetchMetadata(ctx context.Context, client http.Client) result {
+func (g *genericFetcher) fetchMetadata(ctx context.Context, client http.Client, log *logp.Logger) result {
 	res := result{provider: g.provider, metadata: mapstr.M{}}
-	g.fetchRawProviderMetadata(ctx, client, &res)
+	g.fetchRawProviderMetadata(ctx, client, &res, log)
 	if res.err != nil {
 		return res
 	}

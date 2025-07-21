@@ -198,7 +198,7 @@ func TestFromMapstrMapstr(t *testing.T) {
 }
 
 func TestFromMapstrSliceMapstr(t *testing.T) {
-	inputSlice := []mapstr.M{mapstr.M{"item": 1}, mapstr.M{"item": 1}, mapstr.M{"item": 1}}
+	inputSlice := []mapstr.M{{"item": 1}, {"item": 1}, {"item": 1}}
 	inputMap := mapstr.M{
 		"slice": inputSlice,
 	}
@@ -273,6 +273,98 @@ func TestFromMapstrSliceCommonTime(t *testing.T) {
 	assert.Equal(t, want, inputMap)
 }
 
+type structWithTextMarshaler struct {
+	Value string `json:"value"`
+}
+
+func (s *structWithTextMarshaler) MarshalText() ([]byte, error) {
+	return []byte("marshalled:" + s.Value), nil
+}
+
+func TestFromMapstrWithNestedData(t *testing.T) {
+	input := mapstr.M{
+		"any_array":  [3]any{1, "string", 3},
+		"any_slice":  []any{5.1, 6.2},
+		"bool_array": [2]bool{true, false},
+		"bool_slice": []bool{false, true},
+		"struct": struct {
+			Value string `json:"value"`
+		}{
+			Value: "string",
+		},
+		"struct_with_text_marshaler": &structWithTextMarshaler{
+			Value: "string",
+		},
+		"inner": []mapstr.M{
+			{
+				"inner_int":       42,
+				"inner_map_slice": [1]any{nil},
+				"inner_slice": []map[string]any{ // slice -> slice
+					{"string": "string"},
+					{"number": 12.3},
+				},
+				"inner_struct": struct {
+					Value string `json:"value"`
+				}{
+					Value: "string",
+				},
+				"inner_struct_with_text_marshaler": &structWithTextMarshaler{
+					Value: "string",
+				},
+			},
+			{
+				"inner_int": 43,
+				"inner_map_slice": []any{
+					map[string]any{"string": "string3"},
+					mapstr.M{"number": 12.4},
+				},
+				"inner_slice": [2]map[string]any{ // array -> slice
+					{"string": "string2"},
+					{"number": 12.4},
+				},
+			},
+		},
+	}
+	want := mapstr.M{
+		"any_array":  []any{1, "string", 3},
+		"any_slice":  []any{5.1, 6.2},
+		"bool_array": []any{true, false},
+		"bool_slice": []any{false, true},
+		"struct": map[string]any{
+			"value": "string",
+		},
+		"struct_with_text_marshaler": "marshalled:string",
+		"inner": []any{
+			map[string]any{
+				"inner_int":       42,
+				"inner_map_slice": []any{nil},
+				"inner_slice": []any{
+					map[string]any{"string": "string"},
+					map[string]any{"number": 12.3},
+				},
+				"inner_struct": map[string]any{
+					"value": "string",
+				},
+				"inner_struct_with_text_marshaler": "marshalled:string",
+			},
+			map[string]any{
+				"inner_int": 43,
+				"inner_map_slice": []any{
+					map[string]any{"string": "string3"},
+					map[string]any{"number": 12.4},
+				},
+				"inner_slice": []any{
+					map[string]any{"string": "string2"},
+					map[string]any{"number": 12.4},
+				},
+			},
+		},
+	}
+
+	ConvertNonPrimitive(input)
+	assert.Equal(t, want, input)
+}
+
 func TestToMapstr(t *testing.T) {
 	pm := pcommon.NewMap()
 	pm.PutInt("int", 42)
@@ -303,15 +395,13 @@ func TestToMapstr(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
-type unknown int
-
 func TestUnknownType(t *testing.T) {
 	inputMap := mapstr.M{
-		"slice": []unknown{42, 43, 44},
+		"unknown_map": map[string]int{"key": 42},
 	}
 
 	expected := mapstr.M{
-		"slice": "unknown type: []otelmap.unknown",
+		"unknown_map": "unknown type: map[string]int",
 	}
 
 	ConvertNonPrimitive(inputMap)

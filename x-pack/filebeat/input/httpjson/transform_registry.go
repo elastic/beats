@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -17,7 +18,7 @@ import (
 // transforms name.
 type registry map[string]map[string]constructor
 
-type constructor func(config *conf.C, log *logp.Logger) (transform, error)
+type constructor func(config *conf.C, stat status.StatusReporter, log *logp.Logger) (transform, error)
 
 var registeredTransforms = registry{
 	requestNamespace: {

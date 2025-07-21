@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
@@ -25,16 +26,13 @@ func (e HTTPResponse) Error() string {
 	return fmt.Sprintf("%s: HTTP error %s", e.Err.Error(), e.Status)
 }
 
-// FetchAPIData fetches data from the specified path using the provided MetricSet and deserializes it into the specified type T.
-func FetchAPIData[T any](m *elasticsearch.MetricSet, path string) (*T, error) {
-	m.SetServiceURI(path)
-
-	resp, err := m.FetchResponse()
-
+// HandleHTTPResponse handles the HTTP response and deserializes it into the specified type T.
+// This will appropriately close the response body.
+func HandleHTTPResponse[T any](resp *http.Response, err error) (*T, error) {
 	if err != nil {
 		return nil, &HTTPResponse{
 			StatusCode: 0,
-			Status:     "500 Internal Server Error",
+			Status:     "failed to send request",
 			Body:       "",
 			Err:        err,
 		}
@@ -47,9 +45,9 @@ func FetchAPIData[T any](m *elasticsearch.MetricSet, path string) (*T, error) {
 			StatusCode: resp.StatusCode,
 			Status:     "failed to read response body",
 			Body:       "",
-			Err:        err,
+			Err:        readErr,
 		}
-	} else if resp.StatusCode != 200 {
+	} else if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		return nil, &HTTPResponse{
 			StatusCode: resp.StatusCode,
 			Status:     resp.Status,
@@ -59,13 +57,20 @@ func FetchAPIData[T any](m *elasticsearch.MetricSet, path string) (*T, error) {
 	} else if data, deserializeErr := DeserializeData[T](body); deserializeErr != nil {
 		return nil, &HTTPResponse{
 			StatusCode: resp.StatusCode,
-			Status:     "500 Internal Server Error",
+			Status:     "failed to deserialize data",
 			Body:       string(body),
 			Err:        deserializeErr,
 		}
 	} else {
 		return data, nil
 	}
+}
+
+// FetchAPIData fetches data from the specified path using the provided MetricSet and deserializes it into the specified type T.
+func FetchAPIData[T any](m *elasticsearch.MetricSet, path string) (*T, error) {
+	m.SetServiceURI(path)
+
+	return HandleHTTPResponse[T](m.FetchResponse()) //nolint:bodyclose // the handler closes the body
 }
 
 // Deserialize the data to match the expected type, T. Note that success does not mean that fields are populated, which requires a schema

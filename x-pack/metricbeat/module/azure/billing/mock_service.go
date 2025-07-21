@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package billing
 
 import (
@@ -22,11 +24,11 @@ type MockService struct {
 }
 
 // NewMockClient instantiates a new client with the mock billing service
-func NewMockClient() *Client {
+func NewMockClient(logger *logp.Logger) *Client {
 	return &Client{
 		new(MockService),
 		azure.Config{},
-		logp.NewLogger("test azure monitor"),
+		logger.Named("test azure monitor"),
 	}
 }
 

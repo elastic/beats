@@ -49,7 +49,7 @@ func TestRunner(t *testing.T) {
 	}
 
 	// Create a new Wrapper based on the configuration.
-	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), module.WithMetricSetInfo())
+	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), module.WithMetricSetInfo())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,7 +77,7 @@ func TestCPUDiagnostics(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create a new Wrapper based on the configuration.
-	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), module.WithMetricSetInfo())
+	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), module.WithMetricSetInfo())
 	if err != nil {
 		t.Fatal(err)
 	}
