@@ -56,15 +56,18 @@ type eventHubInputV2 struct {
 	pipeline           beat.Pipeline
 	messageDecoder     messageDecoder
 	migrationAssistant *migrationAssistant
+	setupFn            func(ctx context.Context) error
 }
 
 // newEventHubInputV2 creates a new instance of the Azure Event Hub input v2,
 // that uses the modern Azure Event Hub SDK for Go.
 func newEventHubInputV2(config azureInputConfig, log *logp.Logger) (v2.Input, error) {
-	return &eventHubInputV2{
+	in := &eventHubInputV2{
 		config: config,
 		log:    log.Named(inputName),
-	}, nil
+	}
+	in.setupFn = in.setup
+	return in, nil
 }
 
 func (in *eventHubInputV2) Name() string {
@@ -96,7 +99,7 @@ func (in *eventHubInputV2) Run(
 	inputContext.UpdateStatus(status.Configuring, "")
 
 	// Initialize the components needed to process events.
-	err = in.setup(ctx)
+	err = in.setupFn(ctx)
 	if err != nil {
 		inputContext.UpdateStatus(status.Failed, fmt.Sprintf("failed to setup input: %s", err))
 		return err
