@@ -245,6 +245,8 @@ github.com/aws/aws-sdk-go-v2/service/sts v1.34.0 h1:NFOJ/NXEGV4Rq//71Hs1jC/NvPs1
 github.com/aws/aws-sdk-go-v2/service/sts v1.34.0/go.mod h1:7ph2tGpfQvwzgistp2+zga9f+bCjlQJPkPUmMgDSD7w=
 github.com/aws/smithy-go v1.22.4 h1:uqXzVZNuNexwc/xrh6Tb56u89WDlJY6HS+KC0S4QSjw=
 github.com/aws/smithy-go v1.22.4/go.mod h1:t1ufH5HMublsJYulve2RKmHDC15xu1f26kHCp/HgceI=
+github.com/beevik/ntp v1.4.3 h1:PlbTvE5NNy4QHmA4Mg57n7mcFTmr1W1j3gcK7L1lqho=
+github.com/beevik/ntp v1.4.3/go.mod h1:Unr8Zg+2dRn7d8bHFuehIMSvvUYssHMxW3Q5Nx4RW5Q=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/benbjohnson/clock v1.3.0 h1:ip6w0uFQkncKQ979AypyG0ER7mqUSBdKLOgAle/AT8A=
 github.com/benbjohnson/clock v1.3.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
@@ -739,8 +741,8 @@ github.com/lestrrat-go/envload v0.0.0-20180220234015-a3eb8ddeffcc h1:RKf14vYWi2t
 github.com/lestrrat-go/envload v0.0.0-20180220234015-a3eb8ddeffcc/go.mod h1:kopuH9ugFRkIXf3YoqHKyrJ9YfUFsckUU9S7B+XP+is=
 github.com/lestrrat-go/strftime v1.1.0 h1:gMESpZy44/4pXLO/m+sL0yBd1W6LjgjrrD4a68Gapyg=
 github.com/lestrrat-go/strftime v1.1.0/go.mod h1:uzeIB52CeUJenCo1syghlugshMysrqUT51HlxphXVeI=
-github.com/lib/pq v1.10.3 h1:v9QZf2Sn6AmjXtQeFpdoq/eaNtYP6IN+7lcrygsIAtg=
-github.com/lib/pq v1.10.3/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
+github.com/lib/pq v1.10.9 h1:YXG7RB+JIjhP29X+OtkiDnYaXQwpS4JEWq7dtCCRUEw=
+github.com/lib/pq v1.10.9/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
 github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 h1:6E+4a0GO5zZEnZ81pIr0yLvtUWk2if982qA3F3QD6H4=
 github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0/go.mod h1:zJYVVT2jmtg6P3p1VtQj7WsuWi/y4VnjVBn7F8KPB3I=
 github.com/magefile/mage v1.15.0 h1:BvGheCMAsG3bWUDbZ8AyXXpCNwU9u5CB6sM+HNb9HYg=
@@ -1145,6 +1147,8 @@ go.opentelemetry.io/collector/pipeline/xpipeline v0.130.0 h1:5A2nwGbzSPUQTdJSvFW
 go.opentelemetry.io/collector/pipeline/xpipeline v0.130.0/go.mod h1:IGQRi8Om0teSJ56P3tOZai03dLNzzzPvsqCVkcuEd8U=
 go.opentelemetry.io/collector/processor v1.36.0 h1:lPznjCa1r2euVcgkMYRwP0tG2MukXGQlvpX8cTNLrx8=
 go.opentelemetry.io/collector/processor v1.36.0/go.mod h1:7Bzn5sB31d8Bzw2IFsx3Ay1tgH4uIlVoLUT0to9wTu8=
+go.opentelemetry.io/collector/processor/processorhelper v0.130.0 h1:3y5k9OWmOV6ZmZRiKcR7dDDxwTD4SjaOCYHlR5EVVEE=
+go.opentelemetry.io/collector/processor/processorhelper v0.130.0/go.mod h1:d6RoygisVUOeU2njRt7Yc832qK6I3KYQGKciOBAhB7g=
 go.opentelemetry.io/collector/processor/processortest v0.130.0 h1:fI+upRSdb/FfcuSf0MqEh9WM0tH5l91GbUjbL0j+O+Q=
 go.opentelemetry.io/collector/processor/processortest v0.130.0/go.mod h1:IxVVbJQLBRX+O49UblqZ+5yGyloiVdoWDM/z+cuBtaI=
 go.opentelemetry.io/collector/processor/xprocessor v0.130.0 h1:SeZF5FfLKc2UrrSrt1wbfYUgTs6vEQMMQsGPVhqjles=
