@@ -1,0 +1,24 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "system.ntp",
+        "duration": 115000,
+        "module": "system"
+    },
+    "metricset": {
+        "name": "ntp"
+    },
+    "service": {
+        "type": "system"
+    },
+    "system": {
+        "ntp": {
+            "host": "0.pool.ntp.org",
+            "offset": 127140000
+        }
+    }
+}
