@@ -231,7 +231,7 @@ func TestTopicSelection(t *testing.T) {
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
 			test := test
-			selector, err := buildTopicSelector(config.MustNewConfigFrom(test.cfg))
+			selector, err := buildTopicSelector(config.MustNewConfigFrom(test.cfg), logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatalf("Failed to parse configuration: %v", err)
 			}

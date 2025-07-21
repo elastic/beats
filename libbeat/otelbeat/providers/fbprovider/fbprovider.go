@@ -19,67 +19,35 @@ package fbprovider
 
 import (
 	"context"
-	"fmt"
-	"path/filepath"
-	"strings"
 
 	"go.opentelemetry.io/collector/confmap"
 
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/providers"
 )
 
 const schemeName = "fb"
 
-type provider struct{}
+type fbProvider struct{}
 
-// The Provider provides configuration, and allows to watch/monitor for changes.
+// NewFactory returns a provider factory that loads filebeat configuration
 func NewFactory() confmap.ProviderFactory {
 	return confmap.NewProviderFactory(newProvider)
 }
 
 func newProvider(confmap.ProviderSettings) confmap.Provider {
-	return &provider{}
+	return &fbProvider{}
 }
 
 // Retrieve retrieves the beat configuration file and constructs otel config
-func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFunc) (*confmap.Retrieved, error) {
-	if !strings.HasPrefix(uri, schemeName+":") {
-		return nil, fmt.Errorf("%q uri is not supported by %q provider", uri, schemeName)
-	}
-
-	// Load filebeat config file
-	cfg, err := cfgfile.Load(filepath.Clean(uri[len(schemeName)+1:]), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	var receiverMap map[string]any
-	err = cfg.Unpack(&receiverMap)
-	if err != nil {
-		return nil, err
-	}
-
-	// filebeat specific configuration is defined here
-	cfgMap := map[string]any{
-		"receivers": map[string]any{
-			"filebeatreceiver": receiverMap,
-		},
-		"service": map[string]any{
-			"pipelines": map[string]any{
-				"logs": map[string]any{
-					"receivers": []string{"filebeatreceiver"},
-				},
-			},
-		},
-	}
-
-	return confmap.NewRetrieved(cfgMap)
+// uri here is the filepath of the beat config
+func (*fbProvider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFunc) (*confmap.Retrieved, error) {
+	return providers.LoadConfig(uri, schemeName)
 }
 
-func (*provider) Scheme() string {
+func (*fbProvider) Scheme() string {
 	return schemeName
 }
 
-func (*provider) Shutdown(context.Context) error {
+func (*fbProvider) Shutdown(context.Context) error {
 	return nil
 }

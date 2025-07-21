@@ -245,6 +245,7 @@ The following metricsets are available:
 * [memory](/reference/metricbeat/metricbeat-metricset-system-memory.md)
 * [network](/reference/metricbeat/metricbeat-metricset-system-network.md)
 * [network_summary](/reference/metricbeat/metricbeat-metricset-system-network_summary.md)
+* [ntp](/reference/metricbeat/metricbeat-metricset-system-ntp.md)
 * [process](/reference/metricbeat/metricbeat-metricset-system-process.md)
 * [process_summary](/reference/metricbeat/metricbeat-metricset-system-process_summary.md)
 * [raid](/reference/metricbeat/metricbeat-metricset-system-raid.md)
