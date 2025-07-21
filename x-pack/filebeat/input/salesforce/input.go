@@ -76,7 +76,7 @@ func (s *salesforceInput) Test(_ inputcursor.Source, _ v2.TestContext) error {
 // Run starts the input and blocks until it ends completes. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
 func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inputcursor.Cursor, pub inputcursor.Publisher) (err error) {
-	
+
 	env.UpdateStatus(status.Starting, "Initializing Salesforce input.")
 	st := &state{}
 	if !cursor.IsNew() {
@@ -85,7 +85,7 @@ func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inp
 			return err
 		}
 	}
-	
+
 	env.UpdateStatus(status.Configuring, "Salesforce input configuring")
 	if err = s.Setup(env, src, st, pub); err != nil {
 		env.UpdateStatus(status.Failed, fmt.Sprintf("Failed to set up Salesforce input: %v", err))
