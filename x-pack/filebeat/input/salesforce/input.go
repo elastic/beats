@@ -76,24 +76,21 @@ func (s *salesforceInput) Test(_ inputcursor.Source, _ v2.TestContext) error {
 // Run starts the input and blocks until it ends completes. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
 func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inputcursor.Cursor, pub inputcursor.Publisher) (err error) {
-	//status start
+	
 	env.UpdateStatus(status.Starting, "Initializing Salesforce input.")
 	st := &state{}
 	if !cursor.IsNew() {
 		if err = cursor.Unpack(&st); err != nil {
-			//status failed
 			env.UpdateStatus(status.Failed, fmt.Sprintf("Failed to set up Salesforce input: %v", err))
 			return err
 		}
 	}
-	//status configuring
+	
 	env.UpdateStatus(status.Configuring, "Salesforce input configuring")
 	if err = s.Setup(env, src, st, pub); err != nil {
-		//status failed
 		env.UpdateStatus(status.Failed, fmt.Sprintf("Failed to set up Salesforce input: %v", err))
 		return err
 	}
-	//status healthy
 	env.UpdateStatus(status.Healthy, "Salesforce input setup complete. Monitoring events.")
 	return s.run(env)
 }
@@ -138,7 +135,6 @@ func (s *salesforceInput) run(env v2.Context) error {
 	if s.srcConfig.EventMonitoringMethod.EventLogFile.isEnabled() {
 		err := s.RunEventLogFile()
 		if err != nil {
-			//status degraded
 			env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running EventLogFile collection: %v", err))
 			s.log.Errorf("Problem running EventLogFile collection: %s", err)
 		}
@@ -147,7 +143,6 @@ func (s *salesforceInput) run(env v2.Context) error {
 	if s.srcConfig.EventMonitoringMethod.Object.isEnabled() {
 		err := s.RunObject()
 		if err != nil {
-			//status degraded
 			env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running Object collection: %v", err))
 			s.log.Errorf("Problem running Object collection: %s", err)
 		}
@@ -182,22 +177,18 @@ func (s *salesforceInput) run(env v2.Context) error {
 		case <-eventLogFileTicker.C:
 			s.log.Info("Running EventLogFile collection")
 			if err := s.RunEventLogFile(); err != nil {
-				//status degraded
 				env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running EventLogFile collection: %v", err))
 				s.log.Errorf("Problem running EventLogFile collection: %s", err)
 			} else {
-				//status healthy
 				env.UpdateStatus(status.Healthy, "EventLogFile collection completed successfully")
 				s.log.Info("EventLogFile collection completed successfully")
 			}
 		case <-objectMethodTicker.C:
-			//status degraded
 			s.log.Info("Running Object collection")
 			if err := s.RunObject(); err != nil {
 				env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running Object collection: %v", err))
 				s.log.Errorf("Problem running Object collection: %s", err)
 			} else {
-				// status healthy
 				env.UpdateStatus(status.Healthy, "Object collection completed successfully.")
 				s.log.Info("Object collection completed successfully")
 			}
@@ -270,7 +261,6 @@ func (s *salesforceInput) RunObject() error {
 		cursor = mapstr.M{"object": object}
 	}
 
-	//query, err := s.FormQueryWithCursor(s.config.EventMonitoringMethod.Object.Query, cursor)
 	query, err := s.FormQueryWithCursor(s.EventMonitoringMethod.Object.Query, cursor)
 	if err != nil {
 		return fmt.Errorf("error forming query based on cursor: %w", err)
