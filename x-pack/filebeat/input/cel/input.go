@@ -163,18 +163,26 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		return err
 	}
 
-	var auth *lib.BasicAuth
+	var basicAuth *lib.BasicAuth
 	if cfg.Auth.Basic.isEnabled() {
-		auth = &lib.BasicAuth{
+		basicAuth = &lib.BasicAuth{
 			Username: cfg.Auth.Basic.User,
 			Password: cfg.Auth.Basic.Password,
+		}
+	}
+	var tokenAuth *lib.TokenAuth
+	if cfg.Auth.Token.isEnabled() {
+		tokenAuth = &lib.TokenAuth{
+			Type:  cfg.Auth.Token.Type,
+			Value: cfg.Auth.Token.Value,
 		}
 	}
 	wantDump := cfg.FailureDump.enabled() && cfg.FailureDump.Filename != ""
 	doCov := cfg.RecordCoverage && log.IsDebug()
 	httpOptions := lib.HTTPOptions{
 		Limiter:     limiter,
-		BasicAuth:   auth,
+		BasicAuth:   basicAuth,
+		TokenAuth:   tokenAuth,
 		Headers:     cfg.Resource.Headers,
 		MaxBodySize: cfg.Resource.MaxBodySize,
 	}

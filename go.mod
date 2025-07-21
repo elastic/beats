@@ -96,7 +96,7 @@ require (
 	github.com/jonboulle/clockwork v0.2.2
 	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
 	github.com/jpillora/backoff v1.0.0 // indirect
-	github.com/lib/pq v1.10.3
+	github.com/lib/pq v1.10.9
 	github.com/magefile/mage v1.15.0
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/miekg/dns v1.1.66
@@ -170,6 +170,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.28.3
 	github.com/aws/aws-sdk-go-v2/service/health v1.30.3
 	github.com/aws/smithy-go v1.22.4
+	github.com/beevik/ntp v1.4.3
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/dgraph-io/badger/v4 v4.6.0
 	github.com/elastic/bayeux v1.0.5
