@@ -64,9 +64,9 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 	)
 
 	transactionId, err := t.HandlePartitionedTemplates(m, r, info, templatePathPrefix, partitionedTemplates, getNamedTemplates)
+
 	if err != nil {
-		events.SendErrorEvent(err, info, r, CatTemplateMetricSet, CatTemplatePath, transactionId)
-		return err
+		events.LogAndSendErrorEvent(err, info, r, CatTemplateMetricSet, CatTemplatePath, transactionId)
 	}
 
 	return nil
