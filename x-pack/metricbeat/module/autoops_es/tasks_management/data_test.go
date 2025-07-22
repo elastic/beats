@@ -86,34 +86,6 @@ func expectValidParsedMultiTasks(t *testing.T, data metricset.FetcherData[Groupe
 	require.Nil(t, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "ignored_field"))
 }
 
-// Tests that Cluster Info is consistently reported and the Task is properly reported
-func expectMixedValidParsedData(t *testing.T, data metricset.FetcherData[GroupedTasks]) {
-	require.ErrorContains(t, data.Error, "failed applying task schema")
-
-	require.Equal(t, 0, len(data.Reporter.GetErrors()))
-	require.LessOrEqual(t, 1, len(data.Reporter.GetEvents()))
-
-	events := data.Reporter.GetEvents()
-
-	auto_ops_testing.CheckAllEventsUseSameTransactionId(t, events)
-
-	event := auto_ops_testing.GetEventByName(t, events, "task.task_id", "node1:45")
-
-	auto_ops_testing.CheckEventWithRandomTransactionId(t, event, data.ClusterInfo)
-
-	// metrics exist
-	require.True(t, len(*event.MetricSetFields.FlattenKeys()) > 2)
-	require.Equal(t, "node1:45", auto_ops_testing.GetObjectValue(event.MetricSetFields, "task.task_id"))
-
-	// mapper is expected to drop this field if it appears
-	require.Nil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "task.children"))
-}
-
-// Tests that the schema rejects the data
-func expectError(t *testing.T, data metricset.FetcherData[GroupedTasks]) {
-	require.ErrorContains(t, data.Error, "failed applying task schema")
-}
-
 // Expect a valid response from Elasticsearch to create N events
 func TestProperlyHandlesResponse(t *testing.T) {
 	metricset.RunTestsForServerlessMetricSetWithGlobFiles(t, "./_meta/test/tasks.*.json", TasksMetricSet, eventsMapping, expectValidParsedData)
@@ -133,14 +105,4 @@ func TestProperlyIgnoresValuesFromResponse(t *testing.T) {
 // Expect a valid response from Elasticsearch to create N events
 func TestProperlyHandlesMultiResponse(t *testing.T) {
 	metricset.RunTestsForServerlessMetricSetWithGlobFiles(t, "./_meta/test/tasks.multi.*.json", TasksMetricSet, eventsMapping, expectValidParsedMultiTasks)
-}
-
-// Expect a valid response from Elasticsearch to create N events
-func TestProperlyHandlesInnerErrorsInResponse(t *testing.T) {
-	metricset.RunTestsForServerlessMetricSetWithGlobFiles(t, "./_meta/test/mixed.tasks.*.json", TasksMetricSet, eventsMapping, expectMixedValidParsedData)
-}
-
-// Expect a corrupt response from Elasticsearch to trigger an error while applying the schema
-func TestProperlyFailsOnBadResponse(t *testing.T) {
-	metricset.RunTestsForServerlessMetricSetWithGlobFiles(t, "./_meta/test/no_*.tasks.*.json", TasksMetricSet, eventsMapping, expectError)
 }

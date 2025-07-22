@@ -85,29 +85,31 @@ func (m *AutoOpsMetricSet[T]) Fetch(r mb.ReporterV2) error {
 
 	m.Logger().Infof("fetching %v metricset", metricSetName)
 
+	// because Fetch() is part ReporterV2 interface, we're purposely not returning an error
+	// we do not want to the metricset Error() method to be called, so we are returning nil to avoid duplicate errors sent and logger
+	// although metricsets are returning errors, they are not sent to the output, instead they are logged and sent as events
 	var err error
 	var info *utils.ClusterInfo
 	var data *T
 
 	if info, err = GetInfo(m.MetricSet); err != nil {
 		err = fmt.Errorf("failed to get cluster info from cluster, %v metricset %w", metricSetName, err)
-		events.SendErrorEventWithoutClusterInfo(err, r, metricSetName)
-		m.Logger().Errorf(err.Error())
-		return err
+		events.LogAndSendErrorEventWithoutClusterInfo(err, r, metricSetName)
+		return nil
 	} else if data, err = utils.FetchAPIData[T](m.MetricSet, m.RoutePath); err != nil {
 		err = fmt.Errorf("failed to get data, %v metricset %w", metricSetName, err)
-		events.SendErrorEventWithoutClusterInfo(err, r, metricSetName)
-		m.Logger().Errorf(err.Error())
-		return err
+		events.LogAndSendErrorEventWithoutClusterInfo(err, r, metricSetName)
+		return nil
 	}
 
 	// nested mappers reuse the
 	if m.NestedMapper != nil {
 		if err = m.NestedMapper(m.MetricSet, r, info, data); err != nil {
-			return err
+
+			return nil
 		}
 	} else if err = m.Mapper(r, info, data); err != nil {
-		return err
+		return nil
 	}
 
 	m.Logger().Infof("completed fetching %v metricset", metricSetName)
