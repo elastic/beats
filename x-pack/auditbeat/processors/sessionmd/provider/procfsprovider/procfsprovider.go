@@ -71,6 +71,7 @@ func (p prvdr) Sync(ev *beat.Event, pid uint32) error {
 			p.logger.Debugw("couldn't get process info from proc for pid", "pid", pid, "error", err)
 			// If process info couldn't be taken from procfs, populate with as much info as
 			// possible from the event
+			pe.ProcfsLookupFail = true
 			pe.PIDs.Tgid = pid
 			var intr interface{}
 			var i int
@@ -83,7 +84,7 @@ func (p prvdr) Sync(ev *beat.Event, pid uint32) error {
 			if i, ok = intr.(int); !ok {
 				goto out
 			}
-			pe.PIDs.Ppid = uint32(i)
+			pe.PIDs.Ppid = uint32(i) //nolint: gosec // Pids are 32bit
 
 			parent, err = p.db.GetProcess(pe.PIDs.Ppid)
 			if err != nil {
