@@ -21,9 +21,8 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/Shopify/sarama"
-
 	"github.com/elastic/beats/v7/metricbeat/module/kafka"
+	"github.com/elastic/sarama"
 )
 
 type mockClient struct {
@@ -125,7 +124,7 @@ func makeFetchGroupOffsets(
 
 			for i, offset := range partition {
 				T[int32(i)] = &sarama.OffsetFetchResponseBlock{
-					Offset: int64(offset),
+					Offset: offset,
 				}
 			}
 		}
