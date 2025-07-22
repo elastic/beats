@@ -176,8 +176,8 @@ func (b *beatTest) Wait() {
 
 	err := b.beat.Wait()
 	exitErr := &exec.ExitError{}
-	if !errors.As(err, &exitErr) {
-		b.t.Fatalf("unexpected error when stopping %s: %s", b.opts.Beatname, err)
+	if !errors.As(err, &exitErr) && err != nil {
+		b.t.Fatalf("unexpected error when stopping %s: %v", b.opts.Beatname, err)
 		return
 	}
 
@@ -353,7 +353,7 @@ func (b *beatTest) printExpectations() {
 	}
 }
 
-// we know that we're going to inpect the JSON output from the Beat
+// we know that we're going to inspect the JSON output from the Beat
 // so we must take care of the escaped characters,
 // e.g. backslashes in paths on Windows.
 func escapeJSONCharacters(s string) string {
