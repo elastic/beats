@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
 - The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
 - Allow faccessat(2) in seccomp. {pull}43322[43322]
+- Update user agent used by beats http clients {pull}45251[45251]
 
 *Auditbeat*
 
@@ -68,6 +69,7 @@ already present as `container.id` and `container.log.tag` is dropped because it 
 otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 - Fixed password authentication for ACL users in the Redis input of Filebeat. {pull}44137[44137]
+- Add experimental GZIP file ingestion in filestream. {pull}45301[45301]
 
 
 *Heartbeat*
@@ -94,7 +96,9 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
 - Add check for http error codes in the Metricbeat's Prometheus query submodule {pull}44493[44493]
 - Sanitize error messages in Fetch method of SQL module {pull}44577[44577]
+- Add NTP metricset to system module. {pull}44884[44884]
 - Add VPN metrics to meraki module {pull}44851[44851]
+- Improve error messages in AWS Health {pull}45408[45408]
 
 *Osquerybeat*
 
@@ -440,11 +444,12 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Journald `include_matches.match` now accepts `+` to represent a logical disjunction (OR) {issue}40185[40185] {pull}42517[42517]
 - The journald input is now generally available. {pull}42107[42107]
 - Add metrics for number of events and pages published by HTTPJSON input. {issue}42340[42340] {pull}42442[42442]
-- Filestram take over now supports taking over states from other Filestream inputs and dynamic loading of inputs (autodiscover and Elastic-Agent). {issue}42472[42472] {issue}42884[42884] {pull}42624[42624]
+- Filestream take over now supports taking over states from other Filestream inputs and dynamic loading of inputs (autodiscover and Elastic Agent). There is a new syntax for the configuration, but the previous one can still be used. {issue}42472[42472] {issue}42884[42884] {pull}42624[42624]
 - Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
 - Update CEL mito extensions to v1.17.0. {pull}42851[42851]
 - Winlog input now can report its status to Elastic-Agent {pull}43089[43089]
 - Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
+- The Filestream input now can remove files after they reach EOF or are inactive {pull}43368[43368]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
 - Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
 - Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
@@ -477,7 +482,11 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Update CEL mito extensions to v1.21.0. {issue}40762[40762] {pull}45107[45107]
 - Add Fleet health status reporting to the entity analytics input. {issue}44269[44269] {pull}45152[45152]
 - Add Fleet status updating to o356audit input. {issue}44651[44651] {pull}44957[44957]
+- Add support for blob filtering using path_prefix in azureblobstorage input. {issue}35186[35186] {pull}45214[45214]
 - Update CEL mito extensions to v1.22.0. {pull}45245[45245]
+- Allow empty HTTPJSON cursor template value evaluations to be ignored by Fleet health status updates. {pull}45361[45361]
+- Reuse OAuth2 clients in HTTP JSON input where possible. {issue}34834[34834] {pull}44976[44976]
+- Add support for generalized token authentication to CEL input. {pull}45359[45359]
 
 *Auditbeat*
 

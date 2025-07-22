@@ -125,8 +125,7 @@ func MakeDefaultSupport(
 			rawProcessors = cfg.Processors
 		}
 
-		// TODO: pass a local logger to processor.New
-		processors, err := processors.New(rawProcessors, nil)
+		processors, err := processors.New(rawProcessors, log)
 		if err != nil {
 			return nil, fmt.Errorf("error initializing processors: %w", err)
 		}
