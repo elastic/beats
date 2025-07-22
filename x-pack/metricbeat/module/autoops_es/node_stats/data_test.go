@@ -146,42 +146,6 @@ func expectValidParsedDetailedWithCache(t *testing.T, data metricset.FetcherData
 	require.NotNil(t, node1MetricSet["search_latency_in_millis"])
 }
 
-// Tests that Cluster Info is consistently reported and the Node Stats is properly reported
-func expectMixedValidParsedData(t *testing.T, data metricset.FetcherData[NodesStats]) {
-	require.ErrorContains(t, data.Error, "failed applying nodes_stats schema")
-
-	require.Equal(t, 0, len(data.Reporter.GetErrors()))
-	require.Equal(t, 3, len(data.Reporter.GetEvents()))
-
-	events := data.Reporter.GetEvents()
-
-	auto_ops_testing.CheckAllEventsUseSameTransactionId(t, events)
-
-	event := auto_ops_testing.GetEventByName(t, events, "name", "instance-0000000001")
-
-	auto_ops_testing.CheckEvent(t, event, data.ClusterInfo)
-
-	// metrics exist
-	require.True(t, len(*event.MetricSetFields.FlattenKeys()) > 2)
-	require.Equal(t, "deX3GDaCSQSINcDCm-AtDw", auto_ops_testing.GetObjectValue(event.MetricSetFields, "id"))
-	require.Equal(t, "instance-0000000001", auto_ops_testing.GetObjectValue(event.MetricSetFields, "name"))
-	require.Equal(t, "10.42.0.2", auto_ops_testing.GetObjectValue(event.MetricSetFields, "host"))
-	require.Equal(t, true, auto_ops_testing.GetObjectValue(event.MetricSetFields, "is_elected_master"))
-	require.ElementsMatch(t, []string{"data_content", "data_hot", "ingest", "master", "remote_cluster_client", "transform"}, auto_ops_testing.GetObjectValue(event.MetricSetFields, "roles"))
-
-	// schema is expected to drop unknown fields
-	require.Nil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "ignored_field"))
-
-	event = auto_ops_testing.GetEventsWithField(t, events, "nodes")[0]
-
-	require.Equal(t, map[string]string{"deX3GDaCSQSINcDCm-AtDw": "instance-0000000001"}, auto_ops_testing.GetObjectValue(event.MetricSetFields, "nodes"))
-}
-
-// Tests that the schema rejects the data
-func expectError(t *testing.T, data metricset.FetcherData[NodesStats]) {
-	require.ErrorContains(t, data.Error, "failed applying nodes_stats schema")
-}
-
 // Expect a valid response from Elasticsearch to create N events
 func TestProperlyHandlesResponse(t *testing.T) {
 	metricset.RunTestsForFetcherWithGlobFilesAndSetup(t, "./_meta/test/nodes_stats.*.json", setupSuccessfulServer(), useNamedMetricSet, expectValidParsedData, clearCache)
@@ -199,14 +163,4 @@ func TestProperlyHandlesResponseWithDetailsWithCache(t *testing.T) {
 			"deX3GDaCSQSINcDCm-AtDw": getNodeStatsForNode(0),
 		}, 10)
 	})
-}
-
-// Expect a valid mixed with invalid response from Elasticsearch to create N events without bad data
-func TestProperlyHandlesInnerErrorsInResponse(t *testing.T) {
-	metricset.RunTestsForFetcherWithGlobFilesAndSetup(t, "./_meta/test/mixed.nodes_stats.*.json", setupSuccessfulServer(), useNamedMetricSet, expectMixedValidParsedData, clearCache)
-}
-
-// Expect a corrupt response from Elasticsearch to trigger an error while applying the schema
-func TestProperlyFailsOnBadResponse(t *testing.T) {
-	metricset.RunTestsForFetcherWithGlobFilesAndSetup(t, "./_meta/test/no_*.nodes_stats.*.json", setupSuccessfulServer(), useNamedMetricSet, expectError, clearCache)
 }

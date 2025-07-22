@@ -12,10 +12,9 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricset"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricset"
 )
 
 // Tests that Cluster Info is consistently reported, the Cluster Name, and the dynamic status from the filename
@@ -41,17 +40,7 @@ func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]i
 	require.Nil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "ignored_field"))
 }
 
-// Tests that the schema rejects the data
-func expectError(t *testing.T, data metricset.FetcherData[map[string]interface{}]) {
-	require.ErrorContains(t, data.Error, "failed applying cluster health schema")
-}
-
 // Expect a valid response from Elasticsearch to create a single event
 func TestProperlyHandlesResponse(t *testing.T) {
 	metricset.RunTestsForServerlessMetricSetWithGlobFiles(t, "./_meta/test/cluster_health.*.json", ClusterHealthMetricSet, eventsMapping, expectValidParsedData)
-}
-
-// Expect a corrupt response from Elasticsearch to trigger an error while applying the schema
-func TestProperlyFailsOnBadResponse(t *testing.T) {
-	metricset.RunTestsForServerlessMetricSetWithGlobFiles(t, "./_meta/test/no_*.cluster_health.*.json", ClusterHealthMetricSet, eventsMapping, expectError)
 }

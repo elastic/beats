@@ -11,17 +11,14 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
-	autoopsevents "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricset"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricset"
 )
 
 var (
-	setupCatTemplateErrorServer = auto_ops_testing.SetupDataErrorServer(CatTemplatePath)
-	setupEmptySuccessfulServer  = auto_ops_testing.SetupSuccessfulServer(CatTemplatePath)
-	useNamedMetricSet           = auto_ops_testing.UseNamedMetricSet(CatTemplateMetricSet)
+	setupEmptySuccessfulServer = auto_ops_testing.SetupSuccessfulServer(CatTemplatePath)
+	useNamedMetricSet          = auto_ops_testing.UseNamedMetricSet(CatTemplateMetricSet)
 )
 
 func TestEmptySuccessfulFetch(t *testing.T) {
@@ -37,30 +34,5 @@ func TestSuccessfulFetch(t *testing.T) {
 
 		// 1 <= len(...)
 		require.LessOrEqual(t, 1, len(data.Reporter.GetEvents()))
-	})
-}
-
-func TestFailedClusterInfoFetch(t *testing.T) {
-	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/cat_template.*.json", auto_ops_testing.SetupClusterInfoErrorServer, useNamedMetricSet, func(t *testing.T, data metricset.FetcherData[[]CatTemplate]) {
-		require.ErrorContains(t, data.Error, "failed to get cluster info from cluster, cat_template metricset")
-	})
-}
-
-func TestFailedTasksFetch(t *testing.T) {
-	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/cat_template.*.json", setupCatTemplateErrorServer, useNamedMetricSet, func(t *testing.T, data metricset.FetcherData[[]CatTemplate]) {
-		require.ErrorContains(t, data.Error, "failed to get data, cat_template metricset")
-	})
-}
-
-func TestFailedTasksFetchEventsMapping(t *testing.T) {
-	// Note: it will fail due to an inner error looking up templates
-	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/cat_template.*.json", auto_ops_testing.SetupTemplateErrorsServer(CatTemplatePath, templatePathPrefix), useNamedMetricSet, func(t *testing.T, data metricset.FetcherData[[]CatTemplate]) {
-		require.Error(t, data.Error)
-		require.Equal(t, 1, len(data.Reporter.GetEvents()))
-
-		// Check error event
-		event := data.Reporter.GetEvents()[0]
-		_, ok := event.MetricSetFields["error"].(autoopsevents.ErrorEvent)
-		require.True(t, ok, "error field should be of type error.ErrorEvent")
 	})
 }

@@ -11,7 +11,6 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/templates"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 
 	"github.com/stretchr/testify/require"
@@ -122,24 +121,6 @@ func expectValidParsedDetailedTemplates(t *testing.T, data metricset.FetcherData
 	require.Nil(t, auto_ops_testing.GetObjectValue(event2.MetricSetFields, "template.ignored_field"))
 }
 
-// Tests that Cluster Info is consistently reported and the Templates are properly reported
-func expectMixedValidParsedData(t *testing.T, data metricset.FetcherData[ComponentTemplates]) {
-	require.ErrorContains(t, data.Error, "fetching templates failed for failed-response")
-	require.ErrorContains(t, data.Error, "failed applying component template schema for broken-response")
-
-	require.Equal(t, 0, len(data.Reporter.GetErrors()))
-	require.Equal(t, 2, len(data.Reporter.GetEvents()))
-
-	events := data.Reporter.GetEvents()
-
-	event := events[0]
-
-	auto_ops_testing.CheckEventWithRandomTransactionId(t, event, data.ClusterInfo)
-
-	// metrics exist
-	require.NotNil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "template"))
-}
-
 // Expect a valid response from Elasticsearch to create N events
 func TestProperlyHandlesResponseV7(t *testing.T) {
 	expectedTemplateNames := []string{
@@ -180,11 +161,4 @@ func TestProperlyHandlesResponseWithMissingTemplates(t *testing.T) {
 // Expect a valid response from Elasticsearch to create 2 events
 func TestProperlyHandlesCustomResponse(t *testing.T) {
 	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/custom.component_template.*.json", auto_ops_testing.SetupSuccessfulTemplateServerWithIgnoredTemplates(ComponentTemplatePath, templatePathPrefix, getTemplateResponse, []string{"ignored-response"}), useNamedMetricSet, expectValidParsedDetailedTemplates)
-}
-
-// Expect a valid response from Elasticsearch to create N events
-func TestProperlyHandlesInnerErrorsInResponse(t *testing.T) {
-	t.Setenv(templates.TEMPLATE_BATCH_SIZE_NAME, "1") // automatically unsets/resets after test
-
-	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/mixed.component_template.*.json", auto_ops_testing.SetupSuccessfulTemplateServerWithFailedRequests(ComponentTemplatePath, templatePathPrefix, getTemplateResponse, []string{"failed-response"}), useNamedMetricSet, expectMixedValidParsedData)
 }

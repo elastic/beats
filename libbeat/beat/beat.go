@@ -90,31 +90,47 @@ type Beat struct {
 	Registry *reload.Registry // input, & output registry for configuration manager, should be instantiated in NewBeat
 }
 
+func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
+	if beat.Manager == nil {
+		return useragent.AgentManagementModeUnknown
+	}
+	if !beat.Manager.Enabled() {
+		return useragent.AgentManagementModeStandalone
+	}
+
+	info := beat.Manager.AgentInfo()
+	switch info.ManagedMode {
+	case proto.AgentManagedMode_MANAGED:
+		return useragent.AgentManagementModeManaged
+	case proto.AgentManagedMode_STANDALONE:
+		return useragent.AgentManagementModeUnmanaged
+	}
+	// this is probably not reachable
+	return useragent.AgentManagementModeUnknown
+}
+
+func (beat *Beat) userAgentUnprivilegedMode() useragent.AgentUnprivilegedMode {
+	if beat.Manager == nil || !beat.Manager.Enabled() {
+		return useragent.AgentUnprivilegedModeUnknown
+	}
+	if beat.Manager.AgentInfo().Unprivileged {
+		return useragent.AgentUnprivilegedModeUnprivileged
+	}
+	return useragent.AgentUnprivilegedModePrivileged
+}
+
 // GenerateUserAgent populates the UserAgent field on the beat.Info struct
 func (beat *Beat) GenerateUserAgent() {
-	// if we're in fleet mode, construct some additional elements for the UA comment field
-	comments := []string{}
-	if beat.Manager != nil && beat.Manager.Enabled() {
-		info := beat.Manager.AgentInfo()
-		if info.ManagedMode == proto.AgentManagedMode_MANAGED {
-			comments = append(comments, "Managed")
-		} else if info.ManagedMode == proto.AgentManagedMode_STANDALONE {
-			comments = append(comments, "Standalone")
-		}
-
-		if info.Unprivileged {
-			comments = append(comments, "Unprivileged")
-		}
+	userAgentProduct := "Libbeat"
+	if beat.Info.Beat != "" {
+		userAgentProduct = beat.Info.Beat
 	}
 
-	UserAgentProduct := beat.Info.Beat
-	if UserAgentProduct == "" {
-		UserAgentProduct = "Libbeat"
-	}
+	mode := beat.userAgentMode()
+	unprivileged := beat.userAgentUnprivilegedMode()
 
-	finalUserAgent := useragent.UserAgent(UserAgentProduct, version.GetDefaultVersion(),
-		version.Commit(), version.BuildTime().String(), comments...)
-	beat.Info.UserAgent = finalUserAgent
+	beat.Info.UserAgent = useragent.UserAgentWithBeatTelemetry(userAgentProduct, version.GetDefaultVersion(),
+		mode, unprivileged)
 }
 
 // BeatConfig struct contains the basic configuration of every beat

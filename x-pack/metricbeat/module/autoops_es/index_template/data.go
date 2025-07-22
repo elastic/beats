@@ -78,8 +78,7 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 
 	if err != nil {
 		err = fmt.Errorf("failed applying index template schema: %w", err)
-		events.SendErrorEventWithRandomTransactionId(err, info, r, IndexTemplateMetricSet, IndexTemplatePath)
-		return err
+		events.LogAndSendErrorEventWithRandomTransactionId(err, info, r, IndexTemplateMetricSet, IndexTemplatePath)
 	}
 
 	return nil
