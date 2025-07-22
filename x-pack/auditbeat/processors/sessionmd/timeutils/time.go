@@ -30,7 +30,7 @@ func getBootTime() (time.Time, error) {
 	if err != nil {
 		return time.Time{}, fmt.Errorf("could not read /proc/stat: %w", err)
 	}
-	return time.Unix(int64(stat.BootTime), 0), nil
+	return time.Unix(int64(stat.BootTime), 0), nil //nolint: gosec // 292 billion years is enough
 }
 
 func getTicksPerSecond() (uint64, error) {
@@ -38,7 +38,7 @@ func getTicksPerSecond() (uint64, error) {
 	if err != nil {
 		return 0, fmt.Errorf("sysconf(SC_CLK_TCK) failed: %w", err)
 	}
-	return uint64(tps), nil
+	return uint64(tps), nil //nolint: gosec // millisecond ticks will never overflow 63bit
 }
 
 func TicksToNs(ticks uint64) uint64 {
@@ -46,7 +46,7 @@ func TicksToNs(ticks uint64) uint64 {
 	if err != nil {
 		return 0
 	}
-	return ticks * uint64(time.Second.Nanoseconds()) / ticksPerSecond
+	return ticks * uint64(time.Second.Nanoseconds()) / ticksPerSecond //nolint: gosec // always fits: >= 0 && <= 2^30
 }
 
 func TimeFromNsSinceBoot(t time.Duration) *time.Time {
@@ -73,5 +73,5 @@ func ReduceTimestampPrecision(timeNs uint64) time.Duration {
 	if err != nil {
 		return 0
 	}
-	return time.Duration(timeNs).Truncate(time.Second / time.Duration(ticksPerSecond))
+	return time.Duration(timeNs).Truncate(time.Second / time.Duration(ticksPerSecond)) //nolint: gosec // 292 billion years is enough
 }
