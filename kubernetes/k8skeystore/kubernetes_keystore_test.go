@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	v1 "k8s.io/api/core/v1"
@@ -96,7 +96,7 @@ func TestGetKeystoreAndRetrieveWithWrongKeyFormat(t *testing.T) {
 }
 
 func TestGetKeystoreAndRetrieveWithNoSecretsExistent(t *testing.T) {
-	logger := logp.NewLogger("test_k8s_secrets")
+	logger := logptest.NewTestingLogger(t, "test_k8s_secrets")
 	client := k8sfake.NewSimpleClientset()
 
 	kRegistry := NewKubernetesKeystoresRegistry(logger, client)
@@ -122,7 +122,7 @@ func TestGetKeystoreAndRetrieveWithWrongSecretValue(t *testing.T) {
 }
 
 func getKeystoreForWrongValue(t *testing.T) bus.KeystoreProvider {
-	logger := logp.NewLogger("test_k8s_secrets")
+	logger := logptest.NewTestingLogger(t, "test_k8s_secrets")
 	client := k8sfake.NewSimpleClientset()
 	secret := &v1.Secret{
 		TypeMeta: metav1.TypeMeta{

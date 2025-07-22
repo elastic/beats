@@ -5,7 +5,7 @@ go 1.24
 require (
 	github.com/docker/docker v28.1.1+incompatible
 	github.com/docker/go-connections v0.4.0
-	github.com/elastic/elastic-agent-libs v0.11.0
+	github.com/elastic/elastic-agent-libs v0.21.2
 	github.com/magefile/mage v1.13.0
 	github.com/stretchr/testify v1.9.0
 	k8s.io/api v0.29.5

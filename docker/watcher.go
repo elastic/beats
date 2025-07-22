@@ -141,7 +141,7 @@ func NewWatcher(log *logp.Logger, host string, tls *TLSConfig, storeShortID bool
 		}
 	}
 
-	client, err := NewClient(host, httpClient, nil)
+	client, err := NewClient(host, httpClient, nil, log)
 	if err != nil {
 		return nil, err
 	}

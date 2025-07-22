@@ -32,8 +32,8 @@ import (
 // NewClient builds and returns a new Docker client. On the first request the
 // client will negotiate the API version with the server unless
 // DOCKER_API_VERSION is set in the environment.
-func NewClient(host string, httpClient *http.Client, httpHeaders map[string]string) (*client.Client, error) {
-	log := logp.NewLogger("docker")
+func NewClient(host string, httpClient *http.Client, httpHeaders map[string]string, logger *logp.Logger) (*client.Client, error) {
+	log := logger.Named("docker")
 
 	opts := []client.Opt{
 		client.WithHost(host),

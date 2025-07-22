@@ -22,6 +22,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -37,7 +38,7 @@ func TestGetProcessors(t *testing.T) {
 			},
 		},
 	}
-	procs := GetProcessors(hints, "co.elastic.logs")
+	procs := GetProcessors(hints, "co.elastic.logs", logptest.NewTestingLogger(t, ""))
 	assert.Equal(t, []mapstr.M{
 		mapstr.M{
 			"add_fields": mapstr.M{

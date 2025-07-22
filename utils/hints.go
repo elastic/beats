@@ -87,14 +87,14 @@ func GetHintAsList(hints mapstr.M, key, config string) []string {
 }
 
 // GetProcessors gets processor definitions from the hints and returns a list of configs as a MapStr
-func GetProcessors(hints mapstr.M, key string) []mapstr.M {
+func GetProcessors(hints mapstr.M, key string, logger *logp.Logger) []mapstr.M {
 	processors := GetConfigs(hints, key, "processors")
 	for _, proc := range processors {
 		for key, value := range proc {
 			if str, ok := value.(string); ok {
 				cfg := mapstr.M{}
 				if err := json.Unmarshal([]byte(str), &cfg); err != nil {
-					logp.NewLogger(logName).Debugw("Unable to unmarshal json due to error", "error", err)
+					logger.Named(logName).Debugw("Unable to unmarshal json due to error", "error", err)
 					continue
 				}
 				proc[key] = cfg
@@ -155,13 +155,13 @@ func getStringAsList(input string) []string {
 }
 
 // GetHintAsConfigs can read a hint in the form of a stringified JSON and return a mapstr.M
-func GetHintAsConfigs(hints mapstr.M, key string) []mapstr.M {
+func GetHintAsConfigs(hints mapstr.M, key string, logger *logp.Logger) []mapstr.M {
 	if str := GetHintString(hints, key, "raw"); str != "" {
 		// check if it is a single config
 		if str[0] != '[' {
 			cfg := mapstr.M{}
 			if err := json.Unmarshal([]byte(str), &cfg); err != nil {
-				logp.NewLogger(logName).Debugw("Unable to unmarshal json due to error", "error", err)
+				logger.Named(logName).Debugw("Unable to unmarshal json due to error", "error", err)
 				return nil
 			}
 			return []mapstr.M{cfg}
@@ -169,7 +169,7 @@ func GetHintAsConfigs(hints mapstr.M, key string) []mapstr.M {
 
 		var cfg []mapstr.M
 		if err := json.Unmarshal([]byte(str), &cfg); err != nil {
-			logp.NewLogger(logName).Debugw("Unable to unmarshal json due to error", "error", err)
+			logger.Named(logName).Debugw("Unable to unmarshal json due to error", "error", err)
 			return nil
 		}
 		return cfg
@@ -188,11 +188,11 @@ func IsEnabled(hints mapstr.M, key string) bool {
 }
 
 // IsDisabled will return true when 'enabled' is **explicitly** set to false.
-func IsDisabled(hints mapstr.M, key string) bool {
+func IsDisabled(hints mapstr.M, key string, logger *logp.Logger) bool {
 	if value, err := hints.GetValue(fmt.Sprintf("%s.enabled", key)); err == nil {
 		enabled, err := strconv.ParseBool(value.(string))
 		if err != nil {
-			logp.NewLogger(logName).Debugw("Error parsing 'enabled' hint.",
+			logger.Named(logName).Debugw("Error parsing 'enabled' hint.",
 				"error", err, "autodiscover.hints", hints)
 			return false
 		}

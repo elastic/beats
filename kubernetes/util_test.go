@@ -24,10 +24,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -36,7 +35,7 @@ import (
 
 func TestDiscoverKubernetesNode(t *testing.T) {
 	client := k8sfake.NewSimpleClientset()
-	logger := logp.NewLogger("autodiscover.node")
+	logger := logptest.NewTestingLogger(t, "autodiscover.node")
 	ge := errors.New("kubernetes: Node could not be discovered with any known method. Consider setting env var NODE_NAME")
 	tests := []struct {
 		host        string

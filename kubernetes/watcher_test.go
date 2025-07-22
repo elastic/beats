@@ -21,6 +21,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -35,7 +36,7 @@ func TestWatcherStartAndStop(t *testing.T) {
 	listWatch := cachetest.NewFakeControllerSource()
 	resource := &Pod{}
 	informer := cache.NewSharedInformer(listWatch, resource, 0)
-	watcher, err := NewNamedWatcherWithInformer("test", client, resource, informer, WatchOptions{})
+	watcher, err := NewNamedWatcherWithInformer("test", client, resource, informer, logptest.NewTestingLogger(t, ""), WatchOptions{})
 	require.NoError(t, err)
 	require.NoError(t, watcher.Start())
 	watcher.Stop()
@@ -46,7 +47,7 @@ func TestWatcherHandlers(t *testing.T) {
 	listWatch := cachetest.NewFakeControllerSource()
 	resource := &Pod{}
 	informer := cache.NewSharedInformer(listWatch, resource, 0)
-	watcher, err := NewNamedWatcherWithInformer("test", client, resource, informer, WatchOptions{})
+	watcher, err := NewNamedWatcherWithInformer("test", client, resource, informer, logptest.NewTestingLogger(t, ""), WatchOptions{})
 	require.NoError(t, err)
 
 	var added, updated, deleted bool
@@ -102,6 +103,7 @@ func TestWatcherIsUpdated(t *testing.T) {
 	informer := cache.NewSharedInformer(listWatch, resource, 0)
 	// set a custom IsUpdated that always returns true
 	watcher, err := NewNamedWatcherWithInformer("test", client, resource, informer,
+		logptest.NewTestingLogger(t, ""),
 		WatchOptions{IsUpdated: func(old, new interface{}) bool {
 			return true
 		}})
@@ -143,7 +145,7 @@ func TestCachedObject(t *testing.T) {
 	listWatch := cachetest.NewFakeControllerSource()
 	resource := &Namespace{}
 	informer := cache.NewSharedInformer(listWatch, resource, 0)
-	watcher, err := NewNamedWatcherWithInformer("test", client, resource, informer, WatchOptions{})
+	watcher, err := NewNamedWatcherWithInformer("test", client, resource, informer, logptest.NewTestingLogger(t, ""), WatchOptions{})
 	require.NoError(t, err)
 
 	require.NoError(t, watcher.Start())

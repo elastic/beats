@@ -108,20 +108,20 @@ type watcher struct {
 // NewWatcher initializes the watcher client to provide a events handler for
 // resource from the cluster (filtered to the given node)
 // Note: This watcher won't emit workqueue metrics. Use NewNamedWatcher to provide an explicit queue name.
-func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers) (Watcher, error) {
-	return NewNamedWatcher("", client, resource, opts, indexers)
+func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers, logger *logp.Logger) (Watcher, error) {
+	return NewNamedWatcher("", client, resource, opts, indexers, logger)
 }
 
 // NewNamedWatcher initializes the watcher client to provide an events handler for
 // resource from the cluster (filtered to the given node) and also allows to name the k8s
 // client's workqueue that is used by the watcher. Workqueue name is important for exposing workqueue
 // metrics, if it is empty, its metrics will not be logged by the k8s client.
-func NewNamedWatcher(name string, client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers) (Watcher, error) {
+func NewNamedWatcher(name string, client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers, logger *logp.Logger) (Watcher, error) {
 	informer, _, err := NewInformer(client, resource, opts, indexers)
 	if err != nil {
 		return nil, err
 	}
-	return NewNamedWatcherWithInformer(name, client, resource, informer, opts)
+	return NewNamedWatcherWithInformer(name, client, resource, informer, logger, opts)
 }
 
 // NewNamedWatcherWithInformer initializes the watcher client to provide an events handler for
@@ -134,6 +134,7 @@ func NewNamedWatcherWithInformer(
 	client kubernetes.Interface,
 	resource Resource,
 	informer cache.SharedInformer,
+	logger *logp.Logger,
 	opts WatchOptions,
 ) (Watcher, error) {
 	var store cache.Store
@@ -162,7 +163,7 @@ func NewNamedWatcherWithInformer(
 		ctx:          ctx,
 		cachedObject: cachedObject,
 		stop:         cancel,
-		logger:       logp.NewLogger("kubernetes"),
+		logger:       logger.Named("kubernetes"),
 		handler:      NoOpEventHandlerFuncs{},
 	}
 
@@ -214,8 +215,9 @@ func NewMetadataWatcher(
 	opts WatchOptions,
 	indexers cache.Indexers,
 	transformFunc cache.TransformFunc,
+	logger *logp.Logger,
 ) (Watcher, error) {
-	return NewNamedMetadataWatcher("", client, metadataClient, gvr, opts, indexers, transformFunc)
+	return NewNamedMetadataWatcher("", client, metadataClient, gvr, opts, indexers, transformFunc, logger)
 }
 
 // NewNamedMetadataWatcher initializes a metadata-only watcher client to provide an events handler for
@@ -231,6 +233,7 @@ func NewNamedMetadataWatcher(
 	opts WatchOptions,
 	indexers cache.Indexers,
 	transformFunc cache.TransformFunc,
+	logger *logp.Logger,
 ) (Watcher, error) {
 	informer := NewMetadataInformer(metadataClient, gvr, opts, indexers)
 
@@ -241,7 +244,7 @@ func NewNamedMetadataWatcher(
 		}
 	}
 
-	return NewNamedWatcherWithInformer(name, client, &v1.PartialObjectMetadata{}, informer, opts)
+	return NewNamedWatcherWithInformer(name, client, &v1.PartialObjectMetadata{}, informer, logger, opts)
 }
 
 // AddEventHandler adds a resource handler to process each request that is coming into the watcher
