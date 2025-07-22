@@ -30,21 +30,10 @@ https://github.com/elastic/beats/compare/v8.18.2\...v8.18.3[View commits]
 
 *Metricbeat*
 
-<<<<<<< HEAD
 - Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group. {pull}44576[44576]
 - Upgrade `go.mongodb.org/mongo-driver` from version `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module. {pull}44769[44769]
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
-=======
-- Add AWS OwningAccount support for cross account monitoring. {issue}40570[40570] {pull}40691[40691]
-- Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
 - Fix linux/pageinfo module mapping {pull}45425[45425]
-
-*Winlogbeat*
-
-- Reset EventLog if error EOF is encountered. {pull}42826[42826]
-- Implement backoff on error retrial. {pull}42826[42826]
-- Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
->>>>>>> df794bf33 ([metricbeat] fix linux/pageinfo module mapping (#45425))
 
 ==== Added
 
