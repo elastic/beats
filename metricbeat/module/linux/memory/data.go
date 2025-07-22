@@ -78,14 +78,13 @@ func FetchLinuxMemStats(baseMap mapstr.M, hostfs resolve.Resolver) error {
 		swap["free"] = swapFree
 	}
 	if okSF && okST {
-		pct := 0.0
-		if swapTotal != 0 {
-			pct = util.Round(float64(swapTotal-swapFree) / float64(swapTotal))
-		}
-		swap["used"] = mapstr.M{
+		used := mapstr.M{
 			"bytes": swapTotal - swapFree,
-			"pct":   pct,
 		}
+		if swapTotal != 0 {
+			used["pct"] = util.Round(float64(swapTotal-swapFree) / float64(swapTotal))
+		}
+		swap["used"] = used
 	}
 
 	baseMap["swap"] = swap
