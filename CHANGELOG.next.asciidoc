@@ -476,6 +476,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Update CEL mito extensions to v1.22.0. {pull}45245[45245]
 - Allow empty HTTPJSON cursor template value evaluations to be ignored by Fleet health status updates. {pull}45361[45361]
 - Add support for generalized token authentication to CEL input. {pull}45359[45359]
+- Log CEL single object evaluation results as ECS compliant documents where possible. {issue}45254[45254] {pull}45399[45399]
 
 *Auditbeat*
 
