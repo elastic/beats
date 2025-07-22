@@ -91,7 +91,7 @@ The resulting output looks something like this:
   "beat": {
     "hostname": "host.example.com",
     "name": "host.example.com",
-    "version": "{{stack-version}}"
+    "version": "{{version.stack}}"
   },
   "inner": {
     "data": "value"
