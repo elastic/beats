@@ -105,11 +105,10 @@ func (m *AutoOpsMetricSet[T]) Fetch(r mb.ReporterV2) error {
 	// nested mappers reuse the
 	if m.NestedMapper != nil {
 		if err = m.NestedMapper(m.MetricSet, r, info, data); err != nil {
-
-			return nil
+			return nil //nolint: nilerr // The error is reported by the mapper
 		}
 	} else if err = m.Mapper(r, info, data); err != nil {
-		return nil
+		return nil //nolint: nilerr // The error is reported by the mapper
 	}
 
 	m.Logger().Infof("completed fetching %v metricset", metricSetName)
