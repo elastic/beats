@@ -92,8 +92,8 @@ type Process struct {
 	// If set, the process belongs to an interactive session.
 	TTY struct {
 		CharDevice struct {
-			Major uint16 `json:"major,omitempty"`
-			Minor uint16 `json:"minor,omitempty"`
+			Major uint32 `json:"major,omitempty"`
+			Minor uint32 `json:"minor,omitempty"`
 		} `json:"char_device,omitempty"`
 	} `json:"tty,omitempty"`
 
