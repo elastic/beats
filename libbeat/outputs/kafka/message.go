@@ -20,9 +20,8 @@ package kafka
 import (
 	"time"
 
-	"github.com/Shopify/sarama"
-
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/sarama"
 )
 
 type message struct {
@@ -39,8 +38,6 @@ type message struct {
 
 	data publisher.Event
 }
-
-var kafkaMessageKey interface{} = int(0)
 
 func (m *message) initProducerMessage() {
 	m.msg = sarama.ProducerMessage{
