@@ -143,7 +143,7 @@ func getTraceLevel(level string) uint8 {
 // newSessionProperties initializes and returns a pointer to EventTraceProperties
 // with the necessary settings for starting an ETW session.
 // See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-event_trace_properties
-func newSessionProperties(sessionName string) *EventTraceProperties {
+func newSessionProperties(sessionName string, conf Config) *EventTraceProperties {
 	// Calculate buffer size for session properties.
 	sessionNameSize := (len(sessionName) + 1) * 2
 	bufSize := sessionNameSize + int(unsafe.Sizeof(EventTraceProperties{}))
@@ -164,8 +164,13 @@ func newSessionProperties(sessionName string) *EventTraceProperties {
 	// Set logging mode to real-time
 	// See https://learn.microsoft.com/en-us/windows/win32/etw/logging-mode-constants
 	sessionProperties.LogFileMode = EVENT_TRACE_REAL_TIME_MODE
-	sessionProperties.LogFileNameOffset = 0                                            // Can be specified to log to a file as well as to a real-time session
-	sessionProperties.BufferSize = 64                                                  // Default buffer size, can be configurable
+	sessionProperties.LogFileNameOffset = 0 // Can be specified to log to a file as well as to a real-time session
+	if conf.BufferSize == 0 {
+		conf.BufferSize = 64 // Default buffer size if not specified
+	}
+	sessionProperties.BufferSize = conf.BufferSize
+	sessionProperties.MinimumBuffers = conf.MinimumBuffers
+	sessionProperties.MaximumBuffers = conf.MaximumBuffers
 	sessionProperties.LoggerNameOffset = uint32(unsafe.Sizeof(EventTraceProperties{})) // Offset to the logger name
 
 	return sessionProperties
@@ -191,7 +196,7 @@ func NewSession(conf Config) (*Session, error) {
 
 	// If a current session is configured, set up the session properties and return.
 	if conf.Session != "" {
-		session.properties = newSessionProperties(session.Name)
+		session.properties = newSessionProperties(session.Name, conf)
 		return session, nil
 	} else if conf.Logfile != "" {
 		// If a logfile is specified, set up for non-realtime session.
@@ -208,7 +213,7 @@ func NewSession(conf Config) (*Session, error) {
 	}
 
 	// Initialize additional session properties.
-	session.properties = newSessionProperties(session.Name)
+	session.properties = newSessionProperties(session.Name, conf)
 	session.traceLevel = getTraceLevel(conf.TraceLevel)
 	session.matchAnyKeyword = conf.MatchAnyKeyword
 	session.matchAllKeyword = conf.MatchAllKeyword

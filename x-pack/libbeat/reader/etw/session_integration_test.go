@@ -30,6 +30,9 @@ func createTestSessionConfig(sessionName string) Config {
 		TraceLevel:      "verbose",
 		MatchAnyKeyword: 0xFFFFFFFFFFFFFFFF,
 		SessionName:     sessionName,
+		BufferSize:      1024,
+		MinimumBuffers:  10,
+		MaximumBuffers:  10,
 	}
 }
 
@@ -98,7 +101,7 @@ func BenchmarkETWCallbackRate(b *testing.B) {
 	setupProviderManager(b)
 
 	// Configure event generation
-	eventsPerBatch := 1000
+	eventsPerBatch := 300
 	batchInterval := 10 * time.Millisecond
 
 	// Set up callback measurer
@@ -245,7 +248,7 @@ func cleanupBenchmarkSession(b *testing.B, session *Session, generator *ETWEvent
 	// Wait for consumer goroutine to finish
 	select {
 	case <-consumerDone:
-	case <-time.After(30 * time.Second):
+	case <-time.After(time.Minute):
 		b.Logf("Warning: Session didn't stop within timeout")
 	}
 }

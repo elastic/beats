@@ -313,8 +313,8 @@ func (g *ETWEventGenerator) generateEvents(n int, wait time.Duration) error {
 				return err
 			}
 		}
-		time.Sleep(wait)
 	}
+	time.Sleep(wait)
 	return nil
 }
 

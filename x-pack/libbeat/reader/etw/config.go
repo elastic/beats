@@ -14,4 +14,7 @@ type Config struct {
 	MatchAllKeyword uint64   // Filter for all matching keywords (bitmask)
 	Session         string   // Existing session to attach
 	EnableProperty  []string // Properties to enable for the session
+	BufferSize      uint32   // Kilobytes for the session buffer size
+	MinimumBuffers  uint32   // Minimum number of buffers for the session
+	MaximumBuffers  uint32   // Maximum number of buffers for the session
 }
