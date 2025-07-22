@@ -246,17 +246,17 @@ function Get-EtwProviderStatus {
                         $status = $true
                     } else {
                         Write-Host "Provider is not registered or not found." -ForegroundColor Red
-                        $error = Get-Content "temp_error.txt" -ErrorAction SilentlyContinue
-                        if ($error) {
-                            Write-Host "Error details: $($error -join ' ')" -ForegroundColor Red
+                        $eror = Get-Content "temp_error.txt" -ErrorAction SilentlyContinue
+                        if ($eror) {
+                            Write-Host "Error details: $($eror -join ' ')" -ForegroundColor Red
                         }
                         $status = $false
                     }
                 } else {
                     Write-Host "Provider is not registered or not found." -ForegroundColor Red
-                    $error = Get-Content "temp_error.txt" -ErrorAction SilentlyContinue
-                    if ($error) {
-                        Write-Host "Error details: $($error -join ' ')" -ForegroundColor Red
+                    $eror = Get-Content "temp_error.txt" -ErrorAction SilentlyContinue
+                    if ($eror) {
+                        Write-Host "Error details: $($eror -join ' ')" -ForegroundColor Red
                     }
                     $status = $false
                 }

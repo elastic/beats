@@ -4,7 +4,8 @@
     [string]$McExePath = "",
     [string]$RcExePath = "",
     [string]$LinkExePath = "",
-    [switch]$Force = $false
+    [switch]$Force = $false,
+    [switch]$NoCleanup = $false
 )
 
 $ErrorActionPreference = "Stop"
@@ -22,28 +23,32 @@ function Find-Tool {
         if (Test-Path $ProvidedPath -PathType Leaf) {
             $foundTool = $ProvidedPath
             Write-Verbose "Using provided $ToolName path: $foundTool"
-        } else {
+        }
+        else {
             Write-Error "Provided $ToolName path not found or is not a file: '$ProvidedPath'"
             return $null
         }
-    } elseif ($EnvVarName -ne "" -and (Get-Item Env:$EnvVarName -ErrorAction SilentlyContinue)) {
+    }
+    elseif ($EnvVarName -ne "" -and (Get-Item Env:$EnvVarName -ErrorAction SilentlyContinue)) {
         $envValue = Get-Item Env:$EnvVarName | Select-Object -ExpandProperty Value
         if (Test-Path $envValue -PathType Leaf) {
             $foundTool = $envValue
             Write-Verbose "Using $ToolName from environment variable '$EnvVarName': $foundTool"
-        } else {
+        }
+        else {
             Write-Warning "$EnvVarName environment variable points to a non-existent file: '$envValue'. Searching common locations."
         }
     }
 
-    if ($foundTool -eq $null) {
+    if ($null -eq $foundTool) {
         Write-Verbose "Searching for $ToolName in PATH and common SDK/VS locations..."
 
         $toolFromPath = Get-Command $ToolName -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source
         if ($toolFromPath) {
             $foundTool = $toolFromPath
             Write-Host "Found $ToolName in PATH: $foundTool" -ForegroundColor Green
-        } else {
+        }
+        else {
             # Detect system architecture
             $architecture = $env:PROCESSOR_ARCHITECTURE
             $architecturePreference = @()
@@ -51,7 +56,7 @@ function Find-Tool {
             switch ($architecture) {
                 "AMD64" { $architecturePreference = @("x64", "x86") }
                 "ARM64" { $architecturePreference = @("arm64", "x64", "x86") }
-                "x86"   { $architecturePreference = @("x86") }
+                "x86" { $architecturePreference = @("x86") }
                 default { $architecturePreference = @("x64", "x86", "arm64") }
             }
             
@@ -97,7 +102,7 @@ function Find-Tool {
     return $foundTool
 }
 
-function Cleanup-IntermediateFiles {
+function Remove-IntermediateFiles {
     param(
         [string]$OutputDir,
         [string]$ManifestBaseName
@@ -145,19 +150,19 @@ $OutputDllName = "$ManifestBaseName.dll"
 Write-Host "Locating required compilation tools..." -ForegroundColor DarkYellow
 
 $mcExe = Find-Tool -ToolName "mc.exe" -ProvidedPath $McExePath -EnvVarName "MC_EXE_PATH"
-if ($mcExe -eq $null) {
+if ($null -eq $mcExe) {
     Write-Error "Message Compiler (mc.exe) not found. See error message above for installation instructions."
     exit 1
 }
 
 $rcExe = Find-Tool -ToolName "rc.exe" -ProvidedPath $RcExePath -EnvVarName "RC_EXE_PATH"
-if ($rcExe -eq $null) {
+if ($null -eq $rcExe) {
     Write-Error "Resource Compiler (rc.exe) not found. This is part of the Windows SDK. Please install it."
     exit 1
 }
 
 $linkExe = Find-Tool -ToolName "link.exe" -ProvidedPath $LinkExePath -EnvVarName "LINK_EXE_PATH"
-if ($linkExe -eq $null) {
+if ($null -eq $linkExe) {
     Write-Error "Linker (link.exe) not found. This is part of Visual Studio Build Tools or Windows SDK. Please install it."
     exit 1
 }
@@ -258,9 +263,16 @@ try {
     Write-Host "`n--- ETW Manifest Compilation to DLL Completed Successfully! ---" -ForegroundColor Green
     Write-Host "Output DLL: $outputDllPath" -ForegroundColor Green
 
-} catch {
+}
+catch {
     Write-Error "An unexpected error occurred during the compilation process: $($_.Exception.Message)"
     exit 1
-} finally {
-    Cleanup-IntermediateFiles -OutputDir $OutputDir -ManifestBaseName $ManifestBaseName
+}
+finally {
+    if (-not $NoCleanup) {
+        Remove-IntermediateFiles -OutputDir $OutputDir -ManifestBaseName $ManifestBaseName
+    }
+    else {
+        Write-Host "Skipping cleanup of intermediate files due to -NoCleanup flag." -ForegroundColor Yellow
+    }
 }

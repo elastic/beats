@@ -19,42 +19,7 @@
                         enabled="true"
                         symbol="CHANNEL_OPERATIONAL"
                     />
-                </channels>                <levels>
-                    <level name="Critical"
-                        value="16"
-                        symbol="LEVEL_CRITICAL"
-                        message="$(string.Level.Critical)" />
-                    
-                    <level name="Error"
-                        value="17"
-                        symbol="LEVEL_ERROR"
-                        message="$(string.Level.Error)" />
-                    
-                    <level name="Warning"
-                        value="18"
-                        symbol="LEVEL_WARNING"
-                        message="$(string.Level.Warning)" />
-                    
-                    <level name="Information"
-                        value="19"
-                        symbol="LEVEL_INFORMATION"
-                        message="$(string.Level.Information)" />
-                    
-                    <level name="Verbose"
-                        value="20"
-                        symbol="LEVEL_VERBOSE"
-                        message="$(string.Level.Verbose)" />
-                    
-                    <level name="NotValid"
-                        value="21"
-                        symbol="LEVEL_SAMPLEPROVIDER_NOTVALID"
-                        message="$(string.Level.NotValid)" />
-                    
-                    <level name="Valid"
-                        value="22"
-                        symbol="LEVEL_SAMPLEPROVIDER_VALID"
-                        message="$(string.Level.Valid)" />
-                </levels>
+                </channels>
 
                 <tasks>
                     <task name="Connect"
