@@ -12,8 +12,9 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"golang.org/x/sys/windows"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // For testing purposes we create a variable to store the function to call
