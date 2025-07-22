@@ -45,7 +45,7 @@ type provider struct {
 }
 
 type metadataFetcher interface {
-	fetchMetadata(context.Context, http.Client) result
+	fetchMetadata(context.Context, http.Client, *logp.Logger) result
 }
 
 // result is the result of a query for a specific hosting provider's metadata.
@@ -124,7 +124,7 @@ func filterMetaProviders(filter func(string) bool, fetchers map[string]provider)
 	return out
 }
 
-func setupFetchers(providers map[string]provider, c *conf.C) ([]metadataFetcher, error) {
+func setupFetchers(providers map[string]provider, c *conf.C, logger *logp.Logger) ([]metadataFetcher, error) {
 	mf := make([]metadataFetcher, 0, len(providers))
 	visited := map[string]bool{}
 
@@ -183,7 +183,7 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 		go func() {
 			select {
 			case <-ctx.Done():
-			case results <- fetcher.fetchMetadata(ctx, client):
+			case results <- fetcher.fetchMetadata(ctx, client, p.logger):
 			}
 		}()
 	}

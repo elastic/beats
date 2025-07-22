@@ -21,6 +21,7 @@ package elasticsearch
 
 import (
 	"bytes"
+	"compress/gzip"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -28,7 +29,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -102,7 +105,23 @@ func TestPublish(t *testing.T) {
 		require.NoError(t, err)
 		return client, reg
 	}
-
+	makePublishGzipTestClient := func(t *testing.T, url string, compressionLevel int) (*Client, *monitoring.Registry) {
+		reg := monitoring.NewRegistry()
+		client, err := NewClient(
+			clientSettings{
+				observer: outputs.NewStats(reg),
+				connection: eslegclient.ConnectionSettings{
+					URL:              url,
+					CompressionLevel: compressionLevel,
+				},
+				indexSelector: testIndexSelector{},
+			},
+			nil,
+			logger,
+		)
+		require.NoError(t, err)
+		return client, reg
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -279,6 +298,85 @@ func TestPublish(t *testing.T) {
 		assertRegistryUint(t, reg, "events.dropped", 1, "One event should be dropped")
 		assertRegistryUint(t, reg, "events.failed", 3, "Split batches should retry 3 events before dropping them")
 		assertRegistryUint(t, reg, "events.active", 0, "Active events should be zero when Publish returns")
+	})
+
+	t.Run("sends telemetry headers", func(t *testing.T) {
+		events := []publisher.Event{event1, event2, event3}
+		eventsRaw := `{"index":{"_index":"test","_type":"doc"}}
+{"@timestamp":"0001-01-01T00:00:00.000Z","field":1}
+
+{"index":{"_index":"test","_type":"doc"}}
+{"@timestamp":"0001-01-01T00:00:00.000Z","field":2}
+
+{"index":{"_index":"test","_type":"doc"}}
+{"@timestamp":"0001-01-01T00:00:00.000Z","field":3}
+
+`
+		batch := &batchMock{
+			events: events,
+		}
+
+		var requestCount, uncompressedLength, eventCount atomic.Int64
+		buf := bytes.NewBuffer(nil)
+		esMock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			requestCount.Add(1)
+
+			ul := r.Header.Get(eslegclient.HeaderUncompressedLength)
+			if ul != "" {
+				l, _ := strconv.ParseInt(ul, 10, 64)
+				uncompressedLength.Store(l)
+			}
+			ec := r.Header.Get(HeaderEventCount)
+			if ec != "" {
+				c, _ := strconv.ParseInt(ec, 10, 64)
+				eventCount.Store(c)
+			}
+
+			body := r.Body
+			if r.Header.Get("Content-Encoding") == "gzip" {
+				body, _ = gzip.NewReader(body)
+			}
+			io.Copy(buf, body)
+
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"took": 30, "errors": false, "items": [] }`))
+		}))
+		defer esMock.Close()
+		client, _ := makePublishTestClient(t, esMock.URL)
+		gzipClient, _ := makePublishGzipTestClient(t, esMock.URL, 5)
+
+		cases := []struct {
+			name   string
+			client *Client
+		}{
+			{
+				name:   "uncompressed",
+				client: client,
+			},
+			{
+				name:   "compressed",
+				client: gzipClient,
+			},
+		}
+
+		for _, tc := range cases {
+			t.Run(tc.name, func(t *testing.T) {
+				buf.Reset()
+				requestCount.Store(0)
+				// set to -1 to assert the assignment later
+				uncompressedLength.Store(-1)
+				eventCount.Store(-1)
+
+				batch := encodeBatch(tc.client, batch)
+				err := tc.client.Publish(ctx, batch)
+
+				assert.NoError(t, err, "Publish should drop the batch without error")
+				assert.Equal(t, int64(1), requestCount.Load(), "Should process only one request")
+				assert.Equal(t, int64(len(eventsRaw)), uncompressedLength.Load(), "Should have the correct %s header", eslegclient.HeaderUncompressedLength)
+				assert.Equal(t, int64(3), eventCount.Load(), "Should have the correct %s header", HeaderEventCount)
+				assert.Equal(t, eventsRaw, buf.String(), "Should have the correct body")
+			})
+		}
 	})
 }
 
@@ -657,8 +755,6 @@ func TestPublishResultForStats(t *testing.T) {
 }
 
 func BenchmarkCollectPublishFailsNone(b *testing.B) {
-	logger, err := logp.NewDevelopmentLogger("")
-	require.NoError(b, err)
 
 	client, err := NewClient(
 		clientSettings{
@@ -666,7 +762,7 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
 			deadLetterIndex: "",
 		},
 		nil,
-		logger,
+		logp.NewNopLogger(), // we use no-op logger so that it does not skew benchmark results
 	)
 	assert.NoError(b, err)
 
@@ -694,14 +790,12 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
 }
 
 func BenchmarkCollectPublishFailMiddle(b *testing.B) {
-	logger, err := logp.NewDevelopmentLogger("")
-	require.NoError(b, err)
 	client, err := NewClient(
 		clientSettings{
 			observer: outputs.NewNilObserver(),
 		},
 		nil,
-		logger,
+		logp.NewNopLogger(),
 	)
 	assert.NoError(b, err)
 
@@ -730,14 +824,12 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 }
 
 func BenchmarkCollectPublishFailAll(b *testing.B) {
-	logger, err := logp.NewDevelopmentLogger("")
-	require.NoError(b, err)
 	client, err := NewClient(
 		clientSettings{
 			observer: outputs.NewNilObserver(),
 		},
 		nil,
-		logger,
+		logp.NewNopLogger(),
 	)
 	assert.NoError(b, err)
 
@@ -810,8 +902,6 @@ func BenchmarkPublish(b *testing.B) {
 	// Indexing to _bulk api
 	for _, test := range tests {
 		for _, l := range levels {
-			logger, err := logp.NewDevelopmentLogger("")
-			require.NoError(b, err)
 			b.Run(fmt.Sprintf("%s with compression level %d", test.Name, l), func(b *testing.B) {
 				client, err := NewClient(
 					clientSettings{
@@ -825,7 +915,7 @@ func BenchmarkPublish(b *testing.B) {
 						},
 					},
 					nil,
-					logger,
+					logp.NewNopLogger(),
 				)
 				assert.NoError(b, err)
 				batch := encodeBatch(client, outest.NewBatch(test.Events...))

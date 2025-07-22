@@ -37,7 +37,8 @@ var (
 				"count": c.Int("count", s.IgnoreAllErrors),
 			}, c.DictOptional),
 			"store": c.Dict("store", s.Schema{
-				"size_in_bytes": c.Int("size_in_bytes", s.IgnoreAllErrors),
+				"size_in_bytes":                c.Int("size_in_bytes", s.IgnoreAllErrors),
+				"total_data_set_size_in_bytes": c.Int("total_data_set_size_in_bytes", s.IgnoreAllErrors),
 			}, c.DictOptional),
 			"indexing": c.Dict("indexing", s.Schema{
 				"index_total":             c.Int("index_total", s.IgnoreAllErrors),
@@ -235,7 +236,7 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 	timestampDiff := int64(0)
 	enrichedStats := map[string]mapstr.M{}
 	transactionId := utils.NewUUIDV4()
-	events := []mb.Event{}
+	metricSets := []mapstr.M{}
 	nodesList := make(map[string]string, len(nodeStats.Nodes))
 
 	masterNodeId, err := GetMasterNodeId(m)
@@ -280,38 +281,24 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 		// remember the metricset for the next pass
 		enrichedStats[id] = metricSet
 
-		event := e.CreateEvent(info, metricSet, transactionId)
-
-		// TODO: Update the indexer to use these from the metricset and remove this (then we can use utils.CreateAndReportEvents)
-		event.ModuleFields["node"] = mapstr.M{
-			"id":                id,
-			"name":              name,
-			"host":              node["host"],
-			"is_elected_master": id == masterNodeId,
-			"roles":             node["roles"],
-		}
-
-		events = append(events, event)
+		metricSets = append(metricSets, metricSet)
 	}
 
 	// replace the cache with the current data for the next run
 	cache.PreviousCache = enrichedStats
 	cache.PreviousTimestamp = cache.NewTimestamp
 
-	e.ReportEvents(r, events)
+	e.CreateAndReportEvents(r, info, metricSets, transactionId)
 
-	event := e.CreateEvent(info, mapstr.M{"nodes": nodesList, "subType": "list"}, transactionId)
-
-	// TODO: Update the indexer to use these from the metricset and remove this
-	event.RootFields["subType"] = "list"
-	event.ModuleFields["nodes"] = nodesList
+	event := e.CreateEvent(info, mapstr.M{"nodes": nodesList}, transactionId)
 
 	r.Event(event)
 
 	err = errors.Join(errs...)
 
 	if err != nil {
-		e.SendErrorEvent(err, info, r, NodesStatsMetricSet, NodesStatsPath, transactionId)
+		e.LogAndSendErrorEvent(err, info, r, NodesStatsMetricSet, NodesStatsPath, transactionId)
 	}
-	return err
+
+	return nil
 }

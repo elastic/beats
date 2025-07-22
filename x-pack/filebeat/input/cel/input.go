@@ -38,6 +38,7 @@ import (
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/decls"
 	"github.com/google/cel-go/common/types"
+	"github.com/google/cel-go/ext"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -162,18 +163,26 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		return err
 	}
 
-	var auth *lib.BasicAuth
+	var basicAuth *lib.BasicAuth
 	if cfg.Auth.Basic.isEnabled() {
-		auth = &lib.BasicAuth{
+		basicAuth = &lib.BasicAuth{
 			Username: cfg.Auth.Basic.User,
 			Password: cfg.Auth.Basic.Password,
+		}
+	}
+	var tokenAuth *lib.TokenAuth
+	if cfg.Auth.Token.isEnabled() {
+		tokenAuth = &lib.TokenAuth{
+			Type:  cfg.Auth.Token.Type,
+			Value: cfg.Auth.Token.Value,
 		}
 	}
 	wantDump := cfg.FailureDump.enabled() && cfg.FailureDump.Filename != ""
 	doCov := cfg.RecordCoverage && log.IsDebug()
 	httpOptions := lib.HTTPOptions{
 		Limiter:     limiter,
-		BasicAuth:   auth,
+		BasicAuth:   basicAuth,
+		TokenAuth:   tokenAuth,
 		Headers:     cfg.Resource.Headers,
 		MaxBodySize: cfg.Resource.MaxBodySize,
 	}
@@ -1063,6 +1072,7 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 	opts := []cel.EnvOption{
 		cel.VariableDecls(decls.NewVariable(root, types.DynType)),
 		cel.OptionalTypes(cel.OptionalTypesVersion(lib.OptionalTypesVersion)),
+		ext.TwoVarComprehensions(ext.TwoVarComprehensionsVersion(lib.OptionalTypesVersion)),
 		lib.AWS(),
 		lib.Collections(),
 		lib.Crypto(),
