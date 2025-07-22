@@ -15,10 +15,10 @@ import (
 
 func TestReduceTimestampPrecision(t *testing.T) {
 	oneSecond := time.Second.Nanoseconds()
-	result1 := ReduceTimestampPrecision(uint64(oneSecond))
+	result1 := ReduceTimestampPrecision(uint64(oneSecond)) //nolint: gosec // always fits
 	require.Equal(t, time.Duration(oneSecond), result1)
 
 	oneSecondWithDelay := oneSecond + 10
-	result2 := ReduceTimestampPrecision(uint64(oneSecondWithDelay))
+	result2 := ReduceTimestampPrecision(uint64(oneSecondWithDelay)) //nolint: gosec // always fits
 	require.Equal(t, time.Duration(oneSecond), result2)
 }

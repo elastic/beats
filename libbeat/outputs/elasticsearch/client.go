@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -46,6 +47,8 @@ var (
 	ErrTooOld = errors.New("Elasticsearch is too old. Please upgrade the instance. If you would like to connect to older instances set output.elasticsearch.allow_older_versions to true.") //nolint:staticcheck //false positive (Elasticsearch should be capitalized)
 
 	errTooMany = errors.New("Elasticsearch returned error 429 Too Many Requests, throttling connection") //nolint:staticcheck //false positive (Elasticsearch should be capitalized)
+
+	HeaderEventCount = "X-Elastic-Event-Count"
 )
 
 // Client is an elasticsearch client.
@@ -304,8 +307,10 @@ func (client *Client) doBulkRequest(
 	// If we encoded any events, send the network request.
 	if len(result.events) > 0 {
 		begin := time.Now()
+		h := make(http.Header)
+		h.Set(HeaderEventCount, strconv.Itoa(len(result.events)))
 		result.status, result.response, result.connErr =
-			client.conn.Bulk(ctx, "", "", bulkRequestParams, bulkItems)
+			client.conn.Bulk(ctx, "", "", h, bulkRequestParams, bulkItems)
 		if result.connErr == nil {
 			duration := time.Since(begin)
 			client.observer.ReportLatency(duration)
