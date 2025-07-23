@@ -48,7 +48,6 @@ ${KAFKA_HOME}/bin/kafka-storage.sh format \
 
 echo "Starting Kafka broker"
 mkdir -p ${KAFKA_LOGS_DIR}
-touch ${KAFKA_LOGS_DIR}/meta.properties
 cat << EOF > ${KAFKA_LOGS_DIR}/meta.properties
 cluster.id=${KAFKA_CLUSTER_ID}
 node.id=0
