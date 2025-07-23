@@ -27,9 +27,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/libbeat/testing/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestFilebeat(t *testing.T) {
