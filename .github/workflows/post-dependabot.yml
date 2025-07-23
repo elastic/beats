@@ -45,6 +45,7 @@ jobs:
   manage-pr-reviewers:
     permissions:
       pull-requests: write
+      repository-projects: read
     runs-on: ubuntu-latest
     steps:
       - name: Add reviewers (obs-infraobs-integrations) if PR has Team:Obs-InfraObs label
