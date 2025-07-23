@@ -37,11 +37,14 @@ import (
 
 // moduleData provides module-level data that will be used to populate the module list
 type moduleData struct {
-	Path       string
-	Base       string
-	Title      string `yaml:"title"`
-	Release    string `yaml:"release"`
-	Version    string `yaml:"version"`
+	Path    string
+	Base    string
+	Title   string      `yaml:"title"`
+	Release string      `yaml:"release"`
+	Version versionData `yaml:"version"`
+	// Compile all info from `Version` into a single
+	// string to be passed to docs-builder's `applies_to`
+	Applies_to string
 	Dashboards bool
 	Settings   []string `yaml:"settings"`
 	CfgFile    string
@@ -51,14 +54,27 @@ type moduleData struct {
 }
 
 type metricsetData struct {
-	Doc        string
-	Title      string
-	Link       string
-	Release    string
-	Version    string
+	Doc     string
+	Title   string
+	Link    string
+	Release string
+	Version versionData
+	// Compile all info from `Version` into a single
+	// string to be passed to docs-builder's `applies_to`
+	Applies_to string
 	DataExists bool
 	Data       string
 	IsDefault  bool
+}
+
+// Allow all product lifecycles to apply to a single
+// section or field
+type versionData struct {
+	Preview    string
+	Beta       string
+	Ga         string
+	Deprecated string
+	Removed    string
 }
 
 func writeTemplate(filename string, t *template.Template, args interface{}) error {
@@ -236,18 +252,34 @@ func getVersionNumber(metricsetPath string) (string, error) {
 		return "", fmt.Errorf("failed to read from spec file: %w", err)
 	}
 	type metricset struct {
-		Version string `yaml:"version"`
+		Version versionData `yaml:"version"`
 	}
 	var rel []metricset
 	if err = yaml.Unmarshal(raw, &rel); err != nil {
 		return "", err
 	}
-
-	relString, err := getVersion(rel[0].Version)
-	if err != nil {
-		return "", nil
+	// Build the applies_to string: a comma-separated list
+	// of all available lifecycles and versions
+	// NOTE: There's almost certainly a more efficient way
+	// to accomplish this.
+	var versions []string
+	if rel[0].Version.Removed != "" {
+		versions = append(versions, fmt.Sprintf("removed %s", rel[0].Version.Removed))
 	}
-	return relString, nil
+	if rel[0].Version.Deprecated != "" {
+		versions = append(versions, fmt.Sprintf("deprecated %s", rel[0].Version.Deprecated))
+	}
+	if rel[0].Version.Ga != "" {
+		versions = append(versions, fmt.Sprintf("ga %s", rel[0].Version.Ga))
+	}
+	if rel[0].Version.Beta != "" {
+		versions = append(versions, fmt.Sprintf("beta %s", rel[0].Version.Beta))
+	}
+	if rel[0].Version.Preview != "" {
+		versions = append(versions, fmt.Sprintf("preview %s", rel[0].Version.Preview))
+	}
+	applies_to := strings.Join(versions, ", ")
+	return applies_to, nil
 }
 
 // hasDashboards checks to see if the metricset has dashboards
@@ -301,7 +333,7 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 		}
 		metricsetName := filepath.Base(metricset)
 		release, err := getReleaseState(filepath.Join(metricset, "_meta/fields.yml"))
-		version, err := getVersionNumber(filepath.Join(metricset, "_meta/fields.yml"))
+		applies_to, err := getVersionNumber(filepath.Join(metricset, "_meta/fields.yml"))
 		if err != nil {
 			return nil, err
 		}
@@ -333,7 +365,7 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 			Doc:        strings.TrimSpace(string(metricsetDoc)),
 			Title:      metricsetName,
 			Release:    release,
-			Version:    version,
+			Applies_to: applies_to,
 			Link:       link,
 			DataExists: hasData,
 			Data:       strings.TrimSpace(string(data)),

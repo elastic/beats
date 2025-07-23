@@ -19,7 +19,7 @@ nats Module
 type: keyword
 
 
-**`nats.server.time`** {applies_to}`product: deprecated 8.0.0`
+**`nats.server.time`** {applies_to}`stack: deprecated 8.0.0`
 :   Server time of metric creation
 
 type: date

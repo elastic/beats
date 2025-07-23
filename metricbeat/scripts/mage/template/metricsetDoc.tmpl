@@ -2,7 +2,7 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/{{getBeatName}}-metricset-{{.Mod.Base}}-{{.Metricset.Title}}.html
 applies_to:
-  stack: {{.Metricset.Release}} {{.Metricset.Version}}
+  stack: {{ .Metricset.Applies_to }}
 ---
 
 % This file is generated! See scripts/docs_collector.py

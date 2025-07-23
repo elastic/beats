@@ -43,26 +43,14 @@ See the [ECS reference](ecs://reference/index.md) for more information.
             output.write("{}\n\n".format(section["description"].strip()))
         else:
             output.write("## {} [_{}]\n\n".format(section["name"], section["name"]))
-            # If there's a `version` in the YAML file, add an `applies_to` tag to the
-            # heading. A lifecycle type (ga, beta, etc) is required when using `applies_to`
-            # with a specific version. Use `release` if one exists or use `ga` if no `release`
-            # exists.
-            if "version" in section:
-              output.write(
-                "```{{applies_to}}\nstack: {} {}\n```\n\n".format(
-                  section["release"] or "ga",
-                  section["version"]
-                )
-              )
-            # If there's no version, but there is a `release` in the YAML file AND
-            # it's not `ga`, then add an `applies_to`` tag to the heading that includes
-            # the release type but no version.
-            elif "release" in section and section["release"] != "ga":
-              output.write(
-                "```{{applies_to}}\nstack: {}\n```\n\n".format(
-                  section["release"]
-                )
-              )
+
+            # Build a docs-builder applies_to directive
+            applies_to = get_applies_to(section)
+            if len(applies_to) > 0:
+              output.write("```{applies_to}\nstack: ")
+              output.write(", ".join(applies_to))
+              output.write("\n```\n\n")
+
             output.write("{}\n\n".format(section["description"].strip()))
 
     if "fields" not in section or not section["fields"]:
@@ -94,31 +82,14 @@ def document_field(output, field, field_path):
     # TO DO: We could do something similar that we did for
     # sections here for individual fields.
     output.write("**`{}`**".format(field["field_path"]))
-    if "deprecated" in field:
-        output.write(
-          " {{applies_to}}`product: deprecated {}`".format(
-            field["deprecated"]
-          )
-        )
-    # If there's a `version` in the YAML file, add an `applies_to` tag to the
-    # heading. A lifecycle type (ga, beta, etc) is required when using `applies_to`
-    # with a specific version. Use `release` if one exists or use `ga` if no `release`
-    # exists.
-    elif "version" in field:
-      output.write(
-        " {{applies_to}}`stack: ga {}`".format(
-          field["version"]
-        )
-      )
-    # If there's no version, but there is a `release` in the YAML file AND
-    # it's not `ga`, then add an `applies_to`` tag to the heading that includes
-    # the release type but no version.
-    elif "release" in field and field["release"] != "ga":
-      output.write(
-        " {{applies_to}}`stack: {}`".format(
-          field["release"]
-        )
-      )
+
+    # Build a docs-builder applies_to directive
+    applies_to = get_applies_to(field)
+    if len(applies_to) > 0:
+      output.write(" {applies_to}`stack: ")
+      output.write(", ".join(applies_to))
+      output.write("`")
+
     output.write("\n:   ")
 
     if "description" in field and field["description"] is not None and len(field["description"].strip()) > 0:
@@ -156,6 +127,32 @@ def document_field(output, field, field_path):
             document_field(output, subfield, field_path + "." +
                            subfield["name"])
 
+# Build the applies_to string: a comma-separated list
+# of all available lifecycles and versions
+# NOTE: There's almost certainly a more efficient way
+# to accomplish this.
+def get_applies_to(item):
+  applies_to = []
+  if "version" in item:
+    if "preview" in item["version"]:
+        applies_to.append("preview {}".format(item["version"]["preview"]))
+    if "beta" in item["version"]:
+        applies_to.append("beta {}".format(item["version"]["beta"]))
+    if "ga" in item["version"]:
+        applies_to.append("ga {}".format(item["version"]["ga"]))
+    if "deprecated" in item["version"]:
+        applies_to.append("deprecated {}".format(item["version"]["deprecated"]))
+    if "removed" in item["version"]:
+        applies_to.append("removed {}".format(item["version"]["removed"]))
+  # Add `deprecated` to applies_to if not already added via `version`
+  if "deprecated" in item:
+    if "version" not in item or ("version" in item and "deprecated" not in item["version"]):
+        applies_to.append("deprecated {}".format(item["deprecated"]))
+  # Add `release` to applies_to if not already added via `version`
+  if "release" in item:
+    if "version" not in item and item["release"] != "ga":
+        applies_to.append(item["release"])
+  return applies_to
 
 @lru_cache(maxsize=None)
 def ecs_fields():

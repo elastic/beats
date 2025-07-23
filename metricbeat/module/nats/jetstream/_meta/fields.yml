@@ -1,7 +1,8 @@
 - name: jetstream
   type: group
   release: beta
-  version: 9.1.0 # 9.x version when it was added
+  version:
+    beta: 9.1.0
   description: >
     Information pertaining to a NATS JetStream server
   fields:
