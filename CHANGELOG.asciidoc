@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v8.18.2\...v8.18.3[View commits]
 - Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group. {pull}44576[44576]
 - Upgrade `go.mongodb.org/mongo-driver` from version `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module. {pull}44769[44769]
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
+- Fix linux/pageinfo module mapping {pull}45425[45425]
 
 ==== Added
 
