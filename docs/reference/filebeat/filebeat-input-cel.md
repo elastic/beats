@@ -115,7 +115,7 @@ After completion of a program’s execution it should return a single object wit
 }
 ```
 
-1. The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements. The field should be an array, but in the case of an error condition in the CEL program it is acceptable to return a single object instead of an array; this will will be wrapped as an array for publication and an error will be logged. If the single object contains a key, "error", the error value will be used to update the status of the input to report to Elastic Agent. This can be used to more rapidly respond to API failures.
+1. The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements. The field should be an array, but in the case of an error condition in the CEL program it is acceptable to return a single object instead of an array; this will will be wrapped as an array for publication and an error will be logged. If the single object contains a key, "error", the error value will be used to update the status of the input to report to Elastic Agent. This can be used to more rapidly respond to API failures. It is recommended that the object conforms to ECS field definitions, but this is not enforced.
 2. If `cursor` is present it must be either be a single object or an array with the same length as events; each element *i* of the `cursor` will be the details for obtaining the events at and beyond event *i* in the `events` array. If the `cursor` is a single object it is will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array.
 3. If `rate_limit` is present it must be a map with numeric fields `rate` and `burst`. The `rate_limit` field may also have a string `error` field and other fields which will be logged. If it has an `error` field, the `rate` and `burst` will not be used to set rate limit behavior. The [Limit](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#Limit), and [Okta Rate Limit policy](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#OktaRateLimit) and [Draft Rate Limit policy](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#DraftRateLimit) documentation show how to construct this field.
 4. The evaluation is repeated with the new state, after removing the events field, if the "want_more" field is present and true, and a non-zero events array is returned. If the "want_more" field is present after a failed evaluation, it is set to false.
@@ -250,7 +250,7 @@ Host environment variables are made available via the global map `env`. Only env
 
 The CEL environment enables the [optional types](https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes) library using the version defined [here](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#OptionalTypesVersion) and the [two-variable comprehensions extensions](https://pkg.go.dev/github.com/google/cel-go/ext#TwoVarComprehensions) library using the version defined [here](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#TwoVarComprehensionVersion).
 
-Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2.
+Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2, or token authentication.
 
 Example configurations with authentication:
 
@@ -291,6 +291,24 @@ filebeat.inputs:
     token_url: http://localhost/oauth2/token
     user: user@domain.tld
     password: P@$$W0₹D
+  resource.url: http://localhost
+```
+
+```yaml
+filebeat.inputs:
+- type: cel
+  auth.token:
+    type: Bearer
+    value: supersecret_bearer_token
+  resource.url: http://localhost
+```
+
+```yaml
+filebeat.inputs:
+- type: cel
+  auth.token:
+    type: Token
+    value: supersecret_token
   resource.url: http://localhost
 ```
 
@@ -630,6 +648,27 @@ The RSA JWK private key PEM block for your Okta Service App which is used for in
 ::::{note}
 Only one of the credentials settings can be set at once. For more information please refer to [https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/](https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/)
 ::::
+
+
+
+### `auth.token.enabled` [_auth_token_enabled]
+
+When set to `false`, disables the token authentication configuration. Default: `true`.
+
+::::{note}
+Token authentication settings are disabled if either `enabled` is set to `false` or the `auth.token` section is missing.
+::::
+
+
+
+### `auth.token.type` [_auth_token_type]
+
+The type of token to authenticate with, for example "Token" or "Bearer".
+
+
+### `auth.token.value` [_auth_token_value]
+
+The token value to use.
 
 
 

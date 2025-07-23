@@ -95,7 +95,7 @@ var cursorVersion = 1
 
 func (p pathSource) Name() string { return string(p) }
 
-func Configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
+func Configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err

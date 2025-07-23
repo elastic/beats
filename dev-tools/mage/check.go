@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/processors/dissect"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Check looks for created/modified/deleted/renamed files and returns an error
@@ -265,7 +266,13 @@ func checkDashboardForErrors(file string, d []byte) bool {
 		fmt.Println("  ", err)
 	}
 
-	replaced := dashboards.ReplaceIndexInDashboardObject("my-test-index-*", d)
+	// this logger is only used to log error messages.
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		return true
+	}
+
+	replaced := dashboards.ReplaceIndexInDashboardObject("my-test-index-*", d, logger)
 	if bytes.Contains(replaced, []byte(BeatName+"-*")) {
 		hasErrors = true
 		fmt.Printf(">> Cannot modify all index pattern references in dashboard - %s\n", file)
