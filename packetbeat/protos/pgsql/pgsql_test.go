@@ -385,3 +385,47 @@ func Test_gap_in_response(t *testing.T) {
 		assert.Equal(t, m, "Packet loss while capturing the response")
 	}
 }
+
+func FuzzPgsqlMessageParser(f *testing.F) {
+	data1 := []byte("510000001a53454c454354202a2046524f4d20466f6f6261723b00")
+	message1, _ := hex.DecodeString(string(data1))
+	f.Add(message1)
+
+	data2 := []byte("4500000088534552524f5200433235503032004d63757272656e74207472616e73616374696f6e2069732061626f727465642c20636f6d6d616e64732069676e6f72656420756e74696c20656e64206f66207472616e73616374696f6e20626c6f636b0046706f7374677265732e63004c3932310052657865635f73696d706c655f71756572790000")
+	message2, _ := hex.DecodeString(string(data2))
+	f.Add(message2)
+
+	f.Fuzz(func(t *testing.T, message []byte) {
+		pgsql := pgsqlModForTests(nil)
+		stream := &pgsqlStream{data: message, message: new(pgsqlMessage)}
+
+		_, _ = pgsql.pgsqlMessageParser(stream)
+	})
+}
+
+func FuzzParse(f *testing.F) {
+	reqData, _ := hex.DecodeString("510000001873656c656374202a2066726f6d20746573743b00")
+	f.Add(reqData)
+
+	respData, _ := hex.DecodeString(
+		"5400000042000361000000410900" +
+			"0100000413ffffffffffff0000620000" +
+			"004009000200000413ffffffffffff00" +
+			"00630000004009000300000413ffffff" +
+			"ffffff0000440000001b000300000003" +
+			"6d6561000000036d6562000000036d65" +
+			"63440000001e0003000000046d656131" +
+			"000000046d656231000000046d656331" +
+			"440000001e0003000000046d65613200")
+	f.Add(respData)
+
+	f.Fuzz(func(t *testing.T, payload []byte) {
+		store := &eventStore{}
+		pgsql := pgsqlModForTests(store)
+		tcptuple := testTCPTuple()
+		private := protos.ProtocolData(new(pgsqlPrivateData))
+
+		data := protos.Packet{Payload: payload}
+		_ = pgsql.Parse(&data, tcptuple, 0, private)
+	})
+}

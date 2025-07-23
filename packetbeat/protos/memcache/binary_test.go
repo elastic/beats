@@ -204,3 +204,10 @@ func Test_BinParseStatInvalidResponse(t *testing.T) {
 	assert.Nil(t, msg)
 	assert.Equal(t, errExpectedKeys, err)
 }
+
+func FuzzBinTryParse(f *testing.F) {
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		_, _ = binTryParse(t, data)
+	})
+}

@@ -22,3 +22,26 @@ go test -fuzz=FuzzSplitTagsFromMetricName -fuzztime=600s -run=^$ ./metricbeat/mo
 go test -fuzz=FuzzProcess -fuzztime=600s -run=^$ ./metricbeat/module/graphite/server
 go test -fuzz=FuzzParseMBeanName -fuzztime=600s -run=^$ ./metricbeat/module/jolokia/jmx
 go test -fuzz=FuzzParseSrvr -fuzztime=600s -run=^$ ./metricbeat/module/zookeeper/server
+
+# The following fuzz-test requires libpcap.
+go test -fuzz=FuzzOnPacket -fuzztime=600s -run=^$ ./packetbeat/decoder
+go test -fuzz=FuzzParseProcNetProto -fuzztime=600s -run=^$ ./packetbeat/procs
+go test -fuzz=FuzzAmqpMessageParser -fuzztime=600s -run=^$  ./packetbeat/protos/amqp
+go test -fuzz=FuzzParseDHCPv4 -fuzztime=600s -run=^$  ./packetbeat/protos/dhcpv4
+go test -fuzz=FuzzParseTcp -fuzztime=600s -run=^$  ./packetbeat/protos/dns
+go test -fuzz=FuzzParseUDP -fuzztime=600s -run=^$  ./packetbeat/protos/dns
+go test -fuzz=FuzzDecodeDNSData -fuzztime=600s -run=^$  ./packetbeat/protos/dns
+go test -fuzz=FuzzParseStream -fuzztime=600s -run=^$  ./packetbeat/protos/http
+go test -fuzz=FuzzBinTryParse -fuzztime=600s -run=^$  ./packetbeat/protos/memcache
+go test -fuzz=FuzzTextTryParse -fuzztime=600s -run=^$  ./packetbeat/protos/memcache
+go test -fuzz=FuzzMysqlMessageParser -fuzztime=600s -run=^$ ./packetbeat/protos/mysql
+go test -fuzz=FuzzParseMysqlResponse -fuzztime=600s -run=^$ ./packetbeat/protos/mysql
+go test -fuzz=FuzzPgsqlMessageParser -fuzztime=600s -run=^$ ./packetbeat/protos/pgsql
+go test -fuzz=FuzzParse -fuzztime=600s -run=^$ /packetbeat/protos/pgsql
+go test -fuzz=FuzzParse -fuzztime=600s -run=^$ ./packetbeat/protos/redis
+go test -fuzz=FuzzParseURI -fuzztime=600s -run=^$ ./packetbeat/protos/sip
+go test -fuzz=FuzzParseFromToContact -fuzztime=600s -run=^$ ./packetbeat/protos/sip
+go test -fuzz=ParseUDP -fuzztime=600s -run=^$ ./packetbeat/protos/sip
+go test -fuzz=FuzzMessageParser -fuzztime=600s -run=^$  ./packetbeat/protos/thrift
+go test -fuzz=FuzzParse -fuzztime=600s -run=^$  ./packetbeat/protos/thrift
+go test -fuzz=FuzzParse -fuzztime=600s -run=^$  ./packetbeat/protos/tls

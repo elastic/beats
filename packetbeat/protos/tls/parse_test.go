@@ -526,3 +526,26 @@ func TestBadCertMessage(t *testing.T) {
 		assert.Nil(t, parser.certificates, log)
 	}
 }
+
+func FuzzParse(f *testing.F) {
+	hexStrings := []string{
+		"16030300040d000000",
+		"160301002f0200002b030312345678FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF03abcdefC00A010000",
+		"16030100ba010000b603032338f219562c78ca216984f33434bfe952354edf50" +
+			"7588bddb96b35bd1a7639b000026c030c02cc028c024c014c00ac02fc02bc027" +
+			"c023c013c009c012c008c011c007c010c00600ff010000670000001700150000" +
+			"12746573742e6974762e6f72616e67652e6672000b000403000102000a000a00" +
+			"08001700190018001600230000000d0020001e06010602060305010502050304" +
+			"0104020403030103020303020102020203000500050100000000000f000101",
+	}
+
+	for _, hexStr := range hexStrings {
+		bytes, _ := hex.DecodeString(hexStr)
+		f.Add(bytes)
+	}
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		parser := &parser{}
+		_ = parser.parse(streambuf.New(data))
+	})
+}
