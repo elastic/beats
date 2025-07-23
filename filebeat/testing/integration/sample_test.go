@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/testing/integration"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -205,10 +206,7 @@ filebeat.config.modules:
 			Args:   []string{"modules", "list"},
 		})
 
-		test.ExpectOutput("Enabled:")
-		test.ExpectOutput("enabled-module")
-		test.ExpectOutput("Disabled:")
-		test.ExpectOutput("disabled-module")
+		test.ExpectOutput("Enabled:", "enabled-module").ExpectOutput("Disabled:", "disabled-module")
 
 		test.
 			WithReportOptions(reportOptions).
@@ -312,6 +310,216 @@ filebeat.config.modules:
 		assert.True(t, os.IsNotExist(err))
 		_, err = os.Stat(filepath.Join(modules, "enabled3.yml.disabled"))
 		assert.Nil(t, err)
+	})
+
+}
+
+func TestFilebeatDeprecated(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	EnsureCompiled(ctx, t)
+
+	messagePrefix := "sample test message"
+	fileCount := 1
+	lineCount := 1
+
+	reportOptions := integration.ReportOptions{
+		PrintLinesOnFail:  10,
+		PrintConfigOnFail: false,
+	}
+
+	t.Run("check that harvesting works with deprecated input_type", func(t *testing.T) {
+
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		config := `
+filebeat.inputs:
+  - input_type: log
+    id: "test-filestream"
+    paths:
+     - %s
+    scan_frequency: 0.1s
+    allow_deprecated_use: true
+output.console:
+  enabled: true
+`
+		generator := NewPlainTextGenerator(messagePrefix)
+		path, file := GenerateLogFiles(t, fileCount, lineCount, generator)
+		test := NewTest(t, TestOptions{
+			Config: fmt.Sprintf(config, path),
+		})
+
+		line := fmt.Sprintf("%s:%d", filepath.Base(file[0]), 1)
+		test.ExpectOutput(line)
+		test.ExpectOutput("DEPRECATED: input_type input config is deprecated")
+
+		test.
+			WithReportOptions(reportOptions).
+			ExpectStart().
+			Start(ctx).
+			Wait()
+	})
+
+	t.Run("check that harvesting works with deprecated input_type", func(t *testing.T) {
+
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		config := `
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: true
+output.console:
+  enabled: true  
+`
+
+		test := NewTest(t, TestOptions{
+			Config: config,
+			Args:   []string{"-E", "filebeat.prospectors=anything", "-E", "filebeat.config.prospectors=anything"},
+		})
+
+		test.ExpectOutput(`setting 'filebeat.prospectors' has been removed`)
+		test.ExpectOutput(`setting 'filebeat.config.prospectors' has been removed`)
+
+		test.
+			WithReportOptions(reportOptions).
+			Start(ctx).
+			Wait()
+	})
+}
+
+func TestCustomFields(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	EnsureCompiled(ctx, t)
+
+	messagePrefix := "sample test message"
+	fileCount := 1
+	lineCount := 10
+
+	reportOptions := integration.ReportOptions{
+		PrintLinesOnFail:  10,
+		PrintConfigOnFail: true,
+	}
+
+	generator := NewPlainTextGenerator(messagePrefix)
+	path, file := GenerateLogFiles(t, fileCount, lineCount, generator)
+
+	t.Run("tests that custom fields show up in the output dict and  agent.name defaults to hostname", func(t *testing.T) {
+
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		config := `
+filebeat.inputs:
+  - type: filestream
+    id: "test-filestream"
+    paths:
+     - %s
+    fields:
+      hello: world
+      number: 2
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false	  
+output.console:
+  enabled: true
+`
+
+		test := NewTest(t, TestOptions{
+			Config: fmt.Sprintf(config, path),
+		})
+
+		host, _ := os.Hostname()
+		line := fmt.Sprintf("%s:%d", filepath.Base(file[0]), 1)
+
+		test.ExpectJSONFields(mapstr.M{
+			"message":       fmt.Sprintf("sample test message %s", line),
+			"fields.number": float64(2),
+			"fields.hello":  "world",
+			"hostname":      host,
+		})
+
+		test.
+			WithReportOptions(reportOptions).
+			ExpectStart().
+			Start(ctx).
+			Wait()
+	})
+
+	t.Run("tests that custom fields show up in the output dict when fields_under_root: true", func(t *testing.T) {
+
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		config := `
+filebeat.inputs:
+  - type: filestream
+    id: "test-filestream"
+    paths:
+     - %s
+    fields_under_root: true
+    fields:
+      hello: world
+      number: 2
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false	  
+output.console:
+  enabled: true
+`
+
+		test := NewTest(t, TestOptions{
+			Config: fmt.Sprintf(config, path),
+		})
+
+		line := fmt.Sprintf("%s:%d", filepath.Base(file[0]), 1)
+		test.ExpectJSONFields(mapstr.M{
+			"message": fmt.Sprintf("sample test message %s", line),
+			"number":  float64(2),
+			"hello":   "world",
+		})
+
+		test.
+			WithReportOptions(reportOptions).
+			ExpectStart().
+			Start(ctx).
+			Wait()
+	})
+
+	t.Run("tests that custom fields show up in the output dict when fields_under_root: true", func(t *testing.T) {
+
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		config := `
+filebeat.inputs:
+  - type: filestream
+    id: "test-filestream"
+    paths:
+     - %s
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
+shipper: testShipperName
+output.console:
+  enabled: true
+`
+
+		test := NewTest(t, TestOptions{
+			Config: fmt.Sprintf(config, path),
+		})
+
+		line := fmt.Sprintf("%s:%d", filepath.Base(file[0]), 1)
+		test.ExpectJSONFields(mapstr.M{
+			"message":    fmt.Sprintf("sample test message %s", line),
+			"host.name":  "testShipperName",
+			"agent.name": "testShipperName",
+		})
+
+		test.
+			WithReportOptions(reportOptions).
+			ExpectStart().
+			Start(ctx).
+			Wait()
 	})
 
 }

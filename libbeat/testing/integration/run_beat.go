@@ -100,7 +100,7 @@ func (b *RunningBeat) CollectOutput(limit int, pretty bool) string {
 	return builder.String()
 }
 
-// Wait until the Beat exists and all the output is processed
+// Wait until the Beat exits and all the output is processed
 func (b *RunningBeat) Wait() error {
 	err := b.c.Wait()
 	<-b.outputDone

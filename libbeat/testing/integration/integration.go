@@ -71,6 +71,17 @@ type BeatTest interface {
 	// inspecting only the new output lines.
 	ExpectOutput(...string) BeatTest
 
+	// ExpectJSONFields registers an output watch for the given key-value pair.
+	//
+	// It is useful when expecting key-value pair to exist in the output document/ JSON structured logs
+	// Use "." notation to chain nested keys. For example: fields.hello.world: new
+	//
+	// For `AND` behavior use this function multiple times.
+	//
+	// This function should be used before `Start` because it's
+	// inspecting only the new output lines.
+	ExpectJSONFields(map[string]any) BeatTest
+
 	// ExpectOutputRegex registers an output watch for the given regular expression..
 	//
 	// Every future output line produced by the Beat will be matched
@@ -240,6 +251,25 @@ func (b *beatTest) ExpectOutput(lines ...string) BeatTest {
 		watchers = append(watchers, NewStringWatcher(escaped))
 	}
 	b.expectations = append(b.expectations, NewInOrderWatcher(watchers))
+	return b
+}
+
+// ExpectOutput implements the BeatTest interface.
+func (b *beatTest) ExpectJSONFields(fields map[string]interface{}) BeatTest {
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+
+	if b.beat != nil {
+		b.t.Fatal(expectErrMsg)
+		return b
+	}
+
+	if len(fields) == 0 {
+		return b
+	}
+
+	b.expectations = append(b.expectations, NewJSONWatcher(fields))
+
 	return b
 }
 

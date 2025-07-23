@@ -18,9 +18,13 @@
 package integration
 
 import (
+	"encoding/json"
 	"fmt"
+	"reflect"
 	"regexp"
 	"strings"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // OutputWatcher describes operations for watching output.
@@ -184,4 +188,59 @@ func (w *metaWatcher) String() string {
 		expectations = append(expectations, watcher.String())
 	}
 	return " * " + strings.Join(expectations, "\n * ")
+}
+
+// NewJSONWatcher watches for existence of certain key-value pair in a JSON document
+func NewJSONWatcher(fields mapstr.M) OutputWatcher {
+	return &jsonWatcher{
+		fields: fields,
+	}
+}
+
+type jsonWatcher struct {
+	fields mapstr.M
+}
+
+func (w *jsonWatcher) Inspect(line string) {
+	if w.Observed() {
+		return
+	}
+
+	var outputDoc mapstr.M
+	err := json.Unmarshal([]byte(line), &outputDoc)
+	// If a line is not json type, we ignore the error and move ahead
+	if err != nil {
+		return
+	}
+
+	outputDoc = outputDoc.Flatten()
+
+	for key, value := range w.fields {
+		if v, ok := outputDoc[key]; ok {
+			switch v.(type) {
+			case int, string, float64:
+				if v != value {
+					return
+				}
+			default:
+				if reflect.DeepEqual(v, value) {
+					return
+				}
+
+			}
+		}
+
+		w.fields = nil
+	}
+}
+func (w *jsonWatcher) Observed() bool {
+	return w.fields == nil
+}
+
+func (w *jsonWatcher) String() string {
+	if w.Observed() {
+		return ""
+	}
+
+	return fmt.Sprintf("JSON document to contain following fields: %+v", w.fields)
 }
