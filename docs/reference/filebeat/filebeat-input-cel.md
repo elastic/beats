@@ -5,13 +5,11 @@ mapped_pages:
 sub:
   mito_docs: https://pkg.go.dev/github.com/elastic/mito
   mito_version: v1.22.0
+applies_to:
+  stack: ga 8.6.0
 ---
 
 # Common Expression Language input [filebeat-input-cel]
-
-```{applies_to}
-stack: ga 8.6.0
-```
 
 Use the `cel` input to read messages from a file path or HTTP API with a variety of payloads using the [Common Expression Language (CEL)](https://opensource.google.com/projects/cel) and the [mito]({{mito_docs}}/lib) CEL extension libraries.
 
