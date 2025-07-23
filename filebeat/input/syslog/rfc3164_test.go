@@ -807,3 +807,15 @@ func BenchmarkParserRFC3164r(b *testing.B) {
 		e = l
 	}
 }
+
+func FuzzParserRFC3164(f *testing.F) {
+	f.Add([]byte("--- last message repeated 1 time ---"))
+	f.Add([]byte("<13>Feb 25 17:32:18 ::ffff:0:255.255.255.255 Use the Force!"))
+	f.Add([]byte("<13>Feb 25 17:32:18 2607:f0d0:1002:51::4 Use the Force!"))
+	f.Add([]byte("<190>2018-06-19 02:13:38 super mon message"))
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		l := newEvent()
+		ParserRFC3164(data, l)
+	})
+}

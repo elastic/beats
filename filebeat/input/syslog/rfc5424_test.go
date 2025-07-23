@@ -369,3 +369,14 @@ func AssertEvent(t *testing.T, except event, actual *event) {
 	assert.Equal(t, except.data, actual.data)
 	assert.Equal(t, except.Message(), actual.Message())
 }
+
+func FuzzParserRFC5424(f *testing.F) {
+	f.Add([]byte(VersionTestTemplate))
+	f.Add([]byte(RfcDoc65Example1))
+	f.Add([]byte(RfcDoc65Example4WithoutSD))
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		l := newEvent()
+		ParserRFC5424(data, l)
+	})
+}
