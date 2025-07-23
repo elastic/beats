@@ -322,3 +322,26 @@ func BenchmarkIsRFC5424(b *testing.B) {
 		})
 	}
 }
+
+func FuzzParseRFC5424(f *testing.F) {
+	f.Add("<13>1 2003-08-24T05:14:15.000003-07:00 test-host su 1234 msg-5678 - This is a test message")
+
+	f.Fuzz(func(t *testing.T, data string) {
+		_, _ = parseRFC5424(data)
+	})
+}
+
+func FuzzIsRFC5424(f *testing.F) {
+	f.Add("<13>Oct 11 22:14:15 test-host this is the message")
+
+	f.Fuzz(func(t *testing.T, data string) {
+		_ = isRFC5424(data)
+	})
+}
+
+func FuzzParseStructuredData(f *testing.F) {
+
+	f.Fuzz(func(t *testing.T, data string) {
+		parseStructuredData(data)
+	})
+}

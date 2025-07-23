@@ -173,3 +173,12 @@ func mkDateTime(y, M, d, h, m, s int, S time.Duration) time.Time {
 func mkDateTimeWithLocation(y, M, d, h, m, s int, S time.Duration, l *time.Location) time.Time {
 	return time.Date(y, time.Month(M), d, h, m, s, int(S), l)
 }
+
+func FuzzFormat(f *testing.F) {
+	f.Add("yy.MM.dd")
+	f.Add("yyyy-MM-dd'T'HH:mm:ss.fffffffff'Z'")
+
+	f.Fuzz(func(t *testing.T, pattern string) {
+		_, _ = NewFormatter(pattern)
+	})
+}

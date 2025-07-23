@@ -365,3 +365,12 @@ func BenchmarkDissectComplexStackTraceDegradation(b *testing.B) {
 		})
 	}
 }
+
+func FuzzNew(f *testing.F) {
+	f.Add("id=%{id|integer} msg=\"%{message}\"")
+	f.Add("%{?k1}=%{&k1|integer} msg=\"%{message}\"")
+
+	f.Fuzz(func(t *testing.T, tokenizer string) {
+		_, _ = New(tokenizer)
+	})
+}
