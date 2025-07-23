@@ -154,3 +154,11 @@ func TestFieldsFunc(t *testing.T) {
 		}
 	}
 }
+
+func FuzzFields(f *testing.F) {
+
+	f.Fuzz(func(t *testing.T, s string) {
+		var dst [1024]string
+		_, _ = Fields(dst[:], s)
+	})
+}

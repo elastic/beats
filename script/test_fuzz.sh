@@ -45,3 +45,7 @@ go test -fuzz=ParseUDP -fuzztime=600s -run=^$ ./packetbeat/protos/sip
 go test -fuzz=FuzzMessageParser -fuzztime=600s -run=^$  ./packetbeat/protos/thrift
 go test -fuzz=FuzzParse -fuzztime=600s -run=^$  ./packetbeat/protos/thrift
 go test -fuzz=FuzzParse -fuzztime=600s -run=^$  ./packetbeat/protos/tls
+
+go test -fuzz=FuzzFields -fuzztime=600s -run=^$ ./x-pack/filebeat/processors/aws_vpcflow/internal/strings
+go test -fuzz=FuzzUnpack -fuzztime=600s -run=^$ ./x-pack/filebeat/processors/decode_cef/cef
+go test -fuzz=FuzzParse -fuzztime=600s -run=^$ ./x-pack/metricbeat/module/statsd/server 

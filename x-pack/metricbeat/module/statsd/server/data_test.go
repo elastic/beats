@@ -1437,3 +1437,12 @@ func BenchmarkIngest(b *testing.B) {
 		assert.NoError(b, err)
 	}
 }
+
+func FuzzParse(f *testing.F) {
+	f.Add([]byte("metric02:2|c|#k1:v1,k2:v2"))
+	f.Add([]byte("metric08:seven|s|#k1:v1,k2:v2"))
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		_, _ = parse(data, logptest.NewTestingLogger(t, ""))
+	})
+}
