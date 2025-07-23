@@ -68,6 +68,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 *Metricbeat*
 
 - Fix the function to determine CPU cores on windows. {issue}42593[42593] {pull}43409[43409]
+- Fix linux/pageinfo module mapping {pull}45425[45425]
 
 *Winlogbeat*
 
