@@ -49,18 +49,18 @@ func makeUTF16MultiStringBuffer(strs []string) []byte {
 func TestGetEventInfoMultiStringFromOffset(t *testing.T) {
 	// This helper creates a buffer. `info` will point to its start.
 	// `stringListOffset` will be the offset from `info` where the multi-string data begins.
-	makeTestBed := func(teiFixedSize int, stringListToEmbed []string) (backingBuffer []byte, stringListOffset uint32) {
+	makeTestBed := func(teiFixedSize uint32, stringListToEmbed []string) (backingBuffer []byte, stringListOffset uint32) {
 		multiStringBytes := makeUTF16MultiStringBuffer(stringListToEmbed)
 
-		buffer := make([]byte, teiFixedSize+len(multiStringBytes))
+		buffer := make([]byte, int(teiFixedSize)+len(multiStringBytes))
 		copy(buffer[teiFixedSize:], multiStringBytes)
 
-		return buffer, uint32(teiFixedSize)
+		return buffer, teiFixedSize
 	}
 
 	tests := []struct {
 		name           string
-		teiFixedSize   int      // Size of the simulated fixed part of TraceEventInfo
+		teiFixedSize   uint32   // Size of the simulated fixed part of TraceEventInfo
 		stringList     []string // Strings to embed after the fixed part
 		offsetToPass   uint32   // The offset value passed to the function under test
 		expectedResult []string // Can be nil if the function is expected to return nil
@@ -81,42 +81,42 @@ func TestGetEventInfoMultiStringFromOffset(t *testing.T) {
 		},
 		{
 			name:           "Valid offset, empty list (double null at offset)",
-			teiFixedSize:   int(unsafe.Sizeof(TraceEventInfo{})),
+			teiFixedSize:   uint32(unsafe.Sizeof(TraceEventInfo{})),
 			stringList:     []string{}, // Creates only a double null list terminator
 			offsetToPass:   uint32(unsafe.Sizeof(TraceEventInfo{})),
 			expectedResult: nil, // Loop for str=="" breaks, results is nil initially
 		},
 		{
 			name:           "Valid offset, single string",
-			teiFixedSize:   int(unsafe.Sizeof(TraceEventInfo{})),
+			teiFixedSize:   uint32(unsafe.Sizeof(TraceEventInfo{})),
 			stringList:     []string{"Hello"},
 			offsetToPass:   uint32(unsafe.Sizeof(TraceEventInfo{})),
 			expectedResult: []string{"Hello"},
 		},
 		{
 			name:           "Valid offset, multiple strings",
-			teiFixedSize:   int(unsafe.Sizeof(TraceEventInfo{})),
+			teiFixedSize:   uint32(unsafe.Sizeof(TraceEventInfo{})),
 			stringList:     []string{"First", "Second", "Third"},
 			offsetToPass:   uint32(unsafe.Sizeof(TraceEventInfo{})),
 			expectedResult: []string{"First", "Second", "Third"},
 		},
 		{
 			name:           "Strings with surrogate pairs",
-			teiFixedSize:   int(unsafe.Sizeof(TraceEventInfo{})),
+			teiFixedSize:   uint32(unsafe.Sizeof(TraceEventInfo{})),
 			stringList:     []string{"Hi😀", "Test"}, // 😀 is U+1F600
 			offsetToPass:   uint32(unsafe.Sizeof(TraceEventInfo{})),
 			expectedResult: []string{"Hi😀", "Test"},
 		},
 		{
 			name:           "List with empty string element",
-			teiFixedSize:   int(unsafe.Sizeof(TraceEventInfo{})),
+			teiFixedSize:   uint32(unsafe.Sizeof(TraceEventInfo{})),
 			stringList:     []string{"Start", "", "End"},
 			offsetToPass:   uint32(unsafe.Sizeof(TraceEventInfo{})),
 			expectedResult: []string{"Start"},
 		},
 		{
 			name:           "List starting with empty string",
-			teiFixedSize:   int(unsafe.Sizeof(TraceEventInfo{})),
+			teiFixedSize:   uint32(unsafe.Sizeof(TraceEventInfo{})),
 			stringList:     []string{"", "Middle", "End"},
 			offsetToPass:   uint32(unsafe.Sizeof(TraceEventInfo{})),
 			expectedResult: []string{},
@@ -142,7 +142,7 @@ func TestGetEventInfoMultiStringFromOffset(t *testing.T) {
 			// This happens for empty lists or if the first check `str == ""` is true.
 			// `reflect.DeepEqual` considers a nil slice and an empty non-nil slice as different.
 			// So, if `expectedResult` is `[]string{}`, we need to accept `nil` from `got`.
-			if !((len(tt.expectedResult) == 0 && got == nil) || reflect.DeepEqual(got, tt.expectedResult)) {
+			if (len(tt.expectedResult) != 0 || got != nil) && !reflect.DeepEqual(got, tt.expectedResult) {
 				t.Errorf("getEventInfoMultiStringFromOffset(info, %d):\ngot:  %#v (%T)\nwant: %#v (%T)",
 					tt.offsetToPass, got, got, tt.expectedResult, tt.expectedResult)
 			}

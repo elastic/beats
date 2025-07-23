@@ -502,7 +502,7 @@ func getEventInfoBinaryXML(info *TraceEventInfo) string {
 }
 
 func getMultiStringFromBufferOffset(buf []byte, offset uint32) []string {
-	if offset == 0 || len(buf) == 0 || offset >= uint32(len(buf)) {
+	if offset == 0 || len(buf) == 0 || int(offset) >= len(buf) {
 		return nil
 	}
 
@@ -599,7 +599,7 @@ func parseEventPropertyInfo(buf []byte, info *TraceEventInfo, prInfo *EventPrope
 
 		// Bounds checking to prevent reading beyond property array
 		if uint32(lastIndex) > info.PropertyCount {
-			lastIndex = uint16(info.PropertyCount)
+			lastIndex = uint16(info.PropertyCount) //nolint:gosec // This is a safe cast since we already checked the bounds
 		}
 
 		for i := startIndex; i < lastIndex; i++ {
@@ -713,11 +713,14 @@ func isPrintable(data []byte) bool {
 func (mm *bufferPools) getBuffer(size uint32) *[]byte {
 	switch {
 	case size <= 256:
-		return mm.smallBufferPool.Get().(*[]byte)
+		buf, _ := mm.smallBufferPool.Get().(*[]byte)
+		return buf
 	case size <= 1024:
-		return mm.mediumBufferPool.Get().(*[]byte)
+		buf, _ := mm.mediumBufferPool.Get().(*[]byte)
+		return buf
 	default:
-		return mm.largeBufferPool.Get().(*[]byte)
+		buf, _ := mm.largeBufferPool.Get().(*[]byte)
+		return buf
 	}
 }
 

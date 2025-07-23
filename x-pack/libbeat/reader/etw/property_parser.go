@@ -56,7 +56,7 @@ func (p *eventRenderer) render() (RenderedEtwEvent, error) {
 		OpcodeRaw:             p.r.EventHeader.EventDescriptor.Opcode,
 		KeywordsRaw:           p.r.EventHeader.EventDescriptor.Keyword,
 		Channel:               eventInfo.ChannelName,
-		Timestamp:             convertFileTimeToGoTime(uint64(p.r.EventHeader.TimeStamp)),
+		Timestamp:             convertFileTimeToGoTime(uint64(p.r.EventHeader.TimeStamp)), //nolint:gosec // Timestamp is never going to be negative
 		ProcessID:             p.r.EventHeader.ProcessId,
 		ThreadID:              p.r.EventHeader.ThreadId,
 		ActivityIDName:        eventInfo.ActivityIDName,
@@ -360,8 +360,8 @@ func convertFileTimeToGoTime(fileTime64 uint64) time.Time {
 	}
 
 	fileTime := windows.Filetime{
-		HighDateTime: uint32(fileTime64 >> 32),
-		LowDateTime:  uint32(fileTime64 & math.MaxUint32),
+		HighDateTime: uint32(fileTime64 >> 32),            //nolint:gosec // High part of the 64-bit FileTime
+		LowDateTime:  uint32(fileTime64 & math.MaxUint32), //nolint:gosec // Low part of the 64-bit FileTime
 	}
 
 	return time.Unix(0, fileTime.Nanoseconds()).UTC()
@@ -444,7 +444,7 @@ retryLoop:
 		}
 
 		// Ensure buffer is large enough
-		if uint32(len(formattedData)) < formattedDataSize {
+		if len(formattedData) < int(formattedDataSize) {
 			formattedData = make([]byte, formattedDataSize)
 		}
 
@@ -455,7 +455,7 @@ retryLoop:
 			propInfo.InType,
 			propInfo.OutType,
 			uint16(propertyLength),
-			uint16(len(*buf)),
+			uint16(len(*buf)), //nolint:gosec // This is the length of the user data buffer
 			dataPtr,
 			&formattedDataSize,
 			&formattedData[0],
@@ -470,7 +470,7 @@ retryLoop:
 			// For very large properties, we need to allocate a new buffer
 			// Don't use the pool for these exceptional cases to avoid memory bloat
 			formattedData = make([]byte, formattedDataSize*2)
-			formattedDataSize = uint32(len(formattedData))
+			formattedDataSize = uint32(len(formattedData)) //nolint:gosec // Update the size for the next iteration
 			continue
 		case errors.Is(err, ERROR_EVT_INVALID_EVENT_DATA):
 			// Handle invalid event data error.

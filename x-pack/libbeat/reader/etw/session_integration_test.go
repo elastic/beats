@@ -7,10 +7,12 @@
 package etw
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -61,7 +63,7 @@ type ETWCallbackMeasurer struct {
 func (m *ETWCallbackMeasurer) InjectableCallback(session *Session) func(record *EventRecord) uintptr {
 	return func(record *EventRecord) uintptr {
 		_, err := session.RenderEvent(record)
-		if err == nil || err == ErrUnprocessableEvent {
+		if err == nil || errors.Is(err, ErrUnprocessableEvent) {
 			atomic.AddInt64(&m.count, 1)
 		}
 		return 0
@@ -82,15 +84,15 @@ func (m *ETWCallbackMeasurer) GetCount() int64 {
 
 // isRunningAsAdmin checks if the current process has administrator privileges
 func isRunningAsAdmin() bool {
-	cmd := exec.Command("net", "session")
+	cmd := exec.CommandContext(context.Background(), "net", "session")
 	return cmd.Run() == nil
 }
 
 // TestMain ensures proper setup and cleanup for benchmarks
 func TestMain(m *testing.M) {
 	if runtime.GOOS == "windows" && !isRunningAsAdmin() {
-		fmt.Println("Warning: ETW benchmarks require administrator privileges")
-		fmt.Println("Please run as administrator for full benchmark functionality")
+		log.Printf("Warning: ETW benchmarks require administrator privileges")
+		log.Printf("Please run as administrator for full benchmark functionality")
 	}
 
 	code := m.Run()
@@ -247,7 +249,9 @@ func cleanupBenchmarkSession(b *testing.B, session *Session, generator *ETWEvent
 		b.Logf("Failed to close event generator: %v", err)
 	}
 
-	session.StopSession()
+	if err := session.StopSession(); err != nil {
+		b.Logf("Failed to stop ETW session: %v", err)
+	}
 
 	// Wait for consumer goroutine to finish
 	select {
@@ -317,7 +321,11 @@ func collectEventsFromETL(t *testing.T, session *Session) []RenderedEtwEvent {
 	default:
 	}
 
-	t.Cleanup(func() { session.StopSession() })
+	t.Cleanup(func() {
+		if err := session.StopSession(); err != nil {
+			t.Logf("Failed to stop ETW session: %v", err)
+		}
+	})
 
 	// Wait for events to be processed
 	for eventCount == 0 {

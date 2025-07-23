@@ -100,7 +100,7 @@ func TestLazyCacheMapValueEdgeCases(t *testing.T) {
 
 	// Test case 1: Cache miss - no entry should be found
 	testData := []byte{0x01, 0x02, 0x03, 0x04}
-	result, consumed, ok := cachedMapInfo.getFormattedMapEntry(propInfo, testData, 4)
+	_, _, ok := cachedMapInfo.getFormattedMapEntry(propInfo, testData, 4)
 	if ok {
 		t.Error("Expected cache miss for new data, but found cached value")
 	}
@@ -110,7 +110,7 @@ func TestLazyCacheMapValueEdgeCases(t *testing.T) {
 	expectedConsumed := 4
 	cachedMapInfo.cacheFormattedMapEntry(propInfo, testData, expectedResult, expectedConsumed)
 
-	result, consumed, ok = cachedMapInfo.getFormattedMapEntry(propInfo, testData, 4)
+	result, consumed, ok := cachedMapInfo.getFormattedMapEntry(propInfo, testData, 4)
 	if !ok {
 		t.Error("Expected cached value to be found after caching")
 	}
@@ -123,7 +123,7 @@ func TestLazyCacheMapValueEdgeCases(t *testing.T) {
 
 	// Test case 3: Different data should result in cache miss
 	differentData := []byte{0x05, 0x06, 0x07, 0x08}
-	result, consumed, ok = cachedMapInfo.getFormattedMapEntry(propInfo, differentData, 4)
+	_, _, ok = cachedMapInfo.getFormattedMapEntry(propInfo, differentData, 4)
 	if ok {
 		t.Error("Expected cache miss for different data, but found cached value")
 	}

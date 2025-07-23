@@ -96,8 +96,8 @@ type EventHeader struct {
 	ActivityId      windows.GUID
 }
 
-func (e *EventRecord) pointerSize() uint32 {
-	if e.EventHeader.Flags&EVENT_HEADER_FLAG_32_BIT_HEADER == EVENT_HEADER_FLAG_32_BIT_HEADER {
+func (r *EventRecord) pointerSize() uint32 {
+	if r.EventHeader.Flags&EVENT_HEADER_FLAG_32_BIT_HEADER == EVENT_HEADER_FLAG_32_BIT_HEADER {
 		return 4
 	}
 	return 8
@@ -205,7 +205,7 @@ func (info *TraceEventInfo) getEventPropertyInfoAtIndex(i uint32) *EventProperty
 	// Compute the pointer to the i-th EventPropertyInfo safely,
 	// simulating C-style flexible array access using offset arithmetic.
 	eventPropertyInfoPtr := uintptr(unsafe.Pointer(info)) +
-		uintptr(unsafe.Offsetof(info.EventPropertyInfoArray)) +
+		unsafe.Offsetof(info.EventPropertyInfoArray) +
 		uintptr(i)*unsafe.Sizeof(EventPropertyInfo{})
 
 	return (*EventPropertyInfo)(unsafe.Pointer(eventPropertyInfoPtr))
@@ -272,10 +272,6 @@ func (i *EventPropertyInfo) numOfStructMembers() uint16 {
 
 func (i *EventPropertyInfo) mapNameOffset() uint32 {
 	return i.TypeUnion.u3
-}
-
-func (i *EventPropertyInfo) customSchemaOffset() uint32 {
-	return i.mapNameOffset()
 }
 
 // TDH Input Types
@@ -406,10 +402,6 @@ type EventMapInfo struct {
 
 func (mi *EventMapInfo) mapEntryValueType() MapValueType {
 	return MapValueType(mi.Union)
-}
-
-func (mi *EventMapInfo) formatStringOffset() uint32 {
-	return mi.Union
 }
 
 type MapValueType uint32

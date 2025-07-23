@@ -4,11 +4,14 @@
 
 //go:build windows
 
+//nolint:gosec // This file is used for testing ETW functionality and does not handle sensitive data.
 package etw
 
 import (
 	"bytes"
+	"context"
 	"encoding/binary"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -127,12 +130,13 @@ func NewTestProviderManager() (*TestProviderManager, error) {
 
 // Provider management methods
 func (pm *TestProviderManager) checkProviderStatus() (bool, error) {
-	cmd := exec.Command("powershell.exe", "-ExecutionPolicy", "Bypass", "-File", pm.scriptPath, "-Action", "Status")
+	cmd := exec.CommandContext(context.Background(), "powershell.exe", "-ExecutionPolicy", "Bypass", "-File", pm.scriptPath, "-Action", "Status")
 	cmd.Dir = pm.testDataDir
 
 	err := cmd.Run()
 	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok && exitError.ExitCode() == 1 {
+		errExit := &exec.ExitError{}
+		if errors.As(err, &errExit) && errExit.ExitCode() == 1 {
 			return false, nil
 		}
 		return false, fmt.Errorf("failed to check provider status: %w", err)
@@ -141,7 +145,7 @@ func (pm *TestProviderManager) checkProviderStatus() (bool, error) {
 }
 
 func (pm *TestProviderManager) registerProvider() error {
-	cmd := exec.Command("powershell.exe", "-ExecutionPolicy", "Bypass", "-File", pm.scriptPath, "-Action", "Register")
+	cmd := exec.CommandContext(context.Background(), "powershell.exe", "-ExecutionPolicy", "Bypass", "-File", pm.scriptPath, "-Action", "Register")
 	cmd.Dir = pm.testDataDir
 
 	output, err := cmd.CombinedOutput()
@@ -152,7 +156,7 @@ func (pm *TestProviderManager) registerProvider() error {
 }
 
 func (pm *TestProviderManager) unregisterProvider() error {
-	cmd := exec.Command("powershell.exe", "-ExecutionPolicy", "Bypass", "-File", pm.scriptPath, "-Action", "Unregister")
+	cmd := exec.CommandContext(context.Background(), "powershell.exe", "-ExecutionPolicy", "Bypass", "-File", pm.scriptPath, "-Action", "Unregister")
 	cmd.Dir = pm.testDataDir
 
 	output, err := cmd.CombinedOutput()
@@ -234,7 +238,7 @@ func TestRegenerateTestdataETL(t *testing.T) {
 	if err := startETWSession(sessionName, etlPath); err != nil {
 		t.Fatalf("Failed to start ETW session: %v", err)
 	}
-	t.Cleanup(func() { stopETWSession(sessionName) })
+	t.Cleanup(func() { _ = stopETWSession(sessionName) })
 
 	// Generate events using the generator
 	generator, err := NewETWEventGenerator()
@@ -261,14 +265,14 @@ func TestRegenerateTestdataETL(t *testing.T) {
 // Helper functions for ETL session management
 func startETWSession(sessionName, etlPath string) error {
 	_ = stopETWSession(sessionName)
-	cmd := exec.Command("logman", "start", sessionName, "-ets",
+	cmd := exec.CommandContext(context.Background(), "logman", "start", sessionName, "-ets",
 		"-o", etlPath,
 		"-p", testProviderGUID, "0xFFFFFFFFFFFFFFFF", "0xFF")
 	return cmd.Run()
 }
 
 func stopETWSession(sessionName string) error {
-	cmd := exec.Command("logman", "stop", sessionName, "-ets")
+	cmd := exec.CommandContext(context.Background(), "logman", "stop", sessionName, "-ets")
 	return cmd.Run()
 }
 
@@ -302,10 +306,6 @@ func (g *ETWEventGenerator) close() error {
 }
 
 // generateEvents generates n random events, alternating between the two event types
-type randSource interface {
-	Read([]byte) (int, error)
-}
-
 func (g *ETWEventGenerator) generateEvents(n int, wait time.Duration) error {
 	for i := 0; i < n; i++ {
 		if i%2 == 0 {
@@ -360,7 +360,7 @@ func (g *ETWEventGenerator) writeEvent(eventID int, desc []EventDataDescriptor) 
 		uintptr(unsafe.Pointer(&desc[0])),
 	)
 	if ret != 0 {
-		return fmt.Errorf("EventWrite failed: %v", syscall.Errno(ret))
+		return fmt.Errorf("EventWrite failed: %w", syscall.Errno(ret))
 	}
 	return nil
 }
@@ -392,7 +392,7 @@ func (g *ETWEventGenerator) writeAllDataTypesEvent() error {
 	int32v := int32(r.next())
 	uint32v := uint32(r.next())
 	int64v := int64(r.next())
-	uint64v := uint64(r.next())
+	uint64v := r.next()
 	floatv := float32(r.next()%10000)/100 + float32(r.next()%100)/100
 	doublev := float64(r.next()%1000000)/1000 + float64(r.next()%1000)/1000
 	boolv := int32(r.next() % 2)
@@ -500,7 +500,9 @@ func (g *ETWEventGenerator) writeComplexDataEvent() error {
 	var filesBlob bytes.Buffer
 	for _, f := range files {
 		utf16Bytes := windows.StringToUTF16(f)
-		binary.Write(&filesBlob, binary.LittleEndian, utf16Bytes)
+		if err := binary.Write(&filesBlob, binary.LittleEndian, utf16Bytes); err != nil {
+			return fmt.Errorf("failed to write file path %s: %w", f, err)
+		}
 	}
 	packedFiles := filesBlob.Bytes()
 	desc = append(desc, newEventDataDescriptorPtr(unsafe.Pointer(&packedFiles[0]), len(packedFiles)))
@@ -513,9 +515,13 @@ func (g *ETWEventGenerator) writeComplexDataEvent() error {
 	desc = append(desc, newEventDataDescriptorPtr(unsafe.Pointer(&valuesCount), int(unsafe.Sizeof(valuesCount))))
 	var valuesBlob bytes.Buffer
 	for _, v := range values {
-		binary.Write(&valuesBlob, binary.LittleEndian, v.Value)
+		if err := binary.Write(&valuesBlob, binary.LittleEndian, v.Value); err != nil {
+			return fmt.Errorf("failed to write value %d: %w", v.Value, err)
+		}
 		utf16Slice := windows.StringToUTF16(v.Name)
-		binary.Write(&valuesBlob, binary.LittleEndian, utf16Slice)
+		if err := binary.Write(&valuesBlob, binary.LittleEndian, utf16Slice); err != nil {
+			return fmt.Errorf("failed to write name %s: %w", v.Name, err)
+		}
 	}
 	packedValues := valuesBlob.Bytes()
 	desc = append(desc, newEventDataDescriptorPtr(unsafe.Pointer(&packedValues[0]), len(packedValues)))

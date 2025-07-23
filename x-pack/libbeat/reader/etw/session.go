@@ -146,8 +146,8 @@ func getTraceLevel(level string) uint8 {
 // See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-event_trace_properties
 func newSessionProperties(sessionName string, conf Config) *EventTraceProperties {
 	// Calculate buffer size for session properties.
-	sessionNameSize := (len(sessionName) + 1) * 2
-	bufSize := sessionNameSize + int(unsafe.Sizeof(EventTraceProperties{}))
+	sessionNameSize := uintptr(len(sessionName)+1) * 2
+	bufSize := uint32(sessionNameSize + unsafe.Sizeof(EventTraceProperties{}))
 
 	// Allocate buffer and cast to EventTraceProperties.
 	propertiesBuf := make([]byte, bufSize)
@@ -155,7 +155,7 @@ func newSessionProperties(sessionName string, conf Config) *EventTraceProperties
 
 	// Initialize mandatory fields of the EventTraceProperties struct.
 	// Filled based on https://learn.microsoft.com/en-us/windows/win32/etw/wnode-header
-	sessionProperties.Wnode.BufferSize = uint32(bufSize)
+	sessionProperties.Wnode.BufferSize = bufSize
 	sessionProperties.Wnode.Guid = windows.GUID{} // GUID not required for non-private/kernel sessions
 	// ClientContext is used for timestamp resolution
 	// Not used unless adding PROCESS_TRACE_MODE_RAW_TIMESTAMP flag to EVENT_TRACE_LOGFILE struct

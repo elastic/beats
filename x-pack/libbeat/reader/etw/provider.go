@@ -68,6 +68,9 @@ func guidFromProviderName(providerName string) (windows.GUID, error) {
 		buf = make([]byte, bufSize)
 		pEnum = ((*ProviderEnumerationInfo)(unsafe.Pointer(&buf[0])))
 		err = enumerateProvidersFunc(pEnum, &bufSize)
+		if err != nil {
+			return windows.GUID{}, fmt.Errorf("failed to enumerate providers: %w", err)
+		}
 	}
 
 	if pEnum.NumberOfProviders == 0 {
