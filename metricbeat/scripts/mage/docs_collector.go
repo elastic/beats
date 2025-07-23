@@ -24,7 +24,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strings"
 	"text/template"
@@ -134,22 +133,6 @@ func getRelease(rel string) (string, error) {
 	}
 }
 
-// If there's a version and check that it's formatted correctly.
-func getVersion(rel string) (string, error) {
-	pattern := `^\d+\.\d+(\.\d+)$`
-	matched, err := regexp.MatchString(pattern, rel)
-	if err != nil {
-		fmt.Println("Error compiling regex:", err)
-		return "", nil
-	}
-	if matched {
-		return rel, nil
-	} else {
-		return "", nil
-	}
-
-}
-
 // createDocsPath creates the path for the entire docs/ folder
 func createDocsPath(module string) error {
 	return os.MkdirAll(mage.OSSBeatDir("docs/modules", module), 0755)
@@ -246,7 +229,7 @@ func getReleaseState(metricsetPath string) (string, error) {
 // Get `version` from `fields.yml` to be used in `applies_to`.
 // NOTE: I just copied and adjusted the `getReleaseState` function
 // above. I'm sure this could be improved!
-func getVersionNumber(metricsetPath string) (string, error) {
+func getVersion(metricsetPath string) (string, error) {
 	raw, err := os.ReadFile(metricsetPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read from spec file: %w", err)
@@ -333,7 +316,7 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 		}
 		metricsetName := filepath.Base(metricset)
 		release, err := getReleaseState(filepath.Join(metricset, "_meta/fields.yml"))
-		applies_to, err := getVersionNumber(filepath.Join(metricset, "_meta/fields.yml"))
+		applies_to, err := getVersion(filepath.Join(metricset, "_meta/fields.yml"))
 		if err != nil {
 			return nil, err
 		}
