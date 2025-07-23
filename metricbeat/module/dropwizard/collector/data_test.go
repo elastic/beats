@@ -90,3 +90,12 @@ func TestSplitTagsFromMetricName(t *testing.T) {
 		})
 	}
 }
+
+func FuzzSplitTagsFromMetricName(f *testing.F) {
+	f.Add("my_metric1")
+	f.Add("metric{a=b, }")
+
+	f.Fuzz(func(t *testing.T, metricName string) {
+		splitTagsFromMetricName(metricName)
+	})
+}

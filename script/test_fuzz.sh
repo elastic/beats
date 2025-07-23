@@ -16,3 +16,9 @@ go test -fuzz=FuzzParseRFC3164 -fuzztime=600s -run=^$ ./libbeat/reader/syslog
 go test -fuzz=FuzzParseRFC5424 -fuzztime=600s -run=^$ ./libbeat/reader/syslog
 go test -fuzz=FuzzIsRFC5424 -fuzztime=600s -run=^$ ./libbeat/reader/syslog
 go test -fuzz=FuzzParseStructuredData -fuzztime=600s -run=^$ ./libbeat/reader/syslog
+
+go test -fuzz=FuzzParseMetricFamilies -fuzztime=600s -run=^$ ./metricbeat/helper/prometheus
+go test -fuzz=FuzzSplitTagsFromMetricName -fuzztime=600s -run=^$ ./metricbeat/module/dropwizard/collector
+go test -fuzz=FuzzProcess -fuzztime=600s -run=^$ ./metricbeat/module/graphite/server
+go test -fuzz=FuzzParseMBeanName -fuzztime=600s -run=^$ ./metricbeat/module/jolokia/jmx
+go test -fuzz=FuzzParseSrvr -fuzztime=600s -run=^$ ./metricbeat/module/zookeeper/server

@@ -895,3 +895,18 @@ redis_connected_clients{instance="rough-snowflake-web"} 10.0`
 	}
 	require.ElementsMatch(t, expected, result)
 }
+
+func FuzzParseMetricFamilies(f *testing.F) {
+	input := `
+# TYPE target info
+target_info 1
+# TYPE first_metric gauge
+first_metric{label1="value1"} 1
+# EOF
+`
+	f.Add([]byte(input))
+
+	f.Fuzz(func(t *testing.T, input []byte) {
+		_, _ = ParseMetricFamilies(input, ContentTypeTextFormat, time.Now(), logptest.NewTestingLogger(t, "test"))
+	})
+}

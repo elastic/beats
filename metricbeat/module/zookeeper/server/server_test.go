@@ -70,3 +70,12 @@ func TestParser(t *testing.T) {
 	assert.Equal(t, uint32(7), mapStr["epoch"])
 	assert.Equal(t, uint32(0x601132), mapStr["count"])
 }
+
+func FuzzParseSrvr(f *testing.F) {
+	f.Add([]byte(srvrTestInput))
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		logger := logptest.NewTestingLogger(t, "zookeeper.server")
+		_, _, _ = parseSrvr(bytes.NewReader(data), logger)
+	})
+}

@@ -735,3 +735,12 @@ func TestNewJolokiaHTTPClient(t *testing.T) {
 		assert.Equal(t, c.expected, jolokiaGETClient, "httpMethod: "+c.httpMethod)
 	}
 }
+
+func FuzzParseMBeanName(f *testing.F) {
+	f.Add(`type=Runtime`)
+	f.Add(`java.lang:name=Foo,type=Runtime`)
+
+	f.Fuzz(func(t *testing.T, mBeanName string) {
+		_, _ = ParseMBeanName(mBeanName)
+	})
+}
