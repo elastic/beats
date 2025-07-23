@@ -9,8 +9,6 @@ package cat_shards
 
 import (
 	"maps"
-	"net/http"
-	"net/http/httptest"
 	"slices"
 	"testing"
 
