@@ -91,7 +91,7 @@ func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inp
 		env.UpdateStatus(status.Failed, fmt.Sprintf("Failed to set up Salesforce input: %v", err))
 		return err
 	}
-	env.UpdateStatus(status.Healthy, "Salesforce input setup complete. Monitoring events.")
+	env.UpdateStatus(status.Running, "Salesforce input setup complete. Monitoring events.")
 	return s.run(env)
 }
 
@@ -180,7 +180,7 @@ func (s *salesforceInput) run(env v2.Context) error {
 				env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running EventLogFile collection: %v", err))
 				s.log.Errorf("Problem running EventLogFile collection: %s", err)
 			} else {
-				env.UpdateStatus(status.Healthy, "EventLogFile collection completed successfully")
+				env.UpdateStatus(status.Running, "EventLogFile collection completed successfully")
 				s.log.Info("EventLogFile collection completed successfully")
 			}
 		case <-objectMethodTicker.C:
@@ -189,7 +189,7 @@ func (s *salesforceInput) run(env v2.Context) error {
 				env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running Object collection: %v", err))
 				s.log.Errorf("Problem running Object collection: %s", err)
 			} else {
-				env.UpdateStatus(status.Healthy, "Object collection completed successfully.")
+				env.UpdateStatus(status.Running, "Object collection completed successfully.")
 				s.log.Info("Object collection completed successfully")
 			}
 		}

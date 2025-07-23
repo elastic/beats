@@ -40,8 +40,6 @@ const (
 	Stopping
 	// Stopped is status describing unit is stopped.
 	Stopped
-	//Healthy is status describing unit is healthy.
-	Healthy
 )
 
 // StatusReporter provides a method to update current status of a unit.
