@@ -53,6 +53,9 @@ type config struct {
 	// Run 'logman query -ets' to list existing sessions.
 	Session        string   `config:"session"`
 	EnableProperty []string `config:"enable_property"`
+	BufferSize     uint32   `config:"buffer_size"`
+	MinimumBuffers uint32   `config:"minimum_buffers"`
+	MaximumBuffers uint32   `config:"maximum_buffers"`
 }
 
 func convertConfig(cfg config) etw.Config {
@@ -66,6 +69,9 @@ func convertConfig(cfg config) etw.Config {
 		MatchAllKeyword: cfg.MatchAllKeyword,
 		Session:         cfg.Session,
 		EnableProperty:  cfg.EnableProperty,
+		BufferSize:      cfg.BufferSize,
+		MinimumBuffers:  cfg.MinimumBuffers,
+		MaximumBuffers:  cfg.MaximumBuffers,
 	}
 }
 
@@ -73,6 +79,7 @@ func defaultConfig() config {
 	return config{
 		TraceLevel:      "verbose",
 		MatchAnyKeyword: 0xffffffffffffffff,
+		BufferSize:      64,
 	}
 }
 

@@ -140,6 +140,59 @@ Run `logman query providers "<provider.name>"` to list the available keywords fo
 
 Names an existing ETW session to read from. Existing sessions can be listed using `logman query -ets`.
 
+### `enable_property` [_enable_property]
+
+A list of ETW session properties to enable. These properties control advanced session behavior. See [EnableTraceEx2 documentation](https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-enabletraceex2) for details.
+
+Example:
+
+```yaml
+filebeat.inputs:
+- type: etw
+  enable_property:
+    - EVENT_ENABLE_PROPERTY_SID
+    - EVENT_ENABLE_PROPERTY_STACK
+```
+
+
+### `buffer_size` [_buffer_size]
+
+Sets the size (in KB) of each buffer used by the ETW session. Default is 64 KB. Larger buffers may improve performance for high-volume event sources.
+
+Example:
+
+```yaml
+filebeat.inputs:
+- type: etw
+  buffer_size: 128
+```
+
+
+### `minimum_buffers` [_minimum_buffers]
+
+Sets the minimum number of buffers allocated for the ETW session. Increasing this value can help prevent data loss under heavy load.
+
+Example:
+
+```yaml
+filebeat.inputs:
+- type: etw
+  minimum_buffers: 8
+```
+
+
+### `maximum_buffers` [_maximum_buffers]
+
+Sets the maximum number of buffers allocated for the ETW session. This limits memory usage for the session.
+
+Example:
+
+```yaml
+filebeat.inputs:
+- type: etw
+  maximum_buffers: 256
+```
+
 
 ## Common options [filebeat-input-etw-common-options]
 
