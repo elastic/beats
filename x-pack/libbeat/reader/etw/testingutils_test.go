@@ -225,7 +225,7 @@ func TestRegenerateTestdataETL(t *testing.T) {
 	}
 	setupProviderManager(t)
 	const (
-		eventCount = 30
+		eventCount = 2
 	)
 
 	etlPath := filepath.Join("testdata", "sample-test-events.etl")
