@@ -74,6 +74,8 @@ func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return nil, fmt.Errorf("reading %s input config: %w", inputName, err)
 	}
 
+	config.checkUnsupportedParams(m.log)
+
 	switch config.ProcessorVersion {
 	case processorV1:
 		return newEventHubInputV1(config, m.log)

@@ -18,14 +18,13 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/gofrs/uuid/v5"
 
+	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
 
@@ -61,6 +60,9 @@ http.host: localhost
 http.port: %d
 `
 
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbOtelIndex := "logs-integration-" + namespace
+	fbIndex := "logs-filebeat-" + namespace
 	// start filebeat in otel mode
 	filebeatOTel := integration.NewBeat(
 		t,
@@ -70,7 +72,7 @@ http.port: %d
 	)
 
 	logFilePath := filepath.Join(filebeatOTel.TempDir(), "log.log")
-	filebeatOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", 5066))
+	filebeatOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, logFilePath, fbOtelIndex, 5066))
 	writeEventsToLogFile(t, logFilePath, numEvents)
 	filebeatOTel.Start()
 	defer filebeatOTel.Stop()
@@ -83,7 +85,7 @@ http.port: %d
 	)
 	logFilePath = filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
+	s := fmt.Sprintf(beatsCfgFile, logFilePath, fbIndex, 5067)
 
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
@@ -102,10 +104,10 @@ http.port: %d
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
-			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+fbOtelIndex+"*")
 			require.NoError(t, err)
 
-			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-filebeat-default*")
+			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+fbIndex+"*")
 			require.NoError(t, err)
 
 			return otelDocs.Hits.Total.Value >= numEvents && filebeatDocs.Hits.Total.Value >= numEvents
@@ -123,7 +125,7 @@ http.port: %d
 		"log.file.path",
 	}
 
-	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 	assertMonitoring(t, 5066)
 }
 
@@ -245,7 +247,7 @@ processors:
 		"event.created",
 	}
 
-	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 }
 
 func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
@@ -267,25 +269,6 @@ func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
 	if err := logFile.Close(); err != nil {
 		t.Fatalf("could not close log file '%s': %s", filename, err)
 	}
-}
-
-func assertMapsEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg string) {
-	t.Helper()
-
-	flatM1 := m1.Flatten()
-	flatM2 := m2.Flatten()
-	for _, f := range ignoredFields {
-		hasKeyM1, _ := flatM1.HasKey(f)
-		hasKeyM2, _ := flatM2.HasKey(f)
-
-		if !hasKeyM1 && !hasKeyM2 {
-			assert.Failf(t, msg, "ignored field %q does not exist in either map, please remove it from the ignored fields", f)
-		}
-
-		flatM1.Delete(f)
-		flatM2.Delete(f)
-	}
-	require.Equal(t, "", cmp.Diff(flatM1, flatM2), "expected maps to be equal")
 }
 
 func assertMonitoring(t *testing.T, port int) {
@@ -315,13 +298,17 @@ func TestFilebeatOTelReceiverE2E(t *testing.T) {
 		"otel",
 	)
 
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	fbReceiverIndex := "logs-integration-" + namespace
+	filebeatIndex := "logs-filebeat-" + namespace
+
 	otelConfig := struct {
 		Index          string
 		MonitoringPort int
 		InputFile      string
 		PathHome       string
 	}{
-		Index:          "logs-integration-default",
+		Index:          fbReceiverIndex,
 		MonitoringPort: 5066,
 		InputFile:      filepath.Join(filebeatOTel.TempDir(), "log.log"),
 		PathHome:       filebeatOTel.TempDir(),
@@ -427,7 +414,7 @@ http.port: %d
 `
 	logFilePath := filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, wantEvents)
-	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
+	s := fmt.Sprintf(beatsCfgFile, logFilePath, filebeatIndex, 5067)
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
 	defer filebeat.Stop()
@@ -444,10 +431,10 @@ http.port: %d
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
-			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+fbReceiverIndex+"*")
 			require.NoError(t, err)
 
-			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-filebeat-default*")
+			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+filebeatIndex+"*")
 			require.NoError(t, err)
 
 			return otelDocs.Hits.Total.Value >= wantEvents && filebeatDocs.Hits.Total.Value >= wantEvents
@@ -465,7 +452,7 @@ http.port: %d
 		"log.file.path",
 	}
 
-	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 	assertMonitoring(t, otelConfig.MonitoringPort)
 	assertMonitoring(t, 5067) // filebeat
 }
@@ -492,21 +479,22 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 		PathHome       string
 	}
 
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	otelConfig := struct {
 		Index     string
 		Receivers []receiverConfig
 	}{
-		Index: "logs-integration-default",
+		Index: "logs-integration-" + namespace,
 		Receivers: []receiverConfig{
 			{
 				MonitoringPort: 5066,
 				InputFile:      logFilePath,
-				PathHome:       filebeatOTel.TempDir(),
+				PathHome:       filepath.Join(filebeatOTel.TempDir(), "r1"),
 			},
 			{
 				MonitoringPort: 5067,
 				InputFile:      logFilePath,
-				PathHome:       filebeatOTel.TempDir(),
+				PathHome:       filepath.Join(filebeatOTel.TempDir(), "r2"),
 			},
 		},
 	}
@@ -592,7 +580,7 @@ service:
 			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
 			defer findCancel()
 
-			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+otelConfig.Index+"*")
 			require.NoError(t, err)
 
 			return otelDocs.Hits.Total.Value >= wantTotalLogs

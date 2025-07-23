@@ -22,13 +22,16 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/fbprovider"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/mbprovider"
+	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var schemeMap = map[string]string{
-	"filebeat": "fb",
+	"filebeat":   "fb",
+	"metricbeat": "mb",
 }
 
 func OTelCmd(beatname string) *cobra.Command {
@@ -37,8 +40,6 @@ func OTelCmd(beatname string) *cobra.Command {
 		Use:    "otel",
 		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			logger := logp.NewLogger(beatname + "-otel-mode")
-			logger.Info("This mode is experimental and unsupported")
 
 			// get beat configuration file
 			beatCfg, _ := cmd.Flags().GetString("config")
@@ -64,7 +65,7 @@ func OTelCmd(beatname string) *cobra.Command {
 		},
 	}
 
-	command.Flags().String("config", beatname+"-otel.yml", "path to filebeat config file")
+	command.Flags().String("config", beatname+"-otel.yml", "path to "+beatname+" config file")
 	return command
 }
 
@@ -72,6 +73,7 @@ func OTelCmd(beatname string) *cobra.Command {
 func getComponent() (otelcol.Factories, error) {
 	receivers, err := otelcol.MakeFactoryMap(
 		fbreceiver.NewFactory(),
+		mbreceiver.NewFactory(),
 	)
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
@@ -118,7 +120,7 @@ func getCollectorSettings(filename string) otelcol.CollectorSettings {
 	info := component.BuildInfo{
 		Command:     "otel",
 		Description: "Beats OTel",
-		Version:     "9.0.0",
+		Version:     version.GetDefaultVersion(),
 	}
 
 	return otelcol.CollectorSettings{
@@ -130,6 +132,7 @@ func getCollectorSettings(filename string) otelcol.CollectorSettings {
 				ProviderFactories: []confmap.ProviderFactory{
 					fileprovider.NewFactory(),
 					fbprovider.NewFactory(),
+					mbprovider.NewFactory(),
 				},
 				ConverterFactories: []confmap.ConverterFactory{
 					beatconverter.NewFactory(),

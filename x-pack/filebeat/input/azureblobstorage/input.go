@@ -52,7 +52,7 @@ func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	}
 }
 
-func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
+func configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
@@ -80,6 +80,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 			ExpandEventListFromField: container.ExpandEventListFromField,
 			FileSelectors:            container.FileSelectors,
 			ReaderConfig:             container.ReaderConfig,
+			PathPrefix:               container.PathPrefix,
 		})
 	}
 
@@ -153,6 +154,11 @@ func tryOverrideOrDefault(cfg config, c container) container {
 	// and container level is not supported, it's an either or scenario.
 	if reflect.DeepEqual(c.ReaderConfig, defaultReaderConfig) {
 		c.ReaderConfig = cfg.ReaderConfig
+	}
+
+	// If the container level PathPrefix is empty, use the global PathPrefix.
+	if c.PathPrefix == "" {
+		c.PathPrefix = cfg.PathPrefix
 	}
 
 	return c
