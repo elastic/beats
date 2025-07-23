@@ -102,7 +102,7 @@ wait_for_port 8775
 echo "Kafka consumer start"
 # Start a forever consumer
 KAFKA_OPTS="-Djava.security.auth.login.config=/kafka/bin/jaas-kafka-client-consumer.conf -javaagent:/opt/jolokia-jvm-1.5.0-agent.jar=port=8774,host=0.0.0.0" \
- ${KAFKA_HOME}/bin/kafka-console-consumer.sh --topic=test --bootstrap-server=localhost:9091 --consumer.config ${KAFKA_HOME}/bin/sasl-producer.properties > /dev/null &
+ ${KAFKA_HOME}/bin/kafka-console-consumer.sh --topic=test --bootstrap-server=localhost:9091 --consumer.config ${KAFKA_HOME}/bin/sasl-consumer.properties > /dev/null &
 
 wait_for_port 8774
 
