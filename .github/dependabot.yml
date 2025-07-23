@@ -85,6 +85,10 @@ updates:
       - dependency-name: github.com/lib/pq
       - dependency-name: github.com/godror/godror
       - dependency-name: github.com/microsoft/go-mssqldb
+      # Windows dependencies
+      - dependency-name: "github.com/microsoft/wmi"
+      - dependency-name: "github.com/go-ole/go-ole"
+      - dependency-name: "github.com/StackExchange/wmi"
     groups:
       windows:
         patterns:
