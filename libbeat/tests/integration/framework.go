@@ -1058,9 +1058,10 @@ func reportErrors(t *testing.T, tempDir string, beatName string) {
 	}
 }
 
-// GenerateLogFile writes count lines to path, each line is 50 bytes.
+// GenerateLogFile writes count lines to path
 // Each line contains the current time (RFC3339) and a counter
-func GenerateLogFile(t *testing.T, path string, count int, append bool) {
+// Prefix is added instead of current time if it is passed
+func GenerateLogFile(t *testing.T, path string, count int, append bool, prefix ...string) {
 	var file *os.File
 	var err error
 	if !append {
@@ -1085,15 +1086,22 @@ func GenerateLogFile(t *testing.T, path string, count int, append bool) {
 			t.Fatalf("could not sync file: %s", err)
 		}
 	}()
-	now := time.Now().Format(time.RFC3339)
-	// If the length is different, e.g when there is no offset from UTC.
-	// add some padding so the length is predictable
-	if len(now) != len(time.RFC3339) {
-		paddingNeeded := len(time.RFC3339) - len(now)
-		for i := 0; i < paddingNeeded; i++ {
-			now += "-"
+
+	var now string
+	if len(prefix) == 0 {
+		// If the length is different, e.g when there is no offset from UTC.
+		// add some padding so the length is predictable
+		now = time.Now().Format(time.RFC3339)
+		if len(now) != len(time.RFC3339) {
+			paddingNeeded := len(time.RFC3339) - len(now)
+			for i := 0; i < paddingNeeded; i++ {
+				now += "-"
+			}
 		}
+	} else {
+		now = strings.Join(prefix, "")
 	}
+
 	for i := 0; i < count; i++ {
 		if _, err := fmt.Fprintf(file, "%s           %13d\n", now, i); err != nil {
 			t.Fatalf("could not write line %d to file: %s", count+1, err)

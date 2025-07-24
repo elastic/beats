@@ -27,8 +27,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/testing/integration"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/testing/integration"
 )
 
 func TestFilebeatModuleCmd(t *testing.T) {

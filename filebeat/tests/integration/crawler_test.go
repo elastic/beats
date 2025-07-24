@@ -27,11 +27,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
-var filestreamCfg = `
+// Checks that if a line does not have a line ending, then it is not read3.
+// Checks that if a file is renamed, its contents are not re-ingested
+func TestCrawler(t *testing.T) {
+
+	var filestreamCfg = `
 filebeat.inputs:
   - type: filestream
     id: "test-clean-inactive"
@@ -47,10 +52,6 @@ output.file:
   path: ${path.home}
   filename: "output-file"
 `
-
-// Checks that if a line does not have a line ending, then it is not read3.
-// Checks that if a file is renamed, its contents are not re-ingested
-func TestCrawler(t *testing.T) {
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
@@ -122,7 +123,116 @@ func TestCrawler(t *testing.T) {
 
 }
 
-// counts number of lines in the given file and eventually asserts if it matches with the expected count
+// Checks only the log lines defined by include_lines are ingested
+func TestIncludeLines(t *testing.T) {
+
+	var filestreamCfg = `
+filebeat.inputs:
+  - type: filestream
+    id: "test-clean-inactive"
+    paths:
+      - %s
+    include_lines: ['^ERR', '^WARN']
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
+
+path.home: %s
+
+output.file:
+  path: ${path.home}
+  filename: "output-file"
+`
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	tempDir := filebeat.TempDir()
+
+	// 1. Generate the log file path, but do not write data to it
+	logFilePath := filepath.Join(tempDir, "log.log")
+
+	// 2. Write configuration file and start Filebeat
+	filebeat.WriteConfigFile(fmt.Sprintf(filestreamCfg, filepath.Join(tempDir, "*.log"), tempDir))
+	filebeat.Start()
+
+	// 3. Create the log file
+	iterations := 20
+	integration.GenerateLogFile(t, logFilePath, iterations, false, "DBG: a simple debug message")
+	integration.GenerateLogFile(t, logFilePath, iterations, true, "ERR: a simple error message")
+	integration.GenerateLogFile(t, logFilePath, iterations, true, "WARNING: a simple warning message")
+
+	// wait for output file to exist
+	var outputFile string
+	require.Eventually(t, func() bool {
+		matches, err := filepath.Glob(filepath.Join(tempDir, "output-file-*.ndjson"))
+		if err != nil || len(matches) == 0 {
+			t.Logf("could not find output file %v", err)
+			return false
+		}
+		outputFile = matches[0]
+		return true
+	}, 2*time.Minute, 10*time.Second)
+
+	// Ensure include_lines only events are ingested
+	countLinesInFile(t, outputFile, 2*iterations)
+}
+
+// Checks log lines defined by exclude_lines are excluded
+func TestExcludeLines(t *testing.T) {
+
+	var filestreamCfg = `
+filebeat.inputs:
+  - type: filestream
+    id: "test-clean-inactive"
+    paths:
+      - %s
+    exclude_lines: ['^DBG']
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
+
+path.home: %s
+
+output.file:
+  path: ${path.home}
+  filename: "output-file"
+`
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	tempDir := filebeat.TempDir()
+
+	// 1. Generate the log file path, but do not write data to it
+	logFilePath := filepath.Join(tempDir, "log.log")
+
+	// 2. Write configuration file and start Filebeat
+	filebeat.WriteConfigFile(fmt.Sprintf(filestreamCfg, filepath.Join(tempDir, "*.log"), tempDir))
+	filebeat.Start()
+
+	// 3. Create the log file
+	iterations := 20
+	integration.GenerateLogFile(t, logFilePath, iterations, false, "DBG: a simple debug message")
+	integration.GenerateLogFile(t, logFilePath, iterations, true, "ERR: a simple error message")
+	integration.GenerateLogFile(t, logFilePath, iterations, true, "WARNING: a simple warning message")
+
+	// wait for output file to exist
+	var outputFile string
+	require.Eventually(t, func() bool {
+		matches, err := filepath.Glob(filepath.Join(tempDir, "output-file-*.ndjson"))
+		if err != nil || len(matches) == 0 {
+			t.Logf("could not find output file %v", err)
+			return false
+		}
+		outputFile = matches[0]
+		return true
+	}, 2*time.Minute, 10*time.Second)
+
+	countLinesInFile(t, outputFile, 2*iterations)
+}
+
+// counts number of lines in the given file and  asserts if it matches expected count
 func countLinesInFile(t *testing.T, path string, count int) {
 	t.Helper()
 	var lines []byte
