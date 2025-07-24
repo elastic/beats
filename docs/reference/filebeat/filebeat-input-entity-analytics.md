@@ -2,6 +2,8 @@
 navigation_title: "Entity Analytics"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-entity-analytics.html
+applies_to:
+  stack: preview
 ---
 
 # Entity Analytics Input [filebeat-input-entity-analytics]

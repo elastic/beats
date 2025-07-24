@@ -2,6 +2,8 @@
 navigation_title: "Azure Blob Storage"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-azure-blob-storage.html
+applies_to:
+  stack: ga
 ---
 
 # Azure Blob Storage Input [filebeat-input-azure-blob-storage]
