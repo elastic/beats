@@ -102,7 +102,7 @@ packetbeat setup --index-management -E output.logstash.enabled=false -E 'output.
 **docker:**
 
 ```sh subs=true
-docker run --rm docker.elastic.co/beats/packetbeat:{{stack-version}} setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+docker run --rm docker.elastic.co/beats/packetbeat:{{version.stack}} setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ```
 
 **win:**
@@ -176,7 +176,7 @@ packetbeat export template > packetbeat.template.json
 **win:**
 
 ```sh subs=true
-PS > .\packetbeat.exe export template --es.version {{stack-version}} | Out-File -Encoding UTF8 packetbeat.template.json
+PS > .\packetbeat.exe export template --es.version {{version.stack}} | Out-File -Encoding UTF8 packetbeat.template.json
 ```
 
 To install the template, run:
@@ -184,50 +184,50 @@ To install the template, run:
 **deb and rpm:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/packetbeat-{{stack-version}} -d@packetbeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/packetbeat-{{version.stack}} -d@packetbeat.template.json
 ```
 
 **mac:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/packetbeat-{{stack-version}} -d@packetbeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/packetbeat-{{version.stack}} -d@packetbeat.template.json
 ```
 
 **linux:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/packetbeat-{{stack-version}} -d@packetbeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/packetbeat-{{version.stack}} -d@packetbeat.template.json
 ```
 
 **win:**
 
 ```sh subs=true
-PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile packetbeat.template.json -Uri http://localhost:9200/_index_template/packetbeat-{{stack-version}}
+PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile packetbeat.template.json -Uri http://localhost:9200/_index_template/packetbeat-{{version.stack}}
 ```
 
-Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on packetbeat-{{stack-version}} index.
+Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on packetbeat-{{version.stack}} index.
 
 **deb and rpm:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/packetbeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/packetbeat-{{version.stack}}
 ```
 
 **mac:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/packetbeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/packetbeat-{{version.stack}}
 ```
 
 **linux:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/packetbeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/packetbeat-{{version.stack}}
 ```
 
 **win:**
 
 ```sh subs=true
-PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/packetbeat-{{stack-version}}
+PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/packetbeat-{{version.stack}}
 ```
 
