@@ -315,7 +315,6 @@ filebeat.inputs:
   resource.url: http://localhost
 ```
 
-<<<<<<< HEAD
 ```yaml
 filebeat.inputs:
 - type: cel
@@ -334,8 +333,6 @@ filebeat.inputs:
   resource.url: http://localhost
 ```
 
-=======
->>>>>>> 117f67c24 (x-pack/filebeat/input/cel: document surprising number behaviours (#44962))
 ## Input state [input-state-cel]
 
 The `cel` input keeps a runtime state between requests. This state can be accessed by the CEL program and may contain arbitrary objects.
