@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-module-sysmon.html
+applies_to:
+  stack: ga
 ---
 
 # Sysmon Module [winlogbeat-module-sysmon]

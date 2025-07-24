@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-module-security.html
+applies_to:
+  stack: ga
 ---
 
 # Security Module [winlogbeat-module-security]
