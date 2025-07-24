@@ -74,7 +74,7 @@ Also see [Global flags](#global-flags).
 
 ```sh subs=true
 heartbeat export config
-heartbeat export template --es.version {{stack-version}}
+heartbeat export template --es.version {{version.stack}}
 ```
 
 

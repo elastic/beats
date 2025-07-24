@@ -49,7 +49,7 @@ packetbeat setup --dashboards
 
 ::::::{tab-item} Docker
 ```sh subs=true
-docker run --rm --net="host" docker.elastic.co/beats/packetbeat:{{stack-version}} setup --dashboards
+docker run --rm --net="host" docker.elastic.co/beats/packetbeat:{{version.stack}} setup --dashboards
 ```
 ::::::
 
@@ -125,7 +125,7 @@ packetbeat setup -e \
 
 ::::::{tab-item} Docker
 ```sh subs=true
-docker run --rm --net="host" docker.elastic.co/beats/packetbeat:{{stack-version}} setup -e \
+docker run --rm --net="host" docker.elastic.co/beats/packetbeat:{{version.stack}} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=packetbeat_internal \
