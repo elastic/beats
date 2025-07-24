@@ -54,8 +54,8 @@ filebeat.config.modules:
 	if err != nil {
 		t.Fatalf("failed to create a module directory: %v", err)
 	}
-	os.Create(filepath.Join(modules, "enabled-module.yml"))
-	os.Create(filepath.Join(modules, "disabled-module.yml.disabled"))
+	assert.NoError(t, os.Create(filepath.Join(modules, "enabled-module.yml")))
+	assert.NoError(os.Create(filepath.Join(modules, "disabled-module.yml.disabled")))
 
 	t.Run("Test modules list command", func(t *testing.T) {
 
