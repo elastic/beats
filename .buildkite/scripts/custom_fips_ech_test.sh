@@ -3,12 +3,7 @@ set -euo pipefail
 
 source .buildkite/scripts/ech.sh
 
-BEAT_PATH=$1
-
-if [ -z "$BEAT_PATH" ]; then
-    echo "Error: Specify the beat path: custom_fips_ech_test.sh [beat_path]" >&2
-    exit 1
-fi
+BEAT_PATH=${1:?"Error: Specify the beat path: custom_fips_ech_test.sh [beat_path]"}
 
 trap 'ech_down' EXIT
 

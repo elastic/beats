@@ -348,7 +348,7 @@ steps:
           - "metricbeat/build/integration-tests/Test*/*"
           - "metricbeat/build/integration-tests/Test*/data/**/*"
         plugins:
-          - test-collector#v1.10.2:
+          - test-collector#v1.11.0:
               files: "metricbeat/build/TEST-*.xml"
               format: "junit"
               branches: "main"
