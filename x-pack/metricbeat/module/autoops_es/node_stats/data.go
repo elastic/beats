@@ -297,7 +297,8 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 	err = errors.Join(errs...)
 
 	if err != nil {
-		e.SendErrorEvent(err, info, r, NodesStatsMetricSet, NodesStatsPath, transactionId)
+		e.LogAndSendErrorEvent(err, info, r, NodesStatsMetricSet, NodesStatsPath, transactionId)
 	}
-	return err
+
+	return nil
 }
