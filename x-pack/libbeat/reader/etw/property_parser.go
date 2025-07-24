@@ -415,6 +415,13 @@ func renderSingleProperty(cache *providerCache, eventInfo *cachedEventInfo, prop
 		return "", fmt.Errorf("failed to get property length due to: %w", err)
 	}
 
+	// If a property is defined as a variable-length string (indicated by length 0)
+	// but there is no data left in the buffer, it represents an empty string.
+	// TdhFormatProperty can fail in this case, so we handle it explicitly.
+	if propertyLength == 0 && propInfo.isVariableLengthString() && len(*buf) == 0 {
+		return "", nil
+	}
+
 	// If we have a cached map, try to use it directly for simple numeric types
 	if cachedMapInfo != nil && propertyLength > 0 && len(*buf) > 0 {
 		if mappedValue, consumed, ok := cachedMapInfo.getFormattedMapEntry(propInfo, *buf, int(propertyLength)); ok {
