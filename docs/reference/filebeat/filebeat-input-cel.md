@@ -342,6 +342,23 @@ The state must contain a `url` string and may contain any object the user wishes
 All objects are stored at runtime, except `cursor`, which has values that are persisted between restarts.
 
 
+## CEL input and handling numbers [_cel_input_and_numbers]
+
+Numeric values passed in to and out of a CEL evaluation environment are passed as floating point
+values. This can sometimes cause issues when the numbers in the input state are expected to be
+integers, and may result in unexpected field values being ingested into Elasticsearch documents when
+other parts of the ingest pipeline render floating point values with E-notation or add decimal
+points to numbers that are expected to be integers. This is most likely to happen when numbers are
+large (not within ±10^7^). Above the maximum exact integer representation threshold for double
+precision floating point values, within ±2^53^ (±9×10^15^), integer values will lose precision when
+they are returned from the CEL evaluation environment. The CEL input will automatically convert
+integers outside of the ±2^53^ range to strings in order to prevent loss of precision in these
+values, but potentially leading to a situation where some numbers received by the ingest pipeline
+are numbers and some are strings. To avoid these issues, when you have large integer values as part
+of an evaluation result, convert the field value to a string before returning it, and convert input
+numbers to integers explicitly at the start of a CEL program.
+
+
 ## Configuration options [_configuration_options_3]
 
 The `cel` input supports the following configuration options plus the [Common options](#filebeat-input-cel-common-options) described later.
