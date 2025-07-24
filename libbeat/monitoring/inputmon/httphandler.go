@@ -34,7 +34,7 @@ import (
 const InputNested = "__NESTED__"
 
 const (
-	route           = "/inputs/"
+	route           = "/inputs/{$}"
 	contentType     = "Content-Type"
 	applicationJSON = "application/json; charset=utf-8"
 )
