@@ -87,7 +87,7 @@ Also see [Global flags](#global-flags).
 
 ```sh subs=true
 winlogbeat export config
-winlogbeat export template --es.version {{stack-version}}
+winlogbeat export template --es.version {{version.stack}}
 winlogbeat export dashboard --id="a7b35890-8baa-11e8-9676-ef67484126fb" > dashboard.json
 ```
 
