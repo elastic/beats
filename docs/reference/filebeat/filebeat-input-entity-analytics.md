@@ -2,6 +2,8 @@
 navigation_title: "Entity Analytics"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-entity-analytics.html
+applies_to:
+  stack: preview
 ---
 
 # Entity Analytics Input [filebeat-input-entity-analytics]
@@ -972,6 +974,10 @@ The time between Okta API rate limit resets. Expressed as a duration string (e.g
 
 
 #### `batch_size` [_batch_size]
+
+```{applies_to}
+stack: preview 9.0.1
+```
 
 The pagination batch size for requests. If it is zero or negative, the API default is used. The default is 200.
 
