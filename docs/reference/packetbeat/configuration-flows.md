@@ -33,7 +33,7 @@ Here’s an example of a flow information sent by Packetbeat. See [*Flow Event f
   "agent": {
     "hostname": "host.example.com",
     "name": "host.example.com",
-    "version": "{{stack-version}}"
+    "version": "{{version.stack}}"
   },
   "destination": {
     "bytes": 460,
