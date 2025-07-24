@@ -7,7 +7,7 @@ mapped_pages:
 
 You can use Metricbeat on Cloud Foundry to retrieve and ship metrics.
 
-% However, version {{stack-version}} of Metricbeat has not yet been released, no build is currently available for this version.
+% However, version {{version.stack}} of Metricbeat has not yet been released, no build is currently available for this version.
 
 ## Create Cloud Foundry credentials [_create_cloud_foundry_credentials]
 
@@ -31,11 +31,11 @@ You deploy Metricbeat as an application with no route.
 Cloud Foundry requires that 3 files exist inside of a directory to allow Metricbeat to be pushed. The commands below provide the basic steps for getting it up and running.
 
 ```sh subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{stack-version}}-linux-x86_64.tar.gz
-tar xzvf metricbeat-{{stack-version}}-linux-x86_64.tar.gz
-cd metricbeat-{{stack-version}}-linux-x86_64
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/cloudfoundry/metricbeat/metricbeat.yml
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/cloudfoundry/metricbeat/manifest.yml
+curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{version.stack}}-linux-x86_64.tar.gz
+tar xzvf metricbeat-{{version.stack}}-linux-x86_64.tar.gz
+cd metricbeat-{{version.stack}}-linux-x86_64
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.M }}/deploy/cloudfoundry/metricbeat/metricbeat.yml
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.M }}/deploy/cloudfoundry/metricbeat/manifest.yml
 ```
 
 You need to modify the `metricbeat.yml` file to set the `api_address`, `client_id` and `client_secret`.

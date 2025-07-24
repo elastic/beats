@@ -66,7 +66,7 @@ curl -XGET 'localhost:5066/?pretty'
   "hostname": "example.lan",
   "name": "example.lan",
   "uuid": "34f6c6e1-45a8-4b12-9125-11b3e6e89866",
-  "version": "{{stack-version}}"
+  "version": "{{version.stack}}"
 }
 ```
 
