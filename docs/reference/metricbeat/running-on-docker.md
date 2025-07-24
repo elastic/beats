@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/running-on-docker.html
+applies_to:
+  stack: ga
 ---
 
 # Run Metricbeat on Docker [running-on-docker]

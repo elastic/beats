@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/setup-repositories.html
+applies_to:
+  stack: ga
 ---
 
 # Repositories for APT and YUM [setup-repositories]
