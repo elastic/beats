@@ -87,7 +87,7 @@ func (s *Server) Stop() error {
 // matched in the order in which that are attached.
 func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
 	s.mux.Handle(route, h)
-	if !strings.HasSuffix(route, "/") {
+	if !strings.HasSuffix(route, "/") && !strings.HasSuffix(route, "{$}") {
 		// register /route/ handler
 		s.mux.Handle(route+"/{$}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// redirect /route/ to /route
