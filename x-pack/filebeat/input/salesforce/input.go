@@ -77,7 +77,7 @@ func (s *salesforceInput) Test(_ inputcursor.Source, _ v2.TestContext) error {
 // context cancellation or type invalidity errors, any other error will be retried.
 func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inputcursor.Cursor, pub inputcursor.Publisher) (err error) {
 
-	env.UpdateStatus(status.Starting, "Initializing Salesforce input.")
+	env.UpdateStatus(status.Starting, "Initializing Salesforce input")
 	st := &state{}
 	if !cursor.IsNew() {
 		if err = cursor.Unpack(&st); err != nil {
@@ -86,7 +86,7 @@ func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inp
 		}
 	}
 
-	env.UpdateStatus(status.Configuring, "Salesforce input configuring")
+	env.UpdateStatus(status.Configuring, "Configuring Salesforce input")
 	if err = s.Setup(env, src, st, pub); err != nil {
 		env.UpdateStatus(status.Failed, fmt.Sprintf("Failed to set up Salesforce input: %v", err))
 		return err
@@ -132,11 +132,16 @@ func (s *salesforceInput) Setup(env v2.Context, src inputcursor.Source, cursor *
 // or Object to collect events at defined intervals.
 func (s *salesforceInput) run(env v2.Context) error {
 	s.log.Info("Starting Salesforce input run")
+	defer func() {
+		env.UpdateStatus(status.Stopped, "Salesforce input stopped")
+	}()
 	if s.srcConfig.EventMonitoringMethod.EventLogFile.isEnabled() {
 		err := s.RunEventLogFile()
 		if err != nil {
 			env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running EventLogFile collection: %v", err))
 			s.log.Errorf("Problem running EventLogFile collection: %s", err)
+		} else {
+			s.log.Info("Initial EventLogFile collection completed successfully")
 		}
 	}
 
@@ -145,6 +150,8 @@ func (s *salesforceInput) run(env v2.Context) error {
 		if err != nil {
 			env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running Object collection: %v", err))
 			s.log.Errorf("Problem running Object collection: %s", err)
+		} else {
+			s.log.Info("Initial Object collection completed successfully")
 		}
 	}
 
@@ -167,12 +174,14 @@ func (s *salesforceInput) run(env v2.Context) error {
 		// another ticker making the channel ready.
 		select {
 		case <-s.ctx.Done():
+			env.UpdateStatus(status.Stopping, "Salesforce input stopping")
 			return s.isError(s.ctx.Err())
 		default:
 		}
 
 		select {
 		case <-s.ctx.Done():
+			env.UpdateStatus(status.Stopping, "Salesforce input stopping")
 			return s.isError(s.ctx.Err())
 		case <-eventLogFileTicker.C:
 			s.log.Info("Running EventLogFile collection")
@@ -189,7 +198,7 @@ func (s *salesforceInput) run(env v2.Context) error {
 				env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running Object collection: %v", err))
 				s.log.Errorf("Problem running Object collection: %s", err)
 			} else {
-				env.UpdateStatus(status.Running, "Object collection completed successfully.")
+				env.UpdateStatus(status.Running, "Object collection completed successfully")
 				s.log.Info("Object collection completed successfully")
 			}
 		}
