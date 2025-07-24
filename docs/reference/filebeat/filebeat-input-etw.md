@@ -142,6 +142,10 @@ Names an existing ETW session to read from. Existing sessions can be listed usin
 
 ### `enable_property` [_enable_property]
 
+```{applies_to}
+stack: ga 9.2.0
+```
+
 A list of ETW session properties to enable. These properties control advanced session behavior. See [EnableTraceEx2 documentation](https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-enabletraceex2) for details.
 
 Example:
@@ -157,6 +161,10 @@ filebeat.inputs:
 
 ### `buffer_size` [_buffer_size]
 
+```{applies_to}
+stack: ga 9.2.0
+```
+
 Sets the size (in KB) of each buffer used by the ETW session. Default is 64 KB. Larger buffers may improve performance for high-volume event sources.
 
 Example:
@@ -170,6 +178,10 @@ filebeat.inputs:
 
 ### `minimum_buffers` [_minimum_buffers]
 
+```{applies_to}
+stack: ga 9.2.0
+```
+
 Sets the minimum number of buffers allocated for the ETW session. Increasing this value can help prevent data loss under heavy load.
 
 Example:
@@ -182,6 +194,10 @@ filebeat.inputs:
 
 
 ### `maximum_buffers` [_maximum_buffers]
+
+```{applies_to}
+stack: ga 9.2.0
+```
 
 Sets the maximum number of buffers allocated for the ETW session. This limits memory usage for the session.
 
