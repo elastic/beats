@@ -88,38 +88,38 @@ This guide describes how to get started quickly with network packets analytics. 
 ::::::{tab-item} DEB
 :sync: deb
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-amd64.deb
-sudo dpkg -i packetbeat-{{stack-version}}-amd64.deb
+curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{version.stack}}-amd64.deb
+sudo dpkg -i packetbeat-{{version.stack}}-amd64.deb
 ```
 ::::::
 
 ::::::{tab-item} RPM
 :sync: rpm
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-x86_64.rpm
-sudo rpm -vi packetbeat-{{stack-version}}-x86_64.rpm
+curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{version.stack}}-x86_64.rpm
+sudo rpm -vi packetbeat-{{version.stack}}-x86_64.rpm
 ```
 ::::::
 
 ::::::{tab-item} MacOS
 :sync: macos
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-darwin-x86_64.tar.gz
-tar xzvf packetbeat-{{stack-version}}-darwin-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{version.stack}}-darwin-x86_64.tar.gz
+tar xzvf packetbeat-{{version.stack}}-darwin-x86_64.tar.gz
 ```
 ::::::
 
 ::::::{tab-item} Linux
 :sync: linux
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-linux-x86_64.tar.gz
-tar xzvf packetbeat-{{stack-version}}-linux-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{version.stack}}-linux-x86_64.tar.gz
+tar xzvf packetbeat-{{version.stack}}-linux-x86_64.tar.gz
 ```
 ::::::
 
 ::::::{tab-item} Windows
 :sync: windows
-1. Download the [Packetbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-windows-x86_64.zip).
+1. Download the [Packetbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{version.stack}}-windows-x86_64.zip).
 
 2. Extract the contents of the zip file into `C:\Program Files`.
 

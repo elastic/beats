@@ -48,38 +48,38 @@ To download and install Auditbeat, use the commands that work with your system:
 ::::::{tab-item} DEB
 :sync: deb
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{stack-version}}-amd64.deb
-sudo dpkg -i auditbeat-{{stack-version}}-amd64.deb
+curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{version.stack}}-amd64.deb
+sudo dpkg -i auditbeat-{{version.stack}}-amd64.deb
 ```
 ::::::
 
 ::::::{tab-item} RPM
 :sync: rpm
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{stack-version}}-x86_64.rpm
-sudo rpm -vi auditbeat-{{stack-version}}-x86_64.rpm
+curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{version.stack}}-x86_64.rpm
+sudo rpm -vi auditbeat-{{version.stack}}-x86_64.rpm
 ```
 ::::::
 
 ::::::{tab-item} MacOS
 :sync: macos
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{stack-version}}-darwin-x86_64.tar.gz
-tar xzvf auditbeat-{{stack-version}}-darwin-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{version.stack}}-darwin-x86_64.tar.gz
+tar xzvf auditbeat-{{version.stack}}-darwin-x86_64.tar.gz
 ```
 ::::::
 
 ::::::{tab-item} Linux
 :sync: linux
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{stack-version}}-linux-x86_64.tar.gz
-tar xzvf auditbeat-{{stack-version}}-linux-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{version.stack}}-linux-x86_64.tar.gz
+tar xzvf auditbeat-{{version.stack}}-linux-x86_64.tar.gz
 ```
 ::::::
 
 ::::::{tab-item} Windows
 :sync: windows
-1. Download the [Auditbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{stack-version}}-windows-x86_64.zip).
+1. Download the [Auditbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{version.stack}}-windows-x86_64.zip).
 
 2. Extract the contents of the zip file into `C:\Program Files`.
 
