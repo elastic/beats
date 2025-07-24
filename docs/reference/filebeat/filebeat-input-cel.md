@@ -2,14 +2,18 @@
 navigation_title: "CEL"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html
+sub:
+  mito_docs: https://pkg.go.dev/github.com/elastic/mito
+  mito_version: v1.22.0
+applies_to:
+  stack: ga 8.6.0
 ---
 
 # Common Expression Language input [filebeat-input-cel]
 
+Use the `cel` input to read messages from a file path or HTTP API with a variety of payloads using the [Common Expression Language (CEL)](https://opensource.google.com/projects/cel) and the [mito]({{mito_docs}}/lib) CEL extension libraries.
 
-Use the `cel` input to read messages from a file path or HTTP API with a variety of payloads using the [Common Expression Language (CEL)](https://opensource.google.com/projects/cel) and the [mito](https://pkg.go.dev/github.com/elastic/mito/lib) CEL extension libraries.
-
-CEL is a non-Turing complete language that can perform evaluation of expression in inputs, which can include file and API endpoints using the mito extension library. The `cel` input periodically runs a CEL program that is given an execution environment that may be configured by the user, and publishes the set of events that result from the program evaluation. Optionally the CEL program may return cursor states that will be provided to the next execution of the CEL program. The cursor states may be used to control the behaviour of the program.
+CEL is a non-Turing complete language that can perform evaluation of expression in inputs, which can include file and API endpoints using the mito extension library. The `cel` input periodically runs a CEL program that is given an execution environment that may be configured by the user, and publishes the set of events that result from the program evaluation. Optionally the CEL program may return cursor states that will be provided to the next execution of the CEL program. The cursor states may be used to control the behavior of the program.
 
 This input supports:
 
@@ -77,7 +81,7 @@ filebeat.inputs:
 
 ## Execution [_execution]
 
-The execution environment provided for the input includes includes the functions, macros, and global variables provided by the mito library. A single JSON object is provided as an input accessible through a `state` variable. `state` contains a string `url` field and may contain arbitrary other fields configured via the input’s `state` configuration. If the CEL program saves cursor states between executions of the program, the configured `state.cursor` value will be replaced by the saved cursor prior to execution.
+The execution environment provided for the input includes the functions, macros, and global variables provided by the mito library. A single JSON object is provided as an input accessible through a `state` variable. `state` contains a string `url` field and may contain arbitrary other fields configured via the input’s `state` configuration. If the CEL program saves cursor states between executions of the program, the configured `state.cursor` value will be replaced by the saved cursor prior to execution.
 
 On start the `state` is will be something like this:
 
@@ -117,7 +121,7 @@ After completion of a program’s execution it should return a single object wit
 
 1. The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements. The field should be an array, but in the case of an error condition in the CEL program it is acceptable to return a single object instead of an array; this will will be wrapped as an array for publication and an error will be logged. If the single object contains a key, "error", the error value will be used to update the status of the input to report to Elastic Agent. This can be used to more rapidly respond to API failures.
 2. If `cursor` is present it must be either be a single object or an array with the same length as events; each element *i* of the `cursor` will be the details for obtaining the events at and beyond event *i* in the `events` array. If the `cursor` is a single object it is will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array.
-3. If `rate_limit` is present it must be a map with numeric fields `rate` and `burst`. The `rate_limit` field may also have a string `error` field and other fields which will be logged. If it has an `error` field, the `rate` and `burst` will not be used to set rate limit behavior. The [Limit](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#Limit), and [Okta Rate Limit policy](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#OktaRateLimit) and [Draft Rate Limit policy](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#DraftRateLimit) documentation show how to construct this field.
+3. If `rate_limit` is present it must be a map with numeric fields `rate` and `burst`. The `rate_limit` field may also have a string `error` field and other fields which will be logged. If it has an `error` field, the `rate` and `burst` will not be used to set rate limit behavior. The [Limit]({{mito_docs}}@{{mito_version}}/lib#Limit), and [Okta Rate Limit policy]({{mito_docs}}@{{mito_version}}/lib#OktaRateLimit) and [Draft Rate Limit policy]({{mito_docs}}@{{mito_version}}/lib#DraftRateLimit) documentation show how to construct this field.
 4. The evaluation is repeated with the new state, after removing the events field, if the "want_more" field is present and true, and a non-zero events array is returned. If the "want_more" field is present after a failed evaluation, it is set to false.
 
 
@@ -133,124 +137,141 @@ The CEL input will log the complete state after evaluation when logging at the D
 
 As noted above the `cel` input provides functions, macros, and global variables to extend the language.
 
-* [AWS v4 request signing](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#AWS)
+* [AWS v4 request signing]({{mito_docs}}@{{mito_version}}/lib#AWS) {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
 
-    * [Sign AWS from env](https://pkg.go.dev/github.com/elastic/mito/lib#hdr-Sign_AWS_from_env-AWS)
-    * [Sign AWS from shared credentials](https://pkg.go.dev/github.com/elastic/mito/lib#hdr-Sign_AWS_from_shared_credentials-AWS)
-    * [Sign AWS from static credentials](https://pkg.go.dev/github.com/elastic/mito/lib#hdr-Sign_AWS_from_static_credentials-AWS)
+    * [Sign AWS from env]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_env-AWS)
+    * [Sign AWS from shared credentials]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_shared_credentials-AWS)
+    * [Sign AWS from static credentials]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_static_credentials-AWS)
 
-* [Collections](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#Collections)
+* [Collections]({{mito_docs}}@{{mito_version}}/lib#Collections) {applies_to}`stack: ga 8.6.0`
 
-    * [Collate](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Collate-Collections)
-    * [Drop](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Drop-Collections)
-    * [Drop Empty](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Drop_Empty-Collections)
-    * [Flatten](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Flatten-Collections)
-    * [Front](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Front-Collections)
-    * [Keys](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Keys-Collections)
-    * [Max](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Max-Collections)
-    * [Min](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Min-Collections)
-    * [Sum](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Sum-Collections)
-    * [Tail](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Tail-Collections)
-    * [Values](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Values-Collections)
-    * [With](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-With-Collections)
-    * [With Replace](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-With_Replace-Collections)
-    * [With Update](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-With_Update-Collections)
-    * [Zip](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Zip-Collections)
+    * [Collate]({{mito_docs}}@{{mito_version}}/lib#hdr-Collate-Collections)
+    * [Drop]({{mito_docs}}@{{mito_version}}/lib#hdr-Drop-Collections)
+    * [Drop Empty]({{mito_docs}}@{{mito_version}}/lib#hdr-Drop_Empty-Collections)
+    * [Flatten]({{mito_docs}}@{{mito_version}}/lib#hdr-Flatten-Collections)
+    * [Front]({{mito_docs}}@{{mito_version}}/lib#hdr-Front-Collections) {applies_to}`stack: ga 8.18.0`
+    * [Keys]({{mito_docs}}@{{mito_version}}/lib#hdr-Keys-Collections) {applies_to}`stack: ga 8.13.0`
+    * [Max]({{mito_docs}}@{{mito_version}}/lib#hdr-Max-Collections)
+        * list maximum
+        * pair maximum {applies_to}`stack: ga 8.18.0`
+    * [Min]({{mito_docs}}@{{mito_version}}/lib#hdr-Min-Collections)
+        * list minimum
+        * pair minimum {applies_to}`stack: ga 8.18.0`
+    * [Sum]({{mito_docs}}@{{mito_version}}/lib#hdr-Sum-Collections) {applies_to}`stack: ga 8.18.0`
+    * [Tail]({{mito_docs}}@{{mito_version}}/lib#hdr-Tail-Collections)
+        * one parameter {applies_to}`stack: ga 8.15.0`
+        * two parameter {applies_to}`stack: ga 8.18.0`
+    * [Values]({{mito_docs}}@{{mito_version}}/lib#hdr-Values-Collections) {applies_to}`stack: ga 8.13.0`
+    * [With]({{mito_docs}}@{{mito_version}}/lib#hdr-With-Collections)
+    * [With Replace]({{mito_docs}}@{{mito_version}}/lib#hdr-With_Replace-Collections)
+    * [With Update]({{mito_docs}}@{{mito_version}}/lib#hdr-With_Update-Collections)
+    * [Zip]({{mito_docs}}@{{mito_version}}/lib#hdr-Zip-Collections) {applies_to}`stack: ga 8.9.2`
 
-* [Crypto](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#Crypto)
+* [Crypto]({{mito_docs}}@{{mito_version}}/lib#Crypto) {applies_to}`stack: ga 8.6.0`
 
-    * [Base64](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Base64-Crypto)
-    * [Base64 Decode](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Base64_Decode-Crypto)
-    * [Base64 Raw](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Base64_Raw-Crypto)
-    * [Base64 Raw Decode](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Base64_Raw_Decode-Crypto)
-    * [Hex](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Hex-Crypto)
-    * [Hex Decode](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Hex_Decode-Crypto)
-    * [MD5](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-MD5-Crypto)
-    * [SHA-1](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-SHA_1-Crypto)
-    * [SHA-256](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-SHA_256-Crypto)
-    * [HMAC](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-HMAC-Crypto)
-    * [UUID](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-UUID-Crypto)
+    * [Base64]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64-Crypto)
+    * [Base64 Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Decode-Crypto) {applies_to}`stack: ga 8.14.0`
+    * [Base64 Raw]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Raw-Crypto)
+    * [Base64 Raw Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Raw_Decode-Crypto) {applies_to}`stack: ga 8.14.0`
+    * [Hex]({{mito_docs}}@{{mito_version}}/lib#hdr-Hex-Crypto)
+    * [Hex Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Hex_Decode-Crypto) {applies_to}`stack: ga 8.18.1`
+    * [MD5]({{mito_docs}}@{{mito_version}}/lib#hdr-MD5-Crypto)
+    * [SHA-1]({{mito_docs}}@{{mito_version}}/lib#hdr-SHA_1-Crypto)
+    * [SHA-256]({{mito_docs}}@{{mito_version}}/lib#hdr-SHA_256-Crypto)
+    * [HMAC]({{mito_docs}}@{{mito_version}}/lib#hdr-HMAC-Crypto)
+    * [UUID]({{mito_docs}}@{{mito_version}}/lib#hdr-UUID-Crypto)
 
-* [File](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#File) — the file extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#NDJSON), ["application/zip"](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#Zip), ["text/csv; header=absent"](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#CSVNoHeader), and ["text/csv; header=present"](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#CSVHeader).
+* [File]({{mito_docs}}@{{mito_version}}/lib#File) — the file extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader). {applies_to}`stack: ga 8.6.0`
 
-    * [Dir](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Dir-File)
-    * [File](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-File-File)
+    * [Dir]({{mito_docs}}@{{mito_version}}/lib#hdr-Dir-File)
+    * [File]({{mito_docs}}@{{mito_version}}/lib#hdr-File-File)
 
-* [HTTP](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#HTTP)
+* [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) {applies_to}`stack: ga 8.6.0`
 
-    * [HEAD](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-HEAD-HTTP)
-    * [GET](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-GET-HTTP)
-    * [GET Request](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-GET_Request-HTTP)
-    * [POST](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-POST-HTTP)
-    * [POST Request](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-POST_Request-HTTP)
-    * [Request](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Request-HTTP)
-    * [Basic Authentication](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Basic_Authentication-HTTP)
-    * [Do Request](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Do_Request-HTTP)
-    * [Parse URL](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Parse_URL-HTTP)
-    * [Format URL](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Format_URL-HTTP)
-    * [Parse Query](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Parse_Query-HTTP)
-    * [Format Query](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Format_Query-HTTP)
+    * [HEAD]({{mito_docs}}@{{mito_version}}/lib#hdr-HEAD-HTTP)
+    * [GET]({{mito_docs}}@{{mito_version}}/lib#hdr-GET-HTTP)
+    * [GET Request]({{mito_docs}}@{{mito_version}}/lib#hdr-GET_Request-HTTP)
+    * [POST]({{mito_docs}}@{{mito_version}}/lib#hdr-POST-HTTP)
+    * [POST Request]({{mito_docs}}@{{mito_version}}/lib#hdr-POST_Request-HTTP)
+    * [Request]({{mito_docs}}@{{mito_version}}/lib#hdr-Request-HTTP)
+    * [Basic Authentication]({{mito_docs}}@{{mito_version}}/lib#hdr-Basic_Authentication-HTTP) {applies_to}`stack: ga 8.7.0`
+    * [Do Request]({{mito_docs}}@{{mito_version}}/lib#hdr-Do_Request-HTTP)
+    * [Parse URL]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_URL-HTTP)
+    * [Format URL]({{mito_docs}}@{{mito_version}}/lib#hdr-Format_URL-HTTP)
+    * [Parse Query]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_Query-HTTP)
+    * [Format Query]({{mito_docs}}@{{mito_version}}/lib#hdr-Format_Query-HTTP)
 
-* [JSON](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#JSON)
+* [JSON]({{mito_docs}}@{{mito_version}}/lib#JSON) {applies_to}`stack: ga 8.6.0`
 
-    * [Encode JSON](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Encode_JSON-JSON)
-    * [Decode JSON](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Decode_JSON-JSON)
-    * [Decode JSON Stream](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Decode_JSON_Stream-JSON)
+    * [Encode JSON]({{mito_docs}}@{{mito_version}}/lib#hdr-Encode_JSON-JSON)
+    * [Decode JSON]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_JSON-JSON)
+    * [Decode JSON Stream]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_JSON_Stream-JSON)
 
-* [XML](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#XML) — the XML extension is initialized with XML schema definitions provided via the `xsd` configuration option.
+* [XML]({{mito_docs}}@{{mito_version}}/lib#XML) — the XML extension is initialized with XML schema definitions provided via the `xsd` configuration option.  {applies_to}`stack: ga 8.9.0`
 
-    * [Decode XML](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Decode_XML-XML)
+    * [Decode XML]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_XML-XML)
+        * Optional XSD definition in one-parameter form. {applies_to}`stack: ga 8.18.1`
 
-* [Limit](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#Limit) — the rate limit extension is initialized with [Okta (as "okta")](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#OktaRateLimit) and the [Draft Rate Limit (as "draft")](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#DraftRateLimit) policies.
+* [Limit]({{mito_docs}}@{{mito_version}}/lib#Limit) — the rate limit extension is initialized with [Okta (as "okta")]({{mito_docs}}@{{mito_version}}/lib#OktaRateLimit) and the [Draft Rate Limit (as "draft")]({{mito_docs}}@{{mito_version}}/lib#DraftRateLimit) policies. {applies_to}`stack: ga 8.6.0`
 
-    * [Rate Limit](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Rate_Limit-Limit)
+    * [Rate Limit]({{mito_docs}}@{{mito_version}}/lib#hdr-Rate_Limit-Limit)
 
-* [MIME](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#MIME) — the MIME extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#NDJSON), ["application/zip"](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#Zip), ["text/csv; header=absent"](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#CSVNoHeader), and ["text/csv; header=present"](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#CSVHeader).
+* [MIME]({{mito_docs}}@{{mito_version}}/lib#MIME) — the MIME extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader). {applies_to}`stack: ga 8.6.0`
 
-    * [MIME](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-MIME-MIME)
+    * [MIME]({{mito_docs}}@{{mito_version}}/lib#hdr-MIME-MIME)
 
-* [Regexp](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#Regexp) — the regular expression extension is initialized with the patterns specified in the user input configuration via the `regexp` field.
+* [Regexp]({{mito_docs}}@{{mito_version}}/lib#Regexp) — the regular expression extension is initialized with the patterns specified in the user input configuration via the `regexp` field. {applies_to}`stack: ga 8.6.0`
 
-    * [RE Match](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-RE_Match)
-    * [RE Find](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-RE_Find)
-    * [RE Find All](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-RE_Find_All)
-    * [RE Find Submatch](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-RE_Find_Submatch)
-    * [RE Find All Submatch](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-RE_Find_All_Submatch)
-    * [RE Replace All](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-RE_Replace_All)
+    * [RE Match]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Match)
+    * [RE Find]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Find)
+    * [RE Find All]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Find_All)
+    * [RE Find Submatch]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Find_Submatch)
+    * [RE Find All Submatch]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Find_All_Submatch)
+    * [RE Replace All]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Replace_All)
 
-* [Printf](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#Printf)
+* [Printf]({{mito_docs}}@{{mito_version}}/lib#Printf)
 
-    * [Sprintf](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Sprintf-Printf)
+    * [Sprintf]({{mito_docs}}@{{mito_version}}/lib#hdr-Sprintf-Printf)
 
-* [Strings](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#Strings)
+* [Strings]({{mito_docs}}@{{mito_version}}/lib#Strings) {applies_to}`stack: ga 8.7.0`
 
-    * [String Methods](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-String_Methods-Strings)
-    * [String List Methods](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-String_List_Methods-Strings)
-    * [Bytes Methods](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Bytes_Methods-Strings)
+    * [String Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-String_Methods-Strings)
+    * [String List Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-String_List_Methods-Strings)
+    * [Bytes Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-Bytes_Methods-Strings) {applies_to}`stack: ga 8.15.0`
 
-* [Time](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#Time)
+* [Time]({{mito_docs}}@{{mito_version}}/lib#Time) {applies_to}`stack: ga 8.6.0`
 
-    * [Format](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Format-Time)
-    * [Parse Time](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Parse_Time-Time)
-    * [Global Variables](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Global_Variables-Time)
+    * [Format]({{mito_docs}}@{{mito_version}}/lib#hdr-Format-Time)
+    * [Parse Time]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_Time-Time)
+    * [Round]({{mito_docs}}@{{mito_version}}/lib#hdr-Round-Time) {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
+    * [Global Variables]({{mito_docs}}@{{mito_version}}/lib#hdr-Global_Variables-Time)
+        * Support for [`DateOnly`](https://pkg.go.dev/time#DateOnly), [`DateTime`](https://pkg.go.dev/time#DateTime) and [`TimeOnly`](https://pkg.go.dev/time#TimeOnly) time formats. {applies_to}`stack: ga 8.15.0`
 
-* [Try](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#Try)
+* [Try]({{mito_docs}}@{{mito_version}}/lib#Try) {applies_to}`stack: ga 8.6.0`
 
-    * [Try](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Try-Try)
-    * [Is Error](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Is_Error-Try)
+    * [Try]({{mito_docs}}@{{mito_version}}/lib#hdr-Try-Try)
+    * [Is Error]({{mito_docs}}@{{mito_version}}/lib#hdr-Is_Error-Try)
 
-* [Debug](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#Debug) — the debug handler registers a logger with the name extension `cel_debug` and calls to the CEL `debug` function are emitted to that logger.
+* [Debug]({{mito_docs}}@{{mito_version}}/lib#Debug) — the debug handler registers a logger with the name extension `cel_debug` and calls to the CEL `debug` function are emitted to that logger. {applies_to}`stack: ga 8.10.3`
 
-    * [Debug](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#hdr-Debug)
+    * [Debug]({{mito_docs}}@{{mito_version}}/lib#hdr-Debug)
 
 
 In addition to the extensions provided in the packages listed above, a global variable `useragent` is also provided which gives the user CEL program access to the filebeat user-agent string. By default, this value is assigned to all requests' user-agent headers unless the CEL program has already set the user-agent header value. Programs wishing to not provide a user-agent, should set this header to the empty string, `""`.
 
 Host environment variables are made available via the global map `env`. Only environment variables that have been allow listed via the `allowed_environment` configuration list are visible to the CEL program.
 
-The CEL environment enables the [optional types](https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes) library using the version defined [here](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#OptionalTypesVersion) and the [two-variable comprehensions extensions](https://pkg.go.dev/github.com/google/cel-go/ext#TwoVarComprehensions) library using the version defined [here](https://pkg.go.dev/github.com/elastic/mito@v1.22.0/lib#TwoVarComprehensionVersion).
+The CEL environment enables the [optional types](https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#OptionalTypesVersion) and the [two-variable comprehensions extensions](https://pkg.go.dev/github.com/google/cel-go/ext#TwoVarComprehensions) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#TwoVarComprehensionVersion).
 
-Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2, or token authentication.
+* Optional types {applies_to}`stack: ga 8.12.0`
+* Two-variable comprehensions {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
+
+Additionally, it supports authentication via:
+
+* Basic Authentication
+* Digest Authentication {applies_to}`stack: ga 8.12.0`
+* OAuth2
+* token authentication {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
 
 Example configurations with authentication:
 
@@ -369,7 +390,11 @@ filebeat.inputs:
 ```
 
 
-## `allowed_environment` [environ-cel]
+### `allowed_environment` [environ-cel]
+
+```{applies_to}
+stack: ga 8.16.0
+```
 
 A list of host environment variable that will be made visible to the CEL execution environment. By default, no environment variables are visible.
 
@@ -410,6 +435,10 @@ filebeat.inputs:
 
 ### `xsd` [xsd-cel]
 
+```{applies_to}
+stack: ga 8.9.0
+```
+
 XML documents may require additional type information to enable correct parsing and ingestion. This information can be provided as an XML Schema Definitions (XSD) for XML documents using the `xsd` option. The key under which the XSD information is provided is accessed via the `decode_xml` CEL extension.
 
 ```yaml
@@ -429,6 +458,8 @@ filebeat.inputs:
                      <xs:element name="name" type="xs:string"/>
                      <xs:element name="company" type="xs:string"/>
 ```
+
+The `xsd` for an XML document structure may be omitted. {applies_to}`stack: ga 8.18.1`
 
 
 ### `auth.basic.enabled` [_auth_basic_enabled]
@@ -453,6 +484,10 @@ The password to use.
 
 ### `auth.digest.enabled` [_auth_digest_enabled]
 
+```{applies_to}
+stack: ga 8.12.0
+```
+
 When set to `false`, disables the digest auth configuration. Default: `true`.
 
 ::::{note}
@@ -463,15 +498,27 @@ digest auth settings are disabled if either `enabled` is set to `false` or the `
 
 ### `auth.digest.user` [_auth_digest_user]
 
+```{applies_to}
+stack: ga 8.12.0
+```
+
 The user to authenticate with.
 
 
 ### `auth.digest.password` [_auth_digest_password]
 
+```{applies_to}
+stack: ga 8.12.0
+```
+
 The password to use.
 
 
 ### `auth.digest.no_reuse` [_auth_digest_no_reuse]
+
+```{applies_to}
+stack: ga 8.12.0
+```
 
 When set to `true`, Digest Authentication challenges are not reused.
 
@@ -664,6 +711,10 @@ The API endpoint may be accessed via unix socket and Windows named pipes by addi
 
 ### `resource.headers` [_resource_headers]
 
+```{applies_to}
+stack: ga 8.18.1
+```
+
 Headers to be added to all requests. Headers are added before authentication headers, so any collision between headers in this configuration and authentication headers will result in the colliding headers here not being included in requests. Header values must be provided as an array.
 
 ```yaml
@@ -764,6 +815,10 @@ The maximum number of redirects to follow for a request. Default: `10`.
 
 ### `resource.max_body_size` [_resource_max_body_size]
 
+```{applies_to}
+stack: ga 8.18.1
+```
+
 The maximum size of a response body that will be accepted by the client if non-zero. Bodies that are too large will result in an error, "response body too big". Default: `0`.
 
 
@@ -781,12 +836,14 @@ The maximum burst size. Burst is the maximum number of resource requests that ca
 
 It is possible to log HTTP requests and responses in a CEL program to a local file-system for debugging configurations. This option is enabled by setting `resource.tracer.enabled` to true and setting the `resource.tracer.filename` value. Additional options are available to tune log rotation behavior. To delete existing logs, set `resource.tracer.enabled` to false without unsetting the filename option.
 
-Enabling this option compromises security and should only be used for debugging.
+Enabling this option compromises security and should only be used for debugging. {applies_to}`stack: ga 8.15.0`
 
 
 ### `resource.tracer.filename` [_resource_tracer_filename]
 
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. Setting `resource.tracer.filename` with `resource.tracer.enable` set to false will cause any existing trace logs matching the filename option to be deleted.
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+
+Setting `resource.tracer.filename` with `resource.tracer.enable` set to false will cause any existing trace logs matching the filename option to be deleted. {applies_to}`stack: ga 8.15.0`
 
 
 ### `resource.tracer.maxsize` [_resource_tracer_maxsize]
@@ -816,7 +873,11 @@ This determines whether rotated logs should be gzip compressed.
 
 ### `redact` [cel-state-redact]
 
-During debug level logging, the `state` object and the resulting evaluation result are included in logs. This may result in leaking of secrets. In order to prevent this, fields may be redacted or deleted from the logged `state`. The `redact` configuration allows users to configure this field redaction behaviour. For safety reasons if the `redact` configuration is missing a warning is logged.
+```{applies_to}
+stack: ga 8.7.0
+```
+
+During debug level logging, the `state` object and the resulting evaluation result are included in logs. This may result in leaking of secrets. In order to prevent this, fields may be redacted or deleted from the logged `state`. The `redact` configuration allows users to configure this field redaction behavior. For safety reasons if the `redact` configuration is missing a warning is logged.
 
 In the case of no-required redaction an empty `redact.fields` configuration should be used to silence the logged warning.
 
@@ -856,6 +917,10 @@ This specifies whether fields should be replaced with a `*` or deleted entirely 
 
 ### `failure_dump.enabled` [_failure_dump_enabled]
 
+```{applies_to}
+stack: ga 8.18.0
+```
+
 It is possible to log CEL program evaluation failures to a local file-system for debugging configurations. This option is enabled by setting `failure_dump.enabled` to true and setting the `failure_dump.filename` value. To delete existing failure dumps, set `failure_dump.enabled` to false without unsetting the filename option.
 
 Enabling this option compromises security and should only be used for debugging.
@@ -863,10 +928,18 @@ Enabling this option compromises security and should only be used for debugging.
 
 ### `failure_dump.filename` [_failure_dump_filename]
 
+```{applies_to}
+stack: ga 8.18.0
+```
+
 This specifies a directory path to write failure dumps to. If it is not empty and a CEL program evaluation fails, the complete set of states for the CEL program’s evaluation will be written as a JSON file, along with the error that was reported. This option should only be used when debugging a failure as it imposes a significant performance impact on the input and may potentially use large quantities of memory to hold the full set of states. If a failure dump is configured, it is recommended that data input sizes be reduced to avoid excessive memory consumption, and making dumps that are intractable to analysis. To delete existing failure dumps, set `failure_dump.enabled` to false without unsetting the filename option.
 
 
 ### `record_coverage` [cel-record-coverage]
+
+```{applies_to}
+stack: ga 8.18.0
+```
 
 This specifies that CEL code evaluation coverage should be recorded and logged in debug logs. This is a developer-only option.
 
