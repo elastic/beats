@@ -335,6 +335,7 @@ toc:
           - file: filebeat/migrate-to-filestream.md
           - file: filebeat/file-identity.md
           - file: filebeat/migrate-from-deprecated-module.md
+          - file: filebeat/delete-file-guide.md
       - file: filebeat/filebeat-modules.md
         children:
           - file: filebeat/filebeat-modules-overview.md
@@ -1166,6 +1167,7 @@ toc:
               - file: metricbeat/metricbeat-metricset-system-socket_summary.md
               - file: metricbeat/metricbeat-metricset-system-uptime.md
               - file: metricbeat/metricbeat-metricset-system-users.md
+              - file: metricbeat/metricbeat-metricset-system-ntp.md
           - file: metricbeat/metricbeat-module-tomcat.md
             children:
               - file: metricbeat/metricbeat-metricset-tomcat-cache.md

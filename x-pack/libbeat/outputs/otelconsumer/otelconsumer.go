@@ -58,7 +58,7 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		})
 	}
 
-	return outputs.Success(ocConfig.Queue, -1, 0, nil, clients...)
+	return outputs.Success(ocConfig.Queue, -1, 0, nil, beat.Logger, clients...)
 }
 
 // Close is a noop for otelconsumer

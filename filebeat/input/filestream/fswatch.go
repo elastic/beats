@@ -58,6 +58,9 @@ type fileWatcherConfig struct {
 	ResendOnModTime bool `config:"resend_on_touch"`
 	// Scanner is the configuration of the scanner.
 	Scanner fileScannerConfig `config:",inline"`
+	// SendNotChanged sends an event even when the file has not changed
+	// This setting is for internal use only
+	SendNotChanged bool `config:"-"`
 }
 
 // fileWatcher gets the list of files from a FSWatcher and creates events by
@@ -70,7 +73,7 @@ type fileWatcher struct {
 	events  chan loginp.FSEvent
 }
 
-func newFileWatcher(logger *logp.Logger, paths []string, ns *conf.Namespace) (loginp.FSWatcher, error) {
+func newFileWatcher(logger *logp.Logger, paths []string, ns *conf.Namespace, gzipAllowed bool, sendNotChanged bool) (loginp.FSWatcher, error) {
 	var config *conf.C
 	if ns == nil {
 		config = conf.NewConfig()
@@ -78,16 +81,18 @@ func newFileWatcher(logger *logp.Logger, paths []string, ns *conf.Namespace) (lo
 		config = ns.Config()
 	}
 
-	return newScannerWatcher(logger, paths, config)
+	return newScannerWatcher(logger, paths, config, gzipAllowed, sendNotChanged)
 }
 
-func newScannerWatcher(logger *logp.Logger, paths []string, c *conf.C) (loginp.FSWatcher, error) {
+func newScannerWatcher(logger *logp.Logger, paths []string, c *conf.C, gzipAllowed bool, sendNotChanged bool) (loginp.FSWatcher, error) {
 	config := defaultFileWatcherConfig()
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, err
 	}
-	scanner, err := newFileScanner(logger, paths, config.Scanner)
+
+	config.SendNotChanged = sendNotChanged
+	scanner, err := newFileScanner(logger, paths, config.Scanner, gzipAllowed)
 	if err != nil {
 		return nil, err
 	}
@@ -106,6 +111,7 @@ func defaultFileWatcherConfig() fileWatcherConfig {
 		Interval:        10 * time.Second,
 		ResendOnModTime: false,
 		Scanner:         defaultFileScannerConfig(),
+		SendNotChanged:  false,
 	}
 }
 
@@ -167,6 +173,13 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		case prevDesc.Info.Size() < fd.Info.Size():
 			e = writeEvent(path, fd)
 			writtenCount++
+
+		default:
+			// For the delete feature we need to run the harvester for
+			// files that have not changed until they're deleted.
+			if w.cfg.SendNotChanged {
+				e = notChangedEvent(path, fd)
+			}
 		}
 
 		// if none of the conditions were true, the file remained unchanged and we don't need to create an event
@@ -252,6 +265,10 @@ func deleteEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
 	return loginp.FSEvent{Op: loginp.OpDelete, OldPath: path, NewPath: "", Descriptor: fd}
 }
 
+func notChangedEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpNotChanged, OldPath: path, NewPath: path, Descriptor: fd}
+}
+
 func (w *fileWatcher) Event() loginp.FSEvent {
 	return <-w.events
 }
@@ -289,19 +306,21 @@ func defaultFileScannerConfig() fileScannerConfig {
 // fileScanner looks for files which match the patterns in paths.
 // It is able to exclude files and symlinks.
 type fileScanner struct {
-	paths      []string
-	cfg        fileScannerConfig
-	log        *logp.Logger
-	hasher     hash.Hash
-	readBuffer []byte
+	paths       []string
+	cfg         fileScannerConfig
+	log         *logp.Logger
+	hasher      hash.Hash
+	readBuffer  []byte
+	gzipAllowed bool
 }
 
-func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig) (*fileScanner, error) {
+func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, gzipAllowed bool) (*fileScanner, error) {
 	s := fileScanner{
-		paths:  paths,
-		cfg:    config,
-		log:    logger.Named(scannerDebugKey),
-		hasher: sha256.New(),
+		paths:       paths,
+		cfg:         config,
+		log:         logger.Named(scannerDebugKey),
+		hasher:      sha256.New(),
+		gzipAllowed: gzipAllowed,
 	}
 
 	if s.cfg.Fingerprint.Enabled {
@@ -497,40 +516,80 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 
 	fd.Filename = it.filename
 	fd.Info = it.info
+	var osFile *os.File
+	var file File
 
-	if s.cfg.Fingerprint.Enabled {
-		fileSize := it.info.Size()
-		// we should not open the file if we know it's too small
-		minSize := s.cfg.Fingerprint.Offset + s.cfg.Fingerprint.Length
-		if fileSize < minSize {
-			return fd, fmt.Errorf("filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w", fd.Filename, fileSize, minSize, errFileTooSmall)
-		}
+	if !s.cfg.Fingerprint.Enabled {
+		return fd, nil
+	}
+	minSize := s.cfg.Fingerprint.Offset + s.cfg.Fingerprint.Length
 
-		file, err := os.Open(it.originalFilename)
+	osFile, err = os.Open(it.originalFilename)
+	if err != nil {
+		return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+	}
+	defer osFile.Close()
+
+	if s.gzipAllowed {
+		fd.GZIP, err = IsGZIP(osFile)
 		if err != nil {
-			return fd, fmt.Errorf("failed to open %q for fingerprinting: %w", it.originalFilename, err)
+			return fd, fmt.Errorf("failed to check if %q is gzip: %w",
+				it.originalFilename, err)
+		}
+	}
+
+	// Check there is enough data
+	var dataSize int64
+	if fd.GZIP {
+		// Check if there is enough *decompressed* data for fingerprint
+		file, err = newGzipSeekerReader(osFile, int(minSize))
+		if err != nil {
+			return fd, fmt.Errorf("failed to create gzip seeker: %w", err)
 		}
 		defer file.Close()
 
-		if s.cfg.Fingerprint.Offset != 0 {
-			_, err = file.Seek(s.cfg.Fingerprint.Offset, io.SeekStart)
-			if err != nil {
-				return fd, fmt.Errorf("failed to seek %q for fingerprinting: %w", fd.Filename, err)
-			}
+		dataSize, err = file.Seek(minSize, io.SeekStart)
+		if errors.Is(err, io.EOF) {
+			return fd, fmt.Errorf(
+				"filesize is %d bytes, expected at least %d bytes for fingerprinting: %w",
+				dataSize, minSize, errFileTooSmall)
 		}
-
-		s.hasher.Reset()
-		lr := io.LimitReader(file, s.cfg.Fingerprint.Length)
-		written, err := io.CopyBuffer(s.hasher, lr, s.readBuffer)
+		// all good, reset the offset
+		_, err = file.Seek(0, io.SeekStart)
 		if err != nil {
-			return fd, fmt.Errorf("failed to compute hash for first %d bytes of %q: %w", s.cfg.Fingerprint.Length, fd.Filename, err)
+			return fd, fmt.Errorf("failed to reset gzip offset: %w", err)
 		}
-		if written != s.cfg.Fingerprint.Length {
-			return fd, fmt.Errorf("failed to read %d bytes from %q to compute fingerprint, read only %d", written, fd.Filename, s.cfg.Fingerprint.Length)
+	} else {
+		dataSize = it.info.Size()
+		if dataSize < minSize {
+			return fd, fmt.Errorf(
+				"filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w",
+				fd.Filename, dataSize, minSize, errFileTooSmall)
 		}
 
-		fd.Fingerprint = hex.EncodeToString(s.hasher.Sum(nil))
+		// there is enough data wrap it on File
+		file = newPlainFile(osFile)
 	}
+
+	// calculate fingerprint
+	if s.cfg.Fingerprint.Offset != 0 {
+		_, err = file.Seek(s.cfg.Fingerprint.Offset, io.SeekStart)
+		if err != nil {
+			return fd, fmt.Errorf("failed to seek %q for fingerprinting: %w", fd.Filename, err)
+		}
+	}
+
+	s.hasher.Reset()
+	lr := io.LimitReader(file, s.cfg.Fingerprint.Length)
+	written, err := io.CopyBuffer(s.hasher, lr, s.readBuffer)
+	if err != nil {
+		return fd, fmt.Errorf("failed to compute hash for first %d bytes of %q: %w", s.cfg.Fingerprint.Length, fd.Filename, err)
+	}
+	if written != s.cfg.Fingerprint.Length {
+		return fd, fmt.Errorf("failed to read %d bytes from %q to compute fingerprint, read only %d", written, fd.Filename, s.cfg.Fingerprint.Length)
+	}
+
+	fd.Fingerprint = hex.EncodeToString(s.hasher.Sum(nil))
 
 	return fd, nil
 }

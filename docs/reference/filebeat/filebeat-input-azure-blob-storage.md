@@ -131,7 +131,8 @@ $$$supported-attributes$$$
 12. [file_selectors](#attrib-file_selectors)
 13. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
 14. [timestamp_epoch](#attrib-timestamp_epoch)
-15. [custom_properties](#attrib-custom-properties)
+15. [path_prefix](#attrib-path_prefix)
+16. [custom_properties](#attrib-custom-properties)
 
 ## `account_name` [attrib-account-name]
 
@@ -338,6 +339,26 @@ filebeat.inputs:
 
 The Azure Blob Storage APIs don’t provide a direct way to filter files based on timestamp, so the input will download all the files and then filter them based on the timestamp. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available.
 
+## `path_prefix` [attrib-path_prefix]
+
+This attribute can be used to filter out files or blobs that have a prefix string that is different from the specified value. This allows you to efficiently retrieve a subset of blobs that are organized in a virtual folder-like structure. This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority over the root level values if both are specified.
+
+### Example configuration
+
+```yaml
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  containers:
+  - name: container_1
+    path_prefix: "cloudTrail/"
+```
+
+The example configuration above will fetch blobs present in specified container from the virtual `cloudTrail` directory. This operation occurs via the SDK in the blob-storage server so the impact on memory is negligible.
+
 ## Custom properties [attrib-custom-properties]
 
 Some blob properties can be `set` or `overridden` at the input level with the help of certain configuration options. Allowing users to set or override custom blob properties provides more flexibility when reading blobs from a remote storage where the user might only have read access.
@@ -478,6 +499,10 @@ filebeat.inputs:
 **Explanation :** In this configuration even though we have specified `max_workers = 10`, `poll = true` and `poll_interval = 15s` at the root level, both the containers will override these values with their own respective values which are defined as part of their sub attibutes.
 
 ## Metrics [_metrics]
+```{applies_to}
+  stack: ga 9.0.4
+```
+
 This input exposes metrics under the [HTTP monitoring endpoint](/reference/filebeat/http-endpoint.md).
 These metrics are exposed under the `/inputs` path. They can be used to
 observe the activity of the input.

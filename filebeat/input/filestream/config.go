@@ -26,6 +26,7 @@ import (
 	"github.com/dustin/go-humanize"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
@@ -43,6 +44,11 @@ type config struct {
 	FileWatcher  *conf.Namespace `config:"prospector"`
 	FileIdentity *conf.Namespace `config:"file_identity"`
 
+	// GZIPExperimental enables tech-preview support for ingesting GZIP files.
+	// When set to true the input will transparently stream-decompress GZIP files.
+	// This feature is experimental and subject to change.
+	GZIPExperimental bool `config:"gzip_experimental"`
+
 	// -1 means that registry will never be cleaned
 	CleanInactive  time.Duration      `config:"clean_inactive" validate:"min=-1"`
 	CleanRemoved   bool               `config:"clean_removed"`
@@ -50,6 +56,7 @@ type config struct {
 	IgnoreOlder    time.Duration      `config:"ignore_older"`
 	IgnoreInactive ignoreInactiveType `config:"ignore_inactive"`
 	Rotation       *conf.Namespace    `config:"rotation"`
+	Delete         deleterConfig      `config:"delete"`
 
 	// TakeOver is also independently parsed by InputManager.Create
 	// (see internal/input-logfile/manager.go).
@@ -57,6 +64,15 @@ type config struct {
 	// AllowIDDuplication is used by InputManager.Create
 	// (see internal/input-logfile/manager.go).
 	AllowIDDuplication bool `config:"allow_deprecated_id_duplication"`
+}
+
+type deleterConfig struct {
+	Enabled     bool          `config:"enabled"`
+	GracePeriod time.Duration `config:"grace_period"`
+
+	// configurable for testing
+	retries      int           `config:"-"`
+	retryBackoff time.Duration `config:"-"`
 }
 
 type closerConfig struct {
@@ -114,6 +130,7 @@ func defaultConfig() config {
 		CleanRemoved:   true,
 		HarvesterLimit: 0,
 		IgnoreOlder:    0,
+		Delete:         defaultDeleterConfig(),
 	}
 }
 
@@ -145,16 +162,17 @@ func defaultReaderConfig() readerConfig {
 	}
 }
 
+func defaultDeleterConfig() deleterConfig {
+	return deleterConfig{
+		GracePeriod:  30 * time.Minute,
+		retries:      5,
+		retryBackoff: 2 * time.Second,
+	}
+}
+
 func (c *config) Validate() error {
 	if len(c.Paths) == 0 {
 		return fmt.Errorf("no path is configured")
-	}
-
-	if c.AllowIDDuplication {
-		logp.L().Named("input.filestream").Warn(
-			"setting `allow_deprecated_id_duplication` will lead to data " +
-				"duplication and incomplete input metrics, it's use is " +
-				"highly discouraged.")
 	}
 
 	if c.AllowIDDuplication && c.TakeOver.Enabled {
@@ -162,11 +180,32 @@ func (c *config) Validate() error {
 			"cannot be enabled at the same time")
 	}
 
+	if c.GZIPExperimental {
+		// Validate file_identity must be fingerprint when gzip support is enabled.
+		if c.FileIdentity != nil && c.FileIdentity.Name() != fingerprintName {
+			return fmt.Errorf(
+				"gzip_experimental=true requires file_identity to be 'fingerprint'")
+		}
+
+		cfgwarn.Experimental(
+			"filestream: experimental gzip support enabled")
+	}
+
 	if c.ID == "" && c.TakeOver.Enabled {
 		return errors.New("'take_over' mode is only allowed if an input ID is set")
 	}
 
 	return nil
+}
+
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+func (c config) checkUnsupportedParams(logger *logp.Logger) {
+	if c.AllowIDDuplication {
+		logger.Named("input.filestream").Warn(
+			"setting `allow_deprecated_id_duplication` will lead to data " +
+				"duplication and incomplete input metrics, it's use is " +
+				"highly discouraged.")
+	}
 }
 
 // ValidateInputIDs checks all filestream inputs to ensure all input IDs are
