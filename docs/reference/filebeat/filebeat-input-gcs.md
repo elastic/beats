@@ -48,12 +48,12 @@ filebeat.inputs:
     poll_interval: 10s
 ```
 
-**Explanation :** This `configuration` given above describes a basic gcs config having two buckets named `gcs-test-new` and `gcs-test-old`. Each of these buckets have their own attributes such as `name`, `batch_size`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes-gcs). For now lets try to understand how this config works.
+**Explanation :** This `configuration` given above describes a basic gcs config having two buckets named `gcs-test-new` and `gcs-test-old`. Each of these buckets have their own attributes such as `name`, `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes-gcs). For now lets try to understand how this config works.
 
 For google cloud storage input to identify the files it needs to read and process, it will require the bucket names to be specified. We can have as many buckets as we deem fit. We are also able to configure the attributes `max_workers`, `poll` and `poll_interval` at the root level, which will then be applied to all buckets which do not specify any of these attributes explicitly.
 
 ::::{note}
-If the attributes `batch_size`, `max_workers`, `poll` and `poll_interval` are specified at the root level, these can still be overridden at the bucket level with different values, thus offering extensive flexibility and customization. Examples [below](#bucket-overrides) show this behavior.
+If the attributes `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval` are specified at the root level, these can still be overridden at the bucket level with different values, thus offering extensive flexibility and customization. Examples [below](#bucket-overrides) show this behavior.
 ::::
 
 
@@ -147,7 +147,7 @@ $$$supported-attributes-gcs$$$
 3. [auth.credentials_file.path](#attrib-auth-credentials-file)
 4. [buckets](#attrib-buckets)
 5. [name](#attrib-bucket-name)
-6. [batch_size](#attrib-batch_size-gcs)
+6. [batch_size](#attrib-batch_size-gcs) {applies_to}`stack: ga 9.1.0`
 7. [max_workers](#attrib-max_workers-gcs)
 8. [poll](#attrib-poll-gcs)
 9. [poll_interval](#attrib-poll_interval-gcs)
@@ -189,8 +189,11 @@ This attribute contains the details about a specific bucket like `name`, `max_wo
 This is a specific subfield of a bucket. It specifies the bucket name.
 
 ### `batch_size` [attrib-batch_size-gcs]
+```{applies_to}
+  stack: ga 9.1
+```
 
-This attribute specifies the `page size` for the response. In earlier versions, this value was derived from `max_workers`, but with the latest update, `batch_size` is now an independent setting. For backward compatibility, if `batch_size` is not explicitly defined, it will default to a value based on `max_workers`. This attribute can be configured at both the root and bucket levels. When defined at both levels, the bucket-level setting takes precedence.
+This attribute specifies the `page size` for the response. In earlier versions, this value was derived from `max_workers`, but with the latest update, `batch_size` {applies_to}`stack: ga 9.1.0` is now an independent setting. For backward compatibility, if `batch_size` is not explicitly defined, it will default to a value based on `max_workers`. This attribute can be configured at both the root and bucket levels. When defined at both levels, the bucket-level setting takes precedence.
 
 ### `max_workers` [attrib-max_workers-gcs]
 
