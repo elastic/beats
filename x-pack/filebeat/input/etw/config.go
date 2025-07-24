@@ -51,7 +51,11 @@ type config struct {
 	MatchAllKeyword uint64 `config:"match_all_keyword"`
 	// Session is the name of an existing session to read from.
 	// Run 'logman query -ets' to list existing sessions.
-	Session string `config:"session"`
+	Session        string   `config:"session"`
+	EnableProperty []string `config:"enable_property"`
+	BufferSize     uint32   `config:"buffer_size"`
+	MinimumBuffers uint32   `config:"minimum_buffers"`
+	MaximumBuffers uint32   `config:"maximum_buffers"`
 }
 
 func convertConfig(cfg config) etw.Config {
@@ -64,6 +68,10 @@ func convertConfig(cfg config) etw.Config {
 		MatchAnyKeyword: cfg.MatchAnyKeyword,
 		MatchAllKeyword: cfg.MatchAllKeyword,
 		Session:         cfg.Session,
+		EnableProperty:  cfg.EnableProperty,
+		BufferSize:      cfg.BufferSize,
+		MinimumBuffers:  cfg.MinimumBuffers,
+		MaximumBuffers:  cfg.MaximumBuffers,
 	}
 }
 
@@ -71,6 +79,7 @@ func defaultConfig() config {
 	return config{
 		TraceLevel:      "verbose",
 		MatchAnyKeyword: 0xffffffffffffffff,
+		BufferSize:      64,
 	}
 }
 

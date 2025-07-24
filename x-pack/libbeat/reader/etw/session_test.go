@@ -133,7 +133,7 @@ func TestNewSessionProperties(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			props := newSessionProperties(tc.sessionName)
+			props := newSessionProperties(tc.sessionName, Config{})
 
 			assert.Equal(t, tc.expectedSize, props.Wnode.BufferSize, "BufferSize should match expected value")
 			assert.Equal(t, windows.GUID{}, props.Wnode.Guid, "GUID should be empty")
