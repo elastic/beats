@@ -12,7 +12,7 @@ Running {{ecloud}} on Kubernetes? See [Run {{beats}} on ECK](docs-content://depl
 ::::
 
 
-% However, version {{stack-version}} of Auditbeat has not yet been released, so no Docker image is currently available for this version.
+% However, version {{version.stack}} of Auditbeat has not yet been released, so no Docker image is currently available for this version.
 
 
 ## Kubernetes deploy manifests for Auditbeat [_kubernetes_deploy_manifests]
@@ -24,7 +24,7 @@ Everything is deployed under `kube-system` namespace, you can change that by upd
 To get the manifests just run:
 
 ```sh subs=true
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/kubernetes/auditbeat-kubernetes.yaml
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.M }}/deploy/kubernetes/auditbeat-kubernetes.yaml
 ```
 
 ::::{warning}
