@@ -499,6 +499,10 @@ filebeat.inputs:
 **Explanation :** In this configuration even though we have specified `max_workers = 10`, `poll = true` and `poll_interval = 15s` at the root level, both the containers will override these values with their own respective values which are defined as part of their sub attibutes.
 
 ## Metrics [_metrics]
+```{applies_to}
+  stack: ga 9.0.4
+```
+
 This input exposes metrics under the [HTTP monitoring endpoint](/reference/filebeat/http-endpoint.md).
 These metrics are exposed under the `/inputs` path. They can be used to
 observe the activity of the input.
