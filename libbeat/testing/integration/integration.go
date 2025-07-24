@@ -26,6 +26,8 @@ import (
 	"regexp"
 	"sync"
 	"testing"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -74,13 +76,12 @@ type BeatTest interface {
 	// ExpectJSONFields registers an output watch for the given key-value pair.
 	//
 	// It is useful when expecting key-value pair to exist in the output document/ JSON structured logs
-	// Use "." notation to chain nested keys. For example: fields.hello.world: new
 	//
 	// For `AND` behavior use this function multiple times.
 	//
 	// This function should be used before `Start` because it's
 	// inspecting only the new output lines.
-	ExpectJSONFields(map[string]any) BeatTest
+	ExpectJSONFields(mapstr.M) BeatTest
 
 	// ExpectOutputRegex registers an output watch for the given regular expression..
 	//
@@ -255,7 +256,7 @@ func (b *beatTest) ExpectOutput(lines ...string) BeatTest {
 }
 
 // ExpectOutput implements the BeatTest interface.
-func (b *beatTest) ExpectJSONFields(fields map[string]interface{}) BeatTest {
+func (b *beatTest) ExpectJSONFields(fields mapstr.M) BeatTest {
 	b.mtx.Lock()
 	defer b.mtx.Unlock()
 

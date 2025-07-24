@@ -48,7 +48,7 @@ output.file:
   filename: "output-file"
 `
 
-// Checks that if a line does not have a line ending then is is not read yet.
+// Checks that if a line does not have a line ending, then it is not read3.
 // Checks that if a file is renamed, its contents are not re-ingested
 func TestCrawler(t *testing.T) {
 	filebeat := integration.NewBeat(

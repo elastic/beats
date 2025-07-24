@@ -193,7 +193,7 @@ func (w *metaWatcher) String() string {
 // NewJSONWatcher watches for existence of certain key-value pair in a JSON document
 func NewJSONWatcher(fields mapstr.M) OutputWatcher {
 	return &jsonWatcher{
-		fields: fields,
+		fields: fields.Flatten(),
 	}
 }
 
@@ -213,10 +213,8 @@ func (w *jsonWatcher) Inspect(line string) {
 		return
 	}
 
-	outputDoc = outputDoc.Flatten()
-
 	for key, value := range w.fields {
-		if v, ok := outputDoc[key]; ok {
+		if v, err := outputDoc.GetValue(key); err != nil {
 			switch v.(type) {
 			case int, string, float64:
 				if v != value {
