@@ -23,9 +23,8 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"sync"
-
-	"github.com/gorilla/mux"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -35,7 +34,7 @@ import (
 // and will answer all the routes defined in the received ServeMux.
 type Server struct {
 	log    *logp.Logger
-	mux    *mux.Router
+	mux    *http.ServeMux
 	l      net.Listener
 	config Config
 	wg     sync.WaitGroup
@@ -55,7 +54,7 @@ func New(log *logp.Logger, config *config.C) (*Server, error) {
 	}
 
 	return &Server{
-		mux:    mux.NewRouter().StrictSlash(true),
+		mux:    http.NewServeMux(),
 		l:      l,
 		config: cfg,
 		log:    log.Named("api"),
@@ -87,15 +86,20 @@ func (s *Server) Stop() error {
 // AttachHandler will attach a handler at the specified route. Routes are
 // matched in the order in which that are attached.
 func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
-	if err := s.mux.Handle(route, h).GetError(); err != nil {
-		return err
+	s.mux.Handle(route, h)
+	if !strings.HasSuffix(route, "/") {
+		// register /route/ handler
+		s.mux.Handle(route+"/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// redirect /route/ to /route
+			http.Redirect(w, r, strings.TrimSuffix(r.URL.String(), "/"), http.StatusMovedPermanently)
+		}))
 	}
 	s.log.Debugf("Attached handler at %q to server.", route)
 	return nil
 }
 
 // Router returns the mux.Router that handles all request to the server.
-func (s *Server) Router() *mux.Router {
+func (s *Server) Router() *http.ServeMux {
 	return s.mux
 }
 
