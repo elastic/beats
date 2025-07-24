@@ -40,7 +40,7 @@ Every event sent to {{ls}} contains the following metadata fields that you can u
     ...
     "@metadata": { <1>
       "beat": "filebeat", <2>
-      "version": "{{stack-version}}" <3>
+      "version": "{{version.stack}}" <3>
     }
 }
 ```

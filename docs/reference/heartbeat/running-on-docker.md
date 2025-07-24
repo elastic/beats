@@ -16,12 +16,12 @@ These images are free to use under the Elastic license. They contain open source
 Obtaining Heartbeat for Docker is as simple as issuing a `docker pull` command against the Elastic Docker registry.
 
 % ::::{warning} subs=true
-% Version {{stack-version}} of Heartbeat has not yet been released. No Docker image is currently available for Heartbeat {{stack-version}}.
+% Version {{version.stack}} of Heartbeat has not yet been released. No Docker image is currently available for Heartbeat {{version.stack}}.
 % ::::
 
 
 ```sh subs=true
-docker pull docker.elastic.co/beats/heartbeat:{{stack-version}}
+docker pull docker.elastic.co/beats/heartbeat:{{version.stack}}
 ```
 
 Alternatively, you can download other Docker images that contain only features available under the Apache 2.0 license. To download the images, go to [www.docker.elastic.co](https://www.docker.elastic.co).
@@ -29,7 +29,7 @@ Alternatively, you can download other Docker images that contain only features a
 As another option, you can use the hardened [Wolfi](https://wolfi.dev/) image. Using Wolfi images requires Docker version 20.10.10 or higher. For details about why the Wolfi images have been introduced, refer to our article [Reducing CVEs in Elastic container images](https://www.elastic.co/blog/reducing-cves-in-elastic-container-images).
 
 ```bash subs=true
-docker pull docker.elastic.co/beats/heartbeat-wolfi:{{stack-version}}
+docker pull docker.elastic.co/beats/heartbeat-wolfi:{{version.stack}}
 ```
 
 
@@ -38,19 +38,19 @@ docker pull docker.elastic.co/beats/heartbeat-wolfi:{{stack-version}}
 You can use the [Cosign application](https://docs.sigstore.dev/cosign/installation/) to verify the Heartbeat Docker image signature.
 
 % ::::{warning} subs=true
-% Version {{stack-version}} of Heartbeat has not yet been released. No Docker image is currently available for Heartbeat {{stack-version}}.
+% Version {{version.stack}} of Heartbeat has not yet been released. No Docker image is currently available for Heartbeat {{version.stack}}.
 % ::::
 
 
 ```sh subs=true
 wget https://artifacts.elastic.co/cosign.pub
-cosign verify --key cosign.pub docker.elastic.co/beats/heartbeat:{{stack-version}}
+cosign verify --key cosign.pub docker.elastic.co/beats/heartbeat:{{version.stack}}
 ```
 
 The `cosign` command prints the check results and the signature payload in JSON format:
 
 ```sh subs=true
-Verification for docker.elastic.co/beats/heartbeat:{{stack-version}} --
+Verification for docker.elastic.co/beats/heartbeat:{{version.stack}} --
 The following checks were performed on each of these signatures:
   - The cosign claims were validated
   - Existence of the claims in the transparency log was verified offline
@@ -70,7 +70,7 @@ Running Heartbeat with the setup command will create the index pattern and load 
 ```sh subs=true
 docker run --rm \
 --cap-add=NET_RAW \
-docker.elastic.co/beats/heartbeat:{{stack-version}} \
+docker.elastic.co/beats/heartbeat:{{version.stack}} \
 setup -E setup.kibana.host=kibana:5601 \
 -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
 ```
@@ -95,7 +95,7 @@ For example:
 docker run --rm \
   --mount type=bind,source=$(pwd)/data,destination=/usr/share/heartbeat/data \
   --read-only \
-  docker.elastic.co/beats/heartbeat:{{stack-version}}
+  docker.elastic.co/beats/heartbeat:{{version.stack}}
 ```
 
 
@@ -108,7 +108,7 @@ The Docker image provides several methods for configuring Heartbeat. The convent
 Download this example configuration file as a starting point:
 
 ```sh subs=true
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/docker/heartbeat.docker.yml
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.M }}/deploy/docker/heartbeat.docker.yml
 ```
 
 
@@ -122,7 +122,7 @@ docker run -d \
   --user=heartbeat \
   --volume="$(pwd)/heartbeat.docker.yml:/usr/share/heartbeat/heartbeat.yml:ro" \
   --cap-add=NET_RAW \
-  docker.elastic.co/beats/heartbeat:{{stack-version}} \
+  docker.elastic.co/beats/heartbeat:{{version.stack}} \
   --strict.perms=false -e \
   -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
 ```
@@ -142,7 +142,7 @@ The `heartbeat.docker.yml` downloaded earlier should be customized for your envi
 It’s possible to embed your Heartbeat configuration in a custom image. Here is an example Dockerfile to achieve this:
 
 ```dockerfile subs=true
-FROM docker.elastic.co/beats/heartbeat:{{stack-version}}
+FROM docker.elastic.co/beats/heartbeat:{{version.stack}}
 COPY --chown=root:heartbeat heartbeat.yml /usr/share/heartbeat/heartbeat.yml
 ```
 
@@ -152,7 +152,7 @@ COPY --chown=root:heartbeat heartbeat.yml /usr/share/heartbeat/heartbeat.yml
 Under Docker, Heartbeat runs as a non-root user, but requires some privileged network capabilities to operate correctly. Ensure that the `NET_RAW` capability is available to the container.
 
 ```sh subs=true
-docker run --cap-add=NET_RAW docker.elastic.co/beats/heartbeat:{{stack-version}}
+docker run --cap-add=NET_RAW docker.elastic.co/beats/heartbeat:{{version.stack}}
 ```
 
 

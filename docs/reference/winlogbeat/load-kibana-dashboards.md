@@ -44,7 +44,7 @@ winlogbeat setup --dashboards
 
 ::::::{tab-item} Docker
 ```sh subs=true
-docker run --rm --net="host" docker.elastic.co/beats/winlogbeat:{{stack-version}} setup --dashboards
+docker run --rm --net="host" docker.elastic.co/beats/winlogbeat:{{version.stack}} setup --dashboards
 ```
 ::::::
 
@@ -120,7 +120,7 @@ winlogbeat setup -e \
 
 ::::::{tab-item} Docker
 ```sh subs=true
-docker run --rm --net="host" docker.elastic.co/beats/winlogbeat:{{stack-version}} setup -e \
+docker run --rm --net="host" docker.elastic.co/beats/winlogbeat:{{version.stack}} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=winlogbeat_internal \
