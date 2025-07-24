@@ -2,6 +2,8 @@
 navigation_title: "Command reference"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/command-line-options.html
+applies_to:
+  stack: ga
 ---
 
 # Packetbeat command reference [command-line-options]

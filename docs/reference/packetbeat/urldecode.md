@@ -2,6 +2,8 @@
 navigation_title: "urldecode"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/urldecode.html
+applies_to:
+  stack: ga
 ---
 
 # URL Decode [urldecode]

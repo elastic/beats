@@ -2,6 +2,8 @@
 navigation_title: "Quick start"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-installation-configuration.html
+applies_to:
+  stack: ga
 ---
 
 # Packetbeat quick start: installation and configuration [packetbeat-installation-configuration]

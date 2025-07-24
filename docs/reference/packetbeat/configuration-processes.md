@@ -2,6 +2,8 @@
 navigation_title: "Processes"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/configuration-processes.html
+applies_to:
+  stack: ga
 ---
 
 # Configure which processes to monitor [configuration-processes]
