@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/running-on-kubernetes.html
+applies_to:
+  stack: ga
 ---
 
 # Run Filebeat on Kubernetes [running-on-kubernetes]
