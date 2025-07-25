@@ -25,6 +25,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -187,17 +188,17 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 	if err != nil {
 		return fmt.Errorf("failed to add gzip decoder to blob: %s, with error: %w", *j.blob.Name, err)
 	}
-	dec, err := newDecoder(j.src.ReaderConfig.Decoding, r)
+	dec, err := decoder.NewDecoder(j.src.ReaderConfig.Decoding, r)
 	if err != nil {
 		return err
 	}
 	var evtOffset int64
 	switch dec := dec.(type) {
-	case decoder:
-		defer dec.close()
+	case decoder.Decoder:
+		defer dec.Close()
 
-		for dec.next() {
-			msg, err := dec.decode()
+		for dec.Next() {
+			msg, err := dec.Decode()
 			if err != nil {
 				if err == io.EOF {
 					return nil
@@ -206,7 +207,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 				return err
 			}
 			evt := j.createEvent(string(msg), evtOffset)
-			j.publish(evt, !dec.more(), id)
+			j.publish(evt, !dec.More(), id)
 		}
 
 	default:

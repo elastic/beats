@@ -13,6 +13,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	conf "github.com/elastic/elastic-agent-libs/config"
+
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 )
 
 // defaultReaderConfig is a default readerConfig state that is used to evaluate
@@ -109,7 +111,7 @@ type readerConfig struct {
 	// Parsers contains the configuration for different content parsers (e.g., JSON, XML, CSV).
 	Parsers parser.Config `config:",inline"`
 	// Decoding specifies options for decoding the content, such as compression.
-	Decoding decoderConfig `config:"decoding"`
+	Decoding decoder.DecoderConfig `config:"decoding"`
 	// ContentType suggests the MIME type of the blob content, aiding in parsing.
 	ContentType string `config:"content_type"`
 	// Encoding specifies the character encoding of the blob content (e.g., "UTF-8", "gzip").

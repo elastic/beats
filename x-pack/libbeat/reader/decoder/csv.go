@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package gcs
+package decoder
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 )
 
 // csvDecoder is a decoder for CSV data.
-type csvDecoder struct {
+type CsvDecoder struct {
 	r *csv.Reader
 
 	header  []string
@@ -24,8 +24,8 @@ type csvDecoder struct {
 }
 
 // newCSVDecoder creates a new CSV decoder.
-func newCSVDecoder(config decoderConfig, r io.Reader) (decoder, error) {
-	d := csvDecoder{r: csv.NewReader(r)}
+func newCSVDecoder(config DecoderConfig, r io.Reader) (Decoder, error) {
+	d := CsvDecoder{r: csv.NewReader(r)}
 	d.r.ReuseRecord = true
 	if config.Codec.CSV.Comma != nil {
 		d.r.Comma = rune(*config.Codec.CSV.Comma)
@@ -52,12 +52,12 @@ func newCSVDecoder(config decoderConfig, r io.Reader) (decoder, error) {
 	return &d, nil
 }
 
-func (d *csvDecoder) more() bool { return len(d.coming) == len(d.header) }
+func (d *CsvDecoder) More() bool { return len(d.coming) == len(d.header) }
 
 // next advances the decoder to the next data item and returns true if
 // there is more data to be decoded.
-func (d *csvDecoder) next() bool {
-	if !d.more() && d.err != nil {
+func (d *CsvDecoder) Next() bool {
+	if !d.More() && d.err != nil {
 		return false
 	}
 	d.current = d.current[:len(d.header)]
@@ -71,8 +71,8 @@ func (d *csvDecoder) next() bool {
 
 // decode returns the JSON encoded value of the current CSV line. next must
 // have been called before any calls to decode.
-func (d *csvDecoder) decode() ([]byte, error) {
-	err := d.check()
+func (d *CsvDecoder) Decode() ([]byte, error) {
+	err := d.Check()
 	if err != nil {
 		return nil, err
 	}
@@ -96,8 +96,8 @@ func (d *csvDecoder) decode() ([]byte, error) {
 // decodeValue returns the value of the current CSV line interpreted as
 // an object with fields based on the header held by the receiver. next must
 // have been called before any calls to decode.
-func (d *csvDecoder) decodeValue() ([]byte, map[string]any, error) {
-	err := d.check()
+func (d *CsvDecoder) DecodeValue() ([]byte, map[string]any, error) {
+	err := d.Check()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -106,14 +106,14 @@ func (d *csvDecoder) decodeValue() ([]byte, map[string]any, error) {
 		m[n] = d.current[i]
 	}
 	d.current = d.current[:0]
-	b, err := d.decode()
+	b, err := d.Decode()
 	if err != nil {
 		return nil, nil, err
 	}
 	return b, m, nil
 }
 
-func (d *csvDecoder) check() error {
+func (d *CsvDecoder) Check() error {
 	if d.err != nil {
 		if d.err == io.EOF && d.coming == nil {
 			return nil
@@ -131,7 +131,7 @@ func (d *csvDecoder) check() error {
 }
 
 // close closes the csv decoder and releases the resources.
-func (d *csvDecoder) close() error {
+func (d *CsvDecoder) Close() error {
 	if d.err == io.EOF {
 		return nil
 	}
