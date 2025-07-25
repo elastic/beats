@@ -79,7 +79,7 @@ the Kubernetes node.
 -------------------------------------------------------------------------------
 processors:
   - add_kubernetes_metadata:
-      host: <hostname>
+      node: <kubernetes_node_name>
       # If kube_config is not set, KUBECONFIG environment variable will be checked
       # and if not present it will fall back to InCluster
       kube_config: ${HOME}/.kube/config
@@ -102,7 +102,7 @@ enables ones that the user is interested in.
 -------------------------------------------------------------------------------
 processors:
   - add_kubernetes_metadata:
-      host: <hostname>
+      node: <kubernetes_node_name>
       # If kube_config is not set, KUBECONFIG environment variable will be checked
       # and if not present it will fall back to InCluster
       kube_config: ~/.kube/config
@@ -119,7 +119,7 @@ processors:
 
 The `add_kubernetes_metadata` processor has the following configuration settings:
 
-`host`:: (Optional) Specify the node to scope {beatname_lc} to in case it
+`node`:: (Optional) Specify the node to scope {beatname_lc} to in case it
 cannot be accurately detected, as when running {beatname_lc} in host network
 mode.
 `scope`:: (Optional) Specify if the processor should have visibility at the node level or at the entire cluster
