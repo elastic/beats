@@ -42,7 +42,7 @@ type metricSetWithProcessors interface {
 }
 
 // NewFactory creates new Reloader instance for the given config
-func NewFactory(beatInfo beat.Info, monitoring beat.Monitoring, registry *mb.Register, options ...Option) *Factory {
+func NewFactory(beatInfo beat.Info, monitoring beat.Monitoring, registry *mb.Register, options ...Option) cfgfile.RunnerFactory {
 	return &Factory{
 		beatInfo:   beatInfo,
 		monitoring: monitoring,
@@ -60,7 +60,7 @@ func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, e
 
 	runners := make([]cfgfile.Runner, 0, len(metricSets))
 	for _, metricSet := range metricSets {
-		wrapper, err := NewWrapperForMetricSet(module, metricSet, r.monitoring, r.options...)
+		wrapper, err := NewWrapperForMetricSet(module, metricSet, r.monitoring, r.beatInfo.Logger, r.options...)
 		if err != nil {
 			return nil, err
 		}

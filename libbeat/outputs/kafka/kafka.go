@@ -53,7 +53,7 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	topic, err := buildTopicSelector(cfg)
+	topic, err := buildTopicSelector(cfg, log)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -82,7 +82,7 @@ func makeKafka(
 	if kConfig.MaxRetries < 0 {
 		retry = -1
 	}
-	return outputs.Success(kConfig.Queue, kConfig.BulkMaxSize, retry, nil, client)
+	return outputs.Success(kConfig.Queue, kConfig.BulkMaxSize, retry, nil, beat.Logger, client)
 }
 
 // buildTopicSelector builds the topic selector for standalone Beat and when
@@ -90,7 +90,7 @@ func makeKafka(
 //
 // When running standalone the topic selector works as expected and documented.
 // When running under Elastic-Agent, dynamic topic selection is also supported
-func buildTopicSelector(cfg *config.C) (outil.Selector, error) {
+func buildTopicSelector(cfg *config.C, logger *logp.Logger) (outil.Selector, error) {
 
 	if cfg == nil {
 		return outil.Selector{}, fmt.Errorf("Kafka config cannot be nil") //nolint:staticcheck //Keep old behavior
@@ -102,5 +102,5 @@ func buildTopicSelector(cfg *config.C) (outil.Selector, error) {
 		EnableSingleOnly: true,
 		FailEmpty:        true,
 		Case:             outil.SelectorKeepCase,
-	})
+	}, logger)
 }

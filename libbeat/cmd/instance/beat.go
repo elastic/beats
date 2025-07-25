@@ -466,7 +466,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Do not load seccomp for osquerybeat, it was disabled before V2 in the configuration file
 	// https://github.com/elastic/beats/blob/7cf873fd340172c33f294500ccfec948afd7a47c/x-pack/osquerybeat/osquerybeat.yml#L16
 	if b.Info.Beat != "osquerybeat" {
-		if err := seccomp.LoadFilter(b.Config.Seccomp); err != nil {
+		if err := seccomp.LoadFilter(b.Config.Seccomp, logger); err != nil {
 			return err
 		}
 	}
@@ -658,7 +658,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			}
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
-			esClient, err := eslegclient.NewConnectedClient(ctx, outCfg.Config(), b.Info.Beat)
+			esClient, err := eslegclient.NewConnectedClient(ctx, outCfg.Config(), b.Info.Beat, b.Info.Logger)
 			if err != nil {
 				return err
 			}
@@ -853,7 +853,7 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	// initialize config manager
-	m, err := management.NewManager(b.Config.Management, b.Registry)
+	m, err := management.NewManager(b.Config.Management, b.Registry, logger)
 	if err != nil {
 		return err
 	}
@@ -1077,7 +1077,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 // to is at least on the same version as the Beat.
 // If the check is disabled or the output is not Elasticsearch, nothing happens.
 func (b *Beat) registerESVersionCheckCallback() error {
-	_, err := elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
+	_, err := elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection, _ *logp.Logger) error {
 		if !isElasticsearchOutput(b.Config.Output.Name()) {
 			return errors.New("elasticsearch output is not configured")
 		}
@@ -1127,7 +1127,7 @@ func (b *Beat) registerESIndexManagement() error {
 }
 
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
-	return func(esClient *eslegclient.Connection) error {
+	return func(esClient *eslegclient.Connection, _ *logp.Logger) error {
 		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
 		if err != nil {
 			return fmt.Errorf("error creating index management handler: %w", err)
@@ -1284,7 +1284,7 @@ func (b *Beat) clusterUUIDFetchingCallback() elasticsearch.ConnectCallback {
 	elasticsearchRegistry := b.Monitoring.StateRegistry().NewRegistry("outputs.elasticsearch")
 	clusterUUIDRegVar := monitoring.NewString(elasticsearchRegistry, "cluster_uuid")
 
-	callback := func(esClient *eslegclient.Connection) error {
+	callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
 		var response struct {
 			ClusterUUID string `json:"cluster_uuid"`
 		}

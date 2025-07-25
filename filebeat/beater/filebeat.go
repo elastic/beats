@@ -67,13 +67,14 @@ var once = flag.Bool("once", false, "Run filebeat only once until all harvesters
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
 type Filebeat struct {
-	config         *cfg.Config
-	moduleRegistry *fileset.ModuleRegistry
-	pluginFactory  PluginFactory
-	done           chan struct{}
-	stopOnce       sync.Once // wraps the Stop() method
-	pipeline       beat.PipelineConnector
-	logger         *logp.Logger
+	config                   *cfg.Config
+	moduleRegistry           *fileset.ModuleRegistry
+	pluginFactory            PluginFactory
+	done                     chan struct{}
+	stopOnce                 sync.Once // wraps the Stop() method
+	pipeline                 beat.PipelineConnector
+	logger                   *logp.Logger
+	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 }
 
 type PluginFactory func(beat.Info, *logp.Logger, statestore.States) []v2.Plugin
@@ -144,7 +145,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 			"Filebeat's registry",
 			"registry.tar.gz",
 			"application/octet-stream",
-			gzipRegistry)
+			gzipRegistry(b.Info.Logger))
 	}
 
 	// Add inputs created by the modules
@@ -200,14 +201,14 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 	b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
 		ctx, cancel := context.WithCancel(context.TODO())
 		defer cancel()
-		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat")
+		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat", fb.logger)
 		if err != nil {
 			return err
 		}
 
 		// When running the subcommand setup, configuration from modules.d directories
 		// have to be loaded using cfg.Reloader. Otherwise those configurations are skipped.
-		pipelineLoaderFactory := newPipelineLoaderFactory(ctx, b.Config.Output.Config())
+		pipelineLoaderFactory := newPipelineLoaderFactory(ctx, b.Config.Output.Config(), fb.logger)
 		enableAllFilesets, _ := b.BeatConfig.Bool("config.modules.enable_all_filesets", -1)
 		forceEnableModuleFilesets, _ := b.BeatConfig.Bool("config.modules.force_enable_module_filesets", -1)
 		filesetOverrides := fileset.FilesetOverrides{
@@ -234,6 +235,10 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 	return nil
 }
 
+func (fb *Filebeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
+	fb.otelStatusFactoryWrapper = wrapper
+}
+
 // loadModulesPipelines is called when modules are configured to do the initial
 // setup.
 func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
@@ -249,7 +254,7 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 
 	// register pipeline loading to happen every time a new ES connection is
 	// established
-	callback := func(esClient *eslegclient.Connection) error {
+	callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
 		return fb.moduleRegistry.LoadPipelines(esClient, overwritePipelines)
 	}
 	_, err := elasticsearch.RegisterConnectCallback(callback)
@@ -382,6 +387,10 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		input.NewRunnerFactory(pipelineConnector, registrar, fb.done, fb.logger),
 	))
 
+	if fb.otelStatusFactoryWrapper != nil {
+		inputLoader = fb.otelStatusFactoryWrapper(inputLoader)
+	}
+
 	// Create a ES connection factory for dynamic modules pipeline loading
 	var pipelineLoaderFactory fileset.PipelineLoaderFactory
 	// The pipelineFactory needs a context to control the connections to ES,
@@ -392,7 +401,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	pipelineFactoryCtx, cancelPipelineFactoryCtx := context.WithCancel(context.Background())
 	defer cancelPipelineFactoryCtx()
 	if b.Config.Output.Name() == "elasticsearch" {
-		pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config())
+		pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), fb.logger)
 	} else {
 		fb.logger.Warn(pipelinesWarning)
 	}
@@ -535,9 +544,9 @@ func (fb *Filebeat) Stop() {
 }
 
 // Create a new pipeline loader (es client) factory
-func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C) fileset.PipelineLoaderFactory {
+func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, logger *logp.Logger) fileset.PipelineLoaderFactory {
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
-		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat")
+		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat", logger)
 		if err != nil {
 			return nil, fmt.Errorf("Error creating Elasticsearch client: %w", err) //nolint:staticcheck //Keep old behavior
 		}
@@ -547,7 +556,7 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C) fileset.Pip
 }
 
 // fetches all the defined input configuration available at Filebeat startup including external files.
-func fetchInputConfiguration(config *cfg.Config) (inputs []*conf.C, err error) {
+func fetchInputConfiguration(config *cfg.Config, logger *logp.Logger) (inputs []*conf.C, err error) {
 	if len(config.Inputs) == 0 {
 		inputs = []*conf.C{}
 	} else {
@@ -580,7 +589,7 @@ func fetchInputConfiguration(config *cfg.Config) (inputs []*conf.C, err error) {
 	copy(inputs, config.Inputs)
 
 	for _, p := range cfgPaths {
-		externalInputs, err := cfgfile.LoadList(p)
+		externalInputs, err := cfgfile.LoadList(p, logger)
 		if err != nil {
 			return nil, fmt.Errorf("failed to load external input configuration: %w", err)
 		}

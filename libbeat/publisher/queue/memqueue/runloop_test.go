@@ -20,6 +20,7 @@ package memqueue
 import (
 	"context"
 	"io"
+	"sync"
 	"testing"
 	"time"
 
@@ -28,7 +29,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -53,10 +53,16 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 
 	producer := newProducer(broker, nil, nil)
 	rl := broker.runLoop
+	// iterLock is used to ensure distinct runIteration calls can never overlap
+	iterLock := sync.Mutex{}
 	for i := 0; i < 100; i++ {
 		// Pair each publish call with an iteration of the run loop so we
 		// get a response.
-		go rl.runIteration()
+		go func() {
+			iterLock.Lock()
+			rl.runIteration()
+			iterLock.Unlock()
+		}()
 		_, ok := producer.Publish(i)
 		require.True(t, ok, "Queue publish call must succeed")
 	}
@@ -70,7 +76,11 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 		// there's a logical error.
 		_, _ = broker.Get(100)
 	}()
+	// Still have to lock here even though we aren't running asynchronously,
+	// since it's possible that the last asynchronous call is still running.
+	iterLock.Lock()
 	rl.runIteration()
+	iterLock.Unlock()
 	assert.Nil(t, rl.pendingGetRequest, "Queue should have no pending get request since the request should succeed immediately")
 	assert.Equal(t, 100, rl.consumedCount, "Queue should have a consumedCount of 100 after a consumer requested all its events")
 }
@@ -122,7 +132,7 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 
 func TestClosedEmptyQueueDoesNotBlockGet(t *testing.T) {
 	broker := newQueue(
-		logp.NewLogger("testing"),
+		logptest.NewTestingLogger(t, ""),
 		nil,
 		Settings{
 			Events:        1000,

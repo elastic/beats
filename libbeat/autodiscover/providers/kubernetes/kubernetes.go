@@ -117,7 +117,7 @@ func AutodiscoverBuilder(
 
 	k8sKeystoreProvider := k8skeystore.NewKubernetesKeystoresRegistry(logger, client)
 
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, k8sKeystoreProvider)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, k8sKeystoreProvider, logger)
 	if err != nil {
 		return nil, errWrap(err)
 	}

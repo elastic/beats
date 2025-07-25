@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/current/config-file-format-namespacing.html
+applies_to:
+  stack: ga
 ---
 
 # Namespacing [config-file-format-namespacing]

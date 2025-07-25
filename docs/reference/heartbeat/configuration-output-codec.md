@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-output-codec.html
+applies_to:
+  stack: ga
 ---
 
 # Change the output codec [configuration-output-codec]

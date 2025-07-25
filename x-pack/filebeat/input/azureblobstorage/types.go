@@ -16,6 +16,7 @@ import (
 type Source struct {
 	ContainerName            string
 	AccountName              string
+	BatchSize                int
 	MaxWorkers               int
 	Poll                     bool
 	PollInterval             time.Duration
@@ -23,6 +24,7 @@ type Source struct {
 	FileSelectors            []fileSelectorConfig
 	ReaderConfig             readerConfig
 	ExpandEventListFromField string
+	PathPrefix               string
 }
 
 func (s *Source) Name() string {

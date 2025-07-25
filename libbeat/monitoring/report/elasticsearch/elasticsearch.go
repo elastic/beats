@@ -23,6 +23,7 @@ import (
 	"io"
 	"math/rand/v2"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -55,6 +56,7 @@ type reporter struct {
 	client   beat.Client
 
 	out []outputs.NetworkClient
+	wg  sync.WaitGroup
 }
 
 const logSelector = "monitoring"
@@ -195,6 +197,7 @@ func makeReporter(beat beat.Info, mon beat.Monitoring, settings report.Settings,
 		client:     pipeConn,
 		out:        clients,
 	}
+	r.wg.Add(1)
 	go r.initLoop(config)
 	return r, nil
 }
@@ -203,11 +206,15 @@ func (r *reporter) Stop() {
 	r.done.Stop()
 	r.client.Close()
 	r.pipeline.Close()
+	r.wg.Wait()
 }
 
 func (r *reporter) initLoop(c config) {
 	r.logger.Debug("Start monitoring endpoint init loop.")
-	defer r.logger.Debug("Finish monitoring endpoint init loop.")
+	defer func() {
+		r.logger.Debug("Finish monitoring endpoint init loop.")
+		r.wg.Done()
+	}()
 
 	log := r.logger
 
@@ -316,7 +323,7 @@ func makeClient(host string, params map[string]string, config *config, beat beat
 		CompressionLevel: config.CompressionLevel,
 		Transport:        config.Transport,
 		UserAgent:        beat.UserAgent,
-	})
+	}, beat.Logger)
 	if err != nil {
 		return nil, err
 	}

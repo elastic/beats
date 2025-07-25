@@ -2,6 +2,8 @@
 navigation_title: "Set up and run"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/setting-up-and-running.html
+applies_to:
+  stack: ga
 ---
 
 # Set up and run Filebeat [setting-up-and-running]

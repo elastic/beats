@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/howto-guides.html
+applies_to:
+  stack: ga
 ---
 
 # How to guides [howto-guides]
@@ -20,3 +22,4 @@ Learn how to perform common Filebeat configuration tasks.
 * [*Migrate `log` or `container` input configurations to `filestream`*](/reference/filebeat/migrate-to-filestream.md)
 * [*Choose file identity for `filestream`*](/reference/filebeat/file-identity.md)
 * [*Migrating from a Deprecated Filebeat Module*](/reference/filebeat/migrate-from-deprecated-module.md)
+* [*Removing ingested files with the Filestream input*](/reference/filebeat/delete-file-guide.md)

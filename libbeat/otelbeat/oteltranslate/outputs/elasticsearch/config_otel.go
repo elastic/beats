@@ -35,20 +35,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// TODO: add  following unuspported params to below struct
-// indices
-// pipelines
-// parameters
 // setup.ilm.* -> supported but the logic is not in place yet
-// proxy_disable -> supported but the logic is not in place yet
-// proxy_headers
 type unsupportedConfig struct {
-	CompressionLevel   int               `config:"compression_level" `
 	LoadBalance        bool              `config:"loadbalance"`
 	NonIndexablePolicy *config.Namespace `config:"non_indexable_policy"`
-	AllowOlderVersion  bool              `config:"allow_older_versions"`
 	EscapeHTML         bool              `config:"escape_html"`
 	Kerberos           *kerberos.Config  `config:"kerberos"`
+	ProxyDisable       bool              `config:"proxy_disable"`
 }
 
 type esToOTelOptions struct {
@@ -73,15 +66,13 @@ var defaultOptions = esToOTelOptions{
 // ToOTelConfig converts a Beat config into OTel elasticsearch exporter config
 // Ensure cloudid is handled before calling this method
 // Note: This method may override output queue settings defined by user.
-func ToOTelConfig(output *config.C) (map[string]any, error) {
+func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error) {
 	escfg := defaultOptions
-	// check if unsupported configuration is provided
-	temp := unsupportedConfig{}
-	if err := output.Unpack(&temp); err != nil {
+
+	// check for unsupported config
+	err := checkUnsupportedConfig(output, logger)
+	if err != nil {
 		return nil, err
-	}
-	if !isStructEmpty(temp) {
-		return nil, fmt.Errorf("these configuration parameters are not supported %+v", temp)
 	}
 
 	// apply preset here
@@ -94,9 +85,9 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 		if err != nil {
 			return nil, err
 		}
-		logp.Info("Applying performance preset '%v': %v",
+		logger.Infof("Applying performance preset '%v': %v",
 			preset, config.DebugString(presetConfig, false))
-		logp.Warn("Performance preset '%v' overrides user setting for field(s): %s",
+		logger.Warnf("Performance preset '%v' overrides user setting for field(s): %s",
 			preset, strings.Join(overriddenFields, ","))
 	}
 
@@ -120,7 +111,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	}
 
 	// convert ssl configuration
-	otelTLSConfg, err := oteltranslate.TLSCommonToOTel(escfg.Transport.TLS)
+	otelTLSConfg, err := oteltranslate.TLSCommonToOTel(escfg.Transport.TLS, logger)
 	if err != nil {
 		return nil, fmt.Errorf("cannot convert SSL config into OTel: %w", err)
 	}
@@ -151,6 +142,11 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 		"mapping": map[string]any{
 			"mode": "bodymap",
 		},
+
+		"compression": "gzip",
+		"compression_params": map[string]any{
+			"level": escfg.CompressionLevel,
+		},
 	}
 
 	// Authentication
@@ -170,6 +166,34 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	}
 
 	return otelYAMLCfg, nil
+}
+
+// log warning for unsupported config
+func checkUnsupportedConfig(cfg *config.C, logger *logp.Logger) error {
+	// check if unsupported configuration is provided
+	temp := unsupportedConfig{}
+	if err := cfg.Unpack(&temp); err != nil {
+		return err
+	}
+
+	if !isStructEmpty(temp) {
+		logger.Warnf("these configuration parameters are not supported %+v", temp)
+		return nil
+	}
+
+	// check for dictionary like parameters that we do not support yet
+	if cfg.HasField("indices") {
+		logger.Warn("indices is currently not supported")
+	} else if cfg.HasField("pipelines") {
+		logger.Warn("pipelines is currently not supported")
+	} else if cfg.HasField("parameters") {
+		logger.Warn("parameters is currently not supported")
+	} else if cfg.HasField("proxy_headers") {
+		logger.Warn("proxy_headers is currently not supported")
+	} else if value, _ := cfg.Bool("allow_older_versions", -1); !value {
+		logger.Warn("allow_older_versions:false is currently not supported")
+	}
+	return nil
 }
 
 // For type safety check
