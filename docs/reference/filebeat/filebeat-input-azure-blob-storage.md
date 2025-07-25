@@ -132,7 +132,7 @@ $$$supported-attributes$$$
 12. [file_selectors](#attrib-file_selectors)
 13. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
 14. [timestamp_epoch](#attrib-timestamp_epoch)
-16. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.1.0`
+15. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.1.0`
 
 ## `account_name` [attrib-account-name]
 
