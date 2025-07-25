@@ -435,8 +435,8 @@ If this is a self-signed certificate, the `certificate_authorities` field should
 
 This input exposes metrics under the [HTTP monitoring endpoint](/reference/filebeat/http-endpoint.md). These metrics are exposed under the `/inputs` path. They can be used to observe the activity of the input.
 
-| Metric | Description | Version |
-| --- | --- | --- |
+| Metric | Description |
+| --- | --- |
 | `url` | URL of the input resource. |
 | `cel_eval_errors` | Number of errors encountered during cel program evaluation. |
 | `errors_total` | Number of errors encountered over the life cycle of the input. |
@@ -445,11 +445,11 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `received_bytes_total` | Number of bytes received over the life cycle of the input. |
 | `events_received_total` | Number of events received. |
 | `events_published_total` | Number of events published. |
-| `write_control_errors` | Number of errors encountered for write control operations. | {applies_to}`stack: ga 9.0.4`
+| `write_control_errors` {applies_to}`stack: ga 9.0.4` | Number of errors encountered for write control operations. |
 | `cel_processing_time` | Histogram of the elapsed successful CEL program processing times in nanoseconds. |
 | `batch_processing_time` | Histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches). |
-| `ping_message_send_time` | Histogram of the elapsed successful ping message send times in nanoseconds. | {applies_to}`stack: ga 9.0.4`
-| `pong_message_received_time` | Histogram of the elapsed successful pong message receive times in nanoseconds. | {applies_to}`stack: ga 9.0.4`
+| `ping_message_send_time`  {applies_to}`stack: ga 9.0.4` | Histogram of the elapsed successful ping message send times in nanoseconds. |
+| `pong_message_received_time` {applies_to}`stack: ga 9.0.4` | Histogram of the elapsed successful pong message receive times in nanoseconds. | 
 
 
 ## Developer tools [_developer_tools_2]
