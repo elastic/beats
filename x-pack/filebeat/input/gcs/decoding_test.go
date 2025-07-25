@@ -144,13 +144,14 @@ codec:
     comma: ' '
     comment: '#'
 `,
-		want: decoder.DecoderConfig{&decoder.CodecConfig{
-			CSV: &decoder.CsvCodecConfig{
-				Enabled: true,
-				Comma:   ptr[decoder.ConfigRune](' '),
-				Comment: '#',
-			},
-		}},
+		want: decoder.DecoderConfig{
+			Codec: &decoder.CodecConfig{
+				CSV: &decoder.CsvCodecConfig{
+					Enabled: true,
+					Comma:   ptr[decoder.ConfigRune](' '),
+					Comment: '#',
+				},
+			}},
 	},
 	{
 		name: "no_comma",
@@ -159,11 +160,12 @@ codec:
   csv:
     enabled: true
 `,
-		want: decoder.DecoderConfig{&decoder.CodecConfig{
-			CSV: &decoder.CsvCodecConfig{
-				Enabled: true,
-			},
-		}},
+		want: decoder.DecoderConfig{
+			Codec: &decoder.CodecConfig{
+				CSV: &decoder.CsvCodecConfig{
+					Enabled: true,
+				},
+			}},
 	},
 	{
 		name: "null_comma",
@@ -173,12 +175,13 @@ codec:
     enabled: true
     comma: "\u0000"
 `,
-		want: decoder.DecoderConfig{&decoder.CodecConfig{
-			CSV: &decoder.CsvCodecConfig{
-				Enabled: true,
-				Comma:   ptr[decoder.ConfigRune]('\x00'),
-			},
-		}},
+		want: decoder.DecoderConfig{
+			Codec: &decoder.CodecConfig{
+				CSV: &decoder.CsvCodecConfig{
+					Enabled: true,
+					Comma:   ptr[decoder.ConfigRune]('\x00'),
+				},
+			}},
 	},
 	{
 		name: "bad_rune",

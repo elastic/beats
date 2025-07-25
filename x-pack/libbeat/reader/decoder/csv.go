@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/csv"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"slices"
@@ -127,7 +128,7 @@ func (d *CsvDecoder) Check() error {
 
 // close closes the csv decoder and releases the resources.
 func (d *CsvDecoder) Close() error {
-	if d.err == io.EOF {
+	if errors.Is(d.err, io.EOF) {
 		return nil
 	}
 	return d.err
