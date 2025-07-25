@@ -1,8 +1,6 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html
-applies_to:
-  stack: ga
 ---
 
 # Modules [filebeat-modules]
