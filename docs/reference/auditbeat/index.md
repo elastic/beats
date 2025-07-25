@@ -2,6 +2,8 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-overview.html
   - https://www.elastic.co/guide/en/beats/auditbeat/current/index.html
+applies_to:
+  stack: ga
 ---
 
 # Auditbeat

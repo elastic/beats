@@ -2,6 +2,8 @@
 navigation_title: "AWS CloudWatch"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-aws-cloudwatch.html
+applies_to:
+  stack: ga
 ---
 
 # AWS CloudWatch input [filebeat-input-aws-cloudwatch]

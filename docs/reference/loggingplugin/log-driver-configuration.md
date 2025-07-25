@@ -2,6 +2,8 @@
 navigation_title: "Configuration options"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/loggingplugin/current/log-driver-configuration.html
+applies_to:
+  stack: ga
 ---
 
 # Elastic Logging Plugin configuration options [log-driver-configuration]

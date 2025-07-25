@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-starting.html
+applies_to:
+  stack: ga
 ---
 
 # Start Winlogbeat [winlogbeat-starting]

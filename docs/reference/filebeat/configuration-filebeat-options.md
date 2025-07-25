@@ -2,6 +2,8 @@
 navigation_title: "Inputs"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/configuration-filebeat-options.html
+applies_to:
+  stack: ga
 ---
 
 # Configure inputs [configuration-filebeat-options]

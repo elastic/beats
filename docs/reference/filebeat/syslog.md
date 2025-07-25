@@ -2,6 +2,8 @@
 navigation_title: "syslog"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/syslog.html
+applies_to:
+  stack: ga
 ---
 
 # Syslog [syslog]

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-starting.html
+applies_to:
+  stack: ga
 ---
 
 # Start Metricbeat [metricbeat-starting]

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/defining-processors.html
+applies_to:
+  stack: ga
 ---
 
 # Define processors [defining-processors]
