@@ -30,6 +30,7 @@ func New(config config.Config) protocol.Protocol {
 	logger := config.LogOutput().Named(LogPrefix)
 	decoder := DecoderIPFIX{
 		DecoderV9: v9.DecoderV9{Logger: logger, Fields: config.Fields()},
+		FileBased: config.FileSupport(),
 	}
 	proto := &IPFixProtocol{
 		NetflowV9Protocol: *v9.NewProtocolWithDecoder(decoder, config, logger),
