@@ -123,9 +123,14 @@ http.port: %d
 		"agent.id",
 		"log.file.inode",
 		"log.file.path",
+		// only present in beats receivers
+		"otelcol.component.id",
+		"otelcol.component.kind",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+	assert.Equal(t, "filebeatreceiver", otelDoc["otelcol.component.id"], "expected otelcol.component.id field in log record")
+	assert.Equal(t, "receiver", otelDoc["otelcol.component.kind"], "expected otelcol.component.kind field in log record")
 	assertMonitoring(t, 5066)
 }
 
@@ -245,6 +250,9 @@ processors:
 		"agent.ephemeral_id",
 		"agent.id",
 		"event.created",
+		// only present in beats receivers
+		"otelcol.component.id",
+		"otelcol.component.kind",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
@@ -315,7 +323,7 @@ func TestFilebeatOTelReceiverE2E(t *testing.T) {
 	}
 
 	cfg := `receivers:
-  filebeatreceiver:
+  filebeatreceiver/filestream:
     filebeat:
       inputs:
         - type: filestream
@@ -356,7 +364,7 @@ service:
   pipelines:
     logs:
       receivers:
-        - filebeatreceiver
+        - filebeatreceiver/filestream
       exporters:
         - elasticsearch/log
         - debug
@@ -450,9 +458,14 @@ http.port: %d
 		"agent.id",
 		"log.file.inode",
 		"log.file.path",
+		// only present in beats receivers
+		"otelcol.component.id",
+		"otelcol.component.kind",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+	assert.Equal(t, "filebeatreceiver/filestream", otelDoc["otelcol.component.id"], "expected otelcol.component.id field in log record")
+	assert.Equal(t, "receiver", otelDoc["otelcol.component.kind"], "expected otelcol.component.kind field in log record")
 	assertMonitoring(t, otelConfig.MonitoringPort)
 	assertMonitoring(t, 5067) // filebeat
 }
