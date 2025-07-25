@@ -214,22 +214,22 @@ func (w *jsonWatcher) Inspect(line string) {
 	}
 
 	for key, value := range w.fields {
-		if v, err := outputDoc.GetValue(key); err != nil {
+		if v, err := outputDoc.GetValue(key); err == nil {
 			switch v.(type) {
 			case string, float64, bool, nil:
 				if v != value {
 					return
 				}
 			default:
-				if reflect.DeepEqual(v, value) {
+				if !reflect.DeepEqual(v, value) {
 					return
 				}
 
 			}
 		}
-
-		w.fields = nil
 	}
+
+	w.fields = nil
 }
 func (w *jsonWatcher) Observed() bool {
 	return w.fields == nil

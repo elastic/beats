@@ -85,6 +85,7 @@ output.console:
 		})
 
 		test.
+			ExpectEOF(file...).
 			WithReportOptions(reportOptions).
 			Start(ctx).
 			Wait()
@@ -123,6 +124,7 @@ output.console:
 		})
 
 		test.
+			ExpectEOF(file...).
 			WithReportOptions(reportOptions).
 			Start(ctx).
 			Wait()
@@ -158,6 +160,7 @@ output.console:
 		})
 
 		test.
+			ExpectEOF(file...).
 			WithReportOptions(reportOptions).
 			Start(ctx).
 			Wait()

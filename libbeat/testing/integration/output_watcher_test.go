@@ -92,7 +92,7 @@ func TestOutputWatcher(t *testing.T) {
 		InputDoc := mapstr.M{
 			"message": "sample dummy message",
 			"fields": mapstr.M{
-				"number": "20",
+				"number": 20,
 				"slice":  []string{"20", "30", "40"},
 			},
 			"isthisboolean": false,
@@ -105,6 +105,13 @@ func TestOutputWatcher(t *testing.T) {
 			expectObserved bool
 		}{
 			{
+				name: "test when expected value does not exist",
+				fieldsToMatch: mapstr.M{
+					"message": "sample message",
+				},
+				expectObserved: false,
+			},
+			{
 				name: "test when expected value is string type",
 				fieldsToMatch: mapstr.M{
 					"message": "sample dummy message",
@@ -115,7 +122,7 @@ func TestOutputWatcher(t *testing.T) {
 				name: "test when expected value is int type",
 				fieldsToMatch: mapstr.M{
 					"fields": mapstr.M{
-						"number": float64(2),
+						"number": float64(20),
 					},
 				},
 				expectObserved: true,
@@ -124,7 +131,7 @@ func TestOutputWatcher(t *testing.T) {
 				name: "test when expected value is slice type",
 				fieldsToMatch: mapstr.M{
 					"fields": mapstr.M{
-						"slice": []string{"20", "30", "40"},
+						"slice": []interface{}{"20", "30", "40"},
 					},
 				},
 				expectObserved: true,
@@ -147,8 +154,8 @@ func TestOutputWatcher(t *testing.T) {
 				name: "test when expected value is submap type",
 				fieldsToMatch: mapstr.M{
 					"fields": mapstr.M{
-						"number": "20",
-						"slice":  []string{"20", "30", "40"},
+						"number": float64(20),
+						"slice":  []interface{}{"20", "30", "40"},
 					},
 				},
 				expectObserved: true,

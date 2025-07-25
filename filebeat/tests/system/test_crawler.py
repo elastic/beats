@@ -332,7 +332,6 @@ class Test(BaseTest):
             assert text in lines
             assert text + " 2" in lines
 
-
     def test_file_no_permission(self):
         """
         Checks that filebeat handles files without reading permission well

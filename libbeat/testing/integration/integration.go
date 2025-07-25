@@ -76,8 +76,8 @@ type BeatTest interface {
 	// ExpectJSONFields registers an output watch for the given key-value pair.
 	// The input to this method should look like
 	// mapstr.M{
-	// 	"key1.key2": true,
-	// 	"key3": {
+	// 	"key1.key2": []interface{}["20", "30", "40"],
+	// 	"key3": mapstr.M{
 	// 	  "key4": 5,
 	// 	  "key5": 6,
 	// 	},
@@ -118,6 +118,9 @@ type BeatTest interface {
 
 	// WithReportOptions sets the reporting options for the test.
 	WithReportOptions(ReportOptions) BeatTest
+
+	// GetTempDir returns the home path where beat is running
+	GetTempDir() string
 }
 
 // ReportOptions describes all reporting options
@@ -149,8 +152,9 @@ type BeatTestOptions = RunBeatOptions
 // NewBeatTest creates a new integration test for a Beat.
 func NewBeatTest(t *testing.T, opts BeatTestOptions) BeatTest {
 	test := &beatTest{
-		t:    t,
-		opts: opts,
+		t:       t,
+		opts:    opts,
+		tempDir: t.TempDir(),
 	}
 
 	return test
@@ -164,6 +168,15 @@ type beatTest struct {
 	expectedExitCode *int
 	beat             *RunningBeat
 	mtx              sync.Mutex
+	tempDir          string
+}
+
+// GetTempDir implements the BeatTest interface.
+func (b *beatTest) GetTempDir() string {
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+
+	return b.tempDir
 }
 
 // Start implements the BeatTest interface.
@@ -179,7 +192,7 @@ func (b *beatTest) Start(ctx context.Context) BeatTest {
 	if b.reportOpts.PrintExpectationsBeforeStart {
 		b.printExpectations()
 	}
-	b.beat = RunBeat(ctx, b.t, b.opts, watcher)
+	b.beat = RunBeat(ctx, b.t, b.opts, watcher, b.tempDir)
 
 	return b
 }
@@ -263,7 +276,7 @@ func (b *beatTest) ExpectOutput(lines ...string) BeatTest {
 	return b
 }
 
-// ExpectOutput implements the BeatTest interface.
+// ExpectJSONFields implements the BeatTest interface.
 func (b *beatTest) ExpectJSONFields(fields mapstr.M) BeatTest {
 	b.mtx.Lock()
 	defer b.mtx.Unlock()
