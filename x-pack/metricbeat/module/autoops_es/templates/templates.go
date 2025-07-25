@@ -7,14 +7,14 @@ package templates
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"os"
+	"slices"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
-
-	"golang.org/x/exp/maps"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
@@ -110,9 +110,9 @@ func GetPartitionedTemplates[T any](templates []T, namer utils.Supplier[*T, stri
 
 	nameLimit := utils.GetIntEnvParam(TEMPLATE_BATCH_SIZE_NAME, 1500)
 
-	return maps.Values(utils.PartitionByMaxValue(nameLimit, templateNames, func(template string) int {
+	return slices.Collect(maps.Values(utils.PartitionByMaxValue(nameLimit, templateNames, func(template string) int {
 		return len(template)
-	}))
+	})))
 }
 
 func GetPartitionedTemplatesWithErrors[T any](templates []T, namer utils.Supplier[*T, string], filter utils.CheckedPredicate[*T]) ([][]string, []error) {
@@ -128,9 +128,9 @@ func GetPartitionedTemplatesWithErrors[T any](templates []T, namer utils.Supplie
 
 	nameLimit := utils.GetIntEnvParam(TEMPLATE_BATCH_SIZE_NAME, 1500)
 
-	return maps.Values(utils.PartitionByMaxValue(nameLimit, templateNames, func(template string) int {
+	return slices.Collect(maps.Values(utils.PartitionByMaxValue(nameLimit, templateNames, func(template string) int {
 		return len(template)
-	})), predicateErrors
+	}))), predicateErrors
 }
 
 // Loop across the `partitionedTemplates` and request them in associated batches, then extract and report them as events sharing a Transaction ID.
