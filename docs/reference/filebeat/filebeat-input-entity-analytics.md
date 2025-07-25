@@ -988,6 +988,10 @@ The time between Okta API rate limit resets. Expressed as a duration string (e.g
 
 #### `batch_size` [_batch_size]
 
+```{applies_to}
+stack: preview 9.0.1
+```
+
 The pagination batch size for requests. If it is zero or negative, the API default is used. The default is 200.
 
 
