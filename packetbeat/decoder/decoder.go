@@ -253,6 +253,7 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 	if d.flowID != nil && d.flowID.Flags() != 0 {
 		flow := d.flows.Get(d.flowID)
 		d.statPackets.Add(flow, 1)
+		////nolint:gosec // G115: safe conversion, ci.Length is the size of the original packet and is therefore always positive
 		d.statBytes.Add(flow, uint64(ci.Length))
 	}
 }
