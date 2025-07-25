@@ -19,25 +19,28 @@ import (
 	libbeat_reader "github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/convert"
 
+	v9 "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/ipfix"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
-	v9 "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/v9"
 )
 
 type IPFIXReader struct {
-	cfg    *Config
-	reader libbeat_reader.Reader
-	logger *logp.Logger
+	cfg     *Config
+	reader  libbeat_reader.Reader
+	reader_ *bufio.Reader
+	logger  *logp.Logger
 }
 
 func (r *IPFIXReader) Next() (libbeat_reader.Message, error) {
 	// need to handle reading things
+	// get the r.reader.Next() -- i don't know what to do about this
+	// is it a file handle? a stream of bytes?
 	// r.reader
 	return libbeat_reader.Message{}, nil
 }
 
 // BufferedReader parses ipfix inputs from io streams.
 type BufferedReader struct {
-	decoder v9.Decoder
+	decoder v9.DecoderIPFIX
 	reader_ *bufio.Reader
 	offset  int
 	cfg     *Config
@@ -80,7 +83,7 @@ func (sr *BufferedReader) Next() bool {
 	// TODO: we need to read the rest of the packet and skip the length
 	// if the version is wrong, nothing else to read
 	if version != 10 {
-		sr.logger.Debugf("incorrect version (%v)", version)
+		sr.logger.Debugf("incorrect NetFlow version (%v) in IPFIX file", version)
 		return false
 	}
 
@@ -105,42 +108,28 @@ func (sr *BufferedReader) Record() ([]beat.Event, error) {
 	// return
 	// read the next packet
 
-	// read the next four bytes
-	peek, err := sr.reader_.Peek(4)
+	// peek on 16 bytes, because that's the length of the header
+	length := 16
+	data, err := sr.reader_.Peek(length)
 	if err != nil {
 		return nil, fmt.Errorf("Error reading data: %w", err)
 	}
 
-	// the IPFIX packet is two bytes of version, two bytes of length
-	version := binary.BigEndian.Uint16(peek[0:2])
-	length := binary.BigEndian.Uint16(peek[2:4])
+	hdr := bytes.NewBuffer(data)
 
-	// if the version is wrong, nothing else to read
-	if version != 10 {
-		// TODO: read the rest of the packet and skip it
-		_, _ = sr.reader_.Discard(int(length))
-		return nil, fmt.Errorf("incorrect version (%v)", version)
+	// read the packet header
+	header, payload, numFlowSets, err := sr.decoder.ReadPacketHeader(hdr)
+	if err != nil {
+		return nil, fmt.Errorf("error reading header: %w", err)
 	}
 
-	// if the length is says so, nothing else to read
-	if length <= 4 {
-		_, _ = sr.reader_.Discard(int(length))
-		return nil, fmt.Errorf("packet is too small (%v)", length)
-	}
-
-	data := make([]byte, length)
+	// if we have a valid header, read the full packet
+	length = int(header.Count)
+	data = make([]byte, length)
 	n, err := io.ReadFull(sr.reader_, data)
 	if err != nil || n != int(length) {
 		// Not sure how to recover from this
 		return nil, fmt.Errorf("error with reading %d out of %d bytes of data: %w", n, length, err)
-	}
-
-	pkt := bytes.NewBuffer(data)
-
-	// read the packet header
-	header, payload, numFlowSets, err := sr.decoder.ReadPacketHeader(pkt)
-	if err != nil {
-		return nil, fmt.Errorf("error reading header: %w", err)
 	}
 
 	var flows []record.Record
