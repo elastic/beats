@@ -7,24 +7,19 @@ package decoder
 import (
 	"bytes"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"io"
 	"slices"
 )
 
-type offsets struct {
-	current int64
-	coming  int64
-}
-
 // csvDecoder is a decoder for CSV data.
 type CsvDecoder struct {
 	r *csv.Reader
 
-	offset  offsets
 	header  []string
+	offset  int64
 	current []string
-	coming  []string
 
 	err error
 }
@@ -49,41 +44,33 @@ func NewCSVDecoder(config CsvCodecConfig, r io.Reader) (Decoder, error) {
 		}
 		d.header = slices.Clone(h)
 	}
-	d.offset.current = 0
-	d.offset.coming = d.r.InputOffset()
-	var err error
-	d.coming, err = d.r.Read()
-	if err != nil {
-		return nil, err
-	}
-	d.current = make([]string, 0, len(d.header))
 	return &d, nil
 }
 
-func (d *CsvDecoder) More() bool { return len(d.coming) == len(d.header) }
+func (d *CsvDecoder) More() bool { return d.step() }
 
 // next advances the decoder to the next data item and returns true if
 // there is more data to be decoded.
 func (d *CsvDecoder) Next() bool {
-	if !d.More() && d.err != nil {
+	return d.step()
+}
+
+func (d *CsvDecoder) step() bool {
+	if d.err != nil {
 		return false
 	}
-	d.current = d.current[:len(d.header)]
-	copy(d.current, d.coming)
-	d.offset.current = d.offset.coming
-	d.offset.coming = d.r.InputOffset()
-	d.coming, d.err = d.r.Read()
-	if d.err == io.EOF {
-		d.coming = nil
+	if len(d.current) > 0 {
+		return true
 	}
-	return true
+	d.offset = d.r.InputOffset()
+	d.current, d.err = d.r.Read()
+	return d.err == nil
 }
 
 // decode returns the JSON encoded value of the current CSV line. next must
 // have been called before any calls to decode.
 func (d *CsvDecoder) Decode() ([]byte, error) {
-	err := d.Check()
-	if err != nil {
+	if err := d.Check(); err != nil {
 		return nil, err
 	}
 	var buf bytes.Buffer
@@ -107,27 +94,25 @@ func (d *CsvDecoder) Decode() ([]byte, error) {
 // an object with fields based on the header held by the receiver. next must
 // have been called before any calls to decode.
 func (d *CsvDecoder) DecodeValue() (int64, []byte, map[string]any, error) {
-	err := d.Check()
-	if err != nil {
-		return 0, nil, nil, err
+	if err := d.Check(); err != nil {
+		return d.offset, nil, nil, err
 	}
 	m := make(map[string]any, len(d.header))
+	// By the time we are here, current must be the same
+	// length as header; if it was not read, it would be
+	// zero, but if it was, it must match by the contract
+	// of the csv.Reader.
 	for i, n := range d.header {
 		m[n] = d.current[i]
 	}
 	d.current = d.current[:0]
-	b, err := d.Decode()
-	if err != nil {
-		return d.offset.current, nil, nil, err
-	}
-	return d.offset.current, b, m, nil
+
+	b, err := json.Marshal(m)
+	return d.offset, b, m, err
 }
 
 func (d *CsvDecoder) Check() error {
 	if d.err != nil {
-		if d.err == io.EOF && d.coming == nil {
-			return nil
-		}
 		return d.err
 	}
 	if len(d.current) == 0 {

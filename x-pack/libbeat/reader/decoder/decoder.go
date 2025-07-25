@@ -38,14 +38,14 @@ type ValueDecoder interface {
 func NewDecoder(cfg DecoderConfig, r io.Reader) (Decoder, error) {
 	codec := cfg.Codec
 
-	if err := codec.Validate(); err != nil {
+	if cfg.Codec == nil {
+		return nil, nil
+	} else if err := codec.Validate(); err != nil {
 		return nil, err
 	}
 
 	var result Decoder
 	switch {
-	case cfg.Codec == nil:
-		return nil, nil
 	case cfg.Codec.CSV != nil:
 		csv := codec.CSV
 		result, _ = NewCSVDecoder(*csv, r)

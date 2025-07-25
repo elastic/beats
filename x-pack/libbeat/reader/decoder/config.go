@@ -23,6 +23,10 @@ type CodecConfig struct {
 
 func (c *CodecConfig) Validate() error {
 	count := 0
+	if c == nil {
+		return nil
+	}
+
 	if c.Parquet != nil {
 		count++
 	}
