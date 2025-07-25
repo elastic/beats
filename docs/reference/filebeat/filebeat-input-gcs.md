@@ -39,23 +39,24 @@ filebeat.inputs:
   parse_json: true
   buckets:
   - name: gcs-test-new
-    batch_size: 100
+    batch_size: 100 <1>
     max_workers: 3
     poll: true
     poll_interval: 15s
   - name: gcs-test-old
-    batch_size: 50
+    batch_size: 50 <1>
     max_workers: 3
     poll: true
     poll_interval: 10s
 ```
+1. {applies_to}`stack: ga 9.1.0`
 
-**Explanation :** This `configuration` given above describes a basic gcs config having two buckets named `gcs-test-new` and `gcs-test-old`. Each of these buckets have their own attributes such as `name`, `batch_size`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes-gcs). For now lets try to understand how this config works.
+**Explanation :** This `configuration` given above describes a basic gcs config having two buckets named `gcs-test-new` and `gcs-test-old`. Each of these buckets have their own attributes such as `name`, `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes-gcs). For now lets try to understand how this config works.
 
 For google cloud storage input to identify the files it needs to read and process, it will require the bucket names to be specified. We can have as many buckets as we deem fit. We are also able to configure the attributes `max_workers`, `poll` and `poll_interval` at the root level, which will then be applied to all buckets which do not specify any of these attributes explicitly.
 
 ::::{note}
-If the attributes `batch_size`, `max_workers`, `poll` and `poll_interval` are specified at the root level, these can still be overridden at the bucket level with different values, thus offering extensive flexibility and customization. Examples [below](#bucket-overrides) show this behavior.
+If the attributes `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval` are specified at the root level, these can still be overridden at the bucket level with different values, thus offering extensive flexibility and customization. Examples [below](#bucket-overrides) show this behavior.
 ::::
 
 
@@ -149,7 +150,7 @@ $$$supported-attributes-gcs$$$
 3. [auth.credentials_file.path](#attrib-auth-credentials-file)
 4. [buckets](#attrib-buckets)
 5. [name](#attrib-bucket-name)
-6. [batch_size](#attrib-batch_size-gcs)
+6. [batch_size](#attrib-batch_size-gcs) {applies_to}`stack: ga 9.1.0`
 7. [max_workers](#attrib-max_workers-gcs)
 8. [poll](#attrib-poll-gcs)
 9. [poll_interval](#attrib-poll_interval-gcs)
@@ -190,6 +191,9 @@ This attribute contains the details about a specific bucket like `name`, `max_wo
 This is a specific subfield of a bucket. It specifies the bucket name.
 
 ### `batch_size` [attrib-batch_size-gcs]
+```{applies_to}
+  stack: ga 9.1
+```
 
 This attribute specifies the `page size` for the response. In earlier versions, this value was derived from `max_workers`, but with the latest update, `batch_size` is now an independent setting. For backward compatibility, if `batch_size` is not explicitly defined, it will default to a value based on `max_workers`. This attribute can be configured at both the root and bucket levels. When defined at both levels, the bucket-level setting takes precedence.
 
@@ -198,7 +202,7 @@ This attribute specifies the `page size` for the response. In earlier versions, 
 This attribute defines the maximum number of workers (goroutines / lightweight threads) are allocated in the worker pool (thread pool) for processing jobs which read the contents of files. This attribute can be specified both at the root level of the configuration and at the bucket level. Bucket level values override the root level values if both are specified. Larger number of workers do not necessarily improve of throughput, and this should be carefully tuned based on the number of files, the size of the files being processed and resources available. Increasing `max_workers` to very high values may cause resource utilization problems and can lead to a bottleneck in processing. Usually a maximum cap of `2000` workers is recommended. A very low `max_worker` count will drastically increase the number of network calls required to fetch the objects, which can cause a bottleneck in processing.
 
 ::::{note}
-The `batch_size` and `max_workers` attributes are decoupled but functionally related. `batch_size` determines how many objects are fetched in a single API call (i.e., the pagination size), while `max_workers` controls the number of concurrent goroutines used to process the fetched objects. Although these values are independent, they should be configured thoughtfully to ensure efficient workload distribution and optimal performance. For example, setting `batch_size=100` and `max_workers=10` means each pagination request fetches `100` objects, which are then processed by `10` concurrent goroutines. The appropriate value for `max_workers` depends on factors such as the number of files to be processed, available system resources, and network bandwidth.
+The `batch_size` {applies_to}`stack: ga 9.1.0` and `max_workers` attributes are decoupled but functionally related. `batch_size` determines how many objects are fetched in a single API call (i.e., the pagination size), while `max_workers` controls the number of concurrent goroutines used to process the fetched objects. Although these values are independent, they should be configured thoughtfully to ensure efficient workload distribution and optimal performance. For example, setting `batch_size=100` and `max_workers=10` means each pagination request fetches `100` objects, which are then processed by `10` concurrent goroutines. The appropriate value for `max_workers` depends on factors such as the number of files to be processed, available system resources, and network bandwidth.
 ::::
 
 
