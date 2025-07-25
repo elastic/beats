@@ -63,6 +63,9 @@ func (p *eventRenderer) render() (RenderedEtwEvent, error) {
 		RelatedActivityIDName: eventInfo.RelatedActivityIDName,
 		ProviderMessage:       eventInfo.ProviderMessage,
 		Properties:            make([]RenderedProperty, len(eventInfo.Properties)),
+		propertiesMap:         make(map[string]int, len(eventInfo.Properties)),
+		ExtendedData:          make([]RenderedExtendedData, int(p.r.ExtendedDataCount)),
+		extendedDataMap:       make(map[string]int, int(p.r.ExtendedDataCount)),
 	}
 
 	// Set Active Keywords
@@ -75,15 +78,15 @@ func (p *eventRenderer) render() (RenderedEtwEvent, error) {
 	}
 
 	// Parse ExtendedData if present
-	extendedData := make([]RenderedExtendedData, int(p.r.ExtendedDataCount))
+
 	if p.r.ExtendedDataCount > 0 && p.r.ExtendedData != nil {
 		for i := 0; i < int(p.r.ExtendedDataCount); i++ {
 			item := (*EventHeaderExtendedDataItem)(unsafe.Pointer(
 				uintptr(unsafe.Pointer(p.r.ExtendedData)) + uintptr(i)*unsafe.Sizeof(*p.r.ExtendedData),
 			))
-			extendedData[i] = renderExtendedData(item)
+			event.ExtendedData[i] = renderExtendedData(item)
+			event.extendedDataMap[event.ExtendedData[i].ExtType] = i // Map the extended data type to its index
 		}
-		event.ExtendedData = extendedData
 	}
 
 	// Handle the case where the event only contains a string.
@@ -102,6 +105,7 @@ func (p *eventRenderer) render() (RenderedEtwEvent, error) {
 			Name:  prop.Name,
 			Value: value,
 		}
+		event.propertiesMap[prop.Name] = i // Map the property name to its index
 	}
 
 	event.EventMessage = eventInfo.renderEventMessage(event.Properties)

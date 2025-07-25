@@ -39,6 +39,31 @@ type RenderedEtwEvent struct {
 	ProviderMessage       string
 	Properties            []RenderedProperty
 	ExtendedData          []RenderedExtendedData
+
+	propertiesMap   map[string]int
+	extendedDataMap map[string]int
+}
+
+func (e *RenderedEtwEvent) GetProperty(name string) any {
+	if e.propertiesMap == nil {
+		return nil
+	}
+
+	if idx, found := e.propertiesMap[name]; found {
+		return e.Properties[idx].Value
+	}
+	return nil
+}
+
+func (e *RenderedEtwEvent) GetExtendedData(extType string) any {
+	if e.extendedDataMap == nil {
+		return nil
+	}
+
+	if idx, found := e.extendedDataMap[extType]; found {
+		return e.ExtendedData[idx].Data
+	}
+	return nil
 }
 
 type RenderedProperty struct {
