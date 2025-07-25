@@ -2,25 +2,47 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package azureblobstorage
+package decoder
 
 import (
+	"errors"
 	"fmt"
 	"unicode/utf8"
 )
 
 // decoderConfig contains the configuration options for instantiating a decoder.
-type decoderConfig struct {
-	Codec *codecConfig `config:"codec"`
+type DecoderConfig struct {
+	Codec *CodecConfig `config:"codec"`
 }
 
 // codecConfig contains the configuration options for different codecs used by a decoder.
-type codecConfig struct {
-	CSV *csvCodecConfig `config:"csv"`
+type CodecConfig struct {
+	CSV     *CsvCodecConfig     `config:"csv"`
+	Parquet *ParquetCodecConfig `config:"parquet"`
+}
+
+func (c *CodecConfig) Validate() error {
+	count := 0
+	if c == nil {
+		return nil
+	}
+
+	if c.Parquet != nil {
+		count++
+	}
+	if c.CSV != nil {
+		count++
+	}
+
+	if count > 1 {
+		return errors.New("more than one decoder configured")
+	}
+
+	return nil
 }
 
 // csvCodecConfig contains the configuration options for the CSV codec.
-type csvCodecConfig struct {
+type CsvCodecConfig struct {
 	Enabled bool `config:"enabled"`
 
 	// Fields is the set of field names. If it is present
@@ -32,15 +54,15 @@ type csvCodecConfig struct {
 
 	// The fields below have the same meaning as the
 	// fields of the same name in csv.Reader.
-	Comma            *configRune `config:"comma"`
-	Comment          configRune  `config:"comment"`
+	Comma            *ConfigRune `config:"comma"`
+	Comment          ConfigRune  `config:"comment"`
 	LazyQuotes       bool        `config:"lazy_quotes"`
 	TrimLeadingSpace bool        `config:"trim_leading_space"`
 }
 
-type configRune rune
+type ConfigRune rune
 
-func (r *configRune) Unpack(s string) error {
+func (r *ConfigRune) Unpack(s string) error {
 	if s == "" {
 		return nil
 	}
@@ -49,6 +71,17 @@ func (r *configRune) Unpack(s string) error {
 		return fmt.Errorf("single character option given more than one character: %q", s)
 	}
 	_r, _ := utf8.DecodeRuneInString(s)
-	*r = configRune(_r)
+	*r = ConfigRune(_r)
 	return nil
+}
+
+// parquetCodecConfig contains the configuration options for the parquet codec.
+type ParquetCodecConfig struct {
+	Enabled bool `config:"enabled"`
+
+	// If ProcessParallel is true, then functions which read multiple columns will read those columns in parallel
+	// from the file with a number of readers equal to the number of columns. Otherwise columns are read serially.
+	ProcessParallel bool `config:"process_parallel"`
+	// BatchSize is the number of rows to read at a time from the file.
+	BatchSize int `config:"batch_size" default:"1"`
 }

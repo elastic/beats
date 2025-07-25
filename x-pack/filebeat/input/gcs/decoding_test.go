@@ -20,6 +20,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 )
 
 // all test files are read from the "testdata" directory
@@ -35,18 +37,18 @@ func TestDecoding(t *testing.T) {
 		contentType   string
 		numEvents     int
 		assertAgainst string
-		config        decoderConfig
+		config        decoder.DecoderConfig
 	}{
 		{
 			name:          "gzip_csv",
 			file:          "txn.csv.gz",
 			numEvents:     4,
 			assertAgainst: "txn.json",
-			config: decoderConfig{
-				Codec: &codecConfig{
-					CSV: &csvCodecConfig{
+			config: decoder.DecoderConfig{
+				Codec: &decoder.CodecConfig{
+					CSV: &decoder.CsvCodecConfig{
 						Enabled: true,
-						Comma:   ptr[configRune](' '),
+						Comma:   ptr[decoder.ConfigRune](' '),
 					},
 				},
 			},
@@ -56,11 +58,11 @@ func TestDecoding(t *testing.T) {
 			file:          "txn.csv",
 			numEvents:     4,
 			assertAgainst: "txn.json",
-			config: decoderConfig{
-				Codec: &codecConfig{
-					CSV: &csvCodecConfig{
+			config: decoder.DecoderConfig{
+				Codec: &decoder.CodecConfig{
+					CSV: &decoder.CsvCodecConfig{
 						Enabled: true,
-						Comma:   ptr[configRune](' '),
+						Comma:   ptr[decoder.ConfigRune](' '),
 					},
 				},
 			},
@@ -130,7 +132,7 @@ func readJSONFromFile(t *testing.T, filepath string) []string {
 var codecConfigTests = []struct {
 	name    string
 	yaml    string
-	want    decoderConfig
+	want    decoder.DecoderConfig
 	wantErr error
 }{
 	{
@@ -142,13 +144,14 @@ codec:
     comma: ' '
     comment: '#'
 `,
-		want: decoderConfig{&codecConfig{
-			CSV: &csvCodecConfig{
-				Enabled: true,
-				Comma:   ptr[configRune](' '),
-				Comment: '#',
-			},
-		}},
+		want: decoder.DecoderConfig{
+			Codec: &decoder.CodecConfig{
+				CSV: &decoder.CsvCodecConfig{
+					Enabled: true,
+					Comma:   ptr[decoder.ConfigRune](' '),
+					Comment: '#',
+				},
+			}},
 	},
 	{
 		name: "no_comma",
@@ -157,11 +160,12 @@ codec:
   csv:
     enabled: true
 `,
-		want: decoderConfig{&codecConfig{
-			CSV: &csvCodecConfig{
-				Enabled: true,
-			},
-		}},
+		want: decoder.DecoderConfig{
+			Codec: &decoder.CodecConfig{
+				CSV: &decoder.CsvCodecConfig{
+					Enabled: true,
+				},
+			}},
 	},
 	{
 		name: "null_comma",
@@ -171,12 +175,13 @@ codec:
     enabled: true
     comma: "\u0000"
 `,
-		want: decoderConfig{&codecConfig{
-			CSV: &csvCodecConfig{
-				Enabled: true,
-				Comma:   ptr[configRune]('\x00'),
-			},
-		}},
+		want: decoder.DecoderConfig{
+			Codec: &decoder.CodecConfig{
+				CSV: &decoder.CsvCodecConfig{
+					Enabled: true,
+					Comma:   ptr[decoder.ConfigRune]('\x00'),
+				},
+			}},
 	},
 	{
 		name: "bad_rune",
@@ -198,7 +203,7 @@ func TestCodecConfig(t *testing.T) {
 				t.Fatalf("unexpected error unmarshaling config: %v", err)
 			}
 
-			var got decoderConfig
+			var got decoder.DecoderConfig
 			err = c.Unpack(&got)
 			if !sameError(err, test.wantErr) {
 				t.Errorf("unexpected error unpacking config: got:%v want:%v", err, test.wantErr)
