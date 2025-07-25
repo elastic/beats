@@ -6,11 +6,11 @@ package ec2
 
 import (
 	"context"
+	"errors"
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"go.uber.org/multierr"
 
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -55,7 +55,7 @@ func (amf *apiMultiFetcher) fetch(ctx context.Context) ([]*ec2Instance, error) {
 		}
 	}
 
-	return results, multierr.Combine(errs...)
+	return results, errors.Join(errs...)
 }
 
 // apiFetcher is a concrete implementation of fetcher that hits the real AWS API.
@@ -131,7 +131,7 @@ func (p *fetchRequest) fetch() ([]*ec2Instance, error) {
 
 	// Since everything is async we have to retrieve any errors that occurred from here
 	if len(p.errs) > 0 {
-		return nil, multierr.Combine(p.errs...)
+		return nil, errors.Join(p.errs...)
 	}
 
 	return p.ec2Instances, nil

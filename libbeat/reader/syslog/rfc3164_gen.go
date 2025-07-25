@@ -19,10 +19,9 @@
 package syslog
 
 import (
+	"errors"
 	"io"
 	"time"
-
-	"go.uber.org/multierr"
 )
 
 const rfc3164_parser_start int = 1
@@ -34,7 +33,7 @@ const rfc3164_parser_en_main int = 1
 // parseRFC3164 parses an RFC 3164-formatted syslog message. loc is used to enrich
 // timestamps that lack a time zone.
 func parseRFC3164(data string, loc *time.Location) (message, error) {
-	var errs error
+	var errs []error
 	var p, cs, tok int
 
 	pe := len(data)
@@ -135,7 +134,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 		goto tr0
 	tr0:
 
-		errs = multierr.Append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
+		errs = append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
 		p--
 
 		goto st0
@@ -192,14 +191,14 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 	tr6:
 
 		if err := m.setTimestampRFC3339(data[tok:p]); err != nil {
-			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
+			errs = append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
 		goto st4
 	tr30:
 
 		if err := m.setTimestampBSD(data[tok:p], loc); err != nil {
-			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
+			errs = append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
 		goto st4
@@ -408,7 +407,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 	tr15:
 
 		if err := m.setPriority(data[tok:p]); err != nil {
-			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
+			errs = append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
 		goto st10
@@ -835,7 +834,7 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 
 			case 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23:
 
-				errs = multierr.Append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
+				errs = append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
 				p--
 
 			}
@@ -846,5 +845,5 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
 		}
 	}
 
-	return m, errs
+	return m, errors.Join(errs...)
 }
