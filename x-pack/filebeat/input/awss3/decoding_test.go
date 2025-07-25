@@ -15,6 +15,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -37,7 +38,7 @@ func TestDecoding(t *testing.T) {
 			config: &readerConfig{
 				Decoding: decoderConfig{
 					Codec: &codecConfig{
-						Parquet: &parquetCodecConfig{
+						Parquet: &decoder.ParquetCodecConfig{
 							ProcessParallel: true,
 							BatchSize:       1,
 						},
@@ -52,7 +53,7 @@ func TestDecoding(t *testing.T) {
 			config: &readerConfig{
 				Decoding: decoderConfig{
 					Codec: &codecConfig{
-						Parquet: &parquetCodecConfig{
+						Parquet: &decoder.ParquetCodecConfig{
 							ProcessParallel: true,
 							BatchSize:       100,
 						},
@@ -67,7 +68,7 @@ func TestDecoding(t *testing.T) {
 			config: &readerConfig{
 				Decoding: decoderConfig{
 					Codec: &codecConfig{
-						Parquet: &parquetCodecConfig{
+						Parquet: &decoder.ParquetCodecConfig{
 							Enabled: true,
 						},
 					},
@@ -82,7 +83,7 @@ func TestDecoding(t *testing.T) {
 			config: &readerConfig{
 				Decoding: decoderConfig{
 					Codec: &codecConfig{
-						Parquet: &parquetCodecConfig{
+						Parquet: &decoder.ParquetCodecConfig{
 							Enabled:         true,
 							ProcessParallel: true,
 							BatchSize:       1,
@@ -99,9 +100,9 @@ func TestDecoding(t *testing.T) {
 			config: &readerConfig{
 				Decoding: decoderConfig{
 					Codec: &codecConfig{
-						CSV: &csvCodecConfig{
+						CSV: &decoder.CsvCodecConfig{
 							Enabled: true,
-							Comma:   ptr[configRune](' '),
+							Comma:   ptr[decoder.ConfigRune](' '),
 						},
 					},
 				},
@@ -115,9 +116,9 @@ func TestDecoding(t *testing.T) {
 			config: &readerConfig{
 				Decoding: decoderConfig{
 					Codec: &codecConfig{
-						CSV: &csvCodecConfig{
+						CSV: &decoder.CsvCodecConfig{
 							Enabled: true,
-							Comma:   ptr[configRune](' '),
+							Comma:   ptr[decoder.ConfigRune](' '),
 						},
 					},
 				},
@@ -180,9 +181,9 @@ codec:
     comment: '#'
 `,
 		want: decoderConfig{&codecConfig{
-			CSV: &csvCodecConfig{
+			CSV: &decoder.CsvCodecConfig{
 				Enabled: true,
-				Comma:   ptr[configRune](' '),
+				Comma:   ptr[decoder.ConfigRune](' '),
 				Comment: '#',
 			},
 		}},
@@ -195,7 +196,7 @@ codec:
     enabled: true
 `,
 		want: decoderConfig{&codecConfig{
-			CSV: &csvCodecConfig{
+			CSV: &decoder.CsvCodecConfig{
 				Enabled: true,
 			},
 		}},
@@ -209,9 +210,9 @@ codec:
     comma: "\u0000"
 `,
 		want: decoderConfig{&codecConfig{
-			CSV: &csvCodecConfig{
+			CSV: &decoder.CsvCodecConfig{
 				Enabled: true,
-				Comma:   ptr[configRune]('\x00'),
+				Comma:   ptr[decoder.ConfigRune]('\x00'),
 			},
 		}},
 	},

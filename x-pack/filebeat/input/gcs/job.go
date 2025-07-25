@@ -203,7 +203,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 			)
 			if j.src.ParseJSON {
 				var v mapstr.M
-				msg, v, err = dec.DecodeValue()
+				_, msg, v, err = dec.DecodeValue()
 				if err != nil {
 					if err == io.EOF {
 						return nil

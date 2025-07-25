@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -159,37 +160,33 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 	}
 
 	// try to create a dec from the using the codec config
-	dec, err := newDecoder(p.readerConfig.Decoding, streamReader)
+	dec, err := decoder.NewDecoder(p.readerConfig.Decoding, streamReader)
 	if err != nil {
 		return err
 	}
 	switch dec := dec.(type) {
-	case valueDecoder:
-		defer dec.close()
+	case decoder.ValueDecoder:
+		defer dec.Close()
 
-		for dec.next() {
-			evtOffset, val, err := dec.decodeValue()
+		for dec.Next() {
+			evtOffset, msg, _, err := dec.DecodeValue()
 			if err != nil {
 				if errors.Is(err, io.EOF) {
 					return nil
 				}
 				break
 			}
-			data, err := json.Marshal(val)
-			if err != nil {
-				return err
-			}
-			evt := p.createEvent(string(data), evtOffset)
+			evt := p.createEvent(string(msg), evtOffset)
 
 			p.eventCallback(evt)
 		}
 
-	case decoder:
-		defer dec.close()
-
+	case decoder.Decoder:
 		var evtOffset int64
-		for dec.next() {
-			data, err := dec.decode()
+		defer dec.Close()
+
+		for dec.Next() {
+			data, err := dec.Decode()
 			if err != nil {
 				if errors.Is(err, io.EOF) {
 					return nil
