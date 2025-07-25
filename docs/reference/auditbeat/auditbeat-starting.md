@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-starting.html
+applies_to:
+  stack: ga
 ---
 
 # Start Auditbeat [auditbeat-starting]

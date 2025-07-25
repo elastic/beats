@@ -2,6 +2,8 @@
 navigation_title: "add_kubernetes_metadata"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/add-kubernetes-metadata.html
+applies_to:
+  stack: ga
 ---
 
 # Add Kubernetes metadata [add-kubernetes-metadata]

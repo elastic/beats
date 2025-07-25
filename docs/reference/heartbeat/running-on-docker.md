@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/running-on-docker.html
+applies_to:
+  stack: ga
 ---
 
 # Run Heartbeat on Docker [running-on-docker]

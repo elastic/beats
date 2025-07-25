@@ -2,6 +2,8 @@
 navigation_title: "Create a _setup_ user"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/privileges-to-setup-beats.html
+applies_to:
+  stack: ga
 ---
 
 # Grant privileges and roles needed for setup [privileges-to-setup-beats]

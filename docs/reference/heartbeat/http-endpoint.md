@@ -2,6 +2,8 @@
 navigation_title: "HTTP endpoint"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/http-endpoint.html
+applies_to:
+  stack: preview
 ---
 
 # Configure an HTTP endpoint for metrics [http-endpoint]

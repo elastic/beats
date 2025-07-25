@@ -2,6 +2,8 @@
 navigation_title: "rename"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/rename-fields.html
+applies_to:
+  stack: ga
 ---
 
 # Rename fields from events [rename-fields]

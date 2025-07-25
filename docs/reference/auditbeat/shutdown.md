@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/shutdown.html
+applies_to:
+  stack: ga
 ---
 
 # Stop Auditbeat [shutdown]
