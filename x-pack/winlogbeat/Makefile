@@ -2,7 +2,6 @@
 # Variables
 #
 ES_BEATS ?= ../..
-GOX_OS   := windows
 
 #
 # Includes
