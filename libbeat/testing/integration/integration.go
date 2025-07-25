@@ -74,6 +74,14 @@ type BeatTest interface {
 	ExpectOutput(...string) BeatTest
 
 	// ExpectJSONFields registers an output watch for the given key-value pair.
+	// The input to this method should look like
+	// mapstr.M{
+	// 	"key1.key2": true,
+	// 	"key3": {
+	// 	  "key4": 5,
+	// 	  "key5": 6,
+	// 	},
+	// }
 	//
 	// It is useful when expecting key-value pair to exist in the output document/ JSON structured logs
 	//

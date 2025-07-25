@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build integration
-
 package integration
 
 import (
@@ -54,8 +52,10 @@ filebeat.config.modules:
 	if err != nil {
 		t.Fatalf("failed to create a module directory: %v", err)
 	}
-	assert.NoError(t, os.Create(filepath.Join(modules, "enabled-module.yml")))
-	assert.NoError(os.Create(filepath.Join(modules, "disabled-module.yml.disabled")))
+	_, err = os.Create(filepath.Join(modules, "enabled-module.yml"))
+	assert.NoError(t, err)
+	_, err = os.Create(filepath.Join(modules, "disabled-module.yml.disabled"))
+	assert.NoError(t, err)
 
 	t.Run("Test modules list command", func(t *testing.T) {
 
@@ -64,7 +64,7 @@ filebeat.config.modules:
 			Args:   []string{"modules", "list"},
 		})
 
-		test.ExpectOutput("Enabled:", "enabled-module").ExpectOutput("Disabled:", "disabled-module")
+		test.ExpectOutput("Enabled:", "enabled-modue").ExpectOutput("Disabled:", "disabled-module")
 
 		test.
 			WithReportOptions(reportOptions).

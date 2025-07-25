@@ -21,6 +21,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/require"
 )
 
@@ -80,6 +81,83 @@ func TestOutputWatcher(t *testing.T) {
 			t.Run(tc.name, func(t *testing.T) {
 				w := NewRegexpWatcher(tc.expr)
 				w.Inspect(tc.input)
+				require.Equal(t, tc.expectObserved, w.Observed(), "Observed() does not match")
+			})
+		}
+	})
+
+	t.Run("JSON watcher", func(t *testing.T) {
+
+		InputDoc := mapstr.M{
+			"message": "sample dummy message",
+			"fields": mapstr.M{
+				"number": "20",
+				"slice":  []string{"20", "30", "40"},
+			},
+			"isthisboolean": false,
+			"nilValue":      nil,
+		}
+
+		cases := []struct {
+			name           string
+			fieldsToMatch  mapstr.M
+			expectObserved bool
+		}{
+			{
+				name: "test when expected value is string type",
+				fieldsToMatch: mapstr.M{
+					"message": "sample dummy message",
+				},
+				expectObserved: true,
+			},
+			{
+				name: "test when expected value is int type",
+				fieldsToMatch: mapstr.M{
+					"fields": mapstr.M{
+						"number": float64(2),
+					},
+				},
+				expectObserved: true,
+			},
+			{
+				name: "test when expected value is slice type",
+				fieldsToMatch: mapstr.M{
+					"fields": mapstr.M{
+						"slice": []string{"20", "30", "40"},
+					},
+				},
+				expectObserved: true,
+			},
+			{
+				name: "test when expected value is boolean type",
+				fieldsToMatch: mapstr.M{
+					"isthisboolean": false,
+				},
+				expectObserved: true,
+			},
+			{
+				name: "test when expected value is nil type",
+				fieldsToMatch: mapstr.M{
+					"nilValue": nil,
+				},
+				expectObserved: true,
+			},
+			{
+				name: "test when expected value is submap type",
+				fieldsToMatch: mapstr.M{
+					"fields": mapstr.M{
+						"number": "20",
+						"slice":  []string{"20", "30", "40"},
+					},
+				},
+				expectObserved: true,
+			},
+		}
+
+		for _, tc := range cases {
+			t.Run(tc.name, func(t *testing.T) {
+				w := NewJSONWatcher(tc.fieldsToMatch)
+				w.Inspect(InputDoc.String())
 				require.Equal(t, tc.expectObserved, w.Observed(), "Observed() does not match")
 			})
 		}

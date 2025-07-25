@@ -216,7 +216,7 @@ func (w *jsonWatcher) Inspect(line string) {
 	for key, value := range w.fields {
 		if v, err := outputDoc.GetValue(key); err != nil {
 			switch v.(type) {
-			case int, string, float64:
+			case string, float64, bool, nil:
 				if v != value {
 					return
 				}

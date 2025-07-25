@@ -39,7 +39,7 @@ func TestFilebeat(t *testing.T) {
 	lineCount := 128
 
 	reportOptions := integration.ReportOptions{
-		PrintLinesOnFail:  10,
+		PrintLinesOnFail:  100,
 		PrintConfigOnFail: true,
 	}
 

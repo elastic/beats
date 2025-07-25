@@ -1060,7 +1060,7 @@ func reportErrors(t *testing.T, tempDir string, beatName string) {
 
 // GenerateLogFile writes count lines to path
 // Each line contains the current time (RFC3339) and a counter
-// Prefix is added instead of current time if it is passed
+// Prefix is added instead of current time if it exists
 func GenerateLogFile(t *testing.T, path string, count int, append bool, prefix ...string) {
 	var file *os.File
 	var err error
