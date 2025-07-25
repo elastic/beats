@@ -2,6 +2,8 @@
 navigation_title: "UDP"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-udp.html
+applies_to:
+  stack: ga
 ---
 
 # UDP input [filebeat-input-udp]

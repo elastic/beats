@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-reference-yml.html
+applies_to:
+  stack: ga
 ---
 
 # winlogbeat.reference.yml [winlogbeat-reference-yml]

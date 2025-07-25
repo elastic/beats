@@ -2,6 +2,8 @@
 navigation_title: "Create a _reader_ user"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/kibana-user-privileges.html
+applies_to:
+  stack: ga
 ---
 
 # Grant privileges and roles needed to read Winlogbeat data from {{kib}} [kibana-user-privileges]
