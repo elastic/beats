@@ -29,19 +29,32 @@ type Decoder interface {
 type ValueDecoder interface {
 	Decoder
 
-	DecodeValue() ([]byte, map[string]any, error)
+	DecodeValue() (int64, []byte, map[string]any, error)
 }
 
 // newDecoder creates a new decoder based on the codec type.
 // It returns a decoder type and an error if the codec type is not supported.
 // If the reader config codec option is not set, it returns a nil decoder and nil error.
 func NewDecoder(cfg DecoderConfig, r io.Reader) (Decoder, error) {
+	codec := cfg.Codec
+
+	if err := codec.Validate(); err != nil {
+		return nil, err
+	}
+
+	var result Decoder
 	switch {
 	case cfg.Codec == nil:
 		return nil, nil
 	case cfg.Codec.CSV != nil:
-		return newCSVDecoder(cfg, r)
+		csv := codec.CSV
+		result, _ = NewCSVDecoder(*csv, r)
+	case cfg.Codec.Parquet != nil:
+		pqt := codec.Parquet
+		result, _ = NewParquetDecoder(*pqt, r)
 	default:
 		return nil, fmt.Errorf("unsupported config value: %v", cfg)
 	}
+
+	return result, nil
 }

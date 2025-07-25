@@ -7,7 +7,6 @@ package gcs
 import (
 	"bufio"
 	"bytes"
-	"compress/gzip"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -26,6 +25,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 )
 
@@ -183,7 +183,7 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 }
 
 func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
-	r, err := j.addGzipDecoderIfNeeded(bufio.NewReader(r))
+	r, err := reader.AddGzipDecoderIfNeeded(bufio.NewReader(r))
 	if err != nil {
 		return fmt.Errorf("failed to add gzip decoder to object: %s, with error: %w", j.object.Name, err)
 	}
@@ -417,36 +417,6 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, id s
 	}
 
 	return eventsPerObject, nil
-}
-
-// addGzipDecoderIfNeeded determines whether the given stream of bytes (encapsulated in a buffered reader)
-// represents gzipped content or not and adds gzipped decoder if needed. A bufio.Reader is used
-// so the function can peek into the byte  stream without consuming it. This makes it convenient for
-// code executed after this function call to consume the stream if it wants.
-func (j *job) addGzipDecoderIfNeeded(reader *bufio.Reader) (io.Reader, error) {
-	isStreamGzipped := false
-	// check if stream is gziped or not
-	buf, err := reader.Peek(3)
-	if err != nil {
-		if errors.Is(err, io.EOF) {
-			err = nil
-		}
-		return reader, err
-	}
-
-	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
-	isStreamGzipped = bytes.Equal(buf, []byte{0x1F, 0x8B, 0x08})
-
-	if !isStreamGzipped {
-		return reader, nil
-	}
-
-	gzReader, err := gzip.NewReader(reader)
-	if err != nil {
-		return nil, err
-	}
-
-	return gzReader, nil
 }
 
 // evaluateJSON, uses a bufio.NewReader & reader.Peek to evaluate if the

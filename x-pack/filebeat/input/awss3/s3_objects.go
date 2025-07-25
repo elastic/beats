@@ -5,9 +5,7 @@
 package awss3
 
 import (
-	"bufio"
 	"bytes"
-	"compress/gzip"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -25,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	x_reader "github.com/elastic/beats/v7/x-pack/libbeat/reader"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -149,7 +148,7 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 	// Wrap to detect S3 body streaming errors so we can retry them
 	wrappedReader := s3DownloadFailedWrappedReader{r: mReader}
 
-	streamReader, err := p.addGzipDecoderIfNeeded(wrappedReader)
+	streamReader, err := x_reader.AddGzipDecoderIfNeeded(wrappedReader)
 	if err != nil {
 		return fmt.Errorf("failed checking for gzip content: %w", err)
 	}
@@ -250,20 +249,6 @@ func (p *s3ObjectProcessor) download() (obj *s3DownloadedObject, err error) {
 	}
 
 	return s, nil
-}
-
-func (p *s3ObjectProcessor) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
-	bufReader := bufio.NewReader(body)
-
-	gzipped, err := isStreamGzipped(bufReader)
-	if err != nil {
-		return nil, err
-	}
-	if !gzipped {
-		return bufReader, nil
-	}
-
-	return gzip.NewReader(bufReader)
 }
 
 func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
@@ -497,20 +482,6 @@ func s3ObjectHash(obj s3EventV2) string {
 	h.Write([]byte(obj.S3.Object.Key))
 	prefix := hex.EncodeToString(h.Sum(nil))
 	return prefix[:10]
-}
-
-// isStreamGzipped determines whether the given stream of bytes (encapsulated in a buffered reader)
-// represents gzipped content or not. A buffered reader is used so the function can peek into the byte
-// stream without consuming it. This makes it convenient for code executed after this function call
-// to consume the stream if it wants.
-func isStreamGzipped(r *bufio.Reader) (bool, error) {
-	buf, err := r.Peek(3)
-	if err != nil && err != io.EOF {
-		return false, err
-	}
-
-	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
-	return bytes.HasPrefix(buf, []byte{0x1F, 0x8B, 0x08}), nil
 }
 
 // s3Metadata returns a map containing the selected S3 object metadata keys.

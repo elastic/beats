@@ -12,10 +12,16 @@ import (
 	"slices"
 )
 
+type offsets struct {
+	current int64
+	coming  int64
+}
+
 // csvDecoder is a decoder for CSV data.
 type CsvDecoder struct {
 	r *csv.Reader
 
+	offset  offsets
 	header  []string
 	current []string
 	coming  []string
@@ -23,19 +29,19 @@ type CsvDecoder struct {
 	err error
 }
 
-// newCSVDecoder creates a new CSV decoder.
-func newCSVDecoder(config DecoderConfig, r io.Reader) (Decoder, error) {
+// NewCSVDecoder creates a new CSV decoder.
+func NewCSVDecoder(config CsvCodecConfig, r io.Reader) (Decoder, error) {
 	d := CsvDecoder{r: csv.NewReader(r)}
 	d.r.ReuseRecord = true
-	if config.Codec.CSV.Comma != nil {
-		d.r.Comma = rune(*config.Codec.CSV.Comma)
+	if config.Comma != nil {
+		d.r.Comma = rune(*config.Comma)
 	}
-	d.r.Comment = rune(config.Codec.CSV.Comment)
-	d.r.LazyQuotes = config.Codec.CSV.LazyQuotes
-	d.r.TrimLeadingSpace = config.Codec.CSV.TrimLeadingSpace
-	if len(config.Codec.CSV.Fields) != 0 {
-		d.r.FieldsPerRecord = len(config.Codec.CSV.Fields)
-		d.header = config.Codec.CSV.Fields
+	d.r.Comment = rune(config.Comment)
+	d.r.LazyQuotes = config.LazyQuotes
+	d.r.TrimLeadingSpace = config.TrimLeadingSpace
+	if len(config.Fields) != 0 {
+		d.r.FieldsPerRecord = len(config.Fields)
+		d.header = config.Fields
 	} else {
 		h, err := d.r.Read()
 		if err != nil {
@@ -43,6 +49,8 @@ func newCSVDecoder(config DecoderConfig, r io.Reader) (Decoder, error) {
 		}
 		d.header = slices.Clone(h)
 	}
+	d.offset.current = 0
+	d.offset.coming = d.r.InputOffset()
 	var err error
 	d.coming, err = d.r.Read()
 	if err != nil {
@@ -62,6 +70,8 @@ func (d *CsvDecoder) Next() bool {
 	}
 	d.current = d.current[:len(d.header)]
 	copy(d.current, d.coming)
+	d.offset.current = d.offset.coming
+	d.offset.coming = d.r.InputOffset()
 	d.coming, d.err = d.r.Read()
 	if d.err == io.EOF {
 		d.coming = nil
@@ -96,10 +106,10 @@ func (d *CsvDecoder) Decode() ([]byte, error) {
 // decodeValue returns the value of the current CSV line interpreted as
 // an object with fields based on the header held by the receiver. next must
 // have been called before any calls to decode.
-func (d *CsvDecoder) DecodeValue() ([]byte, map[string]any, error) {
+func (d *CsvDecoder) DecodeValue() (int64, []byte, map[string]any, error) {
 	err := d.Check()
 	if err != nil {
-		return nil, nil, err
+		return 0, nil, nil, err
 	}
 	m := make(map[string]any, len(d.header))
 	for i, n := range d.header {
@@ -108,9 +118,9 @@ func (d *CsvDecoder) DecodeValue() ([]byte, map[string]any, error) {
 	d.current = d.current[:0]
 	b, err := d.Decode()
 	if err != nil {
-		return nil, nil, err
+		return d.offset.current, nil, nil, err
 	}
-	return b, m, nil
+	return d.offset.current, b, m, nil
 }
 
 func (d *CsvDecoder) Check() error {
