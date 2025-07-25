@@ -1,6 +1,8 @@
 - name: jetstream
   type: group
   release: beta
+  version:
+    beta: 9.1.0
   description: >
     Information pertaining to a NATS JetStream server
   fields:
@@ -245,11 +247,11 @@
             - name: max_age
               type: long
               description: >
-                Maximum age of any message in the stream, expressed in nanoseconds.	
+                Maximum age of any message in the stream, expressed in nanoseconds.
             - name: max_msgs_per_subject
               type: long
               description: >
-                Limits maximum number of messages in the stream to retain per subject.	
+                Limits maximum number of messages in the stream to retain per subject.
             - name: max_msg_size
               type: long
               format: bytes
