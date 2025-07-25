@@ -34,16 +34,18 @@ filebeat.inputs:
   auth.shared_credentials.account_key: some_key
   containers:
   - name: container_1
-    batch_size: 100
+    batch_size: 100 <1>
     max_workers: 3
     poll: true
     poll_interval: 10s
   - name: container_2
-    batch_size: 50
+    batch_size: 50 <2>
     max_workers: 3
     poll: true
     poll_interval: 10s
 ```
+1. {applies_to}`stack: ga 9.1.0`
+2. {applies_to}`stack: ga 9.1.0`
 
 **Explanation :** This `configuration` given above describes a basic blob storage config having two containers named `container_1` and `container_2`. Each of these containers have their own attributes such as `name`, `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes). For now lets try to understand how this config works.
 
