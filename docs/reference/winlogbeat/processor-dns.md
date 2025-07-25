@@ -2,6 +2,8 @@
 navigation_title: "dns"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/processor-dns.html
+applies_to:
+  stack: ga
 ---
 
 # DNS Reverse Lookup [processor-dns]

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-starting.html
+applies_to:
+  stack: ga
 ---
 
 # Start Packetbeat [packetbeat-starting]

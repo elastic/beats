@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/running-on-kubernetes.html
+applies_to:
+  stack: ga
 ---
 
 # Running Auditbeat on Kubernetes [running-on-kubernetes]

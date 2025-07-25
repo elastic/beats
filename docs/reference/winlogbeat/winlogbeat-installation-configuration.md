@@ -2,6 +2,8 @@
 navigation_title: "Quick start"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-installation-configuration.html
+applies_to:
+  stack: ga
 ---
 
 # Winlogbeat quick start: installation and configuration [winlogbeat-installation-configuration]

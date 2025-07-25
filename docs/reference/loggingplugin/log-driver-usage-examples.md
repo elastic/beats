@@ -2,6 +2,8 @@
 navigation_title: "Usage examples"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/loggingplugin/current/log-driver-usage-examples.html
+applies_to:
+  stack: ga
 ---
 
 # Elastic Logging Plugin usage examples [log-driver-usage-examples]

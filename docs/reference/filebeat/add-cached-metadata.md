@@ -2,6 +2,8 @@
 navigation_title: "cache"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/add-cached-metadata.html
+applies_to:
+  stack: preview
 ---
 
 # Add cached metadata [add-cached-metadata]

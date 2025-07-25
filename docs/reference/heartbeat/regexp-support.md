@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/regexp-support.html
+applies_to:
+  stack: ga
 ---
 
 # Regular expression support [regexp-support]

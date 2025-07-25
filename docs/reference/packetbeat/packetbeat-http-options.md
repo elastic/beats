@@ -2,6 +2,8 @@
 navigation_title: "HTTP"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-http-options.html
+applies_to:
+  stack: ga
 ---
 
 # Capture HTTP traffic [packetbeat-http-options]
