@@ -42,13 +42,12 @@ filebeat.inputs:
     poll: true
     poll_interval: 15s
   - name: gcs-test-old
-    batch_size: 50 <2>
+    batch_size: 50 <1>
     max_workers: 3
     poll: true
     poll_interval: 10s
 ```
 1. {applies_to}`stack: ga 9.1.0`
-2. {applies_to}`stack: ga 9.1.0`
 
 **Explanation :** This `configuration` given above describes a basic gcs config having two buckets named `gcs-test-new` and `gcs-test-old`. Each of these buckets have their own attributes such as `name`, `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes-gcs). For now lets try to understand how this config works.
 
