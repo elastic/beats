@@ -54,7 +54,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta(fmt.Sprintf("The %s %s metricset is beta.", moduleName, metricsetName))
+	base.Logger().Warn(cfgwarn.Beta(fmt.Sprintf("The %s %s metricset is beta.", moduleName, metricsetName)))
 
 	if runtime.GOOS != "linux" {
 		return nil, fmt.Errorf("the %v/%v metricset is only supported on Linux", moduleName, metricsetName)

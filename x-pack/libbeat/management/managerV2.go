@@ -154,8 +154,8 @@ func init() {
 // NewV2AgentManager returns a remote config manager for the agent V2 protocol.
 // This is registered as the manager factory in init() so that calls to
 // lbmanagement.NewManager will be forwarded here.
-func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
-	logger := logp.NewLogger(lbmanagement.DebugK).Named("V2-manager")
+func NewV2AgentManager(config *conf.C, registry *reload.Registry, logger *logp.Logger) (lbmanagement.Manager, error) {
+	logger = logger.Named(lbmanagement.DebugK).Named("V2-manager")
 	c := DefaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
@@ -193,12 +193,12 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 	// debug log messages are only outputted when running in trace mode
 	lbmanagement.SetUnderAgent(true)
 
-	return NewV2AgentManagerWithClient(c, registry, agentClient)
+	return NewV2AgentManagerWithClient(c, registry, agentClient, logger)
 }
 
 // NewV2AgentManagerWithClient actually creates the manager instance used by the rest of the beats.
-func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agentClient client.V2, opts ...func(*BeatV2Manager)) (lbmanagement.Manager, error) {
-	log := logp.NewLogger(lbmanagement.DebugK)
+func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agentClient client.V2, logger *logp.Logger, opts ...func(*BeatV2Manager)) (lbmanagement.Manager, error) {
+	log := logger.Named(lbmanagement.DebugK)
 	if config.RestartOnOutputChange {
 		log.Infof("Output reload is enabled, the beat will restart as needed on change of output config")
 	}

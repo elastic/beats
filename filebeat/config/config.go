@@ -128,7 +128,7 @@ func (config *Config) FetchConfigs(logger *logp.Logger) error {
 		return nil
 	}
 
-	cfgwarn.Deprecate("7.0.0", "config_dir is deprecated. Use `filebeat.config.inputs` instead.")
+	logger.Warn(cfgwarn.Deprecate("7.0.0", "config_dir is deprecated. Use `filebeat.config.inputs` instead."))
 
 	// If configDir is relative, consider it relative to the config path
 	configDir = paths.Resolve(paths.Config, configDir)

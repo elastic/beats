@@ -18,6 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 const (
@@ -294,7 +295,7 @@ func TestAllocationWatcher(t *testing.T) {
 				t.Error(err)
 			}
 
-			watcher, err := NewWatcher(client, options)
+			watcher, err := NewWatcher(client, options, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Error(err)
 			}
