@@ -202,24 +202,6 @@ func GetComputers(ctx context.Context, cli *http.Client, tenant string, tok Toke
 	return getDetails[Computers](ctx, cli, u, tok)
 }
 
-// GetUsers returns Jamf users using the list users API endpoint. tenant is the
-// Jamf user domain and key is the API token to use for the query. If user is not empty,
-// details for the specific user are returned, otherwise a list of all users is returned.
-//
-// See https://developer.jamf.com/jamf-pro/reference/findusers for details.
-func GetUsers(ctx context.Context, cli *http.Client, tenant string, tok Token, query url.Values) ([]User, error) {
-	const endpoint = "/JSSResource/users"
-
-	u := &url.URL{
-		Scheme:   "https",
-		Host:     tenant,
-		Path:     endpoint,
-		RawQuery: query.Encode(),
-	}
-	users, err := getDetails[Users](ctx, cli, u, tok)
-	return users.Users, err
-}
-
 // entity is an Jamf entity analytics entity.
 type entity interface {
 	Computers | Users

@@ -276,28 +276,6 @@ func GetUserGroupDetails(ctx context.Context, cli *http.Client, host, key, user 
 	return getDetails[Group](ctx, cli, u, endpoint, key, true, OmitNone, lim, log)
 }
 
-// GetGroupRoles returns Okta group roles using the groups API endpoint. host is the
-// Okta user domain and key is the API token to use for the query. group must not be empty.
-//
-// See GetUserDetails for details of the query and rate limit parameters.
-//
-// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentBGroup/#tag/RoleAssignmentBGroup/operation/listGroupAssignedRoles.
-func GetGroupRoles(ctx context.Context, cli *http.Client, host, key, group string, lim *RateLimiter, log *logp.Logger) ([]Role, http.Header, error) {
-	if group == "" {
-		return nil, nil, errors.New("no group specified")
-	}
-
-	const endpoint = "/api/v1/groups/{group}/roles"
-	path := strings.Replace(endpoint, "{group}", group, 1)
-
-	u := &url.URL{
-		Scheme: "https",
-		Host:   host,
-		Path:   path,
-	}
-	return getDetails[Role](ctx, cli, u, endpoint, key, true, OmitNone, lim, log)
-}
-
 // GetDeviceDetails returns Okta device details using the list devices API endpoint. host is the
 // Okta user domain and key is the API token to use for the query. If device is not empty,
 // details for the specific device are returned, otherwise a list of all devices is returned.
