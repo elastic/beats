@@ -269,3 +269,20 @@ func TestFragment(t *testing.T) {
 		assert.Equal(t, udp.pkt.Payload, payload, "unexpected payload")
 	})
 }
+
+func FuzzOnPacket(f *testing.F) {
+	f.Add(ipv4TcpDNS)
+	f.Add(ipv4UdpDNS)
+	f.Add(ipv6TcpHTTPGet)
+	f.Add(ipv6UdpDNS)
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		p := gopacket.NewPacket(data, layers.LinkTypeEthernet, gopacket.Default)
+		if p.ErrorLayer() != nil {
+			return
+		}
+
+		d, _, _ := newTestDecoder(t)
+		d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
+	})
+}
