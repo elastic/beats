@@ -946,6 +946,10 @@ The interval in which incremental updates should occur. The interval must be sho
 
 #### `batch_size` [_batch_size]
 
+```{applies_to}
+stack: preview 9.0.1
+```
+
 The pagination batch size for requests. If it is zero or negative, the API default is used. The default is 200.
 
 
