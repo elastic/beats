@@ -255,7 +255,7 @@ logging.level: debug
 
 	registryLogFile := filepath.Join(workDir,
 		"data", "registry", "filebeat", "log.json")
-	entries, _ := readFilestreamRegistryLog(t, registryLogFile)
+	entries, _ := ReadFilestreamRegistryLog(t, registryLogFile)
 
 	var lastEntry *registryEntry
 	for i := range entries {
@@ -281,7 +281,7 @@ logging.level: debug
 	)
 
 	// =============== Verify file read to EOF isn't read again ================
-	gotEntries, _ := readFilestreamRegistryLog(t, registryLogFile)
+	gotEntries, _ := ReadFilestreamRegistryLog(t, registryLogFile)
 	// when the harvester starts, before attempting to open the log file, it
 	// updates the registry, thus reading it again will bring one more entry
 	assert.Equal(t, entries, gotEntries[:len(gotEntries)-1],
@@ -1130,7 +1130,7 @@ logging.level: debug
 	// assert EOF is set on registry
 	registryLogFile := filepath.Join(workDir,
 		"data", "registry", "filebeat", "log.json")
-	entries, _ := readFilestreamRegistryLog(t, registryLogFile)
+	entries, _ := ReadFilestreamRegistryLog(t, registryLogFile)
 	var lastEntry *registryEntry
 	for i := range entries {
 		entry := &entries[i]

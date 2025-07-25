@@ -31,7 +31,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
-// Checks that if a line does not have a line ending, then it is not read3.
+// Checks all log lines are ingested
+// Checks that if a line does not have a line ending, then it is not read.
 // Checks that if a file is renamed, its contents are not re-ingested
 func TestCrawler(t *testing.T) {
 

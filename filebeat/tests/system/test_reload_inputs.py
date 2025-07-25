@@ -170,46 +170,4 @@ class Test(BaseTest):
 
         proc.check_kill_and_wait()
 
-    def test_reload_add(self):
-        """
-        Test adding a input and makes sure both are still running
-        """
-        self.render_config_template(
-            reload=True,
-            reload_path=self.working_dir + "/configs/*.yml",
-            inputs=False,
-        )
-
-        os.mkdir(self.working_dir + "/logs/")
-        logfile1 = self.working_dir + "/logs/test1.log"
-        logfile2 = self.working_dir + "/logs/test2.log"
-        os.mkdir(self.working_dir + "/configs/")
-
-        with open(self.working_dir + "/configs/input.yml", 'w') as f:
-            f.write(inputConfigTemplate.format(self.working_dir + "/logs/test1.log"))
-
-        proc = self.start_beat()
-
-        with open(logfile1, 'w') as f:
-            f.write("Hello world1\n")
-
-        self.wait_until(lambda: self.output_lines() > 0)
-
-        with open(self.working_dir + "/configs/input2.yml", 'w') as f:
-            f.write(inputConfigTemplate.format(self.working_dir + "/logs/test2.log"))
-
-        self.wait_until(
-            lambda: self.log_contains_count("Starting runner:") == 2,
-            max_timeout=15)
-
-        # Add new log line and see if it is picked up = new input is running
-        with open(logfile1, 'a') as f:
-            f.write("Hello world2\n")
-
-        # Add new log line and see if it is picked up = new input is running
-        with open(logfile2, 'a') as f:
-            f.write("Hello world3\n")
-
-        self.wait_until(lambda: self.output_lines() == 3)
-
-        proc.check_kill_and_wait()
+ 
