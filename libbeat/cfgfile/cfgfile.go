@@ -263,8 +263,8 @@ func Load(path string, beatOverrides []ConditionalOverride) (*config.C, error) {
 }
 
 // LoadList loads a list of configs data from the given file.
-func LoadList(file string) ([]*config.C, error) {
-	logp.Debug("cfgfile", "Load config from file: %s", file)
+func LoadList(file string, logger *logp.Logger) ([]*config.C, error) {
+	logger.Named("cfgfile").Debugf("Load config from file: %s", file)
 	rawConfig, err := common.LoadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf("invalid config: %w", err)

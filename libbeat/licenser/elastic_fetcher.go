@@ -54,8 +54,8 @@ type ElasticFetcher struct {
 }
 
 // NewElasticFetcher creates a new Elastic Fetcher
-func NewElasticFetcher(client esclient) *ElasticFetcher {
-	return &ElasticFetcher{client: client, log: logp.NewLogger("elasticfetcher")}
+func NewElasticFetcher(client esclient, logger *logp.Logger) *ElasticFetcher {
+	return &ElasticFetcher{client: client, log: logger.Named("elasticfetcher")}
 }
 
 // Fetch retrieves the license information from an Elasticsearch Client, it will call the `_license`

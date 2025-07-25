@@ -183,7 +183,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	// initialize config manager
-	m, err := management.NewManager(b.Config.Management, b.Registry)
+	m, err := management.NewManager(b.Config.Management, b.Registry, logger)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new manager: %w", err)
 	}

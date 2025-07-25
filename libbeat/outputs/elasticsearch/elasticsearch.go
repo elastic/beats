@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -129,12 +130,12 @@ func makeES(
 		clients[i] = client
 	}
 
-	return outputs.SuccessNet(esConfig.Queue, esConfig.LoadBalance, esConfig.BulkMaxSize, esConfig.MaxRetries, encoderFactory, clients)
+	return outputs.SuccessNet(esConfig.Queue, esConfig.LoadBalance, esConfig.BulkMaxSize, esConfig.MaxRetries, encoderFactory, beatInfo.Logger, clients)
 }
 
 func buildSelectors(
 	im outputs.IndexManager,
-	_ beat.Info,
+	b beat.Info,
 	cfg *config.C,
 ) (index outputs.IndexSelector, pipeline *outil.Selector, err error) {
 	index, err = im.BuildSelector(cfg)
@@ -142,7 +143,7 @@ func buildSelectors(
 		return index, pipeline, err
 	}
 
-	pipelineSel, err := buildPipelineSelector(cfg)
+	pipelineSel, err := buildPipelineSelector(cfg, b.Logger)
 	if err != nil {
 		return index, pipeline, err
 	}
@@ -154,12 +155,12 @@ func buildSelectors(
 	return index, pipeline, err
 }
 
-func buildPipelineSelector(cfg *config.C) (outil.Selector, error) {
+func buildPipelineSelector(cfg *config.C, logger *logp.Logger) (outil.Selector, error) {
 	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
 		Key:              "pipeline",
 		MultiKey:         "pipelines",
 		EnableSingleOnly: true,
 		FailEmpty:        false,
 		Case:             outil.SelectorLowerCase,
-	})
+	}, logger)
 }

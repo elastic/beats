@@ -26,10 +26,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 func TestTLSCommonToOTel_EncryptedPrivateKey_CipherSuites(t *testing.T) {
+
 	got, err := TLSCommonToOTel(&tlscommon.Config{
 		CAs: []string{
 			"testdata/certs/rootCA.crt",
@@ -58,8 +60,10 @@ sxSmbIUfc2SGJGCJD4I=
 			Passphrase:  "changeme",
 		},
 		CipherSuites: []tlscommon.CipherSuite{tlscommon.CipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256)},
-	})
+	}, logptest.NewTestingLogger(t, ""))
+
 	require.NoError(t, err)
+
 	assert.Equal(t, map[string]any{
 		"ca_pem": `-----BEGIN CERTIFICATE-----
 MIIDzTCCArWgAwIBAgIURzQp9/bWT37HJX71yfGEO0xrs2wwDQYJKoZIhvcNAQEL
