@@ -2,6 +2,8 @@
 navigation_title: "Elasticsearch index template"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/configuration-template.html
+applies_to:
+  stack: ga
 ---
 
 # Configure Elasticsearch index template loading [configuration-template]

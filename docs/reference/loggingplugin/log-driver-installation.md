@@ -2,6 +2,8 @@
 navigation_title: "Install and configure"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/loggingplugin/current/log-driver-installation.html
+applies_to:
+  stack: ga
 ---
 
 # Install and configure the Elastic Logging Plugin [log-driver-installation]

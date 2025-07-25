@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/load-kibana-dashboards.html
+applies_to:
+  stack: ga
 ---
 
 # Load Kibana dashboards [load-kibana-dashboards]

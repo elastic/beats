@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/configuring-ssl-logstash.html
+applies_to:
+  stack: ga
 ---
 
 # Secure communication with Logstash [configuring-ssl-logstash]

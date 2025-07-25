@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/monitor-tcp-options.html
+applies_to:
+  stack: ga
 ---
 
 # TCP options [monitor-tcp-options]
