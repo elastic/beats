@@ -698,7 +698,7 @@ func requireRegistryEntryRemoved(t *testing.T, workDir, identity string) {
 	t.Helper()
 
 	registryFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
-	entries, _ := ReadFilestreamRegistryLog(t, registryFile)
+	entries, _ := readFilestreamRegistryLog(t, registryFile)
 	inputEntries := []registryEntry{}
 	for _, currentEntry := range entries {
 		if strings.Contains(currentEntry.Key, identity) {
@@ -794,7 +794,7 @@ func assertRegistry(t *testing.T, workDir, testdataDir, registry, msg string) {
 	}
 
 	registryFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
-	entries, nameToInode := ReadFilestreamRegistryLog(t, registryFile)
+	entries, nameToInode := readFilestreamRegistryLog(t, registryFile)
 	reg := parseRegistry(entries)
 
 	// More Windows workarounds.
