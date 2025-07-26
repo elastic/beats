@@ -60,7 +60,7 @@ setup.kibana:
 	err := os.CopyFS("../../module", os.DirFS(filepath.Join(filebeat.TempDir(), "module")))
 	require.NoError(t, err, "error copying module directory")
 
-	err = os.CopyFS("../../module", os.DirFS(filepath.Join(filebeat.TempDir(), "modules.d")))
+	err = os.CopyFS("../../module.d", os.DirFS(filepath.Join(filebeat.TempDir(), "modules.d")))
 	require.NoError(t, err, "error copying modules.d directory")
 
 	filebeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.Host, esURL.User.Username(), esPassword, kURL.Host, kUserInfo.Username(), kPassword))
@@ -99,7 +99,7 @@ logging.level: debug
 	err := os.CopyFS("../../module", os.DirFS(filepath.Join(filebeat.TempDir(), "module")))
 	require.NoError(t, err, "error copying module directory")
 
-	err = os.CopyFS("../../module", os.DirFS(filepath.Join(filebeat.TempDir(), "modules.d")))
+	err = os.CopyFS("../../module.d", os.DirFS(filepath.Join(filebeat.TempDir(), "modules.d")))
 	require.NoError(t, err, "error copying modules.d directory")
 
 	filebeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.Host, esURL.User.Username(), esPassword, kURL.Host, kUserInfo.Username(), kPassword))
@@ -138,7 +138,7 @@ logging.level: debug
 	err := os.CopyFS("../../module", os.DirFS(filepath.Join(filebeat.TempDir(), "module")))
 	require.NoError(t, err, "error copying module directory")
 
-	err = os.CopyFS("../../module", os.DirFS(filepath.Join(filebeat.TempDir(), "modules.d")))
+	err = os.CopyFS("../../module.d", os.DirFS(filepath.Join(filebeat.TempDir(), "modules.d")))
 	require.NoError(t, err, "error copying modules.d directory")
 
 	filebeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.Host, esURL.User.Username(), esPassword, kURL.Host, kUserInfo.Username(), kPassword))
@@ -177,7 +177,7 @@ logging.level: debug
 	err := os.CopyFS("../../module", os.DirFS(filepath.Join(filebeat.TempDir(), "module")))
 	require.NoError(t, err, "error copying module directory")
 
-	err = os.CopyFS("../../module", os.DirFS(filepath.Join(filebeat.TempDir(), "modules.d")))
+	err = os.CopyFS("../../module.d", os.DirFS(filepath.Join(filebeat.TempDir(), "modules.d")))
 	require.NoError(t, err, "error copying modules.d directory")
 
 	filebeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.Host, esURL.User.Username(), esPassword, kURL.Host, kUserInfo.Username(), kPassword))
