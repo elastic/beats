@@ -34,7 +34,7 @@ import (
 func testRTT(t *testing.T, expected int64, provided time.Duration) {
 	actual, err := RTT(provided).GetValue("us")
 	assert.NoError(t, err)
-	assert.Equal(t, expected, actual.(int64))
+	assert.Equal(t, expected, actual)
 }
 
 func TestPositiveRTTIsKept(t *testing.T) {
