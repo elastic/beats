@@ -1,5 +1,4 @@
 import os
-import pytest
 import time
 from filebeat import BaseTest
 
