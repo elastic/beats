@@ -174,58 +174,56 @@ filebeat.config.modules:
 
 }
 
-// Enable this test when https://github.com/elastic/beats/issues/45551 is fixed
-
 // // Tests filebeat --once command
-// func TestFileBeatOnceCommand(t *testing.T) {
-// 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
-// 	defer cancel()
-// 	EnsureCompiled(ctx, t)
+func TestFileBeatOnceCommand(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	EnsureCompiled(ctx, t)
 
-// 	messagePrefix := "sample test message"
-// 	fileCount := 1
-// 	lineCount := 10
+	messagePrefix := "sample test message"
+	fileCount := 1
+	lineCount := 10
 
-// 	reportOptions := integration.ReportOptions{
-// 		PrintLinesOnFail:  100,
-// 		PrintConfigOnFail: true,
-// 	}
+	reportOptions := integration.ReportOptions{
+		PrintLinesOnFail:  100,
+		PrintConfigOnFail: true,
+	}
 
-// 	generator := NewPlainTextGenerator(messagePrefix)
-// 	path, files := GenerateLogFiles(t, fileCount, lineCount, generator)
+	generator := NewPlainTextGenerator(messagePrefix)
+	path, files := GenerateLogFiles(t, fileCount, lineCount, generator)
 
-// 	config := `
-// filebeat.inputs:
-//   - type: log
-//     enabled: true
-//     id: "test-filestream"
-// 	allow_deprecated_use: true
-//     paths:
-//      - %s
-// output.console:
-//   enabled: true
-// `
+	config := `
+filebeat.inputs:
+  - type: log
+    enabled: true
+    id: "test-log"
+    allow_deprecated_use: true
+    paths:
+     - %s
+output.console:
+  enabled: true
+`
 
-// 	test := NewTest(t, TestOptions{
-// 		Config: fmt.Sprintf(config, path),
-// 		Args:   []string{"--once"},
-// 	})
+	test := NewTest(t, TestOptions{
+		Config: fmt.Sprintf(config, path),
+		Args:   []string{"--once"},
+	})
 
-// 	// ensuring we ingest every line from every file
-// 	for _, filename := range files {
-// 		for i := 1; i <= lineCount; i++ {
-// 			line := fmt.Sprintf("%s:%d", filepath.Base(filename), i)
-// 			test.ExpectOutput(line)
-// 		}
-// 	}
+	// ensuring we ingest every line from every file
+	for _, filename := range files {
+		for i := 1; i <= lineCount; i++ {
+			line := fmt.Sprintf("%s:%d", filepath.Base(filename), i)
+			test.ExpectOutput(line)
+		}
+	}
 
-// 	// // expect filebeat to exit
-// 	// test.ExpectOutput("filebeat stopped")
+	// // expect filebeat to exit
+	// test.ExpectOutput("filebeat stopped")
 
-// 	test.
-// 		ExpectEOF(files...).
-// 		WithReportOptions(reportOptions).
-// 		ExpectStart().
-// 		Start(ctx).
-// 		Wait()
-// }
+	test.
+		ExpectEOF(files...).
+		WithReportOptions(reportOptions).
+		ExpectStart().
+		Start(ctx).
+		Wait()
+}

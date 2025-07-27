@@ -32,10 +32,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
-// This test checks all behavior of input reloading
-// 1. Ensures a new input file is correctly harvest
+// This test checks all input-reloading related behavior
+// 1. Ensures a new input file is correctly harvested
 // 2. Disable the input file and make sure the harvester stops
-// 3. Add another enabled input file and ensure it is picked for reloading
+// 3. Add another enabled input file and ensure it is picked up for reloading
 func TestFilebeatInputReload(t *testing.T) {
 	filebeat := integration.NewBeat(
 		t,
