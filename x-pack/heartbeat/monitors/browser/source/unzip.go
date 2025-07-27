@@ -67,7 +67,10 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 		}
 
 		sansFolder := splitZipFileName[folderDepth:]
-		destPath = filepath.Join(workdir, filepath.Join(sansFolder...))
+		destPath, err = sanitizeFilePath(filepath.Join(sansFolder...), workdir)
+		if err != nil {
+			return err
+		}
 	} else {
 		destPath, err = sanitizeFilePath(f.Name, workdir)
 		if err != nil {
