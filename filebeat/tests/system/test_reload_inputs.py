@@ -15,7 +15,6 @@ inputConfigTemplate = """
 
 class Test(BaseTest):
 
-
     def test_reload_same_input(self):
         """
         Test reloading same input
