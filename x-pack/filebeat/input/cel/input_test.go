@@ -81,8 +81,6 @@ var inputTests = []struct {
 		}},
 	},
 	{
-<<<<<<< HEAD
-=======
 		name: "hello_world_sum",
 		config: map[string]interface{}{
 			"interval": 1,
@@ -126,7 +124,6 @@ var inputTests = []struct {
 		},
 	},
 	{
->>>>>>> 4c1bf91fe (mod: update github.com/elastic/mito to v1.19.0 (#44098))
 		name: "bad_events_type",
 		config: map[string]interface{}{
 			"interval": 1,
