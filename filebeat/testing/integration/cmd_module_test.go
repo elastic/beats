@@ -66,7 +66,7 @@ filebeat.config.modules:
 			Args:   []string{"modules", "list"},
 		})
 
-		test.ExpectOutput("Enabled:", "enabled-modue").ExpectOutput("Disabled:", "disabled-module")
+		test.ExpectOutput("Enabled:", "enabled-module").ExpectOutput("Disabled:", "disabled-module")
 
 		test.
 			WithReportOptions(reportOptions).

@@ -41,7 +41,7 @@ func TestCustomFields(t *testing.T) {
 	lineCount := 10
 
 	reportOptions := integration.ReportOptions{
-		PrintLinesOnFail:  10,
+		PrintLinesOnFail:  100,
 		PrintConfigOnFail: true,
 	}
 
@@ -130,7 +130,7 @@ output.console:
 			Wait()
 	})
 
-	t.Run("tests that custom fields show up in the output dict when fields_under_root: true", func(t *testing.T) {
+	t.Run("Checks that it's possible to set a custom agent name.", func(t *testing.T) {
 
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
@@ -143,7 +143,7 @@ filebeat.inputs:
      - %s
     file_identity.native: ~
     prospector.scanner.fingerprint.enabled: false
-shipper: testShipperName
+name: testShipperName
 output.console:
   enabled: true
 `
