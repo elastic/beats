@@ -196,7 +196,6 @@ require (
 	github.com/google/cel-go v0.25.0
 	github.com/googleapis/gax-go/v2 v2.14.1
 	github.com/gorilla/handlers v1.5.1
-	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/icholy/digest v0.1.22
