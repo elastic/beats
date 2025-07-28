@@ -18,14 +18,13 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/gofrs/uuid/v5"
 
+	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
 
@@ -126,7 +125,7 @@ http.port: %d
 		"log.file.path",
 	}
 
-	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 	assertMonitoring(t, 5066)
 }
 
@@ -248,7 +247,7 @@ processors:
 		"event.created",
 	}
 
-	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 }
 
 func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
@@ -270,25 +269,6 @@ func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
 	if err := logFile.Close(); err != nil {
 		t.Fatalf("could not close log file '%s': %s", filename, err)
 	}
-}
-
-func assertMapsEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg string) {
-	t.Helper()
-
-	flatM1 := m1.Flatten()
-	flatM2 := m2.Flatten()
-	for _, f := range ignoredFields {
-		hasKeyM1, _ := flatM1.HasKey(f)
-		hasKeyM2, _ := flatM2.HasKey(f)
-
-		if !hasKeyM1 && !hasKeyM2 {
-			assert.Failf(t, msg, "ignored field %q does not exist in either map, please remove it from the ignored fields", f)
-		}
-
-		flatM1.Delete(f)
-		flatM2.Delete(f)
-	}
-	require.Equal(t, "", cmp.Diff(flatM1, flatM2), "expected maps to be equal")
 }
 
 func assertMonitoring(t *testing.T, port int) {
@@ -472,7 +452,7 @@ http.port: %d
 		"log.file.path",
 	}
 
-	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 	assertMonitoring(t, otelConfig.MonitoringPort)
 	assertMonitoring(t, 5067) // filebeat
 }

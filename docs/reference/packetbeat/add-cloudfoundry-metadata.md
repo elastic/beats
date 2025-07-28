@@ -2,6 +2,8 @@
 navigation_title: "add_cloudfoundry_metadata"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/add-cloudfoundry-metadata.html
+applies_to:
+  stack: ga
 ---
 
 # Add Cloud Foundry metadata [add-cloudfoundry-metadata]

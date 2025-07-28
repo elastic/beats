@@ -2,6 +2,8 @@
 navigation_title: "translate_sid"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/processor-translate-sid.html
+applies_to:
+  stack: ga
 ---
 
 # Translate SID [processor-translate-sid]
