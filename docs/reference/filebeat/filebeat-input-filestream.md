@@ -1094,8 +1094,10 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `processing_errors_total` | Total number of processing errors. |
 | `processing_time` | Histogram of the elapsed time to process messages (expressed in nanoseconds). |
 
-Note:
-
+Note: Each metric listed has a corresponding gzip_* counterpart (e.g.,
+`gzip_files_opened_total`, `gzip_messages_read_total`). These counterparts track
+the same data but exclusively for GZIP compressed files. The original metrics
+provide the total count, including both plain and GZIP files.
 
 ## Common options [filebeat-input-filestream-common-options]
 
