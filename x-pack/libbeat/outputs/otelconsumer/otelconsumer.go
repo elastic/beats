@@ -42,14 +42,6 @@ type otelConsumer struct {
 }
 
 func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
-
-	out := &otelConsumer{
-		observer:     observer,
-		logsConsumer: beat.LogConsumer,
-		beatInfo:     beat,
-		log:          beat.Logger.Named("otelconsumer"),
-	}
-
 	ocConfig := defaultConfig()
 	if err := cfg.Unpack(&ocConfig); err != nil {
 		return outputs.Fail(err)
