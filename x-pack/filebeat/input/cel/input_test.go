@@ -81,6 +81,49 @@ var inputTests = []struct {
 		}},
 	},
 	{
+		name: "hello_world_sum",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":string(sum([1,2,3,4]))}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{{
+			"message": "10",
+		}},
+	},
+	{
+		name: "hello_world_bytes",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":string(hex_decode("68656c6c6f20776f726c64"))}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{{
+			"message": "hello world",
+		}},
+	},
+	{
+		name: "hello_world_front_and_tail_2",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":front([1,2,3,4,5],2)}, {"message":tail([1,2,3,4,5],2)}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": []any{1.0, 2.0}},
+			{"message": []any{3.0, 4.0, 5.0}},
+		},
+	},
+	{
 		name: "bad_events_type",
 		config: map[string]interface{}{
 			"interval": 1,
