@@ -9,63 +9,23 @@ https://github.com/elastic/beats/compare/v8.18.4\...v8.19.0[View commits]
 
 ==== Breaking changes
 
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
 *Filebeat*
 
-
-- Filebeat fails to start if there is any input with a duplicated ID. It logs the duplicated IDs and the offending inputs configurations. {pull}41731[41731]
-- Filestream inputs with duplicated IDs will fail to start. An error is logged showing the ID and the full input configuration. {issue}41938[41938] {pull}41954[41954]
-- Filestream inputs can define `allow_deprecated_id_duplication: true` to run keep the previous behaviour of running inputs with duplicated IDs. {issue}41938[41938] {pull}41954[41954]
 - The Filestream input only starts to ingest a file when it is >= 1024 bytes in size. This happens because the fingerprint` is the default file identity now. To restore the previous behaviour, set `file_identity.native: ~` and `prospector.scanner.fingerprint.enabled: false` {issue}40197[40197] {pull}41762[41762]
-- Filebeat fails to start when its configuration contains usage of the deprecated `log` or `container` inputs. However, they can still be using while setting `allow_deprecated_use: true` in their configuration {pull}42295[42295]
-- The `add_cloudfoundry_metadata` processor now uses `xxhash` instead of `SHA1` for sanitizing persistent cache filenames. Existing users will experience a one-time cache invalidation as the cache store will be recreated with the new filename format. {pull}43964[43964]
-
-
-*Heartbeat*
-
 
 *Metricbeat*
 
 - Add VPN metrics to meraki module {pull}44851[44851]
 
-*Osquerybeat*
-
-
-
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-- Removal of functionbeat binaries from CI pipelines {issue}40745[40745] {pull}TODO[TODO]
-
-*Elastic Logging Plugin*
-
 
 ==== Bugfixes
-
-*Affecting all Beats*
-
 
 *Auditbeat*
 
 - Fix potential data loss in add_session_metadata. {pull}42795[42795]
 - auditbeat/fim: Fix FIM@ebpfevents for new kernels #44371. {pull}44371[44371]
 
-*Auditbeat*
-
-
 *Filebeat*
-
 
 - Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
 - Fix status reporting panic in GCP Pub/Sub input. {issue}44624[44624] {pull}44625[44625]
@@ -75,24 +35,9 @@ https://github.com/elastic/beats/compare/v8.18.4\...v8.19.0[View commits]
 
 - Added maintenance windows support for Heartbeat. {pull}41508[41508]
 
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
 *Packetbeat*
 
 - Properly marshal nested structs in ECS fields, fixing issues with mixed cases in field names {pull}42116[42116]
-
-
-*Winlogbeat*
-
-
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
@@ -100,20 +45,8 @@ https://github.com/elastic/beats/compare/v8.18.4\...v8.19.0[View commits]
 
 - Publish cloud.availability_zone by add_cloud_metadata processor in azure environments {issue}42601[42601] {pull}43618[43618]
 
-*Auditbeat*
-
-
-*Auditbeat*
-
-
-
-*Auditbeat*
-
-
 *Filebeat*
 
-- Add support for SSL and Proxy configurations for websocket type in streaming input. {pull}41934[41934]
-- Journald `include_matches.match` now accepts `+` to represent a logical disjunction (OR) {issue}40185[40185] {pull}42517[42517]
 - Winlog input now can report its status to Elastic-Agent {pull}43089[43089]
 - Update CEL mito extensions to v1.18.0. {pull}43855[43855]
 - Add milliseconds to document timestamp from awscloudwatch Filebeat input {pull}44306[44306]
@@ -139,78 +72,16 @@ https://github.com/elastic/beats/compare/v8.18.4\...v8.19.0[View commits]
 - Allow empty HTTPJSON cursor template value evaluations to be ignored by Fleet health status updates. {pull}45361[45361]
 - Reuse OAuth2 clients in HTTP JSON input where possible. {issue}34834[34834] {pull}44976[44976]
 - Add support for generalized token authentication to CEL input. {pull}45359[45359]
-
-*Auditbeat*
-
-
-*Libbeat*
-
-
-
-*Heartbeat*
-
+- The `add_cloudfoundry_metadata` processor now uses `xxhash` instead of `SHA1` for sanitizing persistent cache filenames. Existing users will experience a one-time cache invalidation as the cache store will be recreated with the new filename format. {pull}43964[43964]
 
 *Metricbeat*
 
-- Add new metricset wmi for the windows module. {pull}42017[42017]
 - Add a new `match_by_parent_instance` option to `perfmon` module. {pull}43002[43002]
 - Changed the Elasticsearch module behavior to only pull settings from non-system indices. {pull}43243[43243]
 - Exclude dotted indices from settings pull in Elasticsearch module. {pull}43306[43306]
 - Upgrade Prometheus Library to v0.300.1. {pull}43540[43540]
 - Add GCP metadata cache. {pull}44432[44432]
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-
-*Functionbeat*
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
+- Add VPN metrics to meraki module {pull}44851[44851]
 
 
 [[release-notes-8.18.1]]
