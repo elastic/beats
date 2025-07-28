@@ -67,6 +67,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 	}
 
+	// filter empty cmdlines
+	checkCmdlines := []string{}
+	for _, cmdline := range config.CheckCmdlines {
+		if cmdline != "" {
+			checkCmdlines = append(checkCmdlines, cmdline)
+		}
+	}
+
 	m := &MetricSet{
 		BaseMetricSet: base,
 		stats: &process.Stats{
@@ -81,6 +89,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				RootfsMountpoint:  sys,
 				IgnoreRootCgroups: true,
 			},
+			CheckCmdlines: checkCmdlines,
 		},
 		perCPU: config.IncludePerCPU,
 	}

@@ -32,6 +32,7 @@ type Config struct {
 	IncludeCPUTicks bool                     `config:"process.include_cpu_ticks"`
 	IncludePerCPU   bool                     `config:"process.include_per_cpu"`
 	CPUTicks        *bool                    `config:"cpu_ticks"` // Deprecated
+	CheckCmdlines   []string                 `config:"process.cmdline.check"`
 }
 
 // Validate checks for depricated config options
@@ -51,4 +52,5 @@ var defaultConfig = Config{
 		ByMemory: 0,
 	},
 	IncludePerCPU: true,
+	CheckCmdlines: []string{}, // empty array means no additional checking for process alive
 }

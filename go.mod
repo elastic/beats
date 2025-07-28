@@ -141,7 +141,7 @@ require (
 	github.com/shopspring/decimal v1.2.0
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.2
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/ugorji/go/codec v1.1.8
 	github.com/urso/sderr v0.0.0-20210525210834-52b04e8f5c71
@@ -159,7 +159,7 @@ require (
 	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b
 	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094
 	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde
-	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261
+	golang.org/x/sys v0.6.0
 	golang.org/x/text v0.3.7
 	golang.org/x/time v0.0.0-20220609170525-579cf78fd858
 	golang.org/x/tools v0.1.9
@@ -308,11 +308,10 @@ require (
 	github.com/sanathkr/go-yaml v0.0.0-20170819195128-ed9d249f429b // indirect
 	github.com/santhosh-tekuri/jsonschema v1.2.4 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
-	github.com/shirou/gopsutil v3.21.11+incompatible // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
-	github.com/stretchr/objx v0.4.0 // indirect
-	github.com/tklauser/go-sysconf v0.3.9 // indirect
-	github.com/tklauser/numcpus v0.3.0 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
+	github.com/tklauser/go-sysconf v0.3.11 // indirect
+	github.com/tklauser/numcpus v0.6.0 // indirect
 	github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.0.2 // indirect
@@ -356,7 +355,7 @@ replace (
 	github.com/docker/go-plugins-helpers => github.com/elastic/go-plugins-helpers v0.0.0-20200207104224-bdf17607b79f
 	github.com/dop251/goja => github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20
 	github.com/dop251/goja_nodejs => github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
-	github.com/elastic/elastic-agent-system-metrics => github.com/easyops-cn/elastic-agent-system-metrics v1.0.0
+	github.com/elastic/elastic-agent-system-metrics => github.com/easyops-cn/elastic-agent-system-metrics v1.0.4
 	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
 	github.com/fsnotify/fsnotify => github.com/adriansr/fsnotify v1.4.8-0.20211018144411-a81f2b630e7c
 	github.com/godror/godror => github.com/godror/godror v0.33.2 // updating to v0.24.2 caused a breaking change
