@@ -238,6 +238,7 @@ unregister input metrics without relaying on the global 'dataset' namespace.{pul
 - Added `autoops_es` module to x-pack/metricbeat. {pull}44565[44565]
 - Make `x-pack/libbeat/management.BeatV2Manager.UpdateStatus` a no-op if there is no change in state. {pull}44716[44716]
 - Filebeat filebeat/testing/integration test framework ExpectEOF accounts for closed files and allows to choose to pretty print or not the output. {pull}45023[45023]
+- Updated apache/arrow library used in `x-pack/libbeat/reader/parquet` to v18 {issue}45573[45573] {pull}45574[45574]
 
 ==== Deprecated
 
