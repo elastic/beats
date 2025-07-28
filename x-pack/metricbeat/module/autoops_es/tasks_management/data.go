@@ -103,8 +103,8 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, nodeTasks *GroupedT
 	err := errors.Join(errs...)
 
 	if err != nil {
-		e.SendErrorEvent(err, info, r, TasksMetricSet, TasksPath, transactionId)
+		e.LogAndSendErrorEvent(err, info, r, TasksMetricSet, TasksPath, transactionId)
 	}
 
-	return err
+	return nil
 }
