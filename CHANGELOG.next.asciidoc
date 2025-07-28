@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
 - The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
 - Allow faccessat(2) in seccomp. {pull}43322[43322]
+- Update user agent used by beats http clients {pull}45251[45251]
 
 *Auditbeat*
 
@@ -95,7 +96,9 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
 - Add check for http error codes in the Metricbeat's Prometheus query submodule {pull}44493[44493]
 - Sanitize error messages in Fetch method of SQL module {pull}44577[44577]
+- Add NTP metricset to system module. {pull}44884[44884]
 - Add VPN metrics to meraki module {pull}44851[44851]
+- Improve error messages in AWS Health {pull}45408[45408]
 
 *Osquerybeat*
 
@@ -484,6 +487,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Allow empty HTTPJSON cursor template value evaluations to be ignored by Fleet health status updates. {pull}45361[45361]
 - Reuse OAuth2 clients in HTTP JSON input where possible. {issue}34834[34834] {pull}44976[44976]
 - Add support for generalized token authentication to CEL input. {pull}45359[45359]
+- Log CEL single object evaluation results as ECS compliant documents where possible. {issue}45254[45254] {pull}45399[45399]
+- Add status update functionality to Salesforce input. {issue}44653[44653] {pull}45227[45227]
 
 *Auditbeat*
 

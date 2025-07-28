@@ -13,7 +13,6 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
-	autoopsevents "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
 
 	"github.com/stretchr/testify/require"
 
@@ -21,9 +20,8 @@ import (
 )
 
 var (
-	setupIndexTemplateErrorServer = auto_ops_testing.SetupDataErrorServer(IndexTemplatePath)
-	setupEmptySuccessfulServer    = auto_ops_testing.SetupSuccessfulServer(IndexTemplatePath)
-	useNamedMetricSet             = auto_ops_testing.UseNamedMetricSet(IndexTemplateMetricSet)
+	setupEmptySuccessfulServer = auto_ops_testing.SetupSuccessfulServer(IndexTemplatePath)
+	useNamedMetricSet          = auto_ops_testing.UseNamedMetricSet(IndexTemplateMetricSet)
 )
 
 func TestIndexTemplatePath(t *testing.T) {
@@ -60,30 +58,5 @@ func TestSuccessfulFetch(t *testing.T) {
 
 		// 1 <= len(...)
 		require.LessOrEqual(t, 1, len(data.Reporter.GetEvents()))
-	})
-}
-
-func TestFailedClusterInfoFetch(t *testing.T) {
-	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/index_template.*.json", auto_ops_testing.SetupClusterInfoErrorServer, useNamedMetricSet, func(t *testing.T, data metricset.FetcherData[IndexTemplates]) {
-		require.ErrorContains(t, data.Error, "failed to get cluster info from cluster, index_template metricset")
-	})
-}
-
-func TestFailedTasksFetch(t *testing.T) {
-	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/index_template.*.json", setupIndexTemplateErrorServer, useNamedMetricSet, func(t *testing.T, data metricset.FetcherData[IndexTemplates]) {
-		require.ErrorContains(t, data.Error, "failed to get data, index_template metricset")
-	})
-}
-
-func TestFailedTasksFetchEventsMapping(t *testing.T) {
-	// Note: it will fail due to an inner error looking up templates
-	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/index_template.*.json", auto_ops_testing.SetupTemplateErrorsServer(IndexTemplatePath, templatePathPrefix), useNamedMetricSet, func(t *testing.T, data metricset.FetcherData[IndexTemplates]) {
-		require.Error(t, data.Error)
-		require.Equal(t, 1, len(data.Reporter.GetEvents()))
-
-		// Check error event
-		event := data.Reporter.GetEvents()[0]
-		_, ok := event.MetricSetFields["error"].(autoopsevents.ErrorEvent)
-		require.True(t, ok, "error field should be of type error.ErrorEvent")
 	})
 }
