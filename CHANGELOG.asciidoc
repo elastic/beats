@@ -7,57 +7,12 @@
 === Beats version 9.1.0
 https://github.com/elastic/beats/compare/v9.0.4\...v9.1.0[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-- Fixed password authentication for ACL users in the Redis input of Filebeat. {pull}44137[44137]
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-- Update NATS module compatibility. Oldest version supported is now 2.2.6 {pull}43310[43310]
-- Updated list of supported vSphere versions in the documentation. {pull}43642[43642]
-- Add VPN metrics to meraki module {pull}44851[44851]
-
-*Osquerybeat*
-
-
-
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
 ==== Bugfixes
-
-*Affecting all Beats*
-
 
 *Auditbeat*
 
 - Fix potential data loss in add_session_metadata. {pull}42795[42795]
 - auditbeat/fim: Fix FIM@ebpfevents for new kernels #44371. {pull}44371[44371]
-
-*Auditbeat*
-
 
 *Filebeat*
 
@@ -67,44 +22,17 @@ https://github.com/elastic/beats/compare/v9.0.4\...v9.1.0[View commits]
 - Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
 - Fix a logging regression that ignored to_files and logged to stdout. {pull}44573[44573]
 - Fixed issue for "Root level readerConfig no longer respected" in azureblobstorage input. {issue}44812[44812] {pull}44873[44873]
+- Fixed password authentication for ACL users in the Redis input of Filebeat. {pull}44137[44137]
 
 *Heartbeat*
 
 - Added maintenance windows support for Heartbeat. {pull}41508[41508]
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
 *Affecting all Beats*
 
 - Added the `now` processor, which will populate the specified target field with the current timestamp. {pull}44795[44795]
-
-*Auditbeat*
-
-
-*Auditbeat*
-
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
@@ -119,19 +47,8 @@ https://github.com/elastic/beats/compare/v9.0.4\...v9.1.0[View commits]
 - Add proxy support to GCP Pub/Sub input. {pull}44892[44892]
 - Segregated `max_workers` from `batch_size` in the azure-blob-storage input. {issue}44491[44491] {pull}44992[44992]
 - Add support for relationship expansion to EntraID entity analytics provider. {issue}43324[43324] {pull}44761[44761]
-- Update CEL mito extensions to v1.21.0. {issue}40762[40762] {pull}45107[45107]
 - Update CEL mito extensions to v1.22.0. {pull}45245[45245]
 - Add support for generalized token authentication to CEL input. {pull}45359[45359]
-
-*Auditbeat*
-
-
-*Libbeat*
-
-
-
-*Heartbeat*
-
 
 *Metricbeat*
 
@@ -139,70 +56,12 @@ https://github.com/elastic/beats/compare/v9.0.4\...v9.1.0[View commits]
 - Changed the Elasticsearch module behavior to only pull settings from non-system indices. {pull}43243[43243]
 - Exclude dotted indices from settings pull in Elasticsearch module. {pull}43306[43306]
 - Add a `jetstream` metricset to the NATS module {pull}43310[43310]
+- Update NATS module compatibility. Oldest version supported is now 2.2.6 {pull}43310[43310]
 - Upgrade Prometheus Library to v0.300.1. {pull}43540[43540]
 - Add GCP Dataproc metadata collector in GCP module. {pull}43518[43518]
+- Updated list of supported vSphere versions in the documentation. {pull}43642[43642]
 - Add SSL support for sql module: drivers mysql, postgres, and mssql. {pull}44748[44748]
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-
-*Functionbeat*
-
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
-
-
-
-
-
-
+- Add VPN metrics to meraki module {pull}44851[44851]
 
 [[release-notes-9.0.0]]
 === Beats version 9.0.0
