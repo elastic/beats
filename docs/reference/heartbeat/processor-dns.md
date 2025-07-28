@@ -81,7 +81,7 @@ The `dns` processor has the following configuration settings:
 `success_cache.min_ttl`
 :   The duration of the minimum alternative cache TTL for successful DNS responses. Ensures that `TTL=0` successful reverse DNS responses can be cached. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". Default value is `1m`.
 
-`success_cache.enabled`
+`success_cache.enabled` {applies_to}`stack: ga 9.1.0`
 :  Whether the success cache should be enabled. The default value is `true`, meaning the cache is used by default.
 
 ::::{note}
@@ -97,7 +97,7 @@ Disabling the cache has throughput implications, requiring each event to perform
 `failure_cache.ttl`
 :   The duration for which failures are cached. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". Default value is `1m`.
 
-`failure_cache.enabled`
+`failure_cache.enabled` {applies_to}`stack: ga 9.1.0`
 :  Whether the failure cache should be enabled. The default value is `true`, meaning the cache is used by default.
 
 ::::{note}
