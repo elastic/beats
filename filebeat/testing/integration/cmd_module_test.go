@@ -104,7 +104,7 @@ filebeat.config.modules:
 
 		_, err := os.Create(filepath.Join(modules, "disabled2.yml.disabled"))
 		assert.Nil(t, err)
-		_, err := os.Create(filepath.Join(modules, "disabled3.yml.disabled"))
+		_, err = os.Create(filepath.Join(modules, "disabled3.yml.disabled"))
 		assert.Nil(t, err)
 
 		test.ExpectOutput("Enabled disabled2")
@@ -115,7 +115,7 @@ filebeat.config.modules:
 			Start(ctx).
 			Wait()
 
-		_, err := os.Stat(filepath.Join(modules, "disabled2.yml.disabled"))
+		_, err = os.Stat(filepath.Join(modules, "disabled2.yml.disabled"))
 		assert.True(t, os.IsNotExist(err))
 		_, err = os.Stat(filepath.Join(modules, "disabled2.yml"))
 		assert.Nil(t, err)
@@ -155,7 +155,7 @@ filebeat.config.modules:
 
 		_, err := os.Create(filepath.Join(modules, "enabled2.yml"))
 		assert.Nil(t, err)
-		_, err := os.Create(filepath.Join(modules, "enabled3.yml"))
+		_, err = os.Create(filepath.Join(modules, "enabled3.yml"))
 		assert.Nil(t, err)
 
 		test.ExpectOutput("Disabled enabled2")
@@ -166,7 +166,7 @@ filebeat.config.modules:
 			Start(ctx).
 			Wait()
 
-		_, err := os.Stat(filepath.Join(modules, "enabled2.yml"))
+		_, err = os.Stat(filepath.Join(modules, "enabled2.yml"))
 		assert.True(t, os.IsNotExist(err))
 		_, err = os.Stat(filepath.Join(modules, "enabled2.yml.disabled"))
 		assert.Nil(t, err)
