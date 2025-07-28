@@ -116,6 +116,7 @@ type BeatV2Manager struct {
 	// trying to reload the configuration after an input not finished error
 	// happens
 	forceReloadDebounce time.Duration
+	wg                  sync.WaitGroup
 }
 
 // ================================

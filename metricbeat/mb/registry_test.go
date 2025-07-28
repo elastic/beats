@@ -22,6 +22,7 @@ package mb
 import (
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -240,7 +241,7 @@ func TestProcessorsForMetricSet_UndefinedSecondarySource(t *testing.T) {
 
 func TestProcessorsForMetricSet_FromSource(t *testing.T) {
 	registry := NewRegister()
-	registry.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
+	registry.SetSecondarySource(NewLightModulesSource(logptest.NewTestingLogger(t, ""), "testdata/lightmodules"))
 	procs, err := registry.ProcessorsForMetricSet("unpack", "withprocessors")
 	require.NoError(t, err)
 	require.NotNil(t, procs)
