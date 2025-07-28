@@ -18,8 +18,6 @@ https://github.com/elastic/beats/compare/v9.0.4\...v9.1.0[View commits]
 
 - Log bad handshake details when websocket connection fails {pull}41300[41300]
 - Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
-- Log bad handshake details when websocket connection fails {pull}41300[41300]
-- Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
 - Fix a logging regression that ignored to_files and logged to stdout. {pull}44573[44573]
 - Fixed issue for "Root level readerConfig no longer respected" in azureblobstorage input. {issue}44812[44812] {pull}44873[44873]
 - Fixed password authentication for ACL users in the Redis input of Filebeat. {pull}44137[44137]
