@@ -15,13 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build integration
-
 package consumergroup
 
 import (
+	"context"
 	"fmt"
-	"io"
 	"testing"
 	"time"
 
@@ -38,6 +36,28 @@ const (
 	kafkaSASLUsername         = "stats"
 	kafkaSASLPassword         = "test-secret"
 )
+
+type ConsumerGroupHandler struct {
+	t *testing.T
+}
+
+func (ConsumerGroupHandler) Setup(_ sarama.ConsumerGroupSession) error   { return nil }
+func (ConsumerGroupHandler) Cleanup(_ sarama.ConsumerGroupSession) error { return nil }
+func (h *ConsumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
+	count := 0
+	for msg := range claim.Messages() {
+		if count > 5 {
+			// just for testing, do not consume too many messages
+			break
+		}
+		h.t.Logf("Message topic:%q partition:%d offset:%d value:%s\n",
+			msg.Topic, msg.Partition, msg.Offset, string(msg.Value))
+		// mark the message is consumed
+		sess.MarkMessage(msg, "")
+		count += 1
+	}
+	return nil
+}
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "kafka",
@@ -92,9 +112,63 @@ func TestFetch(t *testing.T) {
 	if len(data) == 0 {
 		t.Fatalf("No consumer groups fetched")
 	}
+
+	for _, v := range data {
+		if _, ok := v.MetricSetFields["consumer_lag"]; ok {
+			t.Fatalf("shouldn't have consumer_lag, the consumergroup doesn't consume anything")
+		}
+	}
 }
 
-func startConsumer(t *testing.T, host string, groupID string) (io.Closer, error) {
+func TestFetchWithConsumerLag(t *testing.T) {
+	groupName := "test-group-consumed"
+	service := compose.EnsureUp(t, "kafka",
+		compose.UpWithTimeout(600*time.Second),
+		compose.UpWithAdvertisedHostEnvFileForPort(9092),
+	)
+	c, err := startConsumer(t, service.HostForPort(9092), groupName)
+	if err != nil {
+		t.Fatal(fmt.Errorf("starting kafka consumer: %w", err))
+	}
+	defer c.Close()
+
+	// consue some data
+	handler := ConsumerGroupHandler{
+		t: t,
+	}
+	c.Consume(t.Context(), []string{"test"}, &handler)
+
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(9092)))
+
+	var data []mb.Event
+	var errors []error
+	for retries := 0; retries < 3; retries++ {
+		data, errors = mbtest.ReportingFetchV2Error(f)
+		if len(data) > 0 {
+			continue
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
+	if len(errors) > 0 {
+		t.Fatalf("fetch %v", errors)
+	}
+	if len(data) == 0 {
+		t.Fatalf("No consumer groups fetched")
+	}
+
+	has_lag := false
+	for _, v := range data {
+		// some data won't has consumer_lag
+		if _, ok := v.MetricSetFields["consumer_lag"]; ok {
+			has_lag = true
+		}
+	}
+	if !has_lag {
+		t.Fatalf("consumed some messages but didn't fetch the consumer_lag metrics")
+	}
+}
+
+func startConsumer(t *testing.T, host string, groupID string) (sarama.ConsumerGroup, error) {
 	brokers := []string{host}
 
 	config := sarama.NewConfig()
@@ -113,6 +187,13 @@ func startConsumer(t *testing.T, host string, groupID string) (io.Closer, error)
 	}
 
 	return consumerGroup, nil
+}
+
+func consumeSomeData(ctx context.Context, t *testing.T, consumerGroup sarama.ConsumerGroup, topics []string) {
+	handler := ConsumerGroupHandler{
+		t: t,
+	}
+	consumerGroup.Consume(ctx, topics, &handler)
 }
 
 func getConfig(host string) map[string]interface{} {
