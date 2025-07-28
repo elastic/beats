@@ -72,12 +72,18 @@ func NewProductionLogger(selector string, options ...LogOption) (*Logger, error)
 // NewDevelopmentLogger returns a development suitable logp.Logger
 func NewDevelopmentLogger(selector string, options ...LogOption) (*Logger, error) {
 	options = append([]LogOption{zap.AddCallerSkip(1)}, options...)
-	log, err := zap.NewDevelopment(options...)
-	log = log.Named(selector)
+	config := zap.NewDevelopmentConfig()
+	// if not disabled it shows stacktrace for warn, error level - which can be mistaken for a panic
+	config.DisableStacktrace = true
+	logger, err := config.Build(options...)
 	if err != nil {
 		return nil, err
 	}
-	return &Logger{log, log.Sugar()}, nil
+	logger = logger.Named(selector)
+	if err != nil {
+		return nil, err
+	}
+	return &Logger{logger, logger.Sugar()}, nil
 }
 
 // NewInMemory returns a new in-memory logger along with the buffer to which it
