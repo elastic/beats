@@ -287,6 +287,8 @@ func (cm *BeatV2Manager) Start() error {
 	}
 	ctx, canceller := context.WithCancel(ctx)
 	cm.errCanceller = canceller
+
+	cm.wg.Add(1)
 	go cm.watchErrChan(ctx)
 	cm.client.RegisterDiagnosticHook(
 		"beat-rendered-config",
@@ -295,6 +297,7 @@ func (cm *BeatV2Manager) Start() error {
 		"application/yaml",
 		cm.handleDebugYaml)
 
+	cm.wg.Add(1)
 	go cm.unitListen()
 	cm.isRunning = true
 	return nil
@@ -303,6 +306,7 @@ func (cm *BeatV2Manager) Start() error {
 // Stop stops the current Manager and close the connection to Elastic Agent.
 func (cm *BeatV2Manager) Stop() {
 	cm.stopChan <- struct{}{}
+	cm.wg.Wait()
 }
 
 // CheckRawConfig is currently not implemented for V1.
@@ -460,6 +464,7 @@ func (cm *BeatV2Manager) softDeleteUnit(unit *client.Unit) {
 // ================================
 
 func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
+	defer cm.wg.Done()
 	for {
 		select {
 		case <-ctx.Done():
@@ -475,6 +480,7 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 }
 
 func (cm *BeatV2Manager) unitListen() {
+	defer cm.wg.Done()
 	// register signal handler
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
