@@ -85,6 +85,7 @@ func (s *Server) Stop() error {
 
 // AttachHandler will attach a handler at the specified route. Routes are
 // matched in the order in which that are attached.
+// Attaching teh same route twice will panic
 func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
 	s.mux.Handle(route, h)
 	if !strings.HasSuffix(route, "/") && !strings.HasSuffix(route, "{$}") {
