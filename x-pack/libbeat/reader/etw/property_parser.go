@@ -18,22 +18,24 @@ import (
 )
 
 type eventRenderer struct {
-	cache   *providerCache
-	r       *EventRecord
-	data    []byte
-	ptrSize uint32
+	cache       providerCache
+	r           *EventRecord
+	data        []byte
+	ptrSize     uint32
+	bufferPools *bufferPools
 }
 
 // newEventRenderer initializes a new property parser for a given event record.
-func newEventRenderer(cache *providerCache, r *EventRecord) *eventRenderer {
+func newEventRenderer(cache providerCache, r *EventRecord, bufferPools *bufferPools) *eventRenderer {
 	ptrSize := r.pointerSize()
 
 	// Return a new propertyParser instance initialized with event record data and metadata.
 	return &eventRenderer{
-		r:       r,
-		cache:   cache,
-		ptrSize: ptrSize,
-		data:    unsafe.Slice((*uint8)(unsafe.Pointer(r.UserData)), r.UserDataLength),
+		r:           r,
+		cache:       cache,
+		ptrSize:     ptrSize,
+		data:        unsafe.Slice((*uint8)(unsafe.Pointer(r.UserData)), r.UserDataLength),
+		bufferPools: bufferPools,
 	}
 }
 
@@ -70,7 +72,7 @@ func (p *eventRenderer) render() (RenderedEtwEvent, error) {
 
 	// Set Active Keywords
 	if event.KeywordsRaw != 0 {
-		for keywordBitValue, cachedKw := range p.cache.keywords {
+		for keywordBitValue, cachedKw := range p.cache.getKeywords() {
 			if (event.KeywordsRaw&keywordBitValue) == keywordBitValue && keywordBitValue != 0 { // Check if bit is set
 				event.Keywords = append(event.Keywords, cachedKw.Name)
 			}
@@ -97,7 +99,7 @@ func (p *eventRenderer) render() (RenderedEtwEvent, error) {
 	}
 
 	for i, prop := range eventInfo.Properties {
-		value, err := renderPropertyValue(p.cache, eventInfo, prop, p.r, p.ptrSize, &p.data)
+		value, err := renderPropertyValue(p.cache, eventInfo, prop, p.r, p.ptrSize, &p.data, p.bufferPools)
 		if err != nil {
 			return RenderedEtwEvent{}, fmt.Errorf("failed to render property '%s': %w", prop.Name, err)
 		}
@@ -113,17 +115,17 @@ func (p *eventRenderer) render() (RenderedEtwEvent, error) {
 	return event, nil
 }
 
-func renderPropertyValue(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte) (any, error) {
+func renderPropertyValue(cache providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte, bufferPools *bufferPools) (any, error) {
 	// Determine the rendering strategy based on property type
 	switch {
 	case propInfo.IsStruct && propInfo.IsArray:
-		return renderStructArray(cache, eventInfo, propInfo, r, ptrSize, buf)
+		return renderStructArray(cache, eventInfo, propInfo, r, ptrSize, buf, bufferPools)
 	case propInfo.IsStruct && !propInfo.IsArray:
-		return renderStruct(cache, eventInfo, propInfo, r, ptrSize, buf)
+		return renderStruct(cache, eventInfo, propInfo, r, ptrSize, buf, bufferPools)
 	case !propInfo.IsStruct && propInfo.IsArray:
-		return renderSimpleArray(cache, eventInfo, propInfo, r, ptrSize, buf)
+		return renderSimpleArray(cache, eventInfo, propInfo, r, ptrSize, buf, bufferPools)
 	default: // !propInfo.IsStruct && !propInfo.IsArray
-		return renderSingleSimpleProperty(cache, eventInfo, propInfo, r, ptrSize, buf)
+		return renderSingleSimpleProperty(cache, eventInfo, propInfo, r, ptrSize, buf, bufferPools)
 	}
 }
 
@@ -146,13 +148,13 @@ func getLengthFromProperty(r *EventRecord, dataDescriptor *PropertyDataDescripto
 	return length, nil
 }
 
-func renderStruct(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte) (map[string]any, error) {
+func renderStruct(cache providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte, bufferPools *bufferPools) (map[string]any, error) {
 	// Pre-allocate map with estimated capacity to reduce reallocations
 	memberCount := len(propInfo.StructMembers)
 	structure := make(map[string]any, memberCount)
 
 	for _, sm := range propInfo.StructMembers {
-		value, err := renderPropertyValue(cache, eventInfo, sm, r, ptrSize, buf)
+		value, err := renderPropertyValue(cache, eventInfo, sm, r, ptrSize, buf, bufferPools)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse struct member '%s': %w", sm.Name, err)
 		}
@@ -162,7 +164,7 @@ func renderStruct(cache *providerCache, eventInfo *cachedEventInfo, propInfo *ca
 }
 
 // renderStructArray handles arrays of structs
-func renderStructArray(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte) (any, error) {
+func renderStructArray(cache providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte, bufferPools *bufferPools) (any, error) {
 	count, err := getPropertyLength(eventInfo, propInfo, r)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get array count: %w", err)
@@ -175,7 +177,7 @@ func renderStructArray(cache *providerCache, eventInfo *cachedEventInfo, propInf
 
 	result := make([]any, arraySize)
 	for j := 0; j < arraySize; j++ {
-		value, err := renderStruct(cache, eventInfo, propInfo, r, ptrSize, buf)
+		value, err := renderStruct(cache, eventInfo, propInfo, r, ptrSize, buf, bufferPools)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse struct member %d: %w", j, err)
 		}
@@ -185,7 +187,7 @@ func renderStructArray(cache *providerCache, eventInfo *cachedEventInfo, propInf
 }
 
 // renderSimpleArray handles arrays of simple types (strings, integers, etc.)
-func renderSimpleArray(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte) (any, error) {
+func renderSimpleArray(cache providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte, bufferPools *bufferPools) (any, error) {
 	// Get the count for the array
 	count, err := getPropertyLength(eventInfo, propInfo, r)
 	if err != nil {
@@ -200,7 +202,7 @@ func renderSimpleArray(cache *providerCache, eventInfo *cachedEventInfo, propInf
 	var mapInfo *EventMapInfo
 	var cachedMapInfo *cachedEventMapInfo
 	if propInfo.MapName != "" {
-		if cached, found := cache.propertyMapsCache[propInfo.MapName]; found {
+		if cached, found := cache.getPropertyMaps()[propInfo.MapName]; found {
 			mapInfo = cached.ParsedInfo
 			cachedMapInfo = cached
 		}
@@ -209,7 +211,7 @@ func renderSimpleArray(cache *providerCache, eventInfo *cachedEventInfo, propInf
 	result := make([]any, count)
 	for i := uint32(0); i < count; i++ {
 		// For each array element, process it as a single property
-		value, err := renderSingleProperty(cache, eventInfo, propInfo, r, ptrSize, buf, mapInfo, cachedMapInfo)
+		value, err := renderSingleProperty(cache, eventInfo, propInfo, r, ptrSize, buf, mapInfo, cachedMapInfo, bufferPools)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse array element %d: %w", i, err)
 		}
@@ -219,18 +221,18 @@ func renderSimpleArray(cache *providerCache, eventInfo *cachedEventInfo, propInf
 }
 
 // renderSingleSimpleProperty handles a single simple property (not an array, not a struct)
-func renderSingleSimpleProperty(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte) (any, error) {
+func renderSingleSimpleProperty(cache providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte, bufferPools *bufferPools) (any, error) {
 	// Set up map info for the property
 	var mapInfo *EventMapInfo
 	var cachedMapInfo *cachedEventMapInfo
 	if propInfo.MapName != "" {
-		if cached, found := cache.propertyMapsCache[propInfo.MapName]; found {
+		if cached, found := cache.getPropertyMaps()[propInfo.MapName]; found {
 			mapInfo = cached.ParsedInfo
 			cachedMapInfo = cached
 		}
 	}
 
-	return renderSingleProperty(cache, eventInfo, propInfo, r, ptrSize, buf, mapInfo, cachedMapInfo)
+	return renderSingleProperty(cache, eventInfo, propInfo, r, ptrSize, buf, mapInfo, cachedMapInfo, bufferPools)
 }
 
 func getPropertyLength(eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord) (uint32, error) {
@@ -412,7 +414,7 @@ func cleanUnicodeFormattingChars(s string) string {
 	return replacer.Replace(s)
 }
 
-func renderSingleProperty(cache *providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte, mapInfo *EventMapInfo, cachedMapInfo *cachedEventMapInfo) (any, error) {
+func renderSingleProperty(cache providerCache, eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, r *EventRecord, ptrSize uint32, buf *[]byte, mapInfo *EventMapInfo, cachedMapInfo *cachedEventMapInfo, bufferPools *bufferPools) (any, error) {
 	// Get the length of the individual property element (not the array count).
 	propertyLength, err := getElementLength(eventInfo, propInfo, r)
 	if err != nil {
@@ -439,10 +441,8 @@ func renderSingleProperty(cache *providerCache, eventInfo *cachedEventInfo, prop
 	// Set a default buffer size for formatted data.
 	formattedDataSize := uint32(DEFAULT_PROPERTY_BUFFER_SIZE)
 
-	// Get buffer from pool and memory manager
-	mm := cache.bufferPools
-	formattedDataPtr := mm.getBuffer(formattedDataSize)
-	defer mm.putBuffer(formattedDataPtr, formattedDataSize)
+	formattedDataPtr := bufferPools.getBuffer(formattedDataSize)
+	defer bufferPools.putBuffer(formattedDataPtr, formattedDataSize)
 
 	formattedData := *formattedDataPtr
 

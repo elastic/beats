@@ -287,7 +287,7 @@ func (s *Session) RenderEvent(r *EventRecord) (e RenderedEtwEvent, err error) {
 		return RenderedEtwEvent{}, fmt.Errorf("failed to get provider cache: %w", err)
 	}
 	// Initialize a new property parser for the event record.
-	p := newEventRenderer(providerCache, r)
+	p := newEventRenderer(providerCache, r, s.metadataCache.bufferPools)
 	event, err := p.render()
 	if err != nil {
 		return RenderedEtwEvent{}, fmt.Errorf("failed to parse event properties: %w", err)
