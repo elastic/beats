@@ -273,8 +273,3 @@ func PythonIntegTest(ctx context.Context) error {
 		return devtools.PythonTestForModule(args)
 	})
 }
-
-// FipsECHTest runs a smoke test using a FIPS enabled binary targetting an ECH deployment.
-func FipsECHTest(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultECHTestArgs())
-}

@@ -517,7 +517,7 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 func DefaultECHTestArgs() GoTestArgs {
 	args := makeGoTestArgs("ECH")
 	args.Tags = append(args.Tags, "ech", "integration")
-	args.Dir = "testing/ech"
+	args.Dir = "tests/ech"
 
 	// attempt to use absolute paths for filenames
 	path, err := os.Getwd()

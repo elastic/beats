@@ -124,5 +124,5 @@ func RunSmokeTest(t *testing.T, name, binaryPath, cfg string) {
 		resp, err := es.Search().Index(name + "-*").Do(t.Context())
 		require.NoError(c, err, "search request for index failed.")
 		require.NotZero(c, resp.Hits.Total.Value, "expected to find hits within ES.")
-	}, time.Minute, time.Second, name+" logs are not detected within the elasticsearch deployment")
+	}, time.Minute, time.Second, name+" documents are not detected within the elasticsearch deployment")
 }

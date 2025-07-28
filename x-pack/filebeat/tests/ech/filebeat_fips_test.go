@@ -21,19 +21,19 @@ package fips
 
 import (
 	"fmt"
+	"path"
 	"testing"
 
-	"github.com/elastic/beats/v7/testing/terraform-ech/go-ech"
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/testing/go-ech"
 )
 
-const metricbeatFIPSConfig = `
-metricbeat.modules:
-  - module: system
-    enabled: true
-    period: 5s
-    metricsets:
-      - cpu
-      - memory
+const filebeatFIPSConfig = `
+filebeat.inputs:
+  - type: filestream
+    id: "test-filebeat-fips"
+    paths:
+      - %s
 path.home: %s
 logging.to_files: false
 logging.to_stderr: true
@@ -46,14 +46,19 @@ output:
     password: ${ES_PASS}
 `
 
-// TestMetricbeatFIPSSmoke starts a FIPS compatible binary and ensures that data ends up in an (https) ES cluster.
-func TestMetricbeatFIPSSmoke(t *testing.T) {
+// TestFilebeatFIPSSmoke starts a FIPS compatible binary and ensures that data ends up in an (https) ES cluster.
+func TestFilebeatFIPSSmoke(t *testing.T) {
 	ech.VerifyEnvVars(t)
-	ech.VerifyFIPSBinary(t, "../../metricbeat")
+	ech.VerifyFIPSBinary(t, "../../filebeat")
+
+	// Generate logs
+	tempDir := t.TempDir()
+	logFilePath := path.Join(tempDir, "log.log")
+	integration.GenerateLogFile(t, logFilePath, 1000, false)
 
 	ech.RunSmokeTest(t,
-		"metricbeat",
-		"../../metricbeat",
-		fmt.Sprintf(metricbeatFIPSConfig, t.TempDir()),
+		"filebeat",
+		"../../filebeat",
+		fmt.Sprintf(filebeatFIPSConfig, logFilePath, tempDir),
 	)
 }

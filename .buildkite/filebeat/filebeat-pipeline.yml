@@ -10,7 +10,6 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-  IMAGE_UBUNTU_X86_64_FIPS: "platform-ingest-beats-ubuntu-2204-fips"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
@@ -317,39 +316,6 @@ steps:
         notify:
           - github_commit_status:
               context: "filebeat: Win 2022 Unit Tests"
-
-      - label: ":ubuntu: Filebeat: FIPS ECH Integration Tests"
-        env:
-          ASDF_TERRAFORM_VERSION: "1.9.3"
-          ASDF_PYTHON_VERSION: "3.9.13" # Not needed by ECH tests, but needed by VM
-        command: |
-          .buildkite/scripts/custom_fips_ech_test.sh filebeat
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_X86_64_FIPS}"
-          instanceType: "m5.xlarge"
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
-          - "filebeat/build/integration-tests/*"
-          - "filebeat/build/integration-tests/Test*/*"
-          - "filebeat/build/integration-tests/Test*/data/**/*"
-        plugins:
-          - test-collector#v1.11.0:
-              files: "filebeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-          - elastic/vault-secrets#v0.1.0:
-              path: "kv/ci-shared/platform-ingest/platform-ingest-ec-prod"
-              field: "apiKey"
-              env_var: "EC_API_KEY"
-        notify:
-          - github_commit_status:
-              context: "filebeat: FIPS ECH Integration Tests / Ubuntu x86_64"
 
   - group: "Extended Tests"
     key: "filebeat-extended-tests"
