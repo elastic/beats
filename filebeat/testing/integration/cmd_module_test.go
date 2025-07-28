@@ -102,8 +102,10 @@ filebeat.config.modules:
 			Args:   []string{"modules", "enable", "disabled2", "disabled3"},
 		})
 
-		os.Create(filepath.Join(modules, "disabled2.yml.disabled"))
-		os.Create(filepath.Join(modules, "disabled3.yml.disabled"))
+		_, err := os.Create(filepath.Join(modules, "disabled2.yml.disabled"))
+		assert.Nil(t, err)
+		_, err := os.Create(filepath.Join(modules, "disabled3.yml.disabled"))
+		assert.Nil(t, err)
 
 		test.ExpectOutput("Enabled disabled2")
 		test.ExpectOutput("Enabled disabled3")
@@ -151,8 +153,10 @@ filebeat.config.modules:
 			Args:   []string{"modules", "disable", "enabled2", "enabled3"},
 		})
 
-		os.Create(filepath.Join(modules, "enabled2.yml"))
-		os.Create(filepath.Join(modules, "enabled3.yml"))
+		_, err := os.Create(filepath.Join(modules, "enabled2.yml"))
+		assert.Nil(t, err)
+		_, err := os.Create(filepath.Join(modules, "enabled3.yml"))
+		assert.Nil(t, err)
 
 		test.ExpectOutput("Disabled enabled2")
 		test.ExpectOutput("Disabled enabled3")

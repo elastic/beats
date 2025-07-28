@@ -27,6 +27,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
@@ -113,7 +114,7 @@ output.file:
 	CountLinesInFile(t, outputFile, 12)
 
 	// rename the file
-	os.Rename(logFilePath, filepath.Join(tempDir, "newlog.log"))
+	assert.NoError(t, os.Rename(logFilePath, filepath.Join(tempDir, "newlog.log")))
 
 	// using 6 events to have a separate log line that we can
 	// grep for.

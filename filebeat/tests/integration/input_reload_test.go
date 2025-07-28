@@ -101,7 +101,7 @@ logging.level: debug
 	// Ensure all log lines are ingested eventually
 	CountLinesInFile(t, outputFile, 10)
 
-	os.Rename(filepath.Join(inputs, "filestream.yml"), filepath.Join(inputs, "filestream.yml.disabled"))
+	assert.NoError(t, os.Rename(filepath.Join(inputs, "filestream.yml"), filepath.Join(inputs, "filestream.yml.disabled")))
 	filebeat.WaitForLogs("Runner: 'filestream' has stopped", 2*time.Minute)
 
 	logFilePath2 := filepath.Join(tempDir, "log2.log")
