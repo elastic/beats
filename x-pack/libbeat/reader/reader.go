@@ -11,9 +11,9 @@ import (
 	"io"
 )
 
-// Copied from x-pack/filebeat/input/awss3/s3_objects.go
+// Moved from x-pack/filebeat/input/awss3/s3_objects.go
 //
-// isStreamGzipped determines whether the given stream of bytes (encapsulated in a buffered reader)
+// IsStreamGzipped determines whether the given stream of bytes (encapsulated in a buffered reader)
 // represents gzipped content or not. A buffered reader is used so the function can peek into the byte
 // stream without consuming it. This makes it convenient for code executed after this function call
 // to consume the stream if it wants.
@@ -27,6 +27,12 @@ func IsStreamGzipped(r *bufio.Reader) (bool, error) {
 	return bytes.HasPrefix(buf, []byte{0x1F, 0x8B, 0x08}), nil
 }
 
+// Moved from x-pack/filebeat/input/awss3/s3_object.go
+//
+// addGzipDecoderIfNeeded determines whether the given stream of bytes (encapsulated in a buffered reader)
+// represents gzipped content or not and adds gzipped decoder if needed. A buffered reader is used
+// so the function can peek into the byte  stream without consuming it. This makes it convenient for
+// code executed after this function call to consume the stream if it wants.
 func AddGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
 	bufReader := bufio.NewReader(body)
 

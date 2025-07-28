@@ -252,7 +252,7 @@ func (m *MetricSet) mapToEvents(ctx context.Context, timeSeries []timeSeriesWith
 	var err error
 
 	if !m.config.ExcludeLabels {
-		if metadataService, err = NewMetadataServiceForConfig(ctx, m.config, sdc.ServiceName, m.metadataCacheRegistry); err != nil {
+		if metadataService, err = NewMetadataServiceForConfig(ctx, m.config, sdc.ServiceName, m.metadataCacheRegistry, m.Logger()); err != nil {
 			return nil, fmt.Errorf("error trying to create metadata service: %w", err)
 		}
 	}

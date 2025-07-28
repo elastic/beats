@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# threatintel fields [exported-fields-threatintel]
+# Threat Intel fields [exported-fields-threatintel]
 
 Threat intelligence Filebeat Module.
 

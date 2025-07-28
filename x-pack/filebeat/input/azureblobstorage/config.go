@@ -13,6 +13,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	conf "github.com/elastic/elastic-agent-libs/config"
+
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 )
 
 // defaultReaderConfig is a default readerConfig state that is used to evaluate
@@ -38,6 +40,8 @@ type config struct {
 	StorageURL string `config:"storage_url"`
 	// Auth contains the authentication configuration for accessing the Azure Storage account.
 	Auth authConfig `config:"auth" validate:"required"`
+	// BatchSize - Defines the maximum number of objects that will be fetched from the bucket in a single request.
+	BatchSize int `config:"batch_size"`
 	// MaxWorkers defines the maximum number of concurrent workers for processing blobs.
 	// It can be set globally or overridden at the container level.
 	MaxWorkers *int `config:"max_workers" validate:"max=5000"`
@@ -60,12 +64,16 @@ type config struct {
 	// ExpandEventListFromField specifies a field from which to expand event lists.
 	// It can be set globally or overridden at the container level.
 	ExpandEventListFromField string `config:"expand_event_list_from_field"`
+	// PathPrefix is the prefix for blob paths, useful for filtering blobs in a specific directory structure.
+	PathPrefix string `config:"path_prefix"`
 }
 
 // container contains the config for each specific blob storage container in the root account.
 type container struct {
 	// Name is the name of the individual Azure blob storage container.
 	Name string `config:"name" validate:"required"`
+	// BatchSize - Defines the maximum number of objects that will be fetched from the bucket in a single request.
+	BatchSize *int `config:"batch_size"`
 	// MaxWorkers defines the maximum number of concurrent workers for processing blobs within this specific container.
 	// This value overrides the global MaxWorkers setting.
 	MaxWorkers *int `config:"max_workers" validate:"max=5000"`
@@ -87,6 +95,8 @@ type container struct {
 	// ExpandEventListFromField specifies a field from which to expand event lists for this specific container.
 	// This value overrides the global ExpandEventListFromField setting.
 	ExpandEventListFromField string `config:"expand_event_list_from_field"`
+	// PathPrefix is the prefix for blob paths, useful for filtering blobs in a specific directory structure.
+	PathPrefix string `config:"path_prefix"`
 }
 
 // fileSelectorConfig helps filter out Azure blobs based on a regex pattern.
@@ -101,7 +111,7 @@ type readerConfig struct {
 	// Parsers contains the configuration for different content parsers (e.g., JSON, XML, CSV).
 	Parsers parser.Config `config:",inline"`
 	// Decoding specifies options for decoding the content, such as compression.
-	Decoding decoderConfig `config:"decoding"`
+	Decoding decoder.DecoderConfig `config:"decoding"`
 	// ContentType suggests the MIME type of the blob content, aiding in parsing.
 	ContentType string `config:"content_type"`
 	// Encoding specifies the character encoding of the blob content (e.g., "UTF-8", "gzip").

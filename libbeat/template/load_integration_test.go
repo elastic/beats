@@ -544,13 +544,13 @@ func path(t *testing.T, fileElems []string) string {
 	return fieldsPath
 }
 
-func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
+func getTestingElasticsearch(t *testing.T) *eslegclient.Connection {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:       eslegtest.GetURL(),
 		Transport: httpcommon.DefaultHTTPTransportSettings(),
 		Username:  eslegtest.GetUser(),
 		Password:  eslegtest.GetPass(),
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 		panic(err) // panic in case TestLogger did not stop test
@@ -590,7 +590,7 @@ func getMockElasticsearchClient(t *testing.T, method, endpoint string, code int,
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:       server.URL,
 		Transport: httpcommon.DefaultHTTPTransportSettings(),
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)

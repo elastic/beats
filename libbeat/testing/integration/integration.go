@@ -115,6 +115,9 @@ type ReportOptions struct {
 	// It uses `PrintOutput`, see its documentation for details.
 	PrintLinesOnFail int
 
+	// PrintLinesPretty sets PrintLinesOnFail to pretty print the output.
+	PrintLinesPretty bool
+
 	// PrintConfig defines if the test prints out the entire configuration file
 	// in case of failure.
 	PrintConfigOnFail bool
@@ -148,7 +151,7 @@ func (b *beatTest) Start(ctx context.Context) BeatTest {
 	b.mtx.Lock()
 	defer b.mtx.Unlock()
 	if b.beat != nil {
-		b.t.Fatal("test cannot be startd multiple times")
+		b.t.Fatal("test cannot be started multiple times")
 		return b
 	}
 	watcher := NewOverallWatcher(b.expectations)
@@ -195,15 +198,20 @@ func (b *beatTest) Wait() {
 	if b.beat.watcher != nil {
 		b.t.Cleanup(func() {
 			b.t.Logf("\n\nExpectations are not met:\n\n%s\n\n", b.beat.watcher.String())
+		})
+		b.t.Fail()
+	}
+
+	b.t.Cleanup(func() {
+		if b.t.Failed() {
 			if b.reportOpts.PrintLinesOnFail != 0 {
 				b.PrintOutput(b.reportOpts.PrintLinesOnFail)
 			}
 			if b.reportOpts.PrintConfigOnFail {
 				b.PrintConfig()
 			}
-		})
-		b.t.Fail()
-	}
+		}
+	})
 }
 
 // ExpectOutput implements the BeatTest interface.
@@ -302,7 +310,8 @@ func (b *beatTest) PrintOutput(lineCount int) {
 		return
 	}
 
-	b.t.Logf("\n\nLast %d lines of the output:\n\n%s\n\n", lineCount, b.beat.CollectOutput(lineCount))
+	b.t.Logf("\n\nLast %d lines of the output:\n\n%s\n\n",
+		lineCount, b.beat.CollectOutput(lineCount, b.reportOpts.PrintLinesPretty))
 }
 
 // PrintConfig prints the entire configuration file the Beat test ran with

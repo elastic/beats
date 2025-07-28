@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
 - The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
 - Allow faccessat(2) in seccomp. {pull}43322[43322]
+- Update user agent used by beats http clients {pull}45251[45251]
 
 *Auditbeat*
 
@@ -68,6 +69,7 @@ already present as `container.id` and `container.log.tag` is dropped because it 
 otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 - Fixed password authentication for ACL users in the Redis input of Filebeat. {pull}44137[44137]
+- Add experimental GZIP file ingestion in filestream. {pull}45301[45301]
 
 
 *Heartbeat*
@@ -75,6 +77,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 *Metricbeat*
 
+- Change index summary metricset to use `_nodes/stats` API instead of `_stats` API to avoid data gaps. {pull}45049[45049]
 - Add support for `_nodes/stats` URIs that work with legacy versions of Elasticsearch {pull}44307[44307]
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
@@ -93,7 +96,9 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
 - Add check for http error codes in the Metricbeat's Prometheus query submodule {pull}44493[44493]
 - Sanitize error messages in Fetch method of SQL module {pull}44577[44577]
+- Add NTP metricset to system module. {pull}44884[44884]
 - Add VPN metrics to meraki module {pull}44851[44851]
+- Improve error messages in AWS Health {pull}45408[45408]
 
 *Osquerybeat*
 
@@ -141,6 +146,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix `dns` processor to handle IPv6 server addresses properly. {pull}44526[44526]
 - Fix an issue where the Kafka output could get stuck if a proxied connection to the Kafka cluster was reset. {issue}44606[44606]
 - Use Debian 11 to build linux/arm to match linux/amd64. Upgrades linux/arm64's statically linked glibc from 2.28 to 2.31. {issue}44816[44816]
+- The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
 
 *Auditbeat*
 
@@ -260,6 +266,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 - Added maintenance windows support for Heartbeat. {pull}41508[41508]
 - Add missing dependencies to ubi9-minimal distro. {pull}44556[44556]
+- Add base64 encoding option to inline monitors. {pull}45100[45100]
 
 
 *Metricbeat*
@@ -283,6 +290,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 - Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group. {pull}44576[44576]
 - Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
+- Fix histogram values of zero are filtered out on non-amd64 platforms for openmetrics and prometheus {pull}44750[44750]
 
 *Osquerybeat*
 
@@ -300,6 +308,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Reset EventLog if error EOF is encountered. {pull}42826[42826]
 - Implement backoff on error retrial. {pull}42826[42826]
 - Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
+- Fix EvtVarTypeAnsiString conversion {pull}44026[44026]
 
 
 *Elastic Logging Plugin*
@@ -435,11 +444,12 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Journald `include_matches.match` now accepts `+` to represent a logical disjunction (OR) {issue}40185[40185] {pull}42517[42517]
 - The journald input is now generally available. {pull}42107[42107]
 - Add metrics for number of events and pages published by HTTPJSON input. {issue}42340[42340] {pull}42442[42442]
-- Filestram take over now supports taking over states from other Filestream inputs and dynamic loading of inputs (autodiscover and Elastic-Agent). {issue}42472[42472] {issue}42884[42884] {pull}42624[42624]
+- Filestream take over now supports taking over states from other Filestream inputs and dynamic loading of inputs (autodiscover and Elastic Agent). There is a new syntax for the configuration, but the previous one can still be used. {issue}42472[42472] {issue}42884[42884] {pull}42624[42624]
 - Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
 - Update CEL mito extensions to v1.17.0. {pull}42851[42851]
 - Winlog input now can report its status to Elastic-Agent {pull}43089[43089]
 - Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
+- The Filestream input now can remove files after they reach EOF or are inactive {pull}43368[43368]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
 - Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
 - Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
@@ -464,7 +474,21 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add Fleet status update functionality to tcp input. {issue}44420[44420] {pull}44786[44786]
 - Filestream now logs at level warn the number of files that are too small to be ingested {pull}44751[44751]
 - Add proxy support to GCP Pub/Sub input. {pull}44892[44892]
+- Add Fleet status updating to Azure Blob Storage input. {issue}44268[44268] {pull}44945[44945]
 - Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
+- Segregated `max_workers` from `batch_size` in the azure-blob-storage input. {issue}44491[44491] {pull}44992[44992]
+- Add support for relationship expansion to EntraID entity analytics provider. {issue}43324[43324] {pull}44761[44761]
+- Added support for specifying custom content-types and encodings in gcs input. {issue}44628[44628] {pull}45088[45088]
+- Update CEL mito extensions to v1.21.0. {issue}40762[40762] {pull}45107[45107]
+- Add Fleet health status reporting to the entity analytics input. {issue}44269[44269] {pull}45152[45152]
+- Add Fleet status updating to o356audit input. {issue}44651[44651] {pull}44957[44957]
+- Add support for blob filtering using path_prefix in azureblobstorage input. {issue}35186[35186] {pull}45214[45214]
+- Update CEL mito extensions to v1.22.0. {pull}45245[45245]
+- Allow empty HTTPJSON cursor template value evaluations to be ignored by Fleet health status updates. {pull}45361[45361]
+- Reuse OAuth2 clients in HTTP JSON input where possible. {issue}34834[34834] {pull}44976[44976]
+- Add support for generalized token authentication to CEL input. {pull}45359[45359]
+- Log CEL single object evaluation results as ECS compliant documents where possible. {issue}45254[45254] {pull}45399[45399]
+- Add status update functionality to Salesforce input. {issue}44653[44653] {pull}45227[45227]
 
 *Auditbeat*
 
@@ -480,6 +504,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
 - Add support for RFC7231 methods to http monitors. {pull}41975[41975]
 - Upgrade node to latest LTS v18.20.7. {pull}43511[43511]
+- Upgrade node to latest LTS v20.19.3. {pull}45087[45087]
 
 *Metricbeat*
 
@@ -539,6 +564,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
 - Add latency config option to Azure Monitor module. {pull}44366[44366]
 - Increase default polling period for MongoDB module from 10s to 60s {pull}44781[44781]
+- Upgrade github.com/microsoft/go-mssqldb from v1.7.2 to v1.8.2 {pull}44990[44990]
 - Add SSL support for sql module: drivers mysql, postgres, and mssql. {pull}44748[44748]
 
 *Metricbeat*
@@ -548,6 +574,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 
 *Packetbeat*
+- Optionally ignore MAC address in flow matching {pull}44965[44965]
+- Add `tls.server.ja3s` tls fingerprint {pull}43284[43284]
 
 *Winlogbeat*
 

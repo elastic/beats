@@ -25,6 +25,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader"
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 )
 
 type job struct {
@@ -185,23 +188,23 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 	if err != nil {
 		return fmt.Errorf("failed to add gzip decoder to object: %s, with error: %w", j.object.Name, err)
 	}
-	dec, err := newDecoder(j.src.ReaderConfig.Decoding, r)
+	dec, err := decoder.NewDecoder(j.src.ReaderConfig.Decoding, r)
 	if err != nil {
 		return err
 	}
 	var evtOffset int64
 	switch dec := dec.(type) {
-	case valueDecoder:
-		defer dec.close()
+	case decoder.ValueDecoder:
+		defer dec.Close()
 
-		for dec.next() {
+		for dec.Next() {
 			var (
 				msg []byte
 				val []mapstr.M
 			)
 			if j.src.ParseJSON {
 				var v mapstr.M
-				msg, v, err = dec.decodeValue()
+				_, msg, v, err = dec.DecodeValue()
 				if err != nil {
 					if errors.Is(err, io.EOF) {
 						return nil
@@ -210,7 +213,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 				}
 				val = []mapstr.M{v}
 			} else {
-				msg, err = dec.decode()
+				msg, err = dec.Decode()
 				if err != nil {
 					if errors.Is(err, io.EOF) {
 						return nil
@@ -219,14 +222,14 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 				}
 			}
 			evt := j.createEvent(msg, val, evtOffset)
-			j.publish(evt, !dec.more(), id)
+			j.publish(evt, !dec.More(), id)
 		}
 
-	case decoder:
-		defer dec.close()
+	case decoder.Decoder:
+		defer dec.Close()
 
-		for dec.next() {
-			msg, err := dec.decode()
+		for dec.Next() {
+			msg, err := dec.Decode()
 			if err != nil {
 				if errors.Is(err, io.EOF) {
 					return nil
@@ -241,7 +244,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 				}
 			}
 			evt := j.createEvent(msg, val, evtOffset)
-			j.publish(evt, !dec.more(), id)
+			j.publish(evt, !dec.More(), id)
 		}
 
 	default:
