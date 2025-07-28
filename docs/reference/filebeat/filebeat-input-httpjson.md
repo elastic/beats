@@ -2,6 +2,8 @@
 navigation_title: "HTTP JSON"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-httpjson.html
+applies_to:
+  stack: ga
 ---
 
 # HTTP JSON input [filebeat-input-httpjson]

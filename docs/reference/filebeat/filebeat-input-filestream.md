@@ -2,6 +2,8 @@
 navigation_title: "filestream"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-filestream.html
+applies_to:
+  stack: ga
 ---
 
 # filestream input [filebeat-input-filestream]
