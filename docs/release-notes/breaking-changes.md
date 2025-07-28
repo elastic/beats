@@ -44,8 +44,15 @@ For more information, check [#38523](https://github.com/elastic/beats/issues/385
 
 _No breaking changes_
 
+## 9.0.4 [beats-9.0.4-breaking-changes]
 
-## 9.0.0 [beats-900-breaking-changes]
+**Metricbeat**
+
+::::{dropdown} Change index summary metricset to use `_nodes/stats` API instead of `_stats` API to avoid data gaps.
+For more information, check  [#45049]({{beats-pull}}45049).
+::::
+
+## 9.0.0 [beats-9.0.0-breaking-changes]
 
 % Description and impact of the breaking change.
 % For more information, check [PR #](PR link).
