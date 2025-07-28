@@ -7,10 +7,10 @@ package tasks_management
 import (
 	"errors"
 	"fmt"
+	"maps"
+	"slices"
 
 	e "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
-
-	"golang.org/x/exp/maps"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -85,7 +85,7 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, nodeTasks *GroupedT
 			// guarantee the parent node is in the list (it may not be)
 			nodeMap[node] = true
 
-			task["node"] = maps.Keys(nodeMap)
+			task["node"] = slices.Collect(maps.Keys(nodeMap))
 
 			// remove the children node
 			delete(task, "children")
@@ -103,8 +103,8 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, nodeTasks *GroupedT
 	err := errors.Join(errs...)
 
 	if err != nil {
-		e.SendErrorEvent(err, info, r, TasksMetricSet, TasksPath, transactionId)
+		e.LogAndSendErrorEvent(err, info, r, TasksMetricSet, TasksPath, transactionId)
 	}
 
-	return err
+	return nil
 }
