@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/ulimit.html
+applies_to:
+  stack: ga
 ---
 
 # Auditbeat fails to watch folders because too many files are open [ulimit]

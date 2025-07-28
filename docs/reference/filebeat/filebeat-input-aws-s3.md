@@ -2,6 +2,8 @@
 navigation_title: "AWS S3"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-aws-s3.html
+applies_to:
+  stack: ga
 ---
 
 # AWS S3 input [filebeat-input-aws-s3]
