@@ -68,8 +68,9 @@ sudo ./filebeat -e
 PS C:\Program Files\filebeat> Start-Service filebeat
 ```
 
-By default, Windows log files are stored under `C:\Program Files\Filebeat-Data\logs`.
-For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\filebeat\Logs`.
+{applies_to}`stack: ga 9.1` By default, Windows log files are stored under `C:\Program Files\Filebeat-Data\logs`.
+
+For versions earlier than 9.1.0, logs are stored by default under `C:\ProgramData\filebeat\Logs`.
 ::::::
 
 :::::::
