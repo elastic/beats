@@ -209,7 +209,7 @@ filebeat.inputs:
 
 ## Keep Alive configuration
 ```{applies_to}
-  stack: ga 9.0.4
+  stack: preview 9.0.4
 ```
 
 The `streaming` input currently supports keep-alive configuration options for streams of `type: websocket`. Use these configuration options to further optimize the stability
@@ -445,11 +445,11 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `received_bytes_total` | Number of bytes received over the life cycle of the input. |
 | `events_received_total` | Number of events received. |
 | `events_published_total` | Number of events published. |
-| `write_control_errors` {applies_to}`stack: ga 9.0.4` | Number of errors encountered for write control operations. |
+| `write_control_errors` {applies_to}`stack: preview 9.0.4` | Number of errors encountered for write control operations. |
 | `cel_processing_time` | Histogram of the elapsed successful CEL program processing times in nanoseconds. |
 | `batch_processing_time` | Histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches). |
-| `ping_message_send_time`  {applies_to}`stack: ga 9.0.4` | Histogram of the elapsed successful ping message send times in nanoseconds. |
-| `pong_message_received_time` {applies_to}`stack: ga 9.0.4` | Histogram of the elapsed successful pong message receive times in nanoseconds. | 
+| `ping_message_send_time`  {applies_to}`stack: preview 9.0.4` | Histogram of the elapsed successful ping message send times in nanoseconds. |
+| `pong_message_received_time` {applies_to}`stack: preview 9.0.4` | Histogram of the elapsed successful pong message receive times in nanoseconds. | 
 
 
 ## Developer tools [_developer_tools_2]
