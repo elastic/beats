@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/running-on-docker.html
+applies_to:
+  stack: ga
 ---
 
 # Run Filebeat on Docker [running-on-docker]
@@ -16,12 +18,12 @@ These images are free to use under the Elastic license. They contain open source
 Obtaining Filebeat for Docker is as simple as issuing a `docker pull` command against the Elastic Docker registry.
 
 % ::::{warning}
-% Version {{stack-version}} of Filebeat has not yet been released. No Docker image is currently available for Filebeat {{stack-version}}.
+% Version {{version.stack}} of Filebeat has not yet been released. No Docker image is currently available for Filebeat {{version.stack}}.
 % ::::
 
 
 ```sh subs=true
-docker pull docker.elastic.co/beats/filebeat:{{stack-version}}
+docker pull docker.elastic.co/beats/filebeat:{{version.stack}}
 ```
 
 Alternatively, you can download other Docker images that contain only features available under the Apache 2.0 license. To download the images, go to [www.docker.elastic.co](https://www.docker.elastic.co).
@@ -29,7 +31,7 @@ Alternatively, you can download other Docker images that contain only features a
 As another option, you can use the hardened [Wolfi](https://wolfi.dev/) image. Using Wolfi images requires Docker version 20.10.10 or higher. For details about why the Wolfi images have been introduced, refer to our article [Reducing CVEs in Elastic container images](https://www.elastic.co/blog/reducing-cves-in-elastic-container-images).
 
 ```bash subs=true
-docker pull docker.elastic.co/beats/filebeat-wolfi:{{stack-version}}
+docker pull docker.elastic.co/beats/filebeat-wolfi:{{version.stack}}
 ```
 
 
@@ -38,19 +40,19 @@ docker pull docker.elastic.co/beats/filebeat-wolfi:{{stack-version}}
 You can use the [Cosign application](https://docs.sigstore.dev/cosign/installation/) to verify the Filebeat Docker image signature.
 
 % ::::{warning}
-% Version {{stack-version}} of Filebeat has not yet been released. No Docker image is currently available for Filebeat {{stack-version}}.
+% Version {{version.stack}} of Filebeat has not yet been released. No Docker image is currently available for Filebeat {{version.stack}}.
 % ::::
 
 
 ```sh subs=true
 wget https://artifacts.elastic.co/cosign.pub
-cosign verify --key cosign.pub docker.elastic.co/beats/filebeat:{{stack-version}}
+cosign verify --key cosign.pub docker.elastic.co/beats/filebeat:{{version.stack}}
 ```
 
 The `cosign` command prints the check results and the signature payload in JSON format:
 
 ```sh subs=true
-Verification for docker.elastic.co/beats/filebeat:{{stack-version}} --
+Verification for docker.elastic.co/beats/filebeat:{{version.stack}} --
 The following checks were performed on each of these signatures:
   - The cosign claims were validated
   - Existence of the claims in the transparency log was verified offline
@@ -69,7 +71,7 @@ Running Filebeat with the setup command will create the index pattern and load v
 
 ```sh subs=true
 docker run --rm \
-docker.elastic.co/beats/filebeat:{{stack-version}} \
+docker.elastic.co/beats/filebeat:{{version.stack}} \
 setup -E setup.kibana.host=kibana:5601 \
 -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
 ```
@@ -94,7 +96,7 @@ For example:
 docker run --rm \
   --mount type=bind,source=$(pwd)/data,destination=/usr/share/filebeat/data \
   --read-only \
-  docker.elastic.co/beats/filebeat:{{stack-version}}
+  docker.elastic.co/beats/filebeat:{{version.stack}}
 ```
 
 
@@ -107,7 +109,7 @@ The Docker image provides several methods for configuring Filebeat. The conventi
 Download this example configuration file as a starting point:
 
 ```sh subs=true
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/docker/filebeat.docker.yml
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.M }}/deploy/docker/filebeat.docker.yml
 ```
 
 
@@ -123,7 +125,7 @@ docker run -d \
   --volume="/var/lib/docker/containers:/var/lib/docker/containers:ro" \
   --volume="/var/run/docker.sock:/var/run/docker.sock:ro" \
   --volume="registry:/usr/share/filebeat/data:rw" \
-  docker.elastic.co/beats/filebeat:{{stack-version}} filebeat -e --strict.perms=false \
+  docker.elastic.co/beats/filebeat:{{version.stack}} filebeat -e --strict.perms=false \
   -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
 ```
 
@@ -156,7 +158,7 @@ docker run \
 It’s possible to embed your Filebeat configuration in a custom image. Here is an example Dockerfile to achieve this:
 
 ```dockerfile subs=true
-FROM docker.elastic.co/beats/filebeat:{{stack-version}}
+FROM docker.elastic.co/beats/filebeat:{{version.stack}}
 COPY --chown=root:filebeat filebeat.yml /usr/share/filebeat/filebeat.yml
 ```
 

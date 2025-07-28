@@ -2,6 +2,8 @@
 navigation_title: "Understand logged metrics"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/understand-metricbeat-logs.html
+applies_to:
+  stack: ga
 ---
 
 # Understand metrics in Metricbeat logs [understand-metricbeat-logs]

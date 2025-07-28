@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/monitor-http-options.html
+applies_to:
+  stack: ga
 ---
 
 # HTTP options [monitor-http-options]

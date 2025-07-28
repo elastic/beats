@@ -2,6 +2,8 @@
 navigation_title: "now"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/now.html
+applies_to:
+  stack: ga
 ---
 
 # Now [now]

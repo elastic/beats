@@ -2,6 +2,8 @@
 navigation_title: "journald"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-journald.html
+applies_to:
+  stack: ga
 ---
 
 # Journald input [filebeat-input-journald]
@@ -173,11 +175,11 @@ include_matches:
 ```
 
 The following include matches configuration is the equivalent of the following logical expression:
- 
+
  ```
  A=a OR (B=b AND C=c) OR (D=d AND B=1)
  ```
- 
+
 ```yaml
  include_matches:
    match:
@@ -188,7 +190,7 @@ The following include matches configuration is the equivalent of the following l
      - +
      - B=1
 ```
- 
+
 `include_matches` translates to `journalctl` `MATCHES`, its [documentation](https://www.man7.org/linux/man-pages/man1/journalctl.1.html)  is not clear about how multiple disjunctions are handled. The previous example was tested with journalctl version 257.
 
 To reference fields, use one of the following:
