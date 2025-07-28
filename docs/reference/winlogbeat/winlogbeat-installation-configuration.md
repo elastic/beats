@@ -154,6 +154,8 @@ In `winlogbeat.yml`, configure the event logs that you want to monitor.
     logging.level: info
     ```
 
+{applies_to}`stack: ga 9.1` The default path changed from C:\ProgramData\winlogbeat\Logs to C:\Program Files\winlogbeat-Data\Logs.
+
 3. After you save your configuration file, test it with the following command.
 
     ```shell
@@ -204,6 +206,8 @@ PS C:\Program Files\Winlogbeat> Start-Service winlogbeat
 ```
 
 Winlogbeat should now be running. If you used the logging configuration described here, you can view the log file at `C:\Program Files\winlogbeat-Data\Logs\winlogbeat`.
+
+{applies_to}`stack: ga 9.1` The default path changed from C:\ProgramData\winlogbeat\Logs\winlogbeat to C:\Program Files\winlogbeat-Data\Logs\winlogbeat`.
 
 You can view the status of the service and control it from the Services management console in Windows. To launch the management console, run this command:
 
