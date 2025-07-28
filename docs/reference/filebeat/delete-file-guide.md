@@ -1,3 +1,8 @@
+---
+applies_to:
+  stack: ga 9.2.0
+---
+
 # Removing files after ingestion
 
 ::::{warning}
@@ -23,10 +28,10 @@ to inactivity, {{filestream}} checks if all events have been acknowledged.
 If this is true, then {{filestream}} waits for the configured grace period,
 checks if no new data has been added to the file by
 comparing its current size to the size when the last event was read,
-then tries to remove the file. 
+then tries to remove the file.
 
 During the grace period, {{filebeat}} monitors the file. If the file size
-changes, the grace period is interrupted and the file resumes 
+changes, the grace period is interrupted and the file resumes
 ingesting after the next file system scan.
 
 An output always acknowledges a successfully written event,
@@ -36,7 +41,7 @@ different conditions for dropping an event. Refer the
 for more details.
 
 If any of the checks fail, the harvester is closed. After the next
-file system scan happens, a new harvester starts. If the close 
+file system scan happens, a new harvester starts. If the close
 condition (EOF or inactivity) is met, the remove process restarts.
 
 After all checks are successful the file is removed.

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/advanced-settings.html
+applies_to:
+  stack: ga
 ---
 
 # Override input settings [advanced-settings]

@@ -2,6 +2,8 @@
 navigation_title: "NetFlow"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-netflow.html
+applies_to:
+  stack: ga
 ---
 
 # NetFlow input [filebeat-input-netflow]
