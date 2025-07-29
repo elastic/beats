@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-amqp.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # AMQP fields [exported-fields-amqp]
 
 AMQP specific event fields.

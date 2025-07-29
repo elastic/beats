@@ -54,7 +54,7 @@ type RunningBeat struct {
 // CollectOutput returns the last `limit` lines of the currently
 // accumulated output.
 // `limit=-1` returns the entire output from the beginning.
-func (b *RunningBeat) CollectOutput(limit int) string {
+func (b *RunningBeat) CollectOutput(limit int, pretty bool) string {
 	b.outputRW.RLock()
 	defer b.outputRW.RUnlock()
 	if limit < 0 {
@@ -67,15 +67,31 @@ func (b *RunningBeat) CollectOutput(limit int) string {
 		output = output[len(output)-limit:]
 	}
 
-	m := make(map[string]any)
-	for i, l := range output {
-		err := json.Unmarshal([]byte(l), &m)
-		if err != nil {
-			builder.WriteString(l)
-		} else {
-			pretty, _ := json.MarshalIndent(m, "", "  ")
-			builder.Write(pretty)
+	writeLine := func(l string) {
+		builder.WriteString(l)
+	}
+	if pretty {
+		m := make(map[string]any)
+		writeLine = func(l string) {
+			err := json.Unmarshal([]byte(l), &m)
+			if err != nil {
+				builder.WriteString(l)
+				return
+			}
+
+			data, err := json.MarshalIndent(m, "", "  ")
+			if err != nil {
+				builder.WriteString(l)
+				return
+			}
+
+			builder.Write(data)
 		}
+	}
+
+	for i, l := range output {
+		writeLine(l)
+
 		if i < len(output)-1 {
 			builder.WriteByte('\n')
 		}

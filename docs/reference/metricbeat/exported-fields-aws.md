@@ -3,12 +3,15 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-aws.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # AWS fields [exported-fields-aws]
 
 `aws` module collects AWS monitoring metrics from AWS Cloudwatch.
 
-
 ## aws [_aws]
+
+
 
 **`aws.tags.*`**
 :   Tag key value pairs from aws resources.
@@ -44,7 +47,6 @@ type: keyword
 :   Name or alias used to identify linked account.
 
 type: keyword
-
 
 
 ## awshealth [_awshealth]
@@ -177,8 +179,7 @@ type: keyword
 type: keyword
 
 
-
-## billing [_billing_4]
+## billing [_billing]
 
 `billing` contains the estimated charges for your AWS account in Cloudwatch.
 
@@ -290,8 +291,7 @@ type: keyword
 type: object
 
 
-
-## cloudwatch [_cloudwatch_2]
+## cloudwatch [_cloudwatch]
 
 `cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
 
@@ -301,8 +301,7 @@ type: object
 type: keyword
 
 
-
-## dynamodb [_dynamodb_2]
+## dynamodb [_dynamodb]
 
 `dynamodb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS DynamoDB.
 
@@ -468,8 +467,7 @@ type: double
 type: double
 
 
-
-## ebs [_ebs_2]
+## ebs [_ebs]
 
 `ebs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EBS.
 
@@ -539,8 +537,7 @@ type: double
 type: double
 
 
-
-## ec2 [_ec2_2]
+## ec2 [_ec2]
 
 `ec2` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EC2.
 
@@ -756,8 +753,7 @@ type: keyword
 type: integer
 
 
-
-## elb [_elb_2]
+## elb [_elb]
 
 `elb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ELB.
 
@@ -863,7 +859,6 @@ type: double
 type: double
 
 
-
 ## applicationelb [_applicationelb]
 
 `applicationelb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ApplicationELB.
@@ -893,7 +888,7 @@ type: long
 
 
 **`aws.applicationelb.metrics.HTTP_Redirect_Url_Limit_Exceeded_Count.sum`**
-:   The number of redirect actions that couldn’t be completed because the URL in the response location header is larger than 8K.
+:   The number of redirect actions that couldn't be completed because the URL in the response location header is larger than 8K.
 
 type: long
 
@@ -1000,7 +995,6 @@ type: long
 type: long
 
 
-
 ## networkelb [_networkelb]
 
 `networkelb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS NetworkELB.
@@ -1099,7 +1093,6 @@ type: long
 :   The number of targets that are considered unhealthy.
 
 type: long
-
 
 
 ## kinesis [_kinesis]
@@ -1245,7 +1238,7 @@ type: long
 
 
 **`aws.kinesis.metrics.SubscribeToShardEvent_Success.avg`**
-:   This metric is emitted every time an event is published successfully. It is only emitted when there’s an active subscription.
+:   This metric is emitted every time an event is published successfully. It is only emitted when there's an active subscription.
 
 type: long
 
@@ -1256,8 +1249,7 @@ type: long
 type: long
 
 
-
-## lambda [_lambda_2]
+## lambda [_lambda]
 
 `lambda` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS Lambda.
 
@@ -1310,7 +1302,7 @@ type: double
 
 
 **`aws.lambda.metrics.UnreservedConcurrentExecutions.avg`**
-:   For an AWS Region, the number of events that are being processed by functions that don’t have reserved concurrency.
+:   For an AWS Region, the number of events that are being processed by functions that don't have reserved concurrency.
 
 type: double
 
@@ -1339,8 +1331,7 @@ type: long
 type: long
 
 
-
-## natgateway [_natgateway_2]
+## natgateway [_natgateway]
 
 `natgateway` contains the metrics from Cloudwatch to track usage of NAT gateway related resources.
 
@@ -1428,8 +1419,7 @@ type: long
 type: long
 
 
-
-## rds [_rds_2]
+## rds [_rds]
 
 `rds` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS RDS.
 
@@ -1876,7 +1866,7 @@ type: long
 
 
 **`aws.rds.storage_used.backup_retention_period.bytes`**
-:   The total amount of backup storage in bytes used to support the point-in-time restore feature within the Aurora DB cluster’s backup retention window.
+:   The total amount of backup storage in bytes used to support the point-in-time restore feature within the Aurora DB cluster's backup retention window.
 
 type: long
 
@@ -1923,8 +1913,7 @@ type: long
 type: long
 
 
-
-## s3_daily_storage [_s3_daily_storage_2]
+## s3_daily_storage [_s3_daily_storage]
 
 `s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
 
@@ -1942,8 +1931,7 @@ format: bytes
 type: long
 
 
-
-## s3_request [_s3_request_2]
+## s3_request [_s3_request]
 
 `s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
 
@@ -2055,7 +2043,6 @@ type: long
 format: duration
 
 
-
 ## sns [_sns]
 
 `sns` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SNS.
@@ -2115,7 +2102,7 @@ type: long
 
 
 **`aws.sns.metrics.NumberOfNotificationsFailedToRedriveToDlq.sum`**
-:   The number of messages that couldn’t be moved to a dead-letter queue.
+:   The number of messages that couldn't be moved to a dead-letter queue.
 
 type: long
 
@@ -2126,8 +2113,7 @@ type: long
 type: long
 
 
-
-## sqs [_sqs_2]
+## sqs [_sqs]
 
 `sqs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SQS.
 
@@ -2195,8 +2181,7 @@ format: bytes
 type: keyword
 
 
-
-## transitgateway [_transitgateway_2]
+## transitgateway [_transitgateway]
 
 `transitgateway` contains the metrics from Cloudwatch to track usage of transit gateway related resources.
 
@@ -2248,8 +2233,7 @@ type: long
 type: long
 
 
-
-## usage [_usage_10]
+## usage [_usage]
 
 `usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
 
@@ -2265,8 +2249,7 @@ type: long
 type: long
 
 
-
-## vpn [_vpn_2]
+## vpn [_vpn]
 
 `vpn` contains the metrics from Cloudwatch to track usage of VPN related resources.
 

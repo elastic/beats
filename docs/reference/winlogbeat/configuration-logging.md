@@ -2,6 +2,8 @@
 navigation_title: "Logging"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/configuration-logging.html
+applies_to:
+  stack: ga
 ---
 
 # Configure logging [configuration-logging]
@@ -13,7 +15,7 @@ The `logging` section of the `winlogbeat.yml` config file contains options for c
 logging.level: info
 logging.to_files: true
 logging.files:
-  path: C:\ProgramData\winlogbeat\Logs
+  path: C:\Program Files\winlogbeat-Data\Logs
   name: winlogbeat
   keepfiles: 7
   permissions: 0640

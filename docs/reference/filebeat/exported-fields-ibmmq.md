@@ -3,12 +3,14 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-ibmmq.html
 ---
 
-# ibmmq fields [exported-fields-ibmmq]
+% This file is generated! See scripts/generate_fields_docs.py
+
+# IBM MQ fields [exported-fields-ibmmq]
 
 ibmmq Module
 
-
 ## ibmmq [_ibmmq]
+
 
 
 ## errorlog [_errorlog]

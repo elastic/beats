@@ -72,9 +72,11 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Journald input now calls `journalctl` instead of using `github.com/coreos/go-systemd/v22@v22.5.0/sdjournal`, the CGO dependency has been removed from Filebeat {pull}40061[40061]
 - System module events now contain `input.type: systemlogs` instead of `input.type: log` when harvesting log files, however the ingest pipeline sets it back to the original input (log or journald). {pull}41246[41246]
 - The system-logs input is removed because it's not used anymore {pull}42328[42328]
+- `x-pack/libbeat/common/proc` moved to `libbeat/common/proc` {pull}44996[44996]
 
 ==== Bugfixes
 
+- Handle conversion of `map[string]any` and `[]map[string]any` for `otelconsumer`.{pull}45008[45008]
 - Handle the starting of namespace and node watchers for metadata enrichment according to `add_resource_metadata` configuration.{pull}38762[38762]
 - Fix multiple metricbeat instances reporting same metrics when using autodiscover with provider kubernetes, and ensure leader elector is always running in autodiscover mode.{pull}38471[38471]
 - Fix how Prometheus histograms are calculated when percentiles are provide.{pull}36537[36537]
@@ -113,6 +115,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fix IIS module logging errors in case application pool PDH counter is not found. {pull}42274[42274]
 - Removed direct dependency on Azure/go-autorest/autorest/adal, which is deprecated. {issue}41463[41463] {pull}42959[42959]
 - Fixed flaky zookeeper integration tests. {pull}43638[43638]
+- Fixed Fileebat GCP Pub/Sub input integration tests. {pull}45150[45150]
 
 ==== Added
 
@@ -233,6 +236,8 @@ unregister input metrics without relaying on the global 'dataset' namespace.{pul
 - Added exponential backoff retry logic for vSphere client logout operation in metricbeat. {issue}43449[43449]
 - Improved Filebeat Websocket input exponential backoff logic to produce a smoother backoff curve. {pull}44069[44069]
 - Added `autoops_es` module to x-pack/metricbeat. {pull}44565[44565]
+- Make `x-pack/libbeat/management.BeatV2Manager.UpdateStatus` a no-op if there is no change in state. {pull}44716[44716]
+- Filebeat filebeat/testing/integration test framework ExpectEOF accounts for closed files and allows to choose to pretty print or not the output. {pull}45023[45023]
 
 ==== Deprecated
 

@@ -2,6 +2,8 @@
 navigation_title: "HTTP JSON"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-httpjson.html
+applies_to:
+  stack: ga
 ---
 
 # HTTP JSON input [filebeat-input-httpjson]
@@ -197,7 +199,7 @@ Some built-in helper functions are provided to work with the input state inside 
 * `base64Decode`: Decodes the base64 string. Any binary output will be converted to a UTF8 string.
 * `base64EncodeNoPad`: Joins and base64 encodes all supplied strings without padding. Example `[[base64EncodeNoPad "string1" "string2"]]`
 * `base64Encode`: Joins and base64 encodes all supplied strings. Example `[[base64Encode "string1" "string2"]]`
-* `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns _{{version}}_.
+* `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns _{{version.stack}}_.
 * `div`: does the integer division of two integer values.
 * `formatDate`: formats a `time.Time`. By default the format layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. It will default to UTC timezone when formatting, but you can specify a different timezone. If the timezone is incorrect, it will default to UTC. Example: `[[ formatDate (now) "UnixDate" ]]`, `[[ formatDate (now) "UnixDate" "America/New_York" ]]`.
 * `getRFC5988Link`: extracts a specific relation from a list of [RFC5988](https://tools.ietf.org/html/rfc5988) links. It is useful when parsing header values for pagination. Example: `[[ getRFC5988Link "next" .last_response.header.Link ]]`.
@@ -543,6 +545,11 @@ Under the default behavior, Requests will continue while the `remaining` value i
 * If the value specified for `early_limit` is greater than or equal to `1`, the value is treated as the target value for `remaining`. e.g. instead of rate-limiting when `remaining` hits `0`, rate-limiting will occur when `remaining` hits the value specified.
 
 It is not set by default (by default the rate-limiting as specified in the Response is followed).
+
+
+### `request.rate_limit.max_non_degraded` [_request_rate_limit_max_non_degraded]
+
+The maximum number of consecutive 429 rate limit responses from the endpoint to accept before making an input health status update. If this is not set, rate limit responses will not be reported as health updates. Default behavior is to not report rate limiting responses.
 
 
 ### `request.transforms` [request-transforms]

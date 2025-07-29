@@ -19,6 +19,8 @@
 package otelmap
 
 import (
+	"encoding"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"time"
@@ -28,6 +30,11 @@ import (
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
 )
+
+// Allow ConvertNonPrimitive to be called recursively to handle nested maps of either type.
+type mapstrOrMap interface {
+	mapstr.M | map[string]any
+}
 
 // ToMapstr converts a [pcommon.Map] to a [mapstr.M].
 func ToMapstr(m pcommon.Map) mapstr.M {
@@ -42,7 +49,7 @@ func ToMapstr(m pcommon.Map) mapstr.M {
 //     If you attempt to use other slice types (e.g., []string or []int),
 //     pcommon.Map.FromRaw(...) will return an "invalid type" error.
 //     To overcome this, we use "reflect" to transform []T into []any.
-func ConvertNonPrimitive(m mapstr.M) {
+func ConvertNonPrimitive[T mapstrOrMap](m T) {
 	for key, val := range m {
 		switch x := val.(type) {
 		case mapstr.M:
@@ -53,6 +60,16 @@ func ConvertNonPrimitive(m mapstr.M) {
 			for i, val := range x {
 				ConvertNonPrimitive(val)
 				s[i] = map[string]any(val)
+			}
+			m[key] = s
+		case map[string]any:
+			ConvertNonPrimitive(x)
+			m[key] = x
+		case []map[string]any:
+			s := make([]any, len(x))
+			for i := range x {
+				ConvertNonPrimitive(x[i])
+				s[i] = x[i]
 			}
 			m[key] = s
 		case time.Time:
@@ -71,19 +88,70 @@ func ConvertNonPrimitive(m mapstr.M) {
 				s = append(s, time.Time(i).UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
 			m[key] = s
+		case encoding.TextMarshaler:
+			text, err := x.MarshalText()
+			if err != nil {
+				m[key] = fmt.Sprintf("error converting %T to string: %s", x, err)
+				continue
+			}
+			m[key] = string(text)
 		case []bool, []string, []float32, []float64, []int, []int8, []int16, []int32, []int64,
 			[]uint, []uint8, []uint16, []uint32, []uint64:
 			ref := reflect.ValueOf(x)
-			if ref.Kind() == reflect.Slice || ref.Kind() == reflect.Array {
-				slice := make([]any, ref.Len())
-				for i := 0; i < ref.Len(); i++ {
-					slice[i] = ref.Index(i).Interface()
-				}
-				m[key] = slice
+			s := make([]any, ref.Len())
+			for i := 0; i < ref.Len(); i++ {
+				s[i] = ref.Index(i).Interface()
 			}
-		case nil, string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, bool, []any, map[string]any:
+			m[key] = s
+		case nil, string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, bool:
 		default:
+			ref := reflect.ValueOf(x)
+			if ref.Kind() == reflect.Struct {
+				var im map[string]any
+				err := marshalUnmarshal(x, &im)
+				if err != nil {
+					m[key] = fmt.Sprintf("error encoding struct to map: %s", err)
+					continue
+				}
+				ConvertNonPrimitive(im)
+				m[key] = im
+				break
+			}
+			if ref.Kind() == reflect.Slice || ref.Kind() == reflect.Array {
+				s := make([]any, ref.Len())
+				for i := 0; i < ref.Len(); i++ {
+					elem := ref.Index(i).Interface()
+					if mi, ok := elem.(map[string]any); ok {
+						ConvertNonPrimitive(mi)
+						s[i] = mi
+					} else if mi, ok := elem.(mapstr.M); ok {
+						ConvertNonPrimitive(mi)
+						s[i] = map[string]any(mi)
+					} else {
+						s[i] = elem
+					}
+				}
+				m[key] = s
+				break // we figured out the type, so we don't need the unknown type case
+			}
 			m[key] = fmt.Sprintf("unknown type: %T", x)
 		}
 	}
+}
+
+// marshalUnmarshal converts an interface to a mapstr.M by marshalling to JSON
+// then unmarshalling the JSON object into a mapstr.M.
+// Copied from libbeat/common/event.go
+func marshalUnmarshal(in interface{}, out interface{}) error {
+	// Decode and encode as JSON to normalize the types.
+	marshaled, err := json.Marshal(in)
+	if err != nil {
+		return fmt.Errorf("error marshalling to JSON: %w", err)
+	}
+	err = json.Unmarshal(marshaled, out)
+	if err != nil {
+		return fmt.Errorf("error unmarshalling from JSON: %w", err)
+	}
+
+	return nil
 }

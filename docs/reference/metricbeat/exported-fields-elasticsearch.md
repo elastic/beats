@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-elasticsearch.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Elasticsearch fields [exported-fields-elasticsearch]
 
 Elasticsearch module
@@ -977,7 +979,6 @@ type: boolean
 type: boolean
 
 
-
 ## ccr [_ccr]
 
 Cross-cluster replication stats
@@ -1126,8 +1127,7 @@ type: long
 :   type: long
 
 
-
-## cluster.stats [_cluster_stats]
+## cluster.stats [_cluster.stats]
 
 Cluster stats
 
@@ -1159,7 +1159,6 @@ Cluster stats
 :   Cluster status (green, yellow, red).
 
 type: keyword
-
 
 
 ## nodes [_nodes]
@@ -1204,7 +1203,6 @@ type: long
 :   type: long
 
 
-
 ## indices [_indices]
 
 Indices statistics.
@@ -1221,7 +1219,6 @@ Indices statistics.
 :   Total number of indices in cluster.
 
 type: long
-
 
 
 ## shards [_shards]
@@ -1272,7 +1269,6 @@ type: long
 
 **`elasticsearch.cluster.stats.stack.xpack.ccr.enabled`**
 :   type: boolean
-
 
 
 ## enrich [_enrich]
@@ -1335,8 +1331,7 @@ type: long
 type: long
 
 
-
-## index [_index_3]
+## index [_index]
 
 index
 
@@ -1668,8 +1663,7 @@ type: long
 :   type: long
 
 
-
-## index.recovery [_index_recovery]
+## index.recovery [_index.recovery]
 
 index
 
@@ -1805,8 +1799,7 @@ type: keyword
 :   type: long
 
 
-
-## index.summary [_index_summary]
+## index.summary [_index.summary]
 
 index
 
@@ -1970,7 +1963,6 @@ format: bytes
 :   type: long
 
 
-
 ## ingest_pipeline [_ingest_pipeline]
 
 Runtime metrics on ingest pipeline execution
@@ -1979,7 +1971,6 @@ Runtime metrics on ingest pipeline execution
 :   Name / id of the ingest pipeline
 
 type: wildcard
-
 
 
 ## total [_total]
@@ -2046,8 +2037,7 @@ type: long
 type: long
 
 
-
-## ml.job [_ml_job]
+## ml.job [_ml.job]
 
 ml
 
@@ -2087,8 +2077,7 @@ type: long
 type: long
 
 
-
-## node [_node_2]
+## node [_node]
 
 node
 
@@ -2096,7 +2085,6 @@ node
 :   Node version.
 
 type: keyword
-
 
 
 ## jvm [_jvm]
@@ -2147,8 +2135,7 @@ format: bytes
 type: boolean
 
 
-
-## node.stats [_node_stats]
+## node.stats [_node.stats]
 
 Statistics about each node in a Elasticsearch cluster
 
@@ -2516,8 +2503,7 @@ format: bytes
 :   type: long
 
 
-
-## summary [_summary_4]
+## summary [_summary]
 
 File system summary
 
@@ -2845,8 +2831,7 @@ format: bytes
 format: bytes
 
 
-
-## cluster.pending_task [_cluster_pending_task]
+## cluster.pending_task [_cluster.pending_task]
 
 `cluster.pending_task` contains a pending task description.
 
@@ -2872,7 +2857,6 @@ type: keyword
 :   Time in queue
 
 type: long
-
 
 
 ## shard [_shard]

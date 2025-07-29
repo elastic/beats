@@ -2,6 +2,8 @@
 navigation_title: "GCP Pub/Sub"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-gcp-pubsub.html
+applies_to:
+  stack: ga
 ---
 
 # GCP Pub/Sub input [filebeat-input-gcp-pubsub]
@@ -67,6 +69,22 @@ Path to a JSON file containing the credentials and key used to subscribe. As an 
 ### `credentials_json` [_credentials_json]
 
 JSON blob containing the credentials and key used to subscribe. This can be as an alternative to `credentials_file` if you want to embed the credential data within your config file or put the information into a keystore. You may also use [Google Application Default Credentials](https://cloud.google.com/docs/authentication/production) (ADC).
+
+
+### `proxy_url` [_proxy_url]
+
+```{applies_to}
+stack: ga 9.1.0
+```
+
+This specifies proxy configuration in the form of `http[s]://<user>:<password>@<server name/ip>:<port>`. Proxy headers may be configured using the `resource.proxy_headers` field which accepts a set of key/value pairs.
+
+```yaml
+filebeat.inputs:
+- type: gcp-pubsub
+  . . .
+  proxy_url: http://proxy.example:8080
+```
 
 
 ## Common options [filebeat-input-gcp-pubsub-common-options]

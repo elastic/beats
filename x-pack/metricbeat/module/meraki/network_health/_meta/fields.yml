@@ -1,0 +1,7 @@
+- name: network
+  type: group
+  release: beta
+  fields:
+    - name: id
+      type: keyword
+      dimension: true

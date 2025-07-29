@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -37,7 +38,7 @@ func TestNewUpperCaseProcessor(t *testing.T) {
 		},
 	)
 
-	procInt, err := NewUpperCaseProcessor(c)
+	procInt, err := NewUpperCaseProcessor(c, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 
 	processor, ok := procInt.(*alterFieldProcessor)

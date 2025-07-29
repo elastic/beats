@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package monitor
 
 import (
@@ -16,6 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func MockResourceExpanded() *armresources.GenericResourceExpanded {
@@ -85,7 +88,7 @@ func TestMapMetric(t *testing.T) {
 	}
 	metricConfig := azure.MetricConfig{Namespace: "namespace", Dimensions: []azure.DimensionConfig{{Name: "location", Value: "West Europe"}}}
 	resourceConfig := azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
-	client := azure.NewMockClient()
+	client := azure.NewMockClient(logptest.NewTestingLogger(t, ""))
 	t.Run("return error when no metric definitions were found", func(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitionsWithRetry", mock.Anything, mock.Anything).Return(armmonitor.MetricDefinitionCollection{}, fmt.Errorf("invalid resource ID"))

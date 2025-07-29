@@ -106,14 +106,14 @@ func (p *Input) Run() {
 	for _, host := range p.config.Hosts {
 		pool := CreatePool(host, p.config)
 
-		h, err := NewHarvester(pool.Get())
+		h, err := NewHarvester(pool.Get(), p.logger)
 		if err != nil {
 			p.logger.Errorf("Failed to create harvester: %v", err)
 			continue
 		}
 		h.forwarder = forwarder
 
-		if err := p.registry.Start(h); err != nil {
+		if err := p.registry.Start(h, p.logger); err != nil {
 			p.logger.Errorf("Harvester start failed: %s", err)
 		}
 	}

@@ -2,6 +2,8 @@
 navigation_title: "Quick start"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-installation-configuration.html
+applies_to:
+  stack: ga
 ---
 
 # Packetbeat quick start: installation and configuration [packetbeat-installation-configuration]
@@ -88,38 +90,38 @@ This guide describes how to get started quickly with network packets analytics. 
 ::::::{tab-item} DEB
 :sync: deb
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-amd64.deb
-sudo dpkg -i packetbeat-{{stack-version}}-amd64.deb
+curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{version.stack}}-amd64.deb
+sudo dpkg -i packetbeat-{{version.stack}}-amd64.deb
 ```
 ::::::
 
 ::::::{tab-item} RPM
 :sync: rpm
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-x86_64.rpm
-sudo rpm -vi packetbeat-{{stack-version}}-x86_64.rpm
+curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{version.stack}}-x86_64.rpm
+sudo rpm -vi packetbeat-{{version.stack}}-x86_64.rpm
 ```
 ::::::
 
 ::::::{tab-item} MacOS
 :sync: macos
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-darwin-x86_64.tar.gz
-tar xzvf packetbeat-{{stack-version}}-darwin-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{version.stack}}-darwin-x86_64.tar.gz
+tar xzvf packetbeat-{{version.stack}}-darwin-x86_64.tar.gz
 ```
 ::::::
 
 ::::::{tab-item} Linux
 :sync: linux
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-linux-x86_64.tar.gz
-tar xzvf packetbeat-{{stack-version}}-linux-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{version.stack}}-linux-x86_64.tar.gz
+tar xzvf packetbeat-{{version.stack}}-linux-x86_64.tar.gz
 ```
 ::::::
 
 ::::::{tab-item} Windows
 :sync: windows
-1. Download the [Packetbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-windows-x86_64.zip).
+1. Download the [Packetbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{version.stack}}-windows-x86_64.zip).
 
 2. Extract the contents of the zip file into `C:\Program Files`.
 
@@ -385,6 +387,9 @@ Packetbeat comes with predefined assets for parsing, indexing, and visualizing y
 
     `-e` is optional and sends output to standard error instead of the configured log output.
 
+By default, Windows log files are stored under `C:\Program Files\Packetbeat-Data\logs`.
+For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\packetbeat\Logs`.
+
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to Elasticsearch and deploys the sample dashboards for visualizing the data in Kibana.
 
 :::{tip}
@@ -454,7 +459,8 @@ sudo ./packetbeat -e
 PS C:\Program Files\packetbeat> Start-Service packetbeat
 ```
 
-By default, Windows log files are stored in `C:\ProgramData\packetbeat\Logs`.
+By default, Windows log files are stored under `C:\Program Files\Packetbeat-Data\Logs`.
+For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\packetbeat\Logs`.
 ::::::
 
 :::::::

@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -50,8 +51,8 @@ type Config struct {
 
 // NewEncodeReader creates a new Encode reader from input reader by applying
 // the given codec.
-func NewEncodeReader(r io.ReadCloser, config Config) (EncoderReader, error) {
-	eReader, err := NewLineReader(r, config)
+func NewEncodeReader(r io.ReadCloser, config Config, logger *logp.Logger) (EncoderReader, error) {
+	eReader, err := NewLineReader(r, config, logger)
 	return EncoderReader{eReader}, err
 }
 

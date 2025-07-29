@@ -3,15 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-redis.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Redis fields [exported-fields-redis]
 
 Redis Module
 
-
 ## redis [_redis]
 
 
-## log [_log_13]
+
+## log [_log]
 
 Redis log files
 
@@ -39,8 +41,7 @@ alias to: log.level
 alias to: message
 
 
-
-## slowlog [_slowlog_4]
+## slowlog [_slowlog]
 
 Slow logs are retrieved from Redis via a network connection.
 

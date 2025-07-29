@@ -20,6 +20,7 @@ package module
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -30,8 +31,12 @@ import (
 func ConfiguredModules(registry *mb.Register, modulesData []*conf.C, configModulesData *conf.C, moduleOptions []Option, logger *logp.Logger) ([]*Wrapper, error) {
 	var modules []*Wrapper //nolint:prealloc //can't be preallocated
 
+	// Pass in placeholder monitoring for the module wrappers since this
+	// isn't a real beat startup.
+	mon := beat.NewMonitoring()
+
 	for _, moduleCfg := range modulesData {
-		module, err := NewWrapper(moduleCfg, registry, logger, moduleOptions...)
+		module, err := NewWrapper(moduleCfg, registry, logger, mon, moduleOptions...)
 		if err != nil {
 			return nil, err
 		}
@@ -51,12 +56,12 @@ func ConfiguredModules(registry *mb.Register, modulesData []*conf.C, configModul
 		}
 
 		for _, file := range modulesManager.ListEnabled() {
-			confs, err := cfgfile.LoadList(file.Path)
+			confs, err := cfgfile.LoadList(file.Path, logger)
 			if err != nil {
 				return nil, fmt.Errorf("error loading config files: %w", err)
 			}
 			for _, conf := range confs {
-				m, err := NewWrapper(conf, registry, logger, moduleOptions...)
+				m, err := NewWrapper(conf, registry, logger, mon, moduleOptions...)
 				if err != nil {
 					return nil, fmt.Errorf("module initialization error: %w", err)
 				}

@@ -26,6 +26,7 @@ import (
 
 // Metrics defines a set of metrics for the filestream input.
 type Metrics struct {
+	// Total metrics: plain and GZIP files
 	FilesOpened       *monitoring.Uint // Number of files that have been opened.
 	FilesClosed       *monitoring.Uint // Number of files closed.
 	FilesActive       *monitoring.Uint // Number of files currently open (gauge).
@@ -36,11 +37,29 @@ type Metrics struct {
 	ProcessingErrors  *monitoring.Uint // Number of processing errors.
 	ProcessingTime    metrics.Sample   // Histogram of the elapsed time for processing an event.
 
+	// GZIP only metrics
+	FilesGZIPOpened       *monitoring.Uint // Number of files that have been opened.
+	FilesGZIPClosed       *monitoring.Uint // Number of files closed.
+	FilesGZIPActive       *monitoring.Uint // Number of files currently open (gauge).
+	MessagesGZIPRead      *monitoring.Uint // Number of messages read.
+	MessagesGZIPTruncated *monitoring.Uint // Number of messages truncated.
+	BytesGZIPProcessed    *monitoring.Uint // Number of bytes processed.
+	EventsGZIPProcessed   *monitoring.Uint // Number of events processed.
+	ProcessingGZIPErrors  *monitoring.Uint // Number of processing errors.
+	ProcessingGZIPTime    metrics.Sample   // Histogram of the elapsed time for processing an event.
+
 	// Those metrics use the same registry/keys as the log input uses
+	// Total metrics: plain and GZIP files
 	HarvesterStarted   *monitoring.Int
 	HarvesterClosed    *monitoring.Int
 	HarvesterRunning   *monitoring.Int
 	HarvesterOpenFiles *monitoring.Int
+
+	// GZIP only metrics
+	HarvesterGZIPStarted   *monitoring.Int
+	HarvesterGZIPClosed    *monitoring.Int
+	HarvesterGZIPRunning   *monitoring.Int
+	HarvesterOpenGZIPFiles *monitoring.Int
 }
 
 func NewMetrics(reg *monitoring.Registry) *Metrics {
@@ -48,10 +67,7 @@ func NewMetrics(reg *monitoring.Registry) *Metrics {
 	// variable, so it should always exist before this function runs.
 	// However, at least on testing scenarios this does not hold true, so
 	// if needed, we create the registry ourselves.
-	harvesterMetrics := monitoring.Default.GetRegistry("filebeat.harvester")
-	if harvesterMetrics == nil {
-		harvesterMetrics = monitoring.Default.NewRegistry("filebeat.harvester")
-	}
+	harvesterMetrics := monitoring.Default.GetOrCreateRegistry("filebeat.harvester")
 
 	m := Metrics{
 		FilesOpened:       monitoring.NewUint(reg, "files_opened_total"),
@@ -64,13 +80,30 @@ func NewMetrics(reg *monitoring.Registry) *Metrics {
 		ProcessingErrors:  monitoring.NewUint(reg, "processing_errors_total"),
 		ProcessingTime:    metrics.NewUniformSample(1024),
 
+		FilesGZIPOpened:       monitoring.NewUint(reg, "gzip_files_opened_total"),
+		FilesGZIPClosed:       monitoring.NewUint(reg, "gzip_files_closed_total"),
+		FilesGZIPActive:       monitoring.NewUint(reg, "gzip_files_active"),
+		MessagesGZIPRead:      monitoring.NewUint(reg, "gzip_messages_read_total"),
+		MessagesGZIPTruncated: monitoring.NewUint(reg, "gzip_messages_truncated_total"),
+		BytesGZIPProcessed:    monitoring.NewUint(reg, "gzip_bytes_processed_total"),
+		EventsGZIPProcessed:   monitoring.NewUint(reg, "gzip_events_processed_total"),
+		ProcessingGZIPErrors:  monitoring.NewUint(reg, "gzip_processing_errors_total"),
+		ProcessingGZIPTime:    metrics.NewUniformSample(1024),
+
 		HarvesterStarted:   monitoring.NewInt(harvesterMetrics, "started"),
 		HarvesterClosed:    monitoring.NewInt(harvesterMetrics, "closed"),
 		HarvesterRunning:   monitoring.NewInt(harvesterMetrics, "running"),
 		HarvesterOpenFiles: monitoring.NewInt(harvesterMetrics, "open_files"),
+
+		HarvesterGZIPStarted:   monitoring.NewInt(harvesterMetrics, "gzip_started"),
+		HarvesterGZIPClosed:    monitoring.NewInt(harvesterMetrics, "gzip_closed"),
+		HarvesterGZIPRunning:   monitoring.NewInt(harvesterMetrics, "gzip_running"),
+		HarvesterOpenGZIPFiles: monitoring.NewInt(harvesterMetrics, "gzip_open_files"),
 	}
 	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(m.ProcessingTime))
+	_ = adapter.NewGoMetrics(reg, "gzip_processing_time", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(m.ProcessingGZIPTime))
 
 	return &m
 }

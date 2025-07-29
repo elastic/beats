@@ -58,7 +58,7 @@ func NewConfigAppender(cfg *conf.C, logger *logp.Logger) (autodiscover.Appender,
 	var cond conditions.Condition
 
 	if config.ConditionConfig != nil {
-		cond, err = conditions.NewCondition(config.ConditionConfig)
+		cond, err = conditions.NewCondition(config.ConditionConfig, logger)
 		if err != nil {
 			return nil, fmt.Errorf("unable to create condition due to error: %w", err)
 		}
@@ -104,7 +104,7 @@ func (c *configAppender) Append(event bus.Event) {
 		}
 
 		// Apply the template
-		template.ApplyConfigTemplate(event, cfgs)
+		template.ApplyConfigTemplate(event, cfgs, c.logger)
 	}
 
 	// Replace old config with newly appended configs

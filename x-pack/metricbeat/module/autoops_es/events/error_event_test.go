@@ -6,12 +6,16 @@ package events
 
 import (
 	"errors"
-	"os"
+	"net/http"
 	"testing"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
+	"github.com/elastic/elastic-agent-libs/version"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func TestExtractPathAndQuery(t *testing.T) {
@@ -91,6 +95,16 @@ func TestGetHTTPResponseBodyInfo(t *testing.T) {
 			expectedBody:   "Cluster not ready",
 		},
 		{
+			name: "Error is of type VersionMismatchError",
+			inputError: &utils.VersionMismatchError{
+				ExpectedVersion: "7.10.0",
+				ActualVersion:   "7.9.3",
+			},
+			expectedStatus: 0,
+			expectedCode:   "VERSION_MISMATCH",
+			expectedBody:   "expected 7.10.0, got 7.9.3",
+		},
+		{
 			name:           "Error is not of a known type",
 			inputError:     errors.New("some other error"),
 			expectedStatus: 0,
@@ -124,32 +138,32 @@ func TestGetResourceID(t *testing.T) {
 		expectedValue string
 	}{
 		{
-			name: "DEPLOYMENT_ID is set",
+			name: "AUTOOPS_DEPLOYMENT_ID is set",
 			envVars: map[string]string{
-				"DEPLOYMENT_ID": "deployment-123",
+				"AUTOOPS_DEPLOYMENT_ID": "deployment-123",
 			},
 			expectedValue: "deployment-123",
 		},
 		{
-			name: "PROJECT_ID is set",
+			name: "AUTOOPS_PROJECT_ID is set",
 			envVars: map[string]string{
-				"PROJECT_ID": "project-456",
+				"AUTOOPS_PROJECT_ID": "project-456",
 			},
 			expectedValue: "project-456",
 		},
 		{
-			name: "RESOURCE_ID is set",
+			name: "AUTOOPS_RESOURCE_ID is set",
 			envVars: map[string]string{
-				"RESOURCE_ID": "resource-789",
+				"AUTOOPS_RESOURCE_ID": "resource-789",
 			},
 			expectedValue: "resource-789",
 		},
 		{
 			name: "No environment variables are set",
 			envVars: map[string]string{
-				"DEPLOYMENT_ID": "",
-				"PROJECT_ID":    "",
-				"RESOURCE_ID":   "",
+				"AUTOOPS_DEPLOYMENT_ID": "",
+				"AUTOOPS_PROJECT_ID":    "",
+				"AUTOOPS_RESOURCE_ID":   "",
 			},
 			expectedValue: "",
 		},
@@ -159,19 +173,155 @@ func TestGetResourceID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Set environment variables
 			for key, value := range tt.envVars {
-				os.Setenv(key, value)
+				t.Setenv(key, value)
 			}
 
 			// Call the function
-			result := getResourceID()
+			result := utils.GetAndSetResourceID()
+
+			t.Cleanup(utils.ClearResourceID)
 
 			// Assert the result
 			assert.Equal(t, tt.expectedValue, result)
-
-			// Clean up environment variables
-			for key := range tt.envVars {
-				os.Unsetenv(key)
-			}
 		})
 	}
+}
+
+// MockReporter is a mock implementation of mb.ReporterV2
+type MockReporter struct {
+	mock.Mock
+}
+
+func (m *MockReporter) Event(event mb.Event) bool {
+	args := m.Called(event)
+	return args.Bool(0)
+}
+
+func (m *MockReporter) Error(err error) bool {
+	args := m.Called(err)
+	return args.Bool(0)
+}
+
+func TestLogAndSendErrorEventWithoutClusterInfoDefaultValues(t *testing.T) {
+	mockReporter := new(MockReporter)
+	mockReporter.On("Event", mock.Anything).Return(true)
+
+	err := errors.New("test error")
+	metricSetName := "test_metricset"
+
+	LogAndSendErrorEventWithoutClusterInfo(err, mockReporter, metricSetName)
+
+	mockReporter.AssertCalled(t, "Event", mock.MatchedBy(func(event mb.Event) bool {
+		errorField, ok := event.MetricSetFields["error"].(ErrorEvent)
+		require.True(t, ok)
+		require.Equal(t, "UNKNOWN_ERROR", errorField.ErrorCode)
+		require.Equal(t, "test error", errorField.ErrorMessage)
+		require.Equal(t, "/", errorField.URLPath)
+		require.Equal(t, "", errorField.Query)
+		require.Equal(t, http.MethodGet, errorField.HTTPMethod)
+		require.Equal(t, 0, errorField.HTTPStatusCode)
+		require.Equal(t, "", errorField.HTTPResponse)
+		require.Equal(t, metricSetName, errorField.MetricSet)
+		return true
+	}))
+}
+
+func TestLogAndSendErrorEventWithoutClusterInfoNonDefaultValues(t *testing.T) {
+	mockReporter := new(MockReporter)
+	mockReporter.On("Event", mock.Anything).Return(true)
+
+	err := &utils.HTTPResponse{
+		StatusCode: 500,
+		Status:     "HTTP_500",
+		Body:       "Internal Server Error",
+		Err:        errors.New("server encountered an unexpected condition"),
+	}
+	metricSetName := "custom_metricset"
+
+	LogAndSendErrorEventWithoutClusterInfo(err, mockReporter, metricSetName)
+
+	mockReporter.AssertCalled(t, "Event", mock.MatchedBy(func(event mb.Event) bool {
+		errorField, ok := event.MetricSetFields["error"].(ErrorEvent)
+		require.True(t, ok)
+		assert.Equal(t, "HTTP_500", errorField.ErrorCode)
+		assert.Equal(t, "server encountered an unexpected condition: HTTP error HTTP_500", errorField.ErrorMessage)
+		assert.Equal(t, "/", errorField.URLPath)
+		assert.Equal(t, "", errorField.Query)
+		assert.Equal(t, http.MethodGet, errorField.HTTPMethod)
+		assert.Equal(t, 500, errorField.HTTPStatusCode)
+		assert.Equal(t, "Internal Server Error", errorField.HTTPResponse)
+		assert.Equal(t, metricSetName, errorField.MetricSet)
+		return true
+	}))
+}
+
+func TestLogAndSendErrorEventDefaultValues(t *testing.T) {
+	mockReporter := new(MockReporter)
+	mockReporter.On("Event", mock.Anything).Return(true)
+
+	err := errors.New("test error")
+	clusterInfo := &utils.ClusterInfo{
+		ClusterName: "",
+		ClusterID:   "test-cluster-id",
+		Version: utils.ClusterInfoVersion{
+			Number:       version.MustNew("8.0.0"),
+			Distribution: "",
+		},
+	}
+	metricSetName := "test_metricset"
+	path := "/test/path"
+
+	LogAndSendErrorEvent(err, clusterInfo, mockReporter, metricSetName, path, "test-transaction-id")
+
+	mockReporter.AssertCalled(t, "Event", mock.MatchedBy(func(event mb.Event) bool {
+		errorField, ok := event.MetricSetFields["error"].(ErrorEvent)
+		require.True(t, ok)
+		require.Equal(t, "UNKNOWN_ERROR", errorField.ErrorCode)
+		require.Equal(t, "test error", errorField.ErrorMessage)
+		require.Equal(t, "/test/path", errorField.URLPath)
+		require.Equal(t, "", errorField.Query)
+		require.Equal(t, http.MethodGet, errorField.HTTPMethod)
+		require.Equal(t, 0, errorField.HTTPStatusCode)
+		require.Equal(t, "", errorField.HTTPResponse)
+		require.Equal(t, metricSetName, errorField.MetricSet)
+		return true
+	}))
+}
+
+func TestLogAndSendErrorEventNonDefaultValues(t *testing.T) {
+	mockReporter := new(MockReporter)
+	mockReporter.On("Event", mock.Anything).Return(true)
+
+	err := &utils.HTTPResponse{
+		StatusCode: 500,
+		Status:     "HTTP_500",
+		Body:       "Internal Server Error",
+		Err:        errors.New("server encountered an unexpected condition"),
+	}
+	clusterInfo := &utils.ClusterInfo{
+		ClusterName: "",
+		ClusterID:   "test-cluster-id",
+		Version: utils.ClusterInfoVersion{
+			Number:       version.MustNew("8.0.0"),
+			Distribution: "",
+		},
+	}
+	metricSetName := "custom_metricset"
+	path := "/custom/path?param=value"
+
+	LogAndSendErrorEvent(err, clusterInfo, mockReporter, metricSetName, path, "custom-transaction-id")
+
+	mockReporter.AssertCalled(t, "Event", mock.MatchedBy(func(event mb.Event) bool {
+		errorField, ok := event.MetricSetFields["error"].(ErrorEvent)
+		require.True(t, ok)
+		assert.Equal(t, "HTTP_500", errorField.ErrorCode)
+		assert.Equal(t, "server encountered an unexpected condition: HTTP error HTTP_500", errorField.ErrorMessage)
+		assert.Equal(t, "/custom/path", errorField.URLPath)
+		assert.Equal(t, "param=value", errorField.Query)
+		assert.Equal(t, http.MethodGet, errorField.HTTPMethod)
+		assert.Equal(t, 500, errorField.HTTPStatusCode)
+		assert.Equal(t, "Internal Server Error", errorField.HTTPResponse)
+		assert.Equal(t, metricSetName, errorField.MetricSet)
+		return true
+	}))
 }

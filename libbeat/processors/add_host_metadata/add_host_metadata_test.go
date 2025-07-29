@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo/types"
 
@@ -51,9 +52,9 @@ func TestConfigDefault(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(map[string]interface{}{})
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	switch runtime.GOOS {
-	case "windows", "darwin", "linux":
+	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
@@ -98,9 +99,9 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	switch runtime.GOOS {
-	case "windows", "darwin", "linux":
+	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
@@ -148,7 +149,7 @@ func TestConfigName(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(config)
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
@@ -183,7 +184,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(config)
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
@@ -206,7 +207,7 @@ func TestConfigGeoDisabled(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(config)
 	require.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
@@ -224,9 +225,9 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(cfg)
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	switch runtime.GOOS {
-	case "windows", "darwin", "linux":
+	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
@@ -289,10 +290,10 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 
 			v, err := newEvent.GetValue("host")
 			assert.NoError(t, err)
-			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1)
-			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)
+			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1) //nolint:errcheck // already checked
+			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)  //nolint:errcheck // already checked
 			if c.expectedHostFieldLength != -1 {
-				assert.Equal(t, c.expectedHostFieldLength, len(v.(mapstr.M)))
+				assert.Equal(t, c.expectedHostFieldLength, len(v.(mapstr.M))) //nolint:errcheck // already checked
 			}
 		})
 	}
@@ -304,9 +305,9 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(cfg)
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	switch runtime.GOOS {
-	case "windows", "darwin", "linux":
+	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
@@ -365,8 +366,8 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 
 			v, err := newEvent.GetValue("host")
 			assert.NoError(t, err)
-			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1)
-			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)
+			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1) //nolint:errcheck // already checked
+			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)  //nolint:errcheck // already checked
 		})
 	}
 }
@@ -500,7 +501,7 @@ func TestFQDNEventSync(t *testing.T) {
 	}))
 	require.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	// update
@@ -579,7 +580,7 @@ func TestFQDNLookup(t *testing.T) {
 			testConfig, err := conf.NewConfigFrom(map[string]interface{}{})
 			require.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			addHostMetadataP, ok := p.(*addHostMetadata)

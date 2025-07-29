@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-template.html
+applies_to:
+  stack: ga
 ---
 
 # Load the Elasticsearch index template [metricbeat-template]
@@ -97,7 +99,7 @@ metricbeat setup --index-management -E output.logstash.enabled=false -E 'output.
 **docker:**
 
 ```sh subs=true
-docker run --rm docker.elastic.co/beats/metricbeat:{{stack-version}} setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+docker run --rm docker.elastic.co/beats/metricbeat:{{version.stack}} setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ```
 
 **win:**
@@ -171,7 +173,7 @@ metricbeat export template > metricbeat.template.json
 **win:**
 
 ```sh subs=true
-PS > .\metricbeat.exe export template --es.version {{stack-version}} | Out-File -Encoding UTF8 metricbeat.template.json
+PS > .\metricbeat.exe export template --es.version {{version.stack}} | Out-File -Encoding UTF8 metricbeat.template.json
 ```
 
 To install the template, run:
@@ -179,50 +181,50 @@ To install the template, run:
 **deb and rpm:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/metricbeat-{{stack-version}} -d@metricbeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/metricbeat-{{version.stack}} -d@metricbeat.template.json
 ```
 
 **mac:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/metricbeat-{{stack-version}} -d@metricbeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/metricbeat-{{version.stack}} -d@metricbeat.template.json
 ```
 
 **linux:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/metricbeat-{{stack-version}} -d@metricbeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/metricbeat-{{version.stack}} -d@metricbeat.template.json
 ```
 
 **win:**
 
 ```sh subs=true
-PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile metricbeat.template.json -Uri http://localhost:9200/_index_template/metricbeat-{{stack-version}}
+PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile metricbeat.template.json -Uri http://localhost:9200/_index_template/metricbeat-{{version.stack}}
 ```
 
-Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on metricbeat-{{stack-version}} index.
+Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on metricbeat-{{version.stack}} index.
 
 **deb and rpm:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/metricbeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/metricbeat-{{version.stack}}
 ```
 
 **mac:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/metricbeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/metricbeat-{{version.stack}}
 ```
 
 **linux:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/metricbeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/metricbeat-{{version.stack}}
 ```
 
 **win:**
 
 ```sh subs=true
-PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/metricbeat-{{stack-version}}
+PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/metricbeat-{{version.stack}}
 ```
 

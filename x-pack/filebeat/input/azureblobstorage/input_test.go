@@ -38,6 +38,7 @@ const (
 	beatsNdJSONContainer        = "beatsndjsoncontainer"
 	beatsGzJSONContainer        = "beatsgzjsoncontainer"
 	beatsJSONWithArrayContainer = "beatsjsonwitharraycontainer"
+	beatsCSVContainer           = "beatscsvcontainer"
 )
 
 func Test_StorageClient(t *testing.T) {
@@ -473,6 +474,241 @@ func Test_StorageClient(t *testing.T) {
 				mock.Beatscontainer_2_blob_data3_json:  true,
 			},
 		},
+		{
+			name: "CustomContentTypeUnsupported",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":                  beatsGzJSONContainer,
+						"content_type":          "application/xyz-plain",
+						"override_content_type": true,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				"job with jobId beatsgzjsoncontainer-multiline.json.gz-worker-0 encountered an error: content-type application/xyz-plain not supported": true,
+			},
+		},
+		{
+			name: "CustomContentTypeSupported",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":         beatsGzJSONContainer,
+						"content_type": "application/x-gzip",
+					},
+				},
+			},
+			mockHandler: mock.AzureFileServerNoContentType,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_multiline_json_gz[0]: true,
+				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
+			},
+		},
+		{
+			// The invalid content-type specified is ignored since a
+			// content-type already exists and we are not overriding it.
+			// So we expect a successful run.
+			name: "CustomContentTypeIgnored",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":         beatsNdJSONContainer,
+						"content_type": "application/xyz-plain",
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_log_ndjson[0]: true,
+				mock.BeatsFilesContainer_log_ndjson[1]: true,
+			},
+		},
+		{
+			// This checks if the root level content-type specifications are respected.
+			name: "CustomContentTypeAtRootLevel",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"content_type":                        "application/x-gzip",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsGzJSONContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureFileServerNoContentType,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_multiline_json_gz[0]: true,
+				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
+			},
+		},
+		{
+			name: "ReadCSVContainerLevel",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":                       beatsCSVContainer,
+						"decoding.codec.csv.enabled": true,
+						"decoding.codec.csv.comma":   " ",
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_csv[0]: true,
+				mock.BeatsFilesContainer_csv[1]: true,
+			},
+		},
+		{
+			name: "ReadCSVRootLevel",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"decoding.codec.csv.enabled":          true,
+				"decoding.codec.csv.comma":            " ",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsCSVContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_csv[0]: true,
+				mock.BeatsFilesContainer_csv[1]: true,
+			},
+		},
+		{
+			name: "BatchSizeGlobal",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"batch_size":                          3,
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_ata_json:      true,
+				mock.Beatscontainer_blob_data3_json:    true,
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
+		{
+			name: "BatchContainberLevel",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":       beatsContainer,
+						"batch_size": 3,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_ata_json:      true,
+				mock.Beatscontainer_blob_data3_json:    true,
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
+		{
+			name: "FilterByPathPrefix_NotFoundErr",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"path_prefix":                         "docs/",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer2,
+					},
+				},
+			},
+			mockHandler:   mock.AzureStorageServer,
+			expected:      map[string]bool{},
+			expectedError: mock.NotFoundErr,
+		},
+		{
+			name: "FilterByPathPrefix_RootLevel",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"path_prefix":                         "docs/",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
+		{
+			name: "FilterByPathPrefix_ContainerLevel",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":        beatsContainer,
+						"path_prefix": "docs/",
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -542,7 +778,6 @@ func Test_StorageClient(t *testing.T) {
 					var err error
 					val, err = got.Fields.GetValue("message")
 					assert.NoError(t, err)
-
 					assert.True(t, tt.expected[strings.ReplaceAll(val.(string), "\r\n", "\n")])
 					assert.Equal(t, tt.expectedError, err)
 					receivedCount += 1
@@ -556,7 +791,7 @@ func Test_StorageClient(t *testing.T) {
 	}
 }
 
-func Test_Concurrency(t *testing.T) {
+func TestConcurrency(t *testing.T) {
 	for _, workers := range []int{100, 1000, 2000} {
 		t.Run(fmt.Sprintf("TestConcurrency_%d_Workers", workers), func(t *testing.T) {
 			const expectedLen = mock.TotalRandomDataSets

@@ -214,7 +214,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms := &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
-		log:           logp.NewLogger(system.ModuleName),
+		log:           base.Logger().Named(system.ModuleName),
 		bucket:        bucket,
 	}
 

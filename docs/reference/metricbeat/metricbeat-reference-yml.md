@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-reference-yml.html
+applies_to:
+  stack: ga
 ---
 
 # metricbeat.reference.yml [metricbeat-reference-yml]

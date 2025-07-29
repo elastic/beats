@@ -2,6 +2,8 @@
 navigation_title: "{{kib}} endpoint"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/setup-kibana-endpoint.html
+applies_to:
+  stack: ga
 ---
 
 # Configure the {{kib}} endpoint [setup-kibana-endpoint]

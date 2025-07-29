@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package monitor
 
 import (
@@ -17,6 +19,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestConcurrentMapMetrics(t *testing.T) {
@@ -26,7 +29,7 @@ func TestConcurrentMapMetrics(t *testing.T) {
 	}
 	metricConfig := azure.MetricConfig{Namespace: "namespace", Dimensions: []azure.DimensionConfig{{Name: "location", Value: "West Europe"}}}
 	resourceConfig := azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
-	client := azure.NewMockBatchClient()
+	client := azure.NewMockBatchClient(logptest.NewTestingLogger(t, ""))
 	t.Run("return error when no metric definitions were found", func(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitionsWithRetry", mock.Anything, mock.Anything).Return(armmonitor.MetricDefinitionCollection{}, fmt.Errorf("invalid resource ID"))
@@ -41,7 +44,9 @@ func TestConcurrentMapMetrics(t *testing.T) {
 			// Once all the goroutines are done, close the channels
 			client.Log.Infof("All collections finished. Closing channels ")
 			close(client.ResourceConfigurations.MetricDefinitionsChan)
-			close(client.ResourceConfigurations.ErrorChan)
+			if client.ResourceConfigurations.ErrorChan != nil {
+				close(client.ResourceConfigurations.ErrorChan)
+			}
 		}()
 		var collectedMetrics []azure.Metric
 		var error error

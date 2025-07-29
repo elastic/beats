@@ -20,7 +20,8 @@ var Aliases = map[string]interface{}{
 
 // All updates all generated content.
 func (Update) All() {
-	mg.Deps(Update.Fields, Update.IncludeFields, Update.Config, Update.FieldDocs)
+	// TODO: Figure out documentation for osquerybeat.
+	mg.Deps(Update.Fields, Update.IncludeFields, Update.Config) // Update.FieldDocs
 }
 
 // Config generates both the short and reference configs.

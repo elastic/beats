@@ -3,17 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-oracle.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Oracle fields [exported-fields-oracle]
 
 Oracle database module
-
 
 ## oracle [_oracle]
 
 Oracle module
 
-
-## performance [_performance_5]
+## performance [_performance]
 
 Performance related metrics on a single database instance
 
@@ -42,19 +42,18 @@ type: double
 
 
 **`oracle.performance.lock_requests`**
-:   Average of the ratio between *gethits* and *gets* being *Gethits* the number of times an object’s handle was found in memory and *gets* the number of times a lock was requested for objects of this namespace.
+:   Average of the ratio between 'gethits' and 'gets' being 'Gethits' the number of times an object's handle was found in memory and 'gets' the number of times a lock was requested for objects of this namespace.
 
 type: long
 
 
 **`oracle.performance.pin_requests`**
-:   Average of all pinhits/pins ratios being *PinHits* the number of times all of the metadata pieces of the library object were found in memory and *pins* the number of times a PIN was requested for objects of this namespace
+:   Average of all pinhits/pins ratios being 'PinHits' the number of times all of the metadata pieces of the library object were found in memory and 'pins' the number of times a PIN was requested for objects of this namespace
 
 type: double
 
 
-
-## cache [_cache_4]
+## cache [_cache]
 
 Statistics about all buffer pools available for the instance
 
@@ -70,10 +69,9 @@ type: double
 type: long
 
 
-
 ## get [_get]
 
-Buffer pool *get* statistics
+Buffer pool 'get' statistics
 
 **`oracle.performance.cache.get.consistent`**
 :   Consistent gets statistic
@@ -85,7 +83,6 @@ type: long
 :   Database blocks gotten
 
 type: long
-
 
 
 ## cursors [_cursors]
@@ -110,7 +107,6 @@ type: double
 type: double
 
 
-
 ## opened [_opened]
 
 Opened cursors statistic
@@ -125,7 +121,6 @@ type: long
 :   Total number of cursors opened since the instance started
 
 type: long
-
 
 
 ## parse [_parse]
@@ -156,8 +151,7 @@ type: long
 type: double
 
 
-
-## sysmetric [_sysmetric_2]
+## sysmetric [_sysmetric]
 
 Sysmetric related metrics.
 
@@ -251,7 +245,6 @@ type: double
 type: double
 
 
-
 ## tablespace [_tablespace]
 
 tablespace
@@ -260,7 +253,6 @@ tablespace
 :   Tablespace name
 
 type: keyword
-
 
 
 ## data_file [_data_file]
@@ -279,8 +271,7 @@ type: long
 type: keyword
 
 
-
-## size [_size_3]
+## size [_size]
 
 Size information about the file
 
@@ -309,7 +300,7 @@ format: bytes
 
 
 **`oracle.tablespace.data_file.status`**
-:   *File status: AVAILABLE or INVALID (INVALID means that the file number is not in use, for example, a file in a tablespace that was dropped)*
+:   'File status: AVAILABLE or INVALID (INVALID means that the file number is not in use, for example, a file in a tablespace that was dropped)'
 
 type: keyword
 
@@ -318,7 +309,6 @@ type: keyword
 :   Last known online status of the data file. One of SYSOFF, SYSTEM, OFFLINE, ONLINE or RECOVER.
 
 type: keyword
-
 
 
 ## space [_space]

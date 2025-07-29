@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -321,7 +322,7 @@ func TestDecodeCSVField(t *testing.T) {
 
 	for title, tt := range tests {
 		t.Run(title, func(t *testing.T) {
-			processor, err := NewDecodeCSVField(cfg.MustNewConfigFrom(tt.config))
+			processor, err := NewDecodeCSVField(cfg.MustNewConfigFrom(tt.config), logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -360,7 +361,7 @@ func TestDecodeCSVField(t *testing.T) {
 			"message": []string{"17", "192.168.33.1", "8.8.8.8"},
 		}
 
-		processor, err := NewDecodeCSVField(cfg.MustNewConfigFrom(config))
+		processor, err := NewDecodeCSVField(cfg.MustNewConfigFrom(config), logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -380,7 +381,7 @@ func TestDecodeCSVField_String(t *testing.T) {
 		},
 		"separator":      "#",
 		"ignore_missing": true,
-	}))
+	}), logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

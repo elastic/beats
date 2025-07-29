@@ -3,15 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-iis.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # IIS fields [exported-fields-iis]
 
 iis module
 
-
 ## iis [_iis]
 
 
-## application_pool [_application_pool_2]
+
+## application_pool [_application_pool]
 
 Application pool process stats.
 
@@ -21,8 +23,7 @@ Application pool process stats.
 type: keyword
 
 
-
-## process [_process_4]
+## process [_process]
 
 Worker process overview.
 
@@ -80,7 +81,6 @@ type: float
 type: float
 
 
-
 ## net_clr [_net_clr]
 
 Common Language Runtime overview.
@@ -115,8 +115,7 @@ type: float
 type: float
 
 
-
-## memory [_memory_7]
+## memory [_memory]
 
 Memory overview.
 
@@ -186,7 +185,6 @@ type: float
 type: float
 
 
-
 ## locks_and_threads [_locks_and_threads]
 
 LocksAndThreads overview.
@@ -203,13 +201,11 @@ type: float
 type: float
 
 
-
-## webserver [_webserver_2]
+## webserver [_webserver]
 
 Webserver related metrics.
 
-
-## process [_process_5]
+## process [_process]
 
 The process related stats.
 
@@ -273,7 +269,6 @@ type: float
 type: float
 
 
-
 ## asp_net [_asp_net]
 
 Common Language Runtime overview.
@@ -288,7 +283,6 @@ type: float
 :   Request wait time.
 
 type: long
-
 
 
 ## asp_net_application [_asp_net_application]
@@ -323,7 +317,6 @@ type: float
 :   Number of requests in the application queue.
 
 type: float
-
 
 
 ## cache [_cache]
@@ -414,8 +407,7 @@ type: float
 type: float
 
 
-
-## network [_network_6]
+## network [_network]
 
 The network related stats.
 
@@ -533,8 +525,7 @@ type: float
 type: float
 
 
-
-## website [_website_2]
+## website [_website]
 
 Website related metrics.
 
@@ -544,8 +535,7 @@ Website related metrics.
 type: keyword
 
 
-
-## network [_network_7]
+## network [_network]
 
 The network overview.
 

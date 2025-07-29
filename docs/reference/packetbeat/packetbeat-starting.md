@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-starting.html
+applies_to:
+  stack: ga
 ---
 
 # Start Packetbeat [packetbeat-starting]
@@ -64,7 +66,8 @@ sudo ./packetbeat -e
 PS C:\Program Files\packetbeat> Start-Service packetbeat
 ```
 
-By default, Windows log files are stored in `C:\ProgramData\packetbeat\Logs`.
+By default, Windows log files are stored under `C:\Program Files\Packetbeat-Data\logs`.
+For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\packetbeat\Logs`.
 ::::::
 
 :::::::

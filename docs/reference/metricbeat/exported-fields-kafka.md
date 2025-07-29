@@ -3,15 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-kafka.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Kafka fields [exported-fields-kafka]
 
 Kafka module
 
-
 ## kafka [_kafka]
 
 
-## broker [_broker_2]
+
+## broker [_broker]
 
 Broker Consumer Group Information have been read from (Broker handling the consumer group).
 
@@ -57,8 +59,7 @@ type: keyword
 type: keyword
 
 
-
-## broker [_broker_3]
+## broker [_broker]
 
 Broker metrics from Kafka Broker JMX
 
@@ -188,7 +189,6 @@ type: float
 type: float
 
 
-
 ## consumer [_consumer]
 
 Consumer metrics from Kafka Consumer JMX
@@ -247,7 +247,6 @@ type: float
 type: float
 
 
-
 ## consumergroup [_consumergroup]
 
 consumergroup
@@ -282,8 +281,7 @@ type: long
 type: long
 
 
-
-## client [_client_3]
+## client [_client]
 
 Assigned client reading events from partition
 
@@ -305,11 +303,9 @@ type: keyword
 type: keyword
 
 
-
-## partition [_partition_2]
+## partition [_partition]
 
 partition
-
 
 ## offset [_offset]
 
@@ -327,8 +323,7 @@ type: long
 type: long
 
 
-
-## partition [_partition_3]
+## partition [_partition]
 
 Partition data.
 
@@ -360,7 +355,6 @@ type: boolean
 :   Error code from fetching partition.
 
 type: long
-
 
 
 ## producer [_producer]

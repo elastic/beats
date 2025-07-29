@@ -18,10 +18,12 @@
 package filestream
 
 import (
+	"compress/gzip"
 	"context"
 	"errors"
 	"io"
 	"os"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/go-concert/ctxtool"
@@ -35,13 +37,14 @@ import (
 )
 
 var (
-	ErrFileTruncate = errors.New("detected file being truncated")
 	ErrClosed       = errors.New("reader closed")
+	ErrFileTruncate = errors.New("detected file being truncated")
+	ErrInactive     = errors.New("inactive file, reader closed")
 )
 
 // logFile contains all log related data
 type logFile struct {
-	file      *os.File
+	file      File
 	log       *logp.Logger
 	readerCtx ctxtool.CancelContext
 
@@ -53,6 +56,8 @@ type logFile struct {
 	closeRemoved  bool
 	closeRenamed  bool
 
+	isInactive atomic.Bool
+
 	offset       int64
 	lastTimeRead time.Time
 	backoff      backoff.Backoff
@@ -63,7 +68,7 @@ type logFile struct {
 func newFileReader(
 	log *logp.Logger,
 	canceler input.Canceler,
-	f *os.File,
+	f File,
 	config readerConfig,
 	closerConfig closerConfig,
 ) (*logFile, error) {
@@ -98,6 +103,9 @@ func newFileReader(
 
 // Read reads from the reader and updates the offset
 // The total number of bytes read is returned.
+// If the file is inactive, ErrInactive is returned
+// If f.readerCtx is cancelled for any reason, then
+// ErrClosed is returned
 func (f *logFile) Read(buf []byte) (int, error) {
 	totalN := 0
 
@@ -130,6 +138,15 @@ func (f *logFile) Read(buf []byte) (int, error) {
 
 		f.log.Debugf("End of file reached: %s; Backoff now.", f.file.Name())
 		f.backoff.Wait()
+	}
+
+	// `f.isInactive` is set in a different goroutine, however it is the same
+	// goroutine that cancels `f.readerCtx`. The timer goroutine that checks
+	// for inactivity first sets `f.isInactive`, then it cancels `f.readerCtx`,
+	// once the execution comes back to this method, the for loop condition
+	// evaluates to false and the correct value from `f.isInactive` is read.
+	if f.isInactive.Load() {
+		return 0, ErrInactive
 	}
 
 	return 0, ErrClosed
@@ -180,6 +197,8 @@ func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
 func (f *logFile) shouldBeClosed() bool {
 	if f.closeInactive > 0 {
 		if time.Since(f.lastTimeRead) > f.closeInactive {
+			f.isInactive.Store(true)
+			f.log.Debugf("'%s' is inactive", f.file.Name())
 			return true
 		}
 	}
@@ -211,7 +230,7 @@ func (f *logFile) shouldBeClosed() bool {
 
 	if f.closeRemoved {
 		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
-		if file.IsRemoved(f.file) {
+		if file.IsRemoved(f.file.OSFile()) {
 			f.log.Debugf("close.on_state_change.removed is enabled and file %s has been removed", f.file.Name())
 			return true
 		}
@@ -233,7 +252,15 @@ func isSameFile(path string, info os.FileInfo) bool {
 // based on the config options.
 func (f *logFile) errorChecks(err error) error {
 	if !errors.Is(err, io.EOF) {
-		f.log.Error("Unexpected state reading from %s; error: %s", f.file.Name(), err)
+		f.log.Errorf("Unexpected state reading from %s; error: %s",
+			f.file.Name(), err)
+
+		// gzip.ErrChecksum happens after all data is read from a GZIP file, and
+		// it's recoverable, nothing else to do. Thus, we return EOF.
+		if errors.Is(err, gzip.ErrChecksum) {
+			return io.EOF
+		}
+
 		return err
 	}
 
@@ -241,11 +268,11 @@ func (f *logFile) errorChecks(err error) error {
 }
 
 func (f *logFile) handleEOF() error {
-	if f.closeOnEOF {
+	if f.closeOnEOF || f.file.IsGZIP() {
 		return io.EOF
 	}
 
-	// Refetch fileinfo to check if the file was truncated.
+	// Re-fetch fileinfo to check if the file was truncated.
 	// Errors if the file was removed/rotated after reading and before
 	// calling the stat function
 	info, statErr := f.file.Stat()
@@ -254,7 +281,6 @@ func (f *logFile) handleEOF() error {
 		return statErr
 	}
 
-	// check if file was truncated
 	if info.Size() < f.offset {
 		f.log.Debugf("File was truncated as offset (%d) > size (%d): %s", f.offset, info.Size(), f.file.Name())
 		return ErrFileTruncate
@@ -268,5 +294,6 @@ func (f *logFile) Close() error {
 	f.readerCtx.Cancel()
 	err := f.file.Close()
 	_ = f.tg.Stop() // Wait until all resources are released for sure.
+	f.log.Debugf("Closed reader. Path='%s'", f.file.Name())
 	return err
 }

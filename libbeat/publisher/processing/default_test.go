@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
@@ -51,7 +52,7 @@ func TestGenerateProcessorList(t *testing.T) {
 	plugins, err := processors.NewPluginConfigFromList(inputCfg)
 	require.NoError(t, err)
 
-	processors, err := processors.New(plugins)
+	processors, err := processors.New(plugins, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	// make sure the processor init got the config formatted in a way it expected
 	require.Equal(t, 4, len(processors.List))
@@ -322,7 +323,7 @@ func TestEventNormalizationOverride(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		builder, err := newBuilder(beat.Info{}, logp.NewLogger(""), nil, mapstr.EventMetadata{}, nil, tc.skipNormalize, false)
+		builder, err := newBuilder(beat.Info{}, logp.NewNopLogger(), nil, mapstr.EventMetadata{}, nil, tc.skipNormalize, false)
 		require.NoError(t, err)
 
 		processor, err := builder.Create(beat.ProcessingConfig{EventNormalization: tc.normalizeOverride}, false)

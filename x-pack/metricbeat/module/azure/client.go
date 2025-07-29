@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package azure
 
 import (
@@ -44,13 +46,13 @@ type Client struct {
 type mapResourceMetrics func(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error)
 
 // NewClient instantiates the Azure monitoring client
-func NewClient(config Config) (*Client, error) {
-	azureMonitorService, err := NewService(config)
+func NewClient(config Config, logger *logp.Logger) (*Client, error) {
+	azureMonitorService, err := NewService(config, logger)
 	if err != nil {
 		return nil, err
 	}
 
-	logger := logp.NewLogger("azure monitor client")
+	logger = logger.Named("azure monitor client")
 
 	client := &Client{
 		BaseClient: &BaseClient{
@@ -435,9 +437,9 @@ func (client *BaseClient) MapToEvents(metrics []Metric, reporter mb.ReporterV2) 
 }
 
 // NewMockClient instantiates a new client with the mock azure service
-func NewMockClient() *Client {
+func NewMockClient(logger *logp.Logger) *Client {
 	azureMockService := new(MockService)
-	logger := logp.NewLogger("test azure monitor")
+	logger = logger.Named("test azure monitor")
 	client := &Client{
 		BaseClient: &BaseClient{
 			AzureMonitorService: azureMockService,

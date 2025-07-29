@@ -5,7 +5,6 @@
 package awscloudwatch
 
 import (
-	"context"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
@@ -21,7 +20,7 @@ type logProcessor struct {
 	publisher beat.Client
 }
 
-func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Client, ctx context.Context) *logProcessor {
+func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Client) *logProcessor {
 	if metrics == nil {
 		metrics = newInputMetrics("", nil)
 	}

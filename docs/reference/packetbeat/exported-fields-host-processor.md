@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-host-processor.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Host fields [exported-fields-host-processor]
 
 Info collected for the host machine.

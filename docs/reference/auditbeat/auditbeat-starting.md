@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-starting.html
+applies_to:
+  stack: ga
 ---
 
 # Start Auditbeat [auditbeat-starting]
@@ -56,7 +58,8 @@ sudo ./auditbeat -e
 PS C:\Program Files\auditbeat> Start-Service auditbeat
 ```
 
-By default, Windows log files are stored in `C:\ProgramData\auditbeat\Logs`.
+By default, Windows log files are stored under `C:\Program Files\Auditbeat-Data\Logs`.
+For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\auditibeat\Logs`.
 ::::::
 
 :::::::

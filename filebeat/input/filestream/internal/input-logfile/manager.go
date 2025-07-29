@@ -63,7 +63,7 @@ type InputManager struct {
 
 	// Configure returns an array of Sources, and a configured Input instances
 	// that will be used to collect events from each source.
-	Configure func(cfg *conf.C) (Prospector, Harvester, error)
+	Configure func(cfg *conf.C, log *logp.Logger) (Prospector, Harvester, error)
 
 	initOnce   sync.Once
 	initErr    error
@@ -144,21 +144,18 @@ func (cim *InputManager) shutdown() {
 
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
-func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
+func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	if err := cim.init(); err != nil {
 		return nil, err
 	}
 
 	settings := struct {
 		// All those values are duplicated from the Filestream configuration
-		ID                 string        `config:"id"`
-		CleanInactive      time.Duration `config:"clean_inactive"`
-		HarvesterLimit     uint64        `config:"harvester_limit"`
-		AllowIDDuplication bool          `config:"allow_deprecated_id_duplication"`
-		TakeOver           struct {
-			Enabled bool     `config:"enabled"`
-			FromIDs []string `config:"from_ids"`
-		} `config:"take_over"`
+		ID                 string         `config:"id"`
+		CleanInactive      time.Duration  `config:"clean_inactive"`
+		HarvesterLimit     uint64         `config:"harvester_limit"`
+		AllowIDDuplication bool           `config:"allow_deprecated_id_duplication"`
+		TakeOver           TakeOverConfig `config:"take_over"`
 	}{
 		CleanInactive: cim.DefaultCleanTimeout,
 	}
@@ -171,17 +168,13 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		cim.Logger.Warn("filestream input without ID is discouraged, please add an ID and restart Filebeat")
 	}
 
+	idAlreadyInUse := false
 	cim.idsMux.Lock()
 	if _, exists := cim.ids[settings.ID]; exists {
-		duplicatedInput := map[string]any{}
-		unpackErr := config.Unpack(&duplicatedInput)
-		if unpackErr != nil {
-			duplicatedInput["error"] = fmt.Errorf("failed to unpack duplicated input config: %w", unpackErr).Error()
-		}
-
 		// Keep old behaviour so users can upgrade to 9.0 without
 		// having their inputs not starting.
 		if settings.AllowIDDuplication {
+			idAlreadyInUse = true
 			cim.Logger.Errorf("filestream input with ID '%s' already exists, "+
 				"this will lead to data duplication, please use a different "+
 				"ID. Metrics collection has been disabled on this input. The "+
@@ -211,7 +204,17 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	cim.ids[settings.ID] = struct{}{}
 	cim.idsMux.Unlock()
 
-	prospector, harvester, err := cim.Configure(config)
+	defer func() {
+		// If there is any error creating the input, remove it from the IDs list
+		// if there wasn't any other input running with this ID.
+		if retErr != nil && !idAlreadyInUse {
+			cim.idsMux.Lock()
+			delete(cim.ids, settings.ID)
+			cim.idsMux.Unlock()
+		}
+	}()
+
+	prospector, harvester, err := cim.Configure(config, cim.Logger)
 	if err != nil {
 		return nil, err
 	}
@@ -318,4 +321,61 @@ func (i *sourceIdentifier) ID(s Source) string {
 
 func (i *sourceIdentifier) MatchesInput(id string) bool {
 	return strings.HasPrefix(id, i.prefix)
+}
+
+// TakeOverConfig is the configuration for the take over mode.
+// It allows the Filestream input to take over states from the log
+// input or other Filestream inputs
+type TakeOverConfig struct {
+	Enabled bool `config:"enabled"`
+	// Filestream IDs to take over states
+	FromIDs []string `config:"from_ids"`
+
+	// legacyFormat is set to true when `Unpack` detects
+	// the legacy configuration format. It is used by
+	// `LogWarnings` to log warnings
+	legacyFormat bool
+}
+
+func (t *TakeOverConfig) Unpack(value any) error {
+	switch v := value.(type) {
+	case bool:
+		t.Enabled = v
+		t.legacyFormat = true
+	case map[string]any:
+		rawEnabled := v["enabled"]
+		enabled, ok := rawEnabled.(bool)
+		if !ok {
+			return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as bool", rawEnabled)
+		}
+		t.Enabled = enabled
+
+		rawFromIDs, exists := v["from_ids"]
+		if !exists {
+			return nil
+		}
+
+		fromIDs, ok := rawFromIDs.([]any)
+		if !ok {
+			return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as []any", rawFromIDs)
+		}
+		for _, el := range fromIDs {
+			strEl, ok := el.(string)
+			if !ok {
+				return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as string", el)
+			}
+			t.FromIDs = append(t.FromIDs, strEl)
+		}
+
+	default:
+		return fmt.Errorf("cannot parse '%[1]v' (type %[1]T)", value)
+	}
+
+	return nil
+}
+
+func (t *TakeOverConfig) LogWarnings(logger *logp.Logger) {
+	if t.legacyFormat {
+		logger.Warn("using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'")
+	}
 }
