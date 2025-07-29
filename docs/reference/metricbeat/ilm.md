@@ -2,6 +2,8 @@
 navigation_title: "Index lifecycle management (ILM)"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/ilm.html
+applies_to:
+  stack: ga
 ---
 
 # Configure index lifecycle management [ilm]

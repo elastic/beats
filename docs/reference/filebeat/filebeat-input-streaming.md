@@ -2,6 +2,8 @@
 navigation_title: "Streaming"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-streaming.html
+applies_to:
+  stack: preview
 ---
 
 # Streaming Input [filebeat-input-streaming]
@@ -220,7 +222,7 @@ The `keep_alive` setting has the following configuration options:
 * `enable`: Indicates whether Keep-Alive is enabled. By default, this is set to `false`.
 * `interval`: Interval between Keep-Alive messages, expressed as a time duration value. The default value is `30s`.
 * `write_control_deadline`: Deadline for writing control frames, like `PING`, `PONG`, or `CLOSE`, on a WebSocket connection. The timeout, expressed as a time duration value, helps prevent indefinite blocking when the server or client is not responding to control frame requests. The default value is `10s`.
-   
+
 ::::{note}
 Don't use the `blanket_retries` and `infinite_retries` configuration options together with the `keep_alive` settings. The purpose of `keep_alive` is to keep the connection open so you don't need to `retry` and reconnect all the time. In some scenarios `keep_alive` might not work if the host WebSocket server is not configured to handle `ping` frames.
 ::::

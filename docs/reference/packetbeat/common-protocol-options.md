@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/common-protocol-options.html
+applies_to:
+  stack: ga
 ---
 
 # Common protocol options [common-protocol-options]
