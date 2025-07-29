@@ -116,6 +116,7 @@ type BeatV2Manager struct {
 	// trying to reload the configuration after an input not finished error
 	// happens
 	forceReloadDebounce time.Duration
+	wg                  sync.WaitGroup
 }
 
 // ================================
@@ -154,8 +155,8 @@ func init() {
 // NewV2AgentManager returns a remote config manager for the agent V2 protocol.
 // This is registered as the manager factory in init() so that calls to
 // lbmanagement.NewManager will be forwarded here.
-func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
-	logger := logp.NewLogger(lbmanagement.DebugK).Named("V2-manager")
+func NewV2AgentManager(config *conf.C, registry *reload.Registry, logger *logp.Logger) (lbmanagement.Manager, error) {
+	logger = logger.Named(lbmanagement.DebugK).Named("V2-manager")
 	c := DefaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
@@ -193,12 +194,12 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 	// debug log messages are only outputted when running in trace mode
 	lbmanagement.SetUnderAgent(true)
 
-	return NewV2AgentManagerWithClient(c, registry, agentClient)
+	return NewV2AgentManagerWithClient(c, registry, agentClient, logger)
 }
 
 // NewV2AgentManagerWithClient actually creates the manager instance used by the rest of the beats.
-func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agentClient client.V2, opts ...func(*BeatV2Manager)) (lbmanagement.Manager, error) {
-	log := logp.NewLogger(lbmanagement.DebugK)
+func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agentClient client.V2, logger *logp.Logger, opts ...func(*BeatV2Manager)) (lbmanagement.Manager, error) {
+	log := logger.Named(lbmanagement.DebugK)
 	if config.RestartOnOutputChange {
 		log.Infof("Output reload is enabled, the beat will restart as needed on change of output config")
 	}
@@ -286,6 +287,8 @@ func (cm *BeatV2Manager) Start() error {
 	}
 	ctx, canceller := context.WithCancel(ctx)
 	cm.errCanceller = canceller
+
+	cm.wg.Add(1)
 	go cm.watchErrChan(ctx)
 	cm.client.RegisterDiagnosticHook(
 		"beat-rendered-config",
@@ -294,6 +297,7 @@ func (cm *BeatV2Manager) Start() error {
 		"application/yaml",
 		cm.handleDebugYaml)
 
+	cm.wg.Add(1)
 	go cm.unitListen()
 	cm.isRunning = true
 	return nil
@@ -302,6 +306,7 @@ func (cm *BeatV2Manager) Start() error {
 // Stop stops the current Manager and close the connection to Elastic Agent.
 func (cm *BeatV2Manager) Stop() {
 	cm.stopChan <- struct{}{}
+	cm.wg.Wait()
 }
 
 // CheckRawConfig is currently not implemented for V1.
@@ -459,6 +464,7 @@ func (cm *BeatV2Manager) softDeleteUnit(unit *client.Unit) {
 // ================================
 
 func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
+	defer cm.wg.Done()
 	for {
 		select {
 		case <-ctx.Done():
@@ -474,6 +480,7 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 }
 
 func (cm *BeatV2Manager) unitListen() {
+	defer cm.wg.Done()
 	// register signal handler
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
@@ -489,6 +496,7 @@ func (cm *BeatV2Manager) unitListen() {
 		// The stopChan channel comes from the Manager interface Stop() method
 		case <-cm.stopChan:
 			cm.stopBeat()
+			return
 		case sig := <-sigc:
 			// we can't duplicate the same logic used by stopChan here.
 			// A beat will also watch for sigint and shut down, if we call the stopFunc
@@ -502,6 +510,11 @@ func (cm *BeatV2Manager) unitListen() {
 			}
 			cm.isRunning = false
 			cm.UpdateStatus(status.Stopping, "Stopping")
+			// cancel the context so watchErrChan() can exit
+			if cm.errCanceller != nil {
+				cm.errCanceller()
+				cm.errCanceller = nil
+			}
 			return
 		case change := <-cm.client.UnitChanges():
 			cm.logger.Infof(

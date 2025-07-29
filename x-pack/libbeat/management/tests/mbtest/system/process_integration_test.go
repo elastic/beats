@@ -30,6 +30,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/cmd"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestProcessStatusReporter(t *testing.T) {
@@ -113,12 +115,12 @@ func TestProcessStatusReporter(t *testing.T) {
 		},
 	}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 
-	lbmanagement.SetManagerFactory(func(cfg *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
+	lbmanagement.SetManagerFactory(func(cfg *conf.C, registry *reload.Registry, logger *logp.Logger) (lbmanagement.Manager, error) {
 		c := management.DefaultConfig()
 		if err := cfg.Unpack(&c); err != nil {
 			return nil, err
 		}
-		return management.NewV2AgentManagerWithClient(c, registry, client, management.WithStopOnEmptyUnits)
+		return management.NewV2AgentManagerWithClient(c, registry, client, logptest.NewTestingLogger(t, ""), management.WithStopOnEmptyUnits)
 	})
 
 	go func() {
