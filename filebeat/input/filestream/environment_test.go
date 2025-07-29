@@ -43,7 +43,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -52,6 +51,7 @@ type inputTestingEnvironment struct {
 	workingDir string
 	stateStore statestore.States
 	pipeline   *mockPipelineConnector
+	monitoring beat.Monitoring
 
 	pluginInitOnce sync.Once
 	plugin         v2.Plugin
@@ -89,6 +89,7 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 		workingDir: t.TempDir(),
 		stateStore: openTestStatestore(),
 		pipeline:   &mockPipelineConnector{},
+		monitoring: beat.NewMonitoring(),
 	}
 }
 
@@ -131,19 +132,16 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 		defer wg.Done()
 		defer func() { _ = grp.Stop() }()
 
-		info := beat.Info{Monitoring: beat.Monitoring{
-			Namespace: monitoring.GetNamespace("dataset")},
-		}
+		logger, _ := logp.NewDevelopmentLogger("")
 		reg := inputmon.NewMetricsRegistry(
-			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logp.L())
+			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
 		defer inputmon.CancelMetricsRegistry(
-			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logp.L())
+			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
 
 		inputCtx := v2.Context{
 			ID:              id,
 			IDWithoutName:   id,
 			Name:            inp.Name(),
-			Agent:           info,
 			Cancelation:     ctx,
 			StatusReporter:  nil,
 			MetricsRegistry: reg,
@@ -393,7 +391,7 @@ func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, e
 }
 
 func getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
-	identifier, _ := newINodeDeviceIdentifier(nil)
+	identifier, _ := newINodeDeviceIdentifier(nil, nil)
 	src := identifier.GetSource(loginp.FSEvent{
 		Descriptor: loginp.FileDescriptor{
 			Info: file.ExtendFileInfo(fi),

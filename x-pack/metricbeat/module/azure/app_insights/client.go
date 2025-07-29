@@ -25,8 +25,8 @@ type Client struct {
 }
 
 // NewClient instantiates the an Azure monitoring client
-func NewClient(config Config) (*Client, error) {
-	service, err := NewService(config)
+func NewClient(config Config, logger *logp.Logger) (*Client, error) {
+	service, err := NewService(config, logger)
 	if err != nil {
 		return nil, err
 	}

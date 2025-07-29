@@ -110,7 +110,7 @@ func (eb *Winlogbeat) init(b *beat.Beat) error {
 		overwritePipelines := config.OverwritePipelines
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
-		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Winlogbeat")
+		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Winlogbeat", b.Info.Logger)
 		if err != nil {
 			return err
 		}
@@ -160,7 +160,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	// Initialize metrics.
 	initMetrics("total")
 	if b.API != nil {
-		err := inputmon.AttachHandler(b.API.Router(), nil)
+		err := inputmon.AttachHandler(b.API.Router(), b.Monitoring.InputsRegistry())
 		if err != nil {
 			return fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
@@ -169,7 +169,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
-				data, err := inputmon.MetricSnapshotJSON(nil)
+				data, err := inputmon.MetricSnapshotJSON(b.Monitoring.InputsRegistry())
 				if err != nil {
 					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
 					return []byte(err.Error())

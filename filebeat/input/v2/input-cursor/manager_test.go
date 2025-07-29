@@ -36,7 +36,7 @@ import (
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
@@ -58,7 +58,7 @@ func TestManager_Init(t *testing.T) {
 		var grp unison.TaskGroup
 		store := createSampleStore(t, nil)
 		manager := &InputManager{
-			Logger:              logp.NewLogger("test"),
+			Logger:              logptest.NewTestingLogger(t, "test"),
 			StateStore:          store,
 			Type:                "test",
 			DefaultCleanTimeout: 10 * time.Millisecond,
@@ -90,7 +90,7 @@ func TestManager_Init(t *testing.T) {
 		//nolint:errcheck // We don't need the error from grp.Stop()
 		defer grp.Stop()
 		manager := &InputManager{
-			Logger:              logp.NewLogger("test"),
+			Logger:              logptest.NewTestingLogger(t, "test"),
 			StateStore:          store,
 			Type:                "test",
 			DefaultCleanTimeout: 10 * time.Millisecond,
@@ -252,7 +252,7 @@ func TestManager_InputsTest(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			err = inp.Test(input.TestContext{Logger: logp.NewLogger("test")})
+			err = inp.Test(input.TestContext{Logger: logptest.NewTestingLogger(t, "test")})
 			t.Logf("Test returned: %v", err)
 		}()
 
@@ -282,11 +282,9 @@ func TestManager_InputsRun(t *testing.T) {
 		var clientCounters pubtest.ClientCounter
 		id := uuid.Must(uuid.NewV4()).String()
 		ctx := input.Context{
-			ID:            id,
-			IDWithoutName: id,
-			Name:          inp.Name(),
-			Agent: beat.Info{Monitoring: beat.Monitoring{
-				Namespace: monitoring.GetNamespace("TestManager_InputsRun")}},
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
 			Cancelation:     cancelCtx,
 			StatusReporter:  nil,
 			MetricsRegistry: monitoring.NewRegistry(),
@@ -315,11 +313,9 @@ func TestManager_InputsRun(t *testing.T) {
 		var clientCounters pubtest.ClientCounter
 		id := uuid.Must(uuid.NewV4()).String()
 		ctx := input.Context{
-			ID:            id,
-			IDWithoutName: id,
-			Name:          inp.Name(),
-			Agent: beat.Info{Monitoring: beat.Monitoring{
-				Namespace: monitoring.GetNamespace("TestManager_InputsRun")}},
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
 			Cancelation:     cancelCtx,
 			StatusReporter:  nil,
 			MetricsRegistry: monitoring.NewRegistry(),
@@ -353,11 +349,9 @@ func TestManager_InputsRun(t *testing.T) {
 			defer wg.Done()
 			id := uuid.Must(uuid.NewV4()).String()
 			ctx := input.Context{
-				ID:            id,
-				IDWithoutName: id,
-				Name:          inp.Name(),
-				Agent: beat.Info{Monitoring: beat.Monitoring{
-					Namespace: monitoring.GetNamespace("TestManager_InputsRun")}},
+				ID:              id,
+				IDWithoutName:   id,
+				Name:            inp.Name(),
 				Cancelation:     cancelCtx,
 				StatusReporter:  nil,
 				MetricsRegistry: monitoring.NewRegistry(),
@@ -373,7 +367,7 @@ func TestManager_InputsRun(t *testing.T) {
 	})
 
 	t.Run("continue sending from last known position", func(t *testing.T) {
-		log := logp.NewLogger("test")
+		log := logptest.NewTestingLogger(t, "test")
 
 		type runConfig struct{ Max int }
 
@@ -420,11 +414,9 @@ func TestManager_InputsRun(t *testing.T) {
 		require.NoError(t, err)
 		id := uuid.Must(uuid.NewV4()).String()
 		ctx := input.Context{
-			ID:            id,
-			IDWithoutName: id,
-			Name:          inp.Name(),
-			Agent: beat.Info{Monitoring: beat.Monitoring{
-				Namespace: monitoring.GetNamespace("TestManager_InputsRun")}},
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
 			Cancelation:     context.Background(),
 			StatusReporter:  nil,
 			MetricsRegistry: monitoring.NewRegistry(),
@@ -437,11 +429,9 @@ func TestManager_InputsRun(t *testing.T) {
 		require.NoError(t, err)
 		id = uuid.Must(uuid.NewV4()).String()
 		ctx = input.Context{
-			ID:            id,
-			IDWithoutName: id,
-			Name:          inp.Name(),
-			Agent: beat.Info{Monitoring: beat.Monitoring{
-				Namespace: monitoring.GetNamespace("TestManager_InputsRun")}},
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
 			Cancelation:     context.Background(),
 			StatusReporter:  nil,
 			MetricsRegistry: monitoring.NewRegistry(),
@@ -504,11 +494,9 @@ func TestManager_InputsRun(t *testing.T) {
 			defer wg.Done()
 			id := uuid.Must(uuid.NewV4()).String()
 			ctx := input.Context{
-				ID:            id,
-				IDWithoutName: id,
-				Name:          inp.Name(),
-				Agent: beat.Info{Monitoring: beat.Monitoring{
-					Namespace: monitoring.GetNamespace("TestManager_InputsRun")}},
+				ID:              id,
+				IDWithoutName:   id,
+				Name:            inp.Name(),
 				Cancelation:     cancelCtx,
 				StatusReporter:  nil,
 				MetricsRegistry: monitoring.NewRegistry(),
@@ -550,12 +538,12 @@ func TestLockResource(t *testing.T) {
 		defer store.Release()
 
 		res := store.Get("test::key")
-		err := lockResource(logp.NewLogger("test"), res, context.TODO())
+		err := lockResource(logptest.NewTestingLogger(t, "test"), res, context.TODO())
 		require.NoError(t, err)
 	})
 
 	t.Run("fail to lock resource in use when context is cancelled", func(t *testing.T) {
-		log := logp.NewLogger("test")
+		log := logptest.NewTestingLogger(t, "test")
 
 		store := testOpenStore(t, "test", createSampleStore(t, nil))
 		defer store.Release()
@@ -578,7 +566,7 @@ func TestLockResource(t *testing.T) {
 	})
 
 	t.Run("succeed to lock resource after it has been released", func(t *testing.T) {
-		log := logp.NewLogger("test")
+		log := logptest.NewTestingLogger(t, "test")
 
 		store := testOpenStore(t, "test", createSampleStore(t, nil))
 		defer store.Release()
@@ -611,7 +599,7 @@ func (s stringSource) Name() string { return string(s) }
 
 func simpleManagerWithConfigure(t *testing.T, configure func(*conf.C) ([]Source, Input, error)) *InputManager {
 	return &InputManager{
-		Logger:     logp.NewLogger("test"),
+		Logger:     logptest.NewTestingLogger(t, "test"),
 		StateStore: createSampleStore(t, nil),
 		Type:       "test",
 		Configure:  configure,

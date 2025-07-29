@@ -21,7 +21,10 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -180,6 +183,33 @@ func TestLoader_Configure(t *testing.T) {
 	}
 }
 
+func TestLoader_ConfigureFIPS(t *testing.T) {
+	loaderCfg := loaderConfig{
+		Plugins: []Plugin{
+			{
+				Name:      "a",
+				Stability: feature.Stable,
+				Manager: ConfigureWith(func(_ *conf.C) (Input, error) {
+					return nil, nil
+				}),
+				ExcludeFromFIPS: true,
+			},
+		},
+		TypeField: "type",
+	}
+
+	loader := loaderCfg.MustNewLoader()
+	input, err := loader.Configure(conf.MustNewConfigFrom(map[string]any{"type": "a"}))
+	require.Nil(t, input)
+
+	if version.FIPSDistribution {
+		require.Error(t, err)
+	} else {
+		require.NoError(t, err)
+	}
+	t.Logf("FIPS distribution = %v; err = %v", version.FIPSDistribution, err)
+}
+
 func (b loaderConfig) MustNewLoader() *Loader {
 	l, err := b.NewLoader()
 	if err != nil {
@@ -189,7 +219,8 @@ func (b loaderConfig) MustNewLoader() *Loader {
 }
 
 func (b loaderConfig) NewLoader() (*Loader, error) {
-	return NewLoader(logp.NewLogger("test"), b.Plugins, b.TypeField, b.DefaultType)
+	logger, _ := logp.NewDevelopmentLogger("")
+	return NewLoader(logger, b.Plugins, b.TypeField, b.DefaultType)
 }
 func (b loaderConfig) WithPlugins(p ...Plugin) loaderConfig     { b.Plugins = p; return b }
 func (b loaderConfig) WithTypeField(name string) loaderConfig   { b.TypeField = name; return b }

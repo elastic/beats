@@ -29,13 +29,14 @@ func NewPaginator[T any](
 	doRequest func() (T, *resty.Response, error),
 	onError func(error, *resty.Response) error,
 	onSuccess func(T) error,
+	logger *logp.Logger,
 ) *paginator[T] {
 	return &paginator[T]{
 		setStart:  setStart,
 		doRequest: doRequest,
 		onError:   onError,
 		onSuccess: onSuccess,
-		logger:    logp.NewLogger("meraki.paginator"),
+		logger:    logger.Named("meraki.paginator"),
 	}
 }
 

@@ -46,14 +46,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	// instantiate monitor client
-	billingClient, err := NewClient(config)
+	billingClient, err := NewClient(config, base.Logger())
 	if err != nil {
 		return nil, fmt.Errorf("error initializing the billing client: module azure - billing metricset: %w", err)
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
 		client:        billingClient,
-		log:           logp.NewLogger("azure billing"),
+		log:           base.Logger().Named("azure billing"),
 	}, nil
 }
 

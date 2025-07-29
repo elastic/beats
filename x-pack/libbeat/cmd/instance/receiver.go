@@ -9,12 +9,15 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/status"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/elastic-agent-libs/logp"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
+	"go.opentelemetry.io/collector/component"
 	"go.uber.org/zap"
 )
 
@@ -34,19 +37,13 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 
 	b.RegisterMetrics()
 
-	statsReg := b.Info.Monitoring.StatsRegistry
+	statsReg := b.Monitoring.StatsRegistry()
 
 	// stats.beat
-	processReg := statsReg.GetRegistry("beat")
-	if processReg == nil {
-		processReg = statsReg.NewRegistry("beat")
-	}
+	processReg := statsReg.GetOrCreateRegistry("beat")
 
 	// stats.system
-	systemReg := statsReg.GetRegistry("system")
-	if systemReg == nil {
-		systemReg = statsReg.NewRegistry("system")
-	}
+	systemReg := statsReg.GetOrCreateRegistry("system")
 
 	err = metricreport.SetupMetrics(logp.L().Named("metrics"), b.Info.Beat, version.GetDefaultVersion(), metricreport.WithProcessRegistry(processReg), metricreport.WithSystemRegistry(systemReg))
 	if err != nil {
@@ -55,7 +52,14 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 
 	if b.Config.HTTP.Enabled() {
 		var err error
-		b.API, err = api.NewWithDefaultRoutes(logp.L().Named("metrics.http"), b.Config.HTTP, api.RegistryLookupFunc(b.Info.Monitoring.Namespace))
+		b.API, err = api.NewWithDefaultRoutes(
+			logp.L().Named("metrics.http"),
+			b.Config.HTTP,
+			b.Monitoring.InfoRegistry(),
+			b.Monitoring.StateRegistry(),
+			b.Monitoring.StatsRegistry(),
+			b.Monitoring.InputsRegistry())
+
 		if err != nil {
 			return BeatReceiver{}, fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
@@ -73,8 +77,12 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 	}, nil
 }
 
-// BeatReceiver.Stop() starts the beat receiver.
-func (br *BeatReceiver) Start() error {
+// BeatReceiver.Start() starts the beat receiver.
+func (br *BeatReceiver) Start(host component.Host) error {
+	if w, ok := br.beater.(cfgfile.WithOtelFactoryWrapper); ok {
+		groupReporter := status.NewGroupStatusReporter(host)
+		w.WithOtelFactoryWrapper(status.StatusReporterFactory(groupReporter))
+	}
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
 		return fmt.Errorf("beat receiver run error: %w", err)
 	}

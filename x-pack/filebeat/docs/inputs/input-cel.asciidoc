@@ -1,7 +1,7 @@
 [role="xpack"]
 
 :type: cel
-:mito_version: v1.19.0
+:mito_version: v1.22.0
 :mito_docs: https://pkg.go.dev/github.com/elastic/mito@{mito_version}
 
 [id="{beatname_lc}-input-{type}"]
@@ -134,7 +134,7 @@ After completion of a program's execution it should return a single object with 
 ----
 
 <1> The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements.
-The field should be an array, but in the case of an error condition in the CEL program it is acceptable to return a single object instead of an array; this will will be wrapped as an array for publication and an error will be logged. If the single object contains a key, "error", the error value will be used to update the status of the input to report to Elastic Agent. This can be used to more rapidly respond to API failures.
+The field should be an array, but in the case of an error condition in the CEL program it is acceptable to return a single object instead of an array; this will will be wrapped as an array for publication and an error will be logged. If the single object contains a key, "error", the error value will be used to update the status of the input to report to Elastic Agent. This can be used to more rapidly respond to API failures. It is recommended that the object conforms to ECS field definitions, but this is not enforced.
 
 <2> If `cursor` is present it must be either be a single object or an array with the same length as events; each element _i_ of the `cursor` will be the details for obtaining the events at and beyond event _i_ in the `events` array. If the `cursor` is a single object it is will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array.
 
@@ -154,6 +154,11 @@ See <<cel-state-redact,`redact`>> configuration parameters for settings to exclu
 ==== CEL extension libraries
 
 As noted above the `cel` input provides functions, macros, and global variables to extend the language.
+
+* {mito_docs}/lib#AWS[AWS v4 request signing]
+** {mito_docs}/lib#hdr-Sign_AWS_from_env-AWS[Sign AWS from env]
+** {mito_docs}/lib#hdr-Sign_AWS_from_shared_credentials-AWS[Sign AWS from shared credentials]
+** {mito_docs}/lib#hdr-Sign_AWS_from_static_credentials-AWS[Sign AWS from static credentials]
 
 * {mito_docs}/lib#Collections[Collections]
 ** {mito_docs}/lib#hdr-Collate-Collections[Collate]
@@ -249,9 +254,9 @@ In addition to the extensions provided in the packages listed above, a global va
 
 Host environment variables are made available via the global map `env`. Only environment variables that have been allow listed via the `allowed_environment` configuration list are visible to the CEL program.
 
-The CEL environment enables the https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes[optional types] library using the version defined {mito_docs}/lib#OptionalTypesVersion[here].
+The CEL environment enables the https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes[optional types] library using the version defined {mito_docs}/lib#OptionalTypesVersion[here] and the https://pkg.go.dev/github.com/google/cel-go/ext#TwoVarComprehensions[two-variable comprehensions extensions] library using the version defined {mito_docs}/lib#TwoVarComprehensionVersion[here].
 
-Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2.
+Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2, or token authentication.
 
 Example configurations with authentication:
 
@@ -299,6 +304,26 @@ filebeat.inputs:
   resource.url: http://localhost
 ----
 
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: cel
+  auth.token:
+    type: Bearer
+    value: supersecret_bearer_token
+  resource.url: http://localhost
+----
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: cel
+  auth.token:
+    type: Token
+    value: supersecret_token
+  resource.url: http://localhost
+----
+
 [[input-state-cel]]
 ==== Input state
 
@@ -307,6 +332,23 @@ The `cel` input keeps a runtime state between requests. This state can be access
 The state must contain a `url` string and may contain any object the user wishes to store in it.
 
 All objects are stored at runtime, except `cursor`, which has values that are persisted between restarts.
+
+[[cel-input-and-numbers]]
+==== CEL input and handling numbers
+
+Numeric values passed in to and out of a CEL evaluation environment are passed as floating point
+values. This can sometimes cause issues when the numbers in the input state are expected to be
+integers, and may result in unexpected field values being ingested into Elasticsearch documents when
+other parts of the ingest pipeline render floating point values with E-notation or add decimal
+points to numbers that are expected to be integers. This is most likely to happen when numbers are
+large (not within ±10^7^). Above the maximum exact integer representation threshold for double
+precision floating point values, within ±2^53^ (±9×10^15^), integer values will lose precision when
+they are returned from the CEL evaluation environment. The CEL input will automatically convert
+integers outside of the ±2^53^ range to strings in order to prevent loss of precision in these
+values, but potentially leading to a situation where some numbers received by the ingest pipeline
+are numbers and some are strings. To avoid these issues, when you have large integer values as part
+of an evaluation result, convert the field value to a string before returning it, and convert input
+numbers to integers explicitly at the start of a CEL program.
 
 ==== Configuration options
 
@@ -622,6 +664,23 @@ NOTE: Only one of the credentials settings can be set at once. For more informat
 The RSA JWK private key PEM block for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
 
 NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
+
+[float]
+==== `auth.token.enabled`
+
+When set to `false`, disables the token authentication configuration. Default: `true`.
+
+NOTE: Token authentication settings are disabled if either `enabled` is set to `false` or the `auth.token` section is missing.
+
+[float]
+==== `auth.token.type`
+
+The type of token to authenticate with, for example "Token" or "Bearer".
+
+[float]
+==== `auth.token.value`
+
+The token value to use.
 
 [[resource-parameters]]
 [float]

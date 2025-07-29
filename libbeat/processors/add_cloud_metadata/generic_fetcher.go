@@ -22,6 +22,7 @@ import (
 	"net/http"
 
 	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -42,7 +43,7 @@ func newGenericMetadataFetcher(
 	return gFetcher, nil
 }
 
-func (g *genericFetcher) fetchMetadata(ctx context.Context, client http.Client) result {
+func (g *genericFetcher) fetchMetadata(ctx context.Context, client http.Client, _ *logp.Logger) result {
 	res := result{provider: g.provider, metadata: mapstr.M{}}
 	g.fetchRawProviderMetadata(ctx, client, &res)
 	if res.err != nil {
