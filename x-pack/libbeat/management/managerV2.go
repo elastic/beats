@@ -496,6 +496,7 @@ func (cm *BeatV2Manager) unitListen() {
 		// The stopChan channel comes from the Manager interface Stop() method
 		case <-cm.stopChan:
 			cm.stopBeat()
+			return
 		case sig := <-sigc:
 			// we can't duplicate the same logic used by stopChan here.
 			// A beat will also watch for sigint and shut down, if we call the stopFunc
