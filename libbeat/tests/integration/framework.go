@@ -1184,11 +1184,11 @@ func StartMockES(
 	require.Eventually(
 		t,
 		func() bool {
-			resp, err := http.Get("http://" + addr) // nolint: noctx // It's just a test
+			resp, err := http.Get("http://" + addr) //nolint:noctx // It's just a test
 			if err != nil {
 				return false
 			}
-			// nolint: errcheck // We're just draining the body, we can ignore the error
+			//nolint:errcheck // We're just draining the body, we can ignore the error
 			io.Copy(io.Discard, resp.Body)
 			resp.Body.Close()
 			return true
