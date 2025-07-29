@@ -273,6 +273,7 @@ endpoints:
 idle_conn_timeout: 3s
 logs_index: some-index
 password: changeme
+num_workers: 1
 retry:
   enabled: true
   initial_interval: 1s
