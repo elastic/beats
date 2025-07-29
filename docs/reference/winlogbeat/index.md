@@ -2,6 +2,8 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/_winlogbeat_overview.html
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/index.html
+applies_to:
+  stack: ga
 ---
 
 # Winlogbeat

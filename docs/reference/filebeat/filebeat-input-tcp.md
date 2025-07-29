@@ -2,6 +2,8 @@
 navigation_title: "TCP"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-tcp.html
+applies_to:
+  stack: ga
 ---
 
 # TCP input [filebeat-input-tcp]

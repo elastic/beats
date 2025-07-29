@@ -2,6 +2,8 @@
 navigation_title: "filestream"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-filestream.html
+applies_to:
+  stack: ga
 ---
 
 # filestream input [filebeat-input-filestream]
@@ -354,12 +356,15 @@ The `take over` mode can work correctly only if the source (taken from) inputs a
 `take_over.enabled: true` requires the `filestream` to have a unique ID.
 ::::
 
-
 This `take over` mode was created to enable smooth migration from
 deprecated `log` inputs to the new `filestream` inputs and to allow
 changing `filestream` input IDs without data re-ingestion.
 
 See [*Migrate `log` input configurations to `filestream`*](/reference/filebeat/migrate-to-filestream.md) for more details about the migration process.
+
+The previous configuration format `take_over: true`, while
+deprecated, is still supported to migrate state from the `log` input
+to `filestream`.
 
 ::::{warning}
 The `take over` mode is still in beta, however, it should be generally safe to use.
@@ -417,8 +422,8 @@ the file open to make sure the harvester has completed. If this
 setting results in files that are not completely read because they are
 removed from disk too early, disable this option.
 
-This option is enabled by default on Windows and disabled by default
-on all other OSes.
+{applies_to}`stack: ga 9.1` This option is enabled by default on Windows and disabled by default
+on all other operating systems.
 
 ::::{warning}
 If your Windows log rotation system shows errors because it

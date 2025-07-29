@@ -8,18 +8,15 @@
 package cat_shards
 
 import (
-	"net/http"
-	"net/http/httptest"
 	"slices"
 	"testing"
 
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricset"
 
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/maps"
-
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricset"
 )
 
 var (
@@ -29,8 +26,8 @@ var (
 func TestSendNodeShardsEvent(t *testing.T) {
 	reporter := &mbtest.CapturingReporterV2{}
 	info := auto_ops_testing.CreateClusterInfo("8.15.3")
-	nodeToShards := map[string]NodeShardCount{
-		"node1": {
+	nodeToShards := []NodeShardCount{
+		{
 			NodeId:                    "node1",
 			NodeName:                  "name1",
 			Shards:                    100,
@@ -43,7 +40,7 @@ func TestSendNodeShardsEvent(t *testing.T) {
 			RelocatingPrimaryShards:   1,
 			RelocatingReplicaShards:   2,
 		},
-		"node2": {
+		{
 			NodeId:                    "node2",
 			NodeName:                  "name2",
 			Shards:                    99,
@@ -59,7 +56,7 @@ func TestSendNodeShardsEvent(t *testing.T) {
 	}
 	transactionId := "xyz"
 
-	sendNodeShardsEvent(reporter, &info, nodeShardCountToMapArray(nodeToShards), transactionId)
+	sendNodeShardsEvent(reporter, &info, nodeToShards, transactionId)
 
 	require.Equal(t, 0, len(reporter.GetErrors()))
 	require.Equal(t, 1, len(reporter.GetEvents()))
@@ -68,7 +65,7 @@ func TestSendNodeShardsEvent(t *testing.T) {
 
 	auto_ops_testing.CheckEventWithTransactionId(t, event, info, transactionId)
 
-	require.ElementsMatch(t, maps.Values(nodeToShards), mapArrayToType[NodeShardCount](auto_ops_testing.GetObjectValue(event.MetricSetFields, "node_shards_count").([]map[string]any)))
+	require.ElementsMatch(t, nodeToShards, auto_ops_testing.GetObjectValue(event.MetricSetFields, "node_shards_count"))
 }
 
 func TestSendNodeIndexShardsEventInBatch(t *testing.T) {
@@ -86,7 +83,7 @@ func TestSendNodeIndexShardsEventInBatch(t *testing.T) {
 
 	auto_ops_testing.CheckEventWithTransactionId(t, event, info, transactionId)
 
-	require.ElementsMatch(t, convertObjectArrayToMapArray(nodeIndexShards), auto_ops_testing.GetObjectValue(event.MetricSetFields, "node_index_shards"))
+	require.ElementsMatch(t, nodeIndexShards, auto_ops_testing.GetObjectValue(event.MetricSetFields, "node_index_shards"))
 }
 
 func TestSendNodeIndexShardsEvent(t *testing.T) {
@@ -106,16 +103,16 @@ func TestSendNodeIndexShardsEvent(t *testing.T) {
 
 	auto_ops_testing.CheckAllEventsUseSameTransactionId(t, events)
 
-	eventData := []map[string]any{}
+	eventData := []NodeIndexShards{}
 
 	for _, event := range events {
 		auto_ops_testing.CheckEventWithTransactionId(t, event, info, transactionId)
 
 		array := auto_ops_testing.GetObjectValue(event.MetricSetFields, "node_index_shards")
-		eventData = append(eventData, array.([]map[string]any)...)
+		eventData = append(eventData, array.([]NodeIndexShards)...)
 	}
 
-	require.ElementsMatch(t, convertObjectArrayToMapArray(nodeIndexShards), eventData)
+	require.ElementsMatch(t, nodeIndexShards, eventData)
 }
 
 func expectValidParsedData(t *testing.T, data metricset.FetcherData[[]JSONShard]) {
@@ -131,12 +128,12 @@ func expectValidParsedData(t *testing.T, data metricset.FetcherData[[]JSONShard]
 	nodeShardsCountEvents := auto_ops_testing.GetEventsWithField(t, events, "node_shards_count")
 
 	require.Equal(t, 1, len(nodeShardsCountEvents))
-	require.Equal(t, 2, len(auto_ops_testing.GetObjectValue(nodeShardsCountEvents[0].MetricSetFields, "node_shards_count").([]map[string]any)))
+	require.Equal(t, 2, len(auto_ops_testing.GetObjectValue(nodeShardsCountEvents[0].MetricSetFields, "node_shards_count").([]NodeShardCount)))
 
 	nodeIndexShardsEvents := auto_ops_testing.GetEventsWithField(t, events, "node_index_shards")
 
 	require.Equal(t, 1, len(nodeIndexShardsEvents))
-	require.LessOrEqual(t, 2, len(auto_ops_testing.GetObjectValue(nodeIndexShardsEvents[0].MetricSetFields, "node_index_shards").([]map[string]any)))
+	require.LessOrEqual(t, 2, len(auto_ops_testing.GetObjectValue(nodeIndexShardsEvents[0].MetricSetFields, "node_index_shards").([]NodeIndexShards)))
 }
 
 func expectValidParsedDetailedShards(t *testing.T, data metricset.FetcherData[[]JSONShard]) {
@@ -147,7 +144,7 @@ func expectValidParsedDetailedShards(t *testing.T, data metricset.FetcherData[[]
 	require.Equal(t, 2, len(events))
 
 	nodeShardCountsEvents := auto_ops_testing.GetEventsWithField(t, events, "node_shards_count")
-	nodeShardCounts := mapArrayToType[NodeShardCount](auto_ops_testing.GetObjectValue(nodeShardCountsEvents[0].MetricSetFields, "node_shards_count").([]map[string]any))
+	nodeShardCounts := auto_ops_testing.GetObjectValue(nodeShardCountsEvents[0].MetricSetFields, "node_shards_count").([]NodeShardCount)
 
 	require.Equal(t, 1, len(nodeShardCountsEvents))
 	require.Equal(t, 2, len(nodeShardCounts))
@@ -167,18 +164,17 @@ func expectValidParsedDetailedShards(t *testing.T, data metricset.FetcherData[[]
 	require.EqualValues(t, 0, node2.RelocatingReplicaShards)
 
 	nodeIndexShardsEvents := auto_ops_testing.GetEventsWithField(t, events, "node_index_shards")
-	nodeIndexShards := mapArrayToType[NodeIndexShards](auto_ops_testing.GetObjectValue(nodeIndexShardsEvents[0].MetricSetFields, "node_index_shards").([]map[string]any))
+	nodeIndexShards := auto_ops_testing.GetObjectValue(nodeIndexShardsEvents[0].MetricSetFields, "node_index_shards").([]NodeIndexShards)
 
 	require.Equal(t, 1, len(nodeIndexShardsEvents))
 	require.LessOrEqual(t, 14, len(nodeIndexShards))
 
 	myIndexNode2 := nodeIndexShards[slices.IndexFunc(nodeIndexShards, func(node NodeIndexShards) bool { return node.IndexNode == "my-index-node_id-node2" })]
 
-	switch data.Version {
-	case "7.17.0":
+	if data.Version == "7.17.0" {
 		require.Equal(t, 14, len(nodeIndexShards))
 		require.EqualValues(t, 14, myIndexNode2.TotalFractions)
-	case "8.15.3":
+	} else if data.Version == "8.15.3" {
 		require.Equal(t, 35, len(nodeIndexShards))
 		require.EqualValues(t, 35, myIndexNode2.TotalFractions)
 	}
@@ -236,7 +232,7 @@ func expectValidParsedDetailedShardsWithCache(t *testing.T, data metricset.Fetch
 	expectValidParsedDetailedShards(t, data)
 
 	nodeIndexShardsEvents := auto_ops_testing.GetEventsWithField(t, data.Reporter.GetEvents(), "node_index_shards")
-	nodeIndexShards := mapArrayToType[NodeIndexShards](auto_ops_testing.GetObjectValue(nodeIndexShardsEvents[0].MetricSetFields, "node_index_shards").([]map[string]any))
+	nodeIndexShards := auto_ops_testing.GetObjectValue(nodeIndexShardsEvents[0].MetricSetFields, "node_index_shards").([]NodeIndexShards)
 	myIndexNode2 := nodeIndexShards[slices.IndexFunc(nodeIndexShards, func(node NodeIndexShards) bool { return node.IndexNode == "my-index-node_id-node2" })]
 
 	require.NotNil(t, myIndexNode2.TimestampDiff)
@@ -249,67 +245,6 @@ func expectValidParsedDetailedShardsWithCache(t *testing.T, data metricset.Fetch
 	require.Nil(t, myIndexNode2.MergeRatePerSecond)
 	require.Nil(t, myIndexNode2.IndexLatencyInMillis)
 	require.Nil(t, myIndexNode2.MergeLatencyInMillis)
-}
-
-func expectValidParsedWithoutResolvedIndexDataWithoutElasticSearchError(t *testing.T, data metricset.FetcherData[[]JSONShard]) {
-	require.ErrorContains(t, data.Error, "failed to load resolved index details")
-	require.Equal(t, 0, len(data.Reporter.GetErrors()))
-	// 2 <= len(events)
-	require.LessOrEqual(t, 2, len(data.Reporter.GetEvents()))
-
-	events := data.Reporter.GetEvents()
-
-	auto_ops_testing.CheckAllEventsUseSameTransactionId(t, events)
-
-	nodeShardsCountEvents := auto_ops_testing.GetEventsWithField(t, events, "node_shards_count")
-
-	require.Equal(t, 1, len(nodeShardsCountEvents))
-	require.Equal(t, 2, len(auto_ops_testing.GetObjectValue(nodeShardsCountEvents[0].MetricSetFields, "node_shards_count").([]map[string]any)))
-
-	nodeIndexShardsEvents := auto_ops_testing.GetEventsWithField(t, events, "node_index_shards")
-
-	require.Equal(t, 1, len(nodeIndexShardsEvents))
-	require.LessOrEqual(t, 2, len(auto_ops_testing.GetObjectValue(nodeIndexShardsEvents[0].MetricSetFields, "node_index_shards").([]map[string]any)))
-
-	nodeIndexShards := mapArrayToType[NodeIndexShards](auto_ops_testing.GetObjectValue(nodeIndexShardsEvents[0].MetricSetFields, "node_index_shards").([]map[string]any))
-	myIndexNode2 := nodeIndexShards[slices.IndexFunc(nodeIndexShards, func(node NodeIndexShards) bool { return node.IndexNode == "my-index-node_id-node2" })]
-
-	require.Nil(t, myIndexNode2.IndexType)
-	require.Nil(t, myIndexNode2.Aliases)
-	require.Nil(t, myIndexNode2.Attributes)
-	require.Nil(t, myIndexNode2.IsHidden)
-	require.Nil(t, myIndexNode2.IsOpen)
-	require.Nil(t, myIndexNode2.IsSystem)
-}
-
-func expectValidParsedWithoutResolvedIndexDataWithElasticSearchError(t *testing.T, data metricset.FetcherData[[]JSONShard]) {
-	require.Equal(t, 0, len(data.Reporter.GetErrors()))
-	// 2 <= len(events)
-	require.LessOrEqual(t, 2, len(data.Reporter.GetEvents()))
-
-	events := data.Reporter.GetEvents()
-
-	auto_ops_testing.CheckAllEventsUseSameTransactionId(t, events)
-
-	nodeShardsCountEvents := auto_ops_testing.GetEventsWithField(t, events, "node_shards_count")
-
-	require.Equal(t, 1, len(nodeShardsCountEvents))
-	require.Equal(t, 2, len(auto_ops_testing.GetObjectValue(nodeShardsCountEvents[0].MetricSetFields, "node_shards_count").([]map[string]any)))
-
-	nodeIndexShardsEvents := auto_ops_testing.GetEventsWithField(t, events, "node_index_shards")
-
-	require.Equal(t, 1, len(nodeIndexShardsEvents))
-	require.LessOrEqual(t, 2, len(auto_ops_testing.GetObjectValue(nodeIndexShardsEvents[0].MetricSetFields, "node_index_shards").([]map[string]any)))
-
-	nodeIndexShards := mapArrayToType[NodeIndexShards](auto_ops_testing.GetObjectValue(nodeIndexShardsEvents[0].MetricSetFields, "node_index_shards").([]map[string]any))
-	myIndexNode2 := nodeIndexShards[slices.IndexFunc(nodeIndexShards, func(node NodeIndexShards) bool { return node.IndexNode == "my-index-node_id-node2" })]
-
-	require.Nil(t, myIndexNode2.IndexType)
-	require.Nil(t, myIndexNode2.Aliases)
-	require.Nil(t, myIndexNode2.Attributes)
-	require.Nil(t, myIndexNode2.IsHidden)
-	require.Nil(t, myIndexNode2.IsOpen)
-	require.Nil(t, myIndexNode2.IsSystem)
 }
 
 // Expect a valid response from Elasticsearch to create N events
@@ -345,35 +280,4 @@ func TestProperlyHandlesResponseWithDetailsAndCache(t *testing.T) {
 
 		initCache(nodeIndexShards, 10)
 	})
-}
-
-func setupResolveErrorServer(t *testing.T, clusterInfo []byte, data []byte, _ string) *httptest.Server {
-	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.RequestURI {
-		case "/":
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			w.Write(clusterInfo)
-		case CatShardsPath:
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			w.Write(data)
-		case ResolveIndexPath:
-			w.WriteHeader(500)
-			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte(`Server Error`))
-		default:
-			t.Fatalf("Unknown request to %v", r.RequestURI)
-		}
-	}))
-}
-
-// Expect a valid response from Elasticsearch to create N events without index metadata
-func TestProperlyHandlesInnerErrorsInResponse(t *testing.T) {
-	metricset.RunTestsForFetcherWithGlobFilesAndSetup(t, "./_meta/test/cat_shards.*.json", setupResolveErrorServer, useNamedMetricSet, expectValidParsedWithoutResolvedIndexDataWithoutElasticSearchError, clearCache)
-}
-
-// Expect Elasticsearch errors while creating events without index metadata
-func TestProperlyHandlesInnerElasticSearchErrorsInResponse(t *testing.T) {
-	metricset.RunTestsForFetcherWithGlobFilesAndSetup(t, "./_meta/test/cat_shards.*.json", setupResolveElasticSearchServer, useNamedMetricSet, expectValidParsedWithoutResolvedIndexDataWithElasticSearchError, clearCache)
 }

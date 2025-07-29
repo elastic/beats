@@ -2,6 +2,8 @@
 navigation_title: "Entity Analytics"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-entity-analytics.html
+applies_to:
+  stack: preview
 ---
 
 # Entity Analytics Input [filebeat-input-entity-analytics]
@@ -468,7 +470,7 @@ filebeat.inputs:
   client_id: "CLIENT_ID"
   tenant_id: "TENANT_ID"
   secret: "SECRET"
-  expand:
+  expand: <1>
     users:
       manager:
         - displayName
@@ -476,6 +478,7 @@ filebeat.inputs:
       directReports:
         - id
 ```
+1. {applies_to}`stack: preview 9.1.0`
 
 The `azure-ad` provider supports the following configuration:
 
@@ -537,15 +540,27 @@ Override the default [device query selections](https://learn.microsoft.com/en-us
 
 #### `expand.users` [_expand_users]
 
+```{applies_to}
+stack: preview 9.1.0
+```
+
 Add [user query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the users query.
 
 
 #### `expand.groups` [_expand_groups]
 
+```{applies_to}
+stack: preview 9.1.0
+```
+
 Add [group query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/group?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the groups query.
 
 
 #### `expand.devices` [_expand_devices]
+
+```{applies_to}
+stack: preview 9.1.0
+```
 
 Add [device query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/device?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the devices query.
 
@@ -972,6 +987,10 @@ The time between Okta API rate limit resets. Expressed as a duration string (e.g
 
 
 #### `batch_size` [_batch_size]
+
+```{applies_to}
+stack: preview 9.0.1
+```
 
 The pagination batch size for requests. If it is zero or negative, the API default is used. The default is 200.
 

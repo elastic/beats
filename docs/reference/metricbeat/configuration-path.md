@@ -2,6 +2,8 @@
 navigation_title: "Project paths"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-path.html
+applies_to:
+  stack: ga
 ---
 
 # Configure project paths [configuration-path]

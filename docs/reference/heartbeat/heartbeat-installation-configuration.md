@@ -2,6 +2,8 @@
 navigation_title: "Quick start"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/heartbeat-installation-configuration.html
+applies_to:
+  stack: ga
 ---
 
 # Heartbeat quick start: installation and configuration [heartbeat-installation-configuration]
@@ -49,38 +51,38 @@ To download and install Heartbeat, use the commands that work with your system:
 ::::::{tab-item} DEB
 :sync: deb
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-amd64.deb
-sudo dpkg -i heartbeat-{{stack-version}}-amd64.deb
+curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{version.stack}}-amd64.deb
+sudo dpkg -i heartbeat-{{version.stack}}-amd64.deb
 ```
 ::::::
 
 ::::::{tab-item} RPM
 :sync: rpm
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-x86_64.rpm
-sudo rpm -vi heartbeat-{{stack-version}}-x86_64.rpm
+curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{version.stack}}-x86_64.rpm
+sudo rpm -vi heartbeat-{{version.stack}}-x86_64.rpm
 ```
 ::::::
 
 ::::::{tab-item} MacOS
 :sync: macos
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-darwin-x86_64.tar.gz
-tar xzvf heartbeat-{{stack-version}}-darwin-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{version.stack}}-darwin-x86_64.tar.gz
+tar xzvf heartbeat-{{version.stack}}-darwin-x86_64.tar.gz
 ```
 ::::::
 
 ::::::{tab-item} Linux
 :sync: linux
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-linux-x86_64.tar.gz
-tar xzvf heartbeat-{{stack-version}}-linux-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{version.stack}}-linux-x86_64.tar.gz
+tar xzvf heartbeat-{{version.stack}}-linux-x86_64.tar.gz
 ```
 ::::::
 
 ::::::{tab-item} Windows
 :sync: windows
-1. Download the [Heartbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-windows-x86_64.zip).
+1. Download the [Heartbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{version.stack}}-windows-x86_64.zip).
 
 2. Extract the contents of the zip file into `C:\Program Files`.
 
@@ -363,8 +365,9 @@ PS C:\Program Files\heartbeat> Start-Service heartbeat
 ::::::
 :::::::
 
-By default, Windows log files are stored under `C:\Program Files\Heartbeat-Data\logs`.
-For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\heartbeat\Logs`.
+The default location where Windows log files are stored varies:
+* {applies_to}`stack: ga 9.1` `C:\Program Files\Heartbeat-Data\Logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\heartbeat\Logs`
 
 Heartbeat is now ready to check the status of your services and send events to your defined output.
 
