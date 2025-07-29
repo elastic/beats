@@ -325,7 +325,7 @@ func (pc *JolokiaHTTPGetFetcher) buildGetRequestURIs(mappings []JMXMapping) ([]s
 		}
 
 		if len(mapping.Target.URL) != 0 {
-			err := errors.New("Proxy requests are only valid when using POST method")
+			err := errors.New("proxy requests are only valid when using POST method")
 			return urls, nil, err
 		}
 
