@@ -65,7 +65,7 @@ func HttpAttach(cfg *Config, mux handlerAttacher) error {
 
 	const path = "/debug/pprof"
 	return errors.Join(
-		mux.AttachHandler(path+"/", http.HandlerFunc(pprof.Index)),
+		mux.AttachHandler(path+"/{$}", http.HandlerFunc(pprof.Index)),
 		mux.AttachHandler(path+"/allocs", http.HandlerFunc(pprof.Index)),
 		mux.AttachHandler(path+"/block", http.HandlerFunc(pprof.Index)),
 		mux.AttachHandler(path+"/goroutine", http.HandlerFunc(pprof.Index)),

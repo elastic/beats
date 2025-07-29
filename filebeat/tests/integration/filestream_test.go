@@ -25,7 +25,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -87,7 +86,11 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	tempDir := filebeat.TempDir()
 
 	// 1. Generate the log file path, but do not write data to it
-	logFilePath := path.Join(tempDir, "log.log")
+	logFilePath := filepath.Join(tempDir, "log.log")
+	msgLogFilePath := logFilePath
+	if runtime.GOOS == "windows" {
+		msgLogFilePath = strings.ReplaceAll(logFilePath, `\`, `\\`)
+	}
 
 	// 2. Write configuration file ans start Filebeat
 	filebeat.WriteConfigFile(fmt.Sprintf(filestreamCleanInactiveCfg, logFilePath, tempDir))
@@ -97,14 +100,18 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	integration.GenerateLogFile(t, logFilePath, 10, false)
 
 	// 4. Wait for Filebeat to start scanning for files
-	//
 	filebeat.WaitForLogs(
-		fmt.Sprintf("A new file %s has been found", logFilePath),
+		fmt.Sprintf("A new file %s has been found", msgLogFilePath),
 		10*time.Second,
 		"Filebeat did not start looking for files to ingest")
 
 	filebeat.WaitForLogs(
-		fmt.Sprintf("Reader was closed. Closing. Path='%s", logFilePath),
+		fmt.Sprintf("File is inactive. Closing. Path='%s'", msgLogFilePath),
+		10*time.Second,
+		"File did not became inactive")
+
+	filebeat.WaitForLogs(
+		fmt.Sprintf("Closed reader. Path='%s'", msgLogFilePath),
 		10*time.Second, "Filebeat did not close the file")
 
 	// 5. Now that the reader has been closed, nothing is holding the state
@@ -231,10 +238,9 @@ logging:
 				10*time.Second,
 				"Filebeat did not log a filestream input validation error")
 
-			proc, err := filebeat.Process.Wait()
-			require.NoError(t, err, "filebeat process.Wait returned an error")
-			assert.False(t, proc.Success(), "filebeat should have failed to start")
-
+			err := filebeat.Cmd.Wait()
+			require.Error(t, err, "filebeat Cmd.Process.Wait must return an error because Filebeat should fail to start")
+			assert.False(t, filebeat.Cmd.ProcessState.Success(), "filebeat should have failed to start")
 		})
 	}
 }
@@ -363,6 +369,10 @@ logging:
 			workDir := filebeat.TempDir()
 			outputFile := filepath.Join(workDir, "output-file*")
 			logFilepath := filepath.Join(workDir, "log.log")
+			msgLogFilepath := logFilepath
+			if runtime.GOOS == "windows" {
+				msgLogFilepath = strings.ReplaceAll(logFilepath, `\`, `\\`)
+			}
 			integration.GenerateLogFile(t, logFilepath, 25, false)
 
 			cfgYAML := fmt.Sprintf(cfgTemplate, logFilepath, tc.oldIdentityCfg, workDir)
@@ -370,7 +380,7 @@ logging:
 			filebeat.Start()
 
 			// Wait for the file to be fully ingested
-			eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
+			eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", msgLogFilepath)
 			filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
 			requirePublishedEvents(t, filebeat, 25, outputFile)
 			filebeat.Stop()
@@ -385,7 +395,8 @@ logging:
 			// The happy path is to migrate keys, so we assert it first
 			if tc.expectMigration {
 				// Test the case where the registry migration happens
-				migratingMsg := fmt.Sprintf("are the same, migrating. Source: '%s'", logFilepath)
+
+				migratingMsg := fmt.Sprintf("are the same, migrating. Source: '%s'", msgLogFilepath)
 				filebeat.WaitForLogs(migratingMsg, time.Second*10, "prospector did not migrate registry entry")
 				filebeat.WaitForLogs("migrated entry in registry from", time.Second*10, "store did not update registry key")
 				filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached the second time")
@@ -420,7 +431,7 @@ logging:
 	}
 }
 
-func TestFilestreamMigrateIdentityCornerCases(t *testing.T) {
+func TestFilestreamCanMigrateIdentityCornerCases(t *testing.T) {
 	cfgTemplate := `
 filebeat.inputs:
   - type: filestream
@@ -547,12 +558,12 @@ func TestFilestreamTakeOverFromFilestream(t *testing.T) {
 	workDir := filebeat.TempDir()
 	outputFile := filepath.Join(workDir, "output-file*")
 
-	vars := map[string]string{
+	vars := map[string]any{
 		"inputID":  oldID,
 		"homePath": workDir,
 		"testdata": testDataPath,
 	}
-	cfgYAML := getTakeOverConfig(t, vars, "happy-path.yml")
+	cfgYAML := getConfig(t, vars, "take-over", "happy-path.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 	filebeat.Start()
 
@@ -564,10 +575,10 @@ func TestFilestreamTakeOverFromFilestream(t *testing.T) {
 	vars["previousID"] = oldID
 	vars["inputID"] = newID
 
-	cfgYAML = getTakeOverConfig(t, vars, "happy-path.yml")
+	cfgYAML = getConfig(t, vars, "take-over", "happy-path.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 
-	removeOldLogFiles(t, workDir)
+	filebeat.RemoveLogFiles()
 
 	// Start Filebeat again.
 	// This time the states must be migrated and no new data ingested
@@ -589,6 +600,11 @@ func TestFilestreamTakeOverFromFilestream(t *testing.T) {
 			"expected-registry-happy-path.json"),
 		"Entries in the registry are different from the expectation",
 	)
+
+	deprecationLog := "using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'"
+	if filebeat.LogContains(deprecationLog) {
+		t.Fatalf("deprecation log %q must not be present when using the new syntax", deprecationLog)
+	}
 }
 
 func TestFilestreamTakeOverFromLogInput(t *testing.T) {
@@ -611,11 +627,11 @@ func TestFilestreamTakeOverFromLogInput(t *testing.T) {
 	workDir := filebeat.TempDir()
 	outputFile := filepath.Join(workDir, "output-file*")
 
-	vars := map[string]string{
+	vars := map[string]any{
 		"homePath": workDir,
 		"testdata": testDataPath,
 	}
-	cfgYAML := getTakeOverConfig(t, vars, "happy-path-log-input.yml")
+	cfgYAML := getConfig(t, vars, "take-over", "happy-path-log-input.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 	filebeat.Start()
 
@@ -626,10 +642,10 @@ func TestFilestreamTakeOverFromLogInput(t *testing.T) {
 
 	vars["takeOver"] = "true"
 
-	cfgYAML = getTakeOverConfig(t, vars, "happy-path-log-input.yml")
+	cfgYAML = getConfig(t, vars, "take-over", "happy-path-log-input.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 
-	removeOldLogFiles(t, workDir)
+	filebeat.RemoveLogFiles()
 
 	// Start Filebeat again.
 	// This time the states must be migrated and no new data ingested
@@ -639,7 +655,7 @@ func TestFilestreamTakeOverFromLogInput(t *testing.T) {
 	waitForEOF(t, filebeat, logFiles[:2])
 	// The log input logs a different entry for files that have
 	// not changed, since Filebeat started. Wait for them.
-	waitForDidnotChange(t, filebeat, logFiles[2:])
+	waitForDidNotChange(t, filebeat, logFiles[2:])
 
 	// Ensure no new data has been published
 	requirePublishedEvents(t, filebeat, 8, outputFile)
@@ -655,6 +671,27 @@ func TestFilestreamTakeOverFromLogInput(t *testing.T) {
 			"expected-registry-happy-path-log-input.json"),
 		"Entries in the registry are different from the expectation",
 	)
+
+	deprecationLog := "using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'"
+	if !filebeat.LogContains(deprecationLog) {
+		t.Fatalf("did not find the deprecation log %q", deprecationLog)
+	}
+}
+
+// getConfig renders the template in testdata/<folder>/<tmplPath> using vars
+func getConfig(t *testing.T, vars map[string]any, folder, tmplPath string) string {
+	t.Helper()
+	tmpl := template.Must(
+		template.ParseFiles(
+			filepath.Join("testdata", folder, tmplPath)))
+
+	str := strings.Builder{}
+	if err := tmpl.Execute(&str, vars); err != nil {
+		t.Fatalf("cannot execute template: %s", err)
+	}
+
+	ret := str.String()
+	return ret
 }
 
 func requireRegistryEntryRemoved(t *testing.T, workDir, identity string) {
@@ -707,78 +744,14 @@ func createFileAndWaitIngestion(
 	}
 
 	integration.GenerateLogFile(t, logFilepath, n, false)
+	msgLogFilepath := logFilepath
+	if runtime.GOOS == "windows" {
+		msgLogFilepath = strings.ReplaceAll(logFilepath, `\`, `\\`)
+	}
 
-	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
+	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", msgLogFilepath)
 	fb.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
 	requirePublishedEvents(t, fb, outputTotal, outputFilepath)
-}
-
-func getTakeOverConfig(t *testing.T, vars map[string]string, tmplPath string) string {
-	t.Helper()
-	tmpl := template.Must(
-		template.ParseFiles(
-			filepath.Join("testdata", "take-over", tmplPath)))
-
-	str := strings.Builder{}
-	if err := tmpl.Execute(&str, vars); err != nil {
-		t.Fatalf("cannot execute template: %s", err)
-	}
-
-	ret := str.String()
-	return ret
-}
-
-func waitForEOF(t *testing.T, filebeat *integration.BeatProc, files []string) {
-	for _, path := range files {
-		if runtime.GOOS == "windows" {
-			path = strings.Replace(path, `\`, `\\`, -1)
-		}
-		eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", path)
-
-		require.Eventuallyf(
-			t,
-			func() bool {
-				return filebeat.GetLogLine(eofMsg) != ""
-			},
-			5*time.Second,
-			100*time.Millisecond,
-			"EOF log not found for %q", path,
-		)
-	}
-}
-
-func waitForDidnotChange(t *testing.T, filebeat *integration.BeatProc, files []string) {
-	for _, path := range files {
-		if runtime.GOOS == "windows" {
-			path = strings.Replace(path, `\`, `\\`, -1)
-		}
-		eofMsg := fmt.Sprintf("File didn't change: %s", path)
-
-		require.Eventuallyf(
-			t,
-			func() bool {
-				return filebeat.GetLogLine(eofMsg) != ""
-			},
-			5*time.Second,
-			100*time.Millisecond,
-			"'File didn't change' log not found for %q", path,
-		)
-	}
-}
-
-func removeOldLogFiles(t *testing.T, workDir string) {
-	// Remove old log file so we can correctly search stuff
-	glob := filepath.Join(workDir, "filebeat-*.ndjson")
-	files, err := filepath.Glob(glob)
-	if err != nil {
-		t.Fatalf("cannot list log files: %s", err)
-	}
-
-	for _, f := range files {
-		if err := os.Remove(f); err != nil {
-			t.Fatalf("cannot remove old log file: %s", err)
-		}
-	}
 }
 
 func parseRegistry(entries []registryEntry) map[string]registryEntry {

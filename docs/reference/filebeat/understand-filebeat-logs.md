@@ -2,6 +2,8 @@
 navigation_title: "Understand logged metrics"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/understand-filebeat-logs.html
+applies_to:
+  stack: ga
 ---
 
 # Understand metrics in Filebeat logs [understand-filebeat-logs]

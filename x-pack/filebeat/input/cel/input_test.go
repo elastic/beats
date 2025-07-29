@@ -7,6 +7,7 @@ package cel
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -494,6 +495,40 @@ var inputTests = []struct {
 		},
 		want: []map[string]interface{}{
 			{"message": "AWS4-HMAC-SHA256 Credential=id/20091110/region/service/aws4_request, SignedHeaders=content-length;content-type;host;x-amz-date;x-amz-security-token, Signature=ad27046c0009e06c6626e6009ba2af96027f4893b7a190ab67aaec85becb25cd"},
+		},
+	},
+	{
+		// This test exists purely to demonstrate that the lib is available.
+		name: "optional_types_v2",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `{"events": [{
+				"message": optional.unwrap([optional.of(42), optional.none()]).encode_json(),
+			}]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "[42]"},
+		},
+	},
+	{
+		// This test exists purely to demonstrate that the lib is available.
+		name: "two_var_comprehension_v2",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `{"events": [{
+				"message": {'hello': 'world'}.transformMap(k, v, v + '!').encode_json(),
+			}]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": `{"hello":"world!"}`},
 		},
 	},
 
@@ -1544,6 +1579,136 @@ var inputTests = []struct {
 
 	// Authenticated access tests.
 	{
+		name: "basic_accept",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":            1,
+			"auth.basic.user":     "test_client",
+			"auth.basic.password": "secret_password",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test_client:secret_password"))),
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name: "basic_reject",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":            1,
+			"auth.basic.user":     "test_client",
+			"auth.basic.password": "pleeassssee",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test_client:secret_password"))),
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"error": "not authorized",
+			},
+		},
+	},
+	{
+		name: "token_accept",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":         1,
+			"auth.token.type":  "Token",
+			"auth.token.value": "sssh_super_secret_token",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			"Token sssh_super_secret_token",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name: "token_reject",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":         1,
+			"auth.token.type":  "Token",
+			"auth.token.value": "leaked_but_rolled_over_token_found_on_github",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			"Token sssh_super_secret_token",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"error": "not authorized",
+			},
+		},
+	},
+	{
 		name: "digest_accept",
 		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 			s := httptest.NewServer(h)
@@ -2242,6 +2407,19 @@ func retryHandler() http.HandlerFunc {
 		// Any 5xx except 501 will result in a retry.
 		w.WriteHeader(500)
 		count++
+	}
+}
+
+//nolint:errcheck // No point checking errors in test server.
+func tokenAuthHandler(want string, handle http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		auth := r.Header.Get("Authorization")
+		if auth != want {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusBadRequest)
+			return
+		}
+
+		handle(w, r)
 	}
 }
 
