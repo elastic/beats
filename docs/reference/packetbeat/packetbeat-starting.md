@@ -66,9 +66,9 @@ sudo ./packetbeat -e
 PS C:\Program Files\packetbeat> Start-Service packetbeat
 ```
 
-{applies_to}`stack: ga 9.1` By default, Windows log files are stored under `C:\Program Files\Packetbeat-Data\logs`.
-
-For versions earlier than 9.1.0, logs are stored by default under `C:\ProgramData\packetbeat\Logs`.
+The default location where Windows log files are stored varies:
+* {applies_to}`stack: ga 9.1` `C:\Program Files\Packetbeat-Data\Logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\packetbeat\Logs`
 ::::::
 
 :::::::
