@@ -111,7 +111,9 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName
 			val, err = fallback(errExecutingTemplate)
 		}
 		if err != nil {
-			stat.UpdateStatus(status.Degraded, fmt.Sprintf("failed to execute template %s: %v", targetName, err))
+			if _, ignoreEmpty := stat.(ignoreEmptyValueReporter); !ignoreEmpty || !errors.Is(err, errEmptyTemplateResult) {
+				stat.UpdateStatus(status.Degraded, fmt.Sprintf("failed to execute template %s: %v", targetName, err))
+			}
 			log.Debugw("template execution failed", "target", targetName, "error", err)
 		}
 		tryDebugTemplateValue(targetName, val, log)

@@ -50,6 +50,8 @@ type config struct {
 	Retry *retry `config:"retry"`
 	// Transport is the common the transport config.
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
+	// KeepAlive is the configuration for keep-alive settings.
+	KeepAlive keepAliveConfig `config:"keep_alive"`
 	// CrowdstrikeAppID is the value used to set the
 	// appId request parameter in the FalconHose stream
 	// discovery request.
@@ -73,6 +75,20 @@ type retry struct {
 	InfiniteRetries bool          `config:"infinite_retries"`
 }
 
+// keepAliveConfig is the configuration for keep-alive settings.
+type keepAliveConfig struct {
+	// Enable indicates whether keep-alive is enabled.
+	Enable bool `config:"enable"`
+	// Interval is the interval between keep-alive messages.
+	// by default, this is set to 30 seconds.
+	Interval time.Duration `config:"interval"`
+	// WriteControlDeadline is the deadline for write control messages.
+	// by default, this is set to 10 seconds.
+	WriteControlDeadline time.Duration `config:"write_control_deadline"`
+	// readControlDeadline is the deadline for read control messages.
+	// this is internally set to 3x the value of the writeControlDeadline to account for network latency/jitter.
+	readControlDeadline time.Duration
+}
 type authConfig struct {
 	// Custom auth config to use for authentication.
 	CustomAuth *customAuthConfig `config:"custom"`
@@ -214,6 +230,10 @@ func defaultConfig() config {
 			MaxAttempts: 5,
 			WaitMin:     1 * time.Second,
 			WaitMax:     30 * time.Second,
+		},
+		KeepAlive: keepAliveConfig{
+			Interval:             30 * time.Second,
+			WriteControlDeadline: 10 * time.Second,
 		},
 	}
 }

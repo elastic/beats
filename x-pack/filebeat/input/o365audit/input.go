@@ -7,6 +7,7 @@ package o365audit
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -17,6 +18,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
@@ -43,15 +45,6 @@ type stream struct {
 	contentType string
 }
 
-type apiEnvironment struct {
-	TenantID    string
-	ContentType string
-	Config      APIConfig
-	Callback    func(event beat.Event, cursor interface{}) error
-	Logger      *logp.Logger
-	Clock       func() time.Time
-}
-
 func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       pluginName,
@@ -65,6 +58,13 @@ func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 			Type:       pluginName,
 			Configure:  configure,
 		},
+
+		// ExcludeFromFIPS = true to prevent this input from being used in FIPS-capable
+		// Filebeat distributions.  This input indirectly uses algorithms that are not
+		// FIPS-compliant. Specifically, the input depends on the
+		// github.com/Azure/azure-sdk-for-go/sdk/azidentity package which, in turn,
+		// depends on the golang.org/x/crypto/pkcs12 package, which is not FIPS-compliant.
+		ExcludeFromFIPS: true,
 	}
 }
 
@@ -107,18 +107,26 @@ func (inp *o365input) Test(src cursor.Source, ctx v2.TestContext) error {
 	return nil
 }
 
-func (inp *o365input) Run(
-	ctx v2.Context,
-	src cursor.Source,
-	cursor cursor.Cursor,
-	publisher cursor.Publisher,
-) error {
+func (inp *o365input) Run(ctx v2.Context, src cursor.Source, cursor cursor.Cursor, pub cursor.Publisher) error {
+	stat := ctx.StatusReporter
+	if stat == nil {
+		stat = noopReporter{}
+	}
+	stat.UpdateStatus(status.Starting, "")
+
+	stream, ok := src.(*stream)
+	if !ok {
+		// This should never happen.
+		stat.UpdateStatus(status.Failed, "source is not an O365 stream")
+		return errors.New("source is not an O365 stream")
+	}
+
 	for ctx.Cancelation.Err() == nil {
-		err := inp.runOnce(ctx, src, cursor, publisher)
-		if err == nil {
-			break
-		}
-		if ctx.Cancelation.Err() != err && err != context.Canceled {
+		err := inp.run(ctx, stream, cursor, pub, stat)
+		switch {
+		case err == nil, errors.Is(err, context.Canceled):
+			return nil
+		case err != ctx.Cancelation.Err():
 			msg := mapstr.M{}
 			msg.Put("error.message", err.Error())
 			msg.Put("event.kind", "pipeline_error")
@@ -126,22 +134,21 @@ func (inp *o365input) Run(
 				Timestamp: time.Now(),
 				Fields:    msg,
 			}
-			publisher.Publish(event, nil)
+			if err := pub.Publish(event, nil); err != nil {
+				stat.UpdateStatus(status.Degraded, "failed to publish error: "+err.Error())
+				ctx.Logger.Errorf("publisher.Publish failed: %v", err)
+			}
+			stat.UpdateStatus(status.Degraded, err.Error())
 			ctx.Logger.Errorf("Input failed: %v", err)
 			ctx.Logger.Infof("Restarting in %v", inp.config.API.ErrorRetryInterval)
 			timed.Wait(ctx.Cancelation, inp.config.API.ErrorRetryInterval)
 		}
 	}
+
 	return nil
 }
 
-func (inp *o365input) runOnce(
-	v2ctx v2.Context,
-	src cursor.Source,
-	cursor cursor.Cursor,
-	publisher cursor.Publisher,
-) error {
-	stream := src.(*stream)
+func (inp *o365input) run(v2ctx v2.Context, stream *stream, cursor cursor.Cursor, pub cursor.Publisher, stat status.StatusReporter) error {
 	tenantID, contentType := stream.tenantID, stream.contentType
 	log := v2ctx.Logger.With("tenantID", tenantID, "contentType", contentType)
 	ctx := ctxtool.FromCanceller(v2ctx.Cancelation)
@@ -178,12 +185,13 @@ func (inp *o365input) runOnce(
 
 	start := initCheckpoint(log, cursor, config.API.MaxRetention)
 	action := makeListBlob(start, apiEnvironment{
-		Logger:      log,
-		TenantID:    tenantID,
-		ContentType: contentType,
-		Config:      inp.config.API,
-		Callback:    publisher.Publish,
-		Clock:       time.Now,
+		logger:      log,
+		status:      stat,
+		tenantID:    tenantID,
+		contentType: contentType,
+		config:      inp.config.API,
+		callback:    pub.Publish,
+		clock:       time.Now,
 	})
 	if start.Line > 0 {
 		action = action.WithStartTime(start.StartTime)
@@ -226,17 +234,39 @@ func initCheckpoint(log *logp.Logger, c cursor.Cursor, maxRetention time.Duratio
 	return cp
 }
 
+type apiEnvironment struct {
+	tenantID    string
+	contentType string
+	config      APIConfig
+	callback    func(event beat.Event, cursor interface{}) error
+	status      status.StatusReporter
+	logger      *logp.Logger
+	clock       func() time.Time
+}
+
 // Report returns an action that produces a beat.Event from the given object.
 func (env apiEnvironment) Report(raw json.RawMessage, doc mapstr.M, private interface{}) poll.Action {
 	return func(poll.Enqueuer) error {
-		return env.Callback(env.toBeatEvent(raw, doc), private)
+		err := env.callback(env.toBeatEvent(raw, doc), private)
+		switch err {
+		case nil:
+			env.status.UpdateStatus(status.Running, "")
+		default:
+			env.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
+		}
+		return err
 	}
 }
 
 // ReportAPIError returns an action that produces a beat.Event from an API error.
 func (env apiEnvironment) ReportAPIError(err apiError) poll.Action {
 	return func(poll.Enqueuer) error {
-		return env.Callback(err.ToBeatEvent(), nil)
+		msg := err.Error.Message
+		err := env.callback(err.toBeatEvent(), nil)
+		if err != nil {
+			env.status.UpdateStatus(status.Degraded, fmt.Sprintf("failed to publish API error event %q: %v", msg, err.Error()))
+		}
+		return err
 	}
 }
 
@@ -253,12 +283,13 @@ func (env apiEnvironment) toBeatEvent(raw json.RawMessage, doc mapstr.M) beat.Ev
 			fieldsPrefix: doc,
 		},
 	}
-	if env.Config.SetIDFromAuditRecord {
+	if env.config.SetIDFromAuditRecord {
 		if id, err := getString(doc, "Id"); err == nil && len(id) > 0 {
 			b.SetID(id)
 		}
 	}
-	if env.Config.PreserveOriginalEvent {
+	if env.config.PreserveOriginalEvent {
+		//nolint:errcheck // ignore
 		b.PutValue("event.original", string(raw))
 	}
 	if len(errs) > 0 {
@@ -270,3 +301,7 @@ func (env apiEnvironment) toBeatEvent(raw json.RawMessage, doc mapstr.M) beat.Ev
 	}
 	return b
 }
+
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}

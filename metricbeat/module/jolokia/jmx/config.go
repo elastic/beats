@@ -253,6 +253,7 @@ type JolokiaHTTPRequestFetcher interface {
 // JolokiaHTTPGetFetcher constructs and executes an HTTP GET request
 // which will read MBean information from Jolokia
 type JolokiaHTTPGetFetcher struct {
+	logger *logp.Logger
 }
 
 // BuildRequestsAndMappings generates HTTP GET request
@@ -353,11 +354,9 @@ func (pc *JolokiaHTTPGetFetcher) Fetch(m *MetricSet) ([]mapstr.M, error) {
 	}
 
 	// Log request information
-	if logp.IsDebug(metricsetName) {
-		for _, r := range httpReqs {
-			m.log.Debugw("Jolokia request URI and body",
-				"httpMethod", r.HTTPMethod, "URI", r.URI, "body", string(r.Body), "type", "request")
-		}
+	for _, r := range httpReqs {
+		m.log.Debugw("Jolokia request URI and body",
+			"httpMethod", r.HTTPMethod, "URI", r.URI, "body", string(r.Body), "type", "request")
 	}
 
 	for _, r := range httpReqs {
@@ -369,10 +368,8 @@ func (pc *JolokiaHTTPGetFetcher) Fetch(m *MetricSet) ([]mapstr.M, error) {
 			return nil, err
 		}
 
-		if logp.IsDebug(metricsetName) {
-			m.log.Debugw("Jolokia response body",
-				"host", m.HostData().Host, "uri", m.http.GetURI(), "body", string(resBody), "type", "response")
-		}
+		m.log.Debugw("Jolokia response body",
+			"host", m.HostData().Host, "uri", m.http.GetURI(), "body", string(resBody), "type", "response")
 
 		// Map response to Metricbeat events
 		events, err := pc.EventMapping(resBody, mapping)
@@ -397,12 +394,13 @@ func (pc *JolokiaHTTPGetFetcher) EventMapping(content []byte, mapping AttributeM
 		return nil, fmt.Errorf("failed to unmarshal jolokia JSON response '%v': %w", string(content), err)
 	}
 
-	return eventMapping([]Entry{singleEntry}, mapping)
+	return eventMapping([]Entry{singleEntry}, mapping, pc.logger)
 }
 
 // JolokiaHTTPPostFetcher constructs and executes an HTTP GET request
 // which will read MBean information from Jolokia
 type JolokiaHTTPPostFetcher struct {
+	logger *logp.Logger
 }
 
 // BuildRequestsAndMappings generates HTTP POST request
@@ -480,11 +478,9 @@ func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]mapstr.M, error) {
 	}
 
 	// Log request information
-	if logp.IsDebug(metricsetName) {
-		for _, r := range httpReqs {
-			m.log.Debugw("Jolokia request URI and body",
-				"httpMethod", r.HTTPMethod, "URI", m.http.GetURI(), "body", string(r.Body), "type", "request")
-		}
+	for _, r := range httpReqs {
+		m.log.Debugw("Jolokia request URI and body",
+			"httpMethod", r.HTTPMethod, "URI", m.http.GetURI(), "body", string(r.Body), "type", "request")
 	}
 
 	m.http.SetMethod(httpReqs[0].HTTPMethod)
@@ -495,10 +491,8 @@ func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]mapstr.M, error) {
 		return nil, err
 	}
 
-	if logp.IsDebug(metricsetName) {
-		m.log.Debugw("Jolokia response body",
-			"host", m.HostData().Host, "uri", m.http.GetURI(), "body", string(resBody), "type", "response")
-	}
+	m.log.Debugw("Jolokia response body",
+		"host", m.HostData().Host, "uri", m.http.GetURI(), "body", string(resBody), "type", "response")
 
 	// Map response to Metricbeat events
 	events, err := pc.EventMapping(resBody, mapping)
@@ -519,17 +513,21 @@ func (pc *JolokiaHTTPPostFetcher) EventMapping(content []byte, mapping Attribute
 		return nil, fmt.Errorf("failed to unmarshal jolokia JSON response '%v': %w", string(content), err)
 	}
 
-	return eventMapping(entries, mapping)
+	return eventMapping(entries, mapping, pc.logger)
 }
 
 // NewJolokiaHTTPRequestFetcher is a factory method which creates and returns an implementation
 // class of JolokiaHTTPRequestFetcher interface. HTTP GET and POST are currently supported.
-func NewJolokiaHTTPRequestFetcher(httpMethod string) JolokiaHTTPRequestFetcher {
+func NewJolokiaHTTPRequestFetcher(httpMethod string, logger *logp.Logger) JolokiaHTTPRequestFetcher {
 
 	if httpMethod == "GET" {
-		return &JolokiaHTTPGetFetcher{}
+		return &JolokiaHTTPGetFetcher{
+			logger: logger,
+		}
 	}
 
-	return &JolokiaHTTPPostFetcher{}
+	return &JolokiaHTTPPostFetcher{
+		logger: logger,
+	}
 
 }

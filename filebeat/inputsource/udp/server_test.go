@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 const (
@@ -78,7 +79,7 @@ func testReceiveEventFromUDPWithNetwork(t *testing.T, network string) {
 	fn := func(message []byte, metadata inputsource.NetworkMetadata) {
 		ch <- info{message: message, mt: metadata}
 	}
-	s := New(config, fn)
+	s := New(config, fn, logptest.NewTestingLogger(t, ""))
 	err := s.Start()
 	if !assert.NoError(t, err) {
 		return

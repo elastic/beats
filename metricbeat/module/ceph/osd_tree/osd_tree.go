@@ -73,7 +73,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return fmt.Errorf("error in fetch: %w", err)
 	}
 
-	events, err := eventsMapping(content)
+	events, err := eventsMapping(content, m.Logger())
 	if err != nil {
 		return fmt.Errorf("error in mapping: %w", err)
 	}

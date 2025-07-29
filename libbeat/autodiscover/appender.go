@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Appender provides an interface by which extra configuration can be added into configs
@@ -35,7 +36,7 @@ type Appender interface {
 type Appenders []Appender
 
 // AppenderBuilder is a func used to generate a Appender object
-type AppenderBuilder func(*config.C) (Appender, error)
+type AppenderBuilder func(c *config.C, logger *logp.Logger) (Appender, error)
 
 // AddBuilder registers a new AppenderBuilder
 func (r *registry) AddAppender(name string, appender AppenderBuilder) error {
@@ -82,7 +83,7 @@ func (r *registry) BuildAppender(c *config.C) (Appender, error) {
 		return nil, fmt.Errorf("unknown autodiscover appender %s", config.Type)
 	}
 
-	return appender(c)
+	return appender(c, r.logger)
 }
 
 // Append uses all initialized appenders to modify generated bus.Events.

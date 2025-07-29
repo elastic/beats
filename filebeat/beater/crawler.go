@@ -113,10 +113,6 @@ func (c *crawler) startInput(
 	pipeline beat.PipelineConnector,
 	config *conf.C,
 ) error {
-	// TODO: Either use debug or remove it after https://github.com/elastic/beats/pull/30534
-	// is fixed.
-	c.log.Infof("starting input, keys present on the config: %v",
-		config.FlattenedKeys())
 
 	if !config.Enabled() {
 		c.log.Infof("input disabled, skipping it")
@@ -142,10 +138,6 @@ func (c *crawler) startInput(
 	}
 	if inputRunner, ok := runner.(*input.Runner); ok {
 		inputRunner.Once = c.once
-	}
-
-	if err := checkFIPSCapability(runner); err != nil {
-		return err
 	}
 
 	c.inputs[id] = runner

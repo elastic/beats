@@ -5,8 +5,6 @@
 package ec2
 
 import (
-	"fmt"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -44,6 +42,7 @@ func AutodiscoverBuilder(
 	uuid uuid.UUID,
 	c *conf.C,
 	keystore keystore.Keystore,
+	log *logp.Logger,
 ) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("aws_ec2 autodiscover is experimental")
 
@@ -82,7 +81,7 @@ func AutodiscoverBuilder(
 	clients := make([]ec2.DescribeInstancesAPIClient, 0, len(config.Regions))
 	for _, region := range config.Regions {
 		if err != nil {
-			logp.Error(fmt.Errorf("error loading AWS config for aws_ec2 autodiscover provider: %w", err))
+			log.Errorf("error loading AWS config for aws_ec2 autodiscover provider: %w", err)
 		}
 		awsCfg.Region = region
 		clients = append(clients, ec2.NewFromConfig(awsCfg, func(o *ec2.Options) {
@@ -92,12 +91,18 @@ func AutodiscoverBuilder(
 		}))
 	}
 
-	return internalBuilder(uuid, bus, config, newAPIFetcher(clients), keystore)
+	return internalBuilder(uuid, bus, config, newAPIFetcher(clients, log), keystore, log)
 }
 
 // internalBuilder is mainly intended for testing via mocks and stubs.
 // it can be configured to use a fetcher that doesn't actually hit the AWS API.
-func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetcher fetcher, keystore keystore.Keystore) (*Provider, error) {
+func internalBuilder(
+	uuid uuid.UUID,
+	bus bus.Bus,
+	config *awsauto.Config,
+	fetcher fetcher,
+	keystore keystore.Keystore,
+	log *logp.Logger) (*Provider, error) {
 	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
 	if err != nil {
 		return nil, err
@@ -115,6 +120,7 @@ func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetche
 		config.Period,
 		p.onWatcherStart,
 		p.onWatcherStop,
+		log,
 	)
 
 	return p, nil

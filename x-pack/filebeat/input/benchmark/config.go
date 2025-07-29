@@ -11,6 +11,7 @@ type benchmarkConfig struct {
 	Count   uint64 `config:"count"`
 	Threads uint8  `config:"threads"`
 	Eps     uint64 `config:"eps"`
+	Status  string `config:"status"`
 }
 
 var (

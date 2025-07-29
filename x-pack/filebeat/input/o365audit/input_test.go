@@ -16,7 +16,8 @@ import (
 
 func TestPreserveOriginalEvent(t *testing.T) {
 	env := apiEnvironment{
-		Config: APIConfig{PreserveOriginalEvent: false},
+		status: noopReporter{},
+		config: APIConfig{PreserveOriginalEvent: false},
 	}
 
 	raw := json.RawMessage(`{"field1":"val1"}`)
@@ -30,7 +31,7 @@ func TestPreserveOriginalEvent(t *testing.T) {
 	require.EqualError(t, err, "key not found")
 	assert.Nil(t, v)
 
-	env.Config.PreserveOriginalEvent = true
+	env.config.PreserveOriginalEvent = true
 
 	event = env.toBeatEvent(raw, doc)
 

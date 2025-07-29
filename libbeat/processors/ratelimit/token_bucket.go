@@ -100,7 +100,7 @@ type tokenBucketConfig struct {
 	GC tokenBucketGCConfig `config:"gc"`
 }
 
-func newTokenBucket(config algoConfig) (algorithm, error) {
+func newTokenBucket(config algoConfig, logger *logp.Logger) (algorithm, error) {
 	cfg := tokenBucketConfig{
 		BurstMultiplier: 1.0,
 		GC: tokenBucketGCConfig{
@@ -127,7 +127,7 @@ func newTokenBucket(config algoConfig) (algorithm, error) {
 			},
 		},
 		clock:  clockwork.NewRealClock(),
-		logger: logp.NewLogger("token_bucket"),
+		logger: logger.Named("token_bucket"),
 		mu:     unison.MakeMutex(),
 	}, nil
 }

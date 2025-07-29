@@ -15,14 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !requirefips
+//go:build !integration
 
-package beater
+package index_summary
 
-import "github.com/elastic/beats/v7/libbeat/cfgfile"
+import (
+	"testing"
+)
 
-func checkFIPSCapability(_ cfgfile.Runner) error {
-	// In non-FIPS builds, we assume all inputs are FIPS capable
-	// and proceed without error
-	return nil
+func TestGetServicePath(t *testing.T) {
+	expectedPath := "/_nodes/stats?level=node&filter_path=nodes.*.indices.docs,nodes.*.indices.indexing.index_total,nodes.*.indices.indexing.index_time_in_millis,nodes.*.indices.search.query_total,nodes.*.indices.search.query_time_in_millis,nodes.*.indices.segments.count,nodes.*.indices.segments.memory_in_bytes,nodes.*.indices.store.size_in_bytes,nodes.*.indices.store.total_data_set_size_in_bytes"
+	path, err := getServicePath()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if path != expectedPath {
+		t.Errorf("expected path %q, got %q", expectedPath, path)
+	}
 }

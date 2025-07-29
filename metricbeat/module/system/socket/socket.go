@@ -30,7 +30,6 @@ import (
 	sock "github.com/elastic/beats/v7/metricbeat/helper/socket"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 	"github.com/elastic/gosigar/sys/linux"
@@ -38,7 +37,6 @@ import (
 
 var (
 	debugSelector = "system.socket"
-	debugf        = logp.MakeDebug(debugSelector)
 )
 
 func init() {
@@ -77,8 +75,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	if !ptable.Privileged() {
-		logp.Info("socket process info will only be available for processes owned by the %v user "+
-			"because this Beat is not running with enough privileges", os.Geteuid())
+		base.Logger().Infof("socket process info will only be available for processes owned by the %v user because this Beat is not running with enough privileges", os.Geteuid())
 	}
 
 	m := &MetricSet{
@@ -100,7 +97,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		if c.ReverseLookup.FailureTTL != 0 {
 			successTTL = c.ReverseLookup.FailureTTL
 		}
-		debugf("enabled reverse DNS lookup with cache TTL of %v/%v",
+		base.Logger().Named(debugSelector).Debugf("enabled reverse DNS lookup with cache TTL of %v/%v",
 			successTTL, failureTTL)
 		m.reverseLookup = NewReverseLookupCache(successTTL, failureTTL)
 	}
@@ -112,14 +109,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// Refresh inode to process mapping (must be root).
 	if err := m.ptable.Refresh(); err != nil {
-		debugf("process table refresh had failures: %v", err)
+		m.Logger().Named(debugSelector).Debugf("process table refresh had failures: %v", err)
 	}
 
 	sockets, err := m.netlink.GetSocketList()
 	if err != nil {
 		return fmt.Errorf("failed requesting socket dump: %w", err)
 	}
-	debugf("netlink returned %d sockets", len(sockets))
+	m.Logger().Named(debugSelector).Debugf("netlink returned %d sockets", len(sockets))
 
 	// Filter sockets that were known during the previous poll.
 	sockets = m.filterAndRememberSockets(sockets)
@@ -165,12 +162,10 @@ func (m *MetricSet) filterAndRememberSockets(sockets ...[]*linux.InetDiagMsg) []
 
 			// Filter known sockets.
 			if m.isNewSocket(socket) {
-				if logp.IsDebug(debugSelector) {
-					debugf("found new socket %v:%v -> %v:%v with state=%v, inode=%v, hash-id=%d",
-						socket.SrcIP(), socket.SrcPort(),
-						socket.DstIP(), socket.DstPort(),
-						linux.TCPState(socket.State), socket.Inode, socket.FastHash())
-				}
+				m.Logger().Named(debugSelector).Debugf("found new socket %v:%v -> %v:%v with state=%v, inode=%v, hash-id=%d",
+					socket.SrcIP(), socket.SrcPort(),
+					socket.DstIP(), socket.DstPort(),
+					linux.TCPState(socket.State), socket.Inode, socket.FastHash())
 				newSockets = append(newSockets, socket)
 			}
 		}

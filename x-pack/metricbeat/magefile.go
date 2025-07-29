@@ -52,6 +52,11 @@ func Build() error {
 	return devtools.Build(args)
 }
 
+// BuildOTel builds the Beat binary with OTel sub command
+func BuildOTel() error {
+	return devtools.BuildOTel()
+}
+
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
@@ -235,13 +240,30 @@ func IntegTest() {
 // Use TEST_TAGS=tag1,tag2 to add additional build tags.
 // Use MODULE=module to run only tests for `module`.
 func GoIntegTest(ctx context.Context) error {
+
+	// define modules
 	if os.Getenv("CI") == "true" {
 		mg.Deps(devtools.DefineModules)
 	}
 
 	if !devtools.IsInIntegTestEnv() {
+		// build integration test binary with otel sub command
+		devtools.BuildSystemTestOTelBinary()
+		args := devtools.DefaultGoTestIntegrationFromHostArgs()
+		// ES_USER must be admin in order for the Go Integration tests to function because they require
+		// indices:data/read/search
+		args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
+		args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
+		// run integration test from home directory
+		args.Packages = []string{"./tests/integration/"}
+		err := devtools.GoIntegTestFromHost(ctx, args)
+		if err != nil {
+			return err
+		}
+
 		mg.SerialDeps(Fields, Dashboards)
 	}
+
 	return devtools.GoTestIntegrationForModule(ctx)
 }
 
@@ -252,15 +274,8 @@ func GoIntegTest(ctx context.Context) error {
 // Use TEST_TAGS=tag1,tag2 to add additional build tags.
 // Use MODULE=module to run only tests for `module`.
 func GoFIPSOnlyIntegTest(ctx context.Context) error {
-	if os.Getenv("CI") == "true" {
-		mg.Deps(devtools.DefineModules)
-	}
-
-	if !devtools.IsInIntegTestEnv() {
-		mg.SerialDeps(Fields, Dashboards)
-	}
 	os.Setenv("GODEBUG", "fips140=only")
-	return devtools.GoTestIntegrationForModule(ctx)
+	return GoIntegTest(ctx)
 }
 
 // PythonIntegTest executes the python system tests in the integration
