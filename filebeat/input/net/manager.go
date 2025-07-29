@@ -213,7 +213,7 @@ func (w wrapper) publishLoop(ctx v2.Context, id int, client beat.Client, metrics
 		case d := <-w.evtChan:
 			start := time.Now()
 			evt := beat.Event{
-				Timestamp: time.Now(),
+				Timestamp: d.Timestamp,
 				Fields: mapstr.M{
 					"message": string(d.Data),
 				},
