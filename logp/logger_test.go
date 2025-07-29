@@ -79,3 +79,13 @@ func TestNewInMemory(t *testing.T) {
 	assert.Contains(t, logs[3], "error_key")
 	assert.Contains(t, logs[3], "error_val")
 }
+
+func TestLoggerHasSelector(t *testing.T) {
+	logger := newLogger(zap.NewNop(), map[string]struct{}{
+		"config": {},
+		"*":      {},
+	})
+
+	assert.True(t, logger.HasSelector("config"))
+	assert.False(t, logger.HasSelector("publish"))
+}

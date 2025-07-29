@@ -50,7 +50,7 @@ func init() {
 		rootLogger:   zap.NewNop(),
 		globalLogger: zap.NewNop(),
 		level:        zap.NewAtomicLevel(),
-		logger:       newLogger(zap.NewNop(), ""),
+		logger:       newLogger(zap.NewNop(), make(map[string]struct{})),
 	})
 }
 
@@ -144,7 +144,7 @@ func ConfigureWithOutputs(defaultLoggerCfg Config, outputs ...zapcore.Core) erro
 		selectors:    selectors,
 		rootLogger:   root,
 		globalLogger: root.WithOptions(zap.AddCallerSkip(1)),
-		logger:       newLogger(root, ""),
+		logger:       newLogger(root, selectors),
 		level:        level,
 		observedLogs: observedLogs,
 	})
@@ -197,7 +197,7 @@ func ConfigureWithCore(loggerCfg Config, core zapcore.Core) error {
 		selectors:    selectors,
 		rootLogger:   root,
 		globalLogger: root.WithOptions(zap.AddCallerSkip(1)),
-		logger:       newLogger(root, ""),
+		logger:       newLogger(root, selectors),
 		level:        level,
 		observedLogs: nil,
 	})
@@ -247,11 +247,11 @@ func ConfigureWithCoreLocal(loggerCfg Config, core zapcore.Core) (*Logger, error
 		selectors:    selectors,
 		rootLogger:   root,
 		globalLogger: root.WithOptions(zap.AddCallerSkip(1)),
-		logger:       newLogger(root, ""),
+		logger:       newLogger(root, selectors),
 		level:        level,
 		observedLogs: nil,
 	})
-	return newLogger(root, ""), nil
+	return newLogger(root, selectors), nil
 }
 
 // ConfigureWithTypedOutput configures the global logger to use typed outputs.
@@ -303,7 +303,7 @@ func ConfigureWithTypedOutput(defaultLoggerCfg, typedLoggerCfg Config, key, valu
 		selectors:    selectors,
 		rootLogger:   root,
 		globalLogger: root.WithOptions(zap.AddCallerSkip(1)),
-		logger:       newLogger(root, ""),
+		logger:       newLogger(root, selectors),
 		level:        level,
 		observedLogs: observedLogs,
 	})
@@ -353,11 +353,11 @@ func ConfigureWithTypedOutputLocal(defaultLoggerCfg, typedLoggerCfg Config, key,
 		selectors:    selectors,
 		rootLogger:   root,
 		globalLogger: root.WithOptions(zap.AddCallerSkip(1)),
-		logger:       newLogger(root, ""),
+		logger:       newLogger(root, selectors),
 		level:        level,
 		observedLogs: observedLogs,
 	})
-	logger := newLogger(root, "")
+	logger := newLogger(root, selectors)
 	return logger, nil
 }
 

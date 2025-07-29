@@ -32,16 +32,17 @@ type LogOption = zap.Option
 
 // Logger logs messages to the configured output.
 type Logger struct {
-	logger *zap.Logger
-	sugar  *zap.SugaredLogger
+	logger    *zap.Logger
+	sugar     *zap.SugaredLogger
+	selectors map[string]struct{} // Set of enabled debug selectors.
 }
 
-func newLogger(rootLogger *zap.Logger, selector string, options ...LogOption) *Logger {
+func newLogger(rootLogger *zap.Logger, selector map[string]struct{}, options ...LogOption) *Logger {
 	log := rootLogger.
 		WithOptions(zap.AddCallerSkip(1)).
-		WithOptions(options...).
-		Named(selector)
-	return &Logger{log, log.Sugar()}
+		WithOptions(options...)
+
+	return &Logger{log, log.Sugar(), selector}
 }
 
 // NewLogger returns a new Logger labeled with the name of the selector. This
@@ -50,13 +51,14 @@ func newLogger(rootLogger *zap.Logger, selector string, options ...LogOption) *L
 // Instead create new Logger instance that your object reuses. Or if you need to
 // log from a static context then you may use logp.L().Infow(), for example.
 func NewLogger(selector string, options ...LogOption) *Logger {
-	return newLogger(loadLogger().rootLogger, selector, options...)
+	logger := loadLogger().rootLogger.Named(selector)
+	return newLogger(logger, make(map[string]struct{}), options...)
 }
 
 // NewNopLogger returns a no-op logger
 func NewNopLogger() *Logger {
 	logger := zap.NewNop()
-	return &Logger{logger, logger.Sugar()}
+	return &Logger{logger, logger.Sugar(), make(map[string]struct{})}
 }
 
 // NewProductionLogger returns a production suitable logp.Logger
@@ -66,7 +68,7 @@ func NewProductionLogger(selector string, options ...LogOption) (*Logger, error)
 	if err != nil {
 		return nil, err
 	}
-	return &Logger{log, log.Sugar()}, nil
+	return &Logger{log, log.Sugar(), make(map[string]struct{})}, nil
 }
 
 // NewDevelopmentLogger returns a development suitable logp.Logger
@@ -83,7 +85,7 @@ func NewDevelopmentLogger(selector string, options ...LogOption) (*Logger, error
 	if err != nil {
 		return nil, err
 	}
-	return &Logger{logger, logger.Sugar()}, nil
+	return &Logger{logger, logger.Sugar(), make(map[string]struct{})}, nil
 }
 
 // NewInMemory returns a new in-memory logger along with the buffer to which it
@@ -144,24 +146,30 @@ func NewInMemoryLocal(selector string, encCfg zapcore.EncoderConfig) (*Logger, *
 	return logger, &buff
 }
 
+// HasSelector returns true if the given selector was explicitly set.
+func (l *Logger) HasSelector(selector string) bool {
+	_, found := l.selectors[selector]
+	return found
+}
+
 // WithOptions returns a clone of l with options applied.
 func (l *Logger) WithOptions(options ...LogOption) *Logger {
 	cloned := l.logger.WithOptions(options...)
-	return &Logger{cloned, cloned.Sugar()}
+	return &Logger{cloned, cloned.Sugar(), l.selectors}
 }
 
 // With creates a child logger and adds structured context to it. Fields added
 // to the child don't affect the parent, and vice versa.
 func (l *Logger) With(args ...interface{}) *Logger {
 	sugar := l.sugar.With(args...)
-	return &Logger{sugar.Desugar(), sugar}
+	return &Logger{sugar.Desugar(), sugar, l.selectors}
 }
 
 // Named adds a new path segment to the logger's name. Segments are joined by
 // periods.
 func (l *Logger) Named(name string) *Logger {
 	logger := l.logger.Named(name)
-	return &Logger{logger, logger.Sugar()}
+	return &Logger{logger, logger.Sugar(), l.selectors}
 }
 
 // Sprint
