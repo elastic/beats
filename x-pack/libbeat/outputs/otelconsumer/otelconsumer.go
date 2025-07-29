@@ -178,6 +178,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Retry()
 		}
 
+		out.log.Errorf("failed to consume logs: %v", err)
 		return nil
 	}
 
