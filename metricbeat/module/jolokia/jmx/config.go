@@ -284,7 +284,7 @@ func (pc *JolokiaHTTPGetFetcher) BuildRequestsAndMappings(configMappings []JMXMa
 //
 // /read/<mbean>/<attribute>/[path]?ignoreErrors=true&canonicalNaming=false
 func (pc *JolokiaHTTPGetFetcher) buildJolokiaGETUri(mbean string, attr []Attribute) string {
-	initialURI := "/read/%s?ignoreErrors=true&canonicalNaming=false"
+	initialURI := "/read/%s"
 
 	var attrList []string
 	for _, attribute := range attr {
@@ -361,7 +361,8 @@ func (pc *JolokiaHTTPGetFetcher) Fetch(m *MetricSet) ([]mapstr.M, error) {
 
 	for _, r := range httpReqs {
 		m.http.SetMethod(r.HTTPMethod)
-		m.http.SetURI(m.BaseMetricSet.HostData().SanitizedURI + r.URI)
+		finalURL := SetUpdatedURL(m.BaseMetricSet.HostData().SanitizedURI, r.URI)
+		m.http.SetURI(finalURL)
 
 		resBody, err := m.http.FetchContent()
 		if err != nil {
@@ -530,4 +531,23 @@ func NewJolokiaHTTPRequestFetcher(httpMethod string, logger *logp.Logger) Joloki
 		logger: logger,
 	}
 
+}
+
+// SetURLUpdated constructs the final URL using the sanitized base URI and path.
+// If encoded query parameters (%3F) are present, they are preserved.
+// Otherwise, default query parameters are appended.
+func SetUpdatedURL(sanitizedURI, uri string) string {
+	const encodedQuery = "/%3F"
+	const defaultParams = "?ignoreErrors=true&canonicalNaming=false"
+
+	if strings.Contains(sanitizedURI, encodedQuery) {
+		parts := strings.Split(sanitizedURI, encodedQuery)
+		if len(parts) == 2 {
+			// Append path and add existing encoded query parameters
+			return fmt.Sprintf("%s%s%s%s", parts[0], uri, encodedQuery, parts[1])
+		}
+	}
+
+	// No encoded query params then append default params
+	return fmt.Sprintf("%s%s%s", sanitizedURI, uri, defaultParams)
 }
