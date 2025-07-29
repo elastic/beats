@@ -2,6 +2,8 @@
 navigation_title: "Office 365 Management Activity API"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-o365audit.html
+applies_to:
+  stack: deprecated 8.14.0
 ---
 
 # Office 365 Management Activity API input [filebeat-input-o365audit]

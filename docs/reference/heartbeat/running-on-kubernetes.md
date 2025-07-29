@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/running-on-kubernetes.html
+applies_to:
+  stack: ga
 ---
 
 # Running Heartbeat on Kubernetes [running-on-kubernetes]
@@ -12,7 +14,7 @@ Running {{ecloud}} on Kubernetes? See [Run {{beats}} on ECK](docs-content://depl
 ::::
 
 
-% However, version {{stack-version}} of Heartbeat has not yet been released, so no Docker image is currently available for this version.
+% However, version {{version.stack}} of Heartbeat has not yet been released, so no Docker image is currently available for this version.
 
 
 ## Kubernetes deploy manifests for Heartbeat [_kubernetes_deploy_manifests]
@@ -24,7 +26,7 @@ Everything is deployed under `kube-system` namespace, you can change that by upd
 To get the manifests just run:
 
 ```sh subs=true
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/kubernetes/heartbeat-kubernetes.yaml
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.M }}/deploy/kubernetes/heartbeat-kubernetes.yaml
 ```
 
 ::::{warning}
@@ -75,7 +77,7 @@ Under Kubernetes, Heartbeat can run as a non-root user, but requires some privil
 ```yaml subs=true
 containers:
 - name: heartbeat
-  image: docker.elastic.co/beats/heartbeat:{{stack-version}}
+  image: docker.elastic.co/beats/heartbeat:{{version.stack}}
   securityContext:
     runAsUser: 1000
     runAsGroup: 1000

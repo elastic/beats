@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/migrate-to-filestream.html
+applies_to:
+  stack: ga
 ---
 
 # Migrate `log` or `container` input configurations to filestream

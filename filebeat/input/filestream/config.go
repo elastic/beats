@@ -26,6 +26,7 @@ import (
 	"github.com/dustin/go-humanize"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
@@ -42,6 +43,11 @@ type config struct {
 	Close        closerConfig    `config:"close"`
 	FileWatcher  *conf.Namespace `config:"prospector"`
 	FileIdentity *conf.Namespace `config:"file_identity"`
+
+	// GZIPExperimental enables tech-preview support for ingesting GZIP files.
+	// When set to true the input will transparently stream-decompress GZIP files.
+	// This feature is experimental and subject to change.
+	GZIPExperimental bool `config:"gzip_experimental"`
 
 	// -1 means that registry will never be cleaned
 	CleanInactive  time.Duration      `config:"clean_inactive" validate:"min=-1"`
@@ -169,16 +175,20 @@ func (c *config) Validate() error {
 		return fmt.Errorf("no path is configured")
 	}
 
-	if c.AllowIDDuplication {
-		logp.L().Named("input.filestream").Warn(
-			"setting `allow_deprecated_id_duplication` will lead to data " +
-				"duplication and incomplete input metrics, it's use is " +
-				"highly discouraged.")
-	}
-
 	if c.AllowIDDuplication && c.TakeOver.Enabled {
 		return errors.New("allow_deprecated_id_duplication and take_over " +
 			"cannot be enabled at the same time")
+	}
+
+	if c.GZIPExperimental {
+		// Validate file_identity must be fingerprint when gzip support is enabled.
+		if c.FileIdentity != nil && c.FileIdentity.Name() != fingerprintName {
+			return fmt.Errorf(
+				"gzip_experimental=true requires file_identity to be 'fingerprint'")
+		}
+
+		cfgwarn.Experimental(
+			"filestream: experimental gzip support enabled")
 	}
 
 	if c.ID == "" && c.TakeOver.Enabled {
@@ -186,6 +196,16 @@ func (c *config) Validate() error {
 	}
 
 	return nil
+}
+
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+func (c config) checkUnsupportedParams(logger *logp.Logger) {
+	if c.AllowIDDuplication {
+		logger.Named("input.filestream").Warn(
+			"setting `allow_deprecated_id_duplication` will lead to data " +
+				"duplication and incomplete input metrics, it's use is " +
+				"highly discouraged.")
+	}
 }
 
 // ValidateInputIDs checks all filestream inputs to ensure all input IDs are

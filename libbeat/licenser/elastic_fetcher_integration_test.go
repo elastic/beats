@@ -64,7 +64,7 @@ func getTestClient(t *testing.T) *eslegclient.Connection {
 
 // Sanity check for schema change on the HTTP response from a live Elasticsearch instance.
 func TestElasticsearch(t *testing.T) {
-	f := NewElasticFetcher(getTestClient(t))
+	f := NewElasticFetcher(getTestClient(t), logptest.NewTestingLogger(t, ""))
 	license, err := f.Fetch()
 	if !assert.NoError(t, err) {
 		return
