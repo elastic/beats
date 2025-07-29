@@ -664,7 +664,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
-	reader, err := debug.AppendReaders(h.log)
+	reader, err := debug.AppendReaders(h.log, h.logger)
 	if err != nil {
 		return nil, err
 	}

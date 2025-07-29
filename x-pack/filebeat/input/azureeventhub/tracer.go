@@ -8,21 +8,11 @@ package azureeventhub
 
 import (
 	"context"
-	"os"
 
 	"github.com/devigned/tab"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
-
-func init() {
-	// Register the logs tracer only if the environment variable is
-	// set to avoid the overhead of the tracer in environments where
-	// it's not needed.
-	if os.Getenv("BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED") == "true" {
-		tab.Register(new(logsOnlyTracer))
-	}
-}
 
 // logsOnlyTracer manages the creation of the required
 // Spanners and Loggers with the goal of deferring logging
@@ -38,7 +28,9 @@ func init() {
 //
 // Since we are currently only interested in logging, we will
 // implement a Tracer that only logs.
-type logsOnlyTracer struct{}
+type logsOnlyTracer struct {
+	logger *logp.Logger
+}
 
 // ----------------------------------------------------------------------------
 // Tracer
@@ -46,17 +38,17 @@ type logsOnlyTracer struct{}
 
 // StartSpan returns the input context and a no-op Spanner
 func (nt *logsOnlyTracer) StartSpan(ctx context.Context, operationName string, opts ...interface{}) (context.Context, tab.Spanner) {
-	return ctx, new(logsOnlySpanner)
+	return ctx, &logsOnlySpanner{nt.logger}
 }
 
 // StartSpanWithRemoteParent returns the input context and a no-op Spanner
 func (nt *logsOnlyTracer) StartSpanWithRemoteParent(ctx context.Context, operationName string, carrier tab.Carrier, opts ...interface{}) (context.Context, tab.Spanner) {
-	return ctx, new(logsOnlySpanner)
+	return ctx, &logsOnlySpanner{nt.logger}
 }
 
 // FromContext returns a no-op Spanner without regard to the input context
 func (nt *logsOnlyTracer) FromContext(ctx context.Context) tab.Spanner {
-	return new(logsOnlySpanner)
+	return &logsOnlySpanner{nt.logger}
 }
 
 // NewContext returns the parent context
@@ -70,7 +62,9 @@ func (nt *logsOnlyTracer) NewContext(parent context.Context, span tab.Spanner) c
 
 // logsOnlySpanner is a Spanner implementation that focuses
 // on logging only.
-type logsOnlySpanner struct{}
+type logsOnlySpanner struct {
+	logger *logp.Logger
+}
 
 // AddAttributes is a no-op
 func (ns *logsOnlySpanner) AddAttributes(attributes ...tab.Attribute) {}
@@ -80,7 +74,7 @@ func (ns *logsOnlySpanner) End() {}
 
 // Logger returns a Logger implementation
 func (ns *logsOnlySpanner) Logger() tab.Logger {
-	return &logpLogger{logp.L()}
+	return &logpLogger{ns.logger}
 }
 
 // Inject is no-op
