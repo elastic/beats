@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/recording-trace.html
+applies_to:
+  stack: ga
 ---
 
 # Record a trace [recording-trace]

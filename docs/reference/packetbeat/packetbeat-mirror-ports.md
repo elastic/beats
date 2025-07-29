@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-mirror-ports.html
+applies_to:
+  stack: ga
 ---
 
 # Packetbeat doesn't see any packets when using mirror ports [packetbeat-mirror-ports]

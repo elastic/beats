@@ -2,6 +2,8 @@
 navigation_title: "Secure"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/securing-metricbeat.html
+applies_to:
+  stack: ga
 ---
 
 # Secure Metricbeat [securing-metricbeat]
