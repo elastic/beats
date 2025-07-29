@@ -31,7 +31,6 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestProcessStatusReporter(t *testing.T) {
@@ -120,7 +119,7 @@ func TestProcessStatusReporter(t *testing.T) {
 		if err := cfg.Unpack(&c); err != nil {
 			return nil, err
 		}
-		return management.NewV2AgentManagerWithClient(c, registry, client, logptest.NewTestingLogger(t, ""), management.WithStopOnEmptyUnits)
+		return management.NewV2AgentManagerWithClient(c, registry, client, logp.NewNopLogger(), management.WithStopOnEmptyUnits)
 	})
 
 	go func() {
