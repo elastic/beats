@@ -20,7 +20,6 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"sync"
 	"sync/atomic"
 	"testing"
 
@@ -424,7 +423,6 @@ type logGenerator struct {
 	f           *os.File
 	filePattern string
 	sequenceNum int64
-	mu          sync.Mutex
 }
 
 func newLogGenerator(t *testing.T, tmpDir string) *logGenerator {
@@ -447,11 +445,8 @@ func (g *logGenerator) Stop() {
 }
 
 func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
-	// Generate may be called concurrently.
 	id := receivertest.UniqueIDAttrVal(strconv.FormatInt(atomic.AddInt64(&g.sequenceNum, 1), 10))
 
-	g.mu.Lock()
-	defer g.mu.Unlock()
 	_, err := fmt.Fprintln(g.f, `{"id": "`+id+`", "message": "log message"}`)
 	require.NoError(g.t, err, "failed to write log line to file")
 	require.NoError(g.t, g.f.Sync(), "failed to sync log file")
@@ -461,7 +456,6 @@ func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
 
 func TestConsumeContract(t *testing.T) {
 	tmpDir := t.TempDir()
-	// TODO(mauri870): why setting this to a bigger number such as 100 or more causes multiple events to not be delivered?
 	const logsPerTest = 100
 
 	gen := newLogGenerator(t, tmpDir)
