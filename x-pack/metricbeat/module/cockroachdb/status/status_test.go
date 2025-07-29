@@ -27,7 +27,6 @@ func init() {
 }
 
 func TestEventMapping(t *testing.T) {
-	logp.TestingSetup()
 
 	mbtest.TestDataFiles(t, "cockroachdb", "status")
 }
