@@ -18,12 +18,9 @@
 package ech
 
 import (
-	"bytes"
-	"context"
 	"debug/buildinfo"
 	"os"
 	"os/exec"
-	"path"
 	"regexp"
 	"runtime"
 	"strings"
@@ -34,37 +31,42 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/go-elasticsearch/v8"
+
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
 // VerifyEnvVars ensures that the env vars to connect to ES are set, and that the ES_HOST starts with https
 func VerifyEnvVars(t *testing.T) {
 	t.Helper()
 	esHost := os.Getenv("ES_HOST")
-	require.NotEmpty(t, esHost, "Expected env var ES_HOST to be not-empty.")
-	require.Regexp(t, regexp.MustCompile(`^https://`), esHost)
+	assert.NotEmpty(t, esHost, "Expected env var ES_HOST to be not-empty.")
+	assert.Regexp(t, regexp.MustCompile(`^https://`), esHost)
 	esUser := os.Getenv("ES_USER")
-	require.NotEmpty(t, esUser, "Expected env var ES_USER to be not-empty.")
+	assert.NotEmpty(t, esUser, "Expected env var ES_USER to be not-empty.")
 	esPass := os.Getenv("ES_PASS")
-	require.NotEmpty(t, esPass, "Expected env var ES_PASS to be not-empty.")
+	assert.NotEmpty(t, esPass, "Expected env var ES_PASS to be not-empty.")
+	if t.Failed() {
+		t.Fatal("Missing expected env var.") // stop test if an assertion fails
+	}
 }
 
 // VerifyFIPSBinary ensures the binary on binaryPath has FIPS indicators.
 func VerifyFIPSBinary(t *testing.T, binaryPath string) {
 	t.Helper()
 	info, err := buildinfo.ReadFile(binaryPath)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	var checkLinks, foundTags, foundExperiment bool
 	for _, setting := range info.Settings {
 		switch setting.Key {
 		case "-tags":
 			foundTags = true
-			require.Contains(t, setting.Value, "requirefips")
-			require.Contains(t, setting.Value, "ms_tls13kdf")
+			assert.Contains(t, setting.Value, "requirefips")
+			assert.Contains(t, setting.Value, "ms_tls13kdf")
 			continue
 		case "GOEXPERIMENT":
 			foundExperiment = true
-			require.Contains(t, setting.Value, "systemcrypto")
+			assert.Contains(t, setting.Value, "systemcrypto")
 			continue
 		case "-ldflags":
 			if !strings.Contains(setting.Value, "-s") {
@@ -73,44 +75,28 @@ func VerifyFIPSBinary(t *testing.T, binaryPath string) {
 		}
 	}
 
-	require.True(t, foundTags, "did not find build tags")
-	require.True(t, foundExperiment, "did not find GOEXPERIMENT")
+	assert.True(t, foundTags, "did not find build tags")
+	assert.True(t, foundExperiment, "did not find GOEXPERIMENT")
 
 	if checkLinks && runtime.GOOS == "linux" {
 		t.Log("Binary is not stripped, checking for OpenSSL in the symbols table.")
 		output, err := exec.CommandContext(t.Context(), "go", "tool", "nm", binaryPath).Output()
-		require.NoError(t, err, "unable to run go tool nm")
-		require.Contains(t, output, "OpenSSL_version", "Unable to find OpenSSL_version in symbols link")
+		assert.NoError(t, err, "unable to run go tool nm")
+		assert.Contains(t, output, "OpenSSL_version", "Unable to find OpenSSL_version in symbols link")
+	}
+	if t.Failed() {
+		t.Fatal("Unable to verify FIPS binary.") // stop test if non-FIPS binary is used.
 	}
 }
 
 // RunSmokeTest runs the beat on binaryPath with the passed config, and ensures that data ends up in Elasticsearch.
 func RunSmokeTest(t *testing.T, name, binaryPath, cfg string) {
-	// Write config file
-	tempDir := t.TempDir()
-	configFilePath := path.Join(tempDir, name+".yml")
-
-	err := os.WriteFile(configFilePath, []byte(cfg), 0o644)
-	require.NoError(t, err, "unable to write ", configFilePath)
+	proc := integration.NewStandardBeat(t, name, binaryPath)
+	proc.WriteConfigFile(cfg)
 
 	// start binary
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-	ctx, cancel := context.WithCancel(t.Context())
-	cmd := exec.CommandContext(ctx, binaryPath, "-c", configFilePath)
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	defer func() {
-		cancel()
-		err := cmd.Wait()
-		if t.Failed() {
-			t.Logf("%s exited. err: %v\nstdout: %s\nstderr: %s\n", name, err, stdout.String(), stderr.String())
-		}
-	}()
-
-	err = cmd.Start()
-	require.NoError(t, err, "unable to start ", name)
+	proc.Start()
+	defer proc.Stop()
 
 	// ensure data ends up in ES
 	es, err := elasticsearch.NewTypedClient(elasticsearch.Config{
