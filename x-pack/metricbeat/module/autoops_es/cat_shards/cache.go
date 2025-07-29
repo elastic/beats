@@ -5,9 +5,9 @@
 package cat_shards
 
 import (
+	"maps"
+	"slices"
 	"time"
-
-	"golang.org/x/exp/maps"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 )
@@ -101,7 +101,7 @@ func enrichNodeIndexShards(nodeIndexShardsMap map[string]NodeIndexShards, indexM
 		timestampDiff = &diff
 	}
 
-	nodeIndexShardsList := maps.Values(nodeIndexShardsMap)
+	nodeIndexShardsList := slices.Collect(maps.Values(nodeIndexShardsMap))
 
 	for i := range nodeIndexShardsList {
 		nodeIndexShardsList[i].TotalFractions = size
