@@ -20,6 +20,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 
@@ -423,6 +424,7 @@ type logGenerator struct {
 	f           *os.File
 	filePattern string
 	sequenceNum int64
+	mu          sync.Mutex
 }
 
 func newLogGenerator(t *testing.T, tmpDir string) *logGenerator {
@@ -448,11 +450,12 @@ func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
 	// Generate may be called concurrently.
 	id := receivertest.UniqueIDAttrVal(strconv.FormatInt(atomic.AddInt64(&g.sequenceNum, 1), 10))
 
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	_, err := fmt.Fprintln(g.f, `{"id": "`+id+`", "message": "log message"}`)
 	require.NoError(g.t, err, "failed to write log line to file")
 	require.NoError(g.t, g.f.Sync(), "failed to sync log file")
 
-	// And return the ids for bookkeeping by the test.
 	return []receivertest.UniqueIDAttrVal{id}
 }
 
