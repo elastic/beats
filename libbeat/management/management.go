@@ -80,7 +80,7 @@ type Manager interface {
 }
 
 // ManagerFactory is the factory type for creating a config manager
-type ManagerFactory func(*config.C, *reload.Registry, *logp.Logger) (Manager, error)
+type ManagerFactory func(*config.C, *reload.Registry) (Manager, error)
 
 // If managerFactory is non-nil, NewManager will use it to create the
 // beats manager. managerFactoryLock must be held to access managerFactory.
@@ -98,7 +98,7 @@ func NewManager(cfg *config.C, registry *reload.Registry, logger *logp.Logger) (
 		managerFactoryLock.Lock()
 		defer managerFactoryLock.Unlock()
 		if managerFactory != nil {
-			return managerFactory(cfg, registry, logger)
+			return managerFactory(cfg, registry)
 		}
 	}
 	return &fallbackManager{

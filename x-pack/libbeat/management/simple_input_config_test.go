@@ -19,7 +19,6 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestSimpleInputConfig(t *testing.T) {
@@ -142,7 +141,6 @@ func TestSimpleInputConfig(t *testing.T) {
 		},
 		r,
 		client,
-		logptest.NewTestingLogger(t, ""),
 	)
 	if err != nil {
 		t.Fatalf("could not instantiate ManagerV2: %s", err)

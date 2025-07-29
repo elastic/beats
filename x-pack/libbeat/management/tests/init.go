@@ -19,7 +19,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // InitBeatsForTest tinkers with a bunch of global variables so beats will start up properly in a test environment
@@ -39,12 +38,12 @@ func InitBeatsForTest(t *testing.T, beatRoot *cmd.BeatsRootCmd) {
 }
 
 func fleetClientFactory(srv MockV2Handler) lbmanagement.ManagerFactory {
-	return func(cfg *conf.C, registry *reload.Registry, logger *logp.Logger) (lbmanagement.Manager, error) {
+	return func(cfg *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
 		c := management.DefaultConfig()
 		if err := cfg.Unpack(&c); err != nil {
 			return nil, err
 		}
-		return management.NewV2AgentManagerWithClient(c, registry, srv.Client, logger, management.WithStopOnEmptyUnits)
+		return management.NewV2AgentManagerWithClient(c, registry, srv.Client, management.WithStopOnEmptyUnits)
 	}
 }
 
