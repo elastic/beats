@@ -14,6 +14,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+func init() {
+
+}
+
 // logsOnlyTracer manages the creation of the required
 // Spanners and Loggers with the goal of deferring logging
 // to the `logp` package.

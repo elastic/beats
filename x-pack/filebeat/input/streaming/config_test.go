@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var configTests = []struct {
@@ -218,7 +217,6 @@ var configTests = []struct {
 }
 
 func TestConfig(t *testing.T) {
-	logp.TestingSetup()
 	for _, test := range configTests {
 		t.Run(test.name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(test.config)
@@ -226,7 +224,6 @@ func TestConfig(t *testing.T) {
 			// Make sure we pass the redact requirement.
 			conf.Redact = &redact{}
 			err := cfg.Unpack(&conf)
-
 			switch {
 			case err == nil && test.wantErr != nil:
 				t.Fatalf("expected error unpacking config: %v", test.wantErr)

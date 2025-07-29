@@ -105,7 +105,7 @@ func TestProcessStatusReporter(t *testing.T) {
 		},
 	}
 	require.NoError(t, server.Start(), "could not start V2 mock server")
-	defer server.Stop()
+	t.Cleanup(server.Stop)
 
 	// start the client
 	client := client.NewV2(fmt.Sprintf(":%d", server.Port), token, client.VersionInfo{

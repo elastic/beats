@@ -5,13 +5,16 @@
 package streaming
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/url"
+	"regexp"
 	"time"
 
 	"golang.org/x/oauth2"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -156,6 +159,16 @@ func (c config) Validate() error {
 		return fmt.Errorf("failed to check regular expressions: %w", err)
 	}
 
+	var patterns map[string]*regexp.Regexp
+	if len(c.Regexps) != 0 {
+		patterns = map[string]*regexp.Regexp{".": nil}
+	}
+	if c.Program != "" {
+		_, _, err = newProgram(context.Background(), c.Program, root, patterns, logp.L().Named("input.websocket"))
+		if err != nil {
+			return fmt.Errorf("failed to check program: %w", err)
+		}
+	}
 	err = checkURLScheme(c)
 	if err != nil {
 		return err

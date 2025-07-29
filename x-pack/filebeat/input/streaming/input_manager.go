@@ -5,10 +5,6 @@
 package streaming
 
 import (
-	"context"
-	"fmt"
-	"regexp"
-
 	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -47,10 +43,7 @@ func cursorConfigure(cfg *conf.C, logger *logp.Logger) ([]inputcursor.Source, in
 		return nil, nil, err
 	}
 
-	if err := src.cfg.checkUnsupportedParams(logger); err != nil {
-		return nil, nil, err
-	}
-
+	src.cfg.checkUnsupportedParams(logger)
 	if src.cfg.Program == "" {
 		// set default program
 		src.cfg.Program = `
@@ -65,22 +58,11 @@ func cursorConfigure(cfg *conf.C, logger *logp.Logger) ([]inputcursor.Source, in
 }
 
 // checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
-func (c config) checkUnsupportedParams(logger *logp.Logger) error {
+func (c config) checkUnsupportedParams(logger *logp.Logger) {
 	if c.Redact == nil {
 		logger.Named("websocket").Warn("missing recommended 'redact' configuration: " +
 			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-websocket.html#_redact")
 	}
-	var patterns map[string]*regexp.Regexp
-	if len(c.Regexps) != 0 {
-		patterns = map[string]*regexp.Regexp{".": nil}
-	}
-	if c.Program != "" {
-		_, _, err := newProgram(context.Background(), c.Program, root, patterns, logger.Named("input.websocket"))
-		if err != nil {
-			return fmt.Errorf("failed to check program: %w", err)
-		}
-	}
-	return nil
 }
 
 type source struct{ cfg config }
