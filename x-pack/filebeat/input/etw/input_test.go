@@ -318,6 +318,12 @@ func Test_buildEvent(t *testing.T) {
 		{
 			name: "TestStandardData",
 			event: etw.RenderedEtwEvent{
+				ProviderGUID: windows.GUID{
+					Data1: 0x12345678,
+					Data2: 0x1234,
+					Data3: 0x1234,
+					Data4: [8]byte{0x12, 0x34, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc},
+				},
 				ProcessID:   60,
 				Opcode:      "foo",
 				OpcodeRaw:   50,
@@ -365,12 +371,6 @@ func Test_buildEvent(t *testing.T) {
 				},
 			},
 			session: &etw.Session{
-				GUID: windows.GUID{
-					Data1: 0x12345678,
-					Data2: 0x1234,
-					Data3: 0x1234,
-					Data4: [8]byte{0x12, 0x34, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc},
-				},
 				Name: "Elastic-TestProvider",
 			},
 			cfg: config{
@@ -407,6 +407,12 @@ func Test_buildEvent(t *testing.T) {
 			// This case tests an unmapped severity, empty provider GUID and including logfile
 			name: "TestAlternativeMetadata",
 			event: etw.RenderedEtwEvent{
+				ProviderGUID: windows.GUID{
+					Data1: 0x12345678,
+					Data2: 0x1234,
+					Data3: 0x1234,
+					Data4: [8]byte{0x12, 0x34, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc},
+				},
 				ProcessID:   60,
 				Opcode:      "foo",
 				OpcodeRaw:   50,
@@ -445,12 +451,6 @@ func Test_buildEvent(t *testing.T) {
 				},
 			},
 			session: &etw.Session{
-				GUID: windows.GUID{
-					Data1: 0x12345678,
-					Data2: 0x1234,
-					Data3: 0x1234,
-					Data4: [8]byte{0x12, 0x34, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc},
-				},
 				Name: "Elastic-TestProvider",
 			},
 			cfg: config{

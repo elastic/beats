@@ -9,6 +9,7 @@ package etw
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"syscall"
 	"unsafe"
 
@@ -21,7 +22,6 @@ import (
 // When running tests, these variables point to a mock function
 var (
 	guidFromProviderNameFunc = guidFromProviderName
-	setSessionGUIDFunc       = setSessionGUID
 
 	// EventTraceGuid is the well-known GUID for ETW trace header events.
 	// {68FDD900-4A3E-11D1-84F4-0000F80464E3}
@@ -39,40 +39,25 @@ type Session struct {
 	// Name is the identifier for the session.
 	// It is used to identify the session in logs and also for Windows processes.
 	Name string
-	// GUID is the provider GUID to configure the session.
-	GUID windows.GUID
-	// properties of the session that are initialized in newSessionProperties()
-	// See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-event_trace_properties for more information
-	properties *EventTraceProperties
-	// Enable properties for the session
-	enableProperty []string
-	// handler of the event tracing session for which the provider is being configured.
-	// It is obtained from StartTrace when a new trace is started.
-	// This handler is needed to enable, query or stop the trace.
-	handler uintptr
 	// Realtime is a flag to know if the consumer reads from a logfile or real-time session.
 	Realtime bool
 	// NewSession is a flag to indicate whether a new session has been created or attached to an existing one.
 	NewSession bool
-	// TraceLevel sets the maximum level of events that we want the provider to write.
-	traceLevel uint8
-	// matchAnyKeyword is a 64-bit bitmask of keywords that determine the categories of events that we want the provider to write.
-	// The provider writes an event if the event's keyword bits match any of the bits set in this value
-	// or if the event has no keyword bits set, in addition to meeting the level and matchAllKeyword criteria.
-	matchAnyKeyword uint64
-	// matchAllKeyword is a 64-bit bitmask of keywords that restricts the events that we want the provider to write.
-	// The provider typically writes an event if the event's keyword bits match all of the bits set in this value
-	// or if the event has no keyword bits set, in addition to meeting the level and matchAnyKeyword criteria.
-	matchAllKeyword uint64
-	// traceHandler is the trace processing handle.
-	// It is used to control the trace that receives and processes events.
-	traceHandler uint64
 	// Callback is the pointer to EventRecordCallback which receives and processes event trace events.
 	Callback func(*EventRecord) uintptr
 	// BufferCallback is the pointer to BufferCallback which processes retrieved metadata about the ETW buffers (optional).
 	BufferCallback func(*EventTraceLogfile) uintptr
 
-	metadataCache *metadataCache
+	// properties of the session that are initialized in newSessionProperties()
+	// See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-event_trace_properties for more information
+	properties *EventTraceProperties
+	// handler of the event tracing session for which the provider is being configured.
+	// It is obtained from StartTrace when a new trace is started.
+	// This handler is needed to enable, query or stop the trace.
+	handler uintptr
+	// traceHandler is the trace processing handle.
+	// It is used to control the trace that receives and processes events.
+	traceHandler uint64
 
 	// Pointers to functions that make calls to the Windows API.
 	// In tests, these pointers can be replaced with mock functions to simulate API behavior without making actual calls to the Windows API.
@@ -82,6 +67,9 @@ type Session struct {
 	closeTrace   func(traceHandle uint64) error
 	openTrace    func(elf *EventTraceLogfile) (uint64, error)
 	processTrace func(handleArray *uint64, handleCount uint32, startTime *FileTime, endTime *FileTime) error
+
+	config        Config
+	metadataCache *metadataCache
 }
 
 // setSessionName determines the session name based on the provided configuration.
@@ -93,33 +81,16 @@ func setSessionName(conf Config) string {
 		}
 	}
 
-	if conf.ProviderName != "" {
-		return fmt.Sprintf("Elastic-%s", conf.ProviderName)
-	}
-
-	return fmt.Sprintf("Elastic-%s", conf.ProviderGUID)
-}
-
-// setSessionGUID determines the session GUID based on the provided configuration.
-func setSessionGUID(conf Config) (windows.GUID, error) {
-	var guid windows.GUID
-	var err error
-
-	// If ProviderGUID is not set in the configuration, attempt to resolve it using the provider name.
-	if conf.ProviderGUID == "" {
-		guid, err = guidFromProviderNameFunc(conf.ProviderName)
-		if err != nil {
-			return windows.GUID{}, fmt.Errorf("error resolving GUID: %w", err)
-		}
-	} else {
-		// If ProviderGUID is set, parse it into a GUID structure.
-		guid, err = windows.GUIDFromString(conf.ProviderGUID)
-		if err != nil {
-			return windows.GUID{}, fmt.Errorf("error parsing Windows GUID: %w", err)
+	var nameGUIDs []string
+	for _, provider := range conf.Providers {
+		if provider.Name != "" {
+			nameGUIDs = append(nameGUIDs, provider.Name)
+		} else if provider.GUID != "" {
+			nameGUIDs = append(nameGUIDs, provider.GUID)
 		}
 	}
 
-	return guid, nil
+	return fmt.Sprintf("Elastic-%s", strings.Join(nameGUIDs, "-"))
 }
 
 // getTraceLevel converts a string representation of a trace level
@@ -173,14 +144,13 @@ func newSessionProperties(sessionName string, conf Config) *EventTraceProperties
 	sessionProperties.MinimumBuffers = conf.MinimumBuffers
 	sessionProperties.MaximumBuffers = conf.MaximumBuffers
 	sessionProperties.LoggerNameOffset = uint32(unsafe.Sizeof(EventTraceProperties{})) // Offset to the logger name
-
 	return sessionProperties
 }
 
 // NewSession initializes and returns a new ETW Session based on the provided configuration.
 func NewSession(conf Config) (*Session, error) {
 	session := &Session{
-		enableProperty: conf.EnableProperty,
+		config: conf,
 	}
 
 	// Assign ETW Windows API functions
@@ -207,17 +177,8 @@ func NewSession(conf Config) (*Session, error) {
 
 	session.NewSession = true // Indicate this is a new session
 
-	var err error
-	session.GUID, err = setSessionGUIDFunc(conf)
-	if err != nil {
-		return nil, fmt.Errorf("error when initializing session '%s': %w", session.Name, err)
-	}
-
 	// Initialize additional session properties.
 	session.properties = newSessionProperties(session.Name, conf)
-	session.traceLevel = getTraceLevel(conf.TraceLevel)
-	session.matchAnyKeyword = conf.MatchAnyKeyword
-	session.matchAllKeyword = conf.MatchAllKeyword
 
 	return session, nil
 }

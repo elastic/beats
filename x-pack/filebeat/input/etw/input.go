@@ -243,8 +243,6 @@ func buildEvent(etwEvent etw.RenderedEtwEvent, h etw.EventHeader, session *etw.S
 	// Handle provider GUID with fallback to session GUID
 	if etwEvent.ProviderGUID != zeroGUID {
 		winlog["provider_guid"] = etwEvent.ProviderGUID.String()
-	} else if session.GUID != zeroGUID {
-		winlog["provider_guid"] = session.GUID.String()
 	}
 
 	eventData := mapstr.M{}

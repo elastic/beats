@@ -60,18 +60,22 @@ type config struct {
 
 func convertConfig(cfg config) etw.Config {
 	return etw.Config{
-		Logfile:         cfg.Logfile,
-		ProviderGUID:    cfg.ProviderGUID,
-		ProviderName:    cfg.ProviderName,
-		SessionName:     cfg.SessionName,
-		TraceLevel:      cfg.TraceLevel,
-		MatchAnyKeyword: cfg.MatchAnyKeyword,
-		MatchAllKeyword: cfg.MatchAllKeyword,
-		Session:         cfg.Session,
-		EnableProperty:  cfg.EnableProperty,
-		BufferSize:      cfg.BufferSize,
-		MinimumBuffers:  cfg.MinimumBuffers,
-		MaximumBuffers:  cfg.MaximumBuffers,
+		Logfile:        cfg.Logfile,
+		SessionName:    cfg.SessionName,
+		Session:        cfg.Session,
+		BufferSize:     cfg.BufferSize,
+		MinimumBuffers: cfg.MinimumBuffers,
+		MaximumBuffers: cfg.MaximumBuffers,
+		Providers: []etw.ProviderConfig{
+			{
+				GUID:            cfg.ProviderGUID,
+				Name:            cfg.ProviderName,
+				TraceLevel:      cfg.TraceLevel,
+				MatchAnyKeyword: cfg.MatchAnyKeyword,
+				MatchAllKeyword: cfg.MatchAllKeyword,
+				EnableProperty:  cfg.EnableProperty,
+			},
+		},
 	}
 }
 

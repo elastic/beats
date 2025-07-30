@@ -80,7 +80,6 @@ func (p *eventRenderer) render() (RenderedEtwEvent, error) {
 	}
 
 	// Parse ExtendedData if present
-
 	if p.r.ExtendedDataCount > 0 && p.r.ExtendedData != nil {
 		for i := 0; i < int(p.r.ExtendedDataCount); i++ {
 			item := (*EventHeaderExtendedDataItem)(unsafe.Pointer(
@@ -322,37 +321,35 @@ func getElementLength(eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo, 
 	return 0, nil
 }
 
+var extendedDataHandlers = map[uint16]func(*EventHeaderExtendedDataItem) any{
+	EVENT_HEADER_EXT_TYPE_RELATED_ACTIVITYID: parseGUID,
+	EVENT_HEADER_EXT_TYPE_SID:                parseSID,
+	EVENT_HEADER_EXT_TYPE_TS_ID:              parseUint32,
+	EVENT_HEADER_EXT_TYPE_INSTANCE_INFO:      parseUint64,
+	EVENT_HEADER_EXT_TYPE_STACK_TRACE32:      parseUint32Slice,
+	EVENT_HEADER_EXT_TYPE_STACK_TRACE64:      parseUint64Slice,
+	EVENT_HEADER_EXT_TYPE_PEBS_INDEX:         parseUint64,
+	EVENT_HEADER_EXT_TYPE_PMC_COUNTERS:       parseUint64Slice,
+	EVENT_HEADER_EXT_TYPE_PSM_KEY:            parseUint64,
+	EVENT_HEADER_EXT_TYPE_EVENT_KEY:          parseUint64,
+	EVENT_HEADER_EXT_TYPE_EVENT_SCHEMA_TL:    parseByteSlice,
+	EVENT_HEADER_EXT_TYPE_PROV_TRAITS:        parseByteSlice,
+	EVENT_HEADER_EXT_TYPE_PROCESS_START_KEY:  parseUint64,
+	EVENT_HEADER_EXT_TYPE_QPC_DELTA:          parseUint64,
+	EVENT_HEADER_EXT_TYPE_CONTAINER_ID:       parseGUID,
+}
+
 func renderExtendedData(item *EventHeaderExtendedDataItem) RenderedExtendedData {
 	data := RenderedExtendedData{
 		ExtType:    extTypeToStr(item.ExtType),
 		ExtTypeRaw: item.ExtType,
 		DataSize:   item.DataSize,
 	}
-
-	handlers := map[uint16]func(*EventHeaderExtendedDataItem) any{
-		EVENT_HEADER_EXT_TYPE_RELATED_ACTIVITYID: parseGUID,
-		EVENT_HEADER_EXT_TYPE_SID:                parseSID,
-		EVENT_HEADER_EXT_TYPE_TS_ID:              parseUint32,
-		EVENT_HEADER_EXT_TYPE_INSTANCE_INFO:      parseUint64,
-		EVENT_HEADER_EXT_TYPE_STACK_TRACE32:      parseUint32Slice,
-		EVENT_HEADER_EXT_TYPE_STACK_TRACE64:      parseUint64Slice,
-		EVENT_HEADER_EXT_TYPE_PEBS_INDEX:         parseUint64,
-		EVENT_HEADER_EXT_TYPE_PMC_COUNTERS:       parseUint64Slice,
-		EVENT_HEADER_EXT_TYPE_PSM_KEY:            parseUint64,
-		EVENT_HEADER_EXT_TYPE_EVENT_KEY:          parseUint64,
-		EVENT_HEADER_EXT_TYPE_EVENT_SCHEMA_TL:    parseByteSlice,
-		EVENT_HEADER_EXT_TYPE_PROV_TRAITS:        parseByteSlice,
-		EVENT_HEADER_EXT_TYPE_PROCESS_START_KEY:  parseUint64,
-		EVENT_HEADER_EXT_TYPE_QPC_DELTA:          parseUint64,
-		EVENT_HEADER_EXT_TYPE_CONTAINER_ID:       parseGUID,
-	}
-
-	if handler, ok := handlers[item.ExtType]; ok {
+	if handler, ok := extendedDataHandlers[item.ExtType]; ok {
 		data.Data = handler(item)
 	} else {
 		data.Data = fmt.Sprintf("Unknown ExtType: %d", item.ExtType)
 	}
-
 	return data
 }
 

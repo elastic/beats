@@ -137,11 +137,7 @@ func parseGUID(item *EventHeaderExtendedDataItem) any {
 func parseSID(item *EventHeaderExtendedDataItem) any {
 	sid := (*windows.SID)(unsafe.Pointer(uintptr(item.DataPtr)))
 	if sid != nil {
-		account, domain, _, err := sid.LookupAccount("")
-		if err == nil {
-			return fmt.Sprintf("%s\\%s", domain, account)
-		}
-		return fmt.Sprintf("SID lookup failed: %v", err)
+		return sid.String()
 	}
 	return "SID is nil"
 }

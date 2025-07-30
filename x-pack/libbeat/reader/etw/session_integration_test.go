@@ -31,24 +31,26 @@ var (
 // createTestSessionConfig creates a standard session configuration for tests
 func createTestSessionConfig(sessionName string) Config {
 	return Config{
-		ProviderGUID:    testProviderGUID,
-		ProviderName:    testProviderName,
-		TraceLevel:      "verbose",
-		MatchAnyKeyword: 0xFFFFFFFFFFFFFFFF,
-		SessionName:     sessionName,
-		BufferSize:      1024,
-		MinimumBuffers:  10,
-		MaximumBuffers:  10,
+		Providers: []ProviderConfig{
+			{
+				GUID:            testProviderGUID,
+				Name:            testProviderName,
+				TraceLevel:      "verbose",
+				MatchAnyKeyword: 0xFFFFFFFFFFFFFFFF,
+			},
+		},
+		SessionName:    sessionName,
+		BufferSize:     1024,
+		MinimumBuffers: 10,
+		MaximumBuffers: 10,
 	}
 }
 
 // createETLSessionConfig creates a session configuration for ETL file reading
 func createETLSessionConfig(sessionName string) Config {
 	return Config{
-		Logfile:         "./testdata/sample-test-events.etl",
-		TraceLevel:      "verbose",
-		MatchAnyKeyword: 0xFFFFFFFFFFFFFFFF,
-		SessionName:     sessionName,
+		Logfile:     "./testdata/sample-test-events.etl",
+		SessionName: sessionName,
 	}
 }
 

@@ -10,6 +10,8 @@ import (
 	"errors"
 	"fmt"
 	"syscall"
+
+	"golang.org/x/sys/windows"
 )
 
 // AttachToExistingSession queries the status of an existing ETW session.
@@ -54,7 +56,6 @@ func (s *Session) CreateRealtimeSession() error {
 	err = s.startTrace(&s.handler, sessionPtr, s.properties)
 	switch {
 	case err == nil:
-
 	// Handle specific errors related to starting the trace session.
 	case errors.Is(err, ERROR_ALREADY_EXISTS):
 		return fmt.Errorf("session already exists: %w", err)
@@ -63,32 +64,39 @@ func (s *Session) CreateRealtimeSession() error {
 	default:
 		return fmt.Errorf("failed to start trace: %w", err)
 	}
+	for _, provider := range s.config.Providers {
+		// Set additional parameters for trace enabling.
+		// See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-enable_trace_parameters#members
+		params := EnableTraceParameters{
+			EnableProperty: computeStringEnableProperty(provider.EnableProperty),
+			Version:        2, // ENABLE_TRACE_PARAMETERS_VERSION_2
+		}
 
-	// Set additional parameters for trace enabling.
-	// See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-enable_trace_parameters#members
-	params := EnableTraceParameters{
-		EnableProperty: computeStringEnableProperty(s.enableProperty),
-		Version:        2, // ENABLE_TRACE_PARAMETERS_VERSION_2
+		// Zero timeout means asynchronous enablement
+		const timeout = 0
+
+		guid, err := getProviderGUID(provider)
+		if err != nil {
+			return fmt.Errorf("error parsing GUID: %w", err)
+		}
+
+		// Enable the trace session with extended options.
+		err = s.enableTrace(s.handler, &guid, EVENT_CONTROL_CODE_ENABLE_PROVIDER, getTraceLevel(provider.TraceLevel), provider.MatchAnyKeyword, provider.MatchAllKeyword, timeout, &params)
+		switch {
+		case err == nil:
+			continue
+		// Handle specific errors related to enabling the trace session.
+		case errors.Is(err, ERROR_INVALID_PARAMETER):
+			return fmt.Errorf("invalid parameters when enabling session trace: %w", err)
+		case errors.Is(err, ERROR_TIMEOUT):
+			return fmt.Errorf("timeout value expired before the enable callback completed: %w", err)
+		case errors.Is(err, ERROR_NO_SYSTEM_RESOURCES):
+			return fmt.Errorf("exceeded the number of trace sessions that can enable the provider: %w", err)
+		default:
+			return fmt.Errorf("failed to enable trace: %w", err)
+		}
 	}
-
-	// Zero timeout means asynchronous enablement
-	const timeout = 0
-
-	// Enable the trace session with extended options.
-	err = s.enableTrace(s.handler, &s.GUID, EVENT_CONTROL_CODE_ENABLE_PROVIDER, s.traceLevel, s.matchAnyKeyword, s.matchAllKeyword, timeout, &params)
-	switch {
-	case err == nil:
-		return nil
-	// Handle specific errors related to enabling the trace session.
-	case errors.Is(err, ERROR_INVALID_PARAMETER):
-		return fmt.Errorf("invalid parameters when enabling session trace: %w", err)
-	case errors.Is(err, ERROR_TIMEOUT):
-		return fmt.Errorf("timeout value expired before the enable callback completed: %w", err)
-	case errors.Is(err, ERROR_NO_SYSTEM_RESOURCES):
-		return fmt.Errorf("exceeded the number of trace sessions that can enable the provider: %w", err)
-	default:
-		return fmt.Errorf("failed to enable trace: %w", err)
-	}
+	return nil
 }
 
 // StopSession closes the ETW session and associated handles if they were created.
@@ -119,4 +127,26 @@ func (s *Session) StopSession() error {
 
 func isValidHandler(handler uint64) bool {
 	return handler != 0 && handler != INVALID_PROCESSTRACE_HANDLE
+}
+
+// getProviderGUID determines the GUID based on the provided configuration.
+func getProviderGUID(conf ProviderConfig) (windows.GUID, error) {
+	var guid windows.GUID
+	var err error
+
+	// If ProviderGUID is not set in the configuration, attempt to resolve it using the provider name.
+	if conf.GUID == "" {
+		guid, err = guidFromProviderNameFunc(conf.Name)
+		if err != nil {
+			return windows.GUID{}, fmt.Errorf("error resolving GUID: %w", err)
+		}
+	} else {
+		// If ProviderGUID is set, parse it into a GUID structure.
+		guid, err = windows.GUIDFromString(conf.GUID)
+		if err != nil {
+			return windows.GUID{}, fmt.Errorf("error parsing Windows GUID: %w", err)
+		}
+	}
+
+	return guid, nil
 }
