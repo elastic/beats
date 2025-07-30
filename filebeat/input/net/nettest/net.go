@@ -21,6 +21,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"net/http"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -45,6 +47,8 @@ func RunUDPClient(t *testing.T, address string, data []string) {
 		_, err = conn.Write([]byte(data + "\n"))
 		if err != nil {
 			t.Logf("Error sending data: %s, skipping to next entry", err)
+			time.Sleep(time.Second)
+			continue
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
@@ -88,6 +92,8 @@ FOR:
 	}
 }
 
+// GetNetInputMetrics returns the first input metric from the global
+// input monitoring registry.
 func GetNetInputMetrics(t *testing.T) NetInputMetrics {
 	data, err := inputmon.MetricSnapshotJSON(nil)
 	if err != nil {
@@ -104,6 +110,36 @@ func GetNetInputMetrics(t *testing.T) NetInputMetrics {
 	}
 
 	return metrics[0]
+}
+
+// GetHTTPInputMetrics reads the net input metrics from Filebeat monitoring
+// HTTP endpoint. The input is matched by its ID.
+func GetHTTPInputMetrics(t *testing.T, inputID, addr string) NetInputMetrics {
+	fullURL, err := url.JoinPath(addr, "/inputs/")
+	if err != nil {
+		t.Fatalf("cannot parse URL: %s", err)
+	}
+
+	data, err := http.Get(fullURL)
+	if err != nil {
+		t.Fatalf("cannot fetch metrics: %s", err)
+	}
+	defer data.Body.Close()
+
+	metrics := []NetInputMetrics{}
+
+	if err := json.NewDecoder(data.Body).Decode(&metrics); err != nil {
+		t.Fatalf("cannot unmarshal metrics: %s", err)
+	}
+
+	for _, m := range metrics {
+		if inputID == m.ID {
+			return m
+		}
+	}
+
+	t.Fatalf("no metrics found for %q", inputID)
+	return NetInputMetrics{}
 }
 
 // RequireNetMetricsCount uses require.Eventually to assert
@@ -158,6 +194,7 @@ func RequireNetMetricsCount(t *testing.T, timeout time.Duration, received, publi
 		msg)
 }
 
+// NetInputMetrics holds some metrics published by the net inputs
 type NetInputMetrics struct {
 	ArrivalPeriod        ArrivalPeriod  `json:"arrival_period"`
 	ID                   string         `json:"id"`
@@ -167,14 +204,17 @@ type NetInputMetrics struct {
 	ReceivedEventsTotal  int            `json:"received_events_total"`
 }
 
+// Histogram holds the count of entries in this histogram
 type Histogram struct {
 	Count int `json:"count"`
 }
 
+// ArrivalPeriod holds the arrival period metric
 type ArrivalPeriod struct {
 	Histogram Histogram `json:"histogram"`
 }
 
+// ProcessingTime holds the processing time metric
 type ProcessingTime struct {
 	Histogram Histogram `json:"histogram"`
 }

@@ -22,7 +22,7 @@ filebeat.inputs:
 
 Starting from `9.2.0` the TCP input reads the message in a different
 goroutine than the publishing of messages, this increases the
-performance of the input.
+performance of the input when running slow processors.
 
 ## Configuration options [_configuration_options_20]
 
