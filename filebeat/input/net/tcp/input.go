@@ -76,9 +76,8 @@ type server struct {
 type config struct {
 	tcp.Config `config:",inline"`
 
-	LineDelimiter      string                `config:"line_delimiter" validate:"nonzero"`
-	Framing            streaming.FramingType `config:"framing"`
-	NumPipelineWorkers int                   `config:"number_of_workers" validate:"positive,nonzero"`
+	LineDelimiter string                `config:"line_delimiter" validate:"nonzero"`
+	Framing       streaming.FramingType `config:"framing"`
 }
 
 func newServer(config config) (*server, error) {
@@ -103,7 +102,6 @@ func (s *server) InitMetrics(id string, logger *logp.Logger) netinput.Metrics {
 
 // Run runs the input
 func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, m netinput.Metrics) (err error) {
-	logger := ctx.Logger
 	defer s.metrics.Close()
 
 	split, err := streaming.SplitFunc(s.Framing, []byte(s.LineDelimiter))
@@ -116,11 +114,12 @@ func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, m 
 		&s.Config,
 		streaming.SplitHandlerFactory(
 			inputsource.FamilyTCP,
-			logger,
+			ctx.Logger,
 			tcp.MetadataCallback,
 			func(data []byte, metadata inputsource.NetworkMetadata) {
-				m.EventReceived(len(data), time.Now())
-				logger.Debugw(
+				now := time.Now()
+				m.EventReceived(len(data), now)
+				ctx.Logger.Debugw(
 					"Data received",
 					"bytes", len(data),
 					"remote_address", metadata.RemoteAddr.String(),
@@ -129,18 +128,18 @@ func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, m 
 				evtChan <- netinput.DataMetadata{
 					Data:      data,
 					Metadata:  metadata,
-					Timestamp: time.Now(),
+					Timestamp: now,
 				}
 			},
 			split,
 		),
-		logger,
+		ctx.Logger,
 	)
 	if err != nil {
 		return fmt.Errorf("Failed to start TCP server: %w", err)
 	}
 
-	logger.Debug("tcp input initialized")
+	ctx.Logger.Debug("tcp input initialized")
 	ctx.UpdateStatus(status.Running, "")
 
 	return server.Run(ctxtool.FromCanceller(ctx.Cancelation))

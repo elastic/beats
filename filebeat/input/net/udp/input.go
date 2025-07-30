@@ -28,12 +28,10 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -108,27 +106,12 @@ func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, me
 			"Data received",
 			"bytes", len(data),
 			"remote_address", metadata.RemoteAddr.String(),
-			"truncated", metadata.Truncated,
-		)
-		evt := beat.Event{
-			Timestamp: now,
-			Meta: mapstr.M{
-				"truncated": metadata.Truncated,
-			},
-			Fields: mapstr.M{
-				"message": string(data)},
-		}
-		if metadata.RemoteAddr != nil {
-			evt.Fields["log"] = mapstr.M{
-				"source": mapstr.M{
-					"address": metadata.RemoteAddr.String(),
-				},
-			}
-		}
+			"truncated", metadata.Truncated)
+
 		evtChan <- netinput.DataMetadata{
-			Timestamp: now,
 			Data:      data,
 			Metadata:  metadata,
+			Timestamp: now,
 		}
 	}, logger)
 

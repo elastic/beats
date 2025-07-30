@@ -605,7 +605,7 @@ func (b *BeatProc) WaitForLogs(s string, timeout time.Duration, msgAndArgs ...an
 // The strings can appear in any order. The function will return once all strings
 // have been found or the timeout has been reached.
 // If the timeout is reached before all strings are found, the test will fail with
-// the provided error message and arguments (msgAndArgs).
+// the provided error message and arguments (failMsg).
 func (b *BeatProc) WaitForLogsAnyOrder(msgs []string, timeout time.Duration, failMsg string) {
 	b.t.Helper()
 
@@ -650,7 +650,6 @@ func (b *BeatProc) WaitForLogsAnyOrder(msgs []string, timeout time.Duration, fai
 				}
 			}
 
-			// b.t.Log(msg.String())
 			return allFound
 		},
 		timeout,

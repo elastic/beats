@@ -65,13 +65,12 @@ type Metrics interface {
 }
 
 type manager struct {
-	inputType string
 	configure func(*conf.C) (Input, error)
 }
 
 type config struct {
-	NumPipelineWorkers int    `config:"number_of_workers" validate:"positive,nonzero"`
-	Host               string `config:"host"`
+	NumWorkers int    `config:"number_of_workers" validate:"positive,nonzero"`
+	Host       string `config:"host"`
 }
 
 // DataMetadata contains the data read from the network connection
@@ -104,11 +103,11 @@ func NewManager(fn func(*conf.C) (Input, error)) v2.InputManager {
 // Init Noop, it is required to fulfil the v2.InputManager interface.
 func (*manager) Init(grp unison.Group) error { return nil }
 
-// Create builds a new Input instance from the given configuration
+// Create creates a new Input instance from the given configuration
 // by calling the manager's configure callback, or returns
 // an error if the configuration is invalid.
 func (m *manager) Create(cfg *conf.C) (v2.Input, error) {
-	wrapperCfg := config{NumPipelineWorkers: 1} // Default config
+	wrapperCfg := config{NumWorkers: 1} // Default config
 	if err := cfg.Unpack(&wrapperCfg); err != nil {
 		return nil, err
 	}
@@ -120,11 +119,11 @@ func (m *manager) Create(cfg *conf.C) (v2.Input, error) {
 
 	w := wrapper{
 		inp:                inp,
-		numPipelineWorkers: wrapperCfg.NumPipelineWorkers,
+		numPipelineWorkers: wrapperCfg.NumWorkers,
 		host:               wrapperCfg.Host,
 		// 5 is a magic number, we just need to ensure there is some buffer
 		// in the channel to reduce contingency
-		evtChan: make(chan DataMetadata, wrapperCfg.NumPipelineWorkers*5),
+		evtChan: make(chan DataMetadata, wrapperCfg.NumWorkers*5),
 	}
 
 	return w, nil
@@ -187,7 +186,7 @@ func (w wrapper) initWorkers(ctx v2.Context, pipeline beat.Pipeline, metrics Met
 			PublishMode: beat.DefaultGuarantees,
 		})
 		if err != nil {
-			return fmt.Errorf("[worker %0d] cannot connect to publishing pipeline: %w", id, err)
+			return fmt.Errorf("[worker %d] cannot connect to publishing pipeline: %w", id, err)
 		}
 
 		go w.publishLoop(ctx, id, client, metrics)
