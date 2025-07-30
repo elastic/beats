@@ -30,7 +30,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/filebeat/input/inputtest"
+	"github.com/elastic/beats/v7/filebeat/input/net/nettest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
@@ -43,12 +43,12 @@ func TestNetInputs(t *testing.T) {
 		"TCP": {
 			cfgFile:     "tcp.yml",
 			data:        []string{"foo", "bar"},
-			runClientFn: inputtest.RunTCPClient,
+			runClientFn: nettest.RunTCPClient,
 		},
 		"UDP": {
 			cfgFile:     "udp.yml",
 			data:        []string{"foo", "bar"},
-			runClientFn: inputtest.RunUDPClient,
+			runClientFn: nettest.RunUDPClient,
 		},
 	}
 	for name, tc := range testCases {
@@ -104,14 +104,14 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 			input:       "tcp",
 			events:      500, // That needs to be more than can be published
 			numWorkers:  5,
-			runClientFn: inputtest.RunTCPClient,
+			runClientFn: nettest.RunTCPClient,
 		},
 		"UDP": {
 			cfgFile:     "es.yml",
 			input:       "udp",
 			events:      500, // That needs to be more than can be published
 			numWorkers:  5,
-			runClientFn: inputtest.RunUDPClient,
+			runClientFn: nettest.RunUDPClient,
 		},
 	}
 	for name, tc := range testCases {
@@ -172,7 +172,7 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 				time.Second,
 				"cannot find output error in the logs")
 
-			m := inputtest.GetHTTPInputMetrics(t, id.String(), "http://127.0.0.1:5066")
+			m := nettest.GetHTTPInputMetrics(t, id.String(), "http://127.0.0.1:5066")
 
 			// The number of events published is equal to the queue size
 			expectPublished := 32
