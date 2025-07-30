@@ -224,6 +224,7 @@ func TestConfig(t *testing.T) {
 			// Make sure we pass the redact requirement.
 			conf.Redact = &redact{}
 			err := cfg.Unpack(&conf)
+
 			switch {
 			case err == nil && test.wantErr != nil:
 				t.Fatalf("expected error unpacking config: %v", test.wantErr)
