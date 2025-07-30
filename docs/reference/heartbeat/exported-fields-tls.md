@@ -13,18 +13,14 @@ None
 
 TLS layer related fields.
 
-**`tls.certificate_not_valid_before`**
+**`tls.certificate_not_valid_before`** {applies_to}`stack: deprecated 7.8.0`
 :   Deprecated in favor of `tls.server.x509.not_before`. Earliest time at which the connection's certificates are valid.
-
-{applies_to}`product: deprecated 7.8.0`
 
 type: date
 
 
-**`tls.certificate_not_valid_after`**
+**`tls.certificate_not_valid_after`** {applies_to}`stack: deprecated 7.8.0`
 :   Deprecated in favor of `tls.server.x509.not_after`. Latest time at which the connection's certificates are valid.
-
-{applies_to}`product: deprecated 7.8.0`
 
 type: date
 
