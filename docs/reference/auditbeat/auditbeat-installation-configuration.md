@@ -2,6 +2,8 @@
 navigation_title: "Quick start"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-installation-configuration.html
+applies_to:
+  stack: ga
 ---
 
 # Auditbeat quick start: installation and configuration [auditbeat-installation-configuration]
@@ -48,38 +50,38 @@ To download and install Auditbeat, use the commands that work with your system:
 ::::::{tab-item} DEB
 :sync: deb
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{stack-version}}-amd64.deb
-sudo dpkg -i auditbeat-{{stack-version}}-amd64.deb
+curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{version.stack}}-amd64.deb
+sudo dpkg -i auditbeat-{{version.stack}}-amd64.deb
 ```
 ::::::
 
 ::::::{tab-item} RPM
 :sync: rpm
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{stack-version}}-x86_64.rpm
-sudo rpm -vi auditbeat-{{stack-version}}-x86_64.rpm
+curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{version.stack}}-x86_64.rpm
+sudo rpm -vi auditbeat-{{version.stack}}-x86_64.rpm
 ```
 ::::::
 
 ::::::{tab-item} MacOS
 :sync: macos
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{stack-version}}-darwin-x86_64.tar.gz
-tar xzvf auditbeat-{{stack-version}}-darwin-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{version.stack}}-darwin-x86_64.tar.gz
+tar xzvf auditbeat-{{version.stack}}-darwin-x86_64.tar.gz
 ```
 ::::::
 
 ::::::{tab-item} Linux
 :sync: linux
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{stack-version}}-linux-x86_64.tar.gz
-tar xzvf auditbeat-{{stack-version}}-linux-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{version.stack}}-linux-x86_64.tar.gz
+tar xzvf auditbeat-{{version.stack}}-linux-x86_64.tar.gz
 ```
 ::::::
 
 ::::::{tab-item} Windows
 :sync: windows
-1. Download the [Auditbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{stack-version}}-windows-x86_64.zip).
+1. Download the [Auditbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{version.stack}}-windows-x86_64.zip).
 
 2. Extract the contents of the zip file into `C:\Program Files`.
 
@@ -254,8 +256,9 @@ Auditbeat comes with predefined assets for parsing, indexing, and visualizing yo
     `-e` is optional and sends output to standard error instead of the configured log output.
 
 
-By default, Windows log files are stored under `C:\Program Files\Auditbeat-Data\logs`.
-For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\auditbeat\Logs`.
+The default location where Windows log files are stored varies:
+* {applies_to}`stack: ga 9.1` `C:\Program Files\Auditbeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\auditbeat\Logs`
 
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to {{es}} and deploys the sample dashboards for visualizing the data in {{kib}}.
 
@@ -324,8 +327,9 @@ sudo ./auditbeat -e
 PS C:\Program Files\auditbeat> Start-Service auditbeat
 ```
 
-By default, Windows log files are stored under `C:\Program Files\Auditbeat-Data\Logs`.
-For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\auditbeat\Logs`.
+The default location where Windows log files are stored varies:
+* {applies_to}`stack: ga 9.1` `C:\Program Files\Auditbeat-Data\Logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\auditbeat\Logs`
 ::::::
 
 :::::::

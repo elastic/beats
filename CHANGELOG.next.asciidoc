@@ -489,6 +489,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add support for generalized token authentication to CEL input. {pull}45359[45359]
 - Log CEL single object evaluation results as ECS compliant documents where possible. {issue}45254[45254] {pull}45399[45399]
 - Add full event rendering for the ETW input {pull}44664[44664]
+- Add status update functionality to Salesforce input. {issue}44653[44653] {pull}45227[45227]
+- Improve CEL and Streaming input documentation of the `state` option. {pull}45616[45616]
 
 *Auditbeat*
 
@@ -574,6 +576,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 
 *Packetbeat*
+- Optionally ignore MAC address in flow matching {pull}44965[44965]
+- Add `tls.server.ja3s` tls fingerprint {pull}43284[43284]
 
 *Winlogbeat*
 
