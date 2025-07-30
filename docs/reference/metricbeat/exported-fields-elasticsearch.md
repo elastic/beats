@@ -1965,6 +1965,10 @@ format: bytes
 
 ## ingest_pipeline [_ingest_pipeline]
 
+```{applies_to}
+stack: beta
+```
+
 Runtime metrics on ingest pipeline execution
 
 **`elasticsearch.ingest_pipeline.name`**

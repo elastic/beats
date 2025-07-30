@@ -81,6 +81,10 @@ type: object
 
 ## app_insights [_app_insights]
 
+```{applies_to}
+stack: beta
+```
+
 application insights
 
 **`azure.app_insights.start_date`**
@@ -102,6 +106,10 @@ type: object
 
 
 ## app_state [_app_state]
+
+```{applies_to}
+stack: beta
+```
 
 application state
 
@@ -226,6 +234,10 @@ type: float
 
 
 ## billing [_billing]
+
+```{applies_to}
+stack: beta
+```
 
 billing and usage details
 

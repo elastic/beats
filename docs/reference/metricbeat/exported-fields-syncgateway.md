@@ -15,6 +15,10 @@ SyncGateway metrics
 
 ## syncgateway [_syncgateway]
 
+```{applies_to}
+stack: beta
+```
+
 Couchbase Sync Gateway metrics.
 
 **`syncgateway.syncgateway.name`**
@@ -421,6 +425,10 @@ Dumps a large amount of information about the memory heap and garbage collector
 
 ## memory [_memory]
 
+```{applies_to}
+stack: beta
+```
+
 SyncGateway memory metrics. It dumps a large amount of information about the memory heap and garbage collector
 
 **`syncgateway.memory.BuckHashSys`**
@@ -541,6 +549,10 @@ SyncGateway memory metrics. It dumps a large amount of information about the mem
 
 ## replication [_replication]
 
+```{applies_to}
+stack: beta
+```
+
 SyncGateway per replication metrics.
 
 ## metrics [_metrics]
@@ -584,6 +596,10 @@ type: keyword
 
 
 ## resources [_resources]
+
+```{applies_to}
+stack: beta
+```
 
 SyncGateway global resource utilization
 

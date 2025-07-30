@@ -15,6 +15,10 @@ istio Module
 
 ## citadel [_citadel]
 
+```{applies_to}
+stack: beta
+```
+
 Contains statistics related to the Istio Citadel service
 
 **`istio.citadel.grpc.method`**
@@ -92,6 +96,10 @@ type: long
 
 
 ## galley [_galley]
+
+```{applies_to}
+stack: beta
+```
 
 Contains statistics related to the Istio galley service
 
@@ -293,6 +301,10 @@ type: long
 
 ## mesh [_mesh]
 
+```{applies_to}
+stack: beta
+```
+
 Contains statistics related to the Istio mesh service
 
 **`istio.mesh.instance`**
@@ -473,6 +485,10 @@ type: keyword
 
 ## mixer [_mixer]
 
+```{applies_to}
+stack: beta
+```
+
 Contains statistics related to the Istio mixer service
 
 **`istio.mixer.istio.mcp.request.acks`**
@@ -614,6 +630,10 @@ type: keyword
 
 
 ## pilot [_pilot]
+
+```{applies_to}
+stack: beta
+```
 
 Contains statistics related to the Istio pilot service
 

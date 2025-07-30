@@ -41,6 +41,10 @@ type: keyword
 
 ## task_stats [_task_stats]
 
+```{applies_to}
+stack: beta
+```
+
 `task_stats` contains the metrics that were scraped from AWS fargate task stats ${ECS_CONTAINER_METADATA_URI_V4}/task/stats metadata endpoint.
 
 **`awsfargate.task_stats.cluster_name`**
@@ -211,10 +215,8 @@ type: long
 type: long
 
 
-**`awsfargate.task_stats.diskio.reads`**
+**`awsfargate.task_stats.diskio.reads`** {applies_to}`stack: deprecated 6.4`
 :   Number of current reads per second
-
-{applies_to}`product: deprecated 6.4`
 
 type: scaled_float
 
@@ -261,10 +263,8 @@ type: long
 type: long
 
 
-**`awsfargate.task_stats.diskio.writes`**
+**`awsfargate.task_stats.diskio.writes`** {applies_to}`stack: deprecated 6.4`
 :   Number of current writes per second
-
-{applies_to}`product: deprecated 6.4`
 
 type: scaled_float
 
@@ -311,10 +311,8 @@ type: long
 type: long
 
 
-**`awsfargate.task_stats.diskio.total`**
+**`awsfargate.task_stats.diskio.total`** {applies_to}`stack: deprecated 6.4`
 :   Number of reads and writes per second
-
-{applies_to}`product: deprecated 6.4`
 
 type: scaled_float
 

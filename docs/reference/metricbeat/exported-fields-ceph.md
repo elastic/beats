@@ -241,13 +241,25 @@ type: long
 
 ## mgr_cluster_disk [_mgr_cluster_disk]
 
+```{applies_to}
+stack: beta
+```
+
 see: cluster_disk
 
 ## mgr_cluster_health [_mgr_cluster_health]
 
+```{applies_to}
+stack: beta
+```
+
 see: cluster_health
 
 ## mgr_osd_perf [_mgr_osd_perf]
+
+```{applies_to}
+stack: beta
+```
 
 OSD performance metrics of Ceph cluster
 
@@ -283,6 +295,10 @@ type: long
 
 ## mgr_osd_pool_stats [_mgr_osd_pool_stats]
 
+```{applies_to}
+stack: beta
+```
+
 OSD pool stats of Ceph cluster
 
 **`ceph.mgr_osd_pool_stats.pool_name`**
@@ -305,9 +321,17 @@ type: object
 
 ## mgr_osd_tree [_mgr_osd_tree]
 
+```{applies_to}
+stack: beta
+```
+
 see: osd_tree
 
 ## mgr_pool_disk [_mgr_pool_disk]
+
+```{applies_to}
+stack: beta
+```
 
 see: pool_disk
 

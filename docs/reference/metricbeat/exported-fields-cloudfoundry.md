@@ -31,6 +31,10 @@ type: keyword
 
 ## container [_container]
 
+```{applies_to}
+stack: beta
+```
+
 `container` contains container metrics from Cloud Foundry.
 
 **`cloudfoundry.container.instance_index`**
@@ -71,6 +75,10 @@ type: long
 
 ## counter [_counter]
 
+```{applies_to}
+stack: beta
+```
+
 `counter` contains counter metrics from Cloud Foundry.
 
 **`cloudfoundry.counter.name`**
@@ -92,6 +100,10 @@ type: long
 
 
 ## value [_value]
+
+```{applies_to}
+stack: beta
+```
 
 `value` contains counter metrics from Cloud Foundry.
 

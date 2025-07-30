@@ -11,6 +11,10 @@ Consul module
 
 ## agent [_agent]
 
+```{applies_to}
+stack: beta
+```
+
 Agent Metricset fetches metrics information from a Consul instance running as Agent
 
 **`consul.agent.autopilot.healthy`**

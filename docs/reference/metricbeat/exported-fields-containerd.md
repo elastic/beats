@@ -21,6 +21,10 @@ type: keyword
 
 ## blkio [_blkio]
 
+```{applies_to}
+stack: beta
+```
+
 Block I/O metrics.
 
 **`containerd.blkio.device`**
@@ -85,6 +89,10 @@ format: bytes
 
 ## cpu [_cpu]
 
+```{applies_to}
+stack: beta
+```
+
 Containerd Runtime CPU metrics.
 
 **`containerd.cpu.system.total`**
@@ -142,6 +150,10 @@ type: object
 
 
 ## memory [_memory]
+
+```{applies_to}
+stack: beta
+```
 
 memory
 

@@ -19,10 +19,8 @@ nats Module
 type: keyword
 
 
-**`nats.server.time`**
+**`nats.server.time`** {applies_to}`stack: deprecated 8.0.0`
 :   Server time of metric creation
-
-{applies_to}`product: deprecated 8.0.0`
 
 type: date
 
@@ -168,6 +166,10 @@ type: integer
 
 
 ## jetstream [_jetstream]
+
+```{applies_to}
+stack: beta
+```
 
 Information pertaining to a NATS JetStream server
 

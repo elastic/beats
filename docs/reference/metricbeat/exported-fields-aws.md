@@ -51,6 +51,10 @@ type: keyword
 
 ## awshealth [_awshealth]
 
+```{applies_to}
+stack: beta
+```
+
 AWS Health metrics
 
 **`aws.awshealth.affected_entities_others`**
@@ -181,6 +185,10 @@ type: keyword
 
 ## billing [_billing]
 
+```{applies_to}
+stack: beta
+```
+
 `billing` contains the estimated charges for your AWS account in Cloudwatch.
 
 **`aws.billing.EstimatedCharges`**
@@ -302,6 +310,10 @@ type: keyword
 
 
 ## dynamodb [_dynamodb]
+
+```{applies_to}
+stack: beta
+```
 
 `dynamodb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS DynamoDB.
 
@@ -1097,6 +1109,10 @@ type: long
 
 ## kinesis [_kinesis]
 
+```{applies_to}
+stack: beta
+```
+
 `kinesis` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by Amazon Kinesis.
 
 **`aws.kinesis.metrics.GetRecords_Bytes.avg`**
@@ -1332,6 +1348,10 @@ type: long
 
 
 ## natgateway [_natgateway]
+
+```{applies_to}
+stack: beta
+```
 
 `natgateway` contains the metrics from Cloudwatch to track usage of NAT gateway related resources.
 
@@ -2045,6 +2065,10 @@ format: duration
 
 ## sns [_sns]
 
+```{applies_to}
+stack: beta
+```
+
 `sns` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SNS.
 
 **`aws.sns.metrics.PublishSize.avg`**
@@ -2183,6 +2207,10 @@ type: keyword
 
 ## transitgateway [_transitgateway]
 
+```{applies_to}
+stack: beta
+```
+
 `transitgateway` contains the metrics from Cloudwatch to track usage of transit gateway related resources.
 
 **`aws.transitgateway.metrics.BytesIn.sum`**
@@ -2235,6 +2263,10 @@ type: long
 
 ## usage [_usage]
 
+```{applies_to}
+stack: beta
+```
+
 `usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
 
 **`aws.usage.metrics.CallCount.sum`**
@@ -2250,6 +2282,10 @@ type: long
 
 
 ## vpn [_vpn]
+
+```{applies_to}
+stack: beta
+```
 
 `vpn` contains the metrics from Cloudwatch to track usage of VPN related resources.
 

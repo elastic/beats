@@ -135,6 +135,10 @@ alias to: service.id
 
 ## cluster_actions [_cluster_actions]
 
+```{applies_to}
+stack: beta
+```
+
 Kibana cluster actions metrics.
 
 **`kibana.cluster_actions.kibana.status`**
@@ -154,6 +158,10 @@ Kibana cluster actions metrics.
 
 
 ## cluster_rules [_cluster_rules]
+
+```{applies_to}
+stack: beta
+```
 
 Kibana cluster rule metrics.
 
@@ -175,6 +183,10 @@ Kibana cluster rule metrics.
 
 ## node_actions [_node_actions]
 
+```{applies_to}
+stack: beta
+```
+
 Kibana node actions metrics.
 
 **`kibana.node_actions.kibana.status`**
@@ -194,6 +206,10 @@ Kibana node actions metrics.
 
 
 ## node_rules [_node_rules]
+
+```{applies_to}
+stack: beta
+```
 
 Kibana node rule metrics.
 

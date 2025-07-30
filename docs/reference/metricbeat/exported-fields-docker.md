@@ -726,6 +726,10 @@ type: long
 
 ## network_summary [_network_summary]
 
+```{applies_to}
+stack: beta
+```
+
 network_summary
 
 **`docker.network_summary.ip.*`**

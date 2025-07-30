@@ -15,6 +15,10 @@ vSphere module
 
 ## cluster [_cluster]
 
+```{applies_to}
+stack: beta
+```
+
 Cluster information.
 
 **`vsphere.cluster.datastore.names`**
@@ -214,6 +218,10 @@ format: bytes
 
 
 ## datastorecluster [_datastorecluster]
+
+```{applies_to}
+stack: beta
+```
 
 Datastore Cluster
 
@@ -517,6 +525,10 @@ type: long
 
 ## network [_network]
 
+```{applies_to}
+stack: beta
+```
+
 Network-related information.
 
 **`vsphere.network.accessible`**
@@ -586,6 +598,10 @@ type: object
 
 
 ## resourcepool [_resourcepool]
+
+```{applies_to}
+stack: beta
+```
 
 Resource pool information from vSphere environment.
 

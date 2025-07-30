@@ -11,6 +11,10 @@ Tomcat module
 
 ## cache [_cache]
 
+```{applies_to}
+stack: beta
+```
+
 Catalina Cache metrics from the WebResourceRoot
 
 **`tomcat.cache.mbean`**
@@ -50,6 +54,10 @@ type: long
 
 
 ## memory [_memory]
+
+```{applies_to}
+stack: beta
+```
 
 Memory metrics from java.lang JMX
 
@@ -109,6 +117,10 @@ type: long
 
 ## requests [_requests]
 
+```{applies_to}
+stack: beta
+```
+
 Requests processor metrics from GlobalRequestProcessor JMX
 
 **`tomcat.requests.mbean`**
@@ -148,6 +160,10 @@ type: long
 
 
 ## threading [_threading]
+
+```{applies_to}
+stack: beta
+```
 
 Threading metrics from the Catalina's ThreadPool JMX
 

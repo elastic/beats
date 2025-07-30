@@ -61,6 +61,10 @@ type: keyword
 
 ## broker [_broker]
 
+```{applies_to}
+stack: beta
+```
+
 Broker metrics from Kafka Broker JMX
 
 **`kafka.broker.mbean`**
@@ -190,6 +194,10 @@ type: float
 
 
 ## consumer [_consumer]
+
+```{applies_to}
+stack: beta
+```
 
 Consumer metrics from Kafka Consumer JMX
 
@@ -358,6 +366,10 @@ type: long
 
 
 ## producer [_producer]
+
+```{applies_to}
+stack: beta
+```
 
 Producer metrics from Kafka Producer JMX
 

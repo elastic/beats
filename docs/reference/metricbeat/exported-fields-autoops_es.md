@@ -15,6 +15,10 @@ AutoOps Elasticsearch module
 
 ## cat_shards [_cat_shards]
 
+```{applies_to}
+stack: beta
+```
+
 cat shards information from the cluster
 
 **`autoops_es.cat_shards.ip`**
@@ -115,6 +119,10 @@ type: long
 
 ## cat_template [_cat_template]
 
+```{applies_to}
+stack: beta
+```
+
 tasks information from the cluster
 
 **`autoops_es.cat_template.index`**
@@ -172,6 +180,10 @@ type: keyword
 
 
 ## cluster_health [_cluster_health]
+
+```{applies_to}
+stack: beta
+```
 
 cluster health metrics
 
@@ -266,6 +278,10 @@ type: long
 
 
 ## cluster_settings [_cluster_settings]
+
+```{applies_to}
+stack: beta
+```
 
 cluster_settings
 
@@ -859,6 +875,10 @@ type: keyword
 
 ## component_template [_component_template]
 
+```{applies_to}
+stack: beta
+```
+
 component template information from the cluster
 
 **`autoops_es.component_template.index`**
@@ -916,6 +936,10 @@ type: keyword
 
 
 ## index_template [_index_template]
+
+```{applies_to}
+stack: beta
+```
 
 index templates from the cluster
 
@@ -1176,6 +1200,10 @@ format: bytes
 
 
 ## tasks_management [_tasks_management]
+
+```{applies_to}
+stack: beta
+```
 
 tasks information from cluster
 

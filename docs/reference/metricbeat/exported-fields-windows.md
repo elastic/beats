@@ -109,5 +109,9 @@ format: duration
 
 ## wmi [_wmi]
 
+```{applies_to}
+stack: beta
+```
+
 wmi
 

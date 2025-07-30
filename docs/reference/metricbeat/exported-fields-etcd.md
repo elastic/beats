@@ -61,6 +61,10 @@ type: keyword
 
 ## server [_server]
 
+```{applies_to}
+stack: beta
+```
+
 Server metrics from the Etcd V3 /metrics endpoint
 
 **`etcd.server.has_leader`**
@@ -106,6 +110,10 @@ type: long
 
 
 ## disk [_disk]
+
+```{applies_to}
+stack: beta
+```
 
 Disk metrics from the Etcd V3 /metrics endpoint
 
@@ -155,6 +163,10 @@ type: long
 
 ## memory [_memory]
 
+```{applies_to}
+stack: beta
+```
+
 Memory metrics from the Etcd V3 /metrics endpoint
 
 **`etcd.memory.go_memstats_alloc.bytes`**
@@ -166,6 +178,10 @@ format: bytes
 
 
 ## network [_network]
+
+```{applies_to}
+stack: beta
+```
 
 Network metrics from the Etcd V3 /metrics endpoint
 

@@ -585,6 +585,10 @@ type: long
 
 ## shovel [_shovel]
 
+```{applies_to}
+stack: beta
+```
+
 shovel
 
 **`rabbitmq.shovel.name`**

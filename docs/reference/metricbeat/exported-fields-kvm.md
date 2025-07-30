@@ -27,6 +27,10 @@ type: keyword
 
 ## dommemstat [_dommemstat]
 
+```{applies_to}
+stack: beta
+```
+
 dommemstat
 
 ## stat [_stat]
@@ -58,6 +62,10 @@ type: keyword
 
 
 ## status [_status]
+
+```{applies_to}
+stack: beta
+```
 
 status
 

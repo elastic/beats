@@ -839,6 +839,10 @@ type: long
 
 ## network_summary [_network_summary]
 
+```{applies_to}
+stack: beta
+```
+
 Metrics relating to global network activity
 
 **`system.network_summary.ip.*`**
@@ -872,6 +876,10 @@ type: object
 
 
 ## ntp [_ntp]
+
+```{applies_to}
+stack: beta
+```
 
 `ntp` contains Network Time Protocol (NTP) metrics.
 
@@ -2097,6 +2105,10 @@ type: long
 
 ## service [_service]
 
+```{applies_to}
+stack: beta
+```
+
 metrics for system services
 
 **`system.service.name`**
@@ -2450,6 +2462,10 @@ format: duration
 
 
 ## users [_users]
+
+```{applies_to}
+stack: beta
+```
 
 Logged-in user session data
 

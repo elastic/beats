@@ -87,6 +87,10 @@ type: float
 
 ## carbon [_carbon]
 
+```{applies_to}
+stack: beta
+```
+
 Google Cloud Carbon Footprint metrics
 
 **`gcp.carbon.project_id`**

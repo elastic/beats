@@ -1713,6 +1713,10 @@ type: integer
 
 ## horizontalpodautoscaler [_horizontalpodautoscaler]
 
+```{applies_to}
+stack: beta
+```
+
 kubernetes horizontalpodautoscaler metrics
 
 **`kubernetes.horizontalpodautoscaler.name`**

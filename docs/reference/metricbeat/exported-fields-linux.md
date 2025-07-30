@@ -15,6 +15,10 @@ linux system metrics
 
 ## conntrack [_conntrack]
 
+```{applies_to}
+stack: beta
+```
+
 conntrack
 
 ## summary [_summary]
@@ -70,6 +74,10 @@ type: long
 
 
 ## iostat [_iostat]
+
+```{applies_to}
+stack: beta
+```
 
 iostat
 
@@ -157,6 +165,10 @@ type: float
 
 ## ksm [_ksm]
 
+```{applies_to}
+stack: beta
+```
+
 ksm
 
 ## stats [_stats]
@@ -200,6 +212,10 @@ type: long
 
 
 ## memory [_memory]
+
+```{applies_to}
+stack: beta
+```
 
 Linux memory data
 
@@ -385,6 +401,10 @@ type: long
 
 ## pageinfo [_pageinfo]
 
+```{applies_to}
+stack: beta
+```
+
 pageinfo
 
 ## buddy_info [_buddy_info]
@@ -468,6 +488,10 @@ type: object
 
 
 ## pressure [_pressure]
+
+```{applies_to}
+stack: beta
+```
 
 Linux pressure stall information metrics for cpu, memory, and io
 
@@ -622,6 +646,10 @@ type: long
 
 
 ## rapl [_rapl]
+
+```{applies_to}
+stack: beta
+```
 
 Wattage as reported by Intel RAPL
 

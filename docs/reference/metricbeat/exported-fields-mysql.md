@@ -15,6 +15,10 @@ MySQL server status metrics collected from MySQL.
 
 ## galera_status [_galera_status]
 
+```{applies_to}
+stack: beta
+```
+
 `galera_status` contains the metrics that were obtained by the status SQL query on Galera.
 
 ## apply [_apply]
@@ -309,6 +313,10 @@ type: long
 
 ## performance [_performance]
 
+```{applies_to}
+stack: beta
+```
+
 `performance` contains metrics related to the performance of a MySQL instance
 
 ## events_statements [_events_statements]
@@ -386,6 +394,10 @@ type: long
 
 
 ## query [_query]
+
+```{applies_to}
+stack: beta
+```
 
 `query` metricset fetches custom queries from the user to a MySQL instance.
 

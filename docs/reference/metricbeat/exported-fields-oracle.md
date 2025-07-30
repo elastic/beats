@@ -153,6 +153,10 @@ type: double
 
 ## sysmetric [_sysmetric]
 
+```{applies_to}
+stack: beta
+```
+
 Sysmetric related metrics.
 
 **`oracle.sysmetric.session_count`**

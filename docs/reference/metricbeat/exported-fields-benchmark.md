@@ -15,6 +15,10 @@ benchmark module
 
 ## info [_info]
 
+```{applies_to}
+stack: beta
+```
+
 info
 
 **`benchmark.info.counter`**

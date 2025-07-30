@@ -11,6 +11,10 @@ Openmetrics module
 
 ## openmetrics [_openmetrics]
 
+```{applies_to}
+stack: beta
+```
+
 `openmetrics` contains metrics from endpoints that are following Openmetrics format.
 
 **`openmetrics.help`**

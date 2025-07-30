@@ -15,6 +15,10 @@ openai module
 
 ## usage [_usage]
 
+```{applies_to}
+stack: beta
+```
+
 OpenAI API usage metrics and statistics
 
 **`openai.usage.organization_id`**
