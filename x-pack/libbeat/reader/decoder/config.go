@@ -11,13 +11,13 @@ import (
 )
 
 // decoderConfig contains the configuration options for instantiating a decoder.
-type DecoderConfig struct {
+type Config struct {
 	Codec *CodecConfig `config:"codec"`
 }
 
 // codecConfig contains the configuration options for different codecs used by a decoder.
 type CodecConfig struct {
-	CSV     *CsvCodecConfig     `config:"csv"`
+	CSV     *CSVCodecConfig     `config:"csv"`
 	Parquet *ParquetCodecConfig `config:"parquet"`
 }
 
@@ -41,8 +41,8 @@ func (c *CodecConfig) Validate() error {
 	return nil
 }
 
-// csvCodecConfig contains the configuration options for the CSV codec.
-type CsvCodecConfig struct {
+// CSVCodecConfig contains the configuration options for the CSV codec.
+type CSVCodecConfig struct {
 	Enabled bool `config:"enabled"`
 
 	// Fields is the set of field names. If it is present
@@ -54,15 +54,15 @@ type CsvCodecConfig struct {
 
 	// The fields below have the same meaning as the
 	// fields of the same name in csv.Reader.
-	Comma            *ConfigRune `config:"comma"`
-	Comment          ConfigRune  `config:"comment"`
-	LazyQuotes       bool        `config:"lazy_quotes"`
-	TrimLeadingSpace bool        `config:"trim_leading_space"`
+	Comma            *Rune `config:"comma"`
+	Comment          Rune  `config:"comment"`
+	LazyQuotes       bool  `config:"lazy_quotes"`
+	TrimLeadingSpace bool  `config:"trim_leading_space"`
 }
 
-type ConfigRune rune
+type Rune rune
 
-func (r *ConfigRune) Unpack(s string) error {
+func (r *Rune) Unpack(s string) error {
 	if s == "" {
 		return nil
 	}
@@ -71,7 +71,7 @@ func (r *ConfigRune) Unpack(s string) error {
 		return fmt.Errorf("single character option given more than one character: %q", s)
 	}
 	_r, _ := utf8.DecodeRuneInString(s)
-	*r = ConfigRune(_r)
+	*r = Rune(_r)
 	return nil
 }
 
