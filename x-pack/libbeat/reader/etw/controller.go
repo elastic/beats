@@ -94,7 +94,7 @@ func (s *Session) CreateRealtimeSession() error {
 		// If any descriptors were created, point the params to them.
 		if len(descriptors) > 0 {
 			params.EnableFilterDesc = &descriptors[0]
-			params.FilterDescrCount = uint32(len(descriptors))
+			params.FilterDescrCount = uint32(len(descriptors)) // #nosec
 		}
 
 		// Zero timeout means asynchronous enablement
@@ -193,7 +193,7 @@ func buildEventDescriptor(buf *[][]byte, filter EventFilter) ([]EventFilterDescr
 	// We take a pointer to the first element of the most recently added payload.
 	descriptor := EventFilterDescriptor{
 		Ptr:  uint64(uintptr(unsafe.Pointer(&(*buf)[len(*buf)-1][0]))),
-		Size: uint32(len(payload)),
+		Size: uint32(len(payload)), // #nosec
 		Type: EVENT_FILTER_TYPE_EVENT_ID,
 	}
 
@@ -204,7 +204,7 @@ func buildEventDescriptor(buf *[][]byte, filter EventFilter) ([]EventFilterDescr
 // by serializing a header struct and the list of event IDs.
 func createEventIDFilter(filter EventFilter) ([]byte, error) {
 	header := eventFilterEventIDHeader{
-		Count: uint16(len(filter.EventIDs)),
+		Count: uint16(len(filter.EventIDs)), // #nosec
 	}
 	if filter.FilterIn {
 		header.FilterIn = 1
