@@ -20,42 +20,42 @@ stack: beta
 **`openmetrics.help`**
 :   Brief description of the MetricFamily
 
-type: keyword
+    type: keyword
 
 
 **`openmetrics.type`**
 :   Metric type
 
-type: keyword
+    type: keyword
 
 
 **`openmetrics.unit`**
 :   Metric unit
 
-type: keyword
+    type: keyword
 
 
 **`openmetrics.labels.*`**
 :   Openmetrics metric labels
 
-type: object
+    type: object
 
 
 **`openmetrics.metrics.*`**
 :   Openmetrics metric
 
-type: object
+    type: object
 
 
 **`openmetrics.exemplar.*`**
 :   Openmetrics exemplars
 
-type: object
+    type: object
 
 
 **`openmetrics.exemplar.labels.*`**
 :   Openmetrics metric exemplar labels
 
-type: object
+    type: object
 
 

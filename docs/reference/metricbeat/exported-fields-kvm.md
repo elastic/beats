@@ -12,13 +12,13 @@ kvm module
 **`kvm.id`**
 :   Domain id
 
-type: long
+    type: long
 
 
 **`kvm.name`**
 :   Domain name
 
-type: keyword
+    type: keyword
 
 
 ## kvm [_kvm]
@@ -40,25 +40,25 @@ Memory stat
 **`kvm.dommemstat.stat.name`**
 :   Memory stat name
 
-type: keyword
+    type: keyword
 
 
 **`kvm.dommemstat.stat.value`**
 :   Memory stat value
 
-type: long
+    type: long
 
 
 **`kvm.dommemstat.id`**
 :   Domain id
 
-type: long
+    type: long
 
 
 **`kvm.dommemstat.name`**
 :   Domain name
 
-type: keyword
+    type: keyword
 
 
 ## status [_status]
@@ -72,6 +72,6 @@ status
 **`kvm.status.state`**
 :   Domain state
 
-type: keyword
+    type: keyword
 
 

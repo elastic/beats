@@ -24,69 +24,69 @@ Fields from the PostgreSQL log files.
 **`postgresql.log.core_id`** {applies_to}`stack: deprecated 8.0.0`
 :   Core id. (deprecated, there is no core_id in PostgreSQL logs, this is actually session_line_number).
 
-type: alias
+    type: alias
 
-alias to: postgresql.log.session_line_number
+    alias to: postgresql.log.session_line_number
 
 
 **`postgresql.log.client_addr`**
 :   Host where the connection originated from.
 
-example: 127.0.0.1
+    example: 127.0.0.1
 
 
 **`postgresql.log.client_port`**
 :   Port where the connection originated from.
 
-example: 59700
+    example: 59700
 
 
 **`postgresql.log.session_id`**
 :   PostgreSQL session.
 
-example: 5ff1dd98.22
+    example: 5ff1dd98.22
 
 
 **`postgresql.log.session_line_number`**
 :   Line number inside a session. (%l in `log_line_prefix`).
 
-type: long
+    type: long
 
 
 **`postgresql.log.database`**
 :   Name of database.
 
-example: postgres
+    example: postgres
 
 
 **`postgresql.log.query`**
 :   Query statement. In the case of CSV parse, look at command_tag to get more context.
 
-example: SELECT * FROM users;
+    example: SELECT * FROM users;
 
 
 **`postgresql.log.query_step`**
 :   Statement step when using extended query protocol (one of statement, parse, bind or execute).
 
-example: parse
+    example: parse
 
 
 **`postgresql.log.query_name`**
 :   Name given to a query when using extended query protocol. If it is "<unnamed>", or not present, this field is ignored.
 
-example: pdo_stmt_00000001
+    example: pdo_stmt_00000001
 
 
 **`postgresql.log.command_tag`**
 :   Type of session's current command. The complete list can be found at: src/include/tcop/cmdtaglist.h
 
-example: SELECT
+    example: SELECT
 
 
 **`postgresql.log.session_start_time`**
 :   Time when this session started.
 
-type: date
+    type: date
 
 
 **`postgresql.log.virtual_transaction_id`**
@@ -96,13 +96,13 @@ type: date
 **`postgresql.log.transaction_id`**
 :   The id of current transaction.
 
-type: long
+    type: long
 
 
 **`postgresql.log.sql_state_code`**
 :   State code returned by Postgres (if any). See also https://www.postgresql.org/docs/current/errcodes-appendix.html
 
-type: keyword
+    type: keyword
 
 
 **`postgresql.log.detail`**
@@ -120,7 +120,7 @@ type: keyword
 **`postgresql.log.internal_query_pos`**
 :   Character count of the internal query (if any).
 
-type: long
+    type: long
 
 
 **`postgresql.log.context`**
@@ -130,7 +130,7 @@ type: long
 **`postgresql.log.query_pos`**
 :   Character count of the error position (if any).
 
-type: long
+    type: long
 
 
 **`postgresql.log.location`**
@@ -144,42 +144,42 @@ type: long
 **`postgresql.log.backend_type`**
 :   Type of backend of this event. Possible types are autovacuum launcher, autovacuum worker, logical replication launcher, logical replication worker, parallel worker, background writer, client backend, checkpointer, startup, walreceiver, walsender and walwriter. In addition, background workers registered by extensions may have additional types.
 
-example: client backend
+    example: client backend
 
 
 **`postgresql.log.error.code`** {applies_to}`stack: deprecated 8.0.0`
 :   Error code returned by Postgres (if any). Deprecated: errors can have letters. Use sql_state_code instead.
 
-type: alias
+    type: alias
 
-alias to: postgresql.log.sql_state_code
+    alias to: postgresql.log.sql_state_code
 
 
 **`postgresql.log.timezone`**
 :   type: alias
 
-alias to: event.timezone
+    alias to: event.timezone
 
 
 **`postgresql.log.user`**
 :   type: alias
 
-alias to: user.name
+    alias to: user.name
 
 
 **`postgresql.log.level`**
 :   Valid values are DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, INFO, NOTICE, WARNING, ERROR, LOG, FATAL, and PANIC.
 
-type: alias
+    type: alias
 
-example: LOG
+    example: LOG
 
-alias to: log.level
+    alias to: log.level
 
 
 **`postgresql.log.message`**
 :   type: alias
 
-alias to: message
+    alias to: message
 
 

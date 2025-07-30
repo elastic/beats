@@ -24,49 +24,49 @@ OpenAI API usage metrics and statistics
 **`openai.usage.organization_id`**
 :   Organization identifier
 
-type: keyword
+    type: keyword
 
 
 **`openai.usage.organization_name`**
 :   Organization name
 
-type: keyword
+    type: keyword
 
 
 **`openai.usage.api_key_id`**
 :   API key identifier
 
-type: keyword
+    type: keyword
 
 
 **`openai.usage.api_key_name`**
 :   API key name
 
-type: keyword
+    type: keyword
 
 
 **`openai.usage.api_key_redacted`**
 :   Redacted API key
 
-type: keyword
+    type: keyword
 
 
 **`openai.usage.api_key_type`**
 :   Type of API key
 
-type: keyword
+    type: keyword
 
 
 **`openai.usage.project_id`**
 :   Project identifier
 
-type: keyword
+    type: keyword
 
 
 **`openai.usage.project_name`**
 :   Project name
 
-type: keyword
+    type: keyword
 
 
 ## data [_data]
@@ -76,49 +76,49 @@ General usage data metrics
 **`openai.usage.data.requests_total`**
 :   Number of requests made
 
-type: long
+    type: long
 
 
 **`openai.usage.data.operation`**
 :   Operation type
 
-type: keyword
+    type: keyword
 
 
 **`openai.usage.data.snapshot_id`**
 :   Snapshot identifier
 
-type: keyword
+    type: keyword
 
 
 **`openai.usage.data.context_tokens_total`**
 :   Total number of context tokens used
 
-type: long
+    type: long
 
 
 **`openai.usage.data.generated_tokens_total`**
 :   Total number of generated tokens
 
-type: long
+    type: long
 
 
 **`openai.usage.data.cached_context_tokens_total`**
 :   Total number of cached context tokens
 
-type: long
+    type: long
 
 
 **`openai.usage.data.email`**
 :   User email
 
-type: keyword
+    type: keyword
 
 
 **`openai.usage.data.request_type`**
 :   Type of request
 
-type: keyword
+    type: keyword
 
 
 ## dalle [_dalle]
@@ -128,37 +128,37 @@ DALL-E API usage metrics
 **`openai.usage.dalle.num_images`**
 :   Number of images generated
 
-type: long
+    type: long
 
 
 **`openai.usage.dalle.requests_total`**
 :   Number of requests
 
-type: long
+    type: long
 
 
 **`openai.usage.dalle.image_size`**
 :   Size of generated images
 
-type: keyword
+    type: keyword
 
 
 **`openai.usage.dalle.operation`**
 :   Operation type
 
-type: keyword
+    type: keyword
 
 
 **`openai.usage.dalle.user_id`**
 :   User identifier
 
-type: keyword
+    type: keyword
 
 
 **`openai.usage.dalle.model_id`**
 :   Model identifier
 
-type: keyword
+    type: keyword
 
 
 ## whisper [_whisper]
@@ -168,25 +168,25 @@ Whisper API usage metrics
 **`openai.usage.whisper.model_id`**
 :   Model identifier
 
-type: keyword
+    type: keyword
 
 
 **`openai.usage.whisper.num_seconds`**
 :   Number of seconds processed
 
-type: long
+    type: long
 
 
 **`openai.usage.whisper.requests_total`**
 :   Number of requests
 
-type: long
+    type: long
 
 
 **`openai.usage.whisper.user_id`**
 :   User identifier
 
-type: keyword
+    type: keyword
 
 
 ## tts [_tts]
@@ -196,25 +196,25 @@ Text-to-Speech API usage metrics
 **`openai.usage.tts.model_id`**
 :   Model identifier
 
-type: keyword
+    type: keyword
 
 
 **`openai.usage.tts.num_characters`**
 :   Number of characters processed
 
-type: long
+    type: long
 
 
 **`openai.usage.tts.requests_total`**
 :   Number of requests
 
-type: long
+    type: long
 
 
 **`openai.usage.tts.user_id`**
 :   User identifier
 
-type: keyword
+    type: keyword
 
 
 ## ft_data [_ft_data]
@@ -224,7 +224,7 @@ Fine-tuning data metrics
 **`openai.usage.ft_data.original`**
 :   Raw fine-tuning data
 
-type: object
+    type: object
 
 
 ## assistant_code_interpreter [_assistant_code_interpreter]
@@ -234,7 +234,7 @@ Assistant Code Interpreter usage metrics
 **`openai.usage.assistant_code_interpreter.original`**
 :   Raw assistant code interpreter data
 
-type: object
+    type: object
 
 
 ## retrieval_storage [_retrieval_storage]
@@ -244,6 +244,6 @@ Retrieval storage usage metrics
 **`openai.usage.retrieval_storage.original`**
 :   Raw retrieval storage data
 
-type: object
+    type: object
 
 

@@ -24,6 +24,6 @@ info
 **`benchmark.info.counter`**
 :   The nth info metric emitted by the benchmark module
 
-type: keyword
+    type: keyword
 
 

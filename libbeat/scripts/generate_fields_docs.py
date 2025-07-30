@@ -92,17 +92,18 @@ def document_field(output, field, field_path):
 
     if "description" in field and field["description"] is not None and len(field["description"].strip()) > 0:
         output.write("{}".format(" ".join(x for x in field["description"].split("\n") if x)).strip()+"\n\n")
-
     if "type" in field:
+        if "description" in field:
+          output.write("    ")
         output.write("type: {}\n\n".format(field["type"]))
     if "example" in field:
-        output.write("example: {}\n\n".format(field["example"]))
+        output.write("    example: {}\n\n".format(field["example"]))
     if "format" in field:
-        output.write("format: {}\n\n".format(field["format"]))
+        output.write("    format: {}\n\n".format(field["format"]))
     if "required" in field:
-        output.write("required: {}\n\n".format(field["required"]))
+        output.write("    required: {}\n\n".format(field["required"]))
     if "path" in field:
-        output.write("alias to: {}\n\n".format(field["path"]))
+        output.write("    alias to: {}\n\n".format(field["path"]))
 
     # For Apm-Server docs only
     # Assign an ECS badge for ECS fields

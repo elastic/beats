@@ -16,7 +16,7 @@ Cloud Foundry module
 **`cloudfoundry.type`**
 :   The type of event from Cloud Foundry. Possible values include 'container', 'counter' and 'value'.
 
-type: keyword
+    type: keyword
 
 
 ## app [_app]
@@ -26,7 +26,7 @@ The application the metric is associated with.
 **`cloudfoundry.app.id`**
 :   The ID of the application.
 
-type: keyword
+    type: keyword
 
 
 ## container [_container]
@@ -40,37 +40,37 @@ stack: beta
 **`cloudfoundry.container.instance_index`**
 :   Index of the instance the metric belongs to.
 
-type: long
+    type: long
 
 
 **`cloudfoundry.container.cpu.pct`**
 :   CPU usage percentage.
 
-type: scaled_float
+    type: scaled_float
 
 
 **`cloudfoundry.container.memory.bytes`**
 :   Bytes of used memory.
 
-type: long
+    type: long
 
 
 **`cloudfoundry.container.memory.quota.bytes`**
 :   Bytes of available memory.
 
-type: long
+    type: long
 
 
 **`cloudfoundry.container.disk.bytes`**
 :   Bytes of used storage.
 
-type: long
+    type: long
 
 
 **`cloudfoundry.container.disk.quota.bytes`**
 :   Bytes of available storage.
 
-type: long
+    type: long
 
 
 ## counter [_counter]
@@ -84,19 +84,19 @@ stack: beta
 **`cloudfoundry.counter.name`**
 :   The name of the counter.
 
-type: keyword
+    type: keyword
 
 
 **`cloudfoundry.counter.delta`**
 :   The difference between the last time the counter event occurred.
 
-type: long
+    type: long
 
 
 **`cloudfoundry.counter.total`**
 :   The total value for the counter.
 
-type: long
+    type: long
 
 
 ## value [_value]
@@ -110,18 +110,18 @@ stack: beta
 **`cloudfoundry.value.name`**
 :   The name of the value.
 
-type: keyword
+    type: keyword
 
 
 **`cloudfoundry.value.unit`**
 :   The unit of the value.
 
-type: keyword
+    type: keyword
 
 
 **`cloudfoundry.value.value`**
 :   The value of the value.
 
-type: float
+    type: float
 
 

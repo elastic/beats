@@ -24,7 +24,7 @@ Couchbase Sync Gateway metrics.
 **`syncgateway.syncgateway.name`**
 :   Name of the database on when field `couchbase.syncgateway.type` is `db_stats`.
 
-type: keyword
+    type: keyword
 
 
 ## metrics [_metrics]
@@ -46,13 +46,13 @@ Metrics of all databases contained in the config file of the SyncGateway instanc
 **`syncgateway.syncgateway.metrics.replications.active`**
 :   Number of active replications
 
-type: long
+    type: long
 
 
 **`syncgateway.syncgateway.metrics.replications.total`**
 :   Total number of replications (active or not)
 
-type: long
+    type: long
 
 
 **`syncgateway.syncgateway.gsi.views.tombstones.query.count`**
@@ -562,37 +562,37 @@ Metrics related with data replication.
 **`syncgateway.replication.metrics.attachment.transferred.bytes`**
 :   Number of attachment bytes transferred for this replica.
 
-type: long
+    type: long
 
 
 **`syncgateway.replication.metrics.attachment.transferred.count`**
 :   The total number of attachments transferred since replication started.
 
-type: long
+    type: long
 
 
 **`syncgateway.replication.metrics.docs.checked_sent`**
 :   The total number of documents checked for changes since replication started.
 
-type: double
+    type: double
 
 
 **`syncgateway.replication.metrics.docs.pushed.count`**
 :   The total number of documents checked for changes since replication started.
 
-type: long
+    type: long
 
 
 **`syncgateway.replication.metrics.docs.pushed.failed`**
 :   The total number of documents that failed to be pushed since replication started.
 
-type: long
+    type: long
 
 
 **`syncgateway.replication.id`**
 :   ID of the replica.
 
-type: keyword
+    type: keyword
 
 
 ## resources [_resources]
