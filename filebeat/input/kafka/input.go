@@ -63,10 +63,7 @@ func configure(cfg *conf.C, logger *logp.Logger) (input.Input, error) {
 		return nil, err
 	}
 
-	// log any configuration related warnings
-	config.checkUnsupportedConfig(logger)
-
-	saramaConfig, err := newSaramaConfig(config)
+	saramaConfig, err := newSaramaConfig(config, logger)
 	if err != nil {
 		return nil, fmt.Errorf("initializing Sarama config: %w", err)
 	}

@@ -148,14 +148,7 @@ func (c *kafkaInputConfig) Validate() error {
 	return nil
 }
 
-// log warning for unsupported config
-func (c *kafkaInputConfig) checkUnsupportedConfig(logger *logp.Logger) {
-	if c.Kerberos.IsEnabled() {
-		logger.Warn(cfgwarn.Beta("Kerberos authentication for Kafka is beta."))
-	}
-}
-
-func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
+func newSaramaConfig(config kafkaInputConfig, logger *logp.Logger) (*sarama.Config, error) {
 	k := sarama.NewConfig()
 
 	version, ok := config.Version.Get()
@@ -189,6 +182,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	}
 
 	if config.Kerberos.IsEnabled() {
+		logger.Warn(cfgwarn.Beta("Kerberos authentication for Kafka is beta."))
 
 		k.Net.SASL.Enable = true
 		k.Net.SASL.Mechanism = sarama.SASLTypeGSSAPI
