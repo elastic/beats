@@ -29,12 +29,12 @@ type eventRenderer struct {
 func newEventRenderer(cache providerCache, r *EventRecord, bufferPools *bufferPools) *eventRenderer {
 	ptrSize := r.pointerSize()
 
-	// Return a new propertyParser instance initialized with event record data and metadata.
+	// Return a new eventRenderer instance initialized with event record data and metadata.
 	return &eventRenderer{
-		r:           r,
 		cache:       cache,
-		ptrSize:     ptrSize,
+		r:           r,
 		data:        unsafe.Slice((*uint8)(unsafe.Pointer(r.UserData)), r.UserDataLength),
+		ptrSize:     ptrSize,
 		bufferPools: bufferPools,
 	}
 }

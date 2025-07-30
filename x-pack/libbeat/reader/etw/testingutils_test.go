@@ -85,7 +85,7 @@ var (
 
 // setupProviderManager initializes provider manager with cleanup
 func setupProviderManager(t testing.TB) {
-	pm, err := NewTestProviderManager()
+	pm, err := newTestProviderManager()
 	if err != nil {
 		t.Fatalf("Failed to create test provider manager: %v", err)
 		return
@@ -103,16 +103,16 @@ func setupProviderManager(t testing.TB) {
 	})
 }
 
-// TestProviderManager handles registration/unregistration of the test provider
-type TestProviderManager struct {
+// testProviderManager handles registration/unregistration of the test provider
+type testProviderManager struct {
 	testDataDir  string
 	manifestPath string
 	dllPath      string
 	scriptPath   string
 }
 
-// NewTestProviderManager creates a new provider manager
-func NewTestProviderManager() (*TestProviderManager, error) {
+// newTestProviderManager creates a new provider manager
+func newTestProviderManager() (*testProviderManager, error) {
 	_, currentFile, _, ok := runtime.Caller(0)
 	if !ok {
 		return nil, fmt.Errorf("failed to get current file path")
@@ -120,7 +120,7 @@ func NewTestProviderManager() (*TestProviderManager, error) {
 
 	testDataDir := filepath.Join(filepath.Dir(currentFile), "testdata")
 
-	return &TestProviderManager{
+	return &testProviderManager{
 		testDataDir:  testDataDir,
 		manifestPath: filepath.Join(testDataDir, "sample.man"),
 		dllPath:      filepath.Join(testDataDir, "sample.dll"),
@@ -129,7 +129,7 @@ func NewTestProviderManager() (*TestProviderManager, error) {
 }
 
 // Provider management methods
-func (pm *TestProviderManager) checkProviderStatus() (bool, error) {
+func (pm *testProviderManager) checkProviderStatus() (bool, error) {
 	cmd := exec.CommandContext(context.Background(), "powershell.exe", "-ExecutionPolicy", "Bypass", "-File", pm.scriptPath, "-Action", "Status")
 	cmd.Dir = pm.testDataDir
 
@@ -144,7 +144,7 @@ func (pm *TestProviderManager) checkProviderStatus() (bool, error) {
 	return true, nil
 }
 
-func (pm *TestProviderManager) registerProvider() error {
+func (pm *testProviderManager) registerProvider() error {
 	cmd := exec.CommandContext(context.Background(), "powershell.exe", "-ExecutionPolicy", "Bypass", "-File", pm.scriptPath, "-Action", "Register")
 	cmd.Dir = pm.testDataDir
 
@@ -155,7 +155,7 @@ func (pm *TestProviderManager) registerProvider() error {
 	return nil
 }
 
-func (pm *TestProviderManager) unregisterProvider() error {
+func (pm *testProviderManager) unregisterProvider() error {
 	cmd := exec.CommandContext(context.Background(), "powershell.exe", "-ExecutionPolicy", "Bypass", "-File", pm.scriptPath, "-Action", "Unregister")
 	cmd.Dir = pm.testDataDir
 
@@ -166,7 +166,7 @@ func (pm *TestProviderManager) unregisterProvider() error {
 	return nil
 }
 
-func (pm *TestProviderManager) ensureProviderRegistered() error {
+func (pm *testProviderManager) ensureProviderRegistered() error {
 	registered, err := pm.checkProviderStatus()
 	if err != nil {
 		return fmt.Errorf("failed to check provider status: %w", err)
@@ -178,7 +178,7 @@ func (pm *TestProviderManager) ensureProviderRegistered() error {
 	return pm.registerProvider()
 }
 
-func (pm *TestProviderManager) cleanup() error {
+func (pm *testProviderManager) cleanup() error {
 	return pm.unregisterProvider()
 }
 

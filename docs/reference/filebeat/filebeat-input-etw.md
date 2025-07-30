@@ -146,7 +146,7 @@ Names an existing ETW session to read from. Existing sessions can be listed usin
 stack: ga 9.2.0
 ```
 
-A list of ETW session properties to enable. These properties control advanced session behavior. See [EnableTraceEx2 documentation](https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-enabletraceex2) for details.
+A [list of ETW session properties to enable](https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-enable_trace_parameters). These properties control advanced session behavior. See [EnableTraceEx2 documentation](https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-enabletraceex2) for details.
 
 Example:
 

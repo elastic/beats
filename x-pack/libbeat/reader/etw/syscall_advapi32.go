@@ -283,7 +283,7 @@ func extTypeToStr(extType uint16) string {
 }
 
 // The EnableProperty field of the ENABLE_TRACE_PARAMETERS
-// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-enable_trace_parameters_v1
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-enable_trace_parameters
 const (
 	EVENT_ENABLE_PROPERTY_SID               = 0x00000001
 	EVENT_ENABLE_PROPERTY_TS_ID             = 0x00000002

@@ -34,8 +34,8 @@ func newMetadataCache(log *logp.Logger) *metadataCache {
 }
 
 func (cache *metadataCache) getProviderCache(guid windows.GUID) (providerCache, error) {
-	cache.mutex.RLock()
 	effectiveGUID := findEffectiveGUID(guid)
+	cache.mutex.RLock()
 	provider, found := cache.providerCache[effectiveGUID]
 	cache.mutex.RUnlock()
 	if found {
