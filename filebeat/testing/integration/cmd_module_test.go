@@ -33,7 +33,7 @@ import (
 )
 
 func TestFilebeatModuleCmd(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Minute)
 	defer cancel()
 	EnsureCompiled(ctx, t)
 
