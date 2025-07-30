@@ -93,12 +93,19 @@ type EnableTraceParameters struct {
 	FilterDescrCount uint32
 }
 
+const (
+	EVENT_FILTER_TYPE_EVENT_ID = 0x80000200
+)
+
 // Defines the filter data that a session passes
 // to the provider's enable callback function
 // https://learn.microsoft.com/en-us/windows/win32/api/evntprov/ns-evntprov-event_filter_descriptor
 type EventFilterDescriptor struct {
-	Ptr  uint64
+	// Ptr is a pointer to the filter data (e.g., a byte array)
+	Ptr uint64
+	// Size is the size of the filter data in bytes
 	Size uint32
+	// Type is the filter type (see EVENT_FILTER_TYPE_*)
 	Type uint32
 }
 

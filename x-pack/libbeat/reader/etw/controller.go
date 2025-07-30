@@ -7,12 +7,23 @@
 package etw
 
 import (
+	"bytes"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"syscall"
+	"unsafe"
 
 	"golang.org/x/sys/windows"
 )
+
+// eventFilterEventIDHeader represents the fixed-size portion of the
+// EVENT_FILTER_EVENT_ID structure, which defines an event ID filter.
+type eventFilterEventIDHeader struct {
+	FilterIn uint8  // 1 to allow events in EventIDs, 0 to block them.
+	Reserved uint8  // Must be 0.
+	Count    uint16 // The number of event IDs in the EventIDs array.
+}
 
 // AttachToExistingSession queries the status of an existing ETW session.
 // On success, it updates the Session's handler with the queried information.
@@ -70,6 +81,20 @@ func (s *Session) CreateRealtimeSession() error {
 		params := EnableTraceParameters{
 			EnableProperty: computeStringEnableProperty(provider.EnableProperty),
 			Version:        2, // ENABLE_TRACE_PARAMETERS_VERSION_2
+		}
+
+		// The filterData slice is declared here in the parent scope to ensure its
+		// memory remains valid for the duration of the enableTrace call.
+		var filterData [][]byte
+		descriptors, err := buildEventDescriptor(&filterData, provider.EventFilter)
+		if err != nil {
+			return fmt.Errorf("failed to configure event filters for provider %s: %w", provider.Name, err)
+		}
+
+		// If any descriptors were created, point the params to them.
+		if len(descriptors) > 0 {
+			params.EnableFilterDesc = &descriptors[0]
+			params.FilterDescrCount = uint32(len(descriptors))
 		}
 
 		// Zero timeout means asynchronous enablement
@@ -149,4 +174,53 @@ func getProviderGUID(conf ProviderConfig) (windows.GUID, error) {
 	}
 
 	return guid, nil
+}
+
+// buildEventDescriptor populates the provided filterData slice and returns a
+// descriptor that point to the data within it.
+func buildEventDescriptor(buf *[][]byte, filter EventFilter) ([]EventFilterDescriptor, error) {
+	if len(filter.EventIDs) == 0 {
+		return nil, nil
+	}
+
+	payload, err := createEventIDFilter(filter)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create event ID filter payload: %w", err)
+	}
+	*buf = append(*buf, payload)
+
+	// The descriptor points to the payload we just created.
+	// We take a pointer to the first element of the most recently added payload.
+	descriptor := EventFilterDescriptor{
+		Ptr:  uint64(uintptr(unsafe.Pointer(&(*buf)[len(*buf)-1][0]))),
+		Size: uint32(len(payload)),
+		Type: EVENT_FILTER_TYPE_EVENT_ID,
+	}
+
+	return []EventFilterDescriptor{descriptor}, nil
+}
+
+// createEventIDFilter builds the specific byte payload needed for an EVENT_ID filter
+// by serializing a header struct and the list of event IDs.
+func createEventIDFilter(filter EventFilter) ([]byte, error) {
+	header := eventFilterEventIDHeader{
+		Count: uint16(len(filter.EventIDs)),
+	}
+	if filter.FilterIn {
+		header.FilterIn = 1
+	}
+
+	buf := new(bytes.Buffer)
+
+	// Write the fixed-size header struct to the buffer.
+	if err := binary.Write(buf, binary.LittleEndian, header); err != nil {
+		return nil, fmt.Errorf("failed to write filter header: %w", err)
+	}
+
+	// Write the dynamic part (the event IDs slice) to the buffer.
+	if err := binary.Write(buf, binary.LittleEndian, filter.EventIDs); err != nil {
+		return nil, fmt.Errorf("failed to write filter event IDs: %w", err)
+	}
+
+	return buf.Bytes(), nil
 }

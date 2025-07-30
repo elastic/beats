@@ -161,6 +161,34 @@ filebeat.inputs:
 ```
 
 
+
+### `event_filter` [_event_filter]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+Configures event-level filtering for ETW providers using the [EVENT_FILTER_TYPE_EVENT_ID](https://learn.microsoft.com/en-us/windows/win32/api/evntprov/ns-evntprov-event_filter_descriptor) mechanism. This option allows you to specify a list of event IDs to include or exclude from the trace session.
+
+Example:
+
+```yaml
+filebeat.inputs:
+- type: etw
+  event_filter:
+    event_ids: [1, 2, 3]
+    filter_in: true   # Only include these event IDs
+```
+
+```yaml
+filebeat.inputs:
+- type: etw
+  event_filter:
+    event_ids: [10, 11]
+    filter_in: false  # Exclude these event IDs
+```
+
+
 ### `buffer_size` [_buffer_size]
 
 ```{applies_to}

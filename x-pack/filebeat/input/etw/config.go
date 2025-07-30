@@ -51,14 +51,21 @@ type config struct {
 	MatchAllKeyword uint64 `config:"match_all_keyword"`
 	// Session is the name of an existing session to read from.
 	// Run 'logman query -ets' to list existing sessions.
-	Session        string   `config:"session"`
-	EnableProperty []string `config:"enable_property"`
-	BufferSize     uint32   `config:"buffer_size"`
-	MinimumBuffers uint32   `config:"minimum_buffers"`
-	MaximumBuffers uint32   `config:"maximum_buffers"`
+	Session        string      `config:"session"`
+	EnableProperty []string    `config:"enable_property"`
+	EventFilter    EventFilter `config:"event_filters"`
+	BufferSize     uint32      `config:"buffer_size"`
+	MinimumBuffers uint32      `config:"minimum_buffers"`
+	MaximumBuffers uint32      `config:"maximum_buffers"`
+}
+
+type EventFilter struct {
+	EventIDs []uint16 `config:"event_ids"` // Event IDs to filter
+	FilterIn bool     `config:"filter_in"` // Whether to include or exclude these event IDs
 }
 
 func convertConfig(cfg config) etw.Config {
+	// we might want to add support for multiple providers in the future
 	return etw.Config{
 		Logfile:        cfg.Logfile,
 		SessionName:    cfg.SessionName,
@@ -74,6 +81,10 @@ func convertConfig(cfg config) etw.Config {
 				MatchAnyKeyword: cfg.MatchAnyKeyword,
 				MatchAllKeyword: cfg.MatchAllKeyword,
 				EnableProperty:  cfg.EnableProperty,
+				EventFilter: etw.EventFilter{
+					EventIDs: cfg.EventFilter.EventIDs,
+					FilterIn: cfg.EventFilter.FilterIn,
+				},
 			},
 		},
 	}

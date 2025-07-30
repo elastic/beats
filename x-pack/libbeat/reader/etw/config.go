@@ -15,11 +15,17 @@ type Config struct {
 }
 
 type ProviderConfig struct {
-	GUID            string   // GUID of the ETW provider
-	Name            string   // Name of the ETW provider
-	TraceLevel      string   // Level of tracing (e.g., "verbose")
-	MatchAnyKeyword uint64   // Filter for any matching keywords (bitmask)
-	MatchAllKeyword uint64   // Filter for all matching keywords (bitmask)
-	EnableProperty  []string // Properties to enable for the session
-	EnableFlags     uint32   // Bitmask for enabling flags on kernel sessions
+	GUID            string      // GUID of the ETW provider
+	Name            string      // Name of the ETW provider
+	TraceLevel      string      // Level of tracing (e.g., "verbose")
+	MatchAnyKeyword uint64      // Filter for any matching keywords (bitmask)
+	MatchAllKeyword uint64      // Filter for all matching keywords (bitmask)
+	EnableProperty  []string    // Properties to enable for the session
+	EnableFlags     uint32      // Bitmask for enabling flags on kernel sessions
+	EventFilter     EventFilter // Filters for events from the provider
+}
+
+type EventFilter struct {
+	EventIDs []uint16 // Event IDs to filter
+	FilterIn bool     // Whether to include or exclude these event IDs
 }
