@@ -102,14 +102,14 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 		"TCP": {
 			cfgFile:     "es.yml",
 			input:       "tcp",
-			events:      50, // That needs to be more than can be published
+			events:      500, // That needs to be more than can be published
 			numWorkers:  5,
 			runClientFn: inputtest.RunTCPClient,
 		},
 		"UDP": {
 			cfgFile:     "es.yml",
 			input:       "udp",
-			events:      50, // That needs to be more than can be published
+			events:      500, // That needs to be more than can be published
 			numWorkers:  5,
 			runClientFn: inputtest.RunUDPClient,
 		},
@@ -177,8 +177,11 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 			// The number of events published is equal to the queue size
 			expectPublished := 32
 			// The number of events read by the input is:
-			// queue size + 1 event per pipeline worker + 1 for the input goroutine
-			expectedEventsRead := 32 + tc.numWorkers + 1
+			// queue size + (1 event per pipeline worker)*6 + 1 for the input goroutine
+			// The number of pipeline workers is multiplied by 6 because the channel
+			// used for the input and worker goroutines is sized as num_workers*5, then
+			// we need to add an extra event per worker goroutine running.
+			expectedEventsRead := 32 + tc.numWorkers*6 + 1
 
 			if m.PublishedEventsTotal != expectPublished {
 				t.Errorf(
