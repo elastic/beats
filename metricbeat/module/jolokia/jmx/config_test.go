@@ -39,7 +39,7 @@ func TestBuildJolokiaGETUri(t *testing.T) {
 					Field: `heapMemoryUsage`,
 				},
 			},
-			expected: `/read/java.lang:type=Memory/HeapMemoryUsage?ignoreErrors=true&canonicalNaming=false`,
+			expected: `/read/java.lang:type=Memory/HeapMemoryUsage`,
 		},
 		{
 			mbean: `java.lang:type=Memory`,
@@ -53,7 +53,7 @@ func TestBuildJolokiaGETUri(t *testing.T) {
 					Field: `nonHeapMemoryUsage`,
 				},
 			},
-			expected: `/read/java.lang:type=Memory/HeapMemoryUsage,NonHeapMemoryUsage?ignoreErrors=true&canonicalNaming=false`,
+			expected: `/read/java.lang:type=Memory/HeapMemoryUsage,NonHeapMemoryUsage`,
 		},
 		{
 			mbean: `Catalina:name=HttpRequest1,type=RequestProcessor,worker=!"http-nio-8080!"`,
@@ -62,7 +62,7 @@ func TestBuildJolokiaGETUri(t *testing.T) {
 					Attr:  `globalProcessor`,
 					Field: `maxTime`,
 				}},
-			expected: `/read/Catalina:name=HttpRequest1,type=RequestProcessor,worker=!"http-nio-8080!"/globalProcessor?ignoreErrors=true&canonicalNaming=false`,
+			expected: `/read/Catalina:name=HttpRequest1,type=RequestProcessor,worker=!"http-nio-8080!"/globalProcessor`,
 		},
 	}
 
@@ -540,9 +540,9 @@ func TestBuildGETRequestsAndMappings(t *testing.T) {
 			},
 			httpMethod: "GET",
 			uris: []string{
-				"/read/java.lang:type=Runtime/Uptime?ignoreErrors=true&canonicalNaming=false",
-				"/read/java.lang:name=ConcurrentMarkSweep,type=GarbageCollector/CollectionTime,CollectionCount?ignoreErrors=true&canonicalNaming=false",
-				"/read/java.lang:type=Memory/HeapMemoryUsage,NonHeapMemoryUsage?ignoreErrors=true&canonicalNaming=false",
+				"/read/java.lang:type=Runtime/Uptime",
+				"/read/java.lang:name=ConcurrentMarkSweep,type=GarbageCollector/CollectionTime,CollectionCount",
+				"/read/java.lang:type=Memory/HeapMemoryUsage,NonHeapMemoryUsage",
 			},
 			attributeMappings: map[attributeMappingKey]Attribute{
 				attributeMappingKey{"java.lang:type=Runtime", "Uptime"}: Attribute{
