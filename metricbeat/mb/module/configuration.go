@@ -56,7 +56,7 @@ func ConfiguredModules(registry *mb.Register, modulesData []*conf.C, configModul
 		}
 
 		for _, file := range modulesManager.ListEnabled() {
-			confs, err := cfgfile.LoadList(file.Path)
+			confs, err := cfgfile.LoadList(file.Path, logger)
 			if err != nil {
 				return nil, fmt.Errorf("error loading config files: %w", err)
 			}

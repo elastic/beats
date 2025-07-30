@@ -243,7 +243,7 @@ func (inp *filestream) open(
 		BufferSize: inp.readerConfig.BufferSize,
 		Terminator: inp.readerConfig.LineTerminator,
 		MaxBytes:   encReaderMaxBytes,
-	})
+	}, log)
 	if err != nil {
 		return nil, truncated, err
 	}
