@@ -125,6 +125,10 @@ type: keyword
 
 ## host [_host]
 
+```{applies_to}
+stack: beta
+```
+
 `host` contains general host information.
 
 **`system.audit.host.uptime`**
@@ -237,6 +241,10 @@ type: keyword
 
 ## package [_package]
 
+```{applies_to}
+stack: beta
+```
+
 `package` contains information about an installed or removed package.
 
 **`system.audit.package.entity_id`**
@@ -298,6 +306,10 @@ type: keyword
 
 
 ## user [_user]
+
+```{applies_to}
+stack: beta
+```
 
 `user` contains information about the users on a system.
 
