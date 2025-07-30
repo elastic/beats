@@ -52,7 +52,7 @@ type Input interface {
 	// Run must call EventReceived on Metrics once the
 	// event is received passing the event size and the
 	// current time.
-	Run(v2.Context, chan<- DataMetaData, Metrics) error
+	Run(v2.Context, chan<- DataMetadata, Metrics) error
 }
 
 // Metrics is an interface to abstract the metrics
@@ -74,7 +74,9 @@ type config struct {
 	Host               string `config:"host"`
 }
 
-type DataMetaData struct {
+// DataMetadata contains the data read from the network connection
+// and its metadata
+type DataMetadata struct {
 	Timestamp time.Time
 	Data      []byte
 	Metadata  inputsource.NetworkMetadata
@@ -82,8 +84,8 @@ type DataMetaData struct {
 
 type wrapper struct {
 	inp                Input
-	NumPipelineWorkers int
-	evtChan            chan DataMetaData
+	numPipelineWorkers int
+	evtChan            chan DataMetadata
 	host               string // used for the logger
 }
 
@@ -106,7 +108,7 @@ func (*manager) Init(grp unison.Group) error { return nil }
 // by calling the manager's configure callback, or returns
 // an error if the configuration is invalid.
 func (m *manager) Create(cfg *conf.C) (v2.Input, error) {
-	wrapperCfg := config{NumPipelineWorkers: 1}
+	wrapperCfg := config{NumPipelineWorkers: 1} // Default config
 	if err := cfg.Unpack(&wrapperCfg); err != nil {
 		return nil, err
 	}
@@ -118,9 +120,11 @@ func (m *manager) Create(cfg *conf.C) (v2.Input, error) {
 
 	w := wrapper{
 		inp:                inp,
-		NumPipelineWorkers: wrapperCfg.NumPipelineWorkers,
+		numPipelineWorkers: wrapperCfg.NumPipelineWorkers,
 		host:               wrapperCfg.Host,
-		evtChan:            make(chan DataMetaData, wrapperCfg.NumPipelineWorkers*5),
+		// 5 is a magic number, we just need to ensure there is some buffer
+		// in the channel to reduce contingency
+		evtChan: make(chan DataMetadata, wrapperCfg.NumPipelineWorkers*5),
 	}
 
 	return w, nil
@@ -170,7 +174,7 @@ func (w wrapper) Run(ctx v2.Context, pipeline beat.PipelineConnector) (err error
 
 	if err != nil {
 		ctx.UpdateStatus(status.Failed, "Input exited unexpectedly: "+err.Error())
-		return nil
+		return err
 	}
 
 	ctx.UpdateStatus(status.Stopped, "")
@@ -178,8 +182,8 @@ func (w wrapper) Run(ctx v2.Context, pipeline beat.PipelineConnector) (err error
 }
 
 func (w wrapper) initWorkers(ctx v2.Context, pipeline beat.Pipeline, metrics Metrics) error {
-	for id := range w.NumPipelineWorkers {
-		client, err := pipeline.ConnectWith(beat.ClientConfig{ // pipetool/pipetool.go:42,
+	for id := range w.numPipelineWorkers {
+		client, err := pipeline.ConnectWith(beat.ClientConfig{
 			PublishMode: beat.DefaultGuarantees,
 		})
 		if err != nil {
@@ -197,8 +201,9 @@ func (w wrapper) initWorkers(ctx v2.Context, pipeline beat.Pipeline, metrics Met
 // publishLoop.
 func (w wrapper) publishLoop(ctx v2.Context, id int, client beat.Client, metrics Metrics) {
 	logger := ctx.Logger
-	logger.Infof("[Worker %d] starting publish loop", id)
-	defer logger.Infof("[Worker %d] finished publish loop", id)
+	logger.Debugf("[Worker %d] starting publish loop", id)
+	defer logger.Debugf("[Worker %d] finished publish loop", id)
+
 	defer func() {
 		if err := client.Close(); err != nil {
 			logger.Errorf("[Worker %d] cannot close pipeline client: %s", id, err)

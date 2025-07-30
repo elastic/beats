@@ -55,7 +55,7 @@ func TestInput(t *testing.T) {
 	}
 
 	metrics := inp.InitMetrics("tcp", v2Ctx.Logger)
-	c := make(chan netinput.DataMetaData, 2)
+	c := make(chan netinput.DataMetadata, 2)
 
 	wg.Add(1)
 	go func() {

@@ -102,7 +102,7 @@ func (s *server) InitMetrics(id string, logger *logp.Logger) netinput.Metrics {
 }
 
 // Run runs the input
-func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetaData, m netinput.Metrics) (err error) {
+func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, m netinput.Metrics) (err error) {
 	logger := ctx.Logger
 	defer s.metrics.Close()
 
@@ -126,7 +126,7 @@ func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetaData, m 
 					"remote_address", metadata.RemoteAddr.String(),
 					"truncated", metadata.Truncated)
 
-				evtChan <- netinput.DataMetaData{
+				evtChan <- netinput.DataMetadata{
 					Data:      data,
 					Metadata:  metadata,
 					Timestamp: time.Now(),

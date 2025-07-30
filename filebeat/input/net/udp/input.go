@@ -97,7 +97,7 @@ func (s *server) InitMetrics(id string, logger *logp.Logger) netinput.Metrics {
 	return s.metrics
 }
 
-func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetaData, metrics netinput.Metrics) (err error) {
+func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, metrics netinput.Metrics) (err error) {
 	logger := ctx.Logger
 	defer s.metrics.Close()
 
@@ -125,7 +125,7 @@ func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetaData, me
 				},
 			}
 		}
-		evtChan <- netinput.DataMetaData{
+		evtChan <- netinput.DataMetadata{
 			Timestamp: now,
 			Data:      data,
 			Metadata:  metadata,

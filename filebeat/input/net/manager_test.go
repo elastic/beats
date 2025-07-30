@@ -152,7 +152,7 @@ func TestInitWorkers(t *testing.T) {
 
 	w := wrapper{
 		evtChan:            make(chan beat.Event),
-		NumPipelineWorkers: expectedClients,
+		numPipelineWorkers: expectedClients,
 	}
 
 	publisher := testpipeline.NewPipelineConnector()
@@ -186,7 +186,7 @@ func TestRun(t *testing.T) {
 	}
 	w := wrapper{
 		evtChan:            make(chan beat.Event),
-		NumPipelineWorkers: 2,
+		numPipelineWorkers: 2,
 		inp: &inputMock{
 			NameFunc:        func() string { return t.Name() },
 			InitMetricsFunc: func(s string, logger *logp.Logger) Metrics { return metrics },
@@ -236,7 +236,7 @@ func TestRunRecoversFromPanic(t *testing.T) {
 	inputName := "TCP&UDP"
 	w := wrapper{
 		evtChan:            make(chan beat.Event),
-		NumPipelineWorkers: 1,
+		numPipelineWorkers: 1,
 		inp: &inputMock{
 			NameFunc:        func() string { return inputName },
 			InitMetricsFunc: func(s string, logger *logp.Logger) Metrics { return metrics },
@@ -273,7 +273,7 @@ func TestRunReturnsInitWokersError(t *testing.T) {
 
 	w := wrapper{
 		evtChan:            make(chan beat.Event),
-		NumPipelineWorkers: 1,
+		numPipelineWorkers: 1,
 		inp: &inputMock{
 			NameFunc:        func() string { return t.Name() },
 			InitMetricsFunc: func(s string, logger *logp.Logger) Metrics { return metrics },
