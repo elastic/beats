@@ -15,7 +15,7 @@ meraki
 :   type: keyword
 
 
-**`meraki.network.id`**
+**`meraki.network.id`** {applies_to}`stack: beta 9.1.0`
 :   type: keyword
 
 
