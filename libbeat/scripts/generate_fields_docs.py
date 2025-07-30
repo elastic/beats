@@ -12,12 +12,18 @@ def document_fields(output, section, sections, path, beat):
     if "skipdocs" in section:
         return
     if "anchor" in section:
-        output.write('''---
-mapped_pages:
-  - https://www.elastic.co/guide/en/beats/{}/current/exported-fields-{}.html
----
-
-% This file is generated! See scripts/generate_fields_docs.py\n\n'''.format(beat, section["anchor"]))
+        output.write('---\n')
+        output.write('mapped_pages:\n')
+        output.write('  - https://www.elastic.co/guide/en/beats/{}/current/exported-fields-{}.html\n'.format(beat, section["anchor"]))
+        # Build a docs-builder applies_to directive
+        applies_to = get_applies_to(section)
+        if len(applies_to) > 0:
+            output.write('applies_to:\n')
+            output.write('  stack: ')
+            output.write(', '.join(applies_to))
+            output.write('\n')
+        output.write('---\n\n')
+        output.write('% This file is generated! See scripts/generate_fields_docs.py\n\n')
 
     # Intermediate level titles
     # if ("description" in section and "prefix" not in section and
