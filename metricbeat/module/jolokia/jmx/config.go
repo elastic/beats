@@ -541,7 +541,7 @@ func SetUpdatedURL(sanitizedURI, uri string) string {
 	const defaultParams = "?ignoreErrors=true&canonicalNaming=false"
 
 	if strings.Contains(sanitizedURI, encodedQuery) {
-		parts := strings.Split(sanitizedURI, encodedQuery)
+		parts := strings.SplitN(sanitizedURI, encodedQuery, 2)
 		if len(parts) == 2 {
 			// Append path and add existing encoded query parameters
 			return fmt.Sprintf("%s%s%s%s", parts[0], uri, encodedQuery, parts[1])
