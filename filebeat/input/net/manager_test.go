@@ -37,7 +37,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestCreate(t *testing.T) {
@@ -93,7 +92,7 @@ func TestPublishLoop(t *testing.T) {
 	}
 
 	w := wrapper{
-		evtChan: make(chan beat.Event),
+		evtChan: make(chan DataMetadata),
 	}
 
 	publisher := testpipeline.NewPipelineConnector()
@@ -110,13 +109,16 @@ func TestPublishLoop(t *testing.T) {
 		w.publishLoop(v2Ctx, 0, client, metrics)
 	}()
 
-	events := []beat.Event{
-		{Fields: mapstr.M{"message": "test1"}},
-		{Fields: mapstr.M{"message": "test2"}},
+	events := [][]byte{
+		[]byte("test1"),
+		[]byte("test2"),
 	}
 
-	for _, evt := range events {
-		w.evtChan <- evt
+	for _, msg := range events {
+		w.evtChan <- DataMetadata{
+			Timestamp: time.Now(),
+			Data:      msg,
+		}
 	}
 
 	assert.Eventuallyf(t, func() bool {
@@ -151,7 +153,7 @@ func TestInitWorkers(t *testing.T) {
 	}
 
 	w := wrapper{
-		evtChan:            make(chan beat.Event),
+		evtChan:            make(chan DataMetadata),
 		numPipelineWorkers: expectedClients,
 	}
 
@@ -185,12 +187,12 @@ func TestRun(t *testing.T) {
 		EventReceivedFunc:  func(len int, timestamp time.Time) {},
 	}
 	w := wrapper{
-		evtChan:            make(chan beat.Event),
+		evtChan:            make(chan DataMetadata),
 		numPipelineWorkers: 2,
 		inp: &inputMock{
 			NameFunc:        func() string { return t.Name() },
 			InitMetricsFunc: func(s string, logger *logp.Logger) Metrics { return metrics },
-			RunFunc: func(context v2.Context, eventCh chan<- beat.Event, metrics Metrics) error {
+			RunFunc: func(context v2.Context, eventCh chan<- DataMetadata, metrics Metrics) error {
 				runCalled.Store(true)
 				defer wg.Done()
 				// Block until the context is cancelled
@@ -235,12 +237,12 @@ func TestRunRecoversFromPanic(t *testing.T) {
 	}
 	inputName := "TCP&UDP"
 	w := wrapper{
-		evtChan:            make(chan beat.Event),
+		evtChan:            make(chan DataMetadata),
 		numPipelineWorkers: 1,
 		inp: &inputMock{
 			NameFunc:        func() string { return inputName },
 			InitMetricsFunc: func(s string, logger *logp.Logger) Metrics { return metrics },
-			RunFunc: func(context v2.Context, eventCh chan<- beat.Event, metrics Metrics) error {
+			RunFunc: func(context v2.Context, eventCh chan<- DataMetadata, metrics Metrics) error {
 				panic("can I recover?")
 			},
 		},
@@ -272,7 +274,7 @@ func TestRunReturnsInitWokersError(t *testing.T) {
 	}
 
 	w := wrapper{
-		evtChan:            make(chan beat.Event),
+		evtChan:            make(chan DataMetadata),
 		numPipelineWorkers: 1,
 		inp: &inputMock{
 			NameFunc:        func() string { return t.Name() },

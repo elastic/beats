@@ -24,11 +24,10 @@ import (
 	"sync"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// Ensure, that inputMock does implement Input.
+// Ensure, that InputMock does implement Input.
 // If this is not the case, regenerate this file with moq.
 var _ Input = &inputMock{}
 
@@ -38,13 +37,13 @@ var _ Input = &inputMock{}
 //
 //		// make and configure a mocked Input
 //		mockedInput := &inputMock{
-//			InitMetricsFunc: func(s string, logger *logp.Logger) Metrics {
+//			InitMetricsFunc: func(id string, logger *logp.Logger) Metrics {
 //				panic("mock out the InitMetrics method")
 //			},
 //			NameFunc: func() string {
 //				panic("mock out the Name method")
 //			},
-//			RunFunc: func(context v2.Context, eventCh chan<- beat.Event, metrics Metrics) error {
+//			RunFunc: func(context v2.Context, dataMetadataCh chan<- DataMetadata, metrics Metrics) error {
 //				panic("mock out the Run method")
 //			},
 //			TestFunc: func(testContext v2.TestContext) error {
@@ -58,13 +57,13 @@ var _ Input = &inputMock{}
 //	}
 type inputMock struct {
 	// InitMetricsFunc mocks the InitMetrics method.
-	InitMetricsFunc func(s string, logger *logp.Logger) Metrics
+	InitMetricsFunc func(id string, logger *logp.Logger) Metrics
 
 	// NameFunc mocks the Name method.
 	NameFunc func() string
 
 	// RunFunc mocks the Run method.
-	RunFunc func(context v2.Context, eventCh chan<- beat.Event, metrics Metrics) error
+	RunFunc func(context v2.Context, dataMetadataCh chan<- DataMetadata, metrics Metrics) error
 
 	// TestFunc mocks the Test method.
 	TestFunc func(testContext v2.TestContext) error
@@ -73,8 +72,8 @@ type inputMock struct {
 	calls struct {
 		// InitMetrics holds details about calls to the InitMetrics method.
 		InitMetrics []struct {
-			// S is the s argument value.
-			S string
+			// ID is the id argument value.
+			ID string
 			// Logger is the logger argument value.
 			Logger *logp.Logger
 		}
@@ -85,8 +84,8 @@ type inputMock struct {
 		Run []struct {
 			// Context is the context argument value.
 			Context v2.Context
-			// EventCh is the eventCh argument value.
-			EventCh chan<- beat.Event
+			// DataMetadataCh is the dataMetadataCh argument value.
+			DataMetadataCh chan<- DataMetadata
 			// Metrics is the metrics argument value.
 			Metrics Metrics
 		}
@@ -103,21 +102,21 @@ type inputMock struct {
 }
 
 // InitMetrics calls InitMetricsFunc.
-func (mock *inputMock) InitMetrics(s string, logger *logp.Logger) Metrics {
+func (mock *inputMock) InitMetrics(id string, logger *logp.Logger) Metrics {
 	if mock.InitMetricsFunc == nil {
-		panic("inputMock.InitMetricsFunc: method is nil but Input.InitMetrics was just called")
+		panic("InputMock.InitMetricsFunc: method is nil but Input.InitMetrics was just called")
 	}
 	callInfo := struct {
-		S      string
+		ID     string
 		Logger *logp.Logger
 	}{
-		S:      s,
+		ID:     id,
 		Logger: logger,
 	}
 	mock.lockInitMetrics.Lock()
 	mock.calls.InitMetrics = append(mock.calls.InitMetrics, callInfo)
 	mock.lockInitMetrics.Unlock()
-	return mock.InitMetricsFunc(s, logger)
+	return mock.InitMetricsFunc(id, logger)
 }
 
 // InitMetricsCalls gets all the calls that were made to InitMetrics.
@@ -125,11 +124,11 @@ func (mock *inputMock) InitMetrics(s string, logger *logp.Logger) Metrics {
 //
 //	len(mockedInput.InitMetricsCalls())
 func (mock *inputMock) InitMetricsCalls() []struct {
-	S      string
+	ID     string
 	Logger *logp.Logger
 } {
 	var calls []struct {
-		S      string
+		ID     string
 		Logger *logp.Logger
 	}
 	mock.lockInitMetrics.RLock()
@@ -141,7 +140,7 @@ func (mock *inputMock) InitMetricsCalls() []struct {
 // Name calls NameFunc.
 func (mock *inputMock) Name() string {
 	if mock.NameFunc == nil {
-		panic("inputMock.NameFunc: method is nil but Input.Name was just called")
+		panic("InputMock.NameFunc: method is nil but Input.Name was just called")
 	}
 	callInfo := struct {
 	}{}
@@ -166,23 +165,23 @@ func (mock *inputMock) NameCalls() []struct {
 }
 
 // Run calls RunFunc.
-func (mock *inputMock) Run(context v2.Context, eventCh chan<- beat.Event, metrics Metrics) error {
+func (mock *inputMock) Run(context v2.Context, dataMetadataCh chan<- DataMetadata, metrics Metrics) error {
 	if mock.RunFunc == nil {
-		panic("inputMock.RunFunc: method is nil but Input.Run was just called")
+		panic("InputMock.RunFunc: method is nil but Input.Run was just called")
 	}
 	callInfo := struct {
-		Context v2.Context
-		EventCh chan<- beat.Event
-		Metrics Metrics
+		Context        v2.Context
+		DataMetadataCh chan<- DataMetadata
+		Metrics        Metrics
 	}{
-		Context: context,
-		EventCh: eventCh,
-		Metrics: metrics,
+		Context:        context,
+		DataMetadataCh: dataMetadataCh,
+		Metrics:        metrics,
 	}
 	mock.lockRun.Lock()
 	mock.calls.Run = append(mock.calls.Run, callInfo)
 	mock.lockRun.Unlock()
-	return mock.RunFunc(context, eventCh, metrics)
+	return mock.RunFunc(context, dataMetadataCh, metrics)
 }
 
 // RunCalls gets all the calls that were made to Run.
@@ -190,14 +189,14 @@ func (mock *inputMock) Run(context v2.Context, eventCh chan<- beat.Event, metric
 //
 //	len(mockedInput.RunCalls())
 func (mock *inputMock) RunCalls() []struct {
-	Context v2.Context
-	EventCh chan<- beat.Event
-	Metrics Metrics
+	Context        v2.Context
+	DataMetadataCh chan<- DataMetadata
+	Metrics        Metrics
 } {
 	var calls []struct {
-		Context v2.Context
-		EventCh chan<- beat.Event
-		Metrics Metrics
+		Context        v2.Context
+		DataMetadataCh chan<- DataMetadata
+		Metrics        Metrics
 	}
 	mock.lockRun.RLock()
 	calls = mock.calls.Run
@@ -208,7 +207,7 @@ func (mock *inputMock) RunCalls() []struct {
 // Test calls TestFunc.
 func (mock *inputMock) Test(testContext v2.TestContext) error {
 	if mock.TestFunc == nil {
-		panic("inputMock.TestFunc: method is nil but Input.Test was just called")
+		panic("InputMock.TestFunc: method is nil but Input.Test was just called")
 	}
 	callInfo := struct {
 		TestContext v2.TestContext
