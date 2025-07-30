@@ -11,6 +11,10 @@ Salesforce Module
 
 ## salesforce [_salesforce]
 
+```{applies_to}
+stack: beta
+```
+
 Fileset for ingesting Salesforce Apex logs.
 
 **`salesforce.instance_url`**
@@ -20,6 +24,10 @@ type: keyword
 
 
 ## apex [_apex]
+
+```{applies_to}
+stack: beta
+```
 
 Fileset for ingesting Salesforce Apex logs.
 
@@ -307,6 +315,10 @@ type: keyword
 
 ## salesforce.login [_salesforce.login]
 
+```{applies_to}
+stack: beta
+```
+
 Fileset for ingesting Salesforce Login (REST) logs.
 
 **`salesforce.login.document_id`**
@@ -467,6 +479,10 @@ type: keyword
 
 ## salesforce.logout [_salesforce.logout]
 
+```{applies_to}
+stack: beta
+```
+
 Fileset for parsing Salesforce Logout (REST) logs.
 
 **`salesforce.logout.document_id`**
@@ -590,6 +606,10 @@ type: keyword
 
 
 ## salesforce.setup_audit_trail [_salesforce.setup_audit_trail]
+
+```{applies_to}
+stack: beta
+```
 
 Fileset for ingesting Salesforce SetupAuditTrail logs.
 

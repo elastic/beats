@@ -15,6 +15,10 @@ Fields from NATS logs.
 
 ## log [_log]
 
+```{applies_to}
+stack: beta
+```
+
 Nats log files
 
 ## client [_client]

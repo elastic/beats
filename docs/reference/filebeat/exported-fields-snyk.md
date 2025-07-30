@@ -11,6 +11,10 @@ Snyk module
 
 ## snyk [_snyk]
 
+```{applies_to}
+stack: beta
+```
+
 Module for parsing Snyk project vulnerabilities.
 
 **`snyk.projects`**
@@ -26,6 +30,10 @@ type: keyword
 
 
 ## audit [_audit]
+
+```{applies_to}
+stack: beta
+```
 
 Module for parsing Snyk audit logs.
 
@@ -48,6 +56,10 @@ type: flattened
 
 
 ## vulnerabilities [_vulnerabilities]
+
+```{applies_to}
+stack: beta
+```
 
 Module for parsing Snyk project vulnerabilities.
 

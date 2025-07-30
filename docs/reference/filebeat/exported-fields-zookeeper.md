@@ -15,6 +15,10 @@ ZooKeeper Module
 
 ## audit [_audit]
 
+```{applies_to}
+stack: beta
+```
+
 ZooKeeper Audit logs.
 
 **`zookeeper.audit.session`**
@@ -54,6 +58,10 @@ type: keyword
 
 
 ## log [_log]
+
+```{applies_to}
+stack: beta
+```
 
 ZooKeeper logs.
 

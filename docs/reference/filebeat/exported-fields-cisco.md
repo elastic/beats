@@ -11,6 +11,10 @@ Module for handling Cisco network device logs.
 
 ## cisco.amp [_cisco.amp]
 
+```{applies_to}
+stack: beta
+```
+
 Module for parsing Cisco AMP logs.
 
 **`cisco.amp.timestamp_nanoseconds`**

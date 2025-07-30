@@ -15,6 +15,10 @@ Fields from Pensando logs.
 
 ## dfw [_dfw]
 
+```{applies_to}
+stack: beta
+```
+
 Fields for Pensando DFW
 
 **`pensando.dfw.action`**

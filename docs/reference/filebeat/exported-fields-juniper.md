@@ -11,6 +11,10 @@ juniper fields.
 
 ## juniper.srx [_juniper.srx]
 
+```{applies_to}
+stack: beta
+```
+
 Module for parsing junipersrx syslog.
 
 **`juniper.srx.reason`**

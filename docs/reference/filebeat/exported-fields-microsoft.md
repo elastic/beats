@@ -117,6 +117,10 @@ type: keyword
 
 ## microsoft.m365_defender [_microsoft.m365_defender]
 
+```{applies_to}
+stack: beta
+```
+
 Module for ingesting Microsoft Defender ATP.
 
 **`microsoft.m365_defender.incidentId`**

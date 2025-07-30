@@ -15,5 +15,9 @@ Fields from Amazon ECS Fargate logs.
 
 ## log [_log]
 
+```{applies_to}
+stack: beta
+```
+
 Fields for Amazon Fargate container logs.
 

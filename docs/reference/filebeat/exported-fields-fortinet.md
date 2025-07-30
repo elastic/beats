@@ -21,6 +21,10 @@ type: keyword
 
 ## firewall [_firewall]
 
+```{applies_to}
+stack: beta
+```
+
 Module for parsing Fortinet syslog.
 
 **`fortinet.firewall.acct_stat`**

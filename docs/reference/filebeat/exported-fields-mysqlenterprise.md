@@ -15,6 +15,10 @@ Fields from MySQL Enterprise Logs
 
 ## audit [_audit]
 
+```{applies_to}
+stack: beta
+```
+
 Module for parsing MySQL Enterprise Audit Logs
 
 **`mysqlenterprise.audit.class`**

@@ -11,6 +11,10 @@ sophos Module
 
 ## sophos.xg [_sophos.xg]
 
+```{applies_to}
+stack: beta
+```
+
 Module for parsing sophosxg syslog.
 
 **`sophos.xg.action`**
