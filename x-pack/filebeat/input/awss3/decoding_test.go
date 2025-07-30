@@ -36,7 +36,7 @@ func TestDecoding(t *testing.T) {
 			file:      "vpc-flow.gz.parquet",
 			numEvents: 1304,
 			config: &readerConfig{
-				Decoding: decoder.DecoderConfig{
+				Decoding: decoder.Config{
 					Codec: &decoder.CodecConfig{
 						Parquet: &decoder.ParquetCodecConfig{
 							ProcessParallel: true,
@@ -51,7 +51,7 @@ func TestDecoding(t *testing.T) {
 			file:      "vpc-flow.gz.parquet",
 			numEvents: 1304,
 			config: &readerConfig{
-				Decoding: decoder.DecoderConfig{
+				Decoding: decoder.Config{
 					Codec: &decoder.CodecConfig{
 						Parquet: &decoder.ParquetCodecConfig{
 							ProcessParallel: true,
@@ -66,7 +66,7 @@ func TestDecoding(t *testing.T) {
 			file:      "vpc-flow.gz.parquet",
 			numEvents: 1304,
 			config: &readerConfig{
-				Decoding: decoder.DecoderConfig{
+				Decoding: decoder.Config{
 					Codec: &decoder.CodecConfig{
 						Parquet: &decoder.ParquetCodecConfig{
 							Enabled: true,
@@ -81,7 +81,7 @@ func TestDecoding(t *testing.T) {
 			numEvents:     1,
 			assertAgainst: "cloudtrail.json",
 			config: &readerConfig{
-				Decoding: decoder.DecoderConfig{
+				Decoding: decoder.Config{
 					Codec: &decoder.CodecConfig{
 						Parquet: &decoder.ParquetCodecConfig{
 							Enabled:         true,
@@ -98,11 +98,11 @@ func TestDecoding(t *testing.T) {
 			numEvents:     4,
 			assertAgainst: "txn.json",
 			config: &readerConfig{
-				Decoding: decoder.DecoderConfig{
+				Decoding: decoder.Config{
 					Codec: &decoder.CodecConfig{
-						CSV: &decoder.CsvCodecConfig{
+						CSV: &decoder.CSVCodecConfig{
 							Enabled: true,
-							Comma:   ptr[decoder.ConfigRune](' '),
+							Comma:   ptr[decoder.Rune](' '),
 						},
 					},
 				},
@@ -114,11 +114,11 @@ func TestDecoding(t *testing.T) {
 			numEvents:     4,
 			assertAgainst: "txn.json",
 			config: &readerConfig{
-				Decoding: decoder.DecoderConfig{
+				Decoding: decoder.Config{
 					Codec: &decoder.CodecConfig{
-						CSV: &decoder.CsvCodecConfig{
+						CSV: &decoder.CSVCodecConfig{
 							Enabled: true,
-							Comma:   ptr[decoder.ConfigRune](' '),
+							Comma:   ptr[decoder.Rune](' '),
 						},
 					},
 				},
@@ -168,7 +168,7 @@ func readJSONFromFile(t *testing.T, filepath string) []string {
 var codecConfigTests = []struct {
 	name    string
 	yaml    string
-	want    decoder.DecoderConfig
+	want    decoder.Config
 	wantErr error
 }{
 	{
@@ -180,11 +180,11 @@ codec:
     comma: ' '
     comment: '#'
 `,
-		want: decoder.DecoderConfig{
+		want: decoder.Config{
 			Codec: &decoder.CodecConfig{
-				CSV: &decoder.CsvCodecConfig{
+				CSV: &decoder.CSVCodecConfig{
 					Enabled: true,
-					Comma:   ptr[decoder.ConfigRune](' '),
+					Comma:   ptr[decoder.Rune](' '),
 					Comment: '#',
 				},
 			}},
@@ -196,9 +196,9 @@ codec:
   csv:
     enabled: true
 `,
-		want: decoder.DecoderConfig{
+		want: decoder.Config{
 			Codec: &decoder.CodecConfig{
-				CSV: &decoder.CsvCodecConfig{
+				CSV: &decoder.CSVCodecConfig{
 					Enabled: true,
 				},
 			}},
@@ -211,11 +211,11 @@ codec:
     enabled: true
     comma: "\u0000"
 `,
-		want: decoder.DecoderConfig{
+		want: decoder.Config{
 			Codec: &decoder.CodecConfig{
-				CSV: &decoder.CsvCodecConfig{
+				CSV: &decoder.CSVCodecConfig{
 					Enabled: true,
-					Comma:   ptr[decoder.ConfigRune]('\x00'),
+					Comma:   ptr[decoder.Rune]('\x00'),
 				},
 			}},
 	},
@@ -250,7 +250,7 @@ func TestCodecConfig(t *testing.T) {
 				t.Fatalf("unexpected error unmarshaling config: %v", err)
 			}
 
-			var got decoder.DecoderConfig
+			var got decoder.Config
 			err = c.Unpack(&got)
 			if !sameError(err, test.wantErr) {
 				t.Errorf("unexpected error unpacking config: got:%v want:%v", err, test.wantErr)

@@ -23,11 +23,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader"
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/elastic/beats/v7/x-pack/libbeat/reader"
-	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 )
 
 type job struct {
@@ -206,7 +204,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 				var v mapstr.M
 				_, msg, v, err = dec.DecodeValue()
 				if err != nil {
-					if errors.Is(err, io.EOF) {
+					if err == io.EOF {
 						return nil
 					}
 					break
@@ -215,7 +213,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 			} else {
 				msg, err = dec.Decode()
 				if err != nil {
-					if errors.Is(err, io.EOF) {
+					if err == io.EOF {
 						return nil
 					}
 					break
