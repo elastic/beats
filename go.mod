@@ -196,7 +196,6 @@ require (
 	github.com/google/cel-go v0.25.0
 	github.com/googleapis/gax-go/v2 v2.14.1
 	github.com/gorilla/handlers v1.5.1
-	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/icholy/digest v0.1.22
@@ -232,7 +231,6 @@ require (
 	go.opentelemetry.io/collector/pdata v1.36.0
 	go.opentelemetry.io/collector/receiver v1.36.0
 	go.uber.org/mock v0.5.0
-	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8
 	golang.org/x/term v0.32.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
@@ -489,6 +487,7 @@ require (
 	go.uber.org/ratelimit v0.3.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
+	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	gonum.org/v1/gonum v0.16.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250603155806-513f23925822 // indirect
