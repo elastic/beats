@@ -743,6 +743,11 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 		return err
 	}
 
+	// this snippet handles the package name metadata for the beats .deb or .rpm specs.
+	// If the FIPS-enabled spec is being built, add `-fips` suffix to the package name and list the non-FIPS package
+	// as a conflict in order to prevent having both packages installed at the same time.
+	// If a non FIPS-enabled spec is built but a FIPS-enabled package can be produced for the same beat, list the
+	// FIPS-enabled package as conflict as well.
 	packageName := spec.ServiceName
 	fipsPackageName := packageName + "-fips"
 	var conflicts []string
@@ -752,7 +757,7 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 		// change the package name to distinguish it from the non-FIPS variant
 		packageName = fipsPackageName
 	} else if slices.Contains(FIPSConfig.Beats, BeatName) {
-		// the beat is enabled for FIPS capable build, we are add the FIPS package as conflict
+		// the beat is enabled for FIPS capable build, add the FIPS package as conflict
 		conflicts = append(conflicts, fipsPackageName)
 	}
 	args = append(args,
