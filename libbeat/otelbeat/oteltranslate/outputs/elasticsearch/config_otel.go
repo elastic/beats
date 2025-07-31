@@ -189,9 +189,15 @@ func checkUnsupportedConfig(cfg *config.C) error {
 	} else if cfg.HasField("parameters") {
 		logp.Warn("parameters is currently not supported")
 	} else if cfg.HasField("proxy_headers") {
+<<<<<<< HEAD
 		logp.Warn("proxy_headers is currently not supported")
 	} else if value, _ := cfg.Bool("allow_older_versions", -1); !value {
 		logp.Warn("allow_older_versions:false is currently not supported")
+=======
+		logger.Warn("proxy_headers is currently not supported")
+	} else if value, err := cfg.Bool("allow_older_versions", -1); err == nil && !value {
+		logger.Warn("allow_older_versions:false is currently not supported")
+>>>>>>> bb33c540c (fix: allow_older_versions warning should not be logged if field is absent or value set to true (#45634))
 	}
 	return nil
 }
