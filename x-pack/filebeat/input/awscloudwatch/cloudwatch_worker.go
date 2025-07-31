@@ -10,11 +10,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/aws/smithy-go/transport/http"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -25,6 +28,7 @@ type cwWorker struct {
 	metrics   *inputMetrics
 	processor *logProcessor
 	region    string
+	status    status.StatusReporter
 	svc       *cloudwatchlogs.Client
 	tracker   *ackTracker
 }
@@ -32,6 +36,7 @@ type cwWorker struct {
 func newCWWorker(cfg config,
 	region string,
 	metrics *inputMetrics,
+	status status.StatusReporter,
 	svc *cloudwatchlogs.Client,
 	pipeline beat.Pipeline,
 	log *logp.Logger) (*cwWorker, error) {
@@ -40,6 +45,7 @@ func newCWWorker(cfg config,
 		config:  cfg,
 		region:  region,
 		metrics: metrics,
+		status:  status,
 		svc:     svc,
 		log:     log,
 	}
@@ -94,8 +100,17 @@ func (w *cwWorker) run(ctx context.Context, logGroupId string, startTime, endTim
 		var errRequestCanceled *awssdk.RequestCanceledError
 		if errors.As(err, &errRequestCanceled) {
 			w.log.Error("getLogEventsFromCloudWatch failed with RequestCanceledError: ", errRequestCanceled)
+		} else {
+			w.log.Error("getLogEventsFromCloudWatch failed: ", err)
 		}
-		w.log.Error("getLogEventsFromCloudWatch failed: ", err)
+
+		var rspError *http.ResponseError
+		if errors.As(err, &rspError) {
+			// update status with context details
+			w.status.UpdateStatus(status.Degraded, fmt.Sprintf("Log group listing failed, status: %d, error: %s", rspError.Response.StatusCode, rspError.Error()))
+		} else {
+			w.status.UpdateStatus(status.Degraded, fmt.Sprintf("Log group listing failed, error: %s", err.Error()))
+		}
 	}
 
 	return count

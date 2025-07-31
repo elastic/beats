@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -63,6 +64,7 @@ type cloudwatchInput struct {
 	awsConfig awssdk.Config
 	store     statestore.States
 	metrics   *inputMetrics
+	status    status.StatusReporter
 }
 
 func newInput(config config, store statestore.States, logger *logp.Logger) (*cloudwatchInput, error) {
@@ -91,15 +93,27 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 	log := inputContext.Logger
 
+	// setup status reporter
+	in.status = inputContext.StatusReporter
+	if in.status == nil {
+		in.status = &debugCWStatusReporter{log}
+	}
+
+	defer in.status.UpdateStatus(status.Stopped, "Input stopped")
+	in.status.UpdateStatus(status.Starting, "Input starting")
+
 	handler, err := newStateHandler(log, in.config, in.store)
 	if err != nil {
+		in.status.UpdateStatus(status.Failed, "State registry creation failure")
 		return fmt.Errorf("failed to create state handler: %w", err)
 	}
 	defer handler.Close()
 
+	in.status.UpdateStatus(status.Configuring, "Configuring input")
 	var logGroupIDs []string
 	logGroupIDs, region, err := fromConfig(in.config, in.awsConfig)
 	if err != nil {
+		in.status.UpdateStatus(status.Failed, "Configuration loading error")
 		return fmt.Errorf("error processing configurations: %w", err)
 	}
 
@@ -115,6 +129,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		// now fallback to provided LogGroupNamePrefix and use derived service client to derive logGroupIDs
 		logGroupIDs, err = getLogGroupNames(svc, in.config.LogGroupNamePrefix, in.config.IncludeLinkedAccountsForPrefixMode)
 		if err != nil {
+			in.status.UpdateStatus(status.Failed, "Configuration loading error")
 			return fmt.Errorf("failed to get log group names from LogGroupNamePrefix: %w", err)
 		}
 	}
@@ -126,16 +141,32 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		in.metrics,
 		region,
 		in.config,
-		handler)
+		handler,
+		in.status)
+
+	in.status.UpdateStatus(status.Running, "Input is running")
 
 	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupIDs)))
-	cwPoller.startWorkers(ctx, svc, pipeline)
+	err = cwPoller.startWorkers(ctx, svc, pipeline)
+	if err != nil {
+		in.status.UpdateStatus(status.Failed, "Error starting input processors")
+		return err
+	}
 
 	log.Debugf("Config latency = %f", cwPoller.config.Latency)
 	log.Debugf("Config scan_frequency = %f", cwPoller.config.ScanFrequency)
 	log.Debugf("Config api_sleep = %f", cwPoller.config.APISleep)
 	cwPoller.receive(ctx, logGroupIDs, time.Now)
 	return nil
+}
+
+// debugCWStatusReporter with debugging logs. This is typically used when running in standalone mode.
+type debugCWStatusReporter struct {
+	log *logp.Logger
+}
+
+func (n *debugCWStatusReporter) UpdateStatus(status status.Status, msg string) {
+	n.log.Debugf("CloudWatch input status updated: status: %s, message: %s", status, msg)
 }
 
 // fromConfig is a helper to parse input configurations and derive logGroupIDs & aws region
