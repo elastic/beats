@@ -294,6 +294,7 @@ processors:
 }
 
 func TestMetricbeatOTelMultipleReceiversE2E(t *testing.T) {
+	t.Skip("Flaky test, see https://github.com/elastic/beats/issues/45631")
 	integration.EnsureESIsRunning(t)
 
 	host := integration.GetESURL(t, "http")
