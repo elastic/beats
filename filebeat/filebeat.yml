@@ -25,7 +25,7 @@ filebeat.inputs:
   id: my-filestream-id
 
   # Change to true to enable this input configuration.
-  enabled: true
+  enabled: false
 
   # Paths that should be crawled and fetched. Glob based paths.
   paths:
@@ -161,21 +161,19 @@ setup.kibana:
 # ---------------------------- Elasticsearch Output ----------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["localhost:9201"]
+  hosts: ["localhost:9200"]
 
   # Performance preset - one of "balanced", "throughput", "scale",
   # "latency", or "custom".
   preset: balanced
 
   # Protocol - either `http` (default) or `https`.
-  protocol: "https"
+  #protocol: "https"
 
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-  username: "admin"
-  password: "testing"
-  ssl.certificate_authorities: ["/Users/khushijain/Documents/beats/testing/environments/docker/elasticsearch/pki/ca/ca.pem"]
-  # ssl.verification_mode: certificate
+  #username: "elastic"
+  #password: "changeme"
 
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
