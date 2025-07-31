@@ -25,6 +25,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
@@ -229,6 +230,7 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 
 	switch {
 	case config.Kerberos.IsEnabled():
+		log.Warn(cfgwarn.Beta("Kerberos authentication for Kafka is beta."))
 
 		// Due to a regrettable past decision, the flag controlling Kerberos
 		// FAST authentication was initially added to the output configuration
