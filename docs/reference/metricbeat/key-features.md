@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/key-features.html
+applies_to:
+  stack: ga
 ---
 
 # Key metricbeat features [key-features]

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/heartbeat-template.html
+applies_to:
+  stack: ga
 ---
 
 # Load the Elasticsearch index template [heartbeat-template]

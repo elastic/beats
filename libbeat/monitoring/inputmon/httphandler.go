@@ -24,7 +24,6 @@ import (
 	"strings"
 
 	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -35,7 +34,7 @@ import (
 const InputNested = "__NESTED__"
 
 const (
-	route           = "/inputs"
+	route           = "/inputs/{$}"
 	contentType     = "Content-Type"
 	applicationJSON = "application/json; charset=utf-8"
 )
@@ -49,16 +48,16 @@ type handler struct {
 // requests to /inputs. It will publish the metrics registered in the global
 // 'dataset' metrics namespace and on reg.
 func AttachHandler(
-	r *mux.Router,
+	r *http.ServeMux,
 	reg *monitoring.Registry,
 ) error {
 	return attachHandler(r, globalRegistry(), reg)
 }
 
-func attachHandler(r *mux.Router, global *monitoring.Registry, local *monitoring.Registry) error {
+func attachHandler(r *http.ServeMux, global *monitoring.Registry, local *monitoring.Registry) error {
 	h := &handler{globalReg: global, localReg: local}
-	r = r.PathPrefix(route).Subrouter()
-	return r.StrictSlash(true).Handle("/", validationHandler("GET", []string{"pretty", "type"}, h.allInputs)).GetError()
+	r.Handle(route, validationHandler("GET", []string{"pretty", "type"}, h.allInputs))
+	return nil
 }
 
 func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {

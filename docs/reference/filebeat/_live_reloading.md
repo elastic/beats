@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/_live_reloading.html
+applies_to:
+  stack: ga
 ---
 
 # Live reloading [_live_reloading]
