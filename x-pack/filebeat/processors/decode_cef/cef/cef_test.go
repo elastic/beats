@@ -5,19 +5,11 @@
 package cef
 
 import (
-	"crypto/sha1"
-	"encoding/hex"
-	"errors"
-	"flag"
-	"os"
-	"path/filepath"
 	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
-
-var generateCorpus = flag.Bool("corpus", false, "generate fuzz corpus from test cases")
 
 const (
 	standardMessage = `CEF:26|security|threatmanager|1.0|100|trojan successfully stopped|10|src=10.0.0.192 dst=12.121.122.82 spt=1232 eventId=1 in=4294967296 out=4294967296`
@@ -96,21 +88,15 @@ var testMessages = []string{
 	fuzz3,
 }
 
-func TestGenerateFuzzCorpus(t *testing.T) {
-	if !*generateCorpus {
-		t.Skip("-corpus is not enabled")
-	}
-
+func FuzzUnpack(f *testing.F) {
 	for _, m := range testMessages {
-		h := sha1.New()
-		h.Write([]byte(m))
-		name := hex.EncodeToString(h.Sum(nil))
-
-		err := os.WriteFile(filepath.Join("fuzz/corpus", name), []byte(m), 0o644)
-		if err != nil {
-			t.Fatalf("failed to write fuzzing corpus: %v", err)
-		}
+		f.Add(m)
 	}
+
+	f.Fuzz(func(t *testing.T, m string) {
+		var e Event
+		_ = e.Unpack(m) // This is only testing that Unpack doesn't panic.
+	})
 }
 
 func TestEventUnpack(t *testing.T) {

@@ -280,7 +280,7 @@ program: |
 
 ### `state` [state-streaming]
 
-`state` is an optional object that is passed to the CEL program on the first execution. It is available to the executing program as the `state` variable. Except for the `state.cursor` field, `state` does not persist over restarts.
+`state` is an optional object that is passed to the CEL program as the `state` variable on the first execution. Subsequent executions of the program during the life of the input will populate the `state` variable with the return value of the previous execution, but with the `state.events` field removed. Except for the `state.cursor` field, returned `state` data does not persist over restarts.
 
 
 ### `state.cursor` [cursor-streaming]
