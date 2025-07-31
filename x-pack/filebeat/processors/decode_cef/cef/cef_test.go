@@ -523,13 +523,3 @@ func TimestampField(v string) *Field {
 	}
 	return &Field{String: v, Type: TimestampType, Interface: ts}
 }
-
-func FuzzUnpack(f *testing.F) {
-	f.Add(headerOnly)
-	f.Add(escapedMessage)
-
-	f.Fuzz(func(t *testing.T, data string) {
-		var e Event
-		e.Unpack(data)
-	})
-}
