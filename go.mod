@@ -92,3 +92,8 @@ require (
 	go.elastic.co/go-licence-detector v0.6.0
 	gopkg.in/yaml.v2 v2.4.0
 )
+
+retract (
+	v1.0.1 // Contains retractions only.
+	v1.0.0 // Published accidentally.
+)
