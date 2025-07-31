@@ -490,6 +490,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Log CEL single object evaluation results as ECS compliant documents where possible. {issue}45254[45254] {pull}45399[45399]
 - Add status update functionality to Salesforce input. {issue}44653[44653] {pull}45227[45227]
 - Improve CEL and Streaming input documentation of the `state` option. {pull}45616[45616]
+- Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]
 - Clarify behavior in logging for starting periodic evaluations and for exceeding the maximum execution budget. {pull}45633[45633]
 
 *Auditbeat*
