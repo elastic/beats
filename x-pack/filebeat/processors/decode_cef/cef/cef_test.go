@@ -5,6 +5,7 @@
 package cef
 
 import (
+	"errors"
 	"strconv"
 	"testing"
 
