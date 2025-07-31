@@ -46,6 +46,9 @@ const (
 	ParagraphSeparator
 	// NullTerminator
 	NullTerminator
+
+	// CustomTerminator is a custom terminator defined by the user
+	NoTerminator
 )
 
 var (
@@ -60,6 +63,7 @@ var (
 		"line_separator":            LineSeparator,
 		"paragraph_separator":       ParagraphSeparator,
 		"null_terminator":           NullTerminator,
+		"no_terminator":             NoTerminator,
 	}
 
 	lineTerminatorCharacters = map[LineTerminator][]byte{
@@ -73,6 +77,7 @@ var (
 		LineSeparator:          []byte("\u2028"),
 		ParagraphSeparator:     []byte("\u2029"),
 		NullTerminator:         []byte{'\u0000'},
+		NoTerminator:           []byte("\uFFFF"),
 	}
 )
 

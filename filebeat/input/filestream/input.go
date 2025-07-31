@@ -118,6 +118,7 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
 
+	fmt.Println("Using encoding...", c.Reader.Encoding)
 	encodingFactory, ok := encoding.FindEncoding(c.Reader.Encoding)
 	if !ok || encodingFactory == nil {
 		return nil, nil, fmt.Errorf("unknown encoding('%v')", c.Reader.Encoding)
@@ -423,7 +424,7 @@ func (inp *filestream) open(
 	fs fileSource,
 	offset int64,
 ) (reader.Reader, bool, error) {
-
+	fmt.Println("open()", "Opening file:", fs.newPath, "with offset:", offset)
 	f, encoding, truncated, err := inp.openFile(log, fs.newPath, offset)
 	if err != nil {
 		return nil, truncated, err
@@ -470,6 +471,7 @@ func (inp *filestream) open(
 	encReaderMaxBytes := inp.readerConfig.MaxBytes * 4
 
 	var r reader.Reader
+	fmt.Println("Creating new EncodeReader with encoding:", inp.readerConfig.Encoding)
 	r, err = readfile.NewEncodeReader(dbgReader, readfile.Config{
 		Codec:      encoding,
 		BufferSize: inp.readerConfig.BufferSize,

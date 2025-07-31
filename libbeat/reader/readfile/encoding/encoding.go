@@ -36,6 +36,8 @@ var encodings = map[string]EncodingFactory{
 	"nop":   Plain,
 	"plain": Plain,
 
+	"binary": BinaryEncoding,
+
 	// utf8 (validate input) - shadow htmlindex utf8 codecs not validating input
 	"unicode-1-1-utf-8": utf8Encoding,
 	"utf-8":             utf8Encoding,
