@@ -99,8 +99,11 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	ctx.UpdateStatus(status.Configuring, "")
 
 	const pollInterval = time.Minute
-	metrics := netmetrics.NewUDP(ctx.ID, ctx.MetricsRegistry, s.config.Host, uint64(s.config.ReadBuffer), pollInterval, log) // #nosec G115 -- ignore "overflow conversion int64 -> uint64", config validation ensures value is always positive.
-	defer metrics.Close()
+	var metrics *netmetrics.UDP
+	if ctx.ID != "" {
+		metrics = netmetrics.NewUDP(ctx.MetricsRegistry, s.config.Host, uint64(s.config.ReadBuffer), pollInterval, log) // #nosec G115 -- ignore "overflow conversion int64 -> uint64", config validation ensures value is always positive.
+		defer metrics.Close()
+	}
 
 	server := udp.New(&s.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
 		log.Debugw("Data received", "bytes", len(data), "remote_address", metadata.RemoteAddr.String(), "truncated", metadata.Truncated)

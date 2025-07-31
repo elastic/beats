@@ -51,12 +51,8 @@ type UDP struct {
 	processingTime metrics.Sample     // histogram of the elapsed time between packet receipt and publication
 }
 
-// NewUDP returns a new UDP input metricset. Note that if the id is empty then a nil UDP metricset is returned.
-func NewUDP(id string, reg *monitoring.Registry, device string, buflen uint64, poll time.Duration, log *logp.Logger) *UDP {
-	if id == "" {
-		return nil
-	}
-
+// NewUDP returns a new UDP input metricset.
+func NewUDP(reg *monitoring.Registry, device string, buflen uint64, poll time.Duration, log *logp.Logger) *UDP {
 	out := &UDP{
 		monitorRegistry: reg,
 		bufferLen:       monitoring.NewUint(reg, "udp_read_buffer_length_gauge"),
