@@ -128,7 +128,6 @@ func TestPublish(t *testing.T) {
 
 		err := otelConsumer.Publish(ctx, batch)
 		assert.NoError(t, err)
-		assert.True(t, consumererror.IsPermanent(err))
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchDrop, batch.Signals[0].Tag)
 	})
