@@ -16,24 +16,6 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-func TestUTF16AtOffsetToString(t *testing.T) {
-	// Create a UTF-16 string
-	sampleText := "This is a string test!"
-	utf16Str, _ := syscall.UTF16FromString(sampleText)
-
-	// Convert it to uintptr (simulate as if it's part of a larger struct)
-	ptr := uintptr(unsafe.Pointer(&utf16Str[0]))
-
-	// Test the function
-	result := utf16AtOffsetToString(ptr, 0)
-	assert.Equal(t, sampleText, result, "The converted string should match the original")
-
-	// Test with offset (skip the first character)
-	offset := unsafe.Sizeof(utf16Str[0]) // Size of one UTF-16 character
-	resultWithOffset := utf16AtOffsetToString(ptr, offset)
-	assert.Equal(t, sampleText[1:], resultWithOffset, "The converted string with offset should skip the first character")
-}
-
 func TestGUIDFromProviderName_EmptyName(t *testing.T) {
 	guid, err := guidFromProviderName("")
 	assert.EqualError(t, err, "empty provider name")
@@ -89,7 +71,7 @@ func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
 		// Calculate size needed for the provider name string
 		nameSize := (len(utf16ProviderName) + 1) * 2 // +1 for null-terminator
 
-		requiredSize := uint32(unsafe.Sizeof(ProviderEnumerationInfo{})) + uint32(unsafe.Sizeof(TraceProviderInfo{})) + uint32(nameSize)
+		requiredSize := uint32(unsafe.Sizeof(ProviderEnumerationInfo{}) + unsafe.Sizeof(TraceProviderInfo{}) + uintptr(nameSize))
 		if *pBufferSize < requiredSize {
 			*pBufferSize = requiredSize
 			return ERROR_INSUFFICIENT_BUFFER
@@ -141,7 +123,7 @@ func TestGUIDFromProviderName_Success(t *testing.T) {
 		// Calculate size needed for the provider name string
 		nameSize := (len(utf16ProviderName) + 1) * 2 // +1 for null-terminator
 
-		requiredSize := uint32(unsafe.Sizeof(ProviderEnumerationInfo{})) + uint32(unsafe.Sizeof(TraceProviderInfo{})) + uint32(nameSize)
+		requiredSize := uint32(unsafe.Sizeof(ProviderEnumerationInfo{}) + unsafe.Sizeof(TraceProviderInfo{}) + uintptr(nameSize))
 		if *pBufferSize < requiredSize {
 			*pBufferSize = requiredSize
 			return ERROR_INSUFFICIENT_BUFFER
