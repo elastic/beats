@@ -1,0 +1,74 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+package otelbeat
+
+import (
+	"fmt"
+	"path/filepath"
+
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/fbprovider"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/mbprovider"
+	"github.com/spf13/cobra"
+	"go.opentelemetry.io/collector/confmap"
+	"gopkg.in/yaml.v3"
+)
+
+func OTelInspectComand(beatname string) *cobra.Command {
+	command := &cobra.Command{
+		Short:  "Run this command to inspect the OTeL configuration outputted by beatconverter",
+		Use:    "inspect",
+		Hidden: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			// get beat configuration file
+			beatCfg, _ := cmd.Flags().GetString("config")
+			beatCfgFile := filepath.Join(cfgfile.GetPathConfig(), beatCfg)
+
+			isOtelConfig, err := isOtelConfigFile(beatCfgFile)
+			if err != nil {
+				return fmt.Errorf("error reading config file: %w", err)
+			}
+			if isOtelConfig {
+				// the user has defined a custom OTeL config. Skip the rest of the logic.
+				return nil
+			}
+
+			var provider confmap.Provider
+			switch beatname {
+			case "filebeat":
+				provider = fbprovider.NewFactory().Create(confmap.ProviderSettings{})
+			case "metricbeat":
+				provider = mbprovider.NewFactory().Create(confmap.ProviderSettings{})
+			}
+			retreived, err := provider.Retrieve(cmd.Context(), schemeMap[beatname]+":"+beatCfg, nil)
+			if err != nil {
+				return fmt.Errorf("error getting the config from provider: %w", err)
+			}
+
+			conf, err := retreived.AsConf()
+			if err != nil {
+				return fmt.Errorf("error retriving confmap: %w", err)
+			}
+
+			converter := beatconverter.NewFactory().Create(confmap.ConverterSettings{})
+
+			if err = converter.Convert(cmd.Context(), conf); err != nil {
+				return fmt.Errorf("error converting config: %w", err)
+			}
+
+			b, err := yaml.Marshal(conf.ToStringMap())
+			if err != nil {
+				return fmt.Errorf("error marshalling yaml: %w", err)
+			}
+
+			fmt.Fprintf(cmd.OutOrStdout(), string(b))
+			return nil
+		},
+	}
+
+	command.Flags().String("config", beatname+"-otel.yml", "path to "+beatname+" config file")
+	return command
+}
