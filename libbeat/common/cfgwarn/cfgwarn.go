@@ -37,7 +37,7 @@ func Deprecate(version string, format string, v ...interface{}) string {
 	return fmt.Sprintf("DEPRECATED: "+format+postfix, v...)
 }
 
-// Experimental logs the usage of an experimental feature.
+// Experimental returns a "usage of an experimental feature" message.
 func Experimental(format string, v ...interface{}) string {
 	return fmt.Sprintf("EXPERIMENTAL: "+format, v...)
 }
