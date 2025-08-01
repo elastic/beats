@@ -735,3 +735,46 @@ func TestNewJolokiaHTTPClient(t *testing.T) {
 		assert.Equal(t, c.expected, jolokiaGETClient, "httpMethod: "+c.httpMethod)
 	}
 }
+
+func TestSetUpdatedURL(t *testing.T) {
+	tests := []struct {
+		name         string
+		sanitizedURI string
+		uri          string
+		expected     string
+	}{
+		{
+			name:         "With encoded query in sanitizedURI",
+			sanitizedURI: "http://localhost:8778/jolokia%3FignoreErrors=false&canonicalNaming=false",
+			uri:          "/read/java.lang:type=Runtime/Uptime",
+			expected:     "http://localhost:8778/jolokia/read/java.lang:type=Runtime/Uptime/?ignoreErrors=false&canonicalNaming=false",
+		},
+		{
+			name:         "With encoded query and trailing slash",
+			sanitizedURI: "http://localhost:8778/jolokia/%3FmaxDepth=2",
+			uri:          "/read/java.lang:type=Memory/HeapMemoryUsage",
+			expected:     "http://localhost:8778/jolokia/read/java.lang:type=Memory/HeapMemoryUsage/?maxDepth=2",
+		},
+		{
+			name:         "Without encoded query, add default",
+			sanitizedURI: "http://localhost:8778/jolokia",
+			uri:          "/read/java.lang:type=Runtime/Uptime",
+			expected:     "http://localhost:8778/jolokia/read/java.lang:type=Runtime/Uptime/?ignoreErrors=true&canonicalNaming=false",
+		},
+		{
+			name:         "Without encoded query, trailing slash",
+			sanitizedURI: "http://localhost:8778/jolokia/",
+			uri:          "/read/java.lang:type=Threading/ThreadCount",
+			expected:     "http://localhost:8778/jolokia/read/java.lang:type=Threading/ThreadCount/?ignoreErrors=true&canonicalNaming=false",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := SetUpdatedURL(tt.sanitizedURI, tt.uri)
+			if result != tt.expected {
+				t.Errorf("got: %s, want: %s", result, tt.expected)
+			}
+		})
+	}
+}

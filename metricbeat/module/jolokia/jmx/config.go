@@ -533,21 +533,25 @@ func NewJolokiaHTTPRequestFetcher(httpMethod string, logger *logp.Logger) Joloki
 
 }
 
-// SetURLUpdated constructs the final URL using the sanitized base URI and path.
+// SetUpdatedURL constructs the final URL using the sanitized base URI and path.
 // If encoded query parameters (%3F) are present, they are preserved.
 // Otherwise, default query parameters are appended.
 func SetUpdatedURL(sanitizedURI, uri string) string {
-	const encodedQuery = "/%3F"
+	const encodedQuery = "%3F"
 	const defaultParams = "?ignoreErrors=true&canonicalNaming=false"
 
 	if strings.Contains(sanitizedURI, encodedQuery) {
 		parts := strings.SplitN(sanitizedURI, encodedQuery, 2)
 		if len(parts) == 2 {
+			base := strings.TrimRight(parts[0], "/")
+			path := strings.TrimLeft(uri, "/")
 			// Append path and add existing encoded query parameters
-			return fmt.Sprintf("%s%s%s%s", parts[0], uri, encodedQuery, parts[1])
+			return fmt.Sprintf("%s/%s/?%s", base, path, parts[1])
 		}
 	}
 
 	// No encoded query params then append default params
-	return fmt.Sprintf("%s%s%s", sanitizedURI, uri, defaultParams)
+	base := strings.TrimRight(sanitizedURI, "/")
+	path := strings.TrimLeft(uri, "/")
+	return fmt.Sprintf("%s/%s/%s", base, path, defaultParams)
 }
