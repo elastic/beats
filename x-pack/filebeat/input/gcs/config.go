@@ -17,6 +17,11 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+<<<<<<< HEAD
+=======
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
+	conf "github.com/elastic/elastic-agent-libs/config"
+>>>>>>> a62688919 (Feature: expand Parquet file processing support to GCS and AzureBlobStorage inputs.)
 )
 
 // MaxWorkers, Poll, PollInterval, BucketTimeOut, ParseJSON, FileSelectors, TimeStampEpoch & ExpandEventListFromField
@@ -73,8 +78,23 @@ type fileSelectorConfig struct {
 
 // readerConfig defines the options for reading the content of an GCS object.
 type readerConfig struct {
+<<<<<<< HEAD
 	Parsers  parser.Config `config:",inline"`
 	Decoding decoderConfig `config:"decoding"`
+=======
+	// Parsers contains the configuration for different content parsers (e.g., JSON, XML, CSV).
+	Parsers parser.Config `config:",inline"`
+	// Decoding specifies options for decoding the content, such as compression.
+	Decoding decoder.Config `config:"decoding"`
+	// ContentType hints the MIME type of the object content, aiding in parsing.
+	ContentType string `config:"content_type"`
+	// Encoding specifies the character encoding of the object content (e.g., "UTF-8", "gzip").
+	Encoding string `config:"encoding"`
+	// OverrideContentType indicates whether to force the ContentType rather than inferring it.
+	OverrideContentType bool `config:"override_content_type"`
+	// OverrideEncoding indicates whether to force the Encoding rather than inferring it.
+	OverrideEncoding bool `config:"override_encoding"`
+>>>>>>> a62688919 (Feature: expand Parquet file processing support to GCS and AzureBlobStorage inputs.)
 }
 
 // authConfig defines the authentication mechanism to be used for accessing the gcs bucket.
