@@ -181,6 +181,37 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	return otelYAMLCfg, nil
 }
 
+<<<<<<< HEAD
+=======
+// log warning for unsupported config
+func checkUnsupportedConfig(cfg *config.C, logger *logp.Logger) error {
+	// check if unsupported configuration is provided
+	temp := unsupportedConfig{}
+	if err := cfg.Unpack(&temp); err != nil {
+		return err
+	}
+
+	if !isStructEmpty(temp) {
+		logger.Warnf("these configuration parameters are not supported %+v", temp)
+		return nil
+	}
+
+	// check for dictionary like parameters that we do not support yet
+	if cfg.HasField("indices") {
+		logger.Warn("indices is currently not supported")
+	} else if cfg.HasField("pipelines") {
+		logger.Warn("pipelines is currently not supported")
+	} else if cfg.HasField("parameters") {
+		logger.Warn("parameters is currently not supported")
+	} else if cfg.HasField("proxy_headers") {
+		logger.Warn("proxy_headers is currently not supported")
+	} else if value, err := cfg.Bool("allow_older_versions", -1); err == nil && !value {
+		logger.Warn("allow_older_versions:false is currently not supported")
+	}
+	return nil
+}
+
+>>>>>>> bb33c540c (fix: allow_older_versions warning should not be logged if field is absent or value set to true (#45634))
 // For type safety check
 func typeSafetyCheck(value map[string]any) error {
 	// the  value should match `elasticsearchexporter.Config` type.
