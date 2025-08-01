@@ -72,7 +72,7 @@ func (p *cloudwatchPoller) startWorkers(ctx context.Context, svc *cloudwatchlogs
 	for i := 0; i < p.config.NumberOfWorkers; i++ {
 		worker, err := newCWWorker(p.config, p.region, p.metrics, p.status, svc, pipeline, p.log)
 		if err != nil {
-			return fmt.Errorf("failed to create worker %d: %v", i, err)
+			return fmt.Errorf("failed to create worker %d: %w", i, err)
 		}
 		p.workerWg.Add(1)
 		go func(wrk *cwWorker) {
