@@ -96,7 +96,9 @@ func TestCreateWatcher(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false)
+		false,
+		logptest.NewTestingLogger(t, ""),
+	)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -114,7 +116,9 @@ func TestCreateWatcher(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		true)
+		true,
+		logptest.NewTestingLogger(t, ""),
+	)
 	require.False(t, created)
 	require.NoError(t, err)
 
@@ -132,7 +136,7 @@ func TestCreateWatcher(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false)
+		false, logptest.NewTestingLogger(t, ""))
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -168,7 +172,7 @@ func TestAddToMetricsetsUsing(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false)
+		false, logptest.NewTestingLogger(t, ""))
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -216,7 +220,9 @@ func TestRemoveFromMetricsetsUsing(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false)
+		false,
+		logptest.NewTestingLogger(t, ""),
+	)
 	require.True(t, created)
 	require.NoError(t, err)
 

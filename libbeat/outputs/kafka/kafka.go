@@ -34,8 +34,6 @@ const (
 )
 
 func init() {
-	sarama.Logger = kafkaLogger{log: logp.NewLogger(logSelector)}
-
 	outputs.RegisterType("kafka", makeKafka)
 }
 
@@ -46,6 +44,8 @@ func makeKafka(
 	cfg *config.C,
 ) (outputs.Group, error) {
 	log := beat.Logger.Named(logSelector)
+	sarama.Logger = kafkaLogger{log: log}
+
 	log.Debug("initialize kafka output")
 
 	kConfig, err := readConfig(cfg)

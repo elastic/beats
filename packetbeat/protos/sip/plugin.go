@@ -65,7 +65,8 @@ func New(
 	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
-	cfgwarn.Beta("packetbeat SIP protocol is used")
+	// TODO: use a local logger here
+	logp.NewLogger("").Warn(cfgwarn.Beta("packetbeat SIP protocol is used"))
 
 	isDebug = logp.IsDebug("sip")
 	isDetailed = logp.IsDebug("sipdetailed")

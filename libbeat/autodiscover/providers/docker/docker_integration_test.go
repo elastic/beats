@@ -39,7 +39,7 @@ import (
 func TestDockerStart(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "docker")
 
-	d, err := dk.NewClient()
+	d, err := dk.NewClient(log)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -123,7 +123,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 func newSocketMetricset(config Config, base mb.BaseMetricSet) (*MetricSet, error) {
-	cfgwarn.Beta("The %s dataset is beta.", fullName)
+	base.Logger().Warn(cfgwarn.Beta("The %s dataset is beta.", fullName))
 	logger := base.Logger().Named(metricsetName)
 	sniffer, err := dns.NewSniffer(base, logger)
 	if err != nil {
