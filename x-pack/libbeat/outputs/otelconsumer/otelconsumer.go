@@ -7,6 +7,7 @@ package otelconsumer
 import (
 	"context"
 	"fmt"
+	"os"
 	"runtime"
 	"time"
 
@@ -23,6 +24,7 @@ import (
 	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
+	"go.opentelemetry.io/collector/receiver/receivertest"
 )
 
 const (
@@ -130,6 +132,16 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 		otelmap.ConvertNonPrimitive(beatEvent)
 
+		// The receivertest package needs a unique attribute to track generated ids.
+		// When receivertest allows this to be customized we can remove this condition.
+		// See https://github.com/open-telemetry/opentelemetry-collector/issues/12003.
+		if os.Getenv("OTELCONSUMER_RECEIVERTEST") == "1" {
+			id, ok := event.Content.Meta["_id"].(string)
+			if ok {
+				logRecord.Attributes().PutStr(receivertest.UniqueIDAttrName, id)
+			}
+		}
+
 		// if data_stream field is set on beatEvent. Add it to logrecord.Attributes to support dynamic indexing
 		if val, _ := beatEvent.GetValue("data_stream"); val != nil {
 			// If the below sub fields do not exist, it will return empty string.
@@ -166,7 +178,8 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Retry()
 		}
 
-		return fmt.Errorf("failed to send batch events to otel collector: %w", err)
+		out.log.Errorf("failed to consume logs: %v", err)
+		return nil
 	}
 
 	batch.ACK()
