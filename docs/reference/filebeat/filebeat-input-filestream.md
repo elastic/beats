@@ -422,8 +422,8 @@ the file open to make sure the harvester has completed. If this
 setting results in files that are not completely read because they are
 removed from disk too early, disable this option.
 
-This option is enabled by default on Windows and disabled by default
-on all other OSes.
+{applies_to}`stack: ga 9.1` This option is enabled by default on Windows and disabled by default
+on all other operating systems.
 
 ::::{warning}
 If your Windows log rotation system shows errors because it
