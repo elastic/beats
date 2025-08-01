@@ -1,19 +1,19 @@
 services:
   # This is a proxy used to block "docker-compose up" until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
-  proxy_dep:
-    image: busybox
-    depends_on:
-      elasticsearch:                  { condition: service_healthy }
-      elasticsearchssl:               { condition: service_healthy }
-      logstash:                       { condition: service_healthy }
-      kafka:                          { condition: service_healthy }
-      redis:                          { condition: service_healthy }
-      sredis:                         { condition: service_healthy }
-      kibana:                         { condition: service_healthy }
-    healthcheck:
-      interval: 1s
-      retries: 1200
+  # proxy_dep:
+  #   image: busybox
+  #   depends_on:
+  #     elasticsearch:                  { condition: service_healthy }
+  #     elasticsearchssl:               { condition: service_healthy }
+  #     logstash:                       { condition: service_healthy }
+  #     kafka:                          { condition: service_healthy }
+  #     redis:                          { condition: service_healthy }
+  #     sredis:                         { condition: service_healthy }
+  #     kibana:                         { condition: service_healthy }
+  #   healthcheck:
+  #     interval: 1s
+  #     retries: 1200
 
   elasticsearch:
     extends:
@@ -44,7 +44,7 @@ services:
       - "xpack.license.self_generated.type=trial"
       - "xpack.security.http.ssl.enabled=true"
       - "xpack.security.http.ssl.key=/usr/share/elasticsearch/config/pki/elasticsearchssl/elasticsearchssl_key.pem"
-      - "xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/pki/final.pem"
+      - "xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/pki/elasticsearchssl/elasticsearchssl_cert.pem"
       - "xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/pki/ca/ca.pem"
       # Do no used indices as the storage for credentials, using file based allow Elasticsearch
       # to be online and green much quicker.
@@ -58,40 +58,40 @@ services:
       - 9201:9200
 
   # This host name is static because of the certificate.
-  logstash:
-    extends:
-      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
-      service: logstash
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
+  # logstash:
+  #   extends:
+  #     file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+  #     service: logstash
+  #   depends_on:
+  #     elasticsearch:
+  #       condition: service_healthy
 
-  redis:
-    build: ${ES_BEATS}/testing/environments/docker/redis
-    ports:
-      - 6379:6379
+  # redis:
+  #   build: ${ES_BEATS}/testing/environments/docker/redis
+  #   ports:
+  #     - 6379:6379
 
-  # # This host name is static because of the certificate.
-  sredis: # stunnel proxy for redis
-    build: ${ES_BEATS}/testing/environments/docker/sredis
-    depends_on:
-      redis:
-        condition: service_healthy
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-    ports:
-      - 6380:6380
+  # # # This host name is static because of the certificate.
+  # sredis: # stunnel proxy for redis
+  #   build: ${ES_BEATS}/testing/environments/docker/sredis
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #   environment:
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #   ports:
+  #     - 6380:6380
 
-  kafka:
-    build: ${ES_BEATS}/testing/environments/docker/kafka
-    ports:
-      - 9092:9092
-      - 9093:9093
-      - 9094:9094
-      - 2181:2181
-    environment:
-      - ADVERTISED_HOST=kafka
+  # kafka:
+  #   build: ${ES_BEATS}/testing/environments/docker/kafka
+  #   ports:
+  #     - 9092:9092
+  #     - 9093:9093
+  #     - 9094:9094
+  #     - 2181:2181
+  #   environment:
+  #     - ADVERTISED_HOST=kafka
 
   kibana:
     extends:
