@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -49,6 +50,6 @@ func AssertNotStartedInputCanBeDone(t *testing.T, configMap *conf.C) {
 	config, err := conf.NewConfigFrom(configMap)
 	require.NoError(t, err)
 
-	_, err = Plugin().Manager.Create(config)
+	_, err = Plugin(logp.NewNopLogger()).Manager.Create(config)
 	require.NoError(t, err)
 }
