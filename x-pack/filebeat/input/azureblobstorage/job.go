@@ -7,7 +7,6 @@ package azureblobstorage
 import (
 	"bufio"
 	"bytes"
-	"compress/gzip"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -24,6 +23,12 @@ import (
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
+<<<<<<< HEAD
+=======
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader"
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
+>>>>>>> a62688919 (Feature: expand Parquet file processing support to GCS and AzureBlobStorage inputs.)
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -176,21 +181,21 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 }
 
 func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
-	r, err := j.addGzipDecoderIfNeeded(bufio.NewReader(r))
+	r, err := reader.AddGzipDecoderIfNeeded(bufio.NewReader(r))
 	if err != nil {
 		return fmt.Errorf("failed to add gzip decoder to blob: %s, with error: %w", *j.blob.Name, err)
 	}
-	dec, err := newDecoder(j.src.ReaderConfig.Decoding, r)
+	dec, err := decoder.NewDecoder(j.src.ReaderConfig.Decoding, r)
 	if err != nil {
 		return err
 	}
 	var evtOffset int64
 	switch dec := dec.(type) {
-	case decoder:
-		defer dec.close()
+	case decoder.Decoder:
+		defer dec.Close()
 
-		for dec.next() {
-			msg, err := dec.decode()
+		for dec.Next() {
+			msg, err := dec.Decode()
 			if err != nil {
 				if err == io.EOF {
 					return nil
@@ -198,7 +203,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 				break
 			}
 			evt := j.createEvent(string(msg), evtOffset)
-			j.publish(evt, !dec.more(), id)
+			j.publish(evt, !dec.More(), id)
 		}
 
 	default:
@@ -335,6 +340,7 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, id s
 	return eventsPerObject, nil
 }
 
+<<<<<<< HEAD
 // addGzipDecoderIfNeeded determines whether the given stream of bytes (encapsulated in a buffered reader)
 // represents gzipped content or not and adds gzipped decoder if needed. A buffered reader is used
 // so the function can peek into the byte  stream without consuming it. This makes it convenient for
@@ -361,6 +367,8 @@ func (j *job) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
 	return gzip.NewReader(bufReader)
 }
 
+=======
+>>>>>>> a62688919 (Feature: expand Parquet file processing support to GCS and AzureBlobStorage inputs.)
 // evaluateJSON uses a bufio.NewReader & reader.Peek to evaluate if the
 // data stream contains a json array as the root element or not, without
 // advancing the reader. If the data stream contains an array as the root
