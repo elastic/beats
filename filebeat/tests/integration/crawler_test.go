@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
@@ -84,7 +83,7 @@ output.file:
 	}, 2*time.Minute, 10*time.Second)
 
 	// Ensure all log lines are ingested eventually
-	CountLinesInFile(t, outputFile, 10)
+	integration.AssertLinesInFile(t, outputFile, 10)
 
 	// append a line without \n and ensure it is not crawled
 	logFile, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
@@ -99,7 +98,7 @@ output.file:
 	}
 
 	// Ensure number of lines has not increased
-	CountLinesInFile(t, outputFile, 10)
+	integration.AssertLinesInFile(t, outputFile, 10)
 
 	// add \n to logfile
 	_, err = logFile.Write([]byte("\n"))
@@ -111,7 +110,7 @@ output.file:
 	integration.GenerateLogFile(t, filepath.Join(tempDir, "log.log"), 1, true)
 
 	// Ensure all logs are ingested
-	CountLinesInFile(t, outputFile, 12)
+	integration.AssertLinesInFile(t, outputFile, 12)
 
 	// rename the file
 	assert.NoError(t, os.Rename(logFilePath, filepath.Join(tempDir, "newlog.log")))
@@ -121,7 +120,7 @@ output.file:
 	integration.GenerateLogFile(t, filepath.Join(tempDir, "newlog.log"), 6, true)
 
 	// Ensure all logs are ingested
-	CountLinesInFile(t, outputFile, 18)
+	integration.AssertLinesInFile(t, outputFile, 18)
 
 }
 
@@ -177,7 +176,7 @@ output.file:
 	}, 2*time.Minute, 10*time.Second)
 
 	// Ensure include_lines only events are ingested
-	CountLinesInFile(t, outputFile, 2*iterations)
+	integration.AssertLinesInFile(t, outputFile, 2*iterations)
 }
 
 // Checks log lines defined by exclude_lines are excluded
@@ -231,24 +230,5 @@ output.file:
 		return true
 	}, 2*time.Minute, 10*time.Second)
 
-	CountLinesInFile(t, outputFile, 2*iterations)
-}
-
-// counts number of lines in the given file and  asserts if it matches expected count
-func CountLinesInFile(t *testing.T, path string, count int) {
-	t.Helper()
-	var lines []byte
-	var err error
-	require.Eventuallyf(t, func() bool {
-		// ensure all log lines are ingested
-		lines, err = os.ReadFile(path)
-		if err != nil {
-			t.Logf("error reading file %v", err)
-			return false
-		}
-		lines := strings.Split(string(lines), "\n")
-		// we subtract number of lines by 1 because the last line in output file contains an extra \n
-		return len(lines)-1 == count
-	}, 2*time.Minute, 10*time.Second, "expected lines: %d, got lines: %d", count, lines)
-
+	integration.AssertLinesInFile(t, outputFile, 2*iterations)
 }

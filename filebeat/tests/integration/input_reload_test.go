@@ -99,7 +99,7 @@ logging.level: debug
 	}, 2*time.Minute, 10*time.Second)
 
 	// Ensure all log lines are ingested eventually
-	CountLinesInFile(t, outputFile, 10)
+	integration.AssertLinesInFile(t, outputFile, 10)
 
 	assert.NoError(t, os.Rename(filepath.Join(inputs, "filestream.yml"), filepath.Join(inputs, "filestream.yml.disabled")))
 	filebeat.WaitForLogs("Runner: 'filestream' has stopped", 2*time.Minute)
@@ -110,5 +110,5 @@ logging.level: debug
 	assert.NoError(t, os.WriteFile(filepath.Join(inputs, "secondInput.yml"), []byte(fmt.Sprintf(inputConfig, logFilePath2)), 0666))
 
 	// Ensure all log lines are ingested eventually
-	CountLinesInFile(t, outputFile, 20)
+	integration.AssertLinesInFile(t, outputFile, 20)
 }

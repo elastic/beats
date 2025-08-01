@@ -50,12 +50,11 @@ func TestFilebeatDeprecated(t *testing.T) {
 
 		config := `
 filebeat.inputs:
-  - input_type: log
+  - input_type: filestream
     id: "test-filestream"
     paths:
      - %s
     scan_frequency: 0.1s
-    allow_deprecated_use: true
 output.console:
   enabled: true
 `
