@@ -1,6 +1,6 @@
 services:
   # This is a proxy used to block "docker-compose up" until all services are healthy.
-  See: https://github.com/docker/compose/issues/4369
+  # See: https://github.com/docker/compose/issues/4369
   proxy_dep:
     image: busybox
     depends_on:
@@ -71,7 +71,7 @@ services:
     ports:
       - 6379:6379
 
-  # # This host name is static because of the certificate.
+  # This host name is static because of the certificate.
   sredis: # stunnel proxy for redis
     build: ${ES_BEATS}/testing/environments/docker/sredis
     depends_on:
