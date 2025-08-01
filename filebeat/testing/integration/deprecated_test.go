@@ -21,8 +21,6 @@ package integration
 
 import (
 	"context"
-	"fmt"
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -43,39 +41,7 @@ func TestFilebeatDeprecated(t *testing.T) {
 		PrintConfigOnFail: false,
 	}
 
-	t.Run("check that harvesting works with deprecated input_type", func(t *testing.T) {
-
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-		defer cancel()
-
-		config := `
-filebeat.inputs:
-  - input_type: filestream
-    id: "test-filestream"
-    paths:
-     - %s
-    scan_frequency: 0.1s
-output.console:
-  enabled: true
-`
-		generator := NewPlainTextGenerator(messagePrefix)
-		path, file := GenerateLogFiles(t, fileCount, lineCount, generator)
-		test := NewTest(t, TestOptions{
-			Config: fmt.Sprintf(config, path),
-		})
-
-		line := fmt.Sprintf("%s:%d", filepath.Base(file[0]), 1)
-		test.ExpectOutput(line)
-		test.ExpectOutput("DEPRECATED: input_type input config is deprecated")
-
-		test.
-			WithReportOptions(reportOptions).
-			ExpectStart().
-			Start(ctx).
-			Wait()
-	})
-
-	t.Run("check that harvesting works with deprecated input_type", func(t *testing.T) {
+	t.Run("test invalid config with removed settings", func(t *testing.T) {
 
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
