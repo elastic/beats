@@ -92,7 +92,7 @@ func TestFilestreamCleanInactive(t *testing.T) {
 		msgLogFilePath = strings.ReplaceAll(logFilePath, `\`, `\\`)
 	}
 
-	// 2. Write configuration file ans start Filebeat
+	// 2. Write configuration file and start Filebeat
 	filebeat.WriteConfigFile(fmt.Sprintf(filestreamCleanInactiveCfg, logFilePath, tempDir))
 	filebeat.Start()
 
