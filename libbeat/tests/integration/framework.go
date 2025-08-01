@@ -28,6 +28,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -46,6 +47,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/elastic/mock-es/pkg/api"
 )
 
 type BeatProc struct {
@@ -1035,8 +1037,6 @@ func (b *BeatProc) CountFileLines(glob string) int {
 func (b *BeatProc) ConfigFilePath() string {
 	return b.configFile
 }
-<<<<<<< HEAD
-=======
 
 // StartMockES starts mock-es on the specified address.
 // If add is an empty string a random local port is used.
@@ -1113,4 +1113,3 @@ func StartMockES(
 
 	return &s, addr, es, rdr
 }
->>>>>>> 3750aa1cf (Add a FIPS ECH integration test for x-pack/filebeat and x-pack/metricbeat (#45413))
