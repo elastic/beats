@@ -153,6 +153,13 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	return &p
 }
 
+// NewStandardBeat creates a Beat process from a standard binary.
+func NewStandardBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
+	b := NewBeat(t, beatName, binary, args...)
+	b.baseArgs = append(b.baseArgs[:1], b.baseArgs[2:]...) // remove "--systemTest"
+	return b
+}
+
 // NewAgentBeat creates a new agentbeat process that runs the beatName as a subcommand.
 // See `NewBeat` for options and information for the parameters.
 func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
@@ -1177,11 +1184,11 @@ func StartMockES(
 	require.Eventually(
 		t,
 		func() bool {
-			resp, err := http.Get("http://" + addr) // nolint: noctx // It's just a test
+			resp, err := http.Get("http://" + addr) //nolint:noctx // It's just a test
 			if err != nil {
 				return false
 			}
-			// nolint: errcheck // We're just draining the body, we can ignore the error
+			//nolint:errcheck // We're just draining the body, we can ignore the error
 			io.Copy(io.Discard, resp.Body)
 			resp.Body.Close()
 			return true

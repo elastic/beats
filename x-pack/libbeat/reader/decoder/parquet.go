@@ -31,14 +31,14 @@ func NewParquetDecoder(config ParquetCodecConfig, r io.Reader) (Decoder, error) 
 	}, nil
 }
 
-// next advances the parquet decoder to the next data item and returns true if there is more data to be decoded.
+// More() advances the parquet decoder to the next data item and returns true if there is more data
+// to be decoded.
 func (pd *parquetDecoder) More() bool {
-	// cache the results of Next() locally
-	// set a flag to state we have prepped a
-	return pd.Next()
+	return pd.reader.Next()
 }
 
-// next advances the parquet decoder to the next data item and returns true if there is more data to be decoded.
+// Next() advances the parquet decoder to the next data item and returns true if there is more data
+// to be decoded.
 func (pd *parquetDecoder) Next() bool {
 	// update a boolean
 	return pd.reader.Next()
