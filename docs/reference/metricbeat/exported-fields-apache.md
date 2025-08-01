@@ -20,49 +20,49 @@ Apache HTTPD server metricsets collected from the Apache web server.
 **`apache.status.hostname`**
 :   Apache hostname.
 
-type: keyword
+    type: keyword
 
 
 **`apache.status.total_accesses`**
 :   Total number of access requests.
 
-type: long
+    type: long
 
 
 **`apache.status.total_kbytes`**
 :   Total number of kilobytes served.
 
-type: long
+    type: long
 
 
 **`apache.status.requests_per_sec`**
 :   Requests per second.
 
-type: scaled_float
+    type: scaled_float
 
 
 **`apache.status.bytes_per_sec`**
 :   Bytes per second.
 
-type: scaled_float
+    type: scaled_float
 
 
 **`apache.status.bytes_per_request`**
 :   Bytes per request.
 
-type: scaled_float
+    type: scaled_float
 
 
 **`apache.status.workers.busy`**
 :   Number of busy workers.
 
-type: long
+    type: long
 
 
 **`apache.status.workers.idle`**
 :   Number of idle workers.
 
-type: long
+    type: long
 
 
 ## uptime [_uptime]
@@ -72,13 +72,13 @@ Uptime stats.
 **`apache.status.uptime.server_uptime`**
 :   Server uptime in seconds.
 
-type: long
+    type: long
 
 
 **`apache.status.uptime.uptime`**
 :   Server uptime.
 
-type: long
+    type: long
 
 
 ## cpu [_cpu]
@@ -88,31 +88,31 @@ CPU stats.
 **`apache.status.cpu.load`**
 :   CPU Load.
 
-type: scaled_float
+    type: scaled_float
 
 
 **`apache.status.cpu.user`**
 :   CPU user load.
 
-type: scaled_float
+    type: scaled_float
 
 
 **`apache.status.cpu.system`**
 :   System cpu.
 
-type: scaled_float
+    type: scaled_float
 
 
 **`apache.status.cpu.children_user`**
 :   CPU of children user.
 
-type: scaled_float
+    type: scaled_float
 
 
 **`apache.status.cpu.children_system`**
 :   CPU of children system.
 
-type: scaled_float
+    type: scaled_float
 
 
 ## connections [_connections]
@@ -122,25 +122,25 @@ Connection stats.
 **`apache.status.connections.total`**
 :   Total connections.
 
-type: long
+    type: long
 
 
 **`apache.status.connections.async.writing`**
 :   Async connection writing.
 
-type: long
+    type: long
 
 
 **`apache.status.connections.async.keep_alive`**
 :   Async keeped alive connections.
 
-type: long
+    type: long
 
 
 **`apache.status.connections.async.closing`**
 :   Async closed connections.
 
-type: long
+    type: long
 
 
 ## load [_load]
@@ -150,19 +150,19 @@ Load averages.
 **`apache.status.load.1`**
 :   Load average for the last minute.
 
-type: scaled_float
+    type: scaled_float
 
 
 **`apache.status.load.5`**
 :   Load average for the last 5 minutes.
 
-type: scaled_float
+    type: scaled_float
 
 
 **`apache.status.load.15`**
 :   Load average for the last 15 minutes.
 
-type: scaled_float
+    type: scaled_float
 
 
 ## scoreboard [_scoreboard]
@@ -172,72 +172,72 @@ Scoreboard metrics.
 **`apache.status.scoreboard.starting_up`**
 :   Starting up.
 
-type: long
+    type: long
 
 
 **`apache.status.scoreboard.reading_request`**
 :   Reading requests.
 
-type: long
+    type: long
 
 
 **`apache.status.scoreboard.sending_reply`**
 :   Sending Reply.
 
-type: long
+    type: long
 
 
 **`apache.status.scoreboard.keepalive`**
 :   Keep alive.
 
-type: long
+    type: long
 
 
 **`apache.status.scoreboard.dns_lookup`**
 :   Dns Lookups.
 
-type: long
+    type: long
 
 
 **`apache.status.scoreboard.closing_connection`**
 :   Closing connections.
 
-type: long
+    type: long
 
 
 **`apache.status.scoreboard.logging`**
 :   Logging
 
-type: long
+    type: long
 
 
 **`apache.status.scoreboard.gracefully_finishing`**
 :   Gracefully finishing.
 
-type: long
+    type: long
 
 
 **`apache.status.scoreboard.idle_cleanup`**
 :   Idle cleanups.
 
-type: long
+    type: long
 
 
 **`apache.status.scoreboard.open_slot`**
 :   Open slots.
 
-type: long
+    type: long
 
 
 **`apache.status.scoreboard.waiting_for_connection`**
 :   Waiting for connections.
 
-type: long
+    type: long
 
 
 **`apache.status.scoreboard.total`**
 :   Total.
 
-type: long
+    type: long
 
 

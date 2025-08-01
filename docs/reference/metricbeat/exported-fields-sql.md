@@ -12,30 +12,30 @@ SQL module fetches metrics from a SQL database
 **`sql.driver`**
 :   Driver used to execute the query.
 
-type: keyword
+    type: keyword
 
 
 **`sql.query`**
 :   Query executed to collect metrics.
 
-type: keyword
+    type: keyword
 
 
 **`sql.metrics.numeric.*`**
 :   Numeric metrics collected.
 
-type: object
+    type: object
 
 
 **`sql.metrics.string.*`**
 :   Non-numeric values collected.
 
-type: object
+    type: object
 
 
 **`sql.metrics.boolean.*`**
 :   Boolean values collected.
 
-type: object
+    type: object
 
 

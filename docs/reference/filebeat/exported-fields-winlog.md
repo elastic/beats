@@ -16,9 +16,9 @@ All fields specific to the Windows Event Tracing are defined here.
 **`winlog.activity_id`**
 :   A globally unique identifier that identifies the current activity. The events that are published with this identifier are part of the same activity.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.activity_id_name`**
@@ -32,17 +32,17 @@ required: False
 **`winlog.channel`**
 :   The channel that the event was logged to. The channel is a logical grouping of events that are logged by a provider. The channel is typically used to identify the type of events that are logged, such as security, application, or system events.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.event_data`**
 :   The event-specific data. The content of this object is specific to any provider and event.
 
-type: object
+    type: object
 
-required: False
+    required: False
 
 
 **`winlog.flags`**
@@ -56,9 +56,9 @@ required: False
 **`winlog.flags_raw`**
 :   The bitmap of flags that provide information about the event such as the type of session it was logged to and if the event contains extended data.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.keywords`**
@@ -72,17 +72,17 @@ required: False
 **`winlog.keywords_raw`**
 :   The bitmap of keywords that are used to indicate an event's membership in a set of event categories.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.level`**
 :   Level of severity. Level values 0 through 5 are defined by Microsoft. Level values 6 through 15 are reserved. Level values 16 through 255 can be defined by the event provider.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.level_raw`**
@@ -96,9 +96,9 @@ required: False
 **`winlog.opcode`**
 :   The opcode defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.opcode_raw`**
@@ -112,9 +112,9 @@ required: False
 **`winlog.process_id`**
 :   Identifies the process that generated the event.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.provider`**
@@ -128,9 +128,9 @@ required: False
 **`winlog.provider_guid`**
 :   A globally unique identifier that identifies the provider that logged the event.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.provider_message`**
@@ -144,33 +144,33 @@ required: False
 **`winlog.related_activity_id_name`**
 :   The name of the related activity.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.session`**
 :   Configured session to forward ETW events from providers to consumers.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.severity`**
 :   Human-readable level of severity.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.task`**
 :   The task defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.task_raw`**
@@ -184,16 +184,16 @@ required: False
 **`winlog.thread_id`**
 :   Identifies the thread that generated the event.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.version`**
 :   Specify the version of a manifest-based event.
 
-type: long
+    type: long
 
-required: False
+    required: False
 
 

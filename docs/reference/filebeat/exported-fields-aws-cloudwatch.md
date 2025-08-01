@@ -16,18 +16,18 @@ Fields from AWS CloudWatch logs.
 **`aws.cloudwatch.log_group`**
 :   The name of the log group to which this event belongs.
 
-type: keyword
+    type: keyword
 
 
 **`aws.cloudwatch.log_stream`**
 :   The name of the log stream to which this event belongs.
 
-type: keyword
+    type: keyword
 
 
 **`aws.cloudwatch.ingestion_time`**
 :   The time the event was ingested in AWS CloudWatch.
 
-type: keyword
+    type: keyword
 
 

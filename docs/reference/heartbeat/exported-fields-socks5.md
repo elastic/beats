@@ -24,6 +24,6 @@ Time required to establish a connection via SOCKS5 to endpoint based on availabl
 **`socks5.rtt.connect.us`**
 :   Duration in microseconds
 
-type: long
+    type: long
 
 

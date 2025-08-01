@@ -12,12 +12,12 @@ Statsd module
 **`statsd.*.count`**
 :   Statsd counters
 
-type: object
+    type: object
 
 
 **`statsd.*.*`**
 :   Statsd metrics
 
-type: object
+    type: object
 
 

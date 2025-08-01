@@ -20,8 +20,8 @@ RabbitMQ log files
 **`rabbitmq.log.pid`**
 :   The Erlang process id
 
-type: keyword
+    type: keyword
 
-example: <0.222.0>
+    example: <0.222.0>
 
 

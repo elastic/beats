@@ -5,3 +5,5 @@
     - name: id
       type: keyword
       dimension: true
+      version:
+        beta: 9.1.0

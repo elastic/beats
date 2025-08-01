@@ -20,7 +20,7 @@ HTTP request information
 **`http.request.headers`**
 :   The HTTP headers sent
 
-type: object
+    type: object
 
 
 ## response [_response]
@@ -30,23 +30,23 @@ HTTP response information
 **`http.response.headers`**
 :   The HTTP headers received
 
-type: object
+    type: object
 
 
 **`http.response.code`**
 :   The HTTP status code
 
-type: keyword
+    type: keyword
 
-example: 404
+    example: 404
 
 
 **`http.response.phrase`**
 :   The HTTP status phrase
 
-type: keyword
+    type: keyword
 
-example: Not found
+    example: Not found
 
 
 ## json [_json]
