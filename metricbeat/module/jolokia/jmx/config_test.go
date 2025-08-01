@@ -39,7 +39,7 @@ func TestBuildJolokiaGETUri(t *testing.T) {
 					Field: `heapMemoryUsage`,
 				},
 			},
-			expected: `/read/java.lang:type=Memory/HeapMemoryUsage?ignoreErrors=true&canonicalNaming=false`,
+			expected: `/read/java.lang:type=Memory/HeapMemoryUsage`,
 		},
 		{
 			mbean: `java.lang:type=Memory`,
@@ -53,7 +53,7 @@ func TestBuildJolokiaGETUri(t *testing.T) {
 					Field: `nonHeapMemoryUsage`,
 				},
 			},
-			expected: `/read/java.lang:type=Memory/HeapMemoryUsage,NonHeapMemoryUsage?ignoreErrors=true&canonicalNaming=false`,
+			expected: `/read/java.lang:type=Memory/HeapMemoryUsage,NonHeapMemoryUsage`,
 		},
 		{
 			mbean: `Catalina:name=HttpRequest1,type=RequestProcessor,worker=!"http-nio-8080!"`,
@@ -62,7 +62,7 @@ func TestBuildJolokiaGETUri(t *testing.T) {
 					Attr:  `globalProcessor`,
 					Field: `maxTime`,
 				}},
-			expected: `/read/Catalina:name=HttpRequest1,type=RequestProcessor,worker=!"http-nio-8080!"/globalProcessor?ignoreErrors=true&canonicalNaming=false`,
+			expected: `/read/Catalina:name=HttpRequest1,type=RequestProcessor,worker=!"http-nio-8080!"/globalProcessor`,
 		},
 	}
 
@@ -540,9 +540,9 @@ func TestBuildGETRequestsAndMappings(t *testing.T) {
 			},
 			httpMethod: "GET",
 			uris: []string{
-				"/read/java.lang:type=Runtime/Uptime?ignoreErrors=true&canonicalNaming=false",
-				"/read/java.lang:name=ConcurrentMarkSweep,type=GarbageCollector/CollectionTime,CollectionCount?ignoreErrors=true&canonicalNaming=false",
-				"/read/java.lang:type=Memory/HeapMemoryUsage,NonHeapMemoryUsage?ignoreErrors=true&canonicalNaming=false",
+				"/read/java.lang:type=Runtime/Uptime",
+				"/read/java.lang:name=ConcurrentMarkSweep,type=GarbageCollector/CollectionTime,CollectionCount",
+				"/read/java.lang:type=Memory/HeapMemoryUsage,NonHeapMemoryUsage",
 			},
 			attributeMappings: map[attributeMappingKey]Attribute{
 				attributeMappingKey{"java.lang:type=Runtime", "Uptime"}: Attribute{
@@ -733,5 +733,48 @@ func TestNewJolokiaHTTPClient(t *testing.T) {
 		jolokiaGETClient := NewJolokiaHTTPRequestFetcher(c.httpMethod, logp.NewNopLogger())
 
 		assert.Equal(t, c.expected, jolokiaGETClient, "httpMethod: "+c.httpMethod)
+	}
+}
+
+func TestSetUpdatedURL(t *testing.T) {
+	tests := []struct {
+		name         string
+		sanitizedURI string
+		uri          string
+		expected     string
+	}{
+		{
+			name:         "With encoded query in sanitizedURI",
+			sanitizedURI: "http://localhost:8778/jolokia%3FignoreErrors=false&canonicalNaming=false",
+			uri:          "/read/java.lang:type=Runtime/Uptime",
+			expected:     "http://localhost:8778/jolokia/read/java.lang:type=Runtime/Uptime/?ignoreErrors=false&canonicalNaming=false",
+		},
+		{
+			name:         "With encoded query and trailing slash",
+			sanitizedURI: "http://localhost:8778/jolokia/%3FmaxDepth=2",
+			uri:          "/read/java.lang:type=Memory/HeapMemoryUsage",
+			expected:     "http://localhost:8778/jolokia/read/java.lang:type=Memory/HeapMemoryUsage/?maxDepth=2",
+		},
+		{
+			name:         "Without encoded query, add default",
+			sanitizedURI: "http://localhost:8778/jolokia",
+			uri:          "/read/java.lang:type=Runtime/Uptime",
+			expected:     "http://localhost:8778/jolokia/read/java.lang:type=Runtime/Uptime/?ignoreErrors=true&canonicalNaming=false",
+		},
+		{
+			name:         "Without encoded query, trailing slash",
+			sanitizedURI: "http://localhost:8778/jolokia/",
+			uri:          "/read/java.lang:type=Threading/ThreadCount",
+			expected:     "http://localhost:8778/jolokia/read/java.lang:type=Threading/ThreadCount/?ignoreErrors=true&canonicalNaming=false",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := SetUpdatedURL(tt.sanitizedURI, tt.uri)
+			if result != tt.expected {
+				t.Errorf("got: %s, want: %s", result, tt.expected)
+			}
+		})
 	}
 }
