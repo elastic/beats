@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/error-found-unexpected-character.html
+applies_to:
+  stack: ga
 ---
 
 # Found unexpected or unknown characters [error-found-unexpected-character]

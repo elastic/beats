@@ -2,6 +2,8 @@
 navigation_title: "append"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/append.html
+applies_to:
+  stack: ga
 ---
 
 # Append Processor [append]

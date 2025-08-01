@@ -43,7 +43,7 @@ func AutodiscoverBuilder(
 	uuid uuid.UUID,
 	c *conf.C,
 	keystore keystore.Keystore,
-	_ *logp.Logger,
+	logger *logp.Logger,
 ) (autodiscover.Provider, error) {
 	cfgwarn.Deprecate("", "aws_elb autodiscover is now deprecated and will be removed in a future release.")
 
@@ -101,13 +101,13 @@ func AutodiscoverBuilder(
 		}))
 	}
 
-	return internalBuilder(uuid, bus, config, newAPIFetcher(clients), keystore)
+	return internalBuilder(uuid, bus, config, newAPIFetcher(clients), keystore, logger)
 }
 
 // internalBuilder is mainly intended for testing via mocks and stubs.
 // it can be configured to use a fetcher that doesn't actually hit the AWS API.
-func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetcher fetcher, keystore keystore.Keystore) (*Provider, error) {
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
+func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetcher fetcher, keystore keystore.Keystore, logger *logp.Logger) (*Provider, error) {
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil, logger)
 	if err != nil {
 		return nil, err
 	}

@@ -395,7 +395,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader, logger *logp.Logger) error {
 		Terminator:   p.readerConfig.LineTerminator,
 		CollectOnEOF: true,
 		MaxBytes:     int(p.readerConfig.MaxBytes) * 4,
-	})
+	}, logger)
 	if err != nil {
 		return fmt.Errorf("failed to create encode reader: %w", err)
 	}
