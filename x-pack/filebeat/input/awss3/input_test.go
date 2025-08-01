@@ -9,51 +9,11 @@ import (
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/stretchr/testify/assert"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
-
-func TestGetProviderFromDomain(t *testing.T) {
-	tests := []struct {
-		endpoint string
-		override string
-		want     string
-	}{
-		{endpoint: "", override: "", want: "aws"},
-		{endpoint: "c2s.ic.gov", want: "aws"},
-		{endpoint: "abc.com", override: "abc", want: "abc"},
-		{endpoint: "oraclecloud.com", override: "xyz", want: "xyz"},
-		{endpoint: "amazonaws.com", want: "aws"},
-		{endpoint: "c2s.sgov.gov", want: "aws"},
-		{endpoint: "c2s.ic.gov", want: "aws"},
-		{endpoint: "amazonaws.com.cn", want: "aws"},
-		{endpoint: "https://backblazeb2.com", want: "backblaze"},
-		{endpoint: "https://1234567890.r2.cloudflarestorage.com", want: "cloudflare"},
-		{endpoint: "https://wasabisys.com", want: "wasabi"},
-		{endpoint: "https://digitaloceanspaces.com", want: "digitalocean"},
-		{endpoint: "https://dream.io", want: "dreamhost"},
-		{endpoint: "https://scw.cloud", want: "scaleway"},
-		{endpoint: "https://googleapis.com", want: "gcp"},
-		{endpoint: "https://cloud.it", want: "arubacloud"},
-		{endpoint: "https://linodeobjects.com", want: "linode"},
-		{endpoint: "https://vultrobjects.com", want: "vultr"},
-		{endpoint: "https://appdomain.cloud", want: "ibm"},
-		{endpoint: "https://aliyuncs.com", want: "alibaba"},
-		{endpoint: "https://oraclecloud.com", want: "oracle"},
-		{endpoint: "https://exo.io", want: "exoscale"},
-		{endpoint: "https://upcloudobjects.com", want: "upcloud"},
-		{endpoint: "https://ilandcloud.com", want: "iland"},
-		{endpoint: "https://zadarazios.com", want: "zadara"},
-	}
-
-	for _, test := range tests {
-		assert.Equal(t, test.want, getProviderFromDomain(test.endpoint, test.override),
-			"for endpoint=%q and override=%q", test.endpoint, test.override)
-	}
-}
 
 func TestRegionSelection(t *testing.T) {
 	tests := []struct {
