@@ -89,15 +89,15 @@ func TestOutputWatcher(t *testing.T) {
 
 	t.Run("JSON watcher", func(t *testing.T) {
 
-		InputDoc := mapstr.M{
-			"message": "sample dummy message",
-			"fields": mapstr.M{
+		inputJSON := `
+{			"message": "sample dummy message",
+			"fields": {
 				"number": 20,
-				"slice":  []string{"20", "30", "40"},
+				"slice":  ["20", "30", "40"]
 			},
 			"isthisboolean": false,
-			"nilValue":      nil,
-		}
+			"nilValue":      null
+}`
 
 		cases := []struct {
 			name           string
@@ -165,7 +165,7 @@ func TestOutputWatcher(t *testing.T) {
 		for _, tc := range cases {
 			t.Run(tc.name, func(t *testing.T) {
 				w := NewJSONWatcher(tc.fieldsToMatch)
-				w.Inspect(InputDoc.String())
+				w.Inspect(inputJSON)
 				require.Equal(t, tc.expectObserved, w.Observed(), "Observed() does not match")
 			})
 		}
