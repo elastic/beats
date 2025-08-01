@@ -44,7 +44,7 @@ func AutodiscoverBuilder(
 	keystore keystore.Keystore,
 	log *logp.Logger,
 ) (autodiscover.Provider, error) {
-	cfgwarn.Experimental("aws_ec2 autodiscover is experimental")
+	log.Warn(cfgwarn.Experimental("aws_ec2 autodiscover is experimental"))
 
 	config := awsauto.DefaultConfig()
 	err := c.Unpack(&config)
@@ -58,7 +58,7 @@ func AutodiscoverBuilder(
 			SecretAccessKey: config.AWSConfig.SecretAccessKey,
 			SessionToken:    config.AWSConfig.SessionToken,
 			ProfileName:     config.AWSConfig.ProfileName,
-		})
+		}, log)
 
 	// Construct MetricSet with a full regions list if there is no region specified.
 	if config.Regions == nil {
