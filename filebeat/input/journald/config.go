@@ -90,7 +90,7 @@ func (im *bwcIncludeMatches) Unpack(c *ucfg.Config) error {
 
 		includeMatchesWarnOnce.Do(func() {
 			// TODO: use a local logger here
-			logp.NewLogger("").Warn(cfgwarn.Deprecate("", "Please migrate your journald input's "+
+			logp.NewLogger("journald").Warn(cfgwarn.Deprecate("", "Please migrate your journald input's "+
 				"include_matches config to the new more expressive format."))
 		})
 		return nil

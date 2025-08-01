@@ -74,9 +74,8 @@ var (
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
-		BulkMaxSize:       defaultBulkSize,
-		Transport:         esDefaultTransportSettings(),
-		AllowOlderVersion: true,
+		BulkMaxSize: defaultBulkSize,
+		Transport:   esDefaultTransportSettings(),
 	}
 )
 
