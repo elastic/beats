@@ -94,10 +94,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	log := inputContext.Logger
 
 	// setup status reporter
-	in.status = inputContext.StatusReporter
-	if in.status == nil {
-		in.status = &debugCWStatusReporter{log}
-	}
+	in.status = newCWStateReporter(inputContext, log)
 
 	defer in.status.UpdateStatus(status.Stopped, "Input stopped")
 	in.status.UpdateStatus(status.Starting, "Input starting")
@@ -158,15 +155,6 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	log.Debugf("Config api_sleep = %f", cwPoller.config.APISleep)
 	cwPoller.receive(ctx, logGroupIDs, time.Now)
 	return nil
-}
-
-// debugCWStatusReporter with debugging logs. This is typically used when running in standalone mode.
-type debugCWStatusReporter struct {
-	log *logp.Logger
-}
-
-func (n *debugCWStatusReporter) UpdateStatus(status status.Status, msg string) {
-	n.log.Debugf("CloudWatch input status updated: status: %s, message: %s", status, msg)
 }
 
 // fromConfig is a helper to parse input configurations and derive logGroupIDs & aws region

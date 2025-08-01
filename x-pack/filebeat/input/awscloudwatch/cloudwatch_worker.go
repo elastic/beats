@@ -113,6 +113,10 @@ func (w *cwWorker) run(ctx context.Context, logGroupId string, startTime, endTim
 		}
 	}
 
+	if err == nil {
+		w.status.UpdateStatus(status.Running, "Input is running")
+	}
+
 	return count
 }
 
