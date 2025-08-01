@@ -22,7 +22,7 @@ queue.mem:
 
 output.elasticsearch:
   hosts:
-    - http://{{ .esHost }}
+    - {{ .esHost }}
   backoff:
     init: 10ms
     max: 10ms
