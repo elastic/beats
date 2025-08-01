@@ -182,7 +182,7 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 }
 
 func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
-	r, err := reader.AddGzipDecoderIfNeeded(bufio.NewReader(r))
+	r, err := reader.AddGzipDecoderIfNeeded(r)
 	if err != nil {
 		return fmt.Errorf("failed to add gzip decoder to object: %s, with error: %w", j.object.Name, err)
 	}
