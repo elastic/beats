@@ -30,7 +30,7 @@ func TestCAPinningGoodSHA(t *testing.T) {
 	EnsureESIsRunning(t)
 	esURL := GetESURL(t, "https")
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
-	caPath := filepath.Join(mockbeat.TempDir(), "../../../../", "testing", "environments", "docker", "elasticsearch", "pki", "ca", "ca.crt")
+	caPath := filepath.Join(mockbeat.TempDir(), "../../../../", "testing", "environments", "docker", "elasticsearch", "pki", "ca", "ca.pem")
 	cfg := `
 mockbeat:
 name:
@@ -61,7 +61,7 @@ func TestCAPinningBadSHA(t *testing.T) {
 	EnsureESIsRunning(t)
 	esURL := GetESURL(t, "https")
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
-	caPath := filepath.Join(mockbeat.TempDir(), "../../../../", "testing", "environments", "docker", "elasticsearch", "pki", "ca", "ca.crt")
+	caPath := filepath.Join(mockbeat.TempDir(), "../../../../", "testing", "environments", "docker", "elasticsearch", "pki", "ca", "ca.pem")
 	cfg := `
 mockbeat:
 name:
