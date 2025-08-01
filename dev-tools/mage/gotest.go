@@ -50,6 +50,7 @@ type GoTestArgs struct {
 	OutputFile          string            // File to write verbose test output to.
 	JUnitReportFile     string            // File to write a JUnit XML test report to.
 	CoverageProfileFile string            // Test coverage profile file (enables -cover).
+	Dir                 string            // The directory the test should run from
 	Output              io.Writer         // Write stderr and stdout to Output if set
 }
 
@@ -381,6 +382,12 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	args := append(gotestsumArgs, append([]string{"--"}, testArgs...)...)
 
 	goTest := makeCommand(ctx, params.Env, "gotestsum", args...)
+
+	// Set execution directory
+	if params.Dir != "" {
+		goTest.Dir = params.Dir
+	}
+
 	// Wire up the outputs.
 	var outputs []io.Writer
 	if params.Output != nil {
@@ -505,4 +512,24 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 		log.Printf("BuildSystemTestGoBinary (go %v) took %v.", strings.Join(args, " "), time.Since(start))
 	}()
 	return sh.RunV("go", args...)
+}
+
+func DefaultECHTestArgs() GoTestArgs {
+	args := makeGoTestArgs("ECH")
+	args.Tags = append(args.Tags, "ech", "integration")
+	args.Dir = "tests/ech"
+
+	// attempt to use absolute paths for filenames
+	path, err := os.Getwd()
+	if err != nil {
+		log.Printf("Unable to get working dir, using value: .")
+		path = "."
+	}
+	fileName := path + "/build/TEST-go-ech"
+	args.OutputFile = fileName + ".out"
+	args.JUnitReportFile = fileName + ".xml"
+	if TestCoverage {
+		args.CoverageProfileFile = fileName + ".cov"
+	}
+	return args
 }

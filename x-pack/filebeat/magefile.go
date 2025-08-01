@@ -200,3 +200,8 @@ func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(Fields, Dashboards, devtools.BuildSystemTestBinary)
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
 }
+
+// FipsECHTest runs a smoke test using a FIPS enabled binary targetting an ECH deployment.
+func FipsECHTest(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultECHTestArgs())
+}
