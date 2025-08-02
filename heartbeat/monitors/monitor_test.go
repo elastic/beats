@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -161,7 +162,7 @@ func TestStatusReporter(t *testing.T) {
 	mockDegradedPluginFactory := plugin.PluginFactory{
 		Name:    "fail",
 		Aliases: []string{"failAlias"},
-		Make: func(s string, cfg *conf.C) (plugin.Plugin, error) {
+		Make: func(s string, _ context.Context, cfg *conf.C) (plugin.Plugin, error) {
 			return plugin.Plugin{}, fmt.Errorf("error plugin")
 		},
 		Stats: plugin.NewPluginCountersRecorder("fail", monReg),
