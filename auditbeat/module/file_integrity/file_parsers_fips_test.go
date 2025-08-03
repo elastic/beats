@@ -44,14 +44,20 @@ func TestFileParsers(t *testing.T) {
 		"executable_object": true,
 	}
 	wantFields := map[string]bool{
-		"file.elf.sections":              true,
-		"file.pe.sections":               true,
-		"file.pe.sections.name":          true,
-		"file.pe.sections.physical_size": true,
-		"file.pe.sections.virtual_size":  true,
-		"file.pe.sections.entropy":       true,
-		"file.pe.sections.var_entropy":   true,
-		"file.pe.go_stripped":            true,
+		"file.elf.sections":                    true,
+		"file.pe.sections":                     true,
+		"file.pe.sections.name":                true,
+		"file.pe.sections.physical_size":       true,
+		"file.pe.sections.virtual_size":        true,
+		"file.pe.sections.entropy":             true,
+		"file.pe.sections.var_entropy":         true,
+		"file.pe.imports":                      true,
+		"file.pe.imports_names_entropy":        true,
+		"file.pe.imports_names_var_entropy":    true,
+		"file.pe.go_imports":                   true,
+		"file.pe.go_imports_names_entropy":     true,
+		"file.pe.go_imports_names_var_entropy": true,
+		"file.pe.go_stripped":                  true,
 	}
 
 	gotParserNames, gotFields := parserNamesAndFields(c)
