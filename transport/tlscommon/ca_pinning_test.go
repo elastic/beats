@@ -32,6 +32,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/iobuf"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 )
 
@@ -51,7 +52,7 @@ func TestCAPinning(t *testing.T) {
 		err := cfg.Unpack(config)
 		require.NoError(t, err)
 
-		tlsCfg, err := LoadTLSConfig(config)
+		tlsCfg, err := LoadTLSConfig(config, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 
 		tls := tlsCfg.BuildModuleClientConfig(host)
@@ -67,7 +68,7 @@ func TestCAPinning(t *testing.T) {
 		err := cfg.Unpack(config)
 		require.NoError(t, err)
 
-		tlsCfg, err := LoadTLSConfig(config)
+		tlsCfg, err := LoadTLSConfig(config, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 
 		tls := tlsCfg.BuildModuleClientConfig(host)

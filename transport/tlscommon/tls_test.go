@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestEmptyTlsConfig(t *testing.T) {
@@ -54,14 +55,14 @@ func TestLoadWithEmptyValues(t *testing.T) {
 }
 
 func TestNoLoadNilConfig(t *testing.T) {
-	cfg, err := LoadTLSConfig(nil)
+	cfg, err := LoadTLSConfig(nil, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 	assert.Nil(t, cfg)
 }
 
 func TestNoLoadDisabledConfig(t *testing.T) {
 	enabled := false
-	cfg, err := LoadTLSConfig(&Config{Enabled: &enabled})
+	cfg, err := LoadTLSConfig(&Config{Enabled: &enabled}, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 	assert.Nil(t, cfg)
 }
@@ -101,7 +102,7 @@ func TestValuesSet(t *testing.T) {
 }
 
 func TestApplyEmptyConfig(t *testing.T) {
-	tmp, err := LoadTLSConfig(&Config{})
+	tmp, err := LoadTLSConfig(&Config{}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -128,7 +129,7 @@ func TestApplyWithConfig(t *testing.T) {
       - "ECDHE-ECDSA-AES-256-GCM-SHA384"
     curve_types: [P-384]
     renegotiation: once
-  `))
+  `), logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -155,7 +156,7 @@ key: mykey.pem
 		err := config.Unpack(&c)
 		require.NoError(t, err)
 		c.Certificate = CertificateConfig{} // prevent reading non-existent files
-		tmp, err := LoadTLSServerConfig(&c)
+		tmp, err := LoadTLSServerConfig(&c, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 
 		cfg := tmp.BuildModuleClientConfig("")
@@ -186,7 +187,7 @@ key: mykey.pem
 		require.NoError(t, err)
 		c.Certificate = CertificateConfig{} // prevent reading non-existent files
 		require.NoError(t, err)
-		tmp, err := LoadTLSServerConfig(&c)
+		tmp, err := LoadTLSServerConfig(&c, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 
 		cfg := tmp.BuildModuleClientConfig("")
@@ -232,7 +233,7 @@ func TestApplyWithServerConfig(t *testing.T) {
 	if !assert.NoError(t, err) {
 		return
 	}
-	tmp, err := LoadTLSServerConfig(&c)
+	tmp, err := LoadTLSServerConfig(&c, logptest.NewTestingLogger(t, ""))
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -294,7 +295,7 @@ func TestCertificateFails(t *testing.T) {
 				t.Log(err)
 				return
 			}
-			_, err = LoadTLSConfig(&tlscfg)
+			_, err = LoadTLSConfig(&tlscfg, logptest.NewTestingLogger(t, ""))
 			t.Log(err)
 			assert.Error(t, err)
 		})
@@ -335,7 +336,7 @@ func TestCertificateAuthorities(t *testing.T) {
 		require.NoError(t, err)
 		cfg.CAs = []string{cert}
 
-		tlsC, err := LoadTLSConfig(cfg)
+		tlsC, err := LoadTLSConfig(cfg, logptest.NewTestingLogger(t, ""))
 		assert.NoError(t, err)
 		assert.NotNil(t, tlsC)
 	})
@@ -348,7 +349,7 @@ func TestCertificateAuthorities(t *testing.T) {
 		require.NoError(t, err)
 		cfg.CAs = []string{certFile}
 
-		tlsC, err := LoadTLSConfig(cfg)
+		tlsC, err := LoadTLSConfig(cfg, logptest.NewTestingLogger(t, ""))
 		assert.NoError(t, err)
 		assert.NotNil(t, tlsC)
 	})
@@ -361,7 +362,7 @@ func TestCertificateAuthorities(t *testing.T) {
 		require.NoError(t, err)
 		cfg.CAs = []string{certFile, cert}
 
-		tlsC, err := LoadTLSConfig(cfg)
+		tlsC, err := LoadTLSConfig(cfg, logptest.NewTestingLogger(t, ""))
 		assert.NoError(t, err)
 
 		assert.NotNil(t, tlsC)
@@ -371,6 +372,7 @@ func TestCertificateAuthorities(t *testing.T) {
 
 // TestFIPSCertifacteAndKeys tests encrypted private keys
 func TestCertificateAndKeys(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	t.Run("embed PKCS#1 key", func(t *testing.T) {
 		// Create a dummy configuration and append the CA after.
 		key, cert := makeKeyCertPair(t, blockTypePKCS1, "")
@@ -379,7 +381,7 @@ func TestCertificateAndKeys(t *testing.T) {
 		cfg.Certificate.Certificate = cert
 		cfg.Certificate.Key = key
 
-		tlsC, err := LoadTLSConfig(cfg)
+		tlsC, err := LoadTLSConfig(cfg, logger)
 		require.NoError(t, err)
 		assert.NotNil(t, tlsC)
 	})
@@ -392,7 +394,7 @@ func TestCertificateAndKeys(t *testing.T) {
 		cfg.Certificate.Certificate = cert
 		cfg.Certificate.Key = key
 
-		tlsC, err := LoadTLSConfig(cfg)
+		tlsC, err := LoadTLSConfig(cfg, logger)
 		require.NoError(t, err)
 		assert.NotNil(t, tlsC)
 	})
@@ -405,7 +407,7 @@ func TestCertificateAndKeys(t *testing.T) {
 		cfg.Certificate.Certificate = writeTestFile(t, cert)
 		cfg.Certificate.Key = writeTestFile(t, key)
 
-		tlsC, err := LoadTLSConfig(cfg)
+		tlsC, err := LoadTLSConfig(cfg, logger)
 		require.NoError(t, err)
 		assert.NotNil(t, tlsC)
 	})
@@ -419,7 +421,7 @@ func TestKeyPassphrase(t *testing.T) {
     certificate: testdata/ca.crt
     key: testdata/ca.key
     key_passphrase: Abcd1234!
-    `))
+    `), logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 		assert.Equal(t, 1, len(cfg.Certificates), "expected 1 certificate to be loaded")
 	})

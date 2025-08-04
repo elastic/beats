@@ -20,6 +20,8 @@ package tlscommon
 import (
 	"crypto/tls"
 	"errors"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Config defines the user configurable options in the yaml file.
@@ -40,7 +42,7 @@ type Config struct {
 // defined. If Certificate and CertificateKey are configured, client authentication
 // will be configured. If no CAs are configured, the host CA will be used by go
 // built-in TLS support.
-func LoadTLSConfig(config *Config) (*TLSConfig, error) {
+func LoadTLSConfig(config *Config, logger *logp.Logger) (*TLSConfig, error) {
 	if !config.IsEnabled() {
 		return nil, nil
 	}
@@ -86,6 +88,7 @@ func LoadTLSConfig(config *Config) (*TLSConfig, error) {
 		Renegotiation:        tls.RenegotiationSupport(config.Renegotiation),
 		CASha256:             config.CASha256,
 		CATrustedFingerprint: config.CATrustedFingerprint,
+		logger:               logger,
 	}, nil
 }
 

@@ -26,6 +26,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -52,7 +53,7 @@ func TestNoFIPSCertificateAndKeys(t *testing.T) {
 		cfg.Certificate.Key = string(rawKey)
 		cfg.Certificate.Passphrase = password
 
-		tlsC, err := LoadTLSConfig(cfg)
+		tlsC, err := LoadTLSConfig(cfg, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 		assert.NotNil(t, tlsC)
 	})
@@ -67,7 +68,7 @@ func TestNoFIPSCertificateAndKeys(t *testing.T) {
 		cfg.Certificate.Key = key
 		cfg.Certificate.Passphrase = password
 
-		tlsC, err := LoadTLSConfig(cfg)
+		tlsC, err := LoadTLSConfig(cfg, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 		assert.NotNil(t, tlsC)
 	})
@@ -75,12 +76,13 @@ func TestNoFIPSCertificateAndKeys(t *testing.T) {
 
 func TestEncryptedKeyPassphrase(t *testing.T) {
 	const passphrase = "Abcd1234!" // passphrase for testdata/ca.encrypted.key
+	logger := logptest.NewTestingLogger(t, "")
 	t.Run("no passphrase", func(t *testing.T) {
 		_, err := LoadTLSConfig(mustLoad(t, `
     enabled: true
     certificate: testdata/ca.crt
     key: testdata/ca.encrypted.key
-    `))
+    `), logger)
 		assert.ErrorContains(t, err, "no PEM blocks") // ReadPEMFile will generate an internal "no passphrase available" error that is logged and the no PEM blocks error is returned instead
 	})
 
@@ -90,7 +92,7 @@ func TestEncryptedKeyPassphrase(t *testing.T) {
     certificate: testdata/ca.crt
     key: testdata/ca.encrypted.key
     key_passphrase: "abcd1234!"
-    `))
+    `), logger)
 		assert.ErrorContains(t, err, "no PEM blocks") // ReadPEMFile will fail decrypting with x509.IncorrectPasswordError that will be logged and a no PEM blocks error is returned instead
 	})
 
@@ -100,7 +102,7 @@ func TestEncryptedKeyPassphrase(t *testing.T) {
     certificate: testdata/ca.crt
     key: testdata/ca.encrypted.key
     key_passphrase: Abcd1234!
-    `))
+    `), logger)
 		require.NoError(t, err)
 		assert.Equal(t, 1, len(cfg.Certificates), "expected 1 certificate to be loaded")
 	})
@@ -112,7 +114,7 @@ func TestEncryptedKeyPassphrase(t *testing.T) {
     certificate: testdata/ca.crt
     key: testdata/ca.encrypted.key
     key_passphrase_path: %s
-    `, fileName)))
+    `, fileName)), logger)
 		require.NoError(t, err)
 		assert.Equal(t, 1, len(cfg.Certificates), "expected 1 certificate to be loaded")
 	})
@@ -124,7 +126,7 @@ func TestEncryptedKeyPassphrase(t *testing.T) {
     certificate: testdata/ca.crt
     key: testdata/ca.encrypted.key
     key_passphrase_path: %s
-    `, fileName)))
+    `, fileName)), logger)
 		assert.ErrorContains(t, err, "no PEM blocks") // ReadPEMFile will generate an internal "no passphrase available" error that is logged and the no PEM blocks error is returned instead
 	})
 }

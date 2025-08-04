@@ -86,6 +86,8 @@ type TLSConfig struct {
 	// time returns the current time as the number of seconds since the epoch.
 	// If time is nil, TLS uses time.Now.
 	time func() time.Time
+
+	logger *logp.Logger
 }
 
 var (
@@ -104,7 +106,7 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 
 	insecure := c.Verification != VerifyStrict
 	if c.Verification == VerifyNone {
-		logp.NewLogger("tls").Warn("SSL/TLS verifications disabled.")
+		c.logger.Named("tls").Warn("SSL/TLS verifications disabled.")
 	}
 
 	return &tls.Config{
@@ -119,7 +121,7 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 		Renegotiation:      c.Renegotiation,
 		ClientAuth:         c.ClientAuth,
 		Time:               c.time,
-		VerifyConnection:   makeVerifyConnection(c),
+		VerifyConnection:   makeVerifyConnection(c, c.logger),
 	}
 }
 
@@ -133,7 +135,7 @@ func (c *TLSConfig) BuildModuleClientConfig(host string) *tls.Config {
 			VerifyConnection: makeVerifyConnection(&TLSConfig{
 				Verification: VerifyFull,
 				ServerName:   host,
-			}),
+			}, logp.NewLogger("tls")),
 		}
 	}
 
@@ -175,8 +177,8 @@ func (c *TLSConfig) BuildServerConfig(host string) *tls.Config {
 	return config
 }
 
-func trustRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate) error {
-	logger := logp.NewLogger("tls")
+func trustRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate, logger *logp.Logger) error {
+	logger = logger.Named("tls")
 	logger.Info("'ca_trusted_fingerprint' set, looking for matching fingerprints")
 	fingerprint, err := hex.DecodeString(cfg.CATrustedFingerprint)
 	if err != nil {
@@ -223,7 +225,7 @@ func trustRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate) error {
 	return nil
 }
 
-func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
+func makeVerifyConnection(cfg *TLSConfig, logger *logp.Logger) func(tls.ConnectionState) error {
 	serverName := cfg.ServerName
 
 	switch cfg.Verification {
@@ -233,7 +235,7 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 		// tls.Config.InsecureSkipVerify  is set to true
 		return func(cs tls.ConnectionState) error {
 			if cfg.CATrustedFingerprint != "" {
-				if err := trustRootCA(cfg, cs.PeerCertificates); err != nil {
+				if err := trustRootCA(cfg, cs.PeerCertificates, logger); err != nil {
 					return err
 				}
 			}
@@ -259,7 +261,7 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 		// tls.Config.InsecureSkipVerify is set to true
 		return func(cs tls.ConnectionState) error {
 			if cfg.CATrustedFingerprint != "" {
-				if err := trustRootCA(cfg, cs.PeerCertificates); err != nil {
+				if err := trustRootCA(cfg, cs.PeerCertificates, logger); err != nil {
 					return err
 				}
 			}
@@ -284,7 +286,7 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 		if len(cfg.CASha256) > 0 {
 			return func(cs tls.ConnectionState) error {
 				if cfg.CATrustedFingerprint != "" {
-					if err := trustRootCA(cfg, cs.PeerCertificates); err != nil {
+					if err := trustRootCA(cfg, cs.PeerCertificates, logger); err != nil {
 						return err
 					}
 				}

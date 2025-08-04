@@ -26,6 +26,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -53,7 +54,7 @@ func TestFIPSCertificateAndKeys(t *testing.T) {
 		cfg.Certificate.Key = string(rawKey)
 		cfg.Certificate.Passphrase = password
 
-		_, err = LoadTLSConfig(cfg)
+		_, err = LoadTLSConfig(cfg, logptest.NewTestingLogger(t, ""))
 		require.Error(t, err)
 		assert.ErrorIs(t, err, errors.ErrUnsupported, err)
 	})
@@ -68,7 +69,7 @@ func TestFIPSCertificateAndKeys(t *testing.T) {
 		cfg.Certificate.Key = key
 		cfg.Certificate.Passphrase = password
 
-		_, err = LoadTLSConfig(cfg)
+		_, err = LoadTLSConfig(cfg, logptest.NewTestingLogger(t, ""))
 		assert.ErrorIs(t, err, errors.ErrUnsupported)
 	})
 }

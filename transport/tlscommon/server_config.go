@@ -23,6 +23,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // ServerConfig defines the user configurable tls options for any TCP based service.
@@ -40,7 +41,7 @@ type ServerConfig struct {
 
 // LoadTLSServerConfig tranforms a ServerConfig into a `tls.Config` to be used directly with golang
 // network types.
-func LoadTLSServerConfig(config *ServerConfig) (*TLSConfig, error) {
+func LoadTLSServerConfig(config *ServerConfig, logger *logp.Logger) (*TLSConfig, error) {
 	if !config.IsEnabled() {
 		return nil, nil
 	}
@@ -95,6 +96,7 @@ func LoadTLSServerConfig(config *ServerConfig) (*TLSConfig, error) {
 		CurvePreferences: curves,
 		ClientAuth:       tls.ClientAuthType(clientAuth),
 		CASha256:         config.CASha256,
+		logger:           logger,
 	}, nil
 }
 

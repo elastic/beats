@@ -30,8 +30,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 )
 
@@ -262,9 +266,12 @@ func TestTrustRootCA(t *testing.T) {
 			}
 
 			// Capture the logs
-			_ = logp.DevelopmentSetup(logp.ToObserverOutput())
+			observedCore, observedLogs := observer.New(zapcore.DebugLevel)
+			logger := logptest.NewTestingLogger(t, "test", zap.WrapCore(func(core zapcore.Core) zapcore.Core {
+				return observedCore
+			}))
 
-			err := trustRootCA(&cfg, tc.peerCerts)
+			err := trustRootCA(&cfg, tc.peerCerts, logger)
 			if tc.expectingError && err == nil {
 				t.Fatal("expecting an error when calling trustRootCA")
 			}
@@ -274,7 +281,7 @@ func TestTrustRootCA(t *testing.T) {
 			}
 
 			if len(tc.expectingWarnings) > 0 {
-				warnings := logp.ObserverLogs().FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
+				warnings := observedLogs.FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
 				if len(warnings) == 0 {
 					t.Fatal("expecting a warning message")
 				}
@@ -385,7 +392,7 @@ func TestMakeVerifyConnectionUsesCATrustedFingerprint(t *testing.T) {
 				CASha256:             test.CASHA256,
 			}
 
-			verifier := makeVerifyConnection(cfg)
+			verifier := makeVerifyConnection(cfg, logptest.NewTestingLogger(t, ""))
 			if test.expectedCallback {
 				require.NotNil(t, verifier, "makeVerifyConnection returned a nil verifier")
 			} else {
@@ -469,7 +476,7 @@ func TestMakeVerifyServerConnectionForIPs(t *testing.T) {
 				Verification: test.verificationMode,
 				ServerName:   test.serverName,
 			}
-			verifier := makeVerifyConnection(cfg)
+			verifier := makeVerifyConnection(cfg, logptest.NewTestingLogger(t, ""))
 
 			err = verifier(tls.ConnectionState{
 				PeerCertificates: []*x509.Certificate{peerCerts.Leaf},
@@ -644,6 +651,7 @@ func TestVerificationMode(t *testing.T) {
 				Verification: test.verificationMode,
 				RootCAs:      certPool,
 				ServerName:   test.hostname,
+				logger:       logptest.NewTestingLogger(t, ""),
 			}
 
 			if test.ignoreCerts {
