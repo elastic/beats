@@ -89,7 +89,7 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	// 1. Generate the log file path, but do not write data to it
 	logFilePath := path.Join(tempDir, "log.log")
 
-	// 2. Write configuration file ans start Filebeat
+	// 2. Write configuration file and start Filebeat
 	filebeat.WriteConfigFile(fmt.Sprintf(filestreamCleanInactiveCfg, logFilePath, tempDir))
 	filebeat.Start()
 
