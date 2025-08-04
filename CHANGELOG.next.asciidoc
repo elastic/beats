@@ -99,6 +99,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add NTP metricset to system module. {pull}44884[44884]
 - Add VPN metrics to meraki module {pull}44851[44851]
 - Improve error messages in AWS Health {pull}45408[45408]
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
 
 *Osquerybeat*
 
