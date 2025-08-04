@@ -387,7 +387,7 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 		packets  int
 		timeouts int
 	)
-	s.UpdateStatus(status.Running, fmt.Sprintf("starting sniffer for handle %s", s.id))
+	s.UpdateStatus(status.Running, fmt.Sprintf("running sniffer for handle %s", s.id))
 	for s.state.Load() == snifferActive {
 		select {
 		case <-ctx.Done():

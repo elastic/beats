@@ -78,7 +78,7 @@ func (p *processor) Start() {
 		err := p.sniffer.Run()
 		if err != nil {
 			p.err <- fmt.Errorf("sniffer loop failed: %w", err)
-			p.UpdateStatus(status.Degraded, fmt.Sprintf("processor failed: %w", err))
+			p.UpdateStatus(status.Degraded, fmt.Sprintf("processor failed: %v", err))
 			return
 		}
 		p.err <- nil
