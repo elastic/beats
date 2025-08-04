@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/mitchellh/hashstructure"
+	"github.com/gohugoio/hashstructure"
 
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
 	"github.com/elastic/elastic-agent-libs/config"
