@@ -24,16 +24,10 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestNpcap(t *testing.T) {
-	// Ugh.
-	var lcfg logp.Config
-	logp.ToObserverOutput()(&lcfg)
-	logp.Configure(lcfg)
-	obs := logp.ObserverLogs()
-
 	// Working space.
 	path := filepath.Join(t.TempDir(), "installer")
 	if runtime.GOOS == "windows" {
@@ -46,22 +40,18 @@ func TestNpcap(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to build mock installer: %v\n%s", err, b)
 		}
-		log := logp.NewLogger("npcap_test_install")
+		log := logptest.NewTestingLogger(t, "npcap_test_install")
 		for _, compat := range []bool{false, true} {
 			for _, dst := range []string{
 				"", // Default.
 				`C:\some\other\location`,
 			} {
 				err = install(context.Background(), log, path, dst, compat)
-				messages := obs.TakeAll()
 				if err != nil {
 					if dst == "" {
 						dst = "default location"
 					}
 					t.Errorf("unexpected error running installer to %s with compat=%t: %v", dst, compat, err)
-					for _, e := range messages {
-						t.Log(e.Message)
-					}
 				}
 			}
 		}
@@ -74,14 +64,10 @@ func TestNpcap(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to build mock uninstaller: %v\n%s", err, b)
 		}
-		log := logp.NewLogger("npcap_test_uninstall")
+		log := logptest.NewTestingLogger(t, "npcap_test_install")
 		err = uninstall(context.Background(), log, path)
-		messages := obs.TakeAll()
 		if err != nil {
 			t.Errorf("unexpected error running uninstaller: %v", err)
-			for _, e := range messages {
-				t.Log(e.Message)
-			}
 		}
 	})
 }
