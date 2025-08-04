@@ -25,10 +25,10 @@ import (
 	"math"
 	"time"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
@@ -38,17 +38,19 @@ type Publisher interface {
 }
 
 func Run(
-	inputContext input.Context,
+	reporter status.StatusReporter,
+	ctx context.Context,
+	metricsRegistry *monitoring.Registry,
 	api EventLog,
 	evtCheckpoint checkpoint.EventLogState,
 	publisher Publisher,
 	log *logp.Logger,
 ) error {
-	inputContext.UpdateStatus(status.Starting, fmt.Sprintf("Starting to read from %s", api.Channel()))
+	reporter.UpdateStatus(status.Starting, fmt.Sprintf("Starting to read from %s", api.Channel()))
 	// setup closing the API if either the run function is signaled asynchronously
 	// to shut down or when returning after io.EOF
 	cancelCtx, cancelFn := ctxtool.WithFunc(
-		ctxtool.FromCanceller(inputContext.Cancelation),
+		ctx,
 		func() {
 			if err := api.Close(); err != nil {
 				log.Errorw("error while closing Windows Event Log access", "error", err)
@@ -58,7 +60,7 @@ func Run(
 
 	openErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
 		if IsRecoverable(err, api.IsFile()) {
-			inputContext.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to open %s: %v", api.Channel(), err))
+			reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to open %s: %v", api.Channel(), err))
 			log.Errorw("encountered recoverable error when opening Windows Event Log", "error", err)
 			return true
 		}
@@ -67,7 +69,7 @@ func Run(
 
 	readErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
 		if IsRecoverable(err, api.IsFile()) {
-			inputContext.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to read from %s: %v", api.Channel(), err))
+			reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to read from %s: %v", api.Channel(), err))
 			log.Errorw("encountered recoverable error when reading from Windows Event Log", "error", err)
 			if resetErr := api.Reset(); resetErr != nil {
 				log.Errorw("error resetting Windows Event Log handle", "error", resetErr)
@@ -79,7 +81,7 @@ func Run(
 
 runLoop:
 	for cancelCtx.Err() == nil {
-		openErr := api.Open(evtCheckpoint, inputContext.MetricsRegistry)
+		openErr := api.Open(evtCheckpoint, metricsRegistry)
 		if openErr != nil {
 			if openErrHandler.backoff(cancelCtx, openErr) {
 				continue runLoop
@@ -88,7 +90,7 @@ runLoop:
 			if cancelCtx.Err() != nil {
 				break runLoop
 			}
-			inputContext.UpdateStatus(status.Failed, fmt.Sprintf("Failed to open %s: %v", api.Channel(), openErr))
+			reporter.UpdateStatus(status.Failed, fmt.Sprintf("Failed to open %s: %v", api.Channel(), openErr))
 			return fmt.Errorf("failed to open Windows Event Log channel %q: %w", api.Channel(), openErr)
 		}
 
@@ -96,7 +98,7 @@ runLoop:
 
 		// read loop
 		for cancelCtx.Err() == nil {
-			inputContext.UpdateStatus(status.Running, fmt.Sprintf("Reading from %s", api.Channel()))
+			reporter.UpdateStatus(status.Running, fmt.Sprintf("Reading from %s", api.Channel()))
 			records, readErr := api.Read()
 			if readErr != nil {
 				if readErrHandler.backoff(cancelCtx, readErr) {
@@ -113,7 +115,7 @@ runLoop:
 					break runLoop
 				}
 
-				inputContext.UpdateStatus(status.Failed, fmt.Sprintf("Failed to read from %s: %v", api.Channel(), readErr))
+				reporter.UpdateStatus(status.Failed, fmt.Sprintf("Failed to read from %s: %v", api.Channel(), readErr))
 				log.Errorw("error occurred while reading from Windows Event Log", "error", readErr)
 
 				return readErr
@@ -125,12 +127,12 @@ runLoop:
 			}
 
 			if err := publisher.Publish(records); err != nil {
-				inputContext.UpdateStatus(status.Failed, fmt.Sprintf("Publisher error: %v", err))
+				reporter.UpdateStatus(status.Failed, fmt.Sprintf("Publisher error: %v", err))
 				return err
 			}
 		}
 	}
-	inputContext.UpdateStatus(status.Stopped, "")
+	reporter.UpdateStatus(status.Stopped, "")
 	return nil
 }
 

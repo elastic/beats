@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/go-concert/ctxtool"
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
@@ -101,7 +102,9 @@ func (in winlogInput) Run(
 	api, _ := source.(eventlog.EventLog)
 	log := ctx.Logger.With("eventlog", source.Name(), "channel", api.Channel())
 	return eventlog.Run(
-		ctx,
+		&ctx,
+		ctxtool.FromCanceller(ctx.Cancelation),
+		ctx.MetricsRegistry,
 		api,
 		initCheckpoint(log, cursor),
 		&publisher{cursorPub: pub},
