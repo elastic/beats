@@ -36,6 +36,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/decoder"
 )
@@ -71,6 +72,8 @@ type sniffer struct {
 	decoders Decoders
 
 	log *logp.Logger
+
+	reporter status.StatusReporter
 }
 
 type snifferHandle interface {
@@ -90,7 +93,7 @@ const (
 // only, but no device is opened yet. Accessing and configuring the actual device
 // is done by the Run method. The id parameter is used to specify the metric
 // collection ID for AF_PACKET sniffers on Linux.
-func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig) (*Sniffer, error) {
+func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig, reporter status.StatusReporter) (*Sniffer, error) {
 	s := &Sniffer{
 		sniffers: make([]sniffer, len(interfaces)),
 		log:      logp.NewLogger("sniffer"),
@@ -109,6 +112,7 @@ func New(id string, testMode bool, _ string, decoders map[string]Decoders, inter
 			idx:           i,
 			decoders:      dec,
 			log:           s.log,
+			reporter:      reporter,
 		}
 		child.state.Store(snifferInactive)
 
@@ -383,6 +387,7 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 		packets  int
 		timeouts int
 	)
+	s.UpdateStatus(status.Running, fmt.Sprintf("starting sniffer for handle %s", s.id))
 	for s.state.Load() == snifferActive {
 		select {
 		case <-ctx.Done():
@@ -475,6 +480,13 @@ func (s *sniffer) open(device string) (snifferHandle, error) {
 		return openAFPacket(fmt.Sprintf("%s_%d", s.id, s.idx), device, s.filter, &s.config)
 	default:
 		return nil, fmt.Errorf("unknown sniffer type for %s: %q", device, s.config.Type)
+	}
+}
+
+// UpdateStatus wraps the status reporter we get from central management
+func (s *sniffer) UpdateStatus(status status.Status, message string) {
+	if s.reporter != nil {
+		s.reporter.UpdateStatus(status, message)
 	}
 }
 

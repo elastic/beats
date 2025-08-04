@@ -131,7 +131,7 @@ func (p *processorFactory) CreateWithReporter(pipeline beat.PipelineConnector, c
 	if statusReporter != nil {
 		statusReporter.UpdateStatus(status.Configuring, "starting packetbeat processor configuration")
 	}
-	duration, publisher, flows, sniffer, errChan, err := p.create(pipeline, cfg)
+	duration, publisher, flows, sniffer, errChan, err := p.create(pipeline, cfg, statusReporter)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create packetbeat processor: %w", err)
 	}
@@ -140,14 +140,14 @@ func (p *processorFactory) CreateWithReporter(pipeline beat.PipelineConnector, c
 
 // Create returns a new module runner that publishes to the provided pipeline, configured from cfg.
 func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) (cfgfile.Runner, error) {
-	duration, publisher, flows, sniffer, errChan, err := p.create(pipeline, cfg)
+	duration, publisher, flows, sniffer, errChan, err := p.create(pipeline, cfg, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create packetbeat processor: %w", err)
 	}
 	return newProcessor(duration, publisher, flows, sniffer, errChan, nil), nil
 }
 
-func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C) (time.Duration, *publish.TransactionPublisher, *flows.Flows, *sniffer.Sniffer, chan error, error) {
+func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, reporter status.StatusReporter) (time.Duration, *publish.TransactionPublisher, *flows.Flows, *sniffer.Sniffer, chan error, error) {
 	config, err := p.configurator(cfg)
 	if err != nil {
 		logp.Err("Failed to read the beat config: %v, %v", err, config)
@@ -204,7 +204,7 @@ func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C) 
 	if err != nil {
 		return 0, nil, nil, nil, nil, err
 	}
-	sniffer, err := setupSniffer(id, config, publisher, &watch, flows)
+	sniffer, err := setupSniffer(id, config, publisher, &watch, flows, reporter)
 	if err != nil {
 		return 0, nil, nil, nil, nil, err
 	}
@@ -243,7 +243,7 @@ func setupFlows(pipeline beat.Pipeline, watch *procs.ProcessesWatcher, cfg confi
 	return flows.NewFlows(client.PublishAll, watch, cfg.Flows)
 }
 
-func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublisher, watch *procs.ProcessesWatcher, flows *flows.Flows) (*sniffer.Sniffer, error) {
+func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublisher, watch *procs.ProcessesWatcher, flows *flows.Flows, reporter status.StatusReporter) (*sniffer.Sniffer, error) {
 	icmp, err := cfg.ICMP()
 	if err != nil {
 		return nil, err
@@ -281,7 +281,7 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 		interfaces[i].BpfFilter = protocols.BpfFilter(iface.WithVlans, icmp.Enabled())
 	}
 
-	return sniffer.New(id, false, "", decoders, interfaces)
+	return sniffer.New(id, false, "", decoders, interfaces, reporter)
 }
 
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based
