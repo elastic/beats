@@ -348,7 +348,8 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
 func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger, reg *monitoring.Registry) (*http.Client, error) {
-	netHTTPClient, err := cfg.Transport.Client(clientOptions(cfg.URL.URL, cfg.KeepAlive.settings())...)
+	options := append(clientOptions(cfg.URL.URL, cfg.KeepAlive.settings()), httpcommon.WithLogger(log))
+	netHTTPClient, err := cfg.Transport.Client(options...)
 	if err != nil {
 		return nil, err
 	}

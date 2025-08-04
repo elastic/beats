@@ -15,6 +15,7 @@ import (
 	"github.com/godror/godror/dsn"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -108,7 +109,8 @@ func mysqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
 	if config.TLS.IsEnabled() {
 		c.TLSConfig = mysqlTLSConfigKey
 
-		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		// TODO: use local logger here
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, logp.NewLogger(""))
 		if err != nil {
 			return mb.HostData{}, fmt.Errorf("could not load provided TLS configuration: %w", err)
 		}
@@ -132,7 +134,8 @@ func postgresParseDSN(config ConnectionDetails, host string) (mb.HostData, error
 			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", sanitizeError(err, host))
 		}
 
-		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		// TODO: use local logger here
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, logp.NewLogger(""))
 		if err != nil {
 			return mb.HostData{}, fmt.Errorf("could not load provided TLS configuration: %w", err)
 		}
@@ -203,7 +206,9 @@ func mssqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
 			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", sanitizeError(err, host))
 		}
 
-		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		// TODO: use local logger here.
+		// Should be fixed when we get rid of global module registry
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, logp.NewLogger(""))
 		if err != nil {
 			return mb.HostData{}, fmt.Errorf("could not load provided TLS configuration: %w", err)
 		}

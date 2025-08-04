@@ -787,7 +787,8 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
 func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry) (*http.Client, *httplog.LoggingRoundTripper, error) {
-	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings())...)
+	options := append(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings()), httpcommon.WithLogger(log))
+	c, err := cfg.Resource.Transport.Client(options...)
 	if err != nil {
 		return nil, nil, err
 	}

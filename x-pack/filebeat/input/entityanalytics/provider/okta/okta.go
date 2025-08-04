@@ -188,7 +188,8 @@ type noopReporter struct{}
 func (noopReporter) UpdateStatus(status.Status, string) {}
 
 func newClient(ctx context.Context, cfg conf, log *logp.Logger) (*http.Client, error) {
-	c, err := cfg.Request.Transport.Client(clientOptions(cfg.Request.KeepAlive.settings())...)
+	options := append(clientOptions(cfg.Request.KeepAlive.settings()), httpcommon.WithLogger(log))
+	c, err := cfg.Request.Transport.Client(options...)
 	if err != nil {
 		return nil, err
 	}
