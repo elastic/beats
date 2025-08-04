@@ -857,7 +857,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 is_documented_aliases.append(key)
 
         if undocumented_keys:
-            raise Exception(f"Keys:\n\n{undocumented_keys}\n\nnot documented in event:\n\n{str(evt)}\n")
+            raise Exception(f"Keys: \n\n{undocumented_keys}\n\nnot documented in event: \n\n{str(evt)}\n")
 
         if is_documented_aliases:
             raise Exception(f"Keys {is_documented_aliases} documented as aliases!")

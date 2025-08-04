@@ -14,7 +14,8 @@ def document_fields(output, section, sections, path, beat):
     if "anchor" in section:
         output.write('---\n')
         output.write('mapped_pages:\n')
-        output.write('  - https://www.elastic.co/guide/en/beats/{}/current/exported-fields-{}.html\n'.format(beat, section["anchor"]))
+        output.write(
+            '  - https://www.elastic.co/guide/en/beats/{}/current/exported-fields-{}.html\n'.format(beat, section["anchor"]))
         # Build a docs-builder applies_to directive
         applies_to = get_applies_to(section)
         if len(applies_to) > 0:
@@ -53,9 +54,9 @@ See the [ECS reference](ecs://reference/index.md) for more information.
             # Build a docs-builder applies_to directive
             applies_to = get_applies_to(section)
             if len(applies_to) > 0:
-              output.write("```{applies_to}\nstack: ")
-              output.write(", ".join(applies_to))
-              output.write("\n```\n\n")
+                output.write("```{applies_to}\nstack: ")
+                output.write(", ".join(applies_to))
+                output.write("\n```\n\n")
 
             output.write("{}\n\n".format(section["description"].strip()))
 
@@ -90,9 +91,9 @@ def document_field(output, field, field_path):
     # Build a docs-builder applies_to directive
     applies_to = get_applies_to(field)
     if len(applies_to) > 0:
-      output.write(" {applies_to}`stack: ")
-      output.write(", ".join(applies_to))
-      output.write("`")
+        output.write(" {applies_to}`stack: ")
+        output.write(", ".join(applies_to))
+        output.write("`")
 
     output.write("\n:   ")
 
@@ -100,7 +101,7 @@ def document_field(output, field, field_path):
         output.write("{}".format(" ".join(x for x in field["description"].split("\n") if x)).strip()+"\n\n")
     if "type" in field:
         if "description" in field:
-          output.write("    ")
+            output.write("    ")
         output.write("type: {}\n\n".format(field["type"]))
     if "example" in field:
         output.write("    example: {}\n\n".format(field["example"]))
@@ -136,28 +137,31 @@ def document_field(output, field, field_path):
 # of all available lifecycles and versions
 # NOTE: There's almost certainly a more efficient way
 # to accomplish this.
+
+
 def get_applies_to(item):
-  applies_to = []
-  if "version" in item:
-    if "preview" in item["version"]:
-        applies_to.append("preview {}".format(item["version"]["preview"]))
-    if "beta" in item["version"]:
-        applies_to.append("beta {}".format(item["version"]["beta"]))
-    if "ga" in item["version"]:
-        applies_to.append("ga {}".format(item["version"]["ga"]))
-    if "deprecated" in item["version"]:
-        applies_to.append("deprecated {}".format(item["version"]["deprecated"]))
-    if "removed" in item["version"]:
-        applies_to.append("removed {}".format(item["version"]["removed"]))
-  # Add `deprecated` to applies_to if not already added via `version`
-  if "deprecated" in item:
-    if "version" not in item or ("version" in item and "deprecated" not in item["version"]):
-        applies_to.append("deprecated {}".format(item["deprecated"]))
-  # Add `release` to applies_to if not already added via `version`
-  if "release" in item:
-    if "version" not in item and item["release"] != "ga":
-        applies_to.append(item["release"])
-  return applies_to
+    applies_to = []
+    if "version" in item:
+        if "preview" in item["version"]:
+            applies_to.append("preview {}".format(item["version"]["preview"]))
+        if "beta" in item["version"]:
+            applies_to.append("beta {}".format(item["version"]["beta"]))
+        if "ga" in item["version"]:
+            applies_to.append("ga {}".format(item["version"]["ga"]))
+        if "deprecated" in item["version"]:
+            applies_to.append("deprecated {}".format(item["version"]["deprecated"]))
+        if "removed" in item["version"]:
+            applies_to.append("removed {}".format(item["version"]["removed"]))
+    # Add `deprecated` to applies_to if not already added via `version`
+    if "deprecated" in item:
+        if "version" not in item or ("version" in item and "deprecated" not in item["version"]):
+            applies_to.append("deprecated {}".format(item["deprecated"]))
+    # Add `release` to applies_to if not already added via `version`
+    if "release" in item:
+        if "version" not in item and item["release"] != "ga":
+            applies_to.append(item["release"])
+    return applies_to
+
 
 @lru_cache(maxsize=None)
 def ecs_fields():
