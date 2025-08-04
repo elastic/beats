@@ -245,7 +245,16 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 
 		var err error
 		if err = requester.doRequest(stdCtx, trCtx, pub); err != nil {
-			log.Errorf("Error while processing http request: %v", err)
+			var httpErr *httpError
+			if ok := errors.As(err, &httpErr); ok {
+				log.Errorw("Error while processing http request",
+					"error", err,
+					"error.code", httpErr.StatusCode,
+					"error.id", httpErr.Status,
+					"error.type", "http")
+			} else {
+				log.Errorw("Error while processing http request", "error", err)
+			}
 		}
 
 		metrics.updateIntervalMetrics(err, startTime)
