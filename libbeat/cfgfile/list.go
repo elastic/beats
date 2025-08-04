@@ -22,8 +22,12 @@ import (
 	"fmt"
 	"sync"
 
+<<<<<<< HEAD
 	"github.com/joeshaw/multierror"
 	"github.com/mitchellh/hashstructure"
+=======
+	"github.com/gohugoio/hashstructure"
+>>>>>>> 8d8fd702e (chore: replace deprecated mitchellh dependencies (#45376))
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
