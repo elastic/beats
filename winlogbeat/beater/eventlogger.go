@@ -23,6 +23,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+<<<<<<< HEAD
+=======
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+>>>>>>> 4081f24d2 (Fix panic in winlog input (#45730))
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
@@ -143,7 +148,12 @@ func (e *eventLogger) run(
 		client:     client,
 		eventACKer: eventACKer,
 	}
+<<<<<<< HEAD
 	if err := eventlog.Run(ctx, api, state, publisher, e.log); err != nil {
+=======
+	reg, _ := inputmon.NewInputRegistry("winlog", api.Name(), nil)
+	if err := eventlog.Run(noopReporter{}, ctx, reg, api, state, publisher, e.log); err != nil {
+>>>>>>> 4081f24d2 (Fix panic in winlog input (#45730))
 		e.log.Error(err)
 	}
 }

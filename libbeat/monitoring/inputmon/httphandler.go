@@ -73,9 +73,53 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string]any {
 	metrics := monitoring.CollectStructSnapshot(r, monitoring.Full, false)
 
+<<<<<<< HEAD
 	filtered := make([]map[string]any, 0, len(metrics))
 	for _, ifc := range metrics {
 		m, ok := ifc.(map[string]any)
+=======
+	// Now collect all that match the requested type
+	selected := make([]map[string]any, 0)
+	for _, table := range inputs {
+		if table.input == InputNested {
+			// Containers for nested inputs are never included in snapshots
+			continue
+		}
+		if requestedType == "" || strings.EqualFold(table.input, requestedType) {
+			selected = append(selected, table.data)
+		}
+	}
+	return selected
+}
+
+type inputMetricsTable struct {
+	id    string
+	input string
+	path  string // The path of this input's registry under its root metrics registry
+	data  map[string]any
+}
+
+// Finds all valid input sub-registries within the given registry (including
+// nested ones) and returns them as a map keyed by input id, with all inputs
+// at the top level.
+func inputMetricsFromRegistry(registry *monitoring.Registry) map[string]inputMetricsTable {
+	metrics := monitoring.CollectStructSnapshot(registry, monitoring.Full, false)
+	result := map[string]inputMetricsTable{}
+	addInputMetrics(result, metrics, nil)
+	return result
+}
+
+// A helper that iterates over the entries in "from" looking for
+// valid input metrics tables, adding them to "to", and recurses on
+// any that are tagged with InputNested.
+func addInputMetrics(to map[string]inputMetricsTable, from map[string]any, pathPrefix []string) {
+	for key, value := range from {
+		// A valid input metrics table must be a string-keyed map with string
+		// values for the "id" and "input" keys. An "input" value of InputNested
+		// indicates that this is a container input and only its child registries
+		// should be included.
+		data, ok := value.(map[string]any)
+>>>>>>> 4081f24d2 (Fix panic in winlog input (#45730))
 		if !ok {
 			continue
 		}
@@ -89,7 +133,22 @@ func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string
 			continue
 		}
 
+<<<<<<< HEAD
 		filtered = append(filtered, m)
+=======
+		inputPath := append(pathPrefix, key)
+		to[id] = inputMetricsTable{
+			id:    id,
+			input: input,
+			path:  strings.Join(inputPath, "."),
+			data:  data,
+		}
+
+		if input == InputNested {
+			// Add the contents of this entry recursively
+			addInputMetrics(to, data, inputPath)
+		}
+>>>>>>> 4081f24d2 (Fix panic in winlog input (#45730))
 	}
 	return filtered
 }
