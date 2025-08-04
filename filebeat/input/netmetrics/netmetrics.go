@@ -171,7 +171,7 @@ func (n *netMetrics) EventReceived(len int, timestamp time.Time) {
 	n.lastPacket = timestamp
 
 	n.packets.Add(1)
-	n.bytes.Add(uint64(len)) // noling:gosec // length is never negative
+	n.bytes.Add(uint64(len)) // nolint:gosec // length is never negative
 }
 
 // EventPublished updates all metrics related to published events.
