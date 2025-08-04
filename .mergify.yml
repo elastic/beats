@@ -346,8 +346,8 @@ pull_request_rules:
     conditions:
       - merged
       - label=docs
-      - files~=^docs/ 
-      - head~=^\d+\. 
+      - files~=^docs/
+      - base~=^\d+\.
     actions:
       backport:
         branches:
