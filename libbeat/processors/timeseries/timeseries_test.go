@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -93,7 +94,7 @@ var (
 )
 
 func TestTimesSeriesIsDimension(t *testing.T) {
-	processor := NewTimeSeriesProcessor(fields)
+	processor := NewTimeSeriesProcessor(fields, logptest.NewTestingLogger(t, ""))
 
 	tsProcessor := processor.(*timeseriesProcessor)
 	for _, test := range []struct {
@@ -120,7 +121,7 @@ func TestTimesSeriesIsDimension(t *testing.T) {
 }
 
 func TestTimesSeriesHashes(t *testing.T) {
-	timeseriesProcessor := NewTimeSeriesProcessor(fields)
+	timeseriesProcessor := NewTimeSeriesProcessor(fields, logptest.NewTestingLogger(t, ""))
 
 	for _, test := range []struct {
 		name     string
