@@ -93,6 +93,10 @@ func filteredSnapshot(
 	// Now collect all that match the requested type
 	selected := make([]map[string]any, 0)
 	for _, table := range inputs {
+		if table.input == InputNested {
+			// Containers for nested inputs are never included in snapshots
+			continue
+		}
 		if requestedType == "" || strings.EqualFold(table.input, requestedType) {
 			selected = append(selected, table.data)
 		}
