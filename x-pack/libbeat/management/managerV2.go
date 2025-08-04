@@ -684,25 +684,64 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 	//
 	// in v2 only a single input type will be started per component, so we don't need to
 	// worry about getting multiple re-loaders (we just need the one for the type)
-	if err := cm.reloadInputs(inputUnits); err != nil { // HERE
-		// cm.reloadInputs will use fmt.Errorf and join an error slice
-		// using errors.Join, so we need to unwrap the fmt wrapped error,
-		// then we can iterate over the errors list.
-		err = errors.Unwrap(err)
-		type unwrapList interface {
+	if err := cm.reloadInputs(inputUnits); err != nil {
+		type errList interface {
 			Unwrap() []error
 		}
 
-		//nolint:errorlint // That's a custom logic based on how reloadInputs builds the error
-		errList, isErrList := err.(unwrapList)
-		if isErrList {
-			for _, err := range errList.Unwrap() {
-				unitErr := cfgfile.UnitError{}
-				if errors.As(err, &unitErr) {
-					unitErrors[unitErr.UnitID] = append(unitErrors[unitErr.UnitID], unitErr.Err)
-					delete(healthyInputs, unitErr.UnitID)
+		type errWrapper interface {
+			Unwrap() error
+		}
+
+		switch e := err.(type) {
+		// cfgfile.UnitError implements errWrapper, but we don't want to unwrap
+		// it, so we keep it as the first case
+		case cfgfile.UnitError:
+			// cm.reloadInputs failed when generating the Beat config, diffing
+			// the inputs to reload was not possible. So we set the error for
+			// the failed unit, set the whole Beat as failed and return
+			unitErrors[e.UnitID] = append(unitErrors[e.UnitID], e.Err)
+			cm.UpdateStatus(status.Failed, fmt.Sprintf("cannot process %q configuration: %s", e.UnitID, e.Unwrap()))
+			return
+
+		case errWrapper:
+			// cm.reloadInputs will use fmt.Errorf and join an error slice
+			// using errors.Join, when reloading inputs fail. So to access
+			// the individual errors, we need to fist call Unwrap, to get
+			// the errors list, then call Unwrap on the list to get each error
+			// instance.
+			//
+			// When reloading inputs fail, cm.reloadInputs will get the list
+			// of errors, join it using errors.Join, then wrap the list using
+			// fmt.Errorf to add more context. So to access each individual
+			// error we need to call Unwrap and ensure it is an error list.
+			// Then we can finally access each individual error
+			e2 := errors.Unwrap(err)
+			switch e3 := e2.(type) {
+			case errList:
+				for _, err := range e3.Unwrap() {
+					unitErr := cfgfile.UnitError{}
+					if errors.As(err, &unitErr) {
+						unitErrors[unitErr.UnitID] = append(unitErrors[unitErr.UnitID], unitErr.Err)
+						delete(healthyInputs, unitErr.UnitID)
+					}
 				}
+				return
+
+			default:
+				// That is not one of the cases we know how to handle, hard stop
+				// with generic error.
+				cm.logger.Errorf("unexpected error reloading units: %s", err)
+				cm.UpdateStatus(status.Failed, fmt.Sprintf("cannot reload inputs: %s", err))
+				return
 			}
+
+		default:
+			// That is not one of the cases we know how to handle, hard stop
+			// with generic error.
+			cm.logger.Errorf("unexpected error reloading units: %s", err)
+			cm.UpdateStatus(status.Failed, fmt.Sprintf("cannot reload inputs: %s", err))
+			return
 		}
 	}
 
@@ -806,12 +845,18 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		expected := unit.Expected()
 		if expected.Config == nil {
 			// should not happen; hard stop
-			return fmt.Errorf("input unit %s has no config", unit.ID())
+			return cfgfile.UnitError{
+				UnitID: unit.ID(),
+				Err:    fmt.Errorf("input unit %s has no config", unit.ID()),
+			}
 		}
 
 		inputCfg, err := generateBeatConfig(expected.Config, agentInfo)
 		if err != nil {
-			return fmt.Errorf("failed to generate configuration for unit %s: %w", unit.ID(), err)
+			return cfgfile.UnitError{
+				UnitID: unit.ID(),
+				Err:    fmt.Errorf("failed to generate configuration for unit %s: %w", unit.ID(), err),
+			}
 		}
 		// add diag callbacks for unit
 		// we want to add the diagnostic handler that's specific to the unit, and not the gobal diagnostic handler
