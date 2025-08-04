@@ -81,10 +81,10 @@ type remoteWriteTypedGenerator struct {
 }
 
 func (g *remoteWriteTypedGenerator) Start() {
-	cfgwarn.Beta("Prometheus 'use_types' setting is beta")
+	g.logger.Warn(cfgwarn.Beta("Prometheus 'use_types' setting is beta"))
 
 	if g.rateCounters {
-		cfgwarn.Experimental("Prometheus 'rate_counters' setting is experimental")
+		g.logger.Warn(cfgwarn.Experimental("Prometheus 'rate_counters' setting is experimental"))
 	}
 
 	g.counterCache.Start()
