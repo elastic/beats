@@ -24,7 +24,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/mitchellh/mapstructure"
+	"github.com/go-viper/mapstructure/v2"
 	"go.opentelemetry.io/collector/config/configtls"
 
 	"github.com/elastic/elastic-agent-libs/logp"
