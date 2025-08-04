@@ -238,7 +238,13 @@ func createRunner(factory RunnerFactory, pipeline beat.PipelineConnector, cfg *r
 	// Pass a copy of the config to the factory, this way if the factory modifies it,
 	// that doesn't affect the hash of the original one.
 	c, _ := config.NewConfigFrom(cfg.Config)
-	return factory.Create(pipetool.WithDynamicFields(pipeline, cfg.Meta), c)
+	if run, ok := factory.(RunnerFactoryWithStatusReporter); ok && cfg.StatusReporter != nil {
+		return run.CreateWithReporter(pipetool.WithDynamicFields(pipeline, cfg.Meta), c, cfg.StatusReporter)
+
+	} else {
+		return factory.Create(pipetool.WithDynamicFields(pipeline, cfg.Meta), c)
+	}
+
 }
 
 type UnitError struct {

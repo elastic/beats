@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -76,6 +77,12 @@ type RunnerFactory interface {
 	// is not possible to create an input using the configuration, an error must
 	// be returned.
 	CheckConfig(config *config.C) error
+}
+
+// / RunnerFactoryWithStatusReporter extends the RunnerFactory with a method that accepts at StatusReporter.
+// / This is helpful for cases where a given runner is capable of taking the status reporter during init, and in turn can use that to set the `Configuring` state.
+type RunnerFactoryWithStatusReporter interface {
+	CreateWithReporter(b beat.PipelineConnector, config *config.C, statusReporter status.StatusReporter) (Runner, error)
 }
 
 // Runner is a simple interface providing a simple way to
