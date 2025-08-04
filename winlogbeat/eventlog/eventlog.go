@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // Debug selectors used in this package.
@@ -42,7 +43,7 @@ type EventLog interface {
 	// Open the event log. state points to the last successfully read event
 	// in this event log. Read will resume from the next record. To start reading
 	// from the first event specify a zero-valued EventLogState.
-	Open(state checkpoint.EventLogState) error
+	Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error
 
 	// Read records from the event log. If io.EOF is returned you should stop
 	// reading and close the log.

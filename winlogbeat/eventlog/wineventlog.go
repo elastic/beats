@@ -45,7 +45,10 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+<<<<<<< HEAD
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+=======
+>>>>>>> 4081f24d2 (Fix panic in winlog input (#45730))
 	wininfo "github.com/elastic/go-sysinfo/providers/windows"
 )
 
@@ -325,13 +328,18 @@ func (l *winEventLog) IsFile() bool {
 	return l.file
 }
 
+<<<<<<< HEAD
 func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 	var bookmark win.EvtHandle
 	var err error
+=======
+func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
+	l.lastRead = state
+>>>>>>> 4081f24d2 (Fix panic in winlog input (#45730))
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
-	if l.metrics == nil {
-		l.metrics = newInputMetrics(l.channelName, l.id)
+	if l.metrics == nil && l.id != "" {
+		l.metrics = newInputMetrics(l.channelName, metricsRegistry)
 	}
 	if len(state.Bookmark) > 0 {
 		bookmark, err = win.CreateBookmarkFromXML(state.Bookmark)

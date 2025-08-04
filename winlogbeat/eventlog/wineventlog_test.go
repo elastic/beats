@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-sysinfo/providers/windows"
 )
 
@@ -459,7 +460,7 @@ func openLog(t testing.TB, api string, state *checkpoint.EventLogState, config m
 		eventLogState = *state
 	}
 
-	if err = log.Open(eventLogState); err != nil {
+	if err = log.Open(eventLogState, monitoring.NewRegistry()); err != nil {
 		log.Close()
 		t.Fatal(err)
 	}

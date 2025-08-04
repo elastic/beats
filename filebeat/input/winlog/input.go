@@ -27,6 +27,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 
@@ -70,9 +71,15 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 
 func (eventlogRunner) Name() string { return pluginName }
 
+<<<<<<< HEAD
 func (eventlogRunner) Test(source cursor.Source, ctx input.TestContext) error {
 	api := source.(eventlog.EventLog)
 	err := api.Open(checkpoint.EventLogState{})
+=======
+func (in winlogInput) Test(source cursor.Source, ctx input.TestContext) error {
+	api, _ := source.(eventlog.EventLog)
+	err := api.Open(checkpoint.EventLogState{}, monitoring.NewRegistry())
+>>>>>>> 4081f24d2 (Fix panic in winlog input (#45730))
 	if err != nil {
 		return fmt.Errorf("failed to open %q: %w", api.Channel(), err)
 	}
@@ -87,6 +94,7 @@ func (eventlogRunner) Run(
 ) error {
 	api := source.(eventlog.EventLog)
 	log := ctx.Logger.With("eventlog", source.Name(), "channel", api.Channel())
+<<<<<<< HEAD
 
 	// setup closing the API if either the run function is signaled asynchronously
 	// to shut down or when returning after io.EOF
@@ -178,6 +186,17 @@ runLoop:
 			}
 		}
 	}
+=======
+	return eventlog.Run(
+		&ctx,
+		ctxtool.FromCanceller(ctx.Cancelation),
+		ctx.MetricsRegistry,
+		api,
+		initCheckpoint(log, cursor),
+		&publisher{cursorPub: pub},
+		log,
+	)
+>>>>>>> 4081f24d2 (Fix panic in winlog input (#45730))
 }
 
 func initCheckpoint(log *logp.Logger, cursor cursor.Cursor) checkpoint.EventLogState {
