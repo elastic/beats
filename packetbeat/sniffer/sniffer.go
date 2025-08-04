@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"runtime"
 	"strings"
@@ -161,7 +162,7 @@ func New(id string, testMode bool, _ string, decoders map[string]Decoders, inter
 			}
 		}
 
-		err := validateConfig(iface.BpfFilter, &iface) //nolint:gosec // Bad linter! validateConfig completes before the next iteration.
+		err := validateConfig(iface.BpfFilter, &iface)
 		if err != nil {
 			cfg, _ := json.Marshal(iface)
 			return nil, fmt.Errorf("validate: %w: %s", err, cfg)
@@ -402,7 +403,8 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 
 		if s.config.OneAtATime {
 			fmt.Fprintln(os.Stdout, "Press enter to read packet")
-			fmt.Scanln()
+			// we just use this to block the for loop, don't care about input or error
+			_, _ = fmt.Scanln()
 		}
 
 		data, ci, err := handle.ReadPacketData()
@@ -505,6 +507,9 @@ func (s *Sniffer) Stop() {
 }
 
 func openPcap(device, filter string, cfg *config.InterfaceConfig) (snifferHandle, error) {
+	if cfg.Snaplen > math.MaxInt32 {
+		return nil, fmt.Errorf("snaplen %d is larger than max int32, would overflow", cfg.Snaplen)
+	}
 	snaplen := int32(cfg.Snaplen)
 	timeout := 500 * time.Millisecond
 	h, err := pcap.OpenLive(device, snaplen, true, timeout)
