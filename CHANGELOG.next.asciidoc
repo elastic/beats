@@ -51,6 +51,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
 - Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
 - Improve error messages in AWS Health {pull}45408[45408]
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
 
 *Osquerybeat*
 
