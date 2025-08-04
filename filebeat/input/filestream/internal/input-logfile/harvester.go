@@ -228,7 +228,6 @@ func startHarvester(
 		})
 		if err != nil {
 			hg.readers.remove(srcID)
-			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("error while connecting to output with pipeline: %v", err))
 			return fmt.Errorf("error while connecting to output with pipeline: %w", err)
 		}
 		defer client.Close()
