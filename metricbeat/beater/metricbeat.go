@@ -73,9 +73,9 @@ func WithModuleOptions(options ...module.Option) Option {
 
 // WithLightModules enables light modules support
 func WithLightModules() Option {
-	return func(*Metricbeat) {
+	return func(m *Metricbeat) {
 		path := paths.Resolve(paths.Home, "module")
-		mb.Registry.SetSecondarySource(mb.NewLightModulesSource(path))
+		mb.Registry.SetSecondarySource(mb.NewLightModulesSource(m.logger, path))
 	}
 }
 
