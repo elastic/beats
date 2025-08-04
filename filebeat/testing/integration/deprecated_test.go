@@ -32,10 +32,6 @@ func TestFilebeatDeprecated(t *testing.T) {
 	defer cancel()
 	EnsureCompiled(ctx, t)
 
-	messagePrefix := "sample test message"
-	fileCount := 1
-	lineCount := 1
-
 	reportOptions := integration.ReportOptions{
 		PrintLinesOnFail:  10,
 		PrintConfigOnFail: false,
