@@ -24,9 +24,9 @@ All fields specific to the Windows Event Tracing are defined here.
 **`winlog.activity_id_name`**
 :   The name of the activity that is associated with the activity_id. This is typically used to provide a human-readable name for the activity.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.channel`**
@@ -48,9 +48,9 @@ required: False
 **`winlog.flags`**
 :   Flags that provide information about the event such as the type of session it was logged to and if the event contains extended data. This field is a list of flags, each flag is a string that represents a specific flag.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.flags_raw`**
@@ -64,9 +64,9 @@ required: False
 **`winlog.keywords`**
 :   The keywords defined in the event. Keywords are used to indicate an event's membership in a set of event categories. This keywords are a list of keywords, each keyword is a string that represents a specific keyword.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.keywords_raw`**
@@ -88,9 +88,9 @@ required: False
 **`winlog.level_raw`**
 :   Numeric value of the level of severity. Level values 0 through 5 are defined by Microsoft. Level values 6 through 15 are reserved. Level values 16 through 255 can be defined by the event provider.
 
-type: long
+    type: long
 
-required: False
+    required: False
 
 
 **`winlog.opcode`**
@@ -104,9 +104,9 @@ required: False
 **`winlog.opcode_raw`**
 :   Numeric value of the opcode defined in the event. This is used to identify the location in the application from where the event was logged.
 
-type: long
+    type: long
 
-required: False
+    required: False
 
 
 **`winlog.process_id`**
@@ -120,9 +120,9 @@ required: False
 **`winlog.provider`**
 :   The source of the event log record (the application or service that logged the record).
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.provider_guid`**
@@ -136,9 +136,9 @@ required: False
 **`winlog.provider_message`**
 :   The message that is associated with the provider. This is typically used to provide a human-readable name for the provider.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.related_activity_id_name`**
@@ -176,9 +176,9 @@ required: False
 **`winlog.task_raw`**
 :   Numeric value of the task defined in the event. This is used to identify the location in the application from where the event was logged.
 
-type: long
+    type: long
 
-required: False
+    required: False
 
 
 **`winlog.thread_id`**
