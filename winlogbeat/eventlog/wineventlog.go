@@ -515,7 +515,7 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 		if err := l.Close(); err != nil {
 			return nil, 0, fmt.Errorf("failed to recover from RPC_S_INVALID_BOUND: %w", err)
 		}
-		if err := l.Open(l.lastRead); err != nil {
+		if err := l.Open(l.lastRead, nil); err != nil {
 			return nil, 0, fmt.Errorf("failed to recover from RPC_S_INVALID_BOUND: %w", err)
 		}
 		return l.eventHandles(maxRead / 2)
