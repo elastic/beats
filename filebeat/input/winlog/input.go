@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
@@ -85,7 +86,7 @@ func (winlogInput) Name() string { return pluginName }
 
 func (in winlogInput) Test(source cursor.Source, ctx input.TestContext) error {
 	api, _ := source.(eventlog.EventLog)
-	err := api.Open(checkpoint.EventLogState{})
+	err := api.Open(checkpoint.EventLogState{}, monitoring.NewRegistry())
 	if err != nil {
 		return fmt.Errorf("failed to open %q: %w", api.Channel(), err)
 	}
@@ -103,6 +104,7 @@ func (in winlogInput) Run(
 	return eventlog.Run(
 		ctx,
 		ctxtool.FromCanceller(ctx.Cancelation),
+		ctx.MetricsRegistry,
 		api,
 		initCheckpoint(log, cursor),
 		&publisher{cursorPub: pub},
