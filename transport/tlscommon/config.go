@@ -88,7 +88,7 @@ func LoadTLSConfig(config *Config, logger *logp.Logger) (*TLSConfig, error) {
 		Renegotiation:        tls.RenegotiationSupport(config.Renegotiation),
 		CASha256:             config.CASha256,
 		CATrustedFingerprint: config.CATrustedFingerprint,
-		logger:               logger,
+		Logger:               logger,
 	}, nil
 }
 

@@ -96,7 +96,7 @@ func LoadTLSServerConfig(config *ServerConfig, logger *logp.Logger) (*TLSConfig,
 		CurvePreferences: curves,
 		ClientAuth:       tls.ClientAuthType(clientAuth),
 		CASha256:         config.CASha256,
-		logger:           logger,
+		Logger:           logger,
 	}, nil
 }
 

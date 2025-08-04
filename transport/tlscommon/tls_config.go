@@ -87,7 +87,7 @@ type TLSConfig struct {
 	// If time is nil, TLS uses time.Now.
 	time func() time.Time
 
-	logger *logp.Logger
+	Logger *logp.Logger
 }
 
 var (
@@ -106,7 +106,7 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 
 	insecure := c.Verification != VerifyStrict
 	if c.Verification == VerifyNone {
-		c.logger.Named("tls").Warn("SSL/TLS verifications disabled.")
+		c.Logger.Named("tls").Warn("SSL/TLS verifications disabled.")
 	}
 
 	return &tls.Config{
@@ -121,7 +121,7 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 		Renegotiation:      c.Renegotiation,
 		ClientAuth:         c.ClientAuth,
 		Time:               c.time,
-		VerifyConnection:   makeVerifyConnection(c, c.logger),
+		VerifyConnection:   makeVerifyConnection(c, c.Logger),
 	}
 }
 

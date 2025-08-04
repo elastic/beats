@@ -651,7 +651,7 @@ func TestVerificationMode(t *testing.T) {
 				Verification: test.verificationMode,
 				RootCAs:      certPool,
 				ServerName:   test.hostname,
-				logger:       logptest.NewTestingLogger(t, ""),
+				Logger:       logptest.NewTestingLogger(t, ""),
 			}
 
 			if test.ignoreCerts {
@@ -674,6 +674,8 @@ func TestVerificationMode(t *testing.T) {
 				if err != nil {
 					// We got the expected error, no need to check the status code
 					return
+				} else {
+					t.Fatalf("expected error, got: %v", err)
 				}
 			}
 
