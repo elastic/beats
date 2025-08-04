@@ -20,6 +20,7 @@ package beater
 import (
 	"context"
 
+	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -30,6 +31,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
@@ -144,7 +146,11 @@ func (e *eventLogger) run(
 		client:     client,
 		eventACKer: eventACKer,
 	}
-	if err := eventlog.Run(noopReporter{}, ctx, api, state, publisher, e.log); err != nil {
+	inputContext := input.Context{
+		MetricsRegistry: monitoring.NewRegistry(),
+		Cancelation:     ctx,
+	}
+	if err := eventlog.Run(inputContext, api, state, publisher, e.log); err != nil {
 		e.log.Error(err)
 	}
 }

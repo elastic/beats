@@ -142,16 +142,16 @@ func addInputMetrics(to map[string]inputMetricsTable, from map[string]any, pathP
 		}
 
 		inputPath := append(pathPrefix, key)
+		to[id] = inputMetricsTable{
+			id:    id,
+			input: input,
+			path:  strings.Join(inputPath, "."),
+			data:  data,
+		}
+
 		if input == InputNested {
 			// Add the contents of this entry recursively
 			addInputMetrics(to, data, inputPath)
-		} else {
-			to[id] = inputMetricsTable{
-				id:    id,
-				input: input,
-				path:  strings.Join(inputPath, "."),
-				data:  data,
-			}
 		}
 	}
 }
