@@ -1282,12 +1282,12 @@ func StartMockES(
 		}
 	}()
 
-	sererURL := "http://" + addr
+	serverURL := "http://" + addr
 	// Ensure the Server is up and running before returning
 	require.Eventually(
 		t,
 		func() bool {
-			resp, err := http.Get(sererURL) //nolint: noctx // It's just a test
+			resp, err := http.Get(serverURL) //nolint: noctx // It's just a test
 			if err != nil {
 				return false
 			}
@@ -1300,5 +1300,5 @@ func StartMockES(
 		time.Millisecond,
 		"mock-es server did not start on '%s'", addr)
 
-	return &s, sererURL, es, rdr
+	return &s, serverURL, es, rdr
 }
