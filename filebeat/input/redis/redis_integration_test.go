@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -303,7 +304,7 @@ func createRedisConfig(username string, password string) config {
 	}
 
 	if redisConfig.TLS.IsEnabled() {
-		tlsConfig, _ := tlscommon.LoadTLSConfig(redisConfig.TLS)
+		tlsConfig, _ := tlscommon.LoadTLSConfig(redisConfig.TLS, logp.NewNopLogger())
 		redisConfig.tlsConfig = tlsConfig.ToConfig()
 	}
 
