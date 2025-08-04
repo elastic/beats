@@ -37,7 +37,6 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
@@ -45,10 +44,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-<<<<<<< HEAD
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
-=======
->>>>>>> 4081f24d2 (Fix panic in winlog input (#45730))
 	wininfo "github.com/elastic/go-sysinfo/providers/windows"
 )
 
@@ -328,14 +324,9 @@ func (l *winEventLog) IsFile() bool {
 	return l.file
 }
 
-<<<<<<< HEAD
-func (l *winEventLog) Open(state checkpoint.EventLogState) error {
+func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
 	var bookmark win.EvtHandle
 	var err error
-=======
-func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
-	l.lastRead = state
->>>>>>> 4081f24d2 (Fix panic in winlog input (#45730))
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
 	if l.metrics == nil && l.id != "" {
@@ -689,13 +680,8 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for windows event logs. If id is empty
 // a nil inputMetric is returned.
-func newInputMetrics(name, id string) *inputMetrics {
-	if id == "" {
-		return nil
-	}
-	reg, unreg := inputmon.NewInputRegistry("winlog", id, nil)
+func newInputMetrics(name string, reg *monitoring.Registry) *inputMetrics {
 	out := &inputMetrics{
-		unregister:  unreg,
 		name:        monitoring.NewString(reg, "provider"),
 		events:      monitoring.NewUint(reg, "received_events_total"),
 		dropped:     monitoring.NewUint(reg, "discarded_events_total"),
