@@ -88,6 +88,11 @@ func NewDevelopmentLogger(selector string, options ...LogOption) (*Logger, error
 	return &Logger{logger, logger.Sugar(), make(map[string]struct{})}, nil
 }
 
+// NewZapLogger returns a logger based on the provided zap logger
+func NewZapLogger(logger *zap.Logger) (*Logger, error) {
+	return &Logger{logger, logger.Sugar(), make(map[string]struct{})}, nil
+}
+
 // NewInMemory returns a new in-memory logger along with the buffer to which it
 // logs. It's goroutine safe, but operating directly on the returned buffer is not.
 // This logger is primary intended for short and simple use-cases such as printing

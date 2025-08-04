@@ -24,19 +24,27 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest"
+	"go.uber.org/zap/zaptest/observer"
 )
 
 // NewTestingLogger returns a testing suitable logp.Logger.
 func NewTestingLogger(t testing.TB, selector string, options ...logp.LogOption) *logp.Logger {
-	log := zaptest.NewLogger(t)
+	log := zaptest.NewLogger(t, zaptest.WrapOptions(options...))
 	log = log.Named(selector)
-	wrapCore := zap.WrapCore(func(zapcore.Core) zapcore.Core {
-		return log.Core()
-	})
-	options = append([]logp.LogOption{wrapCore}, options...)
-	logger, err := logp.NewDevelopmentLogger(selector, options...)
+
+	logger, err := logp.NewZapLogger(log)
 	if err != nil {
 		t.Fatal(err)
 	}
 	return logger
+}
+
+// NewTestingLoggerWithObserver returns a testing suitable logp.Logger and an observer
+func NewTestingLoggerWithObserver(t testing.TB, selector string) (*logp.Logger, *observer.ObservedLogs) {
+	observedCore, observedLogs := observer.New(zapcore.DebugLevel)
+	logger := NewTestingLogger(t, selector, zap.WrapCore(func(core zapcore.Core) zapcore.Core {
+		return observedCore
+	}))
+
+	return logger, observedLogs
 }

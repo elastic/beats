@@ -29,6 +29,7 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestMapStrUpdate(t *testing.T) {
@@ -382,7 +383,7 @@ func incrementMapstrValues(m M) {
 		case int:
 			m[k] = v + 1
 		case M:
-			incrementMapstrValues(m[k].(M))
+			incrementMapstrValues(v)
 		case []M:
 			for _, c := range v {
 				incrementMapstrValues(c)
@@ -956,9 +957,6 @@ func BenchmarkMapStrFlatten(b *testing.B) {
 
 // Ensure the MapStr is marshaled in logs the same way it is by json.Marshal.
 func TestMapStrJSONLog(t *testing.T) {
-	err := logp.DevelopmentSetup(logp.ToObserverOutput())
-	require.Nil(t, err)
-
 	m := M{
 		"test": 15,
 		"hello": M{
@@ -977,8 +975,10 @@ func TestMapStrJSONLog(t *testing.T) {
 	}
 	expectedJSON := string(data)
 
-	logp.NewLogger("test").Infow("msg", "m", m)
-	logs := logp.ObserverLogs().TakeAll()
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "test")
+
+	logger.Infow("msg", "m", m)
+	logs := observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		log := logs[0]
 
