@@ -73,6 +73,10 @@ JSON blob containing the credentials and key used to subscribe. This can be as a
 
 ### `proxy_url` [_proxy_url]
 
+```{applies_to}
+stack: ga 9.1.0
+```
+
 This specifies proxy configuration in the form of `http[s]://<user>:<password>@<server name/ip>:<port>`. Proxy headers may be configured using the `resource.proxy_headers` field which accepts a set of key/value pairs.
 
 ```yaml

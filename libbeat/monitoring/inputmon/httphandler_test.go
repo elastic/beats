@@ -27,7 +27,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -64,7 +63,7 @@ func TestHandler(t *testing.T) {
 		monitoring.NewTimestamp(legacy, "last_event_published_time").Set(time.Now())
 	}
 
-	r := mux.NewRouter()
+	r := http.NewServeMux()
 	s := httptest.NewServer(r)
 	defer s.Close()
 

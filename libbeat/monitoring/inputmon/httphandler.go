@@ -24,7 +24,6 @@ import (
 	"strings"
 
 	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -35,7 +34,7 @@ import (
 const InputNested = "__NESTED__"
 
 const (
-	route           = "/inputs"
+	route           = "/inputs/{$}"
 	contentType     = "Content-Type"
 	applicationJSON = "application/json; charset=utf-8"
 )
@@ -49,16 +48,16 @@ type handler struct {
 // requests to /inputs. It will publish the metrics registered in the global
 // 'dataset' metrics namespace and on reg.
 func AttachHandler(
-	r *mux.Router,
+	r *http.ServeMux,
 	reg *monitoring.Registry,
 ) error {
 	return attachHandler(r, globalRegistry(), reg)
 }
 
-func attachHandler(r *mux.Router, global *monitoring.Registry, local *monitoring.Registry) error {
+func attachHandler(r *http.ServeMux, global *monitoring.Registry, local *monitoring.Registry) error {
 	h := &handler{globalReg: global, localReg: local}
-	r = r.PathPrefix(route).Subrouter()
-	return r.StrictSlash(true).Handle("/", validationHandler("GET", []string{"pretty", "type"}, h.allInputs)).GetError()
+	r.Handle(route, validationHandler("GET", []string{"pretty", "type"}, h.allInputs))
+	return nil
 }
 
 func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
@@ -94,6 +93,10 @@ func filteredSnapshot(
 	// Now collect all that match the requested type
 	selected := make([]map[string]any, 0)
 	for _, table := range inputs {
+		if table.input == InputNested {
+			// Containers for nested inputs are never included in snapshots
+			continue
+		}
 		if requestedType == "" || strings.EqualFold(table.input, requestedType) {
 			selected = append(selected, table.data)
 		}
@@ -143,16 +146,16 @@ func addInputMetrics(to map[string]inputMetricsTable, from map[string]any, pathP
 		}
 
 		inputPath := append(pathPrefix, key)
+		to[id] = inputMetricsTable{
+			id:    id,
+			input: input,
+			path:  strings.Join(inputPath, "."),
+			data:  data,
+		}
+
 		if input == InputNested {
 			// Add the contents of this entry recursively
 			addInputMetrics(to, data, inputPath)
-		} else {
-			to[id] = inputMetricsTable{
-				id:    id,
-				input: input,
-				path:  strings.Join(inputPath, "."),
-				data:  data,
-			}
 		}
 	}
 }
