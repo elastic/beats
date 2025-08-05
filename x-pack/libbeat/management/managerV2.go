@@ -855,7 +855,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		if err != nil {
 			return cfgfile.UnitError{
 				UnitID: unit.ID(),
-				Err:    fmt.Errorf("failed to generate configuration for unit %s: %w", unit.ID(), err),
+				Err:    fmt.Errorf("failed to generate configuration for unit %q: %w", unit.ID(), err),
 			}
 		}
 		// add diag callbacks for unit

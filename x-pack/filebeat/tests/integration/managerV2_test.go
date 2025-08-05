@@ -1072,3 +1072,119 @@ func outputUnitES(t *testing.T, id int) *proto.UnitExpected {
 		},
 	}
 }
+
+func TestReloadErrorHandling(t *testing.T) {
+	// First things first, ensure ES is running and we can connect to it.
+	// If ES is not running, the test will timeout and the only way to know
+	// what caused it is going through Filebeat's logs.
+	integration.EnsureESIsRunning(t)
+	filebeat := NewFilebeat(t)
+	finalStateReached := atomic.Bool{}
+
+	var units = []*proto.UnitExpected{
+		{
+			Id:             "output-unit-borken",
+			Type:           proto.UnitType_OUTPUT,
+			ConfigStateIdx: 1,
+			State:          proto.State_FAILED,
+			LogLevel:       proto.UnitLogLevel_DEBUG,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "default",
+				Type: "discard",
+				Name: "discard",
+				Source: integration.RequireNewStruct(t,
+					map[string]any{
+						"type":  "discard",
+						"hosts": []any{"http://localhost:9200"},
+					}),
+			},
+		},
+		{
+			Id:             "broken-unit",
+			Type:           proto.UnitType_INPUT,
+			ConfigStateIdx: 1,
+			State:          proto.State_FAILED,
+			LogLevel:       proto.UnitLogLevel_DEBUG,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "broken-input",
+				Type: "filestream",
+				Name: "filestream",
+			},
+		},
+		{
+			Id:             "filestream-input",
+			Type:           proto.UnitType_INPUT,
+			ConfigStateIdx: 1,
+			State:          proto.State_FAILED,
+			LogLevel:       proto.UnitLogLevel_DEBUG,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "filestream-input",
+				Type: "filestream",
+				Name: "filestream",
+				Streams: []*proto.Stream{
+					{
+						Id: "filestream-input",
+						Source: integration.RequireNewStruct(t, map[string]any{
+							"enabled": true,
+							"type":    "filestream",
+							"paths":   "/tmp/foo",
+						}),
+					},
+				},
+			},
+		},
+	}
+
+	expectedErrMsgs := []string{
+		"failed to generate configuration for unit \"broken-unit\"",
+		"unexpected type for 'type', got <nil>",
+	}
+
+	server := &mock.StubServerV2{
+		// The Beat will call the check-in function multiple times:
+		// - At least once at startup
+		// - At every state change (starting, configuring, healthy, etc)
+		// for every Unit.
+		//
+		// So we wait until the state matches the desired state
+		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+			if management.DoesStateMatch(observed, units, 0) {
+				finalStateReached.Store(true)
+			}
+
+			// Ensure the error message for the broken unit
+			// is correctly set.
+			for _, unit := range observed.Units {
+				if unit.GetId() == "broken-unit" {
+					unitMsg := unit.GetMessage()
+					for _, errMsg := range expectedErrMsgs {
+						// If any expected sub string is not found,
+						// the final state is not reached
+						if !strings.Contains(unitMsg, errMsg) {
+							finalStateReached.Store(false)
+						}
+					}
+				}
+
+			}
+
+			return &proto.CheckinExpected{
+				Units: units,
+			}
+		},
+		ActionImpl: func(response *proto.ActionResponse) error { return nil },
+	}
+
+	require.NoError(t, server.Start())
+
+	filebeat.Start(
+		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
+		"-E", "management.enabled=true",
+	)
+
+	require.Eventually(t, func() bool {
+		return finalStateReached.Load()
+	}, 30*time.Second, 100*time.Millisecond, "Output unit did not report unhealthy")
+
+	t.Cleanup(server.Stop)
+}
