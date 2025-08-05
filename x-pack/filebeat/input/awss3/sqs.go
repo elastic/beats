@@ -76,6 +76,7 @@ func readSQSMessages(
 	msgs, err := sqs.ReceiveMessage(ctx, count)
 	for (err != nil || len(msgs) == 0) && ctx.Err() == nil {
 		if err != nil {
+			// TODO: report Degraded
 			log.Warnw("SQS ReceiveMessage returned an error. Will retry after a short delay.", "error", err)
 		}
 		// Wait for the retry delay, but stop early if the context is cancelled.

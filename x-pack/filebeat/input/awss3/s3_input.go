@@ -62,6 +62,7 @@ func (in *s3PollerInput) Run(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
 ) error {
+	// TODO: defer call "Stopped" status here
 	in.log = inputContext.Logger.Named("s3")
 	in.pipeline = pipeline
 	var err error
@@ -69,6 +70,7 @@ func (in *s3PollerInput) Run(
 	// Load the persistent S3 polling state.
 	in.states, err = newStates(in.log, in.store, in.config.BucketListPrefix)
 	if err != nil {
+		// TODO: report Failed with setup error
 		return fmt.Errorf("can not start persistent store: %w", err)
 	}
 	defer in.states.Close()
@@ -76,6 +78,7 @@ func (in *s3PollerInput) Run(
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 	in.s3, err = in.createS3API(ctx)
 	if err != nil {
+		// TODO: report Failed with setup error
 		return fmt.Errorf("failed to create S3 API: %w", err)
 	}
 
@@ -98,6 +101,7 @@ func (in *s3PollerInput) run(ctx context.Context) {
 	// Scan the bucket in a loop, delaying by the configured interval each
 	// iteration.
 	for ctx.Err() == nil {
+		// TODO: report Running
 		in.runPoll(ctx)
 		_ = timed.Wait(ctx, in.config.BucketListInterval)
 	}
