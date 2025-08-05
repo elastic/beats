@@ -1074,65 +1074,67 @@ func outputUnitES(t *testing.T, id int) *proto.UnitExpected {
 }
 
 func TestReloadErrorHandling(t *testing.T) {
-	// First things first, ensure ES is running and we can connect to it.
-	// If ES is not running, the test will timeout and the only way to know
-	// what caused it is going through Filebeat's logs.
-	integration.EnsureESIsRunning(t)
 	filebeat := NewFilebeat(t)
 	finalStateReached := atomic.Bool{}
 
-	var units = []*proto.UnitExpected{
-		{
-			Id:             "output-unit-borken",
-			Type:           proto.UnitType_OUTPUT,
-			ConfigStateIdx: 1,
-			State:          proto.State_FAILED,
-			LogLevel:       proto.UnitLogLevel_DEBUG,
-			Config: &proto.UnitExpectedConfig{
-				Id:   "default",
-				Type: "discard",
-				Name: "discard",
-				Source: integration.RequireNewStruct(t,
-					map[string]any{
-						"type":  "discard",
-						"hosts": []any{"http://localhost:9200"},
+	output := proto.UnitExpected{
+		Id:             "output-unit-borken",
+		Type:           proto.UnitType_OUTPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_FAILED,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "default",
+			Type: "discard",
+			Name: "discard",
+			Source: integration.RequireNewStruct(t,
+				map[string]any{
+					"type":  "discard",
+					"hosts": []any{"http://localhost:9200"},
+				}),
+		},
+	}
+
+	brokenUnit := proto.UnitExpected{
+		Id:             "broken-unit",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_FAILED,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "broken-input",
+			Type: "filestream",
+			Name: "filestream",
+		},
+	}
+
+	workingUnit := proto.UnitExpected{
+		Id:             "filestream-input",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_FAILED,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "filestream-input",
+			Type: "filestream",
+			Name: "filestream",
+			Streams: []*proto.Stream{
+				{
+					Id: "filestream-input",
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"enabled": true,
+						"type":    "filestream",
+						"paths":   "/tmp/foo",
 					}),
-			},
-		},
-		{
-			Id:             "broken-unit",
-			Type:           proto.UnitType_INPUT,
-			ConfigStateIdx: 1,
-			State:          proto.State_FAILED,
-			LogLevel:       proto.UnitLogLevel_DEBUG,
-			Config: &proto.UnitExpectedConfig{
-				Id:   "broken-input",
-				Type: "filestream",
-				Name: "filestream",
-			},
-		},
-		{
-			Id:             "filestream-input",
-			Type:           proto.UnitType_INPUT,
-			ConfigStateIdx: 1,
-			State:          proto.State_FAILED,
-			LogLevel:       proto.UnitLogLevel_DEBUG,
-			Config: &proto.UnitExpectedConfig{
-				Id:   "filestream-input",
-				Type: "filestream",
-				Name: "filestream",
-				Streams: []*proto.Stream{
-					{
-						Id: "filestream-input",
-						Source: integration.RequireNewStruct(t, map[string]any{
-							"enabled": true,
-							"type":    "filestream",
-							"paths":   "/tmp/foo",
-						}),
-					},
 				},
 			},
 		},
+	}
+
+	units := []*proto.UnitExpected{
+		&output,
+		&brokenUnit,
+		&workingUnit,
 	}
 
 	expectedErrMsgs := []string{
@@ -1155,7 +1157,7 @@ func TestReloadErrorHandling(t *testing.T) {
 			// Ensure the error message for the broken unit
 			// is correctly set.
 			for _, unit := range observed.Units {
-				if unit.GetId() == "broken-unit" {
+				if unit.GetId() == brokenUnit.Id {
 					unitMsg := unit.GetMessage()
 					for _, errMsg := range expectedErrMsgs {
 						// If any expected sub string is not found,
