@@ -693,7 +693,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 			Unwrap() error
 		}
 
-		//nolint:errorlint // That's a custom logic based on how reloadInputs builds the error
+		//nolint:errorlint // Custom error wrapping, not suitable for errors.As
 		switch e := err.(type) {
 		// cfgfile.UnitError implements errWrapper, but we don't want to unwrap
 		// it, so we keep it as the first case
@@ -718,7 +718,8 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 			// error we need to call Unwrap and ensure it is an error list.
 			// Then we can finally access each individual error
 			e2 := errors.Unwrap(err)
-			switch e3 := e2.(type) { //nolint:errorlint // Handling specific error wrapping
+			//nolint:errorlint // Custom error wrapping, not suitable for errors.As
+			switch e3 := e2.(type) {
 			case errList:
 				for _, err := range e3.Unwrap() {
 					unitErr := cfgfile.UnitError{}
