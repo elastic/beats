@@ -79,8 +79,9 @@ type RunnerFactory interface {
 	CheckConfig(config *config.C) error
 }
 
-// / RunnerFactoryWithStatusReporter extends the RunnerFactory with a method that accepts at StatusReporter.
-// / This is helpful for cases where a given runner is capable of taking the status reporter during init, and in turn can use that to set the `Configuring` state.
+// RunnerFactoryWithStatusReporter extends the RunnerFactory Create() method accept a StatusReporter interface.
+// This is helpful for cases where a given runner is capable of taking the status reporter during init,
+// and in turn can use that to set the `Configuring` state.
 type RunnerFactoryWithStatusReporter interface {
 	CreateWithReporter(b beat.PipelineConnector, config *config.C, statusReporter status.StatusReporter) (Runner, error)
 }

@@ -103,7 +103,6 @@ func (p *processor) Stop() {
 
 // UpdateStatus wraps the status reporter we get from central management
 func (p *processor) UpdateStatus(status status.Status, message string) {
-
 	if p.status != nil {
 		p.status.UpdateStatus(status, message)
 	}

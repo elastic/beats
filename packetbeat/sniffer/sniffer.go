@@ -507,7 +507,7 @@ func (s *Sniffer) Stop() {
 }
 
 func openPcap(device, filter string, cfg *config.InterfaceConfig) (snifferHandle, error) {
-	if cfg.Snaplen > math.MaxInt32 {
+	if cfg.Snaplen > math.MaxInt32 || cfg.Snaplen < math.MinInt32 {
 		return nil, fmt.Errorf("snaplen %d is larger than max int32, would overflow", cfg.Snaplen)
 	}
 	snaplen := int32(cfg.Snaplen) //nolint:gosec // G115: we check it right above
