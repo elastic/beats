@@ -27,12 +27,16 @@ var logResponses = flag.Bool("log_response", false, "use to log users/devices re
 var (
 	//go:embed testdata/computers.json
 	computers []byte
+
+	//go:embed testdata/users.json
+	users []byte
 )
 
 var jamfTests = []struct {
 	name          string
 	context       func() (tenant, username, password string, client *http.Client, cleanup func(), err error)
 	wantComputers *Computers
+	wantUsers     []User
 }{
 	{
 		name: "jamf",
@@ -103,6 +107,12 @@ var jamfTests = []struct {
 					w.Write(computers)
 				}
 			}))
+			mux.Handle("/JSSResource/users", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if isValidRequest(w, r) {
+					//nolint:errcheck // no error handling
+					w.Write(users)
+				}
+			}))
 
 			srv := httptest.NewTLSServer(mux)
 			u, err := url.Parse(srv.URL)
@@ -117,6 +127,7 @@ var jamfTests = []struct {
 			return tenant, username, password, cli, srv.Close, nil
 		},
 		wantComputers: mustParseJSON[*Computers]("testdata/computers.json", computers),
+		wantUsers:     mustParseJSON[*Users]("testdata/users.json", users).Users,
 	},
 }
 
@@ -148,6 +159,25 @@ func TestJamf(t *testing.T) {
 			if err != nil {
 				t.Fatalf("unexpected error getting bearer token: %v", err)
 			}
+
+			t.Run("users", func(t *testing.T) {
+				query := make(url.Values)
+				query.Set("page-size", "10")
+				got, err := GetUsers(ctx, client, tenant, tok, query)
+				if err != nil {
+					t.Fatalf("unexpected error: %v", err)
+				}
+				if test.wantUsers != nil && !cmp.Equal(test.wantUsers, got) {
+					t.Errorf("unexpected result\n--- want\n+++ got\n%s", cmp.Diff(test.wantUsers, got))
+				}
+				if *logResponses {
+					b, err := json.Marshal(got)
+					if err != nil {
+						t.Errorf("failed to marshal devices for logging: %v", err)
+					}
+					t.Logf("users: %s", b)
+				}
+			})
 
 			t.Run("computers", func(t *testing.T) {
 				query := make(url.Values)
