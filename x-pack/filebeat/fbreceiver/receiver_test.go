@@ -453,6 +453,13 @@ func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
 	return []receivertest.UniqueIDAttrVal{id}
 }
 
+// TestConsumeContract tests the ConsumeLogs contract for otelconsumer.
+//
+// The following scenarios are tested:
+// - Always succeed. We expect all data passed to ConsumeLogs to be delivered.
+// - Random non-permanent error. We expect the batch to be retried.
+// - Random permanent error. We expect the batch to be dropped.
+// - Random error. We expect the batch to be retried or dropped based on the error type.
 func TestConsumeContract(t *testing.T) {
 	tmpDir := t.TempDir()
 	const logsPerTest = 100
