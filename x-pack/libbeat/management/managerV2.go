@@ -116,7 +116,6 @@ type BeatV2Manager struct {
 	// trying to reload the configuration after an input not finished error
 	// happens
 	forceReloadDebounce time.Duration
-	wg                  sync.WaitGroup
 }
 
 // ================================
@@ -466,8 +465,8 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case err := <-cm.client.Errors():
-			// Don't print the context canceled errors that happen normally during shutdown, restart, etc
-			if !errors.Is(context.Canceled, err) {
+			// Don't print the context cancelled errors that happen normally during shutdown, restart, etc
+			if !errors.Is(err, context.Canceled) {
 				cm.logger.Errorf("elastic-agent-client error: %s", err)
 			}
 
