@@ -238,6 +238,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added missing "text/csv" content-type filter support in azureblobsortorage input. {issue}44596[44596] {pull}44824[44824]
 - Fix unexpected EOF detection and improve memory usage. {pull}44813[44813]
 - Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
+- Fix a panic in the winlog input that prevented it from starting. {issue}45693[45693] {pull}45730[45730]
 
 *Heartbeat*
 
