@@ -702,7 +702,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 			// the inputs to reload was not possible. So we set the error for
 			// the failed unit, set the whole Beat as failed and return
 			unitErrors[e.UnitID] = append(unitErrors[e.UnitID], e.Err)
-			cm.UpdateStatus(status.Failed, fmt.Sprintf("cannot process %q configuration: %s", e.UnitID, e.Unwrap()))
+			cm.UpdateStatus(status.Failed, fmt.Sprintf("cannot process %q configuration: %s", e.UnitID, e.Error()))
 			return
 
 		case errWrapper:
@@ -848,7 +848,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 			// should not happen; hard stop
 			return cfgfile.UnitError{
 				UnitID: unit.ID(),
-				Err:    fmt.Errorf("input unit %s has no config", unit.ID()),
+				Err:    fmt.Errorf("input unit %q has no config", unit.ID()),
 			}
 		}
 
