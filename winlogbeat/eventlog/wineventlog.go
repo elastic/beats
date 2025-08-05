@@ -665,8 +665,6 @@ func incrementMetric(v *expvar.Map, key interface{}) {
 
 // inputMetrics handles event log metric reporting.
 type inputMetrics struct {
-	unregister func()
-
 	lastBatch time.Time
 
 	name        *monitoring.String // name of the provider being read
@@ -747,10 +745,6 @@ func (m *inputMetrics) logDropped(_ error) {
 }
 
 func (m *inputMetrics) close() {
-	if m == nil {
-		return
-	}
-	m.unregister()
 }
 
 // FIXME: Windows Server 2025 has a bug in the Windows Event Log API that causes
