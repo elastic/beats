@@ -73,7 +73,7 @@ type MetricSet struct {
 
 // New creates and returns a new MetricSet instance.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The mysql 'query' metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The mysql 'query' metricset is beta."))
 
 	b := &MetricSet{BaseMetricSet: base}
 

@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -43,12 +44,12 @@ func deadLetterIndexForConfig(config *config.C) (string, error) {
 	return indexConfig.Index, nil
 }
 
-func deadLetterIndexForPolicy(configNamespace *config.Namespace) (string, error) {
+func deadLetterIndexForPolicy(configNamespace *config.Namespace, logger *logp.Logger) (string, error) {
 	if configNamespace == nil || configNamespace.Name() == drop {
 		return "", nil
 	}
 	if configNamespace.Name() == dead_letter_index {
-		cfgwarn.Beta("The non_indexable_policy dead_letter_index is beta.")
+		logger.Warn(cfgwarn.Beta("The non_indexable_policy dead_letter_index is beta."))
 		return deadLetterIndexForConfig(configNamespace.Config())
 	}
 	return "", fmt.Errorf("no such policy type: %s", configNamespace.Name())

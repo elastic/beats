@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !aix
+//go:build linux || darwin || windows
 
 package kubernetes
 
@@ -87,7 +87,7 @@ func NewNodeEventer(
 		Node:         config.Node,
 		IsUpdated:    isUpdated,
 		HonorReSyncs: true,
-	}, nil)
+	}, nil, logger)
 
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Node{}, err)
@@ -109,12 +109,16 @@ func NewNodeEventer(
 // OnAdd ensures processing of node objects that are newly created
 func (n *node) OnAdd(obj interface{}) {
 	n.logger.Debugf("Watcher Node add: %+v", obj)
-	n.emit(obj.(*kubernetes.Node), "start")
+	n.emit(obj.(*kubernetes.Node), "start") //nolint // existing check
 }
 
 // OnUpdate ensures processing of node objects that are updated
 func (n *node) OnUpdate(obj interface{}) {
-	node := obj.(*kubernetes.Node)
+	node, ok := obj.(*kubernetes.Node)
+	if !ok {
+		n.logger.Errorf("Unexpected type expecting *kubernetes.Node: %+v", obj)
+		return
+	}
 	if node.GetObjectMeta().GetDeletionTimestamp() != nil {
 		n.logger.Debugf("Watcher Node update (terminating): %+v", obj)
 		// Node is terminating, don't reload its configuration and ignore the event as long as node is Ready.
@@ -132,7 +136,12 @@ func (n *node) OnUpdate(obj interface{}) {
 // OnDelete ensures processing of node objects that are deleted
 func (n *node) OnDelete(obj interface{}) {
 	n.logger.Debugf("Watcher Node delete: %+v", obj)
-	time.AfterFunc(n.config.CleanupTimeout, func() { n.emit(obj.(*kubernetes.Node), "stop") })
+	time.AfterFunc(n.config.CleanupTimeout, func() {
+		node, ok := obj.(*kubernetes.Node)
+		if ok {
+			n.emit(node, "stop")
+		}
+	})
 }
 
 // GenerateHints creates hints needed for hints builder
@@ -144,11 +153,13 @@ func (n *node) GenerateHints(event bus.Event) bus.Event {
 	var kubeMeta mapstr.M
 	rawMeta, ok := event["kubernetes"]
 	if ok {
-		kubeMeta = rawMeta.(mapstr.M)
-		// The builder base config can configure any of the field values of kubernetes if need be.
-		e["kubernetes"] = kubeMeta
-		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			annotations = rawAnn.(mapstr.M)
+		kubeMeta, ok = rawMeta.(mapstr.M)
+		if ok {
+			// The builder base config can configure any of the field values of kubernetes if need be.
+			e["kubernetes"] = kubeMeta
+			if rawAnn, ok := kubeMeta["annotations"]; ok {
+				annotations = rawAnn.(mapstr.M)
+			}
 		}
 	}
 	if host, ok := event["host"]; ok {

@@ -57,28 +57,28 @@ func TestGetAndSetResourceID(t *testing.T) {
 		{
 			name:               "resourceID already set",
 			initialResourceID:  "pre-existing-id",
-			envVars:            map[string]string{"DEPLOYMENT_ID": "env-dep-id"}, // This env var should not be used
+			envVars:            map[string]string{"AUTOOPS_DEPLOYMENT_ID": "env-dep-id"}, // This env var should not be used
 			expectedResourceID: "pre-existing-id",
 			expectedFinalID:    "pre-existing-id",
 		},
 		{
-			name:               "resourceID empty, DEPLOYMENT_ID set",
+			name:               "resourceID empty, AUTOOPS_DEPLOYMENT_ID set",
 			initialResourceID:  "",
-			envVars:            map[string]string{"DEPLOYMENT_ID": "env-dep-id"},
+			envVars:            map[string]string{"AUTOOPS_DEPLOYMENT_ID": "env-dep-id"},
 			expectedResourceID: "env-dep-id",
 			expectedFinalID:    "env-dep-id",
 		},
 		{
-			name:               "resourceID empty, DEPLOYMENT_ID empty, PROJECT_ID set",
+			name:               "resourceID empty, AUTOOPS_DEPLOYMENT_ID empty, AUTOOPS_PROJECT_ID set",
 			initialResourceID:  "",
-			envVars:            map[string]string{"PROJECT_ID": "env-proj-id"},
+			envVars:            map[string]string{"AUTOOPS_PROJECT_ID": "env-proj-id"},
 			expectedResourceID: "env-proj-id",
 			expectedFinalID:    "env-proj-id",
 		},
 		{
-			name:               "resourceID empty, DEPLOYMENT_ID empty, PROJECT_ID empty, RESOURCE_ID (env) set",
+			name:               "resourceID empty, AUTOOPS_DEPLOYMENT_ID empty, AUTOOPS_PROJECT_ID empty, AUTOOPS_RESOURCE_ID (env) set",
 			initialResourceID:  "",
-			envVars:            map[string]string{"RESOURCE_ID": "env-res-id"},
+			envVars:            map[string]string{"AUTOOPS_RESOURCE_ID": "env-res-id"},
 			expectedResourceID: "env-res-id",
 			expectedFinalID:    "env-res-id",
 		},
@@ -90,16 +90,16 @@ func TestGetAndSetResourceID(t *testing.T) {
 			expectedFinalID:    "",
 		},
 		{
-			name:               "precedence: DEPLOYMENT_ID > PROJECT_ID > RESOURCE_ID (env)",
+			name:               "precedence: AUTOOPS_DEPLOYMENT_ID > AUTOOPS_PROJECT_ID > AUTOOPS_RESOURCE_ID (env)",
 			initialResourceID:  "",
-			envVars:            map[string]string{"DEPLOYMENT_ID": "env-dep-id-prec", "PROJECT_ID": "env-proj-id-prec", "RESOURCE_ID": "env-res-id-prec"},
+			envVars:            map[string]string{"AUTOOPS_DEPLOYMENT_ID": "env-dep-id-prec", "AUTOOPS_PROJECT_ID": "env-proj-id-prec", "AUTOOPS_RESOURCE_ID": "env-res-id-prec"},
 			expectedResourceID: "env-dep-id-prec",
 			expectedFinalID:    "env-dep-id-prec",
 		},
 		{
-			name:               "precedence: PROJECT_ID > RESOURCE_ID (env), DEPLOYMENT_ID empty",
+			name:               "precedence: AUTOOPS_PROJECT_ID > AUTOOPS_RESOURCE_ID (env), AUTOOPS_DEPLOYMENT_ID empty",
 			initialResourceID:  "",
-			envVars:            map[string]string{"DEPLOYMENT_ID": "", "PROJECT_ID": "env-proj-id-prec2", "RESOURCE_ID": "env-res-id-prec2"},
+			envVars:            map[string]string{"AUTOOPS_DEPLOYMENT_ID": "", "AUTOOPS_PROJECT_ID": "env-proj-id-prec2", "AUTOOPS_RESOURCE_ID": "env-res-id-prec2"},
 			expectedResourceID: "env-proj-id-prec2",
 			expectedFinalID:    "env-proj-id-prec2",
 		},
@@ -117,7 +117,7 @@ func TestGetAndSetResourceID(t *testing.T) {
 			// Set environment variables for this specific sub-test.
 			// t.Setenv handles cleanup (restoring original value) for each variable at the end of the sub-test.
 			// Ensure all relevant keys are explicitly set (even to "") for the test's context.
-			relevantKeys := []string{"DEPLOYMENT_ID", "PROJECT_ID", "RESOURCE_ID"}
+			relevantKeys := []string{"AUTOOPS_DEPLOYMENT_ID", "AUTOOPS_PROJECT_ID", "AUTOOPS_RESOURCE_ID"}
 			for _, key := range relevantKeys {
 				if val, ok := tt.envVars[key]; ok {
 					t.Setenv(key, val)

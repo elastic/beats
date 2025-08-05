@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"maps"
 	"net"
 	"net/http"
 	"net/url"
@@ -163,18 +164,26 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		return err
 	}
 
-	var auth *lib.BasicAuth
+	var basicAuth *lib.BasicAuth
 	if cfg.Auth.Basic.isEnabled() {
-		auth = &lib.BasicAuth{
+		basicAuth = &lib.BasicAuth{
 			Username: cfg.Auth.Basic.User,
 			Password: cfg.Auth.Basic.Password,
+		}
+	}
+	var tokenAuth *lib.TokenAuth
+	if cfg.Auth.Token.isEnabled() {
+		tokenAuth = &lib.TokenAuth{
+			Type:  cfg.Auth.Token.Type,
+			Value: cfg.Auth.Token.Value,
 		}
 	}
 	wantDump := cfg.FailureDump.enabled() && cfg.FailureDump.Filename != ""
 	doCov := cfg.RecordCoverage && log.IsDebug()
 	httpOptions := lib.HTTPOptions{
 		Limiter:     limiter,
-		BasicAuth:   auth,
+		BasicAuth:   basicAuth,
+		TokenAuth:   tokenAuth,
 		Headers:     cfg.Resource.Headers,
 		MaxBodySize: cfg.Resource.MaxBodySize,
 	}
@@ -231,7 +240,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	// from mito/lib, a global, useragent, is available to use
 	// in requests.
 	err = periodically(ctx, cfg.Interval, func() error {
-		log.Info("process repeated request")
+		log.Info("process periodic request")
 		var (
 			budget    = *cfg.MaxExecutions
 			waitUntil time.Time
@@ -413,7 +422,21 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if e == nil {
 					return nil
 				}
-				log.Errorw("single event object returned by evaluation", "event", e)
+				if _, ok := e["error"]; ok {
+					// If we have an error, log the complete object on the basis
+					// that it is ECS-conformant.
+					if log.Core().Enabled(zapcore.ErrorLevel) {
+						kv := make([]any, 0, 2*len(e))
+						for k := range maps.Keys(e) {
+							kv = append(kv, k, e[k])
+						}
+						log.Errorw("single event object returned by evaluation", kv...)
+					}
+				} else {
+					// Otherwise, be consistent with the existing documented
+					// behaviour and log the entire object as the error.
+					log.Errorw("single event object returned by evaluation", "error", e)
+				}
 				if err, ok := e["error"]; ok {
 					env.UpdateStatus(status.Degraded, fmt.Sprintf("single event error object returned by evaluation: %s", mapstr.M{"error": err}))
 				} else {
@@ -538,7 +561,10 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			// Check we have a remaining execution budget.
 			budget--
 			if budget <= 0 {
-				log.Warnw("exceeding maximum number of CEL executions", "limit", *cfg.MaxExecutions)
+				log.Warnw("exceeding maximum number of CEL executions: will continue at next periodic evaluation",
+					"limit", *cfg.MaxExecutions,
+					"next_eval_time", start.Add(cfg.Interval),
+				)
 				env.UpdateStatus(status.Degraded, "exceeding maximum number of CEL executions")
 				return nil
 			}

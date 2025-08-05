@@ -52,7 +52,7 @@ func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	}
 }
 
-func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
+func configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err

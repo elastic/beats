@@ -29,7 +29,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -133,7 +132,7 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 
 func TestClosedEmptyQueueDoesNotBlockGet(t *testing.T) {
 	broker := newQueue(
-		logp.NewLogger("testing"),
+		logptest.NewTestingLogger(t, ""),
 		nil,
 		Settings{
 			Events:        1000,

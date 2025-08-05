@@ -78,7 +78,7 @@ func TestDiskQueueUnderAgent(t *testing.T) {
 
 			management.SetUnderAgent(true)
 
-			actualGroup, err := Success(queueConfig, tt.args.batchSize, tt.args.retry, tt.args.encoderFactory, tt.args.clients...)
+			actualGroup, err := Success(queueConfig, tt.args.batchSize, tt.args.retry, tt.args.encoderFactory, logp.NewNopLogger(), tt.args.clients...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Success() error = %v, wantErr %v", err, tt.wantErr)
 				return

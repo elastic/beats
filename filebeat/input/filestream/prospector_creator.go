@@ -24,7 +24,6 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -39,13 +38,13 @@ var experimentalWarning sync.Once
 
 func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 	logger := log.With("filestream_id", config.ID)
-	err := checkConfigCompatibility(config.FileWatcher, config.FileIdentity)
+	err := checkConfigCompatibility(config)
 	if err != nil {
 		return nil, err
 	}
 
-	filewatcher, err := newFileWatcher(logger, config.Paths, config.FileWatcher, config.Delete.Enabled)
-
+	filewatcher, err := newFileWatcher(
+		logger, config.Paths, config.FileWatcher, config.GZIPExperimental, config.Delete.Enabled)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating filewatcher %w", err)
 	}
@@ -91,7 +90,7 @@ func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 		switch strategy {
 		case copytruncateStrategy:
 			experimentalWarning.Do(func() {
-				cfgwarn.Experimental("rotation.external.copytruncate is used.")
+				log.Warn(cfgwarn.Experimental("rotation.external.copytruncate is used."))
 			})
 
 			cpCfg := &copyTruncateConfig{}
@@ -118,15 +117,17 @@ func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 	return nil, fmt.Errorf("no such rotation method: %s", rotationMethod)
 }
 
-func checkConfigCompatibility(fileWatcher, fileIdentifier *conf.Namespace) error {
+func checkConfigCompatibility(config config) error {
 	var fwCfg struct {
 		Fingerprint struct {
 			Enabled bool `config:"enabled"`
 		} `config:"fingerprint"`
 	}
 
-	if fileWatcher != nil && fileIdentifier != nil && fileIdentifier.Name() == fingerprintName {
-		err := fileWatcher.Config().Unpack(&fwCfg)
+	if config.FileWatcher != nil &&
+		config.FileIdentity != nil &&
+		config.FileIdentity.Name() == fingerprintName {
+		err := config.FileWatcher.Config().Unpack(&fwCfg)
 		if err != nil {
 			return fmt.Errorf("failed to parse file watcher configuration: %w", err)
 		}
