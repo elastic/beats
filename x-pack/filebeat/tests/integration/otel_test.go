@@ -124,13 +124,13 @@ http.port: %d
 		"log.file.inode",
 		"log.file.path",
 		// only present in beats receivers
-		"otelcol.component.id",
-		"otelcol.component.kind",
+		"agent.otelcol.component.id",
+		"agent.otelcol.component.kind",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
-	assert.Equal(t, "filebeatreceiver", otelDoc["otelcol.component.id"], "expected otelcol.component.id field in log record")
-	assert.Equal(t, "receiver", otelDoc["otelcol.component.kind"], "expected otelcol.component.kind field in log record")
+	assert.Equal(t, "filebeatreceiver", otelDoc["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
+	assert.Equal(t, "receiver", otelDoc["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
 	assertMonitoring(t, 5066)
 }
 
@@ -251,8 +251,8 @@ processors:
 		"agent.id",
 		"event.created",
 		// only present in beats receivers
-		"otelcol.component.id",
-		"otelcol.component.kind",
+		"agent.otelcol.component.id",
+		"agent.otelcol.component.kind",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
@@ -459,13 +459,13 @@ http.port: %d
 		"log.file.inode",
 		"log.file.path",
 		// only present in beats receivers
-		"otelcol.component.id",
-		"otelcol.component.kind",
+		"agent.otelcol.component.id",
+		"agent.otelcol.component.kind",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
-	assert.Equal(t, "filebeatreceiver/filestream", otelDoc["otelcol.component.id"], "expected otelcol.component.id field in log record")
-	assert.Equal(t, "receiver", otelDoc["otelcol.component.kind"], "expected otelcol.component.kind field in log record")
+	assert.Equal(t, "filebeatreceiver/filestream", otelDoc["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
+	assert.Equal(t, "receiver", otelDoc["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
 	assertMonitoring(t, otelConfig.MonitoringPort)
 	assertMonitoring(t, 5067) // filebeat
 }

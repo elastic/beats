@@ -232,33 +232,17 @@ func TestPublish(t *testing.T) {
 	})
 	t.Run("sets otel specific-fields", func(t *testing.T) {
 		testCases := []struct {
-			name                           string
-			componentID                    string
-			componentKind                  string
-			existingBeatEventComponentID   string
-			existingBeatEventComponentKind string
-			expectedComponentID            string
-			expectedComponentKind          string
+			name                  string
+			componentID           string
+			componentKind         string
+			expectedComponentID   string
+			expectedComponentKind string
 		}{
 			{
 				name:                  "sets beat component ID",
 				componentID:           "filebeatreceiver/1",
 				expectedComponentID:   "filebeatreceiver/1",
 				expectedComponentKind: "receiver",
-			},
-			{
-				name:                         "reuse existing component id and kind in beat event",
-				componentID:                  "filebeatreceiver/1",
-				existingBeatEventComponentID: "metricbeatreceiver/_agent-component/system/metrics-default",
-				expectedComponentID:          "metricbeatreceiver/_agent-component/system/metrics-default",
-				expectedComponentKind:        "receiver",
-			},
-			{
-				name:                           "reuse existing component kind from beat event",
-				componentID:                    "filebeatreceiver/1",
-				expectedComponentID:            "filebeatreceiver/1",
-				existingBeatEventComponentKind: "exporter",
-				expectedComponentKind:          "exporter",
 			},
 		}
 
@@ -267,16 +251,11 @@ func TestPublish(t *testing.T) {
 				event := beat.Event{
 					Fields: mapstr.M{
 						"field": 1,
+						"agent": mapstr.M{},
 					},
 					Meta: mapstr.M{
 						"_id": "abc123",
 					},
-				}
-				if tc.existingBeatEventComponentID != "" {
-					event.Fields[otelComponentIDKey] = tc.existingBeatEventComponentID
-				}
-				if tc.existingBeatEventComponentKind != "" {
-					event.Fields[otelComponentKindKey] = tc.existingBeatEventComponentKind
 				}
 				batch := outest.NewBatch(event)
 				var countLogs int
@@ -291,9 +270,9 @@ func TestPublish(t *testing.T) {
 				assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 				assert.Equal(t, len(batch.Events()), countLogs, "all events should be consumed")
 				for _, event := range batch.Events() {
-					beatEvent := event.Content.Fields
-					assert.Equal(t, tc.expectedComponentID, beatEvent[otelComponentIDKey], "expected otelcol.component.id field in log record")
-					assert.Equal(t, tc.expectedComponentKind, beatEvent[otelComponentKindKey], "expected otelcol.component.kind field in log record")
+					beatEvent := event.Content.Fields.Flatten()
+					assert.Equal(t, tc.expectedComponentID, beatEvent["agent."+otelComponentIDKey], "expected agent.otelcol.component.id field in log record")
+					assert.Equal(t, tc.expectedComponentKind, beatEvent["agent."+otelComponentKindKey], "expected agent.otelcol.component.kind field in log record")
 				}
 			})
 		}

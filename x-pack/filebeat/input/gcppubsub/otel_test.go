@@ -167,8 +167,8 @@ processors:
 		"agent.id",
 		"event.created",
 		// only present in beats receivers
-		"otelcol.component.id",
-		"otelcol.component.kind",
+		"agent.otelcol.component.id",
+		"agent.otelcol.component.kind",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")

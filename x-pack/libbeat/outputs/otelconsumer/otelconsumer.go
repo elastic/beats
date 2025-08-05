@@ -132,11 +132,13 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		}
 		logRecord.SetObservedTimestamp(observedTimestamp)
 
-		if _, exists := beatEvent[otelComponentIDKey]; !exists {
-			beatEvent[otelComponentIDKey] = out.beatInfo.ComponentID
-		}
-		if _, exists := beatEvent[otelComponentKindKey]; !exists {
-			beatEvent[otelComponentKindKey] = "receiver"
+		if agent, _ := beatEvent.GetValue("agent"); agent != nil {
+			switch agent := agent.(type) {
+			case mapstr.M:
+				agent[otelComponentIDKey] = out.beatInfo.ComponentID
+				agent[otelComponentKindKey] = "receiver"
+				beatEvent["agent"] = agent
+			}
 		}
 
 		otelmap.ConvertNonPrimitive(beatEvent)

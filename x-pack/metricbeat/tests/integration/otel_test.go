@@ -131,11 +131,11 @@ http.port: {{.MonitoringPort}}
 	metricbeatDoc := metricbeatDocs.Hits.Hits[0].Source
 	ignoredFields := []string{
 		// only present in beats receivers
-		"otelcol.component.id",
-		"otelcol.component.kind",
+		"agent.otelcol.component.id",
+		"agent.otelcol.component.kind",
 	}
-	assert.Equal(t, "metricbeatreceiver", otelDoc["otelcol.component.id"], "expected otelcol.component.id field in log record")
-	assert.Equal(t, "receiver", otelDoc["otelcol.component.kind"], "expected otelcol.component.kind field in log record")
+	assert.Equal(t, "metricbeatreceiver", otelDoc["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
+	assert.Equal(t, "receiver", otelDoc["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
 	assertMapstrKeysEqual(t, otelDoc, metricbeatDoc, ignoredFields, "expected documents keys to be equal")
 	assertMonitoring(t, optionsValue.MonitoringPort)
 }
