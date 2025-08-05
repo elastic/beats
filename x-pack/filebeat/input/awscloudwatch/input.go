@@ -101,7 +101,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 
 	handler, err := newStateHandler(log, in.config, in.store)
 	if err != nil {
-		in.status.UpdateStatus(status.Failed, "State registry creation failure")
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("State registry creation failure: %s", err.Error()))
 		return fmt.Errorf("failed to create state handler: %w", err)
 	}
 	defer handler.Close()
@@ -110,7 +110,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	var logGroupIDs []string
 	logGroupIDs, region, err := fromConfig(in.config, in.awsConfig)
 	if err != nil {
-		in.status.UpdateStatus(status.Failed, "Configuration loading error")
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Configuration loading error: %s", err.Error()))
 		return fmt.Errorf("error processing configurations: %w", err)
 	}
 
@@ -126,7 +126,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		// now fallback to provided LogGroupNamePrefix and use derived service client to derive logGroupIDs
 		logGroupIDs, err = getLogGroupNames(svc, in.config.LogGroupNamePrefix, in.config.IncludeLinkedAccountsForPrefixMode)
 		if err != nil {
-			in.status.UpdateStatus(status.Failed, "Configuration loading error")
+			in.status.UpdateStatus(status.Failed, fmt.Sprintf("Configuration loading error: %s", err.Error()))
 			return fmt.Errorf("failed to get log group names from LogGroupNamePrefix: %w", err)
 		}
 	}
@@ -146,7 +146,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupIDs)))
 	err = cwPoller.startWorkers(ctx, svc, pipeline)
 	if err != nil {
-		in.status.UpdateStatus(status.Failed, "Error starting input processors")
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Error starting input processors: %s", err.Error()))
 		return err
 	}
 
