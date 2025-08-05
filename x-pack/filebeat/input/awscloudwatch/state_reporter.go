@@ -5,6 +5,8 @@
 package awscloudwatch
 
 import (
+	"sync"
+
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -13,6 +15,8 @@ import (
 type cwStateReporter struct {
 	current  status.Status
 	reporter status.StatusReporter
+
+	sync sync.Mutex
 }
 
 func newCWStateReporter(ctx v2.Context, log *logp.Logger) *cwStateReporter {
@@ -29,6 +33,9 @@ func newCWStateReporter(ctx v2.Context, log *logp.Logger) *cwStateReporter {
 }
 
 func (c *cwStateReporter) UpdateStatus(status status.Status, msg string) {
+	c.sync.Lock()
+	defer c.sync.Unlock()
+
 	// proxy the update only on a state change
 	if c.current != status {
 		c.current = status
