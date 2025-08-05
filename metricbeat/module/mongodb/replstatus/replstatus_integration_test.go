@@ -107,7 +107,7 @@ func initiateReplicaSet(t *testing.T, host string) error {
 	uri := "mongodb://" + host
 	client, err := mongodb.NewClient(mongodb.ModuleConfig{
 		Hosts: []string{host},
-	}, uri, time.Second*5, readpref.PrimaryMode)
+	}, uri, time.Second*5, readpref.PrimaryMode, logp.NewNopLogger())
 	if err != nil {
 		return fmt.Errorf("could not create mongodb client: %w", err)
 	}
