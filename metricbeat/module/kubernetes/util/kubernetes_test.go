@@ -48,6 +48,7 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestWatchOptions(t *testing.T) {
