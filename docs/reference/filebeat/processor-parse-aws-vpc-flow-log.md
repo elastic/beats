@@ -26,7 +26,7 @@ The `parse_aws_vpc_flow_log` processor has the following configuration settings.
 | --- | --- | --- | --- |
 | `field` | no | `message` | Source field containing the VPC flow log message. |
 | `target_field` | no | `aws.vpcflow` | Target field for the VPC flow log object. This applies only to the original VPC flow log fields. ECS fields are written to the standard location. |
-| `format` | yes |  | VPC flow log format. This supports VPC flow log fields from versions 2 through 5. It will accept a string or a list of strings. Each format must have a unique number of fields to enable matching it to a flow log message. |
+| `format` | yes |  | VPC flow log format. This supports VPC flow log fields from versions 2 through 8. It will accept a string or a list of strings. Each format must have a unique number of fields to enable matching it to a flow log message. |
 | `mode` | no | `ecs` | Mode controls what fields are generated. The available options are `original`, `ecs`, and `ecs_and_original`. `original` generates the fields specified in the format string. `ecs` maps the original fields to ECS and removes the original fields that are mapped to ECS. `ecs_and_original` maps the original fields to ECS and retains all the original fields. |
 | `ignore_missing` | no | false | Ignore missing source field. |
 | `ignore_failure` | no | false | Ignore failures while parsing and transforming the flow log message. |
@@ -53,18 +53,33 @@ The AWS VPC flow field names use underscores instead of dashes within Filebeat. 
 | bytes | long |
 | dstaddr | ip |
 | dstport | integer |
+| ecs_cluster_name | string |
+| ecs_container_id | string |
+| ecs_container_instance_arn | string |
+| ecs_container_instance_id | string |
+| ecs_second_container_id | string |
+| ecs_service_name | string |
+| ecs_task_arn | string |
+| ecs_task_definition_arn | string |
+| ecs_task_id | string |
 | end | timestamp |
 | flow_direction | string |
 | instance_id | string |
 | interface_id | string |
 | log_status | string |
 | packets | long |
+| packets_lost_blackhole | long |
+| packets_lost_mtu_exceeded | long |
+| packets_lost_no_route | long|
+| packets_lost_ttl_expired | long|
 | pkt_dst_aws_service | string |
 | pkt_dstaddr | ip |
 | pkt_src_aws_service | string |
 | pkt_srcaddr | ip |
 | protocol | integer |
 | region | string |
+| reject_reason | string |
+| resource_type | string |
 | srcaddr | ip |
 | srcport | integer |
 | start | timestamp |
@@ -73,6 +88,19 @@ The AWS VPC flow field names use underscores instead of dashes within Filebeat. 
 | subnet_id | string |
 | tcp_flags | integer |
 | tcp_flags_array* | integer |
+| tgw_attachment_id | string |
+| tgw_dst_az_id | string |
+| tgw_dst_eni | string |
+| tgw_dst_subnet_id | string |
+| tgw_dst_vpc_account_id | string |
+| tgw_dst_vpc_id | string |
+| tgw_id | string |
+| tgw_pair_attachment_id | string |
+| tgw_src_az_id | string |
+| tgw_src_eni | string |
+| tgw_src_subnet_id | string |
+| tgw_src_vpc_account_id | string |
+| tgw_src_vpc_id | string |
 | traffic_path | integer |
 | type | string |
 | version | integer |
@@ -86,8 +114,8 @@ This mode maps the original VPC flow log fields into their associated Elastic Co
 | VPC Flow Log Field | ECS Field |
 | --- | --- |
 | account_id | cloud.account.id |
-| action | event.outcome |
 | action | event.action |
+| action | event.outcome |
 | action | event.type |
 | az_id | cloud.availability_zone |
 | bytes | network.bytes |
@@ -95,20 +123,63 @@ This mode maps the original VPC flow log fields into their associated Elastic Co
 | dstaddr | destination.address |
 | dstaddr | destination.ip |
 | dstport | destination.port |
+| ecs_cluster_arn | orchestrator.cluster.id |
+| ecs_cluster_name | orchestrator.cluster.name |
+| ecs_container_id | container.id |
+| ecs_container_instance_arn | orchestrator.resource.name |
+| ecs_container_instance_id | orchestrator.resource.id |
+| ecs_second_container_id | - |
+| ecs_service_name | service.name |
+| ecs_task_arn | - |
+| ecs_task_definition_arn | - |
+| ecs_task_id | - |
 | end | @timestamp |
 | end | event.end |
 | flow_direction | network.direction |
 | instance_id | cloud.instance.id |
+| interface_id | - |
+| log_status | - |
 | packets | network.packets |
 | packets | source.packets |
+| packets_lost_blackhole | - |
+| packets_lost_mtu_exceeded | - |
+| packets_lost_no_route | - |
+| packets_lost_ttl_expired | - |
+| pkt_dst_aws_service | - |
+| pkt_dstaddr | - |
+| pkt_src_aws_service | - |
+| pkt_srcaddr | - |
 | protocol | network.iana_number |
 | protocol | network.transport |
 | region | cloud.region |
+| reject_reason | event.reason |
+| resource_type | - |
 | srcaddr | network.type |
 | srcaddr | source.address |
 | srcaddr | source.ip |
 | srcport | source.port |
 | start | event.start |
+| sublocation_id | - |
+| sublocation_type | - |
+| subnet_id | - |
+| tcp_flags | - |
+| tgw_attachment_id | - |
+| tgw_dst_az_id | - |
+| tgw_dst_eni | - |
+| tgw_dst_subnet_id | - |
+| tgw_dst_vpc_account_id | - |
+| tgw_dst_vpc_id | - |
+| tgw_id | - |
+| tgw_pair_attachment_id | - |
+| tgw_src_az_id | - |
+| tgw_src_eni | - |
+| tgw_src_subnet_id | - |
+| tgw_src_vpc_account_id | - |
+| tgw_src_vpc_id | - |
+| traffic_path | - |
+| type | - |
+| version | - |
+| vpc_id | - |
 
 
 ### ECS and Original [_ecs_and_original]
