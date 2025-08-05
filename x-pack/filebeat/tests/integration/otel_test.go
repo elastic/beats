@@ -590,3 +590,95 @@ service:
 		assertMonitoring(t, rec.MonitoringPort)
 	}
 }
+
+func TestFilebeatOTeLInspect(t *testing.T) {
+	filebeatOTel := integration.NewBeat(
+		t,
+		"filebeat-otel",
+		"../../filebeat.test",
+		"otel",
+	)
+
+	var beatsCfgFile = `
+filebeat.inputs:
+  - type: filestream
+    id: filestream-input-id
+    enabled: true
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
+    paths:
+      - /tmp/log.log
+output:
+  elasticsearch:
+    hosts:
+      - localhost:9200
+    username: admin
+    password: testing
+    index: index
+queue.mem.flush.timeout: 0s
+setup.template.enabled: false
+processors:
+    - add_host_metadata: ~
+    - add_cloud_metadata: ~
+    - add_docker_metadata: ~
+    - add_kubernetes_metadata: ~
+`
+	expecteExporter := `exporters:
+    elasticsearch:
+        batcher:
+            enabled: true
+            max_size: 1600
+            min_size: 0
+        compression: gzip
+        compression_params:
+            level: 1
+        endpoints:
+            - http://localhost:9200
+        idle_conn_timeout: 3s
+        logs_index: index
+        mapping:
+            mode: bodymap
+        password: testing
+        retry:
+            enabled: true
+            initial_interval: 1s
+            max_interval: 1m0s
+            max_retries: 3
+        timeout: 1m30s
+        user: admin`
+	expectedReceiver := `receivers:
+    filebeatreceiver:
+        filebeat:
+            inputs:
+                - enabled: true
+                  file_identity:
+                    native: null
+                  id: filestream-input-id
+                  paths:
+                    - /tmp/log.log
+                  prospector:
+                    scanner:
+                        fingerprint:
+                            enabled: false
+                  type: filestream`
+	expectedService := `service:
+    pipelines:
+        logs:
+            exporters:
+                - elasticsearch
+            receivers:
+                - filebeatreceiver
+`
+	filebeatOTel.WriteConfigFile(beatsCfgFile)
+
+	filebeatOTel.Start("inspect")
+	defer filebeatOTel.Stop()
+
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		out, err := filebeatOTel.ReadStdout()
+		require.NoError(t, err)
+		require.Contains(t, out, expecteExporter)
+		require.Contains(t, out, expectedReceiver)
+		require.Contains(t, out, expectedService)
+	}, 10*time.Second, 500*time.Millisecond, "failed to get output of inspect command")
+}

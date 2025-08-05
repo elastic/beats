@@ -19,6 +19,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
@@ -464,4 +465,99 @@ func assertMapstrKeysEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string
 	}
 
 	require.Zero(t, cmp.Diff(flatM1, flatM2), msg)
+}
+
+func TestmbOTelInspect(t *testing.T) {
+	mbOTel := integration.NewBeat(
+		t,
+		"metricbeat-otel",
+		"../../metricbeat.test",
+		"otel",
+	)
+
+	var beatsCfgFile = `
+metricbeat:
+   modules:
+   - module: system
+     enabled: true
+     period: 1s
+     processes:
+      - '.*'
+     metricsets:
+      - cpu		
+output:
+  elasticsearch:
+    hosts:
+      - localhost:9200
+    username: admin
+    password: testing
+    index: index
+queue.mem.flush.timeout: 0s
+setup.template.enabled: false
+processors:
+    - add_host_metadata: ~
+    - add_cloud_metadata: ~
+    - add_docker_metadata: ~
+    - add_kubernetes_metadata: ~
+`
+	expecteExporter := `exporters:
+    elasticsearch:
+        batcher:
+            enabled: true
+            max_size: 1600
+            min_size: 0
+        compression: gzip
+        compression_params:
+            level: 1
+        endpoints:
+            - http://localhost:9200
+        idle_conn_timeout: 3s
+        logs_index: index
+        mapping:
+            mode: bodymap
+        password: testing
+        retry:
+            enabled: true
+            initial_interval: 1s
+            max_interval: 1m0s
+            max_retries: 3
+        timeout: 1m30s
+        user: admin`
+	expectedReceiver := `receivers:
+    metricbeatreceiver:
+        logging:
+            files:
+                rotateeverybytes: 104857600
+                rotateonstartup: false
+            to_files: true
+        metricbeat:
+            modules:
+                - enabled: true
+                  metricsets:
+                    - cpu
+                  module: system
+                  period: 1s
+                  processes:
+                    - .*`
+	expectedService := `service:
+    pipelines:
+        logs:
+            exporters:
+                - elasticsearch
+            receivers:
+                - metricbeatreceiver
+`
+	mbOTel.WriteConfigFile(beatsCfgFile)
+
+	mbOTel.Start("inspect")
+	defer mbOTel.Stop()
+
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		out, err := mbOTel.ReadStdout()
+		fmt.Println(out)
+		require.NoError(collect, err)
+		require.Contains(collect, out, expecteExporter)
+		require.Contains(collect, out, expectedReceiver)
+		require.Contains(collect, out, expectedService)
+	}, 10*time.Second, 500*time.Millisecond, "failed to get output of inspect command")
 }
