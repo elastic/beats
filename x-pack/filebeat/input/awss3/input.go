@@ -9,6 +9,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -31,6 +32,7 @@ func Plugin(logger *logp.Logger, store statestore.States) v2.Plugin {
 type s3InputManager struct {
 	store  statestore.States
 	logger *logp.Logger
+	status status.StatusReporter
 }
 
 func (im *s3InputManager) Init(grp unison.Group) error {
@@ -38,7 +40,6 @@ func (im *s3InputManager) Init(grp unison.Group) error {
 }
 
 func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
-	// TODO: report "Starting" status here (e.g. inputContext.UpdateStatus(status.Configuring, ""))
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		// report Failed with configuration loading error
