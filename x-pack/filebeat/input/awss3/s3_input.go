@@ -66,7 +66,7 @@ func (in *s3PollerInput) Run(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
 ) error {
-	// TODO: set up status reporter
+	in.status = newCWStateReporter(inputContext, inputContext.Logger)
 	// TODO: defer call "Stopped" status here
 	// TODO: report "Starting" status here
 	in.log = inputContext.Logger.Named("s3")
