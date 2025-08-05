@@ -441,7 +441,6 @@ func (g *logGenerator) Start() {
 
 func (g *logGenerator) Stop() {
 	require.NoError(g.t, g.f.Close())
-	require.NoError(g.t, os.Remove(g.f.Name()))
 }
 
 func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
