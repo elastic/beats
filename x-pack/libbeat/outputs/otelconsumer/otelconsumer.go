@@ -37,10 +37,11 @@ func init() {
 }
 
 type otelConsumer struct {
-	observer     outputs.Observer
-	logsConsumer consumer.Logs
-	beatInfo     beat.Info
-	log          *logp.Logger
+	observer       outputs.Observer
+	logsConsumer   consumer.Logs
+	beatInfo       beat.Info
+	log            *logp.Logger
+	isReceiverTest bool // wheather we are running in a receivertest context
 }
 
 func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
@@ -49,14 +50,17 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		return outputs.Fail(err)
 	}
 
+	isReceiverTest := os.Getenv("OTELCONSUMER_RECEIVERTEST") == "1"
+
 	// Default to runtime.NumCPU() workers
 	clients := make([]outputs.Client, 0, runtime.NumCPU())
 	for range runtime.NumCPU() {
 		clients = append(clients, &otelConsumer{
-			observer:     observer,
-			logsConsumer: beat.LogConsumer,
-			beatInfo:     beat,
-			log:          beat.Logger.Named("otelconsumer"),
+			observer:       observer,
+			logsConsumer:   beat.LogConsumer,
+			beatInfo:       beat,
+			log:            beat.Logger.Named("otelconsumer"),
+			isReceiverTest: isReceiverTest,
 		})
 	}
 
@@ -106,6 +110,13 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			switch id := id.(type) {
 			case string:
 				logRecord.Attributes().PutStr(esDocumentIDAttribute, id)
+
+				// The receivertest package needs a unique attribute to track generated ids.
+				// When receivertest allows this to be customized we can remove this condition.
+				// See https://github.com/open-telemetry/opentelemetry-collector/issues/12003.
+				if out.isReceiverTest {
+					logRecord.Attributes().PutStr(receivertest.UniqueIDAttrName, id)
+				}
 			}
 		}
 
@@ -131,16 +142,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		logRecord.SetObservedTimestamp(observedTimestamp)
 
 		otelmap.ConvertNonPrimitive(beatEvent)
-
-		// The receivertest package needs a unique attribute to track generated ids.
-		// When receivertest allows this to be customized we can remove this condition.
-		// See https://github.com/open-telemetry/opentelemetry-collector/issues/12003.
-		if os.Getenv("OTELCONSUMER_RECEIVERTEST") == "1" {
-			id, ok := event.Content.Meta["_id"].(string)
-			if ok {
-				logRecord.Attributes().PutStr(receivertest.UniqueIDAttrName, id)
-			}
-		}
 
 		// if data_stream field is set on beatEvent. Add it to logrecord.Attributes to support dynamic indexing
 		if val, _ := beatEvent.GetValue("data_stream"); val != nil {
