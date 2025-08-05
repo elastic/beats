@@ -41,7 +41,7 @@ type otelConsumer struct {
 	logsConsumer   consumer.Logs
 	beatInfo       beat.Info
 	log            *logp.Logger
-	isReceiverTest bool // wheather we are running in a receivertest context
+	isReceiverTest bool // whether we are running in receivertest context
 }
 
 func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
