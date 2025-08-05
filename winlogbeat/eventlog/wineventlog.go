@@ -37,7 +37,6 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
@@ -325,13 +324,13 @@ func (l *winEventLog) IsFile() bool {
 	return l.file
 }
 
-func (l *winEventLog) Open(state checkpoint.EventLogState) error {
+func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
 	var bookmark win.EvtHandle
 	var err error
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
-	if l.metrics == nil {
-		l.metrics = newInputMetrics(l.channelName, l.id)
+	if l.metrics == nil && l.id != "" {
+		l.metrics = newInputMetrics(l.channelName, metricsRegistry)
 	}
 	if len(state.Bookmark) > 0 {
 		bookmark, err = win.CreateBookmarkFromXML(state.Bookmark)
@@ -516,7 +515,7 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 		if err := l.Close(); err != nil {
 			return nil, 0, fmt.Errorf("failed to recover from RPC_S_INVALID_BOUND: %w", err)
 		}
-		if err := l.Open(l.lastRead); err != nil {
+		if err := l.Open(l.lastRead, nil); err != nil {
 			return nil, 0, fmt.Errorf("failed to recover from RPC_S_INVALID_BOUND: %w", err)
 		}
 		return l.eventHandles(maxRead / 2)
@@ -666,8 +665,6 @@ func incrementMetric(v *expvar.Map, key interface{}) {
 
 // inputMetrics handles event log metric reporting.
 type inputMetrics struct {
-	unregister func()
-
 	lastBatch time.Time
 
 	name        *monitoring.String // name of the provider being read
@@ -681,13 +678,8 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for windows event logs. If id is empty
 // a nil inputMetric is returned.
-func newInputMetrics(name, id string) *inputMetrics {
-	if id == "" {
-		return nil
-	}
-	reg, unreg := inputmon.NewInputRegistry("winlog", id, nil)
+func newInputMetrics(name string, reg *monitoring.Registry) *inputMetrics {
 	out := &inputMetrics{
-		unregister:  unreg,
 		name:        monitoring.NewString(reg, "provider"),
 		events:      monitoring.NewUint(reg, "received_events_total"),
 		dropped:     monitoring.NewUint(reg, "discarded_events_total"),
@@ -753,10 +745,6 @@ func (m *inputMetrics) logDropped(_ error) {
 }
 
 func (m *inputMetrics) close() {
-	if m == nil {
-		return
-	}
-	m.unregister()
 }
 
 // FIXME: Windows Server 2025 has a bug in the Windows Event Log API that causes
