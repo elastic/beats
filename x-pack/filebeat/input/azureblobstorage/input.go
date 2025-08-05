@@ -62,7 +62,7 @@ func configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, erro
 	var sources []cursor.Source
 	// This is to maintain backward compatibility with the old config.
 	if config.BatchSize == 0 {
-		config.BatchSize = *config.MaxWorkers
+		config.BatchSize = config.MaxWorkers
 	}
 	for _, c := range config.Containers {
 		container := tryOverrideOrDefault(config, c)
@@ -102,8 +102,8 @@ func configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, erro
 func tryOverrideOrDefault(cfg config, c container) container {
 	if c.MaxWorkers == nil {
 		maxWorkers := 1
-		if cfg.MaxWorkers != nil {
-			maxWorkers = *cfg.MaxWorkers
+		if cfg.MaxWorkers != 0 {
+			maxWorkers = cfg.MaxWorkers
 		}
 		c.MaxWorkers = &maxWorkers
 	}
