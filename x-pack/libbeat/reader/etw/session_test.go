@@ -7,7 +7,6 @@
 package etw
 
 import (
-	"fmt"
 	"testing"
 	"unsafe"
 
@@ -25,7 +24,11 @@ func TestSetSessionName(t *testing.T) {
 		{
 			name: "ProviderNameSet",
 			config: Config{
-				ProviderName: "Provider1",
+				Providers: []ProviderConfig{
+					{
+						Name: "Provider1",
+					},
+				},
 			},
 			expectedName: "Elastic-Provider1",
 		},
@@ -46,7 +49,11 @@ func TestSetSessionName(t *testing.T) {
 		{
 			name: "FallbackToProviderGUID",
 			config: Config{
-				ProviderGUID: "12345",
+				Providers: []ProviderConfig{
+					{
+						GUID: "12345",
+					},
+				},
 			},
 			expectedName: "Elastic-12345",
 		},
@@ -74,10 +81,10 @@ func TestSetSessionGUID_ProviderName(t *testing.T) {
 	// Replace with mock function
 	guidFromProviderNameFunc = mockGUIDFromProviderName
 
-	conf := Config{ProviderName: "Provider1"}
+	conf := Config{Providers: []ProviderConfig{{Name: "Provider1"}}}
 	expectedGUID := windows.GUID{Data1: 0x12345678, Data2: 0x1234, Data3: 0x5678, Data4: [8]byte{0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78}}
 
-	guid, err := setSessionGUID(conf)
+	guid, err := getProviderGUID(conf.Providers[0])
 	assert.NoError(t, err)
 	assert.Equal(t, expectedGUID, guid, "The GUID should match the mock GUID")
 }
@@ -87,12 +94,12 @@ func TestSetSessionGUID_ProviderGUID(t *testing.T) {
 	guidString := "{12345678-1234-5678-1234-567812345678}"
 
 	// Configuration with a set ProviderGUID
-	conf := Config{ProviderGUID: guidString}
+	conf := Config{Providers: []ProviderConfig{{GUID: guidString}}}
 
 	// Expected GUID based on the GUID string
 	expectedGUID := windows.GUID{Data1: 0x12345678, Data2: 0x1234, Data3: 0x5678, Data4: [8]byte{0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78}}
 
-	guid, err := setSessionGUID(conf)
+	guid, err := getProviderGUID(conf.Providers[0])
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedGUID, guid, "The GUID should match the expected value")
@@ -133,7 +140,7 @@ func TestNewSessionProperties(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			props := newSessionProperties(tc.sessionName)
+			props := newSessionProperties(tc.sessionName, Config{})
 
 			assert.Equal(t, tc.expectedSize, props.Wnode.BufferSize, "BufferSize should match expected value")
 			assert.Equal(t, windows.GUID{}, props.Wnode.Guid, "GUID should be empty")
@@ -147,81 +154,11 @@ func TestNewSessionProperties(t *testing.T) {
 	}
 }
 
-func TestNewSession_ProviderName(t *testing.T) {
-	// Defer restoration of original function
-	t.Cleanup(func() {
-		setSessionGUIDFunc = setSessionGUID
-	})
-
-	// Override setSessionGUIDFunc with mock
-	setSessionGUIDFunc = func(conf Config) (windows.GUID, error) {
-		return windows.GUID{
-			Data1: 0x12345678,
-			Data2: 0x1234,
-			Data3: 0x5678,
-			Data4: [8]byte{0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78},
-		}, nil
-	}
-
-	expectedGUID := windows.GUID{
-		Data1: 0x12345678,
-		Data2: 0x1234,
-		Data3: 0x5678,
-		Data4: [8]byte{0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78},
-	}
-
-	conf := Config{
-		ProviderName:    "Provider1",
-		SessionName:     "Session1",
-		TraceLevel:      "warning",
-		MatchAnyKeyword: 0xffffffffffffffff,
-		MatchAllKeyword: 0,
-	}
-	session, err := NewSession(conf)
-
-	assert.NoError(t, err)
-	assert.Equal(t, "Session1", session.Name, "SessionName should match expected value")
-	assert.Equal(t, expectedGUID, session.GUID, "The GUID in the session should match the expected GUID")
-	assert.Equal(t, uint8(3), session.traceLevel, "TraceLevel should be 3 (warning)")
-	assert.Equal(t, true, session.NewSession)
-	assert.Equal(t, true, session.Realtime)
-	assert.NotNil(t, session.properties)
-}
-
-func TestNewSession_GUIDError(t *testing.T) {
-	// Defer restoration of original function
-	t.Cleanup(func() {
-		setSessionGUIDFunc = setSessionGUID
-	})
-
-	// Override setSessionGUIDFunc with mock
-	setSessionGUIDFunc = func(conf Config) (windows.GUID, error) {
-		// Return an empty GUID and an error
-		return windows.GUID{}, fmt.Errorf("mock error")
-	}
-
-	conf := Config{
-		ProviderName:    "Provider1",
-		SessionName:     "Session1",
-		TraceLevel:      "warning",
-		MatchAnyKeyword: 0xffffffffffffffff,
-		MatchAllKeyword: 0,
-	}
-	session, err := NewSession(conf)
-
-	assert.EqualError(t, err, "error when initializing session 'Session1': mock error")
-	assert.Nil(t, session)
-
-}
-
 func TestNewSession_AttachSession(t *testing.T) {
 	// Test case
 	conf := Config{
-		Session:         "Session1",
-		SessionName:     "TestSession",
-		TraceLevel:      "verbose",
-		MatchAnyKeyword: 0xffffffffffffffff,
-		MatchAllKeyword: 0,
+		Session:     "Session1",
+		SessionName: "TestSession",
 	}
 	session, err := NewSession(conf)
 
@@ -235,10 +172,7 @@ func TestNewSession_AttachSession(t *testing.T) {
 func TestNewSession_Logfile(t *testing.T) {
 	// Test case
 	conf := Config{
-		Logfile:         "LogFile1.etl",
-		TraceLevel:      "verbose",
-		MatchAnyKeyword: 0xffffffffffffffff,
-		MatchAllKeyword: 0,
+		Logfile: "LogFile1.etl",
 	}
 	session, err := NewSession(conf)
 

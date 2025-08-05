@@ -101,8 +101,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/miekg/dns v1.1.65
 	github.com/mitchellh/gox v1.0.1
-	github.com/mitchellh/hashstructure v1.1.0
-	github.com/mitchellh/mapstructure v1.5.0
+	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/osquery/osquery-go v0.0.0-20231108163517-e3cde127e724
 	github.com/pkg/errors v0.9.1
@@ -238,6 +237,8 @@ require (
 )
 
 require (
+	github.com/go-viper/mapstructure/v2 v2.3.0
+	github.com/gohugoio/hashstructure v0.5.0
 	go.opentelemetry.io/collector/pipeline v0.130.0
 	go.opentelemetry.io/collector/processor v1.36.0
 	go.opentelemetry.io/collector/processor/processorhelper v0.130.0
@@ -327,7 +328,6 @@ require (
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
-	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/godror/knownpb v0.1.0 // indirect

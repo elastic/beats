@@ -22,7 +22,7 @@ import (
 	"sync"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/mitchellh/hashstructure"
+	"github.com/gohugoio/hashstructure"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
