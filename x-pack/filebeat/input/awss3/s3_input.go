@@ -16,6 +16,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/timed"
@@ -37,6 +38,9 @@ type s3PollerInput struct {
 	s3ObjectHandler s3ObjectHandlerFactory
 	states          *states
 	filterProvider  *filterProvider
+
+	// health status reporting
+	status status.StatusReporter
 }
 
 func newS3PollerInput(
