@@ -33,6 +33,7 @@ import (
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	wininfo "github.com/elastic/go-sysinfo/providers/windows"
 )
 
@@ -159,12 +160,12 @@ func (l *winEventLog) IsFile() bool {
 	return l.file
 }
 
-func (l *winEventLog) Open(state checkpoint.EventLogState) error {
+func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
 	l.lastRead = state
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
-	if l.metrics == nil {
-		l.metrics = newInputMetrics(l.channelName, l.id)
+	if l.metrics == nil && l.id != "" {
+		l.metrics = newInputMetrics(l.channelName, metricsRegistry)
 	}
 
 	var err error
