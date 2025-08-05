@@ -67,6 +67,7 @@ func (in *sqsReaderInput) Run(
 	pipeline beat.Pipeline,
 ) error {
 	// TODO: defer call "Stopped" status here
+	// TODO: report "Starting" status here
 	// Initialize everything for this run
 	err := in.setup(inputContext, pipeline)
 	if err != nil {
