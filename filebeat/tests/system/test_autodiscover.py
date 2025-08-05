@@ -108,6 +108,7 @@ class TestAutodiscover(filebeat.BaseTest):
     @contextmanager
     def container_running(self, image_name='busybox:latest'):
         docker_client = docker.from_env()
-        container = docker_client.containers.run(image_name, 'sleep 60', detach=True, remove=True)
+        container = docker_client.containers.run(
+            image_name, 'sleep 60', detach=True, remove=True)
         yield container
         container.remove(force=True)
