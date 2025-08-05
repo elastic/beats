@@ -66,9 +66,11 @@ func (in *sqsReaderInput) Run(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
 ) error {
+	// TODO: defer call "Stopped" status here
 	// Initialize everything for this run
 	err := in.setup(inputContext, pipeline)
 	if err != nil {
+		// TODO: report Failed with configuration loading error
 		return err
 	}
 
@@ -161,6 +163,7 @@ func (in *sqsReaderInput) run(ctx context.Context) {
 	}.run(graceCtx)
 
 	in.startWorkers(ctx, graceCtx)
+	// TODO: report Running
 	in.readerLoop(ctx)
 
 	in.workerWg.Wait()
