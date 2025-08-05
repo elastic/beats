@@ -66,6 +66,7 @@ func (in *sqsReaderInput) Run(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
 ) error {
+	// TODO: set up status reporter
 	// TODO: defer call "Stopped" status here
 	// TODO: report "Starting" status here
 	// Initialize everything for this run
