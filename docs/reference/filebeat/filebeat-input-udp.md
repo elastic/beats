@@ -20,9 +20,13 @@ filebeat.inputs:
   host: "localhost:8080"
 ```
 
-Starting from `9.2.0` the UDP input reads the message in a different
-goroutine than the publishing of messages, this increases the
-performance of the input when running slow processors.
+:::{note}
+{applies_to}`stack: ga 9.2.0` Starting in 9.2.0 the UDP input reads
+the message in a different goroutine than the publishing of messages,
+which increases the performance of the input when running slow
+processors.
+:::
+
 
 ## Configuration options [_configuration_options_20]
 
