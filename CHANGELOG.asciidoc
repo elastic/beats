@@ -7,166 +7,24 @@
 === Beats version 8.19.1
 https://github.com/elastic/beats/compare/v8.19.0\...v8.19.1[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
+==== Bugfixes
 
 *Filebeat*
 
-
-
-
-*Heartbeat*
-
+- Fix a panic in the winlog input that prevented it from starting. {issue}45693[45693] {pull}45730[45730]
 
 *Metricbeat*
 
 - Improve error messages in AWS Health {pull}45408[45408]
 - Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
 
-*Osquerybeat*
-
-
-
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Bugfixes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-- Fix a panic in the winlog input that prevented it from starting. {issue}45693[45693] {pull}45730[45730]
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-
-*Elastic Logging Plugin*
-
 
 ==== Added
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Auditbeat*
-
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - Log CEL single object evaluation results as ECS compliant documents where possible. {issue}45254[45254] {pull}45399[45399]
 - Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]
-
-*Auditbeat*
-
-
-*Libbeat*
-
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-
-*Functionbeat*
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
 
 
 [[release-notes-8.18.1]]
