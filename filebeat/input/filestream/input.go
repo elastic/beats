@@ -467,7 +467,7 @@ func (inp *filestream) open(
 	if inp.readerConfig.Binary.Enabled {
 		dbgReader = logReader
 	} else {
-		dbgReader, err = debug.AppendReaders(logReader)
+		dbgReader, err = debug.AppendReaders(logReader, log)
 		if err != nil {
 			return nil, truncated, err
 		}

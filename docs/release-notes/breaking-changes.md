@@ -12,6 +12,8 @@ Breaking changes can impact your Elastic applications, potentially disrupting no
 % Description and impact of the breaking change.
 % For more information, check [PR #](PR link).
 
+## 9.0.1 [beats-9.0.1-breaking-changes]
+
 ::::{dropdown} The default data and logs path for the Windows service installation has changed.
 The base folder has changed from `C:\ProgramData\` to `C:\Program
 Files\` because the latter has stricter permissions. The state
@@ -40,12 +42,15 @@ for more details.
 For more information, check [#38523](https://github.com/elastic/beats/issues/38523)
 ::::
 
-## 9.0.1 [beats-9.0.1-breaking-changes]
+## 9.0.4 [beats-9.0.4-breaking-changes]
 
-_No breaking changes_
+**Metricbeat**
 
+::::{dropdown} Change index summary metricset to use `_nodes/stats` API instead of `_stats` API to avoid data gaps.
+For more information, check  [#45049]({{beats-pull}}45049).
+::::
 
-## 9.0.0 [beats-900-breaking-changes]
+## 9.0.0 [beats-9.0.0-breaking-changes]
 
 % Description and impact of the breaking change.
 % For more information, check [PR #](PR link).

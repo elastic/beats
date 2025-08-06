@@ -190,8 +190,6 @@ func (c *config) Validate() error {
 				"gzip_experimental=true requires file_identity to be 'fingerprint'")
 		}
 
-		cfgwarn.Experimental(
-			"filestream: experimental gzip support enabled")
 	}
 
 	if c.ID == "" && c.TakeOver.Enabled {
@@ -204,10 +202,14 @@ func (c *config) Validate() error {
 // checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
 func (c config) checkUnsupportedParams(logger *logp.Logger) {
 	if c.AllowIDDuplication {
-		logger.Named("input.filestream").Warn(
+		logger.Named("filestream").Warn(
 			"setting `allow_deprecated_id_duplication` will lead to data " +
 				"duplication and incomplete input metrics, it's use is " +
 				"highly discouraged.")
+	}
+	if c.GZIPExperimental {
+		logger.Named("filestream").Warn(cfgwarn.Experimental(
+			"filestream: experimental gzip support enabled"))
 	}
 }
 

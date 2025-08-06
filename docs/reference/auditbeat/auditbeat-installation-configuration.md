@@ -256,8 +256,9 @@ Auditbeat comes with predefined assets for parsing, indexing, and visualizing yo
     `-e` is optional and sends output to standard error instead of the configured log output.
 
 
-By default, Windows log files are stored under `C:\Program Files\Auditbeat-Data\logs`.
-For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\auditbeat\Logs`.
+The default location where Windows log files are stored varies:
+* {applies_to}`stack: ga 9.1` `C:\Program Files\Auditbeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\auditbeat\Logs`
 
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to {{es}} and deploys the sample dashboards for visualizing the data in {{kib}}.
 
@@ -326,8 +327,9 @@ sudo ./auditbeat -e
 PS C:\Program Files\auditbeat> Start-Service auditbeat
 ```
 
-By default, Windows log files are stored under `C:\Program Files\Auditbeat-Data\Logs`.
-For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\auditbeat\Logs`.
+The default location where Windows log files are stored varies:
+* {applies_to}`stack: ga 9.1` `C:\Program Files\Auditbeat-Data\Logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\auditbeat\Logs`
 ::::::
 
 :::::::
