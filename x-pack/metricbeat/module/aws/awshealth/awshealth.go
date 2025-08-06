@@ -6,12 +6,15 @@ package awshealth
 
 import (
 	"context"
+
+	"errors"
 	"fmt"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/health"
 	"github.com/aws/aws-sdk-go-v2/service/health/types"
+	"github.com/aws/smithy-go"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -117,7 +120,7 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 		return err
 	}
 
-	awsConfig := m.MetricSet.AwsConfig.Copy()
+	awsConfig := m.AwsConfig.Copy()
 
 	health_client := health.NewFromConfig(awsConfig, func(o *health.Options) {
 		if config.AWSConfig.FIPSEnabled {
@@ -191,7 +194,13 @@ func (m *MetricSet) getEventDetails(
 		// Perform actions for the current page
 		currentPage, err := dePage.NextPage(ctx)
 		if err != nil {
-			m.Logger().Errorf("[AWS Health] DescribeEvents failed with : %w", err)
+			var opErr *smithy.OperationError
+			if errors.As(err, &opErr) {
+				m.Logger().Errorf("[AWS Health] DescribeEvents failed with: Operation=%s, UnderlyingError=%v",
+					opErr.Operation(), opErr.Err)
+			} else {
+				m.Logger().Errorf("[AWS Health] DescribeEvents failed with: %w", err)
+			}
 			break
 		}
 		deEvents = currentPage.Events
@@ -218,7 +227,13 @@ func (m *MetricSet) getEventDetails(
 			Locale:    &locale,
 		})
 		if err != nil {
-			m.Logger().Errorf("[AWS Health] DescribeEventDetails failed with : %w", err)
+			var opErr *smithy.OperationError
+			if errors.As(err, &opErr) {
+				m.Logger().Errorf("[AWS Health] DescribeEventDetails failed with: Operation=%s, UnderlyingError=%v",
+					opErr.Operation(), opErr.Err)
+			} else {
+				m.Logger().Errorf("[AWS Health] DescribeEventDetails failed with: %w", err)
+			}
 			break
 		}
 		// Fetch event description for the current page of events

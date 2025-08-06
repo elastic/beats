@@ -39,6 +39,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
 - Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
+- Improve error messages in AWS Health {pull}45408[45408]
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
 
 *Osquerybeat*
 
@@ -232,6 +234,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
 - Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
 - Allow empty HTTPJSON cursor template value evaluations to be ignored by Fleet health status updates. {pull}45361[45361]
+- Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]
 
 *Auditbeat*
 

@@ -28,7 +28,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mitchellh/hashstructure"
+	"github.com/gohugoio/hashstructure"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/asset"
