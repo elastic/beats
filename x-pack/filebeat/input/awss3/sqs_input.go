@@ -99,6 +99,7 @@ func (in *sqsReaderInput) setup(
 	in.log = inputContext.Logger.With("queue_url", in.config.QueueURL)
 	in.pipeline = pipeline
 
+	in.status.UpdateStatus(status.Configuring, "Configuring input")
 	in.detectedRegion = getRegionFromQueueURL(in.config.QueueURL)
 	if in.config.RegionName != "" {
 		// Configured region always takes precedence
