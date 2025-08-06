@@ -327,7 +327,7 @@ func (in *sqsReaderInput) startWorkers(ctx, graceCtx context.Context) {
 				in.log.Error(err)
 				// will likely cover auth failures, network connectivity errors
 				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("An SQS worker's setup failed, error: %s", err.Error()))
-				// TODO: re-attempt worker initialization if it fails and address newSQSWorker() setting of the workerWg.Done()
+				// TODO: re-attempt worker initialization if it fails
 				return
 			}
 			go worker.run(ctx, graceCtx)
