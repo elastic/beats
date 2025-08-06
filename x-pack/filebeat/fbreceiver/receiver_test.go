@@ -6,8 +6,6 @@ package fbreceiver
 
 import (
 	"bytes"
-<<<<<<< HEAD
-=======
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -23,7 +21,6 @@ import (
 	"strconv"
 	"strings"
 	"sync/atomic"
->>>>>>> ee17a836e (otel: fix retries in otelconsumer and add receivertest test suite (#45637))
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
@@ -282,8 +279,6 @@ func TestReceiverDegraded(t *testing.T) {
 		})
 	}
 }
-<<<<<<< HEAD
-=======
 
 func genSocketPath() string {
 	randData := make([]byte, 16)
@@ -475,4 +470,3 @@ func TestConsumeContract(t *testing.T) {
 		GenerateCount: logsPerTest,
 	})
 }
->>>>>>> ee17a836e (otel: fix retries in otelconsumer and add receivertest test suite (#45637))

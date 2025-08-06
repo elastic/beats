@@ -7,11 +7,7 @@ package otelconsumer
 import (
 	"context"
 	"fmt"
-<<<<<<< HEAD
-=======
 	"os"
-	"runtime"
->>>>>>> ee17a836e (otel: fix retries in otelconsumer and add receivertest test suite (#45637))
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -48,38 +44,20 @@ type otelConsumer struct {
 }
 
 func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
-
+	isReceiverTest := os.Getenv("OTELCONSUMER_RECEIVERTEST") == "1"
 	out := &otelConsumer{
-		observer:     observer,
-		logsConsumer: beat.LogConsumer,
-		beatInfo:     beat,
-		log:          logp.NewLogger("otelconsumer"),
+		observer:       observer,
+		logsConsumer:   beat.LogConsumer,
+		beatInfo:       beat,
+		log:            logp.NewLogger("otelconsumer"),
+		isReceiverTest: isReceiverTest,
 	}
 
 	ocConfig := defaultConfig()
 	if err := cfg.Unpack(&ocConfig); err != nil {
 		return outputs.Fail(err)
 	}
-<<<<<<< HEAD
 	return outputs.Success(ocConfig.Queue, -1, 0, nil, out)
-=======
-
-	isReceiverTest := os.Getenv("OTELCONSUMER_RECEIVERTEST") == "1"
-
-	// Default to runtime.NumCPU() workers
-	clients := make([]outputs.Client, 0, runtime.NumCPU())
-	for range runtime.NumCPU() {
-		clients = append(clients, &otelConsumer{
-			observer:       observer,
-			logsConsumer:   beat.LogConsumer,
-			beatInfo:       beat,
-			log:            beat.Logger.Named("otelconsumer"),
-			isReceiverTest: isReceiverTest,
-		})
-	}
-
-	return outputs.Success(ocConfig.Queue, -1, 0, nil, beat.Logger, clients...)
->>>>>>> ee17a836e (otel: fix retries in otelconsumer and add receivertest test suite (#45637))
 }
 
 // Close is a noop for otelconsumer
