@@ -112,7 +112,7 @@ func (in *s3PollerInput) run(ctx context.Context) {
 	// Scan the bucket in a loop, delaying by the configured interval each
 	// iteration.
 	for ctx.Err() == nil {
-		// TODO: report Running
+		in.status.UpdateStatus(status.Running, "Input is running")
 		in.runPoll(ctx)
 		_ = timed.Wait(ctx, in.config.BucketListInterval)
 	}

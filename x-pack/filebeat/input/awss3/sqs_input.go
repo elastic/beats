@@ -170,7 +170,7 @@ func (in *sqsReaderInput) run(ctx context.Context) {
 	}.run(graceCtx)
 
 	in.startWorkers(ctx, graceCtx)
-	// TODO: report Running
+	in.status.UpdateStatus(status.Running, "Input is running")
 	in.readerLoop(ctx)
 
 	in.workerWg.Wait()
