@@ -24,12 +24,14 @@ import (
 	"context"
 	"embed"
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	tkbtf "github.com/elastic/tk-btf"
 )
@@ -61,7 +63,7 @@ func getVerifiedProbes(ctx context.Context, timeout time.Duration) (map[tracing.
 
 		probes, err := probeMgr.build(s)
 		if err != nil {
-			allErr = errors.Join(allErr, err)
+			allErr = errors.Join(allErr, fmt.Errorf("error building probe: %w", err))
 			specs = specs[1:]
 			continue
 		}
@@ -70,7 +72,7 @@ func getVerifiedProbes(ctx context.Context, timeout time.Duration) (map[tracing.
 			if probeMgr.onErr(err) {
 				continue
 			}
-			allErr = errors.Join(allErr, err)
+			allErr = errors.Join(allErr, fmt.Errorf("error verifying probes: %w", err))
 			specs = specs[1:]
 			continue
 		}
@@ -184,6 +186,7 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 				}
 
 				if err := verifier.validateEvent(ev.Path, ev.PID, ev.Op); err != nil {
+					logp.L().Infof("error validating event with path %s, pid %d, op %d: %v", ev.Path, ev.PID, ev.Op, err)
 					retC <- err
 					return
 				}
@@ -203,7 +206,7 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 
 	// invoke verifier event generation from our executor
 	if err := exec.Run(verifier.GenerateEvents); err != nil {
-		return err
+		return fmt.Errorf("error invoking verifier: %w", err)
 	}
 
 	// wait for either no new events arriving for timeout duration or
@@ -211,7 +214,7 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 	select {
 	case err = <-retC:
 		if err != nil {
-			return err
+			return fmt.Errorf("got error from verifier: %w", err)
 		}
 	case <-ctx.Done():
 		return ctx.Err()
@@ -219,7 +222,7 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 
 	// check that all events have been verified
 	if err := verifier.Verified(); err != nil {
-		return err
+		return fmt.Errorf("failed to verify all events: %w", err)
 	}
 
 	return nil
