@@ -725,14 +725,47 @@ To differentiate the trace files generated from different input instances, a pla
 
 ## Okta User Identities (`okta`) [provider-okta]
 
-The `okta` provider allows the input to retrieve users and devices from the Okta user API.
+The Okta provider allows the input to retrieve users and devices from the Okta user API.
 
 
 ### Setup [_setup_3]
 
-The necessary API permissions need to be granted in Okta in order for the provider to function properly. In the administration dashboard for your Okta account, navigate to Security>API and in the Tokens tab click the "Create token" button to create a new token. Copy the token value and retain this to configure the provider. Note that the token will not be presented again, so it must be copied now. This value will use given to the provider via the `okta_token` configuration field.
+The Okta provider supports two authentication methods:
 
-Devices API access needs to be activated by Okta support.
+#### API Token Authentication (Traditional)
+
+In the administration dashboard for your Okta account, navigate to Security>API and in the Tokens tab click the "Create token" button to create a new token. Copy the token value and retain this to configure the provider. Note that the token will not be presented again, so it must be copied now. This value will use given to the provider via the `okta_token` configuration field.
+
+#### OAuth2 Authentication (Recommended)
+
+For enhanced security, the provider supports OAuth2 authentication using two methods:
+
+##### JWT-Based Authentication
+
+This method uses a private key to sign JWTs for authentication:
+
+1. Create an OAuth2 application in your Okta admin console
+2. Configure the application with the required scopes:
+   - `okta.users.read`: Read user information
+   - `okta.devices.read`: Read device information (if collecting devices information is enabled)
+3. Generate a private key (RSA) for the application
+4. Register the corresponding public key with Okta
+5. Configure the provider with the private key
+
+##### Client Secret Authentication
+
+This method uses a client secret for authentication:
+
+1. Create an OAuth2 application in your Okta admin console
+2. Configure the application with the required scopes:
+   - `okta.users.read`: Read user information
+   - `okta.devices.read`: Read device information (if collecting devices information is enabled)
+3. Note the client secret from the application configuration
+4. Configure the provider with the client secret
+
+This authentication method can also be used for OIN (Okta Integration Network) applications, where the client secret is provided as part of the OIN integration setup.
+
+The necessary API permissions need to be granted in Okta in order for the provider to function properly. Devices API access needs to be activated by Okta support.
 
 
 ### How It Works [_how_it_works_4]
@@ -927,7 +960,7 @@ Example device document:
 
 ### Configuration [_configuration_5]
 
-Example configuration:
+Example configuration with API token authentication:
 
 ```yaml
 filebeat.inputs:
@@ -939,8 +972,51 @@ filebeat.inputs:
   enrich_with: ["groups", "roles"]
   sync_interval: "12h"
   update_interval: "30m"
-  okta_domain: "OKTA_DOMAIN"
-  okta_token: "OKTA_TOKEN"
+  okta_domain: "your-domain.okta.com"
+  okta_token: "your-okta-token"
+```
+
+Example configuration with OAuth2 JWT-based authentication:
+
+```yaml
+filebeat.inputs:
+- type: entity-analytics
+  enabled: true
+  id: okta-1
+  provider: okta
+  dataset: "all"
+  enrich_with: ["groups", "roles"]
+  sync_interval: "12h"
+  update_interval: "30m"
+  okta_domain: "your-domain.okta.com"
+  oauth2:
+    enabled: true
+    client.id: "your-client-id"
+    scopes: ["okta.users.read", "okta.devices.read"]
+    token_url: "https://your-domain.okta.com/oauth2/v1/token"
+    okta:
+      jwk_file: "/path/to/private-key.jwk"
+```
+
+Example configuration with OAuth2 client secret authentication:
+
+```yaml
+filebeat.inputs:
+- type: entity-analytics
+  enabled: true
+  id: okta-1
+  provider: okta
+  dataset: "all"
+  enrich_with: ["groups", "roles"]
+  sync_interval: "12h"
+  update_interval: "30m"
+  okta_domain: "your-domain.okta.com"
+  oauth2:
+    enabled: true
+    client.id: "your-client-id"
+    client.secret: "your-client-secret"
+    scopes: ["okta.users.read", "okta.devices.read"]
+    token_url: "https://your-domain.okta.com/oauth2/v1/token"
 ```
 
 The `okta` provider supports the following configuration:
@@ -953,7 +1029,86 @@ The Okta domain. Field is required.
 
 #### `okta_token` [_okta_token]
 
-The Okta secret token, used for authentication. Field is required.
+The Okta secret token, used for authentication. Field is required when using API token authentication.
+
+
+#### `oauth2` [_oauth2]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+OAuth2 configuration for enhanced security authentication. When configured, OAuth2 authentication takes precedence over API token authentication.
+
+##### `oauth2.enabled`
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+Enable OAuth2 authentication. Defaults to true if the oauth2 block is present.
+
+##### `oauth2.client.id`
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+The OAuth2 client ID from your Okta application.
+
+##### `oauth2.client.secret`
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+The OAuth2 client secret from your Okta application.
+
+##### `oauth2.scopes`
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+List of OAuth2 scopes required for the application. Common scopes include:
+- `okta.users.read`: Read user information
+- `okta.devices.read`: Read devices information (if collecting devices information is enabled in `dataset` option)
+
+##### `oauth2.token_url`
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+The OAuth2 token endpoint URL. Typically `https://your-domain.okta.com/oauth2/v1/token`.
+
+##### `oauth2.okta.jwk_file`
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+Path to the JWK file containing the private key.
+
+##### `oauth2.okta.jwk_json`
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+JWK JSON content containing the private key.
+
+##### `oauth2.okta.jwk_pem`
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+PEM-formatted private key content.
+
+::::{note}
+Only one of `oauth2.okta.jwk_file`, `oauth2.okta.jwk_json`, or `oauth2.okta.jwk_pem` must be provided for JWT authentication, or `oauth2.client.secret` must be provided for client secret authentication. The authentication method is automatically determined based on which credentials are provided.
+::::
 
 
 #### `collect_device_details` [_collect_device_details]
@@ -1033,6 +1188,3 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 ::::{note}
 This input is experimental and is under active developement. Configuration options and behaviors may change without warning. Use with caution and do not use in production environments.
 ::::
-
-
-
