@@ -133,12 +133,20 @@ var (
 					"young": c.Dict("young", s.Schema{
 						"collection_count":          c.Int("collection_count"),
 						"collection_time_in_millis": c.Int("collection_time_in_millis"),
-					}),
-					"old": c.Dict("young", s.Schema{
+					}, c.DictOptional),
+					"old": c.Dict("old", s.Schema{
 						"collection_count":          c.Int("collection_count"),
 						"collection_time_in_millis": c.Int("collection_time_in_millis"),
-					}),
-				}),
+					}, c.DictOptional),
+					"zgc_cycles": c.Dict("ZGC Cycles", s.Schema{
+						"collection_count":          c.Int("collection_count"),
+						"collection_time_in_millis": c.Int("collection_time_in_millis"),
+					}, c.DictOptional),
+					"zgc_pauses": c.Dict("ZGC Pauses", s.Schema{
+						"collection_count":          c.Int("collection_count"),
+						"collection_time_in_millis": c.Int("collection_time_in_millis"),
+					}, c.DictOptional),
+				}, c.DictOptional),
 			}),
 		}),
 		"thread_pool": c.Dict("thread_pool", s.Schema{
