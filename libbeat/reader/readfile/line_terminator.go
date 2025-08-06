@@ -46,9 +46,6 @@ const (
 	ParagraphSeparator
 	// NullTerminator
 	NullTerminator
-
-	// BinaryLengthTerminator is a custom terminator defined by the user
-	BinaryLengthTerminator
 )
 
 var (
@@ -63,7 +60,6 @@ var (
 		"line_separator":            LineSeparator,
 		"paragraph_separator":       ParagraphSeparator,
 		"null_terminator":           NullTerminator,
-		"binary_length_terminator":  BinaryLengthTerminator,
 	}
 
 	lineTerminatorCharacters = map[LineTerminator][]byte{
@@ -77,7 +73,6 @@ var (
 		LineSeparator:          []byte("\u2028"),
 		ParagraphSeparator:     []byte("\u2029"),
 		NullTerminator:         []byte{'\u0000'},
-		BinaryLengthTerminator: []byte{'\u0000'},
 	}
 )
 

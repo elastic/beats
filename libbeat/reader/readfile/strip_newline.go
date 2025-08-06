@@ -19,7 +19,6 @@ package readfile
 
 import (
 	"bytes"
-	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 )
@@ -37,8 +36,6 @@ func NewStripNewline(r reader.Reader, terminator LineTerminator) *StripNewline {
 	lineEndingFunc := (*StripNewline).lineEndingChars
 	if terminator == AutoLineTerminator {
 		lineEndingFunc = (*StripNewline).autoLineEndingChars
-	} else if terminator == BinaryLengthTerminator {
-		fmt.Printf("binary length terminator!!\n")
 	}
 
 	return &StripNewline{

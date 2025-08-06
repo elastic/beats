@@ -19,7 +19,6 @@ package readfile
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"time"
 
@@ -49,13 +48,12 @@ type Config struct {
 	// state of appending data after temporarily EOF.
 	CollectOnEOF bool
 
-	Binary *encoding.BinaryEncodingConfig
+	Binary encoding.BinaryEncoding
 }
 
 // NewEncodeReader creates a new Encode reader from input reader by applying
 // the given codec.
 func NewEncodeReader(r io.ReadCloser, config Config, logger *logp.Logger) (EncoderReader, error) {
-	fmt.Println("Creating new EncodeReader with encoding:", config.Codec)
 	eReader, err := NewLineReader(r, config, logger)
 	return EncoderReader{eReader}, err
 }
@@ -65,10 +63,17 @@ func NewEncodeReader(r io.ReadCloser, config Config, logger *logp.Logger) (Encod
 func (r EncoderReader) Next() (reader.Message, error) {
 	c, sz, err := r.reader.Next()
 	// Creating message object
-	fmt.Println("content:", string(bytes.Trim(c, "\xef\xbb\xbf")))
+
+	var content []byte
+	if r.reader.IsBinary() {
+		content = c
+	} else {
+		content = bytes.Trim(c, "\xef\xbb\xbf")
+	}
+
 	return reader.Message{
 		Ts:      time.Now(),
-		Content: bytes.Trim(c, "\xef\xbb\xbf"),
+		Content: content,
 		Bytes:   sz,
 		Fields:  mapstr.M{},
 	}, err

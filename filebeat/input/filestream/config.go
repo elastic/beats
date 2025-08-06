@@ -102,10 +102,9 @@ type readerConfig struct {
 	LineTerminator readfile.LineTerminator `config:"line_terminator"`
 	MaxBytes       int                     `config:"message_max_bytes" validate:"min=0,nonzero"`
 	Tail           bool                    `config:"seek_to_tail"`
+	Binary         encoding.BinaryEncoding `config:"binary"`
 
 	Parsers parser.Config `config:",inline"`
-
-	Binary  *encoding.BinaryEncodingConfig `config:",binary"`
 }
 
 type backoffConfig struct {
@@ -162,7 +161,7 @@ func defaultReaderConfig() readerConfig {
 		LineTerminator: readfile.AutoLineTerminator,
 		MaxBytes:       10 * humanize.MiByte,
 		Tail:           false,
-		Binary:         nil,
+		Binary:         encoding.DefaultBinaryEncoding(),
 	}
 }
 

@@ -118,7 +118,6 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
 
-	fmt.Println("Using encoding...", c.Reader.Encoding)
 	encodingFactory, ok := encoding.FindEncoding(c.Reader.Encoding)
 	if !ok || encodingFactory == nil {
 		return nil, nil, fmt.Errorf("unknown encoding('%v')", c.Reader.Encoding)
@@ -197,8 +196,11 @@ func (inp *filestream) Run(
 	}
 
 	if truncated {
+		log.Infof("file is truncated")
 		state.Offset = 0
 	}
+
+	log.Infof("okay, passed the checks for now")
 
 	metrics.FilesActive.Inc()
 	metrics.HarvesterRunning.Inc()
@@ -222,6 +224,7 @@ func (inp *filestream) Run(
 
 	// The caller of Run already reports the error and filters out errors that
 	// must not be reported, like 'context cancelled'.
+	log.Infof("reading from source now!")
 	err = inp.readFromSource(
 		ctx, log, r, fs.newPath, state, publisher, fs.desc.GZIP, metrics)
 	if err != nil {
@@ -424,10 +427,10 @@ func (inp *filestream) open(
 	fs fileSource,
 	offset int64,
 ) (reader.Reader, bool, error) {
-	fmt.Println("open()", "Opening file:", fs.newPath, "with offset:", offset)
+	log.Infof("open() Opening file: %s with offset: %d\n", fs.newPath, offset)
 	f, encoding, truncated, err := inp.openFile(log, fs.newPath, offset)
-	fmt.Printf("and encoding %v\n", encoding)
 	if err != nil {
+		log.Infof("failed to open with error: %v\n", err)
 		return nil, truncated, err
 	}
 
@@ -460,9 +463,14 @@ func (inp *filestream) open(
 		return nil, truncated, err
 	}
 
-	dbgReader, err := debug.AppendReaders(logReader)
-	if err != nil {
-		return nil, truncated, err
+	var dbgReader io.ReadCloser
+	if inp.readerConfig.Binary.Enabled {
+		dbgReader = logReader
+	} else {
+		dbgReader, err = debug.AppendReaders(logReader)
+		if err != nil {
+			return nil, truncated, err
+		}
 	}
 
 	// Configure MaxBytes limit for EncodeReader as multiplied by 4
@@ -472,7 +480,6 @@ func (inp *filestream) open(
 	encReaderMaxBytes := inp.readerConfig.MaxBytes * 4
 
 	var r reader.Reader
-	fmt.Println("Creating new EncodeReader with encoding:", inp.readerConfig.Encoding)
 	r, err = readfile.NewEncodeReader(dbgReader, readfile.Config{
 		Codec:      encoding,
 		BufferSize: inp.readerConfig.BufferSize,
@@ -486,9 +493,7 @@ func (inp *filestream) open(
 	}
 
 	// if this is a binary file, handle that here
-	if inp.readerConfig.Binary != nil {
-		fmt.Printf("got a binary encoding!\n")
-	} else {
+	if !inp.readerConfig.Binary.Enabled {
 		r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 	}
 
@@ -695,7 +700,7 @@ func (inp *filestream) readFromSource(
 			return nil
 		}
 
-		// sate offset increase
+		// save offset increase
 		s.Offset += int64(message.Bytes) + int64(message.Offset)
 
 		flags, err := message.Fields.GetValue("log.flags")

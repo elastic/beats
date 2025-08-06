@@ -22,6 +22,7 @@ import (
 	"compress/gzip"
 	"errors"
 	"fmt"
+	"encoding/hex"
 	"io"
 
 	"golang.org/x/text/transform"
@@ -53,16 +54,15 @@ type LineReader struct {
 	tempBuffer   []byte
 	logger       *logp.Logger
 
-	binenc       encoding.BinaryEncodingConfig
+	binenc       encoding.BinaryEncoding
 }
 
 // NewLineReader creates a new reader object
 func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*LineReader, error) {
-	if config.Terminator == BinaryLengthTerminator {
+	if config.Binary.Enabled {
 		return newBinaryReader(input, config, logger)
 	}
 
-	fmt.Println("Creating new LineReader with encoding")
 	encoder := config.Codec.NewEncoder()
 
 	// Create newline char based on encoding
@@ -93,8 +93,8 @@ func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*Li
 func newBinaryReader(input io.ReadCloser, config Config, logger *logp.Logger) (*LineReader, error) {
 	fmt.Println("Creating new (Binary)LineReader with encoding")
 
-	if config.Binary == nil {
-		return nil, fmt.Errorf("Missing Binary Encoding Config")
+	if err := config.Binary.Validate(); err != nil {
+		return nil, err
 	}
 
 	var nl []byte
@@ -111,8 +111,12 @@ func newBinaryReader(input io.ReadCloser, config Config, logger *logp.Logger) (*
 		outBuffer:    streambuf.New(nil),
 		tempBuffer:   make([]byte, config.BufferSize),
 		logger:       logger.Named("reader_line"),
-		binenc:       *config.Binary,
+		binenc:       config.Binary,
 	}, nil
+}
+
+func (r LineReader) IsBinary() bool {
+	return r.binenc.Enabled
 }
 
 // Next reads the next line until the new line character.  The return
@@ -122,6 +126,10 @@ func newBinaryReader(input io.ReadCloser, config Config, logger *logp.Logger) (*
 // configured with maxBytes n may be larger than the length of b due
 // to skipped lines.
 func (r *LineReader) Next() (b []byte, n int, err error) {
+	if r.binenc.Enabled {
+		return r.binaryNext()
+	}
+
 	// This loop is need in case advance detects an line ending which turns out
 	// not to be one when decoded. If that is the case, reading continues.
 	for {
@@ -201,17 +209,146 @@ func (r *LineReader) Next() (b []byte, n int, err error) {
 	return bytes, sz, nil
 }
 
-func (r *LineReader) binaryAdvance() error {
-	if r.binenc == nil {
-		return fmt.Errorf("No configured binary encoding information!")
+func (r *LineReader) binaryNext() (b []byte, n int, err error) {
+	// This loop is need in case advance detects an line ending which turns out
+	// not to be one when decoded. If that is the case, reading continues.
+	// read next 'potential' line from input buffer/reader
+	err = r.binaryAdvance()
+	if err != nil {
+		if errors.Is(err, io.EOF) && r.collectOnEOF {
+			// Found EOF and collectOnEOF is true
+			// -> decode input sequence into outBuffer
+			end := r.inBuffer.Len()
+
+			sz, err := r.decode(end)
+			if err != nil {
+				r.logger.Errorf("Error decoding line: %s", err)
+				// In case of error increase size by unencoded length
+				sz = r.inBuffer.Len()
+			}
+
+			// Consume transformed bytes from input buffer
+			_ = r.inBuffer.Advance(sz)
+			r.inBuffer.Reset()
+
+			// output buffer contains until EOF. Extract
+			// byte slice from buffer and reset output buffer.
+			bytes, err := r.outBuffer.Collect(r.outBuffer.Len())
+			r.outBuffer.Reset()
+			if err != nil {
+				// This should never happen as otherwise we have a broken state
+				panic(err)
+			}
+
+			// return and reset consumed bytes count
+			sz = r.byteCount
+			r.byteCount = 0
+			return bytes, sz, io.EOF
+		}
+
+		// return and reset consumed bytes count
+		sz := r.byteCount
+		r.byteCount = 0
+		return nil, sz, err
 	}
 
-	length := p.binenc.offset + p.binenc.length
+	// output buffer contains complete message. Extract
+	// byte slice from buffer and reset output buffer.
+	bytes, err := r.outBuffer.Collect(r.outBuffer.Len())
+	r.outBuffer.Reset()
+	if err != nil {
+		// This should never happen as otherwise we have a broken state
+		panic(err)
+	}
 
-	if r.inBuffer.Len() < length {
+	// return and reset consumed bytes count
+	sz := r.byteCount
+	r.byteCount = 0
+	r.logger.Infof("next produced [%d] bytes, which is [%s]",
+		sz, hex.EncodeToString(bytes))
+	return bytes, sz, nil
+}
 
+func (r *LineReader) fillBufferTo(length int) error {
+	numRead := r.inBuffer.Len()
+
+	for numRead < length {
+		// Try to read more bytes into buffer
+		n, err := r.reader.Read(r.tempBuffer)
+
+		if (errors.Is(err, io.EOF) || errors.Is(err, gzip.ErrChecksum)) && n > 0 {
+			// Continue processing the returned bytes. The next call will yield
+			// EOF with 0 bytes.
+			err = nil
+		}
+		// Write to buffer also in case of err
+		_, _ = r.inBuffer.Write(r.tempBuffer[:n])
+
+		if err != nil {
+			return err
+		}
+
+		// Empty read => return buffer error (more bytes required error)
+		if n == 0 {
+			return streambuf.ErrNoMoreBytes
+		}
+
+		numRead += n
 	}
 	return nil
+
+}
+
+func (r *LineReader) binaryAdvance() error {
+	if !r.binenc.Enabled {
+		panic("somehow we're processing a file as binary when we didn't enable it")
+	}
+
+	length := r.binenc.MinimumLength()
+
+	idx := r.inOffset
+
+	// loop while we don't have enough in the buffer to cover the length
+	if r.inBuffer.Len() < length {
+		if err := r.fillBufferTo(length); err != nil {
+			return err
+		}
+	}
+
+	length, err := r.binenc.GetMessageLength(r.inBuffer.Bytes())
+
+	if err != nil {
+		return err
+	}
+
+	if err = r.fillBufferTo(length); err != nil {
+		return err
+	}
+
+	sz, err := r.decode(length)
+	if err != nil {
+		r.logger.Infof("failed to decode: %d :: %v\n",
+			sz, err)
+		return err
+	}
+	r.logger.Infof("decoded [%d], of expected [%d]", sz, length)
+	if sz != length {
+		return encoding.NewBinaryDecodeError(
+			fmt.Sprintf("Error in decoding: should have processed [%d] bytes, but transformed [%d]", length, sz))
+	}
+
+	// Consume transformed bytes from input buffer
+	err = r.inBuffer.Advance(sz)
+	r.inBuffer.Reset()
+
+	// Continue scanning input buffer from last position + 1
+	r.inOffset = idx - sz
+	if r.inOffset < 0 {
+		// Fix inOffset if newline has encoding > 8bits + firl line has been decoded
+		r.inOffset = 0
+	}
+
+	return err
 }
 
 // Reads from the buffer until a new line character is detected
@@ -230,7 +367,6 @@ func (r *LineReader) advance() error {
 
 		// Try to read more bytes into buffer
 		n, err := r.reader.Read(r.tempBuffer)
-		fmt.Println("Reading from input, n:", n, "err:", err)
 
 		if (errors.Is(err, io.EOF) || errors.Is(err, gzip.ErrChecksum)) && n > 0 {
 			// Continue processing the returned bytes. The next call will yield
