@@ -30,6 +30,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-system-metrics/dev-tools/systemtests"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
@@ -182,12 +183,14 @@ func TestParseProcStat(t *testing.T) {
 
 func TestCgroupsBadCgroupsConfig(t *testing.T) {
 	rootfs := systemtests.DockerTestResolver()
-	_ = logp.DevelopmentSetup(logp.ToObserverOutput())
-	testStats := Stats{CPUTicks: true,
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
+	testStats := Stats{
+		CPUTicks:      true,
 		EnableCgroups: true,
 		EnableNetwork: true,
 		Hostfs:        rootfs,
 		Procs:         []string{".*"},
+		logger:        logger,
 		CgroupOpts:    cgroup.ReaderOptions{RootfsMountpoint: resolve.NewTestResolver("testdata")}, // procs here have no cgroup data, leading to errors
 	}
 	err := testStats.Init()
@@ -202,7 +205,7 @@ func TestCgroupsBadCgroupsConfig(t *testing.T) {
 	t.Logf("got %d procs", len(procs))
 	require.NotEmpty(t, procs)
 
-	gotLogs := logp.ObserverLogs().TakeAll()
+	gotLogs := observedLogs.TakeAll()
 	// check to see if we got the "correct" error message
 	foundLogEntry := false
 

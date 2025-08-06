@@ -157,7 +157,9 @@ var PidStates = map[byte]PidState{
 // Init initializes a Stats instance. It returns errors if the provided process regexes
 // cannot be compiled.
 func (procStats *Stats) Init() error {
-	procStats.logger = logp.NewLogger("processes")
+	if procStats.logger == nil {
+		procStats.logger = logp.NewLogger("processes")
+	}
 	var err error
 	procStats.host, err = sysinfo.Host()
 	if err != nil {
