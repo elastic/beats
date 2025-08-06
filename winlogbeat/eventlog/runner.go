@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
@@ -39,6 +40,7 @@ type Publisher interface {
 func Run(
 	reporter status.StatusReporter,
 	ctx context.Context,
+	metricsRegistry *monitoring.Registry,
 	api EventLog,
 	evtCheckpoint checkpoint.EventLogState,
 	publisher Publisher,
@@ -47,11 +49,13 @@ func Run(
 	reporter.UpdateStatus(status.Starting, fmt.Sprintf("Starting to read from %s", api.Channel()))
 	// setup closing the API if either the run function is signaled asynchronously
 	// to shut down or when returning after io.EOF
-	cancelCtx, cancelFn := ctxtool.WithFunc(ctx, func() {
-		if err := api.Close(); err != nil {
-			log.Errorw("error while closing Windows Event Log access", "error", err)
-		}
-	})
+	cancelCtx, cancelFn := ctxtool.WithFunc(
+		ctx,
+		func() {
+			if err := api.Close(); err != nil {
+				log.Errorw("error while closing Windows Event Log access", "error", err)
+			}
+		})
 	defer cancelFn()
 
 	openErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
@@ -77,7 +81,7 @@ func Run(
 
 runLoop:
 	for cancelCtx.Err() == nil {
-		openErr := api.Open(evtCheckpoint)
+		openErr := api.Open(evtCheckpoint, metricsRegistry)
 		if openErr != nil {
 			if openErrHandler.backoff(cancelCtx, openErr) {
 				continue runLoop
