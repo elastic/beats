@@ -197,6 +197,16 @@ func newClient(ctx context.Context, cfg conf, log *logp.Logger) (*http.Client, e
 
 	c.CheckRedirect = checkRedirect(cfg.Request, log)
 
+	// If OAuth2 is configured, use OAuth2 client
+	if cfg.OAuth2 != nil && cfg.OAuth2.isEnabled() {
+		oauthClient, err := cfg.OAuth2.fetchOktaOauthClient(ctx, c)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create OAuth2 client: %w", err)
+		}
+		return oauthClient, nil
+	}
+
+	// Fall back to retryable HTTP client for API token authentication
 	client := &retryablehttp.Client{
 		HTTPClient:   c,
 		Logger:       newRetryLog(log),
@@ -481,7 +491,7 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 		lastUpdated time.Time
 	)
 	for {
-		batch, h, err := okta.GetUserDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", query, omit, p.lim, p.logger)
+		batch, h, err := okta.GetUserDetails(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), "", query, omit, p.lim, p.logger)
 		if err != nil {
 			p.logger.Debugf("received %d users from API", n)
 			return err
@@ -542,7 +552,7 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 		return su
 	}
 	if slices.Contains(p.cfg.EnrichWith, "groups") {
-		groups, _, err := okta.GetUserGroupDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, u.ID, p.lim, p.logger)
+		groups, _, err := okta.GetUserGroupDetails(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), u.ID, p.lim, p.logger)
 		if err != nil {
 			p.logger.Warnf("failed to get user group membership for %s: %v", u.ID, err)
 		} else {
@@ -550,7 +560,7 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 		}
 	}
 	if slices.Contains(p.cfg.EnrichWith, "factors") {
-		factors, _, err := okta.GetUserFactors(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, u.ID, p.lim, p.logger)
+		factors, _, err := okta.GetUserFactors(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), u.ID, p.lim, p.logger)
 		if err != nil {
 			p.logger.Warnf("failed to get user factors for %s: %v", u.ID, err)
 		} else {
@@ -558,7 +568,7 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 		}
 	}
 	if slices.Contains(p.cfg.EnrichWith, "roles") {
-		roles, _, err := okta.GetUserRoles(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, u.ID, p.lim, p.logger)
+		roles, _, err := okta.GetUserRoles(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), u.ID, p.lim, p.logger)
 		if err != nil {
 			p.logger.Warnf("failed to get user roles for %s: %v", u.ID, err)
 		} else {
@@ -618,7 +628,7 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 		lastUpdated time.Time
 	)
 	for {
-		batch, h, err := okta.GetDeviceDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", deviceQuery, p.lim, p.logger)
+		batch, h, err := okta.GetDeviceDetails(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), "", deviceQuery, p.lim, p.logger)
 		if err != nil {
 			p.logger.Debugf("received %d devices from API", n)
 			return err
@@ -637,7 +647,7 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 
 				const omit = okta.OmitCredentials | okta.OmitCredentialsLinks | okta.OmitTransitioningToStatus
 
-				users, h, err := okta.GetDeviceUsers(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, d.ID, userQuery, omit, p.lim, p.logger)
+				users, h, err := okta.GetDeviceUsers(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), d.ID, userQuery, omit, p.lim, p.logger)
 				if err != nil {
 					p.logger.Debugf("received %d device users from API", len(users))
 					return err
@@ -805,4 +815,15 @@ func (p *oktaInput) publishDevice(d *Device, state *stateStore, inputID string, 
 	p.logger.Debugf("Publishing device %q", d.ID)
 
 	client.Publish(event)
+}
+
+// getAuthToken returns the appropriate authentication token for API calls.
+// For OAuth2 authentication, it returns an empty string since the OAuth2 client
+// handles authentication automatically. For API token authentication, it returns
+// the configured token.
+func (p *oktaInput) getAuthToken() string {
+	if p.cfg.OAuth2 != nil && p.cfg.OAuth2.isEnabled() {
+		return ""
+	}
+	return p.cfg.OktaToken
 }
