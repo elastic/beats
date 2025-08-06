@@ -99,6 +99,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add NTP metricset to system module. {pull}44884[44884]
 - Add VPN metrics to meraki module {pull}44851[44851]
 - Improve error messages in AWS Health {pull}45408[45408]
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
 
 *Osquerybeat*
 
@@ -261,6 +262,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix unexpected EOF detection and improve memory usage. {pull}44813[44813]
 - Fixed issue for "Root level readerConfig no longer respected" in azureblobstorage input. {issue}44812[44812] {pull}44873[44873]
 - Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
+- Fix a panic in the winlog input that prevented it from starting. {issue}45693[45693] {pull}45730[45730]
+- Fix error handling in ABS input when both root level `max_workers` and `batch_size` are empty. {issue}45680[45680] {pull}45743[45743]
 
 *Heartbeat*
 
@@ -336,6 +339,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Publish cloud.availability_zone by add_cloud_metadata processor in azure environments {issue}42601[42601] {pull}43618[43618]
 - Added the `now` processor, which will populate the specified target field with the current timestamp. {pull}44795[44795]
+- Improve trimming of BOM from UTF-8 data in the libbeat reader/readfile.EncoderReader. {pull}45742[45742]
 
 *Auditbeat*
 

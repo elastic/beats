@@ -261,6 +261,25 @@ func TestSnapshotWithNestedInputs(t *testing.T) {
 	assert.Equal(t, want, got, "Reported input metrics didn't match expected value")
 }
 
+func TestFindInputRegistryWithID(t *testing.T) {
+	logger := logp.NewNopLogger()
+	root := monitoring.NewRegistry()
+	regA := NewMetricsRegistry("input-a", InputNested, root, logger)
+	NewMetricsRegistry("input-b", "winlog", regA, logger)
+	NewMetricsRegistry("input.c", "winlog", regA, logger)
+	NewMetricsRegistry("input-a::input-d", "winlog", regA, logger)
+	NewMetricsRegistry("input-e", "winlog", root, logger)
+
+	// findInputRegistryWithID should succeed on all id parameters above,
+	// whether they are at top level, nested, or contain other inputs nested
+	// inside them, and whether or not they have periods (which are not allowed
+	// in registry keys).
+	expectedIDs := []string{"input-a", "input-b", "input.c", "input-a::input-d", "input-e"}
+	for _, id := range expectedIDs {
+		assert.NotNil(t, findInputRegistryWithID(root, id), "findInputRegistryWithID should return a non-nil registry for id "+id)
+	}
+}
+
 func TestNewMetricsRegistry(t *testing.T) {
 	parent := monitoring.NewRegistry()
 	inputID := "input-inputID"
