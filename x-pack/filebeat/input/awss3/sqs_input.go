@@ -71,8 +71,9 @@ func (in *sqsReaderInput) Run(
 	pipeline beat.Pipeline,
 ) error {
 	in.status = newCWStateReporter(inputContext, inputContext.Logger)
-	// TODO: defer call "Stopped" status here
-	// TODO: report "Starting" status here
+	defer in.status.UpdateStatus(status.Stopped, "Input stopped")
+	in.status.UpdateStatus(status.Starting, "Input starting")
+
 	// Initialize everything for this run
 	err := in.setup(inputContext, pipeline)
 	if err != nil {
