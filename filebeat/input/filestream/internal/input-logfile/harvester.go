@@ -28,7 +28,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -203,7 +202,6 @@ func startHarvester(
 				ctx.Logger.Debug("Harvester already running")
 				return nil
 			}
-			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("error while adding new reader to the bookkeeper %v", err))
 			return fmt.Errorf("error while adding new reader to the bookkeeper %w", err)
 		}
 
@@ -221,7 +219,6 @@ func startHarvester(
 		resource, err := lock(ctx, hg.store, srcID)
 		if err != nil {
 			hg.readers.remove(srcID)
-			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("error while locking resource: %v", err))
 			return fmt.Errorf("error while locking resource: %w", err)
 		}
 		defer releaseResource(resource)
@@ -231,7 +228,6 @@ func startHarvester(
 		})
 		if err != nil {
 			hg.readers.remove(srcID)
-			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("error while connecting to output with pipeline: %v", err))
 			return fmt.Errorf("error while connecting to output with pipeline: %w", err)
 		}
 		defer client.Close()
@@ -244,7 +240,6 @@ func startHarvester(
 		err = hg.harvester.Run(ctx, src, cursor, publisher, metrics)
 		if err != nil && !errors.Is(err, context.Canceled) {
 			hg.readers.remove(srcID)
-			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("error while running harvester: %v", err))
 			return fmt.Errorf("error while running harvester: %w", err)
 		}
 		// If the context was not cancelled it means that the Harvester is stopping because of
