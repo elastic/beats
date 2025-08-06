@@ -264,6 +264,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
 - Fix a panic in the winlog input that prevented it from starting. {issue}45693[45693] {pull}45730[45730]
 - Fix wrongly emitted missing input ID warning {issue}42969[42969] {pull}45747[45747]
+- Fix error handling in ABS input when both root level `max_workers` and `batch_size` are empty. {issue}45680[45680] {pull}45743[45743]
 
 *Heartbeat*
 
@@ -339,6 +340,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Publish cloud.availability_zone by add_cloud_metadata processor in azure environments {issue}42601[42601] {pull}43618[43618]
 - Added the `now` processor, which will populate the specified target field with the current timestamp. {pull}44795[44795]
+- Improve trimming of BOM from UTF-8 data in the libbeat reader/readfile.EncoderReader. {pull}45742[45742]
 
 *Auditbeat*
 
