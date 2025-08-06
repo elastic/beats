@@ -240,7 +240,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	// from mito/lib, a global, useragent, is available to use
 	// in requests.
 	err = periodically(ctx, cfg.Interval, func() error {
-		log.Info("process repeated request")
+		log.Info("process periodic request")
 		var (
 			budget    = *cfg.MaxExecutions
 			waitUntil time.Time
@@ -561,7 +561,10 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			// Check we have a remaining execution budget.
 			budget--
 			if budget <= 0 {
-				log.Warnw("exceeding maximum number of CEL executions", "limit", *cfg.MaxExecutions)
+				log.Warnw("exceeding maximum number of CEL executions: will continue at next periodic evaluation",
+					"limit", *cfg.MaxExecutions,
+					"next_eval_time", start.Add(cfg.Interval),
+				)
 				env.UpdateStatus(status.Degraded, "exceeding maximum number of CEL executions")
 				return nil
 			}
