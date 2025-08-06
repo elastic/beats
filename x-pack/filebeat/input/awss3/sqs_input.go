@@ -171,7 +171,6 @@ func (in *sqsReaderInput) run(ctx context.Context) {
 	}.run(graceCtx)
 
 	in.startWorkers(ctx, graceCtx)
-	in.status.UpdateStatus(status.Running, "Input is running")
 	in.readerLoop(ctx)
 
 	in.workerWg.Wait()
@@ -200,7 +199,7 @@ func (in *sqsReaderInput) readerLoop(ctx context.Context) {
 		// Block to wait for more requests if requestCount is zero
 		requestCount += channelRequestCount(ctx, in.workRequestChan, requestCount == 0)
 
-		msgs := readSQSMessages(ctx, in.log, in.sqs, in.metrics, requestCount)
+		msgs := readSQSMessages(ctx, in.log, in.status, in.sqs, in.metrics, requestCount)
 
 		for _, msg := range msgs {
 			select {
@@ -314,6 +313,10 @@ func (w *sqsWorker) processMessage(ctx context.Context, msg types.Message) {
 }
 
 func (in *sqsReaderInput) startWorkers(ctx, graceCtx context.Context) {
+	// setting to a "running" state here before async worker launches commence.
+	// this is so a degraded state during async launch doesn't get overwritten by a "running" state.
+	in.status.UpdateStatus(status.Running, "Input is running")
+
 	// Start the worker goroutines that will fetch messages via workRequestChan
 	// and workResponseChan until the input shuts down.
 	for i := 0; i < in.config.NumberOfWorkers; i++ {
@@ -322,6 +325,9 @@ func (in *sqsReaderInput) startWorkers(ctx, graceCtx context.Context) {
 			worker, err := in.newSQSWorker()
 			if err != nil {
 				in.log.Error(err)
+				// will likely cover auth failures, network connectivity errors
+				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("An SQS worker's setup failed, error: %s", err.Error()))
+				// TODO: re-attempt worker initialization if it fails and address newSQSWorker() setting of the workerWg.Done()
 				return
 			}
 			go worker.run(ctx, graceCtx)
