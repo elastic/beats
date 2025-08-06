@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
 
@@ -114,8 +115,9 @@ http.port: %d
 		},
 		2*time.Minute, 1*time.Second, fmt.Sprintf("Number of hits %d not equal to number of events %d", filebeatDocs.Hits.Total.Value, numEvents))
 
-	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
-	otelDoc := otelDocs.Hits.Hits[0].Source
+	var filebeatDoc, otelDoc mapstr.M
+	filebeatDoc = filebeatDocs.Hits.Hits[0].Source
+	otelDoc = otelDocs.Hits.Hits[0].Source
 	ignoredFields := []string{
 		// Expected to change between agentDocs and OtelDocs
 		"@timestamp",
@@ -129,8 +131,11 @@ http.port: %d
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
-	assert.Equal(t, "filebeatreceiver", otelDoc["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-	assert.Equal(t, "receiver", otelDoc["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
+
+	assert.Equal(t, "filebeatreceiver", otelDoc.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
+	assert.Equal(t, "receiver", otelDoc.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
+	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in filebeat log record")
+	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in filebeat log record")
 	assertMonitoring(t, 5066)
 }
 
@@ -449,8 +454,9 @@ http.port: %d
 		},
 		2*time.Minute, 1*time.Second, "expected at least %d events, got filebeat: %d and otel: %d", wantEvents, filebeatDocs.Hits.Total.Value, otelDocs.Hits.Total.Value)
 
-	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
-	otelDoc := otelDocs.Hits.Hits[0].Source
+	var filebeatDoc, otelDoc mapstr.M
+	filebeatDoc = filebeatDocs.Hits.Hits[0].Source
+	otelDoc = otelDocs.Hits.Hits[0].Source
 	ignoredFields := []string{
 		// Expected to change between agentDocs and OtelDocs
 		"@timestamp",
@@ -464,8 +470,10 @@ http.port: %d
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
-	assert.Equal(t, "filebeatreceiver/filestream", otelDoc["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
-	assert.Equal(t, "receiver", otelDoc["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
+	assert.Equal(t, "filebeatreceiver/filestream", otelDoc.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
+	assert.Equal(t, "receiver", otelDoc.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
+	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in filebeat log record")
+	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in filebeat log record")
 	assertMonitoring(t, otelConfig.MonitoringPort)
 	assertMonitoring(t, 5067) // filebeat
 }
