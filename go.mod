@@ -238,6 +238,7 @@ require (
 )
 
 require (
+	go.opentelemetry.io/collector/exporter v0.130.0
 	go.opentelemetry.io/collector/processor v1.36.0
 	go.opentelemetry.io/collector/processor/processorhelper v0.130.0
 	go.opentelemetry.io/otel/sdk/metric v1.37.0
@@ -435,7 +436,6 @@ require (
 	go.opentelemetry.io/collector/consumer/consumererror/xconsumererror v0.130.0 // indirect
 	go.opentelemetry.io/collector/consumer/consumertest v0.130.0 // indirect
 	go.opentelemetry.io/collector/consumer/xconsumer v0.130.0 // indirect
-	go.opentelemetry.io/collector/exporter v0.130.0 // indirect
 	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.130.0 // indirect
 	go.opentelemetry.io/collector/exporter/exportertest v0.130.0 // indirect
 	go.opentelemetry.io/collector/exporter/xexporter v0.130.0 // indirect
