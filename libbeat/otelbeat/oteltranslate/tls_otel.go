@@ -35,6 +35,7 @@ import (
 // ssl.supported_protocols -> partially supported
 // ssl.restart_on_cert_change.*
 // ssl.renegotiation
+// NOTE: ca_trusted_fingerprint, ca_sha256 and verification_modes are supported by beatsauthextension
 func validateUnsupportedConfig(tlscfg *tlscommon.Config) error {
 	if len(tlscfg.CurveTypes) > 0 {
 		return errors.New("ssl.curve_types is currently not supported")
