@@ -263,6 +263,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed issue for "Root level readerConfig no longer respected" in azureblobstorage input. {issue}44812[44812] {pull}44873[44873]
 - Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
 - Fix a panic in the winlog input that prevented it from starting. {issue}45693[45693] {pull}45730[45730]
+- Fix error handling in ABS input when both root level `max_workers` and `batch_size` are empty. {issue}45680[45680] {pull}45743[45743]
 
 *Heartbeat*
 
