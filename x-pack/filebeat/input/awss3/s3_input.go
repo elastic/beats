@@ -146,6 +146,7 @@ func (in *s3PollerInput) runPoll(ctx context.Context) {
 	err := in.states.CleanUp(ids)
 	if err != nil {
 		in.log.Errorf("failed to cleanup states: %v", err.Error())
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Input state cleanup failure: %s", err.Error()))
 	}
 }
 
@@ -185,9 +186,9 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 		if errors.Is(err, errS3DownloadFailed) {
 			// Download errors are ephemeral. Add a backoff delay, then skip to the
 			// next iteration so we don't mark the object as permanently failed.
-			in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Download failure: %s", err.Error()))
-			prevIterationFailed = true
+			in.status.UpdateStatus(status.Degraded, fmt.Sprintf("S3 download failure: %s", err.Error()))
 			rateLimitWaiter.Wait()
+			prevIterationFailed = true
 			continue
 		}
 		// Reset the rate limit delay on results that aren't download errors.
@@ -197,7 +198,7 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 		if err != nil {
 			in.log.Errorf("failed processing S3 event for object key %q in bucket %q: %v",
 				state.Key, state.Bucket, err.Error())
-
+			in.status.UpdateStatus(status.Degraded, fmt.Sprintf("S3 object processing failure: %s", err.Error()))
 			// Non-retryable error.
 			state.Failed = true
 		} else {
@@ -209,6 +210,7 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 			err := in.states.AddState(state)
 			if err != nil {
 				in.log.Errorf("saving completed object state: %v", err.Error())
+				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failure saving completed object state: %s", err.Error()))
 			}
 
 			// Metrics
@@ -240,12 +242,14 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 
 		if err != nil {
 			in.log.Warnw("Error when paginating listing.", "error", err)
+			in.status.UpdateStatus(status.Degraded, fmt.Sprintf("S3 pagination error: %s", err.Error()))
 			// QuotaExceededError is client-side rate limiting in the AWS sdk,
 			// don't include it in the circuit breaker count
 			if !errors.As(err, &ratelimit.QuotaExceededError{}) {
 				circuitBreaker++
 				if circuitBreaker >= readerLoopMaxCircuitBreaker {
 					in.log.Warnw(fmt.Sprintf("%d consecutive error when paginating listing, breaking the circuit.", circuitBreaker), "error", err)
+					in.status.UpdateStatus(status.Failed, fmt.Sprintf("Too many consecutive errors (%d) in S3 pagination. Error: %s", circuitBreaker, err.Error()))
 					return nil, false
 				}
 			}
