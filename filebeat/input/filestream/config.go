@@ -94,17 +94,21 @@ type stateChangeCloserConfig struct {
 }
 
 type readerConfig struct {
-	Backoff        backoffConfig           `config:"backoff"`
-	BufferSize     int                     `config:"buffer_size"`
-	Encoding       string                  `config:"encoding"`
-	ExcludeLines   []match.Matcher         `config:"exclude_lines"`
-	IncludeLines   []match.Matcher         `config:"include_lines"`
-	LineTerminator readfile.LineTerminator `config:"line_terminator"`
-	MaxBytes       int                     `config:"message_max_bytes" validate:"min=0,nonzero"`
-	Tail           bool                    `config:"seek_to_tail"`
-	Binary         encoding.BinaryEncoding `config:"binary"`
+	Backoff        backoffConfig            `config:"backoff"`
+	BufferSize     int                      `config:"buffer_size"`
+	Encoding       string                   `config:"encoding"`
+	ExcludeLines   []match.Matcher          `config:"exclude_lines"`
+	IncludeLines   []match.Matcher          `config:"include_lines"`
+	LineTerminator readfile.LineTerminator  `config:"line_terminator"`
+	MaxBytes       int                      `config:"message_max_bytes" validate:"min=0,nonzero"`
+	Tail           bool                     `config:"seek_to_tail"`
+	Binary         *encoding.BinaryEncoding `config:"binary"`
 
 	Parsers parser.Config `config:",inline"`
+}
+
+func (r readerConfig) IsBinary() bool {
+	return r.Binary != nil && r.Binary.Enabled
 }
 
 type backoffConfig struct {
@@ -161,7 +165,7 @@ func defaultReaderConfig() readerConfig {
 		LineTerminator: readfile.AutoLineTerminator,
 		MaxBytes:       10 * humanize.MiByte,
 		Tail:           false,
-		Binary:         encoding.DefaultBinaryEncoding(),
+		Binary:         nil,
 	}
 }
 

@@ -59,7 +59,7 @@ type LineReader struct {
 
 // NewLineReader creates a new reader object
 func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*LineReader, error) {
-	if config.Binary.Enabled {
+	if nil != config.Binary && config.Binary.Enabled {
 		return newBinaryReader(input, config, logger)
 	}
 
@@ -91,8 +91,6 @@ func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*Li
 }
 
 func newBinaryReader(input io.ReadCloser, config Config, logger *logp.Logger) (*LineReader, error) {
-	fmt.Println("Creating new (Binary)LineReader with encoding")
-
 	if err := config.Binary.Validate(); err != nil {
 		return nil, err
 	}
@@ -111,7 +109,7 @@ func newBinaryReader(input io.ReadCloser, config Config, logger *logp.Logger) (*
 		outBuffer:    streambuf.New(nil),
 		tempBuffer:   make([]byte, config.BufferSize),
 		logger:       logger.Named("reader_line"),
-		binenc:       config.Binary,
+		binenc:       *config.Binary,
 	}, nil
 }
 

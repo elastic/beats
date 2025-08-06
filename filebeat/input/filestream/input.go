@@ -464,7 +464,7 @@ func (inp *filestream) open(
 	}
 
 	var dbgReader io.ReadCloser
-	if inp.readerConfig.Binary.Enabled {
+	if inp.readerConfig.IsBinary() {
 		dbgReader = logReader
 	} else {
 		dbgReader, err = debug.AppendReaders(logReader, log)
@@ -493,7 +493,7 @@ func (inp *filestream) open(
 	}
 
 	// if this is a binary file, handle that here
-	if !inp.readerConfig.Binary.Enabled {
+	if !inp.readerConfig.IsBinary() {
 		r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 	}
 

@@ -48,7 +48,7 @@ type Config struct {
 	// state of appending data after temporarily EOF.
 	CollectOnEOF bool
 
-	Binary encoding.BinaryEncoding
+	Binary *encoding.BinaryEncoding
 }
 
 // NewEncodeReader creates a new Encode reader from input reader by applying
