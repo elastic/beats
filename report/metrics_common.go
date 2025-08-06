@@ -19,28 +19,12 @@ package report
 
 import (
 	"time"
-
-	"github.com/gofrs/uuid/v5"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
-	ephemeralID uuid.UUID
-	startTime   time.Time
+	startTime time.Time
 )
 
 func init() {
 	startTime = time.Now()
-
-	var err error
-	ephemeralID, err = uuid.NewV4()
-	if err != nil {
-		logp.Err("Error while generating ephemeral ID for Beat")
-	}
-}
-
-// EphemeralID returns generated EphemeralID
-func EphemeralID() uuid.UUID {
-	return ephemeralID
 }

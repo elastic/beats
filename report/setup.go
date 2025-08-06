@@ -40,7 +40,7 @@ var (
 const monitoringCgroupsHierarchyOverride = "LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE"
 
 // SetupMetrics creates a basic suite of metrics handlers for monitoring, including build info and system resources
-func SetupMetrics(logger *logp.Logger, name, version string, systemMetrics *monitoring.Registry, processMetrics *monitoring.Registry) error {
+func SetupMetrics(logger *logp.Logger, name, version, ephemeralID string, systemMetrics *monitoring.Registry, processMetrics *monitoring.Registry) error {
 	monitoring.NewFunc(systemMetrics, "cpu", ReportSystemCPUUsage, monitoring.Report)
 
 	name = processName(name)
@@ -60,7 +60,7 @@ func SetupMetrics(logger *logp.Logger, name, version string, systemMetrics *moni
 	monitoring.NewFunc(processMetrics, "memstats", MemStatsReporter(logger, processStats), monitoring.Report)
 	monitoring.NewFunc(processMetrics, "cpu", InstanceCPUReporter(logger, processStats), monitoring.Report)
 	monitoring.NewFunc(processMetrics, "runtime", ReportRuntime, monitoring.Report)
-	monitoring.NewFunc(processMetrics, "info", infoReporter(name, version), monitoring.Report)
+	monitoring.NewFunc(processMetrics, "info", infoReporter(name, version, ephemeralID), monitoring.Report)
 
 	setupPlatformSpecificMetrics(logger, processStats, systemMetrics, processMetrics)
 
@@ -88,7 +88,7 @@ func isWindows() bool {
 	return runtime.GOOS == "windows"
 }
 
-func infoReporter(serviceName, version string) func(_ monitoring.Mode, V monitoring.Visitor) {
+func infoReporter(serviceName, version, ephemeralID string) func(_ monitoring.Mode, V monitoring.Visitor) {
 	return func(_ monitoring.Mode, V monitoring.Visitor) {
 		V.OnRegistryStart()
 		defer V.OnRegistryFinished()
@@ -99,7 +99,7 @@ func infoReporter(serviceName, version string) func(_ monitoring.Mode, V monitor
 			monitoring.ReportInt(V, "ms", uptime)
 		})
 
-		monitoring.ReportString(V, "ephemeral_id", ephemeralID.String())
+		monitoring.ReportString(V, "ephemeral_id", ephemeralID)
 		monitoring.ReportString(V, "name", serviceName)
 		monitoring.ReportString(V, "version", version)
 	}

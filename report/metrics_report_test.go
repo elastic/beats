@@ -32,7 +32,7 @@ import (
 func TestSystemMetricsReport(t *testing.T) {
 	systemMetrics := monitoring.NewRegistry()
 	processMetrics := monitoring.NewRegistry()
-	err := SetupMetrics(logptest.NewTestingLogger(t, ""), "TestSys", "test", systemMetrics, processMetrics)
+	err := SetupMetrics(logptest.NewTestingLogger(t, ""), "TestSys", "test", "", systemMetrics, processMetrics)
 	require.NoError(t, err)
 
 	var gotCPU, gotMem, gotInfo atomic.Bool

@@ -10,7 +10,6 @@ require (
 	github.com/elastic/go-sysinfo v1.14.1
 	github.com/elastic/go-windows v1.0.1
 	github.com/elastic/gosigar v0.14.2
-	github.com/gofrs/uuid/v5 v5.2.0
 	github.com/magefile/mage v1.15.0
 	github.com/shirou/gopsutil/v4 v4.24.7
 	github.com/stretchr/testify v1.9.0
