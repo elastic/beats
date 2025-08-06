@@ -86,6 +86,7 @@ func (in *s3PollerInput) Run(
 	defer in.states.Close()
 
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+	in.status.UpdateStatus(status.Configuring, "Configuring input")
 	in.s3, err = in.createS3API(ctx)
 	if err != nil {
 		err = fmt.Errorf("failed to create S3 API: %w", err)
