@@ -39,15 +39,17 @@ var (
 		"jvm": c.Dict("jvm", s.Schema{
 			"mem": c.Dict("mem", s.Schema{
 				"pools": c.Dict("pools", s.Schema{
-					"young":    c.Dict("young", poolSchema),
-					"survivor": c.Dict("survivor", poolSchema),
-					"old":      c.Dict("old", poolSchema),
+					"young":    c.Dict("young", poolSchema, c.DictOptional),
+					"survivor": c.Dict("survivor", poolSchema, c.DictOptional),
+					"old":      c.Dict("old", poolSchema, c.DictOptional),
 				}),
 			}),
 			"gc": c.Dict("gc", s.Schema{
 				"collectors": c.Dict("collectors", s.Schema{
-					"young": c.Dict("young", collectorSchema),
-					"old":   c.Dict("old", collectorSchema),
+					"young":      c.Dict("young", collectorSchema, c.DictOptional),
+					"old":        c.Dict("old", collectorSchema, c.DictOptional),
+					"zgc_cycles": c.Dict("ZGC Cycles", collectorSchema, c.DictOptional),
+					"zgc_pauses": c.Dict("ZGC Pauses", collectorSchema, c.DictOptional),
 				}),
 			}),
 		}),

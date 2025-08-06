@@ -138,6 +138,32 @@
             - name: ms
               type: long
               description: >
+        - name: zgc_cycles.collection
+          type: group
+          description: >
+            ZGC Cycles collection gc.
+          fields:
+            - name: count
+              type: long
+              description: >
+                Number of ZGC cycles.
+            - name: ms
+              type: long
+              description: >
+                Time spent in ZGC cycles in milliseconds.
+        - name: zgc_pauses.collection
+          type: group
+          description: >
+            ZGC Pauses collection gc.
+          fields:
+            - name: count
+              type: long
+              description: >
+                Number of ZGC pauses.
+            - name: ms
+              type: long
+              description: >
+                Time spent in ZGC pauses in milliseconds.
 
     - name: fs.summary
       type: group
