@@ -257,6 +257,6 @@ func FuzzParseRFC3164(f *testing.F) {
 	f.Add("<13>Oct 11 22:14:15 test-host this is the message")
 
 	f.Fuzz(func(t *testing.T, data string) {
-		parseRFC3164(data, time.UTC)
+		_, _ = parseRFC3164(data, time.UTC)
 	})
 }
