@@ -44,43 +44,17 @@ func TestTLSCommonToOTel(t *testing.T) {
 		assert.Equal(t, want, got)
 	})
 
-	tests := []struct {
-		name  string
-		input *tlscommon.Config
-		want  map[string]any
-		err   bool
-	}{
-		{
-			name: "when unsupported configuration is passed",
-			input: &tlscommon.Config{
-				CATrustedFingerprint: "a3:5f:bf:93:12:8f:bc:5c:ab:14:6d:bf:e4:2a:7f:98:9d:2f:16:92:76:c4:12:ab:67:89:fc:56:4b:8e:0c:43",
-			},
-			want: nil,
-			err:  true,
-		},
-		{
-			name: "when ssl.verification_mode:none ",
-			input: &tlscommon.Config{
-				VerificationMode: tlscommon.VerifyNone,
-			},
-			want: map[string]any{
-				"insecure_skip_verify":         true,
-				"include_system_ca_certs_pool": true,
-			},
-			err: false,
-		},
-	}
+	t.Run("when ssl.verification_mode:none", func(t *testing.T) {
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			got, err := TLSCommonToOTel(test.input, logger)
-			if test.err {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				assert.Equal(t, test.want, got, "beats to otel ssl mapping")
-			}
+		input := &tlscommon.Config{
+			VerificationMode: tlscommon.VerifyNone,
+		}
 
-		})
-	}
+		got, err := TLSCommonToOTel(input, logger)
+		require.NoError(t, err)
+		assert.Equal(t, map[string]any{
+			"insecure_skip_verify": "true",
+		}, got, "beats to otel ssl mapping")
+
+	})
 }

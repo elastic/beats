@@ -24,30 +24,20 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/go-viper/mapstructure/v2"
+	"github.com/mitchellh/mapstructure"
 	"go.opentelemetry.io/collector/config/configtls"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
-// currently unsupported parameters
-// ssl.curve_types
-// ssl.ca_sha256
-// ssl.ca_trustred_fingerprint
+// UNSUPPORTED PARAMETERS
 // ssl.supported_protocols -> partially supported
 // ssl.restart_on_cert_change.*
 // ssl.renegotiation
-// ssl.verification_mode: All modes are not distinctly mapped yet
 func validateUnsupportedConfig(tlscfg *tlscommon.Config) error {
 	if len(tlscfg.CurveTypes) > 0 {
-		return errors.New("setting ssl.curve_types is currently not supported")
-	}
-	if tlscfg.CATrustedFingerprint != "" {
-		return errors.New("setting ssl.ca_trusted_fingerprint is currently not supported")
-	}
-	if len(tlscfg.CASha256) > 0 {
-		return errors.New("setting ssl.ca_sha256 is currently not supported")
+		return errors.New("ssl.curve_types is currently not supported")
 	}
 	return nil
 }
@@ -55,8 +45,6 @@ func validateUnsupportedConfig(tlscfg *tlscommon.Config) error {
 // TLSCommonToOTel converts a tlscommon.Config into the OTel configtls.ClientConfig
 func TLSCommonToOTel(tlscfg *tlscommon.Config, logger *logp.Logger) (map[string]any, error) {
 	logger = logger.Named("tls-to-otel")
-	insecureSkipVerify := false
-
 	if tlscfg == nil {
 		return nil, nil
 	}
@@ -77,13 +65,12 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config, logger *logp.Logger) (map[string]
 		return nil, err
 	}
 
-	//unpacks -> ssl.verification_mode
-	// not fully supported yet
-	switch tlscfg.VerificationMode {
-	case tlscommon.VerifyNone:
-		insecureSkipVerify = true
-	default:
-		// Handle all other cases, including VerifyFull, VerifyCertificate, or VerifyStrict
+	// handler verification_mode:none
+	// Handle all other cases, including VerifyFull, VerifyCertificate, or VerifyStrict by beatsauth extension
+	if tlscfg.VerificationMode == tlscommon.VerifyNone {
+		return map[string]any{
+			"insecure_skip_verify": "true",
+		}, nil
 	}
 
 	// unpacks -> ssl.certificate_authorities
@@ -137,11 +124,9 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config, logger *logp.Logger) (map[string]
 		ciphersuites = append(ciphersuites, tls.CipherSuiteName(cs))
 	}
 
-	otelTLSConfig := map[string]any{
-		"insecure_skip_verify":         insecureSkipVerify, // ssl.verification_mode:none
-		"include_system_ca_certs_pool": includeSystemCACertsPool,
-	}
+	otelTLSConfig := map[string]any{}
 
+	setIfNotNil(otelTLSConfig, "include_system_ca_certs_pool", includeSystemCACertsPool)
 	setIfNotNil(otelTLSConfig, "ca_pem", strings.Join(caCerts, "")) // ssl.certificate_authorities
 	setIfNotNil(otelTLSConfig, "cert_pem", certPem)                 // ssl.certificate
 	setIfNotNil(otelTLSConfig, "key_pem", certKeyPem)               // ssl.key
@@ -182,6 +167,10 @@ func setIfNotNil(m map[string]any, key string, value any) {
 	switch v.Kind() {
 	case reflect.String:
 		if v.String() != "" {
+			m[key] = value
+		}
+	case reflect.Bool:
+		if v.Bool() != false {
 			m[key] = value
 		}
 	case reflect.Map, reflect.Slice:

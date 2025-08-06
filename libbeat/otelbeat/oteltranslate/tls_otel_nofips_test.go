@@ -161,8 +161,6 @@ m8TtceUhSOnXNrrO5agyMRmL0aYf8D425ot/uwTiSkOd4bdFeEaYs0ahHosxHq2N
 me1zqwZ6EX7XHaa6j1mx9tcX
 -----END RSA PRIVATE KEY-----
 `,
-		"insecure_skip_verify":         false,
-		"include_system_ca_certs_pool": false,
-		"cipher_suites":                []string{"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"},
+		"cipher_suites": []string{"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"},
 	}, got, "beats to otel ssl mapping")
 }
