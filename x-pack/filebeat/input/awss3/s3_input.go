@@ -79,16 +79,18 @@ func (in *s3PollerInput) Run(
 	// Load the persistent S3 polling state.
 	in.states, err = newStates(in.log, in.store, in.config.BucketListPrefix)
 	if err != nil {
-		// TODO: report Failed with setup error
-		return fmt.Errorf("can not start persistent store: %w", err)
+		err = fmt.Errorf("can not start persistent store: %w", err)
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failure: %s", err.Error()))
+		return err
 	}
 	defer in.states.Close()
 
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 	in.s3, err = in.createS3API(ctx)
 	if err != nil {
-		// TODO: report Failed with setup error
-		return fmt.Errorf("failed to create S3 API: %w", err)
+		err = fmt.Errorf("failed to create S3 API: %w", err)
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failure: %s", err.Error()))
+		return err
 	}
 
 	in.metrics = newInputMetrics(inputContext.MetricsRegistry, in.config.NumberOfWorkers)

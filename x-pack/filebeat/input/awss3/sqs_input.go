@@ -77,7 +77,7 @@ func (in *sqsReaderInput) Run(
 	// Initialize everything for this run
 	err := in.setup(inputContext, pipeline)
 	if err != nil {
-		// TODO: report Failed with configuration loading error
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failure: %s", err.Error()))
 		return err
 	}
 
