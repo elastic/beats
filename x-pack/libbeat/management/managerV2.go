@@ -465,8 +465,8 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case err := <-cm.client.Errors():
-			// Don't print the context canceled errors that happen normally during shutdown, restart, etc
-			if !errors.Is(context.Canceled, err) {
+			// Don't print the context cancelled errors that happen normally during shutdown, restart, etc
+			if !errors.Is(err, context.Canceled) {
 				cm.logger.Errorf("elastic-agent-client error: %s", err)
 			}
 
@@ -684,6 +684,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 	// in v2 only a single input type will be started per component, so we don't need to
 	// worry about getting multiple re-loaders (we just need the one for the type)
 	if err := cm.reloadInputs(inputUnits); err != nil {
+<<<<<<< HEAD
 		merror := &multierror.MultiError{}
 		if errors.As(err, &merror) {
 			for _, err := range merror.Errors {
@@ -691,8 +692,67 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 				if errors.As(err, &unitErr) {
 					unitErrors[unitErr.UnitID] = append(unitErrors[unitErr.UnitID], unitErr.Err)
 					delete(healthyInputs, unitErr.UnitID)
+=======
+		type errList interface {
+			Unwrap() []error
+		}
+
+		type errWrapper interface {
+			Unwrap() error
+		}
+
+		//nolint:errorlint // Custom error wrapping, not suitable for errors.As
+		switch e := err.(type) {
+		// cfgfile.UnitError implements errWrapper, but we don't want to unwrap
+		// it, so we keep it as the first case
+		case cfgfile.UnitError:
+			// cm.reloadInputs failed when generating the Beat config, diffing
+			// the inputs to reload was not possible. So we set the error for
+			// the failed unit, set the whole Beat as failed and return
+			unitErrors[e.UnitID] = append(unitErrors[e.UnitID], e.Err)
+			cm.UpdateStatus(status.Failed, fmt.Sprintf("cannot process %q configuration: %s", e.UnitID, e.Error()))
+			return
+
+		case errWrapper:
+			// cm.reloadInputs will use fmt.Errorf and join an error slice
+			// using errors.Join, when reloading inputs fail. So to access
+			// the individual errors, we need to fist call Unwrap, to get
+			// the errors list, then call Unwrap on the list to get each error
+			// instance.
+			//
+			// When reloading inputs fail, cm.reloadInputs will get the list
+			// of errors, join it using errors.Join, then wrap the list using
+			// fmt.Errorf to add more context. So to access each individual
+			// error we need to call Unwrap and ensure it is an error list.
+			// Then we can finally access each individual error
+			e2 := errors.Unwrap(err)
+			//nolint:errorlint // Custom error wrapping, not suitable for errors.As
+			switch e3 := e2.(type) {
+			case errList:
+				for _, err := range e3.Unwrap() {
+					unitErr := cfgfile.UnitError{}
+					if errors.As(err, &unitErr) {
+						unitErrors[unitErr.UnitID] = append(unitErrors[unitErr.UnitID], unitErr.Err)
+						delete(healthyInputs, unitErr.UnitID)
+					}
+>>>>>>> d8b1f1afd (Fix error handling from BeatV2Manager reload (#45733))
 				}
+				return
+
+			default:
+				// That is not one of the cases we know how to handle, hard stop
+				// with generic error.
+				cm.logger.Errorf("unexpected error reloading units: %s", err)
+				cm.UpdateStatus(status.Failed, fmt.Sprintf("cannot reload inputs: %s", err))
+				return
 			}
+
+		default:
+			// That is not one of the cases we know how to handle, hard stop
+			// with generic error.
+			cm.logger.Errorf("unexpected error reloading units: %s", err)
+			cm.UpdateStatus(status.Failed, fmt.Sprintf("cannot reload inputs: %s", err))
+			return
 		}
 	}
 
@@ -796,12 +856,18 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		expected := unit.Expected()
 		if expected.Config == nil {
 			// should not happen; hard stop
-			return fmt.Errorf("input unit %s has no config", unit.ID())
+			return cfgfile.UnitError{
+				UnitID: unit.ID(),
+				Err:    fmt.Errorf("input unit %q has no config", unit.ID()),
+			}
 		}
 
 		inputCfg, err := generateBeatConfig(expected.Config, agentInfo)
 		if err != nil {
-			return fmt.Errorf("failed to generate configuration for unit %s: %w", unit.ID(), err)
+			return cfgfile.UnitError{
+				UnitID: unit.ID(),
+				Err:    fmt.Errorf("failed to generate configuration for unit %q: %w", unit.ID(), err),
+			}
 		}
 		// add diag callbacks for unit
 		// we want to add the diagnostic handler that's specific to the unit, and not the gobal diagnostic handler
@@ -835,8 +901,17 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		// If they change the way they report errors, this will break.
 		// TODO (Tiago): update all layers to use the most recent features from
 		// the standard library errors package.
+<<<<<<< HEAD
 		if errors.As(err, &merror) {
 			for _, err := range merror.Errors {
+=======
+		type unwrapList interface {
+			Unwrap() []error
+		}
+		errList, isErrList := err.(unwrapList)
+		if isErrList {
+			for _, err := range errList.Unwrap() {
+>>>>>>> d8b1f1afd (Fix error handling from BeatV2Manager reload (#45733))
 				causeErr := errors.Unwrap(err)
 				// A Log input is only marked as finished when all events it
 				// produced are acked by the acker so when we see this error,
