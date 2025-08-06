@@ -7,6 +7,11 @@ package otelconsumer
 import (
 	"context"
 	"fmt"
+<<<<<<< HEAD
+=======
+	"os"
+	"runtime"
+>>>>>>> ee17a836e (otel: fix retries in otelconsumer and add receivertest test suite (#45637))
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -22,6 +27,7 @@ import (
 	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
+	"go.opentelemetry.io/collector/receiver/receivertest"
 )
 
 const (
@@ -34,10 +40,11 @@ func init() {
 }
 
 type otelConsumer struct {
-	observer     outputs.Observer
-	logsConsumer consumer.Logs
-	beatInfo     beat.Info
-	log          *logp.Logger
+	observer       outputs.Observer
+	logsConsumer   consumer.Logs
+	beatInfo       beat.Info
+	log            *logp.Logger
+	isReceiverTest bool // whether we are running in receivertest context
 }
 
 func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
@@ -53,7 +60,26 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 	if err := cfg.Unpack(&ocConfig); err != nil {
 		return outputs.Fail(err)
 	}
+<<<<<<< HEAD
 	return outputs.Success(ocConfig.Queue, -1, 0, nil, out)
+=======
+
+	isReceiverTest := os.Getenv("OTELCONSUMER_RECEIVERTEST") == "1"
+
+	// Default to runtime.NumCPU() workers
+	clients := make([]outputs.Client, 0, runtime.NumCPU())
+	for range runtime.NumCPU() {
+		clients = append(clients, &otelConsumer{
+			observer:       observer,
+			logsConsumer:   beat.LogConsumer,
+			beatInfo:       beat,
+			log:            beat.Logger.Named("otelconsumer"),
+			isReceiverTest: isReceiverTest,
+		})
+	}
+
+	return outputs.Success(ocConfig.Queue, -1, 0, nil, beat.Logger, clients...)
+>>>>>>> ee17a836e (otel: fix retries in otelconsumer and add receivertest test suite (#45637))
 }
 
 // Close is a noop for otelconsumer
@@ -99,6 +125,13 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			switch id := id.(type) {
 			case string:
 				logRecord.Attributes().PutStr(esDocumentIDAttribute, id)
+
+				// The receivertest package needs a unique attribute to track generated ids.
+				// When receivertest allows this to be customized we can remove this condition.
+				// See https://github.com/open-telemetry/opentelemetry-collector/issues/12003.
+				if out.isReceiverTest {
+					logRecord.Attributes().PutStr(receivertest.UniqueIDAttrName, id)
+				}
 			}
 		}
 
@@ -161,7 +194,8 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Retry()
 		}
 
-		return fmt.Errorf("failed to send batch events to otel collector: %w", err)
+		out.log.Errorf("failed to send batch events to otel collector: %w", err)
+		return nil
 	}
 
 	batch.ACK()

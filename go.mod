@@ -233,6 +233,17 @@ require (
 )
 
 require (
+<<<<<<< HEAD
+=======
+	go.opentelemetry.io/collector/pipeline v0.130.0
+	go.opentelemetry.io/collector/processor v1.36.0
+	go.opentelemetry.io/collector/processor/processorhelper v0.130.0
+	go.opentelemetry.io/collector/receiver/receivertest v0.130.0
+	go.opentelemetry.io/otel/sdk/metric v1.37.0
+)
+
+require (
+>>>>>>> ee17a836e (otel: fix retries in otelconsumer and add receivertest test suite (#45637))
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
 	cel.dev/expr v0.19.1 // indirect
 	cloud.google.com/go/auth v0.13.0 // indirect
@@ -399,6 +410,7 @@ require (
 	go.elastic.co/fastjson v1.4.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
+<<<<<<< HEAD
 	go.opentelemetry.io/collector/client v1.27.0 // indirect
 	go.opentelemetry.io/collector/component/componenttest v0.121.0 // indirect
 	go.opentelemetry.io/collector/config/configauth v0.121.0 // indirect
@@ -444,6 +456,53 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.54.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.59.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.34.0 // indirect
+=======
+	go.opentelemetry.io/collector/client v1.36.0 // indirect
+	go.opentelemetry.io/collector/component/componenttest v0.130.0 // indirect
+	go.opentelemetry.io/collector/config/configauth v0.130.0 // indirect
+	go.opentelemetry.io/collector/config/configcompression v1.36.0 // indirect
+	go.opentelemetry.io/collector/config/confighttp v0.130.0 // indirect
+	go.opentelemetry.io/collector/config/configmiddleware v0.130.0 // indirect
+	go.opentelemetry.io/collector/config/configopaque v1.36.0 // indirect
+	go.opentelemetry.io/collector/config/configoptional v0.130.0 // indirect
+	go.opentelemetry.io/collector/config/configretry v1.36.0 // indirect
+	go.opentelemetry.io/collector/config/configtelemetry v0.130.0 // indirect
+	go.opentelemetry.io/collector/confmap/xconfmap v0.130.0 // indirect
+	go.opentelemetry.io/collector/connector v0.130.0 // indirect
+	go.opentelemetry.io/collector/connector/connectortest v0.130.0 // indirect
+	go.opentelemetry.io/collector/connector/xconnector v0.130.0 // indirect
+	go.opentelemetry.io/collector/consumer/consumererror/xconsumererror v0.130.0 // indirect
+	go.opentelemetry.io/collector/consumer/consumertest v0.130.0 // indirect
+	go.opentelemetry.io/collector/consumer/xconsumer v0.130.0 // indirect
+	go.opentelemetry.io/collector/exporter v0.130.0 // indirect
+	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.130.0 // indirect
+	go.opentelemetry.io/collector/exporter/exportertest v0.130.0 // indirect
+	go.opentelemetry.io/collector/exporter/xexporter v0.130.0 // indirect
+	go.opentelemetry.io/collector/extension v1.36.0 // indirect
+	go.opentelemetry.io/collector/extension/extensionauth v1.36.0 // indirect
+	go.opentelemetry.io/collector/extension/extensioncapabilities v0.130.0 // indirect
+	go.opentelemetry.io/collector/extension/extensionmiddleware v0.130.0 // indirect
+	go.opentelemetry.io/collector/extension/extensiontest v0.130.0 // indirect
+	go.opentelemetry.io/collector/extension/xextension v0.130.0 // indirect
+	go.opentelemetry.io/collector/featuregate v1.36.0 // indirect
+	go.opentelemetry.io/collector/internal/fanoutconsumer v0.130.0 // indirect
+	go.opentelemetry.io/collector/internal/telemetry v0.130.0 // indirect
+	go.opentelemetry.io/collector/pdata/pprofile v0.130.0 // indirect
+	go.opentelemetry.io/collector/pdata/testdata v0.130.0 // indirect
+	go.opentelemetry.io/collector/pdata/xpdata v0.130.0 // indirect
+	go.opentelemetry.io/collector/pipeline/xpipeline v0.130.0 // indirect
+	go.opentelemetry.io/collector/processor/processortest v0.130.0 // indirect
+	go.opentelemetry.io/collector/processor/xprocessor v0.130.0 // indirect
+	go.opentelemetry.io/collector/receiver/xreceiver v0.130.0 // indirect
+	go.opentelemetry.io/collector/service v0.130.0 // indirect
+	go.opentelemetry.io/collector/service/hostcapabilities v0.130.0 // indirect
+	go.opentelemetry.io/contrib/bridges/otelzap v0.12.0 // indirect
+	go.opentelemetry.io/contrib/detectors/gcp v1.35.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.60.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.62.0 // indirect
+	go.opentelemetry.io/contrib/otelconf v0.17.0 // indirect
+	go.opentelemetry.io/contrib/propagators/b3 v1.37.0 // indirect
+>>>>>>> ee17a836e (otel: fix retries in otelconsumer and add receivertest test suite (#45637))
 	go.opentelemetry.io/ebpf-profiler v0.0.0-20250212075250-7bf12d3f962f // indirect
 	go.opentelemetry.io/otel v1.35.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.10.0 // indirect
