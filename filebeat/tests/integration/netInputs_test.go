@@ -23,6 +23,7 @@ import (
 	_ "embed"
 	"fmt"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -177,11 +178,14 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 			// The number of events published is equal to the queue size
 			expectPublished := 32
 			// The number of events read by the input is:
-			// queue size + (1 event per pipeline worker)*6 + 1 for the input goroutine
+			// queue size + (1 event per pipeline worker)*(NumCPU +1) + 2 for
+			// the input goroutine.
+			//
 			// The number of pipeline workers is multiplied by 6 because the channel
-			// used for the input and worker goroutines is sized as num_workers*5, then
-			// we need to add an extra event per worker goroutine running.
-			expectedEventsRead := 32 + tc.numWorkers*6 + 1
+			// used for the input and worker goroutines is sized as:
+			// num_workers * runtime.NumCPU() + 1, then we need to add an extra
+			// event per worker goroutine running.
+			expectedEventsRead := 32 + tc.numWorkers*(runtime.NumCPU()+1) + 2
 
 			if m.PublishedEventsTotal != expectPublished {
 				t.Errorf(

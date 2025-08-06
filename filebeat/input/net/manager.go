@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"runtime"
 	"runtime/debug"
 	"time"
 
@@ -122,8 +123,8 @@ func (m *manager) Create(cfg *conf.C) (v2.Input, error) {
 		numPipelineWorkers: wrapperCfg.NumWorkers,
 		host:               wrapperCfg.Host,
 		// 5 is a magic number, we just need to ensure there is some buffer
-		// in the channel to reduce contingency
-		evtChan: make(chan DataMetadata, wrapperCfg.NumWorkers*5),
+		// in the channel to reduce contention
+		evtChan: make(chan DataMetadata, wrapperCfg.NumWorkers*runtime.NumCPU()+1),
 	}
 
 	return w, nil
