@@ -140,7 +140,12 @@ func CreateReloadConfigFromInputs(raw []map[string]interface{}) ([]*reload.Confi
 // convinence method for wrapping all the stream transformations needed by the shipper and other inputs
 func createStreamRules(raw *proto.UnitExpectedConfig, streamSource map[string]interface{}, stream *proto.Stream, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) (map[string]interface{}, error) {
 
-	streamSource = injectIndexStream(defaultDataStreamType, raw, stream, streamSource)
+	// if the index explicitly set it takes precedence
+	if _, exists := streamSource["index"]; !exists {
+		streamSource = injectIndexStream(defaultDataStreamType, raw, stream, streamSource)
+	} else {
+		delete(streamSource, "data_stream")
+	}
 
 	// the order of building the processors is important
 	// prepend is used to ensure that the processors defined directly on the stream

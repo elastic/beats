@@ -89,6 +89,64 @@ func TestGlobalProcessInject(t *testing.T) {
 	findFieldsInProcessors(t, processorFields, cfgMap)
 }
 
+func TestIndexPrecedence(t *testing.T) {
+
+	withSource := func(source map[string]any) *proto.UnitExpectedConfig {
+		return &proto.UnitExpectedConfig{
+			DataStream: &proto.DataStream{
+				Namespace: "default",
+			},
+			Id:       "filestream-filestream",
+			Type:     "filestream",
+			Name:     "filestream-1",
+			Revision: 1,
+			Meta: &proto.Meta{
+				Package: &proto.Package{
+					Name:    "filestream",
+					Version: "1.3.0",
+				},
+			},
+			Streams: []*proto.Stream{
+				{
+					Id: "filestream-filestream.generic",
+					DataStream: &proto.DataStream{
+						Dataset: "filestream.generic",
+						Type:    "logs",
+					},
+					Source: requireNewStruct(t, source),
+				},
+			},
+		}
+	}
+
+	t.Run("index takes precedence", func(t *testing.T) {
+		source := map[string]any{
+			"data_stream": map[string]any{
+				"dataset": "filestream.generic",
+			},
+			"index": "logs",
+			"paths": []any{"/logs/*"},
+		}
+
+		cfgMap := buildConfigMap(t, withSource(source), &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
+		require.Equal(t, "logs", cfgMap["index"])
+		require.Nil(t, cfgMap["data_stream"])
+	})
+
+	t.Run("data_stream forms an index", func(t *testing.T) {
+		source := map[string]any{
+			"data_stream": map[string]any{
+				"dataset": "filestream.generic",
+			},
+			"paths": []any{"/logs/*"},
+		}
+
+		cfgMap := buildConfigMap(t, withSource(source), &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
+		require.Equal(t, "logs-filestream.generic-default", cfgMap["index"])
+		require.NotNil(t, cfgMap["data_stream"])
+	})
+}
+
 func TestMBGenerate(t *testing.T) {
 	sourceStream := requireNewStruct(t, map[string]interface{}{
 		"metricsets": []interface{}{"filesystem"},
