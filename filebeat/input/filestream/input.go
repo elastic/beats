@@ -423,6 +423,7 @@ func (inp *filestream) open(
 	fs fileSource,
 	offset int64,
 ) (reader.Reader, bool, error) {
+
 	f, encoding, truncated, err := inp.openFile(log, fs.newPath, offset)
 	if err != nil {
 		return nil, truncated, err
@@ -567,6 +568,7 @@ func (inp *filestream) openFile(
 		// if the file was truncated we need to reset the offset and notify
 		// all callers so they can also reset their offsets
 		truncated = true
+		log.Infof("File was truncated. Reading file from offset 0. Path=%s", path)
 		offset = 0
 	}
 
