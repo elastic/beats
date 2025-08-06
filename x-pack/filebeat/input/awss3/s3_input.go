@@ -113,7 +113,6 @@ func (in *s3PollerInput) run(ctx context.Context) {
 	// Scan the bucket in a loop, delaying by the configured interval each
 	// iteration.
 	for ctx.Err() == nil {
-		in.status.UpdateStatus(status.Running, "Input is running")
 		in.runPoll(ctx)
 		_ = timed.Wait(ctx, in.config.BucketListInterval)
 	}
@@ -122,6 +121,8 @@ func (in *s3PollerInput) run(ctx context.Context) {
 func (in *s3PollerInput) runPoll(ctx context.Context) {
 	var workerWg sync.WaitGroup
 	workChan := make(chan state)
+
+	in.status.UpdateStatus(status.Running, "Input is running")
 
 	// Start the worker goroutines to listen on the work channel
 	for i := 0; i < in.config.NumberOfWorkers; i++ {
