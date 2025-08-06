@@ -169,6 +169,7 @@ filebeat.inputs:
      enabled: true
    paths:
      - /var/log/java-exceptions*.log
+
  - type: filestream
    enabled: true
    id: my-container-input
@@ -176,6 +177,7 @@ filebeat.inputs:
      enabled: true
    paths:
      - /var/lib/docker/containers/*.log
+
  - type: filestream
    enabled: true
    id: my-application-input
@@ -183,6 +185,7 @@ filebeat.inputs:
      enabled: true
    paths:
      - /var/log/my-application*.json
+
  - type: filestream
    enabled: true
    id: my-old-files
@@ -202,18 +205,21 @@ filebeat.inputs:
    take_over: true
    paths:
      - /var/log/java-exceptions*.log
+
  - type: filestream
    enabled: true
    id: my-container-input
    take_over: true
    paths:
      - /var/lib/docker/containers/*.log
+
  - type: filestream
    enabled: true
    id: my-application-input
    take_over: true
    paths:
      - /var/log/my-application*.json
+
  - type: filestream
    enabled: true
    id: my-old-files

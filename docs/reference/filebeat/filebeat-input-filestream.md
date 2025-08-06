@@ -372,7 +372,7 @@ take_over: true
 
 
 
-##### Other `filestream` inputs
+##### `filestream` input
 
 ```{applies_to}
 stack: beta 9.1.0
@@ -391,26 +391,21 @@ take_over:
   from_ids: ["foo", "bar"]
 ```
 
-:::{important}
-The take over mode can work correctly only if the source (taken from) inputs are no longer active. If source inputs are still harvesting the files which are being migrated, it will lead to data duplication and in some cases might cause data loss.
-:::
-
-::::{important}
-`take_over.enabled: true` requires the `filestream` to have a unique ID.
-::::
-
 This take over mode was created to enable smooth migration from
 deprecated `log` inputs to the new `filestream` inputs and to allow
 changing `filestream` input IDs without data re-ingestion.
 
 Refer to [Migrate `log` input configurations to `filestream`](/reference/filebeat/migrate-to-filestream.md) for more details about the migration process.
 
-##### Limitations
+##### Notes and limitations
 
-Take over can only migrate states from existing files that are not
-ignored during the `filestream` input start up. Once the input is
-ingesting data, if a new file appears, `filestream` will not try to
-migrate its state.
+When using take over mode, it is important to note:
+
+* Take over mode only works correctly if the source (taken from) inputs are no longer active.
+  If source inputs are still harvesting the files which are being migrated, it will lead to data duplication and in some cases might cause data loss.
+* Using `take_over.enabled: true` requires the `filestream` to have a unique ID.
+* Take over can only migrate states from existing files that are not ignored during the `filestream` input start up.
+  Once the input is ingesting data, if a new file appears, `filestream` will not try to migrate its state.
 
 #### `close.*` [filebeat-input-filestream-close-options]
 
