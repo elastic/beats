@@ -155,13 +155,15 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 	client, err := createPipelineClient(in.pipeline, acks)
 	if err != nil {
 		in.log.Errorf("failed to create pipeline client: %v", err.Error())
+		in.status.UpdateStatus(status.Degraded, fmt.Sprintf("A worker's pipeline client setup failed, error: %s", err.Error()))
+		// TODO: re-attempt pipeline client initialization if it fails
 		return
 	}
 	defer client.Close()
 	defer acks.Close()
 
 	rateLimitWaiter := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
-
+	prevIterationFailed := false
 	for _state := range workChan {
 		state := _state
 		event := in.s3EventForState(state)
@@ -183,6 +185,8 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 		if errors.Is(err, errS3DownloadFailed) {
 			// Download errors are ephemeral. Add a backoff delay, then skip to the
 			// next iteration so we don't mark the object as permanently failed.
+			in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Download failure: %s", err.Error()))
+			prevIterationFailed = true
 			rateLimitWaiter.Wait()
 			continue
 		}
@@ -210,6 +214,12 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 			// Metrics
 			in.metrics.s3ObjectsAckedTotal.Inc()
 		})
+		// if we go from loop iteration failure to success, we should attempt to re-report recovered status
+		// the purpose of this block is to avoid unnecessary synchronization between workers during status update
+		if prevIterationFailed && state.Stored {
+			in.status.UpdateStatus(status.Running, "Input is recovered and running")
+		}
+		prevIterationFailed = state.Failed
 	}
 }
 
