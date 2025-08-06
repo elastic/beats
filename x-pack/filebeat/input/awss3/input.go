@@ -40,14 +40,11 @@ func (im *s3InputManager) Init(grp unison.Group) error {
 func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		// report Failed with configuration loading error
 		return nil, err
 	}
 
-	// TODO: report "Configuring" status here (e.g. inputContext.UpdateStatus(status.Configuring, ""))
 	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig, im.logger)
 	if err != nil {
-		// TODO: report Failed with configuration loading error
 		return nil, fmt.Errorf("initializing AWS config: %w", err)
 	}
 
@@ -64,7 +61,7 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	if config.BucketARN != "" || config.AccessPointARN != "" || config.NonAWSBucketName != "" {
 		return newS3PollerInput(config, awsConfig, im.store)
 	}
-	// TODO: report Failed with configuration loading error
+
 	return nil, fmt.Errorf("configuration has no SQS queue URL and no S3 bucket ARN")
 }
 
