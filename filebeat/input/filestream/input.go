@@ -196,11 +196,8 @@ func (inp *filestream) Run(
 	}
 
 	if truncated {
-		log.Infof("file is truncated")
 		state.Offset = 0
 	}
-
-	log.Infof("okay, passed the checks for now")
 
 	metrics.FilesActive.Inc()
 	metrics.HarvesterRunning.Inc()
@@ -224,7 +221,6 @@ func (inp *filestream) Run(
 
 	// The caller of Run already reports the error and filters out errors that
 	// must not be reported, like 'context cancelled'.
-	log.Infof("reading from source now!")
 	err = inp.readFromSource(
 		ctx, log, r, fs.newPath, state, publisher, fs.desc.GZIP, metrics)
 	if err != nil {
@@ -427,10 +423,8 @@ func (inp *filestream) open(
 	fs fileSource,
 	offset int64,
 ) (reader.Reader, bool, error) {
-	log.Infof("open() Opening file: %s with offset: %d\n", fs.newPath, offset)
 	f, encoding, truncated, err := inp.openFile(log, fs.newPath, offset)
 	if err != nil {
-		log.Infof("failed to open with error: %v\n", err)
 		return nil, truncated, err
 	}
 
@@ -573,7 +567,6 @@ func (inp *filestream) openFile(
 		// if the file was truncated we need to reset the offset and notify
 		// all callers so they can also reset their offsets
 		truncated = true
-		log.Infof("File was truncated. Reading file from offset 0. Path=%s", path)
 		offset = 0
 	}
 
