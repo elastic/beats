@@ -44,6 +44,7 @@ func validateUnsupportedConfig(tlscfg *tlscommon.Config) error {
 }
 
 // TLSCommonToOTel converts a tlscommon.Config into the OTel configtls.ClientConfig
+// ca_trusted_fingerprint, ca_sha_256 and verification mode should be handled separately by beatsauth extension
 func TLSCommonToOTel(tlscfg *tlscommon.Config, logger *logp.Logger) (map[string]any, error) {
 	logger = logger.Named("tls-to-otel")
 	if tlscfg == nil {
@@ -66,7 +67,7 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config, logger *logp.Logger) (map[string]
 		return nil, err
 	}
 
-	// handler verification_mode:none
+	// handle verification_mode:none
 	// Handle all other cases, including VerifyFull, VerifyCertificate, or VerifyStrict by beatsauth extension
 	if tlscfg.VerificationMode == tlscommon.VerifyNone {
 		return map[string]any{
