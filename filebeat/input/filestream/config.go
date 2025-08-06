@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -103,6 +104,8 @@ type readerConfig struct {
 	Tail           bool                    `config:"seek_to_tail"`
 
 	Parsers parser.Config `config:",inline"`
+
+	Binary  *encoding.BinaryEncodingConfig `config:",binary"`
 }
 
 type backoffConfig struct {
@@ -159,6 +162,7 @@ func defaultReaderConfig() readerConfig {
 		LineTerminator: readfile.AutoLineTerminator,
 		MaxBytes:       10 * humanize.MiByte,
 		Tail:           false,
+		Binary:         nil,
 	}
 }
 

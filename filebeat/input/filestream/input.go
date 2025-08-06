@@ -426,6 +426,7 @@ func (inp *filestream) open(
 ) (reader.Reader, bool, error) {
 	fmt.Println("open()", "Opening file:", fs.newPath, "with offset:", offset)
 	f, encoding, truncated, err := inp.openFile(log, fs.newPath, offset)
+	fmt.Printf("and encoding %v\n", encoding)
 	if err != nil {
 		return nil, truncated, err
 	}
@@ -477,12 +478,19 @@ func (inp *filestream) open(
 		BufferSize: inp.readerConfig.BufferSize,
 		Terminator: inp.readerConfig.LineTerminator,
 		MaxBytes:   encReaderMaxBytes,
+
+		Binary:     inp.readerConfig.Binary,
 	}, log)
 	if err != nil {
 		return nil, truncated, err
 	}
 
-	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
+	// if this is a binary file, handle that here
+	if inp.readerConfig.Binary != nil {
+		fmt.Printf("got a binary encoding!\n")
+	} else {
+		r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
+	}
 
 	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, fs.desc.Fingerprint, offset)
 

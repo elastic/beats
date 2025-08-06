@@ -48,6 +48,8 @@ type Config struct {
 	// If CollectOnEOF is set to false the line reader will return 0 content and keep the buffer at the current
 	// state of appending data after temporarily EOF.
 	CollectOnEOF bool
+
+	Binary *encoding.BinaryEncodingConfig
 }
 
 // NewEncodeReader creates a new Encode reader from input reader by applying

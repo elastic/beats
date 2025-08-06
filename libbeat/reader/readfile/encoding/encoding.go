@@ -19,6 +19,7 @@ package encoding
 
 import (
 	"io"
+	"fmt"
 	"strings"
 
 	"golang.org/x/text/encoding"
@@ -36,7 +37,7 @@ var encodings = map[string]EncodingFactory{
 	"nop":   Plain,
 	"plain": Plain,
 
-	"binary": BinaryEncoding,
+	"binary": binaryEncoding,
 
 	// utf8 (validate input) - shadow htmlindex utf8 codecs not validating input
 	"unicode-1-1-utf-8": utf8Encoding,
@@ -116,14 +117,17 @@ var Plain = enc(encoding.Nop)
 //
 // See: http://encoding.spec.whatwg.org/#replacement
 var utf8Encoding = enc(mixed{})
+var binaryEncoding = enc(binenc{})
 
 // FindEncoding searches for an EncodingFactoryby name.
 func FindEncoding(name string) (EncodingFactory, bool) {
+	fmt.Printf("looking for encoding by name [%s]\n", name)
 	if name == "" {
 		return Plain, true
 	}
 	d, ok := encodings[strings.ToLower(name)]
 	if ok {
+		fmt.Printf("found encoding for name [%s]: %v\n", name, d)
 		return d, ok
 	}
 

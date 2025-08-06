@@ -26,6 +26,7 @@ import (
 
 	"golang.org/x/text/transform"
 
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -51,10 +52,16 @@ type LineReader struct {
 	decoder      transform.Transformer
 	tempBuffer   []byte
 	logger       *logp.Logger
+
+	binenc       encoding.BinaryEncodingConfig
 }
 
 // NewLineReader creates a new reader object
 func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*LineReader, error) {
+	if config.Terminator == BinaryLengthTerminator {
+		return newBinaryReader(input, config, logger)
+	}
+
 	fmt.Println("Creating new LineReader with encoding")
 	encoder := config.Codec.NewEncoder()
 
@@ -80,6 +87,31 @@ func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*Li
 		outBuffer:    streambuf.New(nil),
 		tempBuffer:   make([]byte, config.BufferSize),
 		logger:       logger.Named("reader_line"),
+	}, nil
+}
+
+func newBinaryReader(input io.ReadCloser, config Config, logger *logp.Logger) (*LineReader, error) {
+	fmt.Println("Creating new (Binary)LineReader with encoding")
+
+	if config.Binary == nil {
+		return nil, fmt.Errorf("Missing Binary Encoding Config")
+	}
+
+	var nl []byte
+	var terminator []byte
+
+	return &LineReader{
+		reader:       input,
+		maxBytes:     config.MaxBytes,
+		decoder:      config.Codec.NewDecoder(),
+		nl:           nl,
+		decodedNl:    terminator,
+		collectOnEOF: config.CollectOnEOF,
+		inBuffer:     streambuf.New(nil),
+		outBuffer:    streambuf.New(nil),
+		tempBuffer:   make([]byte, config.BufferSize),
+		logger:       logger.Named("reader_line"),
+		binenc:       *config.Binary,
 	}, nil
 }
 
@@ -167,6 +199,19 @@ func (r *LineReader) Next() (b []byte, n int, err error) {
 	sz := r.byteCount
 	r.byteCount = 0
 	return bytes, sz, nil
+}
+
+func (r *LineReader) binaryAdvance() error {
+	if r.binenc == nil {
+		return fmt.Errorf("No configured binary encoding information!")
+	}
+
+	length := p.binenc.offset + p.binenc.length
+
+	if r.inBuffer.Len() < length {
+
+	}
+	return nil
 }
 
 // Reads from the buffer until a new line character is detected

@@ -1,72 +1,49 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package encoding
 
 import (
+	g_binary "encoding/binary"
 	"fmt"
-	"io"
 
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/transform"
 )
 
-type binaryEncoding struct {
-	data []byte
+type BinaryEncodingConfig struct {
+	offset int
+	length int
+	order  g_binary.ByteOrder
 }
 
-func BinaryEncoding(in io.Reader) (Encoding, error) {
-	// Binary encoding does not require any transformation
-	fmt.Println("Creating Binary Encoding")
+type binenc struct {}
 
-	buff := make([]byte, 2048)
-	n, err := in.Read(buff)
+// func (b binary) Reset() {}
+// func (b binary) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) { }
 
-	fmt.Println("4 bytes from input:", buff[:4])
-
-	fmt.Println("Read bytes from input:", n, "Error:", err)
-	if err != nil {
-		fmt.Println("Error reading from input:", err)
-	}
-
-	if len(buff) == 0 {
-		return nil, fmt.Errorf("binary encoding requires non-empty input")
-	}
-	return NewBinaryEncoding(buff[:n]), nil
-}
-
-func NewBinaryEncoding(data []byte) Encoding {
-	fmt.Println("Creating new Binary Encoding")
-	return &binaryEncoding{
-		data: data,
-	}
-}
-
-// func (b *binaryEncoding) Transform(in io.Reader) (io.Reader, error) {
-// 	fmt.Println("Transforming input with Binary Encoding")
-// 	if len(b.data) == 0 {
-// 		return nil, fmt.Errorf("binary encoding requires non-empty data")
-// 	}
-// 	// No transformation needed for binary encoding, just return the input reader
-// 	fmt.Println("Returning input reader without transformation")
-// 	if in == nil {
-// 		return nil, fmt.Errorf("input reader cannot be nil for binary encoding")
-// 	}
-// 	// Return the input reader as is, since binary encoding does not change the data
-// 	fmt.Println("Returning input reader as is for binary encoding")
-// 	if _, err := in.Read(b.data); err != nil && err != io.EOF {
-// 		return nil, fmt.Errorf("error reading from input reader: %w", err)
-// 	}
-
-// 	reader := io.NopCloser(transform.NewReader(in, transform.Nop))
-// 	return reader, nil
-// }
-
-func (b *binaryEncoding) NewDecoder() *encoding.Decoder {
+func (binenc) NewDecoder() *encoding.Decoder {
 	fmt.Println("Creating new Binary Decoder")
 	return &encoding.Decoder{
 		Transformer: transform.Nop,
 	}
 }
 
-func (b *binaryEncoding) NewEncoder() *encoding.Encoder {
+func (binenc) NewEncoder() *encoding.Encoder {
 	fmt.Println("Creating new Binary Encoder")
 	return &encoding.Encoder{
 		Transformer: transform.Nop,
