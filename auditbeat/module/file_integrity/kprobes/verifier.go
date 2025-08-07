@@ -153,15 +153,15 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 		return err
 	}
 
-	m, err := newMonitor(ctx, true, pChannel, exec)
+	monitorHandle, err := newMonitor(ctx, true, pChannel, exec)
 	if err != nil {
 		return err
 	}
 
-	defer m.Close()
+	defer monitorHandle.Close()
 
 	// start the monitor
-	if err := m.Start(); err != nil {
+	if err := monitorHandle.Start(); err != nil {
 		return err
 	}
 
@@ -175,11 +175,13 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 		defer close(retC)
 		for {
 			select {
-			case runErr := <-m.ErrorChannel():
+			case runErr := <-monitorHandle.ErrorChannel():
+				fmt.Fprintf(os.Stdout, "Received error: %+v\n", runErr)
 				retC <- runErr
 				return
 
-			case ev, ok := <-m.EventChannel():
+			case ev, ok := <-monitorHandle.EventChannel():
+				fmt.Fprintf(os.Stdout, "Received event: %+v\n", ev)
 				if !ok {
 					retC <- errors.New("monitor closed unexpectedly")
 					return
@@ -192,6 +194,7 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 				}
 				continue
 			case <-time.After(timeout):
+				fmt.Fprintf(os.Stdout, "verify() listener channel has timed out\n")
 				return
 			case <-cancel:
 				return
@@ -200,7 +203,7 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 	}()
 
 	// add verify base path to monitor
-	if err := m.Add(basePath); err != nil {
+	if err := monitorHandle.Add(basePath); err != nil {
 		return err
 	}
 

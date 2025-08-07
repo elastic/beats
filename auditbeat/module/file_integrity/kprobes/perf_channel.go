@@ -20,6 +20,8 @@
 package kprobes
 
 import (
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
@@ -34,6 +36,7 @@ type perfChannel interface {
 }
 
 func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponent int, bufferSize int, pid int) (*tracing.PerfChannel, error) {
+	fmt.Fprintf(os.Stdout, "Creating perf channel with ring size exponent %d and buffer size %d\n", ringSizeExponent, bufferSize)
 	tfs, err := tracing.NewTraceFS()
 	if err != nil {
 		return nil, err
@@ -52,7 +55,10 @@ func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponen
 	}
 
 	for probe, allocFn := range probes {
-		_ = tfs.RemoveKProbe(probe)
+		err = tfs.RemoveKProbe(probe)
+		if err != nil {
+			return nil, fmt.Errorf("failed to remove existing kprobe %s: %w", probe.Name, err)
+		}
 
 		err := tfs.AddKProbe(probe)
 		if err != nil {

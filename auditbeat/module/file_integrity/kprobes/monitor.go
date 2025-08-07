@@ -23,6 +23,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"sync/atomic"
 	"time"
 
@@ -77,7 +78,7 @@ type Monitor struct {
 }
 
 func New(isRecursive bool) (*Monitor, error) {
-	ctx := context.TODO()
+	ctx, _ := context.WithTimeout(context.Background(), 60*time.Second)
 
 	validatedProbes, exec, err := getVerifiedProbes(ctx, 5*time.Second)
 	if err != nil {
@@ -189,6 +190,7 @@ func (w *Monitor) Start() error {
 				return
 
 			case e, ok := <-w.perfChannel.C():
+				fmt.Fprintf(os.Stdout, "Received perfChannel event: %T ok: %v\n", e, ok)
 				if !ok {
 					w.writeErr(fmt.Errorf("read invalid event from perf channel"))
 					return
