@@ -70,7 +70,7 @@ func (in *s3PollerInput) Run(
 	in.log = inputContext.Logger.Named("s3")
 
 	in.status = newCWStateReporter(inputContext, in.log)
-	defer in.status.UpdateStatus(status.Stopped, "Input stopped")
+	defer in.status.UpdateStatus(status.Stopped, "")
 	in.status.UpdateStatus(status.Starting, "Input starting")
 
 	in.pipeline = pipeline
