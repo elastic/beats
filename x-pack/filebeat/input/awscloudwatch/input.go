@@ -96,7 +96,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	// setup status reporter
 	in.status = newCWStateReporter(inputContext, log)
 
-	defer in.status.UpdateStatus(status.Stopped, "Input stopped")
+	defer in.status.UpdateStatus(status.Stopped, "")
 	in.status.UpdateStatus(status.Starting, "Input starting")
 
 	handler, err := newStateHandler(log, in.config, in.store)

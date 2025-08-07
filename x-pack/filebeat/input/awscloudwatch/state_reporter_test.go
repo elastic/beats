@@ -20,6 +20,7 @@ func Test_constructor(t *testing.T) {
 		require.NotNil(t, reporter)
 
 		require.IsType(t, &cwStateReporter{}, reporter)
+		require.IsType(t, &debugCWStatusReporter{}, reporter.reporter)
 	})
 }
 
@@ -42,6 +43,10 @@ func Test_cwStateReporterStatus(t *testing.T) {
 	require.Equal(t, status.Running, reporter.current)
 	require.Equal(t, 1, counterReporter.count)
 
+	// check for change of status
+	reporter.UpdateStatus(status.Stopped, "")
+	require.Equal(t, status.Stopped, reporter.current)
+	require.Equal(t, 2, counterReporter.count)
 }
 
 // countedReporter helps with testing to track proxying count
