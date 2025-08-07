@@ -82,9 +82,7 @@ func TestMakeDeltaSnapshot(t *testing.T) {
 }
 
 func TestReporterLog(t *testing.T) {
-	observed, zapLogs := observer.New(zapcore.DebugLevel)
-	logger, err := logp.ConfigureWithCoreLocal(logp.Config{}, observed)
-	require.NoError(t, err)
+	logger, zapLogs := logptest.NewTestingLoggerWithObserver(t, "")
 
 	reporter := reporter{config: defaultConfig(), logger: logger.Named("monitoring")}
 
