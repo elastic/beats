@@ -18,6 +18,7 @@
 package testing
 
 import (
+	"fmt"
 	"net"
 	"testing"
 
@@ -37,9 +38,12 @@ func AvailableTCP4Port() (uint16, error) {
 	}
 	defer listener.Close()
 
-	tcpAddr := uint16(listener.Addr().(*net.TCPAddr).Port)
+	tcpAddr, ok := listener.Addr().(*net.TCPAddr)
+	if !ok {
+		return 0, fmt.Errorf("expected TCP address, got %T", listener.Addr())
+	}
 
-	return tcpAddr, nil
+	return uint16(tcpAddr.Port), nil
 }
 
 func MustAvailableTCP4Port(t *testing.T) uint16 {
