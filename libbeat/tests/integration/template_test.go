@@ -63,7 +63,7 @@ output:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
 }
 
 // Test that beat stops in case elasticsearch index is modified and pattern not
@@ -122,7 +122,7 @@ setup.template:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
 }
 
 // Test loading of json based template
@@ -164,11 +164,11 @@ logging:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
 	msg := "Loading json template from file"
-	mockbeat.WaitForLogs(msg, 60*time.Second)
+	mockbeat.WaitLogsContains(msg, 60*time.Second)
 	msg = "Template with name \\\"bla\\\" loaded."
-	mockbeat.WaitForLogs(msg, 60*time.Second)
+	mockbeat.WaitLogsContains(msg, 60*time.Second)
 
 	// check effective changes in ES
 	indexURL, err := FormatIndexTemplateURL(t, esUrl, templateName)
@@ -221,8 +221,8 @@ logging:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
-	mockbeat.WaitForLogs("Template with name \\\"mockbeat-9.9.9\\\" loaded.", 20*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("Template with name \\\"mockbeat-9.9.9\\\" loaded.", 20*time.Second)
 	require.Eventually(t, func() bool {
 		return mockbeat.LogMatch("doBulkRequest: [[:digit:]]+ events have been sent")
 	}, 20*time.Second, 100*time.Millisecond, "looking for PublishEvents")
@@ -294,7 +294,7 @@ logging:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
 	require.Eventually(t, func() bool {
 		return mockbeat.LogMatch("doBulkRequest: [[:digit:]]+ events have been sent")
 	}, 20*time.Second, 100*time.Millisecond, "looking for PublishEvents")

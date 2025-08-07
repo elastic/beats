@@ -143,12 +143,12 @@ logging.level: debug
 	filebeat.Start()
 
 	// 4. Wait for Filebeat to start scanning for files
-	filebeat.WaitForLogs(
+	filebeat.WaitLogsContains(
 		fmt.Sprintf("A new file %s has been found", logFilePath),
 		30*time.Second,
 		"Filebeat did not start looking for files to ingest")
 
-	filebeat.WaitForLogs(
+	filebeat.WaitLogsContains(
 		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePath),
 		10*time.Second, "Filebeat did not close the file")
 

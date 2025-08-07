@@ -82,8 +82,8 @@ func TestFilestreamLiveFileTruncation(t *testing.T) {
 	// 1. Create a log file and let Filebeat harvest all contents
 	integration.GenerateLogFile(t, logFile, 200, false)
 	filebeat.Start()
-	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
-	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
+	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
+	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 
 	// 2. Truncate the file and wait Filebeat to close the file
 	if err := os.Truncate(logFile, 0); err != nil {
@@ -91,10 +91,10 @@ func TestFilestreamLiveFileTruncation(t *testing.T) {
 	}
 
 	// 3. Ensure Filebeat detected the file truncation
-	filebeat.WaitForLogs("File was truncated as offset (10000) > size (0)", 20*time.Second, "file was not truncated")
-	filebeat.WaitForLogs("File was truncated, nothing to read", 20*time.Second, "reader loop did not stop")
-	filebeat.WaitForLogs("Stopped harvester for file", 20*time.Second, "harvester did not stop")
-	filebeat.WaitForLogs("Closing reader of filestream", 20*time.Second, "reader did not close")
+	filebeat.WaitLogsContains("File was truncated as offset (10000) > size (0)", 20*time.Second, "file was not truncated")
+	filebeat.WaitLogsContains("File was truncated, nothing to read", 20*time.Second, "reader loop did not stop")
+	filebeat.WaitLogsContains("Stopped harvester for file", 20*time.Second, "harvester did not stop")
+	filebeat.WaitLogsContains("Closing reader of filestream", 20*time.Second, "reader did not close")
 
 	// 4. Now we need to stop Filebeat before the next scan cycle
 	filebeat.Stop()
@@ -107,8 +107,8 @@ func TestFilestreamLiveFileTruncation(t *testing.T) {
 
 	// 5. Start Filebeat again.
 	filebeat.Start()
-	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
-	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
+	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
+	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 
 	assertLastOffset(t, registryLogFile, 500)
 }
@@ -130,8 +130,8 @@ func TestFilestreamOfflineFileTruncation(t *testing.T) {
 
 	// 2. Ingest the file and stop Filebeat
 	filebeat.Start()
-	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
-	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
+	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
+	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 	filebeat.Stop()
 
 	// 3. Assert the offset is correctly set in the registry
@@ -145,8 +145,8 @@ func TestFilestreamOfflineFileTruncation(t *testing.T) {
 
 	// 5. Read the file again and stop Filebeat
 	filebeat.Start()
-	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
-	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
+	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
+	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 	filebeat.Stop()
 
 	// 6. Assert the registry offset is new, smaller file size.

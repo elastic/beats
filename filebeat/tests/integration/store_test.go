@@ -97,14 +97,14 @@ func TestStore(t *testing.T) {
 		// Files can be ingested out of order, so we cannot specify their path.
 		// There will be more than one log line per file, but that at least gives us
 		// some assurance the files were read
-		filebeat.WaitForLogs("Closing reader of filestream", 30*time.Second, "Filebeat did not finish reading the log file")
+		filebeat.WaitLogsContains("Closing reader of filestream", 30*time.Second, "Filebeat did not finish reading the log file")
 	}
 
 	// 3. Remove files so their state can be cleaned
 	if err := os.RemoveAll(logsFolder); err != nil {
 		t.Fatalf("could not remove logs folder '%s': %s", logsFolder, err)
 	}
-	filebeat.WaitForLogs(fmt.Sprintf("%d entries removed", numLogFiles), 30*time.Second, "store entries not removed")
+	filebeat.WaitLogsContains(fmt.Sprintf("%d entries removed", numLogFiles), 30*time.Second, "store entries not removed")
 	filebeat.Stop()
 
 	registryLogFile := filepath.Join(tempDir, "data/registry/filebeat/log.json")
