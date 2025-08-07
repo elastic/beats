@@ -96,27 +96,28 @@ func (w *cwWorker) Start(ctx context.Context, workReq chan struct{}, workRsp cha
 
 func (w *cwWorker) run(ctx context.Context, logGroupId string, startTime, endTime time.Time) int {
 	count, err := w.getLogEventsFromCloudWatch(ctx, logGroupId, startTime, endTime)
-	if err != nil {
-		var errRequestCanceled *awssdk.RequestCanceledError
-		if errors.As(err, &errRequestCanceled) {
-			w.log.Error("getLogEventsFromCloudWatch failed with RequestCanceledError: ", errRequestCanceled)
-		} else {
-			w.log.Error("getLogEventsFromCloudWatch failed: ", err)
-		}
-
-		var rspError *http.ResponseError
-		if errors.As(err, &rspError) {
-			// update status with context details
-			w.status.UpdateStatus(status.Degraded, fmt.Sprintf("Log group listing failed, status: %d, error: %s", rspError.Response.StatusCode, rspError.Error()))
-		} else {
-			w.status.UpdateStatus(status.Degraded, fmt.Sprintf("Log group listing failed, error: %s", err.Error()))
-		}
-	}
-
 	if err == nil {
+		// return fast for non-errors
 		w.status.UpdateStatus(status.Running, "Input is running")
+		return count
 	}
 
+	// handle errors
+	var errRequestCanceled *awssdk.RequestCanceledError
+	if errors.As(err, &errRequestCanceled) {
+		w.log.Error("getLogEventsFromCloudWatch failed with RequestCanceledError: ", errRequestCanceled)
+	} else {
+		w.log.Error("getLogEventsFromCloudWatch failed: ", err)
+	}
+
+	var rspError *http.ResponseError
+	if errors.As(err, &rspError) && rspError.Response != nil {
+		// update status with context details if Response is available
+		w.status.UpdateStatus(status.Degraded, fmt.Sprintf("Log group listing failed, status: %d, error: %s", rspError.Response.StatusCode, rspError.Error()))
+		return count
+	}
+
+	w.status.UpdateStatus(status.Degraded, fmt.Sprintf("Log group listing failed, error: %s", err.Error()))
 	return count
 }
 
