@@ -31,6 +31,7 @@ func OTelInspectComand(beatname string) *cobra.Command {
 			}
 			if isOtelConfig {
 				// the user has defined a custom OTel config. Skip the rest of the logic.
+				fmt.Fprintln(cmd.OutOrStdout(), "Custom OTel config detected. Skipping translation")
 				return nil
 			}
 

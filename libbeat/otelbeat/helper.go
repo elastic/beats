@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/fbprovider"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/mbprovider"
+
 	"go.opentelemetry.io/collector/confmap"
 )
 
