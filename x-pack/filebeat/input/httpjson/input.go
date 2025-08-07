@@ -19,7 +19,7 @@ import (
 	"strings"
 	"time"
 
-	retryablehttp "github.com/hashicorp/go-retryablehttp"
+	"github.com/hashicorp/go-retryablehttp"
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -31,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
@@ -170,9 +169,8 @@ func test(url *url.URL) error {
 }
 
 func runWithMetrics(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor) error {
-	reg, unreg := inputmon.NewInputRegistry("httpjson", ctx.ID, nil)
-	defer unreg()
-	return run(ctx, cfg, pub, crsr, reg)
+	v2.MetricsRegistryOverrideInput(ctx.MetricsRegistry, "httpjson")
+	return run(ctx, cfg, pub, crsr, ctx.MetricsRegistry)
 }
 
 func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor, reg *monitoring.Registry) error {
@@ -245,7 +243,16 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 
 		var err error
 		if err = requester.doRequest(stdCtx, trCtx, pub); err != nil {
-			log.Errorf("Error while processing http request: %v", err)
+			var httpErr *httpError
+			if ok := errors.As(err, &httpErr); ok {
+				log.Errorw("Error while processing http request",
+					"error", err,
+					"error.code", httpErr.StatusCode,
+					"error.id", httpErr.Status,
+					"error.type", "http")
+			} else {
+				log.Errorw("Error while processing http request", "error", err)
+			}
 		}
 
 		metrics.updateIntervalMetrics(err, startTime)

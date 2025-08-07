@@ -70,7 +70,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta(fmt.Sprintf("The nats %s metricset is beta.", base.Name()))
+	base.Logger().Warn(cfgwarn.Beta(fmt.Sprintf("The nats %s metricset is beta.", base.Name())))
 
 	var config ModuleConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {

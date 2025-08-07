@@ -12,22 +12,23 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
 	inputName = "lumberjack"
 )
 
-func Plugin() inputv2.Plugin {
+func Plugin(log *logp.Logger) inputv2.Plugin {
 	return inputv2.Plugin{
 		Name:      inputName,
 		Stability: feature.Beta,
 		Info:      "Receives data streamed via the Lumberjack protocol.",
-		Manager:   inputv2.ConfigureWith(configure),
+		Manager:   inputv2.ConfigureWith(configure, log),
 	}
 }
 
-func configure(cfg *conf.C) (inputv2.Input, error) {
+func configure(cfg *conf.C, _ *logp.Logger) (inputv2.Input, error) {
 	var lumberjackConfig config
 	if err := cfg.Unpack(&lumberjackConfig); err != nil {
 		return nil, err
@@ -76,8 +77,7 @@ func (i *lumberjackInput) Run(inputCtx inputv2.Context, pipeline beat.Pipeline) 
 
 	setGoLumberLogger(inputCtx.Logger.Named("go-lumber"))
 
-	metrics := newInputMetrics(inputCtx.ID, nil)
-	defer metrics.Close()
+	metrics := newInputMetrics(inputCtx.MetricsRegistry)
 
 	s, err := newServer(i.config, inputCtx.Logger, client.Publish, inputCtx.StatusReporter, metrics)
 	if err != nil {
