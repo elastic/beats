@@ -207,6 +207,8 @@ func newQueue(
 
 	if logger == nil {
 		logger = logp.NewLogger("memqueue")
+	} else {
+		logger = logger.Named("memqueue")
 	}
 
 	b := &broker{

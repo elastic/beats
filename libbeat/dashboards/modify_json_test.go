@@ -22,6 +22,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -109,7 +110,7 @@ func TestReplaceIndexInDashboardObject(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result := ReplaceIndexInDashboardObject(test.pattern, test.dashboard)
+		result := ReplaceIndexInDashboardObject(test.pattern, test.dashboard, logptest.NewTestingLogger(t, ""))
 		assert.Equal(t, string(test.expected), string(result))
 	}
 }

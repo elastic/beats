@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/error-loading-config.html
+applies_to:
+  stack: ga
 ---
 
 # Error loading config file [error-loading-config]

@@ -108,6 +108,9 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 		return nil, nil, err
 	}
 
+	// log warning if deprecated params are set
+	c.checkUnsupportedParams(log)
+
 	c.TakeOver.LogWarnings(log)
 
 	prospector, err := newProspector(c, log)
@@ -455,7 +458,7 @@ func (inp *filestream) open(
 		return nil, truncated, err
 	}
 
-	dbgReader, err := debug.AppendReaders(logReader)
+	dbgReader, err := debug.AppendReaders(logReader, log)
 	if err != nil {
 		return nil, truncated, err
 	}
@@ -472,7 +475,7 @@ func (inp *filestream) open(
 		BufferSize: inp.readerConfig.BufferSize,
 		Terminator: inp.readerConfig.LineTerminator,
 		MaxBytes:   encReaderMaxBytes,
-	})
+	}, log)
 	if err != nil {
 		return nil, truncated, err
 	}

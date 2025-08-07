@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/defining-processors.html
+applies_to:
+  stack: ga
 ---
 
 # Define processors [defining-processors]
@@ -108,7 +110,7 @@ The supported processors are:
 * [`fingerprint`](/reference/auditbeat/fingerprint.md)
 * [`include_fields`](/reference/auditbeat/include-fields.md)
 * [`move-fields`](/reference/auditbeat/move-fields.md)
-* [`now`](/reference/auditbeat/now.md)
+* [`now`](/reference/auditbeat/now.md) {applies_to}`stack: ga 9.1.0`
 * [`rate_limit`](/reference/auditbeat/rate-limit.md)
 * [`registered_domain`](/reference/auditbeat/processor-registered-domain.md)
 * [`rename`](/reference/auditbeat/rename-fields.md)

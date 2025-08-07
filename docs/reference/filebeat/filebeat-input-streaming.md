@@ -2,6 +2,8 @@
 navigation_title: "Streaming"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-streaming.html
+applies_to:
+  stack: preview
 ---
 
 # Streaming Input [filebeat-input-streaming]
@@ -208,6 +210,9 @@ filebeat.inputs:
 ```
 
 ## Keep Alive configuration
+```{applies_to}
+  stack: preview 9.0.4
+```
 
 The `streaming` input currently supports keep-alive configuration options for streams of `type: websocket`. Use these configuration options to further optimize the stability
 of your WebSocket connections and prevent them from idling out.
@@ -217,7 +222,7 @@ The `keep_alive` setting has the following configuration options:
 * `enable`: Indicates whether Keep-Alive is enabled. By default, this is set to `false`.
 * `interval`: Interval between Keep-Alive messages, expressed as a time duration value. The default value is `30s`.
 * `write_control_deadline`: Deadline for writing control frames, like `PING`, `PONG`, or `CLOSE`, on a WebSocket connection. The timeout, expressed as a time duration value, helps prevent indefinite blocking when the server or client is not responding to control frame requests. The default value is `10s`.
-   
+
 ::::{note}
 Don't use the `blanket_retries` and `infinite_retries` configuration options together with the `keep_alive` settings. The purpose of `keep_alive` is to keep the connection open so you don't need to `retry` and reconnect all the time. In some scenarios `keep_alive` might not work if the host WebSocket server is not configured to handle `ping` frames.
 ::::
@@ -275,7 +280,7 @@ program: |
 
 ### `state` [state-streaming]
 
-`state` is an optional object that is passed to the CEL program on the first execution. It is available to the executing program as the `state` variable. Except for the `state.cursor` field, `state` does not persist over restarts.
+`state` is an optional object that is passed to the CEL program as the `state` variable on the first execution. Subsequent executions of the program during the life of the input will populate the `state` variable with the return value of the previous execution, but with the `state.events` field removed. Except for the `state.cursor` field, returned `state` data does not persist over restarts.
 
 
 ### `state.cursor` [cursor-streaming]
@@ -442,11 +447,11 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `received_bytes_total` | Number of bytes received over the life cycle of the input. |
 | `events_received_total` | Number of events received. |
 | `events_published_total` | Number of events published. |
-| `write_control_errors` | Number of errors encountered for write control operations. |
+| `write_control_errors` {applies_to}`stack: preview 9.0.4` | Number of errors encountered for write control operations. |
 | `cel_processing_time` | Histogram of the elapsed successful CEL program processing times in nanoseconds. |
 | `batch_processing_time` | Histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches). |
-| `ping_message_send_time` | Histogram of the elapsed successful ping message send times in nanoseconds. |
-| `pong_message_received_time` | Histogram of the elapsed successful pong message receive times in nanoseconds. |
+| `ping_message_send_time`  {applies_to}`stack: preview 9.0.4` | Histogram of the elapsed successful ping message send times in nanoseconds. |
+| `pong_message_received_time` {applies_to}`stack: preview 9.0.4` | Histogram of the elapsed successful pong message receive times in nanoseconds. | 
 
 
 ## Developer tools [_developer_tools_2]

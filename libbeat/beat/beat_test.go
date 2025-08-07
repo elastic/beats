@@ -73,24 +73,30 @@ func TestUserAgentString(t *testing.T) {
 			name: "unmanaged-privileged",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
 				Manager: testManager{isEnabled: true, isUnpriv: false, mgmtMode: proto.AgentManagedMode_STANDALONE}},
-			expectedComments: []string{"Standalone"},
+			expectedComments: []string{"Unmanaged"},
 		},
 		{
 			name: "unmanaged-unprivileged",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
 				Manager: testManager{isEnabled: true, isUnpriv: true, mgmtMode: proto.AgentManagedMode_STANDALONE}},
-			expectedComments: []string{"Standalone", "Unprivileged"},
+			expectedComments: []string{"Unmanaged", "Unprivileged"},
 		},
 		{
 			name: "management-disabled",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
 				Manager: testManager{isEnabled: false}},
+			expectedComments: []string{"Standalone"},
+		},
+		{
+			name: "no-management",
+			beat: &Beat{Info: Info{Beat: "testbeat"},
+				Manager: nil},
 			expectedComments: []string{},
 		},
 	}
 
 	// User-Agent will take the form of
-	// Elastic-testbeat/8.15.0 (linux; amd64; unknown; 0001-01-01 00:00:00 +0000 UTC; Standalone; Unprivileged)
+	// Elastic-testbeat/9.2.0 (linux; arm64; Managed; Unprivileged)
 	// the RFC (https://www.rfc-editor.org/rfc/rfc9110#name-user-agent) says the comment field can basically be anything,
 	// but we put metadata in it, delimited by '; '
 	uaReg := regexp.MustCompile(`Elastic-testbeat/([\d.]+) \(([\w-:+; ]+)\)`)

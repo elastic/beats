@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/running-on-kubernetes.html
+applies_to:
+  stack: ga
 ---
 
 # Run Metricbeat on Kubernetes [running-on-kubernetes]
@@ -12,7 +14,7 @@ Running {{ecloud}} on Kubernetes? See [Run {{beats}} on ECK](docs-content://depl
 ::::
 
 
-% However, version {{stack-version}} of Metricbeat has not yet been released, so no Docker image is currently available for this version.
+% However, version {{version.stack}} of Metricbeat has not yet been released, so no Docker image is currently available for this version.
 
 
 ## Kubernetes deploy manifests for Metricbeat [_kubernetes_deploy_manifests]
@@ -28,7 +30,7 @@ Everything is deployed under the `kube-system` namespace by default. To change t
 To download the manifest file, run:
 
 ```sh subs=true
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/kubernetes/metricbeat-kubernetes.yaml
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.M }}/deploy/kubernetes/metricbeat-kubernetes.yaml
 ```
 
 ::::{warning}

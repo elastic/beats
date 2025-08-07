@@ -441,7 +441,7 @@ func TestTest(t *testing.T) {
 		"group_id": "filebeat",
 	})
 
-	inp, err := Plugin().Manager.Create(config)
+	inp, err := Plugin(logptest.NewTestingLogger(t, "")).Manager.Create(config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -601,7 +601,7 @@ func writeToKafkaTopic(
 }
 
 func run(t *testing.T, cfg *conf.C, client *beattest.ChanClient) (*kafkaInput, func()) {
-	inp, err := Plugin().Manager.Create(cfg)
+	inp, err := Plugin(logptest.NewTestingLogger(t, "")).Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -58,10 +58,7 @@ type logHints struct {
 
 // InitializeModule initializes this module.
 func InitializeModule() {
-	err := autodiscover.Registry.AddBuilder("hints", NewLogHints)
-	if err != nil {
-		logp.Error(fmt.Errorf("could not add `hints` builder"))
-	}
+	_ = autodiscover.Registry.AddBuilder("hints", NewLogHints)
 }
 
 // NewLogHints builds a log hints builder
@@ -88,7 +85,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 
 	// Hint must be explicitly enabled when default_config sets enabled=false.
 	if !l.config.DefaultConfig.Enabled() && !utils.IsEnabled(hints, l.config.Key) ||
-		utils.IsDisabled(hints, l.config.Key) {
+		utils.IsDisabled(hints, l.config.Key, l.log) {
 		l.log.Debugw("Hints config is not enabled.", "autodiscover.event", event)
 		return nil
 	}
@@ -104,7 +101,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 		}
 		l.log.Debugf("Generated %d input configs from hint.", len(configs))
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs)
+		return template.ApplyConfigTemplate(event, configs, l.log)
 	}
 
 	var configs []*conf.C //nolint:prealloc //breaks tests
@@ -202,7 +199,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 		configs = append(configs, config)
 	}
 	// Apply information in event to the template to generate the final config
-	return template.ApplyConfigTemplate(event, configs)
+	return template.ApplyConfigTemplate(event, configs, l.log)
 }
 
 func (l *logHints) getMultiline(hints mapstr.M) mapstr.M {
@@ -224,11 +221,11 @@ func (l *logHints) getModule(hints mapstr.M) string {
 }
 
 func (l *logHints) getInputsConfigs(hints mapstr.M) []mapstr.M {
-	return utils.GetHintAsConfigs(hints, l.config.Key)
+	return utils.GetHintAsConfigs(hints, l.config.Key, l.log)
 }
 
 func (l *logHints) getProcessors(hints mapstr.M) []mapstr.M {
-	return utils.GetProcessors(hints, l.config.Key)
+	return utils.GetProcessors(hints, l.config.Key, l.log)
 }
 
 func (l *logHints) getPipeline(hints mapstr.M) string {
