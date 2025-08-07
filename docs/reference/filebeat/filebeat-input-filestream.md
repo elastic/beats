@@ -329,6 +329,7 @@ To remove the state of previously harvested files from the registry file, use th
 
 ```{applies_to}
 stack: beta
+```
 
 When `take_over` is enabled, this `filestream` input will take over
 states from the [`log`](/reference/filebeat/filebeat-input-log.md) input
