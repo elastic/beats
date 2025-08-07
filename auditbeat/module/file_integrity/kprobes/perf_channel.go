@@ -55,10 +55,7 @@ func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponen
 	}
 
 	for probe, allocFn := range probes {
-		err = tfs.RemoveKProbe(probe)
-		if err != nil {
-			return nil, fmt.Errorf("failed to remove existing kprobe %s: %w", probe.Name, err)
-		}
+		_ = tfs.RemoveKProbe(probe)
 
 		err := tfs.AddKProbe(probe)
 		if err != nil {
