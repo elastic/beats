@@ -328,7 +328,7 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 		release, err := getReleaseState(filepath.Join(metricset, "_meta/fields.yml"))
 		raw, err := os.ReadFile(filepath.Join(metricset, "_meta/fields.yml"))
 		if err != nil {
-			fmt.Errorf("failed to read from spec file: %w", err)
+			return nil, err
 		}
 		applies_to, err := getVersion(raw)
 		if err != nil {
