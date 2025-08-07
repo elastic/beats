@@ -224,7 +224,9 @@ require (
 	go.opentelemetry.io/collector/exporter/debugexporter v0.121.0
 	go.opentelemetry.io/collector/otelcol v0.121.0
 	go.opentelemetry.io/collector/pdata v1.28.0
+	go.opentelemetry.io/collector/pipeline v0.122.0
 	go.opentelemetry.io/collector/receiver v0.121.0
+	go.opentelemetry.io/collector/receiver/receivertest v0.121.0
 	go.uber.org/mock v0.5.0
 	golang.org/x/term v0.32.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250115164207-1a7da9e5054f
@@ -428,12 +430,10 @@ require (
 	go.opentelemetry.io/collector/internal/telemetry v0.121.0 // indirect
 	go.opentelemetry.io/collector/pdata/pprofile v0.122.0 // indirect
 	go.opentelemetry.io/collector/pdata/testdata v0.122.0 // indirect
-	go.opentelemetry.io/collector/pipeline v0.122.0 // indirect
 	go.opentelemetry.io/collector/pipeline/xpipeline v0.121.0 // indirect
 	go.opentelemetry.io/collector/processor v0.121.0 // indirect
 	go.opentelemetry.io/collector/processor/processortest v0.121.0 // indirect
 	go.opentelemetry.io/collector/processor/xprocessor v0.121.0 // indirect
-	go.opentelemetry.io/collector/receiver/receivertest v0.121.0 // indirect
 	go.opentelemetry.io/collector/receiver/xreceiver v0.121.0 // indirect
 	go.opentelemetry.io/collector/semconv v0.121.0 // indirect
 	go.opentelemetry.io/collector/service v0.121.0 // indirect
