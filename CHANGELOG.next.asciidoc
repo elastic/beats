@@ -499,6 +499,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Improve CEL and Streaming input documentation of the `state` option. {pull}45616[45616]
 - Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]
 - Clarify behavior in logging for starting periodic evaluations and for exceeding the maximum execution budget. {pull}45633[45633]
+- Add status reporting support for AWS CloudWatch input. {pull}45679[45679]
 
 *Auditbeat*
 
