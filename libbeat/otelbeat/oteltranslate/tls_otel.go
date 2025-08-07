@@ -209,7 +209,7 @@ func setIfNotNil(m map[string]any, key string, value any) {
 			m[key] = value
 		}
 	case reflect.Bool:
-		if v.Bool() != false {
+		if v.Bool() {
 			m[key] = value
 		}
 	case reflect.Map, reflect.Slice:
