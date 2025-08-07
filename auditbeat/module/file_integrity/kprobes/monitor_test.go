@@ -483,7 +483,7 @@ func (p *monitorTestSuite) TestNew() {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
-	m, err := New(true)
+	monitorHandle, err := New(true)
 	p.Require().NoError(err)
 
 	tmpDir, err := os.MkdirTemp("", "kprobe_bench_test")
@@ -534,13 +534,13 @@ func (p *monitorTestSuite) TestNew() {
 		defer close(errChan)
 		for {
 			select {
-			case mErr := <-m.ErrorChannel():
+			case mErr := <-monitorHandle.ErrorChannel():
 				select {
 				case errChan <- mErr:
 				case <-cancelChan:
 					return
 				}
-			case e, ok := <-m.EventChannel():
+			case e, ok := <-monitorHandle.EventChannel():
 				if !ok {
 					select {
 					case errChan <- errors.New("closed event channel"):
@@ -556,8 +556,8 @@ func (p *monitorTestSuite) TestNew() {
 		}
 	}()
 
-	p.Require().NoError(m.Start())
-	p.Require().NoError(m.Add(tmpDir))
+	p.Require().NoError(monitorHandle.Start())
+	p.Require().NoError(monitorHandle.Add(tmpDir))
 
 	p.Require().NoError(os.WriteFile(targetFile, []byte("hello world!"), 0o644))
 	p.Require().NoError(os.Chmod(targetFile, 0o777))

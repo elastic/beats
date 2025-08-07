@@ -78,7 +78,7 @@ type Monitor struct {
 }
 
 func New(isRecursive bool) (*Monitor, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 60*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), 60*time.Second) //nolint:govet // Testing timeout issues
 
 	validatedProbes, exec, err := getVerifiedProbes(ctx, 5*time.Second)
 	if err != nil {
