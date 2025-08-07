@@ -468,7 +468,7 @@ func assertMapstrKeysEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string
 	require.Zero(t, cmp.Diff(flatM1, flatM2), msg)
 }
 
-func TestmbOTelInspect(t *testing.T) {
+func TestMetricbeatOTelInspect(t *testing.T) {
 	mbOTel := integration.NewBeat(
 		t,
 		"metricbeat-otel",
@@ -501,7 +501,7 @@ processors:
     - add_docker_metadata: ~
     - add_kubernetes_metadata: ~
 `
-	expecteExporter := `exporters:
+	expectedExporter := `exporters:
     elasticsearch:
         batcher:
             enabled: true
@@ -555,9 +555,8 @@ processors:
 
 	require.EventuallyWithT(t, func(collect *assert.CollectT) {
 		out, err := mbOTel.ReadStdout()
-		fmt.Println(out)
 		require.NoError(collect, err)
-		require.Contains(collect, out, expecteExporter)
+		require.Contains(collect, out, expectedExporter)
 		require.Contains(collect, out, expectedReceiver)
 		require.Contains(collect, out, expectedService)
 	}, 10*time.Second, 500*time.Millisecond, "failed to get output of inspect command")

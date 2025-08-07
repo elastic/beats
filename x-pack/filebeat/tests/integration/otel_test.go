@@ -591,7 +591,7 @@ service:
 	}
 }
 
-func TestFilebeatOTeLInspect(t *testing.T) {
+func TestFilebeatOTelInspect(t *testing.T) {
 	filebeatOTel := integration.NewBeat(
 		t,
 		"filebeat-otel",
@@ -623,7 +623,7 @@ processors:
     - add_docker_metadata: ~
     - add_kubernetes_metadata: ~
 `
-	expecteExporter := `exporters:
+	expectedExporter := `exporters:
     elasticsearch:
         batcher:
             enabled: true
@@ -677,7 +677,7 @@ processors:
 	require.EventuallyWithT(t, func(collect *assert.CollectT) {
 		out, err := filebeatOTel.ReadStdout()
 		require.NoError(t, err)
-		require.Contains(t, out, expecteExporter)
+		require.Contains(t, out, expectedExporter)
 		require.Contains(t, out, expectedReceiver)
 		require.Contains(t, out, expectedService)
 	}, 10*time.Second, 500*time.Millisecond, "failed to get output of inspect command")

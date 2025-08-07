@@ -19,9 +19,8 @@ import (
 
 func OTelInspectComand(beatname string) *cobra.Command {
 	command := &cobra.Command{
-		Short:  "Run this command to inspect the OTeL configuration outputted by beatconverter",
-		Use:    "inspect",
-		Hidden: true,
+		Short: "Run this command to inspect the OTel configuration translated from the Beats config",
+		Use:   "inspect",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// get beat configuration file
 			beatCfg, _ := cmd.Flags().GetString("config")
@@ -32,7 +31,7 @@ func OTelInspectComand(beatname string) *cobra.Command {
 				return fmt.Errorf("error reading config file: %w", err)
 			}
 			if isOtelConfig {
-				// the user has defined a custom OTeL config. Skip the rest of the logic.
+				// the user has defined a custom OTel config. Skip the rest of the logic.
 				return nil
 			}
 
@@ -43,14 +42,14 @@ func OTelInspectComand(beatname string) *cobra.Command {
 			case "metricbeat":
 				provider = mbprovider.NewFactory().Create(confmap.ProviderSettings{})
 			}
-			retreived, err := provider.Retrieve(cmd.Context(), schemeMap[beatname]+":"+beatCfg, nil)
+			retrieved, err := provider.Retrieve(cmd.Context(), schemeMap[beatname]+":"+beatCfg, nil)
 			if err != nil {
 				return fmt.Errorf("error getting the config from provider: %w", err)
 			}
 
-			conf, err := retreived.AsConf()
+			conf, err := retrieved.AsConf()
 			if err != nil {
-				return fmt.Errorf("error retriving confmap: %w", err)
+				return fmt.Errorf("error retrieving confmap: %w", err)
 			}
 
 			converter := beatconverter.NewFactory().Create(confmap.ConverterSettings{})
@@ -64,7 +63,7 @@ func OTelInspectComand(beatname string) *cobra.Command {
 				return fmt.Errorf("error marshalling yaml: %w", err)
 			}
 
-			fmt.Fprintf(cmd.OutOrStdout(), string(b))
+			fmt.Fprintln(cmd.OutOrStdout(), string(b))
 			return nil
 		},
 	}
