@@ -458,6 +458,7 @@ http.port: %d
 }
 
 func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/45631")
 	integration.EnsureESIsRunning(t)
 	wantEvents := 100
 
