@@ -90,7 +90,7 @@ func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 		switch strategy {
 		case copytruncateStrategy:
 			experimentalWarning.Do(func() {
-				cfgwarn.Experimental("rotation.external.copytruncate is used.")
+				log.Warn(cfgwarn.Experimental("rotation.external.copytruncate is used."))
 			})
 
 			cpCfg := &copyTruncateConfig{}

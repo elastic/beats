@@ -24,7 +24,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/mitchellh/mapstructure"
+	"github.com/go-viper/mapstructure/v2"
 	"go.opentelemetry.io/collector/config/configtls"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -125,7 +125,7 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config, logger *logp.Logger) (map[string]
 		certPem = string(certBytes)
 	}
 
-	tlsConfig, err := tlscommon.LoadTLSConfig(tlscfg)
+	tlsConfig, err := tlscommon.LoadTLSConfig(tlscfg, logger)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load SSL configuration: %w", err)
 	}

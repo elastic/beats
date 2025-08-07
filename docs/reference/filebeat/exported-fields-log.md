@@ -12,71 +12,71 @@ Contains log file lines.
 **`log.source.address`**
 :   Source address from which the log event was read / sent from.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`log.offset`**
 :   The file offset the reported line starts at.
 
-type: long
+    type: long
 
-required: False
+    required: False
 
 
 **`stream`**
 :   Log stream when reading container logs, can be 'stdout' or 'stderr'
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`input.type`**
 :   The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Filebeat config file.
 
-required: True
+    required: True
 
 
 **`syslog.facility`**
 :   The facility extracted from the priority.
 
-type: long
+    type: long
 
-required: False
+    required: False
 
 
 **`syslog.priority`**
 :   The priority of the syslog event.
 
-type: long
+    type: long
 
-required: False
+    required: False
 
 
 **`syslog.severity_label`**
 :   The human readable severity.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`syslog.facility_label`**
 :   The human readable facility.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`process.program`**
 :   The name of the program.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`log.flags`**
@@ -86,7 +86,7 @@ required: False
 **`http.response.content_length`**
 :   type: alias
 
-alias to: http.response.body.bytes
+    alias to: http.response.body.bytes
 
 
 **`user_agent.os.full_name`**
@@ -96,114 +96,114 @@ alias to: http.response.body.bytes
 **`fileset.name`**
 :   The Filebeat fileset that generated this event.
 
-type: keyword
+    type: keyword
 
 
 **`fileset.module`**
 :   type: alias
 
-alias to: event.module
+    alias to: event.module
 
 
 **`read_timestamp`**
 :   type: alias
 
-alias to: event.created
+    alias to: event.created
 
 
 **`docker.attrs`**
 :   docker.attrs contains labels and environment variables written by docker's JSON File logging driver. These fields are only available when they are configured in the logging driver options.
 
-type: object
+    type: object
 
 
 **`icmp.code`**
 :   ICMP code.
 
-type: keyword
+    type: keyword
 
 
 **`icmp.type`**
 :   ICMP type.
 
-type: keyword
+    type: keyword
 
 
 **`igmp.type`**
 :   IGMP type.
 
-type: keyword
+    type: keyword
 
 
 **`azure.eventhub`**
 :   Name of the eventhub.
 
-type: keyword
+    type: keyword
 
 
 **`azure.offset`**
 :   The offset.
 
-type: long
+    type: long
 
 
 **`azure.enqueued_time`**
 :   The enqueued time.
 
-type: date
+    type: date
 
 
 **`azure.partition_id`**
 :   The partition id.
 
-type: long
+    type: long
 
 
 **`azure.consumer_group`**
 :   The consumer group.
 
-type: keyword
+    type: keyword
 
 
 **`azure.sequence_number`**
 :   The sequence number.
 
-type: long
+    type: long
 
 
 **`kafka.topic`**
 :   Kafka topic
 
-type: keyword
+    type: keyword
 
 
 **`kafka.partition`**
 :   Kafka partition number
 
-type: long
+    type: long
 
 
 **`kafka.offset`**
 :   Kafka offset of this message
 
-type: long
+    type: long
 
 
 **`kafka.key`**
 :   Kafka key, corresponding to the Kafka value stored in the message
 
-type: keyword
+    type: keyword
 
 
 **`kafka.block_timestamp`**
 :   Kafka outer (compressed) block timestamp
 
-type: date
+    type: date
 
 
 **`kafka.headers`**
 :   An array of Kafka header strings for this message, in the form "<key>: <value>".
 
-type: array
+    type: array
 
 

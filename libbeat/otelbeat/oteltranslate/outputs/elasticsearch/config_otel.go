@@ -23,7 +23,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/mitchellh/mapstructure"
+	"github.com/go-viper/mapstructure/v2"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -190,7 +190,7 @@ func checkUnsupportedConfig(cfg *config.C, logger *logp.Logger) error {
 		logger.Warn("parameters is currently not supported")
 	} else if cfg.HasField("proxy_headers") {
 		logger.Warn("proxy_headers is currently not supported")
-	} else if value, _ := cfg.Bool("allow_older_versions", -1); !value {
+	} else if value, err := cfg.Bool("allow_older_versions", -1); err == nil && !value {
 		logger.Warn("allow_older_versions:false is currently not supported")
 	}
 	return nil

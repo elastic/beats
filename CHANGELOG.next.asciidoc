@@ -99,6 +99,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add NTP metricset to system module. {pull}44884[44884]
 - Add VPN metrics to meraki module {pull}44851[44851]
 - Improve error messages in AWS Health {pull}45408[45408]
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
 
 *Osquerybeat*
 
@@ -147,6 +148,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix an issue where the Kafka output could get stuck if a proxied connection to the Kafka cluster was reset. {issue}44606[44606]
 - Use Debian 11 to build linux/arm to match linux/amd64. Upgrades linux/arm64's statically linked glibc from 2.28 to 2.31. {issue}44816[44816]
 - The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
+- Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
 
 *Auditbeat*
 
@@ -261,6 +263,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix unexpected EOF detection and improve memory usage. {pull}44813[44813]
 - Fixed issue for "Root level readerConfig no longer respected" in azureblobstorage input. {issue}44812[44812] {pull}44873[44873]
 - Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
+- Fix a panic in the winlog input that prevented it from starting. {issue}45693[45693] {pull}45730[45730]
+- Fix error handling in ABS input when both root level `max_workers` and `batch_size` are empty. {issue}45680[45680] {pull}45743[45743]
 
 *Heartbeat*
 
@@ -336,6 +340,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Publish cloud.availability_zone by add_cloud_metadata processor in azure environments {issue}42601[42601] {pull}43618[43618]
 - Added the `now` processor, which will populate the specified target field with the current timestamp. {pull}44795[44795]
+- Improve trimming of BOM from UTF-8 data in the libbeat reader/readfile.EncoderReader. {pull}45742[45742]
 
 *Auditbeat*
 
@@ -488,7 +493,11 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Reuse OAuth2 clients in HTTP JSON input where possible. {issue}34834[34834] {pull}44976[44976]
 - Add support for generalized token authentication to CEL input. {pull}45359[45359]
 - Log CEL single object evaluation results as ECS compliant documents where possible. {issue}45254[45254] {pull}45399[45399]
+- Add full event rendering for the ETW input {pull}44664[44664]
 - Add status update functionality to Salesforce input. {issue}44653[44653] {pull}45227[45227]
+- Improve CEL and Streaming input documentation of the `state` option. {pull}45616[45616]
+- Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]
+- Clarify behavior in logging for starting periodic evaluations and for exceeding the maximum execution budget. {pull}45633[45633]
 
 *Auditbeat*
 
@@ -574,6 +583,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 
 *Packetbeat*
+- Optionally ignore MAC address in flow matching {pull}44965[44965]
+- Add `tls.server.ja3s` tls fingerprint {pull}43284[43284]
 
 *Winlogbeat*
 

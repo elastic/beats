@@ -348,7 +348,7 @@ func (conn *Connection) Test(d testing.Driver) {
 			d.Warn("TLS", "secure connection disabled")
 		} else {
 			d.Run("TLS", func(d testing.Driver) {
-				tls, err := tlscommon.LoadTLSConfig(conn.Transport.TLS)
+				tls, err := tlscommon.LoadTLSConfig(conn.Transport.TLS, conn.log)
 				if err != nil {
 					d.Fatal("load tls config", err)
 				}

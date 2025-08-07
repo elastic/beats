@@ -90,7 +90,7 @@ func init() {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	var ms MetricSet
 
-	cfgwarn.Beta("The %v/%v dataset is beta", system.ModuleName, metricsetName)
+	base.Logger().Warn(cfgwarn.Beta("The %v/%v dataset is beta", system.ModuleName, metricsetName))
 
 	ms.config = defaultConfig
 	ms.log = base.Logger().Named(metricsetName)
