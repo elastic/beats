@@ -20,6 +20,6 @@ Common log fields
 **`mssql.log.origin`**
 :   Origin of the message, usually the server but it can also be a recovery process
 
-type: keyword
+    type: keyword
 
 
