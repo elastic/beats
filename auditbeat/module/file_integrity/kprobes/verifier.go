@@ -31,7 +31,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
-	"github.com/elastic/elastic-agent-libs/logp"
 
 	tkbtf "github.com/elastic/tk-btf"
 )
@@ -188,7 +187,7 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 				}
 
 				if err := verifier.validateEvent(ev.Path, ev.PID, ev.Op); err != nil {
-					logp.L().Infof("error validating event with path %s, pid %d, op %d: %v", ev.Path, ev.PID, ev.Op, err)
+					fmt.Fprintf(os.Stdout, "error validating event with path %s, pid %d, op %d: %v", ev.Path, ev.PID, ev.Op, err)
 					retC <- err
 					return
 				}

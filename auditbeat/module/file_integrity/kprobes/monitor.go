@@ -50,6 +50,7 @@ func newMonitorEmitter(ctx context.Context, eventC chan MonitorEvent) *monitorEm
 }
 
 func (m *monitorEmitter) Emit(ePath string, pid uint32, op uint32) error {
+	fmt.Fprintf(os.Stdout, "Got monitor event: %v\n", ePath)
 	select {
 	case <-m.ctx.Done():
 		return m.ctx.Err()
@@ -94,7 +95,7 @@ func NewWithContext(ctx context.Context, isRecursive bool) (*Monitor, error) {
 func New(isRecursive bool) (*Monitor, error) {
 	ctx := context.TODO()
 
-	validatedProbes, exec, err := getVerifiedProbes(ctx, 5*time.Second)
+	validatedProbes, exec, err := getVerifiedProbes(ctx, 25*time.Second)
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +205,6 @@ func (w *Monitor) Start() error {
 				return
 
 			case e, ok := <-w.perfChannel.C():
-				fmt.Fprintf(os.Stdout, "Received perfChannel event: %T ok: %v\n", e, ok)
 				if !ok {
 					w.writeErr(fmt.Errorf("read invalid event from perf channel"))
 					return
