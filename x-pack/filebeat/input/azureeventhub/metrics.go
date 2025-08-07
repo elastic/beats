@@ -9,17 +9,13 @@ package azureeventhub
 import (
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
 // newInputMetrics creates a new `*inputMetrics` to track input metrics.
-func newInputMetrics(id string, parentRegistry *monitoring.Registry) *inputMetrics {
-	reg, unregister := inputmon.NewInputRegistry(inputName, id, parentRegistry)
+func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 	inputMetrics := inputMetrics{
-		unregister: unregister,
-
 		// Messages
 		receivedMessages:    monitoring.NewUint(reg, "received_messages_total"),
 		receivedBytes:       monitoring.NewUint(reg, "received_bytes_total"),
@@ -69,10 +65,6 @@ func newInputMetrics(id string, parentRegistry *monitoring.Registry) *inputMetri
 //	  "test": "this is some message"
 //	}
 type inputMetrics struct {
-	// unregister is the cancel function to call when the input is
-	// stopping.
-	unregister func()
-
 	// Messages
 	receivedMessages    *monitoring.Uint // receivedMessages tracks the number of messages received from eventhub.
 	receivedBytes       *monitoring.Uint // receivedBytes tracks the number of bytes received from eventhub.
@@ -90,11 +82,4 @@ type inputMetrics struct {
 
 	// Processor
 	processorRestarts *monitoring.Uint // processorRestarts tracks the number of times the processor has restarted.
-}
-
-// Close unregisters the metrics from the registry.
-func (m *inputMetrics) Close() {
-	if m.unregister != nil {
-		m.unregister()
-	}
 }
