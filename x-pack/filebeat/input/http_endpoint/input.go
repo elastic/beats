@@ -62,16 +62,20 @@ func Plugin() v2.Plugin {
 	}
 }
 
+<<<<<<< HEAD
 func configure(cfg *conf.C) (v2.Input, error) {
+=======
+func configure(cfg *conf.C, logger *logp.Logger) (v2.Input, error) {
+>>>>>>> 8df1efe87 (Replace global loggers with local logger #13 (#45720))
 	conf := defaultConfig()
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, err
 	}
 
-	return newHTTPEndpoint(conf)
+	return newHTTPEndpoint(conf, logger)
 }
 
-func newHTTPEndpoint(config config) (*httpEndpoint, error) {
+func newHTTPEndpoint(config config, logger *logp.Logger) (*httpEndpoint, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
@@ -79,7 +83,7 @@ func newHTTPEndpoint(config config) (*httpEndpoint, error) {
 	addr := net.JoinHostPort(config.ListenAddress, config.ListenPort)
 
 	var tlsConfig *tls.Config
-	tlsConfigBuilder, err := tlscommon.LoadTLSServerConfig(config.TLS)
+	tlsConfigBuilder, err := tlscommon.LoadTLSServerConfig(config.TLS, logger)
 	if err != nil {
 		return nil, err
 	}
