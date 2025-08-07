@@ -78,7 +78,7 @@ ssl:
 		input := `
 ssl:
   verification_mode: none
-  restart_on_cert_change.enabled: never
+  restart_on_cert_change.enabled: true
 `
 		cfg := config.MustNewConfigFrom(input)
 		_, err := TLSCommonToOTel(cfg, logger)

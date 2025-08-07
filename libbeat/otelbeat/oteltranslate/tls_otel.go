@@ -51,10 +51,14 @@ func validateUnsupportedConfig(output *config.C) error {
 			return fmt.Errorf("ssl.curve_types is currently not supported: %w", errors.ErrUnsupported)
 		} else if sslConfig.HasField("renegotiation") {
 			return fmt.Errorf("ssl.renegotiation is currently not supported: %w", errors.ErrUnsupported)
-		} else if sslConfig.HasField("restart_on_cert_change.enabled") {
-			return fmt.Errorf("ssl.restart_on_cert_change.enabled is currently not supported: %w", errors.ErrUnsupported)
-		} else if sslConfig.HasField("restart_on_cert_change.period") {
-			return fmt.Errorf("ssl.restart_on_cert_change.period is currently not supported: %w", errors.ErrUnsupported)
+		}
+
+		if reloadCfg, err := sslConfig.Child("restart_on_cert_change", -1); err == nil {
+			if reloadCfg.HasField("enabled") {
+				return fmt.Errorf("ssl.restart_on_cert_change.enabled is currently not supported: %w", errors.ErrUnsupported)
+			} else if reloadCfg.HasField("period") {
+				return fmt.Errorf("ssl.restart_on_cert_change.period is currently not supported: %w", errors.ErrUnsupported)
+			}
 		}
 
 	}
