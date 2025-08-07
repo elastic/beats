@@ -22,7 +22,6 @@ package tracing
 import (
 	"errors"
 	"fmt"
-	"os"
 	"reflect"
 	"sort"
 	"strconv"
@@ -177,7 +176,6 @@ func NewStructDecoder(desc ProbeFormat, allocFn AllocateFn) (Decoder, error) {
 
 	// Validate that allocFn() returns pointers to structs.
 	sample := allocFn()
-	fmt.Fprintf(os.Stdout, "StructDecoder sample output: %#v\n", sample)
 	tSample := reflect.TypeOf(sample)
 	if tSample.Kind() != reflect.Ptr {
 		return nil, errors.New("allocator function doesn't return a pointer")

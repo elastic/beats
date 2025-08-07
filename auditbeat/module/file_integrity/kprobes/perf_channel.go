@@ -68,7 +68,7 @@ func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponen
 
 		decoder, err := tracing.NewStructDecoder(desc, allocFn)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error creating struct decoder for %s (%s): %w", probe.Name, probe.Address, err)
 		}
 
 		if err := pChannel.MonitorProbe(desc, decoder); err != nil {
