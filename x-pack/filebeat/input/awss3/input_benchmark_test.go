@@ -224,7 +224,7 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 		sqsReader := newSQSReaderInput(config, aws.Config{})
 		sqsReader.log = log.Named("sqs")
 		sqsReader.pipeline = newFakePipeline()
-		sqsReader.metrics = newInputMetrics("test_id", monitoring.NewRegistry(), workerCount)
+		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), workerCount)
 		sqsReader.sqs, err = newConstantSQS()
 		require.NoError(t, err)
 		sqsReader.s3 = newConstantS3(t)
@@ -308,8 +308,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		log := logp.NewLogger(inputName)
 		log.Infof("benchmark with %d number of workers", numberOfWorkers)
 
-		metricRegistry := monitoring.NewRegistry()
-		metrics := newInputMetrics("test_id", metricRegistry, numberOfWorkers)
+		metrics := newInputMetrics(monitoring.NewRegistry(), numberOfWorkers)
 		pipeline := newFakePipeline()
 
 		config := makeBenchmarkConfig(t)
