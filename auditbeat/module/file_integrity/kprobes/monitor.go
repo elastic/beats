@@ -77,8 +77,22 @@ type Monitor struct {
 	closeErr    error
 }
 
+func NewWithContext(ctx context.Context, isRecursive bool) (*Monitor, error) {
+	validatedProbes, exec, err := getVerifiedProbes(ctx, 5*time.Second)
+	if err != nil {
+		return nil, err
+	}
+
+	pChannel, err := newPerfChannel(validatedProbes, 10, 4096, perf.AllThreads)
+	if err != nil {
+		return nil, err
+	}
+
+	return newMonitor(ctx, isRecursive, pChannel, exec)
+}
+
 func New(isRecursive bool) (*Monitor, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 60*time.Second) //nolint:govet // Testing timeout issues
+	ctx := context.TODO()
 
 	validatedProbes, exec, err := getVerifiedProbes(ctx, 5*time.Second)
 	if err != nil {

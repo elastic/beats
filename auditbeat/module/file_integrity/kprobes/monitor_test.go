@@ -483,7 +483,9 @@ func (p *monitorTestSuite) TestNew() {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
-	monitorHandle, err := New(true)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+	monitorHandle, err := NewWithContext(ctx, true)
 	p.Require().NoError(err)
 
 	tmpDir, err := os.MkdirTemp("", "kprobe_bench_test")
