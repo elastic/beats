@@ -32,5 +32,5 @@ func NewFactory(beatname string) (confmap.ProviderFactory, error) {
 	case "metricbeat":
 		return mbprovider.NewFactory(), nil
 	}
-	return nil, fmt.Errorf("unkown beatname: %s", beatname)
+	return nil, fmt.Errorf("unknown beatname: %s", beatname)
 }
