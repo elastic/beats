@@ -19,6 +19,7 @@ All fields specific to the Windows Event Tracing are defined here.
     type: keyword
 
     required: False
+<<<<<<< HEAD
 
 
 **`winlog.activity_id_name`**
@@ -27,6 +28,8 @@ All fields specific to the Windows Event Tracing are defined here.
     type: keyword
 
     required: False
+=======
+>>>>>>> 928c4e60a ([9.1](backport #45772) [docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45816))
 
 
 **`winlog.channel`**
@@ -51,6 +54,7 @@ All fields specific to the Windows Event Tracing are defined here.
     type: keyword
 
     required: False
+<<<<<<< HEAD
 
 
 **`winlog.flags_raw`**
@@ -59,6 +63,8 @@ All fields specific to the Windows Event Tracing are defined here.
     type: keyword
 
     required: False
+=======
+>>>>>>> 928c4e60a ([9.1](backport #45772) [docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45816))
 
 
 **`winlog.keywords`**
@@ -67,6 +73,7 @@ All fields specific to the Windows Event Tracing are defined here.
     type: keyword
 
     required: False
+<<<<<<< HEAD
 
 
 **`winlog.keywords_raw`**
@@ -75,6 +82,8 @@ All fields specific to the Windows Event Tracing are defined here.
     type: keyword
 
     required: False
+=======
+>>>>>>> 928c4e60a ([9.1](backport #45772) [docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45816))
 
 
 **`winlog.level`**
@@ -83,6 +92,7 @@ All fields specific to the Windows Event Tracing are defined here.
     type: keyword
 
     required: False
+<<<<<<< HEAD
 
 
 **`winlog.level_raw`**
@@ -91,6 +101,8 @@ All fields specific to the Windows Event Tracing are defined here.
     type: long
 
     required: False
+=======
+>>>>>>> 928c4e60a ([9.1](backport #45772) [docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45816))
 
 
 **`winlog.opcode`**
@@ -99,6 +111,7 @@ All fields specific to the Windows Event Tracing are defined here.
     type: keyword
 
     required: False
+<<<<<<< HEAD
 
 
 **`winlog.opcode_raw`**
@@ -107,6 +120,8 @@ All fields specific to the Windows Event Tracing are defined here.
     type: long
 
     required: False
+=======
+>>>>>>> 928c4e60a ([9.1](backport #45772) [docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45816))
 
 
 **`winlog.process_id`**
@@ -115,6 +130,7 @@ All fields specific to the Windows Event Tracing are defined here.
     type: keyword
 
     required: False
+<<<<<<< HEAD
 
 
 **`winlog.provider`**
@@ -123,6 +139,8 @@ All fields specific to the Windows Event Tracing are defined here.
     type: keyword
 
     required: False
+=======
+>>>>>>> 928c4e60a ([9.1](backport #45772) [docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45816))
 
 
 **`winlog.provider_guid`**
@@ -139,6 +157,7 @@ All fields specific to the Windows Event Tracing are defined here.
     type: keyword
 
     required: False
+<<<<<<< HEAD
 
 
 **`winlog.related_activity_id_name`**
@@ -147,6 +166,8 @@ All fields specific to the Windows Event Tracing are defined here.
     type: keyword
 
     required: False
+=======
+>>>>>>> 928c4e60a ([9.1](backport #45772) [docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45816))
 
 
 **`winlog.session`**
@@ -171,6 +192,7 @@ All fields specific to the Windows Event Tracing are defined here.
     type: keyword
 
     required: False
+<<<<<<< HEAD
 
 
 **`winlog.task_raw`**
@@ -179,6 +201,8 @@ All fields specific to the Windows Event Tracing are defined here.
     type: long
 
     required: False
+=======
+>>>>>>> 928c4e60a ([9.1](backport #45772) [docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45816))
 
 
 **`winlog.thread_id`**
