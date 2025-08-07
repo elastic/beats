@@ -1711,8 +1711,6 @@ Kubernetes deployment replicas info
     type: integer
 
 
-<<<<<<< HEAD
-=======
 ## horizontalpodautoscaler [_horizontalpodautoscaler]
 
 ```{applies_to}
@@ -1765,7 +1763,6 @@ Kubernetes HPA status metrics
     type: keyword
 
 
->>>>>>> 7fbc29824 ([docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45772))
 ## job [_job]
 
 Kubernetes job metrics

@@ -107,14 +107,3 @@ perfmon
     format: duration
 
 
-<<<<<<< HEAD
-=======
-## wmi [_wmi]
-
-```{applies_to}
-stack: beta
-```
-
-wmi
-
->>>>>>> 7fbc29824 ([docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45772))
