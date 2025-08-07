@@ -144,6 +144,7 @@ func createStreamRules(raw *proto.UnitExpectedConfig, streamSource map[string]in
 	if _, exists := streamSource["index"]; !exists {
 		streamSource = injectIndexStream(defaultDataStreamType, raw, stream, streamSource)
 	} else {
+		// we must delete the existing `data_stream` field, otherwise `index` is ignored.
 		delete(streamSource, "data_stream")
 	}
 
