@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -119,7 +120,7 @@ func ParseURL(module mb.Module, host string) (mb.HostData, error) {
 	return parse.NewHostDataFromURL(u), nil
 }
 
-func NewClient(config ModuleConfig, uri string, timeout time.Duration, mode readpref.Mode) (*mongo.Client, error) {
+func NewClient(config ModuleConfig, uri string, timeout time.Duration, mode readpref.Mode, logger *logp.Logger) (*mongo.Client, error) {
 	clientOptions := options.Client()
 
 	// options.Credentials must be nil for the driver to work properly if no auth is provided. Zero values breaks
@@ -153,7 +154,7 @@ func NewClient(config ModuleConfig, uri string, timeout time.Duration, mode read
 	clientOptions.SetConnectTimeout(timeout)
 
 	if config.TLS.IsEnabled() {
-		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, logger)
 		if err != nil {
 			return nil, fmt.Errorf("could not load provided TLS configuration: %w", err)
 		}
