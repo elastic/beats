@@ -95,11 +95,11 @@ func loadAllSpecs() ([]*tkbtf.Spec, error) {
 		specs = append(specs, spec)
 	}
 
-	embeddedSpecs, err := loadEmbeddedSpecs()
-	if err != nil {
-		return nil, err
-	}
-	specs = append(specs, embeddedSpecs...)
+//	embeddedSpecs, err := loadEmbeddedSpecs()
+//	if err != nil {
+//		return nil, err
+//	}
+//	specs = append(specs, embeddedSpecs...)
 	return specs, nil
 }
 
