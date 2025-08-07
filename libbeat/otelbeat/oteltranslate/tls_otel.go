@@ -27,41 +27,70 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 	"go.opentelemetry.io/collector/config/configtls"
 
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
-// UNSUPPORTED PARAMETERS
-// ssl.supported_protocols -> partially supported
-// ssl.restart_on_cert_change.*
-// ssl.renegotiation
-// NOTE: ca_trusted_fingerprint, ca_sha256 and verification_modes are supported by beatsauthextension
-func validateUnsupportedConfig(tlscfg *tlscommon.Config) error {
-	if len(tlscfg.CurveTypes) > 0 {
-		return errors.New("ssl.curve_types is currently not supported")
+// default min and max TLS version in OTel
+const defaultMinTLSVersion = tls.VersionTLS12
+const defaultMaxTLSVersion = tls.VersionTLS13
+
+var tlsVersions = map[uint16]string{
+	tls.VersionTLS10: "1.0",
+	tls.VersionTLS11: "1.1",
+	tls.VersionTLS12: "1.2",
+	tls.VersionTLS13: "1.3",
+}
+
+func validateUnsupportedConfig(output *config.C) error {
+
+	if sslConfig, err := output.Child("ssl", -1); err == nil {
+		if sslConfig.HasField("curve_type") {
+			return fmt.Errorf("ssl.curve_types is currently not supported: %w", errors.ErrUnsupported)
+		} else if sslConfig.HasField("renegotiation") {
+			return fmt.Errorf("ssl.renegotiation is currently not supported: %w", errors.ErrUnsupported)
+		} else if sslConfig.HasField("restart_on_cert_change.enabled") {
+			return fmt.Errorf("ssl.restart_on_cert_change.enabled is currently not supported: %w", errors.ErrUnsupported)
+		} else if sslConfig.HasField("restart_on_cert_change.period") {
+			return fmt.Errorf("ssl.restart_on_cert_change.period is currently not supported: %w", errors.ErrUnsupported)
+		}
+
 	}
+
 	return nil
 }
 
 // TLSCommonToOTel converts a tlscommon.Config into the OTel configtls.ClientConfig
 // ca_trusted_fingerprint, ca_sha_256 and verification mode should be handled separately by beatsauth extension
-func TLSCommonToOTel(tlscfg *tlscommon.Config, logger *logp.Logger) (map[string]any, error) {
+func TLSCommonToOTel(output *config.C, logger *logp.Logger) (map[string]any, error) {
 	logger = logger.Named("tls-to-otel")
-	if tlscfg == nil {
+	otelTLSConfig := map[string]any{}
+
+	var tlsCfg = elasticsearch.ESDefaultTransportSettings()
+
+	err := output.Unpack(&tlsCfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed unpacking config. %w", err)
+	}
+
+	if tlsCfg.TLS == nil {
 		return nil, nil
 	}
 
-	if !tlscfg.IsEnabled() {
+	if !tlsCfg.TLS.IsEnabled() {
 		return map[string]any{
 			"insecure": true,
 		}, nil
 	}
 
-	// throw error if unsupported tls config is passed
-	if err := validateUnsupportedConfig(tlscfg); err != nil {
+	// throw error if unsupported tls config is set
+	if err := validateUnsupportedConfig(output); err != nil {
 		return nil, err
 	}
 
+	tlscfg := tlsCfg.TLS
 	// validate the beats config before proceeding
 	if err := tlscfg.Validate(); err != nil {
 		return nil, err
@@ -70,9 +99,7 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config, logger *logp.Logger) (map[string]
 	// handle verification_mode:none
 	// Handle all other cases, including VerifyFull, VerifyCertificate, or VerifyStrict by beatsauth extension
 	if tlscfg.VerificationMode == tlscommon.VerifyNone {
-		return map[string]any{
-			"insecure_skip_verify": "true",
-		}, nil
+		otelTLSConfig["insecure_skip_verify"] = true
 	}
 
 	// unpacks -> ssl.certificate_authorities
@@ -126,13 +153,19 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config, logger *logp.Logger) (map[string]
 		ciphersuites = append(ciphersuites, tls.CipherSuiteName(cs))
 	}
 
-	otelTLSConfig := map[string]any{}
-
 	setIfNotNil(otelTLSConfig, "include_system_ca_certs_pool", includeSystemCACertsPool)
 	setIfNotNil(otelTLSConfig, "ca_pem", strings.Join(caCerts, "")) // ssl.certificate_authorities
 	setIfNotNil(otelTLSConfig, "cert_pem", certPem)                 // ssl.certificate
 	setIfNotNil(otelTLSConfig, "key_pem", certKeyPem)               // ssl.key
-	setIfNotNil(otelTLSConfig, "cipher_suites", ciphersuites)       // ssl.cipher_suites"
+	setIfNotNil(otelTLSConfig, "cipher_suites", ciphersuites)       // ssl.cipher_suites
+
+	if goTLSConfig.MinVersion != defaultMinTLSVersion { // ssl.min_version
+		otelTLSConfig["min_version"] = tlsVersions[goTLSConfig.MinVersion]
+	}
+
+	if goTLSConfig.MaxVersion != defaultMaxTLSVersion { // ssl.max_version
+		otelTLSConfig["max_version"] = tlsVersions[goTLSConfig.MaxVersion]
+	}
 
 	if err := typeSafetyCheck(otelTLSConfig); err != nil {
 		return nil, err

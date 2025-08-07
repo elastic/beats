@@ -18,24 +18,26 @@
 package oteltranslate
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 func TestTLSCommonToOTel(t *testing.T) {
 
 	logger := logptest.NewTestingLogger(t, "")
 	t.Run("when ssl.enabled = false", func(t *testing.T) {
-		b := false
-		input := &tlscommon.Config{
-			Enabled: &b,
-		}
-		got, err := TLSCommonToOTel(input, logger)
+		input := `
+ssl:
+  enabled: false
+`
+		cfg := config.MustNewConfigFrom(input)
+		got, err := TLSCommonToOTel(cfg, logger)
 		require.NoError(t, err)
 		want := map[string]any{
 			"insecure": true,
@@ -45,16 +47,43 @@ func TestTLSCommonToOTel(t *testing.T) {
 	})
 
 	t.Run("when ssl.verification_mode:none", func(t *testing.T) {
-
-		input := &tlscommon.Config{
-			VerificationMode: tlscommon.VerifyNone,
-		}
-
-		got, err := TLSCommonToOTel(input, logger)
+		input := `
+ssl:
+  verification_mode: none
+`
+		cfg := config.MustNewConfigFrom(input)
+		got, err := TLSCommonToOTel(cfg, logger)
 		require.NoError(t, err)
 		assert.Equal(t, map[string]any{
-			"insecure_skip_verify": "true",
+			"insecure_skip_verify":         true,
+			"include_system_ca_certs_pool": true,
 		}, got, "beats to otel ssl mapping")
+
+	})
+
+	t.Run("when unsupported configuration  renegotiation is used", func(t *testing.T) {
+		input := `
+ssl:
+  verification_mode: none
+  renegotiation: never
+`
+		cfg := config.MustNewConfigFrom(input)
+		_, err := TLSCommonToOTel(cfg, logger)
+		require.Error(t, err)
+		require.ErrorIs(t, err, errors.ErrUnsupported)
+
+	})
+
+	t.Run("when unsupported configuration restart_on_cert_change.enabled is used", func(t *testing.T) {
+		input := `
+ssl:
+  verification_mode: none
+  restart_on_cert_change.enabled: never
+`
+		cfg := config.MustNewConfigFrom(input)
+		_, err := TLSCommonToOTel(cfg, logger)
+		require.Error(t, err)
+		require.ErrorIs(t, err, errors.ErrUnsupported)
 
 	})
 }
