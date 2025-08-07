@@ -19,6 +19,7 @@ import (
 	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
+	"go.opentelemetry.io/collector/receiver/receivertest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -117,7 +118,7 @@ func TestPublish(t *testing.T) {
 		})
 
 		err := otelConsumer.Publish(ctx, batch)
-		assert.Error(t, err)
+		assert.NoError(t, err)
 		assert.False(t, consumererror.IsPermanent(err))
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
@@ -131,8 +132,7 @@ func TestPublish(t *testing.T) {
 		})
 
 		err := otelConsumer.Publish(ctx, batch)
-		assert.Error(t, err)
-		assert.True(t, consumererror.IsPermanent(err))
+		assert.NoError(t, err)
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchDrop, batch.Signals[0].Tag)
 	})
@@ -145,8 +145,7 @@ func TestPublish(t *testing.T) {
 		})
 
 		err := otelConsumer.Publish(ctx, batch)
-		assert.Error(t, err)
-		assert.ErrorIs(t, err, context.Canceled)
+		assert.NoError(t, err)
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
 	})
@@ -169,6 +168,27 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 		assert.Equal(t, event4.Meta["_id"], docID)
+	})
+
+	t.Run("sets the receivertest doc id attribute", func(t *testing.T) {
+		batch := outest.NewBatch(event4)
+
+		var receivertestID string
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			attr, ok := record.Attributes().Get(receivertest.UniqueIDAttrName)
+			require.True(t, ok, "document ID attribute should be set")
+			receivertestID = attr.AsString()
+
+			return nil
+		})
+		otelConsumer.isReceiverTest = true
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+		assert.Equal(t, event4.Meta["_id"], receivertestID, "receivertest ID should match the event ID")
 	})
 
 	t.Run("sets the @timestamp field with the correct format", func(t *testing.T) {
