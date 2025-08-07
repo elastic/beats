@@ -276,7 +276,9 @@ func findFieldsInProcessors(t *testing.T, configFields map[string]any, cfgMap ma
 					if val == found {
 						gotVal = true
 					} else {
-						errStr = found.(string)
+						s, ok := found.(string)
+						require.True(t, ok, "must be a string")
+						errStr = s
 					}
 				}
 			}
