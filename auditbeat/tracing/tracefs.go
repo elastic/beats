@@ -173,7 +173,6 @@ func (dfs *TraceFS) removeAllProbes(filename string) error {
 }
 
 func (dfs *TraceFS) appendToFile(filename string, desc string) error {
-	fmt.Fprintf(os.Stdout, "Appending to %s: '%s'\n", filepath.Join(dfs.basePath, filename), desc)
 	file, err := os.OpenFile(filepath.Join(dfs.basePath, filename), os.O_WRONLY|os.O_APPEND|os.O_SYNC, 0)
 	if err != nil {
 		return err
