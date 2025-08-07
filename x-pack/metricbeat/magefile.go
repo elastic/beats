@@ -107,6 +107,7 @@ func BuildSystemTestBinary() error {
 	args := []string{
 		"test", "-c",
 		"-o", binArgs.Name + ".test",
+		"-tags", "otelbeat",
 	}
 
 	// On Windows 7 32-bit we run out of memory if we enable coverage and DWARF

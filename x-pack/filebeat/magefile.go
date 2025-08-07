@@ -45,7 +45,7 @@ func Build() error {
 
 // BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
 func BuildSystemTestBinary() error {
-	return devtools.BuildSystemTestBinary()
+	return devtools.BuildSystemTestOTelBinary()
 }
 
 // GolangCrossBuild builds the Beat binary inside of the golang-builder.
