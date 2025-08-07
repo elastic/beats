@@ -335,6 +335,7 @@ http.port: {{.MonitoringPort}}
 
 				m = m.Flatten()
 
+<<<<<<< HEAD
 				// Currently, otelconsumer either ACKs or fails the entire batch and has no visibility into individual event failures within the exporter.
 				// From otelconsumer's perspective, the whole batch is considered successful as long as ConsumeLogs returns no error.
 				assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.total"], "expected total events sent to output to match")
@@ -342,5 +343,139 @@ http.port: {{.MonitoringPort}}
 				assert.Equal(ct, float64(0), m["libbeat.output.events.dropped"], "expected total events dropped to match")
 			}, 10*time.Second, 100*time.Millisecond, "expected output stats to be available in monitoring endpoint")
 		})
+=======
+func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/45631")
+	integration.EnsureESIsRunning(t)
+	wantEvents := 100
+
+	// start filebeat in otel mode
+	filebeatOTel := integration.NewBeat(
+		t,
+		"filebeat-otel",
+		"../../filebeat.test",
+		"otel",
+	)
+
+	// write events to log file
+	logFilePath := filepath.Join(filebeatOTel.TempDir(), "log.log")
+	writeEventsToLogFile(t, logFilePath, wantEvents)
+
+	type receiverConfig struct {
+		MonitoringPort int
+		InputFile      string
+		PathHome       string
+	}
+
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	otelConfig := struct {
+		Index     string
+		Receivers []receiverConfig
+	}{
+		Index: "logs-integration-" + namespace,
+		Receivers: []receiverConfig{
+			{
+				MonitoringPort: 5066,
+				InputFile:      logFilePath,
+				PathHome:       filepath.Join(filebeatOTel.TempDir(), "r1"),
+			},
+			{
+				MonitoringPort: 5067,
+				InputFile:      logFilePath,
+				PathHome:       filepath.Join(filebeatOTel.TempDir(), "r2"),
+			},
+		},
+	}
+
+	cfg := `receivers:
+{{range $i, $receiver := .Receivers}}
+  filebeatreceiver/{{$i}}:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-fbreceiver
+          enabled: true
+          paths:
+            - {{$receiver.InputFile}}
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    output:
+      otelconsumer:
+    logging:
+      level: info
+      selectors:
+        - '*'
+    queue.mem.flush.timeout: 0s
+    path.home: {{$receiver.PathHome}}
+{{if $receiver.MonitoringPort}}
+    http.enabled: true
+    http.host: localhost
+    http.port: {{$receiver.MonitoringPort}}
+{{end}}
+{{end}}
+exporters:
+  debug:
+    use_internal_logger: false
+    verbosity: detailed
+  elasticsearch/log:
+    endpoints:
+      - http://localhost:9200
+    compression: none
+    user: admin
+    password: testing
+    logs_index: {{.Index}}
+    batcher:
+      enabled: true
+      flush_timeout: 1s
+    mapping:
+      mode: bodymap
+service:
+  pipelines:
+    logs:
+      receivers:
+{{range $i, $receiver := .Receivers}}
+        - filebeatreceiver/{{$i}}
+{{end}}
+      exporters:
+        - debug
+        - elasticsearch/log
+`
+	var configBuffer bytes.Buffer
+	require.NoError(t,
+		template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, otelConfig))
+	configContents := configBuffer.Bytes()
+
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Config contents:\n%s", configContents)
+		}
+	})
+
+	filebeatOTel.WriteConfigFile(string(configContents))
+	writeEventsToLogFile(t, logFilePath, wantEvents)
+	filebeatOTel.Start()
+	defer filebeatOTel.Stop()
+
+	es := integration.GetESClient(t, "http")
+
+	var otelDocs estools.Documents
+	var err error
+
+	// wait for logs to be published
+	wantTotalLogs := wantEvents * len(otelConfig.Receivers)
+	require.Eventuallyf(t,
+		func() bool {
+			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+otelConfig.Index+"*")
+			require.NoError(t, err)
+
+			return otelDocs.Hits.Total.Value >= wantTotalLogs
+		},
+		2*time.Minute, 100*time.Millisecond, "expected at least %d events, got %d", wantTotalLogs, otelDocs.Hits.Total.Value)
+	for _, rec := range otelConfig.Receivers {
+		assertMonitoring(t, rec.MonitoringPort)
+>>>>>>> 0c0ad474f (Skip flaky test TestFilebeatOTelMultipleReceiversE2E (#45825))
 	}
 }
