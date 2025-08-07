@@ -19,6 +19,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -37,6 +38,10 @@ const (
 	totalListingObjects           = 10000
 	totalListingObjectsForInputS3 = totalListingObjects / 5
 )
+
+type mockStatusReporter struct{}
+
+func (m *mockStatusReporter) UpdateStatus(s status.Status, msg string) {}
 
 type constantSQS struct {
 	msgs []sqsTypes.Message
@@ -223,6 +228,7 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 		config.NumberOfWorkers = workerCount
 		sqsReader := newSQSReaderInput(config, aws.Config{})
 		sqsReader.log = log.Named("sqs")
+		sqsReader.status = &mockStatusReporter{}
 		sqsReader.pipeline = newFakePipeline()
 		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), workerCount)
 		sqsReader.sqs, err = newConstantSQS()
