@@ -113,7 +113,7 @@ func setupPlatformSpecificMetrics(logger *logp.Logger, processStats *process.Sta
 	if isWindows() {
 		SetupWindowsHandlesMetrics(logger, systemMetrics)
 	} else {
-		monitoring.NewFunc(systemMetrics, "load", ReportSystemLoadAverage, monitoring.Report)
+		monitoring.NewFunc(systemMetrics, "load", ReportSystemLoadAverage(logger), monitoring.Report)
 	}
 
 	SetupLinuxBSDFDMetrics(logger, processMetrics, processStats)

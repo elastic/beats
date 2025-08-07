@@ -203,7 +203,7 @@ func (procStats *Stats) Init() error {
 	if procStats.EnableCgroups {
 		cgReader, err := cgroup.NewReaderOptions(procStats.CgroupOpts)
 		if errors.Is(err, cgroup.ErrCgroupsMissing) {
-			logp.Warn("cgroup data collection will be disabled: %v", err)
+			procStats.logger.Warnf("cgroup data collection will be disabled: %v", err)
 			procStats.EnableCgroups = false
 		} else if err != nil {
 			return fmt.Errorf("error initializing cgroup reader: %w", err)

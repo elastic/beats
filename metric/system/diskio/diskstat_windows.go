@@ -24,6 +24,8 @@ import (
 	"errors"
 
 	"github.com/shirou/gopsutil/v4/disk"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // NewDiskIOStat :init DiskIOStat object.
@@ -47,6 +49,6 @@ func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, err
 func (stat *IOStat) CloseSampling() {}
 
 // IOCounters should map functionality to disk package for linux os.
-func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
-	return ioCounters(names...)
+func IOCounters(logger *logp.Logger, names ...string) (map[string]disk.IOCountersStat, error) {
+	return ioCounters(logger, names...)
 }

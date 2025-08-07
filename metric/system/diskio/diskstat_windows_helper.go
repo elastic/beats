@@ -51,7 +51,7 @@ type logicalDrive struct {
 }
 
 // ioCounters gets the diskio counters and maps them to the list of counterstat objects.
-func ioCounters(names ...string) (map[string]disk.IOCountersStat, error) {
+func ioCounters(logger *logp.Logger, names ...string) (map[string]disk.IOCountersStat, error) {
 	if err := enablePerformanceCounters(); err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func ioCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 		var counter diskPerformance
 		err = ioCounter(drive.UNCPath, &counter)
 		if err != nil {
-			logp.Err("Could not return any performance counter values for %s .Error: %v", drive.UNCPath, err)
+			logger.Errorf("Could not return any performance counter values for %s .Error: %v", drive.UNCPath, err)
 			continue
 		}
 		ret[drive.Name] = disk.IOCountersStat{

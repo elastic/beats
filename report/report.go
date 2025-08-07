@@ -128,26 +128,28 @@ func InstanceCPUReporter(logger *logp.Logger, processStats *process.Stats) func(
 	}
 }
 
-func ReportSystemLoadAverage(_ monitoring.Mode, V monitoring.Visitor) {
-	V.OnRegistryStart()
-	defer V.OnRegistryFinished()
+func ReportSystemLoadAverage(logger *logp.Logger) func(monitoring.Mode, monitoring.Visitor) {
+	return func(_ monitoring.Mode, V monitoring.Visitor) {
+		V.OnRegistryStart()
+		defer V.OnRegistryFinished()
 
-	load, err := cpu.Load()
-	if err != nil {
-		logp.Err("Error retrieving load average: %v", err)
-		return
+		load, err := cpu.Load()
+		if err != nil {
+			logger.Errorf("Error retrieving load average: %v", err)
+			return
+		}
+		avgs := load.Averages()
+		monitoring.ReportFloat(V, "1", avgs.OneMinute)
+		monitoring.ReportFloat(V, "5", avgs.FiveMinute)
+		monitoring.ReportFloat(V, "15", avgs.FifteenMinute)
+
+		normAvgs := load.NormalizedAverages()
+		monitoring.ReportNamespace(V, "norm", func() {
+			monitoring.ReportFloat(V, "1", normAvgs.OneMinute)
+			monitoring.ReportFloat(V, "5", normAvgs.FiveMinute)
+			monitoring.ReportFloat(V, "15", normAvgs.FifteenMinute)
+		})
 	}
-	avgs := load.Averages()
-	monitoring.ReportFloat(V, "1", avgs.OneMinute)
-	monitoring.ReportFloat(V, "5", avgs.FiveMinute)
-	monitoring.ReportFloat(V, "15", avgs.FifteenMinute)
-
-	normAvgs := load.NormalizedAverages()
-	monitoring.ReportNamespace(V, "norm", func() {
-		monitoring.ReportFloat(V, "1", normAvgs.OneMinute)
-		monitoring.ReportFloat(V, "5", normAvgs.FiveMinute)
-		monitoring.ReportFloat(V, "15", normAvgs.FifteenMinute)
-	})
 }
 
 func ReportSystemCPUUsage(_ monitoring.Mode, V monitoring.Visitor) {

@@ -29,6 +29,6 @@ import (
 )
 
 func SetupMetrics(logger *logp.Logger, name, version, ephemeralID string, systemMetrics *monitoring.Registry, processMetrics *monitoring.Registry) error {
-	logp.Warn("Metrics not implemented for this OS.")
+	logger.Warn("Metrics not implemented for this OS.")
 	return nil
 }
