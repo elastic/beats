@@ -395,7 +395,13 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, end
 			contentType += "; " + omit.String()
 		}
 		req.Header.Set("Content-Type", contentType)
-		req.Header.Set("Authorization", fmt.Sprintf("SSWS %s", key))
+
+		// Set Authorization header based on authentication method
+		if key != "" {
+			// API token authentication
+			req.Header.Set("Authorization", fmt.Sprintf("SSWS %s", key))
+		}
+		// For OAuth2, the Authorization header is automatically set by the OAuth2 client
 
 		err = lim.Wait(ctx, endpoint, u, log)
 		if err != nil {
