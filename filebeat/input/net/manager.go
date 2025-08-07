@@ -32,10 +32,12 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
 )
 
 // Input is the interface for net inputs
+// go:generate moq -out inputmock_test.go . Input
 type Input interface {
 	// Returns the input name
 	Name() string
@@ -46,7 +48,7 @@ type Input interface {
 
 	// InitMetrics initialises the metrics for the input.
 	// The 'id' argument is the input ID to be used in the metrics
-	InitMetrics(id string, logger *logp.Logger) Metrics
+	InitMetrics(id string, reg *monitoring.Registry, logger *logp.Logger) Metrics
 
 	// Runs the input. Events sent to the channel will be
 	// published by any of the pipeline workers.
@@ -160,7 +162,7 @@ func (w wrapper) Run(ctx v2.Context, pipeline beat.PipelineConnector) (err error
 	ctx.UpdateStatus(status.Starting, "")
 	ctx.UpdateStatus(status.Configuring, "")
 
-	m := w.inp.InitMetrics(ctx.ID, ctx.Logger)
+	m := w.inp.InitMetrics(ctx.ID, ctx.MetricsRegistry, ctx.Logger)
 	if err := w.initWorkers(ctx, pipeline, m); err != nil {
 		logger.Errorf("cannot initialise pipeline workers: %s", err)
 		return fmt.Errorf("cannot initialise pipeline workers: %w", err)

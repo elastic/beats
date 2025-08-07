@@ -31,6 +31,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestInput(t *testing.T) {
@@ -49,12 +50,13 @@ func TestInput(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(t.Context())
 	v2Ctx := v2.Context{
-		ID:          t.Name(),
-		Cancelation: ctx,
-		Logger:      logp.NewNopLogger(),
+		ID:              t.Name(),
+		Cancelation:     ctx,
+		Logger:          logp.NewNopLogger(),
+		MetricsRegistry: monitoring.NewRegistry(),
 	}
 
-	metrics := inp.InitMetrics("tcp", v2Ctx.Logger)
+	metrics := inp.InitMetrics("tcp", v2Ctx.MetricsRegistry, v2Ctx.Logger)
 	c := make(chan netinput.DataMetadata, 2)
 
 	wg.Add(1)
@@ -67,7 +69,7 @@ func TestInput(t *testing.T) {
 		}
 	}()
 
-	nettest.RequireNetMetricsCount(t, time.Second, 2, 0, 6)
+	nettest.RequireNetMetricsCount(t, v2Ctx.MetricsRegistry, time.Second, 2, 0, 6)
 
 	// Stop the input, this removes all metrics
 	cancel()

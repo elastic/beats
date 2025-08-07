@@ -25,6 +25,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // Ensure, that InputMock does implement Input.
@@ -37,7 +38,7 @@ var _ Input = &inputMock{}
 //
 //		// make and configure a mocked Input
 //		mockedInput := &inputMock{
-//			InitMetricsFunc: func(id string, logger *logp.Logger) Metrics {
+//			InitMetricsFunc: func(id string, reg *monitoring.Registry, logger *logp.Logger) Metrics {
 //				panic("mock out the InitMetrics method")
 //			},
 //			NameFunc: func() string {
@@ -57,7 +58,7 @@ var _ Input = &inputMock{}
 //	}
 type inputMock struct {
 	// InitMetricsFunc mocks the InitMetrics method.
-	InitMetricsFunc func(id string, logger *logp.Logger) Metrics
+	InitMetricsFunc func(id string, reg *monitoring.Registry, logger *logp.Logger) Metrics
 
 	// NameFunc mocks the Name method.
 	NameFunc func() string
@@ -74,6 +75,8 @@ type inputMock struct {
 		InitMetrics []struct {
 			// ID is the id argument value.
 			ID string
+			// Reg is the reg argument value.
+			Reg *monitoring.Registry
 			// Logger is the logger argument value.
 			Logger *logp.Logger
 		}
@@ -102,21 +105,23 @@ type inputMock struct {
 }
 
 // InitMetrics calls InitMetricsFunc.
-func (mock *inputMock) InitMetrics(id string, logger *logp.Logger) Metrics {
+func (mock *inputMock) InitMetrics(id string, reg *monitoring.Registry, logger *logp.Logger) Metrics {
 	if mock.InitMetricsFunc == nil {
 		panic("InputMock.InitMetricsFunc: method is nil but Input.InitMetrics was just called")
 	}
 	callInfo := struct {
 		ID     string
+		Reg    *monitoring.Registry
 		Logger *logp.Logger
 	}{
 		ID:     id,
+		Reg:    reg,
 		Logger: logger,
 	}
 	mock.lockInitMetrics.Lock()
 	mock.calls.InitMetrics = append(mock.calls.InitMetrics, callInfo)
 	mock.lockInitMetrics.Unlock()
-	return mock.InitMetricsFunc(id, logger)
+	return mock.InitMetricsFunc(id, reg, logger)
 }
 
 // InitMetricsCalls gets all the calls that were made to InitMetrics.
@@ -125,10 +130,12 @@ func (mock *inputMock) InitMetrics(id string, logger *logp.Logger) Metrics {
 //	len(mockedInput.InitMetricsCalls())
 func (mock *inputMock) InitMetricsCalls() []struct {
 	ID     string
+	Reg    *monitoring.Registry
 	Logger *logp.Logger
 } {
 	var calls []struct {
 		ID     string
+		Reg    *monitoring.Registry
 		Logger *logp.Logger
 	}
 	mock.lockInitMetrics.RLock()

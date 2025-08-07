@@ -29,7 +29,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // RunUDPClient sends each string in `data` to address using a UDP connection.
@@ -94,22 +94,15 @@ FOR:
 
 // GetNetInputMetrics returns the first input metric from the global
 // input monitoring registry.
-func GetNetInputMetrics(t *testing.T) NetInputMetrics {
-	data, err := inputmon.MetricSnapshotJSON(nil)
-	if err != nil {
-		t.Fatalf("cannot get metrics snapshot: %s", err)
-	}
-
-	metrics := []NetInputMetrics{}
+func GetNetInputMetrics(t *testing.T, reg *monitoring.Registry) NetInputMetrics {
+	m := monitoring.CollectStructSnapshot(reg, monitoring.Full, true)
+	data, _ := json.Marshal(m)
+	metrics := NetInputMetrics{}
 	if err := json.Unmarshal(data, &metrics); err != nil {
 		t.Fatalf("cannot read metrics: %s", err)
 	}
 
-	if len(metrics) == 0 {
-		return NetInputMetrics{}
-	}
-
-	return metrics[0]
+	return metrics
 }
 
 // GetHTTPInputMetrics reads the net input metrics from Filebeat monitoring
@@ -149,7 +142,7 @@ func GetHTTPInputMetrics(t *testing.T, inputID, addr string) NetInputMetrics {
 //   - processing_time count
 //   - arrival_period count
 //   - received_bytes_total
-func RequireNetMetricsCount(t *testing.T, timeout time.Duration, received, published, bytes int) {
+func RequireNetMetricsCount(t *testing.T, reg *monitoring.Registry, timeout time.Duration, received, published, bytes int) {
 	t.Helper()
 	want := NetInputMetrics{
 		ReceivedEventsTotal:  received,
@@ -164,7 +157,7 @@ func RequireNetMetricsCount(t *testing.T, timeout time.Duration, received, publi
 		t,
 		func() bool {
 			msg.Reset()
-			got := GetNetInputMetrics(t)
+			got := GetNetInputMetrics(t, reg)
 			fmt.Fprintf(
 				msg,
 				"received: %d, published: %d, arrival_period count: %d, "+

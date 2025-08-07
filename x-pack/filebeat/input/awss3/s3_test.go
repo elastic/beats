@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -147,7 +148,7 @@ func TestS3Poller(t *testing.T) {
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",
-			metrics:         newInputMetrics("", nil, 0),
+			metrics:         newInputMetrics(monitoring.NewRegistry(), 0),
 			filterProvider:  newFilterProvider(&cfg),
 		}
 		poller.runPoll(ctx)
@@ -280,6 +281,7 @@ func TestS3Poller(t *testing.T) {
 			BucketListPrefix:   "key",
 			RegionName:         "region",
 		}
+
 		poller := &s3PollerInput{
 			log: logp.NewLogger(inputName),
 			config: config{
@@ -294,7 +296,7 @@ func TestS3Poller(t *testing.T) {
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",
-			metrics:         newInputMetrics("", nil, 0),
+			metrics:         newInputMetrics(monitoring.NewRegistry(), 0),
 			filterProvider:  newFilterProvider(&cfg),
 		}
 		poller.run(ctx)
@@ -524,7 +526,7 @@ func Test_S3StateHandling(t *testing.T) {
 				pipeline:        newFakePipeline(),
 				s3ObjectHandler: mockObjHandler,
 				states:          s3States,
-				metrics:         newInputMetrics("state-test: "+test.name, nil, 0),
+				metrics:         newInputMetrics(monitoring.NewRegistry(), 0),
 				filterProvider:  newFilterProvider(test.config),
 			}
 

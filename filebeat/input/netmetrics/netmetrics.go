@@ -124,8 +124,7 @@ func containsUnspecifiedAddr(addr []string) (yes bool, which []bool, bad []strin
 }
 
 type netMetrics struct {
-	unregister func()
-	done       chan struct{}
+	done chan struct{}
 
 	monitorRegistry *monitoring.Registry
 
@@ -139,10 +138,9 @@ type netMetrics struct {
 	lastPacket      time.Time
 }
 
-func newNetMetrics(reg *monitoring.Registry, unreg func()) netMetrics {
+func newNetMetrics(reg *monitoring.Registry) netMetrics {
 	return netMetrics{
 		monitorRegistry: reg,
-		unregister:      unreg,
 
 		device:          monitoring.NewString(reg, "device"),
 		packets:         monitoring.NewUint(reg, "received_events_total"),
@@ -203,11 +201,6 @@ func (m *netMetrics) Close() {
 	if m.done != nil {
 		// Shut down poller and wait until done before unregistering metrics.
 		m.done <- struct{}{}
-	}
-
-	if m.unregister != nil {
-		m.unregister()
-		m.unregister = nil
 	}
 
 	m.monitorRegistry = nil

@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestCreate(t *testing.T) {
@@ -191,7 +192,7 @@ func TestRun(t *testing.T) {
 		numPipelineWorkers: 2,
 		inp: &inputMock{
 			NameFunc:        func() string { return t.Name() },
-			InitMetricsFunc: func(s string, logger *logp.Logger) Metrics { return metrics },
+			InitMetricsFunc: func(s string, reg *monitoring.Registry, logger *logp.Logger) Metrics { return metrics },
 			RunFunc: func(context v2.Context, eventCh chan<- DataMetadata, metrics Metrics) error {
 				runCalled.Store(true)
 				defer wg.Done()
@@ -241,7 +242,7 @@ func TestRunRecoversFromPanic(t *testing.T) {
 		numPipelineWorkers: 1,
 		inp: &inputMock{
 			NameFunc:        func() string { return inputName },
-			InitMetricsFunc: func(s string, logger *logp.Logger) Metrics { return metrics },
+			InitMetricsFunc: func(s string, reg *monitoring.Registry, logger *logp.Logger) Metrics { return metrics },
 			RunFunc: func(context v2.Context, eventCh chan<- DataMetadata, metrics Metrics) error {
 				panic("can I recover?")
 			},
@@ -278,7 +279,7 @@ func TestRunReturnsInitWokersError(t *testing.T) {
 		numPipelineWorkers: 1,
 		inp: &inputMock{
 			NameFunc:        func() string { return t.Name() },
-			InitMetricsFunc: func(s string, logger *logp.Logger) Metrics { return metrics },
+			InitMetricsFunc: func(s string, reg *monitoring.Registry, logger *logp.Logger) Metrics { return metrics },
 		},
 	}
 

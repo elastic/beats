@@ -28,8 +28,8 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
@@ -39,13 +39,12 @@ type TCP struct {
 }
 
 // NewTCP returns a new TCP input metricset. Note that if the id is empty then a nil TCP metricset is returned.
-func NewTCP(inputName string, id string, device string, poll time.Duration, log *logp.Logger) *TCP {
+func NewTCP(inputName string, id string, reg *monitoring.Registry, device string, poll time.Duration, log *logp.Logger) *TCP {
 	if id == "" {
 		return nil
 	}
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
 	out := &TCP{
-		netMetrics: newNetMetrics(reg, unreg),
+		netMetrics: newNetMetrics(reg),
 	}
 
 	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).

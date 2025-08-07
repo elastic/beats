@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -90,8 +91,8 @@ func (s *server) Test(_ input.TestContext) error {
 	return l.Close()
 }
 
-func (s *server) InitMetrics(id string, logger *logp.Logger) netinput.Metrics {
-	s.metrics = netmetrics.NewUDP("udp", id, s.Host, uint64(s.ReadBuffer), time.Second, logger)
+func (s *server) InitMetrics(id string, reg *monitoring.Registry, logger *logp.Logger) netinput.Metrics {
+	s.metrics = netmetrics.NewUDP("udp", id, reg, s.Host, uint64(s.ReadBuffer), time.Second, logger)
 	return s.metrics
 }
 

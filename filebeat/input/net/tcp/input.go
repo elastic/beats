@@ -36,6 +36,7 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func Plugin() input.Plugin {
@@ -95,8 +96,8 @@ func (s *server) Test(_ input.TestContext) error {
 }
 
 // InitMetrics initalises and returns an netmetrics.TCP
-func (s *server) InitMetrics(id string, logger *logp.Logger) netinput.Metrics {
-	s.metrics = netmetrics.NewTCP("tcp", id, s.Host, time.Minute, logger)
+func (s *server) InitMetrics(id string, reg *monitoring.Registry, logger *logp.Logger) netinput.Metrics {
+	s.metrics = netmetrics.NewTCP("tcp", id, reg, s.Host, time.Minute, logger)
 	return s.metrics
 }
 

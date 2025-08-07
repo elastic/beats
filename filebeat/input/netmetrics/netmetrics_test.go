@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestAddrs(t *testing.T) {
@@ -56,7 +57,8 @@ func TestAddrs(t *testing.T) {
 }
 
 func TestUDPMetrics(t *testing.T) {
-	m := NewUDP("udp", t.Name(), "localhost:4242", 1000, time.Second, logp.NewNopLogger())
+	reg := monitoring.NewRegistry()
+	m := NewUDP("udp", t.Name(), reg, "localhost:4242", 1000, time.Second, logp.NewNopLogger())
 
 	data := make([]byte, 42, 42)
 	start := time.Now()
