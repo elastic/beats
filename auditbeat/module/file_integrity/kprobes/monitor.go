@@ -53,6 +53,7 @@ func (m *monitorEmitter) Emit(ePath string, pid uint32, op uint32) error {
 	fmt.Fprintf(os.Stdout, "Got monitor event: %v\n", ePath)
 	select {
 	case <-m.ctx.Done():
+		fmt.Fprintf(os.Stdout, "got context done while trying to create event for %s\n", ePath)
 		return m.ctx.Err()
 
 	case m.eventC <- MonitorEvent{
@@ -86,7 +87,7 @@ func NewWithContext(ctx context.Context, isRecursive bool) (*Monitor, error) {
 
 	pChannel, err := newPerfChannel(validatedProbes, 10, 4096, perf.AllThreads)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating perf channel in NewWithContext(): %w", err)
 	}
 
 	return newMonitor(ctx, isRecursive, pChannel, exec)
@@ -102,7 +103,7 @@ func New(isRecursive bool) (*Monitor, error) {
 
 	pChannel, err := newPerfChannel(validatedProbes, 10, 4096, perf.AllThreads)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating perf channel in New(): %w", err)
 	}
 
 	return newMonitor(ctx, isRecursive, pChannel, exec)

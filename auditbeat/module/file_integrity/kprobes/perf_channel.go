@@ -51,7 +51,7 @@ func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponen
 		tracing.WithWakeUpEvents(500),
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating new perf channel: %w", err)
 	}
 
 	for probe, allocFn := range probes {
@@ -63,7 +63,7 @@ func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponen
 		}
 		desc, err := tfs.LoadProbeFormat(probe)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error loading probe format file for %s: %w", probe.Name, err)
 		}
 
 		decoder, err := tracing.NewStructDecoder(desc, allocFn)

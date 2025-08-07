@@ -149,7 +149,7 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 
 	pChannel, err := newPerfChannel(probes, 4, 512, exec.GetTID())
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating perf channel in verify(): %w", err)
 	}
 
 	monitorHandle, err := newMonitor(ctx, true, pChannel, exec)
