@@ -873,6 +873,7 @@ Metrics relating to global network activity
 :   ICMP counters
 
     type: object
+<<<<<<< HEAD
 
 
 ## ntp [_ntp]
@@ -893,6 +894,8 @@ stack: beta
 :   The estimated offset of the local host's system clock relative to the server's clock (in ns).
 
     type: long
+=======
+>>>>>>> 112199148 ([9.0](backport #45772) [docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45815))
 
 
 ## process [_process]

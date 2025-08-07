@@ -39,6 +39,7 @@ Contains nats connection related metrics
 :   The name of the connection
 
     type: keyword
+<<<<<<< HEAD
 
 
 **`nats.connection.kind`**
@@ -87,6 +88,8 @@ Contains nats connection related metrics
 :   The last activity time of the connection
 
     type: date
+=======
+>>>>>>> 112199148 ([9.0](backport #45772) [docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45815))
 
 
 **`nats.connection.subscriptions`**
@@ -163,6 +166,7 @@ Contains nats connection related metrics
 :   The number of currently active clients
 
     type: integer
+<<<<<<< HEAD
 
 
 ## jetstream [_jetstream]
@@ -725,6 +729,8 @@ Information about the configuration for this consumer.
 :   The number of replicas for the consumer's state in a JetStream cluster.
 
     type: long
+=======
+>>>>>>> 112199148 ([9.0](backport #45772) [docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45815))
 
 
 ## route [_route]
@@ -947,6 +953,7 @@ The request distribution on monitoring URIS
 :   The number of hits on root monitoring uri
 
     type: long
+<<<<<<< HEAD
 
 
 **`nats.stats.http.req_stats.uri.jsz`**
@@ -983,6 +990,8 @@ The request distribution on monitoring URIS
 :   The number of hits on leafz monitoring uri
 
     type: long
+=======
+>>>>>>> 112199148 ([9.0](backport #45772) [docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45815))
 
 
 ## subscriptions [_subscriptions]

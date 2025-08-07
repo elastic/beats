@@ -1709,6 +1709,7 @@ Kubernetes deployment replicas info
 :   Deployment updated replicas
 
     type: integer
+<<<<<<< HEAD
 
 
 ## horizontalpodautoscaler [_horizontalpodautoscaler]
@@ -1761,6 +1762,8 @@ Kubernetes HPA status metrics
 :   Kubernetes HPA scaling condition
 
     type: keyword
+=======
+>>>>>>> 112199148 ([9.0](backport #45772) [docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45815))
 
 
 ## job [_job]
