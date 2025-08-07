@@ -875,29 +875,6 @@ Metrics relating to global network activity
     type: object
 
 
-<<<<<<< HEAD
-=======
-## ntp [_ntp]
-
-```{applies_to}
-stack: beta
-```
-
-`ntp` contains Network Time Protocol (NTP) metrics.
-
-**`system.ntp.host`**
-:   The remote NTP server address.
-
-    type: keyword
-
-
-**`system.ntp.offset`**
-:   The estimated offset of the local host's system clock relative to the server's clock (in ns).
-
-    type: long
-
-
->>>>>>> 7fbc29824 ([docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45772))
 ## process [_process]
 
 `process` contains process metadata, CPU metrics, and memory metrics.
