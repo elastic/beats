@@ -36,7 +36,7 @@ func OTelInspectComand(beatname string) *cobra.Command {
 
 			provider, err := otelbeat.NewFactory(beatname)
 			if err != nil {
-				return fmt.Errorf("error getting the config provider for %s: %w", beatname, err)
+				return fmt.Errorf("error creating %s factory: %w", beatname, err)
 			}
 
 			retrieved, err := provider.Create(confmap.ProviderSettings{}).Retrieve(cmd.Context(), schemeMap[beatname]+":"+beatCfg, nil)
