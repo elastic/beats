@@ -141,11 +141,11 @@ func CreateReloadConfigFromInputs(raw []map[string]interface{}) ([]*reload.Confi
 func createStreamRules(raw *proto.UnitExpectedConfig, streamSource map[string]interface{}, stream *proto.Stream, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) (map[string]interface{}, error) {
 
 	// if the index explicitly set it takes precedence
-	if _, exists := streamSource["index"]; !exists {
-		streamSource = injectIndexStream(defaultDataStreamType, raw, stream, streamSource)
-	} else {
+	if _, exists := streamSource["index"]; exists {
 		// we must delete the existing `data_stream` field, otherwise `index` is ignored.
 		delete(streamSource, "data_stream")
+	} else {
+		streamSource = injectIndexStream(defaultDataStreamType, raw, stream, streamSource)
 	}
 
 	// the order of building the processors is important
