@@ -42,7 +42,7 @@ func New(
 	config *Config,
 	factory streaming.HandlerFactory,
 ) (*Server, error) {
-	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS)
+	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS, logger)
 	if err != nil {
 		return nil, err
 	}

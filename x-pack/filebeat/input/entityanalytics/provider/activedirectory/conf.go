@@ -6,8 +6,12 @@ package activedirectory
 
 import (
 	"errors"
+<<<<<<< HEAD
 	"net"
 	"net/url"
+=======
+	"strings"
+>>>>>>> 8df1efe87 (Replace global loggers with local logger #13 (#45720))
 	"time"
 
 	"github.com/go-ldap/ldap/v3"
@@ -67,26 +71,6 @@ func (c *conf) Validate() error {
 	if err != nil {
 		return err
 	}
-	u, err := url.Parse(c.URL)
-	if err != nil {
-		return err
-	}
-	if c.TLS.IsEnabled() && u.Scheme == "ldaps" {
-		_, err := tlscommon.LoadTLSConfig(c.TLS)
-		if err != nil {
-			return err
-		}
-		_, _, err = net.SplitHostPort(u.Host)
-		var addrErr *net.AddrError
-		switch {
-		case err == nil:
-		case errors.As(err, &addrErr):
-			if addrErr.Err != "missing port in address" {
-				return err
-			}
-		default:
-			return err
-		}
-	}
+
 	return nil
 }

@@ -126,8 +126,18 @@ func ExampleRunner() {
 		return
 	}
 
+<<<<<<< HEAD
 	// Create a new Wrapper based on the configuration.
 	m, err := module.NewWrapper(config, mb.Registry, module.WithMetricSetInfo())
+=======
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	// Create a new Wrapper based on the configuration.
+	m, err := module.NewWrapper(config, mb.Registry, logp.NewNopLogger(), beat.NewMonitoring(), module.WithMetricSetInfo())
+>>>>>>> 8df1efe87 (Replace global loggers with local logger #13 (#45720))
 	if err != nil {
 		return
 	}

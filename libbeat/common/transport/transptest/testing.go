@@ -31,6 +31,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -130,7 +132,7 @@ func NewMockServerTLS(t *testing.T, to time.Duration, cert string, proxy *transp
 			Certificate: cert + ".pem",
 			Key:         cert + ".key",
 		},
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("failed to load certificate")
 	}
@@ -177,7 +179,7 @@ func connectTLS(timeout time.Duration, certName string) TransportFactory {
 	return func(addr string, proxy *transport.ProxyConfig) (*transport.Client, error) {
 		tlsConfig, err := tlscommon.LoadTLSConfig(&tlscommon.Config{
 			CAs: []string{certName + ".pem"},
-		})
+		}, logp.NewNopLogger())
 		if err != nil {
 			return nil, err
 		}

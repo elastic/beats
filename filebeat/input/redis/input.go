@@ -58,7 +58,7 @@ func NewInput(cfg *conf.C, connector channel.Connector, context input.Context) (
 	}
 
 	if config.TLS.IsEnabled() {
-		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, logger)
 		if err != nil {
 			return nil, err
 		}

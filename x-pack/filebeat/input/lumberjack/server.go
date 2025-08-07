@@ -31,8 +31,16 @@ type server struct {
 	bindAddress    string
 }
 
+<<<<<<< HEAD
 func newServer(c config, log *logp.Logger, pub func(beat.Event), metrics *inputMetrics) (*server, error) {
 	ljSvr, bindAddress, err := newLumberjack(c)
+=======
+func newServer(c config, log *logp.Logger, pub func(beat.Event), stat status.StatusReporter, metrics *inputMetrics) (*server, error) {
+	if stat == nil {
+		stat = noopReporter{}
+	}
+	ljSvr, bindAddress, err := newLumberjack(c, log)
+>>>>>>> 8df1efe87 (Replace global loggers with local logger #13 (#45720))
 	if err != nil {
 		return nil, err
 	}
@@ -127,11 +135,11 @@ func makeEvent(remoteAddr string, tlsState *tls.ConnectionState, lumberjackEvent
 	return event
 }
 
-func newLumberjack(c config) (lj lumber.Server, bindAddress string, err error) {
+func newLumberjack(c config, logger *logp.Logger) (lj lumber.Server, bindAddress string, err error) {
 	// Setup optional TLS.
 	var tlsConfig *tls.Config
 	if c.TLS.IsEnabled() {
-		elasticTLSConfig, err := tlscommon.LoadTLSServerConfig(c.TLS)
+		elasticTLSConfig, err := tlscommon.LoadTLSServerConfig(c.TLS, logger)
 		if err != nil {
 			return nil, "", err
 		}

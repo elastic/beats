@@ -20,6 +20,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -432,6 +433,21 @@ func TestServerPool(t *testing.T) {
 	}
 }
 
+<<<<<<< HEAD
+=======
+func TestNewHTTPEndpoint(t *testing.T) {
+	cfg := config{
+		ListenAddress: "0:0:0:0:0:0:0:1",
+		ListenPort:    "9200",
+		ResponseBody:  "{}",
+		Method:        http.MethodPost,
+	}
+	h, err := newHTTPEndpoint(cfg, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+	require.Equal(t, "[0:0:0:0:0:0:0:1]:9200", h.addr)
+}
+
+>>>>>>> 8df1efe87 (Replace global loggers with local logger #13 (#45720))
 func doRequest(method, url, contentType string, body io.Reader) (*http.Response, error) {
 	if method == "" {
 		method = http.MethodPost

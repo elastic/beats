@@ -88,7 +88,7 @@ func NewFalconHoseFollower(ctx context.Context, id string, cfg config, cursor ma
 
 	cfg.Transport.Timeout = 0
 	cfg.Transport.IdleConnTimeout = 0
-	s.plainClient, err = cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation())
+	s.plainClient, err = cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation(), httpcommon.WithLogger(log))
 	if err != nil {
 		return nil, err
 	}
