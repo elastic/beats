@@ -4,7 +4,7 @@ mapped_pages:
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
-                 
+
 # Exported fields [exported-fields]
 
 This document describes the fields that are exported by Winlogbeat. They are grouped in the following categories:

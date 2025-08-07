@@ -12,6 +12,6 @@ Fields from Lumberjack input.
 **`lumberjack`**
 :   Structured data received in an event sent over the Lumberjack protocol.
 
-type: flattened
+    type: flattened
 
 
