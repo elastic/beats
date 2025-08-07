@@ -213,7 +213,7 @@ func (w *Monitor) Start() error {
 				switch eWithType := e.(type) {
 				case *ProbeEvent:
 					if err := w.eProc.process(w.ctx, eWithType); err != nil {
-						w.writeErr(err)
+						w.writeErr(fmt.Errorf("error processing event in Monitor: %w", err))
 						return
 					}
 					continue
@@ -223,7 +223,7 @@ func (w *Monitor) Start() error {
 				}
 
 			case err := <-w.perfChannel.ErrC():
-				w.writeErr(err)
+				w.writeErr(fmt.Errorf("perf channel error in Monitor: %w", err))
 				return
 
 			case lost := <-w.perfChannel.LostC():
@@ -231,7 +231,7 @@ func (w *Monitor) Start() error {
 				return
 
 			case err := <-w.pathMonitor.ErrC():
-				w.writeErr(err)
+				w.writeErr(fmt.Errorf("path error in Monitor: %w", err))
 				return
 			}
 		}
