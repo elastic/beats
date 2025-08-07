@@ -20,13 +20,13 @@ perfmon
 **`windows.perfmon.instance`**
 :   Instance value.
 
-type: keyword
+    type: keyword
 
 
 **`windows.perfmon.metrics.*.*`**
 :   Metric values returned.
 
-type: object
+    type: object
 
 
 ## service [_service]
@@ -36,74 +36,85 @@ type: object
 **`windows.service.id`**
 :   A unique ID for the service. It is a hash of the machine's GUID and the service name.
 
-type: keyword
+    type: keyword
 
-example: hW3NJFc1Ap
+    example: hW3NJFc1Ap
 
 
 **`windows.service.name`**
 :   The service name.
 
-type: keyword
+    type: keyword
 
-example: Wecsvc
+    example: Wecsvc
 
 
 **`windows.service.display_name`**
 :   The display name of the service.
 
-type: keyword
+    type: keyword
 
-example: Windows Event Collector
+    example: Windows Event Collector
 
 
 **`windows.service.start_type`**
 :   The startup type of the service. The possible values are `Automatic`, `Boot`, `Disabled`, `Manual`, and `System`.
 
-type: keyword
+    type: keyword
 
 
 **`windows.service.start_name`**
 :   Account name under which a service runs.
 
-type: keyword
+    type: keyword
 
-example: NT AUTHORITY\LocalService
+    example: NT AUTHORITY\LocalService
 
 
 **`windows.service.path_name`**
 :   Fully qualified path to the file that implements the service, including arguments.
 
-type: keyword
+    type: keyword
 
-example: C:\WINDOWS\system32\svchost.exe -k LocalService -p
+    example: C:\WINDOWS\system32\svchost.exe -k LocalService -p
 
 
 **`windows.service.state`**
 :   The actual state of the service. The possible values are `Continuing`, `Pausing`, `Paused`, `Running`, `Starting`, `Stopping`, and `Stopped`.
 
-type: keyword
+    type: keyword
 
 
 **`windows.service.exit_code`**
 :   For `Stopped` services this is the error code that service reports when starting to stopping. This will be the generic Windows service error code unless the service provides a service-specific error code.
 
-type: keyword
+    type: keyword
 
 
 **`windows.service.pid`**
 :   For `Running` services this is the associated process PID.
 
-type: long
+    type: long
 
-example: 1092
+    example: 1092
 
 
 **`windows.service.uptime.ms`**
 :   The service's uptime specified in milliseconds.
 
-type: long
+    type: long
 
-format: duration
+    format: duration
 
 
+<<<<<<< HEAD
+=======
+## wmi [_wmi]
+
+```{applies_to}
+stack: beta
+```
+
+wmi
+
+>>>>>>> 7fbc29824 ([docs automation] Update `generate_fields_docs.py` to add applies_to badges (#45772))
