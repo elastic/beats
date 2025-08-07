@@ -178,7 +178,7 @@ func checkUnsupportedConfig(cfg *config.C, logger *logp.Logger) error {
 	}
 
 	if !isStructEmpty(temp) {
-		fmt.Errorf("these configuration parameters are not supported %+v: %w", temp, errors.ErrUnsupported)
+		return fmt.Errorf("these configuration parameters are not supported %+v: %w", temp, errors.ErrUnsupported)
 	}
 
 	// check for dictionary like parameters that we do not support yet

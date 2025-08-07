@@ -72,7 +72,7 @@ func TLSCommonToOTel(output *config.C, logger *logp.Logger) (map[string]any, err
 
 	err := output.Unpack(&tlsCfg)
 	if err != nil {
-		return nil, fmt.Errorf("failed unpacking config. %w", err)
+		return nil, fmt.Errorf("failed unpacking config: %w", err)
 	}
 
 	if tlsCfg.TLS == nil {
