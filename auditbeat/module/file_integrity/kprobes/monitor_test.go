@@ -494,7 +494,7 @@ func (p *monitorTestSuite) TestNew() {
 	cancelChan := make(chan struct{})
 
 	targetFile := filepath.Join(tmpDir, "file_kprobes.txt")
-	tid := uint32(unix.Gettid())
+	tid := uint32(unix.Gettid()) //nolint:gosec // This is a test.
 
 	expectedEvents := []MonitorEvent{
 		{
