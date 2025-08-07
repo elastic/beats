@@ -158,13 +158,13 @@ func createStreamRules(raw *proto.UnitExpectedConfig, streamSource map[string]in
 	// 2. agentInfo
 	streamSource, err := injectAgentInfoRule(streamSource, agentInfo)
 	if err != nil {
-		return nil, fmt.Errorf("Error injecting agent processors: %w", err)
+		return nil, fmt.Errorf("error injecting agent processors: %w", err)
 	}
 
 	// 3. stream processors
 	streamSource, err = injectStreamProcessors(raw, defaultDataStreamType, stream, streamSource, defaultProcessors)
 	if err != nil {
-		return nil, fmt.Errorf("Error injecting stream processors: %w", err)
+		return nil, fmt.Errorf("error injecting stream processors: %w", err)
 	}
 
 	// now the order of the processors on this input is as follows

@@ -25,8 +25,8 @@ func TestBareConfig(t *testing.T) {
 		Streams: []*proto.Stream{
 			{
 				Id: "system/metrics-system.filesystem-default-system",
-				Source: requireNewStruct(t, map[string]interface{}{
-					"metricsets": []interface{}{"filesystem"},
+				Source: requireNewStruct(t, map[string]any{
+					"metricsets": []any{"filesystem"},
 					"period":     "1m",
 				}),
 			},
@@ -36,7 +36,7 @@ func TestBareConfig(t *testing.T) {
 	cfgMap := buildConfigMap(t, &rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
 
 	// Actual checks
-	processorFields := map[string]interface{}{
+	processorFields := map[string]any{
 		"add_fields.fields.stream_id": "system/metrics-system.filesystem-default-system",
 		"add_fields.fields.dataset":   "generic",
 		"add_fields.fields.namespace": "default",
@@ -56,18 +56,18 @@ func TestGlobalProcessInject(t *testing.T) {
 		Streams: []*proto.Stream{
 			{
 				Id: "system/metrics-system.filesystem-default-system",
-				Source: requireNewStruct(t, map[string]interface{}{
-					"metricsets": []interface{}{"filesystem"},
+				Source: requireNewStruct(t, map[string]any{
+					"metricsets": []any{"filesystem"},
 					"period":     "1m",
 				}),
 			},
 		},
-		Source: requireNewStruct(t, map[string]interface{}{
-			"processors": []interface{}{
-				map[string]interface{}{
-					"add_fields": map[string]interface{}{
-						"fields": map[string]interface{}{
-							"cluster": map[string]interface{}{
+		Source: requireNewStruct(t, map[string]any{
+			"processors": []any{
+				map[string]any{
+					"add_fields": map[string]any{
+						"fields": map[string]any{
+							"cluster": map[string]any{
 								"name": "kind",
 								"url":  "kind-control-plane:6443",
 							},
@@ -80,7 +80,7 @@ func TestGlobalProcessInject(t *testing.T) {
 	}
 
 	cfgMap := buildConfigMap(t, &rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
-	processorFields := map[string]interface{}{
+	processorFields := map[string]any{
 		"add_fields.fields.stream_id":    "system/metrics-system.filesystem-default-system", // make sure we're not overwiting anything
 		"add_fields.fields.dataset":      "generic",
 		"add_fields.fields.cluster.name": "kind", // actual test for the global processors
@@ -148,12 +148,12 @@ func TestIndexPrecedence(t *testing.T) {
 }
 
 func TestMBGenerate(t *testing.T) {
-	sourceStream := requireNewStruct(t, map[string]interface{}{
-		"metricsets": []interface{}{"filesystem"},
+	sourceStream := requireNewStruct(t, map[string]any{
+		"metricsets": []any{"filesystem"},
 		"period":     "1m",
-		"processors": []interface{}{
-			map[string]interface{}{
-				"drop_event.when.regexp": map[string]interface{}{
+		"processors": []any{
+			map[string]any{
+				"drop_event.when.regexp": map[string]any{
 					"system.filesystem.mount_point": "^/(sys|cgroup|proc|dev|etc|host|lib|snap)($|/)",
 				},
 			},
@@ -187,7 +187,7 @@ func TestMBGenerate(t *testing.T) {
 	}
 
 	cfgMap := buildConfigMap(t, &rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
-	configFields := map[string]interface{}{
+	configFields := map[string]any{
 		"drop_event":                  nil,
 		"add_fields.fields.stream_id": "system/metrics-system.filesystem-default-system",
 		"add_fields.fields.dataset":   "system.filesystem",
@@ -201,8 +201,8 @@ func TestMBGenerate(t *testing.T) {
 func TestOutputGen(t *testing.T) {
 	testExpected := proto.UnitExpectedConfig{
 		Type: "elasticsearch",
-		Source: requireNewStruct(t, map[string]interface{}{
-			"hosts":    []interface{}{"localhost:9200"},
+		Source: requireNewStruct(t, map[string]any{
+			"hosts":    []any{"localhost:9200"},
 			"username": "elastic",
 			"password": "changeme",
 		}),
@@ -215,7 +215,9 @@ func TestOutputGen(t *testing.T) {
 	require.NoError(t, err)
 	innerCfg, exists := testStruct["elasticsearch"]
 	assert.True(t, exists, "elasticsearch key does not exist")
-	_, pwExists := innerCfg.(map[string]interface{})["password"]
+	innerCfgMap, ok := innerCfg.(map[string]any)
+	require.True(t, ok, "must be a map[string]any")
+	_, pwExists := innerCfgMap["password"]
 	assert.True(t, pwExists, "password config not found")
 
 }
@@ -234,7 +236,7 @@ func TestOutputIndex(t *testing.T) {
 			Namespace: "default",
 		},
 	}
-	inStream := map[string]interface{}{}
+	inStream := map[string]any{}
 	outStream := injectIndexStream(dataStreamType, unit, stream, inStream)
 	require.Equal(t, "synthetics-icmp-default", outStream["index"])
 
@@ -246,7 +248,7 @@ func TestOutputIndex(t *testing.T) {
 
 }
 
-func requireNewStruct(t *testing.T, v map[string]interface{}) *structpb.Struct {
+func requireNewStruct(t *testing.T, v map[string]any) *structpb.Struct {
 	str, err := structpb.NewStruct(v)
 	if err != nil {
 		require.NoError(t, err)
@@ -254,15 +256,19 @@ func requireNewStruct(t *testing.T, v map[string]interface{}) *structpb.Struct {
 	return str
 }
 
-func findFieldsInProcessors(t *testing.T, configFields map[string]interface{}, cfgMap mapstr.M) {
+func findFieldsInProcessors(t *testing.T, configFields map[string]any, cfgMap mapstr.M) {
 	for key, val := range configFields {
 		gotKey := false
 		gotVal := false
 		errStr := ""
-		for _, proc := range cfgMap["processors"].([]interface{}) {
-			processor := mapstr.M(proc.(map[string]interface{}))
-			found, ok := processor.GetValue(key)
-			if ok == nil {
+		procList, ok := cfgMap["processors"].([]any)
+		require.True(t, ok, "must be a list of objects")
+		for _, proc := range procList {
+			p, ok := proc.(map[string]any)
+			require.True(t, ok, "must be a map[string]any")
+			processor := mapstr.M(p)
+			found, err := processor.GetValue(key)
+			if err == nil {
 				gotKey = true
 				if val == nil {
 					gotVal = true
