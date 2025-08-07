@@ -101,7 +101,7 @@ func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, curs
 
 	cfg.Transport.Timeout = 0
 	cfg.Transport.IdleConnTimeout = 0
-	s.plainClient, err = cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation())
+	s.plainClient, err = cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation(), httpcommon.WithLogger(log))
 	if err != nil {
 		stat.UpdateStatus(status.Failed, "failed to configure client: "+err.Error())
 		return nil, err
