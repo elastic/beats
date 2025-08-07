@@ -39,10 +39,7 @@ type TCP struct {
 }
 
 // NewTCP returns a new TCP input metricset. Note that if the id is empty then a nil TCP metricset is returned.
-func NewTCP(inputName string, id string, reg *monitoring.Registry, device string, poll time.Duration, log *logp.Logger) *TCP {
-	if id == "" {
-		return nil
-	}
+func NewTCP(reg *monitoring.Registry, device string, poll time.Duration, log *logp.Logger) *TCP {
 	out := &TCP{
 		netMetrics: newNetMetrics(reg),
 	}

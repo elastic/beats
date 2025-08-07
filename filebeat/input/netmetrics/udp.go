@@ -44,11 +44,7 @@ type UDP struct {
 }
 
 // NewUDP returns a new UDP input metricset.
-func NewUDP(inputName string, id string, reg *monitoring.Registry, device string, buflen uint64, poll time.Duration, log *logp.Logger) *UDP {
-	if id == "" {
-		return nil
-	}
-
+func NewUDP(reg *monitoring.Registry, device string, buflen uint64, poll time.Duration, log *logp.Logger) *UDP {
 	out := &UDP{
 		bufferLen:  monitoring.NewUint(reg, "udp_read_buffer_length_gauge"),
 		drops:      monitoring.NewUint(reg, "system_packet_drops"),

@@ -58,7 +58,28 @@ func TestAddrs(t *testing.T) {
 
 func TestUDPMetrics(t *testing.T) {
 	reg := monitoring.NewRegistry()
-	m := NewUDP("udp", t.Name(), reg, "localhost:4242", 1000, time.Second, logp.NewNopLogger())
+	m := NewUDP(reg, "localhost:4242", 1000, time.Second, logp.NewNopLogger())
+
+	data := make([]byte, 42, 42)
+	start := time.Now()
+	now := start
+
+	numEvents := 100
+	for range 100 {
+		now = start.Add(100 * time.Millisecond)
+		m.EventReceived(len(data), now)
+		m.EventPublished(now)
+	}
+
+	assert.EqualValues(t, len(data)*numEvents, m.bytes.Get(), "wrong value for bytes received")
+	assert.EqualValues(t, numEvents, m.packets.Get(), "wrong value for packets received")
+	assert.EqualValues(t, numEvents, m.processingTime.Count(), "wrong number of events for processing time calculation")
+	assert.EqualValues(t, numEvents-1, m.arrivalPeriod.Count(), "wrong number of events for processing time calculation")
+}
+
+func TestTCPMetrics(t *testing.T) {
+	reg := monitoring.NewRegistry()
+	m := NewTCP(reg, "localhost:4242", time.Second, logp.NewNopLogger())
 
 	data := make([]byte, 42, 42)
 	start := time.Now()

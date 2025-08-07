@@ -92,7 +92,7 @@ func (s *server) Test(_ input.TestContext) error {
 }
 
 func (s *server) InitMetrics(id string, reg *monitoring.Registry, logger *logp.Logger) netinput.Metrics {
-	s.metrics = netmetrics.NewUDP("udp", id, reg, s.Host, uint64(s.ReadBuffer), time.Second, logger)
+	s.metrics = netmetrics.NewUDP(reg, s.Host, uint64(s.ReadBuffer), time.Second, logger)
 	return s.metrics
 }
 
