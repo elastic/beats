@@ -9,9 +9,8 @@ import (
 	"path/filepath"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/otelbeat"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/fbprovider"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/mbprovider"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/collector/confmap"
 	"gopkg.in/yaml.v3"
@@ -35,14 +34,12 @@ func OTelInspectComand(beatname string) *cobra.Command {
 				return nil
 			}
 
-			var provider confmap.Provider
-			switch beatname {
-			case "filebeat":
-				provider = fbprovider.NewFactory().Create(confmap.ProviderSettings{})
-			case "metricbeat":
-				provider = mbprovider.NewFactory().Create(confmap.ProviderSettings{})
+			provider, err := otelbeat.NewFactory(beatname)
+			if err != nil {
+				return fmt.Errorf("error getting the config provider for %s: %w", beatname, err)
 			}
-			retrieved, err := provider.Retrieve(cmd.Context(), schemeMap[beatname]+":"+beatCfg, nil)
+
+			retrieved, err := provider.Create(confmap.ProviderSettings{}).Retrieve(cmd.Context(), schemeMap[beatname]+":"+beatCfg, nil)
 			if err != nil {
 				return fmt.Errorf("error getting the config from provider: %w", err)
 			}
