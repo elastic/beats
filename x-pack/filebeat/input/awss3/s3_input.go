@@ -146,7 +146,7 @@ func (in *s3PollerInput) runPoll(ctx context.Context) {
 	err := in.states.CleanUp(ids)
 	if err != nil {
 		in.log.Errorf("failed to cleanup states: %v", err.Error())
-		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Input state cleanup failure: %s", err.Error()))
+		in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Input state cleanup failure: %s", err.Error()))
 	}
 }
 
@@ -249,7 +249,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 				circuitBreaker++
 				if circuitBreaker >= readerLoopMaxCircuitBreaker {
 					in.log.Warnw(fmt.Sprintf("%d consecutive error when paginating listing, breaking the circuit.", circuitBreaker), "error", err)
-					in.status.UpdateStatus(status.Failed, fmt.Sprintf("Too many consecutive errors (%d) in S3 pagination. Error: %s", circuitBreaker, err.Error()))
+					in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Too many consecutive errors (%d) in S3 pagination. Error: %s", circuitBreaker, err.Error()))
 					return nil, false
 				}
 			}
