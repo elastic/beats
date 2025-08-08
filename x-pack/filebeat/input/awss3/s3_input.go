@@ -158,7 +158,6 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 	if err != nil {
 		in.log.Errorf("failed to create pipeline client: %v", err.Error())
 		in.status.UpdateStatus(status.Degraded, fmt.Sprintf("A worker's pipeline client setup failed, error: %s", err.Error()))
-		// TODO: re-attempt pipeline client initialization if it fails
 		return
 	}
 	defer client.Close()
