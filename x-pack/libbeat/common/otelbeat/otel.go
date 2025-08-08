@@ -66,6 +66,7 @@ func OTelCmd(beatname string) *cobra.Command {
 	}
 
 	command.Flags().String("config", beatname+"-otel.yml", "path to "+beatname+" config file")
+	command.AddCommand(OTelInspectComand(beatname))
 	return command
 }
 
