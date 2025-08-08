@@ -17,6 +17,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 % ### Fixes [beats-versionext-fixes]
 
+<<<<<<< HEAD
 ## 9.1.2 [beats-9.1.2-release-notes]
 
 ### Features and enhancements [beats-9.1.2-features-enhancements]
@@ -35,6 +36,8 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 - Fix error handling in ABS input when both root level `max_workers` and `batch_size` are empty. [45680]({{beats-issue}}45680) [45743]({{beats-pull}}45743)
 
+=======
+>>>>>>> cce27a15c (add 9.1.1 release notes (#45845) (#45853))
 ## 9.1.1 [beats-9.1.1-release-notes]
 
 ### Features and enhancements [beats-9.1.1-features-enhancements]
