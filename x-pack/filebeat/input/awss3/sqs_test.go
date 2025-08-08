@@ -32,6 +32,7 @@ var (
 )
 
 func TestSQSReceiver(t *testing.T) {
+	//nolint:staticcheck // TODO: fix during sweep of global loggers
 	err := logp.TestingSetup()
 	require.NoError(t, err)
 
@@ -157,6 +158,7 @@ func TestSQSReceiver(t *testing.T) {
 }
 
 func TestGetApproximateMessageCount(t *testing.T) {
+	//nolint:staticcheck // TODO: fix during sweep of global loggers
 	err := logp.TestingSetup()
 	require.NoError(t, err)
 
