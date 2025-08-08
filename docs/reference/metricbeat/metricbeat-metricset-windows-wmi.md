@@ -1,3 +1,16 @@
+<<<<<<< HEAD
+=======
+---
+mapped_pages:
+  - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-windows-wmi.html
+
+applies_to:
+  stack: beta
+---
+
+% This file is generated! See scripts/docs_collector.py
+
+>>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))
 # Windows wmi metricset [metricbeat-metricset-windows-wmi]
 
 ::::{warning}

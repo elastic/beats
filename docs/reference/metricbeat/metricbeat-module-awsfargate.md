@@ -69,6 +69,10 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+<<<<<<< HEAD
 * [task_stats](/reference/metricbeat/metricbeat-metricset-awsfargate-task_stats.md)
 
 
+=======
+* [task_stats](/reference/metricbeat/metricbeat-metricset-awsfargate-task_stats.md)  {applies_to}`stack: beta`
+>>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))

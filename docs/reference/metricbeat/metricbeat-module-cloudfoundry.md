@@ -149,6 +149,7 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+<<<<<<< HEAD
 * [container](/reference/metricbeat/metricbeat-metricset-cloudfoundry-container.md)
 * [counter](/reference/metricbeat/metricbeat-metricset-cloudfoundry-counter.md)
 * [value](/reference/metricbeat/metricbeat-metricset-cloudfoundry-value.md)
@@ -156,3 +157,8 @@ The following metricsets are available:
 
 
 
+=======
+* [container](/reference/metricbeat/metricbeat-metricset-cloudfoundry-container.md)  {applies_to}`stack: beta`
+* [counter](/reference/metricbeat/metricbeat-metricset-cloudfoundry-counter.md)  {applies_to}`stack: beta`
+* [value](/reference/metricbeat/metricbeat-metricset-cloudfoundry-value.md)  {applies_to}`stack: beta`
+>>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))

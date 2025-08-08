@@ -1,8 +1,14 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-openai-usage.html
+<<<<<<< HEAD
   # That link will 404 until 8.18 is current
   # (see https://www.elastic.co/guide/en/beats/metricbeat/8.18/metricbeat-metricset-openai-usage.html)
+=======
+
+applies_to:
+  stack: beta
+>>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))
 ---
 
 # openai usage metricset [metricbeat-metricset-openai-usage]

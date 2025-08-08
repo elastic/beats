@@ -92,6 +92,7 @@ The following metricsets are available:
 * [info](/reference/metricbeat/metricbeat-metricset-docker-info.md)
 * [memory](/reference/metricbeat/metricbeat-metricset-docker-memory.md)
 * [network](/reference/metricbeat/metricbeat-metricset-docker-network.md)
+<<<<<<< HEAD
 * [network_summary](/reference/metricbeat/metricbeat-metricset-docker-network_summary.md)
 
 
@@ -104,3 +105,6 @@ The following metricsets are available:
 
 
 
+=======
+* [network_summary](/reference/metricbeat/metricbeat-metricset-docker-network_summary.md)  {applies_to}`stack: beta`
+>>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))

@@ -122,10 +122,11 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [broker](/reference/metricbeat/metricbeat-metricset-kafka-broker.md)
-* [consumer](/reference/metricbeat/metricbeat-metricset-kafka-consumer.md)
+* [broker](/reference/metricbeat/metricbeat-metricset-kafka-broker.md)  {applies_to}`stack: beta`
+* [consumer](/reference/metricbeat/metricbeat-metricset-kafka-consumer.md)  {applies_to}`stack: beta`
 * [consumergroup](/reference/metricbeat/metricbeat-metricset-kafka-consumergroup.md)
 * [partition](/reference/metricbeat/metricbeat-metricset-kafka-partition.md)
+<<<<<<< HEAD
 * [producer](/reference/metricbeat/metricbeat-metricset-kafka-producer.md)
 
 
@@ -133,3 +134,6 @@ The following metricsets are available:
 
 
 
+=======
+* [producer](/reference/metricbeat/metricbeat-metricset-kafka-producer.md)  {applies_to}`stack: beta`
+>>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))

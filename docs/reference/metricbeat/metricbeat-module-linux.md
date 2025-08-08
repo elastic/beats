@@ -51,6 +51,7 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+<<<<<<< HEAD
 * [conntrack](/reference/metricbeat/metricbeat-metricset-linux-conntrack.md)
 * [iostat](/reference/metricbeat/metricbeat-metricset-linux-iostat.md)
 * [ksm](/reference/metricbeat/metricbeat-metricset-linux-ksm.md)
@@ -66,3 +67,12 @@ The following metricsets are available:
 
 
 
+=======
+* [conntrack](/reference/metricbeat/metricbeat-metricset-linux-conntrack.md)  {applies_to}`stack: beta`
+* [iostat](/reference/metricbeat/metricbeat-metricset-linux-iostat.md)  {applies_to}`stack: beta`
+* [ksm](/reference/metricbeat/metricbeat-metricset-linux-ksm.md)  {applies_to}`stack: beta`
+* [memory](/reference/metricbeat/metricbeat-metricset-linux-memory.md)  {applies_to}`stack: beta`
+* [pageinfo](/reference/metricbeat/metricbeat-metricset-linux-pageinfo.md)  {applies_to}`stack: beta`
+* [pressure](/reference/metricbeat/metricbeat-metricset-linux-pressure.md)  {applies_to}`stack: beta`
+* [rapl](/reference/metricbeat/metricbeat-metricset-linux-rapl.md)  {applies_to}`stack: beta`
+>>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))

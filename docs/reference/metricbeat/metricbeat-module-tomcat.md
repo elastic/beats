@@ -60,6 +60,7 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+<<<<<<< HEAD
 * [cache](/reference/metricbeat/metricbeat-metricset-tomcat-cache.md)
 * [memory](/reference/metricbeat/metricbeat-metricset-tomcat-memory.md)
 * [requests](/reference/metricbeat/metricbeat-metricset-tomcat-requests.md)
@@ -69,3 +70,9 @@ The following metricsets are available:
 
 
 
+=======
+* [cache](/reference/metricbeat/metricbeat-metricset-tomcat-cache.md)  {applies_to}`stack: beta`
+* [memory](/reference/metricbeat/metricbeat-metricset-tomcat-memory.md)  {applies_to}`stack: beta`
+* [requests](/reference/metricbeat/metricbeat-metricset-tomcat-requests.md)  {applies_to}`stack: beta`
+* [threading](/reference/metricbeat/metricbeat-metricset-tomcat-threading.md)  {applies_to}`stack: beta`
+>>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))

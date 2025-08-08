@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-linux-pressure.html
+
+applies_to:
+  stack: beta
 ---
 
 # Linux pressure metricset [metricbeat-metricset-linux-pressure]

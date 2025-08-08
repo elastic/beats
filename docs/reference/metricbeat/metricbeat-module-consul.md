@@ -46,6 +46,10 @@ This module supports TLS connections when using `ssl` config field, as described
 
 The following metricsets are available:
 
+<<<<<<< HEAD
 * [agent](/reference/metricbeat/metricbeat-metricset-consul-agent.md)
 
 
+=======
+* [agent](/reference/metricbeat/metricbeat-metricset-consul-agent.md)  {applies_to}`stack: beta`
+>>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))

@@ -69,6 +69,10 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+<<<<<<< HEAD
 * [info](metricbeat-metricset-benchmark-info.md)
 
 
+=======
+* [info](/reference/metricbeat/metricbeat-metricset-benchmark-info.md)  {applies_to}`stack: beta`
+>>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))
