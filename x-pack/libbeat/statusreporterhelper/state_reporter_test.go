@@ -5,6 +5,7 @@
 package statusreporterhelper
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -23,9 +24,10 @@ func TestConstructor(t *testing.T) {
 	})
 }
 
-func TestStateReporterStatus(t *testing.T) {
+func TestReportingWithReporter(t *testing.T) {
 	mockReporter := &countedReporter{}
-	reporter := New(mockReporter, logp.NewNopLogger())
+	unusedLogger, unusedLoggerBuffer := logp.NewInMemoryLocal("not_used", logp.ConsoleEncoderConfig())
+	reporter := New(mockReporter, unusedLogger)
 	require.IsType(t, &countedReporter{}, reporter.statusReporter)
 
 	// check initials
@@ -44,6 +46,30 @@ func TestStateReporterStatus(t *testing.T) {
 	reporter.UpdateStatus(status.Stopped, "")
 	require.Equal(t, status.Stopped, reporter.current)
 	require.Equal(t, 2, mockReporter.count)
+
+	// assert the passed-in logger was not used when statusresporter is non-nil
+	require.Equal(t, 0, unusedLoggerBuffer.Len())
+}
+
+func TestReportingWithLoggerPassthrough(t *testing.T) {
+	bufferedLogger, buff := logp.NewInMemoryLocal("not_used", logp.ConsoleEncoderConfig())
+	reporter := New(nil, bufferedLogger)
+	require.IsType(t, &debugStatusReporter{}, reporter.statusReporter)
+
+	// check initial state
+	require.Equal(t, 0, buff.Len())
+
+	// update status multiple times
+	reporter.UpdateStatus(status.Running, "some message")
+	reporter.UpdateStatus(status.Running, "some message")
+
+	// check for proxying only the necessary
+	require.Equal(t, status.Running, reporter.current)
+	require.Equal(t, 1, strings.Count(buff.String(), "some message"))
+
+	// check for change of status
+	reporter.UpdateStatus(status.Stopped, "")
+	require.Equal(t, status.Stopped, reporter.current)
 }
 
 // countedReporter helps with testing to track proxying count
