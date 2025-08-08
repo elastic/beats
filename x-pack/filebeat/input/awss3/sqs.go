@@ -7,6 +7,7 @@ package awss3
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
@@ -15,6 +16,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/aws/smithy-go"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -66,6 +68,7 @@ func getRegionFromQueueURL(queueURL string) string {
 func readSQSMessages(
 	ctx context.Context,
 	log *logp.Logger,
+	statusReporter status.StatusReporter,
 	sqs sqsAPI,
 	metrics *inputMetrics,
 	count int,
@@ -76,6 +79,7 @@ func readSQSMessages(
 	msgs, err := sqs.ReceiveMessage(ctx, count)
 	for (err != nil || len(msgs) == 0) && ctx.Err() == nil {
 		if err != nil {
+			statusReporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retryable SQS fetching error: %s", err.Error()))
 			log.Warnw("SQS ReceiveMessage returned an error. Will retry after a short delay.", "error", err)
 		}
 		// Wait for the retry delay, but stop early if the context is cancelled.
@@ -86,6 +90,7 @@ func readSQSMessages(
 		}
 		msgs, err = sqs.ReceiveMessage(ctx, count)
 	}
+	statusReporter.UpdateStatus(status.Running, "Input is running")
 	log.Debugf("Received %v SQS messages.", len(msgs))
 	metrics.sqsMessagesReceivedTotal.Add(uint64(len(msgs)))
 	return msgs

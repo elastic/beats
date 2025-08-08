@@ -12,10 +12,15 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
+
+type mockStatusReporter struct{}
+
+func (m *mockStatusReporter) UpdateStatus(s status.Status, msg string) {}
 
 func TestGetProviderFromDomain(t *testing.T) {
 	tests := []struct {
@@ -155,6 +160,7 @@ func TestRegionSelection(t *testing.T) {
 				MetricsRegistry: monitoring.NewRegistry(),
 			}
 
+			in.status = &mockStatusReporter{}
 			// Run setup and verify that it put the correct region in awsConfig.Region
 			err := in.setup(inputCtx, &fakePipeline{})
 			in.cleanup()
