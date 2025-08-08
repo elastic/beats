@@ -102,6 +102,7 @@ func TestSQSReceiver(t *testing.T) {
 		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), 0)
 		sqsReader.pipeline = &fakePipeline{}
 		sqsReader.msgHandler = mockMsgHandler
+		sqsReader.status = &mockStatusReporter{}
 		sqsReader.run(ctx)
 
 		select {
@@ -150,6 +151,7 @@ func TestSQSReceiver(t *testing.T) {
 		sqsReader.msgHandler = mockMsgHandler
 		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), 0)
 		sqsReader.pipeline = &fakePipeline{}
+		sqsReader.status = &mockStatusReporter{}
 		sqsReader.run(ctx)
 	})
 }
