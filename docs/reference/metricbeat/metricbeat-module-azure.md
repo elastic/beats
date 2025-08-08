@@ -280,9 +280,9 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [app_insights](/reference/metricbeat/metricbeat-metricset-azure-app_insights.md)
-* [app_state](/reference/metricbeat/metricbeat-metricset-azure-app_state.md)
-* [billing](/reference/metricbeat/metricbeat-metricset-azure-billing.md)
+* [app_insights](/reference/metricbeat/metricbeat-metricset-azure-app_insights.md)  {applies_to}`stack: beta`
+* [app_state](/reference/metricbeat/metricbeat-metricset-azure-app_state.md)  {applies_to}`stack: beta`
+* [billing](/reference/metricbeat/metricbeat-metricset-azure-billing.md)  {applies_to}`stack: beta`
 * [compute_vm](/reference/metricbeat/metricbeat-metricset-azure-compute_vm.md)
 * [compute_vm_scaleset](/reference/metricbeat/metricbeat-metricset-azure-compute_vm_scaleset.md)
 * [container_instance](/reference/metricbeat/metricbeat-metricset-azure-container_instance.md)
