@@ -400,6 +400,10 @@ The following metricsets are available:
 * [state_cronjob](/reference/metricbeat/metricbeat-metricset-kubernetes-state_cronjob.md)
 * [state_daemonset](/reference/metricbeat/metricbeat-metricset-kubernetes-state_daemonset.md)
 * [state_deployment](/reference/metricbeat/metricbeat-metricset-kubernetes-state_deployment.md)
+<<<<<<< HEAD
+=======
+* [state_horizontalpodautoscaler](/reference/metricbeat/metricbeat-metricset-kubernetes-state_horizontalpodautoscaler.md)  {applies_to}`stack: beta`
+>>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))
 * [state_job](/reference/metricbeat/metricbeat-metricset-kubernetes-state_job.md)
 * [state_node](/reference/metricbeat/metricbeat-metricset-kubernetes-state_node.md)
 * [state_persistentvolumeclaim](/reference/metricbeat/metricbeat-metricset-kubernetes-state_persistentvolumeclaim.md)
