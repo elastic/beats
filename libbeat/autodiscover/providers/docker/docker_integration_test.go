@@ -26,6 +26,8 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	appConfig "github.com/elastic/beats/v7/libbeat/autodiscover/appenders/config"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	dk "github.com/elastic/beats/v7/libbeat/tests/docker"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
@@ -55,7 +57,14 @@ func TestDockerStart(t *testing.T) {
 	s := &template.MapperSettings{nil, nil}
 	config.Templates = *s
 	k, _ := keystore.NewFileKeystore("test")
-	provider, err := AutodiscoverBuilder("mockBeat", bus, UUID, conf.MustNewConfigFrom(config), k, log)
+	reg := autodiscover.NewRegistry(log)
+	if err := reg.AddProvider(ProviderName, AutodiscoverBuilder); err != nil {
+		t.Fatalf("error adding docker autodiscover provider: %s", err)
+	}
+	if err := reg.AddAppender("config", appConfig.NewConfigAppender); err != nil {
+		t.Fatalf("error adding libbeat autodiscover configuration appender: %s", err)
+	}
+	provider, err := AutodiscoverBuilder("mockBeat", bus, UUID, conf.MustNewConfigFrom(config), k, log, reg)
 	if err != nil {
 		t.Fatal(err)
 	}
