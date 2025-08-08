@@ -295,6 +295,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group. {pull}44576[44576]
 - Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
 - Fix histogram values of zero are filtered out on non-amd64 platforms for openmetrics and prometheus {pull}44750[44750]
+- Enhance behavior of sanitizeError: replace sensitive info even if it is escaped {pull}45857[45857]
 
 *Osquerybeat*
 
