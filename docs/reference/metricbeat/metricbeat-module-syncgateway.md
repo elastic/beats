@@ -38,19 +38,7 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-<<<<<<< HEAD
-* [db](/reference/metricbeat/metricbeat-metricset-syncgateway-db.md)
-* [memory](/reference/metricbeat/metricbeat-metricset-syncgateway-memory.md)
-* [replication](/reference/metricbeat/metricbeat-metricset-syncgateway-replication.md)
-* [resources](/reference/metricbeat/metricbeat-metricset-syncgateway-resources.md)
-
-
-
-
-
-=======
 * [db](/reference/metricbeat/metricbeat-metricset-syncgateway-db.md)  {applies_to}`stack: beta`
 * [memory](/reference/metricbeat/metricbeat-metricset-syncgateway-memory.md)  {applies_to}`stack: beta`
 * [replication](/reference/metricbeat/metricbeat-metricset-syncgateway-replication.md)  {applies_to}`stack: beta`
 * [resources](/reference/metricbeat/metricbeat-metricset-syncgateway-resources.md)  {applies_to}`stack: beta`
->>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))

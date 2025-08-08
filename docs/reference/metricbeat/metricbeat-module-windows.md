@@ -82,14 +82,4 @@ The following metricsets are available:
 
 * [perfmon](/reference/metricbeat/metricbeat-metricset-windows-perfmon.md)
 * [service](/reference/metricbeat/metricbeat-metricset-windows-service.md)
-<<<<<<< HEAD
-* [wmi](/reference/metricbeat/metricbeat-metricset-windows-wmi.md)
-
-
-
-
-
-
-=======
 * [wmi](/reference/metricbeat/metricbeat-metricset-windows-wmi.md)  {applies_to}`stack: beta`
->>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))

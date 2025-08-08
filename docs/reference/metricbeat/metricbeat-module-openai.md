@@ -62,10 +62,4 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-<<<<<<< HEAD
-* [usage](metricbeat-metricset-openai-usage.md)
-
-
-=======
 * [usage](/reference/metricbeat/metricbeat-metricset-openai-usage.md)  {applies_to}`stack: beta`
->>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))

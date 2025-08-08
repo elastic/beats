@@ -660,31 +660,6 @@ The following metricsets are available:
 * [s3_request](/reference/metricbeat/metricbeat-metricset-aws-s3_request.md)
 * [sns](/reference/metricbeat/metricbeat-metricset-aws-sns.md)  {applies_to}`stack: beta`
 * [sqs](/reference/metricbeat/metricbeat-metricset-aws-sqs.md)
-<<<<<<< HEAD
-* [transitgateway](/reference/metricbeat/metricbeat-metricset-aws-transitgateway.md)
-* [usage](/reference/metricbeat/metricbeat-metricset-aws-usage.md)
-* [vpn](/reference/metricbeat/metricbeat-metricset-aws-vpn.md)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-=======
 * [transitgateway](/reference/metricbeat/metricbeat-metricset-aws-transitgateway.md)  {applies_to}`stack: beta`
 * [usage](/reference/metricbeat/metricbeat-metricset-aws-usage.md)  {applies_to}`stack: beta`
 * [vpn](/reference/metricbeat/metricbeat-metricset-aws-vpn.md)  {applies_to}`stack: beta`
->>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))

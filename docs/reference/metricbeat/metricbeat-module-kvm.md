@@ -37,13 +37,5 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-<<<<<<< HEAD
-* [dommemstat](/reference/metricbeat/metricbeat-metricset-kvm-dommemstat.md)
-* [status](/reference/metricbeat/metricbeat-metricset-kvm-status.md)
-
-
-
-=======
 * [dommemstat](/reference/metricbeat/metricbeat-metricset-kvm-dommemstat.md)  {applies_to}`stack: beta`
 * [status](/reference/metricbeat/metricbeat-metricset-kvm-status.md)  {applies_to}`stack: beta`
->>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))
