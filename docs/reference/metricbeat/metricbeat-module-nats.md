@@ -68,10 +68,6 @@ The following metricsets are available:
 
 * [connection](/reference/metricbeat/metricbeat-metricset-nats-connection.md)
 * [connections](/reference/metricbeat/metricbeat-metricset-nats-connections.md)
-<<<<<<< HEAD
-=======
-* [jetstream](/reference/metricbeat/metricbeat-metricset-nats-jetstream.md)  {applies_to}`stack: beta`
->>>>>>> f955bca20 ([docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45837))
 * [route](/reference/metricbeat/metricbeat-metricset-nats-route.md)
 * [routes](/reference/metricbeat/metricbeat-metricset-nats-routes.md)
 * [stats](/reference/metricbeat/metricbeat-metricset-nats-stats.md)
