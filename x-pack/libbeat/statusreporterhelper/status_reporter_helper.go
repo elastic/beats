@@ -23,10 +23,10 @@ type StatusReporterHelper struct {
 }
 
 // New create a new StatusReporterHelper.
-func New(statusReporter status.StatusReporter, log *logp.Logger) *StatusReporterHelper {
+func New(statusReporter status.StatusReporter, log *logp.Logger, name string) *StatusReporterHelper {
 	rep := &StatusReporterHelper{
 		current:        status.Unknown,
-		statusReporter: &debugStatusReporter{log: log},
+		statusReporter: &debugStatusReporter{log: log, name: name},
 	}
 
 	if statusReporter != nil {
@@ -51,9 +51,10 @@ func (c *StatusReporterHelper) UpdateStatus(status status.Status, msg string) {
 // debugStatusReporter with debugging logs.
 // This is typically used when running in standalone mode where injected reporter is nil.
 type debugStatusReporter struct {
-	log *logp.Logger
+	log  *logp.Logger
+	name string
 }
 
 func (n *debugStatusReporter) UpdateStatus(status status.Status, msg string) {
-	n.log.Debugf("Input status updated: status: %s, message: %s", status, msg)
+	n.log.Debugf("%s input status updated: status: %s, message: %s", n.name, status, msg)
 }

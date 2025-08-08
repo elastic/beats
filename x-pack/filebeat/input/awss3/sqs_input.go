@@ -71,7 +71,7 @@ func (in *sqsReaderInput) Run(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
 ) error {
-	in.status = statusreporterhelper.New(inputContext.StatusReporter, inputContext.Logger)
+	in.status = statusreporterhelper.New(inputContext.StatusReporter, inputContext.Logger, "S3 via SQS")
 	defer in.status.UpdateStatus(status.Stopped, "")
 	in.status.UpdateStatus(status.Starting, "Input starting")
 
