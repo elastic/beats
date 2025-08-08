@@ -203,10 +203,12 @@ func (w *Monitor) Start() error {
 		for {
 			select {
 			case <-w.ctx.Done():
+				fmt.Fprintf(os.Stdout, "perf monitor channel got context done\n")
 				return
 
 			case e, ok := <-w.perfChannel.C():
 				if !ok {
+					fmt.Fprintf(os.Stdout, "perf channel in monitor is closed\n")
 					w.writeErr(fmt.Errorf("read invalid event from perf channel"))
 					return
 				}
@@ -214,24 +216,29 @@ func (w *Monitor) Start() error {
 				switch eWithType := e.(type) {
 				case *ProbeEvent:
 					if err := w.eProc.process(w.ctx, eWithType); err != nil {
+						fmt.Fprintf(os.Stdout, "error processing event in Monitor: %w\n", err)
 						w.writeErr(fmt.Errorf("error processing event in Monitor: %w", err))
 						return
 					}
 					continue
 				default:
+					fmt.Fprintf(os.Stdout, "unexpected event type: %#v\n", e)
 					w.writeErr(errors.New("unexpected event type"))
 					return
 				}
 
 			case err := <-w.perfChannel.ErrC():
+				fmt.Fprintf(os.Stdout, "perf channel error in monitor: %s\n", err)
 				w.writeErr(fmt.Errorf("perf channel error in Monitor: %w", err))
 				return
 
 			case lost := <-w.perfChannel.LostC():
+				fmt.Fprintf(os.Stdout, "events lost: %v\n", lost)
 				w.writeErr(fmt.Errorf("events lost %d", lost))
 				return
 
 			case err := <-w.pathMonitor.ErrC():
+				fmt.Fprintf(os.Stdout, "path error in monitor: %s\n", err)
 				w.writeErr(fmt.Errorf("path error in Monitor: %w", err))
 				return
 			}
