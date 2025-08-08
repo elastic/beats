@@ -19,6 +19,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/x-pack/libbeat/statereporter"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -47,7 +48,7 @@ type sqsReaderInput struct {
 	workerWg sync.WaitGroup
 
 	// health status reporting
-	status status.StatusReporter
+	status *statereporter.StateReporter
 }
 
 // Simple wrapper to handle creation of internal channels
@@ -70,7 +71,7 @@ func (in *sqsReaderInput) Run(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
 ) error {
-	in.status = newCWStateReporter(inputContext, inputContext.Logger)
+	in.status = statereporter.New(inputContext.StatusReporter, inputContext.Logger)
 	defer in.status.UpdateStatus(status.Stopped, "")
 	in.status.UpdateStatus(status.Starting, "Input starting")
 

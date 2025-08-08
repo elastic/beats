@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/x-pack/libbeat/statereporter"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/timed"
 )
@@ -40,7 +41,7 @@ type s3PollerInput struct {
 	filterProvider  *filterProvider
 
 	// health status reporting
-	status status.StatusReporter
+	status *statereporter.StateReporter
 }
 
 func newS3PollerInput(
@@ -69,7 +70,7 @@ func (in *s3PollerInput) Run(
 
 	in.log = inputContext.Logger.Named("s3")
 
-	in.status = newCWStateReporter(inputContext, in.log)
+	in.status = statereporter.New(inputContext.StatusReporter, in.log)
 	defer in.status.UpdateStatus(status.Stopped, "")
 	in.status.UpdateStatus(status.Starting, "Input starting")
 
