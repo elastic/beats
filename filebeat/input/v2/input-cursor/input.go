@@ -145,6 +145,7 @@ func (inp *managedInput) Run(
 				Cancelation:     ctx.Cancelation,
 				StatusReporter:  ctx.StatusReporter,
 				MetricsRegistry: reg,
+				StatsRegistry:   ctx.StatsRegistry, // it's the legacy monitoring.Default
 				Logger:          log,
 			}
 

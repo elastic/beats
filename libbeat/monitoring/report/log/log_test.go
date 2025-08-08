@@ -63,7 +63,7 @@ var (
 // Smoke test.
 func TestStartStop(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
-	r, err := MakeReporter(beat.Info{Logger: logger}, conf.NewConfig())
+	r, err := MakeReporter(beat.Info{Logger: logger}, beat.NewMonitoring(), conf.NewConfig())
 	if err != nil {
 		t.Fatal(err)
 	}

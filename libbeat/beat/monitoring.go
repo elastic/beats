@@ -33,7 +33,7 @@ type Monitoring struct {
 	inputsRegistry *monitoring.Registry
 }
 
-// Returns a Monitoring struct that shadows the legacy global monitoring API,
+// NewGlobalMonitoring returns a Monitoring struct that shadows the legacy global monitoring API,
 // which can be used within standalone beats to guarantee full interoperability
 // with components that are not yet migrated to report metrics via a
 // beat.Monitoring field.
@@ -47,7 +47,7 @@ func NewGlobalMonitoring() Monitoring {
 	}
 }
 
-// Returns a new initialized Monitoring struct for use in a Beats Receiver
+// NewMonitoring returns a new initialized Monitoring struct for use in a Beats Receiver
 // or in unit tests. Will not reflect metrics created through the legacy
 // global API (monitoring.Default, monitoring.GetNamespace, etc); for
 // full interoperability with the global API, use NewGlobalMonitoring.
@@ -61,19 +61,19 @@ func NewMonitoring() Monitoring {
 	}
 }
 
-// The top-level info registry for the Beat or Beat Receiver, formerly accessed
+// InfoRegistry is the top-level info registry for the Beat or Beat Receiver, formerly accessed
 // via monitoring.GetNamespace("info").
 func (m Monitoring) InfoRegistry() *monitoring.Registry {
 	return m.infoRegistry
 }
 
-// The top-level state registry for the Beat or Beat Receiver, formerly accessed
+// StateRegistry is the top-level state registry for the Beat or Beat Receiver, formerly accessed
 // via monitoring.GetNamespace("state").
 func (m Monitoring) StateRegistry() *monitoring.Registry {
 	return m.stateRegistry
 }
 
-// The top-level stats / "default" registry for the Beat or Beat Receiver,
+// StatsRegistry is the top-level stats / "default" registry for the Beat or Beat Receiver,
 // formerly accessed via monitoring.GetNamespace("stats") or
 // monitoring.Default. Published in internal monitoring as "metrics" for
 // compatibility with other components.
@@ -81,7 +81,7 @@ func (m Monitoring) StatsRegistry() *monitoring.Registry {
 	return m.statsRegistry
 }
 
-// The top-level input metrics registry for the Beat or Beat Receiver, formerly
+// InputsRegistry is the top-level input metrics registry for the Beat or Beat Receiver, formerly
 // accessed via monitoring.GetNamespace("dataset").
 func (m Monitoring) InputsRegistry() *monitoring.Registry {
 	return m.inputsRegistry

@@ -109,6 +109,7 @@ type Context struct {
 	// MetricsRegistry is the registry collecting metrics for the input using
 	// this context.
 	MetricsRegistry *monitoring.Registry
+	StatsRegistry   *monitoring.Registry
 }
 
 func (c *Context) UpdateStatus(status status.Status, msg string) {

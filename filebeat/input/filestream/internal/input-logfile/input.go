@@ -64,7 +64,7 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
-	metrics := NewMetrics(ctx.MetricsRegistry)
+	metrics := NewMetrics(ctx.MetricsRegistry, ctx.StatsRegistry)
 
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
