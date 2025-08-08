@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-cloudfoundry-counter.html
+
+applies_to:
+  stack: beta
 ---
 
 # Cloudfoundry counter metricset [metricbeat-metricset-cloudfoundry-counter]

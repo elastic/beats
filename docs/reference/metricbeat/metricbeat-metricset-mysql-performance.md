@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-mysql-performance.html
+
+applies_to:
+  stack: beta
 ---
 
 # MySQL performance metricset [metricbeat-metricset-mysql-performance]

@@ -51,6 +51,4 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [statsd](/reference/metricbeat/metricbeat-metricset-airflow-statsd.md)
-
-
+* [statsd](/reference/metricbeat/metricbeat-metricset-airflow-statsd.md)  {applies_to}`stack: beta`

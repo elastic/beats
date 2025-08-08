@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-aws-awshealth.html
+
+applies_to:
+  stack: beta
 ---
 
 # AWS awshealth metricset [metricbeat-metricset-aws-awshealth]

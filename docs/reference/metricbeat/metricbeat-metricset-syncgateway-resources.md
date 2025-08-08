@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-syncgateway-resources.html
+
+applies_to:
+  stack: beta
 ---
 
 # SyncGateway resources metricset [metricbeat-metricset-syncgateway-resources]

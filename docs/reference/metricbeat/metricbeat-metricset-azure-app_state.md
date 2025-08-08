@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-azure-app_state.html
+
+applies_to:
+  stack: beta
 ---
 
 # Azure app_state metricset [metricbeat-metricset-azure-app_state]

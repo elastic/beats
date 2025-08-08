@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-tomcat-cache.html
+
+applies_to:
+  stack: beta
 ---
 
 # Tomcat cache metricset [metricbeat-metricset-tomcat-cache]

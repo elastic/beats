@@ -69,6 +69,4 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [info](metricbeat-metricset-benchmark-info.md)
-
-
+* [info](/reference/metricbeat/metricbeat-metricset-benchmark-info.md)  {applies_to}`stack: beta`

@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-etcd-metrics.html
+
+applies_to:
+  stack: beta
 ---
 
 # Etcd metrics metricset [metricbeat-metricset-etcd-metrics]

@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-openmetrics-collector.html
+
+applies_to:
+  stack: beta
 ---
 
 # Openmetrics collector metricset [metricbeat-metricset-openmetrics-collector]

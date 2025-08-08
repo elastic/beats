@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-awsfargate-task_stats.html
+
+applies_to:
+  stack: beta
 ---
 
 # AWS Fargate task_stats metricset [metricbeat-metricset-awsfargate-task_stats]

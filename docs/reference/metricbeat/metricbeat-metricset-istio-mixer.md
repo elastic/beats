@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-istio-mixer.html
+
+applies_to:
+  stack: beta
 ---
 
 # Istio mixer metricset [metricbeat-metricset-istio-mixer]

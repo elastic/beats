@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-tomcat-threading.html
+
+applies_to:
+  stack: beta
 ---
 
 # Tomcat threading metricset [metricbeat-metricset-tomcat-threading]

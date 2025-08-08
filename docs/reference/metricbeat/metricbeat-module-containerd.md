@@ -75,10 +75,6 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [blkio](/reference/metricbeat/metricbeat-metricset-containerd-blkio.md)
-* [cpu](/reference/metricbeat/metricbeat-metricset-containerd-cpu.md)
-* [memory](/reference/metricbeat/metricbeat-metricset-containerd-memory.md)
-
-
-
-
+* [blkio](/reference/metricbeat/metricbeat-metricset-containerd-blkio.md)  {applies_to}`stack: beta`
+* [cpu](/reference/metricbeat/metricbeat-metricset-containerd-cpu.md)  {applies_to}`stack: beta`
+* [memory](/reference/metricbeat/metricbeat-metricset-containerd-memory.md)  {applies_to}`stack: beta`

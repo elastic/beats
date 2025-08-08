@@ -132,7 +132,7 @@ metricbeat.modules:
 The following metricsets are available:
 
 * [performance](/reference/metricbeat/metricbeat-metricset-oracle-performance.md)
-* [sysmetric](/reference/metricbeat/metricbeat-metricset-oracle-sysmetric.md)
+* [sysmetric](/reference/metricbeat/metricbeat-metricset-oracle-sysmetric.md)  {applies_to}`stack: beta`
 * [tablespace](/reference/metricbeat/metricbeat-metricset-oracle-tablespace.md)
 
 

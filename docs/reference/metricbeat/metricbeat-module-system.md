@@ -252,31 +252,12 @@ The following metricsets are available:
 * [load](/reference/metricbeat/metricbeat-metricset-system-load.md)
 * [memory](/reference/metricbeat/metricbeat-metricset-system-memory.md)
 * [network](/reference/metricbeat/metricbeat-metricset-system-network.md)
-* [network_summary](/reference/metricbeat/metricbeat-metricset-system-network_summary.md)
+* [network_summary](/reference/metricbeat/metricbeat-metricset-system-network_summary.md)  {applies_to}`stack: beta`
 * [process](/reference/metricbeat/metricbeat-metricset-system-process.md)
 * [process_summary](/reference/metricbeat/metricbeat-metricset-system-process_summary.md)
 * [raid](/reference/metricbeat/metricbeat-metricset-system-raid.md)
-* [service](/reference/metricbeat/metricbeat-metricset-system-service.md)
+* [service](/reference/metricbeat/metricbeat-metricset-system-service.md)  {applies_to}`stack: beta`
 * [socket](/reference/metricbeat/metricbeat-metricset-system-socket.md)
 * [socket_summary](/reference/metricbeat/metricbeat-metricset-system-socket_summary.md)
 * [uptime](/reference/metricbeat/metricbeat-metricset-system-uptime.md)
-* [users](/reference/metricbeat/metricbeat-metricset-system-users.md)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+* [users](/reference/metricbeat/metricbeat-metricset-system-users.md)  {applies_to}`stack: beta`

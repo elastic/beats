@@ -62,6 +62,4 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [usage](metricbeat-metricset-openai-usage.md)
-
-
+* [usage](/reference/metricbeat/metricbeat-metricset-openai-usage.md)  {applies_to}`stack: beta`

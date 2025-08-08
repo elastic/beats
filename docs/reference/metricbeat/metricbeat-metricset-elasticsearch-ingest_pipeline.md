@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-elasticsearch-ingest_pipeline.html
+
+applies_to:
+  stack: beta
 ---
 
 # Elasticsearch ingest_pipeline metricset [metricbeat-metricset-elasticsearch-ingest_pipeline]

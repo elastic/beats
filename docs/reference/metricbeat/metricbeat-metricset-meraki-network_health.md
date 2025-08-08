@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-meraki-network_health.html
+
+applies_to:
+  stack: beta
 ---
 
 # Cisco Meraki network_health metricset [metricbeat-metricset-meraki-network_health]

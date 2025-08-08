@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-redisenterprise-node.html
+
+applies_to:
+  stack: beta
 ---
 
 # Redis Enterprise node metricset [metricbeat-metricset-redisenterprise-node]
