@@ -121,22 +121,22 @@ http.port: {{.MonitoringPort}}
 	var metricbeatDocs estools.Documents
 	var otelDocs estools.Documents
 	var err error
-	ok := assert.Eventually(t,
-		func() bool {
+
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
 			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+mbReceiverIndex+"*")
-			assert.NoError(t, err)
+			assert.NoError(ct, err)
 
 			metricbeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+mbIndex+"*")
-			assert.NoError(t, err)
+			assert.NoError(ct, err)
 
-			return otelDocs.Hits.Total.Value >= 1 && metricbeatDocs.Hits.Total.Value >= 1
+			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 log for otel receiver, got %d", otelDocs.Hits.Total.Value)
+			assert.GreaterOrEqual(ct, metricbeatDocs.Hits.Total.Value, 1, "expected at least 1 log for metricbeat, got %d", metricbeatDocs.Hits.Total.Value)
 		},
-		1*time.Minute, 1*time.Second)
-	require.True(t, ok, "expected at least 1 log for metricbeat and otel receiver, got metricbeat: %d, otel: %d",
-		metricbeatDocs.Hits.Total.Value, otelDocs.Hits.Total.Value)
+		1*time.Minute, 1*time.Second, "expected at least 1 log for metricbeat and otel receiver")
 
 	otelDoc := otelDocs.Hits.Hits[0]
 	metricbeatDoc := metricbeatDocs.Hits.Hits[0]
@@ -291,29 +291,27 @@ processors:
 	var otelDocs estools.Documents
 	var err error
 
-	ok := assert.Eventuallyf(t,
-		func() bool {
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
 			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+mbReceiverIndex+"*")
-			assert.NoError(t, err)
+			assert.NoError(ct, err)
 
 			metricbeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+mbIndex+"*")
-			assert.NoError(t, err)
+			assert.NoError(ct, err)
 
-			return otelDocs.Hits.Total.Value >= 1 && metricbeatDocs.Hits.Total.Value >= 1
+			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 log for otel receiver, got %d", otelDocs.Hits.Total.Value)
+			assert.GreaterOrEqual(ct, metricbeatDocs.Hits.Total.Value, 1, "expected at least 1 log for metricbeat receiver, got %d", metricbeatDocs.Hits.Total.Value)
 		},
-		1*time.Minute, 1*time.Second, "expected at least a single log for metricbeat and otel indees")
-	require.True(t, ok, "expected at least 1 log for metricbeat and otel receiver, got metricbeat: %d, otel: %d",
-		metricbeatDocs.Hits.Total.Value, otelDocs.Hits.Total.Value)
+		1*time.Minute, 1*time.Second, "expected at least a single log for metricbeat and otel mode")
 	otelDoc := otelDocs.Hits.Hits[0]
 	metricbeatDoc := metricbeatDocs.Hits.Hits[0]
 	assertMapstrKeysEqual(t, otelDoc.Source, metricbeatDoc.Source, []string{}, "expected documents keys to be equal")
 }
 
 func TestMetricbeatOTelMultipleReceiversE2E(t *testing.T) {
-	t.Skip("Flaky test, see https://github.com/elastic/beats/issues/45631")
 	integration.EnsureESIsRunning(t)
 
 	host := integration.GetESURL(t, "http")
@@ -440,8 +438,8 @@ service:
 	var r0Docs, r1Docs estools.Documents
 	var err error
 
-	ok := assert.Eventually(t,
-		func() bool {
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
 			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
 			defer findCancel()
 
@@ -452,7 +450,7 @@ service:
 					},
 				},
 			}, ".ds-"+otelConfig.Index+"*", es)
-			assert.NoError(t, err, "failed to query for receiver 0 logs")
+			assert.NoError(ct, err, "failed to query for receiver 0 logs")
 
 			r1Docs, err = estools.PerformQueryForRawQuery(findCtx, map[string]any{
 				"query": map[string]any{
@@ -461,12 +459,12 @@ service:
 					},
 				},
 			}, ".ds-"+otelConfig.Index+"*", es)
-			assert.NoError(t, err, "failed to query for receiver 1 logs")
+			assert.NoError(ct, err, "failed to query for receiver 1 logs")
 
-			return r0Docs.Hits.Total.Value >= 1 && r1Docs.Hits.Total.Value >= 1
+			assert.GreaterOrEqualf(ct, r0Docs.Hits.Total.Value, 1, "expected at least 1 log for receiver 0, got %d", r0Docs.Hits.Total.Value)
+			assert.GreaterOrEqualf(ct, r1Docs.Hits.Total.Value, 1, "expected at least 1 log for receiver 1, got %d", r1Docs.Hits.Total.Value)
 		},
-		1*time.Minute, 100*time.Millisecond, "expected at least 1 log for each receiver")
-	require.True(t, ok, "expected at least 1 log for each receiver, got r0: %d, r1: %d", r0Docs.Hits.Total.Value, r1Docs.Hits.Total.Value)
+		1*time.Minute, 100*time.Millisecond, "expected to found receiver logs")
 	assertMapstrKeysEqual(t, r0Docs.Hits.Hits[0].Source, r1Docs.Hits.Hits[0].Source, []string{}, "expected documents keys to be equal")
 	for _, rec := range otelConfig.Receivers {
 		assertMonitoring(t, rec.MonitoringPort)
