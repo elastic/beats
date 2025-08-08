@@ -22,6 +22,7 @@ package integration
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"testing"
 	"time"
 
@@ -53,8 +54,12 @@ output.elasticsearch:
 func TestESOutputRecoversFromNetworkError(t *testing.T) {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 
-	s, esIPPort, _, mr := StartMockES(t, ":4242", 0, 0, 0, 0, 0)
-	esAddr := "http://" + esIPPort
+	s, esAddr, _, mr := StartMockES(t, ":4242", 0, 0, 0, 0, 0)
+
+	esURL, err := url.Parse(esAddr)
+	if err != nil {
+		t.Fatalf("cannot parse mockES URL: %s", err)
+	}
 
 	mockbeat.WriteConfigFile(fmt.Sprintf(esCfg, esAddr))
 	mockbeat.Start()
@@ -69,7 +74,8 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 
 	// 3. Wait for connection error logs
 	mockbeat.WaitLogsContains(
-		fmt.Sprintf(`Get \"%s\": dial tcp %s: connect: connection refused`, esAddr, esIPPort),
+		fmt.Sprintf(`Get \"%s\": dial tcp %s: connect: connection refused`, esAddr, esURL.Host),
+
 		2*time.Second,
 		"did not find connection refused error")
 
