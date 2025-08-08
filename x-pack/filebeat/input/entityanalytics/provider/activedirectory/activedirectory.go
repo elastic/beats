@@ -86,7 +86,7 @@ func (p *adInput) configure(cfg *config.C) (kvstore.Input, error) {
 		return nil, err
 	}
 	if p.cfg.TLS.IsEnabled() && u.Scheme == "ldaps" {
-		tlsConfig, err := tlscommon.LoadTLSConfig(p.cfg.TLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(p.cfg.TLS, p.logger)
 		if err != nil {
 			return nil, err
 		}

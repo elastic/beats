@@ -1,0 +1,74 @@
+[
+    {
+        "@timestamp": "2021-03-26T03:29:09Z",
+        "aws": {
+            "vpcflow": {
+                "ecs_task_arn": "arn:aws:ecs:us-east-1:123456789012:task/DEMOGO-ECS/b9ad2f8a90b24f7bbce4b0341034852f",
+                "ecs_task_definition_arn": "arn:aws:ecs:us-east-1:123456789012:task-definition/catsdef:2",
+                "ecs_task_id": "b9ad2f8a90b24f7bbce4b0341034852f",
+                "interface_id": "eni-069xxxxxb7a490",
+                "log_status": "OK",
+                "version": 5
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "64111117617"
+            }
+        },
+        "container": {
+            "id": "0c5c6db7540ca5c4dbc692a53c1d7bab0a4e17e9cf44fc9167659c8687fd13df"
+        },
+        "destination": {
+            "address": "10.200.0.0",
+            "ip": "10.200.0.0",
+            "port": 33004
+        },
+        "event": {
+            "action": "reject",
+            "end": "2021-03-26T03:29:09Z",
+            "outcome": "failure",
+            "start": "2021-03-26T03:28:12Z",
+            "type": [
+                "connection",
+                "denied"
+            ]
+        },
+        "message": "5 64111117617 eni-069xxxxxb7a490 89.160.20.156 10.200.0.0 50041 33004 17 52 1 1616729292 1616729349 REJECT OK b9ad2f8a90b24f7bbce4b0341034852f arn:aws:ecs:us-east-1:123456789012:task/DEMOGO-ECS/b9ad2f8a90b24f7bbce4b0341034852f arn:aws:ecs:us-east-1:123456789012:task-definition/catsdef:2 DEMOGO-ECS arn:aws:ecs:us-east-1:123456789012:cluster/DEMOGO-ECS 39623aba81594d79b596c0c5f556d47b arn:aws:ecs:us-east-1:123456789012:container-instance/DEMOGO-ECS/39623aba81594d79b596c0c5f556d47b 0c5c6db7540ca5c4dbc692a53c1d7bab0a4e17e9cf44fc9167659c8687fd13df - cats",
+        "network": {
+            "bytes": 1,
+            "iana_number": "17",
+            "packets": 52,
+            "transport": "udp",
+            "type": "ipv4"
+        },
+        "orchestrator": {
+            "cluster": {
+                "id": "arn:aws:ecs:us-east-1:123456789012:cluster/DEMOGO-ECS",
+                "name": "DEMOGO-ECS"
+            },
+            "resource": {
+                "id": "39623aba81594d79b596c0c5f556d47b",
+                "name": "arn:aws:ecs:us-east-1:123456789012:container-instance/DEMOGO-ECS/39623aba81594d79b596c0c5f556d47b",
+                "type": "container"
+            },
+            "type": "ecs"
+        },
+        "related": {
+            "ip": [
+                "89.160.20.156",
+                "10.200.0.0"
+            ]
+        },
+        "service": {
+            "name": "cats"
+        },
+        "source": {
+            "address": "89.160.20.156",
+            "bytes": 1,
+            "ip": "89.160.20.156",
+            "packets": 52,
+            "port": 50041
+        }
+    }
+]

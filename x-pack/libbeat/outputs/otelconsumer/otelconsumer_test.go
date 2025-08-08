@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"go.opentelemetry.io/collector/client"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/consumer"
@@ -35,6 +37,8 @@ func TestPublish(t *testing.T) {
 	event3 := beat.Event{Fields: mapstr.M{"field": 3}}
 	event4 := beat.Event{Meta: mapstr.M{"_id": "abc123"}}
 
+	beatInfo := beat.Info{Name: "testbeat", Version: "0.0.0"}
+
 	makeOtelConsumer := func(t *testing.T, consumeFn func(ctx context.Context, ld plog.Logs) error) *otelConsumer {
 		t.Helper()
 
@@ -44,7 +48,7 @@ func TestPublish(t *testing.T) {
 		consumer := &otelConsumer{
 			observer:     outputs.NewNilObserver(),
 			logsConsumer: logConsumer,
-			beatInfo:     beat.Info{},
+			beatInfo:     beatInfo,
 			log:          logger.Named("otelconsumer"),
 		}
 		return consumer
@@ -242,6 +246,21 @@ func TestPublish(t *testing.T) {
 			recordTimestamp = record.Timestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
 			observedTimestamp = record.ObservedTimestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
 			assert.Equal(t, recordTimestamp, observedTimestamp, "observed timestamp should match log record timestamp")
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+	})
+
+	t.Run("sets the client context metadata with the beat info", func(t *testing.T) {
+		batch := outest.NewBatch(event1)
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			cm := client.FromContext(ctx).Metadata
+			assert.Equal(t, beatInfo.Beat, cm.Get(beatNameCtxKey)[0])
+			assert.Equal(t, beatInfo.Version, cm.Get(beatVersionCtxtKey)[0])
 			return nil
 		})
 

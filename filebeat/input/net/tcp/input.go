@@ -18,24 +18,25 @@
 package tcp
 
 import (
+	"fmt"
 	"net"
 	"time"
 
 	"github.com/dustin/go-humanize"
 
+	netinput "github.com/elastic/beats/v7/filebeat/input/net"
 	"github.com/elastic/beats/v7/filebeat/input/netmetrics"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/go-concert/ctxtool"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func Plugin() input.Plugin {
@@ -44,11 +45,11 @@ func Plugin() input.Plugin {
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "tcp packet server",
-		Manager:    stateless.NewInputManager(configure),
+		Manager:    netinput.NewManager(configure),
 	}
 }
 
-func configure(cfg *conf.C) (stateless.Input, error) {
+func configure(cfg *conf.C) (netinput.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -70,6 +71,7 @@ func defaultConfig() config {
 type server struct {
 	tcp.Server
 	config
+	metrics *netmetrics.TCP
 }
 
 type config struct {
@@ -93,18 +95,15 @@ func (s *server) Test(_ input.TestContext) error {
 	return l.Close()
 }
 
-func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
-	log := ctx.Logger.With("host", s.Host)
+// InitMetrics initalises and returns an netmetrics.TCP
+func (s *server) InitMetrics(id string, reg *monitoring.Registry, logger *logp.Logger) netinput.Metrics {
+	s.metrics = netmetrics.NewTCP(reg, s.Host, time.Minute, logger)
+	return s.metrics
+}
 
-	log.Info("starting tcp socket input")
-	defer log.Info("tcp input stopped")
-
-	ctx.UpdateStatus(status.Starting, "")
-	ctx.UpdateStatus(status.Configuring, "")
-
-	const pollInterval = time.Minute
-	metrics := netmetrics.NewTCP(ctx.ID, ctx.MetricsRegistry, s.config.Host, pollInterval, log)
-	defer metrics.Close()
+// Run runs the input
+func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, m netinput.Metrics) (err error) {
+	defer s.metrics.Close()
 
 	split, err := streaming.SplitFunc(s.Framing, []byte(s.LineDelimiter))
 	if err != nil {
@@ -112,50 +111,37 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 		return err
 	}
 
-	server, err := tcp.New(&s.Config, streaming.SplitHandlerFactory(
-		inputsource.FamilyTCP, log, tcp.MetadataCallback, func(data []byte, metadata inputsource.NetworkMetadata) {
-			log.Debugw("Data received", "bytes", len(data), "remote_address", metadata.RemoteAddr.String(), "truncated", metadata.Truncated)
-			evt := beat.Event{
-				Timestamp: time.Now(),
-				Fields: mapstr.M{
-					"message": string(data),
-				},
-			}
-			if metadata.RemoteAddr != nil {
-				evt.Fields["log"] = mapstr.M{
-					"source": mapstr.M{
-						"address": metadata.RemoteAddr.String(),
-					},
+	server, err := tcp.New(
+		&s.Config,
+		streaming.SplitHandlerFactory(
+			inputsource.FamilyTCP,
+			ctx.Logger,
+			tcp.MetadataCallback,
+			func(data []byte, metadata inputsource.NetworkMetadata) {
+				now := time.Now()
+				m.EventReceived(len(data), now)
+				ctx.Logger.Debugw(
+					"Data received",
+					"bytes", len(data),
+					"remote_address", metadata.RemoteAddr.String(),
+					"truncated", metadata.Truncated)
+
+				evtChan <- netinput.DataMetadata{
+					Data:      data,
+					Metadata:  metadata,
+					Timestamp: now,
 				}
-			}
-
-			publisher.Publish(evt)
-
-			// This must be called after publisher.Publish to measure
-			// the processing time metric.
-			metrics.Log(data, evt.Timestamp)
-		},
-		split,
-	), log)
+			},
+			split,
+		),
+		ctx.Logger,
+	)
 	if err != nil {
-		ctx.UpdateStatus(status.Failed, "Failed to configure input: "+err.Error())
-		return err
+		return fmt.Errorf("Failed to start TCP server: %w", err)
 	}
 
-	log.Debug("tcp input initialized")
+	ctx.Logger.Debug("tcp input initialized")
 	ctx.UpdateStatus(status.Running, "")
 
-	err = server.Run(ctxtool.FromCanceller(ctx.Cancelation))
-	// Ignore error from 'Run' in case shutdown was signaled.
-	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {
-		err = ctxerr
-	}
-
-	if err != nil {
-		ctx.UpdateStatus(status.Failed, "Input exited unexpectedly: "+err.Error())
-	} else {
-		ctx.UpdateStatus(status.Stopped, "")
-	}
-
-	return err
+	return server.Run(ctxtool.FromCanceller(ctx.Cancelation))
 }

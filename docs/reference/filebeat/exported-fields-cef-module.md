@@ -16,7 +16,7 @@ Fields for Forcepoint Custom String mappings
 **`forcepoint.virus_id`**
 :   Virus ID
 
-type: keyword
+    type: keyword
 
 
 ## checkpoint [_checkpoint]
@@ -26,247 +26,247 @@ Fields for Check Point custom string mappings.
 **`checkpoint.app_risk`**
 :   Application risk.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.app_severity`**
 :   Application threat severity.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.app_sig_id`**
 :   The signature ID which the application was detected by.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.auth_method`**
 :   Password authentication protocol used.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.category`**
 :   Category.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.confidence_level`**
 :   Confidence level determined.
 
-type: integer
+    type: integer
 
 
 **`checkpoint.connectivity_state`**
 :   Connectivity state.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.cookie`**
 :   IKE cookie.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.dst_phone_number`**
 :   Destination IP-Phone.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.email_control`**
 :   Engine name.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.email_id`**
 :   Internal email ID.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.email_recipients_num`**
 :   Number of recipients.
 
-type: long
+    type: long
 
 
 **`checkpoint.email_session_id`**
 :   Internal email session ID.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.email_spool_id`**
 :   Internal email spool ID.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.email_subject`**
 :   Email subject.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.event_count`**
 :   Number of events associated with the log.
 
-type: long
+    type: long
 
 
 **`checkpoint.frequency`**
 :   Scan frequency.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.icmp_type`**
 :   ICMP type.
 
-type: long
+    type: long
 
 
 **`checkpoint.icmp_code`**
 :   ICMP code.
 
-type: long
+    type: long
 
 
 **`checkpoint.identity_type`**
 :   Identity type.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.incident_extension`**
 :   Format of original data.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.integrity_av_invoke_type`**
 :   Scan invoke type.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.malware_family`**
 :   Malware family.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.peer_gateway`**
 :   Main IP of the peer Security Gateway.
 
-type: ip
+    type: ip
 
 
 **`checkpoint.performance_impact`**
 :   Protection performance impact.
 
-type: integer
+    type: integer
 
 
 **`checkpoint.protection_id`**
 :   Protection malware ID.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.protection_name`**
 :   Specific signature name of the attack.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.protection_type`**
 :   Type of protection used to detect the attack.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.scan_result`**
 :   Scan result.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.sensor_mode`**
 :   Sensor mode.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.severity`**
 :   Threat severity.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.spyware_name`**
 :   Spyware name.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.spyware_status`**
 :   Spyware status.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.subs_exp`**
 :   The expiration date of the subscription.
 
-type: date
+    type: date
 
 
 **`checkpoint.tcp_flags`**
 :   TCP packet flags.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.termination_reason`**
 :   Termination reason.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.update_status`**
 :   Update status.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.user_status`**
 :   User response.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.uuid`**
 :   External ID.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.virus_name`**
 :   Virus name.
 
-type: keyword
+    type: keyword
 
 
 **`checkpoint.voip_log_type`**
 :   VoIP log types.
 
-type: keyword
+    type: keyword
 
 
 ## cef.extensions [_cef.extensions]

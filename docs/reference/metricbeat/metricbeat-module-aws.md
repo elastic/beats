@@ -647,21 +647,21 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [awshealth](/reference/metricbeat/metricbeat-metricset-aws-awshealth.md)
-* [billing](/reference/metricbeat/metricbeat-metricset-aws-billing.md)
+* [awshealth](/reference/metricbeat/metricbeat-metricset-aws-awshealth.md)  {applies_to}`stack: beta`
+* [billing](/reference/metricbeat/metricbeat-metricset-aws-billing.md)  {applies_to}`stack: beta`
 * [cloudwatch](/reference/metricbeat/metricbeat-metricset-aws-cloudwatch.md)
-* [dynamodb](/reference/metricbeat/metricbeat-metricset-aws-dynamodb.md)
+* [dynamodb](/reference/metricbeat/metricbeat-metricset-aws-dynamodb.md)  {applies_to}`stack: beta`
 * [ebs](/reference/metricbeat/metricbeat-metricset-aws-ebs.md)
 * [ec2](/reference/metricbeat/metricbeat-metricset-aws-ec2.md)
 * [elb](/reference/metricbeat/metricbeat-metricset-aws-elb.md)
-* [kinesis](/reference/metricbeat/metricbeat-metricset-aws-kinesis.md)
+* [kinesis](/reference/metricbeat/metricbeat-metricset-aws-kinesis.md)  {applies_to}`stack: beta`
 * [lambda](/reference/metricbeat/metricbeat-metricset-aws-lambda.md)
-* [natgateway](/reference/metricbeat/metricbeat-metricset-aws-natgateway.md)
+* [natgateway](/reference/metricbeat/metricbeat-metricset-aws-natgateway.md)  {applies_to}`stack: beta`
 * [rds](/reference/metricbeat/metricbeat-metricset-aws-rds.md)
 * [s3_daily_storage](/reference/metricbeat/metricbeat-metricset-aws-s3_daily_storage.md)
 * [s3_request](/reference/metricbeat/metricbeat-metricset-aws-s3_request.md)
-* [sns](/reference/metricbeat/metricbeat-metricset-aws-sns.md)
+* [sns](/reference/metricbeat/metricbeat-metricset-aws-sns.md)  {applies_to}`stack: beta`
 * [sqs](/reference/metricbeat/metricbeat-metricset-aws-sqs.md)
-* [transitgateway](/reference/metricbeat/metricbeat-metricset-aws-transitgateway.md)
-* [usage](/reference/metricbeat/metricbeat-metricset-aws-usage.md)
-* [vpn](/reference/metricbeat/metricbeat-metricset-aws-vpn.md)
+* [transitgateway](/reference/metricbeat/metricbeat-metricset-aws-transitgateway.md)  {applies_to}`stack: beta`
+* [usage](/reference/metricbeat/metricbeat-metricset-aws-usage.md)  {applies_to}`stack: beta`
+* [vpn](/reference/metricbeat/metricbeat-metricset-aws-vpn.md)  {applies_to}`stack: beta`

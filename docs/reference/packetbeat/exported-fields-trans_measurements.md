@@ -12,16 +12,16 @@ These fields contain measurements related to the transaction.
 **`bytes_in`**
 :   The number of bytes of the request. Note that this size is the application layer message length, without the length of the IP or TCP headers.
 
-type: alias
+    type: alias
 
-alias to: source.bytes
+    alias to: source.bytes
 
 
 **`bytes_out`**
 :   The number of bytes of the response. Note that this size is the application layer message length, without the length of the IP or TCP headers.
 
-type: alias
+    type: alias
 
-alias to: destination.bytes
+    alias to: destination.bytes
 
 

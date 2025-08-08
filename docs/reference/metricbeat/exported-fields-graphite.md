@@ -20,6 +20,6 @@ server
 **`graphite.server.example`**
 :   Example field
 
-type: keyword
+    type: keyword
 
 

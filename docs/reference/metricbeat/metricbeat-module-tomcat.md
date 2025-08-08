@@ -62,7 +62,7 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [cache](/reference/metricbeat/metricbeat-metricset-tomcat-cache.md)
-* [memory](/reference/metricbeat/metricbeat-metricset-tomcat-memory.md)
-* [requests](/reference/metricbeat/metricbeat-metricset-tomcat-requests.md)
-* [threading](/reference/metricbeat/metricbeat-metricset-tomcat-threading.md)
+* [cache](/reference/metricbeat/metricbeat-metricset-tomcat-cache.md)  {applies_to}`stack: beta`
+* [memory](/reference/metricbeat/metricbeat-metricset-tomcat-memory.md)  {applies_to}`stack: beta`
+* [requests](/reference/metricbeat/metricbeat-metricset-tomcat-requests.md)  {applies_to}`stack: beta`
+* [threading](/reference/metricbeat/metricbeat-metricset-tomcat-threading.md)  {applies_to}`stack: beta`

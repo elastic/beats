@@ -16,36 +16,36 @@ ICMP specific event fields.
 **`icmp.request.message`**
 :   A human readable form of the request.
 
-type: keyword
+    type: keyword
 
 
 **`icmp.request.type`**
 :   The request type.
 
-type: long
+    type: long
 
 
 **`icmp.request.code`**
 :   The request code.
 
-type: long
+    type: long
 
 
 **`icmp.response.message`**
 :   A human readable form of the response.
 
-type: keyword
+    type: keyword
 
 
 **`icmp.response.type`**
 :   The response type.
 
-type: long
+    type: long
 
 
 **`icmp.response.code`**
 :   The response code.
 
-type: long
+    type: long
 
 

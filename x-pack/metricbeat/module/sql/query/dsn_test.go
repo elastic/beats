@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -44,12 +45,13 @@ func TestParseDSNfunctions(t *testing.T) {
 
 	tlsEnabled := true
 
+	logger := logptest.NewTestingLogger(t, "")
 	t.Run("mysql", func(t *testing.T) {
 		t.Run("TLS disabled", func(t *testing.T) {
 			config := ConnectionDetails{}
 			host := "root:test@tcp(localhost:3306)/"
 
-			hostData, err := mysqlParseDSN(config, host)
+			hostData, err := mysqlParseDSN(config, host, logger)
 			require.NoError(t, err)
 
 			assert.Equal(t, host, hostData.URI)
@@ -71,7 +73,7 @@ func TestParseDSNfunctions(t *testing.T) {
 			}
 			host := "root:test@tcp(localhost:3306)/"
 
-			hostData, err := mysqlParseDSN(config, host)
+			hostData, err := mysqlParseDSN(config, host, logger)
 			require.NoError(t, err)
 
 			assert.Equal(t, "root:test@tcp(localhost:3306)/?tls=custom", hostData.URI)
@@ -88,7 +90,7 @@ func TestParseDSNfunctions(t *testing.T) {
 			}
 			host := "root:test@tcp(localhost:3306)/"
 
-			_, err := mysqlParseDSN(config, host)
+			_, err := mysqlParseDSN(config, host, logger)
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), "could not load provided TLS configuration")
 		})
@@ -102,7 +104,7 @@ func TestParseDSNfunctions(t *testing.T) {
 			}
 			host := "root:test@tcp(localhost:3306)/"
 
-			hostData, err := mysqlParseDSN(config, host)
+			hostData, err := mysqlParseDSN(config, host, logger)
 			require.NoError(t, err)
 
 			assert.Equal(t, "root:test@tcp(localhost:3306)/?tls=custom", hostData.URI)
@@ -116,7 +118,7 @@ func TestParseDSNfunctions(t *testing.T) {
 			config := ConnectionDetails{}
 			host := "postgres://myuser:mypassword@localhost:5432/mydb"
 
-			hostData, err := postgresParseDSN(config, host)
+			hostData, err := postgresParseDSN(config, host, logger)
 			require.NoError(t, err)
 
 			assert.Equal(t, host, hostData.URI)
@@ -138,7 +140,7 @@ func TestParseDSNfunctions(t *testing.T) {
 			}
 			host := "postgres://myuser:mypassword@localhost:5432/mydb"
 
-			hostData, err := postgresParseDSN(config, host)
+			hostData, err := postgresParseDSN(config, host, logger)
 			require.NoError(t, err)
 
 			assert.Equal(t, "postgres://myuser:mypassword@localhost:5432/mydb?sslcert=.%2Fcert.pem&sslkey=.%2Fkey.pem&sslmode=verify-full&sslrootcert=.%2Fca.pem", hostData.URI)
@@ -155,7 +157,7 @@ func TestParseDSNfunctions(t *testing.T) {
 			}
 			host := "postgres://myuser:mypassword@localhost:5432/mydb"
 
-			_, err := postgresParseDSN(config, host)
+			_, err := postgresParseDSN(config, host, logger)
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), "postgres driver supports only one CA certificate")
 		})
@@ -169,7 +171,7 @@ func TestParseDSNfunctions(t *testing.T) {
 			}
 			host := "postgres://myuser:mypassword@localhost:5432/mydb"
 
-			_, err := postgresParseDSN(config, host)
+			_, err := postgresParseDSN(config, host, logger)
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), "postgres driver supports only certificate file path")
 		})
@@ -180,7 +182,7 @@ func TestParseDSNfunctions(t *testing.T) {
 			config := ConnectionDetails{}
 			host := "sqlserver://myuser:mypassword@localhost:1433?database=mydb"
 
-			hostData, err := mssqlParseDSN(config, host)
+			hostData, err := mssqlParseDSN(config, host, logger)
 			require.NoError(t, err)
 
 			assert.Equal(t, host, hostData.URI)
@@ -198,7 +200,7 @@ func TestParseDSNfunctions(t *testing.T) {
 			}
 			host := "sqlserver://myuser:mypassword@localhost:1433?database=mydb"
 
-			hostData, err := mssqlParseDSN(config, host)
+			hostData, err := mssqlParseDSN(config, host, logger)
 			require.NoError(t, err)
 
 			assert.Equal(t, "sqlserver://myuser:mypassword@localhost:1433?TrustServerCertificate=false&certificate=.%2Fca.pem&database=mydb&encrypt=true", hostData.URI)
@@ -215,7 +217,7 @@ func TestParseDSNfunctions(t *testing.T) {
 			}
 			host := "sqlserver://myuser:mypassword@localhost:1433?database=mydb"
 
-			_, err := mssqlParseDSN(config, host)
+			_, err := mssqlParseDSN(config, host, logger)
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), "mssql driver supports only one CA certificate")
 		})
@@ -232,7 +234,7 @@ func TestParseDSNfunctions(t *testing.T) {
 			}
 			host := "sqlserver://myuser:mypassword@localhost:1433?database=mydb"
 
-			_, err := mssqlParseDSN(config, host)
+			_, err := mssqlParseDSN(config, host, logger)
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), "mssql driver supports only CA certificate")
 		})
@@ -246,7 +248,7 @@ func TestParseDSNfunctions(t *testing.T) {
 			}
 			host := "sqlserver://myuser:mypassword@localhost:1433?database=mydb"
 
-			_, err := mssqlParseDSN(config, host)
+			_, err := mssqlParseDSN(config, host, logger)
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), "mssql driver supports only certificate file path")
 		})

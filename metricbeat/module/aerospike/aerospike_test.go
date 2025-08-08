@@ -24,6 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
 	as "github.com/aerospike/aerospike-client-go/v7"
@@ -110,7 +111,7 @@ func TestParseClientPolicy(t *testing.T) {
 	samplePassword := "MySecretPassword"
 
 	TLSPolicy := as.NewClientPolicy()
-	tlsconfig, _ := tlscommon.LoadTLSConfig(&tlscommon.Config{Enabled: pointer(true)})
+	tlsconfig, _ := tlscommon.LoadTLSConfig(&tlscommon.Config{Enabled: pointer(true)}, logptest.NewTestingLogger(t, ""))
 	TLSPolicy.TlsConfig = tlsconfig.ToConfig()
 
 	ClusterNamePolicy := as.NewClientPolicy()
@@ -227,7 +228,7 @@ func TestParseClientPolicy(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result, err := ParseClientPolicy(test.Config)
+		result, err := ParseClientPolicy(test.Config, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			if test.expectedErr != nil {
 				assert.Equalf(t, test.expectedErr.Error(), err.Error(),

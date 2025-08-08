@@ -12,7 +12,7 @@ PostgreSQL-specific event fields.
 **`pgsql.error_code`**
 :   The PostgreSQL error code.
 
-type: long
+    type: long
 
 
 **`pgsql.error_message`**

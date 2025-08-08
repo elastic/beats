@@ -34,5 +34,5 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [device_health](/reference/metricbeat/metricbeat-metricset-meraki-device_health.md)
-* [network_health](/reference/metricbeat/metricbeat-metricset-meraki-network_health.md)
+* [device_health](/reference/metricbeat/metricbeat-metricset-meraki-device_health.md)  {applies_to}`stack: beta`
+* [network_health](/reference/metricbeat/metricbeat-metricset-meraki-network_health.md)  {applies_to}`stack: beta`

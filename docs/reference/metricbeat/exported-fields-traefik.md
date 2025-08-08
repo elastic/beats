@@ -20,7 +20,7 @@ Metrics obtained from Traefik's health API endpoint
 **`traefik.health.uptime.sec`**
 :   Uptime of Traefik instance in seconds
 
-type: long
+    type: long
 
 
 ## response [_response]
@@ -30,18 +30,18 @@ Response metrics
 **`traefik.health.response.count`**
 :   Number of responses
 
-type: long
+    type: long
 
 
 **`traefik.health.response.avg_time.us`**
 :   Average response time in microseconds
 
-type: long
+    type: long
 
 
 **`traefik.health.response.status_codes.*`**
 :   Number of responses per status code
 
-type: object
+    type: object
 
 

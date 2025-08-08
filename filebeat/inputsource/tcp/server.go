@@ -45,7 +45,7 @@ func New(
 	factory streaming.HandlerFactory,
 	logger *logp.Logger,
 ) (*Server, error) {
-	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS)
+	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS, logger)
 	if err != nil {
 		return nil, err
 	}

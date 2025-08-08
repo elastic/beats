@@ -131,14 +131,13 @@ func ExampleRunner() {
 		return
 	}
 
-	logger, err := logp.NewDevelopmentLogger("")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
 
 	// Create a new Wrapper based on the configuration.
-	m, err := module.NewWrapper(config, mb.Registry, logger, beat.NewMonitoring(), module.WithMetricSetInfo())
+	m, err := module.NewWrapper(config, mb.Registry, logp.NewNopLogger(), beat.NewMonitoring(), module.WithMetricSetInfo())
 	if err != nil {
 		return
 	}
