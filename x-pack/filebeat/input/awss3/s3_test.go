@@ -21,6 +21,7 @@ import (
 )
 
 func TestS3Poller(t *testing.T) {
+	//nolint:staticcheck // TODO: fix during sweep of global loggers
 	logp.TestingSetup()
 
 	const bucket = "bucket"
