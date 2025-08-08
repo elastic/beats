@@ -18,6 +18,8 @@
 package providers
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/docker"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/jolokia"
@@ -32,7 +34,9 @@ var KnownProviders = map[string]autodiscover.ProviderBuilder{
 
 func AddKnownProviders(r *autodiscover.Registry, providers map[string]autodiscover.ProviderBuilder) error {
 	for name, builder := range providers {
-		_ = r.AddProvider(name, builder)
+		if err := r.AddProvider(name, builder); err != nil {
+			return fmt.Errorf("error adding provider %s: %w", name, err)
+		}
 	}
 	return nil
 }
