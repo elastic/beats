@@ -90,6 +90,7 @@ func readSQSMessages(
 		}
 		msgs, err = sqs.ReceiveMessage(ctx, count)
 	}
+	statusReporter.UpdateStatus(status.Running, "Input is running")
 	log.Debugf("Received %v SQS messages.", len(msgs))
 	metrics.sqsMessagesReceivedTotal.Add(uint64(len(msgs)))
 	return msgs
