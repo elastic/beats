@@ -164,22 +164,26 @@ type Process struct {
 
 // Metadata contains file metadata.
 type Metadata struct {
-	Inode          uint64      `json:"inode"`
-	UID            uint32      `json:"uid"`
-	GID            uint32      `json:"gid"`
-	SID            string      `json:"sid"`
-	Owner          string      `json:"owner"`
-	Group          string      `json:"group"`
-	Size           uint64      `json:"size"`
-	MTime          time.Time   `json:"mtime"`            // Last modification time.
-	CTime          time.Time   `json:"ctime"`            // Last metadata change time.
-	Type           Type        `json:"type"`             // File type (dir, file, symlink).
-	Mode           os.FileMode `json:"mode"`             // Permissions
-	SetUID         bool        `json:"setuid"`           // setuid bit (POSIX only)
-	SetGID         bool        `json:"setgid"`           // setgid bit (POSIX only)
-	Origin         []string    `json:"origin"`           // External origin info for the file (macOS only)
-	SELinux        string      `json:"selinux"`          // security.selinux xattr value (Linux only)
-	POSIXACLAccess []byte      `json:"posix_acl_access"` // system.posix_acl_access xattr value (Linux only)
+	Attributes         []string          `json:"attributes,omitempty"` // File attributes (Windows only, e.g. "hidden", "system").
+	Inode              uint64            `json:"inode"`                // Inode number (unique identifier for the file).
+	UID                uint32            `json:"uid"`
+	GID                uint32            `json:"gid"`
+	SID                string            `json:"sid"`
+	Owner              string            `json:"owner"`
+	Group              string            `json:"group"`
+	Size               uint64            `json:"size"`
+	MTime              time.Time         `json:"mtime"`                         // Last modification time.
+	CTime              time.Time         `json:"ctime"`                         // Last metadata change time.
+	Accessed           *time.Time        `json:"accessed,omitempty"`            // Last access time.
+	Created            *time.Time        `json:"created,omitempty"`             // Creation time.
+	Type               Type              `json:"type"`                          // File type (dir, file, symlink).
+	Mode               os.FileMode       `json:"mode"`                          // Permissions
+	SetUID             bool              `json:"setuid"`                        // setuid bit (POSIX only)
+	SetGID             bool              `json:"setgid"`                        // setgid bit (POSIX only)
+	Origin             []string          `json:"origin"`                        // External origin info for the file (macOS only)
+	SELinux            string            `json:"selinux"`                       // security.selinux xattr value (Linux only)
+	POSIXACLAccess     []byte            `json:"posix_acl_access"`              // system.posix_acl_access xattr value (Linux only)
+	ExtendedAttributes map[string]string `json:"extended_attributes,omitempty"` // Extended attributes of the file (Windows only)
 }
 
 // NewEventFromFileInfo creates a new Event based on data from a os.FileInfo
@@ -321,10 +325,25 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		file["inode"] = strconv.FormatUint(info.Inode, 10)
 		file["mtime"] = info.MTime
 		file["ctime"] = info.CTime
+		if info.Created != nil {
+			file["created"] = *info.Created
+		}
+		if info.Accessed != nil {
+			file["accessed"] = *info.Accessed
+		}
+		if len(info.Attributes) > 0 {
+			file["attributes"] = info.Attributes
+		}
 
 		if e.Info.Type == FileType {
-			if extension := filepath.Ext(e.Path); extension != "" {
-				file["extension"] = strings.TrimLeft(extension, ".")
+			if filename := filepath.Base(e.Path); filename != "" && filename != "." {
+				// Identify ADS from the extension. Only windows supports ADS.
+				filename, forkName, found := strings.Cut(filename, ":")
+				if found {
+					file["fork_name"] = forkName
+				}
+				file["name"] = filename
+				file["extension"] = strings.TrimLeft(filepath.Ext(filename), ".")
 			}
 			if mimeType := getMimeType(e.Path); mimeType != "" {
 				file["mime_type"] = mimeType
@@ -346,8 +365,8 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		} else {
 			file["uid"] = strconv.Itoa(int(info.UID))
 			file["gid"] = strconv.Itoa(int(info.GID))
-			file["mode"] = fmt.Sprintf("%#04o", uint32(info.Mode))
 		}
+		file["mode"] = fmt.Sprintf("%#04o", uint32(info.Mode))
 
 		if info.Owner != "" {
 			file["owner"] = info.Owner
@@ -373,23 +392,20 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 				file["posix_acl_access"] = a
 			}
 		}
+		if len(info.ExtendedAttributes) > 0 {
+			file["extended_attributes"] = info.ExtendedAttributes
+		}
 	}
 
 	if e.Process != nil {
-		process := mapstr.M{
-			"pid":       e.Process.PID,
-			"name":      e.Process.Name,
-			"entity_id": e.Process.EntityID,
-			"user": mapstr.M{
-				"id":   e.Process.User.ID,
-				"name": e.Process.User.Name,
-			},
-			"group": mapstr.M{
-				"id":   e.Process.Group.ID,
-				"name": e.Process.Group.Name,
-			},
-		}
-
+		process := mapstr.M{}
+		setIfValid(process, "pid", e.Process.PID)
+		setIfValid(process, "name", e.Process.Name)
+		setIfValid(process, "entity_id", e.Process.EntityID)
+		setIfValid(process, "user.id", e.Process.User.ID)
+		setIfValid(process, "user.name", e.Process.User.Name)
+		setIfValid(process, "group.id", e.Process.Group.ID)
+		setIfValid(process, "group.name", e.Process.Group.Name)
 		out.MetricSetFields.Put("process", process)
 	}
 
@@ -620,4 +636,27 @@ func multiWriter(hash []hash.Hash) io.Writer {
 		writers = append(writers, h)
 	}
 	return io.MultiWriter(writers...)
+}
+
+// isValidValue checks if a value should be included in the event (not empty).
+func isValidValue(value any) bool {
+	switch v := value.(type) {
+	case string:
+		return v != ""
+	case []string:
+		return len(v) > 0
+	case []byte:
+		return len(v) > 0
+	case nil:
+		return false
+	default:
+		return true
+	}
+}
+
+// setIfValid sets a field in the map only if the value is valid (not empty).
+func setIfValid(m mapstr.M, key string, value any) {
+	if isValidValue(value) {
+		m.Put(key, value)
+	}
 }
