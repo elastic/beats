@@ -19,7 +19,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/management/status"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -38,10 +37,6 @@ const (
 	totalListingObjects           = 10000
 	totalListingObjectsForInputS3 = totalListingObjects / 5
 )
-
-type mockStatusReporter struct{}
-
-func (m *mockStatusReporter) UpdateStatus(s status.Status, msg string) {}
 
 type constantSQS struct {
 	msgs []sqsTypes.Message
