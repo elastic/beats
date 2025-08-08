@@ -871,6 +871,11 @@ func (b *BeatProc) Stdin() io.WriteCloser {
 	return b.stdin
 }
 
+func (b *BeatProc) ReadStdout() (string, error) {
+	by, err := os.ReadFile(b.stdout.Name())
+	return string(by), err
+}
+
 // GetESURL Returns the ES URL with username and password set,
 // it uses ES_USER and ES_PASS that on our mage automation defaults
 // to user 'beats' and pass 'testing'. This user/role has limited

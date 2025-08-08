@@ -120,10 +120,10 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [cluster](/reference/metricbeat/metricbeat-metricset-vsphere-cluster.md)
+* [cluster](/reference/metricbeat/metricbeat-metricset-vsphere-cluster.md)  {applies_to}`stack: beta`
 * [datastore](/reference/metricbeat/metricbeat-metricset-vsphere-datastore.md)
-* [datastorecluster](/reference/metricbeat/metricbeat-metricset-vsphere-datastorecluster.md)
+* [datastorecluster](/reference/metricbeat/metricbeat-metricset-vsphere-datastorecluster.md)  {applies_to}`stack: beta`
 * [host](/reference/metricbeat/metricbeat-metricset-vsphere-host.md)
-* [network](/reference/metricbeat/metricbeat-metricset-vsphere-network.md)
-* [resourcepool](/reference/metricbeat/metricbeat-metricset-vsphere-resourcepool.md)
+* [network](/reference/metricbeat/metricbeat-metricset-vsphere-network.md)  {applies_to}`stack: beta`
+* [resourcepool](/reference/metricbeat/metricbeat-metricset-vsphere-resourcepool.md)  {applies_to}`stack: beta`
 * [virtualmachine](/reference/metricbeat/metricbeat-metricset-vsphere-virtualmachine.md)
