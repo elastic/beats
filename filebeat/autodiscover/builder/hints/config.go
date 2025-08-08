@@ -29,7 +29,7 @@ type config struct {
 func defaultConfig() config {
 	defaultCfgRaw := map[string]interface{}{
 		"type": "filestream",
-		"id":   "kubernetes-container-logs-${data.kubernetes.container.id}",
+		"id":   "container-logs-${data.container.id}",
 		"prospector": map[string]interface{}{
 			"scanner": map[string]interface{}{
 				"fingerprint.enabled": true,
@@ -46,7 +46,8 @@ func defaultConfig() config {
 			},
 		},
 		"paths": []string{
-			"/var/log/containers/*-${data.kubernetes.container.id}.log",
+			"/var/log/containers/*-${data.container.id}.log",             // Kubernetes
+			"/var/lib/docker/containers/${data.container.id}/*-json.log", // Docker
 		},
 	}
 	defaultCfg, _ := conf.NewConfigFrom(defaultCfgRaw)
