@@ -37,6 +37,12 @@ func defaultConfig() config {
 			},
 		},
 		"file_identity.fingerprint": nil,
+		"take_over": map[string]any{
+			"enabled": true,
+			"from_ids": []string{
+				"kubernetes-container-logs-${data.container.id}",
+			},
+		},
 		"parsers": []interface{}{
 			map[string]interface{}{
 				"container": map[string]interface{}{
