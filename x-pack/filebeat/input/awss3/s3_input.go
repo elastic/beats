@@ -41,7 +41,7 @@ type s3PollerInput struct {
 	filterProvider  *filterProvider
 
 	// health status reporting
-	status *statereporter.StateReporter
+	status *statereporter.EnhancedStatusReporter
 }
 
 func newS3PollerInput(
