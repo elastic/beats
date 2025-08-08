@@ -85,7 +85,7 @@ func TestStore(t *testing.T) {
 
 	for i := 0; i < numLogFiles; i++ {
 		logFile := path.Join(logsFolder, fmt.Sprintf("log-%d.log", i))
-		integration.GenerateLogFile(t, logFile, 10, false)
+		integration.WriteLogFile(t, logFile, 10, false)
 	}
 	logsFolderGlob := filepath.Join(logsFolder, "*")
 	filebeat.WriteConfigFile(fmt.Sprintf(testStoreCfg, logsFolderGlob, tempDir))

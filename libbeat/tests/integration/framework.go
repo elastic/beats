@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//This file was contributed to by generative AI
+
 //go:build integration
 
 package integration
@@ -28,6 +30,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"net"
 	"net/http"
 	"net/url"
@@ -802,6 +805,20 @@ func GetESClient(t *testing.T, scheme string) *elasticsearch.Client {
 
 }
 
+// FileContains searches for the specified string in a file and returns the first matching line.
+// The method reads the file line by line, looking for the first occurrence of the match string.
+// If the match is found, it returns the entire line containing the match.
+// If no match is found, it returns an empty string.
+//
+// Parameters:
+//   - filename: Path to the file to search in
+//   - match: String to search for in the file
+//
+// Returns:
+//
+//	The first line containing the match string or an empty string if not found.
+//
+// The test will fail if the file cannot be opened or if an error occurs while reading.
 func (b *BeatProc) FileContains(filename string, match string) string {
 	file, err := os.Open(filename)
 	require.NoErrorf(b.t, err, "error opening: %s", filename)
@@ -1175,4 +1192,40 @@ func StartMockES(
 		"mock-es server did not start on '%s'", addr)
 
 	return &s, addr, es, rdr
+}
+
+// GetEventsFromFileOutput reads all events from all the files on dir. If n > 0,
+// then it reads up to n events. It considers all files are ndjson, and it skips
+// any directory within dir.
+func GetEventsFromFileOutput[E any](t *testing.T, dir string, n int) []E {
+	t.Helper()
+
+	if n < 1 {
+		n = math.MaxInt
+	}
+
+	var events []E
+	entries, err := os.ReadDir(dir)
+	require.NoError(t, err, "could not read events directory")
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		f, err := os.Open(filepath.Join(dir, e.Name()))
+		require.NoErrorf(t, err, "could not open file %q", e.Name())
+
+		scanner := bufio.NewScanner(f)
+		for scanner.Scan() {
+			var ev E
+			err := json.Unmarshal(scanner.Bytes(), &ev)
+			require.NoError(t, err, "failed to read event")
+			events = append(events, ev)
+
+			if len(events) >= n {
+				return events
+			}
+		}
+	}
+
+	return events
 }

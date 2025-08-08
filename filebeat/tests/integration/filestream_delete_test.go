@@ -127,7 +127,7 @@ func TestFilestreamDelete(t *testing.T) {
 			if runtime.GOOS == "windows" {
 				msgLogFilePath = strings.ReplaceAll(logFile, `\`, `\\`)
 			}
-			integration.GenerateLogFile(t, logFile, 100, false)
+			integration.WriteLogFile(t, logFile, 100, false)
 
 			vars := map[string]any{
 				"homePath":    workDir,
@@ -231,7 +231,7 @@ func testGracePeriod(
 
 			// Wait 1/2 of the grace period, then add data to the file
 			time.Sleep(gracePeriod / 2)
-			integration.GenerateLogFile(t, msgLogFilePath, 5, true)
+			integration.WriteLogFile(t, msgLogFilePath, 5, true)
 
 			// Wait for the message of file size changed
 			changedMsg := fmt.Sprintf("'%s' was updated, won't remove. Closing harvester", msgLogFilePath)
@@ -309,7 +309,7 @@ func TestFilestreamDeleteEnabledOnExistingFiles(t *testing.T) {
 			if runtime.GOOS == "windows" {
 				msgLogFilePath = strings.ReplaceAll(logFile, `\`, `\\`)
 			}
-			integration.GenerateLogFile(t, logFile, 100, false)
+			integration.WriteLogFile(t, logFile, 100, false)
 
 			vars := map[string]any{
 				"homePath":    workDir,

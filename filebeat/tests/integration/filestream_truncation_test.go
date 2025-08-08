@@ -80,7 +80,7 @@ func TestFilestreamLiveFileTruncation(t *testing.T) {
 	filebeat.WriteConfigFile(fmt.Sprintf(truncationCfg, logFile, tempDir, tempDir))
 
 	// 1. Create a log file and let Filebeat harvest all contents
-	integration.GenerateLogFile(t, logFile, 200, false)
+	integration.WriteLogFile(t, logFile, 200, false)
 	filebeat.Start()
 	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
@@ -103,7 +103,7 @@ func TestFilestreamLiveFileTruncation(t *testing.T) {
 	assertLastOffset(t, registryLogFile, 10_000)
 
 	// Open for appending because the file has already been truncated
-	integration.GenerateLogFile(t, logFile, 10, true)
+	integration.WriteLogFile(t, logFile, 10, true)
 
 	// 5. Start Filebeat again.
 	filebeat.Start()
@@ -126,7 +126,7 @@ func TestFilestreamOfflineFileTruncation(t *testing.T) {
 	filebeat.WriteConfigFile(fmt.Sprintf(truncationCfg, logFile, tempDir, tempDir))
 
 	// 1. Create a log file with some lines
-	integration.GenerateLogFile(t, logFile, 10, false)
+	integration.WriteLogFile(t, logFile, 10, false)
 
 	// 2. Ingest the file and stop Filebeat
 	filebeat.Start()
@@ -141,7 +141,7 @@ func TestFilestreamOfflineFileTruncation(t *testing.T) {
 	if err := os.Truncate(logFile, 0); err != nil {
 		t.Fatalf("could not truncate log file: %s", err)
 	}
-	integration.GenerateLogFile(t, logFile, 5, true)
+	integration.WriteLogFile(t, logFile, 5, true)
 
 	// 5. Read the file again and stop Filebeat
 	filebeat.Start()

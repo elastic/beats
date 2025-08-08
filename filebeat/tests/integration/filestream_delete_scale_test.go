@@ -64,7 +64,7 @@ func testLargeScaleFilestreamDelete(t *testing.T, timeout time.Duration, nFiles,
 	fb := integration.NewBeat(t, "filebeat", "../../filebeat.test")
 	start := time.Now()
 
-	dir := integration.GenerateNLogFiles(t, fb.TempDir(), nFiles, lines)
+	dir := integration.WriteNLogFiles(t, fb.TempDir(), nFiles, lines)
 	elapsed := time.Since(start)
 
 	t.Logf("%d files with %d lines each generated in %s", nFiles, lines, elapsed)
