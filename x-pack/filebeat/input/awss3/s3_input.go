@@ -163,7 +163,6 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 	defer acks.Close()
 
 	rateLimitWaiter := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
-	prevIterationFailed := false
 	for _state := range workChan {
 		state := _state
 		event := in.s3EventForState(state)
@@ -187,7 +186,6 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 			// next iteration so we don't mark the object as permanently failed.
 			in.status.UpdateStatus(status.Degraded, fmt.Sprintf("S3 download failure: %s", err.Error()))
 			rateLimitWaiter.Wait()
-			prevIterationFailed = true
 			continue
 		}
 		// Reset the rate limit delay on results that aren't download errors.
@@ -217,10 +215,9 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 		})
 		// if we go from loop iteration failure to success, we should attempt to re-report recovered status
 		// the purpose of this block is to avoid unnecessary synchronization between workers during status update
-		if prevIterationFailed && state.Stored {
+		if state.Stored {
 			in.status.UpdateStatus(status.Running, "Input is recovered and running")
 		}
-		prevIterationFailed = state.Failed
 	}
 }
 
