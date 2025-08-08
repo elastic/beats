@@ -113,7 +113,7 @@ func (e *eProcessor) process(_ context.Context, pe *ProbeEvent) error {
 		})
 
 		if parentEntry == nil || parentEntry.Depth >= 1 && !e.isRecursive {
-			fmt.Fprintf(os.Stdout, "not emitting event for MaskCreate: %v depth: %d, isRecursive: %v\n", parentEntry == nil, parentEntry.Depth, e.isRecursive)
+			fmt.Fprintf(os.Stdout, "not emitting event for MaskCreate: %#v, isRecursive: %v\n", parentEntry, e.isRecursive)
 			return nil
 		}
 
@@ -165,7 +165,7 @@ func (e *eProcessor) process(_ context.Context, pe *ProbeEvent) error {
 		})
 
 		if parentEntry == nil || parentEntry.Depth >= 1 && !e.isRecursive {
-			fmt.Fprintf(os.Stdout, "not emitting event for MoveFrom: %v, depth: %d, isRecursive: %v\n", parentEntry == nil, parentEntry.Depth, e.isRecursive)
+			fmt.Fprintf(os.Stdout, "not emitting event for MoveFrom: %#v, isRecursive: %v\n", parentEntry, e.isRecursive)
 			e.d.MoveClear(uint64(pe.Meta.TID))
 			return nil
 		}
@@ -193,7 +193,7 @@ func (e *eProcessor) process(_ context.Context, pe *ProbeEvent) error {
 			// if parentEntry is nil then this move event is not
 			// for a directory we monitor
 			e.d.MoveClear(uint64(pe.Meta.TID))
-			fmt.Fprintf(os.Stdout, "not emitting event for MaskMoveTo: %v, depth: %d, isRecursive: %v\n", parentEntry == nil, parentEntry.Depth, e.isRecursive)
+			fmt.Fprintf(os.Stdout, "not emitting event for MaskMoveTo: %#v isRecursive: %v\n", parentEntry, e.isRecursive)
 			return nil
 		}
 
@@ -225,7 +225,7 @@ func (e *eProcessor) process(_ context.Context, pe *ProbeEvent) error {
 		})
 
 		if parentEntry == nil || parentEntry.Depth >= 1 && !e.isRecursive {
-			fmt.Fprintf(os.Stdout, "not emitting event for MaskDelete: %v, depth: %d, isRecursive: %v\n", parentEntry == nil, parentEntry.Depth, e.isRecursive)
+			fmt.Fprintf(os.Stdout, "not emitting event for MaskDelete: %v, isRecursive: %v\n", parentEntry, e.isRecursive)
 			return nil
 		}
 
