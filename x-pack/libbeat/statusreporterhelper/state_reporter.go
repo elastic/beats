@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// The statereporter package provides a helper for reporting component state.
+// The statusreporterhelper package provides a helper for reporting component state.
 // It prevents sending duplicate status updates if the status has not changed.
 // It also falls back to standalone mode with debug logs.
 package statusreporterhelper
@@ -22,7 +22,7 @@ type StatusReporterHelper struct {
 	sync sync.Mutex
 }
 
-// New create a new StateReporter.
+// New create a new StatusReporterHelper.
 func New(statusReporter status.StatusReporter, log *logp.Logger) *StatusReporterHelper {
 	rep := &StatusReporterHelper{
 		current:        status.Unknown,
