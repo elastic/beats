@@ -18,7 +18,7 @@ func TestConstructor(t *testing.T) {
 		reporter := New(nil, logp.NewNopLogger())
 		require.NotNil(t, reporter)
 
-		require.IsType(t, &StateReporter{}, reporter)
+		require.IsType(t, &EnhancedStatusReporter{}, reporter)
 		require.IsType(t, &debugStatusReporter{}, reporter.statusReporter)
 	})
 }
