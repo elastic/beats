@@ -22,10 +22,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	// Register require module.
@@ -45,7 +47,8 @@ function process(evt) {
 }
 `
 
-	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
+	observedCore, observedLogs := observer.New(zapcore.DebugLevel)
+	logger, err := logp.ConfigureWithCoreLocal(logp.Config{}, observedCore)
 
 	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil, logger)
 	if err != nil {
