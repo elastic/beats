@@ -353,7 +353,7 @@ func (p *monitorTestSuite) TestRunNoError() {
 	exec := newFixedThreadExecutor(ctx)
 	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
 	p.Require().NoError(err)
-	m.eProc.d.Add(&dEntry{
+	m.eProc.entryCache.Add(&dEntry{
 		Parent:   nil,
 		Depth:    0,
 		Children: nil,
@@ -427,8 +427,8 @@ func (p *monitorTestSuite) TestRunEmitError() {
 	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
 	p.Require().NoError(err)
 
-	m.eProc.e = mockEmitter
-	m.eProc.d.Add(&dEntry{
+	m.eProc.emitter = mockEmitter
+	m.eProc.entryCache.Add(&dEntry{
 		Parent:   nil,
 		Depth:    0,
 		Children: nil,
@@ -677,7 +677,7 @@ func BenchmarkMonitor(b *testing.B) {
 	//   running "find . | wc -l"
 	// so the dcache entry should contain 1 (tmpDir) + 1 (linux-6.6.7.tar.xz archive)
 	//   + 87082 (folder + archive contents) dentries
-	require.Len(b, m.eProc.d.index, 87082+2)
+	require.Len(b, m.eProc.entryCache.index, 87082+2)
 
 	b.Logf("processed %d events", seenEvents)
 }

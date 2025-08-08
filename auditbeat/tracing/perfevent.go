@@ -396,6 +396,7 @@ func (c *PerfChannel) channelLoop() {
 	defer c.wg.Done()
 	ctx := doneWrapperContext(c.done)
 	merger := newRecordMerger(c.events[:c.cpus.NumCPU()], c, c.pollTimeout)
+	fmt.Fprintf(os.Stdout, "PerfChannel channelLoop started with %d CPUs\n", c.cpus.NumCPU())
 	for {
 		// Read the available event from all the monitored ring-buffers that
 		// has the smallest timestamp.
@@ -434,6 +435,7 @@ type recordMerger struct {
 }
 
 func newRecordMerger(sources []*perf.Event, channel *PerfChannel, pollTimeout time.Duration) recordMerger {
+	fmt.Fprintf(os.Stdout, "Creating recordMerger with %#v\n", sources)
 	m := recordMerger{
 		evs:     sources,
 		channel: channel,
@@ -492,6 +494,7 @@ func (m *recordMerger) readSampleNonBlock(ev *perf.Event, ctx context.Context) (
 			return nil, false
 		}
 		if err != nil {
+			fmt.Fprintf(os.Stdout, "Error reading record: %v\n", err)
 			if errors.Is(err, perf.ErrBadRecord) {
 				m.channel.lostC <- ^uint64(0)
 				continue
@@ -499,6 +502,7 @@ func (m *recordMerger) readSampleNonBlock(ev *perf.Event, ctx context.Context) (
 			m.channel.errC <- err
 			return nil, false
 		}
+		fmt.Fprintf(os.Stdout, "got record: %#v\n", rec.Header())
 		h := rec.Header()
 		switch h.Type {
 		case unix.PERF_RECORD_LOST:
