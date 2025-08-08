@@ -30,6 +30,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"net"
 	"net/http"
 	"net/url"
@@ -595,13 +596,13 @@ func (b *BeatProc) searchStrInLogsReversed(logFile *os.File, s string) (bool, st
 	return false, ""
 }
 
-// WaitForLogs waits for the specified string s to be present in the logs within
+// WaitLogsContains waits for the specified string s to be present in the logs within
 // the given timeout duration and fails the test if s is not found.
 // It keeps track of the log file offset, reading only new lines. Each
-// subsequent call to WaitForLogs will only check logs not yet evaluated.
+// subsequent call to WaitLogsContains will only check logs not yet evaluated.
 // msgAndArgs should be a format string and arguments that will be printed
 // if the logs are not found, providing additional context for debugging.
-func (b *BeatProc) WaitForLogs(s string, timeout time.Duration, msgAndArgs ...any) {
+func (b *BeatProc) WaitLogsContains(s string, timeout time.Duration, msgAndArgs ...any) {
 	b.t.Helper()
 	require.Eventually(b.t, func() bool {
 		return b.LogContains(s)
@@ -667,7 +668,7 @@ func (b *BeatProc) WaitForLogsAnyOrder(msgs []string, timeout time.Duration, fai
 
 // WaitForLogsFromBeginning has the same behaviour as WaitForLogs, but it first
 // resets the log offset.
-func (b *BeatProc) WaitForLogsFromBeginning(s string, timeout time.Duration, msgAndArgs ...any) {
+func (b *BeatProc) WaitLogsContainsFromBeginning(s string, timeout time.Duration, msgAndArgs ...any) {
 	b.t.Helper()
 	b.logFileOffset = 0
 	require.Eventually(b.t, func() bool {
@@ -865,6 +866,20 @@ func GetESClient(t *testing.T, scheme string) *elasticsearch.Client {
 
 }
 
+// FileContains searches for the specified string in a file and returns the first matching line.
+// The method reads the file line by line, looking for the first occurrence of the match string.
+// If the match is found, it returns the entire line containing the match.
+// If no match is found, it returns an empty string.
+//
+// Parameters:
+//   - filename: Path to the file to search in
+//   - match: String to search for in the file
+//
+// Returns:
+//
+//	The first line containing the match string or an empty string if not found.
+//
+// The test will fail if the file cannot be opened or if an error occurs while reading.
 func (b *BeatProc) FileContains(filename string, match string) string {
 	file, err := os.Open(filename)
 	require.NoErrorf(b.t, err, "error opening: %s", filename)
@@ -1133,59 +1148,8 @@ func reportErrors(t *testing.T, tempDir string, beatName string) {
 	}
 }
 
-// GenerateLogFile writes count lines to path
-// Each line contains the current time (RFC3339) and a counter
-// Prefix is added instead of current time if it exists
-func GenerateLogFile(t *testing.T, path string, count int, append bool, prefix ...string) {
-	var file *os.File
-	var err error
-	if !append {
-		file, err = os.Create(path)
-		if err != nil {
-			t.Fatalf("could not create file '%s': %s", path, err)
-		}
-	} else {
-		file, err = os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
-		if err != nil {
-			t.Fatalf("could not open or create file: '%s': %s", path, err)
-		}
-	}
-
-	defer func() {
-		if err := file.Close(); err != nil {
-			t.Fatalf("could not close file: %s", err)
-		}
-	}()
-	defer func() {
-		if err := file.Sync(); err != nil {
-			t.Fatalf("could not sync file: %s", err)
-		}
-	}()
-
-	var now string
-	if len(prefix) == 0 {
-		// If the length is different, e.g when there is no offset from UTC.
-		// add some padding so the length is predictable
-		now = time.Now().Format(time.RFC3339)
-		if len(now) != len(time.RFC3339) {
-			paddingNeeded := len(time.RFC3339) - len(now)
-			for i := 0; i < paddingNeeded; i++ {
-				now += "-"
-			}
-		}
-	} else {
-		now = strings.Join(prefix, "")
-	}
-
-	for i := 0; i < count; i++ {
-		if _, err := fmt.Fprintf(file, "%s           %13d\n", now, i); err != nil {
-			t.Fatalf("could not write line %d to file: %s", count+1, err)
-		}
-	}
-}
-
-// AssertLinesInFile counts number of lines in the given file and  asserts if it matches expected count
-func AssertLinesInFile(t *testing.T, path string, count int) {
+// WaitLineCountInFile counts number of lines in the given file and  asserts if it matches expected count
+func WaitLineCountInFile(t *testing.T, path string, count int) {
 	t.Helper()
 	var lines []byte
 	var err error
@@ -1306,4 +1270,56 @@ func StartMockES(
 		"mock-es server did not start on '%s'", addr)
 
 	return &s, serverURL, es, rdr
+}
+
+// GetEventsFromFileOutput reads all events from all the files on dir. If n > 0,
+// then it reads up to n events. It considers all files are ndjson, and it skips
+// any directory within dir.
+func GetEventsFromFileOutput[E any](t *testing.T, dir string, n int) []E {
+	t.Helper()
+
+	if n < 1 {
+		n = math.MaxInt
+	}
+
+	var events []E
+	entries, err := os.ReadDir(dir)
+	require.NoError(t, err, "could not read events directory")
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		f, err := os.Open(filepath.Join(dir, e.Name()))
+		require.NoErrorf(t, err, "could not open file %q", e.Name())
+
+		scanner := bufio.NewScanner(f)
+		for scanner.Scan() {
+			var ev E
+			err := json.Unmarshal(scanner.Bytes(), &ev)
+			require.NoError(t, err, "failed to read event")
+			events = append(events, ev)
+
+			if len(events) >= n {
+				return events
+			}
+		}
+	}
+
+	return events
+}
+
+// WaitPublishedEvents waits until the desired number of events
+// have been published. It assumes the file output is used, the filename
+// for the output is 'output' and 'path' is set to the TempDir.
+func (b *BeatProc) WaitPublishedEvents(t *testing.T, timeout time.Duration, events int) {
+	t.Helper()
+
+	msg := strings.Builder{}
+	path := filepath.Join(b.TempDir(), "output-*.ndjson")
+	assert.Eventually(t, func() bool {
+		got := b.CountFileLines(path)
+		msg.Reset()
+		fmt.Fprintf(&msg, "expecting %d events, got %d", events, got)
+		return got == events
+	}, timeout, 200*time.Millisecond, &msg)
 }

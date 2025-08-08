@@ -163,7 +163,7 @@ logging.level: debug
 			// wait for filebeat read the incomplete GZIP file and reach the
 			// error.
 			for _, want := range tc.initialLogs(logPath) {
-				filebeat.WaitForLogsFromBeginning(
+				filebeat.WaitLogsContainsFromBeginning(
 					want,
 					30*time.Second,
 					"Filebeat did not log: '%s'", want,
@@ -187,7 +187,7 @@ logging.level: debug
 			// written.
 			for _, log := range tc.furtherLogs {
 				want := fmt.Sprintf(log, logPath)
-				filebeat.WaitForLogsFromBeginning(
+				filebeat.WaitLogsContainsFromBeginning(
 					fmt.Sprintf(log, logPath),
 					30*time.Second,
 					"Filebeat did not log: '%s'", want,
@@ -195,7 +195,7 @@ logging.level: debug
 			}
 
 			// Ensure the file is fully read
-			filebeat.WaitForLogsFromBeginning(fmt.Sprintf(
+			filebeat.WaitLogsContainsFromBeginning(fmt.Sprintf(
 				"EOF has been reached. Closing. Path='%s'", logPath),
 				30*time.Second,
 				"Filebeat did not finish reading the log file")
@@ -245,7 +245,7 @@ logging.level: debug
 	filebeat.WriteConfigFile(cfg)
 	filebeat.Start()
 
-	filebeat.WaitForLogsFromBeginning(
+	filebeat.WaitLogsContainsFromBeginning(
 		fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logFilepath),
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -273,7 +273,7 @@ logging.level: debug
 
 	filebeat.Start()
 	wantLog := fmt.Sprintf("GZIP file already read to EOF, not reading it again, file name '%s'", logFilepath)
-	filebeat.WaitForLogsFromBeginning(
+	filebeat.WaitLogsContainsFromBeginning(
 		wantLog,
 		30*time.Second,
 		"Filebeat did find log '%s'",
@@ -344,7 +344,7 @@ logging.level: debug
 	filebeat.WriteConfigFile(cfg)
 	filebeat.Start()
 
-	filebeat.WaitForLogsFromBeginning(
+	filebeat.WaitLogsContainsFromBeginning(
 		fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPath),
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -417,7 +417,7 @@ logging.level: debug
 	filebeat.Start()
 
 	eofLine := fmt.Sprintf("End of file reached: %s; Backoff now.", logPathPlain)
-	filebeat.WaitForLogsFromBeginning(
+	filebeat.WaitLogsContainsFromBeginning(
 		eofLine,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -425,7 +425,7 @@ logging.level: debug
 	)
 
 	eofLine = fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPathGZ)
-	filebeat.WaitForLogsFromBeginning(
+	filebeat.WaitLogsContainsFromBeginning(
 		eofLine,
 		time.Minute,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -598,7 +598,7 @@ logging.level: debug
 	filebeat.Start()
 
 	eofLine := fmt.Sprintf("End of file reached: %s; Backoff now.", logPathPlain)
-	filebeat.WaitForLogsFromBeginning(
+	filebeat.WaitLogsContainsFromBeginning(
 		eofLine,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -612,7 +612,7 @@ logging.level: debug
 	// wait filebeat to pick up the file and see it's the same as the plain file.
 	wantLine := fmt.Sprintf("\\\"%s\\\" points to an already known ingest target \\\"%s\\\" [e64ff2da367b082e1dcc38ec48215bff55925bd408f718f107e50ecf426fe3c3==e64ff2da367b082e1dcc38ec48215bff55925bd408f718f107e50ecf426fe3c3]. Skipping",
 		logPathGZ, logPathPlain)
-	filebeat.WaitForLogsFromBeginning(
+	filebeat.WaitLogsContainsFromBeginning(
 		wantLine,
 		30*time.Second,
 		"Did not find log '%s'",
@@ -683,7 +683,7 @@ logging.level: debug
 	filebeat.Start()
 
 	eofLine := fmt.Sprintf("End of file reached: %s; Backoff now.", logPathPlain)
-	filebeat.WaitForLogsFromBeginning(
+	filebeat.WaitLogsContainsFromBeginning(
 		eofLine,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -704,7 +704,7 @@ logging.level: debug
 
 	// Wait filebeat to finish the gzipped file
 	eofLog := fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPathGZ)
-	filebeat.WaitForLogsFromBeginning(
+	filebeat.WaitLogsContainsFromBeginning(
 		eofLog,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -713,7 +713,7 @@ logging.level: debug
 
 	// Wait filebeat to finish the original file with new content
 	eofLine = fmt.Sprintf("End of file reached: %s; Backoff now.", logPathPlain)
-	filebeat.WaitForLogsFromBeginning(
+	filebeat.WaitLogsContainsFromBeginning(
 		eofLine,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -824,7 +824,7 @@ logging.level: debug
 	filebeat.Start()
 
 	eofLine := fmt.Sprintf("End of file reached: %s; Backoff now.", logPathActive)
-	filebeat.WaitForLogsFromBeginning(
+	filebeat.WaitLogsContainsFromBeginning(
 		eofLine,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -849,7 +849,7 @@ logging.level: debug
 
 	// Wait filebeat to finish the gzipped files
 	eofLog := fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPathLatestRotation)
-	filebeat.WaitForLogsFromBeginning(
+	filebeat.WaitLogsContainsFromBeginning(
 		eofLog,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -857,7 +857,7 @@ logging.level: debug
 	)
 
 	eofLog = fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPathGZOldestRotation)
-	filebeat.WaitForLogsFromBeginning(
+	filebeat.WaitLogsContainsFromBeginning(
 		eofLog,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -866,7 +866,7 @@ logging.level: debug
 
 	// Wait filebeat to finish the original file with new content
 	eofLine = fmt.Sprintf("End of file reached: %s; Backoff now.", logPathActive)
-	filebeat.WaitForLogsFromBeginning(
+	filebeat.WaitLogsContainsFromBeginning(
 		eofLine,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -998,7 +998,7 @@ logging.level: debug
 
 	filebeat.Start()
 	eofLine := fmt.Sprintf("End of file reached: %s; Backoff now.", logPathActive)
-	filebeat.WaitForLogsFromBeginning(
+	filebeat.WaitLogsContainsFromBeginning(
 		eofLine,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
@@ -1119,7 +1119,7 @@ logging.level: debug
 	filebeat.Start()
 
 	eofLog := fmt.Sprintf("EOF has been reached. Closing. Path='%s'", logPath)
-	filebeat.WaitForLogsFromBeginning(
+	filebeat.WaitLogsContainsFromBeginning(
 		eofLog,
 		30*time.Second,
 		"Filebeat did not reach EOF. Did not find log [%s]",
