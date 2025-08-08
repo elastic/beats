@@ -216,7 +216,7 @@ func (w *Monitor) Start() error {
 				switch eWithType := e.(type) {
 				case *ProbeEvent:
 					if err := w.eProc.process(w.ctx, eWithType); err != nil {
-						fmt.Fprintf(os.Stdout, "error processing event in Monitor: %w\n", err)
+						fmt.Fprintf(os.Stdout, "error processing event in Monitor: %s\n", err)
 						w.writeErr(fmt.Errorf("error processing event in Monitor: %w", err))
 						return
 					}
