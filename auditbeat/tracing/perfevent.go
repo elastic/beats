@@ -49,8 +49,9 @@ var (
 )
 
 type stream struct {
-	decoder Decoder
-	probeID int
+	decoder   Decoder
+	probeID   int
+	probeName string
 }
 
 // PerfChannel represents a channel to receive perf events.
@@ -90,6 +91,7 @@ type Metadata struct {
 	TID       uint32
 	PID       uint32
 	EventID   int
+	ProbeName string
 }
 
 // NewPerfChannel creates a new perf channel in order to receive events from
@@ -276,7 +278,7 @@ func (c *PerfChannel) MonitorProbe(format ProbeFormat, decoder Decoder) error {
 				return fmt.Errorf("unable to set filter '%s': %w", format.Probe.Filter, errNo)
 			}
 		}
-		c.streams[cid] = stream{probeID: format.ID, decoder: decoder}
+		c.streams[cid] = stream{probeID: format.ID, probeName: format.Probe.Name, decoder: decoder}
 		c.events = append(c.events, ev)
 
 		if !doGroup {
@@ -379,13 +381,14 @@ func (ctx doneWrapperContext) Value(key interface{}) interface{} {
 	return nil
 }
 
-func makeMetadata(eventID int, record *perf.SampleRecord) Metadata {
+func makeMetadata(eventID int, name string, record *perf.SampleRecord) Metadata {
 	return Metadata{
 		StreamID:  record.StreamID,
 		Timestamp: record.Time,
 		TID:       record.Tid,
 		PID:       record.Pid,
 		EventID:   eventID,
+		ProbeName: name,
 	}
 }
 
@@ -408,7 +411,7 @@ func (c *PerfChannel) channelLoop() {
 			continue
 		}
 		// Decode the event
-		meta := makeMetadata(stream.probeID, sample)
+		meta := makeMetadata(stream.probeID, stream.probeName, sample)
 		output, err := stream.decoder.Decode(sample.Raw, meta)
 		if err != nil {
 			c.errC <- err

@@ -21,6 +21,7 @@ package kprobes
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
@@ -55,6 +56,7 @@ func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponen
 	for probe, allocFn := range probes {
 		_ = tfs.RemoveKProbe(probe)
 
+		fmt.Fprintf(os.Stdout, "Adding probe: %s at address %s\n", probe.Name, probe.Address)
 		err := tfs.AddKProbe(probe)
 		if err != nil {
 			return nil, err

@@ -213,7 +213,7 @@ func (w *Monitor) Start() error {
 					w.writeErr(fmt.Errorf("read invalid event from perf channel"))
 					return
 				}
-
+				fmt.Fprintf(os.Stdout, "monitor got event: %#v\n", e)
 				switch eWithType := e.(type) {
 				case *ProbeEvent:
 					if err := w.eProc.process(w.ctx, eWithType); err != nil {

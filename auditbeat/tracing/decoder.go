@@ -325,14 +325,14 @@ func NewStructDecoder(desc ProbeFormat, allocFn AllocateFn) (Decoder, error) {
 }
 
 // Decode implements the decoder interface.
-func (d *structDecoder) Decode(raw []byte, meta Metadata) (s interface{}, err error) {
+func (d *structDecoder) Decode(raw []byte, meta Metadata) (decodedStruct interface{}, err error) {
 	n := uintptr(len(raw))
 
 	// Allocate a new struct to fill
-	s = d.alloc()
+	decodedStruct = d.alloc()
 
 	// Get a raw pointer to the struct
-	destPtr := unsafe.Pointer(reflect.ValueOf(s).Pointer())
+	destPtr := unsafe.Pointer(reflect.ValueOf(decodedStruct).Pointer())
 	for _, dec := range d.fields {
 		if dec.src+dec.len > n {
 			return nil, fmt.Errorf("perf event field %s overflows message of size %d", dec.name, n)
@@ -363,7 +363,7 @@ func (d *structDecoder) Decode(raw []byte, meta Metadata) (s interface{}, err er
 		}
 	}
 
-	return s, nil
+	return decodedStruct, nil
 }
 
 type dumpDecoder struct {

@@ -35,8 +35,8 @@ type fsNotifySymbol struct {
 	seenSpecs         map[*tkbtf.Spec]struct{}
 }
 
-func loadFsNotifySymbol(s *probeManager) error {
-	symbolInfo, err := s.getSymbolInfoRuntime("fsnotify")
+func loadFsNotifySymbol(symbolProbeManager *probeManager) error {
+	symbolInfo, err := symbolProbeManager.getSymbolInfoRuntime("fsnotify")
 	if err != nil {
 		return err
 	}
@@ -45,13 +45,13 @@ func loadFsNotifySymbol(s *probeManager) error {
 		return fmt.Errorf("symbol %s is optimised", symbolInfo.symbolName)
 	}
 
-	s.buildChecks = append(s.buildChecks, func(spec *tkbtf.Spec) bool {
+	symbolProbeManager.buildChecks = append(symbolProbeManager.buildChecks, func(spec *tkbtf.Spec) bool {
 		return spec.ContainsSymbol(symbolInfo.symbolName)
 	})
 
 	// default filters for all three fsnotify probes enable mask_create, mask_delete, mask_attrib, mask_modify,
 	// mask_moved_to, and mask_moved_from events.
-	s.symbols = append(s.symbols, &fsNotifySymbol{
+	symbolProbeManager.symbols = append(symbolProbeManager.symbols, &fsNotifySymbol{
 		symbolName: symbolInfo.symbolName,
 	})
 
