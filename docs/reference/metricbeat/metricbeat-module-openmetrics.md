@@ -59,4 +59,4 @@ This module supports TLS connections when using `ssl` config field, as described
 
 The following metricsets are available:
 
-* [collector](/reference/metricbeat/metricbeat-metricset-openmetrics-collector.md)
+* [collector](/reference/metricbeat/metricbeat-metricset-openmetrics-collector.md)  {applies_to}`stack: beta`

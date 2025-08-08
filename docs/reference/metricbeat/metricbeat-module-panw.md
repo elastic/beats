@@ -132,7 +132,7 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [interfaces](/reference/metricbeat/metricbeat-metricset-panw-interfaces.md)
-* [routing](/reference/metricbeat/metricbeat-metricset-panw-routing.md)
-* [system](/reference/metricbeat/metricbeat-metricset-panw-system.md)
-* [vpn](/reference/metricbeat/metricbeat-metricset-panw-vpn.md)
+* [interfaces](/reference/metricbeat/metricbeat-metricset-panw-interfaces.md)  {applies_to}`stack: beta`
+* [routing](/reference/metricbeat/metricbeat-metricset-panw-routing.md)  {applies_to}`stack: beta`
+* [system](/reference/metricbeat/metricbeat-metricset-panw-system.md)  {applies_to}`stack: beta`
+* [vpn](/reference/metricbeat/metricbeat-metricset-panw-vpn.md)  {applies_to}`stack: beta`

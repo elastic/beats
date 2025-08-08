@@ -39,6 +39,6 @@ This module supports TLS connections when using `ssl` config field, as described
 The following metricsets are available:
 
 * [leader](/reference/metricbeat/metricbeat-metricset-etcd-leader.md)
-* [metrics](/reference/metricbeat/metricbeat-metricset-etcd-metrics.md)
+* [metrics](/reference/metricbeat/metricbeat-metricset-etcd-metrics.md)  {applies_to}`stack: beta`
 * [self](/reference/metricbeat/metricbeat-metricset-etcd-self.md)
 * [store](/reference/metricbeat/metricbeat-metricset-etcd-store.md)
