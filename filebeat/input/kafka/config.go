@@ -171,7 +171,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	k.Consumer.Group.Rebalance.Retry.Backoff = config.Rebalance.RetryBackoff
 	k.Consumer.Group.Rebalance.Retry.Max = config.Rebalance.MaxRetries
 
-	tls, err := tlscommon.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(config.TLS, logger)
 	if err != nil {
 		return nil, err
 	}

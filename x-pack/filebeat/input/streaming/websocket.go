@@ -420,7 +420,7 @@ func connectWebSocket(ctx context.Context, cfg config, url string, stat status.S
 	var response *http.Response
 	var err error
 	headers := formHeader(cfg)
-	dialer, err := createWebSocketDialer(cfg)
+	dialer, err := createWebSocketDialer(cfg, log)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -512,7 +512,7 @@ func (s *websocketStream) Close() error {
 	return nil
 }
 
-func createWebSocketDialer(cfg config) (*websocket.Dialer, error) {
+func createWebSocketDialer(cfg config, logger *logp.Logger) (*websocket.Dialer, error) {
 	var tlsConfig *tls.Config
 	dialer := &websocket.Dialer{
 		Proxy: http.ProxyFromEnvironment,
@@ -540,7 +540,7 @@ func createWebSocketDialer(cfg config) (*websocket.Dialer, error) {
 	}
 	// load TLS config if available
 	if cfg.Transport.TLS != nil {
-		TLSConfig, err := tlscommon.LoadTLSConfig(cfg.Transport.TLS)
+		TLSConfig, err := tlscommon.LoadTLSConfig(cfg.Transport.TLS, logger)
 		if err != nil {
 			return nil, fmt.Errorf("failed to load TLS config: %w", err)
 		}

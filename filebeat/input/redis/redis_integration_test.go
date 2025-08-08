@@ -191,7 +191,7 @@ func createRedisClient(t *testing.T) *rd.Pool {
 			Certificate: "_meta/certs/server-cert.pem",
 			Key:         "_meta/certs/server-key.pem",
 		},
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("failed to load TLS configuration: %v", err)
 	}
