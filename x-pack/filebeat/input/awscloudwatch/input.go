@@ -65,7 +65,7 @@ type cloudwatchInput struct {
 	awsConfig awssdk.Config
 	store     statestore.States
 	metrics   *inputMetrics
-	status    *statusreporterhelper.StatusReporterHelper
+	status    status.StatusReporter
 }
 
 func newInput(config config, store statestore.States, logger *logp.Logger) (*cloudwatchInput, error) {

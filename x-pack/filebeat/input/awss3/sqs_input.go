@@ -48,7 +48,7 @@ type sqsReaderInput struct {
 	workerWg sync.WaitGroup
 
 	// health status reporting
-	status *statusreporterhelper.StatusReporterHelper
+	status status.StatusReporter
 }
 
 // Simple wrapper to handle creation of internal channels
