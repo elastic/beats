@@ -112,23 +112,24 @@ type ContainerStatus interface {
 // Project is a docker-compose project
 type Project struct {
 	Driver
+	logger *logp.Logger
 }
 
 // NewProject creates a new docker-compose project
-func NewProject(name string, files []string) (*Project, error) {
+func NewProject(name string, files []string, logger *logp.Logger) (*Project, error) {
 	if len(files) == 0 {
 		return nil, errors.New("project needs at least one file")
 	}
 	if name == "" {
 		name = filepath.Base(filepath.Dir(files[0]))
 	}
-	driver, err := newWrapperDriver()
+	driver, err := newWrapperDriver(logger)
 	if err != nil {
 		return nil, err
 	}
 	driver.Name = name
 	driver.Files = files
-	return &Project{Driver: driver}, nil
+	return &Project{Driver: driver, logger: logger}, nil
 }
 
 // Start the container, unless it's running already
@@ -255,20 +256,20 @@ func (c *Project) Lock() {
 	for time.Now().Before(timeout) {
 		if acquireLock(c.LockFile()) {
 			if infoShown {
-				logp.Info("%s lock acquired", c.LockFile())
+				c.logger.Infof("%s lock acquired", c.LockFile())
 			}
 			return
 		}
 
 		if stalledLock(c.LockFile()) {
 			if err := os.Remove(c.LockFile()); err == nil {
-				logp.Info("Stalled lockfile %s removed", c.LockFile())
+				c.logger.Infof("Stalled lockfile %s removed", c.LockFile())
 				continue
 			}
 		}
 
 		if !infoShown {
-			logp.Info("%s is locked, waiting", c.LockFile())
+			c.logger.Infof("%s is locked, waiting", c.LockFile())
 			infoShown = true
 		}
 		time.Sleep(1 * time.Second)
