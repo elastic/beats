@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package statereporter
+package statusreporterhelper
 
 import (
 	"testing"
@@ -18,7 +18,7 @@ func TestConstructor(t *testing.T) {
 		reporter := New(nil, logp.NewNopLogger())
 		require.NotNil(t, reporter)
 
-		require.IsType(t, &EnhancedStatusReporter{}, reporter)
+		require.IsType(t, &StatusReporterHelper{}, reporter)
 		require.IsType(t, &debugStatusReporter{}, reporter.statusReporter)
 	})
 }
