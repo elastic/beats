@@ -52,6 +52,7 @@ func getVerifiedProbes(ctx context.Context, timeout time.Duration) (map[tracing.
 	}
 
 	var allErr error
+	fmt.Fprintf(os.Stdout, "Loaded %d specs\n", len(specs))
 	for len(specs) > 0 {
 
 		s := specs[0]
@@ -67,7 +68,12 @@ func getVerifiedProbes(ctx context.Context, timeout time.Duration) (map[tracing.
 			continue
 		}
 
-		fmt.Fprintf(os.Stdout, "Running verifier for probes: %#v\n", probes)
+		var keys []string
+		for probe := range probes {
+			keys = append(keys, probe.Name)
+		}
+
+		fmt.Fprintf(os.Stdout, "\n==============================\nRunning verifier for probes: %#v\n", keys)
 		if err := verify(ctx, fExec, probes, timeout); err != nil {
 			if probeMgr.onErr(err) {
 				continue

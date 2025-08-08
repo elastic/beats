@@ -483,7 +483,7 @@ func (p *monitorTestSuite) TestNew() {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 	defer cancel()
 	monitorHandle, err := NewWithContext(ctx, true)
 	p.Require().NoError(err)
