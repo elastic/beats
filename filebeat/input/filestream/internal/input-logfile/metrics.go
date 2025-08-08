@@ -62,12 +62,12 @@ type Metrics struct {
 	HarvesterOpenGZIPFiles *monitoring.Int
 }
 
-func NewMetrics(reg *monitoring.Registry) *Metrics {
+func NewMetrics(reg *monitoring.Registry, stats *monitoring.Registry) *Metrics {
 	// The log input creates the `filebeat.harvester` registry as a package
 	// variable, so it should always exist before this function runs.
 	// However, at least on testing scenarios this does not hold true, so
 	// if needed, we create the registry ourselves.
-	harvesterMetrics := monitoring.Default.GetOrCreateRegistry("filebeat.harvester")
+	harvesterMetrics := stats.GetOrCreateRegistry("filebeat.harvester")
 
 	m := Metrics{
 		FilesOpened:       monitoring.NewUint(reg, "files_opened_total"),

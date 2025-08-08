@@ -107,7 +107,7 @@ type reporter struct {
 
 // MakeReporter returns a new Reporter that periodically reports metrics via
 // logp. If cfg is nil defaults will be used.
-func MakeReporter(beat beat.Info, cfg *conf.C) (report.Reporter, error) {
+func MakeReporter(beat beat.Info, m beat.Monitoring, cfg *conf.C) (report.Reporter, error) {
 	config := defaultConfig()
 	if cfg != nil {
 		if err := cfg.Unpack(&config); err != nil {
@@ -123,14 +123,18 @@ func MakeReporter(beat beat.Info, cfg *conf.C) (report.Reporter, error) {
 	}
 
 	for _, ns := range r.config.Namespaces {
-		reg := monitoring.GetNamespace(ns).GetRegistry()
-
-		// That 'stats' namespace is reported as 'metrics' in the Elasticsearch
-		// reporter so use the same name for consistency.
-		if ns == "stats" {
-			ns = "metrics"
+		switch ns {
+		case "info":
+			r.registries["info"] = m.InfoRegistry()
+		case "state":
+			r.registries["state"] = m.StateRegistry()
+		case "stats":
+			r.registries["metrics"] = m.StatsRegistry()
+		case "dataset":
+			r.registries["dataset"] = m.InputsRegistry()
+		default:
+			r.registries[ns] = monitoring.NewRegistry()
 		}
-		r.registries[ns] = reg
 	}
 
 	r.wg.Add(1)

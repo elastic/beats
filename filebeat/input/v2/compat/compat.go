@@ -47,6 +47,7 @@ type factory struct {
 	loader *v2.Loader
 
 	rootInputsRegistry *monitoring.Registry
+	rootStatsRegistry  *monitoring.Registry
 }
 
 // runner wraps a v2.Input, starting a go-routine
@@ -64,6 +65,7 @@ type runner struct {
 	connector          beat.PipelineConnector
 	statusReporter     status.StatusReporter
 	rootInputsRegistry *monitoring.Registry
+	rootStatsRegistry  *monitoring.Registry
 }
 
 // RunnerFactory creates a cfgfile.RunnerFactory from an input Loader that is
@@ -73,9 +75,15 @@ func RunnerFactory(
 	log *logp.Logger,
 	info beat.Info,
 	rootInputsRegistry *monitoring.Registry,
-	loader *v2.Loader,
-) cfgfile.RunnerFactory {
-	return &factory{log: log, info: info, rootInputsRegistry: rootInputsRegistry, loader: loader}
+	rootStatsRegistry *monitoring.Registry, // legacy monitoring.Default
+	loader *v2.Loader) cfgfile.RunnerFactory {
+	return &factory{
+		log:                log,
+		info:               info,
+		rootInputsRegistry: rootInputsRegistry,
+		rootStatsRegistry:  rootStatsRegistry,
+		loader:             loader,
+	}
 }
 
 func (f *factory) CheckConfig(cfg *conf.C) error {
@@ -122,6 +130,7 @@ func (f *factory) Create(
 		input:              input,
 		connector:          p,
 		rootInputsRegistry: f.rootInputsRegistry,
+		rootStatsRegistry:  f.rootStatsRegistry,
 	}, nil
 }
 
@@ -156,6 +165,7 @@ func (r *runner) Start() {
 			Cancelation:     r.sig,
 			StatusReporter:  r.statusReporter,
 			MetricsRegistry: reg,
+			StatsRegistry:   r.rootStatsRegistry, // it's the legacy monitoring.Default
 			Logger:          log,
 		}
 
