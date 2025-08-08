@@ -241,7 +241,7 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 		b.Cleanup(cancel)
 
 		go func() {
-			for sqsReader.metrics.sqsMessagesReceivedTotal.Get() < uint64(b.N) {
+			for sqsReader.metrics.sqsMessagesReceivedTotal.Get() < uint64(b.N) { //nolint:errcheck
 				time.Sleep(5 * time.Millisecond)
 			}
 			cancel()
@@ -268,7 +268,9 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 }
 
 func TestBenchmarkInputSQS(t *testing.T) {
-	err := logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
+	// TODO: remove linter skip and update logger when the new recommended loggers support setting log levels
+	// for now, we don't want debug logs coming through a benchmark test
+	err := logp.TestingSetup(logp.WithLevel(logp.InfoLevel)) //nolint:errcheck
 	require.NoError(t, err)
 
 	results := []testing.BenchmarkResult{
@@ -398,7 +400,9 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 }
 
 func TestBenchmarkInputS3(t *testing.T) {
-	err := logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
+	// TODO: remove linter skip and update logger when the new recommended loggers support setting log levels
+	// for now, we don't want debug logs coming through a benchmark test
+	err := logp.TestingSetup(logp.WithLevel(logp.InfoLevel)) //nolint:errcheck
 	require.NoError(t, err)
 
 	results := []testing.BenchmarkResult{
