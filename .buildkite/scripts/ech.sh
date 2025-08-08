@@ -6,8 +6,6 @@ function ech_up() {
   local WORKSPACE=$(git rev-parse --show-toplevel)
   local TF_DIR="${WORKSPACE}/testing/terraform-ech/"
   local STACK_VERSION=${1:?"Error: Specify stack version: ech_up [stack_version]"}
-  local ECH_REGION=${2:-"gcp-us-west2"}
-
 
   BUILDKITE_BUILD_CREATOR="${BUILDKITE_BUILD_CREATOR:-"$(get_git_user_email)"}"
   BUILDKITE_BUILD_NUMBER="${BUILDKITE_BUILD_NUMBER:-"0"}"
@@ -18,7 +16,6 @@ function ech_up() {
   terraform apply \
     -auto-approve \
     -var="stack_version=${STACK_VERSION}" \
-    -var="ech_region=${ECH_REGION}" \
     -var="creator=${BUILDKITE_BUILD_CREATOR}" \
     -var="buildkite_id=${BUILDKITE_BUILD_NUMBER}" \
     -var="pipeline=${BUILDKITE_PIPELINE_SLUG}"
