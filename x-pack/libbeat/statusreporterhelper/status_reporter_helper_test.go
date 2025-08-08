@@ -16,7 +16,7 @@ import (
 
 func TestConstructor(t *testing.T) {
 	t.Run("Nil context reporter results in reporter with debug reporter", func(t *testing.T) {
-		reporter := New(nil, logp.NewNopLogger())
+		reporter := New(nil, logp.NewNopLogger(), "test")
 		require.NotNil(t, reporter)
 
 		require.IsType(t, &StatusReporterHelper{}, reporter)
@@ -27,7 +27,7 @@ func TestConstructor(t *testing.T) {
 func TestReportingWithReporter(t *testing.T) {
 	mockReporter := &countedReporter{}
 	unusedLogger, unusedLoggerBuffer := logp.NewInMemoryLocal("not_used", logp.ConsoleEncoderConfig())
-	reporter := New(mockReporter, unusedLogger)
+	reporter := New(mockReporter, unusedLogger, "test")
 	require.IsType(t, &countedReporter{}, reporter.statusReporter)
 
 	// check initials
@@ -52,8 +52,8 @@ func TestReportingWithReporter(t *testing.T) {
 }
 
 func TestReportingWithLoggerPassthrough(t *testing.T) {
-	bufferedLogger, buff := logp.NewInMemoryLocal("not_used", logp.ConsoleEncoderConfig())
-	reporter := New(nil, bufferedLogger)
+	bufferedLogger, buff := logp.NewInMemoryLocal("in_memory_passthrough_logger", logp.ConsoleEncoderConfig())
+	reporter := New(nil, bufferedLogger, "test_passthrough_input_name")
 	require.IsType(t, &debugStatusReporter{}, reporter.statusReporter)
 
 	// check initial state
@@ -65,7 +65,9 @@ func TestReportingWithLoggerPassthrough(t *testing.T) {
 
 	// check for proxying only the necessary
 	require.Equal(t, status.Running, reporter.current)
-	require.Equal(t, 1, strings.Count(buff.String(), "some message"))
+	loggerOutput := buff.String()
+	require.Equal(t, 1, strings.Count(loggerOutput, "some message"))
+	require.Equal(t, 1, strings.Count(loggerOutput, "test_passthrough_input_name input status updated: status:"))
 
 	// check for change of status
 	reporter.UpdateStatus(status.Stopped, "")
