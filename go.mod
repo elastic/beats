@@ -238,6 +238,7 @@ require (
 )
 
 require (
+	go.opentelemetry.io/collector/client v1.36.0
 	go.opentelemetry.io/collector/pipeline v0.130.0
 	go.opentelemetry.io/collector/processor v1.36.0
 	go.opentelemetry.io/collector/processor/processorhelper v0.130.0
@@ -420,7 +421,6 @@ require (
 	go.elastic.co/fastjson v1.5.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
-	go.opentelemetry.io/collector/client v1.36.0 // indirect
 	go.opentelemetry.io/collector/component/componenttest v0.130.0 // indirect
 	go.opentelemetry.io/collector/config/configauth v0.130.0 // indirect
 	go.opentelemetry.io/collector/config/configcompression v1.36.0 // indirect
