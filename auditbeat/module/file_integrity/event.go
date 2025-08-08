@@ -59,6 +59,8 @@ const (
 	SourceFSNotify
 	// SourceEBPF identifies events triggered by an eBPF program.
 	SourceEBPF
+	// SourceETW identifies events triggered by ETW.
+	SourceETW
 	// SourceKProbes identifies events triggered by KProbes.
 	SourceKProbes
 )
@@ -67,6 +69,7 @@ var sourceNames = map[Source]string{
 	SourceScan:     "scan",
 	SourceFSNotify: "fsnotify",
 	SourceEBPF:     "ebpf",
+	SourceETW:      "etw",
 	SourceKProbes:  "kprobes",
 }
 
@@ -126,7 +129,7 @@ type Event struct {
 	Action        Action              `json:"action"`                 // Action (like created, updated).
 	Hashes        map[HashType]Digest `json:"hash,omitempty"`         // File hashes.
 	ParserResults mapstr.M            `json:"file,omitempty"`         // Results from running file parsers.
-	Process       *Process            `json:"process,omitempty"`      // Process data. Available only on Linux when using the eBPF backend.
+	Process       *Process            `json:"process,omitempty"`      // Process data. Available only on Linux when using the eBPF backend and on Windows when using ETW.
 	ContainerID   string              `json:"container_id,omitempty"` // Unique container ID. Available only on Linux when using the eBPF backend.
 
 	// Metadata
