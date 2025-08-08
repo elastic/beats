@@ -399,7 +399,6 @@ The following metricsets are available:
 * [state_cronjob](/reference/metricbeat/metricbeat-metricset-kubernetes-state_cronjob.md)
 * [state_daemonset](/reference/metricbeat/metricbeat-metricset-kubernetes-state_daemonset.md)
 * [state_deployment](/reference/metricbeat/metricbeat-metricset-kubernetes-state_deployment.md)
-* [state_horizontalpodautoscaler](/reference/metricbeat/metricbeat-metricset-kubernetes-state_horizontalpodautoscaler.md)  {applies_to}`stack: beta`
 * [state_job](/reference/metricbeat/metricbeat-metricset-kubernetes-state_job.md)
 * [state_node](/reference/metricbeat/metricbeat-metricset-kubernetes-state_node.md)
 * [state_persistentvolumeclaim](/reference/metricbeat/metricbeat-metricset-kubernetes-state_persistentvolumeclaim.md)
