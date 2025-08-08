@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// The statereporter package provides a helper for reporting component state.
+// It prevents sending duplicate status updates if the status has not changed.
+// It also falls back to standalone mode with debug logs.
 package statereporter
 
 import (
@@ -11,11 +14,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// EnhancedStatusReporter reports the state of a component via the status package,
-// with enhancements.
-// Enhancements:
-// - it disallows repeats of status updates unless there is a status change
-// - it also supports a built-in debug status reporter for standalone (Filebeat-only) mode
+// EnhancedStatusReporter helps to report the state of a component via the status package.
 type EnhancedStatusReporter struct {
 	current        status.Status
 	statusReporter status.StatusReporter
