@@ -145,6 +145,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Further rate limiting fix in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41977[41977]
 - Remove erroneous status reporting to Elastic-Agent from the Filestream input {pull}42435[42435]
 - Fix a panic in the winlog input that prevented it from starting. {issue}45693[45693] {pull}45730[45730]
+- Fix wrongly emitted missing input ID warning {issue}42969[42969] {pull}45747[45747]
+- Fix error handling in ABS input when both root level `max_workers` and `batch_size` are empty. {issue}45680[45680] {pull}45743[45743]
 
 *Heartbeat*
 
