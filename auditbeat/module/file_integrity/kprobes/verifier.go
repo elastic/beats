@@ -67,6 +67,7 @@ func getVerifiedProbes(ctx context.Context, timeout time.Duration) (map[tracing.
 			continue
 		}
 
+		fmt.Fprintf(os.Stdout, "Running verifier for probes: %#v\n", probes)
 		if err := verify(ctx, fExec, probes, timeout); err != nil {
 			if probeMgr.onErr(err) {
 				continue
@@ -94,12 +95,6 @@ func loadAllSpecs() ([]*tkbtf.Spec, error) {
 	} else {
 		specs = append(specs, spec)
 	}
-
-//	embeddedSpecs, err := loadEmbeddedSpecs()
-//	if err != nil {
-//		return nil, err
-//	}
-//	specs = append(specs, embeddedSpecs...)
 	return specs, nil
 }
 
