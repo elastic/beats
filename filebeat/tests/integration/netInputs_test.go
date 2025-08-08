@@ -22,14 +22,12 @@ package integration
 import (
 	_ "embed"
 	"fmt"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/filebeat/input/net/nettest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
@@ -77,7 +75,7 @@ func TestNetInputs(t *testing.T) {
 
 			tc.runClientFn(t, addr, tc.data)
 
-			WaitPublishedEvents(t, filebeat, 3*time.Second, len(tc.data))
+			filebeat.WaitPublishedEvents(t, 3*time.Second, len(tc.data))
 			filebeat.Stop()
 			filebeat.WaitForLogsAnyOrder(
 				[]string{
@@ -211,20 +209,4 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 			)
 		})
 	}
-}
-
-// WaitPublishedEvents waits until the desired number of events
-// have been published. It assumes the file output is used, the filename
-// for the output is 'output' and 'path' is set to the TempDir.
-func WaitPublishedEvents(t *testing.T, filebeat *integration.BeatProc, timeout time.Duration, events int) {
-	t.Helper()
-
-	msg := strings.Builder{}
-	path := filepath.Join(filebeat.TempDir(), "output-*.ndjson")
-	assert.Eventually(t, func() bool {
-		got := filebeat.CountFileLines(path)
-		msg.Reset()
-		fmt.Fprintf(&msg, "expecting %d events, got %d", events, got)
-		return got == events
-	}, timeout, 200*time.Millisecond, &msg)
 }

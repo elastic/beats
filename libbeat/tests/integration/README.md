@@ -51,6 +51,7 @@ These methods always read from the beginning of logs:
 + ~WaitFileContains~: Waits for a file to contain a specific string.
 + ~WaitStdErrContains~: Waits for stderr to contain a specific string.
 + ~WaitStdOutContains~: Waits for stdout to contain a specific string.
++ ~WaitPublishedEvents~ - Waits until the desired number of events have been published to the file output.
 + ~CountFileLines~: Counts the number of lines in files matching a glob pattern.
 + ~RemoveLogFiles~: Removes log files and resets the tracked offsets.
 

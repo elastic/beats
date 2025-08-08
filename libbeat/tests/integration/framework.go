@@ -1307,3 +1307,19 @@ func GetEventsFromFileOutput[E any](t *testing.T, dir string, n int) []E {
 
 	return events
 }
+
+// WaitPublishedEvents waits until the desired number of events
+// have been published. It assumes the file output is used, the filename
+// for the output is 'output' and 'path' is set to the TempDir.
+func (b *BeatProc) WaitPublishedEvents(t *testing.T, timeout time.Duration, events int) {
+	t.Helper()
+
+	msg := strings.Builder{}
+	path := filepath.Join(b.TempDir(), "output-*.ndjson")
+	assert.Eventually(t, func() bool {
+		got := b.CountFileLines(path)
+		msg.Reset()
+		fmt.Fprintf(&msg, "expecting %d events, got %d", events, got)
+		return got == events
+	}, timeout, 200*time.Millisecond, &msg)
+}
