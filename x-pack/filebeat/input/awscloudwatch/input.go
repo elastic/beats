@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/x-pack/libbeat/statereporter"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
@@ -64,7 +65,7 @@ type cloudwatchInput struct {
 	awsConfig awssdk.Config
 	store     statestore.States
 	metrics   *inputMetrics
-	status    status.StatusReporter
+	status    *statereporter.StateReporter
 }
 
 func newInput(config config, store statestore.States, logger *logp.Logger) (*cloudwatchInput, error) {
@@ -94,7 +95,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	log := inputContext.Logger
 
 	// setup status reporter
-	in.status = newCWStateReporter(inputContext, log)
+	in.status = statereporter.New(inputContext.StatusReporter, log)
 
 	defer in.status.UpdateStatus(status.Stopped, "")
 	in.status.UpdateStatus(status.Starting, "Input starting")
