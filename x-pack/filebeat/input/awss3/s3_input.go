@@ -70,7 +70,7 @@ func (in *s3PollerInput) Run(
 
 	in.log = inputContext.Logger.Named("s3")
 
-	in.status = statusreporterhelper.New(inputContext.StatusReporter, in.log)
+	in.status = statusreporterhelper.New(inputContext.StatusReporter, in.log, "S3")
 	defer in.status.UpdateStatus(status.Stopped, "")
 	in.status.UpdateStatus(status.Starting, "Input starting")
 
