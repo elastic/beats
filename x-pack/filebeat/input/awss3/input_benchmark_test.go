@@ -360,6 +360,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 					states:          states,
 					provider:        "provider",
 					filterProvider:  newFilterProvider(&config),
+					status:          &mockStatusReporter{},
 				}
 
 				s3Poller.run(ctx)
