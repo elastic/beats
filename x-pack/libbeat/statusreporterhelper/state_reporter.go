@@ -5,7 +5,7 @@
 // The statereporter package provides a helper for reporting component state.
 // It prevents sending duplicate status updates if the status has not changed.
 // It also falls back to standalone mode with debug logs.
-package statereporter
+package statusreporterhelper
 
 import (
 	"sync"
@@ -14,8 +14,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// EnhancedStatusReporter helps to report the state of a component via the status package.
-type EnhancedStatusReporter struct {
+// StatusReporterHelper helps to report the state of a component via the status package.
+type StatusReporterHelper struct {
 	current        status.Status
 	statusReporter status.StatusReporter
 
@@ -23,8 +23,8 @@ type EnhancedStatusReporter struct {
 }
 
 // New create a new StateReporter.
-func New(statusReporter status.StatusReporter, log *logp.Logger) *EnhancedStatusReporter {
-	rep := &EnhancedStatusReporter{
+func New(statusReporter status.StatusReporter, log *logp.Logger) *StatusReporterHelper {
+	rep := &StatusReporterHelper{
 		current:        status.Unknown,
 		statusReporter: &debugStatusReporter{log: log},
 	}
@@ -37,7 +37,7 @@ func New(statusReporter status.StatusReporter, log *logp.Logger) *EnhancedStatus
 }
 
 // UpdateStatus updates the status of the component.
-func (c *EnhancedStatusReporter) UpdateStatus(status status.Status, msg string) {
+func (c *StatusReporterHelper) UpdateStatus(status status.Status, msg string) {
 	c.sync.Lock()
 	defer c.sync.Unlock()
 
