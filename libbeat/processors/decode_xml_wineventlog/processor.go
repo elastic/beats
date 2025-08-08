@@ -79,7 +79,7 @@ func New(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 }
 
 func newProcessor(config config, log *logp.Logger) (beat.Processor, error) {
-	cfgwarn.Experimental("The " + procName + " processor is experimental.")
+	log.Warn(cfgwarn.Experimental("The " + procName + " processor is experimental."))
 
 	return &processor{
 		config:  config,

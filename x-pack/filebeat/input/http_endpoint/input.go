@@ -53,16 +53,16 @@ type httpEndpoint struct {
 	tlsConfig *tls.Config
 }
 
-func Plugin() v2.Plugin {
+func Plugin(log *logp.Logger) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Stable,
 		Deprecated: false,
-		Manager:    v2.ConfigureWith(configure),
+		Manager:    v2.ConfigureWith(configure, log),
 	}
 }
 
-func configure(cfg *conf.C) (v2.Input, error) {
+func configure(cfg *conf.C, _ *logp.Logger) (v2.Input, error) {
 	conf := defaultConfig()
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, err

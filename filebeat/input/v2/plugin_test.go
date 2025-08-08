@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestPlugin_Validate(t *testing.T) {
@@ -36,7 +37,7 @@ func TestPlugin_Validate(t *testing.T) {
 				Deprecated: false,
 				Info:       "test",
 				Doc:        "doc string",
-				Manager:    ConfigureWith(nil),
+				Manager:    ConfigureWith(nil, logp.NewNopLogger()),
 			},
 		},
 		"missing name": {
@@ -46,7 +47,7 @@ func TestPlugin_Validate(t *testing.T) {
 				Deprecated: false,
 				Info:       "test",
 				Doc:        "doc string",
-				Manager:    ConfigureWith(nil),
+				Manager:    ConfigureWith(nil, logp.NewNopLogger()),
 			},
 		},
 		"invalid stability": {
@@ -56,7 +57,7 @@ func TestPlugin_Validate(t *testing.T) {
 				Deprecated: false,
 				Info:       "test",
 				Doc:        "doc string",
-				Manager:    ConfigureWith(nil),
+				Manager:    ConfigureWith(nil, logp.NewNopLogger()),
 			},
 		},
 		"missing manager": {

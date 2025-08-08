@@ -58,9 +58,9 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 }
 
 func newRegisteredDomain(c config, logger *logp.Logger) (*processor, error) {
-	cfgwarn.Beta("The " + procName + " processor is beta.")
-
 	log := logger.Named(logName)
+	logger.Warn(cfgwarn.Beta("The " + procName + " processor is beta."))
+
 	if c.ID != "" {
 		log = log.With("instance_id", c.ID)
 	}

@@ -41,10 +41,10 @@ type LightModulesSource struct {
 }
 
 // NewLightModulesSource creates a new LightModulesSource
-func NewLightModulesSource(paths ...string) *LightModulesSource {
+func NewLightModulesSource(logger *logp.Logger, paths ...string) *LightModulesSource {
 	return &LightModulesSource{
 		paths: paths,
-		log:   logp.NewLogger("registry.lightmodules"),
+		log:   logger.Named("registry.lightmodules"),
 	}
 }
 
