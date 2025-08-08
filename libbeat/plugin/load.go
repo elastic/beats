@@ -42,7 +42,7 @@ func loadPlugins(path string) error {
 
 	bundle := *ptr
 	for name, plugins := range bundle {
-		loader := registry[name]
+		loader := GetLoader(name)
 		if loader == nil {
 			continue
 		}

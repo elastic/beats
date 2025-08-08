@@ -388,7 +388,7 @@ func makeESClient(ctx context.Context, cfg *conf.C, attempts int, wait time.Dura
 
 func HeartbeatAutodiscoverSetup(reg *autodiscover.Registry) error {
 	if err := initialization.Setup(reg); err != nil {
-		return fmt.Errorf("filebeat autodiscover initialization error: %w", err)
+		return fmt.Errorf("heartbeat autodiscover initialization error: %w", err)
 	}
 	if err := hints.Setup(reg); err != nil {
 		return fmt.Errorf("heartbeat hints autodiscover initialization error: %w", err)

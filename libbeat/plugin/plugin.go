@@ -17,19 +17,23 @@
 
 package plugin
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
-type PluginLoader func(p interface{}) error
+type PluginLoader func(p any) error
 
 var (
 	registry                   = map[string]PluginLoader{}
 	ErrLoaderAlreadyRegistered = fmt.Errorf("already registered")
+	m                          sync.Mutex
 )
 
 func Bundle(
-	bundles ...map[string][]interface{},
-) map[string][]interface{} {
-	ret := map[string][]interface{}{}
+	bundles ...map[string][]any,
+) map[string][]any {
+	ret := map[string][]any{}
 
 	for _, bundle := range bundles {
 		for name, plugins := range bundle {
@@ -40,8 +44,8 @@ func Bundle(
 	return ret
 }
 
-func MakePlugin(key string, ifc interface{}) map[string][]interface{} {
-	return map[string][]interface{}{
+func MakePlugin(key string, ifc any) map[string][]any {
+	return map[string][]any{
 		key: {ifc},
 	}
 }
@@ -54,6 +58,8 @@ func MustRegisterLoader(name string, l PluginLoader) {
 }
 
 func RegisterLoader(name string, l PluginLoader) error {
+	m.Lock()
+	defer m.Unlock()
 	if l := registry[name]; l != nil {
 		return fmt.Errorf("plugin loader '%v' %w", name, ErrLoaderAlreadyRegistered)
 	}
@@ -65,4 +71,10 @@ func RegisterLoader(name string, l PluginLoader) error {
 func LoadPlugins(path string) error {
 	// TODO: add flag to enable/disable plugins?
 	return loadPlugins(path)
+}
+
+func GetLoader(name string) PluginLoader {
+	m.Lock()
+	defer m.Unlock()
+	return registry[name]
 }
