@@ -38,8 +38,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
-- Improve error messages in AWS Health {pull}45408[45408]
-- Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
 
 *Osquerybeat*
 
@@ -115,7 +113,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
 - Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
 - Fix a bug in Salesforce input to only handle responses with 200 status code {pull}41015[41015]
-- Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
 
 *Heartbeat*
 
@@ -221,7 +218,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add CSV decoding capacity to azureblobstorage input {pull}40978[40978]
 - Jounrald input now supports filtering by facilities {pull}41061[41061]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
-- Update CEL mito extensions to v1.19.0. {pull}44098[44098]
 
 *Auditbeat*
 
@@ -315,6 +311,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
