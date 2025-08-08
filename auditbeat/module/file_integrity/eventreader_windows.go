@@ -15,18 +15,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build freebsd || openbsd || netbsd
+//go:build windows
 
 package file_integrity
 
 import (
+	"errors"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func NewEventReader(c Config, logger *logp.Logger) (EventProducer, error) {
-	return &fsNotifyReader{
-		config:  c,
-		log:     logger.Named("fsnotify"),
-		parsers: FileParsers(c),
-	}, nil
+	if c.Backend == BackendAuto || c.Backend == BackendFSNotify || c.Backend == "" {
+		// Auto and unset defaults to fsnotify
+		l := logger.Named("fsnotify")
+		l.Info("selected backend: fsnotify")
+		return &fsNotifyReader{
+			config:  c,
+			log:     l,
+			parsers: FileParsers(c),
+		}, nil
+	}
+
+	if c.Backend == BackendETW {
+		l := logger.Named("etw")
+		l.Info("selected backend: etw")
+		return newETWReader(c, l)
+	}
+
+	// unimplemented
+	return nil, errors.ErrUnsupported
 }
