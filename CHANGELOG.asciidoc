@@ -3,6 +3,166 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.18.5]]
+=== Beats version 8.18.5
+https://github.com/elastic/beats/compare/v8.18.4\...v8.18.5[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Improve error messages in AWS Health {pull}45408[45408]
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
+
+*Osquerybeat*
+
+
+
+*Packetbeat*
+
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+- auditd: Request status from a separate socket to avoid data congestion {pull}41207[41207]
+- hasher: Add a cached hasher for upcoming backend. {pull}41952[41952]
+- Fix potential data loss in add_session_metadata. {pull}42795[42795]
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Auditbeat*
+
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Auditbeat*
+
+
+*Libbeat*
+
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+
+*Functionbeat*
+
+*Elastic Log Driver*
+*Elastic Logging Plugin*
+
+
+==== Deprecated
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Known Issues
+
+
+
+
+
 [[release-notes-8.18.4]]
 === Beats version 8.18.4
 https://github.com/elastic/beats/compare/v8.18.3\...v8.18.4[View commits]
