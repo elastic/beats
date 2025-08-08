@@ -10,12 +10,19 @@
         "period": 10000
     },
     "openmetrics": {
+        "help": "Total number of connections closed that were made to the listener of a given name.",
         "labels": {
             "job": "openmetrics"
         },
         "metrics": {
+<<<<<<< HEAD
             "up": 1
         }
+=======
+            "net_conntrack_listener_conn_closed_total": 0
+        },
+        "type": "counter"
+>>>>>>> d24319456 (Bump prometheus/prometheus to 0.305.0 (#45667))
     },
     "service": {
         "address": "127.0.0.1:55555",
