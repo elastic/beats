@@ -12,24 +12,24 @@ S3 fields from s3 input.
 **`bucket.name`**
 :   Name of the S3 bucket that this log retrieved from.
 
-type: keyword
+    type: keyword
 
 
 **`bucket.arn`**
 :   ARN of the S3 bucket that this log retrieved from.
 
-type: keyword
+    type: keyword
 
 
 **`object.key`**
 :   Name of the S3 object that this log retrieved from.
 
-type: keyword
+    type: keyword
 
 
 **`metadata`**
 :   AWS S3 object metadata values.
 
-type: flattened
+    type: flattened
 
 

@@ -20,13 +20,13 @@ HTTP request
 **`http.request.headers`**
 :   A map containing the captured header fields from the request. Which headers to capture is configurable. If headers with the same header name are present in the message, they will be separated by commas.
 
-type: object
+    type: object
 
 
 **`http.request.params`**
 :   type: alias
 
-alias to: url.query
+    alias to: url.query
 
 
 ## response [_response]
@@ -36,24 +36,24 @@ HTTP response
 **`http.response.status_phrase`**
 :   The HTTP status phrase.
 
-example: Not Found
+    example: Not Found
 
 
 **`http.response.headers`**
 :   A map containing the captured header fields from the response. Which headers to capture is configurable. If headers with the same header name are present in the message, they will be separated by commas.
 
-type: object
+    type: object
 
 
 **`http.response.code`**
 :   type: alias
 
-alias to: http.response.status_code
+    alias to: http.response.status_code
 
 
 **`http.response.phrase`**
 :   type: alias
 
-alias to: http.response.status_phrase
+    alias to: http.response.status_phrase
 
 

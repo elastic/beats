@@ -135,6 +135,7 @@ https://github.com/elastic/beats/compare/v9.0.0-beta1\...v9.0.0-rc1[View commits
 
 - Add AWS OwningAccount support for cross account monitoring. {issue}40570[40570] {pull}40691[40691]
 - Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
+- Fix linux/pageinfo module mapping {pull}45425[45425]
 
 *Winlogbeat*
 
