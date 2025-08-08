@@ -313,12 +313,23 @@ func (dfs *TraceFS) LoadProbeFormat(probe Probe) (format ProbeFormat, err error)
 							isDataLoc = true
 						default:
 							if typeIdx != -1 {
-								return format, fmt.Errorf("bad format for kprobe '%s': unknown parameter=`%s` in type=`%s`", probe.String(), part, value)
+								// For debugging, do not commit
+								debugFile, err := os.ReadFile(path)
+								if err != nil {
+									fmt.Fprintf(os.Stdout, "failed to read format file %s: %v\n", path, err)
+								}
+								fmt.Fprintf(os.Stdout, "contents of failed format file are:\n %s \n", debugFile)
+								return format, fmt.Errorf("bad format for kprobe '%s': unknown parameter=`%s` in type=`%s` in format file %s", probe.String(), part, value, path)
 							}
 							typeIdx = idx
 						}
 					}
 					if typeIdx == -1 {
+						debugFile, err := os.ReadFile(path)
+						if err != nil {
+							fmt.Fprintf(os.Stdout, "failed to read format file %s: %v\n", path, err)
+						}
+						fmt.Fprintf(os.Stdout, "contents of failed format file are:\n %s \n", debugFile)
 						return format, fmt.Errorf("bad format for kprobe '%s': type not found in `%s`", probe.String(), value)
 					}
 					intLen, isInt := integerTypes[fparts[typeIdx]]

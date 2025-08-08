@@ -23,6 +23,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"sync/atomic"
 	"time"
 
@@ -49,8 +50,10 @@ func newMonitorEmitter(ctx context.Context, eventC chan MonitorEvent) *monitorEm
 }
 
 func (m *monitorEmitter) Emit(ePath string, pid uint32, op uint32) error {
+	fmt.Fprintf(os.Stdout, "Got monitor event: %v\n", ePath)
 	select {
 	case <-m.ctx.Done():
+		fmt.Fprintf(os.Stdout, "got context done while trying to create event for %s\n", ePath)
 		return m.ctx.Err()
 
 	case m.eventC <- MonitorEvent{
@@ -76,9 +79,7 @@ type Monitor struct {
 	closeErr    error
 }
 
-func New(isRecursive bool) (*Monitor, error) {
-	ctx := context.TODO()
-
+func NewWithContext(ctx context.Context, isRecursive bool) (*Monitor, error) {
 	validatedProbes, exec, err := getVerifiedProbes(ctx, 5*time.Second)
 	if err != nil {
 		return nil, err
@@ -86,7 +87,23 @@ func New(isRecursive bool) (*Monitor, error) {
 
 	pChannel, err := newPerfChannel(validatedProbes, 10, 4096, perf.AllThreads)
 	if err != nil {
+		return nil, fmt.Errorf("error creating perf channel in NewWithContext(): %w", err)
+	}
+
+	return newMonitor(ctx, isRecursive, pChannel, exec)
+}
+
+func New(isRecursive bool) (*Monitor, error) {
+	ctx := context.TODO()
+
+	validatedProbes, exec, err := getVerifiedProbes(ctx, 25*time.Second)
+	if err != nil {
 		return nil, err
+	}
+
+	pChannel, err := newPerfChannel(validatedProbes, 10, 4096, perf.AllThreads)
+	if err != nil {
+		return nil, fmt.Errorf("error creating perf channel in New(): %w", err)
 	}
 
 	return newMonitor(ctx, isRecursive, pChannel, exec)
@@ -178,44 +195,52 @@ func (w *Monitor) Start() error {
 	go func() {
 		defer func() {
 			close(w.eventC)
+			fmt.Fprintf(os.Stdout, "Monitor event channel closing\n")
 			if closeErr := w.Close(); closeErr != nil {
 				w.log.Warnf("error at closing watcher: %v", closeErr)
 			}
 		}()
-
+		fmt.Fprintf(os.Stdout, "Monitor starting\n")
 		for {
 			select {
 			case <-w.ctx.Done():
+				fmt.Fprintf(os.Stdout, "perf monitor channel got context done\n")
 				return
 
 			case e, ok := <-w.perfChannel.C():
 				if !ok {
+					fmt.Fprintf(os.Stdout, "perf channel in monitor is closed\n")
 					w.writeErr(fmt.Errorf("read invalid event from perf channel"))
 					return
 				}
-
+				fmt.Fprintf(os.Stdout, "monitor got event: %#v\n", e)
 				switch eWithType := e.(type) {
 				case *ProbeEvent:
 					if err := w.eProc.process(w.ctx, eWithType); err != nil {
-						w.writeErr(err)
+						fmt.Fprintf(os.Stdout, "error processing event in Monitor: %s\n", err)
+						w.writeErr(fmt.Errorf("error processing event in Monitor: %w", err))
 						return
 					}
 					continue
 				default:
+					fmt.Fprintf(os.Stdout, "unexpected event type: %#v\n", e)
 					w.writeErr(errors.New("unexpected event type"))
 					return
 				}
 
 			case err := <-w.perfChannel.ErrC():
-				w.writeErr(err)
+				fmt.Fprintf(os.Stdout, "perf channel error in monitor: %s\n", err)
+				w.writeErr(fmt.Errorf("perf channel error in Monitor: %w", err))
 				return
 
 			case lost := <-w.perfChannel.LostC():
+				fmt.Fprintf(os.Stdout, "events lost: %v\n", lost)
 				w.writeErr(fmt.Errorf("events lost %d", lost))
 				return
 
 			case err := <-w.pathMonitor.ErrC():
-				w.writeErr(err)
+				fmt.Fprintf(os.Stdout, "path error in monitor: %s\n", err)
+				w.writeErr(fmt.Errorf("path error in Monitor: %w", err))
 				return
 			}
 		}

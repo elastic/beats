@@ -20,6 +20,8 @@
 package kprobes
 
 import (
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
@@ -48,24 +50,25 @@ func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponen
 		tracing.WithWakeUpEvents(500),
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating new perf channel: %w", err)
 	}
 
 	for probe, allocFn := range probes {
 		_ = tfs.RemoveKProbe(probe)
 
+		fmt.Fprintf(os.Stdout, "Adding probe: %s at address %s\n", probe.Name, probe.Address)
 		err := tfs.AddKProbe(probe)
 		if err != nil {
 			return nil, err
 		}
 		desc, err := tfs.LoadProbeFormat(probe)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error loading probe format file for %s: %w", probe.Name, err)
 		}
 
 		decoder, err := tracing.NewStructDecoder(desc, allocFn)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error creating struct decoder for %s (%s): %w", probe.Name, probe.Address, err)
 		}
 
 		if err := pChannel.MonitorProbe(desc, decoder); err != nil {

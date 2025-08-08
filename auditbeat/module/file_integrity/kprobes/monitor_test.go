@@ -353,7 +353,7 @@ func (p *monitorTestSuite) TestRunNoError() {
 	exec := newFixedThreadExecutor(ctx)
 	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
 	p.Require().NoError(err)
-	m.eProc.d.Add(&dEntry{
+	m.eProc.entryCache.Add(&dEntry{
 		Parent:   nil,
 		Depth:    0,
 		Children: nil,
@@ -427,8 +427,8 @@ func (p *monitorTestSuite) TestRunEmitError() {
 	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
 	p.Require().NoError(err)
 
-	m.eProc.e = mockEmitter
-	m.eProc.d.Add(&dEntry{
+	m.eProc.emitter = mockEmitter
+	m.eProc.entryCache.Add(&dEntry{
 		Parent:   nil,
 		Depth:    0,
 		Children: nil,
@@ -484,7 +484,9 @@ func (p *monitorTestSuite) TestNew() {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
-	m, err := New(true)
+	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
+	defer cancel()
+	monitorHandle, err := NewWithContext(ctx, true)
 	p.Require().NoError(err)
 
 	tmpDir, err := os.MkdirTemp("", "kprobe_bench_test")
@@ -495,7 +497,7 @@ func (p *monitorTestSuite) TestNew() {
 	cancelChan := make(chan struct{})
 
 	targetFile := filepath.Join(tmpDir, "file_kprobes.txt")
-	tid := uint32(unix.Gettid())
+	tid := uint32(unix.Gettid()) //nolint:gosec // This is a test.
 
 	expectedEvents := []MonitorEvent{
 		{
@@ -535,13 +537,13 @@ func (p *monitorTestSuite) TestNew() {
 		defer close(errChan)
 		for {
 			select {
-			case mErr := <-m.ErrorChannel():
+			case mErr := <-monitorHandle.ErrorChannel():
 				select {
 				case errChan <- mErr:
 				case <-cancelChan:
 					return
 				}
-			case e, ok := <-m.EventChannel():
+			case e, ok := <-monitorHandle.EventChannel():
 				if !ok {
 					select {
 					case errChan <- errors.New("closed event channel"):
@@ -557,8 +559,8 @@ func (p *monitorTestSuite) TestNew() {
 		}
 	}()
 
-	p.Require().NoError(m.Start())
-	p.Require().NoError(m.Add(tmpDir))
+	p.Require().NoError(monitorHandle.Start())
+	p.Require().NoError(monitorHandle.Add(tmpDir))
 
 	p.Require().NoError(os.WriteFile(targetFile, []byte("hello world!"), 0o644))
 	p.Require().NoError(os.Chmod(targetFile, 0o777))
@@ -676,7 +678,7 @@ func BenchmarkMonitor(b *testing.B) {
 	//   running "find . | wc -l"
 	// so the dcache entry should contain 1 (tmpDir) + 1 (linux-6.6.7.tar.xz archive)
 	//   + 87082 (folder + archive contents) dentries
-	require.Len(b, m.eProc.d.index, 87082+2)
+	require.Len(b, m.eProc.entryCache.index, 87082+2)
 
 	b.Logf("processed %d events", seenEvents)
 }

@@ -24,6 +24,7 @@ import (
 	"context"
 	"embed"
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"strings"
@@ -51,6 +52,7 @@ func getVerifiedProbes(ctx context.Context, timeout time.Duration) (map[tracing.
 	}
 
 	var allErr error
+	fmt.Fprintf(os.Stdout, "Loaded %d specs\n", len(specs))
 	for len(specs) > 0 {
 
 		s := specs[0]
@@ -61,16 +63,22 @@ func getVerifiedProbes(ctx context.Context, timeout time.Duration) (map[tracing.
 
 		probes, err := probeMgr.build(s)
 		if err != nil {
-			allErr = errors.Join(allErr, err)
+			allErr = errors.Join(allErr, fmt.Errorf("error building probe: %w", err))
 			specs = specs[1:]
 			continue
 		}
 
+		var keys []string
+		for probe := range probes {
+			keys = append(keys, probe.Name)
+		}
+
+		fmt.Fprintf(os.Stdout, "\n==============================\nRunning verifier for probes: %#v\n", keys)
 		if err := verify(ctx, fExec, probes, timeout); err != nil {
 			if probeMgr.onErr(err) {
 				continue
 			}
-			allErr = errors.Join(allErr, err)
+			allErr = errors.Join(allErr, fmt.Errorf("error verifying probes: %w", err))
 			specs = specs[1:]
 			continue
 		}
@@ -93,12 +101,6 @@ func loadAllSpecs() ([]*tkbtf.Spec, error) {
 	} else {
 		specs = append(specs, spec)
 	}
-
-	embeddedSpecs, err := loadEmbeddedSpecs()
-	if err != nil {
-		return nil, err
-	}
-	specs = append(specs, embeddedSpecs...)
 	return specs, nil
 }
 
@@ -148,18 +150,18 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 
 	pChannel, err := newPerfChannel(probes, 4, 512, exec.GetTID())
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating perf channel in verify(): %w", err)
 	}
 
-	m, err := newMonitor(ctx, true, pChannel, exec)
+	monitorHandle, err := newMonitor(ctx, true, pChannel, exec)
 	if err != nil {
 		return err
 	}
 
-	defer m.Close()
+	defer monitorHandle.Close()
 
 	// start the monitor
-	if err := m.Start(); err != nil {
+	if err := monitorHandle.Start(); err != nil {
 		return err
 	}
 
@@ -173,22 +175,26 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 		defer close(retC)
 		for {
 			select {
-			case runErr := <-m.ErrorChannel():
+			case runErr := <-monitorHandle.ErrorChannel():
+				fmt.Fprintf(os.Stdout, "Received error: %+v\n", runErr)
 				retC <- runErr
 				return
 
-			case ev, ok := <-m.EventChannel():
+			case ev, ok := <-monitorHandle.EventChannel():
+				fmt.Fprintf(os.Stdout, "Received event: %+v\n", ev)
 				if !ok {
 					retC <- errors.New("monitor closed unexpectedly")
 					return
 				}
 
 				if err := verifier.validateEvent(ev.Path, ev.PID, ev.Op); err != nil {
+					fmt.Fprintf(os.Stdout, "error validating event with path %s, pid %d, op %d: %v", ev.Path, ev.PID, ev.Op, err)
 					retC <- err
 					return
 				}
 				continue
 			case <-time.After(timeout):
+				fmt.Fprintf(os.Stdout, "verify() listener channel has timed out\n")
 				return
 			case <-cancel:
 				return
@@ -197,13 +203,13 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 	}()
 
 	// add verify base path to monitor
-	if err := m.Add(basePath); err != nil {
+	if err := monitorHandle.Add(basePath); err != nil {
 		return err
 	}
 
 	// invoke verifier event generation from our executor
 	if err := exec.Run(verifier.GenerateEvents); err != nil {
-		return err
+		return fmt.Errorf("error invoking verifier: %w", err)
 	}
 
 	// wait for either no new events arriving for timeout duration or
@@ -211,7 +217,7 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 	select {
 	case err = <-retC:
 		if err != nil {
-			return err
+			return fmt.Errorf("got error from verifier: %w", err)
 		}
 	case <-ctx.Done():
 		return ctx.Err()
@@ -219,7 +225,7 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 
 	// check that all events have been verified
 	if err := verifier.Verified(); err != nil {
-		return err
+		return fmt.Errorf("failed to verify all events: %w", err)
 	}
 
 	return nil

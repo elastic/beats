@@ -263,12 +263,12 @@ steps:
 
   - group: "Extended Tests"
     key: "auditbeat-extended-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" ||  build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm|integrations).*/
+    #if: build.env("BUILDKITE_PULL_REQUEST") == "false" ||  build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm|integrations).*/
 
     steps:
       - label: ":ubuntu: Auditbeat: Ubuntu x86_64 Integration Tests -- {{matrix.image}}"
         key: "auditbeat-extended-integ-tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
+        #if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
           set -euo pipefail
           cd auditbeat
