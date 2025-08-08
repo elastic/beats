@@ -195,11 +195,12 @@ func (w *Monitor) Start() error {
 	go func() {
 		defer func() {
 			close(w.eventC)
+			fmt.Fprintf(os.Stdout, "Monitor event channel closing\n")
 			if closeErr := w.Close(); closeErr != nil {
 				w.log.Warnf("error at closing watcher: %v", closeErr)
 			}
 		}()
-
+		fmt.Fprintf(os.Stdout, "Monitor starting\n")
 		for {
 			select {
 			case <-w.ctx.Done():
