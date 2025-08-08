@@ -8,12 +8,13 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/otelbeat"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/collector/confmap"
 	"gopkg.in/yaml.v3"
+
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/otelbeat"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
 )
 
 func OTelInspectComand(beatname string) *cobra.Command {
