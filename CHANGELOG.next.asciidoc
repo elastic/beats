@@ -271,6 +271,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Packetbeat*
+- Optionally ignore MAC address in flow matching {pull}44965[44965]
+- Add `tls.server.ja3s` tls fingerprint {pull}43284[43284]
 
 *Winlogbeat*
 
