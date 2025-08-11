@@ -112,6 +112,7 @@ class Test(BaseTest):
         assert int(event["process.user.id"]) == os.geteuid()
         assert event["process.user.name"] == pwd.getpwuid(os.geteuid()).pw_name
         assert int(event["process.group.id"]) == os.getegid()
+
     @unittest.skipIf(True, 'Flaky test: https://github.com/elastic/beats/issues/45897')
     def _test_non_recursive(self, backend):
         """
@@ -200,6 +201,7 @@ class Test(BaseTest):
     @unittest.skipUnless(is_root(), "Requires root")
     def test_non_recursive__kprobes(self):
         self._test_non_recursive("kprobes")
+
     @unittest.skipIf(True, 'Flaky test: https://github.com/elastic/beats/issues/45897')
     def _test_recursive(self, backend):
         """
