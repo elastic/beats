@@ -162,5 +162,7 @@ me1zqwZ6EX7XHaa6j1mx9tcX
 -----END RSA PRIVATE KEY-----
 `,
 		"cipher_suites": []string{"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"},
+		"min_version":   "1.2",
+		"max_version":   "1.3",
 	}, got, "beats to otel ssl mapping")
 }
