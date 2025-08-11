@@ -68,6 +68,7 @@ linters:
         - github.com/apoydence/eachers
         - github.com/dop251/goja
         - github.com/dop251/goja_nodejs
+        - github.com/elastic/go-quark
         - github.com/fsnotify/fsevents
         - github.com/fsnotify/fsnotify
         - github.com/google/gopacket
