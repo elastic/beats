@@ -1,6 +1,6 @@
 FROM docker.elastic.co/observability/stream:v0.6.1
 
-RUN sed -i 's/stable/bullseye/g' /etc/apt/sources.list \
+RUN sed -i 's/stable/bullseye/g' /etc/apt/sources.list && \
     apt update && \
     apt -y install curl
 ENV PORT="8080"
