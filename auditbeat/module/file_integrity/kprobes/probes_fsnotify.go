@@ -74,9 +74,9 @@ func (f *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, e
 		// for linux kernel versions linux 5.17+, thus we start from here. To see how we handle all
 		// linux kernels filter variation check OnErr() method.
 		f.seenSpecs[spec] = struct{}{}
-		f.pathProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==1"
-		f.inodeProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==2 && nptr!=0"
-		f.dentryProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==3"
+		f.pathProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==2"
+		f.inodeProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==3 && nptr!=0"
+		f.dentryProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==4"
 	}
 
 	pathProbe := tkbtf.NewKProbe().SetRef("fsnotify_path").AddFetchArgs(
