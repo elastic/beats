@@ -264,6 +264,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed issue for "Root level readerConfig no longer respected" in azureblobstorage input. {issue}44812[44812] {pull}44873[44873]
 - Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
 - Fix a panic in the winlog input that prevented it from starting. {issue}45693[45693] {pull}45730[45730]
+- Fix wrongly emitted missing input ID warning {issue}42969[42969] {pull}45747[45747]
 - Fix error handling in ABS input when both root level `max_workers` and `batch_size` are empty. {issue}45680[45680] {pull}45743[45743]
 
 *Heartbeat*
@@ -295,6 +296,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group. {pull}44576[44576]
 - Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
 - Fix histogram values of zero are filtered out on non-amd64 platforms for openmetrics and prometheus {pull}44750[44750]
+- Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. {pull}45761[45761]
 - Enhance behavior of sanitizeError: replace sensitive info even if it is escaped {pull}45857[45857]
 
 *Osquerybeat*
@@ -490,6 +492,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add Fleet status updating to o356audit input. {issue}44651[44651] {pull}44957[44957]
 - Add support for blob filtering using path_prefix in azureblobstorage input. {issue}35186[35186] {pull}45214[45214]
 - Update CEL mito extensions to v1.22.0. {pull}45245[45245]
+- TCP and UDP inputs now support multiple pipeline workers. This improves performance when slow processors are used by decoupling reading from the network connection and publishing {issue}43674[43674] {pull}45124[45124]
 - Allow empty HTTPJSON cursor template value evaluations to be ignored by Fleet health status updates. {pull}45361[45361]
 - Reuse OAuth2 clients in HTTP JSON input where possible. {issue}34834[34834] {pull}44976[44976]
 - Add support for generalized token authentication to CEL input. {pull}45359[45359]

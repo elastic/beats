@@ -36,21 +36,18 @@ func TestDisablingProxy(t *testing.T) {
 			_, _ = w.Write([]byte(teapotMsg))
 		}))
 
-	proxy := integration.NewDisabledProxy(t, server.URL)
-	proxyServer := httptest.NewServer(proxy)
-	t.Cleanup(proxyServer.Close)
-
-	checkStatusCodeAndBody(t, proxyServer.URL, teapotMsg, http.StatusTeapot)
+	proxy, proxyURL := integration.NewDisablingProxy(t, server.URL)
+	checkStatusCodeAndBody(t, proxyURL, teapotMsg, http.StatusTeapot)
 
 	proxy.Disable()
 	checkStatusCodeAndBody(
 		t,
-		proxyServer.URL,
+		proxyURL,
 		"Proxy is disabled\n",
 		http.StatusServiceUnavailable)
 
 	proxy.Enable()
-	checkStatusCodeAndBody(t, proxyServer.URL, teapotMsg, http.StatusTeapot)
+	checkStatusCodeAndBody(t, proxyURL, teapotMsg, http.StatusTeapot)
 }
 
 func checkStatusCodeAndBody(t *testing.T, srvURL, body string, statusCode int) {
