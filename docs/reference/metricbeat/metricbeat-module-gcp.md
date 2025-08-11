@@ -354,7 +354,7 @@ metricbeat.modules:
 The following metricsets are available:
 
 * [billing](/reference/metricbeat/metricbeat-metricset-gcp-billing.md)
-* [carbon](/reference/metricbeat/metricbeat-metricset-gcp-carbon.md)
+* [carbon](/reference/metricbeat/metricbeat-metricset-gcp-carbon.md)  {applies_to}`stack: beta`
 * [compute](/reference/metricbeat/metricbeat-metricset-gcp-compute.md)
 * [dataproc](/reference/metricbeat/metricbeat-metricset-gcp-dataproc.md)
 * [firestore](/reference/metricbeat/metricbeat-metricset-gcp-firestore.md)
