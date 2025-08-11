@@ -360,7 +360,9 @@ func (in *sqsReaderInput) createEventProcessor() (sqsProcessor, error) {
 	if err != nil {
 		return nil, err
 	}
-	return newSQSS3EventProcessor(in.log.Named("sqs_s3_event"), in.metrics, in.sqs, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, s3EventHandlerFactory), nil
+	return newSQSS3EventProcessor(in.log.Named("sqs_s3_event"), in.metrics,
+		in.sqs, script, in.config.VisibilityTimeout,
+		in.config.SQSMaxReceiveCount, s3EventHandlerFactory, in.status), nil
 }
 
 // Read all pending requests and return their count. If block is true,
