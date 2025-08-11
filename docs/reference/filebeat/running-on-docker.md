@@ -79,7 +79,7 @@ setup -E setup.kibana.host=kibana:5601 \
 
    If you are using {{ech}}, replace the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password using this syntax:
 
-   ```she
+   ```sh
    -E cloud.id=<Cloud ID from Elastic Cloud Hosted> \
    -E cloud.auth=elastic:<elastic password>
    ```
