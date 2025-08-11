@@ -122,14 +122,8 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [broker](/reference/metricbeat/metricbeat-metricset-kafka-broker.md)
-* [consumer](/reference/metricbeat/metricbeat-metricset-kafka-consumer.md)
+* [broker](/reference/metricbeat/metricbeat-metricset-kafka-broker.md)  {applies_to}`stack: beta`
+* [consumer](/reference/metricbeat/metricbeat-metricset-kafka-consumer.md)  {applies_to}`stack: beta`
 * [consumergroup](/reference/metricbeat/metricbeat-metricset-kafka-consumergroup.md)
 * [partition](/reference/metricbeat/metricbeat-metricset-kafka-partition.md)
-* [producer](/reference/metricbeat/metricbeat-metricset-kafka-producer.md)
-
-
-
-
-
-
+* [producer](/reference/metricbeat/metricbeat-metricset-kafka-producer.md)  {applies_to}`stack: beta`

@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-containerd-memory.html
+
+applies_to:
+  stack: beta
 ---
 
 # Containerd memory metricset [metricbeat-metricset-containerd-memory]

@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-aws-vpn.html
+
+applies_to:
+  stack: beta
 ---
 
 # AWS vpn metricset [metricbeat-metricset-aws-vpn]
