@@ -368,8 +368,8 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		} else {
 			file["uid"] = strconv.Itoa(int(info.UID))
 			file["gid"] = strconv.Itoa(int(info.GID))
+			file["mode"] = fmt.Sprintf("%#04o", uint32(info.Mode))
 		}
-		file["mode"] = fmt.Sprintf("%#04o", uint32(info.Mode))
 
 		if info.Owner != "" {
 			file["owner"] = info.Owner
