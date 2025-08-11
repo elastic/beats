@@ -68,10 +68,10 @@ func getVerifiedProbes(ctx context.Context, timeout time.Duration) (map[tracing.
 			continue
 		}
 
-		var keys []string
-		for probe := range probes {
-			keys = append(keys, probe.Name)
-		}
+		// var keys []string
+		// for probe := range probes {
+		// 	keys = append(keys, probe.Name)
+		// }
 
 		//fmt.Fprintf(os.Stdout, "\n==============================\nRunning verifier for probes: %#v\n", keys)
 		if err := verify(ctx, fExec, probes, timeout); err != nil {

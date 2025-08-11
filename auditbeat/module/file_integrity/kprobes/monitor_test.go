@@ -489,7 +489,6 @@ func (p *monitorTestSuite) TestRunEmitError() {
 }
 
 func (p *monitorTestSuite) TestNew() {
-	p.T().Skip("Flaky test: https://github.com/elastic/beats/issues/45827")
 	if runtime.GOARCH != "amd64" && runtime.GOARCH != "arm64" {
 		p.T().Skip("skipping on non-amd64/arm64")
 		return

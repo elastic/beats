@@ -23,8 +23,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/cilium/ebpf/btf"
 	tkbtf "github.com/elastic/tk-btf"
+
+	"github.com/cilium/ebpf/btf"
 )
 
 type fsNotifySymbol struct {
