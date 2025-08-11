@@ -58,5 +58,5 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [node](/reference/metricbeat/metricbeat-metricset-redisenterprise-node.md)
-* [proxy](/reference/metricbeat/metricbeat-metricset-redisenterprise-proxy.md)
+* [node](/reference/metricbeat/metricbeat-metricset-redisenterprise-node.md)  {applies_to}`stack: beta`
+* [proxy](/reference/metricbeat/metricbeat-metricset-redisenterprise-proxy.md)  {applies_to}`stack: beta`
