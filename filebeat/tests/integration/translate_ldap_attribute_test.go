@@ -39,7 +39,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-autodiscover/docker"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 const translateguidCfg = `
@@ -130,7 +129,7 @@ func TestTranslateGUIDWithLDAP(t *testing.T) {
 
 func startOpenldapContainer(t *testing.T) {
 	ctx := context.Background()
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logptest.NewTestingLogger(t, ""))
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
