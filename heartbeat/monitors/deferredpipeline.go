@@ -23,8 +23,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
-func WithDelayedPipelineStop(pipeline beat.Pipeline, closeCh chan struct{}) beat.Pipeline {
-	p := &delayedPipelineStop{
+func WithDeferredPipelineClose(pipeline beat.Pipeline, closeCh chan struct{}) beat.Pipeline {
+	p := &deferredPipeline{
 		pipeline: pipeline,
 	}
 
@@ -35,26 +35,26 @@ func WithDelayedPipelineStop(pipeline beat.Pipeline, closeCh chan struct{}) beat
 	return p
 }
 
-type delayedPipelineStop struct {
+type deferredPipeline struct {
 	pipeline beat.Pipeline
 }
 
-func (ps *delayedPipelineStop) ConnectWith(c beat.ClientConfig) (beat.Client, error) {
-	return ps.pipeline.ConnectWith(c)
+func (p *deferredPipeline) ConnectWith(c beat.ClientConfig) (beat.Client, error) {
+	return p.pipeline.ConnectWith(c)
 }
 
-func (ps *delayedPipelineStop) Connect() (beat.Client, error) {
-	return ps.pipeline.Connect()
+func (p *deferredPipeline) Connect() (beat.Client, error) {
+	return p.pipeline.Connect()
 }
 
-func (ps *delayedPipelineStop) Close() error {
+func (p *deferredPipeline) Close() error {
 	// Do not close the underlying pipeline immediately.
 	// Manually close it by listening to the channel in the constructor.
 	return nil
 }
 
-func (ps *delayedPipelineStop) closePipeline() error {
-	if closer, ok := ps.pipeline.(io.Closer); ok {
+func (p *deferredPipeline) closePipeline() error {
+	if closer, ok := p.pipeline.(io.Closer); ok {
 		return closer.Close()
 	}
 	return nil

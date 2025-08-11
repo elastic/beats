@@ -78,6 +78,7 @@ func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 			PipelineClientFactory: func(pipeline beat.Pipeline) (beat.Client, error) {
 				return pipeline.Connect()
 			},
+			MonitorsContext: context.Background(),
 		}),
 		sched,
 		sched.Stop
@@ -168,6 +169,14 @@ func (pc *MockPipeline) PublishedEvents() []*beat.Event {
 	}
 
 	return events
+}
+
+func (pc *MockPipeline) Close() error {
+	for _, c := range pc.Clients {
+		c.Close()
+	}
+
+	return nil
 }
 
 func baseMockEventMonitorValidator(id string, name string, status string) validator.Validator {

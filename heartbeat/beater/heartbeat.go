@@ -172,7 +172,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		pipelineWrapper = sync
 
 		// TODO: find a better way to update beats' publisher
-		b.Publisher = monitors.WithDelayedPipelineStop(pipeline, bt.done)
+		b.Publisher = monitors.WithDeferredPipelineClose(pipeline, bt.done)
 	}
 
 	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
