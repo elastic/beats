@@ -321,9 +321,7 @@ func createWatcher(
 	resourceWatchers *Watchers,
 	metricsRepo *MetricsRepo,
 	namespace string,
-	extraWatcher bool,
-	logger *logp.Logger,
-) (bool, error) {
+	extraWatcher bool) (bool, error) {
 
 	// We need to check the node scope to decide on whether a watcher should be updated or not.
 	nodeScope := false
@@ -355,7 +353,7 @@ func createWatcher(
 			if isNamespaced(resourceName) {
 				options.Namespace = namespace
 			}
-			restartWatcher, err := kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil, logger)
+			restartWatcher, err := kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil)
 			if err != nil {
 				return false, err
 			}
@@ -387,10 +385,9 @@ func createWatcher(
 			options,
 			nil,
 			transformReplicaSetMetadata,
-			logger,
 		)
 	default:
-		watcher, err = kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil, logger)
+		watcher, err = kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil)
 	}
 	if err != nil {
 		return false, fmt.Errorf("error creating watcher for %T: %w", resource, err)
@@ -583,7 +580,7 @@ func createAllWatchers(
 	// Create the main watcher for the given resource.
 	// For example pod metricset's main watcher will be pod watcher.
 	// If it fails, we return an error, so we can stop the extra watchers from creating.
-	created, err := createWatcher(resourceName, res, *options, client, metadataClient, resourceWatchers, metricsRepo, config.Namespace, false, log)
+	created, err := createWatcher(resourceName, res, *options, client, metadataClient, resourceWatchers, metricsRepo, config.Namespace, false)
 	if err != nil {
 		return fmt.Errorf("error initializing Kubernetes watcher %s, required by %s: %w", resourceName, metricsetName, err)
 	} else if created {
@@ -598,7 +595,7 @@ func createAllWatchers(
 	for _, extra := range extraWatchers {
 		extraRes := getResource(extra)
 		if extraRes != nil {
-			created, err = createWatcher(extra, extraRes, *options, client, metadataClient, resourceWatchers, metricsRepo, config.Namespace, true, log)
+			created, err = createWatcher(extra, extraRes, *options, client, metadataClient, resourceWatchers, metricsRepo, config.Namespace, true)
 			if err != nil {
 				log.Errorf("Error initializing Kubernetes watcher %s, required by %s: %s", extra, metricsetName, err)
 			} else {

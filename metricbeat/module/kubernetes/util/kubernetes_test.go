@@ -48,7 +48,6 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestWatchOptions(t *testing.T) {
@@ -97,9 +96,7 @@ func TestCreateWatcher(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false,
-		logptest.NewTestingLogger(t, ""),
-	)
+		false)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -117,9 +114,7 @@ func TestCreateWatcher(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		true,
-		logptest.NewTestingLogger(t, ""),
-	)
+		true)
 	require.False(t, created)
 	require.NoError(t, err)
 
@@ -137,7 +132,7 @@ func TestCreateWatcher(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false, logptest.NewTestingLogger(t, ""))
+		false)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -173,7 +168,7 @@ func TestAddToMetricsetsUsing(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false, logptest.NewTestingLogger(t, ""))
+		false)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -221,9 +216,7 @@ func TestRemoveFromMetricsetsUsing(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false,
-		logptest.NewTestingLogger(t, ""),
-	)
+		false)
 	require.True(t, created)
 	require.NoError(t, err)
 

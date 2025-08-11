@@ -79,7 +79,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		Namespace:   config.Namespace,
 	}
 
-	watcher, err := kubernetes.NewNamedWatcher("event", client, &kubernetes.Event{}, watchOptions, nil, base.Logger())
+	watcher, err := kubernetes.NewNamedWatcher("event", client, &kubernetes.Event{}, watchOptions, nil)
 	if err != nil {
 		return nil, fmt.Errorf("fail to init kubernetes watcher: %w", err)
 	}
