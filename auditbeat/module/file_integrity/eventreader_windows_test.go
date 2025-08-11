@@ -48,7 +48,7 @@ const initialInactivityTimeout = 15 * time.Second
 //
 // Usage:
 //
-//	go test -run TestRegenerateSamples -save-etw-events   # Save raw ETW events
+//	go test -run TestRegenerateSamples -generate-samples -save-etw-events  # Save raw ETW events
 func TestRegenerateSamples(t *testing.T) {
 	if !*generateSamples {
 		t.SkipNow()
