@@ -1292,7 +1292,7 @@ func StartMockES(
 	require.Eventually(
 		t,
 		func() bool {
-			resp, err := http.Get(serverURL) //nolint: noctx // It's just a test
+			resp, err := http.Get(serverURL) //nolint:gosec,noctx // It's just a test
 			if err != nil {
 				return false
 			}

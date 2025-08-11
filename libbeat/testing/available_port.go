@@ -43,7 +43,7 @@ func AvailableTCP4Port() (uint16, error) {
 		return 0, fmt.Errorf("expected TCP address, got %T", listener.Addr())
 	}
 
-	return uint16(tcpAddr.Port), nil
+	return uint16(tcpAddr.Port), nil //nolint:gosec // Safe conversion for port number
 }
 
 func MustAvailableTCP4Port(t *testing.T) uint16 {
