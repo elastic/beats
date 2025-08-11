@@ -1,0 +1,32 @@
+[
+    {
+        "aws": {
+            "vpcflow": {
+                "account_id": "64111117617",
+                "action": "REJECT",
+                "bytes": 1,
+                "dstaddr": "10.200.0.0",
+                "dstport": 33004,
+                "ecs_cluster_arn": "arn:aws:ecs:us-east-1:123456789012:cluster/DEMOGO-ECS",
+                "ecs_cluster_name": "DEMOGO-ECS",
+                "ecs_container_id": "0c5c6db7540ca5c4dbc692a53c1d7bab0a4e17e9cf44fc9167659c8687fd13df",
+                "ecs_container_instance_arn": "arn:aws:ecs:us-east-1:123456789012:container-instance/DEMOGO-ECS/39623aba81594d79b596c0c5f556d47b",
+                "ecs_container_instance_id": "39623aba81594d79b596c0c5f556d47b",
+                "ecs_service_name": "cats",
+                "ecs_task_arn": "arn:aws:ecs:us-east-1:123456789012:task/DEMOGO-ECS/b9ad2f8a90b24f7bbce4b0341034852f",
+                "ecs_task_definition_arn": "arn:aws:ecs:us-east-1:123456789012:task-definition/catsdef:2",
+                "ecs_task_id": "b9ad2f8a90b24f7bbce4b0341034852f",
+                "end": "2021-03-26T03:29:09Z",
+                "interface_id": "eni-069xxxxxb7a490",
+                "log_status": "OK",
+                "packets": 52,
+                "protocol": 17,
+                "srcaddr": "89.160.20.156",
+                "srcport": 50041,
+                "start": "2021-03-26T03:28:12Z",
+                "version": 5
+            }
+        },
+        "message": "5 64111117617 eni-069xxxxxb7a490 89.160.20.156 10.200.0.0 50041 33004 17 52 1 1616729292 1616729349 REJECT OK b9ad2f8a90b24f7bbce4b0341034852f arn:aws:ecs:us-east-1:123456789012:task/DEMOGO-ECS/b9ad2f8a90b24f7bbce4b0341034852f arn:aws:ecs:us-east-1:123456789012:task-definition/catsdef:2 DEMOGO-ECS arn:aws:ecs:us-east-1:123456789012:cluster/DEMOGO-ECS 39623aba81594d79b596c0c5f556d47b arn:aws:ecs:us-east-1:123456789012:container-instance/DEMOGO-ECS/39623aba81594d79b596c0c5f556d47b 0c5c6db7540ca5c4dbc692a53c1d7bab0a4e17e9cf44fc9167659c8687fd13df - cats"
+    }
+]
