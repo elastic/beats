@@ -17,7 +17,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -125,13 +124,10 @@ func TestMetrics(t *testing.T) {
 			ctx, cancel := newV2Context("httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi")
 			t.Cleanup(cancel)
 
-			reg, unreg := inputmon.NewInputRegistry("httpjson-test", ctx.ID, nil)
-			t.Cleanup(unreg)
-
 			var g errgroup.Group
 			g.Go(func() error {
 				pub := statelessPublisher{wrapped: chanClient}
-				return run(ctx, conf, pub, nil, reg)
+				return run(ctx, conf, pub, nil, ctx.MetricsRegistry)
 			})
 
 			timeout := time.NewTimer(5 * time.Second)
@@ -169,7 +165,7 @@ func TestMetrics(t *testing.T) {
 			}
 
 			assert.NoError(t, g.Wait())
-			assert.NoError(t, tc.assertMetrics(reg))
+			assert.NoError(t, tc.assertMetrics(ctx.MetricsRegistry))
 		})
 	}
 }

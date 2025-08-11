@@ -28,9 +28,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-// A sentinel value that can be set on the "input" (type) field of nested
-// inputs, to indicate that the registry contains additional inputs that
-// should be reported at the top level.
+// InputNested is a sentinel value that can be set on the "input" (type) field
+// of nested inputs, to indicate that the registry contains additional inputs
+// that should be reported at the top level.
 const InputNested = "__NESTED__"
 
 const (
