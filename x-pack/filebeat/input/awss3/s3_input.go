@@ -208,16 +208,13 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 			if err != nil {
 				in.log.Errorf("saving completed object state: %v", err.Error())
 				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failure saving completed object state: %s", err.Error()))
+			} else {
+				in.status.UpdateStatus(status.Running, "Input is running")
 			}
 
 			// Metrics
 			in.metrics.s3ObjectsAckedTotal.Inc()
 		})
-		// if we go from loop iteration failure to success, we should attempt to re-report recovered status
-		// the purpose of this block is to avoid unnecessary synchronization between workers during status update
-		if state.Stored {
-			in.status.UpdateStatus(status.Running, "Input is running")
-		}
 	}
 }
 
