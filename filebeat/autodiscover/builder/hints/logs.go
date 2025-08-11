@@ -191,11 +191,11 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 				moduleConf[fileset+".enabled"] = cfg.Enabled
 				moduleConf[fileset+".input"] = filesetConf
 
-				l.log.Debugf("hints.builder", "generated config %+v", moduleConf)
+				l.log.Debugf("generated config %+v", moduleConf)
 			}
 			config, _ = conf.NewConfigFrom(moduleConf)
 		}
-		l.log.Debugf("hints.builder", "generated config %+v of logHints %+v", config, l)
+		l.log.Debugf("generated config %+v of logHints %+v", config, l)
 		configs = append(configs, config)
 	}
 	// Apply information in event to the template to generate the final config
