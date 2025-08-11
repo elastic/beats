@@ -162,6 +162,7 @@ func TestStopSession_Error(t *testing.T) {
 		traceHandler: 12345, // Example handler value
 		properties:   &EventTraceProperties{},
 		closeTrace:   closeTrace,
+		controlTrace: func(uintptr, *uint16, *EventTraceProperties, uint32) error { return nil },
 	}
 
 	err := session.StopSession()

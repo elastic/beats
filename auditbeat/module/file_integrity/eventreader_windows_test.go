@@ -39,6 +39,7 @@ import (
 )
 
 var saveETWEvents = flag.Bool("save-etw-events", false, "Save ETW events to testdata directory")
+var generateSamples = flag.Bool("generate-samples", false, "Generate sample events for testing")
 
 const inactivityTimeout = 5 * time.Second
 const initialInactivityTimeout = 15 * time.Second
@@ -47,8 +48,11 @@ const initialInactivityTimeout = 15 * time.Second
 //
 // Usage:
 //
-//	go test -tags=samples -run TestRegenerateSamples -save-etw-events   # Save raw ETW events
+//	go test -run TestRegenerateSamples -save-etw-events   # Save raw ETW events
 func TestRegenerateSamples(t *testing.T) {
+	if !*generateSamples {
+		t.SkipNow()
+	}
 	testChangeOwner(t)
 	testChangeTimestamps(t)
 	testCreateADS(t)
