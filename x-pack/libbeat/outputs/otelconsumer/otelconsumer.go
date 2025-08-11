@@ -11,6 +11,8 @@ import (
 	"runtime"
 	"time"
 
+	"go.opentelemetry.io/collector/client"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmap"
@@ -34,6 +36,8 @@ const (
 	otelComponentIDKey = "otelcol.component.id"
 	// otelComponentKindKey is the key used to store the Beat receiver's component kind in the beat event. This is always "receiver".
 	otelComponentKindKey = "otelcol.component.kind"
+	beatNameCtxKey       = "beat_name"
+	beatVersionCtxtKey   = "beat_version"
 )
 
 func init() {
@@ -176,7 +180,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		}
 	}
 
-	err := out.logsConsumer.ConsumeLogs(ctx, pLogs)
+	err := out.logsConsumer.ConsumeLogs(out.newConsumerContext(ctx), pLogs)
 	if err != nil {
 		// Permanent errors shouldn't be retried. This tipically means
 		// the data cannot be serialized by the exporter that is attached
@@ -192,7 +196,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Retry()
 		}
 
-		out.log.Errorf("failed to send batch events to otel collector: %w", err)
+		out.log.Errorf("failed to send batch events to otel collector: %v", err)
 		return nil
 	}
 
@@ -200,6 +204,19 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	st.NewBatch(len(events))
 	st.AckedEvents(len(events))
 	return nil
+}
+
+// newConsumerContext creates a new context.Context adding the beats metadata
+// to the client.Info. This is used to pass the beat name and version to the
+// Collector, so it can be used by the components to access that data.
+func (out *otelConsumer) newConsumerContext(ctx context.Context) context.Context {
+	clientInfo := client.Info{
+		Metadata: client.NewMetadata(map[string][]string{
+			beatNameCtxKey:     {out.beatInfo.Beat},
+			beatVersionCtxtKey: {out.beatInfo.Version},
+		}),
+	}
+	return client.NewContext(ctx, clientInfo)
 }
 
 func (out *otelConsumer) String() string {

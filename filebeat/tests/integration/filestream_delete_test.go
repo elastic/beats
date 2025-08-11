@@ -25,8 +25,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -407,23 +405,7 @@ func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
 	esURL := integration.GetESAdminURL(t, "http")
 
 	// Create and start the proxy server
-	proxy := integration.NewDisabledProxy(t, esURL.String())
-	server := &http.Server{
-		Addr:              "localhost:9201",
-		Handler:           proxy,
-		ReadHeaderTimeout: time.Second / 2,
-	}
-	go func() {
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			t.Errorf("Proxy server failed: %s", err)
-		}
-	}()
-	defer server.Close()
-
-	proxyURL, err := url.Parse(server.Addr)
-	if err != nil {
-		t.Fatalf("cannot parse proxy URL: %s", err)
-	}
+	proxy, proxyURL := integration.NewDisablingProxy(t, esURL.String())
 
 	user := esURL.User.Username()
 	pass, _ := esURL.User.Password()
@@ -431,7 +413,7 @@ func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
 		"homePath":    workDir,
 		"logfile":     logFile,
 		"testdata":    testDataPath,
-		"esHost":      proxyURL.String(),
+		"esHost":      proxyURL,
 		"user":        user,
 		"pass":        pass,
 		"index":       index,
