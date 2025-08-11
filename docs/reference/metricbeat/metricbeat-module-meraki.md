@@ -35,4 +35,8 @@ metricbeat.modules:
 The following metricsets are available:
 
 * [device_health](/reference/metricbeat/metricbeat-metricset-meraki-device_health.md)  {applies_to}`stack: beta`
+<<<<<<< HEAD
 * [network_health](/reference/metricbeat/metricbeat-metricset-meraki-network_health.md)  {applies_to}`stack: beta 9.1.0`
+=======
+* [network_health](/reference/metricbeat/metricbeat-metricset-meraki-network_health.md)  {applies_to}`stack: beta`
+>>>>>>> b036c1c56 ([9.1](backport #45837) [docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45856))

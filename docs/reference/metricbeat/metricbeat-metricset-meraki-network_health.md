@@ -3,7 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-meraki-network_health.html
 
 applies_to:
+<<<<<<< HEAD
   stack: beta 9.1.0
+=======
+  stack: beta
+>>>>>>> b036c1c56 ([9.1](backport #45837) [docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45856))
 ---
 
 % This file is generated! See scripts/docs_collector.py

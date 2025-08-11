@@ -245,7 +245,10 @@ The following metricsets are available:
 * [memory](/reference/metricbeat/metricbeat-metricset-system-memory.md)
 * [network](/reference/metricbeat/metricbeat-metricset-system-network.md)
 * [network_summary](/reference/metricbeat/metricbeat-metricset-system-network_summary.md)  {applies_to}`stack: beta`
+<<<<<<< HEAD
 * [ntp](/reference/metricbeat/metricbeat-metricset-system-ntp.md)  {applies_to}`stack: beta`
+=======
+>>>>>>> b036c1c56 ([9.1](backport #45837) [docs] [metricbeat] Update `docs_collector.go` to add `applies_to` badges (#45856))
 * [process](/reference/metricbeat/metricbeat-metricset-system-process.md)
 * [process_summary](/reference/metricbeat/metricbeat-metricset-system-process_summary.md)
 * [raid](/reference/metricbeat/metricbeat-metricset-system-raid.md)
