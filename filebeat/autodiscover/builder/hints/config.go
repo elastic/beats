@@ -37,6 +37,9 @@ func defaultConfig() config {
 			},
 		},
 		"file_identity.fingerprint": nil,
+		// Enable take over mode to migrate state from the previous
+		// configuration version. This prevents re-ingestion of existing
+		// files.
 		"take_over": map[string]any{
 			"enabled": true,
 			"from_ids": []string{
