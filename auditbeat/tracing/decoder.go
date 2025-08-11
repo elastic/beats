@@ -22,6 +22,7 @@ package tracing
 import (
 	"errors"
 	"fmt"
+	"math"
 	"reflect"
 	"sort"
 	"strconv"
@@ -74,6 +75,9 @@ func (f mapDecoder) Decode(raw []byte, meta Metadata) (mapIf interface{}, err er
 		ptr := unsafe.Pointer(&raw[field.Offset])
 		switch field.Type {
 		case FieldTypeInteger:
+			if field.Size > math.MaxInt8 || field.Size < 0 {
+				return nil, fmt.Errorf("bad size=%d, would overflow uint8", field.Size, field.Name)
+			}
 			if value, err = readInt(ptr, uint8(field.Size), field.Signed); err != nil {
 				return nil, fmt.Errorf("bad size=%d for integer field=%s", field.Size, field.Name)
 			}

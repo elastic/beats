@@ -23,6 +23,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"sync"
 	"sync/atomic"
@@ -249,6 +250,9 @@ func WithPollTimeout(timeout time.Duration) PerfChannelConf {
 // ProbeFormat. The Decoder is used to decode events from this probe and
 // will determine the types and contents of the returned events.
 func (c *PerfChannel) MonitorProbe(format ProbeFormat, decoder Decoder) error {
+	if format.ID < 0 {
+		return fmt.Errorf("format.ID is negative: %d", format.ID)
+	}
 	c.attr.Config = uint64(format.ID)
 	doGroup := len(c.events) > 0
 	cpuList := c.cpus.AsList()
@@ -529,6 +533,9 @@ func pollAll(evs []*perf.Event, timeout time.Duration) (active int, closed int, 
 		fd, err := ev.FD()
 		if err != nil {
 			return 0, 0, errors.New("failed to get descriptor for perf event channel")
+		}
+		if fd > math.MaxInt32 || fd < math.MinInt32 {
+			return 0, 0, fmt.Errorf("perf event channel file descriptor %d is out of range for of int32 for unix.PollFd", fd)
 		}
 		pollfds[idx] = unix.PollFd{Fd: int32(fd), Events: unix.POLLIN}
 	}
