@@ -274,6 +274,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Render data values in xml renderer. {pull}44132[44132]
 
 *Functionbeat*
 
