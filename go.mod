@@ -218,6 +218,7 @@ require (
 	go.elastic.co/apm/module/apmhttp/v2 v2.6.3
 	go.elastic.co/apm/v2 v2.7.0
 	go.mongodb.org/mongo-driver v1.17.4
+	go.opentelemetry.io/collector/client v1.36.0
 	go.opentelemetry.io/collector/component v1.36.0
 	go.opentelemetry.io/collector/component/componentstatus v0.130.0
 	go.opentelemetry.io/collector/config/configtls v1.36.0
@@ -237,18 +238,6 @@ require (
 )
 
 require (
-<<<<<<< HEAD
-=======
-	go.opentelemetry.io/collector/client v1.36.0
-	go.opentelemetry.io/collector/pipeline v0.130.0
-	go.opentelemetry.io/collector/processor v1.36.0
-	go.opentelemetry.io/collector/processor/processorhelper v0.130.0
-	go.opentelemetry.io/collector/receiver/receivertest v0.130.0
-	go.opentelemetry.io/otel/sdk/metric v1.37.0
-)
-
-require (
->>>>>>> 5b9e5a96e ([OTel] Add beat name and version into the OTel consumer context (#45744))
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
 	cel.dev/expr v0.23.1 // indirect
 	cloud.google.com/go/auth v0.16.0 // indirect
