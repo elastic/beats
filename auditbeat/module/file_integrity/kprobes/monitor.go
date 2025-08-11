@@ -50,7 +50,7 @@ func newMonitorEmitter(ctx context.Context, eventC chan MonitorEvent) *monitorEm
 }
 
 func (m *monitorEmitter) Emit(ePath string, pid uint32, op uint32) error {
-	fmt.Fprintf(os.Stdout, "Got monitor event: %v\n", ePath)
+	//fmt.Fprintf(os.Stdout, "Got monitor event: %v\n", ePath)
 	select {
 	case <-m.ctx.Done():
 		fmt.Fprintf(os.Stdout, "got context done while trying to create event for %s\n", ePath)

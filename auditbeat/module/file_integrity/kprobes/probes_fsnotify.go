@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cilium/ebpf/btf"
 	tkbtf "github.com/elastic/tk-btf"
 )
 
@@ -61,6 +62,31 @@ func loadFsNotifySymbol(symbolProbeManager *probeManager) error {
 func (f *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, error) {
 	allocFunc := allocProbeEvent
 
+	// Not a proper fix, we're loading the BPF spec twice
+	rawBtf, err := btf.LoadKernelSpec()
+	if err != nil {
+		return nil, fmt.Errorf("failed to load kernel BTF spec: %w", err)
+	}
+	var dataTypeEnum *btf.Enum
+	err = rawBtf.TypeByName("fsnotify_data_type", &dataTypeEnum)
+	if err != nil {
+		return nil, fmt.Errorf("error fetching fsnotify_data_type from btf spec: %w", err)
+	}
+
+	var path_enum_dt uint64
+	var inode_enum_dt uint64
+	var dentry_enum_dt uint64
+	for _, val := range dataTypeEnum.Values {
+		switch val.Name {
+		case "FSNOTIFY_EVENT_PATH":
+			path_enum_dt = val.Value
+		case "FSNOTIFY_EVENT_INODE":
+			inode_enum_dt = val.Value
+		case "FSNOTIFY_EVENT_DENTRY":
+			dentry_enum_dt = val.Value
+		}
+	}
+
 	_, seen := f.seenSpecs[spec]
 	if !seen {
 
@@ -74,9 +100,9 @@ func (f *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, e
 		// for linux kernel versions linux 5.17+, thus we start from here. To see how we handle all
 		// linux kernels filter variation check OnErr() method.
 		f.seenSpecs[spec] = struct{}{}
-		f.pathProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==2"
-		f.inodeProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==3 && nptr!=0"
-		f.dentryProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==4"
+		f.pathProbeFilter = fmt.Sprintf("(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==%d", path_enum_dt)
+		f.inodeProbeFilter = fmt.Sprintf("(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==%d && nptr!=0", inode_enum_dt)
+		f.dentryProbeFilter = fmt.Sprintf("(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==%d", dentry_enum_dt)
 	}
 
 	pathProbe := tkbtf.NewKProbe().SetRef("fsnotify_path").AddFetchArgs(

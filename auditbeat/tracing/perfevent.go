@@ -438,7 +438,7 @@ type recordMerger struct {
 }
 
 func newRecordMerger(sources []*perf.Event, channel *PerfChannel, pollTimeout time.Duration) recordMerger {
-	fmt.Fprintf(os.Stdout, "Creating recordMerger with %#v\n", sources)
+	//fmt.Fprintf(os.Stdout, "Creating recordMerger with %#v\n", sources)
 	m := recordMerger{
 		evs:     sources,
 		channel: channel,

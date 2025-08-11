@@ -137,7 +137,7 @@ func (e *eProcessor) process(_ context.Context, pe *ProbeEvent) error {
 		})
 
 		if entry == nil {
-			fmt.Fprintf(os.Stdout, "MaskModify entry is nil\n")
+			//fmt.Fprintf(os.Stdout, "MaskModify entry is nil\n")
 			return nil
 		}
 
@@ -151,7 +151,7 @@ func (e *eProcessor) process(_ context.Context, pe *ProbeEvent) error {
 		})
 
 		if entry == nil {
-			fmt.Fprintf(os.Stdout, "MaskAttrib entry is nil\n")
+			//fmt.Fprintf(os.Stdout, "MaskAttrib entry is nil\n")
 			return nil
 		}
 

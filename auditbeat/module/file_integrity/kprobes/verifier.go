@@ -73,7 +73,7 @@ func getVerifiedProbes(ctx context.Context, timeout time.Duration) (map[tracing.
 			keys = append(keys, probe.Name)
 		}
 
-		fmt.Fprintf(os.Stdout, "\n==============================\nRunning verifier for probes: %#v\n", keys)
+		//fmt.Fprintf(os.Stdout, "\n==============================\nRunning verifier for probes: %#v\n", keys)
 		if err := verify(ctx, fExec, probes, timeout); err != nil {
 			if probeMgr.onErr(err) {
 				continue
@@ -181,7 +181,7 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 				return
 
 			case ev, ok := <-monitorHandle.EventChannel():
-				fmt.Fprintf(os.Stdout, "Received event: %+v\n", ev)
+				//fmt.Fprintf(os.Stdout, "Received event: %+v\n", ev)
 				if !ok {
 					retC <- errors.New("monitor closed unexpectedly")
 					return

@@ -31,6 +31,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cilium/ebpf/btf"
 	"github.com/elastic/beats/v7/auditbeat/tracing"
 
 	"github.com/stretchr/testify/mock"
@@ -41,6 +42,24 @@ import (
 
 type monitorTestSuite struct {
 	suite.Suite
+}
+
+func TestBtfLookup(t *testing.T) {
+	rawBtf, _ := btf.LoadKernelSpec()
+
+	// foundTypes, err := rawBtf.AnyTypeByName("fsnotify_data_type")
+	// require.NoError(t, err)
+
+	// got := foundTypes.(*btf.Enum)
+	// t.Logf("btf type: %s (%#v)", foundTypes.TypeName(), got.Values)
+
+	var dataTypeEnum *btf.Enum
+	err := rawBtf.TypeByName("fsnotify_data_type", &dataTypeEnum)
+	require.NoError(t, err)
+
+	for _, val := range dataTypeEnum.Values {
+		t.Logf("btf value: '%s' (%d)", val.Name, val.Value)
+	}
 }
 
 func Test_Monitor(t *testing.T) {

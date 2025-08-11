@@ -38,7 +38,7 @@ type perfChannel interface {
 func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponent int, bufferSize int, pid int) (*tracing.PerfChannel, error) {
 	tfs, err := tracing.NewTraceFS()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating new tracefs: %w", err)
 	}
 
 	pChannel, err := tracing.NewPerfChannel(
@@ -54,12 +54,15 @@ func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponen
 	}
 
 	for probe, allocFn := range probes {
-		_ = tfs.RemoveKProbe(probe)
+		err = tfs.RemoveKProbe(probe)
+		if err != nil {
+			fmt.Fprintf(os.Stdout, "Error removing probe %s: %s\n", probe.Name, err)
+		}
 
 		fmt.Fprintf(os.Stdout, "Adding probe: %s at address %s\n", probe.Name, probe.Address)
 		err := tfs.AddKProbe(probe)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error adding probe: %w", err)
 		}
 		desc, err := tfs.LoadProbeFormat(probe)
 		if err != nil {
@@ -72,7 +75,7 @@ func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponen
 		}
 
 		if err := pChannel.MonitorProbe(desc, decoder); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error monitoring probe: %w", err)
 		}
 	}
 
