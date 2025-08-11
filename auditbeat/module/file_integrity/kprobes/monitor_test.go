@@ -31,13 +31,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cilium/ebpf/btf"
 	"github.com/elastic/beats/v7/auditbeat/tracing"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/sys/unix"
+
+	"github.com/cilium/ebpf/btf"
 )
 
 type monitorTestSuite struct {
