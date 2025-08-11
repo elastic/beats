@@ -433,7 +433,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Add handling for missing `EvtVarType`s in experimental api. {issue}19337[19337] {pull}41418[41418]
-
+- Render data values in xml renderer. {pull}44132[44132]
 
 *Functionbeat*
 

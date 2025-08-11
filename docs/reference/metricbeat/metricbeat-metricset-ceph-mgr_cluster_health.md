@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-ceph-mgr_cluster_health.html
+
+applies_to:
+  stack: beta
 ---
 
 # Ceph mgr_cluster_health metricset [metricbeat-metricset-ceph-mgr_cluster_health]

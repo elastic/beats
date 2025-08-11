@@ -61,12 +61,12 @@ The following metricsets are available:
 * [cluster_disk](/reference/metricbeat/metricbeat-metricset-ceph-cluster_disk.md)
 * [cluster_health](/reference/metricbeat/metricbeat-metricset-ceph-cluster_health.md)
 * [cluster_status](/reference/metricbeat/metricbeat-metricset-ceph-cluster_status.md)
-* [mgr_cluster_disk](/reference/metricbeat/metricbeat-metricset-ceph-mgr_cluster_disk.md)
-* [mgr_cluster_health](/reference/metricbeat/metricbeat-metricset-ceph-mgr_cluster_health.md)
-* [mgr_osd_perf](/reference/metricbeat/metricbeat-metricset-ceph-mgr_osd_perf.md)
-* [mgr_osd_pool_stats](/reference/metricbeat/metricbeat-metricset-ceph-mgr_osd_pool_stats.md)
-* [mgr_osd_tree](/reference/metricbeat/metricbeat-metricset-ceph-mgr_osd_tree.md)
-* [mgr_pool_disk](/reference/metricbeat/metricbeat-metricset-ceph-mgr_pool_disk.md)
+* [mgr_cluster_disk](/reference/metricbeat/metricbeat-metricset-ceph-mgr_cluster_disk.md)  {applies_to}`stack: beta`
+* [mgr_cluster_health](/reference/metricbeat/metricbeat-metricset-ceph-mgr_cluster_health.md)  {applies_to}`stack: beta`
+* [mgr_osd_perf](/reference/metricbeat/metricbeat-metricset-ceph-mgr_osd_perf.md)  {applies_to}`stack: beta`
+* [mgr_osd_pool_stats](/reference/metricbeat/metricbeat-metricset-ceph-mgr_osd_pool_stats.md)  {applies_to}`stack: beta`
+* [mgr_osd_tree](/reference/metricbeat/metricbeat-metricset-ceph-mgr_osd_tree.md)  {applies_to}`stack: beta`
+* [mgr_pool_disk](/reference/metricbeat/metricbeat-metricset-ceph-mgr_pool_disk.md)  {applies_to}`stack: beta`
 * [monitor_health](/reference/metricbeat/metricbeat-metricset-ceph-monitor_health.md)
 * [osd_df](/reference/metricbeat/metricbeat-metricset-ceph-osd_df.md)
 * [osd_tree](/reference/metricbeat/metricbeat-metricset-ceph-osd_tree.md)

@@ -28,5 +28,5 @@ This module supports TLS connections when using `ssl` config field, as described
 The following metricsets are available:
 
 {{range $metricset := .Metricsets -}}
-* [{{$metricset.Title}}](/reference/metricbeat/metricbeat-metricset-{{$.Base}}-{{$metricset.Title}}.md)
+* [{{$metricset.Title}}](/reference/metricbeat/metricbeat-metricset-{{$.Base}}-{{$metricset.Title}}.md){{if and $metricset.Applies_to (ne $metricset.Applies_to "ga")}}  {applies_to}`stack: {{$metricset.Applies_to}}`{{end}}
 {{end -}}

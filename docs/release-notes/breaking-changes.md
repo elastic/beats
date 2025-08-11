@@ -14,23 +14,23 @@ Breaking changes can impact your Elastic applications, potentially disrupting no
 
 ## 9.1.1 [beats-9.1.1-breaking-changes]
 
+**All Beats**
 ::::{dropdown} Update user agent used by Beats HTTP clients.
 
-% Description
 The default user agent was updated to distinguish between all beat modes:
 
 * **Standalone** indicates that the beat is not running under agent.
 * **Unmanaged** indicates that the beat is running under agent but not managed by Fleet.
 * **Managed** indicates that the beat is running under agent and managed by Fleet.
 
-% Impact
-% TO DO: Add more details
 Users relying on specific user agents could be impacted.
 
 For more information, check [#45251]({{beats-pull}}45251).
 ::::
 
-## 9.0.1 [beats-9.0.1-breaking-changes]
+## 9.1.0 [beats-9.1.0-breaking-changes]
+
+**Filebeat**
 
 ::::{dropdown} The default data and logs path for the Windows service installation has changed.
 The base folder has changed from `C:\ProgramData\` to `C:\Program
@@ -44,9 +44,7 @@ force using the legacy data path.
 
 In a PowerShell prompt, can use `Get-Help install-service-<Beat Name>.ps1
 -detailed` to get detailed help.
-
 ::::
-
 
 ::::{dropdown} 'close.on_state_change.removed' defaults to `true` on Windows and `false` on the rest of the platforms.
 To keep the previous behaviour, add `close.on_state_change.removed:

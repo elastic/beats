@@ -96,7 +96,7 @@ The following metricsets are available:
 * [index](/reference/metricbeat/metricbeat-metricset-elasticsearch-index.md)
 * [index_recovery](/reference/metricbeat/metricbeat-metricset-elasticsearch-index_recovery.md)
 * [index_summary](/reference/metricbeat/metricbeat-metricset-elasticsearch-index_summary.md)
-* [ingest_pipeline](/reference/metricbeat/metricbeat-metricset-elasticsearch-ingest_pipeline.md)
+* [ingest_pipeline](/reference/metricbeat/metricbeat-metricset-elasticsearch-ingest_pipeline.md)  {applies_to}`stack: beta`
 * [ml_job](/reference/metricbeat/metricbeat-metricset-elasticsearch-ml_job.md)
 * [node](/reference/metricbeat/metricbeat-metricset-elasticsearch-node.md)
 * [node_stats](/reference/metricbeat/metricbeat-metricset-elasticsearch-node_stats.md)

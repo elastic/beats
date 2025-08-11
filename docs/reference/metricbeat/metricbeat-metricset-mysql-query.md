@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-mysql-query.html
+
+applies_to:
+  stack: beta
 ---
 
 # MySQL query metricset [metricbeat-metricset-mysql-query]

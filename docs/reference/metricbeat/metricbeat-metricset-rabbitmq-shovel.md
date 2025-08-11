@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-rabbitmq-shovel.html
+
+applies_to:
+  stack: beta
 ---
 
 # RabbitMQ shovel metricset [metricbeat-metricset-rabbitmq-shovel]
