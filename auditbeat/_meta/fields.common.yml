@@ -50,6 +50,16 @@
         example: s0
         description: The object's SELinux level.
 
+    - name: extended_attributes
+      type: flattened
+      description: >
+        Extended file attributes. Contains NTFS Extended Attributes (EAs) on Windows systems.
+        Extended Attributes are name-value pairs that can be attached to files and directories
+        to store additional metadata beyond standard file attributes. The object contains
+        key-value pairs where keys are EA names and values are their corresponding values.
+        This field is only populated on Windows and only when the file has extended attributes.
+
+
   - name: user
     type: group
     description: User information.
