@@ -57,7 +57,7 @@ type wrapperDriver struct {
 }
 
 func newWrapperDriver(logger *logp.Logger) (*wrapperDriver, error) {
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logger)
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
 	if err != nil {
 		return nil, err
 	}
