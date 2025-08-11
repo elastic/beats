@@ -44,21 +44,21 @@ def collect(base_paths):
             title = fields[0]["title"]
             applies_to = ""
             if "version" in fields[0]:
-              version = fields[0]["version"]
-              versions = []
-              for key, value in version.items():
-                versions.append(f"{key} {value}")
-              applies_to = ", ".join(versions)
+                version = fields[0]["version"]
+                versions = []
+                for key, value in version.items():
+                    versions.append(f"{key} {value}")
+                applies_to = ", ".join(versions)
             elif "release" in fields[0]:
-              if fields[0]["release"] != "ga":
-                applies_to = fields[0]["release"]
+                if fields[0]["release"] != "ga":
+                    applies_to = fields[0]["release"]
 
         module_file = """---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-module-{}.html
 """.format(module)
         if applies_to != "":
-          module_file += """applies_to:
+            module_file += """applies_to:
   stack: {}
 """.format(applies_to)
 
@@ -115,7 +115,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-dataset-{}-{}.html
 """.format(module, dataset)
             if applies_to != "":
-              dataset_file += """applies_to:
+                dataset_file += """applies_to:
   stack: {}
 """.format(applies_to)
 
@@ -182,7 +182,7 @@ This section contains detailed information about the metric collecting modules c
         applies_to = details["applies_to"]
         module_list_output += "* [{}](/reference/auditbeat/auditbeat-module-{}.md)".format(title, m)
         if applies_to:
-          module_list_output += " {{applies_to}}`stack: {}`".format(applies_to)
+            module_list_output += " {{applies_to}}`stack: {}`".format(applies_to)
         module_list_output += "\n"
 
     module_list_output += "\n"
