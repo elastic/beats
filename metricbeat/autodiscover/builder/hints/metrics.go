@@ -322,11 +322,11 @@ func (m *metricHints) getMetricsFilters(hints mapstr.M) mapstr.M {
 }
 
 func (m *metricHints) getModuleConfigs(hints mapstr.M) []mapstr.M {
-	return utils.GetHintAsConfigs(hints, m.Key, m.logger)
+	return utils.GetHintAsConfigs(hints, m.Key)
 }
 
 func (m *metricHints) getProcessors(hints mapstr.M) []mapstr.M {
-	return utils.GetProcessors(hints, m.Key, m.logger)
+	return utils.GetProcessors(hints, m.Key)
 
 }
 
