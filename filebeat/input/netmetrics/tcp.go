@@ -35,35 +35,15 @@ import (
 
 // TCP handles the TCP metric reporting.
 type TCP struct {
-	done chan struct{}
-
-	monitorRegistry *monitoring.Registry
-
-	lastPacket time.Time
-
-	device         *monitoring.String // name of the device being monitored
-	packets        *monitoring.Uint   // number of packets processed
-	bytes          *monitoring.Uint   // number of bytes processed
-	rxQueue        *monitoring.Uint   // value of the rx_queue field from /proc/net/tcp{,6} (only on linux systems)
-	arrivalPeriod  metrics.Sample     // histogram of the elapsed time between packet arrivals
-	processingTime metrics.Sample     // histogram of the elapsed time between packet receipt and publication
+	netMetrics
 }
 
 // NewTCP returns a new TCP input metricset. Note that if the id is empty then a nil TCP metricset is returned.
-func NewTCP(id string, reg *monitoring.Registry, device string, poll time.Duration, log *logp.Logger) *TCP {
-	if id == "" {
-		return nil
+func NewTCP(reg *monitoring.Registry, device string, poll time.Duration, log *logp.Logger) *TCP {
+	out := &TCP{
+		netMetrics: newNetMetrics(reg),
 	}
 
-	out := &TCP{
-		monitorRegistry: reg,
-		device:          monitoring.NewString(reg, "device"),
-		packets:         monitoring.NewUint(reg, "received_events_total"),
-		bytes:           monitoring.NewUint(reg, "received_bytes_total"),
-		rxQueue:         monitoring.NewUint(reg, "receive_queue_length"),
-		arrivalPeriod:   metrics.NewUniformSample(1024),
-		processingTime:  metrics.NewUniformSample(1024),
-	}
 	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
 	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
@@ -82,20 +62,6 @@ func NewTCP(id string, reg *monitoring.Registry, device string, poll time.Durati
 	}
 
 	return out
-}
-
-// Log logs metric for the given packet.
-func (m *TCP) Log(data []byte, timestamp time.Time) {
-	if m == nil {
-		return
-	}
-	m.processingTime.Update(time.Since(timestamp).Nanoseconds())
-	m.packets.Add(1)
-	m.bytes.Add(uint64(len(data)))
-	if !m.lastPacket.IsZero() {
-		m.arrivalPeriod.Update(timestamp.Sub(m.lastPacket).Nanoseconds())
-	}
-	m.lastPacket = timestamp
 }
 
 // poll periodically gets TCP buffer stats from the OS.
@@ -165,15 +131,6 @@ func (m *TCP) poll(addr, addr6 []string, each time.Duration, log *logp.Logger) {
 	}
 }
 
-// Registry returns the monitoring registry of the TCP metricset.
-func (m *TCP) Registry() *monitoring.Registry {
-	if m == nil {
-		return nil
-	}
-
-	return m.monitorRegistry
-}
-
 // procNetTCP returns the rx_queue field of the TCP socket table for the
 // socket on the provided address formatted in hex, xxxxxxxx:xxxx or the IPv6
 // equivalent.
@@ -227,17 +184,4 @@ func procNetTCP(path string, addr []string, hasUnspecified bool, addrIsUnspecifi
 		return rx, nil
 	}
 	return 0, fmt.Errorf("%s entry not found for %s", path, addr)
-}
-
-// Close closes the TCP metricset and unregister the metrics.
-func (m *TCP) Close() {
-	if m == nil {
-		return
-	}
-	if m.done != nil {
-		// Shut down poller and wait until done before unregistering metrics.
-		m.done <- struct{}{}
-	}
-
-	m.monitorRegistry = nil
 }
