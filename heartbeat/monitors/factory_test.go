@@ -330,7 +330,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	require.NoError(t, err)
 
 	// Ensure that an error is returned on a bad config
-	_, m0Err := newMonitor(context.TODO(), badConf, reg, c, sched.Add, nil, nil)
+	_, m0Err := newMonitor(context.Background(), badConf, reg, c, sched.Add, nil, nil)
 	require.Error(t, m0Err)
 
 	// Would fail if the previous newMonitor didn't free the monitor.id

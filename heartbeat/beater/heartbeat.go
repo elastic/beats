@@ -163,9 +163,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	pipeline := b.Publisher
 	var pipelineWrapper monitors.PipelineWrapper = &monitors.NoopPipelineWrapper{}
 
-	// Trigger the close of the pipeline
 	if bt.config.RunOnce {
-		// Wrap publisher using a monitor skipper
 		sync := &monitors.SyncPipelineWrapper{}
 
 		pipeline = monitors.WithSyncPipelineWrapper(pipeline, sync)

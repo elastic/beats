@@ -87,7 +87,7 @@ func (m *Monitor) String() string {
 }
 
 func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg) error {
-	_, err := newMonitor(context.TODO(), config, registrar, nil, nil, monitorstate.NilStateLoader, nil)
+	_, err := newMonitor(context.Background(), config, registrar, nil, nil, monitorstate.NilStateLoader, nil)
 
 	return err
 }
