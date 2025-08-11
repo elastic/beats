@@ -14,17 +14,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/sys/windows"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-<<<<<<< HEAD
-
-	"golang.org/x/sys/windows"
-=======
 	"github.com/elastic/elastic-agent-libs/monitoring"
->>>>>>> b2a696c31 (filebeat: remove usages of inputmon.NewInputRegistry (#43862))
 )
 
 type mockSessionOperator struct {
