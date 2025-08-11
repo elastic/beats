@@ -1,0 +1,94 @@
+[
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "created"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "creation"
+        ]
+      },
+      "file": {
+        "accessed": "2025-08-11T09:47:13.7610698Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-08-11T09:47:13.7610698Z",
+        "ctime": "2025-08-11T09:47:13.7610698Z",
+        "drive_letter": "C",
+        "extension": "lnk",
+        "inode": "17169973579800859",
+        "mtime": "2025-08-11T09:47:13.7610698Z",
+        "name": "MyShortcut.lnk",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesfsnotifycreate-shortcut314813153\\001\\MyShortcut.lnk",
+        "size": 0,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-08-11T09:47:13.7613948Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 506300,
+    "Period": 0,
+    "DisableTimeSeries": false
+  },
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "updated"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "change"
+        ]
+      },
+      "file": {
+        "accessed": "2025-08-11T09:47:13.7641553Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-08-11T09:47:13.7610698Z",
+        "ctime": "2025-08-11T09:47:13.7610698Z",
+        "drive_letter": "C",
+        "extension": "lnk",
+        "inode": "17169973579800859",
+        "mtime": "2025-08-11T09:47:13.7641553Z",
+        "name": "MyShortcut.lnk",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesfsnotifycreate-shortcut314813153\\001\\MyShortcut.lnk",
+        "size": 1319,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-08-11T09:47:13.7647439Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 1130800,
+    "Period": 0,
+    "DisableTimeSeries": false
+  }
+]

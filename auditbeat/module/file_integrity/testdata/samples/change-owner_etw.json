@@ -1,0 +1,56 @@
+[
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "config_change"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "change"
+        ]
+      },
+      "file": {
+        "accessed": "2025-08-11T09:44:28.9840994Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-08-11T09:44:28.9840994Z",
+        "ctime": "2025-08-11T09:44:28.9840994Z",
+        "drive_letter": "C",
+        "extension": "txt",
+        "group": "NT AUTHORITY\\SYSTEM",
+        "inode": "9007199255191745",
+        "mtime": "2025-08-11T09:44:28.9840994Z",
+        "name": "mainfile.txt",
+        "owner": "NT AUTHORITY\\SYSTEM",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwchange-owner4243588941\\001\\mainfile.txt",
+        "size": 0,
+        "type": "file",
+        "uid": "S-1-5-18"
+      },
+      "process": {
+        "pid": 73600,
+        "user": {
+          "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
+          "name": "tp\\Marc"
+        }
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-08-11T09:44:37.1420283Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 1051200,
+    "Period": 0,
+    "DisableTimeSeries": false
+  }
+]
