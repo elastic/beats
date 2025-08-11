@@ -26,8 +26,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/file"
 	"golang.org/x/sys/windows"
+
+	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
 // NewMetadata returns a new Metadata object. If an error is returned it is

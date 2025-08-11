@@ -22,7 +22,7 @@ The operating system features that power this feature are as follows.
 
 * Linux - Multiple backends are supported: `auto`, `fsnotify`, `kprobes`, `ebpf`. By default, `fsnotify` is used, and therefore the kernel must have inotify support. Inotify was initially merged into the 2.6.13 Linux kernel. The eBPF backend uses modern eBPF features and supports 5.10.16+ kernels. The `Kprobes` backend uses tracefs and supports 3.10+ kernels. FSNotify doesn’t have the ability to associate user data to file events. The preferred backend can be selected by specifying the `backend` config option. Since eBPF and Kprobes are in technical preview, `auto` will default to `fsnotify`.
 * macOS (Darwin) - Uses the `FSEvents` API, present since macOS 10.5. This API coalesces multiple changes to a file into a single event. Auditbeat translates this coalesced changes into a meaningful sequence of actions. However, in rare situations the reported events may have a different ordering than what actually happened.
-* Windows - `ReadDirectoryChangesW` is used.
+* Windows - Multiple backends are supported: `auto`, `fsnotify`, `etw`. By default, `fsnotify` is used, which utilizes the `ReadDirectoryChangesW` Windows API. The `etw` backend uses Event Tracing for Windows (ETW) to monitor file system activities at the kernel level, supporting enhanced process context information. It requires Administrator privileges.
 
 The file integrity module should not be used to monitor paths on network file systems.
 
@@ -49,6 +49,18 @@ This module has some configuration options for tuning its behavior. The followin
   scan_rate_per_sec: 50 MiB
   max_file_size: 100 MiB
   hash_types: [sha1]
+```
+
+For Windows with the ETW backend, additional configuration options are available:
+
+```yaml
+- module: file_integrity
+  paths:
+  - C:\Windows\System32
+  - C:\Program Files
+  backend: etw
+  recursive: true
+  flush_interval: 1m
 ```
 
 This module also supports the [standard configuration options](#module-standard-options-file_integrity) described later.
@@ -84,7 +96,16 @@ This module also supports the [standard configuration options](#module-standard-
 :   A list of `file_integrity` fields under `file` that will be populated by file format parsers. The available fields that can be analysed are listed in the auditbeat.reference.yml file. File parsers are run on all files within the `max_file_size` limit in the configured paths during a scan or when a file event involves the file. Files that are not targets of the specific file parser are only sniffed to examine whether analysis should proceed. This will usually only involve reading a small number of bytes.
 
 **`backend`**
-:   (**Linux only**) Select the backend which will be used to source events. Valid values: `auto`, `fsnotify`, `kprobes`, `ebpf`. Default: `fsnotify`.
+:   Select the backend which will be used to source events. The available backends vary by operating system:
+    
+    **Linux:** `auto`, `fsnotify`, `kprobes`, `ebpf`. Default: `fsnotify`.
+    
+    **Windows:** `auto`, `fsnotify`, `etw`. Default: `fsnotify`.
+    
+    **macOS:** Only `auto` and `fsnotify` are supported. Default: `fsnotify`
+
+**`flush_interval`**
+:   (**ETW backend only**) Controls how often the ETW backend flushes event correlation groups. The ETW backend groups related file operations (like create, write, close) to provide meaningful events. This setting determines how long to wait for related events before considering an operation complete and sending the event. Setting a shorter interval will send events more quickly but may break up related operations. Setting a longer interval will provide better event correlation but may delay event delivery and impact memory footprint. This option is ignored when using other backends. Default: `1m`.
 
 
 ### Standard configuration options [module-standard-options-file_integrity]

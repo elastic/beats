@@ -351,6 +351,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add linux capabilities to processes in the system/process. {pull}37453[37453]
 - Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
 - Split module/system/process into common and provider bits. {pull}41868[41868]
+- Add new ETW FIM backend for Windows. {pull}45887[45887]
 
 *Auditbeat*
 

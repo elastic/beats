@@ -32,9 +32,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/stretchr/testify/require"
 )
 
 var saveETWEvents = flag.Bool("save-etw-events", false, "Save ETW events to testdata directory")

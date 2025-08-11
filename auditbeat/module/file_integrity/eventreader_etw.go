@@ -32,10 +32,11 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
-	"github.com/elastic/elastic-agent-libs/logp"
 	lru "github.com/hashicorp/golang-lru/v2"
 	"golang.org/x/sys/windows"
+
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // ETW keyword constants for enabling specific event categories
@@ -116,11 +117,10 @@ type etwReader struct {
 	eventC     chan Event
 	stopC      chan struct{}
 	inflightWG sync.WaitGroup
-	
+
 	// Device path translation for converting kernel paths to user paths
 	deviceMap  map[string]string // Maps kernel device paths to drive letters
 	deviceList []string          // Sorted list of device paths (longest first)
-
 
 	pathsCache    *lru.Cache[fileObject, string]
 	processCache  *lru.Cache[processStartKey, *Process]
