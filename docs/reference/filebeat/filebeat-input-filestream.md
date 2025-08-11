@@ -2,21 +2,31 @@
 navigation_title: "filestream"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-filestream.html
+applies_to:
+  stack: ga
 ---
 
 # filestream input [filebeat-input-filestream]
 
+::::{important}
+By default, Filestream starts ingesting files **only when
+their size is greater than 1024 bytes**. You can configure
+a different length for the fingerprint by setting the
+[`prospector.scanner.fingerprint.length`](#filebeat-input-filestream-scan-fingerprint)
+value.
+::::
 
 Use the `filestream` input to read lines from active log files. It is the new, improved alternative to the `log` input. It comes with various improvements to the existing input:
 
-1. Checking of `close.on_state_change.*` options happens out of band. Thus, if an output is blocked, Filebeat can close the reader and avoid keeping too many files open.
-2. Detailed metrics are available for all files that match the `paths` configuration regardless of the `harvester_limit`. This way, you can keep track of all files, even ones that are not actively read.
-3. The order of `parsers` is configurable. So it is possible to parse JSON lines and then aggregate the contents into a multiline event.
-4. Some position updates and metadata changes no longer depend on the publishing pipeline. If the pipeline is blocked some changes are still applied to the registry.
-5. Only the most recent updates are serialized to the registry. In contrast, the `log` input has to serialize the complete registry on each ACK from the outputs. This makes the registry updates much quicker with this input.
-6. The input ensures that only offsets updates are written to the registry append only log. The `log` writes the complete file state.
-7. Stale entries can be removed from the registry, even if there is no active input.
-8. The default behaviour is to identify files based on their contents using the [`fingerprint`](#filebeat-input-filestream-file-identity-fingerprint) [`file_identity`](#filebeat-input-filestream-file-identity) This solves data duplication caused by inode reuse.
+* The default behavior is to identify files based on their contents using [`fingerprint`](#filebeat-input-filestream-file-identity-fingerprint) [`file_identity`](#filebeat-input-filestream-file-identity). This solves data duplication caused by inode reuse.
+* Validation of `close.on_state_change.*` options happens out of band. If an output is blocked, Filebeat can close the reader and avoid keeping too many files open.
+* Detailed metrics are available for all files that match the `paths` configuration regardless of the `harvester_limit`. This way, you can keep track of all files, even ones that are not actively read.
+* The order of `parsers` is configurable. You can parse JSON lines and then aggregate the contents into a multiline event.
+* Some position updates and metadata changes no longer depend on the publishing pipeline. If the pipeline is blocked, some changes are still applied to the registry.
+* Only the most recent updates are serialized to the registry. In contrast, the `log` input has to serialize the complete registry on each ACK from the outputs. This makes the registry updates much quicker with this input.
+* The input ensures that only offsets updates are written to the registry append only log. The `log` writes the complete file state.
+* Stale entries can be removed from the registry, even if there is no active input.
+
 
 To configure this input, specify a list of glob-based [`paths`](#filestream-input-paths) that must be crawled to locate and fetch the log lines.
 
@@ -175,7 +185,7 @@ filebeat.inputs:
 
 See [Regular expression support](/reference/filebeat/regexp-support.md) for a list of supported regexp patterns.
 
-### `prospector.scanner.include_files` [_prospector_scanner_include_files]
+#### `prospector.scanner.include_files` [_prospector_scanner_include_files]
 
 A list of regular expressions to match the files that you want Filebeat to include. If a list of regexes is provided, only the files that are allowed by the patterns are harvested.
 
@@ -198,7 +208,7 @@ Patterns should start with `^` in case of absolute paths.
 See [Regular expression support](/reference/filebeat/regexp-support.md) for a list of supported regexp patterns.
 
 
-### `prospector.scanner.symlinks` [filebeat-input-filestream-prospector-scanner-symlinks]
+#### `prospector.scanner.symlinks` [filebeat-input-filestream-prospector-scanner-symlinks]
 
 The `symlinks` option allows Filebeat to harvest symlinks in addition to regular files. When harvesting symlinks, Filebeat opens and reads the original file even though it reports the path of the symlink.
 
@@ -209,7 +219,7 @@ The `symlinks` option can be useful if symlinks to the log files have additional
 Because this option may lead to data loss, it is disabled by default.
 
 
-### `prospector.scanner.resend_on_touch` [_prospector_scanner_resend_on_touch]
+#### `prospector.scanner.resend_on_touch` [_prospector_scanner_resend_on_touch]
 
 If this option is enabled a file is resent if its size has not changed but its modification time has changed to a later time than before. It is disabled by default to avoid accidentally resending files.
 
@@ -257,8 +267,6 @@ Following are some scenarios where this can happen:
 
 
 **Configuration**
-
-Fingerprint mode is disabled by default.
 
 ::::{warning}
 Enabling fingerprint mode delays ingesting new files until they grow to at least `offset`+`length` bytes in size, so they can be fingerprinted. Until then these files are ignored.
@@ -317,20 +325,58 @@ The setting relies on the modification time of the file to determine if a file i
 
 To remove the state of previously harvested files from the registry file, use the `clean_inactive` configuration option.
 
-## Take over [filebeat-input-filestream-take-over]
+#### `take_over` [filebeat-input-filestream-take-over]
+
+```{applies_to}
+stack: beta
+```
+
 When `take_over` is enabled, this `filestream` input will take over
 states from the [`log`](/reference/filebeat/filebeat-input-log.md) input
 or other `filestream` inputs. Only states of files being actively
 harvested by this input are taken over.
 
-To take over files from a `log` input, simply set `take_over.enabled: true`.
+The syntax for enabling take over mode varies by version:
 
-To take over states from other `filestream` inputs, set
-`take_over.enabled: true` and set `take_over.from_ids` to a list of
-existing `filestream` IDs you want to migrate files from.
+* {applies_to}`stack: beta 9.0.0` Use `take_over: true`.
+* {applies_to}`stack: beta 9.1.0` Use `take_over.enabled: true`.
 
-On both cases make sure the files you want this input to take over
-match the configured globs in `paths`.
+:::{note}
+While `take_over: true` is still supported to migrate state from the `log` input to
+`filestream`, we plan to remove support in a future version so you should use
+the new syntax if possible.
+:::
+
+##### `log` input
+
+To take over files from a `log` input, enable take over mode
+and make sure the files you want this input to take over match the configured globs in `paths`.
+
+::::{tab-set}
+:::{tab-item} 9.1.0
+```yaml
+take_over:
+  enabled: true
+```
+:::
+:::{tab-item} 9.0.0
+```yaml
+take_over: true
+```
+:::
+::::
+
+
+
+##### `filestream` input
+
+```{applies_to}
+stack: beta 9.1.0
+```
+
+To take over states from other `filestream` inputs, enable take over mode,
+set `take_over.from_ids` to a list of existing `filestream` IDs you want to migrate files from,
+and make sure the files you want this input to take over match the configured globs in `paths`.
 
 When `take_over.from_ids` is set, files are not taken over from `log`
 inputs. The migration is limited to `filestream` inputs only.
@@ -338,33 +384,24 @@ inputs. The migration is limited to `filestream` inputs only.
 ```yaml
 take_over:
   enabled: true
-  from_ids: ["foo", "bar"] # omit to take over from the log input
+  from_ids: ["foo", "bar"]
 ```
-:::{important}
-The `take over` mode can work correctly only if the source (taken from) inputs are no longer active. If source inputs are still harvesting the files which are being migrated, it will lead to data duplication and in some cases might cause data loss.
-:::
 
-::::{important}
-`take_over.enabled: true` requires the `filestream` to have a unique ID.
-::::
-
-
-This `take over` mode was created to enable smooth migration from
+This take over mode was created to enable smooth migration from
 deprecated `log` inputs to the new `filestream` inputs and to allow
 changing `filestream` input IDs without data re-ingestion.
 
-See [*Migrate `log` input configurations to `filestream`*](/reference/filebeat/migrate-to-filestream.md) for more details about the migration process.
+Refer to [Migrate `log` input configurations to `filestream`](/reference/filebeat/migrate-to-filestream.md) for more details about the migration process.
 
-::::{warning}
-The `take over` mode is still in beta, however, it should be generally safe to use.
-::::
+##### Notes and limitations
 
+When using take over mode, it is important to note:
 
-### Limitations
-Take over can only migrate states from existing files that are not
-ignored during the `filestream` input start up. Once the input is
-ingesting data, if a new file appears, `filestream` will not try to
-migrate its state.
+* Take over mode only works correctly if the source (taken from) inputs are no longer active.
+  If source inputs are still harvesting the files which are being migrated, it will lead to data duplication and in some cases might cause data loss.
+* Using `take_over.enabled: true` requires the `filestream` to have a unique ID.
+* Take over can only migrate states from existing files that are not ignored during the `filestream` input start up.
+  Once the input is ingesting data, if a new file appears, `filestream` will not try to migrate its state.
 
 #### `close.*` [filebeat-input-filestream-close-options]
 
@@ -383,8 +420,8 @@ Setting `close.on_state_change.inactive` to a lower value means that file handle
 
 The timestamp for closing a file does not depend on the modification time of the file. Instead, Filebeat uses an internal timestamp that reflects when the file was last harvested. For example, if `close.on_state_change.inactive` is set to 5 minutes, the countdown for the 5 minutes starts after the harvester reads the last line of the file.
 
-You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 5m.
-
+You can use time strings like `2h` (2 hours) and `5m` (5 minutes). The
+default is `5m`.
 
 #### `close.on_state_change.renamed` [filebeat-input-filestream-close-renamed]
 
@@ -402,12 +439,22 @@ WINDOWS: If your Windows log rotation system shows errors because it can’t rot
 
 #### `close.on_state_change.removed` [filebeat-input-filestream-close-removed]
 
-When this option is enabled, Filebeat closes the harvester when a file is removed. Normally a file should only be removed after it’s inactive for the duration specified by `close.on_state_change.inactive`. However, if a file is removed early and you don’t enable `close.on_state_change.removed`, Filebeat keeps the file open to make sure the harvester has completed. If this setting results in files that are not completely read because they are removed from disk too early, disable this option.
+When this option is enabled, Filebeat closes the harvester when a file
+is removed. Normally a file should only be removed after it’s inactive
+for the duration specified by
+`close.on_state_change.inactive`. However, if a file is removed early
+and you don’t enable `close.on_state_change.removed`, Filebeat keeps
+the file open to make sure the harvester has completed. If this
+setting results in files that are not completely read because they are
+removed from disk too early, disable this option.
 
-This option is enabled by default. If you disable this option, you must also disable `clean_removed`.
+{applies_to}`stack: ga 9.1` This option is enabled by default on Windows and disabled by default
+on all other operating systems.
 
-WINDOWS: If your Windows log rotation system shows errors because it can’t rotate files, make sure this option is enabled.
-
+::::{warning}
+If your Windows log rotation system shows errors because it
+can’t rotate files, make sure this option is enabled.
+::::
 
 #### `close.reader.on_eof` [filebeat-input-filestream-close-eof]
 
@@ -577,6 +624,66 @@ file_identity.path: ~
 file_identity.inode_marker.path: /logs/.filebeat-marker
 ```
 
+## Removing fully ingested files [filebeat-input-filestream-delete-options]
+
+By default, Filestream input doesn't delete files. If option is turned
+on, Filestream input can delete files when those conditions are met:
+ - The reader is closed. The default is 5 minutes of inactivity.
+ - EOF has been reached.
+ - All events have been acknowledged by the output.
+
+If there are events pending acknowledgement or there is an issue while
+deleting the file, the harvester reopens at the next scan and the
+remove operation is retried. You can configure the scan for changes
+in files by setting the
+[`prospector.scanner.check_interval`](#filebeat-input-filestream-scan-frequency)
+property.
+
+An output always acknowledges a successfully written event.
+However, it also acknowledges dropped events. Each output has
+different conditions for dropping an event. Refer the
+[output's](/reference/filebeat/configuring-output.md) documentation for
+more details.
+
+If Filebeat fails to remove the file, it retries up to 5 times with
+a constant backoff of 2 seconds. If all attempts fail, the harvester
+is closed and a new harvester starts in the next scan.
+
+If you turned on removing files, keep `clean_removed` enabled.
+Removing files is turned off by default.
+
+### `delete.enabled` [filebeat-input-filestream-delete-enabled]
+
+When set to `true`, files are removed when the following conditions
+are met:
+ - The reader is closed.
+ - EOF has been reached.
+ - All events have been acknowledged by the output.
+
+### `delete.grace_period` [filebeat-input-filestream-delete-grace-period]
+
+An interval to wait after the reader is closed and all events have
+been acknowledged before trying to remove the file.
+
+The harvester for the file stays open while waiting for the grace period.
+If the file size changes while waiting the grace period, the harvester is closed
+and the process restarts from the beginning. After the grace
+period expires, Filestream checks if the file is at EOF. If it's not,
+then the harvester is closed, otherwise the file is removed. During
+the grace period Filebeat periodically checks the file for changes
+using the same interval as the prospector, configured by
+[`prospector.scanner.check_interval`](#filebeat-input-filestream-scan-frequency).
+The default value is 30 minutes.
+
+For examples on how to use this feature, refer to [Removing files after
+ingestion](/reference/filebeat/delete-file-guide.md).
+
+:::{warning}
+When delete is enabled, do not use log rotation tools/strategies that
+might replace/move the files {{filebeat}} will delete after
+ingestion. This can cause files not fully ingested to be accidentally
+removed.
+:::
 
 ## Log rotation [filestream-log-rotation-support]
 

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-elasticsearch.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Elasticsearch fields [exported-fields-elasticsearch]
 
 Elasticsearch module
@@ -14,968 +16,967 @@ Elasticsearch module
 **`index_recovery.shards.start_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.index.recovery.start_time.ms
+    alias to: elasticsearch.index.recovery.start_time.ms
 
 
 **`index_recovery.shards.stop_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.index.recovery.stop_time.ms
+    alias to: elasticsearch.index.recovery.stop_time.ms
 
 
 **`index_recovery.shards.total_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.index.recovery.total_time.ms
+    alias to: elasticsearch.index.recovery.total_time.ms
 
 
 **`stack_stats.apm.found`**
 :   type: alias
 
-alias to: elasticsearch.cluster.stats.stack.apm.found
+    alias to: elasticsearch.cluster.stats.stack.apm.found
 
 
 **`stack_stats.xpack.ccr.enabled`**
 :   type: alias
 
-alias to: elasticsearch.cluster.stats.stack.xpack.ccr.enabled
+    alias to: elasticsearch.cluster.stats.stack.xpack.ccr.enabled
 
 
 **`stack_stats.xpack.ccr.available`**
 :   type: alias
 
-alias to: elasticsearch.cluster.stats.stack.xpack.ccr.available
+    alias to: elasticsearch.cluster.stats.stack.xpack.ccr.available
 
 
 **`license.status`**
 :   type: alias
 
-alias to: elasticsearch.cluster.stats.license.status
+    alias to: elasticsearch.cluster.stats.license.status
 
 
 **`license.type`**
 :   type: alias
 
-alias to: elasticsearch.cluster.stats.license.type
+    alias to: elasticsearch.cluster.stats.license.type
 
 
 **`shard.primary`**
 :   type: alias
 
-alias to: elasticsearch.shard.primary
+    alias to: elasticsearch.shard.primary
 
 
 **`shard.state`**
 :   type: alias
 
-alias to: elasticsearch.shard.state
+    alias to: elasticsearch.shard.state
 
 
 **`shard.index`**
 :   type: alias
 
-alias to: elasticsearch.index.name
+    alias to: elasticsearch.index.name
 
 
 **`shard.node`**
 :   type: alias
 
-alias to: elasticsearch.node.id
+    alias to: elasticsearch.node.id
 
 
 **`shard.shard`**
 :   type: alias
 
-alias to: elasticsearch.shard.number
+    alias to: elasticsearch.shard.number
 
 
 **`cluster_stats.indices.count`**
 :   type: alias
 
-alias to: elasticsearch.cluster.stats.indices.total
+    alias to: elasticsearch.cluster.stats.indices.total
 
 
 **`cluster_stats.indices.shards.total`**
 :   type: alias
 
-alias to: elasticsearch.cluster.stats.indices.shards.count
+    alias to: elasticsearch.cluster.stats.indices.shards.count
 
 
 **`cluster_stats.nodes.count.total`**
 :   type: alias
 
-alias to: elasticsearch.cluster.stats.nodes.count
+    alias to: elasticsearch.cluster.stats.nodes.count
 
 
 **`cluster_stats.nodes.jvm.max_uptime_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.cluster.stats.nodes.jvm.max_uptime.ms
+    alias to: elasticsearch.cluster.stats.nodes.jvm.max_uptime.ms
 
 
 **`cluster_stats.nodes.jvm.mem.heap_used_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.cluster.stats.nodes.jvm.memory.heap.used.bytes
+    alias to: elasticsearch.cluster.stats.nodes.jvm.memory.heap.used.bytes
 
 
 **`cluster_stats.nodes.jvm.mem.heap_max_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.cluster.stats.nodes.jvm.memory.heap.max.bytes
+    alias to: elasticsearch.cluster.stats.nodes.jvm.memory.heap.max.bytes
 
 
 **`cluster_state.nodes_hash`**
 :   type: alias
 
-alias to: elasticsearch.cluster.stats.state.nodes_hash
+    alias to: elasticsearch.cluster.stats.state.nodes_hash
 
 
 **`cluster_state.version`**
 :   type: alias
 
-alias to: elasticsearch.cluster.stats.state.version
+    alias to: elasticsearch.cluster.stats.state.version
 
 
 **`cluster_state.master_node`**
 :   type: alias
 
-alias to: elasticsearch.cluster.stats.state.master_node
+    alias to: elasticsearch.cluster.stats.state.master_node
 
 
 **`cluster_state.state_uuid`**
 :   type: alias
 
-alias to: elasticsearch.cluster.stats.state.state_uuid
+    alias to: elasticsearch.cluster.stats.state.state_uuid
 
 
 **`cluster_state.status`**
 :   type: alias
 
-alias to: elasticsearch.cluster.stats.status
+    alias to: elasticsearch.cluster.stats.status
 
 
 **`timestamp`**
 :   type: alias
 
-alias to: @timestamp
+    alias to: @timestamp
 
 
 **`cluster_uuid`**
 :   type: alias
 
-alias to: elasticsearch.cluster.id
+    alias to: elasticsearch.cluster.id
 
 
 **`source_node.uuid`**
 :   type: alias
 
-alias to: elasticsearch.node.id
+    alias to: elasticsearch.node.id
 
 
 **`source_node.name`**
 :   type: alias
 
-alias to: elasticsearch.node.name
+    alias to: elasticsearch.node.name
 
 
 **`job_stats.job_id`**
 :   type: alias
 
-alias to: elasticsearch.ml.job.id
+    alias to: elasticsearch.ml.job.id
 
 
 **`job_stats.forecasts_stats.total`**
 :   type: alias
 
-alias to: elasticsearch.ml.job.forecasts_stats.total
+    alias to: elasticsearch.ml.job.forecasts_stats.total
 
 
 **`index_stats.index`**
 :   type: alias
 
-alias to: elasticsearch.index.name
+    alias to: elasticsearch.index.name
 
 
 **`index_stats.primaries.store.size_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.primaries.store.size_in_bytes
+    alias to: elasticsearch.index.primaries.store.size_in_bytes
 
 
 **`index_stats.primaries.docs.count`**
 :   type: alias
 
-alias to: elasticsearch.index.primaries.docs.count
+    alias to: elasticsearch.index.primaries.docs.count
 
 
 **`index_stats.primaries.segments.count`**
 :   type: alias
 
-alias to: elasticsearch.index.primaries.segments.count
+    alias to: elasticsearch.index.primaries.segments.count
 
 
 **`index_stats.primaries.refresh.total_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.index.primaries.refresh.total_time_in_millis
+    alias to: elasticsearch.index.primaries.refresh.total_time_in_millis
 
 
 **`index_stats.primaries.merges.total_size_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.primaries.merges.total_size_in_bytes
+    alias to: elasticsearch.index.primaries.merges.total_size_in_bytes
 
 
 **`index_stats.primaries.indexing.index_total`**
 :   type: alias
 
-alias to: elasticsearch.index.primaries.indexing.index_total
+    alias to: elasticsearch.index.primaries.indexing.index_total
 
 
 **`index_stats.primaries.indexing.index_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.index.primaries.indexing.index_time_in_millis
+    alias to: elasticsearch.index.primaries.indexing.index_time_in_millis
 
 
 **`index_stats.primaries.indexing.throttle_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.index.primaries.indexing.throttle_time_in_millis
+    alias to: elasticsearch.index.primaries.indexing.throttle_time_in_millis
 
 
 **`index_stats.total.query_cache.memory_size_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.total.query_cache.memory_size_in_bytes
+    alias to: elasticsearch.index.total.query_cache.memory_size_in_bytes
 
 
 **`index_stats.total.fielddata.memory_size_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.total.fielddata.memory_size_in_bytes
+    alias to: elasticsearch.index.total.fielddata.memory_size_in_bytes
 
 
 **`index_stats.total.request_cache.memory_size_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.total.request_cache.memory_size_in_bytes
+    alias to: elasticsearch.index.total.request_cache.memory_size_in_bytes
 
 
 **`index_stats.total.merges.total_size_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.total.merges.total_size_in_bytes
+    alias to: elasticsearch.index.total.merges.total_size_in_bytes
 
 
 **`index_stats.total.refresh.total_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.index.total.refresh.total_time_in_millis
+    alias to: elasticsearch.index.total.refresh.total_time_in_millis
 
 
 **`index_stats.total.store.size_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.total.store.size_in_bytes
+    alias to: elasticsearch.index.total.store.size_in_bytes
 
 
 **`index_stats.total.indexing.index_total`**
 :   type: alias
 
-alias to: elasticsearch.index.total.indexing.index_total
+    alias to: elasticsearch.index.total.indexing.index_total
 
 
 **`index_stats.total.indexing.index_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.index.total.indexing.index_time_in_millis
+    alias to: elasticsearch.index.total.indexing.index_time_in_millis
 
 
 **`index_stats.total.indexing.throttle_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.index.total.indexing.throttle_time_in_millis
+    alias to: elasticsearch.index.total.indexing.throttle_time_in_millis
 
 
 **`index_stats.total.search.query_total`**
 :   type: alias
 
-alias to: elasticsearch.index.total.search.query_total
+    alias to: elasticsearch.index.total.search.query_total
 
 
 **`index_stats.total.search.query_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.index.total.search.query_time_in_millis
+    alias to: elasticsearch.index.total.search.query_time_in_millis
 
 
 **`index_stats.total.segments.terms_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.total.segments.terms_memory_in_bytes
+    alias to: elasticsearch.index.total.segments.terms_memory_in_bytes
 
 
 **`index_stats.total.segments.points_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.total.segments.points_memory_in_bytes
+    alias to: elasticsearch.index.total.segments.points_memory_in_bytes
 
 
 **`index_stats.total.segments.count`**
 :   type: alias
 
-alias to: elasticsearch.index.total.segments.count
+    alias to: elasticsearch.index.total.segments.count
 
 
 **`index_stats.total.segments.doc_values_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.total.segments.doc_values_memory_in_bytes
+    alias to: elasticsearch.index.total.segments.doc_values_memory_in_bytes
 
 
 **`index_stats.total.segments.norms_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.total.segments.norms_memory_in_bytes
+    alias to: elasticsearch.index.total.segments.norms_memory_in_bytes
 
 
 **`index_stats.total.segments.stored_fields_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.total.segments.stored_fields_memory_in_bytes
+    alias to: elasticsearch.index.total.segments.stored_fields_memory_in_bytes
 
 
 **`index_stats.total.segments.fixed_bit_set_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.total.segments.fixed_bit_set_memory_in_bytes
+    alias to: elasticsearch.index.total.segments.fixed_bit_set_memory_in_bytes
 
 
 **`index_stats.total.segments.term_vectors_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.total.segments.term_vectors_memory_in_bytes
+    alias to: elasticsearch.index.total.segments.term_vectors_memory_in_bytes
 
 
 **`index_stats.total.segments.version_map_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.total.segments.version_map_memory_in_bytes
+    alias to: elasticsearch.index.total.segments.version_map_memory_in_bytes
 
 
 **`index_stats.total.segments.index_writer_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.total.segments.index_writer_memory_in_bytes
+    alias to: elasticsearch.index.total.segments.index_writer_memory_in_bytes
 
 
 **`index_stats.total.segments.memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.index.total.segments.memory_in_bytes
+    alias to: elasticsearch.index.total.segments.memory_in_bytes
 
 
 **`ccr_auto_follow_stats.number_of_failed_follow_indices`**
 :   type: alias
 
-alias to: elasticsearch.ccr.auto_follow.failed.follow_indices.count
+    alias to: elasticsearch.ccr.auto_follow.failed.follow_indices.count
 
 
 **`ccr_auto_follow_stats.number_of_failed_remote_cluster_state_requests`**
 :   type: alias
 
-alias to: elasticsearch.ccr.auto_follow.failed.remote_cluster_state_requests.count
+    alias to: elasticsearch.ccr.auto_follow.failed.remote_cluster_state_requests.count
 
 
 **`ccr_auto_follow_stats.number_of_successful_follow_indices`**
 :   type: alias
 
-alias to: elasticsearch.ccr.auto_follow.success.follow_indices.count
+    alias to: elasticsearch.ccr.auto_follow.success.follow_indices.count
 
 
 **`ccr_auto_follow_stats.follower.failed_read_requests`**
 :   type: alias
 
-alias to: elasticsearch.ccr.requests.failed.read.count
+    alias to: elasticsearch.ccr.requests.failed.read.count
 
 
 **`ccr_stats.shard_id`**
 :   type: alias
 
-alias to: elasticsearch.ccr.follower.shard.number
+    alias to: elasticsearch.ccr.follower.shard.number
 
 
 **`ccr_stats.remote_cluster`**
 :   type: alias
 
-alias to: elasticsearch.ccr.remote_cluster
+    alias to: elasticsearch.ccr.remote_cluster
 
 
 **`ccr_stats.leader_index`**
 :   type: alias
 
-alias to: elasticsearch.ccr.leader.index
+    alias to: elasticsearch.ccr.leader.index
 
 
 **`ccr_stats.follower_index`**
 :   type: alias
 
-alias to: elasticsearch.ccr.follower.index
+    alias to: elasticsearch.ccr.follower.index
 
 
 **`ccr_stats.leader_global_checkpoint`**
 :   type: alias
 
-alias to: elasticsearch.ccr.leader.global_checkpoint
+    alias to: elasticsearch.ccr.leader.global_checkpoint
 
 
 **`ccr_stats.leader_max_seq_no`**
 :   type: alias
 
-alias to: elasticsearch.ccr.leader.max_seq_no
+    alias to: elasticsearch.ccr.leader.max_seq_no
 
 
 **`ccr_stats.follower_global_checkpoint`**
 :   type: alias
 
-alias to: elasticsearch.ccr.follower.global_checkpoint
+    alias to: elasticsearch.ccr.follower.global_checkpoint
 
 
 **`ccr_stats.follower_max_seq_no`**
 :   type: alias
 
-alias to: elasticsearch.ccr.follower.max_seq_no
+    alias to: elasticsearch.ccr.follower.max_seq_no
 
 
 **`ccr_stats.last_requested_seq_no`**
 :   type: alias
 
-alias to: elasticsearch.ccr.last_requested_seq_no
+    alias to: elasticsearch.ccr.last_requested_seq_no
 
 
 **`ccr_stats.outstanding_read_requests`**
 :   type: alias
 
-alias to: elasticsearch.ccr.requests.outstanding.read.count
+    alias to: elasticsearch.ccr.requests.outstanding.read.count
 
 
 **`ccr_stats.outstanding_write_requests`**
 :   type: alias
 
-alias to: elasticsearch.ccr.requests.outstanding.write.count
+    alias to: elasticsearch.ccr.requests.outstanding.write.count
 
 
 **`ccr_stats.write_buffer_operation_count`**
 :   type: alias
 
-alias to: elasticsearch.ccr.write_buffer.operation.count
+    alias to: elasticsearch.ccr.write_buffer.operation.count
 
 
 **`ccr_stats.write_buffer_size_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.ccr.write_buffer.size.bytes
+    alias to: elasticsearch.ccr.write_buffer.size.bytes
 
 
 **`ccr_stats.follower_mapping_version`**
 :   type: alias
 
-alias to: elasticsearch.ccr.follower.mapping_version
+    alias to: elasticsearch.ccr.follower.mapping_version
 
 
 **`ccr_stats.follower_settings_version`**
 :   type: alias
 
-alias to: elasticsearch.ccr.follower.settings_version
+    alias to: elasticsearch.ccr.follower.settings_version
 
 
 **`ccr_stats.follower_aliases_version`**
 :   type: alias
 
-alias to: elasticsearch.ccr.follower.aliases_version
+    alias to: elasticsearch.ccr.follower.aliases_version
 
 
 **`ccr_stats.total_read_time_millis`**
 :   type: alias
 
-alias to: elasticsearch.ccr.total_time.read.ms
+    alias to: elasticsearch.ccr.total_time.read.ms
 
 
 **`ccr_stats.total_read_remote_exec_time_millis`**
 :   type: alias
 
-alias to: elasticsearch.ccr.total_time.read.remote_exec.ms
+    alias to: elasticsearch.ccr.total_time.read.remote_exec.ms
 
 
 **`ccr_stats.successful_read_requests`**
 :   type: alias
 
-alias to: elasticsearch.ccr.requests.successful.read.count
+    alias to: elasticsearch.ccr.requests.successful.read.count
 
 
 **`ccr_stats.failed_read_requests`**
 :   type: alias
 
-alias to: elasticsearch.ccr.requests.failed.read.count
+    alias to: elasticsearch.ccr.requests.failed.read.count
 
 
 **`ccr_stats.operations_read`**
 :   type: alias
 
-alias to: elasticsearch.ccr.follower.operations.read.count
+    alias to: elasticsearch.ccr.follower.operations.read.count
 
 
 **`ccr_stats.operations_written`**
 :   type: alias
 
-alias to: elasticsearch.ccr.follower.operations_written
+    alias to: elasticsearch.ccr.follower.operations_written
 
 
 **`ccr_stats.bytes_read`**
 :   type: alias
 
-alias to: elasticsearch.ccr.bytes_read
+    alias to: elasticsearch.ccr.bytes_read
 
 
 **`ccr_stats.total_write_time_millis`**
 :   type: alias
 
-alias to: elasticsearch.ccr.total_time.write.ms
+    alias to: elasticsearch.ccr.total_time.write.ms
 
 
 **`ccr_stats.successful_write_requests`**
 :   type: alias
 
-alias to: elasticsearch.ccr.requests.successful.write.count
+    alias to: elasticsearch.ccr.requests.successful.write.count
 
 
 **`ccr_stats.failed_write_requests`**
 :   type: alias
 
-alias to: elasticsearch.ccr.requests.failed.write.count
+    alias to: elasticsearch.ccr.requests.failed.write.count
 
 
 **`node_stats.fs.total.available_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.fs.summary.available.bytes
+    alias to: elasticsearch.node.stats.fs.summary.available.bytes
 
 
 **`node_stats.fs.total.total_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.fs.summary.total.bytes
+    alias to: elasticsearch.node.stats.fs.summary.total.bytes
 
 
 **`node_stats.fs.summary.available.bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.fs.summary.available.bytes
+    alias to: elasticsearch.node.stats.fs.summary.available.bytes
 
 
 **`node_stats.fs.summary.total.bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.fs.summary.total.bytes
+    alias to: elasticsearch.node.stats.fs.summary.total.bytes
 
 
 **`node_stats.fs.io_stats.total.operations`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.fs.io_stats.total.operations.count
+    alias to: elasticsearch.node.stats.fs.io_stats.total.operations.count
 
 
 **`node_stats.fs.io_stats.total.read_operations`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.fs.io_stats.total.read.operations.count
+    alias to: elasticsearch.node.stats.fs.io_stats.total.read.operations.count
 
 
 **`node_stats.fs.io_stats.total.write_operations`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.fs.io_stats.total.write.operations.count
+    alias to: elasticsearch.node.stats.fs.io_stats.total.write.operations.count
 
 
 **`node_stats.indices.store.size_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.store.size.bytes
+    alias to: elasticsearch.node.stats.indices.store.size.bytes
 
 
 **`node_stats.indices.store.size.bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.store.size.bytes
+    alias to: elasticsearch.node.stats.indices.store.size.bytes
 
 
 **`node_stats.indices.docs.count`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.docs.count
+    alias to: elasticsearch.node.stats.indices.docs.count
 
 
 **`node_stats.indices.indexing.index_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.indexing.index_time.ms
+    alias to: elasticsearch.node.stats.indices.indexing.index_time.ms
 
 
 **`node_stats.indices.indexing.index_total`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.indexing.index_total.count
+    alias to: elasticsearch.node.stats.indices.indexing.index_total.count
 
 
 **`node_stats.indices.indexing.throttle_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.indexing.throttle_time.ms
+    alias to: elasticsearch.node.stats.indices.indexing.throttle_time.ms
 
 
 **`node_stats.indices.fielddata.memory_size_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.fielddata.memory.bytes
+    alias to: elasticsearch.node.stats.indices.fielddata.memory.bytes
 
 
 **`node_stats.indices.query_cache.memory_size_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.query_cache.memory.bytes
+    alias to: elasticsearch.node.stats.indices.query_cache.memory.bytes
 
 
 **`node_stats.indices.request_cache.memory_size_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.request_cache.memory.bytes
+    alias to: elasticsearch.node.stats.indices.request_cache.memory.bytes
 
 
 **`node_stats.indices.search.query_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.search.query_time.ms
+    alias to: elasticsearch.node.stats.indices.search.query_time.ms
 
 
 **`node_stats.indices.search.query_total`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.search.query_total.count
+    alias to: elasticsearch.node.stats.indices.search.query_total.count
 
 
 **`node_stats.indices.segments.count`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.segments.count
+    alias to: elasticsearch.node.stats.indices.segments.count
 
 
 **`node_stats.indices.segments.doc_values_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.segments.doc_values.memory.bytes
+    alias to: elasticsearch.node.stats.indices.segments.doc_values.memory.bytes
 
 
 **`node_stats.indices.segments.fixed_bit_set_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.segments.fixed_bit_set.memory.bytes
+    alias to: elasticsearch.node.stats.indices.segments.fixed_bit_set.memory.bytes
 
 
 **`node_stats.indices.segments.index_writer_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.segments.index_writer.memory.bytes
+    alias to: elasticsearch.node.stats.indices.segments.index_writer.memory.bytes
 
 
 **`node_stats.indices.segments.memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.segments.memory.bytes
+    alias to: elasticsearch.node.stats.indices.segments.memory.bytes
 
 
 **`node_stats.indices.segments.norms_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.segments.norms.memory.bytes
+    alias to: elasticsearch.node.stats.indices.segments.norms.memory.bytes
 
 
 **`node_stats.indices.segments.points_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.segments.points.memory.bytes
+    alias to: elasticsearch.node.stats.indices.segments.points.memory.bytes
 
 
 **`node_stats.indices.segments.stored_fields_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.segments.stored_fields.memory.bytes
+    alias to: elasticsearch.node.stats.indices.segments.stored_fields.memory.bytes
 
 
 **`node_stats.indices.segments.term_vectors_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.segments.term_vectors.memory.bytes
+    alias to: elasticsearch.node.stats.indices.segments.term_vectors.memory.bytes
 
 
 **`node_stats.indices.segments.terms_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.segments.terms.memory.bytes
+    alias to: elasticsearch.node.stats.indices.segments.terms.memory.bytes
 
 
 **`node_stats.indices.segments.version_map_memory_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.indices.segments.version_map.memory.bytes
+    alias to: elasticsearch.node.stats.indices.segments.version_map.memory.bytes
 
 
 **`node_stats.jvm.gc.collectors.old.collection_count`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.jvm.gc.collectors.old.collection.count
+    alias to: elasticsearch.node.stats.jvm.gc.collectors.old.collection.count
 
 
 **`node_stats.jvm.gc.collectors.old.collection_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.jvm.gc.collectors.old.collection.ms
+    alias to: elasticsearch.node.stats.jvm.gc.collectors.old.collection.ms
 
 
 **`node_stats.jvm.gc.collectors.young.collection_count`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.jvm.gc.collectors.young.collection.count
+    alias to: elasticsearch.node.stats.jvm.gc.collectors.young.collection.count
 
 
 **`node_stats.jvm.gc.collectors.young.collection_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.jvm.gc.collectors.young.collection.ms
+    alias to: elasticsearch.node.stats.jvm.gc.collectors.young.collection.ms
 
 
 **`node_stats.jvm.mem.heap_max_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.jvm.mem.heap.max.bytes
+    alias to: elasticsearch.node.stats.jvm.mem.heap.max.bytes
 
 
 **`node_stats.jvm.mem.heap_used_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.jvm.mem.heap.used.bytes
+    alias to: elasticsearch.node.stats.jvm.mem.heap.used.bytes
 
 
 **`node_stats.jvm.mem.heap_used_percent`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.jvm.mem.heap.used.pct
+    alias to: elasticsearch.node.stats.jvm.mem.heap.used.pct
 
 
 **`node_stats.node_id`**
 :   type: alias
 
-alias to: elasticsearch.node.id
+    alias to: elasticsearch.node.id
 
 
 **`node_stats.os.cpu.load_average.1m`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.os.cpu.load_avg.1m
+    alias to: elasticsearch.node.stats.os.cpu.load_avg.1m
 
 
 **`node_stats.os.cgroup.cpuacct.usage_nanos`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.os.cgroup.cpuacct.usage.ns
+    alias to: elasticsearch.node.stats.os.cgroup.cpuacct.usage.ns
 
 
 **`node_stats.os.cgroup.cpu.cfs_quota_micros`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.os.cgroup.cpu.cfs.quota.us
+    alias to: elasticsearch.node.stats.os.cgroup.cpu.cfs.quota.us
 
 
 **`node_stats.os.cgroup.cpu.stat.number_of_elapsed_periods`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.os.cgroup.cpu.stat.elapsed_periods.count
+    alias to: elasticsearch.node.stats.os.cgroup.cpu.stat.elapsed_periods.count
 
 
 **`node_stats.os.cgroup.cpu.stat.number_of_times_throttled`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.os.cgroup.cpu.stat.times_throttled.count
+    alias to: elasticsearch.node.stats.os.cgroup.cpu.stat.times_throttled.count
 
 
 **`node_stats.os.cgroup.cpu.stat.time_throttled_nanos`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.os.cgroup.cpu.stat.time_throttled.ns
+    alias to: elasticsearch.node.stats.os.cgroup.cpu.stat.time_throttled.ns
 
 
 **`node_stats.os.cgroup.memory.control_group`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.os.cgroup.memory.control_group
+    alias to: elasticsearch.node.stats.os.cgroup.memory.control_group
 
 
 **`node_stats.os.cgroup.memory.limit_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.os.cgroup.memory.limit.bytes
+    alias to: elasticsearch.node.stats.os.cgroup.memory.limit.bytes
 
 
 **`node_stats.os.cgroup.memory.usage_in_bytes`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.os.cgroup.memory.usage.bytes
+    alias to: elasticsearch.node.stats.os.cgroup.memory.usage.bytes
 
 
 **`node_stats.process.cpu.percent`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.process.cpu.pct
+    alias to: elasticsearch.node.stats.process.cpu.pct
 
 
 **`node_stats.thread_pool.bulk.queue`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.thread_pool.bulk.queue.count
+    alias to: elasticsearch.node.stats.thread_pool.bulk.queue.count
 
 
 **`node_stats.thread_pool.bulk.rejected`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.thread_pool.bulk.rejected.count
+    alias to: elasticsearch.node.stats.thread_pool.bulk.rejected.count
 
 
 **`node_stats.thread_pool.get.queue`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.thread_pool.get.queue.count
+    alias to: elasticsearch.node.stats.thread_pool.get.queue.count
 
 
 **`node_stats.thread_pool.get.rejected`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.thread_pool.get.rejected.count
+    alias to: elasticsearch.node.stats.thread_pool.get.rejected.count
 
 
 **`node_stats.thread_pool.index.queue`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.thread_pool.index.queue.count
+    alias to: elasticsearch.node.stats.thread_pool.index.queue.count
 
 
 **`node_stats.thread_pool.index.rejected`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.thread_pool.index.rejected.count
+    alias to: elasticsearch.node.stats.thread_pool.index.rejected.count
 
 
 **`node_stats.thread_pool.search.queue`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.thread_pool.search.queue.count
+    alias to: elasticsearch.node.stats.thread_pool.search.queue.count
 
 
 **`node_stats.thread_pool.search.rejected`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.thread_pool.search.rejected.count
+    alias to: elasticsearch.node.stats.thread_pool.search.rejected.count
 
 
 **`node_stats.thread_pool.write.queue`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.thread_pool.write.queue.count
+    alias to: elasticsearch.node.stats.thread_pool.write.queue.count
 
 
 **`node_stats.thread_pool.write.rejected`**
 :   type: alias
 
-alias to: elasticsearch.node.stats.thread_pool.write.rejected.count
+    alias to: elasticsearch.node.stats.thread_pool.write.rejected.count
 
 
 **`indices_stats._all.primaries.indexing.index_total`**
 :   type: alias
 
-alias to: elasticsearch.index.summary.primaries.indexing.index.count
+    alias to: elasticsearch.index.summary.primaries.indexing.index.count
 
 
 **`indices_stats._all.primaries.indexing.index_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.index.summary.primaries.indexing.index.time.ms
+    alias to: elasticsearch.index.summary.primaries.indexing.index.time.ms
 
 
 **`indices_stats._all.total.search.query_total`**
 :   type: alias
 
-alias to: elasticsearch.index.summary.total.search.query.count
+    alias to: elasticsearch.index.summary.total.search.query.count
 
 
 **`indices_stats._all.total.search.query_time_in_millis`**
 :   type: alias
 
-alias to: elasticsearch.index.summary.total.search.query.time.ms
+    alias to: elasticsearch.index.summary.total.search.query.time.ms
 
 
 **`indices_stats._all.total.indexing.index_total`**
 :   type: alias
 
-alias to: elasticsearch.index.summary.total.indexing.index.count
+    alias to: elasticsearch.index.summary.total.indexing.index.count
 
 
 **`elasticsearch.cluster.name`**
 :   Elasticsearch cluster name.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.cluster.id`**
 :   Elasticsearch cluster id.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.cluster.state.id`**
 :   Elasticsearch state id.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.node.id`**
 :   Node ID
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.node.name`**
 :   Node name.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.node.roles`**
 :   Node roles.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.node.master`**
 :   Is the node the master node?
 
-type: boolean
+    type: boolean
 
 
 **`elasticsearch.node.mlockall`**
 :   Is mlockall enabled on the node?
 
-type: boolean
-
+    type: boolean
 
 
 ## ccr [_ccr]
@@ -1061,13 +1062,13 @@ Cross-cluster replication stats
 **`elasticsearch.ccr.leader.index`**
 :   Name of leader index
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.ccr.leader.max_seq_no`**
 :   Maximum sequence number of operation on the leader shard
 
-type: long
+    type: long
 
 
 **`elasticsearch.ccr.leader.global_checkpoint`**
@@ -1077,37 +1078,37 @@ type: long
 **`elasticsearch.ccr.follower.index`**
 :   Name of follower index
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.ccr.follower.shard.number`**
 :   Number of the shard within the index
 
-type: long
+    type: long
 
 
 **`elasticsearch.ccr.follower.operations_written`**
 :   Number of operations indexed (replicated) into the follower shard from the leader shard
 
-type: long
+    type: long
 
 
 **`elasticsearch.ccr.follower.time_since_last_read.ms`**
 :   Time, in ms, since the follower last fetched from the leader
 
-type: long
+    type: long
 
 
 **`elasticsearch.ccr.follower.global_checkpoint`**
 :   Global checkpoint value on follower shard
 
-type: long
+    type: long
 
 
 **`elasticsearch.ccr.follower.max_seq_no`**
 :   Maximum sequence number of operation on the follower shard
 
-type: long
+    type: long
 
 
 **`elasticsearch.ccr.follower.mapping_version`**
@@ -1126,8 +1127,7 @@ type: long
 :   type: long
 
 
-
-## cluster.stats [_cluster_stats]
+## cluster.stats [_cluster.stats]
 
 Cluster stats
 
@@ -1158,8 +1158,7 @@ Cluster stats
 **`elasticsearch.cluster.stats.status`**
 :   Cluster status (green, yellow, red).
 
-type: keyword
-
+    type: keyword
 
 
 ## nodes [_nodes]
@@ -1177,19 +1176,19 @@ Nodes statistics.
 **`elasticsearch.cluster.stats.nodes.count`**
 :   Total number of nodes in cluster.
 
-type: long
+    type: long
 
 
 **`elasticsearch.cluster.stats.nodes.master`**
 :   Number of master-eligible nodes in cluster.
 
-type: long
+    type: long
 
 
 **`elasticsearch.cluster.stats.nodes.data`**
 :   Number of data nodes in cluster.
 
-type: long
+    type: long
 
 
 **`elasticsearch.cluster.stats.nodes.jvm.max_uptime.ms`**
@@ -1202,7 +1201,6 @@ type: long
 
 **`elasticsearch.cluster.stats.nodes.jvm.memory.heap.used.bytes`**
 :   type: long
-
 
 
 ## indices [_indices]
@@ -1220,8 +1218,7 @@ Indices statistics.
 **`elasticsearch.cluster.stats.indices.total`**
 :   Total number of indices in cluster.
 
-type: long
-
+    type: long
 
 
 ## shards [_shards]
@@ -1235,19 +1232,19 @@ Shard statistics.
 **`elasticsearch.cluster.stats.indices.shards.count`**
 :   Total number of shards in cluster.
 
-type: long
+    type: long
 
 
 **`elasticsearch.cluster.stats.indices.shards.primaries`**
 :   Total number of primary shards in cluster.
 
-type: long
+    type: long
 
 
 **`elasticsearch.cluster.stats.indices.fielddata.memory.bytes`**
 :   Memory used for fielddata.
 
-type: long
+    type: long
 
 
 **`elasticsearch.cluster.stats.license.expiry_date_in_millis`**
@@ -1272,7 +1269,6 @@ type: long
 
 **`elasticsearch.cluster.stats.stack.xpack.ccr.enabled`**
 :   type: boolean
-
 
 
 ## enrich [_enrich]
@@ -1314,29 +1310,28 @@ Enrich stats
 **`elasticsearch.enrich.queue.size`**
 :   Number of search requests in the queue.
 
-type: long
+    type: long
 
 
 **`elasticsearch.enrich.executed_searches.total`**
 :   Number of search requests that enrich processors have executed since node startup.
 
-type: long
+    type: long
 
 
 **`elasticsearch.enrich.remote_requests.current`**
 :   Current number of outstanding remote requests.
 
-type: long
+    type: long
 
 
 **`elasticsearch.enrich.remote_requests.total`**
 :   Number of outstanding remote requests executed since node startup.
 
-type: long
+    type: long
 
 
-
-## index [_index_3]
+## index [_index]
 
 index
 
@@ -1375,7 +1370,7 @@ index
 **`elasticsearch.index.name`**
 :   Index name.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.index.primaries.search.query_total`**
@@ -1501,29 +1496,29 @@ type: keyword
 **`elasticsearch.index.total.docs.count`**
 :   Total number of documents in the index.
 
-type: long
+    type: long
 
 
 **`elasticsearch.index.total.docs.deleted`**
 :   Total number of deleted documents in the index.
 
-type: long
+    type: long
 
 
 **`elasticsearch.index.total.store.size_in_bytes`**
 :   Total size of the index in bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.index.total.store.total_data_set_size_in_bytes`**
 :   Total size of the index in bytes including backing data for partially mounted indices.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.index.total.query_cache.memory_size_in_bytes`**
@@ -1581,9 +1576,9 @@ format: bytes
 **`elasticsearch.index.total.segments.memory_in_bytes`**
 :   Total number of memory used by the segments in bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.index.total.segments.terms_memory_in_bytes`**
@@ -1597,7 +1592,7 @@ format: bytes
 **`elasticsearch.index.total.segments.count`**
 :   Total number of index segments.
 
-type: long
+    type: long
 
 
 **`elasticsearch.index.total.segments.doc_values_memory_in_bytes`**
@@ -1668,8 +1663,7 @@ type: long
 :   type: long
 
 
-
-## index.recovery [_index_recovery]
+## index.recovery [_index.recovery]
 
 index
 
@@ -1720,25 +1714,25 @@ index
 **`elasticsearch.index.recovery.id`**
 :   Shard recovery id.
 
-type: long
+    type: long
 
 
 **`elasticsearch.index.recovery.type`**
 :   Shard recovery type.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.index.recovery.primary`**
 :   True if primary shard.
 
-type: boolean
+    type: boolean
 
 
 **`elasticsearch.index.recovery.stage`**
 :   Recovery stage.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.index.recovery.translog.percent`**
@@ -1760,19 +1754,19 @@ type: keyword
 **`elasticsearch.index.recovery.target.id`**
 :   Target node id.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.index.recovery.target.host`**
 :   Target node host address (could be IP address or hostname).
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.index.recovery.target.name`**
 :   Target node name.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.index.recovery.source.transport_address`**
@@ -1782,19 +1776,19 @@ type: keyword
 **`elasticsearch.index.recovery.source.id`**
 :   Source node id.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.index.recovery.source.host`**
 :   Source node host address (could be IP address or hostname).
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.index.recovery.source.name`**
 :   Source node name.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.index.recovery.verify_index.check_index_time.ms`**
@@ -1805,51 +1799,50 @@ type: keyword
 :   type: long
 
 
-
-## index.summary [_index_summary]
+## index.summary [_index.summary]
 
 index
 
 **`elasticsearch.index.summary.primaries.docs.count`**
 :   Total number of documents in the index.
 
-type: long
+    type: long
 
 
 **`elasticsearch.index.summary.primaries.docs.deleted`**
 :   Total number of deleted documents in the index.
 
-type: long
+    type: long
 
 
 **`elasticsearch.index.summary.primaries.store.size.bytes`**
 :   Total size of the index in bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.index.summary.primaries.store.total_data_set_size.bytes`**
 :   Total size of the index in bytes including backing data for partially mounted indices.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.index.summary.primaries.segments.count`**
 :   Total number of index segments.
 
-type: long
+    type: long
 
 
 **`elasticsearch.index.summary.primaries.segments.memory.bytes`**
 :   Total number of memory used by the segments in bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.index.summary.primaries.indexing.index.count`**
@@ -1891,43 +1884,43 @@ format: bytes
 **`elasticsearch.index.summary.total.docs.count`**
 :   Total number of documents in the index.
 
-type: long
+    type: long
 
 
 **`elasticsearch.index.summary.total.docs.deleted`**
 :   Total number of deleted documents in the index.
 
-type: long
+    type: long
 
 
 **`elasticsearch.index.summary.total.store.size.bytes`**
 :   Total size of the index in bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.index.summary.total.store.total_data_set_size.bytes`**
 :   Total size of the index in bytes including backing data for partially mounted indices.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.index.summary.total.segments.count`**
 :   Total number of index segments.
 
-type: long
+    type: long
 
 
 **`elasticsearch.index.summary.total.segments.memory.bytes`**
 :   Total number of memory used by the segments in bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.index.summary.total.indexing.index.count`**
@@ -1970,16 +1963,18 @@ format: bytes
 :   type: long
 
 
-
 ## ingest_pipeline [_ingest_pipeline]
+
+```{applies_to}
+stack: beta
+```
 
 Runtime metrics on ingest pipeline execution
 
 **`elasticsearch.ingest_pipeline.name`**
 :   Name / id of the ingest pipeline
 
-type: wildcard
-
+    type: wildcard
 
 
 ## total [_total]
@@ -1989,78 +1984,77 @@ Metrics on the total ingest pipeline execution, including all processors.
 **`elasticsearch.ingest_pipeline.total.count`**
 :   Number of documents processed by this pipeline
 
-type: long
+    type: long
 
 
 **`elasticsearch.ingest_pipeline.total.failed`**
 :   Number of documented failed to process by this pipeline
 
-type: long
+    type: long
 
 
 **`elasticsearch.ingest_pipeline.total.time.total.ms`**
 :   Total time spent processing documents through this pipeline, inclusive of other pipelines called
 
-type: long
+    type: long
 
 
 **`elasticsearch.ingest_pipeline.total.time.self.ms`**
 :   Time spent processing documents through this pipeline, exclusive of other pipelines called
 
-type: long
+    type: long
 
 
 **`elasticsearch.ingest_pipeline.processor.type`**
 :   The type of ingest processor
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.ingest_pipeline.processor.type_tag`**
 :   The type and the tag for this processor in the format "<type>:<tag>"
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.ingest_pipeline.processor.order_index`**
 :   The order this processor appears in the pipeline definition
 
-type: long
+    type: long
 
 
 **`elasticsearch.ingest_pipeline.processor.count`**
 :   Number of documents processed by this processor
 
-type: long
+    type: long
 
 
 **`elasticsearch.ingest_pipeline.processor.failed`**
 :   Number of documented failed to process by this processor
 
-type: long
+    type: long
 
 
 **`elasticsearch.ingest_pipeline.processor.time.total.ms`**
 :   Total time spent processing documents through this processor
 
-type: long
+    type: long
 
 
-
-## ml.job [_ml_job]
+## ml.job [_ml.job]
 
 ml
 
 **`elasticsearch.ml.job.id`**
 :   Unique ml job id.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.ml.job.state`**
 :   Job state.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.ml.job.forecasts_stats.total`**
@@ -2078,25 +2072,23 @@ type: keyword
 **`elasticsearch.ml.job.data_counts.processed_record_count`**
 :   Processed data events.
 
-type: long
+    type: long
 
 
 **`elasticsearch.ml.job.data.invalid_date.count`**
 :   The number of records with either a missing date field or a date that could not be parsed.
 
-type: long
+    type: long
 
 
-
-## node [_node_2]
+## node [_node]
 
 node
 
 **`elasticsearch.node.version`**
 :   Node version.
 
-type: keyword
-
+    type: keyword
 
 
 ## jvm [_jvm]
@@ -2106,49 +2098,48 @@ JVM Info.
 **`elasticsearch.node.jvm.version`**
 :   JVM version.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.node.jvm.memory.heap.init.bytes`**
 :   Heap init used by the JVM in bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.jvm.memory.heap.max.bytes`**
 :   Heap max used by the JVM in bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.jvm.memory.nonheap.init.bytes`**
 :   Non-Heap init used by the JVM in bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.jvm.memory.nonheap.max.bytes`**
 :   Non-Heap max used by the JVM in bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.process.mlockall`**
 :   If process locked in memory.
 
-type: boolean
+    type: boolean
 
 
-
-## node.stats [_node_stats]
+## node.stats [_node.stats]
 
 Statistics about each node in a Elasticsearch cluster
 
@@ -2191,39 +2182,39 @@ Statistics about each node in a Elasticsearch cluster
 **`elasticsearch.node.stats.indices.docs.count`**
 :   Total number of existing documents.
 
-type: long
+    type: long
 
 
 **`elasticsearch.node.stats.indices.docs.deleted`**
 :   Total number of deleted documents.
 
-type: long
+    type: long
 
 
 **`elasticsearch.node.stats.indices.segments.count`**
 :   Total number of segments.
 
-type: long
+    type: long
 
 
 **`elasticsearch.node.stats.indices.segments.memory.bytes`**
 :   Total size of segments in bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indices.store.size.bytes`**
 :   Total size of all shards assigned to this node in bytes.
 
-type: long
+    type: long
 
 
 **`elasticsearch.node.stats.indices.store.total_data_set_size.bytes`**
 :   Total size of shards in bytes assigned to this node including backing data for partially mounted indices.
 
-type: long
+    type: long
 
 
 **`elasticsearch.node.stats.indices.fielddata.evictions.count`**
@@ -2233,7 +2224,7 @@ type: long
 **`elasticsearch.node.stats.indices.fielddata.memory.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indices.flush.total_time.ms`**
@@ -2275,7 +2266,7 @@ format: bytes
 **`elasticsearch.node.stats.indices.query_cache.memory.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indices.refresh.total_time.ms`**
@@ -2289,7 +2280,7 @@ format: bytes
 **`elasticsearch.node.stats.indices.request_cache.memory.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indices.search.query_time.ms`**
@@ -2315,55 +2306,55 @@ format: bytes
 **`elasticsearch.node.stats.indices.segments.doc_values.memory.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indices.segments.fixed_bit_set.memory.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indices.segments.index_writer.memory.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indices.segments.norms.memory.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indices.segments.points.memory.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indices.segments.stored_fields.memory.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indices.segments.term_vectors.memory.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indices.segments.terms.memory.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indices.segments.version_map.memory.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indices.translog.size.bytes`**
@@ -2377,19 +2368,19 @@ format: bytes
 **`elasticsearch.node.stats.jvm.mem.heap.max.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.jvm.mem.heap.used.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.jvm.mem.heap.used.pct`**
 :   type: double
 
-format: percent
+    format: percent
 
 
 **`elasticsearch.node.stats.jvm.threads.count`**
@@ -2399,97 +2390,97 @@ format: percent
 **`elasticsearch.node.stats.jvm.mem.pools.old.max.bytes`**
 :   Max bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.jvm.mem.pools.old.peak.bytes`**
 :   Peak bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.jvm.mem.pools.old.peak_max.bytes`**
 :   Peak max bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.jvm.mem.pools.old.used.bytes`**
 :   Used bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.jvm.mem.pools.young.max.bytes`**
 :   Max bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.jvm.mem.pools.young.peak.bytes`**
 :   Peak bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.jvm.mem.pools.young.peak_max.bytes`**
 :   Peak max bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.jvm.mem.pools.young.used.bytes`**
 :   Used bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.jvm.mem.pools.survivor.max.bytes`**
 :   Max bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.jvm.mem.pools.survivor.peak.bytes`**
 :   Peak bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.jvm.mem.pools.survivor.peak_max.bytes`**
 :   Peak max bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.jvm.mem.pools.survivor.used.bytes`**
 :   Used bytes.
 
-type: long
+    type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.jvm.gc.collectors.old.collection.count`**
@@ -2516,27 +2507,26 @@ format: bytes
 :   type: long
 
 
-
-## summary [_summary_4]
+## summary [_summary]
 
 File system summary
 
 **`elasticsearch.node.stats.fs.summary.total.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.fs.summary.free.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.fs.summary.available.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.fs.io_stats.total.operations.count`**
@@ -2590,7 +2580,7 @@ format: bytes
 **`elasticsearch.node.stats.process.cpu.pct`**
 :   type: double
 
-format: percent
+    format: percent
 
 
 **`elasticsearch.node.stats.process.mem.total_virtual.bytes`**
@@ -2764,115 +2754,113 @@ format: percent
 **`elasticsearch.node.stats.indexing_pressure.memory.current.combined_coordinating_and_primary.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indexing_pressure.memory.total.primary.rejections`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indexing_pressure.memory.total.primary.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indexing_pressure.memory.total.coordinating.rejections`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indexing_pressure.memory.total.coordinating.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indexing_pressure.memory.total.replica.rejections`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indexing_pressure.memory.total.replica.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indexing_pressure.memory.total.combined_coordinating_and_primary.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indexing_pressure.memory.current.coordinating.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indexing_pressure.memory.current.primary.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indexing_pressure.memory.current.replica.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indexing_pressure.memory.current.all.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indexing_pressure.memory.total.all.bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
 **`elasticsearch.node.stats.indexing_pressure.memory.limit_in_bytes`**
 :   type: long
 
-format: bytes
+    format: bytes
 
 
-
-## cluster.pending_task [_cluster_pending_task]
+## cluster.pending_task [_cluster.pending_task]
 
 `cluster.pending_task` contains a pending task description.
 
 **`elasticsearch.cluster.pending_task.insert_order`**
 :   Insert order
 
-type: long
+    type: long
 
 
 **`elasticsearch.cluster.pending_task.priority`**
 :   Priority
 
-type: long
+    type: long
 
 
 **`elasticsearch.cluster.pending_task.source`**
 :   Source. For example: put-mapping
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.cluster.pending_task.time_in_queue.ms`**
 :   Time in queue
 
-type: long
-
+    type: long
 
 
 ## shard [_shard]
@@ -2882,31 +2870,31 @@ shard fields
 **`elasticsearch.shard.primary`**
 :   True if this is the primary shard.
 
-type: boolean
+    type: boolean
 
 
 **`elasticsearch.shard.number`**
 :   The number of this shard.
 
-type: long
+    type: long
 
 
 **`elasticsearch.shard.state`**
 :   The state of this shard.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.shard.relocating_node.name`**
 :   The node the shard was relocated from.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.shard.relocating_node.id`**
 :   The node the shard was relocated from. It has the exact same value than relocating_node.name for compatibility purposes.
 
-type: keyword
+    type: keyword
 
 
 **`elasticsearch.shard.source_node.name`**

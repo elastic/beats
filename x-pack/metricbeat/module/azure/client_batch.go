@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package azure
 
 import (
@@ -39,13 +41,13 @@ type ResDefGroupingCriteria struct {
 type concurrentMapResourceMetrics func(client *BatchClient, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig, wg *sync.WaitGroup)
 
 // NewBatchClient instantiates the Azure monitoring batch client
-func NewBatchClient(config Config) (*BatchClient, error) {
-	azureMonitorService, err := NewService(config)
+func NewBatchClient(config Config, logger *logp.Logger) (*BatchClient, error) {
+	azureMonitorService, err := NewService(config, logger)
 	if err != nil {
 		return nil, err
 	}
 
-	logger := logp.NewLogger("azure monitor client")
+	logger = logger.Named("azure monitor client")
 
 	client := &BatchClient{
 		BaseClient: &BaseClient{
@@ -150,12 +152,8 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 	var result []Metric
 	for criteria, metricsDefinitions := range groupedMetrics {
 		// Same end time for all metrics in the same batch.
-		interval := client.Config.Period
+		startTime, endTime := calculateTimespan(referenceTime, criteria.TimeGrain, client.Config)
 
-		// // Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
-		endTime := referenceTime
-		timespanDuration := max(asDuration(criteria.TimeGrain), interval)
-		startTime := endTime.Add(timespanDuration * -1)
 		// Limit batch size to 50 resources (if you have more, you can split the batch)
 		filter := ""
 		if len(metricsDefinitions[0].Dimensions) > 0 {
@@ -315,9 +313,9 @@ func (client *BatchClient) MapMetricByPrimaryAggregation(metrics []armmonitor.Me
 }
 
 // NewMockBatchClient instantiates a new batch client with the mock azure service
-func NewMockBatchClient() *BatchClient {
+func NewMockBatchClient(logger *logp.Logger) *BatchClient {
 	azureMockService := new(MockService)
-	logger := logp.NewLogger("test azure monitor")
+	logger = logger.Named("test azure monitor")
 	client := &BatchClient{
 		BaseClient: &BaseClient{
 			AzureMonitorService: azureMockService,

@@ -198,10 +198,10 @@ func (p *Parser) Next() (reader.Message, error) {
 }
 
 // NewParser creates a new Syslog parser.
-func NewParser(r reader.Reader, cfg *Config) *Parser {
+func NewParser(r reader.Reader, cfg *Config, logger *logp.Logger) *Parser {
 	return &Parser{
 		cfg:    cfg,
 		reader: r,
-		logger: logp.NewLogger("reader_syslog"),
+		logger: logger.Named("reader_syslog"),
 	}
 }

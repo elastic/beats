@@ -589,7 +589,7 @@ filebeat.modules:
       # based on zone egress and ingress
       #var.external_zones: [ "External" ]
 
-#------------------------------ Checkpoint Module ------------------------------
+#----------------------------- Check Point Module -----------------------------
 - module: checkpoint
   firewall:
     enabled: false
@@ -744,7 +744,7 @@ filebeat.modules:
     # Overriding the default request timeout, optional.
     #var.request_timeout: 60s
 
-#------------------------------- Coredns Module -------------------------------
+#------------------------------- CoreDNS Module -------------------------------
 - module: coredns
   # Fileset for native deployment
   log: 
@@ -754,7 +754,7 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#----------------------------- Crowdstrike Module -----------------------------
+#----------------------------- CrowdStrike Module -----------------------------
 - module: crowdstrike
   
   falcon:
@@ -764,7 +764,7 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#----------------------------- CyberArk PAS Module -----------------------------
+#----------------------------- Cyberark PAS Module -----------------------------
 - module: cyberarkpas
   audit:
     enabled: false
@@ -940,7 +940,7 @@ filebeat.modules:
     # the subscription.
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
-#--------------------------- Google_workspace Module ---------------------------
+#--------------------------- Google Workspace Module ---------------------------
 - module: google_workspace
   saml:
     enabled: false
@@ -1005,7 +1005,7 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#-------------------------------- Ibmmq Module --------------------------------
+#-------------------------------- IBM MQ Module --------------------------------
 - module: ibmmq
   # All logs
   errorlog:
@@ -1208,7 +1208,7 @@ filebeat.modules:
     # You can also pass SSL options. For example:
     #var.ssl.verification_mode: none
 
-#------------------------------- Mongodb Module -------------------------------
+#------------------------------- MongoDB Module -------------------------------
 #- module: mongodb
   # Logs
   #log:
@@ -1222,7 +1222,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#-------------------------------- Mssql Module --------------------------------
+#-------------------------------- MSSQL Module --------------------------------
 - module: mssql
   # Fileset for native deployment
   log:
@@ -1410,7 +1410,7 @@ filebeat.modules:
     # of the document. The default is true.
     #var.use_namespace: true
 
-#--------------------------------- Panw Module ---------------------------------
+#-------------------------- Palo Alto Networks Module --------------------------
 - module: panw
   panos:
     enabled: false
@@ -1778,7 +1778,7 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#----------------------------- Threatintel Module -----------------------------
+#----------------------------- Threat Intel Module -----------------------------
 - module: threatintel
   abuseurl:
     enabled: false
@@ -1964,7 +1964,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#--------------------------------- Zeek Module ---------------------------------
+#------------------------------ Zeek (Bro) Module ------------------------------
 - module: zeek
   capture_loss:
     enabled: false
@@ -2620,7 +2620,8 @@ filebeat.inputs:
   # When enabling this option, a file handler is closed immediately in case a file can't be found
   # any more. In case the file shows up again later, harvesting will continue at the last known position
   # after scan_frequency.
-  #close.on_state_change.removed: true
+  # By default, it's `true` on Windows and `false` on the rest of the platforms.
+  #close.on_state_change.removed: false
 
   # Closes the file handler as soon as the harvesters reaches the end of the file.
   # By default this option is disabled.
@@ -2632,6 +2633,20 @@ filebeat.inputs:
   # By default this option is disabled.
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close.reader.after_interval: 0
+
+  ### File deleting options
+  # Filestream cam delete the file after it has been acknowledged by the output,
+  # has reached EOF or became inactive.
+
+  # Enable deleting the file after the reader is closed
+  # and all events have been ingested.
+  #delete.enabled: false
+
+  # Grace period to wait before trying to remove a file.
+  # If data is added during the grace, deletion is cancelled.
+  # The grace period will re-start next time the close condition
+  # is reached.
+  #delete.grace_period: 30m
 
 #----------------------------- Stdin input -------------------------------
 # Configuration to use stdin input
@@ -2665,6 +2680,9 @@ filebeat.inputs:
 #- type: udp
   #enabled: false
 
+  # Number of pipeline workers
+  #number_of_workers: 1
+
   # Maximum size of the message received over UDP
   #max_message_size: 10KiB
 
@@ -2682,6 +2700,9 @@ filebeat.inputs:
 
   # Character used to split new message
   #line_delimiter: "\n"
+
+  # Number of pipeline workers
+  #number_of_workers: 1
 
   # Maximum size in bytes of the message received over TCP
   #max_message_size: 20MiB

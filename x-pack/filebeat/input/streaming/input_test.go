@@ -27,6 +27,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 //nolint:gosec // These are test tokens and are not used in production code.
@@ -128,7 +129,8 @@ var inputTests = []struct {
 					"events": [inner_body],
 				})`,
 		},
-		response: []string{`
+		response: []string{
+			`
 			{
 				"pps": {
 					"agent": "example.proofpoint.com",
@@ -178,7 +180,8 @@ var inputTests = []struct {
 					"pri": 35342
 				},
 				"id": "ZeYGULpZmL5N0151HN1OyX"
-	   }`},
+	   }`,
+		},
 		want: []map[string]interface{}{
 			{
 				"pps": map[string]interface{}{
@@ -279,7 +282,8 @@ var inputTests = []struct {
 				},
 			},
 		},
-		response: []string{`
+		response: []string{
+			`
 	       {
 	          "pps": {
 	              "agent": "example.proofpoint.com",
@@ -318,7 +322,8 @@ var inputTests = []struct {
 				"basic_token": basicToken,
 			},
 		},
-		response: []string{`
+		response: []string{
+			`
 	       {
 	          "pps": {
 	              "agent": "example.proofpoint.com",
@@ -350,7 +355,8 @@ var inputTests = []struct {
 				"bearer_token": bearerToken,
 			},
 		},
-		response: []string{`
+		response: []string{
+			`
 	       {
 	          "pps": {
 	              "agent": "example.proofpoint.com",
@@ -385,7 +391,8 @@ var inputTests = []struct {
 				},
 			},
 		},
-		response: []string{`
+		response: []string{
+			`
 	       {
 	          "pps": {
 	              "agent": "example.proofpoint.com",
@@ -419,7 +426,8 @@ var inputTests = []struct {
 				"wait_max":     "2s",
 			},
 		},
-		response: []string{`
+		response: []string{
+			`
 	       {
 	          "pps": {
 	              "agent": "example.proofpoint.com",
@@ -816,7 +824,6 @@ func TestURLEval(t *testing.T) {
 	logp.TestingSetup()
 	for _, test := range urlEvalTests {
 		t.Run(test.name, func(t *testing.T) {
-
 			cfg := conf.MustNewConfigFrom(test.config)
 
 			conf := config{}
@@ -899,9 +906,10 @@ func TestInput(t *testing.T) {
 			defer cancel()
 
 			v2Ctx := v2.Context{
-				Logger:      logp.NewLogger("websocket_test"),
-				ID:          "test_id:" + test.name,
-				Cancelation: ctx,
+				Logger:          logp.NewLogger("websocket_test"),
+				ID:              "test_id:" + test.name,
+				Cancelation:     ctx,
+				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
 			client.done = func() {

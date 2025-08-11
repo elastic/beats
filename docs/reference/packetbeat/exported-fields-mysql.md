@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-mysql.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # MySQL fields [exported-fields-mysql]
 
 MySQL-specific event fields.
@@ -10,7 +12,7 @@ MySQL-specific event fields.
 **`mysql.affected_rows`**
 :   If the MySQL command is successful, this field contains the affected number of rows of the last statement.
 
-type: long
+    type: long
 
 
 **`mysql.insert_id`**
@@ -26,13 +28,13 @@ type: long
 
 
 **`mysql.query`**
-:   The row mysql query as read from the transaction’s request.
+:   The row mysql query as read from the transaction's request.
 
 
 **`mysql.error_code`**
 :   The error code returned by MySQL.
 
-type: long
+    type: long
 
 
 **`mysql.error_message`**

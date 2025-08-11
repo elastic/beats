@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-ceph.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Ceph module [metricbeat-module-ceph]
 
 The Ceph module collects metrics by submitting HTTP GET requests to the [ceph-rest-api](https://docs.ceph.com/docs/jewel/man/8/ceph-rest-api/). The default metricsets are `cluster_disk`, `cluster_health`, `monitor_health`, `pool_disk`, `osd_tree`.
@@ -24,7 +26,7 @@ The Ceph module comes with a predefined dashboard showing Ceph cluster related m
 ![ceph overview dashboard](images/ceph-overview-dashboard.png)
 
 
-## Example configuration [_example_configuration_10]
+## Example configuration [_example_configuration]
 
 The Ceph module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -54,34 +56,20 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_15]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [cluster_disk](/reference/metricbeat/metricbeat-metricset-ceph-cluster_disk.md)
 * [cluster_health](/reference/metricbeat/metricbeat-metricset-ceph-cluster_health.md)
 * [cluster_status](/reference/metricbeat/metricbeat-metricset-ceph-cluster_status.md)
-* [mgr_cluster_disk](/reference/metricbeat/metricbeat-metricset-ceph-mgr_cluster_disk.md)
-* [mgr_cluster_health](/reference/metricbeat/metricbeat-metricset-ceph-mgr_cluster_health.md)
-* [mgr_osd_perf](/reference/metricbeat/metricbeat-metricset-ceph-mgr_osd_perf.md)
-* [mgr_osd_pool_stats](/reference/metricbeat/metricbeat-metricset-ceph-mgr_osd_pool_stats.md)
-* [mgr_osd_tree](/reference/metricbeat/metricbeat-metricset-ceph-mgr_osd_tree.md)
-* [mgr_pool_disk](/reference/metricbeat/metricbeat-metricset-ceph-mgr_pool_disk.md)
+* [mgr_cluster_disk](/reference/metricbeat/metricbeat-metricset-ceph-mgr_cluster_disk.md)  {applies_to}`stack: beta`
+* [mgr_cluster_health](/reference/metricbeat/metricbeat-metricset-ceph-mgr_cluster_health.md)  {applies_to}`stack: beta`
+* [mgr_osd_perf](/reference/metricbeat/metricbeat-metricset-ceph-mgr_osd_perf.md)  {applies_to}`stack: beta`
+* [mgr_osd_pool_stats](/reference/metricbeat/metricbeat-metricset-ceph-mgr_osd_pool_stats.md)  {applies_to}`stack: beta`
+* [mgr_osd_tree](/reference/metricbeat/metricbeat-metricset-ceph-mgr_osd_tree.md)  {applies_to}`stack: beta`
+* [mgr_pool_disk](/reference/metricbeat/metricbeat-metricset-ceph-mgr_pool_disk.md)  {applies_to}`stack: beta`
 * [monitor_health](/reference/metricbeat/metricbeat-metricset-ceph-monitor_health.md)
 * [osd_df](/reference/metricbeat/metricbeat-metricset-ceph-osd_df.md)
 * [osd_tree](/reference/metricbeat/metricbeat-metricset-ceph-osd_tree.md)
 * [pool_disk](/reference/metricbeat/metricbeat-metricset-ceph-pool_disk.md)
-
-
-
-
-
-
-
-
-
-
-
-
-
-

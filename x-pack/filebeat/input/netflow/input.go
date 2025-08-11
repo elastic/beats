@@ -124,8 +124,10 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 	n.logger.Info("Connecting to beat event publishing")
 
 	const pollInterval = time.Minute
-	n.udpMetrics = netmetrics.NewUDP("netflow", env.ID, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
-	defer n.udpMetrics.Close()
+	if env.ID != "" {
+		n.udpMetrics = netmetrics.NewUDP(env.MetricsRegistry, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
+		defer n.udpMetrics.Close()
+	}
 
 	n.metrics = newInputMetrics(n.udpMetrics.Registry())
 	var err error
@@ -196,7 +198,8 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 						}
 						client.PublishAll(evs)
 					}
-					n.udpMetrics.Log(pkt.data, pktStartTime)
+					n.udpMetrics.EventReceived(len(pkt.data), pktStartTime)
+					n.udpMetrics.EventPublished(pktStartTime)
 				}
 			}
 		}(client)
@@ -217,7 +220,7 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 				discardedEvents.Inc()
 			}
 		}
-	})
+	}, n.logger)
 	err = udpServer.Start()
 	if err != nil {
 		errorMsg := fmt.Sprintf("Failed to start udp server: %v", err)

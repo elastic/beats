@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-common.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Common fields [exported-fields-common]
 
 Contains common fields available in all event types.
@@ -10,9 +12,9 @@ Contains common fields available in all event types.
 **`metricset.module`**
 :   The name of the module that generated the event.
 
-type: alias
+    type: alias
 
-alias to: event.module
+    alias to: event.module
 
 
 **`metricset.name`**
@@ -22,7 +24,7 @@ alias to: event.module
 **`metricset.period`**
 :   Current data collection period for this event in milliseconds.
 
-type: integer
+    type: integer
 
 
 **`service.hostname`**
@@ -32,20 +34,20 @@ type: integer
 **`type`**
 :   The document type. Always set to "doc".
 
-example: metricsets
+    example: metricsets
 
-required: True
+    required: True
 
 
 **`systemd.fragment_path`**
 :   the location of the systemd unit path
 
-type: keyword
+    type: keyword
 
 
 **`systemd.unit`**
 :   the unit name of the systemd service
 
-type: keyword
+    type: keyword
 
 

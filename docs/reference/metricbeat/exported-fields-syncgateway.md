@@ -1,30 +1,35 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-syncgateway.html
+applies_to:
+  stack: beta
 ---
+
+% This file is generated! See scripts/generate_fields_docs.py
 
 # SyncGateway fields [exported-fields-syncgateway]
 
 SyncGateway metrics
 
-
 ## syncgateway [_syncgateway]
 
 `syncgateway` contains the information and statistics from SyncGateway.
 
+## syncgateway [_syncgateway]
 
-## syncgateway [_syncgateway_2]
+```{applies_to}
+stack: beta
+```
 
 Couchbase Sync Gateway metrics.
 
 **`syncgateway.syncgateway.name`**
 :   Name of the database on when field `couchbase.syncgateway.type` is `db_stats`.
 
-type: keyword
+    type: keyword
 
 
-
-## metrics [_metrics_10]
+## metrics [_metrics]
 
 Metrics of all databases contained in the config file of the SyncGateway instance.
 
@@ -43,13 +48,13 @@ Metrics of all databases contained in the config file of the SyncGateway instanc
 **`syncgateway.syncgateway.metrics.replications.active`**
 :   Number of active replications
 
-type: long
+    type: long
 
 
 **`syncgateway.syncgateway.metrics.replications.total`**
 :   Total number of replications (active or not)
 
-type: long
+    type: long
 
 
 **`syncgateway.syncgateway.gsi.views.tombstones.query.count`**
@@ -300,7 +305,6 @@ type: long
 :   type: double
 
 
-
 ## memstats [_memstats]
 
 Dumps a large amount of information about the memory heap and garbage collector
@@ -421,8 +425,11 @@ Dumps a large amount of information about the memory heap and garbage collector
 :   type: double
 
 
+## memory [_memory]
 
-## memory [_memory_11]
+```{applies_to}
+stack: beta
+```
 
 SyncGateway memory metrics. It dumps a large amount of information about the memory heap and garbage collector
 
@@ -542,54 +549,59 @@ SyncGateway memory metrics. It dumps a large amount of information about the mem
 :   type: double
 
 
+## replication [_replication]
 
-## replication [_replication_3]
+```{applies_to}
+stack: beta
+```
 
 SyncGateway per replication metrics.
 
-
-## metrics [_metrics_11]
+## metrics [_metrics]
 
 Metrics related with data replication.
 
 **`syncgateway.replication.metrics.attachment.transferred.bytes`**
 :   Number of attachment bytes transferred for this replica.
 
-type: long
+    type: long
 
 
 **`syncgateway.replication.metrics.attachment.transferred.count`**
 :   The total number of attachments transferred since replication started.
 
-type: long
+    type: long
 
 
 **`syncgateway.replication.metrics.docs.checked_sent`**
 :   The total number of documents checked for changes since replication started.
 
-type: double
+    type: double
 
 
 **`syncgateway.replication.metrics.docs.pushed.count`**
 :   The total number of documents checked for changes since replication started.
 
-type: long
+    type: long
 
 
 **`syncgateway.replication.metrics.docs.pushed.failed`**
 :   The total number of documents that failed to be pushed since replication started.
 
-type: long
+    type: long
 
 
 **`syncgateway.replication.id`**
 :   ID of the replica.
 
-type: keyword
-
+    type: keyword
 
 
 ## resources [_resources]
+
+```{applies_to}
+stack: beta
+```
 
 SyncGateway global resource utilization
 

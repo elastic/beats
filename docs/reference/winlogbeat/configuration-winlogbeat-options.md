@@ -2,6 +2,8 @@
 navigation_title: "Winlogbeat"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/configuration-winlogbeat-options.html
+applies_to:
+  stack: ga
 ---
 
 # Configure Winlogbeat [configuration-winlogbeat-options]
@@ -27,11 +29,15 @@ You can specify the following options in the `winlogbeat` section of the `winlog
 
 ### `registry_file` [_registry_file]
 
-The name of the file where Winlogbeat stores information that it uses to resume monitoring after a restart. By default the file is stored as `.winlogbeat.yml` in the directory where the Beat was started. When you run the process as a Windows service, it’s recommended that you set the value to `C:/ProgramData/winlogbeat/.winlogbeat.yml`.
+The name of the file where Winlogbeat stores information that it uses to resume monitoring after a restart. By default, the file is stored as `.winlogbeat.yml` in the directory where Beat was started. When you run the process as a Windows service, set the value to `C:/Program Files/Winlogbeat-Data/.winlogbeat.yml`.
 
 ```yaml
-winlogbeat.registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yml
+winlogbeat.registry_file: C:/Program Files/Winlogbeat-Data/.winlogbeat.yml
 ```
+
+The default location varies:
+* {applies_to}`stack: ga 9.1` `C:/Program Files/Winlogbeat-Data/.winlogbeat.yml`
+* {applies_to}`stack: ga 9.0` `C:/ProgramData/winlogbeat/.winlogbeat.yml`
 
 ::::{note}
 The forward slashes (/) in the path are automatically changed to backslashes (\) for Windows compatibility. You can use either forward or backslashes. Forward slashes are easier to work with in YAML because there is no need to escape them.

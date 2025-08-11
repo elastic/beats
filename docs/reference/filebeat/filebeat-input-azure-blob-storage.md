@@ -2,6 +2,8 @@
 navigation_title: "Azure Blob Storage"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-azure-blob-storage.html
+applies_to:
+  stack: ga
 ---
 
 # Azure Blob Storage Input [filebeat-input-azure-blob-storage]
@@ -34,21 +36,24 @@ filebeat.inputs:
   auth.shared_credentials.account_key: some_key
   containers:
   - name: container_1
+    batch_size: 100 <1>
     max_workers: 3
     poll: true
     poll_interval: 10s
   - name: container_2
+    batch_size: 50 <1>
     max_workers: 3
     poll: true
     poll_interval: 10s
 ```
+1. {applies_to}`stack: ga 9.1.0`
 
-**Explanation :** This `configuration` given above describes a basic blob storage config having two containers named `container_1` and `container_2`. Each of these containers have their own attributes such as `name`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes). For now lets try to understand how this config works.
+**Explanation :** This `configuration` given above describes a basic blob storage config having two containers named `container_1` and `container_2`. Each of these containers have their own attributes such as `name`, `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes). For now lets try to understand how this config works.
 
-For azure blob storage input to identify the files it needs to read and process, it will require the container names to be specified. We can have as many containers as we deem fit. We are also able to configure the attributes `max_workers`, `poll` and `poll_interval` at the root level, which will then be applied to all containers which do not specify any of these attributes explicitly.
+For azure blob storage input to identify the files it needs to read and process, it will require the container names to be specified. We can have as many containers as we deem fit. We are also able to configure the attributes `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval` at the root level, which will then be applied to all containers which do not specify any of these attributes explicitly.
 
 ::::{note}
-If the attributes `max_workers`, `poll` and `poll_interval` are specified at the root level, these can still be overridden at the container level with different values, thus offering extensive flexibility and customization. Examples [below](#container-overrides) show this behaviour.
+If the attributes `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval` are specified at the root level, these can still be overridden at the container level with different values, thus offering extensive flexibility and customization. Examples [below](#container-overrides) show this behaviour.
 ::::
 
 
@@ -122,13 +127,15 @@ $$$supported-attributes$$$
 5. [storage_url](#attrib-storage-url)
 6. [containers](#attrib-containers)
 7. [name](#attrib-container-name)
-8. [max_workers](#attrib-max_workers)
-9. [poll](#attrib-poll)
-10. [poll_interval](#attrib-poll_interval)
-11. [file_selectors](#attrib-file_selectors)
-12. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
-13. [timestamp_epoch](#attrib-timestamp_epoch)
-
+8. [batch_size](#attrib-batch_size-abs) {applies_to}`stack: ga 9.1.0`
+9. [max_workers](#attrib-max_workers)
+10. [poll](#attrib-poll)
+11. [poll_interval](#attrib-poll_interval)
+12. [file_selectors](#attrib-file_selectors)
+13. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
+14. [timestamp_epoch](#attrib-timestamp_epoch)
+15. [path_prefix](#attrib-path_prefix)
+16. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.1.0`
 
 ## `account_name` [attrib-account-name]
 
@@ -199,18 +206,20 @@ This attribute contains the details about a specific container like `name`, `max
 
 This is a specific subfield of a container. It specifies the container name.
 
+## `batch_size` [attrib-batch_size-abs]
+```{applies_to}
+  stack: ga 9.1
+```
+
+This attribute specifies the "page size" for the response. In earlier versions, this value was derived from `max_workers`, but with the latest update, `batch_size` is now an independent setting. For backward compatibility, if `batch_size` is not explicitly defined, it will default to a value based on `max_workers`. This attribute can be configured at both the root and container levels. When defined at both levels, the container-level setting takes precedence.
 
 ## `max_workers` [attrib-max_workers]
 
 This attribute defines the maximum number of workers allocated to the worker pool for processing jobs which read file contents. It can be specified both at the root level of the configuration, and at the container level. Container level values override root level values if both are specified. Larger number of workers do not necessarily improve throughput, and this should be carefully tuned based on the number of files, the size of the files being processed and resources available. Increasing `max_workers` to very high values may cause resource utilization problems and may lead to bottlenecks in processing. Usually a maximum of `2000` workers is recommended. A very low `max_worker` count will drastically increase the number of network calls required to fetch the blobs, which may cause a bottleneck in processing.
 
-The batch size for workload distribution is calculated by the input to ensure that there is an even workload across all workers. This means that for a given `max_workers` parameter value, the input will calculate the optimal batch size for that setting. The `max_workers` value should be configured based on factors such as the total number of files to be processed, available system resources and network bandwidth.
-
-Example:
-
-* Setting `max_workers=3` would result in each request fetching `3 blobs` (batch size = 3), which are then distributed among `3 workers`.
-* Setting `max_workers=100` would fetch `100 blobs` (batch size = 100) per request, distributed among `100 workers`.
-
+::::{note}
+The `batch_size` {applies_to}`stack: ga 9.1.0` and `max_workers` attributes are decoupled but functionally related. `batch_size` determines how many blobs are fetched in a single API call (that is, the pagination size), while `max_workers` controls the number of concurrent goroutines used to process the fetched blobs. Although these values are independent, they should be configured thoughtfully to ensure efficient workload distribution and optimal performance. For example, setting `batch_size=100` and `max_workers=10` means each pagination request fetches `100` blobs, which are then processed by `10` concurrent goroutines. The appropriate value for `max_workers` depends on factors such as the number of files to be processed, available system resources, and network bandwidth.
+::::
 
 ## `poll` [attrib-poll]
 
@@ -336,6 +345,120 @@ filebeat.inputs:
 
 The Azure Blob Storage APIs don’t provide a direct way to filter files based on timestamp, so the input will download all the files and then filter them based on the timestamp. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available.
 
+## `path_prefix` [attrib-path_prefix]
+
+This attribute can be used to filter out files or blobs that have a prefix string that is different from the specified value. This allows you to efficiently retrieve a subset of blobs that are organized in a virtual folder-like structure. This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority over the root level values if both are specified.
+
+### Example configuration
+
+```yaml
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  containers:
+  - name: container_1
+    path_prefix: "cloudTrail/"
+```
+
+The example configuration above will fetch blobs present in specified container from the virtual `cloudTrail` directory. This operation occurs via the SDK in the blob-storage server so the impact on memory is negligible.
+
+## Custom properties [attrib-custom-properties]
+```{applies_to}
+  stack: ga 9.1
+```
+
+Some blob properties can be `set` or `overridden` at the input level with the help of certain configuration options. Allowing users to set or override custom blob properties provides more flexibility when reading blobs from a remote storage where the user might only have read access.
+
+**The supported custom properties are:**
+
+1. [`content_type`](#attrib-content-type)
+2. [`encoding`](#attrib-encoding)
+
+## `content_type` [attrib-content-type]
+```{applies_to}
+  stack: ga 9.1
+```
+
+Use the `content_type` configuration attribute to set a user-defined content type for the blob property. Setting a custom content type only sets the `content-type` property of a blob if it's missing or empty. If you want to override an already existing `content-type` value, set the `override_content_type` flag to `true`. You can define these attributes at the `root` or `container` level in the configuration. Container level definitions always take precedence.
+
+### Example configuration
+
+This is a sample configuration at root level:
+
+```yaml
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  content_type: `application/x-gzip`
+  override_content_type: true
+  containers:
+  - name: container_1
+```
+
+This is a sample configuration at container level:
+
+```yaml
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  containers:
+  - name: container_1
+    content_type: `application/x-gzip`
+    override_content_type: true
+```
+
+## `encoding` [attrib-encoding]
+```{applies_to}
+  stack: ga 9.1
+```
+
+Use the `encoding` configuration attribute to set a user-defined encoding for the blob property. Setting a custom encoding only sets the `encoding` property of a blob if it's missing or empty. If you want to override an already existing encoding value, set the `override_encoding` flag to `true`. You can define these attributes at the `root` or `container` level in the configuration. Container level definitions always take precedence.
+
+### Example configuration
+
+This is a sample configuration at root level:
+
+```yaml
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  encoding: `gzip`
+  override_encoding: true
+  containers:
+  - name: container_1
+```
+
+This is a sample configuration at container level:
+
+```yaml
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  containers:
+  - name: container_1
+    encoding: `gzip`
+    override_encoding: true
+```
+
+::::{note}
+Custom property configurations are affected by input restrictions. For example, you can set an unsupported content-type or encoding but the input will reject it and report an error.
+::::
+
 $$$container-overrides$$$
 **The sample configs below will explain the container level overriding of attributes a bit further :-**
 
@@ -391,6 +514,10 @@ filebeat.inputs:
 **Explanation :** In this configuration even though we have specified `max_workers = 10`, `poll = true` and `poll_interval = 15s` at the root level, both the containers will override these values with their own respective values which are defined as part of their sub attibutes.
 
 ## Metrics [_metrics]
+```{applies_to}
+  stack: ga 9.0.4
+```
+
 This input exposes metrics under the [HTTP monitoring endpoint](/reference/filebeat/http-endpoint.md).
 These metrics are exposed under the `/inputs` path. They can be used to
 observe the activity of the input.

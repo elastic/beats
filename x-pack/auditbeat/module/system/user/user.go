@@ -238,7 +238,7 @@ type MetricSet struct {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The %v/%v dataset is beta", system.ModuleName, metricsetName)
+	base.Logger().Warn(cfgwarn.Beta("The %v/%v dataset is beta", system.ModuleName, metricsetName))
 	if runtime.GOOS != "linux" {
 		return nil, fmt.Errorf("the %v/%v dataset is only supported on Linux", system.ModuleName, metricsetName)
 	}
@@ -256,7 +256,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms := &MetricSet{
 		SystemMetricSet: system.NewSystemMetricSet(base),
 		config:          config,
-		log:             logp.NewLogger(metricsetName),
+		log:             base.Logger().Named(metricsetName),
 		cache:           cache.New[*User](),
 		bucket:          bucket,
 	}

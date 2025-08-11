@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-sip.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # SIP fields [exported-fields-sip]
 
 SIP-specific event fields.
-
 
 ## sip [_sip]
 
@@ -15,37 +16,37 @@ Information about SIP traffic.
 **`sip.code`**
 :   Response status code.
 
-type: keyword
+    type: keyword
 
 
 **`sip.method`**
 :   Request method.
 
-type: keyword
+    type: keyword
 
 
 **`sip.status`**
 :   Response status phrase.
 
-type: keyword
+    type: keyword
 
 
 **`sip.type`**
 :   Either request or response.
 
-type: keyword
+    type: keyword
 
 
 **`sip.version`**
 :   SIP protocol version.
 
-type: keyword
+    type: keyword
 
 
 **`sip.uri.original`**
 :   The original URI.
 
-type: keyword
+    type: keyword
 
 
 **`sip.uri.original.text`**
@@ -55,43 +56,43 @@ type: keyword
 **`sip.uri.scheme`**
 :   The URI scheme.
 
-type: keyword
+    type: keyword
 
 
 **`sip.uri.username`**
 :   The URI user name.
 
-type: keyword
+    type: keyword
 
 
 **`sip.uri.host`**
 :   The URI host.
 
-type: keyword
+    type: keyword
 
 
 **`sip.uri.port`**
 :   The URI port.
 
-type: keyword
+    type: keyword
 
 
 **`sip.accept`**
 :   Accept header value.
 
-type: keyword
+    type: keyword
 
 
 **`sip.allow`**
 :   Allowed methods.
 
-type: keyword
+    type: keyword
 
 
 **`sip.call_id`**
 :   Call ID.
 
-type: keyword
+    type: keyword
 
 
 **`sip.content_length`**
@@ -109,7 +110,7 @@ type: keyword
 **`sip.supported`**
 :   Supported methods.
 
-type: keyword
+    type: keyword
 
 
 **`sip.user_agent.original`**
@@ -123,7 +124,7 @@ type: keyword
 **`sip.private.uri.original`**
 :   Private original URI.
 
-type: keyword
+    type: keyword
 
 
 **`sip.private.uri.original.text`**
@@ -133,43 +134,43 @@ type: keyword
 **`sip.private.uri.scheme`**
 :   Private URI scheme.
 
-type: keyword
+    type: keyword
 
 
 **`sip.private.uri.username`**
 :   Private URI user name.
 
-type: keyword
+    type: keyword
 
 
 **`sip.private.uri.host`**
 :   Private URI host.
 
-type: keyword
+    type: keyword
 
 
 **`sip.private.uri.port`**
 :   Private URI port.
 
-type: keyword
+    type: keyword
 
 
 **`sip.cseq.code`**
 :   Sequence code.
 
-type: keyword
+    type: keyword
 
 
 **`sip.cseq.method`**
 :   Sequence method.
 
-type: keyword
+    type: keyword
 
 
 **`sip.via.original`**
 :   The original Via value.
 
-type: keyword
+    type: keyword
 
 
 **`sip.via.original.text`**
@@ -179,13 +180,13 @@ type: keyword
 **`sip.to.display_info`**
 :   To display info
 
-type: keyword
+    type: keyword
 
 
 **`sip.to.uri.original`**
 :   To original URI
 
-type: keyword
+    type: keyword
 
 
 **`sip.to.uri.original.text`**
@@ -195,43 +196,43 @@ type: keyword
 **`sip.to.uri.scheme`**
 :   To URI scheme
 
-type: keyword
+    type: keyword
 
 
 **`sip.to.uri.username`**
 :   To URI user name
 
-type: keyword
+    type: keyword
 
 
 **`sip.to.uri.host`**
 :   To URI host
 
-type: keyword
+    type: keyword
 
 
 **`sip.to.uri.port`**
 :   To URI port
 
-type: keyword
+    type: keyword
 
 
 **`sip.to.tag`**
 :   To tag
 
-type: keyword
+    type: keyword
 
 
 **`sip.from.display_info`**
 :   From display info
 
-type: keyword
+    type: keyword
 
 
 **`sip.from.uri.original`**
 :   From original URI
 
-type: keyword
+    type: keyword
 
 
 **`sip.from.uri.original.text`**
@@ -241,43 +242,43 @@ type: keyword
 **`sip.from.uri.scheme`**
 :   From URI scheme
 
-type: keyword
+    type: keyword
 
 
 **`sip.from.uri.username`**
 :   From URI user name
 
-type: keyword
+    type: keyword
 
 
 **`sip.from.uri.host`**
 :   From URI host
 
-type: keyword
+    type: keyword
 
 
 **`sip.from.uri.port`**
 :   From URI port
 
-type: keyword
+    type: keyword
 
 
 **`sip.from.tag`**
 :   From tag
 
-type: keyword
+    type: keyword
 
 
 **`sip.contact.display_info`**
 :   Contact display info
 
-type: keyword
+    type: keyword
 
 
 **`sip.contact.uri.original`**
 :   Contact original URI
 
-type: keyword
+    type: keyword
 
 
 **`sip.contact.uri.original.text`**
@@ -287,67 +288,67 @@ type: keyword
 **`sip.contact.uri.scheme`**
 :   Contat URI scheme
 
-type: keyword
+    type: keyword
 
 
 **`sip.contact.uri.username`**
 :   Contact URI user name
 
-type: keyword
+    type: keyword
 
 
 **`sip.contact.uri.host`**
 :   Contact URI host
 
-type: keyword
+    type: keyword
 
 
 **`sip.contact.uri.port`**
 :   Contact URI port
 
-type: keyword
+    type: keyword
 
 
 **`sip.contact.transport`**
 :   Contact transport
 
-type: keyword
+    type: keyword
 
 
 **`sip.contact.line`**
 :   Contact line
 
-type: keyword
+    type: keyword
 
 
 **`sip.contact.expires`**
 :   Contact expires
 
-type: keyword
+    type: keyword
 
 
 **`sip.contact.q`**
 :   Contact Q
 
-type: keyword
+    type: keyword
 
 
 **`sip.auth.scheme`**
 :   Auth scheme
 
-type: keyword
+    type: keyword
 
 
 **`sip.auth.realm`**
 :   Auth realm
 
-type: keyword
+    type: keyword
 
 
 **`sip.auth.uri.original`**
 :   Auth original URI
 
-type: keyword
+    type: keyword
 
 
 **`sip.auth.uri.original.text`**
@@ -357,73 +358,73 @@ type: keyword
 **`sip.auth.uri.scheme`**
 :   Auth URI scheme
 
-type: keyword
+    type: keyword
 
 
 **`sip.auth.uri.host`**
 :   Auth URI host
 
-type: keyword
+    type: keyword
 
 
 **`sip.auth.uri.port`**
 :   Auth URI port
 
-type: keyword
+    type: keyword
 
 
 **`sip.sdp.version`**
 :   SDP version
 
-type: keyword
+    type: keyword
 
 
 **`sip.sdp.owner.username`**
 :   SDP owner user name
 
-type: keyword
+    type: keyword
 
 
 **`sip.sdp.owner.session_id`**
 :   SDP owner session ID
 
-type: keyword
+    type: keyword
 
 
 **`sip.sdp.owner.version`**
 :   SDP owner version
 
-type: keyword
+    type: keyword
 
 
 **`sip.sdp.owner.ip`**
 :   SDP owner IP
 
-type: ip
+    type: ip
 
 
 **`sip.sdp.session.name`**
 :   SDP session name
 
-type: keyword
+    type: keyword
 
 
 **`sip.sdp.connection.info`**
 :   SDP connection info
 
-type: keyword
+    type: keyword
 
 
 **`sip.sdp.connection.address`**
 :   SDP connection address
 
-type: keyword
+    type: keyword
 
 
 **`sip.sdp.body.original`**
 :   SDP original body
 
-type: keyword
+    type: keyword
 
 
 **`sip.sdp.body.original.text`**

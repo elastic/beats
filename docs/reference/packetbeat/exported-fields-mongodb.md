@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-mongodb.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # MongoDb fields [exported-fields-mongodb]
 
 MongoDB-specific event fields. These fields mirror closely the fields for the MongoDB wire protocol. The higher level fields (for example, `query` and `resource`) apply to MongoDB events as well.
@@ -18,19 +20,19 @@ MongoDB-specific event fields. These fields mirror closely the fields for the Mo
 **`mongodb.numberToSkip`**
 :   Sets the number of documents to omit - starting from the first document in the resulting dataset - when returning the result of the query.
 
-type: long
+    type: long
 
 
 **`mongodb.numberToReturn`**
 :   The requested maximum number of documents to be returned.
 
-type: long
+    type: long
 
 
 **`mongodb.numberReturned`**
 :   The number of documents in the reply.
 
-type: long
+    type: long
 
 
 **`mongodb.startingFrom`**

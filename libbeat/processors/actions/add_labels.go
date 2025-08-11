@@ -22,8 +22,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -37,7 +39,7 @@ func init() {
 			checks.AllowedFields(LabelsKey, "when")))
 }
 
-func createAddLabels(c *conf.C) (beat.Processor, error) {
+func createAddLabels(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := struct {
 		Labels mapstr.M `config:"labels" validate:"required"`
 	}{}
@@ -51,7 +53,7 @@ func createAddLabels(c *conf.C) (beat.Processor, error) {
 		return nil, fmt.Errorf("failed to flatten labels: %w", err)
 	}
 
-	return makeFieldsProcessor(LabelsKey, flatLabels, true), nil
+	return addfields.MakeFieldsProcessor(LabelsKey, flatLabels, true), nil
 }
 
 // NewAddLabels creates a new processor adding the given object to events. Set
@@ -66,7 +68,7 @@ func NewAddLabels(labels mapstr.M, shared bool) (beat.Processor, error) {
 		return nil, fmt.Errorf("failed to flatten labels: %w", err)
 	}
 
-	return NewAddFields(mapstr.M{
+	return addfields.NewAddFields(mapstr.M{
 		LabelsKey: flatLabels,
 	}, shared, true), nil
 }

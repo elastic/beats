@@ -105,13 +105,13 @@ func kubernetesMetadataExist(event *beat.Event) bool {
 }
 
 // New constructs a new add_kubernetes_metadata processor.
-func New(cfg *config.C) (beat.Processor, error) {
+func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	config, err := newProcessorConfig(cfg, Indexing)
 	if err != nil {
 		return nil, err
 	}
 
-	log := logp.NewLogger(selector).With("libbeat.processor", "add_kubernetes_metadata")
+	log = log.Named(selector).With("libbeat.processor", "add_kubernetes_metadata")
 	processor := &kubernetesAnnotator{
 		log:                 log,
 		cache:               newCache(config.CleanupTimeout),
@@ -174,7 +174,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			return
 		}
 
-		matchers := NewMatchers(config.Matchers)
+		matchers := NewMatchers(config.Matchers, k.log)
 
 		if matchers.Empty() {
 			k.log.Debugf("Could not initialize kubernetes plugin with zero matcher plugins")
@@ -202,7 +202,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			Node:         config.Node,
 			Namespace:    config.Namespace,
 			HonorReSyncs: true,
-		}, nil)
+		}, nil, k.log)
 		if err != nil {
 			k.log.Errorf("Couldn't create kubernetes watcher for %T", &kubernetes.Pod{})
 			return
@@ -215,7 +215,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 				SyncTimeout:  config.SyncPeriod,
 				Node:         config.Node,
 				HonorReSyncs: true,
-			}, nil)
+			}, nil, k.log)
 			if err != nil {
 				k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
 			}
@@ -226,7 +226,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 				SyncTimeout:  config.SyncPeriod,
 				Namespace:    config.Namespace,
 				HonorReSyncs: true,
-			}, nil)
+			}, nil, k.log)
 			if err != nil {
 				k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 			}
@@ -253,6 +253,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 				},
 				nil,
 				metadata.RemoveUnnecessaryReplicaSetData,
+				k.log,
 			)
 			if err != nil {
 				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
@@ -264,7 +265,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 				SyncTimeout:  config.SyncPeriod,
 				Namespace:    config.Namespace,
 				HonorReSyncs: true,
-			}, nil)
+			}, nil, k.log)
 			if err != nil {
 				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
 			}

@@ -1,0 +1,27 @@
+{
+    "tasks": {
+        "node1:45": {
+            "node": "node1",
+            "id": 45,
+            "type": "transport",
+            "action": "cluster:monitor/tasks/lists",
+            "start_time_in_millis": 1513823752749,
+            "running_time_in_nanos": 60000293139,
+            "cancellable": false,
+            "headers": {
+                "X-Opaque-Id": "123456"
+            },
+            "children": [{ "node": "node1" }, { "node": "node2" }]
+        },
+        "node12:321": {
+            "node": "node12",
+            "id": 321,
+            "type": "transport",
+            "action": "indices:data/write/bulk",
+            "start_time_in_millis": 1513823752749,
+            "running_time_in_nanos": 60000293139,
+            "cancellable": false
+        },
+        "invalid:1": { "children": [{}, {}] }
+    }
+}

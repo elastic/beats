@@ -9,21 +9,25 @@ import (
 	"fmt"
 	"time"
 
-	meraki "github.com/meraki/dashboard-api-go/v3/sdk"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/meraki"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	sdk "github.com/meraki/dashboard-api-go/v3/sdk"
 )
 
 type switchport struct {
-	port       *meraki.ResponseItemSwitchGetOrganizationSwitchPortsBySwitchPorts
-	portStatus *meraki.ResponseItemSwitchGetDeviceSwitchPortsStatuses
+	port       *sdk.ResponseItemSwitchGetOrganizationSwitchPortsBySwitchPorts
+	portStatus *sdk.ResponseItemSwitchGetDeviceSwitchPortsStatuses
 }
 
-func getDeviceSwitchports(client *meraki.Client, organizationID string, devices map[Serial]*Device, period time.Duration) error {
-	switches, res, err := client.Switch.GetOrganizationSwitchPortsBySwitch(organizationID, &meraki.GetOrganizationSwitchPortsBySwitchQueryParams{})
+func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map[Serial]*Device, period time.Duration) error {
+	switches, res, err := client.Switch.GetOrganizationSwitchPortsBySwitch(organizationID, &sdk.GetOrganizationSwitchPortsBySwitchQueryParams{})
 	if err != nil {
-		return fmt.Errorf("GetOrganizationSwitchPortsBySwitch failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		if res != nil {
+			return fmt.Errorf("GetOrganizationSwitchPortsBySwitch failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		}
+		return fmt.Errorf("GetOrganizationSwitchPortsBySwitch failed; %w", err)
 	}
 
 	if switches == nil {
@@ -40,11 +44,14 @@ func getDeviceSwitchports(client *meraki.Client, organizationID string, devices 
 			switchports = append(switchports, &switchport{port: &(*device.Ports)[i]})
 		}
 
-		statuses, res, err := client.Switch.GetDeviceSwitchPortsStatuses(device.Serial, &meraki.GetDeviceSwitchPortsStatusesQueryParams{
+		statuses, res, err := client.Switch.GetDeviceSwitchPortsStatuses(device.Serial, &sdk.GetDeviceSwitchPortsStatusesQueryParams{
 			Timespan: period.Seconds(),
 		})
 		if err != nil {
-			return fmt.Errorf("GetDeviceSwitchPortsStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+			if res != nil {
+				return fmt.Errorf("GetDeviceSwitchPortsStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+			}
+			return fmt.Errorf("GetDeviceSwitchPortsStatuses failed; %w", err)
 		}
 
 		// match status to the port attributes found earlier using the shared port ID
@@ -164,5 +171,5 @@ func reportSwitchportMetrics(reporter mb.ReporterV2, organizationID string, devi
 		}
 	}
 
-	reportMetricsForOrganization(reporter, organizationID, metrics)
+	meraki.ReportMetricsForOrganization(reporter, organizationID, metrics)
 }

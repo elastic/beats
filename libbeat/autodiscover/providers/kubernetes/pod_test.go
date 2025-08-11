@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
+
 package kubernetes
 
 import (
@@ -38,7 +40,7 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -341,10 +343,10 @@ func TestGenerateHints(t *testing.T) {
 	}
 
 	cfg := defaultConfig()
-
+	logger := logptest.NewTestingLogger(t, "")
 	p := pod{
 		config: cfg,
-		logger: logp.NewLogger("kubernetes.pod"),
+		logger: logger.Named("kubernetes.pod"),
 	}
 	for _, test := range tests {
 		test := test
@@ -1949,9 +1951,10 @@ func TestPod_EmitEvent(t *testing.T) {
 
 	client := k8sfake.NewSimpleClientset()
 	addResourceMetadata := metadata.GetDefaultResourceMetadataConfig()
+	logger := logptest.NewTestingLogger(t, "")
 	for _, test := range tests {
 		t.Run(test.Message, func(t *testing.T) {
-			mapper, err := template.NewConfigMapper(nil, nil, nil)
+			mapper, err := template.NewConfigMapper(nil, nil, nil, logger)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -1959,9 +1962,9 @@ func TestPod_EmitEvent(t *testing.T) {
 			metaGen := metadata.NewPodMetadataGenerator(conf.NewConfig(), nil, client, nil, nil, nil, nil, addResourceMetadata)
 			p := &Provider{
 				config:    defaultConfig(),
-				bus:       bus.New(logp.NewLogger("bus"), "test"),
+				bus:       bus.New(logptest.NewTestingLogger(t, "bus"), "test"),
 				templates: mapper,
-				logger:    logp.NewLogger("kubernetes"),
+				logger:    logger.Named("kubernetes"),
 			}
 
 			pub := &publisher{b: p.bus}
@@ -1970,7 +1973,7 @@ func TestPod_EmitEvent(t *testing.T) {
 				config:      defaultConfig(),
 				publishFunc: pub.publish,
 				uuid:        UUID,
-				logger:      logp.NewLogger("kubernetes.pod"),
+				logger:      logger.Named("kubernetes.pod"),
 			}
 
 			p.eventManager = NewMockPodEventerManager(pod)
@@ -2214,7 +2217,7 @@ func TestPodEventer_Namespace_Node_Watcher(t *testing.T) {
 			err = config.Unpack(&c)
 			assert.NoError(t, err)
 
-			eventer, err := NewPodEventer(uuid, config, client, nil)
+			eventer, err := NewPodEventer(uuid, config, client, nil, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatal(err)
 			}

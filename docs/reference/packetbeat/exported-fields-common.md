@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-common.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Common fields [exported-fields-common]
 
 These fields contain data about the environment in which the transaction or flow was captured.
@@ -10,7 +12,7 @@ These fields contain data about the environment in which the transaction or flow
 **`type`**
 :   The type of the transaction (for example, HTTP, MySQL, Redis, or RUM) or "flow" in case of flows.
 
-required: True
+    required: True
 
 
 **`server.process.name`**
@@ -56,16 +58,16 @@ required: True
 **`real_ip`**
 :   If the server initiating the transaction is a proxy, this field contains the original client IP address. For HTTP, for example, the IP address extracted from a configurable HTTP header, by default `X-Forwarded-For`. Unless this field is disabled, it always has a value, and it matches the `client_ip` for non proxy clients.
 
-type: alias
+    type: alias
 
-alias to: network.forwarded_ip
+    alias to: network.forwarded_ip
 
 
 **`transport`**
 :   The transport protocol used for the transaction. If not specified, then tcp is assumed.
 
-type: alias
+    type: alias
 
-alias to: network.transport
+    alias to: network.transport
 
 

@@ -24,7 +24,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/mitchellh/mapstructure"
+	"github.com/go-viper/mapstructure/v2"
 	"go.opentelemetry.io/collector/config/configtls"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -53,8 +53,8 @@ func validateUnsupportedConfig(tlscfg *tlscommon.Config) error {
 }
 
 // TLSCommonToOTel converts a tlscommon.Config into the OTel configtls.ClientConfig
-func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
-	logger := logp.L().Named("tls-to-otel")
+func TLSCommonToOTel(tlscfg *tlscommon.Config, logger *logp.Logger) (map[string]any, error) {
+	logger = logger.Named("tls-to-otel")
 	insecureSkipVerify := false
 
 	if tlscfg == nil {
@@ -125,7 +125,7 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 		certPem = string(certBytes)
 	}
 
-	tlsConfig, err := tlscommon.LoadTLSConfig(tlscfg)
+	tlsConfig, err := tlscommon.LoadTLSConfig(tlscfg, logger)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load SSL configuration: %w", err)
 	}

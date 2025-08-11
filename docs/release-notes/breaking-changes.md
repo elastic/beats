@@ -12,11 +12,63 @@ Breaking changes can impact your Elastic applications, potentially disrupting no
 % Description and impact of the breaking change.
 % For more information, check [PR #](PR link).
 
+## 9.1.1 [beats-9.1.1-breaking-changes]
+
+::::{dropdown} Update user agent used by Beats HTTP clients.
+
+% Description
+The default user agent was updated to distinguish between all beat modes:
+
+* **Standalone** indicates that the beat is not running under agent.
+* **Unmanaged** indicates that the beat is running under agent but not managed by Fleet.
+* **Managed** indicates that the beat is running under agent and managed by Fleet.
+
+% Impact
+% TO DO: Add more details
+Users relying on specific user agents could be impacted.
+
+For more information, check [#45251]({{beats-pull}}45251).
+::::
+
 ## 9.0.1 [beats-9.0.1-breaking-changes]
 
-_No breaking changes_
+::::{dropdown} The default data and logs path for the Windows service installation has changed.
+The base folder has changed from `C:\ProgramData\` to `C:\Program
+Files\` because the latter has stricter permissions. The state
+and logs are now stored in `C:\Program Files\<Beat Name>-Data`.
 
-## 9.0.0 [beats-900-breaking-changes]
+When the installation script runs, it looks for the previous default
+data path. If the path is found, data is moved to the new path.
+The installation script accepts the parameter `-UseLegacyPath` to
+force using the legacy data path.
+
+In a PowerShell prompt, can use `Get-Help install-service-<Beat Name>.ps1
+-detailed` to get detailed help.
+
+::::
+
+
+::::{dropdown} 'close.on_state_change.removed' defaults to `true` on Windows and `false` on the rest of the platforms.
+To keep the previous behaviour, add `close.on_state_change.removed:
+true` on every Filestream input.
+
+Even after the file is removed, the file handles will stay open until
+it is closed due to
+inactivity. See [`close.on_state_change.inactive`](https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-filestream#filebeat-input-filestream-close-inactive)
+for more details.
+
+For more information, check [#38523](https://github.com/elastic/beats/issues/38523)
+::::
+
+## 9.0.4 [beats-9.0.4-breaking-changes]
+
+**Metricbeat**
+
+::::{dropdown} Change index summary metricset to use `_nodes/stats` API instead of `_stats` API to avoid data gaps.
+For more information, check  [#45049]({{beats-pull}}45049).
+::::
+
+## 9.0.0 [beats-9.0.0-breaking-changes]
 
 % Description and impact of the breaking change.
 % For more information, check [PR #](PR link).

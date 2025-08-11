@@ -1,0 +1,66 @@
+- name: cluster_health
+  type: group
+  release: beta
+  description: >
+    cluster health metrics
+  fields:
+    - name: cluster_name
+      type: keyword
+      description: >
+        The cluster name
+    - name: status
+      type: keyword
+      description: >
+        The cluster status
+    - name: timed_out
+      type: keyword
+      description: >
+        Whether the call for status was timed out
+    - name: number_of_nodes
+      type: long
+      description: >
+        Number of nodes on cluster
+    - name: number_of_data_nodes
+      type: long
+      description: >
+        The number of data nodes
+    - name: active_primary_shards
+      type: long
+      description: >
+        The number of active primary shards
+    - name: active_shards
+      type: long
+      description: >
+        The number of active shards
+    - name: relocating_shards
+      type: long
+      description: >
+        The number of relocating shards
+    - name: initializing_shards
+      type: long
+      description: >
+        The number of initializing shards
+    - name: unassigned_shards
+      type: long
+      description: >
+        The number of unassigned shards
+    - name: delayed_unassigned_shards
+      type: long
+      description: >
+        The delayed unassigned shards
+    - name: number_of_pending_tasks
+      type: long
+      description: >
+        The number of pending tasks
+    - name: number_of_in_flight_fetch
+      type: long
+      description: >
+        The number of in flight_fetch
+    - name: task_max_waiting_in_queue_millis
+      type: long
+      description: >
+        The task max waiting in queue millis
+    - name: active_shards_percent_as_number
+      type: long
+      description: >
+        The active shards percent as number

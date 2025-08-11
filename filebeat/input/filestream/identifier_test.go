@@ -27,6 +27,7 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type testFileIdentifierConfig struct {
@@ -40,7 +41,7 @@ func TestFileIdentifier(t *testing.T) {
 		if err := cfg.Unpack(&ns); err != nil {
 			t.Fatalf("cannot unpack config into conf.Namespace: %s", err)
 		}
-		identifier, err := newFileIdentifier(&ns, "")
+		identifier, err := newFileIdentifier(&ns, "", logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 		assert.Equal(t, DefaultIdentifierName, identifier.Name())
 
@@ -69,7 +70,7 @@ func TestFileIdentifier(t *testing.T) {
 		if err := cfg.Unpack(&ns); err != nil {
 			t.Fatalf("cannot unpack config into conf.Namespace: %s", err)
 		}
-		identifier, err := newFileIdentifier(&ns, "my-suffix")
+		identifier, err := newFileIdentifier(&ns, "my-suffix", logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 		assert.Equal(t, DefaultIdentifierName, identifier.Name())
 
@@ -102,7 +103,7 @@ func TestFileIdentifier(t *testing.T) {
 		err := c.Unpack(&cfg)
 		require.NoError(t, err)
 
-		identifier, err := newFileIdentifier(cfg.Identifier, "")
+		identifier, err := newFileIdentifier(cfg.Identifier, "", logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 		assert.Equal(t, pathName, identifier.Name())
 
@@ -149,7 +150,7 @@ func TestFileIdentifier(t *testing.T) {
 		err := c.Unpack(&cfg)
 		require.NoError(t, err)
 
-		identifier, err := newFileIdentifier(cfg.Identifier, "")
+		identifier, err := newFileIdentifier(cfg.Identifier, "", logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 		assert.Equal(t, fingerprintName, identifier.Name())
 

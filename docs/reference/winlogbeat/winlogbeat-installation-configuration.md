@@ -2,6 +2,8 @@
 navigation_title: "Quick start"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-installation-configuration.html
+applies_to:
+  stack: ga
 ---
 
 # Winlogbeat quick start: installation and configuration [winlogbeat-installation-configuration]
@@ -148,9 +150,13 @@ In `winlogbeat.yml`, configure the event logs that you want to monitor.
     ```yaml
     logging.to_files: true
     logging.files:
-      path: C:\ProgramData\winlogbeat\Logs
+      path: C:\Program Files\winlogbeat-Data\Logs
     logging.level: info
     ```
+
+The default location where Windows log files are stored varies:
+* {applies_to}`stack: ga 9.1` `C:\Program Files\Winlogbeat-Data\Logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\winlogbeat\Logs`
 
 3. After you save your configuration file, test it with the following command.
 
@@ -201,7 +207,11 @@ To start the Winlogbeat service, run:
 PS C:\Program Files\Winlogbeat> Start-Service winlogbeat
 ```
 
-Winlogbeat should now be running. If you used the logging configuration described here, you can view the log file at `C:\ProgramData\winlogbeat\Logs\winlogbeat`.
+Winlogbeat should now be running. If you used the logging configuration described here, you can view the log file at `C:\Program Files\winlogbeat-Data\Logs\winlogbeat`.
+
+The default location where Windows log files are stored varies:
+* {applies_to}`stack: ga 9.1` `C:\Program Files\Winlogbeat-Data\Logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\winlogbeat\Logs`
 
 You can view the status of the service and control it from the Services management console in Windows. To launch the management console, run this command:
 

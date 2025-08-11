@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-reference-yml.html
+applies_to:
+  stack: ga
 ---
 
 # packetbeat.reference.yml [packetbeat-reference-yml]

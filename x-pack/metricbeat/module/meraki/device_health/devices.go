@@ -12,13 +12,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-resty/resty/v2"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/meraki"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	meraki "github.com/meraki/dashboard-api-go/v3/sdk"
+	"github.com/go-resty/resty/v2"
+	sdk "github.com/meraki/dashboard-api-go/v3/sdk"
 )
 
 // Serial is the unique identifier for all devices
@@ -26,22 +26,26 @@ type Serial string
 
 // Device contains attributes, statuses and metrics for Meraki devices
 type Device struct {
-	details          *meraki.ResponseItemOrganizationsGetOrganizationDevices
-	status           *meraki.ResponseItemOrganizationsGetOrganizationDevicesStatuses
-	haStatus         *meraki.ResponseItemApplianceGetOrganizationApplianceUplinkStatusesHighAvailability
-	performanceScore *meraki.ResponseApplianceGetDeviceAppliancePerformance
-	license          *meraki.ResponseItemOrganizationsGetOrganizationLicenses
-	bandUtilization  map[string]*meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBand
+	details          *sdk.ResponseItemOrganizationsGetOrganizationDevices
+	status           *sdk.ResponseItemOrganizationsGetOrganizationDevicesStatuses
+	haStatus         *sdk.ResponseItemApplianceGetOrganizationApplianceUplinkStatusesHighAvailability
+	performanceScore *sdk.ResponseApplianceGetDeviceAppliancePerformance
+	license          *sdk.ResponseItemOrganizationsGetOrganizationLicenses
+	bandUtilization  map[string]*sdk.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBand
+	vpnStatus        *sdk.ResponseItemApplianceGetOrganizationApplianceVpnStatuses
 
 	uplinks     []*uplink
 	switchports []*switchport
 }
 
-func getDevices(client *meraki.Client, organizationID string) (map[Serial]*Device, error) {
-	val, res, err := client.Organizations.GetOrganizationDevices(organizationID, &meraki.GetOrganizationDevicesQueryParams{})
+func getDevices(client *sdk.Client, organizationID string) (map[Serial]*Device, error) {
+	val, res, err := client.Organizations.GetOrganizationDevices(organizationID, &sdk.GetOrganizationDevicesQueryParams{})
 
 	if err != nil {
-		return nil, fmt.Errorf("GetOrganizationDevices failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		if res != nil {
+			return nil, fmt.Errorf("GetOrganizationDevices failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		}
+		return nil, fmt.Errorf("GetOrganizationDevices failed; %w", err)
 	}
 
 	devices := make(map[Serial]*Device)
@@ -55,11 +59,14 @@ func getDevices(client *meraki.Client, organizationID string) (map[Serial]*Devic
 	return devices, nil
 }
 
-func getDeviceStatuses(client *meraki.Client, organizationID string, devices map[Serial]*Device) error {
-	val, res, err := client.Organizations.GetOrganizationDevicesStatuses(organizationID, &meraki.GetOrganizationDevicesStatusesQueryParams{})
+func getDeviceStatuses(client *sdk.Client, organizationID string, devices map[Serial]*Device) error {
+	val, res, err := client.Organizations.GetOrganizationDevicesStatuses(organizationID, &sdk.GetOrganizationDevicesStatusesQueryParams{})
 
 	if err != nil {
-		return fmt.Errorf("GetOrganizationDevicesStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		if res != nil {
+			return fmt.Errorf("GetOrganizationDevicesStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		}
+		return fmt.Errorf("GetOrganizationDevicesStatuses failed; %w", err)
 	}
 
 	if val == nil {
@@ -76,7 +83,7 @@ func getDeviceStatuses(client *meraki.Client, organizationID string, devices map
 	return nil
 }
 
-func getDevicePerformanceScores(logger *logp.Logger, client *meraki.Client, devices map[Serial]*Device) {
+func getDevicePerformanceScores(logger *logp.Logger, client *sdk.Client, devices map[Serial]*Device) {
 	for _, device := range devices {
 		if device == nil || device.details == nil {
 			continue
@@ -88,7 +95,7 @@ func getDevicePerformanceScores(logger *logp.Logger, client *meraki.Client, devi
 
 		val, res, err := client.Appliance.GetDeviceAppliancePerformance(device.details.Serial)
 		if err != nil {
-			if !(res.StatusCode() != http.StatusBadRequest && strings.Contains(string(res.Body()), "Feature not supported")) {
+			if res != nil && (res.StatusCode() == http.StatusBadRequest && !strings.Contains(string(res.Body()), "Feature not supported")) {
 				logger.Errorf("GetDeviceAppliancePerformance failed; [%d] %s. %v", res.StatusCode(), res.Body(), err)
 			}
 
@@ -96,33 +103,33 @@ func getDevicePerformanceScores(logger *logp.Logger, client *meraki.Client, devi
 		}
 
 		// 204 indicates there is no data for the device, it's likely 'offline' or 'dormant'
-		if res.StatusCode() != 204 {
+		if res != nil && res.StatusCode() != 204 {
 			device.performanceScore = val
 		}
 	}
 }
 
 type NetworkHealthService interface {
-	GetNetworkNetworkHealthChannelUtilization(networkID string, getNetworkNetworkHealthChannelUtilizationQueryParams *meraki.GetNetworkNetworkHealthChannelUtilizationQueryParams) (*meraki.ResponseNetworksGetNetworkNetworkHealthChannelUtilization, *resty.Response, error)
+	GetNetworkNetworkHealthChannelUtilization(networkID string, getNetworkNetworkHealthChannelUtilizationQueryParams *sdk.GetNetworkNetworkHealthChannelUtilizationQueryParams) (*sdk.ResponseNetworksGetNetworkNetworkHealthChannelUtilization, *resty.Response, error)
 }
 
 type NetworkHealthServiceWrapper struct {
-	service *meraki.NetworksService
+	service *sdk.NetworksService
 }
 
-func (w *NetworkHealthServiceWrapper) GetNetworkNetworkHealthChannelUtilization(networkID string, getNetworkNetworkHealthChannelUtilizationQueryParams *meraki.GetNetworkNetworkHealthChannelUtilizationQueryParams) (*meraki.ResponseNetworksGetNetworkNetworkHealthChannelUtilization, *resty.Response, error) {
+func (w *NetworkHealthServiceWrapper) GetNetworkNetworkHealthChannelUtilization(networkID string, getNetworkNetworkHealthChannelUtilizationQueryParams *sdk.GetNetworkNetworkHealthChannelUtilizationQueryParams) (*sdk.ResponseNetworksGetNetworkNetworkHealthChannelUtilization, *resty.Response, error) {
 	return w.service.GetNetworkNetworkHealthChannelUtilization(networkID, getNetworkNetworkHealthChannelUtilizationQueryParams)
 }
 
 type DeviceService interface {
-	GetOrganizationWirelessDevicesChannelUtilizationByDevice(organizationID string, getOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams *meraki.GetOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams) (*resty.Response, error)
+	GetOrganizationWirelessDevicesChannelUtilizationByDevice(organizationID string, getOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams *sdk.GetOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams) (*resty.Response, error)
 }
 
 type DeviceServiceWrapper struct {
-	service *meraki.DevicesService
+	service *sdk.DevicesService
 }
 
-func (w *DeviceServiceWrapper) GetOrganizationWirelessDevicesChannelUtilizationByDevice(organizationID string, getOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams *meraki.GetOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams) (*resty.Response, error) {
+func (w *DeviceServiceWrapper) GetOrganizationWirelessDevicesChannelUtilizationByDevice(organizationID string, getOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams *sdk.GetOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams) (*resty.Response, error) {
 	return w.service.GetOrganizationWirelessDevicesChannelUtilizationByDevice(organizationID, getOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams)
 }
 
@@ -136,28 +143,38 @@ func getDeviceChannelUtilization(client DeviceService, devices map[Serial]*Devic
 	// - Utilization categories are now named `wifi/nonWifi` instead of `80211/non80211`.
 
 	for _, orgID := range organizations {
-		res, err := client.GetOrganizationWirelessDevicesChannelUtilizationByDevice(orgID, &meraki.GetOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams{
+		res, err := client.GetOrganizationWirelessDevicesChannelUtilizationByDevice(orgID, &sdk.GetOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams{
 			// The API requires the interval to be at least 300s, and the timespan can't be less than the interval.
 			// Since our max collection period is also 300s, we set both values to 300s.
 			Timespan: 300,
 			Interval: 300,
 		})
 		if err != nil {
-			return fmt.Errorf("GetOrganizationWirelessDevicesChannelUtilizationByDevice for organization %s failed; [%d] %s. %w", orgID, res.StatusCode(), res.Body(), err)
+			if res != nil {
+				return fmt.Errorf("GetOrganizationWirelessDevicesChannelUtilizationByDevice for organization %s failed; [%d] %s. %w", orgID, res.StatusCode(), res.Body(), err)
+			}
+			return fmt.Errorf("GetOrganizationWirelessDevicesChannelUtilizationByDevice for organization %s failed: %w", orgID, err)
 		}
 
-		var result meraki.ResponseOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDevice
+		if res == nil {
+			continue
+		}
+
+		var result sdk.ResponseOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDevice
 		if err := json.Unmarshal(res.Body(), &result); err != nil {
 			return fmt.Errorf("failed to unmarshal response body for organization %s: %w", orgID, err)
 		}
 
 		for _, d := range result {
+			if d.ByBand == nil {
+				continue
+			}
 			for _, band := range *d.ByBand {
 				if device, ok := devices[Serial(d.Serial)]; ok {
 					if device.bandUtilization == nil {
-						device.bandUtilization = make(map[string]*meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBand)
+						device.bandUtilization = make(map[string]*sdk.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBand)
 					}
-					device.bandUtilization[band.Band] = &meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBand{
+					device.bandUtilization[band.Band] = &sdk.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBand{
 						Wifi:    band.Wifi,
 						NonWifi: band.NonWifi,
 						Total:   band.Total,
@@ -169,14 +186,22 @@ func getDeviceChannelUtilization(client DeviceService, devices map[Serial]*Devic
 	return nil
 }
 
-func getDeviceLicenses(client *meraki.Client, organizationID string, devices map[Serial]*Device) error {
-	val, res, err := client.Organizations.GetOrganizationLicenses(organizationID, &meraki.GetOrganizationLicensesQueryParams{})
+func getDeviceLicenses(client *sdk.Client, organizationID string, devices map[Serial]*Device) error {
+	val, res, err := client.Organizations.GetOrganizationLicenses(organizationID, &sdk.GetOrganizationLicensesQueryParams{})
 	if err != nil {
 		// Ignore 400 error for per-device licensing not supported
-		if res.StatusCode() == 400 && strings.Contains(string(res.Body()), "does not support per-device licensing") {
+		if res != nil && res.StatusCode() == 400 && strings.Contains(string(res.Body()), "does not support per-device licensing") {
 			return nil
 		}
-		return fmt.Errorf("GetOrganizationLicenses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+
+		if strings.Contains(err.Error(), "does not support per-device licensing") {
+			return nil
+		}
+
+		if res != nil {
+			return fmt.Errorf("GetOrganizationLicenses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		}
+		return fmt.Errorf("GetOrganizationLicenses failed; %w", err)
 	}
 
 	if val == nil {
@@ -193,7 +218,7 @@ func getDeviceLicenses(client *meraki.Client, organizationID string, devices map
 	return nil
 }
 
-func deviceDetailsToMapstr(details *meraki.ResponseItemOrganizationsGetOrganizationDevices) mapstr.M {
+func deviceDetailsToMapstr(details *sdk.ResponseItemOrganizationsGetOrganizationDevices) mapstr.M {
 	return mapstr.M{
 		"device.serial":       details.Serial,
 		"device.address":      details.Address,
@@ -262,8 +287,67 @@ func reportDeviceMetrics(reporter mb.ReporterV2, organizationID string, devices 
 			metric["device.license.total_duration_in_days"] = device.license.TotalDurationInDays
 		}
 
+		if device.vpnStatus != nil {
+			metric["device.network_name"] = device.vpnStatus.NetworkName
+			metric["vpn"] = vpnStatusToMapStr(device.vpnStatus)
+		}
+
 		metrics = append(metrics, metric)
 	}
 
-	reportMetricsForOrganization(reporter, organizationID, metrics)
+	meraki.ReportMetricsForOrganization(reporter, organizationID, metrics)
+}
+
+func vpnStatusToMapStr(status *sdk.ResponseItemApplianceGetOrganizationApplianceVpnStatuses) mapstr.M {
+	res := mapstr.M{
+		"mode": status.VpnMode,
+	}
+
+	if status.ExportedSubnets != nil {
+		exportedSubnets := make([]mapstr.M, len(*status.ExportedSubnets))
+		for i, subnet := range *status.ExportedSubnets {
+			exportedSubnets[i] = mapstr.M{
+				"name":   subnet.Name,
+				"subnet": subnet.Subnet,
+			}
+		}
+		res["exported_subnets"] = exportedSubnets
+	}
+
+	if status.MerakiVpnpeers != nil {
+		vpnPeers := make([]mapstr.M, len(*status.MerakiVpnpeers))
+		for i, peer := range *status.MerakiVpnpeers {
+			vpnPeers[i] = mapstr.M{
+				"network_id":   peer.NetworkID,
+				"network_name": peer.NetworkName,
+				"reachability": peer.Reachability,
+			}
+			res["meraki_vpn_peers"] = vpnPeers
+		}
+	}
+
+	if status.ThirdPartyVpnpeers != nil {
+		thirdPartyVpnPeers := make([]mapstr.M, len(*status.ThirdPartyVpnpeers))
+		for i, peer := range *status.ThirdPartyVpnpeers {
+			thirdPartyVpnPeers[i] = mapstr.M{
+				"name":         peer.Name,
+				"public_ip":    peer.PublicIP,
+				"reachability": peer.Reachability,
+			}
+		}
+		res["third_party_vpn_peers"] = thirdPartyVpnPeers
+	}
+
+	if status.Uplinks != nil {
+		uplinks := make([]mapstr.M, len(*status.Uplinks))
+		for i, uplink := range *status.Uplinks {
+			uplinks[i] = mapstr.M{
+				"interface": uplink.Interface,
+				"public_ip": uplink.PublicIP,
+			}
+		}
+		res["uplinks"] = uplinks
+	}
+
+	return res
 }

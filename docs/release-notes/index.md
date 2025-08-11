@@ -17,6 +17,211 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 % ### Fixes [beats-versionext-fixes]
 
+## 9.1.1 [beats-9.1.1-release-notes]
+
+### Features and enhancements [beats-9.1.1-features-enhancements]
+
+**Filebeat**
+
+- Log CEL single object evaluation results as ECS compliant documents where possible. [45254]({{beats-issue}}45254) [45399]({{beats-pull}}45399)
+- Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. [45653]({{beats-pull}}45653)
+
+### Fixes [beats-9.1.1-fixes]
+
+**Filebeat**
+
+- Fix a panic in the winlog input that prevented it from starting. [45693]({{beats-issue}}45693) [45730]({{beats-pull}}45730)
+
+**Metricbeat**
+
+- Improve error messages in AWS Health [45408]({{beats-pull}}45408)
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia [45620]({{beats-pull}}45620)
+
+## 9.1.0 [beats-9.1.0-release-notes]
+
+### Features and enhancements [beats-9.1.0-features-enhancements]
+
+**Affecting all Beats**
+
+- Added the `now` processor, which will populate the specified target field with the current timestamp. [44795]({{beats-pull}}44795)
+
+**Filebeat**
+
+- Refactor & cleanup with updates to default values and documentation. [41834]({{beats-pull}}41834)
+- Add support for SSL and Proxy configurations for websocket type in streaming input. [41934]({{beats-pull}}41934)
+- Filestream take over now supports taking over states from other Filestream inputs and dynamic loading of inputs (autodiscover and Elastic Agent). There is a new syntax for the configuration, but the previous one can still be used. [42472]({{beats-issue}}42472) [42884]({{beats-issue}}42884) [42624]({{beats-pull}}42624)
+- Refactor & cleanup with updates to default values and documentation. [41834]({{beats-pull}}41834)
+- Segregated `max_workers` from `batch_size` in the GCS input. [44311]({{beats-issue}}44311) [44333]({{beats-pull}}44333)
+- Add milliseconds to document timestamp from awscloudwatch Filebeat input [44306]({{beats-pull}}44306)
+- Added support for specifying custom content-types and encodings in azureblobstorage input. [44330]({{beats-issue}}44330) [44402]({{beats-pull}}44402)
+- Introduce lastSync start position to AWS CloudWatch input backed by state registry. [43251]({{beats-pull}}43251)
+- Add proxy support to GCP Pub/Sub input. [44892]({{beats-pull}}44892)
+- Segregated `max_workers` from `batch_size` in the azure-blob-storage input. [44491]({{beats-issue}}44491) [44992]({{beats-pull}}44992)
+- Add support for relationship expansion to EntraID entity analytics provider. [43324]({{beats-issue}}43324) [44761]({{beats-pull}}44761)
+- Update CEL mito extensions to v1.22.0. [45245]({{beats-pull}}45245)
+- Add support for generalized token authentication to CEL input. [45359]({{beats-pull}}45359)
+
+**Metricbeat**
+
+- Add new metricset wmi for the windows module. [42017]({{beats-pull}}42017)
+- Changed the Elasticsearch module behavior to only pull settings from non-system indices. [43243]({{beats-pull}}43243)
+- Exclude dotted indices from settings pull in Elasticsearch module. [43306]({{beats-pull}}43306)
+- Add a `jetstream` metricset to the NATS module [43310]({{beats-pull}}43310)
+- Update NATS module compatibility. Oldest version supported is now 2.2.6 [43310]({{beats-pull}}43310)
+- Upgrade Prometheus Library to v0.300.1. [43540]({{beats-pull}}43540)
+- Add GCP Dataproc metadata collector in GCP module. [43518]({{beats-pull}}43518)
+- Updated list of supported vSphere versions in the documentation. [43642]({{beats-pull}}43642)
+- Add SSL support for sql module: drivers mysql, postgres, and mssql. [44748]({{beats-pull}}44748)
+- Add VPN metrics to meraki module [44851]({{beats-pull}}44851)
+- Add GCP cache for metadata collectors. [44432]({{beats-pull}}44432)
+
+### Fixes [beats-9.1.0-fixes]
+
+**Auditbeat**
+
+- Fix potential data loss in add_session_metadata. [42795]({{beats-pull}}42795)
+- auditbeat/fim: Fix FIM@ebpfevents for new kernels #44371. [44371]({{beats-pull}}44371)
+
+**Filebeat**
+
+- Log bad handshake details when websocket connection fails [41300]({{beats-pull}}41300)
+- Fix aws region in aws-s3 input s3 polling mode.  [41572]({{beats-pull}}41572)
+- Fix a logging regression that ignored to_files and logged to stdout. [44573]({{beats-pull}}44573)
+- Fixed issue for "Root level readerConfig no longer respected" in azureblobstorage input. [44812]({{beats-issue}}44812) [44873]({{beats-pull}}44873)
+- Fixed password authentication for ACL users in the Redis input of Filebeat. [44137]({{beats-pull}}44137)
+
+**Heartbeat**
+
+- Added maintenance windows support for Heartbeat. [41508]({{beats-pull}}41508)
+
+
+## 9.0.4 [beats-9.0.4-release-notes]
+
+### Features and enhancements [beats-9.0.4-features-enhancements]
+
+**Filebeat**
+
+- Add Fleet status updating to GCS input. [44273]({{beats-issue}}44273) [44508]({{beats-pull}}44508)
+- Add Fleet status update functionality to udp input. [44419]({{beats-issue}}44419) [44785]({{beats-pull}}44785)
+- Add Fleet status update functionality to tcp input. [44420]({{beats-issue}}44420) [44786]({{beats-pull}}44786)
+- Add Fleet status updating to Azure Blob Storage input. [44268]({{beats-issue}}44268) [44945]({{beats-pull}}44945)
+- Add Fleet status updating to HTTP JSON input. [44282]({{beats-issue}}44282) [44365]({{beats-pull}}44365)
+- Add input metrics to Azure Blob Storage input. [36641]({{beats-issue}}36641) [43954]({{beats-pull}}43954)
+- Add support for websocket keep_alive heartbeat in the streaming input. [42277]({{beats-issue}}42277) [44204]({{beats-pull}}44204)
+- Add missing "text/csv" content-type filter support in GCS input. [44922]({{beats-issue}}44922) [44923]({{beats-pull}}44923)
+
+**Heartbeat**
+
+- Upgrade Node version to latest LTS v20.19.3. [45087]({{beats-pull}}45087)
+- Add base64 encoding option to inline monitors. [45100]({{beats-pull}}45100)
+
+**Metricbeat**
+
+- Upgrade github.com/microsoft/go-mssqldb version from v1.7.2 to v1.8.2. [44990]({{beats-pull}}44990)
+
+### Fixes [beats-9.0.4-fixes]
+
+**Affecting all Beats**
+
+- The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. [36926]({{beats-issue}}36926) [45073]({{beats-pull}}45073)
+
+**Winlogbeat**
+
+- Fix EvtVarTypeAnsiString conversion. [44026]({{beats-pull}}44026)
+
+## 9.0.3 [beats-9.0.3-release-notes]
+
+### Features and enhancements [beats-9.0.3-features-enhancements]
+
+**Affecting all Beats**
+
+- Update to Go 1.24.4. [44696]({{beats-pull}}44696)
+
+**Filebeat**
+
+- Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. [44349]({{beats-issue}}44349) [44436]({{beats-pull}}44436)
+- Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. [44349]({{beats-issue}}44349) [44571]({{beats-pull}}44571)
+- Filestream now logs at level warn the number of files that are too small to be ingested [44751]({{beats-pull}}44751)
+
+**Metricbeat**
+
+- Add check for http error codes in the Metricbeat's Prometheus query submodule [44493]({{beats-pull}}44493)
+- Increase default polling period for MongoDB module from 10s to 60s [44781]({{beats-pull}}44781)
+
+### Fixes [beats-9.0.3-fixes]
+
+**Affecting all Beats**
+
+- Fix `dns` processor to handle IPv6 server addresses properly. [44526]({{beats-pull}}44526)
+- Fix an issue where the Kafka output could get stuck if a proxied connection to the Kafka cluster was reset. [44606]({{beats-issue}}44606)
+- Use Debian 11 to build linux/arm to match linux/amd64. Upgrades linux/arm64's statically linked glibc from 2.28 to 2.31. [44816]({{beats-issue}}44816)
+
+**Filebeat**
+
+- Handle special values of accountExpires in the Activedirectory Entity Analytics provider. [43364]({{beats-pull}}43364)
+- Fix status reporting panic in GCP Pub/Sub input. [44624]({{beats-issue}}44624) [44625]({{beats-pull}}44625)
+- If a Filestream input fails to be created, its ID is removed from the list of running input IDs [44697]({{beats-pull}}44697)
+- Fix timeout handling by Crowdstrike streaming input. [44720]({{beats-pull}}44720)
+- Ensure DEPROVISIONED Okta entities are published by Okta entityanalytics provider. [12658]({{beats-issue}}12658) [44719]({{beats-pull}}44719)
+- Fix handling of cursors by the streaming input for Crowdstrike. [44364]({{beats-issue}}44364) [44548]({{beats-pull}}44548)
+- Added missing "text/csv" content-type filter support in azureblobsortorage input. [44596]({{beats-issue}}44596) [44824]({{beats-pull}}44824)
+- Fix unexpected EOF detection and improve memory usage. [44813]({{beats-pull}}44813)
+
+**Heartbeat**
+
+- Add missing dependencies to ubi9-minimal distro. [44556]({{beats-pull}}44556)
+
+**Metricbeat**
+
+- Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group. [44576]({{beats-pull}}44576)
+- Sanitize error messages in Fetch method of SQL module [44577]({{beats-pull}}44577)
+- Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module [44769]({{beats-pull}}44769)
+
+## 9.0.2 [beats-9.0.2-release-notes]
+
+### Features and enhancements [beats-9.0.2-features-enhancements]
+
+**Affecting all Beats**
+
+- Update Go version to v1.24.3. [44270]({{beats-pull}}44270)
+
+**Filebeat**
+
+- Add support for collecting device entities in the Active Directory entity analytics provider. [44309]({{beats-pull}}44309)
+- The `add_cloudfoundry_metadata` processor now uses `xxhash` instead of `SHA1` for sanitizing persistent cache filenames. Existing users will experience a one-time cache invalidation as the cache store will be recreated with the new filename format. [43964]({{beats-pull}}43964)
+
+**Metricbeat**
+
+- Add checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. [44193]({{beats-pull}}44193)
+- Add a latency configuration option to the Azure Monitor module. [44366]({{beats-pull}}44366)
+
+**Osquerybeat**
+
+- Update osquery version to v5.15.0. [43426]({{beats-pull}}43426)
+
+### Fixes [beats-9.0.2-fixes]
+
+**Affecting all Beats**
+
+- Fix the 'add_cloud_metadata' processor to better support custom certificate bundles by improving how the AWS provider HTTP client is overridden. [44189]({{beats-pull}}44189)
+
+**Auditbeat**
+
+- Fix a potential error in the system/package component that could occur during internal package database schema migration. [44294]({{beats-issue}}44294) [44296]({{beats-pull}}44296)
+
+**Filebeat**
+
+- Fix endpoint path typo in the Okta entity analytics provider. [44147]({{beats-pull}}44147)
+- Fix a WebSocket panic scenario that occured after exhausting the maximum number of retries. [44342]({{beats-pull}}44342)
+
+**Metricbeat**
+
+- Add AWS OwningAccount support for cross-account monitoring. [40570]({{beats-issue}}40570) [40691]({{beats-pull}}40691)
+- Use namespace for GetListMetrics calls in AWS when available. [41022]({{beats-pull}}41022)
+- Limit index stats collection to cluster-level summaries. [36019]({{beats-issue}}36019) [42901]({{beats-pull}}42901)
+- Omit `tier_preference`, `creation_date` and `version` fields in output documents when not pulled from source indices. [43637]({{beats-pull}}43637)
+- Add support for `_nodes/stats` URIs compatible with legacy Elasticsearch versions. [44307]({{beats-pull}}44307)
+
 ## 9.0.1 [beats-9.0.1-release-notes]
 
 ### Features and enhancements [beats-9.0.1-features-enhancements]
@@ -30,7 +235,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 ### Fixes [beats-9.0.1-fixes]
 
 * For all Beats: Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected services. [#40765]({{beats-issue}}40765) [#43665]({{beats-pull}}43665).
-* Fixed websocket input panic on sudden network error or server crash in Filebeat. [#44063]({{beats-issue}}44063) [44068]({{beats-pull}}44068).
+* Fixed WebSocket input panic on sudden network error or server crash in Filebeat. [#44063]({{beats-issue}}44063) [44068]({{beats-pull}}44068).
 * [Filestream] Log the "reader closed" message on the debug level to avoid log spam in Filebeat. [#44051]({{beats-pull}}44051)
 * Fix links to CEL mito extension functions in input documentation in Filebeat. [#44098]({{beats-pull}}44098)
 

@@ -10,13 +10,11 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/beater"
 	"github.com/elastic/beats/v7/filebeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/beatreceiver"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/x-pack/filebeat/include"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
-	"github.com/elastic/elastic-agent-libs/config"
+	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"go.opentelemetry.io/collector/component"
@@ -47,38 +45,18 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 	settings.ElasticLicensed = true
 	settings.Initialize = append(settings.Initialize, include.InitializeModule)
 
-	b, err := instance.NewBeatReceiver(settings, cfg.Beatconfig, true, consumer, set.Logger.Core())
+	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, true, consumer, set.Logger.Core())
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
 
 	beatCreator := beater.New(inputs.Init)
-
-	beatConfig, err := b.BeatConfig()
+	br, err := xpInstance.NewBeatReceiver(b, beatCreator, set.Logger)
 	if err != nil {
-		return nil, fmt.Errorf("error getting beat config: %w", err)
+		return nil, fmt.Errorf("error creating %s:%w", Name, err)
 	}
 
-	fbBeater, err := beatCreator(&b.Beat, beatConfig)
-	if err != nil {
-		return nil, fmt.Errorf("error getting %s creator:%w", Name, err)
-	}
-
-	httpConf := struct {
-		HTTP *config.C `config:"http"`
-	}{}
-	if err := b.RawConfig.Unpack(&httpConf); err != nil {
-		return nil, fmt.Errorf("error unpacking monitoring config: %w", err)
-	}
-
-	base := beatreceiver.BeatReceiver{
-		HttpConf: httpConf.HTTP,
-		Beat:     b,
-		Beater:   fbBeater,
-		Logger:   set.Logger,
-	}
-
-	return &filebeatReceiver{BeatReceiver: base}, nil
+	return &filebeatReceiver{BeatReceiver: br}, nil
 }
 
 // copied from filebeat cmd.

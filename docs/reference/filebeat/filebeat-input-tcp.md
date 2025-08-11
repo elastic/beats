@@ -2,6 +2,8 @@
 navigation_title: "TCP"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-tcp.html
+applies_to:
+  stack: ga
 ---
 
 # TCP input [filebeat-input-tcp]
@@ -18,6 +20,13 @@ filebeat.inputs:
   host: "localhost:9000"
 ```
 
+:::{note}
+{applies_to}`stack: ga 9.2.0` Starting in 9.2.0 the TCP input reads
+the message in a different goroutine than the publishing of messages,
+which increases the performance of the input when running slow
+processors.
+:::
+
 ## Configuration options [_configuration_options_19]
 
 The `tcp` input supports the following configuration options plus the [Common options](#filebeat-input-tcp-common-options) described later.
@@ -31,6 +40,13 @@ The maximum size of the message received over TCP. The default is `20MiB`.
 ### `host` [filebeat-input-tcp-tcp-host]
 
 The host and TCP port to listen on for event streams.
+
+### `number_of_workers` [filebeat-input-tcp-number-of-workers]
+```{applies_to}
+stack: ga 9.2.0
+```
+
+The number of pipeline workers. Default: 1
 
 
 ### `network` [filebeat-input-tcp-tcp-network]
@@ -75,6 +91,7 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `received_events_total` | Total number of packets (events) that have been received. |
 | `received_bytes_total` | Total number of bytes received. |
 | `receive_queue_length` | Aggregated size of the system receive queues (IPv4 and IPv6) (linux only) (gauge). |
+| `published_events_total`  {applies_to}`stack: ga 9.2.0`| Total number of packets (events) published. | 
 | `arrival_period` | Histogram of the time between successive packets in nanoseconds. |
 | `processing_time` | Histogram of the time taken to process packets in nanoseconds. |
 

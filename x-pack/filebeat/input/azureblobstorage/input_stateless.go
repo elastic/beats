@@ -13,6 +13,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type statelessInput struct {
@@ -51,6 +52,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		source = &Source{
 			AccountName:              in.config.AccountName,
 			ContainerName:            c.Name,
+			BatchSize:                *container.BatchSize,
 			MaxWorkers:               *container.MaxWorkers,
 			Poll:                     *container.Poll,
 			PollInterval:             *container.PollInterval,
@@ -58,15 +60,16 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			ExpandEventListFromField: container.ExpandEventListFromField,
 			FileSelectors:            container.FileSelectors,
 			ReaderConfig:             container.ReaderConfig,
+			PathPrefix:               container.PathPrefix,
 		}
 
 		st := newState()
 		currentSource := source.(*Source)
 		log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container", currentSource.ContainerName)
-		// create a new inputMetrics instance
-		metrics := newInputMetrics(inputCtx.ID+":"+currentSource.ContainerName, nil)
+		// use a new metrics registry associated to no parent. No metrics will
+		// be published.
+		metrics := newInputMetrics(monitoring.NewRegistry())
 		metrics.url.Set(in.serviceURL + currentSource.ContainerName)
-		defer metrics.Close()
 
 		ctx, cancel := context.WithCancel(context.Background())
 		go func() {
@@ -83,7 +86,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			return err
 		}
 
-		scheduler := newScheduler(pub, containerClient, credential, currentSource, &in.config, st, in.serviceURL, metrics, log)
+		scheduler := newScheduler(pub, containerClient, credential, currentSource, &in.config, st, in.serviceURL, noopReporter{}, metrics, log)
 		// allows multiple containers to be scheduled concurrently while testing
 		// the stateless input is triggered only while testing and till now it did not mimic
 		// the real world concurrent execution of multiple containers. This fix allows it to do so.

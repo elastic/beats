@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var withTraces = flag.Bool("log-traces", false, "specify logging request traces during tests")
@@ -256,6 +257,52 @@ func Test_apiResponse(t *testing.T) {
 			},
 			wantStatus:   http.StatusOK,
 			wantResponse: `{"message": "success"}`,
+		},
+		{
+			name: "options_with_headers",
+			conf: func() config {
+				c := defaultConfig()
+				c.OptionsHeaders = http.Header{
+					"optional-response-header": {"Optional-response-value"},
+				}
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodOptions, "/", nil)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       []mapstr.M{},
+			wantStatus:   http.StatusOK,
+			wantResponse: "",
+		},
+		{
+			name: "options_empty_headers",
+			conf: func() config {
+				c := defaultConfig()
+				c.OptionsHeaders = http.Header{}
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodOptions, "/", nil)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       []mapstr.M{},
+			wantStatus:   http.StatusOK,
+			wantResponse: "",
+		},
+		{
+			name: "options_no_header",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodOptions, "/", nil)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       []mapstr.M{},
+			wantStatus:   http.StatusBadRequest,
+			wantResponse: `{"message":"OPTIONS requests are only allowed with options_headers set"}`,
 		},
 		{
 			name:  "hmac_hex",
@@ -550,9 +597,8 @@ func Test_apiResponse(t *testing.T) {
 				tc.setup(t)
 			}
 			pub := new(publisher)
-			metrics := newInputMetrics("")
-			defer metrics.Close()
-			apiHandler := newHandler(ctx, newTracerConfig(tc.name, tc.conf, *withTraces), nil, pub.Publish, logp.NewLogger("http_endpoint.test"), metrics)
+			metrics := newInputMetrics(monitoring.NewRegistry())
+			apiHandler := newHandler(ctx, newTracerConfig(tc.name, tc.conf, *withTraces), nil, pub.Publish, nil, logp.NewLogger("http_endpoint.test"), metrics)
 
 			// Execute handler.
 			respRec := httptest.NewRecorder()

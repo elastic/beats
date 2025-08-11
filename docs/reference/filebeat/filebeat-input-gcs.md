@@ -2,6 +2,8 @@
 navigation_title: "Google Cloud Storage"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-gcs.html
+applies_to:
+  stack: ga
 ---
 
 # Google Cloud Storage Input [filebeat-input-gcs]
@@ -37,21 +39,24 @@ filebeat.inputs:
   parse_json: true
   buckets:
   - name: gcs-test-new
+    batch_size: 100 <1>
     max_workers: 3
     poll: true
     poll_interval: 15s
   - name: gcs-test-old
+    batch_size: 50 <1>
     max_workers: 3
     poll: true
     poll_interval: 10s
 ```
+1. {applies_to}`stack: ga 9.1.0`
 
-**Explanation :** This `configuration` given above describes a basic gcs config having two buckets named `gcs-test-new` and `gcs-test-old`. Each of these buckets have their own attributes such as `name`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes-gcs). For now lets try to understand how this config works.
+**Explanation :** This `configuration` given above describes a basic gcs config having two buckets named `gcs-test-new` and `gcs-test-old`. Each of these buckets have their own attributes such as `name`, `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes-gcs). For now lets try to understand how this config works.
 
 For google cloud storage input to identify the files it needs to read and process, it will require the bucket names to be specified. We can have as many buckets as we deem fit. We are also able to configure the attributes `max_workers`, `poll` and `poll_interval` at the root level, which will then be applied to all buckets which do not specify any of these attributes explicitly.
 
 ::::{note}
-If the attributes `max_workers`, `poll` and `poll_interval` are specified at the root level, these can still be overridden at the bucket level with different values, thus offering extensive flexibility and customization. Examples [below](#bucket-overrides) show this behavior.
+If the attributes `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval` are specified at the root level, these can still be overridden at the bucket level with different values, thus offering extensive flexibility and customization. Examples [below](#bucket-overrides) show this behavior.
 ::::
 
 
@@ -145,14 +150,16 @@ $$$supported-attributes-gcs$$$
 3. [auth.credentials_file.path](#attrib-auth-credentials-file)
 4. [buckets](#attrib-buckets)
 5. [name](#attrib-bucket-name)
-6. [max_workers](#attrib-max_workers-gcs)
-7. [poll](#attrib-poll-gcs)
-8. [poll_interval](#attrib-poll_interval-gcs)
-9. [parse_json](#attrib-parse_json)
-10. [file_selectors](#attrib-file_selectors-gcs)
-11. [expand_event_list_from_field](#attrib-expand_event_list_from_field-gcs)
-12. [timestamp_epoch](#attrib-timestamp_epoch-gcs)
-13. [retry](#attrib-retry-gcs)
+6. [batch_size](#attrib-batch_size-gcs) {applies_to}`stack: ga 9.1.0`
+7. [max_workers](#attrib-max_workers-gcs)
+8. [poll](#attrib-poll-gcs)
+9. [poll_interval](#attrib-poll_interval-gcs)
+10. [parse_json](#attrib-parse_json)
+11. [file_selectors](#attrib-file_selectors-gcs)
+12. [expand_event_list_from_field](#attrib-expand_event_list_from_field-gcs)
+13. [timestamp_epoch](#attrib-timestamp_epoch-gcs)
+14. [retry](#attrib-retry-gcs)
+15. [custom_properties](#attrib-custom-properties)
 
 
 ### `project_id` [attrib-project-id]
@@ -184,13 +191,19 @@ This attribute contains the details about a specific bucket like `name`, `max_wo
 
 This is a specific subfield of a bucket. It specifies the bucket name.
 
+### `batch_size` [attrib-batch_size-gcs]
+```{applies_to}
+  stack: ga 9.1
+```
+
+This attribute specifies the `page size` for the response. In earlier versions, this value was derived from `max_workers`, but with the latest update, `batch_size` is now an independent setting. For backward compatibility, if `batch_size` is not explicitly defined, it will default to a value based on `max_workers`. This attribute can be configured at both the root and bucket levels. When defined at both levels, the bucket-level setting takes precedence.
 
 ### `max_workers` [attrib-max_workers-gcs]
 
 This attribute defines the maximum number of workers (goroutines / lightweight threads) are allocated in the worker pool (thread pool) for processing jobs which read the contents of files. This attribute can be specified both at the root level of the configuration and at the bucket level. Bucket level values override the root level values if both are specified. Larger number of workers do not necessarily improve of throughput, and this should be carefully tuned based on the number of files, the size of the files being processed and resources available. Increasing `max_workers` to very high values may cause resource utilization problems and can lead to a bottleneck in processing. Usually a maximum cap of `2000` workers is recommended. A very low `max_worker` count will drastically increase the number of network calls required to fetch the objects, which can cause a bottleneck in processing.
 
 ::::{note}
-The value of `max_workers` is tied to the `batch_size` currently to ensure even distribution of workloads across all goroutines. This ensures that the input is able to process the files in an efficient manner. This `batch_size` determines how many objects will be fetched in one single call. The `max_workers` value should be set based on the number of files to be read, the resources available and the network speed. For example,`max_workers=3` would mean that every pagination request a total number of `3` gcs objects are fetched and distributed among `3 goroutines`, `max_workers=100` would mean `100` gcs objects are fetched in every pagination request and distributed among `100 goroutines`.
+The `batch_size` {applies_to}`stack: ga 9.1.0` and `max_workers` attributes are decoupled but functionally related. `batch_size` determines how many objects are fetched in a single API call (i.e., the pagination size), while `max_workers` controls the number of concurrent goroutines used to process the fetched objects. Although these values are independent, they should be configured thoughtfully to ensure efficient workload distribution and optimal performance. For example, setting `batch_size=100` and `max_workers=10` means each pagination request fetches `100` objects, which are then processed by `10` concurrent goroutines. The appropriate value for `max_workers` depends on factors such as the number of files to be processed, available system resources, and network bandwidth.
 ::::
 
 
@@ -245,7 +258,7 @@ An example config is shown below:
 
 ### `file_selectors` [attrib-file_selectors-gcs]
 
-If the GCS buckets have objects that correspond to files that Filebeat shouldn’t process, `file_selectors` can be used to limit the files that are downloaded. This is a list of selectors which are based on a regular expression pattern. The regular expression should match the object name or should be a part of the object name (ideally a prefix). The regular expression syntax used is [RE2](https://github.com/google/re2/wiki/Syntax). Files that don’t match any configured expression won’t be processed.This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+If the GCS buckets have objects that correspond to files that Filebeat shouldn’t process, `file_selectors` can be used to limit the files that are downloaded. This is a list of selectors which are based on a regular expression pattern. The regular expression should match the object name or should be a part of the object name (ideally a prefix). The regular expression syntax used is [RE2](https://github.com/google/re2/wiki/Syntax). Files that don’t match any configured expression won’t be processed.This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority and override the root level values if both are specified.
 
 ```yaml
 filebeat.inputs:
@@ -268,7 +281,7 @@ The `file_selectors` operation is performed within the agent locally, hence usin
 
 ### `expand_event_list_from_field` [attrib-expand_event_list_from_field-gcs]
 
-If the file-set using this input expects to receive multiple messages bundled under a specific field or an array of objects then the config option for `expand_event_list_from_field` can be specified. This setting will be able to split the messages under the group value into separate events. For example, if you have logs that are in JSON format and events are found under the JSON object "Records". To split the events into separate events, the config option `expand_event_list_from_field` can be set to "Records". This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+If the file-set using this input expects to receive multiple messages bundled under a specific field or an array of objects then the config option for `expand_event_list_from_field` can be specified. This setting will be able to split the messages under the group value into separate events. For example, if you have logs that are in JSON format and events are found under the JSON object "Records". To split the events into separate events, the config option `expand_event_list_from_field` can be set to "Records". This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority and override the root level values if both are specified.
 
 ```json
 {
@@ -310,7 +323,7 @@ The `parse_json` setting is incompatible with `expand_event_list_from_field`. If
 
 ### `timestamp_epoch` [attrib-timestamp_epoch-gcs]
 
-This attribute can be used to filter out files and objects that have a timestamp older than the specified value. The value of this attribute should be in unix `epoch` (seconds) format. The timestamp value is compared with the `object.Updated` field obtained from the object metadata. This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+This attribute can be used to filter out files and objects that have a timestamp older than the specified value. The value of this attribute should be in unix `epoch` (seconds) format. The timestamp value is compared with the `object.Updated` field obtained from the object metadata. This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority and override the root level values if both are specified.
 
 ```yaml
 filebeat.inputs:
@@ -362,6 +375,95 @@ filebeat.inputs:
     poll: true
     poll_interval: 11m
 ```
+
+### Custom properties [attrib-custom-properties]
+
+Some object properties can be **set** or **overridden** at the input level with the help of certain configuration options. Allowing users to set or override custom object properties provides more flexibility when reading objects from a remote storage where the user might only have read access.
+
+**The supported custom properties are:**
+
+- [`content_type`](#attrib-content-type)
+- [`encoding`](#attrib-encoding)
+
+### `content_type` [attrib-content-type]
+
+Use the `content_type` configuration attribute to set a user-defined content type for the object property. Setting a custom content type only sets the `content-type` property of a object if it's missing or empty. If you want to override an already existing `content-type` value, set the `override_content_type` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Container level definitions always take precedence.
+
+### Example configuration
+
+This is a sample configuration at root level:
+
+```yaml
+filebeat.inputs:
+- type: gcs
+  project_id: my_project_id
+  auth.credentials_file.path: {{file_path}}/{{creds_file_name}}.json
+  max_workers: 3
+  poll: true
+  poll_interval: 5m
+  content_type: `application/x-gzip`
+  override_content_type: true
+  buckets:
+  - name: obs-bucket
+```
+
+This is a sample configuration at bucket level:
+
+```yaml
+filebeat.inputs:
+- type: gcs
+  project_id: my_project_id
+  auth.credentials_file.path: {{file_path}}/{{creds_file_name}}.json
+  max_workers: 3
+  poll: true
+  poll_interval: 5m
+  buckets:
+  - name: obs-bucket
+    content_type: `application/x-gzip`
+    override_content_type: true
+```
+
+### `encoding` [attrib-encoding]
+
+Use the `encoding` configuration attribute to set a user-defined encoding for the object property. Setting a custom encoding only sets the `encoding` property of a object if it's missing or empty. If you want to override an already existing encoding value, set the `override_encoding` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Container level definitions always take precedence.
+
+### Example configuration
+
+This is a sample configuration at root level:
+
+```yaml
+filebeat.inputs:
+- type: gcs
+  project_id: my_project_id
+  auth.credentials_file.path: {{file_path}}/{{creds_file_name}}.json
+  max_workers: 3
+  poll: true
+  poll_interval: 5m
+  encoding: `gzip`
+  override_encoding: true
+  buckets:
+  - name: obs-bucket
+```
+
+This is a sample configuration at bucket level:
+
+```yaml
+filebeat.inputs:
+- type: gcs
+  project_id: my_project_id
+  auth.credentials_file.path: {{file_path}}/{{creds_file_name}}.json
+  max_workers: 3
+  poll: true
+  poll_interval: 5m
+  buckets:
+  - name: obs-bucket
+    encoding: `gzip`
+    override_encoding: true
+```
+
+::::{note}
+Custom property configurations are affected by input restrictions. For example, you can set an unsupported content-type or encoding but the input will reject it and report an error.
+::::
 
 $$$bucket-overrides$$$
 **The sample configs below will explain the bucket level overriding of attributes a bit further :-**

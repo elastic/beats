@@ -1,20 +1,24 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-cloudfoundry.html
+applies_to:
+  stack: beta
 ---
+
+% This file is generated! See scripts/generate_fields_docs.py
 
 # Cloudfoundry fields [exported-fields-cloudfoundry]
 
 Cloud Foundry module
 
-
 ## cloudfoundry [_cloudfoundry]
 
+
+
 **`cloudfoundry.type`**
-:   The type of event from Cloud Foundry. Possible values include *container*, *counter* and *value*.
+:   The type of event from Cloud Foundry. Possible values include 'container', 'counter' and 'value'.
 
-type: keyword
-
+    type: keyword
 
 
 ## app [_app]
@@ -24,93 +28,102 @@ The application the metric is associated with.
 **`cloudfoundry.app.id`**
 :   The ID of the application.
 
-type: keyword
+    type: keyword
 
 
+## container [_container]
 
-## container [_container_2]
+```{applies_to}
+stack: beta
+```
 
 `container` contains container metrics from Cloud Foundry.
 
 **`cloudfoundry.container.instance_index`**
 :   Index of the instance the metric belongs to.
 
-type: long
+    type: long
 
 
 **`cloudfoundry.container.cpu.pct`**
 :   CPU usage percentage.
 
-type: scaled_float
+    type: scaled_float
 
 
 **`cloudfoundry.container.memory.bytes`**
 :   Bytes of used memory.
 
-type: long
+    type: long
 
 
 **`cloudfoundry.container.memory.quota.bytes`**
 :   Bytes of available memory.
 
-type: long
+    type: long
 
 
 **`cloudfoundry.container.disk.bytes`**
 :   Bytes of used storage.
 
-type: long
+    type: long
 
 
 **`cloudfoundry.container.disk.quota.bytes`**
 :   Bytes of available storage.
 
-type: long
+    type: long
 
 
+## counter [_counter]
 
-## counter [_counter_2]
+```{applies_to}
+stack: beta
+```
 
 `counter` contains counter metrics from Cloud Foundry.
 
 **`cloudfoundry.counter.name`**
 :   The name of the counter.
 
-type: keyword
+    type: keyword
 
 
 **`cloudfoundry.counter.delta`**
 :   The difference between the last time the counter event occurred.
 
-type: long
+    type: long
 
 
 **`cloudfoundry.counter.total`**
 :   The total value for the counter.
 
-type: long
+    type: long
 
 
+## value [_value]
 
-## value [_value_2]
+```{applies_to}
+stack: beta
+```
 
 `value` contains counter metrics from Cloud Foundry.
 
 **`cloudfoundry.value.name`**
 :   The name of the value.
 
-type: keyword
+    type: keyword
 
 
 **`cloudfoundry.value.unit`**
 :   The unit of the value.
 
-type: keyword
+    type: keyword
 
 
 **`cloudfoundry.value.value`**
 :   The value of the value.
 
-type: float
+    type: float
 
 

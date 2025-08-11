@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-beat.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Beat fields [exported-fields-beat]
 
 Beat module
@@ -10,1377 +12,1431 @@ Beat module
 **`beats_stats.apm-server.acm.request.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.request.count
+    alias to: beat.stats.apm_server.acm.request.count
 
 
 **`beats_stats.apm-server.acm.response.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.count
+    alias to: beat.stats.apm_server.acm.response.count
 
 
 **`beats_stats.apm-server.acm.response.errors.closed`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.closed
+    alias to: beat.stats.apm_server.acm.response.errors.closed
 
 
 **`beats_stats.apm-server.acm.response.errors.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.count
+    alias to: beat.stats.apm_server.acm.response.errors.count
 
 
 **`beats_stats.apm-server.acm.response.errors.decode`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.decode
+    alias to: beat.stats.apm_server.acm.response.errors.decode
 
 
 **`beats_stats.apm-server.acm.response.errors.forbidden`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.forbidden
+    alias to: beat.stats.apm_server.acm.response.errors.forbidden
 
 
 **`beats_stats.apm-server.acm.response.errors.internal`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.internal
+    alias to: beat.stats.apm_server.acm.response.errors.internal
 
 
 **`beats_stats.apm-server.acm.response.errors.invalidquery`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.invalidquery
+    alias to: beat.stats.apm_server.acm.response.errors.invalidquery
 
 
 **`beats_stats.apm-server.acm.response.errors.method`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.method
+    alias to: beat.stats.apm_server.acm.response.errors.method
 
 
 **`beats_stats.apm-server.acm.response.errors.notfound`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.notfound
+    alias to: beat.stats.apm_server.acm.response.errors.notfound
 
 
 **`beats_stats.apm-server.acm.response.errors.queue`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.queue
+    alias to: beat.stats.apm_server.acm.response.errors.queue
 
 
 **`beats_stats.apm-server.acm.response.errors.ratelimit`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.ratelimit
+    alias to: beat.stats.apm_server.acm.response.errors.ratelimit
 
 
 **`beats_stats.apm-server.acm.response.errors.timeout`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.timeout
+    alias to: beat.stats.apm_server.acm.response.errors.timeout
 
 
 **`beats_stats.apm-server.acm.response.errors.toolarge`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.toolarge
+    alias to: beat.stats.apm_server.acm.response.errors.toolarge
 
 
 **`beats_stats.apm-server.acm.response.errors.unauthorized`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.unauthorized
+    alias to: beat.stats.apm_server.acm.response.errors.unauthorized
 
 
 **`beats_stats.apm-server.acm.response.errors.unavailable`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.unavailable
+    alias to: beat.stats.apm_server.acm.response.errors.unavailable
 
 
 **`beats_stats.apm-server.acm.response.errors.validate`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.validate
+    alias to: beat.stats.apm_server.acm.response.errors.validate
 
 
 **`beats_stats.apm-server.acm.response.valid.accepted`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.valid.accepted
+    alias to: beat.stats.apm_server.acm.response.valid.accepted
 
 
 **`beats_stats.apm-server.acm.response.valid.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.valid.count
+    alias to: beat.stats.apm_server.acm.response.valid.count
 
 
 **`beats_stats.apm-server.acm.response.valid.notmodified`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.valid.notmodified
+    alias to: beat.stats.apm_server.acm.response.valid.notmodified
 
 
 **`beats_stats.apm-server.acm.response.valid.ok`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.response.valid.ok
+    alias to: beat.stats.apm_server.acm.response.valid.ok
 
 
 **`beats_stats.apm-server.acm.unset`**
 :   type: alias
 
-alias to: beat.stats.apm_server.acm.unset
+    alias to: beat.stats.apm_server.acm.unset
 
 
 **`beats_stats.apm-server.agentcfg.elasticsearch.cache.entries.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.agentcfg.elasticsearch.cache.entries.count
+    alias to: beat.stats.apm_server.agentcfg.elasticsearch.cache.entries.count
 
 
 **`beats_stats.apm-server.agentcfg.elasticsearch.cache.refresh.failures`**
 :   type: alias
 
-alias to: beat.stats.apm_server.agentcfg.elasticsearch.cache.refresh.failures
+    alias to: beat.stats.apm_server.agentcfg.elasticsearch.cache.refresh.failures
 
 
 **`beats_stats.apm-server.agentcfg.elasticsearch.cache.refresh.successes`**
 :   type: alias
 
-alias to: beat.stats.apm_server.agentcfg.elasticsearch.cache.refresh.successes
+    alias to: beat.stats.apm_server.agentcfg.elasticsearch.cache.refresh.successes
 
 
 **`beats_stats.apm-server.agentcfg.elasticsearch.fetch.es`**
 :   type: alias
 
-alias to: beat.stats.apm_server.agentcfg.elasticsearch.fetch.es
+    alias to: beat.stats.apm_server.agentcfg.elasticsearch.fetch.es
 
 
 **`beats_stats.apm-server.agentcfg.elasticsearch.fetch.fallback`**
 :   type: alias
 
-alias to: beat.stats.apm_server.agentcfg.elasticsearch.fetch.fallback
+    alias to: beat.stats.apm_server.agentcfg.elasticsearch.fetch.fallback
 
 
 **`beats_stats.apm-server.agentcfg.elasticsearch.fetch.invalid`**
 :   type: alias
 
-alias to: beat.stats.apm_server.agentcfg.elasticsearch.fetch.invalid
+    alias to: beat.stats.apm_server.agentcfg.elasticsearch.fetch.invalid
 
 
 **`beats_stats.apm-server.agentcfg.elasticsearch.fetch.unavailable`**
 :   type: alias
 
-alias to: beat.stats.apm_server.agentcfg.elasticsearch.fetch.unavailable
+    alias to: beat.stats.apm_server.agentcfg.elasticsearch.fetch.unavailable
 
 
 **`beats_stats.apm-server.jaeger.grpc.collect.request.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.jaeger.grpc.collect.request.count
+    alias to: beat.stats.apm_server.jaeger.grpc.collect.request.count
 
 
 **`beats_stats.apm-server.jaeger.grpc.collect.response.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.jaeger.grpc.collect.response.count
+    alias to: beat.stats.apm_server.jaeger.grpc.collect.response.count
 
 
 **`beats_stats.apm-server.jaeger.grpc.collect.response.errors.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.jaeger.grpc.collect.response.errors.count
+    alias to: beat.stats.apm_server.jaeger.grpc.collect.response.errors.count
 
 
 **`beats_stats.apm-server.jaeger.grpc.collect.response.errors.ratelimit`**
 :   type: alias
 
-alias to: beat.stats.apm_server.jaeger.grpc.collect.response.errors.ratelimit
+    alias to: beat.stats.apm_server.jaeger.grpc.collect.response.errors.ratelimit
 
 
 **`beats_stats.apm-server.jaeger.grpc.collect.response.errors.timeout`**
 :   type: alias
 
-alias to: beat.stats.apm_server.jaeger.grpc.collect.response.errors.timeout
+    alias to: beat.stats.apm_server.jaeger.grpc.collect.response.errors.timeout
 
 
 **`beats_stats.apm-server.jaeger.grpc.collect.response.errors.unauthorized`**
 :   type: alias
 
-alias to: beat.stats.apm_server.jaeger.grpc.collect.response.errors.unauthorized
+    alias to: beat.stats.apm_server.jaeger.grpc.collect.response.errors.unauthorized
 
 
 **`beats_stats.apm-server.jaeger.grpc.collect.response.valid.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.jaeger.grpc.collect.response.valid.count
+    alias to: beat.stats.apm_server.jaeger.grpc.collect.response.valid.count
 
 
 **`beats_stats.apm-server.jaeger.grpc.sampling.event.received.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.jaeger.grpc.sampling.event.received.count
+    alias to: beat.stats.apm_server.jaeger.grpc.sampling.event.received.count
 
 
 **`beats_stats.apm-server.jaeger.grpc.sampling.request.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.jaeger.grpc.sampling.request.count
+    alias to: beat.stats.apm_server.jaeger.grpc.sampling.request.count
 
 
 **`beats_stats.apm-server.jaeger.grpc.sampling.response.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.jaeger.grpc.sampling.response.count
+    alias to: beat.stats.apm_server.jaeger.grpc.sampling.response.count
 
 
 **`beats_stats.apm-server.jaeger.grpc.sampling.response.errors.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.jaeger.grpc.sampling.response.errors.count
+    alias to: beat.stats.apm_server.jaeger.grpc.sampling.response.errors.count
 
 
 **`beats_stats.apm-server.jaeger.grpc.sampling.response.valid.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.jaeger.grpc.sampling.response.valid.count
+    alias to: beat.stats.apm_server.jaeger.grpc.sampling.response.valid.count
 
 
 **`beats_stats.apm-server.otlp.grpc.logs.request.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.logs.request.count
+    alias to: beat.stats.apm_server.otlp.grpc.logs.request.count
 
 
 **`beats_stats.apm-server.otlp.grpc.logs.response.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.logs.response.count
+    alias to: beat.stats.apm_server.otlp.grpc.logs.response.count
 
 
 **`beats_stats.apm-server.otlp.grpc.logs.response.errors.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.logs.response.errors.count
+    alias to: beat.stats.apm_server.otlp.grpc.logs.response.errors.count
 
 
 **`beats_stats.apm-server.otlp.grpc.logs.response.errors.ratelimit`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.logs.response.errors.ratelimit
+    alias to: beat.stats.apm_server.otlp.grpc.logs.response.errors.ratelimit
 
 
 **`beats_stats.apm-server.otlp.grpc.logs.response.errors.timeout`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.logs.response.errors.timeout
+    alias to: beat.stats.apm_server.otlp.grpc.logs.response.errors.timeout
 
 
 **`beats_stats.apm-server.otlp.grpc.logs.response.errors.unauthorized`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.logs.response.errors.unauthorized
+    alias to: beat.stats.apm_server.otlp.grpc.logs.response.errors.unauthorized
 
 
 **`beats_stats.apm-server.otlp.grpc.logs.response.valid.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.logs.response.valid.count
+    alias to: beat.stats.apm_server.otlp.grpc.logs.response.valid.count
 
 
 **`beats_stats.apm-server.otlp.grpc.metrics.consumer.unsupported_dropped`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.metrics.consumer.unsupported_dropped
+    alias to: beat.stats.apm_server.otlp.grpc.metrics.consumer.unsupported_dropped
 
 
 **`beats_stats.apm-server.otlp.grpc.metrics.request.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.metrics.request.count
+    alias to: beat.stats.apm_server.otlp.grpc.metrics.request.count
 
 
 **`beats_stats.apm-server.otlp.grpc.metrics.response.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.metrics.response.count
+    alias to: beat.stats.apm_server.otlp.grpc.metrics.response.count
 
 
 **`beats_stats.apm-server.otlp.grpc.metrics.response.errors.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.metrics.response.errors.count
+    alias to: beat.stats.apm_server.otlp.grpc.metrics.response.errors.count
 
 
 **`beats_stats.apm-server.otlp.grpc.metrics.response.errors.ratelimit`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.metrics.response.errors.ratelimit
+    alias to: beat.stats.apm_server.otlp.grpc.metrics.response.errors.ratelimit
 
 
 **`beats_stats.apm-server.otlp.grpc.metrics.response.errors.timeout`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.metrics.response.errors.timeout
+    alias to: beat.stats.apm_server.otlp.grpc.metrics.response.errors.timeout
 
 
 **`beats_stats.apm-server.otlp.grpc.metrics.response.errors.unauthorized`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.metrics.response.errors.unauthorized
+    alias to: beat.stats.apm_server.otlp.grpc.metrics.response.errors.unauthorized
 
 
 **`beats_stats.apm-server.otlp.grpc.metrics.response.valid.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.metrics.response.valid.count
+    alias to: beat.stats.apm_server.otlp.grpc.metrics.response.valid.count
 
 
 **`beats_stats.apm-server.otlp.grpc.traces.request.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.traces.request.count
+    alias to: beat.stats.apm_server.otlp.grpc.traces.request.count
 
 
 **`beats_stats.apm-server.otlp.grpc.traces.response.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.traces.response.count
+    alias to: beat.stats.apm_server.otlp.grpc.traces.response.count
 
 
 **`beats_stats.apm-server.otlp.grpc.traces.response.errors.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.traces.response.errors.count
+    alias to: beat.stats.apm_server.otlp.grpc.traces.response.errors.count
 
 
 **`beats_stats.apm-server.otlp.grpc.traces.response.errors.ratelimit`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.traces.response.errors.ratelimit
+    alias to: beat.stats.apm_server.otlp.grpc.traces.response.errors.ratelimit
 
 
 **`beats_stats.apm-server.otlp.grpc.traces.response.errors.timeout`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.traces.response.errors.timeout
+    alias to: beat.stats.apm_server.otlp.grpc.traces.response.errors.timeout
 
 
 **`beats_stats.apm-server.otlp.grpc.traces.response.errors.unauthorized`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.traces.response.errors.unauthorized
+    alias to: beat.stats.apm_server.otlp.grpc.traces.response.errors.unauthorized
 
 
 **`beats_stats.apm-server.otlp.grpc.traces.response.valid.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.grpc.traces.response.valid.count
+    alias to: beat.stats.apm_server.otlp.grpc.traces.response.valid.count
 
 
 **`beats_stats.apm-server.otlp.http.logs.request.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.logs.request.count
+    alias to: beat.stats.apm_server.otlp.http.logs.request.count
 
 
 **`beats_stats.apm-server.otlp.http.logs.response.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.logs.response.count
+    alias to: beat.stats.apm_server.otlp.http.logs.response.count
 
 
 **`beats_stats.apm-server.otlp.http.logs.response.errors.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.logs.response.errors.count
+    alias to: beat.stats.apm_server.otlp.http.logs.response.errors.count
 
 
 **`beats_stats.apm-server.otlp.http.logs.response.errors.ratelimit`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.logs.response.errors.ratelimit
+    alias to: beat.stats.apm_server.otlp.http.logs.response.errors.ratelimit
 
 
 **`beats_stats.apm-server.otlp.http.logs.response.errors.timeout`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.logs.response.errors.timeout
+    alias to: beat.stats.apm_server.otlp.http.logs.response.errors.timeout
 
 
 **`beats_stats.apm-server.otlp.http.logs.response.errors.unauthorized`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.logs.response.errors.unauthorized
+    alias to: beat.stats.apm_server.otlp.http.logs.response.errors.unauthorized
 
 
 **`beats_stats.apm-server.otlp.http.logs.response.valid.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.logs.response.valid.count
+    alias to: beat.stats.apm_server.otlp.http.logs.response.valid.count
 
 
 **`beats_stats.apm-server.otlp.http.metrics.consumer.unsupported_dropped`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.metrics.consumer.unsupported_dropped
+    alias to: beat.stats.apm_server.otlp.http.metrics.consumer.unsupported_dropped
 
 
 **`beats_stats.apm-server.otlp.http.metrics.request.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.metrics.request.count
+    alias to: beat.stats.apm_server.otlp.http.metrics.request.count
 
 
 **`beats_stats.apm-server.otlp.http.metrics.response.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.metrics.response.count
+    alias to: beat.stats.apm_server.otlp.http.metrics.response.count
 
 
 **`beats_stats.apm-server.otlp.http.metrics.response.errors.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.metrics.response.errors.count
+    alias to: beat.stats.apm_server.otlp.http.metrics.response.errors.count
 
 
 **`beats_stats.apm-server.otlp.http.metrics.response.errors.ratelimit`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.metrics.response.errors.ratelimit
+    alias to: beat.stats.apm_server.otlp.http.metrics.response.errors.ratelimit
 
 
 **`beats_stats.apm-server.otlp.http.metrics.response.errors.timeout`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.metrics.response.errors.timeout
+    alias to: beat.stats.apm_server.otlp.http.metrics.response.errors.timeout
 
 
 **`beats_stats.apm-server.otlp.http.metrics.response.errors.unauthorized`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.metrics.response.errors.unauthorized
+    alias to: beat.stats.apm_server.otlp.http.metrics.response.errors.unauthorized
 
 
 **`beats_stats.apm-server.otlp.http.metrics.response.valid.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.metrics.response.valid.count
+    alias to: beat.stats.apm_server.otlp.http.metrics.response.valid.count
 
 
 **`beats_stats.apm-server.otlp.http.traces.request.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.traces.request.count
+    alias to: beat.stats.apm_server.otlp.http.traces.request.count
 
 
 **`beats_stats.apm-server.otlp.http.traces.response.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.traces.response.count
+    alias to: beat.stats.apm_server.otlp.http.traces.response.count
 
 
 **`beats_stats.apm-server.otlp.http.traces.response.errors.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.traces.response.errors.count
+    alias to: beat.stats.apm_server.otlp.http.traces.response.errors.count
 
 
 **`beats_stats.apm-server.otlp.http.traces.response.errors.ratelimit`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.traces.response.errors.ratelimit
+    alias to: beat.stats.apm_server.otlp.http.traces.response.errors.ratelimit
 
 
 **`beats_stats.apm-server.otlp.http.traces.response.errors.timeout`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.traces.response.errors.timeout
+    alias to: beat.stats.apm_server.otlp.http.traces.response.errors.timeout
 
 
 **`beats_stats.apm-server.otlp.http.traces.response.errors.unauthorized`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.traces.response.errors.unauthorized
+    alias to: beat.stats.apm_server.otlp.http.traces.response.errors.unauthorized
 
 
 **`beats_stats.apm-server.otlp.http.traces.response.valid.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.otlp.http.traces.response.valid.count
+    alias to: beat.stats.apm_server.otlp.http.traces.response.valid.count
 
 
 **`beats_stats.apm-server.processor.error.transformations`**
 :   type: alias
 
-alias to: beat.stats.apm_server.processor.error.transformations
+    alias to: beat.stats.apm_server.processor.error.transformations
 
 
 **`beats_stats.apm-server.processor.metric.transformations`**
 :   type: alias
 
-alias to: beat.stats.apm_server.processor.metric.transformations
+    alias to: beat.stats.apm_server.processor.metric.transformations
 
 
 **`beats_stats.apm-server.processor.span.transformations`**
 :   type: alias
 
-alias to: beat.stats.apm_server.processor.span.transformations
+    alias to: beat.stats.apm_server.processor.span.transformations
 
 
 **`beats_stats.apm-server.processor.stream.accepted`**
 :   type: alias
 
-alias to: beat.stats.apm_server.processor.stream.accepted
+    alias to: beat.stats.apm_server.processor.stream.accepted
 
 
 **`beats_stats.apm-server.processor.stream.errors.invalid`**
 :   type: alias
 
-alias to: beat.stats.apm_server.processor.stream.errors.invalid
+    alias to: beat.stats.apm_server.processor.stream.errors.invalid
 
 
 **`beats_stats.apm-server.processor.stream.errors.toolarge`**
 :   type: alias
 
-alias to: beat.stats.apm_server.processor.stream.errors.toolarge
+    alias to: beat.stats.apm_server.processor.stream.errors.toolarge
 
 
 **`beats_stats.apm-server.processor.transaction.transformations`**
 :   type: alias
 
-alias to: beat.stats.apm_server.processor.transaction.transformations
+    alias to: beat.stats.apm_server.processor.transaction.transformations
 
 
 **`beats_stats.apm-server.root.request.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.request.count
+    alias to: beat.stats.apm_server.root.request.count
 
 
 **`beats_stats.apm-server.root.response.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.count
+    alias to: beat.stats.apm_server.root.response.count
 
 
 **`beats_stats.apm-server.root.response.errors.closed`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.errors.closed
+    alias to: beat.stats.apm_server.root.response.errors.closed
 
 
 **`beats_stats.apm-server.root.response.errors.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.errors.count
+    alias to: beat.stats.apm_server.root.response.errors.count
 
 
 **`beats_stats.apm-server.root.response.errors.decode`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.errors.decode
+    alias to: beat.stats.apm_server.root.response.errors.decode
 
 
 **`beats_stats.apm-server.root.response.errors.forbidden`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.errors.forbidden
+    alias to: beat.stats.apm_server.root.response.errors.forbidden
 
 
 **`beats_stats.apm-server.root.response.errors.internal`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.errors.internal
+    alias to: beat.stats.apm_server.root.response.errors.internal
 
 
 **`beats_stats.apm-server.root.response.errors.invalidquery`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.errors.invalidquery
+    alias to: beat.stats.apm_server.root.response.errors.invalidquery
 
 
 **`beats_stats.apm-server.root.response.errors.method`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.errors.method
+    alias to: beat.stats.apm_server.root.response.errors.method
 
 
 **`beats_stats.apm-server.root.response.errors.notfound`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.errors.notfound
+    alias to: beat.stats.apm_server.root.response.errors.notfound
 
 
 **`beats_stats.apm-server.root.response.errors.queue`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.errors.queue
+    alias to: beat.stats.apm_server.root.response.errors.queue
 
 
 **`beats_stats.apm-server.root.response.errors.ratelimit`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.errors.ratelimit
+    alias to: beat.stats.apm_server.root.response.errors.ratelimit
 
 
 **`beats_stats.apm-server.root.response.errors.timeout`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.errors.timeout
+    alias to: beat.stats.apm_server.root.response.errors.timeout
 
 
 **`beats_stats.apm-server.root.response.errors.toolarge`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.errors.toolarge
+    alias to: beat.stats.apm_server.root.response.errors.toolarge
 
 
 **`beats_stats.apm-server.root.response.errors.unauthorized`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.errors.unauthorized
+    alias to: beat.stats.apm_server.root.response.errors.unauthorized
 
 
 **`beats_stats.apm-server.root.response.errors.unavailable`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.errors.unavailable
+    alias to: beat.stats.apm_server.root.response.errors.unavailable
 
 
 **`beats_stats.apm-server.root.response.errors.validate`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.errors.validate
+    alias to: beat.stats.apm_server.root.response.errors.validate
 
 
 **`beats_stats.apm-server.root.response.valid.accepted`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.valid.accepted
+    alias to: beat.stats.apm_server.root.response.valid.accepted
 
 
 **`beats_stats.apm-server.root.response.valid.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.valid.count
+    alias to: beat.stats.apm_server.root.response.valid.count
 
 
 **`beats_stats.apm-server.root.response.valid.notmodified`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.valid.notmodified
+    alias to: beat.stats.apm_server.root.response.valid.notmodified
 
 
 **`beats_stats.apm-server.root.response.valid.ok`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.response.valid.ok
+    alias to: beat.stats.apm_server.root.response.valid.ok
 
 
 **`beats_stats.apm-server.root.unset`**
 :   type: alias
 
-alias to: beat.stats.apm_server.root.unset
+    alias to: beat.stats.apm_server.root.unset
+
+
+**`beats_stats.apm-server.sampling.tail.dynamic_service_groups`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.dynamic_service_groups
+
+
+**`beats_stats.apm-server.sampling.tail.events.dropped`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.events.dropped
+
+
+**`beats_stats.apm-server.sampling.tail.events.failed_writes`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.events.failed_writes
+
+
+**`beats_stats.apm-server.sampling.tail.events.head_unsampled`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.events.head_unsampled
+
+
+**`beats_stats.apm-server.sampling.tail.events.processed`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.events.processed
+
+
+**`beats_stats.apm-server.sampling.tail.events.sampled`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.events.sampled
+
+
+**`beats_stats.apm-server.sampling.tail.events.stored`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.events.stored
+
+
+**`beats_stats.apm-server.sampling.tail.storage.lsm_size`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.storage.lsm_size
+
+
+**`beats_stats.apm-server.sampling.tail.storage.value_log_size`**
+:   type: alias
+
+    alias to: beat.stats.apm_server.sampling.tail.storage.value_log_size
 
 
 **`beats_stats.apm-server.sampling.transactions_dropped`**
 :   type: alias
 
-alias to: beat.stats.apm_server.sampling.transactions_dropped
+    alias to: beat.stats.apm_server.sampling.transactions_dropped
 
 
 **`beats_stats.apm-server.server.request.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.request.count
+    alias to: beat.stats.apm_server.server.request.count
 
 
 **`beats_stats.apm-server.server.response.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.count
+    alias to: beat.stats.apm_server.server.response.count
 
 
 **`beats_stats.apm-server.server.response.errors.closed`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.errors.closed
+    alias to: beat.stats.apm_server.server.response.errors.closed
 
 
 **`beats_stats.apm-server.server.response.errors.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.errors.count
+    alias to: beat.stats.apm_server.server.response.errors.count
 
 
 **`beats_stats.apm-server.server.response.errors.decode`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.errors.decode
+    alias to: beat.stats.apm_server.server.response.errors.decode
 
 
 **`beats_stats.apm-server.server.response.errors.forbidden`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.errors.forbidden
+    alias to: beat.stats.apm_server.server.response.errors.forbidden
 
 
 **`beats_stats.apm-server.server.response.errors.internal`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.errors.internal
+    alias to: beat.stats.apm_server.server.response.errors.internal
 
 
 **`beats_stats.apm-server.server.response.errors.invalidquery`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.errors.invalidquery
+    alias to: beat.stats.apm_server.server.response.errors.invalidquery
 
 
 **`beats_stats.apm-server.server.response.errors.method`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.errors.method
+    alias to: beat.stats.apm_server.server.response.errors.method
 
 
 **`beats_stats.apm-server.server.response.errors.notfound`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.errors.notfound
+    alias to: beat.stats.apm_server.server.response.errors.notfound
 
 
 **`beats_stats.apm-server.server.response.errors.queue`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.errors.queue
+    alias to: beat.stats.apm_server.server.response.errors.queue
 
 
 **`beats_stats.apm-server.server.response.errors.ratelimit`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.errors.ratelimit
+    alias to: beat.stats.apm_server.server.response.errors.ratelimit
 
 
 **`beats_stats.apm-server.server.response.errors.timeout`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.errors.timeout
+    alias to: beat.stats.apm_server.server.response.errors.timeout
 
 
 **`beats_stats.apm-server.server.response.errors.toolarge`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.errors.toolarge
+    alias to: beat.stats.apm_server.server.response.errors.toolarge
 
 
 **`beats_stats.apm-server.server.response.errors.unauthorized`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.errors.unauthorized
+    alias to: beat.stats.apm_server.server.response.errors.unauthorized
 
 
 **`beats_stats.apm-server.server.response.errors.unavailable`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.errors.unavailable
+    alias to: beat.stats.apm_server.server.response.errors.unavailable
 
 
 **`beats_stats.apm-server.server.response.errors.validate`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.errors.validate
+    alias to: beat.stats.apm_server.server.response.errors.validate
 
 
 **`beats_stats.apm-server.server.response.valid.accepted`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.valid.accepted
+    alias to: beat.stats.apm_server.server.response.valid.accepted
 
 
 **`beats_stats.apm-server.server.response.valid.count`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.valid.count
+    alias to: beat.stats.apm_server.server.response.valid.count
 
 
 **`beats_stats.apm-server.server.response.valid.notmodified`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.valid.notmodified
+    alias to: beat.stats.apm_server.server.response.valid.notmodified
 
 
 **`beats_stats.apm-server.server.response.valid.ok`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.response.valid.ok
+    alias to: beat.stats.apm_server.server.response.valid.ok
 
 
 **`beats_stats.apm-server.server.unset`**
 :   type: alias
 
-alias to: beat.stats.apm_server.server.unset
+    alias to: beat.stats.apm_server.server.unset
 
 
 **`beats_stats.beat.host`**
 :   type: alias
 
-alias to: beat.stats.info.host
+    alias to: beat.stats.info.host
 
 
 **`beats_stats.beat.name`**
 :   type: alias
 
-alias to: beat.stats.info.name
+    alias to: beat.stats.info.name
 
 
 **`beats_stats.beat.type`**
 :   type: alias
 
-alias to: beat.stats.info.type
+    alias to: beat.stats.info.type
 
 
 **`beats_stats.beat.uuid`**
 :   type: alias
 
-alias to: beat.stats.info.uuid
+    alias to: beat.stats.info.uuid
 
 
 **`beats_stats.beat.version`**
 :   type: alias
 
-alias to: beat.stats.info.version
+    alias to: beat.stats.info.version
 
 
 **`beats_stats.metrics.system.cpu.cores`**
 :   type: alias
 
-alias to: beat.stats.system.cpu.cores
+    alias to: beat.stats.system.cpu.cores
 
 
 **`beats_stats.metrics.system.load.1`**
 :   type: alias
 
-alias to: beat.stats.system.load.1
+    alias to: beat.stats.system.load.1
 
 
 **`beats_stats.metrics.system.load.5`**
 :   type: alias
 
-alias to: beat.stats.system.load.5
+    alias to: beat.stats.system.load.5
 
 
 **`beats_stats.metrics.system.load.15`**
 :   type: alias
 
-alias to: beat.stats.system.load.15
+    alias to: beat.stats.system.load.15
 
 
 **`beats_stats.metrics.system.load.norm.1`**
 :   type: alias
 
-alias to: beat.stats.system.load.norm.1
+    alias to: beat.stats.system.load.norm.1
 
 
 **`beats_stats.metrics.system.load.norm.15`**
 :   type: alias
 
-alias to: beat.stats.system.load.norm.15
+    alias to: beat.stats.system.load.norm.15
 
 
 **`beats_stats.metrics.system.load.norm.5`**
 :   type: alias
 
-alias to: beat.stats.system.load.norm.5
+    alias to: beat.stats.system.load.norm.5
 
 
 **`beats_stats.metrics.libbeat.pipeline.clients`**
 :   type: alias
 
-alias to: beat.stats.libbeat.pipeline.clients
+    alias to: beat.stats.libbeat.pipeline.clients
 
 
 **`beats_stats.metrics.libbeat.pipeline.queue.acked`**
 :   type: alias
 
-alias to: beat.stats.libbeat.pipeline.queue.acked
+    alias to: beat.stats.libbeat.pipeline.queue.acked
 
 
 **`beats_stats.metrics.libbeat.pipeline.event.active`**
 :   type: alias
 
-alias to: beat.stats.libbeat.pipeline.events.active
+    alias to: beat.stats.libbeat.pipeline.events.active
 
 
 **`beats_stats.metrics.libbeat.pipeline.event.dropped`**
 :   type: alias
 
-alias to: beat.stats.libbeat.pipeline.events.dropped
+    alias to: beat.stats.libbeat.pipeline.events.dropped
 
 
 **`beats_stats.metrics.libbeat.pipeline.event.failed`**
 :   type: alias
 
-alias to: beat.stats.libbeat.pipeline.events.failed
+    alias to: beat.stats.libbeat.pipeline.events.failed
 
 
 **`beats_stats.metrics.libbeat.pipeline.event.filtered`**
 :   type: alias
 
-alias to: beat.stats.libbeat.pipeline.events.filtered
+    alias to: beat.stats.libbeat.pipeline.events.filtered
 
 
 **`beats_stats.metrics.libbeat.pipeline.event.published`**
 :   type: alias
 
-alias to: beat.stats.libbeat.pipeline.events.published
+    alias to: beat.stats.libbeat.pipeline.events.published
 
 
 **`beats_stats.metrics.libbeat.pipeline.event.retry`**
 :   type: alias
 
-alias to: beat.stats.libbeat.pipeline.events.retry
+    alias to: beat.stats.libbeat.pipeline.events.retry
 
 
 **`beats_stats.metrics.libbeat.pipeline.event.total`**
 :   type: alias
 
-alias to: beat.stats.libbeat.pipeline.events.total
+    alias to: beat.stats.libbeat.pipeline.events.total
 
 
 **`beats_stats.metrics.libbeat.output.events.acked`**
 :   type: alias
 
-alias to: beat.stats.libbeat.output.events.acked
+    alias to: beat.stats.libbeat.output.events.acked
 
 
 **`beats_stats.metrics.libbeat.output.events.active`**
 :   type: alias
 
-alias to: beat.stats.libbeat.output.events.active
+    alias to: beat.stats.libbeat.output.events.active
 
 
 **`beats_stats.metrics.libbeat.output.events.batches`**
 :   type: alias
 
-alias to: beat.stats.libbeat.output.events.batches
+    alias to: beat.stats.libbeat.output.events.batches
 
 
 **`beats_stats.metrics.libbeat.output.events.dropped`**
 :   type: alias
 
-alias to: beat.stats.libbeat.output.events.dropped
+    alias to: beat.stats.libbeat.output.events.dropped
 
 
 **`beats_stats.metrics.libbeat.output.events.duplicated`**
 :   type: alias
 
-alias to: beat.stats.libbeat.output.events.duplicates
+    alias to: beat.stats.libbeat.output.events.duplicates
 
 
 **`beats_stats.metrics.libbeat.output.events.failed`**
 :   type: alias
 
-alias to: beat.stats.libbeat.output.events.failed
+    alias to: beat.stats.libbeat.output.events.failed
 
 
 **`beats_stats.metrics.libbeat.output.events.toomany`**
 :   type: alias
 
-alias to: beat.stats.libbeat.output.events.toomany
+    alias to: beat.stats.libbeat.output.events.toomany
 
 
 **`beats_stats.metrics.libbeat.output.events.total`**
 :   type: alias
 
-alias to: beat.stats.libbeat.output.events.total
+    alias to: beat.stats.libbeat.output.events.total
 
 
 **`beats_stats.metrics.libbeat.output.read.bytes`**
 :   type: alias
 
-alias to: beat.stats.libbeat.output.read.bytes
+    alias to: beat.stats.libbeat.output.read.bytes
 
 
 **`beats_stats.metrics.libbeat.output.read.errors`**
 :   type: alias
 
-alias to: beat.stats.libbeat.output.read.errors
+    alias to: beat.stats.libbeat.output.read.errors
 
 
 **`beats_stats.metrics.libbeat.output.type`**
 :   type: alias
 
-alias to: beat.stats.libbeat.output.type
+    alias to: beat.stats.libbeat.output.type
 
 
 **`beats_stats.metrics.libbeat.output.write.bytes`**
 :   type: alias
 
-alias to: beat.stats.libbeat.output.write.bytes
+    alias to: beat.stats.libbeat.output.write.bytes
 
 
 **`beats_stats.metrics.libbeat.output.write.errors`**
 :   type: alias
 
-alias to: beat.stats.libbeat.output.write.errors
+    alias to: beat.stats.libbeat.output.write.errors
 
 
 **`beats_stats.metrics.libbeat.config.module.running`**
 :   type: alias
 
-alias to: beat.stats.libbeat.config.running
+    alias to: beat.stats.libbeat.config.running
 
 
 **`beats_stats.metrics.libbeat.config.module.starts`**
 :   type: alias
 
-alias to: beat.stats.libbeat.config.starts
+    alias to: beat.stats.libbeat.config.starts
 
 
 **`beats_stats.metrics.libbeat.config.module.stops`**
 :   type: alias
 
-alias to: beat.stats.libbeat.config.stops
+    alias to: beat.stats.libbeat.config.stops
 
 
 **`beats_stats.metrics.beat.info.ephemeral_id`**
 :   type: alias
 
-alias to: beat.stats.info.ephemeral_id
+    alias to: beat.stats.info.ephemeral_id
 
 
 **`beats_stats.metrics.beat.info.uptime.ms`**
 :   type: alias
 
-alias to: beat.stats.info.uptime.ms
+    alias to: beat.stats.info.uptime.ms
 
 
 **`beats_stats.metrics.beat.handles.limit.hard`**
 :   type: alias
 
-alias to: beat.stats.handles.limit.hard
+    alias to: beat.stats.handles.limit.hard
 
 
 **`beats_stats.metrics.beat.handles.limit.soft`**
 :   type: alias
 
-alias to: beat.stats.handles.limit.soft
+    alias to: beat.stats.handles.limit.soft
 
 
 **`beats_stats.metrics.beat.handles.open`**
 :   type: alias
 
-alias to: beat.stats.handles.open
+    alias to: beat.stats.handles.open
 
 
 **`beats_stats.metrics.beat.memstats.gc_next`**
 :   type: alias
 
-alias to: beat.stats.memstats.gc_next
+    alias to: beat.stats.memstats.gc_next
 
 
 **`beats_stats.metrics.beat.memstats.memory_alloc`**
 :   type: alias
 
-alias to: beat.stats.memstats.memory.alloc
+    alias to: beat.stats.memstats.memory.alloc
 
 
 **`beats_stats.metrics.beat.memstats.memory_total`**
 :   type: alias
 
-alias to: beat.stats.memstats.memory.total
+    alias to: beat.stats.memstats.memory.total
 
 
 **`beats_stats.metrics.beat.memstats.rss`**
 :   type: alias
 
-alias to: beat.stats.memstats.rss
+    alias to: beat.stats.memstats.rss
 
 
 **`beats_stats.metrics.beat.cgroup.cpu.id`**
 :   type: alias
 
-alias to: beat.stats.cgroup.cpu.id
+    alias to: beat.stats.cgroup.cpu.id
 
 
 **`beats_stats.metrics.beat.cgroup.cpu.cfs.period.us`**
 :   type: alias
 
-alias to: beat.stats.cgroup.cpu.cfs.period.us
+    alias to: beat.stats.cgroup.cpu.cfs.period.us
 
 
 **`beats_stats.metrics.beat.cgroup.cpu.cfs.quota.us`**
 :   type: alias
 
-alias to: beat.stats.cgroup.cpu.cfs.quota.us
+    alias to: beat.stats.cgroup.cpu.cfs.quota.us
 
 
 **`beats_stats.metrics.beat.cgroup.cpu.stats.periods`**
 :   type: alias
 
-alias to: beat.stats.cgroup.cpu.stats.periods
+    alias to: beat.stats.cgroup.cpu.stats.periods
 
 
 **`beats_stats.metrics.beat.cgroup.cpu.stats.throttled.periods`**
 :   type: alias
 
-alias to: beat.stats.cgroup.cpu.stats.throttled.periods
+    alias to: beat.stats.cgroup.cpu.stats.throttled.periods
 
 
 **`beats_stats.metrics.beat.cgroup.cpu.stats.throttled.ns`**
 :   type: alias
 
-alias to: beat.stats.cgroup.cpu.stats.throttled.ns
+    alias to: beat.stats.cgroup.cpu.stats.throttled.ns
 
 
 **`beats_stats.metrics.beat.cgroup.cpuacct.id`**
 :   type: alias
 
-alias to: beat.stats.cgroup.cpuacct.id
+    alias to: beat.stats.cgroup.cpuacct.id
 
 
 **`beats_stats.metrics.beat.cgroup.cpuacct.total.ns`**
 :   type: alias
 
-alias to: beat.stats.cgroup.cpuacct.total.ns
+    alias to: beat.stats.cgroup.cpuacct.total.ns
 
 
 **`beats_stats.metrics.beat.cgroup.memory.id`**
 :   type: alias
 
-alias to: beat.stats.cgroup.memory.id
+    alias to: beat.stats.cgroup.memory.id
 
 
 **`beats_stats.metrics.beat.cgroup.mem.limit.bytes`**
 :   type: alias
 
-alias to: beat.stats.cgroup.memory.mem.limit.bytes
+    alias to: beat.stats.cgroup.memory.mem.limit.bytes
 
 
 **`beats_stats.metrics.beat.cgroup.mem.usage.bytes`**
 :   type: alias
 
-alias to: beat.stats.cgroup.memory.mem.usage.bytes
+    alias to: beat.stats.cgroup.memory.mem.usage.bytes
 
 
 **`beats_stats.metrics.beat.cpu.system.ticks`**
 :   type: alias
 
-alias to: beat.stats.cpu.system.ticks
+    alias to: beat.stats.cpu.system.ticks
 
 
 **`beats_stats.metrics.beat.cpu.system.time.ms`**
 :   type: alias
 
-alias to: beat.stats.cpu.system.time.ms
+    alias to: beat.stats.cpu.system.time.ms
 
 
 **`beats_stats.metrics.beat.cpu.total.value`**
 :   type: alias
 
-alias to: beat.stats.cpu.total.value
+    alias to: beat.stats.cpu.total.value
 
 
 **`beats_stats.metrics.beat.cpu.total.ticks`**
 :   type: alias
 
-alias to: beat.stats.cpu.total.ticks
+    alias to: beat.stats.cpu.total.ticks
 
 
 **`beats_stats.metrics.beat.cpu.total.time.ms`**
 :   type: alias
 
-alias to: beat.stats.cpu.total.time.ms
+    alias to: beat.stats.cpu.total.time.ms
 
 
 **`beats_stats.metrics.beat.cpu.user.ticks`**
 :   type: alias
 
-alias to: beat.stats.cpu.user.ticks
+    alias to: beat.stats.cpu.user.ticks
 
 
 **`beats_stats.metrics.beat.cpu.user.time.ms`**
 :   type: alias
 
-alias to: beat.stats.cpu.user.time.ms
+    alias to: beat.stats.cpu.user.time.ms
 
 
 **`beats_stats.output.elasticsearch.bulk_requests.available`**
 :   type: alias
 
-alias to: beat.stats.output.elasticsearch.bulk_requests.available
+    alias to: beat.stats.output.elasticsearch.bulk_requests.available
 
 
 **`beats_stats.output.elasticsearch.bulk_requests.completed`**
 :   type: alias
 
-alias to: beat.stats.output.elasticsearch.bulk_requests.completed
+    alias to: beat.stats.output.elasticsearch.bulk_requests.completed
 
 
 **`beats_stats.output.elasticsearch.indexers.active`**
 :   type: alias
 
-alias to: beat.stats.output.elasticsearch.indexers.active
+    alias to: beat.stats.output.elasticsearch.indexers.active
 
 
 **`beats_stats.output.elasticsearch.indexers.created`**
 :   type: alias
 
-alias to: beat.stats.output.elasticsearch.indexers.created
+    alias to: beat.stats.output.elasticsearch.indexers.created
 
 
 **`beats_stats.output.elasticsearch.indexers.destroyed`**
 :   type: alias
 
-alias to: beat.stats.output.elasticsearch.indexers.destroyed
+    alias to: beat.stats.output.elasticsearch.indexers.destroyed
 
 
 **`beats_state.beat.host`**
 :   type: alias
 
-alias to: beat.state.beat.host
+    alias to: beat.state.beat.host
 
 
 **`beats_state.beat.name`**
 :   type: alias
 
-alias to: beat.state.beat.name
+    alias to: beat.state.beat.name
 
 
 **`beats_state.beat.type`**
 :   type: alias
 
-alias to: beat.state.beat.type
+    alias to: beat.state.beat.type
 
 
 **`beats_state.beat.uuid`**
 :   type: alias
 
-alias to: beat.state.beat.uuid
+    alias to: beat.state.beat.uuid
 
 
 **`beats_state.beat.version`**
 :   type: alias
 
-alias to: beat.state.beat.version
+    alias to: beat.state.beat.version
 
 
 **`beats_state.timestamp`**
 :   type: alias
 
-alias to: @timestamp
+    alias to: @timestamp
 
 
 **`beats_state.state.beat.name`**
 :   type: alias
 
-alias to: beat.state.beat.name
+    alias to: beat.state.beat.name
 
 
 **`beats_state.state.host.architecture`**
 :   type: alias
 
-alias to: host.architecture
+    alias to: host.architecture
 
 
 **`beats_state.state.host.hostname`**
 :   type: alias
 
-alias to: host.hostname
+    alias to: host.hostname
 
 
 **`beats_state.state.host.name`**
 :   type: alias
 
-alias to: host.name
+    alias to: host.name
 
 
 **`beats_state.state.host.os.platform`**
 :   type: alias
 
-alias to: beat.state.host.os.platform
+    alias to: beat.state.host.os.platform
 
 
 **`beats_state.state.host.os.version`**
 :   type: alias
 
-alias to: beat.state.host.os.version
+    alias to: beat.state.host.os.version
 
 
 **`beats_state.state.input.count`**
 :   type: alias
 
-alias to: beat.state.input.count
+    alias to: beat.state.input.count
 
 
 **`beats_state.state.input.names`**
 :   type: alias
 
-alias to: beat.state.input.names
+    alias to: beat.state.input.names
 
 
 **`beats_state.state.module.count`**
 :   type: alias
 
-alias to: beat.state.module.count
+    alias to: beat.state.module.count
 
 
 **`beats_state.state.module.names`**
 :   type: alias
 
-alias to: beat.state.module.names
+    alias to: beat.state.module.names
 
 
 **`beats_state.state.output.name`**
 :   type: alias
 
-alias to: beat.state.output.name
+    alias to: beat.state.output.name
 
 
 **`beats_state.state.service.id`**
 :   type: alias
 
-alias to: beat.state.service.id
+    alias to: beat.state.service.id
 
 
 **`beats_state.state.service.name`**
 :   type: alias
 
-alias to: beat.state.service.name
+    alias to: beat.state.service.name
 
 
 **`beats_state.state.service.version`**
 :   type: alias
 
-alias to: beat.state.service.version
-
+    alias to: beat.state.service.version
 
 
 ## beat [_beat]
 
+
+
 **`beat.id`**
 :   Beat ID.
 
-type: keyword
+    type: keyword
 
 
 **`beat.type`**
 :   Beat type.
 
-type: keyword
+    type: keyword
 
 
 **`beat.elasticsearch.cluster.id`**
 :   type: keyword
-
 
 
 ## state [_state]
@@ -1454,13 +1510,13 @@ Beat state
 **`beat.state.management.enabled`**
 :   Is central management enabled?
 
-type: boolean
+    type: boolean
 
 
 **`beat.state.module.count`**
 :   Number of modules enabled
 
-type: integer
+    type: integer
 
 
 **`beat.state.module.names`**
@@ -1470,17 +1526,16 @@ type: integer
 **`beat.state.output.name`**
 :   Name of output used by Beat
 
-type: keyword
+    type: keyword
 
 
 **`beat.state.queue.name`**
 :   Name of queue being used by Beat
 
-type: keyword
+    type: keyword
 
 
-
-## stats [_stats_2]
+## stats [_stats]
 
 Beat stats
 
@@ -1940,6 +1995,42 @@ Beat stats
 :   type: long
 
 
+**`beat.stats.apm_server.sampling.tail.dynamic_service_groups`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.events.dropped`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.events.failed_writes`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.events.head_unsampled`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.events.processed`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.events.sampled`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.events.stored`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.storage.lsm_size`**
+:   type: long
+
+
+**`beat.stats.apm_server.sampling.tail.storage.value_log_size`**
+:   type: long
+
+
 **`beat.stats.apm_server.sampling.transactions_dropped`**
 :   type: long
 
@@ -2211,14 +2302,13 @@ Beat stats
 **`beat.stats.uptime.ms`**
 :   Beat uptime
 
-type: long
+    type: long
 
 
 **`beat.stats.runtime.goroutines`**
 :   Number of goroutines running in Beat
 
-type: long
-
+    type: long
 
 
 ## libbeat [_libbeat]
@@ -2230,11 +2320,69 @@ Fields common to all Beats
 
 
 **`beat.stats.libbeat.pipeline.queue.acked`**
-:   type: long
+:   Number of acknowledged events
+
+    type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.added.bytes`**
+:   Number of bytes added to the queue
+
+    type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.added.events`**
+:   Number of events added to the queue
+
+    type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.consumed.bytes`**
+:   Number of bytes consumed from the queue
+
+    type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.consumed.events`**
+:   Number of events consumed from the queue
+
+    type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.filled.bytes`**
+:   Number of bytes filled in the queue
+
+    type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.filled.events`**
+:   Number of events filled in the queue
+
+    type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.filled.pct`**
+:   Percentage of the queue filled
+
+    type: float
 
 
 **`beat.stats.libbeat.pipeline.queue.max_events`**
-:   type: long
+:   Maximum number of events allowed in the queue
+
+    type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.removed.bytes`**
+:   Number of bytes removed from the queue
+
+    type: long
+
+
+**`beat.stats.libbeat.pipeline.queue.removed.events`**
+:   Number of events removed from the queue
+
+    type: long
 
 
 **`beat.stats.libbeat.pipeline.events.active`**
@@ -2281,7 +2429,6 @@ Fields common to all Beats
 :   type: long
 
 
-
 ## output [_output]
 
 Output stats
@@ -2289,8 +2436,7 @@ Output stats
 **`beat.stats.libbeat.output.type`**
 :   Type of output
 
-type: keyword
-
+    type: keyword
 
 
 ## events [_events]
@@ -2300,83 +2446,101 @@ Event counters
 **`beat.stats.libbeat.output.events.acked`**
 :   Number of events acknowledged
 
-type: long
+    type: long
 
 
 **`beat.stats.libbeat.output.events.active`**
 :   Number of active events
 
-type: long
+    type: long
 
 
 **`beat.stats.libbeat.output.events.batches`**
 :   Number of event batches
 
-type: long
+    type: long
 
 
 **`beat.stats.libbeat.output.events.dropped`**
 :   Number of events dropped
 
-type: long
+    type: long
 
 
 **`beat.stats.libbeat.output.events.duplicates`**
 :   Number of events duplicated
 
-type: long
+    type: long
 
 
 **`beat.stats.libbeat.output.events.failed`**
 :   Number of events failed
 
-type: long
+    type: long
 
 
 **`beat.stats.libbeat.output.events.toomany`**
 :   Number of too many events
 
-type: long
+    type: long
 
 
 **`beat.stats.libbeat.output.events.total`**
 :   Total number of events
 
-type: long
+    type: long
 
 
-
-## read [_read_3]
+## read [_read]
 
 Read stats
 
 **`beat.stats.libbeat.output.read.bytes`**
 :   Number of bytes read
 
-type: long
+    type: long
 
 
 **`beat.stats.libbeat.output.read.errors`**
 :   Number of read errors
 
-type: long
+    type: long
 
 
-
-## write [_write_3]
+## write [_write]
 
 Write stats
 
 **`beat.stats.libbeat.output.write.bytes`**
 :   Number of bytes written
 
-type: long
+    type: long
 
 
 **`beat.stats.libbeat.output.write.errors`**
 :   Number of write errors
 
-type: long
+    type: long
+
+
+**`beat.stats.libbeat.output.write.latency.histogram.count`**
+:   type: long
+
+
+**`beat.stats.libbeat.output.write.latency.histogram.max`**
+:   type: float
+
+
+**`beat.stats.libbeat.output.write.latency.histogram.median`**
+:   type: long
+
+
+**`beat.stats.libbeat.output.write.latency.histogram.p95`**
+:   type: float
+
+
+**`beat.stats.libbeat.output.write.latency.histogram.p99`**
+:   type: float
 
 
 **`beat.stats.output.elasticsearch.bulk_requests.available`**

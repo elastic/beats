@@ -207,7 +207,6 @@ steps:
       - label: ":windows: x-pack/packetbeat: Win 2022 System Tests"
         key: "mandatory-win-2022-system-tests"
         command: |
-          .buildkite/scripts/gcp_auth.ps1
           Set-Location -Path x-pack/packetbeat
           mage systemTest
         retry:
@@ -228,6 +227,12 @@ steps:
               format: "junit"
               branches: "main"
               debug: true
+          # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/beats/01-gcp-buildkite-oidc.tf
+          # This plugin authenticates to Google Cloud using the OIDC token.
+          - elastic/oblt-google-auth#v1.3.0:
+              lifetime: 10800 # seconds
+              project-id: "elastic-observability-ci"
+              project-number: "911195782929"
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 2022 System Tests"
@@ -262,7 +267,6 @@ steps:
       - label: ":windows: x-pack/packetbeat: Win 2025 System Tests"
         key: "mandatory-win-2025-system-tests"
         command: |
-          .buildkite/scripts/gcp_auth.ps1
           Set-Location -Path x-pack/packetbeat
           mage systemTest
         retry:
@@ -283,6 +287,12 @@ steps:
               format: "junit"
               branches: "main"
               debug: true
+          # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/beats/01-gcp-buildkite-oidc.tf
+          # This plugin authenticates to Google Cloud using the OIDC token.
+          - elastic/oblt-google-auth#v1.3.0:
+              lifetime: 10800 # seconds
+              project-id: "elastic-observability-ci"
+              project-number: "911195782929"
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 2025 System Tests"
@@ -376,7 +386,6 @@ steps:
       - label: ":windows: x-pack/packetbeat: Win 10 System Tests"
         key: "extended-win-10-system-tests"
         command: |
-          .buildkite/scripts/gcp_auth.ps1
           Set-Location -Path x-pack/packetbeat
           mage systemTest
         retry:
@@ -397,6 +406,12 @@ steps:
               format: "junit"
               branches: "main"
               debug: true
+          # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/beats/01-gcp-buildkite-oidc.tf
+          # This plugin authenticates to Google Cloud using the OIDC token.
+          - elastic/oblt-google-auth#v1.3.0:
+              lifetime: 10800 # seconds
+              project-id: "elastic-observability-ci"
+              project-number: "911195782929"
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 10 System Tests"

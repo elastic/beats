@@ -1,12 +1,15 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-panw.html
+applies_to:
+  stack: beta
 ---
+
+% This file is generated! See scripts/generate_fields_docs.py
 
 # Panw fields [exported-fields-panw]
 
 PAN-OS module
-
 
 ## panw [_panw]
 

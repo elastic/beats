@@ -1,4 +1,6 @@
 project: 'Beats docs'
+products:
+  - id: beats
 cross_links:
   - docs-content
   - ecs
@@ -12,7 +14,6 @@ toc:
   - toc: release-notes
   - toc: extend
 subs:
-  version: "9.0.0"
   beats-ref:   "https://www.elastic.co/guide/en/beats/libbeat/current"
   ecloud:   "Elastic Cloud"
   ess:   "Elasticsearch Service"
@@ -38,13 +39,11 @@ subs:
   metricbeat:   "Metricbeat"
   packetbeat:   "Packetbeat"
   winlogbeat:   "Winlogbeat"
+  filestream: "Filestream"
   security-features:   "security features"
   es-security-features:   "Elasticsearch security features"
   elastic-sec:   "Elastic Security"
   monitoring:   "X-Pack monitoring"
   monitor-features:   "monitoring features"
-  stack-version: "9.0.0"
-  major-version: "9.0"
-  major-release: "9.x"
   beats-pull: "https://github.com/elastic/beats/pull/"
   beats-issue: "https://github.com/elastic/beats/issues/"

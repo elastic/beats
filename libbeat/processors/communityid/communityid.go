@@ -56,21 +56,21 @@ type processor struct {
 //
 // Other IP-borne protocols:
 // IP src / IP dst / IP proto
-func New(cfg *cfg.C) (beat.Processor, error) {
+func New(cfg *cfg.C, log *logp.Logger) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the community_id configuration: %w", err)
 	}
 
-	return newFromConfig(c)
+	return newFromConfig(c, log)
 }
 
-func newFromConfig(c config) (*processor, error) {
+func newFromConfig(c config, log *logp.Logger) (*processor, error) {
 	hasher := flowhash.NewCommunityID(c.Seed, flowhash.Base64Encoding, crypto.SHA1)
 
 	return &processor{
 		config: c,
-		log:    logp.NewLogger(logName),
+		log:    log.Named(logName),
 		hasher: hasher,
 	}, nil
 }

@@ -23,22 +23,27 @@ package apiserver
 import (
 	"testing"
 
+	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
-func TestEventMappingV2_0(t *testing.T) {
-	ptest.TestMetricSet(t, "kubernetes", "apiserver",
-		ptest.TestCases{
-			ptest.TestCase{
-				MetricsFile:  "./_meta/test/metrics.2.0",
-				ExpectedFile: "./_meta/test/metrics.2.0.expected",
-			},
-		},
-	)
+func TestEventMapping(t *testing.T) {
+	var testCases ptest.TestCases
+	for _, file := range k.GetMetricInputFiles(t, ".") {
+		testCases = append(testCases, ptest.TestCase{
+			MetricsFile:  file,
+			ExpectedFile: file + ".expected",
+		})
+	}
+	ptest.TestMetricSet(t, "kubernetes", "apiserver", testCases)
 }
 
 func TestData(t *testing.T) {
 	mbtest.TestDataFiles(t, "kubernetes", "apiserver")
+}
+
+func TestMetricsFamily(t *testing.T) {
+	k.TestMetricsFamilyFromFiles(t, k.GetMetricInputFiles(t, "."), mapping)
 }

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-nats.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # NATS module [metricbeat-module-nats]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -33,7 +35,7 @@ The Nats module comes with a predefined dashboard. For example:
 ![metricbeat nats dashboard](images/metricbeat_nats_dashboard.png)
 
 
-## Example configuration [_example_configuration_47]
+## Example configuration [_example_configuration]
 
 The NATS module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -79,21 +81,14 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_54]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [connection](/reference/metricbeat/metricbeat-metricset-nats-connection.md)
 * [connections](/reference/metricbeat/metricbeat-metricset-nats-connections.md)
-* [jetstream](/reference/metricbeat/metricbeat-metricset-nats-jetstream.md)
+* [jetstream](/reference/metricbeat/metricbeat-metricset-nats-jetstream.md)  {applies_to}`stack: beta`
 * [route](/reference/metricbeat/metricbeat-metricset-nats-route.md)
 * [routes](/reference/metricbeat/metricbeat-metricset-nats-routes.md)
 * [stats](/reference/metricbeat/metricbeat-metricset-nats-stats.md)
 * [subscriptions](/reference/metricbeat/metricbeat-metricset-nats-subscriptions.md)
-
-
-
-
-
-
-

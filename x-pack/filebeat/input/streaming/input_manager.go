@@ -34,11 +34,16 @@ func NewInputManager(log *logp.Logger, store statestore.States) InputManager {
 	}
 }
 
-func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
-	src := &source{cfg: defaultConfig()}
+func cursorConfigure(cfg *conf.C, logger *logp.Logger) ([]inputcursor.Source, inputcursor.Input, error) {
+	dc := defaultConfig()
+	// set readControlDeadline to 3x the writeControlDeadline
+	dc.KeepAlive.readControlDeadline = 3 * dc.KeepAlive.WriteControlDeadline
+	src := &source{cfg: dc}
 	if err := cfg.Unpack(&src.cfg); err != nil {
 		return nil, nil, err
 	}
+
+	src.cfg.checkUnsupportedParams(logger)
 	if src.cfg.Program == "" {
 		// set default program
 		src.cfg.Program = `
@@ -50,6 +55,14 @@ func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, erro
 		`
 	}
 	return []inputcursor.Source{src}, input{}, nil
+}
+
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+func (c config) checkUnsupportedParams(logger *logp.Logger) {
+	if c.Redact == nil {
+		logger.Named("websocket").Warn("missing recommended 'redact' configuration: " +
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-websocket.html#_redact")
+	}
 }
 
 type source struct{ cfg config }

@@ -3,44 +3,46 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-santa.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Google Santa fields [exported-fields-santa]
 
 Santa Module
 
-
 ## santa [_santa]
+
+
 
 **`santa.action`**
 :   Action
 
-type: keyword
+    type: keyword
 
-example: EXEC
+    example: EXEC
 
 
 **`santa.decision`**
 :   Decision that santad took.
 
-type: keyword
+    type: keyword
 
-example: ALLOW
+    example: ALLOW
 
 
 **`santa.reason`**
 :   Reason for the decsision.
 
-type: keyword
+    type: keyword
 
-example: CERT
+    example: CERT
 
 
 **`santa.mode`**
 :   Operating mode of Santa.
 
-type: keyword
+    type: keyword
 
-example: M
-
+    example: M
 
 
 ## disk [_disk]
@@ -62,19 +64,19 @@ Fields for DISKAPPEAR actions.
 **`santa.disk.bsdname`**
 :   The disk BSD name.
 
-example: disk1s3
+    example: disk1s3
 
 
 **`santa.disk.model`**
 :   The disk model.
 
-example: APPLE SSD SM0512L
+    example: APPLE SSD SM0512L
 
 
 **`santa.disk.fs`**
 :   The disk volume kind (filesystem type).
 
-example: apfs
+    example: apfs
 
 
 **`santa.disk.mount`**
@@ -84,12 +86,12 @@ example: apfs
 **`santa.certificate.common_name`**
 :   Common name from code signing certificate.
 
-type: keyword
+    type: keyword
 
 
 **`santa.certificate.sha256`**
 :   SHA256 hash of code signing certificate.
 
-type: keyword
+    type: keyword
 
 

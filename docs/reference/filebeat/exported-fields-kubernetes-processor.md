@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-kubernetes-processor.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Kubernetes fields [exported-fields-kubernetes-processor]
 
 Kubernetes metadata added by the kubernetes processor
@@ -10,78 +12,78 @@ Kubernetes metadata added by the kubernetes processor
 **`kubernetes.pod.name`**
 :   Kubernetes pod name
 
-type: keyword
+    type: keyword
 
 
 **`kubernetes.pod.uid`**
 :   Kubernetes Pod UID
 
-type: keyword
+    type: keyword
 
 
 **`kubernetes.pod.ip`**
 :   Kubernetes Pod IP
 
-type: ip
+    type: ip
 
 
 **`kubernetes.namespace`**
 :   Kubernetes namespace
 
-type: keyword
+    type: keyword
 
 
 **`kubernetes.node.name`**
 :   Kubernetes node name
 
-type: keyword
+    type: keyword
 
 
 **`kubernetes.node.hostname`**
 :   Kubernetes hostname as reported by the node’s kernel
 
-type: keyword
+    type: keyword
 
 
 **`kubernetes.labels.*`**
 :   Kubernetes labels map
 
-type: object
+    type: object
 
 
 **`kubernetes.annotations.*`**
 :   Kubernetes annotations map
 
-type: object
+    type: object
 
 
 **`kubernetes.selectors.*`**
 :   Kubernetes selectors map
 
-type: object
+    type: object
 
 
 **`kubernetes.replicaset.name`**
 :   Kubernetes replicaset name
 
-type: keyword
+    type: keyword
 
 
 **`kubernetes.deployment.name`**
 :   Kubernetes deployment name
 
-type: keyword
+    type: keyword
 
 
 **`kubernetes.statefulset.name`**
 :   Kubernetes statefulset name
 
-type: keyword
+    type: keyword
 
 
 **`kubernetes.container.name`**
 :   Kubernetes container name (different than the name from the runtime)
 
-type: keyword
+    type: keyword
 
 

@@ -26,9 +26,11 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -305,13 +307,15 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 				})
 				require.NoError(t, err)
 
+				monitoring := beat.NewMonitoring()
+
 				aModule, metricSets, err := mb.NewModule(tc.config, r, logptest.NewTestingLogger(t, ""))
 				require.NoError(t, err)
 
 				// Set the mock status reporter
 				aModule.SetStatusReporter(msr)
 
-				moduleWrapper, err := NewWrapperForMetricSet(aModule, metricSets[0], WithMetricSetInfo())
+				moduleWrapper, err := NewWrapperForMetricSet(aModule, metricSets[0], monitoring, logp.NewNopLogger(), WithMetricSetInfo())
 				require.NoError(t, err)
 
 				// run metricset synchronously
@@ -319,7 +323,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 
 				t.Cleanup(func() {
 					// release stats structure across testcases
-					releaseStats(wrappedMetricSet.stats)
+					releaseStats(monitoring.StatsRegistry(), wrappedMetricSet.stats)
 				})
 
 				for i := 0; i < tc.iterations; i++ {
@@ -533,13 +537,15 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 				})
 				require.NoError(t, err)
 
+				monitoring := beat.NewMonitoring()
+
 				aModule, metricSets, err := mb.NewModule(tc.config, r, logptest.NewTestingLogger(t, ""))
 				require.NoError(t, err)
 
 				// Set the mock status reporter
 				aModule.SetStatusReporter(msr)
 
-				moduleWrapper, err := NewWrapperForMetricSet(aModule, metricSets[0], WithMetricSetInfo())
+				moduleWrapper, err := NewWrapperForMetricSet(aModule, metricSets[0], monitoring, logp.NewNopLogger(), WithMetricSetInfo())
 				require.NoError(t, err)
 
 				// run metricset synchronously
@@ -547,7 +553,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 
 				t.Cleanup(func() {
 					// release stats structure across testcases
-					releaseStats(wrappedMetricSet.stats)
+					releaseStats(monitoring.StatsRegistry(), wrappedMetricSet.stats)
 				})
 
 				for i := 0; i < tc.iterations; i++ {

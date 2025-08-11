@@ -51,7 +51,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	testEvent := mapstr.M{
 		"name": "DC0_C0",
-		"id":   "domain-c29",
+		"id":   "domain-c28",
 		"host": mapstr.M{
 			"count": 3,
 			"names": []string{"DC0_C0_H0", "DC0_C0_H1", "DC0_C0_H2"},
@@ -62,11 +62,11 @@ func TestFetchEventContents(t *testing.T) {
 		},
 		"network": mapstr.M{
 			"count": 3,
-			"names": []string{"VM Network", "DVS0-DVUplinks-9", "DC0_DVPG0"},
+			"names": []string{"VM Network", "DVS0-DVUplinks-8", "DC0_DVPG0"},
 		},
 	}
 
-	assert.Exactly(t, event, testEvent)
+	assert.Exactly(t, testEvent, event)
 }
 
 func TestClusterMetricSetData(t *testing.T) {

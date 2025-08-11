@@ -37,6 +37,7 @@ const (
 	beatsNdJSONBucket        = "beatsndjsonbucket"
 	beatsGzJSONBucket        = "beatsgzjsonbucket"
 	beatsJSONWithArrayBucket = "beatsjsonwitharraybucket"
+	beatsCSVBucket           = "beatscsvbucket"
 )
 
 func Test_StorageClient(t *testing.T) {
@@ -592,6 +593,182 @@ func Test_StorageClient(t *testing.T) {
 			mockHandler: mock.GCSRetryServer,
 			expected:    map[string]bool{},
 			isError:     errors.New("requires value >= 1.1 accessing 'retry.backoff_multiplier'"),
+		},
+		{
+			name: "BatchSizeGlobal",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"batch_size":                 3,
+				"max_workers":                2,
+				"poll":                       true,
+				"poll_interval":              "5s",
+				"buckets": []map[string]interface{}{
+					{
+						"name": "gcs-test-new",
+					},
+				},
+			},
+			mockHandler: mock.GCSServer,
+			expected: map[string]bool{
+				mock.Gcs_test_new_object_ata_json:      true,
+				mock.Gcs_test_new_object_data3_json:    true,
+				mock.Gcs_test_new_object_docs_ata_json: true,
+			},
+		},
+		{
+			name: "BatchSizeBucketLevel",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"max_workers":                2,
+				"poll":                       true,
+				"poll_interval":              "5s",
+				"buckets": []map[string]interface{}{
+					{
+						"name":       "gcs-test-new",
+						"batch_size": 3,
+					},
+				},
+			},
+			mockHandler: mock.GCSServer,
+			expected: map[string]bool{
+				mock.Gcs_test_new_object_ata_json:      true,
+				mock.Gcs_test_new_object_data3_json:    true,
+				mock.Gcs_test_new_object_docs_ata_json: true,
+			},
+		},
+		{
+			name: "ReadCSVRootLevel",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "10s",
+				"decoding.codec.csv.enabled": true,
+				"decoding.codec.csv.comma":   " ",
+				"buckets": []map[string]interface{}{
+					{
+						"name": beatsCSVBucket,
+					},
+				},
+			},
+			mockHandler: mock.GCSFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesBucket_csv[0]: true,
+				mock.BeatsFilesBucket_csv[1]: true,
+			},
+		},
+		{
+			name: "ReadCSVBucketLevel",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "10s",
+				"buckets": []map[string]interface{}{
+					{
+						"name":                       beatsCSVBucket,
+						"decoding.codec.csv.enabled": true,
+						"decoding.codec.csv.comma":   " ",
+					},
+				},
+			},
+			mockHandler: mock.GCSFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesBucket_csv[0]: true,
+				mock.BeatsFilesBucket_csv[1]: true,
+			},
+		},
+		{
+			name: "CustomContentTypeUnsupported",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"max_workers":                2,
+				"poll":                       true,
+				"poll_interval":              "10s",
+				"buckets": []map[string]interface{}{
+					{
+						"name":                  beatsGzJSONBucket,
+						"content_type":          "application/xyz-plain",
+						"override_content_type": true,
+					},
+				},
+			},
+			mockHandler: mock.GCSFileServer,
+			expected: map[string]bool{
+				"job with jobId beatsgzjsonbucket-multiline.json.gz-worker-0 encountered an error: content-type application/xyz-plain not supported": true,
+			},
+		},
+		{
+			name: "CustomContentTypeSupported",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"max_workers":                2,
+				"poll":                       true,
+				"poll_interval":              "10s",
+				"buckets": []map[string]interface{}{
+					{
+						"name":         beatsGzJSONBucket,
+						"content_type": "application/x-gzip",
+					},
+				},
+			},
+			mockHandler: mock.GCSFileServerNoContentType,
+			expected: map[string]bool{
+				mock.BeatsFilesBucket_multiline_json_gz[0]: true,
+				mock.BeatsFilesBucket_multiline_json_gz[1]: true,
+			},
+		},
+		{
+			// The invalid content-type specified is ignored since a
+			// content-type already exists and we are not overriding it.
+			// So we expect a successful run.
+			name: "CustomContentTypeIgnored",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"max_workers":                2,
+				"poll":                       true,
+				"poll_interval":              "10s",
+				"buckets": []map[string]interface{}{
+					{
+						"name":         beatsNdJSONBucket,
+						"content_type": "application/xyz-plain",
+					},
+				},
+			},
+			mockHandler: mock.GCSFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesBucket_log_ndjson[0]: true,
+				mock.BeatsFilesBucket_log_ndjson[1]: true,
+			},
+		},
+		{
+			// This checks if the root level content-type specifications are respected.
+			name: "CustomContentTypeAtRootLevel",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"max_workers":                2,
+				"poll":                       true,
+				"poll_interval":              "10s",
+				"content_type":               "application/x-gzip",
+				"buckets": []map[string]interface{}{
+					{
+						"name": beatsGzJSONBucket,
+					},
+				},
+			},
+			mockHandler: mock.GCSFileServerNoContentType,
+			expected: map[string]bool{
+				mock.BeatsFilesBucket_multiline_json_gz[0]: true,
+				mock.BeatsFilesBucket_multiline_json_gz[1]: true,
+			},
 		},
 	}
 	for _, tt := range tests {

@@ -3,13 +3,14 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/exported-fields-winlog.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Winlogbeat fields [exported-fields-winlog]
 
 Fields from the Windows Event Log.
 
 **`event.original`**
 :   The raw XML representation of the event obtained from Windows. This field is only available on operating systems supporting the Windows Event Log API (Microsoft Windows Vista and newer). This field is not included by default and must be enabled by setting `include_xml: true` as a configuration option for an individual event log. The XML representation of the event is useful for troubleshooting purposes. The data in the fields reported by Winlogbeat can be compared to the data in the XML to diagnose problems.
-
 
 
 ## winlog [_winlog]
@@ -19,50 +20,49 @@ All fields specific to the Windows Event Log are defined here.
 **`winlog.activity_id`**
 :   A globally unique identifier that identifies the current activity. The events that are published with this identifier are part of the same activity.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.computer_name`**
 :   The name of the computer that generated the record. When using Windows event forwarding, this name can differ from `agent.hostname`.
 
-type: keyword
+    type: keyword
 
-required: True
+    required: True
 
 
 **`winlog.computerObject.domain`**
 :   The domain of the account that was added, modified or deleted in the event.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.computerObject.id`**
 :   A globally unique identifier that identifies the target device.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.computerObject.name`**
 :   The account name that was added, modified or deleted in the event.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.event_data`**
 :   The event-specific data. This field is mutually exclusive with `user_data`. If you are capturing event data on versions prior to Windows Vista, the parameters in `event_data` are named `param1`, `param2`, and so on, because event log parameters are unnamed in earlier versions of Windows.
 
-type: object
+    type: object
 
-required: False
-
+    required: False
 
 
 ## event_data [_event_data]
@@ -588,166 +588,166 @@ This is a non-exhaustive list of parameters that are used in Windows events. By 
 **`winlog.event_id`**
 :   The event identifier. The value is specific to the source of the event.
 
-type: keyword
+    type: keyword
 
-required: True
+    required: True
 
 
 **`winlog.keywords`**
 :   The keywords are used to classify an event.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.channel`**
 :   The name of the channel from which this record was read. This value is one of the names from the `event_logs` collection in the configuration.
 
-type: keyword
+    type: keyword
 
-required: True
+    required: True
 
 
 **`winlog.record_id`**
-:   The record ID of the event log record. The first record written to an event log is record number 1, and other records are numbered sequentially. If the record number reaches the maximum value (232 for the Event Logging API and 264 for the Windows Event Log API), the next record number will be 0.
+:   The record ID of the event log record. The first record written to an event log is record number 1, and other records are numbered sequentially. If the record number reaches the maximum value (2^32^ for the Event Logging API and 2^64^ for the Windows Event Log API), the next record number will be 0.
 
-type: keyword
+    type: keyword
 
-required: True
+    required: True
 
 
 **`winlog.related_activity_id`**
 :   A globally unique identifier that identifies the activity to which control was transferred to. The related events would then have this identifier as their `activity_id` identifier.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.opcode`**
 :   The opcode defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.provider_guid`**
 :   A globally unique identifier that identifies the provider that logged the event.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.process.pid`**
 :   The process_id of the Client Server Runtime Process.
 
-type: long
+    type: long
 
-required: False
+    required: False
 
 
 **`winlog.provider_name`**
 :   The source of the event log record (the application or service that logged the record).
 
-type: keyword
+    type: keyword
 
-required: True
+    required: True
 
 
 **`winlog.task`**
 :   The task defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged. The category used by the Event Logging API (on pre Windows Vista operating systems) is written to this field.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.time_created`**
 :   The event creation time.
 
-type: date
+    type: date
 
-required: False
+    required: False
 
 
 **`winlog.trustAttribute`**
 :   The decimal value of attributes for new trust created to a domain.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.trustDirection`**
 :   The direction of new trust created to a domain. Possible values are `TRUST_DIRECTION_DISABLED`, `TRUST_DIRECTION_INBOUND`, `TRUST_DIRECTION_OUTBOUND` and `TRUST_DIRECTION_BIDIRECTIONAL`
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.trustType`**
 :   The account name that was added, modified or deleted in the event. Possible values are `TRUST_TYPE_DOWNLEVEL`, `TRUST_TYPE_UPLEVEL`, `TRUST_TYPE_MIT` and `TRUST_TYPE_DCE`
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.process.thread.id`**
 :   type: long
 
-required: False
+    required: False
 
 
 **`winlog.user_data`**
 :   The event specific data. This field is mutually exclusive with `event_data`.
 
-type: object
+    type: object
 
-required: False
+    required: False
 
 
 **`winlog.user.identifier`**
 :   The Windows security identifier (SID) of the account associated with this event. If Winlogbeat cannot resolve the SID to a name, then the `user.name`, `user.domain`, and `user.type` fields will be omitted from the event. If you discover Winlogbeat not resolving SIDs, review the log for clues as to what the problem may be.
 
-type: keyword
+    type: keyword
 
-example: S-1-5-21-3541430928-2051711210-1391384369-1001
+    example: S-1-5-21-3541430928-2051711210-1391384369-1001
 
-required: False
+    required: False
 
 
 **`winlog.user.name`**
 :   Name of the user associated with this event.
 
-type: keyword
+    type: keyword
 
 
 **`winlog.user.domain`**
 :   The domain that the account associated with this event is a member of.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.user.type`**
 :   The type of account associated with this event.
 
-type: keyword
+    type: keyword
 
-required: False
+    required: False
 
 
 **`winlog.version`**
-:   The version number of the event’s definition.
+:   The version number of the event's definition.
 
-type: long
+    type: long
 
-required: False
+    required: False
 
 

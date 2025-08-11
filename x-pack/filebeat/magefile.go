@@ -43,9 +43,14 @@ func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
+// BuildOTel builds the Beat binary with OTel sub command
+func BuildOTel() error {
+	return devtools.BuildOTel()
+}
+
 // BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
 func BuildSystemTestBinary() error {
-	return devtools.BuildSystemTestBinary()
+	return devtools.BuildSystemTestOTelBinary()
 }
 
 // GolangCrossBuild builds the Beat binary inside of the golang-builder.
@@ -168,12 +173,35 @@ func IntegTest() {
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
-	mg.Deps(BuildSystemTestBinary)
-	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
+	// build integration test binary with otel sub command
+	devtools.BuildSystemTestOTelBinary()
+	args := devtools.DefaultGoTestIntegrationFromHostArgs()
+	// ES_USER must be admin in order for the Go Integration tests to function because they require
+	// indices:data/read/search
+	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
+	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
+	return devtools.GoIntegTestFromHost(ctx, args)
+}
+
+// GoFIPSOnlyIntegTest starts the docker containers and executes the Go integration tests with GODEBUG=fips140=only set.
+func GoFIPSOnlyIntegTest(ctx context.Context) error {
+	// build integration test binary with otel sub command
+	devtools.BuildSystemTestOTelBinary()
+	args := devtools.DefaultGoTestIntegrationFromHostArgs()
+	// ES_USER must be admin in order for the Go Integration tests to function because they require
+	// indices:data/read/search
+	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
+	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
+	return devtools.GoIntegTestFromHost(ctx, args)
 }
 
 // PythonIntegTest starts the docker containers and executes the Python integration tests.
 func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(Fields, Dashboards, devtools.BuildSystemTestBinary)
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
+}
+
+// FipsECHTest runs a smoke test using a FIPS enabled binary targetting an ECH deployment.
+func FipsECHTest(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultECHTestArgs())
 }

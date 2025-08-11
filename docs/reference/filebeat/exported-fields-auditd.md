@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-auditd.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Auditd fields [exported-fields-auditd]
 
 Module for parsing auditd logs.
@@ -10,120 +12,118 @@ Module for parsing auditd logs.
 **`user.terminal`**
 :   Terminal or tty device on which the user is performing the observed activity.
 
-type: keyword
+    type: keyword
 
 
 **`user.audit.id`**
 :   One or multiple unique identifiers of the user.
 
-type: keyword
+    type: keyword
 
 
 **`user.audit.name`**
 :   Short name or login of the user.
 
-type: keyword
+    type: keyword
 
-example: albert
+    example: albert
 
 
 **`user.audit.group.id`**
 :   Unique identifier for the group on the system/platform.
 
-type: keyword
+    type: keyword
 
 
 **`user.audit.group.name`**
 :   Name of the group.
 
-type: keyword
+    type: keyword
 
 
 **`user.filesystem.id`**
 :   One or multiple unique identifiers of the user.
 
-type: keyword
+    type: keyword
 
 
 **`user.filesystem.name`**
 :   Short name or login of the user.
 
-type: keyword
+    type: keyword
 
-example: albert
+    example: albert
 
 
 **`user.filesystem.group.id`**
 :   Unique identifier for the group on the system/platform.
 
-type: keyword
+    type: keyword
 
 
 **`user.filesystem.group.name`**
 :   Name of the group.
 
-type: keyword
+    type: keyword
 
 
 **`user.owner.id`**
 :   One or multiple unique identifiers of the user.
 
-type: keyword
+    type: keyword
 
 
 **`user.owner.name`**
 :   Short name or login of the user.
 
-type: keyword
+    type: keyword
 
-example: albert
+    example: albert
 
 
 **`user.owner.group.id`**
 :   Unique identifier for the group on the system/platform.
 
-type: keyword
+    type: keyword
 
 
 **`user.owner.group.name`**
 :   Name of the group.
 
-type: keyword
+    type: keyword
 
 
 **`user.saved.id`**
 :   One or multiple unique identifiers of the user.
 
-type: keyword
+    type: keyword
 
 
 **`user.saved.name`**
 :   Short name or login of the user.
 
-type: keyword
+    type: keyword
 
-example: albert
+    example: albert
 
 
 **`user.saved.group.id`**
 :   Unique identifier for the group on the system/platform.
 
-type: keyword
+    type: keyword
 
 
 **`user.saved.group.name`**
 :   Name of the group.
 
-type: keyword
-
+    type: keyword
 
 
 ## auditd [_auditd]
 
 Fields from the auditd logs.
 
-
-## log [_log_2]
+## log [_log]
 
 Fields from the Linux audit log. Not all fields are documented here because they are dynamic and vary by audit event type.
 
@@ -146,7 +146,7 @@ Fields from the Linux audit log. Not all fields are documented here because they
 **`auditd.log.sequence`**
 :   The audit event sequence number.
 
-type: long
+    type: long
 
 
 **`auditd.log.items`**
@@ -184,180 +184,180 @@ type: long
 **`auditd.log.acct`**
 :   type: alias
 
-alias to: user.name
+    alias to: user.name
 
 
 **`auditd.log.pid`**
 :   type: alias
 
-alias to: process.pid
+    alias to: process.pid
 
 
 **`auditd.log.ppid`**
 :   type: alias
 
-alias to: process.parent.pid
+    alias to: process.parent.pid
 
 
 **`auditd.log.res`**
 :   type: alias
 
-alias to: event.outcome
+    alias to: event.outcome
 
 
 **`auditd.log.record_type`**
 :   type: alias
 
-alias to: event.action
+    alias to: event.action
 
 
 **`auditd.log.geoip.continent_name`**
 :   type: alias
 
-alias to: source.geo.continent_name
+    alias to: source.geo.continent_name
 
 
 **`auditd.log.geoip.country_iso_code`**
 :   type: alias
 
-alias to: source.geo.country_iso_code
+    alias to: source.geo.country_iso_code
 
 
 **`auditd.log.geoip.location`**
 :   type: alias
 
-alias to: source.geo.location
+    alias to: source.geo.location
 
 
 **`auditd.log.geoip.region_name`**
 :   type: alias
 
-alias to: source.geo.region_name
+    alias to: source.geo.region_name
 
 
 **`auditd.log.geoip.city_name`**
 :   type: alias
 
-alias to: source.geo.city_name
+    alias to: source.geo.city_name
 
 
 **`auditd.log.geoip.region_iso_code`**
 :   type: alias
 
-alias to: source.geo.region_iso_code
+    alias to: source.geo.region_iso_code
 
 
 **`auditd.log.arch`**
 :   type: alias
 
-alias to: host.architecture
+    alias to: host.architecture
 
 
 **`auditd.log.gid`**
 :   type: alias
 
-alias to: user.group.id
+    alias to: user.group.id
 
 
 **`auditd.log.uid`**
 :   type: alias
 
-alias to: user.id
+    alias to: user.id
 
 
 **`auditd.log.agid`**
 :   type: alias
 
-alias to: user.audit.group.id
+    alias to: user.audit.group.id
 
 
 **`auditd.log.auid`**
 :   type: alias
 
-alias to: user.audit.id
+    alias to: user.audit.id
 
 
 **`auditd.log.fsgid`**
 :   type: alias
 
-alias to: user.filesystem.group.id
+    alias to: user.filesystem.group.id
 
 
 **`auditd.log.fsuid`**
 :   type: alias
 
-alias to: user.filesystem.id
+    alias to: user.filesystem.id
 
 
 **`auditd.log.egid`**
 :   type: alias
 
-alias to: user.effective.group.id
+    alias to: user.effective.group.id
 
 
 **`auditd.log.euid`**
 :   type: alias
 
-alias to: user.effective.id
+    alias to: user.effective.id
 
 
 **`auditd.log.sgid`**
 :   type: alias
 
-alias to: user.saved.group.id
+    alias to: user.saved.group.id
 
 
 **`auditd.log.suid`**
 :   type: alias
 
-alias to: user.saved.id
+    alias to: user.saved.id
 
 
 **`auditd.log.ogid`**
 :   type: alias
 
-alias to: user.owner.group.id
+    alias to: user.owner.group.id
 
 
 **`auditd.log.ouid`**
 :   type: alias
 
-alias to: user.owner.id
+    alias to: user.owner.id
 
 
 **`auditd.log.comm`**
 :   type: alias
 
-alias to: process.name
+    alias to: process.name
 
 
 **`auditd.log.exe`**
 :   type: alias
 
-alias to: process.executable
+    alias to: process.executable
 
 
 **`auditd.log.terminal`**
 :   type: alias
 
-alias to: user.terminal
+    alias to: user.terminal
 
 
 **`auditd.log.msg`**
 :   type: alias
 
-alias to: message
+    alias to: message
 
 
 **`auditd.log.src`**
 :   type: alias
 
-alias to: source.address
+    alias to: source.address
 
 
 **`auditd.log.dst`**
 :   type: alias
 
-alias to: destination.address
+    alias to: destination.address
 
 

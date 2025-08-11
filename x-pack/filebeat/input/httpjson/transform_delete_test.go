@@ -116,7 +116,7 @@ func TestNewDelete(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(tc.config)
-			gotDelete, gotErr := tc.constructor(cfg, nil)
+			gotDelete, gotErr := tc.constructor(cfg, noopReporter{}, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)
 				assert.Equal(t, tc.expectedTarget, (gotDelete.(*delete)).targetInfo)

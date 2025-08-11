@@ -27,9 +27,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -54,7 +54,8 @@ var testCases = []TestCase{
 
 func TestHandler(t *testing.T) {
 	parent := monitoring.NewRegistry()
-	reg, _ := NewInputRegistry("foo", "123abc", parent)
+	reg := NewMetricsRegistry(
+		"123abc", "foo", parent, logptest.NewTestingLogger(t, ""))
 	monitoring.NewInt(reg, "gauge").Set(13344)
 
 	// Register legacy metrics without id or input. This must be ignored.
@@ -64,7 +65,7 @@ func TestHandler(t *testing.T) {
 		monitoring.NewTimestamp(legacy, "last_event_published_time").Set(time.Now())
 	}
 
-	r := mux.NewRouter()
+	r := http.NewServeMux()
 	s := httptest.NewServer(r)
 	defer s.Close()
 
@@ -111,8 +112,9 @@ func TestHandler(t *testing.T) {
 
 func BenchmarkHandlers(b *testing.B) {
 	reg := monitoring.NewRegistry()
+	log := logptest.NewTestingLogger(b, "")
 	for i := 0; i < 1000; i++ {
-		reg, _ := NewInputRegistry("foo", "id-"+strconv.Itoa(i), reg)
+		reg := NewMetricsRegistry("id-"+strconv.Itoa(i), "foo", reg, log)
 		monitoring.NewInt(reg, "gauge").Set(int64(i))
 	}
 

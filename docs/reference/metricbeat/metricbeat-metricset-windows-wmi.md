@@ -1,3 +1,13 @@
+---
+mapped_pages:
+  - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-windows-wmi.html
+
+applies_to:
+  stack: beta
+---
+
+% This file is generated! See scripts/docs_collector.py
+
 # Windows wmi metricset [metricbeat-metricset-windows-wmi]
 
 ::::{warning}
@@ -48,6 +58,27 @@ results after a specified timeout. This is controlled by the
 While Metricbeat stops waiting for the result, the underlying WMI query
 may continue running until the WMI Arbitrator decides to stop execution.
 
+## WMI Type support
+
+The `microsoft/wmi` library internally uses the WMI Scripting API. This API, as per the
+[official WMI Documentation](https://learn.microsoft.com/en-us/windows/win32/wmisdk/querying-wmi),
+does not provide direct type conversion for `uint64`, `sint64`, and `datetime` CIM types;
+instead, these values are returned as strings.
+
+To ensure the correct data type is reported, Metricbeat dynamically fetches the
+CIM type definitions for the properties of the WMI instance classes involved in the query,
+and then performs the necessary data type conversions.
+
+To optimize performance and avoid repeatedly fetching these schema definitions
+for every row and every request, an LRU cache is utilized. This cache stores
+the schema definition for each unique WMI class encountered. For queries involving
+superclasses, such as `CIM_LogicalDevice`, the cache will populate with individual entries
+for each specific derived class (leaf of the class hierarchy) whose instances are returned by the query (for example, `Win32_DiskDrive` or `Win32_NetworkAdapter`).
+
+::::{note}
+The properties of type `CIM_Object` (embedded objects) are not yet supported and are ignored.
+::::
+
 ## Configuration
 
 ```yaml
@@ -60,6 +91,7 @@ may continue running until the WMI Arbitrator decides to stop execution.
     include_queries: true
     include_null_properties: false
     include_empty_strings_properties: false
+    max_rows_per_query: 100
     queries:
     - class: Win32_OperatingSystem
       properties:
@@ -82,8 +114,12 @@ query. The default is `root\cimv2`.
 :   The time threshold after which Metricbeat will stop waiting for the
 query result and return control to the main flow of the program. A
 warning is logged indicating that the query execution has exceeded the
-threshold. The default is equal to the period. See [WMI Arbitrator and
+threshold. The default is equal to the module's period. See [WMI Arbitrator and
 Query Execution](#wmi-arbitrator-and-query-execution) for more details.
+
+**`wmi.include_query_class`**
+:   If set to `true` the metricset includes the queried class. 
+This is useful if superclasses are queried. The default value is `false`.
 
 **`wmi.include_queries`**
 :   If set to `true` the metricset includes the query in the output
@@ -91,12 +127,22 @@ document. The default value is `false`.
 
 **`wmi.include_null_properties`**
 :   If set to `true` the metricset includes the properties that have null
-value in the output document. properties that have a `null` value in the
-output document. The default value is `false`.
+value in the output document. The default value is `false`.
 
 **`wmi.include_empty_string_properties`**
 :   A boolean option that causes the metricset to include the properties
 that are empty string. The default value is `false`.
+
+**`wmi.max_rows_per_query`**
+:   Limits the number of rows returned by a single WMI query.
+The default value is `0`, which is a special value indicating that all fetched
+results should be returned without a row limit.
+
+**`wmi.schema_cache_size`**
+:   The maximum number of WMI class definitions that can be cached per single query. Every query keeps its own separate cache.  This cache helps improve performance when dealing with queries that involve inheritance hierarchies. Read more in [WMI Type Support](#wmi-type-support).
+For example, if a superclass is queried, the cache
+might store all its derived classes (leaves of the class hierarchy) to optimize subsequent operations.
+The default value is `1000`.
 
 **`wmi.queries`**
 :   The list of queries to execute. The list cannot be empty. See [Query
@@ -104,10 +150,10 @@ Configuration](#query-configuration) for the format of the queries.
 
 ### Query Configuration
 
-Each item in the `queries` list specifies a wmi query to perform.
+Each item in the `queries` list specifies a WMI query to perform.
 
 **`class`**
-:    The wmi class. In the query it specifies the `FROM` clause. Required
+:    The WMI class. In the query it specifies the `FROM` clause. Required
 
 **`properties`**
 :    List of properties to return. In the query it specifies the `SELECT`
@@ -123,7 +169,7 @@ Documentation](https://learn.microsoft.com/en-us/windows/win32/wmisdk/where-clau
 :   The WMI Namespace for this particular query (it overwrites the
 metricset’s `namespace` value)
 
-### Example
+#### Example
 
 Example WQL Query:
 
@@ -146,19 +192,15 @@ Equivalent YAML Configuration:
 
 ## Best Practices
 
-- Test your queries in isolation using the `Get-CimInstance` PowerShell
-  cmdlet or the WMI Explorer.
+- Test your WMI queries in isolation using the [`Get-CimInstance`](https://learn.microsoft.com/en-us/powershell/module/cimcmdlets/get-ciminstance) PowerShell cmdlet or [the WMI Explorer tool](https://github.com/vinaypamnani/wmie2).
 
-- Ensure that `wmi.warning_threshold` is **less than or equal to** the
-  module’s `period`. This prevents starting intentionally multiple
-  executions of the same query.
+- Ensure that `wmi.warning_threshold` is less than or equal to the module's `period`. This configuration prevents Metricbeat from attempting to start multiple concurrent executions of the same query if a previous one is running slowly.
 
-- Set up alerts in Metricbeat logs for timeouts and empty query results.
-  If a query frequently times out or returns no data, investigate the
-  cause to prevent missing critical information.
+- When possible, try querying concrete (leaf) classes or classes closer to the leaves of the WMI inheritance hierarchy. Querying abstract superclasses may require fetching and caching the schema definitions for numerous derived classes, which can lead to increased memory usage and potential performance penalties due to cache misses.
 
-- \[Advanced\] Collect WMI-Activity Operational Logs to correlate with
-  Metricbeat WMI warnings.
+- Set up alerts in Metricbeat for documents with the `error.message` field set.
+
+- [Advanced] Configure collection of WMI-Activity Operational Logs (found in Event Viewer under `Applications and Services Logs/Microsoft/Windows/WMI-Activity/Operational`). These logs can be invaluable for correlating issues with Metricbeat WMI warnings or documents containing `error.message`.
 
 ## Compatibility
 
@@ -171,4 +213,37 @@ This module has been tested on the following platform:
 Other Windows versions and architectures may also work but have not been
 explicitly tested.
 
+## Fields [_fields]
 
+For a description of each field in the metricset, see the [exported fields](/reference/metricbeat/exported-fields-windows.md) section.
+
+Here is an example document generated by this metricset:
+
+```json
+{
+    "@timestamp": "2024-12-12T15:46:39.622Z",
+    "event": {
+        "dataset": "windows.wmi",
+        "duration": 58982500,
+        "module": "windows"
+    },
+    "metricset": {
+        "name": "wmi",
+        "period": 10000
+    },
+    "service": {
+        "type": "windows"
+    },
+    "windows": {
+        "wmi": {
+            "FreePhysicalMemory": 7537796,
+            "FreeSpaceInPagingFiles": 2257908,
+            "FreeVirtualMemory": 9694064,
+            "LocalDateTime": "2024-12-12T15:46:39.62Z",
+            "NumberOfUsers": 1,
+            "class": "Win32_OperatingSystem",
+            "namespace": "root\\cimv2"
+        }
+    }
+}
+```

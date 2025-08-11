@@ -50,6 +50,7 @@ type GoTestArgs struct {
 	OutputFile          string            // File to write verbose test output to.
 	JUnitReportFile     string            // File to write a JUnit XML test report to.
 	CoverageProfileFile string            // Test coverage profile file (enables -cover).
+	Dir                 string            // The directory the test should run from
 	Output              io.Writer         // Write stderr and stdout to Output if set
 }
 
@@ -102,6 +103,7 @@ func makeGoTestArgsForPackage(name, pkg string) GoTestArgs {
 //
 //	[kafka kafka/broker kafka/consumer kafka/consumergroup kafka/partition kafka/producer]
 func fetchGoPackages(module string) ([]string, error) {
+	//nolint:gosec // G204 can be ignored as we don't send any input
 	cmd := execabs.Command(
 		"go", "list", "-tags", "integration", fmt.Sprintf("./%s/...", module))
 	output, err := cmd.Output()
@@ -183,12 +185,28 @@ func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
 	return args
 }
 
+// FIPSOnlyGoTestIngrationFromHostArgs returns a default set of arguments for running
+// all integration tests from the host system (outside the docker network) along
+// with the GODEBUG=fips140=only arg set.
+func FIPSOnlyGoTestIntegrationFromHostArgs() GoTestArgs {
+	args := DefaultGoTestIntegrationArgs()
+	args.Tags = append(args.Tags, "requirefips")
+	args.Env = WithGoIntegTestHostEnv(args.Env)
+	args.Env["GODEBUG"] = "fips140=only"
+	return args
+}
+
 // GoTestIntegrationArgsForPackage returns a default set of arguments for running
 // module integration tests. We tag integration test files with 'integration'.
 func GoTestIntegrationArgsForPackage(pkg string) GoTestArgs {
 	args := makeGoTestArgsForPackage("Integration", pkg)
 
 	args.Tags = append(args.Tags, "integration")
+
+	// add the requirefips tag when doing fips140 testing
+	if v, ok := os.LookupEnv("GODEBUG"); ok && strings.Contains(v, "fips140=only") {
+		args.Tags = append(args.Tags, "requirefips")
+	}
 	return args
 }
 
@@ -364,6 +382,12 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	args := append(gotestsumArgs, append([]string{"--"}, testArgs...)...)
 
 	goTest := makeCommand(ctx, params.Env, "gotestsum", args...)
+
+	// Set execution directory
+	if params.Dir != "" {
+		goTest.Dir = params.Dir
+	}
+
 	// Wire up the outputs.
 	var outputs []io.Writer
 	if params.Output != nil {
@@ -454,6 +478,13 @@ func BuildSystemTestBinary() error {
 	return BuildSystemTestGoBinary(DefaultTestBinaryArgs())
 }
 
+// BuildSystemTestOTelBinary builds beat binary that includes otel.
+func BuildSystemTestOTelBinary() error {
+	args := DefaultTestBinaryArgs()
+	args.ExtraFlags = []string{"-tags", "otelbeat"}
+	return BuildSystemTestGoBinary(args)
+}
+
 // BuildSystemTestGoBinary build a binary for testing that is instrumented for
 // testing and measuring code coverage. The binary is only instrumented for
 // coverage when TEST_COVERAGE=true (default is false).
@@ -481,4 +512,24 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 		log.Printf("BuildSystemTestGoBinary (go %v) took %v.", strings.Join(args, " "), time.Since(start))
 	}()
 	return sh.RunV("go", args...)
+}
+
+func DefaultECHTestArgs() GoTestArgs {
+	args := makeGoTestArgs("ECH")
+	args.Tags = append(args.Tags, "ech", "integration")
+	args.Dir = "tests/ech"
+
+	// attempt to use absolute paths for filenames
+	path, err := os.Getwd()
+	if err != nil {
+		log.Printf("Unable to get working dir, using value: .")
+		path = "."
+	}
+	fileName := path + "/build/TEST-go-ech"
+	args.OutputFile = fileName + ".out"
+	args.JUnitReportFile = fileName + ".xml"
+	if TestCoverage {
+		args.CoverageProfileFile = fileName + ".cov"
+	}
+	return args
 }

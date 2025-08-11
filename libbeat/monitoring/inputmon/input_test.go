@@ -20,11 +20,13 @@ package inputmon
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
@@ -64,7 +66,7 @@ func TestNewInputMonitor(t *testing.T) {
 			tc.ID != "", tc.Input != "", tc.OptionalParent != nil, tc.PublicMetrics)
 
 		t.Run(testName, func(t *testing.T) {
-			reg, unreg := NewInputRegistry(tc.Input, tc.ID, tc.OptionalParent)
+			reg, unreg := NewDeprecatedMetricsRegistry(tc.Input, tc.ID, tc.OptionalParent)
 			defer unreg()
 			assert.NotNil(t, reg)
 
@@ -97,15 +99,15 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	inputID := "input-with-pipeline-metrics-new-inputAPI"
 	inputType := "test"
 
-	parentLocalReg := monitoring.GetNamespace("beat-x").GetRegistry()
+	parentLocalReg := monitoring.NewRegistry()
 	reg := NewMetricsRegistry(inputID, inputType, parentLocalReg, log)
 	monitoring.NewInt(reg, "foo_total").Set(10)
 	monitoring.NewInt(reg, "events_pipeline_total").Set(10)
 
 	// simulate a duplicated ID in the local and global namespace.
 	reg = globalRegistry().NewRegistry(inputID)
-	monitoring.NewString(reg, "id").Set(inputID)
-	monitoring.NewString(reg, "input").Set(inputType)
+	monitoring.NewString(reg, MetricKeyID).Set(inputID)
+	monitoring.NewString(reg, MetricKeyInput).Set(inputType)
 	monitoring.NewBool(reg, "should_be_overwritten").Set(true)
 
 	// =========== Input using new API and legacy, global namespace ===========
@@ -119,8 +121,8 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	defer globalRegistry().Remove(inputID)
 
 	// now the input also register its metrics with the deprecated
-	// NewInputRegistry.
-	reg, cancel := NewInputRegistry(
+	// NewDeprecatedMetricsRegistry.
+	reg, cancel := NewDeprecatedMetricsRegistry(
 		inputType, inputID, nil)
 	defer cancel()
 	monitoring.NewInt(reg, "foo_total").Set(20)
@@ -130,7 +132,7 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	// input which does not use the metrics registry from filebeat
 	// input/v2.Context.
 	inputOldAPI := "input-without-pipeline-metrics"
-	reg, cancel = NewInputRegistry(
+	reg, cancel = NewDeprecatedMetricsRegistry(
 		inputType, inputOldAPI, nil)
 	defer cancel()
 	monitoring.NewInt(reg, "foo_total").Set(30)
@@ -143,7 +145,7 @@ func TestMetricSnapshotJSON(t *testing.T) {
 
 	// another input registry missing required information.
 	reg = globalRegistry().NewRegistry("yet-another-registry")
-	monitoring.NewString(reg, "id").Set("some-id")
+	monitoring.NewString(reg, MetricKeyID).Set("some-id")
 	monitoring.NewInt(reg, "foo3_total").Set(100)
 	defer globalRegistry().Remove("yet-another-registry")
 
@@ -203,6 +205,81 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	}
 }
 
+func TestSnapshotWithNestedInputs(t *testing.T) {
+	logger := logp.NewNopLogger()
+	inputs := monitoring.NewRegistry()
+	regA := NewMetricsRegistry("input-a", "filestream", inputs, logger)
+	monitoring.NewInt(regA, "events_pipeline_total").Set(10)
+	regB := NewMetricsRegistry("input-b", "gcp", inputs, logger)
+	monitoring.NewInt(regB, "events_pipeline_total").Set(20)
+
+	// input-b is a GCP input with two data sources, override its type with
+	// InputNested to indicate its registry contains other input registries.
+	monitoring.NewString(regB, "input").Set(InputNested)
+	regC := NewMetricsRegistry("input-b.C", "gcp", regB, logger)
+	monitoring.NewInt(regC, "events_pipeline_total").Set(30)
+	regD := NewMetricsRegistry("input-b.D", "gcp", regB, logger)
+	monitoring.NewInt(regD, "events_pipeline_total").Set(40)
+
+	jsonBytes, err := MetricSnapshotJSON(inputs)
+	require.NoError(t, err)
+
+	type Resp struct {
+		ID                  string `json:"id"`
+		Input               string `json:"input"`
+		EventsPipelineTotal int    `json:"events_pipeline_total,omitempty"`
+	}
+	// The result should have only the three leaf nodes in the input registry
+	// tree (input-b should be excluded)
+	want := []Resp{
+		{
+			ID:                  "input-a",
+			Input:               "filestream",
+			EventsPipelineTotal: 10,
+		},
+		{
+			ID:                  "input-b.C",
+			Input:               "gcp",
+			EventsPipelineTotal: 30,
+		},
+		{
+			ID:                  "input-b.D",
+			Input:               "gcp",
+			EventsPipelineTotal: 40,
+		},
+	}
+
+	var got []Resp
+
+	err = json.Unmarshal(jsonBytes, &got)
+	require.NoError(t, err, "failed to unmarshal response")
+
+	// Sort the arrays before checking equality since registry key order isn't guaranteed
+	sort.Slice(want, func(i, j int) bool { return want[i].ID < want[j].ID })
+	sort.Slice(got, func(i, j int) bool { return got[i].ID < got[j].ID })
+
+	assert.Equal(t, want, got, "Reported input metrics didn't match expected value")
+}
+
+func TestFindInputRegistryWithID(t *testing.T) {
+	logger := logp.NewNopLogger()
+	root := monitoring.NewRegistry()
+	regA := NewMetricsRegistry("input-a", InputNested, root, logger)
+	NewMetricsRegistry("input-b", "winlog", regA, logger)
+	NewMetricsRegistry("input.c", "winlog", regA, logger)
+	NewMetricsRegistry("input-a::input-d", "winlog", regA, logger)
+	NewMetricsRegistry("input-e", "winlog", root, logger)
+
+	// findInputRegistryWithID should succeed on all id parameters above,
+	// whether they are at top level, nested, or contain other inputs nested
+	// inside them, and whether or not they have periods (which are not allowed
+	// in registry keys).
+	expectedIDs := []string{"input-a", "input-b", "input.c", "input-a::input-d", "input-e"}
+	for _, id := range expectedIDs {
+		assert.NotNil(t, findInputRegistryWithID(root, id), "findInputRegistryWithID should return a non-nil registry for id "+id)
+	}
+}
+
 func TestNewMetricsRegistry(t *testing.T) {
 	parent := monitoring.NewRegistry()
 	inputID := "input-inputID"
@@ -217,8 +294,8 @@ func TestNewMetricsRegistry(t *testing.T) {
 	assert.Equal(t, parent.GetRegistry(inputID), got)
 
 	vals := monitoring.CollectFlatSnapshot(got, monitoring.Full, false)
-	assert.Equal(t, inputID, vals.Strings["id"])
-	assert.Equal(t, inputType, vals.Strings["input"])
+	assert.Equal(t, inputID, vals.Strings[MetricKeyID])
+	assert.Equal(t, inputType, vals.Strings[MetricKeyInput])
 }
 
 func TestNewMetricsRegistry_duplicatedInputID(t *testing.T) {

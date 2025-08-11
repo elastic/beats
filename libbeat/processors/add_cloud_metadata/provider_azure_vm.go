@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package add_cloud_metadata
 
 import (
@@ -128,17 +130,17 @@ var azureVMMetadataFetcher = provider{
 // fetchMetadata fetches azure vm metadata from
 //  1. Azure metadata endpoint with httpMetadataFetcher
 //  2. Azure Managed Clusters using azure sdk  with genericMetadataFetcher
-func (az *azureMetadataFetcher) fetchMetadata(ctx context.Context, client http.Client) result {
+func (az *azureMetadataFetcher) fetchMetadata(ctx context.Context, client http.Client, logger *logp.Logger) result {
 	res := result{provider: az.provider, metadata: mapstr.M{}, err: nil}
-	logger := logp.NewLogger("add_cloud_metadata")
-	httpRes := az.httpMetadataFetcher.fetchMetadata(ctx, client)
+	logger = logger.Named("add_cloud_metadata")
+	httpRes := az.httpMetadataFetcher.fetchMetadata(ctx, client, logger)
 	if httpRes.err != nil {
 		res.err = httpRes.err
 		return res
 	}
 	res.metadata = httpRes.metadata
 	az.httpMeta = httpRes.metadata
-	gRes := az.genericMetadataFetcher.fetchMetadata(ctx, client)
+	gRes := az.genericMetadataFetcher.fetchMetadata(ctx, client, logger)
 	if gRes.err != nil {
 		logger.Warnf("Failed to get additional AKS Cluster meta: %+v", gRes.err)
 		return res
@@ -183,8 +185,9 @@ func (az *azureMetadataFetcher) fetchAzureClusterMeta(
 	ctx context.Context,
 	client http.Client,
 	result *result,
+	logger *logp.Logger,
 ) {
-	logger := logp.NewLogger("add_cloud_metadata")
+	logger = logger.Named("add_cloud_metadata")
 	subscriptionID, _ := az.httpMeta.GetValue("cloud.account.id")
 	resourceGroupName, _ := az.httpMeta.GetValue("cloud.resourcegroup")
 	strResourceGroupName := ""

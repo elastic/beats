@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-istio-proxy.html
+
+applies_to:
+  stack: beta
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Istio proxy metricset [metricbeat-metricset-istio-proxy]
 
@@ -34,8 +39,7 @@ metricbeat.autodiscover:
               hosts: "${data.kubernetes.pod.ip}:15090"
 ```
 
-## Fields [_fields_126]
+## Fields [_fields]
 
 For a description of each field in the metricset, see the [exported fields](/reference/metricbeat/exported-fields-istio.md) section.
-
 

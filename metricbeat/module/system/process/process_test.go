@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
 )
 
@@ -64,7 +63,6 @@ func TestFetchDegradeOnPartial(t *testing.T) {
 		t.Skip("Skip: running as root on non-windows, but the test requires to run as non-root")
 	}
 
-	logp.DevelopmentSetup()
 	config := getConfig()
 	config["degrade_on_partial"] = true
 
@@ -81,7 +79,6 @@ func TestFetchDegradeOnPartial(t *testing.T) {
 }
 
 func TestFetchSinglePid(t *testing.T) {
-	logp.DevelopmentSetup()
 
 	cfg := getConfig()
 	cfg["process.pid"] = os.Getpid()

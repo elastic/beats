@@ -2,6 +2,8 @@
 navigation_title: "UDP"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-udp.html
+applies_to:
+  stack: ga
 ---
 
 # UDP input [filebeat-input-udp]
@@ -18,6 +20,14 @@ filebeat.inputs:
   host: "localhost:8080"
 ```
 
+:::{note}
+{applies_to}`stack: ga 9.2.0` Starting in 9.2.0 the UDP input reads
+the message in a different goroutine than the publishing of messages,
+which increases the performance of the input when running slow
+processors.
+:::
+
+
 ## Configuration options [_configuration_options_20]
 
 The `udp` input supports the following configuration options plus the [Common options](#filebeat-input-udp-common-options) described later.
@@ -32,6 +42,12 @@ The maximum size of the message received over UDP. The default is `10KiB`.
 
 The host and UDP port to listen on for event streams.
 
+### `number_of_workers` [filebeat-input-udp-number-of-workers]
+```{applies_to}
+stack: ga 9.2.0
+```
+
+The number of pipeline workers. Default: 1
 
 ### `network` [filebeat-input-udp-udp-network]
 
@@ -58,6 +74,7 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `udp_read_buffer_length_gauge` | Size of the UDP socket buffer length in bytes (gauge). |
 | `received_events_total` | Total number of packets (events) that have been received. |
 | `received_bytes_total` | Total number of bytes received. |
+| `published_events_total`  {applies_to}`stack: ga 9.2.0`| Total number of packets (events) published. |
 | `receive_queue_length` | Aggregated size of the system receive queues (IPv4 and IPv6) (linux only) (gauge). |
 | `system_packet_drops` | Aggregated number of system packet drops (IPv4 and IPv6) (linux only) (gauge). |
 | `arrival_period` | Histogram of the time between successive packets in nanoseconds. |

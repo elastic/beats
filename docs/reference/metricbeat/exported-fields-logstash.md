@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-logstash.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Logstash fields [exported-fields-logstash]
 
 Logstash module
@@ -10,55 +12,55 @@ Logstash module
 **`logstash_stats.timestamp`**
 :   type: alias
 
-alias to: @timestamp
+    alias to: @timestamp
 
 
 **`logstash_stats.jvm.mem.heap_used_in_bytes`**
 :   type: alias
 
-alias to: logstash.node.stats.jvm.mem.heap_used_in_bytes
+    alias to: logstash.node.stats.jvm.mem.heap_used_in_bytes
 
 
 **`logstash_stats.jvm.mem.heap_max_in_bytes`**
 :   type: alias
 
-alias to: logstash.node.stats.jvm.mem.heap_max_in_bytes
+    alias to: logstash.node.stats.jvm.mem.heap_max_in_bytes
 
 
 **`logstash_stats.jvm.uptime_in_millis`**
 :   type: alias
 
-alias to: logstash.node.stats.jvm.uptime_in_millis
+    alias to: logstash.node.stats.jvm.uptime_in_millis
 
 
 **`logstash_stats.events.in`**
 :   type: alias
 
-alias to: logstash.node.stats.events.in
+    alias to: logstash.node.stats.events.in
 
 
 **`logstash_stats.events.out`**
 :   type: alias
 
-alias to: logstash.node.stats.events.out
+    alias to: logstash.node.stats.events.out
 
 
 **`logstash_stats.events.duration_in_millis`**
 :   type: alias
 
-alias to: logstash.node.stats.events.duration_in_millis
+    alias to: logstash.node.stats.events.duration_in_millis
 
 
 **`logstash_stats.logstash.uuid`**
 :   type: alias
 
-alias to: logstash.node.stats.logstash.uuid
+    alias to: logstash.node.stats.logstash.uuid
 
 
 **`logstash_stats.logstash.version`**
 :   type: alias
 
-alias to: logstash.node.stats.logstash.version
+    alias to: logstash.node.stats.logstash.version
 
 
 **`logstash_stats.pipelines`**
@@ -68,86 +70,84 @@ alias to: logstash.node.stats.logstash.version
 **`logstash_stats.os.cpu.load_average.15m`**
 :   type: alias
 
-alias to: logstash.node.stats.os.cpu.load_average.15m
+    alias to: logstash.node.stats.os.cpu.load_average.15m
 
 
 **`logstash_stats.os.cpu.load_average.1m`**
 :   type: alias
 
-alias to: logstash.node.stats.os.cpu.load_average.1m
+    alias to: logstash.node.stats.os.cpu.load_average.1m
 
 
 **`logstash_stats.os.cpu.load_average.5m`**
 :   type: alias
 
-alias to: logstash.node.stats.os.cpu.load_average.5m
+    alias to: logstash.node.stats.os.cpu.load_average.5m
 
 
 **`logstash_stats.os.cgroup.cpuacct.usage_nanos`**
 :   type: alias
 
-alias to: logstash.node.stats.os.cgroup.cpuacct.usage_nanos
+    alias to: logstash.node.stats.os.cgroup.cpuacct.usage_nanos
 
 
 **`logstash_stats.os.cgroup.cpu.cfs_quota_micros`**
 :   type: alias
 
-alias to: logstash.node.stats.os.cgroup.cpu.cfs_quota_micros
+    alias to: logstash.node.stats.os.cgroup.cpu.cfs_quota_micros
 
 
 **`logstash_stats.os.cgroup.cpu.stat.number_of_elapsed_periods`**
 :   type: alias
 
-alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods
+    alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods
 
 
 **`logstash_stats.os.cgroup.cpu.stat.time_throttled_nanos`**
 :   type: alias
 
-alias to: logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos
+    alias to: logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos
 
 
 **`logstash_stats.os.cgroup.cpu.stat.number_of_times_throttled`**
 :   type: alias
 
-alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled
+    alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled
 
 
 **`logstash_stats.process.cpu.percent`**
 :   type: alias
 
-alias to: logstash.node.stats.process.cpu.percent
+    alias to: logstash.node.stats.process.cpu.percent
 
 
 **`logstash_stats.queue.events_count`**
 :   type: alias
 
-alias to: logstash.node.stats.queue.events_count
+    alias to: logstash.node.stats.queue.events_count
 
 
 **`logstash_state.pipeline.id`**
 :   type: alias
 
-alias to: logstash.node.state.pipeline.id
+    alias to: logstash.node.state.pipeline.id
 
 
 **`logstash_state.pipeline.hash`**
 :   type: alias
 
-alias to: logstash.node.state.pipeline.hash
+    alias to: logstash.node.state.pipeline.hash
 
 
 **`logstash.elasticsearch.cluster.id`**
 :   type: keyword
 
 
-
-## node [_node_6]
+## node [_node]
 
 node
 
-
-## node [_node_7]
+## node [_node]
 
 node_stats metrics.
 
@@ -198,36 +198,35 @@ node_stats metrics.
 **`logstash.node.host`**
 :   Host name
 
-type: alias
+    type: alias
 
-alias to: host.hostname
+    alias to: host.hostname
 
 
 **`logstash.node.version`**
 :   Logstash Version
 
-type: alias
+    type: alias
 
-alias to: service.version
+    alias to: service.version
 
 
-
-## jvm [_jvm_3]
+## jvm [_jvm]
 
 JVM Info
 
 **`logstash.node.jvm.version`**
 :   Version
 
-type: keyword
+    type: keyword
 
 
 **`logstash.node.jvm.pid`**
 :   Process ID
 
-type: alias
+    type: alias
 
-alias to: process.pid
+    alias to: process.pid
 
 
 **`logstash.node.stats.timestamp`**
@@ -246,27 +245,26 @@ alias to: process.pid
 :   type: long
 
 
-
-## events [_events_2]
+## events [_events]
 
 Events stats
 
 **`logstash.node.stats.events.in`**
 :   Incoming events counter.
 
-type: long
+    type: long
 
 
 **`logstash.node.stats.events.out`**
 :   Outgoing events counter.
 
-type: long
+    type: long
 
 
 **`logstash.node.stats.events.filtered`**
 :   Filtered events counter.
 
-type: long
+    type: long
 
 
 **`logstash.node.stats.events.duration_in_millis`**

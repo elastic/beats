@@ -19,6 +19,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory/internal/activedirectory"
@@ -85,7 +86,7 @@ func (p *adInput) configure(cfg *config.C) (kvstore.Input, error) {
 		return nil, err
 	}
 	if p.cfg.TLS.IsEnabled() && u.Scheme == "ldaps" {
-		tlsConfig, err := tlscommon.LoadTLSConfig(p.cfg.TLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(p.cfg.TLS, p.logger)
 		if err != nil {
 			return nil, err
 		}
@@ -115,9 +116,13 @@ func (*adInput) Test(v2.TestContext) error { return nil }
 
 // Run will start data collection on this provider.
 func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
+	stat := inputCtx.StatusReporter
+	if stat == nil {
+		stat = noopReporter{}
+	}
+	stat.UpdateStatus(status.Starting, "")
 	p.logger = inputCtx.Logger.With("provider", Name, "domain", p.cfg.URL)
-	p.metrics = newMetrics(inputCtx.ID, nil)
-	defer p.metrics.Close()
+	p.metrics = newMetrics(inputCtx.MetricsRegistry)
 
 	lastSyncTime, _ := getLastSync(store)
 	syncWaitTime := time.Until(lastSyncTime.Add(p.cfg.SyncInterval))
@@ -130,6 +135,7 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 	p.cfg.UserAttrs = withMandatory(p.cfg.UserAttrs, "distinguishedName", "whenChanged")
 	p.cfg.GrpAttrs = withMandatory(p.cfg.GrpAttrs, "distinguishedName", "whenChanged")
 
+	stat.UpdateStatus(status.Running, "")
 	var (
 		last time.Time
 		err  error
@@ -138,14 +144,21 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 		select {
 		case <-inputCtx.Cancelation.Done():
 			if !errors.Is(inputCtx.Cancelation.Err(), context.Canceled) {
-				return inputCtx.Cancelation.Err()
+				err := inputCtx.Cancelation.Err()
+				stat.UpdateStatus(status.Stopping, err.Error())
+				return err
 			}
+			stat.UpdateStatus(status.Stopping, "Deadline passed")
 			return nil
 		case start := <-syncTimer.C:
 			last, err = p.runFullSync(inputCtx, store, client)
 			if err != nil {
-				p.logger.Errorw("Error running full sync", "error", err)
+				msg := "Error running full sync"
+				p.logger.Errorw(msg, "error", err)
+				stat.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.syncError.Inc()
+			} else {
+				stat.UpdateStatus(status.Running, "Successful full sync")
 			}
 			p.metrics.syncTotal.Inc()
 			p.metrics.syncProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -164,8 +177,12 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 		case start := <-updateTimer.C:
 			last, err = p.runIncrementalUpdate(inputCtx, store, last, client)
 			if err != nil {
-				p.logger.Errorw("Error running incremental update", "error", err)
+				msg := "Error running incremental update"
+				p.logger.Errorw(msg, "error", err)
+				stat.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.updateError.Inc()
+			} else {
+				stat.UpdateStatus(status.Running, "Successful incremental update")
 			}
 			p.metrics.updateTotal.Inc()
 			p.metrics.updateProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -174,6 +191,10 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 		}
 	}
 }
+
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}
 
 // withMandatory adds the required attribute names to attr unless attr is empty.
 func withMandatory(attr []string, include ...string) []string {
@@ -212,65 +233,43 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 		}
 	}()
 
-	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
-	p.logger.Debugf("Starting fetch...")
-	users, err := p.doFetchUsers(ctx, state, true)
-	if err != nil {
-		return time.Time{}, err
-	}
-
-	if len(users) != 0 || state.len() != 0 {
-		// Active Directory does not have a notion of deleted users
-		// beyond absence from the directory, so compare found users
-		// with users already known by the state store and if any
-		// are in the store but not returned in the previous fetch,
-		// mark them as deleted and publish the deletion. We do not
-		// have the time of the deletion, so use now.
-		if state.len() != 0 {
-			found := make(map[string]bool)
-			for _, u := range users {
-				found[u.ID] = true
-			}
-			deleted := make(map[string]*User)
-			now := time.Now()
-			state.forEach(func(u *User) {
-				if u.State == Deleted {
-					// We have already seen that this is deleted
-					// so we do not need to publish again. The
-					// user will be deleted from the store when
-					// the state is closed.
-					return
-				}
-				if found[u.ID] {
-					// We have the user, so we do not need to
-					// mark it as deleted.
-					return
-				}
-				// This modifies the state store's copy since u
-				// is a pointer held by the state store map.
-				u.State = Deleted
-				u.WhenChanged = now
-				deleted[u.ID] = u
-			})
-			for _, u := range deleted {
-				users = append(users, u)
+	wantUsers := p.cfg.wantUsers()
+	wantDevices := p.cfg.wantDevices()
+	if wantUsers || wantDevices {
+		var users, devices []*User
+		ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
+		p.logger.Debugf("Starting fetch...")
+		if wantUsers {
+			users, err = p.doFetchUsers(ctx, state, true)
+			if err != nil {
+				return time.Time{}, err
 			}
 		}
-		if len(users) != 0 {
-			start := time.Now()
-			tracker := kvstore.NewTxTracker(ctx)
-			p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
-			for _, u := range users {
-				p.publishUser(u, state, inputCtx.ID, client, tracker)
+		if wantDevices {
+			devices, err = p.doFetchDevices(ctx, state, true)
+			if err != nil {
+				return time.Time{}, err
 			}
-			end := time.Now()
-			p.publishMarker(end, end, inputCtx.ID, false, client, tracker)
-			tracker.Wait()
 		}
-	}
 
-	if ctx.Err() != nil {
-		return time.Time{}, ctx.Err()
+		tracker := kvstore.NewTxTracker(ctx)
+		start := time.Now()
+		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
+
+		for _, u := range p.unifyState(ctx, state.users, users) {
+			p.publishUser(u, state, inputCtx.ID, client, tracker)
+		}
+		for _, d := range p.unifyState(ctx, state.devices, devices) {
+			p.publishDevice(d, state, inputCtx.ID, client, tracker)
+		}
+
+		end := time.Now()
+		p.publishMarker(end, end, inputCtx.ID, false, client, tracker)
+		tracker.Wait()
+
+		if ctx.Err() != nil {
+			return time.Time{}, ctx.Err()
+		}
 	}
 
 	// state.whenChanged is modified by the call to doFetchUsers to be
@@ -285,6 +284,52 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 	}
 
 	return latest, nil
+}
+
+// unifyState merges the state and entries, updating User values that have
+// are in state, but not in entries to mark them as deleted.
+func (p *adInput) unifyState(ctx context.Context, state map[string]*User, entries []*User) []*User {
+	if len(entries) == 0 && len(state) == 0 {
+		return nil
+	}
+
+	// Active Directory does not have a notion of deleted users
+	// beyond absence from the directory, so compare found users
+	// with users already known by the state store and if any
+	// are in the store but not returned in the previous fetch,
+	// mark them as deleted and publish the deletion. We do not
+	// have the time of the deletion, so use now.
+	if len(state) != 0 {
+		found := make(map[string]bool)
+		for _, u := range entries {
+			found[u.ID] = true
+		}
+		deleted := make(map[string]*User)
+		now := time.Now()
+		for _, e := range state {
+			if e.State == Deleted {
+				// We have already seen that this is deleted
+				// so we do not need to publish again. The
+				// user will be deleted from the store when
+				// the state is closed.
+				continue
+			}
+			if found[e.ID] {
+				// We have the user, so we do not need to
+				// mark it as deleted.
+				continue
+			}
+			// This modifies the state store's copy since u
+			// is a pointer held by the state store map.
+			e.State = Deleted
+			e.WhenChanged = now
+			deleted[e.ID] = e
+		}
+		for _, d := range deleted {
+			entries = append(entries, d)
+		}
+	}
+	return entries
 }
 
 // runIncrementalUpdate will run an incremental update. The process is similar
@@ -304,16 +349,28 @@ func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store
 		}
 	}()
 
+	var updatedUsers, updatedDevices []*User
 	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
-	updatedUsers, err := p.doFetchUsers(ctx, state, false)
-	if err != nil {
-		return last, err
+	if p.cfg.wantUsers() {
+		updatedUsers, err = p.doFetchUsers(ctx, state, false)
+		if err != nil {
+			return last, err
+		}
+	}
+	if p.cfg.wantDevices() {
+		updatedDevices, err = p.doFetchDevices(ctx, state, false)
+		if err != nil {
+			return last, err
+		}
 	}
 
-	if len(updatedUsers) != 0 {
+	if len(updatedUsers) != 0 || len(updatedDevices) != 0 {
 		tracker := kvstore.NewTxTracker(ctx)
 		for _, u := range updatedUsers {
 			p.publishUser(u, state, inputCtx.ID, client, tracker)
+		}
+		for _, d := range updatedDevices {
+			p.publishDevice(d, state, inputCtx.ID, client, tracker)
 		}
 		tracker.Wait()
 	}
@@ -345,7 +402,11 @@ func (p *adInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync 
 		since = state.whenChanged
 	}
 
-	entries, err := activedirectory.GetDetails(p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
+	query := "(&(objectCategory=person)(objectClass=user))"
+	if p.cfg.UserQuery != "" {
+		query = p.cfg.UserQuery
+	}
+	entries, err := activedirectory.GetDetails(query, p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
 	p.logger.Debugf("received %d users from API", len(entries))
 	if err != nil {
 		return nil, err
@@ -360,6 +421,38 @@ func (p *adInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync 
 	}
 	p.logger.Debugf("processed %d users from API", len(users))
 	return users, nil
+}
+
+// doFetchDevices handles fetching device identities from Active Directory. If
+// fullSync is true, then any existing whenChanged will be ignored, forcing a
+// full synchronization from Active Directory. The whenChanged time of state
+// is modified to be the time stamp of the latest User.WhenChanged value.
+// Returns a set of modified users by ID.
+func (p *adInput) doFetchDevices(ctx context.Context, state *stateStore, fullSync bool) ([]*User, error) {
+	var since time.Time
+	if !fullSync {
+		since = state.whenChanged
+	}
+
+	query := "(&(objectClass=computer)(objectClass=user))"
+	if p.cfg.DeviceQuery != "" {
+		query = p.cfg.DeviceQuery
+	}
+	entries, err := activedirectory.GetDetails(query, p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
+	p.logger.Debugf("received %d devices from API", len(entries))
+	if err != nil {
+		return nil, err
+	}
+
+	devices := make([]*User, 0, len(entries))
+	for _, d := range entries {
+		devices = append(devices, state.storeDevice(d))
+		if d.WhenChanged.After(state.whenChanged) {
+			state.whenChanged = d.WhenChanged
+		}
+	}
+	p.logger.Debugf("processed %d devices from API", len(devices))
+	return devices, nil
 }
 
 // publishMarker will publish a write marker document using the given beat.Client.
@@ -416,6 +509,35 @@ func (p *adInput) publishUser(u *User, state *stateStore, inputID string, client
 	tracker.Add()
 
 	p.logger.Debugf("Publishing user %q", u.ID)
+
+	client.Publish(event)
+}
+
+// publishDevices will publish a device document using the given beat.Client.
+func (p *adInput) publishDevice(u *User, state *stateStore, inputID string, client beat.Client, tracker *kvstore.TxTracker) {
+	userDoc := mapstr.M{}
+
+	_, _ = userDoc.Put("activedirectory", u.Entry)
+	_, _ = userDoc.Put("labels.identity_source", inputID)
+	_, _ = userDoc.Put("device.id", u.ID)
+
+	switch u.State {
+	case Deleted:
+		_, _ = userDoc.Put("event.action", "device-deleted")
+	case Discovered:
+		_, _ = userDoc.Put("event.action", "device-discovered")
+	case Modified:
+		_, _ = userDoc.Put("event.action", "device-modified")
+	}
+
+	event := beat.Event{
+		Timestamp: time.Now(),
+		Fields:    userDoc,
+		Private:   tracker,
+	}
+	tracker.Add()
+
+	p.logger.Debugf("Publishing device %q", u.ID)
 
 	client.Publish(event)
 }

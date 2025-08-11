@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type inputParsersConfig struct {
@@ -109,7 +110,7 @@ func TestParsersExampleInline(t *testing.T) {
 			err := cfg.Unpack(&c)
 			require.NoError(t, err)
 
-			p := c.Parsers.Create(testReader(test.lines))
+			p := c.Parsers.Create(testReader(test.lines), logptest.NewTestingLogger(t, ""))
 
 			i := 0
 			msg, err := p.Next()

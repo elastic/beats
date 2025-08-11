@@ -2,6 +2,8 @@
 navigation_title: "Quick start"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-installation-configuration.html
+applies_to:
+  stack: ga
 ---
 
 # Filebeat quick start: installation and configuration [filebeat-installation-configuration]
@@ -47,38 +49,38 @@ To download and install Filebeat, use the commands that work with your system:
 ::::::{tab-item} DEB
 :sync: deb
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{stack-version}}-amd64.deb
-sudo dpkg -i filebeat-{{stack-version}}-amd64.deb
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{version.stack}}-amd64.deb
+sudo dpkg -i filebeat-{{version.stack}}-amd64.deb
 ```
 ::::::
 
 ::::::{tab-item} RPM
 :sync: rpm
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{stack-version}}-x86_64.rpm
-sudo rpm -vi filebeat-{{stack-version}}-x86_64.rpm
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{version.stack}}-x86_64.rpm
+sudo rpm -vi filebeat-{{version.stack}}-x86_64.rpm
 ```
 ::::::
 
 ::::::{tab-item} MacOS
 :sync: macos
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{stack-version}}-darwin-x86_64.tar.gz
-tar xzvf filebeat-{{stack-version}}-darwin-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{version.stack}}-darwin-x86_64.tar.gz
+tar xzvf filebeat-{{version.stack}}-darwin-x86_64.tar.gz
 ```
 ::::::
 
 ::::::{tab-item} Linux
 :sync: linux
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{stack-version}}-linux-x86_64.tar.gz
-tar xzvf filebeat-{{stack-version}}-linux-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{version.stack}}-linux-x86_64.tar.gz
+tar xzvf filebeat-{{version.stack}}-linux-x86_64.tar.gz
 ```
 ::::::
 
 ::::::{tab-item} Windows
 :sync: windows
-1. Download the [Filebeat Windows zip file](https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{stack-version}}-windows-x86_64.zip).
+1. Download the [Filebeat Windows zip file](https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{version.stack}}-windows-x86_64.zip).
 
 2. Extract the contents of the zip file into `C:\Program Files`.
 
@@ -154,13 +156,14 @@ cloud.auth: "filebeat_setup:YOUR_PASSWORD" <1>
     ```yaml
       setup.kibana:
         host: "mykibanahost:5601" <1>
-        username: "my_kibana_user" <2> <3>
+        username: "my_kibana_user" <2>
         password: "YOUR_PASSWORD"
     ```
 
     1. The hostname and port of the machine where {{kib}} is running, for example, `mykibanahost:5601`. If you specify a path after the port number, include the scheme and port: `http://mykibanahost:5601/path`.
     2. The `username` and `password` settings for {{kib}} are optional. If you don’t specify credentials for {{kib}}, Filebeat uses the `username` and `password` specified for the {{es}} output.
-    3. To use the pre-built {{kib}} dashboards, this user must be authorized to view dashboards or have the `kibana_admin` [built-in role](elasticsearch://reference/elasticsearch/roles.md).
+
+        To use the pre-built {{kib}} dashboards, this user must be authorized to view dashboards or have the `kibana_admin` [built-in role](elasticsearch://reference/elasticsearch/roles.md).
 ::::::
 
 :::::::
@@ -176,8 +179,8 @@ You can send data to other [outputs](/reference/filebeat/configuring-output.md),
 
 There are several ways to collect log data with Filebeat:
 
-* Data collection modules — simplify the collection, parsing, and visualization of common log formats
-* ECS loggers — structure and format application logs into ECS-compatible JSON
+* Data collection modules — simplify the collection, parsing, and visualization of common log formats
+* ECS loggers — structure and format application logs into ECS-compatible JSON
 * Manual Filebeat configuration
 
 
@@ -354,6 +357,10 @@ visualizing your data. To load these assets:
 
     `-e` is optional and sends output to standard error instead of the configured log output.
 
+The default location where Windows log files are stored varies:
+* {applies_to}`stack: ga 9.1` `C:\Program Files\Filebeat-Data\Logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\filebeat\Logs`
+
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to {{es}} and deploys the sample dashboards for visualizing the data in {{kib}}.
 
 This step does not load the ingest pipelines used to parse log lines. By default, ingest pipelines are set up automatically the first time you run the module and connect to {{es}}.
@@ -434,7 +441,9 @@ sudo ./filebeat -e
 PS C:\Program Files\filebeat> Start-Service filebeat
 ```
 
-By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
+The default location where Windows log files are stored varies:
+* {applies_to}`stack: ga 9.1` `C:\Program Files\Filebeat-Data\Logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\filebeat\Logs`
 ::::::
 
 :::::::

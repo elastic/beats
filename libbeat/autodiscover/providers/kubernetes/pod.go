@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !aix
+//go:build linux || darwin || windows
 
 package kubernetes
 
@@ -58,8 +58,14 @@ type pod struct {
 }
 
 // NewPodEventer creates an eventer that can discover and process pod objects
-func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
-	logger := logp.NewLogger("autodiscover.pod")
+func NewPodEventer(
+	uuid uuid.UUID,
+	cfg *conf.C,
+	client k8s.Interface,
+	publish func(event []bus.Event),
+	logger *logp.Logger,
+) (Eventer, error) {
+	logger = logger.Named("autodiscover.pod")
 
 	var replicaSetWatcher, jobWatcher, namespaceWatcher, nodeWatcher kubernetes.Watcher
 
@@ -93,7 +99,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 		Node:         config.Node,
 		Namespace:    config.Namespace,
 		HonorReSyncs: true,
-	}, nil)
+	}, nil, logger)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Pod{}, err)
 	}
@@ -115,7 +121,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 			Node:         config.Node,
 			HonorReSyncs: true,
 		}
-		nodeWatcher, err = kubernetes.NewNamedWatcher("node", client, &kubernetes.Node{}, options, nil)
+		nodeWatcher, err = kubernetes.NewNamedWatcher("node", client, &kubernetes.Node{}, options, nil, logger)
 		if err != nil {
 			logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
 		}
@@ -126,7 +132,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 			SyncTimeout:  config.SyncPeriod,
 			Namespace:    config.Namespace,
 			HonorReSyncs: true,
-		}, nil)
+		}, nil, logger)
 		if err != nil {
 			logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 		}
@@ -153,6 +159,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 			},
 			nil,
 			metadata.RemoveUnnecessaryReplicaSetData,
+			logger,
 		)
 		if err != nil {
 			logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
@@ -163,7 +170,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 			SyncTimeout:  config.SyncPeriod,
 			Namespace:    config.Namespace,
 			HonorReSyncs: true,
-		}, nil)
+		}, nil, logger)
 		if err != nil {
 			logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
 		}

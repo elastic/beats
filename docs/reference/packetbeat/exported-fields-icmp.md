@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-icmp.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # ICMP fields [exported-fields-icmp]
 
 ICMP specific event fields.
@@ -14,36 +16,36 @@ ICMP specific event fields.
 **`icmp.request.message`**
 :   A human readable form of the request.
 
-type: keyword
+    type: keyword
 
 
 **`icmp.request.type`**
 :   The request type.
 
-type: long
+    type: long
 
 
 **`icmp.request.code`**
 :   The request code.
 
-type: long
+    type: long
 
 
 **`icmp.response.message`**
 :   A human readable form of the response.
 
-type: keyword
+    type: keyword
 
 
 **`icmp.response.type`**
 :   The response type.
 
-type: long
+    type: long
 
 
 **`icmp.response.code`**
 :   The response code.
 
-type: long
+    type: long
 
 

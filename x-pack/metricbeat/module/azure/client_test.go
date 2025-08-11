@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package azure
 
 import (
@@ -15,6 +17,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var (
@@ -45,13 +49,14 @@ func mockMapResourceMetrics(client *Client, resources []*armresources.GenericRes
 }
 
 func TestInitResources(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	t.Run("return error when no resource options were configured", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logger)
 		err := client.InitResources(mockMapResourceMetrics)
 		assert.Error(t, err, "no resource options were configured")
 	})
 	t.Run("return error no resources were found", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logger)
 		client.Config = resourceQueryConfig
 		m := &MockService{}
 		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]*armresources.GenericResourceExpanded{}, errors.New("invalid resource query"))
@@ -66,7 +71,8 @@ func TestInitResources(t *testing.T) {
 }
 
 func TestGetMetricValues(t *testing.T) {
-	client := NewMockClient()
+	logger := logptest.NewTestingLogger(t, "")
+	client := NewMockClient(logger)
 	client.Config = resourceIDConfig
 
 	t.Run("return no error when no metric values are returned but log and send event", func(t *testing.T) {
@@ -117,7 +123,7 @@ func TestGetMetricValues(t *testing.T) {
 	})
 
 	t.Run("multiple aggregation types", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logger)
 		referenceTime := time.Now().UTC()
 		client.ResourceConfigurations = ResourceConfiguration{
 			Metrics: []Metric{
@@ -182,7 +188,7 @@ func TestGetMetricValues(t *testing.T) {
 	})
 
 	t.Run("single aggregation types", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logger)
 		referenceTime := time.Now().UTC()
 		timestamp := time.Now().UTC()
 		client.ResourceConfigurations = ResourceConfiguration{
@@ -268,57 +274,4 @@ func TestGetMetricValues(t *testing.T) {
 
 		m.AssertExpectations(t)
 	})
-}
-
-func TestBuildBuildTimespan(t *testing.T) {
-	t.Run("Collection period greater than the time grain (PT1M metric every 5 minutes)", func(t *testing.T) {
-		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
-		timeGain := "PT1M"
-		collectionPeriod := 5 * time.Minute
-
-		timespan := buildTimespan(referenceTime, timeGain, collectionPeriod)
-
-		assert.Equal(t, "2024-07-30T18:51:00Z/2024-07-30T18:56:00Z", timespan)
-	})
-
-	t.Run("Collection period equal to time grain (PT1M metric every 1 minutes)", func(t *testing.T) {
-		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
-		timeGain := "PT1M"
-		collectionPeriod := 1 * time.Minute
-
-		timespan := buildTimespan(referenceTime, timeGain, collectionPeriod)
-
-		assert.Equal(t, "2024-07-30T18:55:00Z/2024-07-30T18:56:00Z", timespan)
-	})
-
-	t.Run("Collection period equal to time grain (PT5M metric every 5 minutes)", func(t *testing.T) {
-		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
-		timeGain := "PT5M"
-		collectionPeriod := 5 * time.Minute
-
-		timespan := buildTimespan(referenceTime, timeGain, collectionPeriod)
-
-		assert.Equal(t, "2024-07-30T18:51:00Z/2024-07-30T18:56:00Z", timespan)
-	})
-
-	t.Run("Collection period equal to time grain (PT1H metric every 60 minutes)", func(t *testing.T) {
-		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
-		timeGain := "PT1H"
-		collectionPeriod := 60 * time.Minute
-
-		timespan := buildTimespan(referenceTime, timeGain, collectionPeriod)
-
-		assert.Equal(t, "2024-07-30T17:56:00Z/2024-07-30T18:56:00Z", timespan)
-	})
-
-	t.Run("Collection period is less that time grain (PT1H metric every 5 minutes)", func(t *testing.T) {
-		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
-		timeGain := "PT1H"
-		collectionPeriod := 5 * time.Minute
-
-		timespan := buildTimespan(referenceTime, timeGain, collectionPeriod)
-
-		assert.Equal(t, "2024-07-30T17:56:00Z/2024-07-30T18:56:00Z", timespan)
-	})
-
 }
