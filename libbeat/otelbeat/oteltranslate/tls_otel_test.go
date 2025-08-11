@@ -57,6 +57,8 @@ ssl:
 		assert.Equal(t, map[string]any{
 			"insecure_skip_verify":         true,
 			"include_system_ca_certs_pool": true,
+			"min_version":                  "1.2",
+			"max_version":                  "1.3",
 		}, got, "beats to otel ssl mapping")
 
 	})

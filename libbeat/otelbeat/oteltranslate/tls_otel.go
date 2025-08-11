@@ -33,10 +33,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
-// default min and max TLS version in OTel
-const defaultMinTLSVersion = tls.VersionTLS12
-const defaultMaxTLSVersion = tls.VersionTLS13
-
 var tlsVersions = map[uint16]string{
 	tls.VersionTLS10: "1.0",
 	tls.VersionTLS11: "1.1",
@@ -163,13 +159,8 @@ func TLSCommonToOTel(output *config.C, logger *logp.Logger) (map[string]any, err
 	setIfNotNil(otelTLSConfig, "key_pem", certKeyPem)               // ssl.key
 	setIfNotNil(otelTLSConfig, "cipher_suites", ciphersuites)       // ssl.cipher_suites
 
-	if goTLSConfig.MinVersion != defaultMinTLSVersion { // ssl.min_version
-		otelTLSConfig["min_version"] = tlsVersions[goTLSConfig.MinVersion]
-	}
-
-	if goTLSConfig.MaxVersion != defaultMaxTLSVersion { // ssl.max_version
-		otelTLSConfig["max_version"] = tlsVersions[goTLSConfig.MaxVersion]
-	}
+	otelTLSConfig["min_version"] = tlsVersions[goTLSConfig.MinVersion]
+	otelTLSConfig["max_version"] = tlsVersions[goTLSConfig.MaxVersion]
 
 	if err := typeSafetyCheck(otelTLSConfig); err != nil {
 		return nil, err
