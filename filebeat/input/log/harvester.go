@@ -155,6 +155,8 @@ func NewHarvester(
 		return nil, err
 	}
 
+	h.config.checkUnsupportedParams(logger)
+
 	encodingFactory, ok := encoding.FindEncoding(h.config.Encoding)
 	if !ok || encodingFactory == nil {
 		return nil, fmt.Errorf("unknown encoding('%v')", h.config.Encoding)
@@ -662,7 +664,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
-	reader, err := debug.AppendReaders(h.log)
+	reader, err := debug.AppendReaders(h.log, h.logger)
 	if err != nil {
 		return nil, err
 	}
