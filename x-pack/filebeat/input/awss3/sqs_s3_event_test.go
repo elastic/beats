@@ -27,6 +27,7 @@ import (
 )
 
 func TestSQSS3EventProcessor(t *testing.T) {
+	//nolint:staticcheck // TODO: fix during sweep of global loggers
 	err := logp.TestingSetup()
 	require.NoError(t, err)
 	msg, err := newSQSMessage(newS3Event("log.json"))
@@ -224,6 +225,7 @@ func TestSqsProcessor_keepalive(t *testing.T) {
 }
 
 func TestSqsProcessor_getS3Notifications(t *testing.T) {
+	//nolint:staticcheck // TODO: fix during sweep of global loggers
 	err := logp.TestingSetup()
 	require.NoError(t, err)
 
