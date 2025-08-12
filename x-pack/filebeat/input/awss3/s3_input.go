@@ -90,7 +90,7 @@ func (in *s3PollerInput) Run(
 	in.status.UpdateStatus(status.Configuring, "Configuring input")
 	in.s3, err = in.createS3API(ctx)
 	if err != nil {
-		err = fmt.Errorf("failed to create S3 API: %w", err)
+		err = fmt.Errorf("failed to create S3 API for bucket ARN '%s': Error: %w", in.config.getBucketARN(), err)
 		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failure: %s", err.Error()))
 		return err
 	}
