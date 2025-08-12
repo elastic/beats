@@ -738,6 +738,10 @@ In the administration dashboard for your Okta account, navigate to Security>API 
 
 #### OAuth2 Authentication (Recommended)
 
+```{applies_to}
+stack: ga 9.2.0
+```
+
 For enhanced security, the provider supports OAuth2 authentication using two methods:
 
 ##### JWT-Based Authentication
@@ -989,7 +993,7 @@ filebeat.inputs:
   sync_interval: "12h"
   update_interval: "30m"
   okta_domain: "your-domain.okta.com"
-  oauth2:
+  oauth2: <1>
     enabled: true
     client.id: "your-client-id"
     scopes: ["okta.users.read", "okta.devices.read"]
@@ -997,6 +1001,7 @@ filebeat.inputs:
     okta:
       jwk_file: "/path/to/private-key.jwk"
 ```
+1. {applies_to}`stack: ga 9.2`
 
 Example configuration with OAuth2 client secret authentication:
 
@@ -1011,13 +1016,14 @@ filebeat.inputs:
   sync_interval: "12h"
   update_interval: "30m"
   okta_domain: "your-domain.okta.com"
-  oauth2:
+  oauth2: <1>
     enabled: true
     client.id: "your-client-id"
     client.secret: "your-client-secret"
     scopes: ["okta.users.read", "okta.devices.read"]
     token_url: "https://your-domain.okta.com/oauth2/v1/token"
 ```
+1. {applies_to}`stack: ga 9.2`
 
 The `okta` provider supports the following configuration:
 
