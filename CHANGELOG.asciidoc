@@ -3,6 +3,11 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.19.2]]
+=== Beats version 8.19.2
+https://github.com/elastic/beats/compare/v8.19.1\...v8.19.2[View commits]
+
+
 [[release-notes-8.19.1]]
 === Beats version 8.19.1
 https://github.com/elastic/beats/compare/v8.19.0\...v8.19.1[View commits]
