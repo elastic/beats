@@ -24,6 +24,8 @@ import (
 	"fmt"
 
 	tkbtf "github.com/elastic/tk-btf"
+
+	"github.com/cilium/ebpf/btf"
 )
 
 type fsNotifySymbol struct {
@@ -58,6 +60,58 @@ func loadFsNotifySymbol(s *probeManager) error {
 	return nil
 }
 
+// setKprobeFiltersFromBTF fetches the enum values of the fsnotify_data_type enum from the BTF,
+// and uses them to construct the probe filters, so that each of the three fsnotify probes only forwards
+// events from the matching data type.
+func (f *fsNotifySymbol) setKprobeFiltersFromBTF(spec *tkbtf.Spec) error {
+	types, err := spec.AnyTypesByName("fsnotify_data_type")
+	if err != nil {
+		// Kernels pre-5.7 do not have the fsnotify_data_type enum and instead code the data types as #define statements.
+		// These do not show up in the BTF output, and thus we need a manual fallback.
+		if errors.Is(err, btf.ErrNotFound) {
+			f.setKprobeFilters(1, 2, 3)
+			return nil
+		}
+		return fmt.Errorf("error fetching fsnotify_data_type from BTF: %w", err)
+	}
+	btfEnum := &btf.Enum{}
+	found := false
+
+	for _, foundType := range types {
+		btfEnum, found = foundType.(*btf.Enum)
+		if !found {
+			continue
+		} else {
+			break
+		}
+	}
+
+	if !found || btfEnum == nil {
+		return fmt.Errorf("fsnotify_data_type not an enum, this may be a kernel support issue.")
+	}
+
+	var dentry, path, inode uint64
+	for _, enumType := range btfEnum.Values {
+		switch enumType.Name {
+		case "FSNOTIFY_EVENT_PATH":
+			path = enumType.Value
+		case "FSNOTIFY_EVENT_INODE":
+			inode = enumType.Value
+		case "FSNOTIFY_EVENT_DENTRY":
+			dentry = enumType.Value
+		}
+	}
+
+	f.setKprobeFilters(path, inode, dentry)
+	return nil
+}
+
+func (f *fsNotifySymbol) setKprobeFilters(eventPath uint64, eventInode uint64, eventDentry uint64) {
+	f.pathProbeFilter = fmt.Sprintf("(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==%d", eventPath)
+	f.inodeProbeFilter = fmt.Sprintf("(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==%d && nptr!=0", eventInode)
+	f.dentryProbeFilter = fmt.Sprintf("(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==%d", eventDentry)
+}
+
 func (f *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, error) {
 	allocFunc := allocProbeEvent
 
@@ -74,9 +128,18 @@ func (f *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, e
 		// for linux kernel versions linux 5.17+, thus we start from here. To see how we handle all
 		// linux kernels filter variation check OnErr() method.
 		f.seenSpecs[spec] = struct{}{}
-		f.pathProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==1"
-		f.inodeProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==2 && nptr!=0"
-		f.dentryProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==3"
+		// ***************** TO WHOEVER IS DEBUGGING THIS CODE IN THE FUTURE: *****************
+		// the kprobe filters work by giving each of the three fsnotify kprobes (one each for dentry,
+		// inode and path-based events) filtering rules based on the presence
+		// of mask values, and the value of the fsnotify() data_type field.
+		// If for some reason these events become corrupted or invalid (changes in the kernel, kprobe bug on our end)
+		// the events that get get through the filters might look strange or corrupted with no apparent pattern.
+		// Your first debugging step should be to disable these filters.
+		// NOTE: in the future we may want to investigate alternatives to these filters (doing the filtering in userland, etc).
+		err := f.setKprobeFiltersFromBTF(spec)
+		if err != nil {
+			return nil, fmt.Errorf("error creating kprobe filters from BTF: %w", err)
+		}
 	}
 
 	pathProbe := tkbtf.NewKProbe().SetRef("fsnotify_path").AddFetchArgs(
