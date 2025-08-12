@@ -32,9 +32,6 @@ import (
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/elastic-agent-autodiscover/docker"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/gofrs/uuid/v5"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -43,6 +40,10 @@ import (
 	"sigs.k8s.io/kind/pkg/apis/config/v1alpha4"
 	"sigs.k8s.io/kind/pkg/cluster"
 	"sigs.k8s.io/kind/pkg/cmd"
+
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestHintsDocker(t *testing.T) {
