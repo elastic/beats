@@ -7,159 +7,27 @@
 === Beats version 9.0.5
 https://github.com/elastic/beats/compare/v9.0.4\...v9.0.5[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-- Improve error messages in AWS Health {pull}45408[45408]
-- Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
-
-*Osquerybeat*
-
-
-
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Bugfixes
-
-*Affecting all Beats*
-
 
 *Auditbeat*
 
 - auditd: Request status from a separate socket to avoid data congestion {pull}41207[41207]
 - Fix potential data loss in add_session_metadata. {pull}42795[42795]
 
-*Filebeat*
-
-
-*Heartbeat*
-
-
 
 *Metricbeat*
 
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-
-*Elastic Logging Plugin*
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
 
 
 ==== Added
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Auditbeat*
-
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]
 
-*Auditbeat*
-
-
-*Libbeat*
-
-
-
-*Heartbeat*
-
-
 *Metricbeat*
 
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
+- Improve error messages in AWS Health {pull}45408[45408]
 
 
 [[release-notes-9.0.4]]
