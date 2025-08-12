@@ -19,6 +19,7 @@ package elasticsearchtranslate
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -111,7 +112,11 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	}
 
 	// convert ssl configuration
+<<<<<<< HEAD
 	otelTLSConfg, err := oteltranslate.TLSCommonToOTel(escfg.Transport.TLS)
+=======
+	otelTLSConfg, err := oteltranslate.TLSCommonToOTel(output, logger)
+>>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
 	if err != nil {
 		return nil, fmt.Errorf("cannot convert SSL config into OTel: %w", err)
 	}
@@ -177,12 +182,17 @@ func checkUnsupportedConfig(cfg *config.C) error {
 	}
 
 	if !isStructEmpty(temp) {
+<<<<<<< HEAD
 		logp.Warn("these configuration parameters are not supported %+v", temp)
 		return nil
+=======
+		return fmt.Errorf("these configuration parameters are not supported %+v: %w", temp, errors.ErrUnsupported)
+>>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
 	}
 
 	// check for dictionary like parameters that we do not support yet
 	if cfg.HasField("indices") {
+<<<<<<< HEAD
 		logp.Warn("indices is currently not supported")
 	} else if cfg.HasField("pipelines") {
 		logp.Warn("pipelines is currently not supported")
@@ -192,6 +202,17 @@ func checkUnsupportedConfig(cfg *config.C) error {
 		logp.Warn("proxy_headers is currently not supported")
 	} else if value, err := cfg.Bool("allow_older_versions", -1); err == nil && !value {
 		logp.Warn("allow_older_versions:false is currently not supported")
+=======
+		return fmt.Errorf("indices is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("pipelines") {
+		return fmt.Errorf("pipelines is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("parameters") {
+		return fmt.Errorf("parameters is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("proxy_headers") {
+		return fmt.Errorf("proxy_headers is currently not supported: %w", errors.ErrUnsupported)
+	} else if value, err := cfg.Bool("allow_older_versions", -1); err == nil && !value {
+		return fmt.Errorf("allow_older_versions:false is currently not supported: %w", errors.ErrUnsupported)
+>>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
 	}
 	return nil
 }
