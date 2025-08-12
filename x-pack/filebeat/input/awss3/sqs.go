@@ -81,6 +81,9 @@ func readSQSMessages(
 		if err != nil {
 			statusReporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retryable SQS fetching error: %s", err.Error()))
 			log.Warnw("SQS ReceiveMessage returned an error. Will retry after a short delay.", "error", err)
+		} else {
+			// no auth error - input is running
+			statusReporter.UpdateStatus(status.Running, "Input is running")
 		}
 		// Wait for the retry delay, but stop early if the context is cancelled.
 		select {
