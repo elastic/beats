@@ -200,7 +200,7 @@ func (in *sqsReaderInput) readerLoop(ctx context.Context) {
 		// Block to wait for more requests if requestCount is zero
 		requestCount += channelRequestCount(ctx, in.workRequestChan, requestCount == 0)
 
-		msgs := readSQSMessages(ctx, in.log, in.status, in.sqs, in.metrics, requestCount)
+		msgs := readSQSMessages(ctx, in.log, in.status, in.sqs, in.metrics, requestCount, in.config.QueueURL)
 
 		for _, msg := range msgs {
 			select {
