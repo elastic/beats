@@ -51,6 +51,6 @@ Also see {beatname_url}/running-with-systemd.html[{beatname_uc} and systemd].
 PS C:{backslash}Program Files{backslash}{beatname_lc}> Start-Service {beatname_lc}
 ----
 
-By default, Windows log files are stored in +C:{backslash}ProgramData{backslash}{beatname_lc}\Logs+.
+By default, Windows log files are stored in +C:{backslash}Program Files{backslash}{beatname_uc}-Data\logs+.
 
 // end::win[]
