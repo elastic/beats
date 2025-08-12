@@ -147,7 +147,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			// empty string
 			cID, ok := (containerID).(string)
 			if !ok {
-				m.Logger().Debugf("Error while casting containerID: %s", ok)
+				m.Logger().Debugf("Error while casting containerID: %t", ok)
 			}
 			split := strings.Index(cID, "://")
 			if split != -1 {
@@ -162,7 +162,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if containerImage, ok := event["image"]; ok {
 			cImage, ok := (containerImage).(string)
 			if !ok {
-				m.Logger().Debugf("Error while casting containerImage: %s", ok)
+				m.Logger().Debugf("Error while casting containerImage: %t", ok)
 			}
 
 			kubernetes.ShouldPut(containerFields, "image.name", cImage, m.Logger())
