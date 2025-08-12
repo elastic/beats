@@ -38,7 +38,7 @@ type Client struct {
 
 // NewClient builds and returns a docker Client
 func NewClient(logger *logp.Logger) (Client, error) {
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logger)
 	return Client{cli: c}, err
 }
 
