@@ -29,7 +29,6 @@ import (
 // oktaTokenSource is a custom implementation of the oauth2.TokenSource interface.
 // For more information, see https://pkg.go.dev/golang.org/x/oauth2#TokenSource.
 type oktaTokenSource struct {
-	mu      sync.Mutex
 	ctx     context.Context
 	conf    *oauth2.Config
 	token   *oauth2.Token
@@ -39,11 +38,12 @@ type oktaTokenSource struct {
 // clientSecretTokenSource is a custom implementation of the oauth2.TokenSource interface
 // for client secret authentication.
 type clientSecretTokenSource struct {
-	mu           sync.Mutex
 	ctx          context.Context
 	conf         *oauth2.Config
 	clientSecret string
-	token        *oauth2.Token
+
+	mu    sync.Mutex
+	token *oauth2.Token
 }
 
 // fetchOktaOauthClient creates an OAuth2 HTTP client for Okta authentication.
@@ -63,17 +63,19 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, _ *http.Client)
 	hasClientSecret := o.ClientSecret != ""
 	hasJWTKeys := o.OktaJWKFile != "" || o.OktaJWKJSON != nil || o.OktaJWKPEM != nil
 
-	if hasClientSecret {
+	switch {
+	case hasClientSecret:
 		// Use client secret authentication
 		tokenSource = &clientSecretTokenSource{
 			ctx:          ctx,
 			conf:         oauthConfig,
 			clientSecret: o.ClientSecret,
 		}
-	} else if hasJWTKeys {
+	case hasJWTKeys:
 		// Use JWT-based authentication
 		var oktaJWT string
-		if o.OktaJWKFile != "" {
+		switch {
+		case o.OktaJWKFile != "":
 			oktaJWK, err := os.ReadFile(o.OktaJWKFile)
 			if err != nil {
 				return nil, fmt.Errorf("failed to read JWK file: %w", err)
@@ -82,17 +84,17 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, _ *http.Client)
 			if err != nil {
 				return nil, fmt.Errorf("failed to generate Okta JWT: %w", err)
 			}
-		} else if o.OktaJWKJSON != nil {
+		case o.OktaJWKJSON != nil:
 			oktaJWT, err = generateOktaJWT(o.OktaJWKJSON, oauthConfig)
 			if err != nil {
 				return nil, fmt.Errorf("failed to generate Okta JWT: %w", err)
 			}
-		} else if o.OktaJWKPEM != nil {
+		case o.OktaJWKPEM != nil:
 			oktaJWT, err = generateOktaJWTPEM(string(o.OktaJWKPEM), oauthConfig)
 			if err != nil {
 				return nil, fmt.Errorf("failed to generate Okta JWT: %w", err)
 			}
-		} else {
+		default:
 			return nil, errors.New("no JWT credentials provided")
 		}
 
@@ -108,7 +110,7 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, _ *http.Client)
 			oktaJWK: o.OktaJWKJSON,
 			token:   token,
 		}
-	} else {
+	default:
 		return nil, errors.New("no authentication credentials provided")
 	}
 
@@ -138,8 +140,7 @@ func (cs *clientSecretTokenSource) Token() (*oauth2.Token, error) {
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to exchange client credentials: %w", err)
 	}
@@ -156,7 +157,8 @@ func (cs *clientSecretTokenSource) Token() (*oauth2.Token, error) {
 		ExpiresIn   int    `json:"expires_in"`
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&tokenResponse); err != nil {
+	err = json.NewDecoder(resp.Body).Decode(&tokenResponse)
+	if err != nil {
 		return nil, fmt.Errorf("failed to decode token response: %w", err)
 	}
 
@@ -173,9 +175,6 @@ func (cs *clientSecretTokenSource) Token() (*oauth2.Token, error) {
 // custom token refresh logic. The parent context is passed via the
 // customTokenSource struct since we cannot modify the function signature here.
 func (ts *oktaTokenSource) Token() (*oauth2.Token, error) {
-	ts.mu.Lock()
-	defer ts.mu.Unlock()
-
 	oktaJWT, err := generateOktaJWT(ts.oktaJWK, ts.conf)
 	if err != nil {
 		return nil, fmt.Errorf("error generating Okta JWT: %w", err)

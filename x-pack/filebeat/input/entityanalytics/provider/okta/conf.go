@@ -298,7 +298,8 @@ func (c *conf) Validate() error {
 
 	// Validate authentication configuration
 	if c.OAuth2 != nil && c.OAuth2.isEnabled() {
-		if err := c.OAuth2.Validate(); err != nil {
+		err := c.OAuth2.Validate()
+		if err != nil {
 			return err
 		}
 	} else if c.OktaToken == "" {
@@ -340,7 +341,8 @@ func (c *conf) wantDevices() bool {
 
 // populateJSONFromFile reads a JSON file and populates the destination.
 func populateJSONFromFile(file string, dst *[]byte) error {
-	if _, err := os.Stat(file); errors.Is(err, os.ErrNotExist) {
+	_, err := os.Stat(file)
+	if errors.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("the file %q cannot be found", file)
 	}
 
