@@ -7,8 +7,11 @@ package otelconsumer
 import (
 	"context"
 	"fmt"
+	"os"
 	"runtime"
 	"time"
+
+	"go.opentelemetry.io/collector/client"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -23,11 +26,14 @@ import (
 	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
+	"go.opentelemetry.io/collector/receiver/receivertest"
 )
 
 const (
 	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
 	esDocumentIDAttribute = "elasticsearch.document_id"
+	beatNameCtxKey        = "beat_name"
+	beatVersionCtxtKey    = "beat_version"
 )
 
 func init() {
@@ -35,10 +41,11 @@ func init() {
 }
 
 type otelConsumer struct {
-	observer     outputs.Observer
-	logsConsumer consumer.Logs
-	beatInfo     beat.Info
-	log          *logp.Logger
+	observer       outputs.Observer
+	logsConsumer   consumer.Logs
+	beatInfo       beat.Info
+	log            *logp.Logger
+	isReceiverTest bool // whether we are running in receivertest context
 }
 
 func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
@@ -47,14 +54,17 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		return outputs.Fail(err)
 	}
 
+	isReceiverTest := os.Getenv("OTELCONSUMER_RECEIVERTEST") == "1"
+
 	// Default to runtime.NumCPU() workers
 	clients := make([]outputs.Client, 0, runtime.NumCPU())
 	for range runtime.NumCPU() {
 		clients = append(clients, &otelConsumer{
-			observer:     observer,
-			logsConsumer: beat.LogConsumer,
-			beatInfo:     beat,
-			log:          beat.Logger.Named("otelconsumer"),
+			observer:       observer,
+			logsConsumer:   beat.LogConsumer,
+			beatInfo:       beat,
+			log:            beat.Logger.Named("otelconsumer"),
+			isReceiverTest: isReceiverTest,
 		})
 	}
 
@@ -104,6 +114,13 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			switch id := id.(type) {
 			case string:
 				logRecord.Attributes().PutStr(esDocumentIDAttribute, id)
+
+				// The receivertest package needs a unique attribute to track generated ids.
+				// When receivertest allows this to be customized we can remove this condition.
+				// See https://github.com/open-telemetry/opentelemetry-collector/issues/12003.
+				if out.isReceiverTest {
+					logRecord.Attributes().PutStr(receivertest.UniqueIDAttrName, id)
+				}
 			}
 		}
 
@@ -150,7 +167,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		}
 	}
 
-	err := out.logsConsumer.ConsumeLogs(ctx, pLogs)
+	err := out.logsConsumer.ConsumeLogs(out.newConsumerContext(ctx), pLogs)
 	if err != nil {
 		// Permanent errors shouldn't be retried. This tipically means
 		// the data cannot be serialized by the exporter that is attached
@@ -166,13 +183,27 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Retry()
 		}
 
-		return fmt.Errorf("failed to send batch events to otel collector: %w", err)
+		out.log.Errorf("failed to send batch events to otel collector: %v", err)
+		return nil
 	}
 
 	batch.ACK()
 	st.NewBatch(len(events))
 	st.AckedEvents(len(events))
 	return nil
+}
+
+// newConsumerContext creates a new context.Context adding the beats metadata
+// to the client.Info. This is used to pass the beat name and version to the
+// Collector, so it can be used by the components to access that data.
+func (out *otelConsumer) newConsumerContext(ctx context.Context) context.Context {
+	clientInfo := client.Info{
+		Metadata: client.NewMetadata(map[string][]string{
+			beatNameCtxKey:     {out.beatInfo.Beat},
+			beatVersionCtxtKey: {out.beatInfo.Version},
+		}),
+	}
+	return client.NewContext(ctx, clientInfo)
 }
 
 func (out *otelConsumer) String() string {

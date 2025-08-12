@@ -103,7 +103,7 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [galera_status](/reference/metricbeat/metricbeat-metricset-mysql-galera_status.md)
-* [performance](/reference/metricbeat/metricbeat-metricset-mysql-performance.md)
-* [query](/reference/metricbeat/metricbeat-metricset-mysql-query.md)
+* [galera_status](/reference/metricbeat/metricbeat-metricset-mysql-galera_status.md)  {applies_to}`stack: beta`
+* [performance](/reference/metricbeat/metricbeat-metricset-mysql-performance.md)  {applies_to}`stack: beta`
+* [query](/reference/metricbeat/metricbeat-metricset-mysql-query.md)  {applies_to}`stack: beta`
 * [status](/reference/metricbeat/metricbeat-metricset-mysql-status.md)

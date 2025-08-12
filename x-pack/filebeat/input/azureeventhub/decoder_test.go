@@ -20,12 +20,11 @@ import (
 func TestDecodeRecords(t *testing.T) {
 	config := defaultConfig()
 	log := logp.NewLogger(fmt.Sprintf("%s test for input", inputName))
-	reg := monitoring.NewRegistry()
 
 	decoder := messageDecoder{
 		config:  config,
 		log:     log,
-		metrics: newInputMetrics("test", reg),
+		metrics: newInputMetrics(monitoring.NewRegistry()),
 	}
 
 	msgs := []string{
@@ -93,9 +92,7 @@ func TestDecodeRecordsWithSanitization(t *testing.T) {
 	config := defaultConfig()
 	config.LegacySanitizeOptions = []string{"SINGLE_QUOTES", "NEW_LINES"}
 	log := logp.NewLogger(fmt.Sprintf("%s test for input", inputName))
-	reg := monitoring.NewRegistry()
-	metrics := newInputMetrics("test", reg)
-	defer metrics.Close()
+	metrics := newInputMetrics(monitoring.NewRegistry())
 
 	sanitizers, err := newSanitizers(config.Sanitizers, config.LegacySanitizeOptions)
 	require.NoError(t, err)

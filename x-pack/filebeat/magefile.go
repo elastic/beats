@@ -50,7 +50,7 @@ func BuildOTel() error {
 
 // BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
 func BuildSystemTestBinary() error {
-	return devtools.BuildSystemTestBinary()
+	return devtools.BuildSystemTestOTelBinary()
 }
 
 // GolangCrossBuild builds the Beat binary inside of the golang-builder.
@@ -199,4 +199,9 @@ func GoFIPSOnlyIntegTest(ctx context.Context) error {
 func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(Fields, Dashboards, devtools.BuildSystemTestBinary)
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
+}
+
+// FipsECHTest runs a smoke test using a FIPS enabled binary targetting an ECH deployment.
+func FipsECHTest(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultECHTestArgs())
 }

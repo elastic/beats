@@ -28,9 +28,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-// A sentinel value that can be set on the "input" (type) field of nested
-// inputs, to indicate that the registry contains additional inputs that
-// should be reported at the top level.
+// InputNested is a sentinel value that can be set on the "input" (type) field
+// of nested inputs, to indicate that the registry contains additional inputs
+// that should be reported at the top level.
 const InputNested = "__NESTED__"
 
 const (
@@ -93,6 +93,10 @@ func filteredSnapshot(
 	// Now collect all that match the requested type
 	selected := make([]map[string]any, 0)
 	for _, table := range inputs {
+		if table.input == InputNested {
+			// Containers for nested inputs are never included in snapshots
+			continue
+		}
 		if requestedType == "" || strings.EqualFold(table.input, requestedType) {
 			selected = append(selected, table.data)
 		}
@@ -142,16 +146,16 @@ func addInputMetrics(to map[string]inputMetricsTable, from map[string]any, pathP
 		}
 
 		inputPath := append(pathPrefix, key)
+		to[id] = inputMetricsTable{
+			id:    id,
+			input: input,
+			path:  strings.Join(inputPath, "."),
+			data:  data,
+		}
+
 		if input == InputNested {
 			// Add the contents of this entry recursively
 			addInputMetrics(to, data, inputPath)
-		} else {
-			to[id] = inputMetricsTable{
-				id:    id,
-				input: input,
-				path:  strings.Join(inputPath, "."),
-				data:  data,
-			}
 		}
 	}
 }

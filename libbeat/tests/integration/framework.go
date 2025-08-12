@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build integration
 
 package integration
@@ -45,6 +47,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 
@@ -151,6 +154,13 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	})
 
 	return &p
+}
+
+// NewStandardBeat creates a Beat process from a standard binary.
+func NewStandardBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
+	b := NewBeat(t, beatName, binary, args...)
+	b.baseArgs = append(b.baseArgs[:1], b.baseArgs[2:]...) // remove "--systemTest"
+	return b
 }
 
 // NewAgentBeat creates a new agentbeat process that runs the beatName as a subcommand.
@@ -598,6 +608,63 @@ func (b *BeatProc) WaitForLogs(s string, timeout time.Duration, msgAndArgs ...an
 	}, timeout, 100*time.Millisecond, msgAndArgs...)
 }
 
+// WaitForLogsAnyOrder waits for all strings in the msgs slice to appear in the logs.
+// The strings can appear in any order. The function will return once all strings
+// have been found or the timeout has been reached.
+// If the timeout is reached before all strings are found, the test will fail with
+// the provided error message and arguments (failMsg).
+func (b *BeatProc) WaitForLogsAnyOrder(msgs []string, timeout time.Duration, failMsg string) {
+	b.t.Helper()
+
+	if len(msgs) == 0 {
+		return
+	}
+
+	// Create a map to track which messages have been found
+	found := make(map[string]bool, len(msgs))
+	for _, msg := range msgs {
+		found[msg] = false
+	}
+
+	msg := &strings.Builder{}
+
+	assert.Eventually(
+		b.t,
+		func() bool {
+			// Check for each unfound message
+			allFound := true
+
+			for msgToFind := range found {
+				if !found[msgToFind] {
+					if b.GetLogLine(msgToFind) != "" {
+						found[msgToFind] = true
+					} else {
+						allFound = false
+					}
+				}
+			}
+
+			// Prepare message for potential failure
+			if !allFound {
+				msg.Reset()
+				fmt.Fprintf(msg, "%s\nwaiting for log messages: ", failMsg)
+				for msgToFind, wasFound := range found {
+					if !wasFound {
+						fmt.Fprintf(msg, "\n- %q (not found)", msgToFind)
+					} else {
+						fmt.Fprintf(msg, "\n- %q (✓)", msgToFind)
+					}
+				}
+			}
+
+			return allFound
+		},
+		timeout,
+		100*time.Millisecond,
+		msg,
+	)
+}
+
 // WaitForLogsFromBeginning has the same behaviour as WaitForLogs, but it first
 // resets the log offset.
 func (b *BeatProc) WaitForLogsFromBeginning(s string, timeout time.Duration, msgAndArgs ...any) {
@@ -684,13 +751,16 @@ func (b *BeatProc) openLogFile() *os.File {
 // If the events log file does not exist, nil is returned
 // It's the caller's responsibility to close the file.
 func (b *BeatProc) openEventLogFile() *os.File {
+	return b.openGlobFile(b.getEventLogFileGlob(), false)
+}
+
+func (b *BeatProc) getEventLogFileGlob() string {
 	// Beats can produce two different log files, to make sure we're
 	// reading the normal one we add the year to the glob. The default
 	// log file name looks like: filebeat-20240116.ndjson
 	year := time.Now().Year()
 	glob := fmt.Sprintf("%s-events-data-%d*.ndjson", filepath.Join(b.tempDir, b.beatName), year)
-
-	return b.openGlobFile(glob, false)
+	return glob
 }
 
 // createTempDir creates a temporary directory that will be
@@ -862,6 +932,11 @@ func (b *BeatProc) RemoveAllCLIArgs() {
 
 func (b *BeatProc) Stdin() io.WriteCloser {
 	return b.stdin
+}
+
+func (b *BeatProc) ReadStdout() (string, error) {
+	by, err := os.ReadFile(b.stdout.Name())
+	return string(by), err
 }
 
 // GetESURL Returns the ES URL with username and password set,
@@ -1058,9 +1133,10 @@ func reportErrors(t *testing.T, tempDir string, beatName string) {
 	}
 }
 
-// GenerateLogFile writes count lines to path, each line is 50 bytes.
+// GenerateLogFile writes count lines to path
 // Each line contains the current time (RFC3339) and a counter
-func GenerateLogFile(t *testing.T, path string, count int, append bool) {
+// Prefix is added instead of current time if it exists
+func GenerateLogFile(t *testing.T, path string, count int, append bool, prefix ...string) {
 	var file *os.File
 	var err error
 	if !append {
@@ -1085,15 +1161,22 @@ func GenerateLogFile(t *testing.T, path string, count int, append bool) {
 			t.Fatalf("could not sync file: %s", err)
 		}
 	}()
-	now := time.Now().Format(time.RFC3339)
-	// If the length is different, e.g when there is no offset from UTC.
-	// add some padding so the length is predictable
-	if len(now) != len(time.RFC3339) {
-		paddingNeeded := len(time.RFC3339) - len(now)
-		for i := 0; i < paddingNeeded; i++ {
-			now += "-"
+
+	var now string
+	if len(prefix) == 0 {
+		// If the length is different, e.g when there is no offset from UTC.
+		// add some padding so the length is predictable
+		now = time.Now().Format(time.RFC3339)
+		if len(now) != len(time.RFC3339) {
+			paddingNeeded := len(time.RFC3339) - len(now)
+			for i := 0; i < paddingNeeded; i++ {
+				now += "-"
+			}
 		}
+	} else {
+		now = strings.Join(prefix, "")
 	}
+
 	for i := 0; i < count; i++ {
 		if _, err := fmt.Fprintf(file, "%s           %13d\n", now, i); err != nil {
 			t.Fatalf("could not write line %d to file: %s", count+1, err)
@@ -1101,6 +1184,26 @@ func GenerateLogFile(t *testing.T, path string, count int, append bool) {
 	}
 }
 
+// AssertLinesInFile counts number of lines in the given file and  asserts if it matches expected count
+func AssertLinesInFile(t *testing.T, path string, count int) {
+	t.Helper()
+	var lines []byte
+	var err error
+	require.Eventuallyf(t, func() bool {
+		// ensure all log lines are ingested
+		lines, err = os.ReadFile(path)
+		if err != nil {
+			t.Logf("error reading file %v", err)
+			return false
+		}
+		lines := strings.Split(string(lines), "\n")
+		// we subtract number of lines by 1 because the last line in output file contains an extra \n
+		return len(lines)-1 == count
+	}, 2*time.Minute, 10*time.Second, "expected lines: %d, got lines: %d", count, lines)
+
+}
+
+// CountFileLines returns the number of lines matching in given glob pattern
 func (b *BeatProc) CountFileLines(glob string) int {
 	file := b.openGlobFile(glob, true)
 	defer file.Close()
@@ -1112,6 +1215,17 @@ func (b *BeatProc) CountFileLines(glob string) int {
 	return bytes.Count(data, []byte{'\n'})
 }
 
+func (b *BeatProc) WaitEventsInLogFile(events int, timeout time.Duration) {
+	msg := strings.Builder{}
+
+	require.Eventually(b.t, func() bool {
+		msg.Reset()
+		got := b.CountFileLines(b.getEventLogFileGlob())
+		fmt.Fprintf(&msg, "expecting %d events, got %d", events, got)
+		return events == got
+	}, timeout, 100*time.Millisecond, &msg)
+}
+
 // ConfigFilePath returns the config file path
 func (b *BeatProc) ConfigFilePath() string {
 	return b.configFile
@@ -1121,7 +1235,7 @@ func (b *BeatProc) ConfigFilePath() string {
 // If add is an empty string a random local port is used.
 // The return values are:
 //   - The HTTP server
-//   - The server address in the form ip:port
+//   - The server address in the form http://ip:port
 //   - The mock-es API handler
 //   - The ManualReader for accessing the metrics
 func StartMockES(
@@ -1155,7 +1269,7 @@ func StartMockES(
 	)
 
 	if addr == "" {
-		addr = ":0"
+		addr = "localhost:0"
 	}
 
 	l, err := net.Listen("tcp", addr)
@@ -1173,15 +1287,16 @@ func StartMockES(
 		}
 	}()
 
+	serverURL := "http://" + addr
 	// Ensure the Server is up and running before returning
 	require.Eventually(
 		t,
 		func() bool {
-			resp, err := http.Get("http://" + addr) // nolint: noctx // It's just a test
+			resp, err := http.Get(serverURL) //nolint: noctx // It's just a test
 			if err != nil {
 				return false
 			}
-			// nolint: errcheck // We're just draining the body, we can ignore the error
+			//nolint: errcheck // We're just draining the body, we can ignore the error
 			io.Copy(io.Discard, resp.Body)
 			resp.Body.Close()
 			return true
@@ -1190,5 +1305,5 @@ func StartMockES(
 		time.Millisecond,
 		"mock-es server did not start on '%s'", addr)
 
-	return &s, addr, es, rdr
+	return &s, serverURL, es, rdr
 }
