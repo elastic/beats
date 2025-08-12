@@ -273,11 +273,9 @@ steps:
               context: "x-pack/filebeat: Python Integration Tests"
 
       - label: ":windows: x-pack/filebeat: Win 2022 Python Integration Tests"
-        env:
-          WIN_TESTS: "1"
         command: |
           cd x-pack/filebeat
-          mage pythonIntegTest
+          mage pythonWinIntegTest
         retry:
           automatic:
             - limit: 1
