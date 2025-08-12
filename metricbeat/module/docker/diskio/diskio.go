@@ -73,8 +73,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if config.SkipMajor == nil {
 		config.SkipMajor = defaultMajorDev
 	}
+<<<<<<< HEAD
 	logp.L().Debugf("Skipping major devices: %v", config.SkipMajor)
 	client, err := docker.NewDockerClient(base.HostData().URI, docker.Config{TLS: config.TLS, DeDot: config.DeDot})
+=======
+	base.Logger().Debugf("Skipping major devices: %v", config.SkipMajor)
+	client, err := docker.NewDockerClient(base.HostData().URI, docker.Config{TLS: config.TLS, DeDot: config.DeDot}, base.Logger())
+>>>>>>> a00936c22 ([Chore][Backport] Replace global logger with local logger #12 (#45926))
 	if err != nil {
 		return nil, err
 	}

@@ -61,7 +61,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 }
 
 // NewDockerClient initializes and returns a new Docker client
-func NewDockerClient(endpoint string, config Config) (*client.Client, error) {
+func NewDockerClient(endpoint string, config Config, logger *logp.Logger) (*client.Client, error) {
 	var httpClient *http.Client
 
 	if config.TLS.IsEnabled() {
@@ -83,7 +83,7 @@ func NewDockerClient(endpoint string, config Config) (*client.Client, error) {
 		}
 	}
 
-	client, err := docker.NewClient(endpoint, httpClient, nil)
+	client, err := docker.NewClient(endpoint, httpClient, nil, logger)
 	if err != nil {
 		return nil, err
 	}
