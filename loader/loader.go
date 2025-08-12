@@ -62,7 +62,7 @@ func (l *Loader) Load(files []string) (*Config, error) {
 				return nil, fmt.Errorf("cannot get configuration from '%s': %w", f, err)
 			}
 			inputsList = append(inputsList, inp...)
-			l.logger.Debugf("Loaded %s input(s) from configuration from %s", len(inp), f)
+			l.logger.Debugf("Loaded %d input(s) from configuration from %s", len(inp), f)
 		} else {
 			if err := merger.Add(cfg.access(), err); err != nil {
 				return nil, fmt.Errorf("failed to merge configuration file '%s' to existing one: %w", f, err)

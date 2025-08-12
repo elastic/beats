@@ -82,9 +82,6 @@ func NewDevelopmentLogger(selector string, options ...LogOption) (*Logger, error
 		return nil, err
 	}
 	logger = logger.Named(selector)
-	if err != nil {
-		return nil, err
-	}
 	return &Logger{logger, logger.Sugar(), make(map[string]struct{})}, nil
 }
 
@@ -224,37 +221,58 @@ func (l *Logger) IsDebug() bool {
 
 // Debugf uses fmt.Sprintf to construct and log a message.
 func (l *Logger) Debugf(format string, args ...interface{}) {
+	if false {
+		_ = fmt.Sprintf(format, args...) // enable printf checking
+	}
 	l.sugar.Debugf(format, args...)
 }
 
 // Infof uses fmt.Sprintf to log a templated message.
 func (l *Logger) Infof(format string, args ...interface{}) {
+	if false {
+		_ = fmt.Sprintf(format, args...) // enable printf checking
+	}
 	l.sugar.Infof(format, args...)
 }
 
 // Warnf uses fmt.Sprintf to log a templated message.
 func (l *Logger) Warnf(format string, args ...interface{}) {
+	if false {
+		_ = fmt.Sprintf(format, args...) // enable printf checking
+	}
 	l.sugar.Warnf(format, args...)
 }
 
 // Errorf uses fmt.Sprintf to log a templated message.
 func (l *Logger) Errorf(format string, args ...interface{}) {
+	if false {
+		_ = fmt.Sprintf(format, args...) // enable printf checking
+	}
 	l.sugar.Errorf(format, args...)
 }
 
 // Fatalf uses fmt.Sprintf to log a templated message, then calls os.Exit(1).
 func (l *Logger) Fatalf(format string, args ...interface{}) {
+	if false {
+		_ = fmt.Sprintf(format, args...) // enable printf checking
+	}
 	l.sugar.Fatalf(format, args...)
 }
 
 // Panicf uses fmt.Sprintf to log a templated message, then panics.
 func (l *Logger) Panicf(format string, args ...interface{}) {
+	if false {
+		_ = fmt.Sprintf(format, args...) // enable printf checking
+	}
 	l.sugar.Panicf(format, args...)
 }
 
 // DPanicf uses fmt.Sprintf to log a templated message. In development, the
 // logger then panics.
 func (l *Logger) DPanicf(format string, args ...interface{}) {
+	if false {
+		_ = fmt.Sprintf(format, args...) // enable printf checking
+	}
 	l.sugar.DPanicf(format, args...)
 }
 
