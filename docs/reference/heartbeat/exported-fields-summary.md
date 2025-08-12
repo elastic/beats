@@ -16,42 +16,42 @@ Present in the last event emitted during a check. If a monitor checks multiple e
 **`summary.up`**
 :   The number of endpoints that succeeded
 
-type: integer
+    type: integer
 
 
 **`summary.down`**
 :   The number of endpoints that failed
 
-type: integer
+    type: integer
 
 
 **`summary.status`**
 :   The status of this check as a whole. Either up or down.
 
-type: keyword
+    type: keyword
 
 
 **`summary.attempt`**
 :   When performing a check this number is 1 for the first check, and increments in the event of a retry.
 
-type: short
+    type: short
 
 
 **`summary.max_attempts`**
 :   The maximum number of checks that may be performed. Note, the actual number may be smaller.
 
-type: short
+    type: short
 
 
 **`summary.final_attempt`**
 :   True if no further checks will be performed in this retry group.
 
-type: boolean
+    type: boolean
 
 
 **`summary.retry_group`**
 :   A unique token used to group checks across attempts.
 
-type: keyword
+    type: keyword
 
 

@@ -39,8 +39,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
 - Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
-- Improve error messages in AWS Health {pull}45408[45408]
-- Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
 
 *Osquerybeat*
 
@@ -85,13 +83,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Auditbeat*
 
-- auditd: Request status from a separate socket to avoid data congestion {pull}41207[41207]
-- auditd: Use ECS `event.type: end` instead of `stop` for SERVICE_STOP, DAEMON_ABORT, and DAEMON_END messages. {pull}41558[41558]
-- auditd: Update syscall names for Linux 6.11. {pull}41558[41558]
-- hasher: Geneneral improvements and fixes. {pull}41863[41863]
-- hasher: Add a cached hasher for upcoming backend. {pull}41952[41952]
-- Split common tty definitions. {pull}42004[42004]
-- Fix potential data loss in add_session_metadata. {pull}42795[42795]
 
 *Filebeat*
 
@@ -123,6 +114,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
 - Prevent panic in CEL and salesforce inputs when github.com/hashicorp/go-retryablehttp exceeds maximum retries. {pull}40144[40144]
 - Fix publishing Okta entity analytics enrichments. {pull}44483[44483]
+- Fix handling of unnecessary BOM in UTF-8 text received by o365audit input. {issue}44327[44327] {pull}45739[45739]
 
 *Heartbeat*
 
@@ -226,15 +218,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add Fleet status updating to HTTP Endpoint input. {issue}44281[44281] {pull}44310[44310]
 - Add Fleet status updating to streaming input. {issue}44284[44284] {pull}44340[44340]
 - Add Fleet status update functionality to gcppubsub input. {issue}44272[44272] {pull}44507[44507]
-- Add Fleet status updating to GCS input. {issue}44273[44273] {pull}44508[44508]
-- Add Fleet status update functionality to udp input. {issue}44419[44419] {pull}44785[44785]
-- Add Fleet status update functionality to tcp input. {issue}44420[44420] {pull}44786[44786]
-- Add Fleet status updating to Azure Blob Storage input. {issue}44268[44268] {pull}44945[44945]
-- Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
 - Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
 - Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
 - Allow empty HTTPJSON cursor template value evaluations to be ignored by Fleet health status updates. {pull}45361[45361]
-- Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]
 
 *Auditbeat*
 
@@ -274,6 +260,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Render data values in xml renderer. {pull}44132[44132]
 
 *Functionbeat*
 
@@ -313,4 +300,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
