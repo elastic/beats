@@ -12,6 +12,8 @@ from filebeat import BaseTest
 from requests.auth import HTTPBasicAuth
 import unittest
 
+WIN_TESTS = os.environ.get('WIN_TESTS', False)
+
 
 class Test(BaseTest):
     """
@@ -60,6 +62,8 @@ class Test(BaseTest):
             inputs=False,
         )
 
+    @unittest.skipUnless(WIN_TESTS, "windows test")
+    @pytest.mark.windows
     @pytest.mark.skipif(sys.platform != "win32", reason="This test is specific to Windows")
     def test_etw_can_ingest(self):
         """
