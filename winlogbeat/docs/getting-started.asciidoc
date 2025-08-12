@@ -92,7 +92,7 @@ For more information about this command, see the configuration details for
 ----
 logging.to_files: true
 logging.files:
-  path: C:\ProgramData\winlogbeat\Logs
+  path: C:\Program Files\Winlogbeat-Data\Logs
 logging.level: info
 ----
 
@@ -162,7 +162,7 @@ PS C:\Program Files\Winlogbeat> Start-Service winlogbeat
 
 {beatname_uc} should now be running. If you used the logging configuration
 described here, you can view the log file at
-`C:\ProgramData\winlogbeat\Logs\winlogbeat`.
+`C:\Program Files\Winlogbeat-Data\Logs\winlogbeat`.
 
 You can view the status of the service and control it from the Services
 management console in Windows. To launch the management console, run
