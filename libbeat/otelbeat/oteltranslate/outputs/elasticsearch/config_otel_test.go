@@ -82,9 +82,14 @@ compression: gzip
 compression_params:
   level: 1
  `
+<<<<<<< HEAD
 		input := newFromYamlString(t, beatCfg)
 		cfg := config.MustNewConfigFrom(input.ToStringMap())
 		got, err := ToOTelConfig(cfg)
+=======
+		cfg := config.MustNewConfigFrom(beatCfg)
+		got, err := ToOTelConfig(cfg, logger)
+>>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
 		require.NoError(t, err, "error translating elasticsearch output to ES exporter config")
 		expOutput := newFromYamlString(t, OTelCfg)
 		compareAndAssert(t, expOutput, confmap.NewFromStringMap(got))
@@ -122,9 +127,14 @@ compression: gzip
 compression_params:
   level: 1
  `
+<<<<<<< HEAD
 		input := newFromYamlString(t, beatCfg)
 		cfg := config.MustNewConfigFrom(input.ToStringMap())
 		got, err := ToOTelConfig(cfg)
+=======
+		cfg := config.MustNewConfigFrom(beatCfg)
+		got, err := ToOTelConfig(cfg, logger)
+>>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
 		require.NoError(t, err, "error translating elasticsearch output to ES exporter config ")
 		expOutput := newFromYamlString(t, OTelCfg)
 		compareAndAssert(t, expOutput, confmap.NewFromStringMap(got))
@@ -241,9 +251,14 @@ batcher:
 
 		for _, test := range tests {
 			t.Run("config translation w/"+test.presetName, func(t *testing.T) {
+<<<<<<< HEAD
 				input := newFromYamlString(t, fmt.Sprintf(commonBeatCfg, test.presetName))
 				cfg := config.MustNewConfigFrom(input.ToStringMap())
 				got, err := ToOTelConfig(cfg)
+=======
+				cfg := config.MustNewConfigFrom(fmt.Sprintf(commonBeatCfg, test.presetName))
+				got, err := ToOTelConfig(cfg, logger)
+>>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
 				require.NoError(t, err, "error translating elasticsearch output to OTel ES exporter type")
 				expOutput := newFromYamlString(t, test.output)
 				compareAndAssert(t, expOutput, confmap.NewFromStringMap(got))
@@ -293,9 +308,14 @@ compression_params:
 
 	for level := range 9 {
 		t.Run(fmt.Sprintf("compression-level-%d", level), func(t *testing.T) {
+<<<<<<< HEAD
 			input := newFromYamlString(t, fmt.Sprintf(compressionConfig, level))
 			cfg := config.MustNewConfigFrom(input.ToStringMap())
 			got, err := ToOTelConfig(cfg)
+=======
+			cfg := config.MustNewConfigFrom(fmt.Sprintf(compressionConfig, level))
+			got, err := ToOTelConfig(cfg, logp.NewNopLogger())
+>>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
 			require.NoError(t, err, "error translating elasticsearch output to ES exporter config")
 			expOutput := newFromYamlString(t, fmt.Sprintf(otelConfig, level))
 			compareAndAssert(t, expOutput, confmap.NewFromStringMap(got))
@@ -303,9 +323,14 @@ compression_params:
 	}
 
 	t.Run("invalid-compression-level", func(t *testing.T) {
+<<<<<<< HEAD
 		input := newFromYamlString(t, fmt.Sprintf(compressionConfig, 10))
 		cfg := config.MustNewConfigFrom(input.ToStringMap())
 		got, err := ToOTelConfig(cfg)
+=======
+		cfg := config.MustNewConfigFrom(fmt.Sprintf(compressionConfig, 10))
+		got, err := ToOTelConfig(cfg, logp.NewNopLogger())
+>>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
 		require.ErrorContains(t, err, "failed unpacking config. requires value <= 9 accessing 'compression_level'")
 		require.Nil(t, got)
 	})

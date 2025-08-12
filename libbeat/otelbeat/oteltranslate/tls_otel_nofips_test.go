@@ -15,111 +15,57 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package oteltranslate
 
 import (
-<<<<<<< HEAD
-	"crypto/tls"
-=======
-	"errors"
->>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-<<<<<<< HEAD
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
-=======
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
->>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
 )
 
-func TestTLSCommonToOTel(t *testing.T) {
-
-	t.Run("when ssl.enabled = false", func(t *testing.T) {
-<<<<<<< HEAD
-		b := false
-		input := &tlscommon.Config{
-			Enabled: &b,
-		}
-		got, err := TLSCommonToOTel(input)
-=======
-		input := `
+func TestTLSCommonToOTel_EncryptedPrivateKey_CipherSuites(t *testing.T) {
+	input := `
 ssl:
-  enabled: false
+  certificate_authorities:
+  - "testdata/certs/rootCA.crt"
+  - |
+    -----BEGIN CERTIFICATE-----
+    MIIDCjCCAfKgAwIBAgITJ706Mu2wJlKckpIvkWxEHvEyijANBgkqhkiG9w0BAQsF
+    ADAUMRIwEAYDVQQDDAlsb2NhbGhvc3QwIBcNMTkwNzIyMTkyOTA0WhgPMjExOTA2
+    MjgxOTI5MDRaMBQxEjAQBgNVBAMMCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEB
+    BQADggEPADCCAQoCggEBANce58Y/JykI58iyOXpxGfw0/gMvF0hUQAcUrSMxEO6n
+    fZRA49b4OV4SwWmA3395uL2eB2NB8y8qdQ9muXUdPBWE4l9rMZ6gmfu90N5B5uEl
+    94NcfBfYOKi1fJQ9i7WKhTjlRkMCgBkWPkUokvBZFRt8RtF7zI77BSEorHGQCk9t
+    /D7BS0GJyfVEhftbWcFEAG3VRcoMhF7kUzYwp+qESoriFRYLeDWv68ZOvG7eoWnP
+    PsvZStEVEimjvK5NSESEQa9xWyJOmlOKXhkdymtcUd/nXnx6UTCFgnkgzSdTWV41
+    CI6B6aJ9svCTI2QuoIq2HxX/ix7OvW1huVmcyHVxyUECAwEAAaNTMFEwHQYDVR0O
+    BBYEFPwN1OceFGm9v6ux8G+DZ3TUDYxqMB8GA1UdIwQYMBaAFPwN1OceFGm9v6ux
+    8G+DZ3TUDYxqMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAG5D
+    874A4YI7YUwOVsVAdbWtgp1d0zKcPRR+r2OdSbTAV5/gcS3jgBJ3i1BN34JuDVFw
+    3DeJSYT3nxy2Y56lLnxDeF8CUTUtVQx3CuGkRg1ouGAHpO/6OqOhwLLorEmxi7tA
+    H2O8mtT0poX5AnOAhzVy7QW0D/k4WaoLyckM5hUa6RtvgvLxOwA0U+VGurCDoctu
+    8F4QOgTAWyh8EZIwaKCliFRSynDpv3JTUwtfZkxo6K6nce1RhCWFAsMvDZL8Dgc0
+    yvgJ38BRsFOtkRuAGSf6ZUwTO8JJRRIFnpUzXflAnGivK9M13D5GEQMmIl6U9Pvk
+    sxSmbIUfc2SGJGCJD4I=
+    -----END CERTIFICATE-----
+  certificate: "testdata/certs/client.crt"
+  key: "testdata/certs/client.key"
+  key_passphrase: "changeme"
+  cipher_suites: "ECDHE-ECDSA-AES-128-GCM-SHA256"
 `
-		cfg := config.MustNewConfigFrom(input)
-		got, err := TLSCommonToOTel(cfg, logger)
->>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
-		require.NoError(t, err)
-		want := map[string]any{
-			"insecure": true,
-		}
 
-		assert.Equal(t, want, got)
-	})
+	got, err := TLSCommonToOTel(config.MustNewConfigFrom(input), logptest.NewTestingLogger(t, ""))
 
-<<<<<<< HEAD
-	tests := []struct {
-		name  string
-		input *tlscommon.Config
-		want  map[string]any
-		err   bool
-	}{
-		{
-			name: "when unsupported configuration is passed",
-			input: &tlscommon.Config{
-				CATrustedFingerprint: "a3:5f:bf:93:12:8f:bc:5c:ab:14:6d:bf:e4:2a:7f:98:9d:2f:16:92:76:c4:12:ab:67:89:fc:56:4b:8e:0c:43",
-			},
-			want: nil,
-			err:  true,
-		},
-		{
-			name: "when ssl.verification_mode:none ",
-			input: &tlscommon.Config{
-				VerificationMode: tlscommon.VerifyNone,
-			},
-			want: map[string]any{
-				"insecure_skip_verify":         true,
-				"include_system_ca_certs_pool": true,
-			},
-			err: false,
-		},
-		{
-			name: "when ca, cert, key and key_passphrase, cipher_suites is provided",
-			input: &tlscommon.Config{
-				CAs: []string{
-					"testdata/certs/rootCA.crt",
-					`-----BEGIN CERTIFICATE-----
-MIIDCjCCAfKgAwIBAgITJ706Mu2wJlKckpIvkWxEHvEyijANBgkqhkiG9w0BAQsF
-ADAUMRIwEAYDVQQDDAlsb2NhbGhvc3QwIBcNMTkwNzIyMTkyOTA0WhgPMjExOTA2
-MjgxOTI5MDRaMBQxEjAQBgNVBAMMCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEB
-BQADggEPADCCAQoCggEBANce58Y/JykI58iyOXpxGfw0/gMvF0hUQAcUrSMxEO6n
-fZRA49b4OV4SwWmA3395uL2eB2NB8y8qdQ9muXUdPBWE4l9rMZ6gmfu90N5B5uEl
-94NcfBfYOKi1fJQ9i7WKhTjlRkMCgBkWPkUokvBZFRt8RtF7zI77BSEorHGQCk9t
-/D7BS0GJyfVEhftbWcFEAG3VRcoMhF7kUzYwp+qESoriFRYLeDWv68ZOvG7eoWnP
-PsvZStEVEimjvK5NSESEQa9xWyJOmlOKXhkdymtcUd/nXnx6UTCFgnkgzSdTWV41
-CI6B6aJ9svCTI2QuoIq2HxX/ix7OvW1huVmcyHVxyUECAwEAAaNTMFEwHQYDVR0O
-BBYEFPwN1OceFGm9v6ux8G+DZ3TUDYxqMB8GA1UdIwQYMBaAFPwN1OceFGm9v6ux
-8G+DZ3TUDYxqMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAG5D
-874A4YI7YUwOVsVAdbWtgp1d0zKcPRR+r2OdSbTAV5/gcS3jgBJ3i1BN34JuDVFw
-3DeJSYT3nxy2Y56lLnxDeF8CUTUtVQx3CuGkRg1ouGAHpO/6OqOhwLLorEmxi7tA
-H2O8mtT0poX5AnOAhzVy7QW0D/k4WaoLyckM5hUa6RtvgvLxOwA0U+VGurCDoctu
-8F4QOgTAWyh8EZIwaKCliFRSynDpv3JTUwtfZkxo6K6nce1RhCWFAsMvDZL8Dgc0
-yvgJ38BRsFOtkRuAGSf6ZUwTO8JJRRIFnpUzXflAnGivK9M13D5GEQMmIl6U9Pvk
-sxSmbIUfc2SGJGCJD4I=
------END CERTIFICATE-----`},
-				Certificate: tlscommon.CertificateConfig{
-					Certificate: "testdata/certs/client.crt",
-					Key:         "testdata/certs/client.key",
-					Passphrase:  "changeme",
-				},
-				CipherSuites: []tlscommon.CipherSuite{tlscommon.CipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA)},
-			},
-			want: map[string]any{
-				"ca_pem": `-----BEGIN CERTIFICATE-----
+	require.NoError(t, err)
+
+	assert.Equal(t, map[string]any{
+		"ca_pem": `-----BEGIN CERTIFICATE-----
 MIIDzTCCArWgAwIBAgIURzQp9/bWT37HJX71yfGEO0xrs2wwDQYJKoZIhvcNAQEL
 BQAwdjELMAkGA1UEBhMCVVMxDzANBgNVBAgMBkFsYXNrYTETMBEGA1UEBwwKR2xl
 bm5hbGxlbjEQMA4GA1UECgwHRWxhc3RpYzEQMA4GA1UEAwwHRWxhc3RpYzEdMBsG
@@ -162,7 +108,7 @@ yvgJ38BRsFOtkRuAGSf6ZUwTO8JJRRIFnpUzXflAnGivK9M13D5GEQMmIl6U9Pvk
 sxSmbIUfc2SGJGCJD4I=
 -----END CERTIFICATE-----
 `,
-				"cert_pem": `-----BEGIN CERTIFICATE-----
+		"cert_pem": `-----BEGIN CERTIFICATE-----
 MIID2jCCAsKgAwIBAgIUXSGhi1rVH7ftDmJ6TlavLsY/74MwDQYJKoZIhvcNAQEL
 BQAwgY8xCzAJBgNVBAYTAlVTMRAwDgYDVQQIDAdGbG9yaWRhMRAwDgYDVQQHDAdP
 cmxhbmRvMSEwHwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQxFzAVBgNV
@@ -186,7 +132,7 @@ qesVBabxXBCL6Y1foh5OLLHyEWw28yfK/PnVdqU0lLrBhW9VJ6mQ9XCwZxf/tlSk
 B3FafTQk4ZtU+4bVJuiAiQI7DeqpIFU6Lczds2gG
 -----END CERTIFICATE-----
 `, // the following key pem is decrypted value using key_passphrse
-				"key_pem": `-----BEGIN RSA PRIVATE KEY-----
+		"key_pem": `-----BEGIN RSA PRIVATE KEY-----
 MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDAVGPlx4U2BpWf
 QlyMNraLMjdJAo4PjO2GrDbwg2cAO4QFbMECEiNHakvuJ3zVVDO+HsBdkLWr8nO4
 iXmZDokfDrOrANJuqq16p022soC8pJQz9uIBWTnxDGd/wdofi4H+V5uaMhw961sg
@@ -215,79 +161,8 @@ m8TtceUhSOnXNrrO5agyMRmL0aYf8D425ot/uwTiSkOd4bdFeEaYs0ahHosxHq2N
 me1zqwZ6EX7XHaa6j1mx9tcX
 -----END RSA PRIVATE KEY-----
 `,
-				"insecure_skip_verify":         false,
-				"include_system_ca_certs_pool": false,
-				"cipher_suites":                []string{"TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA"},
-			},
-			err: false,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			got, err := TLSCommonToOTel(test.input)
-			if test.err {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				assert.Equal(t, test.want, got, "beats to otel ssl mapping")
-			}
-=======
-	t.Run("when ssl.verification_mode:none", func(t *testing.T) {
-		input := `
-ssl:
-  verification_mode: none
-`
-		cfg := config.MustNewConfigFrom(input)
-		got, err := TLSCommonToOTel(cfg, logger)
-		require.NoError(t, err)
-		assert.Equal(t, map[string]any{
-			"insecure_skip_verify":         true,
-			"include_system_ca_certs_pool": true,
-			"min_version":                  "1.2",
-			"max_version":                  "1.3",
-		}, got, "beats to otel ssl mapping")
-
-	})
->>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
-
-	t.Run("when unsupported configuration  renegotiation is used", func(t *testing.T) {
-		input := `
-ssl:
-  verification_mode: none
-  renegotiation: never
-`
-		cfg := config.MustNewConfigFrom(input)
-		_, err := TLSCommonToOTel(cfg, logger)
-		require.Error(t, err)
-		require.ErrorIs(t, err, errors.ErrUnsupported)
-
-	})
-
-	t.Run("when unsupported configuration restart_on_cert_change.enabled is used", func(t *testing.T) {
-		input := `
-ssl:
-  verification_mode: none
-  restart_on_cert_change.enabled: true
-`
-		cfg := config.MustNewConfigFrom(input)
-		_, err := TLSCommonToOTel(cfg, logger)
-		require.Error(t, err)
-		require.ErrorIs(t, err, errors.ErrUnsupported)
-
-	})
-
-	t.Run("when unsupported tls version is passed", func(t *testing.T) {
-		input := `
-ssl:
-  verification_mode: none
-  supported_protocols: 
-   - TLSv1.4
-`
-		cfg := config.MustNewConfigFrom(input)
-		_, err := TLSCommonToOTel(cfg, logger)
-		require.Error(t, err)
-		require.ErrorContains(t, err, "invalid tls version")
-
-	})
+		"cipher_suites": []string{"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"},
+		"min_version":   "1.2",
+		"max_version":   "1.3",
+	}, got, "beats to otel ssl mapping")
 }

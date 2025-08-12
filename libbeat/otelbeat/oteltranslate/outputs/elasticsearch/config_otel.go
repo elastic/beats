@@ -19,6 +19,7 @@ package elasticsearchtranslate
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -119,7 +120,11 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	}
 
 	// convert ssl configuration
+<<<<<<< HEAD
 	otelTLSConfg, err := oteltranslate.TLSCommonToOTel(escfg.Transport.TLS)
+=======
+	otelTLSConfg, err := oteltranslate.TLSCommonToOTel(output, logger)
+>>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
 	if err != nil {
 		return nil, fmt.Errorf("cannot convert SSL config into OTel: %w", err)
 	}
@@ -181,6 +186,36 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	return otelYAMLCfg, nil
 }
 
+<<<<<<< HEAD
+=======
+// log warning for unsupported config
+func checkUnsupportedConfig(cfg *config.C, logger *logp.Logger) error {
+	// check if unsupported configuration is provided
+	temp := unsupportedConfig{}
+	if err := cfg.Unpack(&temp); err != nil {
+		return err
+	}
+
+	if !isStructEmpty(temp) {
+		return fmt.Errorf("these configuration parameters are not supported %+v: %w", temp, errors.ErrUnsupported)
+	}
+
+	// check for dictionary like parameters that we do not support yet
+	if cfg.HasField("indices") {
+		return fmt.Errorf("indices is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("pipelines") {
+		return fmt.Errorf("pipelines is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("parameters") {
+		return fmt.Errorf("parameters is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("proxy_headers") {
+		return fmt.Errorf("proxy_headers is currently not supported: %w", errors.ErrUnsupported)
+	} else if value, err := cfg.Bool("allow_older_versions", -1); err == nil && !value {
+		return fmt.Errorf("allow_older_versions:false is currently not supported: %w", errors.ErrUnsupported)
+	}
+	return nil
+}
+
+>>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
 // For type safety check
 func typeSafetyCheck(value map[string]any) error {
 	// the  value should match `elasticsearchexporter.Config` type.
