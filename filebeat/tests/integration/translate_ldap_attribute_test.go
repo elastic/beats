@@ -129,7 +129,7 @@ func TestTranslateGUIDWithLDAP(t *testing.T) {
 
 func startOpenldapContainer(t *testing.T) {
 	ctx := context.Background()
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
