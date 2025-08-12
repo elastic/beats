@@ -12,6 +12,21 @@ Breaking changes can impact your Elastic applications, potentially disrupting no
 % Description and impact of the breaking change.
 % For more information, check [PR #](PR link).
 
+::::{dropdown} The default data and logs path for the Windows service installation has changed.
+The base folder has changed from `C:\ProgramData\` to `C:\Program
+Files\` because the latter has stricter permissions. The state
+and logs are now stored in `C:\Program Files\<Beat Name>-Data`.
+
+When the installation script runs, it looks for the previous default
+data path. If the path is found, data is moved to the new path.
+The installation script accepts the parameter `-UseLegacyPath` to
+force using the legacy data path.
+
+In a PowerShell prompt, can use `Get-Help install-service-<Beat Name>.ps1
+-detailed` to get detailed help.
+
+::::
+
 ## 9.0.1 [beats-9.0.1-breaking-changes]
 
 _No breaking changes_
