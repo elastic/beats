@@ -359,6 +359,7 @@ visualizing your data. To load these assets:
 
 The default location where Windows log files are stored varies:
 * {applies_to}`stack: ga 9.1` `C:\Program Files\Filebeat-Data\Logs`
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Filebeat-Data\Logs`
 * {applies_to}`stack: ga 9.0` `C:\ProgramData\filebeat\Logs`
 
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to {{es}} and deploys the sample dashboards for visualizing the data in {{kib}}.
@@ -443,6 +444,7 @@ PS C:\Program Files\filebeat> Start-Service filebeat
 
 The default location where Windows log files are stored varies:
 * {applies_to}`stack: ga 9.1` `C:\Program Files\Filebeat-Data\Logs`
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Filebeat-Data\Logs`
 * {applies_to}`stack: ga 9.0` `C:\ProgramData\filebeat\Logs`
 ::::::
 

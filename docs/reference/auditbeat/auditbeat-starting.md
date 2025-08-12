@@ -60,6 +60,7 @@ PS C:\Program Files\auditbeat> Start-Service auditbeat
 
 The default location where Windows log files are stored varies:
 * {applies_to}`stack: ga 9.1` `C:\Program Files\Auditbeat-Data\Logs`
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Auditbeat-Data\Logs`
 * {applies_to}`stack: ga 9.0` `C:\ProgramData\auditbeat\Logs`
 ::::::
 

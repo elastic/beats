@@ -70,6 +70,7 @@ PS C:\Program Files\filebeat> Start-Service filebeat
 
 The default location where Windows log files are stored varies:
 * {applies_to}`stack: ga 9.1` `C:\Program Files\Filebeat-Data\Logs`
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Filebeat-Data\Logs`
 * {applies_to}`stack: ga 9.0` `C:\ProgramData\filebeat\Logs`
 ::::::
 

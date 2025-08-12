@@ -21,7 +21,8 @@ logging.files:
   permissions: 0640
 ```
 
-1. {applies_to}`stack: ga 9.1` Default path changed from `C:\ProgramData\winlogbeat\Logs` to `C:\Program Files\winlogbeat-Data\Logs`.
+1. {applies_to}`stack: ga 9.1` Default path changed from `C:\ProgramData\winlogbeat\Logs` to `C:\Program Files\Winlogbeat-Data\Logs`.
+1. {applies_to}`stack: ga 9.0.6` Default path changed from `C:\ProgramData\winlogbeat\Logs` to `C:\Program Files\Winlogbeat-Data\Logs`.
 
 ::::{tip}
 In addition to setting logging options in the config file, you can modify the logging output configuration from the command line. See [Command reference](/reference/winlogbeat/command-line-options.md).
