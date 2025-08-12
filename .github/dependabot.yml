@@ -64,7 +64,7 @@ updates:
 
   - package-ecosystem: gomod
     directory: /
-    # Workaround to satisfy Dependabot's unique constraint (needs unique 'package-ecosystem', 'directory', 'target-branch' tuples) 
+    # Workaround to satisfy Dependabot's unique constraint (needs unique 'package-ecosystem', 'directory', 'target-branch' tuples)
     # for duplicate package-ecosystem configurations: https://github.com/dependabot/dependabot-core/issues/1778#issuecomment-1988140219
     target-branch: main
     schedule:
@@ -96,6 +96,19 @@ updates:
           - "github.com/go-ole/go-ole"
           - "github.com/StackExchange/wmi"
     open-pull-requests-limit: 5
+
+  # Update integration test container images
+  - package-ecosystem: "docker"
+    directories:
+      # Starting with the sredis image, we might want to add other images later.
+      - '/testing/environments/docker/sredis'
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "23:29"
+    labels:
+      - automation
+      - dependabot
 
   # GitHub actions
   - package-ecosystem: "github-actions"
