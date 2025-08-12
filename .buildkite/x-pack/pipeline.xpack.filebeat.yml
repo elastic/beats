@@ -272,7 +272,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Python Integration Tests"
 
-      - label: ":ubuntu: x-pack/filebeat: Go Windows Integration Tests"
+      - label: ":windows: x-pack/filebeat: Go Windows Integration Tests"
         command: |
           cd x-pack/filebeat
           mage goWindowsIntegTest
