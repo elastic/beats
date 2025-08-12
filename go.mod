@@ -176,7 +176,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.7.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.0
-	github.com/elastic/elastic-agent-libs v0.22.1
+	github.com/elastic/elastic-agent-libs v0.21.5
 	github.com/elastic/elastic-agent-system-metrics v0.11.11
 	github.com/elastic/go-elasticsearch/v8 v8.18.1
 	github.com/elastic/go-freelru v0.16.0
@@ -208,7 +208,7 @@ require (
 	github.com/otiai10/copy v1.12.0
 	github.com/pierrec/lz4/v4 v4.1.22
 	github.com/pkg/xattr v0.4.9
-	github.com/prometheus/prometheus v0.305.0
+	github.com/prometheus/prometheus v0.304.3-0.20250703114031-419d436a447a
 	github.com/shirou/gopsutil/v4 v4.25.6
 	github.com/teambition/rrule-go v1.8.2
 	github.com/tklauser/go-sysconf v0.3.12
