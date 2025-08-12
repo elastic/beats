@@ -1,6 +1,7 @@
 import jinja2
 import requests
 import platform
+import pytest
 import sys
 import hmac
 import hashlib
@@ -59,6 +60,7 @@ class Test(BaseTest):
             inputs=False,
         )
 
+    @pytest.mark.skipif(sys.platform != "win32", reason="This test is specific to Windows")
     def test_etw_can_ingest(self):
         """
         Test ETW input with Windows trace logs
