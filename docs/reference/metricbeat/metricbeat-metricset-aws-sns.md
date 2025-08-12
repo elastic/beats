@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-aws-sns.html
+
+applies_to:
+  stack: beta
 ---
 
 # AWS sns metricset [metricbeat-metricset-aws-sns]

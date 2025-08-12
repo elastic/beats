@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-linux-rapl.html
+
+applies_to:
+  stack: beta
 ---
 
 # Linux rapl metricset [metricbeat-metricset-linux-rapl]

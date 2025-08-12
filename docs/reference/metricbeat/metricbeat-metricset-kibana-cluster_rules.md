@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kibana-cluster_rules.html
+
+applies_to:
+  stack: beta
 ---
 
 # Kibana cluster_rules metricset [metricbeat-metricset-kibana-cluster_rules]

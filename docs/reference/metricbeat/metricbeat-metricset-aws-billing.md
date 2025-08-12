@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-aws-billing.html
+
+applies_to:
+  stack: beta
 ---
 
 # AWS billing metricset [metricbeat-metricset-aws-billing]
