@@ -195,20 +195,15 @@ func GoFIPSOnlyIntegTest(ctx context.Context) error {
 	return devtools.GoIntegTestFromHost(ctx, args)
 }
 
+// GoWindowsIntegTest executes the Go windows integration tests.
+func GoWindowsIntegTest(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultGoWindowsTestIntegrationArgs())
+}
+
 // PythonIntegTest starts the docker containers and executes the Python integration tests.
 func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(Fields, Dashboards, devtools.BuildSystemTestBinary)
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
-}
-
-// PythonIntegTest executes the Python integration tests for windows.
-func PythonWinIntegTest(ctx context.Context) error {
-	mg.Deps(Fields, Dashboards, devtools.BuildSystemTestBinary)
-	params := devtools.DefaultPythonTestIntegrationFromHostArgs()
-	params.Env["PYTEST_ADDOPTS"] = "-m windows"
-	params.Env["INTEGRATION_TESTS"] = "1"
-	params.Env["WIN_TESTS"] = "1"
-	return devtools.PythonTest(params)
 }
 
 // FipsECHTest runs a smoke test using a FIPS enabled binary targetting an ECH deployment.

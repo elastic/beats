@@ -128,7 +128,11 @@ func fetchGoPackages(module string) ([]string, error) {
 // environment variables, e.g: TEST_TAGS=aws,azure.
 // If the FIPS env var is set to true, the requirefips and ms_tls13kdf tags are injected.
 func testTagsFromEnv() []string {
-	tags := strings.Split(strings.Trim(os.Getenv("TEST_TAGS"), ", "), ",")
+	testTags := strings.Trim(os.Getenv("TEST_TAGS"), ", ")
+	var tags []string
+	if testTags != "" {
+		tags = strings.Split(testTags, ",")
+	}
 	if FIPSBuild {
 		tags = append(tags, "requirefips", "ms_tls13kdf")
 	}
@@ -144,6 +148,17 @@ func DefaultGoTestUnitArgs() GoTestArgs { return makeGoTestArgs("Unit") }
 func DefaultGoFIPSOnlyTestArgs() GoTestArgs {
 	args := makeGoTestArgs("Unit-FIPS-only")
 	args.Env["GODEBUG"] = "fips140=only"
+	return args
+}
+
+// DefaultGoWindowsTestIntegrationArgs returns a default set of arguments for running
+// windows integration tests. We tag integration test files with 'integration'.
+func DefaultGoWindowsTestIntegrationArgs() GoTestArgs {
+	args := makeGoTestArgs("Windows-Integration")
+	args.Tags = append(args.Tags, "win_integration")
+	fmt.Println(args.Tags)
+	args.ExtraFlags = append(args.ExtraFlags, "-count=1")
+	args.Packages = []string{"./tests/integration/windows"}
 	return args
 }
 

@@ -272,10 +272,10 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Python Integration Tests"
 
-      - label: ":windows: x-pack/filebeat: Win 2022 Python Integration Tests"
+      - label: ":ubuntu: x-pack/filebeat: Go Windows Integration Tests"
         command: |
           cd x-pack/filebeat
-          mage pythonWinIntegTest
+          mage goWindowsIntegTest
         retry:
           automatic:
             - limit: 1
@@ -297,7 +297,7 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Win 2022 Python Integration Tests"
+              context: "x-pack/filebeat: Go Windows Integration Tests"
 
       - label: ":windows: x-pack/filebeat: Win 2022 Unit Tests"
         command: |
