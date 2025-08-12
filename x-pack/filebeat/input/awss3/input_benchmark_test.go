@@ -224,7 +224,7 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 		sqsReader := newSQSReaderInput(config, aws.Config{})
 		sqsReader.log = log.Named("sqs")
 		sqsReader.pipeline = newFakePipeline()
-		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), workerCount)
+		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), workerCount, logp.NewNopLogger())
 		sqsReader.sqs, err = newConstantSQS()
 		require.NoError(t, err)
 		sqsReader.s3 = newConstantS3(t)
@@ -308,7 +308,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		log := logp.NewLogger(inputName)
 		log.Infof("benchmark with %d number of workers", numberOfWorkers)
 
-		metrics := newInputMetrics(monitoring.NewRegistry(), numberOfWorkers)
+		metrics := newInputMetrics(monitoring.NewRegistry(), numberOfWorkers, logp.NewNopLogger())
 		pipeline := newFakePipeline()
 
 		config := makeBenchmarkConfig(t)
@@ -341,7 +341,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				states, err := newStates(nil, store, "")
 				assert.NoError(t, err, "states creation should succeed")
 
-				s3EventHandlerFactory := newS3ObjectProcessorFactory(metrics, s3API, config.FileSelectors, backupConfig{})
+				s3EventHandlerFactory := newS3ObjectProcessorFactory(metrics, s3API, config.FileSelectors, backupConfig{}, logp.NewNopLogger())
 				s3Poller := &s3PollerInput{
 					log:             logp.NewLogger(inputName),
 					config:          config,

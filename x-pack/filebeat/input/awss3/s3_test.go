@@ -129,7 +129,7 @@ func TestS3Poller(t *testing.T) {
 			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("2024-02-08T08:35:00+00:02.json.gz")).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{})
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{}, logp.NewNopLogger())
 		states, err := newStates(nil, store, listPrefix)
 		require.NoError(t, err, "states creation must succeed")
 
@@ -148,7 +148,7 @@ func TestS3Poller(t *testing.T) {
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",
-			metrics:         newInputMetrics(monitoring.NewRegistry(), 0),
+			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
 		}
 		poller.runPoll(ctx)
@@ -270,7 +270,7 @@ func TestS3Poller(t *testing.T) {
 			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key5")).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3, nil, backupConfig{})
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3, nil, backupConfig{}, logp.NewNopLogger())
 		states, err := newStates(nil, store, listPrefix)
 		require.NoError(t, err, "states creation must succeed")
 
@@ -296,7 +296,7 @@ func TestS3Poller(t *testing.T) {
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",
-			metrics:         newInputMetrics(monitoring.NewRegistry(), 0),
+			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 			filterProvider:  newFilterProvider(&cfg),
 		}
 		poller.run(ctx)
@@ -526,7 +526,7 @@ func Test_S3StateHandling(t *testing.T) {
 				pipeline:        newFakePipeline(),
 				s3ObjectHandler: mockObjHandler,
 				states:          s3States,
-				metrics:         newInputMetrics(monitoring.NewRegistry(), 0),
+				metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
 				filterProvider:  newFilterProvider(test.config),
 			}
 

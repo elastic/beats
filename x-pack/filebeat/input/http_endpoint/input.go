@@ -50,6 +50,7 @@ type httpEndpoint struct {
 	config    config
 	addr      string
 	tlsConfig *tls.Config
+	logger *logp.Logger
 }
 
 func Plugin(log *logp.Logger) v2.Plugin {
@@ -90,6 +91,7 @@ func newHTTPEndpoint(config config, logger *logp.Logger) (*httpEndpoint, error) 
 		config:    config,
 		tlsConfig: tlsConfig,
 		addr:      addr,
+		logger: logger,
 	}, nil
 }
 
@@ -107,7 +109,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	ctx.UpdateStatus(status.Starting, "")
 	ctx.UpdateStatus(status.Configuring, "")
 
-	metrics := newInputMetrics(ctx.MetricsRegistry)
+	metrics := newInputMetrics(ctx.MetricsRegistry, e.)
 
 	if e.config.Tracer != nil {
 		id := sanitizeFileName(ctx.IDWithoutName)
