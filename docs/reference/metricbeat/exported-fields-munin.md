@@ -12,12 +12,12 @@ Munin node metrics exporter
 **`munin.metrics.*`**
 :   Metrics exposed by a plugin of a munin node agent.
 
-type: object
+    type: object
 
 
 **`munin.plugin.name`**
 :   Name of the plugin collecting these metrics.
 
-type: keyword
+    type: keyword
 
 

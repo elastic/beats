@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-zookeeper.html
+applies_to:
+  stack: beta
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -15,45 +17,53 @@ ZooKeeper Module
 
 ## audit [_audit]
 
+```{applies_to}
+stack: beta
+```
+
 ZooKeeper Audit logs.
 
 **`zookeeper.audit.session`**
 :   Client session id
 
-type: keyword
+    type: keyword
 
 
 **`zookeeper.audit.znode`**
 :   Path of the znode
 
-type: keyword
+    type: keyword
 
 
 **`zookeeper.audit.znode_type`**
 :   Type of znode in case of creation operation
 
-type: keyword
+    type: keyword
 
 
 **`zookeeper.audit.acl`**
 :   String representation of znode ACL like cdrwa(create, delete,read, write, admin). This is logged only for setAcl operation
 
-type: keyword
+    type: keyword
 
 
 **`zookeeper.audit.result`**
 :   Result of the operation. Possible values are (success/failure/invoked). Result "invoked" is used for serverStop operation because stop is logged before ensuring that server actually stopped.
 
-type: keyword
+    type: keyword
 
 
 **`zookeeper.audit.user`**
 :   Comma separated list of users who are associate with a client session
 
-type: keyword
+    type: keyword
 
 
 ## log [_log]
+
+```{applies_to}
+stack: beta
+```
 
 ZooKeeper logs.
 
