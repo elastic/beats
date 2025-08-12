@@ -114,6 +114,8 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fix IIS module logging errors in case application pool PDH counter is not found. {pull}42274[42274]
 - Removed direct dependency on Azure/go-autorest/autorest/adal, which is deprecated. {issue}41463[41463] {pull}42959[42959]
 - Fixed Fileebat GCP Pub/Sub input integration tests. {pull}45150[45150]
+- `mage BuildSystemTestBinary` now build Otel enabled binaries for Filebeat and Metricbeat {pull}45824[45824]
+- testing/environments/docker/cometd: update base img version {pull}45889[45889]
 
 ==== Added
 
