@@ -165,8 +165,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added missing "text/csv" content-type filter support in azureblobsortorage input. {issue}44596[44596] {pull}44824[44824]
 - Fix unexpected EOF detection and improve memory usage. {pull}44813[44813]
 - Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
-- Fix a panic in the winlog input that prevented it from starting. {issue}45693[45693] {pull}45730[45730]
-- Fix error handling in ABS input when both root level `max_workers` and `batch_size` are empty. {issue}45680[45680] {pull}45743[45743]
 - Fix handling of unnecessary BOM in UTF-8 text received by o365audit input. {issue}44327[44327] {pull}45739[45739]
 
 *Heartbeat*
