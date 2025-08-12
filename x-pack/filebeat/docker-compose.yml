@@ -2,12 +2,12 @@ version: '2.3'
 services:
   # This is a proxy used to block beats until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
-  # proxy_dep:
-  #   image: busybox
-  #   depends_on:
-  #     elasticsearch: { condition: service_healthy }
-  #     kibana:        { condition: service_healthy }
-  #     cometd: { condition: service_healthy }
+  proxy_dep:
+    image: busybox
+    depends_on:
+      elasticsearch: { condition: service_healthy }
+      kibana:        { condition: service_healthy }
+      cometd: { condition: service_healthy }
 
   elasticsearch:
     extends:
