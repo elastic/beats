@@ -87,7 +87,7 @@ func (f *fsNotifySymbol) setKprobeFiltersFromBTF(spec *tkbtf.Spec) error {
 	}
 
 	if !found || btfEnum == nil {
-		return fmt.Errorf("fsnotify_data_type not an enum, this may be a kernel support issue.")
+		return fmt.Errorf("fsnotify_data_type not an enum, this may be a kernel support issue")
 	}
 
 	var dentry, path, inode uint64

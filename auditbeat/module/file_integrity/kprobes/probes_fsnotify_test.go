@@ -36,7 +36,8 @@ func Test_fsNotifyDataTypeBTF(t *testing.T) {
 	require.NoError(t, err)
 
 	var knownBtf *btf.Enum
-	rawSpec.TypeByName("fsnotify_data_type", &knownBtf)
+	err = rawSpec.TypeByName("fsnotify_data_type", &knownBtf)
+	require.NoError(t, err)
 	for _, enumType := range knownBtf.Values {
 		switch enumType.Name {
 		case "FSNOTIFY_EVENT_PATH":
