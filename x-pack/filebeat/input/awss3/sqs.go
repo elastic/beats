@@ -72,6 +72,7 @@ func readSQSMessages(
 	sqs sqsAPI,
 	metrics *inputMetrics,
 	count int,
+	queueURL string,
 ) []types.Message {
 	if count <= 0 {
 		return nil
@@ -79,7 +80,7 @@ func readSQSMessages(
 	msgs, err := sqs.ReceiveMessage(ctx, count)
 	for (err != nil || len(msgs) == 0) && ctx.Err() == nil {
 		if err != nil {
-			statusReporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retryable SQS fetching error: %s", err.Error()))
+			statusReporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retryable SQS fetching error for queue '%s': %s", queueURL, err.Error()))
 			log.Warnw("SQS ReceiveMessage returned an error. Will retry after a short delay.", "error", err)
 		} else {
 			// no auth error - input is running
