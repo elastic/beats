@@ -3,6 +3,110 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.19.1]]
+=== Beats version 8.19.1
+https://github.com/elastic/beats/compare/v8.19.0\...v8.19.1[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix a panic in the winlog input that prevented it from starting. {issue}45693[45693] {pull}45730[45730]
+
+*Metricbeat*
+
+- Improve error messages in AWS Health {pull}45408[45408]
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia. {pull}45620[45620]
+
+
+==== Added
+
+*Filebeat*
+
+- Log CEL single object evaluation results as ECS compliant documents where possible. {issue}45254[45254] {pull}45399[45399]
+- Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]
+
+[[release-notes-8.19.0]]
+=== Beats version 8.19.0
+https://github.com/elastic/beats/compare/v8.18.4\...v8.19.0[View commits]
+
+==== Breaking changes
+
+*Filebeat*
+
+- The Filestream input only starts to ingest a file when it is >= 1024 bytes in size. This happens because the fingerprint` is the default file identity now. To restore the previous behaviour, set `file_identity.native: ~` and `prospector.scanner.fingerprint.enabled: false` {issue}40197[40197] {pull}41762[41762]
+
+*Metricbeat*
+
+- Add VPN metrics to meraki module {pull}44851[44851]
+
+
+==== Bugfixes
+
+*Auditbeat*
+
+- Fix potential data loss in add_session_metadata. {pull}42795[42795]
+- auditbeat/fim: Fix FIM@ebpfevents for new kernels #44371. {pull}44371[44371]
+
+*Filebeat*
+
+- Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
+- Fix status reporting panic in GCP Pub/Sub input. {issue}44624[44624] {pull}44625[44625]
+- Fix a logging regression that ignored to_files and logged to stdout. {pull}44573[44573]
+
+*Heartbeat*
+
+- Added maintenance windows support for Heartbeat. {pull}41508[41508]
+
+*Packetbeat*
+
+- Properly marshal nested structs in ECS fields, fixing issues with mixed cases in field names {pull}42116[42116]
+
+==== Added
+
+*Affecting all Beats*
+
+- Publish cloud.availability_zone by add_cloud_metadata processor in azure environments {issue}42601[42601] {pull}43618[43618]
+
+*Filebeat*
+
+- Winlog input now can report its status to Elastic-Agent {pull}43089[43089]
+- Update CEL mito extensions to v1.18.0. {pull}43855[43855]
+- Add milliseconds to document timestamp from awscloudwatch Filebeat input {pull}44306[44306]
+- Add support to the Active Directory entity analytics provider for device entities. {pull}44309[44309]
+- Add support for OPTIONS request to HTTP Endpoint input. {issue}43930[43930] {pull}44387[44387]
+- Add Fleet status update functionality to lumberjack input. {issue}44283[44283] {pull}44339[44339]
+- Add Fleet status updating to HTTP Endpoint input. {issue}44281[44281] {pull}44310[44310]
+- Add Fleet status updating to streaming input. {issue}44284[44284] {pull}44340[44340]
+- Add Fleet status update functionality to gcppubsub input. {issue}44272[44272] {pull}44507[44507]
+- Add Fleet status updating to GCS input. {issue}44273[44273] {pull}44508[44508]
+- Introduce lastSync start position to AWS CloudWatch input backed by state registry. {pull}43251[43251]
+- Add Fleet status update functionality to tcp input. {issue}44420[44420] {pull}44786[44786]
+- Add Fleet status update functionality to udp input. {issue}44419[44419] {pull}44785[44785]
+- Add Fleet status updating to Azure Blob Storage input. {issue}44268[44268] {pull}44945[44945]
+- Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
+- Add proxy support to GCP Pub/Sub input. {pull}44892[44892]
+- Add support for relationship expansion to EntraID entity analytics provider. {issue}43324[43324] {pull}44761[44761]
+- Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
+- Update CEL mito extensions to v1.21.0. {issue}40762[40762] {pull}45107[45107]
+- Add Fleet health status reporting to the entity analytics input. {issue}44269[44269] {pull}45152[45152]
+- Add Fleet status updating to o356audit input. {issue}44651[44651] {pull}44957[44957]
+- Update CEL mito extensions to v1.22.0. {pull}45245[45245]
+- Allow empty HTTPJSON cursor template value evaluations to be ignored by Fleet health status updates. {pull}45361[45361]
+- Reuse OAuth2 clients in HTTP JSON input where possible. {issue}34834[34834] {pull}44976[44976]
+- Add support for generalized token authentication to CEL input. {pull}45359[45359]
+- The `add_cloudfoundry_metadata` processor now uses `xxhash` instead of `SHA1` for sanitizing persistent cache filenames. Existing users will experience a one-time cache invalidation as the cache store will be recreated with the new filename format. {pull}43964[43964]
+
+*Metricbeat*
+
+- Add a new `match_by_parent_instance` option to `perfmon` module. {pull}43002[43002]
+- Changed the Elasticsearch module behavior to only pull settings from non-system indices. {pull}43243[43243]
+- Exclude dotted indices from settings pull in Elasticsearch module. {pull}43306[43306]
+- Upgrade Prometheus Library to v0.300.1. {pull}43540[43540]
+- Add GCP metadata cache. {pull}44432[44432]
+- Add VPN metrics to meraki module {pull}44851[44851]
+
+
 [[release-notes-8.18.1]]
 === Beats version 8.18.1
 https://github.com/elastic/beats/compare/v8.18.0\...v8.18.1[View commits]
