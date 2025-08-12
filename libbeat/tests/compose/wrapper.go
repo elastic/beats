@@ -55,8 +55,13 @@ type wrapperDriver struct {
 	client *client.Client
 }
 
+<<<<<<< HEAD
 func newWrapperDriver() (*wrapperDriver, error) {
 	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
+=======
+func newWrapperDriver(logger *logp.Logger) (*wrapperDriver, error) {
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logger)
+>>>>>>> a00936c22 ([Chore][Backport] Replace global logger with local logger #12 (#45926))
 	if err != nil {
 		return nil, err
 	}

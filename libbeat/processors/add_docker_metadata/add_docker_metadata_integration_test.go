@@ -40,7 +40,7 @@ func TestAddDockerMetadata(t *testing.T) {
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.Check(t)
 
-	client, err := docker.NewClient(defaultConfig().Host, nil, nil)
+	client, err := docker.NewClient(defaultConfig().Host, nil, nil, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	// Docker clients can affect the goroutines checker because they keep
