@@ -156,7 +156,6 @@ func DefaultGoFIPSOnlyTestArgs() GoTestArgs {
 func DefaultGoWindowsTestIntegrationArgs() GoTestArgs {
 	args := makeGoTestArgs("Windows-Integration")
 	args.Tags = append(args.Tags, "win_integration")
-	fmt.Println(args.Tags)
 	args.ExtraFlags = append(args.ExtraFlags, "-count=1")
 	args.Packages = []string{"./tests/integration/windows"}
 	return args
