@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -29,18 +30,19 @@ const (
 	inputName = "aws-cloudwatch"
 )
 
-func Plugin(store statestore.States) v2.Plugin {
+func Plugin(logger *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "Collect logs from cloudwatch",
-		Manager:    &cloudwatchInputManager{store: store},
+		Manager:    &cloudwatchInputManager{store: store, logger: logger},
 	}
 }
 
 type cloudwatchInputManager struct {
-	store statestore.States
+	store  statestore.States
+	logger *logp.Logger
 }
 
 func (im *cloudwatchInputManager) Init(grp unison.Group) error {
@@ -53,7 +55,7 @@ func (im *cloudwatchInputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	return newInput(config, im.store)
+	return newInput(config, im.store, im.logger)
 }
 
 // cloudwatchInput is an input for reading logs from CloudWatch periodically.
@@ -65,11 +67,11 @@ type cloudwatchInput struct {
 	status    status.StatusReporter
 }
 
-func newInput(config config, store statestore.States) (*cloudwatchInput, error) {
-	cfgwarn.Beta("aws-cloudwatch input type is used")
+func newInput(config config, store statestore.States, logger *logp.Logger) (*cloudwatchInput, error) {
+	logger.Warn(cfgwarn.Beta("aws-cloudwatch input type is used"))
 
 	// perform AWS configuration validation
-	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
+	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig, logger)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize AWS credentials: %w", err)
 	}
