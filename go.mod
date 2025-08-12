@@ -207,7 +207,11 @@ require (
 	github.com/otiai10/copy v1.12.0
 	github.com/pierrec/lz4/v4 v4.1.22
 	github.com/pkg/xattr v0.4.9
+<<<<<<< HEAD
 	github.com/prometheus/prometheus v0.304.1
+=======
+	github.com/prometheus/prometheus v0.304.3-0.20250703114031-419d436a447a
+>>>>>>> 2e0b89426 (Match prometheus version with upstream prometheusreceivers' (#45886))
 	github.com/shirou/gopsutil/v4 v4.25.6
 	github.com/teambition/rrule-go v1.8.2
 	github.com/tklauser/go-sysconf v0.3.12
