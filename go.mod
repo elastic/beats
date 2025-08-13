@@ -100,13 +100,8 @@ require (
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/lib/pq v1.10.3
 	github.com/magefile/mage v1.15.0
-<<<<<<< HEAD
 	github.com/mattn/go-colorable v0.1.13
-	github.com/miekg/dns v1.1.65
-=======
-	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/miekg/dns v1.1.66
->>>>>>> d24319456 (Bump prometheus/prometheus to 0.305.0 (#45667))
 	github.com/mitchellh/gox v1.0.1
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/osquery/osquery-go v0.0.0-20231108163517-e3cde127e724
@@ -157,7 +152,7 @@ require (
 	cloud.google.com/go/compute v1.37.0
 	cloud.google.com/go/redis v1.18.2
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.18.0
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.9.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.10.1
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.3.1
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
