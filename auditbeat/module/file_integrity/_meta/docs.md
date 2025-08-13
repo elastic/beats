@@ -13,7 +13,7 @@ The operating system features that power this feature are as follows.
 
 * Linux - Multiple backends are supported: `auto`, `fsnotify`, `kprobes`, `ebpf`. By default, `fsnotify` is used, and therefore the kernel must have inotify support. Inotify was initially merged into the 2.6.13 Linux kernel. The eBPF backend uses modern eBPF features and supports 5.10.16+ kernels. The `Kprobes` backend uses tracefs and supports 3.10+ kernels. FSNotify doesn’t have the ability to associate user data to file events. The preferred backend can be selected by specifying the `backend` config option. Since eBPF and Kprobes are in technical preview, `auto` will default to `fsnotify`.
 * macOS (Darwin) - Uses the `FSEvents` API, present since macOS 10.5. This API coalesces multiple changes to a file into a single event. Auditbeat translates this coalesced changes into a meaningful sequence of actions. However, in rare situations the reported events may have a different ordering than what actually happened.
-* Windows - Multiple backends are supported: `auto`, `fsnotify`, `etw`. By default, `fsnotify` is used, which utilizes the `ReadDirectoryChangesW` Windows API. The `etw` backend uses Event Tracing for Windows (ETW) to monitor file system activities at the kernel level, supporting enhanced process context information. It requires Administrator privileges.
+* Windows - Multiple backends are supported: `auto`, `fsnotify`, `etw`. By default, `fsnotify` is used, which utilizes the `ReadDirectoryChangesW` Windows API. The `etw` backend uses Event Tracing for Windows (ETW) to monitor file system activities at the kernel level, supporting enhanced process context information. It requires Administrator privileges. **Note: The ETW backend is in technical preview and may change in future releases.**
 
 The file integrity module should not be used to monitor paths on network file systems.
 
@@ -43,6 +43,8 @@ This module has some configuration options for tuning its behavior. The followin
 ```
 
 For Windows with the ETW backend, additional configuration options are available:
+
+**Note: The ETW backend is in technical preview and may change in future releases.**
 
 ```yaml
 - module: file_integrity
@@ -91,7 +93,7 @@ This module also supports the [standard configuration options](#module-standard-
     
     **Linux:** `auto`, `fsnotify`, `kprobes`, `ebpf`. Default: `fsnotify`.
     
-    **Windows:** `auto`, `fsnotify`, `etw`. Default: `fsnotify`.
+    **Windows:** `auto`, `fsnotify`, `etw`. Default: `fsnotify`. **Note: The `etw` backend is in technical preview and may change in future releases.**
     
     **macOS:** Only `auto` and `fsnotify` are supported. Default: `fsnotify`
 

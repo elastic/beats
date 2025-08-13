@@ -35,6 +35,7 @@ import (
 	lru "github.com/hashicorp/golang-lru/v2"
 	"golang.org/x/sys/windows"
 
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -136,6 +137,8 @@ type etwReader struct {
 }
 
 func newETWReader(c Config, l *logp.Logger) (EventProducer, error) {
+	l.Warn(cfgwarn.Preview("ETW file integrity monitoring may change in future releases."))
+
 	paths := make(map[string]struct{})
 	for _, p := range c.Paths {
 		paths[p] = struct{}{}
