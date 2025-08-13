@@ -25,7 +25,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -119,9 +118,7 @@ type etwReader struct {
 	stopC      chan struct{}
 	inflightWG sync.WaitGroup
 
-	// Device path translation for converting kernel paths to user paths
-	deviceMap  map[string]string // Maps kernel device paths to drive letters
-	deviceList []string          // Sorted list of device paths (longest first)
+	deviceResolver *deviceResolver
 
 	pathsCache    *lru.Cache[fileObject, string]
 	processCache  *lru.Cache[processStartKey, *Process]
@@ -144,19 +141,10 @@ func newETWReader(c Config, l *logp.Logger) (EventProducer, error) {
 		paths[p] = struct{}{}
 	}
 
-	deviceMap, err := buildDeviceMap()
+	deviceResolver, err := newDeviceResolver(l)
 	if err != nil {
-		return nil, fmt.Errorf("failed to build device map: %w", err)
+		return nil, fmt.Errorf("failed to create device resolver: %w", err)
 	}
-	// To handle cases with nested mount points, we sort keys by length descending.
-	// This ensures we match the longest possible prefix first.
-	deviceList := make([]string, 0, len(deviceMap))
-	for k := range deviceMap {
-		deviceList = append(deviceList, k)
-	}
-	sort.Slice(deviceList, func(i, j int) bool {
-		return len(deviceList[i]) > len(deviceList[j])
-	})
 
 	pathsCache, err := lru.New[fileObject, string](1000)
 	if err != nil {
@@ -176,18 +164,17 @@ func newETWReader(c Config, l *logp.Logger) (EventProducer, error) {
 	}
 
 	r := &etwReader{
-		config:        c,
-		parsers:       FileParsers(c),
-		paths:         paths,
-		eventC:        make(chan Event),
-		deviceMap:     deviceMap,
-		deviceList:    deviceList,
-		pathsCache:    pathsCache,
-		processCache:  processCache,
-		sidCache:      sidCache,
-		fileInfoCache: fileInfoCache,
-		correlator:    newOperationsCorrelator(),
-		ownpid:        windows.GetCurrentProcessId(), // Get the PID of the current process
+		config:         c,
+		parsers:        FileParsers(c),
+		paths:          paths,
+		eventC:         make(chan Event),
+		deviceResolver: deviceResolver,
+		pathsCache:     pathsCache,
+		processCache:   processCache,
+		sidCache:       sidCache,
+		fileInfoCache:  fileInfoCache,
+		correlator:     newOperationsCorrelator(),
+		ownpid:         windows.GetCurrentProcessId(), // Get the PID of the current process
 	}
 
 	r.etwSession, err = etw.NewSession(etw.Config{
@@ -394,7 +381,7 @@ func (r *etwReader) handleFileEvent(record *etw.EventRecord) uintptr {
 
 func (r *etwReader) cacheFilename(etwEvent *etw.RenderedEtwEvent) bool {
 	fileObj := fileObject(getUint64Property(etwEvent, "FileObject"))
-	path := r.translateDevicePath(getRawPathFromEvent(etwEvent))
+	path := r.deviceResolver.translateDevicePath(getRawPathFromEvent(etwEvent))
 	if r.excluded(path) {
 		return false
 	}
@@ -422,7 +409,7 @@ func (r *etwReader) getEventPath(etwEvent *etw.RenderedEtwEvent) string {
 			return path
 		}
 	}
-	return r.translateDevicePath(getRawPathFromEvent(etwEvent))
+	return r.deviceResolver.translateDevicePath(getRawPathFromEvent(etwEvent))
 }
 
 func (r *etwReader) sendEvent(op *etwOp) {
@@ -432,7 +419,7 @@ func (r *etwReader) sendEvent(op *etwOp) {
 
 	start := time.Now()
 
-	path := r.translateDevicePath(op.path)
+	path := r.deviceResolver.translateDevicePath(op.path)
 	info, updated, infoErr := r.getFileInfo(path)
 
 	switch op.action {
@@ -567,35 +554,6 @@ func (r *etwReader) excluded(path string) bool {
 	return true
 }
 
-// translateDevicePath converts kernel-level device paths to user-level drive paths.
-//
-// Windows kernel file events report paths using device names like:
-// "\Device\HarddiskVolume1\Windows\System32\file.txt"
-//
-// This function translates them to familiar drive paths like:
-// "C:\Windows\System32\file.txt"
-//
-// The translation uses the deviceMap built during initialization, which maps
-// device names to their corresponding drive letters. The deviceList is sorted
-// by length (longest first) to handle nested mount points correctly.
-//
-// Returns the original path if no translation mapping is found.
-func (r *etwReader) translateDevicePath(kernelPath string) string {
-	if kernelPath == "" {
-		return ""
-	}
-	for _, device := range r.deviceList {
-		if strings.HasPrefix(kernelPath, device) {
-			drive := r.deviceMap[device]
-			// Replace the device prefix with the drive letter path
-			return strings.Replace(kernelPath, device, drive, 1)
-		}
-	}
-
-	// Return the original path if no mapping was found
-	return kernelPath
-}
-
 func (r *etwReader) handleProcessEvent(record *etw.EventRecord) uintptr {
 	if skipProcessEvent(record.EventHeader.EventDescriptor.Id) {
 		// should never happen, but there are some systems that might not support
@@ -617,7 +575,7 @@ func (r *etwReader) handleProcessEvent(record *etw.EventRecord) uintptr {
 	switch etwEvent.EventID {
 	case processStart:
 		var process Process
-		process.Name = r.translateDevicePath(getStringProperty(&etwEvent, "ImageName"))
+		process.Name = r.deviceResolver.translateDevicePath(getStringProperty(&etwEvent, "ImageName"))
 		process.User.ID = getStringExtendedData(&etwEvent, "SID")
 		userInfo := r.getUserInfo(process.User.ID)
 		if userInfo != nil {
@@ -770,29 +728,6 @@ func getPrimaryGroupForAccount(sid, account string) (groupSID, groupName string)
 	}
 
 	return groupSID, groupName
-}
-
-// buildDeviceMap queries the system for all logical drives and builds the translation map.
-func buildDeviceMap() (map[string]string, error) {
-	deviceMap := make(map[string]string)
-	bitmask, err := windows.GetLogicalDrives()
-	if err != nil {
-		return nil, fmt.Errorf("GetLogicalDrives failed: %w", err)
-	}
-
-	for i := 0; i < 26; i++ {
-		if (bitmask>>i)&1 == 1 {
-			driveLetter := string(byte('A' + i))
-			drivePath := driveLetter + ":"
-			buffer := make([]uint16, windows.MAX_PATH)
-			_, err := windows.QueryDosDevice(windows.StringToUTF16Ptr(drivePath), &buffer[0], uint32(len(buffer)))
-			if err != nil {
-				continue
-			}
-			deviceMap[windows.UTF16ToString(buffer)] = drivePath
-		}
-	}
-	return deviceMap, nil
 }
 
 func skipFileEvent(event uint16) bool {
