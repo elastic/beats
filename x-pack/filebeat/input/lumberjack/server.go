@@ -37,14 +37,14 @@ func newServer(c config, log *logp.Logger, pub func(beat.Event), stat status.Sta
 	if stat == nil {
 		stat = noopReporter{}
 	}
-	ljSvr, bindAddress, err := newLumberjack(c)
+	ljSvr, bindAddress, err := newLumberjack(c, log)
 	if err != nil {
 		stat.UpdateStatus(status.Failed, "failed to start lumberjack server: "+err.Error())
 		return nil, err
 	}
 
 	if metrics == nil {
-		metrics = newInputMetrics("", monitoring.NewRegistry())
+		metrics = newInputMetrics(monitoring.NewRegistry())
 	}
 
 	bindURI := "tcp://" + bindAddress
@@ -141,11 +141,11 @@ func makeEvent(remoteAddr string, tlsState *tls.ConnectionState, lumberjackEvent
 	return event
 }
 
-func newLumberjack(c config) (lj lumber.Server, bindAddress string, err error) {
+func newLumberjack(c config, logger *logp.Logger) (lj lumber.Server, bindAddress string, err error) {
 	// Setup optional TLS.
 	var tlsConfig *tls.Config
 	if c.TLS.IsEnabled() {
-		elasticTLSConfig, err := tlscommon.LoadTLSServerConfig(c.TLS)
+		elasticTLSConfig, err := tlscommon.LoadTLSServerConfig(c.TLS, logger)
 		if err != nil {
 			return nil, "", err
 		}

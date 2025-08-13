@@ -42,7 +42,7 @@ concurrency:
 jobs:
   unit-tests-push:
     name: Unit tests ${{ matrix.os }}
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     strategy:
       fail-fast: false
       matrix:
@@ -52,7 +52,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: ./.github/actions/unit-test
         with:
@@ -63,10 +63,10 @@ jobs:
     # Disabled due to: https://github.com/elastic/beats/issues/40496
     # TODO: remove the `if: false` and uncomment `if: github.event_name == 'pull_request'`for testing or once solved
     if: false
-    # if: github.event_name == 'pull_request'
+    # if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     runs-on: [macos-15]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: ./.github/actions/unit-test
         with:
