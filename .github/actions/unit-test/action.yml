@@ -32,6 +32,10 @@ runs:
       shell: bash
       working-directory: ${{ inputs.beat }}
 
+    - name: Check working dir
+      run: echo "Current working dir $(pwd)"
+      shell: bash
+
     - name: Run unitTest
       run: mage unitTest
       shell: bash

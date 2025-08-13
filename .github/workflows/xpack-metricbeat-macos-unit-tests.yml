@@ -54,6 +54,10 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - run: |
+          ls -la x-pack/metricbeat
+          pwd
+
       - uses: ./.github/actions/unit-test
         with:
           beat: ${{ env.BEAT }}'
