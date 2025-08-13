@@ -122,6 +122,7 @@ func BuildSystemTestBinary() error {
 	args := []string{
 		"test", "-c",
 		"-o", binArgs.Name + ".test",
+		"-tags", "otelbeat",
 	}
 
 	// On Windows 7 32-bit we run out of memory if we enable coverage and DWARF
@@ -310,4 +311,9 @@ func PythonIntegTest(ctx context.Context) error {
 
 func isWindows32bitRunner() bool {
 	return runtime.GOOS == "windows" && runtime.GOARCH == "386"
+}
+
+// FipsECHTest runs a smoke test using a FIPS enabled binary targetting an ECH deployment.
+func FipsECHTest(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultECHTestArgs())
 }

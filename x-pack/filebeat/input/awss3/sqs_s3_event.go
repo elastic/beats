@@ -20,6 +20,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -137,7 +138,7 @@ func newSQSS3EventProcessor(
 ) *sqsS3EventProcessor {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
-		metrics = newInputMetrics("", nil, 0)
+		metrics = newInputMetrics(monitoring.NewRegistry(), 0)
 	}
 	return &sqsS3EventProcessor{
 		s3HandlerFactory:     s3,
