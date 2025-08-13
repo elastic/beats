@@ -22,6 +22,7 @@ import (
 	"os"
 
 	"github.com/prometheus/procfs"
+	"github.com/ti-mo/conntrack"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -37,13 +38,16 @@ func init() {
 	mb.Registry.MustAddMetricSet("linux", "conntrack", New)
 }
 
+type fetchFunc func() ([]procfs.ConntrackStatEntry, error)
+
 // MetricSet holds any configuration or state information. It must implement
 // the mb.MetricSet interface. And this is best achieved by embedding
 // mb.BaseMetricSet because it implements all of the required mb.MetricSet
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	mod resolve.Resolver
+	mod       resolve.Resolver
+	fetchFunc fetchFunc
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -56,25 +60,44 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("unexpected module type: %T", base.Module())
 	}
 
-	return &MetricSet{
+	mset := &MetricSet{
 		BaseMetricSet: base,
 		mod:           sys,
-	}, nil
+	}
+
+	err := mset.selectMetricsSource()
+	if err != nil {
+		return nil, fmt.Errorf("error selecting metrics source: %w", err)
+	}
+
+	return mset, nil
+}
+
+func (m *MetricSet) selectMetricsSource() error {
+	var f fetchFunc
+	procExists, err := fileExists(m.mod.ResolveHostFS("/proc/net/stat/nf_conntrack"))
+	if err != nil {
+		return fmt.Errorf("error checking for procfs: %w", err)
+	}
+
+	if procExists {
+		m.Logger().Info("Using procfs to fetch conntrack metrics")
+		f = m.fetchProcFSMetrics
+	} else { // fallback to netlink
+		m.Logger().Info("nf_conntrack kernel module not loaded, using netlink to fetch conntrack metrics")
+		f = m.fetchNetlinkMetrics
+	}
+
+	m.fetchFunc = f
+	return nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	newFS, err := procfs.NewFS(m.mod.ResolveHostFS("/proc"))
+	conntrackStats, err := m.fetchFunc()
 	if err != nil {
-		return fmt.Errorf("error creating new Host FS at %s: %w", m.mod.ResolveHostFS("/proc"), err)
-	}
-	conntrackStats, err := newFS.ConntrackStat()
-	if err != nil {
-		if os.IsNotExist(err) {
-			err = mb.PartialMetricsError{Err: fmt.Errorf("nf_conntrack kernel module not loaded: %w", err)}
-		}
 		return fmt.Errorf("error fetching conntrack stats: %w", err)
 	}
 
@@ -106,4 +129,63 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	})
 
 	return nil
+}
+
+func fileExists(path string) (ok bool, err error) {
+	if _, err = os.Stat(path); err == nil {
+		ok = true
+	} else if os.IsNotExist(err) {
+		err = nil
+	}
+	return ok, err
+}
+
+func (m *MetricSet) fetchProcFSMetrics() ([]procfs.ConntrackStatEntry, error) {
+	newFS, err := procfs.NewFS(m.mod.ResolveHostFS("/proc"))
+	if err != nil {
+		return nil, fmt.Errorf("error creating new Host FS at /proc: %w", err)
+	}
+	conntrackStats, err := newFS.ConntrackStat()
+	if err != nil {
+		if os.IsNotExist(err) {
+			err = mb.PartialMetricsError{Err: fmt.Errorf("nf_conntrack kernel module not loaded: %w", err)}
+		}
+		return nil, err
+	}
+	return conntrackStats, nil
+}
+
+func (m *MetricSet) fetchNetlinkMetrics() ([]procfs.ConntrackStatEntry, error) {
+	conn, err := conntrack.Dial(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	cpuStats, err := conn.Stats()
+	if err != nil {
+		return nil, err
+	}
+
+	stats := make([]procfs.ConntrackStatEntry, 0, len(cpuStats))
+
+	for _, stat := range cpuStats {
+		stats = append(stats, procfs.ConntrackStatEntry{
+			Found:         uint64(stat.Found),
+			Invalid:       uint64(stat.Invalid),
+			Ignore:        uint64(stat.Ignore),
+			InsertFailed:  uint64(stat.InsertFailed),
+			Drop:          uint64(stat.Drop),
+			EarlyDrop:     uint64(stat.EarlyDrop),
+			SearchRestart: uint64(stat.SearchRestart),
+		})
+	}
+
+	globalStats, err := conn.StatsGlobal()
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch global stats: %w", err)
+	}
+
+	stats[0].Entries = uint64(globalStats.Entries)
+	return stats, nil
 }

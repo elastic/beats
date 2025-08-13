@@ -18,15 +18,11 @@
 package conntrack
 
 import (
-	"errors"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -65,21 +61,12 @@ func TestFetch(t *testing.T) {
 	assert.Equal(t, testConn, rawEvent)
 }
 
-func TestFetchConntrackModuleNotLoaded(t *testing.T) {
-	// Create a temporary directory to simulate a missing /proc/net/stat/nf_conntrack file
-	tmpDir := t.TempDir()
-	assert.NoError(t, os.MkdirAll(filepath.Join(tmpDir, "proc/net/stat"), 0755))
-	c := getConfig()
-	c["hostfs"] = tmpDir
-
-	f := mbtest.NewReportingMetricSetV2Error(t, c)
-	events, errs := mbtest.ReportingFetchV2Error(f)
-
-	require.Len(t, errs, 1)
-	err := errors.Join(errs...)
-	assert.ErrorAs(t, err, &mb.PartialMetricsError{})
-	assert.Contains(t, err.Error(), "error fetching conntrack stats: nf_conntrack kernel module not loaded")
-	require.Empty(t, events)
+func BenchmarkFetch(b *testing.B) {
+	f := mbtest.NewReportingMetricSetV2Error(b, getConfig())
+	for range b.N {
+		_, errs := mbtest.ReportingFetchV2Error(f)
+		require.Empty(b, errs, "fetch should not return an error")
+	}
 }
 
 func getConfig() map[string]interface{} {
