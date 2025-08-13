@@ -28,7 +28,10 @@ import (
 // When adding or retrieving variables, all names are split on the `.`-symbol and
 // intermediate registries will be generated.
 type Registry struct {
-	mu sync.RWMutex
+	// txMu is a transaction mutex for the New* functions which create new
+	// variables on a registry as they are not goroutine safe.
+	txMu sync.Mutex
+	mu   sync.RWMutex
 
 	name    string
 	entries map[string]entry

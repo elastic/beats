@@ -18,24 +18,150 @@
 package monitoring
 
 import (
+	"sync"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestSafeVars(t *testing.T) {
-	uintValName := "testUint"
-	testReg := Default.NewRegistry("safe_registry")
-	testUint := NewUint(testReg, uintValName)
-	testUint.Set(5)
-	// Add the first time
-	require.NotNil(t, testUint)
+	t.Run("no concurrency", func(t *testing.T) {
+		uintValName := "testUint"
+		testReg := NewRegistry().NewRegistry("safe_registry")
+		testUint := NewUint(testReg, uintValName)
+		testUint.Set(5)
+		// Add the first time
+		require.NotNil(t, testUint)
 
-	// Add the metric a second time
-	testSecondUint := NewUint(testReg, uintValName)
-	require.NotNil(t, testSecondUint)
-	// make sure we fetch the same unit
-	require.Equal(t, uint64(5), testSecondUint.Get())
+		// Add the metric a second time
+		testSecondUint := NewUint(testReg, uintValName)
+		require.NotNil(t, testSecondUint)
+		// make sure we fetch the same unit
+		require.Equal(t, uint64(5), testSecondUint.Get())
+	})
+
+	t.Run("with concurrency", func(t *testing.T) {
+		t.Run("NewInt", func(t *testing.T) {
+			reg := NewRegistry()
+			name := "foo"
+
+			wg := sync.WaitGroup{}
+			assert.NotPanics(t, func() {
+				for i := 0; i < 1000; i++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						NewInt(reg, name)
+					}()
+				}
+			})
+			wg.Wait()
+		})
+
+		t.Run("NewUint", func(t *testing.T) {
+			reg := NewRegistry()
+			name := "foo"
+
+			wg := sync.WaitGroup{}
+			assert.NotPanics(t, func() {
+				for i := 0; i < 1000; i++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						NewUint(reg, name)
+					}()
+				}
+			})
+			wg.Wait()
+		})
+
+		t.Run("NewFloat", func(t *testing.T) {
+			reg := NewRegistry()
+			name := "foo"
+
+			wg := sync.WaitGroup{}
+			assert.NotPanics(t, func() {
+				for i := 0; i < 1000; i++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						NewFloat(reg, name)
+					}()
+				}
+			})
+			wg.Wait()
+		})
+
+		t.Run("NewBool", func(t *testing.T) {
+			reg := NewRegistry()
+			name := "foo"
+
+			wg := sync.WaitGroup{}
+			assert.NotPanics(t, func() {
+				for i := 0; i < 1000; i++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						NewBool(reg, name)
+					}()
+				}
+			})
+			wg.Wait()
+		})
+
+		t.Run("NewString", func(t *testing.T) {
+			reg := NewRegistry()
+			name := "foo"
+
+			wg := sync.WaitGroup{}
+			assert.NotPanics(t, func() {
+				for i := 0; i < 1000; i++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						NewString(reg, name)
+					}()
+				}
+			})
+			wg.Wait()
+		})
+
+		t.Run("NewFunc", func(t *testing.T) {
+			reg := NewRegistry()
+			name := "foo"
+			dummyFunc := func(m Mode, v Visitor) {}
+
+			wg := sync.WaitGroup{}
+			assert.NotPanics(t, func() {
+				for i := 0; i < 1000; i++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						NewFunc(reg, name, dummyFunc)
+					}()
+				}
+			})
+			wg.Wait()
+		})
+		
+		t.Run("NewTimestamp", func(t *testing.T) {
+			reg := NewRegistry()
+			name := "foo"
+
+			wg := sync.WaitGroup{}
+			assert.NotPanics(t, func() {
+				for i := 0; i < 1000; i++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						NewTimestamp(reg, name)
+					}()
+				}
+			})
+			wg.Wait()
+		})
+	})
 }
 
 func TestVarsTypes(t *testing.T) {
