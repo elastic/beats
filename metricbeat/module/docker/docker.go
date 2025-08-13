@@ -82,7 +82,7 @@ func NewDockerClient(endpoint string, config Config) (*client.Client, error) {
 		}
 	}
 
-	client, err := docker.NewClient(endpoint, httpClient, nil)
+	client, err := docker.NewClient(endpoint, httpClient, nil, logp.NewNopLogger())
 	if err != nil {
 		return nil, err
 	}

@@ -88,7 +88,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 
 	// Hint must be explicitly enabled when default_config sets enabled=false.
 	if !l.config.DefaultConfig.Enabled() && !utils.IsEnabled(hints, l.config.Key) ||
-		utils.IsDisabled(hints, l.config.Key) {
+		utils.IsDisabled(hints, l.config.Key, l.log) {
 		l.log.Debugw("Hints config is not enabled.", "autodiscover.event", event)
 		return nil
 	}
@@ -224,11 +224,11 @@ func (l *logHints) getModule(hints mapstr.M) string {
 }
 
 func (l *logHints) getInputsConfigs(hints mapstr.M) []mapstr.M {
-	return utils.GetHintAsConfigs(hints, l.config.Key)
+	return utils.GetHintAsConfigs(hints, l.config.Key, l.log)
 }
 
 func (l *logHints) getProcessors(hints mapstr.M) []mapstr.M {
-	return utils.GetProcessors(hints, l.config.Key)
+	return utils.GetProcessors(hints, l.config.Key, l.log)
 }
 
 func (l *logHints) getPipeline(hints mapstr.M) string {
