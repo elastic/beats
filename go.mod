@@ -126,6 +126,7 @@ require (
 	go.etcd.io/bbolt v1.3.10
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
+<<<<<<< HEAD
 	golang.org/x/crypto v0.39.0
 	golang.org/x/mod v0.25.0
 	golang.org/x/net v0.40.0
@@ -139,6 +140,21 @@ require (
 	google.golang.org/genproto v0.0.0-20240730163845-b1a4ccb954bf // indirect
 	google.golang.org/grpc v1.67.1
 	google.golang.org/protobuf v1.36.5
+=======
+	golang.org/x/crypto v0.41.0
+	golang.org/x/mod v0.27.0
+	golang.org/x/net v0.43.0
+	golang.org/x/oauth2 v0.30.0
+	golang.org/x/sync v0.16.0
+	golang.org/x/sys v0.35.0
+	golang.org/x/text v0.28.0
+	golang.org/x/time v0.12.0
+	golang.org/x/tools v0.36.0
+	google.golang.org/api v0.238.0
+	google.golang.org/genproto v0.0.0-20250505200425-f936aa4a68b2 // indirect
+	google.golang.org/grpc v1.73.0
+	google.golang.org/protobuf v1.36.6
+>>>>>>> 97736493a (Fix file_integrity kprobe filters, use BTF values where possible (#45950))
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/gotestsum v1.7.0
@@ -185,7 +201,7 @@ require (
 	github.com/elastic/mito v1.19.0
 	github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015
 	github.com/elastic/sarama v1.19.1-0.20250603175145-7672917f26b6
-	github.com/elastic/tk-btf v0.1.0
+	github.com/elastic/tk-btf v0.2.0
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/go-ldap/ldap/v3 v3.4.6
@@ -228,10 +244,27 @@ require (
 	go.opentelemetry.io/collector/pdata v1.20.0
 	go.opentelemetry.io/collector/receiver v0.114.0
 	go.uber.org/mock v0.5.0
+<<<<<<< HEAD
 	golang.org/x/term v0.32.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20241104194629-dd2ea8efbc28
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gotest.tools/v3 v3.5.1
+=======
+	golang.org/x/term v0.34.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
+	gopkg.in/yaml.v3 v3.0.1
+)
+
+require (
+	github.com/cilium/ebpf v0.16.0
+	go.opentelemetry.io/collector/client v1.36.0
+	go.opentelemetry.io/collector/pipeline v0.130.0
+	go.opentelemetry.io/collector/processor v1.36.0
+	go.opentelemetry.io/collector/processor/processorhelper v0.130.0
+	go.opentelemetry.io/collector/receiver/receivertest v0.130.0
+	go.opentelemetry.io/otel/sdk/metric v1.37.0
+>>>>>>> 97736493a (Fix file_integrity kprobe filters, use BTF values where possible (#45950))
 )
 
 require (
@@ -273,8 +306,17 @@ require (
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bluekeyes/go-gitdiff v0.7.1 // indirect
+<<<<<<< HEAD
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cilium/ebpf v0.13.2 // indirect
+=======
+	github.com/cenkalti/backoff/v5 v5.0.2 // indirect
+	github.com/cespare/xxhash v1.1.0 // indirect
+	github.com/cncf/xds/go v0.0.0-20250326154945-ae57f3c0d45f // indirect
+	github.com/containerd/containerd/v2 v2.1.0 // indirect
+	github.com/containerd/errdefs v1.0.0 // indirect
+	github.com/containerd/errdefs/pkg v0.3.0 // indirect
+>>>>>>> 97736493a (Fix file_integrity kprobe filters, use BTF values where possible (#45950))
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20180511133405-39ca1b05acc7 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.5 // indirect
@@ -454,7 +496,13 @@ require (
 	go.opentelemetry.io/otel/trace v1.34.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
+<<<<<<< HEAD
 	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842 // indirect
+=======
+	go.yaml.in/yaml/v2 v2.4.2 // indirect
+	go.yaml.in/yaml/v3 v3.0.4 // indirect
+	golang.org/x/exp v0.0.0-20250811191247-51f88131bc50 // indirect
+>>>>>>> 97736493a (Fix file_integrity kprobe filters, use BTF values where possible (#45950))
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	gonum.org/v1/gonum v0.15.1 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241209162323-e6fa225c2576 // indirect
