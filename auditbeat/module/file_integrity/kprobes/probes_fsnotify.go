@@ -22,6 +22,7 @@ package kprobes
 import (
 	"errors"
 	"fmt"
+	"math"
 
 	tkbtf "github.com/elastic/tk-btf"
 
@@ -90,7 +91,7 @@ func (f *fsNotifySymbol) setKprobeFiltersFromBTF(spec *tkbtf.Spec) error {
 		return fmt.Errorf("fsnotify_data_type not an enum, this may be a kernel support issue")
 	}
 
-	var dentry, path, inode uint64
+	var dentry, path, inode uint64 = math.MaxUint64, math.MaxUint64, math.MaxUint64
 	for _, enumType := range btfEnum.Values {
 		switch enumType.Name {
 		case "FSNOTIFY_EVENT_PATH":
@@ -100,6 +101,10 @@ func (f *fsNotifySymbol) setKprobeFiltersFromBTF(spec *tkbtf.Spec) error {
 		case "FSNOTIFY_EVENT_DENTRY":
 			dentry = enumType.Value
 		}
+	}
+
+	if dentry == math.MaxUint64 || inode == math.MaxUint64 || path == math.MaxUint64 {
+		return fmt.Errorf("values missing from fsnotify_data_type struct, may be a kernel support issue: %v", btfEnum.Values)
 	}
 
 	f.setKprobeFilters(path, inode, dentry)
@@ -132,9 +137,9 @@ func (f *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, e
 		// the kprobe filters work by giving each of the three fsnotify kprobes (one each for dentry,
 		// inode and path-based events) filtering rules based on the presence
 		// of mask values, and the value of the fsnotify() data_type field.
-		// If for some reason these events become corrupted or invalid (changes in the kernel, kprobe bug on our end)
+		// If for some reason those mask/data_type fields become invalid (changes in the kernel, kprobe bug on our end)
 		// the events that get get through the filters might look strange or corrupted with no apparent pattern.
-		// Your first debugging step should be to disable these filters.
+		// Your first debugging step should be to disable these filters so you can see events as they arrive.
 		// NOTE: in the future we may want to investigate alternatives to these filters (doing the filtering in userland, etc).
 		err := f.setKprobeFiltersFromBTF(spec)
 		if err != nil {
