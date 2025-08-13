@@ -19,6 +19,7 @@ package elasticsearchtranslate
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -66,7 +67,7 @@ var defaultOptions = esToOTelOptions{
 // ToOTelConfig converts a Beat config into OTel elasticsearch exporter config
 // Ensure cloudid is handled before calling this method
 // Note: This method may override output queue settings defined by user.
-func ToOTelConfig(output *config.C) (map[string]any, error) {
+func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error) {
 	escfg := defaultOptions
 
 	// check for unsupported config
@@ -111,7 +112,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	}
 
 	// convert ssl configuration
-	otelTLSConfg, err := oteltranslate.TLSCommonToOTel(escfg.Transport.TLS)
+	otelTLSConfg, err := oteltranslate.TLSCommonToOTel(output, logger)
 	if err != nil {
 		return nil, fmt.Errorf("cannot convert SSL config into OTel: %w", err)
 	}
@@ -177,21 +178,20 @@ func checkUnsupportedConfig(cfg *config.C) error {
 	}
 
 	if !isStructEmpty(temp) {
-		logp.Warn("these configuration parameters are not supported %+v", temp)
-		return nil
+		return fmt.Errorf("these configuration parameters are not supported %+v: %w", temp, errors.ErrUnsupported)
 	}
 
 	// check for dictionary like parameters that we do not support yet
 	if cfg.HasField("indices") {
-		logp.Warn("indices is currently not supported")
+		return fmt.Errorf("indices is currently not supported: %w", errors.ErrUnsupported)
 	} else if cfg.HasField("pipelines") {
-		logp.Warn("pipelines is currently not supported")
+		return fmt.Errorf("pipelines is currently not supported: %w", errors.ErrUnsupported)
 	} else if cfg.HasField("parameters") {
-		logp.Warn("parameters is currently not supported")
+		return fmt.Errorf("parameters is currently not supported: %w", errors.ErrUnsupported)
 	} else if cfg.HasField("proxy_headers") {
-		logp.Warn("proxy_headers is currently not supported")
+		return fmt.Errorf("proxy_headers is currently not supported: %w", errors.ErrUnsupported)
 	} else if value, err := cfg.Bool("allow_older_versions", -1); err == nil && !value {
-		logp.Warn("allow_older_versions:false is currently not supported")
+		return fmt.Errorf("allow_older_versions:false is currently not supported: %w", errors.ErrUnsupported)
 	}
 	return nil
 }
