@@ -89,7 +89,18 @@ endif::has_modules_command[]
 PS C:{backslash}Program Files{backslash}{beatname_lc}> Start-Service {beatname_lc}
 ----------------------------------------------------------------------
 
+[IMPORTANT]
+=========================
 By default, Windows log files are stored in +C:{backslash}Program Files{backslash}{beatname_uc}-Data\logs+.
+The base folder has changed from `C:\ProgramData\` to `C:\Program Files\`
+because the latter has stricter permissions. The home path (base for
+state and logs) is now `C:\Program Files\{beatname_uc}-Data`.
+
+The install script (`install-service-filebeat.ps1`) will check whether
+`C:\ProgramData\{beatname_uc}` exits and move it to `C:\Program Files\{beatname_uc}-Data`.
+For more details on the installation script refer to: <<install-script>>.
+
+=========================
 
 ifeval::["{beatname_lc}"=="metricbeat"]
 NOTE: On Windows, statistics about system load and swap usage are currently
