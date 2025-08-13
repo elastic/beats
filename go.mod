@@ -177,8 +177,13 @@ require (
 	github.com/dgraph-io/badger/v4 v4.6.0
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.7.0
+<<<<<<< HEAD
 	github.com/elastic/elastic-agent-autodiscover v0.9.0
 	github.com/elastic/elastic-agent-libs v0.21.5
+=======
+	github.com/elastic/elastic-agent-autodiscover v0.10.0
+	github.com/elastic/elastic-agent-libs v0.21.2
+>>>>>>> 516cf2102 ([Chore][Backport] Updates elastic-agent-autodiscover to v0.10.0 (#45958))
 	github.com/elastic/elastic-agent-system-metrics v0.11.11
 	github.com/elastic/go-elasticsearch/v8 v8.17.0
 	github.com/elastic/go-quark v0.2.0
