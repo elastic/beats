@@ -82,6 +82,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"urlEncode":           urlEncode,
 			"userAgent":           userAgentString,
 			"uuid":                uuidString,
+			"terminate":           func(s string) (any, error) { return nil, &errTerminate{s} },
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -94,7 +95,22 @@ func (t *valueTpl) Unpack(in string) error {
 	return nil
 }
 
+<<<<<<< HEAD
 func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName string, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
+=======
+type errTerminate struct {
+	Reason string
+}
+
+func (e *errTerminate) Error() string {
+	if e.Reason != "" {
+		return "terminated template: " + e.Reason
+	}
+	return "terminated template"
+}
+
+func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName string, defaultVal *valueTpl, stat status.StatusReporter, log *logp.Logger) (val string, err error) {
+>>>>>>> f324f295a (x-pack/filebeat/input/httpjson: allow template termination without logging error (#45810))
 	fallback := func(err error) (string, error) {
 		if defaultVal != nil {
 			log.Debugw("template execution: falling back to default value", "target", targetName)
@@ -128,6 +144,11 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName
 	}
 
 	if err := t.Template.Execute(buf, data); err != nil {
+		var termErr *errTerminate
+		if errors.As(err, &termErr) {
+			log.Debugw("template execution terminated", "target", targetName, "reason", termErr.Reason)
+			return "", nil
+		}
 		return fallback(err)
 	}
 
