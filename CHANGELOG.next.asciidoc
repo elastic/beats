@@ -221,6 +221,17 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
 - Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
 - Allow empty HTTPJSON cursor template value evaluations to be ignored by Fleet health status updates. {pull}45361[45361]
+- Reuse OAuth2 clients in HTTP JSON input where possible. {issue}34834[34834] {pull}44976[44976]
+- Add support for generalized token authentication to CEL input. {pull}45359[45359]
+- Log CEL single object evaluation results as ECS compliant documents where possible. {issue}45254[45254] {pull}45399[45399]
+- Add full event rendering for the ETW input {pull}44664[44664]
+- Add status update functionality to Salesforce input. {issue}44653[44653] {pull}45227[45227]
+- Improve CEL and Streaming input documentation of the `state` option. {pull}45616[45616]
+- Updated the `parse_aws_vpc_flow_log` processor to handle AWS VPC flow log v6, v7, and v8 fields. {pull}45746[45746]
+- Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]
+- Clarify behavior in logging for starting periodic evaluations and for exceeding the maximum execution budget. {pull}45633[45633]
+- Add status reporting support for AWS CloudWatch input. {pull}45679[45679]
+- Add mechanism to allow HTTP JSON templates to terminate without logging an error. {issue}45664[45664] {pull}45810[45810]
 
 *Auditbeat*
 
