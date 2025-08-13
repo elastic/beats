@@ -100,6 +100,21 @@ tar xzvf heartbeat-{{version.stack}}-linux-x86_64.tar.gz
 :::{note}
 If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-heartbeat.ps1`.
 :::
+
+:::{important}
+```{applies_to}
+stack: ga 9.0.6
+```
+The base folder has changed from `C:\ProgramData\` to `C:\Program Files\`
+because the latter has stricter permissions. The home path (base for
+state and logs) is now `C:\Program Files\Heartbeat-Data`.
+
+The install script (`install-service-heartbeat.ps1`) will check whether
+`C:\ProgramData\Heartbeat` exits and move it to `C:\Program Files\Heartbeat-Data`.
+For more details on the installation script refer to: [install script](/reference/heartbeat/heartbeat-installation-script.md).
+
+:::
+
 ::::::
 :::::::
 

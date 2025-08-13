@@ -72,6 +72,19 @@ If script execution is disabled on your system, you need to set the execution po
 To use a local non-Administrator account to run Winlogbeat, follow [these additional steps](#local-user-account-setup).
 :::
 
+:::{important}
+```{applies_to}
+stack: ga 9.0.6
+```
+The base folder has changed from `C:\ProgramData\` to `C:\Program Files\`
+because the latter has stricter permissions. The home path (base for
+state and logs) is now `C:\Program Files\Winlogbeat-Data`.
+
+The install script (`install-service-winlogbeat.ps1`) will check whether
+`C:\ProgramData\Winlogbeat` exits and move it to `C:\Program Files\Winlogbeat-Data`.
+For more details on the installation script refer to: [install script](/reference/winlogbeat/winlogbeat-installation-script.md).
+
+:::
 
 
 ## Step 2: Connect to the {{stack}} [set-connection]
