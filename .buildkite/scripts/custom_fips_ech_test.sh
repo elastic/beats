@@ -12,7 +12,7 @@ trap 'ech_down' EXIT
 # haven't been published yet and are, therefore, not yet available in ECH.
 # Once artifacts matching the version in `libbeat/version/version.go` are available in ECH, the
 # following line should be removed and the line after that should be uncommented.
-STACK_VERSION="9.1.1-SNAPSHOT"
+STACK_VERSION="9.1.2-SNAPSHOT"
 # STACK_VERSION="$(./dev-tools/get_version)-SNAPSHOT"
 
 ech_up $STACK_VERSION
