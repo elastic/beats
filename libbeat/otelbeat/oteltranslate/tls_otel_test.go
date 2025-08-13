@@ -18,22 +18,26 @@
 package oteltranslate
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestTLSCommonToOTel(t *testing.T) {
 
+	logger := logptest.NewTestingLogger(t, "")
 	t.Run("when ssl.enabled = false", func(t *testing.T) {
-		b := false
-		input := &tlscommon.Config{
-			Enabled: &b,
-		}
-		got, err := TLSCommonToOTel(input)
+		input := `
+ssl:
+  enabled: false
+`
+		cfg := config.MustNewConfigFrom(input)
+		got, err := TLSCommonToOTel(cfg, logger)
 		require.NoError(t, err)
 		want := map[string]any{
 			"insecure": true,
@@ -42,43 +46,60 @@ func TestTLSCommonToOTel(t *testing.T) {
 		assert.Equal(t, want, got)
 	})
 
-	tests := []struct {
-		name  string
-		input *tlscommon.Config
-		want  map[string]any
-		err   bool
-	}{
-		{
-			name: "when unsupported configuration is passed",
-			input: &tlscommon.Config{
-				CATrustedFingerprint: "a3:5f:bf:93:12:8f:bc:5c:ab:14:6d:bf:e4:2a:7f:98:9d:2f:16:92:76:c4:12:ab:67:89:fc:56:4b:8e:0c:43",
-			},
-			want: nil,
-			err:  true,
-		},
-		{
-			name: "when ssl.verification_mode:none ",
-			input: &tlscommon.Config{
-				VerificationMode: tlscommon.VerifyNone,
-			},
-			want: map[string]any{
-				"insecure_skip_verify":         true,
-				"include_system_ca_certs_pool": true,
-			},
-			err: false,
-		},
-	}
+	t.Run("when ssl.verification_mode:none", func(t *testing.T) {
+		input := `
+ssl:
+  verification_mode: none
+`
+		cfg := config.MustNewConfigFrom(input)
+		got, err := TLSCommonToOTel(cfg, logger)
+		require.NoError(t, err)
+		assert.Equal(t, map[string]any{
+			"insecure_skip_verify":         true,
+			"include_system_ca_certs_pool": true,
+			"min_version":                  "1.2",
+			"max_version":                  "1.3",
+		}, got, "beats to otel ssl mapping")
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			got, err := TLSCommonToOTel(test.input)
-			if test.err {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				assert.Equal(t, test.want, got, "beats to otel ssl mapping")
-			}
+	})
 
-		})
-	}
+	t.Run("when unsupported configuration  renegotiation is used", func(t *testing.T) {
+		input := `
+ssl:
+  verification_mode: none
+  renegotiation: never
+`
+		cfg := config.MustNewConfigFrom(input)
+		_, err := TLSCommonToOTel(cfg, logger)
+		require.Error(t, err)
+		require.ErrorIs(t, err, errors.ErrUnsupported)
+
+	})
+
+	t.Run("when unsupported configuration restart_on_cert_change.enabled is used", func(t *testing.T) {
+		input := `
+ssl:
+  verification_mode: none
+  restart_on_cert_change.enabled: true
+`
+		cfg := config.MustNewConfigFrom(input)
+		_, err := TLSCommonToOTel(cfg, logger)
+		require.Error(t, err)
+		require.ErrorIs(t, err, errors.ErrUnsupported)
+
+	})
+
+	t.Run("when unsupported tls version is passed", func(t *testing.T) {
+		input := `
+ssl:
+  verification_mode: none
+  supported_protocols: 
+   - TLSv1.4
+`
+		cfg := config.MustNewConfigFrom(input)
+		_, err := TLSCommonToOTel(cfg, logger)
+		require.Error(t, err)
+		require.ErrorContains(t, err, "invalid tls version")
+
+	})
 }
