@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -147,7 +148,7 @@ func (c *kafkaInputConfig) Validate() error {
 	return nil
 }
 
-func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
+func newSaramaConfig(config kafkaInputConfig, logger *logp.Logger) (*sarama.Config, error) {
 	k := sarama.NewConfig()
 
 	version, ok := config.Version.Get()
@@ -181,7 +182,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	}
 
 	if config.Kerberos.IsEnabled() {
-		cfgwarn.Beta("Kerberos authentication for Kafka is beta.")
+		logger.Warn(cfgwarn.Beta("Kerberos authentication for Kafka is beta."))
 
 		k.Net.SASL.Enable = true
 		k.Net.SASL.Mechanism = sarama.SASLTypeGSSAPI

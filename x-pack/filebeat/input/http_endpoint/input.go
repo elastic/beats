@@ -53,12 +53,12 @@ type httpEndpoint struct {
 	tlsConfig *tls.Config
 }
 
-func Plugin() v2.Plugin {
+func Plugin(log *logp.Logger) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Stable,
 		Deprecated: false,
-		Manager:    v2.ConfigureWith(configure),
+		Manager:    v2.ConfigureWith(configure, log),
 	}
 }
 
