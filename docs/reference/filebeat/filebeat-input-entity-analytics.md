@@ -998,8 +998,7 @@ filebeat.inputs:
     client.id: "your-client-id"
     scopes: ["okta.users.read", "okta.devices.read"]
     token_url: "https://your-domain.okta.com/oauth2/v1/token"
-    okta:
-      jwk_file: "/path/to/private-key.jwk"
+    jwk_file: "/path/to/private-key.jwk"
 ```
 1. {applies_to}`stack: ga 9.2`
 
@@ -1088,7 +1087,7 @@ stack: ga 9.2.0
 
 The OAuth2 token endpoint URL. Typically `https://your-domain.okta.com/oauth2/v1/token`.
 
-##### `oauth2.okta.jwk_file`
+##### `oauth2.jwk_file`
 
 ```{applies_to}
 stack: ga 9.2.0
@@ -1096,7 +1095,7 @@ stack: ga 9.2.0
 
 Path to the JWK file containing the private key.
 
-##### `oauth2.okta.jwk_json`
+##### `oauth2.jwk_json`
 
 ```{applies_to}
 stack: ga 9.2.0
@@ -1104,7 +1103,7 @@ stack: ga 9.2.0
 
 JWK JSON content containing the private key.
 
-##### `oauth2.okta.jwk_pem`
+##### `oauth2.jwk_pem`
 
 ```{applies_to}
 stack: ga 9.2.0
@@ -1113,7 +1112,7 @@ stack: ga 9.2.0
 PEM-formatted private key content.
 
 ::::{note}
-Only one of `oauth2.okta.jwk_file`, `oauth2.okta.jwk_json`, or `oauth2.okta.jwk_pem` must be provided for JWT authentication, or `oauth2.client.secret` must be provided for client secret authentication. The authentication method is automatically determined based on which credentials are provided.
+Only one of `oauth2.jwk_file`, `oauth2.jwk_json`, or `oauth2.jwk_pem` must be provided for JWT authentication, or `oauth2.client.secret` must be provided for client secret authentication. The authentication method is automatically determined based on which credentials are provided.
 ::::
 
 

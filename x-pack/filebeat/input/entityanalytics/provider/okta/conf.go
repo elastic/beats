@@ -102,9 +102,9 @@ type oAuth2Config struct {
 	TokenURL     string   `config:"token_url" validate:"required"`
 
 	// JWT-based authentication (private key)
-	OktaJWKFile string `config:"okta.jwk_file"`
-	OktaJWKJSON []byte `config:"okta.jwk_json"`
-	OktaJWKPEM  []byte `config:"okta.jwk_pem"`
+	OktaJWKFile string `config:"jwk_file"`
+	OktaJWKJSON []byte `config:"jwk_json"`
+	OktaJWKPEM  []byte `config:"jwk_pem"`
 }
 
 func (o *oAuth2Config) isEnabled() bool {
@@ -132,7 +132,7 @@ func (o *oAuth2Config) Validate() error {
 	}
 
 	if !hasClientSecret && !hasJWTKeys {
-		return errors.New("oauth2 validation error: must provide either client.secret or one of okta.jwk_file, okta.jwk_json, or okta.jwk_pem")
+		return errors.New("oauth2 validation error: must provide either client.secret or one of jwk_file, jwk_json, or jwk_pem")
 	}
 
 	// Validate JWT key format if using JWT authentication
@@ -149,7 +149,7 @@ func (o *oAuth2Config) Validate() error {
 			n++
 		}
 		if n > 1 {
-			return errors.New("oauth2 validation error: only one of okta.jwk_file, okta.jwk_json, or okta.jwk_pem should be provided")
+			return errors.New("oauth2 validation error: only one of jwk_file, jwk_json, or jwk_pem should be provided")
 		}
 
 		// Validate JWT key format
