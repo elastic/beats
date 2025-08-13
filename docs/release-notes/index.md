@@ -17,6 +17,24 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 % ### Fixes [beats-versionext-fixes]
 
+## 9.1.2 [beats-9.1.2-release-notes]
+
+### Features and enhancements [beats-9.1.2-features-enhancements]
+
+**Filebeat**
+
+- Add status reporting support for AWS CloudWatch input. [45679]({{beats-pull}}45679)
+
+**Winlogbeat**
+
+- Render data values in XML renderer. [44132]({{beats-pull}}44132)
+
+### Fixes [beats-9.1.2-fixes]
+
+**Filebeat**
+
+- Fix error handling in ABS input when both root level `max_workers` and `batch_size` are empty. [45680]({{beats-issue}}45680) [45743]({{beats-pull}}45743)
+
 ## 9.1.1 [beats-9.1.1-release-notes]
 
 ### Features and enhancements [beats-9.1.1-features-enhancements]
@@ -94,6 +112,28 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 - Added maintenance windows support for Heartbeat. [41508]({{beats-pull}}41508)
 
+## 9.0.5 [beats-9.0.5-release-notes]
+
+### Features and enhancements [beats-9.0.5-features-enhancements]
+
+**Filebeat**
+
+- Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. [45653]({{beats-pull}}45653)
+
+**Metricbeat**
+
+- Improve error messages in AWS Health. [45408]({{beats-pull}}45408)
+
+### Fixes [beats-9.0.5-fixes]
+
+**Auditbeat**
+
+- Auditd: Request status from a separate socket to avoid data congestion. [41207]({{beats-pull}}41207)
+- Fix potential data loss in `add_session_metadata`. [42795]({{beats-pull}}42795)
+
+**Metricbeat**
+
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia. [45620]({{beats-pull}}45620)
 
 ## 9.0.4 [beats-9.0.4-release-notes]
 
