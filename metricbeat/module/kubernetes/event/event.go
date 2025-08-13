@@ -127,7 +127,7 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 		FilterFunc: func(obj interface{}) bool {
 			eve, ok := obj.(*kubernetes.Event)
 			if !ok {
-				m.Logger().Debugf("Error while casting event: %t", ok)
+				m.Logger().Debugf("Error while casting event. Got type: %T", obj)
 			}
 			// if fields are null they are decoded to `0001-01-01 00:00:00 +0000 UTC`
 			// so we need to check if they are valid first

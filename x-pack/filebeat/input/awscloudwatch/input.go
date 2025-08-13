@@ -149,9 +149,9 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		return err
 	}
 
-	log.Debugf("Config latency = %d", cwPoller.config.Latency)
-	log.Debugf("Config scan_frequency = %d", cwPoller.config.ScanFrequency)
-	log.Debugf("Config api_sleep = %d", cwPoller.config.APISleep)
+	log.Debugf("Config latency = %s", cwPoller.config.Latency)
+	log.Debugf("Config scan_frequency = %s", cwPoller.config.ScanFrequency)
+	log.Debugf("Config api_sleep = %s", cwPoller.config.APISleep)
 	cwPoller.receive(ctx, logGroupIDs, time.Now)
 	return nil
 }
