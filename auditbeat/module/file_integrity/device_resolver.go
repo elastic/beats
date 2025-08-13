@@ -24,9 +24,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	lru "github.com/hashicorp/golang-lru/v2"
 	"golang.org/x/sys/windows"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type trieNode struct {
