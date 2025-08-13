@@ -107,6 +107,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 - Fix a logging regression that ignored to_files and logged to stdout. [44573]({{beats-pull}}44573)
 - Fixed issue for "Root level readerConfig no longer respected" in azureblobstorage input. [44812]({{beats-issue}}44812) [44873]({{beats-pull}}44873)
 - Fixed password authentication for ACL users in the Redis input of Filebeat. [44137]({{beats-pull}}44137)
+- The data and logs path has changed on Windows to `$env:ProgramFiles`. See the breaking changes page for more details.
 
 **Heartbeat**
 
