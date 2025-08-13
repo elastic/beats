@@ -24,31 +24,20 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-<<<<<<< HEAD
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
-=======
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
->>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
 )
 
 func TestTLSCommonToOTel(t *testing.T) {
 
+	logger := logptest.NewTestingLogger(t, "")
 	t.Run("when ssl.enabled = false", func(t *testing.T) {
-<<<<<<< HEAD
-		b := false
-		input := &tlscommon.Config{
-			Enabled: &b,
-		}
-		got, err := TLSCommonToOTel(input)
-=======
 		input := `
 ssl:
   enabled: false
 `
 		cfg := config.MustNewConfigFrom(input)
 		got, err := TLSCommonToOTel(cfg, logger)
->>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
 		require.NoError(t, err)
 		want := map[string]any{
 			"insecure": true,
@@ -72,19 +61,7 @@ ssl:
 			"max_version":                  "1.3",
 		}, got, "beats to otel ssl mapping")
 
-<<<<<<< HEAD
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			got, err := TLSCommonToOTel(test.input)
-			if test.err {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				assert.Equal(t, test.want, got, "beats to otel ssl mapping")
-			}
-=======
 	})
->>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
 
 	t.Run("when unsupported configuration  renegotiation is used", func(t *testing.T) {
 		input := `

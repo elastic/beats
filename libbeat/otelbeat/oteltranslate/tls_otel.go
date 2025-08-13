@@ -63,16 +63,10 @@ func validateUnsupportedConfig(output *config.C) error {
 }
 
 // TLSCommonToOTel converts a tlscommon.Config into the OTel configtls.ClientConfig
-<<<<<<< HEAD
-func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
-	logger := logp.L().Named("tls-to-otel")
-	insecureSkipVerify := false
-=======
 // ca_trusted_fingerprint, ca_sha_256 and verification mode should be handled separately by beatsauth extension
 func TLSCommonToOTel(output *config.C, logger *logp.Logger) (map[string]any, error) {
 	logger = logger.Named("tls-to-otel")
 	otelTLSConfig := map[string]any{}
->>>>>>> 208317d1c ([beatreceiver] Return standard unsupported error and update TLS to OTel config translation (#45754))
 
 	var tlsCfg = elasticsearch.ESDefaultTransportSettings()
 
