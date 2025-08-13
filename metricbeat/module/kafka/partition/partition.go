@@ -53,11 +53,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// lower than the one specified here. Therefore, any changes to this property should be made cautiously,
 	// and must be thoroughly tested against all supported Kafka versions.
 	opts := kafka.MetricSetOptions{
-<<<<<<< HEAD
-		Version: "2.2.0",
-=======
 		Version: "2.1.0",
->>>>>>> 2515ddf78 ([metricbeat][kafka] change kafka protocol version from 3.6.0 to 2.1.0 (#45761))
 	}
 
 	ms, err := kafka.NewMetricSet(base, opts)
