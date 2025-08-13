@@ -14,9 +14,6 @@ Running {{ecloud}} on Kubernetes? See [Run {{beats}} on ECK](docs-content://depl
 ::::
 
 
-% However, version {{version.stack}} of Filebeat has not yet been released, so no Docker image is currently available for this version.
-
-
 ## Kubernetes deploy manifests for Filebeat [_kubernetes_deploy_manifests]
 
 You deploy Filebeat as a [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) to ensure there’s a running instance on each node of the cluster.
@@ -32,10 +29,8 @@ curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.
 ```
 
 ::::{warning}
-**If you are using Kubernetes 1.7 or earlier:** Filebeat uses a hostPath volume to persist internal data. It’s located under `/var/lib/filebeat-data`. The manifest uses folder autocreation (`DirectoryOrCreate`), which was introduced in Kubernetes 1.8. You need to remove `type: DirectoryOrCreate` from the manifest and create the host folder yourself.
-
+**If you are using Kubernetes 1.7 or earlier:** Filebeat uses a hostPath volume to persist internal data. It’s located under `/var/lib/filebeat-data`. The manifest uses folder autocreation (`DirectoryOrCreate`), which was introduced in Kubernetes 1.8. You need to remove `type: DirectoryOrCreate` from the manifest, and create the host folder yourself.
 ::::
-
 
 
 ## Settings [_settings]
@@ -56,7 +51,7 @@ By default, Filebeat sends events to an existing Elasticsearch deployment, if pr
 
 ### Running Filebeat on control plane nodes [_running_filebeat_on_control_plane_nodes]
 
-Kubernetes control plane nodes can use [taints](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) to limit the workloads that can run on them. To run Filebeat on control plane nodes you may need to update the Daemonset spec to include proper tolerations:
+Kubernetes control plane nodes can use [taints](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) to limit the workloads that can run on them. To run Filebeat on control plane nodes, you may need to update the Daemonset spec to include proper tolerations:
 
 ```yaml
 spec:
@@ -95,34 +90,42 @@ If you are using Red Hat OpenShift, you need to specify additional settings in t
 
     This command sets the node selector for the project to an empty string. If you don’t run this command, the default node selector will skip control plane nodes.
 
-
-In order to support runtime environments with Openshift (eg. CRI-O, containerd) you need to configure following path:
+In order to support runtime environments with Openshift (for example, CRI-O, containerd), you need to configure the following path:
 
 ```yaml
 filebeat.inputs:
-- type: container
+- type: filestream
+  id: container-${data.kubernetes.container.id} <1>
+  prospector.scanner.symlinks: true <2>
+  parsers:
+    - container: ~
   paths: <1>
-    - '/var/log/containers/*.log'
+    - /var/log/containers/*.log
 ```
+1. All `filestream` inputs require a unique ID.
+2. Container logs use symlinks, so they need to be enabled.
+3. The same path needs to be configured in the autodiscover settings, if enabled:
 
-1. Same path needs to be configured in case autodiscovery needs to be enabled:
+    ```yaml
+    filebeat.autodiscover:
+      providers:
+        - type: kubernetes
+          node: ${NODE_NAME}
+          hints.enabled: true
+          hints.default_config:
+            type: filestream
+            id: container-${data.kubernetes.container.id}
+            prospector.scanner.symlinks: true
+            parsers:
+              - container: ~
+            paths:
+              - /var/log/containers/*.log
 
-```yaml
-filebeat.autodiscover:
-  providers:
-    - type: kubernetes
-      node: ${NODE_NAME}
-      hints.enabled: true
-      hints.default_config:
-        type: container
-        paths:
-          - /var/log/containers/*.log
-```
+    ```
 
 ::::{note}
-`/var/log/containers/\*.log` is normally a symlink to `/var/log/pods/*/*.log`, so above paths can be edited accordingly
+`/var/log/containers/\*.log` is normally a symlink to `/var/log/pods/*/*.log`, so `paths` can be edited accordingly.
 ::::
-
 
 
 ## Load {{kib}} dashboards [_load_kib_dashboards]
@@ -136,12 +139,10 @@ The `setup` command does not load the ingest pipelines used to parse log lines. 
 ::::{important}
 If you are using a different output other than {{es}}, such as {{ls}}, you need to:
 
-* [Load the index template manually](/reference/filebeat/filebeat-template.md#load-template-manually)
-* [*Load {{kib}} dashboards*](/reference/filebeat/load-kibana-dashboards.md)
-* [*Load ingest pipelines*](/reference/filebeat/load-ingest-pipelines.md)
-
+- [Load the index template manually](/reference/filebeat/filebeat-template.md#load-template-manually)
+- [Load {{kib}} dashboards](/reference/filebeat/load-kibana-dashboards.md)
+- [Load ingest pipelines](/reference/filebeat/load-ingest-pipelines.md)
 ::::
-
 
 
 ## Deploy [_deploy]
@@ -164,9 +165,11 @@ filebeat   32        32        0         32           0           <none>        
 Log events should start flowing to Elasticsearch. The events are annotated with metadata added by the [add_kubernetes_metadata](/reference/filebeat/add-kubernetes-metadata.md) processor.
 
 
-## Parsing json logs [_parsing_json_logs]
+## Parsing JSON logs [_parsing_json_logs]
 
-It is common case when collecting logs from workloads running on Kubernetes that these applications are logging in json format. In these case, special handling can be applied so as to parse these json logs properly and decode them into fields. Bellow there are provided 2 different ways of configuring [filebeat’s autodiscover](/reference/filebeat/configuration-autodiscover.md) so as to identify and parse json logs. We will use an example of one Pod with 2 containers where only one of these logs in json format.
+The application logs from workloads running on Kubernetes are usually in JSON format. In such cases, special handling can be applied to parse the JSON logs properly and decode them into fields. 
+
+You can configure [Filebeat autodiscover](/reference/filebeat/configuration-autodiscover.md) to identify and parse JSON logs in two different ways. We will use an example of one pod with two containers where only the logs of one container are in JSON format.
 
 Example log:
 
@@ -174,7 +177,7 @@ Example log:
 {"type":"log","@timestamp":"2020-11-16T14:30:13+00:00","tags":["warning","plugins","licensing"],"pid":7,"message":"License information could not be obtained from Elasticsearch due to Error: No Living connections error"}
 ```
 
-1. Using `json.*` options with templates
+- Using `json.*` options with templates:
 
     ```yaml
     filebeat.autodiscover:
@@ -186,53 +189,70 @@ Example log:
                   contains:
                     kubernetes.container.name: "no-json-logging"
                 config:
-                  - type: container
+                  - type: filestream
+                    id: container-${data.kubernetes.container.id}
+                    prospector.scanner.symlinks: true
+                    parsers:
+                      - container: ~
                     paths:
-                      - "/var/log/containers/*-${data.kubernetes.container.id}.log"
+                      - /var/log/containers/*-${data.kubernetes.container.id}.log
               - condition:
                   contains:
                     kubernetes.container.name: "json-logging"
                 config:
-                  - type: container
+                  - type: filestream
+                    id: container-${data.kubernetes.container.id}
+                    prospector.scanner.symlinks: true
+                    parsers:
+                      - container: ~
+                      - ndjson:
+                          keys_under_root: true
+                          add_error_key: true
+                          message_key: message
                     paths:
-                      - "/var/log/containers/*-${data.kubernetes.container.id}.log"
-                    json.keys_under_root: true
-                    json.add_error_key: true
-                    json.message_key: message
+                      - /var/log/containers/*-${data.kubernetes.container.id}.log
     ```
 
-2. Using `json.*` options with hints
+- Using `json.*` options with hints:
 
-    Key part here is to properly annotate the Pod to only parse logs of the correct container as json logs. In this, annotation should be constructed like this:
-
-    `co.elastic.logs.<container_name>/json.keys_under_root: "true"`
-
-    Autodiscovery configuration:
+    Here, it is important to annotate the pod to only parse logs of the correct container as JSON logs. To achieve this, construct the annotations like this:
 
     ```yaml
-    filebeat.autodiscover:
-      providers:
-        - type: kubernetes
-          node: ${NODE_NAME}
-          hints.enabled: true
-          hints.default_config:
-            type: container
-            paths:
-              - /var/log/containers/*${data.kubernetes.container.id}.log
+    co.elastic.logs.<kubernetes_container_name>/json.keys_under_root: "true"
+    co.elastic.logs.<kubernetes_container_name>/json.add_error_key: "true"
+    co.elastic.logs.<kubernetes_container_name>/json.message_key: "message"
     ```
 
-    Then annotate the pod properly:
+    1. Configure autodiscover:
 
-    ```yaml
-    annotations:
-        co.elastic.logs.json-logging/json.keys_under_root: "true"
-        co.elastic.logs.json-logging/json.add_error_key: "true"
-        co.elastic.logs.json-logging/json.message_key: "message"
-    ```
+        ```yaml
+        filebeat.autodiscover:
+          providers:
+            - type: kubernetes
+              node: ${NODE_NAME}
+              hints.enabled: true
+              hints.default_config:
+                type: filestream
+                id: container-${data.kubernetes.container.id}
+                prospector.scanner.symlinks: true
+                parsers:
+                  - container: ~
+                paths:
+                  - /var/log/containers/*${data.kubernetes.container.id}.log
+        ```
+
+    2. Then annotate the pod:
+
+        ```yaml
+        annotations:
+            co.elastic.logs.json-logging/json.keys_under_root: "true"
+            co.elastic.logs.json-logging/json.add_error_key: "true"
+            co.elastic.logs.json-logging/json.message_key: "message"
+        ```
 
 
+## Log rotation [_logrotation]
 
-## Logrotation [_logrotation]
+Refer to the official [Kubernetes documentation on log rotation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation).
 
-According to [kubernetes documentation](https://kubernetes.io/docs/concepts/cluster-administration/logging/#logging-at-the-node-level) *Kubernetes is not responsible for rotating logs, but rather a deployment tool should set up a solution to address that*. Different logrotation strategies can cause issues that might make Filebeat losing events or even duplicating events. Users can find more information about Filebeat’s logrotation best practises at Filebeat’s [log rotation specific documentation](/reference/filebeat/file-log-rotation.md)
-
+Filebeat supports reading from rotating log files. However, some log rotation strategies can result in lost or duplicate events when using Filebeat to forward messages. For more information, refer to [Log rotation results in lost or duplicate events](/reference/filebeat/file-log-rotation.md).
