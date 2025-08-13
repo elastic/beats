@@ -303,9 +303,6 @@ func BuildIntegTestContainers() error {
 		out = os.Stderr
 	}
 
-	wd, err := os.Getwd()
-	fmt.Printf("DEBUG: wd: %s. err: %v\n", wd, err)
-	fmt.Printf("DEBUG: running: docker %v", args)
 	_, err = sh.Exec(
 		composeEnv,
 		out,
