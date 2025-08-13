@@ -141,7 +141,7 @@ func TLSCommonToOTel(output *config.C, logger *logp.Logger) (map[string]any, err
 		certPem = string(certBytes)
 	}
 
-	tlsConfig, err := tlscommon.LoadTLSConfig(tlscfg)
+	tlsConfig, err := tlscommon.LoadTLSConfig(tlscfg, logger)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load SSL configuration: %w", err)
 	}
