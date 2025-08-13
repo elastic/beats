@@ -27,7 +27,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 **Winlogbeat**
 
-- Render data values in xml renderer. [44132]({{beats-pull}}44132)
+- Render data values in XML renderer. [44132]({{beats-pull}}44132)
 
 ### Fixes [beats-9.1.2-fixes]
 
@@ -122,18 +122,18 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 **Metricbeat**
 
-- Improve error messages in AWS Health [45408]({{beats-pull}}45408)
+- Improve error messages in AWS Health. [45408]({{beats-pull}}45408)
 
 ### Fixes [beats-9.0.5-fixes]
 
 **Auditbeat**
 
-- auditd: Request status from a separate socket to avoid data congestion [41207]({{beats-pull}}41207)
-- Fix potential data loss in add_session_metadata. [42795]({{beats-pull}}42795)
+- Auditd: Request status from a separate socket to avoid data congestion. [41207]({{beats-pull}}41207)
+- Fix potential data loss in `add_session_metadata`. [42795]({{beats-pull}}42795)
 
 **Metricbeat**
 
-- Fix URL construction to handle query parameters properly in GET requests for Jolokia [45620]({{beats-pull}}45620)
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia. [45620]({{beats-pull}}45620)
 
 ## 9.0.4 [beats-9.0.4-release-notes]
 
