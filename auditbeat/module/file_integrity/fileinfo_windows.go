@@ -192,33 +192,64 @@ func extractSecurityInfo(secInfo *windows.SECURITY_DESCRIPTOR, path string) (own
 	return ownerSID, ownerName, groupName, nil
 }
 
-// attributeMap maps the Windows file attribute constants to human-readable strings.
-var attributeMap = map[uint32]string{
-	windows.FILE_ATTRIBUTE_READONLY:      "read_only",
-	windows.FILE_ATTRIBUTE_HIDDEN:        "hidden",
-	windows.FILE_ATTRIBUTE_SYSTEM:        "system",
-	windows.FILE_ATTRIBUTE_DIRECTORY:     "directory",
-	windows.FILE_ATTRIBUTE_ARCHIVE:       "archive",
-	windows.FILE_ATTRIBUTE_DEVICE:        "device",
-	windows.FILE_ATTRIBUTE_NORMAL:        "normal",
-	windows.FILE_ATTRIBUTE_TEMPORARY:     "temporary",
-	windows.FILE_ATTRIBUTE_SPARSE_FILE:   "sparse_file",
-	windows.FILE_ATTRIBUTE_REPARSE_POINT: "reparse_point",
-	windows.FILE_ATTRIBUTE_COMPRESSED:    "compressed",
-	windows.FILE_ATTRIBUTE_OFFLINE:       "offline",
-	windows.FILE_ATTRIBUTE_ENCRYPTED:     "encrypted",
-	windows.FILE_ATTRIBUTE_VIRTUAL:       "virtual",
-}
-
 func attributesToStrings(attributes uint32) []string {
 	var result []string
-
-	for flag, name := range attributeMap {
-		// Check if the attribute bit is set in the input value.
-		if attributes&flag != 0 {
-			result = append(result, name)
-		}
+	if attributes&windows.FILE_ATTRIBUTE_READONLY != 0 {
+		result = append(result, "read_only")
 	}
-
+	if attributes&windows.FILE_ATTRIBUTE_HIDDEN != 0 {
+		result = append(result, "hidden")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_SYSTEM != 0 {
+		result = append(result, "system")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_DIRECTORY != 0 {
+		result = append(result, "directory")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_ARCHIVE != 0 {
+		result = append(result, "archive")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_DEVICE != 0 {
+		result = append(result, "device")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_NORMAL != 0 {
+		result = append(result, "normal")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_TEMPORARY != 0 {
+		result = append(result, "temporary")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_SPARSE_FILE != 0 {
+		result = append(result, "sparse_file")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_REPARSE_POINT != 0 {
+		result = append(result, "reparse_point")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_COMPRESSED != 0 {
+		result = append(result, "compressed")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_OFFLINE != 0 {
+		result = append(result, "offline")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_NOT_CONTENT_INDEXED != 0 {
+		result = append(result, "not_content_indexed")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_ENCRYPTED != 0 {
+		result = append(result, "encrypted")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_INTEGRITY_STREAM != 0 {
+		result = append(result, "integrity_stream")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_VIRTUAL != 0 {
+		result = append(result, "virtual")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_NO_SCRUB_DATA != 0 {
+		result = append(result, "no_scrub_data")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_RECALL_ON_OPEN != 0 {
+		result = append(result, "recall_on_open")
+	}
+	if attributes&windows.FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS != 0 {
+		result = append(result, "recall_on_data_access")
+	}
 	return result
 }
