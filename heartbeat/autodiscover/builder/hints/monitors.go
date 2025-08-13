@@ -81,7 +81,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 	monitorConfig := hb.getRawConfigs(hints)
 
 	// If explicty disabled, return nothing
-	if utils.IsDisabled(hints, hb.config.Key) {
+	if utils.IsDisabled(hints, hb.config.Key, hb.logger) {
 		hb.logger.Warnf("heartbeat config disabled by hint: %+v", event)
 		return []*conf.C{}
 	}
@@ -144,7 +144,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 }
 
 func (hb *heartbeatHints) getRawConfigs(hints mapstr.M) []mapstr.M {
-	return utils.GetHintAsConfigs(hints, hb.config.Key)
+	return utils.GetHintAsConfigs(hints, hb.config.Key, hb.logger)
 }
 
 func (hb *heartbeatHints) getProcessors(hints mapstr.M) []mapstr.M {
