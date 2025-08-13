@@ -80,9 +80,7 @@ func (f *fsNotifySymbol) setKprobeFiltersFromBTF(spec *tkbtf.Spec) error {
 
 	for _, foundType := range types {
 		btfEnum, found = foundType.(*btf.Enum)
-		if !found {
-			continue
-		} else {
+		if found {
 			break
 		}
 	}
