@@ -358,9 +358,8 @@ visualizing your data. To load these assets:
     `-e` is optional and sends output to standard error instead of the configured log output.
 
 The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.1` `C:\Program Files\Filebeat-Data\Logs`
-* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Filebeat-Data\Logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\filebeat\Logs`
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Filebeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\filebeat\logs`
 
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to {{es}} and deploys the sample dashboards for visualizing the data in {{kib}}.
 
@@ -443,9 +442,8 @@ PS C:\Program Files\filebeat> Start-Service filebeat
 ```
 
 The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.1` `C:\Program Files\Filebeat-Data\Logs`
-* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Filebeat-Data\Logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\filebeat\Logs`
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Filebeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\filebeat\logs`
 ::::::
 
 :::::::

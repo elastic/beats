@@ -332,9 +332,8 @@ Metricbeat comes with predefined assets for parsing, indexing, and visualizing y
     `-e` is optional and sends output to standard error instead of the configured log output.
 
 The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.1` `C:\Program Files\Metricbeat-Data\Logs`
-* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Metricbeat-Data\Logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\metricbeat\Logs`
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Metricbeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\metricbeat\logs`
 
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to Elasticsearch and deploys the sample dashboards for visualizing the data in Kibana.
 
@@ -408,11 +407,8 @@ PS C:\Program Files\metricbeat> Start-Service metricbeat
 ```
 
 The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.1` `C:\Program Files\Metricbeat-Data\Logs`
-* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Metricbeat-Data\Logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\metricbeat\Logs`
-
-For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\metricbeat\Logs`.
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Metricbeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\metricbeat\logs`
 
 ::::{note}
 On Windows, statistics about system load and swap usage are currently not captured

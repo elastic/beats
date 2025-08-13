@@ -67,9 +67,8 @@ PS C:\Program Files\packetbeat> Start-Service packetbeat
 ```
 
 The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.1` `C:\Program Files\Packetbeat-Data\Logs`
-* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Packetbeat-Data\Logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\packetbeat\Logs`
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Packetbeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\packetbeat\logs`
 ::::::
 
 :::::::

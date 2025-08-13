@@ -30,6 +30,7 @@ Users relying on specific user agents could be impacted.
 For more information, check [#45251]({{beats-pull}}45251).
 ::::
 
+## 9.1.0 [beats-9.1.0-breaking-changes]
 
 ::::{dropdown} The default data and logs path for the Windows service installation has changed.
 The base folder has changed from `C:\ProgramData\` to `C:\Program

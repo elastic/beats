@@ -366,9 +366,8 @@ PS C:\Program Files\heartbeat> Start-Service heartbeat
 :::::::
 
 The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.1` `C:\Program Files\Heartbeat-Data\Logs`
-* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Heartbeat-Data\Logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\heartbeat\Logs`
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Heartbeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\heartbeat\logs`
 
 Heartbeat is now ready to check the status of your services and send events to your defined output.
 
