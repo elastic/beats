@@ -98,7 +98,7 @@ state and logs) is now `C:\Program Files\{beatname_uc}-Data`.
 
 The install script (`install-service-filebeat.ps1`) will check whether
 `C:\ProgramData\{beatname_uc}` exits and move it to `C:\Program Files\{beatname_uc}-Data`.
-For more details on the installation script refer to: <<install-script>>.
+For more details on the installation script refer to: <<installation-script>>.
 
 =========================
 

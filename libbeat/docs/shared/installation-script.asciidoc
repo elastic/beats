@@ -1,5 +1,6 @@
-[id=install-script]
-== Installation script
+[[installation-script]]
+=== Windows Installation Script
+
 The installation script, `install-service-{beatname_lc}.ps1` is responsible
 for creating the Windows Service for {beatname_uc}. Starting in 9.0.6, the
 base folder has changed from `C:\ProgramData\` to  `C:\Program Files\`
@@ -11,8 +12,9 @@ The install script (`install-service-{beatname_lc}.ps1`) will check whether
 If an error occurs, the script will stop and print the error.
 
 Then it will create the Windows Service setting:
- - `path.home` as `$env:ProgramFiles\{beatname_uc}-Data`
- - `path.logs` as `$env:ProgramFiles\{beatname_uc}-Data\logs`
+
+ * `path.home` as `$env:ProgramFiles\{beatname_uc}-Data`
+ * `path.logs` as `$env:ProgramFiles\{beatname_uc}-Data\logs`
 
 The script also supports passing the parameter `-ForceLegacyPath` to
 use the old default `C:\ProgramData\` that is set using
@@ -22,7 +24,7 @@ recommended**.
 In a PowerShell prompt, can use `Get-Help install-service-{beatname_lc}.ps1
 -detailed` to get detailed help.
 
-=== Troubleshooting
+==== Troubleshooting
 If there is a permission error when the installation script is moving
 the folder, ensure the user running the script has enough permissions
 to do so. If the problem persists, the folder can be moved manually,
