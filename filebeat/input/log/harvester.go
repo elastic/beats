@@ -60,7 +60,7 @@ import (
 )
 
 var (
-	harvesterMetrics = monitoring.Default.NewRegistry("filebeat.harvester")
+	harvesterMetrics = monitoring.Default.GetOrCreateRegistry("filebeat.harvester")
 	filesMetrics     = monitoring.GetNamespace("dataset").GetRegistry()
 
 	harvesterStarted   = monitoring.NewInt(harvesterMetrics, "started")
@@ -219,7 +219,7 @@ func (h *Harvester) Setup() error {
 }
 
 func newHarvesterProgressMetrics(id string) *harvesterProgressMetrics {
-	r := filesMetrics.NewRegistry(id)
+	r := filesMetrics.GetOrCreateRegistry(id)
 	return &harvesterProgressMetrics{
 		metricsRegistry:             r,
 		filename:                    monitoring.NewString(r, "name"),
