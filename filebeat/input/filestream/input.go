@@ -226,7 +226,7 @@ func (inp *filestream) open(
 		return nil, truncated, err
 	}
 
-	dbgReader, err := debug.AppendReaders(logReader)
+	dbgReader, err := debug.AppendReaders(logReader, log)
 	if err != nil {
 		return nil, truncated, err
 	}

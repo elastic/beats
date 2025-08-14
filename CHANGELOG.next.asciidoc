@@ -42,7 +42,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
-- Improve error messages in AWS Health {pull}45408[45408]
 - Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
 
 *Osquerybeat*
@@ -146,6 +145,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove erroneous status reporting to Elastic-Agent from the Filestream input {pull}42435[42435]
 - Fix a panic in the winlog input that prevented it from starting. {issue}45693[45693] {pull}45730[45730]
 - Fix wrongly emitted missing input ID warning {issue}42969[42969] {pull}45747[45747]
+- Fix handling of unnecessary BOM in UTF-8 text received by o365audit input. {issue}44327[44327] {pull}45739[45739]
 
 *Heartbeat*
 
@@ -174,6 +174,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Don't skip first bucket value in GCP metrics metricset for distribution type metrics {pull}41822[41822]
 - [K8s Integration] Enhance HTTP authentication in case of token updates for Apiserver, Controllermanager and Scheduler metricsets  {issue}41910[41910] {pull}42016[42016]
 - Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
+- Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. {pull}45761[45761]
 
 *Osquerybeat*
 
@@ -183,7 +184,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Winlogbeat*
-
 
 
 *Elastic Logging Plugin*
@@ -260,12 +260,44 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Jounrald input now supports filtering by facilities {pull}41061[41061]
 - Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
-- Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
 - Update CEL mito extensions to v1.16.0. {pull}41727[41727]
 - Filebeat's registry is now added to the Elastic-Agent diagnostics bundle {issue}33238[33238] {pull}41795[41795]
+- Add support for SSL and Proxy configurations for websocket type in streaming input. {pull}41934[41934]
+- Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
+- Journald `include_matches.match` now accepts `+` to represent a logical disjunction (OR) {issue}40185[40185] {pull}42517[42517]
+- Winlog input now can report its status to Elastic-Agent {pull}43089[43089]
+- Update CEL mito extensions to v1.18.0. {pull}43855[43855]
+- Add milliseconds to document timestamp from awscloudwatch Filebeat input {pull}44306[44306]
+- Add support to the Active Directory entity analytics provider for device entities. {pull}44309[44309]
+- Add support for OPTIONS request to HTTP Endpoint input. {issue}43930[43930] {pull}44387[44387]
+- Add Fleet status update functionality to lumberjack input. {issue}44283[44283] {pull}44339[44339]
+- Add Fleet status updating to HTTP Endpoint input. {issue}44281[44281] {pull}44310[44310]
+- Add Fleet status updating to streaming input. {issue}44284[44284] {pull}44340[44340]
+- Add Fleet status update functionality to gcppubsub input. {issue}44272[44272] {pull}44507[44507]
+- Add Fleet status updating to GCS input. {issue}44273[44273] {pull}44508[44508]
+- Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. {issue}44349[44349] {pull}44436[44436]
+- Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
+- Introduce lastSync start position to AWS CloudWatch input backed by state registry. {pull}43251[43251]
+- Add Fleet status update functionality to tcp input. {issue}44420[44420] {pull}44786[44786]
+- Add Fleet status update functionality to udp input. {issue}44419[44419] {pull}44785[44785]
+- Filestream now logs at level warn the number of files that are too small to be ingested {pull}44751[44751]
+- Add Fleet status updating to Azure Blob Storage input. {issue}44268[44268] {pull}44945[44945]
+- Add Fleet status updating to HTTP JSON input. {issue}44282[44282] {pull}44365[44365]
+- Add proxy support to GCP Pub/Sub input. {pull}44892[44892]
+- Add support for relationship expansion to EntraID entity analytics provider. {issue}43324[43324] {pull}44761[44761]
+- Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
+- Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
+- Update CEL mito extensions to v1.21.0. {issue}40762[40762] {pull}45107[45107]
+- Add Fleet health status reporting to the entity analytics input. {issue}44269[44269] {pull}45152[45152]
+- Add Fleet status updating to o356audit input. {issue}44651[44651] {pull}44957[44957]
+- Update CEL mito extensions to v1.22.0. {pull}45245[45245]
+- Allow empty HTTPJSON cursor template value evaluations to be ignored by Fleet health status updates. {pull}45361[45361]
+- Reuse OAuth2 clients in HTTP JSON input where possible. {issue}34834[34834] {pull}44976[44976]
+- Add support for generalized token authentication to CEL input. {pull}45359[45359]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
 - Log CEL single object evaluation results as ECS compliant documents where possible. {issue}45254[45254] {pull}45399[45399]
-- Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]
+- Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]19
+- Add status reporting support for AWS CloudWatch input. {pull}45679[45679]
 
 *Auditbeat*
 
@@ -365,6 +397,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 

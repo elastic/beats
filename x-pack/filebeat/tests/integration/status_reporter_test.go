@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestLogStatusReporter(t *testing.T) {
@@ -96,19 +97,19 @@ func TestLogStatusReporter(t *testing.T) {
 		},
 	}
 	require.NoError(t, server.Start())
-	defer server.Stop()
+	t.Cleanup(server.Stop)
 
 	// start the client
 	client := client.NewV2(fmt.Sprintf(":%d", server.Port), token, client.VersionInfo{
 		Name: "program",
 	}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 
-	lbmanagement.SetManagerFactory(func(cfg *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
+	lbmanagement.SetManagerFactory(func(cfg *conf.C, registry *reload.Registry, logger *logp.Logger) (lbmanagement.Manager, error) {
 		c := management.DefaultConfig()
 		if err := cfg.Unpack(&c); err != nil {
 			return nil, err
 		}
-		return management.NewV2AgentManagerWithClient(c, registry, client, management.WithStopOnEmptyUnits)
+		return management.NewV2AgentManagerWithClient(c, registry, client, logp.NewNopLogger(), management.WithStopOnEmptyUnits)
 	})
 
 	go func() {
