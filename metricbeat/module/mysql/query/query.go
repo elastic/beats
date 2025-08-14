@@ -82,7 +82,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	if b.Config.TLS.IsEnabled() {
-		tlsConfig, err := tlscommon.LoadTLSConfig(b.Config.TLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(b.Config.TLS, base.Logger())
 		if err != nil {
 			return nil, fmt.Errorf("could not load provided TLS configuration: %w", err)
 		}
