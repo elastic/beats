@@ -80,7 +80,7 @@ func InitializeAWSConfig(beatsConfig ConfigAWS) (awssdk.Config, error) {
 	}
 	var tlsConfig *tls.Config
 	if beatsConfig.TLS != nil {
-		TLSConfig, _ := tlscommon.LoadTLSConfig(beatsConfig.TLS, logger)
+		TLSConfig, _ := tlscommon.LoadTLSConfig(beatsConfig.TLS, logp.NewNopLogger())
 		tlsConfig = TLSConfig.ToConfig()
 	}
 	awsConfig.HTTPClient = &http.Client{
