@@ -25,8 +25,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func makeLogstashEventEncoder(log *logp.Logger, info beat.Info, escapeHTML bool, index string) func(interface{}) ([]byte, error) {
-	enc := json.New(info.Version, json.Config{
+func makeLogstashEventEncoder(log *logp.Logger, beatVersion string, escapeHTML bool, index string) func(interface{}) ([]byte, error) {
+	enc := json.New(beatVersion, json.Config{
 		Pretty:     false,
 		EscapeHTML: escapeHTML,
 	})
