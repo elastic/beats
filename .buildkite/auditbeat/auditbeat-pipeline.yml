@@ -16,7 +16,7 @@ env:
   IMAGE_UBUNTU_2404_X86_64: "family/platform-ingest-beats-ubuntu-2404"
   IMAGE_UBUNTU_2404_ARM64: "platform-ingest-beats-ubuntu-2404-aarch64"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
-  IMAGE_WIN_11: "platform-ingest-beats-windows-11-1754994861"
+  IMAGE_WIN_11: "platform-ingest-beats-windows-11-1755156912"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
