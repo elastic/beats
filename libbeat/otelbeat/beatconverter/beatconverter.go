@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	elasticsearchtranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate/outputs/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // list of supported beatreceivers
@@ -68,11 +69,13 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 			return fmt.Errorf("multiple outputs are not supported")
 		}
 
+		logger, _ := logp.NewDevelopmentLogger("")
+
 		for key, output := range output.ToStringMap() {
 			switch key {
 			case "elasticsearch":
 				esConfig := config.MustNewConfigFrom(output)
-				esOTelConfig, err := elasticsearchtranslate.ToOTelConfig(esConfig)
+				esOTelConfig, err := elasticsearchtranslate.ToOTelConfig(esConfig, logger)
 				if err != nil {
 					return fmt.Errorf("cannot convert elasticsearch config: %w", err)
 				}
