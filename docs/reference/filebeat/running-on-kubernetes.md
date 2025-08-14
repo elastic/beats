@@ -99,7 +99,7 @@ filebeat.inputs:
   prospector.scanner.symlinks: true <2>
   parsers:
     - container: ~
-  paths: <1>
+  paths: <3>
     - /var/log/containers/*.log
 ```
 1. All `filestream` inputs require a unique ID.
@@ -120,7 +120,6 @@ filebeat.inputs:
               - container: ~
             paths:
               - /var/log/containers/*.log
-
     ```
 
 ::::{note}
@@ -137,7 +136,7 @@ If these dashboards are not already loaded into {{kib}}, you must [install Fileb
 The `setup` command does not load the ingest pipelines used to parse log lines. By default, ingest pipelines are set up automatically the first time you run Filebeat and connect to {{es}}.
 
 ::::{important}
-If you are using a different output other than {{es}}, such as {{ls}}, you need to:
+If you are using an output other than {{es}}, such as {{ls}}, you need to:
 
 - [Load the index template manually](/reference/filebeat/filebeat-template.md#load-template-manually)
 - [Load {{kib}} dashboards](/reference/filebeat/load-kibana-dashboards.md)
@@ -167,9 +166,14 @@ Log events should start flowing to Elasticsearch. The events are annotated with 
 
 ## Parsing JSON logs [_parsing_json_logs]
 
-The application logs from workloads running on Kubernetes are usually in JSON format. In such cases, special handling can be applied to parse the JSON logs properly and decode them into fields. 
+The application logs from workloads running on Kubernetes are usually in JSON format. In such cases, special handling can be applied to parse the JSON logs properly and decode them into fields.
 
-You can configure [Filebeat autodiscover](/reference/filebeat/configuration-autodiscover.md) to identify and parse JSON logs in two different ways. We will use an example of one pod with two containers where only the logs of one container are in JSON format.
+You can configure [Filebeat autodiscover](/reference/filebeat/configuration-autodiscover.md) to identify and parse JSON logs in two different ways:
+
+- [Using templates and `ndjson` parser options](#templates-and-parser-options)
+- [Using hints and annotations](#hints-and-annotations)
+
+We will illustrate this using an example of one pod with two containers where only the logs of one container are in JSON format.
 
 Example log:
 
@@ -177,78 +181,82 @@ Example log:
 {"type":"log","@timestamp":"2020-11-16T14:30:13+00:00","tags":["warning","plugins","licensing"],"pid":7,"message":"License information could not be obtained from Elasticsearch due to Error: No Living connections error"}
 ```
 
-- Using `json.*` options with templates:
+### Using templates and `ndjson` parser options [templates-and-parser-options]
+
+To use this method to parse the JSON logs in our example, configure autodiscover:
+
+```yaml
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      node: ${NODE_NAME}
+      templates:
+        - condition:
+            contains:
+              kubernetes.container.name: "no-json-logging"
+          config:
+            - type: filestream
+              id: container-${data.kubernetes.container.id}
+              prospector.scanner.symlinks: true
+              parsers:
+                - container: ~
+              paths:
+                - /var/log/containers/*-${data.kubernetes.container.id}.log
+        - condition:
+            contains:
+              kubernetes.container.name: "json-logging"
+          config:
+            - type: filestream
+              id: container-${data.kubernetes.container.id}
+              prospector.scanner.symlinks: true
+              parsers:
+                - container: ~
+                - ndjson:
+                    target: ""
+                    add_error_key: true
+                    message_key: message
+              paths:
+                - /var/log/containers/*-${data.kubernetes.container.id}.log
+```
+
+### Using hints and annotations [hints-and-annotations]
+
+To configure autodiscover to parse JSON logs using this method, it is important to annotate the pod to only parse logs of the correct container as JSON logs. To achieve this, construct the annotations like this:
+
+```yaml
+co.elastic.logs.<kubernetes_container_name>/json.keys_under_root: "true"
+co.elastic.logs.<kubernetes_container_name>/json.add_error_key: "true"
+co.elastic.logs.<kubernetes_container_name>/json.message_key: "message"
+```
+
+For the example we're using:
+
+1. Configure autodiscover:
 
     ```yaml
     filebeat.autodiscover:
       providers:
-          - type: kubernetes
-            node: ${NODE_NAME}
-            templates:
-              - condition:
-                  contains:
-                    kubernetes.container.name: "no-json-logging"
-                config:
-                  - type: filestream
-                    id: container-${data.kubernetes.container.id}
-                    prospector.scanner.symlinks: true
-                    parsers:
-                      - container: ~
-                    paths:
-                      - /var/log/containers/*-${data.kubernetes.container.id}.log
-              - condition:
-                  contains:
-                    kubernetes.container.name: "json-logging"
-                config:
-                  - type: filestream
-                    id: container-${data.kubernetes.container.id}
-                    prospector.scanner.symlinks: true
-                    parsers:
-                      - container: ~
-                      - ndjson:
-                          keys_under_root: true
-                          add_error_key: true
-                          message_key: message
-                    paths:
-                      - /var/log/containers/*-${data.kubernetes.container.id}.log
+        - type: kubernetes
+          node: ${NODE_NAME}
+          hints.enabled: true
+          hints.default_config:
+            type: filestream
+            id: container-${data.kubernetes.container.id}
+            prospector.scanner.symlinks: true
+            parsers:
+              - container: ~
+            paths:
+              - /var/log/containers/*-${data.kubernetes.container.id}.log
     ```
 
-- Using `json.*` options with hints:
-
-    Here, it is important to annotate the pod to only parse logs of the correct container as JSON logs. To achieve this, construct the annotations like this:
+2. Then annotate the pod:
 
     ```yaml
-    co.elastic.logs.<kubernetes_container_name>/json.keys_under_root: "true"
-    co.elastic.logs.<kubernetes_container_name>/json.add_error_key: "true"
-    co.elastic.logs.<kubernetes_container_name>/json.message_key: "message"
+    annotations:
+      co.elastic.logs.json-logging/json.keys_under_root: "true"
+      co.elastic.logs.json-logging/json.add_error_key: "true"
+      co.elastic.logs.json-logging/json.message_key: "message"
     ```
-
-    1. Configure autodiscover:
-
-        ```yaml
-        filebeat.autodiscover:
-          providers:
-            - type: kubernetes
-              node: ${NODE_NAME}
-              hints.enabled: true
-              hints.default_config:
-                type: filestream
-                id: container-${data.kubernetes.container.id}
-                prospector.scanner.symlinks: true
-                parsers:
-                  - container: ~
-                paths:
-                  - /var/log/containers/*${data.kubernetes.container.id}.log
-        ```
-
-    2. Then annotate the pod:
-
-        ```yaml
-        annotations:
-            co.elastic.logs.json-logging/json.keys_under_root: "true"
-            co.elastic.logs.json-logging/json.add_error_key: "true"
-            co.elastic.logs.json-logging/json.message_key: "message"
-        ```
 
 
 ## Log rotation [_logrotation]
