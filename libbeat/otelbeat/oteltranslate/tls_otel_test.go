@@ -46,7 +46,7 @@ ssl:
 		assert.Equal(t, want, got)
 	})
 
-	t.Run("when ssl.enabled = false", func(t *testing.T) {
+	t.Run("when ssl.enabled = true", func(t *testing.T) {
 		input := `
 ssl:
   enabled: true
