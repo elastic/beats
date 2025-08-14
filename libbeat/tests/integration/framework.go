@@ -30,6 +30,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"net"
 	"net/http"
 	"net/url"
@@ -1306,4 +1307,51 @@ func StartMockES(
 		"mock-es server did not start on '%s'", addr)
 
 	return &s, serverURL, es, rdr
+}
+
+// WaitPublishedEvents waits until the desired number of events
+// have been published. It assumes the file output is used, the filename
+// for the output is 'output' and 'path' is set to the TempDir.
+func (b *BeatProc) WaitPublishedEvents(timeout time.Duration, events int) {
+	t := b.t
+	t.Helper()
+
+	msg := strings.Builder{}
+	path := filepath.Join(b.TempDir(), "output-*.ndjson")
+	assert.Eventually(t, func() bool {
+		got := b.CountFileLines(path)
+		msg.Reset()
+		fmt.Fprintf(&msg, "expecting %d events, got %d", events, got)
+		return got == events
+	}, timeout, 200*time.Millisecond, &msg)
+}
+
+// GetEventsFromFileOutput reads all events from file output. If n > 0,
+// then it reads up to n events. It assumes the filename
+// for the output is 'output' and 'path' is set to the TempDir.
+func GetEventsFromFileOutput[E any](b *BeatProc, n int) []E {
+	b.t.Helper()
+
+	if n < 1 {
+		n = math.MaxInt
+	}
+
+	var events []E
+	path := filepath.Join(b.TempDir(), "output-*.ndjson")
+
+	f := b.openGlobFile(path, true)
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		var ev E
+		err := json.Unmarshal(scanner.Bytes(), &ev)
+		require.NoError(b.t, err, "failed to read event")
+		events = append(events, ev)
+
+		if len(events) >= n {
+			return events
+		}
+	}
+
+	return events
 }
