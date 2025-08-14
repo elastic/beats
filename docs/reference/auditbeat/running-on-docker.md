@@ -7,7 +7,7 @@ applies_to:
 
 # Run Auditbeat on Docker [running-on-docker]
 
-Docker images for Auditbeat are available from the Elastic Docker registry. The base image is [centos:7](https://hub.docker.com/_/centos/).
+Docker images for Auditbeat are available from the Elastic Docker registry. The base image is [Red Hat Universal Base Image 9 Minimal](https://hub.docker.com/r/redhat/ubi9-minimal).
 
 A list of all published Docker images and tags is available at [www.docker.elastic.co](https://www.docker.elastic.co).
 
@@ -75,17 +75,16 @@ docker run --rm \
   --cap-add="AUDIT_READ" \
   docker.elastic.co/beats/auditbeat:{{version.stack}} \
   setup -E setup.kibana.host=kibana:5601 \
-  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1>
 ```
+1. Substitute your {{kib}} and {{es}} hosts and ports. 
 
-1. Substitute your Kibana and Elasticsearch hosts and ports.
-2. If you are using the {{ech}}, replace the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password using this syntax:
+   If you are using {{ech}}, replace the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password using this syntax:
 
-
-```shell
--E cloud.id=<Cloud ID from Elastic Cloud Hosted> \
--E cloud.auth=elastic:<elastic password>
-```
+   ```sh
+   -E cloud.id=<Cloud ID from Elastic Cloud Hosted> \
+   -E cloud.auth=elastic:<elastic password>
+   ```
 
 
 ## Run Auditbeat on a read-only file system [_run_auditbeat_on_a_read_only_file_system]
@@ -129,12 +128,11 @@ docker run -d \
   --pid=host \
   docker.elastic.co/beats/auditbeat:{{version.stack}} -e \
   --strict.perms=false \
-  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1>
 ```
+1. Substitute your {{es}} hosts and ports.
 
-1. Substitute your Elasticsearch hosts and ports.
-2. If you are using the {{ech}}, replace the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password using the syntax shown earlier.
-
+   If you are using {{ech}}, replace the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password using the syntax shown earlier.
 
 
 ### Customize your configuration [_customize_your_configuration]
