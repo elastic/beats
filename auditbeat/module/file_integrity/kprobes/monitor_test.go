@@ -23,6 +23,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"math"
 	"net/http"
 	"os"
 	"os/exec"
@@ -470,7 +471,6 @@ func (p *monitorTestSuite) TestRunEmitError() {
 }
 
 func (p *monitorTestSuite) TestNew() {
-	p.T().Skip("Flaky test: https://github.com/elastic/beats/issues/45827")
 	if runtime.GOARCH != "amd64" && runtime.GOARCH != "arm64" {
 		p.T().Skip("skipping on non-amd64/arm64")
 		return
@@ -495,7 +495,11 @@ func (p *monitorTestSuite) TestNew() {
 	cancelChan := make(chan struct{})
 
 	targetFile := filepath.Join(tmpDir, "file_kprobes.txt")
-	tid := uint32(unix.Gettid())
+	unixTid := unix.Gettid()
+	if unixTid > math.MaxUint32 || unixTid < 0 {
+		p.T().Errorf("got TID out of range for uint32: %d", unixTid)
+	}
+	tid := uint32(unixTid)
 
 	expectedEvents := []MonitorEvent{
 		{
