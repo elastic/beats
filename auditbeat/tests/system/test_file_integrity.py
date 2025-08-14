@@ -113,7 +113,6 @@ class Test(BaseTest):
         assert event["process.user.name"] == pwd.getpwuid(os.geteuid()).pw_name
         assert int(event["process.group.id"]) == os.getegid()
 
-    @unittest.skipIf(True, 'Flaky test: https://github.com/elastic/beats/issues/45897')
     def _test_non_recursive(self, backend):
         """
         file_integrity monitors watched directories (non recursive).
@@ -202,7 +201,6 @@ class Test(BaseTest):
     def test_non_recursive__kprobes(self):
         self._test_non_recursive("kprobes")
 
-    @unittest.skipIf(True, 'Flaky test: https://github.com/elastic/beats/issues/45897')
     def _test_recursive(self, backend):
         """
         file_integrity monitors watched directories (recursive).
@@ -284,7 +282,6 @@ class Test(BaseTest):
         self._test_recursive("kprobes")
 
     @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
-    @unittest.skipIf(True, 'Flaky test: https://github.com/elastic/beats/issues/45897')
     def _test_file_modified(self, backend):
         """
         file_integrity tests for file modifications (chmod, chown, write, truncate, xattrs).

@@ -83,6 +83,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"urlEncode":           urlEncode,
 			"userAgent":           userAgentString,
 			"uuid":                uuidString,
+			"terminate":           func(s string) (any, error) { return nil, &errTerminate{s} },
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -93,6 +94,17 @@ func (t *valueTpl) Unpack(in string) error {
 	*t = valueTpl{Template: tpl}
 
 	return nil
+}
+
+type errTerminate struct {
+	Reason string
+}
+
+func (e *errTerminate) Error() string {
+	if e.Reason != "" {
+		return "terminated template: " + e.Reason
+	}
+	return "terminated template"
 }
 
 func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName string, defaultVal *valueTpl, stat status.StatusReporter, log *logp.Logger) (val string, err error) {
@@ -134,6 +146,11 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName
 	}
 
 	if err := t.Template.Execute(buf, data); err != nil {
+		var termErr *errTerminate
+		if errors.As(err, &termErr) {
+			log.Debugw("template execution terminated", "target", targetName, "reason", termErr.Reason)
+			return "", nil
+		}
 		return fallback(err)
 	}
 
