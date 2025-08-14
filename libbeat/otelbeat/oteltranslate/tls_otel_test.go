@@ -46,6 +46,22 @@ ssl:
 		assert.Equal(t, want, got)
 	})
 
+	t.Run("when ssl.enabled = false", func(t *testing.T) {
+		input := `
+ssl:
+  enabled: true
+`
+		cfg := config.MustNewConfigFrom(input)
+		got, err := TLSCommonToOTel(cfg, logger)
+		require.NoError(t, err)
+		want := map[string]any{
+			"min_version": "1.2",
+			"max_version": "1.3",
+		}
+
+		assert.Equal(t, want, got)
+	})
+
 	t.Run("when ssl.verification_mode:none", func(t *testing.T) {
 		input := `
 ssl:
@@ -55,10 +71,9 @@ ssl:
 		got, err := TLSCommonToOTel(cfg, logger)
 		require.NoError(t, err)
 		assert.Equal(t, map[string]any{
-			"insecure_skip_verify":         true,
-			"include_system_ca_certs_pool": true,
-			"min_version":                  "1.2",
-			"max_version":                  "1.3",
+			"insecure_skip_verify": true,
+			"min_version":          "1.2",
+			"max_version":          "1.3",
 		}, got, "beats to otel ssl mapping")
 
 	})
