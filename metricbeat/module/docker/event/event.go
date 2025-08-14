@@ -64,7 +64,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	client, err := docker.NewDockerClient(base.HostData().URI, config)
+	client, err := docker.NewDockerClient(base.HostData().URI, config, base.Logger())
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		dockerClient:  client,
 		dedot:         config.DeDot,
-		logger:        logp.NewLogger("docker"),
+		logger:        base.Logger().Named("docker"),
 	}, nil
 }
 

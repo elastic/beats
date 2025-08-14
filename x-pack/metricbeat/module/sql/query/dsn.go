@@ -27,6 +27,7 @@ type ConnectionDetails struct {
 
 // ParseDSN tries to parse the host
 func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
+
 	// TODO: Add support for `username` and `password` as module options
 	config := ConnectionDetails{}
 	if err := mod.UnpackConfig(&config); err != nil {

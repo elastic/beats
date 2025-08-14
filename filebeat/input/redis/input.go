@@ -49,7 +49,7 @@ type Input struct {
 
 // NewInput creates a new redis input
 func NewInput(cfg *conf.C, connector channel.Connector, context input.Context, logger *logp.Logger) (input.Input, error) {
-	cfgwarn.Experimental("Redis slowlog input is enabled.")
+	logger.Warn(cfgwarn.Experimental("Redis slowlog input is enabled."))
 
 	config := defaultConfig()
 
@@ -59,7 +59,7 @@ func NewInput(cfg *conf.C, connector channel.Connector, context input.Context, l
 	}
 
 	if config.TLS.IsEnabled() {
-		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, logger)
 		if err != nil {
 			return nil, err
 		}

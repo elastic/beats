@@ -6,12 +6,14 @@ package awscloudwatch
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -21,6 +23,7 @@ type cloudwatchPoller struct {
 	log          *logp.Logger
 	metrics      *inputMetrics
 	stateHandler *stateHandler
+	status       status.StatusReporter
 
 	workersListingMap    *sync.Map
 	workersProcessingMap *sync.Map
@@ -41,8 +44,7 @@ type workResponse struct {
 	startTime, endTime time.Time
 }
 
-func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
-	awsRegion string, config config, stateHandler *stateHandler) *cloudwatchPoller {
+func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics, awsRegion string, config config, stateHandler *stateHandler, reporter status.StatusReporter) *cloudwatchPoller {
 	if metrics == nil {
 		metrics = newInputMetrics("", nil)
 	}
@@ -53,6 +55,7 @@ func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
 		region:               awsRegion,
 		config:               config,
 		stateHandler:         stateHandler,
+		status:               reporter,
 		workersListingMap:    new(sync.Map),
 		workersProcessingMap: new(sync.Map),
 		// workRequestChan is unbuffered to guarantee that
@@ -65,20 +68,20 @@ func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
 	}
 }
 
-func (p *cloudwatchPoller) startWorkers(ctx context.Context, svc *cloudwatchlogs.Client, pipeline beat.Pipeline) {
+func (p *cloudwatchPoller) startWorkers(ctx context.Context, svc *cloudwatchlogs.Client, pipeline beat.Pipeline) error {
 	for i := 0; i < p.config.NumberOfWorkers; i++ {
+		worker, err := newCWWorker(p.config, p.region, p.metrics, p.status, svc, pipeline, p.log)
+		if err != nil {
+			return fmt.Errorf("failed to create worker %d: %w", i, err)
+		}
 		p.workerWg.Add(1)
-		go func() {
+		go func(wrk *cwWorker) {
 			defer p.workerWg.Done()
-
-			worker, err := newCWWorker(p.config, p.region, p.metrics, svc, pipeline, p.log)
-			if err != nil {
-				p.log.Error("Error creating CloudWatch worker: ", err)
-				return
-			}
-			worker.Start(ctx, p.workRequestChan, p.workResponseChan, p.stateHandler)
-		}()
+			wrk.Start(ctx, p.workRequestChan, p.workResponseChan, p.stateHandler)
+		}(worker)
 	}
+
+	return nil
 }
 
 // receive implements the main run loop that distributes tasks to the worker

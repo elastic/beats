@@ -32,6 +32,7 @@ import (
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/model/textparse"
 	"github.com/prometheus/prometheus/model/timestamp"
+	"github.com/prometheus/prometheus/schema"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -480,7 +481,7 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 }
 
 func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
-	parser, err := textparse.New(b, contentType, ContentTypeTextFormat, false, false, labels.NewSymbolTable()) // Fallback protocol set to ContentTypeTextFormat
+	parser, err := textparse.New(b, contentType, ContentTypeTextFormat, false, false, false, labels.NewSymbolTable()) // Fallback protocol set to ContentTypeTextFormat
 	if err != nil {
 		return nil, err
 	}
@@ -569,8 +570,10 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 
 		var lset labels.Labels
 		parser.Labels(&lset)
+		metadata := schema.NewMetadataFromLabels(lset)
+		metricName := metadata.Name
 
-		if !lset.Has(labels.MetricName) {
+		if metricName == "" {
 			// missing metric name from labels.MetricName, skip.
 			break
 		}
@@ -578,9 +581,9 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		var lbls strings.Builder
 		var labelPairs = []*labels.Label{}
 		var qv string // value of le or quantile label
-		for _, l := range lset.Copy() {
+		lset.Range(func(l labels.Label) {
 			if l.Name == labels.MetricName {
-				continue
+				return
 			}
 
 			switch l.Name {
@@ -600,11 +603,9 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 				Name:  n,
 				Value: v,
 			})
-		}
+		})
 
 		var metric *OpenMetric
-
-		metricName := lset.Get(labels.MetricName)
 
 		// lookupMetricName will have the suffixes removed
 		lookupMetricName := metricName

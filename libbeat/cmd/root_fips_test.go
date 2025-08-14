@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -72,7 +73,7 @@ func TestGenRootCmdWithSettings_TLSDefaults(t *testing.T) {
 		var common tlscommon.Config
 		err = sslCfg.Unpack(&common)
 		require.NoError(t, err)
-		tlsCfg, err := tlscommon.LoadTLSConfig(&common)
+		tlsCfg, err := tlscommon.LoadTLSConfig(&common, logp.NewNopLogger())
 		require.NoError(t, err)
 
 		c := tlsCfg.ToConfig()

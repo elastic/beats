@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/gohugoio/hashstructure"
@@ -37,8 +38,8 @@ type timeseriesProcessor struct {
 // Events are processed to extract all their dimensions (keyword fields that
 // hold a dimension of the metrics) and compute a hash of all their values into
 // `timeseries.instance` field.
-func NewTimeSeriesProcessor(fields mapping.Fields) beat.Processor {
-	cfgwarn.Experimental("timeseries.instance field is experimental")
+func NewTimeSeriesProcessor(fields mapping.Fields, logger *logp.Logger) beat.Processor {
+	logger.Warn(cfgwarn.Experimental("timeseries.instance field is experimental"))
 
 	dimensions := map[string]bool{}
 	prefixes := map[string]bool{}
