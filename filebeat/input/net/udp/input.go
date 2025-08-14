@@ -23,17 +23,16 @@ import (
 
 	"github.com/dustin/go-humanize"
 
+	netinput "github.com/elastic/beats/v7/filebeat/input/net"
 	"github.com/elastic/beats/v7/filebeat/input/netmetrics"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -43,11 +42,11 @@ func Plugin() input.Plugin {
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "udp packet server",
-		Manager:    stateless.NewInputManager(configure),
+		Manager:    netinput.NewManager(configure),
 	}
 }
 
-func configure(cfg *conf.C) (stateless.Input, error) {
+func configure(cfg *conf.C) (netinput.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -69,6 +68,7 @@ func defaultConfig() config {
 type server struct {
 	udp.Server
 	config
+	metrics *netmetrics.UDP
 }
 
 type config struct {
@@ -76,7 +76,9 @@ type config struct {
 }
 
 func newServer(config config) (*server, error) {
-	return &server{config: config}, nil
+	return &server{
+		config: config,
+	}, nil
 }
 
 func (s *server) Name() string { return "udp" }
@@ -89,59 +91,33 @@ func (s *server) Test(_ input.TestContext) error {
 	return l.Close()
 }
 
-func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
-	log := ctx.Logger.With("host", s.Host)
+func (s *server) InitMetrics(id string, reg *monitoring.Registry, logger *logp.Logger) netinput.Metrics {
+	s.metrics = netmetrics.NewUDP(reg, s.Host, uint64(s.ReadBuffer), time.Second, logger)
+	return s.metrics
+}
 
-	log.Info("starting udp socket input")
-	defer log.Info("udp input stopped")
-
-	ctx.UpdateStatus(status.Starting, "")
-	ctx.UpdateStatus(status.Configuring, "")
-
-	const pollInterval = time.Minute
-	metrics := netmetrics.NewUDP("udp", ctx.ID, s.Host, uint64(s.ReadBuffer), pollInterval, log) // #nosec G115 -- ignore "overflow conversion int64 -> uint64", config validation ensures value is always positive.
-	defer metrics.Close()
+func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, metrics netinput.Metrics) (err error) {
+	logger := ctx.Logger
+	defer s.metrics.Close()
 
 	server := udp.New(&s.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
-		log.Debugw("Data received", "bytes", len(data), "remote_address", metadata.RemoteAddr.String(), "truncated", metadata.Truncated)
-		evt := beat.Event{
-			Timestamp: time.Now(),
-			Meta: mapstr.M{
-				"truncated": metadata.Truncated,
-			},
-			Fields: mapstr.M{
-				"message": string(data),
-			},
+		now := time.Now()
+		metrics.EventReceived(len(data), now)
+		logger.Debugw(
+			"Data received",
+			"bytes", len(data),
+			"remote_address", metadata.RemoteAddr.String(),
+			"truncated", metadata.Truncated)
+
+		evtChan <- netinput.DataMetadata{
+			Data:      data,
+			Metadata:  metadata,
+			Timestamp: now,
 		}
-		if metadata.RemoteAddr != nil {
-			evt.Fields["log"] = mapstr.M{
-				"source": mapstr.M{
-					"address": metadata.RemoteAddr.String(),
-				},
-			}
-		}
+	}, logger)
 
-		publisher.Publish(evt)
-
-		// This must be called after publisher.Publish to measure
-		// the processing time metric.
-		metrics.Log(data, evt.Timestamp)
-	}, log)
-
-	log.Debug("udp input initialized")
+	logger.Debug("udp input initialized")
 	ctx.UpdateStatus(status.Running, "")
 
-	err := server.Run(ctxtool.FromCanceller(ctx.Cancelation))
-	// Ignore error from 'Run' in case shutdown was signaled.
-	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {
-		err = ctxerr
-	}
-
-	if err != nil {
-		ctx.UpdateStatus(status.Failed, "Input exited unexpectedly: "+err.Error())
-	} else {
-		ctx.UpdateStatus(status.Stopped, "")
-	}
-
-	return err
+	return server.Run(ctxtool.FromCanceller(ctx.Cancelation))
 }
