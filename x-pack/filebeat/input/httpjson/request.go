@@ -386,6 +386,9 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 	if err != nil {
 		return false, fmt.Errorf("error while evaluating expression: %w", err)
 	}
+	if val == "" {
+		return false, nil
+	}
 	result, err := strconv.ParseBool(val)
 	if err != nil {
 		return false, fmt.Errorf("error while parsing boolean value of string: %w", err)
