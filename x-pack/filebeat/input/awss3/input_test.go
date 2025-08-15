@@ -14,6 +14,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestGetProviderFromDomain(t *testing.T) {
@@ -149,8 +150,9 @@ func TestRegionSelection(t *testing.T) {
 			}
 			in := newSQSReaderInput(config, awssdk.Config{})
 			inputCtx := v2.Context{
-				Logger: logp.NewLogger("awss3_test"),
-				ID:     "test_id",
+				Logger:          logp.NewLogger("awss3_test"),
+				ID:              "test_id",
+				MetricsRegistry: monitoring.NewRegistry(),
 			}
 
 			// Run setup and verify that it put the correct region in awsConfig.Region

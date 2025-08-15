@@ -13,6 +13,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type statelessInput struct {
@@ -63,10 +64,10 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		st := newState()
 		currentSource := source.(*Source)
 		log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container", currentSource.ContainerName)
-		// create a new inputMetrics instance
-		metrics := newInputMetrics(inputCtx.ID+":"+currentSource.ContainerName, nil)
+		// use a new metrics registry associated to no parent. No metrics will
+		// be published.
+		metrics := newInputMetrics(monitoring.NewRegistry())
 		metrics.url.Set(in.serviceURL + currentSource.ContainerName)
-		defer metrics.Close()
 
 		ctx, cancel := context.WithCancel(context.Background())
 		go func() {

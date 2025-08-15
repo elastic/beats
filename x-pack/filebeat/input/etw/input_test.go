@@ -14,13 +14,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/sys/windows"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"golang.org/x/sys/windows"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type mockSessionOperator struct {
@@ -78,8 +78,9 @@ func Test_RunEtwInput_NewSessionError(t *testing.T) {
 
 	// Setup input
 	inputCtx := input.Context{
-		Cancelation: nil,
-		Logger:      logp.NewLogger("test"),
+		Cancelation:     nil,
+		Logger:          logp.NewLogger("test"),
+		MetricsRegistry: monitoring.NewRegistry(),
 	}
 
 	etwInput := &etwInput{
@@ -91,7 +92,8 @@ func Test_RunEtwInput_NewSessionError(t *testing.T) {
 			MatchAllKeyword: 0,
 		},
 		operator: mockOperator,
-		metrics:  newInputMetrics("", ""),
+		metrics: newInputMetrics(
+			"test", inputCtx.MetricsRegistry),
 	}
 
 	// Run test
@@ -119,8 +121,9 @@ func Test_RunEtwInput_AttachToExistingSessionError(t *testing.T) {
 
 	// Setup input
 	inputCtx := input.Context{
-		Cancelation: nil,
-		Logger:      logp.NewLogger("test"),
+		Cancelation:     nil,
+		Logger:          logp.NewLogger("test"),
+		MetricsRegistry: monitoring.NewRegistry(),
 	}
 
 	etwInput := &etwInput{
@@ -132,7 +135,6 @@ func Test_RunEtwInput_AttachToExistingSessionError(t *testing.T) {
 			MatchAllKeyword: 0,
 		},
 		operator: mockOperator,
-		metrics:  newInputMetrics("", ""),
 	}
 
 	// Run test
@@ -164,8 +166,9 @@ func Test_RunEtwInput_CreateRealtimeSessionError(t *testing.T) {
 
 	// Setup input
 	inputCtx := input.Context{
-		Cancelation: nil,
-		Logger:      logp.NewLogger("test"),
+		Cancelation:     nil,
+		Logger:          logp.NewLogger("test"),
+		MetricsRegistry: monitoring.NewRegistry(),
 	}
 
 	etwInput := &etwInput{
@@ -177,7 +180,6 @@ func Test_RunEtwInput_CreateRealtimeSessionError(t *testing.T) {
 			MatchAllKeyword: 0,
 		},
 		operator: mockOperator,
-		metrics:  newInputMetrics("", ""),
 	}
 
 	// Run test
@@ -221,8 +223,9 @@ func Test_RunEtwInput_StartConsumerError(t *testing.T) {
 
 	// Setup input
 	inputCtx := input.Context{
-		Cancelation: ctx,
-		Logger:      logp.NewLogger("test"),
+		Cancelation:     ctx,
+		Logger:          logp.NewLogger("test"),
+		MetricsRegistry: monitoring.NewRegistry(),
 	}
 
 	etwInput := &etwInput{
@@ -234,7 +237,6 @@ func Test_RunEtwInput_StartConsumerError(t *testing.T) {
 			MatchAllKeyword: 0,
 		},
 		operator: mockOperator,
-		metrics:  newInputMetrics("", ""),
 	}
 
 	// Run test
@@ -278,8 +280,9 @@ func Test_RunEtwInput_Success(t *testing.T) {
 
 	// Setup input
 	inputCtx := input.Context{
-		Cancelation: ctx,
-		Logger:      logp.NewLogger("test"),
+		Cancelation:     ctx,
+		Logger:          logp.NewLogger("test"),
+		MetricsRegistry: monitoring.NewRegistry(),
 	}
 
 	etwInput := &etwInput{
@@ -291,7 +294,6 @@ func Test_RunEtwInput_Success(t *testing.T) {
 			MatchAllKeyword: 0,
 		},
 		operator: mockOperator,
-		metrics:  newInputMetrics("", ""),
 	}
 
 	// Run test

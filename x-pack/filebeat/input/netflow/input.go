@@ -124,8 +124,10 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 	n.logger.Info("Connecting to beat event publishing")
 
 	const pollInterval = time.Minute
-	n.udpMetrics = netmetrics.NewUDP("netflow", env.ID, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
-	defer n.udpMetrics.Close()
+	if env.ID != "" {
+		n.udpMetrics = netmetrics.NewUDP(env.MetricsRegistry, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
+		defer n.udpMetrics.Close()
+	}
 
 	n.metrics = newInputMetrics(n.udpMetrics.Registry())
 	var err error

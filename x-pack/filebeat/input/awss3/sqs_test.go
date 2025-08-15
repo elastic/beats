@@ -21,6 +21,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const testTimeout = 10 * time.Second
@@ -96,7 +97,7 @@ func TestSQSReceiver(t *testing.T) {
 		sqsReader := newSQSReaderInput(config{NumberOfWorkers: workerCount}, aws.Config{})
 		sqsReader.log = logger
 		sqsReader.sqs = mockSQS
-		sqsReader.metrics = newInputMetrics("", nil, 0)
+		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), 0)
 		sqsReader.pipeline = &fakePipeline{}
 		sqsReader.msgHandler = mockMsgHandler
 		sqsReader.run(ctx)
@@ -145,7 +146,7 @@ func TestSQSReceiver(t *testing.T) {
 		sqsReader.log = logp.NewLogger(inputName)
 		sqsReader.sqs = mockSQS
 		sqsReader.msgHandler = mockMsgHandler
-		sqsReader.metrics = newInputMetrics("", nil, 0)
+		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), 0)
 		sqsReader.pipeline = &fakePipeline{}
 		sqsReader.run(ctx)
 	})

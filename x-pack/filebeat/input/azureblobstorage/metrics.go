@@ -7,14 +7,12 @@ package azureblobstorage
 import (
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
 // inputMetrics handles the input's metric reporting.
 type inputMetrics struct {
-	unregister        func()
 	url               *monitoring.String // URL of the input resource.
 	errorsTotal       *monitoring.Uint   // Number of errors encountered.
 	decodeErrorsTotal *monitoring.Uint   // Number of decode errors encountered.
@@ -32,10 +30,8 @@ type inputMetrics struct {
 	sourceLagTime                   metrics.Sample   // Histogram of the time between the source (Updated) timestamp and the time the blob was read.
 }
 
-func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
+func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 	out := &inputMetrics{
-		unregister:        unreg,
 		url:               monitoring.NewString(reg, "url"),
 		errorsTotal:       monitoring.NewUint(reg, "errors_total"),
 		decodeErrorsTotal: monitoring.NewUint(reg, "decode_errors_total"),
@@ -65,8 +61,4 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 		Register("histogram", metrics.NewHistogram(out.sourceLagTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
 	return out
-}
-
-func (m *inputMetrics) Close() {
-	m.unregister()
 }
