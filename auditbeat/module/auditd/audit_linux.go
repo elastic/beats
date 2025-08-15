@@ -450,7 +450,7 @@ func (ms *MetricSet) updateKernelLostMetric(lost uint32) {
 		}
 		logFn("kernel lost events: %d (total: %d)", delta, lost)
 	} else {
-		ms.log.Warnf("kernel lost event counter reset from %d to %d", ms.kernelLost, lost)
+		ms.log.Warnf("kernel lost event counter reset from %d to %d", ms.kernelLost.counter, lost)
 	}
 	ms.kernelLost.counter = lost
 }

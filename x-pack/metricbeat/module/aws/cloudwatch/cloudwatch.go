@@ -149,8 +149,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// Get listMetricDetailTotal and namespaceDetailTotal from configuration
 	listMetricDetailTotal, namespaceDetailTotal := m.readCloudwatchConfig()
-	m.logger.Debugf("listMetricDetailTotal = %s", listMetricDetailTotal)
-	m.logger.Debugf("namespaceDetailTotal = %s", namespaceDetailTotal)
+	m.logger.Debugf("listMetricDetailTotal = %v", listMetricDetailTotal)
+	m.logger.Debugf("namespaceDetailTotal = %v", namespaceDetailTotal)
 
 	var config aws.Config
 	err = m.Module().UnpackConfig(&config)
@@ -209,13 +209,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		if len(namespaceDetailTotal) == 0 {
 			listMetricsOutput, err = aws.GetListMetricsOutput("*", regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, APIClients.CloudWatchClient)
 			if err != nil {
-				m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %w", regionName, "*", err)
+				m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %v", regionName, "*", err)
 			}
 		} else {
 			for namespace := range namespaceDetailTotal {
 				listMetricsOutputPerNamespace, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, APIClients.CloudWatchClient)
 				if err != nil {
-					m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %w", regionName, namespace, err)
+					m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %v", regionName, namespace, err)
 				}
 				listMetricsOutput = append(listMetricsOutput, listMetricsOutputPerNamespace...)
 			}
