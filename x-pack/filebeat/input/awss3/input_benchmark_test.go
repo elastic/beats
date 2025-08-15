@@ -223,6 +223,7 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 		config.NumberOfWorkers = workerCount
 		sqsReader := newSQSReaderInput(config, aws.Config{})
 		sqsReader.log = log.Named("sqs")
+		sqsReader.status = &mockStatusReporter{}
 		sqsReader.pipeline = newFakePipeline()
 		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), workerCount)
 		sqsReader.sqs, err = newConstantSQS()
@@ -235,6 +236,7 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 		b.Cleanup(cancel)
 
 		go func() {
+			//nolint:gosec // not going to have anywhere near uint64 overflow number of received messages
 			for sqsReader.metrics.sqsMessagesReceivedTotal.Get() < uint64(b.N) {
 				time.Sleep(5 * time.Millisecond)
 			}
@@ -262,6 +264,9 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 }
 
 func TestBenchmarkInputSQS(t *testing.T) {
+	// TODO: remove linter skip and update logger when the new recommended loggers support setting log levels
+	// for now, we don't want debug logs coming through a benchmark test
+	//nolint:staticcheck // see above
 	err := logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
 	require.NoError(t, err)
 
@@ -352,6 +357,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 					states:          states,
 					provider:        "provider",
 					filterProvider:  newFilterProvider(&config),
+					status:          &mockStatusReporter{},
 				}
 
 				s3Poller.run(ctx)
@@ -392,6 +398,9 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 }
 
 func TestBenchmarkInputS3(t *testing.T) {
+	// TODO: remove linter skip and update logger when the new recommended loggers support setting log levels
+	// for now, we don't want debug logs coming through a benchmark test
+	//nolint:staticcheck // see above
 	err := logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
 	require.NoError(t, err)
 
