@@ -46,7 +46,7 @@ func NewMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch will be called periodically by the framework.
-func (ms *MetricSet) Fetch(report mb.Reporter) {
+func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	// Fetch data from the host at ms.HostData().URI and return the data.
 	data, err := mapstr.M{
 		"some_metric":          18.0,
@@ -59,9 +59,11 @@ func (ms *MetricSet) Fetch(report mb.Reporter) {
 	}
 
 	// Otherwise report the collected data.
-	report.Event(data)
+	report.Event(mb.Event{
+		RootFields: data,
+	})
 }
 
-// ExampleReportingMetricSet demonstrates how to register a MetricSetFactory
+// ExampleReportingMetricSetV2 demonstrates how to register a MetricSetFactory
 // and implement a ReportingMetricSet.
-func ExampleReportingMetricSet() {}
+func ExampleReportingMetricSetV2() {}

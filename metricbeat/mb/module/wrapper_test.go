@@ -55,13 +55,15 @@ type fakeReportingFetcher struct {
 	mb.BaseMetricSet
 }
 
-func (ms *fakeReportingFetcher) Fetch(r mb.Reporter) {
+func (ms *fakeReportingFetcher) Fetch(r mb.ReporterV2) {
 	t, _ := time.Parse(time.RFC3339, "2016-05-10T23:27:58.485Z")
-	r.Event(mapstr.M{"@timestamp": common.Time(t), "metric": 1})
+	r.Event(mb.Event{
+		RootFields: mapstr.M{"@timestamp": common.Time(t), "metric": 1},
+	})
 }
 
 func newFakeReportingFetcher(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	var r mb.ReportingMetricSet = &fakeReportingFetcher{BaseMetricSet: base}
+	var r mb.ReportingMetricSetV2 = &fakeReportingFetcher{BaseMetricSet: base}
 	return r, nil
 }
 
@@ -71,15 +73,17 @@ type fakePushMetricSet struct {
 	mb.BaseMetricSet
 }
 
-func (ms *fakePushMetricSet) Run(r mb.PushReporter) {
+func (ms *fakePushMetricSet) Run(r mb.PushReporterV2) {
 	t, _ := time.Parse(time.RFC3339, "2016-05-10T23:27:58.485Z")
 	event := mapstr.M{"@timestamp": common.Time(t), "metric": 1}
-	r.Event(event)
+	r.Event(mb.Event{
+		RootFields: event,
+	})
 	<-r.Done()
 }
 
 func newFakePushMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	var r mb.PushMetricSet = &fakePushMetricSet{BaseMetricSet: base}
+	var r mb.PushMetricSetV2 = &fakePushMetricSet{BaseMetricSet: base}
 	return r, nil
 }
 
