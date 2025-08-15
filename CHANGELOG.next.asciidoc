@@ -505,6 +505,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Clarify behavior in logging for starting periodic evaluations and for exceeding the maximum execution budget. {pull}45633[45633]
 - Add status reporting support for AWS CloudWatch input. {pull}45679[45679]
 - Add mechanism to allow HTTP JSON templates to terminate without logging an error. {issue}45664[45664] {pull}45810[45810]
+- Improve error reporting for schemeless URLs in HTTP JSON input. {pull}45953[45953]
 
 *Auditbeat*
 
