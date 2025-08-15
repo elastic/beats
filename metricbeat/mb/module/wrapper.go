@@ -31,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/testing"
 )
@@ -227,13 +226,11 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 	}
 
 	switch ms := msw.MetricSet.(type) {
-	case mb.PushMetricSet: //nolint:staticcheck // PushMetricSet is deprecated but not removed
-		ms.Run(reporter.V1())
 	case mb.PushMetricSetV2:
 		ms.Run(reporter.V2())
 	case mb.PushMetricSetV2WithContext:
 		ms.Run(&channelContext{done}, reporter.V2())
-	case mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext: //nolint:staticcheck // ReportingMetricSet is deprecated but not removed
+	case mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext:
 		msw.startPeriodicFetching(&channelContext{done}, reporter)
 	default:
 		// Earlier startup stages prevent this from happening.
@@ -270,9 +267,6 @@ func (msw *metricSetWrapper) startPeriodicFetching(ctx context.Context, reporter
 // and log a stack track if one occurs.
 func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 	switch fetcher := msw.MetricSet.(type) {
-	case mb.ReportingMetricSet: //nolint:staticcheck // ReportingMetricSet is deprecated but not removed
-		reporter.StartFetchTimer()
-		fetcher.Fetch(reporter.V1())
 	case mb.ReportingMetricSetV2:
 		reporter.StartFetchTimer()
 		fetcher.Fetch(reporter.V2())
@@ -339,7 +333,6 @@ func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporte
 
 type reporter interface {
 	StartFetchTimer()
-	V1() mb.PushReporter //nolint:staticcheck // PushReporter is deprecated but not removed
 	V2() mb.PushReporterV2
 }
 
@@ -355,10 +348,7 @@ type eventReporter struct {
 
 // startFetchTimer demarcates the start of a new fetch. The elapsed time of a
 // fetch is computed based on the time of this call.
-func (r *eventReporter) StartFetchTimer() { r.start = time.Now() }
-func (r *eventReporter) V1() mb.PushReporter { //nolint:staticcheck // PushReporter is deprecated but not removed
-	return reporterV1{v2: r.V2(), module: r.msw.module.Name()}
-}
+func (r *eventReporter) StartFetchTimer()      { r.start = time.Now() }
 func (r *eventReporter) V2() mb.PushReporterV2 { return reporterV2{r} }
 
 // channelContext implements context.Context by wrapping a channel
@@ -377,23 +367,6 @@ func (r *channelContext) Err() error {
 	}
 }
 func (r *channelContext) Value(key interface{}) interface{} { return nil }
-
-// reporterV1 wraps V2 to provide a v1 interface.
-type reporterV1 struct {
-	v2     mb.PushReporterV2
-	module string
-}
-
-func (r reporterV1) Done() <-chan struct{}     { return r.v2.Done() }
-func (r reporterV1) Event(event mapstr.M) bool { return r.ErrorWith(nil, event) }
-func (r reporterV1) Error(err error) bool      { return r.ErrorWith(err, nil) }
-func (r reporterV1) ErrorWith(err error, meta mapstr.M) bool {
-	// Skip nil events without error
-	if err == nil && meta == nil {
-		return true
-	}
-	return r.v2.Event(mb.TransformMapStrToEvent(r.module, meta, err))
-}
 
 type reporterV2 struct {
 	*eventReporter
