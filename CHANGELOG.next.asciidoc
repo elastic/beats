@@ -145,6 +145,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove erroneous status reporting to Elastic-Agent from the Filestream input {pull}42435[42435]
 - Fix wrongly emitted missing input ID warning {issue}42969[42969] {pull}45747[45747]
 - Fix handling of unnecessary BOM in UTF-8 text received by o365audit input. {issue}44327[44327] {pull}45739[45739]
+- Restore the Streaming input on Windows. {pull}46031[46031]
 
 *Heartbeat*
 
