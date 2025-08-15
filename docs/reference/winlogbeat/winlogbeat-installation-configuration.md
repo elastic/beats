@@ -72,6 +72,19 @@ If script execution is disabled on your system, you need to set the execution po
 To use a local non-Administrator account to run Winlogbeat, follow [these additional steps](#local-user-account-setup).
 :::
 
+:::{important}
+```{applies_to}
+stack: ga 9.0.6
+```
+The base folder has changed from `C:\ProgramData\` to `C:\Program Files\`
+because the latter has stricter permissions. The home path (base for
+state and logs) is now `C:\Program Files\Winlogbeat-Data`.
+
+The install script (`install-service-winlogbeat.ps1`) will check whether
+`C:\ProgramData\Winlogbeat` exits and move it to `C:\Program Files\Winlogbeat-Data`.
+For more details on the installation script refer to: [install script](/reference/winlogbeat/winlogbeat-installation-script.md).
+
+:::
 
 
 ## Step 2: Connect to the {{stack}} [set-connection]
@@ -155,8 +168,8 @@ In `winlogbeat.yml`, configure the event logs that you want to monitor.
     ```
 
 The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.1` `C:\Program Files\Winlogbeat-Data\Logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\winlogbeat\Logs`
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Winlogbeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\winlogbeat\logs`
 
 3. After you save your configuration file, test it with the following command.
 
@@ -210,8 +223,8 @@ PS C:\Program Files\Winlogbeat> Start-Service winlogbeat
 Winlogbeat should now be running. If you used the logging configuration described here, you can view the log file at `C:\Program Files\winlogbeat-Data\Logs\winlogbeat`.
 
 The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.1` `C:\Program Files\Winlogbeat-Data\Logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\winlogbeat\Logs`
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Winlogbeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\winlogbeat\logs`
 
 You can view the status of the service and control it from the Services management console in Windows. To launch the management console, run this command:
 
