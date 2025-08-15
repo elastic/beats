@@ -12,6 +12,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Fix FQDN being lowercased when used as `host.hostname` {issue}39993[39993]
 - Beats won't log start up information when running under the Elastic Agent {40390}40390[40390]
+- The default data and logs path for the Windows service installation has changed from `C:\ProgramData\<Beat>` and `C:\ProgramData\<Beat>\logs`, respectively to `C:\Program Files\<Beat>-Data` and `C:\Program Files\<Beat>-Data\logs`. See 'Quick start -> Installation script' from each Beat for more details. {pull}45946{45946}.
 
 *Auditbeat*
 
