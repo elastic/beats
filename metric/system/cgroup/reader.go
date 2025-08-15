@@ -119,11 +119,13 @@ type ReaderOptions struct {
 }
 
 // NewReader creates and returns a new Reader.
-func NewReader(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool, logger *logp.Logger) (*Reader, error) {
+//
+// Deprecated: use NewReaderOptions
+func NewReader(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (*Reader, error) {
 	return NewReaderOptions(ReaderOptions{
 		RootfsMountpoint:  rootfsMountpoint,
 		IgnoreRootCgroups: ignoreRootCgroups,
-		Logger:            logger,
+		Logger:            logp.NewNopLogger(),
 	})
 }
 
@@ -258,7 +260,10 @@ func (r *Reader) GetV2StatsForProcess(pid int) (*StatsV2, error) { //nolint: dup
 // ProcessCgroupPaths is a wrapper around Reader.ProcessCgroupPaths for libraries that only need the slimmer functionality from
 // the gosigar cgroups code. This does not have the same function signature, and consumers still need to distinguish between v1 and v2 cgroups.
 func ProcessCgroupPaths(hostfs resolve.Resolver, pid int, logger *logp.Logger) (PathList, error) {
-	reader, err := NewReader(hostfs, false, logger)
+	reader, err := NewReaderOptions(ReaderOptions{
+		RootfsMountpoint: hostfs,
+		Logger:           logger,
+	})
 	if err != nil {
 		return PathList{}, fmt.Errorf("error creating cgroups reader: %w", err)
 	}

@@ -53,7 +53,11 @@ func TestReaderOptsWithoutResolve(t *testing.T) {
 
 func TestV1EventDifferentPaths(t *testing.T) {
 	pid := 3757
-	reader, err := NewReader(resolve.NewTestResolver("testdata/ubuntu1804"), true, logptest.NewTestingLogger(t, ""))
+	reader, err := NewReaderOptions(ReaderOptions{
+		RootfsMountpoint:  resolve.NewTestResolver("testdata/ubuntu1804"),
+		IgnoreRootCgroups: true,
+		Logger:            logptest.NewTestingLogger(t, ""),
+	})
 	require.NoError(t, err, "error in NewReader")
 
 	stats, err := reader.GetV1StatsForProcess(pid)
@@ -67,7 +71,11 @@ func TestV1EventDifferentPaths(t *testing.T) {
 }
 
 func TestReaderGetStatsV1(t *testing.T) {
-	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), true, logptest.NewTestingLogger(t, ""))
+	reader, err := NewReaderOptions(ReaderOptions{
+		RootfsMountpoint:  resolve.NewTestResolver("testdata/docker"),
+		IgnoreRootCgroups: true,
+		Logger:            logptest.NewTestingLogger(t, ""),
+	})
 	require.NoError(t, err, "error in NewReader")
 
 	stats, err := reader.GetV1StatsForProcess(985)
@@ -97,7 +105,11 @@ func TestReaderGetStatsV1(t *testing.T) {
 // testcase for the situation where both cgroup v1 and v2 controllers exist but
 // /sys/fs/cgroup/unified is not mounted
 func TestReaderGetStatsV1MalformedHybrid(t *testing.T) {
-	reader, err := NewReader(resolve.NewTestResolver("testdata/amzn2"), true, logptest.NewTestingLogger(t, ""))
+	reader, err := NewReaderOptions(ReaderOptions{
+		RootfsMountpoint:  resolve.NewTestResolver("testdata/amzn2"),
+		IgnoreRootCgroups: true,
+		Logger:            logptest.NewTestingLogger(t, ""),
+	})
 	require.NoError(t, err, "error in NewReader")
 
 	stats, err := reader.GetV1StatsForProcess(493239)
@@ -124,7 +136,11 @@ func TestReaderGetStatsV1MalformedHybrid(t *testing.T) {
 }
 
 func TestReaderGetStatsV2(t *testing.T) {
-	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), true, logptest.NewTestingLogger(t, ""))
+	reader, err := NewReaderOptions(ReaderOptions{
+		RootfsMountpoint:  resolve.NewTestResolver("testdata/docker"),
+		IgnoreRootCgroups: true,
+		Logger:            logptest.NewTestingLogger(t, ""),
+	})
 	require.NoError(t, err, "error in NewReader")
 
 	stats, err := reader.GetV2StatsForProcess(312)

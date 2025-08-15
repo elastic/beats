@@ -157,7 +157,10 @@ func TestSubsystemMountpoints(t *testing.T) {
 }
 
 func TestProcessCgroupPaths(t *testing.T) {
-	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), false, logptest.NewTestingLogger(t, ""))
+	reader, err := NewReaderOptions(ReaderOptions{
+		RootfsMountpoint: resolve.NewTestResolver("testdata/docker"),
+		Logger:           logptest.NewTestingLogger(t, ""),
+	})
 	if err != nil {
 		t.Fatalf("error in NewReader: %s", err)
 	}
@@ -181,7 +184,10 @@ func TestProcessCgroupPaths(t *testing.T) {
 }
 
 func TestProcessCgroupHybridPaths(t *testing.T) {
-	reader, err := NewReader(resolve.NewTestResolver("testdata/amzn2"), false, logptest.NewTestingLogger(t, ""))
+	reader, err := NewReaderOptions(ReaderOptions{
+		RootfsMountpoint: resolve.NewTestResolver("testdata/amzn2"),
+		Logger:           logptest.NewTestingLogger(t, ""),
+	})
 	if err != nil {
 		t.Fatalf("error in NewReader: %s", err)
 	}
@@ -206,7 +212,10 @@ func TestProcessCgroupHybridPaths(t *testing.T) {
 }
 
 func TestProcessCgroupPathsV2(t *testing.T) {
-	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), false, logptest.NewTestingLogger(t, ""))
+	reader, err := NewReaderOptions(ReaderOptions{
+		RootfsMountpoint: resolve.NewTestResolver("testdata/docker"),
+		Logger:           logptest.NewTestingLogger(t, ""),
+	})
 	if err != nil {
 		t.Fatalf("error in NewReader: %s", err)
 	}
@@ -233,7 +242,10 @@ func TestMountpointsV2(t *testing.T) {
 		[]byte(pidFmt), 0o744)
 	require.NoError(t, err)
 
-	reader, err := NewReader(resolve.NewTestResolver("testdata/docker2"), false, logptest.NewTestingLogger(t, ""))
+	reader, err := NewReaderOptions(ReaderOptions{
+		RootfsMountpoint: resolve.NewTestResolver("testdata/docker2"),
+		Logger:           logptest.NewTestingLogger(t, ""),
+	})
 	require.NoError(t, err)
 
 	stats, err := reader.GetStatsForPid(2233801)
