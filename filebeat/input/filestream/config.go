@@ -28,9 +28,9 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/reader/binary"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -102,7 +102,7 @@ type readerConfig struct {
 	LineTerminator readfile.LineTerminator  `config:"line_terminator"`
 	MaxBytes       int                      `config:"message_max_bytes" validate:"min=0,nonzero"`
 	Tail           bool                     `config:"seek_to_tail"`
-	Binary         *encoding.BinaryEncoding `config:"binary"`
+	Binary         *binary.Encoding         `config:"binary"`
 
 	Parsers parser.Config `config:",inline"`
 }
