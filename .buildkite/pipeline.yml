@@ -164,41 +164,41 @@ steps:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
 
-  - label: "Trigger x-pack/dockerlogbeat"
-    if: build.pull_request.id != null
-    plugins:
-      - monorepo-diff#v1.0.1:
-          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
-          interpolation: false
-          watch:
-            - path:
-                - .go-version
-                - x-pack/dockerlogbeat/
-                - .buildkite/x-pack/pipeline.xpack.dockerlogbeat.yml
-                - .buildkite/hooks/
-                - .buildkite/scripts
-                #OSS
-                - go.mod
-                - pytest.ini
-                - dev-tools/
-                - libbeat/**
-                - testing/**
-              config:
-                trigger: "beats-xpack-dockerlogbeat"
-                build:
-                  commit: "${BUILDKITE_COMMIT}"
-                  branch: "${BUILDKITE_BRANCH}"
-                  env:
-                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
-
-  - label: "Triggering Build for x-pack/dockerlogbeat"
-    if: build.pull_request.id == null
-    trigger: "beats-xpack-dockerlogbeat"
-    build:
-      commit: "${BUILDKITE_COMMIT}"
-      branch: "${BUILDKITE_BRANCH}"
+#  - label: "Trigger x-pack/dockerlogbeat"
+#    if: build.pull_request.id != null
+#    plugins:
+#      - monorepo-diff#v1.0.1:
+#          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+#          interpolation: false
+#          watch:
+#            - path:
+#                - .go-version
+#                - x-pack/dockerlogbeat/
+#                - .buildkite/x-pack/pipeline.xpack.dockerlogbeat.yml
+#                - .buildkite/hooks/
+#                - .buildkite/scripts
+#                #OSS
+#                - go.mod
+#                - pytest.ini
+#                - dev-tools/
+#                - libbeat/**
+#                - testing/**
+#              config:
+#                trigger: "beats-xpack-dockerlogbeat"
+#                build:
+#                  commit: "${BUILDKITE_COMMIT}"
+#                  branch: "${BUILDKITE_BRANCH}"
+#                  env:
+#                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+#                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+#                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+#
+#  - label: "Triggering Build for x-pack/dockerlogbeat"
+#    if: build.pull_request.id == null
+#    trigger: "beats-xpack-dockerlogbeat"
+#    build:
+#      commit: "${BUILDKITE_COMMIT}"
+#      branch: "${BUILDKITE_BRANCH}"
 
   - label: "Trigger Metricbeat"
     if: build.pull_request.id != null
@@ -351,37 +351,37 @@ steps:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
 
-  - label: "Trigger Deploy/K8S"
-    if: build.pull_request.id != null
-    plugins:
-      - monorepo-diff#v1.0.1:
-          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
-          interpolation: false
-          watch:
-            - path:
-                - .go-version
-                - .buildkite/deploy/kubernetes/**
-                - .buildkite/hooks/
-                - .buildkite/scripts
-                - deploy/kubernetes/**
-                - metricbeat/module/kubernetes/**
-                - libbeat/docs/version.asciidoc
-              config:
-                trigger: "deploy-k8s"
-                build:
-                  commit: "${BUILDKITE_COMMIT}"
-                  branch: "${BUILDKITE_BRANCH}"
-                  env:
-                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
-
-  - label: "Triggering Build for Deploy/K8S"
-    if: build.pull_request.id == null
-    trigger: "deploy-k8s"
-    build:
-      commit: "${BUILDKITE_COMMIT}"
-      branch: "${BUILDKITE_BRANCH}"
+#  - label: "Trigger Deploy/K8S"
+#    if: build.pull_request.id != null
+#    plugins:
+#      - monorepo-diff#v1.0.1:
+#          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+#          interpolation: false
+#          watch:
+#            - path:
+#                - .go-version
+#                - .buildkite/deploy/kubernetes/**
+#                - .buildkite/hooks/
+#                - .buildkite/scripts
+#                - deploy/kubernetes/**
+#                - metricbeat/module/kubernetes/**
+#                - libbeat/docs/version.asciidoc
+#              config:
+#                trigger: "deploy-k8s"
+#                build:
+#                  commit: "${BUILDKITE_COMMIT}"
+#                  branch: "${BUILDKITE_BRANCH}"
+#                  env:
+#                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+#                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+#                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+#
+#  - label: "Triggering Build for Deploy/K8S"
+#    if: build.pull_request.id == null
+#    trigger: "deploy-k8s"
+#    build:
+#      commit: "${BUILDKITE_COMMIT}"
+#      branch: "${BUILDKITE_BRANCH}"
 
   - label: "Trigger Libbeat"
     if: build.pull_request.id != null
@@ -641,59 +641,59 @@ steps:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
 
-  - label: "Trigger Agentbeat"
-    if: build.pull_request.id != null
-    plugins:
-      - monorepo-diff#v1.0.1:
-          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
-          interpolation: false
-          watch:
-            - path:
-                - .go-version
-                - auditbeat/
-                - filebeat/
-                - heartbeat/
-                - metricbeat/
-                - osquerybeat/
-                - packetbeat/
-
-                - x-pack/agentbeat/
-                - x-pack/auditbeat/
-                - x-pack/filebeat/
-                - x-pack/heartbeat/
-                - x-pack/metricbeat/
-                - x-pack/osquerybeat/
-                - x-pack/packetbeat/
-
-                - .buildkite/x-pack/pipeline.xpack.agentbeat.yml
-                - .buildkite/scripts/
-                - .buildkite/hooks/
-                #OSS
-                - go.mod
-                - pytest.ini
-                - dev-tools/
-                - libbeat/
-                - testing/
-              config:
-                trigger: "beats-xpack-agentbeat"
-                build:
-                  commit: "${BUILDKITE_COMMIT}"
-                  branch: "${BUILDKITE_BRANCH}"
-                  env:
-                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
-
-  - label: "Triggering Build for Agentbeat"
-    if: build.pull_request.id == null
-    trigger: "beats-xpack-agentbeat"
-    build:
-      commit: "${BUILDKITE_COMMIT}"
-      branch: "${BUILDKITE_BRANCH}"
-
-  # Triggers Serverless Beats tests in the elastic-agent repo for main/release branches
-  - label: "Serverless beats tests(elastic-agent)"
-    if: build.pull_request.id == null
-    trigger: "beats-agent-serverless-tests"
-    build:
-      branch: "main"
+#  - label: "Trigger Agentbeat"
+#    if: build.pull_request.id != null
+#    plugins:
+#      - monorepo-diff#v1.0.1:
+#          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+#          interpolation: false
+#          watch:
+#            - path:
+#                - .go-version
+#                - auditbeat/
+#                - filebeat/
+#                - heartbeat/
+#                - metricbeat/
+#                - osquerybeat/
+#                - packetbeat/
+#
+#                - x-pack/agentbeat/
+#                - x-pack/auditbeat/
+#                - x-pack/filebeat/
+#                - x-pack/heartbeat/
+#                - x-pack/metricbeat/
+#                - x-pack/osquerybeat/
+#                - x-pack/packetbeat/
+#
+#                - .buildkite/x-pack/pipeline.xpack.agentbeat.yml
+#                - .buildkite/scripts/
+#                - .buildkite/hooks/
+#                #OSS
+#                - go.mod
+#                - pytest.ini
+#                - dev-tools/
+#                - libbeat/
+#                - testing/
+#              config:
+#                trigger: "beats-xpack-agentbeat"
+#                build:
+#                  commit: "${BUILDKITE_COMMIT}"
+#                  branch: "${BUILDKITE_BRANCH}"
+#                  env:
+#                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+#                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+#                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+#
+#  - label: "Triggering Build for Agentbeat"
+#    if: build.pull_request.id == null
+#    trigger: "beats-xpack-agentbeat"
+#    build:
+#      commit: "${BUILDKITE_COMMIT}"
+#      branch: "${BUILDKITE_BRANCH}"
+#
+#  # Triggers Serverless Beats tests in the elastic-agent repo for main/release branches
+#  - label: "Serverless beats tests(elastic-agent)"
+#    if: build.pull_request.id == null
+#    trigger: "beats-agent-serverless-tests"
+#    build:
+#      branch: "main"
