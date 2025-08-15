@@ -75,7 +75,7 @@ func NewQueueObserver(metrics *monitoring.Registry) Observer {
 			return nilObserver{}
 		}
 	} else {
-		queueMetrics = metrics.NewRegistry("queue")
+		queueMetrics = metrics.GetOrCreateRegistry("queue")
 	}
 
 	ob := &queueObserver{
