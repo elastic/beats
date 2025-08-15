@@ -92,8 +92,8 @@ func TestJournaldInputRunsAndRecoversFromJournalctlFailures(t *testing.T) {
 	filebeat.Start()
 	// On a normal execution we run journalclt twice, the first time to read all messages from the
 	// previous boot until 'now' and the second one with the --follow flag that should keep on running.
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
+	filebeat.WaitLogsContains("journalctl started with PID", 10*time.Second, "journalctl did not start")
+	filebeat.WaitLogsContains("journalctl started with PID", 10*time.Second, "journalctl did not start")
 
 	pidLine := filebeat.GetLastLogLine("journalctl started with PID")
 	logEntry := struct{ Message string }{}
@@ -104,7 +104,7 @@ func TestJournaldInputRunsAndRecoversFromJournalctlFailures(t *testing.T) {
 	pid := 0
 	fmt.Sscanf(logEntry.Message, "journalctl started with PID %d", &pid)
 
-	filebeat.WaitForLogs("Count: 003", 5*time.Second, "did not find the third event in published events")
+	filebeat.WaitLogsContains("Count: 003", 5*time.Second, "did not find the third event in published events")
 
 	// Kill journalctl
 	if err := syscall.Kill(pid, syscall.SIGKILL); err != nil {
@@ -112,8 +112,8 @@ func TestJournaldInputRunsAndRecoversFromJournalctlFailures(t *testing.T) {
 	}
 
 	go generateJournaldLogs(t, context.Background(), syslogID, 5)
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
-	filebeat.WaitForLogs("Count: 005", time.Second, "expected log message not found in published events SECOND")
+	filebeat.WaitLogsContains("journalctl started with PID", 10*time.Second, "journalctl did not start")
+	filebeat.WaitLogsContains("Count: 005", time.Second, "expected log message not found in published events SECOND")
 
 	eventsPublished := filebeat.CountFileLines(filepath.Join(filebeat.TempDir(), "output-*.ndjson"))
 
@@ -144,8 +144,8 @@ func TestJournaldInputDoesNotDuplicateData(t *testing.T) {
 	filebeat.Start()
 	// On a normal execution we run journalclt twice, the first time to read all messages from the
 	// previous boot until 'now' and the second one with the --follow flag that should keep on running.
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
+	filebeat.WaitLogsContains("journalctl started with PID", 10*time.Second, "journalctl did not start")
+	filebeat.WaitLogsContains("journalctl started with PID", 10*time.Second, "journalctl did not start")
 
 	pidLine := filebeat.GetLastLogLine("journalctl started with PID")
 	logEntry := struct{ Message string }{}
@@ -153,7 +153,7 @@ func TestJournaldInputDoesNotDuplicateData(t *testing.T) {
 		t.Errorf("could not parse PID log entry as JSON: %s", err)
 	}
 
-	filebeat.WaitForLogs("Count: 003", 5*time.Second, "did not find the third event in published events")
+	filebeat.WaitLogsContains("Count: 003", 5*time.Second, "did not find the third event in published events")
 
 	// Stop Filebeat
 	filebeat.Stop()
@@ -165,10 +165,10 @@ func TestJournaldInputDoesNotDuplicateData(t *testing.T) {
 	filebeat.Start()
 
 	// Wait for journalctl to start
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
+	filebeat.WaitLogsContains("journalctl started with PID", 10*time.Second, "journalctl did not start")
 
 	// Wait for last even in the debug logs
-	filebeat.WaitForLogs("Count: 005", time.Second, "did not find the last event in published events")
+	filebeat.WaitLogsContains("Count: 005", time.Second, "did not find the last event in published events")
 
 	eventsPublished := filebeat.CountFileLines(filepath.Join(filebeat.TempDir(), "output-*.ndjson"))
 

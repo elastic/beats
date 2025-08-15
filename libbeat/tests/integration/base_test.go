@@ -43,9 +43,9 @@ output.console:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
 	mockbeat.Stop()
-	mockbeat.WaitForLogs("mockbeat stopped.", 30*time.Second)
+	mockbeat.WaitLogsContains("mockbeat stopped.", 30*time.Second)
 }
 
 func TestSigHUP(t *testing.T) {
@@ -66,11 +66,11 @@ output.console:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
 	err := mockbeat.Cmd.Process.Signal(syscall.SIGHUP)
 	require.NoErrorf(t, err, "error sending SIGHUP to mockbeat")
 	mockbeat.Stop()
-	mockbeat.WaitForLogs("mockbeat stopped.", 30*time.Second)
+	mockbeat.WaitLogsContains("mockbeat stopped.", 30*time.Second)
 }
 
 func TestNoConfig(t *testing.T) {

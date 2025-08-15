@@ -13,7 +13,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"math"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -81,7 +80,7 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	filebeat := NewFilebeat(t)
 
 	logFilePath := filepath.Join(filebeat.TempDir(), "flog.log")
-	generateLogFile(t, logFilePath)
+	integration.WriteAppendingLogFile(t, logFilePath)
 	var units = [][]*proto.UnitExpected{
 		{
 			{
@@ -347,7 +346,7 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 	// input to start which creates a more realistic test case and
 	// can help uncover other issues in the startup/shutdown process.
 	logFilePath := filepath.Join(filebeat.TempDir(), "flog.log")
-	generateLogFile(t, logFilePath)
+	integration.WriteAppendingLogFile(t, logFilePath)
 
 	logLevel := proto.UnitLogLevel_INFO
 	filestreamInputHealthy := proto.UnitExpected{
@@ -518,7 +517,7 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 	filebeat := NewFilebeat(t)
 
 	logFilePath := filepath.Join(filebeat.TempDir(), "logs-to-ingest.log")
-	generateLogFile(t, logFilePath)
+	integration.WriteAppendingLogFile(t, logFilePath)
 
 	eventsDir := filepath.Join(filebeat.TempDir(), "ingested-events")
 	logLevel := proto.UnitLogLevel_INFO
@@ -697,7 +696,7 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 
 	assert.Equal(t, version.Commit(), observed.VersionInfo.BuildHash)
 
-	evs := getEventsFromFileOutput[Event](t, eventsDir, 100)
+	evs := integration.GetEventsFromFileOutput[Event](t, eventsDir, 100)
 	for _, got := range evs {
 		assert.Equal(t, wantVersion, got.Metadata.Version)
 
@@ -708,86 +707,6 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 		assert.Equal(t, wantAgentInfo.Id, got.Agent.Id)
 		assert.Equal(t, wantVersion, got.Agent.Version)
 	}
-}
-
-// generateLogFile generates a log file by appending the current
-// time to it every second.
-func generateLogFile(t *testing.T, fullPath string) {
-	t.Helper()
-	f, err := os.Create(fullPath)
-	if err != nil {
-		t.Fatalf("could not create file '%s: %s", fullPath, err)
-	}
-
-	go func() {
-		t.Helper()
-		ticker := time.NewTicker(time.Second)
-		t.Cleanup(ticker.Stop)
-
-		done := make(chan struct{})
-		t.Cleanup(func() { close(done) })
-
-		defer func() {
-			if err := f.Close(); err != nil {
-				t.Errorf("could not close log file '%s': %s", fullPath, err)
-			}
-		}()
-
-		for {
-			select {
-			case <-done:
-				return
-			case now := <-ticker.C:
-				_, err := fmt.Fprintln(f, now.Format(time.RFC3339))
-				if err != nil {
-					// The Go compiler does not allow me to call t.Fatalf from a non-test
-					// goroutine, so just log it instead
-					t.Errorf("could not write data to log file '%s': %s", fullPath, err)
-					return
-				}
-				// make sure log lines are synced as quickly as possible
-				if err := f.Sync(); err != nil {
-					t.Errorf("could not sync file '%s': %s", fullPath, err)
-				}
-			}
-		}
-	}()
-}
-
-// getEventsFromFileOutput reads all events from all the files on dir. If n > 0,
-// then it reads up to n events. It considers all files are ndjson, and it skips
-// any directory within dir.
-func getEventsFromFileOutput[E any](t *testing.T, dir string, n int) []E {
-	t.Helper()
-
-	if n < 1 {
-		n = math.MaxInt
-	}
-
-	var events []E
-	entries, err := os.ReadDir(dir)
-	require.NoError(t, err, "could not read events directory")
-	for _, e := range entries {
-		if e.IsDir() {
-			continue
-		}
-		f, err := os.Open(filepath.Join(dir, e.Name()))
-		require.NoErrorf(t, err, "could not open file %q", e.Name())
-
-		scanner := bufio.NewScanner(f)
-		for scanner.Scan() {
-			var ev E
-			err := json.Unmarshal(scanner.Bytes(), &ev)
-			require.NoError(t, err, "failed to read event")
-			events = append(events, ev)
-
-			if len(events) >= n {
-				return events
-			}
-		}
-	}
-
-	return events
 }
 
 func writeStartUpInfo(t *testing.T, w io.Writer, info *proto.StartUpInfo) {
