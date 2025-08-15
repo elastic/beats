@@ -59,9 +59,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 
 	// Otherwise report the collected data.
-	report.Event(mb.Event{
-		RootFields: data,
-	})
+	report.Event(mb.TransformMapStrToEvent(ms.Module().Name(), data, nil))
 }
 
 // ExampleReportingMetricSetV2 demonstrates how to register a MetricSetFactory

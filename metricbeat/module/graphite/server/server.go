@@ -100,9 +100,7 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 					if err != nil {
 						reporter.Error(err)
 					} else {
-						reporter.Event(mb.Event{
-							RootFields: event,
-						})
+						reporter.Event(mb.TransformMapStrToEvent(m.Module().Name(), event, nil))
 					}
 				}
 			}

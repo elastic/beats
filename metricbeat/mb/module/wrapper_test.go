@@ -57,9 +57,7 @@ type fakeReportingFetcher struct {
 
 func (ms *fakeReportingFetcher) Fetch(r mb.ReporterV2) {
 	t, _ := time.Parse(time.RFC3339, "2016-05-10T23:27:58.485Z")
-	r.Event(mb.Event{
-		RootFields: mapstr.M{"@timestamp": common.Time(t), "metric": 1},
-	})
+	r.Event(mb.TransformMapStrToEvent(ms.Module().Name(), mapstr.M{"@timestamp": common.Time(t), "metric": 1}, nil))
 }
 
 func newFakeReportingFetcher(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -76,9 +74,7 @@ type fakePushMetricSet struct {
 func (ms *fakePushMetricSet) Run(r mb.PushReporterV2) {
 	t, _ := time.Parse(time.RFC3339, "2016-05-10T23:27:58.485Z")
 	event := mapstr.M{"@timestamp": common.Time(t), "metric": 1}
-	r.Event(mb.Event{
-		RootFields: event,
-	})
+	r.Event(mb.TransformMapStrToEvent(ms.Module().Name(), event, nil))
 	<-r.Done()
 }
 
