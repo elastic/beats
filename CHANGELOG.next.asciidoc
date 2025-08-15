@@ -71,6 +71,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Update to Go 1.24.5. {pull}45404[45404]
 
 *Auditbeat*
 
