@@ -8,6 +8,7 @@ package query
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 )
 
@@ -66,6 +67,20 @@ func TestSanitizeError(t *testing.T) {
 			err:          errors.New("Nothing should change here"),
 			sensitive:    "",
 			expectedErr:  "Nothing should change here",
+			expectNilErr: false,
+		},
+		{
+			name:         "Sqlserver url parse error",
+			err:          fmt.Errorf("cannot open connection: %w", errors.New("testing connection: parse \"sqlserver://mmm\\\\elasticsearch:ttt@localhost:4441\": net/url: invalid userinfo")),
+			sensitive:    "sqlserver://mmm\\\\elasticsearch:ttt@localhost:4441",
+			expectedErr:  "cannot open connection: testing connection: parse \"(redacted)\": net/url: invalid userinfo",
+			expectNilErr: false,
+		},
+		{
+			name:         "Sqlserver url parse error. URL in error is escaped",
+			err:          fmt.Errorf("cannot open connection: %w", errors.New("testing connection: parse \"sqlserver://mmm\\\\elasticsearch:ttt@localhost:4441\": net/url: invalid userinfo")),
+			sensitive:    "sqlserver://mmm\\elasticsearch:ttt@localhost:4441",
+			expectedErr:  "cannot open connection: testing connection: parse (redacted): net/url: invalid userinfo",
 			expectNilErr: false,
 		},
 	}

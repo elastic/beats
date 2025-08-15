@@ -403,7 +403,11 @@ func sanitizeError(err error, sensitive string) error {
 		return err
 	}
 
-	sanitizedMessage := strings.ReplaceAll(err.Error(), sensitive, "(redacted)")
+	escapedSensitive := fmt.Sprintf("%q", sensitive)
+
+	sanitizedMessage := err.Error()
+	sanitizedMessage = strings.ReplaceAll(sanitizedMessage, sensitive, "(redacted)")
+	sanitizedMessage = strings.ReplaceAll(sanitizedMessage, escapedSensitive, "(redacted)")
 
 	return errors.New(sanitizedMessage)
 }
