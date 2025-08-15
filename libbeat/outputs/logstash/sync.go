@@ -21,7 +21,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -40,12 +39,12 @@ type syncClient struct {
 }
 
 func newSyncClient(
-	beat beat.Info,
+	log *logp.Logger,
+	beatVersion string,
 	conn *transport.Client,
 	observer outputs.Observer,
 	config *Config,
 ) (*syncClient, error) {
-	log := beat.Logger.Named("logstash")
 	c := &syncClient{
 		log:      log,
 		Client:   conn,
@@ -61,7 +60,7 @@ func newSyncClient(
 	}
 
 	var err error
-	enc := makeLogstashEventEncoder(log, beat, config.EscapeHTML, config.Index)
+	enc := makeLogstashEventEncoder(log, beatVersion, config.EscapeHTML, config.Index)
 	c.client, err = v2.NewSyncClientWithConn(conn,
 		v2.JSONEncoder(enc),
 		v2.Timeout(config.Timeout),
