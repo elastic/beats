@@ -19,13 +19,13 @@ While {{filebeat}} modules are still supported, we recommend {{agent}} integrati
 * [*Apache module*](/reference/filebeat/filebeat-module-apache.md)
 * [*Auditd module*](/reference/filebeat/filebeat-module-auditd.md)
 * [*AWS module*](/reference/filebeat/filebeat-module-aws.md)
-* [*AWS Fargate module*](/reference/filebeat/filebeat-module-awsfargate.md)
+* [*AWS Fargate module*](/reference/filebeat/filebeat-module-awsfargate.md) {applies_to}`stack: beta`
 * [*Azure module*](/reference/filebeat/filebeat-module-azure.md)
 * [*CEF module*](/reference/filebeat/filebeat-module-cef.md)
 * [*Check Point module*](/reference/filebeat/filebeat-module-checkpoint.md)
 * [*Cisco module*](/reference/filebeat/filebeat-module-cisco.md)
 * [*CoreDNS module*](/reference/filebeat/filebeat-module-coredns.md)
-* [*CrowdStrike module*](/reference/filebeat/filebeat-module-crowdstrike.md)
+* [*CrowdStrike module*](/reference/filebeat/filebeat-module-crowdstrike.md) {applies_to}`stack: beta`
 * [*Cyberark PAS module*](/reference/filebeat/filebeat-module-cyberarkpas.md)
 * [*Elasticsearch module*](/reference/filebeat/filebeat-module-elasticsearch.md)
 * [*Envoyproxy module*](/reference/filebeat/filebeat-module-envoyproxy.md)
@@ -47,7 +47,7 @@ While {{filebeat}} modules are still supported, we recommend {{agent}} integrati
 * [*MSSQL module*](/reference/filebeat/filebeat-module-mssql.md)
 * [*MySQL module*](/reference/filebeat/filebeat-module-mysql.md)
 * [*MySQL Enterprise module*](/reference/filebeat/filebeat-module-mysqlenterprise.md)
-* [*NATS module*](/reference/filebeat/filebeat-module-nats.md)
+* [*NATS module*](/reference/filebeat/filebeat-module-nats.md) {applies_to}`stack: beta`
 * [*NetFlow module*](/reference/filebeat/filebeat-module-netflow.md)
 * [*Nginx module*](/reference/filebeat/filebeat-module-nginx.md)
 * [*Office 365 module*](/reference/filebeat/filebeat-module-o365.md)
@@ -68,6 +68,6 @@ While {{filebeat}} modules are still supported, we recommend {{agent}} integrati
 * [*Threat Intel module*](/reference/filebeat/filebeat-module-threatintel.md)
 * [*Traefik module*](/reference/filebeat/filebeat-module-traefik.md)
 * [*Zeek (Bro) module*](/reference/filebeat/filebeat-module-zeek.md)
-* [*ZooKeeper module*](/reference/filebeat/filebeat-module-zookeeper.md)
+* [*ZooKeeper module*](/reference/filebeat/filebeat-module-zookeeper.md) {applies_to}`stack: beta`
 * [*Zoom module*](/reference/filebeat/filebeat-module-zoom.md)
 
