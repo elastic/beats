@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-zookeeper.html
+applies_to:
+  stack: beta
 ---
 
 # ZooKeeper module [filebeat-module-zookeeper]

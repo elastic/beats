@@ -33,24 +33,42 @@ def collect(beat_name):
         with open(beat_path + "/fields.yml", encoding='utf_8') as f:
             fields = yaml.load(f.read(), Loader=yaml.FullLoader)
             title = fields[0]["title"]
+            applies_to = ""
+            if "version" in fields[0]:
+                version = fields[0]["version"]
+                versions = []
+                for key, value in version.items():
+                    versions.append(f"{key} {value}")
+                applies_to = ", ".join(versions)
+            elif "release" in fields[0]:
+                if fields[0]["release"] != "ga":
+                    applies_to = fields[0]["release"]
 
         module_file = generated_note
 
         module_file += """---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-{}.html
----
+""".format(module)
+        if applies_to != "":
+            module_file += """applies_to:
+  stack: {}
+""".format(applies_to)
+
+        module_file += """---
 
 % This file is generated! See scripts/docs_collector.py
 
 # {} module [filebeat-module-{}]
 
-""".format(module, title, module)
+""".format(title, module)
 
         with open(module_doc, encoding='utf_8') as f:
             module_file += f.read()
 
-        modules_list[module] = title
+        modules_list[module] = {}
+        modules_list[module]["title"] = title
+        modules_list[module]["applies_to"] = applies_to
 
         module_file += """
 ## Fields [_fields]
@@ -86,8 +104,18 @@ For a description of each field in the module, see the [exported fields](/refere
 # * [*Modules overview*](/reference/filebeat/filebeat-modules-overview.md)
 # """
 
+<<<<<<< HEAD
 #     for m, title in sorted(six.iteritems(modules_list)):
 #         module_list_output += "* [*{} module*](/reference/filebeat/filebeat-module-{}.md)\n".format(title.title(), m)
+=======
+    for m, details in sorted(six.iteritems(modules_list)):
+        title = details["title"]
+        applies_to = details["applies_to"]
+        module_list_output += "* [*{} module*](/reference/filebeat/filebeat-module-{}.md)".format(title, m)
+        if applies_to:
+            module_list_output += " {{applies_to}}`stack: {}`".format(applies_to)
+        module_list_output += "\n"
+>>>>>>> fc9287068 ([docs] [filebeat] Update `docs_collector.py` to add `applies_to` badges (#45890))
 
 #     module_list_output += "\n"
 

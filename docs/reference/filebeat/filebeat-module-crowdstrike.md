@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-crowdstrike.html
+applies_to:
+  stack: beta
 ---
 
 # CrowdStrike module [filebeat-module-crowdstrike]
