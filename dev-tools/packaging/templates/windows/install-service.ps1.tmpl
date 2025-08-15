@@ -1,3 +1,30 @@
+<#
+.SYNOPSIS
+    Installs {{.BeatName | title}} Windows service.
+.DESCRIPTION
+    Installs {{.BeatName | title}} Windows service, the data and logs path are
+    set as part of the command for the service.
+
+    For {{.BeatName | title}} < 9.1.0 the data path used to be
+    'C:\ProgramData\{{.BeatName | title}}' (set from '$env:ProgramData) for >= 9.1.0
+    the new default is 'C:\Program Files\{{.BeatName | title}}-Data'
+    (set from '$env:ProgramFiles').
+
+    If the legacy data path exists, then the script will move it to the new place,
+    regardless of {{.BeatName | title}} version.
+
+    You can pass ForceLegacyPath to use the legacy data path.
+
+    If the Windows service already exists, it will be stopped and deleted, then
+    the new one will be installed.
+#>
+
+Param (
+  # Force the usage of the legacy ( < 9.1.0) data path.
+  [switch]$ForceLegacyPath
+
+)
+
 # Delete and stop the service if it already exists.
 if (Get-Service {{.BeatName}} -ErrorAction SilentlyContinue) {
   Stop-Service {{.BeatName}}
@@ -6,12 +33,45 @@ if (Get-Service {{.BeatName}} -ErrorAction SilentlyContinue) {
   sc.exe delete {{.BeatName}}
 }
 
-$workdir = Split-Path $MyInvocation.MyCommand.Path
+# We need to support a new default path for the data folder, ideally
+# automatically detecting if the old one is used and keeping it
+
+$WorkDir = Split-Path $MyInvocation.MyCommand.Path
+$BasePath = "$env:ProgramFiles\{{.BeatName | title}}-Data"
+$LegacyDataPath = "$env:PROGRAMDATA\{{.BeatName | title}}"
+
+# Move the data path from ProgramData to Program Files
+If ($ForceLegacyPath -eq $True) {
+  $BasePath = $LegacyDataPath
+} elseif (Test-Path $LegacyDataPath) {
+    Write-Output "Files found at $LegacyDataPath, moving them to $BasePath"
+  Try {
+    Move-Item $LegacyDataPath $BasePath -ErrorAction Stop
+  } Catch {
+    Write-Output "Could not move $LegacyDataPath to $BasePath"
+    Write-Output "make sure the folder can be moved or set -ForceLegacyPath"
+    Write-Output "to force using $LegacyDataPath as the data path"
+    Throw $_.Exception
+  }
+}
+
+$HomePath = "$BasePath\{{.BeatName | title}}"
+$LogsPath = "$HomePath\logs"
+$KeystorePath = "$WorkDir\data\{{.BeatName | title}}.keystore"
+
+$FullCmd = "`"$WorkDir\{{.BeatName}}.exe`" " +
+           "--environment=windows_service " +
+           "-c `"$WorkDir\{{.BeatName}}.yml`" " +
+           "--path.home `"$WorkDir`" " +
+           "--path.data `"$HomePath`" " +
+           "--path.logs `"$LogsPath`" " +
+           "-E keystore.path=`"$KeyStorePath`" " +
+           "-E logging.files.redirect_stderr=true"
 
 # Create the new service.
 New-Service -name {{.BeatName}} `
   -displayName {{.BeatName | title}} `
-  -binaryPathName "`"$workdir\{{.BeatName}}.exe`" --environment=windows_service -c `"$workdir\{{.BeatName}}.yml`" --path.home `"$workdir`" --path.data `"$env:PROGRAMDATA\{{.BeatName}}`" --path.logs `"$env:PROGRAMDATA\{{.BeatName}}\logs`" -E keystore.path=`"$workdir\data\{{.BeatName}}.keystore`" -E logging.files.redirect_stderr=true"
+  -binaryPathName $FullCmd
 
 # Attempt to set the service to delayed start using sc config.
 Try {

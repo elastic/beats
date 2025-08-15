@@ -59,4 +59,6 @@ include::{libbeat-dir}/shared-systemd.asciidoc[]
 
 include::{libbeat-dir}/shared/start-beat.asciidoc[]
 
+include::{libbeat-dir}/shared/installation-script.asciidoc[]
+
 include::{libbeat-dir}/shared/shutdown.asciidoc[]
