@@ -18,12 +18,14 @@
 package binary
 
 import (
-	"bufio"
 	"context"
+	"errors"
 	"fmt"
-	"io"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/transform"
+	"encoding/hex"
+	"strings"
 
-	g_binary "encoding/binary"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -44,11 +46,44 @@ func DefaultConfig() Config {
 	}
 }
 
-type Encoding struct {
-	offset uint
-	numBytes uint
-	decoder g_binary.ByteOrder
+type ConversionFunction func(inBytes []byte) (string, error)
+
+var DefaultConverter ConversionFunction = convertToPrintableAsciiDropping
+
+func convertToHex(inBytes []byte) (string, error) {
+	return hex.EncodeToString(inBytes), nil
 }
+func convertToPrintableAscii(inBytes []byte) (string, error) {
+	replacementChar := '.' // Character to replace non-ASCII bytes with
+
+	var result string
+	for _, b := range inBytes {
+		if b >= 32 && b <= 126 { // Check if the byte is a printable ASCII character
+			result += string(b)
+		} else {
+			result += string(replacementChar)
+		}
+	}
+	return result, nil
+}
+
+func convertToPrintableAsciiDropping(inBytes []byte) (string, error) {
+	var result string
+	for _, b := range inBytes {
+		if b >= 32 && b <= 126 { // Check if the byte is a printable ASCII character
+			result += string(b)
+		}
+	}
+	return result, nil
+}
+
+type Encoding struct {
+	Enabled bool `config:"enabled"`
+	// default is convert-bytes-to-hex
+	Convert *string `config:"convert-by"`
+	convertFunc ConversionFunction
+}
+
 
 // FilterParser accepts a list of matchers to determine if a line
 // should be kept or not. If one of the patterns matches the
@@ -57,39 +92,21 @@ type Encoding struct {
 type Parser struct {
 	ctx      ctxtool.CancelContext
 	logger   *logp.Logger
-	r        *bufio.Reader
+	r        reader.Reader
 	coding   Encoding
 }
 
-func NewParser(r io.Reader, c *Config, logger *logp.Logger) *Parser {
+func NewParser(r reader.Reader, c *Config, logger *logp.Logger) *Parser {
+	// parse the config
 	return &Parser{
 		ctx:      ctxtool.WithCancelContext(context.Background()),
 		logger:   logger.Named("binary_parser"),
-		r:        bufio.NewReader(r),
+		r:        r,
 		coding:   Encoding {
-			offset:   2,
-			numBytes:   2,
-			decoder:  g_binary.BigEndian,
+			Enabled: true,
+			convertFunc: DefaultConverter,
 		},
 	}
-}
-
-func (p *Parser) get_length(buf []byte) (length uint, err error) {
-	if uint(len(buf)) < p.coding.numBytes {
-		return 0, fmt.Errorf("Not enough bytes (%d) -- expected %d", len(buf), p.coding.numBytes)
-	}
-
-	buffy := buf[:p.coding.numBytes]
-	n, err := g_binary.Decode(buffy, p.coding.decoder, length)
-	if err != nil {
-		return length, err
-	}
-	if uint(n) != p.coding.numBytes {
-		return length, fmt.Errorf("Wrong number of bytes consumed: %d (should be %d)",
-			n, p.coding.numBytes)
-	}
-
-	return length, nil
 }
 
 func (p *Parser) Next() (message reader.Message, err error) {
@@ -102,18 +119,106 @@ func (p *Parser) Next() (message reader.Message, err error) {
 	}()
 
 	for p.ctx.Err() == nil {
-		// peek to the end of the length field
-		b, err := p.r.Peek(int(p.coding.offset + p.coding.numBytes))
+		message, err := p.r.Next()
 		if err != nil {
 			return message, err
 		}
-		msgLength,err := p.get_length(b[p.coding.offset:p.coding.numBytes])
-		p.logger.Debug("this message has %d bytes in it (or error %v)", msgLength, err)
+
+		content := message.Content
+		p.logger.Debug("this message has %d bytes in it (or error %v)", len(content), err)
+		return message, nil
 	}
-	return reader.Message{}, io.EOF
+	return reader.Message{}, p.ctx.Err()
 }
 
 func (p *Parser) Close() error {
 	p.ctx.Cancel()
 	return nil
+}
+var ErrNotEnoughBytes = errors.New("not enough data in slice")
+
+type BinaryDecodeError struct {
+	msg string
+}
+
+func (d BinaryDecodeError) Error() string {
+	return d.msg
+}
+
+func NewBinaryDecodeError(msg string) BinaryDecodeError {
+	return BinaryDecodeError{
+		msg: msg,
+	}
+}
+
+type BinaryConfigError struct {
+	msg string
+}
+
+func (d BinaryConfigError) Error() string {
+	return d.msg
+}
+
+func NewBinaryConfigError(msg string) BinaryConfigError {
+	return BinaryConfigError{
+		msg: msg,
+	}
+}
+
+func (b *Encoding) Validate() error {
+
+	if b.Convert != nil {
+		if strings.Contains(*b.Convert, "ascii") {
+			if strings.Contains(*b.Convert, "drop") {
+				b.convertFunc = convertToPrintableAsciiDropping
+			} else {
+				b.convertFunc = convertToPrintableAscii
+			}
+		} else if strings.Contains(*b.Convert, "hex") {
+			b.convertFunc = convertToHex
+		}
+	}
+
+	if b.convertFunc == nil {
+		b.convertFunc = DefaultConverter
+	}
+
+	return nil
+}
+
+func DefaultEncoding() Encoding {
+	def := "ascii-dropping"
+	return Encoding {
+		Enabled: false,
+		Convert: &def,
+		convertFunc: DefaultConverter,
+	}
+}
+
+type binenc struct {}
+
+// func (b binary) Reset() {}
+// func (b binary) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) { }
+
+func (binenc) NewDecoder() *encoding.Decoder {
+	fmt.Println("Creating new Binary Decoder")
+	return &encoding.Decoder{
+		Transformer: transform.Nop,
+	}
+}
+
+func (binenc) NewEncoder() *encoding.Encoder {
+	fmt.Println("Creating new Binary Encoder")
+	return &encoding.Encoder{
+		Transformer: transform.Nop,
+	}
+}
+
+var binaryEncoder = binenc{}
+
+func NewDecoder() *encoding.Decoder {
+	return binaryEncoder.NewDecoder()
+}
+func NewEncoder() *encoding.Encoder {
+	return binaryEncoder.NewEncoder()
 }

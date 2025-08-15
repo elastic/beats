@@ -12,3 +12,6 @@ dockerlogbeat/vendor/github.com/elastic/beats
 *beat/*beat.test.exe
 *beat/fields.yml
 *beat/_meta/kibana.generated
+
+# TODO: remove this before merging
+pcap-to-ipfix

@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/binary"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -48,7 +49,7 @@ type Config struct {
 	// state of appending data after temporarily EOF.
 	CollectOnEOF bool
 
-	Binary *encoding.BinaryEncoding
+	Binary *binary.Encoding
 }
 
 // NewEncodeReader creates a new Encode reader from input reader by applying

@@ -27,7 +27,7 @@ import (
 
 	"golang.org/x/text/transform"
 
-	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/v7/libbeat/reader/binary"
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -54,7 +54,7 @@ type LineReader struct {
 	tempBuffer   []byte
 	logger       *logp.Logger
 
-	binenc       encoding.BinaryEncoding
+	binenc       binary.Encoding
 }
 
 // NewLineReader creates a new reader object
@@ -108,7 +108,7 @@ func newBinaryReader(input io.ReadCloser, config Config, logger *logp.Logger) (*
 		inBuffer:     streambuf.New(nil),
 		outBuffer:    streambuf.New(nil),
 		tempBuffer:   make([]byte, config.BufferSize),
-		logger:       logger.Named("reader_line"),
+		logger:       logger.Named("reader_binary"),
 		binenc:       *config.Binary,
 	}, nil
 }
@@ -302,21 +302,15 @@ func (r *LineReader) binaryAdvance() error {
 		panic("somehow we're processing a file as binary when we didn't enable it")
 	}
 
-	length := r.binenc.MinimumLength()
-
+	var err error
 	idx := r.inOffset
 
+	length := 1024
 	// loop while we don't have enough in the buffer to cover the length
 	if r.inBuffer.Len() < length {
 		if err := r.fillBufferTo(length); err != nil {
 			return err
 		}
-	}
-
-	length, err := r.binenc.GetMessageLength(r.inBuffer.Bytes())
-
-	if err != nil {
-		return err
 	}
 
 	if err = r.fillBufferTo(length); err != nil {
@@ -331,7 +325,7 @@ func (r *LineReader) binaryAdvance() error {
 	}
 	r.logger.Infof("decoded [%d], of expected [%d]", sz, length)
 	if sz != length {
-		return encoding.NewBinaryDecodeError(
+		return binary.NewBinaryDecodeError(
 			fmt.Sprintf("Error in decoding: should have processed [%d] bytes, but transformed [%d]", length, sz))
 	}
 
