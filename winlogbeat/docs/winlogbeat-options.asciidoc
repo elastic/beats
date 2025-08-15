@@ -34,11 +34,11 @@ The name of the file where {beatname_uc} stores information that it uses to resu
 monitoring after a restart. By default the file is stored as `.winlogbeat.yml`
 in the directory where the Beat was started. When you run the process as a
 Windows service, it's recommended that you set the value to
-`C:/ProgramData/winlogbeat/.winlogbeat.yml`.
+`C:/Program Files/winlogbeat/.winlogbeat.yml`.
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat.registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yml
+winlogbeat.registry_file: C:/Program Files/winlogbeat/.winlogbeat.yml
 --------------------------------------------------------------------------------
 
 NOTE: The forward slashes (/) in the path are automatically changed to

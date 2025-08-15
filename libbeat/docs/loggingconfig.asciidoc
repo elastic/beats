@@ -42,7 +42,7 @@ ifdef::win_only[]
 logging.level: info
 logging.to_files: true
 logging.files:
-  path: C:{backslash}ProgramData{backslash}{beatname_lc}{backslash}Logs
+  path: C:{backslash}Program Files{backslash}{beatname_uc}-Data{backslash}logs
   name: {beatname_lc}
   keepfiles: 7
   permissions: 0640
