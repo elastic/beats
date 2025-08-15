@@ -101,12 +101,12 @@ type Stats struct {
 	// NetworkMetrics is an allowlist of network metrics,
 	// the names of which can be found in /proc/PID/net/snmp and /proc/PID/net/netstat
 	NetworkMetrics []string
+	Logger         *logp.Logger
 
 	skipExtended bool
 	procRegexps  []match.Matcher // List of regular expressions used to whitelist processes.
 	envRegexps   []match.Matcher // List of regular expressions used to whitelist env vars.
 	cgroups      *cgroup.Reader
-	logger       *logp.Logger
 	host         types.Host
 	excludedPIDs map[uint64]struct{} // List of PIDs to ignore while calling FillMetricsRequiringMoreAccess
 }
@@ -157,14 +157,14 @@ var PidStates = map[byte]PidState{
 // Init initializes a Stats instance. It returns errors if the provided process regexes
 // cannot be compiled.
 func (procStats *Stats) Init() error {
-	if procStats.logger == nil {
-		procStats.logger = logp.NewLogger("processes")
+	if procStats.Logger == nil {
+		procStats.Logger = logp.NewLogger("processes")
 	}
 	var err error
 	procStats.host, err = sysinfo.Host()
 	if err != nil {
 		procStats.host = nil
-		procStats.logger.Warnf("Getting host details: %v", err)
+		procStats.Logger.Warnf("Getting host details: %v", err)
 	}
 
 	// footcannon prevention
@@ -173,7 +173,7 @@ func (procStats *Stats) Init() error {
 	}
 
 	if procStats.EnableNetwork && len(procStats.NetworkMetrics) == 0 {
-		procStats.logger.Warnf("Collecting all network metrics per-process; this will produce a large volume of data.")
+		procStats.Logger.Warnf("Collecting all network metrics per-process; this will produce a large volume of data.")
 	}
 
 	procStats.ProcsMap = NewProcsTrack()
@@ -201,16 +201,19 @@ func (procStats *Stats) Init() error {
 	}
 
 	if procStats.EnableCgroups {
+		if procStats.CgroupOpts.Logger == nil {
+			procStats.CgroupOpts.Logger = procStats.Logger
+		}
 		cgReader, err := cgroup.NewReaderOptions(procStats.CgroupOpts)
 		if errors.Is(err, cgroup.ErrCgroupsMissing) {
-			procStats.logger.Warnf("cgroup data collection will be disabled: %v", err)
+			procStats.Logger.Warnf("cgroup data collection will be disabled: %v", err)
 			procStats.EnableCgroups = false
 		} else if err != nil {
 			return fmt.Errorf("error initializing cgroup reader: %w", err)
 		}
 		procStats.cgroups = cgReader
 	}
-	procStats.excludedPIDs = processesToIgnore(procStats.logger)
+	procStats.excludedPIDs = processesToIgnore(procStats.Logger)
 	return nil
 }
 

@@ -24,13 +24,14 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-system-metrics/dev-tools/systemtests"
 )
 
 func TestFileSystemList(t *testing.T) {
-	_ = logp.DevelopmentSetup()
+	logger := logptest.NewTestingLogger(t, "")
 	skipTypes := []string{"cdrom", "tracefs", "overlay", "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs", "vmhgfs"}
-	hostfs := systemtests.DockerTestResolver()
+	hostfs := systemtests.DockerTestResolver(logger)
 	//Exclude FS types that will give us a permission error
 	fss, err := GetFilesystems(hostfs, BuildFilterWithList(skipTypes))
 	if err != nil {
@@ -50,7 +51,7 @@ func TestFileSystemListFiltering(t *testing.T) {
 		// Windows doesn't like these unix paths, the OS-specific code in stdlib will return different results.
 		t.Skip("These cases don't need to work on Windows")
 	}
-	_ = logp.DevelopmentSetup()
+	logger := logptest.NewTestingLogger(t, "")
 	fakeDevDir := t.TempDir()
 
 	cases := []struct {
@@ -133,7 +134,7 @@ func TestFileSystemListFiltering(t *testing.T) {
 
 	for _, c := range cases {
 
-		filtered := filterFileSystemList(c.fss)
+		filtered := filterFileSystemList(logger, c.fss)
 		ok := assert.ElementsMatch(t, c.expected, filtered, c.description)
 		if !ok {
 			t.FailNow()
@@ -142,8 +143,8 @@ func TestFileSystemListFiltering(t *testing.T) {
 }
 
 // Emulate the filtering process that would normally happen inside the callbacks from platform-specific code
-func filterFileSystemList(stats []FSStat) []FSStat {
-	hostfs := systemtests.DockerTestResolver()
+func filterFileSystemList(logger *logp.Logger, stats []FSStat) []FSStat {
+	hostfs := systemtests.DockerTestResolver(logger)
 	filtered := []FSStat{}
 	for _, stat := range stats {
 		if avoidFileSystem(stat) && buildDefaultFilters(hostfs)(stat) {

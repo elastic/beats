@@ -89,6 +89,7 @@ type Reader struct {
 	ignoreRootCgroups        bool // Ignore a cgroup when its path is "/".
 	cgroupsHierarchyOverride string
 	cgroupMountpoints        Mountpoints // Mountpoints for each subsystem (e.g. cpu, cpuacct, memory, blkio).
+	logger                   *logp.Logger
 
 	// Cache to map known v2 cgroup controllerPaths to pathListWithTime.
 	v2ControllerPathCache pathCache
@@ -112,13 +113,17 @@ type ReaderOptions struct {
 	// where the paths in /proc/<pid>/cgroup do not correspond to any
 	// paths under /sys/fs/cgroup.
 	CgroupsHierarchyOverride string
+
+	// Logger holds a logger
+	Logger *logp.Logger
 }
 
 // NewReader creates and returns a new Reader.
-func NewReader(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (*Reader, error) {
+func NewReader(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool, logger *logp.Logger) (*Reader, error) {
 	return NewReaderOptions(ReaderOptions{
 		RootfsMountpoint:  rootfsMountpoint,
 		IgnoreRootCgroups: ignoreRootCgroups,
+		Logger:            logger,
 	})
 }
 
@@ -129,6 +134,10 @@ func NewReaderOptions(opts ReaderOptions) (*Reader, error) {
 		opts.RootfsMountpoint = resolve.NewTestResolver("/")
 	}
 
+	if opts.Logger == nil {
+		opts.Logger = logp.NewNopLogger()
+	}
+
 	// Determine what subsystems are supported by the kernel.
 	subsystems, err := SupportedSubsystems(opts.RootfsMountpoint)
 	// We can return a not-quite-an-error ErrCgroupsMissing here, so return the bare error.
@@ -137,7 +146,7 @@ func NewReaderOptions(opts ReaderOptions) (*Reader, error) {
 	}
 
 	// Locate the mountpoints of those subsystems.
-	mountpoints, err := SubsystemMountpoints(opts.RootfsMountpoint, subsystems)
+	mountpoints, err := SubsystemMountpoints(opts.RootfsMountpoint, subsystems, opts.Logger)
 	if err != nil {
 		return nil, fmt.Errorf("error finding mountpoints: %w", err)
 	}
@@ -148,6 +157,7 @@ func NewReaderOptions(opts ReaderOptions) (*Reader, error) {
 		cgroupsHierarchyOverride: opts.CgroupsHierarchyOverride,
 		cgroupMountpoints:        mountpoints,
 		v2ControllerPathCache:    pathCache{cache: make(map[string]pathListWithTime)},
+		logger:                   opts.Logger,
 	}, nil
 }
 
@@ -178,7 +188,7 @@ func (r *Reader) CgroupsVersion(pid int) (CgroupsVersion, error) {
 		// V1 and V2 controllers on a cgroup. If the V2 controller has no actual controllers associated with it,
 		// We revert to V1. If it does, report V2. In the future, we may want to "combine" V2 and V1 metrics somehow.
 		if len(controllers) > 0 {
-			logp.L().Debugf("fetching V2 controller: %#v for pid %d\n", controllers, pid)
+			r.logger.Debugf("fetching V2 controller: %#v for pid %d\n", controllers, pid)
 			return CgroupsV2, nil
 		}
 		return CgroupsV1, nil
@@ -247,8 +257,8 @@ func (r *Reader) GetV2StatsForProcess(pid int) (*StatsV2, error) { //nolint: dup
 
 // ProcessCgroupPaths is a wrapper around Reader.ProcessCgroupPaths for libraries that only need the slimmer functionality from
 // the gosigar cgroups code. This does not have the same function signature, and consumers still need to distinguish between v1 and v2 cgroups.
-func ProcessCgroupPaths(hostfs resolve.Resolver, pid int) (PathList, error) {
-	reader, err := NewReader(hostfs, false)
+func ProcessCgroupPaths(hostfs resolve.Resolver, pid int, logger *logp.Logger) (PathList, error) {
+	reader, err := NewReader(hostfs, false, logger)
 	if err != nil {
 		return PathList{}, fmt.Errorf("error creating cgroups reader: %w", err)
 	}
@@ -371,7 +381,7 @@ func (r *Reader) readControllerList(cgroupsFile string) ([]string, error) {
 		return []string{}, nil
 	}
 	cgFilePath := filepath.Join(r.cgroupMountpoints.V2Loc, cgpath, "cgroup.controllers")
-	if cgroupNSStateFetch() && r.rootfsMountpoint.IsSet() {
+	if cgroupNSStateFetch(r.logger) && r.rootfsMountpoint.IsSet() {
 		cgFilePath = filepath.Join(r.cgroupMountpoints.V2Loc, r.cgroupMountpoints.ContainerizedRootMount, cgpath, "cgroup.controllers")
 	}
 

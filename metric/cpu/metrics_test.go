@@ -23,15 +23,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-system-metrics/dev-tools/systemtests"
 )
 
 func TestMonitorSample(t *testing.T) {
-	_ = logp.DevelopmentSetup()
-	cpu, err := New(systemtests.DockerTestResolver())
+	logger := logptest.NewTestingLogger(t, "")
+	cpu, err := New(systemtests.DockerTestResolver(logger))
 	require.NoError(t, err)
 	s, err := cpu.Fetch()
 	require.NoError(t, err)
@@ -43,7 +43,8 @@ func TestMonitorSample(t *testing.T) {
 }
 
 func TestCoresMonitorSample(t *testing.T) {
-	cores, err := New(systemtests.DockerTestResolver())
+	logger := logptest.NewTestingLogger(t, "")
+	cores, err := New(systemtests.DockerTestResolver(logger))
 	require.NoError(t, err)
 
 	cpuMetrics, err := Get(cores)

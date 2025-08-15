@@ -30,6 +30,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/testhelpers"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
@@ -139,7 +140,7 @@ func TestSubsystemMountpoints(t *testing.T) {
 	subsystems["memory"] = struct{}{}
 	subsystems["perf_event"] = struct{}{}
 
-	mountpoints, err := SubsystemMountpoints(resolve.NewTestResolver("testdata/docker"), subsystems)
+	mountpoints, err := SubsystemMountpoints(resolve.NewTestResolver("testdata/docker"), subsystems, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -156,7 +157,7 @@ func TestSubsystemMountpoints(t *testing.T) {
 }
 
 func TestProcessCgroupPaths(t *testing.T) {
-	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), false)
+	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), false, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("error in NewReader: %s", err)
 	}
@@ -180,7 +181,7 @@ func TestProcessCgroupPaths(t *testing.T) {
 }
 
 func TestProcessCgroupHybridPaths(t *testing.T) {
-	reader, err := NewReader(resolve.NewTestResolver("testdata/amzn2"), false)
+	reader, err := NewReader(resolve.NewTestResolver("testdata/amzn2"), false, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("error in NewReader: %s", err)
 	}
@@ -205,7 +206,7 @@ func TestProcessCgroupHybridPaths(t *testing.T) {
 }
 
 func TestProcessCgroupPathsV2(t *testing.T) {
-	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), false)
+	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), false, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("error in NewReader: %s", err)
 	}
@@ -223,7 +224,7 @@ func TestProcessCgroupPathsV2(t *testing.T) {
 
 func TestMountpointsV2(t *testing.T) {
 	// emulate running in a private namespace docker container
-	cgroupNSStateFetch = func() bool { return true }
+	cgroupNSStateFetch = func(*logp.Logger) bool { return true }
 	// inject our PID into the cgroup.procs file to so ProcessCgroupPaths()
 	// can find our root cgroup
 	pid := os.Getpid()
@@ -232,9 +233,7 @@ func TestMountpointsV2(t *testing.T) {
 		[]byte(pidFmt), 0o744)
 	require.NoError(t, err)
 
-	_ = logp.DevelopmentSetup()
-
-	reader, err := NewReader(resolve.NewTestResolver("testdata/docker2"), false)
+	reader, err := NewReader(resolve.NewTestResolver("testdata/docker2"), false, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	stats, err := reader.GetStatsForPid(2233801)
@@ -330,7 +329,7 @@ func TestFetchV2Paths(t *testing.T) {
 
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
-			got := getProperV2Paths(testCase.rootfs, testCase.lines)
+			got := getProperV2Paths(testCase.rootfs, testCase.lines, logptest.NewTestingLogger(t, ""))
 			assert.Equal(t, testCase.expectedPath, got)
 		})
 	}

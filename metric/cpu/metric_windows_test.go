@@ -24,11 +24,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-system-metrics/dev-tools/systemtests"
 )
 
 func TestCounterLength(t *testing.T) {
-	monitor, err := New(systemtests.DockerTestResolver(), WithWindowsPerformanceCounter())
+	monitor, err := New(systemtests.DockerTestResolver(logptest.NewTestingLogger(t, "")), WithWindowsPerformanceCounter())
 	require.NoError(t, err)
 	require.NoError(t, monitor.query.CollectData())
 
@@ -54,7 +55,7 @@ func TestCounterLength(t *testing.T) {
 }
 
 func TestCounterDisabled(t *testing.T) {
-	monitor, err := New(systemtests.DockerTestResolver())
+	monitor, err := New(systemtests.DockerTestResolver(logptest.NewTestingLogger(t, "")))
 	require.NoError(t, err)
 	require.Nil(t, monitor.query)
 }

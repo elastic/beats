@@ -79,7 +79,7 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 
 	for i := 0; i < num; i++ {
 		if err := binary.Read(bbuf, binary.LittleEndian, &pid); err != nil {
-			procStats.logger.Debugf("Errror reading from PROC_ALL_PIDS buffer: %s", err)
+			procStats.Logger.Debugf("Errror reading from PROC_ALL_PIDS buffer: %s", err)
 			continue
 		}
 		if pid == 0 {

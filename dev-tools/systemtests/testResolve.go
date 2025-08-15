@@ -26,9 +26,9 @@ import (
 
 // DockerTestResolver is a resolver meant for use with the containerized system tests.
 // The logic here is extremely simple: if USE_HOSTFS is set, return that for the resolver
-func DockerTestResolver() resolve.Resolver {
+func DockerTestResolver(logger *logp.Logger) resolve.Resolver {
 	if path, set := os.LookupEnv("HOSTFS"); set {
-		logp.L().Infof("Using /hostfs for container tests")
+		logger.Info("Using /hostfs for container tests")
 		return resolve.NewTestResolver(path)
 	}
 	return resolve.NewTestResolver("/")

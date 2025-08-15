@@ -175,6 +175,7 @@ func InstanceCroupsReporter(logger *logp.Logger, override string) func(monitorin
 		RootfsMountpoint:         resolve.NewTestResolver("/"),
 		IgnoreRootCgroups:        true,
 		CgroupsHierarchyOverride: os.Getenv(override),
+		Logger:                   logger,
 	})
 	if err != nil {
 		if errors.Is(err, cgroup.ErrCgroupsMissing) {

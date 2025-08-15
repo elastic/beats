@@ -202,7 +202,7 @@ func SupportedSubsystems(rootfs resolve.Resolver) (map[string]struct{}, error) {
 // SubsystemMountpoints returns the mountpoints for each of the given subsystems.
 // The returned map contains the subsystem name as a key and the value is the
 // mountpoint.
-func SubsystemMountpoints(rootfs resolve.Resolver, subsystems map[string]struct{}) (Mountpoints, error) {
+func SubsystemMountpoints(rootfs resolve.Resolver, subsystems map[string]struct{}, logger *logp.Logger) (Mountpoints, error) {
 	// TODO: will we run into mount namespace issues if we use /proc/self/mountinfo?
 	mountinfo, err := os.Open(rootfs.ResolveHostFS("/proc/self/mountinfo"))
 	if err != nil {
@@ -259,18 +259,18 @@ func SubsystemMountpoints(rootfs resolve.Resolver, subsystems map[string]struct{
 
 	}
 
-	mountInfo.V2Loc = getProperV2Paths(rootfs, possibleV2Paths)
+	mountInfo.V2Loc = getProperV2Paths(rootfs, possibleV2Paths, logger)
 	mountInfo.V1Mounts = mounts
 
 	// we only care about a contanerized root path if we're trying to monitor a host system
 	// from inside a container
 	// This logic helps us proper fetch the cgroup path when we're running inside a container
 	// with a private namespace
-	if mountInfo.V2Loc != "" && rootfs.IsSet() && cgroupNSStateFetch() {
+	if mountInfo.V2Loc != "" && rootfs.IsSet() && cgroupNSStateFetch(logger) {
 		mountInfo.ContainerizedRootMount, err = guessContainerCgroupPath(mountInfo.V2Loc, os.Getpid())
 		// treat this as a non-fatal error. If we end up needing this value, the lookups will fail down the line
 		if err != nil {
-			logp.L().Debugf("could not fetch cgroup path inside container: %w", err)
+			logger.Debugf("could not fetch cgroup path inside container: %w", err)
 		}
 	}
 
@@ -280,12 +280,12 @@ func SubsystemMountpoints(rootfs resolve.Resolver, subsystems map[string]struct{
 // isCgroupNSHost returns true if we're running inside a container with a
 // private cgroup namespace. Will return true if we're in a public namespace, or there's an error
 // Note that this function only makes sense *inside* a container. Outside it will probably always return false.
-func isCgroupNSPrivate() bool {
+func isCgroupNSPrivate(logger *logp.Logger) bool {
 	// we don't care about hostfs here, since we're just concerned about
 	// detecting the environment we're running under.
 	raw, err := os.ReadFile("/proc/self/cgroup")
 	if err != nil {
-		logp.L().Debugf("error reading /proc/self/cgroup to detect docker namespace settings: %w", err)
+		logger.Debugf("error reading /proc/self/cgroup to detect docker namespace settings: %w", err)
 		return false
 	}
 	// if we have a path of just "/" that means we're in our own private namespace
@@ -380,7 +380,7 @@ func foundMatchingPidInProcsFile(ourPid int, fileData string) bool {
 // 1771 1770 0:26 / /hostfs/var/lib/docker/overlay2/1b570230fa3ec3679e354b0c219757c739f91d774ebc02174106488606549da0/merged/sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup rw,seclabel
 // That latter mountpoint, just a link to the overlayfs, is almost guaranteed to throw a permissions error
 // try to sort out the mountpoints, and use the correct one
-func getProperV2Paths(rootfs resolve.Resolver, possibleV2Paths []string) string {
+func getProperV2Paths(rootfs resolve.Resolver, possibleV2Paths []string, logger *logp.Logger) string {
 	if len(possibleV2Paths) > 1 {
 		// try to sort out anything that looks like a docker fs
 		filteredPaths := []string{}
@@ -394,7 +394,7 @@ func getProperV2Paths(rootfs resolve.Resolver, possibleV2Paths []string) string 
 		// the "last one" ideom preserves behavior before we got more clever with looking for the V2 paths
 		if len(filteredPaths) == 0 {
 			usePath := possibleV2Paths[len(possibleV2Paths)-1]
-			logp.L().Debugf("could not find correct cgroupv2 path, reverting to path that may produce errors: %s", usePath)
+			logger.Debugf("could not find correct cgroupv2 path, reverting to path that may produce errors: %s", usePath)
 			return usePath
 		}
 
@@ -413,7 +413,7 @@ func getProperV2Paths(rootfs resolve.Resolver, possibleV2Paths []string) string 
 				return hostFSPaths[len(hostFSPaths)-1]
 			} else {
 				usePath := filteredPaths[len(filteredPaths)-1]
-				logp.L().Debugf("An alternate hostfs was specified, but could not find any cgroup mountpoints that contain a hostfs. Using: %s", usePath)
+				logger.Debugf("An alternate hostfs was specified, but could not find any cgroup mountpoints that contain a hostfs. Using: %s", usePath)
 				return usePath
 			}
 		} else {
@@ -472,12 +472,12 @@ func (r *Reader) ProcessCgroupPaths(pid int) (PathList, error) {
 		//
 		// However, when we try to append something like `/../..` to another path, we obviously blow things up.
 		// we need to use the absolute path of the container cgroup
-		if cgroupNSStateFetch() && r.rootfsMountpoint.IsSet() {
+		if cgroupNSStateFetch(r.logger) && r.rootfsMountpoint.IsSet() {
 			if r.cgroupMountpoints.ContainerizedRootMount == "" {
-				logp.L().Debugf("cgroup for process %d contains a relative cgroup path (%s), but we were not able to find a root cgroup. Cgroup monitoring for this PID may be incomplete",
+				r.logger.Debugf("cgroup for process %d contains a relative cgroup path (%s), but we were not able to find a root cgroup. Cgroup monitoring for this PID may be incomplete",
 					pid, path)
 			} else {
-				logp.L().Debugf("using root mount %s and path %s", r.cgroupMountpoints.ContainerizedRootMount, path)
+				r.logger.Debugf("using root mount %s and path %s", r.cgroupMountpoints.ContainerizedRootMount, path)
 				path = filepath.Join(r.cgroupMountpoints.ContainerizedRootMount, path)
 			}
 		}
@@ -501,7 +501,7 @@ func (r *Reader) ProcessCgroupPaths(pid int) (PathList, error) {
 
 			controllerPath := filepath.Join(r.cgroupMountpoints.V2Loc, path)
 			if r.cgroupMountpoints.V2Loc == "" && !r.rootfsMountpoint.IsSet() {
-				logp.L().Debugf(`PID %d contains a cgroups V2 path (%s) but no V2 mountpoint was found.
+				r.logger.Debugf(`PID %d contains a cgroups V2 path (%s) but no V2 mountpoint was found.
 This may be because metricbeat is running inside a container on a hybrid system.
 To monitor cgroups V2 processess in this way, mount the unified (V2) hierarchy inside
 the container as /sys/fs/cgroup/unified and start the system module with the hostfs setting.`, pid, line)

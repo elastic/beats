@@ -62,7 +62,7 @@ func ListStates(hostfs resolve.Resolver) ([]ProcState, error) {
 	}
 	failedPIDs := extractFailedPIDs(pidMap)
 	if err != nil && len(failedPIDs) > 0 {
-		init.logger.Debugf("error fetching process metrics: %v", err)
+		init.Logger.Debugf("error fetching process metrics: %v", err)
 		return plist, NonFatalErr{Err: fmt.Errorf(errFetchingPIDs, len(failedPIDs))}
 	}
 	return plist, toNonFatal(err)
@@ -115,7 +115,7 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 	if procStats.host != nil {
 		memStats, err := procStats.host.Memory()
 		if err != nil {
-			procStats.logger.Warnf("Getting memory details: %v", err)
+			procStats.Logger.Warnf("Getting memory details: %v", err)
 		} else {
 			totalPhyMem = memStats.Total
 		}
@@ -141,7 +141,7 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 		rootEvents = append(rootEvents, rootMap)
 	}
 	if wrappedErr != nil && len(failedPIDs) > 0 {
-		procStats.logger.Debugf("error fetching process metrics: %v", wrappedErr)
+		procStats.Logger.Debugf("error fetching process metrics: %v", wrappedErr)
 		return procs, rootEvents, NonFatalErr{Err: fmt.Errorf(errFetchingPIDs, len(failedPIDs))}
 	}
 	return procs, rootEvents, toNonFatal(wrappedErr)
@@ -209,7 +209,7 @@ func (procStats *Stats) pidIter(pid int, procMap ProcsMap, proclist []ProcState)
 	if err != nil {
 		procMap[pid] = ProcState{Failed: true}
 		if !errors.Is(err, NonFatalErr{}) {
-			procStats.logger.Debugf("Error fetching PID info for %d, skipping: %s", pid, err)
+			procStats.Logger.Debugf("Error fetching PID info for %d, skipping: %s", pid, err)
 			// While monitoring a set of processes, some processes might get killed after we get all the PIDs
 			// So, there's no need to capture "process not found" error.
 			if errors.Is(err, syscall.ESRCH) {
@@ -218,10 +218,10 @@ func (procStats *Stats) pidIter(pid int, procMap ProcsMap, proclist []ProcState)
 			return procMap, proclist, err
 		}
 		nonFatalErr = fmt.Errorf("error for pid %d: %w", pid, err)
-		procStats.logger.Debugf(err.Error())
+		procStats.Logger.Debugf(err.Error())
 	}
 	if !saved {
-		procStats.logger.Debugf("Process name does not match the provided regex; PID=%d; name=%s", pid, status.Name)
+		procStats.Logger.Debugf("Process name does not match the provided regex; PID=%d; name=%s", pid, status.Name)
 		return procMap, proclist, nonFatalErr
 	}
 	// there was some non-fatal error and given state is partial
@@ -268,7 +268,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 			return status, true, fmt.Errorf("FillPidMetrics failed for PID %d: %w", pid, err)
 		}
 		wrappedErr = errors.Join(wrappedErr, err)
-		procStats.logger.Debugf(wrappedErr.Error())
+		procStats.Logger.Debugf(wrappedErr.Error())
 	}
 
 	if status.CPU.Total.Ticks.Exists() {
@@ -285,7 +285,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	if procStats.EnableCgroups {
 		cgStats, err := procStats.cgroups.GetStatsForPid(status.Pid.ValueOr(0))
 		if err != nil {
-			procStats.logger.Debugf("Non-fatal error fetching cgroups metrics for pid %d, metrics are valid but partial: %s", pid, err)
+			procStats.Logger.Debugf("Non-fatal error fetching cgroups metrics for pid %d, metrics are valid but partial: %s", pid, err)
 		} else {
 			status.Cgroup = cgStats
 			if ok {
@@ -298,7 +298,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	if _, isExcluded := procStats.excludedPIDs[uint64(pid)]; !isExcluded {
 		status, err = FillMetricsRequiringMoreAccess(pid, status)
 		if err != nil {
-			procStats.logger.Debugf("error calling FillMetricsRequiringMoreAccess for pid %d: %w", pid, err)
+			procStats.Logger.Debugf("error calling FillMetricsRequiringMoreAccess for pid %d: %w", pid, err)
 		}
 
 		// Generate `status.Cmdline` here for compatibility because on Windows
@@ -313,13 +313,13 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 		procHandle, err := sysinfo.Process(pid)
 		// treat this as a soft error
 		if err != nil {
-			procStats.logger.Debugf("error initializing process handler for pid %d while trying to fetch network data: %w", pid, err)
+			procStats.Logger.Debugf("error initializing process handler for pid %d while trying to fetch network data: %w", pid, err)
 		} else {
 			procNet, ok := procHandle.(sysinfotypes.NetworkCounters)
 			if ok {
 				status.Network, err = procNet.NetworkCounters()
 				if err != nil {
-					procStats.logger.Debugf("error fetching network counters for process %d: %w", pid, err)
+					procStats.Logger.Debugf("error fetching network counters for process %d: %w", pid, err)
 				}
 			}
 		}

@@ -50,6 +50,7 @@ func SetupMetrics(logger *logp.Logger, name, version, ephemeralID string, system
 		CPUTicks:     true,
 		CacheCmdLine: true,
 		IncludeTop:   process.IncludeTopConfig{},
+		Logger:       logger,
 	}
 
 	err := processStats.Init()

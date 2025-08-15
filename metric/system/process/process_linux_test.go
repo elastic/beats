@@ -29,7 +29,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-system-metrics/dev-tools/systemtests"
@@ -38,11 +37,11 @@ import (
 )
 
 func TestFetchOtherProcessCgroup(t *testing.T) {
-	_ = logp.DevelopmentSetup()
+	logger := logptest.NewTestingLogger(t, "")
 
 	testConfig := Stats{
 		Procs:        []string{".*"},
-		Hostfs:       systemtests.DockerTestResolver(),
+		Hostfs:       systemtests.DockerTestResolver(logger),
 		CPUTicks:     false,
 		CacheCmdLine: true,
 		EnvWhitelist: []string{".*"},
@@ -53,9 +52,11 @@ func TestFetchOtherProcessCgroup(t *testing.T) {
 		},
 		EnableCgroups: false,
 		CgroupOpts: cgroup.ReaderOptions{
-			RootfsMountpoint:  systemtests.DockerTestResolver(),
+			RootfsMountpoint:  systemtests.DockerTestResolver(logger),
 			IgnoreRootCgroups: true,
+			Logger:            logger,
 		},
+		Logger: logger,
 	}
 	err := testConfig.Init()
 	assert.NoError(t, err, "Init")
@@ -78,12 +79,12 @@ func TestGetSelfPidNoHostfs(t *testing.T) {
 }
 
 func TestFetchProcessFromOtherUser(t *testing.T) {
-	_ = logp.DevelopmentSetup()
+	logger := logptest.NewTestingLogger(t, "")
 	// If we just used Get() or FetchPids() to get a list of processes on the system, this would produce a bootstrapping problem
 	// where if the code wasn't working (and we were skipping over PIDs not owned by us) this test would pass.
 	// re-implement part of the core pid-fetch logic
 	// All this does is find a pid that's not owned by us.
-	rootpath := systemtests.DockerTestResolver()
+	rootpath := systemtests.DockerTestResolver(logger)
 	dir, err := os.Open(rootpath.ResolveHostFS("/proc"))
 	require.NoError(t, err, "error opening /proc")
 
@@ -104,7 +105,7 @@ func TestFetchProcessFromOtherUser(t *testing.T) {
 			t.Logf("Error converting PID name %s", name)
 			continue
 		}
-		pidUser, err := getUser(systemtests.DockerTestResolver(), pid)
+		pidUser, err := getUser(systemtests.DockerTestResolver(logger), pid)
 		if err == nil {
 			if pidUser != us.Name {
 				testPid = pid
@@ -122,7 +123,7 @@ func TestFetchProcessFromOtherUser(t *testing.T) {
 
 	testConfig := Stats{
 		Procs:        []string{".*"},
-		Hostfs:       systemtests.DockerTestResolver(),
+		Hostfs:       systemtests.DockerTestResolver(logger),
 		CPUTicks:     false,
 		CacheCmdLine: true,
 		EnvWhitelist: []string{".*"},
@@ -133,9 +134,11 @@ func TestFetchProcessFromOtherUser(t *testing.T) {
 		},
 		EnableCgroups: false,
 		CgroupOpts: cgroup.ReaderOptions{
-			RootfsMountpoint:  systemtests.DockerTestResolver(),
+			RootfsMountpoint:  systemtests.DockerTestResolver(logger),
 			IgnoreRootCgroups: true,
+			Logger:            logger,
 		},
+		Logger: logger,
 	}
 	err = testConfig.Init()
 	assert.NoError(t, err, "Init")
@@ -182,16 +185,19 @@ func TestParseProcStat(t *testing.T) {
 }
 
 func TestCgroupsBadCgroupsConfig(t *testing.T) {
-	rootfs := systemtests.DockerTestResolver()
 	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
+	rootfs := systemtests.DockerTestResolver(logger)
 	testStats := Stats{
 		CPUTicks:      true,
 		EnableCgroups: true,
 		EnableNetwork: true,
 		Hostfs:        rootfs,
 		Procs:         []string{".*"},
-		logger:        logger,
-		CgroupOpts:    cgroup.ReaderOptions{RootfsMountpoint: resolve.NewTestResolver("testdata")}, // procs here have no cgroup data, leading to errors
+		Logger:        logger,
+		CgroupOpts: cgroup.ReaderOptions{
+			RootfsMountpoint: resolve.NewTestResolver("testdata"), // procs here have no cgroup data, leading to errors
+			Logger:           logger,
+		},
 	}
 	err := testStats.Init()
 	require.NoError(t, err)

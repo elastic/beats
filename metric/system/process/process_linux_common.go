@@ -95,7 +95,7 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 		// Will this actually fail?
 		pid, err := strconv.Atoi(name)
 		if err != nil {
-			procStats.logger.Debugf("Error converting PID name %s", name)
+			procStats.Logger.Debugf("Error converting PID name %s", name)
 			continue
 		}
 		procMap, plist, err = procStats.pidIter(pid, procMap, plist)

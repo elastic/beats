@@ -25,6 +25,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
@@ -40,7 +41,9 @@ const (
 )
 
 func TestReaderOptsWithoutResolve(t *testing.T) {
-	reader, err := NewReaderOptions(ReaderOptions{})
+	reader, err := NewReaderOptions(ReaderOptions{
+		Logger: logptest.NewTestingLogger(t, ""),
+	})
 	require.NoError(t, err)
 
 	// actual value doesn't matter, the point is that we don't set RootfsMountpoint and we __don't__ get a nil pointer deref panic.
@@ -50,7 +53,7 @@ func TestReaderOptsWithoutResolve(t *testing.T) {
 
 func TestV1EventDifferentPaths(t *testing.T) {
 	pid := 3757
-	reader, err := NewReader(resolve.NewTestResolver("testdata/ubuntu1804"), true)
+	reader, err := NewReader(resolve.NewTestResolver("testdata/ubuntu1804"), true, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err, "error in NewReader")
 
 	stats, err := reader.GetV1StatsForProcess(pid)
@@ -64,7 +67,7 @@ func TestV1EventDifferentPaths(t *testing.T) {
 }
 
 func TestReaderGetStatsV1(t *testing.T) {
-	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), true)
+	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), true, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err, "error in NewReader")
 
 	stats, err := reader.GetV1StatsForProcess(985)
@@ -94,7 +97,7 @@ func TestReaderGetStatsV1(t *testing.T) {
 // testcase for the situation where both cgroup v1 and v2 controllers exist but
 // /sys/fs/cgroup/unified is not mounted
 func TestReaderGetStatsV1MalformedHybrid(t *testing.T) {
-	reader, err := NewReader(resolve.NewTestResolver("testdata/amzn2"), true)
+	reader, err := NewReader(resolve.NewTestResolver("testdata/amzn2"), true, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err, "error in NewReader")
 
 	stats, err := reader.GetV1StatsForProcess(493239)
@@ -121,7 +124,7 @@ func TestReaderGetStatsV1MalformedHybrid(t *testing.T) {
 }
 
 func TestReaderGetStatsV2(t *testing.T) {
-	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), true)
+	reader, err := NewReader(resolve.NewTestResolver("testdata/docker"), true, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err, "error in NewReader")
 
 	stats, err := reader.GetV2StatsForProcess(312)
@@ -153,6 +156,7 @@ func TestReaderGetStatsHierarchyOverride(t *testing.T) {
 		RootfsMountpoint:         resolve.NewTestResolver("testdata/docker"),
 		IgnoreRootCgroups:        false,
 		CgroupsHierarchyOverride: "/",
+		Logger:                   logptest.NewTestingLogger(t, ""),
 	})
 	require.NoError(t, err, "error in NewReaderOptions")
 
@@ -168,6 +172,7 @@ func TestReaderGetStatsHierarchyOverride(t *testing.T) {
 		RootfsMountpoint:         resolve.NewTestResolver("testdata/docker"),
 		IgnoreRootCgroups:        true,
 		CgroupsHierarchyOverride: "/system.slice/",
+		Logger:                   logptest.NewTestingLogger(t, ""),
 	})
 	require.NoError(t, err, "error in NewReaderOptions")
 

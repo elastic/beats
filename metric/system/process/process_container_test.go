@@ -27,7 +27,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/dev-tools/systemtests"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
@@ -38,14 +38,19 @@ import (
 // However, they are designed so that `go test` can run them normally as well
 
 func TestContainerMonitoringFromInsideContainer(t *testing.T) {
-	_ = logp.DevelopmentSetup()
+	logger := logptest.NewTestingLogger(t, "")
 
-	testStats := Stats{CPUTicks: true,
+	testStats := Stats{
+		CPUTicks:      true,
 		EnableCgroups: true,
 		EnableNetwork: false,
-		Hostfs:        systemtests.DockerTestResolver(),
+		Hostfs:        systemtests.DockerTestResolver(logger),
 		Procs:         []string{".*"},
-		CgroupOpts:    cgroup.ReaderOptions{RootfsMountpoint: systemtests.DockerTestResolver()},
+		CgroupOpts: cgroup.ReaderOptions{
+			RootfsMountpoint: systemtests.DockerTestResolver(logger),
+			Logger:           logger,
+		},
+		Logger: logger,
 	}
 	err := testStats.Init()
 	require.NoError(t, err)
@@ -64,13 +69,17 @@ func TestContainerMonitoringFromInsideContainer(t *testing.T) {
 }
 
 func TestSelfMonitoringFromInsideContainer(t *testing.T) {
-	_ = logp.DevelopmentSetup()
+	logger := logptest.NewTestingLogger(t, "")
 
-	testStats := Stats{CPUTicks: true,
+	testStats := Stats{
+		CPUTicks:      true,
 		EnableCgroups: true,
 		EnableNetwork: false,
 		Procs:         []string{".*"},
-		CgroupOpts:    cgroup.ReaderOptions{},
+		CgroupOpts: cgroup.ReaderOptions{
+			Logger: logger,
+		},
+		Logger: logger,
 	}
 	err := testStats.Init()
 	require.NoError(t, err)
@@ -89,14 +98,19 @@ func TestSelfMonitoringFromInsideContainer(t *testing.T) {
 }
 
 func TestSystemHostFromContainer(t *testing.T) {
-	_ = logp.DevelopmentSetup()
+	logger := logptest.NewTestingLogger(t, "")
 
-	testStats := Stats{CPUTicks: true,
+	testStats := Stats{
+		CPUTicks:      true,
 		EnableCgroups: true,
 		EnableNetwork: false,
-		Hostfs:        systemtests.DockerTestResolver(),
+		Hostfs:        systemtests.DockerTestResolver(logger),
 		Procs:         []string{".*"},
-		CgroupOpts:    cgroup.ReaderOptions{RootfsMountpoint: systemtests.DockerTestResolver()},
+		CgroupOpts: cgroup.ReaderOptions{
+			RootfsMountpoint: systemtests.DockerTestResolver(logger),
+			Logger:           logger,
+		},
+		Logger: logger,
 	}
 	err := testStats.Init()
 	require.NoError(t, err)

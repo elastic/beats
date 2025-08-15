@@ -34,7 +34,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-system-metrics/metric"
@@ -61,7 +61,7 @@ func TestProcessEvent(t *testing.T) {
 // BenchmarkGetProcess runs a benchmark of the GetProcess method with caching
 // of the command line and environment variables.
 func BenchmarkGetProcess(b *testing.B) {
-	stat, err := initTestResolver()
+	stat, err := initTestResolver(b)
 	if err != nil {
 		b.Fatalf("Failed init: %s", err)
 	}
@@ -80,7 +80,7 @@ func BenchmarkGetProcess(b *testing.B) {
 }
 
 func BenchmarkGetTop(b *testing.B) {
-	stat, err := initTestResolver()
+	stat, err := initTestResolver(b)
 	if err != nil {
 		b.Fatalf("Failed init: %s", err)
 	}
@@ -119,6 +119,7 @@ func TestGetState(t *testing.T) {
 }
 
 func TestGetOneRoot(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	testConfig := Stats{
 		Procs:        []string{".*"},
 		Hostfs:       resolve.NewTestResolver("/"),
@@ -131,9 +132,11 @@ func TestGetOneRoot(t *testing.T) {
 			ByMemory: 0,
 		},
 		EnableCgroups: false,
+		Logger:        logger,
 		CgroupOpts: cgroup.ReaderOptions{
 			RootfsMountpoint:  resolve.NewTestResolver("/"),
 			IgnoreRootCgroups: true,
+			Logger:            logger,
 		},
 	}
 	err := testConfig.Init()
@@ -148,6 +151,7 @@ func TestGetOneRoot(t *testing.T) {
 }
 
 func TestGetOne(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	testConfig := Stats{
 		Procs:        []string{".*"},
 		Hostfs:       resolve.NewTestResolver("/"),
@@ -160,9 +164,11 @@ func TestGetOne(t *testing.T) {
 			ByMemory: 0,
 		},
 		EnableCgroups: false,
+		Logger:        logger,
 		CgroupOpts: cgroup.ReaderOptions{
 			RootfsMountpoint:  resolve.NewTestResolver("/"),
 			IgnoreRootCgroups: true,
+			Logger:            logger,
 		},
 	}
 	err := testConfig.Init()
@@ -189,6 +195,7 @@ func TestNetworkFetch(t *testing.T) {
 		CPUTicks:      false,
 		EnableCgroups: false,
 		EnableNetwork: true,
+		Logger:        logptest.NewTestingLogger(t, ""),
 	}
 
 	err := testConfig.Init()
@@ -209,6 +216,7 @@ func TestNetworkFilter(t *testing.T) {
 		Hostfs:         resolve.NewTestResolver("/"),
 		EnableNetwork:  true,
 		NetworkMetrics: []string{"Forwarding"},
+		Logger:         logptest.NewTestingLogger(t, ""),
 	}
 
 	err := testConfig.Init()
@@ -231,6 +239,7 @@ func TestFilter(t *testing.T) {
 	testConfig := Stats{
 		Procs:  []string{".*"},
 		Hostfs: resolve.NewTestResolver("/"),
+		Logger: logptest.NewTestingLogger(t, ""),
 		IncludeTop: IncludeTopConfig{
 			Enabled:  true,
 			ByCPU:    1,
@@ -253,6 +262,7 @@ func TestFilter(t *testing.T) {
 	testZero := Stats{
 		Procs:  []string{".*"},
 		Hostfs: resolve.NewTestResolver("/"),
+		Logger: logptest.NewTestingLogger(t, ""),
 		IncludeTop: IncludeTopConfig{
 			Enabled:  true,
 			ByCPU:    0,
@@ -284,7 +294,7 @@ func TestProcessList(t *testing.T) {
 }
 
 func TestSelfPersist(t *testing.T) {
-	stat, err := initTestResolver()
+	stat, err := initTestResolver(t)
 	require.NoError(t, err, "Init()")
 	first, err := stat.GetSelf()
 	require.NoError(t, err, "First GetSelf()")
@@ -301,7 +311,7 @@ func TestSelfPersist(t *testing.T) {
 }
 
 func TestGetProcess(t *testing.T) {
-	stat, err := initTestResolver()
+	stat, err := initTestResolver(t)
 	assert.NoError(t, err, "Init()")
 	process, err := stat.GetSelf()
 	assert.NoError(t, err, "FetchPid")
@@ -620,7 +630,10 @@ func TestIncludeTopProcesses(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		procStats := Stats{IncludeTop: test.Cfg}
+		procStats := Stats{
+			IncludeTop: test.Cfg,
+			Logger:     logptest.NewTestingLogger(t, ""),
+		}
 		res := procStats.includeTopProcesses(processes)
 
 		resPids := []int{}
@@ -638,6 +651,7 @@ func TestProcessesExcluded(t *testing.T) {
 		Procs:    []string{".*"},
 		Hostfs:   resolve.NewTestResolver("/"),
 		CPUTicks: false,
+		Logger:   logptest.NewTestingLogger(t, ""),
 	}
 	require.NoError(t, state.Init())
 
@@ -711,11 +725,8 @@ func runThreads(t *testing.T) *exec.Cmd { //nolint: deadcode,structcheck,unused 
 	return cmd
 }
 
-func initTestResolver() (Stats, error) {
-	err := logp.DevelopmentSetup()
-	if err != nil {
-		return Stats{}, err
-	}
+func initTestResolver(t testing.TB) (Stats, error) {
+	logger := logptest.NewTestingLogger(t, "")
 	testConfig := Stats{
 		Procs:        []string{".*"},
 		Hostfs:       resolve.NewTestResolver("/"),
@@ -728,12 +739,14 @@ func initTestResolver() (Stats, error) {
 			ByMemory: 5,
 		},
 		EnableCgroups: true,
+		Logger:        logger,
 		CgroupOpts: cgroup.ReaderOptions{
 			RootfsMountpoint:  resolve.NewTestResolver("/"),
 			IgnoreRootCgroups: true,
+			Logger:            logger,
 		},
 	}
-	err = testConfig.Init()
+	err := testConfig.Init()
 	return testConfig, err
 }
 
