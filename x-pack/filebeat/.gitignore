@@ -1,0 +1,16 @@
+# TODO: remove this before merging
+ca.pem
+cmd/data/
+file-based.patch
+how-to.md
+netflow-config.yml
+netflow-console.yml
+nfipfix-console.yml
+nfipfix-netflow.yml
+nfipfix.yml
+raw.bin
+run-filebeat.sh
+test.tar.gz
+*.ipfix
+*.ipfix.gz
+
