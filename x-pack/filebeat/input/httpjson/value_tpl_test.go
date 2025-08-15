@@ -76,6 +76,14 @@ func TestValueTpl(t *testing.T) {
 			expectedVal: "25",
 		},
 		{
+			name:        "terminate",
+			value:       `[[if false]]ok[[else]][[terminate "because reasons"]][[end]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			paramDefVal: "this should not be seen",
+			expectedVal: "",
+		},
+		{
 			name:          "returns error if result is empty and no default is set",
 			value:         "",
 			paramCtx:      emptyTransformContext(),
