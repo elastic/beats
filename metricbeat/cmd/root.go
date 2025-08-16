@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/cmd/test"
 	"github.com/elastic/beats/v7/metricbeat/include"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 
 	// import modules
@@ -72,8 +73,16 @@ func MetricbeatSettings(moduleNameSpace string) instance.Settings {
 
 // Initialize initializes the entrypoint commands for metricbeat
 func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
-	rootCmd := cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
+	rootCmd := cmd.GenRootCmdWithSettings(beater.Creator(mb.Registry,
+		beater.MetricbeatAutodiscoverSetup,
+		beater.WithLightModules(),
+		beater.WithModuleOptions(module.WithMetricSetInfo(), module.WithServiceName()),
+	), settings)
 	rootCmd.AddCommand(cmd.GenModulesCmd(Name, "", BuildModulesManager))
-	rootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
+	rootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.Creator(mb.Registry,
+		beater.MetricbeatAutodiscoverSetup,
+		beater.WithLightModules(),
+		beater.WithModuleOptions(module.WithMetricSetInfo(), module.WithMaxStartDelay(0)),
+	)))
 	return rootCmd
 }
