@@ -382,10 +382,12 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	inputLoader := channel.RunnerFactoryWithCommonInputSettings(b.Info, compat.Combine(
-		compat.RunnerFactory(inputsLogger, b.Info, b.Monitoring.InputsRegistry(), v2InputLoader),
-		input.NewRunnerFactory(pipelineConnector, registrar, fb.done, fb.logger),
-	))
+	inputLoader := channel.RunnerFactoryWithCommonInputSettings(
+		b.Info,
+		compat.Combine(
+			compat.RunnerFactory(inputsLogger, b.Info, b.Monitoring.InputsRegistry(), b.Monitoring.StatsRegistry(), v2InputLoader),
+			input.NewRunnerFactory(pipelineConnector, registrar, fb.done, fb.logger),
+		))
 
 	if fb.otelStatusFactoryWrapper != nil {
 		inputLoader = fb.otelStatusFactoryWrapper(inputLoader)
