@@ -22,6 +22,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule/cron"
 )
@@ -48,13 +50,13 @@ func TestParse(t *testing.T) {
 		{
 			"cron every minute",
 			"* * * * *",
-			&Schedule{cron.MustParse("* * * * *")},
+			&Schedule{cronMustParse(t, "* * * * *")},
 			false,
 		},
 		{
 			"cron complex",
 			"*/15 4 * 2 *",
-			&Schedule{cron.MustParse("*/15 4 * 2 *")},
+			&Schedule{cronMustParse(t, "*/15 4 * 2 *")},
 			false,
 		},
 		{
@@ -128,7 +130,7 @@ func TestSchedule_Unpack(t *testing.T) {
 		},
 		{
 			"every 15 cron -> every second interval",
-			&Schedule{cron.MustParse("*/15 * * * *")},
+			&Schedule{cronMustParse(t, "*/15 * * * *")},
 			"@every 1s",
 			intervalScheduler{time.Second},
 			false,
@@ -137,7 +139,7 @@ func TestSchedule_Unpack(t *testing.T) {
 			"every second interval -> every 15 cron",
 			&Schedule{intervalScheduler{time.Second}},
 			"*/15 * * * *",
-			cron.MustParse("*/15 * * * *"),
+			cronMustParse(t, "*/15 * * * *"),
 			false,
 		},
 		{
@@ -160,4 +162,10 @@ func TestSchedule_Unpack(t *testing.T) {
 			}
 		})
 	}
+}
+
+func cronMustParse(tb testing.TB, in string) *cron.Schedule {
+	s, err := cron.Parse(in)
+	require.NoError(tb, err)
+	return s
 }
