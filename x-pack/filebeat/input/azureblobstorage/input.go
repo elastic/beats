@@ -204,7 +204,7 @@ func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state
 	log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container_name", currentSource.ContainerName)
 	log.Infof("Running azure blob storage for account: %s", input.config.AccountName)
 	// create a new inputMetrics instance
-	metrics := newInputMetrics(inputCtx.MetricsRegistry, input.logger)
+	metrics := newInputMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
 	metrics.url.Set(input.serviceURL + currentSource.ContainerName)
 
 	ctx, cancel := context.WithCancel(context.Background())
