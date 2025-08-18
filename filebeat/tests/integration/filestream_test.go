@@ -510,11 +510,8 @@ func TestFilestreamDefaultRegistryTTL(t *testing.T) {
 filebeat.inputs:
   - type: filestream
     id: filestream-id
-    harvester_limit: 2
     paths:
       - %s
-    file_identity.native: ~
-    prospector.scanner.fingerprint.enabled: false
     prospector.scanner.check_interval: 1s
 
 queue.mem:
@@ -540,7 +537,10 @@ logging:
 	logFilePath := path.Join(tempDir, "input_log.log")
 	outputFile := filepath.Join(tempDir, "output-file*")
 
-	integration.GenerateLogFile(t, logFilePath, 10, false)
+	// > 1kb in total to trigger default fingerprinting
+	numEvents := 30
+
+	integration.GenerateLogFile(t, logFilePath, numEvents, false)
 
 	filebeat.WriteConfigFile(fmt.Sprintf(cfg, logFilePath, tempDir))
 	filebeat.Start()
@@ -553,25 +553,17 @@ logging:
 	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePath)
 	filebeat.WaitForLogs(eofMsg, 10*time.Second, "EOF was not reached")
 
-	requirePublishedEvents(t, filebeat, 10, outputFile)
+	requirePublishedEvents(t, filebeat, numEvents, outputFile)
 
 	// Read the registry log file and check the TTL
 	registryLogFile := filepath.Join(tempDir, "data", "registry", "filebeat", "log.json")
 	entries := readFilestreamRegistryLog(t, registryLogFile)
-
-	var foundEntry *registryEntry
-	for _, entry := range entries {
-		if strings.Contains(entry.Key, "filestream::filestream-id::native::") && entry.Filename == logFilePath {
-			foundEntry = &entry
-			break
-		}
-	}
-
-	require.NotNil(t, foundEntry, "Registry entry for filestream input not found")
+	require.GreaterOrEqual(t, len(entries), 1, "No registry entries found")
+	firstEntry := entries[0]
 
 	expectedTTL := time.Duration(-1)
-	assert.Equal(t, expectedTTL, foundEntry.TTL,
-		"Registry entry TTL should be -1 by default, but got %v", foundEntry.TTL)
+	assert.Equal(t, expectedTTL, firstEntry.TTL,
+		"Registry entry TTL should be -1 by default, but got %v", firstEntry.TTL)
 }
 
 func requireRegistryEntryRemoved(t *testing.T, workDir, identity string) {
