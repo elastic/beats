@@ -365,7 +365,7 @@ func TestProcessObjectMetricCollection(t *testing.T) {
 
 			// metric recorder with zero workers
 			metricRecorder := newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger())
-			objFactory := newS3ObjectProcessorFactory(metricRecorder, mockS3API, nil, backupConfig{})
+			objFactory := newS3ObjectProcessorFactory(metricRecorder, mockS3API, nil, backupConfig{}, logp.NewNopLogger())
 			objHandler := objFactory.Create(ctx, s3Event)
 
 			// when
@@ -414,7 +414,7 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int,
 			Return(s3Resp, nil),
 	)
 
-	s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, selectors, backupConfig{})
+	s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, selectors, backupConfig{}, logp.NewNopLogger())
 	err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(
 		logptest.NewTestingLogger(t, inputName),
 		func(event beat.Event) { events = append(events, event) })

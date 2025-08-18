@@ -139,7 +139,7 @@ func newSQSS3EventProcessor(
 ) *sqsS3EventProcessor {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
-		metrics = newInputMetrics(monitoring.NewRegistry(), 0)
+		metrics = newInputMetrics(monitoring.NewRegistry(), 0, log)
 	}
 	return &sqsS3EventProcessor{
 		s3HandlerFactory:     s3,

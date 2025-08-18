@@ -723,7 +723,7 @@ func Test_StorageClient(t *testing.T) {
 				assert.EqualError(t, err, tt.expectedError.Error())
 				return
 			}
-			input := newStatelessInput(conf, serv.URL+"/")
+			input := newStatelessInput(conf, serv.URL+"/", logp.NewNopLogger())
 
 			assert.Equal(t, "azure-blob-storage-stateless", input.Name())
 			assert.NoError(t, input.Test(v2.TestContext{}))
