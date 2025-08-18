@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -432,8 +433,7 @@ func TestServerPool(t *testing.T) {
 				fails = make(chan error, 1)
 			)
 			ctx, cancel := newCtx("server_pool_test", test.name)
-			metrics := newInputMetrics("")
-			defer metrics.Close()
+			metrics := newInputMetrics(monitoring.NewRegistry())
 			var wg sync.WaitGroup
 			for _, cfg := range test.cfgs {
 				cfg := cfg
