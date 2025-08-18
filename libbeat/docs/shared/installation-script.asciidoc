@@ -2,7 +2,7 @@
 === Windows Installation Script
 
 The installation script, +install-service-{beatname_lc}.ps1+ is responsible
-for creating the Windows Service for {beatname_uc}. Starting in 8.16.6, the
+for creating the Windows Service for {beatname_uc}. Starting in 8.18.6, the
 base folder has changed from +C:{backslash}ProgramData{backslash}+ to  +C:{backslash}Program Files{backslash}+
 because the latter has stricter permissions, therefore the home path
 (base for state and logs) is now +C:{backslash}Program Files{backslash}{beatname_uc}-Data+.
