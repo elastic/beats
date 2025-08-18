@@ -512,7 +512,6 @@ filebeat.inputs:
     id: filestream-id
     paths:
       - %s
-    prospector.scanner.check_interval: 1s
 
 queue.mem:
   flush.timeout: 0s
