@@ -264,11 +264,6 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 }
 
 func TestBenchmarkInputSQS(t *testing.T) {
-	// TODO: remove linter skip and update logger when the new recommended loggers support setting log levels
-	// for now, we don't want debug logs coming through a benchmark test
-	//nolint:staticcheck // see above
-	err := logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
-	require.NoError(t, err)
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputSQS(t, 1),
@@ -398,11 +393,6 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 }
 
 func TestBenchmarkInputS3(t *testing.T) {
-	// TODO: remove linter skip and update logger when the new recommended loggers support setting log levels
-	// for now, we don't want debug logs coming through a benchmark test
-	//nolint:staticcheck // see above
-	err := logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
-	require.NoError(t, err)
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputS3(t, 1),
