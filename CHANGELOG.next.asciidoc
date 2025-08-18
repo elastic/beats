@@ -267,6 +267,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix wrongly emitted missing input ID warning {issue}42969[42969] {pull}45747[45747]
 - Fix error handling in ABS input when both root level `max_workers` and `batch_size` are empty. {issue}45680[45680] {pull}45743[45743]
 - Fix handling of unnecessary BOM in UTF-8 text received by o365audit input. {issue}44327[44327] {pull}45739[45739]
+- Restore the Streaming input on Windows. {pull}46031[46031]
 
 *Heartbeat*
 
@@ -504,6 +505,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]
 - Clarify behavior in logging for starting periodic evaluations and for exceeding the maximum execution budget. {pull}45633[45633]
 - Add status reporting support for AWS CloudWatch input. {pull}45679[45679]
+- Add mechanism to allow HTTP JSON templates to terminate without logging an error. {issue}45664[45664] {pull}45810[45810]
+- Improve error reporting for schemeless URLs in HTTP JSON input. {pull}45953[45953]
 
 *Auditbeat*
 

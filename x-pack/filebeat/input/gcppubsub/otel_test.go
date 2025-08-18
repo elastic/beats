@@ -48,6 +48,9 @@ func TestGCPInputOTelE2E(t *testing.T) {
 	otelNamespace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
 	fbNameSpace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
 
+	otelIndex := "logs-integration-" + otelNamespace
+	fbIndex := "logs-integration-" + fbNameSpace
+
 	type options struct {
 		Namespace    string
 		ESURL        string
@@ -125,6 +128,14 @@ processors:
 	// prepare to query ES
 	es := integration.GetESClient(t, "http")
 
+	t.Cleanup(func() {
+		_, err := es.Indices.DeleteDataStream([]string{
+			otelIndex,
+			fbIndex,
+		})
+		require.NoError(t, err, "failed to delete indices")
+	})
+
 	rawQuery := map[string]any{
 		"query": map[string]any{
 			"match_phrase": map[string]any{
@@ -146,15 +157,15 @@ processors:
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
-			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-logs-integration-"+otelNamespace+"*", es)
-			assert.NoError(ct, err, "failed to query ES for otel documents: %v", err)
+			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+otelIndex+"*", es)
+			assert.NoError(ct, err)
+			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 otel document, got %d", otelDocs.Hits.Total.Value)
 
-			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-logs-integration-"+fbNameSpace+"*", es)
-			assert.NoError(ct, err, "failed to query ES for filebeat documents: %v", err)
-			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, int64(1), "expected at least one document by otel")
-			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, int64(1), "expected at least one document by filebeat")
+			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+fbIndex+"*", es)
+			assert.NoError(ct, err)
+			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat document, got %d", filebeatDocs.Hits.Total.Value)
 		},
-		3*time.Minute, 1*time.Second, "failed to find documents for filebeat and otel")
+		3*time.Minute, 1*time.Second, "expected at least 1 document for both filebeat and otel modes")
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
