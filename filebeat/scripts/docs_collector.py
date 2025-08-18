@@ -104,10 +104,6 @@ For a description of each field in the module, see the [exported fields](/refere
 # * [*Modules overview*](/reference/filebeat/filebeat-modules-overview.md)
 # """
 
-<<<<<<< HEAD
-#     for m, title in sorted(six.iteritems(modules_list)):
-#         module_list_output += "* [*{} module*](/reference/filebeat/filebeat-module-{}.md)\n".format(title.title(), m)
-=======
     for m, details in sorted(six.iteritems(modules_list)):
         title = details["title"]
         applies_to = details["applies_to"]
@@ -115,7 +111,6 @@ For a description of each field in the module, see the [exported fields](/refere
         if applies_to:
             module_list_output += " {{applies_to}}`stack: {}`".format(applies_to)
         module_list_output += "\n"
->>>>>>> fc9287068 ([docs] [filebeat] Update `docs_collector.py` to add `applies_to` badges (#45890))
 
 #     module_list_output += "\n"
 

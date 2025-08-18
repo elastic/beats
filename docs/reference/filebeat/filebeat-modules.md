@@ -67,12 +67,7 @@ While {{filebeat}} modules are still supported, we recommend {{agent}} integrati
 * [*System module*](/reference/filebeat/filebeat-module-system.md)
 * [*Threat Intel module*](/reference/filebeat/filebeat-module-threatintel.md)
 * [*Traefik module*](/reference/filebeat/filebeat-module-traefik.md)
-<<<<<<< HEAD
-* [*Zeek (Bro) Module*](/reference/filebeat/filebeat-module-zeek.md)
-* [*ZooKeeper module*](/reference/filebeat/filebeat-module-zookeeper.md)
-=======
 * [*Zeek (Bro) module*](/reference/filebeat/filebeat-module-zeek.md)
 * [*ZooKeeper module*](/reference/filebeat/filebeat-module-zookeeper.md) {applies_to}`stack: beta`
->>>>>>> fc9287068 ([docs] [filebeat] Update `docs_collector.py` to add `applies_to` badges (#45890))
 * [*Zoom module*](/reference/filebeat/filebeat-module-zoom.md)
 
