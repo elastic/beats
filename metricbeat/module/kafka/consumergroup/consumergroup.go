@@ -52,7 +52,12 @@ var debugf = logp.MakeDebug("kafka")
 // New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	opts := kafka.MetricSetOptions{
-		Version: "3.6.0",
+		// NOTE: Sarama uses this property to determine which Kafka version it is interacting with
+		// (see: https://github.com/elastic/sarama/blob/7672917f26b6112627457d6bd1736a8636449c5b/config.go#L496).
+		// Modifying this value can impact compatibility with Kafka clusters, especially those running versions
+		// lower than the one specified here. Therefore, any changes to this property should be made cautiously,
+		// and must be thoroughly tested against all supported Kafka versions.
+		Version: "2.1.0",
 	}
 
 	ms, err := kafka.NewMetricSet(base, opts)
