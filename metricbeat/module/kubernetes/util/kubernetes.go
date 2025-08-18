@@ -353,7 +353,7 @@ func createWatcher(
 			if isNamespaced(resourceName) {
 				options.Namespace = namespace
 			}
-			restartWatcher, err := kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil)
+			restartWatcher, err := kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil, logp.NewNopLogger())
 			if err != nil {
 				return false, err
 			}
@@ -385,9 +385,10 @@ func createWatcher(
 			options,
 			nil,
 			transformReplicaSetMetadata,
+			logp.NewNopLogger(),
 		)
 	default:
-		watcher, err = kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil)
+		watcher, err = kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil, logp.NewNopLogger())
 	}
 	if err != nil {
 		return false, fmt.Errorf("error creating watcher for %T: %w", resource, err)

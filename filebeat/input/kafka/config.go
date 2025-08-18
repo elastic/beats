@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -171,7 +172,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	k.Consumer.Group.Rebalance.Retry.Backoff = config.Rebalance.RetryBackoff
 	k.Consumer.Group.Rebalance.Retry.Max = config.Rebalance.MaxRetries
 
-	tls, err := tlscommon.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(config.TLS, logp.NewNopLogger())
 	if err != nil {
 		return nil, err
 	}
