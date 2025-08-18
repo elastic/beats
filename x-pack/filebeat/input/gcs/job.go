@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type job struct {
@@ -62,7 +63,7 @@ func newJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, objectURI
 ) *job {
 	if metrics == nil {
 		// metrics are optional, initialize a stub if not provided
-		metrics = newInputMetrics("", nil)
+		metrics = newInputMetrics(monitoring.NewRegistry())
 	}
 	return &job{
 		bucket:    bucket,
