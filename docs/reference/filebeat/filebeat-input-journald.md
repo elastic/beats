@@ -292,7 +292,7 @@ The following snippet configures Filebeat to read the `stdout` stream from all c
 
 #### `syslog` [_syslog_2]
 
-The `syslog` parser parses RFC 3146 and/or RFC 5424 formatted syslog messages.
+The `syslog` parser parses RFC 3164 and/or RFC 5424 formatted syslog messages.
 
 The supported configuration options are:
 
