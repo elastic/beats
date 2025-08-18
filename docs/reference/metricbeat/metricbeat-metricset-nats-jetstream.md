@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-nats-jetstream.html
 
 applies_to:
-  stack: beta
+  stack: beta 9.1.0
 ---
 
 # NATS JetStream metricset [metricbeat-metricset-nats-jetstream]
