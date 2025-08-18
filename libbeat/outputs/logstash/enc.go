@@ -18,6 +18,7 @@
 package logstash
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -31,11 +32,17 @@ func makeLogstashEventEncoder(log *logp.Logger, beatVersion string, escapeHTML b
 		EscapeHTML: escapeHTML,
 	})
 	index = strings.ToLower(index)
-	return func(event interface{}) (d []byte, err error) {
-		d, err = enc.Encode(index, event.(*beat.Event))
+	return func(event interface{}) ([]byte, error) {
+		beatEvent, ok := event.(*beat.Event)
+		if !ok {
+			return nil, errors.New("event is not of type *beat.Event")
+		}
+
+		d, err := enc.Encode(index, beatEvent)
 		if err != nil {
 			log.Debugf("Failed to encode event: %v", event)
+			return nil, err
 		}
-		return
+		return d, nil
 	}
 }
