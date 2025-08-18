@@ -21,15 +21,11 @@ import (
 	"go.uber.org/mock/gomock"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-concert/timed"
 )
 
 func TestSQSS3EventProcessor(t *testing.T) {
-	//nolint:staticcheck // TODO: fix during sweep of global loggers
-	err := logp.TestingSetup()
-	require.NoError(t, err)
 	msg, err := newSQSMessage(newS3Event("log.json"))
 	require.NoError(t, err)
 
@@ -225,9 +221,6 @@ func TestSqsProcessor_keepalive(t *testing.T) {
 }
 
 func TestSqsProcessor_getS3Notifications(t *testing.T) {
-	//nolint:staticcheck // TODO: fix during sweep of global loggers
-	err := logp.TestingSetup()
-	require.NoError(t, err)
 
 	p := newSQSS3EventProcessor(logptest.NewTestingLogger(t, inputName), nil, nil, nil, time.Minute, 5, nil, &mockStatusReporter{})
 

@@ -32,9 +32,6 @@ var (
 )
 
 func TestSQSReceiver(t *testing.T) {
-	//nolint:staticcheck // TODO: fix during sweep of global loggers
-	err := logp.TestingSetup()
-	require.NoError(t, err)
 
 	const workerCount = 5
 
@@ -158,9 +155,6 @@ func TestSQSReceiver(t *testing.T) {
 }
 
 func TestGetApproximateMessageCount(t *testing.T) {
-	//nolint:staticcheck // TODO: fix during sweep of global loggers
-	err := logp.TestingSetup()
-	require.NoError(t, err)
 
 	const count = 500
 	attrName := []types.QueueAttributeName{sqsApproximateNumberOfMessages}
