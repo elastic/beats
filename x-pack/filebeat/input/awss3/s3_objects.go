@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type s3ObjectProcessorFactory struct {
@@ -68,7 +69,7 @@ var errS3DownloadFailed = errors.New("S3 download failure")
 func newS3ObjectProcessorFactory(metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
-		metrics = newInputMetrics("", nil, 0)
+		metrics = newInputMetrics(monitoring.NewRegistry(), 0)
 	}
 	if len(sel) == 0 {
 		sel = []fileSelectorConfig{
