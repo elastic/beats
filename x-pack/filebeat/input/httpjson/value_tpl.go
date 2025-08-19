@@ -95,9 +95,6 @@ func (t *valueTpl) Unpack(in string) error {
 	return nil
 }
 
-<<<<<<< HEAD
-func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName string, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
-=======
 type errTerminate struct {
 	Reason string
 }
@@ -109,8 +106,7 @@ func (e *errTerminate) Error() string {
 	return "terminated template"
 }
 
-func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName string, defaultVal *valueTpl, stat status.StatusReporter, log *logp.Logger) (val string, err error) {
->>>>>>> f324f295a (x-pack/filebeat/input/httpjson: allow template termination without logging error (#45810))
+func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName string, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
 	fallback := func(err error) (string, error) {
 		if defaultVal != nil {
 			log.Debugw("template execution: falling back to default value", "target", targetName)
