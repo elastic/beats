@@ -6,21 +6,45 @@ package awss3
 
 import (
 	"errors"
+	"sync"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/stretchr/testify/assert"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-type mockStatusReporter struct{}
+// mockStatusReporter is a thread-safe mock of a status reporter that
+// records all status updates.
+type mockStatusReporter struct {
+	mu       sync.Mutex
+	statuses []mgmtStatusUpdate
+}
 
-func (m *mockStatusReporter) UpdateStatus(s status.Status, msg string) {}
+type mgmtStatusUpdate struct {
+	status status.Status
+	msg    string
+}
+
+func (r *mockStatusReporter) getStatuses() []mgmtStatusUpdate {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	s := make([]mgmtStatusUpdate, len(r.statuses))
+	copy(s, r.statuses)
+	return s
+}
+
+func (r *mockStatusReporter) UpdateStatus(s status.Status, msg string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.statuses = append(r.statuses, mgmtStatusUpdate{status: s, msg: msg})
+}
 
 func TestGetProviderFromDomain(t *testing.T) {
 	tests := []struct {
