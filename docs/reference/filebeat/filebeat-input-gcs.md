@@ -140,10 +140,9 @@ As we can see from the response above, the `message` field contains the original
 5. **gcs.storage.object.content_type** : Content type of the file/object. You can find the supported content types [here](#supported-types-gcs) .
 6. **gcs.storage.object.json_data** :  Objectified json file data, representing the contents of the file.
 
-Now let’s explore the configuration attributes a bit more elaborately.
+## Supported Attributes [supported-attributes-gcs]
 
-$$$supported-attributes-gcs$$$
-**Supported Attributes :-**
+Now let’s explore the configuration attributes a bit more elaborately.
 
 1. [project_id](#attrib-project-id)
 2. [auth.credentials_json.account_key](#attrib-auth-credentials-json)
@@ -159,7 +158,7 @@ $$$supported-attributes-gcs$$$
 12. [expand_event_list_from_field](#attrib-expand_event_list_from_field-gcs)
 13. [timestamp_epoch](#attrib-timestamp_epoch-gcs)
 14. [retry](#attrib-retry-gcs)
-15. [custom_properties](#attrib-custom-properties)
+15. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.2.0`
 
 
 ### `project_id` [attrib-project-id]
@@ -378,6 +377,10 @@ filebeat.inputs:
 
 ### Custom properties [attrib-custom-properties]
 
+```{applies_to}
+stack: ga 9.2.0
+```
+
 Some object properties can be **set** or **overridden** at the input level with the help of certain configuration options. Allowing users to set or override custom object properties provides more flexibility when reading objects from a remote storage where the user might only have read access.
 
 **The supported custom properties are:**
@@ -385,11 +388,11 @@ Some object properties can be **set** or **overridden** at the input level with 
 - [`content_type`](#attrib-content-type)
 - [`encoding`](#attrib-encoding)
 
-### `content_type` [attrib-content-type]
+#### `content_type` [attrib-content-type]
 
 Use the `content_type` configuration attribute to set a user-defined content type for the object property. Setting a custom content type only sets the `content-type` property of a object if it's missing or empty. If you want to override an already existing `content-type` value, set the `override_content_type` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Container level definitions always take precedence.
 
-### Example configuration
+##### Example configuration
 
 This is a sample configuration at root level:
 
@@ -423,11 +426,11 @@ filebeat.inputs:
     override_content_type: true
 ```
 
-### `encoding` [attrib-encoding]
+#### `encoding` [attrib-encoding]
 
 Use the `encoding` configuration attribute to set a user-defined encoding for the object property. Setting a custom encoding only sets the `encoding` property of a object if it's missing or empty. If you want to override an already existing encoding value, set the `override_encoding` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Container level definitions always take precedence.
 
-### Example configuration
+##### Example configuration
 
 This is a sample configuration at root level:
 
@@ -464,6 +467,8 @@ filebeat.inputs:
 ::::{note}
 Custom property configurations are affected by input restrictions. For example, you can set an unsupported content-type or encoding but the input will reject it and report an error.
 ::::
+
+### Sample configs
 
 $$$bucket-overrides$$$
 **The sample configs below will explain the bucket level overriding of attributes a bit further :-**
@@ -546,9 +551,7 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 
 ## Common input options [_common_input_options]
 
-
-
-## Common options [filebeat-input-gcs-common-options]
+$$$filebeat-input-gcs-common-options$$$
 
 The following configuration options are supported by all inputs.
 
