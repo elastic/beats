@@ -117,6 +117,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of unnecessary BOM in UTF-8 text received by o365audit input. {issue}44327[44327] {pull}45739[45739]
 - Restore the Streaming input on Windows. {pull}46031[46031]
 - Fix filestream registry entries being prematurely removed, which could cause files to be re-ingested after Filebeat restarts. {issue}46007[46007] {pull}46032[46032]
+- Fix termination of input on API errors. {pull}45999[45999]
 
 *Heartbeat*
 
@@ -169,6 +170,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
+- Update to Go 1.24.5. {pull}45403[45403]
 
 *Auditbeat*
 
@@ -224,6 +226,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
 - Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
 - Allow empty HTTPJSON cursor template value evaluations to be ignored by Fleet health status updates. {pull}45361[45361]
+- Add mechanism to allow HTTP JSON templates to terminate without logging an error. {issue}45664[45664] {pull}45810[45810]
 
 *Auditbeat*
 
