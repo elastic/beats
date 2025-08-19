@@ -346,6 +346,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Publish cloud.availability_zone by add_cloud_metadata processor in azure environments {issue}42601[42601] {pull}43618[43618]
 - Added the `now` processor, which will populate the specified target field with the current timestamp. {pull}44795[44795]
 - Improve trimming of BOM from UTF-8 data in the libbeat reader/readfile.EncoderReader. {pull}45742[45742]
+- The following output latency_delta metrics are now included when `logging.metrics` is enabled: `output.latency_delta.{count, max, median, min, p99}`. This only includes data since the last internal metrics was logged. {pull}45749[45749]
 
 *Auditbeat*
 
