@@ -23,7 +23,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"os/exec"
 	"strings"
 	"syscall"
@@ -203,7 +203,7 @@ func generateJournaldLogs(t *testing.T, syslogID string, lines, size int) {
 func largeStr(t *testing.T, len int) string {
 	str := strings.Builder{}
 	for range len {
-		c := rand.Int31n(93) + 33
+		c := rand.Int32N(93) + 33
 		if err := str.WriteByte(byte(c)); err != nil {
 			t.Fatal(err)
 		}
