@@ -15,15 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build (!darwin || !cgo) && (!freebsd || !cgo) && !linux && !windows
-// +build !darwin !cgo
-// +build !freebsd !cgo
-// +build !linux
-// +build !windows
-
 package report
 
-func SetupMetricsOptions(opts MetricOptions) error {
-	opts.Logger.Warn("Metrics not implemented for this OS.")
-	return nil
+import (
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+)
+
+type MetricOptions struct {
+	Name           string
+	Version        string
+	EphemeralID    string
+	Logger         *logp.Logger
+	SystemMetrics  *monitoring.Registry
+	ProcessMetrics *monitoring.Registry
 }
