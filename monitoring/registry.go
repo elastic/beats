@@ -83,11 +83,15 @@ func (r *Registry) doVisit(mode Mode, vs Visitor) {
 		}
 
 		vs.OnKey(key)
-		v.Var.Visit(mode, vs)
+		v.Visit(mode, vs)
 	}
 }
 
-// NewRegistry creates and register a new registry
+// NewRegistry creates and registers a new registry. Panics if there is already
+// a variable or registry with the same name.
+//
+// Deprecated: Use GetOrCreateRegistry instead, which does not panic if the
+// given name already exists.
 func (r *Registry) NewRegistry(name string, opts ...Option) *Registry {
 	v := &Registry{
 		name:    fullName(r, name),
@@ -134,6 +138,12 @@ func (r *Registry) newRegistryChainWithLock(names []string, opts *options) *Regi
 	return cur
 }
 
+// GetOrCreateRegistry creates and returns a new registry with the specified
+// name or path under the given parent, or returns the existing registry if
+// one with that name already exists.
+//
+// If the name exists but refers to a non-registry variable,
+// GetOrCreateRegistry returns nil.
 func (r *Registry) GetOrCreateRegistry(name string, opts ...Option) *Registry {
 	names := strings.Split(name, ".")
 	return r.getOrCreateRegistry(names, opts...)
