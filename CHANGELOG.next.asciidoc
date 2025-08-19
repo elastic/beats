@@ -125,6 +125,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of unnecessary BOM in UTF-8 text received by o365audit input. {issue}44327[44327] {pull}45739[45739]
 - Restore the Streaming input on Windows. {pull}46031[46031]
 - Fix termination of input on API errors. {pull}45999[45999]
+- Fix filestream registry entries being prematurely removed, which could cause files to be re-ingested after Filebeat restarts. {issue}46007[46007] {pull}46032[46032]
 
 *Heartbeat*
 
