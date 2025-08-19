@@ -210,7 +210,7 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 			err := in.states.AddState(state)
 			if err != nil {
 				in.log.Errorf("saving completed object state: %v", err.Error())
-				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failure saving completed object state: %s", err.Error()))
+				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failure checkpointing (saving completed object state): %s", err.Error()))
 			} else {
 				in.status.UpdateStatus(status.Running, "Input is running")
 			}
