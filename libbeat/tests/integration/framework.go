@@ -28,6 +28,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+<<<<<<< HEAD
+=======
+	"math"
+	"net"
+>>>>>>> fd21452b1 ([Journald] Add `--all` flag when calling journalctl (#46017))
 	"net/http"
 	"net/url"
 	"os"
@@ -1035,3 +1040,130 @@ func (b *BeatProc) CountFileLines(glob string) int {
 func (b *BeatProc) ConfigFilePath() string {
 	return b.configFile
 }
+<<<<<<< HEAD
+=======
+
+// StartMockES starts mock-es on the specified address.
+// If add is an empty string a random local port is used.
+// The return values are:
+//   - The HTTP server
+//   - The server address in the form http://ip:port
+//   - The mock-es API handler
+//   - The ManualReader for accessing the metrics
+func StartMockES(
+	t *testing.T,
+	addr string,
+	percentDuplicate,
+	percentTooMany,
+	percentNonIndex,
+	percentTooLarge,
+	historyCap uint,
+) (*http.Server, string, *api.APIHandler, *sdkmetric.ManualReader) {
+
+	uid := uuid.Must(uuid.NewV4())
+
+	rdr := sdkmetric.NewManualReader()
+	provider := sdkmetric.NewMeterProvider(
+		sdkmetric.WithReader(rdr),
+	)
+
+	es := api.NewAPIHandler(
+		uid,
+		t.Name(),
+		provider,
+		time.Now().Add(24*time.Hour),
+		0,
+		percentDuplicate,
+		percentTooMany,
+		percentNonIndex,
+		percentTooLarge,
+		historyCap,
+	)
+
+	if addr == "" {
+		addr = "localhost:0"
+	}
+
+	l, err := net.Listen("tcp", addr)
+	if err != nil {
+		if l, err = net.Listen("tcp6", addr); err != nil {
+			t.Fatalf("failed to listen on a port: %v", err)
+		}
+	}
+
+	addr = l.Addr().String()
+	s := http.Server{Handler: es, ReadHeaderTimeout: time.Second}
+	go func() {
+		if err := s.Serve(l); !errors.Is(err, http.ErrServerClosed) {
+			t.Errorf("could not start mock-es server: %s", err)
+		}
+	}()
+
+	serverURL := "http://" + addr
+	// Ensure the Server is up and running before returning
+	require.Eventually(
+		t,
+		func() bool {
+			resp, err := http.Get(serverURL) //nolint:gosec,noctx // It's just a test
+			if err != nil {
+				return false
+			}
+			//nolint: errcheck // We're just draining the body, we can ignore the error
+			io.Copy(io.Discard, resp.Body)
+			resp.Body.Close()
+			return true
+		},
+		time.Second,
+		time.Millisecond,
+		"mock-es server did not start on '%s'", addr)
+
+	return &s, serverURL, es, rdr
+}
+
+// WaitPublishedEvents waits until the desired number of events
+// have been published. It assumes the file output is used, the filename
+// for the output is 'output' and 'path' is set to the TempDir.
+func (b *BeatProc) WaitPublishedEvents(timeout time.Duration, events int) {
+	t := b.t
+	t.Helper()
+
+	msg := strings.Builder{}
+	path := filepath.Join(b.TempDir(), "output-*.ndjson")
+	assert.Eventually(t, func() bool {
+		got := b.CountFileLines(path)
+		msg.Reset()
+		fmt.Fprintf(&msg, "expecting %d events, got %d", events, got)
+		return got == events
+	}, timeout, 200*time.Millisecond, &msg)
+}
+
+// GetEventsFromFileOutput reads all events from file output. If n > 0,
+// then it reads up to n events. It assumes the filename
+// for the output is 'output' and 'path' is set to the TempDir.
+func GetEventsFromFileOutput[E any](b *BeatProc, n int) []E {
+	b.t.Helper()
+
+	if n < 1 {
+		n = math.MaxInt
+	}
+
+	var events []E
+	path := filepath.Join(b.TempDir(), "output-*.ndjson")
+
+	f := b.openGlobFile(path, true)
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		var ev E
+		err := json.Unmarshal(scanner.Bytes(), &ev)
+		require.NoError(b.t, err, "failed to read event")
+		events = append(events, ev)
+
+		if len(events) >= n {
+			return events
+		}
+	}
+
+	return events
+}
+>>>>>>> fd21452b1 ([Journald] Add `--all` flag when calling journalctl (#46017))
