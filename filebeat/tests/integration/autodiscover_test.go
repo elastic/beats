@@ -24,6 +24,7 @@ package integration
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -31,6 +32,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"github.com/gofrs/uuid/v5"
 	corev1 "k8s.io/api/core/v1"
@@ -39,7 +41,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/kind/pkg/apis/config/v1alpha4"
 	"sigs.k8s.io/kind/pkg/cluster"
-	"sigs.k8s.io/kind/pkg/cmd"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-autodiscover/docker"
@@ -47,7 +48,7 @@ import (
 )
 
 func TestHintsDocker(t *testing.T) {
-	containerID := startFlogContainer(t)
+	containerID := startFlogDocker(t)
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
@@ -76,7 +77,7 @@ func TestHintsKubernetes(t *testing.T) {
 		"../../filebeat.test",
 	)
 
-	kubeConfigPath, noneName, containerID := startFlogInKubernetes(t, filebeat.TempDir())
+	kubeConfigPath, noneName, containerID := startFlogKubernetes(t, filebeat.TempDir())
 
 	cfgYAML := getConfig(
 		t,
@@ -100,10 +101,18 @@ func TestHintsKubernetes(t *testing.T) {
 		"Filestream did not start for the test container")
 }
 
-func startFlogInKubernetes(t *testing.T, tempDir string) (string, string, string) {
+func startFlogKubernetes(t *testing.T, tempDir string) (string, string, string) {
 	uid := uuid.Must(uuid.NewV4()).String()
+
+	defer func() {
+		if t.Failed() {
+			t.Log("To see the Kind logs search for 'cluster.ProviderWithLogger' and uncomment it.")
+		}
+	}()
 	provider := cluster.NewProvider(
-		cluster.ProviderWithLogger(cmd.NewLogger()),
+	// Uncomment the next line to have Kind logs written to stderr.
+	// You will also have to import "sigs.k8s.io/kind/pkg/cmd"
+	// cluster.ProviderWithLogger(cmd.NewLogger()),
 	)
 
 	clusterName := fmt.Sprintf("test-cluster-%s", uid)
@@ -194,15 +203,28 @@ func startFlogInKubernetes(t *testing.T, tempDir string) (string, string, string
 	return kubeConfigPath, pod.Spec.NodeName, ""
 }
 
-// startFlogContainer starts a `mingrammer/flog` that logs one line every
+// startFlogDocker starts a `mingrammer/flog` that logs one line every
 // second. The container ID is returned and the container is stopped at the
 // end of the test. On error the test fails by calling t.Fatalf
-func startFlogContainer(t *testing.T) string {
+func startFlogDocker(t *testing.T) string {
 	ctx := t.Context()
 	img := "mingrammer/flog"
 	cli, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logp.NewNopLogger())
 	if err != nil {
 		t.Fatalf("cannot create Docker client: %s", err)
+	}
+
+	// Pull the image first
+	reader, err := cli.ImagePull(ctx, img, image.PullOptions{})
+	if err != nil {
+		t.Fatalf("cannot pull image %q: %s", img, err)
+	}
+	defer reader.Close()
+
+	// Wait for the pull to complete by reading the response
+	_, err = io.Copy(io.Discard, reader)
+	if err != nil {
+		t.Fatalf("error while pulling image %q: %s", img, err)
 	}
 
 	resp, err := cli.ContainerCreate(
