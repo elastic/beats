@@ -24,6 +24,7 @@ import (
 type mockStatusReporter struct {
 	mu       sync.Mutex
 	statuses []mgmtStatusUpdate
+	current  status.Status
 }
 
 type mgmtStatusUpdate struct {
@@ -42,7 +43,11 @@ func (r *mockStatusReporter) getStatuses() []mgmtStatusUpdate {
 func (r *mockStatusReporter) UpdateStatus(s status.Status, msg string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.statuses = append(r.statuses, mgmtStatusUpdate{status: s, msg: msg})
+	// Imitate behavior of statusReporterHelper. Only record if the new status is different.
+	if s != r.current {
+		r.current = s
+		r.statuses = append(r.statuses, mgmtStatusUpdate{status: s, msg: msg})
+	}
 }
 
 func TestGetProviderFromDomain(t *testing.T) {
