@@ -205,5 +205,6 @@ output.console:
 	mockbeat.Start()
 	mockbeat.WaitStdErrContains("mockbeat start running.", 10*time.Second)
 	metaFile2, err := mockbeat.LoadMeta()
+	require.NoError(t, err, "LoadMeta returned an error")
 	require.Equal(t, metaFile1.UUID.String(), metaFile2.UUID.String())
 }

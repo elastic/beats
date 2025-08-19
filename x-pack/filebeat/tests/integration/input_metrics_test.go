@@ -332,9 +332,10 @@ func makeServer() *httptest.Server {
 func randomPort(t *testing.T) string {
 	t.Helper()
 
-	listener, err := net.Listen("tcp", ":0")
+	listener, err := net.Listen("tcp", ":0") //nolint:gosec // It's ok on a test
 	require.NoError(t, err, "could not create nte.Listener to find a free port")
 	defer listener.Close()
 
+	//nolint:errcheck // It's a test
 	return strconv.Itoa(listener.Addr().(*net.TCPAddr).Port)
 }

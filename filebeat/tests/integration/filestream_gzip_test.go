@@ -432,6 +432,7 @@ logging.level: debug
 		eofLine,
 	)
 
+	//nolint:noctx // It's fine on a test
 	resp, err := http.Get("http://localhost:4242/inputs/")
 	require.NoError(t, err, "failed to get input metrics")
 	defer resp.Body.Close()
@@ -1274,7 +1275,7 @@ func waitForLatestOutput(t *testing.T, outputFilePattern string, tempDir string,
 		// missing information :/
 		writeMsg := func(format string, a ...any) {
 			msg.Reset()
-			msg.WriteString(fmt.Sprintf(format, a...))
+			fmt.Fprintf(msg, format, a...)
 		}
 		msg.Reset()
 

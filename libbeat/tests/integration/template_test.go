@@ -154,6 +154,7 @@ logging:
 
 	// prepare the config
 	pwd, err := os.Getwd()
+	require.NoError(t, err, "cannot get work directory")
 	path := filepath.Join(pwd, "../files/template.json")
 	esUrl := GetESURL(t, "http")
 	user := esUrl.User.Username()
@@ -240,13 +241,13 @@ logging:
 
 	refreshURL := FormatRefreshURL(t, esUrl)
 	require.NoError(t, err)
-	status, body, err = HttpDo(t, http.MethodPost, refreshURL)
+	status, _, err = HttpDo(t, http.MethodPost, refreshURL)
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, status, "incorrect http status")
 
 	searchURL, err := FormatDataStreamSearchURL(t, esUrl, datastream)
 	require.NoError(t, err)
-	status, body, err = HttpDo(t, http.MethodGet, searchURL)
+	_, body, err = HttpDo(t, http.MethodGet, searchURL)
 	require.NoError(t, err)
 	var results SearchResult
 	err = json.Unmarshal(body, &results)
@@ -300,7 +301,10 @@ logging:
 	}, 20*time.Second, 100*time.Millisecond, "looking for PublishEvents")
 
 	u := fmt.Sprintf("%s/_index_template/%s", esUrl.String(), datastream)
-	r, _ := http.Get(u)
+	r, err := http.Get(u) //nolint:gosec,noctx // It's a test
+	if err != nil {
+		defer r.Body.Close()
+	}
 	require.Equal(t, 404, r.StatusCode, "incorrect status code")
 }
 
@@ -429,16 +433,14 @@ setup:
 	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 
 	// check template didn't load
-	status, body, err := HttpDo(t, http.MethodGet, templateURL)
+	status, _, err := HttpDo(t, http.MethodGet, templateURL)
 	require.NoError(t, err)
 	require.Equal(t, http.StatusNotFound, status, "incorrect status code")
 
-	status, body, err = HttpDo(t, http.MethodGet, policyURL)
+	status, body, err := HttpDo(t, http.MethodGet, policyURL)
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, status, "incorrect status code")
-
 	require.Truef(t, strings.Contains(string(body), "max_primary_shard_size\":\"50gb"), "primary shard not found in %s", string(body))
-
 	require.Truef(t, strings.Contains(string(body), "max_age\":\"30d"), "max_age not found in %s", string(body))
 }
 
@@ -562,7 +564,7 @@ logging:
 	require.Truef(t, found, "data stream should be in: %v", r.IndexTemplates)
 
 	// check policy not created
-	status, body, err = HttpDo(t, http.MethodGet, policyURL)
+	status, _, err = HttpDo(t, http.MethodGet, policyURL)
 	require.NoError(t, err)
 	require.Equalf(t, http.StatusNotFound, status, "incorrect status code for: %s", policyURL.String())
 

@@ -99,7 +99,7 @@ func testLargeScaleFilestreamDelete(t *testing.T, timeout time.Duration, nFiles,
 		count := deletedCount.Load()
 		fmt.Fprintf(&buff, "%d", count)
 
-		return count == uint64(nFiles) // nolint:gosec // it is always positive
+		return count == uint64(nFiles) //nolint:gosec // it is always positive
 	}, timeout, time.Millisecond*100, "expecting %d deleted files, got: %s", nFiles, &buff)
 
 	t.Logf("Filebeat took %s to remove %d files", time.Since(fbStarted), nFiles)

@@ -102,7 +102,7 @@ func TestJournaldInputRunsAndRecoversFromJournalctlFailures(t *testing.T) {
 	}
 
 	pid := 0
-	fmt.Sscanf(logEntry.Message, "journalctl started with PID %d", &pid)
+	_, _ = fmt.Sscanf(logEntry.Message, "journalctl started with PID %d", &pid)
 
 	filebeat.WaitLogsContains("Count: 003", 5*time.Second, "did not find the third event in published events")
 
