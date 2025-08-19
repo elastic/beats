@@ -195,7 +195,10 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 		if err != nil {
 			in.log.Errorf("failed processing S3 event for object key %q in bucket %q: %v",
 				state.Key, state.Bucket, err.Error())
-			in.status.UpdateStatus(status.Degraded, fmt.Sprintf("S3 object processing failure: %s", err.Error()))
+			in.status.UpdateStatus(status.Degraded,
+				fmt.Sprintf(
+					"S3 object processing failure for object key '%s' in bucket '%s': %s",
+					state.Key, state.Bucket, err.Error()))
 			// Non-retryable error.
 			state.Failed = true
 		} else {
