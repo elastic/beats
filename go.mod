@@ -229,36 +229,20 @@ require (
 	go.opentelemetry.io/collector/pdata v1.36.0
 	go.opentelemetry.io/collector/receiver v1.36.0
 	go.uber.org/mock v0.5.0
-<<<<<<< HEAD
 	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8
-	golang.org/x/term v0.32.0
-=======
 	golang.org/x/term v0.34.0
->>>>>>> 97736493a (Fix file_integrity kprobe filters, use BTF values where possible (#45950))
 	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
-require (
-<<<<<<< HEAD
-=======
-	github.com/cilium/ebpf v0.16.0
-	go.opentelemetry.io/collector/client v1.36.0
-	go.opentelemetry.io/collector/pipeline v0.130.0
-	go.opentelemetry.io/collector/processor v1.36.0
-	go.opentelemetry.io/collector/processor/processorhelper v0.130.0
-	go.opentelemetry.io/collector/receiver/receivertest v0.130.0
-	go.opentelemetry.io/otel/sdk/metric v1.37.0
-)
+require cloud.google.com/go/compute/metadata v0.7.0 // indirect
 
 require (
->>>>>>> 97736493a (Fix file_integrity kprobe filters, use BTF values where possible (#45950))
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
 	cel.dev/expr v0.23.1 // indirect
 	cloud.google.com/go/auth v0.16.2 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
-	cloud.google.com/go/compute/metadata v0.7.0 // indirect
 	cloud.google.com/go/iam v1.5.2 // indirect
 	cloud.google.com/go/longrunning v0.6.7 // indirect
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
@@ -299,6 +283,7 @@ require (
 	github.com/bluekeyes/go-gitdiff v0.7.1 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.2 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
+	github.com/cilium/ebpf v0.16.0
 	github.com/cncf/xds/go v0.0.0-20250326154945-ae57f3c0d45f // indirect
 	github.com/containerd/containerd/v2 v2.1.0 // indirect
 	github.com/containerd/errdefs v1.0.0 // indirect
@@ -498,10 +483,6 @@ require (
 	go.uber.org/ratelimit v0.3.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-<<<<<<< HEAD
-=======
-	golang.org/x/exp v0.0.0-20250811191247-51f88131bc50 // indirect
->>>>>>> 97736493a (Fix file_integrity kprobe filters, use BTF values where possible (#45950))
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	gonum.org/v1/gonum v0.16.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250603155806-513f23925822 // indirect
