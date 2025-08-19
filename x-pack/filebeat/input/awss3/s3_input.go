@@ -184,7 +184,9 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 		if errors.Is(err, errS3DownloadFailed) {
 			// Download errors are ephemeral. Add a backoff delay, then skip to the
 			// next iteration so we don't mark the object as permanently failed.
-			in.status.UpdateStatus(status.Degraded, fmt.Sprintf("S3 download failure: %s", err.Error()))
+			in.status.UpdateStatus(status.Degraded,
+				fmt.Sprintf("S3 download failure for object key '%s' in bucket '%s': %s",
+					state.Key, state.Bucket, err.Error()))
 			rateLimitWaiter.Wait()
 			continue
 		}
