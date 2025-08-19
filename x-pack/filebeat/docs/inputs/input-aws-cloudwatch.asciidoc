@@ -144,7 +144,7 @@ Please see <<aws-credentials-config,AWS credentials options>> for more details.
 === AWS Permissions
 Specific AWS permissions are required for IAM user to access aws-cloudwatch:
 ----
-cloudwatchlogs:DescribeLogGroups
+logs:DescribeLogGroups
 logs:FilterLogEvents
 ----
 
