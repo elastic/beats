@@ -32,6 +32,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"github.com/elastic/beats/v7/libbeat/common/proc"
 )
 
 var (
@@ -120,7 +121,7 @@ func (b *RunningBeat) writeOutputLine(line string) {
 	b.watcher.Inspect(line)
 	if b.watcher.Observed() {
 		if !b.keepRunning {
-			_ = b.c.Process.Kill()
+			_ = proc.StopCmd(b.c.Process)
 		}
 		b.watcher = nil
 	}

@@ -28,25 +28,29 @@ import (
 )
 
 // AssertLastOffset takes path of the regsitry file and the expected offset
-// and asserts if the expected offset exists on regisry
-func AssertLastOffset(t *testing.T, path string, offset int) {
-	t.Helper()
+// and returns true if the expected offset exists on registry. Otherwise
+// false is returned. It will fail the test on any error reading/parsing
+// the registry file.
+func AssertLastOffset(t *testing.T, path string, offset int) bool {
 	entries, _ := readFilestreamRegistryLog(t, path)
 	lastEntry := entries[len(entries)-1]
 	if lastEntry.Offset != offset {
 		t.Errorf("expecting offset %d got %d instead", offset, lastEntry.Offset)
 		t.Log("last registry entries:")
 
+		l := len(entries)
 		max := len(entries)
 		if max > 10 {
 			max = 10
 		}
-		for _, e := range entries[:max] {
+		for _, e := range entries[l-max:] {
 			t.Logf("%+v\n", e)
 		}
 
-		t.FailNow()
+		return false
 	}
+
+	return true
 }
 
 type registryEntry struct {
