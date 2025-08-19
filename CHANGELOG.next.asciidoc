@@ -329,6 +329,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add status update functionality to Salesforce input. {issue}44653[44653] {pull}45227[45227]
 - Improve CEL and Streaming input documentation of the `state` option. {pull}45616[45616]
 - Clarify behavior in logging for starting periodic evaluations and for exceeding the maximum execution budget. {pull}45633[45633]
+- Add mechanism to allow HTTP JSON templates to terminate without logging an error. {issue}45664[45664] {pull}45810[45810]
 
 *Auditbeat*
 
