@@ -195,6 +195,11 @@ func GoFIPSOnlyIntegTest(ctx context.Context) error {
 	return devtools.GoIntegTestFromHost(ctx, args)
 }
 
+// GoWindowsIntegTest executes the Go windows integration tests.
+func GoWindowsIntegTest(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultGoWindowsTestIntegrationArgs())
+}
+
 // PythonIntegTest starts the docker containers and executes the Python integration tests.
 func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(Fields, Dashboards, devtools.BuildSystemTestBinary)
