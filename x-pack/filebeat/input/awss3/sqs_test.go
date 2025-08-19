@@ -348,6 +348,7 @@ func TestReadSQSMessagesStatusUpdates(t *testing.T) {
 
 	assert.Equal(t, status.Degraded, statuses[1].status)
 	assert.Contains(t, statuses[1].msg, "Retryable SQS fetching error for queue")
+	assert.Contains(t, statuses[1].msg, "fake connectivity issue")
 
 	assert.Equal(t, status.Running, statuses[2].status)
 	assert.Equal(t, "Input is running", statuses[2].msg)
