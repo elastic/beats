@@ -167,6 +167,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
 - Fix handling of unnecessary BOM in UTF-8 text received by o365audit input. {issue}44327[44327] {pull}45739[45739]
 - Restore the Streaming input on Windows. {pull}46031[46031]
+- Fix termination of input on API errors. {pull}45999[45999]
 
 *Heartbeat*
 
