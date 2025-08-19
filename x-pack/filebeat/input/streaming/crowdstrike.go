@@ -116,26 +116,13 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 	for {
 		state, err = s.followSession(ctx, cli, state)
 		if err != nil {
-<<<<<<< HEAD
-			if !errors.Is(err, Warning{}) {
-				if errors.Is(err, context.Canceled) {
-					return nil
-				}
-				s.metrics.errorsTotal.Inc()
-				return err
-			}
-			s.metrics.errorsTotal.Inc()
-=======
 			if errors.Is(err, context.Canceled) {
-				s.status.UpdateStatus(status.Stopping, "")
 				return nil
 			}
 			s.metrics.errorsTotal.Inc()
 			if errors.Is(err, hardError{}) {
 				return err
 			}
-			s.status.UpdateStatus(status.Degraded, err.Error())
->>>>>>> 6f02d0104 (x-pack/filebeat/input/streaming: don't exit on API request errors (#45999))
 			s.log.Warnw("session warning", "error", err)
 		}
 	}
@@ -156,12 +143,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		var buf bytes.Buffer
 		io.Copy(&buf, resp.Body)
 		s.log.Errorw("unsuccessful request", "status_code", resp.StatusCode, "status", resp.Status, "body", buf.String())
-<<<<<<< HEAD
-		err := fmt.Errorf("unsuccessful request: %s: %s", resp.Status, &buf)
-		return nil, err
-=======
 		return nil, fmt.Errorf("unsuccessful request: %s: %s", resp.Status, &buf)
->>>>>>> 6f02d0104 (x-pack/filebeat/input/streaming: don't exit on API request errors (#45999))
 	}
 
 	dec := json.NewDecoder(resp.Body)
@@ -282,14 +264,9 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
 			if err != nil {
 				s.log.Errorw("failed to process and publish data", "error", err)
-<<<<<<< HEAD
-				return nil, err
-=======
-				s.status.UpdateStatus(status.Failed, "failed to process and publish data: "+err.Error())
 				// Fail the input so that we do not attempt to progress
 				// while dropping data on the floor.
 				return nil, hardError{err}
->>>>>>> 6f02d0104 (x-pack/filebeat/input/streaming: don't exit on API request errors (#45999))
 			}
 		}
 	}
