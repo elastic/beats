@@ -65,7 +65,7 @@ func TestJournaldInputRunsAndRecoversFromJournalctlFailures(t *testing.T) {
 	}
 
 	pid := 0
-	fmt.Sscanf(logEntry.Message, "journalctl started with PID %d", &pid)
+	fmt.Sscanf(logEntry.Message, "journalctl started with PID %d", &pid) ///nolint:errcheck
 	filebeat.WaitPublishedEvents(5*time.Second, 3)
 
 	// Kill journalctl
