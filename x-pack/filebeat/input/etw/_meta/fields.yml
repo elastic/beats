@@ -21,6 +21,8 @@
         - name: activity_id_name
           type: keyword
           required: false
+          version:
+            ga: 9.2.0
           description: >
             The name of the activity that is associated with the activity_id.
             This is typically used to provide a human-readable name for the
@@ -55,6 +57,8 @@
         - name: flags_raw
           type: keyword
           required: false
+          version:
+            ga: 9.2.0
           description: >
             The bitmap of flags that provide information about the event such as the
             type of session it was logged to and if the event contains extended data.
@@ -71,9 +75,11 @@
         - name: keywords_raw
           type: keyword
           required: false
+          version:
+            ga: 9.2.0
           description: >
             The bitmap of keywords that are used to indicate an event's membership
-            in a set of event categories. 
+            in a set of event categories.
 
         - name: level
           type: keyword
@@ -84,6 +90,8 @@
         - name: level_raw
           type: long
           required: false
+          version:
+            ga: 9.2.0
           description: >
             Numeric value of the level of severity. Level values 0 through 5 are
             defined by Microsoft. Level values 6 through 15 are reserved. Level
@@ -100,6 +108,8 @@
         - name: opcode_raw
           type: long
           required: false
+          version:
+            ga: 9.2.0
           description: >
             Numeric value of the opcode defined in the event. This is used to
             identify the location in the application from where the event was
@@ -114,6 +124,8 @@
         - name: provider
           type: keyword
           required: false
+          version:
+            ga: 9.2.0
           description: >
             The source of the event log record (the application or service that
             logged the record).
@@ -128,6 +140,8 @@
         - name: provider_message
           type: keyword
           required: false
+          version:
+            ga: 9.2.0
           description: >
             The message that is associated with the provider. This is typically
             used to provide a human-readable name for the provider.
@@ -135,6 +149,8 @@
         - name: related_activity_id_name
           type: keyword
           required: false
+          version:
+            ga: 9.2.0
           description: >
             The name of the related activity.
 
@@ -161,6 +177,8 @@
         - name: task_raw
           type: long
           required: false
+          version:
+            ga: 9.2.0
           description: >
             Numeric value of the task defined in the event. This is used to
             identify the location in the application from where the event was
