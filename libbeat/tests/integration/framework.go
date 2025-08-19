@@ -1107,7 +1107,7 @@ func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
 }
 
 func reportErrors(t *testing.T, tempDir string, beatName string) {
-	var maxlen int64 = 2048
+	var maxlen int64 = 100 * 1024 // 100 KiB
 	stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
 	if err != nil {
 		t.Logf("error reading stderr: %s", err)
@@ -1293,7 +1293,7 @@ func StartMockES(
 	require.Eventually(
 		t,
 		func() bool {
-			resp, err := http.Get(serverURL) //nolint: noctx // It's just a test
+			resp, err := http.Get(serverURL) //nolint:gosec,noctx // It's just a test
 			if err != nil {
 				return false
 			}
