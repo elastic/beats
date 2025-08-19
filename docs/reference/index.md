@@ -11,28 +11,35 @@ mapped_pages:
 {{beats}} are open source data shippers that you install as agents on your servers to send operational data to [{{es}}](https://www.elastic.co/products/elasticsearch). Elastic provides {{beats}} for capturing:
 
 Audit data
-:   [Auditbeat](https://www.elastic.co/products/beats/auditbeat)
+:   [Auditbeat overview](https://www.elastic.co/products/beats/auditbeat)
+:   [Auditbeat documentation](/reference/auditbeat/index.md)
 
 Log files and journals
-:   [Filebeat](https://www.elastic.co/products/beats/filebeat)
+:   [Filebeat overview](https://www.elastic.co/products/beats/filebeat)
+:   [Filebeat documentation](/reference/filebeat/index.md)
 
 Availability
-:   [Heartbeat](https://www.elastic.co/products/beats/heartbeat)
+:   [Heartbeat overview](https://www.elastic.co/products/beats/heartbeat)
+:   [Heartbeat documentation](/reference/heartbeat/index.md)
 
 Metrics
-:   [Metricbeat](https://www.elastic.co/products/beats/metricbeat)
+:   [Metricbeat overview](https://www.elastic.co/products/beats/metricbeat)
+:   [Metricbeat documentation](/reference/metricbeat/index.md)
 
 Network traffic
-:   [Packetbeat](https://www.elastic.co/products/beats/packetbeat)
+:   [Packetbeat overview](https://www.elastic.co/products/beats/packetbeat)
+:   [Packetbeat documentation](/reference/packetbeat/index.md)
 
 Windows event logs
-:   [Winlogbeat](https://www.elastic.co/products/beats/winlogbeat)
+:   [Winlogbeat overview](https://www.elastic.co/products/beats/winlogbeat)
+:   [Winlogbeat documentation](/reference/winlogbeat/index.md)
 
-{{beats}} can send data directly to {{es}} or via [{{ls}}](https://www.elastic.co/products/logstash), where you can further process and enhance the data, before visualizing it in [{{kib}}](https://www.elastic.co/products/logstash).
+
+{{beats}} can send data directly to {{es}} or through [{{ls}}](https://www.elastic.co/products/logstash), where you can further process and enhance the data, before visualizing it in [{{kib}}](https://www.elastic.co/products/logstash).
 
 ![Beats Platform](libbeat/images/beats-platform.png)
 
-Want to get up and running quickly with infrastructure metrics monitoring and centralized log analytics? Try out the {{metrics-app}} and the {{logs-app}} in {{kib}}. For more details, see [Analyze metrics](docs-content://solutions/observability/infra-and-hosts/analyze-infrastructure-host-metrics.md) and [Monitor logs](docs-content://solutions/observability/logs/explore-logs.md).
+Want to get up and running quickly with infrastructure metrics monitoring and centralized log analytics? Try out the {{metrics-app}} and the {{logs-app}} in {{kib}}. For more details, check out [Analyze metrics](docs-content://solutions/observability/infra-and-hosts/analyze-infrastructure-host-metrics.md) and [Monitor logs](docs-content://solutions/observability/logs/explore-logs.md).
 
 
 ## Need to capture other kinds of data? [_need_to_capture_other_kinds_of_data]
