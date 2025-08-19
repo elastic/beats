@@ -9,12 +9,12 @@ mapped_pages:
 
 | Data | {{beats}} |
 | --- | --- |
-| Audit data | [Auditbeat](https://www.elastic.co/products/beats/auditbeat) |
-| Log files and journals | [Filebeat](https://www.elastic.co/products/beats/filebeat) |
-| Availability | [Heartbeat](https://www.elastic.co/products/beats/heartbeat) |
-| Metrics | [Metricbeat](https://www.elastic.co/products/beats/metricbeat) |
-| Network traffic | [Packetbeat](https://www.elastic.co/products/beats/packetbeat) |
-| Windows event logs | [Winlogbeat](https://www.elastic.co/products/beats/winlogbeat) |
+| Audit data | [Auditbeat overview](https://www.elastic.co/products/beats/auditbeat) <br> [Auditbeat documentation](/reference/auditbeat/index.md) |
+| Log files and journals | [Filebeat overview](https://www.elastic.co/products/beats/filebeat) <br> [Filebeat documentation](/reference/filebeat/index.md) |
+| Availability | [Heartbeat overview](https://www.elastic.co/products/beats/heartbeat)  <br> [Heartbeat documentation](/reference/heartbeat/index.md) |
+| Metrics | [Metricbeat overview](https://www.elastic.co/products/beats/metricbeat) <br> [Metricbeat documentation](/reference/metricbeat/index.md) |
+| Network traffic | [Packetbeat overview](https://www.elastic.co/products/beats/packetbeat) <br> [Packetbeat documentation](/reference/packetbeat/index.md) |
+| Windows event logs | [Winlogbeat overview](https://www.elastic.co/products/beats/winlogbeat) <br> [Winlogbeat documentation](/reference/winlogbeat/index.md) |
 
 {{beats}} can send data to {{es}} directly or through {{ls}}, where you can further process and enhance the data before visualizing it in {{kib}}.
 
