@@ -123,6 +123,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
 - Fix handling of unnecessary BOM in UTF-8 text received by o365audit input. {issue}44327[44327] {pull}45739[45739]
 - Restore the Streaming input on Windows. {pull}46031[46031]
+- Fix termination of input on API errors. {pull}45999[45999]
 
 *Heartbeat*
 
