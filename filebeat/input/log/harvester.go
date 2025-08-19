@@ -180,7 +180,7 @@ func (h *Harvester) open() error {
 	case harvester.LogType, harvester.DockerType, harvester.ContainerType:
 		return h.openFile()
 	default:
-		return fmt.Errorf("Invalid harvester type: %+v", h.config)
+		return fmt.Errorf("invalid harvester type: %+v", h.config)
 	}
 }
 
@@ -446,7 +446,7 @@ func (h *Harvester) onMessage(
 	// Check if json fields exist
 	var jsonFields mapstr.M
 	if f, ok := fields["json"]; ok {
-		jsonFields = f.(mapstr.M)
+		jsonFields, _ = f.(mapstr.M)
 	}
 
 	var meta mapstr.M

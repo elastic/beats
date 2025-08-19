@@ -100,16 +100,24 @@ func NewQueueObserver(metrics *monitoring.Registry) Observer {
 }
 
 func (ob *queueObserver) MaxEvents(value int) {
-	ob.maxEvents.Set(uint64(value))
+	if value >= 0 {
+		ob.maxEvents.Set(uint64(value))
+	}
 }
 
 func (ob *queueObserver) MaxBytes(value int) {
-	ob.maxBytes.Set(uint64(value))
+	if value >= 0 {
+		ob.maxBytes.Set(uint64(value))
+	}
 }
 
 func (ob *queueObserver) Restore(eventCount int, byteCount int) {
-	ob.filledEvents.Set(uint64(eventCount))
-	ob.filledBytes.Set(uint64(byteCount))
+	if eventCount >= 0 {
+		ob.filledEvents.Set(uint64(eventCount))
+	}
+	if byteCount >= 0 {
+		ob.filledBytes.Set(uint64(byteCount))
+	}
 	ob.updateFilledPct()
 }
 
