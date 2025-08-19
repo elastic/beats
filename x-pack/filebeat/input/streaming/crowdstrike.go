@@ -302,7 +302,7 @@ type hardError struct {
 	error
 }
 
-// Is returns true if target is a Warning.
+// Is returns true if target is a hardError.
 func (e hardError) Is(target error) bool {
 	_, ok := target.(hardError)
 	return ok
