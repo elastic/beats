@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -74,7 +75,7 @@ func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Vali
 
 	c, err := pipel.Connect()
 	require.NoError(t, err)
-	mon, err := newMonitor(conf, reg, c, sched.Add, nil, nil)
+	mon, err := newMonitor(context.Background(), conf, reg, c, sched.Add, nil, nil)
 	require.NoError(t, err)
 
 	mon.Start()
@@ -123,7 +124,7 @@ func TestCheckInvalidConfig(t *testing.T) {
 
 	c, err := pipel.Connect()
 	require.NoError(t, err)
-	m, err := newMonitor(serverMonConf, reg, c, sched.Add, nil, nil)
+	m, err := newMonitor(context.Background(), serverMonConf, reg, c, sched.Add, nil, nil)
 	require.Error(t, err)
 	// This could change if we decide the contract for newMonitor should always return a monitor
 	require.Nil(t, m, "For this test to work we need a nil value for the monitor.")
@@ -161,7 +162,7 @@ func TestStatusReporter(t *testing.T) {
 	mockDegradedPluginFactory := plugin.PluginFactory{
 		Name:    "fail",
 		Aliases: []string{"failAlias"},
-		Make: func(s string, cfg *conf.C) (plugin.Plugin, error) {
+		Make: func(s string, _ context.Context, cfg *conf.C) (plugin.Plugin, error) {
 			return plugin.Plugin{}, fmt.Errorf("error plugin")
 		},
 		Stats: plugin.NewPluginCountersRecorder("fail", monReg),
@@ -173,7 +174,7 @@ func TestStatusReporter(t *testing.T) {
 
 	c, err := pipel.Connect()
 	require.NoError(t, err)
-	m, err := newMonitor(cfg, reg, c, sched.Add, nil, nil)
+	m, err := newMonitor(context.Background(), cfg, reg, c, sched.Add, nil, nil)
 	require.NoError(t, err)
 
 	// Track status marked as failed during run_once execution
