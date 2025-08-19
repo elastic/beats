@@ -143,12 +143,6 @@ func TestJournaldLargeLines(t *testing.T) {
 		}
 	}()
 
-	defer func() {
-		if t.Failed() {
-			t.Logf("Syslog ID: %q", syslogID)
-		}
-	}()
-
 	filebeat.WriteConfigFile(yamlCfg)
 	filebeat.Start()
 
