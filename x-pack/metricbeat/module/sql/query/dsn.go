@@ -31,7 +31,10 @@ type ConnectionDetails struct {
 const mysqlTLSConfigKey = "custom"
 
 // ParseDSN tries to parse the host
-func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
+func ParseDSN(mod mb.Module, host string) (_ mb.HostData, fetchErr error) {
+	defer func() {
+		fetchErr = sanitizeError(fetchErr, host)
+	}()
 
 	logger := logp.NewLogger("")
 	// At the time of writing, mod always is of type *mb.BaseModule.

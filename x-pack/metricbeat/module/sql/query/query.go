@@ -146,7 +146,11 @@ func dbSelector(driver, dbName string) string {
 	return ""
 }
 
-func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.ReporterV2, queries []query) (bool, error) {
+func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.ReporterV2, queries []query) (_ bool, fetchErr error) {
+	defer func() {
+		fetchErr = sanitizeError(fetchErr, m.HostData().URI)
+	}()
+
 	var ok bool
 	merged := make(mapstr.M, 0)
 	storeQueries := make([]string, 0, len(queries))
