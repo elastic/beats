@@ -83,6 +83,34 @@ func TestSanitizeError(t *testing.T) {
 			expectedErr:  "cannot open connection: testing connection: parse (redacted): net/url: invalid userinfo",
 			expectNilErr: false,
 		},
+		{
+			name:         "Pattern-based password sanitization in connection string",
+			err:          errors.New("Failed to connect: Server=localhost;Database=myDB;User Id=admin;Password=secret123;"),
+			sensitive:    "",
+			expectedErr:  "Failed to connect: Server=localhost;Database=myDB;User Id=admin;Password=(redacted);",
+			expectNilErr: false,
+		},
+		{
+			name:         "Pattern-based URL auth sanitization",
+			err:          errors.New("Connection failed for postgres://user:mypassword@localhost:5432/db"),
+			sensitive:    "",
+			expectedErr:  "Connection failed for postgres://user:(redacted)@localhost:5432/db",
+			expectNilErr: false,
+		},
+		{
+			name:         "URL-encoded sensitive data",
+			err:          errors.New("Failed to parse: secret%40123"),
+			sensitive:    "secret@123",
+			expectedErr:  "Failed to parse: (redacted)",
+			expectNilErr: false,
+		},
+		{
+			name:         "Multiple password patterns",
+			err:          errors.New("pwd=test123 failed, also PASS=another456 failed"),
+			sensitive:    "",
+			expectedErr:  "pwd=(redacted) failed, also PASS=(redacted) failed",
+			expectNilErr: false,
+		},
 	}
 
 	for _, test := range tests {
