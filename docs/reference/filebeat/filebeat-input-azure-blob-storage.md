@@ -134,7 +134,7 @@ $$$supported-attributes$$$
 12. [file_selectors](#attrib-file_selectors)
 13. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
 14. [timestamp_epoch](#attrib-timestamp_epoch)
-15. [path_prefix](#attrib-path_prefix)
+15. [path_prefix](#attrib-path_prefix) {applies_to}`stack: ga 9.2.0`
 16. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.1.0`
 
 ## `account_name` [attrib-account-name]
@@ -346,6 +346,10 @@ filebeat.inputs:
 The Azure Blob Storage APIs don’t provide a direct way to filter files based on timestamp, so the input will download all the files and then filter them based on the timestamp. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available.
 
 ## `path_prefix` [attrib-path_prefix]
+
+```{applies_to}
+stack: ga 9.2.0
+```
 
 This attribute can be used to filter out files or blobs that have a prefix string that is different from the specified value. This allows you to efficiently retrieve a subset of blobs that are organized in a virtual folder-like structure. This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority over the root level values if both are specified.
 
