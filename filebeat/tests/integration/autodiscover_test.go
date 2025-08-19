@@ -17,7 +17,7 @@
 
 //This file was contributed to by generative AI
 
-//go:build integration
+//go:build integration && !requirefips
 
 package integration
 
