@@ -27,7 +27,7 @@ import (
 	"time"
 )
 
-// AssertLastOffset takes path of the regsitry file and the expected offset
+// AssertLastOffset takes path of the registry file and the expected offset
 // and returns true if the expected offset exists on registry. Otherwise
 // false is returned. It will fail the test on any error reading/parsing
 // the registry file.
