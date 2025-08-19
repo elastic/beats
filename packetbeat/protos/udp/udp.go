@@ -169,7 +169,7 @@ func newInputMetrics(id, device string, ports map[uint16]protos.Protocol) *input
 		processingTime: metrics.NewUniformSample(1024),
 	}
 
-	// TODO: use local logger
+	// TODO: https://github.com/elastic/ingest-dev/issues/6000
 	_ = adapter.NewGoMetrics(reg, "arrival_period", logp.NewLogger(""), adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
 	_ = adapter.NewGoMetrics(reg, "processing_time", logp.NewLogger(""), adapter.Accept).
