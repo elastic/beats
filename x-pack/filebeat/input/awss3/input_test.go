@@ -19,9 +19,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-// mockStatusReporter is a thread-safe mock of a status reporter that
-// records all status updates.
-type mockStatusReporter struct {
+// statusReporterHelperMock is a thread-safe mock of a status reporter that
+// behaves like StatusReporterHelper
+type statusReporterHelperMock struct {
 	mu       sync.Mutex
 	statuses []mgmtStatusUpdate
 	current  status.Status
@@ -32,7 +32,7 @@ type mgmtStatusUpdate struct {
 	msg    string
 }
 
-func (r *mockStatusReporter) getStatuses() []mgmtStatusUpdate {
+func (r *statusReporterHelperMock) getStatuses() []mgmtStatusUpdate {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	s := make([]mgmtStatusUpdate, len(r.statuses))
@@ -40,7 +40,7 @@ func (r *mockStatusReporter) getStatuses() []mgmtStatusUpdate {
 	return s
 }
 
-func (r *mockStatusReporter) UpdateStatus(s status.Status, msg string) {
+func (r *statusReporterHelperMock) UpdateStatus(s status.Status, msg string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	// Imitate behavior of statusReporterHelper. Only record if the new status is different.
@@ -188,7 +188,7 @@ func TestRegionSelection(t *testing.T) {
 				MetricsRegistry: monitoring.NewRegistry(),
 			}
 
-			in.status = &mockStatusReporter{}
+			in.status = &statusReporterHelperMock{}
 			// Run setup and verify that it put the correct region in awsConfig.Region
 			err := in.setup(inputCtx, &fakePipeline{})
 			in.cleanup()

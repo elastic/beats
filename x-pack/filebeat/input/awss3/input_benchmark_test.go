@@ -223,7 +223,7 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 		config.NumberOfWorkers = workerCount
 		sqsReader := newSQSReaderInput(config, aws.Config{})
 		sqsReader.log = log.Named("sqs")
-		sqsReader.status = &mockStatusReporter{}
+		sqsReader.status = &statusReporterHelperMock{}
 		sqsReader.pipeline = newFakePipeline()
 		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), workerCount)
 		sqsReader.sqs, err = newConstantSQS()
@@ -352,7 +352,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 					states:          states,
 					provider:        "provider",
 					filterProvider:  newFilterProvider(&config),
-					status:          &mockStatusReporter{},
+					status:          &statusReporterHelperMock{},
 				}
 
 				s3Poller.run(ctx)

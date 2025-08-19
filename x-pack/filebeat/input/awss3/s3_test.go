@@ -149,7 +149,7 @@ func TestS3Poller(t *testing.T) {
 			provider:        "provider",
 			metrics:         newInputMetrics(monitoring.NewRegistry(), 0),
 			filterProvider:  newFilterProvider(&cfg),
-			status:          &mockStatusReporter{},
+			status:          &statusReporterHelperMock{},
 		}
 		poller.runPoll(ctx)
 	})
@@ -298,7 +298,7 @@ func TestS3Poller(t *testing.T) {
 			provider:        "provider",
 			metrics:         newInputMetrics(monitoring.NewRegistry(), 0),
 			filterProvider:  newFilterProvider(&cfg),
-			status:          &mockStatusReporter{},
+			status:          &statusReporterHelperMock{},
 		}
 		poller.run(ctx)
 	})
@@ -529,7 +529,7 @@ func Test_S3StateHandling(t *testing.T) {
 				states:          s3States,
 				metrics:         newInputMetrics(monitoring.NewRegistry(), 0),
 				filterProvider:  newFilterProvider(test.config),
-				status:          &mockStatusReporter{},
+				status:          &statusReporterHelperMock{},
 			}
 
 			// when - run polling for desired time
