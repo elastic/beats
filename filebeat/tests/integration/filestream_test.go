@@ -505,6 +505,66 @@ logging:
 	requireRegistryEntryRemoved(t, workDir, "native")
 }
 
+func TestFilestreamDefaultRegistryTTL(t *testing.T) {
+	cfg := `
+filebeat.inputs:
+  - type: filestream
+    id: filestream-id
+    paths:
+      - %s
+
+queue.mem:
+  flush.timeout: 0s
+
+path.home: %s
+
+output.file:
+  path: ${path.home}
+  filename: "output-file"
+  rotate_on_startup: false
+
+logging:
+  level: debug
+`
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	tempDir := filebeat.TempDir()
+	logFilePath := path.Join(tempDir, "input_log.log")
+	outputFile := filepath.Join(tempDir, "output-file*")
+
+	// > 1kb in total to trigger default fingerprinting
+	numEvents := 30
+
+	integration.GenerateLogFile(t, logFilePath, numEvents, false)
+
+	filebeat.WriteConfigFile(fmt.Sprintf(cfg, logFilePath, tempDir))
+	filebeat.Start()
+
+	filebeat.WaitForLogs(
+		fmt.Sprintf("A new file %s has been found", logFilePath),
+		10*time.Second,
+		"Filebeat did not start looking for files to ingest")
+
+	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePath)
+	filebeat.WaitForLogs(eofMsg, 10*time.Second, "EOF was not reached")
+
+	requirePublishedEvents(t, filebeat, numEvents, outputFile)
+
+	// Read the registry log file and check the TTL
+	registryLogFile := filepath.Join(tempDir, "data", "registry", "filebeat", "log.json")
+	entries := readFilestreamRegistryLog(t, registryLogFile)
+	require.GreaterOrEqual(t, len(entries), 1, "No registry entries found")
+	firstEntry := entries[0]
+
+	expectedTTL := time.Duration(-1)
+	assert.Equal(t, expectedTTL, firstEntry.TTL,
+		"Registry entry TTL should be -1 by default, but got %v", firstEntry.TTL)
+}
+
 func requireRegistryEntryRemoved(t *testing.T, workDir, identity string) {
 	t.Helper()
 
