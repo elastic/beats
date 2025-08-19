@@ -58,23 +58,23 @@ type GoMetricsRegistry struct {
 //
 //	it's recommended to have the underlying registry being generated with
 //	`monitoring.IgnorePublishExpvar`.
-func GetGoMetrics(parent *monitoring.Registry, name string, filters ...MetricFilter) *GoMetricsRegistry {
+func GetGoMetrics(parent *monitoring.Registry, name string, logger *logp.Logger, filters ...MetricFilter) *GoMetricsRegistry {
 	v := parent.Get(name)
 	if v == nil {
-		return NewGoMetrics(parent, name, filters...)
+		return NewGoMetrics(parent, name, logger, filters...)
 	}
-	return newGoMetrics(v.(*monitoring.Registry), filters...) //nolint:errcheck //code depends on panic
+	return newGoMetrics(v.(*monitoring.Registry), logger, filters...) //nolint:errcheck //code depends on panic
 }
 
 // NewGoMetrics creates and registers a new GoMetricsRegistry with the parent
 // registry.
-func NewGoMetrics(parent *monitoring.Registry, name string, filters ...MetricFilter) *GoMetricsRegistry {
-	return newGoMetrics(parent.NewRegistry(name, monitoring.IgnorePublishExpvar), filters...)
+func NewGoMetrics(parent *monitoring.Registry, name string, logger *logp.Logger, filters ...MetricFilter) *GoMetricsRegistry {
+	return newGoMetrics(parent.NewRegistry(name, monitoring.IgnorePublishExpvar), logger, filters...)
 }
 
-func newGoMetrics(reg *monitoring.Registry, filters ...MetricFilter) *GoMetricsRegistry {
+func newGoMetrics(reg *monitoring.Registry, logger *logp.Logger, filters ...MetricFilter) *GoMetricsRegistry {
 	return &GoMetricsRegistry{
-		log:     logp.NewLogger("monitoring"),
+		log:     logger.Named("monitoring"),
 		reg:     reg,
 		shadow:  metrics.NewRegistry(),
 		filters: makeFilters(filters...),

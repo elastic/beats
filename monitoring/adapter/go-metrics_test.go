@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -53,7 +54,7 @@ func TestGoMetricsAdapter(t *testing.T) {
 	}
 
 	monReg := monitoring.NewRegistry()
-	var reg metrics.Registry = GetGoMetrics(monReg, "test", filters...)
+	var reg metrics.Registry = GetGoMetrics(monReg, "test", logp.NewNopLogger(), filters...)
 
 	// register some metrics and check they're satisfying the go-metrics interface
 	// no matter if owned by monitoring or go-metrics
@@ -116,8 +117,8 @@ func TestGoMetricsHistogramClearOnVisit(t *testing.T) {
 	monReg := monitoring.NewRegistry()
 	histogramSample := metrics.NewUniformSample(10)
 	clearedHistogramSample := metrics.NewUniformSample(10)
-	_ = NewGoMetrics(monReg, "original", Accept).Register("histogram", metrics.NewHistogram(histogramSample))
-	_ = NewGoMetrics(monReg, "cleared", Accept).Register("histogram", NewClearOnVisitHistogram(clearedHistogramSample))
+	_ = NewGoMetrics(monReg, "original", logp.NewNopLogger(), Accept).Register("histogram", metrics.NewHistogram(histogramSample))
+	_ = NewGoMetrics(monReg, "cleared", logp.NewNopLogger(), Accept).Register("histogram", NewClearOnVisitHistogram(clearedHistogramSample))
 	dataPoints := [...]int{2, 4, 8, 4, 2}
 	dataPointsMedian := 4.0
 	for _, i := range dataPoints {

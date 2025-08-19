@@ -340,7 +340,7 @@ func (l *Logger) DPanicw(msg string, keysAndValues ...interface{}) {
 func (l *Logger) Recover(msg string) {
 	if r := recover(); r != nil {
 		msg := fmt.Sprintf("%s. Recovering, but please report this.", msg)
-		l.Error(msg, zap.Any("panic", r), zap.Stack("stack"))
+		l.WithOptions(zap.AddCallerSkip(1)).Error(msg, zap.Any("panic", r), zap.Stack("stack"))
 	}
 }
 
