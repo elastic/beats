@@ -32,6 +32,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+
 	"github.com/elastic/beats/v7/libbeat/common/proc"
 )
 
