@@ -1,13 +1,15 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-installation-script.html
-applies_to:
-  stack: ga 9.0.6
 ---
+
+This page applies to:
+ - 9.0.6 for versions >= 9.0.0 and < 9.1.0.
+ - 9.1.0 for versions >= 9.1.0.
 
 # Installation script
 The installation script, `install-service-metricbeat.ps1` is responsible
-for creating the Windows Service for Metricbeat. Starting in 9.0.6, the
+for creating the Windows Service for Metricbeat. The
 base folder has changed from `C:\ProgramData\` to  `C:\Program Files\`
 because the latter has stricter permissions, therefore the home path
 (base for state and logs) is now `C:\Program Files\Metricbeat-Data`.
@@ -33,3 +35,7 @@ If there is a permission error when the installation script is moving
 the folder, ensure the user running the script has enough permissions
 to do so. If the problem persists, the folder can be moved manually,
 then the installation script can be executed again.
+
+If the script still cannot move the files, you can manually move
+`C:\ProgramData\metricbeat` to `C:\Program Files\Metricbeat-Data`
+and run the install script again.
