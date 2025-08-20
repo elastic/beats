@@ -262,10 +262,6 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 }
 
 func TestBenchmarkInputSQS(t *testing.T) {
-<<<<<<< HEAD
-	logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
-=======
->>>>>>> 3ec4a35ae (feat: add status reporting to S3 (#45748))
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputSQS(t, 1),
@@ -395,10 +391,6 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 }
 
 func TestBenchmarkInputS3(t *testing.T) {
-<<<<<<< HEAD
-	logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
-=======
->>>>>>> 3ec4a35ae (feat: add status reporting to S3 (#45748))
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputS3(t, 1),

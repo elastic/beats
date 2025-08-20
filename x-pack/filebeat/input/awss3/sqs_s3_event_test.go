@@ -26,14 +26,7 @@ import (
 )
 
 func TestSQSS3EventProcessor(t *testing.T) {
-<<<<<<< HEAD
-	logp.TestingSetup()
-
 	msg := newSQSMessage(newS3Event("log.json"))
-=======
-	msg, err := newSQSMessage(newS3Event("log.json"))
-	require.NoError(t, err)
->>>>>>> 3ec4a35ae (feat: add status reporting to S3 (#45748))
 
 	t.Run("s3 events are processed and sqs msg is deleted", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
@@ -223,10 +216,6 @@ func TestSqsProcessor_keepalive(t *testing.T) {
 }
 
 func TestSqsProcessor_getS3Notifications(t *testing.T) {
-<<<<<<< HEAD
-	logp.TestingSetup()
-=======
->>>>>>> 3ec4a35ae (feat: add status reporting to S3 (#45748))
 
 	p := newSQSS3EventProcessor(logptest.NewTestingLogger(t, inputName), nil, nil, nil, time.Minute, 5, nil, &statusReporterHelperMock{})
 

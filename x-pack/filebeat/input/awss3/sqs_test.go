@@ -33,10 +33,6 @@ var (
 )
 
 func TestSQSReceiver(t *testing.T) {
-<<<<<<< HEAD
-	logp.TestingSetup()
-=======
->>>>>>> 3ec4a35ae (feat: add status reporting to S3 (#45748))
 
 	const workerCount = 5
 
@@ -159,10 +155,6 @@ func TestSQSReceiver(t *testing.T) {
 }
 
 func TestGetApproximateMessageCount(t *testing.T) {
-<<<<<<< HEAD
-	logp.TestingSetup()
-=======
->>>>>>> 3ec4a35ae (feat: add status reporting to S3 (#45748))
 
 	const count = 500
 	attrName := []types.QueueAttributeName{sqsApproximateNumberOfMessages}
