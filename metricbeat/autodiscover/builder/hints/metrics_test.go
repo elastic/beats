@@ -25,16 +25,25 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestMain(m *testing.M) {
-	InitializeModule()
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		os.Exit(1)
+	}
+	reg := autodiscover.NewRegistry(logger)
+	if err := Setup(reg); err != nil {
+		os.Exit(1)
+	}
 
 	os.Exit(m.Run())
 }
@@ -738,7 +747,6 @@ func NewMockMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 func (ms *MockMetricSet) Fetch(report mb.ReporterV2) {
-
 }
 
 type MockPrometheus struct {

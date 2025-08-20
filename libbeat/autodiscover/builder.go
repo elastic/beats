@@ -46,7 +46,7 @@ type Builders struct {
 type BuilderConstructor func(c *config.C, logger *logp.Logger) (Builder, error)
 
 // AddBuilder registers a new BuilderConstructor
-func (r *registry) AddBuilder(name string, builder BuilderConstructor) error {
+func (r *Registry) AddBuilder(name string, builder BuilderConstructor) error {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 
@@ -69,7 +69,7 @@ func (r *registry) AddBuilder(name string, builder BuilderConstructor) error {
 }
 
 // GetBuilder returns the provider with the giving name, nil if it doesn't exist
-func (r *registry) GetBuilder(name string) BuilderConstructor {
+func (r *Registry) GetBuilder(name string) BuilderConstructor {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 
@@ -78,7 +78,7 @@ func (r *registry) GetBuilder(name string) BuilderConstructor {
 }
 
 // BuildBuilder reads provider configuration and instantiate one
-func (r *registry) BuildBuilder(c *config.C) (Builder, error) {
+func (r *Registry) BuildBuilder(c *config.C) (Builder, error) {
 	var config BuilderConfig
 	err := c.Unpack(&config)
 	if err != nil {
@@ -121,6 +121,7 @@ func NewBuilders(
 	bConfigs []*config.C,
 	hintsCfg *config.C,
 	keystoreProvider bus.KeystoreProvider,
+	registry *Registry,
 ) (Builders, error) {
 	var builders Builders
 	if hintsCfg.Enabled() {
@@ -137,7 +138,7 @@ func NewBuilders(
 	}
 
 	for _, bcfg := range bConfigs {
-		builder, err := Registry.BuildBuilder(bcfg)
+		builder, err := registry.BuildBuilder(bcfg)
 		if err != nil {
 			return Builders{}, err
 		}

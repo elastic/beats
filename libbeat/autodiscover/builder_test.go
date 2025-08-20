@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-ucfg"
 )
 
@@ -41,7 +42,8 @@ func newFakeBuilder(_ *conf.C, logger *logp.Logger) (Builder, error) {
 
 func TestBuilderRegistry(t *testing.T) {
 	// Add a new builder
-	reg := NewRegistry()
+	logger := logptest.NewTestingLogger(t, "")
+	reg := NewRegistry(logger)
 	err := reg.AddBuilder("fake", newFakeBuilder)
 	require.NoError(t, err)
 

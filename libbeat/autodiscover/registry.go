@@ -24,7 +24,7 @@ import (
 )
 
 // Register of autodiscover providers
-type registry struct {
+type Registry struct {
 	// Lock to control concurrent read/writes
 	lock sync.RWMutex
 	// A map of provider name to ProviderBuilder.
@@ -37,15 +37,16 @@ type registry struct {
 	logger *logp.Logger
 }
 
-// Registry holds all known autodiscover providers, they must be added to it to enable them for use
-var Registry = NewRegistry()
+// RegistrySetup is an Interface for defining function that should
+// add providers, builders, and appenders to the Registry
+type RegistrySetup func(*Registry) error
 
 // NewRegistry creates and returns a new Registry
-func NewRegistry() *registry {
-	return &registry{
+func NewRegistry(logger *logp.Logger) *Registry {
+	return &Registry{
 		providers: make(map[string]ProviderBuilder, 0),
 		builders:  make(map[string]BuilderConstructor, 0),
 		appenders: make(map[string]AppenderBuilder, 0),
-		logger:    logp.NewLogger("autodiscover"),
+		logger:    logger,
 	}
 }

@@ -36,12 +36,9 @@ type tokenAppender struct {
 	logger    *logp.Logger
 }
 
-// InitializeModule initializes this module.
-func InitializeModule() {
-	err := autodiscover.Registry.AddAppender("kubernetes.token", NewTokenAppender)
-	if err != nil {
-		logp.Error(fmt.Errorf("could not add `kubernetes.token` appender"))
-	}
+// Setup initializes this module.
+func Setup(reg *autodiscover.Registry) error {
+	return reg.AddAppender("kubernetes.token", NewTokenAppender)
 }
 
 // NewTokenAppender creates a token appender that can append a bearer token required to authenticate with
@@ -52,7 +49,7 @@ func NewTokenAppender(cfg *conf.C, logger *logp.Logger) (autodiscover.Appender, 
 
 	err := cfg.Unpack(&conf)
 	if err != nil {
-		return nil, fmt.Errorf("unable to unpack config due to error: %v", err)
+		return nil, fmt.Errorf("unable to unpack config due to error: %w", err)
 	}
 
 	var cond conditions.Condition
@@ -60,7 +57,7 @@ func NewTokenAppender(cfg *conf.C, logger *logp.Logger) (autodiscover.Appender, 
 		// Attempt to create a condition. If fails then report error
 		cond, err = conditions.NewCondition(conf.ConditionConfig, logger)
 		if err != nil {
-			return nil, fmt.Errorf("unable to create condition due to error: %v", err)
+			return nil, fmt.Errorf("unable to create condition due to error: %w", err)
 		}
 	}
 	appender := tokenAppender{
@@ -87,7 +84,7 @@ func (t *tokenAppender) Append(event bus.Event) {
 	}
 
 	// Check if the condition is met. Attempt to append only if that is the case.
-	if t.Condition == nil || t.Condition.Check(mapstr.M(event)) == true {
+	if t.Condition == nil || t.Condition.Check(mapstr.M(event)) {
 		tok := t.getAuthHeaderFromToken()
 		// If token is empty then just return
 		if tok == "" {

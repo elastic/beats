@@ -30,10 +30,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func init() {
-	autodiscover.Registry.AddAppender("config", NewConfigAppender)
-}
-
 type config struct {
 	ConditionConfig *conditions.Config `config:"condition"`
 	Config          *conf.C            `config:"config"`
@@ -52,7 +48,7 @@ func NewConfigAppender(cfg *conf.C, logger *logp.Logger) (autodiscover.Appender,
 	config := config{}
 	err := cfg.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("unable to unpack config appender due to error: %+v", err)
+		return nil, fmt.Errorf("unable to unpack config appender due to error: %w", err)
 	}
 
 	var cond conditions.Condition
@@ -88,7 +84,7 @@ func (c *configAppender) Append(event bus.Event) {
 	if !ok {
 		return
 	}
-	if c.condition == nil || c.condition.Check(mapstr.M(event)) == true {
+	if c.condition == nil || c.condition.Check(mapstr.M(event)) {
 		// Merge the template with all the configs
 		for _, cfg := range cfgs {
 			cf := mapstr.M{}
