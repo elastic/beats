@@ -52,6 +52,8 @@
 
     - name: extended_attributes
       type: flattened
+      version:
+        preview: 9.2.0
       description: >
         Extended file attributes. Contains NTFS Extended Attributes (EAs) on Windows systems.
         Extended Attributes are name-value pairs that can be attached to files and directories

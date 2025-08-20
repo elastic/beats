@@ -22,7 +22,9 @@ The operating system features that power this feature are as follows.
 
 * Linux - Multiple backends are supported: `auto`, `fsnotify`, `kprobes`, `ebpf`. By default, `fsnotify` is used, and therefore the kernel must have inotify support. Inotify was initially merged into the 2.6.13 Linux kernel. The eBPF backend uses modern eBPF features and supports 5.10.16+ kernels. The `Kprobes` backend uses tracefs and supports 3.10+ kernels. FSNotify doesn’t have the ability to associate user data to file events. The preferred backend can be selected by specifying the `backend` config option. Since eBPF and Kprobes are in technical preview, `auto` will default to `fsnotify`.
 * macOS (Darwin) - Uses the `FSEvents` API, present since macOS 10.5. This API coalesces multiple changes to a file into a single event. Auditbeat translates this coalesced changes into a meaningful sequence of actions. However, in rare situations the reported events may have a different ordering than what actually happened.
-* Windows - Multiple backends are supported: `auto`, `fsnotify`, `etw`. By default, `fsnotify` is used, which utilizes the `ReadDirectoryChangesW` Windows API. The `etw` backend uses Event Tracing for Windows (ETW) to monitor file system activities at the kernel level, supporting enhanced process context information. It requires Administrator privileges. **Note: The ETW backend is in technical preview and may change in future releases.**
+* Windows:
+  * `ReadDirectoryChangesW` is used.
+  * {applies_to}`stack: preview 9.2.0` Multiple backends are supported: `auto`, `fsnotify`, `etw`. By default, `fsnotify` is used, which utilizes the `ReadDirectoryChangesW` Windows API. The `etw` backend uses Event Tracing for Windows (ETW) to monitor file system activities at the kernel level, supporting enhanced process context information. It requires Administrator privileges.
 
 The file integrity module should not be used to monitor paths on network file systems.
 
@@ -51,9 +53,7 @@ This module has some configuration options for tuning its behavior. The followin
   hash_types: [sha1]
 ```
 
-For Windows with the ETW backend, additional configuration options are available:
-
-**Note: The ETW backend is in technical preview and may change in future releases.**
+{applies_to}`stack: preview 9.2.0` For Windows with the ETW backend, additional configuration options are available:
 
 ```yaml
 - module: file_integrity
@@ -100,13 +100,11 @@ This module also supports the [standard configuration options](#module-standard-
 **`backend`**
 :   Select the backend which will be used to source events. The available backends vary by operating system:
     
-    **Linux:** `auto`, `fsnotify`, `kprobes`, `ebpf`. Default: `fsnotify`.
-    
-    **Windows:** `auto`, `fsnotify`, `etw`. Default: `fsnotify`. **Note: The `etw` backend is in technical preview and may change in future releases.**
-    
-    **macOS:** Only `auto` and `fsnotify` are supported. Default: `fsnotify`
+    * **Linux:** `auto`, `fsnotify`, `kprobes`, `ebpf`. Default: `fsnotify`.
+    * {applies_to}`stack: ga 9.2.0` **Windows:** `auto`, `fsnotify`, `etw`. Default: `fsnotify`.
+    * {applies_to}`stack: ga 9.2.0` **macOS:** Only `auto` and `fsnotify` are supported. Default: `fsnotify`
 
-**`flush_interval`**
+**`flush_interval`** {applies_to}`stack: ga 9.2.0`
 :   (**ETW backend only**) Controls how often the ETW backend flushes event correlation groups. The ETW backend groups related file operations (like create, write, close) to provide meaningful events. This setting determines how long to wait for related events before considering an operation complete and sending the event. Setting a shorter interval will send events more quickly but may break up related operations. Setting a longer interval will provide better event correlation but may delay event delivery and impact memory footprint. This option is ignored when using other backends. Default: `1m`.
 
 

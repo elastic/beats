@@ -71,7 +71,7 @@ The SELinux identity of the file.
     example: s0
 
 
-**`file.extended_attributes`**
+**`file.extended_attributes`** {applies_to}`stack: preview 9.2.0`
 :   Extended file attributes. Contains NTFS Extended Attributes (EAs) on Windows systems. Extended Attributes are name-value pairs that can be attached to files and directories to store additional metadata beyond standard file attributes. The object contains key-value pairs where keys are EA names and values are their corresponding values. This field is only populated on Windows and only when the file has extended attributes.
 
     type: flattened
