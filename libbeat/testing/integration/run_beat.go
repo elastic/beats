@@ -122,7 +122,9 @@ func (b *RunningBeat) writeOutputLine(line string) {
 	b.watcher.Inspect(line)
 	if b.watcher.Observed() {
 		if !b.keepRunning {
-			_ = proc.StopCmd(b.c.Process)
+			if err := proc.StopCmd(b.c.Process); err != nil {
+				fmt.Printf("Cannot stop Beat: %s\n", err)
+			}
 		}
 		b.watcher = nil
 	}
@@ -177,6 +179,7 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 
 	t.Logf("running %s %s", binaryFilename, strings.Join(execArgs, " "))
 	c := exec.CommandContext(ctx, binaryFilename, execArgs...)
+	c.SysProcAttr = proc.GetSysProcAttr()
 
 	// we must use 2 pipes since writes are not aligned by lines
 	// part of the stdout output can end up in the middle of the stderr line
