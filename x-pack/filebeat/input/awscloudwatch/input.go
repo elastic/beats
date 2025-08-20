@@ -18,8 +18,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
@@ -63,6 +65,7 @@ type cloudwatchInput struct {
 	awsConfig awssdk.Config
 	store     statestore.States
 	metrics   *inputMetrics
+	status    status.StatusReporter
 }
 
 func newInput(config config, store statestore.States, logger *logp.Logger) (*cloudwatchInput, error) {
@@ -91,15 +94,24 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 	log := inputContext.Logger
 
+	// setup status reporter
+	in.status = statusreporterhelper.New(inputContext.StatusReporter, log, "CloudWatch")
+
+	defer in.status.UpdateStatus(status.Stopped, "")
+	in.status.UpdateStatus(status.Starting, "Input starting")
+
 	handler, err := newStateHandler(log, in.config, in.store)
 	if err != nil {
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("State registry creation failure: %s", err.Error()))
 		return fmt.Errorf("failed to create state handler: %w", err)
 	}
 	defer handler.Close()
 
+	in.status.UpdateStatus(status.Configuring, "Configuring input")
 	var logGroupIDs []string
 	logGroupIDs, region, err := fromConfig(in.config, in.awsConfig)
 	if err != nil {
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Configuration loading error: %s", err.Error()))
 		return fmt.Errorf("error processing configurations: %w", err)
 	}
 
@@ -115,6 +127,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		// now fallback to provided LogGroupNamePrefix and use derived service client to derive logGroupIDs
 		logGroupIDs, err = getLogGroupNames(svc, in.config.LogGroupNamePrefix, in.config.IncludeLinkedAccountsForPrefixMode)
 		if err != nil {
+			in.status.UpdateStatus(status.Failed, fmt.Sprintf("Configuration loading error: %s", err.Error()))
 			return fmt.Errorf("failed to get log group names from LogGroupNamePrefix: %w", err)
 		}
 	}
@@ -125,14 +138,21 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		in.metrics,
 		region,
 		in.config,
-		handler)
+		handler,
+		in.status)
+
+	in.status.UpdateStatus(status.Running, "Input is running")
 
 	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupIDs)))
-	cwPoller.startWorkers(ctx, svc, pipeline)
+	err = cwPoller.startWorkers(ctx, svc, pipeline)
+	if err != nil {
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Error starting input processors: %s", err.Error()))
+		return err
+	}
 
-	log.Debugf("Config latency = %f", cwPoller.config.Latency)
-	log.Debugf("Config scan_frequency = %f", cwPoller.config.ScanFrequency)
-	log.Debugf("Config api_sleep = %f", cwPoller.config.APISleep)
+	log.Debugf("Config latency = %s", cwPoller.config.Latency)
+	log.Debugf("Config scan_frequency = %s", cwPoller.config.ScanFrequency)
+	log.Debugf("Config api_sleep = %s", cwPoller.config.APISleep)
 	cwPoller.receive(ctx, logGroupIDs, time.Now)
 	return nil
 }

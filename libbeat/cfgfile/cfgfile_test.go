@@ -42,7 +42,7 @@ type Connection struct {
 	Host string
 }
 
-func TestRead(t *testing.T) {
+func TestLoad(t *testing.T) {
 	absPath, err := filepath.Abs("../tests/files/")
 	os.Setenv("TEST_KEY", "test_value")
 
@@ -51,9 +51,11 @@ func TestRead(t *testing.T) {
 
 	config := &TestConfig{}
 
-	if err = Read(config, absPath+"/config.yml"); err != nil {
-		t.Fatal(err)
-	}
+	cfg, err := Load(absPath+"/config.yml", nil)
+	assert.NoError(t, err)
+
+	err = cfg.Unpack(config)
+	assert.NoError(t, err)
 
 	// validate
 	assert.Equal(t, "localhost", config.Output.Elasticsearch.Host)

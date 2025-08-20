@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build integration
 
 package integration
@@ -28,6 +30,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"net"
 	"net/http"
 	"net/url"
@@ -45,6 +48,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 
@@ -605,6 +609,63 @@ func (b *BeatProc) WaitForLogs(s string, timeout time.Duration, msgAndArgs ...an
 	}, timeout, 100*time.Millisecond, msgAndArgs...)
 }
 
+// WaitForLogsAnyOrder waits for all strings in the msgs slice to appear in the logs.
+// The strings can appear in any order. The function will return once all strings
+// have been found or the timeout has been reached.
+// If the timeout is reached before all strings are found, the test will fail with
+// the provided error message and arguments (failMsg).
+func (b *BeatProc) WaitForLogsAnyOrder(msgs []string, timeout time.Duration, failMsg string) {
+	b.t.Helper()
+
+	if len(msgs) == 0 {
+		return
+	}
+
+	// Create a map to track which messages have been found
+	found := make(map[string]bool, len(msgs))
+	for _, msg := range msgs {
+		found[msg] = false
+	}
+
+	msg := &strings.Builder{}
+
+	assert.Eventually(
+		b.t,
+		func() bool {
+			// Check for each unfound message
+			allFound := true
+
+			for msgToFind := range found {
+				if !found[msgToFind] {
+					if b.GetLogLine(msgToFind) != "" {
+						found[msgToFind] = true
+					} else {
+						allFound = false
+					}
+				}
+			}
+
+			// Prepare message for potential failure
+			if !allFound {
+				msg.Reset()
+				fmt.Fprintf(msg, "%s\nwaiting for log messages: ", failMsg)
+				for msgToFind, wasFound := range found {
+					if !wasFound {
+						fmt.Fprintf(msg, "\n- %q (not found)", msgToFind)
+					} else {
+						fmt.Fprintf(msg, "\n- %q (✓)", msgToFind)
+					}
+				}
+			}
+
+			return allFound
+		},
+		timeout,
+		100*time.Millisecond,
+		msg,
+	)
+}
+
 // WaitForLogsFromBeginning has the same behaviour as WaitForLogs, but it first
 // resets the log offset.
 func (b *BeatProc) WaitForLogsFromBeginning(s string, timeout time.Duration, msgAndArgs ...any) {
@@ -691,13 +752,16 @@ func (b *BeatProc) openLogFile() *os.File {
 // If the events log file does not exist, nil is returned
 // It's the caller's responsibility to close the file.
 func (b *BeatProc) openEventLogFile() *os.File {
+	return b.openGlobFile(b.getEventLogFileGlob(), false)
+}
+
+func (b *BeatProc) getEventLogFileGlob() string {
 	// Beats can produce two different log files, to make sure we're
 	// reading the normal one we add the year to the glob. The default
 	// log file name looks like: filebeat-20240116.ndjson
 	year := time.Now().Year()
 	glob := fmt.Sprintf("%s-events-data-%d*.ndjson", filepath.Join(b.tempDir, b.beatName), year)
-
-	return b.openGlobFile(glob, false)
+	return glob
 }
 
 // createTempDir creates a temporary directory that will be
@@ -871,6 +935,11 @@ func (b *BeatProc) Stdin() io.WriteCloser {
 	return b.stdin
 }
 
+func (b *BeatProc) ReadStdout() (string, error) {
+	by, err := os.ReadFile(b.stdout.Name())
+	return string(by), err
+}
+
 // GetESURL Returns the ES URL with username and password set,
 // it uses ES_USER and ES_PASS that on our mage automation defaults
 // to user 'beats' and pass 'testing'. This user/role has limited
@@ -1038,7 +1107,7 @@ func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
 }
 
 func reportErrors(t *testing.T, tempDir string, beatName string) {
-	var maxlen int64 = 2048
+	var maxlen int64 = 100 * 1024 // 100 KiB
 	stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
 	if err != nil {
 		t.Logf("error reading stderr: %s", err)
@@ -1147,6 +1216,17 @@ func (b *BeatProc) CountFileLines(glob string) int {
 	return bytes.Count(data, []byte{'\n'})
 }
 
+func (b *BeatProc) WaitEventsInLogFile(events int, timeout time.Duration) {
+	msg := strings.Builder{}
+
+	require.Eventually(b.t, func() bool {
+		msg.Reset()
+		got := b.CountFileLines(b.getEventLogFileGlob())
+		fmt.Fprintf(&msg, "expecting %d events, got %d", events, got)
+		return events == got
+	}, timeout, 100*time.Millisecond, &msg)
+}
+
 // ConfigFilePath returns the config file path
 func (b *BeatProc) ConfigFilePath() string {
 	return b.configFile
@@ -1156,7 +1236,7 @@ func (b *BeatProc) ConfigFilePath() string {
 // If add is an empty string a random local port is used.
 // The return values are:
 //   - The HTTP server
-//   - The server address in the form ip:port
+//   - The server address in the form http://ip:port
 //   - The mock-es API handler
 //   - The ManualReader for accessing the metrics
 func StartMockES(
@@ -1190,7 +1270,7 @@ func StartMockES(
 	)
 
 	if addr == "" {
-		addr = ":0"
+		addr = "localhost:0"
 	}
 
 	l, err := net.Listen("tcp", addr)
@@ -1208,11 +1288,12 @@ func StartMockES(
 		}
 	}()
 
+	serverURL := "http://" + addr
 	// Ensure the Server is up and running before returning
 	require.Eventually(
 		t,
 		func() bool {
-			resp, err := http.Get("http://" + addr) //nolint: noctx // It's just a test
+			resp, err := http.Get(serverURL) //nolint:gosec,noctx // It's just a test
 			if err != nil {
 				return false
 			}
@@ -1225,5 +1306,52 @@ func StartMockES(
 		time.Millisecond,
 		"mock-es server did not start on '%s'", addr)
 
-	return &s, addr, es, rdr
+	return &s, serverURL, es, rdr
+}
+
+// WaitPublishedEvents waits until the desired number of events
+// have been published. It assumes the file output is used, the filename
+// for the output is 'output' and 'path' is set to the TempDir.
+func (b *BeatProc) WaitPublishedEvents(timeout time.Duration, events int) {
+	t := b.t
+	t.Helper()
+
+	msg := strings.Builder{}
+	path := filepath.Join(b.TempDir(), "output-*.ndjson")
+	assert.Eventually(t, func() bool {
+		got := b.CountFileLines(path)
+		msg.Reset()
+		fmt.Fprintf(&msg, "expecting %d events, got %d", events, got)
+		return got == events
+	}, timeout, 200*time.Millisecond, &msg)
+}
+
+// GetEventsFromFileOutput reads all events from file output. If n > 0,
+// then it reads up to n events. It assumes the filename
+// for the output is 'output' and 'path' is set to the TempDir.
+func GetEventsFromFileOutput[E any](b *BeatProc, n int) []E {
+	b.t.Helper()
+
+	if n < 1 {
+		n = math.MaxInt
+	}
+
+	var events []E
+	path := filepath.Join(b.TempDir(), "output-*.ndjson")
+
+	f := b.openGlobFile(path, true)
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		var ev E
+		err := json.Unmarshal(scanner.Bytes(), &ev)
+		require.NoError(b.t, err, "failed to read event")
+		events = append(events, ev)
+
+		if len(events) >= n {
+			return events
+		}
+	}
+
+	return events
 }

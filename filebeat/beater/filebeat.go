@@ -95,6 +95,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		rawConfig,
 		"prospectors",
 		"config.prospectors",
+		"config_dir",
 		"registry_file",
 		"registry_file_permissions",
 		"registry_flush",
@@ -115,10 +116,6 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 	moduleInputs, err := moduleRegistry.GetInputConfigs()
 	if err != nil {
-		return nil, err
-	}
-
-	if err := config.FetchConfigs(b.Info.Logger); err != nil {
 		return nil, err
 	}
 
