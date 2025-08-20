@@ -78,7 +78,8 @@ type Stats struct {
 	readBytes  *monitoring.Uint // total amount of bytes read
 	readErrors *monitoring.Uint // total number of errors while waiting for response on output
 
-	sendLatencyMillis metrics.Sample
+	sendLatencyLifetimeMillis metrics.Sample // output latency in milliseconds for lifetime of connection
+	sendLatencyDeltaMillis    metrics.Sample // output latency in milliseconds, cleared each time "Visit" is used to report the metric
 }
 
 // NewStats creates a new Stats instance using a backing monitoring registry.
@@ -104,9 +105,11 @@ func NewStats(reg *monitoring.Registry, logger *logp.Logger) *Stats {
 		readBytes:  monitoring.NewUint(reg, "read.bytes"),
 		readErrors: monitoring.NewUint(reg, "read.errors"),
 
-		sendLatencyMillis: metrics.NewUniformSample(1024),
+		sendLatencyLifetimeMillis: metrics.NewUniformSample(1024),
+		sendLatencyDeltaMillis:    metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "write.latency", logger, adapter.Accept).Register("histogram", metrics.NewHistogram(obj.sendLatencyMillis))
+	_ = adapter.NewGoMetrics(reg, "write.latency", logger, adapter.Accept).Register("histogram", metrics.NewHistogram(obj.sendLatencyLifetimeMillis))
+	_ = adapter.NewGoMetrics(reg, "write.latency_delta", logger, adapter.Accept).Register("histogram", adapter.NewClearOnVisitHistogram(obj.sendLatencyDeltaMillis))
 	return obj
 }
 
@@ -114,43 +117,44 @@ func NewStats(reg *monitoring.Registry, logger *logp.Logger) *Stats {
 func (s *Stats) NewBatch(n int) {
 	if s != nil {
 		s.eventsBatches.Inc()
-		s.eventsTotal.Add(uint64(n))
-		s.eventsActive.Add(uint64(n))
+		s.eventsTotal.Add(uint64(n))  //nolint:gosec //num events not over uint64
+		s.eventsActive.Add(uint64(n)) //nolint:gosec //num events not over uint64
 	}
 }
 
 func (s *Stats) ReportLatency(time time.Duration) {
-	s.sendLatencyMillis.Update(time.Milliseconds())
+	s.sendLatencyLifetimeMillis.Update(time.Milliseconds())
+	s.sendLatencyDeltaMillis.Update(time.Milliseconds())
 }
 
 // AckedEvents updates active and acked event metrics.
 func (s *Stats) AckedEvents(n int) {
 	if s != nil {
-		s.eventsACKed.Add(uint64(n))
-		s.eventsActive.Sub(uint64(n))
+		s.eventsACKed.Add(uint64(n))  //nolint:gosec  //num events not over uint64
+		s.eventsActive.Sub(uint64(n)) //nolint:gosec //num events not over uint64
 	}
 }
 
 func (s *Stats) DeadLetterEvents(n int) {
 	if s != nil {
-		s.eventsDeadLetter.Add(uint64(n))
-		s.eventsActive.Sub(uint64(n))
+		s.eventsDeadLetter.Add(uint64(n)) //nolint:gosec //num events not over uint64
+		s.eventsActive.Sub(uint64(n))     //nolint:gosec //num events not over uint64
 	}
 }
 
 // RetryableErrors updates active and failed event metrics.
 func (s *Stats) RetryableErrors(n int) {
 	if s != nil {
-		s.eventsFailed.Add(uint64(n))
-		s.eventsActive.Sub(uint64(n))
+		s.eventsFailed.Add(uint64(n)) //nolint:gosec //num events not over uint64
+		s.eventsActive.Sub(uint64(n)) //nolint:gosec //num events not over uint64
 	}
 }
 
 // DuplicateEvents updates the active and duplicate event metrics.
 func (s *Stats) DuplicateEvents(n int) {
 	if s != nil {
-		s.eventsDuplicates.Add(uint64(n))
-		s.eventsActive.Sub(uint64(n))
+		s.eventsDuplicates.Add(uint64(n)) //nolint:gosec //num events not over uint64
+		s.eventsActive.Sub(uint64(n))     //nolint:gosec //num events not over uint64
 	}
 }
 
@@ -161,8 +165,8 @@ func (s *Stats) DuplicateEvents(n int) {
 func (s *Stats) PermanentErrors(n int) {
 	// number of dropped events (e.g. encoding failures)
 	if s != nil {
-		s.eventsActive.Sub(uint64(n))
-		s.eventsDropped.Add(uint64(n))
+		s.eventsActive.Sub(uint64(n))  //nolint:gosec //num events not over uint64
+		s.eventsDropped.Add(uint64(n)) //nolint:gosec //num events not over uint64
 	}
 }
 
@@ -175,7 +179,7 @@ func (s *Stats) BatchSplit() {
 // ErrTooMany updates the number of Too Many Requests responses reported by the output.
 func (s *Stats) ErrTooMany(n int) {
 	if s != nil {
-		s.eventsTooMany.Add(uint64(n))
+		s.eventsTooMany.Add(uint64(n)) //nolint:gosec //num events not over uint64
 	}
 }
 
@@ -189,7 +193,7 @@ func (s *Stats) WriteError(err error) {
 // WriteBytes updates the total number of bytes written/send by an output.
 func (s *Stats) WriteBytes(n int) {
 	if s != nil {
-		s.writeBytes.Add(uint64(n))
+		s.writeBytes.Add(uint64(n)) //nolint:gosec //num events not over uint64
 	}
 }
 
@@ -203,6 +207,6 @@ func (s *Stats) ReadError(err error) {
 // ReadBytes updates the total number of bytes read/received by an output.
 func (s *Stats) ReadBytes(n int) {
 	if s != nil {
-		s.readBytes.Add(uint64(n))
+		s.readBytes.Add(uint64(n)) //nolint:gosec //num events not over uint64
 	}
 }
