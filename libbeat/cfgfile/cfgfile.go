@@ -144,20 +144,6 @@ func HandleFlags() error {
 	return nil
 }
 
-// Deprecated: Please use Load().
-//
-// Read reads the configuration from a YAML file into the given interface
-// structure. If path is empty this method reads from the configuration
-// file specified by the '-c' command line flag.
-func Read(out interface{}, path string) error {
-	config, err := Load(path, nil)
-	if err != nil {
-		return err
-	}
-
-	return config.Unpack(out)
-}
-
 // Load reads the configuration from a YAML file structure. If path is empty
 // this method reads from the configuration file specified by the '-c' command
 // line flag.

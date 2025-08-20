@@ -1,6 +1,8 @@
 - name: network
   type: group
   release: beta
+  version:
+    beta: 9.1.0
   fields:
     - name: id
       type: keyword

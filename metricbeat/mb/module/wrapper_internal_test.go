@@ -68,11 +68,6 @@ func (mr *mockReporter) StartFetchTimer() {
 	mr.Called()
 }
 
-func (mr *mockReporter) V1() mb.PushReporter { //nolint:staticcheck // PushReporter is deprecated but not removed
-	args := mr.Called()
-	return args.Get(0).(mb.PushReporter) //nolint:staticcheck // PushReporter is deprecated but not removed
-}
-
 func (mr *mockReporter) V2() mb.PushReporterV2 {
 	args := mr.Called()
 	return args.Get(0).(mb.PushReporterV2)
