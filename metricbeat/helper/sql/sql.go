@@ -20,7 +20,6 @@ package sql
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -212,6 +211,20 @@ func SwitchDriverName(d string) string {
 	return d
 }
 
+// internal error type for SanitizeError function to support both error message replacing and error wrapping
+type sqlSanitizedError struct {
+	sanitized string
+	err       error
+}
+
+func (err *sqlSanitizedError) Error() string {
+	return err.sanitized
+}
+
+func (err *sqlSanitizedError) Unwrap() error {
+	return err.err
+}
+
 const redacted = "(redacted)"
 
 var patterns = []struct {
@@ -275,5 +288,8 @@ func SanitizeError(err error, sensitive string) error {
 		msg = p.re.ReplaceAllString(msg, p.repl)
 	}
 
-	return errors.New(msg)
+	return &sqlSanitizedError{
+		sanitized: msg,
+		err:       err,
+	}
 }

@@ -23,6 +23,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"net/url"
 	"strconv"
 	"testing"
 	"time"
@@ -379,4 +380,20 @@ func TestSanitizeError(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("errors.Is/As still work", func(t *testing.T) {
+		host := "sqlserver://mmm\\elasticsearch:ttt@localhost:4441"
+
+		internalErr := &url.Error{
+			Op:  "parse",
+			URL: host,
+			Err: errors.New("net/url: invalid userinfo"),
+		}
+		sanitizedErr := SanitizeError(fmt.Errorf("cannot open connection: %w", internalErr), host)
+
+		require.True(t, errors.Is(sanitizedErr, internalErr))
+
+		var urlErr *url.Error
+		require.True(t, errors.As(sanitizedErr, &urlErr))
+	})
 }
