@@ -20,12 +20,25 @@ package file
 import (
 	"os"
 	"path/filepath"
+	"time"
 )
 
+const windowsRenameRetryInterval = 50 * time.Millisecond
+const windowsRenameRetryDuration = 2 * time.Second
+
 // SafeFileRotate safely rotates an existing file under path and replaces it with the tempfile
-func SafeFileRotate(path, tempfile string) error {
+func SafeFileRotate(path, tempfile string, opts ...RotateOpt) error {
+	// On Windows, retry the rename operation by default. This is useful in cases where
+	// path, the destination file, may be locked or in use.
+	options := rotateOpts{
+		renameRetryDuration: windowsRenameRetryDuration,
+		renameRetryInterval: windowsRenameRetryInterval,
+	}
+	for _, opt := range opts {
+		opt(&options)
+	}
+
 	old := path + ".old"
-	var e error
 
 	// In Windows, one cannot rename a file if the destination already exists, at least
 	// not with using the os.Rename function that Golang offers.
@@ -37,8 +50,8 @@ func SafeFileRotate(path, tempfile string) error {
 	// ignore error in case path doesn't exist
 	_ = os.Rename(path, old)
 
-	if e = os.Rename(tempfile, path); e != nil {
-		return e
+	if err := rename(tempfile, path, options); err != nil {
+		return err
 	}
 
 	// .old file will still exist if path file is already there, it should be removed

@@ -25,10 +25,14 @@ import (
 )
 
 // SafeFileRotate safely rotates an existing file under path and replaces it with the tempfile
-func SafeFileRotate(path, tempfile string) error {
+func SafeFileRotate(path, tempfile string, opts ...RotateOpt) error {
+	options := rotateOpts{}
+	for _, opt := range opts {
+		opt(&options)
+	}
 
-	if e := os.Rename(tempfile, path); e != nil {
-		return e
+	if err := rename(tempfile, path, options); err != nil {
+		return err
 	}
 
 	// best-effort fsync on parent directory. The fsync is required by some
