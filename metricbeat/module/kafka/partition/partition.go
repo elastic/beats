@@ -100,7 +100,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	for _, topic := range topics {
+<<<<<<< HEAD
 		debugf("fetch events for topic: ", topic.Name)
+=======
+		m.Logger().Named("kafka").Debugf("fetch events for topic: %s", topic.Name)
+>>>>>>> a5be2a856 (chore: fix formatting issues in logp printf-style calls (#45944))
 		evtTopic := mapstr.M{
 			"name": topic.Name,
 		}

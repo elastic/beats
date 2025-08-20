@@ -106,7 +106,11 @@ func NewInput(
 	cleanupIfNeeded := func(f func() error) {
 		if cleanupNeeded {
 			if err := f(); err != nil {
+<<<<<<< HEAD
 				logp.L().Named("input.log").Errorf("clean up function returned an error: %w", err)
+=======
+				logger.Named("input.log").Errorf("clean up function returned an error: %v", err)
+>>>>>>> a5be2a856 (chore: fix formatting issues in logp printf-style calls (#45944))
 			}
 		}
 	}

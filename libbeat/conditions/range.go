@@ -114,7 +114,11 @@ func (c Range) Check(event ValuesMap) bool {
 
 		floatValue, err := ExtractFloat(value)
 		if err != nil {
+<<<<<<< HEAD
 			logp.L().Named(logName).Warnf(err.Error())
+=======
+			c.logger.Named(logName).Warn(err.Error())
+>>>>>>> a5be2a856 (chore: fix formatting issues in logp printf-style calls (#45944))
 			return false
 		}
 
