@@ -217,8 +217,6 @@ func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.Rep
 // of an error set the Error field of mb.Event or simply call report.Error().
 // It calls m.fetchTableMode() or m.fetchVariableMode() depending on the response
 // format of the query.
-// Fetch returns a sanitized error recreated with errors.New (via defer sql.SanitizeError) to avoid leaking sensitive data.
-// The returned error does not wrap the original, so errors.Is/As will not match.
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (fetchErr error) {
 	defer func() {
 		fetchErr = sql.SanitizeError(fetchErr, m.HostData().URI)

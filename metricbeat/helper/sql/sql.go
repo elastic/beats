@@ -254,8 +254,6 @@ var patterns = []struct {
 
 // SanitizeError replaces all occurrences of 'sensitive' parameter in err.Error() with "(redacted)"
 // It also sanitizes common patterns that might contain passwords or sensitive data
-// SanitizeError returns a sanitized error recreated with errors.New to avoid leaking sensitive data.
-// The returned error does not wrap the original, so errors.Is/As will not match.
 func SanitizeError(err error, sensitive string) error {
 	if err == nil {
 		return nil

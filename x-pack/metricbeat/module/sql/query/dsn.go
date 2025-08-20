@@ -32,8 +32,6 @@ type ConnectionDetails struct {
 const mysqlTLSConfigKey = "custom"
 
 // ParseDSN tries to parse the host
-// ParseDSN may return an error: it is a sanitized error recreated with errors.New (via defer sql.SanitizeError) to avoid leaking sensitive data.
-// The returned error does not wrap the original, so errors.Is/As will not match.
 func ParseDSN(mod mb.Module, host string) (_ mb.HostData, fetchErr error) {
 	defer func() {
 		fetchErr = sql.SanitizeError(fetchErr, host)
