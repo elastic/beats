@@ -20,7 +20,10 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
+	"net/url"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -207,4 +210,70 @@ func SwitchDriverName(d string) string {
 	}
 
 	return d
+}
+
+const redacted = "(redacted)"
+
+var patterns = []struct {
+	re   *regexp.Regexp
+	repl string
+}{
+	// scheme://user:password@host -> redact password
+	{regexp.MustCompile(`([a-z][a-z0-9+\.\-]*://[^:/?#\s]+):([^@/\s]+)@`), `$1:` + redacted + `@`},
+	// user:password@... (no scheme), common in MySQL DSNs like user:pass@tcp(...)
+	// Important: Disallow '/' in the password part to avoid matching URI schemes like "postgres://..."
+	{regexp.MustCompile(`(^|[\s'\"])([^:/@\s]+):([^@/\s]+)@`), `$1$2:` + redacted + `@`},
+
+	// Key=Value forms (connection strings): handle quoted and unquoted values.
+	// Single-quoted values: Password='secret'; Token='abc';
+	{regexp.MustCompile(`(?i)\b(password|pwd|pass|passwd|token|secret)\b\s*=\s*'[^']*'`), `$1='` + redacted + `'`},
+	// Double-quoted values: Password="secret value";
+	{regexp.MustCompile(`(?i)\b(password|pwd|pass|passwd|token|secret)\b\s*=\s*"[^"]*"`), `$1="` + redacted + `"`},
+	// Unquoted values until delimiter or whitespace: Password=secret123; PASS=foo
+	{regexp.MustCompile(`(?i)\b(password|pwd|pass|passwd|token|secret)\b\s*=\s*[^;,#&\s]+`), `$1=` + redacted},
+
+	// JSON-style fields: {"password":"secret"}
+	{regexp.MustCompile(`(?i)"(password|pwd|pass|passwd|token|secret)"\s*:\s*"(?:[^"\\]|\\.)*"`), `"$1":"` + redacted + `"`},
+
+	// Query parameters in URLs: ?password=secret&...
+	{regexp.MustCompile(`(?i)([?&])(password|pwd|pass|passwd|token|secret)\s*=\s*([^&#\s]+)`), `$1$2=` + redacted},
+}
+
+// SanitizeError replaces all occurrences of 'sensitive' parameter in err.Error() with "(redacted)"
+// It also sanitizes common patterns that might contain passwords or sensitive data
+// SanitizeError returns a sanitized error recreated with errors.New to avoid leaking sensitive data.
+// The returned error does not wrap the original, so errors.Is/As will not match.
+func SanitizeError(err error, sensitive string) error {
+	if err == nil {
+		return nil
+	}
+
+	msg := err.Error()
+
+	// First, replace the primary sensitive string if provided (raw, quoted, and URL-encoded forms)
+	if s := strings.TrimSpace(sensitive); s != "" {
+		// raw
+		msg = strings.ReplaceAll(msg, s, redacted)
+		// quoted (fmt %q style)
+		quoted := fmt.Sprintf("%q", s)
+		msg = strings.ReplaceAll(msg, quoted, redacted)
+		// URL-encoded (both query and path escaping just to be safe)
+		qEsc := url.QueryEscape(s)
+		if qEsc != s {
+			msg = strings.ReplaceAll(msg, qEsc, redacted)
+		}
+		pEsc := url.PathEscape(s)
+		if pEsc != s && pEsc != qEsc {
+			msg = strings.ReplaceAll(msg, pEsc, redacted)
+		}
+	}
+
+	// Pattern-based sanitization for common secrets in errors (URLs, DSNs, key/value strings, JSON, query params).
+	// Order matters: apply more specific URL userinfo patterns first.
+
+	for _, p := range patterns {
+		msg = p.re.ReplaceAllString(msg, p.repl)
+	}
+
+	return errors.New(msg)
 }
