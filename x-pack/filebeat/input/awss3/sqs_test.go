@@ -324,7 +324,7 @@ func TestReadSQSMessagesStatusUpdates(t *testing.T) {
 	statusReporter := &statusReporterHelperMock{}
 	log := logp.NewLogger("awss3_test")
 	ctx := context.Background()
-	metrics := newInputMetrics(monitoring.NewRegistry(), 0)
+	metrics := newInputMetrics("", nil, 0)
 
 	// assuming we're entering this function with a running state from outside the func
 	startingRunningMsg := "We've started running somewhere else"
