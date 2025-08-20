@@ -52,7 +52,11 @@ func fetchGroupInfo(
 		return nil
 	}
 
+<<<<<<< HEAD
 	debugf("known consumer groups: ", groups)
+=======
+	logger.Named("kafka").Debugf("known consumer groups: %s", groups)
+>>>>>>> a5be2a856 (chore: fix formatting issues in logp printf-style calls (#45944))
 
 	assignments, err := fetchGroupAssignments(b, groups)
 	if err != nil {

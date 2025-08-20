@@ -861,7 +861,7 @@ func NewContainerMetadataEnricher(
 
 		pod, ok := r.(*kubernetes.Pod)
 		if !ok {
-			base.Logger().Debugf("Error while casting event: %s", ok)
+			base.Logger().Debugf("Error while casting event, got %T", r)
 		}
 		pmeta := metaGen.Generate(pod)
 
@@ -900,7 +900,11 @@ func NewContainerMetadataEnricher(
 		ids := make([]string, 0)
 		pod, ok := r.(*kubernetes.Pod)
 		if !ok {
+<<<<<<< HEAD
 			base.Logger().Debugf("Error while casting event: %s", ok)
+=======
+			log.Debugf("Error while casting event, got %T", r)
+>>>>>>> a5be2a856 (chore: fix formatting issues in logp printf-style calls (#45944))
 		}
 
 		for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {

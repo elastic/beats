@@ -176,7 +176,11 @@ func (m *MetricSet) updatePower() map[int]map[rapl.RAPLDomain]energyUsage {
 				continue
 			}
 			if err != nil {
+<<<<<<< HEAD
 				logp.L().Infof("Error reading MSR from domain %s: %s skipping.", domain, err)
+=======
+				m.Logger().Infof("Error reading MSR from domain %s: %s skipping.", domain.Name, err)
+>>>>>>> a5be2a856 (chore: fix formatting issues in logp printf-style calls (#45944))
 				continue
 			}
 			domainList[domain] = energyTrack{joules: joules, time: time.Now()}
