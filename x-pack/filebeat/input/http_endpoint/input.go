@@ -61,11 +61,7 @@ func Plugin(log *logp.Logger) v2.Plugin {
 	}
 }
 
-<<<<<<< HEAD
 func configure(cfg *conf.C, logger *logp.Logger) (v2.Input, error) {
-=======
-func configure(cfg *conf.C, _ *logp.Logger) (v2.Input, error) {
->>>>>>> 10c60b746 ([8.19](backport #45463) [Chore] Replace global logger with local logger #12 (#45692))
 	conf := defaultConfig()
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, err

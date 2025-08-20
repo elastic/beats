@@ -39,11 +39,7 @@ type Client struct {
 
 // NewClient builds and returns a docker Client
 func NewClient(logger *logp.Logger) (Client, error) {
-<<<<<<< HEAD
 	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logger)
-=======
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
->>>>>>> 10c60b746 ([8.19](backport #45463) [Chore] Replace global logger with local logger #12 (#45692))
 	return Client{cli: c}, err
 }
 
