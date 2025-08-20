@@ -20,7 +20,6 @@ import (
 )
 
 func TestS3Poller(t *testing.T) {
-	logp.TestingSetup()
 
 	const bucket = "bucket"
 	const listPrefix = "key"
@@ -149,6 +148,7 @@ func TestS3Poller(t *testing.T) {
 			provider:        "provider",
 			metrics:         newInputMetrics("", nil, 0),
 			filterProvider:  newFilterProvider(&cfg),
+			status:          &statusReporterHelperMock{},
 		}
 		poller.runPoll(ctx)
 	})
@@ -296,6 +296,7 @@ func TestS3Poller(t *testing.T) {
 			provider:        "provider",
 			metrics:         newInputMetrics("", nil, 0),
 			filterProvider:  newFilterProvider(&cfg),
+			status:          &statusReporterHelperMock{},
 		}
 		poller.run(ctx)
 	})
@@ -526,6 +527,7 @@ func Test_S3StateHandling(t *testing.T) {
 				states:          s3States,
 				metrics:         newInputMetrics("state-test: "+test.name, nil, 0),
 				filterProvider:  newFilterProvider(test.config),
+				status:          &statusReporterHelperMock{},
 			}
 
 			// when - run polling for desired time
