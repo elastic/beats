@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -510,7 +511,7 @@ func retryErrorHandler(max int, log *logp.Logger) retryablehttp.ErrorHandler {
 }
 
 func newClient(cfg config, log *logp.Logger) (*http.Client, error) {
-	c, err := cfg.Resource.Transport.Client()
+	c, err := cfg.Resource.Transport.Client(httpcommon.WithLogger(log))
 	if err != nil {
 		return nil, err
 	}
