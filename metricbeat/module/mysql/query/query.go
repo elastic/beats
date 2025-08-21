@@ -109,7 +109,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	for _, q := range m.Config.Queries {
 		err := m.fetchQuery(ctx, q, reporter)
 		if err != nil {
-			m.Logger().Errorf("error doing query %s", q, err)
+			m.Logger().Errorf("error doing query %v: %v", q, err)
 		}
 	}
 
