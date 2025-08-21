@@ -102,7 +102,7 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 		r := mapstr.M{}
 
 		for i, c := range cols {
-			value := getValue(vals[i].(*interface{})) //nolint:errcheck - getValue does not return an error. Each element is guaranteed to be *interface{}.
+			value := getValue(vals[i].(*interface{})) //nolint:errcheck // getValue does not return an error. Each element is guaranteed to be *interface{}.
 			r.Put(c, value)
 		}
 
