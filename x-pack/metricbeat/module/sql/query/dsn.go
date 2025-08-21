@@ -26,14 +26,6 @@ type ConnectionDetails struct {
 // ParseDSN tries to parse the host
 func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 
-	logger := logp.NewLogger("")
-	// At the time of writing, mod always is of type *mb.BaseModule.
-	// If this assumption is ever broken, we use global logger then
-	sqlModule, ok := mod.(*mb.BaseModule)
-	if ok {
-		logger = sqlModule.Logger
-	}
-
 	// TODO: Add support for `username` and `password` as module options
 	config := ConnectionDetails{}
 	if err := mod.UnpackConfig(&config); err != nil {
