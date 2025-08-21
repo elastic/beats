@@ -419,6 +419,10 @@ func (s *states) Find(key string, create bool) *resource {
 		key:    key,
 		lock:   unison.MakeMutex(),
 	}
+	// -1 means this resource will not be cleaned up due to a timeout.
+	// The zero-value for internalState.TTL means this resource is
+	// soft-deleted.
+	resource.internalState.TTL = -1
 	s.table[key] = resource
 	resource.Retain()
 	return resource
