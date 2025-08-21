@@ -208,7 +208,7 @@ func TestToDotKeys(t *testing.T) {
 	ms := mapstr.M{"key_value": "value"}
 	ms = ReplaceUnderscores(ms)
 
-	if ms["key"].(mapstr.M)["value"] != "value" {
+	if ms["key"].(mapstr.M)["value"] != "value" { //nolint:errcheck // false positive
 		t.Fail()
 	}
 }
