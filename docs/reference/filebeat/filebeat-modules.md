@@ -68,6 +68,10 @@ While {{filebeat}} modules are still supported, we recommend {{agent}} integrati
 * [*Threat Intel module*](/reference/filebeat/filebeat-module-threatintel.md)
 * [*Traefik module*](/reference/filebeat/filebeat-module-traefik.md)
 * [*Zeek (Bro) module*](/reference/filebeat/filebeat-module-zeek.md)
+<<<<<<< HEAD
 * [*ZooKeeper module*](/reference/filebeat/filebeat-module-zookeeper.md) {applies_to}`stack: beta`
+=======
+* [*ZooKeeper module*](/reference/filebeat/filebeat-module-zookeeper.md)
+>>>>>>> 5c6f19d22 ([docs][filebeat] convert remaining docs to markdown (#44858) (#46127))
 * [*Zoom module*](/reference/filebeat/filebeat-module-zoom.md)
 

@@ -101,6 +101,7 @@ While {{filebeat}} modules are still supported, we recommend {{agent}} integrati
 * [*Modules overview*](/reference/filebeat/filebeat-modules-overview.md)
 """
 
+<<<<<<< HEAD
     for m, details in sorted(six.iteritems(modules_list)):
         title = details["title"]
         applies_to = details["applies_to"]
@@ -108,6 +109,10 @@ While {{filebeat}} modules are still supported, we recommend {{agent}} integrati
         if applies_to:
             module_list_output += " {{applies_to}}`stack: {}`".format(applies_to)
         module_list_output += "\n"
+=======
+    for m, title in sorted(six.iteritems(modules_list)):
+        module_list_output += "* [*{} module*](/reference/filebeat/filebeat-module-{}.md)\n".format(title, m)
+>>>>>>> 5c6f19d22 ([docs][filebeat] convert remaining docs to markdown (#44858) (#46127))
 
     module_list_output += "\n"
 
