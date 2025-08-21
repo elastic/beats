@@ -6,8 +6,6 @@ package activedirectory
 
 import (
 	"errors"
-	"net"
-	"net/url"
 	"strings"
 	"time"
 
@@ -84,27 +82,7 @@ func (c *conf) Validate() error {
 	if err != nil {
 		return err
 	}
-	u, err := url.Parse(c.URL)
-	if err != nil {
-		return err
-	}
-	if c.TLS.IsEnabled() && u.Scheme == "ldaps" {
-		_, err := tlscommon.LoadTLSConfig(c.TLS)
-		if err != nil {
-			return err
-		}
-		_, _, err = net.SplitHostPort(u.Host)
-		var addrErr *net.AddrError
-		switch {
-		case err == nil:
-		case errors.As(err, &addrErr):
-			if addrErr.Err != "missing port in address" {
-				return err
-			}
-		default:
-			return err
-		}
-	}
+
 	return nil
 }
 

@@ -93,7 +93,7 @@ func newInput(
 	clientSubscriptions := createClientSubscriptions(config)
 	onMessageHandler := createOnMessageHandler(logger, out, inflightMessages)
 	onConnectHandler := createOnConnectHandler(logger, &inputContext, onMessageHandler, clientSubscriptions, newBackoff)
-	clientOptions, err := createClientOptions(config, onConnectHandler)
+	clientOptions, err := createClientOptions(config, onConnectHandler, logger)
 	if err != nil {
 		return nil, err
 	}
