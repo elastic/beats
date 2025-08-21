@@ -123,8 +123,6 @@ mapped_pages:
 
 % This file is generated! See scripts/docs_collector.py
 
-% This file is generated! See scripts/docs_collector.py
-
 # {module_title} {dataset} dataset [auditbeat-dataset-{module}-{dataset}]
 
 """.format(module_title=title, module=module, dataset=dataset)
