@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
@@ -94,7 +95,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	log := inputContext.Logger
 
 	// setup status reporter
-	in.status = newCWStateReporter(inputContext, log)
+	in.status = statusreporterhelper.New(inputContext.StatusReporter, log, "CloudWatch")
 
 	defer in.status.UpdateStatus(status.Stopped, "")
 	in.status.UpdateStatus(status.Starting, "Input starting")
@@ -149,9 +150,9 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		return err
 	}
 
-	log.Debugf("Config latency = %f", cwPoller.config.Latency)
-	log.Debugf("Config scan_frequency = %f", cwPoller.config.ScanFrequency)
-	log.Debugf("Config api_sleep = %f", cwPoller.config.APISleep)
+	log.Debugf("Config latency = %s", cwPoller.config.Latency)
+	log.Debugf("Config scan_frequency = %s", cwPoller.config.ScanFrequency)
+	log.Debugf("Config api_sleep = %s", cwPoller.config.APISleep)
 	cwPoller.receive(ctx, logGroupIDs, time.Now)
 	return nil
 }

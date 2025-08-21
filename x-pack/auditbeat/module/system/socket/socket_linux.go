@@ -295,7 +295,7 @@ func (m *MetricSet) Setup() (err error) {
 					continue
 				}
 				if tracing.IsTraceFSAvailable() != nil {
-					m.log.Warnf("Mounted %s but no kprobes available", mount, err)
+					m.log.Warnf("Mounted %s but no kprobes available: %v", mount, err)
 					mount.unmount()
 					continue
 				}
