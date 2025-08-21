@@ -133,6 +133,16 @@ func testTagsFromEnv() []string {
 	return tags
 }
 
+// DefaultGoWindowsTestIntegrationArgs returns a default set of arguments for running
+// windows integration tests. We tag integration test files with 'integration'.
+func DefaultGoWindowsTestIntegrationArgs() GoTestArgs {
+	args := makeGoTestArgs("Windows-Integration")
+	args.Tags = append(args.Tags, "win_integration")
+	args.ExtraFlags = append(args.ExtraFlags, "-count=1")
+	args.Packages = []string{"./tests/integration/windows"}
+	return args
+}
+
 // DefaultGoTestUnitArgs returns a default set of arguments for running
 // all unit tests. We tag unit test files with '!integration'.
 func DefaultGoTestUnitArgs() GoTestArgs { return makeGoTestArgs("Unit") }
