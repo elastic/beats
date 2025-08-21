@@ -3,7 +3,9 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-envoyproxy.html
 ---
 
-# Envoyproxy Module [filebeat-module-envoyproxy]
+% This file is generated! See scripts/docs_collector.py
+
+# Envoyproxy module [filebeat-module-envoyproxy]
 
 This is a Filebeat module for Envoy proxy access log ([https://www.envoyproxy.io/docs/envoy/v1.10.0/configuration/access_log](https://www.envoyproxy.io/docs/envoy/v1.10.0/configuration/access_log)). It supports both standalone deployment and Envoy proxy deployment in Kubernetes.
 
@@ -25,8 +27,6 @@ This module comes with a sample dashboard.
 % TO DO: Use `:class: screenshot`
 ![kibana envoyproxy](images/kibana-envoyproxy.jpg)
 
-
-## Fields [_fields_16]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-envoyproxy.md) section.
-

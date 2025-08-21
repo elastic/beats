@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-nats.html
+applies_to:
+  stack: beta
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # NATS module [filebeat-module-nats]
 
@@ -67,7 +71,6 @@ The `nats` module comes with a predefined dashboard. For example:
 
 ![filebeat nats dashboard](images/filebeat_nats_dashboard.png)
 
-
-## Fields [_fields_35]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-nats.md) section.
