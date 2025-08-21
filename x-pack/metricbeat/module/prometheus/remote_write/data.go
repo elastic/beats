@@ -89,11 +89,7 @@ func (g *remoteWriteTypedGenerator) Start() {
 }
 
 func (g *remoteWriteTypedGenerator) Stop() {
-<<<<<<< HEAD
 	logp.Debug("prometheus.remote_write.cache", "stopping counterCache")
-=======
-	g.logger.Debug("stopping counterCache")
->>>>>>> a5be2a856 (chore: fix formatting issues in logp printf-style calls (#45944))
 	g.counterCache.Stop()
 }
 
