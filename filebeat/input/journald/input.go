@@ -205,13 +205,7 @@ func (inp *journald) Run(
 
 		event := entry.ToEvent()
 		if err := publisher.Publish(event, event.Private); err != nil {
-<<<<<<< HEAD
 			logger.Errorf("could not publish event: %s", err)
-=======
-			msg := fmt.Sprintf("could not publish event: %s", err)
-			ctx.UpdateStatus(status.Failed, msg)
-			logger.Errorf("%s", msg)
->>>>>>> a5be2a856 (chore: fix formatting issues in logp printf-style calls (#45944))
 			return err
 		}
 	}
