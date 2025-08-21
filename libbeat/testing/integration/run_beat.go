@@ -51,6 +51,7 @@ type RunningBeat struct {
 	outputDone  chan struct{}
 	watcher     OutputWatcher
 	keepRunning bool
+	t           *testing.T
 }
 
 // CollectOutput returns the last `limit` lines of the currently
@@ -123,7 +124,7 @@ func (b *RunningBeat) writeOutputLine(line string) {
 	if b.watcher.Observed() {
 		if !b.keepRunning {
 			if err := proc.StopCmd(b.c.Process); err != nil {
-				fmt.Printf("Cannot stop Beat: %s\n", err)
+				b.t.Logf("Cannot stop Beat: %s\n", err)
 			}
 		}
 		b.watcher = nil
@@ -200,6 +201,7 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 		watcher:     watcher,
 		keepRunning: opts.KeepRunning,
 		outputDone:  make(chan struct{}),
+		t:           t,
 	}
 
 	var wg sync.WaitGroup
