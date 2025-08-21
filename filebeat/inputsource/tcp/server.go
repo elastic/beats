@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -42,7 +43,7 @@ func New(
 	config *Config,
 	factory streaming.HandlerFactory,
 ) (*Server, error) {
-	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS)
+	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS, logp.NewLogger(""))
 	if err != nil {
 		return nil, err
 	}

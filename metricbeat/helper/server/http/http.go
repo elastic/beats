@@ -60,7 +60,7 @@ func getDefaultHttpServer(mb mb.BaseMetricSet) (*HttpServer, error) {
 		return nil, err
 	}
 
-	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS)
+	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS, mb.Logger())
 	if err != nil {
 		return nil, err
 	}
