@@ -14,6 +14,7 @@ output:
   file:
     path: ${path.home}
     filename: "output"
+    rotate_on_startup: false
 
 logging:
   level: debug
