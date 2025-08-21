@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -188,7 +189,7 @@ func createRedisClient(t *testing.T) *rd.Pool {
 			Certificate: "_meta/certs/server-cert.pem",
 			Key:         "_meta/certs/server-key.pem",
 		},
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("failed to load TLS configuration: %v", err)
 	}

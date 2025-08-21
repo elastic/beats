@@ -65,7 +65,7 @@ func newFromConfig(c config) (*processor, error) {
 		searchTimeLimit: c.LDAPSearchTimeLimit,
 	}
 	if c.LDAPTLS != nil {
-		tlsConfig, err := tlscommon.LoadTLSConfig(c.LDAPTLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(c.LDAPTLS, logp.NewLogger(""))
 		if err != nil {
 			return nil, fmt.Errorf("could not load provided LDAP TLS configuration: %w", err)
 		}
