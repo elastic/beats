@@ -179,7 +179,6 @@ This section contains detailed information about the metric collecting modules c
 
 """
 
-<<<<<<< HEAD
     for m, details in sorted(six.iteritems(modules_list)):
         title = details["title"]
         applies_to = details["applies_to"]
@@ -187,10 +186,6 @@ This section contains detailed information about the metric collecting modules c
         if applies_to:
             module_list_output += " {{applies_to}}`stack: {}`".format(applies_to)
         module_list_output += "\n"
-=======
-    for m, title in sorted(six.iteritems(modules_list)):
-        module_list_output += "* [{}](/reference/auditbeat/auditbeat-module-{}.md)\n".format(title, m)
->>>>>>> eeec409af (docs: remove todod and convert remaining docs to markdown (#44802))
 
     module_list_output += "\n"
 
