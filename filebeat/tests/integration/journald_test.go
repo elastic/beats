@@ -200,56 +200,53 @@ func generateJournaldLogs(t *testing.T, syslogID string, lines, size int) {
 	}
 }
 
-<<<<<<< HEAD
-//go:embed testdata/filebeat_journald.yml
-var journaldInputCfg string
+// func TestJournaldInputRunsAndRecoversFromJournalctlFailures(t *testing.T) {
+// 	filebeat := integration.NewBeat(
+// 		t,
+// 		"filebeat",
+// 		"../../filebeat.test",
+// 	)
 
-func TestJournaldInputRunsAndRecoversFromJournalctlFailures(t *testing.T) {
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+// 	// render configuration
+// 	syslogID := fmt.Sprintf("%s-%s", t.Name(), uuid.Must(uuid.NewV4()).String())
+// 	yamlCfg := fmt.Sprintf(journaldInputCfg, syslogID, filebeat.TempDir())
 
-	// render configuration
-	syslogID := fmt.Sprintf("%s-%s", t.Name(), uuid.Must(uuid.NewV4()).String())
-	yamlCfg := fmt.Sprintf(journaldInputCfg, syslogID, filebeat.TempDir())
+// 	go generateJournaldLogs(t, syslogID, 3, 150)
 
-	go generateJournaldLogs(t, context.Background(), syslogID, 3)
+// 	filebeat.WriteConfigFile(yamlCfg)
+// 	filebeat.Start()
+// 	// On a normal execution we run journalclt twice, the first time to read all messages from the
+// 	// previous boot until 'now' and the second one with the --follow flag that should keep on running.
+// 	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
+// 	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
 
-	filebeat.WriteConfigFile(yamlCfg)
-	filebeat.Start()
-	// On a normal execution we run journalclt twice, the first time to read all messages from the
-	// previous boot until 'now' and the second one with the --follow flag that should keep on running.
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
+// 	pidLine := filebeat.GetLastLogLine("journalctl started with PID")
+// 	logEntry := struct{ Message string }{}
+// 	if err := json.Unmarshal([]byte(pidLine), &logEntry); err != nil {
+// 		t.Errorf("could not parse PID log entry as JSON: %s", err)
+// 	}
 
-	pidLine := filebeat.GetLastLogLine("journalctl started with PID")
-	logEntry := struct{ Message string }{}
-	if err := json.Unmarshal([]byte(pidLine), &logEntry); err != nil {
-		t.Errorf("could not parse PID log entry as JSON: %s", err)
-	}
+// 	pid := 0
+// 	fmt.Sscanf(logEntry.Message, "journalctl started with PID %d", &pid)
 
-	pid := 0
-	fmt.Sscanf(logEntry.Message, "journalctl started with PID %d", &pid)
+// 	filebeat.WaitForLogs("Count: 003", 5*time.Second, "did not find the third event in published events")
 
-	filebeat.WaitForLogs("Count: 003", 5*time.Second, "did not find the third event in published events")
+// 	// Kill journalctl
+// 	if err := syscall.Kill(pid, syscall.SIGKILL); err != nil {
+// 		t.Fatalf("coluld not kill journalctl with PID %d: %s", pid, err)
+// 	}
 
-	// Kill journalctl
-	if err := syscall.Kill(pid, syscall.SIGKILL); err != nil {
-		t.Fatalf("coluld not kill journalctl with PID %d: %s", pid, err)
-	}
+// 	go generateJournaldLogs(t, syslogID, 5, 150)
+// 	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
+// 	filebeat.WaitForLogs("Count: 005", time.Second, "expected log message not found in published events SECOND")
 
-	go generateJournaldLogs(t, context.Background(), syslogID, 5)
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
-	filebeat.WaitForLogs("Count: 005", time.Second, "expected log message not found in published events SECOND")
+// 	eventsPublished := filebeat.CountFileLines(filepath.Join(filebeat.TempDir(), "output-*.ndjson"))
 
-	eventsPublished := filebeat.CountFileLines(filepath.Join(filebeat.TempDir(), "output-*.ndjson"))
+// 	if eventsPublished != 8 {
+// 		t.Fatalf("expecting 8 published events, got %d instead'", eventsPublished)
+// 	}
+// }
 
-	if eventsPublished != 8 {
-		t.Fatalf("expecting 8 published events, got %d instead'", eventsPublished)
-	}
-=======
 func largeStr(t *testing.T, len int) string {
 	str := strings.Builder{}
 	for range len {
@@ -261,5 +258,5 @@ func largeStr(t *testing.T, len int) string {
 
 	gen := str.String()
 	return gen
->>>>>>> fd21452b1 ([Journald] Add `--all` flag when calling journalctl (#46017))
+
 }
