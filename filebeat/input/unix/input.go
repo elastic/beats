@@ -117,7 +117,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 		return err
 	}
 
-	log.Debugf("%s Input '%v' initialized", s.config.Config.SocketType, ctx.ID)
+	log.Debugf("%v Input '%v' initialized", s.config.Config.SocketType, ctx.ID)
 
 	err = server.Run(ctxtool.FromCanceller(ctx.Cancelation))
 
