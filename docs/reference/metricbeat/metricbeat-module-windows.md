@@ -84,8 +84,4 @@ The following metricsets are available:
 
 * [perfmon](/reference/metricbeat/metricbeat-metricset-windows-perfmon.md)
 * [service](/reference/metricbeat/metricbeat-metricset-windows-service.md)
-<<<<<<< HEAD
 * [wmi](/reference/metricbeat/metricbeat-metricset-windows-wmi.md)  {applies_to}`stack: beta 9.1.0`
-=======
-* [wmi](/reference/metricbeat/metricbeat-metricset-windows-wmi.md)
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))

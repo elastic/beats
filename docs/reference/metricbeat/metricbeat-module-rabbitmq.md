@@ -62,8 +62,4 @@ The following metricsets are available:
 * [exchange](/reference/metricbeat/metricbeat-metricset-rabbitmq-exchange.md)
 * [node](/reference/metricbeat/metricbeat-metricset-rabbitmq-node.md)
 * [queue](/reference/metricbeat/metricbeat-metricset-rabbitmq-queue.md)
-<<<<<<< HEAD
 * [shovel](/reference/metricbeat/metricbeat-metricset-rabbitmq-shovel.md)  {applies_to}`stack: beta`
-=======
-* [shovel](/reference/metricbeat/metricbeat-metricset-rabbitmq-shovel.md)
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))

@@ -60,8 +60,4 @@ This module supports TLS connections when using `ssl` config field, as described
 
 The following metricsets are available:
 
-<<<<<<< HEAD
 * [qmgr](/reference/metricbeat/metricbeat-metricset-ibmmq-qmgr.md)  {applies_to}`stack: beta`
-=======
-* [qmgr](/reference/metricbeat/metricbeat-metricset-ibmmq-qmgr.md)
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))

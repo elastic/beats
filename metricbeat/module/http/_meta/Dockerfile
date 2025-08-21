@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 FROM golang:1.24.5
-=======
-FROM golang:1.24.3
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))
 
 COPY test/main.go main.go
 

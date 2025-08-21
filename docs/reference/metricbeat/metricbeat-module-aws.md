@@ -662,12 +662,6 @@ The following metricsets are available:
 * [s3_request](/reference/metricbeat/metricbeat-metricset-aws-s3_request.md)
 * [sns](/reference/metricbeat/metricbeat-metricset-aws-sns.md)  {applies_to}`stack: beta`
 * [sqs](/reference/metricbeat/metricbeat-metricset-aws-sqs.md)
-<<<<<<< HEAD
 * [transitgateway](/reference/metricbeat/metricbeat-metricset-aws-transitgateway.md)  {applies_to}`stack: beta`
 * [usage](/reference/metricbeat/metricbeat-metricset-aws-usage.md)  {applies_to}`stack: beta`
 * [vpn](/reference/metricbeat/metricbeat-metricset-aws-vpn.md)  {applies_to}`stack: beta`
-=======
-* [transitgateway](/reference/metricbeat/metricbeat-metricset-aws-transitgateway.md)
-* [usage](/reference/metricbeat/metricbeat-metricset-aws-usage.md)
-* [vpn](/reference/metricbeat/metricbeat-metricset-aws-vpn.md)
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))

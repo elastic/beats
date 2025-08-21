@@ -71,8 +71,4 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-<<<<<<< HEAD
 * [task_stats](/reference/metricbeat/metricbeat-metricset-awsfargate-task_stats.md)  {applies_to}`stack: beta`
-=======
-* [task_stats](/reference/metricbeat/metricbeat-metricset-awsfargate-task_stats.md)
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))

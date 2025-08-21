@@ -39,10 +39,5 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-<<<<<<< HEAD
 * [dommemstat](/reference/metricbeat/metricbeat-metricset-kvm-dommemstat.md)  {applies_to}`stack: beta`
 * [status](/reference/metricbeat/metricbeat-metricset-kvm-status.md)  {applies_to}`stack: beta`
-=======
-* [dommemstat](/reference/metricbeat/metricbeat-metricset-kvm-dommemstat.md)
-* [status](/reference/metricbeat/metricbeat-metricset-kvm-status.md)
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))

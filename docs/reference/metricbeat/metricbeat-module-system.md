@@ -252,8 +252,4 @@ The following metricsets are available:
 * [socket](/reference/metricbeat/metricbeat-metricset-system-socket.md)
 * [socket_summary](/reference/metricbeat/metricbeat-metricset-system-socket_summary.md)
 * [uptime](/reference/metricbeat/metricbeat-metricset-system-uptime.md)
-<<<<<<< HEAD
 * [users](/reference/metricbeat/metricbeat-metricset-system-users.md)  {applies_to}`stack: beta`
-=======
-* [users](/reference/metricbeat/metricbeat-metricset-system-users.md)
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))

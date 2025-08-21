@@ -151,12 +151,6 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-<<<<<<< HEAD
 * [container](/reference/metricbeat/metricbeat-metricset-cloudfoundry-container.md)  {applies_to}`stack: beta`
 * [counter](/reference/metricbeat/metricbeat-metricset-cloudfoundry-counter.md)  {applies_to}`stack: beta`
 * [value](/reference/metricbeat/metricbeat-metricset-cloudfoundry-value.md)  {applies_to}`stack: beta`
-=======
-* [container](/reference/metricbeat/metricbeat-metricset-cloudfoundry-container.md)
-* [counter](/reference/metricbeat/metricbeat-metricset-cloudfoundry-counter.md)
-* [value](/reference/metricbeat/metricbeat-metricset-cloudfoundry-value.md)
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))

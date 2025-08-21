@@ -94,8 +94,4 @@ The following metricsets are available:
 * [info](/reference/metricbeat/metricbeat-metricset-docker-info.md)
 * [memory](/reference/metricbeat/metricbeat-metricset-docker-memory.md)
 * [network](/reference/metricbeat/metricbeat-metricset-docker-network.md)
-<<<<<<< HEAD
 * [network_summary](/reference/metricbeat/metricbeat-metricset-docker-network_summary.md)  {applies_to}`stack: beta`
-=======
-* [network_summary](/reference/metricbeat/metricbeat-metricset-docker-network_summary.md)
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))

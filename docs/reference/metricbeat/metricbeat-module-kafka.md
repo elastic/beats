@@ -128,8 +128,4 @@ The following metricsets are available:
 * [consumer](/reference/metricbeat/metricbeat-metricset-kafka-consumer.md)  {applies_to}`stack: beta`
 * [consumergroup](/reference/metricbeat/metricbeat-metricset-kafka-consumergroup.md)
 * [partition](/reference/metricbeat/metricbeat-metricset-kafka-partition.md)
-<<<<<<< HEAD
 * [producer](/reference/metricbeat/metricbeat-metricset-kafka-producer.md)  {applies_to}`stack: beta`
-=======
-* [producer](/reference/metricbeat/metricbeat-metricset-kafka-producer.md)
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))

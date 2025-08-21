@@ -1,12 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-openai-usage.html
-<<<<<<< HEAD
 
 applies_to:
   stack: beta
-=======
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))
 ---
 
 % This file is generated! See scripts/docs_collector.py

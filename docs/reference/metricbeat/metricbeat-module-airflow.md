@@ -53,8 +53,4 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-<<<<<<< HEAD
 * [statsd](/reference/metricbeat/metricbeat-metricset-airflow-statsd.md)  {applies_to}`stack: beta`
-=======
-* [statsd](/reference/metricbeat/metricbeat-metricset-airflow-statsd.md)
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))

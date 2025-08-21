@@ -62,8 +62,4 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-<<<<<<< HEAD
 * [usage](/reference/metricbeat/metricbeat-metricset-openai-usage.md)  {applies_to}`stack: beta`
-=======
-* [usage](/reference/metricbeat/metricbeat-metricset-openai-usage.md)
->>>>>>> 15a959f97 ([docs][metricbeat] - remove asciidoc and add markdown (#44947))
