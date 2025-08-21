@@ -50,7 +50,7 @@ To create a new metricset:
 After running the mage commands, you’ll find the metricset, along with its generated files, under `module/{{module}}/{metricset}`. This directory contains the following files:
 
 * `\{{metricset}}.go`
-* `_meta/docs.asciidoc`
+* `_meta/docs.md`
 * `_meta/data.json`
 * `_meta/fields.yml`
 
