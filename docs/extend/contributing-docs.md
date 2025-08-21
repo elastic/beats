@@ -16,15 +16,15 @@ This means that a single page should stay valid over time and use version-relate
 
 For information on labeling manually maintained content with product lifecycle and versioning information, refer to [Write cumulative documentation](https://elastic.github.io/docs-builder/contribute/cumulative-docs/).
 
-For generated content, read more below in [Update `fields.yml`](#update-fields).
+For generated content, read more in [Update `fields.yml`](#update-fields).
 
 ## Generated docs [generated-docs]
 
 Many Markdown files in the Beats repo should be edited directly, but some are generated including:
 
-* Exported fields (for example, [AWS fields](https://www.elastic.co/docs/reference/beats/metricbeat/exported-fields-aws))
-* Module docs (for example, [AWS module](https://www.elastic.co/docs/reference/beats/metricbeat/metricbeat-module-aws))
-* Metricset and dataset docs (for example, [AWS billing metricset](https://www.elastic.co/docs/reference/beats/metricbeat/metricbeat-metricset-aws-billing))
+* Exported fields (for example, [AWS fields](/reference/metricbeat/exported-fields-aws.md))
+* Module docs (for example, [AWS module](/reference/metricbeat/metricbeat-module-aws.md))
+* Metricset and dataset docs (for example, [AWS billing metricset](/reference/metricbeat/metricbeat-metricset-aws-billing.md))
 
 :::{tip}
 Every Markdown file that is generated includes a code comment at the top of the content that states `% This file is generated!`.
@@ -54,17 +54,17 @@ The `fields.yml` files in `_meta` directories across individual beats contain de
 
 ### Update `docs.md`
 
-The `docs.md` files in `_meta` directories is used for generated module documentation.
+The `docs.md` files in `_meta` directories are used for generated module documentation.
 
 ### Generate the docs
 
-After updating `fields.md` and `docs.md` files in `_meta` directories,
+After updating `fields.yml` and `docs.md` files in `_meta` directories,
 you must run the doc collector scripts to regenerate the docs:
 
 1. Make sure you [set up your Beats development environment](./index.md#setting-up-dev-environment)
   and use the correct Go version.
     * The Go version is listed in the `version.asciidoc` file for the branch you want to update.
-1. Change to the beats directory.
+1. Change to the beats repo directory.
 1. Run `make update` to run the docs collector scripts.
 
     ::::{warning}

@@ -122,7 +122,7 @@ You can find up to 3 different types of files named `fields.yml` in the beats re
     1. This is used to add product lifecycle and version related tags to illustrate how the product has evolved.
        In this example, the metricset was added in GA in version 9.0.0.
        Read more in [](/extend/contributing-docs.md#cumulative-docs).
-    2. And this illustrates that a new field was added to the existing metricset in beta in version 9.1.0.
+    2. This illustrates that a new field was added to the existing metricset in beta in version 9.1.0.
 
 
 
