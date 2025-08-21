@@ -68,10 +68,10 @@ func configure(cfg *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	return newHTTPEndpoint(conf)
+	return newHTTPEndpoint(conf, logp.NewLogger(""))
 }
 
-func newHTTPEndpoint(config config) (*httpEndpoint, error) {
+func newHTTPEndpoint(config config, logger *logp.Logger) (*httpEndpoint, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func newHTTPEndpoint(config config) (*httpEndpoint, error) {
 	addr := fmt.Sprintf("%v:%v", config.ListenAddress, config.ListenPort)
 
 	var tlsConfig *tls.Config
-	tlsConfigBuilder, err := tlscommon.LoadTLSServerConfig(config.TLS)
+	tlsConfigBuilder, err := tlscommon.LoadTLSServerConfig(config.TLS, logger)
 	if err != nil {
 		return nil, err
 	}
