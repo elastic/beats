@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# logstash fields [exported-fields-logstash]
+# Logstash fields [exported-fields-logstash]
 
 logstash Module
 
