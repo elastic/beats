@@ -118,7 +118,6 @@ class Test(BaseTest):
         reg = self.get_registry()
         assert reg == [] or reg[0]["offset"] == 0
 
-<<<<<<< HEAD
     def test_once(self):
         """
         Test filebeat running with the once flag.
@@ -158,8 +157,6 @@ class Test(BaseTest):
         data = self.get_registry()
         assert len(data) == 1
 
-=======
->>>>>>> c02667e24 (Replace Python tests with GO test (#45503))
     def nasa_logs(self):
 
         # Uncompress the nasa log file.
