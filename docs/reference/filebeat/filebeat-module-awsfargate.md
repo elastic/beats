@@ -5,6 +5,8 @@ applies_to:
   stack: beta
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # AWS Fargate module [filebeat-module-awsfargate]
 
 ::::{warning}
@@ -328,8 +330,6 @@ Because temporary security credentials are short term, after they expire, the us
 
 IAM policy is an entity that defines permissions to an object within your AWS environment. Specific permissions needs to be added into the IAM user’s policy to authorize Metricbeat to collect AWS monitoring metrics. Please see documentation under each metricset for required permissions.
 
-
-## Fields [_fields_7]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-awsfargate.md) section.
-

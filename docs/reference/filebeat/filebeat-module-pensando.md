@@ -3,7 +3,9 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-pensando.html
 ---
 
-# pensando module [filebeat-module-pensando]
+% This file is generated! See scripts/docs_collector.py
+
+# Pensando module [filebeat-module-pensando]
 
 The `pensando` module parses distributed firewall logs created by the [Pensando](http://pensando.io/) distributed services card (DSC).
 
@@ -67,7 +69,6 @@ This module comes with a sample dashboard. For example:
 % TO DO: Use `:class: screenshot`
 ![filebeat pensando dfw](images/filebeat-pensando-dfw.png)
 
-
-## Fields [_fields_43]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-pensando.md) section.

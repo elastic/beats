@@ -5,6 +5,8 @@ applies_to:
   stack: beta
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # CrowdStrike module [filebeat-module-crowdstrike]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -89,7 +91,6 @@ For alerts, go to Detections → External alerts.
 
 And for all over event CrowdStrike Falcon event types, go to Host → Events.
 
-
-## Fields [_fields_13]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-crowdstrike.md) section.
