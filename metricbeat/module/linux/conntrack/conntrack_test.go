@@ -60,7 +60,7 @@ func TestFetch(t *testing.T) {
 		"search_restart": uint64(3),
 	}
 
-	rawEvent := events[0].BeatEvent("linux", "conntrack").Fields["linux"].(mapstr.M)["conntrack"].(mapstr.M)["summary"]
+	rawEvent := events[0].BeatEvent("linux", "conntrack").Fields["linux"].(mapstr.M)["conntrack"].(mapstr.M)["summary"] //nolint:errcheck // ignore
 
 	assert.Equal(t, testConn, rawEvent)
 }
