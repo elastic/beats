@@ -217,6 +217,7 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 				// In this case, we track the time grain returned by the API. Azure
 				// provides a default time grain for each metric.
 				if client.ResourceConfigurations.Metrics[i].TimeGrain == "" {
+					// this should not be hit anymore - we grab the first timegrain reported
 					client.ResourceConfigurations.Metrics[i].TimeGrain = timeGrain
 				}
 

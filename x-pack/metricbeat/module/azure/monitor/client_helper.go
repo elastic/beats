@@ -71,11 +71,15 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 				}
 			}
 			for key, metricGroup := range metricGroups {
-				var metricNames []string
-				for _, metricName := range metricGroup {
-					metricNames = append(metricNames, *metricName.Name.Value)
+				metricNamesByFirstTimegrain := make(map[string][]string)
+				for _, metricFromGroup := range metricGroup {
+					// combine like first timegrains
+					// we can sort these if we ever discover ordering is not guaranteed
+					metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain] = append(metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain], *metricFromGroup.Name.Value)
 				}
-				metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, metric.Timegrain))
+				for timeGrain, metricNames := range metricNamesByFirstTimegrain {
+					metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, timeGrain))
+				}
 			}
 		}
 	}
