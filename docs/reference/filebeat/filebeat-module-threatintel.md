@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-threatintel.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Threat Intel module [filebeat-module-threatintel]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -545,8 +547,6 @@ Overview of the information provided by the MISP feed.
 
 Overview of the information provided by the ThreatQuotient feed.
 
-
-## Fields [_fields_53]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-threatintel.md) section.
-

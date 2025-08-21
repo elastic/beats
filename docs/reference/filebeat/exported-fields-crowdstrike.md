@@ -7,7 +7,7 @@ applies_to:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# Crowdstrike fields [exported-fields-crowdstrike]
+# CrowdStrike fields [exported-fields-crowdstrike]
 
 Module for collecting Crowdstrike events.
 
