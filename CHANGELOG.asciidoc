@@ -279,6 +279,72 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Remove 22 clause limitation. {issue}35047[35047] {pull}42187[42187]
 - Add handling for recoverable publisher disabled errors. {issue}35316[35316] {pull}42187[42187]
 
+[[release-notes-8.17.8]]
+=== Beats version 8.17.8
+https://github.com/elastic/beats/compare/v8.17.7\...v8.17.8[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix `dns` processor to handle IPv6 server addresses properly. {pull}44526[44526]
+- Use Debian 11 to build linux/arm to match linux/amd64. Upgrades linux/arm64's statically linked glibc from 2.28 to 2.31. {issue}44816[44816]
+
+*Filebeat*
+
+- If a Filestream input fails to be created, its ID is removed from the list of running input IDs {pull}44697[44697]
+- Ensure DEPROVISIONED Okta entities are published by Okta entityanalytics provider. {issue}12658[12658] {pull}44719[44719]
+- Added missing "text/csv" content-type filter support in azureblobsortorage input. {issue}44596[44596] {pull}44824[44824]
+- Fix unexpected EOF detection and improve memory usage. {pull}44813[44813]
+- Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. {issue}44349[44349] {pull}44436[44436]
+- Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
+
+*Metricbeat*
+
+- Upgrade `go.mongodb.org/mongo-driver` version from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module. {pull}44769[44769]
+- Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.24.4. {pull}44696[44696]
+
+*Filebeat*
+
+- Filestream now logs at level warn the number of files that are too small to be ingested. {pull}44751[44751]
+
+*Metricbeat*
+
+- Add check for HTTP error codes in the Metricbeat's Prometheus query submodule. {pull}44493[44493]
+- Sanitize error messages in Fetch method of SQL module. {pull}44577[44577]
+
+[[release-notes-8.17.7]]
+=== Beats version 8.17.7
+https://github.com/elastic/beats/compare/v8.17.6\...v8.17.7[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix the 'add_cloud_metadata' processor to better support custom certificate bundles by improving how the AWS provider HTTP client is overridden. {pull}44189[44189]
+
+*Auditbeat*
+
+- Fix a potential error in the system/package component that could occur during internal package database schema migration. {issue}44294[44294] {pull}44296[44296]
+
+*Filebeat*
+
+- Fix a WebSocket panic scenario that occured after exhausting the maximum number of retries. {pull}44342[44342]
+
+==== Added
+
+*Metricbeat*
+
+- Add checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
+- Add `enable_batch_api` option in the Azure monitor module to allow metrics collection of multiple resources using Azure batch API. {pull}41790[41790]
+- Add support for `_nodes/stats` URIs compatible with legacy Elasticsearch versions. {pull}44307[44307]
+- Add a latency configuration option to the Azure Monitor module. {pull}44366[44366]
 
 [[release-notes-8.17.6]]
 === Beats version 8.17.6
