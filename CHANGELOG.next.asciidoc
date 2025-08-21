@@ -330,7 +330,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improve CEL and Streaming input documentation of the `state` option. {pull}45616[45616]
 - Clarify behavior in logging for starting periodic evaluations and for exceeding the maximum execution budget. {pull}45633[45633]
 - Add mechanism to allow HTTP JSON templates to terminate without logging an error. {issue}45664[45664] {pull}45810[45810]
-- Update CEL mito extensions to v1.22.0. {pull}45245[45245]
 
 *Auditbeat*
 
