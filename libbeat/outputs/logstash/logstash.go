@@ -42,27 +42,27 @@ func makeLogstash(
 	observer outputs.Observer,
 	cfg *conf.C,
 ) (outputs.Group, error) {
-	lsConfig, err := readConfig(cfg, beat)
-	if err != nil {
-		return outputs.Fail(err)
-	}
-
-	hosts, err := outputs.ReadHostList(cfg)
-	if err != nil {
-		return outputs.Fail(err)
-	}
-
 	log := beat.Logger.Named("logstash")
-	return MakeLogstashClients(beat.Version, log, lsConfig, hosts, observer)
+	return MakeLogstashClients(beat.Version, log, observer, cfg, beat.IndexPrefix)
 }
 
 func MakeLogstashClients(
 	beatVersion string,
 	logger *logp.Logger,
-	config *Config,
-	hosts []string,
 	observer outputs.Observer,
+	rawCfg *conf.C,
+	beatIndexPrefix string,
 ) (outputs.Group, error) {
+	config, err := readConfig(rawCfg, beatIndexPrefix)
+	if err != nil {
+		return outputs.Fail(err)
+	}
+
+	hosts, err := outputs.ReadHostList(rawCfg)
+	if err != nil {
+		return outputs.Fail(err)
+	}
+
 	tls, err := tlscommon.LoadTLSConfig(config.TLS, logger)
 	if err != nil {
 		return outputs.Group{}, err
