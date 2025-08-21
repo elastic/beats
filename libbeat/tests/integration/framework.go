@@ -980,9 +980,10 @@ func reportErrors(t *testing.T, tempDir string, beatName string) {
 	}
 }
 
-// GenerateLogFile writes count lines to path, each line is 50 bytes.
+// GenerateLogFile writes count lines to path
 // Each line contains the current time (RFC3339) and a counter
-func GenerateLogFile(t *testing.T, path string, count int, append bool) {
+// Prefix is added instead of current time if it exists
+func GenerateLogFile(t *testing.T, path string, count int, append bool, prefix ...string) {
 	var file *os.File
 	var err error
 	if !append {
@@ -1007,15 +1008,22 @@ func GenerateLogFile(t *testing.T, path string, count int, append bool) {
 			t.Fatalf("could not sync file: %s", err)
 		}
 	}()
-	now := time.Now().Format(time.RFC3339)
-	// If the length is different, e.g when there is no offset from UTC.
-	// add some padding so the length is predictable
-	if len(now) != len(time.RFC3339) {
-		paddingNeeded := len(time.RFC3339) - len(now)
-		for i := 0; i < paddingNeeded; i++ {
-			now += "-"
+
+	var now string
+	if len(prefix) == 0 {
+		// If the length is different, e.g when there is no offset from UTC.
+		// add some padding so the length is predictable
+		now = time.Now().Format(time.RFC3339)
+		if len(now) != len(time.RFC3339) {
+			paddingNeeded := len(time.RFC3339) - len(now)
+			for i := 0; i < paddingNeeded; i++ {
+				now += "-"
+			}
 		}
+	} else {
+		now = strings.Join(prefix, "")
 	}
+
 	for i := 0; i < count; i++ {
 		if _, err := fmt.Fprintf(file, "%s           %13d\n", now, i); err != nil {
 			t.Fatalf("could not write line %d to file: %s", count+1, err)
@@ -1023,6 +1031,26 @@ func GenerateLogFile(t *testing.T, path string, count int, append bool) {
 	}
 }
 
+// AssertLinesInFile counts number of lines in the given file and  asserts if it matches expected count
+func AssertLinesInFile(t *testing.T, path string, count int) {
+	t.Helper()
+	var lines []byte
+	var err error
+	require.Eventuallyf(t, func() bool {
+		// ensure all log lines are ingested
+		lines, err = os.ReadFile(path)
+		if err != nil {
+			t.Logf("error reading file %v", err)
+			return false
+		}
+		lines := strings.Split(string(lines), "\n")
+		// we subtract number of lines by 1 because the last line in output file contains an extra \n
+		return len(lines)-1 == count
+	}, 2*time.Minute, 10*time.Second, "expected lines: %d, got lines: %d", count, lines)
+
+}
+
+// CountFileLines returns the number of lines matching in given glob pattern
 func (b *BeatProc) CountFileLines(glob string) int {
 	file := b.openGlobFile(glob, true)
 	defer file.Close()
