@@ -223,12 +223,7 @@ func (r sqsProcessingResult) Done() {
 			return
 		}
 		p.metrics.sqsMessagesDeletedTotal.Inc()
-<<<<<<< HEAD
-		p.log.Errorf("failed processing SQS message (message was deleted): %w", processingErr)
-=======
 		p.log.Errorf("failed processing SQS message (message was deleted): %v", processingErr)
-		r.processor.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failed processing SQS message. Message was deleted. Processing error: %s", processingErr.Error()))
->>>>>>> a5be2a856 (chore: fix formatting issues in logp printf-style calls (#45944))
 		return
 	}
 
@@ -237,12 +232,7 @@ func (r sqsProcessingResult) Done() {
 	// queue is enabled then the message will eventually placed on the DLQ
 	// after maximum receives is reached.
 	p.metrics.sqsMessagesReturnedTotal.Inc()
-<<<<<<< HEAD
-	p.log.Errorf("failed processing SQS message (it will return to queue after visibility timeout): %w", processingErr)
-=======
 	p.log.Errorf("failed processing SQS message (it will return to queue after visibility timeout): %v", processingErr)
-	r.processor.status.UpdateStatus(status.Degraded, fmt.Sprintf("Failed processing SQS message. Processing will be reattempted: %s", processingErr.Error()))
->>>>>>> a5be2a856 (chore: fix formatting issues in logp printf-style calls (#45944))
 }
 
 func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, msg *types.Message) {
