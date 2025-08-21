@@ -127,7 +127,8 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 		// For libbeat ES output, the "workers" setting controls the number of concurrent connections per ES host.
 		// For elasticsearchexporter, we can achieve the same concurrency by specifying "max_conns_per_host" setting
 		// as our otelconsumer sends data parallelly to the consumer.
-		"max_conns_per_host": escfg.NumWorkers() * len(escfg.Hosts),
+		"max_conns_per_host":  escfg.NumWorkers(),
+		"force_attempt_http2": false,
 
 		// Retry
 		"retry": map[string]any{
@@ -153,7 +154,6 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 		"compression_params": map[string]any{
 			"level": escfg.CompressionLevel,
 		},
-		"force_attempt_http2": false,
 	}
 
 	// Authentication
