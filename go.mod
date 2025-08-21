@@ -175,15 +175,9 @@ require (
 	github.com/aws/smithy-go v1.22.1
 	github.com/dgraph-io/badger/v4 v4.6.0
 	github.com/elastic/bayeux v1.0.5
-<<<<<<< HEAD
-	github.com/elastic/ebpfevents v0.6.0
-	github.com/elastic/elastic-agent-autodiscover v0.9.0
-	github.com/elastic/elastic-agent-libs v0.20.0
-=======
 	github.com/elastic/ebpfevents v0.7.0
-	github.com/elastic/elastic-agent-autodiscover v0.10.0
+	github.com/elastic/elastic-agent-autodiscover v0.9.0
 	github.com/elastic/elastic-agent-libs v0.21.5
->>>>>>> 8df1efe87 (Replace global loggers with local logger #13 (#45720))
 	github.com/elastic/elastic-agent-system-metrics v0.11.11
 	github.com/elastic/go-elasticsearch/v8 v8.17.0
 	github.com/elastic/go-quark v0.2.0

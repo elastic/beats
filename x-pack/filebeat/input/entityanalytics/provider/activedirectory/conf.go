@@ -6,12 +6,6 @@ package activedirectory
 
 import (
 	"errors"
-<<<<<<< HEAD
-	"net"
-	"net/url"
-=======
-	"strings"
->>>>>>> 8df1efe87 (Replace global loggers with local logger #13 (#45720))
 	"time"
 
 	"github.com/go-ldap/ldap/v3"

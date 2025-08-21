@@ -31,16 +31,8 @@ type server struct {
 	bindAddress    string
 }
 
-<<<<<<< HEAD
 func newServer(c config, log *logp.Logger, pub func(beat.Event), metrics *inputMetrics) (*server, error) {
 	ljSvr, bindAddress, err := newLumberjack(c)
-=======
-func newServer(c config, log *logp.Logger, pub func(beat.Event), stat status.StatusReporter, metrics *inputMetrics) (*server, error) {
-	if stat == nil {
-		stat = noopReporter{}
-	}
-	ljSvr, bindAddress, err := newLumberjack(c, log)
->>>>>>> 8df1efe87 (Replace global loggers with local logger #13 (#45720))
 	if err != nil {
 		return nil, err
 	}
