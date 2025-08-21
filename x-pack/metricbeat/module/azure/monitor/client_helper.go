@@ -75,7 +75,9 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 				for _, metricFromGroup := range metricGroup {
 					// combine like first timegrains
 					// we can sort these if we ever discover ordering is not guaranteed
-					metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain] = append(metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain], *metricFromGroup.Name.Value)
+					metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain] = append(
+						metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain],
+						*metricFromGroup.Name.Value)
 				}
 				for timeGrain, metricNames := range metricNamesByFirstTimegrain {
 					metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, timeGrain))
