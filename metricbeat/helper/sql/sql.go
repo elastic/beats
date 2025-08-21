@@ -102,7 +102,7 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 		r := mapstr.M{}
 
 		for i, c := range cols {
-			value := getValue(vals[i].(*interface{}))
+			value := getValue(vals[i].(*interface{})) //nolint:errcheck
 			r.Put(c, value)
 		}
 
@@ -162,7 +162,7 @@ func (d *DbClient) fetchVariableMode(rows sqlRow) (mapstr.M, error) {
 func ReplaceUnderscores(ms mapstr.M) mapstr.M {
 	dotMap := mapstr.M{}
 	for k, v := range ms {
-		dotMap.Put(strings.Replace(k, "_", ".", -1), v)
+		dotMap.Put(strings.ReplaceAll(k, "_", "."), v)
 	}
 
 	return dotMap

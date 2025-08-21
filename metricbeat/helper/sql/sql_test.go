@@ -158,7 +158,7 @@ func checkValue(t *testing.T, res kv, ms mapstr.M) {
 			t.Errorf("key %q: expected nil, got %v (%T)", res.k, actual, actual)
 		}
 	case []interface{}:
-		actualSlice := actual.([]interface{})
+		actualSlice := actual.([]interface{}) //nolint:errcheck
 		if len(v) != len(actualSlice) {
 			t.Errorf("key %q: slice length mismatch: expected %d, got %d", res.k, len(v), len(actualSlice))
 			return
@@ -169,7 +169,7 @@ func checkValue(t *testing.T, res kv, ms mapstr.M) {
 			}
 		}
 	case []byte:
-		actualStr := actual.(string)
+		actualStr := actual.(string) //nolint:errcheck
 		if actualStr != string(v) {
 			t.Errorf("key %q: expected %q (string), got %q", res.k, string(v), actualStr)
 		}
