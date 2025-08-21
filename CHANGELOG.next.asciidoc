@@ -301,7 +301,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
 - Fix histogram values of zero are filtered out on non-amd64 platforms for openmetrics and prometheus {pull}44750[44750]
 - Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. {pull}45761[45761]
-- Fix an issue where the conntrack metricset entries field reported an inflated count because it was multiplied by the number of CPU cores. {issue}00000[00000] {pull}00000[00000]
+- Fix an issue where the conntrack metricset entries field reported an inflated count because it was multiplied by the number of CPU cores. {issue}46138[46138] {pull}46140[46140]
 
 *Osquerybeat*
 
