@@ -303,6 +303,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]19
 - Add status reporting support for AWS CloudWatch input. {pull}45679[45679]
 - Add mechanism to allow HTTP JSON templates to terminate without logging an error. {issue}45664[45664] {pull}45810[45810]
+- Add status reporting support for AWS S3 input. {pull}45748[45748]
 
 *Auditbeat*
 
