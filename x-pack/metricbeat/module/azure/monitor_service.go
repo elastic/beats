@@ -417,6 +417,13 @@ func (service *MonitorService) GetMetricValues(resourceId string, namespace stri
 			return metrics, "", err
 		}
 
+		if resp.Interval == nil || *resp.Interval == "" {
+			// TODO: Joe to figure out impact here - is this OK downstream?
+			service.log.Warnf("The returned interval (timegrain) for the list operation response is empty. Skipping this data."+
+				" Query parameters: Aggregation: '%v', Filter: '%v', Metric Names: '%v', Timespan: '%v', Result Type: '%v'",
+				aggregations, metricsFilter, metricNames, timespan, resultTypeData)
+			continue
+		}
 		interval = *resp.Interval
 
 		for _, v := range resp.Value {
