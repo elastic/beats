@@ -13,11 +13,6 @@ import (
 	"github.com/godror/godror/dsn"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-<<<<<<< HEAD
-=======
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
->>>>>>> 8df1efe87 (Replace global loggers with local logger #13 (#45720))
 )
 
 // ConnectionDetails contains all possible data that can be used to create a connection with
@@ -30,14 +25,6 @@ type ConnectionDetails struct {
 
 // ParseDSN tries to parse the host
 func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
-
-	logger := logp.NewLogger("")
-	// At the time of writing, mod always is of type *mb.BaseModule.
-	// If this assumption is ever broken, we use global logger then
-	sqlModule, ok := mod.(*mb.BaseModule)
-	if ok {
-		logger = sqlModule.Logger
-	}
 
 	// TODO: Add support for `username` and `password` as module options
 	config := ConnectionDetails{}
@@ -64,27 +51,6 @@ func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 			Password:     params.Password.Secret(),
 		}, nil
 	}
-<<<<<<< HEAD
-=======
-
-	if config.Driver == "mysql" {
-		return mysqlParseDSN(config, host, logger)
-	}
-
-	if config.Driver == "postgres" {
-		return postgresParseDSN(config, host, logger)
-	}
-
-	if config.Driver == "mssql" {
-		return mssqlParseDSN(config, host, logger)
-	}
-
-	return defaultParseDSN(config, host)
-}
-
-// defaultParseDSN is for backwards compatibility. It just passes the "host" param unchanged to the database driver
-func defaultParseDSN(_ ConnectionDetails, host string) (mb.HostData, error) {
->>>>>>> 8df1efe87 (Replace global loggers with local logger #13 (#45720))
 	sanitized := sanitize(host)
 	return mb.HostData{
 		URI:          host,
@@ -108,178 +74,3 @@ func sanitize(host string) string {
 
 	return "(redacted)"
 }
-<<<<<<< HEAD
-=======
-
-func oracleParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
-	params, err := godror.ParseDSN(host)
-	if err != nil {
-		return mb.HostData{}, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
-	}
-	if params.Username == "" {
-		params.Username = config.Username
-	}
-	if params.Password.Secret() == "" {
-		params.StandaloneConnection = true
-		params.Password = dsn.NewPassword(config.Password)
-	}
-	return mb.HostData{
-		URI:          params.StringWithPassword(),
-		SanitizedURI: params.ConnectString,
-		Host:         params.String(),
-		User:         params.Username,
-		Password:     params.Password.Secret(),
-	}, nil
-}
-
-func mysqlParseDSN(config ConnectionDetails, host string, logger *logp.Logger) (mb.HostData, error) {
-	c, err := mysql.ParseDSN(host)
-
-	if err != nil {
-		return mb.HostData{}, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
-	}
-
-	sanitized := c.Addr
-
-	if config.TLS.IsEnabled() {
-		c.TLSConfig = mysqlTLSConfigKey
-
-		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, logger)
-		if err != nil {
-			return mb.HostData{}, fmt.Errorf("could not load provided TLS configuration: %w", err)
-		}
-
-		if err := mysql.RegisterTLSConfig(mysqlTLSConfigKey, tlsConfig.ToConfig()); err != nil {
-			return mb.HostData{}, fmt.Errorf("registering custom tls config failed: %w", err)
-		}
-	}
-
-	return mb.HostData{
-		URI:          c.FormatDSN(),
-		SanitizedURI: sanitized,
-		Host:         sanitized,
-	}, nil
-}
-
-func postgresParseDSN(config ConnectionDetails, host string, logger *logp.Logger) (mb.HostData, error) {
-	if config.TLS.IsEnabled() {
-		u, err := url.Parse(host)
-		if err != nil {
-			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", sanitizeError(err, host))
-		}
-
-		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, logger)
-		if err != nil {
-			return mb.HostData{}, fmt.Errorf("could not load provided TLS configuration: %w", err)
-		}
-
-		q := u.Query()
-
-		if sslmode := postgresTranslateVerificationMode(tlsConfig.Verification); sslmode != "" {
-			q.Set("sslmode", sslmode)
-		}
-
-		if len(config.TLS.CAs) > 1 {
-			return mb.HostData{}, fmt.Errorf("postgres driver supports only one CA certificate, got %d CAs", len(config.TLS.CAs))
-		} else if len(config.TLS.CAs) == 1 {
-			ca := config.TLS.CAs[0]
-			if tlscommon.IsPEMString(ca) {
-				return mb.HostData{}, fmt.Errorf("postgres driver supports only certificate file path, got 'ca' as PEM formatted certificate")
-			}
-			q.Set("sslrootcert", ca)
-		}
-
-		if key := config.TLS.Certificate.Key; key != "" {
-			if tlscommon.IsPEMString(key) {
-				return mb.HostData{}, fmt.Errorf("postgres driver supports only certificate file path, got 'key' as PEM formatted certificate")
-			}
-			q.Set("sslkey", key)
-		}
-
-		if cert := config.TLS.Certificate.Certificate; cert != "" {
-			if tlscommon.IsPEMString(cert) {
-				return mb.HostData{}, fmt.Errorf("postgres driver supports only certificate file path, got 'certificate' as PEM formatted certificate")
-			}
-			q.Set("sslcert", cert)
-		}
-
-		u.RawQuery = q.Encode()
-
-		return mb.HostData{
-			URI:          u.String(),
-			SanitizedURI: u.Host,
-			Host:         u.Host,
-		}, nil
-	}
-
-	// If ssl.enabled param is false (default) we choose to maintain backward compatibility
-	// by calling defaultParseDSN which passes the unchanged and unparsed connection string `host`
-	// to the database driver (to support database-specific formats of DSN, not just URLs)
-	return defaultParseDSN(config, host)
-}
-
-// rough translation of SSL modes
-func postgresTranslateVerificationMode(mode tlscommon.TLSVerificationMode) (sslmode string) {
-	switch mode {
-	case tlscommon.VerifyFull:
-		return "verify-full"
-	case tlscommon.VerifyStrict:
-		return "verify-full"
-	case tlscommon.VerifyCertificate:
-		return "verify-ca"
-	default:
-		return "require"
-	}
-}
-
-func mssqlParseDSN(config ConnectionDetails, host string, logger *logp.Logger) (mb.HostData, error) {
-	if config.TLS.IsEnabled() {
-		u, err := url.Parse(host)
-		if err != nil {
-			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", sanitizeError(err, host))
-		}
-
-		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, logger)
-		if err != nil {
-			return mb.HostData{}, fmt.Errorf("could not load provided TLS configuration: %w", err)
-		}
-
-		q := u.Query()
-
-		q.Set("encrypt", "true")
-
-		if tlsConfig.Verification == tlscommon.VerifyNone {
-			q.Set("TrustServerCertificate", "true")
-		} else {
-			q.Set("TrustServerCertificate", "false")
-		}
-
-		if config.TLS.Certificate.Certificate != "" || config.TLS.Certificate.Key != "" {
-			return mb.HostData{}, fmt.Errorf("mssql driver supports only CA certificate, but got client key and/or certificate")
-		}
-
-		if len(config.TLS.CAs) > 1 {
-			return mb.HostData{}, fmt.Errorf("mssql driver supports only one CA certificate, but got %d CAs", len(config.TLS.CAs))
-		} else if len(config.TLS.CAs) == 1 {
-			ca := config.TLS.CAs[0]
-			if tlscommon.IsPEMString(ca) {
-				return mb.HostData{}, fmt.Errorf("mssql driver supports only certificate file path, got 'ca' as PEM formatted certificate")
-			}
-			q.Set("certificate", ca)
-		}
-
-		u.RawQuery = q.Encode()
-
-		return mb.HostData{
-			URI:          u.String(),
-			SanitizedURI: u.Host,
-			Host:         u.Host,
-		}, nil
-	}
-
-	// If ssl.enabled param is false (default) we choose to maintain backward compatibility
-	// by calling defaultParseDSN which passes the unchanged and unparsed connection string `host`
-	// to the database driver (to support database-specific formats of DSN, not just URLs)
-	return defaultParseDSN(config, host)
-}
->>>>>>> 8df1efe87 (Replace global loggers with local logger #13 (#45720))
