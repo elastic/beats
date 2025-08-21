@@ -134,7 +134,11 @@ $$$supported-attributes$$$
 12. [file_selectors](#attrib-file_selectors)
 13. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
 14. [timestamp_epoch](#attrib-timestamp_epoch)
+<<<<<<< HEAD
 15. [path_prefix](#attrib-path_prefix) {applies_to}`stack: ga 9.1.0`
+=======
+15. [path_prefix](#attrib-path_prefix) {applies_to}`stack: ga 9.1.4`
+>>>>>>> 3b952a0f4 ([docs] Adds applies_to to changes from #45214 (#46096))
 16. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.1.0`
 
 ## `account_name` [attrib-account-name]
@@ -348,7 +352,11 @@ The Azure Blob Storage APIs don’t provide a direct way to filter files based o
 ## `path_prefix` [attrib-path_prefix]
 
 ```{applies_to}
+<<<<<<< HEAD
 stack: ga 9.1.0
+=======
+stack: ga 9.1.4
+>>>>>>> 3b952a0f4 ([docs] Adds applies_to to changes from #45214 (#46096))
 ```
 
 This attribute can be used to filter out files or blobs that have a prefix string that is different from the specified value. This allows you to efficiently retrieve a subset of blobs that are organized in a virtual folder-like structure. This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority over the root level values if both are specified.
