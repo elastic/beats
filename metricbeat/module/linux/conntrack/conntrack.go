@@ -79,8 +79,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	summedEvents := procfs.ConntrackStatEntry{}
-	for _, conn := range conntrackStats {
-		summedEvents.Entries += conn.Entries
+	for i, conn := range conntrackStats {
+		// Entries is the total connections in the conntrack table and is repeated per-cpu.
+		if i == 0 {
+			summedEvents.Entries += conn.Entries
+		}
 		summedEvents.Found += conn.Found
 		summedEvents.Invalid += conn.Invalid
 		summedEvents.Ignore += conn.Ignore

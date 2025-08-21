@@ -52,7 +52,7 @@ func TestFetch(t *testing.T) {
 	testConn := mapstr.M{
 		"drop":           uint64(0),
 		"early_drop":     uint64(0),
-		"entries":        uint64(16),
+		"entries":        uint64(4),
 		"found":          uint64(0),
 		"ignore":         uint64(3271028),
 		"insert_failed":  uint64(0),
