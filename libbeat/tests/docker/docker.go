@@ -24,6 +24,7 @@ import (
 	"io/ioutil"
 
 	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -38,7 +39,7 @@ type Client struct {
 
 // NewClient builds and returns a docker Client
 func NewClient() (Client, error) {
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logp.NewNopLogger())
 	return Client{cli: c}, err
 }
 
