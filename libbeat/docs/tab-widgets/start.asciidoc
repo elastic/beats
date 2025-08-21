@@ -89,8 +89,6 @@ endif::has_modules_command[]
 PS C:{backslash}Program Files{backslash}{beatname_lc}> Start-Service {beatname_lc}
 ----------------------------------------------------------------------
 
-By default, Windows log files are stored in +C:{backslash}ProgramData{backslash}{beatname_lc}\Logs+.
-
 ifeval::["{beatname_lc}"=="metricbeat"]
 NOTE: On Windows, statistics about system load and swap usage are currently
 not captured
