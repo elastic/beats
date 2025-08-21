@@ -199,7 +199,7 @@ func (m *MetricSet) getEventDetails(
 				m.Logger().Errorf("[AWS Health] DescribeEvents failed with: Operation=%s, UnderlyingError=%v",
 					opErr.Operation(), opErr.Err)
 			} else {
-				m.Logger().Errorf("[AWS Health] DescribeEvents failed with: %w", err)
+				m.Logger().Errorf("[AWS Health] DescribeEvents failed with: %v", err)
 			}
 			break
 		}
@@ -232,7 +232,7 @@ func (m *MetricSet) getEventDetails(
 				m.Logger().Errorf("[AWS Health] DescribeEventDetails failed with: Operation=%s, UnderlyingError=%v",
 					opErr.Operation(), opErr.Err)
 			} else {
-				m.Logger().Errorf("[AWS Health] DescribeEventDetails failed with: %w", err)
+				m.Logger().Errorf("[AWS Health] DescribeEventDetails failed with: %v", err)
 			}
 			break
 		}
@@ -261,7 +261,7 @@ func (m *MetricSet) getEventDetails(
 			// Fetch current page of affected entities
 			affCurrentPage, err := affPage.NextPage(ctx)
 			if err != nil {
-				m.Logger().Errorf("[AWS Health] DescribeAffectedEntitie failed with : %w", err)
+				m.Logger().Errorf("[AWS Health] DescribeAffectedEntitie failed with : %v", err)
 				break
 			}
 			// Extract relevant details of affected entities and match them with event details

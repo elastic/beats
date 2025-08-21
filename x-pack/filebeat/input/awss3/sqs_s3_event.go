@@ -255,7 +255,7 @@ func (r sqsProcessingResult) Done() {
 			return
 		}
 		p.metrics.sqsMessagesDeletedTotal.Inc()
-		p.log.Errorf("failed processing SQS message (message was deleted): %w", processingErr)
+		p.log.Errorf("failed processing SQS message (message was deleted): %v", processingErr)
 		return
 	}
 
@@ -264,7 +264,7 @@ func (r sqsProcessingResult) Done() {
 	// queue is enabled then the message will eventually placed on the DLQ
 	// after maximum receives is reached.
 	p.metrics.sqsMessagesReturnedTotal.Inc()
-	p.log.Errorf("failed processing SQS message (it will return to queue after visibility timeout): %w", processingErr)
+	p.log.Errorf("failed processing SQS message (it will return to queue after visibility timeout): %v", processingErr)
 }
 
 func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, msg *types.Message) {
