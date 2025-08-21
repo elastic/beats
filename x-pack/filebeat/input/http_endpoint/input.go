@@ -67,7 +67,7 @@ func configure(cfg *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	return newHTTPEndpoint(conf, logger)
+	return newHTTPEndpoint(conf, logp.NewLogger(""))
 }
 
 func newHTTPEndpoint(config config, logger *logp.Logger) (*httpEndpoint, error) {

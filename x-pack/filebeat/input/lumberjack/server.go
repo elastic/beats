@@ -32,7 +32,7 @@ type server struct {
 }
 
 func newServer(c config, log *logp.Logger, pub func(beat.Event), metrics *inputMetrics) (*server, error) {
-	ljSvr, bindAddress, err := newLumberjack(c)
+	ljSvr, bindAddress, err := newLumberjack(c, log)
 	if err != nil {
 		return nil, err
 	}
