@@ -18,6 +18,7 @@ import (
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestRunUpdatesStatusToStartingAndFailed(t *testing.T) {
@@ -37,9 +38,10 @@ func TestRunUpdatesStatusToStartingAndFailed(t *testing.T) {
 
 	statusReporter := newMockStatusReporter()
 	inputTestCtx := inputv2.Context{
-		Logger:         logp.NewLogger(inputName),
-		Cancelation:    ctx,
-		StatusReporter: statusReporter,
+		Logger:          logp.NewLogger(inputName),
+		Cancelation:     ctx,
+		StatusReporter:  statusReporter,
+		MetricsRegistry: monitoring.NewRegistry(),
 	}
 
 	// The Run function is expected to return the error from the mock setup function.
