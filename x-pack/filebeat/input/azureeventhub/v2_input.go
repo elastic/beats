@@ -399,7 +399,7 @@ func (in *eventHubInputV2) containerExists(ctx context.Context, blobContainerCli
 		return false, nil
 	}
 
-	return false, fmt.Errorf("failed to check if blob container exists: %w", err)
+	return false, err
 }
 
 // workersLoop starts a goroutine for each partition to process events.
