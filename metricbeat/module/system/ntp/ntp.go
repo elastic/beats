@@ -37,6 +37,7 @@ var (
 
 type ntpQueryProvider interface {
 	query(host string, options ntp.QueryOptions) (*ntp.Response, error)
+	validate(*ntp.Response) error
 }
 
 type beevikNTPQueryProvider struct{}
@@ -52,6 +53,10 @@ func (n *beevikNTPQueryProvider) query(host string, options ntp.QueryOptions) (*
 	}
 
 	return response, nil
+}
+
+func (n *beevikNTPQueryProvider) validate(response *ntp.Response) error {
+	return response.Validate()
 }
 
 type MetricSet struct {
@@ -95,6 +100,16 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 				reporter.Error(err)
 				fetchErrors <- err
 				return
+			}
+
+			if m.config.Validate {
+				err = m.queryProvider.validate(response)
+				if err != nil {
+					err := fmt.Errorf("error validating NTP response from %s: %w", server, err)
+					reporter.Error(err)
+					fetchErrors <- err
+					return
+				}
 			}
 
 			reporter.Event(mb.Event{MetricSetFields: mapstr.M{

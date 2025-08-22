@@ -36,6 +36,10 @@ func (n *ntpSuccess) query(host string, opt ntp.QueryOptions) (*ntp.Response, er
 	return &ntp.Response{ClockOffset: time.Duration(1.23 * float64(time.Second))}, nil
 }
 
+func (n *ntpSuccess) validate(_ *ntp.Response) error {
+	return nil
+}
+
 func getTestConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":      "system",
@@ -74,6 +78,10 @@ func (n *ntpError) query(host string, opt ntp.QueryOptions) (*ntp.Response, erro
 	return nil, errors.New("ntp error")
 }
 
+func (n *ntpError) validate(_ *ntp.Response) error {
+	return nil
+}
+
 func TestFetchOffset_Error(t *testing.T) {
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, getTestConfig())
 	ntpMetricSet, ok := metricSet.(*MetricSet)
@@ -83,4 +91,52 @@ func TestFetchOffset_Error(t *testing.T) {
 
 	_, errs := mbtest.ReportingFetchV2Error(ntpMetricSet)
 	assert.NotEmpty(t, errs, "expected error, got none")
+}
+
+type ntpValidationFailed struct {
+	Called int
+}
+
+func (n *ntpValidationFailed) query(host string, opt ntp.QueryOptions) (*ntp.Response, error) {
+	return &ntp.Response{ClockOffset: time.Duration(1.23 * float64(time.Second))}, nil
+}
+
+func (n *ntpValidationFailed) validate(_ *ntp.Response) error {
+	n.Called++
+	return errors.New("ntp validation error")
+}
+
+func TestFetchOffset_ValidationError(t *testing.T) {
+
+	t.Run("ntp.validate=true", func(t *testing.T) {
+		metricSet := mbtest.NewReportingMetricSetV2Error(t, getTestConfig())
+		ntpMetricSet, ok := metricSet.(*MetricSet)
+		require.True(t, ok, "metricSet is not of type *MetricSet")
+
+		queryProvider := &ntpValidationFailed{}
+
+		ntpMetricSet.queryProvider = queryProvider
+
+		_, errs := mbtest.ReportingFetchV2Error(ntpMetricSet)
+		assert.Equal(t, 2, queryProvider.Called, "expected validate to be called twice, called %d times", queryProvider.Called)
+		assert.NotEmpty(t, errs, "expected error, got none")
+	})
+
+	t.Run("ntp.validate=false", func(t *testing.T) {
+		config := getTestConfig()
+		config["ntp.validate"] = "false"
+
+		metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+		ntpMetricSet, ok := metricSet.(*MetricSet)
+		require.True(t, ok, "metricSet is not of type *MetricSet")
+
+		queryProvider := &ntpValidationFailed{}
+
+		ntpMetricSet.queryProvider = queryProvider
+
+		_, errs := mbtest.ReportingFetchV2Error(ntpMetricSet)
+		assert.Equal(t, 0, queryProvider.Called, "expected validate to be NOT called, called %d times", queryProvider.Called)
+		require.Empty(t, errs, "expected no errors, got: %v", errs)
+	})
+
 }

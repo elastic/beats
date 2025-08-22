@@ -18,3 +18,6 @@ This metricset is available on:
 
 **`ntp.version`**
 :   Version of the NTP protocol to use. Must be one of "3" or "4". Defaults to "4".
+
+**`ntp.validate`**
+:   Whether to validate the NTP response if it is suitable for time synchronization purposes. If not, fail with a validation error. Must be one of "true" or "false". Defaults to "true".
