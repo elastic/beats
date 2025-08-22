@@ -484,7 +484,7 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 			}
 
 			in.status.UpdateStatus(status.Degraded,
-				fmt.Sprintf("Receive events error for partition %s: %s", partitionID, err.Error()))
+				fmt.Sprintf("Possible network fault: Receive events error for partition %s: %s", partitionID, err.Error()))
 			return err
 		} else {
 			// no error, report Running in case we are
