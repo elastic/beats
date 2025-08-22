@@ -266,7 +266,7 @@ func (in *eventHubInputV2) run(inputContext v2.Context, ctx context.Context) {
 		go in.workersLoop(ctx, processor)
 
 		// Update input status to running.
-		in.status.UpdateStatus(status.Running, "")
+		in.status.UpdateStatus(status.Running, "Input is running")
 
 		// Run the processor to start processing events (blocking call).
 		//
