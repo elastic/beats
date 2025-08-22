@@ -105,9 +105,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			if m.config.Validate {
 				err = m.queryProvider.validate(response)
 				if err != nil {
-					err := fmt.Errorf("error validating NTP response from %s: %w", server, err)
-					reporter.Error(err)
-					fetchErrors <- err
+					m.Logger().Warnf("invalid NTP response from %s: %w", server, err)
 					return
 				}
 			}

@@ -107,7 +107,6 @@ func (n *ntpValidationFailed) validate(_ *ntp.Response) error {
 }
 
 func TestFetchOffset_ValidationError(t *testing.T) {
-
 	t.Run("ntp.validate=true", func(t *testing.T) {
 		metricSet := mbtest.NewReportingMetricSetV2Error(t, getTestConfig())
 		ntpMetricSet, ok := metricSet.(*MetricSet)
@@ -117,9 +116,10 @@ func TestFetchOffset_ValidationError(t *testing.T) {
 
 		ntpMetricSet.queryProvider = queryProvider
 
-		_, errs := mbtest.ReportingFetchV2Error(ntpMetricSet)
+		events, errs := mbtest.ReportingFetchV2Error(ntpMetricSet)
 		assert.Equal(t, 2, queryProvider.Called, "expected validate to be called twice, called %d times", queryProvider.Called)
-		assert.NotEmpty(t, errs, "expected error, got none")
+		require.Empty(t, events, "expected no events, got %v", events)
+		require.Empty(t, errs, "expected no errors, got: %v", errs)
 	})
 
 	t.Run("ntp.validate=false", func(t *testing.T) {
