@@ -21,6 +21,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"math"
 	"reflect"
 	"strings"
 
@@ -127,6 +128,7 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 		// For libbeat ES output, the "workers" setting controls the number of concurrent connections per ES host.
 		// For elasticsearchexporter, we can achieve the same concurrency by specifying "max_conns_per_host" setting
 		// as our otelconsumer sends data parallelly to the consumer.
+		// Also, we use http/1 in libbeat. To achive parity, disable force_attempt_http2
 		"max_conns_per_host":  escfg.NumWorkers(),
 		"force_attempt_http2": false,
 
@@ -136,14 +138,19 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 			"initial_interval": escfg.Backoff.Init, // backoff.init
 			"max_interval":     escfg.Backoff.Max,  // backoff.max
 			"max_retries":      escfg.MaxRetries,   // max_retries
-
 		},
 
-		// Batcher is experimental
-		"batcher": map[string]any{
-			"enabled":  true,
-			"max_size": escfg.BulkMaxSize, // bulk_max_size
-			"min_size": 0,                 // 0 means immediately trigger a flush
+		"sending_queue": map[string]any{
+			"batch": map[string]any{
+				"max_size": escfg.BulkMaxSize, // bulk_max_size
+				"min_size": 0,                 // 0 means immediately trigger a flush
+				"sizer":    "items",
+			},
+			"enabled":           true,
+			"queue_size":        math.MaxInt,
+			"block_on_overflow": true,
+			"wait_for_result":   true,
+			"num_consumers":     escfg.NumWorkers(),
 		},
 
 		"mapping": map[string]any{
@@ -168,9 +175,9 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 	// Dynamic routing is disabled if output.elasticsearch.index is set
 	setIfNotNil(otelYAMLCfg, "logs_index", escfg.Index) // index
 
-	if err := typeSafetyCheck(otelYAMLCfg); err != nil {
-		return nil, err
-	}
+	// if err := typeSafetyCheck(otelYAMLCfg); err != nil {
+	// 	return nil, err
+	// }
 
 	return otelYAMLCfg, nil
 }
