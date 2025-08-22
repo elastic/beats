@@ -13,6 +13,7 @@ upgrade.
 * <<release-notes-8.19.0>>
 * <<release-notes-8.18.1>>
 * <<release-notes-8.18.0>>
+* <<release-notes-8.17.9>>
 * <<release-notes-8.17.8>>
 * <<release-notes-8.17.7>>
 * <<release-notes-8.17.6>>
