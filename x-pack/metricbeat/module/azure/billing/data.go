@@ -231,7 +231,7 @@ func getEventsFromQueryResult(result armcostmanagement.QueryResult, subscription
 			// 20170401 (float64) --> "2017-04-01T00:00:00Z" (time.Time)
 			usageDate, err = time.Parse("20060102", strconv.FormatInt(int64(value), 10))
 			if err != nil {
-				logger.Errorf("unsupported usage date format: not valid date: %w", err)
+				logger.Errorf("unsupported usage date format: not valid date: %v", err)
 				continue
 			}
 		}
