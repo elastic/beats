@@ -182,7 +182,7 @@ func New(
 
 	logger = logger.Named("reader")
 
-	args := []string{"--utc", "--output=json", "--no-pager"}
+	args := []string{"--utc", "--output=json", "--no-pager", "--all"}
 
 	if file != "" && file != localSystemJournalID {
 		args = append(args, "--file", file)
