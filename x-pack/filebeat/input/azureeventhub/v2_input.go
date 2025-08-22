@@ -279,7 +279,7 @@ func (in *eventHubInputV2) run(inputContext v2.Context, ctx context.Context) {
 			in.log.Errorw("processor encountered an unrecoverable error and needs to be restarted", "error", err)
 
 			// Update input status to degraded.
-			in.status.UpdateStatus(status.Degraded, fmt.Sprintf("error: %s", err))
+			in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Processor error: %s", err))
 
 			in.log.Infow("waiting before retrying starting the processor")
 
@@ -448,6 +448,8 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 	// 1/3 [BEGIN] Initialize any partition specific resources for your application.
 	pipelineClient, err := initializePartitionResources(ctx, partitionClient, in.pipeline, in.log)
 	if err != nil {
+		in.status.UpdateStatus(status.Degraded,
+			fmt.Sprintf("Error initializing partition resources: %s", err.Error()))
 		return err
 	}
 
@@ -476,10 +478,14 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 					"ownership lost for partition, stopping processing",
 					"partition_id", partitionID,
 				)
+				in.status.UpdateStatus(status.Degraded,
+					fmt.Sprintf("Ownership lost for partition '%s': %s", partitionID, err.Error()))
 
 				return nil
 			}
 
+			in.status.UpdateStatus(status.Degraded,
+				fmt.Sprintf("Receive events error for partition '%s': %s", partitionID, err.Error()))
 			return err
 		}
 
@@ -493,6 +499,10 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 
 		err = in.processReceivedEvents(events, partitionID, pipelineClient)
 		if err != nil {
+			in.status.UpdateStatus(status.Degraded,
+				fmt.Sprintf(
+					"Error processing received events for partition '%s': %s",
+					partitionID, err.Error()))
 			return fmt.Errorf("error processing received events: %w", err)
 		}
 	}
