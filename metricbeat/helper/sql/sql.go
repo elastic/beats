@@ -252,8 +252,10 @@ var patterns = []struct {
 	{regexp.MustCompile(`(?i)([?&])(password|pwd|pass|passwd|token|secret)\s*=\s*([^&#\s]+)`), `$1$2=` + redacted},
 }
 
-// SanitizeError replaces all occurrences of 'sensitive' parameter in err.Error() with "(redacted)"
-// It also sanitizes common patterns that might contain passwords or sensitive data
+// SanitizeError redacts sensitive information from an error's message, replacing it with "(redacted)".
+// It handles raw, quoted, and URL-encoded forms of the sensitive string, as well as common patterns
+// (e.g., passwords in URLs or DSNs). The returned error wraps the original error to preserve context
+// for errors.Is() and errors.As() checks.
 func SanitizeError(err error, sensitive string) error {
 	if err == nil {
 		return nil
