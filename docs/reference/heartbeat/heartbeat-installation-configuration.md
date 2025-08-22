@@ -103,7 +103,7 @@ If script execution is disabled on your system, you need to set the execution po
 
 :::{important}
 ```{applies_to}
-stack: ga 9.0.6
+stack: ga 9.1.0, ga 9.0.6
 ```
 The base folder has changed from `C:\ProgramData\` to `C:\Program Files\`
 because the latter has stricter permissions. The home path (base for
