@@ -93,7 +93,7 @@ func (in *eventHubInputV2) Run(
 	defer in.status.UpdateStatus(status.Stopped, "")
 
 	// When the input is initializing before attempting to connect to Azure Event Hub.
-	in.status.UpdateStatus(status.Starting, "")
+	in.status.UpdateStatus(status.Starting, "Input starting")
 
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
@@ -102,7 +102,7 @@ func (in *eventHubInputV2) Run(
 	in.metrics = inputMetrics
 
 	// When setting up Azure Event Hub client and validating configuration.
-	in.status.UpdateStatus(status.Configuring, "")
+	in.status.UpdateStatus(status.Configuring, "Configuring input")
 
 	// Initialize the components needed to process events.
 	err = in.setupFn(ctx)
