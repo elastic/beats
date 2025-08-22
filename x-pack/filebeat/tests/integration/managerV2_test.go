@@ -696,7 +696,7 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 
 	assert.Equal(t, version.Commit(), observed.VersionInfo.BuildHash)
 
-	evs := integration.GetEventsFromFileOutput[Event](t, eventsDir, 100)
+	evs := integration.GetEventsFromFileOutput[Event](filebeat, 100)
 	for _, got := range evs {
 		assert.Equal(t, wantVersion, got.Metadata.Version)
 
