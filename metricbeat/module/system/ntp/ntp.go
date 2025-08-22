@@ -47,8 +47,7 @@ func (n *beevikNTPQueryProvider) query(host string, options ntp.QueryOptions) (*
 		return nil, err
 	}
 
-	err = response.Validate()
-	if err != nil {
+	if err := response.Validate(); err != nil {
 		return nil, err
 	}
 
