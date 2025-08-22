@@ -87,6 +87,8 @@ func (in *eventHubInputV2) Run(
 ) error {
 	var err error
 
+	defer in.status.UpdateStatus(status.Stopped, "")
+
 	// Setting up the status reporter helper
 	in.status = statusreporterhelper.New(inputContext.StatusReporter, in.log, "Azure Event Hub")
 
@@ -118,8 +120,6 @@ func (in *eventHubInputV2) Run(
 	// Start the main run loop (blocking call).
 	in.run(inputContext, ctx)
 
-	// When the input is stopped (clean exit, no errors).
-	in.status.UpdateStatus(status.Stopped, "")
 	return nil
 }
 
