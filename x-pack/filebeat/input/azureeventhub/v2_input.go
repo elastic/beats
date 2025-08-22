@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -57,6 +58,7 @@ type eventHubInputV2 struct {
 	messageDecoder     messageDecoder
 	migrationAssistant *migrationAssistant
 	setupFn            func(ctx context.Context) error
+	status             status.StatusReporter
 }
 
 // newEventHubInputV2 creates a new instance of the Azure Event Hub input v2,
@@ -85,8 +87,11 @@ func (in *eventHubInputV2) Run(
 ) error {
 	var err error
 
+	// Setting up the status reporter helper
+	in.status = statusreporterhelper.New(inputContext.StatusReporter, in.log, "Azure Event Hub")
+
 	// When the input is initializing before attempting to connect to Azure Event Hub.
-	inputContext.UpdateStatus(status.Starting, "")
+	in.status.UpdateStatus(status.Starting, "")
 
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
@@ -95,12 +100,12 @@ func (in *eventHubInputV2) Run(
 	in.metrics = inputMetrics
 
 	// When setting up Azure Event Hub client and validating configuration.
-	inputContext.UpdateStatus(status.Configuring, "")
+	in.status.UpdateStatus(status.Configuring, "")
 
 	// Initialize the components needed to process events.
 	err = in.setupFn(ctx)
 	if err != nil {
-		inputContext.UpdateStatus(status.Failed, fmt.Sprintf("failed to setup input: %s", err))
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("failed to setup input: %s", err))
 		return err
 	}
 	defer in.teardown(ctx)
@@ -114,7 +119,7 @@ func (in *eventHubInputV2) Run(
 	in.run(inputContext, ctx)
 
 	// When the input is stopped (clean exit, no errors).
-	inputContext.UpdateStatus(status.Stopped, "")
+	in.status.UpdateStatus(status.Stopped, "")
 	return nil
 }
 
@@ -260,7 +265,7 @@ func (in *eventHubInputV2) run(inputContext v2.Context, ctx context.Context) {
 		go in.workersLoop(ctx, processor)
 
 		// Update input status to running.
-		inputContext.UpdateStatus(status.Running, "")
+		in.status.UpdateStatus(status.Running, "")
 
 		// Run the processor to start processing events (blocking call).
 		//
@@ -273,7 +278,7 @@ func (in *eventHubInputV2) run(inputContext v2.Context, ctx context.Context) {
 			in.log.Errorw("processor encountered an unrecoverable error and needs to be restarted", "error", err)
 
 			// Update input status to degraded.
-			inputContext.UpdateStatus(status.Degraded, fmt.Sprintf("error: %s", err))
+			in.status.UpdateStatus(status.Degraded, fmt.Sprintf("error: %s", err))
 
 			in.log.Infow("waiting before retrying starting the processor")
 
