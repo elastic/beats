@@ -478,14 +478,18 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 					"partition_id", partitionID,
 				)
 				in.status.UpdateStatus(status.Degraded,
-					fmt.Sprintf("Ownership lost for partition '%s': %s", partitionID, err.Error()))
+					fmt.Sprintf("Ownership lost for partition %s: %s", partitionID, err.Error()))
 
 				return nil
 			}
 
 			in.status.UpdateStatus(status.Degraded,
-				fmt.Sprintf("Receive events error for partition '%s': %s", partitionID, err.Error()))
+				fmt.Sprintf("Receive events error for partition %s: %s", partitionID, err.Error()))
 			return err
+		} else {
+			// no error, report Running in case we are
+			// currently transitioning from degraded back to healthy
+			in.status.UpdateStatus(status.Running, "Input is running")
 		}
 
 		if len(events) == 0 {
@@ -500,7 +504,7 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 		if err != nil {
 			in.status.UpdateStatus(status.Degraded,
 				fmt.Sprintf(
-					"Error processing received events for partition '%s': %s",
+					"Error processing received events for partition %s: %s",
 					partitionID, err.Error()))
 			return fmt.Errorf("error processing received events: %w", err)
 		}
