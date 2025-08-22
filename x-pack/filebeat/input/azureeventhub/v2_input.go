@@ -118,6 +118,8 @@ func (in *eventHubInputV2) Run(
 	in.pipeline = pipeline
 
 	// Start the main run loop (blocking call).
+	// Update input status to running.
+	in.status.UpdateStatus(status.Running, "Input is running")
 	in.run(inputContext, ctx)
 
 	return nil
@@ -264,9 +266,6 @@ func (in *eventHubInputV2) run(inputContext v2.Context, ctx context.Context) {
 		// Launch one goroutines for each partition
 		// to process events.
 		go in.workersLoop(ctx, processor)
-
-		// Update input status to running.
-		in.status.UpdateStatus(status.Running, "Input is running")
 
 		// Run the processor to start processing events (blocking call).
 		//
