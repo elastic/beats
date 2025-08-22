@@ -12,6 +12,7 @@ import (
 	"github.com/godror/godror"
 	"github.com/godror/godror/dsn"
 
+	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -24,7 +25,10 @@ type ConnectionDetails struct {
 }
 
 // ParseDSN tries to parse the host
-func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
+func ParseDSN(mod mb.Module, host string) (_ mb.HostData, fetchErr error) {
+	defer func() {
+		fetchErr = sql.SanitizeError(fetchErr, host)
+	}()
 
 	// TODO: Add support for `username` and `password` as module options
 	config := ConnectionDetails{}
