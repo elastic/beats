@@ -107,7 +107,7 @@ func (in *eventHubInputV2) Run(
 	// Initialize the components needed to process events.
 	err = in.setupFn(ctx)
 	if err != nil {
-		in.status.UpdateStatus(status.Failed, fmt.Sprintf("failed to setup input: %s", err))
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Failed to set up input: %s", err.Error()))
 		return err
 	}
 	defer in.teardown(ctx)
@@ -152,6 +152,7 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		},
 	)
 	if err != nil {
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating blob container client: %s", err.Error()))
 		return fmt.Errorf("failed to create blob container client: %w", err)
 	}
 
