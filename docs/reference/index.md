@@ -8,31 +8,29 @@ mapped_pages:
 
 # Beats [beats-reference]
 
-{{beats}} are open source data shippers that you install as agents on your servers to send operational data to [{{es}}](https://www.elastic.co/products/elasticsearch). Elastic provides {{beats}} for capturing:
+{{beats}} are open source data shippers that you install as agents on your servers to send operational data to [{{es}}](https://www.elastic.co/products/elasticsearch). 
+
+New to {{beats}}? Check out the [{{beats}} overview]https://www.elastic.co/beats [{{beats}} overview](https://www.elastic.co/beats) to see what {{beats}} can do for you.
+
+Elastic provides {{beats}} for capturing:
 
 Audit data
-:   [Auditbeat overview](https://www.elastic.co/products/beats/auditbeat)
-:   [Auditbeat documentation](/reference/auditbeat/index.md)
+:   [Auditbeat](/reference/auditbeat/index.md)
 
 Log files and journals
-:   [Filebeat overview](https://www.elastic.co/products/beats/filebeat)
-:   [Filebeat documentation](/reference/filebeat/index.md)
+:   [Filebeat](/reference/filebeat/index.md)
 
 Availability
-:   [Heartbeat overview](https://www.elastic.co/products/beats/heartbeat)
-:   [Heartbeat documentation](/reference/heartbeat/index.md)
+:   [Heartbeat](/reference/heartbeat/index.md)
 
 Metrics
-:   [Metricbeat overview](https://www.elastic.co/products/beats/metricbeat)
-:   [Metricbeat documentation](/reference/metricbeat/index.md)
+:   [Metricbeat](/reference/metricbeat/index.md)
 
 Network traffic
-:   [Packetbeat overview](https://www.elastic.co/products/beats/packetbeat)
-:   [Packetbeat documentation](/reference/packetbeat/index.md)
+:   [Packetbeat](/reference/packetbeat/index.md)
 
 Windows event logs
-:   [Winlogbeat overview](https://www.elastic.co/products/beats/winlogbeat)
-:   [Winlogbeat documentation](/reference/winlogbeat/index.md)
+:   [Winlogbeat](/reference/winlogbeat/index.md)
 
 
 {{beats}} can send data directly to {{es}} or through [{{ls}}](https://www.elastic.co/products/logstash), where you can further process and enhance the data, before visualizing it in [{{kib}}](https://www.elastic.co/products/logstash).
