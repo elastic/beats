@@ -42,7 +42,17 @@ type ntpQueryProvider interface {
 type beevikNTPQueryProvider struct{}
 
 func (n *beevikNTPQueryProvider) query(host string, options ntp.QueryOptions) (*ntp.Response, error) {
-	return ntp.QueryWithOptions(host, options)
+	response, err := ntp.QueryWithOptions(host, options)
+	if err != nil {
+		return nil, err
+	}
+
+	err = response.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }
 
 type MetricSet struct {
