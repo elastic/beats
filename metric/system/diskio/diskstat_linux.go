@@ -27,6 +27,7 @@ import (
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/disk"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-system-metrics/metric"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/numcpu"
 )
@@ -39,7 +40,7 @@ func GetCLKTCK() uint32 {
 }
 
 // IOCounters should map functionality to disk package for linux os.
-func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
+func IOCounters(_ *logp.Logger, names ...string) (map[string]disk.IOCountersStat, error) {
 	return disk.IOCounters(names...)
 }
 
@@ -95,7 +96,7 @@ func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, err
 	}
 
 	// calculate the delta ms between the CloseSampling and OpenSampling
-	deltams := 1000.0 * (float64(uint64(total(stat.curCPU)) - uint64(total(stat.lastCPU)))) / float64(numcpu.NumCPU())
+	deltams := 1000.0 * (float64(uint64(total(stat.curCPU)) - uint64(total(stat.lastCPU)))) / float64(numcpu.NumCPUWithLogger(logp.NewLogger("")))
 	if deltams <= 0 {
 		return IOMetric{}, errors.New("the delta cpu time between close sampling and open sampling is less or equal to 0")
 	}

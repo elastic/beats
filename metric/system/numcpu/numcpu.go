@@ -31,14 +31,20 @@ import (
 // this number will not reflect the system config.
 // Because this is drop-in, it will not return an error.
 // if it can't fetch the CPU count the "correct" way, it'll fallback to runtime.NumCPU().
+//
+// Deprecated: use NumCPUWithLogger
 func NumCPU() int {
+	return NumCPUWithLogger(logp.NewLogger(""))
+}
+
+func NumCPUWithLogger(logger *logp.Logger) int {
 	count, exists, err := getCPU()
 	if err != nil {
-		logp.L().Debugf("Error fetching CPU count: %s", err)
+		logger.Debugf("Error fetching CPU count: %v", err)
 		return runtime.NumCPU()
 	}
 	if !exists {
-		logp.L().Debugf("Accurate CPU counts not available on platform, falling back to runtime.NumCPU for metrics")
+		logger.Debugf("Accurate CPU counts not available on platform, falling back to runtime.NumCPU for metrics")
 		return runtime.NumCPU()
 	}
 

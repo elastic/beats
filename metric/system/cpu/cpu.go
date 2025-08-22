@@ -23,24 +23,33 @@ package cpu
 import (
 	"github.com/shirou/gopsutil/v4/load"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-system-metrics/metric"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/numcpu"
 )
 
 // Load returns CPU load information for the previous 1, 5, and 15 minute
 // periods.
+// Deprecated: use LoadWithLogger
 func Load() (*LoadMetrics, error) {
+	return LoadWithLogger(logp.NewLogger(""))
+}
+
+// LoadWithLogger returns CPU load information for the previous 1, 5, and 15 minute
+// periods.
+func LoadWithLogger(logger *logp.Logger) (*LoadMetrics, error) {
 	avg, err := load.Avg()
 	if err != nil {
 		return nil, err
 	}
 
-	return &LoadMetrics{avg}, nil
+	return &LoadMetrics{avg, logger}, nil
 }
 
 // LoadMetrics stores the sampled load average values of the host.
 type LoadMetrics struct {
 	sample *load.AvgStat
+	logger *logp.Logger
 }
 
 // LoadAverages stores the values of load averages of the last 1, 5 and 15 minutes.
@@ -63,7 +72,7 @@ func (m *LoadMetrics) Averages() LoadAverages {
 // NormalizedAverages return the CPU load averages normalized by the NumCPU.
 // These values should range from 0 to 1.
 func (m *LoadMetrics) NormalizedAverages() LoadAverages {
-	cpus := numcpu.NumCPU()
+	cpus := numcpu.NumCPUWithLogger(m.logger)
 	return LoadAverages{
 		OneMinute:     metric.Round(m.sample.Load1 / float64(cpus)),
 		FiveMinute:    metric.Round(m.sample.Load5 / float64(cpus)),
