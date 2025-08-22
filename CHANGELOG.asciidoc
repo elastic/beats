@@ -3,6 +3,7 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+<<<<<<< HEAD
 [[release-notes-8.19.2]]
 === Beats version 8.19.2
 https://github.com/elastic/beats/compare/v8.19.1\...v8.19.2[View commits]
@@ -22,10 +23,28 @@ https://github.com/elastic/beats/compare/v8.19.0\...v8.19.1[View commits]
 
 - Improve error messages in AWS Health {pull}45408[45408]
 - Fix URL construction to handle query parameters properly in GET requests for Jolokia. {pull}45620[45620]
+=======
+[[release-notes-8.18.5]]
+=== Beats version 8.18.5
+https://github.com/elastic/beats/compare/v8.18.4\...v8.18.5[View commits]
+
+==== Bugfixes
+
+*Auditbeat*
+
+- auditd: Request status from a separate socket to avoid data congestion {pull}41207[41207]
+- hasher: Add a cached hasher for upcoming backend. {pull}41952[41952]
+- Fix potential data loss in add_session_metadata. {pull}42795[42795]
+
+*Metricbeat*
+
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
+>>>>>>> fba7288e2 (docs: Prepare Changelog for 8.18.5 (#45873))
 
 
 ==== Added
 
+<<<<<<< HEAD
 *Filebeat*
 
 - Log CEL single object evaluation results as ECS compliant documents where possible. {issue}45254[45254] {pull}45399[45399]
@@ -34,6 +53,16 @@ https://github.com/elastic/beats/compare/v8.19.0\...v8.19.1[View commits]
 [[release-notes-8.19.0]]
 === Beats version 8.19.0
 https://github.com/elastic/beats/compare/v8.18.4\...v8.19.0[View commits]
+=======
+*Metricbeat*
+
+- Improve error messages in AWS Health {pull}45408[45408]
+
+
+[[release-notes-8.18.4]]
+=== Beats version 8.18.4
+https://github.com/elastic/beats/compare/v8.18.3\...v8.18.4[View commits]
+>>>>>>> fba7288e2 (docs: Prepare Changelog for 8.18.5 (#45873))
 
 ==== Breaking changes
 
