@@ -75,7 +75,7 @@ func TestNetInputs(t *testing.T) {
 
 			tc.runClientFn(t, addr, tc.data)
 
-			filebeat.WaitPublishedEvents(t, 3*time.Second, len(tc.data))
+			filebeat.WaitPublishedEvents(3*time.Second, len(tc.data))
 			filebeat.Stop()
 			filebeat.WaitForLogsAnyOrder(
 				[]string{
