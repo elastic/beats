@@ -44,7 +44,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
-- Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected services {issue}40765[40765] {pull}43665[43665]
 
 *Osquerybeat*
 
@@ -101,7 +100,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - auditd: Request status from a separate socket to avoid data congestion {pull}41207[41207]
 - hasher: Add a cached hasher for upcoming backend. {pull}41952[41952]
-- 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
 
 *Auditbeat*
 
@@ -148,13 +146,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove erroneous status reporting to Elastic-Agent from the Filestream input {pull}42435[42435]
 - Fix wrongly emitted missing input ID warning {issue}42969[42969] {pull}45747[45747]
 - Fix handling of unnecessary BOM in UTF-8 text received by o365audit input. {issue}44327[44327] {pull}45739[45739]
+- Fix reading journald messages with more than 4kb. {issue}45511[45511] {pull}46017[46017]
 - Restore the Streaming input on Windows. {pull}46031[46031]
 - Fix termination of input on API errors. {pull}45999[45999]
 - Fix filestream registry entries being prematurely removed, which could cause files to be re-ingested after Filebeat restarts. {issue}46007[46007] {pull}46032[46032]
-- Journald input now works on Docker containers (except Wolfi) {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
-- Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
-- Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
-- Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
 
 *Heartbeat*
 
@@ -184,8 +179,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - [K8s Integration] Enhance HTTP authentication in case of token updates for Apiserver, Controllermanager and Scheduler metricsets  {issue}41910[41910] {pull}42016[42016]
 - Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
 - Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. {pull}45761[45761]
-- Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
-- Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices {pull}43637[43637]
+- Enhance behavior of sanitizeError: replace sensitive info even if it is escaped and add pattern-based sanitization {pull}45857[45857]
 
 *Osquerybeat*
 
@@ -359,9 +353,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
 - Preserve queries for debugging when `merge_results: true` in SQL module {pull}42271[42271]
 - Collect more fields from ES node/stats metrics and only those that are necessary {pull}42421[42421]
-- Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
-- Add `enable_batch_api` option in azure monitor to allow metrics collection of multiple resources using azure batch Api {pull}41790[41790]
-- Upgrade github.com/microsoft/go-mssqldb from v1.7.2 to v1.8.2 {pull}44990[44990]
 
 *Metricbeat*
 
@@ -414,6 +405,40 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
