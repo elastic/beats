@@ -117,20 +117,15 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		}
 	}
 
-	switch c.IncludeXML {
+	switch c.IncludeXML || l.isForwarded() {
 	case true:
 		l.renderer = win.NewXMLRenderer(
-			win.RenderConfig{
-				IsForwarded: l.isForwarded(),
-				Locale:      c.EventLanguage,
-			},
+			c.EventLanguage,
+			l.isForwarded(),
 			win.NilHandle, l.log)
 	case false:
 		l.renderer, err = win.NewRenderer(
-			win.RenderConfig{
-				IsForwarded: l.isForwarded(),
-				Locale:      c.EventLanguage,
-			},
+			c.EventLanguage,
 			win.NilHandle, l.log)
 		if err != nil {
 			return nil, err
