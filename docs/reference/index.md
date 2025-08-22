@@ -8,31 +8,36 @@ mapped_pages:
 
 # Beats [beats-reference]
 
-{{beats}} are open source data shippers that you install as agents on your servers to send operational data to [{{es}}](https://www.elastic.co/products/elasticsearch). Elastic provides {{beats}} for capturing:
+{{beats}} are open source data shippers that you install as agents on your servers to send operational data to [{{es}}](https://www.elastic.co/products/elasticsearch). 
+
+New to {{beats}}? Check out the [{{beats}} overview]https://www.elastic.co/beats [{{beats}} overview](https://www.elastic.co/beats) to see what {{beats}} can do for you.
+
+Elastic provides {{beats}} for capturing:
 
 Audit data
-:   [Auditbeat](https://www.elastic.co/products/beats/auditbeat)
+:   [Auditbeat](/reference/auditbeat/index.md)
 
 Log files and journals
-:   [Filebeat](https://www.elastic.co/products/beats/filebeat)
+:   [Filebeat](/reference/filebeat/index.md)
 
 Availability
-:   [Heartbeat](https://www.elastic.co/products/beats/heartbeat)
+:   [Heartbeat](/reference/heartbeat/index.md)
 
 Metrics
-:   [Metricbeat](https://www.elastic.co/products/beats/metricbeat)
+:   [Metricbeat](/reference/metricbeat/index.md)
 
 Network traffic
-:   [Packetbeat](https://www.elastic.co/products/beats/packetbeat)
+:   [Packetbeat](/reference/packetbeat/index.md)
 
 Windows event logs
-:   [Winlogbeat](https://www.elastic.co/products/beats/winlogbeat)
+:   [Winlogbeat](/reference/winlogbeat/index.md)
 
-{{beats}} can send data directly to {{es}} or via [{{ls}}](https://www.elastic.co/products/logstash), where you can further process and enhance the data, before visualizing it in [{{kib}}](https://www.elastic.co/products/logstash).
+
+{{beats}} can send data directly to {{es}} or through [{{ls}}](https://www.elastic.co/products/logstash), where you can further process and enhance the data, before visualizing it in [{{kib}}](https://www.elastic.co/products/logstash).
 
 ![Beats Platform](libbeat/images/beats-platform.png)
 
-Want to get up and running quickly with infrastructure metrics monitoring and centralized log analytics? Try out the {{metrics-app}} and the {{logs-app}} in {{kib}}. For more details, see [Analyze metrics](docs-content://solutions/observability/infra-and-hosts/analyze-infrastructure-host-metrics.md) and [Monitor logs](docs-content://solutions/observability/logs/explore-logs.md).
+Want to get up and running quickly with infrastructure metrics monitoring and centralized log analytics? Try out the {{metrics-app}} and the {{logs-app}} in {{kib}}. For more details, check out [Analyze metrics](docs-content://solutions/observability/infra-and-hosts/analyze-infrastructure-host-metrics.md) and [Monitor logs](docs-content://solutions/observability/logs/explore-logs.md).
 
 
 ## Need to capture other kinds of data? [_need_to_capture_other_kinds_of_data]
