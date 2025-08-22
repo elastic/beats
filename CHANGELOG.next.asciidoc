@@ -141,6 +141,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove excessive info-level logs in cgroups setup {pull}40491[40491]
 - Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
 - Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. {pull}45761[45761]
+- Enhance behavior of sanitizeError: replace sensitive info even if it is escaped and add pattern-based sanitization {pull}45857[45857]
 
 *Osquerybeat*
 
