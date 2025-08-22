@@ -47,6 +47,12 @@ func readConfig(c *conf.C, config interface{}) error {
 	return nil
 }
 
+func defaultConfig() config {
+	return config{
+		BatchReadSize: 512,
+	}
+}
+
 type config struct {
 	Name                 string             `config:"name"`            // Name of the event log or channel or file.
 	ID                   string             `config:"id"`              // Identifier for the event log.
@@ -57,7 +63,7 @@ type config struct {
 	SimpleQuery          query              `config:",inline"`
 	NoMoreEvents         NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
 	EventLanguage        uint32             `config:"language"`
-	IgnoreMissingChannel bool               `config:"ignore_missing_channel"` // Ignore missing channels and continue reading.
+	IgnoreMissingChannel *bool              `config:"ignore_missing_channel"` // Ignore missing channels and continue reading.
 
 	// FIXME: This is for a WS2025 known issue so we can bypass the workaround
 	// and will be removed in the future.

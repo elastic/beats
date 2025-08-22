@@ -60,7 +60,7 @@ type winEventLog struct {
 func newWinEventLog(options *conf.C) (EventLog, error) {
 	var err error
 
-	c := config{BatchReadSize: 512}
+	c := defaultConfig()
 	if err := readConfig(options, &c); err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (l *winEventLog) IsFile() bool {
 
 // IgnoreMissingChannel returns true if missing channels should be ignored.
 func (l *winEventLog) IgnoreMissingChannel() bool {
-	return !l.file && l.config.IgnoreMissingChannel
+	return !l.file && (l.config.IgnoreMissingChannel == nil || *l.config.IgnoreMissingChannel)
 }
 
 func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {

@@ -257,7 +257,7 @@ Example:
 stack: ga 9.2.0
 ```
 
-Boolean option that controls whether Winlogbeat should ignore missing event log channels and continue monitoring other configured channels. When set to `true`, if a specified event log channel doesn't exist or cannot be accessed, Winlogbeat will log a warning and continue processing other event logs instead of stopping with an error. The default is `false`.
+Boolean option that controls whether Winlogbeat should ignore missing event log channels and continue monitoring other configured channels. When set to `true`, if a specified event log channel doesn't exist or cannot be accessed, Winlogbeat will log a warning and continue processing other event logs instead of stopping with an error. The default is `true`.
 
 This option is useful when deploying Winlogbeat configurations across multiple systems where certain event log channels may not be available on all machines, or when monitoring optional channels that may not always be present.
 
