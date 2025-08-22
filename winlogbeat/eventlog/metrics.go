@@ -27,7 +27,6 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -57,8 +56,6 @@ func incrementMetric(v *expvar.Map, key interface{}) {
 
 // inputMetrics handles event log metric reporting.
 type inputMetrics struct {
-	unregister func()
-
 	lastBatch time.Time
 
 	name        *monitoring.String // name of the provider being read
@@ -72,13 +69,8 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for windows event logs. If id is empty
 // a nil inputMetric is returned.
-func newInputMetrics(name, id string) *inputMetrics {
-	if id == "" {
-		return nil
-	}
-	reg, unreg := inputmon.NewInputRegistry("winlog", id, nil)
+func newInputMetrics(name string, reg *monitoring.Registry) *inputMetrics {
 	out := &inputMetrics{
-		unregister:  unreg,
 		name:        monitoring.NewString(reg, "provider"),
 		events:      monitoring.NewUint(reg, "received_events_total"),
 		dropped:     monitoring.NewUint(reg, "discarded_events_total"),
@@ -144,8 +136,4 @@ func (m *inputMetrics) logDropped(_ error) {
 }
 
 func (m *inputMetrics) close() {
-	if m == nil {
-		return
-	}
-	m.unregister()
 }

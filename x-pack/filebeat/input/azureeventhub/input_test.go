@@ -53,9 +53,7 @@ func TestGetAzureEnvironment(t *testing.T) {
 func TestProcessEvents(t *testing.T) {
 	log := logp.NewLogger(fmt.Sprintf("%s test for input", inputName))
 
-	reg := monitoring.NewRegistry()
-	metrics := newInputMetrics("test", reg)
-	defer metrics.Close()
+	metrics := newInputMetrics(monitoring.NewRegistry())
 
 	fakePipelineClient := fakeClient{}
 
@@ -99,7 +97,7 @@ func TestProcessEvents(t *testing.T) {
 	assert.Equal(t, message, single)
 }
 
-//func TestNewInputDone(t *testing.T) {
+// func TestNewInputDone(t *testing.T) {
 //	log := logp.NewLogger(fmt.Sprintf("%s test for input", inputName))
 //	config := mapstr.M{
 //		"connection_string":   "Endpoint=sb://something",
@@ -108,7 +106,7 @@ func TestProcessEvents(t *testing.T) {
 //		"storage_account_key": "secret",
 //	}
 //	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
-//}
+// }
 
 // ackClient is a fake beat.Client that ACKs the published messages.
 type fakeClient struct {

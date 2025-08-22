@@ -23,6 +23,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"math"
 	"net/http"
 	"os"
 	"os/exec"
@@ -494,7 +495,11 @@ func (p *monitorTestSuite) TestNew() {
 	cancelChan := make(chan struct{})
 
 	targetFile := filepath.Join(tmpDir, "file_kprobes.txt")
-	tid := uint32(unix.Gettid())
+	unixTid := unix.Gettid()
+	if unixTid > math.MaxUint32 || unixTid < 0 {
+		p.T().Errorf("got TID out of range for uint32: %d", unixTid)
+	}
+	tid := uint32(unixTid)
 
 	expectedEvents := []MonitorEvent{
 		{

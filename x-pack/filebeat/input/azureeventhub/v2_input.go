@@ -91,8 +91,7 @@ func (in *eventHubInputV2) Run(
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
 	// Setup input metrics
-	inputMetrics := newInputMetrics(inputContext.ID, nil)
-	defer inputMetrics.Close()
+	inputMetrics := newInputMetrics(inputContext.MetricsRegistry)
 	in.metrics = inputMetrics
 
 	// When setting up Azure Event Hub client and validating configuration.

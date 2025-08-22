@@ -191,7 +191,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		if config.Scope == "node" {
 			config.Node, err = kubernetes.DiscoverKubernetesNode(k.log, nd)
 			if err != nil {
-				k.log.Errorf("Couldn't discover Kubernetes node: %w", err)
+				k.log.Errorf("Couldn't discover Kubernetes node: %v", err)
 				return
 			}
 			k.log.Debugf("Initializing a new Kubernetes watcher using host: %s", config.Node)
@@ -202,7 +202,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			Node:         config.Node,
 			Namespace:    config.Namespace,
 			HonorReSyncs: true,
-		}, nil)
+		}, nil, k.log)
 		if err != nil {
 			k.log.Errorf("Couldn't create kubernetes watcher for %T", &kubernetes.Pod{})
 			return
@@ -215,7 +215,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 				SyncTimeout:  config.SyncPeriod,
 				Node:         config.Node,
 				HonorReSyncs: true,
-			}, nil)
+			}, nil, k.log)
 			if err != nil {
 				k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
 			}
@@ -226,7 +226,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 				SyncTimeout:  config.SyncPeriod,
 				Namespace:    config.Namespace,
 				HonorReSyncs: true,
-			}, nil)
+			}, nil, k.log)
 			if err != nil {
 				k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 			}
@@ -253,6 +253,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 				},
 				nil,
 				metadata.RemoveUnnecessaryReplicaSetData,
+				k.log,
 			)
 			if err != nil {
 				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
@@ -264,7 +265,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 				SyncTimeout:  config.SyncPeriod,
 				Namespace:    config.Namespace,
 				HonorReSyncs: true,
-			}, nil)
+			}, nil, k.log)
 			if err != nil {
 				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
 			}
@@ -299,30 +300,30 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		// be populated before trying to generate metadata for Pods.
 		if k.nodeWatcher != nil {
 			if err := k.nodeWatcher.Start(); err != nil {
-				k.log.Debugf("add_kubernetes_metadata", "Couldn't start node watcher: %v", err)
+				k.log.Debugf("Couldn't start node watcher: %v", err)
 				return
 			}
 		}
 		if k.nsWatcher != nil {
 			if err := k.nsWatcher.Start(); err != nil {
-				k.log.Debugf("add_kubernetes_metadata", "Couldn't start namespace watcher: %v", err)
+				k.log.Debugf("Couldn't start namespace watcher: %v", err)
 				return
 			}
 		}
 		if k.rsWatcher != nil {
 			if err := k.rsWatcher.Start(); err != nil {
-				k.log.Debugf("add_kubernetes_metadata", "Couldn't start replicaSet watcher: %v", err)
+				k.log.Debugf("Couldn't start replicaSet watcher: %v", err)
 				return
 			}
 		}
 		if k.jobWatcher != nil {
 			if err := k.jobWatcher.Start(); err != nil {
-				k.log.Debugf("add_kubernetes_metadata", "Couldn't start job watcher: %v", err)
+				k.log.Debugf("Couldn't start job watcher: %v", err)
 				return
 			}
 		}
 		if err := watcher.Start(); err != nil {
-			k.log.Debugf("add_kubernetes_metadata", "Couldn't start pod watcher: %v", err)
+			k.log.Debugf("Couldn't start pod watcher: %v", err)
 			return
 		}
 	})

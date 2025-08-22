@@ -101,7 +101,7 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	cbID, err := uuid.NewV4()
 	// if we fail, fall back to the processor name, hope for the best.
 	if err != nil {
-		p.logger.Errorf("error generating ID for FQDN callback, reverting to processor name: %w", err)
+		p.logger.Errorf("error generating ID for FQDN callback, reverting to processor name: %v", err)
 		cbIDStr = processorName
 	} else {
 		cbIDStr = cbID.String()
@@ -262,7 +262,7 @@ func (p *addHostMetadata) updateOrExpire(useFQDN bool) {
 	go func() {
 		err := p.loadData(false, useFQDN)
 		if err != nil {
-			p.logger.Errorf("error updating data for processor: %w")
+			p.logger.Errorf("error updating data for processor: %v", err)
 			updateChanSuccess <- false
 			return
 		}

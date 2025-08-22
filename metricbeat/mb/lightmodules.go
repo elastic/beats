@@ -41,10 +41,10 @@ type LightModulesSource struct {
 }
 
 // NewLightModulesSource creates a new LightModulesSource
-func NewLightModulesSource(paths ...string) *LightModulesSource {
+func NewLightModulesSource(logger *logp.Logger, paths ...string) *LightModulesSource {
 	return &LightModulesSource{
 		paths: paths,
-		log:   logp.NewLogger("registry.lightmodules"),
+		log:   logger.Named("registry.lightmodules"),
 	}
 }
 
@@ -258,12 +258,12 @@ func (s *LightModulesSource) moduleNames() ([]string, error) {
 	modules := make(map[string]bool)
 	for _, dir := range s.paths {
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
-			s.log.Debugf("Light modules directory '%d' doesn't exist", dir)
+			s.log.Debugf("Light modules directory '%s' doesn't exist", dir)
 			continue
 		}
 		files, err := ioutil.ReadDir(dir)
 		if err != nil {
-			return nil, fmt.Errorf("listing modules on path '%s': %w", dir, err)
+			return nil, fmt.Errorf("listing modules on path '%s': %v", dir, err)
 		}
 		for _, f := range files {
 			if !f.IsDir() {
