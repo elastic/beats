@@ -8,7 +8,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -144,7 +143,11 @@ func dbSelector(driver, dbName string) string {
 	return ""
 }
 
-func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.ReporterV2, queries []query) (bool, error) {
+func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.ReporterV2, queries []query) (_ bool, fetchErr error) {
+	defer func() {
+		fetchErr = sql.SanitizeError(fetchErr, m.HostData().URI)
+	}()
+
 	var ok bool
 	merged := make(mapstr.M, 0)
 	for _, q := range queries {
@@ -210,7 +213,7 @@ func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.Rep
 // format of the query.
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (fetchErr error) {
 	defer func() {
-		fetchErr = sanitizeError(fetchErr, m.HostData().URI)
+		fetchErr = sql.SanitizeError(fetchErr, m.HostData().URI)
 	}()
 
 	db, err := sql.NewDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
@@ -385,21 +388,4 @@ func inferTypeFromMetrics(ms mapstr.M) mapstr.M {
 	}
 
 	return ret
-}
-
-// sanitizeError replaces all occurrences of 'sensitive' parameter in err.Error() with "(redacted)"
-func sanitizeError(err error, sensitive string) error {
-	if err == nil {
-		return nil
-	}
-
-	sensitive = strings.TrimSpace(sensitive)
-
-	if sensitive == "" {
-		return err
-	}
-
-	sanitizedMessage := strings.ReplaceAll(err.Error(), sensitive, "(redacted)")
-
-	return errors.New(sanitizedMessage)
 }
