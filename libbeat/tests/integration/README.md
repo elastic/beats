@@ -37,7 +37,7 @@ These methods always read from the beginning of logs:
 + `GetLogLine`: Searches for a string in logs and returns the matching line.
 + `GetLastLogLine`: Searches for a string from the end of logs and returns the matching line.
 + `WaitLogsContainsFromBeginning`: Resets offset, then waits for logs to contain a string.
-+ `WaitForLogsAnyOrder` - Waits for all specified strings to appear in logs in any order within the given timeout.
++ `WaitLogsContainsAnyOrder` - Waits for all specified strings to appear in logs in any order within the given timeout.
 
 ### Generating log files for ingestion
 

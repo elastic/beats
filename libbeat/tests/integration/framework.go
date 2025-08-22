@@ -609,12 +609,12 @@ func (b *BeatProc) WaitLogsContains(s string, timeout time.Duration, msgAndArgs 
 	}, timeout, 100*time.Millisecond, msgAndArgs...)
 }
 
-// WaitForLogsAnyOrder waits for all strings in the msgs slice to appear in the logs.
+// WaitLogsContainsAnyOrder waits for all strings in the msgs slice to appear in the logs.
 // The strings can appear in any order. The function will return once all strings
 // have been found or the timeout has been reached.
 // If the timeout is reached before all strings are found, the test will fail with
 // the provided error message and arguments (failMsg).
-func (b *BeatProc) WaitForLogsAnyOrder(msgs []string, timeout time.Duration, failMsg string) {
+func (b *BeatProc) WaitLogsContainsAnyOrder(msgs []string, timeout time.Duration, failMsg string) {
 	b.t.Helper()
 
 	if len(msgs) == 0 {
@@ -1271,42 +1271,6 @@ func StartMockES(
 
 	return &s, serverURL, es, rdr
 }
-
-// // GetEventsFromFileOutput reads all events from all the files on dir. If n > 0,
-// // then it reads up to n events. It considers all files are ndjson, and it skips
-// // any directory within dir.
-// func GetEventsFromFileOutput[E any](t *testing.T, dir string, n int) []E {
-// 	t.Helper()
-
-// 	if n < 1 {
-// 		n = math.MaxInt
-// 	}
-
-// 	var events []E
-// 	entries, err := os.ReadDir(dir)
-// 	require.NoError(t, err, "could not read events directory")
-// 	for _, e := range entries {
-// 		if e.IsDir() {
-// 			continue
-// 		}
-// 		f, err := os.Open(filepath.Join(dir, e.Name()))
-// 		require.NoErrorf(t, err, "could not open file %q", e.Name())
-
-// 		scanner := bufio.NewScanner(f)
-// 		for scanner.Scan() {
-// 			var ev E
-// 			err := json.Unmarshal(scanner.Bytes(), &ev)
-// 			require.NoError(t, err, "failed to read event")
-// 			events = append(events, ev)
-
-// 			if len(events) >= n {
-// 				return events
-// 			}
-// 		}
-// 	}
-
-// 	return events
-// }
 
 // WaitPublishedEvents waits until the desired number of events
 // have been published. It assumes the file output is used, the filename

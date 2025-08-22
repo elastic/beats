@@ -64,7 +64,7 @@ func TestNetInputs(t *testing.T) {
 
 			filebeat.WriteConfigFile(cfg)
 			filebeat.Start()
-			filebeat.WaitForLogsAnyOrder(
+			filebeat.WaitLogsContainsAnyOrder(
 				[]string{
 					"[Worker 0] starting publish loop",
 					"[Worker 1] starting publish loop",
@@ -77,7 +77,7 @@ func TestNetInputs(t *testing.T) {
 
 			filebeat.WaitPublishedEvents(3*time.Second, len(tc.data))
 			filebeat.Stop()
-			filebeat.WaitForLogsAnyOrder(
+			filebeat.WaitLogsContainsAnyOrder(
 				[]string{
 					"[Worker 0] finished publish loop",
 					"[Worker 1] finished publish loop",
@@ -150,7 +150,7 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 
 			filebeat.WriteConfigFile(cfg)
 			filebeat.Start()
-			filebeat.WaitForLogsAnyOrder(
+			filebeat.WaitLogsContainsAnyOrder(
 				workerStartedMsgs,
 				5*time.Second,
 				"not all workers have started",
@@ -202,7 +202,7 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 			filebeat.Stop()
 
 			// Ensure all workers are finished, no goroutine leak
-			filebeat.WaitForLogsAnyOrder(
+			filebeat.WaitLogsContainsAnyOrder(
 				workerDoneMsgs,
 				5*time.Second,
 				"not all workers have started",
