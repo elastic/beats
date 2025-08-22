@@ -257,6 +257,7 @@ func (in *eventHubInputV2) run(inputContext v2.Context, ctx context.Context) {
 		)
 		if err != nil {
 			in.log.Errorw("error creating processor", "error", err)
+			in.status.UpdateStatus(status.Failed, fmt.Sprintf("Error creating processor. Error: %s", err))
 			return
 		}
 
