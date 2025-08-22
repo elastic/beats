@@ -145,8 +145,6 @@ func dbSelector(driver, dbName string) string {
 	return ""
 }
 
-// fetch returns a sanitized error recreated with errors.New (via defer sql.SanitizeError) to avoid leaking sensitive data.
-// The returned error does not wrap the original, so errors.Is/As will not match.
 func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.ReporterV2, queries []query) (_ bool, fetchErr error) {
 	defer func() {
 		fetchErr = sql.SanitizeError(fetchErr, m.HostData().URI)
