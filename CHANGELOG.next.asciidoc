@@ -139,10 +139,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
-- Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group. {pull}44576[44576]
-- Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
-- Fix histogram values of zero are filtered out on non-amd64 platforms for openmetrics and prometheus {pull}44750[44750]
-- Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. {pull}45761[45761]
 - Enhance behavior of sanitizeError: replace sensitive info even if it is escaped and add pattern-based sanitization {pull}45857[45857]
 
 *Osquerybeat*
