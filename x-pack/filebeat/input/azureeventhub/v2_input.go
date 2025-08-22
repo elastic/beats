@@ -87,10 +87,10 @@ func (in *eventHubInputV2) Run(
 ) error {
 	var err error
 
-	defer in.status.UpdateStatus(status.Stopped, "")
-
 	// Setting up the status reporter helper
 	in.status = statusreporterhelper.New(inputContext.StatusReporter, in.log, "Azure Event Hub")
+
+	defer in.status.UpdateStatus(status.Stopped, "")
 
 	// When the input is initializing before attempting to connect to Azure Event Hub.
 	in.status.UpdateStatus(status.Starting, "")
