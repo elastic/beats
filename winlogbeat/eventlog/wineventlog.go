@@ -155,6 +155,11 @@ func (l *winEventLog) IsFile() bool {
 	return l.file
 }
 
+// IgnoreMissingChannel returns true if missing channels should be ignored.
+func (l *winEventLog) IgnoreMissingChannel() bool {
+	return !l.file && l.config.IgnoreMissingChannel
+}
+
 func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
 	l.lastRead = state
 	// we need to defer metrics initialization since when the event log

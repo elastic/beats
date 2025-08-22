@@ -289,6 +289,27 @@ winlogbeat.event_logs:
 * This can have a significant impact on performance that can vary depending on your system specs.
 
 
+### `event_logs.ignore_missing_channel` [_event_logs_ignore_missing_channel]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+Boolean option that controls whether Winlogbeat should ignore missing event log channels and continue monitoring other configured channels. When set to `true`, if a specified event log channel doesn't exist or cannot be accessed, Winlogbeat will log a warning and continue processing other event logs instead of stopping with an error. The default is `false`.
+
+This option is useful when deploying Winlogbeat configurations across multiple systems where certain event log channels may not be available on all machines, or when monitoring optional channels that may not always be present.
+
+Example:
+
+```yaml
+winlogbeat.event_logs:
+  - name: Application
+  - name: System 
+  - name: Sysmon
+    ignore_missing_channel: true
+```
+
+
 ### `event_logs.tags` [_event_logs_tags]
 
 A list of tags that the Beat includes in the `tags` field of each published event. Tags make it easy to select specific events in Kibana or apply conditional filtering in Logstash. These tags will be appended to the list of tags specified in the general configuration.

@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
+	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
@@ -59,6 +60,10 @@ func Run(
 	defer cancelFn()
 
 	openErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
+		if mustIgnoreError(err, api) {
+			log.Warnw("ignoring open error", "error", err, "channel", api.Channel())
+			return true
+		}
 		if IsRecoverable(err, api.IsFile()) {
 			reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to open %s: %v", api.Channel(), err))
 			log.Errorw("encountered recoverable error when opening Windows Event Log", "error", err)
@@ -68,15 +73,22 @@ func Run(
 	})
 
 	readErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
+		var mustRetry bool
+		if mustIgnoreError(err, api) {
+			log.Warnw("ignoring read error", "error", err, "channel", api.Channel())
+			mustRetry = true
+		}
 		if IsRecoverable(err, api.IsFile()) {
 			reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to read from %s: %v", api.Channel(), err))
 			log.Errorw("encountered recoverable error when reading from Windows Event Log", "error", err)
+			mustRetry = true
+		}
+		if mustRetry {
 			if resetErr := api.Reset(); resetErr != nil {
 				log.Errorw("error resetting Windows Event Log handle", "error", resetErr)
 			}
-			return true
 		}
-		return false
+		return mustRetry
 	})
 
 runLoop:
@@ -173,4 +185,8 @@ func (b *exponentialLimitedBackoff) backoff(ctx context.Context, err error) bool
 
 func (b *exponentialLimitedBackoff) reset() {
 	b.currentDelay = b.initialDelay
+}
+
+func mustIgnoreError(err error, api EventLog) bool {
+	return api.IgnoreMissingChannel() && errors.Is(err, win.ERROR_EVT_CHANNEL_NOT_FOUND)
 }

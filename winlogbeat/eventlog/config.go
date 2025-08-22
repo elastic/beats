@@ -48,15 +48,16 @@ func readConfig(c *conf.C, config interface{}) error {
 }
 
 type config struct {
-	Name          string             `config:"name"`            // Name of the event log or channel or file.
-	ID            string             `config:"id"`              // Identifier for the event log.
-	XMLQuery      string             `config:"xml_query"`       // Custom query XML. Must not be used with the keys from eventlog.query.
-	BatchReadSize int                `config:"batch_read_size"` // Maximum number of events that Read will return.
-	IncludeXML    bool               `config:"include_xml"`
-	Forwarded     *bool              `config:"forwarded"`
-	SimpleQuery   query              `config:",inline"`
-	NoMoreEvents  NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
-	EventLanguage uint32             `config:"language"`
+	Name                 string             `config:"name"`            // Name of the event log or channel or file.
+	ID                   string             `config:"id"`              // Identifier for the event log.
+	XMLQuery             string             `config:"xml_query"`       // Custom query XML. Must not be used with the keys from eventlog.query.
+	BatchReadSize        int                `config:"batch_read_size"` // Maximum number of events that Read will return.
+	IncludeXML           bool               `config:"include_xml"`
+	Forwarded            *bool              `config:"forwarded"`
+	SimpleQuery          query              `config:",inline"`
+	NoMoreEvents         NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
+	EventLanguage        uint32             `config:"language"`
+	IgnoreMissingChannel bool               `config:"ignore_missing_channel"` // Ignore missing channels and continue reading.
 
 	// FIXME: This is for a WS2025 known issue so we can bypass the workaround
 	// and will be removed in the future.
