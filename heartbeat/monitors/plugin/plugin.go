@@ -18,7 +18,6 @@
 package plugin
 
 import (
-	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -30,7 +29,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/plugin"
 )
 
 // PluginFactory represents an uninstantiated plug in instance generated from a monitor config. Invoking the Make function creates a plug-in instance.
@@ -87,8 +85,6 @@ func (p Plugin) RunWrapped(fields stdfields.StdMonitorFields) chan *beat.Event {
 	return results
 }
 
-var pluginKey = "heartbeat.monitor"
-
 // stateGlobalRecorder records statistics across all plugin types
 var stateGlobalRecorder = newRootGaugeRecorder(hbregistry.TelemetryRegistry)
 
@@ -103,18 +99,6 @@ func statsForPlugin(pluginName string) RegistryRecorder {
 			stateGlobalRecorder,
 		},
 	}
-}
-
-func init() {
-	plugin.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
-		p, ok := ifc.(PluginFactory)
-		if !ok {
-			return errors.New("plugin does not match monitor plugin type")
-		}
-
-		stats := statsForPlugin(p.Name)
-		return GlobalPluginsReg.Register(PluginFactory{p.Name, p.Aliases, p.Make, stats})
-	})
 }
 
 // Type represents whether a plugin is active or passive.
@@ -196,6 +180,7 @@ func (r *PluginsReg) String() string {
 	return fmt.Sprintf("globalPluginsReg, monitor: %v",
 		strings.Join(monitors, ", "))
 }
+
 func (r *PluginsReg) MonitorNames() []string {
 	names := make([]string, 0, len(r.monitors))
 	for k := range r.monitors {
