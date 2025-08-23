@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/binary"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -47,6 +48,8 @@ type Config struct {
 	// If CollectOnEOF is set to false the line reader will return 0 content and keep the buffer at the current
 	// state of appending data after temporarily EOF.
 	CollectOnEOF bool
+
+	Binary *binary.Encoding
 }
 
 // NewEncodeReader creates a new Encode reader from input reader by applying
@@ -65,9 +68,17 @@ func NewEncodeReader(r io.ReadCloser, config Config, logger *logp.Logger) (Encod
 func (r EncoderReader) Next() (reader.Message, error) {
 	c, sz, err := r.reader.Next()
 	// Creating message object
+
+	var content []byte
+	if r.reader.IsBinary() {
+		content = c
+	} else {
+		content = bytes.TrimPrefix(c, []byte("\uFEFF"))
+	}
+
 	return reader.Message{
 		Ts:      time.Now(),
-		Content: bytes.TrimPrefix(c, []byte("\uFEFF")),
+		Content: content,
 		Bytes:   sz,
 		Fields:  mapstr.M{},
 	}, err

@@ -458,9 +458,14 @@ func (inp *filestream) open(
 		return nil, truncated, err
 	}
 
-	dbgReader, err := debug.AppendReaders(logReader, log)
-	if err != nil {
-		return nil, truncated, err
+	var dbgReader io.ReadCloser
+	if inp.readerConfig.IsBinary() {
+		dbgReader = logReader
+	} else {
+		dbgReader, err = debug.AppendReaders(logReader, log)
+		if err != nil {
+			return nil, truncated, err
+		}
 	}
 
 	// Configure MaxBytes limit for EncodeReader as multiplied by 4
@@ -475,12 +480,17 @@ func (inp *filestream) open(
 		BufferSize: inp.readerConfig.BufferSize,
 		Terminator: inp.readerConfig.LineTerminator,
 		MaxBytes:   encReaderMaxBytes,
+
+		Binary:     inp.readerConfig.Binary,
 	}, log)
 	if err != nil {
 		return nil, truncated, err
 	}
 
-	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
+	// if this is a binary file, handle that here
+	if !inp.readerConfig.IsBinary() {
+		r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
+	}
 
 	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, fs.desc.Fingerprint, offset)
 
@@ -685,7 +695,7 @@ func (inp *filestream) readFromSource(
 			return nil
 		}
 
-		// sate offset increase
+		// save offset increase
 		s.Offset += int64(message.Bytes) + int64(message.Offset)
 
 		flags, err := message.Fields.GetValue("log.flags")
