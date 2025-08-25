@@ -81,7 +81,7 @@ func AutodiscoverBuilder(
 	clients := make([]ec2.DescribeInstancesAPIClient, 0, len(config.Regions))
 	for _, region := range config.Regions {
 		if err != nil {
-			log.Errorf("error loading AWS config for aws_ec2 autodiscover provider: %w", err)
+			log.Errorf("error loading AWS config for aws_ec2 autodiscover provider: %v", err)
 		}
 		awsCfg.Region = region
 		clients = append(clients, ec2.NewFromConfig(awsCfg, func(o *ec2.Options) {

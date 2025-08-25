@@ -123,12 +123,12 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 
 		assetNames, err := getAssetNames(ctx, pc, &datastoreCluster[i])
 		if err != nil {
-			m.Logger().Errorf("Failed to retrieve object from datastore cluster %s: v", datastoreCluster[i].Name, err)
+			m.Logger().Errorf("Failed to retrieve object from datastore cluster %s: %v", datastoreCluster[i].Name, err)
 		}
 
 		triggeredAlarm, err := getTriggeredAlarm(ctx, pc, datastoreCluster[i].TriggeredAlarmState)
 		if err != nil {
-			m.Logger().Errorf("Failed to retrieve alerts from datastore cluster %s: %w", datastoreCluster[i].Name, err)
+			m.Logger().Errorf("Failed to retrieve alerts from datastore cluster %s: %v", datastoreCluster[i].Name, err)
 		}
 
 		reporter.Event(mb.Event{MetricSetFields: m.mapEvent(datastoreCluster[i], &metricData{assetNames: assetNames, triggeredAlarms: triggeredAlarm})})

@@ -174,7 +174,7 @@ func scanExistingSegments(logger *logp.Logger, pathStr string) ([]*queueSegment,
 	for _, dirEntry := range dirEntries {
 		file, err := dirEntry.Info()
 		if err != nil {
-			logger.Errorf("could not get info for file '%s', skipping. Error: %w", dirEntry.Name(), err)
+			logger.Errorf("could not get info for file '%s', skipping. Error: %v", dirEntry.Name(), err)
 			continue
 		}
 

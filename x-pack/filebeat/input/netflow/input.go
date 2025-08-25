@@ -223,7 +223,7 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 	err = udpServer.Start()
 	if err != nil {
 		errorMsg := fmt.Sprintf("Failed to start udp server: %v", err)
-		n.logger.Errorf(errorMsg)
+		n.logger.Error(errorMsg)
 		env.UpdateStatus(status.Failed, errorMsg)
 		n.stop()
 		return err
