@@ -111,6 +111,45 @@ https://github.com/elastic/beats/compare/v8.18.4\...v8.19.0[View commits]
 - Add GCP metadata cache. {pull}44432[44432]
 - Add VPN metrics to meraki module {pull}44851[44851]
 
+[[release-notes-8.18.2]]
+=== Beats version 8.18.2
+https://github.com/elastic/beats/compare/v8.18.1\...v8.18.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix the 'add_cloud_metadata' processor to better support custom certificate bundles by improving how the AWS provider HTTP client is overridden. {pull}44189[44189]
+
+*Auditbeat*
+
+- Fix a potential error in the system/package component that could occur during internal package database schema migration. {issue}44294[44294] {pull}44296[44296]
+
+*Filebeat*
+
+- Fix endpoint path typo in the Okta entity analytics provider. {pull}44147[44147]
+- Fix a WebSocket panic scenario that occured after exhausting the maximum number of retries. {pull}44342[44342]
+
+*Osquerybeat*
+
+- Disable the allow_unsafe osquery configuration. {pull}40130[40130]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to v1.24.3. {pull}44270[44270]
+
+*Metricbeat*
+
+- Add checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
+- Add `enable_batch_api` option in the Azure monitor module to allow metrics collection of multiple resources using Azure batch API. {pull}41790[41790]
+- Add support for `_nodes/stats` URIs compatible with legacy Elasticsearch versions. {pull}44307[44307]
+- Add a latency configuration option to the Azure Monitor module. {pull}44366[44366]
+
+*Osquerybeat*
+
+- Update osquery version to v5.15.0. {pull}43426[43426]
 
 [[release-notes-8.18.1]]
 === Beats version 8.18.1
@@ -232,6 +271,40 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Make the experimental API GA and rename it to winlogbeat-raw. {issue}39580[39580] {pull}41770[41770]
 - Remove 22 clause limitation. {issue}35047[35047] {pull}42187[42187]
 - Add handling for recoverable publisher disabled errors. {issue}35316[35316] {pull}42187[42187]
+
+[[release-notes-8.17.9]]
+=== Beats version 8.17.9
+https://github.com/elastic/beats/compare/v8.17.8\...v8.17.9[View commits]
+
+==== Breaking changes
+
+*Metricbeat*
+
+- Change index summary metricset to use `_nodes/stats` API instead of `_stats` API to avoid data gaps. {pull}45049[45049]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
+
+*Filebeat*
+
+- Add missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
+
+*Winlogbeat*
+
+- Fix EvtVarTypeAnsiString conversion. {pull}44026[44026]
+
+==== Added
+
+*Heartbeat*
+
+- Upgrade Node version to latest LTS v20.19.3. {pull}45087[45087]
+
+*Metricbeat*
+
+- Increase default polling period for MongoDB module from 10s to 60s. {pull}44781[44781]
 
 [[release-notes-8.17.8]]
 === Beats version 8.17.8
