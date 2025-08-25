@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"html/template"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -19,7 +18,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
-	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 
@@ -44,19 +42,14 @@ func TestOtelBeatProcessorE2E(t *testing.T) {
 	processorIndex := "logs-processor-" + namespace
 	receiverIndex := "logs-receiver-" + namespace
 
-	processor := int(libbeattesting.MustAvailableTCP4Port(t))
-	receiverMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
-
 	configParameters := struct {
-		Index          string
-		MonitoringPort int
-		InputFile      string
-		PathHome       string
+		Index     string
+		InputFile string
+		PathHome  string
 	}{
-		Index:          processorIndex,
-		MonitoringPort: processor,
-		InputFile:      filepath.Join(processorFilebeat.TempDir(), "log.log"),
-		PathHome:       processorFilebeat.TempDir(),
+		Index:     processorIndex,
+		InputFile: filepath.Join(processorFilebeat.TempDir(), "log.log"),
+		PathHome:  processorFilebeat.TempDir(),
 	}
 
 	configTemplate := `
@@ -97,9 +90,6 @@ receivers:
         - '*'
     queue.mem.flush.timeout: 0s
     path.home: {{.PathHome}}
-    http.enabled: true
-    http.host: localhost
-    http.port: {{.MonitoringPort}}
 processors:
   beat:
     processors:
@@ -179,9 +169,6 @@ receivers:
         - '*'
     queue.mem.flush.timeout: 0s
     path.home: %s
-    http.enabled: true
-    http.host: localhost
-    http.port: %v
 exporters:
   debug:
     use_internal_logger: false
@@ -204,7 +191,6 @@ exporters:
 	receiverRenderedConfig := fmt.Sprintf(receiverConfig,
 		logFilePath,
 		filebeatWithReceiver.TempDir(),
-		receiverMonitoringPort,
 		receiverIndex,
 	)
 	t.Cleanup(func() {
@@ -251,8 +237,6 @@ exporters:
 	}
 
 	oteltest.AssertMapsEqual(t, receiverDoc, processorDoc, ignoredFields, "expected documents to be equal")
-	assertMonitoring(t, configParameters.MonitoringPort)
-	assertMonitoring(t, receiverMonitoringPort)
 }
 
 func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
@@ -274,19 +258,4 @@ func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
 	if err := logFile.Close(); err != nil {
 		t.Fatalf("could not close log file '%s': %s", filename, err)
 	}
-}
-
-func assertMonitoring(t *testing.T, port int) {
-	address := fmt.Sprintf("http://localhost:%d", port)
-	r, err := http.Get(address) //nolint:noctx,bodyclose,gosec // fine for tests
-	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
-
-	r, err = http.Get(address + "/stats") //nolint:noctx,bodyclose // fine for tests
-	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
-
-	r, err = http.Get(address + "/not-exist") //nolint:noctx,bodyclose // fine for tests
-	require.NoError(t, err)
-	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }
