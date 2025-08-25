@@ -22,8 +22,8 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/gohugoio/hashstructure"
 	"github.com/joeshaw/multierror"
-	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
