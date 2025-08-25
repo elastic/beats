@@ -48,7 +48,7 @@ CHANGELOG*
 /filebeat/module/mysql @elastic/obs-infraobs-integrations
 /filebeat/module/nats @elastic/obs-infraobs-integrations
 /filebeat/module/nginx @elastic/obs-infraobs-integrations
-/filebeat/module/osquery @elastic/integration-experience
+/filebeat/module/osquery @elastic/sec-windows-platform
 /filebeat/module/pensando @elastic/integration-experience
 /filebeat/module/postgresql @elastic/obs-infraobs-integrations
 /filebeat/module/redis @elastic/obs-infraobs-integrations
@@ -265,6 +265,6 @@ CHANGELOG*
 /x-pack/metricbeat/module/statsd @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/stan/ @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/tomcat @elastic/obs-infraobs-integrations
-/x-pack/osquerybeat/ @elastic/integration-experience
+/x-pack/osquerybeat/ @elastic/sec-windows-platform
 /x-pack/packetbeat/ @elastic/sec-linux-platform
 /x-pack/winlogbeat/ @elastic/sec-windows-platform
