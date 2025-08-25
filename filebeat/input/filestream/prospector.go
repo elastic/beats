@@ -425,7 +425,7 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 		err := s.FindCursorMeta(src, &meta)
 		if err != nil {
 			meta.IdentifierName = p.identifier.Name()
-			log.Warnf("Error while getting cursor meta data of entry '%s': '%w'"+
+			log.Warnf("Error while getting cursor meta data of entry '%s': '%v'"+
 				", using prospector's identifier: '%s'",
 				src.Name(), err, meta.IdentifierName)
 		}
