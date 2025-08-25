@@ -917,6 +917,7 @@ func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings, log *
 		fallthrough
 	case !ok:
 		return []httpcommon.TransportOption{
+			httpcommon.WithLogger(log),
 			httpcommon.WithAPMHTTPInstrumentation(),
 			keepalive,
 		}
