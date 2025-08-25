@@ -21,15 +21,18 @@ package integration
 
 import (
 	"encoding/json"
+	"net/http"
 	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
-// GetEventsMsgFromES gets the 'message' field from all documents
+// GetEventsMsgFromES fetches the `message` field from `size` documents
 // in `index`. If Elasticsearch returns an status code other than 200
-// nil is returned. `size` sets the number of documents returned
+// nil is returned.
+// ES is queried by calling <index>/_search and documents are ordered
+// in ascending order by `@timestamp` field.
 func GetEventsMsgFromES(t *testing.T, index string, size int) []string {
 	t.Helper()
 	// Step 1: Get the Elasticsearch Admin URL so we can query any index
@@ -51,7 +54,7 @@ func GetEventsMsgFromES(t *testing.T, index string, size int) []string {
 	searchURL.RawQuery = queryParams.Encode()
 
 	// Step 4: Perform the HTTP GET request using HttpDo
-	statusCode, body, err := HttpDo(t, "GET", searchURL)
+	statusCode, body, err := HttpDo(t, http.MethodGet, searchURL)
 	require.NoError(t, err, "Failed to perform HTTP request")
 	if statusCode != 200 {
 		return nil

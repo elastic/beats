@@ -866,20 +866,10 @@ func GetESClient(t *testing.T, scheme string) *elasticsearch.Client {
 
 }
 
-// FileContains searches for the specified string in a file and returns the first matching line.
+// FileContains searches for `match` in `filename` and returns the first matching line.
 // The method reads the file line by line, looking for the first occurrence of the match string.
-// If the match is found, it returns the entire line containing the match.
 // If no match is found, it returns an empty string.
-//
-// Parameters:
-//   - filename: Path to the file to search in
-//   - match: String to search for in the file
-//
-// Returns:
-//
-//	The first line containing the match string or an empty string if not found.
-//
-// The test will fail if the file cannot be opened or if an error occurs while reading.
+// The test will fail (t.Fatal) if the file cannot be opened or if an error occurs while reading.
 func (b *BeatProc) FileContains(filename string, match string) string {
 	file, err := os.Open(filename)
 	require.NoErrorf(b.t, err, "error opening: %s", filename)
@@ -1148,7 +1138,7 @@ func reportErrors(t *testing.T, tempDir string, beatName string) {
 	}
 }
 
-// WaitLineCountInFile counts number of lines in the given file and  asserts if it matches expected count
+// WaitLineCountInFile counts number of lines in the given file and asserts if it matches expected count
 func WaitLineCountInFile(t *testing.T, path string, count int) {
 	t.Helper()
 	var lines []byte

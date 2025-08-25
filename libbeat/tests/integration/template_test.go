@@ -305,6 +305,7 @@ logging:
 	if err != nil {
 		defer r.Body.Close()
 	}
+	require.NoError(t, err, "could not query the index template")
 	require.Equal(t, 404, r.StatusCode, "incorrect status code")
 }
 
