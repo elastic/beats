@@ -637,25 +637,33 @@ processors:
 `
 	expectedExporter := `exporters:
     elasticsearch:
-        batcher:
-            enabled: true
-            max_size: 1600
-            min_size: 0
         compression: gzip
         compression_params:
             level: 1
         endpoints:
             - http://localhost:9200
+        force_attempt_http2: false
         idle_conn_timeout: 3s
         logs_index: index
         mapping:
             mode: bodymap
+        max_conns_per_host: 1
         password: testing
         retry:
             enabled: true
             initial_interval: 1s
             max_interval: 1m0s
             max_retries: 3
+        sending_queue:
+            batch:
+                max_size: 1600
+                min_size: 0
+                sizer: items
+            block_on_overflow: true
+            enabled: true
+            num_consumers: 1
+            queue_size: 9223372036854775807
+            wait_for_result: true
         timeout: 1m30s
         user: admin`
 	expectedReceiver := `receivers:
