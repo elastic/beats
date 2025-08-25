@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# iptables fields [exported-fields-iptables]
+# Iptables fields [exported-fields-iptables]
 
 Module for handling the iptables logs.
 
@@ -16,25 +16,25 @@ Fields from the iptables logs.
 **`iptables.ether_type`**
 :   Value of the ethernet type field identifying the network layer protocol.
 
-type: long
+    type: long
 
 
 **`iptables.flow_label`**
 :   IPv6 flow label.
 
-type: integer
+    type: integer
 
 
 **`iptables.fragment_flags`**
 :   IP fragment flags. A combination of CE, DF and MF.
 
-type: keyword
+    type: keyword
 
 
 **`iptables.fragment_offset`**
 :   Offset of the current IP fragment.
 
-type: long
+    type: long
 
 
 ## icmp [_icmp]
@@ -44,79 +44,79 @@ ICMP fields.
 **`iptables.icmp.code`**
 :   ICMP code.
 
-type: long
+    type: long
 
 
 **`iptables.icmp.id`**
 :   ICMP ID.
 
-type: long
+    type: long
 
 
 **`iptables.icmp.parameter`**
 :   ICMP parameter.
 
-type: long
+    type: long
 
 
 **`iptables.icmp.redirect`**
 :   ICMP redirect address.
 
-type: ip
+    type: ip
 
 
 **`iptables.icmp.seq`**
 :   ICMP sequence number.
 
-type: long
+    type: long
 
 
 **`iptables.icmp.type`**
 :   ICMP type.
 
-type: long
+    type: long
 
 
 **`iptables.id`**
 :   Packet identifier.
 
-type: long
+    type: long
 
 
 **`iptables.incomplete_bytes`**
 :   Number of incomplete bytes.
 
-type: long
+    type: long
 
 
 **`iptables.input_device`**
 :   Device that received the packet.
 
-type: keyword
+    type: keyword
 
 
 **`iptables.precedence_bits`**
 :   IP precedence bits.
 
-type: short
+    type: short
 
 
 **`iptables.tos`**
 :   IP Type of Service field.
 
-type: long
+    type: long
 
 
 **`iptables.length`**
 :   Packet length.
 
-type: long
+    type: long
 
 
 **`iptables.output_device`**
 :   Device that output the packet.
 
-type: keyword
+    type: keyword
 
 
 ## tcp [_tcp]
@@ -126,37 +126,37 @@ TCP fields.
 **`iptables.tcp.flags`**
 :   TCP flags.
 
-type: keyword
+    type: keyword
 
 
 **`iptables.tcp.reserved_bits`**
 :   TCP reserved bits.
 
-type: short
+    type: short
 
 
 **`iptables.tcp.seq`**
 :   TCP sequence number.
 
-type: long
+    type: long
 
 
 **`iptables.tcp.ack`**
 :   TCP Acknowledgment number.
 
-type: long
+    type: long
 
 
 **`iptables.tcp.window`**
 :   Advertised TCP window size.
 
-type: long
+    type: long
 
 
 **`iptables.ttl`**
 :   Time To Live field.
 
-type: integer
+    type: integer
 
 
 ## udp [_udp]
@@ -166,7 +166,7 @@ UDP fields.
 **`iptables.udp.length`**
 :   Length of the UDP header and payload.
 
-type: long
+    type: long
 
 
 ## ubiquiti [_ubiquiti]
@@ -176,24 +176,24 @@ Fields for Ubiquiti network devices.
 **`iptables.ubiquiti.input_zone`**
 :   Input zone.
 
-type: keyword
+    type: keyword
 
 
 **`iptables.ubiquiti.output_zone`**
 :   Output zone.
 
-type: keyword
+    type: keyword
 
 
 **`iptables.ubiquiti.rule_number`**
 :   The rule number within the rule set.
 
-type: keyword
+    type: keyword
 
 
 **`iptables.ubiquiti.rule_set`**
 :   The rule set name.
 
-type: keyword
+    type: keyword
 
 

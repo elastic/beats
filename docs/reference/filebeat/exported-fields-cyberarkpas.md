@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# CyberArk PAS fields [exported-fields-cyberarkpas]
+# Cyberark PAS fields [exported-fields-cyberarkpas]
 
 cyberarkpas fields.
 
@@ -16,7 +16,7 @@ Cyberark Privileged Access Security Audit fields.
 **`cyberarkpas.audit.action`**
 :   A description of the audit record.
 
-type: keyword
+    type: keyword
 
 
 ## ca_properties [_ca_properties]
@@ -142,13 +142,13 @@ Account metadata.
 **`cyberarkpas.audit.category`**
 :   The category name (for category-related operations).
 
-type: keyword
+    type: keyword
 
 
 **`cyberarkpas.audit.desc`**
 :   A static value that displays a description of the audit codes.
 
-type: keyword
+    type: keyword
 
 
 ## extra_details [_extra_details]
@@ -226,41 +226,41 @@ Specific extra details of the audit records.
 **`cyberarkpas.audit.file`**
 :   The name of the target file.
 
-type: keyword
+    type: keyword
 
 
 **`cyberarkpas.audit.gateway_station`**
 :   The IP of the web application machine (PVWA).
 
-type: ip
+    type: ip
 
 
 **`cyberarkpas.audit.hostname`**
 :   The hostname, in upper case.
 
-type: keyword
+    type: keyword
 
-example: MY-COMPUTER
+    example: MY-COMPUTER
 
 
 **`cyberarkpas.audit.iso_timestamp`**
 :   The timestamp, in ISO Timestamp format (RFC 3339).
 
-type: date
+    type: date
 
-example: 2013-06-25 10:47:19+00:00
+    example: 2013-06-25 10:47:19+00:00
 
 
 **`cyberarkpas.audit.issuer`**
 :   The Vault user who wrote the audit. This is usually the user who performed the operation.
 
-type: keyword
+    type: keyword
 
 
 **`cyberarkpas.audit.location`**
 :   The target Location (for Location operations).
 
-type: keyword
+    type: keyword
 
 Field is not indexed.
 
@@ -268,31 +268,31 @@ Field is not indexed.
 **`cyberarkpas.audit.message`**
 :   A description of the audit records (same information as in the Desc field).
 
-type: keyword
+    type: keyword
 
 
 **`cyberarkpas.audit.message_id`**
 :   The code ID of the audit records.
 
-type: keyword
+    type: keyword
 
 
 **`cyberarkpas.audit.product`**
 :   A static value that represents the product.
 
-type: keyword
+    type: keyword
 
 
 **`cyberarkpas.audit.pvwa_details`**
 :   Specific details of the PVWA audit records.
 
-type: flattened
+    type: flattened
 
 
 **`cyberarkpas.audit.raw`**
 :   Raw XML for the original audit record. Only present when XSLT file has debugging enabled.
 
-type: keyword
+    type: keyword
 
 Field is not indexed.
 
@@ -300,64 +300,64 @@ Field is not indexed.
 **`cyberarkpas.audit.reason`**
 :   The reason entered by the user.
 
-type: text
+    type: text
 
 
 **`cyberarkpas.audit.rfc5424`**
 :   Whether the syslog format complies with RFC5424.
 
-type: boolean
+    type: boolean
 
-example: True
+    example: True
 
 
 **`cyberarkpas.audit.safe`**
 :   The name of the target Safe.
 
-type: keyword
+    type: keyword
 
 
 **`cyberarkpas.audit.severity`**
 :   The severity of the audit records.
 
-type: keyword
+    type: keyword
 
 
 **`cyberarkpas.audit.source_user`**
 :   The name of the Vault user who performed the operation.
 
-type: keyword
+    type: keyword
 
 
 **`cyberarkpas.audit.station`**
 :   The IP from where the operation was performed. For PVWA sessions, this will be the real client machine IP.
 
-type: ip
+    type: ip
 
 
 **`cyberarkpas.audit.target_user`**
 :   The name of the Vault user on which the operation was performed.
 
-type: keyword
+    type: keyword
 
 
 **`cyberarkpas.audit.timestamp`**
 :   The timestamp, in MMM DD HH:MM:SS format.
 
-type: keyword
+    type: keyword
 
-example: Jun 25 10:47:19
+    example: Jun 25 10:47:19
 
 
 **`cyberarkpas.audit.vendor`**
 :   A static value that represents the vendor.
 
-type: keyword
+    type: keyword
 
 
 **`cyberarkpas.audit.version`**
 :   A static value that represents the version of the Vault.
 
-type: keyword
+    type: keyword
 
 

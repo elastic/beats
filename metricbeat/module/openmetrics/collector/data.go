@@ -22,6 +22,7 @@ import (
 	"strconv"
 
 	"github.com/prometheus/common/model"
+	promlabels "github.com/prometheus/prometheus/model/labels"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -105,11 +106,11 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.MetricFamily)
 			if metric.Exemplar.HasTs {
 				_, _ = exemplars.Put("timestamp", metric.Exemplar.Ts)
 			}
-			for _, label := range metric.Exemplar.Labels {
-				if label.Name != "" && label.Value != "" {
-					_, _ = exemplars.Put("labels."+label.Name, label.Value)
+			metric.Exemplar.Labels.Range(func(l promlabels.Label) {
+				if l.Name != "" && l.Value != "" {
+					_, _ = exemplars.Put("labels."+l.Name, l.Value)
 				}
-			}
+			})
 		}
 
 		counter := metric.GetCounter()
@@ -249,11 +250,11 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.MetricFamily)
 					if bucket.Exemplar.HasTs {
 						_, _ = exemplars.Put("timestamp", bucket.Exemplar.Ts)
 					}
-					for _, label := range bucket.Exemplar.Labels {
-						if label.Name != "" && label.Value != "" {
-							_, _ = exemplars.Put("labels."+label.Name, label.Value)
+					metric.Exemplar.Labels.Range(func(l promlabels.Label) {
+						if l.Name != "" && l.Value != "" {
+							_, _ = exemplars.Put("labels."+l.Name, l.Value)
 						}
-					}
+					})
 				}
 
 				bucketLabels := labels.Clone()

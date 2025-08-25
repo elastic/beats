@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# mongodb fields [exported-fields-mongodb]
+# MongoDB fields [exported-fields-mongodb]
 
 Module for parsing MongoDB log files.
 
@@ -20,36 +20,36 @@ Contains fields from MongoDB logs.
 **`mongodb.log.component`**
 :   Functional categorization of message
 
-type: keyword
+    type: keyword
 
-example: COMMAND
+    example: COMMAND
 
 
 **`mongodb.log.context`**
 :   Context of message
 
-type: keyword
+    type: keyword
 
-example: initandlisten
+    example: initandlisten
 
 
 **`mongodb.log.severity`**
 :   type: alias
 
-alias to: log.level
+    alias to: log.level
 
 
 **`mongodb.log.message`**
 :   type: alias
 
-alias to: message
+    alias to: message
 
 
 **`mongodb.log.id`**
 :   Integer representing the unique identifier of the log statement
 
-type: long
+    type: long
 
-example: 4615611
+    example: 4615611
 
 

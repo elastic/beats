@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-aws-natgateway.html
+
+applies_to:
+  stack: beta
 ---
 
 # AWS natgateway metricset [metricbeat-metricset-aws-natgateway]

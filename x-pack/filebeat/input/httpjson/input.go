@@ -329,7 +329,7 @@ func newHTTPClient(ctx context.Context, config config, stat status.StatusReporte
 const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
 func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger, reg *monitoring.Registry) (*http.Client, error) {
-	netHTTPClient, err := cfg.Transport.Client(clientOptions(cfg.URL.URL, cfg.KeepAlive.settings())...)
+	netHTTPClient, err := cfg.Transport.Client(clientOptions(cfg.URL.URL, cfg.KeepAlive.settings(), log)...)
 	if err != nil {
 		return nil, err
 	}
@@ -421,7 +421,7 @@ func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *re
 
 // clientOption returns constructed client configuration options, including
 // setting up http+unix and http+npipe transports if requested.
-func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []httpcommon.TransportOption {
+func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings, logger *logp.Logger) []httpcommon.TransportOption {
 	scheme, trans, ok := strings.Cut(u.Scheme, "+")
 	var dialer transport.Dialer
 	switch {
@@ -429,6 +429,7 @@ func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []htt
 		fallthrough
 	case !ok:
 		return []httpcommon.TransportOption{
+			httpcommon.WithLogger(logger),
 			httpcommon.WithAPMHTTPInstrumentation(),
 			keepalive,
 		}

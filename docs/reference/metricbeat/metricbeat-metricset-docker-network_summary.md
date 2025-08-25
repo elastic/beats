@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-docker-network_summary.html
+
+applies_to:
+  stack: beta
 ---
 
 # Docker network_summary metricset [metricbeat-metricset-docker-network_summary]
