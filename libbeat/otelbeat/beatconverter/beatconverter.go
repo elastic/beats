@@ -23,6 +23,9 @@ import (
 
 	"go.opentelemetry.io/collector/confmap"
 
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/logstash"
+
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	elasticsearchtranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate/outputs/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -71,6 +74,54 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 
 		for key, output := range output.ToStringMap() {
 			switch key {
+			case "logstash":
+				lsOutputConfig := config.MustNewConfigFrom(output)
+
+				// ignore logstash output if it is not enabled
+				if !lsOutputConfig.Enabled() {
+					continue
+				}
+
+				// when output.queue is set by user, promote it to global level
+				if ok := lsOutputConfig.HasField("queue"); ok {
+					if err := promoteOutputQueueSettings(beatreceiver, lsOutputConfig, conf); err != nil {
+						return err
+					}
+					// remove queue from logstash output config
+					if _, err := lsOutputConfig.Remove("queue", -1); err != nil {
+						return err
+					}
+				}
+
+				lsHostWorker := struct {
+					outputs.HostWorkerCfg `config:",inline"`
+					logstash.Config       `config:",inline"`
+				}{
+					Config: logstash.DefaultConfig(),
+				}
+
+				// unpack and validate LS config
+				if err := lsOutputConfig.Unpack(&lsHostWorker); err != nil {
+					return fmt.Errorf("failed unpacking logstash config: %w", err)
+				}
+
+				lsConfig := config.MustNewConfigFrom(lsHostWorker)
+				var lsConfigMap map[string]any
+				if err := lsConfig.Unpack(&lsConfigMap); err != nil {
+					return err
+				}
+
+				out = map[string]any{
+					"service::pipelines::logs::exporters": []string{"logstash"},
+					"exporters": map[string]any{
+						"logstash": lsConfigMap,
+					},
+				}
+
+				if err := conf.Merge(confmap.NewFromStringMap(out)); err != nil {
+					return err
+				}
+
 			case "elasticsearch":
 				esConfig := config.MustNewConfigFrom(output)
 				// we use development logger here as this method is part of dev-only otel command
