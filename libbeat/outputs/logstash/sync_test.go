@@ -25,7 +25,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/transport/transptest"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
@@ -65,14 +64,14 @@ func newClientServerTCP(t *testing.T, to time.Duration) *clientServer {
 }
 
 func makeTestClient(conn *transport.Client) testClientDriver {
-	config := defaultConfig()
+	config := DefaultConfig()
 	config.Timeout = 1 * time.Second
 	config.TTL = 5 * time.Second
 	logger, err := logp.NewDevelopmentLogger("")
 	if err != nil {
 		panic(err)
 	}
-	client, err := newSyncClient(beat.Info{Logger: logger}, conn, outputs.NewNilObserver(), &config)
+	client, err := newSyncClient(logger, "beat_version", conn, outputs.NewNilObserver(), &config)
 	if err != nil {
 		panic(err)
 	}
