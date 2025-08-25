@@ -41,8 +41,7 @@ concurrency:
 jobs:
   unit-tests-push:
     name: Unit tests ${{ matrix.os }}
-    if: github.event_name == 'pull_request'
-#    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     strategy:
       fail-fast: false
       matrix:
@@ -58,7 +57,7 @@ jobs:
 
   unit-tests-pr:
     name: Unit tests macos-15
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     runs-on: [macos-15]
     timeout-minutes: 60
     steps:

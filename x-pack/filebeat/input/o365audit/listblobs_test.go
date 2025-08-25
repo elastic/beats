@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"sort"
@@ -107,7 +108,7 @@ func (f *fakePoll) deliverResult(t testing.TB, pl poll.Transaction, msg interfac
 	}
 	response := &http.Response{
 		StatusCode:    200,
-		Body:          ioutil.NopCloser(bytes.NewReader(js)),
+		Body:          ioutil.NopCloser(io.MultiReader(strings.NewReader("\xef\xbb\xbf"), bytes.NewReader(js))),
 		ContentLength: int64(len(js)),
 	}
 	if nextUrl != "" {

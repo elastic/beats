@@ -125,7 +125,22 @@ func fetchGoPackages(module string) ([]string, error) {
 // testTagsFromEnv gets a list of comma-separated tags from the TEST_TAGS
 // environment variables, e.g: TEST_TAGS=aws,azure.
 func testTagsFromEnv() []string {
-	return strings.Split(strings.Trim(os.Getenv("TEST_TAGS"), ", "), ",")
+	testTags := strings.Trim(os.Getenv("TEST_TAGS"), ", ")
+	var tags []string
+	if testTags != "" {
+		tags = strings.Split(testTags, ",")
+	}
+	return tags
+}
+
+// DefaultGoWindowsTestIntegrationArgs returns a default set of arguments for running
+// windows integration tests. We tag integration test files with 'integration'.
+func DefaultGoWindowsTestIntegrationArgs() GoTestArgs {
+	args := makeGoTestArgs("Windows-Integration")
+	args.Tags = append(args.Tags, "win_integration")
+	args.ExtraFlags = append(args.ExtraFlags, "-count=1")
+	args.Packages = []string{"./tests/integration/windows"}
+	return args
 }
 
 // DefaultGoTestUnitArgs returns a default set of arguments for running
