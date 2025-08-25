@@ -192,18 +192,23 @@ func (f *factory) generateCheckConfig(config *conf.C) (*conf.C, error) {
 		return nil, fmt.Errorf("failed to create new config: %w", err)
 	}
 
-	// let's try to override the `id` field, if it fails, give up
-	inputID, err := testCfg.String("id", -1)
+	uid, err := uuid.NewV4()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get 'id': %w", err)
+		return nil, fmt.Errorf("failed to generate check config id: %w", err)
 	}
 
-	id, err := uuid.NewV4()
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate check congig id: %w", err)
+	finalID := uid.String()
+	// if 'id' is present, use it as a prefix
+	if testCfg.HasField("id") {
+		inputID, err := testCfg.String("id", -1)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get 'id': %w", err)
+		}
+
+		finalID = inputID + "-" + finalID
 	}
-	err = testCfg.SetString("id", -1, inputID+"-"+id.String())
-	if err != nil {
+
+	if err := testCfg.SetString("id", -1, finalID); err != nil {
 		return nil, fmt.Errorf("failed to set 'id': %w", err)
 	}
 
