@@ -48,11 +48,12 @@ func TestRunUpdatesStatusToStartingAndFailed(t *testing.T) {
 	err = eventHubInputV2.Run(inputTestCtx, nil)
 	require.Error(t, err, "setup failure")
 
-	// Verify that the status was updated to Starting and then to Failed.
-	assert.Len(t, statusReporter.statuses, 3)
+	// Verify that the status was updated to Starting and then to Failed and Stopped.
+	assert.Len(t, statusReporter.statuses, 4)
 	assert.Equal(t, status.Starting, statusReporter.statuses[0])
 	assert.Equal(t, status.Configuring, statusReporter.statuses[1])
 	assert.Equal(t, status.Failed, statusReporter.statuses[2])
+	assert.Equal(t, status.Stopped, statusReporter.statuses[3])
 }
 
 // mockStatusReporter is a mock implementation of the status.Reporter interface.
