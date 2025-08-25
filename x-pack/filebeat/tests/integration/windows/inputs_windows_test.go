@@ -90,3 +90,81 @@ output.console:
 		}
 	})
 }
+
+func TestWinlogIgnoreMissingChannel(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+	defer cancel()
+	lbint.EnsureCompiled(ctx, t, "filebeat")
+
+	reportOptions := lbint.ReportOptions{
+		PrintLinesOnFail:  10,
+		PrintConfigOnFail: true,
+	}
+
+	tcs := map[string]struct {
+		configTemplate string
+		expectedOutput []string
+	}{
+		"default behavior ignores missing channels": {
+			configTemplate: `
+filebeat.inputs:
+  - type: winlog
+    id: "test-winlog-missing-default"
+    enabled: true
+    name: "NonExistentChannel1"
+output.console:
+  enabled: true
+logging.level: info
+`,
+			expectedOutput: []string{
+				"ignoring open error",
+				"NonExistentChannel1",
+			},
+		},
+		"explicit true ignores missing channels": {
+			configTemplate: `
+filebeat.inputs:
+  - type: winlog
+    id: "test-winlog-missing-explicit-true"
+    enabled: true
+    name: "NonExistentChannel2"
+    ignore_missing_channel: true
+output.console:
+  enabled: true
+logging.level: info
+`,
+			expectedOutput: []string{"ignoring open error", "NonExistentChannel2"},
+		},
+		"explicit false fails on missing channels": {
+			configTemplate: `
+filebeat.inputs:
+  - type: winlog
+    id: "test-winlog-missing-explicit-false"
+    enabled: true
+    name: "NonExistentChannel3"
+    ignore_missing_channel: false
+output.console:
+  enabled: true
+logging.level: debug
+`,
+			expectedOutput: []string{"NonExistentChannel3", "The specified channel could not be found", "encountered recoverable error"},
+		},
+	}
+	for name, tc := range tcs {
+		t.Run(name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+			defer cancel()
+
+			test := fbint.NewTest(t, fbint.TestOptions{
+				Config: tc.configTemplate,
+			})
+
+			test.
+				ExpectOutput(tc.expectedOutput...).
+				WithReportOptions(reportOptions).
+				ExpectStart().
+				Start(ctx).
+				Wait()
+		})
+	}
+}
