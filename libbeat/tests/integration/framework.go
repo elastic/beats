@@ -824,6 +824,11 @@ func (b *BeatProc) Stdin() io.WriteCloser {
 	return b.stdin
 }
 
+func (b *BeatProc) ReadStdout() (string, error) {
+	by, err := os.ReadFile(b.stdout.Name())
+	return string(by), err
+}
+
 func GetESURL(t *testing.T, scheme string) url.URL {
 	t.Helper()
 
