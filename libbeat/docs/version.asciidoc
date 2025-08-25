@@ -1,4 +1,4 @@
-:stack-version: 9.0.5
+:stack-version: 9.0.6
 :doc-branch: 9.0
 :go-version: 1.24.5
 :release-state: unreleased
