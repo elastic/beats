@@ -1,0 +1,55 @@
+[
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "attributes_modified"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "change"
+        ]
+      },
+      "file": {
+        "accessed": "2025-08-11T09:45:01.2254635Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-08-09T09:45:09Z",
+        "ctime": "2025-08-09T09:45:09Z",
+        "drive_letter": "C",
+        "extension": "txt",
+        "inode": "9570149208631817",
+        "mtime": "2025-08-09T09:45:09Z",
+        "name": "mainfile.txt",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwchange-timestamps1034689288\\001\\mainfile.txt",
+        "size": 0,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      },
+      "process": {
+        "pid": 67724,
+        "user": {
+          "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
+          "name": "tp\\Marc"
+        }
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-08-11T09:45:09.4942282Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 1001900,
+    "Period": 0,
+    "DisableTimeSeries": false
+  }
+]

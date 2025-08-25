@@ -12,6 +12,7 @@ import (
 	"errors"
 	"fmt"
 	"syscall"
+	"time"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
@@ -129,6 +130,17 @@ func (s *Session) StopSession() error {
 	if !s.Realtime {
 		return nil
 	}
+
+	// try to flush all buffer before stopping the session
+	_ = s.controlTrace(
+		s.handler,
+		nil,
+		s.properties,
+		EVENT_TRACE_CONTROL_FLUSH,
+	)
+
+	// give time to process any flushed events
+	time.Sleep(time.Second)
 
 	if isValidHandler(s.traceHandler) {
 		// Attempt to close the trace and handle potential errors.

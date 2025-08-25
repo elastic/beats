@@ -1,0 +1,48 @@
+[
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "updated"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "change"
+        ]
+      },
+      "file": {
+        "accessed": "2025-08-11T09:45:26.2563736Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-08-11T09:45:18.3284652Z",
+        "ctime": "2025-08-11T09:45:18.3284652Z",
+        "drive_letter": "C",
+        "extension": "txt",
+        "inode": "7599824371657228",
+        "mtime": "2025-08-11T09:45:26.2563736Z",
+        "name": "mainfile.txt",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesfsnotifycreate-ads703749159\\001\\mainfile.txt",
+        "size": 0,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-08-11T09:45:26.2563736Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 1892700,
+    "Period": 0,
+    "DisableTimeSeries": false
+  }
+]
