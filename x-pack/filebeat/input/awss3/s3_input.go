@@ -95,7 +95,7 @@ func (in *s3PollerInput) Run(
 		return err
 	}
 
-	in.metrics = newInputMetrics(inputContext.MetricsRegistry, in.config.NumberOfWorkers)
+	in.metrics = newInputMetrics(inputContext.MetricsRegistry, in.config.NumberOfWorkers, in.log)
 	defer in.metrics.Close()
 
 	in.s3ObjectHandler = newS3ObjectProcessorFactory(
@@ -103,6 +103,7 @@ func (in *s3PollerInput) Run(
 		in.s3,
 		in.config.getFileSelectors(),
 		in.config.BackupConfig,
+		in.log,
 	)
 
 	in.run(ctx)

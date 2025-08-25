@@ -7,6 +7,7 @@ package gcs
 import (
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -33,7 +34,7 @@ type inputMetrics struct {
 	sourceLagTime                   metrics.Sample   // Histogram of the time between the source (Updated) timestamp and the time the object was read.
 }
 
-func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
+func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	out := &inputMetrics{
 		url:               monitoring.NewString(reg, "url"),
 		errorsTotal:       monitoring.NewUint(reg, "errors_total"),
@@ -55,15 +56,15 @@ func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 		sourceLagTime:                   metrics.NewUniformSample(1024),
 	}
 
-	adapter.NewGoMetrics(reg, "gcs_object_processing_time", adapter.Accept).
+	adapter.NewGoMetrics(reg, "gcs_object_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.gcsObjectProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "gcs_object_size_in_bytes", adapter.Accept).
+	adapter.NewGoMetrics(reg, "gcs_object_size_in_bytes", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.gcsObjectSizeInBytes)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "gcs_events_per_object", adapter.Accept).
+	adapter.NewGoMetrics(reg, "gcs_events_per_object", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.gcsEventsPerObject)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "gcs_jobs_scheduled_after_validation", adapter.Accept).
+	adapter.NewGoMetrics(reg, "gcs_jobs_scheduled_after_validation", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.gcsJobsScheduledAfterValidation)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "source_lag_time", adapter.Accept).
+	adapter.NewGoMetrics(reg, "source_lag_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sourceLagTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
 	return out
