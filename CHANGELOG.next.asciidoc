@@ -169,6 +169,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix reading journald messages with more than 4kb. {issue}45511[45511] {pull}46017[46017]
 - Restore the Streaming input on Windows. {pull}46031[46031]
 - Fix termination of input on API errors. {pull}45999[45999]
+- Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
 
 *Heartbeat*
 
