@@ -35,6 +35,7 @@ import (
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"github.com/gofrs/uuid/v5"
+	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -129,10 +130,15 @@ func startFlogKubernetes(t *testing.T, tempDir string) (string, string, string) 
 
 	time.Sleep(30 * time.Second)
 
-	kubeConfig, err := provider.KubeConfig(clusterName, false)
-	if err != nil {
-		t.Fatalf("could not get KubeConfig: %s", err)
-	}
+	var kubeConfig string
+	require.Eventually(t, func() bool {
+		kubeConfig, err = provider.KubeConfig(clusterName, false)
+		if err != nil {
+			return false
+		}
+
+		return true
+	}, 30*time.Second, 100*time.Millisecond, "could not get kube config")
 
 	kubeConfigPath := filepath.Join(tempDir, "kube-config")
 	if err := os.WriteFile(kubeConfigPath, []byte(kubeConfig), 0666); err != nil {
@@ -171,36 +177,44 @@ func startFlogKubernetes(t *testing.T, tempDir string) (string, string, string) 
 	}
 
 	t.Cleanup(func() {
+		// by the time Cleanup runs, t.Context has been cancelled, so we need a new context here
 		err := clientset.CoreV1().Pods("default").Delete(context.Background(), pod.Name, metav1.DeleteOptions{})
 		if err != nil {
 			t.Logf("could not remove pod: %s", err)
 		}
 	})
 
-	// Wait for pod to be running
-	for range 60 {
-		pod, err = clientset.CoreV1().Pods("default").Get(context.Background(), pod.Name, metav1.GetOptions{})
-		if err != nil {
-			// We can probably ignore it and just time out
-			t.Logf("could not get pod: %s", err)
-		}
-
-		if pod.Status.Phase == corev1.PodRunning && len(pod.Status.ContainerStatuses) > 0 {
-			containerID := pod.Status.ContainerStatuses[0].ContainerID
-			if containerID != "" {
-				// Remove the runtime prefix (e.g., "containerd://")
-				if idx := strings.Index(containerID, "://"); idx != -1 {
-					return kubeConfigPath, pod.Spec.NodeName, containerID[idx+3:]
-				}
-				return kubeConfigPath, pod.Spec.NodeName, containerID
+	var containerID string
+	var podNodeName string
+	require.Eventually(
+		t,
+		func() bool {
+			pod, err = clientset.CoreV1().Pods("default").Get(t.Context(), pod.Name, metav1.GetOptions{})
+			if err != nil {
+				return false
 			}
-		}
 
-		time.Sleep(time.Second)
-	}
+			if pod.Status.Phase == corev1.PodRunning && len(pod.Status.ContainerStatuses) > 0 {
+				containerID = pod.Status.ContainerStatuses[0].ContainerID
+				if containerID != "" {
+					podNodeName = pod.Spec.NodeName
+					// Remove the runtime prefix (e.g., "containerd://")
+					if idx := strings.Index(containerID, "://"); idx != -1 {
+						containerID = containerID[idx+3:]
+						return true
+					}
+					return true
+				}
+			}
 
-	t.Fatalf("pod did not start within timeout")
-	return kubeConfigPath, pod.Spec.NodeName, ""
+			return false
+		},
+		60*time.Second,
+		100*time.Millisecond,
+		"pod did not start within timeout",
+	)
+
+	return kubeConfigPath, podNodeName, containerID
 }
 
 // startFlogDocker starts a `mingrammer/flog` that logs one line every
@@ -208,7 +222,7 @@ func startFlogKubernetes(t *testing.T, tempDir string) (string, string, string) 
 // end of the test. On error the test fails by calling t.Fatalf
 func startFlogDocker(t *testing.T) string {
 	ctx := t.Context()
-	img := "mingrammer/flog"
+	img := "mingrammer/flog:0.4.3"
 	cli, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logp.NewNopLogger())
 	if err != nil {
 		t.Fatalf("cannot create Docker client: %s", err)
