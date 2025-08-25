@@ -12,7 +12,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"go.uber.org/zap"
+	zap "go.uber.org/zap"
 )
 
 // StatusReporterHelper helps to report the state of a component via the status package.

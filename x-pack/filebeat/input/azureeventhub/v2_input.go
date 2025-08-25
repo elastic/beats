@@ -169,7 +169,7 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		var respError *azcore.ResponseError
 		if errors.As(err, &respError) && respError != nil && respError.StatusCode == 403 {
 			in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed due to authentication error: %s", err.Error()))
-			return fmt.Errorf("Authentication error: %w", err)
+			return fmt.Errorf("authentication error: %w", err)
 		}
 		return fmt.Errorf("failed to ensure blob container exists: %w", err)
 	}
