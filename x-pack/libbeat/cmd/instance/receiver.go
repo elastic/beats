@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/pprof"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/status"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
@@ -63,6 +64,13 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 			return BeatReceiver{}, fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
 		b.API.Start()
+		if b.Config.HTTPPprof.IsEnabled() {
+			pprof.SetRuntimeProfilingParameters(b.Config.HTTPPprof)
+
+			if err := pprof.HttpAttach(b.Config.HTTPPprof, b.API); err != nil {
+				return BeatReceiver{}, fmt.Errorf("failed to attach http handlers for pprof: %w", err)
+			}
+		}
 	}
 
 	beater, err := creator(&b.Beat, beatConfig)
