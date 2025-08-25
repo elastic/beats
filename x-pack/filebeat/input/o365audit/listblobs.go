@@ -5,6 +5,7 @@
 package o365audit
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -282,6 +283,9 @@ func readJSONBody(response *http.Response, dest interface{}) error {
 	if err != nil {
 		return fmt.Errorf("reading body failed: %w", err)
 	}
+	// Remove the BOM ("\uFEFF") prefix if it exists.
+	// https://unicode.org/faq/utf_bom.html#bom5
+	body = bytes.TrimPrefix(body, []byte("\uFEFF"))
 	if err = json.Unmarshal(body, dest); err != nil {
 		return fmt.Errorf("decoding json failed: %w", err)
 	}

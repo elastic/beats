@@ -32,7 +32,7 @@ type server struct {
 }
 
 func newServer(c config, log *logp.Logger, pub func(beat.Event), metrics *inputMetrics) (*server, error) {
-	ljSvr, bindAddress, err := newLumberjack(c)
+	ljSvr, bindAddress, err := newLumberjack(c, log)
 	if err != nil {
 		return nil, err
 	}
@@ -127,11 +127,11 @@ func makeEvent(remoteAddr string, tlsState *tls.ConnectionState, lumberjackEvent
 	return event
 }
 
-func newLumberjack(c config) (lj lumber.Server, bindAddress string, err error) {
+func newLumberjack(c config, logger *logp.Logger) (lj lumber.Server, bindAddress string, err error) {
 	// Setup optional TLS.
 	var tlsConfig *tls.Config
 	if c.TLS.IsEnabled() {
-		elasticTLSConfig, err := tlscommon.LoadTLSServerConfig(c.TLS)
+		elasticTLSConfig, err := tlscommon.LoadTLSServerConfig(c.TLS, logger)
 		if err != nil {
 			return nil, "", err
 		}
