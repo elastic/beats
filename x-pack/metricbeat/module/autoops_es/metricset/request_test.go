@@ -5,7 +5,7 @@
 //go:build !integration
 // +build !integration
 
-package ccm
+package metricset
 
 import (
 	"testing"
