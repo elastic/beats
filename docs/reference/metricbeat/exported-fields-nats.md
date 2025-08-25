@@ -29,7 +29,7 @@ nats Module
 
 Contains nats connection related metrics
 
-**`nats.connection.id`**
+**`nats.connection.id`** {applies_to}`stack: ga 9.1.0`
 :   The ID of the connection
 
     type: keyword
@@ -41,49 +41,49 @@ Contains nats connection related metrics
     type: keyword
 
 
-**`nats.connection.kind`**
+**`nats.connection.kind`** {applies_to}`stack: ga 9.1.0`
 :   The kind of connection
 
     type: keyword
 
 
-**`nats.connection.type`**
+**`nats.connection.type`** {applies_to}`stack: ga 9.1.0`
 :   The type of connection
 
     type: keyword
 
 
-**`nats.connection.ip`**
+**`nats.connection.ip`** {applies_to}`stack: ga 9.1.0`
 :   The IP address of the connection
 
     type: ip
 
 
-**`nats.connection.port`**
+**`nats.connection.port`** {applies_to}`stack: ga 9.1.0`
 :   The port of the connection
 
     type: integer
 
 
-**`nats.connection.lang`**
+**`nats.connection.lang`** {applies_to}`stack: ga 9.1.0`
 :   The language of the client connection
 
     type: keyword
 
 
-**`nats.connection.version`**
+**`nats.connection.version`** {applies_to}`stack: ga 9.1.0`
 :   The version of the client connection
 
     type: keyword
 
 
-**`nats.connection.start`**
+**`nats.connection.start`** {applies_to}`stack: ga 9.1.0`
 :   The time the connection was started
 
     type: date
 
 
-**`nats.connection.last_activity`**
+**`nats.connection.last_activity`** {applies_to}`stack: ga 9.1.0`
 :   The last activity time of the connection
 
     type: date
@@ -168,7 +168,7 @@ Contains nats connection related metrics
 ## jetstream [_jetstream]
 
 ```{applies_to}
-stack: beta
+stack: beta 9.1.0
 ```
 
 Information pertaining to a NATS JetStream server
@@ -811,13 +811,13 @@ Contains nats route related metrics
 
 Contains nats var related metrics
 
-**`nats.stats.server_name`**
+**`nats.stats.server_name`** {applies_to}`stack: ga 9.1.0`
 :   The name of the NATS server
 
     type: keyword
 
 
-**`nats.stats.version`**
+**`nats.stats.version`** {applies_to}`stack: ga 9.1.0`
 :   The version of the NATS server
 
     type: keyword
@@ -949,37 +949,37 @@ The request distribution on monitoring URIS
     type: long
 
 
-**`nats.stats.http.req_stats.uri.jsz`**
+**`nats.stats.http.req_stats.uri.jsz`** {applies_to}`stack: ga 9.1.0`
 :   The number of hits on jsz monitoring uri
 
     type: long
 
 
-**`nats.stats.http.req_stats.uri.accountz`**
+**`nats.stats.http.req_stats.uri.accountz`** {applies_to}`stack: ga 9.1.0`
 :   The number of hits on accountz monitoring uri
 
     type: long
 
 
-**`nats.stats.http.req_stats.uri.accstatz`**
+**`nats.stats.http.req_stats.uri.accstatz`** {applies_to}`stack: ga 9.1.0`
 :   The number of hits on accstatz monitoring uri
 
     type: long
 
 
-**`nats.stats.http.req_stats.uri.gatewayz`**
+**`nats.stats.http.req_stats.uri.gatewayz`** {applies_to}`stack: ga 9.1.0`
 :   The number of hits on gatewayz monitoring uri
 
     type: long
 
 
-**`nats.stats.http.req_stats.uri.healthz`**
+**`nats.stats.http.req_stats.uri.healthz`** {applies_to}`stack: ga 9.1.0`
 :   The number of hits on healthz monitoring uri
 
     type: long
 
 
-**`nats.stats.http.req_stats.uri.leafz`**
+**`nats.stats.http.req_stats.uri.leafz`** {applies_to}`stack: ga 9.1.0`
 :   The number of hits on leafz monitoring uri
 
     type: long

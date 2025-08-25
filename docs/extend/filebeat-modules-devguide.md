@@ -39,7 +39,7 @@ After running the `make create-module` command, you’ll find the module, along 
 module/{module}
 ├── module.yml
 └── _meta
-    └── docs.asciidoc
+    └── docs.md
     └── fields.yml
     └── kibana
 ```
@@ -52,14 +52,30 @@ Let’s look at these files one by one.
 This file contains list of all the dashboards available for the module and used by `export_dashboards.go` script for exporting dashboards. Each dashboard is defined by an id and the name of json file where the dashboard is saved locally. At generation new fileset this file will be automatically updated with "default" dashboard settings for new fileset. Please ensure that this settings are correct.
 
 
-### _meta/docs.asciidoc [_metadocs_asciidoc]
+### _meta/docs.md [_metadocs_md]
 
 This file contains module-specific documentation. You should include information about which versions of the service were tested and the variables that are defined in each fileset.
 
 
 ### _meta/fields.yml [_metafields_yml]
 
-The module level `fields.yml` contains descriptions for the module-level fields. Please review and update the title and the descriptions in this file. The title is used as a title in the docs, so it’s best to capitalize it.
+The module level `fields.yml` contains descriptions for the module-level fields.
+
+After the default file is created, make sure to:
+
+* Update the `description` of the module and each field.
+* Add a `version` property with information about the product lifecycle and version in which the module is being added.
+  For example, if a module is being added in Elastic Stack version 9.1.0 in beta:
+  ```yaml
+  - key: {module}
+    title: "{module}"
+    version:
+      beta: 9.1.0
+    description: >
+      {module} module
+  ```
+
+For more tips on fine-tuning the `fields.yml` file for generating documentation, refer to [](/extend/contributing-docs.md#update-fields).
 
 
 ### _meta/kibana [_metakibana]

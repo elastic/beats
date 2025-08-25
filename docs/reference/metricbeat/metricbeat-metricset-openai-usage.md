@@ -1,8 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-openai-usage.html
-  # That link will 404 until 8.18 is current
-  # (see https://www.elastic.co/guide/en/beats/metricbeat/8.18/metricbeat-metricset-openai-usage.html)
+
+applies_to:
+  stack: beta
 ---
 
 # openai usage metricset [metricbeat-metricset-openai-usage]

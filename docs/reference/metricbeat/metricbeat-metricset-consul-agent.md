@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-consul-agent.html
+
+applies_to:
+  stack: beta
 ---
 
 # Consul agent metricset [metricbeat-metricset-consul-agent]

@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kafka-producer.html
+
+applies_to:
+  stack: beta
 ---
 
 # Kafka producer metricset [metricbeat-metricset-kafka-producer]

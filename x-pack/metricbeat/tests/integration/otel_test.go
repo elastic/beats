@@ -18,8 +18,10 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
@@ -32,8 +34,19 @@ func TestMetricbeatOTelE2E(t *testing.T) {
 	user := host.User.Username()
 	password, _ := host.User.Password()
 
+	es := integration.GetESClient(t, "http")
+
 	// create a random uuid and make sure it doesn't contain dashes/
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	mbIndex := "logs-integration-mb-" + namespace
+	mbReceiverIndex := "logs-integration-mbreceiver-" + namespace
+	t.Cleanup(func() {
+		_, err := es.Indices.DeleteDataStream([]string{
+			mbIndex,
+			mbReceiverIndex,
+		})
+		require.NoError(t, err, "failed to delete indices")
+	})
 
 	type options struct {
 		Index          string
@@ -83,11 +96,11 @@ http.port: {{.MonitoringPort}}
 		ESURL:          fmt.Sprintf("%s://%s", host.Scheme, host.Host),
 		Username:       user,
 		Password:       password,
-		MonitoringPort: 5078,
+		MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
 	}
 
 	var configBuffer bytes.Buffer
-	optionsValue.Index = "logs-integration-mbreceiver-" + namespace
+	optionsValue.Index = mbReceiverIndex
 	require.NoError(t, template.Must(template.New("config").Parse(beatsCfgFile)).Execute(&configBuffer, optionsValue))
 
 	metricbeatOTel.WriteConfigFile(configBuffer.String())
@@ -95,35 +108,34 @@ http.port: {{.MonitoringPort}}
 	defer metricbeatOTel.Stop()
 
 	var mbConfigBuffer bytes.Buffer
-	optionsValue.Index = "logs-integration-mb-" + namespace
-	optionsValue.MonitoringPort = 5079
+	optionsValue.Index = mbIndex
+	optionsValue.MonitoringPort = int(libbeattesting.MustAvailableTCP4Port(t))
 	require.NoError(t, template.Must(template.New("config").Parse(beatsCfgFile)).Execute(&mbConfigBuffer, optionsValue))
 	metricbeat := integration.NewBeat(t, "metricbeat", "../../metricbeat.test")
 	metricbeat.WriteConfigFile(mbConfigBuffer.String())
 	metricbeat.Start()
 	defer metricbeat.Stop()
 
-	// prepare to query ES
-	es := integration.GetESClient(t, "http")
-
 	// Make sure find the logs
 	var metricbeatDocs estools.Documents
 	var otelDocs estools.Documents
 	var err error
-	require.Eventually(t,
-		func() bool {
+
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
-			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-mbreceiver-"+namespace+"*")
-			require.NoError(t, err)
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+mbReceiverIndex+"*")
+			assert.NoError(ct, err)
 
-			metricbeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-mb-"+namespace+"*")
-			require.NoError(t, err)
+			metricbeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+mbIndex+"*")
+			assert.NoError(ct, err)
 
-			return otelDocs.Hits.Total.Value >= 1 && metricbeatDocs.Hits.Total.Value >= 1
+			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 log for otel receiver, got %d", otelDocs.Hits.Total.Value)
+			assert.GreaterOrEqual(ct, metricbeatDocs.Hits.Total.Value, 1, "expected at least 1 log for metricbeat, got %d", metricbeatDocs.Hits.Total.Value)
 		},
-		2*time.Minute, 1*time.Second, "Expected at least one ingested metric event, got metricbeat: %d, otel: %d", metricbeatDocs.Hits.Total.Value, otelDocs.Hits.Total.Value)
+		1*time.Minute, 1*time.Second, "expected at least 1 log for metricbeat and otel receiver")
 
 	otelDoc := otelDocs.Hits.Hits[0]
 	metricbeatDoc := metricbeatDocs.Hits.Hits[0]

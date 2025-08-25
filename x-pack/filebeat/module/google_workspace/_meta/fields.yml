@@ -1,5 +1,5 @@
 - key: google_workspace
-  title: "google_workspace"
+  title: Google Workspace
   description: >
     Google Workspace Module
   fields:

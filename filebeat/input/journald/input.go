@@ -216,7 +216,7 @@ func (inp *journald) Run(
 		if err := publisher.Publish(event, event.Private); err != nil {
 			msg := fmt.Sprintf("could not publish event: %s", err)
 			ctx.UpdateStatus(status.Failed, msg)
-			logger.Errorf(msg)
+			logger.Errorf("%s", msg)
 			return err
 		}
 	}

@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-linux-conntrack.html
+
+applies_to:
+  stack: beta
 ---
 
 # Linux conntrack metricset [metricbeat-metricset-linux-conntrack]
