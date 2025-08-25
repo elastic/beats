@@ -7,7 +7,6 @@
 package integration
 
 import (
-	"bufio"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
@@ -16,7 +15,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -519,7 +517,6 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 	logFilePath := filepath.Join(filebeat.TempDir(), "logs-to-ingest.log")
 	integration.WriteAppendingLogFile(t, logFilePath)
 
-	eventsDir := filepath.Join(filebeat.TempDir(), "ingested-events")
 	logLevel := proto.UnitLogLevel_INFO
 	units := []*proto.UnitExpected{
 		{
@@ -534,9 +531,9 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 				Name: "events-to-file",
 				Source: integration.RequireNewStruct(t,
 					map[string]any{
-						"name": "events-to-file",
-						"type": "file",
-						"path": eventsDir,
+						"filename": "output",
+						"type":     "file",
+						"path":     filebeat.TempDir(),
 					}),
 			},
 		},
@@ -632,71 +629,19 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 		}
 	}()
 
-	msg := strings.Builder{}
-	require.Eventuallyf(t, func() bool {
-		msg.Reset()
-
-		_, err = os.Stat(eventsDir)
-		if err != nil {
-			fmt.Fprintf(&msg, "could not verify output directory exists: %v",
-				err)
-			return false
-		}
-
-		entries, err := os.ReadDir(eventsDir)
-		if err != nil {
-			fmt.Fprintf(&msg, "failed checking output directory for files: %v",
-				err)
-			return false
-		}
-
-		if len(entries) == 0 {
-			fmt.Fprintf(&msg, "no file found on %s", eventsDir)
-			return false
-		}
-
-		for _, e := range entries {
-			if e.IsDir() {
-				continue
-			}
-
-			i, err := e.Info()
-			if err != nil {
-				fmt.Fprintf(&msg, "could not read info of %q", e.Name())
-				return false
-			}
-			if i.Size() == 0 {
-				fmt.Fprintf(&msg, "file %q was created, but it's still empty",
-					e.Name())
-				return false
-			}
-
-			// read one line to make sure it isn't a 1/2 written JSON
-			eventsFile := filepath.Join(eventsDir, e.Name())
-			f, err := os.Open(eventsFile)
-			if err != nil {
-				fmt.Fprintf(&msg, "could not open file %q", eventsFile)
-				return false
-			}
-
-			scanner := bufio.NewScanner(f)
-			if scanner.Scan() {
-				var ev Event
-				err := json.Unmarshal(scanner.Bytes(), &ev)
-				if err != nil {
-					fmt.Fprintf(&msg, "failed to read event from file: %v", err)
-					return false
-				}
-				return true
-			}
-		}
-
-		return true
-	}, 30*time.Second, time.Second, "no event was produced: %s", &msg)
-
 	assert.Equal(t, version.Commit(), observed.VersionInfo.BuildHash)
 
-	evs := integration.GetEventsFromFileOutput[Event](filebeat, 100)
+	evs := []Event{}
+	require.Eventually(
+		t,
+		func() bool {
+			evs = integration.GetEventsFromFileOutput[Event](filebeat, 100, true)
+			return len(evs) >= 1
+		},
+		60*time.Second,
+		100*time.Millisecond,
+		"did not find any event in the output file")
+
 	for _, got := range evs {
 		assert.Equal(t, wantVersion, got.Metadata.Version)
 

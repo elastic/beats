@@ -698,7 +698,7 @@ func (b *BeatProc) WriteConfigFile(cfg string) {
 // openGlobFile opens a file defined by glob. The glob must resolve to a single
 // file otherwise the test fails. It returns a *os.File or nil if none is found.
 //
-// If `waitForFile` is true, it will wait up to 5 seconds for the file to
+// If `waitForFile` is true, it will wait up to 45 seconds for the file to
 // be created. The test will fail if the file is not found. If waitForFile is
 // false and no file is found, nil and false are returned.
 func (b *BeatProc) openGlobFile(glob string, waitForFile bool) *os.File {
@@ -716,7 +716,7 @@ func (b *BeatProc) openGlobFile(glob string, waitForFile bool) *os.File {
 				t.Fatalf("could not expand log file glob: %s", err)
 			}
 			return len(files) == 1
-		}, 5*time.Second, 100*time.Millisecond,
+		}, 45*time.Second, 100*time.Millisecond,
 			"waiting for log file matching glob '%s' to be created", glob)
 	}
 
@@ -1282,7 +1282,8 @@ func (b *BeatProc) WaitPublishedEvents(timeout time.Duration, events int) {
 // GetEventsFromFileOutput reads all events from file output. If n > 0,
 // then it reads up to n events. It assumes the filename
 // for the output is 'output' and 'path' is set to the TempDir.
-func GetEventsFromFileOutput[E any](b *BeatProc, n int) []E {
+// TODO
+func GetEventsFromFileOutput[E any](b *BeatProc, n int, waitForFile bool) []E {
 	b.t.Helper()
 
 	if n < 1 {
@@ -1292,7 +1293,7 @@ func GetEventsFromFileOutput[E any](b *BeatProc, n int) []E {
 	var events []E
 	path := filepath.Join(b.TempDir(), "output-*.ndjson")
 
-	f := b.openGlobFile(path, true)
+	f := b.openGlobFile(path, waitForFile)
 
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {

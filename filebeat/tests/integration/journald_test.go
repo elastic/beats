@@ -154,7 +154,7 @@ func TestJournaldLargeLines(t *testing.T) {
 		Message string `json:"message"`
 	}
 
-	evts := integration.GetEventsFromFileOutput[evt](filebeat, 5)
+	evts := integration.GetEventsFromFileOutput[evt](filebeat, 5, false)
 	for i, e := range evts {
 		if len(e.Message) != evtLen {
 			t.Errorf("event %d: expecting len %d, got %d", i, evtLen, len(e.Message))
