@@ -26,7 +26,7 @@ To use SSL mutual authentication:
 
         ```yaml
         output.logstash:
-          hosts: ["logs.mycompany.com:5044"]
+          hosts: ["logs.example.com:5044"]
           ssl.certificate_authorities: ["/etc/ca.crt"]
           ssl.certificate: "/etc/client.crt"
           ssl.key: "/etc/client.key"
@@ -65,25 +65,25 @@ To use SSL mutual authentication:
 Before running Packetbeat, you should validate the Logstash server’s certificate. You can use `curl` to validate the certificate even though the protocol used to communicate with Logstash is not based on HTTP. For example:
 
 ```shell
-curl -v --cacert ca.crt https://logs.mycompany.com:5044
+curl -v --cacert ca.crt https://logs.example.com:5044
 ```
 
 If the test is successful, you’ll receive an empty response error:
 
 ```shell
-* Rebuilt URL to: https://logs.mycompany.com:5044/
+* Rebuilt URL to: https://logs.example.com:5044/
 *   Trying 192.168.99.100...
-* Connected to logs.mycompany.com (192.168.99.100) port 5044 (#0)
+* Connected to logs.example.com (192.168.99.100) port 5044 (#0)
 * TLS 1.2 connection using TLS_DHE_RSA_WITH_AES_256_CBC_SHA
-* Server certificate: logs.mycompany.com
-* Server certificate: mycompany.com
+* Server certificate: logs.example.com
+* Server certificate: example.com
 > GET / HTTP/1.1
-> Host: logs.mycompany.com:5044
+> Host: logs.example.com:5044
 > User-Agent: curl/7.43.0
 > Accept: */*
 >
 * Empty reply from server
-* Connection #0 to host logs.mycompany.com left intact
+* Connection #0 to host logs.example.com left intact
 curl: (52) Empty reply from server
 ```
 
@@ -93,7 +93,7 @@ The following example uses the IP address rather than the hostname to validate t
 curl -v --cacert ca.crt https://192.168.99.100:5044
 ```
 
-Validation for this test fails because the certificate is not valid for the specified IP address. It’s only valid for the `logs.mycompany.com`, the hostname that appears in the Subject field of the certificate.
+Validation for this test fails because the certificate is not valid for the specified IP address. It’s only valid for the `logs.example.com`, the hostname that appears in the Subject field of the certificate.
 
 ```shell
 * Rebuilt URL to: https://192.168.99.100:5044/

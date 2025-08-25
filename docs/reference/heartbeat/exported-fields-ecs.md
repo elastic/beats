@@ -7413,7 +7413,7 @@ Field is not indexed.
 
     type: keyword
 
-    example: bad-domain.com
+    example: example.com
 
 
 **`threat.enrichments.matched.field`**

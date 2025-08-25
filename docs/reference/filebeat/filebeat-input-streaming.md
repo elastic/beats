@@ -199,7 +199,7 @@ filebeat.inputs:
   auth:
     client_id: a23fcea2643868ef1a41565a1a8a1c7c
     client_secret: c3VwZXJzZWNyZXRfY2xpZW50X3NlY3JldF9zaGhoaGgK
-    token_url: https://api.sample-url.com/oauth2/token
+    token_url: https://api.example.com/oauth2/token
     scopes: ["read", "write"]
     endpoint_params:
       param1: value1
@@ -451,7 +451,7 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `cel_processing_time` | Histogram of the elapsed successful CEL program processing times in nanoseconds. |
 | `batch_processing_time` | Histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches). |
 | `ping_message_send_time`  {applies_to}`stack: preview 9.0.4` | Histogram of the elapsed successful ping message send times in nanoseconds. |
-| `pong_message_received_time` {applies_to}`stack: preview 9.0.4` | Histogram of the elapsed successful pong message receive times in nanoseconds. | 
+| `pong_message_received_time` {applies_to}`stack: preview 9.0.4` | Histogram of the elapsed successful pong message receive times in nanoseconds. |
 
 
 ## Developer tools [_developer_tools_2]

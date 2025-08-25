@@ -7757,7 +7757,7 @@
       ignore_above: 1024
       description: Identifies the atomic indicator value that matched a local environment
         endpoint or network event.
-      example: bad-domain.com
+      example: example.com
       default_field: false
     - name: enrichments.matched.field
       level: extended
