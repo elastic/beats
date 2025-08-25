@@ -59,7 +59,7 @@ func TestHandler(t *testing.T) {
 
 	// Register legacy metrics without id or input. This must be ignored.
 	{
-		legacy := parent.NewRegistry("f49c0680-fc5f-4b78-bd98-7b16628f9a77")
+		legacy := parent.GetOrCreateRegistry("f49c0680-fc5f-4b78-bd98-7b16628f9a77")
 		monitoring.NewString(legacy, "name").Set("/var/log/wifi.log")
 		monitoring.NewTimestamp(legacy, "last_event_published_time").Set(time.Now())
 	}
