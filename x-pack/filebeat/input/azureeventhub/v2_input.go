@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
@@ -25,6 +26,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -55,15 +58,19 @@ type eventHubInputV2 struct {
 	pipeline           beat.Pipeline
 	messageDecoder     messageDecoder
 	migrationAssistant *migrationAssistant
+	setupFn            func(ctx context.Context) error
+	status             status.StatusReporter
 }
 
 // newEventHubInputV2 creates a new instance of the Azure Event Hub input v2,
 // that uses the modern Azure Event Hub SDK for Go.
 func newEventHubInputV2(config azureInputConfig, log *logp.Logger) (v2.Input, error) {
-	return &eventHubInputV2{
+	in := &eventHubInputV2{
 		config: config,
 		log:    log.Named(inputName),
-	}, nil
+	}
+	in.setupFn = in.setup
+	return in, nil
 }
 
 func (in *eventHubInputV2) Name() string {
@@ -81,15 +88,27 @@ func (in *eventHubInputV2) Run(
 ) error {
 	var err error
 
+	// Setting up the status reporter helper
+	in.status = statusreporterhelper.New(inputContext.StatusReporter, in.log, "Azure Event Hub")
+
+	defer in.status.UpdateStatus(status.Stopped, "")
+
+	// When the input is initializing before attempting to connect to Azure Event Hub.
+	in.status.UpdateStatus(status.Starting, "Input starting")
+
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
 	// Setup input metrics
 	inputMetrics := newInputMetrics(inputContext.MetricsRegistry)
 	in.metrics = inputMetrics
 
+	// When setting up Azure Event Hub client and validating configuration.
+	in.status.UpdateStatus(status.Configuring, "Configuring input")
+
 	// Initialize the components needed to process events.
-	err = in.setup(ctx)
+	err = in.setupFn(ctx)
 	if err != nil {
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Failed to set up input: %s", err.Error()))
 		return err
 	}
 	defer in.teardown(ctx)
@@ -99,8 +118,10 @@ func (in *eventHubInputV2) Run(
 	// partition.
 	in.pipeline = pipeline
 
-	// Start the main run loop
-	in.run(ctx)
+	// Start the main run loop (blocking call).
+	// Update input status to running.
+	in.status.UpdateStatus(status.Running, "Input is running")
+	in.run(inputContext, ctx)
 
 	return nil
 }
@@ -132,6 +153,7 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		},
 	)
 	if err != nil {
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating blob container client: %s", err.Error()))
 		return fmt.Errorf("failed to create blob container client: %w", err)
 	}
 
@@ -144,6 +166,11 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	// We need to ensure it exists before we can use it.
 	err = in.ensureContainerExists(ctx, containerClient)
 	if err != nil {
+		var respError *azcore.ResponseError
+		if errors.As(err, &respError) && respError != nil && respError.StatusCode == 403 {
+			in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed due to authentication error: %s", err.Error()))
+			return fmt.Errorf("Authentication error: %w", err)
+		}
 		return fmt.Errorf("failed to ensure blob container exists: %w", err)
 	}
 
@@ -198,7 +225,7 @@ func (in *eventHubInputV2) teardown(ctx context.Context) {
 }
 
 // run starts the main loop for processing events.
-func (in *eventHubInputV2) run(ctx context.Context) {
+func (in *eventHubInputV2) run(inputContext v2.Context, ctx context.Context) {
 	if in.config.MigrateCheckpoint {
 		in.log.Infow("checkpoint migration is enabled")
 		// Check if we need to migrate the checkpoint store.
@@ -239,6 +266,7 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 		)
 		if err != nil {
 			in.log.Errorw("error creating processor", "error", err)
+			in.status.UpdateStatus(status.Failed, fmt.Sprintf("Error creating processor. Error: %s", err))
 			return
 		}
 
@@ -246,17 +274,26 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 		// to process events.
 		go in.workersLoop(ctx, processor)
 
-		// Run the processor to start processing events.
+		// Run the processor to start processing events (blocking call).
 		//
-		// This is a blocking call.
-		//
-		// It will return when the processor stops due to:
-		//  - an error
-		//	- when the context is cancelled.
+		// Run handles the load balancing loop, blocking until the passed in context
+		// is cancelled or it encounters an unrecoverable error.
 		//
 		// On cancellation, it will return a nil error.
 		if err := processor.Run(ctx); err != nil {
-			in.log.Errorw("processor exited with a non-nil error", "error", err)
+			// The processor encountered an unrecoverable error.
+			in.log.Errorw("processor encountered an unrecoverable error and needs to be restarted", "error", err)
+
+			// The underlying error type for authentication is internal so we can't cast to it.
+			// Instead, we'll check the error message for the status code.
+			if strings.Contains(err.Error(), "status code 401") {
+				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Authentication error: %s", err.Error()))
+			} else if strings.Contains(err.Error(), "no such host") {
+				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Event Hub not found: %s", err.Error()))
+			} else {
+				// Update input status to degraded with a more generic issue
+				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Processor error: %s", err))
+			}
 
 			in.log.Infow("waiting before retrying starting the processor")
 
@@ -371,7 +408,7 @@ func (in *eventHubInputV2) containerExists(ctx context.Context, blobContainerCli
 		return false, nil
 	}
 
-	return false, fmt.Errorf("failed to check if blob container exists: %w", err)
+	return false, err
 }
 
 // workersLoop starts a goroutine for each partition to process events.
@@ -425,6 +462,8 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 	// 1/3 [BEGIN] Initialize any partition specific resources for your application.
 	pipelineClient, err := initializePartitionResources(ctx, partitionClient, in.pipeline, in.log)
 	if err != nil {
+		in.status.UpdateStatus(status.Degraded,
+			fmt.Sprintf("Error initializing partition resources: %s", err.Error()))
 		return err
 	}
 
@@ -453,11 +492,22 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 					"ownership lost for partition, stopping processing",
 					"partition_id", partitionID,
 				)
+				in.status.UpdateStatus(status.Degraded,
+					fmt.Sprintf("Ownership lost for partition %s: %s", partitionID, err.Error()))
 
 				return nil
 			}
 
+			in.status.UpdateStatus(status.Degraded,
+				fmt.Sprintf(
+					"Possible network fault: "+
+						"Receive events error for partition %s: %s",
+					partitionID, err.Error()))
 			return err
+		} else {
+			// no error, report Running in case we are
+			// currently transitioning from degraded back to healthy
+			in.status.UpdateStatus(status.Running, "Input is running")
 		}
 
 		if len(events) == 0 {
@@ -470,6 +520,10 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 
 		err = in.processReceivedEvents(events, partitionID, pipelineClient)
 		if err != nil {
+			in.status.UpdateStatus(status.Degraded,
+				fmt.Sprintf(
+					"Error processing received events for partition %s: %s",
+					partitionID, err.Error()))
 			return fmt.Errorf("error processing received events: %w", err)
 		}
 	}
