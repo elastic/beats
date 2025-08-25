@@ -25,9 +25,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/go-viper/mapstructure/v2"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	oteltranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate"
@@ -63,6 +60,9 @@ var defaultOptions = esToOTelOptions{
 	Pipeline: "",
 	ProxyURL: "",
 	Preset:   "custom", // default is custom if not set
+	HostWorkerCfg: outputs.HostWorkerCfg{
+		Workers: 1,
+	},
 }
 
 // ToOTelConfig converts a Beat config into OTel elasticsearch exporter config
@@ -128,7 +128,7 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 		// For libbeat ES output, the "workers" setting controls the number of concurrent connections per ES host.
 		// For elasticsearchexporter, we can achieve the same concurrency by specifying "max_conns_per_host" setting
 		// as our otelconsumer sends data parallelly to the consumer.
-		// Also, we use http/1 in libbeat. To achive parity, disable force_attempt_http2
+		// Also, we use http/1 in libbeat. To achieve parity, disable force_attempt_http2
 		"max_conns_per_host":  escfg.NumWorkers(),
 		"force_attempt_http2": false,
 
@@ -175,10 +175,6 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 	// Dynamic routing is disabled if output.elasticsearch.index is set
 	setIfNotNil(otelYAMLCfg, "logs_index", escfg.Index) // index
 
-	// if err := typeSafetyCheck(otelYAMLCfg); err != nil {
-	// 	return nil, err
-	// }
-
 	return otelYAMLCfg, nil
 }
 
@@ -207,24 +203,6 @@ func checkUnsupportedConfig(cfg *config.C, logger *logp.Logger) error {
 		return fmt.Errorf("allow_older_versions:false is currently not supported: %w", errors.ErrUnsupported)
 	}
 	return nil
-}
-
-// For type safety check
-func typeSafetyCheck(value map[string]any) error {
-	// the  value should match `elasticsearchexporter.Config` type.
-	// it throws an error if non existing key names  are set
-	var result elasticsearchexporter.Config
-	d, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		Squash:      true,
-		Result:      &result,
-		ErrorUnused: true,
-	})
-
-	err := d.Decode(value)
-	if err != nil {
-		return err
-	}
-	return err
 }
 
 // Helper function to check if a struct is empty
