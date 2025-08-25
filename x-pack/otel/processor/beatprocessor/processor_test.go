@@ -51,14 +51,14 @@ func TestConsumeLogs(t *testing.T) {
 			for i, logRecord := range scopeLogs.LogRecords().All() {
 				// Verify that the original contents of the log is unchanged.
 				messageAttribute, found := logRecord.Body().Map().Get("message")
-				assert.True(t, found)
+				assert.True(t, found, "'message' not found in log record")
 				assert.Equal(t, fmt.Sprintf("test log message %v", i), messageAttribute.Str())
 
 				// Verify that the host attribute is added.
 				hostAttribute, found := logRecord.Body().Map().Get("host")
-				assert.True(t, found)
+				assert.True(t, found, "'host' not found in log record")
 				nameAttribute, found := hostAttribute.Map().Get("name")
-				assert.True(t, found)
+				assert.True(t, found, "'name' not found in 'host' attribute")
 				assert.Equal(t, "test-host", nameAttribute.Str())
 			}
 		}
