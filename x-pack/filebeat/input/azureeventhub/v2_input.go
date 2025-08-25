@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
@@ -283,8 +284,14 @@ func (in *eventHubInputV2) run(inputContext v2.Context, ctx context.Context) {
 			// The processor encountered an unrecoverable error.
 			in.log.Errorw("processor encountered an unrecoverable error and needs to be restarted", "error", err)
 
-			// Update input status to degraded.
-			in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Processor error: %s", err))
+			// The underlying error type for authentication is internal so we can't cast to it.
+			// Instead, we'll check the error message for the status code.
+			if strings.Contains(err.Error(), "status code 401") {
+				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Authentication error: %s", err.Error()))
+			} else {
+				// Update input status to degraded with a more generic issue
+				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Processor error: %s", err))
+			}
 
 			in.log.Infow("waiting before retrying starting the processor")
 
