@@ -435,7 +435,7 @@ func getMetricSetStats(mon beat.Monitoring, module, name string) *stats {
 		return s
 	}
 
-	reg := mon.StatsRegistry().NewRegistry(key)
+	reg := mon.StatsRegistry().GetOrCreateRegistry(key)
 	s := &stats{
 		key:                 key,
 		ref:                 1,
