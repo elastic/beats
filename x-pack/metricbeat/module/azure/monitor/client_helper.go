@@ -70,17 +70,30 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 					dim = append(dim, azure.Dimension(dimension))
 				}
 			}
-			for key, metricGroup := range metricGroups {
-				metricNamesByFirstTimegrain := make(map[string][]string)
-				for _, metricFromGroup := range metricGroup {
-					// combine like first timegrains
-					// we can sort these if we ever discover ordering is not guaranteed
-					metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain] = append(
-						metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain],
-						*metricFromGroup.Name.Value)
+			// TODO: potentially refactor the if-else bodies into funcs
+			if metric.Timegrain == "" { // no timegrain provided in user config
+				// Need to leverage first available timegrain from each metric definition
+				for key, metricGroup := range metricGroups {
+					metricNamesByFirstTimegrain := make(map[string][]string)
+					for _, metricFromGroup := range metricGroup {
+						// combine like first timegrains
+						// we can sort these if we ever discover ordering is not guaranteed
+						metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain] = append(
+							metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain],
+							*metricFromGroup.Name.Value)
+					}
+					for timeGrain, metricNames := range metricNamesByFirstTimegrain {
+						metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, timeGrain))
+					}
 				}
-				for timeGrain, metricNames := range metricNamesByFirstTimegrain {
-					metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, timeGrain))
+			} else { // user-specified timegrain provided
+				// no need to grab timegrains from metric definition
+				for key, metricGroup := range metricGroups {
+					var metricNames []string
+					for _, metricName := range metricGroup {
+						metricNames = append(metricNames, *metricName.Name.Value)
+					}
+					metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, metric.Timegrain))
 				}
 			}
 		}
