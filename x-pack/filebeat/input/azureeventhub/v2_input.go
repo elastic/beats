@@ -288,6 +288,8 @@ func (in *eventHubInputV2) run(inputContext v2.Context, ctx context.Context) {
 			// Instead, we'll check the error message for the status code.
 			if strings.Contains(err.Error(), "status code 401") {
 				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Authentication error: %s", err.Error()))
+			} else if strings.Contains(err.Error(), "no such host") {
+				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Event Hub not found: %s", err.Error()))
 			} else {
 				// Update input status to degraded with a more generic issue
 				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Processor error: %s", err))
