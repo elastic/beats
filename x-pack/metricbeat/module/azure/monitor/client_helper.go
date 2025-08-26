@@ -95,9 +95,11 @@ func getMappedResourceDefinitions(
 		}
 
 		if metric.Timegrain == "" {
-			metrics = append(metrics, mapMetricsWithFirstAllowedTimegrain(client, resource, metric, metricGroups, dim)...)
+			metrics = append(metrics,
+				mapMetricsWithFirstAllowedTimegrain(client, resource, metric, metricGroups, dim)...)
 		} else {
-			metrics = append(metrics, mapMetricsWithUserTimegrain(client, resource, metric, metricGroups, dim)...)
+			metrics = append(metrics,
+				mapMetricsWithUserTimegrain(client, resource, metric, metricGroups, dim)...)
 		}
 	}
 	return metrics, nil
