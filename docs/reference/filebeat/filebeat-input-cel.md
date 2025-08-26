@@ -378,7 +378,7 @@ The CEL program that is executed each polling period. This field is required.
 
 `max_executions` is the maximum number of times a CEL program can request to be re-run with a `want_more` field. This is used to ensure that accidental infinite loops do not halt processing. When the execution budget is exceeded, execution will be restarted at the next interval and a warning will be written into the logs. Default: 1000.
 
-The number of executions remaining in the execution budget after the completion of the current evaluation is available within the CEL program by referencing the `remaining_executions` global variable. {applies_to}`stack: unavailable 9.2.0`
+The number of executions remaining in the execution budget after the completion of the current evaluation is available within the CEL program by referencing the `remaining_executions` global variable. {applies_to}`stack: ga 9.2.0`
 
 ### `state` [state-cel]
 
