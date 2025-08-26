@@ -1282,7 +1282,8 @@ func (b *BeatProc) WaitPublishedEvents(timeout time.Duration, events int) {
 // GetEventsFromFileOutput reads all events from file output. If n > 0,
 // then it reads up to n events. It assumes the filename
 // for the output is 'output' and 'path' is set to the TempDir.
-// TODO
+// If waitForFile is true, it will GetEventsFromFileOutput wait up to 45
+// seconds for the file to appear.
 func GetEventsFromFileOutput[E any](b *BeatProc, n int, waitForFile bool) []E {
 	b.t.Helper()
 
