@@ -191,10 +191,10 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 				}
 				continue
 			case <-time.After(timeout):
-				logger.Error("verify function timed out. Kernel may be unsupported or kprobes may have a bug.")
+				logger.Error("verify function timed out. Kernel may be unsupported or kprobes may have a bug")
 				return
 			case <-cancel:
-				logger.Error("verify function got context canceled, returning")
+				logger.Error("verify function got context canceled")
 				return
 			}
 		}
