@@ -111,6 +111,46 @@ https://github.com/elastic/beats/compare/v8.18.4\...v8.19.0[View commits]
 - Add GCP metadata cache. {pull}44432[44432]
 - Add VPN metrics to meraki module {pull}44851[44851]
 
+[[release-notes-8.18.4]]
+=== Beats version 8.18.4
+https://github.com/elastic/beats/compare/v8.18.3\...v8.18.4[View commits]
+
+==== Breaking changes
+
+*Metricbeat*
+
+- Change index summary metricset to use `_nodes/stats` API instead of `_stats` API to avoid data gaps. {pull}45049[45049]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
+
+*Filebeat*
+
+- Add missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
+
+*Winlogbeat*
+
+- Fix EvtVarTypeAnsiString conversion. {pull}44026[44026]
+
+==== Added
+
+*Filebeat*
+
+- Add input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
+
+*Heartbeat*
+
+- Upgrade Node version to latest LTS v20.19.3. {pull}45087[45087]
+- Add base64 encoding option to inline monitors. {pull}45100[45100]
+
+
+*Metricbeat*
+
+- Upgrade github.com/microsoft/go-mssqldb version from v1.7.2 to v1.8.2 {pull}44990[44990]
+
 [[release-notes-8.18.3]]
 === Beats version 8.18.3
 https://github.com/elastic/beats/compare/v8.18.2\...v8.18.3[View commits]
