@@ -58,7 +58,9 @@ func (stat *IOStat) OpenSampling() error {
 	if err != nil {
 		return err
 	}
-	stat.curCPU = times[0]
+	if len(times) > 0 {
+		stat.curCPU = times[0]
+	}
 	return nil
 }
 

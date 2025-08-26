@@ -44,7 +44,11 @@ func Get(m *Monitor) (CPUMetrics, error) {
 	for _, cpu := range perCPU {
 		cpulist = append(cpulist, fillCPU(cpu))
 	}
-	return CPUMetrics{totals: fillCPU(sum[0]), list: cpulist}, nil
+	cpuTotal := CPU{}
+	if len(sum) > 0 {
+		cpuTotal = fillCPU(sum[0])
+	}
+	return CPUMetrics{totals: cpuTotal, list: cpulist}, nil
 }
 
 func fillCPU(raw cpu.TimesStat) CPU {
