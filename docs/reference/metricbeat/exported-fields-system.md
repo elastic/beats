@@ -878,7 +878,7 @@ Metrics relating to global network activity
 ## ntp [_ntp]
 
 ```{applies_to}
-stack: beta
+stack: beta 9.2.0
 ```
 
 `ntp` contains Network Time Protocol (NTP) metrics.
