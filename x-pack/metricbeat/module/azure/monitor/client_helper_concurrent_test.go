@@ -288,8 +288,8 @@ func TestConcurrentMapMetricsNoConfiguredTimegrain(t *testing.T) {
 
 		// we should have two groups, one per first timegrain value
 		assert.Len(t, collectedMetrics, 2)
-		// this for loop with checks is necessary because the ordering of timegrains is non-deterministic
-		// without a configured timegrain, we are iterating over a map in the function under test
+		// this for loop with the switch statement is necessary because the ordering of timegrains is non-deterministic
+		// due to map iteration. Without a configured timegrain, we are iterating over a map
 		for _, collectedMetric := range collectedMetrics {
 			switch collectedMetric.TimeGrain {
 			case oneMinuteDuration:
@@ -357,8 +357,8 @@ func TestConcurrentMapMetricsNoConfiguredTimegrain(t *testing.T) {
 
 		// we should have two groups, one per first timegrain value
 		assert.Len(t, collectedMetrics, 2)
-		// this for loop with checks is necessary because the ordering of timegrains is non-deterministic
-		// without a configured timegrain, we are iterating over a map in the function under test
+		// this for loop with the switch statement is necessary because the ordering of timegrains is non-deterministic
+		// due to map iteration. Without a configured timegrain, we are iterating over a map
 		for _, collectedMetric := range collectedMetrics {
 			switch collectedMetric.TimeGrain {
 			case oneMinuteDuration:
