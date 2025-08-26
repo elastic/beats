@@ -20,7 +20,6 @@
 package kprobes
 
 import (
-	"context"
 	"testing"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
@@ -667,7 +666,7 @@ func Test_EventProcessor_process(t *testing.T) {
 
 			eProc := newEventProcessor(mockPathTraverser, mockEmitter, c.isRecursive)
 			for len(c.events) > 0 {
-				err := eProc.process(context.TODO(), c.events[0])
+				err := eProc.process(c.events[0])
 				require.NoError(t, err)
 				c.events = c.events[1:]
 			}

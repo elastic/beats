@@ -62,8 +62,8 @@ type pTraverser struct {
 	errC          chan error
 	ctx           context.Context
 	cancelFn      context.CancelFunc
-	e             executor
-	w             inotifyWatcher
+	exec          executor
+	watcher       inotifyWatcher
 	isRecursive   bool
 	waitQueueChan chan struct{}
 	sMatchTimeout time.Duration
@@ -75,7 +75,7 @@ var lstat = os.Lstat // for testing
 func newPathMonitor(ctx context.Context, exec executor, timeOut time.Duration, isRecursive bool) (*pTraverser, error) {
 	mWatcher, err := newInotifyWatcher()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating new inotify watcher: %w", err)
 	}
 
 	if timeOut == 0 {
@@ -89,31 +89,31 @@ func newPathMonitor(ctx context.Context, exec executor, timeOut time.Duration, i
 		ctx:           mCtx,
 		errC:          make(chan error),
 		cancelFn:      cancelFn,
-		e:             exec,
-		w:             mWatcher,
+		exec:          exec,
+		watcher:       mWatcher,
 		isRecursive:   isRecursive,
 		sMatchTimeout: timeOut,
 	}, nil
 }
 
-func (r *pTraverser) Close() error {
-	r.cancelFn()
-	return r.w.Close()
+func (traverser *pTraverser) Close() error {
+	traverser.cancelFn()
+	return traverser.watcher.Close()
 }
 
-func (r *pTraverser) GetMonitorPath(ino uint64, major uint32, minor uint32, name string) (MonitorPath, bool) {
-	if r.ctx.Err() != nil {
+func (traverser *pTraverser) GetMonitorPath(ino uint64, major uint32, minor uint32, name string) (MonitorPath, bool) {
+	if traverser.ctx.Err() != nil {
 		return MonitorPath{}, false
 	}
 
-	r.mtx.Lock()
-	defer r.mtx.Unlock()
+	traverser.mtx.Lock()
+	defer traverser.mtx.Unlock()
 
-	if len(r.statQueue) == 0 {
+	if len(traverser.statQueue) == 0 {
 		return MonitorPath{}, false
 	}
 
-	monitorPath := r.statQueue[0]
+	monitorPath := traverser.statQueue[0]
 	if monitorPath.ino != ino ||
 		monitorPath.major != major ||
 		monitorPath.minor != minor ||
@@ -121,11 +121,11 @@ func (r *pTraverser) GetMonitorPath(ino uint64, major uint32, minor uint32, name
 		return MonitorPath{}, false
 	}
 
-	r.statQueue = r.statQueue[1:]
+	traverser.statQueue = traverser.statQueue[1:]
 
-	if len(r.statQueue) == 0 && r.waitQueueChan != nil {
-		close(r.waitQueueChan)
-		r.waitQueueChan = nil
+	if len(traverser.statQueue) == 0 && traverser.waitQueueChan != nil {
+		close(traverser.waitQueueChan)
+		traverser.waitQueueChan = nil
 	}
 
 	return MonitorPath{
@@ -139,29 +139,29 @@ func (r *pTraverser) GetMonitorPath(ino uint64, major uint32, minor uint32, name
 func readDirNames(dirName string) ([]string, error) {
 	f, err := os.Open(dirName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error opening directory %s: %w", dirName, err)
 	}
 	names, err := f.Readdirnames(-1)
 	_ = f.Close()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error reading %s: %w", dirName, err)
 	}
 	sort.Strings(names)
 	return names, nil
 }
 
-func (r *pTraverser) ErrC() <-chan error {
-	return r.errC
+func (traverser *pTraverser) ErrC() <-chan error {
+	return traverser.errC
 }
 
-func (r *pTraverser) WalkAsync(path string, depth uint32, tid uint32) {
-	if r.ctx.Err() != nil {
+func (traverser *pTraverser) WalkAsync(path string, depth uint32, tid uint32) {
+	if traverser.ctx.Err() != nil {
 		return
 	}
 
 	go func() {
-		walkErr := r.e.Run(func() error {
-			return r.walk(r.ctx, path, depth, true, tid)
+		walkErr := traverser.exec.Run(func() error {
+			return traverser.walk(traverser.ctx, path, depth, true, tid)
 		})
 
 		if walkErr == nil {
@@ -169,22 +169,22 @@ func (r *pTraverser) WalkAsync(path string, depth uint32, tid uint32) {
 		}
 
 		select {
-		case r.errC <- walkErr:
-		case <-r.ctx.Done():
+		case traverser.errC <- walkErr:
+		case <-traverser.ctx.Done():
 		}
 	}()
 }
 
-func (r *pTraverser) walkRecursive(ctx context.Context, path string, mounts mountPoints, depth uint32, isFromMove bool, tid uint32) error {
+func (traverser *pTraverser) walkRecursive(ctx context.Context, path string, mounts mountPoints, depth uint32, isFromMove bool, tid uint32) error {
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
 
-	if r.ctx.Err() != nil {
-		return r.ctx.Err()
+	if traverser.ctx.Err() != nil {
+		return traverser.ctx.Err()
 	}
 
-	if !r.isRecursive && depth > 1 {
+	if !traverser.isRecursive && depth > 1 {
 		return nil
 	}
 
@@ -195,16 +195,16 @@ func (r *pTraverser) walkRecursive(ctx context.Context, path string, mounts moun
 	}
 
 	// add the inotify watcher if it does not exist
-	if _, err := r.w.Add(mnt.DeviceMajor, mnt.DeviceMinor, path); err != nil {
-		return err
+	if _, err := traverser.watcher.Add(mnt.DeviceMajor, mnt.DeviceMinor, path); err != nil {
+		return fmt.Errorf("error adding inotify watch for %s: %w", path, err)
 	}
 
-	r.mtx.Lock()
+	traverser.mtx.Lock()
 	info, err := lstat(path)
 	if err != nil {
 		// maybe this path got deleted/moved in the meantime
 		// return nil
-		r.mtx.Unlock()
+		traverser.mtx.Unlock()
 		//lint:ignore nilerr no errors returned for lstat from walkRecursive
 		return nil
 	}
@@ -220,7 +220,7 @@ func (r *pTraverser) walkRecursive(ctx context.Context, path string, mounts moun
 
 	matchFileName := filepath.Base(mntPath)
 
-	r.statQueue = append(r.statQueue, statMatch{
+	traverser.statQueue = append(traverser.statQueue, statMatch{
 		ino:        info.Sys().(*syscall.Stat_t).Ino,
 		major:      mnt.DeviceMajor,
 		minor:      mnt.DeviceMinor,
@@ -230,7 +230,7 @@ func (r *pTraverser) walkRecursive(ctx context.Context, path string, mounts moun
 		tid:        tid,
 		fullPath:   path,
 	})
-	r.mtx.Unlock()
+	traverser.mtx.Unlock()
 
 	if !info.IsDir() {
 		return nil
@@ -246,7 +246,7 @@ func (r *pTraverser) walkRecursive(ctx context.Context, path string, mounts moun
 
 	for _, name := range names {
 		filename := filepath.Join(path, name)
-		if err = r.walkRecursive(ctx, filename, mounts, depth+1, isFromMove, tid); err != nil {
+		if err = traverser.walkRecursive(ctx, filename, mounts, depth+1, isFromMove, tid); err != nil {
 			//lint:ignore nilerr no errors returned for readDirNames from walkRecursive
 			return nil
 		}
@@ -254,53 +254,53 @@ func (r *pTraverser) walkRecursive(ctx context.Context, path string, mounts moun
 	return nil
 }
 
-func (r *pTraverser) waitForWalk(ctx context.Context) error {
-	r.mtx.Lock()
+func (traverser *pTraverser) waitForWalk(ctx context.Context) error {
+	traverser.mtx.Lock()
 
 	// statQueue is already empty, return
-	if len(r.statQueue) == 0 {
-		r.mtx.Unlock()
+	if len(traverser.statQueue) == 0 {
+		traverser.mtx.Unlock()
 		return nil
 	}
 
-	r.waitQueueChan = make(chan struct{})
-	r.mtx.Unlock()
+	traverser.waitQueueChan = make(chan struct{})
+	traverser.mtx.Unlock()
 
 	select {
 	// ctx of pTraverser is done
-	case <-r.ctx.Done():
-		return r.ctx.Err()
+	case <-traverser.ctx.Done():
+		return traverser.ctx.Err()
 	// ctx of walk is done
 	case <-ctx.Done():
 		return ctx.Err()
 	// statQueue is empty
-	case <-r.waitQueueChan:
+	case <-traverser.waitQueueChan:
 		return nil
 	// timeout
-	case <-time.After(r.sMatchTimeout):
+	case <-time.After(traverser.sMatchTimeout):
 		return ErrAckTimeout
 	}
 }
 
-func (r *pTraverser) walk(ctx context.Context, path string, depth uint32, isFromMove bool, tid uint32) error {
+func (traverser *pTraverser) walk(ctx context.Context, path string, depth uint32, isFromMove bool, tid uint32) error {
 	// get a snapshot of all mountpoints
 	mounts, err := getAllMountPoints()
 	if err != nil {
-		return err
+		return fmt.Errorf("error getting mount points: %w", err)
 	}
 
 	// start walking the given path
-	if err := r.walkRecursive(ctx, path, mounts, depth, isFromMove, tid); err != nil {
-		return err
+	if err := traverser.walkRecursive(ctx, path, mounts, depth, isFromMove, tid); err != nil {
+		return fmt.Errorf("error walking path %s: %w", path, err)
 	}
 
 	// wait for the monitor queue to get empty
-	return r.waitForWalk(ctx)
+	return traverser.waitForWalk(ctx)
 }
 
-func (r *pTraverser) AddPathToMonitor(ctx context.Context, path string) error {
-	if r.ctx.Err() != nil {
-		return r.ctx.Err()
+func (traverser *pTraverser) AddPathToMonitor(ctx context.Context, path string) error {
+	if traverser.ctx.Err() != nil {
+		return traverser.ctx.Err()
 	}
 
 	if ctx.Err() != nil {
@@ -311,11 +311,11 @@ func (r *pTraverser) AddPathToMonitor(ctx context.Context, path string) error {
 	// walk masks out all file existence errors
 	_, err := lstat(path)
 	if err != nil {
-		return err
+		return fmt.Errorf("error stating path %s: %w", path, err)
 	}
 
 	// paths from AddPathToMonitor are always starting with a depth of 0
-	return r.e.Run(func() error {
-		return r.walk(ctx, path, 0, false, 0)
+	return traverser.exec.Run(func() error {
+		return traverser.walk(ctx, path, 0, false, 0)
 	})
 }

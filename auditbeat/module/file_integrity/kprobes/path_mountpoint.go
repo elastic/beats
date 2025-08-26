@@ -181,7 +181,7 @@ func readMountInfo(r io.Reader) (mountPoints, error) {
 		line := scanner.Text()
 		mnt, err := parseMountInfoLine(line)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error reading mountinfo line: %w", err)
 		}
 
 		if mnt == nil {
@@ -218,7 +218,7 @@ func getAllMountPoints() (mountPoints, error) {
 
 	file, err := os.Open("/proc/self/mountinfo")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error opening mountinfo: %w", err)
 	}
 	defer file.Close()
 	return readMountInfo(file)

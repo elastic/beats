@@ -21,6 +21,7 @@ package kprobes
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	"golang.org/x/sys/unix"
@@ -95,7 +96,7 @@ func (w *iWatcher) Add(devMajor uint32, devMinor uint32, mountPath string) (bool
 
 	wd, err := inotifyAddWatch(w.inotifyFD, mountPath, unix.IN_UNMOUNT)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("error adding inotify watch for %s: %w", mountPath, err)
 	}
 
 	_, fdExists := w.uniqueFDs[uint32(wd)]

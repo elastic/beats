@@ -24,12 +24,14 @@ import (
 	"context"
 	"embed"
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	tkbtf "github.com/elastic/tk-btf"
 )
@@ -37,17 +39,17 @@ import (
 //go:embed embed
 var embedBTFFolder embed.FS
 
-func getVerifiedProbes(ctx context.Context, timeout time.Duration) (map[tracing.Probe]tracing.AllocateFn, executor, error) {
+func getVerifiedProbes(ctx context.Context, timeout time.Duration, logger *logp.Logger) (map[tracing.Probe]tracing.AllocateFn, executor, error) {
 	fExec := newFixedThreadExecutor(ctx)
 
 	probeMgr, err := newProbeManager(fExec)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("error creating probe manager: %w", err)
 	}
 
 	specs, err := loadAllSpecs()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("error loading BTF specs: %w", err)
 	}
 
 	var allErr error
@@ -66,7 +68,7 @@ func getVerifiedProbes(ctx context.Context, timeout time.Duration) (map[tracing.
 			continue
 		}
 
-		if err := verify(ctx, fExec, probes, timeout); err != nil {
+		if err := verify(ctx, fExec, probes, timeout, logger); err != nil {
 			if probeMgr.onErr(err) {
 				continue
 			}
@@ -88,7 +90,7 @@ func loadAllSpecs() ([]*tkbtf.Spec, error) {
 	spec, err := tkbtf.NewSpecFromKernel()
 	if err != nil {
 		if !errors.Is(err, tkbtf.ErrSpecKernelNotSupported) {
-			return nil, err
+			return nil, fmt.Errorf("error reading BTF from kernel: %w", err)
 		}
 	} else {
 		specs = append(specs, spec)
@@ -96,7 +98,7 @@ func loadAllSpecs() ([]*tkbtf.Spec, error) {
 
 	embeddedSpecs, err := loadEmbeddedSpecs()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error loading embedded BTF specs: %w", err)
 	}
 	specs = append(specs, embeddedSpecs...)
 	return specs, nil
@@ -106,7 +108,7 @@ func loadEmbeddedSpecs() ([]*tkbtf.Spec, error) {
 	var specs []*tkbtf.Spec
 	err := fs.WalkDir(embedBTFFolder, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
-			return err
+			return fmt.Errorf("error while walking embedded BTF folder: %w", err)
 		}
 
 		if !strings.HasSuffix(path, ".btf") {
@@ -115,12 +117,12 @@ func loadEmbeddedSpecs() ([]*tkbtf.Spec, error) {
 
 		embedFileBytes, err := embedBTFFolder.ReadFile(path)
 		if err != nil {
-			return err
+			return fmt.Errorf("error reading embedded BTF file %s: %w", path, err)
 		}
 
 		embedSpec, err := tkbtf.NewSpecFromReader(bytes.NewReader(embedFileBytes), nil)
 		if err != nil {
-			return err
+			return fmt.Errorf("error creating spec from embedded file %s: %w", path, err)
 		}
 
 		specs = append(specs, embedSpec)
@@ -133,37 +135,37 @@ func loadEmbeddedSpecs() ([]*tkbtf.Spec, error) {
 	return specs, nil
 }
 
-func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing.AllocateFn, timeout time.Duration) error {
+func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing.AllocateFn, timeout time.Duration, logger *logp.Logger) error {
 	basePath, err := os.MkdirTemp("", "verifier")
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating temp directory: %w", err)
 	}
 
 	defer os.RemoveAll(basePath)
 
 	verifier, err := newEventsVerifier(basePath)
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating verifier: %w", err)
 	}
 
 	pChannel, err := newPerfChannel(probes, 4, 512, exec.GetTID())
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating perf buffer channels: %w", err)
 	}
 
-	m, err := newMonitor(ctx, true, pChannel, exec)
+	m, err := newMonitor(ctx, true, pChannel, exec, logger)
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating events monitor: %w", err)
 	}
 
 	defer m.Close()
 
 	// start the monitor
 	if err := m.Start(); err != nil {
-		return err
+		return fmt.Errorf("error starting events monitor: %w", err)
 	}
 
-	// spaw goroutine to send events to verifier to be verified
+	// spawn goroutine to send events to verifier to be verified
 	cancel := make(chan struct{})
 	defer close(cancel)
 
@@ -189,8 +191,10 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 				}
 				continue
 			case <-time.After(timeout):
+				logger.Error("verify function timed out. Kernel may be unsupported or kprobes may have a bug.")
 				return
 			case <-cancel:
+				logger.Error("verify function got context canceled, returning")
 				return
 			}
 		}
@@ -198,12 +202,12 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 
 	// add verify base path to monitor
 	if err := m.Add(basePath); err != nil {
-		return err
+		return fmt.Errorf("error adding path %s to monitor: %w", basePath, err)
 	}
 
 	// invoke verifier event generation from our executor
 	if err := exec.Run(verifier.GenerateEvents); err != nil {
-		return err
+		return fmt.Errorf("error running event generator: %w", err)
 	}
 
 	// wait for either no new events arriving for timeout duration or
@@ -211,7 +215,7 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 	select {
 	case err = <-retC:
 		if err != nil {
-			return err
+			return fmt.Errorf("error while verifying events: %w", err)
 		}
 	case <-ctx.Done():
 		return ctx.Err()
@@ -219,7 +223,7 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 
 	// check that all events have been verified
 	if err := verifier.Verified(); err != nil {
-		return err
+		return fmt.Errorf("events could not be verified: %w", err)
 	}
 
 	return nil
