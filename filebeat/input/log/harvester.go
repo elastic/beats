@@ -60,7 +60,7 @@ import (
 )
 
 var (
-	harvesterMetrics = monitoring.Default.NewRegistry("filebeat.harvester")
+	harvesterMetrics = monitoring.Default.GetOrCreateRegistry("filebeat.harvester")
 	filesMetrics     = monitoring.GetNamespace("dataset").GetRegistry()
 
 	harvesterStarted   = monitoring.NewInt(harvesterMetrics, "started")
@@ -180,7 +180,7 @@ func (h *Harvester) open() error {
 	case harvester.LogType, harvester.DockerType, harvester.ContainerType:
 		return h.openFile()
 	default:
-		return fmt.Errorf("Invalid harvester type: %+v", h.config)
+		return fmt.Errorf("invalid harvester type: %+v", h.config)
 	}
 }
 
@@ -219,7 +219,7 @@ func (h *Harvester) Setup() error {
 }
 
 func newHarvesterProgressMetrics(id string) *harvesterProgressMetrics {
-	r := filesMetrics.NewRegistry(id)
+	r := filesMetrics.GetOrCreateRegistry(id)
 	return &harvesterProgressMetrics{
 		metricsRegistry:             r,
 		filename:                    monitoring.NewString(r, "name"),
@@ -446,7 +446,7 @@ func (h *Harvester) onMessage(
 	// Check if json fields exist
 	var jsonFields mapstr.M
 	if f, ok := fields["json"]; ok {
-		jsonFields = f.(mapstr.M)
+		jsonFields, _ = f.(mapstr.M)
 	}
 
 	var meta mapstr.M

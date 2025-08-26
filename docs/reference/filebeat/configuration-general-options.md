@@ -79,23 +79,6 @@ filebeat.registry.migrate_file: /path/to/old/registry_file
 The registry will be migrated to the new location only if a registry using the directory format does not already exist.
 
 
-### `config_dir` [_config_dir]
-
-:::{admonition} Deprecated in 6.0.0.
-Use [Input config](/reference/filebeat/filebeat-configuration-reloading.md#load-input-config) instead.
-:::
-
-The full path to the directory that contains additional input configuration files. Each configuration file must end with `.yml`. Each config file must also specify the full Filebeat config hierarchy even though only the `inputs` part of each file is processed. All global options, such as `registry_file`, are ignored.
-
-The `config_dir` option MUST point to a directory other than the directory where the main Filebeat config file resides.
-
-If the specified path is not absolute, it is considered relative to the configuration path. See the [Directory layout](/reference/filebeat/directory-layout.md) section for details.
-
-```yaml
-filebeat.config_dir: path/to/configs
-```
-
-
 ### `shutdown_timeout` [shutdown-timeout]
 
 How long Filebeat waits on shutdown for the publisher to finish sending events before Filebeat shuts down.

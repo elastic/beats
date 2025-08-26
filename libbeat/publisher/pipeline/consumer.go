@@ -162,8 +162,7 @@ outerLoop:
 		case outputChan <- active:
 			// Successfully sent a batch to the output workers
 			if len(retryBatches) > 0 {
-				// This was a retry, report it to the observer
-				c.retryObserver.eventsRetry(len(active.Events()))
+				// This was a retry, advance the retry batch list
 				retryBatches = retryBatches[1:]
 			} else {
 				// This was directly from the queue, clear the value so we can
@@ -182,8 +181,10 @@ outerLoop:
 
 				alive := req.batch.reduceTTL()
 
+				// Report retried vs dropped event count to the observer
 				countDropped := countFailed - len(req.batch.Events())
 				c.retryObserver.eventsDropped(countDropped)
+				c.retryObserver.eventsRetry(len(req.batch.Events()))
 
 				if !alive {
 					log.Info("Drop batch")

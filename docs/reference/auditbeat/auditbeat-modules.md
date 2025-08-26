@@ -11,5 +11,5 @@ This section contains detailed information about the metric collecting modules c
 
 * [Auditd](/reference/auditbeat/auditbeat-module-auditd.md)
 * [File Integrity](/reference/auditbeat/auditbeat-module-file_integrity.md)
-* [System](/reference/auditbeat/auditbeat-module-system.md)
+* [System](/reference/auditbeat/auditbeat-module-system.md) {applies_to}`stack: beta`
 

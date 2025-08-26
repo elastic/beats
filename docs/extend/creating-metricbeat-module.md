@@ -13,7 +13,7 @@ It’s important to complete the configuration and documentation files for a mod
 ## Module Files [_module_files]
 
 * `config.yml` and `config.reference.yml`
-* `docs.asciidoc`
+* `docs.md`
 * `fields.yml`
 
 After updating any of these files, make sure you run `make update` in your beat directory so all generated files are updated.
@@ -40,11 +40,11 @@ It contains the module name, your metricset, and the default period. If you have
 The `full.config.yml` file is optional and by default has the same content as the `config.yml`. It is used to add and document more advanced configuration options that should not be part of the minimal config file shipped by default.
 
 
-### docs.asciidoc [_docs_asciidoc]
+### docs.md [_docs_md]
 
-The `docs.asciidoc` file contains the documentation about your module. During generation of the documentation, the default config file will be appended to the docs. Use this file to describe your module in more detail and to document specific configuration options.
+The `docs.md` file contains the documentation about your module. During generation of the documentation, the default config file will be appended to the docs. Use this file to describe your module in more detail and to document specific configuration options.
 
-```asciidoc
+```md
 This is the {module} module.
 ```
 
@@ -58,18 +58,30 @@ The default file looks like this:
 ```yaml
 - key: {module}
   title: "{module}"
-  release: beta
   description: >
     {module} module
   fields:
     - name: {module}
       type: group
-      description: >
+      description:
       fields:
 ```
 
-Make sure that you update at least the description of the module.
+After the default file is created, make sure to:
 
+* Update the `description` of the module and each field.
+* Add a `version` property with information about the product lifecycle and version in which the module is being added.
+  For example, if a module is being added in Elastic Stack version 9.1.0 in beta:
+  ```yaml
+  - key: {module}
+    title: "{module}"
+    version:
+      beta: 9.1.0
+    description: >
+      {module} module
+  ```
+
+For more tips on fine-tuning the `fields.yml` file for generating documentation, refer to [](/extend/contributing-docs.md#update-fields).
 
 ## Testing [_testing_2]
 

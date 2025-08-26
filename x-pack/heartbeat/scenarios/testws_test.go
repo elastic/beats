@@ -6,7 +6,6 @@ package scenarios
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"sync"
@@ -40,29 +39,6 @@ func startFailingTestWebserver(t *testing.T) *httptest.Server {
 	})
 
 	return failingTestWs
-}
-
-func StartStatefulTestWS(t *testing.T, statuses []int) *httptest.Server {
-	mtx := sync.Mutex{}
-	statusIdx := 0
-	testWs = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		mtx.Lock()
-		defer mtx.Unlock()
-
-		statusIdx++
-		if statusIdx > len(statuses)-1 {
-			statusIdx = 0
-		}
-
-		status := statuses[statusIdx]
-		w.WriteHeader(status)
-		_, _ = w.Write([]byte(fmt.Sprintf("Status: %d", status)))
-	}))
-
-	// wait for ws to become available
-	waitForWs(t, testWs.URL, 200)
-
-	return testWs
 }
 
 func waitForWs(t *testing.T, url string, statusCode int) {

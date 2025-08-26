@@ -164,7 +164,7 @@ For Filebeat versions that emit unstructured logs, the following script can be u
 ### Check if {{filebeat}} is processing events [_check_if_filebeat_is_processing_events]
 
 ```
-$ cat beat.log | jq -r '[.["@timestamp"],.monitoring.metrics.filebeat.events.active,.monitoring.metrics.libbeat.pipeline.events.active,.monitoring.metrics.libbeat.output.events.total,.monitoring.metrics.libbeat.output.events.acked,.monitoring.metrics.libbeat.output.events.failed//0] | @tsv' | sort
+cat beat.log | jq -r '[.["@timestamp"],.monitoring.metrics.filebeat.events.active,.monitoring.metrics.libbeat.pipeline.events.active,.monitoring.metrics.libbeat.output.events.total,.monitoring.metrics.libbeat.output.events.acked,.monitoring.metrics.libbeat.output.events.failed//0] | @tsv' | sort
 ```
 
 Example output:
