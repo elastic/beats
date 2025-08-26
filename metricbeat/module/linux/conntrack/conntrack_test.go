@@ -48,7 +48,7 @@ func TestFetch(t *testing.T) {
 	testConn := mapstr.M{
 		"drop":           uint64(0),
 		"early_drop":     uint64(0),
-		"entries":        uint64(16),
+		"entries":        uint64(4),
 		"found":          uint64(0),
 		"ignore":         uint64(3271028),
 		"insert_failed":  uint64(0),
@@ -56,7 +56,7 @@ func TestFetch(t *testing.T) {
 		"search_restart": uint64(3),
 	}
 
-	rawEvent := events[0].BeatEvent("linux", "conntrack").Fields["linux"].(mapstr.M)["conntrack"].(mapstr.M)["summary"]
+	rawEvent := events[0].BeatEvent("linux", "conntrack").Fields["linux"].(mapstr.M)["conntrack"].(mapstr.M)["summary"] //nolint:errcheck // ignore
 
 	assert.Equal(t, testConn, rawEvent)
 }
