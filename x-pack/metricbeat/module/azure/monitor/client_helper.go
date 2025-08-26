@@ -70,36 +70,47 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 					dim = append(dim, azure.Dimension(dimension))
 				}
 			}
-			// TODO: potentially refactor the if-else bodies into funcs
 			if metric.Timegrain == "" { // no timegrain provided in user config
-				// Need to leverage first available timegrain from each metric definition
-				for key, metricGroup := range metricGroups {
-					metricNamesByFirstTimegrain := make(map[string][]string)
-					for _, metricFromGroup := range metricGroup {
-						// combine like first timegrains
-						// we can sort these if we ever discover ordering is not guaranteed
-						metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain] = append(
-							metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain],
-							*metricFromGroup.Name.Value)
-					}
-					for timeGrain, metricNames := range metricNamesByFirstTimegrain {
-						metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, timeGrain))
-					}
-				}
+				metrics = append(metrics, mapMetricsWithFirstAllowedTimegrain(client, resource, metric, metricGroups, dim)...)
 			} else { // user-specified timegrain provided
-				// no need to grab timegrains from metric definition
-				for key, metricGroup := range metricGroups {
-					var metricNames []string
-					for _, metricName := range metricGroup {
-						metricNames = append(metricNames, *metricName.Name.Value)
-					}
-					metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, metric.Timegrain))
-				}
+				metrics = append(metrics, mapMetricsWithUserTimegrain(client, resource, metric, metricGroups, dim)...)
 			}
 		}
 	}
 
 	return metrics, nil
+}
+
+func mapMetricsWithFirstAllowedTimegrain(client *azure.Client, resource *armresources.GenericResourceExpanded, metric azure.MetricConfig, metricGroups map[string][]*armmonitor.MetricDefinition, dim []azure.Dimension) []azure.Metric {
+	var metrics []azure.Metric
+	// Need to leverage first available timegrain from each metric definition
+	for key, metricGroup := range metricGroups {
+		metricNamesByFirstTimegrain := make(map[string][]string)
+		for _, metricFromGroup := range metricGroup {
+			// combine like first timegrains
+			// we can sort these if we ever discover ordering is not guaranteed
+			metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain] = append(
+				metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain],
+				*metricFromGroup.Name.Value)
+		}
+		for timeGrain, metricNames := range metricNamesByFirstTimegrain {
+			metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, timeGrain))
+		}
+	}
+	return metrics
+}
+
+func mapMetricsWithUserTimegrain(client *azure.Client, resource *armresources.GenericResourceExpanded, metric azure.MetricConfig, metricGroups map[string][]*armmonitor.MetricDefinition, dim []azure.Dimension) []azure.Metric {
+	var metrics []azure.Metric
+	// no need to grab timegrains from metric definition
+	for key, metricGroup := range metricGroups {
+		var metricNames []string
+		for _, metricName := range metricGroup {
+			metricNames = append(metricNames, *metricName.Name.Value)
+		}
+		metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, metric.Timegrain))
+	}
+	return metrics
 }
 
 // filterMetricNames func will verify if the metric names entered are valid and will also return the corresponding list of metrics
