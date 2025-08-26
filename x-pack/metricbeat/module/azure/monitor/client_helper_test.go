@@ -103,6 +103,60 @@ func MockMetricDefinitions() []*armmonitor.MetricDefinition {
 	return defs
 }
 
+func TestMapMetricWithConfiguredTimegrain(t *testing.T) {
+	resource := MockResourceExpanded()
+	metricDefinitions := armmonitor.MetricDefinitionCollection{
+		Value: MockMetricDefinitions(),
+	}
+	metricConfig := azure.MetricConfig{Namespace: "namespace",
+		Dimensions: []azure.DimensionConfig{{Name: "location", Value: "West Europe"}},
+		Timegrain:  oneHrDuration}
+	resourceConfig := azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
+	client := azure.NewMockClient(logptest.NewTestingLogger(t, ""))
+	t.Run("return error when no metric definitions were found", func(t *testing.T) {
+		m := &azure.MockService{}
+		m.On("GetMetricDefinitionsWithRetry", mock.Anything, mock.Anything).Return(armmonitor.MetricDefinitionCollection{}, fmt.Errorf("invalid resource ID"))
+		client.AzureMonitorService = m
+		metric, err := mapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig)
+		assert.Error(t, err)
+		assert.Equal(t, metric, []azure.Metric(nil))
+		m.AssertExpectations(t)
+	})
+	t.Run("return all metrics when all metric names and aggregations were configured", func(t *testing.T) {
+		m := &azure.MockService{}
+		m.On("GetMetricDefinitionsWithRetry", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
+		client.AzureMonitorService = m
+		metricConfig.Name = []string{"*"}
+		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
+		metrics, err := mapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig)
+		assert.NoError(t, err)
+		assert.Equal(t, metrics[0].ResourceId, "123")
+		assert.Equal(t, metrics[0].Namespace, "namespace")
+		assert.Equal(t, metrics[0].Names, []string{"TotalRequests", "Capacity", "BytesRead"})
+		assert.Equal(t, metrics[0].Aggregations, "Average")
+		assert.Equal(t, metrics[0].Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+		m.AssertExpectations(t)
+	})
+	t.Run("return all metrics when specific metric names and aggregations were configured", func(t *testing.T) {
+		m := &azure.MockService{}
+		m.On("GetMetricDefinitionsWithRetry", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
+		client.AzureMonitorService = m
+		metricConfig.Name = []string{"TotalRequests", "Capacity"}
+		metricConfig.Aggregations = []string{"Average"}
+		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
+		metrics, err := mapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig)
+		assert.NoError(t, err)
+
+		assert.True(t, len(metrics) > 0)
+		assert.Equal(t, metrics[0].ResourceId, "123")
+		assert.Equal(t, metrics[0].Namespace, "namespace")
+		assert.Equal(t, metrics[0].Names, []string{"TotalRequests", "Capacity"})
+		assert.Equal(t, metrics[0].Aggregations, "Average")
+		assert.Equal(t, metrics[0].Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+		m.AssertExpectations(t)
+	})
+}
+
 func TestMapMetricNoConfiguredTimegrain(t *testing.T) {
 	resource := MockResourceExpanded()
 	metricDefinitions := armmonitor.MetricDefinitionCollection{
