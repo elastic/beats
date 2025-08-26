@@ -43,16 +43,7 @@ type ntpQueryProvider interface {
 type beevikNTPQueryProvider struct{}
 
 func (n *beevikNTPQueryProvider) query(host string, options ntp.QueryOptions) (*ntp.Response, error) {
-	response, err := ntp.QueryWithOptions(host, options)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := response.Validate(); err != nil {
-		return nil, err
-	}
-
-	return response, nil
+	return ntp.QueryWithOptions(host, options)
 }
 
 func (n *beevikNTPQueryProvider) validate(response *ntp.Response) error {
