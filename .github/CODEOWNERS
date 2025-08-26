@@ -108,6 +108,7 @@ CHANGELOG*
 /metricbeat/module/rabbitmq @elastic/obs-infraobs-integrations
 /metricbeat/module/redis @elastic/obs-infraobs-integrations
 /metricbeat/module/system/ @elastic/elastic-agent-data-plane
+/metricbeat/module/system/ntp @elastic/obs-infraobs-integrations
 /metricbeat/module/vsphere @elastic/obs-infraobs-integrations
 /metricbeat/module/windows/wmi @elastic/obs-infraobs-integrations
 /metricbeat/module/zookeeper @elastic/obs-infraobs-integrations
