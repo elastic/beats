@@ -39,7 +39,8 @@ func TestNewMiekgResolverWithIPv6(t *testing.T) {
 	const addr = `fe80::1%en0` // Example IPv6 address with zone index.
 
 	reg := monitoring.NewRegistry()
-	_, err := newMiekgResolver(reg.NewRegistry(logName), 0, "udp", logp.NewNopLogger(), addr)
+
+	_, err := newMiekgResolver(reg.GetOrCreateRegistry(logName), 0, "udp", logp.NewNopLogger(), addr)
 	assert.NoError(t, err)
 }
 
@@ -53,7 +54,7 @@ func TestMiekgResolverLookupPTR(t *testing.T) {
 	}()
 
 	reg := monitoring.NewRegistry()
-	res, err := newMiekgResolver(reg.NewRegistry(logName), 0, "udp", logp.NewNopLogger(), addr)
+	res, err := newMiekgResolver(reg.GetOrCreateRegistry(logName), 0, "udp", logp.NewNopLogger(), addr)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,7 +105,7 @@ func TestMiekgResolverLookupPTRTLS(t *testing.T) {
 
 	reg := monitoring.NewRegistry()
 
-	res, err := newMiekgResolver(reg.NewRegistry(logName), 0, "tls", logp.NewNopLogger(), addr)
+	res, err := newMiekgResolver(reg.GetOrCreateRegistry(logName), 0, "tls", logp.NewNopLogger(), addr)
 	if err != nil {
 		t.Fatal(err)
 	}
