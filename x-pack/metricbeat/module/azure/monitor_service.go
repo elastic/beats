@@ -418,11 +418,21 @@ func (service *MonitorService) GetMetricValues(resourceId string, namespace stri
 		}
 
 		if resp.Interval == nil || *resp.Interval == "" {
-			// TODO: Joe to figure out impact here - is this OK downstream?
-			service.log.Warnf("The returned interval (timegrain) for the list operation response is empty. Skipping this data."+
-				" Query parameters: Aggregation: '%v', Filter: '%v', Metric Names: '%v', Timespan: '%v', Result Type: '%v'",
-				aggregations, metricsFilter, metricNames, timespan, resultTypeData)
-			continue
+			// this should not happen because we have handled the wildcard
+			// timegrain config scenario. We should not continue with data
+			// returned from the latest API call, because this data
+			// could be bad
+			err = fmt.Errorf(
+				"the returned interval (timegrain) for the list operation "+
+					"response is empty. Skipping this data. Query "+
+					"parameters: Aggregation: '%v', Filter: '%v', "+
+					"Metric Names: '%v', Timespan: '%v', Result Type: '%v'",
+				aggregations, metricsFilter, metricNames, timespan,
+				resultTypeData,
+			)
+			service.log.Error(err.Error())
+
+			return metrics, "", err
 		}
 		interval = *resp.Interval
 
