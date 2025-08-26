@@ -127,6 +127,7 @@ func TestConcurrentMapMetricsWithConfiguredTimegrain(t *testing.T) {
 		assert.Equal(t, collectedMetrics[0].Names, []string{"TotalRequests", "Capacity", "BytesRead"})
 		assert.Equal(t, collectedMetrics[0].Aggregations, "Average")
 		assert.Equal(t, collectedMetrics[0].Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+		assert.Equal(t, collectedMetrics[0].TimeGrain, oneHrDuration)
 		m.AssertExpectations(t)
 	})
 	t.Run("return all metrics when specific metric names and aggregations were configured", func(t *testing.T) {
@@ -180,6 +181,7 @@ func TestConcurrentMapMetricsWithConfiguredTimegrain(t *testing.T) {
 		assert.Equal(t, collectedMetrics[0].Names, []string{"TotalRequests", "Capacity"})
 		assert.Equal(t, collectedMetrics[0].Aggregations, "Average")
 		assert.Equal(t, collectedMetrics[0].Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+		assert.Equal(t, collectedMetrics[0].TimeGrain, oneHrDuration)
 		m.AssertExpectations(t)
 	})
 }
