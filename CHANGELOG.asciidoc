@@ -111,6 +111,30 @@ https://github.com/elastic/beats/compare/v8.18.4\...v8.19.0[View commits]
 - Add GCP metadata cache. {pull}44432[44432]
 - Add VPN metrics to meraki module {pull}44851[44851]
 
+[[release-notes-8.18.5]]
+=== Beats version 8.18.5
+https://github.com/elastic/beats/compare/v8.18.4\...v8.18.5[View commits]
+
+==== Bugfixes
+
+*Auditbeat*
+
+- auditd: Request status from a separate socket to avoid data congestion {pull}41207[41207]
+- hasher: Add a cached hasher for upcoming backend. {pull}41952[41952]
+- Fix potential data loss in add_session_metadata. {pull}42795[42795]
+
+*Metricbeat*
+
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
+
+
+==== Added
+
+*Metricbeat*
+
+- Improve error messages in AWS Health {pull}45408[45408]
+
+
 [[release-notes-8.18.4]]
 === Beats version 8.18.4
 https://github.com/elastic/beats/compare/v8.18.3\...v8.18.4[View commits]
@@ -360,6 +384,30 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Make the experimental API GA and rename it to winlogbeat-raw. {issue}39580[39580] {pull}41770[41770]
 - Remove 22 clause limitation. {issue}35047[35047] {pull}42187[42187]
 - Add handling for recoverable publisher disabled errors. {issue}35316[35316] {pull}42187[42187]
+
+[[release-notes-8.17.10]]
+=== Beats version 8.17.10
+https://github.com/elastic/beats/compare/v8.17.9\...v8.17.10[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
+
+*Metricbeat*
+
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
+
+==== Added
+
+*Filebeat*
+
+- Update CEL mito extensions to v1.19.0. {pull}44098[44098]
+
+*Metricbeat*
+
+- Improve error messages in AWS Health {pull}45408[45408]
 
 [[release-notes-8.17.9]]
 === Beats version 8.17.9
