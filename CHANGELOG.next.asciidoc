@@ -301,6 +301,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
 - Fix histogram values of zero are filtered out on non-amd64 platforms for openmetrics and prometheus {pull}44750[44750]
 - Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. {pull}45761[45761]
+- Enhance behavior of sanitizeError: replace sensitive info even if it is escaped and add pattern-based sanitization {pull}45857[45857]
 
 *Osquerybeat*
 
@@ -511,6 +512,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add mechanism to allow HTTP JSON templates to terminate without logging an error. {issue}45664[45664] {pull}45810[45810]
 - Improve error reporting for schemeless URLs in HTTP JSON input. {pull}45953[45953]
 - Add status reporting support for AWS S3 input. {pull}45748[45748]
+- Add `remaining_executions` global to the CEL input evaluation context. {pull}46210[46210]
 
 *Auditbeat*
 
