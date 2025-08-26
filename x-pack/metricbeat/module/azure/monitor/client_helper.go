@@ -34,7 +34,11 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 
 // getMappedResourceDefinitions is the shared logic that fetches, filters, and maps metrics.
 // It accepts a generic client to handle both synchronous and concurrent (batch) cases.
-func getMappedResourceDefinitions(client any, resource *armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
+func getMappedResourceDefinitions(
+	client any, resource *armresources.GenericResourceExpanded,
+	resourceConfig azure.ResourceConfig,
+) ([]azure.Metric, error) {
+
 	var metrics []azure.Metric
 	namespaceMetrics := make(map[string]armmonitor.MetricDefinitionCollection)
 
@@ -99,7 +103,13 @@ func getMappedResourceDefinitions(client any, resource *armresources.GenericReso
 	return metrics, nil
 }
 
-func mapMetricsWithFirstAllowedTimegrain(client interface{}, resource *armresources.GenericResourceExpanded, metric azure.MetricConfig, metricGroups map[string][]*armmonitor.MetricDefinition, dim []azure.Dimension) []azure.Metric {
+func mapMetricsWithFirstAllowedTimegrain(
+	client any, resource *armresources.GenericResourceExpanded,
+	metric azure.MetricConfig,
+	metricGroups map[string][]*armmonitor.MetricDefinition,
+	dim []azure.Dimension,
+) []azure.Metric {
+
 	var metrics []azure.Metric
 	// Need to leverage first available timegrain from each metric definition
 	for key, metricGroup := range metricGroups {
@@ -137,7 +147,13 @@ func mapMetricsWithFirstAllowedTimegrain(client interface{}, resource *armresour
 	return metrics
 }
 
-func mapMetricsWithUserTimegrain(client interface{}, resource *armresources.GenericResourceExpanded, metric azure.MetricConfig, metricGroups map[string][]*armmonitor.MetricDefinition, dim []azure.Dimension) []azure.Metric {
+func mapMetricsWithUserTimegrain(
+	client any, resource *armresources.GenericResourceExpanded,
+	metric azure.MetricConfig,
+	metricGroups map[string][]*armmonitor.MetricDefinition,
+	dim []azure.Dimension,
+) []azure.Metric {
+
 	var metrics []azure.Metric
 	for key, metricGroup := range metricGroups {
 		var metricNames []string
