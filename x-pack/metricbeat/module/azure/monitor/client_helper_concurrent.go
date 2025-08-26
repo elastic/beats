@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
+
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
