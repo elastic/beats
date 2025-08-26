@@ -126,7 +126,7 @@ func (ch *CachedHasher) HashFile(path string) (map[HashType]Digest, error) {
 	entry := hashEntry{hashes: hashes, statx: statx}
 	if ch.hashLRU.Add(path, entry) {
 		ch.stats.Evictions++
-		ch.log.Debugf("evict (%s)")
+		ch.log.Debugf("evict (%s)", path)
 	}
 
 	ch.log.Debugf("miss (%s) took %v", path, time.Since(x))

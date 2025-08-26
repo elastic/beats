@@ -56,7 +56,7 @@ type dnsConnectionData struct {
 func (dns *dnsPlugin) Parse(pkt *protos.Packet, tcpTuple *common.TCPTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
 	defer dns.logger.Recover("Dns ParseTcp")
 
-	dns.logger.Debugf("dns", "Parsing packet addressed with %s of length %d.", &pkt.Tuple, len(pkt.Payload))
+	dns.logger.Debugf("Parsing packet addressed with %s of length %d.", &pkt.Tuple, len(pkt.Payload))
 
 	conn := ensureDNSConnection(private, dns.logger)
 
@@ -99,7 +99,7 @@ func (dns *dnsPlugin) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTu
 
 		stream.rawData = append(stream.rawData, payload...)
 		if len(stream.rawData) > tcp.TCPMaxDataInStream {
-			dns.logger.Debugf("dns", "Stream data too large, dropping DNS stream")
+			dns.logger.Debug("Stream data too large, dropping DNS stream")
 			conn.data[dir] = nil
 			return conn
 		}
@@ -107,7 +107,7 @@ func (dns *dnsPlugin) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTu
 	decodedData, err := stream.handleTCPRawData()
 	if err != nil {
 		if err == incompleteMsg { //nolint:errorlint // incompleteMsg is not wrapped.
-			dns.logger.Debugf("dns", "Waiting for more raw data")
+			dns.logger.Debug("Waiting for more raw data")
 			return conn
 		}
 
@@ -115,7 +115,7 @@ func (dns *dnsPlugin) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTu
 			dns.publishResponseError(conn, err)
 		}
 
-		dns.logger.Debugf("dns", "%v addresses %s, length %d", err, tcpTuple, len(stream.rawData))
+		dns.logger.Debugf("%v addresses %s, length %d", err, tcpTuple, len(stream.rawData))
 
 		// This means that malformed requests or responses are being sent...
 		// TODO: publish the situation also if Request
@@ -187,7 +187,7 @@ func (dns *dnsPlugin) ReceivedFin(tcpTuple *common.TCPTuple, dir uint8, private 
 		dns.publishResponseError(conn, err)
 	}
 
-	dns.logger.Debugf("dns", "%v addresses %s, length %d", err, tcpTuple, len(stream.rawData))
+	dns.logger.Debugf("%v addresses %s, length %d", err, tcpTuple, len(stream.rawData))
 
 	return conn
 }
@@ -216,8 +216,8 @@ func (dns *dnsPlugin) GapInStream(tcpTuple *common.TCPTuple, dir uint8, nbytes i
 		dns.publishResponseError(conn, err)
 	}
 
-	dns.logger.Debugf("dns", "%v addresses %s, length %d", err, tcpTuple, len(stream.rawData))
-	dns.logger.Debugf("dns", "Dropping the stream %s", tcpTuple)
+	dns.logger.Debugf("%v addresses %s, length %d", err, tcpTuple, len(stream.rawData))
+	dns.logger.Debugf("Dropping the stream %s", tcpTuple)
 
 	// drop the stream because it is binary Data and it would be unexpected to have a decodable message later
 	return private, true

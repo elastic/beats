@@ -32,6 +32,8 @@ import (
 	"strings"
 	"sync"
 	"testing"
+
+	"github.com/elastic/beats/v7/libbeat/common/proc"
 )
 
 var (
@@ -49,6 +51,7 @@ type RunningBeat struct {
 	outputDone  chan struct{}
 	watcher     OutputWatcher
 	keepRunning bool
+	t           *testing.T
 }
 
 // CollectOutput returns the last `limit` lines of the currently
@@ -120,7 +123,9 @@ func (b *RunningBeat) writeOutputLine(line string) {
 	b.watcher.Inspect(line)
 	if b.watcher.Observed() {
 		if !b.keepRunning {
-			_ = b.c.Process.Kill()
+			if err := proc.StopCmd(b.c.Process); err != nil {
+				b.t.Logf("Cannot stop Beat: %s\n", err)
+			}
 		}
 		b.watcher = nil
 	}
@@ -175,6 +180,7 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 
 	t.Logf("running %s %s", binaryFilename, strings.Join(execArgs, " "))
 	c := exec.CommandContext(ctx, binaryFilename, execArgs...)
+	c.SysProcAttr = proc.GetSysProcAttr()
 
 	// we must use 2 pipes since writes are not aligned by lines
 	// part of the stdout output can end up in the middle of the stderr line
@@ -195,6 +201,7 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 		watcher:     watcher,
 		keepRunning: opts.KeepRunning,
 		outputDone:  make(chan struct{}),
+		t:           t,
 	}
 
 	var wg sync.WaitGroup

@@ -116,7 +116,12 @@ func (u *urlConfig) Unpack(in string) error {
 	if err != nil {
 		return err
 	}
-
+	if parsed.Scheme == "" {
+		// Note that this will not catch cases like host.name:9001/path/to/endpoint
+		// which will see "host.name" as the scheme of an opaque URI. These will
+		// get caught later.
+		return fmt.Errorf("url %q is missing scheme", in)
+	}
 	*u = urlConfig{URL: parsed}
 
 	return nil

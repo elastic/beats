@@ -110,7 +110,7 @@ perfmon
 ## wmi [_wmi]
 
 ```{applies_to}
-stack: beta
+stack: beta 9.1.0
 ```
 
 wmi

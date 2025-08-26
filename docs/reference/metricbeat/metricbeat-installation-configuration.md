@@ -102,6 +102,21 @@ tar xzvf metricbeat-{{version.stack}}-linux-x86_64.tar.gz
 :::{note}
 If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-metricbeat.ps1`.
 :::
+
+:::{important}
+```{applies_to}
+stack: ga 9.1.0, ga 9.0.6
+```
+The base folder has changed from `C:\ProgramData\` to `C:\Program Files\`
+because the latter has stricter permissions. The home path (base for
+state and logs) is now `C:\Program Files\Metricbeat-Data`.
+
+The install script (`install-service-metricbeat.ps1`) will check whether
+`C:\ProgramData\Metricbeat` exits and move it to `C:\Program Files\Metricbeat-Data`.
+For more details on the installation script refer to: [install script](/reference/metricbeat/metricbeat-installation-script.md).
+
+:::
+
 ::::::
 
 :::::::
@@ -332,8 +347,8 @@ Metricbeat comes with predefined assets for parsing, indexing, and visualizing y
     `-e` is optional and sends output to standard error instead of the configured log output.
 
 The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.1` `C:\Program Files\Metricbeat-Data\Logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\metricbeat\Logs`
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Metricbeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\metricbeat\logs`
 
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to Elasticsearch and deploys the sample dashboards for visualizing the data in Kibana.
 
@@ -407,10 +422,8 @@ PS C:\Program Files\metricbeat> Start-Service metricbeat
 ```
 
 The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.1` `C:\Program Files\Metricbeat-Data\Logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\metricbeat\Logs`
-
-For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\metricbeat\Logs`.
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Metricbeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\metricbeat\logs`
 
 ::::{note}
 On Windows, statistics about system load and swap usage are currently not captured

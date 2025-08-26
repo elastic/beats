@@ -10,12 +10,12 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"strings"
 	"testing"
 	"text/template"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
@@ -47,6 +47,9 @@ func TestGCPInputOTelE2E(t *testing.T) {
 	// create a random uuid and make sure it doesn't contain dashes/
 	otelNamespace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
 	fbNameSpace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
+
+	otelIndex := "logs-integration-" + otelNamespace
+	fbIndex := "logs-integration-" + fbNameSpace
 
 	type options struct {
 		Namespace    string
@@ -125,6 +128,14 @@ processors:
 	// prepare to query ES
 	es := integration.GetESClient(t, "http")
 
+	t.Cleanup(func() {
+		_, err := es.Indices.DeleteDataStream([]string{
+			otelIndex,
+			fbIndex,
+		})
+		require.NoError(t, err, "failed to delete indices")
+	})
+
 	rawQuery := map[string]any{
 		"query": map[string]any{
 			"match_phrase": map[string]any{
@@ -139,24 +150,22 @@ processors:
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
 	var err error
-	msg := &strings.Builder{}
 
 	// wait for logs to be published
-	require.Eventuallyf(t,
-		func() bool {
-			msg.Reset()
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
-			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-logs-integration-"+otelNamespace+"*", es)
-			msg.WriteString(fmt.Sprintf("failed to query ES for beat documents: %v", err))
+			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+otelIndex+"*", es)
+			assert.NoError(ct, err)
+			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 otel document, got %d", otelDocs.Hits.Total.Value)
 
-			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-logs-integration-"+fbNameSpace+"*", es)
-			msg.WriteString(fmt.Sprintf("failed to query ES for beat documents: %v", err))
-
-			return otelDocs.Hits.Total.Value >= 1 && filebeatDocs.Hits.Total.Value >= 1
+			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+fbIndex+"*", es)
+			assert.NoError(ct, err)
+			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat document, got %d", filebeatDocs.Hits.Total.Value)
 		},
-		3*time.Minute, 1*time.Second, "document indexed by fb-otel: %d, by fb-classic: %d: expected atleast one document by both modes: %s", otelDocs.Hits.Total.Value, filebeatDocs.Hits.Total.Value, msg)
+		3*time.Minute, 1*time.Second, "expected at least 1 document for both filebeat and otel modes")
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source

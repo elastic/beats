@@ -46,7 +46,10 @@ The host and TCP port to listen on for event streams.
 stack: ga 9.2.0
 ```
 
-The number of pipeline workers. Default: 1
+The number of pipeline workers. Default: 1. Increasing the number of
+workers can increase performance when the bottleneck is the time the
+processors take to run. The number of CPUs allocated to Filebeat is
+usually the best value for the number of workers.
 
 
 ### `network` [filebeat-input-tcp-tcp-network]

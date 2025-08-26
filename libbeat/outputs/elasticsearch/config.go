@@ -75,7 +75,7 @@ var (
 			Max:  60 * time.Second,
 		},
 		BulkMaxSize: defaultBulkSize,
-		Transport:   esDefaultTransportSettings(),
+		Transport:   ESDefaultTransportSettings(),
 	}
 )
 
@@ -83,7 +83,7 @@ func DefaultConfig() ElasticsearchConfig {
 	return defaultConfig
 }
 
-func esDefaultTransportSettings() httpcommon.HTTPTransportSettings {
+func ESDefaultTransportSettings() httpcommon.HTTPTransportSettings {
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	// The ES output differs from the common transport settings by having
 	// a 3-second idle timeout

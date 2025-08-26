@@ -222,7 +222,7 @@ func getStats(id string, reg *monitoring.Registry) *processorStats {
 		// If a module is reloaded then the namespace could already exist.
 		_ = processorReg.Clear()
 	} else {
-		processorReg = reg.NewRegistry(namespace, monitoring.DoNotReport)
+		processorReg = reg.GetOrCreateRegistry(namespace, monitoring.DoNotReport)
 	}
 
 	stats := &processorStats{

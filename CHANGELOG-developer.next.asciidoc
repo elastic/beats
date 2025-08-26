@@ -117,6 +117,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fixed flaky zookeeper integration tests. {pull}43638[43638]
 - Fixed Fileebat GCP Pub/Sub input integration tests. {pull}45150[45150]
 - `mage BuildSystemTestBinary` now build Otel enabled binaries for Filebeat and Metricbeat {pull}45824[45824]
+- testing/environments/docker/cometd: update base img version {pull}45889[45889]
 
 ==== Added
 

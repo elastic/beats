@@ -1,7 +1,7 @@
-FROM docker.elastic.co/observability/stream:v0.6.1
+FROM docker.elastic.co/observability/stream:v0.19.0
 
-RUN apt update && \
-    apt -y install curl
+RUN apk add --no-cache curl
+
 ENV PORT="8080"
 COPY files /files
 HEALTHCHECK --interval=1s --retries=600 CMD curl -X POST http://localhost:8080/token

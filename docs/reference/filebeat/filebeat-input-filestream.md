@@ -626,6 +626,10 @@ file_identity.inode_marker.path: /logs/.filebeat-marker
 
 ## Removing fully ingested files [filebeat-input-filestream-delete-options]
 
+```{applies_to}
+stack: ga 9.2.0
+```
+
 By default, Filestream input doesn't delete files. If option is turned
 on, Filestream input can delete files when those conditions are met:
  - The reader is closed. The default is 5 minutes of inactivity.
@@ -950,7 +954,7 @@ The following snippet configures Filebeat to read the `stdout` stream from all c
 
 #### `syslog` [_syslog]
 
-The `syslog` parser parses RFC 3146 and/or RFC 5424 formatted syslog messages.
+The `syslog` parser parses RFC 3164 and/or RFC 5424 formatted syslog messages.
 
 The supported configuration options are:
 
