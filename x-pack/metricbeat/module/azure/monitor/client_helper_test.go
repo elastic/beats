@@ -103,7 +103,7 @@ func MockMetricDefinitions() []*armmonitor.MetricDefinition {
 	return defs
 }
 
-func TestMapMetric(t *testing.T) {
+func TestMapMetricNoConfiguredTimegrain(t *testing.T) {
 	resource := MockResourceExpanded()
 	metricDefinitions := armmonitor.MetricDefinitionCollection{
 		Value: MockMetricDefinitions(),
