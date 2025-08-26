@@ -2,7 +2,7 @@
 
 This integration test framework aims to replace our Python one, it
 started small by implementing in Go the basic functionality and
-helpers provided by the Python one and since them it has been growing
+helpers provided by the Python one and since then it has been growing
 in features and helper functions.
 
 ## Beat Process Creation and Management
