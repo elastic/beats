@@ -80,13 +80,43 @@ func getMappedResourceDefinitions(client *azure.BatchClient, resourceId string, 
 				dim = append(dim, azure.Dimension(dimension))
 			}
 		}
-		for key, metricGroup := range metricGroups {
-			var metricNames []string
-			for _, metricName := range metricGroup {
-				metricNames = append(metricNames, *metricName.Name.Value)
-			}
-			metrics = append(metrics, client.CreateMetric(resourceId, "", metric.Namespace, location, subscriptionId, metricNames, key, dim, metric.Timegrain))
+		if metric.Timegrain == "" { // no timegrain provided in user config
+			metrics = append(metrics, mapConcurrentMetricsWithFirstAllowedTimegrain(client, resourceId, location, subscriptionId, metric, metricGroups, dim)...)
+		} else { // user-specified timegrain provided
+			metrics = append(metrics, mapConcurrentMetricsWithUserTimegrain(client, resourceId, location, subscriptionId, metric, metricGroups, dim)...)
 		}
 	}
 	return metrics, nil
+}
+
+func mapConcurrentMetricsWithFirstAllowedTimegrain(client *azure.BatchClient, resourceId string, location string, subscriptionId string, metric azure.MetricConfig, metricGroups map[string][]*armmonitor.MetricDefinition, dim []azure.Dimension) []azure.Metric {
+	var metrics []azure.Metric
+	// Need to leverage first available timegrain from each metric definition
+	for key, metricGroup := range metricGroups {
+		metricNamesByFirstTimegrain := make(map[string][]string)
+		for _, metricFromGroup := range metricGroup {
+			// combine like first timegrains
+			// we can sort these if we ever discover ordering is not guaranteed
+			metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain] = append(
+				metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain],
+				*metricFromGroup.Name.Value)
+		}
+		for timeGrain, metricNames := range metricNamesByFirstTimegrain {
+			metrics = append(metrics, client.CreateMetric(resourceId, "", metric.Namespace, location, subscriptionId, metricNames, key, dim, timeGrain))
+		}
+	}
+	return metrics
+}
+
+func mapConcurrentMetricsWithUserTimegrain(client *azure.BatchClient, resourceId string, location string, subscriptionId string, metric azure.MetricConfig, metricGroups map[string][]*armmonitor.MetricDefinition, dim []azure.Dimension) []azure.Metric {
+	var metrics []azure.Metric
+	// no need to grab timegrains from metric definition
+	for key, metricGroup := range metricGroups {
+		var metricNames []string
+		for _, metricName := range metricGroup {
+			metricNames = append(metricNames, *metricName.Name.Value)
+		}
+		metrics = append(metrics, client.CreateMetric(resourceId, "", metric.Namespace, location, subscriptionId, metricNames, key, dim, metric.Timegrain))
+	}
+	return metrics
 }
