@@ -69,7 +69,7 @@ doc collector scripts to regenerate the docs.
 Make sure you
 <<setting-up-dev-environment,set up your Beats development environment>> and use
 the correct Go version. The Go version is listed in the `version.asciidoc` file
-for the branch you want to update. 
+for the branch you want to update.
 
 To run the docs collector scripts, change to the beats directory and run:
 
@@ -108,7 +108,6 @@ generates
 
 * `auditbeat/docs/fields.asciidoc`
 * `filebeat/docs/fields.asciidoc`
-* `functionbeat/docs/fields.asciidoc`
 * `heartbeat/docs/fields.asciidoc`
 * `metricbeat/docs/fields.asciidoc`
 * `packetbeat/docs/fields.asciidoc`

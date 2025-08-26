@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type Namespace struct {
@@ -38,6 +39,11 @@ type pluginer interface {
 	Plugin() Constructor
 }
 
+var (
+	ErrExistsAlready           error = errors.New("exists already")
+	ErrPluginAlreadyRegistered error = errors.New("non-namespace plugin already registered")
+)
+
 func NewNamespace() *Namespace {
 	return &Namespace{
 		reg: map[string]pluginer{},
@@ -47,7 +53,7 @@ func NewNamespace() *Namespace {
 func (ns *Namespace) Register(name string, factory Constructor) error {
 	p := plugin{NewConditional(factory)}
 	names := strings.Split(name, ".")
-	if err := ns.add(names, p); err != nil {
+	if err := ns.add(names, p); err != nil && !errors.Is(err, ErrExistsAlready) && !errors.Is(err, ErrPluginAlreadyRegistered) {
 		return fmt.Errorf("plugin %s registration fail %w", name, err)
 	}
 	return nil
@@ -59,7 +65,7 @@ func (ns *Namespace) add(names []string, p pluginer) error {
 	// register plugin if intermediate node in path being processed
 	if len(names) == 1 {
 		if _, found := ns.reg[name]; found {
-			return fmt.Errorf("%v exists already", name)
+			return fmt.Errorf("%s %w", name, ErrExistsAlready)
 		}
 
 		ns.reg[name] = p
@@ -71,7 +77,7 @@ func (ns *Namespace) add(names []string, p pluginer) error {
 	if found {
 		ns, ok := tmp.(*Namespace)
 		if !ok {
-			return errors.New("non-namespace plugin already registered")
+			return ErrPluginAlreadyRegistered
 		}
 		return ns.add(names[1:], p)
 	}
@@ -87,7 +93,7 @@ func (ns *Namespace) add(names []string, p pluginer) error {
 }
 
 func (ns *Namespace) Plugin() Constructor {
-	return NewConditional(func(cfg *config.C) (beat.Processor, error) {
+	return NewConditional(func(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 		var section string
 		for _, name := range cfg.GetFields() {
 			if name == "when" { // TODO: remove check for "when" once fields are filtered
@@ -117,7 +123,7 @@ func (ns *Namespace) Plugin() Constructor {
 		}
 
 		constructor := backend.Plugin()
-		return constructor(config)
+		return constructor(config, log)
 	})
 }
 

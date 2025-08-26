@@ -45,7 +45,7 @@ type Server struct {
 var gceMetadataFetcher = provider{
 	Name: "google-gce",
 
-	Local: true,
+	DefaultEnabled: true,
 
 	Create: func(provider string, config *conf.C) (metadataFetcher, error) {
 		gceMetadataURI := "/computeMetadata/v1/?recursive=true&alt=json"

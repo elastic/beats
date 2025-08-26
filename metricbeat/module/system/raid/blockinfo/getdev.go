@@ -19,14 +19,15 @@ package blockinfo
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // ListAll lists all the multi-disk devices in a RAID array
 func ListAll(path string) ([]MDDevice, error) {
-	dir, err := ioutil.ReadDir(path)
+	dir, err := os.ReadDir(path)
 	if err != nil {
 		return nil, fmt.Errorf("could not read directory: %w", err)
 	}
@@ -44,7 +45,7 @@ func ListAll(path string) ([]MDDevice, error) {
 	}
 
 	if len(mds) == 0 {
-		return nil, fmt.Errorf("no matches from path %s", path)
+		return nil, mb.PartialMetricsError{Err: fmt.Errorf("no RAID devices found. You have probably enabled the RAID metrics on a non-RAID system.")}
 	}
 
 	return mds, nil
@@ -69,8 +70,5 @@ func getMDDevice(path string) (MDDevice, error) {
 // Right now, we're doing this by looking for an `md` directory in the device dir.
 func isMD(path string) bool {
 	_, err := os.Stat(filepath.Join(path, "md"))
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }

@@ -37,6 +37,8 @@ filebeat.inputs:
   - type: filestream
     id: filestream-input-id
     enabled: true
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
     parsers:
       - ndjson:
           target: ""

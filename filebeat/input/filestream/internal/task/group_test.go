@@ -21,7 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -95,7 +95,7 @@ func TestGroup_Go(t *testing.T) {
 
 		assert.Eventually(t,
 			func() bool { return want == runningCount.Load() },
-			time.Second, 100*time.Millisecond)
+			1*time.Second, 10*time.Millisecond)
 	})
 
 	t.Run("workloads wait for available worker", func(t *testing.T) {
@@ -158,7 +158,7 @@ func TestGroup_Go(t *testing.T) {
 		// Wait to ensure f1 and f2 are running, thus there is no workers free.
 		assert.Eventually(t,
 			func() bool { return int64(2) == runningCount.Load() },
-			100*time.Millisecond, time.Millisecond)
+			1*time.Second, 10*time.Millisecond)
 
 		err = g.Go(f3)
 		require.NoError(t, err)
@@ -170,7 +170,7 @@ func TestGroup_Go(t *testing.T) {
 			func() bool {
 				return f3Started.Load()
 			},
-			100*time.Millisecond, time.Millisecond)
+			1*time.Second, 10*time.Millisecond)
 
 		// If f3 started, f2 must have finished
 		assert.True(t, f2Finished.Load())
@@ -186,8 +186,8 @@ func TestGroup_Go(t *testing.T) {
 
 		assert.Eventually(t,
 			func() bool { return doneCount.Load() == 3 },
-			50*time.Millisecond,
-			time.Millisecond,
+			1*time.Second,
+			10*time.Millisecond,
 			"not all goroutines finished")
 	})
 
@@ -202,14 +202,13 @@ func TestGroup_Go(t *testing.T) {
 
 	t.Run("without limit, all goroutines run", func(t *testing.T) {
 		// 100 <= limit <= 10000
-		limit := rand.Int63n(10000-100) + 100
+		limit := rand.IntN(10000-100) + 100
 		t.Logf("running %d goroutines", limit)
 		g := NewGroup(uint64(limit), time.Second, noopLogger{}, "")
 
 		done := make(chan struct{})
 		var runningCounter atomic.Int64
-		var i int64
-		for i = 0; i < limit; i++ {
+		for i := 0; i < limit; i++ {
 			err := g.Go(func(context.Context) error {
 				runningCounter.Add(1)
 				defer runningCounter.Add(-1)
@@ -221,9 +220,9 @@ func TestGroup_Go(t *testing.T) {
 		}
 
 		assert.Eventually(t,
-			func() bool { return limit == runningCounter.Load() },
-			100*time.Millisecond,
-			time.Millisecond)
+			func() bool { return int64(limit) == runningCounter.Load() },
+			1*time.Second,
+			10*time.Millisecond)
 
 		close(done)
 		err := g.Stop()
@@ -253,7 +252,7 @@ func TestGroup_Go(t *testing.T) {
 
 		assert.Eventually(t, func() bool {
 			return count.Load() == want && logger.String() != ""
-		}, 100*time.Millisecond, time.Millisecond)
+		}, 1*time.Second, 10*time.Millisecond)
 
 		err = g.Stop()
 		require.NoError(t, err)
@@ -286,7 +285,7 @@ func TestGroup_Go(t *testing.T) {
 
 		assert.Eventually(t, func() bool {
 			return count.Load() == want && logger.String() != ""
-		}, 100*time.Millisecond, time.Millisecond, "not all workloads finished")
+		}, 1*time.Second, 10*time.Millisecond, "not all workloads finished")
 
 		assert.Contains(t, logger.String(), wantErr.Error())
 
@@ -329,20 +328,22 @@ func TestGroup_Go(t *testing.T) {
 
 func TestGroup_Stop(t *testing.T) {
 	t.Run("timeout", func(t *testing.T) {
-
-		g := NewGroup(1, time.Nanosecond, noopLogger{}, "")
+		g := NewGroup(50, time.Millisecond, noopLogger{}, "")
 
 		done := make(chan struct{})
+		wg := sync.WaitGroup{}
+		wg.Add(1)
 		defer func() { close(done) }()
 		err := g.Go(func(_ context.Context) error {
+			wg.Done() // signal that the goroutine is running
 			<-done
 			return nil
 		})
 		require.NoError(t, err, "could not launch goroutine")
-
-		time.Sleep(time.Nanosecond)
+		wg.Wait() // wait for the goroutine to start
 
 		err = g.Stop()
+		require.NotNil(t, err, "Stop should return a timeout error")
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})
 

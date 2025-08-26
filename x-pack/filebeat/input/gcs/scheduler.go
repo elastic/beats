@@ -17,7 +17,9 @@ import (
 	"google.golang.org/api/iterator"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -34,22 +36,30 @@ type scheduler struct {
 	src       *Source
 	cfg       *config
 	state     *state
+	status    status.StatusReporter
 	log       *logp.Logger
 	limiter   *limiter
+	metrics   *inputMetrics
 }
 
 // newScheduler, returns a new scheduler instance
 func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src *Source, cfg *config,
-	state *state, log *logp.Logger,
+	state *state, stat status.StatusReporter, metrics *inputMetrics, log *logp.Logger,
 ) *scheduler {
+	if metrics == nil {
+		// metrics are optional, initialize a stub if not provided
+		metrics = newInputMetrics(monitoring.NewRegistry())
+	}
 	return &scheduler{
 		publisher: publisher,
 		bucket:    bucket,
 		src:       src,
 		cfg:       cfg,
 		state:     state,
+		status:    stat,
 		log:       log,
 		limiter:   &limiter{limit: make(chan struct{}, src.MaxWorkers)},
+		metrics:   metrics,
 	}
 }
 
@@ -96,11 +106,14 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 		var objects []*storage.ObjectAttrs
 		nextPageToken, err := pager.NextPage(&objects)
 		if err != nil {
+			s.metrics.errorsTotal.Inc()
+			s.status.UpdateStatus(status.Failed, "failed to get page token from storage: "+err.Error())
 			return err
 		}
 		numObs += len(objects)
 		jobs := s.createJobs(objects, s.log)
 		s.log.Debugf("scheduler: %d objects fetched for current batch", len(objects))
+		s.metrics.gcsObjectsListedTotal.Add(uint64(len(objects)))
 
 		// If previous checkpoint was saved then look up starting point for new jobs
 		if !s.state.checkpoint().LatestEntryTime.IsZero() {
@@ -110,6 +123,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 			}
 		}
 		s.log.Debugf("scheduler: %d jobs scheduled for current batch", len(jobs))
+		s.metrics.gcsJobsScheduledAfterValidation.Update(int64(len(jobs)))
 
 		// distributes jobs among workers with the help of a limiter
 		for i, job := range jobs {
@@ -165,7 +179,7 @@ func (s *scheduler) createJobs(objects []*storage.ObjectAttrs, log *logp.Logger)
 		}
 
 		objectURI := "gs://" + s.src.BucketName + "/" + obj.Name
-		job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, log, false)
+		job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.status, s.metrics, log, false)
 		jobs = append(jobs, job)
 	}
 
@@ -201,7 +215,6 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 
 func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 	jobMap := make(map[string]bool)
-
 	for _, j := range jobs {
 		jobMap[j.Name()] = true
 	}
@@ -215,19 +228,19 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 			if err != nil {
 				if errors.Is(err, storage.ErrObjectNotExist) {
 					// if the object is not found in the bucket, then remove it from the failed job list
-					s.state.deleteFailedJob(name)
+					s.state.deleteFailedJob(name, s.metrics)
 					s.log.Debugf("scheduler: failed job %s not found in bucket %s", name, s.src.BucketName)
 				} else {
 					// if there is an error while validating the object,
 					// then update the failed job retry count and work towards natural removal
-					s.state.updateFailedJobs(name)
+					s.state.updateFailedJobs(name, s.metrics)
 					s.log.Errorf("scheduler: adding failed job %s to job list caused an error: %v", name, err)
 				}
 				continue
 			}
 
 			objectURI := "gs://" + s.src.BucketName + "/" + obj.Name
-			job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.log, true)
+			job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.status, s.metrics, s.log, true)
 			jobs = append(jobs, job)
 			s.log.Debugf("scheduler: adding failed job number %d with name %s to job current list", fj, job.Name())
 			fj++

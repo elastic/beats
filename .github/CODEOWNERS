@@ -12,23 +12,28 @@
 # https://github.community/t/codeowners-file-with-a-not-file-type-condition/1423/9
 CHANGELOG*
 
+# Top-level files ownership
+/catalog-info.yaml @elastic/observablt-ci @elastic/observablt-ci-contractors
 # The tech leads of the teams working in Beats share ownership of the Go module dependencies and related files.
-/.github/CODEOWNERS @elastic/beats-tech-leads
 /go.mod @elastic/beats-tech-leads
 /go.sum @elastic/beats-tech-leads
 /NOTICE.txt @elastic/beats-tech-leads
 
-/.ci/ @elastic/elastic-agent-data-plane @elastic/ingest-eng-prod
-/.github/ @elastic/ingest-eng-prod
+# Sub-directories/files ownership. Remember that order matters; the last matching pattern takes the most precedence.
+/.buildkite @elastic/observablt-ci
+/.ci/ @elastic/elastic-agent-data-plane @elastic/observablt-ci
+/.github/actions @elastic/observablt-ci
+/.github/workflows @elastic/observablt-ci
+/.github/CODEOWNERS @elastic/beats-tech-leads
 /auditbeat/ @elastic/sec-linux-platform
 /deploy/ @elastic/elastic-agent-data-plane
-/deploy/kubernetes @elastic/elastic-agent-data-plane @elastic/obs-cloudnative-monitoring
+/deploy/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /dev-tools/ @elastic/elastic-agent-data-plane
-/dev-tools/kubernetes @elastic/obs-ds-hosted-services
-/docs/ @elastic/elastic-agent-data-plane
+/dev-tools/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
+/docs/ @elastic/ingest-docs
 /filebeat @elastic/elastic-agent-data-plane
 /filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
-/filebeat/input/syslog/ @elastic/sec-deployment-and-devices
+/filebeat/input/syslog/ @elastic/integration-experience
 /filebeat/input/winlog/ @elastic/sec-windows-platform
 /filebeat/module/apache @elastic/obs-infraobs-integrations
 /filebeat/module/auditd @elastic/sec-linux-platform
@@ -43,8 +48,8 @@ CHANGELOG*
 /filebeat/module/mysql @elastic/obs-infraobs-integrations
 /filebeat/module/nats @elastic/obs-infraobs-integrations
 /filebeat/module/nginx @elastic/obs-infraobs-integrations
-/filebeat/module/osquery @elastic/sec-deployment-and-devices
-/filebeat/module/pensando @elastic/sec-deployment-and-devices
+/filebeat/module/osquery @elastic/integration-experience
+/filebeat/module/pensando @elastic/integration-experience
 /filebeat/module/postgresql @elastic/obs-infraobs-integrations
 /filebeat/module/redis @elastic/obs-infraobs-integrations
 /filebeat/module/santa @elastic/security-service-integrations
@@ -53,23 +58,26 @@ CHANGELOG*
 /heartbeat/ @elastic/obs-ds-hosted-services
 /journalbeat @elastic/elastic-agent-data-plane
 /libbeat/ @elastic/elastic-agent-data-plane
+/libbeat/autodiscover/providers/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /libbeat/docs/processors-list.asciidoc @elastic/ingest-docs
 /libbeat/management @elastic/elastic-agent-control-plane
+/libbeat/processors/add_cloud_metadata @elastic/obs-ds-hosted-services
+/libbeat/processors/add_kubernetes_metadata @elastic/elastic-agent-data-plane
 /libbeat/processors/cache/ @elastic/security-service-integrations
-/libbeat/processors/community_id/ @elastic/sec-deployment-and-devices
+/libbeat/processors/community_id/ @elastic/integration-experience
 /libbeat/processors/decode_xml/ @elastic/security-service-integrations
 /libbeat/processors/decode_xml_wineventlog/ @elastic/sec-windows-platform
-/libbeat/processors/dns/ @elastic/sec-deployment-and-devices
-/libbeat/processors/registered_domain/ @elastic/sec-deployment-and-devices
-/libbeat/processors/syslog/ @elastic/sec-deployment-and-devices
+/libbeat/processors/dns/ @elastic/integration-experience
+/libbeat/processors/registered_domain/ @elastic/integration-experience
+/libbeat/processors/syslog/ @elastic/integration-experience
+/libbeat/processors/translate_ldap_attribute/ @elastic/sec-windows-platform
 /libbeat/processors/translate_sid/ @elastic/sec-windows-platform
-/libbeat/processors/add_cloud_metadata @elastic/obs-cloud-monitoring
-/libbeat/processors/add_kubernetes_metadata @elastic/obs-cloudnative-monitoring
-/libbeat/reader/syslog/ @elastic/sec-deployment-and-devices
+/libbeat/reader/syslog/ @elastic/integration-experience
+/libbeat/scripts @elastic/observablt-ci @elastic/observablt-ci-contractors
 /licenses/ @elastic/elastic-agent-data-plane
 /metricbeat/ @elastic/elastic-agent-data-plane
 /metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
-/metricbeat/helper/kubernetes @elastic/obs-cloudnative-monitoring
+/metricbeat/helper/kubernetes @elastic/obs-ds-hosted-services
 /metricbeat/module/aerospike @elastic/obs-infraobs-integrations
 /metricbeat/module/apache @elastic/obs-infraobs-integrations
 /metricbeat/module/beat/ @elastic/stack-monitoring
@@ -84,20 +92,21 @@ CHANGELOG*
 /metricbeat/module/jolokia @elastic/obs-infraobs-integrations
 /metricbeat/module/kafka @elastic/obs-infraobs-integrations
 /metricbeat/module/kibana/ @elastic/stack-monitoring
-/metricbeat/module/kubernetes/ @elastic/obs-cloudnative-monitoring
+/metricbeat/module/kubernetes/ @elastic/obs-ds-hosted-services
 /metricbeat/module/logstash/ @elastic/stack-monitoring
 /metricbeat/module/memcached @elastic/obs-infraobs-integrations
 /metricbeat/module/mongodb @elastic/obs-infraobs-integrations
 /metricbeat/module/mysql @elastic/obs-infraobs-integrations
-/metricbeat/module/nats/ @elastic/obs-cloudnative-monitoring
+/metricbeat/module/nats/ @elastic/obs-ds-hosted-services
 /metricbeat/module/nginx @elastic/obs-infraobs-integrations
 /metricbeat/module/php_fpm @elastic/obs-infraobs-integrations
-/metricbeat/module/prometheus/ @elastic/obs-cloudnative-monitoring
+/metricbeat/module/prometheus/ @elastic/obs-ds-hosted-services
 /metricbeat/module/postgresql @elastic/obs-infraobs-integrations
 /metricbeat/module/rabbitmq @elastic/obs-infraobs-integrations
 /metricbeat/module/redis @elastic/obs-infraobs-integrations
 /metricbeat/module/system/ @elastic/elastic-agent-data-plane
 /metricbeat/module/vsphere @elastic/obs-infraobs-integrations
+/metricbeat/module/windows/wmi @elastic/obs-infraobs-integrations
 /metricbeat/module/zookeeper @elastic/obs-infraobs-integrations
 /packetbeat/ @elastic/sec-linux-platform
 /script/ @elastic/elastic-agent-data-plane
@@ -109,10 +118,10 @@ CHANGELOG*
 /x-pack/filebeat @elastic/elastic-agent-data-plane
 /x-pack/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /x-pack/filebeat/docs/inputs/input-salesforce.asciidoc @elastic/obs-infraobs-integrations
-/x-pack/filebeat/input/awscloudwatch/ @elastic/obs-cloud-monitoring
-/x-pack/filebeat/input/awss3/ @elastic/obs-cloud-monitoring
+/x-pack/filebeat/input/awscloudwatch/ @elastic/obs-ds-hosted-services
+/x-pack/filebeat/input/awss3/ @elastic/obs-ds-hosted-services
 /x-pack/filebeat/input/azureblobstorage/ @elastic/security-service-integrations
-/x-pack/filebeat/input/azureeventhub/ @elastic/obs-cloud-monitoring
+/x-pack/filebeat/input/azureeventhub/ @elastic/obs-ds-hosted-services
 /x-pack/filebeat/input/cel/ @elastic/security-service-integrations
 /x-pack/filebeat/input/cometd/ @elastic/obs-infraobs-integrations
 /x-pack/filebeat/input/entityanalytics/ @elastic/security-service-integrations
@@ -125,61 +134,61 @@ CHANGELOG*
 /x-pack/filebeat/input/internal/httpmon @elastic/security-service-integrations
 /x-pack/filebeat/input/internal/private @elastic/security-service-integrations
 /x-pack/filebeat/input/lumberjack/ @elastic/security-service-integrations
-/x-pack/filebeat/input/netflow/ @elastic/sec-deployment-and-devices
+/x-pack/filebeat/input/netflow/ @elastic/integration-experience
 /x-pack/filebeat/input/o365audit/ @elastic/security-service-integrations
 /x-pack/filebeat/input/salesforce @elastic/obs-infraobs-integrations
 /x-pack/filebeat/input/streaming/ @elastic/security-service-integrations
 /x-pack/filebeat/module/activemq @elastic/obs-infraobs-integrations
-/x-pack/filebeat/module/aws @elastic/obs-cloud-monitoring
-/x-pack/filebeat/module/awsfargate @elastic/obs-cloud-monitoring
-/x-pack/filebeat/module/azure @elastic/obs-cloud-monitoring
+/x-pack/filebeat/module/aws @elastic/obs-ds-hosted-services
+/x-pack/filebeat/module/awsfargate @elastic/obs-ds-hosted-services
+/x-pack/filebeat/module/azure @elastic/obs-ds-hosted-services
 /x-pack/filebeat/module/barracuda @elastic/security-service-integrations
-/x-pack/filebeat/module/bluecoat @elastic/sec-deployment-and-devices
-/x-pack/filebeat/module/cef @elastic/sec-deployment-and-devices
-/x-pack/filebeat/module/checkpoint @elastic/sec-deployment-and-devices
-/x-pack/filebeat/module/cisco @elastic/sec-deployment-and-devices
-/x-pack/filebeat/module/coredns @elastic/sec-deployment-and-devices
+/x-pack/filebeat/module/bluecoat @elastic/integration-experience
+/x-pack/filebeat/module/cef @elastic/integration-experience
+/x-pack/filebeat/module/checkpoint @elastic/integration-experience
+/x-pack/filebeat/module/cisco @elastic/integration-experience
+/x-pack/filebeat/module/coredns @elastic/integration-experience
 /x-pack/filebeat/module/crowdstrike @elastic/security-service-integrations
 /x-pack/filebeat/module/cyberarkpas @elastic/security-service-integrations
 /x-pack/filebeat/module/cylance @elastic/security-service-integrations
-/x-pack/filebeat/module/envoyproxy @elastic/sec-deployment-and-devices
+/x-pack/filebeat/module/envoyproxy @elastic/integration-experience
 /x-pack/filebeat/module/f5 @elastic/security-service-integrations
-/x-pack/filebeat/module/fortinet @elastic/sec-deployment-and-devices
+/x-pack/filebeat/module/fortinet @elastic/integration-experience
 /x-pack/filebeat/module/gcp @elastic/security-service-integrations
 /x-pack/filebeat/module/google_workspace @elastic/security-service-integrations
 /x-pack/filebeat/module/ibmmq @elastic/obs-infraobs-integrations
-/x-pack/filebeat/module/imperva @elastic/sec-deployment-and-devices
+/x-pack/filebeat/module/imperva @elastic/integration-experience
 /x-pack/filebeat/module/infoblox @elastic/security-service-integrations
-/x-pack/filebeat/module/iptables @elastic/sec-deployment-and-devices
-/x-pack/filebeat/module/juniper @elastic/sec-deployment-and-devices
+/x-pack/filebeat/module/iptables @elastic/integration-experience
+/x-pack/filebeat/module/juniper @elastic/integration-experience
 /x-pack/filebeat/module/microsoft @elastic/sec-windows-platform
 /x-pack/filebeat/module/misp @elastic/security-service-integrations
 /x-pack/filebeat/module/mssql @elastic/obs-infraobs-integrations
 /x-pack/filebeat/module/mysqlenterprise @elastic/sec-windows-platform
-/x-pack/filebeat/module/netflow @elastic/sec-deployment-and-devices
-/x-pack/filebeat/module/netscout @elastic/sec-deployment-and-devices
+/x-pack/filebeat/module/netflow @elastic/integration-experience
+/x-pack/filebeat/module/netscout @elastic/integration-experience
 /x-pack/filebeat/module/o365 @elastic/security-service-integrations
 /x-pack/filebeat/module/okta @elastic/security-service-integrations
 /x-pack/filebeat/module/oracle @elastic/obs-infraobs-integrations
-/x-pack/filebeat/module/panw @elastic/sec-deployment-and-devices
+/x-pack/filebeat/module/panw @elastic/integration-experience
 /x-pack/filebeat/module/proofpoint @elastic/security-service-integrations
 /x-pack/filebeat/module/rabbitmq @elastic/obs-infraobs-integrations
-/x-pack/filebeat/module/radware @elastic/sec-deployment-and-devices
+/x-pack/filebeat/module/radware @elastic/integration-experience
 /x-pack/filebeat/module/salesforce @elastic/obs-infraobs-integrations
-/x-pack/filebeat/module/snort @elastic/sec-deployment-and-devices
+/x-pack/filebeat/module/snort @elastic/integration-experience
 /x-pack/filebeat/module/snyk @elastic/security-service-integrations
-/x-pack/filebeat/module/sonicwall @elastic/sec-deployment-and-devices
-/x-pack/filebeat/module/sophos @elastic/sec-deployment-and-devices
-/x-pack/filebeat/module/squid @elastic/sec-deployment-and-devices
-/x-pack/filebeat/module/suricata @elastic/sec-deployment-and-devices
+/x-pack/filebeat/module/sonicwall @elastic/integration-experience
+/x-pack/filebeat/module/sophos @elastic/integration-experience
+/x-pack/filebeat/module/squid @elastic/integration-experience
+/x-pack/filebeat/module/suricata @elastic/integration-experience
 /x-pack/filebeat/module/threatintel @elastic/security-service-integrations
 /x-pack/filebeat/module/tomcat @elastic/obs-infraobs-integrations
-/x-pack/filebeat/module/zeek @elastic/sec-deployment-and-devices
+/x-pack/filebeat/module/zeek @elastic/integration-experience
 /x-pack/filebeat/module/zookeeper @elastic/obs-infraobs-integrations
 /x-pack/filebeat/module/zoom @elastic/security-service-integrations
 /x-pack/filebeat/module/zscaler @elastic/security-service-integrations
 /x-pack/filebeat/modules.d/zoom.yml.disabled @elastic/security-service-integrations
-/x-pack/filebeat/processors/decode_cef/ @elastic/sec-deployment-and-devices
+/x-pack/filebeat/processors/decode_cef/ @elastic/integration-experience
 /x-pack/heartbeat/ @elastic/obs-ds-hosted-services
 /x-pack/libbeat/reader/parquet/ @elastic/security-service-integrations
 /x-pack/libbeat/reader/etw/ @elastic/sec-windows-platform
@@ -193,7 +202,7 @@ CHANGELOG*
 /x-pack/metricbeat/module/azure/billing @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/cloudfoundry @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/cockroachdb @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/containerd/ @elastic/obs-cloudnative-monitoring
+/x-pack/metricbeat/module/containerd/ @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/coredns @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/enterprisesearch @elastic/app-search-team
 /x-pack/metricbeat/module/gcp @elastic/obs-ds-hosted-services @elastic/obs-infraobs-integrations
@@ -214,22 +223,17 @@ CHANGELOG*
 /x-pack/metricbeat/module/gcp/storage @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/ibmmq @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/iis @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/istio/ @elastic/obs-cloudnative-monitoring
+/x-pack/metricbeat/module/istio/ @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/mssql @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/openai @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/oracle @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/panw @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/prometheus/ @elastic/obs-cloudnative-monitoring
+/x-pack/metricbeat/module/prometheus/ @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/redisenterprise @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/sql @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/statsd @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/stan/ @elastic/obs-cloudnative-monitoring
+/x-pack/metricbeat/module/stan/ @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/tomcat @elastic/obs-infraobs-integrations
-/x-pack/osquerybeat/ @elastic/sec-deployment-and-devices
+/x-pack/osquerybeat/ @elastic/integration-experience
 /x-pack/packetbeat/ @elastic/sec-linux-platform
 /x-pack/winlogbeat/ @elastic/sec-windows-platform
-
-# Ownership of CI or related files by the Ingest Eng Prod team
-/.buildkite @elastic/ingest-eng-prod
-/catalog-info.yaml @elastic/ingest-eng-prod
-/libbeat/scripts @elastic/ingest-eng-prod
-/metricbeat/tests @elastic/ingest-eng-prod

@@ -84,6 +84,9 @@ this option usually results in simpler configuration files. If the pipeline is
 configured both in the input and output, the option from the
 input is used.
 
+IMPORTANT: The `pipeline` is always lowercased. If `pipeline: Foo-Bar`, then
+the pipeline name in {es} needs to be defined as `foo-bar`.
+
 [float]
 ===== `keep_null`
 

@@ -28,6 +28,8 @@ import (
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
 
+	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
@@ -55,6 +57,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create vSphere metricset: %w", err)
 	}
+
+	security.WarnIfInsecure(ms.Logger(), "network", ms.Insecure)
 	return &NetworkMetricSet{ms}, nil
 }
 

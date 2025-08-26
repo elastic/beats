@@ -9,6 +9,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -22,7 +23,7 @@ type InputManager struct {
 
 var _ v2.InputManager = InputManager{}
 
-func NewInputManager(log *logp.Logger, store inputcursor.StateStore) InputManager {
+func NewInputManager(log *logp.Logger, store statestore.States) InputManager {
 	return InputManager{
 		cursor: &inputcursor.InputManager{
 			Logger:     log,
@@ -33,12 +34,25 @@ func NewInputManager(log *logp.Logger, store inputcursor.StateStore) InputManage
 	}
 }
 
-func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
+func cursorConfigure(cfg *conf.C, logger *logp.Logger) ([]inputcursor.Source, inputcursor.Input, error) {
 	src := &source{cfg: defaultConfig()}
 	if err := cfg.Unpack(&src.cfg); err != nil {
 		return nil, nil, err
 	}
+	src.cfg.checkUnsupportedParams(logger)
 	return []inputcursor.Source{src}, input{}, nil
+}
+
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+func (c config) checkUnsupportedParams(logger *logp.Logger) {
+	if c.RecordCoverage {
+		logger.Named("cel").Warn("execution coverage enabled: " +
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-record-coverage")
+	}
+	if c.Redact == nil {
+		logger.Named("cel").Warn("missing recommended 'redact' configuration: " +
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-state-redact")
+	}
 }
 
 type source struct{ cfg config }

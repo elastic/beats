@@ -31,7 +31,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -39,7 +39,7 @@ spec:
       name: beats
       description: "Beats Main pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/pipeline.yml"
       provider_settings:
         build_pull_request_forks: false
@@ -51,9 +51,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -81,7 +81,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -89,7 +89,7 @@ spec:
       name: beats-metricbeat
       description: "Beats Metricbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/metricbeat/pipeline.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -102,9 +102,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       env:
         # TODO set to truue once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -128,7 +128,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -136,7 +136,7 @@ spec:
       name: filebeat
       description: "Filebeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/filebeat/filebeat-pipeline.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -149,9 +149,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       env:
         # TODO set to truue once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -175,7 +175,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -196,9 +196,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -222,7 +222,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -230,7 +230,7 @@ spec:
       name: heartbeat
       description: "Heartbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/heartbeat/heartbeat-pipeline.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -243,9 +243,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -269,7 +269,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -290,9 +290,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -316,7 +316,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -324,7 +324,7 @@ spec:
       name: beats-libbeat
       description: "Beats libbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/libbeat/pipeline.libbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -337,9 +337,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -363,7 +363,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -371,7 +371,7 @@ spec:
       name: beats-packetbeat
       description: "Beats packetbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/packetbeat/pipeline.packetbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -384,9 +384,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -410,7 +410,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -430,9 +430,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -456,7 +456,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -464,7 +464,7 @@ spec:
       name: beats-winlogbeat
       description: "Beats winlogbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/winlogbeat/pipeline.winlogbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -477,9 +477,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -503,7 +503,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -511,7 +511,7 @@ spec:
       name: beats-xpack-winlogbeat
       description: "Beats x-pack winlogbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.winlogbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -524,9 +524,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -550,7 +550,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -558,7 +558,7 @@ spec:
       name: beats-xpack-packetbeat
       description: "Beats x-pack packetbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.packetbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -571,9 +571,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -597,7 +597,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -605,7 +605,7 @@ spec:
       name: beats-xpack-libbeat
       description: "Beats x-pack libbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.libbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -618,9 +618,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -644,7 +644,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -652,7 +652,7 @@ spec:
       name: beats-xpack-metricbeat
       description: "Beats x-pack metricbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.metricbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -665,9 +665,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -690,7 +690,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -725,7 +725,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -761,7 +761,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -782,9 +782,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -808,7 +808,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -829,9 +829,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -855,7 +855,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -876,9 +876,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -902,7 +902,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -923,9 +923,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -949,7 +949,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -970,9 +970,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -996,7 +996,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -1017,9 +1017,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !8.*"
+      skip_intermediate_builds_branch_filter: "!main !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -1043,7 +1043,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -1053,7 +1053,7 @@ spec:
     spec:
       repository: elastic/beats
       pipeline_file: ".buildkite/packaging.pipeline.yml"
-      branch_configuration: "main 8.* 7.17"
+      branch_configuration: "main 8.* 7.17 9.*"
       cancel_intermediate_builds: false
       skip_intermediate_builds: false
       maximum_timeout_in_minutes: 90
@@ -1092,7 +1092,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -1102,7 +1102,7 @@ spec:
     spec:
       repository: elastic/beats
       pipeline_file: ".buildkite/ironbank-validation.yml"
-      branch_configuration: "main 8.* 7.17"
+      branch_configuration: "main 8.* 7.17 9.*"
       cancel_intermediate_builds: false
       skip_intermediate_builds: false
       provider_settings:
@@ -1128,7 +1128,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
@@ -1154,6 +1154,49 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
+  name: beats-macos-tests
+  description: 'Runs of Beats macOS tests'
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-macos-tests
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: platform-ingest
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-macos-tests
+      description: 'Runs of Beats macOS tests'
+    spec:
+      repository: elastic/beats
+      pipeline_file: ".buildkite/macos-tests-pipeline.yml"
+      cancel_intermediate_builds: false
+      provider_settings:
+        trigger_mode: none
+      env:
+        ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
+        SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
+        SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
+      schedules:
+        Weekly main:
+          branch: main
+          cronline: 0 0 * * 0
+          message: Weekly build of macOS tests
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        release-eng:
+          access_level: BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
   name: beats-pipeline-scheduler
   description: 'Scheduled runs of various Beats pipelines per release branch'
   links:
@@ -1162,7 +1205,7 @@ metadata:
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
-  system: buildkite
+  system: platform-ingest
   implementation:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline

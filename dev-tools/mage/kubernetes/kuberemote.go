@@ -23,14 +23,14 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"encoding/hex"
 	"encoding/pem"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -127,11 +127,17 @@ func (r *KubeRemote) Run(env map[string]string, stdout io.Writer, stderr io.Writ
 	if err != nil {
 		return err
 	}
-	go f.ForwardPorts()
+	go func() {
+		if err := f.ForwardPorts(); err != nil {
+			log.Printf("forward port error: %v\n", err)
+		}
+	}()
 	<-readyChannel
 
 	// perform the rsync
-	r.rsync(randomPort, stderr, stderr)
+	if err := r.rsync(randomPort, stderr, stderr, r.syncDir, r.destDir); err != nil {
+		return fmt.Errorf("rsync failed: %w", err)
+	}
 
 	// stop port forwarding
 	close(stopChannel)
@@ -258,14 +264,14 @@ func (r *KubeRemote) portForward(ports []string, stopChannel, readyChannel chan 
 	}
 
 	path := fmt.Sprintf("/api/v1/namespaces/%s/pods/%s/portforward", r.namespace, r.name)
-	hostIP := strings.TrimLeft(r.cfg.Host, "https://")
+	hostIP := strings.TrimPrefix(r.cfg.Host, "https://")
 	serverURL := url.URL{Scheme: "https", Path: path, Host: hostIP}
 	dialer := spdy.NewDialer(upgrader, &http.Client{Transport: roundTripper}, http.MethodPost, &serverURL)
 	return portforward.New(dialer, ports, stopChannel, readyChannel, stdout, stderr)
 }
 
 // rsync performs the rsync of sync directory to destination directory inside of the pod.
-func (r *KubeRemote) rsync(port uint16, stdout, stderr io.Writer) error {
+func (r *KubeRemote) rsync(port uint16, stdout, stderr io.Writer, src string, dst string) error {
 	privateKeyFile, err := createTempFile(r.privateKey)
 	if err != nil {
 		return err
@@ -274,8 +280,8 @@ func (r *KubeRemote) rsync(port uint16, stdout, stderr io.Writer) error {
 	rsh := fmt.Sprintf("ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -p %d -i %s", port, privateKeyFile)
 	args := []string{
 		"--rsh", rsh,
-		"-a", fmt.Sprintf("%s/", r.syncDir),
-		fmt.Sprintf("root@localhost:%s", r.destDir),
+		"-a", fmt.Sprintf("%s/", src),
+		fmt.Sprintf("root@localhost:%s", dst),
 	}
 	cmd := exec.Command("rsync", args...)
 	cmd.Stdout = stdout
@@ -491,6 +497,10 @@ func createPodManifest(name string, image string, env map[string]string, cmd []s
 							Name:      "destdir",
 							MountPath: destDir,
 						},
+						{
+							Name:      "gomodcache",
+							MountPath: "/go/pkg/mod",
+						},
 					},
 				},
 			},
@@ -508,6 +518,14 @@ func createPodManifest(name string, image string, env map[string]string, cmd []s
 					Name: "destdir",
 					VolumeSource: apiv1.VolumeSource{
 						EmptyDir: &apiv1.EmptyDirVolumeSource{},
+					},
+				},
+				{
+					Name: "gomodcache",
+					VolumeSource: apiv1.VolumeSource{
+						HostPath: &apiv1.HostPathVolumeSource{
+							Path: "/go/pkg/mod",
+						},
 					},
 				},
 			},
@@ -542,7 +560,7 @@ func isInitContainersReady(pod *apiv1.Pod) bool {
 }
 
 func isScheduled(pod *apiv1.Pod) bool {
-	if &pod.Status != nil && len(pod.Status.Conditions) > 0 {
+	if len(pod.Status.Conditions) > 0 {
 		for _, condition := range pod.Status.Conditions {
 			if condition.Type == apiv1.PodScheduled &&
 				condition.Status == apiv1.ConditionTrue {
@@ -554,18 +572,15 @@ func isScheduled(pod *apiv1.Pod) bool {
 }
 
 func isInitContainersRunning(pod *apiv1.Pod) bool {
-	if &pod.Status != nil {
-		if len(pod.Spec.InitContainers) != len(pod.Status.InitContainerStatuses) {
+	if len(pod.Spec.InitContainers) != len(pod.Status.InitContainerStatuses) {
+		return false
+	}
+	for _, status := range pod.Status.InitContainerStatuses {
+		if status.State.Running == nil {
 			return false
 		}
-		for _, status := range pod.Status.InitContainerStatuses {
-			if status.State.Running == nil {
-				return false
-			}
-		}
-		return true
 	}
-	return false
+	return true
 }
 
 func containerRunning(containerName string) func(watch.Event) (bool, error) {
@@ -620,9 +635,7 @@ func podDone(event watch.Event) (bool, error) {
 }
 
 func createTempFile(content []byte) (string, error) {
-	randBytes := make([]byte, 16)
-	rand.Read(randBytes)
-	tmpfile, err := ioutil.TempFile("", hex.EncodeToString(randBytes))
+	tmpfile, err := os.CreateTemp("", "kuberemote-")
 	if err != nil {
 		return "", err
 	}

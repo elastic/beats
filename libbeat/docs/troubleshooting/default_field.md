@@ -306,7 +306,6 @@ PUT /metricbeat-6.6.2-2019.04.09/_settings
         "windows.service.name",
         "windows.service.start_type",
         "windows.service.state",
-        "zookeeper.mntr.hostname",
         "zookeeper.mntr.server_state",
         "zookeeper.mntr.version",
         "fields.*"

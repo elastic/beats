@@ -22,15 +22,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Shopify/sarama"
-
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/sarama"
 )
 
 type kafkaInputConfig struct {
@@ -148,7 +148,7 @@ func (c *kafkaInputConfig) Validate() error {
 	return nil
 }
 
-func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
+func newSaramaConfig(config kafkaInputConfig, logger *logp.Logger) (*sarama.Config, error) {
 	k := sarama.NewConfig()
 
 	version, ok := config.Version.Get()
@@ -172,7 +172,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	k.Consumer.Group.Rebalance.Retry.Backoff = config.Rebalance.RetryBackoff
 	k.Consumer.Group.Rebalance.Retry.Max = config.Rebalance.MaxRetries
 
-	tls, err := tlscommon.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(config.TLS, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +182,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	}
 
 	if config.Kerberos.IsEnabled() {
-		cfgwarn.Beta("Kerberos authentication for Kafka is beta.")
+		logger.Warn(cfgwarn.Beta("Kerberos authentication for Kafka is beta."))
 
 		k.Net.SASL.Enable = true
 		k.Net.SASL.Mechanism = sarama.SASLTypeGSSAPI
@@ -241,8 +241,8 @@ func (off *initialOffset) Unpack(value string) error {
 
 func (st rebalanceStrategy) asSaramaStrategy() sarama.BalanceStrategy {
 	return map[rebalanceStrategy]sarama.BalanceStrategy{
-		rebalanceStrategyRange:      sarama.BalanceStrategyRange,
-		rebalanceStrategyRoundRobin: sarama.BalanceStrategyRoundRobin,
+		rebalanceStrategyRange:      sarama.NewBalanceStrategyRange(),
+		rebalanceStrategyRoundRobin: sarama.NewBalanceStrategyRoundRobin(),
 	}[st]
 }
 

@@ -26,7 +26,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
+	"github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // chainBuilder builds a new processor chain.
@@ -45,7 +47,7 @@ func newChainBuilder(runtime *goja.Runtime) func(call goja.ConstructorCall) *goj
 		}
 
 		c := &chainBuilder{runtime: runtime, this: call.This}
-		for name, fn := range registry.Constructors() {
+		for name, fn := range registry.Registry.Constructors() {
 			_ = c.this.Set(name, c.makeBuilderFunc(fn))
 		}
 		_ = call.This.Set("Add", c.Add)
@@ -150,7 +152,8 @@ func newNativeProcessor(constructor processors.Constructor, call gojaCall) (proc
 		cfg = config.NewConfig()
 	}
 
-	p, err := constructor(cfg)
+	// TODO: use a local logger here instead
+	p, err := constructor(cfg, logp.NewLogger(""))
 	if err != nil {
 		return nil, err
 	}

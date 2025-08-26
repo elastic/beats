@@ -50,7 +50,7 @@ type InputManager struct {
 	Logger *logp.Logger
 
 	// StateStore gives the InputManager access to the persistent key value store.
-	StateStore StateStore
+	StateStore statestore.States
 
 	// Type must contain the name of the input type. It is used to create the key name
 	// for all sources the inputs collect from.
@@ -62,7 +62,7 @@ type InputManager struct {
 
 	// Configure returns an array of Sources, and a configured Input instances
 	// that will be used to collect events from each source.
-	Configure func(cfg *conf.C) (Prospector, Harvester, error)
+	Configure func(cfg *conf.C, log *logp.Logger) (Prospector, Harvester, error)
 
 	initOnce   sync.Once
 	initErr    error
@@ -85,12 +85,6 @@ var errNoInputRunner = errors.New("no input runner available")
 // globalInputID is a default ID for inputs created without an ID
 // Deprecated: Inputs without an ID are not supported anymore.
 const globalInputID = ".global"
-
-// StateStore interface and configurations used to give the Manager access to the persistent store.
-type StateStore interface {
-	Access() (*statestore.Store, error)
-	CleanupInterval() time.Duration
-}
 
 func (cim *InputManager) init() error {
 	cim.initOnce.Do(func() {
@@ -149,7 +143,7 @@ func (cim *InputManager) shutdown() {
 
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
-func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
+func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	if err := cim.init(); err != nil {
 		return nil, err
 	}
@@ -168,13 +162,13 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 			" duplication, please add an ID and restart Filebeat")
 	}
 
-	metricsID := settings.ID
+	idAlreadyInUse := false
 	cim.idsMux.Lock()
 	if _, exists := cim.ids[settings.ID]; exists {
+		idAlreadyInUse = true
 		cim.Logger.Errorf("filestream input with ID '%s' already exists, this "+
 			"will lead to data duplication, please use a different ID. Metrics "+
 			"collection has been disabled on this input.", settings.ID)
-		metricsID = ""
 	}
 
 	// TODO: improve how inputs with empty IDs are tracked.
@@ -182,7 +176,17 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	cim.ids[settings.ID] = struct{}{}
 	cim.idsMux.Unlock()
 
-	prospector, harvester, err := cim.Configure(config)
+	defer func() {
+		// If there is any error creating the input, remove it from the IDs list
+		// if there wasn't any other input running with this ID.
+		if retErr != nil && !idAlreadyInUse {
+			cim.idsMux.Lock()
+			delete(cim.ids, settings.ID)
+			cim.idsMux.Unlock()
+		}
+	}()
+
+	prospector, harvester, err := cim.Configure(config, cim.Logger)
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +221,6 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		manager:          cim,
 		ackCH:            cim.ackCH,
 		userID:           settings.ID,
-		metricsID:        metricsID,
 		prospector:       prospector,
 		harvester:        harvester,
 		sourceIdentifier: sourceIdentifier,

@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestLogFileTimedClosing(t *testing.T) {
@@ -60,7 +61,7 @@ func TestLogFileTimedClosing(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			reader, err := newFileReader(
-				logp.L(),
+				logp.NewNopLogger(),
 				context.TODO(),
 				f,
 				readerConfig{},
@@ -90,7 +91,7 @@ func TestLogFileTruncated(t *testing.T) {
 	defer f.Close()
 	defer os.Remove(f.Name())
 
-	reader, err := newFileReader(logp.L(), context.TODO(), f, readerConfig{}, closerConfig{})
+	reader, err := newFileReader(logptest.NewTestingLogger(t, ""), context.TODO(), f, readerConfig{}, closerConfig{})
 	if err != nil {
 		t.Fatalf("error while creating logReader: %+v", err)
 	}

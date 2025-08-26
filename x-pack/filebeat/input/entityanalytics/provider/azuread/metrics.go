@@ -7,15 +7,12 @@ package azuread
 import (
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
 // inputMetrics defines metrics for this provider.
 type inputMetrics struct {
-	unregister func()
-
 	syncTotal            *monitoring.Uint // The total number of full synchronizations.
 	syncError            *monitoring.Uint // The number of full synchronizations that failed due to an error.
 	syncProcessingTime   metrics.Sample   // Histogram of the elapsed full synchronization times in nanoseconds (time of API contact to items sent to output).
@@ -24,17 +21,9 @@ type inputMetrics struct {
 	updateProcessingTime metrics.Sample   // Histogram of the elapsed incremental update times in nanoseconds (time of API contact to items sent to output).
 }
 
-// Close removes metrics from the registry.
-func (m *inputMetrics) Close() {
-	m.unregister()
-}
-
 // newMetrics creates a new instance for gathering metrics.
-func newMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
-	reg, unreg := inputmon.NewInputRegistry(FullName, id, optionalParent)
-
+func newMetrics(reg *monitoring.Registry) *inputMetrics {
 	out := inputMetrics{
-		unregister:           unreg,
 		syncTotal:            monitoring.NewUint(reg, "sync_total"),
 		syncError:            monitoring.NewUint(reg, "sync_error"),
 		syncProcessingTime:   metrics.NewUniformSample(1024),

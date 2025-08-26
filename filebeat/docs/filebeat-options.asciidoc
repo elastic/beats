@@ -95,6 +95,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-syslog>>
 * <<{beatname_lc}-input-tcp>>
 * <<{beatname_lc}-input-udp>>
+* <<{beatname_lc}-input-unifiedlogs>>
 * <<{beatname_lc}-input-unix>>
 * <<{beatname_lc}-input-winlog>>
 
@@ -157,6 +158,8 @@ include::inputs/input-syslog.asciidoc[]
 include::inputs/input-tcp.asciidoc[]
 
 include::inputs/input-udp.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-unifiedlogs.asciidoc[]
 
 include::inputs/input-unix.asciidoc[]
 

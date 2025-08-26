@@ -24,6 +24,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -55,7 +56,7 @@ func TestEventMapper(t *testing.T) {
 	}
 
 	// Construct a new POST response event mapper
-	eventMapper := NewJolokiaHTTPRequestFetcher("POST")
+	eventMapper := NewJolokiaHTTPRequestFetcher("POST", logptest.NewTestingLogger(t, ""))
 
 	// Map response to Metricbeat events
 	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)
@@ -126,7 +127,7 @@ func TestEventGroupingMapper(t *testing.T) {
 	}
 
 	// Construct a new POST response event mapper
-	eventMapper := NewJolokiaHTTPRequestFetcher("POST")
+	eventMapper := NewJolokiaHTTPRequestFetcher("POST", logptest.NewTestingLogger(t, ""))
 
 	// Map response to Metricbeat events
 	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)
@@ -193,7 +194,7 @@ func TestEventGroupingMapperGetRequest(t *testing.T) {
 	}
 
 	// Construct a new GET response event mapper
-	eventMapper := NewJolokiaHTTPRequestFetcher("GET")
+	eventMapper := NewJolokiaHTTPRequestFetcher("GET", logptest.NewTestingLogger(t, ""))
 
 	// Map response to Metricbeat events
 	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)
@@ -240,7 +241,7 @@ func TestEventGroupingMapperGetRequestUptime(t *testing.T) {
 	}
 
 	// Construct a new GET response event mapper
-	eventMapper := NewJolokiaHTTPRequestFetcher("GET")
+	eventMapper := NewJolokiaHTTPRequestFetcher("GET", logptest.NewTestingLogger(t, ""))
 
 	// Map response to Metricbeat events
 	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)
@@ -276,7 +277,7 @@ func TestEventMapperWithWildcard(t *testing.T) {
 	}
 
 	// Construct a new POST response event mapper
-	eventMapper := NewJolokiaHTTPRequestFetcher("POST")
+	eventMapper := NewJolokiaHTTPRequestFetcher("POST", logptest.NewTestingLogger(t, ""))
 
 	// Map response to Metricbeat events
 	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)
@@ -317,7 +318,7 @@ func TestEventGroupingMapperWithWildcard(t *testing.T) {
 	}
 
 	// Construct a new POST response event mapper
-	eventMapper := NewJolokiaHTTPRequestFetcher("POST")
+	eventMapper := NewJolokiaHTTPRequestFetcher("POST", logptest.NewTestingLogger(t, ""))
 
 	// Map response to Metricbeat events
 	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)

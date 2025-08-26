@@ -14,7 +14,7 @@ import (
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -60,7 +60,16 @@ func (bi *benchmarkInput) Test(ctx v2.TestContext) error {
 // Run starts the data generation.
 func (bi *benchmarkInput) Run(ctx v2.Context, publisher stateless.Publisher) error {
 	var wg sync.WaitGroup
-	metrics := newInputMetrics(ctx.ID)
+	metrics := newInputMetrics(ctx.MetricsRegistry)
+
+	switch bi.cfg.Status {
+	case "degraded":
+		ctx.UpdateStatus(status.Degraded, "benchmark input degraded")
+	case "failed":
+		ctx.UpdateStatus(status.Failed, "benchmark input failed")
+	default:
+		ctx.UpdateStatus(status.Running, "")
+	}
 
 	for i := uint8(0); i < bi.cfg.Threads; i++ {
 		wg.Add(1)
@@ -103,8 +112,8 @@ func runThread(ctx v2.Context, publisher stateless.Publisher, thread uint8, cfg 
 				ticker.Stop()
 				return
 			case <-ticker.C:
-				//don't want to block on filling doPublish channel
-				//so only send as many as it can hold right now
+				// don't want to block on filling doPublish channel
+				// so only send as many as it can hold right now
 				numToSend := cap(pubChan) - len(pubChan)
 				for i := 0; i < numToSend; i++ {
 					pubChan <- true
@@ -150,17 +159,13 @@ func publishEvt(publisher stateless.Publisher, msg string, line uint64, filename
 }
 
 type inputMetrics struct {
-	unregister func()
-
 	eventsPublished *monitoring.Uint // number of events published
 	publishingTime  metrics.Sample   // histogram of the elapsed times in nanoseconds (time of publisher.Publish)
 }
 
 // newInputMetrics returns an input metric for the benchmark processor.
-func newInputMetrics(id string) *inputMetrics {
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
+func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 	out := &inputMetrics{
-		unregister:      unreg,
 		eventsPublished: monitoring.NewUint(reg, "events_published_total"),
 		publishingTime:  metrics.NewUniformSample(1024),
 	}
@@ -169,8 +174,4 @@ func newInputMetrics(id string) *inputMetrics {
 		Register("histogram", metrics.NewHistogram(out.publishingTime))
 
 	return out
-}
-
-func (m *inputMetrics) Close() {
-	m.unregister()
 }

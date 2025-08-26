@@ -28,12 +28,12 @@ import (
 	// Import packages that perform 'func init()'.
 	_ "github.com/elastic/beats/v7/filebeat/input"
 	_ "github.com/elastic/beats/v7/filebeat/input/container"
+	_ "github.com/elastic/beats/v7/filebeat/input/filestream"
 	_ "github.com/elastic/beats/v7/filebeat/input/log"
 	_ "github.com/elastic/beats/v7/filebeat/input/mqtt"
 	_ "github.com/elastic/beats/v7/filebeat/input/redis"
 	_ "github.com/elastic/beats/v7/filebeat/input/stdin"
 	_ "github.com/elastic/beats/v7/filebeat/input/syslog"
-	_ "github.com/elastic/beats/v7/filebeat/input/systemlogs"
 	_ "github.com/elastic/beats/v7/filebeat/module/apache"
 	_ "github.com/elastic/beats/v7/filebeat/module/auditd"
 	_ "github.com/elastic/beats/v7/filebeat/module/elasticsearch"

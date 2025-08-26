@@ -15,12 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 /*
 Package status fetches MySQL server status metrics.
 
 For more information on the query it uses, see:
 http://dev.mysql.com/doc/refman/5.7/en/show-status.html
 */
+
 package query
 
 import (
@@ -70,7 +73,7 @@ type MetricSet struct {
 
 // New creates and returns a new MetricSet instance.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The mysql 'query' metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The mysql 'query' metricset is beta."))
 
 	b := &MetricSet{BaseMetricSet: base}
 
@@ -79,7 +82,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	if b.Config.TLS.IsEnabled() {
-		tlsConfig, err := tlscommon.LoadTLSConfig(b.Config.TLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(b.Config.TLS, base.Logger())
 		if err != nil {
 			return nil, fmt.Errorf("could not load provided TLS configuration: %w", err)
 		}

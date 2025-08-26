@@ -5,38 +5,31 @@
 package auth
 
 import (
-	"fmt"
+	"context"
 
-	"github.com/Azure/go-autorest/autorest/adal"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 )
 
 // TokenProvider is the interface that wraps an authentication mechanism and
 // allows to obtain tokens.
 type TokenProvider interface {
 	// Token returns a valid OAuth token, or an error.
-	Token() (string, error)
-
-	// Renew must be called to re-authenticate against the oauth2 endpoint if
-	// when the API returns an Authentication error.
-	Renew() error
+	Token(ctx context.Context) (string, error)
 }
 
-// servicePrincipalToken extends adal.ServicePrincipalToken with the
+// credentialTokenProvider extends azidentity.ClientSecretCredential with the
 // the TokenProvider interface.
-type servicePrincipalToken adal.ServicePrincipalToken
+type credentialTokenProvider azidentity.ClientSecretCredential
 
 // Token returns an oauth token that can be used for bearer authorization.
-func (provider *servicePrincipalToken) Token() (string, error) {
-	inner := (*adal.ServicePrincipalToken)(provider)
-	if err := inner.EnsureFresh(); err != nil {
-		return "", fmt.Errorf("refreshing spt token: %w", err)
+func (provider *credentialTokenProvider) Token(ctx context.Context) (string, error) {
+	inner := (*azidentity.ClientSecretCredential)(provider)
+	tk, err := inner.GetToken(
+		ctx, policy.TokenRequestOptions{Scopes: []string{"https://manage.office.com/.default"}},
+	)
+	if err != nil {
+		return "", err
 	}
-	token := inner.Token()
-	return token.OAuthToken(), nil
-}
-
-// Renew re-authenticates with the oauth2 endpoint to get a new Service Principal Token.
-func (provider *servicePrincipalToken) Renew() error {
-	inner := (*adal.ServicePrincipalToken)(provider)
-	return inner.Refresh()
+	return tk.Token, nil
 }

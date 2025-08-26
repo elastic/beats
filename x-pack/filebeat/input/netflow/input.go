@@ -124,15 +124,16 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 	n.logger.Info("Connecting to beat event publishing")
 
 	const pollInterval = time.Minute
-	n.udpMetrics = netmetrics.NewUDP("netflow", env.ID, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
-	defer n.udpMetrics.Close()
+	if env.ID != "" {
+		n.udpMetrics = netmetrics.NewUDP(env.MetricsRegistry, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
+		defer n.udpMetrics.Close()
+	}
 
 	n.metrics = newInputMetrics(n.udpMetrics.Registry())
 	var err error
-	n.decoder, err = decoder.NewDecoder(decoder.NewConfig().
+	n.decoder, err = decoder.NewDecoder(decoder.NewConfig(n.logger).
 		WithProtocols(n.cfg.Protocols...).
 		WithExpiration(n.cfg.ExpirationTimeout).
-		WithLogOutput(&logDebugWrapper{Logger: n.logger}).
 		WithCustomFields(n.customFields...).
 		WithSequenceResetEnabled(n.cfg.DetectSequenceReset).
 		WithSharedTemplates(n.cfg.ShareTemplates).
@@ -218,7 +219,7 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 				discardedEvents.Inc()
 			}
 		}
-	})
+	}, n.logger)
 	err = udpServer.Start()
 	if err != nil {
 		errorMsg := fmt.Sprintf("Failed to start udp server: %v", err)
@@ -234,26 +235,6 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 	n.stop()
 
 	return nil
-}
-
-// An adapter so that logp.Logger can be used as a log.Logger.
-type logDebugWrapper struct {
-	sync.Mutex
-	Logger *logp.Logger
-	buf    []byte
-}
-
-// Write writes messages to the log.
-func (w *logDebugWrapper) Write(p []byte) (n int, err error) {
-	w.Lock()
-	defer w.Unlock()
-	n = len(p)
-	w.buf = append(w.buf, p...)
-	for endl := bytes.IndexByte(w.buf, '\n'); endl != -1; endl = bytes.IndexByte(w.buf, '\n') {
-		w.Logger.Debug(string(w.buf[:endl]))
-		w.buf = w.buf[endl+1:]
-	}
-	return n, nil
 }
 
 // stop stops the netflow input

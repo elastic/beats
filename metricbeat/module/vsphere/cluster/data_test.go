@@ -33,6 +33,11 @@ func TestEventMapping(t *testing.T) {
 		ComputeResource: mo.ComputeResource{
 			ManagedEntity: mo.ManagedEntity{
 				Name: "Cluster_0",
+				ExtensibleManagedObject: mo.ExtensibleManagedObject{
+					Self: types.ManagedObjectReference{
+						Value: "CS_0",
+					},
+				},
 			},
 		},
 		Configuration: types.ClusterConfigInfo{
@@ -64,6 +69,7 @@ func TestEventMapping(t *testing.T) {
 			},
 		},
 		"name": "Cluster_0",
+		"id":   "CS_0",
 		"host": mapstr.M{
 			"count": 1,
 			"names": []string{"Host_0"},

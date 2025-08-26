@@ -27,13 +27,10 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
-
-var debugf = logp.NewLogger("system.process").Debugf
 
 func init() {
 	mb.Registry.MustAddMetricSet("system", "process", New,
@@ -45,9 +42,10 @@ func init() {
 // MetricSet that fetches process metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	stats  *process.Stats
-	perCPU bool
-	setpid int
+	stats            *process.Stats
+	perCPU           bool
+	setpid           int
+	degradeOnPartial bool
 }
 
 // New creates and returns a new MetricSet.
@@ -56,6 +54,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
+	// log warning message related to config
+	config.checkUnsupportedConfig(base.Logger())
 
 	sys, ok := base.Module().(resolve.Resolver)
 	if !ok {
@@ -65,14 +65,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if runtime.GOOS == "linux" {
 		if config.Cgroups == nil || *config.Cgroups {
 			enableCgroups = true
-			debugf("process cgroup data collection is enabled, using hostfs='%v'", sys.ResolveHostFS(""))
+			base.Logger().Named("system.process").Debugf("process cgroup data collection is enabled, using hostfs='%v'", sys.ResolveHostFS(""))
 		}
 	}
 
 	if config.Pid != 0 && config.Procs[0] != ".*" {
-		logp.L().Warnf("`process.pid` set to %d, but `processes` is set to a non-default value. Metricset will only report metrics for pid %d", config.Pid, config.Pid)
+		base.Logger().Warnf("`process.pid` set to %d, but `processes` is set to a non-default value. Metricset will only report metrics for pid %d", config.Pid, config.Pid)
 	}
-
+	degradedConf := struct {
+		DegradeOnPartial bool `config:"degrade_on_partial"`
+	}{}
+	if err := base.Module().UnpackConfig(&degradedConf); err != nil {
+		base.Logger().Warnf("Failed to unpack config; degraded mode will be disabled for partial metrics: %v", err)
+	}
 	m := &MetricSet{
 		BaseMetricSet: base,
 		stats: &process.Stats{
@@ -88,7 +93,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				IgnoreRootCgroups: true,
 			},
 		},
-		perCPU: config.IncludePerCPU,
+		perCPU:           config.IncludePerCPU,
+		degradeOnPartial: degradedConf.DegradeOnPartial,
 	}
 
 	m.setpid = config.Pid
@@ -119,6 +125,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			// return only if the error is fatal in nature
 			return fmt.Errorf("process stats: %w", err)
 		} else if (err != nil && errors.Is(err, process.NonFatalErr{})) {
+			if m.degradeOnPartial {
+				return fmt.Errorf("error fetching process list: %w", err)
+			}
 			err = mb.PartialMetricsError{Err: err}
 		}
 
@@ -138,6 +147,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			// return only if the error is fatal in nature
 			return fmt.Errorf("error fetching pid %d: %w", m.setpid, err)
 		} else if (err != nil && errors.Is(err, process.NonFatalErr{})) {
+			if m.degradeOnPartial {
+				return fmt.Errorf("error fetching process list: %w", err)
+			}
 			err = mb.PartialMetricsError{Err: err}
 		}
 		// if error is non-fatal, emit partial metrics.

@@ -41,14 +41,14 @@ const (
 
 	osqueryLensesDir = "lenses"
 
-	osqueryVersion = "5.12.1"
+	osqueryVersion = "5.15.0"
 	osqueryMSIExt  = ".msi"
 	osqueryPkgExt  = ".pkg"
 
-	osqueryDistroDarwinSHA256   = "77ad2953c8edbef4616cc30467848afbcf92ad128dbc2a242230f0c94272392e"
-	osqueryDistroLinuxSHA256    = "e90eaae262467a212720f1cc612dc98939a0b5f0981104d58fec9aee77b39b29"
-	osqueryDistroLinuxARMSHA256 = "1e21f1fb9a804a2435e1110f3f436286b58f11627ce70615521d8e83779941dd"
-	osqueryDistroWindowsSHA256  = "e9b0acfee492bd375714dc3d92d477272623b301b31a459fcc989cc6aa7dd0c0"
+	osqueryDistroDarwinSHA256   = "5044ba8207a68cd756ef01ffcb408e558cf4e28eab7793cce0337095c9499bac"
+	osqueryDistroLinuxSHA256    = "9bc11806afba259a5d25bf937fbf6c16337abc672c1a5b09369226c2abe8dcd3"
+	osqueryDistroLinuxARMSHA256 = "ca6e92e4d60cf2990d346c98362c171e9ce3d43aa050db79f0bc2b03949800d3"
+	osqueryDistroWindowsSHA256  = "9c06dd0b8fbe76129cff5bebc79277044213d5cddccb9ddfe2179606908a817e"
 )
 
 type OSArch struct {

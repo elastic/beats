@@ -35,7 +35,7 @@ var (
 // GetDashboard returns the dashboard with the given id with the index pattern removed
 func Get(client *kibana.Client, id string) ([]byte, error) {
 	if client.Version.LessThan(MinimumRequiredVersionSavedObjects) {
-		return nil, fmt.Errorf("Kibana version must be at least " + MinimumRequiredVersionSavedObjects.String())
+		return nil, fmt.Errorf("Kibana version must be at least %s", MinimumRequiredVersionSavedObjects.String())
 	}
 
 	// add a special header for serverless, where saved_objects is "hidden"

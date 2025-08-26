@@ -64,8 +64,9 @@ func NewInput(
 	cfg *conf.C,
 	connector channel.Connector,
 	inputContext input.Context,
+	logger *logp.Logger,
 ) (input.Input, error) {
-	return newInput(cfg, connector, inputContext, libmqtt.NewClient, backoff.NewEqualJitterBackoff)
+	return newInput(cfg, connector, inputContext, libmqtt.NewClient, backoff.NewEqualJitterBackoff, logger)
 }
 
 func newInput(
@@ -74,6 +75,7 @@ func newInput(
 	inputContext input.Context,
 	newMqttClient func(options *libmqtt.ClientOptions) libmqtt.Client,
 	newBackoff func(done <-chan struct{}, init, max time.Duration) backoff.Backoff,
+	logger *logp.Logger,
 ) (input.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
@@ -85,15 +87,15 @@ func newInput(
 		return nil, err
 	}
 
-	logger := logp.NewLogger("mqtt input").With("hosts", config.Hosts)
-	setupLibraryLogging()
+	logger = logger.Named("mqtt input").With("hosts", config.Hosts)
+	setupLibraryLogging(logger)
 
 	clientDisconnected := new(sync.WaitGroup)
 	inflightMessages := new(sync.WaitGroup)
 	clientSubscriptions := createClientSubscriptions(config)
 	onMessageHandler := createOnMessageHandler(logger, out, inflightMessages)
 	onConnectHandler := createOnConnectHandler(logger, &inputContext, onMessageHandler, clientSubscriptions, newBackoff)
-	clientOptions, err := createClientOptions(config, onConnectHandler)
+	clientOptions, err := createClientOptions(config, onConnectHandler, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +104,7 @@ func newInput(
 		client:             newMqttClient(clientOptions),
 		clientDisconnected: clientDisconnected,
 		inflightMessages:   inflightMessages,
-		logger:             logp.NewLogger("mqtt input").With("hosts", config.Hosts),
+		logger:             logger,
 	}, nil
 }
 
@@ -186,7 +188,7 @@ func (mi *mqttInput) Stop() {
 
 	mi.clientDisconnected.Add(1)
 	go func() {
-		mi.client.Disconnect(uint(disconnectTimeout.Milliseconds()))
+		mi.client.Disconnect(uint(disconnectTimeout.Milliseconds())) //nolint:gosec //can ignore
 		mi.clientDisconnected.Done()
 	}()
 }

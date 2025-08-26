@@ -39,24 +39,18 @@ func makeES(
 	observer outputs.Observer,
 	cfg *config.C,
 ) (outputs.Group, error) {
-	log := logp.NewLogger(logSelector)
-	if !cfg.HasField("bulk_max_size") {
-		if err := cfg.SetInt("bulk_max_size", -1, defaultBulkSize); err != nil {
-			return outputs.Fail(err)
-		}
-	}
-
+	log := beatInfo.Logger.Named(logSelector)
+	esConfig := defaultConfig
 	indexSelector, pipelineSelector, err := buildSelectors(im, beatInfo, cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
-	esConfig := defaultConfig
 	preset, err := cfg.String("preset", -1)
 	if err == nil && preset != "" {
 		// Performance preset is present, apply it and log any fields that
 		// were overridden
-		overriddenFields, presetConfig, err := applyPreset(preset, cfg)
+		overriddenFields, presetConfig, err := ApplyPreset(preset, cfg)
 		if err != nil {
 			return outputs.Fail(err)
 		}
@@ -73,7 +67,7 @@ func makeES(
 		return outputs.Fail(err)
 	}
 
-	deadLetterIndex, err := deadLetterIndexForPolicy(esConfig.NonIndexablePolicy)
+	deadLetterIndex, err := deadLetterIndexForPolicy(esConfig.NonIndexablePolicy, log)
 	if err != nil {
 		log.Errorf("error in non_indexable_policy: %v", err)
 		return outputs.Fail(err)
@@ -127,7 +121,7 @@ func makeES(
 			pipelineSelector: pipelineSelector,
 			observer:         observer,
 			deadLetterIndex:  deadLetterIndex,
-		}, &connectCallbackRegistry)
+		}, &connectCallbackRegistry, log)
 		if err != nil {
 			return outputs.Fail(err)
 		}
@@ -136,12 +130,12 @@ func makeES(
 		clients[i] = client
 	}
 
-	return outputs.SuccessNet(esConfig.Queue, esConfig.LoadBalance, esConfig.BulkMaxSize, esConfig.MaxRetries, encoderFactory, clients)
+	return outputs.SuccessNet(esConfig.Queue, esConfig.LoadBalance, esConfig.BulkMaxSize, esConfig.MaxRetries, encoderFactory, beatInfo.Logger, clients)
 }
 
 func buildSelectors(
 	im outputs.IndexManager,
-	_ beat.Info,
+	b beat.Info,
 	cfg *config.C,
 ) (index outputs.IndexSelector, pipeline *outil.Selector, err error) {
 	index, err = im.BuildSelector(cfg)
@@ -149,7 +143,7 @@ func buildSelectors(
 		return index, pipeline, err
 	}
 
-	pipelineSel, err := buildPipelineSelector(cfg)
+	pipelineSel, err := buildPipelineSelector(cfg, b.Logger)
 	if err != nil {
 		return index, pipeline, err
 	}
@@ -161,12 +155,12 @@ func buildSelectors(
 	return index, pipeline, err
 }
 
-func buildPipelineSelector(cfg *config.C) (outil.Selector, error) {
+func buildPipelineSelector(cfg *config.C, logger *logp.Logger) (outil.Selector, error) {
 	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
 		Key:              "pipeline",
 		MultiKey:         "pipelines",
 		EnableSingleOnly: true,
 		FailEmpty:        false,
 		Case:             outil.SelectorLowerCase,
-	})
+	}, logger)
 }

@@ -233,6 +233,11 @@ inputs:
     platforms: *platforms
     outputs: *outputs
     command: *filebeat_command
+  - name: unifiedlogs
+    description: "macOS Unified logs"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
   - name: unix
     description: "Unix Socket"
     platforms: *platforms
@@ -507,6 +512,11 @@ inputs:
     platforms: *platforms
     outputs: *outputs
     command: *metricbeat_command
+  - name: openai/metrics
+    description: "OpenAI metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
   - name: panw/metrics
     description: "Palo Alto Networks metrics"
     platforms: *platforms
@@ -549,6 +559,11 @@ inputs:
     command: *metricbeat_command
   - name: zookeeper/metrics
     description: "ZooKeeper metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: aerospike/metrics
+    description: "Aerospike metrics"
     platforms: *platforms
     outputs: *outputs
     command: *metricbeat_command

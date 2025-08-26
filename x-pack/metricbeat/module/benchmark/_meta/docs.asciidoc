@@ -1,0 +1,31 @@
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
+The `benchmark` module is used to generate synthetic metrics at a predictable rate.  This can be useful when you want to test output settings or test system sizing without using real data.
+
+The `benchmark` module metricset is `info`.
+
+[source,yaml]
+----
+- module: benchmark
+  metricsets:
+    - info
+  enabled: true
+  period: 10s
+----
+
+[float]
+== Metricsets
+
+[float]
+=== `info`
+A metric that includes a `counter` field which is used to keep the metric unique.
+
+[float]
+=== Module-specific configuration notes
+
+`count`:: number, the number of metrics to emit per fetch.
+
+
+

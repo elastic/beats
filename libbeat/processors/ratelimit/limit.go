@@ -52,7 +52,7 @@ func (l *rate) Unpack(str string) error {
 	}
 
 	if allowed := []unit{unitPerSecond, unitPerMinute, unitPerHour}; !contains(allowed, unitStr) {
-		allowedStrs := make([]string, len(allowed))
+		allowedStrs := make([]string, 0, len(allowed))
 		for _, a := range allowed {
 			allowedStrs = append(allowedStrs, "/"+string(a))
 		}

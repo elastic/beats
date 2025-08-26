@@ -26,6 +26,10 @@
               type: long
               description: >
                 The static CPU resource entitlement for a virtual machine.
+    - name: id
+      type: keyword
+      description: >
+        Unique resource pool ID.
     - name: memory
       type: group
       fields:

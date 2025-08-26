@@ -46,8 +46,8 @@ type Options struct {
 // New creates and returns a new persistent cache.
 // Cache returned by this method must be closed with Close() when
 // not needed anymore.
-func New(name string, opts Options) (*PersistentCache, error) {
-	logger := logp.NewLogger("persistentcache")
+func New(name string, opts Options, logger *logp.Logger) (*PersistentCache, error) {
+	logger = logger.Named("persistentcache")
 
 	rootPath := opts.RootPath
 	if rootPath == "" {
@@ -97,7 +97,7 @@ func (c *PersistentCache) Get(k string, v interface{}) error {
 		return err
 	}
 	if c.refreshOnAccess && c.timeout > 0 {
-		c.store.Set([]byte(k), d, c.timeout)
+		c.store.Set([]byte(k), d, c.timeout) //nolint:errcheck //This is a test file
 	}
 	err = c.codec.Decode(d, v)
 	if err != nil {

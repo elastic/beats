@@ -1762,6 +1762,7 @@
         "log.level": "warning",
         "log.offset": 14716,
         "message": "File was blocked by file filter.",
+        "network.community_id": "1:rvPv+zcw0vwFn1vndUF/kdLu6zs=",
         "network.direction": "inbound",
         "network.iana_number": "16",
         "network.protocol": "cifs",

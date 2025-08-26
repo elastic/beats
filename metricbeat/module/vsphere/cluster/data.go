@@ -25,6 +25,7 @@ import (
 
 func (m *ClusterMetricSet) mapEvent(cl mo.ClusterComputeResource, data *metricData) mapstr.M {
 	event := mapstr.M{
+		"id": cl.Self.Value,
 		"host": mapstr.M{
 			"count": len(data.assetNames.outputHostNames),
 			"names": data.assetNames.outputHostNames,

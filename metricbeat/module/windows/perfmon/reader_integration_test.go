@@ -23,6 +23,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // TestNewReaderWhenQueryPathNotProvided will check for invalid/no query.
@@ -39,7 +41,7 @@ func TestNewReaderWhenQueryPathNotProvided(t *testing.T) {
 			Name: "% Processor Time",
 		},
 	}
-	reader, err := NewReader(config)
+	reader, err := NewReader(config, logp.NewLogger("test"))
 	assert.Error(t, err)
 	assert.Nil(t, reader)
 	assert.EqualValues(t, err.Error(), `failed to expand counter (query="\Invalid(*)\% Processor Time"): The specified object was not found on the computer.`)
@@ -60,7 +62,10 @@ func TestNewReaderWithValidQueryPath(t *testing.T) {
 			Name: "% Processor Time",
 		},
 	}
-	reader, err := NewReader(config)
+	reader, err := NewReader(config, logp.NewLogger("test"))
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer reader.Close()
 	assert.NoError(t, err)
 	assert.NotNil(t, reader)
@@ -85,7 +90,7 @@ func TestReadSuccessfully(t *testing.T) {
 			Name: "% Processor Time",
 		},
 	}
-	reader, err := NewReader(config)
+	reader, err := NewReader(config, logp.NewLogger("test"))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -15,10 +15,11 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
-	retryablehttp "github.com/hashicorp/go-retryablehttp"
+	"github.com/hashicorp/go-retryablehttp"
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -29,10 +30,12 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/private"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -82,12 +85,66 @@ func (log *retryLogger) Warn(msg string, keysAndValues ...interface{}) {
 	log.log.Warnw(msg, keysAndValues...)
 }
 
-func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Manager:    NewInputManager(log, store),
+	}
+}
+
+type redact struct {
+	value  mapstrM
+	fields []string
+}
+
+func (r redact) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	v, err := private.Redact(r.value, "", r.fields)
+	if err != nil {
+		return fmt.Errorf("could not redact value: %v", err)
+	}
+	return v.MarshalLogObject(enc)
+}
+
+// mapstrM is a non-mutating version of mapstr.M.
+// See https://github.com/elastic/elastic-agent-libs/issues/232.
+type mapstrM mapstr.M
+
+// MarshalLogObject implements the zapcore.ObjectMarshaler interface and allows
+// for more efficient marshaling of mapstrM in structured logging.
+func (m mapstrM) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	if len(m) == 0 {
+		return nil
+	}
+
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		v := m[k]
+		if inner, ok := tryToMapStr(v); ok {
+			err := enc.AddObject(k, inner)
+			if err != nil {
+				return fmt.Errorf("failed to add object: %w", err)
+			}
+			continue
+		}
+		zap.Any(k, v).AddTo(enc)
+	}
+	return nil
+}
+
+func tryToMapStr(v interface{}) (mapstrM, bool) {
+	switch m := v.(type) {
+	case mapstrM:
+		return m, true
+	case map[string]interface{}:
+		return mapstrM(m), true
+	default:
+		return nil, false
 	}
 }
 
@@ -112,14 +169,19 @@ func test(url *url.URL) error {
 }
 
 func runWithMetrics(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor) error {
-	reg, unreg := inputmon.NewInputRegistry("httpjson", ctx.ID, nil)
-	defer unreg()
-	return run(ctx, cfg, pub, crsr, reg)
+	v2.MetricsRegistryOverrideInput(ctx.MetricsRegistry, "httpjson")
+	return run(ctx, cfg, pub, crsr, ctx.MetricsRegistry)
 }
 
 func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor, reg *monitoring.Registry) error {
-	log := ctx.Logger.With("input_url", cfg.Request.URL)
+	stat := ctx.StatusReporter
+	if stat == nil {
+		stat = noopReporter{}
+	}
+	stat.UpdateStatus(status.Starting, "")
+	stat.UpdateStatus(status.Configuring, "")
 
+	log := ctx.Logger.With("input_url", cfg.Request.URL)
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
 	if cfg.Request.Tracer != nil {
@@ -139,14 +201,16 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 
 	metrics := newInputMetrics(reg)
 
-	client, err := newHTTPClient(stdCtx, cfg, log, reg)
+	client, err := newHTTPClient(stdCtx, cfg.Auth, cfg.Request, stat, log, reg, nil)
 	if err != nil {
+		stat.UpdateStatus(status.Failed, "failed to create HTTP client: "+err.Error())
 		return err
 	}
 
-	requestFactory, err := newRequestFactory(stdCtx, cfg, log, metrics, reg)
+	requestFactory, err := newRequestFactory(stdCtx, cfg, stat, log, metrics, reg)
 	if err != nil {
 		log.Errorf("Error while creating requestFactory: %v", err)
+		stat.UpdateStatus(status.Failed, "failed to create request factory: "+err.Error())
 		return err
 	}
 	var xmlDetails map[string]xml.Detail
@@ -154,15 +218,16 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 		xmlDetails, err = xml.Details([]byte(cfg.Response.XSD))
 		if err != nil {
 			log.Errorf("error while collecting xml decoder type hints: %v", err)
+			stat.UpdateStatus(status.Failed, "error while collecting xml decoder type hints: "+err.Error())
 			return err
 		}
 	}
-	pagination := newPagination(cfg, client, log)
-	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, log)
-	requester := newRequester(client, requestFactory, responseProcessor, log)
+	pagination := newPagination(cfg, client, stat, log)
+	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, stat, log)
+	requester := newRequester(client, requestFactory, responseProcessor, metrics, stat, log)
 
 	trCtx := emptyTransformContext()
-	trCtx.cursor = newCursor(cfg.Cursor, log)
+	trCtx.cursor = newCursor(cfg.Cursor, stat, log)
 	trCtx.cursor.load(crsr)
 
 	doFunc := func() error {
@@ -178,12 +243,22 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 
 		var err error
 		if err = requester.doRequest(stdCtx, trCtx, pub); err != nil {
-			log.Errorf("Error while processing http request: %v", err)
+			var httpErr *httpError
+			if ok := errors.As(err, &httpErr); ok {
+				log.Errorw("Error while processing http request",
+					"error", err,
+					"error.code", httpErr.StatusCode,
+					"error.id", httpErr.Status,
+					"error.type", "http")
+			} else {
+				log.Errorw("Error while processing http request", "error", err)
+			}
 		}
 
 		metrics.updateIntervalMetrics(err, startTime)
 
 		if err := stdCtx.Err(); err != nil {
+			stat.UpdateStatus(status.Stopping, "")
 			return err
 		}
 
@@ -197,9 +272,13 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	}
 
 	log.Infof("Input stopped because context was cancelled with: %v", err)
-
+	stat.UpdateStatus(status.Stopped, "")
 	return nil
 }
+
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}
 
 // sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
 // The request.tracer.filename may have ":" when a httpjson input has cursor config and
@@ -210,34 +289,53 @@ func sanitizeFileName(name string) string {
 	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
-func newHTTPClient(ctx context.Context, config config, log *logp.Logger, reg *monitoring.Registry) (*httpClient, error) {
-	client, err := newNetHTTPClient(ctx, config.Request, log, reg)
-	if err != nil {
-		return nil, err
+// newHTTPClient returns a new httpClient based on the provided configuration values and
+// sharing common OAuth2 client if it is configured. If authCfg.OAuth2.isEnabled() is true
+// and there is no prepared OAuth2 client, one will be constructed and cached in the
+// authCfg.OAuth2.prepared field, otherwise the existing cached client will be used.
+func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, stat status.StatusReporter, log *logp.Logger, reg *monitoring.Registry, p *Policy) (*httpClient, error) {
+	var (
+		client *http.Client
+		err    error
+	)
+	if authCfg.OAuth2.isEnabled() {
+		client = authCfg.OAuth2.prepared
+		if client == nil {
+			client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
+			if err != nil {
+				return nil, err
+			}
+			client, err = authCfg.OAuth2.client(ctx, client)
+			if err != nil {
+				return nil, err
+			}
+			authCfg.OAuth2.prepared = client
+		}
+	} else {
+		client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	if config.Request.Retry.getMaxAttempts() > 1 {
+	if requestCfg.Retry.getMaxAttempts() > 1 {
+		retryPolicy := retryablehttp.DefaultRetryPolicy
+		if p != nil {
+			retryPolicy = p.CustomRetryPolicy
+		}
 		// Make retryable HTTP client if needed.
 		client = (&retryablehttp.Client{
 			HTTPClient:   client,
 			Logger:       newRetryLogger(log),
-			RetryWaitMin: config.Request.Retry.getWaitMin(),
-			RetryWaitMax: config.Request.Retry.getWaitMax(),
-			RetryMax:     config.Request.Retry.getMaxAttempts(),
-			CheckRetry:   retryablehttp.DefaultRetryPolicy,
+			RetryWaitMin: requestCfg.Retry.getWaitMin(),
+			RetryWaitMax: requestCfg.Retry.getWaitMax(),
+			RetryMax:     requestCfg.Retry.getMaxAttempts(),
+			CheckRetry:   retryPolicy,
 			Backoff:      retryablehttp.DefaultBackoff,
 		}).StandardClient()
 	}
 
-	limiter := newRateLimiterFromConfig(config.Request.RateLimit, log)
-
-	if config.Auth.OAuth2.isEnabled() {
-		authClient, err := config.Auth.OAuth2.client(ctx, client)
-		if err != nil {
-			return nil, err
-		}
-		return &httpClient{client: authClient, limiter: limiter}, nil
-	}
+	limiter := newRateLimiterFromConfig(requestCfg.RateLimit, stat, log)
 
 	return &httpClient{client: client, limiter: limiter}, nil
 }
@@ -248,7 +346,7 @@ func newHTTPClient(ctx context.Context, config config, log *logp.Logger, reg *mo
 const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
 func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger, reg *monitoring.Registry) (*http.Client, error) {
-	netHTTPClient, err := cfg.Transport.Client(clientOptions(cfg.URL.URL, cfg.KeepAlive.settings())...)
+	netHTTPClient, err := cfg.Transport.Client(clientOptions(cfg.URL.URL, cfg.KeepAlive.settings(), log)...)
 	if err != nil {
 		return nil, err
 	}
@@ -267,12 +365,8 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 		)
 		traceLogger := zap.New(core)
 
-		const margin = 10e3 // 1OkB ought to be enough room for all the remainder of the trace details.
-		maxSize := cfg.Tracer.MaxSize*1e6 - margin
-		if maxSize < 0 {
-			maxSize = 0
-		}
-		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxSize, log)
+		maxBodyLen := cfg.Tracer.MaxSize * 1e6 / 10 // 10% of file max
+		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxBodyLen, log)
 	} else if cfg.Tracer != nil {
 		// We have a trace log name, but we are not enabled,
 		// so remove all trace logs we own.
@@ -303,48 +397,9 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 	return netHTTPClient, nil
 }
 
-func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, log *logp.Logger, reg *monitoring.Registry, p ...*Policy) (*httpClient, error) {
-	client, err := newNetHTTPClient(ctx, requestCfg, log, reg)
-	if err != nil {
-		return nil, err
-	}
-
-	var retryPolicyFunc retryablehttp.CheckRetry
-	if len(p) != 0 {
-		retryPolicyFunc = p[0].CustomRetryPolicy
-	} else {
-		retryPolicyFunc = retryablehttp.DefaultRetryPolicy
-	}
-
-	if requestCfg.Retry.getMaxAttempts() > 1 {
-		// Make retryable HTTP client if needed.
-		client = (&retryablehttp.Client{
-			HTTPClient:   client,
-			Logger:       newRetryLogger(log),
-			RetryWaitMin: requestCfg.Retry.getWaitMin(),
-			RetryWaitMax: requestCfg.Retry.getWaitMax(),
-			RetryMax:     requestCfg.Retry.getMaxAttempts(),
-			CheckRetry:   retryPolicyFunc,
-			Backoff:      retryablehttp.DefaultBackoff,
-		}).StandardClient()
-	}
-
-	limiter := newRateLimiterFromConfig(requestCfg.RateLimit, log)
-
-	if authCfg != nil && authCfg.OAuth2.isEnabled() {
-		authClient, err := authCfg.OAuth2.client(ctx, client)
-		if err != nil {
-			return nil, err
-		}
-		return &httpClient{client: authClient, limiter: limiter}, nil
-	}
-
-	return &httpClient{client: client, limiter: limiter}, nil
-}
-
 // clientOption returns constructed client configuration options, including
 // setting up http+unix and http+npipe transports if requested.
-func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []httpcommon.TransportOption {
+func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings, logger *logp.Logger) []httpcommon.TransportOption {
 	scheme, trans, ok := strings.Cut(u.Scheme, "+")
 	var dialer transport.Dialer
 	switch {
@@ -352,6 +407,7 @@ func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []htt
 		fallthrough
 	case !ok:
 		return []httpcommon.TransportOption{
+			httpcommon.WithLogger(logger),
 			httpcommon.WithAPMHTTPInstrumentation(),
 			keepalive,
 		}

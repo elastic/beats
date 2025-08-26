@@ -33,7 +33,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -45,8 +45,8 @@ const (
 
 var (
 	hostPort = fmt.Sprintf("tcp://%s:%s",
-		getOrDefault(os.Getenv("MOSQUITTO_HOST"), "localhost"),
-		getOrDefault(os.Getenv("MOSQUITTO_PORT"), "1883"))
+		getOrDefault(os.Getenv("MOSQUITTO_HOST"), "localhost"), //nolint:misspell //required
+		getOrDefault(os.Getenv("MOSQUITTO_PORT"), "1883"))      //nolint:misspell //required
 	topic = fmt.Sprintf("topic-%d", time.Now().UnixNano())
 )
 
@@ -82,7 +82,6 @@ func (ec *eventCaptor) Done() <-chan struct{} {
 }
 
 func TestInput(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("mqtt input", "libmqtt"))
 
 	// Setup the input config.
 	config := conf.MustNewConfigFrom(mapstr.M{
@@ -107,8 +106,9 @@ func TestInput(t *testing.T) {
 		BeatDone: make(chan struct{}),
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	// Setup the input
-	input, err := NewInput(config, connector, inputContext)
+	input, err := NewInput(config, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 

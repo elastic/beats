@@ -26,11 +26,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestFetch(t *testing.T) {
-	logp.TestingSetup()
 
 	service := compose.EnsureUp(t, "zookeeper")
 

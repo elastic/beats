@@ -31,14 +31,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-concert/unison"
 )
-
-type testStateStore struct {
-	Store    *statestore.Store
-	GCPeriod time.Duration
-}
 
 func TestResource_CopyInto(t *testing.T) {
 	src := resource{lock: unison.MakeMutex()}
@@ -70,7 +65,7 @@ func TestStore_OpenClose(t *testing.T) {
 	})
 
 	t.Run("fail if persistent store can not be accessed", func(t *testing.T) {
-		_, err := openStore(logp.NewLogger("test"), testStateStore{}, "test")
+		_, err := openStore(logptest.NewTestingLogger(t, ""), testStateStore{}, "test")
 		require.Error(t, err)
 	})
 
@@ -138,7 +133,7 @@ func TestStore_Get(t *testing.T) {
 		defer res.Release()
 
 		// new resource has empty state
-		require.Equal(t, state{}, res.stateSnapshot())
+		require.Equal(t, state{TTL: time.Duration(-1)}, res.stateSnapshot())
 	})
 
 	t.Run("same resource is returned", func(t *testing.T) {
@@ -347,11 +342,11 @@ type testMeta struct {
 func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 	t.Run("update identifiers when TTL is bigger than zero", func(t *testing.T) {
 		backend := createSampleStore(t, map[string]state{
-			"test::key1": {
+			"test::key1": { // Active resource
 				TTL:  60 * time.Second,
 				Meta: testMeta{IdentifierName: "method"},
 			},
-			"test::key2": {
+			"test::key2": { // Deleted resource
 				TTL:  0 * time.Second,
 				Meta: testMeta{IdentifierName: "method"},
 			},
@@ -372,22 +367,25 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 			return "", nil
 		})
 
-		var newState state
-		s.persistentStore.Get("test::key1::updated", &newState)
+		// The persistentStore is a mock that does not consider if a state has
+		// been removed before returning it, thus allowing us to get Updated
+		// timestamp from when the resource was deleted.
+		var deletedState state
+		s.persistentStore.Get("test::key1", &deletedState)
 
 		want := map[string]state{
-			"test::key1": {
-				Updated: s.Get("test::key1").internalState.Updated,
-				TTL:     60 * time.Second,
+			"test::key1": { // old resource is deleted, TTL must be zero
+				Updated: deletedState.Updated,
+				TTL:     0 * time.Second,
 				Meta:    map[string]interface{}{"identifiername": "method"},
 			},
-			"test::key2": {
+			"test::key2": { // Unchanged
 				Updated: s.Get("test::key2").internalState.Updated,
 				TTL:     0 * time.Second,
 				Meta:    map[string]interface{}{"identifiername": "method"},
 			},
-			"test::key1::updated": {
-				Updated: newState.Updated,
+			"test::key1::updated": { // Updated resource
+				Updated: s.Get("test::key1::updated").internalState.Updated,
 				TTL:     60 * time.Second,
 				Meta:    map[string]interface{}{"identifiername": "something"},
 			},
@@ -405,27 +403,33 @@ func TestSourceStore_CleanIf(t *testing.T) {
 				TTL: 60 * time.Second,
 			},
 			"test::key2": {
-				TTL: 0 * time.Second,
+				TTL:     0 * time.Second,
+				Updated: time.Now(),
 			},
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test"}, s}
+		store := &sourceStore{
+			identifier: &sourceIdentifier{"test"},
+			store:      s,
+		}
 
 		store.CleanIf(func(_ Value) bool {
 			return true
 		})
 
+		s.ephemeralStore.mu.Lock()
 		want := map[string]state{
 			"test::key1": {
-				Updated: s.Get("test::key1").internalState.Updated,
+				Updated: s.ephemeralStore.table["test::key1"].internalState.Updated,
 				TTL:     0 * time.Second,
 			},
 			"test::key2": {
-				Updated: s.Get("test::key2").internalState.Updated,
+				Updated: s.ephemeralStore.table["test::key2"].internalState.Updated,
 				TTL:     0 * time.Second,
 			},
 		}
+		s.ephemeralStore.mu.Unlock()
 
 		checkEqualStoreState(t, want, storeMemorySnapshot(s))
 		checkEqualStoreState(t, want, storeInSyncSnapshot(s))
@@ -437,27 +441,33 @@ func TestSourceStore_CleanIf(t *testing.T) {
 				TTL: 60 * time.Second,
 			},
 			"test::key2": {
-				TTL: 0 * time.Second,
+				TTL:     0 * time.Second,
+				Updated: time.Now(),
 			},
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test"}, s}
+		store := &sourceStore{
+			identifier: &sourceIdentifier{"test"},
+			store:      s,
+		}
 
 		store.CleanIf(func(v Value) bool {
 			return false
 		})
 
+		s.ephemeralStore.mu.Lock()
 		want := map[string]state{
 			"test::key1": {
-				Updated: s.Get("test::key1").internalState.Updated,
+				Updated: s.ephemeralStore.table["test::key1"].internalState.Updated,
 				TTL:     60 * time.Second,
 			},
 			"test::key2": {
-				Updated: s.Get("test::key2").internalState.Updated,
+				Updated: s.ephemeralStore.table["test::key2"].internalState.Updated,
 				TTL:     0 * time.Second,
 			},
 		}
+		s.ephemeralStore.mu.Unlock()
 
 		checkEqualStoreState(t, want, storeMemorySnapshot(s))
 		checkEqualStoreState(t, want, storeInSyncSnapshot(s))
@@ -473,12 +483,12 @@ func closeStoreWith(fn func(s *store)) func() {
 }
 
 //nolint:unparam // It's a test helper
-func testOpenStore(t *testing.T, prefix string, persistentStore StateStore) *store {
+func testOpenStore(t *testing.T, prefix string, persistentStore statestore.States) *store {
 	if persistentStore == nil {
 		persistentStore = createSampleStore(t, nil)
 	}
 
-	store, err := openStore(logp.NewLogger("test"), persistentStore, prefix)
+	store, err := openStore(logptest.NewTestingLogger(t, ""), persistentStore, prefix)
 	if err != nil {
 		t.Fatalf("failed to open the store")
 	}
@@ -503,9 +513,16 @@ func createSampleStore(t *testing.T, data map[string]state) testStateStore {
 	}
 }
 
+var _ statestore.States = testStateStore{}
+
+type testStateStore struct {
+	Store    *statestore.Store
+	GCPeriod time.Duration
+}
+
 func (ts testStateStore) WithGCPeriod(d time.Duration) testStateStore { ts.GCPeriod = d; return ts }
 func (ts testStateStore) CleanupInterval() time.Duration              { return ts.GCPeriod }
-func (ts testStateStore) Access() (*statestore.Store, error) {
+func (ts testStateStore) StoreFor(string) (*statestore.Store, error) {
 	if ts.Store == nil {
 		return nil, errors.New("no store configured")
 	}

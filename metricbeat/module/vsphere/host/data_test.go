@@ -29,6 +29,13 @@ import (
 func TestEventMapping(t *testing.T) {
 	var m *HostMetricSet
 	HostSystemTest := mo.HostSystem{
+		ManagedEntity: mo.ManagedEntity{
+			ExtensibleManagedObject: mo.ExtensibleManagedObject{
+				Self: types.ManagedObjectReference{
+					Value: "ha-host",
+				},
+			},
+		},
 		Summary: types.HostListSummary{
 			Host: &types.ManagedObjectReference{Type: "HostSystem", Value: "ha-host"},
 			Hardware: &types.HostHardwareSummary{
@@ -80,6 +87,9 @@ func TestEventMapping(t *testing.T) {
 
 	cpuTotal, _ := event.GetValue("cpu.total.mhz")
 	assert.EqualValues(t, 4588, cpuTotal)
+
+	id, _ := event.GetValue("id")
+	assert.EqualValues(t, "ha-host", id)
 
 	cpuFree, _ := event.GetValue("cpu.free.mhz")
 	assert.EqualValues(t, 4521, cpuFree)

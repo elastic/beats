@@ -1,15 +1,9 @@
 description: Entrypoint Pipeline for system/auth Filebeat module
 processors:
-  - script:
-      source: |
-              if(ctx?.journald != null){
-                  ctx['auth_pipeline'] = '{< IngestPipeline "journald" >}';
-                  return;
-                }
-              ctx['auth_pipeline'] = '{< IngestPipeline "files" >}';
-              return;
   - pipeline:
-      name: "{{ auth_pipeline }}"
-  - remove:
-      ignore_failure: true
-      field: "auth_pipeline"
+      if: ctx?.input?.type == "journald"
+      name: '{< IngestPipeline "journald" >}'
+
+  - pipeline:
+      if: ctx?.input?.type == "log"
+      name: '{< IngestPipeline "files" >}'

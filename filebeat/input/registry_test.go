@@ -24,9 +24,10 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-var fakeFactory = func(_ *conf.C, _ channel.Connector, _ Context) (Input, error) {
+var fakeFactory = func(_ *conf.C, _ channel.Connector, _ Context, _ *logp.Logger) (Input, error) {
 	return nil, nil
 }
 

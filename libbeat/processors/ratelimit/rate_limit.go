@@ -22,12 +22,12 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
+	"sync/atomic"
 
 	"github.com/jonboulle/clockwork"
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -36,7 +36,7 @@ import (
 )
 
 // instanceID is used to assign each instance a unique monitoring namespace.
-var instanceID = atomic.MakeUint32(0)
+var instanceID atomic.Uint32
 
 const processorName = "rate_limit"
 const logName = "processor." + processorName
@@ -58,7 +58,7 @@ type rateLimit struct {
 }
 
 // new constructs a new rate limit processor.
-func new(cfg *c.C) (beat.Processor, error) {
+func new(cfg *c.C, log *logp.Logger) (beat.Processor, error) {
 	var config config
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("could not unpack processor configuration: %w", err)
@@ -72,18 +72,18 @@ func new(cfg *c.C) (beat.Processor, error) {
 		limit:  config.Limit,
 		config: *config.Algorithm.Config(),
 	}
-	algo, err := factory(config.Algorithm.Name(), algoConfig)
+	algo, err := factory(config.Algorithm.Name(), algoConfig, log)
 	if err != nil {
 		return nil, fmt.Errorf("could not construct rate limiting algorithm: %w", err)
 	}
 
 	// Logging and metrics (each processor instance has a unique ID).
 	var (
-		id  = int(instanceID.Inc())
-		log = logp.NewLogger(logName).With("instance_id", id)
+		id  = int(instanceID.Add(1))
 		reg = monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
 	)
 
+	log = log.Named(logName).With("instance_id", id)
 	p := &rateLimit{
 		config:    config,
 		algorithm: algo,

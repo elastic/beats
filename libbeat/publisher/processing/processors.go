@@ -44,9 +44,9 @@ type processorFn struct {
 	fn   func(event *beat.Event) (*beat.Event, error)
 }
 
-func newGeneralizeProcessor(keepNull bool) *processorFn {
-	logger := logp.NewLogger("publisher_processing")
-	g := common.NewGenericEventConverter(keepNull)
+func newGeneralizeProcessor(keepNull bool, logger *logp.Logger) *processorFn {
+	logger = logger.Named("publisher_processing")
+	g := common.NewGenericEventConverter(keepNull, logger)
 	return newProcessor("generalizeEvent", func(event *beat.Event) (*beat.Event, error) {
 		// Filter out empty events. Empty events are still reported by ACK callbacks.
 		if len(event.Fields) == 0 {
@@ -208,7 +208,6 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 
 		b, err := encoder.Encode(info.Beat, event)
 		if err != nil {
-			//nolint:nilerr // encoder failure is not considered an error by this processor [why not?]
 			return event, nil
 		}
 

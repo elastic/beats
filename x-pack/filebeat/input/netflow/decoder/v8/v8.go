@@ -9,7 +9,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"time"
 
@@ -18,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -300,16 +300,18 @@ var templates = map[AggType]*template.Template{
 }
 
 type NetflowV8Protocol struct {
-	logger *log.Logger
+	logger *logp.Logger
 }
 
 func init() {
-	protocol.Registry.Register(ProtocolName, New)
+	if err := protocol.Registry.Register(ProtocolName, New); err != nil {
+		panic(err)
+	}
 }
 
 func New(config config.Config) protocol.Protocol {
 	return &NetflowV8Protocol{
-		logger: log.New(config.LogOutput(), LogPrefix, 0),
+		logger: config.LogOutput().Named(LogPrefix),
 	}
 }
 
@@ -320,12 +322,12 @@ func (NetflowV8Protocol) Version() uint16 {
 func (p *NetflowV8Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows []record.Record, err error) {
 	header, err := ReadPacketHeader(buf)
 	if err != nil {
-		p.logger.Printf("Failed parsing packet: %v", err)
+		p.logger.Debugf("Failed parsing packet: %v", err)
 		return nil, fmt.Errorf("error reading V8 header: %w", err)
 	}
 	template, found := templates[header.Aggregation]
 	if !found {
-		p.logger.Printf("Packet from %s uses an unknown V8 aggregation: %d", source, header.Aggregation)
+		p.logger.Debugf("Packet from %s uses an unknown V8 aggregation: %d", source, header.Aggregation)
 		return nil, fmt.Errorf("unsupported V8 aggregation: %d", header.Aggregation)
 	}
 	metadata := header.GetMetadata(source)

@@ -33,7 +33,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var defaultConfig = Config{
@@ -234,8 +234,9 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 				return
 			}
 
-			factory := streaming.SplitHandlerFactory(inputsource.FamilyTCP, logp.NewLogger("test"), MetadataCallback, to, splitFunc)
-			server, err := New(&config, factory)
+			logger := logptest.NewTestingLogger(t, "test")
+			factory := streaming.SplitHandlerFactory(inputsource.FamilyTCP, logger, MetadataCallback, to, splitFunc)
+			server, err := New(&config, factory, logger)
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -287,9 +288,9 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 		return
 	}
 
-	factory := streaming.SplitHandlerFactory(inputsource.FamilyTCP, logp.NewLogger("test"), MetadataCallback, to, bufio.ScanLines)
+	factory := streaming.SplitHandlerFactory(inputsource.FamilyTCP, logptest.NewTestingLogger(t, "test"), MetadataCallback, to, bufio.ScanLines)
 
-	server, err := New(&config, factory)
+	server, err := New(&config, factory, logptest.NewTestingLogger(t, ""))
 	if !assert.NoError(t, err) {
 		return
 	}

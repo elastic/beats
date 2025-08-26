@@ -15,14 +15,18 @@
           type: keyword
           description: >
             Hostname of the host.
+    - name: id
+      type: keyword
+      description: >
+        Unique virtual machine ID.
     - name: name
       type: keyword
       description: >
-        Virtual Machine name.
+        Virtual machine name.
     - name: os
       type: keyword
       description: >
-        Virtual Machine Operating System name.
+        Virtual machine Operating System name.
     - name: cpu.used.mhz
       type: long
       description: >
@@ -35,26 +39,34 @@
       type: long
       description: >
         Available CPU in Mhz.
+    - name: cpu.usage.percent
+      type: scaled_float
+      description: >
+        CPU usage as a percentage.
     - name: memory.used.guest.bytes
       type: long
       description: >
-        Used Memory of Guest in bytes.
+        Used memory of Guest in bytes.
       format: bytes
     - name: memory.used.host.bytes
       type: long
       description: >
-        Used Memory of Host in bytes.
+        Used memory of Host in bytes.
       format: bytes
     - name: memory.total.guest.bytes
       type: long
       description: >
-        Total Memory of Guest in bytes.
+        Total memory of Guest in bytes.
       format: bytes
     - name: memory.free.guest.bytes
       type: long
       description: >
-        Free Memory of Guest in bytes.
+        Free memory of Guest in bytes.
       format: bytes
+    - name: memory.usage.percent
+      type: scaled_float
+      description: >
+        Memory usage as percent of total configured or available memory.
     - name: custom_fields
       type: object
       object_type: keyword
@@ -109,3 +121,26 @@
       object_type: keyword
       description: >
         List of all the triggered alarms.
+    - name: disk
+      type: group
+      fields:
+        - name: average.bytes
+          type: long
+          description: >
+            Aggregated disk I/O rate.
+        - name: read.average.bytes
+          type: long
+          description: >
+            Rate at which data is read from each virtual disk on the virtual machine.
+        - name: write.average.bytes
+          type: long
+          description: >
+            Rate at which data is written to each virtual disk on the virtual machine.
+        - name: numberRead.count
+          type: long
+          description: >
+            Number of times data was read.
+        - name: numberWrite.count
+          type: long
+          description: >
+            Number of disk writes.

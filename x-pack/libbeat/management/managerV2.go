@@ -117,6 +117,7 @@ type BeatV2Manager struct {
 	// trying to reload the configuration after an input not finished error
 	// happens
 	forceReloadDebounce time.Duration
+	wg                  sync.WaitGroup
 }
 
 // ================================
@@ -155,8 +156,8 @@ func init() {
 // NewV2AgentManager returns a remote config manager for the agent V2 protocol.
 // This is registered as the manager factory in init() so that calls to
 // lbmanagement.NewManager will be forwarded here.
-func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
-	logger := logp.NewLogger(lbmanagement.DebugK).Named("V2-manager")
+func NewV2AgentManager(config *conf.C, registry *reload.Registry, logger *logp.Logger) (lbmanagement.Manager, error) {
+	logger = logger.Named(lbmanagement.DebugK).Named("V2-manager")
 	c := DefaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
@@ -194,12 +195,12 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 	// debug log messages are only outputted when running in trace mode
 	lbmanagement.SetUnderAgent(true)
 
-	return NewV2AgentManagerWithClient(c, registry, agentClient)
+	return NewV2AgentManagerWithClient(c, registry, agentClient, logger)
 }
 
 // NewV2AgentManagerWithClient actually creates the manager instance used by the rest of the beats.
-func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agentClient client.V2, opts ...func(*BeatV2Manager)) (lbmanagement.Manager, error) {
-	log := logp.NewLogger(lbmanagement.DebugK)
+func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agentClient client.V2, logger *logp.Logger, opts ...func(*BeatV2Manager)) (lbmanagement.Manager, error) {
+	log := logger.Named(lbmanagement.DebugK)
 	if config.RestartOnOutputChange {
 		log.Infof("Output reload is enabled, the beat will restart as needed on change of output config")
 	}
@@ -250,7 +251,9 @@ func (cm *BeatV2Manager) RegisterDiagnosticHook(name string, description string,
 func (cm *BeatV2Manager) UpdateStatus(status status.Status, msg string) {
 	cm.mx.Lock()
 	defer cm.mx.Unlock()
-
+	if cm.status == status && cm.message == msg {
+		return
+	}
 	cm.status = status
 	cm.message = msg
 	cm.updateStatuses()
@@ -285,6 +288,7 @@ func (cm *BeatV2Manager) Start() error {
 	}
 	ctx, canceller := context.WithCancel(ctx)
 	cm.errCanceller = canceller
+
 	go cm.watchErrChan(ctx)
 	cm.client.RegisterDiagnosticHook(
 		"beat-rendered-config",
@@ -893,6 +897,13 @@ func (cm *BeatV2Manager) reloadAPM(unit *agentUnit) {
 			apmConfig = expected.APMConfig
 		}
 	}
+
+	if (cm.lastAPMCfg == nil && apmConfig == nil) || (cm.lastAPMCfg != nil && gproto.Equal(cm.lastAPMCfg, apmConfig)) {
+		// configuration for the APM tracing did not change; do nothing
+		cm.logger.Debug("Skipped reloading APM tracing; configuration didn't change")
+		return
+	}
+
 	if apmConfig == nil {
 		// APM tracing is being stopped
 		cm.logger.Debug("Stopping APM tracing")
@@ -904,12 +915,6 @@ func (cm *BeatV2Manager) reloadAPM(unit *agentUnit) {
 		cm.lastAPMCfg = nil
 		cm.lastBeatAPMCfg = nil
 		cm.logger.Debug("Stopped APM tracing")
-		return
-	}
-
-	if cm.lastAPMCfg != nil && gproto.Equal(cm.lastAPMCfg, apmConfig) {
-		// configuration for the APM tracing did not change; do nothing
-		cm.logger.Debug("Skipped reloading APM tracing; configuration didn't change")
 		return
 	}
 

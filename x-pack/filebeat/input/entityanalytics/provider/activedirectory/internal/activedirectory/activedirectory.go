@@ -39,7 +39,13 @@ type Entry struct {
 // only records with whenChanged since that time will be returned. since is
 // expected to be configured in a time zone the Active Directory server will
 // understand, most likely UTC.
-func GetDetails(url, user, pass string, base *ldap.DN, since time.Time, userAttrs, grpAttrs []string, pagingSize uint32, dialer *net.Dialer, tlsconfig *tls.Config) ([]Entry, error) {
+//
+// query is a complete LDAP query used to identify users, which may include
+// computers, for example (&(objectCategory=person)(objectClass=user)) for human
+// users or (&(objectClass=computer)(objectClass=user)) for computers. When
+// since is a non-zero time.Time, the query will be conjugated with
+// (whenChanged>="<SINCETIME>") into a new query.
+func GetDetails(query, url, user, pass string, base *ldap.DN, since time.Time, userAttrs, grpAttrs []string, pagingSize uint32, dialer *net.Dialer, tlsconfig *tls.Config) ([]Entry, error) {
 	if base == nil || len(base.RDNs) == 0 {
 		return nil, fmt.Errorf("%w: no path", ErrInvalidDistinguishedName)
 	}
@@ -86,9 +92,9 @@ func GetDetails(url, user, pass string, base *ldap.DN, since time.Time, userAttr
 	}
 
 	// Get users in the directory...
-	userFilter := "(objectClass=user)"
+	userFilter := query
 	if sinceFmtd != "" {
-		userFilter = "(&(objectClass=user)(whenChanged>=" + sinceFmtd + "))"
+		userFilter = "(&" + query + "(whenChanged>=" + sinceFmtd + "))"
 	}
 	usrs, err := search(conn, baseDN, userFilter, userAttrs, pagingSize)
 	if err != nil {
@@ -120,8 +126,7 @@ func GetDetails(url, user, pass string, base *ldap.DN, since time.Time, userAttr
 				for i, u := range modGrps {
 					modGrps[i] = "(memberOf=" + u + ")"
 				}
-				query := "(&(objectClass=user)(|" + strings.Join(modGrps, "") + ")"
-				usrs, err := search(conn, baseDN, query, userAttrs, pagingSize)
+				usrs, err := search(conn, baseDN, "(&"+query+"(|"+strings.Join(modGrps, "")+")", userAttrs, pagingSize)
 				if err != nil {
 					errs = append(errs, fmt.Errorf("failed to collect users of changed groups%w: %w", ErrUsers, err))
 				} else {
@@ -313,6 +318,11 @@ func entype(attr *ldap.EntryAttribute) any {
 			ts, err := strconv.ParseInt(v, 10, 64)
 			if err != nil {
 				return attr.Values
+			}
+			// Check for special values of accountExpires.
+			// See https://learn.microsoft.com/en-us/windows/win32/adschema/a-accountexpires.
+			if attr.Name == "accountExpires" && (ts == 0 || ts == 0x7fff_ffff_ffff_ffff) {
+				return v // Return the raw string instead of converting to time
 			}
 			if len(attr.Values) == 1 {
 				return fromWindowsNT(ts)

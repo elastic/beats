@@ -1,6 +1,5 @@
 `mntr` Metricset fetches the data returned by the `mntr` admin keyword. It exposes the following metrics:
 
-* `zookeeper.mntr.hostname`: ZooKeeper hostname.
 * `zookeeper.mntr.approximate_data_size`: Approximate size of ZooKeeper data.
 * `zookeeper.mntr.latency.avg`: Average latency between ensemble hosts in milliseconds.
 * `zookeeper.mntr.ephemerals_count`: Number of ephemeral znodes.

@@ -20,7 +20,7 @@ package actions
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
@@ -29,7 +29,7 @@ import (
 )
 
 func TestCopyFields(t *testing.T) {
-	log := logp.NewLogger("copy_fields_test")
+	log := logptest.NewTestingLogger(t, "copy_fields_test")
 	var tests = map[string]struct {
 		FromTo   fromTo
 		Input    mapstr.M

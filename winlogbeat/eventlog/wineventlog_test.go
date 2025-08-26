@@ -37,6 +37,8 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/go-sysinfo/providers/windows"
 )
 
 const (
@@ -167,14 +169,17 @@ func TestWinEventLogConfig_Validate(t *testing.T) {
 }
 
 func TestWindowsEventLogAPI(t *testing.T) {
-	testWindowsEventLog(t, winEventLogAPIName)
+	testWindowsEventLog(t, winEventLogAPIName, false)
 }
 
-func TestWindowsEventLogAPIExperimental(t *testing.T) {
-	testWindowsEventLog(t, winEventLogExpAPIName)
+func TestWindowsEventLogAPIRaw(t *testing.T) {
+	// for the raw api using include xml behave differently than not
+	// so we must test both settings
+	testWindowsEventLog(t, winEventLogRawAPIName, true)
+	testWindowsEventLog(t, winEventLogRawAPIName, false)
 }
 
-func testWindowsEventLog(t *testing.T, api string) {
+func testWindowsEventLog(t *testing.T, api string, includeXML bool) {
 	writer, teardown := createLog(t)
 	defer teardown()
 
@@ -192,7 +197,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 	}
 
 	t.Run("has_message", func(t *testing.T) {
-		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1})
+		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1, "include_xml": includeXML})
 		defer log.Close()
 
 		for i := 0; i < 10; i++ {
@@ -208,8 +213,9 @@ func testWindowsEventLog(t *testing.T, api string) {
 	// Test reading from an event log using a custom XML query.
 	t.Run("custom_xml_query", func(t *testing.T) {
 		cfg := map[string]interface{}{
-			"id":        "custom-xml-query",
-			"xml_query": customXMLQuery,
+			"id":          "custom-xml-query",
+			"xml_query":   customXMLQuery,
+			"include_xml": includeXML,
 		}
 
 		log := openLog(t, cfg)
@@ -236,7 +242,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 	t.Run("batch_read_size_config", func(t *testing.T) {
 		const batchReadSize = 2
 
-		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": batchReadSize})
+		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": batchReadSize, "include_xml": includeXML})
 		defer log.Close()
 
 		records, err := log.Read()
@@ -251,7 +257,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 	// When combined with large messages this causes EvtNext to fail with
 	// RPC_S_INVALID_BOUND error. The reader should recover from the error.
 	t.Run("large_batch_read", func(t *testing.T) {
-		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1024})
+		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1024, "include_xml": includeXML})
 		defer log.Close()
 
 		var eventCount int
@@ -282,6 +288,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 		log := openLog(t, map[string]interface{}{
 			"name":           path,
 			"no_more_events": "stop",
+			"include_xml":    includeXML,
 		})
 		defer log.Close()
 
@@ -310,6 +317,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 			"name":           path,
 			"no_more_events": "stop",
 			"event_id":       "3, 5",
+			"include_xml":    includeXML,
 		})
 		defer log.Close()
 
@@ -326,6 +334,49 @@ func testWindowsEventLog(t *testing.T, api string) {
 
 		assert.Len(t, records, 21)
 	})
+}
+
+func TestWindows2025IgnoresFilters(t *testing.T) {
+	os, err := windows.OperatingSystem()
+	if err != nil {
+		t.Fatalf("failed to get operating system info: %v", err)
+	}
+	t.Logf("running tests on %s", os.Name)
+
+	path, err := filepath.Abs("../sys/wineventlog/testdata/sysmon-9.01.evtx")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, api := range []string{winEventLogAPIName, winEventLogRawAPIName} {
+		log := openLog(t, api, nil, map[string]interface{}{
+			"name":           path,
+			"no_more_events": "stop",
+			"event_id":       "3, 5",
+			"include_xml":    false,
+			"forwarded":      true,
+		})
+
+		records, err := log.Read()
+
+		// This implementation returns the EOF on the next call.
+		if err == nil && api == winEventLogAPIName {
+			_, err = log.Read()
+		}
+
+		if assert.Error(t, err, "no_more_events=stop requires io.EOF to be returned") {
+			assert.Equal(t, io.EOF, err)
+		}
+
+		if !strings.Contains(os.Name, "2025") {
+			assert.Len(t, records, 21)
+		} else {
+			// we get all events on 2025
+			// because the event log is not filtered by event id
+			assert.Len(t, records, 32)
+		}
+		log.Close()
+	}
 }
 
 // ---- Utility Functions -----
@@ -401,8 +452,8 @@ func openLog(t testing.TB, api string, state *checkpoint.EventLogState, config m
 	switch api {
 	case winEventLogAPIName:
 		log, err = newWinEventLog(cfg)
-	case winEventLogExpAPIName:
-		log, err = newWinEventLogExp(cfg)
+	case winEventLogRawAPIName:
+		log, err = newWinEventLogRaw(cfg)
 	default:
 		t.Fatalf("Unknown API name: '%s'", api)
 	}
@@ -415,7 +466,7 @@ func openLog(t testing.TB, api string, state *checkpoint.EventLogState, config m
 		eventLogState = *state
 	}
 
-	if err = log.Open(eventLogState); err != nil {
+	if err = log.Open(eventLogState, monitoring.NewRegistry()); err != nil {
 		log.Close()
 		t.Fatal(err)
 	}

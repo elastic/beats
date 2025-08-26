@@ -26,8 +26,8 @@ even though it can get expensive with dealing with a very large number of files.
     describing said error.
 
 [id="supported-types"]
-NOTE: NOTE: Currently only `JSON` and `NDJSON` are supported blob/file formats. Blobs/files may be also be gzip compressed.
-As for authentication types, we currently have support for `shared access keys` and `connection strings`.
+NOTE: `JSON`, `NDJSON` and `CSV` are supported blob/file formats. Blobs/files may be also be gzip compressed.
+`shared access keys`, `connection strings` and `Microsoft Entra ID RBAC` authentication types are supported.
 
 [id="basic-config"]
 *A sample configuration with detailed explanation for each field is given below :-*
@@ -224,10 +224,14 @@ This is a specific subfield of a container. It specifies the container name.
 [float]
 ==== `max_workers`
 
-This attribute defines the maximum number of workers (go routines / lightweight threads) are allocated in the worker pool (thread pool) for processing jobs 
-which read contents of file. More number of workers equals a greater amount of concurrency achieved. There is an upper cap of `5000` workers per container that 
-can be defined due to internal sdk constraints. This attribute can be specified both at the root level of the configuration as well at the container level. 
-The container level values will always take priority and override the root level values if both are specified.
+This attribute defines the maximum number of workers allocated to the worker pool for processing jobs which read file contents. It can be specified both at the root level of the configuration, and at the container level. Container level values override root level values if both are specified. Larger number of workers do not necessarily improve throughput, and this should be carefully tuned based on the number of files, the size of the files being processed and resources available. Increasing `max_workers` to very high values may cause resource utilization problems and may lead to bottlenecks in processing. Usually a maximum of `2000` workers is recommended. A very low `max_worker` count will drastically increase the number of network calls required to fetch the blobs, which may cause a bottleneck in processing.
+
+The batch size for workload distribution is calculated by the input to ensure that there is an even workload across all workers. This means that for a given `max_workers` parameter value, the input will calculate the optimal batch size for that setting. The `max_workers` value should be configured based on factors such as the total number of files to be processed, available system resources and network bandwidth.
+
+Example:
+
+- Setting `max_workers=3` would result in each request fetching `3 blobs` (batch size = 3), which are then distributed among `3 workers`.
+- Setting `max_workers=100` would fetch `100 blobs` (batch size = 100) per request, distributed among `100 workers`.
 
 [id="attrib-poll"]
 [float]
@@ -325,6 +329,8 @@ filebeat.inputs:
     - regex: '/Security-Logs/'
 ----
 
+The `file_selectors` operation is performed within the agent locally. The agent will download all the files and then filter them based on the `file_selectors`. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available.
+
 [id="attrib-expand_event_list_from_field"]
 [float]
 ==== `expand_event_list_from_field`
@@ -384,6 +390,8 @@ filebeat.inputs:
   - name: container_1
     timestamp_epoch: 1627233600
 ----
+
+The Azure Blob Storage APIs don't provide a direct way to filter files based on timestamp, so the input will download all the files and then filter them based on the timestamp. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available.
 
 [id="container-overrides"]
 *The sample configs below will explain the container level overriding of attributes a bit further :-*
@@ -446,5 +454,35 @@ filebeat.inputs:
 In this configuration even though we have specified `max_workers = 10`, `poll = true` and `poll_interval = 15s` at the root level, both the containers
 will override these values with their own respective values which are defined as part of their sub attibutes.
 
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                                | Description
+| `url`                                 | URL of the input resource.
+| `errors_total`                        | Total number of errors encountered by the input.
+| `decode_errors_total`                 | Total number of decode errors encountered by the input.
+| `abs_blobs_requested_total`           | Total number of ABS blobs downloaded.
+| `abs_blobs_published_total`           | Total number of ABS blobs processed that were published.
+| `abs_blobs_listed_total`              | Total number of ABS blobs returned by list operations.
+| `abs_bytes_processed_total`           | Total number of ABS bytes processed.
+| `abs_events_created_total`            | Total number of events created from processing ABS data.
+| `abs_blobs_inflight_gauge`            | Number of ABS blobs inflight (gauge).
+| `abs_jobs_scheduled_after_validation` | Histogram of the number of jobs scheduled after validation.
+| `abs_blob_processing_time`            | Histogram of the elapsed ABS blob processing times in nanoseconds (start of download to completion of parsing).
+| `abs_blob_size_in_bytes`              | Histogram of processed ABS blob size in bytes.
+| `abs_events_per_blob`                 | Histogram of event count per ABS blob.
+| `source_lag_time`                     | Histogram of the time between the source (Updated) timestamp and the time the blob was read, in nanoseconds.
+|=======
+
+==== Common input options
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
 NOTE: Any feedback is welcome which will help us further optimize this input. Please feel free to open a github issue for any bugs or feature requests.

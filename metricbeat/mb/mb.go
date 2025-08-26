@@ -80,6 +80,7 @@ type BaseModule struct {
 	config         ModuleConfig
 	rawConfig      *conf.C
 	statusReporter status.StatusReporter
+	Logger         *logp.Logger
 }
 
 func (m *BaseModule) String() string {
@@ -136,6 +137,7 @@ func (m *BaseModule) WithConfig(config conf.C) (*BaseModule, error) {
 	newBM := &BaseModule{
 		name:      m.name,
 		rawConfig: &config,
+		Logger:    m.Logger,
 	}
 
 	if err := config.Unpack(&newBM.config); err != nil {

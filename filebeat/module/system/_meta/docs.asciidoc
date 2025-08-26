@@ -16,7 +16,7 @@ include::../include/gs-link.asciidoc[]
 === Compatibility
 
 This module was tested with logs from OSes like Ubuntu 12.04, Centos 7, and
-macOS Sierra. For Debian 12 Journald is used to read the system logs.
+macOS Sierra.
 
 This module is not available for Windows.
 
@@ -57,14 +57,12 @@ include::../include/config-option-intro.asciidoc[]
 ==== `syslog` fileset settings
 
 include::../include/var-paths.asciidoc[]
-
 include::../include/use-journald.asciidoc[]
 
 [float]
 ==== `auth` fileset settings
 
 include::../include/var-paths.asciidoc[]
-
 include::../include/use-journald.asciidoc[]
 
 *`var.tags`*::

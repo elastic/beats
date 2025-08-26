@@ -19,12 +19,14 @@
 package eslegclient
 
 import (
+	"context"
 	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func GetValidQueryResult() QueryResult {
@@ -170,11 +172,20 @@ func TestReadSearchResult_invalid(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func newTestConnection(url string) *Connection {
+// newTestConnection creates a new connection for testing
+//
+//nolint:unused // it's used by files with the !integration constraint
+func newTestConnection(t *testing.T, url string) *Connection {
 	conn, _ := NewConnection(ConnectionSettings{
 		URL: url,
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	conn.Encoder = NewJSONEncoder(nil, false)
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	if err := conn.Connect(ctx); err != nil {
+		t.Fatalf("cannot connect to Elasticsearch: %s", err)
+	}
+
 	return conn
 }
 

@@ -37,25 +37,25 @@ const (
 
 var experimentalWarning sync.Once
 
-func newProspector(config config) (loginp.Prospector, error) {
+func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
+	logger := log.With("filestream_id", config.ID)
 	err := checkConfigCompatibility(config.FileWatcher, config.FileIdentity)
 	if err != nil {
 		return nil, err
 	}
 
-	filewatcher, err := newFileWatcher(config.Paths, config.FileWatcher)
+	filewatcher, err := newFileWatcher(logger, config.Paths, config.FileWatcher)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating filewatcher %w", err)
 	}
 
-	identifier, err := newFileIdentifier(config.FileIdentity, config.Reader.Parsers.Suffix)
+	identifier, err := newFileIdentifier(config.FileIdentity, config.Reader.Parsers.Suffix, log)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating file identifier: %w", err)
 	}
 
-	logp.L().
-		With("filestream_id", config.ID).
-		Debugf("file identity is set to %s", identifier.Name())
+	logger = logger.Named("filestream")
+	logger.Debugf("file identity is set to %s", identifier.Name())
 
 	fileprospector := fileProspector{
 		filewatcher:         filewatcher,
@@ -64,6 +64,7 @@ func newProspector(config config) (loginp.Prospector, error) {
 		ignoreInactiveSince: config.IgnoreInactive,
 		cleanRemoved:        config.CleanRemoved,
 		stateChangeCloser:   config.Close.OnStateChange,
+		logger:              logger.Named("prospector"),
 	}
 	if config.Rotation == nil {
 		return &fileprospector, nil
@@ -88,7 +89,7 @@ func newProspector(config config) (loginp.Prospector, error) {
 		switch strategy {
 		case copytruncateStrategy:
 			experimentalWarning.Do(func() {
-				cfgwarn.Experimental("rotation.external.copytruncate is used.")
+				log.Warn(cfgwarn.Experimental("rotation.external.copytruncate is used."))
 			})
 
 			cpCfg := &copyTruncateConfig{}

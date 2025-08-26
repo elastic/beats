@@ -14,12 +14,11 @@ var:
     default: []
   - name: use_journald
     default: false
-  - name: use_files
-    default: false
 
 ingest_pipeline:
   - ingest/entrypoint.yml
   - ingest/files.yml
   - ingest/journald.yml
   - ingest/grok-auth-messages.yml
+
 input: config/auth.yml

@@ -1046,6 +1046,7 @@
         "log.level": "informational",
         "log.offset": 11047,
         "network.bytes": 0,
+        "network.community_id": "1:LFE/FJ5zfsQGP8HTeu6b6rxLS78=",
         "network.packets": 0,
         "network.transport": "0",
         "observer.product": "XG",

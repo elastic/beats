@@ -20,14 +20,13 @@ package kafka
 import (
 	"fmt"
 
-	"github.com/Shopify/sarama"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/sarama"
 )
 
 const (
@@ -35,8 +34,6 @@ const (
 )
 
 func init() {
-	sarama.Logger = kafkaLogger{log: logp.NewLogger(logSelector)}
-
 	outputs.RegisterType("kafka", makeKafka)
 }
 
@@ -46,7 +43,9 @@ func makeKafka(
 	observer outputs.Observer,
 	cfg *config.C,
 ) (outputs.Group, error) {
-	log := logp.NewLogger(logSelector)
+	log := beat.Logger.Named(logSelector)
+	sarama.Logger = kafkaLogger{log: log}
+
 	log.Debug("initialize kafka output")
 
 	kConfig, err := readConfig(cfg)
@@ -54,7 +53,7 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	topic, err := buildTopicSelector(cfg)
+	topic, err := buildTopicSelector(cfg, log)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -74,7 +73,7 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, kConfig.Key, topic, kConfig.Headers, codec, libCfg)
+	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, kConfig.Key, topic, kConfig.Headers, codec, libCfg, beat.Logger)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -83,7 +82,7 @@ func makeKafka(
 	if kConfig.MaxRetries < 0 {
 		retry = -1
 	}
-	return outputs.Success(kConfig.Queue, kConfig.BulkMaxSize, retry, nil, client)
+	return outputs.Success(kConfig.Queue, kConfig.BulkMaxSize, retry, nil, beat.Logger, client)
 }
 
 // buildTopicSelector builds the topic selector for standalone Beat and when
@@ -91,10 +90,10 @@ func makeKafka(
 //
 // When running standalone the topic selector works as expected and documented.
 // When running under Elastic-Agent, dynamic topic selection is also supported
-func buildTopicSelector(cfg *config.C) (outil.Selector, error) {
+func buildTopicSelector(cfg *config.C, logger *logp.Logger) (outil.Selector, error) {
 
 	if cfg == nil {
-		return outil.Selector{}, fmt.Errorf("Kafka config cannot be nil")
+		return outil.Selector{}, fmt.Errorf("Kafka config cannot be nil") //nolint:staticcheck //Keep old behavior
 	}
 
 	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
@@ -103,5 +102,5 @@ func buildTopicSelector(cfg *config.C) (outil.Selector, error) {
 		EnableSingleOnly: true,
 		FailEmpty:        true,
 		Case:             outil.SelectorKeepCase,
-	})
+	}, logger)
 }

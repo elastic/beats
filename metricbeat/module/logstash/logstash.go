@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
@@ -38,7 +37,7 @@ func init() {
 
 // NewModule creates a new module
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	return elastic.NewModule(&base, []string{"node", "node_stats"}, []string{}, logp.NewLogger(ModuleName))
+	return elastic.NewModule(&base, []string{"node", "node_stats"}, []string{}, base.Logger.Named(ModuleName))
 }
 
 // ModuleName is the name of this module.

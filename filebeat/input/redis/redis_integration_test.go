@@ -34,7 +34,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -61,8 +61,13 @@ func newEventCaptor(events chan beat.Event) channel.Outleter {
 }
 
 func (ec *eventCaptor) OnEvent(event beat.Event) bool {
-	ec.events <- event
-	return true
+	select {
+	case ec.events <- event:
+		return true
+	case <-ec.c:
+		// captor has been closed
+		return false
+	}
 }
 
 func (ec *eventCaptor) Close() error {
@@ -78,8 +83,6 @@ func (ec *eventCaptor) Done() <-chan struct{} {
 }
 
 func TestInput(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("redis input", "redis"))
-
 	// Setup the input config.
 	config := conf.MustNewConfigFrom(mapstr.M{
 		"network":      "tcp",
@@ -101,11 +104,6 @@ func TestInput(t *testing.T) {
 
 	captor := newEventCaptor(eventsCh)
 
-	t.Cleanup(func() {
-		close(eventsCh)
-		captor.Close()
-	})
-
 	connector := channel.ConnectorFunc(func(_ *conf.C, _ beat.ClientConfig) (channel.Outleter, error) {
 		return channel.SubOutlet(captor), nil
 	})
@@ -116,12 +114,18 @@ func TestInput(t *testing.T) {
 		BeatDone: make(chan struct{}),
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	// Setup the input
-	input, err := NewInput(config, connector, inputContext)
+	input, err := NewInput(config, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
 	t.Cleanup(func() {
+		// Captor must close before input during cleanup, otherwise it can keep
+		// trying to send to eventsCh after we stop reading it, which blocks
+		// and prevents input.Stop() from returning since it waits for the
+		// harvester to close.
+		captor.Close()
 		input.Stop()
 	})
 
@@ -141,6 +145,10 @@ func TestInput(t *testing.T) {
 		val, err := event.GetValue("message")
 		require.NoError(t, err)
 		require.Equal(t, message, val)
+		val, err = event.GetValue("redis")
+		require.NoError(t, err)
+		role := val.(mapstr.M)["slowlog"].(mapstr.M)["role"] //nolint:errcheck //Safe to ignore in tests
+		require.Equal(t, "master", role)
 	case <-time.After(30 * time.Second):
 		t.Fatal("Timeout waiting for event")
 	}
@@ -183,7 +191,7 @@ func createRedisClient(t *testing.T) *rd.Pool {
 			Certificate: "_meta/certs/server-cert.pem",
 			Key:         "_meta/certs/server-key.pem",
 		},
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("failed to load TLS configuration: %v", err)
 	}

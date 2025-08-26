@@ -33,6 +33,7 @@
       },
       "log": {
         "syslog": {
+          "appname": "sudo",
           "facility": {
             "code": 10
           },
@@ -98,11 +99,6 @@
           }
         }
       },
-      "syslog": {
-        "facility": 10,
-        "identifier": "sudo",
-        "priority": 6
-      },
       "systemd": {
         "cgroup": "/user.slice/user-1000.slice/session-1.scope",
         "invocation_id": "2172b101bd684f7b9ca1c434ff2cdd80",
@@ -165,8 +161,10 @@
         },
         "uid": 1000
       },
+      "message_id": "39f53479d3a045ac8e11786248231fbf",
       "log": {
         "syslog": {
+          "appname": "systemd",
           "facility": {
             "code": 3
           },
@@ -174,7 +172,6 @@
         }
       },
       "message": "Started Outputs some log lines.",
-      "message_id": "39f53479d3a045ac8e11786248231fbf",
       "process": {
         "args": [
           "/usr/lib/systemd/systemd",
@@ -183,11 +180,6 @@
         "args_count": 2,
         "command_line": "/usr/lib/systemd/systemd --user",
         "pid": 1003
-      },
-      "syslog": {
-        "facility": 3,
-        "identifier": "systemd",
-        "priority": 6
       },
       "systemd": {
         "cgroup": "/user.slice/user-1000.slice/user@1000.service/init.scope",
@@ -240,6 +232,7 @@
       },
       "log": {
         "syslog": {
+          "appname": "cat",
           "facility": {
             "code": 3
           },
@@ -250,11 +243,6 @@
       "process": {
         "pid": 2084785
       },
-      "syslog": {
-        "facility": 3,
-        "identifier": "cat",
-        "priority": 6
-      },
       "systemd": {
         "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/log-service.service",
         "invocation_id": "ceb98539accb4f60be76734b4ddd6d44",
@@ -307,6 +295,7 @@
       },
       "log": {
         "syslog": {
+          "appname": "cat",
           "facility": {
             "code": 3
           },
@@ -317,11 +306,6 @@
       "process": {
         "pid": 2084785
       },
-      "syslog": {
-        "facility": 3,
-        "identifier": "cat",
-        "priority": 6
-      },
       "systemd": {
         "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/log-service.service",
         "invocation_id": "ceb98539accb4f60be76734b4ddd6d44",
@@ -374,6 +358,7 @@
       },
       "log": {
         "syslog": {
+          "appname": "cat",
           "facility": {
             "code": 3
           },
@@ -384,11 +369,6 @@
       "process": {
         "pid": 2084785
       },
-      "syslog": {
-        "facility": 3,
-        "identifier": "cat",
-        "priority": 6
-      },
       "systemd": {
         "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/log-service.service",
         "invocation_id": "ceb98539accb4f60be76734b4ddd6d44",
@@ -441,6 +421,7 @@
       },
       "log": {
         "syslog": {
+          "appname": "cat",
           "facility": {
             "code": 3
           },
@@ -451,11 +432,6 @@
       "process": {
         "pid": 2084785
       },
-      "syslog": {
-        "facility": 3,
-        "identifier": "cat",
-        "priority": 6
-      },
       "systemd": {
         "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/log-service.service",
         "invocation_id": "ceb98539accb4f60be76734b4ddd6d44",
@@ -508,6 +484,7 @@
       },
       "log": {
         "syslog": {
+          "appname": "cat",
           "facility": {
             "code": 3
           },
@@ -518,11 +495,6 @@
       "process": {
         "pid": 2084785
       },
-      "syslog": {
-        "facility": 3,
-        "identifier": "cat",
-        "priority": 6
-      },
       "systemd": {
         "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/log-service.service",
         "invocation_id": "ceb98539accb4f60be76734b4ddd6d44",
@@ -575,6 +547,7 @@
       },
       "log": {
         "syslog": {
+          "appname": "cat",
           "facility": {
             "code": 3
           },
@@ -584,11 +557,6 @@
       "message": "6th line",
       "process": {
         "pid": 2084785
-      },
-      "syslog": {
-        "facility": 3,
-        "identifier": "cat",
-        "priority": 6
       },
       "systemd": {
         "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/log-service.service",

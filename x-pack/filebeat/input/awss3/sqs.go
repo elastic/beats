@@ -7,6 +7,7 @@ package awss3
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
@@ -15,6 +16,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/aws/smithy-go"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -31,29 +33,30 @@ const (
 
 var errBadQueueURL = errors.New("QueueURL is not in format: https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME} or https://{VPC_ENDPOINT}.sqs.{REGION_ENDPOINT}.vpce.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
 
-func getRegionFromQueueURL(queueURL, endpoint string) string {
+func getRegionFromQueueURL(queueURL string) string {
 	// get region from queueURL
+	// Example for custom domain queue: https://sqs.us-east-1.abc.xyz/12345678912/test-s3-logs
 	// Example for sqs queue: https://sqs.us-east-1.amazonaws.com/12345678912/test-s3-logs
 	// Example for vpce: https://vpce-test.sqs.us-east-1.vpce.amazonaws.com/12345678912/sqs-queue
+	// We use a simple heuristic that works for all essential cases:
+	// - If queue hostname is sqs.X.*, return region X
+	// - If queue hostname is X.sqs.Y.*, return region Y
+	// Hosts that don't follow this convention need the input config to
+	// specify a custom endpoint and an explicit region.
 	u, err := url.Parse(queueURL)
 	if err != nil {
 		return ""
 	}
+	hostSplit := strings.SplitN(u.Hostname(), ".", 5)
 
-	// check for sqs queue url
-	host := strings.SplitN(u.Host, ".", 3)
-	if len(host) == 3 && host[0] == "sqs" {
-		if host[2] == endpoint || (endpoint == "" && strings.HasPrefix(host[2], "amazonaws.")) {
-			return host[1]
-		}
+	// check for sqs-style queue url
+	if len(hostSplit) >= 4 && hostSplit[0] == "sqs" {
+		return hostSplit[1]
 	}
 
-	// check for vpce url
-	host = strings.SplitN(u.Host, ".", 5)
-	if len(host) == 5 && host[1] == "sqs" {
-		if host[4] == endpoint || (endpoint == "" && strings.HasPrefix(host[4], "amazonaws.")) {
-			return host[2]
-		}
+	// check for vpce-style url
+	if len(hostSplit) == 5 && hostSplit[1] == "sqs" {
+		return hostSplit[2]
 	}
 
 	return ""
@@ -65,9 +68,11 @@ func getRegionFromQueueURL(queueURL, endpoint string) string {
 func readSQSMessages(
 	ctx context.Context,
 	log *logp.Logger,
+	statusReporter status.StatusReporter,
 	sqs sqsAPI,
 	metrics *inputMetrics,
 	count int,
+	queueURL string,
 ) []types.Message {
 	if count <= 0 {
 		return nil
@@ -75,7 +80,11 @@ func readSQSMessages(
 	msgs, err := sqs.ReceiveMessage(ctx, count)
 	for (err != nil || len(msgs) == 0) && ctx.Err() == nil {
 		if err != nil {
+			statusReporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retryable SQS fetching error for queue '%s': %s", queueURL, err.Error()))
 			log.Warnw("SQS ReceiveMessage returned an error. Will retry after a short delay.", "error", err)
+		} else {
+			// no auth error - input is running
+			statusReporter.UpdateStatus(status.Running, "Input is running")
 		}
 		// Wait for the retry delay, but stop early if the context is cancelled.
 		select {
@@ -85,6 +94,7 @@ func readSQSMessages(
 		}
 		msgs, err = sqs.ReceiveMessage(ctx, count)
 	}
+	statusReporter.UpdateStatus(status.Running, "Input is running")
 	log.Debugf("Received %v SQS messages.", len(msgs))
 	metrics.sqsMessagesReceivedTotal.Add(uint64(len(msgs)))
 	return msgs

@@ -18,13 +18,18 @@
 package inputmon
 
 import (
+	"encoding/json"
 	"fmt"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
 func TestNewInputMonitor(t *testing.T) {
@@ -61,7 +66,7 @@ func TestNewInputMonitor(t *testing.T) {
 			tc.ID != "", tc.Input != "", tc.OptionalParent != nil, tc.PublicMetrics)
 
 		t.Run(testName, func(t *testing.T) {
-			reg, unreg := NewInputRegistry(tc.Input, tc.ID, tc.OptionalParent)
+			reg, unreg := NewDeprecatedMetricsRegistry(tc.Input, tc.ID, tc.OptionalParent)
 			defer unreg()
 			assert.NotNil(t, reg)
 
@@ -86,21 +91,270 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	t.Cleanup(func() {
 		require.NoError(t, globalRegistry().Clear())
 	})
+	log := logptest.NewTestingLogger(t, "TestMetricSnapshotJSON")
 
-	r, cancel := NewInputRegistry("test", "my-id", nil)
+	// ============== Input using new API and unique namespace ==============
+	// Simulates input using the metrics registry from the v2.Context.
+	// It cannot use the v2.Context directly because it creates an import cycle.
+	inputID := "input-with-pipeline-metrics-new-inputAPI"
+	inputType := "test"
+
+	parentLocalReg := monitoring.NewRegistry()
+	reg := NewMetricsRegistry(inputID, inputType, parentLocalReg, log)
+	monitoring.NewInt(reg, "foo_total").Set(10)
+	monitoring.NewInt(reg, "events_pipeline_total").Set(10)
+
+	// simulate a duplicated ID in the local and global namespace.
+	reg = globalRegistry().NewRegistry(inputID)
+	monitoring.NewString(reg, MetricKeyID).Set(inputID)
+	monitoring.NewString(reg, MetricKeyInput).Set(inputType)
+	monitoring.NewBool(reg, "should_be_overwritten").Set(true)
+
+	// =========== Input using new API and legacy, global namespace ===========
+	// Simulates input unaware of the metrics registry from the v2.Context. In
+	// that case the parentLocalReg context used by the v2.Context is the legacy
+	// globalRegistry() and the input also registers its metrics directly.
+	inputID = "input-with-pipeline-metrics-globalRegistry()"
+	inputType = "test"
+	reg = NewMetricsRegistry(inputID, inputType, globalRegistry(), log)
+	monitoring.NewInt(reg, "events_pipeline_total").Set(20)
+	defer globalRegistry().Remove(inputID)
+
+	// now the input also register its metrics with the deprecated
+	// NewDeprecatedMetricsRegistry.
+	reg, cancel := NewDeprecatedMetricsRegistry(
+		inputType, inputID, nil)
 	defer cancel()
-	monitoring.NewInt(r, "foo_total").Set(100)
+	monitoring.NewInt(reg, "foo_total").Set(20)
 
-	jsonBytes, err := MetricSnapshotJSON()
+	// ===== An input registering metrics, but not using the new API =====
+	// an input registering metrics on the global namespace. This simulates an
+	// input which does not use the metrics registry from filebeat
+	// input/v2.Context.
+	inputOldAPI := "input-without-pipeline-metrics"
+	reg, cancel = NewDeprecatedMetricsRegistry(
+		inputType, inputOldAPI, nil)
+	defer cancel()
+	monitoring.NewInt(reg, "foo_total").Set(30)
+
+	// ==== registries in the global registries which aren't input metrics ===
+	// unrelated registry in the global namespace, should be ignored.
+	reg = globalRegistry().NewRegistry("another-registry")
+	monitoring.NewInt(reg, "foo3_total").Set(100)
+	defer globalRegistry().Remove("another-registry")
+
+	// another input registry missing required information.
+	reg = globalRegistry().NewRegistry("yet-another-registry")
+	monitoring.NewString(reg, MetricKeyID).Set("some-id")
+	monitoring.NewInt(reg, "foo3_total").Set(100)
+	defer globalRegistry().Remove("yet-another-registry")
+
+	jsonBytes, err := MetricSnapshotJSON(parentLocalReg)
 	require.NoError(t, err)
 
-	const expected = `[
-  {
-    "foo_total": 100,
-    "id": "my-id",
-    "input": "test"
-  }
-]`
+	type Resp struct {
+		EventsPipelineTotal int    `json:"events_pipeline_total,omitempty"`
+		FooTotal            int    `json:"foo_total"`
+		ID                  string `json:"id"`
+		Input               string `json:"input"`
+	}
+	var got []Resp
 
-	assert.Equal(t, expected, string(jsonBytes))
+	err = json.Unmarshal(jsonBytes, &got)
+	require.NoError(t, err, "failed to unmarshal response")
+	want := map[string]Resp{
+		"input-with-pipeline-metrics-new-inputAPI": {
+			EventsPipelineTotal: 10,
+			FooTotal:            10,
+			ID:                  "input-with-pipeline-metrics-new-inputAPI",
+			Input:               inputType,
+		},
+		"input-with-pipeline-metrics-globalRegistry()": {
+			EventsPipelineTotal: 20,
+			FooTotal:            20,
+			ID:                  "input-with-pipeline-metrics-globalRegistry()",
+			Input:               inputType,
+		},
+		"input-without-pipeline-metrics": {
+			FooTotal: 30,
+			ID:       "input-without-pipeline-metrics",
+			Input:    inputType,
+		},
+	}
+	found := map[string]bool{}
+
+	assert.Equal(t, len(want), len(got), "got a different number of metrics than wanted")
+	for _, m := range got {
+		if found[m.ID] {
+			t.Error("found duplicate id")
+		}
+
+		w, ok := want[m.ID]
+		if !assert.True(t, ok, "unexpected input ID in metrics: %s", m.ID) {
+			continue
+		}
+
+		if assert.Equal(t, w, m) {
+			found[m.ID] = true
+		}
+	}
+
+	// It's easier to understand the failure with the full output.
+	if t.Failed() {
+		t.Logf("API response:\n%s\n", string(jsonBytes))
+	}
+}
+
+func TestSnapshotWithNestedInputs(t *testing.T) {
+	logger := logp.NewNopLogger()
+	inputs := monitoring.NewRegistry()
+	regA := NewMetricsRegistry("input-a", "filestream", inputs, logger)
+	monitoring.NewInt(regA, "events_pipeline_total").Set(10)
+	regB := NewMetricsRegistry("input-b", "gcp", inputs, logger)
+	monitoring.NewInt(regB, "events_pipeline_total").Set(20)
+
+	// input-b is a GCP input with two data sources, override its type with
+	// InputNested to indicate its registry contains other input registries.
+	monitoring.NewString(regB, "input").Set(InputNested)
+	regC := NewMetricsRegistry("input-b.C", "gcp", regB, logger)
+	monitoring.NewInt(regC, "events_pipeline_total").Set(30)
+	regD := NewMetricsRegistry("input-b.D", "gcp", regB, logger)
+	monitoring.NewInt(regD, "events_pipeline_total").Set(40)
+
+	jsonBytes, err := MetricSnapshotJSON(inputs)
+	require.NoError(t, err)
+
+	type Resp struct {
+		ID                  string `json:"id"`
+		Input               string `json:"input"`
+		EventsPipelineTotal int    `json:"events_pipeline_total,omitempty"`
+	}
+	// The result should have only the three leaf nodes in the input registry
+	// tree (input-b should be excluded)
+	want := []Resp{
+		{
+			ID:                  "input-a",
+			Input:               "filestream",
+			EventsPipelineTotal: 10,
+		},
+		{
+			ID:                  "input-b.C",
+			Input:               "gcp",
+			EventsPipelineTotal: 30,
+		},
+		{
+			ID:                  "input-b.D",
+			Input:               "gcp",
+			EventsPipelineTotal: 40,
+		},
+	}
+
+	var got []Resp
+
+	err = json.Unmarshal(jsonBytes, &got)
+	require.NoError(t, err, "failed to unmarshal response")
+
+	// Sort the arrays before checking equality since registry key order isn't guaranteed
+	sort.Slice(want, func(i, j int) bool { return want[i].ID < want[j].ID })
+	sort.Slice(got, func(i, j int) bool { return got[i].ID < got[j].ID })
+
+	assert.Equal(t, want, got, "Reported input metrics didn't match expected value")
+}
+
+func TestFindInputRegistryWithID(t *testing.T) {
+	logger := logp.NewNopLogger()
+	root := monitoring.NewRegistry()
+	regA := NewMetricsRegistry("input-a", InputNested, root, logger)
+	NewMetricsRegistry("input-b", "winlog", regA, logger)
+	NewMetricsRegistry("input.c", "winlog", regA, logger)
+	NewMetricsRegistry("input-a::input-d", "winlog", regA, logger)
+	NewMetricsRegistry("input-e", "winlog", root, logger)
+
+	// findInputRegistryWithID should succeed on all id parameters above,
+	// whether they are at top level, nested, or contain other inputs nested
+	// inside them, and whether or not they have periods (which are not allowed
+	// in registry keys).
+	expectedIDs := []string{"input-a", "input-b", "input.c", "input-a::input-d", "input-e"}
+	for _, id := range expectedIDs {
+		assert.NotNil(t, findInputRegistryWithID(root, id), "findInputRegistryWithID should return a non-nil registry for id "+id)
+	}
+}
+
+func TestNewMetricsRegistry(t *testing.T) {
+	parent := monitoring.NewRegistry()
+	inputID := "input-inputID"
+	inputType := "input-type"
+	got := NewMetricsRegistry(
+		inputID,
+		inputType,
+		parent,
+		logptest.NewTestingLogger(t, "test"))
+
+	require.NotNil(t, got, "new metrics registry should not be nil")
+	assert.Equal(t, parent.GetRegistry(inputID), got)
+
+	vals := monitoring.CollectFlatSnapshot(got, monitoring.Full, false)
+	assert.Equal(t, inputID, vals.Strings[MetricKeyID])
+	assert.Equal(t, inputType, vals.Strings[MetricKeyInput])
+}
+
+func TestNewMetricsRegistry_duplicatedInputID(t *testing.T) {
+	parent := monitoring.NewRegistry()
+	inputID := "input-inputID"
+	inputType := "input-type"
+	metricName := "foo_total"
+	goMetricsRegistryName := "bar_registry"
+
+	// 1st call, create the registry
+	got := NewMetricsRegistry(
+		inputID,
+		inputType,
+		parent,
+		logptest.NewTestingLogger(t, "test"))
+
+	require.NotNil(t, got, "new metrics registry should not be nil")
+	assert.Equal(t, parent.GetRegistry(inputID), got)
+	// register a metric to the registry
+	monitoring.NewInt(got, metricName)
+	adapter.NewGoMetrics(got, goMetricsRegistryName, adapter.Accept)
+
+	// 2nd call, return an unregistered registry
+	got = NewMetricsRegistry(
+		inputID,
+		inputType,
+		parent,
+		logptest.NewTestingLogger(t, "test"))
+	require.NotNil(t, got, "new metrics registry should not be nil")
+	assert.NotEqual(t, parent.GetRegistry(inputID), got,
+		"should get an unregistered registry, but found the registry on parent")
+	assert.NotPanics(t, func() {
+		// register the same metric again
+		monitoring.NewInt(got, metricName)
+		adapter.NewGoMetrics(got, goMetricsRegistryName, adapter.Accept)
+	}, "the registry should be a new and empty registry")
+}
+
+func TestCancelMetricsRegistry(t *testing.T) {
+	parent := monitoring.NewRegistry()
+	inputID := "input-ID"
+	inputType := "input-type"
+
+	_ = parent.NewRegistry(inputID)
+	got := parent.GetRegistry(inputID)
+	require.NotNil(t, got, "metrics registry not found on parent")
+
+	CancelMetricsRegistry(inputID, inputType, parent, logptest.NewTestingLogger(t, "test"))
+
+	got = parent.GetRegistry(inputID)
+	assert.Nil(t, got, "metrics registry was not removed from parent")
+}
+
+func TestMetricSnapshotJSON_regNil(t *testing.T) {
+	err := globalRegistry().Clear()
+	require.NoError(t, err, "could not clear global registry")
+
+	got, err := MetricSnapshotJSON(nil)
+
+	require.NoError(t, err, "MetricSnapshotJSON should not return an error")
+	assert.Equal(t, "[]", string(got))
 }

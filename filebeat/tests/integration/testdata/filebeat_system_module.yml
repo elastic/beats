@@ -1,0 +1,29 @@
+filebeat.modules:
+  - module: system
+    syslog:
+      enabled: true
+      var.paths:
+        - "%s"
+    auth:
+      enabled: true
+      var.paths:
+        - "%s"
+
+path.home: %s
+
+queue.mem:
+  flush.timeout: 0
+
+output:
+  file:
+    path: ${path.home}
+    filename: "output"
+    rotate_every_kb: 500000 # 500mb
+
+logging:
+  level: debug
+  selectors:
+    - input
+    - input.journald
+    - input.journald.reader
+    - input.journald.reader.journalctl-runner

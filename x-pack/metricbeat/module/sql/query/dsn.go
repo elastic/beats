@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package query
 
 import (
@@ -12,6 +14,7 @@ import (
 	"github.com/godror/godror"
 	"github.com/godror/godror/dsn"
 
+	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -24,7 +27,11 @@ type ConnectionDetails struct {
 }
 
 // ParseDSN tries to parse the host
-func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
+func ParseDSN(mod mb.Module, host string) (_ mb.HostData, fetchErr error) {
+	defer func() {
+		fetchErr = sql.SanitizeError(fetchErr, host)
+	}()
+
 	// TODO: Add support for `username` and `password` as module options
 	config := ConnectionDetails{}
 	if err := mod.UnpackConfig(&config); err != nil {

@@ -30,8 +30,10 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -57,7 +59,7 @@ type salesforceInput struct {
 // var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
 // Plugin returns the input plugin.
-func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:      inputName,
 		Stability: feature.Stable,
@@ -509,7 +511,7 @@ func retryErrorHandler(max int, log *logp.Logger) retryablehttp.ErrorHandler {
 }
 
 func newClient(cfg config, log *logp.Logger) (*http.Client, error) {
-	c, err := cfg.Resource.Transport.Client()
+	c, err := cfg.Resource.Transport.Client(httpcommon.WithLogger(log))
 	if err != nil {
 		return nil, err
 	}

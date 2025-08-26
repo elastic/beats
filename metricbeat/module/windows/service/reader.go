@@ -28,6 +28,7 @@ import (
 
 	"golang.org/x/sys/windows/registry"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -48,9 +49,10 @@ type Reader struct {
 	guid              string            // Host's MachineGuid value (a unique ID for the host).
 	ids               map[string]string // Cache of service IDs.
 	protectedServices map[string]struct{}
+	log               *logp.Logger
 }
 
-func NewReader() (*Reader, error) {
+func NewReader(log *logp.Logger) (*Reader, error) {
 	handle, err := openSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
 	if err != nil {
 		return nil, fmt.Errorf("initialization failed: %w", err)
@@ -67,13 +69,14 @@ func NewReader() (*Reader, error) {
 		guid:              guid,
 		ids:               map[string]string{},
 		protectedServices: map[string]struct{}{},
+		log:               log,
 	}
 
 	return r, nil
 }
 
 func (reader *Reader) Read() ([]mapstr.M, error) {
-	services, err := GetServiceStates(reader.handle, reader.state, reader.protectedServices)
+	services, err := GetServiceStates(reader.log, reader.handle, reader.state, reader.protectedServices)
 	if err != nil {
 		return nil, err
 	}

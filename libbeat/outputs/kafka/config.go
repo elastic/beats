@@ -21,11 +21,9 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"math/rand"
+	"math/rand/v2"
 	"strings"
 	"time"
-
-	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -38,6 +36,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/sarama"
 )
 
 type backoffConfig struct {
@@ -100,12 +99,18 @@ var compressionModes = map[string]sarama.CompressionCodec{
 	// As of sarama 1.24.1, zstd support is broken
 	// (https://github.com/Shopify/sarama/issues/1252), which needs to be
 	// addressed before we add support here.
+
+	// (https://github.com/IBM/sarama/pull/1574) sarama version 1.26.0 has
+	// fixed this issue and elastic version of sarama has merged this commit.
+	// (https://github.com/elastic/sarama/commit/37faed7ffc7d59e681d99cfebd1f3d453d6d607c)
+
 	"none":   sarama.CompressionNone,
 	"no":     sarama.CompressionNone,
 	"off":    sarama.CompressionNone,
 	"gzip":   sarama.CompressionGZIP,
 	"lz4":    sarama.CompressionLZ4,
 	"snappy": sarama.CompressionSnappy,
+	"zstd":   sarama.CompressionZSTD,
 }
 
 func defaultConfig() kafkaConfig {
@@ -180,6 +185,10 @@ func (c *kafkaConfig) Validate() error {
 		return errors.New("either 'topic' or 'topics' must be defined")
 	}
 
+	if len(c.Headers) != 0 && c.Version < kafka.Version("0.11") {
+		return errors.New("including headers is not supported for kafka versions < 0.11")
+	}
+
 	// When running under Elastic-Agent we do not support dynamic topic
 	// selection, so `topics` is not supported and `topic` is treated as an
 	// plain string
@@ -209,7 +218,7 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 	k.Producer.Timeout = config.BrokerTimeout
 	k.Producer.CompressionLevel = config.CompressionLevel
 
-	tls, err := tlscommon.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(config.TLS, log)
 	if err != nil {
 		return nil, err
 	}
@@ -221,7 +230,7 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 
 	switch {
 	case config.Kerberos.IsEnabled():
-		cfgwarn.Beta("Kerberos authentication for Kafka is beta.")
+		log.Warn(cfgwarn.Beta("Kerberos authentication for Kafka is beta."))
 
 		// Due to a regrettable past decision, the flag controlling Kerberos
 		// FAST authentication was initially added to the output configuration
@@ -300,11 +309,14 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 	k.Version = version
 
 	k.Producer.Partitioner = partitioner
+
 	k.MetricRegistry = adapter.GetGoMetrics(
 		monitoring.Default,
-		"libbeat.outputs.kafka",
-		adapter.Rename("incoming-byte-rate", "bytes_read"),
-		adapter.Rename("outgoing-byte-rate", "bytes_write"),
+		"libbeat.outputs",
+		adapter.Rename("incoming-byte-rate", "read.bytes"),
+		adapter.Rename("outgoing-byte-rate", "write.bytes"),
+		adapter.Rename("request-latency-in-ms", "write.latency"),
+		adapter.Rename("requests-in-flight", "kafka.requests-in-flight"),
 		adapter.GoMetricsNilify,
 	)
 
@@ -330,7 +342,7 @@ func makeBackoffFunc(cfg backoffConfig) func(retries, maxRetries int) time.Durat
 		// apply about equaly distributed jitter in second half of the interval, such that the wait
 		// time falls into the interval [dur/2, dur]
 		limit := int64(dur / 2)
-		jitter := rand.Int63n(limit + 1)
+		jitter := rand.Int64N(limit + 1)
 		return time.Duration(limit + jitter)
 	}
 }

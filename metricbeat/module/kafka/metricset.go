@@ -42,7 +42,7 @@ func NewMetricSet(base mb.BaseMetricSet, options MetricSetOptions) (*MetricSet, 
 		return nil, err
 	}
 
-	tlsCfg, err := tlscommon.LoadTLSConfig(config.TLS)
+	tlsCfg, err := tlscommon.LoadTLSConfig(config.TLS, base.Logger())
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func NewMetricSet(base mb.BaseMetricSet, options MetricSetOptions) (*MetricSet, 
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		broker:        NewBroker(base.Host(), cfg),
+		broker:        NewBroker(base.Host(), base.Logger(), cfg),
 	}, nil
 
 }

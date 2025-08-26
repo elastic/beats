@@ -13,10 +13,29 @@ suffix: plain
 path: "../_meta/test/KSM"
 ```
 
+In order to support a new KSM version, first update the KSM version in the `kubernetes.yml` file from the root of the kubernetes module, then apply the file into an existing cluster:
 
-When you update the KSM directory files, remember to run `go test -data` inside each `state_*` metricset directory to generate the expected files. To check against the expected files already present, you can just run `go test .`.
+```bash
+kubectl apply -f kubernetes.yml
+```
 
-> **TIP**: To run tests and generate the expected files for all state metricsets you can run `go test ./state... --data`. Navigate to `/elastic/beats/metricbeat/module/kubernetes/` to run this command.
+After that, you should have a kube-state-metrics pod running. In order to fetch metrics first use port-forward to expose the KSM api:
+
+```bash
+kubectl port-forward svc/kube-state-metrics 8080
+```
+
+Then you can fetch the metrics from `localhost:8080/metrics` and then save it to a new `./KSM/ksm.vx.xx.x.plain` file.
+
+To generate and check the expectation files, you can run the following commands:
+
+```bash
+cd metricbeat/module/kubernetes
+# generate the expected files
+go test ./state... --data
+# test the expected files
+go test ./state...
+```
 
 > **_NOTE:_**  The expected files inside the two folders of each `state_*` mericset (`_meta/test` and `_meta/testdata`) are not deleted when running the tests. Remember to delete them if they are from an old version.
 

@@ -30,7 +30,9 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // Input interface for cursor based inputs. This interface must be implemented
@@ -109,18 +111,44 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
+	// Override the reported type in the registry to a sentinel value so that
+	// metrics reporters that aggregate over inputs know to skip this registry
+	// and report its nested sources (instantiated below) as top-level inputs.
+	// (We need child inputs to be reported at the top level for backwards
+	// compatibility, but we don't want to expose the top-level inputs registry
+	// to every individual input, so we keep nested input metrics within their
+	// parent's registry and aggregate them at the top level during the reporting
+	// stage.)
+	monitoring.NewString(ctx.MetricsRegistry, "input").Set(inputmon.InputNested)
+
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
 		source := source
 		grp.Go(func() (err error) {
 			// refine per worker context
-			inpCtx := ctx
-			// Preserve IDWithoutName, in case the context was constructed who knows how
-			inpCtx.IDWithoutName = ctx.ID
-			inpCtx.ID = ctx.ID + "::" + source.Name()
-			inpCtx.Logger = ctx.Logger.With("input_source", source.Name())
+			inpCtxID := ctx.ID + "::" + source.Name()
+			log := ctx.Logger.With("input_source", source.Name())
 
-			if err = inp.runSource(inpCtx, inp.manager.store, source, pipeline); err != nil {
+			reg, pc, cancelMetrics := input.PrepareInputMetrics(
+				inpCtxID,
+				ctx.Name,
+				ctx.MetricsRegistry,
+				pipeline,
+				log)
+			defer cancelMetrics()
+
+			inpCtx := input.Context{
+				ID:              inpCtxID,
+				IDWithoutName:   ctx.ID, // Preserve IDWithoutName, in case the context was constructed who knows how
+				Name:            ctx.Name,
+				Agent:           ctx.Agent,
+				Cancelation:     ctx.Cancelation,
+				StatusReporter:  ctx.StatusReporter,
+				MetricsRegistry: reg,
+				Logger:          log,
+			}
+
+			if err = inp.runSource(inpCtx, inp.manager.store, source, pc); err != nil {
 				cancel()
 			}
 			return err

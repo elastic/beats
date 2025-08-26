@@ -28,7 +28,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: meraki
-  metricsets: ["device_health"]
+  metricsets: ["device_health", "network_health"]
   enabled: true
   period: 300s
   apiKey: "Meraki dashboard API key"
@@ -42,6 +42,10 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-meraki-device_health,device_health>>
 
+* <<metricbeat-metricset-meraki-network_health,network_health>>
+
 include::meraki/device_health.asciidoc[]
+
+include::meraki/network_health.asciidoc[]
 
 :edit_url!:

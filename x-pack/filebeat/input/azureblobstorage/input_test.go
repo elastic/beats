@@ -6,6 +6,8 @@ package azureblobstorage
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -26,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/mock"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -36,6 +39,7 @@ const (
 	beatsNdJSONContainer        = "beatsndjsoncontainer"
 	beatsGzJSONContainer        = "beatsgzjsoncontainer"
 	beatsJSONWithArrayContainer = "beatsjsonwitharraycontainer"
+	beatsCSVContainer           = "beatscsvcontainer"
 )
 
 func Test_StorageClient(t *testing.T) {
@@ -471,6 +475,28 @@ func Test_StorageClient(t *testing.T) {
 				mock.Beatscontainer_2_blob_data3_json:  true,
 			},
 		},
+		{
+			name: "ReadCSV",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"decoding.codec.csv.enabled":          true,
+				"decoding.codec.csv.comma":            " ",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsCSVContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_csv[0]: true,
+				mock.BeatsFilesContainer_csv[1]: true,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -492,7 +518,7 @@ func Test_StorageClient(t *testing.T) {
 			chanClient := beattest.NewChanClient(len(tt.expected))
 			t.Cleanup(func() { _ = chanClient.Close() })
 
-			ctx, cancel := newV2Context()
+			ctx, cancel := newV2Context(t)
 			t.Cleanup(cancel)
 			ctx.ID += tt.name
 
@@ -540,7 +566,7 @@ func Test_StorageClient(t *testing.T) {
 					var err error
 					val, err = got.Fields.GetValue("message")
 					assert.NoError(t, err)
-					assert.True(t, tt.expected[val.(string)])
+					assert.True(t, tt.expected[strings.ReplaceAll(val.(string), "\r\n", "\n")])
 					assert.Equal(t, tt.expectedError, err)
 					receivedCount += 1
 					if receivedCount == len(tt.expected) {
@@ -596,7 +622,7 @@ func Test_Concurrency(t *testing.T) {
 					PollInterval:  *container.PollInterval,
 				}
 			}
-			v2Ctx, cancel := newV2Context()
+			v2Ctx, cancel := newV2Context(t)
 			t.Cleanup(cancel)
 			v2Ctx.ID += t.Name()
 			client := publisher{
@@ -660,11 +686,24 @@ func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
 	return nil
 }
 
-func newV2Context() (v2.Context, func()) {
+func newV2Context(t *testing.T) (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
+	id, err := generateRandomID(8)
+	if err != nil {
+		t.Fatalf("failed to generate random id: %v", err)
+	}
 	return v2.Context{
-		Logger:      logp.NewLogger("azure-blob-storage_test"),
-		ID:          "test_id:",
-		Cancelation: ctx,
+		Logger:          logp.NewLogger("abs_test"),
+		ID:              "abs_test-" + id,
+		Cancelation:     ctx,
+		MetricsRegistry: monitoring.NewRegistry(),
 	}, cancel
+}
+
+func generateRandomID(length int) (string, error) {
+	bytes := make([]byte, length)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(bytes), nil
 }

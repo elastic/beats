@@ -5,8 +5,6 @@
 package ipfix
 
 import (
-	"log"
-
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
 	v9 "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/v9"
@@ -29,7 +27,7 @@ func init() {
 }
 
 func New(config config.Config) protocol.Protocol {
-	logger := log.New(config.LogOutput(), LogPrefix, 0)
+	logger := config.LogOutput().Named(LogPrefix)
 	decoder := DecoderIPFIX{
 		DecoderV9: v9.DecoderV9{Logger: logger, Fields: config.Fields()},
 	}

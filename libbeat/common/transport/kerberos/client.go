@@ -18,48 +18,11 @@
 package kerberos
 
 import (
-	"fmt"
 	"net/http"
-
-	krbclient "gopkg.in/jcmturner/gokrb5.v7/client"
-	krbconfig "gopkg.in/jcmturner/gokrb5.v7/config"
-	"gopkg.in/jcmturner/gokrb5.v7/keytab"
-	"gopkg.in/jcmturner/gokrb5.v7/spnego"
 )
 
-type Client struct {
-	spClient *spnego.Client
-}
+type Client interface {
+	Do(req *http.Request) (*http.Response, error)
 
-func NewClient(config *Config, httpClient *http.Client, esurl string) (*Client, error) {
-	var krbClient *krbclient.Client
-	krbConf, err := krbconfig.Load(config.ConfigPath)
-	if err != nil {
-		return nil, fmt.Errorf("error creating Kerberos client: %+v", err)
-	}
-
-	switch config.AuthType {
-	case authKeytab:
-		kTab, err := keytab.Load(config.KeyTabPath)
-		if err != nil {
-			return nil, fmt.Errorf("cannot load keytab file %s: %+v", config.KeyTabPath, err)
-		}
-		krbClient = krbclient.NewClientWithKeytab(config.Username, config.Realm, kTab, krbConf)
-	case authPassword:
-		krbClient = krbclient.NewClientWithPassword(config.Username, config.Realm, config.Password, krbConf)
-	default:
-		return nil, InvalidAuthType
-	}
-
-	return &Client{
-		spClient: spnego.NewClient(krbClient, httpClient, ""),
-	}, nil
-}
-
-func (c *Client) Do(req *http.Request) (*http.Response, error) {
-	return c.spClient.Do(req)
-}
-
-func (c *Client) CloseIdleConnections() {
-	c.spClient.CloseIdleConnections()
+	CloseIdleConnections()
 }

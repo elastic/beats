@@ -21,13 +21,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Shopify/sarama"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/kafka"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/sarama"
 )
 
 // init registers the partition MetricSet with the central registry.
@@ -47,12 +45,15 @@ type MetricSet struct {
 
 var errFailQueryOffset = errors.New("operation failed")
 
-var debugf = logp.MakeDebug("kafka")
-
 // New creates a new instance of the partition MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	// NOTE: Sarama uses this property to determine which Kafka version it is interacting with
+	// (see: https://github.com/elastic/sarama/blob/7672917f26b6112627457d6bd1736a8636449c5b/config.go#L496).
+	// Modifying this value can impact compatibility with Kafka clusters, especially those running versions
+	// lower than the one specified here. Therefore, any changes to this property should be made cautiously,
+	// and must be thoroughly tested against all supported Kafka versions.
 	opts := kafka.MetricSetOptions{
-		Version: "0.8.2.0",
+		Version: "2.1.0",
 	}
 
 	ms, err := kafka.NewMetricSet(base, opts)
@@ -86,7 +87,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return fmt.Errorf("error getting topic metadata: %w", err)
 	}
 	if len(topics) == 0 {
-		debugf("no topic could be read, check ACLs")
+		m.Logger().Named("kafka").Debugf("no topic could be read, check ACLs")
 		return nil
 	}
 
@@ -96,7 +97,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	for _, topic := range topics {
-		debugf("fetch events for topic: ", topic.Name)
+		m.Logger().Named("kafka").Debugf("fetch events for topic: ", topic.Name)
 		evtTopic := mapstr.M{
 			"name": topic.Name,
 		}
@@ -110,7 +111,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		for _, partition := range topic.Partitions {
 			// partition offsets can be queried from leader only
 			if broker.ID() != partition.Leader {
-				debugf("broker is not leader (broker=%v, leader=%v)", broker.ID(), partition.Leader)
+				m.Logger().Named("kafka").Debugf("broker is not leader (broker=%v, leader=%v)", broker.ID(), partition.Leader)
 				continue
 			}
 
@@ -125,7 +126,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 						err = errFailQueryOffset
 					}
 
-					msg := fmt.Errorf("Failed to query kafka partition (%v:%v) offsets: %v",
+					msg := fmt.Errorf("failed to query kafka partition (%v:%v) offsets: %w",
 						topic.Name, partition.ID, err)
 					m.Logger().Warn(msg)
 					r.Error(msg)

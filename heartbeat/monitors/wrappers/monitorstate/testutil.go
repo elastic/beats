@@ -18,6 +18,7 @@
 package monitorstate
 
 import (
+	"context"
 	"encoding/json"
 	"testing"
 
@@ -26,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/elastic/beats/v7/heartbeat/esutil"
 	"github.com/elastic/go-elasticsearch/v8"
@@ -42,7 +44,7 @@ func IntegES(t *testing.T) (esc *eslegclient.Connection) {
 		URL:      eslegtest.GetURL(),
 		Username: "admin",
 		Password: "testing",
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 		panic(err) // panic in case TestLogger did not stop test
@@ -50,7 +52,9 @@ func IntegES(t *testing.T) (esc *eslegclient.Connection) {
 
 	conn.Encoder = eslegclient.NewJSONEncoder(nil, false)
 
-	err = conn.Connect()
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	err = conn.Connect(ctx)
 	if err != nil {
 		t.Fatal(err)
 		panic(err) // panic in case TestLogger did not stop test

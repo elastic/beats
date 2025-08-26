@@ -7,7 +7,8 @@
         "fileset.name": "syslog",
         "host.hostname": "vagrant-debian-12",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
-        "input.type": "system-logs",
+        "input.type": "journald",
+        "log.syslog.appname": "systemd",
         "log.syslog.facility.code": 3,
         "log.syslog.priority": 6,
         "message": "Stopped target getty.target - Login Prompts.",
@@ -16,7 +17,8 @@
         ],
         "process.args_count": 1,
         "process.command_line": "/sbin/init",
-        "process.pid": "1",
+        "process.name": "systemd",
+        "process.pid": 1,
         "related.hosts": [
             "vagrant-debian-12"
         ],
@@ -32,11 +34,11 @@
         "fileset.name": "syslog",
         "host.hostname": "vagrant-debian-12",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
-        "input.type": "system-logs",
+        "input.type": "journald",
+        "log.syslog.appname": "kernel",
         "log.syslog.facility.code": 0,
         "log.syslog.priority": 6,
         "message": "Console: switching to colour frame buffer device 160x50",
-        "process.pid": "",
         "related.hosts": [
             "vagrant-debian-12"
         ],
@@ -50,11 +52,11 @@
         "fileset.name": "syslog",
         "host.hostname": "bookworm",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
-        "input.type": "system-logs",
+        "input.type": "journald",
+        "log.syslog.appname": "kernel",
         "log.syslog.facility.code": 0,
         "log.syslog.priority": 6,
         "message": "thermal_sys: Registered thermal governor 'power_allocator'",
-        "process.pid": "",
         "related.hosts": [
             "bookworm"
         ],

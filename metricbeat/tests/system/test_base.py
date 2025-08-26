@@ -59,7 +59,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         assert len(es.cat.templates(name='metricbeat-*', h='name')) > 0
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.timeout(8*60, func_only=True)
+    @pytest.mark.timeout(8 * 60, func_only=True)
     def test_dashboards(self):
         """
         Test that the dashboards can be loaded with `setup --dashboards`

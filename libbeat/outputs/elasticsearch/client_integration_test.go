@@ -22,7 +22,7 @@ package elasticsearch
 import (
 	"context"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 	"time"
 
@@ -37,7 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -78,12 +78,13 @@ func TestClientPublishEventKerberosAware(t *testing.T) {
 }
 
 func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
-	output, client := connectTestEsWithStats(t, cfg, index)
+	registry := monitoring.NewRegistry()
+	output, client := connectTestEs(t, cfg, outputs.NewStats(registry))
 
 	// drop old index preparing test
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 
-	batch := encodeBatch(client, outest.NewBatch(beat.Event{
+	batch := encodeBatch[*outest.Batch](client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"type":    "libbeat",
@@ -108,7 +109,7 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 
 	assert.Equal(t, 1, resp.Count)
 
-	outputSnapshot := monitoring.CollectFlatSnapshot(monitoring.Default.GetRegistry("output-"+index), monitoring.Full, true)
+	outputSnapshot := monitoring.CollectFlatSnapshot(registry, monitoring.Full, true)
 	assert.Greater(t, outputSnapshot.Ints["write.bytes"], int64(0), "output.events.write.bytes must be greater than 0")
 	assert.Greater(t, outputSnapshot.Ints["read.bytes"], int64(0), "output.events.read.bytes must be greater than 0")
 	assert.Equal(t, int64(0), outputSnapshot.Ints["write.errors"])
@@ -118,15 +119,13 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 func TestClientPublishEventWithPipeline(t *testing.T) {
 	type obj map[string]interface{}
 
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	index := "beat-int-pub-single-with-pipeline"
 	pipeline := "beat-int-pub-single-pipeline"
 
-	output, client := connectTestEsWithoutStats(t, obj{
+	output, client := connectTestEs(t, obj{
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
-	})
+	}, nil)
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 
 	// Check version
@@ -135,7 +134,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	}
 
 	publish := func(event beat.Event) {
-		batch := encodeBatch(client, outest.NewBatch(event))
+		batch := encodeBatch[*outest.Batch](client, outest.NewBatch(event))
 		err := output.Publish(context.Background(), batch)
 		if err != nil {
 			t.Fatal(err)
@@ -201,23 +200,21 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 	type obj map[string]interface{}
 
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	index := "beat-int-test-dli-index"
 	deadletterIndex := "beat-int-test-dli-dead-letter-index"
 
-	output, client := connectTestEsWithoutStats(t, obj{
+	output, client := connectTestEs(t, obj{
 		"index": index,
 		"non_indexable_policy": map[string]interface{}{
 			"dead_letter_index": map[string]interface{}{
 				"index": deadletterIndex,
 			},
 		},
-	})
+	}, nil)
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 	_, _, _ = client.conn.Delete(deadletterIndex, "", "", nil)
 
-	batch := encodeBatch(client, outest.NewBatch(beat.Event{
+	batch := encodeBatch[*outest.Batch](client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"type":      "libbeat",
@@ -230,7 +227,7 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	batch = encodeBatch(client, outest.NewBatch(beat.Event{
+	batch = encodeBatch[*outest.Batch](client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"type":      "libbeat",
@@ -263,15 +260,13 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	type obj map[string]interface{}
 
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	index := "beat-int-pub-bulk-with-pipeline"
 	pipeline := "beat-int-pub-bulk-pipeline"
 
-	output, client := connectTestEsWithoutStats(t, obj{
+	output, client := connectTestEs(t, obj{
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
-	})
+	}, nil)
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 
 	if client.conn.GetVersion().Major < 5 {
@@ -279,7 +274,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	}
 
 	publish := func(events ...beat.Event) {
-		batch := encodeBatch(client, outest.NewBatch(events...))
+		batch := encodeBatch[*outest.Batch](client, outest.NewBatch(events...))
 		err := output.Publish(context.Background(), batch)
 		if err != nil {
 			t.Fatal(err)
@@ -346,13 +341,13 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 
 func TestClientPublishTracer(t *testing.T) {
 	index := "beat-apm-tracer-test"
-	output, client := connectTestEsWithoutStats(t, map[string]interface{}{
+	output, client := connectTestEs(t, map[string]interface{}{
 		"index": index,
-	})
+	}, nil)
 
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 
-	batch := encodeBatch(client, outest.NewBatch(beat.Event{
+	batch := encodeBatch[*outest.Batch](client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"message": "Hello world",
@@ -384,17 +379,11 @@ func TestClientPublishTracer(t *testing.T) {
 	assert.Equal(t, "/_bulk", secondSpan.Context.HTTP.URL.Path)
 }
 
-func connectTestEsWithStats(t *testing.T, cfg interface{}, suffix string) (outputs.Client, *Client) {
-	m := monitoring.Default.NewRegistry("output-" + suffix)
-	s := outputs.NewStats(m)
-	return connectTestEs(t, cfg, s)
-}
-
-func connectTestEsWithoutStats(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
-	return connectTestEs(t, cfg, outputs.NewNilObserver())
-}
-
 func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outputs.Client, *Client) {
+	t.Helper()
+	if stats == nil {
+		stats = outputs.NewNilObserver()
+	}
 	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"hosts":            eslegtest.GetEsHost(),
 		"username":         eslegtest.GetUser(),
@@ -415,9 +404,10 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 		t.Fatal(err)
 	}
 
-	info := beat.Info{Beat: "libbeat"}
+	logger := logptest.NewTestingLogger(t, "elasticsearch")
+	info := beat.Info{Beat: "libbeat", Logger: logger}
 	// disable ILM if using specified index name
-	im, _ := idxmgmt.DefaultSupport(nil, info, conf.MustNewConfigFrom(map[string]interface{}{"setup.ilm.enabled": "false"}))
+	im, _ := idxmgmt.DefaultSupport(info, conf.MustNewConfigFrom(map[string]interface{}{"setup.ilm.enabled": "false"}))
 	output, err := makeES(im, info, stats, config)
 	if err != nil {
 		t.Fatal(err)
@@ -427,21 +417,26 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 		outputs.NetworkClient
 		Client() outputs.NetworkClient
 	}
-	client := randomClient(output).(clientWrap).Client().(*Client)
+	client, ok := randomClient(output).(clientWrap).Client().(*Client)
+	assert.True(t, ok)
 
-	// Load version number
-	_ = client.Connect()
+	// Load version ctx
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	if err := client.Connect(ctx); err != nil {
+		t.Fatalf("cannot connect to ES: %s", err)
+	}
 
 	return client, client
 }
 
 // setupRoleMapping sets up role mapping for the Kerberos user beats@ELASTIC
 func setupRoleMapping(t *testing.T, host string) error {
-	_, client := connectTestEsWithoutStats(t, map[string]interface{}{
+	_, client := connectTestEs(t, map[string]interface{}{
 		"hosts":    host,
 		"username": "elastic",
 		"password": "changeme",
-	})
+	}, nil)
 
 	roleMappingURL := client.conn.URL + "/_security/role_mapping/kerbrolemapping"
 
@@ -468,6 +463,6 @@ func randomClient(grp outputs.Group) outputs.NetworkClient {
 		panic("no elasticsearch client")
 	}
 
-	client := grp.Clients[rand.Intn(L)]
-	return client.(outputs.NetworkClient)
+	client := grp.Clients[rand.IntN(L)]
+	return client.(outputs.NetworkClient) //nolint:errcheck //This is a test file, can ignore
 }

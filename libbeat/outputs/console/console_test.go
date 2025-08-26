@@ -36,6 +36,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -113,8 +115,9 @@ func TestConsoleOutput(t *testing.T) {
 	for _, test := range tests {
 		test := test
 		t.Run(test.title, func(t *testing.T) {
+			logger := logptest.NewTestingLogger(t, "")
 			batch := outest.NewBatch(test.events...)
-			lines, err := run(test.codec, batch)
+			lines, err := run(test.codec, logger, batch)
 			assert.NoError(t, err)
 			assert.Equal(t, test.expected, lines)
 
@@ -127,9 +130,9 @@ func TestConsoleOutput(t *testing.T) {
 	}
 }
 
-func run(codec codec.Codec, batches ...publisher.Batch) (string, error) {
+func run(codec codec.Codec, logger *logp.Logger, batches ...publisher.Batch) (string, error) {
 	return withStdout(func() {
-		c, _ := newConsole("test", outputs.NewNilObserver(), codec)
+		c, _ := newConsole("test", outputs.NewNilObserver(), codec, logger)
 		for _, b := range batches {
 			c.Publish(context.Background(), b)
 		}

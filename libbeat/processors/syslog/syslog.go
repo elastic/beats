@@ -22,14 +22,14 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/beats/v7/libbeat/reader/syslog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -43,7 +43,7 @@ const (
 )
 
 // instanceID is used to assign each instance a unique monitoring namespace.
-var instanceID = atomic.MakeUint32(0)
+var instanceID atomic.Uint32
 
 // config defines the configuration for this processor.
 type config struct {
@@ -107,15 +107,15 @@ func defaultConfig() config {
 }
 
 // New creates a new processor from the provided configuration, or an error if the configuration is invalid.
-func New(c *conf.C) (beat.Processor, error) {
+func New(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	cfg := defaultConfig()
 
 	if err := c.Unpack(&cfg); err != nil {
 		return nil, fmt.Errorf("fail to unpack the "+procName+" processor configuration: %w", err)
 	}
 
-	id := int(instanceID.Inc())
-	log := logp.NewLogger(logName).With("instance_id", id)
+	id := int(instanceID.Add(1))
+	log = log.Named(logName).With("instance_id", id)
 	registryName := logName + "." + strconv.Itoa(id)
 
 	if cfg.Tag != "" {

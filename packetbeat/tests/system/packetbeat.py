@@ -130,7 +130,7 @@ class BaseTest(TestCase):
                     required_fields=None):
 
         if output_file is None:
-            output_file = "output/packetbeat-"+self.today+".ndjson"
+            output_file = "output/packetbeat-" + self.today + ".ndjson"
         print(output_file)
 
         jsons = []

@@ -36,6 +36,12 @@ func TestUTF16BytesToString(t *testing.T) {
 	assert.Equal(t, input, output)
 }
 
+func TestMakeDisplayableBinaryString(t *testing.T) {
+	input := []byte{0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF}
+	output := BinaryToString(input)
+	assert.Equal(t, "0123456789ABCDEF", output)
+}
+
 func BenchmarkUTF16BytesToString(b *testing.B) {
 	utf16Bytes := common.StringToUTF16Bytes("A logon was attempted using explicit credentials.")
 

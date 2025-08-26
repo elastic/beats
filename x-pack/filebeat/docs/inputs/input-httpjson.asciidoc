@@ -230,6 +230,7 @@ Some built-in helper functions are provided to work with the input state inside 
 - `parseTimestamp`: parses a timestamp in seconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732]]` returns `2020-11-05 13:25:32 +0000 UTC`.
 - `replaceAll(old, new, s)`: replaces all non-overlapping instances of `old` with `new` in `s`. Example: `[[ replaceAll "some" "my" "some value" ]]` returns `my value`.
 - `sprintf`: formats according to a format specifier and returns the resulting string. Refer to https://pkg.go.dev/fmt#Sprintf[the Go docs] for usage. Example: `[[sprintf "%d:%q" 34 "quote this"]]`
+- `terminate`: exits the template without falling back to the default value and without causing an error. It takes a single string argument that is logged in debug logging.
 - `toInt`: converts a value of any type to an integer when possible. Returns 0 if the conversion fails.
 - `toJSON`: converts a value to a JSON string. This can be used with `value_type: json` to create an object from a template. Example: `[[ toJSON .last_response.body.pagingIdentifiers ]]`.
 - `urlEncode`: URL encodes the supplied string. Example `[[urlEncode "string1"]]`. Example `[[urlEncode "<string1>"]]` will return `%3Cstring1%3E`.
@@ -572,6 +573,15 @@ e.g. instead of rate-limiting when `remaining` hits `0`, rate-limiting will occu
 
 It is not set by default (by default the rate-limiting as specified in the Response is followed).
 
+[[request-rate-limit-max-non-degraded]]
+[float]
+==== `request.rate_limit.max_non_degraded`
+
+The maximum number of consecutive 429 rate limit responses from the endpoint to accept
+before making an input health status update. If this is not set, rate limit responses
+will not be reported as health updates. Default behavior is to not report rate limiting
+responses.
+
 [[request-transforms]]
 [float]
 ==== `request.transforms`
@@ -659,6 +669,7 @@ filename and will be replaced with the input instance id. For Example, `http-req
 
 This value sets the maximum size, in megabytes, the log file will reach before it is rotated. By default
 logs are allowed to reach 1MB before rotation.
+Individual request/response bodies will be truncated to 10% of this size.
 
 [float]
 ==== `request.tracer.maxage`
@@ -782,6 +793,8 @@ Valid when used with `type: map`. When not empty, defines a new field where the 
 ==== `response.split[].ignore_empty_value`
 
 If set to true, empty or missing value will be ignored and processing will pass on to the next nested split operation instead of failing with an error. Default: `false`.
+
+Note that if `ignore_empty_value` is `true` and the final result is empty, no event will be published, and no cursor update will be made. If a cursor update must be made for all responses, this should be set to `false` and the ingest pipeline must be configured to tolerate empty event sets.
 
 [float]
 ==== `response.split[].split`
@@ -1556,6 +1569,8 @@ See  <<chain-step-replace_with, chain[].step.replace_with>> .
 
 Cursor is a list of key value objects where arbitrary values are defined. The values are interpreted as  <<value-templates,value templates>> and a default template can be set. Cursor state is kept between input restarts and updated once all the events for a request are published.
 
+If no event is published, no cursor update is made. This can have implications on how cursor updates should be performed when the target API returns empty response sets.
+
 Each cursor entry is formed by:
 
 - A `value` template, which will define the value to store when evaluated.
@@ -1618,6 +1633,8 @@ observe the activity of the input.
 [options="header"]
 |=======
 | Metric                                     | Description
+| `events_published_total`                   | Total number of events published.
+| `pages_published_total`                    | Total number of pages of event published.
 | `http_request_total`                       | Total number of processed requests.
 | `http_request_errors_total`                | Total number of request errors.
 | `http_request_delete_total`                | Total number of `DELETE` requests.

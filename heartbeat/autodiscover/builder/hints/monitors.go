@@ -55,7 +55,7 @@ func InitializeModule() {
 }
 
 // NewHeartbeatHints builds a heartbeat hints builder
-func NewHeartbeatHints(cfg *conf.C) (autodiscover.Builder, error) {
+func NewHeartbeatHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(config)
 
@@ -63,7 +63,7 @@ func NewHeartbeatHints(cfg *conf.C) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	return &heartbeatHints{config, logp.L()}, nil
+	return &heartbeatHints{config, logger}, nil
 }
 
 // Create config based on input hints in the bus event
@@ -81,7 +81,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 	monitorConfig := hb.getRawConfigs(hints)
 
 	// If explicty disabled, return nothing
-	if utils.IsDisabled(hints, hb.config.Key) {
+	if utils.IsDisabled(hints, hb.config.Key, hb.logger) {
 		hb.logger.Warnf("heartbeat config disabled by hint: %+v", event)
 		return []*conf.C{}
 	}
@@ -105,7 +105,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 		}
 		hb.logger.Debugf("generated config %+v", configs)
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs)
+		return template.ApplyConfigTemplate(event, configs, hb.logger)
 	}
 
 	tempCfg := mapstr.M{}
@@ -140,11 +140,11 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 	}
 
 	// Apply information in event to the template to generate the final config
-	return template.ApplyConfigTemplate(event, configs)
+	return template.ApplyConfigTemplate(event, configs, hb.logger)
 }
 
 func (hb *heartbeatHints) getRawConfigs(hints mapstr.M) []mapstr.M {
-	return utils.GetHintAsConfigs(hints, hb.config.Key)
+	return utils.GetHintAsConfigs(hints, hb.config.Key, hb.logger)
 }
 
 func (hb *heartbeatHints) getProcessors(hints mapstr.M) []mapstr.M {

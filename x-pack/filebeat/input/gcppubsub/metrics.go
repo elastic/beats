@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package gcppubsub
 
 import (
@@ -24,7 +26,9 @@ type inputMetrics struct {
 }
 
 func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
+	// It's a v1 input, thus it does not have access to the v2.Context with the
+	// metrics registry.
+	reg, unreg := inputmon.NewDeprecatedMetricsRegistry(inputName, id, optionalParent)
 
 	out := &inputMetrics{
 		unregister:              unreg,

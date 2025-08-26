@@ -78,7 +78,7 @@ func TestDiskQueueUnderAgent(t *testing.T) {
 
 			management.SetUnderAgent(true)
 
-			actualGroup, err := Success(queueConfig, tt.args.batchSize, tt.args.retry, tt.args.encoderFactory, tt.args.clients...)
+			actualGroup, err := Success(queueConfig, tt.args.batchSize, tt.args.retry, tt.args.encoderFactory, logp.NewNopLogger(), tt.args.clients...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Success() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -92,8 +92,7 @@ func TestDiskQueueUnderAgent(t *testing.T) {
 			require.NotNil(t, actualGroup)
 			require.NotNil(t, actualGroup.QueueFactory)
 
-			testlogger, _ := logp.NewInMemory("test-diskqueue", zapcore.EncoderConfig{})
-
+			testlogger, _ := logp.NewInMemoryLocal("test-diskqueue", zapcore.EncoderConfig{})
 			actualQueue, err := actualGroup.QueueFactory(testlogger, nil, 1, nil)
 			require.NoError(t, err)
 			require.NotNil(t, actualQueue)

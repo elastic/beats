@@ -24,8 +24,8 @@ import (
 	"io/ioutil"
 
 	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
@@ -37,8 +37,8 @@ type Client struct {
 }
 
 // NewClient builds and returns a docker Client
-func NewClient() (Client, error) {
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
+func NewClient(logger *logp.Logger) (Client, error) {
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logger)
 	return Client{cli: c}, err
 }
 
@@ -109,7 +109,7 @@ func (c Client) ContainerWait(ID string) error {
 }
 
 // ContainerInspect recovers information of the container
-func (c Client) ContainerInspect(ID string) (types.ContainerJSON, error) {
+func (c Client) ContainerInspect(ID string) (container.InspectResponse, error) {
 	ctx := context.Background()
 	return c.cli.ContainerInspect(ctx, ID)
 }

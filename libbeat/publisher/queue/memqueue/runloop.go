@@ -155,6 +155,12 @@ func (l *runLoop) runIteration() {
 		l.handleGetReply(l.pendingGetRequest)
 		l.pendingGetRequest = nil
 	}
+
+	// Check for final shutdown (if we are closing and the event buffer is
+	// completely drained)
+	if l.closing && l.eventCount == 0 {
+		l.broker.ctxCancel()
+	}
 }
 
 func (l *runLoop) handleGetRequest(req *getRequest) {
@@ -214,10 +220,6 @@ func (l *runLoop) handleDelete(count int) {
 	l.eventCount -= count
 	l.consumedCount -= count
 	l.observer.RemoveEvents(count, byteCount)
-	if l.closing && l.eventCount == 0 {
-		// Our last events were acknowledged during shutdown, signal final shutdown
-		l.broker.ctxCancel()
-	}
 }
 
 func (l *runLoop) handleInsert(req *pushRequest) {

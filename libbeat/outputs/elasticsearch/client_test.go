@@ -21,6 +21,7 @@ package elasticsearch
 
 import (
 	"bytes"
+	"compress/gzip"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -28,7 +29,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -40,6 +43,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
+	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
@@ -48,6 +52,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	libversion "github.com/elastic/elastic-agent-libs/version"
@@ -85,6 +90,7 @@ func (bm *batchMock) RetryEvents(events []publisher.Event) {
 
 func TestPublish(t *testing.T) {
 
+	logger := logptest.NewTestingLogger(t, "")
 	makePublishTestClient := func(t *testing.T, url string) (*Client, *monitoring.Registry) {
 		reg := monitoring.NewRegistry()
 		client, err := NewClient(
@@ -94,11 +100,28 @@ func TestPublish(t *testing.T) {
 				indexSelector: testIndexSelector{},
 			},
 			nil,
+			logger,
 		)
 		require.NoError(t, err)
 		return client, reg
 	}
-
+	makePublishGzipTestClient := func(t *testing.T, url string, compressionLevel int) (*Client, *monitoring.Registry) {
+		reg := monitoring.NewRegistry()
+		client, err := NewClient(
+			clientSettings{
+				observer: outputs.NewStats(reg),
+				connection: eslegclient.ConnectionSettings{
+					URL:              url,
+					CompressionLevel: compressionLevel,
+				},
+				indexSelector: testIndexSelector{},
+			},
+			nil,
+			logger,
+		)
+		require.NoError(t, err)
+		return client, reg
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -276,6 +299,85 @@ func TestPublish(t *testing.T) {
 		assertRegistryUint(t, reg, "events.failed", 3, "Split batches should retry 3 events before dropping them")
 		assertRegistryUint(t, reg, "events.active", 0, "Active events should be zero when Publish returns")
 	})
+
+	t.Run("sends telemetry headers", func(t *testing.T) {
+		events := []publisher.Event{event1, event2, event3}
+		eventsRaw := `{"index":{"_index":"test","_type":"doc"}}
+{"@timestamp":"0001-01-01T00:00:00.000Z","field":1}
+
+{"index":{"_index":"test","_type":"doc"}}
+{"@timestamp":"0001-01-01T00:00:00.000Z","field":2}
+
+{"index":{"_index":"test","_type":"doc"}}
+{"@timestamp":"0001-01-01T00:00:00.000Z","field":3}
+
+`
+		batch := &batchMock{
+			events: events,
+		}
+
+		var requestCount, uncompressedLength, eventCount atomic.Int64
+		buf := bytes.NewBuffer(nil)
+		esMock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			requestCount.Add(1)
+
+			ul := r.Header.Get(eslegclient.HeaderUncompressedLength)
+			if ul != "" {
+				l, _ := strconv.ParseInt(ul, 10, 64)
+				uncompressedLength.Store(l)
+			}
+			ec := r.Header.Get(HeaderEventCount)
+			if ec != "" {
+				c, _ := strconv.ParseInt(ec, 10, 64)
+				eventCount.Store(c)
+			}
+
+			body := r.Body
+			if r.Header.Get("Content-Encoding") == "gzip" {
+				body, _ = gzip.NewReader(body)
+			}
+			io.Copy(buf, body)
+
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"took": 30, "errors": false, "items": [] }`))
+		}))
+		defer esMock.Close()
+		client, _ := makePublishTestClient(t, esMock.URL)
+		gzipClient, _ := makePublishGzipTestClient(t, esMock.URL, 5)
+
+		cases := []struct {
+			name   string
+			client *Client
+		}{
+			{
+				name:   "uncompressed",
+				client: client,
+			},
+			{
+				name:   "compressed",
+				client: gzipClient,
+			},
+		}
+
+		for _, tc := range cases {
+			t.Run(tc.name, func(t *testing.T) {
+				buf.Reset()
+				requestCount.Store(0)
+				// set to -1 to assert the assignment later
+				uncompressedLength.Store(-1)
+				eventCount.Store(-1)
+
+				batch := encodeBatch(tc.client, batch)
+				err := tc.client.Publish(ctx, batch)
+
+				assert.NoError(t, err, "Publish should drop the batch without error")
+				assert.Equal(t, int64(1), requestCount.Load(), "Should process only one request")
+				assert.Equal(t, int64(len(eventsRaw)), uncompressedLength.Load(), "Should have the correct %s header", eslegclient.HeaderUncompressedLength)
+				assert.Equal(t, int64(3), eventCount.Load(), "Should have the correct %s header", HeaderEventCount)
+				assert.Equal(t, eventsRaw, buf.String(), "Should have the correct body")
+			})
+		}
+	})
 }
 
 func assertRegistryUint(t *testing.T, reg *monitoring.Registry, key string, expected uint64, message string) {
@@ -286,11 +388,13 @@ func assertRegistryUint(t *testing.T, reg *monitoring.Registry, key string, expe
 }
 
 func TestCollectPublishFailsNone(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	client, err := NewClient(
 		clientSettings{
 			observer: outputs.NewNilObserver(),
 		},
 		nil,
+		logger,
 	)
 	assert.NoError(t, err)
 
@@ -313,11 +417,13 @@ func TestCollectPublishFailsNone(t *testing.T) {
 }
 
 func TestCollectPublishFailMiddle(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	client, err := NewClient(
 		clientSettings{
 			observer: outputs.NewNilObserver(),
 		},
 		nil,
+		logger,
 	)
 	assert.NoError(t, err)
 
@@ -348,12 +454,14 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 
 func TestCollectPublishFailDeadLetterSuccess(t *testing.T) {
 	const deadLetterIndex = "test_index"
+	logger := logptest.NewTestingLogger(t, "")
 	client, err := NewClient(
 		clientSettings{
 			observer:        outputs.NewNilObserver(),
 			deadLetterIndex: deadLetterIndex,
 		},
 		nil,
+		logger,
 	)
 	assert.NoError(t, err)
 
@@ -380,12 +488,14 @@ func TestCollectPublishFailFatalErrorNotRetried(t *testing.T) {
 	// Test that a fatal error sending to the dead letter index is reported as
 	// a dropped event, and is not retried forever
 	const deadLetterIndex = "test_index"
+	logger := logptest.NewTestingLogger(t, "")
 	client, err := NewClient(
 		clientSettings{
 			observer:        outputs.NewNilObserver(),
 			deadLetterIndex: deadLetterIndex,
 		},
 		nil,
+		logger,
 	)
 	assert.NoError(t, err)
 
@@ -409,9 +519,11 @@ func TestCollectPublishFailFatalErrorNotRetried(t *testing.T) {
 }
 
 func TestCollectPublishFailInvalidBulkIndexResponse(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	client, err := NewClient(
 		clientSettings{observer: outputs.NewNilObserver()},
 		nil,
+		logger,
 	)
 	assert.NoError(t, err)
 
@@ -438,6 +550,7 @@ func TestCollectPublishFailInvalidBulkIndexResponse(t *testing.T) {
 }
 
 func TestCollectPublishFailDeadLetterIndex(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	const deadLetterIndex = "test_index"
 	client, err := NewClient(
 		clientSettings{
@@ -445,6 +558,7 @@ func TestCollectPublishFailDeadLetterIndex(t *testing.T) {
 			deadLetterIndex: deadLetterIndex,
 		},
 		nil,
+		logger,
 	)
 	assert.NoError(t, err)
 
@@ -486,12 +600,14 @@ func TestCollectPublishFailDeadLetterIndex(t *testing.T) {
 }
 
 func TestCollectPublishFailDrop(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	client, err := NewClient(
 		clientSettings{
 			observer:        outputs.NewNilObserver(),
 			deadLetterIndex: "",
 		},
 		nil,
+		logger,
 	)
 	assert.NoError(t, err)
 
@@ -534,11 +650,13 @@ func TestCollectPublishFailDrop(t *testing.T) {
 }
 
 func TestCollectPublishFailAll(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	client, err := NewClient(
 		clientSettings{
 			observer: outputs.NewNilObserver(),
 		},
 		nil,
+		logger,
 	)
 	assert.NoError(t, err)
 
@@ -564,13 +682,14 @@ func TestCollectPublishFailAll(t *testing.T) {
 }
 
 func TestCollectPipelinePublishFail(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
+	logger := logptest.NewTestingLogger(t, "")
 
 	client, err := NewClient(
 		clientSettings{
 			observer: outputs.NewNilObserver(),
 		},
 		nil,
+		logger,
 	)
 	assert.NoError(t, err)
 
@@ -615,13 +734,35 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 	assert.Equal(t, events, res)
 }
 
+func TestPublishResultForStats(t *testing.T) {
+	// publishResultForStats should return errTooMany if it is given
+	// stats with tooMany > 0, and nil otherwise (all other errors are
+	// either caused by encoding or connection failures, or are
+	// immediately retryable).
+	stats := bulkResultStats{
+		acked:        1,
+		duplicates:   2,
+		fails:        3,
+		nonIndexable: 4,
+		deadLetter:   5,
+		tooMany:      1,
+	}
+
+	assert.Equal(t, errTooMany, publishResultForStats(stats), "publishResultForStats should return errTooMany if tooMany > 0")
+
+	stats.tooMany = 0
+	assert.Nil(t, publishResultForStats(stats), "publishResultForStats should return nil if tooMany == 0")
+}
+
 func BenchmarkCollectPublishFailsNone(b *testing.B) {
+
 	client, err := NewClient(
 		clientSettings{
 			observer:        outputs.NewNilObserver(),
 			deadLetterIndex: "",
 		},
 		nil,
+		logp.NewNopLogger(), // we use no-op logger so that it does not skew benchmark results
 	)
 	assert.NoError(b, err)
 
@@ -654,6 +795,7 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 			observer: outputs.NewNilObserver(),
 		},
 		nil,
+		logp.NewNopLogger(),
 	)
 	assert.NoError(b, err)
 
@@ -687,6 +829,7 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
 			observer: outputs.NewNilObserver(),
 		},
 		nil,
+		logp.NewNopLogger(),
 	)
 	assert.NoError(b, err)
 
@@ -713,6 +856,83 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
 	}
 }
 
+func BenchmarkPublish(b *testing.B) {
+	tests := []struct {
+		Name   string
+		Events []beat.Event
+	}{
+		{
+			Name:   "5 events",
+			Events: testutil.GenerateEvents(50, 5, 3),
+		},
+		{
+			Name:   "50 events",
+			Events: testutil.GenerateEvents(500, 5, 3),
+		},
+		{
+			Name:   "500 events",
+			Events: testutil.GenerateEvents(500, 5, 3),
+		},
+	}
+
+	levels := []int{1, 4, 7, 9}
+
+	requestCount := 0
+
+	// start a mock HTTP server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(b, "testing value", r.Header.Get("X-Test"))
+		// from the documentation: https://golang.org/pkg/net/http/
+		// For incoming requests, the Host header is promoted to the
+		// Request.Host field and removed from the Header map.
+		assert.Equal(b, "myhost.local", r.Host)
+
+		var response string
+		if r.URL.Path == "/" {
+			response = `{ "version": { "number": "7.6.0" } }`
+		} else {
+			response = `{"items":[{"index":{}},{"index":{}},{"index":{}}]}`
+
+		}
+		fmt.Fprintln(w, response)
+		requestCount++
+	}))
+	defer ts.Close()
+
+	// Indexing to _bulk api
+	for _, test := range tests {
+		for _, l := range levels {
+			b.Run(fmt.Sprintf("%s with compression level %d", test.Name, l), func(b *testing.B) {
+				client, err := NewClient(
+					clientSettings{
+						connection: eslegclient.ConnectionSettings{
+							URL: ts.URL,
+							Headers: map[string]string{
+								"host":   "myhost.local",
+								"X-Test": "testing value",
+							},
+							CompressionLevel: l,
+						},
+					},
+					nil,
+					logp.NewNopLogger(),
+				)
+				assert.NoError(b, err)
+				batch := encodeBatch(client, outest.NewBatch(test.Events...))
+
+				// It uses gzip encoder internally for encoding data
+				b.ResetTimer()
+				for i := 0; i < b.N; i++ {
+					err := client.Publish(context.Background(), batch)
+					assert.NoError(b, err)
+				}
+			})
+
+		}
+	}
+
+}
+
 func TestClientWithHeaders(t *testing.T) {
 	requestCount := 0
 	// start a mock HTTP server
@@ -735,6 +955,7 @@ func TestClientWithHeaders(t *testing.T) {
 	}))
 	defer ts.Close()
 
+	logger := logptest.NewTestingLogger(t, "")
 	client, err := NewClient(clientSettings{
 		observer: outputs.NewNilObserver(),
 		connection: eslegclient.ConnectionSettings{
@@ -745,11 +966,13 @@ func TestClientWithHeaders(t *testing.T) {
 			},
 		},
 		indexSelector: outil.MakeSelector(outil.ConstSelectorExpr("test", outil.SelectorLowerCase)),
-	}, nil)
+	}, nil, logger)
 	assert.NoError(t, err)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
 	// simple ping
-	err = client.Connect()
+	err = client.Connect(ctx)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, requestCount)
 
@@ -790,13 +1013,15 @@ func TestBulkEncodeEvents(t *testing.T) {
 	for name, test := range cases {
 		test := test
 		t.Run(name, func(t *testing.T) {
+			logger := logptest.NewTestingLogger(t, "")
 			cfg := c.MustNewConfigFrom(test.config)
 			info := beat.Info{
 				IndexPrefix: "test",
 				Version:     test.version,
+				Logger:      logger,
 			}
 
-			im, err := idxmgmt.DefaultSupport(nil, info, c.NewConfig())
+			im, err := idxmgmt.DefaultSupport(info, c.NewConfig())
 			require.NoError(t, err)
 
 			index, pipeline, err := buildSelectors(im, info, cfg)
@@ -809,6 +1034,7 @@ func TestBulkEncodeEvents(t *testing.T) {
 					pipelineSelector: pipeline,
 				},
 				nil,
+				logger,
 			)
 			assert.NoError(t, err)
 
@@ -859,12 +1085,14 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 	}
 
 	cfg := c.MustNewConfigFrom(mapstr.M{})
+	logger := logptest.NewTestingLogger(t, "")
 	info := beat.Info{
 		IndexPrefix: "test",
 		Version:     version.GetDefaultVersion(),
+		Logger:      logger,
 	}
 
-	im, err := idxmgmt.DefaultSupport(nil, info, c.NewConfig())
+	im, err := idxmgmt.DefaultSupport(info, c.NewConfig())
 	require.NoError(t, err)
 
 	index, pipeline, err := buildSelectors(im, info, cfg)
@@ -877,6 +1105,7 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 			pipelineSelector: pipeline,
 		},
 		nil,
+		logger,
 	)
 
 	events := make([]publisher.Event, len(cases))
@@ -934,24 +1163,30 @@ func TestClientWithAPIKey(t *testing.T) {
 	}))
 	defer ts.Close()
 
+	logger := logptest.NewTestingLogger(t, "")
+
 	client, err := NewClient(clientSettings{
 		observer: outputs.NewNilObserver(),
 		connection: eslegclient.ConnectionSettings{
 			URL:    ts.URL,
 			APIKey: "hyokHG4BfWk5viKZ172X:o45JUkyuS--yiSAuuxl8Uw",
 		},
-	}, nil)
+	}, nil, logger)
 	assert.NoError(t, err)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
 	// This connection will fail since the server doesn't return a valid
 	// response. This is fine since we're just testing the headers in the
 	// original client request.
 	//nolint:errcheck // connection doesn't need to succeed
-	client.Connect()
+	client.Connect(ctx)
 	assert.Equal(t, "ApiKey aHlva0hHNEJmV2s1dmlLWjE3Mlg6bzQ1SlVreXVTLS15aVNBdXV4bDhVdw==", headers.Get("Authorization"))
 }
 
 func TestBulkRequestHasFilterPath(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
 	makePublishTestClient := func(t *testing.T, url string, configParams map[string]string) *Client {
 		client, err := NewClient(
 			clientSettings{
@@ -963,6 +1198,7 @@ func TestBulkRequestHasFilterPath(t *testing.T) {
 				indexSelector: testIndexSelector{},
 			},
 			nil,
+			logger,
 		)
 		require.NoError(t, err)
 		return client

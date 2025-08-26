@@ -44,7 +44,7 @@ func makeDiscard(
 	cfg *config.C,
 ) (outputs.Group, error) {
 	out := &discardOutput{
-		log:      logp.NewLogger("discard"),
+		log:      beat.Logger.Named("discard"),
 		beat:     beat,
 		observer: observer,
 	}
@@ -56,7 +56,7 @@ func makeDiscard(
 	// disable bulk support in publisher pipeline
 	_ = cfg.SetInt("bulk_max_size", -1, -1)
 	out.log.Infof("Initialized discard output")
-	return outputs.Success(doConfig.Queue, -1, 0, nil, out)
+	return outputs.Success(doConfig.Queue, -1, 0, nil, beat.Logger, out)
 }
 
 // Implement Outputer

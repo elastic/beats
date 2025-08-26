@@ -21,7 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"sync"
 	"time"
 
@@ -36,16 +36,18 @@ import (
 	"github.com/elastic/elastic-agent-libs/testing"
 )
 
-// Expvar metric names.
 const (
-	successesKey = "success"
-	failuresKey  = "failures"
-	eventsKey    = "events"
+	// Expvar metric names.
+	successesKey           = "success"
+	failuresKey            = "failures"
+	eventsKey              = "events"
+	consecutiveFailuresKey = "consecutive_failures"
+
+	// Failure threshold config key
+	failureThresholdKey = "failure_threshold"
 )
 
 var (
-	debugf = logp.MakeDebug("module")
-
 	fetchesLock = sync.Mutex{}
 	fetches     = map[string]*stats{}
 )
@@ -57,10 +59,12 @@ var (
 type Wrapper struct {
 	mb.Module
 	metricSets []*metricSetWrapper // List of pointers to its associated MetricSets.
+	monitoring beat.Monitoring
 
 	// Options
 	maxStartDelay  time.Duration
 	eventModifiers []mb.EventModifier
+	logger         *logp.Logger
 }
 
 // metricSetWrapper contains the MetricSet and the private data associated with
@@ -70,47 +74,68 @@ type metricSetWrapper struct {
 	module *Wrapper // Parent Module.
 	stats  *stats   // stats for this MetricSet.
 
-	periodic bool // Set to true if this metricset is a periodic fetcher
+	periodic         bool // Set to true if this metricset is a periodic fetcher
+	failureThreshold uint // threshold of consecutive errors needed to set the stream as degraded
 }
 
 // stats bundles common metricset stats.
 type stats struct {
-	key      string          // full stats key
-	ref      uint32          // number of modules/metricsets reusing stats instance
-	success  *monitoring.Int // Total success events.
-	failures *monitoring.Int // Total error events.
-	events   *monitoring.Int // Total events published.
+	key                 string           // full stats key
+	ref                 uint32           // number of modules/metricsets reusing stats instance
+	success             *monitoring.Int  // Total success events.
+	failures            *monitoring.Int  // Total error events.
+	events              *monitoring.Int  // Total events published.
+	consecutiveFailures *monitoring.Uint // Consecutive failures fetching this metricset
 }
 
 // NewWrapper creates a new module and its associated metricsets based on the given configuration.
-func NewWrapper(config *conf.C, r *mb.Register, options ...Option) (*Wrapper, error) {
-	module, metricSets, err := mb.NewModule(config, r)
+func NewWrapper(config *conf.C, r *mb.Register, logger *logp.Logger, monitoring beat.Monitoring, options ...Option) (*Wrapper, error) {
+	module, metricSets, err := mb.NewModule(config, r, logger)
 	if err != nil {
 		return nil, err
 	}
-	return createWrapper(module, metricSets, options...)
+	return createWrapper(module, metricSets, monitoring, logger, options...)
 }
 
 // NewWrapperForMetricSet creates a wrapper for the selected module and metricset.
-func NewWrapperForMetricSet(module mb.Module, metricSet mb.MetricSet, options ...Option) (*Wrapper, error) {
-	return createWrapper(module, []mb.MetricSet{metricSet}, options...)
+func NewWrapperForMetricSet(module mb.Module, metricSet mb.MetricSet, monitoring beat.Monitoring, logger *logp.Logger, options ...Option) (*Wrapper, error) {
+	return createWrapper(module, []mb.MetricSet{metricSet}, monitoring, logger, options...)
 }
 
-func createWrapper(module mb.Module, metricSets []mb.MetricSet, options ...Option) (*Wrapper, error) {
+func createWrapper(module mb.Module, metricSets []mb.MetricSet, monitoring beat.Monitoring, logger *logp.Logger, options ...Option) (*Wrapper, error) {
 	wrapper := &Wrapper{
 		Module:     module,
 		metricSets: make([]*metricSetWrapper, len(metricSets)),
+		monitoring: monitoring,
+		logger:     logger,
 	}
 
 	for _, applyOption := range options {
 		applyOption(wrapper)
 	}
 
+	failureThreshold := uint(1)
+
+	var streamHealthSettings struct {
+		FailureThreshold *uint `config:"failure_threshold"`
+	}
+
+	err := module.UnpackConfig(&streamHealthSettings)
+
+	if err != nil {
+		return nil, fmt.Errorf("unpacking raw config: %w", err)
+	}
+
+	if streamHealthSettings.FailureThreshold != nil {
+		failureThreshold = *streamHealthSettings.FailureThreshold
+	}
+
 	for i, metricSet := range metricSets {
 		wrapper.metricSets[i] = &metricSetWrapper{
-			MetricSet: metricSet,
-			module:    wrapper,
-			stats:     getMetricSetStats(wrapper.Name(), metricSet.Name()),
+			MetricSet:        metricSet,
+			module:           wrapper,
+			stats:            getMetricSetStats(monitoring, wrapper.Name(), metricSet.Name()),
+			failureThreshold: failureThreshold,
 		}
 	}
 	return wrapper, nil
@@ -128,7 +153,7 @@ func createWrapper(module mb.Module, metricSets []mb.MetricSet, options ...Optio
 //
 // Start should be called only once in the life of a Wrapper.
 func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
-	debugf("Starting %s", mw)
+	mw.logger.Named("module").Debugf("Starting %s", mw)
 
 	out := make(chan beat.Event, 1)
 
@@ -138,10 +163,10 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 	for _, msw := range mw.metricSets {
 		go func(msw *metricSetWrapper) {
 			metricsPath := msw.ID()
-			registry := monitoring.GetNamespace("dataset").GetRegistry()
+			registry := mw.monitoring.InputsRegistry()
 
 			defer registry.Remove(metricsPath)
-			defer releaseStats(msw.stats)
+			defer releaseStats(mw.monitoring.StatsRegistry(), msw.stats)
 			defer wg.Done()
 			defer msw.close()
 
@@ -157,7 +182,7 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 	go func() {
 		wg.Wait()
 		close(out)
-		debugf("Stopped %s", mw)
+		mw.logger.Named("module").Debugf("Stopped %s", mw)
 	}()
 
 	return out
@@ -177,13 +202,13 @@ func (mw *Wrapper) MetricSets() []*metricSetWrapper {
 // metricSetWrapper methods
 
 func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
-	defer logp.Recover(fmt.Sprintf("recovered from panic while fetching "+
+	defer msw.Logger().Recover(fmt.Sprintf("recovered from panic while fetching "+
 		"'%s/%s' for host '%s'", msw.module.Name(), msw.Name(), msw.Host()))
 
 	// Start each metricset randomly over a period of MaxDelayPeriod.
 	if msw.module.maxStartDelay > 0 {
-		delay := time.Duration(rand.Int63n(int64(msw.module.maxStartDelay)))
-		debugf("%v/%v will start after %v", msw.module.Name(), msw.Name(), delay)
+		delay := rand.N(msw.module.maxStartDelay)
+		msw.Logger().Named("module").Debugf("%v/%v will start after %v", msw.module.Name(), msw.Name(), delay)
 		select {
 		case <-done:
 			return
@@ -191,8 +216,8 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 		}
 	}
 
-	debugf("Starting %s", msw)
-	defer debugf("Stopped %s", msw)
+	msw.Logger().Named("module").Debugf("Starting %s", msw)
+	defer msw.Logger().Named("module").Debugf("Stopped %s", msw)
 
 	// Events and errors are reported through this.
 	reporter := &eventReporter{
@@ -212,7 +237,7 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 		msw.startPeriodicFetching(&channelContext{done}, reporter)
 	default:
 		// Earlier startup stages prevent this from happening.
-		logp.Err("MetricSet '%s/%s' does not implement an event producing interface",
+		msw.Logger().Errorf("MetricSet '%s/%s' does not implement an event producing interface",
 			msw.Module().Name(), msw.Name())
 	}
 }
@@ -254,35 +279,11 @@ func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 	case mb.ReportingMetricSetV2Error:
 		reporter.StartFetchTimer()
 		err := fetcher.Fetch(reporter.V2())
-		if err != nil {
-			reporter.V2().Error(err)
-			if errors.As(err, &mb.PartialMetricsError{}) {
-				// mark module as running if metrics are partially available and display the error message
-				msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
-			} else {
-				// mark it as degraded for any other issue encountered
-				msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
-			}
-			logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
-		} else {
-			msw.module.UpdateStatus(status.Running, "")
-		}
+		msw.handleFetchError(err, reporter.V2())
 	case mb.ReportingMetricSetV2WithContext:
 		reporter.StartFetchTimer()
 		err := fetcher.Fetch(ctx, reporter.V2())
-		if err != nil {
-			reporter.V2().Error(err)
-			if errors.As(err, &mb.PartialMetricsError{}) {
-				// mark module as running if metrics are partially available and display the error message
-				msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
-			} else {
-				// mark it as degraded for any other issue encountered
-				msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
-			}
-			logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
-		} else {
-			msw.module.UpdateStatus(status.Running, "")
-		}
+		msw.handleFetchError(err, reporter.V2())
 	default:
 		panic(fmt.Sprintf("unexpected fetcher type for %v", msw))
 	}
@@ -309,6 +310,31 @@ func (msw *metricSetWrapper) Test(d testing.Driver) {
 		done := receiveOneEvent(d, events, msw.module.maxStartDelay+5*time.Second)
 		msw.run(done, events)
 	})
+}
+
+func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporterV2) {
+	switch {
+	case err == nil:
+		msw.stats.consecutiveFailures.Set(0)
+		msw.module.UpdateStatus(status.Running, "")
+
+	case errors.As(err, &mb.PartialMetricsError{}):
+		reporter.Error(err)
+		msw.stats.consecutiveFailures.Set(0)
+		// mark module as running if metrics are partially available and display the error message
+		msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.Name(), err))
+		msw.Logger().Errorf("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+
+	default:
+		reporter.Error(err)
+		msw.stats.consecutiveFailures.Inc()
+		if msw.failureThreshold > 0 && msw.stats.consecutiveFailures != nil && uint(msw.stats.consecutiveFailures.Get()) >= msw.failureThreshold {
+			// mark it as degraded for any other issue encountered
+			msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.Name(), err))
+		}
+		msw.Logger().Errorf("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+
+	}
 }
 
 type reporter interface {
@@ -377,7 +403,8 @@ func (r reporterV2) Done() <-chan struct{} { return r.done }
 func (r reporterV2) Error(err error) bool  { return r.Event(mb.Event{Error: err}) }
 func (r reporterV2) Event(event mb.Event) bool {
 	if event.Took == 0 && !r.start.IsZero() {
-		event.Took = time.Since(r.start)
+		// ensure elapsed time is always > 0
+		event.Took = max(time.Since(r.start), time.Microsecond)
 	}
 	if r.msw.periodic {
 		event.Period = r.msw.Module().Config().Period
@@ -404,7 +431,7 @@ func (r reporterV2) Event(event mb.Event) bool {
 	if event.Namespace == "" {
 		event.Namespace = r.msw.Registration().Namespace
 	}
-	beatEvent := event.BeatEvent(r.msw.module.Name(), r.msw.MetricSet.Name(), r.msw.module.eventModifiers...)
+	beatEvent := event.BeatEvent(r.msw.module.Name(), r.msw.Name(), r.msw.module.eventModifiers...)
 	if !writeEvent(r.done, r.out, beatEvent) {
 		return false
 	}
@@ -424,7 +451,7 @@ func writeEvent(done <-chan struct{}, out chan<- beat.Event, event beat.Event) b
 	}
 }
 
-func getMetricSetStats(module, name string) *stats {
+func getMetricSetStats(mon beat.Monitoring, module, name string) *stats {
 	key := fmt.Sprintf("metricbeat.%s.%s", module, name)
 
 	fetchesLock.Lock()
@@ -435,20 +462,21 @@ func getMetricSetStats(module, name string) *stats {
 		return s
 	}
 
-	reg := monitoring.Default.NewRegistry(key)
+	reg := mon.StatsRegistry().NewRegistry(key)
 	s := &stats{
-		key:      key,
-		ref:      1,
-		success:  monitoring.NewInt(reg, successesKey),
-		failures: monitoring.NewInt(reg, failuresKey),
-		events:   monitoring.NewInt(reg, eventsKey),
+		key:                 key,
+		ref:                 1,
+		success:             monitoring.NewInt(reg, successesKey),
+		failures:            monitoring.NewInt(reg, failuresKey),
+		events:              monitoring.NewInt(reg, eventsKey),
+		consecutiveFailures: monitoring.NewUint(reg, consecutiveFailuresKey),
 	}
 
 	fetches[key] = s
 	return s
 }
 
-func releaseStats(s *stats) {
+func releaseStats(reg *monitoring.Registry, s *stats) {
 	fetchesLock.Lock()
 	defer fetchesLock.Unlock()
 
@@ -458,5 +486,5 @@ func releaseStats(s *stats) {
 	}
 
 	delete(fetches, s.key)
-	monitoring.Default.Remove(s.key)
+	reg.Remove(s.key)
 }

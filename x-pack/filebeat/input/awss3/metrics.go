@@ -14,7 +14,6 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/go-concert/timed"
@@ -36,15 +35,14 @@ func init() {
 // currentTime returns the current time. This exists to allow unit tests
 // simulate the passage of time.
 func currentTime() time.Time {
-	clock := clockValue.Load().(clock)
+	clock, _ := clockValue.Load().(clock)
 	return clock.Now()
 }
 
 type inputMetrics struct {
-	registry   *monitoring.Registry
-	unregister func()
-	ctx        context.Context    // ctx signals when to stop the sqs worker utilization goroutine.
-	cancel     context.CancelFunc // cancel cancels the ctx context.
+	registry *monitoring.Registry
+	ctx      context.Context    // ctx signals when to stop the sqs worker utilization goroutine.
+	cancel   context.CancelFunc // cancel cancels the ctx context.
 
 	sqsMaxMessagesInflight            int                  // Maximum number of SQS workers allowed.
 	sqsWorkerUtilizationMutex         sync.Mutex           // Guards the sqs worker utilization fields.
@@ -78,7 +76,6 @@ type inputMetrics struct {
 // Close cancels the context and removes the metrics from the registry.
 func (m *inputMetrics) Close() {
 	m.cancel()
-	m.unregister()
 }
 
 // beginSQSWorker tracks the start of a new SQS worker. The returned ID
@@ -147,13 +144,11 @@ func (m *inputMetrics) updateSqsWorkerUtilization() {
 	m.sqsWorkerUtilizationLastUpdate = now
 }
 
-func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers int) *inputMetrics {
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
+func newInputMetrics(reg *monitoring.Registry, maxWorkers int) *inputMetrics {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	out := &inputMetrics{
 		registry:                            reg,
-		unregister:                          unreg,
 		ctx:                                 ctx,
 		cancel:                              cancel,
 		sqsMaxMessagesInflight:              maxWorkers,
@@ -206,18 +201,26 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers 
 	return out
 }
 
-// monitoredReader implements io.Reader and counts the number of bytes read.
+// monitoredReader implements io.Reader and wraps byte read tracking fields for S3 bucket objects.
+// Following are the tracked metrics,
+//   - totalBytesReadMetric - a total metric tracking bytes reads throughout the runtime from all processed objects
+//   - totalBytesReadCurrent - total bytes read from the currently tracked object
+//
+// See newMonitoredReader for initialization considerations.
 type monitoredReader struct {
-	reader         io.Reader
-	totalBytesRead *monitoring.Uint
+	reader                io.Reader
+	totalBytesReadMetric  *monitoring.Uint
+	totalBytesReadCurrent int64
 }
 
+// newMonitoredReader initialize the monitoredReader with a shared monitor that tracks all bytes read.
 func newMonitoredReader(r io.Reader, metric *monitoring.Uint) *monitoredReader {
-	return &monitoredReader{reader: r, totalBytesRead: metric}
+	return &monitoredReader{reader: r, totalBytesReadMetric: metric}
 }
 
 func (m *monitoredReader) Read(p []byte) (int, error) {
 	n, err := m.reader.Read(p)
-	m.totalBytesRead.Add(uint64(n))
+	m.totalBytesReadMetric.Add(uint64(n))
+	m.totalBytesReadCurrent += int64(n)
 	return n, err
 }

@@ -21,10 +21,11 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/gosigar"
 )
 
-func InitModule(config string) {
+func InitModule(config string, _ *logp.Logger) {
 	configureHostFS(config)
 }
 

@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -55,7 +55,7 @@ func init() {
 	jsprocessor.RegisterPlugin("URLDecode", New)
 }
 
-func New(c *config.C) (beat.Processor, error) {
+func New(c *config.C, log *logp.Logger) (beat.Processor, error) {
 	config := urlDecodeConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -67,7 +67,7 @@ func New(c *config.C) (beat.Processor, error) {
 
 	return &urlDecode{
 		config: config,
-		log:    logp.NewLogger("urldecode"),
+		log:    log.Named("urldecode"),
 	}, nil
 
 }

@@ -22,11 +22,11 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -36,7 +36,7 @@ import (
 const logName = "processor.dns"
 
 // instanceID is used to assign each instance a unique monitoring namespace.
-var instanceID = atomic.MakeUint32(0)
+var instanceID atomic.Uint32
 
 func init() {
 	processors.RegisterPlugin("dns", New)
@@ -50,7 +50,7 @@ type processor struct {
 }
 
 // New constructs a new DNS processor.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the dns configuration: %w", err)
@@ -58,11 +58,11 @@ func New(cfg *conf.C) (beat.Processor, error) {
 
 	// Logging and metrics (each processor instance has a unique ID).
 	var (
-		id      = int(instanceID.Inc())
-		log     = logp.NewLogger(logName).With("instance_id", id)
+		id      = int(instanceID.Add(1))
 		metrics = monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
 	)
 
+	log = log.Named(logName).With("instance_id", id)
 	log.Debugf("DNS processor config: %+v", c)
 	resolver, err := newMiekgResolver(metrics, c.Timeout, c.Transport, c.Nameservers...)
 	if err != nil {

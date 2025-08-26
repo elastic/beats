@@ -19,10 +19,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
-	"net/http"
-	_ "net/http/pprof"
+	_ "net/http/pprof" //nolint:gosec //Keep behavior
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -34,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline/stress"
 	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	logpcfg "github.com/elastic/elastic-agent-libs/logp/configure"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/service"
 )
@@ -56,18 +54,23 @@ func main() {
 }
 
 func run() error {
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		return err
+	}
 	info := beat.Info{
 		Beat:     "stresser",
 		Version:  "0",
 		Name:     "stresser.test",
 		Hostname: "stresser.test",
+		Logger:   logger,
 	}
 
 	flag.DurationVar(&duration, "duration", 0, "Test duration (default 0)")
 	flag.Parse()
 
 	files := flag.Args()
-	fmt.Println("load config files:", files)
+	logger.Infof("load config files:", files)
 
 	cfg, err := common.LoadFiles(files...)
 	if err != nil {
@@ -89,17 +92,8 @@ func run() error {
 	if err := paths.InitPaths(&config.Path); err != nil {
 		return err
 	}
-	if err = logpcfg.Logging("test", config.Logging); err != nil {
-		return err
-	}
 
 	common.PrintConfigDebugf(cfg, "input config:")
 
 	return stress.RunTests(info, duration, cfg, nil)
-}
-
-func startHTTP(bind string) {
-	go func() {
-		http.ListenAndServe(bind, nil)
-	}()
 }

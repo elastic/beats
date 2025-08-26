@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -68,23 +68,23 @@ type decoder interface {
 }
 
 // New constructs a new decode_xml processor.
-func New(c *conf.C) (beat.Processor, error) {
+func New(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig()
 
 	if err := c.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("fail to unpack the "+procName+" processor configuration: %s", err)
 	}
 
-	return newProcessor(config)
+	return newProcessor(config, log)
 }
 
-func newProcessor(config config) (beat.Processor, error) {
-	cfgwarn.Experimental("The " + procName + " processor is experimental.")
+func newProcessor(config config, log *logp.Logger) (beat.Processor, error) {
+	log.Warn(cfgwarn.Experimental("The " + procName + " processor is experimental."))
 
 	return &processor{
 		config:  config,
-		decoder: newDecoder(),
-		log:     logp.NewLogger(logName),
+		decoder: newDecoder(config.Language, log),
+		log:     log.Named(logName),
 	}, nil
 }
 

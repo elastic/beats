@@ -44,7 +44,7 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	reader, err := NewReader()
+	reader, err := NewReader(base.Logger())
 	if err != nil {
 		return nil, err
 	}

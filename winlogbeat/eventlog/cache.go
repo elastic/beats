@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
+
 package eventlog
 
 // This component of the eventlog package provides a cache for storing Handles
@@ -26,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
+	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -92,7 +95,7 @@ func newMessageFilesCache(eventLogName string, loader messageFileLoaderFunc,
 // If no item is cached, then one is loaded, stored, and returned.
 // Callers should check the MessageFiles.Err value to see if an error occurred
 // while loading the message files.
-func (hc *messageFilesCache) get(sourceName string) sys.MessageFiles {
+func (hc *messageFilesCache) get(sourceName string) win.EvtHandle {
 	v := hc.cache.Get(sourceName)
 	if v == nil {
 		hc.miss()
@@ -111,7 +114,12 @@ func (hc *messageFilesCache) get(sourceName string) sys.MessageFiles {
 
 			// Return the existing cached value.
 			messageFiles, _ = existing.(sys.MessageFiles)
-			return messageFiles
+
+			if messageFiles.Err == nil {
+				// There is only ever a single handle when using the Windows Event
+				// Log API.
+				return win.EvtHandle(messageFiles.Handles[0].Handle)
+			}
 		}
 		hc.size()
 	} else {
@@ -119,7 +127,12 @@ func (hc *messageFilesCache) get(sourceName string) sys.MessageFiles {
 	}
 
 	messageFiles, _ := v.(sys.MessageFiles)
-	return messageFiles
+	if messageFiles.Err == nil {
+		// There is only ever a single handle when using the Windows Event
+		// Log API.
+		return win.EvtHandle(messageFiles.Handles[0].Handle)
+	}
+	return win.NilHandle
 }
 
 // evictionHandler is the callback handler that receives notifications when

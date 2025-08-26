@@ -22,6 +22,7 @@ package journald
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
@@ -29,8 +30,10 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -42,6 +45,7 @@ type journalReader interface {
 }
 
 type journald struct {
+	ID                 string
 	Backoff            time.Duration
 	MaxBackoff         time.Duration
 	Since              time.Duration
@@ -69,10 +73,10 @@ const localSystemJournalID = "LOCAL_SYSTEM_JOURNAL"
 const pluginName = "journald"
 
 // Plugin creates a new journald input plugin for creating a stateful input.
-func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
-		Stability:  feature.Experimental,
+		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "journald input",
 		Doc:        "The journald input collects logs from the local journald service",
@@ -91,7 +95,7 @@ var cursorVersion = 1
 
 func (p pathSource) Name() string { return string(p) }
 
-func Configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
+func Configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
@@ -108,6 +112,7 @@ func Configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	}
 
 	return sources, &journald{
+		ID:                 config.ID,
 		Since:              config.Since,
 		Seek:               config.Seek,
 		Matches:            journalfield.IncludeMatches(config.Matches),
@@ -124,7 +129,7 @@ func (inp *journald) Name() string { return pluginName }
 
 func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
 	reader, err := journalctl.New(
-		ctx.Logger,
+		ctx.Logger.With("input_id", inp.ID),
 		ctx.Cancelation,
 		inp.Units,
 		inp.Identifiers,
@@ -149,7 +154,11 @@ func (inp *journald) Run(
 	cursor cursor.Cursor,
 	publisher cursor.Publisher,
 ) error {
-	logger := ctx.Logger.With("path", src.Name())
+	logger := ctx.Logger.
+		With("path", src.Name()).
+		With("input_id", inp.ID)
+
+	ctx.UpdateStatus(status.Starting, "Starting")
 	currentCheckpoint := initCheckpoint(logger, cursor)
 
 	mode := inp.Seek
@@ -169,7 +178,9 @@ func (inp *journald) Run(
 		journalctl.Factory,
 	)
 	if err != nil {
-		return fmt.Errorf("could not start journal reader: %w", err)
+		wrappedErr := fmt.Errorf("could not start journal reader: %w", err)
+		ctx.UpdateStatus(status.Failed, wrappedErr.Error())
+		return wrappedErr
 	}
 
 	defer reader.Close()
@@ -180,8 +191,9 @@ func (inp *journald) Run(
 			converter:          journalfield.NewConverter(ctx.Logger, nil),
 			canceler:           ctx.Cancelation,
 			saveRemoteHostname: inp.SaveRemoteHostname,
-		})
+		}, logger)
 
+	ctx.UpdateStatus(status.Running, "Running")
 	for {
 		entry, err := parser.Next()
 		if err != nil {
@@ -193,14 +205,18 @@ func (inp *journald) Run(
 			case errors.Is(err, journalctl.ErrRestarting):
 				continue
 			default:
-				logger.Errorf("could not read event: %s", err)
+				msg := fmt.Sprintf("could not read event: %s", err)
+				ctx.UpdateStatus(status.Failed, msg)
+				logger.Error(msg)
 				return err
 			}
 		}
 
 		event := entry.ToEvent()
 		if err := publisher.Publish(event, event.Private); err != nil {
-			logger.Errorf("could not publish event: %s", err)
+			msg := fmt.Sprintf("could not publish event: %s", err)
+			ctx.UpdateStatus(status.Failed, msg)
+			logger.Errorf(msg)
 			return err
 		}
 	}
@@ -274,6 +290,20 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 	fields := r.converter.Convert(data.Fields)
 	fields.Put("event.kind", "event")
 	fields.Put("event.created", created)
+
+	// IF 'container.partial' is present, we can parse it and it's true, then
+	// add 'partial_message' to tags.
+	if partialMessageRaw, err := fields.GetValue("container.partial"); err == nil {
+		partialMessage, err := strconv.ParseBool(fmt.Sprint(partialMessageRaw))
+		if err == nil && partialMessage {
+			// 'fields' came directly from the journal,
+			// so there is no chance tags already exist
+			fields.Put("tags", []string{"partial_message"})
+		}
+	}
+
+	// Delete 'container.partial', if there are any errors, ignore it
+	_ = fields.Delete("container.partial")
 
 	// if entry is coming from a remote journal, add_host_metadata overwrites
 	// the source hostname, so it has to be copied to a different field

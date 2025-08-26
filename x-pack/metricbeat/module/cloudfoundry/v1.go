@@ -7,7 +7,8 @@
 package cloudfoundry
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"sync/atomic"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	cfcommon "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -29,7 +30,6 @@ func newModuleV1(base mb.BaseModule, hub CloudfoundryHub, log *logp.Logger) (*Mo
 	m := ModuleV1{
 		BaseModule: base,
 		log:        log,
-		running:    atomic.MakeBool(false),
 	}
 	consumer, err := hub.DopplerConsumer(cfcommon.DopplerCallbacks{
 		Metric: m.callback,
@@ -83,7 +83,7 @@ func (m *ModuleV1) callback(event cfcommon.Event) {
 
 // run ensures that the module is running with the passed subscription
 func (m *ModuleV1) run(s subscription) {
-	if !m.running.CAS(false, true) {
+	if !m.running.CompareAndSwap(false, true) {
 		// Module is already running, queue subscription for current dispatcher.
 		m.subscriptions <- s
 		return

@@ -24,7 +24,7 @@ import (
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func stringp(x string) *string {
@@ -507,7 +507,7 @@ first_metric{label1="value1"} 1
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), logp.NewLogger("test"))
+	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), logptest.NewTestingLogger(t, "test"))
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}

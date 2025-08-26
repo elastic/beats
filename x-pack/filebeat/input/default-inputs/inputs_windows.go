@@ -7,9 +7,9 @@
 package inputs
 
 import (
-	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/awscloudwatch"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/awss3"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage"
@@ -25,10 +25,12 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/lumberjack"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/salesforce"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/streaming"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func xpackInputs(info beat.Info, log *logp.Logger, store beater.StateStore) []v2.Plugin {
+func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States) []v2.Plugin {
 	return []v2.Plugin{
 		azureblobstorage.Plugin(log, store),
 		azureeventhub.Plugin(log),
@@ -36,14 +38,17 @@ func xpackInputs(info beat.Info, log *logp.Logger, store beater.StateStore) []v2
 		cloudfoundry.Plugin(),
 		entityanalytics.Plugin(log),
 		gcs.Plugin(log, store),
-		http_endpoint.Plugin(),
+		http_endpoint.Plugin(log),
 		httpjson.Plugin(log, store),
 		o365audit.Plugin(log, store),
-		awss3.Plugin(store),
-		awscloudwatch.Plugin(),
-		lumberjack.Plugin(),
+		awss3.Plugin(log, store),
+		awscloudwatch.Plugin(log, store),
+		lumberjack.Plugin(log),
 		etw.Plugin(),
+		streaming.Plugin(log, store),
+		streaming.PluginWebsocketAlias(log, store),
 		netflow.Plugin(log),
+		salesforce.Plugin(log, store),
 		benchmark.Plugin(),
 	}
 }

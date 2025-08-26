@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/elastic-agent-libs/logp"
 	metrics "github.com/elastic/elastic-agent-system-metrics/metric/cpu"
 )
 
@@ -34,16 +35,14 @@ const (
 
 // Config for the system core metricset.
 type Config struct {
-	Metrics  []string `config:"core.metrics"`
-	CPUTicks *bool    `config:"cpu_ticks"` // Deprecated.
+	Metrics                 []string `config:"core.metrics"`
+	CPUTicks                *bool    `config:"cpu_ticks"` // Deprecated.
+	UserPerformanceCounters bool     `config:"use_performance_counters"`
 }
 
 // Validate validates the core config.
 func (c Config) Validate() (metrics.MetricOpts, error) {
 	opts := metrics.MetricOpts{}
-	if c.CPUTicks != nil {
-		cfgwarn.Deprecate("6.1.0", "cpu_ticks is deprecated. Add 'ticks' to the core.metrics list.")
-	}
 
 	if len(c.Metrics) == 0 {
 		return opts, errors.New("core.metrics cannot be empty")
@@ -64,6 +63,15 @@ func (c Config) Validate() (metrics.MetricOpts, error) {
 	return opts, nil
 }
 
+// log warning for unsupported config
+func (c Config) checkUnsupportedConfig(logger *logp.Logger) {
+	if c.CPUTicks != nil {
+		logger.Warn(cfgwarn.Deprecate("6.1.0", "cpu_ticks is deprecated. Add 'ticks' to the cpu.metrics list."))
+	}
+
+}
+
 var defaultConfig = Config{
-	Metrics: []string{percentages},
+	Metrics:                 []string{percentages},
+	UserPerformanceCounters: false,
 }

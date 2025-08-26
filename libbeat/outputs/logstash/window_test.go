@@ -26,7 +26,6 @@ import (
 )
 
 func TestShrinkWindowSizeNeverZero(t *testing.T) {
-	enableLogging([]string{"logstash"})
 
 	windowSize := 124
 	var w window
@@ -68,7 +67,6 @@ func TestGrowWindowSizeToMaxOKOnly(t *testing.T) {
 func testGrowWindowSize(t *testing.T,
 	initial, maxOK, windowSize, batchSize, expected int,
 ) {
-	enableLogging([]string{"logstash"})
 	var w window
 	w.init(initial, windowSize)
 	w.maxOkWindowSize = maxOK

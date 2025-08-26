@@ -6,7 +6,7 @@ package persistentcache
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"path/filepath"
 	"strconv"
 	"testing"
@@ -17,13 +17,14 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestPutGet(t *testing.T) {
-	logp.TestingSetup()
 	t.Parallel()
+	logger := logptest.NewTestingLogger(t, "")
 
-	cache, err := New("test", testOptions(t))
+	cache, err := New("test", testOptions(t), logger)
 	require.NoError(t, err)
 	defer cache.Close()
 
@@ -47,12 +48,12 @@ func TestPutGet(t *testing.T) {
 }
 
 func TestPersist(t *testing.T) {
-	logp.TestingSetup()
+	logger := logptest.NewTestingLogger(t, "")
 	t.Parallel()
 
 	options := testOptions(t)
 
-	cache, err := New("test", options)
+	cache, err := New("test", options, logger)
 	require.NoError(t, err)
 
 	type valueType struct {
@@ -67,8 +68,7 @@ func TestPersist(t *testing.T) {
 
 	err = cache.Close()
 	assert.NoError(t, err)
-
-	cache, err = New("test", options)
+	cache, err = New("test", options, logger)
 	require.NoError(t, err)
 	defer cache.Close()
 
@@ -82,11 +82,12 @@ func TestExpired(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping in short mode")
 	}
-	logp.TestingSetup()
 	t.Parallel()
 
 	options := testOptions(t)
-	cache, err := New("test", options)
+
+	logger := logptest.NewTestingLogger(t, "")
+	cache, err := New("test", options, logger)
 	require.NoError(t, err)
 	defer cache.Close()
 
@@ -118,7 +119,6 @@ func TestRefreshOnAccess(t *testing.T) {
 		t.Skip("skipping in short mode")
 	}
 
-	logp.TestingSetup()
 	t.Parallel()
 
 	// Badger TTL is not reliable on sub-second durations.
@@ -126,7 +126,8 @@ func TestRefreshOnAccess(t *testing.T) {
 	options.Timeout = 2 * time.Second
 	options.RefreshOnAccess = true
 
-	cache, err := New("test", options)
+	logger := logptest.NewTestingLogger(t, "")
+	cache, err := New("test", options, logger)
 	require.NoError(t, err)
 	defer cache.Close()
 
@@ -170,7 +171,7 @@ func BenchmarkPut(b *testing.B) {
 
 	options := testOptions(b)
 	newPersistentCache := func(tb testing.TB, name string) cache {
-		cache, err := New(name, options)
+		cache, err := New(name, options, logp.NewNopLogger())
 		require.NoError(tb, err)
 		return cache
 	}
@@ -294,7 +295,7 @@ func BenchmarkOpen(b *testing.B) {
 
 	options := testOptions(b)
 	newPersistentCache := func(tb testing.TB, name string) cache {
-		cache, err := New(name, options)
+		cache, err := New(name, options, logp.NewNopLogger())
 		require.NoError(tb, err)
 		return cache
 	}
@@ -347,7 +348,7 @@ func BenchmarkGet(b *testing.B) {
 
 	options := testOptions(b)
 	newPersistentCache := func(tb testing.TB, name string) cache {
-		cache, err := New(name, options)
+		cache, err := New(name, options, logp.NewNopLogger())
 		require.NoError(tb, err)
 		return cache
 	}
@@ -390,7 +391,7 @@ func BenchmarkGet(b *testing.B) {
 
 					b.ResetTimer()
 					for i := 0; i < b.N; i++ {
-						expected := objects[rand.Intn(size)]
+						expected := objects[rand.IntN(size)]
 						//nolint:errcheck // benchmarks
 						cache.Get(expected.ID, &result)
 						if expected.ID != result.ID {

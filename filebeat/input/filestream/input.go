@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"time"
 
 	"golang.org/x/text/transform"
@@ -34,12 +35,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/debug"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -67,7 +68,7 @@ type filestream struct {
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
-func Plugin(log *logp.Logger, store loginp.StateStore) input.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Stable,
@@ -84,13 +85,13 @@ func Plugin(log *logp.Logger, store loginp.StateStore) input.Plugin {
 	}
 }
 
-func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
+func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvester, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
 	}
 
-	prospector, err := newProspector(config)
+	prospector, err := newProspector(config, log)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
@@ -165,11 +166,9 @@ func (inp *filestream) Run(
 	})
 	defer streamCancel()
 
-	if err := inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics); err != nil {
-		ctx.UpdateStatus(status.Degraded, fmt.Sprintf("error while reading from source: %v", err))
-		return err
-	}
-	return nil
+	// The caller of Run already reports the error and filters out errors that
+	// must not be reported, like 'context cancelled'.
+	return inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
 }
 
 func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
@@ -227,7 +226,7 @@ func (inp *filestream) open(
 		return nil, truncated, err
 	}
 
-	dbgReader, err := debug.AppendReaders(logReader)
+	dbgReader, err := debug.AppendReaders(logReader, log)
 	if err != nil {
 		return nil, truncated, err
 	}
@@ -244,7 +243,7 @@ func (inp *filestream) open(
 		BufferSize: inp.readerConfig.BufferSize,
 		Terminator: inp.readerConfig.LineTerminator,
 		MaxBytes:   encReaderMaxBytes,
-	})
+	}, log)
 	if err != nil {
 		return nil, truncated, err
 	}
@@ -253,7 +252,7 @@ func (inp *filestream) open(
 
 	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, fs.desc.Fingerprint, offset)
 
-	r = inp.parsers.Create(r)
+	r = inp.parsers.Create(r, log)
 
 	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
 
@@ -367,7 +366,7 @@ func (inp *filestream) readFromSource(
 			if errors.Is(err, ErrFileTruncate) {
 				log.Infof("File was truncated, nothing to read. Path='%s'", path)
 			} else if errors.Is(err, ErrClosed) {
-				log.Infof("Reader was closed. Closing. Path='%s'", path)
+				log.Debugf("Reader was closed. Closing. Path='%s'", path)
 			} else if errors.Is(err, io.EOF) {
 				log.Debugf("EOF has been reached. Closing. Path='%s'", path)
 			} else {
@@ -379,6 +378,15 @@ func (inp *filestream) readFromSource(
 		}
 
 		s.Offset += int64(message.Bytes) + int64(message.Offset)
+
+		flags, err := message.Fields.GetValue("log.flags")
+		if err == nil {
+			if flags, ok := flags.([]string); ok {
+				if slices.Contains(flags, "truncated") { //nolint:typecheck,nolintlint // linter fails to infer generics
+					metrics.MessagesTruncated.Add(1)
+				}
+			}
+		}
 
 		metrics.MessagesRead.Inc()
 		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {

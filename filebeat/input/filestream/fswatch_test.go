@@ -28,15 +28,16 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap/zapcore"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestFileWatcher(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/41209")
 	dir := t.TempDir()
 	paths := []string{filepath.Join(dir, "*.log")}
 	cfgStr := `
@@ -54,7 +55,8 @@ scanner:
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	fw := createWatcherWithConfig(t, paths, cfgStr)
+	logger := logp.NewNopLogger()
+	fw := createWatcherWithConfig(t, logger, paths, cfgStr)
 
 	go fw.Run(ctx)
 
@@ -197,7 +199,9 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		fw := createWatcherWithConfig(t, paths, cfgStr)
+		logger := logp.NewNopLogger()
+		fw := createWatcherWithConfig(t, logger, paths, cfgStr)
+
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -223,13 +227,16 @@ scanner:
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
+  fingerprint.enabled: false
   check_interval: 10ms
 `
 
 		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
-		fw := createWatcherWithConfig(t, paths, cfgStr)
+		logger := logp.NewNopLogger()
+		fw := createWatcherWithConfig(t, logger, paths, cfgStr)
+
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -261,15 +268,16 @@ scanner:
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
-  check_interval: 10ms
+  fingerprint.enabled: false
+  check_interval: 50ms
 `
 
-		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
 		logp.DevelopmentSetup(logp.ToObserverOutput())
 
-		fw := createWatcherWithConfig(t, paths, cfgStr)
+		fw := createWatcherWithConfig(t, logp.L(), paths, cfgStr)
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -322,7 +330,9 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 		defer cancel()
 
-		fw := createWatcherWithConfig(t, paths, cfgStr)
+		logger := logp.NewNopLogger()
+		fw := createWatcherWithConfig(t, logger, paths, cfgStr)
+
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -371,6 +381,7 @@ scanner:
 		}
 		cfgStr := `
 scanner:
+  fingerprint.enabled: false
   check_interval: 100ms
 `
 
@@ -379,7 +390,7 @@ scanner:
 
 		logp.DevelopmentSetup(logp.ToObserverOutput())
 
-		fw := createWatcherWithConfig(t, paths, cfgStr)
+		fw := createWatcherWithConfig(t, logp.L(), paths, cfgStr)
 
 		go fw.Run(ctx)
 
@@ -437,9 +448,13 @@ func TestFileScanner(t *testing.T) {
 	normalSymlinkBasename := "normal_symlink.log"
 	exclSymlinkBasename := "excl_symlink.log"
 	travelerSymlinkBasename := "portal.log"
+	undersizedGlob := "undersized-*.txt"
 
 	normalFilename := filepath.Join(dir, normalBasename)
 	undersizedFilename := filepath.Join(dir, undersizedBasename)
+	undersized1Filename := filepath.Join(dir, "undersized-1.txt")
+	undersized2Filename := filepath.Join(dir, "undersized-2.txt")
+	undersized3Filename := filepath.Join(dir, "undersized-3.txt")
 	excludedFilename := filepath.Join(dir, excludedBasename)
 	excludedIncludedFilename := filepath.Join(dir, excludedIncludedBasename)
 	travelerFilename := filepath.Join(dir2, travelerBasename)
@@ -450,6 +465,9 @@ func TestFileScanner(t *testing.T) {
 	files := map[string]string{
 		normalFilename:           strings.Repeat("a", 1024),
 		undersizedFilename:       strings.Repeat("a", 128),
+		undersized1Filename:      strings.Repeat("1", 42),
+		undersized2Filename:      strings.Repeat("2", 42),
+		undersized3Filename:      strings.Repeat("3", 42),
 		excludedFilename:         strings.Repeat("nothing to see here", 1024),
 		excludedIncludedFilename: strings.Repeat("perhaps something to see here", 1024),
 		travelerFilename:         strings.Repeat("folks, I think I got lost", 1024),
@@ -616,6 +634,7 @@ scanner:
 			name: "returns no symlink if the original file is excluded",
 			cfgStr: `
 scanner:
+  fingerprint.enabled: false
   exclude_files: ['.*exclude.*', '.*traveler.*']
   symlinks: true
 `,
@@ -662,6 +681,7 @@ scanner:
 			name: "returns no included symlink if the original file is not included",
 			cfgStr: `
 scanner:
+  fingerprint.enabled: false
   include_files: ['.*include.*', '.*portal.*']
   symlinks: true
 `,
@@ -679,6 +699,7 @@ scanner:
 			name: "returns an included symlink if the original file is included",
 			cfgStr: `
 scanner:
+  fingerprint.enabled: false
   include_files: ['.*include.*', '.*portal.*', '.*traveler.*']
   symlinks: true
 `,
@@ -796,12 +817,13 @@ scanner:
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			s := createScannerWithConfig(t, paths, tc.cfgStr)
+			logger := logp.NewNopLogger()
+			s := createScannerWithConfig(t, logger, paths, tc.cfgStr)
 			requireEqualFiles(t, tc.expDesc, s.GetFiles())
 		})
 	}
 
-	t.Run("does not issue warnings when file is too small", func(t *testing.T) {
+	t.Run("issue a single warning with the number of files that are too small and debug with filenames", func(t *testing.T) {
 		cfgStr := `
 scanner:
   fingerprint:
@@ -809,15 +831,45 @@ scanner:
     offset: 0
     length: 1024
 `
-		logp.DevelopmentSetup(logp.ToObserverOutput())
 
-		// this file is 128 bytes long
-		paths := []string{filepath.Join(dir, undersizedBasename)}
-		s := createScannerWithConfig(t, paths, cfgStr)
+		// the glob for the very small files
+		paths := []string{filepath.Join(dir, undersizedGlob)}
+		logger, buffer := logp.NewInMemoryLocal("test-logger", zapcore.EncoderConfig{})
+
+		s := createScannerWithConfig(t, logger, paths, cfgStr)
 		files := s.GetFiles()
 		require.Empty(t, files)
-		logs := logp.ObserverLogs().FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
-		require.Empty(t, logs, "there must be no warning logs for files too small")
+
+		logs := parseLogs(buffer.String())
+		require.NotEmpty(t, logs, "fileScanner.GetFiles must log some warnings")
+
+		// The last log entry from s.GetFiles must be at warn level and
+		// in the format 'x files are too small"
+		lastEntry := logs[len(logs)-1]
+		require.Equal(t, "warn", lastEntry.level, "'x files are too small' must be at level warn")
+		require.Contains(t, lastEntry.message, "3 files are too small to be ingested")
+
+		// For each file that is too small to be ingested, s.GetFiles must log
+		// at debug level the filename and its size
+		expectedMsgs := []string{
+			fmt.Sprintf("cannot start ingesting from file %[1]q: filesize of %[1]q is 42 bytes", undersized1Filename),
+			fmt.Sprintf("cannot start ingesting from file %[1]q: filesize of %[1]q is 42 bytes", undersized2Filename),
+			fmt.Sprintf("cannot start ingesting from file %[1]q: filesize of %[1]q is 42 bytes", undersized3Filename),
+		}
+
+		for _, msg := range expectedMsgs {
+			found := false
+			for _, log := range logs {
+				if strings.HasPrefix(log.message, msg) {
+					found = true
+					break
+				}
+			}
+
+			if !found {
+				t.Errorf("did not find %q in the logs", msg)
+			}
+		}
 	})
 
 	t.Run("returns error when creating scanner with a fingerprint too small", func(t *testing.T) {
@@ -835,10 +887,45 @@ scanner:
 		err = ns.Unpack(cfg)
 		require.NoError(t, err)
 
-		_, err = newFileWatcher(paths, ns)
+		logger := logptest.NewTestingLogger(t, "log-selector")
+		_, err = newFileWatcher(logger, paths, ns)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
 	})
+}
+
+type logEntry struct {
+	timestamp string
+	level     string
+	message   string
+}
+
+// parseLogs parsers the logs in buff and returns them as a slice of logEntry.
+// It is meant to be used with `logp.NewInMemoryLocal` where buff is the
+// contents of the buffer returned by `logp.NewInMemoryLocal`.
+// Log entries are expected to be separated by a new line and each log entry
+// is expected to have 3 fields separated by a tab "\t": timestamp, level
+// and message.
+func parseLogs(buff string) []logEntry {
+	logEntries := []logEntry{}
+
+	for l := range strings.SplitSeq(buff, "\n") {
+		if l == "" {
+			continue
+		}
+
+		split := strings.Split(l, "\t")
+		if len(split) != 3 {
+			continue
+		}
+		logEntries = append(logEntries, logEntry{
+			timestamp: split[0],
+			level:     split[1],
+			message:   split[2],
+		})
+	}
+
+	return logEntries
 }
 
 const benchmarkFileCount = 1000
@@ -859,7 +946,9 @@ func BenchmarkGetFiles(b *testing.B) {
 			Enabled: false,
 		},
 	}
-	s, err := newFileScanner(paths, cfg)
+
+	logger := logp.NewNopLogger()
+	s, err := newFileScanner(logger, paths, cfg)
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
@@ -886,7 +975,9 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 			Length:  1024,
 		},
 	}
-	s, err := newFileScanner(paths, cfg)
+
+	logger := logp.NewNopLogger()
+	s, err := newFileScanner(logger, paths, cfg)
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
@@ -895,7 +986,7 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 	}
 }
 
-func createWatcherWithConfig(t *testing.T, paths []string, cfgStr string) loginp.FSWatcher {
+func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, cfgStr string) loginp.FSWatcher {
 	cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
 	require.NoError(t, err)
 
@@ -903,13 +994,13 @@ func createWatcherWithConfig(t *testing.T, paths []string, cfgStr string) loginp
 	err = ns.Unpack(cfg)
 	require.NoError(t, err)
 
-	fw, err := newFileWatcher(paths, ns)
+	fw, err := newFileWatcher(logger, paths, ns)
 	require.NoError(t, err)
 
 	return fw
 }
 
-func createScannerWithConfig(t *testing.T, paths []string, cfgStr string) loginp.FSScanner {
+func createScannerWithConfig(t *testing.T, logger *logp.Logger, paths []string, cfgStr string) loginp.FSScanner {
 	cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
 	require.NoError(t, err)
 
@@ -920,7 +1011,8 @@ func createScannerWithConfig(t *testing.T, paths []string, cfgStr string) loginp
 	config := defaultFileWatcherConfig()
 	err = ns.Config().Unpack(&config)
 	require.NoError(t, err)
-	scanner, err := newFileScanner(paths, config.Scanner)
+
+	scanner, err := newFileScanner(logger, paths, config.Scanner)
 	require.NoError(t, err)
 
 	return scanner
@@ -975,7 +1067,9 @@ func BenchmarkToFileDescriptor(b *testing.B) {
 			Length:  1024,
 		},
 	}
-	s, err := newFileScanner(paths, cfg)
+
+	logger := logp.NewNopLogger()
+	s, err := newFileScanner(logger, paths, cfg)
 	require.NoError(b, err)
 
 	it, err := s.getIngestTarget(filename)

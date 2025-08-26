@@ -6,6 +6,10 @@ processors:
   - rename:
       field: "journald.process.name"
       target_field: process.name
+  - set:
+      field: "process.pid"
+      copy_from: "journald.pid"
+      ignore_failure: true
   - rename:
       field: message
       target_field: _temp.message
