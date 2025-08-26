@@ -74,7 +74,7 @@ To use a local non-Administrator account to run Winlogbeat, follow [these additi
 
 :::{important}
 ```{applies_to}
-stack: ga 9.0.6
+stack: ga 9.1.0, ga 9.0.6
 ```
 The base folder has changed from `C:\ProgramData\` to `C:\Program Files\`
 because the latter has stricter permissions. The home path (base for
