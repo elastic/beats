@@ -11,77 +11,94 @@ import (
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
-
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
-
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const missingMetricDefinitions = "no metric definitions were found for resource %s and namespace %s. Verify if the namespace is spelled correctly or if it is supported by the resource in case"
 
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
 func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
-	var metrics []azure.Metric
-
+	var combinedMetrics []azure.Metric
 	for _, resource := range resources {
-
-		// We use this map to avoid calling the metrics definition function for the same namespace and same resource
-		// multiple times.
-		namespaceMetrics := make(map[string]armmonitor.MetricDefinitionCollection)
-
-		for _, metric := range resourceConfig.Metrics {
-
-			var err error
-
-			metricDefinitions, exists := namespaceMetrics[metric.Namespace]
-			if !exists {
-				metricDefinitions, err = client.AzureMonitorService.GetMetricDefinitionsWithRetry(*resource.ID, metric.Namespace)
-				if err != nil {
-					return nil, err
-				}
-				namespaceMetrics[metric.Namespace] = metricDefinitions
-			}
-
-			if len(metricDefinitions.Value) == 0 {
-				if metric.IgnoreUnsupported {
-					client.Log.Infof(missingMetricDefinitions, *resource.ID, metric.Namespace)
-					continue
-				}
-
-				return nil, fmt.Errorf(missingMetricDefinitions, *resource.ID, metric.Namespace)
-			}
-
-			// validate metric names and filter on the supported metrics
-			supportedMetricNames, err := filterMetricNames(*resource.ID, metric, metricDefinitions.Value)
-			if err != nil {
-				return nil, err
-			}
-
-			//validate aggregations and filter on supported aggregations
-			metricGroups, err := filterOnSupportedAggregations(supportedMetricNames, metric, metricDefinitions.Value)
-			if err != nil {
-				return nil, err
-			}
-
-			// map dimensions
-			var dim []azure.Dimension
-			if len(metric.Dimensions) > 0 {
-				for _, dimension := range metric.Dimensions {
-					dim = append(dim, azure.Dimension(dimension))
-				}
-			}
-			if metric.Timegrain == "" { // no timegrain provided in user config
-				metrics = append(metrics, mapMetricsWithFirstAllowedTimegrain(client, resource, metric, metricGroups, dim)...)
-			} else { // user-specified timegrain provided
-				metrics = append(metrics, mapMetricsWithUserTimegrain(client, resource, metric, metricGroups, dim)...)
-			}
+		resourceMetrics, err := getMappedResourceDefinitions(client, resource, resourceConfig)
+		if err != nil {
+			return nil, err
 		}
+		combinedMetrics = append(combinedMetrics, resourceMetrics...)
+	}
+	return combinedMetrics, nil
+}
+
+// getMappedResourceDefinitions is the shared logic that fetches, filters, and maps metrics.
+// It accepts a generic client to handle both synchronous and concurrent (batch) cases.
+func getMappedResourceDefinitions(client any, resource *armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
+	var metrics []azure.Metric
+	namespaceMetrics := make(map[string]armmonitor.MetricDefinitionCollection)
+
+	var monitorService azure.Service
+	var logger *logp.Logger
+
+	switch c := client.(type) {
+	case *azure.Client:
+		monitorService = c.AzureMonitorService
+		logger = c.Log
+	case *azure.BatchClient:
+		monitorService = c.AzureMonitorService
+		logger = c.Log
+	default:
+		return nil, fmt.Errorf("unknown client type for getMappedResourceDefinitions")
 	}
 
+	for _, metric := range resourceConfig.Metrics {
+
+		var err error
+
+		metricDefinitions, exists := namespaceMetrics[metric.Namespace]
+		if !exists {
+			metricDefinitions, err = monitorService.GetMetricDefinitionsWithRetry(*resource.ID, metric.Namespace)
+			if err != nil {
+				return nil, err
+			}
+			namespaceMetrics[metric.Namespace] = metricDefinitions
+		}
+
+		if len(metricDefinitions.Value) == 0 {
+			if metric.IgnoreUnsupported {
+				logger.Infof(missingMetricDefinitions, *resource.ID, metric.Namespace)
+				continue
+			}
+			return nil, fmt.Errorf(missingMetricDefinitions, *resource.ID, metric.Namespace)
+		}
+
+		supportedMetricNames, err := filterMetricNames(*resource.ID, metric, metricDefinitions.Value)
+		if err != nil {
+			return nil, err
+		}
+
+		metricGroups, err := filterOnSupportedAggregations(supportedMetricNames, metric, metricDefinitions.Value)
+		if err != nil {
+			return nil, err
+		}
+
+		var dim []azure.Dimension
+		if len(metric.Dimensions) > 0 {
+			for _, dimension := range metric.Dimensions {
+				dim = append(dim, azure.Dimension(dimension))
+			}
+		}
+
+		if metric.Timegrain == "" {
+			metrics = append(metrics, mapMetricsWithFirstAllowedTimegrain(client, resource, metric, metricGroups, dim)...)
+		} else {
+			metrics = append(metrics, mapMetricsWithUserTimegrain(client, resource, metric, metricGroups, dim)...)
+		}
+	}
 	return metrics, nil
 }
 
-func mapMetricsWithFirstAllowedTimegrain(client *azure.Client, resource *armresources.GenericResourceExpanded, metric azure.MetricConfig, metricGroups map[string][]*armmonitor.MetricDefinition, dim []azure.Dimension) []azure.Metric {
+func mapMetricsWithFirstAllowedTimegrain(client interface{}, resource *armresources.GenericResourceExpanded, metric azure.MetricConfig, metricGroups map[string][]*armmonitor.MetricDefinition, dim []azure.Dimension) []azure.Metric {
 	var metrics []azure.Metric
 	// Need to leverage first available timegrain from each metric definition
 	for key, metricGroup := range metricGroups {
@@ -89,26 +106,60 @@ func mapMetricsWithFirstAllowedTimegrain(client *azure.Client, resource *armreso
 		for _, metricFromGroup := range metricGroup {
 			// combine like first timegrains
 			// we can sort these if we ever discover ordering is not guaranteed
-			metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain] = append(
-				metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain],
-				*metricFromGroup.Name.Value)
+			if len(metricFromGroup.MetricAvailabilities) > 0 && metricFromGroup.MetricAvailabilities[0].TimeGrain != nil {
+				metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain] = append(
+					metricNamesByFirstTimegrain[*metricFromGroup.MetricAvailabilities[0].TimeGrain],
+					*metricFromGroup.Name.Value)
+			}
 		}
+		// extract metric names combined with like timegrain and append to metrics list to return
 		for timeGrain, metricNames := range metricNamesByFirstTimegrain {
-			metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, timeGrain))
+			switch c := client.(type) {
+			case *azure.Client:
+				metrics = append(metrics,
+					c.CreateMetric(
+						*resource.ID, "", metric.Namespace, metricNames, key,
+						dim, timeGrain,
+					),
+				)
+			case *azure.BatchClient:
+				metrics = append(metrics,
+					c.CreateMetric(
+						*resource.ID, "", metric.Namespace, *resource.Location,
+						c.Config.SubscriptionId, metricNames, key, dim,
+						timeGrain,
+					),
+				)
+			}
 		}
 	}
 	return metrics
 }
 
-func mapMetricsWithUserTimegrain(client *azure.Client, resource *armresources.GenericResourceExpanded, metric azure.MetricConfig, metricGroups map[string][]*armmonitor.MetricDefinition, dim []azure.Dimension) []azure.Metric {
+func mapMetricsWithUserTimegrain(client interface{}, resource *armresources.GenericResourceExpanded, metric azure.MetricConfig, metricGroups map[string][]*armmonitor.MetricDefinition, dim []azure.Dimension) []azure.Metric {
 	var metrics []azure.Metric
-	// no need to grab timegrains from metric definition
 	for key, metricGroup := range metricGroups {
 		var metricNames []string
 		for _, metricName := range metricGroup {
 			metricNames = append(metricNames, *metricName.Name.Value)
 		}
-		metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, metric.Timegrain))
+		switch c := client.(type) {
+		case *azure.Client:
+			metrics = append(metrics,
+				c.CreateMetric(
+					*resource.ID, "", metric.Namespace, metricNames, key, dim,
+					metric.Timegrain,
+				),
+			)
+		case *azure.BatchClient:
+			metrics = append(metrics,
+				c.CreateMetric(
+					*resource.ID, "", metric.Namespace, *resource.Location,
+					c.Config.SubscriptionId, metricNames, key, dim,
+					metric.Timegrain,
+				),
+			)
+		}
 	}
 	return metrics
 }
@@ -117,14 +168,11 @@ func mapMetricsWithUserTimegrain(client *azure.Client, resource *armresources.Ge
 func filterMetricNames(resourceId string, metricConfig azure.MetricConfig, metricDefinitions []*armmonitor.MetricDefinition) ([]string, error) {
 	var supportedMetricNames []string
 	var unsupportedMetricNames []string
-	// If users selected the wildcard option (*), we add
-	// all the metric definitions to the supported metric.
 	if strings.Contains(strings.Join(metricConfig.Name, " "), "*") {
 		for _, definition := range metricDefinitions {
 			supportedMetricNames = append(supportedMetricNames, *definition.Name.Value)
 		}
 	} else {
-		// verify if configured metric names are valid, return log error event for the invalid ones, map only  the valid metric names
 		supportedMetricNames, unsupportedMetricNames = filterConfiguredMetrics(metricConfig.Name, metricDefinitions)
 		if len(unsupportedMetricNames) > 0 && !metricConfig.IgnoreUnsupported {
 			return nil, fmt.Errorf("the metric names configured  %s are not supported for the resource %s and namespace %s",
