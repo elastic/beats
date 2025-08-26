@@ -21,11 +21,9 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"math"
 	"reflect"
 	"strings"
-
-	"github.com/go-viper/mapstructure/v2"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
@@ -62,6 +60,9 @@ var defaultOptions = esToOTelOptions{
 	Pipeline: "",
 	ProxyURL: "",
 	Preset:   "custom", // default is custom if not set
+	HostWorkerCfg: outputs.HostWorkerCfg{
+		Workers: 1,
+	},
 }
 
 // ToOTelConfig converts a Beat config into OTel elasticsearch exporter config
@@ -124,20 +125,32 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 		"timeout":           escfg.Transport.Timeout,         // timeout
 		"idle_conn_timeout": escfg.Transport.IdleConnTimeout, // idle_connection_timeout
 
+		// For libbeat ES output, the "workers" setting controls the number of concurrent connections per ES host.
+		// For elasticsearchexporter, we can achieve the same concurrency by specifying "max_conns_per_host" setting
+		// as our otelconsumer sends data parallelly to the consumer.
+		// Also, we use http/1 in libbeat. To achieve parity, disable force_attempt_http2
+		"max_conns_per_host":  escfg.NumWorkers(),
+		"force_attempt_http2": false,
+
 		// Retry
 		"retry": map[string]any{
 			"enabled":          true,
 			"initial_interval": escfg.Backoff.Init, // backoff.init
 			"max_interval":     escfg.Backoff.Max,  // backoff.max
 			"max_retries":      escfg.MaxRetries,   // max_retries
-
 		},
 
-		// Batcher is experimental
-		"batcher": map[string]any{
-			"enabled":  true,
-			"max_size": escfg.BulkMaxSize, // bulk_max_size
-			"min_size": 0,                 // 0 means immediately trigger a flush
+		"sending_queue": map[string]any{
+			"batch": map[string]any{
+				"max_size": escfg.BulkMaxSize, // bulk_max_size
+				"min_size": 0,                 // 0 means immediately trigger a flush
+				"sizer":    "items",
+			},
+			"enabled":           true,
+			"queue_size":        math.MaxInt,
+			"block_on_overflow": true,
+			"wait_for_result":   true,
+			"num_consumers":     escfg.NumWorkers(),
 		},
 
 		"mapping": map[string]any{
@@ -161,10 +174,6 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 	setIfNotNil(otelYAMLCfg, "pipeline", escfg.Pipeline)  // pipeline
 	// Dynamic routing is disabled if output.elasticsearch.index is set
 	setIfNotNil(otelYAMLCfg, "logs_index", escfg.Index) // index
-
-	if err := typeSafetyCheck(otelYAMLCfg); err != nil {
-		return nil, err
-	}
 
 	return otelYAMLCfg, nil
 }
@@ -194,24 +203,6 @@ func checkUnsupportedConfig(cfg *config.C, logger *logp.Logger) error {
 		return fmt.Errorf("allow_older_versions:false is currently not supported: %w", errors.ErrUnsupported)
 	}
 	return nil
-}
-
-// For type safety check
-func typeSafetyCheck(value map[string]any) error {
-	// the  value should match `elasticsearchexporter.Config` type.
-	// it throws an error if non existing key names  are set
-	var result elasticsearchexporter.Config
-	d, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		Squash:      true,
-		Result:      &result,
-		ErrorUnused: true,
-	})
-
-	err := d.Decode(value)
-	if err != nil {
-		return err
-	}
-	return err
 }
 
 // Helper function to check if a struct is empty
