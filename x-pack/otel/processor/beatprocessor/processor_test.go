@@ -65,6 +65,46 @@ func TestConsumeLogs(t *testing.T) {
 	}
 }
 
+func TestCreateProcessor(t *testing.T) {
+	t.Run("nil config returns nil processor", func(t *testing.T) {
+		processor, err := createProcessor(nil)
+		require.NoError(t, err)
+		assert.Nil(t, processor)
+	})
+
+	t.Run("empty config returns nil processor", func(t *testing.T) {
+		processor, err := createProcessor(map[string]any{})
+		require.NoError(t, err)
+		assert.Nil(t, processor)
+	})
+
+	t.Run("multiple processor names in config returns error", func(t *testing.T) {
+		_, err := createProcessor(map[string]any{
+			"add_host_metadata": map[string]any{},
+			"another_key":       map[string]any{},
+		})
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "expected single processor name")
+	})
+
+	t.Run("unknown processor returns error", func(t *testing.T) {
+		_, err := createProcessor(map[string]any{
+			"unknown_processor": map[string]any{},
+		})
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "invalid processor name 'unknown_processor'")
+	})
+
+	t.Run("valid add_host_metadata processor config returns processor", func(t *testing.T) {
+		processor, err := createProcessor(map[string]any{
+			"add_host_metadata": map[string]any{},
+		})
+		require.NoError(t, err)
+		require.NotNil(t, processor)
+		assert.Equal(t, "add_host_metadata", processor.String()[:len("add_host_metadata")])
+	})
+}
+
 type mockProcessor struct {
 	runFunc func(event *beat.Event) (*beat.Event, error)
 }
