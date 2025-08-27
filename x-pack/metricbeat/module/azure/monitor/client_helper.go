@@ -46,6 +46,14 @@ func getMappedResourceDefinitions(
 	var logger *logp.Logger
 
 	switch c := client.(type) {
+	// These case statements look a bit repetitive, but the static linter
+	// used by VSCode (and likely other tools)
+	// does not like when multiple types are on the same case line in
+	// the type switch, e.g. *azure.Client, *azure.BatchClient.
+	// The effect is that the asserted type falls back to "any" within
+	// the case block. This causes the field accesses to become illegal with a
+	// MissingFieldOrMethod error. Therefore, the case statements are kept
+	// redundant in the face of this limitation.
 	case *azure.Client:
 		monitorService = c.AzureMonitorService
 		logger = c.Log
