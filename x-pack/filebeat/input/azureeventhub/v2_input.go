@@ -91,8 +91,6 @@ func (in *eventHubInputV2) Run(
 	// Setting up the status reporter helper
 	in.status = statusreporterhelper.New(inputContext.StatusReporter, in.log, "Azure Event Hub")
 
-	defer in.status.UpdateStatus(status.Stopped, "")
-
 	// When the input is initializing before attempting to connect to Azure Event Hub.
 	in.status.UpdateStatus(status.Starting, "Input starting")
 
@@ -121,8 +119,14 @@ func (in *eventHubInputV2) Run(
 	// Start the main run loop (blocking call).
 	// Update input status to running.
 	in.status.UpdateStatus(status.Running, "Input is running")
-	in.run(ctx)
-
+	err = in.run(ctx)
+	if err != nil {
+		// for future failures outside of the errored processor state
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Run failed: %s", err.Error()))
+		return err
+	}
+	// did not error out, but the run loop finished
+	in.status.UpdateStatus(status.Stopped, "")
 	return nil
 }
 
@@ -225,7 +229,7 @@ func (in *eventHubInputV2) teardown(ctx context.Context) {
 }
 
 // run starts the main loop for processing events.
-func (in *eventHubInputV2) run(ctx context.Context) {
+func (in *eventHubInputV2) run(ctx context.Context) error {
 	if in.config.MigrateCheckpoint {
 		in.log.Infow("checkpoint migration is enabled")
 		// Check if we need to migrate the checkpoint store.
@@ -267,7 +271,7 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 		if err != nil {
 			in.log.Errorw("error creating processor", "error", err)
 			in.status.UpdateStatus(status.Failed, fmt.Sprintf("Error creating processor. Error: %s", err))
-			return
+			return err
 		}
 
 		// Launch one goroutines for each partition
@@ -312,6 +316,7 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 			"context_error", ctx.Err(),
 		)
 	}
+	return nil
 }
 
 // createProcessorOptions creates the processor options using the input configuration.
