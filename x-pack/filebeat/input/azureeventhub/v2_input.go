@@ -497,8 +497,6 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 					"ownership lost for partition, stopping processing",
 					"partition_id", partitionID,
 				)
-				in.status.UpdateStatus(status.Degraded,
-					fmt.Sprintf("Ownership lost for partition %s: %s", partitionID, err.Error()))
 
 				return nil
 			}
