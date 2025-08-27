@@ -24,7 +24,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 **Affecting all Beats**
 
 - Update Go version to 1.24.5. [45403]({{beats-pull}}45403)
-- Improve trimming of BOM from UTF-8 data in the libbeat reader/readfile.EncoderReader. [45742]({{beats-pull}}45742)
+- Improve trimming of BOM from UTF-8 data in the libbeat `reader/readfile.EncoderReader`. [45742]({{beats-pull}}45742)
 
 **Filebeat**
 
@@ -47,7 +47,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 **Metricbeat**
 
 - Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. [45761]({{beats-pull}}45761)
-- Enhance behavior of sanitizeError: replace sensitive info even if it is escaped and add pattern-based sanitization [45857]({{beats-pull}}45857)
+- Enhance behavior of `sanitizeError`: replace sensitive info even if it is escaped and add pattern-based sanitization. [45857]({{beats-pull}}45857)
 
 ## 9.1.2 [beats-9.1.2-release-notes]
 

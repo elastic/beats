@@ -16,12 +16,12 @@ Breaking changes can impact your Elastic applications, potentially disrupting no
 
 **Metricbeat**
 
-::::{dropdown} API used by index summary metricset changed
+::::{dropdown} API used by index summary metricset changed.
 Changed index summary metricset to use `_nodes/stats` API instead of `_stats` API to avoid data gaps.
 
 % **Impact**<br>Add a description of the impact.
 
-% **Action**<br>Add a description of the what action to take.
+% **Action**<br>Add a description of what action to take.
 
 For more information, check [#45049]({{beats-pull}}45049).
 ::::
