@@ -30,14 +30,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-// RegistryLookupFunc is used to look up a registry by its path inside a
-// containing registry.
-func RegistryLookupFunc(root *monitoring.Registry) LookupFunc {
-	return func(s string) *monitoring.Registry {
-		return root.GetRegistry(s)
-	}
-}
-
 type LookupFunc func(string) *monitoring.Registry
 
 // NewWithDefaultRoutes creates a new server with default API routes.
