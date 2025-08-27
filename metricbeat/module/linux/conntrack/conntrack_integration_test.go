@@ -34,8 +34,9 @@ import (
 )
 
 func BenchmarkFetchNetlink(b *testing.B) {
-	if os.Geteuid() != 0 {
+	if os.Getuid() != 0 {
 		b.Skip("This benchmark requires CAP_NET_ADMIN capability (run as root)")
+		return
 	}
 
 	cfg := getConfig()
@@ -48,8 +49,9 @@ func BenchmarkFetchNetlink(b *testing.B) {
 }
 
 func TestFetchNetlink(t *testing.T) {
-	if os.Geteuid() != 0 {
+	if os.Getuid() != 0 {
 		t.Skip("This test requires CAP_NET_ADMIN capability (run as root)")
+		return
 	}
 
 	// hide /proc/net/stat/nf_conntrack file so it uses netlink
@@ -74,9 +76,10 @@ func TestFetchNetlink(t *testing.T) {
 	assert.Contains(t, keys, "search_restart")
 }
 
-func TestFetchABTest(t *testing.T) {
-	if os.Geteuid() != 0 {
+func TestFetchProcfsVsNetlink(t *testing.T) {
+	if os.Getuid() != 0 {
 		t.Skip("This test requires CAP_NET_ADMIN capability (run as root)")
+		return
 	}
 
 	cfg := getConfig()
