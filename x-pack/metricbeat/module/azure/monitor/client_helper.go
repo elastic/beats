@@ -46,7 +46,7 @@ func getMappedResourceDefinitions(
 	var logger *logp.Logger
 
 	switch c := client.(type) {
-	// These case statements look a bit repetitive, but the static linter
+	// These case statements look a bit repetitive, but the linter
 	// used by VSCode (and likely other tools)
 	// does not like when multiple types are on the same case line in
 	// the type switch, e.g. "case *azure.Client, *azure.BatchClient:".
