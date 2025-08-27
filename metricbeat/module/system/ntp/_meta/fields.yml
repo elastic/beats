@@ -3,6 +3,8 @@
   description: >
     `ntp` contains Network Time Protocol (NTP) metrics.
   release: beta
+  version:
+    beta: 9.2.0
   fields:
   - name: host
     type: keyword
