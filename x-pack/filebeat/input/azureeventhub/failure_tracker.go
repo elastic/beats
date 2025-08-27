@@ -24,16 +24,16 @@ type partitionFailureInfo struct {
 type partitionFailureTracker struct {
 	partitionFailureData map[string]*partitionFailureInfo
 	mux                  sync.Mutex
-	window               time.Duration
+	minWindow            time.Duration
 	threshold            int
 	failingPartitions    map[string]struct{}
 }
 
 // newPartitionFailureTracker creates a new partitionFailureTracker.
-func newPartitionFailureTracker(window time.Duration, threshold int) *partitionFailureTracker {
+func newPartitionFailureTracker(minWindow time.Duration, threshold int) *partitionFailureTracker {
 	return &partitionFailureTracker{
 		partitionFailureData: make(map[string]*partitionFailureInfo),
-		window:               window,
+		minWindow:            minWindow,
 		threshold:            threshold,
 		failingPartitions:    make(map[string]struct{}),
 	}
@@ -52,7 +52,7 @@ func (t *partitionFailureTracker) TrackFailure(partitionID string) (bool, int) {
 	}
 
 	info.failureCount++
-	isFailing := time.Since(info.firstFailureTime) > t.window && info.failureCount >= t.threshold
+	isFailing := time.Since(info.firstFailureTime) > t.minWindow && info.failureCount >= t.threshold
 
 	if isFailing {
 		t.failingPartitions[partitionID] = struct{}{}
