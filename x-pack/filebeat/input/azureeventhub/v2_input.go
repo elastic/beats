@@ -121,7 +121,7 @@ func (in *eventHubInputV2) Run(
 	// Start the main run loop (blocking call).
 	// Update input status to running.
 	in.status.UpdateStatus(status.Running, "Input is running")
-	in.run(inputContext, ctx)
+	in.run(ctx)
 
 	return nil
 }
@@ -225,7 +225,7 @@ func (in *eventHubInputV2) teardown(ctx context.Context) {
 }
 
 // run starts the main loop for processing events.
-func (in *eventHubInputV2) run(inputContext v2.Context, ctx context.Context) {
+func (in *eventHubInputV2) run(ctx context.Context) {
 	if in.config.MigrateCheckpoint {
 		in.log.Infow("checkpoint migration is enabled")
 		// Check if we need to migrate the checkpoint store.
