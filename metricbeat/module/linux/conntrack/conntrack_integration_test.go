@@ -61,7 +61,7 @@ func TestFetchNetlink(t *testing.T) {
 	require.Empty(t, errs, "fetch should not return an error")
 
 	require.NotEmpty(t, events)
-	rawEvent := events[0].BeatEvent("linux", "conntrack").Fields["linux"].(mapstr.M)["conntrack"].(mapstr.M)["summary"].(mapstr.M)
+	rawEvent := events[0].BeatEvent("linux", "conntrack").Fields["linux"].(mapstr.M)["conntrack"].(mapstr.M)["summary"].(mapstr.M) //nolint:errcheck // ignore
 	keys := slices.Collect(maps.Keys(rawEvent))
 	assert.Contains(t, keys, "entries")
 	assert.Greater(t, rawEvent["entries"], uint64(0), "entries should be greater than 0")
@@ -87,7 +87,7 @@ func TestFetchABTest(t *testing.T) {
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	require.Empty(t, errs, "fetch should not return an error")
 	require.NotEmpty(t, events)
-	procfsEvent := events[0].BeatEvent("linux", "conntrack").Fields["linux"].(mapstr.M)["conntrack"].(mapstr.M)["summary"].(mapstr.M)
+	procfsEvent := events[0].BeatEvent("linux", "conntrack").Fields["linux"].(mapstr.M)["conntrack"].(mapstr.M)["summary"].(mapstr.M) //nolint:errcheck // ignore
 
 	// netlink
 	cfg["hostfs"] = t.TempDir()
@@ -97,7 +97,7 @@ func TestFetchABTest(t *testing.T) {
 	require.Empty(t, errs, "fetch should not return an error")
 
 	require.NotEmpty(t, events)
-	netlinkEvent := events[0].BeatEvent("linux", "conntrack").Fields["linux"].(mapstr.M)["conntrack"].(mapstr.M)["summary"].(mapstr.M)
+	netlinkEvent := events[0].BeatEvent("linux", "conntrack").Fields["linux"].(mapstr.M)["conntrack"].(mapstr.M)["summary"].(mapstr.M) //nolint:errcheck // ignore
 
 	assert.Equal(t, procfsEvent, netlinkEvent, "events should be equal")
 }
