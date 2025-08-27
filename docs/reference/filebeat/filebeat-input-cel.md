@@ -273,6 +273,8 @@ Additionally, it supports authentication via:
 * OAuth2
 * token authentication {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
 
+As described in Mito's [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) documentation, configuration for Basic Authentication or token authentication will only affect direct HEAD, GET and POST method calls, not explicity constructed requests run with `.do_request()`. Configuration for Digest Authentication or OAuth2 will be used for all requests made from CEL.
+
 Example configurations with authentication:
 
 ```yaml
@@ -488,6 +490,9 @@ When set to `false`, disables the basic auth configuration. Default: `true`.
 Basic auth settings are disabled if either `enabled` is set to `false` or the `auth.basic` section is missing.
 ::::
 
+::::{note}
+Basic auth settings do not affect requests run with `.do_request()`, as explained in [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP).
+::::
 
 
 ### `auth.basic.user` [_auth_basic_user]
@@ -707,6 +712,9 @@ When set to `false`, disables the token authentication configuration. Default: `
 Token authentication settings are disabled if either `enabled` is set to `false` or the `auth.token` section is missing.
 ::::
 
+::::{note}
+Token authentication settings do not affect requests run with `.do_request()`, as explained in [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP).
+::::
 
 
 ### `auth.token.type` [_auth_token_type]
