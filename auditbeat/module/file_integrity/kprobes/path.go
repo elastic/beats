@@ -220,8 +220,13 @@ func (traverser *pTraverser) walkRecursive(ctx context.Context, path string, mou
 
 	matchFileName := filepath.Base(mntPath)
 
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	if !ok {
+		return fmt.Errorf("file info is %T, not a stat_t object", info.Sys())
+	}
+
 	traverser.statQueue = append(traverser.statQueue, statMatch{
-		ino:        info.Sys().(*syscall.Stat_t).Ino,
+		ino:        stat.Ino,
 		major:      mnt.DeviceMajor,
 		minor:      mnt.DeviceMinor,
 		depth:      depth,

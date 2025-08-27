@@ -107,7 +107,7 @@ func unescapeString(str string) string {
 		b := str[i]
 		if b == '\\' && i+3 < len(str) {
 			if parsed, err := strconv.ParseInt(str[i+1:i+4], 8, 8); err == nil {
-				b = uint8(parsed)
+				b = uint8(parsed) //nolint:gosec // ParseInt will fail if we're larger than 8 bits anyway
 				i += 3
 			}
 		}
