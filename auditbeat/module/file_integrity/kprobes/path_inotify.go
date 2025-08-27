@@ -103,13 +103,14 @@ func (w *iWatcher) Add(devMajor uint32, devMinor uint32, mountPath string) (bool
 	if wd > math.MaxUint32 || wd < 0 {
 		return false, fmt.Errorf("inotify watch descriptor %d is out of range", wd)
 	}
+	watchdev := uint32(wd)
 
-	_, fdExists := w.uniqueFDs[uint32(wd)]
+	_, fdExists := w.uniqueFDs[watchdev]
 	if fdExists {
 		return false, nil
 	}
 
-	w.uniqueFDs[uint32(wd)] = struct{}{}
+	w.uniqueFDs[watchdev] = struct{}{}
 	w.mounts[id] = struct{}{}
 	return true, nil
 }
