@@ -597,10 +597,13 @@ func Test_EventProcessor_process(t *testing.T) {
 			mockEmitter := &EmitterMock{}
 			mockEmitterCall := mockEmitter.On("Emit", mock.Anything, mock.Anything, mock.Anything)
 			mockEmitterCall.Run(func(args mock.Arguments) {
+				path, _ := args.Get(0).(string)
+				pid, _ := args.Get(1).(uint32)
+				op, _ := args.Get(2).(uint32)
 				emittedEvents = append(emittedEvents, emitted{
-					path: args.Get(0).(string),
-					pid:  args.Get(1).(uint32),
-					op:   args.Get(2).(uint32),
+					path: path,
+					pid:  pid,
+					op:   op,
 				})
 				mockEmitterCall.ReturnArguments = []any{nil}
 			})
@@ -608,10 +611,10 @@ func Test_EventProcessor_process(t *testing.T) {
 			mockPathTraverser := &pathTraverserMock{}
 			mockPathTraverserCall := mockPathTraverser.On("GetMonitorPath", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
 			mockPathTraverserCall.Run(func(args mock.Arguments) {
-				ino := args.Get(0).(uint64)
-				major := args.Get(1).(uint32)
-				minor := args.Get(2).(uint32)
-				name := args.Get(3).(string)
+				ino, _ := args.Get(0).(uint64)
+				major, _ := args.Get(1).(uint32)
+				minor, _ := args.Get(2).(uint32)
+				name, _ := args.Get(3).(string)
 				if len(c.statMatches) == 0 {
 					mockPathTraverserCall.ReturnArguments = []any{MonitorPath{}, false}
 					return
@@ -636,11 +639,13 @@ func Test_EventProcessor_process(t *testing.T) {
 			})
 
 			mockPathTraverser.On("WalkAsync", mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
-				pid := args.Get(2).(uint32)
+				pid, _ := args.Get(2).(uint32)
+				fullPath, _ := args.Get(0).(string)
+				depth, _ := args.Get(1).(uint32)
 
 				c.statMatches = append(c.statMatches, statMatch{
-					fullPath:   args.Get(0).(string),
-					depth:      args.Get(1).(uint32),
+					fullPath:   fullPath,
+					depth:      depth,
 					ino:        20,
 					major:      1,
 					minor:      1,
