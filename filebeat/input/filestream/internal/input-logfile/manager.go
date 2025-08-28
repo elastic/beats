@@ -325,11 +325,17 @@ func (i *sourceIdentifier) MatchesInput(id string) bool {
 
 // TakeOverConfig is the configuration for the take over mode.
 // It allows the Filestream input to take over states from the log
-// input or other Filestream inputs
+// input or other Filestream inputs.
+//
+// TakeOverConfig uses a custom Unpack method, if a field is added,
+// it also needs to be added to the Unpack method.
 type TakeOverConfig struct {
 	Enabled bool `config:"enabled"`
 	// Filestream IDs to take over states
 	FromIDs []string `config:"from_ids"`
+
+	// PoC
+	FromRegistry string `config:"from_registry"`
 
 	// legacyFormat is set to true when `Unpack` detects
 	// the legacy configuration format. It is used by
@@ -349,6 +355,8 @@ func (t *TakeOverConfig) Unpack(value any) error {
 			return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as bool", rawEnabled)
 		}
 		t.Enabled = enabled
+
+		t.FromRegistry, _ = v["from_registry"].(string)
 
 		rawFromIDs, exists := v["from_ids"]
 		if !exists {

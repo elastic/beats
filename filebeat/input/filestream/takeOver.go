@@ -2,6 +2,7 @@ package filestream
 
 import (
 	"fmt"
+	"os"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
@@ -66,6 +67,14 @@ func TakeOverFromEA(
 		logger.Errorf("could not run store.Each: %s", err)
 	}
 
-	dstStore.BulkInsert(states, identifier.Name())
+	if err := dstStore.BulkInsert(states, identifier.Name()); err != nil {
+		logger.Errorf("could not bulk insert into the store: %s", err)
+	}
+
+	if err := os.RemoveAll(oldRegistry); err != nil {
+		logger.Errorf("could not remove old registry: %s", err)
+		return fmt.Errorf("cannot remove old registry: %w", err)
+	}
+
 	return nil
 }
