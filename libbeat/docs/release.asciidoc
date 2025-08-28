@@ -8,9 +8,13 @@ This section summarizes the changes in each release. Also read
 <<breaking-changes>> for more detail about changes that affect
 upgrade.
 
+<<<<<<< HEAD
 * <<release-notes-8.19.2>>
 * <<release-notes-8.19.1>>
 * <<release-notes-8.19.0>>
+=======
+* <<release-notes-8.18.6>>
+>>>>>>> 5c9a0ec69 (docs: Prepare Changelog for 8.18.6 (#46269))
 * <<release-notes-8.18.5>>
 * <<release-notes-8.18.4>>
 * <<release-notes-8.18.3>>
