@@ -3,6 +3,52 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-9.1.3]]
+=== Beats version 9.1.3
+https://github.com/elastic/beats/compare/v9.1.2\...v9.1.3[View commits]
+
+==== Breaking changes
+
+*Metricbeat*
+
+- Change index summary metricset to use `_nodes/stats` API instead of `_stats` API to avoid data gaps. {pull}45049[45049]
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
+
+
+*Filebeat*
+
+- Fix handling of unnecessary BOM in UTF-8 text received by o365audit input. {issue}44327[44327] {pull}45739[45739]
+- Fix reading journald messages with more than 4kb. {issue}45511[45511] {pull}46017[46017]
+- Restore the Streaming input on Windows. {pull}46031[46031]
+- Fix termination of input on API errors. {pull}45999[45999]
+
+
+*Metricbeat*
+
+- Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. {pull}45761[45761]
+- Enhance behavior of sanitizeError: replace sensitive info even if it is escaped and add pattern-based sanitization {pull}45857[45857]
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.24.5. {pull}45403[45403]
+- Improve trimming of BOM from UTF-8 data in the libbeat reader/readfile.EncoderReader. {pull}45742[45742]
+
+
+*Filebeat*
+
+- Add mechanism to allow HTTP JSON templates to terminate without logging an error. {issue}45664[45664] {pull}45810[45810]
+- Add status reporting support for AWS S3 input. {pull}45748[45748]
+
+
 [[release-notes-9.1.2]]
 === Beats version 9.1.2
 https://github.com/elastic/beats/compare/v9.1.1\...v9.1.2[View commits]
