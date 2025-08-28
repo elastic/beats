@@ -13,47 +13,8 @@ https://github.com/elastic/beats/compare/v8.19.2\...v8.19.3[View commits]
 
 - The base folder for data and logs on Windows has changed from `C:\ProgramData\[BeatName]` to to `C:\Program Files\[BeatName]-Data` because the latter has stricter permissions. {pull}45948[45948]
 
-*Auditbeat*
-
-
-*Filebeat*
-
-
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
 
 ==== Bugfixes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
@@ -65,155 +26,23 @@ https://github.com/elastic/beats/compare/v8.19.2\...v8.19.3[View commits]
 - Fix termination of input on API errors. {pull}45999[45999]
 - Fix filestream registry entries being prematurely removed, which could cause files to be re-ingested after Filebeat restarts. {issue}46007[46007] {pull}46032[46032]
 
-*Heartbeat*
-
-
 
 *Metricbeat*
 
 - Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. {pull}45761[45761]
 - Enhance behavior of sanitizeError: replace sensitive info even if it is escaped and add pattern-based sanitization {pull}45857[45857]
 
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-*Elastic Logging Plugin*
-
-
 ==== Added
 
 *Affecting all Beats*
 
-- Update to Go 1.24.5. {pull}45403[45403]
-
-*Auditbeat*
-
-
-*Auditbeat*
-
-
-
-*Auditbeat*
-
+- Update Go version to 1.24.5. {pull}45403[45403]
 
 *Filebeat*
 
 - Add status reporting support for AWS CloudWatch input. {pull}45679[45679]
 - Add mechanism to allow HTTP JSON templates to terminate without logging an error. {issue}45664[45664] {pull}45810[45810]
 - Add status reporting support for AWS S3 input. {pull}45748[45748]
-
-*Auditbeat*
-
-
-*Libbeat*
-
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-
-*Functionbeat*
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 [[release-notes-8.19.2]]
