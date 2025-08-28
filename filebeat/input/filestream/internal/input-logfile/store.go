@@ -339,7 +339,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 	// That's the only way to access the log input states.
 	// We only iterate through the whole store if we're not migrating from
 	// a Filestream input
-	fromLogInput := map[string]logInputState{}
+	fromLogInput := map[string]LogInputState{}
 	if len(s.identifiersToTakeOver) == 0 {
 		s.store.persistentStore.Each(func(key string, value statestore.ValueDecoder) (bool, error) {
 			if strings.HasPrefix(key, "filebeat::logs::") {
@@ -347,7 +347,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 				if err := value.Decode(&m); err != nil {
 					return true, err
 				}
-				st, err := logInputStateFromMapM(m)
+				st, err := LogInputStateFromMapM(m)
 				if err != nil {
 					// Log the error and continue
 					s.store.log.Errorf("cannot read Log input state: %s", err)
@@ -490,7 +490,11 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 	}
 }
 
-type logInputState struct {
+func (s *sourceStore) BulkInsert(sts []LogInputState, fileIdentityName string) error {
+	return s.store.BulkInsert(sts, fileIdentityName)
+}
+
+type LogInputState struct {
 	ID     string        `json:"id"`
 	Offset int64         `json:"offset"`
 	TTL    time.Duration `json:"ttl" struct:"ttl"`
@@ -500,28 +504,31 @@ type logInputState struct {
 	// and are used by UnpackCursorMeta
 	Source         string `json:"source" struct:"source"`
 	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
+
+	// PoC
+	NewKey string
 }
 
-func logInputStateFromMapM(m mapstr.M) (logInputState, error) {
-	state := logInputState{}
+func LogInputStateFromMapM(m mapstr.M) (LogInputState, error) {
+	state := LogInputState{}
 
 	// typeconf.Convert kept failing with an "unsupported" error because
 	// FileStateOS was present, we don't need it, so just delete it.
 	m.Delete("FileStateOS") //nolint:errcheck // The key is always there
 	if err := typeconv.Convert(&state, m); err != nil {
-		return logInputState{}, fmt.Errorf("cannot convert Log input state: %w", err)
+		return LogInputState{}, fmt.Errorf("cannot convert Log input state: %w", err)
 	}
 
 	return state, nil
 }
 
 // UnpackCursorMeta unpacks the cursor metadata's into the provided struct. TBD
-func (l logInputState) UnpackCursorMeta(to any) error {
+func (l LogInputState) UnpackCursorMeta(to any) error {
 	return typeconv.Convert(to, l)
 }
 
 // Key returns the resource's key
-func (l logInputState) Key() string {
+func (l LogInputState) Key() string {
 	return l.key
 }
 
@@ -647,6 +654,38 @@ func (s *store) UpdateTTL(resource *resource, ttl time.Duration) {
 		// be overwritten in the persistent store
 		resource.invalid = true
 	}
+}
+
+func (s *store) BulkInsert(sts []LogInputState, fileIdentityName string) error {
+	for _, st := range sts {
+		s.log.Infof("====================: %s, Path: %s", st.ID, st.Source)
+
+		// Find or create a resource. It should always create a new one.
+		res := s.ephemeralStore.unsafeFind(st.NewKey, true)
+		res.cursorMeta = struct {
+			Source         string `json:"source" struct:"source"`
+			IdentifierName string `json:"identifier_name" struct:"identifier_name"`
+		}{
+			Source:         st.Source,
+			IdentifierName: fileIdentityName,
+		}
+
+		//		Convert the offset to the correct type
+		res.cursor = struct {
+			Offset int64 `json:"offset" struct:"offset"`
+		}{
+			Offset: st.Offset,
+		}
+
+		// Write to disk
+		s.writeState(res)
+
+		// Update in-memory store
+		s.ephemeralStore.table[st.NewKey] = res
+		res.Release()
+	}
+
+	return nil
 }
 
 // Find returns the resource for a given key. If the key is unknown and create is set to false nil will be returned.

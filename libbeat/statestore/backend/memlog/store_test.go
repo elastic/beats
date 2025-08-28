@@ -36,7 +36,7 @@ func TestRecoverFromCorruption(t *testing.T) {
 	}
 
 	logger := logptest.NewTestingLogger(t, "")
-	store, err := openStore(logger.Named("test"), path, 0660, 4096, false, func(_ uint64) bool {
+	store, err := OpenStore(logger.Named("test"), path, 0660, 4096, false, func(_ uint64) bool {
 		return false
 	})
 	require.NoError(t, err, "openStore must succeed")

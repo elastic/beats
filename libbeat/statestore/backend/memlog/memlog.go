@@ -113,10 +113,13 @@ func (r *Registry) Access(name string) (backend.Store, error) {
 	home := filepath.Join(r.settings.Root, name)
 	fileMode := r.settings.FileMode
 	bufSz := r.settings.BufferSize
-	store, err := openStore(logger, home, fileMode, bufSz, r.settings.IgnoreVersionCheck, r.settings.Checkpoint)
+	store, err := OpenStore(logger, home, fileMode, bufSz, r.settings.IgnoreVersionCheck, r.settings.Checkpoint)
 	if err != nil {
 		return nil, err
 	}
+
+	// // Create a checkpoint to test opening/reading the store
+	// store.Checkpoint()
 
 	return store, nil
 }

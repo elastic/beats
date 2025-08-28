@@ -91,6 +91,14 @@ func (p *fileProspector) Init(
 ) error {
 	files := p.filewatcher.GetFiles()
 
+	TakeOverFromEA(
+		p.logger,
+		"/tmp/test-registry",
+		prospectorStore.(PocStore),
+		newID,
+		files,
+		p.identifier)
+
 	// If this fileProspector belongs to an input that did not have an ID
 	// this will find its files in the registry and update them to use the
 	// new ID.
