@@ -127,7 +127,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 **Winlogbeat**
 
-- Render data values in xml renderer. [44132]({{beats-pull}}44132)
+- Render data values in XML renderer. [44132]({{beats-pull}}44132)
 
 ### Fixes [beats-9.0.6-fixes]
 
@@ -142,7 +142,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 **Metricbeat**
 
 - Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. [45761]({{beats-pull}}45761)
-- Enhance behavior of `sanitizeError`: replace sensitive info even if it is escaped and add pattern-based sanitization [45857]({{beats-pull}}45857)
+- Enhance behavior of `sanitizeError`: replace sensitive info even if it is escaped and add pattern-based sanitization. [45857]({{beats-pull}}45857)
 
 ## 9.0.5 [beats-9.0.5-release-notes]
 
