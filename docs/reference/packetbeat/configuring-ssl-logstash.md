@@ -76,7 +76,7 @@ If the test is successful, you’ll receive an empty response error. Here's an e
 * Connected to logs.example.com (192.168.99.100) port 5044 (#0)
 * TLS 1.2 connection using TLS_DHE_RSA_WITH_AES_256_CBC_SHA
 * Server certificate: logs.example.com
-* Server certificate:.example.com
+* Server certificate: example.com
 > GET / HTTP/1.1
 > Host: logs.example.com:5044
 > User-Agent: curl/7.43.0
