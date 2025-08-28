@@ -49,9 +49,6 @@ https://github.com/elastic/beats/compare/v9.1.2\...v9.1.3[View commits]
 - Add status reporting support for AWS S3 input. {pull}45748[45748]
 
 
-*Elastic Logging Plugin*
-
-
 [[release-notes-9.1.2]]
 === Beats version 9.1.2
 https://github.com/elastic/beats/compare/v9.1.1\...v9.1.2[View commits]
