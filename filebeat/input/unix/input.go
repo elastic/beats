@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -124,6 +125,11 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {
 		err = ctxerr
 	}
+
+	if err != nil {
+		ctx.UpdateStatus(status.Failed, err.Error())
+	}
+
 	return err
 }
 
