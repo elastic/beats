@@ -3,6 +3,46 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.18.6]]
+=== Beats version 8.18.6
+https://github.com/elastic/beats/compare/v8.18.5\...v8.18.6[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- The base folder for data and logs on Windows has changed from `C:\ProgramData\[BeatName]` to to `C:\Program Files\[BeatName]-Data` because the latter has stricter permissions. {pull}45949[45949]
+
+==== Bugfixes
+
+
+*Filebeat*
+
+- Fix wrongly emitted missing input ID warning {issue}42969[42969] {pull}45747[45747]
+- Fix handling of unnecessary BOM in UTF-8 text received by o365audit input. {issue}44327[44327] {pull}45739[45739]
+- Fix reading journald messages with more than 4kb. {issue}45511[45511] {pull}46017[46017]
+- Restore the Streaming input on Windows. {pull}46031[46031]
+- Fix termination of input on API errors. {pull}45999[45999]
+- Fix filestream registry entries being prematurely removed, which could cause files to be re-ingested after Filebeat restarts. {issue}46007[46007] {pull}46032[46032]
+
+
+*Metricbeat*
+
+- Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. {pull}45761[45761]
+- Enhance behavior of sanitizeError: replace sensitive info even if it is escaped and add pattern-based sanitization {pull}45857[45857]
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Update to Go version to 1.24.5. {pull}45403[45403]
+
+*Filebeat*
+
+- Add mechanism to allow HTTP JSON templates to terminate without logging an error. {issue}45664[45664] {pull}45810[45810]
+
+
 [[release-notes-8.18.5]]
 === Beats version 8.18.5
 https://github.com/elastic/beats/compare/v8.18.4\...v8.18.5[View commits]
