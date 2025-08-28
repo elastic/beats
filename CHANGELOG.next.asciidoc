@@ -301,6 +301,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
 - Fix histogram values of zero are filtered out on non-amd64 platforms for openmetrics and prometheus {pull}44750[44750]
 - Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. {pull}45761[45761]
+- Fix an issue where the conntrack metricset entries field reported a count inflated by a factor of the number of CPU cores. {issue}46138[46138] {pull}46140[46140]
 - Enhance behavior of sanitizeError: replace sensitive info even if it is escaped and add pattern-based sanitization {pull}45857[45857]
 
 *Osquerybeat*
@@ -512,6 +513,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add mechanism to allow HTTP JSON templates to terminate without logging an error. {issue}45664[45664] {pull}45810[45810]
 - Improve error reporting for schemeless URLs in HTTP JSON input. {pull}45953[45953]
 - Add status reporting support for AWS S3 input. {pull}45748[45748]
+- Add `remaining_executions` global to the CEL input evaluation context. {pull}46210[46210]
 
 *Auditbeat*
 
@@ -589,6 +591,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Increase default polling period for MongoDB module from 10s to 60s {pull}44781[44781]
 - Upgrade github.com/microsoft/go-mssqldb from v1.7.2 to v1.8.2 {pull}44990[44990]
 - Add SSL support for sql module: drivers mysql, postgres, and mssql. {pull}44748[44748]
+- Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
+- Add NTP response validation for system/ntp module. {pull}46184[46184]
 
 *Metricbeat*
 
