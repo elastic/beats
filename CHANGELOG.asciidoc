@@ -1301,6 +1301,10 @@ https://github.com/elastic/beats/compare/v8.14.3\...v8.15.0[View commits]
 
 ==== Known issues
 
+*Affecting all Beats*
+
+- Beats Docker images do not log to stderr by default. The workaround is to pass the CLI flag `-e` or to set `logging.to_stderr: true` in the configuration file. {issue}41118[41118]
+
 *Filebeat*
 
 - The Azure EventHub input in Filebeat is not found when running on Windows. Please refrain from upgrading to 8.15. See {issue}40608[40608] for details.

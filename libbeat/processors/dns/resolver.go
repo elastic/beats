@@ -241,7 +241,7 @@ func (res *miekgResolver) getOrCreateNameserverStats(ns string) *nameserverStats
 	}
 
 	// Create stats for the nameserver.
-	reg := res.registry.NewRegistry(strings.Replace(ns, ".", "_", -1))
+	reg := res.registry.GetOrCreateRegistry(strings.Replace(ns, ".", "_", -1))
 	stats = &nameserverStats{
 		success:         monitoring.NewInt(reg, "success"),
 		failure:         monitoring.NewInt(reg, "failure"),
