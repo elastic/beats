@@ -8,12 +8,7 @@ This metricset periodically fetches JMX metrics from Kafka Producers implemented
 
 ## Compatibility [_compatibility_29]
 
-<<<<<<< HEAD
-The module has been tested with Kafka 2.1.1 and 2.2.2. Other versions are expected to work.
-=======
 The module has been tested with Kafka 2.1.1, 2.2.2, 3.6.0 and 4.0.0. Other versions are expected to work.
-
->>>>>>> 186a6af77 (metricbeat/module/kafka: Add Kafka 4.0 support (#44723))
 
 ## Usage [_usage_8]
 
