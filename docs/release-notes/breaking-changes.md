@@ -12,6 +12,7 @@ Breaking changes can impact your Elastic applications, potentially disrupting no
 % Description and impact of the breaking change.
 % For more information, check [PR #](PR link).
 
+<<<<<<< HEAD
 ## 9.1.3 [beats-9.1.3-breaking-changes]
 
 **Metricbeat**
@@ -80,6 +81,10 @@ For more information, check [#38523](https://github.com/elastic/beats/issues/385
 
 ## 9.0.6 [beats-9.0.6-breaking-changes]
 
+=======
+## 9.0.6 [beats-9.0.6-breaking-changes]
+
+>>>>>>> 8522c6ae9 ([9.0](backport #46248) [docs] Add 9.0.6 release notes in Markdown (#46281))
 **All Beats**
 
 ::::{dropdown} The default data and logs path for the Windows service installation has changed.

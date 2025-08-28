@@ -17,6 +17,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 % ### Fixes [beats-versionext-fixes]
 
+<<<<<<< HEAD
 ## 9.1.3 [beats-9.1.3-release-notes]
 
 ### Features and enhancements [beats-9.1.3-features-enhancements]
@@ -145,6 +146,8 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 - Added maintenance windows support for Heartbeat. [41508]({{beats-pull}}41508)
 
+=======
+>>>>>>> 8522c6ae9 ([9.0](backport #46248) [docs] Add 9.0.6 release notes in Markdown (#46281))
 ## 9.0.6 [beats-9.0.6-release-notes]
 
 ### Features and enhancements [beats-9.0.6-features-enhancements]
