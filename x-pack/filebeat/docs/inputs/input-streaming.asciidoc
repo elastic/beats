@@ -18,7 +18,7 @@ The websocket streaming input supports:
 
 * Auth
 ** Basic
-** Bearer 
+** Bearer
 ** Custom
 ** OAuth2.0
 
@@ -140,7 +140,7 @@ filebeat.inputs:
 - type: streaming
   auth.custom:
     header: "x-api-key"
-    value: "dXNlcjpwYXNzd29yZA=="   
+    value: "dXNlcjpwYXNzd29yZA=="
   url: wss://localhost:443/_stream
 ----
 
@@ -150,7 +150,7 @@ filebeat.inputs:
 - type: streaming
   auth.custom:
     header: "Auth"
-    value: "Bearer dXNlcjpwYXNzd29yZA=="   
+    value: "Bearer dXNlcjpwYXNzd29yZA=="
   url: wss://localhost:443/_stream
 ----
 
@@ -169,10 +169,10 @@ filebeat.inputs:
 
 ==== Websocket OAuth2.0
 
-The `websocket` streaming input supports OAuth2.0 authentication. The `auth` configuration field is used to specify the OAuth2.0 configuration. These values are not exposed to the `state` object. 
+The `websocket` streaming input supports OAuth2.0 authentication. The `auth` configuration field is used to specify the OAuth2.0 configuration. These values are not exposed to the `state` object.
 
 The `auth` configuration field has the following subfields:
-  
+
   - `client_id`: The client ID to use for OAuth2.0 authentication.
   - `client_secret`: The client secret to use for OAuth2.0 authentication.
   - `token_url`: The token URL to use for OAuth2.0 authentication.
@@ -184,7 +184,7 @@ The `auth` configuration field has the following subfields:
 **Explanations for `auth_style` and `token_expiry_buffer`:**
 
 - `auth_style`: The authentication style to use for OAuth2.0 authentication which determines how the values of sensitive information like `client_id` and `client_secret` are sent in the token request. The default style value is automatically inferred and used appropriately if no value is provided. The `auth_style` configuration field is optional and can be used to specify the authentication style to use for OAuth2.0 authentication. The `auth_style` configuration field supports the following configurable values:
-  
+
   * `in_header`: The `client_id` and `client_secret` is sent in the header as a base64 encoded `Authorization` header.
   * `in_params`: The `client_id` and `client_secret` is sent in the request body along with the other OAuth2 parameters.
 
@@ -199,7 +199,7 @@ filebeat.inputs:
   auth:
     client_id: a23fcea2643868ef1a41565a1a8a1c7c
     client_secret: c3VwZXJzZWNyZXRfY2xpZW50X3NlY3JldF9zaGhoaGgK
-    token_url: https://api.sample-url.com/oauth2/token
+    token_url: <YOUR_TOKEN_URL>
     scopes: ["read", "write"]
     endpoint_params:
       param1: value1
@@ -218,7 +218,7 @@ The `keep_alive` setting has the following configuration options:
 * `enable`: Indicates whether Keep-Alive is enabled. By default, this is set to `false`.
 * `interval`: Interval between Keep-Alive messages, expressed as a time duration value. The default value is `30s`.
 * `write_control_deadline`: Deadline for writing control frames, like `PING`, `PONG`, or `CLOSE`, on a WebSocket connection. The timeout, expressed as a time duration value, helps prevent indefinite blocking when the server or client is not responding to control frame requests. The default value is `10s`.
-   
+
 NOTE: Don't use the `blanket_retries` and `infinite_retries` configuration options together with the `keep_alive` settings. The purpose of `keep_alive` is to keep the connection open so you don't need to `retry` and reconnect all the time. In some scenarios `keep_alive` might not work if the host WebSocket server is not configured to handle `ping` frames.
 
 [[input-state-streaming]]
@@ -432,7 +432,7 @@ This specifies the headers to be sent to the proxy server. The `proxy_headers` c
 ==== `ssl`
 This specifies the SSL configuration for the connection. The `ssl` configuration is optional and can be used to configure the SSL settings for the connection. The `ssl` configuration has the following subfields:
 
-  - `certificate_authorities`: A list of root certificates to use for verifying the server's certificate.   
+  - `certificate_authorities`: A list of root certificates to use for verifying the server's certificate.
   - `certificate`: The (PEM encoded) certificate to use for client authentication.
   - `key`: The (PEM encoded) private key to use for client authentication.
 
@@ -448,18 +448,18 @@ observe the activity of the input.
 [options="header"]
 |=======
 | Metric                       | Description
-| `url`                        | URL of the input resource. 
-| `cel_eval_errors`            | Number of errors encountered during cel program evaluation. 
-| `errors_total`               | Number of errors encountered over the life cycle of the input. 
-| `batches_received_total`     | Number of event arrays received. 
-| `batches_published_total`    | Number of event arrays published. 
-| `received_bytes_total`       | Number of bytes received over the life cycle of the input. 
-| `events_received_total`      | Number of events received. 
-| `events_published_total`     | Number of events published. 
-| `write_control_errors`       | Number of errors encountered for write control operations. 
-| `cel_processing_time`        | Histogram of the elapsed successful CEL program processing times in nanoseconds. 
-| `batch_processing_time`      | Histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches). 
-| `ping_message_send_time`     | Histogram of the elapsed successful ping message send times in nanoseconds. 
+| `url`                        | URL of the input resource.
+| `cel_eval_errors`            | Number of errors encountered during cel program evaluation.
+| `errors_total`               | Number of errors encountered over the life cycle of the input.
+| `batches_received_total`     | Number of event arrays received.
+| `batches_published_total`    | Number of event arrays published.
+| `received_bytes_total`       | Number of bytes received over the life cycle of the input.
+| `events_received_total`      | Number of events received.
+| `events_published_total`     | Number of events published.
+| `write_control_errors`       | Number of errors encountered for write control operations.
+| `cel_processing_time`        | Histogram of the elapsed successful CEL program processing times in nanoseconds.
+| `batch_processing_time`      | Histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
+| `ping_message_send_time`     | Histogram of the elapsed successful ping message send times in nanoseconds.
 | `pong_message_received_time` | Histogram of the elapsed successful pong message receive times in nanoseconds.
 |=======
 
