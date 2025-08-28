@@ -29,8 +29,8 @@ import (
 )
 
 type worker struct {
-	qu   chan publisher.Batch
-	done chan struct{}
+	qu     chan publisher.Batch
+	cancel func()
 }
 
 // clientWorker manages output client of type outputs.Client, not supporting reconnect.
@@ -50,14 +50,15 @@ type netClientWorker struct {
 }
 
 func makeClientWorker(qu chan publisher.Batch, client outputs.Client, logger logger, tracer *apm.Tracer) outputWorker {
+	ctx, cancel := context.WithCancel(context.Background())
 	w := worker{
-		qu:   qu,
-		done: make(chan struct{}),
+		qu:     qu,
+		cancel: cancel,
 	}
 
 	var c interface {
 		outputWorker
-		run()
+		run(context.Context)
 	}
 
 	if nc, ok := client.(outputs.NetworkClient); ok {
@@ -71,12 +72,12 @@ func makeClientWorker(qu chan publisher.Batch, client outputs.Client, logger log
 		c = &clientWorker{worker: w, client: client}
 	}
 
-	go c.run()
+	go c.run(ctx)
 	return c
 }
 
 func (w *worker) close() {
-	close(w.done)
+	w.cancel()
 }
 
 func (w *clientWorker) Close() error {
@@ -84,20 +85,20 @@ func (w *clientWorker) Close() error {
 	return w.client.Close()
 }
 
-func (w *clientWorker) run() {
+func (w *clientWorker) run(ctx context.Context) {
 	for {
 		// We wait for either the worker to be closed or for there to be a batch of
 		// events to publish.
 		select {
 
-		case <-w.done:
+		case <-ctx.Done():
 			return
 
 		case batch := <-w.qu:
 			if batch == nil {
 				continue
 			}
-			if err := w.client.Publish(context.TODO(), batch); err != nil {
+			if err := w.client.Publish(ctx, batch); err != nil {
 				return
 			}
 		}
@@ -109,7 +110,7 @@ func (w *netClientWorker) Close() error {
 	return w.client.Close()
 }
 
-func (w *netClientWorker) run() {
+func (w *netClientWorker) run(ctx context.Context) {
 	var (
 		connected         = false
 		reconnectAttempts = 0
@@ -120,7 +121,7 @@ func (w *netClientWorker) run() {
 		// events to publish.
 		select {
 
-		case <-w.done:
+		case <-ctx.Done():
 			return
 
 		case batch := <-w.qu:
@@ -139,7 +140,7 @@ func (w *netClientWorker) run() {
 					w.logger.Infof("Attempting to reconnect to %v with %d reconnect attempt(s)", w.client, reconnectAttempts)
 				}
 
-				err := w.client.Connect()
+				err := w.client.Connect(ctx)
 				connected = err == nil
 				if connected {
 					w.logger.Infof("Connection to %v established", w.client)
@@ -152,15 +153,14 @@ func (w *netClientWorker) run() {
 				continue
 			}
 
-			if err := w.publishBatch(batch); err != nil {
+			if err := w.publishBatch(ctx, batch); err != nil {
 				connected = false
 			}
 		}
 	}
 }
 
-func (w *netClientWorker) publishBatch(batch publisher.Batch) error {
-	ctx := context.Background()
+func (w *netClientWorker) publishBatch(ctx context.Context, batch publisher.Batch) error {
 	if w.tracer != nil && w.tracer.Recording() {
 		tx := w.tracer.StartTransaction("publish", "output")
 		defer tx.End()

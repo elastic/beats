@@ -62,7 +62,7 @@ func (t *batchACKTracker) ACK() {
 }
 
 // newEventACKHandler returns a beat ACKer that can receive callbacks when
-// an event has been ACKed an output. If the event contains a private metadata
+// an event has been ACKed by an output. If the event contains a private metadata
 // pointing to a batchACKTracker then it will invoke the tracker's ACK() method
 // to decrement the number of pending ACKs.
 func newEventACKHandler() beat.EventListener {

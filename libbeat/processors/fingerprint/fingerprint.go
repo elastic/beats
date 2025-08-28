@@ -26,8 +26,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -47,7 +48,7 @@ type fingerprint struct {
 }
 
 // New constructs a new fingerprint processor.
-func New(cfg *config.C) (beat.Processor, error) {
+func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, makeErrConfigUnpack(err)
@@ -60,7 +61,7 @@ func New(cfg *config.C) (beat.Processor, error) {
 
 	p := &fingerprint{
 		config: config,
-		hash:   config.Method,
+		hash:   config.Method.Hash,
 		fields: fields,
 	}
 
@@ -75,7 +76,7 @@ func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
 		return nil, makeErrComputeFingerprint(err)
 	}
 
-	encodedHash := p.config.Encoding(hashFn.Sum(nil))
+	encodedHash := p.config.Encoding.Encode(hashFn.Sum(nil))
 
 	if _, err := event.PutValue(p.config.TargetField, encodedHash); err != nil {
 		return nil, makeErrComputeFingerprint(err)
@@ -85,8 +86,7 @@ func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (p *fingerprint) String() string {
-	//nolint:staticcheck // https://github.com/elastic/beats/issues/35174
-	json, _ := json.Marshal(p.config)
+	json, _ := json.Marshal(&p.config)
 	return procName + "=" + string(json)
 }
 

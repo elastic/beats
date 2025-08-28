@@ -21,12 +21,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
-	"github.com/pkg/errors"
-
 	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -65,7 +65,7 @@ func newMetadataFetcher(
 // fetchMetadata queries metadata from a hosting provider's metadata service.
 // Some providers require multiple HTTP requests to gather the whole metadata,
 // len(f.responseHandlers)  > 1 indicates that multiple requests are needed.
-func (f *httpMetadataFetcher) fetchMetadata(ctx context.Context, client http.Client) result {
+func (f *httpMetadataFetcher) fetchMetadata(ctx context.Context, client http.Client, _ *logp.Logger) result {
 	res := result{provider: f.provider, metadata: mapstr.M{}}
 	for url, responseHandler := range f.responseHandlers {
 		f.fetchRaw(ctx, client, url, responseHandler, &res)
@@ -91,7 +91,7 @@ func (f *httpMetadataFetcher) fetchRaw(
 ) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		result.err = errors.Wrapf(err, "failed to create http request for %v", f.provider)
+		result.err = fmt.Errorf("failed to create http request for %v: %w", f.provider, err)
 		return
 	}
 	for k, v := range f.headers {
@@ -101,19 +101,19 @@ func (f *httpMetadataFetcher) fetchRaw(
 
 	rsp, err := client.Do(req)
 	if err != nil {
-		result.err = errors.Wrapf(err, "failed requesting %v metadata", f.provider)
+		result.err = fmt.Errorf("failed requesting %v metadata: %w", f.provider, err)
 		return
 	}
 	defer rsp.Body.Close()
 
 	if rsp.StatusCode != http.StatusOK {
-		result.err = errors.Errorf("failed with http status code %v", rsp.StatusCode)
+		result.err = fmt.Errorf("failed with http status code %v", rsp.StatusCode)
 		return
 	}
 
 	all, err := ioutil.ReadAll(rsp.Body)
 	if err != nil {
-		result.err = errors.Wrapf(err, "failed requesting %v metadata", f.provider)
+		result.err = fmt.Errorf("failed requesting %v metadata: %w", f.provider, err)
 		return
 	}
 
@@ -143,7 +143,7 @@ func getMetadataURLsWithScheme(c *cfg.C, scheme string, defaultHost string, meta
 	}
 	err := c.Unpack(&config)
 	if err != nil {
-		return urls, errors.Wrap(err, "failed to unpack add_cloud_metadata config")
+		return urls, fmt.Errorf("failed to unpack add_cloud_metadata config: %w", err)
 	}
 	for _, uri := range metadataURIs {
 		urls = append(urls, scheme+"://"+config.MetadataHostAndPort+uri)
@@ -159,7 +159,7 @@ func makeJSONPicker(provider string) responseHandler {
 		dec.UseNumber()
 		err := dec.Decode(&res.metadata)
 		if err != nil {
-			err = errors.Wrapf(err, "failed to unmarshal %v JSON of '%v'", provider, string(all))
+			err = fmt.Errorf("failed to unmarshal %v JSON of '%v': %w", provider, string(all), err)
 			return err
 		}
 		return nil

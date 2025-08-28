@@ -17,7 +17,6 @@
 
 // skipping tests on windows 32 bit versions, not supported
 //go:build !windows && !386
-// +build !windows,!386
 
 package data
 

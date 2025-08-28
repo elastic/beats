@@ -19,8 +19,7 @@ package pool
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -58,16 +57,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		return errors.Wrap(err, "error in http fetch")
+		return fmt.Errorf("error in http fetch: %w", err)
 	}
 	var stats map[string]interface{}
 	err = json.Unmarshal(content, &stats)
 	if err != nil {
-		return errors.Wrap(err, "error unmarshalling json")
+		return fmt.Errorf("error unmarshalling json: %w", err)
 	}
 	event, err := schema.Apply(stats)
 	if err != nil {
-		return errors.Wrap(err, "error in event mapping")
+		return fmt.Errorf("error in event mapping: %w", err)
 	}
 	reporter.Event(mb.Event{
 		MetricSetFields: event,

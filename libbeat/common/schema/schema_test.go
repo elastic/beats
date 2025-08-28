@@ -20,7 +20,8 @@ package schema
 import (
 	"testing"
 
-	"github.com/pkg/errors"
+	"errors"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -159,7 +160,7 @@ func TestSchemaCases(t *testing.T) {
 			if errs != nil {
 				errorMessage := errs.Error()
 				if tc.expectedErrorMessage == "" {
-					t.Errorf("unexpected error ocurred: %s", errorMessage)
+					t.Errorf("unexpected error occurred: %s", errorMessage)
 				}
 				assert.Contains(t, errorMessage, tc.expectedErrorMessage)
 			} else if tc.expectedErrorMessage != "" {

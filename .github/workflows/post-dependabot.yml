@@ -1,0 +1,65 @@
+# Follow-on actions relating to dependabot PRs. In elastic/beats, any changes to
+# dependencies contained in go.mod requires the change to be reflected in the
+# NOTICE.txt file. When dependabot creates a branch for a go_modules change this
+# will update the NOTICE.txt file for that change.
+name: post-dependabot
+
+on:
+  push:
+    branches:
+      - 'dependabot/go_modules/**'
+
+permissions:
+  contents: read
+
+jobs:
+  update-notice:
+    permissions:
+      # Allow job to write to the branch.
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .go-version
+
+      - name: update NOTICE.txt
+        run: make notice
+
+      - name: check for modified NOTICE.txt
+        id: notice-check
+        run: echo "modified=$(if git status --porcelain --untracked-files=no | grep -q -E ' NOTICE.txt$'; then echo "true"; else echo "false"; fi)" >> $GITHUB_OUTPUT
+
+      - name: commit NOTICE.txt
+        if: steps.notice-check.outputs.modified == 'true'
+        run: |
+          git config --global user.name 'dependabot[bot]'
+          git config --global user.email 'dependabot[bot]@users.noreply.github.com'
+          git add NOTICE.txt
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git commit -m "Update NOTICE.txt"
+          git push
+
+  manage-pr-reviewers:
+    permissions:
+      pull-requests: write
+      repository-projects: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add reviewers (obs-infraobs-integrations) if PR has Team:Obs-InfraObs label
+        run: |
+          PR_NUMBER=$(gh pr list --repo ${{ github.repository }} --head ${{ github.ref_name }} --json number --jq '.[0].number')
+          
+          if [ -n "$PR_NUMBER" ] && [ "$PR_NUMBER" != "null" ]; then
+            echo "Found PR #$PR_NUMBER"
+            HAS_LABEL=$(gh pr view $PR_NUMBER --repo ${{ github.repository }} --json labels --jq '.labels[] | select(.name == "Team:Obs-InfraObs") | .name')
+            
+            if [ -n "$HAS_LABEL" ]; then
+              echo "PR #$PR_NUMBER has Team:Obs-InfraObs label, adding reviewer elastic/obs-infraobs-integrations"
+              gh pr edit $PR_NUMBER --repo ${{ github.repository }} --add-reviewer elastic/obs-infraobs-integrations
+            fi
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -4,17 +4,19 @@
 # data path.
 #filebeat.registry.path: ${path.data}/registry
 
-# The permissions mask to apply on registry data, and meta files. The default
+# The permissions mask to apply on registry data and meta files. The default
 # value is 0600.  Must be a valid Unix-style file permissions mask expressed in
 # octal notation.  This option is not supported on Windows.
 #filebeat.registry.file_permissions: 0600
 
-# The timeout value that controls when registry entries are written to disk
+# The timeout value that controls when registry entries are written to the disk
 # (flushed). When an unwritten update exceeds this value, it triggers a write
 # to disk. When flush is set to 0s, the registry is written to disk after each
 # batch of events has been published successfully. The default value is 1s.
 #filebeat.registry.flush: 1s
 
+# The interval which to run the registry clean up
+#filebeat.registry.cleanup_interval: 5m
 
 # Starting with Filebeat 7.0, the registry uses a new directory format to store
 # Filebeat state. After you upgrade, Filebeat will automatically migrate a 6.x
@@ -25,7 +27,7 @@
 
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
-# everytime a new Elasticsearch connection is established.
+# every time a new Elasticsearch connection is established.
 #filebeat.overwrite_pipelines: false
 
 # How long filebeat waits on shutdown for the publisher to finish.

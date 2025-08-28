@@ -25,3 +25,11 @@
           type: keyword
           description: >
             Kubernetes pod scheduled status (true, false, unknown)
+        - name: reason
+          type: keyword
+          description: >
+            The reason the pod is in its current state (Evicted, NodeAffinity, NodeLost, Shutdown or UnexpectedAdmissionError)
+        - name: ready_time
+          type: double
+          description: >
+            Readiness achieved time in unix timestamp for a pod 

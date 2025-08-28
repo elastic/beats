@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -35,14 +36,16 @@ type Server struct {
 
 	config    *Config
 	tlsConfig *tlscommon.TLSConfig
+	logger    *logp.Logger
 }
 
 // New creates a new tcp server
 func New(
 	config *Config,
 	factory streaming.HandlerFactory,
+	logger *logp.Logger,
 ) (*Server, error) {
-	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS)
+	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -54,12 +57,13 @@ func New(
 	server := &Server{
 		config:    config,
 		tlsConfig: tlsConfig,
+		logger:    logger,
 	}
 	server.Listener = streaming.NewListener(inputsource.FamilyTCP, config.Host, factory, server.createServer, &streaming.ListenerConfig{
 		Timeout:        config.Timeout,
 		MaxMessageSize: config.MaxMessageSize,
 		MaxConnections: config.MaxConnections,
-	})
+	}, logger)
 
 	return server, nil
 }
@@ -67,14 +71,15 @@ func New(
 func (s *Server) createServer() (net.Listener, error) {
 	var l net.Listener
 	var err error
+	network := s.network()
 	if s.tlsConfig != nil {
 		t := s.tlsConfig.BuildServerConfig(s.config.Host)
-		l, err = tls.Listen("tcp", s.config.Host, t)
+		l, err = tls.Listen(network, s.config.Host, t)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		l, err = net.Listen("tcp", s.config.Host)
+		l, err = net.Listen(network, s.config.Host)
 		if err != nil {
 			return nil, err
 		}
@@ -84,4 +89,11 @@ func (s *Server) createServer() (net.Listener, error) {
 		return netutil.LimitListener(l, s.config.MaxConnections), nil
 	}
 	return l, nil
+}
+
+func (s *Server) network() string {
+	if s.config.Network != "" {
+		return s.config.Network
+	}
+	return networkTCP
 }

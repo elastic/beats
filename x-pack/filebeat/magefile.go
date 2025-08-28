@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build mage
-// +build mage
 
 package main
 
@@ -44,9 +43,14 @@ func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
+// BuildOTel builds the Beat binary with OTel sub command
+func BuildOTel() error {
+	return devtools.BuildOTel()
+}
+
 // BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
 func BuildSystemTestBinary() error {
-	return devtools.BuildSystemTestBinary()
+	return devtools.BuildSystemTestOTelBinary()
 }
 
 // GolangCrossBuild builds the Beat binary inside of the golang-builder.
@@ -58,16 +62,6 @@ func GolangCrossBuild() error {
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
 	return filebeat.CrossBuild()
-}
-
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
 }
 
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
@@ -95,7 +89,7 @@ func Package() {
 	filebeat.CustomizePackaging()
 
 	mg.Deps(Update)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -179,11 +173,40 @@ func IntegTest() {
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
-	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
+	// build integration test binary with otel sub command
+	devtools.BuildSystemTestOTelBinary()
+	args := devtools.DefaultGoTestIntegrationFromHostArgs()
+	// ES_USER must be admin in order for the Go Integration tests to function because they require
+	// indices:data/read/search
+	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
+	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
+	return devtools.GoIntegTestFromHost(ctx, args)
+}
+
+// GoFIPSOnlyIntegTest starts the docker containers and executes the Go integration tests with GODEBUG=fips140=only set.
+func GoFIPSOnlyIntegTest(ctx context.Context) error {
+	// build integration test binary with otel sub command
+	devtools.BuildSystemTestOTelBinary()
+	args := devtools.DefaultGoTestIntegrationFromHostArgs()
+	// ES_USER must be admin in order for the Go Integration tests to function because they require
+	// indices:data/read/search
+	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
+	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
+	return devtools.GoIntegTestFromHost(ctx, args)
+}
+
+// GoWindowsIntegTest executes the Go windows integration tests.
+func GoWindowsIntegTest(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultGoWindowsTestIntegrationArgs())
 }
 
 // PythonIntegTest starts the docker containers and executes the Python integration tests.
 func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(Fields, Dashboards, devtools.BuildSystemTestBinary)
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
+}
+
+// FipsECHTest runs a smoke test using a FIPS enabled binary targetting an ECH deployment.
+func FipsECHTest(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultECHTestArgs())
 }

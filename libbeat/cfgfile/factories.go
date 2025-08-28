@@ -18,7 +18,7 @@
 package cfgfile
 
 import (
-	"github.com/pkg/errors"
+	"errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -91,4 +91,10 @@ func (f multiplexedFactory) findFactory(c *config.C) (RunnerFactory, error) {
 	}
 
 	return nil, errConfigDoesNotMatch
+}
+
+type FactoryWrapper func(RunnerFactory) RunnerFactory
+
+type WithOtelFactoryWrapper interface {
+	WithOtelFactoryWrapper(FactoryWrapper)
 }

@@ -19,12 +19,11 @@ package cli
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // Confirm shows the confirmation text and ask the user to answer (y/n)
@@ -36,14 +35,14 @@ func Confirm(prompt string, def bool) (bool, error) {
 }
 
 func confirm(r io.Reader, out io.Writer, prompt string, def bool) (bool, error) {
-	options := " [Y/n]"
+	options := "[Y/n]"
 	if !def {
-		options = " [y/N]"
+		options = "[y/N]"
 	}
 
 	reader := bufio.NewScanner(r)
 	for {
-		fmt.Fprintf(out, prompt+options+":")
+		fmt.Fprintf(out, "%s %s:", prompt, options)
 
 		if !reader.Scan() {
 			break

@@ -18,21 +18,22 @@
 package elasticsearch
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConnectCallbacksManagement(t *testing.T) {
-	f0 := func(client *eslegclient.Connection) error { fmt.Println("i am function #0"); return nil }
-	f1 := func(client *eslegclient.Connection) error { fmt.Println("i am function #1"); return nil }
-	f2 := func(client *eslegclient.Connection) error { fmt.Println("i am function #2"); return nil }
+	f0 := func(client *eslegclient.Connection, _ *logp.Logger) error { return nil }
+	f1 := func(client *eslegclient.Connection, _ *logp.Logger) error { return nil }
+	f2 := func(client *eslegclient.Connection, _ *logp.Logger) error { return nil }
 
 	_, err := RegisterConnectCallback(f0)
 	if err != nil {
@@ -55,9 +56,9 @@ func TestConnectCallbacksManagement(t *testing.T) {
 }
 
 func TestGlobalConnectCallbacksManagement(t *testing.T) {
-	f0 := func(client *eslegclient.Connection) error { fmt.Println("i am function #0"); return nil }
-	f1 := func(client *eslegclient.Connection) error { fmt.Println("i am function #1"); return nil }
-	f2 := func(client *eslegclient.Connection) error { fmt.Println("i am function #2"); return nil }
+	f0 := func(client *eslegclient.Connection, _ *logp.Logger) error { return nil }
+	f1 := func(client *eslegclient.Connection, _ *logp.Logger) error { return nil }
+	f2 := func(client *eslegclient.Connection, _ *logp.Logger) error { return nil }
 
 	_, err := RegisterGlobalCallback(f0)
 	if err != nil {
@@ -116,23 +117,18 @@ func TestPipelineSelection(t *testing.T) {
 		},
 	}
 
-	for name, test := range cases {
+	for name, _test := range cases {
+		// de-alias loop variable
+		test := _test
 		t.Run(name, func(t *testing.T) {
-			selector, err := buildPipelineSelector(config.MustNewConfigFrom(test.cfg))
-
-			client, err := NewClient(
-				ClientSettings{
-					Pipeline: &selector,
-				},
-				nil,
-			)
-			assert.NoError(t, err)
+			selector, err := buildPipelineSelector(config.MustNewConfigFrom(test.cfg), logptest.NewTestingLogger(t, ""))
+			require.NoError(t, err)
 
 			if err != nil {
 				t.Fatalf("Failed to parse configuration: %v", err)
 			}
 
-			got, err := client.getPipeline(&test.event)
+			got, err := getPipeline(&test.event, &selector)
 			if err != nil {
 				t.Fatalf("Failed to create pipeline name: %v", err)
 			}

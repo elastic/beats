@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package decoder
 
@@ -92,7 +91,7 @@ var ipv4TcpDNS = []byte{
 
 // Test that DecodePacket decodes and IPv4/TCP packet and invokes the TCP processor.
 func TestDecodePacketData_ipv4Tcp(t *testing.T) {
-	_ = logp.TestingSetup(logp.WithSelectors("decoder"))
+	logp.TestingSetup(logp.WithSelectors("decoder"))
 
 	p := gopacket.NewPacket(ipv4TcpDNS, layers.LinkTypeEthernet, gopacket.Default)
 	if p.ErrorLayer() != nil {
@@ -213,7 +212,7 @@ func newTestDecoder(t *testing.T) (*Decoder, *TestTCPProcessor, *TestUDPProcesso
 	icmp6Layer := &TestIcmp6Processor{}
 	tcpLayer := &TestTCPProcessor{}
 	udpLayer := &TestUDPProcessor{}
-	d, err := New(nil, layers.LinkTypeEthernet, icmp4Layer, icmp6Layer, tcpLayer, udpLayer)
+	d, err := New(nil, layers.LinkTypeEthernet, icmp4Layer, icmp6Layer, tcpLayer, udpLayer, false)
 	if err != nil {
 		t.Fatalf("Error creating decoder %v", err)
 	}

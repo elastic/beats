@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+
+if [[ "${BUILDKITE_LABEL:-}" == *"Pipeline upload"* || "${BUILDKITE_LABEL:-}" == *"Upload Pipeline"* ]]; then
+
+  if [[ "${GITHUB_PR_TRIGGER_COMMENT:-}" != "" ]]; then
+    buildkite-agent annotate "**No changes.** Triggered from comment: _${GITHUB_PR_TRIGGER_COMMENT}_" --style "info" --context 'ctx-info'
+  fi
+fi
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-macos-tests" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-agentbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-winlogbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
+  echo "--- Prepare BK test analytics token :vault:"
+  BUILDKITE_ANALYTICS_TOKEN=$(vault kv get -field token kv/ci-shared/platform-ingest/buildkite_beats_analytics_token)
+  export BUILDKITE_ANALYTICS_TOKEN
+fi
+
+CPU_ARCH=$(uname -m)
+PLATFORM_TYPE=$(uname)
+
+if [[ "${CPU_ARCH}" == "x86_64" ]]; then
+  case "${PLATFORM_TYPE}" in
+    Linux|Darwin)
+      export GOX_FLAGS="-arch amd64"
+      export GO_ARCH_TYPE="amd64"
+      ;;
+    MINGW*)
+      export GOX_FLAGS="-arch 386"
+      ;;
+  esac
+elif [[ "${CPU_ARCH}" == "aarch64" || "${CPU_ARCH}" == "arm64" ]]; then
+  export GOX_FLAGS="-arch arm"
+  export GO_ARCH_TYPE="arm64"
+else
+  echo "Unsupported OS"
+  exit 1
+fi

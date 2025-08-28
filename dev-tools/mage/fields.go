@@ -18,9 +18,8 @@
 package mage
 
 import (
+	"fmt"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 
 	"github.com/magefile/mage/sh"
 )
@@ -45,6 +44,7 @@ type IncludeListOptions struct {
 	Outfile          string
 	BuildTags        string
 	Pkg              string
+	SkipInitModule   bool
 }
 
 // DefaultIncludeListOptions initializes IncludeListOptions struct with default values
@@ -56,6 +56,7 @@ func DefaultIncludeListOptions() IncludeListOptions {
 		Outfile:          "include/list.go",
 		BuildTags:        "",
 		Pkg:              "include",
+		SkipInitModule:   false,
 	}
 }
 
@@ -195,6 +196,9 @@ func GenerateIncludeListGo(options IncludeListOptions) error {
 		"-out", options.Outfile, "-buildTags", options.BuildTags,
 		"-pkg", options.Pkg,
 	}
+	if options.SkipInitModule {
+		cmd = append(cmd, "-skip-init-module")
+	}
 
 	includeListCmd := sh.RunCmd("go", cmd...)
 
@@ -229,6 +233,6 @@ func toLibbeatLicenseName(name string) string {
 	case "Elastic License":
 		return "Elastic"
 	default:
-		panic(errors.Errorf("invalid license name '%v'", name))
+		panic(fmt.Errorf("invalid license name '%v'", name))
 	}
 }

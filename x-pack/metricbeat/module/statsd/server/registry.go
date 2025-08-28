@@ -14,20 +14,18 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-var logger = logp.NewLogger("statd")
-
 type metric struct {
-	name       string
-	tags       map[string]string
-	lastSeen   time.Time
-	sampleRate float32
-	metric     interface{}
+	name     string
+	tags     map[string]string
+	lastSeen time.Time
+	metric   interface{}
 }
 
 type registry struct {
 	metrics    map[string]map[string]*metric
 	ttl        time.Duration
 	lastReport time.Time
+	logger     *logp.Logger
 }
 
 type setMetric struct {
@@ -287,7 +285,7 @@ func (r *registry) getOrNew(name string, tags map[string]string, new func() inte
 	tc, ok := r.metrics[tagsKey]
 	if !ok {
 		counter := new()
-		r.metrics[tagsKey] = map[string]*metric{name: &metric{
+		r.metrics[tagsKey] = map[string]*metric{name: {
 			metric:   counter,
 			name:     name,
 			tags:     tags,
@@ -317,7 +315,7 @@ func (r *registry) clearTypeChanged(name string, tags map[string]string) {
 	// type was changed
 	// we can try to support the situation where a new version of the app has changed a type in
 	// a metric by deleting the old one and creating a new one
-	logger.With("name", name).Warn("metric changed type")
+	r.logger.With("name", name).Warn("metric changed type")
 	r.Delete(name, tags)
 }
 
@@ -330,7 +328,6 @@ func (r *registry) GetOrNewCounter(name string, tags map[string]string) metrics.
 
 	r.clearTypeChanged(name, tags)
 	return r.GetOrNewCounter(name, tags)
-
 }
 
 func (r *registry) GetOrNewTimer(name string, tags map[string]string) *samplingTimer {

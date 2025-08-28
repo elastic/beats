@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package fileset
 
@@ -32,6 +31,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -82,7 +82,8 @@ func TestNewModuleRegistry(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"}, false)
+	logger := logptest.NewTestingLogger(t, "")
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger}, FilesetOverrides{})
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -149,7 +150,8 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"}, false)
+	logger := logptest.NewTestingLogger(t, "")
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger}, FilesetOverrides{})
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -175,7 +177,8 @@ func TestMovedModule(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"}, false)
+	logger := logptest.NewTestingLogger(t, "")
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger}, FilesetOverrides{})
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 }
@@ -446,7 +449,8 @@ func TestMissingModuleFolder(t *testing.T) {
 		load(t, map[string]interface{}{"module": "nginx"}),
 	}
 
-	reg, err := NewModuleRegistry(configs, beat.Info{Version: "5.2.0"}, true, false)
+	logger := logptest.NewTestingLogger(t, "")
+	reg, err := NewModuleRegistry(configs, beat.Info{Version: "5.2.0", Logger: logger}, true, FilesetOverrides{})
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 

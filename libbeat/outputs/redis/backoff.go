@@ -19,6 +19,7 @@ package redis
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
@@ -60,8 +61,8 @@ func newBackoffClient(client *client, init, max time.Duration) *backoffClient {
 	}
 }
 
-func (b *backoffClient) Connect() error {
-	err := b.client.Connect()
+func (b *backoffClient) Connect(ctx context.Context) error {
+	err := b.client.Connect(ctx)
 	if err != nil {
 		// give the client a chance to promote an internal error to a network error.
 		b.updateFailReason(err)
@@ -102,7 +103,8 @@ func (b *backoffClient) updateFailReason(err error) {
 		return
 	}
 
-	if _, ok := err.(redis.Error); ok {
+	var redisErr *redis.Error
+	if errors.As(err, &redisErr) {
 		b.reason = failRedis
 	} else {
 		b.reason = failOther

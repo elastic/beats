@@ -19,8 +19,7 @@ package ingest_pipeline
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
@@ -60,7 +59,7 @@ type PipelineStat struct {
 func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool, sampleProcessors bool) error {
 	var nodeIngestStats Stats
 	if err := json.Unmarshal(content, &nodeIngestStats); err != nil {
-		return errors.Wrap(err, "failure parsing Node Ingest Stats API response")
+		return fmt.Errorf("failure parsing Node Ingest Stats API response: %w", err)
 	}
 
 	for nodeId, nodeStats := range nodeIngestStats.Nodes {

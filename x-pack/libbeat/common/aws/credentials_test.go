@@ -11,6 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -23,7 +24,7 @@ func TestInitializeAWSConfig(t *testing.T) {
 		},
 		ProxyUrl: "http://proxy:3128",
 	}
-	awsConfig, err := InitializeAWSConfig(inputConfig)
+	awsConfig, err := InitializeAWSConfig(inputConfig, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 
 	retrievedAWSConfig, err := awsConfig.Credentials.Retrieve(context.Background())
@@ -41,7 +42,7 @@ func TestGetAWSCredentials(t *testing.T) {
 		SecretAccessKey: "abc",
 		SessionToken:    "fake-session-token",
 	}
-	awsConfig, err := GetAWSCredentials(inputConfig)
+	awsConfig, err := getAWSCredentials(inputConfig, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 
 	retrievedAWSConfig, err := awsConfig.Credentials.Retrieve(context.Background())
@@ -78,7 +79,7 @@ func TestDefaultRegion(t *testing.T) {
 			if c.region != "" {
 				inputConfig.DefaultRegion = c.region
 			}
-			awsConfig, err := InitializeAWSConfig(inputConfig)
+			awsConfig, err := InitializeAWSConfig(inputConfig, logptest.NewTestingLogger(t, ""))
 			assert.NoError(t, err)
 			assert.Equal(t, c.expectedRegion, awsConfig.Region)
 		})

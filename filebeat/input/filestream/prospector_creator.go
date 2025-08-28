@@ -24,6 +24,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -35,16 +36,26 @@ const (
 
 var experimentalWarning sync.Once
 
-func newProspector(config config) (loginp.Prospector, error) {
-	filewatcher, err := newFileWatcher(config.Paths, config.FileWatcher)
+func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
+	logger := log.With("filestream_id", config.ID)
+	err := checkConfigCompatibility(config)
+	if err != nil {
+		return nil, err
+	}
+
+	filewatcher, err := newFileWatcher(
+		logger, config.Paths, config.FileWatcher, config.GZIPExperimental, config.Delete.Enabled)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating filewatcher %w", err)
 	}
 
-	identifier, err := newFileIdentifier(config.FileIdentity, getIdentifierSuffix(config))
+	identifier, err := newFileIdentifier(config.FileIdentity, config.Reader.Parsers.Suffix, log)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating file identifier: %w", err)
 	}
+
+	logger = logger.Named("filestream")
+	logger.Debugf("file identity is set to %s", identifier.Name())
 
 	fileprospector := fileProspector{
 		filewatcher:         filewatcher,
@@ -53,6 +64,8 @@ func newProspector(config config) (loginp.Prospector, error) {
 		ignoreInactiveSince: config.IgnoreInactive,
 		cleanRemoved:        config.CleanRemoved,
 		stateChangeCloser:   config.Close.OnStateChange,
+		logger:              logger.Named("prospector"),
+		takeOver:            config.TakeOver,
 	}
 	if config.Rotation == nil {
 		return &fileprospector, nil
@@ -77,7 +90,7 @@ func newProspector(config config) (loginp.Prospector, error) {
 		switch strategy {
 		case copytruncateStrategy:
 			experimentalWarning.Do(func() {
-				cfgwarn.Experimental("rotation.external.copytruncate is used.")
+				log.Warn(cfgwarn.Experimental("rotation.external.copytruncate is used."))
 			})
 
 			cpCfg := &copyTruncateConfig{}
@@ -104,6 +117,24 @@ func newProspector(config config) (loginp.Prospector, error) {
 	return nil, fmt.Errorf("no such rotation method: %s", rotationMethod)
 }
 
-func getIdentifierSuffix(config config) string {
-	return config.Reader.Parsers.Suffix
+func checkConfigCompatibility(config config) error {
+	var fwCfg struct {
+		Fingerprint struct {
+			Enabled bool `config:"enabled"`
+		} `config:"fingerprint"`
+	}
+
+	if config.FileWatcher != nil &&
+		config.FileIdentity != nil &&
+		config.FileIdentity.Name() == fingerprintName {
+		err := config.FileWatcher.Config().Unpack(&fwCfg)
+		if err != nil {
+			return fmt.Errorf("failed to parse file watcher configuration: %w", err)
+		}
+		if !fwCfg.Fingerprint.Enabled {
+			return fmt.Errorf("fingerprint file identity can be used only when fingerprint is enabled in the scanner")
+		}
+	}
+
+	return nil
 }

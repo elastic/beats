@@ -50,7 +50,7 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/configs/")
 
         with open(self.working_dir + "/configs/system.yml.test", 'w') as f:
-            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*"))
+            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*.log"))
         os.rename(self.working_dir + "/configs/system.yml.test",
                   self.working_dir + "/configs/system.yml")
 
@@ -81,7 +81,7 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/configs/")
 
         with open(self.working_dir + "/configs/system.yml.test", 'w') as f:
-            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*"))
+            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*.log"))
         os.rename(self.working_dir + "/configs/system.yml.test",
                   self.working_dir + "/configs/system.yml")
 
@@ -109,7 +109,7 @@ class Test(BaseTest):
 
         os.mkdir(self.working_dir + "/configs/")
         with open(self.working_dir + "/configs/system.yml.test", 'w') as f:
-            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*"))
+            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*.log"))
         os.rename(self.working_dir + "/configs/system.yml.test",
                   self.working_dir + "/configs/system.yml")
 
@@ -134,7 +134,7 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/configs/")
 
         with open(self.working_dir + "/configs/system.yml.test", 'w') as f:
-            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*"))
+            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*.log"))
         os.rename(self.working_dir + "/configs/system.yml.test",
                   self.working_dir + "/configs/system.yml")
 
@@ -144,13 +144,13 @@ class Test(BaseTest):
         self.wait_until(lambda: self.output_lines() == 1, max_timeout=10)
         print(self.output_lines())
 
-        # Remove input
-        with open(self.working_dir + "/configs/system.yml", 'w') as f:
-            f.write("")
+        # Remove input by moving the file
+        # we keep it around to help debugging
+        os.rename(self.working_dir + "/configs/system.yml", self.working_dir + "/configs/system.yml.disabled")
 
         # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Stopping runner:"),
+            lambda: self.log_contains("Runner: 'test (test)' has stopped"),
             max_timeout=15)
 
         with open(logfile, 'a') as f:
@@ -217,6 +217,7 @@ class Test(BaseTest):
         self.render_config_template(
             reload=False,
             reload_path=self.working_dir + "/configs/*.yml",
+            reload_type="modules",
             inputs=False,
         )
         os.mkdir(self.working_dir + "/configs/")
@@ -227,6 +228,7 @@ class Test(BaseTest):
   test:
     enabled: true
     wrong_field: error
+    var.paths: []
     input:
       scan_frequency: 1s
 """
@@ -235,9 +237,8 @@ class Test(BaseTest):
 
         exit_code = self.run_beat()
 
-        # Wait until offset for new line is updated
         self.wait_until(
-            lambda: self.log_contains("No paths were defined for input accessing"),
+            lambda: self.log_contains("No paths were defined for input accessing config"),
             max_timeout=10)
 
         assert exit_code == 1

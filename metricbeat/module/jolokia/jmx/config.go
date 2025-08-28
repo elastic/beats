@@ -19,12 +19,11 @@ package jmx
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"regexp"
 	"sort"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -254,6 +253,7 @@ type JolokiaHTTPRequestFetcher interface {
 // JolokiaHTTPGetFetcher constructs and executes an HTTP GET request
 // which will read MBean information from Jolokia
 type JolokiaHTTPGetFetcher struct {
+	logger *logp.Logger
 }
 
 // BuildRequestsAndMappings generates HTTP GET request
@@ -284,7 +284,7 @@ func (pc *JolokiaHTTPGetFetcher) BuildRequestsAndMappings(configMappings []JMXMa
 //
 // /read/<mbean>/<attribute>/[path]?ignoreErrors=true&canonicalNaming=false
 func (pc *JolokiaHTTPGetFetcher) buildJolokiaGETUri(mbean string, attr []Attribute) string {
-	initialURI := "/read/%s?ignoreErrors=true&canonicalNaming=false"
+	initialURI := "/read/%s"
 
 	var attrList []string
 	for _, attribute := range attr {
@@ -325,7 +325,7 @@ func (pc *JolokiaHTTPGetFetcher) buildGetRequestURIs(mappings []JMXMapping) ([]s
 		}
 
 		if len(mapping.Target.URL) != 0 {
-			err := errors.New("Proxy requests are only valid when using POST method")
+			err := errors.New("proxy requests are only valid when using POST method")
 			return urls, nil, err
 		}
 
@@ -354,26 +354,23 @@ func (pc *JolokiaHTTPGetFetcher) Fetch(m *MetricSet) ([]mapstr.M, error) {
 	}
 
 	// Log request information
-	if logp.IsDebug(metricsetName) {
-		for _, r := range httpReqs {
-			m.log.Debugw("Jolokia request URI and body",
-				"httpMethod", r.HTTPMethod, "URI", r.URI, "body", string(r.Body), "type", "request")
-		}
+	for _, r := range httpReqs {
+		m.log.Debugw("Jolokia request URI and body",
+			"httpMethod", r.HTTPMethod, "URI", r.URI, "body", string(r.Body), "type", "request")
 	}
 
 	for _, r := range httpReqs {
 		m.http.SetMethod(r.HTTPMethod)
-		m.http.SetURI(m.BaseMetricSet.HostData().SanitizedURI + r.URI)
+		finalURL := SetUpdatedURL(m.BaseMetricSet.HostData().SanitizedURI, r.URI)
+		m.http.SetURI(finalURL)
 
 		resBody, err := m.http.FetchContent()
 		if err != nil {
 			return nil, err
 		}
 
-		if logp.IsDebug(metricsetName) {
-			m.log.Debugw("Jolokia response body",
-				"host", m.HostData().Host, "uri", m.http.GetURI(), "body", string(resBody), "type", "response")
-		}
+		m.log.Debugw("Jolokia response body",
+			"host", m.HostData().Host, "uri", m.http.GetURI(), "body", string(resBody), "type", "response")
 
 		// Map response to Metricbeat events
 		events, err := pc.EventMapping(resBody, mapping)
@@ -395,15 +392,16 @@ func (pc *JolokiaHTTPGetFetcher) EventMapping(content []byte, mapping AttributeM
 
 	// When we use GET, the response is a single Entry
 	if err := json.Unmarshal(content, &singleEntry); err != nil {
-		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
+		return nil, fmt.Errorf("failed to unmarshal jolokia JSON response '%v': %w", string(content), err)
 	}
 
-	return eventMapping([]Entry{singleEntry}, mapping)
+	return eventMapping([]Entry{singleEntry}, mapping, pc.logger)
 }
 
 // JolokiaHTTPPostFetcher constructs and executes an HTTP GET request
 // which will read MBean information from Jolokia
 type JolokiaHTTPPostFetcher struct {
+	logger *logp.Logger
 }
 
 // BuildRequestsAndMappings generates HTTP POST request
@@ -481,11 +479,9 @@ func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]mapstr.M, error) {
 	}
 
 	// Log request information
-	if logp.IsDebug(metricsetName) {
-		for _, r := range httpReqs {
-			m.log.Debugw("Jolokia request URI and body",
-				"httpMethod", r.HTTPMethod, "URI", m.http.GetURI(), "body", string(r.Body), "type", "request")
-		}
+	for _, r := range httpReqs {
+		m.log.Debugw("Jolokia request URI and body",
+			"httpMethod", r.HTTPMethod, "URI", m.http.GetURI(), "body", string(r.Body), "type", "request")
 	}
 
 	m.http.SetMethod(httpReqs[0].HTTPMethod)
@@ -496,10 +492,8 @@ func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]mapstr.M, error) {
 		return nil, err
 	}
 
-	if logp.IsDebug(metricsetName) {
-		m.log.Debugw("Jolokia response body",
-			"host", m.HostData().Host, "uri", m.http.GetURI(), "body", string(resBody), "type", "response")
-	}
+	m.log.Debugw("Jolokia response body",
+		"host", m.HostData().Host, "uri", m.http.GetURI(), "body", string(resBody), "type", "response")
 
 	// Map response to Metricbeat events
 	events, err := pc.EventMapping(resBody, mapping)
@@ -517,21 +511,47 @@ func (pc *JolokiaHTTPPostFetcher) EventMapping(content []byte, mapping Attribute
 
 	// When we use POST, the response is an array of Entry objects
 	if err := json.Unmarshal(content, &entries); err != nil {
-
-		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
+		return nil, fmt.Errorf("failed to unmarshal jolokia JSON response '%v': %w", string(content), err)
 	}
 
-	return eventMapping(entries, mapping)
+	return eventMapping(entries, mapping, pc.logger)
 }
 
 // NewJolokiaHTTPRequestFetcher is a factory method which creates and returns an implementation
 // class of JolokiaHTTPRequestFetcher interface. HTTP GET and POST are currently supported.
-func NewJolokiaHTTPRequestFetcher(httpMethod string) JolokiaHTTPRequestFetcher {
+func NewJolokiaHTTPRequestFetcher(httpMethod string, logger *logp.Logger) JolokiaHTTPRequestFetcher {
 
 	if httpMethod == "GET" {
-		return &JolokiaHTTPGetFetcher{}
+		return &JolokiaHTTPGetFetcher{
+			logger: logger,
+		}
 	}
 
-	return &JolokiaHTTPPostFetcher{}
+	return &JolokiaHTTPPostFetcher{
+		logger: logger,
+	}
 
+}
+
+// SetUpdatedURL constructs the final URL using the sanitized base URI and path.
+// If encoded query parameters (%3F) are present, they are preserved.
+// Otherwise, default query parameters are appended.
+func SetUpdatedURL(sanitizedURI, uri string) string {
+	const encodedQuery = "%3F"
+	const defaultParams = "?ignoreErrors=true&canonicalNaming=false"
+
+	if strings.Contains(sanitizedURI, encodedQuery) {
+		parts := strings.SplitN(sanitizedURI, encodedQuery, 2)
+		if len(parts) == 2 {
+			base := strings.TrimRight(parts[0], "/")
+			path := strings.TrimLeft(uri, "/")
+			// Append path and add existing encoded query parameters
+			return fmt.Sprintf("%s/%s/?%s", base, path, parts[1])
+		}
+	}
+
+	// No encoded query params then append default params
+	base := strings.TrimRight(sanitizedURI, "/")
+	path := strings.TrimLeft(uri, "/")
+	return fmt.Sprintf("%s/%s/%s", base, path, defaultParams)
 }

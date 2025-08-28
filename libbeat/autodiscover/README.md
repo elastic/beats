@@ -24,7 +24,7 @@ We will describe the internals of three ways of Kubernetes autodiscover process.
 ## Templates Based Autodiscover
 
 As the name suggests, user needs to set a template to indicate to autodiscover provider what to do.
-There is one configuration variable that differentiates in a way how the autosicover process is performed.
+There is one configuration variable that differentiates in a way how the autodiscover process is performed.
 This variable is `unique`
 
 ### Autodiscover with LeaderElection

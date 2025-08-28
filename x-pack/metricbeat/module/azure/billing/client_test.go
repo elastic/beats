@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package billing
 
 import (
@@ -12,10 +14,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
-	"github.com/Azure/azure-sdk-for-go/services/costmanagement/mgmt/2019-11-01/costmanagement"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var (
@@ -33,11 +36,11 @@ func TestClient(t *testing.T) {
 	}
 
 	t.Run("return error not valid query", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logptest.NewTestingLogger(t, ""))
 		client.Config = config
 		m := &MockService{}
-		m.On("GetForecast", mock.Anything, mock.Anything, mock.Anything).Return(costmanagement.QueryResult{}, errors.New("invalid query"))
-		m.On("GetUsageDetails", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(consumption.UsageDetailsListResultPage{}, nil)
+		m.On("GetForecast", mock.Anything, mock.Anything, mock.Anything).Return(armcostmanagement.QueryResult{}, errors.New("invalid query"))
+		m.On("GetUsageDetails", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(armconsumption.UsageDetailsListResult{}, nil)
 		client.BillingService = m
 		_, err := client.GetMetrics(opts)
 		assert.Error(t, err)
@@ -47,12 +50,12 @@ func TestClient(t *testing.T) {
 		m.AssertExpectations(t)
 	})
 	t.Run("return results", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logptest.NewTestingLogger(t, ""))
 		client.Config = config
 		m := &MockService{}
-		forecasts := costmanagement.QueryResult{}
+		forecasts := armcostmanagement.QueryResult{}
 		m.On("GetForecast", mock.Anything, mock.Anything, mock.Anything).Return(forecasts, nil)
-		m.On("GetUsageDetails", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(consumption.UsageDetailsListResultPage{}, nil)
+		m.On("GetUsageDetails", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(armconsumption.UsageDetailsListResult{}, nil)
 		client.BillingService = m
 		_, err := client.GetMetrics(opts)
 		assert.NoError(t, err)

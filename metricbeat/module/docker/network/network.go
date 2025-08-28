@@ -16,13 +16,13 @@
 // under the License.
 
 //go:build linux || darwin || windows
-// +build linux darwin windows
 
 package network
 
 import (
+	"fmt"
+
 	"github.com/docker/docker/client"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
@@ -49,7 +49,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	client, err := docker.NewDockerClient(base.HostData().URI, config)
+	client, err := docker.NewDockerClient(base.HostData().URI, config, base.Logger())
 	if err != nil {
 		return nil, err
 	}
@@ -66,9 +66,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch methods creates a list of network events for each container.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout)
+	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout, false, m.Logger())
 	if err != nil {
-		return errors.Wrap(err, "failed to get docker stats")
+		return fmt.Errorf("failed to get docker stats: %w", err)
 	}
 
 	formattedStats := m.netService.getNetworkStatsPerContainer(stats, m.dedot)

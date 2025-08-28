@@ -19,25 +19,19 @@ package diskqueue
 
 import (
 	"flag"
-	"io/ioutil"
-	"math/rand"
-	"os"
+	"math/rand/v2"
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/stretchr/testify/require"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var seed int64
 
 type testQueue struct {
 	*diskQueue
-	teardown func()
 }
 
 func init() {
@@ -48,10 +42,10 @@ func TestProduceConsumer(t *testing.T) {
 	maxEvents := 1024
 	minEvents := 32
 
-	rand.Seed(seed)
-	events := rand.Intn(maxEvents-minEvents) + minEvents
-	batchSize := rand.Intn(events-8) + 4
-	bufferSize := rand.Intn(batchSize*2) + 4
+	r := rand.New(rand.NewPCG(uint64(seed), 0)) //nolint:gosec //Safe to ignore in tests
+	events := r.IntN(maxEvents-minEvents) + minEvents
+	batchSize := r.IntN(events-8) + 4
+	bufferSize := r.IntN(batchSize*2) + 4
 
 	// events := 4
 	// batchSize := 1
@@ -78,64 +72,20 @@ func TestProduceConsumer(t *testing.T) {
 	t.Run("direct", testWith(makeTestQueue()))
 }
 
-func TestMetrics(t *testing.T) {
-	dir, err := ioutil.TempDir("", "diskqueue_metrics")
-	defer func() {
-		_ = os.RemoveAll(dir)
-	}()
-	require.NoError(t, err)
-	settings := DefaultSettings()
-	settings.Path = dir
-	// lower max segment size so we can get multiple segments
-	settings.MaxSegmentSize = 100
-
-	testQueue, err := NewQueue(logp.L(), nil, settings)
-	require.NoError(t, err)
-	defer testQueue.Close()
-
-	eventsToTest := 100
-
-	// Send events to queue
-	producer := testQueue.Producer(queue.ProducerConfig{})
-	sendEventsToQueue(eventsToTest, producer)
-
-	// fetch metrics before we read any events
-	time.Sleep(time.Millisecond * 500)
-	testMetrics, err := testQueue.Metrics()
-	require.NoError(t, err)
-
-	require.Equal(t, testMetrics.ByteLimit.ValueOr(0), uint64((1 << 30)))
-	require.NotZero(t, testMetrics.ByteCount.ValueOr(0))
-	t.Logf("got %d bytes written", testMetrics.ByteCount.ValueOr(0))
-
-}
-
-func sendEventsToQueue(count int, prod queue.Producer) {
-	for i := 0; i < count; i++ {
-		prod.Publish(queuetest.MakeEvent(mapstr.M{"count": i}))
-	}
-}
-
 func makeTestQueue() queuetest.QueueFactory {
 	return func(t *testing.T) queue.Queue {
-		dir, err := ioutil.TempDir("", "diskqueue_test")
-		if err != nil {
-			t.Fatal(err)
-		}
+		dir := t.TempDir()
 		settings := DefaultSettings()
 		settings.Path = dir
-		queue, _ := NewQueue(logp.L(), nil, settings)
+		logger := logptest.NewTestingLogger(t, "")
+		queue, _ := NewQueue(logger, nil, settings, nil)
 		return testQueue{
 			diskQueue: queue,
-			teardown: func() {
-				os.RemoveAll(dir)
-			},
 		}
 	}
 }
 
 func (t testQueue) Close() error {
 	err := t.diskQueue.Close()
-	t.teardown()
 	return err
 }

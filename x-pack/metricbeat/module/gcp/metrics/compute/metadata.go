@@ -6,29 +6,60 @@ package compute
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
+	compute "cloud.google.com/go/compute/apiv1"
+	"cloud.google.com/go/compute/apiv1/computepb"
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
-	compute "google.golang.org/api/compute/v1"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP Compute resource
-func NewMetadataService(projectID, zone string, region string, regions []string, opt ...option.ClientOption) (gcp.MetadataService, error) {
-	return &metadataCollector{
+func NewMetadataService(
+	ctx context.Context,
+	projectID, zone, region string,
+	regions []string,
+	organizationID, organizationName, projectName string,
+	cacheRegistry *gcp.CacheRegistry,
+	logger *logp.Logger,
+	opt ...option.ClientOption) (gcp.MetadataService, error) {
+	mc := &metadataCollector{
 		projectID:        projectID,
+		projectName:      projectName,
+		organizationID:   organizationID,
+		organizationName: organizationName,
 		zone:             zone,
 		region:           region,
 		regions:          regions,
 		opt:              opt,
-		computeInstances: make(map[uint64]*compute.Instance),
-		logger:           logp.NewLogger("metrics-compute"),
-	}, nil
+		instanceCache:    cacheRegistry.Compute,
+		logger:           logger.Named("metrics-compute"),
+	}
+
+	// Freshen up the cache, later all we have to do is look up the instance
+	err := mc.instanceCache.EnsureFresh(func() (map[string]*computepb.Instance, error) {
+		instances := make(map[string]*computepb.Instance)
+		r := backoff.NewRetryer(3, time.Second, 30*time.Second)
+
+		err := r.Retry(ctx, func() error {
+			var err error
+			instances, err = mc.fetchComputeInstances(ctx)
+			return err
+		})
+
+		return instances, err
+	})
+
+	return mc, err
 }
 
 // computeMetadata is an object to store data in between the extraction and the writing in the destination (to uncouple
@@ -46,11 +77,14 @@ type computeMetadata struct {
 
 type metadataCollector struct {
 	projectID        string
+	projectName      string
+	organizationID   string
+	organizationName string
 	zone             string
 	region           string
 	regions          []string
 	opt              []option.ClientOption
-	computeInstances map[uint64]*compute.Instance
+	instanceCache    *gcp.Cache[*computepb.Instance]
 	logger           *logp.Logger
 }
 
@@ -60,7 +94,7 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 	if err != nil {
 		return gcp.MetadataCollectorData{}, err
 	}
-	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp)
+	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp, s.organizationID, s.organizationName, s.projectName)
 	metadataCollectorData, err := stackdriverLabels.Metadata(ctx, resp)
 	if err != nil {
 		return gcp.MetadataCollectorData{}, err
@@ -99,54 +133,42 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 
 // instanceMetadata returns the labels of an instance
 func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zone string) (*computeMetadata, error) {
-	instance, err := s.instance(ctx, instanceID)
-	if err != nil {
-		return nil, fmt.Errorf("error trying to get data from instance '%s' %w", instanceID, err)
-	}
-
 	computeMetadata := &computeMetadata{
 		instanceID: instanceID,
 		zone:       zone,
 	}
 
-	if instance == nil {
-		s.logger.Debugf("couldn't find instance %s, call Instances.AggregatedList", instanceID)
+	instance, ok := s.instanceCache.Get(instanceID)
+	if !ok {
+		s.logger.Warnf("Instance %s not found in compute cache.", instanceID)
 		return computeMetadata, nil
 	}
 
-	if instance.Labels != nil {
-		computeMetadata.User = instance.Labels
+	labels := instance.GetLabels()
+	if labels != nil {
+		computeMetadata.User = labels
 	}
 
-	if instance.MachineType != "" {
-		computeMetadata.machineType = instance.MachineType
+	machineType := instance.GetMachineType()
+	if machineType != "" {
+		computeMetadata.machineType = machineType
 	}
 
-	if instance.Metadata != nil && instance.Metadata.Items != nil {
-		computeMetadata.Metadata = make(map[string]string)
+	metadata := instance.GetMetadata()
 
-		for _, i := range instance.Metadata.Items {
-			computeMetadata.Metadata[i.Key] = *i.Value
+	if metadata != nil {
+		metadataItems := metadata.GetItems()
+
+		if metadataItems != nil {
+			computeMetadata.Metadata = make(map[string]string)
+
+			for _, item := range metadataItems {
+				computeMetadata.Metadata[item.GetKey()] = item.GetValue()
+			}
 		}
 	}
 
 	return computeMetadata, nil
-}
-
-// instance returns data from an instance ID using the cache or making a request
-func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*compute.Instance, error) {
-	s.getComputeInstances(ctx)
-
-	instanceIdInt, _ := strconv.Atoi(instanceID)
-	computeInstance, ok := s.computeInstances[uint64(instanceIdInt)]
-	if ok {
-		return computeInstance, nil
-	}
-
-	// Remake the compute instances map to avoid having stale data.
-	s.computeInstances = make(map[uint64]*compute.Instance)
-
-	return nil, nil
 }
 
 func (s *metadataCollector) instanceID(ts *monitoringpb.TimeSeries) string {
@@ -165,28 +187,46 @@ func (s *metadataCollector) instanceZone(ts *monitoringpb.TimeSeries) string {
 	return ""
 }
 
-func (s *metadataCollector) getComputeInstances(ctx context.Context) {
-	if len(s.computeInstances) > 0 {
-		return
-	}
+func (s *metadataCollector) fetchComputeInstances(ctx context.Context) (map[string]*computepb.Instance, error) {
+	s.logger.Debug("Executing fetchComputeInstances via CacheRegistry request")
 
-	s.logger.Debug("Compute API Instances.AggregatedList")
-
-	computeService, err := compute.NewService(ctx, s.opt...)
+	instancesClient, err := compute.NewInstancesRESTClient(ctx, s.opt...)
 	if err != nil {
-		s.logger.Errorf("error getting client from Compute service: %v", err)
-		return
+		return nil, fmt.Errorf("error creating compute client: %w", err)
+	}
+	defer instancesClient.Close()
+
+	start := time.Now()
+	s.logger.Debug("Compute API Instances.AggregatedList starting...")
+
+	req := &computepb.AggregatedListInstancesRequest{
+		Project: s.projectID,
+	}
+	it := instancesClient.AggregatedList(ctx, req)
+	fetchedInstances := make(map[string]*computepb.Instance)
+
+	pageCount := 0
+	instanceCount := 0
+	for {
+		instancesScopedListPair, err := it.Next()
+		if errors.Is(err, iterator.Done) {
+			break
+		}
+		if err != nil {
+			s.logger.Errorf("Error fetching next instance page: %v", err)
+			return nil, fmt.Errorf("error iterating compute instances: %w", err)
+		}
+		pageCount++
+
+		instances := instancesScopedListPair.Value.GetInstances()
+
+		for _, instance := range instances {
+			instanceIdStr := strconv.FormatUint(instance.GetId(), 10)
+			fetchedInstances[instanceIdStr] = instance
+			instanceCount++
+		}
 	}
 
-	req := computeService.Instances.AggregatedList(s.projectID)
-	if err := req.Pages(ctx, func(page *compute.InstanceAggregatedList) error {
-		for _, instancesScopedList := range page.Items {
-			for _, instance := range instancesScopedList.Instances {
-				s.computeInstances[instance.Id] = instance
-			}
-		}
-		return nil
-	}); err != nil {
-		s.logger.Errorf("google Instances.AggregatedList error: %v", err)
-	}
+	s.logger.Debugf("Compute AggregatedList finished in %s. Fetched %d instances across %d pages.", time.Since(start), instanceCount, pageCount)
+	return fetchedInstances, nil
 }

@@ -10,8 +10,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
-	"github.com/urso/sderr"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
@@ -21,12 +20,14 @@ import (
 var (
 	usersBucket         = []byte("users")
 	groupsBucket        = []byte("groups")
+	devicesBucket       = []byte("devices")
 	relationshipsBucket = []byte("relationships")
 	stateBucket         = []byte("state")
 
 	lastSyncKey         = []byte("last_sync")
 	lastUpdateKey       = []byte("last_update")
 	usersLinkKey        = []byte("users_link")
+	devicesLinkKey      = []byte("devices_link")
 	groupsLinkKey       = []byte("groups_link")
 	groupMembershipsKey = []byte("group_memberships")
 )
@@ -39,8 +40,10 @@ type stateStore struct {
 	lastSync      time.Time
 	lastUpdate    time.Time
 	usersLink     string
+	devicesLink   string
 	groupsLink    string
 	users         map[uuid.UUID]*fetcher.User
+	devices       map[uuid.UUID]*fetcher.Device
 	groups        map[uuid.UUID]*fetcher.Group
 	relationships collections.UUIDTree
 }
@@ -57,9 +60,10 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 	}
 
 	s := stateStore{
-		users:  map[uuid.UUID]*fetcher.User{},
-		groups: map[uuid.UUID]*fetcher.Group{},
-		tx:     tx,
+		users:   map[uuid.UUID]*fetcher.User{},
+		devices: map[uuid.UUID]*fetcher.Device{},
+		groups:  map[uuid.UUID]*fetcher.Group{},
+		tx:      tx,
 	}
 
 	if err = s.tx.Get(stateBucket, lastSyncKey, &s.lastSync); err != nil && !errIsItemNotFound(err) {
@@ -70,6 +74,9 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 	}
 	if err = s.tx.Get(stateBucket, usersLinkKey, &s.usersLink); err != nil && !errIsItemNotFound(err) {
 		return nil, fmt.Errorf("unable to get users link from state: %w", err)
+	}
+	if err = s.tx.Get(stateBucket, devicesLinkKey, &s.devicesLink); err != nil && !errIsItemNotFound(err) {
+		return nil, fmt.Errorf("unable to get devices link from state: %w", err)
 	}
 	if err = s.tx.Get(stateBucket, groupsLinkKey, &s.groupsLink); err != nil && !errIsItemNotFound(err) {
 		return nil, fmt.Errorf("unable to get groups link from state: %w", err)
@@ -85,6 +92,18 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 		return nil
 	}); err != nil && !errIsItemNotFound(err) {
 		return nil, fmt.Errorf("unable to get users from state: %w", err)
+	}
+
+	if err = s.tx.ForEach(devicesBucket, func(key, value []byte) error {
+		var d fetcher.Device
+		if err = json.Unmarshal(value, &d); err != nil {
+			return fmt.Errorf("unable to unmarshal device from state: %w", err)
+		}
+		s.devices[d.ID] = &d
+
+		return nil
+	}); err != nil && !errIsItemNotFound(err) {
+		return nil, fmt.Errorf("unable to get devices from state: %w", err)
 	}
 
 	if err = s.tx.ForEach(groupsBucket, func(key, value []byte) error {
@@ -119,6 +138,19 @@ func (s *stateStore) storeUser(u *fetcher.User) {
 	}
 }
 
+// storeDevice stores a device. If the device does not exist in the store, then the
+// device will be marked as discovered. Otherwise, the device will be marked
+// as modified.
+func (s *stateStore) storeDevice(d *fetcher.Device) {
+	if existing, ok := s.devices[d.ID]; ok {
+		d.Modified = true
+		existing.Merge(d)
+	} else if !d.Deleted {
+		d.Discovered = true
+		s.devices[d.ID] = d
+	}
+}
+
 // storeGroup stores a group. If the group already exists, it will be overwritten.
 func (s *stateStore) storeGroup(g *fetcher.Group) {
 	s.groups[g.ID] = g
@@ -143,7 +175,7 @@ func (s *stateStore) close(commit bool) (err error) {
 		}
 
 		if err != nil {
-			err = sderr.WrapAll([]error{err, rollbackErr}, "multiple errors during statestore close")
+			err = fmt.Errorf("multiple errors during statestore close: %w", errors.Join(err, rollbackErr))
 		} else {
 			err = rollbackErr
 		}
@@ -164,6 +196,11 @@ func (s *stateStore) close(commit bool) (err error) {
 			return fmt.Errorf("unable to save users link to state: %w", err)
 		}
 	}
+	if s.devicesLink != "" {
+		if err = s.tx.Set(stateBucket, devicesLinkKey, &s.devicesLink); err != nil {
+			return fmt.Errorf("unable to save devices link to state: %w", err)
+		}
+	}
 	if s.groupsLink != "" {
 		if err = s.tx.Set(stateBucket, groupsLinkKey, &s.groupsLink); err != nil {
 			return fmt.Errorf("unable to save groups link to state: %w", err)
@@ -173,6 +210,11 @@ func (s *stateStore) close(commit bool) (err error) {
 	for key, value := range s.users {
 		if err = s.tx.Set(usersBucket, key[:], value); err != nil {
 			return fmt.Errorf("unable to save user %q to state: %w", key, err)
+		}
+	}
+	for key, value := range s.devices {
+		if err = s.tx.Set(devicesBucket, key[:], value); err != nil {
+			return fmt.Errorf("unable to save device %q to state: %w", key, err)
 		}
 	}
 	for key, value := range s.groups {

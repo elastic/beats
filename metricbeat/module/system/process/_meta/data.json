@@ -11,28 +11,28 @@
     },
     "process": {
         "args": [
-            "/tmp/go-build2412913392/b001/process.test",
+            "/tmp/go-build2159656503/b001/process.test",
             "-test.paniconexit0",
             "-test.timeout=10m0s",
             "-test.v=true",
             "-data",
             "-test.run=TestData"
         ],
-        "command_line": "/tmp/go-build2412913392/b001/process.test -test.paniconexit0 -test.timeout=10m0s -test.v=true -data -test.run=TestData",
+        "command_line": "/tmp/go-build2159656503/b001/process.test -test.paniconexit0 -test.timeout=10m0s -test.v=true -data -test.run=TestData",
         "cpu": {
-            "pct": 0.0013,
-            "start_time": "2022-01-31T21:06:54.000Z"
+            "pct": 0.0012,
+            "start_time": "2023-11-28T03:13:18.000Z"
         },
-        "executable": "/tmp/go-build2412913392/b001/process.test",
+        "executable": "/tmp/go-build2159656503/b001/process.test",
         "memory": {
-            "pct": 0.0004
+            "pct": 0.0008
         },
         "name": "process.test",
         "parent": {
-            "pid": 3334369
+            "pid": 592387
         },
-        "pgid": 3334369,
-        "pid": 3334614,
+        "pgid": 592387,
+        "pid": 592516,
         "state": "sleeping",
         "working_directory": "/home/alexk/go/src/github.com/elastic/beats/metricbeat/module/system/process"
     },
@@ -44,8 +44,8 @@
             "cgroup": {
                 "cgroups_version": 2,
                 "cpu": {
-                    "id": "session-27.scope",
-                    "path": "/user.slice/user-1000.slice/session-27.scope",
+                    "id": "session-426.scope",
+                    "path": "/user.slice/user-1000.slice/session-426.scope",
                     "pressure": {
                         "full": {
                             "10": {
@@ -57,48 +57,53 @@
                             "60": {
                                 "pct": 0
                             },
-                            "total": 3431214
+                            "total": 5524742
                         },
                         "some": {
                             "10": {
-                                "pct": 0
+                                "pct": 0.07
                             },
                             "300": {
-                                "pct": 0
+                                "pct": 0.1
                             },
                             "60": {
-                                "pct": 0
+                                "pct": 0.3
                             },
-                            "total": 3626431
+                            "total": 32365561
                         }
                     },
                     "stats": {
+                        "periods": 0,
                         "system": {
                             "norm": {
                                 "pct": 0
                             },
-                            "ns": 70940728,
+                            "ns": 548263994,
                             "pct": 0
+                        },
+                        "throttled": {
+                            "periods": 0,
+                            "us": 0
                         },
                         "usage": {
                             "norm": {
                                 "pct": 0
                             },
-                            "ns": 502653872,
+                            "ns": 1599791233,
                             "pct": 0
                         },
                         "user": {
                             "norm": {
                                 "pct": 0
                             },
-                            "ns": 431713143,
+                            "ns": 1051527238,
                             "pct": 0
                         }
                     }
                 },
-                "id": "session-27.scope",
+                "id": "session-426.scope",
                 "memory": {
-                    "id": "session-27.scope",
+                    "id": "session-426.scope",
                     "mem": {
                         "events": {
                             "high": 0,
@@ -111,7 +116,7 @@
                             "bytes": 0
                         },
                         "usage": {
-                            "bytes": 2462191616
+                            "bytes": 3864518656
                         }
                     },
                     "memsw": {
@@ -127,28 +132,28 @@
                             "bytes": 0
                         }
                     },
-                    "path": "/user.slice/user-1000.slice/session-27.scope",
+                    "path": "/user.slice/user-1000.slice/session-426.scope",
                     "stats": {
                         "active_anon": {
-                            "bytes": 19554304
+                            "bytes": 1759969280
                         },
                         "active_file": {
-                            "bytes": 4419584
+                            "bytes": 990560256
                         },
                         "anon": {
-                            "bytes": 2368811008
+                            "bytes": 1781649408
                         },
                         "anon_thp": {
-                            "bytes": 205520896
+                            "bytes": 618659840
                         },
                         "file": {
-                            "bytes": 48955392
+                            "bytes": 1710731264
                         },
                         "file_dirty": {
                             "bytes": 0
                         },
                         "file_mapped": {
-                            "bytes": 14315520
+                            "bytes": 15060992
                         },
                         "file_thp": {
                             "bytes": 0
@@ -156,53 +161,53 @@
                         "file_writeback": {
                             "bytes": 0
                         },
-                        "htp_collapse_alloc": 28,
+                        "htp_collapse_alloc": 313,
                         "inactive_anon": {
-                            "bytes": 2370981888
+                            "bytes": 327753728
                         },
                         "inactive_file": {
-                            "bytes": 24166400
+                            "bytes": 698679296
                         },
                         "kernel_stack": {
-                            "bytes": 2621440
+                            "bytes": 2899968
                         },
-                        "major_page_faults": 45,
-                        "page_activate": 12197,
+                        "major_page_faults": 3001,
+                        "page_activate": 0,
                         "page_deactivate": 0,
-                        "page_faults": 3623174,
+                        "page_faults": 79495294,
                         "page_lazy_free": 0,
                         "page_lazy_freed": 0,
                         "page_refill": 0,
                         "page_scan": 0,
                         "page_steal": 0,
                         "page_tables": {
-                            "bytes": 22589440
+                            "bytes": 19267584
                         },
                         "per_cpu": {
-                            "bytes": 0
+                            "bytes": 10336
                         },
                         "shmem": {
-                            "bytes": 20369408
+                            "bytes": 21491712
                         },
                         "shmem_thp": {
                             "bytes": 0
                         },
                         "slab": {
-                            "bytes": 13215832
+                            "bytes": 60957576
                         },
                         "slab_reclaimable": {
-                            "bytes": 8919768
+                            "bytes": 55816376
                         },
                         "slab_unreclaimable": {
-                            "bytes": 4296064
+                            "bytes": 5141200
                         },
                         "sock": {
-                            "bytes": 16384
+                            "bytes": 0
                         },
                         "swap_cached": {
                             "bytes": 0
                         },
-                        "thp_fault_alloc": 91,
+                        "thp_fault_alloc": 8577,
                         "unevictable": {
                             "bytes": 0
                         },
@@ -210,29 +215,29 @@
                         "workingset_activate_file": 0,
                         "workingset_node_reclaim": 0,
                         "workingset_refault_anon": 0,
-                        "workingset_refault_file": 1381,
+                        "workingset_refault_file": 0,
                         "workingset_restore_anon": 0,
                         "workingset_restore_file": 0
                     }
                 },
-                "path": "/user.slice/user-1000.slice/session-27.scope"
+                "path": "/user.slice/user-1000.slice/session-426.scope"
             },
-            "cmdline": "/tmp/go-build2412913392/b001/process.test -test.paniconexit0 -test.timeout=10m0s -test.v=true -data -test.run=TestData",
+            "cmdline": "/tmp/go-build2159656503/b001/process.test -test.paniconexit0 -test.timeout=10m0s -test.v=true -data -test.run=TestData",
             "cpu": {
-                "start_time": "2022-01-31T21:06:54.000Z",
+                "start_time": "2023-11-28T03:13:18.000Z",
                 "system": {
-                    "ticks": 140
+                    "ticks": 40
                 },
                 "total": {
                     "norm": {
-                        "pct": 0.0013
+                        "pct": 0.0012
                     },
-                    "pct": 0.0158,
-                    "ticks": 340,
-                    "value": 340
+                    "pct": 0.007,
+                    "ticks": 100,
+                    "value": 100
                 },
                 "user": {
-                    "ticks": 200
+                    "ticks": 60
                 }
             },
             "fd": {
@@ -240,16 +245,26 @@
                     "hard": 524288,
                     "soft": 524288
                 },
-                "open": 11
+                "open": 15
+            },
+            "io": {
+                "cancelled_write_bytes": 0,
+                "read_bytes": 0,
+                "read_char": 2517537,
+                "read_ops": 9551,
+                "write_bytes": 0,
+                "write_char": 22,
+                "write_ops": 4
             },
             "memory": {
                 "rss": {
-                    "bytes": 23404544,
-                    "pct": 0.0004
+                    "bytes": 26234880,
+                    "pct": 0.0008
                 },
-                "share": 14946304,
-                "size": 1725992960
+                "share": 16252928,
+                "size": 1886003200
             },
+            "num_threads": 9,
             "state": "sleeping"
         }
     },

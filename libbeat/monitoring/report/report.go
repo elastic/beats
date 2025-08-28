@@ -21,8 +21,6 @@ import (
 	"errors"
 	"fmt"
 
-	errw "github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
@@ -41,7 +39,7 @@ type Reporter interface {
 	Stop()
 }
 
-type ReporterFactory func(beat.Info, Settings, *conf.C) (Reporter, error)
+type ReporterFactory func(beat.Info, beat.Monitoring, Settings, *conf.C) (Reporter, error)
 
 type hostsCfg struct {
 	Hosts []string `config:"hosts"`
@@ -62,11 +60,12 @@ func RegisterReporterFactory(name string, f ReporterFactory) {
 
 func New(
 	beat beat.Info,
+	mon beat.Monitoring,
 	settings Settings,
 	cfg *conf.C,
 	outputs conf.Namespace,
 ) (Reporter, error) {
-	name, cfg, err := getReporterConfig(cfg, settings, outputs)
+	name, cfg, err := getReporterConfig(cfg, outputs)
 	if err != nil {
 		return nil, err
 	}
@@ -76,12 +75,11 @@ func New(
 		return nil, fmt.Errorf("unknown reporter type '%v'", name)
 	}
 
-	return f(beat, settings, cfg)
+	return f(beat, mon, settings, cfg)
 }
 
 func getReporterConfig(
 	monitoringConfig *conf.C,
-	settings Settings,
 	outputs conf.Namespace,
 ) (string, *conf.C, error) {
 	cfg := collectSubObject(monitoringConfig)
@@ -98,10 +96,6 @@ func getReporterConfig(
 
 		// merge reporter config with output config if both are present
 		if outCfg := outputs.Config(); outputs.Name() == name && outCfg != nil {
-			// require monitoring to not configure any hosts if output is configured:
-			hosts := hostsCfg{}
-			rc.Unpack(&hosts)
-
 			merged, err := conf.MergeConfigs(outCfg, rc)
 			if err != nil {
 				return "", nil, err
@@ -135,7 +129,7 @@ func collectSubObject(cfg *conf.C) *conf.C {
 	for _, field := range cfg.GetFields() {
 		if obj, err := cfg.Child(field, -1); err == nil {
 			// on error field is no object, but primitive value -> ignore
-			out.SetChild(field, -1, obj)
+			out.SetChild(field, -1, obj) //nolint:errcheck // this error is safe to ignore
 			continue
 		}
 	}
@@ -150,14 +144,14 @@ func mergeHosts(merged, outCfg, reporterCfg *conf.C) error {
 	outputHosts := hostsCfg{}
 	if outCfg != nil {
 		if err := outCfg.Unpack(&outputHosts); err != nil {
-			return errw.Wrap(err, "unable to parse hosts from output config")
+			return fmt.Errorf("unable to parse hosts from output config: %w", err)
 		}
 	}
 
 	reporterHosts := hostsCfg{}
 	if reporterCfg != nil {
 		if err := reporterCfg.Unpack(&reporterHosts); err != nil {
-			return errw.Wrap(err, "unable to parse hosts from reporter config")
+			return fmt.Errorf("unable to parse hosts from reporter config: %w", err)
 		}
 	}
 
@@ -174,11 +168,11 @@ func mergeHosts(merged, outCfg, reporterCfg *conf.C) error {
 		newHostsCfg, err = conf.NewConfigFrom(outputHosts.Hosts)
 	}
 	if err != nil {
-		return errw.Wrap(err, "unable to make config from new hosts")
+		return fmt.Errorf("unable to make config from new hosts: %w", err)
 	}
 
 	if err := merged.SetChild("hosts", -1, newHostsCfg); err != nil {
-		return errw.Wrap(err, "unable to set new hosts into merged config")
+		return fmt.Errorf("unable to set new hosts into merged config: %w", err)
 	}
 	return nil
 }

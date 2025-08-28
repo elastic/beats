@@ -17,22 +17,35 @@
 
 package version
 
-import "time"
+import (
+	"sync/atomic"
+	"time"
+)
 
-// GetDefaultVersion returns the current libbeat version.
-// This method is in a separate file as the version.go file is auto generated
+var (
+	packageVersion atomic.Value
+	buildTime      = "unknown"
+	commit         = "unknown"
+	qualifier      = ""
+)
+
+// GetDefaultVersion returns the current version.
+// If running in stand-alone mode, it's the libbeat version. If running in
+// managed mode, a.k.a under the agent, it's the package version set using
+// SetPackageVersion. If SetPackageVersion haven't been called, it reports the
+// libbeat version
+//
+// This method is in a separate file as the version.go file is auto-generated.
 func GetDefaultVersion() string {
+	if v, ok := packageVersion.Load().(string); ok && v != "" {
+		return v
+	}
+
 	if qualifier == "" {
 		return defaultBeatVersion
 	}
 	return defaultBeatVersion + "-" + qualifier
 }
-
-var (
-	buildTime = "unknown"
-	commit    = "unknown"
-	qualifier = ""
-)
 
 // BuildTime exposes the compile-time build time information.
 // It will represent the zero time instant if parsing fails.
@@ -47,4 +60,11 @@ func BuildTime() time.Time {
 // Commit exposes the compile-time commit hash.
 func Commit() string {
 	return commit
+}
+
+// SetPackageVersion sets the package version, overriding the defaultBeatVersion.
+func SetPackageVersion(version string) {
+	// Currently, the Elastic Agent does not perform any validation on the
+	// package version, therefore, no validation is done here either.
+	packageVersion.Store(version)
 }

@@ -1,2 +1,0 @@
-TIP: Read the <<{beatname_lc}-installation-configuration,quick start>> to learn
-how to configure and run modules.

@@ -4,7 +4,7 @@
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {}
         },
-        "title": "Tablespace Total Size [Metricbeat Oracle]",
+        "title": "Tablespace Max Total Size [Metricbeat Oracle]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -24,13 +24,40 @@
                         "fill": 0.5,
                         "formatter": "bytes",
                         "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                        "label": "Tablespace total size",
+                        "label": "Tablespace max total size",
                         "line_width": 1,
                         "metrics": [
                             {
-                                "field": "oracle.tablespace.space.total.bytes",
+                                "agg_with": "avg",
+                                "field": "oracle.tablespace.space.used.bytes",
                                 "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                                "type": "avg"
+                                "type": "max"
+                            },
+                            {
+                                "agg_with": "avg",
+                                "colors": [
+                                    "#68BC00"
+                                ],
+                                "field": "oracle.tablespace.space.free.bytes",
+                                "id": "e04e8f40-24cd-4066-b12c-da0db0ff73d4",
+                                "type": "max"
+                            },
+                            {
+                                "id": "2cf57800-8b54-41fa-a877-159b49699a50",
+                                "script": "params.used_bytes + params.free_bytes",
+                                "type": "math",
+                                "variables": [
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                        "id": "631a44d5-d18a-4743-bea0-6f61930fd65f",
+                                        "name": "used_bytes"
+                                    },
+                                    {
+                                        "field": "e04e8f40-24cd-4066-b12c-da0db0ff73d4",
+                                        "id": "c255d24c-3a29-4879-b999-77af43d97c6b",
+                                        "name": "free_bytes"
+                                    }
+                                ]
                             }
                         ],
                         "point_size": 1,
@@ -48,7 +75,7 @@
                 "type": "timeseries",
                 "use_kibana_indexes": false
             },
-            "title": "Tablespace Total Size [Metricbeat Oracle]",
+            "title": "Tablespace Max Total Size [Metricbeat Oracle]",
             "type": "metrics"
         }
     },

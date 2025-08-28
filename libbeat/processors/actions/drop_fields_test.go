@@ -22,8 +22,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	config2 "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -48,6 +50,22 @@ func TestDropFieldRun(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, mapstr.M{}, newEvent.Fields)
 		assert.Equal(t, event.Meta, newEvent.Meta)
+	})
+
+	t.Run("Do not drop mandatory fields", func(t *testing.T) {
+		c := config2.MustNewConfigFrom(
+			mapstr.M{
+				"fields":         []string{"field1", "type", "type.value.key", "typeKey"},
+				"ignore_missing": true,
+			},
+		)
+
+		p, err := newDropFields(c, logptest.NewTestingLogger(t, ""))
+		require.NoError(t, err)
+		process, ok := p.(*dropFields)
+		assert.True(t, ok)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{"field1", "typeKey"}, process.Fields)
 	})
 
 	t.Run("supports a metadata field", func(t *testing.T) {
@@ -100,14 +118,14 @@ func TestNewDropFields(t *testing.T) {
 			"fields": []string{"/field_.*1/", "/second/", "third"},
 		})
 
-		procInt, err := newDropFields(c)
+		procInt, err := newDropFields(c, logptest.NewTestingLogger(t, ""))
 		assert.NoError(t, err)
 
 		processor, ok := procInt.(*dropFields)
 		assert.True(t, ok)
 		assert.Equal(t, []string{"third"}, processor.Fields)
 		assert.Equal(t, "<substring 'second'>", processor.RegexpFields[0].String())
-		assert.Equal(t, "field_(?-s:.)*1", processor.RegexpFields[1].String())
+		assert.Equal(t, "(?-s:field_.*1)", processor.RegexpFields[1].String())
 	})
 
 	t.Run("returns error when regexp field is badly written", func(t *testing.T) {
@@ -115,7 +133,7 @@ func TestNewDropFields(t *testing.T) {
 			"fields": []string{"/[//"},
 		})
 
-		_, err := newDropFields(c)
+		_, err := newDropFields(c, logptest.NewTestingLogger(t, ""))
 
 		assert.Equal(t, "wrong configuration in drop_fields[0]=/[//. error parsing regexp: missing closing ]: `[/`", err.Error())
 	})

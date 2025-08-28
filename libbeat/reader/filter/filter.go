@@ -46,24 +46,33 @@ type FilterParser struct {
 	matchers []match.Matcher
 }
 
-func NewParser(r reader.Reader, c *Config) *FilterParser {
+func NewParser(r reader.Reader, c *Config, logger *logp.Logger) *FilterParser {
 	return &FilterParser{
 		ctx:      ctxtool.WithCancelContext(context.Background()),
-		logger:   logp.NewLogger("filter_parser"),
+		logger:   logger.Named("filter_parser"),
 		r:        r,
 		matchers: c.Patterns,
 	}
 }
 
-func (p *FilterParser) Next() (reader.Message, error) {
+func (p *FilterParser) Next() (message reader.Message, err error) {
+	// discardedOffset accounts for the bytes of discarded messages. The inputs
+	// need to correctly track the file offset, therefore if only the matching
+	// message size is returned, the offset cannot be correctly updated.
+	var discardedOffset int
+	defer func() {
+		message.Offset = discardedOffset
+	}()
+
 	for p.ctx.Err() == nil {
-		message, err := p.r.Next()
+		message, err = p.r.Next()
 		if err != nil {
 			return message, err
 		}
 		if p.matchAny(string(message.Content)) {
 			return message, err
 		}
+		discardedOffset += message.Bytes
 		p.logger.Debug("dropping message because it does not match any of the provided patterns [%v]: %s", p.matchers, string(message.Content))
 	}
 	return reader.Message{}, io.EOF

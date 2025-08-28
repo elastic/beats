@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 /*
 Package status fetches MySQL server status metrics.
 
@@ -25,11 +27,10 @@ package status
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mysql"
-
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -41,22 +42,27 @@ func init() {
 
 // MetricSet for fetching MySQL server status.
 type MetricSet struct {
-	mb.BaseMetricSet
+	*mysql.Metricset
 	db *sql.DB
 }
 
 // New creates and returns a new MetricSet instance.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return &MetricSet{BaseMetricSet: base}, nil
+	ms, err := mysql.NewMetricset(base)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MetricSet{Metricset: ms, db: nil}, nil
 }
 
 // Fetch fetches status messages from a mysql host.
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	if m.db == nil {
 		var err error
-		m.db, err = mysql.NewDB(m.HostData().URI)
+		m.db, err = mysql.NewDB(m.HostData().URI, m.Metricset.Config.TLSConfig)
 		if err != nil {
-			return errors.Wrap(err, "mysql-status fetch failed")
+			return fmt.Errorf("mysql-status fetch failed: %w", err)
 		}
 	}
 
@@ -109,5 +115,5 @@ func (m *MetricSet) Close() error {
 	if m.db == nil {
 		return nil
 	}
-	return errors.Wrap(m.db.Close(), "failed to close mysql database client")
+	return fmt.Errorf("failed to close mysql database client: %w", m.db.Close())
 }

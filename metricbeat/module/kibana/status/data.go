@@ -19,8 +19,7 @@ package status
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -39,7 +38,19 @@ var (
 		}),
 		"status": c.Dict("status", s.Schema{
 			"overall": c.Dict("overall", s.Schema{
-				"state": c.Str("state"),
+				"state":   c.Str("state"),
+				"level":   c.Str("level"),
+				"summary": c.Str("summary"),
+			}),
+			"core": c.Dict("core", s.Schema{
+				"elasticsearch": c.Dict("elasticsearch", s.Schema{
+					"level":   c.Str("level"),
+					"summary": c.Str("summary"),
+				}),
+				"savedObjects": c.Dict("savedObjects", s.Schema{
+					"level":   c.Str("level"),
+					"summary": c.Str("summary"),
+				}),
 			}),
 		}),
 		"metrics": c.Dict("metrics", s.Schema{
@@ -60,7 +71,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Kibana Status API response")
+		return fmt.Errorf("failure parsing Kibana Status API response: %w", err)
 	}
 
 	dataFields, _ := schema.Apply(data)

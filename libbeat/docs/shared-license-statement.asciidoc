@@ -1,4 +1,0 @@
-Don't have a license? You can start a 30-day trial. At the end of the trial
-period, you can purchase a subscription to keep using central management. For
-more information, see https://www.elastic.co/subscriptions and
-{kibana-ref}/managing-licenses.html[License Management].

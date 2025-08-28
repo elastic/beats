@@ -7,7 +7,6 @@
 // to the VM inception problem.
 //
 //go:build !windows
-// +build !windows
 
 package test
 

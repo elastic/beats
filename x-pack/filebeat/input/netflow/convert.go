@@ -24,13 +24,38 @@ import (
 )
 
 func toBeatEvent(flow record.Record, internalNetworks []string) (event beat.Event) {
+	var e beat.Event
 	switch flow.Type {
 	case record.Flow:
-		return flowToBeatEvent(flow, internalNetworks)
+		e = flowToBeatEvent(flow, internalNetworks)
 	case record.Options:
-		return optionsToBeatEvent(flow)
+		e = optionsToBeatEvent(flow)
 	default:
-		return toBeatEventCommon(flow)
+		e = toBeatEventCommon(flow)
+	}
+
+	normaliseIPFields(e.Fields)
+	return e
+}
+
+// normaliseIPFields normalizes net.IP fields in the given map from []byte to string.
+// This function mutates the map and assumes every net.IP field is a direct entry.
+// Fields that don't adhere to this convention (e.g. part of a struct) are not
+// normalized.
+func normaliseIPFields(fields mapstr.M) {
+	for key, value := range fields {
+		switch valueType := value.(type) {
+		case net.IP:
+			fields[key] = valueType.String()
+		case []net.IP:
+			stringIPs := make([]string, len(valueType))
+			for i, ip := range valueType {
+				stringIPs[i] = ip.String()
+			}
+			fields[key] = stringIPs
+		case mapstr.M:
+			normaliseIPFields(valueType)
+		}
 	}
 }
 
@@ -302,13 +327,15 @@ func flowToBeatEvent(flow record.Record, internalNetworks []string) beat.Event {
 		ecsNetwork["name"] = ssid
 	}
 
-	ecsNetwork["community_id"] = flowhash.CommunityID.Hash(flowhash.Flow{
+	if communityid := flowhash.CommunityID.Hash(flowhash.Flow{
 		SourceIP:        srcIP,
 		SourcePort:      srcPort,
 		DestinationIP:   dstIP,
 		DestinationPort: dstPort,
 		Protocol:        uint8(protocol),
-	})
+	}); communityid != "" {
+		ecsNetwork["community_id"] = communityid
+	}
 
 	if len(ecsFlow) > 0 {
 		event.Fields["flow"] = ecsFlow

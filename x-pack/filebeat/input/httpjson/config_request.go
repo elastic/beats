@@ -60,10 +60,11 @@ func (c retryConfig) getWaitMax() time.Duration {
 }
 
 type rateLimitConfig struct {
-	Limit      *valueTpl `config:"limit"`
-	Reset      *valueTpl `config:"reset"`
-	Remaining  *valueTpl `config:"remaining"`
-	EarlyLimit *float64  `config:"early_limit"`
+	Limit          *valueTpl `config:"limit"`
+	Reset          *valueTpl `config:"reset"`
+	Remaining      *valueTpl `config:"remaining"`
+	EarlyLimit     *float64  `config:"early_limit"`
+	MaxNonDegraded *int      `config:"max_non_degraded"`
 }
 
 func (c rateLimitConfig) Validate() error {
@@ -115,7 +116,12 @@ func (u *urlConfig) Unpack(in string) error {
 	if err != nil {
 		return err
 	}
-
+	if parsed.Scheme == "" {
+		// Note that this will not catch cases like host.name:9001/path/to/endpoint
+		// which will see "host.name" as the scheme of an opaque URI. These will
+		// get caught later.
+		return fmt.Errorf("url %q is missing scheme", in)
+	}
 	*u = urlConfig{URL: parsed}
 
 	return nil
@@ -136,7 +142,16 @@ type requestConfig struct {
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 
-	Tracer *lumberjack.Logger `config:"tracer"`
+	Tracer *tracerConfig `config:"tracer"`
+}
+
+type tracerConfig struct {
+	Enabled           *bool `config:"enabled"`
+	lumberjack.Logger `config:",inline"`
+}
+
+func (t *tracerConfig) enabled() bool {
+	return t != nil && (t.Enabled == nil || *t.Enabled)
 }
 
 func (c *requestConfig) Validate() error {
@@ -151,7 +166,7 @@ func (c *requestConfig) Validate() error {
 		return fmt.Errorf("unsupported method %q", c.Method)
 	}
 
-	if _, err := newBasicTransformsFromConfig(c.Transforms, requestNamespace, nil); err != nil {
+	if _, err := newBasicTransformsFromConfig(registeredTransforms, c.Transforms, requestNamespace, noopReporter{}, nil); err != nil {
 		return err
 	}
 

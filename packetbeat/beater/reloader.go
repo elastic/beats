@@ -23,15 +23,16 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type reloader struct {
 	*cfgfile.RunnerList
 }
 
-func newReloader(name string, factory *processorFactory, pipeline beat.PipelineConnector) *reloader {
+func newReloader(name string, factory *processorFactory, pipeline beat.PipelineConnector, logger *logp.Logger) *reloader {
 	return &reloader{
-		RunnerList: cfgfile.NewRunnerList(name, factory, pipeline),
+		RunnerList: cfgfile.NewRunnerList(name, factory, pipeline, logger),
 	}
 }
 

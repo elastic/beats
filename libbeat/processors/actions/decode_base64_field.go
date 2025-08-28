@@ -26,8 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -57,7 +56,7 @@ func init() {
 }
 
 // NewDecodeBase64Field construct a new decode_base64_field processor.
-func NewDecodeBase64Field(c *cfg.C) (beat.Processor, error) {
+func NewDecodeBase64Field(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 	config := base64Config{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -70,7 +69,7 @@ func NewDecodeBase64Field(c *cfg.C) (beat.Processor, error) {
 
 	return &decodeBase64Field{
 		config: config,
-		log:    logp.NewLogger(processorName),
+		log:    log.Named(processorName),
 	}, nil
 }
 
@@ -84,9 +83,8 @@ func (f *decodeBase64Field) Run(event *beat.Event) (*beat.Event, error) {
 	err := f.decodeField(event)
 	if err != nil {
 		errMsg := fmt.Errorf("failed to decode base64 fields in processor: %w", err)
-		if publisher.LogWithTrace() {
-			f.log.Debug(errMsg.Error())
-		}
+		f.log.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
+
 		if f.config.FailOnError {
 			event = backup
 			_, _ = event.PutValue("error.message", errMsg.Error())

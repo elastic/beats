@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build darwin
-// +build darwin
 
 package tables
 
@@ -18,8 +17,9 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
 	"github.com/osquery/osquery-go/plugin/table"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
 )
 
 func ExecuteStderr(ctx context.Context, name string, arg ...string) (out string, err error) {

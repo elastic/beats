@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
 
@@ -37,13 +38,25 @@ func TestFileLoader_Load(t *testing.T) {
 	tmplName := fmt.Sprintf("%s-%s", prefix, ver)
 
 	for name, test := range map[string]struct {
-		settings TemplateSettings
-		body     mapstr.M
-		fields   []byte
-		want     mapstr.M
-		wantErr  error
+		settings     TemplateSettings
+		isServerless bool
+		body         mapstr.M
+		fields       []byte
+		want         mapstr.M
+		wantErr      error
 	}{
 		"load minimal config info": {
+			isServerless: false,
+			body: mapstr.M{
+				"index_patterns": []string{"mock-7.0.0"},
+				"data_stream":    struct{}{},
+				"priority":       150,
+				"template": mapstr.M{
+					"settings": mapstr.M{"index": nil}},
+			},
+		},
+		"load minimal config info serverless": {
+			isServerless: true,
 			body: mapstr.M{
 				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
@@ -53,7 +66,8 @@ func TestFileLoader_Load(t *testing.T) {
 			},
 		},
 		"load minimal config with index settings": {
-			settings: TemplateSettings{Index: mapstr.M{"code": "best_compression"}},
+			isServerless: false,
+			settings:     TemplateSettings{Index: mapstr.M{"code": "best_compression"}},
 			body: mapstr.M{
 				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
@@ -63,7 +77,8 @@ func TestFileLoader_Load(t *testing.T) {
 			},
 		},
 		"load minimal config with source settings": {
-			settings: TemplateSettings{Source: mapstr.M{"enabled": false}},
+			isServerless: false,
+			settings:     TemplateSettings{Source: mapstr.M{"enabled": false}},
 			body: mapstr.M{
 				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
@@ -80,6 +95,7 @@ func TestFileLoader_Load(t *testing.T) {
 			},
 		},
 		"load config and in-line analyzer fields": {
+			isServerless: false,
 			body: mapstr.M{
 				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
@@ -155,7 +171,7 @@ func TestFileLoader_Load(t *testing.T) {
 							"refresh_interval": "5s",
 							"mapping": mapstr.M{
 								"total_fields": mapstr.M{
-									"limit": 10000,
+									"limit": defaultTotalFieldsLimit,
 								},
 							},
 							"query": mapstr.M{
@@ -178,6 +194,7 @@ func TestFileLoader_Load(t *testing.T) {
 			},
 		},
 		"load config and in-line analyzer fields with name collision": {
+			isServerless: false,
 			body: mapstr.M{
 				"index_patterns": []string{"mock-7.0.0"},
 				"settings":       mapstr.M{"index": nil},
@@ -210,7 +227,8 @@ func TestFileLoader_Load(t *testing.T) {
 	} {
 		t.Run(name, func(t *testing.T) {
 			fc := newFileClient(ver)
-			fl := NewFileLoader(fc)
+			logger := logptest.NewTestingLogger(t, "")
+			fl := NewFileLoader(fc, test.isServerless, logger)
 
 			cfg := DefaultConfig(info)
 			cfg.Settings = test.settings

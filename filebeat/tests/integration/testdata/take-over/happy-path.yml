@@ -1,0 +1,51 @@
+filebeat.inputs:
+  - type: filestream
+    id: "{{.inputID}}"
+    paths:
+      - {{.testdata}}/take-over/*.log
+{{ if .previousID }}
+    take_over:
+      enabled: true
+      from_ids:
+        - {{ .previousID }}
+{{ end }}
+    file_identity.fingerprint: ~
+    prospector:
+      scanner:
+        fingerprint:
+          enabled: true
+          length: 64
+        check_interval: 0.1s
+
+  - type: filestream
+    id: "not-in-test-input"
+    paths:
+      - {{.testdata}}/take-over/*.txt
+    file_identity.fingerprint: ~
+    prospector:
+      scanner:
+        fingerprint:
+          enabled: true
+          length: 64
+        check_interval: 0.1s
+
+queue.mem:
+  flush.timeout: 0s
+
+path.home: {{.homePath}}
+
+output.file:
+  path: ${path.home}
+  filename: "output-file"
+  rotate_on_startup: false
+
+filebeat.registry:
+  cleanup_interval: 5s
+  flush: 1s
+
+logging:
+  level: debug
+  selectors:
+    - "*"
+  metrics:
+    enabled: false

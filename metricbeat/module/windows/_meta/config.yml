@@ -15,3 +15,22 @@
 #       field: cpu_usage
 #       format: "float"
 #     - name: "Thread Count"
+
+#  - module: windows
+#   metricsets:
+#   - wmi
+#   period: 10m
+#   wmi:
+#     warning_threshold: 10m
+#     # namespace: "root\\cimv2"
+#     queries:
+#     - class: Win32_OperatingSystem  # FROM: Class to fetch
+#       properties:                   # SELECT: Properties to retrieve for this WMI class. Omit the setting to fetch all properties
+#        - FreePhysicalMemory
+#        - FreeSpaceInPagingFiles
+#        - FreeVirtualMemory
+#        - LocalDateTime
+#        - NumberOfUsers
+#       where: ""                     # Optional WHERE clause to filter query results
+#       # Namespace for this specific query. Uncomment to override the default namespace.
+#       # namespace: "root\\cimv2"

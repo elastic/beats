@@ -25,12 +25,13 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
 type managedInput struct {
 	userID           string
+	metricsID        string
 	manager          *InputManager
 	ackCH            *updateChan
 	sourceIdentifier *sourceIdentifier
@@ -48,11 +49,12 @@ func (inp *managedInput) Test(ctx input.TestContext) error {
 	return inp.prospector.Test()
 }
 
-// Run
+// Run runs the input
 func (inp *managedInput) Run(
 	ctx input.Context,
 	pipeline beat.PipelineConnector,
 ) (err error) {
+	ctx.UpdateStatus(status.Starting, "")
 	groupStore := inp.manager.getRetainedStore()
 	defer groupStore.Release()
 
@@ -61,6 +63,8 @@ func (inp *managedInput) Run(
 	cancelCtx, cancel := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
 	defer cancel()
 	ctx.Cancelation = cancelCtx
+
+	metrics := NewMetrics(ctx.MetricsRegistry)
 
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
@@ -75,22 +79,27 @@ func (inp *managedInput) Run(
 			time.Minute, // magic number
 			ctx.Logger,
 			"harvester:"),
+		metrics: metrics,
 	}
 
 	prospectorStore := inp.manager.getRetainedStore()
 	defer prospectorStore.Release()
-	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier)
+	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, nil)
+
+	// Mark it as running for now.
+	// Any errors encountered by harvester will change state to Degraded
+	ctx.UpdateStatus(status.Running, "")
 
 	inp.prospector.Run(ctx, sourceStore, hg)
 
-	// Notify the manager the input  has stopped, currently that is used to
+	// Notify the manager the input has stopped, currently that is used to
 	// keep track of duplicated IDs
 	inp.manager.StopInput(inp.userID)
 
 	return nil
 }
 
-func newInputACKHandler(ch *updateChan, log *logp.Logger) beat.EventListener {
+func newInputACKHandler(ch *updateChan) beat.EventListener {
 	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
 		var n uint
 		var last int

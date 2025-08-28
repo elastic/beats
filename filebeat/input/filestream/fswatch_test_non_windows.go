@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !windows
-// +build !windows
 
 package filestream
 
@@ -34,7 +33,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestFileScannerSymlinks(t *testing.T) {
@@ -108,7 +107,7 @@ func TestFileScannerSymlinks(t *testing.T) {
 				Symlinks:      true,
 				RecursiveGlob: false,
 			}
-			fs, err := newFileScanner(test.paths, cfg)
+			fs, err := newFileScanner(test.paths, cfg, false)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -141,12 +140,12 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 		Symlinks:      false,
 		RecursiveGlob: false,
 	}
-	scanner, err := newFileScanner([]string{testPath, renamedPath}, cfg)
+	scanner, err := newFileScanner([]string{testPath, renamedPath}, cfg, false)
 	if err != nil {
 		t.Fatal(err)
 	}
 	w := fileWatcher{
-		log:          logp.L(),
+		log:          logptest.NewTestingLogger(t, ""),
 		scanner:      scanner,
 		events:       make(chan loginp.FSEvent),
 		sameFileFunc: testSameFile,
@@ -177,12 +176,12 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 func TestFileWatcherRenamedTruncated(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	fs, err := newFileScanner([]string{filepath.Join(tmpDir, "app.log*")}, fileScannerConfig{})
+	fs, err := newFileScanner([]string{filepath.Join(tmpDir, "app.log*")}, fileScannerConfig{}, false)
 	if err != nil {
 		t.Fatal(err)
 	}
 	w := fileWatcher{
-		log:          logp.L(),
+		log:          logptest.NewTestingLogger(t, ""),
 		scanner:      fs,
 		events:       make(chan loginp.FSEvent),
 		sameFileFunc: os.SameFile,

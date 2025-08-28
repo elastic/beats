@@ -30,11 +30,14 @@ type Pipeline interface {
 	Connect() (Client, error)
 }
 
+// PipelineConnector wraps the Pipeline interface
 type PipelineConnector = Pipeline
 
 // Client holds a connection to the beats publisher pipeline
 type Client interface {
+	// Publish the event
 	Publish(Event)
+	// PublishAll events specified in the Event array
 	PublishAll([]Event)
 	Close() error
 }
@@ -45,8 +48,6 @@ type ClientConfig struct {
 	PublishMode PublishMode
 
 	Processing ProcessingConfig
-
-	CloseRef CloseRef
 
 	// WaitClose sets the maximum duration to wait on ACK, if client still has events
 	// active non-acknowledged events in the publisher pipeline.
@@ -75,24 +76,17 @@ type EventListener interface {
 	// This allows the ACKer to do some bookkeeping for dropped events.
 	AddEvent(event Event, published bool)
 
-	// ACK Events from the output and pipeline queue are forwarded to ACKEvents.
+	// ACKEvents ack events from the output and pipeline queue are forwarded to ACKEvents.
 	// The number of reported events only matches the known number of events downstream.
 	// ACKers might need to keep track of dropped events by themselves.
 	ACKEvents(n int)
 
 	// ClientClosed informs the ACKer that the Client used to publish to the pipeline has been closed.
 	// No new events should be published anymore. The ACKEvents method still will be called as long
-	// as long as there are pending events for the client in the pipeline. The Close signal can be used
+	// as there are pending events for the client in the pipeline. The Close signal can be used
 	// to suppress any ACK event propagation if required.
 	// Close might be called from another go-routine than AddEvent and ACKEvents.
 	ClientClosed()
-}
-
-// CloseRef allows users to close the client asynchronously.
-// A CloseRef implements a subset of function required for context.Context.
-type CloseRef interface {
-	Done() <-chan struct{}
-	Err() error
 }
 
 // ProcessingConfig provides additional event processing settings a client can
@@ -101,7 +95,7 @@ type ProcessingConfig struct {
 	// EventMetadata configures additional fields/tags to be added to published events.
 	EventMetadata mapstr.EventMetadata
 
-	// Meta provides additional meta data to be added to the Meta field in the beat.Event
+	// Meta provides additional metadata to be added to the Meta field in the beat.Event
 	// structure.
 	Meta mapstr.M
 
@@ -125,6 +119,9 @@ type ProcessingConfig struct {
 	// is applied to events. If nil the Beat's default behavior prevails.
 	EventNormalization *bool
 
+	// Disables the addition of input.type
+	DisableType bool
+
 	// Private contains additional information to be passed to the processing
 	// pipeline builder.
 	Private interface{}
@@ -135,8 +132,9 @@ type ClientListener interface {
 	Closing() // Closing indicates the client is being shutdown next
 	Closed()  // Closed indicates the client being fully shutdown
 
+	NewEvent()              // event has arrived at the pipeline
+	Filtered()              // event has been filtered by the pipeline
 	Published()             // event has successfully entered the queue
-	FilteredOut(Event)      // event has been filtered out/dropped by processors
 	DroppedOnPublish(Event) // event has been dropped, while waiting for the queue
 }
 
@@ -172,3 +170,37 @@ const (
 	// state up-to-date.
 	DropIfFull
 )
+
+type CombinedClientListener struct {
+	A, B ClientListener
+}
+
+func (c *CombinedClientListener) Closing() {
+	c.A.Closing()
+	c.B.Closing()
+}
+
+func (c *CombinedClientListener) Closed() {
+	c.A.Closed()
+	c.B.Closed()
+}
+
+func (c *CombinedClientListener) NewEvent() {
+	c.A.NewEvent()
+	c.B.NewEvent()
+}
+
+func (c *CombinedClientListener) Filtered() {
+	c.A.Filtered()
+	c.B.Filtered()
+}
+
+func (c *CombinedClientListener) Published() {
+	c.A.Published()
+	c.B.Published()
+}
+
+func (c *CombinedClientListener) DroppedOnPublish(event Event) {
+	c.A.DroppedOnPublish(event)
+	c.B.DroppedOnPublish(event)
+}

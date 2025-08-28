@@ -14,9 +14,8 @@
     "log": {
       "level": "information"
     },
-    "message": "A privileged service was called.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tDC_TEST2K12$\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x3E7\n\nService:\n\tServer:\tNT Local Security Authority / Authentication Service\n\tService Name:\tLsaRegisterLogonProcess()\n\nProcess:\n\tProcess ID:\t0x1f0\n\tProcess Name:\tC:\\Windows\\System32\\lsass.exe\n\nService Request Information:\n\tPrivileges:\t\tSeTcbPrivilege",
+    "message": "A privileged service was called.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tDC_TEST2K12$\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x3e7\n\nService:\n\tServer:\tNT Local Security Authority / Authentication Service\n\tService Name:\tLsaRegisterLogonProcess()\n\nProcess:\n\tProcess ID:\t0x1f0\n\tProcess Name:\tC:\\Windows\\System32\\lsass.exe\n\nService Request Information:\n\tPrivileges:\t\tSeTcbPrivilege",
     "winlog": {
-      "api": "wineventlog",
       "channel": "Security",
       "computer_name": "DC_TEST2k12.TEST.SAAS",
       "event_data": {
@@ -41,7 +40,7 @@
           "id": 504
         }
       },
-      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 5109160,
       "task": "Sensitive Privilege Use"

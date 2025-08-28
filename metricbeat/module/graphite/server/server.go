@@ -18,13 +18,12 @@
 package server
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	serverhelper "github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/helper/server/tcp"
 	"github.com/elastic/beats/v7/metricbeat/helper/server/udp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // init registers the MetricSet with the central registry.
@@ -77,11 +76,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Run method provides the Graphite server with a reporter with which events can be reported.
-func (m *MetricSet) Run(reporter mb.PushReporter) {
+func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	// Start event watcher
 	if err := m.server.Start(); err != nil {
-		err = errors.Wrap(err, "failed to start graphite server")
-		logp.Err("%v", err)
+		err = fmt.Errorf("failed to start graphite server: %w", err)
+		m.Logger().Errorf("%v", err)
 		reporter.Error(err)
 		return
 	}
@@ -101,7 +100,7 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 					if err != nil {
 						reporter.Error(err)
 					} else {
-						reporter.Event(event)
+						reporter.Event(mb.TransformMapStrToEvent(m.Module().Name(), event, nil))
 					}
 				}
 			}

@@ -1,5 +1,5 @@
 # Module: aws
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-aws.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-aws.html
 
 - module: aws
   period: 1m
@@ -15,6 +15,8 @@
   period: 5m
   metricsets:
     - cloudwatch
+  include_linked_accounts: true
+  # owning_account: 111111111111
   metrics:
     - namespace: AWS/EC2
       #name: ["CPUUtilization", "DiskWriteOps"]
@@ -49,8 +51,10 @@
   period: 24h
   metricsets:
     - s3_daily_storage
+    - awshealth
 - module: aws
   period: 1m
   latency: 5m
+  include_linked_accounts: false
   metricsets:
     - s3_request

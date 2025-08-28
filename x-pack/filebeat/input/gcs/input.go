@@ -6,6 +6,8 @@ package gcs
 
 import (
 	"context"
+	"fmt"
+	"reflect"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -14,6 +16,8 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -22,16 +26,22 @@ type gcsInput struct {
 	config config
 }
 
+// defines the valid range for Unix timestamps for 64 bit integers
+var (
+	minTimestamp = time.Date(1970, time.January, 1, 0, 0, 0, 0, time.UTC).Unix()
+	maxTimestamp = time.Date(3000, time.January, 1, 0, 0, 0, 0, time.UTC).Unix()
+)
+
 const (
 	inputName = "gcs"
 )
 
-func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
-		Stability:  feature.Beta,
+		Stability:  feature.Stable,
 		Deprecated: false,
-		Info:       "Google Cloud Storage (Beta)",
+		Info:       "Google Cloud Storage",
 		Doc:        "Collect logs from Google Cloud Storage Service",
 		Manager: &cursor.InputManager{
 			Logger:     log,
@@ -42,74 +52,96 @@ func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 	}
 }
 
-func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
-	config := config{}
+func configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, error) {
+	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
 	}
-
-	var sources []cursor.Source
+	sources := make([]cursor.Source, 0, len(config.Buckets))
+	// This is to maintain backward compatibility with the old config.
+	if config.BatchSize == 0 {
+		config.BatchSize = config.MaxWorkers
+	}
 	for _, b := range config.Buckets {
 		bucket := tryOverrideOrDefault(config, b)
+		if bucket.TimeStampEpoch != nil && !isValidUnixTimestamp(*bucket.TimeStampEpoch) {
+			return nil, nil, fmt.Errorf("invalid timestamp epoch: %d", *bucket.TimeStampEpoch)
+		}
 		sources = append(sources, &Source{
-			ProjectId:     config.ProjectId,
-			BucketName:    bucket.Name,
-			BucketTimeOut: *bucket.BucketTimeOut,
-			MaxWorkers:    *bucket.MaxWorkers,
-			Poll:          *bucket.Poll,
-			PollInterval:  *bucket.PollInterval,
-			ParseJSON:     *bucket.ParseJSON,
+			ProjectId:                config.ProjectId,
+			BucketName:               bucket.Name,
+			BatchSize:                *bucket.BatchSize,
+			MaxWorkers:               *bucket.MaxWorkers,
+			Poll:                     *bucket.Poll,
+			PollInterval:             *bucket.PollInterval,
+			ParseJSON:                *bucket.ParseJSON,
+			TimeStampEpoch:           bucket.TimeStampEpoch,
+			ExpandEventListFromField: bucket.ExpandEventListFromField,
+			FileSelectors:            bucket.FileSelectors,
+			ReaderConfig:             bucket.ReaderConfig,
+			Retry:                    config.Retry,
 		})
 	}
 
 	return sources, &gcsInput{config: config}, nil
 }
 
-// tryOverrideOrDefault, overrides global values with local
-// bucket level values if present. If both global & local values
-// are absent, assigns default values
+// tryOverrideOrDefault, overrides the bucket level values with global values if the bucket fields are not set
 func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	if b.MaxWorkers == nil {
-		maxWorkers := 1
-		if cfg.MaxWorkers != nil {
-			maxWorkers = *cfg.MaxWorkers
-		}
-		b.MaxWorkers = &maxWorkers
+		b.MaxWorkers = &cfg.MaxWorkers
+	}
+
+	if b.BatchSize == nil && cfg.BatchSize != 0 {
+		// If the global batch size is set, use it
+		b.BatchSize = &cfg.BatchSize
+	} else {
+		// If the global batch size is not set, use the local max_workers as the batch size
+		// since at this point we know `b.MaxWorkers` will be set to a non-nil value.
+		// This is to maintain backward compatibility with the old config.
+		b.BatchSize = b.MaxWorkers
 	}
 
 	if b.Poll == nil {
-		var poll bool
-		if cfg.Poll != nil {
-			poll = *cfg.Poll
-		}
-		b.Poll = &poll
+		b.Poll = &cfg.Poll
 	}
 
 	if b.PollInterval == nil {
-		interval := time.Second * 300
-		if cfg.PollInterval != nil {
-			interval = *cfg.PollInterval
-		}
-		b.PollInterval = &interval
+		b.PollInterval = &cfg.PollInterval
 	}
 
 	if b.ParseJSON == nil {
-		parse := false
-		if cfg.ParseJSON != nil {
-			parse = *cfg.ParseJSON
-		}
-		b.ParseJSON = &parse
+		b.ParseJSON = &cfg.ParseJSON
 	}
 
-	if b.BucketTimeOut == nil {
-		timeOut := time.Second * 50
-		if cfg.BucketTimeOut != nil {
-			timeOut = *cfg.BucketTimeOut
-		}
-		b.BucketTimeOut = &timeOut
+	if b.TimeStampEpoch == nil {
+		b.TimeStampEpoch = cfg.TimeStampEpoch
+	}
+
+	if b.ExpandEventListFromField == "" {
+		b.ExpandEventListFromField = cfg.ExpandEventListFromField
+	}
+
+	if len(b.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
+		b.FileSelectors = cfg.FileSelectors
+	}
+
+	// If the bucket level ReaderConfig matches the default config ReaderConfig state,
+	// use the global ReaderConfig. Matching the default ReaderConfig state
+	// means that the bucket level ReaderConfig is not set, and we should use the
+	// global ReaderConfig. Partial definition of ReaderConfig at both the global
+	// and bucket level is not supported, it's an either or scenario.
+	if reflect.DeepEqual(b.ReaderConfig, defaultReaderConfig) {
+		b.ReaderConfig = cfg.ReaderConfig
 	}
 
 	return b
+}
+
+// isValidUnixTimestamp checks if the timestamp is a valid Unix timestamp
+func isValidUnixTimestamp(timestamp int64) bool {
+	// checks if the timestamp is within the valid range
+	return minTimestamp <= timestamp && timestamp <= maxTimestamp
 }
 
 func (input *gcsInput) Name() string {
@@ -121,16 +153,29 @@ func (input *gcsInput) Test(src cursor.Source, ctx v2.TestContext) error {
 }
 
 func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
-	cursor cursor.Cursor, publisher cursor.Publisher) error {
+	cursor cursor.Cursor, publisher cursor.Publisher,
+) error {
 	st := newState()
 	currentSource := src.(*Source)
 
+	stat := inputCtx.StatusReporter
+	if stat == nil {
+		stat = noopReporter{}
+	}
+	stat.UpdateStatus(status.Starting, "")
+	stat.UpdateStatus(status.Configuring, "")
+
 	log := inputCtx.Logger.With("project_id", currentSource.ProjectId).With("bucket", currentSource.BucketName)
 	log.Infof("Running google cloud storage for project: %s", input.config.ProjectId)
+	// create a new inputMetrics instance
+	metrics := newInputMetrics(inputCtx.MetricsRegistry)
+	metrics.url.Set("gs://" + currentSource.BucketName)
 
 	var cp *Checkpoint
 	if !cursor.IsNew() {
 		if err := cursor.Unpack(&cp); err != nil {
+			metrics.errorsTotal.Inc()
+			stat.UpdateStatus(status.Failed, "failed to configure input: "+err.Error())
 			return err
 		}
 
@@ -143,20 +188,31 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 		cancel()
 	}()
 
-	client, err := fetchStorageClient(ctx, input.config, log)
+	client, err := fetchStorageClient(ctx, input.config)
 	if err != nil {
+		metrics.errorsTotal.Inc()
+		stat.UpdateStatus(status.Failed, "failed to get storage client: "+err.Error())
 		return err
 	}
+
 	bucket := client.Bucket(currentSource.BucketName).Retryer(
+		// Use WithMaxAttempts to change the maximum number of attempts.
+		storage.WithMaxAttempts(currentSource.Retry.MaxAttempts),
 		// Use WithBackoff to change the timing of the exponential backoff.
 		storage.WithBackoff(gax.Backoff{
-			Initial: 2 * time.Second,
+			Initial:    currentSource.Retry.InitialBackOffDuration,
+			Max:        currentSource.Retry.MaxBackOffDuration,
+			Multiplier: currentSource.Retry.BackOffMultiplier,
 		}),
 		// RetryAlways will retry the operation even if it is non-idempotent.
 		// Since we are only reading, the operation is always idempotent
 		storage.WithPolicy(storage.RetryAlways),
 	)
-	scheduler := newScheduler(ctx, publisher, bucket, currentSource, &input.config, st, log)
+	scheduler := newScheduler(publisher, bucket, currentSource, &input.config, st, stat, metrics, log)
 
-	return scheduler.schedule()
+	return scheduler.schedule(ctx)
 }
+
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}

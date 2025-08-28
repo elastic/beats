@@ -1,0 +1,45 @@
+version: '2.3'
+services:
+  # This is a proxy used to block beats until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy_dep:
+    image: busybox
+    depends_on:
+      elasticsearch: { condition: service_healthy }
+      kibana:        { condition: service_healthy }
+      cometd: { condition: service_healthy }
+
+  elasticsearch:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${STACK_ENVIRONMENT}.yml
+      service: elasticsearch
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+      retries: 300
+      interval: 1s
+    ports:
+      - 9200:9200
+
+  googlepubsub:
+    image: docker.elastic.co/integrations-ci/beats-googlepubsub:emulator-${SDK_VERSION:-467.0.0-0}-1
+    build:
+      context: ${ES_BEATS}/testing/environments/docker/googlepubsub
+      args:
+        SDK_VERSION: ${SDK_VERSION:-467.0.0-0}
+    hostname: googlepubsub
+    ports:
+      - 8432:8432
+
+  cometd:
+    build: ${ES_BEATS}/testing/environments/docker/cometd
+    hostname: cometd
+    ports:
+      - 8080:8080
+
+  kibana:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${STACK_ENVIRONMENT}.yml
+      service: kibana
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'" ]
+      retries: 600

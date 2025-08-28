@@ -1,0 +1,123 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+package streaming
+
+import (
+	"context"
+	"encoding/json"
+	"flag"
+	"net/url"
+	"os"
+	"testing"
+	"time"
+
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+)
+
+var (
+	timeout    = flag.Duration("crowdstrike_timeout", time.Minute, "time to allow Crowdstrike FalconHose test to run")
+	offset     = flag.Int("crowdstrike_offset", -1, "offset into stream (negative to ignore)")
+	cursorText = flag.String("cursor", "", "cursor JSON to inject into test")
+)
+
+func TestCrowdstrikeFalconHose(t *testing.T) {
+	logp.TestingSetup()
+	logger := logp.L()
+
+	feedURL, ok := os.LookupEnv("CROWDSTRIKE_URL")
+	if !ok {
+		t.Skip("crowdstrike tests require ${CROWDSTRIKE_URL} to be set")
+	}
+	tokenURL, ok := os.LookupEnv("CROWDSTRIKE_TOKEN_URL")
+	if !ok {
+		t.Skip("crowdstrike tests require ${CROWDSTRIKE_TOKEN_URL} to be set")
+	}
+	clientID, ok := os.LookupEnv("CROWDSTRIKE_CLIENT_ID")
+	if !ok {
+		t.Skip("crowdstrike tests require ${CROWDSTRIKE_CLIENT_ID} to be set")
+	}
+	clientSecret, ok := os.LookupEnv("CROWDSTRIKE_CLIENT_SECRET")
+	if !ok {
+		t.Skip("crowdstrike tests require ${CROWDSTRIKE_CLIENT_SECRET} to be set")
+	}
+	appID, ok := os.LookupEnv("CROWDSTRIKE_APPID")
+	if !ok {
+		t.Skip("crowdstrike tests require ${CROWDSTRIKE_APPID} to be set")
+	}
+
+	var state map[string]any
+	if *cursorText != "" {
+		var crsr any
+		err := json.Unmarshal([]byte(*cursorText), &crsr)
+		if err != nil {
+			t.Fatalf("failed to parse cursor text: %v", err)
+		}
+		state = map[string]any{"cursor": crsr}
+	}
+
+	u, err := url.Parse(feedURL)
+	if err != nil {
+		t.Fatalf("unexpected error parsing feed url: %v", err)
+	}
+	cfg := config{
+		Type: "crowdstrike",
+		URL:  &urlConfig{u},
+		Program: `
+				state.response.decode_json().as(body,{
+					"events": [body],
+					"cursor": state.cursor.with({
+						?state.feed: body.?metadata.optMap(m, {"offset": m.offset}),
+					}),
+				})`,
+		Auth: authConfig{
+			OAuth2: oAuth2Config{
+				ClientID:     clientID,
+				ClientSecret: clientSecret,
+				TokenURL:     tokenURL,
+			},
+		},
+		CrowdstrikeAppID: appID,
+		State:            state,
+	}
+
+	err = cfg.Validate()
+	if err != nil {
+		t.Fatalf("unexpected error validating config: %v", err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	time.AfterFunc(*timeout, func() {
+		cancel()
+	})
+	var cursor map[string]any
+	if *offset >= 0 {
+		cursor = map[string]any{"offset": *offset}
+	}
+	env := v2.Context{ID: "crowdstrike_testing",
+		MetricsRegistry: monitoring.NewRegistry()}
+	s, err := NewFalconHoseFollower(ctx, env, cfg, cursor, &testPublisher{logger}, nil, logger, time.Now)
+	if err != nil {
+		t.Fatalf("unexpected error constructing follower: %v", err)
+	}
+	err = s.FollowStream(ctx)
+	if err != nil {
+		t.Errorf("unexpected error following stream: %v", err)
+	}
+}
+
+type testPublisher struct {
+	log *logp.Logger
+}
+
+var _ cursor.Publisher = testPublisher{}
+
+func (p testPublisher) Publish(e beat.Event, cursor any) error {
+	p.log.Infow("publish", "event", e.Fields, "cursor", cursor)
+	return nil
+}

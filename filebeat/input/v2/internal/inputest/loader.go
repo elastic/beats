@@ -22,7 +22,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // Loader wraps the input Loader in order to provide additional methods for reuse in tests.
@@ -34,14 +34,14 @@ type Loader struct {
 // MustNewTestLoader creates a new Loader. The test fails with fatal if the
 // NewLoader constructor function returns an error.
 func MustNewTestLoader(t testing.TB, plugins []v2.Plugin, typeField, defaultType string) *Loader {
-	l, err := v2.NewLoader(logp.NewLogger("test"), plugins, typeField, defaultType)
+	l, err := v2.NewLoader(logptest.NewTestingLogger(t, ""), plugins, typeField, defaultType)
 	if err != nil {
 		t.Fatalf("Failed to create loader: %v", err)
 	}
 	return &Loader{t: t, Loader: l}
 }
 
-// MustConfigure confiures a new input. The test fails with t.Fatal if the
+// MustConfigure configures a new input. The test fails with t.Fatal if the
 // operation failed.
 func (l *Loader) MustConfigure(cfg *conf.C) v2.Input {
 	i, err := l.Configure(cfg)

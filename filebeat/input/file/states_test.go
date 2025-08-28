@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package file
 
@@ -25,6 +24,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var cleanupTests = []struct {
@@ -82,7 +83,7 @@ func TestCleanup(t *testing.T) {
 	for _, test := range cleanupTests {
 		test := test
 		t.Run(test.title, func(t *testing.T) {
-			states := NewStates()
+			states := NewStates(logptest.NewTestingLogger(t, ""))
 			states.SetStates([]State{test.state})
 
 			assert.Equal(t, test.countBefore, states.Count())

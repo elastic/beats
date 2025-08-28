@@ -30,8 +30,12 @@ type Message struct {
 	Ts      time.Time // timestamp the content was read
 	Content []byte    // actual content read
 	Bytes   int       // total number of bytes read to generate the message
+	Offset  int       // total number of bytes read and discarded prior to generate the message
 	Fields  mapstr.M  // optional fields that can be added by reader
 	Meta    mapstr.M  // deprecated
+	// Private is for input-specific data. The input that populates this field
+	// is fully responsible for its management. No guarantees are given about
+	// the content of this field as other components are able to modify it.
 	Private interface{}
 }
 

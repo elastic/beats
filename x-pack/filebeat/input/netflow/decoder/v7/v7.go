@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
-	"log"
 	"net"
 	"time"
 
@@ -55,11 +54,13 @@ var v7template = template.Template{
 }
 
 func init() {
-	protocol.Registry.Register(ProtocolName, New)
+	if err := protocol.Registry.Register(ProtocolName, New); err != nil {
+		panic(err)
+	}
 }
 
 func New(config config.Config) protocol.Protocol {
-	return v1.NewProtocol(ProtocolID, &v7template, ReadV7Header, log.New(config.LogOutput(), LogPrefix, 0))
+	return v1.NewProtocol(ProtocolID, &v7template, ReadV7Header, config.LogOutput().Named(LogPrefix))
 }
 
 type PacketHeader struct {

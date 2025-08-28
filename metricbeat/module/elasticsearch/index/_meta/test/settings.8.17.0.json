@@ -1,0 +1,1326 @@
+{
+  ".internal.alerts-transform.health.alerts-default-000001" : {
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : ".alerts-ilm-policy",
+          "rollover_alias" : ".alerts-transform.health.alerts-default"
+        },
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "2500"
+          },
+          "ignore_malformed" : "true"
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".internal.alerts-transform.health.alerts-default-000001",
+        "creation_date" : "1737763538802",
+        "number_of_replicas" : "0",
+        "uuid" : "FzzefKpwSzG6My4NKjuvRg",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".ds-metrics-elastic_agent.filebeat-default-2025.01.25-000001" : {
+    "settings" : {
+      "index" : {
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "1000",
+            "ignore_dynamic_beyond_limit" : "true"
+          }
+        },
+        "hidden" : "true",
+        "time_series" : {
+          "end_time" : "2025-01-25T00:50:20.000Z",
+          "start_time" : "2025-01-24T22:07:06.000Z"
+        },
+        "provided_name" : ".ds-metrics-elastic_agent.filebeat-default-2025.01.25-000001",
+        "final_pipeline" : ".fleet_final_pipeline-1",
+        "creation_date" : "1737763626540",
+        "number_of_replicas" : "1",
+        "routing_path" : [
+          "component.id",
+          "metricset.name",
+          "agent.id"
+        ],
+        "uuid" : "FXV4fc6NSPCW0s9Ts8hVTw",
+        "version" : {
+          "created" : "8521000"
+        },
+        "lifecycle" : {
+          "name" : "metrics"
+        },
+        "mode" : "time_series",
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_hot"
+            }
+          }
+        },
+        "number_of_shards" : "1",
+        "default_pipeline" : "metrics-elastic_agent.filebeat-2.0.3"
+      }
+    }
+  },
+  ".kibana_analytics_8.17.0_001" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "1500"
+          }
+        },
+        "refresh_interval" : "1s",
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".kibana_analytics_8.17.0_001",
+        "creation_date" : "1737763535486",
+        "priority" : "10",
+        "number_of_replicas" : "0",
+        "uuid" : "Esg5g9nvT_Sjtt-J-Hm3tw",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".ds-metrics-elastic_agent.fleet_server-default-2025.01.25-000001" : {
+    "settings" : {
+      "index" : {
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "1000",
+            "ignore_dynamic_beyond_limit" : "true"
+          }
+        },
+        "hidden" : "true",
+        "time_series" : {
+          "end_time" : "2025-01-25T00:50:20.000Z",
+          "start_time" : "2025-01-24T22:06:08.000Z"
+        },
+        "provided_name" : ".ds-metrics-elastic_agent.fleet_server-default-2025.01.25-000001",
+        "final_pipeline" : ".fleet_final_pipeline-1",
+        "creation_date" : "1737763568470",
+        "number_of_replicas" : "1",
+        "routing_path" : [
+          "service.address",
+          "agent.id"
+        ],
+        "uuid" : "lJjCxk63QN6NvWgRPx-VGA",
+        "version" : {
+          "created" : "8521000"
+        },
+        "lifecycle" : {
+          "name" : "metrics"
+        },
+        "mode" : "time_series",
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_hot"
+            }
+          }
+        },
+        "number_of_shards" : "1",
+        "default_pipeline" : "metrics-elastic_agent.fleet_server-2.0.3"
+      }
+    }
+  },
+  ".ds-metrics-elastic_agent.metricbeat-default-2025.01.25-000001" : {
+    "settings" : {
+      "index" : {
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "1000",
+            "ignore_dynamic_beyond_limit" : "true"
+          }
+        },
+        "hidden" : "true",
+        "time_series" : {
+          "end_time" : "2025-01-25T00:50:20.000Z",
+          "start_time" : "2025-01-24T22:07:06.000Z"
+        },
+        "provided_name" : ".ds-metrics-elastic_agent.metricbeat-default-2025.01.25-000001",
+        "final_pipeline" : ".fleet_final_pipeline-1",
+        "creation_date" : "1737763626493",
+        "number_of_replicas" : "1",
+        "routing_path" : [
+          "component.id",
+          "metricset.name",
+          "agent.id"
+        ],
+        "uuid" : "H_4Up0q0TjCiIJLOYRVLkw",
+        "version" : {
+          "created" : "8521000"
+        },
+        "lifecycle" : {
+          "name" : "metrics"
+        },
+        "mode" : "time_series",
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_hot"
+            }
+          }
+        },
+        "number_of_shards" : "1",
+        "default_pipeline" : "metrics-elastic_agent.metricbeat-2.0.3"
+      }
+    }
+  },
+  ".slo-observability.sli-v3.3" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".slo-observability.sli-v3.3",
+        "creation_date" : "1737763539198",
+        "number_of_replicas" : "0",
+        "uuid" : "li9mgfAyRo6IlXfzG3MsfA",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".fleet-agents-7" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".fleet-agents",
+        "creation_date" : "1737763557161",
+        "number_of_replicas" : "0",
+        "uuid" : "BP1r5ZZ3Q4K1PrgQPcsrbQ",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".internal.alerts-ml.anomaly-detection.alerts-default-000001" : {
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : ".alerts-ilm-policy",
+          "rollover_alias" : ".alerts-ml.anomaly-detection.alerts-default"
+        },
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "2500"
+          },
+          "ignore_malformed" : "true"
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".internal.alerts-ml.anomaly-detection.alerts-default-000001",
+        "creation_date" : "1737763538934",
+        "number_of_replicas" : "0",
+        "uuid" : "JuTJS7s2SqOKEkSgjAARgA",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".kibana_security_solution_8.17.0_001" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "1500"
+          }
+        },
+        "refresh_interval" : "1s",
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".kibana_security_solution_8.17.0_001",
+        "creation_date" : "1737763535602",
+        "priority" : "10",
+        "number_of_replicas" : "0",
+        "uuid" : "ct09HofMR1CShPsSHtsTiA",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".internal.alerts-observability.slo.alerts-default-000001" : {
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : ".alerts-ilm-policy",
+          "rollover_alias" : ".alerts-observability.slo.alerts-default"
+        },
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "2500"
+          },
+          "ignore_malformed" : "true"
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".internal.alerts-observability.slo.alerts-default-000001",
+        "creation_date" : "1737763539013",
+        "number_of_replicas" : "0",
+        "uuid" : "zxMyG_r5T8ubSS2rMUlb8A",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".kibana_security_session_1" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".kibana_security_session_1",
+        "creation_date" : "1737763538190",
+        "priority" : "1000",
+        "number_of_replicas" : "0",
+        "uuid" : "akBZ4S2WQRmhuF3G-nBSGw",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".ds-.kibana-event-log-ds-2025.01.25-000001" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_hot"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".ds-.kibana-event-log-ds-2025.01.25-000001",
+        "creation_date" : "1737763539377",
+        "number_of_replicas" : "0",
+        "uuid" : "QMmAJ7r0T6eQd6BJAQiuNA",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".internal.alerts-default.alerts-default-000001" : {
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : ".alerts-ilm-policy",
+          "rollover_alias" : ".alerts-default.alerts-default"
+        },
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "2500"
+          },
+          "ignore_malformed" : "true"
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".internal.alerts-default.alerts-default-000001",
+        "creation_date" : "1737763538666",
+        "number_of_replicas" : "0",
+        "uuid" : "DU8cdD5WS2yGC5MhPCOf0g",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".internal.alerts-observability.apm.alerts-default-000001" : {
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : ".alerts-ilm-policy",
+          "rollover_alias" : ".alerts-observability.apm.alerts-default"
+        },
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "2500"
+          },
+          "ignore_malformed" : "true"
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".internal.alerts-observability.apm.alerts-default-000001",
+        "creation_date" : "1737763538835",
+        "number_of_replicas" : "0",
+        "uuid" : "BK-sIMhTS42_oDCpank6Rg",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".ds-metrics-fleet_server.agent_status-default-2025.01.25-000001" : {
+    "settings" : {
+      "index" : {
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "1000",
+            "ignore_dynamic_beyond_limit" : "true"
+          }
+        },
+        "hidden" : "true",
+        "time_series" : {
+          "end_time" : "2025-01-25T00:50:20.000Z",
+          "start_time" : "2025-01-24T22:06:39.000Z"
+        },
+        "provided_name" : ".ds-metrics-fleet_server.agent_status-default-2025.01.25-000001",
+        "final_pipeline" : ".fleet_final_pipeline-1",
+        "creation_date" : "1737763599574",
+        "number_of_replicas" : "1",
+        "routing_path" : [
+          "cluster.id"
+        ],
+        "uuid" : "McASLcxjQS6qCxRQghwEWw",
+        "version" : {
+          "created" : "8521000"
+        },
+        "lifecycle" : {
+          "name" : "metrics"
+        },
+        "mode" : "time_series",
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_hot"
+            }
+          }
+        },
+        "number_of_shards" : "1",
+        "default_pipeline" : "metrics-fleet_server.agent_status-1.6.0"
+      }
+    }
+  },
+  ".internal.alerts-observability.metrics.alerts-default-000001" : {
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : ".alerts-ilm-policy",
+          "rollover_alias" : ".alerts-observability.metrics.alerts-default"
+        },
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "2500"
+          },
+          "ignore_malformed" : "true"
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".internal.alerts-observability.metrics.alerts-default-000001",
+        "creation_date" : "1737763539106",
+        "number_of_replicas" : "0",
+        "uuid" : "MU3GVR_RSceoNYt3B9-hFA",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".apm-custom-link" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".apm-custom-link",
+        "creation_date" : "1737763538021",
+        "number_of_replicas" : "0",
+        "uuid" : "7PqikKNuQfKdgZTTdk878g",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".ds-logs-elastic_agent-default-2025.01.25-000001" : {
+    "settings" : {
+      "index" : {
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "1000",
+            "ignore_dynamic_beyond_limit" : "true"
+          },
+          "ignore_malformed" : "true"
+        },
+        "hidden" : "true",
+        "provided_name" : ".ds-logs-elastic_agent-default-2025.01.25-000001",
+        "final_pipeline" : ".fleet_final_pipeline-1",
+        "creation_date" : "1737763567502",
+        "number_of_replicas" : "1",
+        "uuid" : "e7mdmpuRTcegaaeRE24Llg",
+        "version" : {
+          "created" : "8521000"
+        },
+        "lifecycle" : {
+          "name" : "logs"
+        },
+        "codec" : "best_compression",
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_hot"
+            }
+          }
+        },
+        "number_of_shards" : "1",
+        "default_pipeline" : "logs-elastic_agent-2.0.3"
+      }
+    }
+  },
+  ".kibana_alerting_cases_8.17.0_001" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "1500"
+          }
+        },
+        "refresh_interval" : "1s",
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".kibana_alerting_cases_8.17.0_001",
+        "creation_date" : "1737763535641",
+        "priority" : "10",
+        "number_of_replicas" : "0",
+        "uuid" : "C9D8OL8cTSCp4l5Tj4PeyQ",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".internal.alerts-ml.anomaly-detection-health.alerts-default-000001" : {
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : ".alerts-ilm-policy",
+          "rollover_alias" : ".alerts-ml.anomaly-detection-health.alerts-default"
+        },
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "2500"
+          },
+          "ignore_malformed" : "true"
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".internal.alerts-ml.anomaly-detection-health.alerts-default-000001",
+        "creation_date" : "1737763538912",
+        "number_of_replicas" : "0",
+        "uuid" : "vkz5yE7MQEixuprietyxxQ",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".ds-metrics-elastic_agent.filebeat_input-default-2025.01.25-000001" : {
+    "settings" : {
+      "index" : {
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "1000",
+            "ignore_dynamic_beyond_limit" : "true"
+          }
+        },
+        "hidden" : "true",
+        "provided_name" : ".ds-metrics-elastic_agent.filebeat_input-default-2025.01.25-000001",
+        "final_pipeline" : ".fleet_final_pipeline-1",
+        "creation_date" : "1737763568513",
+        "number_of_replicas" : "1",
+        "uuid" : "vcW-LPN0Tra6nTHoxxUDaA",
+        "version" : {
+          "created" : "8521000"
+        },
+        "lifecycle" : {
+          "name" : "metrics"
+        },
+        "codec" : "best_compression",
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_hot"
+            }
+          }
+        },
+        "number_of_shards" : "1",
+        "default_pipeline" : "metrics-elastic_agent.filebeat_input-2.0.3"
+      }
+    }
+  },
+  ".internal.alerts-security.alerts-default-000001" : {
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : ".alerts-ilm-policy",
+          "rollover_alias" : ".alerts-security.alerts-default"
+        },
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "2500"
+          },
+          "ignore_malformed" : "true"
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".internal.alerts-security.alerts-default-000001",
+        "creation_date" : "1737763538767",
+        "number_of_replicas" : "0",
+        "uuid" : "xbJRbR8vTT6LSrvewrWEyQ",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".internal.alerts-stack.alerts-default-000001" : {
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : ".alerts-ilm-policy",
+          "rollover_alias" : ".alerts-stack.alerts-default"
+        },
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "2500"
+          },
+          "ignore_malformed" : "true"
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".internal.alerts-stack.alerts-default-000001",
+        "creation_date" : "1737763538878",
+        "number_of_replicas" : "0",
+        "uuid" : "arsSbmjPRwueBKMHoEvF0A",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".internal.alerts-observability.logs.alerts-default-000001" : {
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : ".alerts-ilm-policy",
+          "rollover_alias" : ".alerts-observability.logs.alerts-default"
+        },
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "2500"
+          },
+          "ignore_malformed" : "true"
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".internal.alerts-observability.logs.alerts-default-000001",
+        "creation_date" : "1737763538966",
+        "number_of_replicas" : "0",
+        "uuid" : "6DdYK3zjTBqc33eoY2Ubyw",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".ds-metrics-fleet_server.agent_versions-default-2025.01.25-000001" : {
+    "settings" : {
+      "index" : {
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "1000",
+            "ignore_dynamic_beyond_limit" : "true"
+          }
+        },
+        "hidden" : "true",
+        "time_series" : {
+          "end_time" : "2025-01-25T00:50:20.000Z",
+          "start_time" : "2025-01-24T22:06:39.000Z"
+        },
+        "provided_name" : ".ds-metrics-fleet_server.agent_versions-default-2025.01.25-000001",
+        "final_pipeline" : ".fleet_final_pipeline-1",
+        "creation_date" : "1737763599761",
+        "number_of_replicas" : "1",
+        "routing_path" : [
+          "cluster.id",
+          "fleet.agent.version"
+        ],
+        "uuid" : "qtY_rz5kTi68FyIAmkuSJA",
+        "version" : {
+          "created" : "8521000"
+        },
+        "lifecycle" : {
+          "name" : "metrics"
+        },
+        "mode" : "time_series",
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_hot"
+            }
+          }
+        },
+        "number_of_shards" : "1",
+        "default_pipeline" : "metrics-fleet_server.agent_versions-1.6.0"
+      }
+    }
+  },
+  ".internal.alerts-observability.uptime.alerts-default-000001" : {
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : ".alerts-ilm-policy",
+          "rollover_alias" : ".alerts-observability.uptime.alerts-default"
+        },
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "2500"
+          },
+          "ignore_malformed" : "true"
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".internal.alerts-observability.uptime.alerts-default-000001",
+        "creation_date" : "1737763539070",
+        "number_of_replicas" : "0",
+        "uuid" : "b5X4RQxgT-W61MHBKMkjQg",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".fleet-enrollment-api-keys-7" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".fleet-enrollment-api-keys",
+        "creation_date" : "1737763548741",
+        "number_of_replicas" : "0",
+        "uuid" : "setuzbuoQeulHz22ml6RQQ",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".kibana_usage_counters_8.17.0_001" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "1500"
+          }
+        },
+        "refresh_interval" : "1s",
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".kibana_usage_counters_8.17.0_001",
+        "creation_date" : "1737763535457",
+        "priority" : "10",
+        "number_of_replicas" : "0",
+        "uuid" : "HvSHhtHVQce04kl-fDpj5A",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".apm-agent-configuration" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".apm-agent-configuration",
+        "creation_date" : "1737763538075",
+        "number_of_replicas" : "0",
+        "uuid" : "cUiNbx5AQY6QhGVt4v7HZw",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".apm-source-map" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".apm-source-map",
+        "creation_date" : "1737763538398",
+        "number_of_replicas" : "0",
+        "uuid" : "y5yKY9z-Q-KSt2eCfYuMtA",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".ds-logs-elastic_agent.fleet_server-default-2025.01.25-000001" : {
+    "settings" : {
+      "index" : {
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "1000",
+            "ignore_dynamic_beyond_limit" : "true"
+          },
+          "ignore_malformed" : "true"
+        },
+        "hidden" : "true",
+        "provided_name" : ".ds-logs-elastic_agent.fleet_server-default-2025.01.25-000001",
+        "final_pipeline" : ".fleet_final_pipeline-1",
+        "creation_date" : "1737763567534",
+        "number_of_replicas" : "1",
+        "uuid" : "qBY1MxmvQ-OFgG0-Lo7j2Q",
+        "version" : {
+          "created" : "8521000"
+        },
+        "lifecycle" : {
+          "name" : "logs"
+        },
+        "codec" : "best_compression",
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_hot"
+            }
+          }
+        },
+        "number_of_shards" : "1",
+        "default_pipeline" : "logs-elastic_agent.fleet_server-2.0.3"
+      }
+    }
+  },
+  ".slo-observability.summary-v3.3" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".slo-observability.summary-v3.3",
+        "creation_date" : "1737763539569",
+        "number_of_replicas" : "0",
+        "uuid" : "bnySCA-RTBSH2EJUSiDjAg",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".kibana_ingest_8.17.0_001" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "1500"
+          }
+        },
+        "refresh_interval" : "1s",
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".kibana_ingest_8.17.0_001",
+        "creation_date" : "1737763535671",
+        "priority" : "10",
+        "number_of_replicas" : "0",
+        "uuid" : "ld3HrgXxSAuJekeWweYX_w",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".slo-observability.summary-v3.3.temp" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".slo-observability.summary-v3.3.temp",
+        "creation_date" : "1737763539762",
+        "number_of_replicas" : "0",
+        "uuid" : "7APnjhseTwOcsYV6rgbkJg",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".security-7" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_hot,data_content"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".security-7",
+        "format" : "6",
+        "creation_date" : "1737763538443",
+        "analysis" : {
+          "filter" : {
+            "email" : {
+              "type" : "pattern_capture",
+              "preserve_original" : "true",
+              "patterns" : [
+                "([^@]+)",
+                "(\\p{L}+)",
+                "(\\d+)",
+                "@(.+)"
+              ]
+            }
+          },
+          "analyzer" : {
+            "email" : {
+              "filter" : [
+                "email",
+                "lowercase",
+                "unique"
+              ],
+              "tokenizer" : "uax_url_email"
+            }
+          }
+        },
+        "priority" : "1000",
+        "number_of_replicas" : "0",
+        "uuid" : "Yd-hAIGPQSqbtKaYTvU4HA",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  "testindex" : {
+    "settings" : {
+      "index" : {
+        "number_of_shards" : "1",
+        "provided_name" : "testindex",
+        "number_of_replicas" : "1",
+        "uuid" : "ZhZrAICFSxKFtO2vbhz9Mg",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".ds-metrics-elastic_agent.elastic_agent-default-2025.01.25-000001" : {
+    "settings" : {
+      "index" : {
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "1000",
+            "ignore_dynamic_beyond_limit" : "true"
+          }
+        },
+        "hidden" : "true",
+        "time_series" : {
+          "end_time" : "2025-01-25T00:50:20.000Z",
+          "start_time" : "2025-01-24T22:06:08.000Z"
+        },
+        "provided_name" : ".ds-metrics-elastic_agent.elastic_agent-default-2025.01.25-000001",
+        "final_pipeline" : ".fleet_final_pipeline-1",
+        "number_of_replicas" : "1",
+        "routing_path" : [
+          "agent.id",
+          "component.id",
+          "metricset.name"
+        ],
+        "uuid" : "v8Oz8cazQg6RC8s8JCMgxA",
+        "lifecycle" : {
+          "name" : "metrics"
+        },
+        "mode" : "time_series",
+        "number_of_shards" : "1",
+        "default_pipeline" : "metrics-elastic_agent.elastic_agent-2.0.3"
+      }
+    }
+  },
+  ".internal.alerts-observability.threshold.alerts-default-000001" : {
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : ".alerts-ilm-policy",
+          "rollover_alias" : ".alerts-observability.threshold.alerts-default"
+        },
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "2500"
+          },
+          "ignore_malformed" : "true"
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".internal.alerts-observability.threshold.alerts-default-000001",
+        "creation_date" : "1737763539147",
+        "number_of_replicas" : "0",
+        "uuid" : "JnsYz7zwQ3adm29STLg0Gg",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".kibana_task_manager_8.17.0_001" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "1500"
+          }
+        },
+        "refresh_interval" : "1s",
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".kibana_task_manager_8.17.0_001",
+        "creation_date" : "1737763535525",
+        "priority" : "10",
+        "number_of_replicas" : "0",
+        "uuid" : "p8r199xyRCKiQW43g1mUVA",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".kibana_8.17.0_001" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "mapping" : {
+          "total_fields" : {
+            "limit" : "1500"
+          }
+        },
+        "refresh_interval" : "1s",
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".kibana_8.17.0_001",
+        "creation_date" : "1737763535561",
+        "priority" : "10",
+        "number_of_replicas" : "0",
+        "uuid" : "gwKwmerSSieac6sJzYuThw",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".ds-.logs-deprecation.elasticsearch-default-2025.01.25-000001" : {
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : ".deprecation-indexing-ilm-policy"
+        },
+        "codec" : "best_compression",
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_hot"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".ds-.logs-deprecation.elasticsearch-default-2025.01.25-000001",
+        "query" : {
+          "default_field" : [
+            "message"
+          ]
+        },
+        "creation_date" : "1737763525886",
+        "number_of_replicas" : "0",
+        "uuid" : "oylCfKmrRBSwgkZIZVsyyg",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".ds-ilm-history-7-2025.01.25-000001" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_hot"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".ds-ilm-history-7-2025.01.25-000001",
+        "creation_date" : "1737763530980",
+        "number_of_replicas" : "0",
+        "uuid" : "-YJZAr4dS9m3cLuLPDKmGg",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  },
+  ".fleet-policies-7" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".fleet-policies",
+        "creation_date" : "1737763550954",
+        "number_of_replicas" : "0",
+        "uuid" : "Izd-52p2SkeFGJO_A-oKyA",
+        "version" : {
+          "created" : "8521000"
+        }
+      }
+    }
+  }
+}

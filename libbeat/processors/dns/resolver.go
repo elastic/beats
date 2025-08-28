@@ -18,14 +18,16 @@
 package dns
 
 import (
+	"errors"
+	"math"
 	"net"
+	"net/netip"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/miekg/dns"
-	"github.com/pkg/errors"
 	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -34,20 +36,20 @@ import (
 
 const etcResolvConf = "/etc/resolv.conf"
 
-// PTR represents a DNS pointer record (IP to hostname).
-type PTR struct {
-	Host string // Hostname.
-	TTL  uint32 // Time to live in seconds.
+// result represents a DNS lookup result.
+type result struct {
+	Data []string // Hostname.
+	TTL  uint32   // Time to live in seconds.
 }
 
-// PTRResolver performs PTR record lookups.
-type PTRResolver interface {
-	LookupPTR(ip string) (*PTR, error)
+// resolver performs result record lookups.
+type resolver interface {
+	Lookup(q string, qt queryType) (*result, error)
 }
 
-// MiekgResolver is a PTRResolver that is implemented using github.com/miekg/dns
+// miekgResolver is a resolver that is implemented using github.com/miekg/dns
 // to send requests to DNS servers. It does not use the Go resolver.
-type MiekgResolver struct {
+type miekgResolver struct {
 	client  *dns.Client
 	servers []string
 
@@ -57,14 +59,14 @@ type MiekgResolver struct {
 }
 
 type nameserverStats struct {
-	success     *monitoring.Int // Number of responses from server.
-	failure     *monitoring.Int // Number of failures (e.g. I/O timeout) (not NXDOMAIN).
-	ptrResponse metrics.Sample  // Histogram of response times.
+	success         *monitoring.Int // Number of responses from server.
+	failure         *monitoring.Int // Number of failures (e.g. I/O timeout) (not NXDOMAIN).
+	requestDuration metrics.Sample  // Histogram of response times.
 }
 
-// NewMiekgResolver returns a new MiekgResolver. It returns an error if no
+// newMiekgResolver returns a new miekgResolver. It returns an error if no
 // nameserver are given and none can be read from /etc/resolv.conf.
-func NewMiekgResolver(reg *monitoring.Registry, timeout time.Duration, transport string, servers ...string) (*MiekgResolver, error) {
+func newMiekgResolver(reg *monitoring.Registry, timeout time.Duration, transport string, servers ...string) (*miekgResolver, error) {
 	// Use /etc/resolv.conf if no nameservers are given. (Won't work for Windows).
 	if len(servers) == 0 {
 		config, err := dns.ClientConfigFromFile(etcResolvConf)
@@ -76,6 +78,9 @@ func NewMiekgResolver(reg *monitoring.Registry, timeout time.Duration, transport
 
 	// Add port if one was not specified.
 	for i, s := range servers {
+		if isIPv6Address(s) {
+			s = "[" + s + "]" // Add brackets for IPv6 addresses.
+		}
 		if _, _, err := net.SplitHostPort(s); err != nil {
 			var withPort string
 			switch transport {
@@ -94,7 +99,7 @@ func NewMiekgResolver(reg *monitoring.Registry, timeout time.Duration, transport
 	}
 
 	if timeout == 0 {
-		timeout = defaultConfig.Timeout
+		timeout = defaultConfig().Timeout
 	}
 
 	var clientTransferType string
@@ -105,7 +110,7 @@ func NewMiekgResolver(reg *monitoring.Registry, timeout time.Duration, transport
 		clientTransferType = "udp"
 	}
 
-	return &MiekgResolver{
+	return &miekgResolver{
 		client: &dns.Client{
 			Net:     clientTransferType,
 			Timeout: timeout,
@@ -129,37 +134,42 @@ func (e *dnsError) Error() string {
 	return "dns: " + e.err
 }
 
-// LookupPTR performs a reverse lookup on the given IP address.
-func (res *MiekgResolver) LookupPTR(ip string) (*PTR, error) {
+// Lookup performs a DNS query.
+func (res *miekgResolver) Lookup(q string, qt queryType) (*result, error) {
 	if len(res.servers) == 0 {
 		return nil, errors.New("no dns servers configured")
 	}
 
-	// Create PTR (reverse) DNS request.
+	// Create DNS request.
 	m := new(dns.Msg)
-	arpa, err := dns.ReverseAddr(ip)
-	if err != nil {
-		return nil, err
+	switch qt {
+	case typePTR:
+		arpa, err := dns.ReverseAddr(q)
+		if err != nil {
+			return nil, err
+		}
+		m.SetQuestion(arpa, dns.TypePTR)
+	case typeA, typeAAAA, typeTXT:
+		m.SetQuestion(dns.Fqdn(q), uint16(qt))
 	}
-	m.SetQuestion(arpa, dns.TypePTR)
 	m.RecursionDesired = true
 
 	// Try the nameservers until we get a response.
-	var rtnErr error
+	var nameserverErr error
 	for _, server := range res.servers {
 		stats := res.getOrCreateNameserverStats(server)
 
 		r, rtt, err := res.client.Exchange(m, server)
 		if err != nil {
-			// Try next server if any. Otherwise return retErr.
-			rtnErr = err
+			// Try next server if any. Otherwise, return nameserverErr.
+			nameserverErr = err
 			stats.failure.Inc()
 			continue
 		}
 
 		// We got a response.
 		stats.success.Inc()
-		stats.ptrResponse.Update(int64(rtt))
+		stats.requestDuration.Update(int64(rtt))
 		if r.Rcode != dns.RcodeSuccess {
 			name, found := dns.RcodeToString[r.Rcode]
 			if !found {
@@ -168,27 +178,48 @@ func (res *MiekgResolver) LookupPTR(ip string) (*PTR, error) {
 			return nil, &dnsError{"nameserver " + server + " returned " + name}
 		}
 
+		var rtn result
+		rtn.TTL = math.MaxUint32
 		for _, a := range r.Answer {
-			if ptr, ok := a.(*dns.PTR); ok {
-				return &PTR{
-					Host: strings.TrimSuffix(ptr.Ptr, "."),
-					TTL:  ptr.Hdr.Ttl,
+			// Ignore records that don't match the query type.
+			if a.Header().Rrtype != uint16(qt) {
+				continue
+			}
+
+			switch rr := a.(type) {
+			case *dns.PTR:
+				return &result{
+					Data: []string{strings.TrimSuffix(rr.Ptr, ".")},
+					TTL:  rr.Hdr.Ttl,
 				}, nil
+			case *dns.A:
+				rtn.Data = append(rtn.Data, rr.A.String())
+				rtn.TTL = min(rtn.TTL, rr.Hdr.Ttl)
+			case *dns.AAAA:
+				rtn.Data = append(rtn.Data, rr.AAAA.String())
+				rtn.TTL = min(rtn.TTL, rr.Hdr.Ttl)
+			case *dns.TXT:
+				rtn.Data = append(rtn.Data, rr.Txt...)
+				rtn.TTL = min(rtn.TTL, rr.Hdr.Ttl)
 			}
 		}
 
-		return nil, &dnsError{"no PTR record was found in the response"}
+		if len(rtn.Data) == 0 {
+			return nil, &dnsError{"no " + qt.String() + " resource records were found in the response"}
+		}
+
+		return &rtn, nil
 	}
 
-	if rtnErr != nil {
-		return nil, rtnErr
+	if nameserverErr != nil {
+		return nil, nameserverErr
 	}
 
 	// This should never get here.
-	panic("LookupPTR should have returned a response.")
+	panic("dns resolver Lookup() should have returned a response.")
 }
 
-func (res *MiekgResolver) getOrCreateNameserverStats(ns string) *nameserverStats {
+func (res *miekgResolver) getOrCreateNameserverStats(ns string) *nameserverStats {
 	// Trim port.
 	ns = ns[:strings.LastIndex(ns, ":")]
 
@@ -210,15 +241,32 @@ func (res *MiekgResolver) getOrCreateNameserverStats(ns string) *nameserverStats
 	}
 
 	// Create stats for the nameserver.
-	reg := res.registry.NewRegistry(strings.Replace(ns, ".", "_", -1))
+	reg := res.registry.GetOrCreateRegistry(strings.Replace(ns, ".", "_", -1))
 	stats = &nameserverStats{
-		success:     monitoring.NewInt(reg, "success"),
-		failure:     monitoring.NewInt(reg, "failure"),
-		ptrResponse: metrics.NewUniformSample(1028),
+		success:         monitoring.NewInt(reg, "success"),
+		failure:         monitoring.NewInt(reg, "failure"),
+		requestDuration: metrics.NewUniformSample(1028),
 	}
-	adapter.NewGoMetrics(reg, "response.ptr", adapter.Accept).
-		Register("histogram", metrics.NewHistogram(stats.ptrResponse))
+
+	//nolint:errcheck // Register should never fail because this is a new empty registry.
+	adapter.NewGoMetrics(reg, "request_duration", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(stats.requestDuration))
 	res.nsStats[ns] = stats
 
 	return stats
+}
+
+func min(a, b uint32) uint32 {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func isIPv6Address(addr string) bool {
+	ip, err := netip.ParseAddr(addr)
+	if err != nil {
+		return false
+	}
+	return ip.Is6()
 }

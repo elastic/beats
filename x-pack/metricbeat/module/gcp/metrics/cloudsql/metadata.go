@@ -6,30 +6,58 @@ package cloudsql
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"google.golang.org/api/option"
 	sqladmin "google.golang.org/api/sqladmin/v1"
 
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP CloudSQL resource.
-func NewMetadataService(projectID, zone string, region string, regions []string, opt ...option.ClientOption) (gcp.MetadataService, error) {
-	return &metadataCollector{
-		projectID: projectID,
-		zone:      zone,
-		region:    region,
-		regions:   regions,
-		opt:       opt,
-		instances: make(map[string]*sqladmin.DatabaseInstance),
-		logger:    logp.NewLogger("metrics-cloudsql"),
-	}, nil
+func NewMetadataService(
+	ctx context.Context,
+	projectID, zone string,
+	region string,
+	regions []string,
+	organizationID, organizationName, projectName string,
+	cacheRegistry *gcp.CacheRegistry,
+	logger *logp.Logger,
+	opt ...option.ClientOption) (gcp.MetadataService, error) {
+	mc := &metadataCollector{
+		projectID:        projectID,
+		projectName:      projectName,
+		organizationID:   organizationID,
+		organizationName: organizationName,
+		zone:             zone,
+		region:           region,
+		regions:          regions,
+		opt:              opt,
+		instanceCache:    cacheRegistry.CloudSQL,
+		logger:           logger.Named("metrics-cloudsql"),
+	}
+
+	// Freshen up the cache, later all we have to do is look up the instance
+	err := mc.instanceCache.EnsureFresh(func() (map[string]*sqladmin.DatabaseInstance, error) {
+		instances := make(map[string]*sqladmin.DatabaseInstance)
+		r := backoff.NewRetryer(3, time.Second, 30*time.Second)
+
+		err := r.Retry(ctx, func() error {
+			var err error
+			instances, err = mc.fetchCloudSQLInstances(ctx)
+			return err
+		})
+
+		return instances, err
+	})
+
+	return mc, err
 }
 
 // cloudsqlMetadata is an object to store data in between the extraction and the writing in the destination (to uncouple
@@ -47,15 +75,16 @@ type cloudsqlMetadata struct {
 }
 
 type metadataCollector struct {
-	projectID string
-	zone      string
-	region    string
-	regions   []string
-	opt       []option.ClientOption
-	// NOTE: instances holds data used for all metrics collected in a given period
-	// this avoids calling the remote endpoint for each metric, which would take a long time overall
-	instances map[string]*sqladmin.DatabaseInstance
-	logger    *logp.Logger
+	projectID        string
+	projectName      string
+	organizationID   string
+	organizationName string
+	zone             string
+	region           string
+	regions          []string
+	opt              []option.ClientOption
+	instanceCache    *gcp.Cache[*sqladmin.DatabaseInstance]
+	logger           *logp.Logger
 }
 
 func getDatabaseNameAndVersion(db string) mapstr.M {
@@ -92,7 +121,7 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 		return gcp.MetadataCollectorData{}, err
 	}
 
-	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp)
+	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp, s.organizationID, s.organizationName, s.projectName)
 
 	metadataCollectorData, err := stackdriverLabels.Metadata(ctx, resp)
 	if err != nil {
@@ -132,18 +161,14 @@ func (s *metadataCollector) instanceRegion(ts *monitoringpb.TimeSeries) string {
 
 // instanceMetadata returns the labels of an instance
 func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, region string) (*cloudsqlMetadata, error) {
-	instance, err := s.instance(ctx, instanceID)
-	if err != nil {
-		return nil, fmt.Errorf("error trying to get data from instance '%s' %w", instanceID, err)
-	}
-
 	cloudsqlMetadata := &cloudsqlMetadata{
 		instanceID: instanceID,
 		region:     region,
 	}
 
-	if instance == nil {
-		s.logger.Debugf("couldn't find instance %s, call sqladmin Instances.List", instanceID)
+	instance, ok := s.instanceCache.Get(instanceID)
+	if !ok {
+		s.logger.Warnf("Instance %s not found in cloudsql cache.", instanceID)
 		return cloudsqlMetadata, nil
 	}
 
@@ -158,58 +183,26 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, re
 	return cloudsqlMetadata, nil
 }
 
-func (s *metadataCollector) ID(ctx context.Context, in *gcp.MetadataCollectorInputData) (string, error) {
-	metadata, err := s.Metadata(ctx, in.TimeSeries)
-	if err != nil {
-		return "", err
-	}
-
-	metadata.ECS.Update(metadata.Labels)
-	if in.Timestamp != nil {
-		_, _ = metadata.ECS.Put("timestamp", in.Timestamp)
-	} else if in.Point != nil {
-		_, _ = metadata.ECS.Put("timestamp", in.Point.Interval.EndTime)
-	} else {
-		return "", errors.New("no timestamp information found")
-	}
-
-	return metadata.ECS.String(), nil
-}
-
-func (s *metadataCollector) instance(ctx context.Context, instanceName string) (*sqladmin.DatabaseInstance, error) {
-	s.getInstances(ctx)
-
-	instance, ok := s.instances[instanceName]
-	if ok {
-		return instance, nil
-	}
-
-	// Remake the compute instances map to avoid having stale data.
-	s.instances = make(map[string]*sqladmin.DatabaseInstance)
-
-	return nil, nil
-}
-
-func (s *metadataCollector) getInstances(ctx context.Context) {
-	if len(s.instances) > 0 {
-		return
-	}
-
+func (s *metadataCollector) fetchCloudSQLInstances(ctx context.Context) (map[string]*sqladmin.DatabaseInstance, error) {
 	s.logger.Debug("sqladmin Instances.List API")
 
 	service, err := sqladmin.NewService(ctx, s.opt...)
 	if err != nil {
 		s.logger.Errorf("error getting client from sqladmin service: %v", err)
-		return
+		return nil, err
 	}
+
+	fetchedInstances := make(map[string]*sqladmin.DatabaseInstance)
 
 	req := service.Instances.List(s.projectID)
 	if err := req.Pages(ctx, func(page *sqladmin.InstancesListResponse) error {
 		for _, instancesScopedList := range page.Items {
-			s.instances[fmt.Sprintf("%s:%s", instancesScopedList.Project, instancesScopedList.Name)] = instancesScopedList
+			fetchedInstances[fmt.Sprintf("%s:%s", instancesScopedList.Project, instancesScopedList.Name)] = instancesScopedList
 		}
 		return nil
 	}); err != nil {
 		s.logger.Errorf("sqladmin Instances.List error: %v", err)
 	}
+
+	return fetchedInstances, nil
 }

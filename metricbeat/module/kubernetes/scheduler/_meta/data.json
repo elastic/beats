@@ -7,22 +7,49 @@
     },
     "kubernetes": {
         "scheduler": {
-            "name": "RequestHeaderAuthRequestController",
-            "workqueue": {
-                "adds": {
-                    "count": 0
+            "process": {
+                "cpu": {
+                    "sec": 3
                 },
-                "depth": {
-                    "count": 0
+                "fds": {
+                    "max": {
+                        "count": 1048576
+                    },
+                    "open": {
+                        "count": 11
+                    }
                 },
-                "longestrunning": {
-                    "sec": 0
+                "memory": {
+                    "resident": {
+                        "bytes": 59043840
+                    },
+                    "virtual": {
+                        "bytes": 1317883904
+                    }
                 },
-                "retries": {
-                    "count": 0
-                },
-                "unfinished": {
-                    "sec": 0
+                "started": {
+                    "sec": 1714044432.82
+                }
+            },
+            "scheduling": {
+                "preemption": {
+                    "attempts": {
+                        "count": 1
+                    },
+                    "victims": {
+                        "bucket": {
+                            "+Inf": 0,
+                            "1": 0,
+                            "16": 0,
+                            "2": 0,
+                            "32": 0,
+                            "4": 0,
+                            "64": 0,
+                            "8": 0
+                        },
+                        "count": 0,
+                        "sum": 0
+                    }
                 }
             }
         }

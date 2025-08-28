@@ -3,14 +3,13 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package add_cloudfoundry_metadata
 
 import (
 	"fmt"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -36,7 +35,7 @@ type addCloudFoundryMetadata struct {
 const selector = "add_cloudfoundry_metadata"
 
 // New constructs a new add_cloudfoundry_metadata processor.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	var config cloudfoundry.Config
 
 	// ShardID is required in cloudfoundry config to consume from the firehose,
@@ -47,7 +46,7 @@ func New(cfg *conf.C) (beat.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
-	log := logp.NewLogger(selector)
+	log = log.Named(selector)
 	hub := cloudfoundry.NewHub(&config, "add_cloudfoundry_metadata", log)
 	client, err := hub.ClientWithCache()
 	if err != nil {

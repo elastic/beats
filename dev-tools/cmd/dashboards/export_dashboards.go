@@ -28,7 +28,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/kibana"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 var (
@@ -42,9 +44,10 @@ const (
 
 func main() {
 	kibanaURL := flag.String("kibana", "http://localhost:5601", "Kibana URL")
+	insecure := flag.Bool("insecure", false, "Disable TLS verification.")
 	spaceID := flag.String("space-id", "", "Space ID")
 	dashboard := flag.String("dashboard", "", "Dashboard ID")
-	fileOutput := flag.String("output", "", "Output NDJSON file, when exporting dashboards for Beats, please use -folder instead")
+	fileOutput := flag.String("output", "", "Output NDJSON file, when exporting dashboards for Beats, please use --folder instead")
 	folderOutput := flag.String("folder", "", "Output folder to save all assets to more human friendly JSON format")
 	ymlFile := flag.String("yml", "", "Path to the module.yml file containing the dashboards")
 	flag.BoolVar(&indexPattern, "indexPattern", false, "include index-pattern in output")
@@ -54,7 +57,7 @@ func main() {
 	log.SetFlags(0)
 
 	if len(*fileOutput) > 0 {
-		log.Fatalf("-output is configured, please use -folder flag instead to get the expected formatting of assets")
+		log.Fatalf("--output is configured, please use --folder flag instead to get the expected formatting of assets")
 	}
 
 	u, err := url.Parse(*kibanaURL)
@@ -71,6 +74,9 @@ func main() {
 	}
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = kibanaTimeout
+	if *insecure {
+		transport.TLS = &tlscommon.Config{VerificationMode: tlscommon.VerifyNone}
+	}
 
 	client, err := kibana.NewClientWithConfig(&kibana.ClientConfig{
 		Protocol:  u.Scheme,
@@ -87,14 +93,15 @@ func main() {
 
 	if len(*ymlFile) == 0 && len(*dashboard) == 0 {
 		flag.Usage()
-		log.Fatalf("Please specify a dashboard ID (-dashboard) or a manifest file (-yml)")
+		log.Fatalf("Please specify a dashboard ID (--dashboard) or a manifest file (--yml)")
 	}
 	if len(*folderOutput) == 0 {
-		log.Fatalf("Please specify a target folder using -folder flag")
+		log.Fatalf("Please specify a target folder using --folder flag")
 	}
 
+	logger, _ := logp.NewDevelopmentLogger("")
 	if len(*ymlFile) > 0 {
-		err = exportDashboardsFromYML(client, *ymlFile)
+		err = exportDashboardsFromYML(client, *ymlFile, logger)
 		if err != nil {
 			log.Fatalf("Failed to export dashboards from YML file: %v", err)
 		}
@@ -103,7 +110,7 @@ func main() {
 	}
 
 	if len(*dashboard) > 0 {
-		err = exportSingleDashboard(client, *dashboard, *folderOutput)
+		err = exportSingleDashboard(client, *dashboard, *folderOutput, logger)
 		if err != nil {
 			log.Fatalf("Failed to export the dashboard: %v", err)
 		}
@@ -114,14 +121,14 @@ func main() {
 	}
 }
 
-func exportDashboardsFromYML(client *kibana.Client, ymlFile string) error {
+func exportDashboardsFromYML(client *kibana.Client, ymlFile string, logger *logp.Logger) error {
 	results, info, err := dashboards.ExportAllFromYml(client, ymlFile)
 	if err != nil {
 		return err
 	}
 	for i, r := range results {
 		log.Printf("id=%s, name=%s\n", info.Dashboards[i].ID, info.Dashboards[i].File)
-		r = dashboards.DecodeExported(r)
+		r = dashboards.DecodeExported(r, logger)
 		err = dashboards.SaveToFile(r, info.Dashboards[i].File, filepath.Dir(ymlFile), client.GetVersion())
 		if err != nil {
 			return err
@@ -130,11 +137,11 @@ func exportDashboardsFromYML(client *kibana.Client, ymlFile string) error {
 	return nil
 }
 
-func exportSingleDashboard(client *kibana.Client, dashboard, folder string) error {
+func exportSingleDashboard(client *kibana.Client, dashboard, folder string, logger *logp.Logger) error {
 	result, err := dashboards.Export(client, dashboard)
 	if err != nil {
-		return fmt.Errorf("failed to export the dashboard: %+v", err)
+		return fmt.Errorf("failed to export the dashboard: %w", err)
 	}
-	result = dashboards.DecodeExported(result)
+	result = dashboards.DecodeExported(result, logger)
 	return dashboards.SaveToFolder(result, folder, client.GetVersion())
 }

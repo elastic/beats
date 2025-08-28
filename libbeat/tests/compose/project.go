@@ -15,17 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
+
 package compose
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"syscall"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -92,6 +93,7 @@ type Driver interface {
 	Kill(ctx context.Context, signal string, service string) error
 	KillOld(ctx context.Context, except []string) error
 	Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error)
+	Remove(ctx context.Context, service string, force bool) error
 	Inspect(ctx context.Context, serviceName string) (string, error)
 
 	LockFile() string
@@ -112,23 +114,24 @@ type ContainerStatus interface {
 // Project is a docker-compose project
 type Project struct {
 	Driver
+	logger *logp.Logger
 }
 
 // NewProject creates a new docker-compose project
-func NewProject(name string, files []string) (*Project, error) {
+func NewProject(name string, files []string, logger *logp.Logger) (*Project, error) {
 	if len(files) == 0 {
 		return nil, errors.New("project needs at least one file")
 	}
 	if name == "" {
 		name = filepath.Base(filepath.Dir(files[0]))
 	}
-	driver, err := newWrapperDriver()
+	driver, err := newWrapperDriver(logger)
 	if err != nil {
 		return nil, err
 	}
 	driver.Name = name
 	driver.Files = files
-	return &Project{Driver: driver}, nil
+	return &Project{Driver: driver, logger: logger}, nil
 }
 
 // Start the container, unless it's running already
@@ -148,7 +151,7 @@ func (c *Project) Start(service string, options UpOptions) error {
 	c.Lock()
 	defer c.Unlock()
 
-	return c.Driver.Up(context.Background(), options, service)
+	return c.Up(context.Background(), options, service)
 }
 
 // Wait ensures all wanted services are healthy. Wait loop (60s timeout)
@@ -195,12 +198,12 @@ func (c *Project) HostInformation(service string) (ServiceInfo, error) {
 	}
 
 	if len(servicesStatus) == 0 {
-		return nil, errors.New("no container running for service")
+		return nil, fmt.Errorf("no container running for service: %s", service)
 	}
 
 	status, ok := servicesStatus[service]
 	if !ok || status.Host() == "" {
-		return nil, errors.New("unknown host:port for service")
+		return nil, fmt.Errorf("unknown host:port for service: %s", service)
 	}
 
 	return status, nil
@@ -214,15 +217,24 @@ func (c *Project) Kill(service string) error {
 	return c.Driver.Kill(context.Background(), "KILL", service)
 }
 
-// KillOld kills old containers
+// Remove a container
+func (c *Project) Remove(service string, force bool) error {
+	c.Lock()
+	defer c.Unlock()
+
+	return c.Driver.Remove(context.Background(), service, force)
+}
+
+// KillOld kills and removes old containers.
 func (c *Project) KillOld(except []string) error {
 	// Do not kill ourselves ;)
 	except = append(except, "beat")
 
-	// These services take very long to start up and stop. If they are stopped
-	// it can happen that an other package tries to start them at the same time
-	// which leads to a conflict. We need a better solution long term but that should
-	// solve the problem for now.
+	// These services take very long to start up and stop. If they are stopped, one or more
+	// packages may try to start them at the same time which would lead to a conflict.
+	//
+	// NOTE: We need a better solution long term but the current implementation should solve
+	// the problem for now.
 	except = append(except, "elasticsearch", "kibana", "logstash", "kubernetes", "kafka")
 
 	return c.Driver.KillOld(context.TODO(), except)
@@ -246,27 +258,27 @@ func (c *Project) Lock() {
 	for time.Now().Before(timeout) {
 		if acquireLock(c.LockFile()) {
 			if infoShown {
-				logp.Info("%s lock acquired", c.LockFile())
+				c.logger.Infof("%s lock acquired", c.LockFile())
 			}
 			return
 		}
 
 		if stalledLock(c.LockFile()) {
 			if err := os.Remove(c.LockFile()); err == nil {
-				logp.Info("Stalled lockfile %s removed", c.LockFile())
+				c.logger.Infof("Stalled lockfile %s removed", c.LockFile())
 				continue
 			}
 		}
 
 		if !infoShown {
-			logp.Info("%s is locked, waiting", c.LockFile())
+			c.logger.Infof("%s is locked, waiting", c.LockFile())
 			infoShown = true
 		}
 		time.Sleep(1 * time.Second)
 	}
 
 	// This should rarely happen as we lock for start only, less than a second
-	panic(errors.New("Timeout waiting for lock"))
+	panic("timeout waiting for lock")
 }
 
 func acquireLock(path string) bool {
@@ -278,7 +290,7 @@ func acquireLock(path string) bool {
 
 	_, err = fmt.Fprintf(file, "%d", os.Getpid())
 	if err != nil {
-		panic(errors.Wrap(err, "Failed to write pid to lock file"))
+		panic(fmt.Errorf("failed to write pid to lock file: %w", err))
 	}
 	return true
 }
@@ -292,7 +304,10 @@ func stalledLock(path string) bool {
 	defer file.Close()
 
 	var pid int
-	fmt.Fscanf(file, "%d", &pid)
+	_, err = fmt.Fscanf(file, "%d", &pid)
+	if err != nil {
+		return false
+	}
 
 	return !processExists(pid)
 }
@@ -329,7 +344,7 @@ func (c *Project) getServices(filter ...string) (map[string]ServiceInfo, error) 
 	defer c.Unlock()
 
 	result := make(map[string]ServiceInfo)
-	services, err := c.Driver.Ps(context.Background(), filter...)
+	services, err := c.Ps(context.Background(), filter...)
 	if err != nil {
 		return nil, err
 	}
@@ -355,7 +370,7 @@ type containerServiceInfo struct {
 }
 
 func (i *containerServiceInfo) Name() string {
-	return i.ContainerStatus.ServiceName()
+	return i.ServiceName()
 }
 
 func contains(list []string, item string) bool {

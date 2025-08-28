@@ -12,6 +12,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Bluecoat module
 
+deprecated::[8.12.0,"This module is deprecated. See <<migrate-from-deprecated-module>> for migration options."]
+
 experimental[]
 
 include::{libbeat-dir}/shared/integration-link.asciidoc[]

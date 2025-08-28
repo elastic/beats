@@ -25,12 +25,10 @@ import (
 	"io"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/Shopify/sarama"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -42,29 +40,30 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/sarama"
 )
 
 const pluginName = "kafka"
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
-func Plugin() input.Plugin {
+func Plugin(log *logp.Logger) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "Kafka input",
 		Doc:        "The Kafka input consumes events from topics by connecting to the configured kafka brokers",
-		Manager:    input.ConfigureWith(configure),
+		Manager:    input.ConfigureWith(configure, log),
 	}
 }
 
-func configure(cfg *conf.C) (input.Input, error) {
+func configure(cfg *conf.C, logger *logp.Logger) (input.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
-	saramaConfig, err := newSaramaConfig(config)
+	saramaConfig, err := newSaramaConfig(config, logger)
 	if err != nil {
 		return nil, fmt.Errorf("initializing Sarama config: %w", err)
 	}
@@ -120,12 +119,12 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 				}
 			}),
 		),
-		CloseRef:  ctx.Cancelation,
 		WaitClose: input.config.WaitClose,
 	})
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 
 	log.Info("Starting Kafka input")
 	defer log.Info("Kafka input stopped")
@@ -309,7 +308,7 @@ func (h *groupHandler) ack(message *sarama.ConsumerMessage) {
 
 func (h *groupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	reader := h.createReader(claim)
-	parser := h.parsers.Create(reader)
+	parser := h.parsers.Create(reader, h.log)
 	for h.session.Context().Err() == nil {
 		message, err := parser.Next()
 		if errors.Is(err, io.EOF) {
@@ -392,9 +391,10 @@ func (l *listFromFieldReader) Next() (reader.Message, error) {
 	timestamp, kafkaFields := composeEventMetadata(l.claim, l.groupHandler, msg)
 	messages := l.parseMultipleMessages(msg.Value)
 
-	neededAcks := atomic.MakeInt(len(messages))
+	neededAcks := atomic.Int64{}
+	neededAcks.Add(int64(len(messages)))
 	ackHandler := func() {
-		if neededAcks.Dec() == 0 {
+		if neededAcks.Add(-1) == 0 {
 			l.groupHandler.ack(msg)
 		}
 	}

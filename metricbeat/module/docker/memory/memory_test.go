@@ -21,44 +21,68 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func TestMemoryService_GetMemoryStats(t *testing.T) {
-	//Container  + dockerstats
-	containerID := "containerID"
-	labels := map[string]string{
-		"label1":     "val1",
-		"label2":     "val2",
-		"label2.foo": "val3",
-	}
-	container := types.Container{
-		ID:         containerID,
-		Image:      "image",
-		Command:    "command",
-		Created:    123789,
-		Status:     "Up",
-		SizeRw:     123,
-		SizeRootFs: 456,
-		Names:      []string{"/name1", "name1/fake"},
-		Labels:     labels,
-	}
+var defaultContainerID = "containerID"
+
+var defaultLabels = map[string]string{
+	"label1":     "val1",
+	"label2":     "val2",
+	"label2.foo": "val3",
+}
+
+var defaultContainerStats = container.Summary{
+	ID:         defaultContainerID,
+	Image:      "image",
+	Command:    "command",
+	Created:    123789,
+	Status:     "Up",
+	SizeRw:     123,
+	SizeRootFs: 456,
+	Names:      []string{"/name1", "name1/fake"},
+	Labels:     defaultLabels,
+}
+
+func TestMemStatsV2(t *testing.T) {
+	// Test to make sure we don't report any RSS metrics where they don't exist
 	memoryService := &MemoryService{}
-	memorystats := getMemoryStats(time.Now(), 1)
+	memorystats := getMemoryStats(time.Now(), 1, false)
 
 	memoryRawStats := docker.Stat{}
-	memoryRawStats.Container = &container
+	memoryRawStats.Container = &defaultContainerStats
+	memoryRawStats.Stats = memorystats
+
+	rawStats := memoryService.getMemoryStats(memoryRawStats, false)
+	require.False(t, rawStats.TotalRss.Exists())
+	require.False(t, rawStats.TotalRssP.Exists())
+
+	r := &mbtest.CapturingReporterV2{}
+	eventMapping(r, &rawStats)
+	events := r.GetEvents()
+	require.NotContains(t, "rss", events[0].MetricSetFields)
+
+}
+
+func TestMemoryService_GetMemoryStats(t *testing.T) {
+
+	memoryService := &MemoryService{}
+	memorystats := getMemoryStats(time.Now(), 1, true)
+
+	memoryRawStats := docker.Stat{}
+	memoryRawStats.Container = &defaultContainerStats
 	memoryRawStats.Stats = memorystats
 
 	totalRSS := memorystats.MemoryStats.Stats["total_rss"]
 	expectedRootFields := mapstr.M{
 		"container": mapstr.M{
-			"id":   containerID,
+			"id":   defaultContainerID,
 			"name": "name1",
 			"image": mapstr.M{
 				"name": "image",
@@ -113,64 +137,60 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 
 func TestMemoryServiceBadData(t *testing.T) {
 
-	badMemStats := types.StatsJSON{
-		Stats: types.Stats{
-			Read:        time.Now(),
-			MemoryStats: types.MemoryStats{}, //Test for cases where this is empty
-		},
+	badMemStats := container.StatsResponse{
+		Read:        time.Now(),
+		MemoryStats: container.MemoryStats{}, //Test for cases where this is empty
 	}
 
 	memoryService := &MemoryService{}
-	memoryRawStats := []docker.Stat{docker.Stat{Stats: badMemStats}}
+	memoryRawStats := []docker.Stat{{Stats: badMemStats}}
 	rawStats := memoryService.getMemoryStatsList(memoryRawStats, false)
 	assert.Len(t, rawStats, 0)
 
 }
 
 func TestMemoryMath(t *testing.T) {
-	memStats := types.StatsJSON{
-		Stats: types.Stats{
-			Read: time.Now(),
-			PreCPUStats: types.CPUStats{
-				CPUUsage: types.CPUUsage{
-					TotalUsage: 200,
-				},
+	memStats := container.StatsResponse{
+		Read: time.Now(),
+		PreCPUStats: container.CPUStats{
+			CPUUsage: container.CPUUsage{
+				TotalUsage: 200,
 			},
-			MemoryStats: types.MemoryStats{
-				Limit: 5,
-				Usage: 5000,
-				Stats: map[string]uint64{
-					"total_inactive_file": 1000, // CGV1
-					"inactive_file":       900,
-				},
-			}, //Test for cases where this is empty
 		},
+		MemoryStats: container.MemoryStats{
+			Limit: 5,
+			Usage: 5000,
+			Stats: map[string]uint64{
+				"total_inactive_file": 1000, // CGV1
+				"inactive_file":       900,
+			},
+		}, //Test for cases where this is empty
 	}
 
 	memoryService := &MemoryService{}
 	memoryRawStats := []docker.Stat{
-		docker.Stat{Stats: memStats, Container: &types.Container{Names: []string{"test-container"}, Labels: map[string]string{}}},
+		{Stats: memStats, Container: &container.Summary{Names: []string{"test-container"}, Labels: map[string]string{}}},
 	}
 	rawStats := memoryService.getMemoryStatsList(memoryRawStats, false)
 	assert.Equal(t, float64(800), rawStats[0].UsageP) // 5000-900 /5
 }
 
-func getMemoryStats(read time.Time, number uint64) types.StatsJSON {
+func getMemoryStats(read time.Time, number uint64, rssExists bool) container.StatsResponse {
 
-	myMemoryStats := types.StatsJSON{
-		Stats: types.Stats{
-			Read: read,
-			MemoryStats: types.MemoryStats{
-				MaxUsage: number,
-				Usage:    number * 2,
-				Failcnt:  number * 3,
-				Limit:    number * 4,
-				Stats:    map[string]uint64{},
-			},
+	myMemoryStats := container.StatsResponse{
+		Read: read,
+		MemoryStats: container.MemoryStats{
+			MaxUsage: number,
+			Usage:    number * 2,
+			Failcnt:  number * 3,
+			Limit:    number * 4,
+			Stats:    map[string]uint64{},
 		},
 	}
 
-	myMemoryStats.MemoryStats.Stats["total_rss"] = number * 5
+	if rssExists {
+		myMemoryStats.MemoryStats.Stats["total_rss"] = number * 5
+	}
 
 	return myMemoryStats
 }

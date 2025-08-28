@@ -59,14 +59,15 @@ var (
 				},
 			)),
 
-			"kube_pod_container_status_ready":                  p.BooleanMetric("status.ready"),
-			"kube_pod_container_status_restarts_total":         p.Metric("status.restarts"),
-			"kube_pod_container_status_running":                p.KeywordMetric("status.phase", "running"),
-			"kube_pod_container_status_terminated":             p.KeywordMetric("status.phase", "terminated"),
-			"kube_pod_container_status_waiting":                p.KeywordMetric("status.phase", "waiting"),
-			"kube_pod_container_status_terminated_reason":      p.LabelMetric("status.reason", "reason"),
-			"kube_pod_container_status_waiting_reason":         p.LabelMetric("status.reason", "reason"),
-			"kube_pod_container_status_last_terminated_reason": p.LabelMetric("status.last_terminated_reason", "reason"),
+			"kube_pod_container_status_ready":                     p.BooleanMetric("status.ready"),
+			"kube_pod_container_status_restarts_total":            p.Metric("status.restarts"),
+			"kube_pod_container_status_running":                   p.KeywordMetric("status.phase", "running"),
+			"kube_pod_container_status_terminated":                p.KeywordMetric("status.phase", "terminated"),
+			"kube_pod_container_status_waiting":                   p.KeywordMetric("status.phase", "waiting"),
+			"kube_pod_container_status_terminated_reason":         p.LabelMetric("status.reason", "reason"),
+			"kube_pod_container_status_waiting_reason":            p.LabelMetric("status.reason", "reason"),
+			"kube_pod_container_status_last_terminated_reason":    p.LabelMetric("status.last_terminated_reason", "reason"),
+			"kube_pod_container_status_last_terminated_timestamp": p.Metric("status.last_terminated_timestamp"),
 		},
 
 		Labels: map[string]p.LabelMap{
@@ -115,7 +116,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
-		enricher:      util.NewContainerMetadataEnricher(base, mod.GetMetricsRepo(), false),
+		enricher:      util.NewContainerMetadataEnricher(base, mod.GetMetricsRepo(), mod.GetResourceWatchers(), false),
 		mod:           mod,
 	}, nil
 }
@@ -124,7 +125,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	m.enricher.Start()
+	m.enricher.Start(m.mod.GetResourceWatchers())
 
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
@@ -146,7 +147,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			// empty string
 			cID, ok := (containerID).(string)
 			if !ok {
-				m.Logger().Debugf("Error while casting containerID: %s", ok)
+				m.Logger().Debugf("Error while casting containerID, got %T", containerID)
 			}
 			split := strings.Index(cID, "://")
 			if split != -1 {
@@ -161,7 +162,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if containerImage, ok := event["image"]; ok {
 			cImage, ok := (containerImage).(string)
 			if !ok {
-				m.Logger().Debugf("Error while casting containerImage: %s", ok)
+				m.Logger().Debugf("Error while casting containerImage, got %T", containerImage)
 			}
 
 			kubernetes.ShouldPut(containerFields, "image.name", cImage, m.Logger())
@@ -196,6 +197,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 // Close stops this metricset
 func (m *MetricSet) Close() error {
-	m.enricher.Stop()
+	m.enricher.Stop(m.mod.GetResourceWatchers())
 	return nil
 }

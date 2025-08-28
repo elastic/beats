@@ -22,6 +22,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
 	"github.com/elastic/go-ucfg/yaml"
@@ -34,8 +35,7 @@ import (
 var (
 	// Defaults used in the template
 	defaultDateDetection           = false
-	defaultTotalFieldsLimit        = 10000
-	defaultNumberOfRoutingShards   = 30
+	defaultTotalFieldsLimit        = 12500
 	defaultMaxDocvalueFieldsSearch = 200
 
 	defaultFields []string
@@ -52,18 +52,21 @@ type Template struct {
 	esVersion       version.V
 	config          TemplateConfig
 	migration       bool
-	order           int
 	priority        int
+	isServerless    bool
+	logger          *logp.Logger
 }
 
 // New creates a new template instance
 func New(
+	isServerless bool,
 	beatVersion string,
 	beatName string,
 	elasticLicensed bool,
 	esVersion version.V,
 	config TemplateConfig,
 	migration bool,
+	log *logp.Logger,
 ) (*Template, error) {
 	bV, err := version.New(beatVersion)
 	if err != nil {
@@ -137,6 +140,8 @@ func New(
 		config:          config,
 		migration:       migration,
 		priority:        config.Priority,
+		isServerless:    isServerless,
+		logger:          log,
 	}, nil
 }
 
@@ -198,6 +203,10 @@ func (t *Template) LoadMinimal() mapstr.M {
 			nil, nil,
 			mapstr.M(t.config.Settings.Source))
 	}
+	// delete default settings not available on serverless
+	if _, ok := t.config.Settings.Index["number_of_shards"]; ok && t.isServerless {
+		delete(t.config.Settings.Index, "number_of_shards")
+	}
 	templ["settings"] = mapstr.M{
 		"index": t.config.Settings.Index,
 	}
@@ -242,9 +251,14 @@ func (t *Template) generateComponent(properties, analyzers mapstr.M, dynamicTemp
 				"index": buildIdxSettings(
 					t.esVersion,
 					t.config.Settings.Index,
+					t.isServerless,
+					t.logger,
 				),
 			},
 		},
+	}
+	if len(t.config.Settings.Lifecycle) > 0 {
+		m.Put("template.lifecycle", t.config.Settings.Lifecycle)
 	}
 	if len(analyzers) != 0 {
 		m.Put("template.settings.analysis.analyzer", analyzers)
@@ -288,7 +302,7 @@ func buildDynTmpl(ver version.V) mapstr.M {
 	}
 }
 
-func buildIdxSettings(ver version.V, userSettings mapstr.M) mapstr.M {
+func buildIdxSettings(ver version.V, userSettings mapstr.M, isServerless bool, logger *logp.Logger) mapstr.M {
 	indexSettings := mapstr.M{
 		"refresh_interval": "5s",
 		"mapping": mapstr.M{
@@ -305,7 +319,13 @@ func buildIdxSettings(ver version.V, userSettings mapstr.M) mapstr.M {
 
 	indexSettings.Put("query.default_field", fields)
 
-	indexSettings.Put("max_docvalue_fields_search", defaultMaxDocvalueFieldsSearch)
+	// deal with settings that aren't available on serverless
+	if isServerless {
+		logger.Infof("remote instance is serverless, number_of_shards and max_docvalue_fields_search will be skipped in index template")
+		userSettings.Delete("number_of_shards")
+	} else {
+		indexSettings.Put("max_docvalue_fields_search", defaultMaxDocvalueFieldsSearch)
+	}
 
 	indexSettings.DeepUpdate(userSettings)
 	return indexSettings

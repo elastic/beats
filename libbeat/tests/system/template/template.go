@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/asset"
 	"github.com/elastic/beats/v7/libbeat/template"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
@@ -48,7 +49,7 @@ func testTemplateDefaultFieldLength(beatName string, elasticLicensed bool) func(
 		}
 
 		// Generate a template based on the embedded fields.yml data.
-		tmpl, err := template.New(version.GetDefaultVersion(), beatName, elasticLicensed, *esVersion, template.TemplateConfig{}, false)
+		tmpl, err := template.New(false, version.GetDefaultVersion(), beatName, elasticLicensed, *esVersion, template.TemplateConfig{}, false, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Fatal(err)
 		}

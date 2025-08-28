@@ -21,14 +21,12 @@ package cloudid
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"net/url"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const defaultCloudPort = "443"
@@ -81,12 +79,12 @@ func (c *CloudID) Password() string {
 func (c *CloudID) decode() error {
 	var err error
 	if err = c.decodeCloudID(); err != nil {
-		return errors.Wrapf(err, "invalid cloud id '%v'", c.id)
+		return fmt.Errorf("invalid cloud id '%v': %w", c.id, err)
 	}
 
 	if c.auth != "" {
 		if err = c.decodeCloudAuth(); err != nil {
-			return errors.Wrap(err, "invalid cloud auth")
+			return fmt.Errorf("invalid cloud auth: %w", err)
 		}
 	}
 
@@ -106,13 +104,13 @@ func (c *CloudID) decodeCloudID() error {
 	// 2. base64 decode
 	decoded, err := base64.StdEncoding.DecodeString(cloudID)
 	if err != nil {
-		return errors.Wrapf(err, "base64 decoding failed on %s", cloudID)
+		return fmt.Errorf("base64 decoding failed on %s: %w", cloudID, err)
 	}
 
 	// 3. separate based on `$`
 	words := strings.Split(string(decoded), "$")
 	if len(words) < 3 {
-		return errors.Errorf("Expected at least 3 parts in %s", string(decoded))
+		return fmt.Errorf("Expected at least 3 parts in %s", string(decoded))
 	}
 
 	// 4. extract port from the ES and Kibana host, or use 443 as the default
@@ -149,7 +147,6 @@ func (c *CloudID) decodeCloudAuth() error {
 // settings.
 func OverwriteSettings(cfg *config.C) error {
 
-	logger := logp.NewLogger("cloudid")
 	cloudID, _ := cfg.String("cloud.id", -1)
 	cloudAuth, _ := cfg.String("cloud.auth", -1)
 
@@ -158,7 +155,6 @@ func OverwriteSettings(cfg *config.C) error {
 		return nil
 	}
 
-	logger.Debugf("cloud.id: %s, cloud.auth: %s", cloudID, cloudAuth)
 	if cloudID == "" {
 		return errors.New("cloud.auth specified but cloud.id is empty. Please specify both")
 	}
@@ -166,10 +162,8 @@ func OverwriteSettings(cfg *config.C) error {
 	// cloudID overwrites
 	cid, err := NewCloudID(cloudID, cloudAuth)
 	if err != nil {
-		return errors.Errorf("Error decoding cloud.id: %v", err)
+		return fmt.Errorf("Error decoding cloud.id: %w", err)
 	}
-
-	logger.Infof("Setting Elasticsearch and Kibana URLs based on the cloud id: output.elasticsearch.hosts=%s and setup.kibana.host=%s", cid.esURL, cid.kibURL)
 
 	esURLConfig, err := config.NewConfigFrom([]string{cid.ElasticsearchURL()})
 	if err != nil {
@@ -184,7 +178,7 @@ func OverwriteSettings(cfg *config.C) error {
 		return err
 	}
 	if out := tmp.Output; out.IsSet() && out.Name() != "elasticsearch" {
-		return errors.Errorf("The cloud.id setting enables the Elasticsearch output, but you already have the %s output enabled in the config", out.Name())
+		return fmt.Errorf("The cloud.id setting enables the Elasticsearch output, but you already have the %s output enabled in the config", out.Name())
 	}
 
 	err = cfg.SetChild("output.elasticsearch.hosts", -1, esURLConfig)

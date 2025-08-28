@@ -6,6 +6,7 @@ filebeat.{{input_config | default("inputs")}}:
 {% endif %}
 {% if inputs %}
 - type: {{type | default("log") }}
+  allow_deprecated_use: true
   input_type: {{input_type_deprecated }}
   # Paths that should be crawled and fetched
   {% if path %}paths:

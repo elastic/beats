@@ -2,16 +2,19 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package gcppubsub
 
 import (
 	"context"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -23,11 +26,10 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 const (
@@ -43,7 +45,7 @@ func testSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 
 	var host string
 	if isInDockerIntegTestEnv() {
-		// We're running inside out integration test environment so
+		// We're running inside of integration test environment so
 		// make sure that that googlepubsub container is running.
 		host = compose.EnsureUp(t, "googlepubsub").Host()
 		os.Setenv("PUBSUB_EMULATOR_HOST", host)
@@ -57,7 +59,6 @@ func testSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 	}
 
 	once.Do(func() {
-		_ = logp.TestingSetup()
 
 		// Disable HTTP keep-alives to ensure no extra goroutines hang around.
 		httpClient := http.Client{Transport: &http.Transport{DisableKeepAlives: true}}
@@ -70,7 +71,7 @@ func testSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 		}
 		defer resp.Body.Close()
 
-		_, err = ioutil.ReadAll(resp.Body)
+		_, err = io.ReadAll(resp.Body)
 		if err != nil {
 			t.Fatal("failed to read response", err)
 		}
@@ -166,11 +167,11 @@ func publishMessages(t *testing.T, client *pubsub.Client, numMsgs int) []string 
 	return messageIDs
 }
 
-func createSubscription(t *testing.T, client *pubsub.Client) {
+func createSubscription(t *testing.T, subscription string, client *pubsub.Client) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	sub := client.Subscription(emulatorSubscription)
+	sub := client.Subscription(subscription)
 	exists, err := sub.Exists(ctx)
 	if err != nil {
 		t.Fatalf("failed to check if sub exists: %v", err)
@@ -179,7 +180,7 @@ func createSubscription(t *testing.T, client *pubsub.Client) {
 		return
 	}
 
-	sub, err = client.CreateSubscription(ctx, emulatorSubscription, pubsub.SubscriptionConfig{
+	sub, err = client.CreateSubscription(ctx, subscription, pubsub.SubscriptionConfig{
 		Topic: client.Topic(emulatorTopic),
 	})
 	if err != nil {
@@ -243,11 +244,15 @@ func runTestWithACKer(t *testing.T, cfg *conf.C, onEvent eventHandler, run func(
 		return eventOutlet, nil
 	})
 
-	in, err := NewInput(cfg, connector, inputCtx)
+	logger := logptest.NewTestingLogger(t, "")
+	in, err := NewInput(cfg, connector, inputCtx, logger)
 	if err != nil {
 		t.Fatal(err)
 	}
+	//nolint:errcheck // ignore
 	pubsubInput := in.(*pubsubInput)
+	// Initialize metrics explicitly for tests
+	pubsubInput.metrics = newInputMetrics("", nil)
 	defer pubsubInput.Stop()
 
 	run(client, pubsubInput, eventOutlet, t)
@@ -364,7 +369,7 @@ func TestSubscriptionExists(t *testing.T) {
 
 	runTest(t, cfg, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
 		createTopic(t, client)
-		createSubscription(t, client)
+		createSubscription(t, emulatorSubscription, client)
 		publishMessages(t, client, 5)
 
 		var group errgroup.Group
@@ -421,13 +426,14 @@ func TestRunStop(t *testing.T) {
 func TestEndToEndACK(t *testing.T) {
 	cfg := defaultTestConfig()
 
-	var count atomic.Int
+	var count atomic.Int64
 	seen := make(map[string]struct{})
 	// ACK every other message
 	halfAcker := func(ev beat.Event, clientConfig beat.ClientConfig) bool {
+		//nolint:errcheck // ignore
 		msg := ev.Private.(*pubsub.Message)
 		seen[msg.ID] = struct{}{}
-		if count.Inc()&1 != 0 {
+		if count.Add(1)&1 != 0 {
 			// Nack will result in the Message being redelivered more quickly than if it were allowed to expire.
 			msg.Nack()
 			return false
@@ -437,7 +443,7 @@ func TestEndToEndACK(t *testing.T) {
 
 	runTestWithACKer(t, cfg, halfAcker, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
 		createTopic(t, client)
-		createSubscription(t, client)
+		createSubscription(t, emulatorSubscription, client)
 
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
@@ -453,6 +459,7 @@ func TestEndToEndACK(t *testing.T) {
 		assert.Len(t, events, len(seen))
 		got := make(map[string]struct{})
 		for _, ev := range events {
+			//nolint:errcheck // ignore
 			msg := ev.Private.(*pubsub.Message)
 			got[msg.ID] = struct{}{}
 		}
@@ -460,6 +467,9 @@ func TestEndToEndACK(t *testing.T) {
 			_, exists := got[id]
 			assert.True(t, exists)
 		}
+
+		assert.EqualValues(t, input.metrics.ackedMessageCount.Get(), len(seen))
+
 		input.Stop()
 		out.Close()
 		if err := group.Wait(); err != nil {

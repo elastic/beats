@@ -20,8 +20,6 @@ package udp
 import (
 	"net"
 
-	"github.com/dustin/go-humanize"
-
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/dgram"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -37,37 +35,46 @@ type Server struct {
 	config *Config
 
 	localaddress string
+	logger       *logp.Logger
 }
 
 // New returns a new UDPServer instance.
-func New(config *Config, callback inputsource.NetworkFunc) *Server {
-	server := &Server{config: config}
-	log := logp.NewLogger("udp").With("address", config.Host)
-	factory := dgram.DatagramReaderFactory(inputsource.FamilyUDP, log, callback)
+func New(config *Config, callback inputsource.NetworkFunc, logger *logp.Logger) *Server {
+	server := &Server{config: config, logger: logger}
+	factory := dgram.DatagramReaderFactory(inputsource.FamilyUDP, logger, callback)
 	server.Listener = dgram.NewListener(inputsource.FamilyUDP, config.Host, factory, server.createConn, &dgram.ListenerConfig{
 		Timeout:        config.Timeout,
 		MaxMessageSize: config.MaxMessageSize,
-	})
+	}, logger)
 	return server
 }
 
 func (u *Server) createConn() (net.PacketConn, error) {
 	var err error
-	udpAdddr, err := net.ResolveUDPAddr("udp", u.config.Host)
+	network := u.network()
+	udpAdddr, err := net.ResolveUDPAddr(network, u.config.Host)
 	if err != nil {
 		return nil, err
 	}
-	listener, err := net.ListenUDP("udp", udpAdddr)
+	listener, err := net.ListenUDP(network, udpAdddr)
 	if err != nil {
 		return nil, err
 	}
-	socketSize := int(u.config.ReadBuffer) * humanize.KiByte
-	if socketSize != 0 {
+
+	if int(u.config.ReadBuffer) != 0 {
 		if err := listener.SetReadBuffer(int(u.config.ReadBuffer)); err != nil {
 			return nil, err
 		}
 	}
+
 	u.localaddress = listener.LocalAddr().String()
 
 	return listener, err
+}
+
+func (u *Server) network() string {
+	if u.config.Network != "" {
+		return u.config.Network
+	}
+	return networkUDP
 }

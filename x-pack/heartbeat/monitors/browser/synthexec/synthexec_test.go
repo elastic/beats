@@ -2,22 +2,24 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build linux || darwin
-// +build linux darwin
+//go:build linux || synthetics
 
 package synthexec
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"testing"
 	"time"
 
-	"github.com/go-test/deep"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/stretchr/testify/require"
 )
 
@@ -91,11 +93,34 @@ func TestJsonToSynthEvent(t *testing.T) {
 				require.NoError(t, err, "for line %s", tt.line)
 			}
 
-			if diff := deep.Equal(gotRes, tt.synthEvent); diff != nil {
+			if diff := cmp.Diff(gotRes, tt.synthEvent, cmpopts.IgnoreUnexported(SynthEvent{})); diff != "" {
 				t.Error(diff)
 			}
 		})
 	}
+}
+
+var emptyStringRegexp = regexp.MustCompile(`^\s*$`)
+
+// jsonToSynthEvent can take a line from the scanner and transform it into a *SynthEvent. Will return
+// nil res on empty lines.
+func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
+	// Skip empty lines
+	if emptyStringRegexp.Match(bytes) {
+		return nil, nil
+	}
+
+	res = &SynthEvent{}
+	err = json.Unmarshal(bytes, res)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if res.Type == "" {
+		return nil, fmt.Errorf("unmarshal succeeded, but no type found for: %s", text)
+	}
+	return res, err
 }
 
 func goCmd(args ...string) *exec.Cmd {
@@ -182,9 +207,9 @@ func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string, cmdTimeout time
 	cwd, err := os.Getwd()
 	require.NoError(t, err)
 	cmd.Dir = filepath.Join(cwd, "testcmd")
-	ctx := context.WithValue(context.TODO(), SynthexecTimeout, cmdTimeout)
+	ctx := context.WithValue(context.TODO(), SynthexecTimeoutKey, cmdTimeout)
 
-	mpx, err := runCmd(ctx, cmd, &stdinStr, nil, FilterJourneyConfig{})
+	mpx, err := runCmd(ctx, &SynthCmd{cmd}, &stdinStr, nil, FilterJourneyConfig{})
 	require.NoError(t, err)
 
 	var synthEvents []*SynthEvent

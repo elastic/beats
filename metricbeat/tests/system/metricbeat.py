@@ -136,6 +136,11 @@ class BaseTest(TestCase):
 
         self.assert_fields_are_documented(evt)
 
+    def remove_fields(self, event: object, fields: list):
+        for field in fields:
+            if field in event:
+                del event[field]
+
 
 def supported_versions(path):
     """

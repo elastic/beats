@@ -21,12 +21,12 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-
+	"net/url"
+	"regexp"
 	"strconv"
-	"strings"
 	"time"
 
-	"github.com/pkg/errors"
+	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -46,22 +46,25 @@ type sqlRow interface {
 
 // NewDBClient gets a client ready to query the database
 func NewDBClient(driver, uri string, l *logp.Logger) (*DbClient, error) {
-	dbx, err := sql.Open(switchDriverName(driver), uri)
+	dbx, err := sql.Open(SwitchDriverName(driver), uri)
 	if err != nil {
-		return nil, errors.Wrap(err, "opening connection")
+		return nil, fmt.Errorf("opening connection: %w", err)
 	}
 	err = dbx.Ping()
 	if err != nil {
 		if closeErr := dbx.Close(); closeErr != nil {
-			return nil, errors.Wrapf(err, "failed to close with %s, after connection test failed", closeErr)
+			// NOTE(SS): Support for wrapping multiple errors is there in Go 1.20+.
+			// TODO(SS): When beats module starts using Go 1.20+, use: https://pkg.go.dev/errors#Join
+			// and until then, let's use the following workaround.
+			return nil, fmt.Errorf(fmt.Sprintf("failed to close with: %s", closeErr.Error())+" after connection test failed: %w", err)
 		}
-		return nil, errors.Wrap(err, "testing connection")
+		return nil, fmt.Errorf("testing connection: %w", err)
 	}
 
 	return &DbClient{DB: dbx, logger: l}, nil
 }
 
-// fetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
+// FetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
 func (d *DbClient) FetchTableMode(ctx context.Context, q string) ([]mapstr.M, error) {
 	rows, err := d.QueryContext(ctx, q)
 	if err != nil {
@@ -76,7 +79,7 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 	// https://stackoverflow.com/questions/23507531/is-golangs-sql-package-incapable-of-ad-hoc-exploratory-queries/23507765#23507765
 	cols, err := rows.Columns()
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting columns")
+		return nil, fmt.Errorf("error getting columns: %w", err)
 	}
 
 	for k, v := range cols {
@@ -92,14 +95,14 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 	for rows.Next() {
 		err = rows.Scan(vals...)
 		if err != nil {
-			d.logger.Debug(errors.Wrap(err, "error trying to scan rows"))
+			d.logger.Debug(fmt.Errorf("error trying to scan rows: %w", err))
 			continue
 		}
 
 		r := mapstr.M{}
 
 		for i, c := range cols {
-			value := getValue(vals[i].(*interface{}))
+			value := getValue(vals[i].(*interface{})) //nolint:errcheck // getValue does not return an error. Each element is guaranteed to be *interface{}.
 			r.Put(c, value)
 		}
 
@@ -107,13 +110,13 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 	}
 
 	if err = rows.Err(); err != nil {
-		d.logger.Debug(errors.Wrap(err, "error trying to read rows"))
+		d.logger.Debug(fmt.Errorf("error trying to read rows: %w", err))
 	}
 
 	return rr, nil
 }
 
-// fetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
+// FetchVariableMode executes the provided SQL query and returns the results in a key/value format.
 func (d *DbClient) FetchVariableMode(ctx context.Context, q string) (mapstr.M, error) {
 	rows, err := d.QueryContext(ctx, q)
 	if err != nil {
@@ -122,7 +125,7 @@ func (d *DbClient) FetchVariableMode(ctx context.Context, q string) (mapstr.M, e
 	return d.fetchVariableMode(rows)
 }
 
-// fetchVariableMode scan the rows and publishes the event for querys that return the response in a key/value format.
+// fetchVariableMode scans the provided SQL rows and returns the results in a key/value format.
 func (d *DbClient) fetchVariableMode(rows sqlRow) (mapstr.M, error) {
 	data := mapstr.M{}
 
@@ -131,7 +134,7 @@ func (d *DbClient) fetchVariableMode(rows sqlRow) (mapstr.M, error) {
 		var val interface{}
 		err := rows.Scan(&key, &val)
 		if err != nil {
-			d.logger.Debug(errors.Wrap(err, "error trying to scan rows"))
+			d.logger.Debug(fmt.Errorf("error trying to scan rows: %w", err))
 			continue
 		}
 
@@ -140,13 +143,14 @@ func (d *DbClient) fetchVariableMode(rows sqlRow) (mapstr.M, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		d.logger.Debug(errors.Wrap(err, "error trying to read rows"))
+		d.logger.Debug(fmt.Errorf("error trying to read rows: %w", err))
 	}
 
 	r := mapstr.M{}
 
 	for key, value := range data {
-		value := getValue(&value)
+		value := value
+		value = getValue(&value)
 		r.Put(key, value)
 	}
 
@@ -158,40 +162,41 @@ func (d *DbClient) fetchVariableMode(rows sqlRow) (mapstr.M, error) {
 func ReplaceUnderscores(ms mapstr.M) mapstr.M {
 	dotMap := mapstr.M{}
 	for k, v := range ms {
-		dotMap.Put(strings.Replace(k, "_", ".", -1), v)
+		dotMap.Put(strings.ReplaceAll(k, "_", "."), v)
 	}
 
 	return dotMap
 }
 
 func getValue(pval *interface{}) interface{} {
+	if pval == nil {
+		return nil
+	}
+
 	switch v := (*pval).(type) {
-	case nil, bool:
+	case nil, bool, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, string, []interface{}:
 		return v
 	case []byte:
-		s := string(v)
-		num, err := strconv.ParseFloat(s, 64)
-		if err == nil {
-			return num
-		}
-		return s
+		return string(v)
 	case time.Time:
 		return v.Format(time.RFC3339Nano)
-	case []interface{}:
-		return v
 	default:
+		// For any other types, convert to string and try to parse as number
 		s := fmt.Sprint(v)
-		num, err := strconv.ParseFloat(s, 64)
-		if err == nil {
+		if len(s) > 1 && s[0] == '0' && s[1] != '.' {
+			// Preserve string with leading zeros i.e., 00100 stays 00100
+			return s
+		}
+		if num, err := strconv.ParseFloat(s, 64); err == nil {
 			return num
 		}
 		return s
 	}
 }
 
-// switchDriverName switches between driver name and a pretty name for a driver. For example, 'oracle' driver is called
+// SwitchDriverName switches between driver name and a pretty name for a driver. For example, 'oracle' driver is called
 // 'godror' so this detail implementation must be hidden to the user, that should only choose and see 'oracle' as driver
-func switchDriverName(d string) string {
+func SwitchDriverName(d string) string {
 	switch d {
 	case "oracle":
 		return "godror"
@@ -204,4 +209,87 @@ func switchDriverName(d string) string {
 	}
 
 	return d
+}
+
+// sqlSanitizedError is an internal error type for SanitizeError function to support both error message replacing and error wrapping
+type sqlSanitizedError struct {
+	sanitized string
+	err       error
+}
+
+func (err *sqlSanitizedError) Error() string {
+	return err.sanitized
+}
+
+func (err *sqlSanitizedError) Unwrap() error {
+	return err.err
+}
+
+const redacted = "(redacted)"
+
+var patterns = []struct {
+	re   *regexp.Regexp
+	repl string
+}{
+	// scheme://user:password@host -> redact password
+	{regexp.MustCompile(`([a-z][a-z0-9+\.\-]*://[^:/?#\s]+):([^@/\s]+)@`), `$1:` + redacted + `@`},
+	// user:password@... (no scheme), common in MySQL DSNs like user:pass@tcp(...)
+	// Important: Disallow '/' in the password part to avoid matching URI schemes like "postgres://..."
+	{regexp.MustCompile(`(^|[\s'\"])([^:/@\s]+):([^@/\s]+)@`), `$1$2:` + redacted + `@`},
+
+	// Key=Value forms (connection strings): handle quoted and unquoted values.
+	// Single-quoted values: Password='secret'; Token='abc';
+	{regexp.MustCompile(`(?i)\b(password|pwd|pass|passwd|token|secret)\b\s*=\s*'[^']*'`), `$1='` + redacted + `'`},
+	// Double-quoted values: Password="secret value";
+	{regexp.MustCompile(`(?i)\b(password|pwd|pass|passwd|token|secret)\b\s*=\s*"[^"]*"`), `$1="` + redacted + `"`},
+	// Unquoted values until delimiter or whitespace: Password=secret123; PASS=foo
+	{regexp.MustCompile(`(?i)\b(password|pwd|pass|passwd|token|secret)\b\s*=\s*[^;,#&\s]+`), `$1=` + redacted},
+
+	// JSON-style fields: {"password":"secret"}
+	{regexp.MustCompile(`(?i)"(password|pwd|pass|passwd|token|secret)"\s*:\s*"(?:[^"\\]|\\.)*"`), `"$1":"` + redacted + `"`},
+
+	// Query parameters in URLs: ?password=secret&...
+	{regexp.MustCompile(`(?i)([?&])(password|pwd|pass|passwd|token|secret)\s*=\s*([^&#\s]+)`), `$1$2=` + redacted},
+}
+
+// SanitizeError redacts sensitive information from an error's message, replacing it with "(redacted)".
+// It handles raw, quoted, and URL-encoded forms of the sensitive string, as well as common patterns
+// (e.g., passwords in URLs or DSNs). The returned error wraps the original error to preserve context
+// for errors.Is() and errors.As() checks.
+func SanitizeError(err error, sensitive string) error {
+	if err == nil {
+		return nil
+	}
+
+	msg := err.Error()
+
+	// First, replace the primary sensitive string if provided (raw, quoted, and URL-encoded forms)
+	if s := strings.TrimSpace(sensitive); s != "" {
+		// raw
+		msg = strings.ReplaceAll(msg, s, redacted)
+		// quoted (fmt %q style)
+		quoted := fmt.Sprintf("%q", s)
+		msg = strings.ReplaceAll(msg, quoted, redacted)
+		// URL-encoded (both query and path escaping just to be safe)
+		qEsc := url.QueryEscape(s)
+		if qEsc != s {
+			msg = strings.ReplaceAll(msg, qEsc, redacted)
+		}
+		pEsc := url.PathEscape(s)
+		if pEsc != s && pEsc != qEsc {
+			msg = strings.ReplaceAll(msg, pEsc, redacted)
+		}
+	}
+
+	// Pattern-based sanitization for common secrets in errors (URLs, DSNs, key/value strings, JSON, query params).
+	// Order matters: apply more specific URL userinfo patterns first.
+
+	for _, p := range patterns {
+		msg = p.re.ReplaceAllString(msg, p.repl)
+	}
+
+	return &sqlSanitizedError{
+		sanitized: msg,
+		err:       err,
+	}
 }

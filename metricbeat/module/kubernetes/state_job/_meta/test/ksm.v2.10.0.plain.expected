@@ -1,0 +1,81 @@
+[
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"completions": {
+				"desired": 1
+			},
+			"name": "hello",
+			"parallelism": {
+				"desired": 1
+			},
+			"pods": {
+				"active": 0,
+				"failed": 0,
+				"succeeded": 1
+			},
+			"status": {
+				"complete": "true"
+			},
+			"time": {
+				"completed": "2023-10-31T11:19:41.000Z",
+				"created": "2023-10-31T11:19:20.000Z"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"completions": {
+				"desired": 1
+			},
+			"name": "hello-28312520",
+			"owner": {
+				"is_controller": "true",
+				"kind": "CronJob",
+				"name": "hello"
+			},
+			"parallelism": {
+				"desired": 1
+			},
+			"pods": {
+				"active": 0,
+				"failed": 0,
+				"succeeded": 1
+			},
+			"status": {
+				"complete": "true"
+			},
+			"time": {
+				"completed": "2023-10-31T11:20:03.000Z",
+				"created": "2023-10-31T11:20:00.000Z"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]

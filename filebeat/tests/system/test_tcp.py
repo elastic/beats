@@ -37,7 +37,13 @@ class Test(BaseTest):
         """
         self.send_events_with_rfc6587_framing("octet")
 
-    def send_events_with_delimiter(self, delimiter):
+    def test_tcp_with_wildcard_address(self):
+        """
+        Test TCP input with it binding to the wildcard address 0.0.0.0.
+        """
+        self.send_events_with_delimiter("\n", bind="0.0.0.0")
+
+    def send_events_with_delimiter(self, delimiter, bind="127.0.0.1"):
         host = "127.0.0.1"
         port = 8080
         input_raw = """
@@ -50,7 +56,7 @@ class Test(BaseTest):
         if delimiter != "":
             input_raw += "\n  line_delimiter: {}".format(delimiter)
 
-        input_raw = input_raw.format(host, port)
+        input_raw = input_raw.format(bind, port)
 
         self.render_config_template(
             input_raw=input_raw,

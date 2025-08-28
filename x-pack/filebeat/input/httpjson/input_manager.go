@@ -13,6 +13,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -26,7 +27,7 @@ type InputManager struct {
 
 var _ v2.InputManager = InputManager{}
 
-func NewInputManager(log *logp.Logger, store inputcursor.StateStore) InputManager {
+func NewInputManager(log *logp.Logger, store statestore.States) InputManager {
 	sim := stateless.NewInputManager(statelessConfigure)
 	return InputManager{
 		stateless: &sim,
@@ -40,15 +41,10 @@ func NewInputManager(log *logp.Logger, store inputcursor.StateStore) InputManage
 }
 
 // Init initializes both wrapped input managers.
-func (m InputManager) Init(grp unison.Group, mode v2.Mode) error {
-	registerRequestTransforms()
-	registerResponseTransforms()
-	registerPaginationTransforms()
-	registerEncoders()
-	registerDecoders()
+func (m InputManager) Init(grp unison.Group) error {
 	return multierr.Append(
-		m.stateless.Init(grp, mode),
-		m.cursor.Init(grp, mode),
+		m.stateless.Init(grp),
+		m.cursor.Init(grp),
 	)
 }
 

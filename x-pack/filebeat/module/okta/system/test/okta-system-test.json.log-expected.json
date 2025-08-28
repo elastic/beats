@@ -99,7 +99,7 @@
         "user_agent.os.full": "Mac OS X 10.15",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.15",
-        "user_agent.version": "72.0."
+        "user_agent.version": "72.0"
     },
     {
         "@timestamp": "2020-02-14T20:18:57.718Z",
@@ -201,7 +201,7 @@
         "user_agent.os.full": "Mac OS X 10.15",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.15",
-        "user_agent.version": "72.0."
+        "user_agent.version": "72.0"
     },
     {
         "@timestamp": "2020-02-14T20:18:57.762Z",
@@ -316,7 +316,7 @@
         "user_agent.os.full": "Mac OS X 10.15",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.15",
-        "user_agent.version": "72.0."
+        "user_agent.version": "72.0"
     },
     {
         "@timestamp": "2020-02-14T20:18:57.762Z",
@@ -453,7 +453,7 @@
         "user_agent.os.full": "Mac OS X 10.15",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.15",
-        "user_agent.version": "72.0."
+        "user_agent.version": "72.0"
     },
     {
         "@timestamp": "2020-02-14T20:18:57.762Z",
@@ -582,7 +582,7 @@
         "user_agent.os.full": "Mac OS X 10.15",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.15",
-        "user_agent.version": "72.0."
+        "user_agent.version": "72.0"
     },
     {
         "@timestamp": "2022-05-11T09:25:18.716Z",
@@ -1179,6 +1179,6 @@
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/109.0",
         "user_agent.os.name": "Linux",
-        "user_agent.version": "109.0."
+        "user_agent.version": "109.0"
     }
 ]

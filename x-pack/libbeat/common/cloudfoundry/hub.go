@@ -5,11 +5,11 @@
 package cloudfoundry
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -68,7 +68,7 @@ func (h *Hub) Client() (*cfclient.Client, error) {
 		UserAgent:         h.userAgent,
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating cloudfoundry client")
+		return nil, fmt.Errorf("error creating cloudfoundry client: %w", err)
 	}
 	if h.cfg.DopplerAddress != "" {
 		cf.Endpoint.DopplerEndpoint = h.cfg.DopplerAddress
@@ -129,9 +129,9 @@ func (h *Hub) DopplerConsumerFromClient(client *cfclient.Client, callbacks Doppl
 	if dopplerAddress == "" {
 		dopplerAddress = client.Endpoint.DopplerEndpoint
 	}
-	tlsConfig, err := tlscommon.LoadTLSConfig(h.cfg.Transport.TLS)
+	tlsConfig, err := tlscommon.LoadTLSConfig(h.cfg.Transport.TLS, h.log)
 	if err != nil {
-		return nil, errors.Wrap(err, "loading tls config")
+		return nil, fmt.Errorf("loading tls config: %w", err)
 	}
 	proxy := h.cfg.Transport.Proxy.ProxyFunc()
 
@@ -154,11 +154,11 @@ func (h *Hub) doerFromClient(client *cfclient.Client) (*authTokenDoer, error) {
 
 // httpClient returns an HTTP client configured with the configuration TLS.
 func (h *Hub) httpClient() (*http.Client, bool, error) {
-	httpClient, err := h.cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation())
+	httpClient, err := h.cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation(), httpcommon.WithLogger(h.log))
 	if err != nil {
 		return nil, false, err
 	}
 
-	tls, _ := tlscommon.LoadTLSConfig(h.cfg.Transport.TLS)
+	tls, _ := tlscommon.LoadTLSConfig(h.cfg.Transport.TLS, h.log)
 	return httpClient, tls.ToConfig().InsecureSkipVerify, nil
 }

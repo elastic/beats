@@ -18,6 +18,7 @@
 package dialchain
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"strconv"
@@ -49,27 +50,10 @@ func TCPDialer(to time.Duration) NetDialer {
 	return CreateNetDialer(to)
 }
 
-// UDPDialer creates a new NetDialer with constant event fields and default
-// connection timeout.
-// The fields parameter holds additional constants to be added to the final
-// event structure.
-//
-// The dialer will update the active events with:
-//
-//	{
-//	  "udp": {
-//	    "port": ...,
-//	    "rtt": { "connect": { "us": ... }}
-//	  }
-//	}
-func UDPDialer(to time.Duration) NetDialer {
-	return CreateNetDialer(to)
-}
-
 // CreateNetDialer returns a NetDialer with the given timeout.
 func CreateNetDialer(timeout time.Duration) NetDialer {
 	return func(event *beat.Event) (transport.Dialer, error) {
-		return makeDialer(func(network, address string) (net.Conn, error) {
+		return makeDialer(func(ctx context.Context, network, address string) (net.Conn, error) {
 			var namespace string
 
 			switch network {
@@ -100,7 +84,7 @@ func CreateNetDialer(timeout time.Duration) NetDialer {
 			dialer := &net.Dialer{Timeout: timeout}
 
 			start := time.Now()
-			conn, err := transport.DialWith(dialer, network, host, addresses, port)
+			conn, err := transport.DialWith(ctx, dialer, network, host, addresses, port)
 			if err != nil {
 				return nil, ecserr.NewCouldNotConnectErr(host, port, err)
 			}

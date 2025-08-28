@@ -18,12 +18,13 @@
 package helper
 
 import (
+	"fmt"
 	"sync"
 	"syscall"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/gosigar/sys/windows"
+
+	"errors"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -55,7 +56,7 @@ func enableSeDebugPrivilege() error {
 	}
 
 	if err = windows.EnableTokenPrivileges(token, windows.SeDebugPrivilege); err != nil {
-		return errors.Wrap(err, "EnableTokenPrivileges failed")
+		return fmt.Errorf("EnableTokenPrivileges failed: %w", err)
 	}
 
 	return nil
@@ -63,20 +64,20 @@ func enableSeDebugPrivilege() error {
 
 // CheckAndEnableSeDebugPrivilege checks if the process's token has the
 // SeDebugPrivilege and enables it if it is disabled.
-func CheckAndEnableSeDebugPrivilege() error {
+func CheckAndEnableSeDebugPrivilege(logger *logp.Logger) error {
 	var err error
 	once.Do(func() {
-		err = checkAndEnableSeDebugPrivilege()
+		err = checkAndEnableSeDebugPrivilege(logger)
 	})
 	return err
 }
 
-func checkAndEnableSeDebugPrivilege() error {
+func checkAndEnableSeDebugPrivilege(logger *logp.Logger) error {
 	info, err := windows.GetDebugInfo()
 	if err != nil {
-		return errors.Wrap(err, "GetDebugInfo failed")
+		return fmt.Errorf("GetDebugInfo failed: %w", err)
 	}
-	logp.Info("Metricbeat process and system info: %v", info)
+	logger.Infof("Metricbeat process and system info: %v", info)
 
 	seDebug, found := info.ProcessPrivs[windows.SeDebugPrivilege]
 	if !found {
@@ -84,17 +85,17 @@ func checkAndEnableSeDebugPrivilege() error {
 	}
 
 	if seDebug.Enabled {
-		logp.Info("SeDebugPrivilege is enabled. %v", seDebug)
+		logger.Infof("SeDebugPrivilege is enabled. %v", seDebug)
 		return nil
 	}
 
 	if err = enableSeDebugPrivilege(); err != nil {
-		logp.Warn("Failure while attempting to enable SeDebugPrivilege. %v", err)
+		logger.Warnf("Failure while attempting to enable SeDebugPrivilege. %v", err)
 	}
 
 	info, err = windows.GetDebugInfo()
 	if err != nil {
-		return errors.Wrap(err, "GetDebugInfo failed")
+		return fmt.Errorf("GetDebugInfo failed: %w", err)
 	}
 
 	seDebug, found = info.ProcessPrivs[windows.SeDebugPrivilege]
@@ -103,11 +104,11 @@ func checkAndEnableSeDebugPrivilege() error {
 	}
 
 	if !seDebug.Enabled {
-		return errors.Errorf("Metricbeat failed to enable the "+
+		return fmt.Errorf("Metricbeat failed to enable the "+
 			"SeDebugPrivilege, a Windows privilege that allows it to collect "+
 			"metrics from other processes. %v", seDebug)
 	}
 
-	logp.Info("SeDebugPrivilege is now enabled. %v", seDebug)
+	logger.Infof("SeDebugPrivilege is now enabled. %v", seDebug)
 	return nil
 }

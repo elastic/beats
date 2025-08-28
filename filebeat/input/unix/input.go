@@ -30,9 +30,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
@@ -98,10 +96,10 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	log.Info("Starting Unix socket input")
 	defer log.Info("Unix socket input stopped")
 
-	metrics := newInputMetrics(ctx.ID, s.config.Path, log)
-	defer metrics.close()
+	metrics := newInputMetrics(ctx.ID, ctx.MetricsRegistry, s.config.Path)
 
 	server, err := unix.New(log, &s.config.Config, func(data []byte, _ inputsource.NetworkMetadata) {
+		log.Debugw("Data received", "bytes", len(data))
 		evt := beat.Event{
 			Timestamp: time.Now(),
 			Fields: mapstr.M{
@@ -118,7 +116,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 		return err
 	}
 
-	log.Debugf("%s Input '%v' initialized", s.config.Config.SocketType, ctx.ID)
+	log.Debugf("%v Input '%v' initialized", s.config.Config.SocketType, ctx.ID)
 
 	err = server.Run(ctxtool.FromCanceller(ctx.Cancelation))
 
@@ -131,8 +129,6 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 
 // inputMetrics handles the input's metric reporting.
 type inputMetrics struct {
-	unregister func()
-
 	lastPacket time.Time
 
 	path           *monitoring.String // name of the socket path being monitored
@@ -144,13 +140,11 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for the unix socket processor. If id is empty
 // a nil inputMetric is returned.
-func newInputMetrics(id, path string, log *logp.Logger) *inputMetrics {
+func newInputMetrics(id string, reg *monitoring.Registry, path string) *inputMetrics {
 	if id == "" {
 		return nil
 	}
-	reg, unreg := inputmon.NewInputRegistry("unix", id, nil)
 	out := &inputMetrics{
-		unregister:     unreg,
 		path:           monitoring.NewString(reg, "path"),
 		packets:        monitoring.NewUint(reg, "received_events_total"),
 		bytes:          monitoring.NewUint(reg, "received_bytes_total"),
@@ -179,11 +173,4 @@ func (m *inputMetrics) log(data []byte, timestamp time.Time) {
 		m.arrivalPeriod.Update(timestamp.Sub(m.lastPacket).Nanoseconds())
 	}
 	m.lastPacket = timestamp
-}
-
-func (m *inputMetrics) close() {
-	if m == nil {
-		return
-	}
-	m.unregister()
 }

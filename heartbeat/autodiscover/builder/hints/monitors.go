@@ -34,10 +34,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func init() {
-	_ = autodiscover.Registry.AddBuilder("hints", NewHeartbeatHints)
-}
-
 const (
 	schedule   = "schedule"
 	hosts      = "hosts"
@@ -50,8 +46,16 @@ type heartbeatHints struct {
 	logger *logp.Logger
 }
 
+// InitializeModule initializes this module.
+func InitializeModule() {
+	err := autodiscover.Registry.AddBuilder("hints", NewHeartbeatHints)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `hints` builder"))
+	}
+}
+
 // NewHeartbeatHints builds a heartbeat hints builder
-func NewHeartbeatHints(cfg *conf.C) (autodiscover.Builder, error) {
+func NewHeartbeatHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(config)
 
@@ -59,7 +63,7 @@ func NewHeartbeatHints(cfg *conf.C) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	return &heartbeatHints{config, logp.L()}, nil
+	return &heartbeatHints{config, logger}, nil
 }
 
 // Create config based on input hints in the bus event
@@ -77,7 +81,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 	monitorConfig := hb.getRawConfigs(hints)
 
 	// If explicty disabled, return nothing
-	if utils.IsDisabled(hints, hb.config.Key) {
+	if utils.IsDisabled(hints, hb.config.Key, hb.logger) {
 		hb.logger.Warnf("heartbeat config disabled by hint: %+v", event)
 		return []*conf.C{}
 	}
@@ -101,7 +105,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 		}
 		hb.logger.Debugf("generated config %+v", configs)
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs)
+		return template.ApplyConfigTemplate(event, configs, hb.logger)
 	}
 
 	tempCfg := mapstr.M{}
@@ -120,7 +124,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 
 		h, err := hb.getHostsWithPort(monitor, port, podEvent)
 		if err != nil {
-			hb.logger.Warnf("unable to find valid hosts for %+v: %w", monitor, err)
+			hb.logger.Warnf("unable to find valid hosts for %+v: %v", monitor, err)
 			continue
 		}
 
@@ -131,16 +135,16 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 			hb.logger.Debugf("unable to create config from MapStr %+v", tempCfg)
 			return []*conf.C{}
 		}
-		hb.logger.Debugf("hints.builder", "generated config %+v", config)
+		hb.logger.Debugf("generated config %+v", config)
 		configs = append(configs, config)
 	}
 
 	// Apply information in event to the template to generate the final config
-	return template.ApplyConfigTemplate(event, configs)
+	return template.ApplyConfigTemplate(event, configs, hb.logger)
 }
 
 func (hb *heartbeatHints) getRawConfigs(hints mapstr.M) []mapstr.M {
-	return utils.GetHintAsConfigs(hints, hb.config.Key)
+	return utils.GetHintAsConfigs(hints, hb.config.Key, hb.logger)
 }
 
 func (hb *heartbeatHints) getProcessors(hints mapstr.M) []mapstr.M {
@@ -170,7 +174,7 @@ func (hb *heartbeatHints) getHostsWithPort(hints mapstr.M, port int, podEvent bo
 		return nil, fmt.Errorf("no hosts selected for port %d with hints: %+v", port, thosts)
 	}
 
-	var result []string
+	result := make([]string, 0, len(hostSet))
 	for host := range hostSet {
 		result = append(result, host)
 	}

@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 const (
@@ -40,6 +41,15 @@ type info struct {
 }
 
 func TestReceiveEventFromUDP(t *testing.T) {
+	// Excluding udp6 for now, since it fails in our CI
+	for _, network := range []string{networkUDP, networkUDP4} {
+		t.Run(network, func(t *testing.T) {
+			testReceiveEventFromUDPWithNetwork(t, network)
+		})
+	}
+}
+
+func testReceiveEventFromUDPWithNetwork(t *testing.T, network string) {
 	tests := []struct {
 		name     string
 		message  []byte
@@ -64,11 +74,12 @@ func TestReceiveEventFromUDP(t *testing.T) {
 		MaxMessageSize: maxMessageSize,
 		Timeout:        timeout,
 		ReadBuffer:     maxSocketSize,
+		Network:        network,
 	}
 	fn := func(message []byte, metadata inputsource.NetworkMetadata) {
 		ch <- info{message: message, mt: metadata}
 	}
-	s := New(config, fn)
+	s := New(config, fn, logptest.NewTestingLogger(t, ""))
 	err := s.Start()
 	if !assert.NoError(t, err) {
 		return
@@ -77,7 +88,7 @@ func TestReceiveEventFromUDP(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			conn, err := net.Dial("udp", s.localaddress)
+			conn, err := net.Dial(s.network(), s.localaddress)
 			if !assert.NoError(t, err) {
 				return
 			}

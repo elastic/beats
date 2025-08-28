@@ -18,7 +18,6 @@
 package filestream
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -28,6 +27,7 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type testFileIdentifierConfig struct {
@@ -35,12 +35,17 @@ type testFileIdentifierConfig struct {
 }
 
 func TestFileIdentifier(t *testing.T) {
-	t.Run("default file identifier", func(t *testing.T) {
-		identifier, err := newFileIdentifier(nil, "")
+	t.Run("native file identifier", func(t *testing.T) {
+		cfg := conf.MustNewConfigFrom(`native: ~`)
+		ns := conf.Namespace{}
+		if err := cfg.Unpack(&ns); err != nil {
+			t.Fatalf("cannot unpack config into conf.Namespace: %s", err)
+		}
+		identifier, err := newFileIdentifier(&ns, "", logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 		assert.Equal(t, DefaultIdentifierName, identifier.Name())
 
-		tmpFile, err := ioutil.TempFile("", "test_file_identifier_native")
+		tmpFile, err := os.CreateTemp("", "test_file_identifier_native")
 		if err != nil {
 			t.Fatalf("cannot create temporary file for test: %v", err)
 		}
@@ -52,19 +57,24 @@ func TestFileIdentifier(t *testing.T) {
 		}
 
 		src := identifier.GetSource(loginp.FSEvent{
-			NewPath: tmpFile.Name(),
-			Info:    fi,
+			NewPath:    tmpFile.Name(),
+			Descriptor: loginp.FileDescriptor{Info: file.ExtendFileInfo(fi)},
 		})
 
 		assert.Equal(t, identifier.Name()+"::"+file.GetOSState(fi).String(), src.Name())
 	})
 
-	t.Run("default file identifier with suffix", func(t *testing.T) {
-		identifier, err := newFileIdentifier(nil, "my-suffix")
+	t.Run("native file identifier with suffix", func(t *testing.T) {
+		cfg := conf.MustNewConfigFrom(`native: ~`)
+		ns := conf.Namespace{}
+		if err := cfg.Unpack(&ns); err != nil {
+			t.Fatalf("cannot unpack config into conf.Namespace: %s", err)
+		}
+		identifier, err := newFileIdentifier(&ns, "my-suffix", logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 		assert.Equal(t, DefaultIdentifierName, identifier.Name())
 
-		tmpFile, err := ioutil.TempFile("", "test_file_identifier_native")
+		tmpFile, err := os.CreateTemp("", "test_file_identifier_native")
 		if err != nil {
 			t.Fatalf("cannot create temporary file for test: %v", err)
 		}
@@ -76,8 +86,8 @@ func TestFileIdentifier(t *testing.T) {
 		}
 
 		src := identifier.GetSource(loginp.FSEvent{
-			NewPath: tmpFile.Name(),
-			Info:    fi,
+			NewPath:    tmpFile.Name(),
+			Descriptor: loginp.FileDescriptor{Info: file.ExtendFileInfo(fi)},
 		})
 
 		assert.Equal(t, identifier.Name()+"::"+file.GetOSState(fi).String()+"-my-suffix", src.Name())
@@ -93,7 +103,7 @@ func TestFileIdentifier(t *testing.T) {
 		err := c.Unpack(&cfg)
 		require.NoError(t, err)
 
-		identifier, err := newFileIdentifier(cfg.Identifier, "")
+		identifier, err := newFileIdentifier(cfg.Identifier, "", logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 		assert.Equal(t, pathName, identifier.Name())
 
@@ -125,6 +135,58 @@ func TestFileIdentifier(t *testing.T) {
 				NewPath: test.newPath,
 				OldPath: test.oldPath,
 				Op:      test.operation,
+			})
+			assert.Equal(t, test.expectedSrc, src.Name())
+		}
+	})
+
+	t.Run("fingerprint identifier", func(t *testing.T) {
+		c := conf.MustNewConfigFrom(map[string]interface{}{
+			"identifier": map[string]interface{}{
+				"fingerprint": nil,
+			},
+		})
+		var cfg testFileIdentifierConfig
+		err := c.Unpack(&cfg)
+		require.NoError(t, err)
+
+		identifier, err := newFileIdentifier(cfg.Identifier, "", logptest.NewTestingLogger(t, ""))
+		require.NoError(t, err)
+		assert.Equal(t, fingerprintName, identifier.Name())
+
+		testCases := []struct {
+			newPath     string
+			oldPath     string
+			operation   loginp.Operation
+			desc        loginp.FileDescriptor
+			expectedSrc string
+		}{
+			{
+				newPath:     "/path/to/file",
+				desc:        loginp.FileDescriptor{Fingerprint: "fingerprintvalue"},
+				expectedSrc: fingerprintName + "::fingerprintvalue",
+			},
+			{
+				newPath:     "/new/path/to/file",
+				oldPath:     "/old/path/to/file",
+				operation:   loginp.OpRename,
+				desc:        loginp.FileDescriptor{Fingerprint: "fingerprintvalue"},
+				expectedSrc: fingerprintName + "::fingerprintvalue",
+			},
+			{
+				oldPath:     "/old/path/to/file",
+				operation:   loginp.OpDelete,
+				desc:        loginp.FileDescriptor{Fingerprint: "fingerprintvalue"},
+				expectedSrc: fingerprintName + "::fingerprintvalue",
+			},
+		}
+
+		for _, test := range testCases {
+			src := identifier.GetSource(loginp.FSEvent{
+				NewPath:    test.newPath,
+				OldPath:    test.oldPath,
+				Op:         test.operation,
+				Descriptor: test.desc,
 			})
 			assert.Equal(t, test.expectedSrc, src.Name())
 		}

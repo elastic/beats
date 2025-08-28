@@ -30,20 +30,29 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-type lookupFunc func(string) *monitoring.Namespace
+// RegistryLookupFunc is used to look up a registry by its path inside a
+// containing registry.
+func RegistryLookupFunc(root *monitoring.Registry) LookupFunc {
+	return func(s string) *monitoring.Registry {
+		return root.GetRegistry(s)
+	}
+}
+
+type LookupFunc func(string) *monitoring.Registry
 
 // NewWithDefaultRoutes creates a new server with default API routes.
-func NewWithDefaultRoutes(log *logp.Logger, config *config.C, ns lookupFunc) (*Server, error) {
+func NewWithDefaultRoutes(log *logp.Logger, config *config.C,
+	info, state, stats, inputs *monitoring.Registry) (*Server, error) {
 	api, err := New(log, config)
 	if err != nil {
 		return nil, err
 	}
 
 	err = multierr.Combine(
-		api.AttachHandler("/", makeRootAPIHandler(makeAPIHandler(ns("info")))),
-		api.AttachHandler("/state", makeAPIHandler(ns("state"))),
-		api.AttachHandler("/stats", makeAPIHandler(ns("stats"))),
-		api.AttachHandler("/dataset", makeAPIHandler(ns("dataset"))),
+		api.AttachHandler("/", makeRootAPIHandler(makeAPIHandler(info))),
+		api.AttachHandler("/state", makeAPIHandler(state)),
+		api.AttachHandler("/stats", makeAPIHandler(stats)),
+		api.AttachHandler("/dataset", makeAPIHandler(inputs)),
 	)
 	if err != nil {
 		return nil, err
@@ -62,12 +71,12 @@ func makeRootAPIHandler(handler http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func makeAPIHandler(ns *monitoring.Namespace) http.HandlerFunc {
+func makeAPIHandler(registry *monitoring.Registry) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 		data := monitoring.CollectStructSnapshot(
-			ns.GetRegistry(),
+			registry,
 			monitoring.Full,
 			false,
 		)

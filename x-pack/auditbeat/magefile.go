@@ -3,13 +3,15 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build mage
-// +build mage
 
 package main
 
 import (
 	"fmt"
+	"os"
 	"time"
+
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 
 	"github.com/magefile/mage/mg"
 	"go.uber.org/multierr"
@@ -26,8 +28,6 @@ import (
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
 	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
-	//mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
@@ -58,21 +58,20 @@ func CrossBuild() error {
 	return devtools.CrossBuild()
 }
 
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
-}
-
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
 // universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
 // were built and only performs the merge.
 func AssembleDarwinUniversal() error {
 	return build.AssembleDarwinUniversal()
+}
+
+// GenerateIncludeListGo generates an include/list.go file containing imports
+// for the packages that match the paths (or globs) in importDirs (optional)
+// and moduleDirs (optional).
+func GenerateModuleIncludeListGo() error {
+	opts := devtools.DefaultIncludeListOptions()
+	opts.ImportDirs = []string{"processors/*"}
+	return devtools.GenerateIncludeListGo(opts)
 }
 
 // Package packages the Beat for distribution.
@@ -87,8 +86,8 @@ func Package() {
 	devtools.PackageKibanaDashboardsFromBuildDir()
 	auditbeat.CustomizePackaging(auditbeat.XPackPackaging)
 
-	mg.SerialDeps(Fields, Dashboards, Config, devtools.GenerateModuleIncludeListGo)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.SerialDeps(Update)
+	mg.Deps(CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -108,7 +107,7 @@ func TestPackages() error {
 
 // Update is an alias for running fields, dashboards, config.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config, devtools.GenerateModuleIncludeListGo)
+	mg.SerialDeps(Fields, Dashboards, Config, GenerateModuleIncludeListGo)
 }
 
 // Config generates both the short and reference configs.
@@ -142,4 +141,13 @@ func ExportDashboard() error {
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
 	return devtools.KibanaDashboards(devtools.OSSBeatDir("module"), "module")
+}
+
+// Test runs all available tests (unitTest + integTest)
+func Test() {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
+	test.Test()
 }

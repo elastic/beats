@@ -15,12 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package database
 
 import (
 	"context"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
@@ -59,7 +60,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	ctx := context.Background()
 	results, err := m.QueryStats(ctx, "SELECT * FROM pg_stat_database")
 	if err != nil {
-		return errors.Wrap(err, "error in QueryStats")
+		return fmt.Errorf("error in QueryStats: %w", err)
 	}
 
 	for _, result := range results {

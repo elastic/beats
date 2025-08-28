@@ -21,31 +21,96 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func TestCreateProspector_SetIgnoreInactiveSince(t *testing.T) {
-	testCases := map[string]struct {
-		ignore_inactive_since string
-	}{
-		"ignore_inactive_since set to since_last_start": {
-			ignore_inactive_since: "since_last_start",
-		},
-		"ignore_inactive_since set to since_first_start": {
-			ignore_inactive_since: "since_first_start",
-		},
-		"ignore_inactive_since not set": {
-			ignore_inactive_since: "",
-		},
-	}
-	for name, test := range testCases {
-		test := test
-		t.Run(name, func(t *testing.T) {
-			c := config{
-				IgnoreInactive: ignoreInactiveSettings[test.ignore_inactive_since],
-			}
-			p, _ := newProspector(c)
-			fileProspector := p.(*fileProspector)
-			assert.Equal(t, fileProspector.ignoreInactiveSince, ignoreInactiveSettings[test.ignore_inactive_since])
-		})
-	}
+func TestCreateProspector(t *testing.T) {
+	t.Run("SetIgnoreInactiveSince", func(t *testing.T) {
+		testCases := map[string]struct {
+			ignore_inactive_since string
+		}{
+			"ignore_inactive_since set to since_last_start": {
+				ignore_inactive_since: "since_last_start",
+			},
+			"ignore_inactive_since set to since_first_start": {
+				ignore_inactive_since: "since_first_start",
+			},
+			"ignore_inactive_since not set": {
+				ignore_inactive_since: "",
+			},
+		}
+		for name, test := range testCases {
+			test := test
+			t.Run(name, func(t *testing.T) {
+				c := config{
+					IgnoreInactive: ignoreInactiveSettings[test.ignore_inactive_since],
+				}
+				p, _ := newProspector(c, logp.NewNopLogger())
+				fileProspector := p.(*fileProspector)
+				assert.Equal(t, fileProspector.ignoreInactiveSince, ignoreInactiveSettings[test.ignore_inactive_since])
+			})
+		}
+	})
+	t.Run("file watcher and file identity compatibility", func(t *testing.T) {
+		cases := []struct {
+			name   string
+			cfgStr string
+			err    string
+		}{
+			{
+				name: "returns no error for a fully default config",
+				cfgStr: `
+paths: ['some']
+`,
+			},
+			{
+				name: "returns no error when fingerprint and identity is configured",
+				cfgStr: `
+paths: ['some']
+file_identity.fingerprint: ~
+prospector.scanner.fingerprint.enabled: true
+`,
+			},
+			{
+				name: "returns no error when fingerprint and other identity is configured",
+				cfgStr: `
+paths: ['some']
+file_identity.path: ~
+prospector.scanner.fingerprint.enabled: true
+`,
+			},
+			{
+				name: "returns error when fingerprint is disabled but fingerprint identity is configured",
+				cfgStr: `
+paths: ['some']
+file_identity.fingerprint: ~
+prospector.scanner.fingerprint.enabled: false
+`,
+				err: "fingerprint file identity can be used only when fingerprint is enabled in the scanner",
+			},
+		}
+
+		for _, tc := range cases {
+			t.Run(tc.name, func(t *testing.T) {
+				c, err := conf.NewConfigWithYAML([]byte(tc.cfgStr), tc.cfgStr)
+				require.NoError(t, err)
+
+				cfg := defaultConfig()
+				err = c.Unpack(&cfg)
+				require.NoError(t, err)
+
+				_, err = newProspector(cfg, logp.NewNopLogger())
+				if tc.err == "" {
+					require.NoError(t, err)
+					return
+				}
+
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.err)
+			})
+		}
+	})
 }

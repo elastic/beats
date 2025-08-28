@@ -3,7 +3,7 @@
         "columns": [
             "source.address",
             "log.level",
-            "apache2.error.module",
+            "apache.error.module",
             "message"
         ],
         "description": "",

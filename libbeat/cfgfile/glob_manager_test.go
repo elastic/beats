@@ -18,43 +18,42 @@
 package cfgfile
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestGlobManagerInit(t *testing.T) {
 	// Wrong settings return error
-	manager, err := NewGlobManager("dir/*.yml", ".noyml", ".disabled")
+	logger := logptest.NewTestingLogger(t, "")
+	manager, err := NewGlobManager("dir/*.yml", ".noyml", ".disabled", logger)
 	assert.Error(t, err)
 	assert.Nil(t, manager)
 }
 
 func TestGlobManager(t *testing.T) {
 	// Create random temp directory
-	dir, err := ioutil.TempDir("", "glob_manager")
-	defer os.RemoveAll(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := t.TempDir()
 
 	// Prepare scenario:
 	content := []byte("test\n")
-	err = ioutil.WriteFile(dir+"/config1.yml", content, 0644)
+	err := os.WriteFile(dir+"/config1.yml", content, 0644)
 	assert.NoError(t, err)
-	err = ioutil.WriteFile(dir+"/config2.yml", content, 0644)
+	err = os.WriteFile(dir+"/config2.yml", content, 0644)
 	assert.NoError(t, err)
-	err = ioutil.WriteFile(dir+"/config2-alt.yml.disabled", content, 0644)
+	err = os.WriteFile(dir+"/config2-alt.yml.disabled", content, 0644)
 	assert.NoError(t, err)
-	err = ioutil.WriteFile(dir+"/config3.yml.disabled", content, 0644)
+	err = os.WriteFile(dir+"/config3.yml.disabled", content, 0644)
 	assert.NoError(t, err)
 
 	// Init Glob Manager
 	glob := dir + "/*.yml"
-	manager, err := NewGlobManager(glob, ".yml", ".disabled")
+	logger := logptest.NewTestingLogger(t, "")
+	manager, err := NewGlobManager(glob, ".yml", ".disabled", logger)
 	if err != nil {
 		t.Fatal(err)
 	}

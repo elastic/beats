@@ -4,7 +4,9 @@
 
 package task_stats
 
-import "github.com/docker/docker/api/types"
+import (
+	dcontainer "github.com/docker/docker/api/types/container"
+)
 
 type memoryStats struct {
 	Failcnt   uint64
@@ -13,7 +15,6 @@ type memoryStats struct {
 	TotalRss  uint64
 	TotalRssP float64
 	Usage     uint64
-	UsageP    float64
 	//Raw stats from the cgroup subsystem
 	Stats map[string]uint64
 	//Windows-only memory stats
@@ -22,19 +23,18 @@ type memoryStats struct {
 	PrivateWorkingSet uint64
 }
 
-func getMemoryStats(taskStats types.StatsJSON) memoryStats {
-	totalRSS := taskStats.Stats.MemoryStats.Stats["total_rss"]
+func getMemoryStats(taskStats dcontainer.StatsResponse) memoryStats {
+	totalRSS := taskStats.MemoryStats.Stats["total_rss"]
 
 	return memoryStats{
 		TotalRss:  totalRSS,
-		MaxUsage:  taskStats.Stats.MemoryStats.MaxUsage,
-		TotalRssP: float64(totalRSS) / float64(taskStats.Stats.MemoryStats.Limit),
-		Usage:     taskStats.Stats.MemoryStats.Usage,
-		UsageP:    float64(taskStats.Stats.MemoryStats.Usage) / float64(taskStats.Stats.MemoryStats.Limit),
-		Stats:     taskStats.Stats.MemoryStats.Stats,
+		MaxUsage:  taskStats.MemoryStats.MaxUsage,
+		TotalRssP: float64(totalRSS) / float64(taskStats.MemoryStats.Limit),
+		Usage:     taskStats.MemoryStats.Usage,
+		Stats:     taskStats.MemoryStats.Stats,
 		//Windows memory statistics
-		Commit:            taskStats.Stats.MemoryStats.Commit,
-		CommitPeak:        taskStats.Stats.MemoryStats.CommitPeak,
-		PrivateWorkingSet: taskStats.Stats.MemoryStats.PrivateWorkingSet,
+		Commit:            taskStats.MemoryStats.Commit,
+		CommitPeak:        taskStats.MemoryStats.CommitPeak,
+		PrivateWorkingSet: taskStats.MemoryStats.PrivateWorkingSet,
 	}
 }

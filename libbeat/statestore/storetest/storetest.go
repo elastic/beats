@@ -141,7 +141,7 @@ func (s *MapStore) Has(key string) (bool, error) {
 }
 
 // Get returns a key value pair from the store. An error is returned if the
-// store has been closed, the key is unknown, or an decoding error occured.
+// store has been closed, the key is unknown, or an decoding error occurred.
 func (s *MapStore) Get(key string, into interface{}) error {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -212,4 +212,8 @@ func (s *MapStore) Each(fn func(string, backend.ValueDecoder) (bool, error)) err
 
 func (d valueUnpacker) Decode(to interface{}) error {
 	return typeconv.Convert(to, d.from)
+}
+
+func (s *MapStore) SetID(_ string) {
+	// NOOP
 }

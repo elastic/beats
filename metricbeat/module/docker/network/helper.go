@@ -20,7 +20,7 @@ package network
 import (
 	"time"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
@@ -64,7 +64,7 @@ type NetStats struct {
 	TxDropped     float64
 	TxErrors      float64
 	TxPackets     float64
-	Total         *types.NetworkStats
+	Total         *container.NetworkStats
 }
 
 func (n *NetService) getNetworkStatsPerContainer(rawStats []docker.Stat, dedot bool) []NetStats {
@@ -78,7 +78,7 @@ func (n *NetService) getNetworkStatsPerContainer(rawStats []docker.Stat, dedot b
 	return formattedStats
 }
 
-func (n *NetService) getNetworkStats(nameInterface string, rawNetStats types.NetworkStats, myRawstats docker.Stat, dedot bool) NetStats {
+func (n *NetService) getNetworkStats(nameInterface string, rawNetStats container.NetworkStats, myRawstats docker.Stat, dedot bool) NetStats {
 	newNetworkStats := createNetRaw(myRawstats.Stats.Read, &rawNetStats)
 	oldNetworkStat, exist := n.NetworkStatPerContainer[myRawstats.Container.ID][nameInterface]
 
@@ -99,7 +99,9 @@ func (n *NetService) getNetworkStats(nameInterface string, rawNetStats types.Net
 		netStats.TxErrors = n.getTxErrorsPerSecond(&newNetworkStats, &oldNetworkStat)
 		netStats.TxPackets = n.getTxPacketsPerSecond(&newNetworkStats, &oldNetworkStat)
 	} else {
-		n.NetworkStatPerContainer[myRawstats.Container.ID] = make(map[string]NetRaw)
+		if _, conExists := n.NetworkStatPerContainer[myRawstats.Container.ID]; !conExists {
+			n.NetworkStatPerContainer[myRawstats.Container.ID] = make(map[string]NetRaw)
+		}
 	}
 
 	n.NetworkStatPerContainer[myRawstats.Container.ID][nameInterface] = newNetworkStats
@@ -107,7 +109,7 @@ func (n *NetService) getNetworkStats(nameInterface string, rawNetStats types.Net
 	return netStats
 }
 
-func createNetRaw(time time.Time, stats *types.NetworkStats) NetRaw {
+func createNetRaw(time time.Time, stats *container.NetworkStats) NetRaw {
 	return NetRaw{
 		Time:      time,
 		RxBytes:   stats.RxBytes,
@@ -119,13 +121,6 @@ func createNetRaw(time time.Time, stats *types.NetworkStats) NetRaw {
 		TxErrors:  stats.TxErrors,
 		TxPackets: stats.TxPackets,
 	}
-}
-
-func (n *NetService) checkStats(containerID string, nameInterface string) bool {
-	if _, exist := n.NetworkStatPerContainer[containerID][nameInterface]; exist {
-		return true
-	}
-	return false
 }
 
 func (n *NetService) getRxBytesPerSecond(newStats *NetRaw, oldStats *NetRaw) float64 {

@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !windows
-// +build !windows
 
 package pkg
 
@@ -18,18 +17,21 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestData(t *testing.T) {
 	defer abtest.SetupDataDir(t)()
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 	defer deleteBucket(t, f)
 
 	events, errs := mbtest.ReportingFetchV2(f)
@@ -46,7 +48,7 @@ func TestData(t *testing.T) {
 }
 
 func TestDpkg(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	defer abtest.SetupDataDir(t)()
 
@@ -68,7 +70,7 @@ func TestDpkg(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 	defer deleteBucket(t, f)
 
 	events, errs := mbtest.ReportingFetchV2(f)
@@ -105,7 +107,7 @@ func TestDpkgInstalledSize(t *testing.T) {
 		"python2.7-minimal": 0,
 	}
 
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	defer abtest.SetupDataDir(t)()
 
@@ -127,7 +129,7 @@ func TestDpkgInstalledSize(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 	defer deleteBucket(t, f)
 
 	events, errs := mbtest.ReportingFetchV2(f)
@@ -159,7 +161,7 @@ func TestDpkgInstalledSize(t *testing.T) {
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":   "system",
+		"module":   system.ModuleName,
 		"datasets": []string{"package"},
 	}
 }
@@ -236,6 +238,28 @@ func TestPackageDatabaseMigration(t *testing.T) {
 				Type:        "brew",
 			}, pkg)
 		}
+	}
+}
+
+// TestPackageDatabaseMigrationWithEmptyPackageV1Bucket verifies that an
+// empty package.v1 bucket can be migrated to the new schema without errors.
+//
+// This is a reproduction of https://github.com/elastic/beats/issues/44294.
+func TestPackageDatabaseMigrationWithEmptyPackageV1Bucket(t *testing.T) {
+	// Create empty package.v1 bucket.
+	dbPath := filepath.Join(t.TempDir(), "beat.db")
+	ds := datastore.New(dbPath, 0o600)
+
+	bucket, err := ds.OpenBucket("package.v1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = bucket.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := ds.Update(migrateDatastoreSchema); err != nil {
+		t.Fatal(err)
 	}
 }
 

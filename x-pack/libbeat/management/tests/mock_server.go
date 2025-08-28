@@ -31,7 +31,7 @@ func NewMockServer(t *testing.T, canStop func(string) bool, inputConfig *proto.U
 	unitOutID := mock.NewID()
 
 	token := mock.NewID()
-	//var gotConfig bool
+	// var gotConfig bool
 
 	var mut sync.Mutex
 
@@ -98,12 +98,11 @@ func NewMockServer(t *testing.T, canStop func(string) bool, inputConfig *proto.U
 	require.NoError(t, err)
 
 	client := client.NewV2(fmt.Sprintf(":%d", srv.Port), token, client.VersionInfo{
-		Name:    "program",
-		Version: "v1.0.0",
+		Name: "program",
 		Meta: map[string]string{
 			"key": "value",
 		},
-	}, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 
 	return MockV2Handler{Srv: srv, Client: client}
 }
@@ -111,7 +110,7 @@ func NewMockServer(t *testing.T, canStop func(string) bool, inputConfig *proto.U
 // helper to wrap the CheckinExpected config we need with every refresh of the mock server
 func sendUnitsWithState(state proto.State, input, output *proto.UnitExpectedConfig, inId, outId string, stateIndex uint64) *proto.CheckinExpected {
 	return &proto.CheckinExpected{
-		AgentInfo: &proto.CheckinAgentInfo{
+		AgentInfo: &proto.AgentInfo{
 			Id:       "test-agent",
 			Version:  "8.4.0",
 			Snapshot: true,

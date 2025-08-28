@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 /*
 Package galera_status fetches MySQL Galera server status metrics.
 
@@ -26,12 +28,11 @@ package galera_status
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mysql"
-
-	"github.com/pkg/errors"
 )
 
 // init registers the MetricSet with the central registry.
@@ -43,15 +44,21 @@ func init() {
 
 // MetricSet for fetching Galera-MySQL server status
 type MetricSet struct {
-	mb.BaseMetricSet
+	*mysql.Metricset
 	db *sql.DB
 }
 
 // New create a new instance of the MetricSet
 // Loads query_mode config setting from the config file
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The galera_status metricset is experimental.")
-	return &MetricSet{BaseMetricSet: base}, nil
+	base.Logger().Warn(cfgwarn.Experimental("The galera_status metricset is experimental."))
+
+	ms, err := mysql.NewMetricset(base)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MetricSet{Metricset: ms, db: nil}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
@@ -59,9 +66,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	if m.db == nil {
 		var err error
-		m.db, err = mysql.NewDB(m.HostData().URI)
+		m.db, err = mysql.NewDB(m.HostData().URI, m.Metricset.Config.TLSConfig)
 		if err != nil {
-			return errors.Wrap(err, "Galera-status fetch failed")
+			return fmt.Errorf("Galera-status fetch failed: %w", err)
 		}
 	}
 
@@ -114,5 +121,5 @@ func (m *MetricSet) Close() error {
 	if m.db == nil {
 		return nil
 	}
-	return errors.Wrap(m.db.Close(), "failed to close mysql database client")
+	return fmt.Errorf("failed to close mysql database client: %w", m.db.Close())
 }

@@ -23,6 +23,7 @@ import (
 	"net/url"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -30,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -107,7 +107,7 @@ func (jf *jobFactory) makePlugin() (plugin2 plugin.Plugin, err error) {
 			return plugin.Plugin{}, err
 		}
 
-		j = append(j, wrappers.WithURLField(u, job))
+		j = append(j, wraputil.WithURLField(u, job))
 	}
 
 	return plugin.Plugin{Jobs: j, Endpoints: len(jf.config.Hosts)}, nil

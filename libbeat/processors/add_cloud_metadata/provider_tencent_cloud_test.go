@@ -27,21 +27,22 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func initQCloudTestServer() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.RequestURI == "/meta-data/instance-id" {
-			w.Write([]byte("ins-qcloudv5"))
+			_, _ = w.Write([]byte("ins-qcloudv5"))
 			return
 		}
 		if r.RequestURI == "/meta-data/placement/region" {
-			w.Write([]byte("china-south-gz"))
+			_, _ = w.Write([]byte("china-south-gz"))
 			return
 		}
 		if r.RequestURI == "/meta-data/placement/zone" {
-			w.Write([]byte("gz-azone2"))
+			_, _ = w.Write([]byte("gz-azone2"))
 			return
 		}
 
@@ -64,7 +65,7 @@ func TestRetrieveQCloudMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := New(config)
+	p, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

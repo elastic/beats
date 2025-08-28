@@ -31,8 +31,8 @@ import (
 type eventConsumer struct {
 	logger *logp.Logger
 
-	// eventConsumer calls the observer methods eventsRetry and eventsDropped.
-	observer outputObserver
+	// eventConsumer calls the retryObserver methods eventsRetry and eventsDropped.
+	retryObserver retryObserver
 
 	// When the output changes, the new target is sent to the worker routine
 	// on this channel. Clients should call eventConsumer.setTarget().
@@ -73,12 +73,12 @@ type retryRequest struct {
 
 func newEventConsumer(
 	log *logp.Logger,
-	observer outputObserver,
+	observer retryObserver,
 ) *eventConsumer {
 	c := &eventConsumer{
-		logger:      log,
-		observer:    observer,
-		queueReader: makeQueueReader(),
+		logger:        log,
+		retryObserver: observer,
+		queueReader:   makeQueueReader(),
 
 		targetChan: make(chan consumerTarget),
 		retryChan:  make(chan retryRequest),
@@ -162,8 +162,7 @@ outerLoop:
 		case outputChan <- active:
 			// Successfully sent a batch to the output workers
 			if len(retryBatches) > 0 {
-				// This was a retry, report it to the observer
-				c.observer.eventsRetry(len(active.Events()))
+				// This was a retry, advance the retry batch list
 				retryBatches = retryBatches[1:]
 			} else {
 				// This was directly from the queue, clear the value so we can
@@ -182,8 +181,10 @@ outerLoop:
 
 				alive := req.batch.reduceTTL()
 
+				// Report retried vs dropped event count to the observer
 				countDropped := countFailed - len(req.batch.Events())
-				c.observer.eventsDropped(countDropped)
+				c.retryObserver.eventsDropped(countDropped)
+				c.retryObserver.eventsRetry(len(req.batch.Events()))
 
 				if !alive {
 					log.Info("Drop batch")

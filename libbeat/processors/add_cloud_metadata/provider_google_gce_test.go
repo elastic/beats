@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -308,7 +309,7 @@ func initGCETestServer(resp string) *httptest.Server {
 }
 
 func TestRetrieveGCEMetadata(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	server := initGCETestServer(gceMetadataV1)
 	defer server.Close()
@@ -320,7 +321,7 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := New(config)
+	p, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -344,6 +345,7 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
+			"region":            "us-east1",
 			"project": mapstr.M{
 				"id": "test-dev",
 			},
@@ -356,7 +358,7 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 }
 
 func TestRetrieveGCEMetadataInK8s(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	server := initGCETestServer(gceK8sMetadataV1)
 	defer server.Close()
@@ -368,7 +370,7 @@ func TestRetrieveGCEMetadataInK8s(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := New(config)
+	p, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -392,6 +394,7 @@ func TestRetrieveGCEMetadataInK8s(t *testing.T) {
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
+			"region":            "us-east1",
 			"project": mapstr.M{
 				"id": "test-dev",
 			},
@@ -410,7 +413,7 @@ func TestRetrieveGCEMetadataInK8s(t *testing.T) {
 }
 
 func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	server := initGCETestServer(gceK8sMetadataV1)
 	defer server.Close()
@@ -422,7 +425,7 @@ func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := New(config)
+	p, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -457,6 +460,7 @@ func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
+			"region":            "us-east1",
 			"project": mapstr.M{
 				"id": "test-dev",
 			},
@@ -475,7 +479,7 @@ func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
 }
 
 func TestRetrieveGCEMetadataInK8sPartial(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	server := initGCETestServer(gceK8sPartialMetadataV1)
 	defer server.Close()
@@ -487,7 +491,7 @@ func TestRetrieveGCEMetadataInK8sPartial(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := New(config)
+	p, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -511,6 +515,7 @@ func TestRetrieveGCEMetadataInK8sPartial(t *testing.T) {
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
+			"region":            "us-east1",
 			"project": mapstr.M{
 				"id": "test-dev",
 			},

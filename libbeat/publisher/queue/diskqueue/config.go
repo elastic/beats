@@ -64,14 +64,8 @@ type Settings struct {
 	RetryInterval    time.Duration
 	MaxRetryInterval time.Duration
 
-	// EncryptionKey is used to encrypt data if SchemaVersion 2 is used.
-	EncryptionKey []byte
-
 	// UseCompression enables or disables LZ4 compression
 	UseCompression bool
-
-	// UseProtobuf enables protobuf serialization instead of CBOR
-	UseProtobuf bool
 }
 
 // userConfig holds the parameters for a disk queue that are configurable
@@ -166,7 +160,7 @@ func SettingsForUserConfig(config *config.C) (Settings, error) {
 		settings.RetryInterval = *userConfig.RetryInterval
 	}
 	if userConfig.MaxRetryInterval != nil {
-		settings.MaxRetryInterval = *userConfig.RetryInterval
+		settings.MaxRetryInterval = *userConfig.MaxRetryInterval
 	}
 
 	return settings, nil

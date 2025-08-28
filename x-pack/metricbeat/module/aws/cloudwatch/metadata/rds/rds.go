@@ -15,7 +15,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const metadataPrefix = "aws.rds.db_instance."
@@ -28,13 +27,9 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 		}
 	})
 
-	// Get DBInstance IDs per region
-	dbDetailsMap, err := getDBInstancesPerRegion(svc)
-	if err != nil {
-		logp.Error(fmt.Errorf("getInstancesPerRegion failed, skipping region %s: %w", regionName, err))
-		return events, nil
-	}
-
+	// Normalize CPU Utilization values before making the API call,
+	// because the API call can fail, and we need to ensure the
+	// CPU values are correctly scaled regardless of the API call outcome.
 	for _, event := range events {
 		cpuValue, err := event.RootFields.GetValue("aws.rds.metrics.CPUUtilization.avg")
 		if err == nil {
@@ -42,6 +37,12 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 				_, _ = event.RootFields.Put("aws.rds.metrics.CPUUtilization.avg", value/100)
 			}
 		}
+	}
+
+	// Get DBInstance IDs per region
+	dbDetailsMap, err := getDBInstancesPerRegion(svc)
+	if err != nil {
+		return events, fmt.Errorf("aws.rds.db_instance fields are not available, skipping region %s: %w", regionName, err)
 	}
 
 	for dbInstanceIdentifier, output := range dbDetailsMap {

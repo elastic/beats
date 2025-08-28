@@ -1,6 +1,14 @@
 version: '2.3'
 
 services:
+  # This is a proxy used to block "docker-compose up" until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy_dep:
+    image: busybox
+    depends_on:
+      elasticsearch: { condition: service_healthy }
+      kibana:        { condition: service_healthy }
+
   beat:
     build: ../../metricbeat
     environment:
@@ -24,11 +32,11 @@ services:
   kibana:
     # Copied configuration from OSS metricbeat because services with depends_on
     # cannot be extended with extends
-    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-8.7.0}-1
+    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-8.17.1}-1
     build:
       context: ../../metricbeat/module/kibana/_meta
       args:
-        KIBANA_VERSION: ${KIBANA_VERSION:-8.7.0}
+        KIBANA_VERSION: ${KIBANA_VERSION:-8.17.1}
     depends_on:
       - elasticsearch
     ports:

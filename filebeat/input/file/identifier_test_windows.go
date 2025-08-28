@@ -16,14 +16,17 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package file
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+)
 
 func TestInodeMarkerError(t *testing.T) {
-	_, err := newINodeMarkerIdentifier(nil)
+	_, err := newINodeMarkerIdentifier(nil, logptest.NewTestingLogger(t, ""))
 	if err == nil {
 		t.Fatal("inode_marker should not be supported on windows")
 	}

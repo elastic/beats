@@ -49,20 +49,21 @@ type publishClient struct {
 func newPublishClient(
 	es *eslegclient.Connection,
 	params map[string]string,
+	logger *logp.Logger,
 ) (*publishClient, error) {
 	p := &publishClient{
 		es:     es,
 		params: params,
 
-		log: logp.NewLogger(logSelector),
+		log: logger.Named(logSelector),
 	}
 	return p, nil
 }
 
-func (c *publishClient) Connect() error {
+func (c *publishClient) Connect(ctx context.Context) error {
 	c.log.Debug("Monitoring client: connect.")
 
-	err := c.es.Connect()
+	err := c.es.Connect(ctx)
 	if err != nil {
 		return fmt.Errorf("cannot connect underlying Elasticsearch client: %w", err)
 	}
@@ -171,7 +172,6 @@ func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, 
 		meta["_type"] = "doc"
 	}
 
-	//nolint:typecheck // typecheck linter is buggy and thinks opType is unused.
 	opType := events.OpTypeCreate
 	if esVersion.LessThan(createDocPrivAvailableESVersion) {
 		opType = events.OpTypeIndex
@@ -208,7 +208,7 @@ func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, 
 
 	// Currently one request per event is sent. Reason is that each event can contain different
 	// interval params and X-Pack requires to send the interval param.
-	_, result, err := c.es.Bulk(ctx, getMonitoringIndexName(), "", nil, bulk[:])
+	_, result, err := c.es.Bulk(ctx, getMonitoringIndexName(), "", nil, nil, bulk[:])
 	if err != nil {
 		apm.CaptureError(ctx, fmt.Errorf("failed to perform any bulk index operations: %w", err)).Send()
 		return err
@@ -224,7 +224,7 @@ func getMonitoringIndexName() string {
 	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
 }
 
-func logBulkFailures(log *logp.Logger, result eslegclient.BulkResult, events []report.Event) {
+func logBulkFailures(log *logp.Logger, result eslegclient.BulkResponse, events []report.Event) {
 	var response struct {
 		Items []map[string]map[string]interface{} `json:"items"`
 	}

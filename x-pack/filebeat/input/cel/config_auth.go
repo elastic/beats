@@ -24,12 +24,27 @@ import (
 )
 
 type authConfig struct {
-	Basic  *basicAuthConfig `config:"basic"`
-	OAuth2 *oAuth2Config    `config:"oauth2"`
+	Basic  *basicAuthConfig  `config:"basic"`
+	Token  *tokenAuthConfig  `config:"token"`
+	Digest *digestAuthConfig `config:"digest"`
+	OAuth2 *oAuth2Config     `config:"oauth2"`
 }
 
 func (c authConfig) Validate() error {
-	if c.Basic.isEnabled() && c.OAuth2.isEnabled() {
+	var n int
+	if c.Basic.isEnabled() {
+		n++
+	}
+	if c.Token.isEnabled() {
+		n++
+	}
+	if c.Digest.isEnabled() {
+		n++
+	}
+	if c.OAuth2.isEnabled() {
+		n++
+	}
+	if n > 1 {
 		return errors.New("only one kind of auth can be enabled")
 	}
 	return nil
@@ -41,7 +56,7 @@ type basicAuthConfig struct {
 	Password string `config:"password"`
 }
 
-// IsEnabled returns true if the `enable` field is set to true in the yaml.
+// isEnabled returns true if the `enable` field is set to true in the yaml.
 func (b *basicAuthConfig) isEnabled() bool {
 	return b != nil && (b.Enabled == nil || *b.Enabled)
 }
@@ -59,6 +74,55 @@ func (b *basicAuthConfig) Validate() error {
 	return nil
 }
 
+type tokenAuthConfig struct {
+	Enabled *bool  `config:"enabled"`
+	Type    string `config:"type"`
+	Value   string `config:"value"`
+}
+
+// isEnabled returns true if the `enable` field is set to true in the yaml.
+func (b *tokenAuthConfig) isEnabled() bool {
+	return b != nil && (b.Enabled == nil || *b.Enabled)
+}
+
+// Validate checks if token authentication config is valid.
+func (b *tokenAuthConfig) Validate() error {
+	if !b.isEnabled() {
+		return nil
+	}
+
+	if b.Type == "" || b.Value == "" {
+		return errors.New("both type and value must be set")
+	}
+
+	return nil
+}
+
+type digestAuthConfig struct {
+	Enabled  *bool  `config:"enabled"`
+	User     string `config:"user"`
+	Password string `config:"password"`
+	NoReuse  *bool  `config:"no_reuse"`
+}
+
+// isEnabled returns true if the `enable` field is set to true in the yaml.
+func (d *digestAuthConfig) isEnabled() bool {
+	return d != nil && (d.Enabled == nil || *d.Enabled)
+}
+
+// Validate checks if oauth2 config is valid.
+func (d *digestAuthConfig) Validate() error {
+	if !d.isEnabled() {
+		return nil
+	}
+
+	if d.User == "" || d.Password == "" {
+		return errors.New("both user and password must be set")
+	}
+
+	return nil
+}
+
 // An oAuth2Provider represents a supported oauth provider.
 type oAuth2Provider string
 
@@ -66,6 +130,7 @@ const (
 	oAuth2ProviderDefault oAuth2Provider = ""       // oAuth2ProviderDefault means no specific provider is set.
 	oAuth2ProviderAzure   oAuth2Provider = "azure"  // oAuth2ProviderAzure AzureAD.
 	oAuth2ProviderGoogle  oAuth2Provider = "google" // oAuth2ProviderGoogle Google.
+	oAuth2ProviderOkta    oAuth2Provider = "okta"   // oAuth2ProviderOkta Okta.
 )
 
 func (p *oAuth2Provider) Unpack(in string) error {
@@ -100,9 +165,14 @@ type oAuth2Config struct {
 	// microsoft azure specific
 	AzureTenantID string `config:"azure.tenant_id"`
 	AzureResource string `config:"azure.resource"`
+
+	// okta specific RSA JWK private key
+	OktaJWKFile string          `config:"okta.jwk_file"`
+	OktaJWKJSON common.JSONBlob `config:"okta.jwk_json"`
+	OktaJWKPEM  string          `config:"okta.jwk_pem"`
 }
 
-// IsEnabled returns true if the `enable` field is set to true in the yaml.
+// isEnabled returns true if the `enable` field is set to true in the yaml.
 func (o *oAuth2Config) isEnabled() bool {
 	return o != nil && (o.Enabled == nil || *o.Enabled)
 }
@@ -155,11 +225,22 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 			return cfg.Client(ctx), nil
 		}
 
-		creds, err := google.CredentialsFromJSON(ctx, o.GoogleCredentialsJSON, o.Scopes...)
-		if err != nil {
-			return nil, fmt.Errorf("oauth2 client: error loading credentials: %w", err)
+		var creds *google.Credentials
+		var err error
+		if len(o.GoogleCredentialsJSON) != 0 {
+			creds, err = google.CredentialsFromJSON(ctx, o.GoogleCredentialsJSON, o.Scopes...)
+			if err != nil {
+				return nil, fmt.Errorf("oauth2 client: error loading credentials: %w", err)
+			}
+		} else {
+			creds, err = findDefaultGoogleCredentials(ctx, o.Scopes...)
+			if err != nil {
+				return nil, fmt.Errorf("oauth2 client: no valid auth specified: %w", err)
+			}
 		}
 		return oauth2.NewClient(ctx, creds.TokenSource), nil
+	case oAuth2ProviderOkta:
+		return o.fetchOktaOauthClient(ctx, client)
 	default:
 		return nil, errors.New("oauth2 client: unknown provider")
 	}
@@ -216,12 +297,14 @@ func (o *oAuth2Config) Validate() error {
 		return o.validateAzureProvider()
 	case oAuth2ProviderGoogle:
 		return o.validateGoogleProvider()
+	case oAuth2ProviderOkta:
+		return o.validateOktaProvider()
 	case oAuth2ProviderDefault:
-		if o.TokenURL == "" || o.ClientID == "" || o.ClientSecret == nil {
-			return errors.New("both token_url and client credentials must be provided")
-		}
 		if (o.User != "" && o.Password == "") || (o.User == "" && o.Password != "") {
 			return errors.New("both user and password credentials must be provided")
+		}
+		if o.TokenURL == "" || ((o.ClientID == "" || o.ClientSecret == nil) && (o.User == "" || o.Password == "")) {
+			return errors.New("both token_url and client credentials must be provided")
 		}
 	default:
 		return fmt.Errorf("unknown provider %q", o.getProvider())
@@ -267,12 +350,48 @@ func (o *oAuth2Config) validateGoogleProvider() error {
 
 	// Application Default Credentials (ADC)
 	ctx := context.Background()
-	if creds, err := findDefaultGoogleCredentials(ctx, o.Scopes...); err == nil {
-		o.GoogleCredentialsJSON = creds.JSON
+	if _, err := findDefaultGoogleCredentials(ctx, o.Scopes...); err == nil {
 		return nil
 	}
 
 	return fmt.Errorf("no authentication credentials were configured or detected (ADC)")
+}
+
+func (o *oAuth2Config) validateOktaProvider() error {
+	if o.TokenURL == "" || o.ClientID == "" || len(o.Scopes) == 0 {
+		return errors.New("okta validation error: token_url, client_id, scopes must be provided")
+	}
+	var n int
+	if o.OktaJWKJSON != nil {
+		n++
+	}
+	if o.OktaJWKFile != "" {
+		n++
+	}
+	if o.OktaJWKPEM != "" {
+		n++
+	}
+	if n != 1 {
+		return errors.New("okta validation error: one of okta.jwk_json, okta.jwk_file or okta.jwk_pem must be provided")
+	}
+	// jwk_pem
+	if o.OktaJWKPEM != "" {
+		_, err := pemPKCS8PrivateKey([]byte(o.OktaJWKPEM))
+		if err != nil {
+			return fmt.Errorf("okta validation error: %w", err)
+		}
+		return err
+	}
+	// jwk_file
+	if o.OktaJWKFile != "" {
+		return populateJSONFromFile(o.OktaJWKFile, &o.OktaJWKJSON)
+	}
+	// jwk_json
+	if len(o.OktaJWKJSON) != 0 {
+		return nil
+	}
+
+	return fmt.Errorf("okta validation error: no authentication credentials were configured or detected")
 }
 
 func populateJSONFromFile(file string, dst *common.JSONBlob) error {

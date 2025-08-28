@@ -18,10 +18,9 @@
 package jmx
 
 import (
+	"errors"
+	"fmt"
 	"strings"
-
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -115,12 +114,12 @@ type eventKey struct {
 	mbean, event string
 }
 
-func eventMapping(entries []Entry, mapping AttributeMapping) ([]mapstr.M, error) {
+func eventMapping(entries []Entry, mapping AttributeMapping, logger *logp.Logger) ([]mapstr.M, error) {
 
 	// Generate a different event for each wildcard mbean, and and additional one
 	// for non-wildcard requested mbeans, group them by event name if defined
 	mbeanEvents := make(map[eventKey]mapstr.M)
-	var errs multierror.Errors
+	var errs []error
 
 	for _, v := range entries {
 		if v.Value == nil || v.Request.Attribute == nil {
@@ -131,16 +130,18 @@ func eventMapping(entries []Entry, mapping AttributeMapping) ([]mapstr.M, error)
 		case string:
 			switch entryValues := v.Value.(type) {
 			case float64:
-				err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, entryValues, mbeanEvents, mapping)
+				err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, entryValues, mbeanEvents, mapping, logger)
 				if err != nil {
 					errs = append(errs, err)
 				}
 			case map[string]interface{}:
-				constructEvents(entryValues, v, mbeanEvents, mapping, errs)
+				errs = constructEvents(entryValues, v, mbeanEvents, mapping, errs, logger)
 			}
 		case []interface{}:
-			entryValues := v.Value.(map[string]interface{})
-			constructEvents(entryValues, v, mbeanEvents, mapping, errs)
+			entryValues, ok := v.Value.(map[string]interface{})
+			if ok {
+				errs = constructEvents(entryValues, v, mbeanEvents, mapping, errs, logger)
+			}
 		}
 	}
 
@@ -149,14 +150,14 @@ func eventMapping(entries []Entry, mapping AttributeMapping) ([]mapstr.M, error)
 		events = append(events, event)
 	}
 
-	return events, errs.Err()
+	return events, errors.Join(errs...)
 }
 
-func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents map[eventKey]mapstr.M, mapping AttributeMapping, errs multierror.Errors) {
+func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents map[eventKey]mapstr.M, mapping AttributeMapping, errs []error, logger *logp.Logger) []error {
 	hasWildcard := strings.Contains(v.Request.Mbean, "*")
 	for attribute, value := range entryValues {
 		if !hasWildcard {
-			err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, value, mbeanEvents, mapping)
+			err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, value, mbeanEvents, mapping, logger)
 			if err != nil {
 				errs = append(errs, err)
 			}
@@ -168,18 +169,19 @@ func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents ma
 		// to be actually the matching mbean name
 		values, ok := value.(map[string]interface{})
 		if !ok {
-			errs = append(errs, errors.Errorf("expected map of values for %s", v.Request.Mbean))
+			errs = append(errs, fmt.Errorf("expected map of values for %s", v.Request.Mbean))
 			continue
 		}
 
 		responseMbean := attribute
 		for attribute, value := range values {
-			err := parseResponseEntry(v.Request.Mbean, responseMbean, attribute, value, mbeanEvents, mapping)
+			err := parseResponseEntry(v.Request.Mbean, responseMbean, attribute, value, mbeanEvents, mapping, logger)
 			if err != nil {
 				errs = append(errs, err)
 			}
 		}
 	}
+	return errs
 }
 
 func selectEvent(events map[eventKey]mapstr.M, key eventKey) mapstr.M {
@@ -201,13 +203,14 @@ func parseResponseEntry(
 	attributeValue interface{},
 	events map[eventKey]mapstr.M,
 	mapping AttributeMapping,
+	logger *logp.Logger,
 ) error {
 	field, exists := mapping.Get(requestMbeanName, attributeName)
 	if !exists {
 		// This shouldn't ever happen, if it does it is probably that some of our
 		// assumptions when building the request and the mapping is wrong.
-		logp.Debug("jolokia.jmx", "mapping: %+v", mapping)
-		return errors.Errorf("metric key '%v' for mbean '%s' not found in mapping", attributeName, requestMbeanName)
+		logger.Named("jolokia.jmx").Debugf("mapping: %+v", mapping)
+		return fmt.Errorf("metric key '%v' for mbean '%s' not found in mapping", attributeName, requestMbeanName)
 	}
 
 	var key eventKey

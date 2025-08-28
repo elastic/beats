@@ -1,8 +1,7 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
-//go:build linux || darwin
-// +build linux darwin
+//go:build linux || synthetics
 
 package synthexec
 
@@ -17,7 +16,7 @@ func TestExecMultiplexer(t *testing.T) {
 	em := NewExecMultiplexer()
 
 	// Generate three fake journeys with three fake steps
-	var testEvents []*SynthEvent
+	testEvents := make([]*SynthEvent, 0, 3)
 	time := float64(0)
 	for jIdx := 0; jIdx < 3; jIdx++ {
 		time++ // fake time to make events seem spaced out

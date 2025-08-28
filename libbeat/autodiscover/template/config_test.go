@@ -22,13 +22,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -145,6 +145,8 @@ func TestConfigsMapping(t *testing.T) {
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
+
 	for _, test := range tests {
 		var mappings MapperSettings
 		config, err := conf.NewConfigWithYAML([]byte(test.mapping), "")
@@ -156,7 +158,7 @@ func TestConfigsMapping(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		mapper, err := NewConfigMapper(mappings, nil, nil)
+		mapper, err := NewConfigMapper(mappings, nil, nil, logger)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -199,6 +201,8 @@ func TestConfigsMappingKeystore(t *testing.T) {
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
+
 	for _, test := range tests {
 		var mappings MapperSettings
 		config, err := conf.NewConfigWithYAML([]byte(test.mapping), "")
@@ -210,7 +214,7 @@ func TestConfigsMappingKeystore(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		mapper, err := NewConfigMapper(mappings, keystore, nil)
+		mapper, err := NewConfigMapper(mappings, keystore, nil, logger)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -254,6 +258,8 @@ func TestConfigsMappingKeystoreProvider(t *testing.T) {
 	}
 
 	keystoreProvider := newMockKeystoreProvider(secret)
+	logger := logptest.NewTestingLogger(t, "")
+
 	for _, test := range tests {
 		var mappings MapperSettings
 		config, err := conf.NewConfigWithYAML([]byte(test.mapping), "")
@@ -265,7 +271,7 @@ func TestConfigsMappingKeystoreProvider(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		mapper, err := NewConfigMapper(mappings, keystore, keystoreProvider)
+		mapper, err := NewConfigMapper(mappings, keystore, keystoreProvider, logger)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -306,7 +312,7 @@ func TestNilConditionConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = NewConfigMapper(mappings, nil, nil)
+	_, err = NewConfigMapper(mappings, nil, nil, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 	assert.Nil(t, mappings[0].ConditionConfig)
 }
@@ -332,7 +338,7 @@ func createAnExistingKeystore(path string, secret string) keystore.Keystore {
 
 // create a temporary file on disk to save the keystore.
 func getTemporaryKeystoreFile() string {
-	path, err := ioutils.TempDir("", "testing")
+	path, err := os.MkdirTemp("", "testing")
 	if err != nil {
 		panic(err)
 	}

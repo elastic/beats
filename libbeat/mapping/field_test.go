@@ -454,7 +454,7 @@ func TestFieldConcat(t *testing.T) {
 		"duplicates fail": {
 			a:   Fields{{Name: "a"}},
 			b:   Fields{{Name: "a"}},
-			err: "1 error: fields contain key <a>",
+			err: "fields contain key <a>",
 		},
 		"nested with common prefix": {
 			a: Fields{{
@@ -495,7 +495,7 @@ func TestFieldConcat(t *testing.T) {
 				Name:   "a",
 				Fields: Fields{{Name: "c"}},
 			}},
-			err: "1 error: fields contain key <a.c>",
+			err: "fields contain key <a.c>",
 		},
 		"a is prefix of b": {
 			a: Fields{{Name: "a"}},
@@ -503,7 +503,7 @@ func TestFieldConcat(t *testing.T) {
 				Name:   "a",
 				Fields: Fields{{Name: "b"}},
 			}},
-			err: "1 error: fields contain non object node conflicting with key <a.b>",
+			err: "fields contain non object node conflicting with key <a.b>",
 		},
 		"a is object and prefix of b": {
 			a: Fields{{Name: "a", Type: "object"}},
@@ -522,7 +522,7 @@ func TestFieldConcat(t *testing.T) {
 				Fields: Fields{{Name: "b"}},
 			}},
 			b:   Fields{{Name: "a"}},
-			err: "1 error: fields contain key <a>",
+			err: "fields contain key <a>",
 		},
 		"multiple errors": {
 			a: Fields{
@@ -536,7 +536,7 @@ func TestFieldConcat(t *testing.T) {
 				{Name: "foo", Fields: Fields{{Name: "b", Fields: Fields{{Name: "c"}}}}},
 			},
 
-			err: "2 errors: fields contain key <a>; fields contain non object node conflicting with key <foo.b.c>",
+			err: "fields contain key <a>\nfields contain non object node conflicting with key <foo.b.c>",
 		},
 	}
 

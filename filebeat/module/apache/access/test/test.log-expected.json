@@ -50,7 +50,7 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "50.0."
+        "user_agent.version": "50.0"
     },
     {
         "@timestamp": "2016-12-26T14:16:48.000Z",

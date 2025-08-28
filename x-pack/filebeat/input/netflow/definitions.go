@@ -5,13 +5,13 @@
 package netflow
 
 import (
+	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math"
 	"os"
 	"strconv"
 
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
@@ -64,7 +64,7 @@ func LoadFieldDefinitions(yaml interface{}) (defs fields.FieldDict, err error) {
 	defs = fields.FieldDict{}
 	if !isIPFIX {
 		if err := loadFields(tree, 0, defs); err != nil {
-			return nil, errors.Wrap(err, "failed to load NetFlow fields")
+			return nil, fmt.Errorf("failed to load NetFlow fields: %w", err)
 		}
 		return defs, nil
 	}
@@ -81,7 +81,7 @@ func LoadFieldDefinitions(yaml interface{}) (defs fields.FieldDict, err error) {
 			return nil, fmt.Errorf("IPFIX fields for pem=%d malformed", pem)
 		}
 		if err := loadFields(tree, uint32(pem), defs); err != nil {
-			return nil, errors.Wrapf(err, "failed to load IPFIX fields for pem=%d", pem)
+			return nil, fmt.Errorf("failed to load IPFIX fields for pem=%d: %w", pem, err)
 		}
 	}
 	return defs, nil
@@ -95,13 +95,13 @@ func LoadFieldDefinitionsFromFile(path string) (defs fields.FieldDict, err error
 		return nil, err
 	}
 	defer file.Close()
-	contents, err := ioutil.ReadAll(file)
+	contents, err := io.ReadAll(file)
 	if err != nil {
 		return nil, err
 	}
 	var tree interface{}
 	if err := yaml.Unmarshal(contents, &tree); err != nil {
-		return nil, errors.Wrap(err, "unable to parse YAML")
+		return nil, fmt.Errorf("unable to parse YAML: %w", err)
 	}
 	return LoadFieldDefinitions(tree)
 }
@@ -169,7 +169,7 @@ func loadFields(def map[interface{}]interface{}, pem uint32, dest fields.FieldDi
 			return fmt.Errorf("bad field ID %d: should have two items (type, name) or one (:skip) (Got %+v)", fieldID, list)
 		}
 		key := fields.Key{
-			EnterpriseID: uint32(pem),
+			EnterpriseID: pem,
 			FieldID:      uint16(fieldID),
 		}
 		if _, exists := dest[key]; exists {

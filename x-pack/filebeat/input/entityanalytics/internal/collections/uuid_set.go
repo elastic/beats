@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"sort"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 )
 
 type UUIDSet struct {

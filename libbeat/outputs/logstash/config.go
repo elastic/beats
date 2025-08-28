@@ -43,6 +43,7 @@ type Config struct {
 	Proxy            transport.ProxyConfig `config:",inline"`
 	Backoff          Backoff               `config:"backoff"`
 	EscapeHTML       bool                  `config:"escape_html"`
+	Queue            config.Namespace      `config:"queue"`
 }
 
 type Backoff struct {

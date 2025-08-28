@@ -1,5 +1,5 @@
 # Module: prometheus
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-prometheus.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-prometheus.html
 
 - module: prometheus
   period: 10s
@@ -15,6 +15,9 @@
   #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
 
   # Use Elasticsearch histogram type to store histograms (beta, default: false)
   # This will change the default layout and put metric type in the field name
@@ -32,6 +35,9 @@
   # Secure settings for the server using TLS/SSL:
   #ssl.certificate: "/etc/pki/server/cert.pem"
   #ssl.key: "/etc/pki/server/cert.key"
+
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
 
   # Use Elasticsearch histogram type to store histograms (beta, default: false)
   # This will change the default layout and put metric type in the field name

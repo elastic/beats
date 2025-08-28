@@ -65,3 +65,8 @@ func (b *ExpBackoff) Wait() bool {
 		return true
 	}
 }
+
+// Last returns the time when the last call to Wait returned
+func (b *ExpBackoff) Last() time.Time {
+	return b.last
+}

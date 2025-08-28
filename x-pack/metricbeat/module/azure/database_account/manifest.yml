@@ -9,7 +9,7 @@ input:
       resource_type: "Microsoft.DocumentDb/databaseAccounts"
       metrics:
       - name: ["AddRegion", "RemoveRegion", "UpdateAccountReplicationSettings", "UpdateAccountNetworkSettings", "UpdateAccountKeys", "ServiceAvailability", "ReplicationLatency",
-               "RegionFailover", "DeleteAccount", "CreateAccount", "CassandraConnectionClosures", "UpdateDiagnosticsSettings"]
+               "RegionFailover", "DeleteAccount", "CreateAccount", "UpdateDiagnosticsSettings"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
       - name: ["AvailableStorage", "DataUsage","DocumentCount", "DocumentQuota", "IndexUsage", "MetadataRequests", "MongoRequestCharge", "MongoRequests", "MongoRequestsCount",
                "MongoRequestsInsert", "MongoRequestsDelete", "MongoRequestsQuery", "MongoRequestsUpdate","ProvisionedThroughput", "NormalizedRUConsumption"]
@@ -35,6 +35,13 @@ input:
         dimensions:
         - name: "DatabaseName"
           value: "*"
+      - name: ["CassandraConnectionClosures"]
+        namespace: "Microsoft.DocumentDb/databaseAccounts"
+        ignore_unsupported: true
+        timegrain: "PT1M"
+        dimensions:
+          - name: "ClosureReason"
+            value: "*"
       - name: [ "GremlinDatabaseDelete", "GremlinDatabaseThroughputUpdate", "GremlinDatabaseUpdate", "GremlinGraphDelete","GremlinGraphThroughputUpdate", "GremlinGraphUpdate",
         "MongoCollectionDelete", "MongoCollectionThroughputUpdate", "MongoCollectionUpdate", "MongoDBDatabaseUpdate", "MongoDatabaseDelete", "MongoDatabaseThroughputUpdate",
         "CassandraKeyspaceDelete", "CassandraKeyspaceThroughputUpdate", "CassandraKeyspaceUpdate","CassandraTableDelete", "CassandraTableThroughputUpdate", "CassandraTableUpdate",
@@ -48,7 +55,7 @@ input:
     - resource_id: ""
       metrics:
       - name: ["AddRegion", "RemoveRegion", "UpdateAccountReplicationSettings", "UpdateAccountNetworkSettings", "UpdateAccountKeys", "ServiceAvailability", "ReplicationLatency",
-               "RegionFailover", "DeleteAccount", "CreateAccount", "CassandraConnectionClosures", "UpdateDiagnosticsSettings"]
+               "RegionFailover", "DeleteAccount", "CreateAccount", "UpdateDiagnosticsSettings"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
       - name: ["AvailableStorage", "DataUsage","DocumentCount", "DocumentQuota", "IndexUsage", "MetadataRequests", "MongoRequestCharge", "MongoRequests", "MongoRequestsCount",
                "MongoRequestsInsert", "MongoRequestsDelete", "MongoRequestsQuery", "MongoRequestsUpdate","ProvisionedThroughput", "NormalizedRUConsumption"]
@@ -73,6 +80,13 @@ input:
         timegrain: "PT1M"
         dimensions:
         - name: "DatabaseName"
+          value: "*"
+      - name: ["CassandraConnectionClosures"]
+        namespace: "Microsoft.DocumentDb/databaseAccounts"
+        ignore_unsupported: true
+        timegrain: "PT1M"
+        dimensions:
+        - name: "ClosureReason"
           value: "*"
       - name: [ "GremlinDatabaseDelete", "GremlinDatabaseThroughputUpdate", "GremlinDatabaseUpdate", "GremlinGraphDelete","GremlinGraphThroughputUpdate", "GremlinGraphUpdate",
                 "MongoCollectionDelete", "MongoCollectionThroughputUpdate", "MongoCollectionUpdate", "MongoDBDatabaseUpdate", "MongoDatabaseDelete", "MongoDatabaseThroughputUpdate",

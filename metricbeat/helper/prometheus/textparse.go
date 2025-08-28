@@ -18,6 +18,8 @@
 package prometheus
 
 import (
+	"errors"
+	"io"
 	"math"
 	"mime"
 	"net/http"
@@ -26,10 +28,13 @@ import (
 	"time"
 
 	"github.com/prometheus/common/model"
-	"github.com/prometheus/prometheus/pkg/exemplar"
-	"github.com/prometheus/prometheus/pkg/labels"
-	"github.com/prometheus/prometheus/pkg/textparse"
-	"github.com/prometheus/prometheus/pkg/timestamp"
+	"github.com/prometheus/prometheus/model/exemplar"
+	"github.com/prometheus/prometheus/model/labels"
+	"github.com/prometheus/prometheus/model/textparse"
+	"github.com/prometheus/prometheus/model/timestamp"
+	"github.com/prometheus/prometheus/schema"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -37,7 +42,6 @@ const (
 	hdrContentType               = "Content-Type"
 	TextVersion                  = "0.0.4"
 	OpenMetricsType              = `application/openmetrics-text`
-	FmtUnknown            string = `<unknown>`
 	ContentTypeTextFormat string = `text/plain; version=` + TextVersion + `; charset=utf-8`
 )
 
@@ -62,6 +66,7 @@ func (m *Info) GetValue() int64 {
 	}
 	return 0
 }
+
 func (m *Info) HasValidValue() bool {
 	return m != nil && *m.Value == 1
 }
@@ -112,12 +117,12 @@ func (m *Quantile) GetValue() float64 {
 }
 
 type Summary struct {
-	SampleCount *uint64
+	SampleCount *float64
 	SampleSum   *float64
 	Quantile    []*Quantile
 }
 
-func (m *Summary) GetSampleCount() uint64 {
+func (m *Summary) GetSampleCount() float64 {
 	if m != nil && m.SampleCount != nil {
 		return *m.SampleCount
 	}
@@ -150,12 +155,12 @@ func (m *Unknown) GetValue() float64 {
 }
 
 type Bucket struct {
-	CumulativeCount *uint64
+	CumulativeCount *float64
 	UpperBound      *float64
 	Exemplar        *exemplar.Exemplar
 }
 
-func (m *Bucket) GetCumulativeCount() uint64 {
+func (m *Bucket) GetCumulativeCount() float64 {
 	if m != nil && m.CumulativeCount != nil {
 		return *m.CumulativeCount
 	}
@@ -170,13 +175,13 @@ func (m *Bucket) GetUpperBound() float64 {
 }
 
 type Histogram struct {
-	SampleCount      *uint64
+	SampleCount      *float64
 	SampleSum        *float64
 	Bucket           []*Bucket
 	IsGaugeHistogram bool
 }
 
-func (m *Histogram) GetSampleCount() uint64 {
+func (m *Histogram) GetSampleCount() float64 {
 	if m != nil && m.SampleCount != nil {
 		return *m.SampleCount
 	}
@@ -291,7 +296,7 @@ func (m *OpenMetric) GetTimestampMs() int64 {
 type MetricFamily struct {
 	Name   *string
 	Help   *string
-	Type   textparse.MetricType
+	Type   model.MetricType
 	Unit   *string
 	Metric []*OpenMetric
 }
@@ -317,17 +322,23 @@ func (m *MetricFamily) GetMetric() []*OpenMetric {
 }
 
 const (
-	suffixTotal  = "_total"
-	suffixGCount = "_gcount"
-	suffixGSum   = "_gsum"
-	suffixCount  = "_count"
-	suffixSum    = "_sum"
-	suffixBucket = "_bucket"
+	suffixTotal   = "_total"
+	suffixGCount  = "_gcount"
+	suffixGSum    = "_gsum"
+	suffixCount   = "_count"
+	suffixSum     = "_sum"
+	suffixBucket  = "_bucket"
+	suffixCreated = "_created"
+	suffixInfo    = "_info"
 )
 
 // Counters have _total suffix
 func isTotal(name string) bool {
 	return strings.HasSuffix(name, suffixTotal)
+}
+
+func isCreated(name string) bool {
+	return strings.HasSuffix(name, suffixCreated)
 }
 
 func isGCount(name string) bool {
@@ -350,19 +361,22 @@ func isBucket(name string) bool {
 	return strings.HasSuffix(name, suffixBucket)
 }
 
-func summaryMetricName(name string, s float64, qv string, lbls string, t *int64, summariesByName map[string]map[string]*OpenMetric) (string, *OpenMetric) {
+func isInfo(name string) bool {
+	return strings.HasSuffix(name, suffixInfo)
+}
+
+func summaryMetricName(name string, s float64, qv string, lbls string, summariesByName map[string]map[string]*OpenMetric) (string, *OpenMetric) {
 	var summary = &Summary{}
 	var quantile = []*Quantile{}
 	var quant = &Quantile{}
 
 	switch {
 	case isCount(name):
-		u := uint64(s)
-		summary.SampleCount = &u
-		name = name[:len(name)-6]
+		summary.SampleCount = &s
+		name = strings.TrimSuffix(name, suffixCount)
 	case isSum(name):
 		summary.SampleSum = &s
-		name = name[:len(name)-4]
+		name = strings.TrimSuffix(name, suffixSum)
 	default:
 		f, err := strconv.ParseFloat(qv, 64)
 		if err != nil {
@@ -372,8 +386,8 @@ func summaryMetricName(name string, s float64, qv string, lbls string, t *int64,
 		quant.Value = &s
 	}
 
-	_, k := summariesByName[name]
-	if !k {
+	_, ok := summariesByName[name]
+	if !ok {
 		summariesByName[name] = make(map[string]*OpenMetric)
 	}
 	metric, ok := summariesByName[name][lbls]
@@ -391,10 +405,17 @@ func summaryMetricName(name string, s float64, qv string, lbls string, t *int64,
 	} else if quant.Quantile != nil {
 		metric.Summary.Quantile = append(metric.Summary.Quantile, quant)
 	}
-
 	return name, metric
 }
 
+/*
+histogramMetricName returns the metric name without the suffix and its histogram.
+OpenMetric suffixes: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#suffixes.
+Prometheus histogram suffixes: https://prometheus.io/docs/concepts/metric_types/#histogram.
+OpenMetric includes the extra suffix _created, that falls under default in this function.
+OpenMetric also includes _g* suffixes that are not present for Prometheus metrics and are taken care of separately in
+this function.
+*/
 func histogramMetricName(name string, s float64, qv string, lbls string, t *int64, isGaugeHistogram bool, e *exemplar.Exemplar, histogramsByName map[string]map[string]*OpenMetric) (string, *OpenMetric) {
 	var histogram = &Histogram{}
 	var bucket = []*Bucket{}
@@ -402,30 +423,24 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 
 	switch {
 	case isCount(name):
-		u := uint64(s)
-		histogram.SampleCount = &u
-		name = name[:len(name)-6]
+		histogram.SampleCount = &s
+		name = strings.TrimSuffix(name, suffixCount)
 	case isSum(name):
 		histogram.SampleSum = &s
-		name = name[:len(name)-4]
+		name = strings.TrimSuffix(name, suffixSum)
 	case isGaugeHistogram && isGCount(name):
-		u := uint64(s)
-		histogram.SampleCount = &u
-		name = name[:len(name)-7]
+		histogram.SampleCount = &s
+		name = strings.TrimSuffix(name, suffixGCount)
 	case isGaugeHistogram && isGSum(name):
 		histogram.SampleSum = &s
-		name = name[:len(name)-5]
-	default:
-		if isBucket(name) {
-			name = name[:len(name)-7]
-		}
+		name = strings.TrimSuffix(name, suffixGSum)
+	case isBucket(name):
 		f, err := strconv.ParseFloat(qv, 64)
 		if err != nil {
 			f = math.MaxUint64
 		}
-		cnt := uint64(s)
 		bkt.UpperBound = &f
-		bkt.CumulativeCount = &cnt
+		bkt.CumulativeCount = &s
 
 		if e != nil {
 			if !e.HasTs {
@@ -433,6 +448,9 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 			}
 			bkt.Exemplar = e
 		}
+		name = strings.TrimSuffix(name, suffixBucket)
+	default:
+		return "", nil
 	}
 
 	_, k := histogramsByName[name]
@@ -458,17 +476,20 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 	return name, metric
 }
 
-func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricFamily, error) {
+func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
+	parser, err := textparse.New(b, contentType, ContentTypeTextFormat, false, false, false, labels.NewSymbolTable()) // Fallback protocol set to ContentTypeTextFormat
+	if err != nil {
+		return nil, err
+	}
 	var (
-		parser               = textparse.New(b, contentType)
 		defTime              = timestamp.FromTime(ts)
 		metricFamiliesByName = map[string]*MetricFamily{}
 		summariesByName      = map[string]map[string]*OpenMetric{}
 		histogramsByName     = map[string]map[string]*OpenMetric{}
 		fam                  *MetricFamily
-		mt                   = textparse.MetricTypeUnknown
+		// metricTypes stores the metric type for each metric name.
+		metricTypes = make(map[string]model.MetricType)
 	)
-	var err error
 
 	for {
 		var (
@@ -477,20 +498,39 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			e  exemplar.Exemplar
 		)
 		if et, err = parser.Next(); err != nil {
-			// TODO: log here
-			// if errors.Is(err, io.EOF) {}
+			if strings.HasPrefix(err.Error(), "invalid metric type") {
+				logger.Debugf("Ignored invalid metric type : %v ", err)
+
+				// NOTE: ignore any errors that are not EOF. This is to avoid breaking the parsing.
+				// if acceptHeader in the prometheus client is `Accept: text/plain; version=0.0.4` (like it is now)
+				// any `info` metrics are not supported, and then there will be ignored here.
+				// if acceptHeader in the prometheus client `Accept: application/openmetrics-text; version=0.0.1`
+				// any `info` metrics are supported, and then there will be parsed here.
+				continue
+			}
+
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			if strings.HasPrefix(err.Error(), "data does not end with # EOF") {
+				break
+			}
+			logger.Debugf("Error while parsing metrics: %v ", err)
 			break
 		}
 		switch et {
 		case textparse.EntryType:
 			buf, t := parser.Type()
 			s := string(buf)
-			_, ok = metricFamiliesByName[s]
+			fam, ok = metricFamiliesByName[s]
 			if !ok {
 				fam = &MetricFamily{Name: &s, Type: t}
 				metricFamiliesByName[s] = fam
+			} else {
+				fam.Type = t
 			}
-			mt = t
+			// Store the metric type for each base metric name.
+			metricTypes[s] = t
 			continue
 		case textparse.EntryHelp:
 			buf, t := parser.Help()
@@ -498,10 +538,11 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			h := string(t)
 			_, ok = metricFamiliesByName[s]
 			if !ok {
-				fam = &MetricFamily{Name: &s, Help: &h, Type: textparse.MetricTypeUnknown}
+				fam = &MetricFamily{Name: &s, Help: &h}
 				metricFamiliesByName[s] = fam
+			} else {
+				fam.Help = &h
 			}
-			fam.Help = &h
 			continue
 		case textparse.EntryUnit:
 			buf, t := parser.Unit()
@@ -509,10 +550,11 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			u := string(t)
 			_, ok = metricFamiliesByName[s]
 			if !ok {
-				fam = &MetricFamily{Name: &s, Unit: &u, Type: textparse.MetricTypeUnknown}
+				fam = &MetricFamily{Name: &s, Unit: &u}
 				metricFamiliesByName[string(buf)] = fam
+			} else {
+				fam.Unit = &u
 			}
-			fam.Unit = &u
 			continue
 		case textparse.EntryComment:
 			continue
@@ -522,31 +564,34 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 		t := defTime
 		_, tp, v := parser.Series()
 
-		var (
-			lset labels.Labels
-			mets string
-		)
+		var lset labels.Labels
+		parser.Labels(&lset)
+		metadata := schema.NewMetadataFromLabels(lset)
+		metricName := metadata.Name
 
-		mets = parser.Metric(&lset)
-
-		if !lset.Has(labels.MetricName) {
+		if metricName == "" {
 			// missing metric name from labels.MetricName, skip.
 			break
 		}
 
 		var lbls strings.Builder
-		lbls.Grow(len(mets))
 		var labelPairs = []*labels.Label{}
-		for _, l := range lset.Copy() {
+		var qv string // value of le or quantile label
+		lset.Range(func(l labels.Label) {
 			if l.Name == labels.MetricName {
-				continue
+				return
 			}
 
-			if l.Name != model.QuantileLabel && l.Name != labels.BucketLabel { // quantile and le are special labels handled below
-
+			switch l.Name {
+			case model.QuantileLabel:
+				qv = lset.Get(model.QuantileLabel)
+			case labels.BucketLabel:
+				qv = lset.Get(labels.BucketLabel)
+			default:
 				lbls.WriteString(l.Name)
 				lbls.WriteString(l.Value)
 			}
+
 			n := l.Name
 			v := l.Value
 
@@ -554,84 +599,126 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 				Name:  n,
 				Value: v,
 			})
-		}
+		})
 
 		var metric *OpenMetric
 
-		metricName := lset.Get(labels.MetricName)
-		var lookupMetricName string
+		// lookupMetricName will have the suffixes removed
+		lookupMetricName := metricName
 		var exm *exemplar.Exemplar
+
+		mt, ok := metricTypes[metricName]
+		if !ok {
+			// Splitting is necessary to find the base metric name type in the metricTypes map.
+			// This allows us to group related metrics together under the same base metric name.
+			// For example, the metric family `summary_metric` can have the metrics
+			// `summary_metric_count` and `summary_metric_sum`, all having the same metric type.
+			parts := strings.Split(metricName, "_")
+			baseMetricNamekey := strings.Join(parts[:len(parts)-1], "_")
+
+			// If the metric type is not found, default to unknown
+			if metricTypeFound, ok := metricTypes[baseMetricNamekey]; ok {
+				mt = metricTypeFound
+			} else {
+				mt = model.MetricTypeUnknown
+			}
+		}
 
 		// Suffixes - https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#suffixes
 		switch mt {
-		case textparse.MetricTypeCounter:
+		case model.MetricTypeCounter:
+			if contentType == OpenMetricsType && !isTotal(metricName) && !isCreated(metricName) {
+				// Possible suffixes for counter in Open metrics are _created and _total.
+				// Otherwise, ignore.
+				// https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#counter-1
+				continue
+			}
+
 			var counter = &Counter{Value: &v}
 			mn := lset.Get(labels.MetricName)
 			metric = &OpenMetric{Name: &mn, Counter: counter, Label: labelPairs}
-			if isTotal(metricName) && contentType == OpenMetricsType { // Remove suffix _total, get lookup metricname
-				lookupMetricName = metricName[:len(metricName)-6]
+			if contentType == OpenMetricsType {
+				// Remove the two possible suffixes, _created and _total
+				if isTotal(metricName) {
+					lookupMetricName = strings.TrimSuffix(metricName, suffixTotal)
+				} else {
+					lookupMetricName = strings.TrimSuffix(metricName, suffixCreated)
+				}
 			} else {
 				lookupMetricName = metricName
 			}
-		case textparse.MetricTypeGauge:
+		case model.MetricTypeGauge:
 			var gauge = &Gauge{Value: &v}
 			metric = &OpenMetric{Name: &metricName, Gauge: gauge, Label: labelPairs}
-			lookupMetricName = metricName
-		case textparse.MetricTypeInfo:
+			//lookupMetricName = metricName
+		case model.MetricTypeInfo:
+			// Info only exists for Openmetrics. It must have the suffix _info
+			if !isInfo(metricName) {
+				continue
+			}
+			lookupMetricName = strings.TrimSuffix(metricName, suffixInfo)
 			value := int64(v)
 			var info = &Info{Value: &value}
 			metric = &OpenMetric{Name: &metricName, Info: info, Label: labelPairs}
-			lookupMetricName = metricName
-		case textparse.MetricTypeSummary:
-			lookupMetricName, metric = summaryMetricName(metricName, v, lset.Get(model.QuantileLabel), lbls.String(), &t, summariesByName)
+		case model.MetricTypeSummary:
+			lookupMetricName, metric = summaryMetricName(metricName, v, qv, lbls.String(), summariesByName)
 			metric.Label = labelPairs
 			if !isSum(metricName) {
+				// Avoid registering the metric multiple times.
 				continue
 			}
-			metricName = lookupMetricName
-		case textparse.MetricTypeHistogram:
+		case model.MetricTypeHistogram:
 			if hasExemplar := parser.Exemplar(&e); hasExemplar {
 				exm = &e
 			}
-			lookupMetricName, metric = histogramMetricName(metricName, v, lset.Get(labels.BucketLabel), lbls.String(), &t, false, exm, histogramsByName)
-			metric.Label = labelPairs
-			if !isSum(metricName) {
+			lookupMetricName, metric = histogramMetricName(metricName, v, qv, lbls.String(), &t, false, exm, histogramsByName)
+			if metric == nil {
 				continue
 			}
-			metricName = lookupMetricName
-		case textparse.MetricTypeGaugeHistogram:
+			metric.Label = labelPairs
+			if !isSum(metricName) {
+				// Avoid registering the metric multiple times.
+				continue
+			}
+		case model.MetricTypeGaugeHistogram:
 			if hasExemplar := parser.Exemplar(&e); hasExemplar {
 				exm = &e
 			}
-			lookupMetricName, metric = histogramMetricName(metricName, v, lset.Get(labels.BucketLabel), lbls.String(), &t, true, exm, histogramsByName)
+			lookupMetricName, metric = histogramMetricName(metricName, v, qv, lbls.String(), &t, true, exm, histogramsByName)
+			if metric == nil { // metric name does not have a suffix supported for the type gauge histogram
+				continue
+			}
 			metric.Label = labelPairs
 			metric.Histogram.IsGaugeHistogram = true
 			if !isGSum(metricName) {
+				// Avoid registering the metric multiple times.
 				continue
 			}
-			metricName = lookupMetricName
-		case textparse.MetricTypeStateset:
+		case model.MetricTypeStateset:
 			value := int64(v)
 			var stateset = &Stateset{Value: &value}
 			metric = &OpenMetric{Name: &metricName, Stateset: stateset, Label: labelPairs}
-			lookupMetricName = metricName
-		case textparse.MetricTypeUnknown:
+		case model.MetricTypeUnknown:
 			var unknown = &Unknown{Value: &v}
 			metric = &OpenMetric{Name: &metricName, Unknown: unknown, Label: labelPairs}
-			lookupMetricName = metricName
 		default:
-			lookupMetricName = metricName
 		}
 
 		fam, ok = metricFamiliesByName[lookupMetricName]
 		if !ok {
-			fam = &MetricFamily{Type: mt}
-			metricFamiliesByName[lookupMetricName] = fam
+			// If the lookupMetricName is not in metricFamiliesByName, we check for metric name, in case
+			// the removed suffix is part of the name.
+			fam, ok = metricFamiliesByName[metricName]
+			if !ok {
+				// There is not any metadata for this metric. In this case, the name of the metric
+				// will remain metricName instead of the possible modified lookupMetricName
+				fam = &MetricFamily{Name: &metricName, Type: mt}
+				metricFamiliesByName[metricName] = fam
+
+			}
 		}
 
-		fam.Name = &metricName
-
-		if hasExemplar := parser.Exemplar(&e); hasExemplar && mt != textparse.MetricTypeHistogram && metric != nil {
+		if hasExemplar := parser.Exemplar(&e); hasExemplar && mt != model.MetricTypeHistogram && metric != nil {
 			if !e.HasTs {
 				e.Ts = t
 			}
@@ -660,7 +747,7 @@ func GetContentType(h http.Header) string {
 
 	mediatype, params, err := mime.ParseMediaType(ct)
 	if err != nil {
-		return FmtUnknown
+		return ""
 	}
 
 	const textType = "text/plain"
@@ -668,16 +755,16 @@ func GetContentType(h http.Header) string {
 	switch mediatype {
 	case OpenMetricsType:
 		if e, ok := params["encoding"]; ok && e != "delimited" {
-			return FmtUnknown
+			return ""
 		}
 		return OpenMetricsType
 
 	case textType:
 		if v, ok := params["version"]; ok && v != TextVersion {
-			return FmtUnknown
+			return ""
 		}
 		return ContentTypeTextFormat
 	}
 
-	return FmtUnknown
+	return ""
 }

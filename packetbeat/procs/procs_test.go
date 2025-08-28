@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package procs
 
@@ -79,7 +78,7 @@ func (w *mockWatcher) GetLocalIPs() ([]net.IP, error) {
 }
 
 func TestFindProcessTuple(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 	config := ProcsConfig{
 		Enabled: true,
 		Monitored: []ProcConfig{

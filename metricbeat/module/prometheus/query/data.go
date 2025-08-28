@@ -19,6 +19,7 @@ package query
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"strconv"
@@ -120,8 +121,7 @@ func parseResponse(body []byte, pathConfig QueryConfig) ([]mb.Event, error) {
 		}
 		events = append(events, evnts...)
 	default:
-		msg := fmt.Sprintf("Unknown resultType '%v'", resultType)
-		return events, fmt.Errorf(msg)
+		return events, fmt.Errorf("Unknown resultType '%v'", resultType)
 	}
 	return events, nil
 }
@@ -223,8 +223,7 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 		} else if resultType == "string" {
 			value, ok := convertedArray.Data.Results[1].(string)
 			if !ok {
-				msg := fmt.Sprintf("Could not parse value of result: %v", convertedArray.Data.Results)
-				return mb.Event{}, fmt.Errorf(msg)
+				return mb.Event{}, fmt.Errorf("Could not parse value of result: %v", convertedArray.Data.Results)
 			}
 			return mb.Event{
 				Timestamp: getTimestamp(timestamp),
@@ -249,8 +248,7 @@ func getTimestampFromVector(vector []interface{}) (float64, error) {
 	}
 	timestamp, ok := vector[0].(float64)
 	if !ok {
-		msg := fmt.Sprintf("Could not parse timestamp of result: %v", vector)
-		return 0, fmt.Errorf(msg)
+		return 0, fmt.Errorf("Could not parse timestamp of result: %v", vector)
 	}
 	return timestamp, nil
 }
@@ -258,17 +256,15 @@ func getTimestampFromVector(vector []interface{}) (float64, error) {
 func getValueFromVector(vector []interface{}) (float64, error) {
 	// Example input: [ <unix_time>, "<sample_value>" ]
 	if len(vector) != 2 {
-		return 0, fmt.Errorf("could not parse results")
+		return 0, errors.New("could not parse results")
 	}
 	value, ok := vector[1].(string)
 	if !ok {
-		msg := fmt.Sprintf("Could not parse value of result: %v", vector)
-		return 0, fmt.Errorf(msg)
+		return 0, fmt.Errorf("Could not parse value of result: %v", vector)
 	}
 	val, err := strconv.ParseFloat(value, 64)
 	if err != nil {
-		msg := fmt.Sprintf("Could not parse value of result: %v", vector)
-		return 0, fmt.Errorf(msg)
+		return 0, fmt.Errorf("Could not parse value of result: %v", vector)
 	}
 	return val, nil
 }

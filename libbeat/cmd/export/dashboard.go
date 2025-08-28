@@ -40,7 +40,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 			folder, _ := cmd.Flags().GetString("folder")
 
 			if len(folder) == 0 {
-				fatalf("-folder must be specified")
+				fatalf("--folder must be specified")
 			}
 
 			b, err := instance.NewInitializedBeat(settings)
@@ -71,7 +71,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 					fatalf("Error exporting dashboards from yml: %+v.\n", err)
 				}
 				for i, r := range results {
-					r = dashboards.DecodeExported(r)
+					r = dashboards.DecodeExported(r, b.Info.Logger)
 
 					err = dashboards.SaveToFile(r, info.Dashboards[i].File, filepath.Dir(yml), client.GetVersion())
 					if err != nil {
@@ -89,7 +89,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 					fatalf("Error exporting dashboard: %+v.\n", err)
 				}
 
-				result = dashboards.DecodeExported(result)
+				result = dashboards.DecodeExported(result, b.Info.Logger)
 
 				err = dashboards.SaveToFolder(result, folder, client.GetVersion())
 				if err != nil {

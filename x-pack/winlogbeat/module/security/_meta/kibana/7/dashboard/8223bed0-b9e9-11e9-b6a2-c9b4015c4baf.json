@@ -503,11 +503,10 @@
         "title": "[Winlogbeat Security] User Management Events - Simple Metric",
         "version": 1
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:06.403Z",
     "id": "8223bed0-b9e9-11e9-b6a2-c9b4015c4baf",
-    "migrationVersion": {
-        "dashboard": "7.14.0"
-    },
+    "managed": false,
     "references": [
         {
             "id": "2dc6b820-b9e8-11e9-b6a2-c9b4015c4baf",
@@ -646,6 +645,7 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2021-08-11T13:18:59.362Z",
-    "version": "WzIyNzksMl0="
+    "typeMigrationVersion": "8.9.0",
+    "updated_at": "2023-11-10T17:08:06.403Z",
+    "version": "WzI3NSwxXQ=="
 }

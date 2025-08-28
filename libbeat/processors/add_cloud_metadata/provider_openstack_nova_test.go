@@ -27,30 +27,31 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func openstackNovaMetadataHandler() http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		if r.RequestURI == osMetadataInstanceIDURI {
-			w.Write([]byte("i-0000ffac"))
+			_, _ = w.Write([]byte("i-0000ffac"))
 			return
 		}
 		if r.RequestURI == osMetadataInstanceTypeURI {
-			w.Write([]byte("m1.xlarge"))
+			_, _ = w.Write([]byte("m1.xlarge"))
 			return
 		}
 		if r.RequestURI == osMetadataHostnameURI {
-			w.Write([]byte("testvm01.stack.cloud"))
+			_, _ = w.Write([]byte("testvm01.stack.cloud"))
 			return
 		}
 		if r.RequestURI == osMetadataZoneURI {
-			w.Write([]byte("az-test-2"))
+			_, _ = w.Write([]byte("az-test-2"))
 			return
 		}
 
 		http.Error(w, "not found", http.StatusNotFound)
-	})
+	}
 }
 
 func TestRetrieveOpenstackNovaMetadata(t *testing.T) {
@@ -89,7 +90,7 @@ func TestRetrieveOpenstackNovaMetadataWithHTTPS(t *testing.T) {
 }
 
 func assertOpenstackNova(t *testing.T, config *conf.C) {
-	p, err := New(config)
+	p, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

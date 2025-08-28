@@ -19,9 +19,8 @@ package connection
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -36,8 +35,17 @@ var (
 		},
 	}
 	connectionsSchema = s.Schema{
-		"name":          c.Str("name"),
+		"id":            c.Int("cid", s.Optional),
+		"kind":          c.Str("kind", s.Optional),
+		"type":          c.Str("type", s.Optional),
+		"name":          c.Str("name", s.Optional),
+		"ip":            c.Str("ip", s.Optional),
+		"port":          c.Int("port", s.Optional),
 		"subscriptions": c.Int("subscriptions"),
+		"lang":          c.Str("lang", s.Optional),
+		"version":       c.Str("version", s.Optional),
+		"start":         c.Str("start", s.Optional),
+		"last_activity": c.Str("last_activity", s.Optional),
 		"in": s.Object{
 			"messages": c.Int("in_msgs"),
 			"bytes":    c.Int("in_bytes"),
@@ -63,26 +71,26 @@ type Connections struct {
 func eventMapping(content map[string]interface{}, fieldsSchema s.Schema) (mb.Event, error) {
 	fields, err := fieldsSchema.Apply(content)
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "error applying connection schema")
+		return mb.Event{}, fmt.Errorf("error applying connection schema: %w", err)
 	}
 
 	err = util.UpdateDuration(fields, "uptime")
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "failure updating uptime key")
+		return mb.Event{}, fmt.Errorf("failure updating uptime key: %w", err)
 	}
 
 	err = util.UpdateDuration(fields, "idle_time")
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "failure updating idle_time key")
+		return mb.Event{}, fmt.Errorf("failure updating idle_time key: %w", err)
 	}
 
 	moduleFields, err := moduleSchema.Apply(content)
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "error applying module schema")
+		return mb.Event{}, fmt.Errorf("error applying module schema: %w", err)
 	}
 
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "failure parsing server timestamp")
+		return mb.Event{}, fmt.Errorf("failure parsing server timestamp: %w", err)
 	}
 	event := mb.Event{
 		MetricSetFields: fields,
@@ -96,7 +104,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	var err error
 	connections := Connections{}
 	if err = json.Unmarshal(content, &connections); err != nil {
-		return errors.Wrap(err, "failure parsing NATS connections API response")
+		return fmt.Errorf("failure parsing NATS connections API response: %w", err)
 	}
 
 	for _, con := range connections.Connections {
@@ -104,7 +112,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 		con["server_id"] = connections.ServerID
 		evt, err = eventMapping(con, connectionsSchema)
 		if err != nil {
-			r.Error(errors.Wrap(err, "error mapping connection event"))
+			r.Error(fmt.Errorf("error mapping connection event: %w", err))
 			continue
 		}
 		evt.Timestamp = connections.Now

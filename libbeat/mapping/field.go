@@ -18,11 +18,9 @@
 package mapping
 
 import (
+	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg/yaml"
@@ -158,7 +156,7 @@ func (a *Analyzer) Unpack(v interface{}) error {
 // Validate ensures objectTypeParams are not mixed with top level objectType configuration
 func (f *Field) Validate() error {
 	if err := f.validateType(); err != nil {
-		return errors.Wrapf(err, "incorrect type configuration for field '%s'", f.Name)
+		return fmt.Errorf("incorrect type configuration for field '%s': %w", f.Name, err)
 	}
 	if len(f.ObjectTypeParams) > 0 {
 		if f.ScalingFactor != 0 || f.ObjectTypeMappingType != "" || f.ObjectType != "" {
@@ -442,14 +440,14 @@ func ConcatFields(a, b Fields) (Fields, error) {
 }
 
 func (f Fields) conflicts(fields Fields) error {
-	var errs multierror.Errors
+	var errs []error
 	for _, key := range fields.GetKeys() {
 		keys := strings.Split(key, ".")
 		if err := f.canConcat(key, keys); err != nil {
 			errs = append(errs, err)
 		}
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // canConcat checks if the given string can be concatenated to the existing fields f
@@ -468,12 +466,12 @@ func (f Fields) canConcat(k string, keys []string) error {
 		}
 		// last key to compare
 		if len(keys) == 0 {
-			return errors.Errorf("fields contain key <%s>", k)
+			return fmt.Errorf("fields contain key <%s>", k)
 		}
 		// last field to compare, only valid if it is of type object
 		if len(field.Fields) == 0 {
 			if field.Type != "object" {
-				return errors.Errorf("fields contain non object node conflicting with key <%s>", k)
+				return fmt.Errorf("fields contain non object node conflicting with key <%s>", k)
 			}
 		}
 		return field.Fields.canConcat(k, keys)

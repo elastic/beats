@@ -52,8 +52,7 @@ type ValuesMap interface {
 }
 
 // NewCondition takes a Config and turns it into a real Condition
-func NewCondition(config *Config) (Condition, error) {
-
+func NewCondition(config *Config, logger *logp.Logger) (Condition, error) {
 	if config == nil {
 		// empty condition
 		return nil, errors.New("missing condition config")
@@ -63,28 +62,28 @@ func NewCondition(config *Config) (Condition, error) {
 	var err error
 	switch {
 	case config.Equals != nil:
-		condition, err = NewEqualsCondition(config.Equals.fields)
+		condition, err = NewEqualsCondition(config.Equals.fields, logger)
 	case config.Contains != nil:
-		condition, err = NewMatcherCondition("contains", config.Contains.fields, match.CompileString)
+		condition, err = NewMatcherCondition("contains", config.Contains.fields, match.CompileString, logger)
 	case config.Regexp != nil:
-		condition, err = NewMatcherCondition("regexp", config.Regexp.fields, match.Compile)
+		condition, err = NewMatcherCondition("regexp", config.Regexp.fields, match.Compile, logger)
 	case config.Range != nil:
-		condition, err = NewRangeCondition(config.Range.fields)
+		condition, err = NewRangeCondition(config.Range.fields, logger)
 	case config.HasFields != nil:
 		condition = NewHasFieldsCondition(config.HasFields)
 	case config.Network != nil && len(config.Network) > 0:
-		condition, err = NewNetworkCondition(config.Network)
+		condition, err = NewNetworkCondition(config.Network, logger)
 	case len(config.OR) > 0:
 		var conditionsList []Condition
-		conditionsList, err = NewConditionList(config.OR)
+		conditionsList, err = NewConditionList(config.OR, logger)
 		condition = NewOrCondition(conditionsList)
 	case len(config.AND) > 0:
 		var conditionsList []Condition
-		conditionsList, err = NewConditionList(config.AND)
+		conditionsList, err = NewConditionList(config.AND, logger)
 		condition = NewAndCondition(conditionsList)
 	case config.NOT != nil:
 		var inner Condition
-		inner, err = NewCondition(config.NOT)
+		inner, err = NewCondition(config.NOT, logger)
 		if err == nil {
 			condition, err = NewNotCondition(inner)
 		}
@@ -95,15 +94,15 @@ func NewCondition(config *Config) (Condition, error) {
 		return nil, err
 	}
 
-	logp.L().Named(logName).Debugf("New condition %v", condition)
+	logger.Named(logName).Debugf("New condition %v", condition)
 	return condition, nil
 }
 
 // NewConditionList takes a slice of Config objects and turns them into real Condition objects.
-func NewConditionList(config []Config) ([]Condition, error) {
+func NewConditionList(config []Config, logger *logp.Logger) ([]Condition, error) {
 	out := make([]Condition, len(config))
 	for i := range config {
-		cond, err := NewCondition(&config[i])
+		cond, err := NewCondition(&config[i], logger)
 		if err != nil {
 			return nil, err
 		}

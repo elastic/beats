@@ -16,14 +16,12 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package eslegclient
 
 import (
 	"context"
-	"io/ioutil"
-	"math/rand"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -35,15 +33,25 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
-	"github.com/elastic/beats/v7/libbeat/outputs"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 func TestConnect(t *testing.T) {
 	conn := getTestingElasticsearch(t)
-	err := conn.Connect()
+	err := conn.Connect(context.Background())
 	assert.NoError(t, err)
+}
+
+func TestConnectionCanBeClosedAndReused(t *testing.T) {
+	conn := getTestingElasticsearch(t)
+	ctx, cancel := context.WithCancel(context.Background())
+	assert.NoError(t, conn.Connect(ctx), "first connect must succeed")
+	assert.NoError(t, conn.Close(), "close must succeed")
+	cancel()
+	assert.NoError(t, conn.Connect(context.Background()), "calling connect after close must succeed")
 }
 
 func TestConnectWithProxy(t *testing.T) {
@@ -67,7 +75,9 @@ func TestConnectWithProxy(t *testing.T) {
 		"timeout": 5, // seconds
 	})
 	require.NoError(t, err)
-	assert.Error(t, client.Connect(), "it should fail without proxy")
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	assert.Error(t, client.Connect(ctx), "it should fail without proxy")
 
 	client, err = connectTestEs(t, map[string]interface{}{
 		"hosts":     "http://" + wrongPort.Addr().String(),
@@ -75,7 +85,7 @@ func TestConnectWithProxy(t *testing.T) {
 		"timeout":   5, // seconds
 	})
 	require.NoError(t, err)
-	assert.NoError(t, client.Connect())
+	assert.NoError(t, client.Connect(ctx))
 }
 
 func connectTestEs(t *testing.T, cfg interface{}) (*Connection, error) {
@@ -123,7 +133,7 @@ func connectTestEs(t *testing.T, cfg interface{}) (*Connection, error) {
 		s.Transport.Proxy.URL = proxyURI
 	}
 
-	return NewConnection(s)
+	return NewConnection(s, logptest.NewTestingLogger(t, ""))
 }
 
 // getTestingElasticsearch creates a test client.
@@ -133,21 +143,11 @@ func getTestingElasticsearch(t eslegtest.TestLogger) *Connection {
 		Username:         eslegtest.GetUser(),
 		Password:         eslegtest.GetPass(),
 		CompressionLevel: 3,
-	})
+	}, logp.NewNopLogger())
 	conn.Transport.Timeout = 60 * time.Second
 
 	eslegtest.InitConnection(t, conn, err)
 	return conn
-}
-
-func randomClient(grp outputs.Group) outputs.NetworkClient {
-	L := len(grp.Clients)
-	if L == 0 {
-		panic("no elasticsearch client")
-	}
-
-	client := grp.Clients[rand.Intn(L)]
-	return client.(outputs.NetworkClient)
 }
 
 // startTestProxy starts a proxy that redirects all connections to the specified URL
@@ -167,14 +167,14 @@ func startTestProxy(t *testing.T, redirectURL string) *httptest.Server {
 		require.NoError(t, err)
 		defer resp.Body.Close()
 
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		require.NoError(t, err)
 
 		for _, header := range []string{"Content-Encoding", "Content-Type"} {
 			w.Header().Set(header, resp.Header.Get(header))
 		}
 		w.WriteHeader(resp.StatusCode)
-		w.Write(body)
+		w.Write(body) //nolint: errcheck // It's a test, we can ignore this error
 	}))
 	return proxy
 }

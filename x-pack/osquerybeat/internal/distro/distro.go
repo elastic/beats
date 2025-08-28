@@ -36,14 +36,19 @@ const (
 	osqueryCertsDarwinPath  = "private/var/osquery/certs/" + osqueryCertsPEM
 	osqueryCertsWindowsPath = "osquery/certs/" + osqueryCertsPEM
 
-	osqueryVersion = "5.7.0"
+	osqueryLensesLinuxDir  = "opt/osquery/share/osquery/lenses"
+	osqueryLensesDarwinDir = "private/var/osquery/lenses"
+
+	osqueryLensesDir = "lenses"
+
+	osqueryVersion = "5.15.0"
 	osqueryMSIExt  = ".msi"
 	osqueryPkgExt  = ".pkg"
 
-	osqueryDistroDarwinSHA256   = "6147f5632d7ae0bfb5c485f3b2211057179ceed18904b375007f23043408261f"
-	osqueryDistroLinuxSHA256    = "0e34979a795be205b2a1bdf0b85464a34951fe94b462bd7c23bd894e24baceef"
-	osqueryDistroLinuxARMSHA256 = "86826541444fe192b3a5f54d0e7d9f83375fc242c44e741fcd0766c8f933cac0"
-	osqueryDistroWindowsSHA256  = "0e54fec4b8b8a800e3bdd178a2473db9de25e53b8ea800775b7f9cc8c847be1c"
+	osqueryDistroDarwinSHA256   = "5044ba8207a68cd756ef01ffcb408e558cf4e28eab7793cce0337095c9499bac"
+	osqueryDistroLinuxSHA256    = "9bc11806afba259a5d25bf937fbf6c16337abc672c1a5b09369226c2abe8dcd3"
+	osqueryDistroLinuxARMSHA256 = "ca6e92e4d60cf2990d346c98362c171e9ce3d43aa050db79f0bc2b03949800d3"
+	osqueryDistroWindowsSHA256  = "9c06dd0b8fbe76129cff5bebc79277044213d5cddccb9ddfe2179606908a817e"
 )
 
 type OSArch struct {
@@ -90,6 +95,10 @@ func OsquerydCertsPath(dir string) string {
 	return filepath.Join(dir, osqueryCertsPath)
 }
 
+func OsquerydLensesDir(dir string) string {
+	return filepath.Join(dir, osqueryLensesDir)
+}
+
 func OsquerydDarwinDistroPath() string {
 	return osqueryDarwinPath
 }
@@ -108,6 +117,14 @@ func OsquerydCertsDarwinDistroPath() string {
 
 func OsquerydCertsWindowsDistroPath() string {
 	return osqueryCertsWindowsPath
+}
+
+func OsquerydLensesLinuxDistroDir() string {
+	return osqueryLensesLinuxDir
+}
+
+func OsquerydLensesDarwinDistroDir() string {
+	return osqueryLensesDarwinDir
 }
 
 func OsquerydDistroFilename() string {
@@ -161,7 +178,7 @@ var specs = map[OSArch]Spec{
 	{"linux", "arm64"}:   {"_1.linux_aarch64.tar.gz", osqueryDistroLinuxARMSHA256, true},
 	{"darwin", "amd64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, true},
 	{"darwin", "arm64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, true},
-	{"windows", "amd64"}: {osqueryMSIExt, osqueryDistroWindowsSHA256, false},
+	{"windows", "amd64"}: {osqueryMSIExt, osqueryDistroWindowsSHA256, true},
 }
 
 func GetSpec(osarch OSArch) (spec Spec, err error) {

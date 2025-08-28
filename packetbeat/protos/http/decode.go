@@ -23,7 +23,7 @@ import (
 	"compress/gzip"
 	"io"
 
-	"github.com/pkg/errors"
+	"errors"
 )
 
 var (

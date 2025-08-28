@@ -14,9 +14,8 @@
     "log": {
       "level": "information"
     },
-    "message": "The Per-user audit policy table was created.\n\nNumber of Elements:\t0\nPolicy ID:\t0x9FD2",
+    "message": "The Per-user audit policy table was created.\n\nNumber of Elements:\t0\nPolicy ID:\t0x9fd2",
     "winlog": {
-      "api": "wineventlog",
       "channel": "Security",
       "computer_name": "WIN-BVM4LI1L1Q6.TEST.local",
       "event_data": {
@@ -34,7 +33,7 @@
           "id": 832
         }
       },
-      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 140273,
       "task": "Audit Policy Change"

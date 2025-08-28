@@ -18,7 +18,9 @@
 package conntrack
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+	"os"
+
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -47,9 +49,12 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The linux conntrack metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The linux conntrack metricset is beta."))
 
-	sys := base.Module().(resolve.Resolver)
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, fmt.Errorf("unexpected module type: %T", base.Module())
+	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -63,16 +68,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	newFS, err := procfs.NewFS(m.mod.ResolveHostFS("/proc"))
 	if err != nil {
-		return errors.Wrapf(err, "error creating new Host FS at %s", m.mod.ResolveHostFS("/proc"))
+		return fmt.Errorf("error creating new Host FS at %s: %w", m.mod.ResolveHostFS("/proc"), err)
 	}
 	conntrackStats, err := newFS.ConntrackStat()
 	if err != nil {
-		return errors.Wrap(err, "error fetching conntrack stats")
+		if os.IsNotExist(err) {
+			err = mb.PartialMetricsError{Err: fmt.Errorf("nf_conntrack kernel module not loaded: %w", err)}
+		}
+		return fmt.Errorf("error fetching conntrack stats: %w", err)
 	}
 
 	summedEvents := procfs.ConntrackStatEntry{}
-	for _, conn := range conntrackStats {
-		summedEvents.Entries += conn.Entries
+	for i, conn := range conntrackStats {
+		// Entries represents the total number of connections in the conntrack table,
+		// but the value is reported once per CPU. Only add it from the first entry.
+		if i == 0 {
+			summedEvents.Entries = conn.Entries
+		}
 		summedEvents.Found += conn.Found
 		summedEvents.Invalid += conn.Invalid
 		summedEvents.Ignore += conn.Ignore

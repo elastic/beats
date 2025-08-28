@@ -25,8 +25,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/urso/sderr"
-
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -45,14 +44,14 @@ import (
 // input, and without any pending update operations for the persistent store.
 //
 // The Type field is used to create the key name in the persistent store. Users
-// are allowed to add a custome per input configuration ID using the `id`
+// are allowed to add a custom type per input configuration ID using the `id`
 // setting, to collect the same source multiple times, but with different
 // state. The key name in the persistent store becomes <Type>-[<ID>]-<Source Name>
 type InputManager struct {
 	Logger *logp.Logger
 
-	// StateStore gives the InputManager access to the persitent key value store.
-	StateStore StateStore
+	// StateStore gives the InputManager access to the persistent key value store.
+	StateStore statestore.States
 
 	// Type must contain the name of the input type. It is used to create the key name
 	// for all sources the inputs collect from.
@@ -64,7 +63,7 @@ type InputManager struct {
 
 	// Configure returns an array of Sources, and a configured Input instances
 	// that will be used to collect events from each source.
-	Configure func(cfg *conf.C) (Prospector, Harvester, error)
+	Configure func(cfg *conf.C, log *logp.Logger) (Prospector, Harvester, error)
 
 	initOnce   sync.Once
 	initErr    error
@@ -85,20 +84,11 @@ type Source interface {
 var errNoInputRunner = errors.New("no input runner available")
 
 // globalInputID is a default ID for inputs created without an ID
-// Deprecated: Inputs without an ID are not supported any more.
+// Deprecated: Inputs without an ID are not supported anymore.
 const globalInputID = ".global"
-
-// StateStore interface and configurations used to give the Manager access to the persistent store.
-type StateStore interface {
-	Access() (*statestore.Store, error)
-	CleanupInterval() time.Duration
-}
 
 func (cim *InputManager) init() error {
 	cim.initOnce.Do(func() {
-		if cim.DefaultCleanTimeout <= 0 {
-			cim.DefaultCleanTimeout = 30 * time.Minute
-		}
 
 		log := cim.Logger.With("input_type", cim.Type)
 
@@ -119,11 +109,7 @@ func (cim *InputManager) init() error {
 
 // Init starts background processes for deleting old entries from the
 // persistent store if mode is ModeRun.
-func (cim *InputManager) Init(group unison.Group, mode v2.Mode) error {
-	if mode != v2.ModeRun {
-		return nil
-	}
-
+func (cim *InputManager) Init(group unison.Group) error {
 	if err := cim.init(); err != nil {
 		return err
 	}
@@ -145,7 +131,7 @@ func (cim *InputManager) Init(group unison.Group, mode v2.Mode) error {
 	if err != nil {
 		store.Release()
 		cim.shutdown()
-		return sderr.Wrap(err, "Can not start registry cleanup process")
+		return fmt.Errorf("Can not start registry cleanup process: %w", err)
 	}
 
 	return nil
@@ -158,35 +144,77 @@ func (cim *InputManager) shutdown() {
 
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
-func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
+func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	if err := cim.init(); err != nil {
 		return nil, err
 	}
 
 	settings := struct {
-		ID             string        `config:"id"`
-		CleanTimeout   time.Duration `config:"clean_timeout"`
-		HarvesterLimit uint64        `config:"harvester_limit"`
-	}{CleanTimeout: cim.DefaultCleanTimeout}
+		// All those values are duplicated from the Filestream configuration
+		ID                 string         `config:"id"`
+		CleanInactive      time.Duration  `config:"clean_inactive"`
+		HarvesterLimit     uint64         `config:"harvester_limit"`
+		AllowIDDuplication bool           `config:"allow_deprecated_id_duplication"`
+		TakeOver           TakeOverConfig `config:"take_over"`
+	}{
+		CleanInactive: cim.DefaultCleanTimeout,
+	}
+
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
 	}
 
 	if settings.ID == "" {
-		cim.Logger.Error("filestream input ID without ID might lead to data" +
-			" duplication, please add an ID and restart Filebeat")
+		cim.Logger.Warn("filestream input without ID is discouraged, please add an ID and restart Filebeat")
 	}
 
+	idAlreadyInUse := false
 	cim.idsMux.Lock()
 	if _, exists := cim.ids[settings.ID]; exists {
-		cim.Logger.Errorf("filestream input with ID '%s' already exists, this "+
-			"will lead to data duplication, please use a different ID", settings.ID)
+		// Keep old behaviour so users can upgrade to 9.0 without
+		// having their inputs not starting.
+		if settings.AllowIDDuplication {
+			idAlreadyInUse = true
+			cim.Logger.Errorf("filestream input with ID '%s' already exists, "+
+				"this will lead to data duplication, please use a different "+
+				"ID. Metrics collection has been disabled on this input. The "+
+				" input will start only because "+
+				"'allow_deprecated_id_duplication' is set to true",
+				settings.ID)
+		} else {
+			cim.Logger.Errorw(
+				fmt.Sprintf(
+					"filestream input ID '%s' is duplicated: input will NOT start",
+					settings.ID,
+				),
+				"input.cfg", conf.DebugString(config, true))
+
+			cim.idsMux.Unlock()
+			return nil, &common.ErrNonReloadable{
+				Err: fmt.Errorf(
+					"filestream input with ID '%s' already exists, this "+
+						"will lead to data duplication, please use a different ID",
+					settings.ID,
+				)}
+		}
 	}
 
+	// TODO: improve how inputs with empty IDs are tracked.
+	// https://github.com/elastic/beats/issues/35202
 	cim.ids[settings.ID] = struct{}{}
 	cim.idsMux.Unlock()
 
-	prospector, harvester, err := cim.Configure(config)
+	defer func() {
+		// If there is any error creating the input, remove it from the IDs list
+		// if there wasn't any other input running with this ID.
+		if retErr != nil && !idAlreadyInUse {
+			cim.idsMux.Lock()
+			delete(cim.ids, settings.ID)
+			cim.idsMux.Unlock()
+		}
+	}()
+
+	prospector, harvester, err := cim.Configure(config, cim.Logger)
 	if err != nil {
 		return nil, err
 	}
@@ -194,15 +222,30 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		return nil, errNoInputRunner
 	}
 
-	sourceIdentifier, err := newSourceIdentifier(cim.Type, settings.ID)
+	srcIdentifier, err := newSourceIdentifier(cim.Type, settings.ID)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating source identifier for input: %w", err)
+	}
+
+	var previousSrcIdentifiers []*sourceIdentifier
+	if settings.TakeOver.Enabled {
+		for _, id := range settings.TakeOver.FromIDs {
+			si, err := newSourceIdentifier(cim.Type, id)
+			if err != nil {
+				return nil,
+					fmt.Errorf(
+						"[ID: %q] error while creating source identifier for previous ID %q: %w",
+						settings.ID, id, err)
+			}
+
+			previousSrcIdentifiers = append(previousSrcIdentifiers, si)
+		}
 	}
 
 	pStore := cim.getRetainedStore()
 	defer pStore.Release()
 
-	prospectorStore := newSourceStore(pStore, sourceIdentifier)
+	prospectorStore := newSourceStore(pStore, srcIdentifier, previousSrcIdentifiers)
 
 	// create a store with the deprecated global ID. This will be used to
 	// migrate the entries in the registry to use the new input ID.
@@ -210,9 +253,9 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot create global identifier for input: %w", err)
 	}
-	globalStore := newSourceStore(pStore, globalIdentifier)
+	globalStore := newSourceStore(pStore, globalIdentifier, nil)
 
-	err = prospector.Init(prospectorStore, globalStore, sourceIdentifier.ID)
+	err = prospector.Init(prospectorStore, globalStore, srcIdentifier.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -223,13 +266,25 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		userID:           settings.ID,
 		prospector:       prospector,
 		harvester:        harvester,
-		sourceIdentifier: sourceIdentifier,
-		cleanTimeout:     settings.CleanTimeout,
+		sourceIdentifier: srcIdentifier,
+		cleanTimeout:     settings.CleanInactive,
 		harvesterLimit:   settings.HarvesterLimit,
 	}, nil
 }
 
-// StopInput peforms all necessary clean up when an input finishes.
+func (cim *InputManager) Delete(cfg *conf.C) error {
+	settings := struct {
+		ID string `config:"id"`
+	}{}
+	if err := cfg.Unpack(&settings); err != nil {
+		return fmt.Errorf("could not unpack config to get the input ID: %w", err)
+	}
+
+	cim.StopInput(settings.ID)
+	return nil
+}
+
+// StopInput performs all necessary clean up when an input finishes.
 func (cim *InputManager) StopInput(id string) {
 	cim.idsMux.Lock()
 	delete(cim.ids, id)
@@ -266,4 +321,61 @@ func (i *sourceIdentifier) ID(s Source) string {
 
 func (i *sourceIdentifier) MatchesInput(id string) bool {
 	return strings.HasPrefix(id, i.prefix)
+}
+
+// TakeOverConfig is the configuration for the take over mode.
+// It allows the Filestream input to take over states from the log
+// input or other Filestream inputs
+type TakeOverConfig struct {
+	Enabled bool `config:"enabled"`
+	// Filestream IDs to take over states
+	FromIDs []string `config:"from_ids"`
+
+	// legacyFormat is set to true when `Unpack` detects
+	// the legacy configuration format. It is used by
+	// `LogWarnings` to log warnings
+	legacyFormat bool
+}
+
+func (t *TakeOverConfig) Unpack(value any) error {
+	switch v := value.(type) {
+	case bool:
+		t.Enabled = v
+		t.legacyFormat = true
+	case map[string]any:
+		rawEnabled := v["enabled"]
+		enabled, ok := rawEnabled.(bool)
+		if !ok {
+			return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as bool", rawEnabled)
+		}
+		t.Enabled = enabled
+
+		rawFromIDs, exists := v["from_ids"]
+		if !exists {
+			return nil
+		}
+
+		fromIDs, ok := rawFromIDs.([]any)
+		if !ok {
+			return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as []any", rawFromIDs)
+		}
+		for _, el := range fromIDs {
+			strEl, ok := el.(string)
+			if !ok {
+				return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as string", el)
+			}
+			t.FromIDs = append(t.FromIDs, strEl)
+		}
+
+	default:
+		return fmt.Errorf("cannot parse '%[1]v' (type %[1]T)", value)
+	}
+
+	return nil
+}
+
+func (t *TakeOverConfig) LogWarnings(logger *logp.Logger) {
+	if t.legacyFormat {
+		logger.Warn("using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'")
+	}
 }

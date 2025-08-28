@@ -37,8 +37,8 @@ var schema = s.Schema{
 		"read": c.Int("blks_read"),
 		"hit":  c.Int("blks_hit"),
 		"time": s.Object{
-			"read":  s.Object{"ms": c.Int("blk_read_time")},
-			"write": s.Object{"ms": c.Int("blk_write_time")},
+			"read":  s.Object{"ms": c.Float("blk_read_time")},
+			"write": s.Object{"ms": c.Float("blk_write_time")},
 		},
 	},
 	"rows": s.Object{

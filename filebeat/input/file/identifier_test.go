@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !windows
-// +build !windows
 
 package file
 
@@ -29,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type stateTestCase struct {
@@ -66,7 +66,7 @@ func TestINodeDeviceIdentifier(t *testing.T) {
 		},
 	}
 
-	identifier, _ := newINodeDeviceIdentifier(nil)
+	identifier, _ := newINodeDeviceIdentifier(nil, nil)
 	for name, test := range tests {
 		test := test
 		for i := 0; i < len(test.states); i++ {
@@ -110,7 +110,7 @@ func TestPathIdentifier(t *testing.T) {
 		},
 	}
 
-	identifier, _ := newPathIdentifier(nil)
+	identifier, _ := newPathIdentifier(nil, nil)
 	for name, test := range tests {
 		test := test
 		for i := 0; i < len(test.states); i++ {
@@ -194,7 +194,8 @@ func TestInodeMarkerIdentifier(t *testing.T) {
 
 func newMockInodeMarkerIdentifier() StateIdentifier {
 	cfg := conf.MustNewConfigFrom(map[string]string{"path": filepath.Join("testdata", "identifier_marker")})
-	i, err := newINodeMarkerIdentifier(cfg)
+	logger, _ := logp.NewDevelopmentLogger("")
+	i, err := newINodeMarkerIdentifier(cfg, logger)
 	fmt.Println(err)
 	return i
 }

@@ -5,11 +5,6 @@
 package cef
 
 import (
-	"crypto/sha1"
-	"encoding/hex"
-	"flag"
-	"os"
-	"path/filepath"
 	"strconv"
 	"testing"
 
@@ -17,10 +12,8 @@ import (
 	"go.uber.org/multierr"
 )
 
-var generateCorpus = flag.Bool("corpus", false, "generate fuzz corpus from test cases")
-
 const (
-	standardMessage = `CEF:26|security|threatmanager|1.0|100|trojan successfully stopped|10|src=10.0.0.192 dst=12.121.122.82 spt=1232 eventId=1`
+	standardMessage = `CEF:26|security|threatmanager|1.0|100|trojan successfully stopped|10|src=10.0.0.192 dst=12.121.122.82 spt=1232 eventId=1 in=4294967296 out=4294967296`
 
 	headerOnly = `CEF:26|security|threatmanager|1.0|100|trojan successfully stopped|10|`
 
@@ -58,6 +51,10 @@ const (
 
 	truncatedHeader = "CEF:0|SentinelOne|Mgmt|activityID=1111111111111111111 activityType=3505 siteId=None siteName=None accountId=1222222222222222222 accountName=foo-bar mdr notificationScope=ACCOUNT"
 
+	noValueInExtension = `CEF:26|security|threat=manager|1.0|100|trojan successfully stopped|10|src= dst=12.121.122.82 spt=`
+
+	hyphenInExtensionKey = `CEF:26|security|threatmanager|1.0|100|trojan successfully stopped|10|Some-Key=123456`
+
 	// Found by fuzzing but minimised by hand.
 	fuzz0 = `CEF:0|a=\\ b|`
 	fuzz1 = `CEF:0|\|a=|b=`
@@ -84,27 +81,23 @@ var testMessages = []string{
 	tabMessage,
 	escapedMessage,
 	truncatedHeader,
+	noValueInExtension,
+	hyphenInExtensionKey,
 	fuzz0,
 	fuzz1,
 	fuzz2,
 	fuzz3,
 }
 
-func TestGenerateFuzzCorpus(t *testing.T) {
-	if !*generateCorpus {
-		t.Skip("-corpus is not enabled")
-	}
-
+func FuzzUnpack(f *testing.F) {
 	for _, m := range testMessages {
-		h := sha1.New()
-		h.Write([]byte(m))
-		name := hex.EncodeToString(h.Sum(nil))
-
-		err := os.WriteFile(filepath.Join("fuzz/corpus", name), []byte(m), 0o644)
-		if err != nil {
-			t.Fatalf("failed to write fuzzing corpus: %v", err)
-		}
+		f.Add(m)
 	}
+
+	f.Fuzz(func(t *testing.T, m string) {
+		var e Event
+		_ = e.Unpack(m) // This is only testing that Unpack doesn't panic.
+	})
 }
 
 func TestEventUnpack(t *testing.T) {
@@ -124,6 +117,8 @@ func TestEventUnpack(t *testing.T) {
 			"dst":     IPField("12.121.122.82"),
 			"spt":     IntegerField(1232),
 			"eventId": LongField(1),
+			"in":      LongField(4294967296),
+			"out":     LongField(4294967296),
 		}, e.Extensions)
 	})
 
@@ -156,6 +151,40 @@ func TestEventUnpack(t *testing.T) {
 			"src": IPField("10.0.0.192"),
 			"dst": IPField("12.121.122.82"),
 			"spt": IntegerField(1232),
+		}, e.Extensions)
+	})
+
+	t.Run("noValueInExtension", func(t *testing.T) {
+		var e Event
+		err := e.Unpack(noValueInExtension, WithRemoveEmptyValues())
+		assert.NoError(t, err)
+		assert.Equal(t, 26, e.Version)
+		assert.Equal(t, "security", e.DeviceVendor)
+		assert.Equal(t, "threat=manager", e.DeviceProduct)
+		assert.Equal(t, "1.0", e.DeviceVersion)
+		assert.Equal(t, "100", e.DeviceEventClassID)
+		assert.Equal(t, "trojan successfully stopped", e.Name)
+		assert.Equal(t, "10", e.Severity)
+		assert.Equal(t, map[string]*Field{
+			"dst": IPField("12.121.122.82"),
+		}, e.Extensions)
+	})
+
+	t.Run("hyphenInExtensionKey", func(t *testing.T) {
+		var e Event
+		err := e.Unpack(hyphenInExtensionKey)
+		assert.NoError(t, err)
+		assert.Equal(t, 26, e.Version)
+		assert.Equal(t, "security", e.DeviceVendor)
+		assert.Equal(t, "threatmanager", e.DeviceProduct)
+		assert.Equal(t, "1.0", e.DeviceVersion)
+		assert.Equal(t, "100", e.DeviceEventClassID)
+		assert.Equal(t, "trojan successfully stopped", e.Name)
+		assert.Equal(t, "10", e.Severity)
+		assert.Equal(t, map[string]*Field{
+			"Some-Key": {
+				String: "123456",
+			},
 		}, e.Extensions)
 	})
 
@@ -449,6 +478,8 @@ func TestEventUnpackWithFullExtensionNames(t *testing.T) {
 		"destinationAddress": IPField("12.121.122.82"),
 		"sourcePort":         IntegerField(1232),
 		"eventId":            LongField(1),
+		"bytesIn":            LongField(4294967296),
+		"bytesOut":           LongField(4294967296),
 	}, e.Extensions)
 }
 

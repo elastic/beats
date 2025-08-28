@@ -19,9 +19,8 @@ package pending_tasks
 
 import (
 	"encoding/json"
-
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -47,14 +46,14 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 
 	err := json.Unmarshal(content, &tasksStruct)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch Pending Tasks API response")
+		return fmt.Errorf("failure parsing Elasticsearch Pending Tasks API response: %w", err)
 	}
 
 	if tasksStruct.Tasks == nil {
 		return elastic.MakeErrorForMissingField("tasks", elastic.Elasticsearch)
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	for _, task := range tasksStruct.Tasks {
 		event := mb.Event{}
 
@@ -67,7 +66,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 
 		event.MetricSetFields, err = schema.Apply(task)
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure applying task schema"))
+			errs = append(errs, fmt.Errorf("failure applying task schema: %w", err))
 			continue
 		}
 
@@ -81,5 +80,5 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		r.Event(event)
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }

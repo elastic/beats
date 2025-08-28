@@ -1,12 +1,7 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    rev: v4.4.0
     hooks:
     -   id: check-merge-conflict
-
--   repo: https://github.com/elastic/apm-pipeline-library.git
-    rev: current
-    hooks:
-    -   id: check-jenkins-pipelines
-        files: ^(.ci/(.*\.groovy|Jenkinsfile)|Jenkinsfile)$
-    -   id: check-jjbb
+        args: ['--assume-in-merge']
+        exclude: (^NOTICE.txt$)

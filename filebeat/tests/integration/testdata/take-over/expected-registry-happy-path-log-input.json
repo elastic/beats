@@ -1,0 +1,50 @@
+{
+  "filebeat::logs::native::NATIVE-01.log": {
+    "Key": "filebeat::logs::native::NATIVE-01.log",
+    "Offset": 309,
+    "Filename": "TESTDATA-PATH/take-over/01.log",
+    "TTL": -2,
+    "Op": "set",
+    "Removed": false
+  },
+  "filebeat::logs::native::NATIVE-01.txt": {
+    "Key": "filebeat::logs::native::NATIVE-01.txt",
+    "Offset": 304,
+    "Filename": "TESTDATA-PATH/take-over/01.txt",
+    "TTL": -1,
+    "Op": "set",
+    "Removed": false
+  },
+  "filebeat::logs::native::NATIVE-02.log": {
+    "Key": "filebeat::logs::native::NATIVE-02.log",
+    "Offset": 296,
+    "Filename": "TESTDATA-PATH/take-over/02.log",
+    "TTL": -2,
+    "Op": "set",
+    "Removed": false
+  },
+  "filebeat::logs::native::NATIVE-02.txt": {
+    "Key": "filebeat::logs::native::NATIVE-02.txt",
+    "Offset": 302,
+    "Filename": "TESTDATA-PATH/take-over/02.txt",
+    "TTL": -1,
+    "Op": "set",
+    "Removed": false
+  },
+  "filestream::take-over-from-log-input::fingerprint::6fb3cb6c565bdba1354f64a42dd47ef937964019400dd571f25c2cd13a9fb5be": {
+    "Key": "filestream::take-over-from-log-input::fingerprint::6fb3cb6c565bdba1354f64a42dd47ef937964019400dd571f25c2cd13a9fb5be",
+    "Offset": 309,
+    "Filename": "TESTDATA-PATH/take-over/01.log",
+    "TTL": -1,
+    "Op": "set",
+    "Removed": false
+  },
+  "filestream::take-over-from-log-input::fingerprint::db8399294e69089070405b13d4f057672f3852fa8e0f56ce4b6c92398aef1b6a": {
+    "Key": "filestream::take-over-from-log-input::fingerprint::db8399294e69089070405b13d4f057672f3852fa8e0f56ce4b6c92398aef1b6a",
+    "Offset": 296,
+    "Filename": "TESTDATA-PATH/take-over/02.log",
+    "TTL": -1,
+    "Op": "set",
+    "Removed": false
+  }
+}

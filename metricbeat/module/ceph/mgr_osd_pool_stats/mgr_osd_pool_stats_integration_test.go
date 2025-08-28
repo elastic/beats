@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build integration && linux
-// +build integration,linux
 
 package mgr_osd_pool_stats
 

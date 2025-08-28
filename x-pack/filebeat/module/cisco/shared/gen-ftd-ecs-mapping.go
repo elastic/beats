@@ -3,12 +3,12 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build ignore
-// +build ignore
 
 package main
 
 import (
 	"encoding/csv"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -17,8 +17,6 @@ import (
 	"unicode"
 
 	"gopkg.in/yaml.v2"
-
-	"github.com/pkg/errors"
 )
 
 var (
@@ -143,7 +141,7 @@ func generate() error {
 	content = append(content, end...)
 	n, err := outHandle.Write(content)
 	if err != nil {
-		return errors.Wrap(err, "failed writing output file")
+		return fmt.Errorf("failed writing output file: %w", err)
 	}
 	if n != len(content) {
 		return fmt.Errorf("short write on output file. expected=%d, written=%d", len(content), n)
@@ -161,7 +159,7 @@ func loadMappings(reader io.Reader) (m mappings, err error) {
 			break
 		}
 		if err != nil {
-			return m, errors.Wrapf(err, "failed reading line %d", lineNum)
+			return m, fmt.Errorf("failed reading line %d: %w", lineNum, err)
 		}
 		if len(record) < 3 {
 			return m, fmt.Errorf("line %d has unexpected number of columns: %d", lineNum, len(record))

@@ -1,0 +1,45 @@
+filebeat.inputs:
+  - type: {{ if .takeOver }}filestream{{ else }}log{{ end}}
+    paths:
+      - {{.testdata}}/take-over/*.log
+{{ if .takeOver }}
+    id: take-over-from-log-input
+    take_over: true
+    file_identity.fingerprint: ~
+    prospector:
+      scanner:
+        fingerprint:
+          enabled: true
+          length: 64
+        check_interval: 0.1s
+{{ else }}
+    allow_deprecated_use: true
+    scan_frequency: 0.1s
+{{ end }}
+
+  - type: log
+    paths:
+      - {{.testdata}}/take-over/*.txt
+    scan_frequency: 0.1s
+    allow_deprecated_use: true
+
+queue.mem:
+  flush.timeout: 0s
+
+path.home: {{.homePath}}
+
+output.file:
+  path: ${path.home}
+  filename: "output-file"
+  rotate_on_startup: false
+
+filebeat.registry:
+  cleanup_interval: 5s
+  flush: 1s
+
+logging:
+  level: debug
+  selectors:
+    - "*"
+  metrics:
+    enabled: false

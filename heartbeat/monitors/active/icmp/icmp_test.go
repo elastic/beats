@@ -50,7 +50,7 @@ func TestICMPFields(t *testing.T) {
 	validator := lookslike.Strict(
 		lookslike.Compose(
 			hbtest.BaseChecks(ip, "up", "icmp"),
-			hbtest.SummaryChecks(1, 0),
+			hbtest.SummaryStateChecks(1, 0),
 			hbtest.URLChecks(t, hostURL),
 			hbtest.ResolveChecks(ip),
 			lookslike.MustCompile(map[string]interface{}{

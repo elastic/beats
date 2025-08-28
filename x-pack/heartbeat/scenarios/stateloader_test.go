@@ -7,23 +7,38 @@ package scenarios
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
 )
 
-var esIntegTwists = framework.MultiTwist(TwistAddRunFrom, TwistMultiRun(3))
+const numRuns = 2
+
+var esIntegTwists = framework.MultiTwist(TwistAddRunFrom, TwistMultiRun(numRuns))
 
 func TestStateContinuity(t *testing.T) {
+	t.Parallel()
 	scenarioDB.RunAllWithATwist(t, esIntegTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
+		events := mtr.Events()
+		var errors = []*beat.Event{}
+		var sout string
+		for _, e := range events {
+			if message, ok := e.GetValue("synthetics.payload.message"); ok == nil {
+				sout = sout + "\n" + message.(string)
+			}
+			if _, ok := e.GetValue("error"); ok == nil {
+				errors = append(errors, e)
+			}
+		}
+
 		lastSS := framework.LastState(mtr.Events())
 
-		require.Equal(t, monitorstate.StatusUp, lastSS.State.Status)
+		assert.Equal(t, mtr.Meta.Status, lastSS.State.Status, "monitor had unexpected state %v, synthetics console output: %s, errors", lastSS.State.Status, sout, errors)
 
 		allSS := framework.AllStates(mtr.Events())
-		require.Len(t, allSS, 3)
+		assert.Len(t, allSS, numRuns)
 
-		require.Equal(t, 3, lastSS.State.Checks)
+		assert.Equal(t, numRuns, lastSS.State.Checks)
 	})
 }

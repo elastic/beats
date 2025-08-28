@@ -15,8 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !aix
-// +build !aix
+//go:build linux || darwin || windows
 
 package kubernetes
 
@@ -26,7 +25,7 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/utils"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	k8s "k8s.io/client-go/kubernetes"
@@ -50,9 +49,14 @@ type node struct {
 }
 
 // NewNodeEventer creates an eventer that can discover and process node objects
-func NewNodeEventer(uuid uuid.UUID, cfg *config.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
-	logger := logp.NewLogger("autodiscover.node")
+func NewNodeEventer(
+	uuid uuid.UUID,
+	cfg *config.C,
+	client k8s.Interface,
+	publish func(event []bus.Event),
+	logger *logp.Logger) (Eventer, error) {
 
+	logger = logger.Named("node")
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 	if err != nil {
@@ -83,7 +87,7 @@ func NewNodeEventer(uuid uuid.UUID, cfg *config.C, client k8s.Interface, publish
 		Node:         config.Node,
 		IsUpdated:    isUpdated,
 		HonorReSyncs: true,
-	}, nil)
+	}, nil, logger)
 
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Node{}, err)
@@ -105,12 +109,16 @@ func NewNodeEventer(uuid uuid.UUID, cfg *config.C, client k8s.Interface, publish
 // OnAdd ensures processing of node objects that are newly created
 func (n *node) OnAdd(obj interface{}) {
 	n.logger.Debugf("Watcher Node add: %+v", obj)
-	n.emit(obj.(*kubernetes.Node), "start")
+	n.emit(obj.(*kubernetes.Node), "start") //nolint // existing check
 }
 
 // OnUpdate ensures processing of node objects that are updated
 func (n *node) OnUpdate(obj interface{}) {
-	node := obj.(*kubernetes.Node)
+	node, ok := obj.(*kubernetes.Node)
+	if !ok {
+		n.logger.Errorf("Unexpected type expecting *kubernetes.Node: %+v", obj)
+		return
+	}
 	if node.GetObjectMeta().GetDeletionTimestamp() != nil {
 		n.logger.Debugf("Watcher Node update (terminating): %+v", obj)
 		// Node is terminating, don't reload its configuration and ignore the event as long as node is Ready.
@@ -128,7 +136,12 @@ func (n *node) OnUpdate(obj interface{}) {
 // OnDelete ensures processing of node objects that are deleted
 func (n *node) OnDelete(obj interface{}) {
 	n.logger.Debugf("Watcher Node delete: %+v", obj)
-	time.AfterFunc(n.config.CleanupTimeout, func() { n.emit(obj.(*kubernetes.Node), "stop") })
+	time.AfterFunc(n.config.CleanupTimeout, func() {
+		node, ok := obj.(*kubernetes.Node)
+		if ok {
+			n.emit(node, "stop")
+		}
+	})
 }
 
 // GenerateHints creates hints needed for hints builder
@@ -140,11 +153,13 @@ func (n *node) GenerateHints(event bus.Event) bus.Event {
 	var kubeMeta mapstr.M
 	rawMeta, ok := event["kubernetes"]
 	if ok {
-		kubeMeta = rawMeta.(mapstr.M)
-		// The builder base config can configure any of the field values of kubernetes if need be.
-		e["kubernetes"] = kubeMeta
-		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			annotations = rawAnn.(mapstr.M)
+		kubeMeta, ok = rawMeta.(mapstr.M)
+		if ok {
+			// The builder base config can configure any of the field values of kubernetes if need be.
+			e["kubernetes"] = kubeMeta
+			if rawAnn, ok := kubeMeta["annotations"]; ok {
+				annotations = rawAnn.(mapstr.M)
+			}
 		}
 	}
 	if host, ok := event["host"]; ok {
@@ -154,7 +169,11 @@ func (n *node) GenerateHints(event bus.Event) bus.Event {
 		e["port"] = port
 	}
 
-	hints := utils.GenerateHints(annotations, "", n.config.Prefix)
+	hints, incorrecthints := utils.GenerateHints(annotations, "", n.config.Prefix, true, AllSupportedHints)
+	// We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
+	for _, value := range incorrecthints {
+		n.logger.Debugf("provided hint: %s/%s is not in the supported list", n.config.Prefix, value)
+	}
 	n.logger.Debugf("Generated hints %+v", hints)
 	if len(hints) != 0 {
 		e["hints"] = hints

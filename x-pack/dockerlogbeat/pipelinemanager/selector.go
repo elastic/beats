@@ -7,8 +7,6 @@ package pipelinemanager
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
@@ -36,7 +34,7 @@ func (s *IdxSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, error)
 	if cfg.HasField("indicies") {
 		sub, err := cfg.Child("indices", -1)
 		if err != nil {
-			return nil, errors.Wrap(err, "error getting indicies field")
+			return nil, fmt.Errorf("error getting indicies field: %w", err)
 		}
 		bsCfg.SetChild("indices", -1, sub)
 	}
@@ -62,9 +60,9 @@ func (s *IdxSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, error)
 		FailEmpty:        true,
 	}
 
-	indexSel, err := outil.BuildSelectorFromConfig(bsCfg, buildSettings)
+	indexSel, err := outil.BuildSelectorFromConfig(bsCfg, buildSettings, s.beatInfo.Logger)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating build Selector")
+		return nil, fmt.Errorf("error creating build Selector: %w", err)
 	}
 
 	return indexSel, nil

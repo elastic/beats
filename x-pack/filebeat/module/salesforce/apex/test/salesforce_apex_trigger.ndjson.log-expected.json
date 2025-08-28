@@ -1,0 +1,31 @@
+[
+    {
+        "@timestamp": "2021-11-02T09:25:02.894Z",
+        "event.action": "apex-trigger",
+        "event.dataset": "salesforce.apex",
+        "event.duration": 4.0,
+        "event.kind": "event",
+        "event.module": "salesforce",
+        "event.timezone": "-02:00",
+        "event.type": "connection",
+        "fileset.name": "apex",
+        "input.type": "log",
+        "log.offset": 0,
+        "salesforce.apex.cpu_time": 3.0,
+        "salesforce.apex.entity_name": "Book__c",
+        "salesforce.apex.event_type": "ApexTrigger",
+        "salesforce.apex.organization_id": "00D5j000000VI3n",
+        "salesforce.apex.request_id": "4fDkS1iz2_p5i-l1cJOqAV",
+        "salesforce.apex.trigger_id": "01q5j000000ClvF",
+        "salesforce.apex.trigger_name": "HelloWorldTrigger",
+        "salesforce.apex.trigger_type": "BeforeInsert",
+        "salesforce.apex.user_id_derived": "0055j000000utlPAAQ",
+        "salesforce.instance_url": "<no value>",
+        "service.type": "salesforce",
+        "tags": [
+            "forwarded",
+            "salesforce-apex"
+        ],
+        "user.id": "0055j000000utlP"
+    }
+]

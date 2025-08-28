@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package mb
 
@@ -31,13 +30,13 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_id"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // TestLightModulesAsModuleSource checks that registry correctly lists
 // metricsets when used with light modules
 func TestLightModulesAsModuleSource(t *testing.T) {
-	logp.TestingSetup()
 
 	type testMetricSet struct {
 		name       string
@@ -109,7 +108,7 @@ func TestLightModulesAsModuleSource(t *testing.T) {
 			}
 			r.MustAddMetricSet(m.module, m.name, fakeMetricSetFactory, opts...)
 		}
-		r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
+		r.SetSecondarySource(NewLightModulesSource(logptest.NewTestingLogger(t, ""), "testdata/lightmodules"))
 		return r
 	}
 
@@ -173,7 +172,7 @@ func TestLoadModule(t *testing.T) {
 
 	for _, c := range cases {
 		register := NewRegister()
-		r := NewLightModulesSource("testdata/lightmodules")
+		r := NewLightModulesSource(logptest.NewTestingLogger(t, ""), "testdata/lightmodules")
 		t.Run(c.name, func(t *testing.T) {
 			_, err := r.loadModule(register, c.name)
 			if c.err {
@@ -252,14 +251,14 @@ func TestNewModuleFromConfig(t *testing.T) {
 	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
 	r.MustAddMetricSet("foo", "light", newMetricSetWithOption)
 	r.MustAddMetricSet("mixed", "standard", newMetricSetWithOption)
-	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
+	r.SetSecondarySource(NewLightModulesSource(logptest.NewTestingLogger(t, ""), "testdata/lightmodules"))
 
 	for title, c := range cases {
 		t.Run(title, func(t *testing.T) {
 			config, err := conf.NewConfigFrom(c.config)
 			require.NoError(t, err)
 
-			module, metricSets, err := NewModule(config, r)
+			module, metricSets, err := NewModule(config, r, logptest.NewTestingLogger(t, ""))
 			if c.err {
 				assert.Error(t, err)
 				return
@@ -306,7 +305,7 @@ func TestLightMetricSet_VerifyHostDataURI(t *testing.T) {
 				URI:  host,
 			}, nil
 		}))
-	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
+	r.SetSecondarySource(NewLightModulesSource(logptest.NewTestingLogger(t, ""), "testdata/lightmodules"))
 
 	config, err := conf.NewConfigFrom(
 		mapstr.M{
@@ -316,7 +315,7 @@ func TestLightMetricSet_VerifyHostDataURI(t *testing.T) {
 		})
 	require.NoError(t, err)
 
-	_, metricSets, err := NewModule(config, r)
+	_, metricSets, err := NewModule(config, r, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	require.Len(t, metricSets, 1)
 
@@ -329,7 +328,7 @@ func TestLightMetricSet_WithoutHostParser(t *testing.T) {
 
 	r := NewRegister()
 	r.MustAddMetricSet("http", "json", newMetricSetWithOption)
-	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
+	r.SetSecondarySource(NewLightModulesSource(logptest.NewTestingLogger(t, ""), "testdata/lightmodules"))
 
 	config, err := conf.NewConfigFrom(
 		mapstr.M{
@@ -339,7 +338,7 @@ func TestLightMetricSet_WithoutHostParser(t *testing.T) {
 		})
 	require.NoError(t, err)
 
-	_, metricSets, err := NewModule(config, r)
+	_, metricSets, err := NewModule(config, r, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	require.Len(t, metricSets, 1)
 
@@ -362,7 +361,7 @@ func TestLightMetricSet_VerifyHostDataURI_NonParsableHost(t *testing.T) {
 				URI:  postgresParsed,
 			}, nil
 		}))
-	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
+	r.SetSecondarySource(NewLightModulesSource(logptest.NewTestingLogger(t, ""), "testdata/lightmodules"))
 
 	config, err := conf.NewConfigFrom(
 		mapstr.M{
@@ -372,7 +371,7 @@ func TestLightMetricSet_VerifyHostDataURI_NonParsableHost(t *testing.T) {
 		})
 	require.NoError(t, err)
 
-	_, metricSets, err := NewModule(config, r)
+	_, metricSets, err := NewModule(config, r, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	require.Len(t, metricSets, 1)
 
@@ -385,7 +384,7 @@ func TestNewModulesCallModuleFactory(t *testing.T) {
 
 	r := NewRegister()
 	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
-	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
+	r.SetSecondarySource(NewLightModulesSource(logptest.NewTestingLogger(t, ""), "testdata/lightmodules"))
 
 	called := false
 	r.AddModule("foo", func(base BaseModule) (Module, error) {
@@ -396,7 +395,7 @@ func TestNewModulesCallModuleFactory(t *testing.T) {
 	config, err := conf.NewConfigFrom(mapstr.M{"module": "service"})
 	require.NoError(t, err)
 
-	_, _, err = NewModule(config, r)
+	_, _, err = NewModule(config, r, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 
 	assert.True(t, called, "module factory must be called if registered")
@@ -404,7 +403,7 @@ func TestNewModulesCallModuleFactory(t *testing.T) {
 
 func TestProcessorsForMetricSet_UnknownModule(t *testing.T) {
 	r := NewRegister()
-	source := NewLightModulesSource("testdata/lightmodules")
+	source := NewLightModulesSource(logptest.NewTestingLogger(t, ""), "testdata/lightmodules")
 	procs, err := source.ProcessorsForMetricSet(r, "nonexisting", "fake")
 	require.Error(t, err)
 	require.Nil(t, procs)
@@ -412,7 +411,7 @@ func TestProcessorsForMetricSet_UnknownModule(t *testing.T) {
 
 func TestProcessorsForMetricSet_UnknownMetricSet(t *testing.T) {
 	r := NewRegister()
-	source := NewLightModulesSource("testdata/lightmodules")
+	source := NewLightModulesSource(logptest.NewTestingLogger(t, ""), "testdata/lightmodules")
 	procs, err := source.ProcessorsForMetricSet(r, "unpack", "nonexisting")
 	require.Error(t, err)
 	require.Nil(t, procs)
@@ -420,7 +419,7 @@ func TestProcessorsForMetricSet_UnknownMetricSet(t *testing.T) {
 
 func TestProcessorsForMetricSet_ProcessorsRead(t *testing.T) {
 	r := NewRegister()
-	source := NewLightModulesSource("testdata/lightmodules")
+	source := NewLightModulesSource(logptest.NewTestingLogger(t, ""), "testdata/lightmodules")
 	procs, err := source.ProcessorsForMetricSet(r, "unpack", "withprocessors")
 	require.NoError(t, err)
 	require.NotNil(t, procs)
@@ -428,7 +427,7 @@ func TestProcessorsForMetricSet_ProcessorsRead(t *testing.T) {
 }
 
 func TestProcessorsForMetricSet_ListModules(t *testing.T) {
-	source := NewLightModulesSource("testdata/lightmodules")
+	source := NewLightModulesSource(logptest.NewTestingLogger(t, ""), "testdata/lightmodules")
 	modules, err := source.Modules()
 	require.NoError(t, err)
 

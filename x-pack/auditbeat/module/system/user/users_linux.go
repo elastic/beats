@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build linux && cgo
-// +build linux,cgo
 
 package user
 
@@ -19,6 +18,7 @@ import "C"
 
 import (
 	"crypto/sha512"
+	"errors"
 	"fmt"
 	"os/user"
 	"runtime"
@@ -26,8 +26,6 @@ import (
 	"strings"
 	"syscall"
 	"time"
-
-	"github.com/joeshaw/multierror"
 )
 
 var epoch = time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
@@ -35,7 +33,7 @@ var epoch = time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
 // GetUsers retrieves a list of users using information from
 // /etc/passwd, /etc/group, and - if configured - /etc/shadow.
 func GetUsers(readPasswords bool) ([]*User, error) {
-	var errs multierror.Errors
+	var errs []error
 
 	// We are using a number of thread sensitive C functions in
 	// this file, most importantly setpwent/getpwent/endpwent and
@@ -62,7 +60,7 @@ func GetUsers(readPasswords bool) ([]*User, error) {
 		}
 	}
 
-	return users, errs.Err()
+	return users, errors.Join(errs...)
 }
 
 func readPasswdFile(readPasswords bool) ([]*User, error) {
@@ -81,7 +79,7 @@ func readPasswdFile(readPasswords bool) ([]*User, error) {
 		if passwd == nil {
 			// getpwent() can return ENOENT even when there is no error,
 			// see https://github.com/systemd/systemd/issues/9585.
-			if err != nil && err != syscall.ENOENT {
+			if err != nil && !errors.Is(err, syscall.ENOENT) {
 				return users, fmt.Errorf("error getting user: %w", err)
 			}
 

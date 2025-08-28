@@ -46,7 +46,7 @@ type Harvester interface {
 	Test(Source, inputv2.TestContext) error
 	// Run is the event loop which reads from the source
 	// and forwards it to the publisher.
-	Run(inputv2.Context, Source, Cursor, Publisher) error
+	Run(inputv2.Context, Source, Cursor, Publisher, *Metrics) error
 }
 
 type readerGroup struct {
@@ -125,6 +125,7 @@ type defaultHarvesterGroup struct {
 	ackCH        *updateChan
 	identifier   *sourceIdentifier
 	tg           *task.Group
+	metrics      *Metrics
 }
 
 // Start starts the Harvester for a Source if no Harvester is running for the
@@ -133,13 +134,11 @@ type defaultHarvesterGroup struct {
 // be started. Start does not block.
 func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 	sourceName := hg.identifier.ID(src)
-
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
-	ctx.Logger.Debug("Starting harvester for file")
 
-	if err := hg.tg.Go(startHarvester(ctx, hg, src, false)); err != nil {
+	if err := hg.tg.Go(startHarvester(ctx, hg, src, false, hg.metrics)); err != nil {
 		ctx.Logger.Warnf(
-			"tried to start harvester with task group already closed",
+			"tried to start harvester for %s with task group already closed",
 			ctx.ID)
 	}
 }
@@ -154,7 +153,7 @@ func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 	ctx.Logger.Debug("Restarting harvester for file")
 
-	if err := hg.tg.Go(startHarvester(ctx, hg, src, true)); err != nil {
+	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics)); err != nil {
 		ctx.Logger.Warnf(
 			"input %s tried to restart harvester with task group already closed",
 			ctx.ID)
@@ -169,10 +168,12 @@ func startHarvester(
 	ctx inputv2.Context,
 	hg *defaultHarvesterGroup,
 	src Source,
-	restart bool) func(context.Context) error {
+	restart bool,
+	metrics *Metrics,
+) func(context.Context) error {
 	srcID := hg.identifier.ID(src)
 
-	return func(canceler context.Context) error {
+	return func(canceler context.Context) (err error) {
 		defer func() {
 			if v := recover(); v != nil {
 				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
@@ -185,15 +186,32 @@ func startHarvester(
 			// stop previous harvester
 			hg.readers.remove(srcID)
 		}
-		defer ctx.Logger.Debug("Stopped harvester for file")
 
 		harvesterCtx, cancelHarvester, err := hg.readers.newContext(srcID, canceler)
 		if err != nil {
-			// The returned may or not be collected by the caller, thus logging
-			// it here is important.
-			ctx.Logger.Errorf("error while adding new reader to the bookkeeper %v", err)
+			// The only possible returned error is ErrHarvesterAlreadyRunning, which is a normal
+			// behaviour of the Filestream input, it's not really an error, it's just an situation.
+			// If the harvester is already running we don't need to start a new one.
+			// At the moment of writing even the returned error is ignored. So the
+			// only real effect of this branch is to not start a second harvester.
+			//
+			// Currently the only places this error is checked is on task.Group and the
+			// only thing it does is to log the error. So to avoid unnecessary errors,
+			// we just return nil.
+			if errors.Is(err, ErrHarvesterAlreadyRunning) {
+				ctx.Logger.Debug("Harvester already running")
+				return nil
+			}
 			return fmt.Errorf("error while adding new reader to the bookkeeper %w", err)
 		}
+
+		defer func() {
+			if err != nil {
+				ctx.Logger.Debugf("Stopped harvester for file due to an error: %s", err)
+				return
+			}
+			ctx.Logger.Debugf("Stopped harvester for file")
+		}()
 
 		ctx.Cancelation = harvesterCtx
 		defer cancelHarvester()
@@ -206,8 +224,7 @@ func startHarvester(
 		defer releaseResource(resource)
 
 		client, err := hg.pipeline.ConnectWith(beat.ClientConfig{
-			CloseRef:      ctx.Cancelation,
-			EventListener: newInputACKHandler(hg.ackCH, ctx.Logger),
+			EventListener: newInputACKHandler(hg.ackCH),
 		})
 		if err != nil {
 			hg.readers.remove(srcID)
@@ -219,7 +236,8 @@ func startHarvester(
 		cursor := makeCursor(resource)
 		publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
 
-		err = hg.harvester.Run(ctx, src, cursor, publisher)
+		ctx.Logger.Debug("Starting harvester for file")
+		err = hg.harvester.Run(ctx, src, cursor, publisher, metrics)
 		if err != nil && !errors.Is(err, context.Canceled) {
 			hg.readers.remove(srcID)
 			return fmt.Errorf("error while running harvester: %w", err)
@@ -305,6 +323,7 @@ func lockResource(log *logp.Logger, resource *resource, canceler inputv2.Cancele
 	if !resource.lock.TryLock() {
 		log.Infof("Resource '%v' currently in use, waiting...", resource.key)
 		err := resource.lock.LockContext(canceler)
+		log.Infof("Resource '%v' finally released. Lock acquired", resource.key)
 		if err != nil {
 			log.Infof("Input for resource '%v' has been stopped while waiting", resource.key)
 			return err

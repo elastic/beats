@@ -24,14 +24,80 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+func TestTimeMarshal(t *testing.T) {
+	testTime := time.Now()
+	f := NewFields()
+
+	f.Process = &ecs.Process{
+		Start: testTime,
+		Parent: &ecs.Process{
+			Start: testTime,
+		},
+	}
+
+	m := mapstr.M{}
+	err := f.MarshalMapStr(m)
+	require.NoError(t, err)
+	procData := m["process"]
+	assert.Equal(t, testTime, procData.(mapstr.M)["start"])
+	assert.Equal(t, testTime, procData.(mapstr.M)["parent"].(mapstr.M)["start"])
+
+}
+
+func TestPointerHandling(t *testing.T) {
+	testInt := 10
+	testStr := "test"
+	// test to make to sure we correctly handle pointers that aren't structs
+	// mostly checking to make sure we don't panic due to pointer/reflect bugs
+	testStruct := struct {
+		PointerInt       *int         `ecs:"one"`
+		SecondPointerInt *int         `ecs:"two"`
+		TestStruct       *ecs.Process `ecs:"struct"`
+		StrPointer       *string      `ecs:"string"`
+	}{
+		PointerInt:       nil,
+		SecondPointerInt: &testInt,
+		StrPointer:       &testStr,
+		TestStruct: &ecs.Process{
+			Name: "Test",
+		},
+	}
+
+	out := mapstr.M{}
+	err := MarshalStruct(out, "test", testStruct)
+	require.NoError(t, err)
+
+	want := mapstr.M{
+		"test": mapstr.M{
+			"struct": mapstr.M{
+				"name": "Test",
+			},
+			"two":    &testInt,
+			"string": &testStr,
+		},
+	}
+
+	require.Equal(t, want, out)
+}
+
 func TestMarshalMapStr(t *testing.T) {
 	f := NewFields()
 	f.Source = &ecs.Source{IP: "127.0.0.1"}
+	// make sure recursion works properly
+	f.Process = &ecs.Process{
+		Parent: &ecs.Process{
+			Name: "Foo",
+			Parent: &ecs.Process{
+				Name: "Bar",
+			},
+		},
+	}
 
 	m := mapstr.M{}
 	if err := f.MarshalMapStr(m); err != nil {
@@ -45,6 +111,14 @@ func TestMarshalMapStr(t *testing.T) {
 			"type":     []string{"connection", "protocol"},
 		},
 		"source": mapstr.M{"ip": "127.0.0.1"},
+		"process": mapstr.M{
+			"parent": mapstr.M{
+				"name": "Foo",
+				"parent": mapstr.M{
+					"name": "Bar",
+				},
+			},
+		},
 	}, m)
 }
 

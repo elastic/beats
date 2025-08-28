@@ -8,6 +8,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type cursorInput struct{}
@@ -24,7 +25,7 @@ func (src source) Name() string {
 	return src.config.Request.URL.String()
 }
 
-func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
+func cursorConfigure(cfg *conf.C, _ *logp.Logger) ([]inputcursor.Source, inputcursor.Input, error) {
 	conf := defaultConfig()
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, nil, err
@@ -45,12 +46,7 @@ func (in *cursorInput) Test(src inputcursor.Source, _ v2.TestContext) error {
 
 // Run starts the input and blocks until it ends the execution.
 // It will return on context cancellation, any other error will be retried.
-func (in *cursorInput) Run(
-	ctx v2.Context,
-	src inputcursor.Source,
-	cursor inputcursor.Cursor,
-	publisher inputcursor.Publisher,
-) error {
+func (in *cursorInput) Run(ctx v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
 	s := src.(*source)
-	return run(ctx, s.config, publisher, &cursor)
+	return runWithMetrics(ctx, s.config, pub, &crsr)
 }

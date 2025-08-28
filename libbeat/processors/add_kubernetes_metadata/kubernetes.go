@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux || darwin || windows
-// +build linux darwin windows
 
 package add_kubernetes_metadata
 
@@ -26,15 +25,18 @@ import (
 	"sync"
 	"time"
 
+	"k8s.io/apimachinery/pkg/runtime/schema"
+
 	k8sclient "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 const (
@@ -46,6 +48,10 @@ const (
 type kubernetesAnnotator struct {
 	log                 *logp.Logger
 	watcher             kubernetes.Watcher
+	nsWatcher           kubernetes.Watcher
+	nodeWatcher         kubernetes.Watcher
+	rsWatcher           kubernetes.Watcher
+	jobWatcher          kubernetes.Watcher
 	indexers            *Indexers
 	matchers            *Matchers
 	cache               *cache
@@ -99,20 +105,20 @@ func kubernetesMetadataExist(event *beat.Event) bool {
 }
 
 // New constructs a new add_kubernetes_metadata processor.
-func New(cfg *config.C) (beat.Processor, error) {
+func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	config, err := newProcessorConfig(cfg, Indexing)
 	if err != nil {
 		return nil, err
 	}
 
-	log := logp.NewLogger(selector).With("libbeat.processor", "add_kubernetes_metadata")
+	log = log.Named(selector).With("libbeat.processor", "add_kubernetes_metadata")
 	processor := &kubernetesAnnotator{
 		log:                 log,
 		cache:               newCache(config.CleanupTimeout),
 		kubernetesAvailable: false,
 	}
 
-	// complete processor's initialisation asynchronously so as to re-try on failing k8s client initialisations in case
+	// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
 	// the k8s node is not yet ready.
 	go processor.init(config, cfg)
 
@@ -120,8 +126,7 @@ func New(cfg *config.C) (beat.Processor, error) {
 }
 
 func newProcessorConfig(cfg *config.C, register *Register) (kubeAnnotatorConfig, error) {
-	config := defaultKubernetesAnnotatorConfig()
-
+	var config kubeAnnotatorConfig
 	err := cfg.Unpack(&config)
 	if err != nil {
 		return config, fmt.Errorf("fail to unpack the kubernetes configuration: %w", err)
@@ -142,6 +147,17 @@ func newProcessorConfig(cfg *config.C, register *Register) (kubeAnnotatorConfig,
 
 func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 	k.initOnce.Do(func() {
+		var replicaSetWatcher, jobWatcher, namespaceWatcher, nodeWatcher kubernetes.Watcher
+
+		// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
+		err := config.AddResourceMetadata.Namespace.SetBool("use_kubeadm", -1, config.KubeAdm)
+		if err != nil {
+			k.log.Errorf("couldn't set kubeadm variable for namespace due to error %+v", err)
+		}
+		err = config.AddResourceMetadata.Node.SetBool("use_kubeadm", -1, config.KubeAdm)
+		if err != nil {
+			k.log.Errorf("couldn't set kubeadm variable for node due to error %+v", err)
+		}
 		client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 		if err != nil {
 			if kubernetes.IsInCluster(config.KubeConfig) {
@@ -158,7 +174,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			return
 		}
 
-		matchers := NewMatchers(config.Matchers)
+		matchers := NewMatchers(config.Matchers, k.log)
 
 		if matchers.Empty() {
 			k.log.Debugf("Could not initialize kubernetes plugin with zero matcher plugins")
@@ -175,17 +191,18 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		if config.Scope == "node" {
 			config.Node, err = kubernetes.DiscoverKubernetesNode(k.log, nd)
 			if err != nil {
-				k.log.Errorf("Couldn't discover Kubernetes node: %w", err)
+				k.log.Errorf("Couldn't discover Kubernetes node: %v", err)
 				return
 			}
 			k.log.Debugf("Initializing a new Kubernetes watcher using host: %s", config.Node)
 		}
 
 		watcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_pod", client, &kubernetes.Pod{}, kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
-			Node:        config.Node,
-			Namespace:   config.Namespace,
-		}, nil)
+			SyncTimeout:  config.SyncPeriod,
+			Node:         config.Node,
+			Namespace:    config.Namespace,
+			HonorReSyncs: true,
+		}, nil, k.log)
 		if err != nil {
 			k.log.Errorf("Couldn't create kubernetes watcher for %T", &kubernetes.Pod{})
 			return
@@ -193,63 +210,120 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 
 		metaConf := config.AddResourceMetadata
 
-		options := kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
-			Node:        config.Node,
-			Namespace:   config.Namespace,
+		if metaConf.Node.Enabled() {
+			nodeWatcher, err = kubernetes.NewNamedWatcher("add_kubernetes_metadata_node", client, &kubernetes.Node{}, kubernetes.WatchOptions{
+				SyncTimeout:  config.SyncPeriod,
+				Node:         config.Node,
+				HonorReSyncs: true,
+			}, nil, k.log)
+			if err != nil {
+				k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+			}
 		}
 
-		nodeWatcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_node", client, &kubernetes.Node{}, options, nil)
-		if err != nil {
-			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+		if metaConf.Namespace.Enabled() {
+			namespaceWatcher, err = kubernetes.NewNamedWatcher("add_kubernetes_metadata_namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+				SyncTimeout:  config.SyncPeriod,
+				Namespace:    config.Namespace,
+				HonorReSyncs: true,
+			}, nil, k.log)
+			if err != nil {
+				k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+			}
 		}
-		namespaceWatcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
-		}, nil)
-		if err != nil {
-			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+
+		// Resource is Pod, so we need to create watchers for Replicasets and Jobs that it might belong to
+		// in order to be able to retrieve 2nd layer Owner metadata like in case of:
+		// Deployment -> Replicaset -> Pod
+		// CronJob -> job -> Pod
+		if metaConf.Deployment {
+			metadataClient, err := kubernetes.GetKubernetesMetadataClient(config.KubeConfig, config.KubeClientOptions)
+			if err != nil {
+				k.log.Errorf("Error creating metadata client due to error %+v", err)
+			}
+			replicaSetWatcher, err = kubernetes.NewNamedMetadataWatcher(
+				"resource_metadata_enricher_rs",
+				client,
+				metadataClient,
+				schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "replicasets"},
+				kubernetes.WatchOptions{
+					SyncTimeout:  config.SyncPeriod,
+					Namespace:    config.Namespace,
+					HonorReSyncs: true,
+				},
+				nil,
+				metadata.RemoveUnnecessaryReplicaSetData,
+				k.log,
+			)
+			if err != nil {
+				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
+			}
+			k.rsWatcher = replicaSetWatcher
 		}
+		if metaConf.CronJob {
+			jobWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
+				SyncTimeout:  config.SyncPeriod,
+				Namespace:    config.Namespace,
+				HonorReSyncs: true,
+			}, nil, k.log)
+			if err != nil {
+				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
+			}
+			k.jobWatcher = jobWatcher
+		}
+
 		// TODO: refactor the above section to a common function to be used by NeWPodEventer too
-		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, metaConf)
+		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, metaConf)
 
 		k.indexers = NewIndexers(config.Indexers, metaGen)
 		k.watcher = watcher
 		k.kubernetesAvailable = true
+		k.nodeWatcher = nodeWatcher
+		k.nsWatcher = namespaceWatcher
 
 		watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				pod := obj.(*kubernetes.Pod)
-				k.log.Debugf("Adding kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
+				pod, _ := obj.(*kubernetes.Pod)
 				k.addPod(pod)
 			},
 			UpdateFunc: func(obj interface{}) {
-				pod := obj.(*kubernetes.Pod)
-				k.log.Debugf("Updating kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
+				pod, _ := obj.(*kubernetes.Pod)
 				k.updatePod(pod)
 			},
 			DeleteFunc: func(obj interface{}) {
-				pod := obj.(*kubernetes.Pod)
-				k.log.Debugf("Removing pod: %s/%s", pod.GetNamespace(), pod.GetName())
+				pod, _ := obj.(*kubernetes.Pod)
 				k.removePod(pod)
 			},
 		})
 
 		// NOTE: order is important here since pod meta will include node meta and hence node.Store() should
 		// be populated before trying to generate metadata for Pods.
-		if nodeWatcher != nil {
-			if err := nodeWatcher.Start(); err != nil {
-				k.log.Debugf("add_kubernetes_metadata", "Couldn't start node watcher: %v", err)
+		if k.nodeWatcher != nil {
+			if err := k.nodeWatcher.Start(); err != nil {
+				k.log.Debugf("Couldn't start node watcher: %v", err)
 				return
 			}
 		}
-		if namespaceWatcher != nil {
-			if err := namespaceWatcher.Start(); err != nil {
-				k.log.Debugf("add_kubernetes_metadata", "Couldn't start namespace watcher: %v", err)
+		if k.nsWatcher != nil {
+			if err := k.nsWatcher.Start(); err != nil {
+				k.log.Debugf("Couldn't start namespace watcher: %v", err)
+				return
+			}
+		}
+		if k.rsWatcher != nil {
+			if err := k.rsWatcher.Start(); err != nil {
+				k.log.Debugf("Couldn't start replicaSet watcher: %v", err)
+				return
+			}
+		}
+		if k.jobWatcher != nil {
+			if err := k.jobWatcher.Start(); err != nil {
+				k.log.Debugf("Couldn't start job watcher: %v", err)
 				return
 			}
 		}
 		if err := watcher.Start(); err != nil {
-			k.log.Debugf("add_kubernetes_metadata", "Couldn't start pod watcher: %v", err)
+			k.log.Debugf("Couldn't start pod watcher: %v", err)
 			return
 		}
 	})
@@ -263,19 +337,17 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 	if kubernetesMetadataExist(event) {
-		k.log.Debug("Skipping add_kubernetes_metadata processor as kubernetes metadata already exist")
 		return event, nil
 	}
+
 	index := k.matchers.MetadataIndex(event.Fields)
 	if index == "" {
 		k.log.Debug("No container match string, not adding kubernetes data")
 		return event, nil
 	}
 
-	k.log.Debugf("Using the following index key %s", index)
 	metadata := k.cache.get(index)
 	if metadata == nil {
-		k.log.Debugf("Index key %s did not match any of the cached resources", index)
 		return event, nil
 	}
 
@@ -307,6 +379,18 @@ func (k *kubernetesAnnotator) Close() error {
 	if k.watcher != nil {
 		k.watcher.Stop()
 	}
+	if k.nodeWatcher != nil {
+		k.nodeWatcher.Stop()
+	}
+	if k.nsWatcher != nil {
+		k.nsWatcher.Stop()
+	}
+	if k.rsWatcher != nil {
+		k.rsWatcher.Stop()
+	}
+	if k.jobWatcher != nil {
+		k.jobWatcher.Stop()
+	}
 	if k.cache != nil {
 		k.cache.stop()
 	}
@@ -316,7 +400,6 @@ func (k *kubernetesAnnotator) Close() error {
 func (k *kubernetesAnnotator) addPod(pod *kubernetes.Pod) {
 	metadata := k.indexers.GetMetadata(pod)
 	for _, m := range metadata {
-		k.log.Debugf("Created index %s for pod %s/%s", m.Index, pod.GetNamespace(), pod.GetName())
 		k.cache.set(m.Index, m.Data)
 	}
 }
@@ -326,7 +409,6 @@ func (k *kubernetesAnnotator) updatePod(pod *kubernetes.Pod) {
 
 	// Add it again only if it is not being deleted
 	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
-		k.log.Debugf("Removing kubernetes pod being terminated: %s/%s", pod.GetNamespace(), pod.GetName())
 		return
 	}
 

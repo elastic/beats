@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package readfile
 
@@ -37,6 +36,7 @@ import (
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // Sample texts are from http://www.columbia.edu/~kermit/utf8.html
@@ -107,7 +107,7 @@ func TestReaderEncodings(t *testing.T) {
 		}
 
 		// create line reader
-		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, test.lineTerminator, unlimited, test.collectOnEOF})
+		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, test.lineTerminator, unlimited, test.collectOnEOF}, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Fatal("failed to initialize reader:", err)
 		}
@@ -226,7 +226,7 @@ func TestLineTerminators(t *testing.T) {
 		buffer.Write([]byte("this is my second line"))
 		buffer.Write(nl)
 
-		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, terminator, unlimited, false})
+		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, terminator, unlimited, false}, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Errorf("failed to initialize reader: %v", err)
 			continue
@@ -304,7 +304,7 @@ func testReadLines(t *testing.T, inputLines [][]byte, eofOnLastRead bool) {
 	}
 
 	codec, _ := encoding.Plain(r)
-	reader, err := NewLineReader(ioutil.NopCloser(r), Config{codec, buffer.Len(), LineFeed, unlimited, false})
+	reader, err := NewLineReader(ioutil.NopCloser(r), Config{codec, buffer.Len(), LineFeed, unlimited, false}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("Error initializing reader: %v", err)
 	}
@@ -420,7 +420,7 @@ func TestMaxBytesLimit(t *testing.T) {
 	}
 
 	// Create line reader
-	reader, err := NewLineReader(ioutil.NopCloser(strings.NewReader(input)), Config{codec, bufferSize, LineFeed, lineMaxLimit, false})
+	reader, err := NewLineReader(ioutil.NopCloser(strings.NewReader(input)), Config{codec, bufferSize, LineFeed, lineMaxLimit, false}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal("failed to initialize reader:", err)
 	}
@@ -480,7 +480,7 @@ func TestBufferSize(t *testing.T) {
 	bufferSize := 10
 
 	in := ioutil.NopCloser(strings.NewReader(strings.Join(lines, "")))
-	reader, err := NewLineReader(in, Config{codec, bufferSize, AutoLineTerminator, 1024, false})
+	reader, err := NewLineReader(in, Config{codec, bufferSize, AutoLineTerminator, 1024, false}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal("failed to initialize reader:", err)
 	}

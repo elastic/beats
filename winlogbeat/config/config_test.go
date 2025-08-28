@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package config
 
@@ -61,8 +60,7 @@ func TestConfigValidate(t *testing.T) {
 		},
 		{
 			WinlogbeatConfig{},
-			"1 error: at least one event log must be configured as part of " +
-				"event_logs",
+			"at least one event log must be configured as part of event_logs",
 		},
 	}
 

@@ -1,5 +1,5 @@
 - key: coredns
-  title: Coredns
+  title: CoreDNS
   description: >
     Module for handling logs produced by coredns
   fields:

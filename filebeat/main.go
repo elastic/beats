@@ -19,6 +19,7 @@ package main
 
 import (
 	"os"
+	_ "time/tzdata" // for timezone handling
 
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	inputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
@@ -33,7 +34,7 @@ import (
 // Finally, input uses the registrar information, on restart, to
 // determine where in each file to restart a harvester.
 func main() {
-	if err := cmd.Filebeat(inputs.Init, cmd.FilebeatSettings()).Execute(); err != nil {
+	if err := cmd.Filebeat(inputs.Init, cmd.FilebeatSettings("")).Execute(); err != nil {
 		os.Exit(1)
 	}
 }

@@ -7,9 +7,10 @@ package nomad
 import (
 	"testing"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/hashicorp/nomad/api"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -43,12 +44,10 @@ func newJob(jobID string) *Job {
 						},
 						Services: []*api.Service{
 							{
-								Id:   "service-a",
 								Name: "web",
 								Tags: []string{"tag-a", "tag-b", "${NOMAD_JOB_NAME}"},
 							},
 							{
-								Id:   "service-b",
 								Name: "nginx",
 								Tags: []string{"tag-c", "tag-d"},
 							},
@@ -75,6 +74,7 @@ func TestAllocationMetadata(t *testing.T) {
 		"annotations.dedot":   false,
 		"include_annotations": []string{"b", "b.key"},
 	})
+	require.NoError(t, err)
 
 	metaGen, err := NewMetaGenerator(config, nil)
 	if err != nil {
@@ -105,6 +105,7 @@ func TestExcludeMetadata(t *testing.T) {
 	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"exclude_labels": []string{"key1", "canary_tags"},
 	})
+	require.NoError(t, err)
 
 	metaGen, err := NewMetaGenerator(config, nil)
 	if err != nil {
@@ -158,6 +159,7 @@ func TestCronJob(t *testing.T) {
 	}
 
 	config, err := conf.NewConfigFrom(map[string]interface{}{})
+	require.NoError(t, err)
 
 	metaGen, err := NewMetaGenerator(config, nil)
 	if err != nil {

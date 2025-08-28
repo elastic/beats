@@ -19,11 +19,11 @@ package mage
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
@@ -46,7 +46,7 @@ func init() {
 // Use VERSION_QUALIFIER to control the version qualifier.
 func Package() {
 	start := time.Now()
-	defer func() { fmt.Println("package ran for", time.Since(start)) }()
+	defer func() { log.Println("package ran for", time.Since(start)) }()
 
 	switch SelectLogic {
 	case devtools.OSSProject:
@@ -58,7 +58,7 @@ func Package() {
 	devtools.PackageKibanaDashboardsFromBuildDir()
 
 	mg.Deps(Update.All)
-	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
+	mg.Deps(build.CrossBuild)
 	mg.SerialDeps(devtools.Package, pkg.PackageTest)
 }
 
@@ -86,7 +86,7 @@ func customizePackaging() {
 			case devtools.Deb, devtools.RPM:
 				args.Spec.Files["/etc/{{.BeatName}}/module"] = moduleDir
 			default:
-				panic(errors.Errorf("unhandled package type: %v", pkgType))
+				panic(fmt.Errorf("unhandled package type: %v", pkgType))
 			}
 		}
 	}

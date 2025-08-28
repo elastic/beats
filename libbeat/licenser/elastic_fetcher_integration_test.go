@@ -16,11 +16,11 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package licenser
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -36,7 +37,7 @@ const (
 	elasticsearchPort = "9200"
 )
 
-func getTestClient() *eslegclient.Connection {
+func getTestClient(t *testing.T) *eslegclient.Connection {
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = 60 * time.Second
 
@@ -47,17 +48,23 @@ func getTestClient() *eslegclient.Connection {
 		Password:         "testing",
 		CompressionLevel: 3,
 		Transport:        transport,
-	})
-
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
-		panic(err)
+		t.Fatalf("cannot get new ES connection: %s", err)
 	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	if err := client.Connect(ctx); err != nil {
+		t.Fatalf("cannot connect to ES: %s", err)
+	}
+
 	return client
 }
 
 // Sanity check for schema change on the HTTP response from a live Elasticsearch instance.
 func TestElasticsearch(t *testing.T) {
-	f := NewElasticFetcher(getTestClient())
+	f := NewElasticFetcher(getTestClient(t), logptest.NewTestingLogger(t, ""))
 	license, err := f.Fetch()
 	if !assert.NoError(t, err) {
 		return

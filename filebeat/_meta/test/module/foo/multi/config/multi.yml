@@ -1,4 +1,5 @@
-type: log
+type: filestream
+id: foo-multi
 paths:
   - /tmp
 exclude_files: [".gz$"]

@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build integration
-// +build integration
 
 package stats
 
@@ -16,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	// Register input module and metricset
 	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus"
@@ -25,7 +25,7 @@ import (
 func init() {
 	// To be moved to some kind of helper
 	os.Setenv("BEAT_STRICT_PERMS", "false")
-	mb.Registry.SetSecondarySource(mb.NewLightModulesSource("../../../module"))
+	mb.Registry.SetSecondarySource(mb.NewLightModulesSource(logp.NewNopLogger(), "../../../module"))
 }
 
 func TestFetch(t *testing.T) {

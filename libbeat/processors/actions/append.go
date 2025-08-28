@@ -23,8 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -54,7 +53,7 @@ func init() {
 }
 
 // NewAppendProcessor returns a new append processor.
-func NewAppendProcessor(c *conf.C) (beat.Processor, error) {
+func NewAppendProcessor(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := appendProcessorConfig{
 		IgnoreMissing:     false,
 		IgnoreEmptyValues: false,
@@ -68,7 +67,7 @@ func NewAppendProcessor(c *conf.C) (beat.Processor, error) {
 
 	f := &appendProcessor{
 		config: config,
-		logger: logp.NewLogger("append"),
+		logger: log.Named("append"),
 	}
 	return f, nil
 }
@@ -82,9 +81,8 @@ func (f *appendProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	err := f.appendValues(f.config.TargetField, f.config.Fields, f.config.Values, event)
 	if err != nil {
 		errMsg := fmt.Errorf("failed to append fields in append processor: %w", err)
-		if publisher.LogWithTrace() {
-			f.logger.Debug(errMsg.Error())
-		}
+		f.logger.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
+
 		if f.config.FailOnError {
 			event = backup
 			if _, err := event.PutValue("error.message", errMsg.Error()); err != nil {

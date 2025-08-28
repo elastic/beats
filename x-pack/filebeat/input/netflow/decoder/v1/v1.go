@@ -7,18 +7,17 @@ package v1
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"io"
-	"log"
 	"net"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -53,21 +52,23 @@ var templateV1 = template.Template{
 type ReadHeaderFn func(*bytes.Buffer, net.Addr) (int, time.Time, record.Map, error)
 
 type NetflowProtocol struct {
-	logger       *log.Logger
+	logger       *logp.Logger
 	flowTemplate *template.Template
 	version      uint16
 	readHeader   ReadHeaderFn
 }
 
 func init() {
-	protocol.Registry.Register(ProtocolName, New)
+	if err := protocol.Registry.Register(ProtocolName, New); err != nil {
+		panic(err)
+	}
 }
 
 func New(config config.Config) protocol.Protocol {
-	return NewProtocol(ProtocolID, &templateV1, readV1Header, log.New(config.LogOutput(), LogPrefix, 0))
+	return NewProtocol(ProtocolID, &templateV1, readV1Header, config.LogOutput().Named(LogPrefix))
 }
 
-func NewProtocol(version uint16, template *template.Template, readHeader ReadHeaderFn, logger *log.Logger) protocol.Protocol {
+func NewProtocol(version uint16, template *template.Template, readHeader ReadHeaderFn, logger *logp.Logger) protocol.Protocol {
 	return &NetflowProtocol{
 		logger:       logger,
 		flowTemplate: template,
@@ -91,12 +92,12 @@ func (NetflowProtocol) Stop() error {
 func (p *NetflowProtocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows []record.Record, err error) {
 	numFlows, timestamp, metadata, err := p.readHeader(buf, source)
 	if err != nil {
-		p.logger.Printf("Failed parsing packet: %v", err)
-		return nil, errors.Wrap(err, "error reading netflow header")
+		p.logger.Debugf("Failed parsing packet: %v", err)
+		return nil, fmt.Errorf("error reading netflow header: %w", err)
 	}
 	flows, err = p.flowTemplate.Apply(buf, numFlows)
 	if err != nil {
-		return nil, errors.Wrap(err, "error parsing flows")
+		return nil, fmt.Errorf("error parsing flows: %w", err)
 	}
 	for i := range flows {
 		flows[i].Exporter = metadata

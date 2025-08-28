@@ -10,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -47,8 +48,11 @@ func TestTransformableClone(t *testing.T) {
 }
 
 func TestNewTransformsFromConfig(t *testing.T) {
-	registerTransform("test", setName, newSetRequestPagination)
-	t.Cleanup(func() { registeredTransforms = newRegistry() })
+	registeredTransforms := registry{
+		"test": {
+			setName: newSetRequestPagination,
+		},
+	}
 
 	cases := []struct {
 		name               string
@@ -95,6 +99,7 @@ func TestNewTransformsFromConfig(t *testing.T) {
 				&set{
 					targetInfo: targetInfo{Name: "foo", Type: "body"},
 					valueType:  valueTypeString,
+					status:     noopReporter{},
 				},
 			},
 		},
@@ -104,7 +109,7 @@ func TestNewTransformsFromConfig(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(tc.paramCfg)
-			gotTransforms, gotErr := newTransformsFromConfig(transformsConfig{cfg}, tc.paramNamespace, nil)
+			gotTransforms, gotErr := newTransformsFromConfig(registeredTransforms, transformsConfig{cfg}, tc.paramNamespace, noopReporter{}, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)
 				tr := gotTransforms[0].(*set)
@@ -123,13 +128,14 @@ type fakeTransform struct{}
 func (fakeTransform) transformName() string { return "fake" }
 
 func TestNewBasicTransformsFromConfig(t *testing.T) {
-	fakeConstr := func(*conf.C, *logp.Logger) (transform, error) {
-		return fakeTransform{}, nil
+	registeredTransforms := registry{
+		"test": {
+			setName: newSetRequestPagination,
+			"fake": func(*conf.C, status.StatusReporter, *logp.Logger) (transform, error) {
+				return fakeTransform{}, nil
+			},
+		},
 	}
-
-	registerTransform("test", setName, newSetRequestPagination)
-	registerTransform("test", "fake", fakeConstr)
-	t.Cleanup(func() { registeredTransforms = newRegistry() })
 
 	cases := []struct {
 		name           string
@@ -160,7 +166,7 @@ func TestNewBasicTransformsFromConfig(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(tc.paramCfg)
-			_, gotErr := newBasicTransformsFromConfig(transformsConfig{cfg}, tc.paramNamespace, nil)
+			_, gotErr := newBasicTransformsFromConfig(registeredTransforms, transformsConfig{cfg}, tc.paramNamespace, noopReporter{}, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)
 			} else {

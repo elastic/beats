@@ -22,6 +22,7 @@ import (
 	"net"
 	"os"
 	"runtime"
+	"sync"
 	"testing"
 	"time"
 
@@ -31,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo/types"
 
@@ -50,9 +52,9 @@ func TestConfigDefault(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(map[string]interface{}{})
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	switch runtime.GOOS {
-	case "windows", "darwin", "linux":
+	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
@@ -97,9 +99,9 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	switch runtime.GOOS {
-	case "windows", "darwin", "linux":
+	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
@@ -147,7 +149,7 @@ func TestConfigName(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(config)
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
@@ -182,7 +184,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(config)
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
@@ -205,7 +207,7 @@ func TestConfigGeoDisabled(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(config)
 	require.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
@@ -223,9 +225,9 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(cfg)
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	switch runtime.GOOS {
-	case "windows", "darwin", "linux":
+	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
@@ -288,10 +290,10 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 
 			v, err := newEvent.GetValue("host")
 			assert.NoError(t, err)
-			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1)
-			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)
+			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1) //nolint:errcheck // already checked
+			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)  //nolint:errcheck // already checked
 			if c.expectedHostFieldLength != -1 {
-				assert.Equal(t, c.expectedHostFieldLength, len(v.(mapstr.M)))
+				assert.Equal(t, c.expectedHostFieldLength, len(v.(mapstr.M))) //nolint:errcheck // already checked
 			}
 		})
 	}
@@ -303,9 +305,9 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 	testConfig, err := conf.NewConfigFrom(cfg)
 	assert.NoError(t, err)
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 	switch runtime.GOOS {
-	case "windows", "darwin", "linux":
+	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
@@ -364,8 +366,8 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 
 			v, err := newEvent.GetValue("host")
 			assert.NoError(t, err)
-			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1)
-			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)
+			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1) //nolint:errcheck // already checked
+			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)  //nolint:errcheck // already checked
 		})
 	}
 }
@@ -473,45 +475,60 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 	}
 }
 
-func TestExpireCacheOnFQDNReportingChange(t *testing.T) {
+func TestFQDNEventSync(t *testing.T) {
+	hostname, err := os.Hostname()
+	require.NoError(t, err)
+	srv, _ := mockdns.NewServer(map[string]mockdns.Zone{
+		hostname + ".": {
+			CNAME: "foo.bar.baz.",
+		},
+		"foo.bar.baz.": {
+			A: []string{"1.1.1.1"},
+		},
+	}, false)
+	defer srv.Close()
+
+	srv.PatchNet(net.DefaultResolver)
+	defer mockdns.UnpatchNet(net.DefaultResolver)
+
 	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
 		"cache.ttl": "5m",
 	})
 
-	p, err := New(testConfig)
+	// Start with FQDN off
+	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+		"features.fqdn.enabled": false,
+	}))
 	require.NoError(t, err)
 
-	ahmP, ok := p.(*addHostMetadata)
-	require.True(t, ok)
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
 
-	// Call the expired() method once to prime the cache's
-	// lastUpdated value
-	ahmP.expired()
-
-	// Since we just primed the cache's lastUpdated value, the
-	// cache should no longer be expired.
-	expired := ahmP.expired()
-	require.False(t, expired)
-
-	// Toggle the FQDN feature flag; this should cause the cache
-	// to expire.
+	// update
 	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
 		"features.fqdn.enabled": true,
 	}))
 	require.NoError(t, err)
 
-	expired = ahmP.expired()
-	require.True(t, expired)
+	t.Logf("updated FQDN")
 
-	// Set the FQDN feature flag to the same value; this should NOT
-	// cause the cache to expire.
-	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
-		"features.fqdn.enabled": true,
-	}))
-	require.NoError(t, err)
-
-	expired = ahmP.expired()
-	require.False(t, expired)
+	// run a number of events, make sure none have wrong hostname.
+	checkWait := sync.WaitGroup{}
+	for i := 0; i < 10; i++ {
+		checkWait.Add(1)
+		go func() {
+			resp, err := p.Run(&beat.Event{
+				Fields: mapstr.M{},
+			})
+			require.NoError(t, err)
+			name, err := resp.Fields.GetValue("host.name")
+			require.NoError(t, err)
+			require.Equal(t, "foo.bar.baz", name)
+			checkWait.Done()
+		}()
+	}
+	t.Logf("Waiting for runners to return...")
+	checkWait.Wait()
 }
 
 func TestFQDNLookup(t *testing.T) {
@@ -524,8 +541,8 @@ func TestFQDNLookup(t *testing.T) {
 		expectedFQDNLookupFailedCount int64
 	}{
 		"lookup_succeeds": {
-			cnameLookupResult:             "foo.bar.baz.",
-			expectedHostName:              "foo.bar.baz",
+			cnameLookupResult:             "example.com.",
+			expectedHostName:              "example.com",
 			expectedFQDNLookupFailedCount: 0,
 		},
 		"lookup_fails": {
@@ -563,12 +580,14 @@ func TestFQDNLookup(t *testing.T) {
 			testConfig, err := conf.NewConfigFrom(map[string]interface{}{})
 			require.NoError(t, err)
 
-			p, err := New(testConfig)
+			p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			addHostMetadataP, ok := p.(*addHostMetadata)
 			require.True(t, ok)
 			require.Equal(t, test.expectedFQDNLookupFailedCount, addHostMetadataP.metrics.FQDNLookupFailed.Get())
+			// reset so next run is correct, registry is global
+			addHostMetadataP.metrics.FQDNLookupFailed.Set(0)
 
 			// Run event through processor and check that hostname reported
 			// by processor is same as OS-reported hostname

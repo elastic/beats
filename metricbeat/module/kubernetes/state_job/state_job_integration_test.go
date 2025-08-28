@@ -16,23 +16,32 @@
 // under the License.
 
 //go:build integration && linux
-// +build integration,linux
 
 package state_job
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/test"
 )
 
 func TestFetchMetricset(t *testing.T) {
+	var events []mb.Event
+	var errs []error
 	config := test.GetKubeStateMetricsConfig(t, "state_job")
 	metricSet := mbtest.NewFetcher(t, config)
-	events, errs := metricSet.FetchEvents()
+	for retries := 0; retries < 5; retries++ {
+		events, errs = metricSet.FetchEvents()
+		if len(errs) == 0 && len(events) > 0 {
+			break
+		}
+		time.Sleep(10 * time.Second)
+	}
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}

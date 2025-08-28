@@ -7,7 +7,7 @@
     },
     "kubernetes": {
         "daemonset": {
-            "name": "metricbeat",
+            "name": "kube-proxy",
             "replicas": {
                 "available": 1,
                 "desired": 1,

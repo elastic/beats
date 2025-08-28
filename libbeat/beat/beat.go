@@ -22,8 +22,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 // Creator initializes and configures a new Beater instance used to execute
@@ -57,6 +60,8 @@ type Beat struct {
 	Info      Info     // beat metadata.
 	Publisher Pipeline // Publisher pipeline
 
+	Monitoring Monitoring
+
 	InSetupCmd bool // this is set to true when the `setup` command is called
 
 	OverwritePipelinesCallback OverwritePipelinesCallback // ingest pipeline loader callback
@@ -81,7 +86,51 @@ type Beat struct {
 
 	Instrumentation instrumentation.Instrumentation // instrumentation holds an APM agent for capturing and reporting traces
 
-	API *api.Server // API server. This is nil unless the http endpoint is enabled.
+	API      *api.Server      // API server. This is nil unless the http endpoint is enabled.
+	Registry *reload.Registry // input, & output registry for configuration manager, should be instantiated in NewBeat
+}
+
+func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
+	if beat.Manager == nil {
+		return useragent.AgentManagementModeUnknown
+	}
+	if !beat.Manager.Enabled() {
+		return useragent.AgentManagementModeStandalone
+	}
+
+	info := beat.Manager.AgentInfo()
+	switch info.ManagedMode {
+	case proto.AgentManagedMode_MANAGED:
+		return useragent.AgentManagementModeManaged
+	case proto.AgentManagedMode_STANDALONE:
+		return useragent.AgentManagementModeUnmanaged
+	}
+	// this is probably not reachable
+	return useragent.AgentManagementModeUnknown
+}
+
+func (beat *Beat) userAgentUnprivilegedMode() useragent.AgentUnprivilegedMode {
+	if beat.Manager == nil || !beat.Manager.Enabled() {
+		return useragent.AgentUnprivilegedModeUnknown
+	}
+	if beat.Manager.AgentInfo().Unprivileged {
+		return useragent.AgentUnprivilegedModeUnprivileged
+	}
+	return useragent.AgentUnprivilegedModePrivileged
+}
+
+// GenerateUserAgent populates the UserAgent field on the beat.Info struct
+func (beat *Beat) GenerateUserAgent() {
+	userAgentProduct := "Libbeat"
+	if beat.Info.Beat != "" {
+		userAgentProduct = beat.Info.Beat
+	}
+
+	mode := beat.userAgentMode()
+	unprivileged := beat.userAgentUnprivilegedMode()
+
+	beat.Info.UserAgent = useragent.UserAgentWithBeatTelemetry(userAgentProduct, version.GetDefaultVersion(),
+		mode, unprivileged)
 }
 
 // BeatConfig struct contains the basic configuration of every beat

@@ -9,51 +9,38 @@ import (
 	"crypto/x509"
 	"fmt"
 
-	"github.com/Azure/go-autorest/autorest/adal"
-	"github.com/pkg/errors"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // NewProviderFromCertificate returns a TokenProvider that uses certificate-based
 // authentication.
-func NewProviderFromCertificate(
-	endpoint, resource, applicationID, tenantID string,
-	conf tlscommon.CertificateConfig) (sptp TokenProvider, err error) {
+func NewProviderFromCertificate(resource, applicationID, tenantID string, conf tlscommon.CertificateConfig) (sptp TokenProvider, err error) {
 	cert, privKey, err := loadConfigCerts(conf)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed loading certificates")
-	}
-	oauth, err := adal.NewOAuthConfig(endpoint, tenantID)
-	if err != nil {
-		return nil, errors.Wrap(err, "error generating OAuthConfig")
+		return nil, fmt.Errorf("failed loading certificates: %w", err)
 	}
 
-	spt, err := adal.NewServicePrincipalTokenFromCertificate(
-		*oauth,
-		applicationID,
-		cert,
-		privKey,
-		resource,
-	)
+	cred, err := azidentity.NewClientCertificateCredential(tenantID, applicationID, []*x509.Certificate{cert}, privKey, nil)
 	if err != nil {
 		return nil, err
 	}
-	spt.SetAutoRefresh(true)
-	return (*servicePrincipalToken)(spt), nil
+
+	return (*credentialTokenProvider)(cred), nil
 }
 
 func loadConfigCerts(cfg tlscommon.CertificateConfig) (cert *x509.Certificate, key *rsa.PrivateKey, err error) {
 	tlsCert, err := tlscommon.LoadCertificate(&cfg)
 	if err != nil {
-		return nil, nil, errors.Wrapf(err, "error loading X509 certificate from '%s'", cfg.Certificate)
+		return nil, nil, fmt.Errorf("error loading X509 certificate from '%s': %w", cfg.Certificate, err)
 	}
 	if tlsCert == nil || len(tlsCert.Certificate) == 0 {
 		return nil, nil, fmt.Errorf("no certificates loaded from '%s'", cfg.Certificate)
 	}
 	cert, err = x509.ParseCertificate(tlsCert.Certificate[0])
 	if err != nil {
-		return nil, nil, errors.Wrapf(err, "error parsing X509 certificate from '%s'", cfg.Certificate)
+		return nil, nil, fmt.Errorf("error parsing X509 certificate from '%s': %w", cfg.Certificate, err)
 	}
 	if tlsCert.PrivateKey == nil {
 		return nil, nil, fmt.Errorf("failed loading private key from '%s'", cfg.Key)

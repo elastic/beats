@@ -22,7 +22,7 @@ type testProvider struct {
 	createFn func(c *config.C) (v2.Input, error)
 }
 
-func (p *testProvider) Init(grp unison.Group, mode v2.Mode) error {
+func (p *testProvider) Init(grp unison.Group) error {
 	return nil
 }
 

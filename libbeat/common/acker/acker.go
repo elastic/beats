@@ -19,9 +19,9 @@ package acker
 
 import (
 	"sync"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 // Nil creates an ACKer that does nothing.
@@ -98,7 +98,7 @@ type gapInfo struct {
 }
 
 func (a *trackingACKer) AddEvent(_ beat.Event, published bool) {
-	a.events.Inc()
+	a.events.Add(1)
 	if published {
 		a.addPublishedEvent()
 	} else {
@@ -148,7 +148,7 @@ func (a *trackingACKer) addDropEvent() {
 		a.lst.Unlock()
 		current.Unlock()
 
-		a.events.Dec()
+		a.events.Add(^uint32(0))
 		return
 	}
 
@@ -202,7 +202,7 @@ func (a *trackingACKer) ACKEvents(n int) {
 		current.Unlock()
 	}
 
-	a.events.Sub(uint32(total))
+	a.events.Add(^uint32(total - 1))
 	a.fn(acked, total)
 }
 

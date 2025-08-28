@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package status
 
@@ -31,7 +30,6 @@ import (
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "mongodb")
-
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
@@ -53,7 +51,7 @@ func TestFetch(t *testing.T) {
 	assert.True(t, available.(int32) > 0)
 
 	pageFaults, _ := event.GetValue("mongodb.status.extra_info.page_faults")
-	assert.True(t, pageFaults.(int32) >= 0)
+	assert.True(t, pageFaults.(int64) >= 0)
 }
 
 func TestData(t *testing.T) {

@@ -1,0 +1,71 @@
+{{ if eq .input "salesforce" }}
+
+id: login
+type: salesforce
+enabled: true
+{{ if .api_version }}
+version: {{ .api_version }}
+{{ end }}
+auth.oauth2: {{ .authentication | tojson }}
+url: {{ .url }}
+event_monitoring_method:
+  event_log_file:
+    enabled: {{ if .event_log_file }}true{{ else }}false{{ end }}
+    interval: {{ .elf_interval }}
+    query:
+      default: SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE {{ if .initial_interval }}LogDate > [[ (formatTime (now.Add (parseDuration "-{{ .initial_interval }}")) "2006-01-02T15:04:05.000Z0700") ]] AND{{ end }} Interval = '{{ .log_file_interval }}' AND EventType = 'Login' ORDER BY LogDate ASC NULLS FIRST
+      value: SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = '{{ .log_file_interval }}' AND EventType = 'Login' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] ORDER BY LogDate ASC NULLS FIRST
+    cursor:
+      field: "CreatedDate"
+  object:
+    enabled: {{ if .real_time }}true{{ else }}false{{ end }}
+    interval: {{ .real_time_interval }}
+    query:
+      default: SELECT FIELDS(STANDARD) FROM LoginEvent{{ if .initial_interval }} WHERE EventDate > [[ (formatTime (now.Add (parseDuration "-{{ .initial_interval }}")) "2006-01-02T15:04:05.000Z0700") ]]{{ end }}
+      value: SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ .cursor.object.first_event_time ]]
+    cursor:
+      field: "EventDate"
+
+processors:
+  - add_fields:
+      target: salesforce
+      fields:
+        instance_url: {{ .url }}
+  - add_locale: ~
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+processors:
+  - add_fields:
+      target: salesforce
+      fields:
+        instance_url: {{ .url }}
+  - decode_json_fields:
+      fields: ["message"]
+      target: "json"
+  - script:
+      lang: javascript
+      source: >
+        function process(event) {
+          if (event.Get("json.EVENT_TYPE") == "Login") {
+            event.Put("event.provider", "EventLogFile");
+          } else {
+            event.Put("event.provider", "Object");
+          }
+        }
+  - drop_fields:
+      fields: json
+      ignore_missing: true
+  - add_locale: ~
+
+{{ end }}
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}

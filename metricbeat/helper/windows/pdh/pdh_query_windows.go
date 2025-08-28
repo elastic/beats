@@ -16,11 +16,12 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package pdh
 
 import (
+	"errors"
+	"fmt"
 	"regexp"
 	"runtime"
 	"strings"
@@ -28,8 +29,6 @@ import (
 	"unsafe"
 
 	"golang.org/x/sys/windows"
-
-	"github.com/pkg/errors"
 )
 
 var (
@@ -196,10 +195,10 @@ func (q *Query) GetFormattedCounterValues() (map[string][]CounterValue, error) {
 func (q *Query) GetCountersAndInstances(objectName string) ([]string, []string, error) {
 	counters, instances, err := PdhEnumObjectItems(objectName)
 	if err != nil {
-		return nil, nil, errors.Wrapf(err, "Unable to retrieve counter and instance list for %s", objectName)
+		return nil, nil, fmt.Errorf("Unable to retrieve counter and instance list for %s: %w", objectName, err)
 	}
 	if len(counters) == 0 && len(instances) == 0 {
-		return nil, nil, errors.Errorf("Unable to retrieve counter and instance list for %s", objectName)
+		return nil, nil, fmt.Errorf("Unable to retrieve counter and instance list for %s", objectName)
 	}
 	return UTF16ToStringArray(counters), UTF16ToStringArray(instances), nil
 }
@@ -334,7 +333,7 @@ func getCounterValue(counter *Counter) CounterValue {
 			counterValue.Measurement = value.Value
 		}
 	default:
-		counterValue.Err.Error = errors.Errorf("initialization failed: format '%#v' "+
+		counterValue.Err.Error = fmt.Errorf("initialization failed: format '%#v' "+
 			"for instance '%s' is invalid (must be PdhFmtDouble, PdhFmtLarge or PdhFmtLong)",
 			counter.format, counter.instanceName)
 	}

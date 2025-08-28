@@ -24,8 +24,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
@@ -112,7 +110,7 @@ func GetFields(m mapstr.M) (*Fields, error) {
 
 	fields, ok := v.(*Fields)
 	if !ok {
-		return nil, errors.Errorf("%v must be a *types.Fields, but is %T", FieldsKey, fields)
+		return nil, fmt.Errorf("%v must be a *types.Fields, but is %T", FieldsKey, fields)
 	}
 	return fields, nil
 }
@@ -418,8 +416,23 @@ func marshalStruct(m mapstr.M, key string, val reflect.Value) error {
 	}
 
 	typ := val.Type()
+	// pre-emptively handle time
+	if reflect.TypeOf(time.Time{}) == typ {
+		_, err := m.Put(key, val.Interface())
+		if err != nil {
+			return fmt.Errorf("error creating time value: %w", err)
+		}
+		return nil
+	}
+
+	// NumField() will panic if we don't have a struct
+	if val.Type().Kind() != reflect.Struct {
+		return fmt.Errorf("value must be a struct or a pointer to a struct, but got %v at key %s", val.Type(), key)
+	}
+
 	for i := 0; i < typ.NumField(); i++ {
 		structField := typ.Field(i)
+
 		tag := getTag(structField)
 		if tag == "" {
 			continue
@@ -433,7 +446,7 @@ func marshalStruct(m mapstr.M, key string, val reflect.Value) error {
 				case "inline":
 					inline = true
 				default:
-					return fmt.Errorf("Unsupported flag %q in tag %q of type %s", flag, tag, typ)
+					return fmt.Errorf("unsupported flag %q in tag %q of type %s", flag, tag, typ)
 				}
 			}
 			tag = tags[0]
@@ -446,6 +459,13 @@ func marshalStruct(m mapstr.M, key string, val reflect.Value) error {
 
 		if inline {
 			if err := marshalStruct(m, key, fieldValue); err != nil {
+				return err
+			}
+			// look for a struct or pointer to a struct
+			// that reflect.Ptr check is needed so Elem() doesn't panic
+		} else if (structField.Type.Kind() == reflect.Ptr && fieldValue.Elem().Kind() == reflect.Struct) ||
+			structField.Type.Kind() == reflect.Struct {
+			if err := marshalStruct(m, key+"."+tag, fieldValue); err != nil {
 				return err
 			}
 		} else {

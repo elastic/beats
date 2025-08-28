@@ -5,14 +5,14 @@
 package inputs
 
 import (
-	"github.com/elastic/beats/v7/filebeat/beater"
 	ossinputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func Init(info beat.Info, log *logp.Logger, store beater.StateStore) []v2.Plugin {
+func Init(info beat.Info, log *logp.Logger, store statestore.States) []v2.Plugin {
 	return append(
 		xpackInputs(info, log, store),
 		ossinputs.Init(info, log, store)...,

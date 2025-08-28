@@ -1,0 +1,11 @@
+config:
+  - path: dev-tools/packaging/templates/ironbank/auditbeat
+  - path: dev-tools/packaging/templates/ironbank/filebeat
+  - path: dev-tools/packaging/templates/ironbank/heartbeat
+  - path: dev-tools/packaging/templates/ironbank/metricbeat
+  - path: dev-tools/packaging/templates/ironbank/packetbeat
+
+pull_request:
+  labels:
+    - dependencies
+    - backport-active-all

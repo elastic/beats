@@ -1,0 +1,92 @@
+- name: salesforce.logout
+  type: group
+  release: beta
+  description: >
+    Fileset for parsing Salesforce Logout (REST) logs.
+  fields:
+    - name: document_id
+      type: keyword
+      description: >
+        Unique Id.
+    - name: session
+      type: group
+      fields:
+        - name: key
+          type: keyword
+          description: >
+            The user's unique session ID. You can use this value to identify all user events within a session. When a user logs out and logs in again, a new session is started.
+        - name: level
+          type: text
+          description: >
+            The security level of the session that was used when logging out (e.g. Standard Session or High-Assurance Session).
+        - name: type
+          type: keyword
+          description: >
+            The session type that was used when logging out (e.g. API, Oauth2 or UI).
+    - name: login_key
+      type: keyword
+      description: >
+        The string that ties together all events in a given user's login session. It starts with a login event and ends with either a logout event or the user session expiring.
+    - name: api
+      type: group
+      fields:
+        - name: type
+          type: keyword
+          description: >
+            The type of Salesforce API request.
+        - name: version
+          type: keyword
+          description: >
+            The version of the Salesforce API that's being used.
+    - name: app_type
+      type: keyword
+      description: >
+        The application type that was in use upon logging out.
+    - name: browser_type
+      type: keyword
+      description: >
+        The identifier string returned by the browser used at login.
+    - name: client_version
+      type: keyword
+      description: >
+        The version of the client that was in use upon logging out.
+    - name: event_type
+      type: keyword
+      description: >
+        The type of event. The value is always Logout.
+    - name: organization_by_id
+      type: keyword
+      description: >
+        The 15-character ID of the organization.
+    - name: platform_type
+      type: keyword
+      description: >
+        The code for the client platform. If a timeout caused the logout, this field is null.
+    - name: resolution_type
+      type: keyword
+      description: >
+        The screen resolution of the client. If a timeout caused the logout, this field is null.
+    - name: user_id
+      type: keyword
+      description: >
+        The 15-character ID of the user who's using Salesforce services through the UI or the API.
+    - name: user_id_derived
+      type: keyword
+      description: >
+        The 18-character case-safe ID of the user who's using Salesforce services through the UI or the API.
+    - name: user_initiated_logout
+      type: keyword
+      description: >
+        The value is 1 if the user intentionally logged out of the organization by clicking the Logout button. If the user's session timed out due to inactivity or another implicit logout action, the value is 0.
+    - name: created_by_id
+      type: keyword
+      description: >
+        Unavailable
+    - name: event_identifier
+      type: keyword
+      description: >
+        This field is populated only when the activity that this event monitors requires extra authentication, such as multi-factor authentication. In this case, Salesforce generates more events and sets the RelatedEventIdentifier field of the new events to the value of the EventIdentifier field of the original event. Use this field with the EventIdentifier field to correlate all the related events. If no extra authentication is required, this field is blank.
+    - name: organization_id
+      type: keyword
+      description: >
+        The 15-character ID of the organization.

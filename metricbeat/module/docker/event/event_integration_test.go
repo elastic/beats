@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package event
 
@@ -27,14 +26,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestData(t *testing.T) {
@@ -71,13 +71,13 @@ func assertNoErrors(t *testing.T, events []mb.Event) {
 }
 
 func createEvent(t *testing.T) {
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer c.Close()
 
-	reader, err := c.ImagePull(context.Background(), "busybox", types.ImagePullOptions{})
+	reader, err := c.ImagePull(context.Background(), "busybox", image.PullOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,7 +92,7 @@ func createEvent(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	c.ContainerRemove(context.Background(), resp.ID, types.ContainerRemoveOptions{})
+	c.ContainerRemove(context.Background(), resp.ID, container.RemoveOptions{})
 }
 
 func getConfig() map[string]interface{} {

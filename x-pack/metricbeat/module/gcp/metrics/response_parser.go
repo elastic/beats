@@ -16,16 +16,22 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func newIncomingFieldExtractor(l *logp.Logger, mc metricsConfig) *incomingFieldExtractor {
-	return &incomingFieldExtractor{logger: l, mc: mc}
+// newIncomingFieldMapper creates a new incomingFieldMapper.
+func newIncomingFieldMapper(l *logp.Logger, mc metricsConfig) *incomingFieldMapper {
+	return &incomingFieldMapper{logger: l, mc: mc}
 }
 
-type incomingFieldExtractor struct {
+// incomingFieldMapper is a component that maps the incoming data from GCP to a slice
+// of KeyValuePoint structs.
+type incomingFieldMapper struct {
 	logger *logp.Logger
 	mc     metricsConfig
 }
 
-// KeyValuePoint is a struct to capture the information parsed in an instant of a single metric
+// KeyValuePoint is a struct to capture the information parsed in an instant of a single metric.
+//
+// The metricset uses the KeyValuePoint struct internally to represent a single metric value,
+// @timestamp, and metadata.
 type KeyValuePoint struct {
 	Key       string
 	Value     interface{}
@@ -34,8 +40,11 @@ type KeyValuePoint struct {
 	Timestamp time.Time
 }
 
-// extractTimeSeriesMetricValues valuable to send to Elasticsearch. This includes, for example, metric values, labels and timestamps
-func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoringpb.TimeSeries, aligner string) (points []KeyValuePoint) {
+// mapTimeSeriesToKeyValuesPoints maps TimeSeries data from GCP to a slice of KeyValuePoint structs.
+//
+// The metricset uses the KeyValuePoint struct internally to represent a single metric value with
+// its corresponding metadata.
+func (e *incomingFieldMapper) mapTimeSeriesToKeyValuesPoints(resp *monitoringpb.TimeSeries, aligner string) (points []KeyValuePoint) {
 	points = make([]KeyValuePoint, 0)
 
 	for _, point := range resp.Points {
@@ -58,7 +67,7 @@ func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoringp
 	return points
 }
 
-func (e *incomingFieldExtractor) getTimestamp(p *monitoringpb.Point) (ts time.Time, err error) {
+func (e *incomingFieldMapper) getTimestamp(p *monitoringpb.Point) (ts time.Time, err error) {
 	// Don't add point intervals that can't be "stated" at some timestamp.
 	if p.Interval != nil {
 		return p.Interval.EndTime.AsTime(), nil

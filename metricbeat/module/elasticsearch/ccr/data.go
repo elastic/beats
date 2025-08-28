@@ -19,12 +19,11 @@ package ccr
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -139,10 +138,10 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 	var data response
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch CCR Stats API response")
+		return fmt.Errorf("failure parsing Elasticsearch CCR Stats API response: %w", err)
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	for _, followerIndex := range data.FollowStats.Indices {
 		for _, followerShard := range followerIndex.Shards {
 			event := mb.Event{}
@@ -169,5 +168,5 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		}
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }

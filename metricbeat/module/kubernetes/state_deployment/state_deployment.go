@@ -32,7 +32,23 @@ var mapping = &p.MetricsMapping{
 		"kube_deployment_status_replicas_unavailable": p.Metric("replicas.unavailable"),
 		"kube_deployment_status_replicas_available":   p.Metric("replicas.available"),
 		"kube_deployment_spec_replicas":               p.Metric("replicas.desired"),
-		"kube_deployment_spec_paused":                 p.BooleanMetric("paused"),
+		/*
+			This is how deployment_status_condition field will be exported:
+
+			kube_deployment_status_condition{namespace="default",deployment="test-deployment",condition="Available",status="true"} 0
+			kube_deployment_status_condition{namespace="default",deployment="test-deployment",condition="Available",status="false"} 1
+			kube_deployment_status_condition{namespace="default",deployment="test-deployment",condition="Available",status="unknown"} 0
+			kube_deployment_status_condition{namespace="default",deployment="test-deployment",condition="Progressing",status="true"} 1
+			kube_deployment_status_condition{namespace="default",deployment="test-deployment",condition="Progressing",status="false"} 0
+			kube_deployment_status_condition{namespace="default",deployment="test-deployment",condition="Progressing",status="unknown"} 0
+		*/
+		"kube_deployment_status_condition": p.LabelMetric("status", "status", p.OpFilterMap(
+			"condition", map[string]string{
+				"Progressing": "progressing",
+				"Available":   "available",
+			},
+		)), //The current status conditions of a deployment
+		"kube_deployment_spec_paused": p.BooleanMetric("paused"),
 	},
 
 	Labels: map[string]p.LabelMap{

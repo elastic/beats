@@ -29,6 +29,7 @@ class TestAutodiscover(filebeat.BaseTest):
                                 equals.docker.container.name: {container.name}
                             config:
                               - type: log
+                                allow_deprecated_use: true
                                 paths:
                                   - %s/${{data.docker.container.name}}.log
                         ''' % self.working_dir,
@@ -58,6 +59,7 @@ class TestAutodiscover(filebeat.BaseTest):
                         'hints.enabled': 'true',
                         'hints.default_config': '''
                           type: log
+                          allow_deprecated_use: true
                           paths:
                             - %s/${data.container.name}.log
                         ''' % self.working_dir,
@@ -74,7 +76,23 @@ class TestAutodiscover(filebeat.BaseTest):
         with open(os.path.join(self.working_dir, f'{container.name}.log'), 'wb') as f:
             f.write(b'Busybox output 1\n')
 
-        self.wait_until(lambda: self.log_contains('Starting runner: input'))
+        docker_client = docker.from_env()
+
+        def wait_container_start():
+            for i, c in enumerate(docker_client.containers.list()):
+                if c.name == container.name:
+                    return True
+
+        # Ensure the container is running before checkging
+        # if the input is running
+        self.wait_until(
+            wait_container_start,
+            name="wait for test container",
+            err_msg="the test container is not running yet")
+
+        self.wait_until(lambda: self.log_contains('Starting runner: input'),
+                        name="wait for input to start",
+                        err_msg="did not find 'Starting runner: input' in the logs")
         self.wait_until(lambda: self.output_has(lines=1))
 
         output = self.read_output_json()

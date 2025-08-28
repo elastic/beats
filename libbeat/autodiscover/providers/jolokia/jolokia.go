@@ -20,17 +20,18 @@ package jolokia
 import (
 	"fmt"
 
-	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
+	//nolint:errcheck // init function
 	autodiscover.Registry.AddProvider("jolokia", AutodiscoverBuilder)
 }
 
@@ -43,12 +44,12 @@ type DiscoveryProber interface {
 
 // Provider is the Jolokia Discovery autodiscover provider
 type Provider struct {
-	config    *Config
 	bus       bus.Bus
 	builders  autodiscover.Builders
 	appenders autodiscover.Appenders
 	templates template.Mapper
 	discovery DiscoveryProber
+	logger    *logp.Logger
 }
 
 // AutodiscoverBuilder builds a Jolokia Discovery autodiscover provider, it fails if
@@ -59,9 +60,10 @@ func AutodiscoverBuilder(
 	uuid uuid.UUID,
 	c *config.C,
 	keystore keystore.Keystore,
+	logger *logp.Logger,
 ) (autodiscover.Provider, error) {
 	errWrap := func(err error) error {
-		return errors.Wrap(err, "error setting up jolokia autodiscover provider")
+		return fmt.Errorf("error setting up jolokia autodiscover provider: %w", err)
 	}
 
 	config := defaultConfig()
@@ -73,9 +75,10 @@ func AutodiscoverBuilder(
 	discovery := &Discovery{
 		ProviderUUID: uuid,
 		Interfaces:   config.Interfaces,
+		log:          logger,
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil, logger)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -99,6 +102,7 @@ func AutodiscoverBuilder(
 		builders:  builders,
 		appenders: appenders,
 		discovery: discovery,
+		logger:    logger.Named("jolokia"),
 	}, nil
 }
 

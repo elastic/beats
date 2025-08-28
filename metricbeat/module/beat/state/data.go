@@ -19,11 +19,10 @@ package state
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/pkg/errors"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -75,24 +74,21 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte, isXpack bool)
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Beat's State API response")
+		return fmt.Errorf("failure parsing Beat's State API response: %w", err)
 	}
-
-	event.MetricSetFields, _ = schema.Apply(data)
 
 	clusterUUID := getMonitoringClusterUUID(data)
 	if clusterUUID == "" {
 		if isOutputES(data) {
 			clusterUUID = getClusterUUID(data)
-			if clusterUUID != "" {
-				event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
 
-				if event.MetricSetFields != nil {
-					event.MetricSetFields.Put("cluster.uuid", clusterUUID)
-				}
+			if clusterUUID == "" {
+				return nil
 			}
 		}
 	}
+
+	event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
 
 	event.MetricSetFields, _ = schema.Apply(data)
 

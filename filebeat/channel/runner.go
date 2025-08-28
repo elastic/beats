@@ -144,7 +144,7 @@ func newCommonConfigEditor(
 			indexProcessor = add_formatted_index.New(timestampFormat)
 		}
 
-		userProcessors, err := processors.New(config.Processors)
+		userProcessors, err := processors.New(config.Processors, beatInfo.Logger)
 		if err != nil {
 			return clientCfg, err
 		}
@@ -155,7 +155,9 @@ func newCommonConfigEditor(
 		setOptional(meta, "pipeline", config.Pipeline)
 		setOptional(fields, "fileset.name", config.Fileset)
 		setOptional(fields, "service.type", serviceType)
-		setOptional(fields, "input.type", config.Type)
+		if !clientCfg.Processing.DisableType {
+			setOptional(fields, "input.type", config.Type)
+		}
 		if config.Module != "" {
 			event := mapstr.M{"module": config.Module}
 			if config.Fileset != "" {
@@ -168,7 +170,7 @@ func newCommonConfigEditor(
 		// 1. add support for index configuration via processor
 		// 2. add processors added by the input that wants to connect
 		// 3. add locally configured processors from the 'processors' settings
-		procs := processors.NewList(nil)
+		procs := processors.NewList(beatInfo.Logger)
 		if indexProcessor != nil {
 			procs.AddProcessor(indexProcessor)
 		}

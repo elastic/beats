@@ -35,14 +35,13 @@ class WriteReadTest(BaseTest):
     testSuffix = None
     sid = None
     sidString = None
-    api = None
 
     def setUp(self):
         super(WriteReadTest, self).setUp()
 
         # Every test will use its own event log and application names to ensure
         # isolation.
-        self.testSuffix = "_" + hashlib.sha256(str(self.api + self._testMethodName).encode('utf_8')).hexdigest()[:5]
+        self.testSuffix = "_" + hashlib.sha256(str(self._testMethodName).encode('utf_8')).hexdigest()[:5]
         self.providerName = PROVIDER + self.testSuffix
         self.applicationName = APP_NAME + self.testSuffix
         self.otherAppName = OTHER_APP_NAME + self.testSuffix
@@ -107,7 +106,7 @@ class WriteReadTest(BaseTest):
         if config is None:
             config = {
                 "event_logs": [
-                    {"name": self.providerName, "api": self.api}
+                    {"name": self.providerName}
                 ]
             }
 
@@ -146,7 +145,6 @@ class WriteReadTest(BaseTest):
             "log.level": level.lower(),
             "winlog.channel": self.providerName,
             "winlog.provider_name": self.applicationName,
-            "winlog.api": self.api,
         }
         assert expected.items() <= evt.items()
 

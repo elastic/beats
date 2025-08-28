@@ -36,6 +36,9 @@ The `aws` module requires AWS credentials configuration in order to make AWS API
 Users can either use `access_key_id`, `secret_access_key` and/or
 `session_token`, or use `role_arn` AWS IAM role, or use shared AWS credentials file.
 
+Users may use `external_id` to support assuming a role in another account, see
+https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html[the AWS documentation for use of external IDs].
+
 Please see <<aws-credentials-options,AWS credentials options>> for more details.
 
 include::../include/gs-link.asciidoc[]

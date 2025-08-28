@@ -19,11 +19,14 @@ package module
 
 import (
 	"fmt"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 )
 
 const (
@@ -31,22 +34,40 @@ const (
 	fakeRunnerName = "fakeRunner"
 )
 
+type fakeRunnerDiag struct {
+	id int
+}
+
+func (fr *fakeRunnerDiag) Start() {}
+func (fr *fakeRunnerDiag) Stop()  {}
+func (fr *fakeRunnerDiag) String() string {
+	return fmt.Sprintf("%s-%d", fakeRunnerName, fr.id)
+}
+func (fr *fakeRunnerDiag) Diagnostics() []diagnostics.DiagnosticSetup {
+	return []diagnostics.DiagnosticSetup{
+		{
+			Name:     "test-diagnostic",
+			Callback: func() []byte { return []byte("test result") },
+		},
+	}
+}
+
 type fakeRunner struct {
 	id int
 
-	startCounter *atomic.Int
-	stopCounter  *atomic.Int
+	startCounter *atomic.Int64
+	stopCounter  *atomic.Int64
 }
 
 func (fr *fakeRunner) Start() {
 	if fr.startCounter != nil {
-		fr.startCounter.Inc()
+		fr.startCounter.Add(1)
 	}
 }
 
 func (fr *fakeRunner) Stop() {
 	if fr.stopCounter != nil {
-		fr.stopCounter.Inc()
+		fr.stopCounter.Add(1)
 	}
 }
 
@@ -55,15 +76,14 @@ func (fr *fakeRunner) String() string {
 }
 
 func TestStartStop(t *testing.T) {
-	startCounter := atomic.NewInt(0)
-	stopCounter := atomic.NewInt(0)
+	var startCounter, stopCounter atomic.Int64
 
-	var runners []Runner
+	runners := make([]cfgfile.Runner, 0, fakeRunnersNum)
 	for i := 0; i < fakeRunnersNum; i++ {
 		runners = append(runners, &fakeRunner{
 			id:           i,
-			startCounter: startCounter,
-			stopCounter:  stopCounter,
+			startCounter: &startCounter,
+			stopCounter:  &stopCounter,
 		})
 	}
 
@@ -72,12 +92,48 @@ func TestStartStop(t *testing.T) {
 
 	runnerGroup.Stop()
 
-	assert.Equal(t, fakeRunnersNum, startCounter.Load())
-	assert.Equal(t, fakeRunnersNum, stopCounter.Load())
+	assert.Equal(t, int64(fakeRunnersNum), startCounter.Load())
+	assert.Equal(t, int64(fakeRunnersNum), stopCounter.Load())
+}
+
+func TestDiagnosticsUnsupported(t *testing.T) {
+	runners := make([]cfgfile.Runner, 0, fakeRunnersNum)
+	for i := 0; i < fakeRunnersNum; i++ {
+		runners = append(runners, &fakeRunner{
+			id:           i,
+			startCounter: &atomic.Int64{},
+			stopCounter:  &atomic.Int64{},
+		})
+	}
+
+	runnerGroup := newRunnerGroup(runners)
+	runnerGroup.Start()
+
+	// fakeRunner doesn't support diagnostics, make sure nothing panics/returns invalid values
+	diags, ok := runnerGroup.(diagnostics.DiagnosticReporter)
+	// the runner group does implement the interface, but should return nothing
+	require.True(t, ok)
+	res := diags.Diagnostics()
+	require.Empty(t, res)
+}
+
+func TestDiagosticsSupported(t *testing.T) {
+	runners := make([]cfgfile.Runner, 0, fakeRunnersNum)
+	for i := 0; i < fakeRunnersNum; i++ {
+		runners = append(runners, &fakeRunnerDiag{
+			id: i,
+		})
+	}
+	runnerGroup := newRunnerGroup(runners)
+	runnerGroup.Start()
+	diags, ok := runnerGroup.(diagnostics.DiagnosticReporter)
+	require.True(t, ok)
+	res := diags.Diagnostics()
+	require.NotEmpty(t, res)
 }
 
 func TestString(t *testing.T) {
-	var runners []Runner
+	runners := make([]cfgfile.Runner, 0, fakeRunnersNum)
 	for i := 0; i < fakeRunnersNum; i++ {
 		runners = append(runners, &fakeRunner{
 			id: i,

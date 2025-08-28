@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package file
 
@@ -24,8 +23,9 @@ import (
 	"fmt"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func newINodeMarkerIdentifier(cfg *conf.C) (StateIdentifier, error) {
+func newINodeMarkerIdentifier(cfg *conf.C, _ *logp.Logger) (StateIdentifier, error) {
 	return nil, fmt.Errorf("inode_deviceid is not supported on Windows")
 }

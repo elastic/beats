@@ -18,7 +18,7 @@
 package harvester
 
 import (
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 )
 
 // Harvester contains all methods which must be supported by each harvester

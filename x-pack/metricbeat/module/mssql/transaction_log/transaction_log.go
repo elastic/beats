@@ -2,13 +2,13 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package transaction_log
 
 import (
 	"database/sql"
 	"fmt"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql"
@@ -54,11 +54,11 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := logp.NewLogger("mssql.transaction_log").With("host", base.HostData().SanitizedURI)
+	logger := base.Logger().Named("mssql.transaction_log").With("host", base.HostData().SanitizedURI)
 
 	db, err := mssql.NewConnection(base.HostData().URI)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not create connection to db")
+		return nil, fmt.Errorf("could not create connection to db: %w", err)
 	}
 
 	return &MetricSet{
@@ -131,7 +131,7 @@ func (m *MetricSet) getLogSpaceUsageForDb(dbName string) (mapstr.M, error) {
 		&res.logSpaceInBytesSinceLastBackup); err != nil {
 		// Because this query only returns a single result an error in the first scan is
 		// probably a "data returned but not properly scanned"
-		err = errors.Wrap(err, "error scanning single result")
+		err = fmt.Errorf("error scanning single result: %w", err)
 		return nil, err
 	}
 
@@ -156,7 +156,7 @@ func (m *MetricSet) getLogStats(db dbInfo) (mapstr.M, error) {
 	if err := row.Scan(&res.databaseID, &res.sizeMB, &res.activeSizeMB, &res.backupTime, &res.sinceLastBackupMB, &res.sinceLastCheckpointMB, &res.recoverySizeMB); err != nil {
 		// Because this query only returns a single result an error in the first scan is
 		// probably a "data returned but not properly scanned"
-		err = errors.Wrap(err, "error scanning single result")
+		err = fmt.Errorf("error scanning single result: %w", err)
 		return nil, err
 	}
 
@@ -189,14 +189,14 @@ func (m *MetricSet) getDbsNames() ([]dbInfo, error) {
 	var rows *sql.Rows
 	rows, err := m.db.Query("SELECT name, database_id FROM sys.databases")
 	if err != nil {
-		return nil, errors.Wrap(err, "error doing query 'SELECT name, database_id FROM sys.databases'")
+		return nil, fmt.Errorf("error doing query 'SELECT name, database_id FROM sys.databases': %w", err)
 	}
-	defer closeRows(rows)
+	defer closeRows(rows, m.log)
 
 	for rows.Next() {
 		var row dbInfo
 		if err = rows.Scan(&row.name, &row.id); err != nil {
-			return nil, errors.Wrap(err, "error scanning row results")
+			return nil, fmt.Errorf("error scanning row results: %w", err)
 		}
 
 		res = append(res, row)
@@ -205,8 +205,8 @@ func (m *MetricSet) getDbsNames() ([]dbInfo, error) {
 	return res, nil
 }
 
-func closeRows(rows *sql.Rows) {
+func closeRows(rows *sql.Rows, logger *logp.Logger) {
 	if err := rows.Close(); err != nil {
-		logp.Err("error closing rows: %s", err)
+		logger.Errorf("error closing rows: %s", err)
 	}
 }

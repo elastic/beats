@@ -1,0 +1,1808 @@
+# HELP aggregator_discovery_aggregation_count_total [ALPHA] Counter of number of times discovery was aggregated
+# TYPE aggregator_discovery_aggregation_count_total counter
+aggregator_discovery_aggregation_count_total 0
+# HELP apiserver_audit_event_total [ALPHA] Counter of audit events generated and sent to the audit backend.
+# TYPE apiserver_audit_event_total counter
+apiserver_audit_event_total 0
+# HELP apiserver_audit_requests_rejected_total [ALPHA] Counter of apiserver requests rejected due to an error in audit logging backend.
+# TYPE apiserver_audit_requests_rejected_total counter
+apiserver_audit_requests_rejected_total 0
+# HELP apiserver_client_certificate_expiration_seconds [ALPHA] Distribution of the remaining lifetime on the certificate used to authenticate a request.
+# TYPE apiserver_client_certificate_expiration_seconds histogram
+apiserver_client_certificate_expiration_seconds_bucket{le="0"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="1800"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="3600"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="7200"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="21600"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="43200"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="86400"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="172800"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="345600"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="604800"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="2.592e+06"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="7.776e+06"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="1.5552e+07"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="3.1104e+07"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="+Inf"} 0
+apiserver_client_certificate_expiration_seconds_sum 0
+apiserver_client_certificate_expiration_seconds_count 0
+# HELP apiserver_delegated_authn_request_duration_seconds [ALPHA] Request latency in seconds. Broken down by status code.
+# TYPE apiserver_delegated_authn_request_duration_seconds histogram
+apiserver_delegated_authn_request_duration_seconds_bucket{code="201",le="0.25"} 1
+apiserver_delegated_authn_request_duration_seconds_bucket{code="201",le="0.5"} 1
+apiserver_delegated_authn_request_duration_seconds_bucket{code="201",le="0.7"} 1
+apiserver_delegated_authn_request_duration_seconds_bucket{code="201",le="1"} 1
+apiserver_delegated_authn_request_duration_seconds_bucket{code="201",le="1.5"} 1
+apiserver_delegated_authn_request_duration_seconds_bucket{code="201",le="3"} 1
+apiserver_delegated_authn_request_duration_seconds_bucket{code="201",le="5"} 1
+apiserver_delegated_authn_request_duration_seconds_bucket{code="201",le="10"} 1
+apiserver_delegated_authn_request_duration_seconds_bucket{code="201",le="+Inf"} 1
+apiserver_delegated_authn_request_duration_seconds_sum{code="201"} 0.009021638
+apiserver_delegated_authn_request_duration_seconds_count{code="201"} 1
+# HELP apiserver_delegated_authn_request_total [ALPHA] Number of HTTP requests partitioned by status code.
+# TYPE apiserver_delegated_authn_request_total counter
+apiserver_delegated_authn_request_total{code="201"} 1
+# HELP apiserver_delegated_authz_request_duration_seconds [ALPHA] Request latency in seconds. Broken down by status code.
+# TYPE apiserver_delegated_authz_request_duration_seconds histogram
+apiserver_delegated_authz_request_duration_seconds_bucket{code="201",le="0.25"} 1
+apiserver_delegated_authz_request_duration_seconds_bucket{code="201",le="0.5"} 1
+apiserver_delegated_authz_request_duration_seconds_bucket{code="201",le="0.7"} 1
+apiserver_delegated_authz_request_duration_seconds_bucket{code="201",le="1"} 1
+apiserver_delegated_authz_request_duration_seconds_bucket{code="201",le="1.5"} 1
+apiserver_delegated_authz_request_duration_seconds_bucket{code="201",le="3"} 1
+apiserver_delegated_authz_request_duration_seconds_bucket{code="201",le="5"} 1
+apiserver_delegated_authz_request_duration_seconds_bucket{code="201",le="10"} 1
+apiserver_delegated_authz_request_duration_seconds_bucket{code="201",le="+Inf"} 1
+apiserver_delegated_authz_request_duration_seconds_sum{code="201"} 0.003091905
+apiserver_delegated_authz_request_duration_seconds_count{code="201"} 1
+# HELP apiserver_delegated_authz_request_total [ALPHA] Number of HTTP requests partitioned by status code.
+# TYPE apiserver_delegated_authz_request_total counter
+apiserver_delegated_authz_request_total{code="201"} 1
+# HELP apiserver_envelope_encryption_dek_cache_fill_percent [ALPHA] Percent of the cache slots currently occupied by cached DEKs.
+# TYPE apiserver_envelope_encryption_dek_cache_fill_percent gauge
+apiserver_envelope_encryption_dek_cache_fill_percent 0
+# HELP apiserver_storage_data_key_generation_duration_seconds [ALPHA] Latencies in seconds of data encryption key(DEK) generation operations.
+# TYPE apiserver_storage_data_key_generation_duration_seconds histogram
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="5e-06"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="1e-05"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="2e-05"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="4e-05"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="8e-05"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.00016"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.00032"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.00064"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.00128"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.00256"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.00512"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.01024"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.02048"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.04096"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="+Inf"} 0
+apiserver_storage_data_key_generation_duration_seconds_sum 0
+apiserver_storage_data_key_generation_duration_seconds_count 0
+# HELP apiserver_storage_data_key_generation_failures_total [ALPHA] Total number of failed data encryption key(DEK) generation operations.
+# TYPE apiserver_storage_data_key_generation_failures_total counter
+apiserver_storage_data_key_generation_failures_total 0
+# HELP apiserver_storage_envelope_transformation_cache_misses_total [ALPHA] Total number of cache misses while accessing key decryption key(KEK).
+# TYPE apiserver_storage_envelope_transformation_cache_misses_total counter
+apiserver_storage_envelope_transformation_cache_misses_total 0
+# HELP apiserver_webhooks_x509_insecure_sha1_total [ALPHA] Counts the number of requests to servers with insecure SHA1 signatures in their serving certificate OR the number of connection failures due to the insecure SHA1 signatures (either/or, based on the runtime environment)
+# TYPE apiserver_webhooks_x509_insecure_sha1_total counter
+apiserver_webhooks_x509_insecure_sha1_total 0
+# HELP apiserver_webhooks_x509_missing_san_total [ALPHA] Counts the number of requests to servers missing SAN extension in their serving certificate OR the number of connection failures due to the lack of x509 certificate SAN extension missing (either/or, based on the runtime environment)
+# TYPE apiserver_webhooks_x509_missing_san_total counter
+apiserver_webhooks_x509_missing_san_total 0
+# HELP authenticated_user_requests [ALPHA] Counter of authenticated requests broken out by username.
+# TYPE authenticated_user_requests counter
+authenticated_user_requests{username="other"} 38
+# HELP authentication_attempts [ALPHA] Counter of authenticated attempts.
+# TYPE authentication_attempts counter
+authentication_attempts{result="success"} 38
+# HELP authentication_duration_seconds [ALPHA] Authentication duration in seconds broken out by result.
+# TYPE authentication_duration_seconds histogram
+authentication_duration_seconds_bucket{result="success",le="0.001"} 38
+authentication_duration_seconds_bucket{result="success",le="0.002"} 38
+authentication_duration_seconds_bucket{result="success",le="0.004"} 38
+authentication_duration_seconds_bucket{result="success",le="0.008"} 38
+authentication_duration_seconds_bucket{result="success",le="0.016"} 38
+authentication_duration_seconds_bucket{result="success",le="0.032"} 38
+authentication_duration_seconds_bucket{result="success",le="0.064"} 38
+authentication_duration_seconds_bucket{result="success",le="0.128"} 38
+authentication_duration_seconds_bucket{result="success",le="0.256"} 38
+authentication_duration_seconds_bucket{result="success",le="0.512"} 38
+authentication_duration_seconds_bucket{result="success",le="1.024"} 38
+authentication_duration_seconds_bucket{result="success",le="2.048"} 38
+authentication_duration_seconds_bucket{result="success",le="4.096"} 38
+authentication_duration_seconds_bucket{result="success",le="8.192"} 38
+authentication_duration_seconds_bucket{result="success",le="16.384"} 38
+authentication_duration_seconds_bucket{result="success",le="+Inf"} 38
+authentication_duration_seconds_sum{result="success"} 0.0012335150000000003
+authentication_duration_seconds_count{result="success"} 38
+# HELP authentication_token_cache_active_fetch_count [ALPHA]
+# TYPE authentication_token_cache_active_fetch_count gauge
+authentication_token_cache_active_fetch_count{status="blocked"} 0
+authentication_token_cache_active_fetch_count{status="in_flight"} 0
+# HELP authentication_token_cache_fetch_total [ALPHA]
+# TYPE authentication_token_cache_fetch_total counter
+authentication_token_cache_fetch_total{status="ok"} 1
+# HELP authentication_token_cache_request_duration_seconds [ALPHA]
+# TYPE authentication_token_cache_request_duration_seconds histogram
+authentication_token_cache_request_duration_seconds_bucket{status="miss",le="0.005"} 0
+authentication_token_cache_request_duration_seconds_bucket{status="miss",le="0.01"} 0
+authentication_token_cache_request_duration_seconds_bucket{status="miss",le="0.025"} 1
+authentication_token_cache_request_duration_seconds_bucket{status="miss",le="0.05"} 1
+authentication_token_cache_request_duration_seconds_bucket{status="miss",le="0.1"} 1
+authentication_token_cache_request_duration_seconds_bucket{status="miss",le="0.25"} 1
+authentication_token_cache_request_duration_seconds_bucket{status="miss",le="0.5"} 1
+authentication_token_cache_request_duration_seconds_bucket{status="miss",le="1"} 1
+authentication_token_cache_request_duration_seconds_bucket{status="miss",le="2.5"} 1
+authentication_token_cache_request_duration_seconds_bucket{status="miss",le="5"} 1
+authentication_token_cache_request_duration_seconds_bucket{status="miss",le="10"} 1
+authentication_token_cache_request_duration_seconds_bucket{status="miss",le="+Inf"} 1
+authentication_token_cache_request_duration_seconds_sum{status="miss"} 0.013
+authentication_token_cache_request_duration_seconds_count{status="miss"} 1
+# HELP authentication_token_cache_request_total [ALPHA]
+# TYPE authentication_token_cache_request_total counter
+authentication_token_cache_request_total{status="miss"} 1
+# HELP authorization_attempts_total [ALPHA] Counter of authorization attempts broken down by result. It can be either 'allowed', 'denied', 'no-opinion' or 'error'.
+# TYPE authorization_attempts_total counter
+authorization_attempts_total{result="allowed"} 38
+# HELP authorization_duration_seconds [ALPHA] Authorization duration in seconds broken out by result.
+# TYPE authorization_duration_seconds histogram
+authorization_duration_seconds_bucket{result="allowed",le="0.001"} 38
+authorization_duration_seconds_bucket{result="allowed",le="0.002"} 38
+authorization_duration_seconds_bucket{result="allowed",le="0.004"} 38
+authorization_duration_seconds_bucket{result="allowed",le="0.008"} 38
+authorization_duration_seconds_bucket{result="allowed",le="0.016"} 38
+authorization_duration_seconds_bucket{result="allowed",le="0.032"} 38
+authorization_duration_seconds_bucket{result="allowed",le="0.064"} 38
+authorization_duration_seconds_bucket{result="allowed",le="0.128"} 38
+authorization_duration_seconds_bucket{result="allowed",le="0.256"} 38
+authorization_duration_seconds_bucket{result="allowed",le="0.512"} 38
+authorization_duration_seconds_bucket{result="allowed",le="1.024"} 38
+authorization_duration_seconds_bucket{result="allowed",le="2.048"} 38
+authorization_duration_seconds_bucket{result="allowed",le="4.096"} 38
+authorization_duration_seconds_bucket{result="allowed",le="8.192"} 38
+authorization_duration_seconds_bucket{result="allowed",le="16.384"} 38
+authorization_duration_seconds_bucket{result="allowed",le="+Inf"} 38
+authorization_duration_seconds_sum{result="allowed"} 0.000301018
+authorization_duration_seconds_count{result="allowed"} 38
+# HELP disabled_metrics_total [BETA] The count of disabled metrics.
+# TYPE disabled_metrics_total counter
+disabled_metrics_total 0
+# HELP go_cgo_go_to_c_calls_calls_total Count of calls made from Go to C by the current process.
+# TYPE go_cgo_go_to_c_calls_calls_total counter
+go_cgo_go_to_c_calls_calls_total 0
+# HELP go_cpu_classes_gc_mark_assist_cpu_seconds_total Estimated total CPU time goroutines spent performing GC tasks to assist the GC and prevent it from falling behind the application. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics.
+# TYPE go_cpu_classes_gc_mark_assist_cpu_seconds_total counter
+go_cpu_classes_gc_mark_assist_cpu_seconds_total 0.002014685
+# HELP go_cpu_classes_gc_mark_dedicated_cpu_seconds_total Estimated total CPU time spent performing GC tasks on processors (as defined by GOMAXPROCS) dedicated to those tasks. This includes time spent with the world stopped due to the GC. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics.
+# TYPE go_cpu_classes_gc_mark_dedicated_cpu_seconds_total counter
+go_cpu_classes_gc_mark_dedicated_cpu_seconds_total 0.055565699
+# HELP go_cpu_classes_gc_mark_idle_cpu_seconds_total Estimated total CPU time spent performing GC tasks on spare CPU resources that the Go scheduler could not otherwise find a use for. This should be subtracted from the total GC CPU time to obtain a measure of compulsory GC CPU time. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics.
+# TYPE go_cpu_classes_gc_mark_idle_cpu_seconds_total counter
+go_cpu_classes_gc_mark_idle_cpu_seconds_total 0.014884382
+# HELP go_cpu_classes_gc_pause_cpu_seconds_total Estimated total CPU time spent with the application paused by the GC. Even if only one thread is running during the pause, this is computed as GOMAXPROCS times the pause latency because nothing else can be executing. This is the exact sum of samples in /gc/pause:seconds if each sample is multiplied by GOMAXPROCS at the time it is taken. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics.
+# TYPE go_cpu_classes_gc_pause_cpu_seconds_total counter
+go_cpu_classes_gc_pause_cpu_seconds_total 0.013685448
+# HELP go_cpu_classes_gc_total_cpu_seconds_total Estimated total CPU time spent performing GC tasks. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics. Sum of all metrics in /cpu/classes/gc.
+# TYPE go_cpu_classes_gc_total_cpu_seconds_total counter
+go_cpu_classes_gc_total_cpu_seconds_total 0.086150214
+# HELP go_cpu_classes_idle_cpu_seconds_total Estimated total available CPU time not spent executing any Go or Go runtime code. In other words, the part of /cpu/classes/total:cpu-seconds that was unused. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics.
+# TYPE go_cpu_classes_idle_cpu_seconds_total counter
+go_cpu_classes_idle_cpu_seconds_total 2708.20701688
+# HELP go_cpu_classes_scavenge_assist_cpu_seconds_total Estimated total CPU time spent returning unused memory to the underlying platform in response eagerly in response to memory pressure. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics.
+# TYPE go_cpu_classes_scavenge_assist_cpu_seconds_total counter
+go_cpu_classes_scavenge_assist_cpu_seconds_total 3.91e-07
+# HELP go_cpu_classes_scavenge_background_cpu_seconds_total Estimated total CPU time spent performing background tasks to return unused memory to the underlying platform. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics.
+# TYPE go_cpu_classes_scavenge_background_cpu_seconds_total counter
+go_cpu_classes_scavenge_background_cpu_seconds_total 1.29e-07
+# HELP go_cpu_classes_scavenge_total_cpu_seconds_total Estimated total CPU time spent performing tasks that return unused memory to the underlying platform. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics. Sum of all metrics in /cpu/classes/scavenge.
+# TYPE go_cpu_classes_scavenge_total_cpu_seconds_total counter
+go_cpu_classes_scavenge_total_cpu_seconds_total 5.2e-07
+# HELP go_cpu_classes_total_cpu_seconds_total Estimated total available CPU time for user Go code or the Go runtime, as defined by GOMAXPROCS. In other words, GOMAXPROCS integrated over the wall-clock duration this process has been executing for. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics. Sum of all metrics in /cpu/classes.
+# TYPE go_cpu_classes_total_cpu_seconds_total counter
+go_cpu_classes_total_cpu_seconds_total 3095.81241836
+# HELP go_cpu_classes_user_cpu_seconds_total Estimated total CPU time spent running user Go code. This may also include some small amount of time spent in the Go runtime. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics.
+# TYPE go_cpu_classes_user_cpu_seconds_total counter
+go_cpu_classes_user_cpu_seconds_total 387.519250746
+# HELP go_gc_cycles_automatic_gc_cycles_total Count of completed GC cycles generated by the Go runtime.
+# TYPE go_gc_cycles_automatic_gc_cycles_total counter
+go_gc_cycles_automatic_gc_cycles_total 12
+# HELP go_gc_cycles_forced_gc_cycles_total Count of completed GC cycles forced by the application.
+# TYPE go_gc_cycles_forced_gc_cycles_total counter
+go_gc_cycles_forced_gc_cycles_total 0
+# HELP go_gc_cycles_total_gc_cycles_total Count of all completed GC cycles.
+# TYPE go_gc_cycles_total_gc_cycles_total counter
+go_gc_cycles_total_gc_cycles_total 12
+# HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 4.9982e-05
+go_gc_duration_seconds{quantile="0.25"} 8.823e-05
+go_gc_duration_seconds{quantile="0.5"} 0.000100372
+go_gc_duration_seconds{quantile="0.75"} 0.000243385
+go_gc_duration_seconds{quantile="1"} 0.000299856
+go_gc_duration_seconds_sum 0.001710681
+go_gc_duration_seconds_count 12
+# HELP go_gc_heap_allocs_by_size_bytes Distribution of heap allocations by approximate size. Note that this does not include tiny objects as defined by /gc/heap/tiny/allocs:objects, only tiny blocks.
+# TYPE go_gc_heap_allocs_by_size_bytes histogram
+go_gc_heap_allocs_by_size_bytes_bucket{le="8.999999999999998"} 6569
+go_gc_heap_allocs_by_size_bytes_bucket{le="24.999999999999996"} 102581
+go_gc_heap_allocs_by_size_bytes_bucket{le="64.99999999999999"} 185096
+go_gc_heap_allocs_by_size_bytes_bucket{le="144.99999999999997"} 246667
+go_gc_heap_allocs_by_size_bytes_bucket{le="320.99999999999994"} 278923
+go_gc_heap_allocs_by_size_bytes_bucket{le="704.9999999999999"} 286024
+go_gc_heap_allocs_by_size_bytes_bucket{le="1536.9999999999998"} 287739
+go_gc_heap_allocs_by_size_bytes_bucket{le="3200.9999999999995"} 288395
+go_gc_heap_allocs_by_size_bytes_bucket{le="6528.999999999999"} 289332
+go_gc_heap_allocs_by_size_bytes_bucket{le="13568.999999999998"} 289499
+go_gc_heap_allocs_by_size_bytes_bucket{le="27264.999999999996"} 289550
+go_gc_heap_allocs_by_size_bytes_bucket{le="+Inf"} 289601
+go_gc_heap_allocs_by_size_bytes_sum 3.6535336e+07
+go_gc_heap_allocs_by_size_bytes_count 289601
+# HELP go_gc_heap_allocs_bytes_total Cumulative sum of memory allocated to the heap by the application.
+# TYPE go_gc_heap_allocs_bytes_total counter
+go_gc_heap_allocs_bytes_total 3.6535336e+07
+# HELP go_gc_heap_allocs_objects_total Cumulative count of heap allocations triggered by the application. Note that this does not include tiny objects as defined by /gc/heap/tiny/allocs:objects, only tiny blocks.
+# TYPE go_gc_heap_allocs_objects_total counter
+go_gc_heap_allocs_objects_total 289601
+# HELP go_gc_heap_frees_by_size_bytes Distribution of freed heap allocations by approximate size. Note that this does not include tiny objects as defined by /gc/heap/tiny/allocs:objects, only tiny blocks.
+# TYPE go_gc_heap_frees_by_size_bytes histogram
+go_gc_heap_frees_by_size_bytes_bucket{le="8.999999999999998"} 4038
+go_gc_heap_frees_by_size_bytes_bucket{le="24.999999999999996"} 85701
+go_gc_heap_frees_by_size_bytes_bucket{le="64.99999999999999"} 158104
+go_gc_heap_frees_by_size_bytes_bucket{le="144.99999999999997"} 214533
+go_gc_heap_frees_by_size_bytes_bucket{le="320.99999999999994"} 244063
+go_gc_heap_frees_by_size_bytes_bucket{le="704.9999999999999"} 249989
+go_gc_heap_frees_by_size_bytes_bucket{le="1536.9999999999998"} 251384
+go_gc_heap_frees_by_size_bytes_bucket{le="3200.9999999999995"} 251831
+go_gc_heap_frees_by_size_bytes_bucket{le="6528.999999999999"} 252669
+go_gc_heap_frees_by_size_bytes_bucket{le="13568.999999999998"} 252780
+go_gc_heap_frees_by_size_bytes_bucket{le="27264.999999999996"} 252796
+go_gc_heap_frees_by_size_bytes_bucket{le="+Inf"} 252833
+go_gc_heap_frees_by_size_bytes_sum 3.034272e+07
+go_gc_heap_frees_by_size_bytes_count 252833
+# HELP go_gc_heap_frees_bytes_total Cumulative sum of heap memory freed by the garbage collector.
+# TYPE go_gc_heap_frees_bytes_total counter
+go_gc_heap_frees_bytes_total 3.034272e+07
+# HELP go_gc_heap_frees_objects_total Cumulative count of heap allocations whose storage was freed by the garbage collector. Note that this does not include tiny objects as defined by /gc/heap/tiny/allocs:objects, only tiny blocks.
+# TYPE go_gc_heap_frees_objects_total counter
+go_gc_heap_frees_objects_total 252833
+# HELP go_gc_heap_goal_bytes Heap size target for the end of the GC cycle.
+# TYPE go_gc_heap_goal_bytes gauge
+go_gc_heap_goal_bytes 1.2824032e+07
+# HELP go_gc_heap_objects_objects Number of objects, live or unswept, occupying heap memory.
+# TYPE go_gc_heap_objects_objects gauge
+go_gc_heap_objects_objects 36768
+# HELP go_gc_heap_tiny_allocs_objects_total Count of small allocations that are packed together into blocks. These allocations are counted separately from other allocations because each individual allocation is not tracked by the runtime, only their block. Each block is already accounted for in allocs-by-size and frees-by-size.
+# TYPE go_gc_heap_tiny_allocs_objects_total counter
+go_gc_heap_tiny_allocs_objects_total 24964
+# HELP go_gc_limiter_last_enabled_gc_cycle GC cycle the last time the GC CPU limiter was enabled. This metric is useful for diagnosing the root cause of an out-of-memory error, because the limiter trades memory for CPU time when the GC's CPU time gets too high. This is most likely to occur with use of SetMemoryLimit. The first GC cycle is cycle 1, so a value of 0 indicates that it was never enabled.
+# TYPE go_gc_limiter_last_enabled_gc_cycle gauge
+go_gc_limiter_last_enabled_gc_cycle 0
+# HELP go_gc_pauses_seconds Distribution individual GC-related stop-the-world pause latencies.
+# TYPE go_gc_pauses_seconds histogram
+go_gc_pauses_seconds_bucket{le="6.399999999999999e-08"} 0
+go_gc_pauses_seconds_bucket{le="6.399999999999999e-07"} 0
+go_gc_pauses_seconds_bucket{le="7.167999999999999e-06"} 4
+go_gc_pauses_seconds_bucket{le="8.191999999999999e-05"} 18
+go_gc_pauses_seconds_bucket{le="0.0009175039999999999"} 24
+go_gc_pauses_seconds_bucket{le="0.010485759999999998"} 24
+go_gc_pauses_seconds_bucket{le="0.11744051199999998"} 24
+go_gc_pauses_seconds_bucket{le="+Inf"} 24
+go_gc_pauses_seconds_sum 0.0005944320000000001
+go_gc_pauses_seconds_count 24
+# HELP go_gc_stack_starting_size_bytes The stack size of new goroutines.
+# TYPE go_gc_stack_starting_size_bytes gauge
+go_gc_stack_starting_size_bytes 2048
+# HELP go_goroutines Number of goroutines that currently exist.
+# TYPE go_goroutines gauge
+go_goroutines 172
+# HELP go_info Information about the Go environment.
+# TYPE go_info gauge
+go_info{version="go1.20.7"} 1
+# HELP go_memory_classes_heap_free_bytes Memory that is completely free and eligible to be returned to the underlying system, but has not been. This metric is the runtime's estimate of free address space that is backed by physical memory.
+# TYPE go_memory_classes_heap_free_bytes gauge
+go_memory_classes_heap_free_bytes 2.41664e+06
+# HELP go_memory_classes_heap_objects_bytes Memory occupied by live objects and dead objects that have not yet been marked free by the garbage collector.
+# TYPE go_memory_classes_heap_objects_bytes gauge
+go_memory_classes_heap_objects_bytes 6.192616e+06
+# HELP go_memory_classes_heap_released_bytes Memory that is completely free and has been returned to the underlying system. This metric is the runtime's estimate of free address space that is still mapped into the process, but is not backed by physical memory.
+# TYPE go_memory_classes_heap_released_bytes gauge
+go_memory_classes_heap_released_bytes 1.810432e+06
+# HELP go_memory_classes_heap_stacks_bytes Memory allocated from the heap that is reserved for stack space, whether or not it is currently in-use.
+# TYPE go_memory_classes_heap_stacks_bytes gauge
+go_memory_classes_heap_stacks_bytes 1.507328e+06
+# HELP go_memory_classes_heap_unused_bytes Memory that is reserved for heap objects but is not currently used to hold heap objects.
+# TYPE go_memory_classes_heap_unused_bytes gauge
+go_memory_classes_heap_unused_bytes 4.8502e+06
+# HELP go_memory_classes_metadata_mcache_free_bytes Memory that is reserved for runtime mcache structures, but not in-use.
+# TYPE go_memory_classes_metadata_mcache_free_bytes gauge
+go_memory_classes_metadata_mcache_free_bytes 6000
+# HELP go_memory_classes_metadata_mcache_inuse_bytes Memory that is occupied by runtime mcache structures that are currently being used.
+# TYPE go_memory_classes_metadata_mcache_inuse_bytes gauge
+go_memory_classes_metadata_mcache_inuse_bytes 9600
+# HELP go_memory_classes_metadata_mspan_free_bytes Memory that is reserved for runtime mspan structures, but not in-use.
+# TYPE go_memory_classes_metadata_mspan_free_bytes gauge
+go_memory_classes_metadata_mspan_free_bytes 30560
+# HELP go_memory_classes_metadata_mspan_inuse_bytes Memory that is occupied by runtime mspan structures that are currently being used.
+# TYPE go_memory_classes_metadata_mspan_inuse_bytes gauge
+go_memory_classes_metadata_mspan_inuse_bytes 230560
+# HELP go_memory_classes_metadata_other_bytes Memory that is reserved for or used to hold runtime metadata.
+# TYPE go_memory_classes_metadata_other_bytes gauge
+go_memory_classes_metadata_other_bytes 8.977888e+06
+# HELP go_memory_classes_os_stacks_bytes Stack memory allocated by the underlying operating system.
+# TYPE go_memory_classes_os_stacks_bytes gauge
+go_memory_classes_os_stacks_bytes 0
+# HELP go_memory_classes_other_bytes Memory used by execution trace buffers, structures for debugging the runtime, finalizer and profiler specials, and more.
+# TYPE go_memory_classes_other_bytes gauge
+go_memory_classes_other_bytes 1.702081e+06
+# HELP go_memory_classes_profiling_buckets_bytes Memory that is used by the stack trace hash map used for profiling.
+# TYPE go_memory_classes_profiling_buckets_bytes gauge
+go_memory_classes_profiling_buckets_bytes 1.492343e+06
+# HELP go_memory_classes_total_bytes All memory mapped by the Go runtime into the current process as read-write. Note that this does not include memory mapped by code called via cgo or via the syscall package. Sum of all metrics in /memory/classes.
+# TYPE go_memory_classes_total_bytes gauge
+go_memory_classes_total_bytes 2.9226248e+07
+# HELP go_memstats_alloc_bytes Number of bytes allocated and still in use.
+# TYPE go_memstats_alloc_bytes gauge
+go_memstats_alloc_bytes 6.192616e+06
+# HELP go_memstats_alloc_bytes_total Total number of bytes allocated, even if freed.
+# TYPE go_memstats_alloc_bytes_total counter
+go_memstats_alloc_bytes_total 3.6535336e+07
+# HELP go_memstats_buck_hash_sys_bytes Number of bytes used by the profiling bucket hash table.
+# TYPE go_memstats_buck_hash_sys_bytes gauge
+go_memstats_buck_hash_sys_bytes 1.492343e+06
+# HELP go_memstats_frees_total Total number of frees.
+# TYPE go_memstats_frees_total counter
+go_memstats_frees_total 277797
+# HELP go_memstats_gc_sys_bytes Number of bytes used for garbage collection system metadata.
+# TYPE go_memstats_gc_sys_bytes gauge
+go_memstats_gc_sys_bytes 8.977888e+06
+# HELP go_memstats_heap_alloc_bytes Number of heap bytes allocated and still in use.
+# TYPE go_memstats_heap_alloc_bytes gauge
+go_memstats_heap_alloc_bytes 6.192616e+06
+# HELP go_memstats_heap_idle_bytes Number of heap bytes waiting to be used.
+# TYPE go_memstats_heap_idle_bytes gauge
+go_memstats_heap_idle_bytes 4.227072e+06
+# HELP go_memstats_heap_inuse_bytes Number of heap bytes that are in use.
+# TYPE go_memstats_heap_inuse_bytes gauge
+go_memstats_heap_inuse_bytes 1.1042816e+07
+# HELP go_memstats_heap_objects Number of allocated objects.
+# TYPE go_memstats_heap_objects gauge
+go_memstats_heap_objects 36768
+# HELP go_memstats_heap_released_bytes Number of heap bytes released to OS.
+# TYPE go_memstats_heap_released_bytes gauge
+go_memstats_heap_released_bytes 1.810432e+06
+# HELP go_memstats_heap_sys_bytes Number of heap bytes obtained from system.
+# TYPE go_memstats_heap_sys_bytes gauge
+go_memstats_heap_sys_bytes 1.5269888e+07
+# HELP go_memstats_last_gc_time_seconds Number of seconds since 1970 of last garbage collection.
+# TYPE go_memstats_last_gc_time_seconds gauge
+go_memstats_last_gc_time_seconds 1.698752772363916e+09
+# HELP go_memstats_lookups_total Total number of pointer lookups.
+# TYPE go_memstats_lookups_total counter
+go_memstats_lookups_total 0
+# HELP go_memstats_mallocs_total Total number of mallocs.
+# TYPE go_memstats_mallocs_total counter
+go_memstats_mallocs_total 314565
+# HELP go_memstats_mcache_inuse_bytes Number of bytes in use by mcache structures.
+# TYPE go_memstats_mcache_inuse_bytes gauge
+go_memstats_mcache_inuse_bytes 9600
+# HELP go_memstats_mcache_sys_bytes Number of bytes used for mcache structures obtained from system.
+# TYPE go_memstats_mcache_sys_bytes gauge
+go_memstats_mcache_sys_bytes 15600
+# HELP go_memstats_mspan_inuse_bytes Number of bytes in use by mspan structures.
+# TYPE go_memstats_mspan_inuse_bytes gauge
+go_memstats_mspan_inuse_bytes 230560
+# HELP go_memstats_mspan_sys_bytes Number of bytes used for mspan structures obtained from system.
+# TYPE go_memstats_mspan_sys_bytes gauge
+go_memstats_mspan_sys_bytes 261120
+# HELP go_memstats_next_gc_bytes Number of heap bytes when next garbage collection will take place.
+# TYPE go_memstats_next_gc_bytes gauge
+go_memstats_next_gc_bytes 1.2824032e+07
+# HELP go_memstats_other_sys_bytes Number of bytes used for other system allocations.
+# TYPE go_memstats_other_sys_bytes gauge
+go_memstats_other_sys_bytes 1.702081e+06
+# HELP go_memstats_stack_inuse_bytes Number of bytes in use by the stack allocator.
+# TYPE go_memstats_stack_inuse_bytes gauge
+go_memstats_stack_inuse_bytes 1.507328e+06
+# HELP go_memstats_stack_sys_bytes Number of bytes obtained from system for stack allocator.
+# TYPE go_memstats_stack_sys_bytes gauge
+go_memstats_stack_sys_bytes 1.507328e+06
+# HELP go_memstats_sys_bytes Number of bytes obtained from system.
+# TYPE go_memstats_sys_bytes gauge
+go_memstats_sys_bytes 2.9226248e+07
+# HELP go_sched_gomaxprocs_threads The current runtime.GOMAXPROCS setting, or the number of operating system threads that can execute user-level Go code simultaneously.
+# TYPE go_sched_gomaxprocs_threads gauge
+go_sched_gomaxprocs_threads 8
+# HELP go_sched_goroutines_goroutines Count of live goroutines.
+# TYPE go_sched_goroutines_goroutines gauge
+go_sched_goroutines_goroutines 172
+# HELP go_sched_latencies_seconds Distribution of the time goroutines have spent in the scheduler in a runnable state before actually running.
+# TYPE go_sched_latencies_seconds histogram
+go_sched_latencies_seconds_bucket{le="6.399999999999999e-08"} 902
+go_sched_latencies_seconds_bucket{le="6.399999999999999e-07"} 985
+go_sched_latencies_seconds_bucket{le="7.167999999999999e-06"} 1409
+go_sched_latencies_seconds_bucket{le="8.191999999999999e-05"} 2335
+go_sched_latencies_seconds_bucket{le="0.0009175039999999999"} 2440
+go_sched_latencies_seconds_bucket{le="0.010485759999999998"} 2446
+go_sched_latencies_seconds_bucket{le="0.11744051199999998"} 2446
+go_sched_latencies_seconds_bucket{le="+Inf"} 2446
+go_sched_latencies_seconds_sum 0.021020864
+go_sched_latencies_seconds_count 2446
+# HELP go_sync_mutex_wait_total_seconds_total Approximate cumulative time goroutines have spent blocked on a sync.Mutex or sync.RWMutex. This metric is useful for identifying global changes in lock contention. Collect a mutex or block profile using the runtime/pprof package for more detailed contention data.
+# TYPE go_sync_mutex_wait_total_seconds_total counter
+go_sync_mutex_wait_total_seconds_total 0.03976712
+# HELP go_threads Number of OS threads created.
+# TYPE go_threads gauge
+go_threads 12
+# HELP hidden_metrics_total [BETA] The count of hidden metrics.
+# TYPE hidden_metrics_total counter
+hidden_metrics_total 0
+# HELP kubernetes_build_info [ALPHA] A metric with a constant '1' value labeled by major, minor, git version, git commit, git tree state, build date, Go version, and compiler from which Kubernetes was built, and platform on which it is running.
+# TYPE kubernetes_build_info gauge
+kubernetes_build_info{build_date="2023-08-15T21:24:51Z",compiler="gc",git_commit="855e7c48de7388eb330da0f8d9d2394ee818fb8d",git_tree_state="clean",git_version="v1.28.0",go_version="go1.20.7",major="1",minor="28",platform="linux/amd64"} 1
+# HELP kubernetes_feature_enabled [BETA] This metric records the data about the stage and enablement of a k8s feature.
+# TYPE kubernetes_feature_enabled gauge
+kubernetes_feature_enabled{name="APIListChunking",stage="BETA"} 1
+kubernetes_feature_enabled{name="APIPriorityAndFairness",stage="BETA"} 1
+kubernetes_feature_enabled{name="APIResponseCompression",stage="BETA"} 1
+kubernetes_feature_enabled{name="APISelfSubjectReview",stage=""} 1
+kubernetes_feature_enabled{name="APIServerIdentity",stage="BETA"} 1
+kubernetes_feature_enabled{name="APIServerTracing",stage="BETA"} 1
+kubernetes_feature_enabled{name="AdmissionWebhookMatchConditions",stage="BETA"} 1
+kubernetes_feature_enabled{name="AggregatedDiscoveryEndpoint",stage="BETA"} 1
+kubernetes_feature_enabled{name="AllAlpha",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="AllBeta",stage="BETA"} 0
+kubernetes_feature_enabled{name="AnyVolumeDataSource",stage="BETA"} 1
+kubernetes_feature_enabled{name="AppArmor",stage="BETA"} 1
+kubernetes_feature_enabled{name="CPUManager",stage=""} 1
+kubernetes_feature_enabled{name="CPUManagerPolicyAlphaOptions",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="CPUManagerPolicyBetaOptions",stage="BETA"} 1
+kubernetes_feature_enabled{name="CPUManagerPolicyOptions",stage="BETA"} 1
+kubernetes_feature_enabled{name="CRDValidationRatcheting",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="CSIMigrationAzureFile",stage=""} 1
+kubernetes_feature_enabled{name="CSIMigrationPortworx",stage="BETA"} 0
+kubernetes_feature_enabled{name="CSIMigrationRBD",stage="DEPRECATED"} 0
+kubernetes_feature_enabled{name="CSIMigrationvSphere",stage=""} 1
+kubernetes_feature_enabled{name="CSINodeExpandSecret",stage="BETA"} 1
+kubernetes_feature_enabled{name="CSIVolumeHealth",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="CloudControllerManagerWebhook",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="CloudDualStackNodeIPs",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ClusterTrustBundle",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ComponentSLIs",stage="BETA"} 1
+kubernetes_feature_enabled{name="ConsistentHTTPGetHandlers",stage=""} 1
+kubernetes_feature_enabled{name="ConsistentListFromCache",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ContainerCheckpoint",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ContextualLogging",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="CronJobTimeZone",stage=""} 1
+kubernetes_feature_enabled{name="CronJobsScheduledAnnotation",stage="BETA"} 1
+kubernetes_feature_enabled{name="CrossNamespaceVolumeDataSource",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="CustomCPUCFSQuotaPeriod",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="CustomResourceValidationExpressions",stage="BETA"} 1
+kubernetes_feature_enabled{name="DefaultHostNetworkHostPortsInPodTemplates",stage="DEPRECATED"} 0
+kubernetes_feature_enabled{name="DevicePluginCDIDevices",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="DisableCloudProviders",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="DisableKubeletCloudCredentialProviders",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="DownwardAPIHugePages",stage=""} 1
+kubernetes_feature_enabled{name="DynamicResourceAllocation",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="EfficientWatchResumption",stage=""} 1
+kubernetes_feature_enabled{name="ElasticIndexedJob",stage="BETA"} 1
+kubernetes_feature_enabled{name="EventedPLEG",stage="BETA"} 0
+kubernetes_feature_enabled{name="ExecProbeTimeout",stage=""} 1
+kubernetes_feature_enabled{name="ExpandedDNSConfig",stage=""} 1
+kubernetes_feature_enabled{name="ExperimentalHostUserNamespaceDefaulting",stage="DEPRECATED"} 0
+kubernetes_feature_enabled{name="GRPCContainerProbe",stage=""} 1
+kubernetes_feature_enabled{name="GracefulNodeShutdown",stage="BETA"} 1
+kubernetes_feature_enabled{name="GracefulNodeShutdownBasedOnPodPriority",stage="BETA"} 1
+kubernetes_feature_enabled{name="HPAContainerMetrics",stage="BETA"} 1
+kubernetes_feature_enabled{name="HPAScaleToZero",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="HonorPVReclaimPolicy",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="IPTablesOwnershipCleanup",stage=""} 1
+kubernetes_feature_enabled{name="InPlacePodVerticalScaling",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="InTreePluginAWSUnregister",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="InTreePluginAzureDiskUnregister",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="InTreePluginAzureFileUnregister",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="InTreePluginGCEUnregister",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="InTreePluginOpenStackUnregister",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="InTreePluginPortworxUnregister",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="InTreePluginRBDUnregister",stage="DEPRECATED"} 0
+kubernetes_feature_enabled{name="InTreePluginvSphereUnregister",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="JobBackoffLimitPerIndex",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="JobMutableNodeSchedulingDirectives",stage=""} 1
+kubernetes_feature_enabled{name="JobPodFailurePolicy",stage="BETA"} 1
+kubernetes_feature_enabled{name="JobPodReplacementPolicy",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="JobReadyPods",stage="BETA"} 1
+kubernetes_feature_enabled{name="JobTrackingWithFinalizers",stage=""} 1
+kubernetes_feature_enabled{name="KMSv1",stage="DEPRECATED"} 1
+kubernetes_feature_enabled{name="KMSv2",stage="BETA"} 1
+kubernetes_feature_enabled{name="KMSv2KDF",stage="BETA"} 0
+kubernetes_feature_enabled{name="KubeProxyDrainingTerminatingNodes",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="KubeletCgroupDriverFromCRI",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="KubeletInUserNamespace",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="KubeletPodResources",stage=""} 1
+kubernetes_feature_enabled{name="KubeletPodResourcesDynamicResources",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="KubeletPodResourcesGet",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="KubeletPodResourcesGetAllocatable",stage=""} 1
+kubernetes_feature_enabled{name="KubeletTracing",stage="BETA"} 1
+kubernetes_feature_enabled{name="LegacyServiceAccountTokenCleanUp",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="LegacyServiceAccountTokenNoAutoGeneration",stage=""} 1
+kubernetes_feature_enabled{name="LegacyServiceAccountTokenTracking",stage=""} 1
+kubernetes_feature_enabled{name="LocalStorageCapacityIsolationFSQuotaMonitoring",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="LogarithmicScaleDown",stage="BETA"} 1
+kubernetes_feature_enabled{name="LoggingAlphaOptions",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="LoggingBetaOptions",stage="BETA"} 1
+kubernetes_feature_enabled{name="MatchLabelKeysInPodTopologySpread",stage="BETA"} 1
+kubernetes_feature_enabled{name="MaxUnavailableStatefulSet",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="MemoryManager",stage="BETA"} 1
+kubernetes_feature_enabled{name="MemoryQoS",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="MinDomainsInPodTopologySpread",stage="BETA"} 1
+kubernetes_feature_enabled{name="MinimizeIPTablesRestore",stage=""} 1
+kubernetes_feature_enabled{name="MultiCIDRRangeAllocator",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="MultiCIDRServiceAllocator",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="NewVolumeManagerReconstruction",stage="BETA"} 1
+kubernetes_feature_enabled{name="NodeInclusionPolicyInPodTopologySpread",stage="BETA"} 1
+kubernetes_feature_enabled{name="NodeLogQuery",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="NodeOutOfServiceVolumeDetach",stage=""} 1
+kubernetes_feature_enabled{name="NodeSwap",stage="BETA"} 0
+kubernetes_feature_enabled{name="OpenAPIEnums",stage="BETA"} 1
+kubernetes_feature_enabled{name="OpenAPIV3",stage=""} 1
+kubernetes_feature_enabled{name="PDBUnhealthyPodEvictionPolicy",stage="BETA"} 1
+kubernetes_feature_enabled{name="PersistentVolumeLastPhaseTransitionTime",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="PodAndContainerStatsFromCRI",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="PodDeletionCost",stage="BETA"} 1
+kubernetes_feature_enabled{name="PodDisruptionConditions",stage="BETA"} 1
+kubernetes_feature_enabled{name="PodHostIPs",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="PodIndexLabel",stage="BETA"} 1
+kubernetes_feature_enabled{name="PodReadyToStartContainersCondition",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="PodSchedulingReadiness",stage="BETA"} 1
+kubernetes_feature_enabled{name="ProbeTerminationGracePeriod",stage=""} 1
+kubernetes_feature_enabled{name="ProcMountType",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ProxyTerminatingEndpoints",stage=""} 1
+kubernetes_feature_enabled{name="QOSReserved",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ReadWriteOncePod",stage="BETA"} 1
+kubernetes_feature_enabled{name="RecoverVolumeExpansionFailure",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="RemainingItemCount",stage="BETA"} 1
+kubernetes_feature_enabled{name="RemoveSelfLink",stage=""} 1
+kubernetes_feature_enabled{name="RetroactiveDefaultStorageClass",stage=""} 1
+kubernetes_feature_enabled{name="RotateKubeletServerCertificate",stage="BETA"} 1
+kubernetes_feature_enabled{name="SELinuxMountReadWriteOncePod",stage="BETA"} 1
+kubernetes_feature_enabled{name="SchedulerQueueingHints",stage="BETA"} 1
+kubernetes_feature_enabled{name="SeccompDefault",stage=""} 1
+kubernetes_feature_enabled{name="SecurityContextDeny",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ServerSideApply",stage=""} 1
+kubernetes_feature_enabled{name="ServerSideFieldValidation",stage=""} 1
+kubernetes_feature_enabled{name="ServiceNodePortStaticSubrange",stage="BETA"} 1
+kubernetes_feature_enabled{name="SidecarContainers",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="SizeMemoryBackedVolumes",stage="BETA"} 1
+kubernetes_feature_enabled{name="SkipReadOnlyValidationGCE",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="StableLoadBalancerNodeSet",stage="BETA"} 1
+kubernetes_feature_enabled{name="StatefulSetAutoDeletePVC",stage="BETA"} 1
+kubernetes_feature_enabled{name="StatefulSetStartOrdinal",stage="BETA"} 1
+kubernetes_feature_enabled{name="StorageVersionAPI",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="StorageVersionHash",stage="BETA"} 1
+kubernetes_feature_enabled{name="TopologyAwareHints",stage="BETA"} 1
+kubernetes_feature_enabled{name="TopologyManager",stage=""} 1
+kubernetes_feature_enabled{name="TopologyManagerPolicyAlphaOptions",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="TopologyManagerPolicyBetaOptions",stage="BETA"} 1
+kubernetes_feature_enabled{name="TopologyManagerPolicyOptions",stage="BETA"} 1
+kubernetes_feature_enabled{name="UnknownVersionInteroperabilityProxy",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="UserNamespacesSupport",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ValidatingAdmissionPolicy",stage="BETA"} 0
+kubernetes_feature_enabled{name="VolumeCapacityPriority",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="WatchBookmark",stage=""} 1
+kubernetes_feature_enabled{name="WatchList",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="WinDSR",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="WinOverlay",stage="BETA"} 1
+kubernetes_feature_enabled{name="WindowsHostNetwork",stage="ALPHA"} 1
+# HELP leader_election_master_status [ALPHA] Gauge of if the reporting system is master of the relevant lease, 0 indicates backup, 1 indicates master. 'name' is the string used to identify the lease. Please make sure to group by name.
+# TYPE leader_election_master_status gauge
+leader_election_master_status{name="kube-scheduler"} 1
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 3.01
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 10
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 4.54656e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.69875238442e+09
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 7.8721024e+08
+# HELP process_virtual_memory_max_bytes Maximum amount of virtual memory available in bytes.
+# TYPE process_virtual_memory_max_bytes gauge
+process_virtual_memory_max_bytes 1.8446744073709552e+19
+# HELP registered_metrics_total [BETA] The count of registered metrics broken by stability level and deprecation version.
+# TYPE registered_metrics_total counter
+registered_metrics_total{deprecated_version="",stability_level="ALPHA"} 78
+registered_metrics_total{deprecated_version="",stability_level="BETA"} 6
+registered_metrics_total{deprecated_version="",stability_level="STABLE"} 12
+# HELP rest_client_exec_plugin_certificate_rotation_age [ALPHA] Histogram of the number of seconds the last auth exec plugin client certificate lived before being rotated. If auth exec plugin client certificates are unused, histogram will contain no data.
+# TYPE rest_client_exec_plugin_certificate_rotation_age histogram
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="600"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="1800"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="3600"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="14400"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="86400"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="604800"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="2.592e+06"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="7.776e+06"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="1.5552e+07"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="3.1104e+07"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="1.24416e+08"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="+Inf"} 0
+rest_client_exec_plugin_certificate_rotation_age_sum 0
+rest_client_exec_plugin_certificate_rotation_age_count 0
+# HELP rest_client_exec_plugin_ttl_seconds [ALPHA] Gauge of the shortest TTL (time-to-live) of the client certificate(s) managed by the auth exec plugin. The value is in seconds until certificate expiry (negative if already expired). If auth exec plugins are unused or manage no TLS certificates, the value will be +INF.
+# TYPE rest_client_exec_plugin_ttl_seconds gauge
+rest_client_exec_plugin_ttl_seconds +Inf
+# HELP rest_client_rate_limiter_duration_seconds [ALPHA] Client side rate limiter latency in seconds. Broken down by verb, and host.
+# TYPE rest_client_rate_limiter_duration_seconds histogram
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="0.005"} 237
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="0.025"} 237
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="0.1"} 237
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="0.25"} 237
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="0.5"} 237
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="1"} 237
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="2"} 237
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="4"} 237
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="8"} 237
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="15"} 237
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="30"} 237
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="60"} 237
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="+Inf"} 237
+rest_client_rate_limiter_duration_seconds_sum{host="172.18.0.2:6443",verb="GET"} 0.0009123660000000004
+rest_client_rate_limiter_duration_seconds_count{host="172.18.0.2:6443",verb="GET"} 237
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="0.005"} 3
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="0.025"} 3
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="0.1"} 3
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="0.25"} 3
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="0.5"} 3
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="1"} 3
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="2"} 3
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="4"} 3
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="8"} 3
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="15"} 3
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="30"} 3
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="60"} 3
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="+Inf"} 3
+rest_client_rate_limiter_duration_seconds_sum{host="172.18.0.2:6443",verb="PATCH"} 3.5005e-05
+rest_client_rate_limiter_duration_seconds_count{host="172.18.0.2:6443",verb="PATCH"} 3
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="0.005"} 21
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="0.025"} 21
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="0.1"} 21
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="0.25"} 21
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="0.5"} 21
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="1"} 21
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="2"} 21
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="4"} 21
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="8"} 21
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="15"} 21
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="30"} 21
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="60"} 21
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="+Inf"} 21
+rest_client_rate_limiter_duration_seconds_sum{host="172.18.0.2:6443",verb="POST"} 9.512799999999997e-05
+rest_client_rate_limiter_duration_seconds_count{host="172.18.0.2:6443",verb="POST"} 21
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="0.005"} 189
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="0.025"} 189
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="0.1"} 189
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="0.25"} 189
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="0.5"} 189
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="1"} 189
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="2"} 189
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="4"} 189
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="8"} 189
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="15"} 189
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="30"} 189
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="60"} 189
+rest_client_rate_limiter_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="+Inf"} 189
+rest_client_rate_limiter_duration_seconds_sum{host="172.18.0.2:6443",verb="PUT"} 0.000467786
+rest_client_rate_limiter_duration_seconds_count{host="172.18.0.2:6443",verb="PUT"} 189
+# HELP rest_client_request_duration_seconds [ALPHA] Request latency in seconds. Broken down by verb, and host.
+# TYPE rest_client_request_duration_seconds histogram
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="0.005"} 226
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="0.025"} 236
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="0.1"} 236
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="0.25"} 236
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="0.5"} 236
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="1"} 236
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="2"} 236
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="4"} 237
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="8"} 237
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="15"} 237
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="30"} 237
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="60"} 237
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="GET",le="+Inf"} 237
+rest_client_request_duration_seconds_sum{host="172.18.0.2:6443",verb="GET"} 4.451666564999998
+rest_client_request_duration_seconds_count{host="172.18.0.2:6443",verb="GET"} 237
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="0.005"} 0
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="0.025"} 3
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="0.1"} 3
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="0.25"} 3
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="0.5"} 3
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="1"} 3
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="2"} 3
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="4"} 3
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="8"} 3
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="15"} 3
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="30"} 3
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="60"} 3
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PATCH",le="+Inf"} 3
+rest_client_request_duration_seconds_sum{host="172.18.0.2:6443",verb="PATCH"} 0.04556753399999999
+rest_client_request_duration_seconds_count{host="172.18.0.2:6443",verb="PATCH"} 3
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="0.005"} 5
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="0.025"} 21
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="0.1"} 21
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="0.25"} 21
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="0.5"} 21
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="1"} 21
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="2"} 21
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="4"} 21
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="8"} 21
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="15"} 21
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="30"} 21
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="60"} 21
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="POST",le="+Inf"} 21
+rest_client_request_duration_seconds_sum{host="172.18.0.2:6443",verb="POST"} 0.14683643499999996
+rest_client_request_duration_seconds_count{host="172.18.0.2:6443",verb="POST"} 21
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="0.005"} 27
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="0.025"} 182
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="0.1"} 186
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="0.25"} 189
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="0.5"} 189
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="1"} 189
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="2"} 189
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="4"} 189
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="8"} 189
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="15"} 189
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="30"} 189
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="60"} 189
+rest_client_request_duration_seconds_bucket{host="172.18.0.2:6443",verb="PUT",le="+Inf"} 189
+rest_client_request_duration_seconds_sum{host="172.18.0.2:6443",verb="PUT"} 2.021037979000001
+rest_client_request_duration_seconds_count{host="172.18.0.2:6443",verb="PUT"} 189
+# HELP rest_client_request_size_bytes [ALPHA] Request size in bytes. Broken down by verb and host.
+# TYPE rest_client_request_size_bytes histogram
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="64"} 237
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="256"} 237
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="512"} 237
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="1024"} 237
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="4096"} 237
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="16384"} 237
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="65536"} 237
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="262144"} 237
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="1.048576e+06"} 237
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="4.194304e+06"} 237
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="1.6777216e+07"} 237
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="+Inf"} 237
+rest_client_request_size_bytes_sum{host="172.18.0.2:6443",verb="GET"} 0
+rest_client_request_size_bytes_count{host="172.18.0.2:6443",verb="GET"} 237
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="64"} 0
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="256"} 0
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="512"} 3
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="1024"} 3
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="4096"} 3
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="16384"} 3
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="65536"} 3
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="262144"} 3
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="1.048576e+06"} 3
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="4.194304e+06"} 3
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="1.6777216e+07"} 3
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="+Inf"} 3
+rest_client_request_size_bytes_sum{host="172.18.0.2:6443",verb="PATCH"} 1029
+rest_client_request_size_bytes_count{host="172.18.0.2:6443",verb="PATCH"} 3
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="64"} 0
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="256"} 8
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="512"} 19
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="1024"} 20
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="4096"} 21
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="16384"} 21
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="65536"} 21
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="262144"} 21
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="1.048576e+06"} 21
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="4.194304e+06"} 21
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="1.6777216e+07"} 21
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="+Inf"} 21
+rest_client_request_size_bytes_sum{host="172.18.0.2:6443",verb="POST"} 7220
+rest_client_request_size_bytes_count{host="172.18.0.2:6443",verb="POST"} 21
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="64"} 0
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="256"} 0
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="512"} 189
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="1024"} 189
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="4096"} 189
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="16384"} 189
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="65536"} 189
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="262144"} 189
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="1.048576e+06"} 189
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="4.194304e+06"} 189
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="1.6777216e+07"} 189
+rest_client_request_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="+Inf"} 189
+rest_client_request_size_bytes_sum{host="172.18.0.2:6443",verb="PUT"} 80519
+rest_client_request_size_bytes_count{host="172.18.0.2:6443",verb="PUT"} 189
+# HELP rest_client_requests_total [ALPHA] Number of HTTP requests, partitioned by status code, method, and host.
+# TYPE rest_client_requests_total counter
+rest_client_requests_total{code="200",host="172.18.0.2:6443",method="GET"} 224
+rest_client_requests_total{code="200",host="172.18.0.2:6443",method="PATCH"} 3
+rest_client_requests_total{code="200",host="172.18.0.2:6443",method="PUT"} 189
+rest_client_requests_total{code="201",host="172.18.0.2:6443",method="POST"} 21
+rest_client_requests_total{code="403",host="172.18.0.2:6443",method="GET"} 32
+rest_client_requests_total{code="404",host="172.18.0.2:6443",method="GET"} 1
+# HELP rest_client_response_size_bytes [ALPHA] Response size in bytes. Broken down by verb and host.
+# TYPE rest_client_response_size_bytes histogram
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="64"} 9
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="256"} 35
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="512"} 231
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="1024"} 233
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="4096"} 236
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="16384"} 237
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="65536"} 237
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="262144"} 237
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="1.048576e+06"} 237
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="4.194304e+06"} 237
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="1.6777216e+07"} 237
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="GET",le="+Inf"} 237
+rest_client_response_size_bytes_sum{host="172.18.0.2:6443",verb="GET"} 103711
+rest_client_response_size_bytes_count{host="172.18.0.2:6443",verb="GET"} 237
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="64"} 0
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="256"} 0
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="512"} 0
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="1024"} 0
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="4096"} 3
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="16384"} 3
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="65536"} 3
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="262144"} 3
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="1.048576e+06"} 3
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="4.194304e+06"} 3
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="1.6777216e+07"} 3
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PATCH",le="+Inf"} 3
+rest_client_response_size_bytes_sum{host="172.18.0.2:6443",verb="PATCH"} 10810
+rest_client_response_size_bytes_count{host="172.18.0.2:6443",verb="PATCH"} 3
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="64"} 7
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="256"} 7
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="512"} 8
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="1024"} 19
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="4096"} 21
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="16384"} 21
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="65536"} 21
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="262144"} 21
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="1.048576e+06"} 21
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="4.194304e+06"} 21
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="1.6777216e+07"} 21
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="POST",le="+Inf"} 21
+rest_client_response_size_bytes_sum{host="172.18.0.2:6443",verb="POST"} 11028
+rest_client_response_size_bytes_count{host="172.18.0.2:6443",verb="POST"} 21
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="64"} 0
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="256"} 0
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="512"} 189
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="1024"} 189
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="4096"} 189
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="16384"} 189
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="65536"} 189
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="262144"} 189
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="1.048576e+06"} 189
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="4.194304e+06"} 189
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="1.6777216e+07"} 189
+rest_client_response_size_bytes_bucket{host="172.18.0.2:6443",verb="PUT",le="+Inf"} 189
+rest_client_response_size_bytes_sum{host="172.18.0.2:6443",verb="PUT"} 80520
+rest_client_response_size_bytes_count{host="172.18.0.2:6443",verb="PUT"} 189
+# HELP rest_client_transport_cache_entries [ALPHA] Number of transport entries in the internal cache.
+# TYPE rest_client_transport_cache_entries gauge
+rest_client_transport_cache_entries 2
+# HELP rest_client_transport_create_calls_total [ALPHA] Number of calls to get a new transport, partitioned by the result of the operation hit: obtained from the cache, miss: created and added to the cache, uncacheable: created and not cached
+# TYPE rest_client_transport_create_calls_total counter
+rest_client_transport_create_calls_total{result="hit"} 4
+rest_client_transport_create_calls_total{result="miss"} 2
+# HELP scheduler_framework_extension_point_duration_seconds [STABLE] Latency for running all plugins of a specific extension point.
+# TYPE scheduler_framework_extension_point_duration_seconds histogram
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Bind",profile="default-scheduler",status="Success",le="0.0001"} 0
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Bind",profile="default-scheduler",status="Success",le="0.0002"} 0
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Bind",profile="default-scheduler",status="Success",le="0.0004"} 0
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Bind",profile="default-scheduler",status="Success",le="0.0008"} 0
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Bind",profile="default-scheduler",status="Success",le="0.0016"} 0
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Bind",profile="default-scheduler",status="Success",le="0.0032"} 0
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Bind",profile="default-scheduler",status="Success",le="0.0064"} 1
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Bind",profile="default-scheduler",status="Success",le="0.0128"} 5
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Bind",profile="default-scheduler",status="Success",le="0.0256"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Bind",profile="default-scheduler",status="Success",le="0.0512"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Bind",profile="default-scheduler",status="Success",le="0.1024"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Bind",profile="default-scheduler",status="Success",le="0.2048"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Bind",profile="default-scheduler",status="Success",le="+Inf"} 7
+scheduler_framework_extension_point_duration_seconds_sum{extension_point="Bind",profile="default-scheduler",status="Success"} 0.06508699500000001
+scheduler_framework_extension_point_duration_seconds_count{extension_point="Bind",profile="default-scheduler",status="Success"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Filter",profile="default-scheduler",status="Success",le="0.0001"} 8
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Filter",profile="default-scheduler",status="Success",le="0.0002"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Filter",profile="default-scheduler",status="Success",le="0.0004"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Filter",profile="default-scheduler",status="Success",le="0.0008"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Filter",profile="default-scheduler",status="Success",le="0.0016"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Filter",profile="default-scheduler",status="Success",le="0.0032"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Filter",profile="default-scheduler",status="Success",le="0.0064"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Filter",profile="default-scheduler",status="Success",le="0.0128"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Filter",profile="default-scheduler",status="Success",le="0.0256"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Filter",profile="default-scheduler",status="Success",le="0.0512"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Filter",profile="default-scheduler",status="Success",le="0.1024"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Filter",profile="default-scheduler",status="Success",le="0.2048"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Filter",profile="default-scheduler",status="Success",le="+Inf"} 10
+scheduler_framework_extension_point_duration_seconds_sum{extension_point="Filter",profile="default-scheduler",status="Success"} 0.000804865
+scheduler_framework_extension_point_duration_seconds_count{extension_point="Filter",profile="default-scheduler",status="Success"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Permit",profile="default-scheduler",status="Success",le="0.0001"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Permit",profile="default-scheduler",status="Success",le="0.0002"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Permit",profile="default-scheduler",status="Success",le="0.0004"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Permit",profile="default-scheduler",status="Success",le="0.0008"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Permit",profile="default-scheduler",status="Success",le="0.0016"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Permit",profile="default-scheduler",status="Success",le="0.0032"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Permit",profile="default-scheduler",status="Success",le="0.0064"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Permit",profile="default-scheduler",status="Success",le="0.0128"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Permit",profile="default-scheduler",status="Success",le="0.0256"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Permit",profile="default-scheduler",status="Success",le="0.0512"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Permit",profile="default-scheduler",status="Success",le="0.1024"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Permit",profile="default-scheduler",status="Success",le="0.2048"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Permit",profile="default-scheduler",status="Success",le="+Inf"} 7
+scheduler_framework_extension_point_duration_seconds_sum{extension_point="Permit",profile="default-scheduler",status="Success"} 2.0112e-05
+scheduler_framework_extension_point_duration_seconds_count{extension_point="Permit",profile="default-scheduler",status="Success"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostBind",profile="default-scheduler",status="Success",le="0.0001"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostBind",profile="default-scheduler",status="Success",le="0.0002"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostBind",profile="default-scheduler",status="Success",le="0.0004"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostBind",profile="default-scheduler",status="Success",le="0.0008"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostBind",profile="default-scheduler",status="Success",le="0.0016"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostBind",profile="default-scheduler",status="Success",le="0.0032"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostBind",profile="default-scheduler",status="Success",le="0.0064"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostBind",profile="default-scheduler",status="Success",le="0.0128"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostBind",profile="default-scheduler",status="Success",le="0.0256"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostBind",profile="default-scheduler",status="Success",le="0.0512"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostBind",profile="default-scheduler",status="Success",le="0.1024"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostBind",profile="default-scheduler",status="Success",le="0.2048"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostBind",profile="default-scheduler",status="Success",le="+Inf"} 7
+scheduler_framework_extension_point_duration_seconds_sum{extension_point="PostBind",profile="default-scheduler",status="Success"} 6.3082e-05
+scheduler_framework_extension_point_duration_seconds_count{extension_point="PostBind",profile="default-scheduler",status="Success"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostFilter",profile="default-scheduler",status="Unschedulable",le="0.0001"} 3
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostFilter",profile="default-scheduler",status="Unschedulable",le="0.0002"} 3
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostFilter",profile="default-scheduler",status="Unschedulable",le="0.0004"} 3
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostFilter",profile="default-scheduler",status="Unschedulable",le="0.0008"} 3
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostFilter",profile="default-scheduler",status="Unschedulable",le="0.0016"} 3
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostFilter",profile="default-scheduler",status="Unschedulable",le="0.0032"} 3
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostFilter",profile="default-scheduler",status="Unschedulable",le="0.0064"} 3
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostFilter",profile="default-scheduler",status="Unschedulable",le="0.0128"} 3
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostFilter",profile="default-scheduler",status="Unschedulable",le="0.0256"} 3
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostFilter",profile="default-scheduler",status="Unschedulable",le="0.0512"} 3
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostFilter",profile="default-scheduler",status="Unschedulable",le="0.1024"} 3
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostFilter",profile="default-scheduler",status="Unschedulable",le="0.2048"} 3
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PostFilter",profile="default-scheduler",status="Unschedulable",le="+Inf"} 3
+scheduler_framework_extension_point_duration_seconds_sum{extension_point="PostFilter",profile="default-scheduler",status="Unschedulable"} 5.443e-05
+scheduler_framework_extension_point_duration_seconds_count{extension_point="PostFilter",profile="default-scheduler",status="Unschedulable"} 3
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreBind",profile="default-scheduler",status="Success",le="0.0001"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreBind",profile="default-scheduler",status="Success",le="0.0002"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreBind",profile="default-scheduler",status="Success",le="0.0004"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreBind",profile="default-scheduler",status="Success",le="0.0008"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreBind",profile="default-scheduler",status="Success",le="0.0016"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreBind",profile="default-scheduler",status="Success",le="0.0032"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreBind",profile="default-scheduler",status="Success",le="0.0064"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreBind",profile="default-scheduler",status="Success",le="0.0128"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreBind",profile="default-scheduler",status="Success",le="0.0256"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreBind",profile="default-scheduler",status="Success",le="0.0512"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreBind",profile="default-scheduler",status="Success",le="0.1024"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreBind",profile="default-scheduler",status="Success",le="0.2048"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreBind",profile="default-scheduler",status="Success",le="+Inf"} 7
+scheduler_framework_extension_point_duration_seconds_sum{extension_point="PreBind",profile="default-scheduler",status="Success"} 0.000137523
+scheduler_framework_extension_point_duration_seconds_count{extension_point="PreBind",profile="default-scheduler",status="Success"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreEnqueue",profile="default-scheduler",status="Success",le="0.0001"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreEnqueue",profile="default-scheduler",status="Success",le="0.0002"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreEnqueue",profile="default-scheduler",status="Success",le="0.0004"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreEnqueue",profile="default-scheduler",status="Success",le="0.0008"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreEnqueue",profile="default-scheduler",status="Success",le="0.0016"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreEnqueue",profile="default-scheduler",status="Success",le="0.0032"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreEnqueue",profile="default-scheduler",status="Success",le="0.0064"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreEnqueue",profile="default-scheduler",status="Success",le="0.0128"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreEnqueue",profile="default-scheduler",status="Success",le="0.0256"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreEnqueue",profile="default-scheduler",status="Success",le="0.0512"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreEnqueue",profile="default-scheduler",status="Success",le="0.1024"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreEnqueue",profile="default-scheduler",status="Success",le="0.2048"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreEnqueue",profile="default-scheduler",status="Success",le="+Inf"} 10
+scheduler_framework_extension_point_duration_seconds_sum{extension_point="PreEnqueue",profile="default-scheduler",status="Success"} 0.00012312899999999998
+scheduler_framework_extension_point_duration_seconds_count{extension_point="PreEnqueue",profile="default-scheduler",status="Success"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreFilter",profile="default-scheduler",status="Success",le="0.0001"} 9
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreFilter",profile="default-scheduler",status="Success",le="0.0002"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreFilter",profile="default-scheduler",status="Success",le="0.0004"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreFilter",profile="default-scheduler",status="Success",le="0.0008"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreFilter",profile="default-scheduler",status="Success",le="0.0016"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreFilter",profile="default-scheduler",status="Success",le="0.0032"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreFilter",profile="default-scheduler",status="Success",le="0.0064"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreFilter",profile="default-scheduler",status="Success",le="0.0128"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreFilter",profile="default-scheduler",status="Success",le="0.0256"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreFilter",profile="default-scheduler",status="Success",le="0.0512"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreFilter",profile="default-scheduler",status="Success",le="0.1024"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreFilter",profile="default-scheduler",status="Success",le="0.2048"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="PreFilter",profile="default-scheduler",status="Success",le="+Inf"} 10
+scheduler_framework_extension_point_duration_seconds_sum{extension_point="PreFilter",profile="default-scheduler",status="Success"} 0.000671459
+scheduler_framework_extension_point_duration_seconds_count{extension_point="PreFilter",profile="default-scheduler",status="Success"} 10
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Reserve",profile="default-scheduler",status="Success",le="0.0001"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Reserve",profile="default-scheduler",status="Success",le="0.0002"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Reserve",profile="default-scheduler",status="Success",le="0.0004"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Reserve",profile="default-scheduler",status="Success",le="0.0008"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Reserve",profile="default-scheduler",status="Success",le="0.0016"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Reserve",profile="default-scheduler",status="Success",le="0.0032"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Reserve",profile="default-scheduler",status="Success",le="0.0064"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Reserve",profile="default-scheduler",status="Success",le="0.0128"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Reserve",profile="default-scheduler",status="Success",le="0.0256"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Reserve",profile="default-scheduler",status="Success",le="0.0512"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Reserve",profile="default-scheduler",status="Success",le="0.1024"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Reserve",profile="default-scheduler",status="Success",le="0.2048"} 7
+scheduler_framework_extension_point_duration_seconds_bucket{extension_point="Reserve",profile="default-scheduler",status="Success",le="+Inf"} 7
+scheduler_framework_extension_point_duration_seconds_sum{extension_point="Reserve",profile="default-scheduler",status="Success"} 4.0518999999999996e-05
+scheduler_framework_extension_point_duration_seconds_count{extension_point="Reserve",profile="default-scheduler",status="Success"} 7
+# HELP scheduler_goroutines [ALPHA] Number of running goroutines split by the work they do such as binding.
+# TYPE scheduler_goroutines gauge
+scheduler_goroutines{operation="Filter"} 0
+scheduler_goroutines{operation="InterPodAffinity"} 0
+scheduler_goroutines{operation="binding"} 0
+# HELP scheduler_pending_pods [STABLE] Number of pending pods, by the queue type. 'active' means number of pods in activeQ; 'backoff' means number of pods in backoffQ; 'unschedulable' means number of pods in unschedulablePods that the scheduler attempted to schedule and failed; 'gated' is the number of unschedulable pods that the scheduler never attempted to schedule because they are gated.
+# TYPE scheduler_pending_pods gauge
+scheduler_pending_pods{queue="active"} 0
+scheduler_pending_pods{queue="backoff"} 0
+scheduler_pending_pods{queue="gated"} 0
+scheduler_pending_pods{queue="unschedulable"} 0
+# HELP scheduler_plugin_evaluation_total [ALPHA] Number of attempts to schedule pods by each plugin and the extension point (available only in PreFilter and Filter.).
+# TYPE scheduler_plugin_evaluation_total counter
+scheduler_plugin_evaluation_total{extension_point="Filter",plugin="AzureDiskLimits",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Filter",plugin="EBSLimits",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Filter",plugin="GCEPDLimits",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Filter",plugin="InterPodAffinity",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Filter",plugin="NodeAffinity",profile="default-scheduler"} 7
+scheduler_plugin_evaluation_total{extension_point="Filter",plugin="NodeName",profile="default-scheduler"} 10
+scheduler_plugin_evaluation_total{extension_point="Filter",plugin="NodePorts",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Filter",plugin="NodeResourcesFit",profile="default-scheduler"} 7
+scheduler_plugin_evaluation_total{extension_point="Filter",plugin="NodeUnschedulable",profile="default-scheduler"} 10
+scheduler_plugin_evaluation_total{extension_point="Filter",plugin="NodeVolumeLimits",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Filter",plugin="PodTopologySpread",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Filter",plugin="TaintToleration",profile="default-scheduler"} 10
+scheduler_plugin_evaluation_total{extension_point="Filter",plugin="VolumeBinding",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Filter",plugin="VolumeRestrictions",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Filter",plugin="VolumeZone",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="PreFilter",plugin="AzureDiskLimits",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="PreFilter",plugin="EBSLimits",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="PreFilter",plugin="GCEPDLimits",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="PreFilter",plugin="InterPodAffinity",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="PreFilter",plugin="NodeAffinity",profile="default-scheduler"} 10
+scheduler_plugin_evaluation_total{extension_point="PreFilter",plugin="NodePorts",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="PreFilter",plugin="NodeResourcesFit",profile="default-scheduler"} 10
+scheduler_plugin_evaluation_total{extension_point="PreFilter",plugin="NodeVolumeLimits",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="PreFilter",plugin="PodTopologySpread",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="PreFilter",plugin="VolumeBinding",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="PreFilter",plugin="VolumeRestrictions",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="PreFilter",plugin="VolumeZone",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="PreScore",plugin="InterPodAffinity",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="PreScore",plugin="NodeAffinity",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="PreScore",plugin="NodeResourcesBalancedAllocation",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="PreScore",plugin="NodeResourcesFit",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="PreScore",plugin="PodTopologySpread",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="PreScore",plugin="TaintToleration",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Score",plugin="ImageLocality",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Score",plugin="InterPodAffinity",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Score",plugin="NodeAffinity",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Score",plugin="NodeResourcesBalancedAllocation",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Score",plugin="NodeResourcesFit",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Score",plugin="PodTopologySpread",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Score",plugin="TaintToleration",profile="default-scheduler"} 0
+scheduler_plugin_evaluation_total{extension_point="Score",plugin="VolumeBinding",profile="default-scheduler"} 0
+# HELP scheduler_plugin_execution_duration_seconds [ALPHA] Duration for running a plugin at a specific extension point.
+# TYPE scheduler_plugin_execution_duration_seconds histogram
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="1e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="1.5000000000000002e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="2.2500000000000005e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="3.375000000000001e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="5.062500000000001e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="7.593750000000002e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="0.00011390625000000003"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="0.00017085937500000006"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="0.0002562890625000001"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="0.00038443359375000017"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="0.0005766503906250003"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="0.0008649755859375004"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="0.0012974633789062506"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="0.0019461950683593758"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="0.0029192926025390638"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="0.004378938903808595"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="0.006568408355712893"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Bind",plugin="DefaultBinder",status="Success",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="Bind",plugin="DefaultBinder",status="Success"} 0.008267277
+scheduler_plugin_execution_duration_seconds_count{extension_point="Bind",plugin="DefaultBinder",status="Success"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="1e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="1.5000000000000002e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="2.2500000000000005e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeAffinity",status="Success",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="Filter",plugin="NodeAffinity",status="Success"} 2.3894e-05
+scheduler_plugin_execution_duration_seconds_count{extension_point="Filter",plugin="NodeAffinity",status="Success"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="1e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="1.5000000000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="2.2500000000000005e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeName",status="Success",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="Filter",plugin="NodeName",status="Success"} 3.94e-07
+scheduler_plugin_execution_duration_seconds_count{extension_point="Filter",plugin="NodeName",status="Success"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="1e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="1.5000000000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="2.2500000000000005e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeResourcesFit",status="Success",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="Filter",plugin="NodeResourcesFit",status="Success"} 5.703e-06
+scheduler_plugin_execution_duration_seconds_count{extension_point="Filter",plugin="NodeResourcesFit",status="Success"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="1e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="1.5000000000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="2.2500000000000005e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="NodeUnschedulable",status="Success",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="Filter",plugin="NodeUnschedulable",status="Success"} 1.257e-06
+scheduler_plugin_execution_duration_seconds_count{extension_point="Filter",plugin="NodeUnschedulable",status="Success"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="1e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="1.5000000000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="2.2500000000000005e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Filter",plugin="TaintToleration",status="Success",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="Filter",plugin="TaintToleration",status="Success"} 2.868e-06
+scheduler_plugin_execution_duration_seconds_count{extension_point="Filter",plugin="TaintToleration",status="Success"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="1e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="1.5000000000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="2.2500000000000005e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreBind",plugin="VolumeBinding",status="Success",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="PreBind",plugin="VolumeBinding",status="Success"} 8.74e-07
+scheduler_plugin_execution_duration_seconds_count{extension_point="PreBind",plugin="VolumeBinding",status="Success"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="1e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="1.5000000000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="2.2500000000000005e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip"} 9.42e-07
+scheduler_plugin_execution_duration_seconds_count{extension_point="PreFilter",plugin="AzureDiskLimits",status="Skip"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="1e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="1.5000000000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="2.2500000000000005e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="EBSLimits",status="Skip",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="PreFilter",plugin="EBSLimits",status="Skip"} 1.396e-06
+scheduler_plugin_execution_duration_seconds_count{extension_point="PreFilter",plugin="EBSLimits",status="Skip"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="1e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="1.5000000000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="2.2500000000000005e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip"} 6.97e-07
+scheduler_plugin_execution_duration_seconds_count{extension_point="PreFilter",plugin="GCEPDLimits",status="Skip"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="1e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="1.5000000000000002e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="2.2500000000000005e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip"} 2.303e-05
+scheduler_plugin_execution_duration_seconds_count{extension_point="PreFilter",plugin="InterPodAffinity",status="Skip"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="1e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="1.5000000000000002e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="2.2500000000000005e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeAffinity",status="Success",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="PreFilter",plugin="NodeAffinity",status="Success"} 2.6412e-05
+scheduler_plugin_execution_duration_seconds_count{extension_point="PreFilter",plugin="NodeAffinity",status="Success"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="1e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="1.5000000000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="2.2500000000000005e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodePorts",status="Skip",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="PreFilter",plugin="NodePorts",status="Skip"} 1.366e-06
+scheduler_plugin_execution_duration_seconds_count{extension_point="PreFilter",plugin="NodePorts",status="Skip"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="1e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="1.5000000000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="2.2500000000000005e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success"} 1.2539e-05
+scheduler_plugin_execution_duration_seconds_count{extension_point="PreFilter",plugin="NodeResourcesFit",status="Success"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="1e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="1.5000000000000002e-05"} 0
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="2.2500000000000005e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip"} 2.178e-05
+scheduler_plugin_execution_duration_seconds_count{extension_point="PreFilter",plugin="NodeVolumeLimits",status="Skip"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="1e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="1.5000000000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="2.2500000000000005e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip"} 3.188e-06
+scheduler_plugin_execution_duration_seconds_count{extension_point="PreFilter",plugin="PodTopologySpread",status="Skip"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="1e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="1.5000000000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="2.2500000000000005e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeBinding",status="Skip",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="PreFilter",plugin="VolumeBinding",status="Skip"} 4.612e-06
+scheduler_plugin_execution_duration_seconds_count{extension_point="PreFilter",plugin="VolumeBinding",status="Skip"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="1e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="1.5000000000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="2.2500000000000005e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip"} 3.713e-06
+scheduler_plugin_execution_duration_seconds_count{extension_point="PreFilter",plugin="VolumeRestrictions",status="Skip"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="1e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="1.5000000000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="2.2500000000000005e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="PreFilter",plugin="VolumeZone",status="Skip",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="PreFilter",plugin="VolumeZone",status="Skip"} 1.696e-06
+scheduler_plugin_execution_duration_seconds_count{extension_point="PreFilter",plugin="VolumeZone",status="Skip"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="1e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="1.5000000000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="2.2500000000000005e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="3.375000000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="5.062500000000001e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="7.593750000000002e-05"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="0.00011390625000000003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="0.00017085937500000006"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="0.0002562890625000001"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="0.00038443359375000017"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="0.0005766503906250003"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="0.0008649755859375004"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="0.0012974633789062506"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="0.0019461950683593758"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="0.0029192926025390638"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="0.004378938903808595"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="0.006568408355712893"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="0.009852612533569338"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="0.014778918800354007"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="0.02216837820053101"} 1
+scheduler_plugin_execution_duration_seconds_bucket{extension_point="Reserve",plugin="VolumeBinding",status="Success",le="+Inf"} 1
+scheduler_plugin_execution_duration_seconds_sum{extension_point="Reserve",plugin="VolumeBinding",status="Success"} 1.344e-06
+scheduler_plugin_execution_duration_seconds_count{extension_point="Reserve",plugin="VolumeBinding",status="Success"} 1
+# HELP scheduler_pod_scheduling_attempts [STABLE] Number of attempts to successfully schedule a pod.
+# TYPE scheduler_pod_scheduling_attempts histogram
+scheduler_pod_scheduling_attempts_bucket{le="1"} 4
+scheduler_pod_scheduling_attempts_bucket{le="2"} 7
+scheduler_pod_scheduling_attempts_bucket{le="4"} 7
+scheduler_pod_scheduling_attempts_bucket{le="8"} 7
+scheduler_pod_scheduling_attempts_bucket{le="16"} 7
+scheduler_pod_scheduling_attempts_bucket{le="+Inf"} 7
+scheduler_pod_scheduling_attempts_sum 10
+scheduler_pod_scheduling_attempts_count 7
+# HELP scheduler_pod_scheduling_duration_seconds [STABLE] E2e latency for a pod being scheduled which may include multiple scheduling attempts.
+# TYPE scheduler_pod_scheduling_duration_seconds histogram
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="0.01"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="0.02"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="0.04"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="0.08"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="0.16"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="0.32"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="0.64"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="1.28"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="2.56"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="5.12"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="10.24"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="20.48"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="40.96"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="81.92"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="163.84"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="327.68"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="655.36"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="1310.72"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="2621.44"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="5242.88"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="1",le="+Inf"} 4
+scheduler_pod_scheduling_duration_seconds_sum{attempts="1"} 0.031305079
+scheduler_pod_scheduling_duration_seconds_count{attempts="1"} 4
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="0.01"} 0
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="0.02"} 0
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="0.04"} 0
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="0.08"} 0
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="0.16"} 0
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="0.32"} 0
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="0.64"} 0
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="1.28"} 0
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="2.56"} 0
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="5.12"} 0
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="10.24"} 3
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="20.48"} 3
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="40.96"} 3
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="81.92"} 3
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="163.84"} 3
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="327.68"} 3
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="655.36"} 3
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="1310.72"} 3
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="2621.44"} 3
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="5242.88"} 3
+scheduler_pod_scheduling_duration_seconds_bucket{attempts="2",le="+Inf"} 3
+scheduler_pod_scheduling_duration_seconds_sum{attempts="2"} 15.507525172000001
+scheduler_pod_scheduling_duration_seconds_count{attempts="2"} 3
+# HELP scheduler_preemption_attempts_total [STABLE] Total preemption attempts in the cluster till now
+# TYPE scheduler_preemption_attempts_total counter
+scheduler_preemption_attempts_total 3
+# HELP scheduler_preemption_victims [STABLE] Number of selected preemption victims
+# TYPE scheduler_preemption_victims histogram
+scheduler_preemption_victims_bucket{le="1"} 0
+scheduler_preemption_victims_bucket{le="2"} 0
+scheduler_preemption_victims_bucket{le="4"} 0
+scheduler_preemption_victims_bucket{le="8"} 0
+scheduler_preemption_victims_bucket{le="16"} 0
+scheduler_preemption_victims_bucket{le="32"} 0
+scheduler_preemption_victims_bucket{le="64"} 0
+scheduler_preemption_victims_bucket{le="+Inf"} 0
+scheduler_preemption_victims_sum 0
+scheduler_preemption_victims_count 0
+# HELP scheduler_queue_incoming_pods_total [STABLE] Number of pods added to scheduling queues by event and queue type.
+# TYPE scheduler_queue_incoming_pods_total counter
+scheduler_queue_incoming_pods_total{event="NodeTaintChange",queue="active"} 3
+scheduler_queue_incoming_pods_total{event="PodAdd",queue="active"} 7
+scheduler_queue_incoming_pods_total{event="ScheduleAttemptFailure",queue="unschedulable"} 3
+# HELP scheduler_schedule_attempts_total [STABLE] Number of attempts to schedule pods, by the result. 'unschedulable' means a pod could not be scheduled, while 'error' means an internal scheduler problem.
+# TYPE scheduler_schedule_attempts_total counter
+scheduler_schedule_attempts_total{profile="default-scheduler",result="scheduled"} 7
+scheduler_schedule_attempts_total{profile="default-scheduler",result="unschedulable"} 3
+# HELP scheduler_scheduler_cache_size [ALPHA] Number of nodes, pods, and assumed (bound) pods in the scheduler cache.
+# TYPE scheduler_scheduler_cache_size gauge
+scheduler_scheduler_cache_size{type="assumed_pods"} 0
+scheduler_scheduler_cache_size{type="nodes"} 1
+scheduler_scheduler_cache_size{type="pods"} 11
+# HELP scheduler_scheduling_algorithm_duration_seconds [ALPHA] Scheduling algorithm latency in seconds
+# TYPE scheduler_scheduling_algorithm_duration_seconds histogram
+scheduler_scheduling_algorithm_duration_seconds_bucket{le="0.001"} 7
+scheduler_scheduling_algorithm_duration_seconds_bucket{le="0.002"} 7
+scheduler_scheduling_algorithm_duration_seconds_bucket{le="0.004"} 7
+scheduler_scheduling_algorithm_duration_seconds_bucket{le="0.008"} 7
+scheduler_scheduling_algorithm_duration_seconds_bucket{le="0.016"} 7
+scheduler_scheduling_algorithm_duration_seconds_bucket{le="0.032"} 7
+scheduler_scheduling_algorithm_duration_seconds_bucket{le="0.064"} 7
+scheduler_scheduling_algorithm_duration_seconds_bucket{le="0.128"} 7
+scheduler_scheduling_algorithm_duration_seconds_bucket{le="0.256"} 7
+scheduler_scheduling_algorithm_duration_seconds_bucket{le="0.512"} 7
+scheduler_scheduling_algorithm_duration_seconds_bucket{le="1.024"} 7
+scheduler_scheduling_algorithm_duration_seconds_bucket{le="2.048"} 7
+scheduler_scheduling_algorithm_duration_seconds_bucket{le="4.096"} 7
+scheduler_scheduling_algorithm_duration_seconds_bucket{le="8.192"} 7
+scheduler_scheduling_algorithm_duration_seconds_bucket{le="16.384"} 7
+scheduler_scheduling_algorithm_duration_seconds_bucket{le="+Inf"} 7
+scheduler_scheduling_algorithm_duration_seconds_sum 0.0012906859999999999
+scheduler_scheduling_algorithm_duration_seconds_count 7
+# HELP scheduler_scheduling_attempt_duration_seconds [STABLE] Scheduling attempt latency in seconds (scheduling algorithm + binding)
+# TYPE scheduler_scheduling_attempt_duration_seconds histogram
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="scheduled",le="0.001"} 0
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="scheduled",le="0.002"} 0
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="scheduled",le="0.004"} 0
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="scheduled",le="0.008"} 3
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="scheduled",le="0.016"} 7
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="scheduled",le="0.032"} 7
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="scheduled",le="0.064"} 7
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="scheduled",le="0.128"} 7
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="scheduled",le="0.256"} 7
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="scheduled",le="0.512"} 7
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="scheduled",le="1.024"} 7
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="scheduled",le="2.048"} 7
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="scheduled",le="4.096"} 7
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="scheduled",le="8.192"} 7
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="scheduled",le="16.384"} 7
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="scheduled",le="+Inf"} 7
+scheduler_scheduling_attempt_duration_seconds_sum{profile="default-scheduler",result="scheduled"} 0.067800619
+scheduler_scheduling_attempt_duration_seconds_count{profile="default-scheduler",result="scheduled"} 7
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="unschedulable",le="0.001"} 3
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="unschedulable",le="0.002"} 3
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="unschedulable",le="0.004"} 3
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="unschedulable",le="0.008"} 3
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="unschedulable",le="0.016"} 3
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="unschedulable",le="0.032"} 3
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="unschedulable",le="0.064"} 3
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="unschedulable",le="0.128"} 3
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="unschedulable",le="0.256"} 3
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="unschedulable",le="0.512"} 3
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="unschedulable",le="1.024"} 3
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="unschedulable",le="2.048"} 3
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="unschedulable",le="4.096"} 3
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="unschedulable",le="8.192"} 3
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="unschedulable",le="16.384"} 3
+scheduler_scheduling_attempt_duration_seconds_bucket{profile="default-scheduler",result="unschedulable",le="+Inf"} 3
+scheduler_scheduling_attempt_duration_seconds_sum{profile="default-scheduler",result="unschedulable"} 0.000606865
+scheduler_scheduling_attempt_duration_seconds_count{profile="default-scheduler",result="unschedulable"} 3
+# HELP scheduler_unschedulable_pods [ALPHA] The number of unschedulable pods broken down by plugin name. A pod will increment the gauge for all plugins that caused it to not schedule and so this metric have meaning only when broken down by plugin.
+# TYPE scheduler_unschedulable_pods gauge
+scheduler_unschedulable_pods{plugin="TaintToleration",profile="default-scheduler"} 0
+# HELP workqueue_adds_total [ALPHA] Total number of adds handled by workqueue
+# TYPE workqueue_adds_total counter
+workqueue_adds_total{name="DynamicConfigMapCABundle-client-ca"} 8
+workqueue_adds_total{name="DynamicServingCertificateController"} 8
+workqueue_adds_total{name="RequestHeaderAuthRequestController"} 0
+# HELP workqueue_depth [ALPHA] Current depth of workqueue
+# TYPE workqueue_depth gauge
+workqueue_depth{name="DynamicConfigMapCABundle-client-ca"} 0
+workqueue_depth{name="DynamicServingCertificateController"} 0
+workqueue_depth{name="RequestHeaderAuthRequestController"} 0
+# HELP workqueue_longest_running_processor_seconds [ALPHA] How many seconds has the longest running processor for workqueue been running.
+# TYPE workqueue_longest_running_processor_seconds gauge
+workqueue_longest_running_processor_seconds{name="DynamicConfigMapCABundle-client-ca"} 0
+workqueue_longest_running_processor_seconds{name="DynamicServingCertificateController"} 0
+workqueue_longest_running_processor_seconds{name="RequestHeaderAuthRequestController"} 0
+# HELP workqueue_queue_duration_seconds [ALPHA] How long in seconds an item stays in workqueue before being requested.
+# TYPE workqueue_queue_duration_seconds histogram
+workqueue_queue_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="1e-08"} 0
+workqueue_queue_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="1e-07"} 0
+workqueue_queue_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="1e-06"} 0
+workqueue_queue_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="9.999999999999999e-06"} 0
+workqueue_queue_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="9.999999999999999e-05"} 6
+workqueue_queue_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="0.001"} 7
+workqueue_queue_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="0.01"} 7
+workqueue_queue_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="0.1"} 8
+workqueue_queue_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="1"} 8
+workqueue_queue_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="10"} 8
+workqueue_queue_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="+Inf"} 8
+workqueue_queue_duration_seconds_sum{name="DynamicConfigMapCABundle-client-ca"} 0.033180206000000004
+workqueue_queue_duration_seconds_count{name="DynamicConfigMapCABundle-client-ca"} 8
+workqueue_queue_duration_seconds_bucket{name="DynamicServingCertificateController",le="1e-08"} 0
+workqueue_queue_duration_seconds_bucket{name="DynamicServingCertificateController",le="1e-07"} 0
+workqueue_queue_duration_seconds_bucket{name="DynamicServingCertificateController",le="1e-06"} 0
+workqueue_queue_duration_seconds_bucket{name="DynamicServingCertificateController",le="9.999999999999999e-06"} 0
+workqueue_queue_duration_seconds_bucket{name="DynamicServingCertificateController",le="9.999999999999999e-05"} 6
+workqueue_queue_duration_seconds_bucket{name="DynamicServingCertificateController",le="0.001"} 8
+workqueue_queue_duration_seconds_bucket{name="DynamicServingCertificateController",le="0.01"} 8
+workqueue_queue_duration_seconds_bucket{name="DynamicServingCertificateController",le="0.1"} 8
+workqueue_queue_duration_seconds_bucket{name="DynamicServingCertificateController",le="1"} 8
+workqueue_queue_duration_seconds_bucket{name="DynamicServingCertificateController",le="10"} 8
+workqueue_queue_duration_seconds_bucket{name="DynamicServingCertificateController",le="+Inf"} 8
+workqueue_queue_duration_seconds_sum{name="DynamicServingCertificateController"} 0.001107015
+workqueue_queue_duration_seconds_count{name="DynamicServingCertificateController"} 8
+workqueue_queue_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="1e-08"} 0
+workqueue_queue_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="1e-07"} 0
+workqueue_queue_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="1e-06"} 0
+workqueue_queue_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="9.999999999999999e-06"} 0
+workqueue_queue_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="9.999999999999999e-05"} 0
+workqueue_queue_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="0.001"} 0
+workqueue_queue_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="0.01"} 0
+workqueue_queue_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="0.1"} 0
+workqueue_queue_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="1"} 0
+workqueue_queue_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="10"} 0
+workqueue_queue_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="+Inf"} 0
+workqueue_queue_duration_seconds_sum{name="RequestHeaderAuthRequestController"} 0
+workqueue_queue_duration_seconds_count{name="RequestHeaderAuthRequestController"} 0
+# HELP workqueue_retries_total [ALPHA] Total number of retries handled by workqueue
+# TYPE workqueue_retries_total counter
+workqueue_retries_total{name="DynamicConfigMapCABundle-client-ca"} 0
+workqueue_retries_total{name="DynamicServingCertificateController"} 0
+workqueue_retries_total{name="RequestHeaderAuthRequestController"} 0
+# HELP workqueue_unfinished_work_seconds [ALPHA] How many seconds of work has done that is in progress and hasn't been observed by work_duration. Large values indicate stuck threads. One can deduce the number of stuck threads by observing the rate at which this increases.
+# TYPE workqueue_unfinished_work_seconds gauge
+workqueue_unfinished_work_seconds{name="DynamicConfigMapCABundle-client-ca"} 0
+workqueue_unfinished_work_seconds{name="DynamicServingCertificateController"} 0
+workqueue_unfinished_work_seconds{name="RequestHeaderAuthRequestController"} 0
+# HELP workqueue_work_duration_seconds [ALPHA] How long in seconds processing an item from workqueue takes.
+# TYPE workqueue_work_duration_seconds histogram
+workqueue_work_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="1e-08"} 0
+workqueue_work_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="1e-07"} 0
+workqueue_work_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="1e-06"} 0
+workqueue_work_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="9.999999999999999e-06"} 1
+workqueue_work_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="9.999999999999999e-05"} 6
+workqueue_work_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="0.001"} 8
+workqueue_work_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="0.01"} 8
+workqueue_work_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="0.1"} 8
+workqueue_work_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="1"} 8
+workqueue_work_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="10"} 8
+workqueue_work_duration_seconds_bucket{name="DynamicConfigMapCABundle-client-ca",le="+Inf"} 8
+workqueue_work_duration_seconds_sum{name="DynamicConfigMapCABundle-client-ca"} 0.00057137
+workqueue_work_duration_seconds_count{name="DynamicConfigMapCABundle-client-ca"} 8
+workqueue_work_duration_seconds_bucket{name="DynamicServingCertificateController",le="1e-08"} 0
+workqueue_work_duration_seconds_bucket{name="DynamicServingCertificateController",le="1e-07"} 0
+workqueue_work_duration_seconds_bucket{name="DynamicServingCertificateController",le="1e-06"} 0
+workqueue_work_duration_seconds_bucket{name="DynamicServingCertificateController",le="9.999999999999999e-06"} 0
+workqueue_work_duration_seconds_bucket{name="DynamicServingCertificateController",le="9.999999999999999e-05"} 6
+workqueue_work_duration_seconds_bucket{name="DynamicServingCertificateController",le="0.001"} 7
+workqueue_work_duration_seconds_bucket{name="DynamicServingCertificateController",le="0.01"} 8
+workqueue_work_duration_seconds_bucket{name="DynamicServingCertificateController",le="0.1"} 8
+workqueue_work_duration_seconds_bucket{name="DynamicServingCertificateController",le="1"} 8
+workqueue_work_duration_seconds_bucket{name="DynamicServingCertificateController",le="10"} 8
+workqueue_work_duration_seconds_bucket{name="DynamicServingCertificateController",le="+Inf"} 8
+workqueue_work_duration_seconds_sum{name="DynamicServingCertificateController"} 0.0020430379999999996
+workqueue_work_duration_seconds_count{name="DynamicServingCertificateController"} 8
+workqueue_work_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="1e-08"} 0
+workqueue_work_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="1e-07"} 0
+workqueue_work_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="1e-06"} 0
+workqueue_work_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="9.999999999999999e-06"} 0
+workqueue_work_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="9.999999999999999e-05"} 0
+workqueue_work_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="0.001"} 0
+workqueue_work_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="0.01"} 0
+workqueue_work_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="0.1"} 0
+workqueue_work_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="1"} 0
+workqueue_work_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="10"} 0
+workqueue_work_duration_seconds_bucket{name="RequestHeaderAuthRequestController",le="+Inf"} 0
+workqueue_work_duration_seconds_sum{name="RequestHeaderAuthRequestController"} 0
+workqueue_work_duration_seconds_count{name="RequestHeaderAuthRequestController"} 0

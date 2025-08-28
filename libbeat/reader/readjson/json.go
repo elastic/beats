@@ -44,20 +44,20 @@ type JSONParser struct {
 }
 
 // NewJSONReader creates a new reader that can decode JSON.
-func NewJSONReader(r reader.Reader, cfg *Config) *JSONReader {
+func NewJSONReader(r reader.Reader, cfg *Config, logger *logp.Logger) *JSONReader {
 	return &JSONReader{
 		reader: r,
 		cfg:    cfg,
-		logger: logp.NewLogger("reader_json"),
+		logger: logger.Named("reader_json"),
 	}
 }
 
-func NewJSONParser(r reader.Reader, cfg *ParserConfig) *JSONParser {
+func NewJSONParser(r reader.Reader, cfg *ParserConfig, logger *logp.Logger) *JSONParser {
 	return &JSONParser{
 		JSONReader{
 			reader: r,
 			cfg:    &cfg.Config,
-			logger: logp.NewLogger("parser_json"),
+			logger: logger.Named("parser_json"),
 		},
 		cfg.Field,
 		cfg.Target,
@@ -195,7 +195,9 @@ func (p *JSONParser) Next() (reader.Message, error) {
 		message.Fields = event.Fields
 		message.Meta = event.Meta
 	} else {
-		message.AddFields(mapstr.M{p.target: jsonFields})
+		fields := mapstr.M{}
+		fields.Put(p.target, jsonFields)
+		message.AddFields(fields)
 	}
 
 	return message, err

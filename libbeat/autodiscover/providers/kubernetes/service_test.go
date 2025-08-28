@@ -15,13 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
+
 package kubernetes
 
 import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,7 +35,7 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -226,7 +228,7 @@ func TestGenerateHints_Service(t *testing.T) {
 
 	s := service{
 		config: cfg,
-		logger: logp.NewLogger("kubernetes.service"),
+		logger: logptest.NewTestingLogger(t, "kubernetes.service"),
 	}
 	for _, test := range tests {
 		assert.Equal(t, s.GenerateHints(test.event), test.result)
@@ -391,9 +393,10 @@ func TestEmitEvent_Service(t *testing.T) {
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	for _, test := range tests {
 		t.Run(test.Message, func(t *testing.T) {
-			mapper, err := template.NewConfigMapper(nil, nil, nil)
+			mapper, err := template.NewConfigMapper(nil, nil, nil, logger)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -402,9 +405,9 @@ func TestEmitEvent_Service(t *testing.T) {
 
 			p := &Provider{
 				config:    defaultConfig(),
-				bus:       bus.New(logp.NewLogger("bus"), "test"),
+				bus:       bus.New(logger.Named("bus"), "test"),
 				templates: mapper,
-				logger:    logp.NewLogger("kubernetes"),
+				logger:    logger.Named("kubernetes"),
 			}
 
 			service := &service{
@@ -412,7 +415,7 @@ func TestEmitEvent_Service(t *testing.T) {
 				config:  defaultConfig(),
 				publish: p.publish,
 				uuid:    UUID,
-				logger:  logp.NewLogger("kubernetes.service"),
+				logger:  logger.Named("kubernetes.service"),
 			}
 
 			p.eventManager = NewMockServiceEventerManager(service)
@@ -427,6 +430,105 @@ func TestEmitEvent_Service(t *testing.T) {
 				if test.Expected != nil {
 					t.Fatal("Timeout while waiting for event")
 				}
+			}
+		})
+	}
+}
+
+func TestServiceEventer_NamespaceWatcher(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		cfg         mapstr.M
+		expectedNil bool
+		name        string
+		msg         string
+	}{
+		{
+			cfg: mapstr.M{
+				"resource": "service",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": false,
+				},
+				"hints.enabled": false,
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: true,
+			name:        "add_resource_metadata.namespace disabled and hints disabled.",
+			msg:         "Namespace watcher should be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "service",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": false,
+				},
+				"hints.enabled": true,
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata.namespace disabled and hints enabled.",
+			msg:         "Namespace watcher should not be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "service",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": true,
+				},
+				"hints.enabled": false,
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata.namespace enabled and hints disabled.",
+			msg:         "Namespace watcher should not be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "pod",
+				"node":     "node-1",
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata default and hints default.",
+			msg:         "Watcher should not be nil.",
+		},
+	}
+
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			config := conf.MustNewConfigFrom(&test.cfg)
+
+			eventer, err := NewServiceEventer(uuid, config, client, nil, logptest.NewTestingLogger(t, ""))
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			namespaceWatcher := eventer.(*service).namespaceWatcher
+
+			if test.expectedNil {
+				assert.Equalf(t, nil, namespaceWatcher, test.msg)
+			} else {
+				assert.NotEqualf(t, nil, namespaceWatcher, test.msg)
 			}
 		})
 	}

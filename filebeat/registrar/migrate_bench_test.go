@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux || darwin
-// +build linux darwin
 
 package registrar
 

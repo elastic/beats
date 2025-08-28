@@ -15,24 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 /*
 Package status fetches MySQL server status metrics.
 
 For more information on the query it uses, see:
 http://dev.mysql.com/doc/refman/5.7/en/show-status.html
 */
+
 package query
 
 import (
 	"context"
+	"crypto/tls"
+	"fmt"
 
-	"github.com/pkg/errors"
+	mysqlDriver "github.com/go-sql-driver/mysql"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mysql"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 func init() {
@@ -58,19 +64,30 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	db     *sql.DbClient
 	Config struct {
-		Queries   []query `config:"queries" validate:"nonzero,required"`
-		Namespace string  `config:"namespace" validate:"nonzero,required"`
+		Queries   []query           `config:"queries" validate:"nonzero,required"`
+		Namespace string            `config:"namespace" validate:"nonzero,required"`
+		TLS       *tlscommon.Config `config:"ssl"`
+		TLSConfig *tls.Config
 	}
 }
 
 // New creates and returns a new MetricSet instance.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The mysql 'query' metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The mysql 'query' metricset is beta."))
 
 	b := &MetricSet{BaseMetricSet: base}
 
 	if err := base.Module().UnpackConfig(&b.Config); err != nil {
 		return nil, err
+	}
+
+	if b.Config.TLS.IsEnabled() {
+		tlsConfig, err := tlscommon.LoadTLSConfig(b.Config.TLS, base.Logger())
+		if err != nil {
+			return nil, fmt.Errorf("could not load provided TLS configuration: %w", err)
+		}
+
+		b.Config.TLSConfig = tlsConfig.ToConfig()
 	}
 
 	return b, nil
@@ -79,17 +96,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches status messages from a mysql host.
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	if m.db == nil {
+		if m.Config.TLSConfig != nil {
+			err := mysqlDriver.RegisterTLSConfig(mysql.TLSConfigKey, m.Config.TLSConfig)
+			if err != nil {
+				return fmt.Errorf("registering custom tls config failed: %w", err)
+			}
+		}
 		var err error
 		m.db, err = sql.NewDBClient("mysql", m.HostData().URI, m.Logger())
 		if err != nil {
-			return errors.Wrap(err, "mysql-status fetch failed")
+			return fmt.Errorf("mysql-query fetch failed: %w", err)
 		}
 	}
 
 	for _, q := range m.Config.Queries {
 		err := m.fetchQuery(ctx, q, reporter)
 		if err != nil {
-			m.Logger().Errorf("error doing query %s", q, err)
+			m.Logger().Errorf("error doing query %v: %v", q, err)
 		}
 	}
 
@@ -142,5 +165,5 @@ func (m *MetricSet) Close() error {
 	if m.db == nil {
 		return nil
 	}
-	return errors.Wrap(m.db.Close(), "failed to close mysql database client")
+	return fmt.Errorf("failed to close mysql database client: %w", m.db.Close())
 }

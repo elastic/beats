@@ -1,0 +1,45 @@
+[
+    {
+        "@timestamp": "2021-10-19T05:07:07.128Z",
+        "event.action": "logout",
+        "event.category": [
+            "authentication"
+        ],
+        "event.code": "4exLFFQZNa5xxFl1cJNwOV",
+        "event.dataset": "salesforce.logout",
+        "event.kind": "event",
+        "event.module": "salesforce",
+        "event.provider": "EventLogFile",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "logout",
+        "input.type": "log",
+        "log.offset": 0,
+        "related.ip": [
+            "123.201.231.42"
+        ],
+        "salesforce.instance_url": "<no value>",
+        "salesforce.logout.app_type": 1000,
+        "salesforce.logout.browser_type": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36",
+        "salesforce.logout.client_version": 9998,
+        "salesforce.logout.event_type": "Logout",
+        "salesforce.logout.login_key": "OKyrFuSUIZVr9YzF",
+        "salesforce.logout.organization_id": "00D5j000000VI3n",
+        "salesforce.logout.platform_type": 1015,
+        "salesforce.logout.resolution_type": 9999,
+        "salesforce.logout.session.level": "STANDARD(db=1,api=STANDARD)",
+        "salesforce.logout.session.type": "UI",
+        "salesforce.logout.user_id": "0055j000000utlP",
+        "salesforce.logout.user_initiated_logout": 1,
+        "service.type": "salesforce",
+        "source.ip": "123.201.231.42",
+        "tags": [
+            "forwarded",
+            "salesforce-logout"
+        ],
+        "user.id": "0055j000000utlPAAQ",
+        "user.roles": "Standard(db=S,api=Standard)"
+    }
+]

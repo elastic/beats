@@ -5,8 +5,8 @@
 package cache
 
 // Cache is just a map being used as a cache.
-type Cache struct {
-	hashMap map[uint64]Cacheable
+type Cache[V Cacheable] struct {
+	hashMap map[uint64]V
 }
 
 // Cacheable is the interface items stored in Cache need to implement.
@@ -15,23 +15,23 @@ type Cacheable interface {
 }
 
 // New creates a new cache.
-func New() *Cache {
-	return &Cache{
-		hashMap: make(map[uint64]Cacheable),
+func New[V Cacheable]() *Cache[V] {
+	return &Cache[V]{
+		hashMap: make(map[uint64]V),
 	}
 }
 
 // IsEmpty checks if the cache is empty.
-func (cache *Cache) IsEmpty() bool {
+func (cache *Cache[V]) IsEmpty() bool {
 	return len(cache.hashMap) == 0
 }
 
 // DiffAndUpdateCache takes a list of new items to cache, compares them to the current
 // cache contents, and returns both items new to the cache and items that are in the cache
 // but missing in the new data.
-func (cache *Cache) DiffAndUpdateCache(current []Cacheable) (new, missing []interface{}) {
+func (cache *Cache[V]) DiffAndUpdateCache(current []V) (new, missing []V) {
 	// Create hashmap of incoming Cacheables to avoid calling Hash() on each one many times
-	currentMap := make(map[uint64]Cacheable, len(current))
+	currentMap := make(map[uint64]V, len(current))
 
 	for _, currentValue := range current {
 		currentMap[currentValue.Hash()] = currentValue

@@ -7,6 +7,7 @@ package httpjson
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -19,24 +20,28 @@ type appendConfig struct {
 	Value               *valueTpl `config:"value"`
 	Default             *valueTpl `config:"default"`
 	FailOnTemplateError bool      `config:"fail_on_template_error"`
+	DoNotLogFailure     bool      `config:"do_not_log_failure"`
 	ValueType           string    `config:"value_type"`
 }
 
 type appendt struct {
-	log                 *logp.Logger
 	targetInfo          targetInfo
 	value               *valueTpl
 	defaultValue        *valueTpl
 	failOnTemplateError bool
+	doNotLogFailure     bool
 	valueType           valueType
 
 	runFunc func(ctx *transformContext, transformable transformable, key string, val interface{}) error
+
+	status status.StatusReporter
+	log    *logp.Logger
 }
 
 func (appendt) transformName() string { return appendName }
 
-func newAppendRequest(cfg *conf.C, log *logp.Logger) (transform, error) {
-	append, err := newAppend(cfg, log)
+func newAppendRequest(cfg *conf.C, stat status.StatusReporter, log *logp.Logger) (transform, error) {
+	append, err := newAppend(cfg, stat, log)
 	if err != nil {
 		return nil, err
 	}
@@ -55,8 +60,8 @@ func newAppendRequest(cfg *conf.C, log *logp.Logger) (transform, error) {
 	return &append, nil
 }
 
-func newAppendResponse(cfg *conf.C, log *logp.Logger) (transform, error) {
-	append, err := newAppend(cfg, log)
+func newAppendResponse(cfg *conf.C, stat status.StatusReporter, log *logp.Logger) (transform, error) {
+	append, err := newAppend(cfg, stat, log)
 	if err != nil {
 		return nil, err
 	}
@@ -71,8 +76,8 @@ func newAppendResponse(cfg *conf.C, log *logp.Logger) (transform, error) {
 	return &append, nil
 }
 
-func newAppendPagination(cfg *conf.C, log *logp.Logger) (transform, error) {
-	append, err := newAppend(cfg, log)
+func newAppendPagination(cfg *conf.C, stat status.StatusReporter, log *logp.Logger) (transform, error) {
+	append, err := newAppend(cfg, stat, log)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +96,7 @@ func newAppendPagination(cfg *conf.C, log *logp.Logger) (transform, error) {
 	return &append, nil
 }
 
-func newAppend(cfg *conf.C, log *logp.Logger) (appendt, error) {
+func newAppend(cfg *conf.C, stat status.StatusReporter, log *logp.Logger) (appendt, error) {
 	c := &appendConfig{}
 	if err := cfg.Unpack(c); err != nil {
 		return appendt{}, fmt.Errorf("fail to unpack the append configuration: %w", err)
@@ -108,18 +113,23 @@ func newAppend(cfg *conf.C, log *logp.Logger) (appendt, error) {
 	}
 
 	return appendt{
+		status:              stat,
 		log:                 log,
 		targetInfo:          ti,
 		value:               c.Value,
 		defaultValue:        c.Default,
 		failOnTemplateError: c.FailOnTemplateError,
+		doNotLogFailure:     c.DoNotLogFailure,
 		valueType:           vt,
 	}, nil
 }
 
 func (append *appendt) run(ctx *transformContext, tr transformable) (transformable, error) {
-	value, err := append.value.Execute(ctx, tr, append.targetInfo.Name, append.defaultValue, append.log)
+	value, err := append.value.Execute(ctx, tr, append.targetInfo.Name, append.defaultValue, append.status, append.log)
 	if err != nil && append.failOnTemplateError {
+		if append.doNotLogFailure {
+			err = notLogged{err}
+		}
 		return transformable{}, err
 	}
 	if value == "" {

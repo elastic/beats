@@ -18,36 +18,22 @@
 package mage
 
 import (
+	_ "embed"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/dev-tools/mage"
 )
 
-const moduleDocsGlob = "module/*/_meta/docs.asciidoc"
+const moduleDocsGlob = "module/*/_meta/docs.md"
 
-var moduleNameRegex = regexp.MustCompile(`module\/(.*)\/_meta\/docs.asciidoc`)
+var moduleNameRegex = regexp.MustCompile(`module\/(.*)\/_meta\/docs.md`)
 
-var modulesListTmpl = `
-////
-This file is generated! See scripts/mage/docs.go or run 'mage docs'.
-////
-{{range $module := .Modules}}
-  * <<{beatname_lc}-module-{{$module}},{{$module | title}}>>
-{{- end}}
-
---
-
-{{range $module := .Modules}}
-include::./modules/{{$module}}.asciidoc[]
-{{- end}}
-`[1:]
+//go:embed templates/moduleList.tmpl
+var modulesListTmpl string
 
 func moduleDocs() error {
 	searchPath := filepath.Join(mage.XPackBeatDir(moduleDocsGlob))
@@ -58,12 +44,7 @@ func moduleDocs() error {
 		return err
 	}
 	if len(files) == 0 {
-		return errors.Errorf("No modules found matching %v", searchPath)
-	}
-
-	// Clean existing files.
-	if err := os.RemoveAll(mage.OSSBeatDir("docs/modules")); err != nil {
-		return err
+		return fmt.Errorf("No modules found matching %v", searchPath)
 	}
 
 	// Extract module name from path and copy the file.
@@ -71,25 +52,19 @@ func moduleDocs() error {
 	for _, f := range files {
 		matches := moduleNameRegex.FindStringSubmatch(filepath.ToSlash(f))
 		if len(matches) != 2 {
-			return errors.Errorf("module path %v does not match regexp", f)
+			return fmt.Errorf("module path %v does not match regexp", f)
 		}
 		name := matches[1]
 		names = append(names, name)
+		modulesListTmpl += fmt.Sprintf("* [%s](/reference/winlogbeat/winlogbeat-module-%s.md)\n", strings.Title(name), name)
 
 		// Copy to the docs dirs.
-		if err = mage.Copy(f, mage.CreateDir(mage.OSSBeatDir("docs/modules", name+".asciidoc"))); err != nil {
+		dest := filepath.Join(mage.DocsDir(), "reference", "winlogbeat", fmt.Sprintf("winlogbeat-module-%s.md", name))
+		if err = mage.Copy(f, mage.CreateDir(dest)); err != nil {
 			return err
 		}
 	}
 
-	// Generate and write the docs/modules_list.asciidoc file.
-	content, err := mage.Expand(modulesListTmpl, map[string]interface{}{
-		"Modules": names,
-	})
-	if err != nil {
-		return err
-	}
-
 	fmt.Printf(">> update:moduleDocs: Collecting module documentation for %v.\n", strings.Join(names, ", "))
-	return ioutil.WriteFile(mage.OSSBeatDir("docs/modules_list.asciidoc"), []byte(content), 0o644)
+	return os.WriteFile(filepath.Join(mage.DocsDir(), "reference", "winlogbeat", "winlogbeat-modules.md"), []byte(modulesListTmpl), 0o644)
 }

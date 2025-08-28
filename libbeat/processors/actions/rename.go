@@ -24,8 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -56,7 +55,7 @@ func init() {
 }
 
 // NewRenameFields returns a new rename processor.
-func NewRenameFields(c *conf.C) (beat.Processor, error) {
+func NewRenameFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := renameFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -68,7 +67,7 @@ func NewRenameFields(c *conf.C) (beat.Processor, error) {
 
 	f := &renameFields{
 		config: config,
-		logger: logp.NewLogger("rename"),
+		logger: log.Named("rename"),
 	}
 	return f, nil
 }
@@ -84,9 +83,8 @@ func (f *renameFields) Run(event *beat.Event) (*beat.Event, error) {
 		err := f.renameField(field.From, field.To, event)
 		if err != nil {
 			errMsg := fmt.Errorf("Failed to rename fields in processor: %w", err)
-			if publisher.LogWithTrace() {
-				f.logger.Debug(errMsg.Error())
-			}
+			f.logger.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
+
 			if f.config.FailOnError {
 				event = backup
 				_, _ = event.PutValue("error.message", errMsg.Error())

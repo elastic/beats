@@ -16,18 +16,18 @@
 // under the License.
 
 //go:build !windows
-// +build !windows
 
 package decode_xml_wineventlog
 
 import (
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type nonWinDecoder struct{}
 
-func newDecoder() decoder {
+func newDecoder(uint32, *logp.Logger) decoder {
 	return nonWinDecoder{}
 }
 

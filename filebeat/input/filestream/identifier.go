@@ -19,11 +19,10 @@ package filestream
 
 import (
 	"fmt"
-	"os"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common/file"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type identifierFeature uint8
@@ -36,6 +35,7 @@ const (
 	nativeName      = "native"
 	pathName        = "path"
 	inodeMarkerName = "inode_marker"
+	fingerprintName = "fingerprint"
 
 	DefaultIdentifierName = nativeName
 	identitySep           = "::"
@@ -45,9 +45,10 @@ var identifierFactories = map[string]identifierFactory{
 	nativeName:      newINodeDeviceIdentifier,
 	pathName:        newPathIdentifier,
 	inodeMarkerName: newINodeMarkerIdentifier,
+	fingerprintName: newFingerprintIdentifier,
 }
 
-type identifierFactory func(*conf.C) (fileIdentifier, error)
+type identifierFactory func(*conf.C, *logp.Logger) (fileIdentifier, error)
 
 type fileIdentifier interface {
 	GetSource(loginp.FSEvent) fileSource
@@ -58,25 +59,25 @@ type fileIdentifier interface {
 // fileSource implements the Source interface
 // It is required to identify and manage file sources.
 type fileSource struct {
-	info      os.FileInfo
+	desc      loginp.FileDescriptor
 	newPath   string
 	oldPath   string
 	truncated bool
 	archived  bool
 
-	name                string
+	fileID              string
 	identifierGenerator string
 }
 
 // Name returns the registry identifier of the file.
 func (f fileSource) Name() string {
-	return f.name
+	return f.fileID
 }
 
 // newFileIdentifier creates a new state identifier for a log input.
-func newFileIdentifier(ns *conf.Namespace, suffix string) (fileIdentifier, error) {
+func newFileIdentifier(ns *conf.Namespace, suffix string, log *logp.Logger) (fileIdentifier, error) {
 	if ns == nil {
-		i, err := newINodeDeviceIdentifier(nil)
+		i, err := newFingerprintIdentifier(nil, log)
 		if err != nil {
 			return nil, err
 		}
@@ -89,7 +90,7 @@ func newFileIdentifier(ns *conf.Namespace, suffix string) (fileIdentifier, error
 		return nil, fmt.Errorf("no such file_identity generator: %s", identifierType)
 	}
 
-	i, err := f(ns.Config())
+	i, err := f(ns.Config(), log)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +101,7 @@ type inodeDeviceIdentifier struct {
 	name string
 }
 
-func newINodeDeviceIdentifier(_ *conf.C) (fileIdentifier, error) {
+func newINodeDeviceIdentifier(_ *conf.C, _ *logp.Logger) (fileIdentifier, error) {
 	return &inodeDeviceIdentifier{
 		name: nativeName,
 	}, nil
@@ -108,12 +109,12 @@ func newINodeDeviceIdentifier(_ *conf.C) (fileIdentifier, error) {
 
 func (i *inodeDeviceIdentifier) GetSource(e loginp.FSEvent) fileSource {
 	return fileSource{
-		info:                e.Info,
+		desc:                e.Descriptor,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		name:                i.name + identitySep + file.GetOSState(e.Info).String(),
+		fileID:              i.name + identitySep + e.Descriptor.Info.GetOSState().String(),
 		identifierGenerator: i.name,
 	}
 }
@@ -135,7 +136,7 @@ type pathIdentifier struct {
 	name string
 }
 
-func newPathIdentifier(_ *conf.C) (fileIdentifier, error) {
+func newPathIdentifier(_ *conf.C, _ *logp.Logger) (fileIdentifier, error) {
 	return &pathIdentifier{
 		name: pathName,
 	}, nil
@@ -147,12 +148,12 @@ func (p *pathIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		path = e.OldPath
 	}
 	return fileSource{
-		info:                e.Info,
+		desc:                e.Descriptor,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		name:                p.name + identitySep + path,
+		fileID:              p.name + identitySep + path,
 		identifierGenerator: p.name,
 	}
 }
@@ -179,7 +180,7 @@ func withSuffix(inner fileIdentifier, suffix string) fileIdentifier {
 
 func (s *suffixIdentifier) GetSource(e loginp.FSEvent) fileSource {
 	fs := s.i.GetSource(e)
-	fs.name += "-" + s.suffix
+	fs.fileID += "-" + s.suffix
 	return fs
 }
 
@@ -190,14 +191,3 @@ func (s *suffixIdentifier) Name() string {
 func (s *suffixIdentifier) Supports(f identifierFeature) bool {
 	return s.i.Supports(f)
 }
-
-// mockIdentifier is used for testing
-type MockIdentifier struct{}
-
-func (m *MockIdentifier) GetSource(e loginp.FSEvent) fileSource {
-	return fileSource{identifierGenerator: "mock"}
-}
-
-func (m *MockIdentifier) Name() string { return "mock" }
-
-func (m *MockIdentifier) Supports(_ identifierFeature) bool { return false }

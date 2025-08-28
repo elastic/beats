@@ -16,8 +16,6 @@
 // under the License.
 
 //go:build (linux || darwin || windows) && integration
-// +build linux darwin windows
-// +build integration
 
 package add_docker_metadata
 
@@ -35,6 +33,7 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -42,7 +41,7 @@ func TestAddDockerMetadata(t *testing.T) {
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.Check(t)
 
-	client, err := docker.NewClient(defaultConfig().Host, nil, nil)
+	client, err := docker.NewClient(defaultConfig().Host, nil, nil, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	// Docker clients can affect the goroutines checker because they keep
@@ -52,7 +51,7 @@ func TestAddDockerMetadata(t *testing.T) {
 	defer client.Close()
 
 	// Start a container to have some data to enrich events
-	testClient, err := dockertest.NewClient()
+	testClient, err := dockertest.NewClient(logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	// Explicitly close client to don't affect goroutines checker
 	defer testClient.Close()

@@ -57,6 +57,9 @@ var mapping = &p.MetricsMapping{
 	},
 	Labels: map[string]p.LabelMap{
 		"node": p.KeyLabel("name"),
+
+		// from info metric "kube_node_info"
+		"kubelet_version": p.Label("kubelet.version"),
 	},
 }
 

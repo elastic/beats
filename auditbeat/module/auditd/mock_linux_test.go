@@ -29,6 +29,8 @@ import (
 
 type MockNetlinkSendReceiver struct {
 	messages []syscall.NetlinkMessage
+	sendRet  []uint32
+	errors   []error
 	done     chan struct{}
 }
 
@@ -37,13 +39,28 @@ func NewMock() *MockNetlinkSendReceiver {
 }
 
 func (n *MockNetlinkSendReceiver) returnACK() *MockNetlinkSendReceiver {
+	return n.returnReceiveAckWithSeq(0)
+}
+
+func (n *MockNetlinkSendReceiver) returnReceiveAckWithSeq(seq uint32) *MockNetlinkSendReceiver {
 	n.messages = append(n.messages, syscall.NetlinkMessage{
 		Header: syscall.NlMsghdr{
 			Type:  syscall.NLMSG_ERROR,
 			Flags: syscall.NLM_F_ACK,
+			Seq:   seq,
 		},
 		Data: make([]byte, 4), // Return code 0 (success).
 	})
+	return n
+}
+
+func (n *MockNetlinkSendReceiver) returnSendValue(ret uint32) *MockNetlinkSendReceiver {
+	n.sendRet = append(n.sendRet, ret)
+	return n
+}
+
+func (n *MockNetlinkSendReceiver) returnReceiveError(err error) *MockNetlinkSendReceiver {
+	n.errors = append(n.errors, err)
 	return n
 }
 
@@ -93,10 +110,24 @@ func (n *MockNetlinkSendReceiver) Close() error {
 }
 
 func (n *MockNetlinkSendReceiver) Send(msg syscall.NetlinkMessage) (uint32, error) {
+	if len(n.sendRet) > 0 {
+		ret := n.sendRet[0]
+		n.sendRet = n.sendRet[1:]
+		return ret, nil
+	}
+	return 0, nil
+}
+
+func (n *MockNetlinkSendReceiver) SendNoWait(msg syscall.NetlinkMessage) (uint32, error) {
 	return 0, nil
 }
 
 func (n *MockNetlinkSendReceiver) Receive(nonBlocking bool, p libaudit.NetlinkParser) ([]syscall.NetlinkMessage, error) {
+	if len(n.errors) > 0 {
+		err := n.errors[0]
+		n.errors = n.errors[1:]
+		return nil, err
+	}
 	if len(n.messages) > 0 {
 		msg := n.messages[0]
 		n.messages = n.messages[1:]

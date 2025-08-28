@@ -25,8 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -56,7 +55,7 @@ func init() {
 	jsprocessor.RegisterPlugin("URLDecode", New)
 }
 
-func New(c *config.C) (beat.Processor, error) {
+func New(c *config.C, log *logp.Logger) (beat.Processor, error) {
 	config := urlDecodeConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -68,7 +67,7 @@ func New(c *config.C) (beat.Processor, error) {
 
 	return &urlDecode{
 		config: config,
-		log:    logp.NewLogger("urldecode"),
+		log:    log.Named("urldecode"),
 	}, nil
 
 }
@@ -83,9 +82,8 @@ func (p *urlDecode) Run(event *beat.Event) (*beat.Event, error) {
 		err := p.decodeField(field.From, field.To, event)
 		if err != nil {
 			errMsg := fmt.Errorf("failed to decode fields in urldecode processor: %w", err)
-			if publisher.LogWithTrace() {
-				p.log.Debug(errMsg.Error())
-			}
+			p.log.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
+
 			if p.config.FailOnError {
 				event = backup
 				_, _ = event.PutValue("error.message", errMsg.Error())

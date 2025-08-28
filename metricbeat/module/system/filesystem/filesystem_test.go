@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || openbsd || windows
-// +build darwin freebsd linux openbsd windows
 
 package filesystem
 
@@ -27,7 +26,6 @@ import (
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
-	"github.com/elastic/elastic-agent-libs/logp"
 	fs "github.com/elastic/elastic-agent-system-metrics/metric/system/filesystem"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
@@ -35,8 +33,7 @@ import (
 func TestFetch(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
-	err := logp.DevelopmentSetup()
-	assert.NoError(t, err)
+
 	assert.Empty(t, errs)
 	if !assert.NotEmpty(t, events) {
 		t.FailNow()

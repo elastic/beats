@@ -6,9 +6,8 @@ package ec2
 
 import (
 	"context"
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -31,7 +30,8 @@ func newWatcher(
 	fetcher fetcher,
 	period time.Duration,
 	onStart func(uuid string, instanceMap *ec2Instance),
-	onStop func(uuid string)) *watcher {
+	onStop func(uuid string),
+	log *logp.Logger) *watcher {
 	return &watcher{
 		fetcher:      fetcher,
 		onStart:      onStart,
@@ -40,7 +40,7 @@ func newWatcher(
 		ticker:       time.NewTicker(period),
 		period:       period,
 		ec2Instances: map[string]uint64{},
-		logger:       logp.NewLogger("autodiscover-ec2-watcher"),
+		logger:       log.Named("autodiscover-ec2-watcher"),
 	}
 }
 
@@ -61,7 +61,7 @@ func (w *watcher) forever() {
 		case <-w.ticker.C:
 			err := w.once()
 			if err != nil {
-				logp.Error(errors.Wrap(err, "error while fetching AWS EC2s"))
+				logp.Error(fmt.Errorf("error while fetching AWS EC2s: %w", err))
 			}
 		}
 	}

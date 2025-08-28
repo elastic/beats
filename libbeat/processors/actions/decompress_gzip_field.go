@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -52,7 +51,7 @@ func init() {
 }
 
 // NewDecompressGzipFields construct a new decompress_gzip_fields processor.
-func NewDecompressGzipFields(c *conf.C) (beat.Processor, error) {
+func NewDecompressGzipFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := decompressGzipFieldConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -63,7 +62,7 @@ func NewDecompressGzipFields(c *conf.C) (beat.Processor, error) {
 		return nil, fmt.Errorf("failed to unpack the decompress_gzip_fields configuration: %w", err)
 	}
 
-	return &decompressGzipField{config: config, log: logp.NewLogger("decompress_gzip_field")}, nil
+	return &decompressGzipField{config: config, log: log.Named("decompress_gzip_field")}, nil
 }
 
 // Run applies the decompress_gzip_fields processor to an event.
@@ -76,9 +75,8 @@ func (f *decompressGzipField) Run(event *beat.Event) (*beat.Event, error) {
 	err := f.decompressGzipField(event)
 	if err != nil {
 		errMsg := fmt.Errorf("Failed to decompress field in decompress_gzip_field processor: %w", err)
-		if publisher.LogWithTrace() {
-			f.log.Debug(errMsg.Error())
-		}
+		f.log.Debugw(errMsg.Error(), logp.EventType, logp.TypeKey)
+
 		if f.config.FailOnError {
 			event = backup
 			_, _ = event.PutValue("error.message", errMsg.Error())

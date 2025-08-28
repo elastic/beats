@@ -18,11 +18,13 @@
 package monitorstate
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 )
 
@@ -42,16 +44,16 @@ func TestRecordingAndFlapping(t *testing.T) {
 	require.Nil(t, ms.Ends, "expected nil ends after a stable series")
 
 	// Since we're now in a stable state a single up check should create a new state from a stable one
-	ms.recordCheck(TestSf, StatusUp)
+	ms.recordCheck(TestSf, StatusUp, true)
 	require.Equal(t, StatusUp, ms.Status)
 	requireMSCounts(t, ms, 1, 0)
 }
 
 func TestDuration(t *testing.T) {
 	ms := newMonitorState(TestSf, StatusUp, 0, true)
-	ms.recordCheck(TestSf, StatusUp)
+	ms.recordCheck(TestSf, StatusUp, true)
 	time.Sleep(time.Millisecond * 10)
-	ms.recordCheck(TestSf, StatusUp)
+	ms.recordCheck(TestSf, StatusUp, true)
 	// Pretty forgiving upper bound to account for flaky CI
 	require.True(t, ms.DurationMs > 9 && ms.DurationMs < 900, "Expected duration to be ~10ms, got %d", ms.DurationMs)
 }
@@ -60,9 +62,9 @@ func TestDuration(t *testing.T) {
 func recordFlappingSeries(TestSf stdfields.StdMonitorFields, ms *State) {
 	for i := 0; i < FlappingThreshold; i++ {
 		if i%2 == 0 {
-			ms.recordCheck(TestSf, StatusUp)
+			ms.recordCheck(TestSf, StatusUp, true)
 		} else {
-			ms.recordCheck(TestSf, StatusDown)
+			ms.recordCheck(TestSf, StatusDown, true)
 		}
 	}
 }
@@ -70,7 +72,7 @@ func recordFlappingSeries(TestSf stdfields.StdMonitorFields, ms *State) {
 // recordStableSeries is a test helper for repeatedly recording one status
 func recordStableSeries(TestSf stdfields.StdMonitorFields, ms *State, count int, s StateStatus) {
 	for i := 0; i < count; i++ {
-		ms.recordCheck(TestSf, s)
+		ms.recordCheck(TestSf, s, true)
 	}
 }
 
@@ -93,4 +95,48 @@ func TestTransitionTo(t *testing.T) {
 	require.Equal(t, second.Down, s.Ends.Down)
 	// Ensure No infinite storage of states
 	require.Nil(t, s.Ends.Ends)
+}
+
+func TestLoaderDBKey(t *testing.T) {
+	tests := []struct {
+		name      string
+		runFromID string
+		at        time.Time
+		ctr       int
+		expected  string
+	}{
+		{
+			"simple - no rfid",
+			"",
+			time.Unix(0, 0),
+			0,
+			"default-0-0",
+		},
+		{
+			"simple - other time / count",
+			"",
+			time.Unix(12345, 0),
+			98765,
+			fmt.Sprintf("default-%x-%x", 12345000, 98765),
+		},
+		{
+			"Service location, weird chars",
+			"Asia/Pacific - Japan",
+			time.Unix(0, 0),
+			0,
+			"Asia_Pacific_-_Japan-0-0",
+		},
+	}
+
+	for _, tt := range tests {
+		sf := stdfields.StdMonitorFields{}
+		if tt.runFromID != "" {
+			sf.RunFrom = &config.LocationWithID{
+				ID: tt.runFromID,
+			}
+		}
+
+		key := LoaderDBKey(sf, tt.at, tt.ctr)
+		require.Equal(t, tt.expected, key)
+	}
 }
