@@ -16,6 +16,191 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 % ### Fixes [beats-versionext-fixes]
 
+<<<<<<< HEAD
+=======
+## 9.1.3 [beats-9.1.3-release-notes]
+
+### Features and enhancements [beats-9.1.3-features-enhancements]
+
+**Affecting all Beats**
+
+- Update Go version to 1.24.5. [45403]({{beats-pull}}45403)
+- Improve trimming of BOM from UTF-8 data in the libbeat `reader/readfile.EncoderReader`. [45742]({{beats-pull}}45742)
+
+**Filebeat**
+
+- Add mechanism to allow HTTP JSON templates to terminate without logging an error. [45664]({{beats-issue}}45664) [45810]({{beats-pull}}45810)
+- Add status reporting support for AWS S3 input. [45748]({{beats-pull}}45748)
+
+### Fixes [beats-9.1.3-fixes]
+
+**Affecting all Beats**
+
+- Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. [43118]({{beats-issue}}43118) [45733]({{beats-pull}}45733)
+
+**Filebeat**
+
+- Fix handling of unnecessary BOM in UTF-8 text received by o365audit input. [44327]({{beats-issue}}44327) [45739]({{beats-pull}}45739)
+- Fix reading journald messages with more than 4kb. [45511]({{beats-issue}}45511) [46017]({{beats-pull}}46017)
+- Restore the Streaming input on Windows. [46031]({{beats-pull}}46031)
+- Fix termination of input on API errors. [45999]({{beats-pull}}45999)
+
+**Metricbeat**
+
+- Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. [45761]({{beats-pull}}45761)
+- Enhance behavior of `sanitizeError`: replace sensitive info even if it is escaped and add pattern-based sanitization. [45857]({{beats-pull}}45857)
+
+## 9.1.2 [beats-9.1.2-release-notes]
+
+### Features and enhancements [beats-9.1.2-features-enhancements]
+
+**Filebeat**
+
+- Add status reporting support for AWS CloudWatch input. [45679]({{beats-pull}}45679)
+
+**Winlogbeat**
+
+- Render data values in XML renderer. [44132]({{beats-pull}}44132)
+
+### Fixes [beats-9.1.2-fixes]
+
+**Filebeat**
+
+- Fix error handling in ABS input when both root level `max_workers` and `batch_size` are empty. [45680]({{beats-issue}}45680) [45743]({{beats-pull}}45743)
+
+## 9.1.1 [beats-9.1.1-release-notes]
+
+### Features and enhancements [beats-9.1.1-features-enhancements]
+
+**Filebeat**
+
+- Log CEL single object evaluation results as ECS compliant documents where possible. [45254]({{beats-issue}}45254) [45399]({{beats-pull}}45399)
+- Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. [45653]({{beats-pull}}45653)
+
+### Fixes [beats-9.1.1-fixes]
+
+**Filebeat**
+
+- Fix a panic in the winlog input that prevented it from starting. [45693]({{beats-issue}}45693) [45730]({{beats-pull}}45730)
+
+**Metricbeat**
+
+- Improve error messages in AWS Health [45408]({{beats-pull}}45408)
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia [45620]({{beats-pull}}45620)
+
+## 9.1.0 [beats-9.1.0-release-notes]
+
+### Features and enhancements [beats-9.1.0-features-enhancements]
+
+**Affecting all Beats**
+
+- Added the `now` processor, which will populate the specified target field with the current timestamp. [44795]({{beats-pull}}44795)
+
+**Filebeat**
+
+- Refactor & cleanup with updates to default values and documentation. [41834]({{beats-pull}}41834)
+- Add support for SSL and Proxy configurations for websocket type in streaming input. [41934]({{beats-pull}}41934)
+- Filestream take over now supports taking over states from other Filestream inputs and dynamic loading of inputs (autodiscover and Elastic Agent). There is a new syntax for the configuration, but the previous one can still be used. [42472]({{beats-issue}}42472) [42884]({{beats-issue}}42884) [42624]({{beats-pull}}42624)
+- Refactor & cleanup with updates to default values and documentation. [41834]({{beats-pull}}41834)
+- Segregated `max_workers` from `batch_size` in the GCS input. [44311]({{beats-issue}}44311) [44333]({{beats-pull}}44333)
+- Add milliseconds to document timestamp from awscloudwatch Filebeat input [44306]({{beats-pull}}44306)
+- Added support for specifying custom content-types and encodings in azureblobstorage input. [44330]({{beats-issue}}44330) [44402]({{beats-pull}}44402)
+- Introduce lastSync start position to AWS CloudWatch input backed by state registry. [43251]({{beats-pull}}43251)
+- Add proxy support to GCP Pub/Sub input. [44892]({{beats-pull}}44892)
+- Segregated `max_workers` from `batch_size` in the azure-blob-storage input. [44491]({{beats-issue}}44491) [44992]({{beats-pull}}44992)
+- Add support for relationship expansion to EntraID entity analytics provider. [43324]({{beats-issue}}43324) [44761]({{beats-pull}}44761)
+- Update CEL mito extensions to v1.22.0. [45245]({{beats-pull}}45245)
+- Add support for generalized token authentication to CEL input. [45359]({{beats-pull}}45359)
+
+**Metricbeat**
+
+- Add new metricset wmi for the windows module. [42017]({{beats-pull}}42017)
+- Changed the Elasticsearch module behavior to only pull settings from non-system indices. [43243]({{beats-pull}}43243)
+- Exclude dotted indices from settings pull in Elasticsearch module. [43306]({{beats-pull}}43306)
+- Add a `jetstream` metricset to the NATS module [43310]({{beats-pull}}43310)
+- Update NATS module compatibility. Oldest version supported is now 2.2.6 [43310]({{beats-pull}}43310)
+- Upgrade Prometheus Library to v0.300.1. [43540]({{beats-pull}}43540)
+- Add GCP Dataproc metadata collector in GCP module. [43518]({{beats-pull}}43518)
+- Updated list of supported vSphere versions in the documentation. [43642]({{beats-pull}}43642)
+- Add SSL support for sql module: drivers mysql, postgres, and mssql. [44748]({{beats-pull}}44748)
+- Add VPN metrics to meraki module [44851]({{beats-pull}}44851)
+- Add GCP cache for metadata collectors. [44432]({{beats-pull}}44432)
+
+### Fixes [beats-9.1.0-fixes]
+
+**Auditbeat**
+
+- Fix potential data loss in add_session_metadata. [42795]({{beats-pull}}42795)
+- auditbeat/fim: Fix FIM@ebpfevents for new kernels #44371. [44371]({{beats-pull}}44371)
+
+**Filebeat**
+
+- Log bad handshake details when websocket connection fails [41300]({{beats-pull}}41300)
+- Fix aws region in aws-s3 input s3 polling mode.  [41572]({{beats-pull}}41572)
+- Fix a logging regression that ignored to_files and logged to stdout. [44573]({{beats-pull}}44573)
+- Fixed issue for "Root level readerConfig no longer respected" in azureblobstorage input. [44812]({{beats-issue}}44812) [44873]({{beats-pull}}44873)
+- Fixed password authentication for ACL users in the Redis input of Filebeat. [44137]({{beats-pull}}44137)
+- The data and logs path has changed on Windows to `$env:ProgramFiles`. See the breaking changes page for more details.
+
+**Heartbeat**
+
+- Added maintenance windows support for Heartbeat. [41508]({{beats-pull}}41508)
+
+## 9.0.6 [beats-9.0.6-release-notes]
+
+### Features and enhancements [beats-9.0.6-features-enhancements]
+
+**Affecting all Beats**
+
+- Update Go version to 1.24.5. [45403]({{beats-pull}}45403)
+
+**Filebeat**
+
+- Add mechanism to allow HTTP JSON templates to terminate without logging an error. [45664]({{beats-issue}}45664) [45810]({{beats-pull}}45810)
+
+**Winlogbeat**
+
+- Render data values in XML renderer. [44132]({{beats-pull}}44132)
+
+### Fixes [beats-9.0.6-fixes]
+
+**Filebeat**
+
+- Fix handling of unnecessary BOM in UTF-8 text received by o365audit input. [44327]({{beats-issue}}44327) [45739]({{beats-pull}}45739)
+- Fix reading journald messages with more than 4kb. [45511]({{beats-issue}}45511) [46017]({{beats-pull}}46017)
+- Restore the Streaming input on Windows. [46031]({{beats-pull}}46031)
+- Fix termination of input on API errors. [45999]({{beats-pull}}45999)
+- Fix filestream registry entries being prematurely removed, which could cause files to be re-ingested after Filebeat restarts. [46007]({{beats-issue}}46007) [46032]({{beats-pull}}46032)
+
+**Metricbeat**
+
+- Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. [45761]({{beats-pull}}45761)
+- Enhance behavior of `sanitizeError`: replace sensitive info even if it is escaped and add pattern-based sanitization. [45857]({{beats-pull}}45857)
+
+## 9.0.5 [beats-9.0.5-release-notes]
+
+### Features and enhancements [beats-9.0.5-features-enhancements]
+
+**Filebeat**
+
+- Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. [45653]({{beats-pull}}45653)
+
+**Metricbeat**
+
+- Improve error messages in AWS Health. [45408]({{beats-pull}}45408)
+
+### Fixes [beats-9.0.5-fixes]
+
+**Auditbeat**
+
+- Auditd: Request status from a separate socket to avoid data congestion. [41207]({{beats-pull}}41207)
+- Fix potential data loss in `add_session_metadata`. [42795]({{beats-pull}}42795)
+
+**Metricbeat**
+
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia. [45620]({{beats-pull}}45620)
+
+>>>>>>> 1a67f9e0a ([docs] Add 9.0.6 release notes in Markdown (#46248))
 ## 9.0.4 [beats-9.0.4-release-notes]
 
 ### Features and enhancements [beats-9.0.4-features-enhancements]
