@@ -36,7 +36,7 @@ const (
 	// startPositionEarliest lets the processor start from the earliest
 	// available event from the event hub retention period.
 	startPositionEarliest = "earliest"
-	// startPositionEarliest lets the processor start from the latest
+	// startPositionLatest lets the processor start from the latest
 	// available event from the event hub retention period.
 	startPositionLatest = "latest"
 	// processorRestartBackoff is the initial backoff time before
@@ -45,21 +45,30 @@ const (
 	// processorRestartMaxBackoff is the maximum backoff time before
 	// restarting the processor.
 	processorRestartMaxBackoff = 120 * time.Second
+	// partitionInitFailureThreshold is the number of consecutive initialization
+	// failures for a single partition (along with the failure window)
+	// before we consider it a persistent problem.
+	partitionInitFailureThreshold = 3
+	// partitionMinFailureWindow is the minimum time window in which consecutive
+	// initialization failures (along with the failure threshold)
+	// for a single partition are considered a persistent problem.
+	partitionMinFailureWindow = 30 * time.Second
 )
 
 // azureInputConfig the Azure Event Hub input v2,
 // that uses the modern Azure Event Hub SDK for Go.
 type eventHubInputV2 struct {
-	config             azureInputConfig
-	log                *logp.Logger
-	metrics            *inputMetrics
-	checkpointStore    *checkpoints.BlobStore
-	consumerClient     *azeventhubs.ConsumerClient
-	pipeline           beat.Pipeline
-	messageDecoder     messageDecoder
-	migrationAssistant *migrationAssistant
-	setupFn            func(ctx context.Context) error
-	status             status.StatusReporter
+	config                  azureInputConfig
+	log                     *logp.Logger
+	metrics                 *inputMetrics
+	checkpointStore         *checkpoints.BlobStore
+	consumerClient          *azeventhubs.ConsumerClient
+	pipeline                beat.Pipeline
+	messageDecoder          messageDecoder
+	migrationAssistant      *migrationAssistant
+	setupFn                 func(ctx context.Context) error
+	status                  status.StatusReporter
+	partitionFailureTracker *partitionFailureTracker
 }
 
 // newEventHubInputV2 creates a new instance of the Azure Event Hub input v2,
@@ -90,6 +99,7 @@ func (in *eventHubInputV2) Run(
 
 	// Setting up the status reporter helper
 	in.status = statusreporterhelper.New(inputContext.StatusReporter, in.log, "Azure Event Hub")
+	in.partitionFailureTracker = newPartitionFailureTracker(partitionMinFailureWindow, partitionInitFailureThreshold)
 
 	// When the input is initializing before attempting to connect to Azure Event Hub.
 	in.status.UpdateStatus(status.Starting, "Input starting")
@@ -293,7 +303,7 @@ func (in *eventHubInputV2) run(ctx context.Context) error {
 			if strings.Contains(err.Error(), "status code 401") {
 				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Authentication error: %s", err.Error()))
 			} else if strings.Contains(err.Error(), "no such host") {
-				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Event Hub not found: %s", err.Error()))
+				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Event Hub not found, although cause could be network partition: %s", err.Error()))
 			} else {
 				// Update input status to degraded with a more generic issue
 				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Processor error: %s", err))
@@ -467,9 +477,21 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 	// 1/3 [BEGIN] Initialize any partition specific resources for your application.
 	pipelineClient, err := initializePartitionResources(ctx, partitionClient, in.pipeline, in.log)
 	if err != nil {
-		in.status.UpdateStatus(status.Degraded,
-			fmt.Sprintf("Error initializing partition resources: %s", err.Error()))
+		if shouldReport, count := in.partitionFailureTracker.TrackFailure(partitionID); shouldReport {
+			// TODO: check if this handles network faults
+			in.status.UpdateStatus(status.Degraded,
+				fmt.Sprintf("Partition %s has encountered %d consecutive failures. Current failure: %s",
+					partitionID, count, err.Error()))
+		}
 		return err
+	}
+	in.partitionFailureTracker.TrackSuccess(partitionID)
+
+	if !in.partitionFailureTracker.HasFailingPartitions() {
+		// we have received events with no error.
+		// Report Running in case we are
+		// currently transitioning from degraded back to healthy
+		in.status.UpdateStatus(status.Running, "Input is running")
 	}
 
 	defer func() {
@@ -500,17 +522,7 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 
 				return nil
 			}
-
-			in.status.UpdateStatus(status.Degraded,
-				fmt.Sprintf(
-					"Possible network fault: "+
-						"Receive events error for partition %s: %s",
-					partitionID, err.Error()))
 			return err
-		} else {
-			// no error, report Running in case we are
-			// currently transitioning from degraded back to healthy
-			in.status.UpdateStatus(status.Running, "Input is running")
 		}
 
 		if len(events) == 0 {
