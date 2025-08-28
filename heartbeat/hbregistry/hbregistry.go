@@ -20,10 +20,10 @@ package hbregistry
 import "github.com/elastic/elastic-agent-libs/monitoring"
 
 // StatsRegistry contains a singleton instance of the heartbeat stats registry
-var StatsRegistry = monitoring.Default.NewRegistry("heartbeat")
+var StatsRegistry = monitoring.Default.GetOrCreateRegistry("heartbeat")
 
 // SchedulerRegistry holds scheduler stats
-var SchedulerRegistry = StatsRegistry.NewRegistry("scheduler")
+var SchedulerRegistry = StatsRegistry.GetOrCreateRegistry("scheduler")
 
 // TelemetryRegistry contains a singleton instance of the heartbeat telemetry registry
-var TelemetryRegistry = monitoring.GetNamespace("state").GetRegistry().NewRegistry("heartbeat")
+var TelemetryRegistry = monitoring.GetNamespace("state").GetRegistry().GetOrCreateRegistry("heartbeat")

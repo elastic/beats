@@ -25,7 +25,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -59,7 +58,7 @@ func makeAsyncTestClient(conn *transport.Client) testClientDriver {
 	if err != nil {
 		panic(err)
 	}
-	client, err := newAsyncClient(beat.Info{Logger: logger}, conn, outputs.NewNilObserver(), &config)
+	client, err := newAsyncClient(logger, "beat_version", conn, outputs.NewNilObserver(), &config)
 	if err != nil {
 		panic(err)
 	}

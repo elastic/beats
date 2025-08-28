@@ -88,7 +88,7 @@ func TestConfig(t *testing.T) {
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			cfg, err := readConfig(test.config, info)
+			cfg, err := readConfig(test.config, info.IndexPrefix)
 			if test.err {
 				assert.Error(t, err)
 				assert.Nil(t, cfg)

@@ -14,6 +14,7 @@ import (
 	"github.com/godror/godror"
 	"github.com/godror/godror/dsn"
 
+	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -31,7 +32,10 @@ type ConnectionDetails struct {
 const mysqlTLSConfigKey = "custom"
 
 // ParseDSN tries to parse the host
-func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
+func ParseDSN(mod mb.Module, host string) (_ mb.HostData, fetchErr error) {
+	defer func() {
+		fetchErr = sql.SanitizeError(fetchErr, host)
+	}()
 
 	logger := logp.NewLogger("")
 	// At the time of writing, mod always is of type *mb.BaseModule.
@@ -139,7 +143,7 @@ func postgresParseDSN(config ConnectionDetails, host string, logger *logp.Logger
 	if config.TLS.IsEnabled() {
 		u, err := url.Parse(host)
 		if err != nil {
-			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", sanitizeError(err, host))
+			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", err)
 		}
 
 		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, logger)
@@ -210,7 +214,7 @@ func mssqlParseDSN(config ConnectionDetails, host string, logger *logp.Logger) (
 	if config.TLS.IsEnabled() {
 		u, err := url.Parse(host)
 		if err != nil {
-			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", sanitizeError(err, host))
+			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", err)
 		}
 
 		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, logger)

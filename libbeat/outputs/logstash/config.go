@@ -21,7 +21,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -69,7 +68,7 @@ func DefaultConfig() Config {
 	}
 }
 
-func readConfig(cfg *config.C, info beat.Info) (*Config, error) {
+func readConfig(cfg *config.C, indexPrefix string) (*Config, error) {
 	c := DefaultConfig()
 
 	err := cfgwarn.CheckRemoved6xSettings(cfg, "port")
@@ -82,7 +81,7 @@ func readConfig(cfg *config.C, info beat.Info) (*Config, error) {
 	}
 
 	if c.Index == "" {
-		c.Index = strings.ToLower(info.IndexPrefix)
+		c.Index = strings.ToLower(indexPrefix)
 	}
 
 	return &c, nil
