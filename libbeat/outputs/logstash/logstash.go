@@ -97,9 +97,5 @@ func MakeLogstashClients(
 		clients[i] = client
 	}
 
-<<<<<<< HEAD
-	return outputs.SuccessNet(lsConfig.Queue, lsConfig.LoadBalance, lsConfig.BulkMaxSize, lsConfig.MaxRetries, nil, clients)
-=======
-	return outputs.SuccessNet(config.Queue, config.LoadBalance, config.BulkMaxSize, config.MaxRetries, nil, logger, clients)
->>>>>>> aed42964b (Export the Logstash client to enable reuse across packages. (#46040))
+	return outputs.SuccessNet(config.Queue, config.LoadBalance, config.BulkMaxSize, config.MaxRetries, nil, clients)
 }
