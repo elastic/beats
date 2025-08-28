@@ -31,8 +31,10 @@ import (
 type oktaTokenSource struct {
 	ctx     context.Context
 	conf    *oauth2.Config
-	token   *oauth2.Token
 	oktaJWK []byte
+
+	mu    sync.Mutex
+	token *oauth2.Token
 }
 
 // clientSecretTokenSource is a custom implementation of the oauth2.TokenSource interface
@@ -175,6 +177,9 @@ func (cs *clientSecretTokenSource) Token() (*oauth2.Token, error) {
 // custom token refresh logic. The parent context is passed via the
 // customTokenSource struct since we cannot modify the function signature here.
 func (ts *oktaTokenSource) Token() (*oauth2.Token, error) {
+	ts.mu.Lock()
+	defer ts.mu.Unlock()
+
 	oktaJWT, err := generateOktaJWT(ts.oktaJWK, ts.conf)
 	if err != nil {
 		return nil, fmt.Errorf("error generating Okta JWT: %w", err)
