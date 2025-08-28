@@ -52,7 +52,7 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 			},
 		})
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
-		factory := RunnerFactory(log, beat.Info{}, monitoring.NewRegistry(), loader.Loader)
+		factory := RunnerFactory(log, beat.Info{}, monitoring.NewRegistry(), monitoring.NewRegistry(), loader.Loader)
 
 		// run
 		err := factory.CheckConfig(conf.NewConfig())
@@ -95,11 +95,7 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 			},
 		})
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
-		factory := RunnerFactory(
-			log,
-			beat.Info{Logger: log},
-			monitoring.NewRegistry(),
-			loader.Loader)
+		factory := RunnerFactory(log, beat.Info{Logger: log}, monitoring.NewRegistry(), monitoring.NewRegistry(), loader.Loader)
 
 		inputID := "filestream-kubernetes-pod-aee2af1c6365ecdd72416f44aab49cd8bdc7522ab008c39784b7fd9d46f794a4"
 		inputCfg := fmt.Sprintf(`
@@ -139,11 +135,7 @@ type: test
 		log := logptest.NewTestingLogger(t, "")
 		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(nil))
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "")
-		factory := RunnerFactory(
-			log,
-			beat.Info{Logger: log},
-			monitoring.NewRegistry(),
-			loader.Loader)
+		factory := RunnerFactory(log, beat.Info{Logger: log}, monitoring.NewRegistry(), monitoring.NewRegistry(), loader.Loader)
 
 		// run
 		err := factory.CheckConfig(conf.MustNewConfigFrom(map[string]interface{}{
@@ -167,11 +159,7 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 			},
 		}))
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
-		factory := RunnerFactory(
-			log,
-			beat.Info{Logger: log},
-			monitoring.NewRegistry(),
-			loader.Loader)
+		factory := RunnerFactory(log, beat.Info{Logger: log}, monitoring.NewRegistry(), monitoring.NewRegistry(), loader.Loader)
 
 		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
 			"type": "test",
@@ -189,7 +177,7 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 		log := logptest.NewTestingLogger(t, "")
 		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(nil))
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "")
-		factory := RunnerFactory(log, beat.Info{}, monitoring.NewRegistry(), loader.Loader)
+		factory := RunnerFactory(log, beat.Info{}, monitoring.NewRegistry(), monitoring.NewRegistry(), loader.Loader)
 
 		// run
 		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
