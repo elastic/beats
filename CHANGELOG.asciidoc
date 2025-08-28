@@ -39,7 +39,7 @@ https://github.com/elastic/beats/compare/v9.1.2\...v9.1.3[View commits]
 
 *Affecting all Beats*
 
-- Update to Go 1.24.5. {pull}45403[45403]
+- Update Go version to 1.24.5. {pull}45403[45403]
 - Improve trimming of BOM from UTF-8 data in the libbeat reader/readfile.EncoderReader. {pull}45742[45742]
 
 
