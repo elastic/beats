@@ -42,7 +42,7 @@ Use internal collectors to send {{beats}} monitoring data directly to your monit
       enabled: true
       cluster_uuid: PRODUCTION_ES_CLUSTER_UUID <1>
       elasticsearch:
-        hosts: ["https://example.com:9200", "https://example.org:9200"] <2>
+        hosts: ["<HOST_URL_1>:<PORT_1>", "<HOST_URL_2>:<PORT_2>"] <2>
         api_key:  id:api_key <3>
         username: beats_system
         password: somepassword
@@ -60,7 +60,7 @@ Use internal collectors to send {{beats}} monitoring data directly to your monit
       enabled: true
       cluster_uuid: PRODUCTION_ES_CLUSTER_UUID
       elasticsearch:
-        hosts: ["https://example.com:9200", "https://example.org:9200"]
+        hosts: ["<HOST_URL_1>:<PORT_1>", "<HOST_URL_2>:<PORT_2>"]
         username: ""
         ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
         ssl.certificate: "/etc/pki/client/cert.pem"

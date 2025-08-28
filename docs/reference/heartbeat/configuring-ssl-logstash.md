@@ -26,7 +26,7 @@ To use SSL mutual authentication:
 
         ```yaml
         output.logstash:
-          hosts: ["logs.example.com:5044"]
+          hosts: ["<HOST_URL>:<PORT>"]
           ssl.certificate_authorities: ["/etc/ca.crt"]
           ssl.certificate: "/etc/client.crt"
           ssl.key: "/etc/client.key"
@@ -65,10 +65,10 @@ To use SSL mutual authentication:
 Before running Heartbeat, you should validate the Logstash server’s certificate. You can use `curl` to validate the certificate even though the protocol used to communicate with Logstash is not based on HTTP. For example:
 
 ```shell
-curl -v --cacert ca.crt https://logs.example.com:5044
+curl -v --cacert ca.crt <HOST_URL>:<PORT>
 ```
 
-If the test is successful, you’ll receive an empty response error:
+If the test is successful, you’ll receive an empty response error. Here's an example response assuming the `HOST_URL` was `logs.example.com` and `PORT` was `5044`:
 
 ```shell
 * Rebuilt URL to: https://logs.example.com:5044/
@@ -76,7 +76,7 @@ If the test is successful, you’ll receive an empty response error:
 * Connected to logs.example.com (192.168.99.100) port 5044 (#0)
 * TLS 1.2 connection using TLS_DHE_RSA_WITH_AES_256_CBC_SHA
 * Server certificate: logs.example.com
-* Server certificate: example.com
+* Server certificate:.example.com
 > GET / HTTP/1.1
 > Host: logs.example.com:5044
 > User-Agent: curl/7.43.0

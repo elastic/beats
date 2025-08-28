@@ -199,7 +199,7 @@ filebeat.inputs:
   auth:
     client_id: a23fcea2643868ef1a41565a1a8a1c7c
     client_secret: c3VwZXJzZWNyZXRfY2xpZW50X3NlY3JldF9zaGhoaGgK
-    token_url: https://api.example.com/oauth2/token
+    token_url: <YOUR_TOKEN_URL>
     scopes: ["read", "write"]
     endpoint_params:
       param1: value1
