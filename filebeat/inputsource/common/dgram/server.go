@@ -85,7 +85,7 @@ func (l *Listener) Run(ctx context.Context) error {
 func (l *Listener) doRun(ctx context.Context) error {
 	conn, err := l.listener()
 	if err != nil {
-		l.log.Debugw("Cannot connect", "error", err)
+		l.log.Errorw("Cannot connect", "error", err)
 		return err
 	}
 
