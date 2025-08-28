@@ -394,6 +394,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add latency config option to Azure Monitor module. {pull}44366[44366]
 - Increase default polling period for MongoDB module from 10s to 60s {pull}44781[44781]
 - Upgrade github.com/microsoft/go-mssqldb from v1.7.2 to v1.8.2 {pull}44990[44990]
+- Add SSL support for sql module: drivers mysql, postgres, and mssql. {pull}44748[44748]
+- Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
+- Add NTP response validation for system/ntp module. {pull}46184[46184]
 
 *Metricbeat*
 
