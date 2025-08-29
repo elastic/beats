@@ -22,7 +22,6 @@ import (
 	"strings"
 	"sync/atomic"
 	"testing"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -31,12 +30,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componentstatus"
-	"go.opentelemetry.io/collector/consumer"
-	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/pipeline"
 	"go.opentelemetry.io/collector/receiver"
 	"go.opentelemetry.io/collector/receiver/receivertest"
-	"go.uber.org/goleak"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
@@ -524,76 +520,4 @@ func TestConsumeContract(t *testing.T) {
 		Generator:     gen,
 		GenerateCount: logsPerTest,
 	})
-}
-
-func TestLeak(t *testing.T) {
-	t.Skip("skipping because other tests don't consume the logs and leave go routines")
-	// goroutine comes from init in cloud.google.com/go/pubsub and filebeat/input/gcppubsub
-	defer goleak.VerifyNone(t, goleak.IgnoreTopFunction("go.opencensus.io/stats/view.(*worker).start"))
-
-	monitorSocket := genSocketPath()
-	var monitorHost string
-	if runtime.GOOS == "windows" {
-		monitorHost = "npipe:///" + filepath.Base(monitorSocket)
-	} else {
-		monitorHost = "unix://" + monitorSocket
-	}
-	config := Config{
-		Beatconfig: map[string]any{
-			"filebeat": map[string]any{
-				"inputs": []map[string]any{
-					{
-						"type":    "benchmark",
-						"enabled": true,
-						"message": "test",
-						"count":   1,
-					},
-					{
-						"type":    "filestream",
-						"enabled": true,
-						"id":      "must-be-unique",
-						"paths":   []string{"none"},
-					},
-				},
-			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
-			"logging": map[string]any{
-				"level": "debug",
-				"selectors": []string{
-					"*",
-				},
-			},
-			"path.home":               t.TempDir(),
-			"http.enabled":            true,
-			"http.host":               monitorHost,
-			"queue.mem.flush.timeout": "0s",
-		},
-	}
-
-	factory := NewFactory()
-	var receiverSettings receiver.Settings
-	receiverSettings.Logger = zap.NewNop()
-	receiverSettings.ID = component.NewIDWithName(factory.Type(), "r1")
-
-	var consumeLogs DummyConsumer
-	rec, err := factory.CreateLogs(t.Context(), receiverSettings, &config, &consumeLogs)
-	require.NoError(t, err)
-	require.NoError(t, rec.Start(t.Context(), nil))
-	time.Sleep(3 * time.Second)
-	require.NoError(t, rec.Shutdown(t.Context()))
-	time.Sleep(3 * time.Second)
-}
-
-type DummyConsumer struct {
-	context.Context
-}
-
-func (d *DummyConsumer) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
-	return nil
-}
-
-func (d *DummyConsumer) Capabilities() consumer.Capabilities {
-	return consumer.Capabilities{}
 }

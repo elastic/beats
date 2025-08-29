@@ -82,13 +82,17 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		groupReporter := status.NewGroupStatusReporter(host)
 		w.WithOtelFactoryWrapper(status.StatusReporterFactory(groupReporter))
 	}
+	defer func() {
+		br.beat.Instrumentation.Tracer().Close()
+		proc := br.beat.GetProcessors()
+		if err := proc.Close(); err != nil {
+			br.beat.Info.Logger.Warnf("failed to close global processing: %s", err)
+		}
+	}()
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
 		return fmt.Errorf("beat receiver run error: %w", err)
 	}
-	proc := br.beat.GetProcessors()
-	if err := proc.Close(); err != nil {
-		return fmt.Errorf("failed to close global processing: %w", err)
-	}
+
 	return nil
 }
 
