@@ -97,7 +97,7 @@ func NewFromConfig(c Config, reg *monitoring.Registry) (beat.Processor, error) {
 		sessionPool: pool,
 		sourceProg:  prog,
 		sourceFile:  sourceFile,
-		stats:       getStats(c.Tag, reg, logger),
+		stats:       getStats(c.Tag, reg, logp.NewLogger("")),
 	}, nil
 }
 
