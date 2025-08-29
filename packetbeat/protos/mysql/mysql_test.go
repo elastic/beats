@@ -681,3 +681,49 @@ func Test_PreparedStatement(t *testing.T) {
 	send(tcp.TCPDirectionReverse, "01000001011e0000020364656600000008636f6c5f305f305f000c3f001500000008810000000005000003fe000001200a00000400000b0000000000000005000005fe00000120")
 	assert.Len(t, results.events, 2)
 }
+
+func FuzzMysqlMessageParser(f *testing.F) {
+	data1 := []byte("6f00000003494e5345525420494e544f20706f737" +
+		"42028757365726e616d652c207469746c652c2062" +
+		"6f64792c207075625f64617465292056414c55455" +
+		"3202827416e6f6e796d6f7573272c202774657374" +
+		"272c202774657374272c2027323031332d30372d3" +
+		"2322031383a34343a31372729")
+	message1, err := hex.DecodeString(string(data1))
+	if err == nil {
+		f.Add(message1)
+	}
+
+	data2 := []byte("2e000001ff7a042334325330325461626c6520276d696e69747769742e706f737373742720646f65736e2774206578697374")
+	message2, err := hex.DecodeString(string(data2))
+	if err == nil {
+		f.Add(message2)
+	}
+
+	f.Fuzz(func(t *testing.T, message []byte) {
+		stream1 := &mysqlStream{data: message, message: new(mysqlMessage), isClient: true}
+		mysqlMessageParser(stream1)
+
+		stream2 := &mysqlStream{data: message, message: new(mysqlMessage)}
+		mysqlMessageParser(stream2)
+	})
+}
+
+func FuzzParseMysqlResponse(f *testing.F) {
+	data1 := []byte{0x05, 0x00, 0x00, 0x01, 0x01, 0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00}
+
+	data2 := []byte{
+		0x15, 0x00, 0x00, 0x01, 0x01,
+		0x0b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0xfe, 0x00, 0x01,
+		0x01, 0x00, 0x00, 0x00, 0xfe,
+	}
+
+	f.Add(data1)
+	f.Add(data2)
+
+	mysql := mysqlModForTests(nil)
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		mysql.parseMysqlResponse(data)
+	})
+}
