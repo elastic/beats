@@ -7,17 +7,14 @@
 package integration
 
 import (
-	"bufio"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io"
-	"math"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -81,7 +78,7 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	filebeat := NewFilebeat(t)
 
 	logFilePath := filepath.Join(filebeat.TempDir(), "flog.log")
-	generateLogFile(t, logFilePath)
+	integration.WriteAppendingLogFile(t, logFilePath)
 	var units = [][]*proto.UnitExpected{
 		{
 			{
@@ -347,7 +344,7 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 	// input to start which creates a more realistic test case and
 	// can help uncover other issues in the startup/shutdown process.
 	logFilePath := filepath.Join(filebeat.TempDir(), "flog.log")
-	generateLogFile(t, logFilePath)
+	integration.WriteAppendingLogFile(t, logFilePath)
 
 	logLevel := proto.UnitLogLevel_INFO
 	filestreamInputHealthy := proto.UnitExpected{
@@ -518,9 +515,8 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 	filebeat := NewFilebeat(t)
 
 	logFilePath := filepath.Join(filebeat.TempDir(), "logs-to-ingest.log")
-	generateLogFile(t, logFilePath)
+	integration.WriteAppendingLogFile(t, logFilePath)
 
-	eventsDir := filepath.Join(filebeat.TempDir(), "ingested-events")
 	logLevel := proto.UnitLogLevel_INFO
 	units := []*proto.UnitExpected{
 		{
@@ -535,9 +531,9 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 				Name: "events-to-file",
 				Source: integration.RequireNewStruct(t,
 					map[string]any{
-						"name": "events-to-file",
-						"type": "file",
-						"path": eventsDir,
+						"filename": "output",
+						"type":     "file",
+						"path":     filebeat.TempDir(),
 					}),
 			},
 		},
@@ -633,71 +629,19 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 		}
 	}()
 
-	msg := strings.Builder{}
-	require.Eventuallyf(t, func() bool {
-		msg.Reset()
-
-		_, err = os.Stat(eventsDir)
-		if err != nil {
-			fmt.Fprintf(&msg, "could not verify output directory exists: %v",
-				err)
-			return false
-		}
-
-		entries, err := os.ReadDir(eventsDir)
-		if err != nil {
-			fmt.Fprintf(&msg, "failed checking output directory for files: %v",
-				err)
-			return false
-		}
-
-		if len(entries) == 0 {
-			fmt.Fprintf(&msg, "no file found on %s", eventsDir)
-			return false
-		}
-
-		for _, e := range entries {
-			if e.IsDir() {
-				continue
-			}
-
-			i, err := e.Info()
-			if err != nil {
-				fmt.Fprintf(&msg, "could not read info of %q", e.Name())
-				return false
-			}
-			if i.Size() == 0 {
-				fmt.Fprintf(&msg, "file %q was created, but it's still empty",
-					e.Name())
-				return false
-			}
-
-			// read one line to make sure it isn't a 1/2 written JSON
-			eventsFile := filepath.Join(eventsDir, e.Name())
-			f, err := os.Open(eventsFile)
-			if err != nil {
-				fmt.Fprintf(&msg, "could not open file %q", eventsFile)
-				return false
-			}
-
-			scanner := bufio.NewScanner(f)
-			if scanner.Scan() {
-				var ev Event
-				err := json.Unmarshal(scanner.Bytes(), &ev)
-				if err != nil {
-					fmt.Fprintf(&msg, "failed to read event from file: %v", err)
-					return false
-				}
-				return true
-			}
-		}
-
-		return true
-	}, 30*time.Second, time.Second, "no event was produced: %s", &msg)
-
 	assert.Equal(t, version.Commit(), observed.VersionInfo.BuildHash)
 
-	evs := getEventsFromFileOutput[Event](t, eventsDir, 100)
+	evs := []Event{}
+	require.Eventually(
+		t,
+		func() bool {
+			evs = integration.GetEventsFromFileOutput[Event](filebeat, 100, true)
+			return len(evs) >= 1
+		},
+		60*time.Second,
+		100*time.Millisecond,
+		"did not find any event in the output file")
+
 	for _, got := range evs {
 		assert.Equal(t, wantVersion, got.Metadata.Version)
 
@@ -708,86 +652,6 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 		assert.Equal(t, wantAgentInfo.Id, got.Agent.Id)
 		assert.Equal(t, wantVersion, got.Agent.Version)
 	}
-}
-
-// generateLogFile generates a log file by appending the current
-// time to it every second.
-func generateLogFile(t *testing.T, fullPath string) {
-	t.Helper()
-	f, err := os.Create(fullPath)
-	if err != nil {
-		t.Fatalf("could not create file '%s: %s", fullPath, err)
-	}
-
-	go func() {
-		t.Helper()
-		ticker := time.NewTicker(time.Second)
-		t.Cleanup(ticker.Stop)
-
-		done := make(chan struct{})
-		t.Cleanup(func() { close(done) })
-
-		defer func() {
-			if err := f.Close(); err != nil {
-				t.Errorf("could not close log file '%s': %s", fullPath, err)
-			}
-		}()
-
-		for {
-			select {
-			case <-done:
-				return
-			case now := <-ticker.C:
-				_, err := fmt.Fprintln(f, now.Format(time.RFC3339))
-				if err != nil {
-					// The Go compiler does not allow me to call t.Fatalf from a non-test
-					// goroutine, so just log it instead
-					t.Errorf("could not write data to log file '%s': %s", fullPath, err)
-					return
-				}
-				// make sure log lines are synced as quickly as possible
-				if err := f.Sync(); err != nil {
-					t.Errorf("could not sync file '%s': %s", fullPath, err)
-				}
-			}
-		}
-	}()
-}
-
-// getEventsFromFileOutput reads all events from all the files on dir. If n > 0,
-// then it reads up to n events. It considers all files are ndjson, and it skips
-// any directory within dir.
-func getEventsFromFileOutput[E any](t *testing.T, dir string, n int) []E {
-	t.Helper()
-
-	if n < 1 {
-		n = math.MaxInt
-	}
-
-	var events []E
-	entries, err := os.ReadDir(dir)
-	require.NoError(t, err, "could not read events directory")
-	for _, e := range entries {
-		if e.IsDir() {
-			continue
-		}
-		f, err := os.Open(filepath.Join(dir, e.Name()))
-		require.NoErrorf(t, err, "could not open file %q", e.Name())
-
-		scanner := bufio.NewScanner(f)
-		for scanner.Scan() {
-			var ev E
-			err := json.Unmarshal(scanner.Bytes(), &ev)
-			require.NoError(t, err, "failed to read event")
-			events = append(events, ev)
-
-			if len(events) >= n {
-				return events
-			}
-		}
-	}
-
-	return events
 }
 
 func writeStartUpInfo(t *testing.T, w io.Writer, info *proto.StartUpInfo) {
