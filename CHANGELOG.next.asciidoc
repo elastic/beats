@@ -152,6 +152,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Restore the Streaming input on Windows. {pull}46031[46031]
 - Fix termination of input on API errors. {pull}45999[45999]
 - Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
+- Fixed hints autodiscover for Docker when the configuration is only `hints.enabled: true`. {issue}45156[45156] {pull}45864[45864]
 
 *Heartbeat*
 
