@@ -227,7 +227,7 @@ func getProperty(instance *wmi.WmiInstance, propertyName string, logger *logp.Lo
 	sWbemObjectExAsIDispatch := rawResult.ToIDispatch()
 	defer func() {
 		if cerr := rawResult.Clear(); cerr != nil {
-			logger.Debugf("failed to release connection: %w", err)
+			logger.Debugf("failed to release connection: %v", err)
 		}
 	}()
 

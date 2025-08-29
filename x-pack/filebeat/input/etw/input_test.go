@@ -19,6 +19,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -93,7 +94,7 @@ func Test_RunEtwInput_NewSessionError(t *testing.T) {
 		},
 		operator: mockOperator,
 		metrics: newInputMetrics(
-			"test", inputCtx.MetricsRegistry),
+			"test", inputCtx.MetricsRegistry, logptest.NewTestingLogger(t, "")),
 	}
 
 	// Run test
