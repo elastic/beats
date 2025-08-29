@@ -12,12 +12,25 @@ import (
 	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/exporter/exporterhelper"
 	"go.opentelemetry.io/collector/pdata/plog"
+
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/logstash"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
 	Name              = "logstash"
 	LogStabilityLevel = component.StabilityLevelDevelopment
 )
+
+type logstashOutputConfig struct {
+	outputs.HostWorkerCfg `config:",inline"`
+	logstash.Config       `config:",inline"`
+}
+
+type logstashExporter struct {
+	config *logstashOutputConfig
+}
 
 func NewFactory() exporter.Factory {
 	return exporter.NewFactory(
@@ -34,17 +47,32 @@ func createDefaultConfig() component.Config {
 func createLogsExporter(
 	ctx context.Context,
 	settings exporter.Settings,
-	config component.Config,
+	cfg component.Config,
 ) (exporter.Logs, error) {
+	parsedCfg, err := config.NewConfigFrom(&cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	lsOutputCfg := logstashOutputConfig{}
+	err = parsedCfg.Unpack(&lsOutputCfg)
+	if err != nil {
+		return nil, err
+	}
+
+	exp := logstashExporter{
+		config: &lsOutputCfg,
+	}
+
 	return exporterhelper.NewLogs(
 		ctx,
 		settings,
-		config,
-		pushLogData,
+		cfg,
+		exp.pushLogData,
 		exporterhelper.WithCapabilities(consumer.Capabilities{MutatesData: false}),
 	)
 }
 
-func pushLogData(context.Context, plog.Logs) error {
+func (l *logstashExporter) pushLogData(context.Context, plog.Logs) error {
 	return nil
 }
