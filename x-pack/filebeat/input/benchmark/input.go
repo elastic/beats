@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
@@ -61,7 +62,11 @@ func (bi *benchmarkInput) Test(ctx v2.TestContext) error {
 // Run starts the data generation.
 func (bi *benchmarkInput) Run(ctx v2.Context, publisher stateless.Publisher) error {
 	var wg sync.WaitGroup
+<<<<<<< HEAD
 	metrics := newInputMetrics(ctx)
+=======
+	metrics := newInputMetrics(ctx.MetricsRegistry, ctx.Logger)
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	switch bi.cfg.Status {
 	case "degraded":
@@ -167,6 +172,7 @@ type inputMetrics struct {
 }
 
 // newInputMetrics returns an input metric for the benchmark processor.
+<<<<<<< HEAD
 func newInputMetrics(ctx v2.Context) *inputMetrics {
 	var globalRegistry *monitoring.Registry
 	// When running under Elastic-Agent Namespace can be nil.
@@ -175,13 +181,16 @@ func newInputMetrics(ctx v2.Context) *inputMetrics {
 		globalRegistry = ctx.Agent.Monitoring.Namespace.GetRegistry()
 	}
 	reg, unreg := inputmon.NewInputRegistry(inputName, ctx.ID, globalRegistry)
+=======
+func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	out := &inputMetrics{
 		unregister:      unreg,
 		eventsPublished: monitoring.NewUint(reg, "events_published_total"),
 		publishingTime:  metrics.NewUniformSample(1024),
 	}
 
-	_ = adapter.NewGoMetrics(reg, "publishing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "publishing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.publishingTime))
 
 	return out

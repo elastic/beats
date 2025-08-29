@@ -59,7 +59,11 @@ func NewFalconHoseFollower(ctx context.Context, id string, cfg config, cursor ma
 			pub:     pub,
 			log:     log,
 			redact:  cfg.Redact,
+<<<<<<< HEAD
 			metrics: newInputMetrics(id, nil),
+=======
+			metrics: newInputMetrics(env.MetricsRegistry, log),
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 		},
 		creds: &clientcredentials.Config{
 			ClientID:       cfg.Auth.OAuth2.ClientID,

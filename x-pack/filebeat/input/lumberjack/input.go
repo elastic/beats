@@ -76,8 +76,12 @@ func (i *lumberjackInput) Run(inputCtx inputv2.Context, pipeline beat.Pipeline) 
 
 	setGoLumberLogger(inputCtx.Logger.Named("go-lumber"))
 
+<<<<<<< HEAD
 	metrics := newInputMetrics(inputCtx.ID, nil)
 	defer metrics.Close()
+=======
+	metrics := newInputMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	s, err := newServer(i.config, inputCtx.Logger, client.Publish, inputCtx.StatusReporter, metrics)
 	if err != nil {

@@ -163,8 +163,13 @@ func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 	l.lastRead = state
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
+<<<<<<< HEAD
 	if l.metrics == nil {
 		l.metrics = newInputMetrics(l.channelName, l.id)
+=======
+	if l.metrics == nil && l.id != "" {
+		l.metrics = newInputMetrics(l.channelName, metricsRegistry, l.log)
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	}
 
 	var err error
