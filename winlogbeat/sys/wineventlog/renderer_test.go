@@ -44,7 +44,7 @@ func TestRenderer(t *testing.T) {
 		log := openLog(t, security4738File)
 		defer log.Close()
 
-		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.L())
+		r, err := NewRenderer(0, NilHandle, logp.L())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -62,7 +62,7 @@ func TestRenderer(t *testing.T) {
 		log := openLog(t, security4752File)
 		defer log.Close()
 
-		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.L())
+		r, err := NewRenderer(0, NilHandle, logp.L())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -108,7 +108,7 @@ func TestRenderer(t *testing.T) {
 		log := openLog(t, winErrorReportingFile)
 		defer log.Close()
 
-		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.L())
+		r, err := NewRenderer(0, NilHandle, logp.L())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -153,7 +153,7 @@ func TestRenderer(t *testing.T) {
 		log := openLog(t, security4738File)
 		defer log.Close()
 
-		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.L())
+		r, err := NewRenderer(0, NilHandle, logp.L())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -282,7 +282,7 @@ func BenchmarkRenderer(b *testing.B) {
 			b.Fatal(err)
 		}
 
-		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.NewLogger("bench"))
+		r, err := NewRenderer(0, NilHandle, logp.NewLogger("bench"))
 		if err != nil {
 			log.Close()
 			itr.Close()
