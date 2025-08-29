@@ -18,11 +18,9 @@ type Decoder interface {
 	Next() bool
 	// close closes the decoder and releases any resources associated with it.
 	// It returns an error if the decoder cannot be closed.
-
+	Close() error
 	// more returns whether there are more records to read.
 	More() bool
-
-	Close() error
 }
 
 // valueDecoder is a decoder that can decode directly to a JSON serialisable value.

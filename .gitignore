@@ -45,3 +45,7 @@ x-pack/dockerlogbeat/temproot.tar
 
 # Files generated with the bump version automations
 *.bck
+
+# TODO: remove before merge
+/patches
+long-walk-home.json
