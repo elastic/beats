@@ -494,10 +494,17 @@ The following endpoints/providers will be detected automatically:
 [float]
 ==== `path_style`
 
+<<<<<<< HEAD
 Enabling this option sets the bucket name as a path in the API call instead of a subdomain. When enabled
 https://<bucket-name>.s3.<region>.<provider>.com becomes https://s3.<region>.<provider>.com/<bucket-name>.
 This is only supported with 3rd party S3 providers.  AWS does not support path style.
 
+=======
+Enabling this option sets the bucket name as a path in the API call instead of
+a subdomain. When enabled `https://<bucket-name>.s3.<region>.<provider>.com`
+becomes `https://s3.<region>.<provider>.com/<bucket-name>`.  This is only
+supported with third-party S3 providers.  AWS does not support path style.
+>>>>>>> 51c3ca9bc (update url placeholders (#46303))
 
 [float]
 ==== `aws credentials`
