@@ -10,6 +10,8 @@ package statusreporterhelper
 import (
 	"sync"
 
+	zap "go.uber.org/zap"
+
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -26,7 +28,7 @@ type StatusReporterHelper struct {
 func New(statusReporter status.StatusReporter, log *logp.Logger, name string) *StatusReporterHelper {
 	rep := &StatusReporterHelper{
 		current:        status.Unknown,
-		statusReporter: &debugStatusReporter{log: log, name: name},
+		statusReporter: &debugStatusReporter{log: log.WithOptions(zap.AddCallerSkip(2)), name: name},
 	}
 
 	if statusReporter != nil {
