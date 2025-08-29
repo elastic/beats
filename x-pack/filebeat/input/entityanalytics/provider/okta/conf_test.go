@@ -20,13 +20,20 @@ var validateTests = []struct {
 	wantErr error
 }{
 	{
-		name:    "default",
-		cfg:     defaultConfig(),
+		name: "default",
+		cfg: func() conf {
+			cfg := defaultConfig()
+			cfg.OktaDomain = "test.okta.com"
+			cfg.OktaToken = "test-token"
+			return cfg
+		}(),
 		wantErr: nil,
 	},
 	{
 		name: "invalid_sync_interval",
 		cfg: conf{
+			OktaDomain:     "test.okta.com",
+			OktaToken:      "test-token",
 			SyncInterval:   0,
 			UpdateInterval: time.Second * 2,
 		},
@@ -35,6 +42,8 @@ var validateTests = []struct {
 	{
 		name: "invalid_update_interval",
 		cfg: conf{
+			OktaDomain:     "test.okta.com",
+			OktaToken:      "test-token",
 			SyncInterval:   time.Second,
 			UpdateInterval: 0,
 		},
@@ -43,6 +52,8 @@ var validateTests = []struct {
 	{
 		name: "invalid_relative_intervals",
 		cfg: conf{
+			OktaDomain:     "test.okta.com",
+			OktaToken:      "test-token",
 			SyncInterval:   time.Second,
 			UpdateInterval: time.Second * 2,
 		},
