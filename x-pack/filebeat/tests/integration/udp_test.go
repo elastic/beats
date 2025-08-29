@@ -24,7 +24,12 @@ func TestUDPReportsError(t *testing.T) {
 	filebeat := NewFilebeat(t)
 
 	// get a random port on all interfaces
-	ln, err := net.ListenUDP("udp", nil)
+	addr, err := net.ResolveUDPAddr("udp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("cannot create UDPAddr: %s", err)
+	}
+
+	ln, err := net.ListenUDP("udp", addr)
 	if err != nil {
 		t.Fatalf("cannot create UDP listener: %s", err)
 	}
