@@ -149,6 +149,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Use Debian 11 to build linux/arm to match linux/amd64. Upgrades linux/arm64's statically linked glibc from 2.28 to 2.31. {issue}44816[44816]
 - The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
 - Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
+- Fix a race condition during metrics initialization which could cause a panic. {issue}45822[45822] {pull}46054[46054]
 
 *Auditbeat*
 
@@ -272,6 +273,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix termination of input on API errors. {pull}45999[45999]
 - The UDP input now fails if it cannot bind to the configured port and its status is set to failed when running under Elastic Agent. {issue}37216[37216] {pull}46302[46302]
 - The Unix input now fails on errors listening to the socket and its status is set to failed when running under Elastic Agent. {pull}46302[46302]
+- Fixed hints autodiscover for Docker when the configuration is only `hints.enabled: true`. {issue}45156[45156] {pull}45864[45864]
 
 *Heartbeat*
 
