@@ -223,13 +223,8 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 		sqsReader.log = log.Named("sqs")
 		sqsReader.status = &statusReporterHelperMock{}
 		sqsReader.pipeline = newFakePipeline()
-<<<<<<< HEAD
-		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), workerCount)
-		sqsReader.sqs = newConstantSQS()
-=======
 		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), workerCount, logp.NewNopLogger())
-		sqsReader.sqs, err = newConstantSQS()
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
+		sqsReader.sqs = newConstantSQS()
 		require.NoError(t, err)
 		sqsReader.s3 = newConstantS3(t)
 		sqsReader.msgHandler, err = sqsReader.createEventProcessor()
