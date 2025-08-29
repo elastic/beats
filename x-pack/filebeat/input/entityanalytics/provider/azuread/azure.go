@@ -89,8 +89,12 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 	}
 	p.fetcher.SetLogger(p.logger)
 
+<<<<<<< HEAD
 	p.metrics = newMetrics(inputCtx.ID, nil)
 	defer p.metrics.Close()
+=======
+	p.metrics = newMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	lastSyncTime, _ := getLastSync(store)
 	syncWaitTime := time.Until(lastSyncTime.Add(p.conf.SyncInterval))

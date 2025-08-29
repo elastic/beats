@@ -326,9 +326,27 @@ func (l *winEventLog) IsFile() bool {
 	return l.file
 }
 
+<<<<<<< HEAD
 // IgnoreMissingChannel returns true if missing channels should be ignored.
 func (l *winEventLog) IgnoreMissingChannel() bool {
 	return !l.file && (l.config.IgnoreMissingChannel == nil || *l.config.IgnoreMissingChannel)
+=======
+func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
+	l.lastRead = state
+	// we need to defer metrics initialization since when the event log
+	// is used from winlog input it would register it twice due to CheckConfig calls
+	if l.metrics == nil && l.id != "" {
+		l.metrics = newInputMetrics(l.channelName, metricsRegistry, l.log)
+	}
+
+	var err error
+	l.iterator, err = win.NewEventIterator(
+		win.WithSubscriptionFactory(func() (handle win.EvtHandle, err error) {
+			return l.open(l.lastRead)
+		}),
+		win.WithBatchSize(l.maxRead))
+	return err
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 }
 
 func (l *winEventLog) Open(state checkpoint.EventLogState) error {

@@ -176,11 +176,20 @@ require (
 	github.com/dgraph-io/badger/v4 v4.6.0
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.7.0
+<<<<<<< HEAD
 	github.com/elastic/elastic-agent-autodiscover v0.9.0
 	github.com/elastic/elastic-agent-libs v0.21.5
 	github.com/elastic/elastic-agent-system-metrics v0.11.11
 	github.com/elastic/go-elasticsearch/v8 v8.17.0
 	github.com/elastic/go-quark v0.2.0
+=======
+	github.com/elastic/elastic-agent-autodiscover v0.10.0
+	github.com/elastic/elastic-agent-libs v0.23.0
+	github.com/elastic/elastic-agent-system-metrics v0.13.2
+	github.com/elastic/go-elasticsearch/v8 v8.18.1
+	github.com/elastic/go-freelru v0.16.0
+	github.com/elastic/go-quark v0.3.0
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.19.0
 	github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015

@@ -25,7 +25,11 @@ func TestDecodeRecords(t *testing.T) {
 	decoder := messageDecoder{
 		config:  config,
 		log:     log,
+<<<<<<< HEAD
 		metrics: newInputMetrics("test", reg),
+=======
+		metrics: newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger()),
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	}
 
 	msgs := []string{
@@ -93,9 +97,13 @@ func TestDecodeRecordsWithSanitization(t *testing.T) {
 	config := defaultConfig()
 	config.LegacySanitizeOptions = []string{"SINGLE_QUOTES", "NEW_LINES"}
 	log := logp.NewLogger(fmt.Sprintf("%s test for input", inputName))
+<<<<<<< HEAD
 	reg := monitoring.NewRegistry()
 	metrics := newInputMetrics("test", reg)
 	defer metrics.Close()
+=======
+	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	sanitizers, err := newSanitizers(config.Sanitizers, config.LegacySanitizeOptions)
 	require.NoError(t, err)
