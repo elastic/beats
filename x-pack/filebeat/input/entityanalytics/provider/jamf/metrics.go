@@ -7,7 +7,11 @@ package jamf
 import (
 	"github.com/rcrowley/go-metrics"
 
+<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+=======
+	"github.com/elastic/elastic-agent-libs/logp"
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -30,9 +34,13 @@ func (m *inputMetrics) Close() {
 }
 
 // newMetrics creates a new instance for gathering metrics.
+<<<<<<< HEAD
 func newMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
 	reg, unreg := inputmon.NewInputRegistry(FullName, id, optionalParent)
 
+=======
+func newMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	out := inputMetrics{
 		unregister:           unreg,
 		syncTotal:            monitoring.NewUint(reg, "sync_total"),
@@ -43,8 +51,8 @@ func newMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
 		updateProcessingTime: metrics.NewUniformSample(1024),
 	}
 
-	adapter.NewGoMetrics(reg, "sync_processing_time", adapter.Accept).Register("histogram", metrics.NewHistogram(out.syncProcessingTime))     //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "update_processing_time", adapter.Accept).Register("histogram", metrics.NewHistogram(out.updateProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "sync_processing_time", logger, adapter.Accept).Register("histogram", metrics.NewHistogram(out.syncProcessingTime))     //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "update_processing_time", logger, adapter.Accept).Register("histogram", metrics.NewHistogram(out.updateProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
 	return &out
 }

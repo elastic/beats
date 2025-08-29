@@ -18,6 +18,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"golang.org/x/sys/windows"
@@ -91,7 +92,12 @@ func Test_RunEtwInput_NewSessionError(t *testing.T) {
 			MatchAllKeyword: 0,
 		},
 		operator: mockOperator,
+<<<<<<< HEAD
 		metrics:  newInputMetrics("", ""),
+=======
+		metrics: newInputMetrics(
+			"test", inputCtx.MetricsRegistry, logptest.NewTestingLogger(t, "")),
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	}
 
 	// Run test

@@ -77,8 +77,14 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		st := newState()
 		currentSource := source.(*Source)
 		log := inputCtx.Logger.With("project_id", currentSource.ProjectId).With("bucket", currentSource.BucketName)
+<<<<<<< HEAD:x-pack/filebeat/input/gcs/input_stateless.go
 		metrics := newInputMetrics(inputCtx.ID+":"+currentSource.BucketName, nil)
 		defer metrics.Close()
+=======
+		// use a new metrics registry associated to no parent. No metrics will
+		// be published.
+		metrics := newInputMetrics(monitoring.NewRegistry(), inputCtx.Logger)
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054)):x-pack/filebeat/input/gcs/input_stateless_test.go
 		metrics.url.Set("gs://" + currentSource.BucketName)
 
 		ctx, cancel := context.WithCancel(context.Background())

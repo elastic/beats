@@ -133,7 +133,7 @@ func loadOutput(
 		} else {
 			metrics = monitors.Metrics.NewRegistry("output")
 		}
-		outStats = outputs.NewStats(metrics)
+		outStats = outputs.NewStats(metrics, monitors.Logger)
 	}
 
 	outName, out, err := makeOutput(outStats)

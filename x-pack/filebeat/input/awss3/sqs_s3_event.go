@@ -141,7 +141,11 @@ func newSQSS3EventProcessor(
 ) *sqsS3EventProcessor {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
+<<<<<<< HEAD
 		metrics = newInputMetrics("", nil, 0)
+=======
+		metrics = newInputMetrics(monitoring.NewRegistry(), 0, log)
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	}
 	return &sqsS3EventProcessor{
 		s3HandlerFactory:     s3,

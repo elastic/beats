@@ -152,7 +152,11 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 	log := inputCtx.Logger.With("project_id", currentSource.ProjectId).With("bucket", currentSource.BucketName)
 	log.Infof("Running google cloud storage for project: %s", input.config.ProjectId)
 	// create a new inputMetrics instance
+<<<<<<< HEAD
 	metrics := newInputMetrics(inputCtx.ID+":"+currentSource.BucketName, nil)
+=======
+	metrics := newInputMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	metrics.url.Set("gs://" + currentSource.BucketName)
 	defer metrics.Close()
 

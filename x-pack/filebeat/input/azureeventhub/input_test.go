@@ -53,9 +53,13 @@ func TestGetAzureEnvironment(t *testing.T) {
 func TestProcessEvents(t *testing.T) {
 	log := logp.NewLogger(fmt.Sprintf("%s test for input", inputName))
 
+<<<<<<< HEAD
 	reg := monitoring.NewRegistry()
 	metrics := newInputMetrics("test", reg)
 	defer metrics.Close()
+=======
+	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	fakePipelineClient := fakeClient{}
 

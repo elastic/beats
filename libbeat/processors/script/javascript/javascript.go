@@ -97,7 +97,7 @@ func NewFromConfig(c Config, reg *monitoring.Registry) (beat.Processor, error) {
 		sessionPool: pool,
 		sourceProg:  prog,
 		sourceFile:  sourceFile,
-		stats:       getStats(c.Tag, reg),
+		stats:       getStats(c.Tag, reg, logger),
 	}, nil
 }
 
@@ -211,7 +211,7 @@ type processorStats struct {
 	processTime metrics.Sample
 }
 
-func getStats(id string, reg *monitoring.Registry) *processorStats {
+func getStats(id string, reg *monitoring.Registry, logger *logp.Logger) *processorStats {
 	if id == "" || reg == nil {
 		return nil
 	}
@@ -229,7 +229,7 @@ func getStats(id string, reg *monitoring.Registry) *processorStats {
 		exceptions:  monitoring.NewInt(processorReg, "exceptions"),
 		processTime: metrics.NewUniformSample(2048),
 	}
-	_ = adapter.NewGoMetrics(processorReg, "histogram", adapter.Accept).
+	_ = adapter.NewGoMetrics(processorReg, "histogram", logger, adapter.Accept).
 		Register("process_time", metrics.NewHistogram(stats.processTime))
 
 	return stats

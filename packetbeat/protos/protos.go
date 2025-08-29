@@ -116,7 +116,12 @@ func (s ProtocolsStruct) Init(test bool, pub reporterFactory, watch *procs.Proce
 
 func (s ProtocolsStruct) InitFiltered(test bool, device string, pub reporterFactory, watch *procs.ProcessesWatcher, cfgs map[string]*conf.C, list []*conf.C) error {
 	if len(cfgs) != 0 {
+<<<<<<< HEAD
 		cfgwarn.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration.")
+=======
+		// TODO: https://github.com/elastic/ingest-dev/issues/6000
+		logp.NewLogger("").Warn(cfgwarn.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration."))
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	}
 
 	for proto := range protocolSyms {

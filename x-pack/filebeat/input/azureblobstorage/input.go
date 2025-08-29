@@ -24,6 +24,7 @@ import (
 type azurebsInput struct {
 	config     config
 	serviceURL string
+	logger     *logp.Logger
 }
 
 // defines the valid range for Unix timestamps for 64 bit integers
@@ -52,7 +53,11 @@ func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	}
 }
 
+<<<<<<< HEAD
 func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
+=======
+func configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input, error) {
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
@@ -93,7 +98,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	} else {
 		urL = "https://" + config.AccountName + ".blob.core.windows.net/"
 	}
-	return sources, &azurebsInput{config: config, serviceURL: urL}, nil
+	return sources, &azurebsInput{config: config, serviceURL: urL, logger: logger}, nil
 }
 
 // tryOverrideOrDefault, overrides global values with local
@@ -203,7 +208,11 @@ func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state
 	log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container_name", currentSource.ContainerName)
 	log.Infof("Running azure blob storage for account: %s", input.config.AccountName)
 	// create a new inputMetrics instance
+<<<<<<< HEAD
 	metrics := newInputMetrics(inputCtx.ID+":"+currentSource.ContainerName, nil)
+=======
+	metrics := newInputMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	metrics.url.Set(input.serviceURL + currentSource.ContainerName)
 	defer metrics.Close()
 
