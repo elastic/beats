@@ -26,7 +26,7 @@ Use the `filestream` input to read lines from log files. It is the improved alte
 * Only the most recent updates are serialized to the registry. In contrast, the `log` input has to serialize the complete registry on each ACK from the outputs. This makes the registry updates much quicker with this input.
 * The input ensures that only offsets updates are written to the registry append only log. The `log` writes the complete file state.
 * Stale entries can be removed from the registry, even if there is no active input.
-* {applies_to} `stack: preview 9.2.0` As a technical preview feature, it can read GZIP files.
+* {applies_to}`stack: preview 9.2.0` As a technical preview feature, it can read GZIP files.
 
 
 To configure this input, specify a list of glob-based [`paths`](#filestream-input-paths) that must be crawled to locate and fetch the log lines.
