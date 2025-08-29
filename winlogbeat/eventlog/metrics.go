@@ -27,6 +27,7 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -69,7 +70,7 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for windows event logs. If id is empty
 // a nil inputMetric is returned.
-func newInputMetrics(name string, reg *monitoring.Registry) *inputMetrics {
+func newInputMetrics(name string, reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	out := &inputMetrics{
 		name:        monitoring.NewString(reg, "provider"),
 		events:      monitoring.NewUint(reg, "received_events_total"),
@@ -80,11 +81,11 @@ func newInputMetrics(name string, reg *monitoring.Registry) *inputMetrics {
 		batchPeriod: metrics.NewUniformSample(1024),
 	}
 	out.name.Set(name)
-	_ = adapter.NewGoMetrics(reg, "received_events_count", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "received_events_count", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchSize))
-	_ = adapter.NewGoMetrics(reg, "source_lag_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "source_lag_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sourceLag))
-	_ = adapter.NewGoMetrics(reg, "batch_read_period", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_read_period", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchPeriod))
 
 	return out
