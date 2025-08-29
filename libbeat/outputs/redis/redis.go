@@ -145,7 +145,7 @@ func makeRedis(
 			}
 		}
 
-		conn, err := transport.NewClient(transp, "tcp", hostUrl.Host, defaultPort)
+		conn, err := transport.NewClient(transp, "tcp", hostUrl.Host, defaultPort, beat.Logger)
 		if err != nil {
 			return outputs.Fail(err)
 		}

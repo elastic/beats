@@ -63,6 +63,9 @@ func NewServiceEventer(
 		return nil, err
 	}
 
+	// log warning about any unsupported params
+	config.checkUnsupportedParams(logger)
+
 	watcher, err := kubernetes.NewNamedWatcher("service", client, &kubernetes.Service{}, kubernetes.WatchOptions{
 		SyncTimeout:  config.SyncPeriod,
 		Namespace:    config.Namespace,

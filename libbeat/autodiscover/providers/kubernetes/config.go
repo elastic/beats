@@ -113,9 +113,13 @@ func (c *Config) Validate() error {
 	if c.Scope != "node" && c.Scope != "cluster" {
 		return fmt.Errorf("invalid `scope` configured. supported values are `node` and `cluster`")
 	}
-	if c.Unique && c.Scope != "cluster" {
-		logp.L().Warnf("can only set `unique` when scope is `cluster`")
-	}
 
 	return nil
+}
+
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+func (c Config) checkUnsupportedParams(logger *logp.Logger) {
+	if c.Unique && c.Scope != "cluster" {
+		logger.Warn("can only set `unique` when scope is `cluster`")
+	}
 }

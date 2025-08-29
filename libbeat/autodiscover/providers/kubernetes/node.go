@@ -63,6 +63,9 @@ func NewNodeEventer(
 		return nil, err
 	}
 
+	// log warning about any unsupported params
+	config.checkUnsupportedParams(logger)
+
 	// Ensure that node is set correctly whenever the scope is set to "node". Make sure that node is empty
 	// when cluster scope is enforced.
 	if config.Scope == "node" {

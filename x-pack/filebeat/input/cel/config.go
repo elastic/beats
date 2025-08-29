@@ -5,19 +5,15 @@
 package cel
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
-	"regexp"
 	"time"
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/mito/lib"
 )
 
 const defaultMaxExecutions = 1000
@@ -100,16 +96,6 @@ func (c config) Validate() error {
 	_, err := regexpsFromConfig(c)
 	if err != nil {
 		return fmt.Errorf("failed to check regular expressions: %w", err)
-	}
-	// TODO: Consider just building the program here to avoid this wasted work.
-	var patterns map[string]*regexp.Regexp
-	if len(c.Regexps) != 0 {
-		patterns = map[string]*regexp.Regexp{".": nil}
-	}
-	wantDump := c.FailureDump.enabled() && c.FailureDump.Filename != ""
-	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, lib.HTTPOptions{}, patterns, c.XSDs, logp.L().Named("input.cel"), nil, wantDump, false)
-	if err != nil {
-		return fmt.Errorf("failed to check program: %w", err)
 	}
 	return nil
 }

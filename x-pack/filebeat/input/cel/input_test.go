@@ -19,6 +19,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"runtime"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -31,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -2173,7 +2175,6 @@ func TestInput(t *testing.T) {
 		t.Fatalf("failed to remove failure_dumps directory: %v", err)
 	}
 
-	logp.TestingSetup()
 	for _, test := range inputTests {
 		t.Run(test.name, func(t *testing.T) {
 			if reason, skip := skipOnWindows[test.name]; runtime.GOOS == "windows" && skip {
@@ -2202,6 +2203,15 @@ func TestInput(t *testing.T) {
 			if err != nil {
 				if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 					t.Fatalf("unexpected error unpacking config: %v", err)
+				}
+				return
+			}
+
+			// check unsupported param
+			err = conf.checkUnsupportedParams(logptest.NewTestingLogger(t, ""))
+			if err != nil {
+				if strings.Contains(err.Error(), test.wantErr.Error()) {
+					t.Fatalf("unexpected error checking unsupported params: %v", err)
 				}
 				return
 			}
