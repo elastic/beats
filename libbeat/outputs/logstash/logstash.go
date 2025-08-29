@@ -79,7 +79,7 @@ func MakeLogstashClients(
 	for i, host := range hosts {
 		var client outputs.NetworkClient
 
-		conn, err := transport.NewClient(transp, "tcp", host, defaultPort)
+		conn, err := transport.NewClient(transp, "tcp", host, defaultPort, logger)
 		if err != nil {
 			return outputs.Fail(err)
 		}
