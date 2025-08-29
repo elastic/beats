@@ -152,3 +152,4 @@ func (c *Config) ActiveSessionsMetric() ActiveSessionsMetric {
 
 	return c.activeSessionsMetric
 }
+
