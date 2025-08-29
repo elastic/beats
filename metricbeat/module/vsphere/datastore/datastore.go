@@ -157,7 +157,7 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 
 		triggeredAlarm, err := getTriggeredAlarm(ctx, pc, dst[i].TriggeredAlarmState)
 		if err != nil {
-			m.Logger().Errorf("Failed to retrieve alerts from datastore %s: %w", dst[i].Name, err)
+			m.Logger().Errorf("Failed to retrieve alerts from datastore %s: %v", dst[i].Name, err)
 		}
 
 		reporter.Event(mb.Event{
