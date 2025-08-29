@@ -19,9 +19,6 @@ package kibana
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"regexp"
 
 	"github.com/elastic/beats/v7/libbeat/mapping"
@@ -137,28 +134,4 @@ func (i *IndexPatternGenerator) addFieldsSpecific(indexPattern *mapstr.M) error 
 func clean(name string) string {
 	reg := regexp.MustCompile("[^a-zA-Z0-9_]+")
 	return reg.ReplaceAllString(name, "")
-}
-
-func dumpToFile(f string, pattern mapstr.M) error {
-	patternIndent, err := json.MarshalIndent(pattern, "", "  ")
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile(f, patternIndent, 0644)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func createTargetDir(baseDir string, version version.V) string {
-	targetDir := filepath.Join(baseDir, getVersionPath(version), "index-pattern")
-	if _, err := os.Stat(targetDir); os.IsNotExist(err) {
-		os.MkdirAll(targetDir, 0755)
-	}
-	return targetDir
-}
-
-func getVersionPath(version version.V) string {
-	return "7"
 }

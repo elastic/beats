@@ -22,10 +22,6 @@ import "sync/atomic"
 var (
 	// underAgent is set to true with this beat is being ran under the elastic-agent
 	underAgent atomic.Bool
-
-	// underAgentTrace is set to true when the elastic-agent has placed this beat into
-	// trace mode (which enables logging of published events)
-	underAgentTrace atomic.Bool
 )
 
 // SetUnderAgent sets that the processing pipeline is being ran under the elastic-agent.
@@ -33,27 +29,7 @@ func SetUnderAgent(val bool) {
 	underAgent.Store(val)
 }
 
-// SetUnderAgentTrace sets that trace mode has been enabled by the elastic-agent.
-//
-// SetUnderAgent must also be called and set to true before this has an effect.
-func SetUnderAgentTrace(val bool) {
-	underAgentTrace.Store(val)
-}
-
 // UnderAgent returns true when running under Elastic Agent.
 func UnderAgent() bool {
 	return underAgent.Load()
-}
-
-// TraceLevelEnabled returns true when the "trace log level" is enabled.
-//
-// It always returns true when not running under Elastic Agent.
-// Otherwise it returns true when the trace level is enabled
-func TraceLevelEnabled() bool {
-	if underAgent.Load() {
-		return underAgentTrace.Load()
-	}
-
-	// Always true when not running under the Elastic Agent.
-	return true
 }

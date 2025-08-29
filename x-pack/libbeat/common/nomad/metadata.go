@@ -55,11 +55,6 @@ func NewMetaGenerator(cfg *conf.C, c *Client) (MetaGenerator, error) {
 	return &generator, err
 }
 
-// NewMetaGeneratorFromConfig initializes and returns a new nomad metadata generator
-func NewMetaGeneratorFromConfig(cfg *MetaGeneratorConfig) MetaGenerator {
-	return cfg
-}
-
 // ResourceMetadata generates metadata for the given Nomad allocation*
 func (g *metaGenerator) ResourceMetadata(obj Resource) mapstr.M {
 	// default labels that we expose / filter with `IncludeLabels`
