@@ -124,7 +124,14 @@ func (cim *InputManager) Init(group unison.Group) error {
 	store := cim.store
 	cleaner := &cleaner{log: log}
 	store.Retain()
+	// TL;DR: If Filebeat shuts down too quickly, the function passed to
+	// `group.Go` will never run, therefore this instance of InputManager
+	// will never be shutdown, locking Filebeat's shutdown process.
+	//
+	// To circumvent that, we wait for `group.Go` to start our function.
+	waitRunning := make(chan struct{})
 	err := group.Go(func(canceler context.Context) error {
+		waitRunning <- struct{}{}
 		defer cim.shutdown()
 		defer store.Release()
 		interval := cim.StateStore.CleanupInterval()
@@ -140,6 +147,7 @@ func (cim *InputManager) Init(group unison.Group) error {
 		return fmt.Errorf("Can not start registry cleanup process: %w", err)
 	}
 
+	<-waitRunning
 	return nil
 }
 

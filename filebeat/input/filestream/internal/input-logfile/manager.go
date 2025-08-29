@@ -118,7 +118,9 @@ func (cim *InputManager) Init(group unison.Group) error {
 
 	store := cim.getRetainedStore()
 	cleaner := &cleaner{log: log}
+	waitRunning := make(chan struct{})
 	err := group.Go(func(canceler context.Context) error {
+		waitRunning <- struct{}{}
 		defer cim.shutdown()
 		defer store.Release()
 		interval := cim.StateStore.CleanupInterval()
@@ -133,7 +135,7 @@ func (cim *InputManager) Init(group unison.Group) error {
 		cim.shutdown()
 		return fmt.Errorf("Can not start registry cleanup process: %w", err)
 	}
-
+	<-waitRunning
 	return nil
 }
 
