@@ -95,7 +95,7 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 	}
 	p.fetcher.SetLogger(p.logger)
 
-	p.metrics = newMetrics(inputCtx.MetricsRegistry)
+	p.metrics = newMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
 
 	lastSyncTime, _ := getLastSync(store)
 	syncWaitTime := time.Until(lastSyncTime.Add(p.conf.SyncInterval))

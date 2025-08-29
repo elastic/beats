@@ -14,6 +14,7 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/go-concert/timed"
@@ -144,7 +145,7 @@ func (m *inputMetrics) updateSqsWorkerUtilization() {
 	m.sqsWorkerUtilizationLastUpdate = now
 }
 
-func newInputMetrics(reg *monitoring.Registry, maxWorkers int) *inputMetrics {
+func newInputMetrics(reg *monitoring.Registry, maxWorkers int, logger *logp.Logger) *inputMetrics {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	out := &inputMetrics{
@@ -178,15 +179,15 @@ func newInputMetrics(reg *monitoring.Registry, maxWorkers int) *inputMetrics {
 	// Initializing the sqs_messages_waiting_gauge value to -1 so that we can distinguish between no messages waiting (0) and never collected / error collecting (-1).
 	out.sqsMessagesWaiting.Set(int64(-1))
 
-	adapter.NewGoMetrics(reg, "sqs_message_processing_time", adapter.Accept).
+	adapter.NewGoMetrics(reg, "sqs_message_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sqsMessageProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "sqs_lag_time", adapter.Accept).
+	adapter.NewGoMetrics(reg, "sqs_lag_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sqsLagTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "s3_object_processing_time", adapter.Accept).
+	adapter.NewGoMetrics(reg, "s3_object_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.s3ObjectProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "s3_object_size_in_bytes", adapter.Accept).
+	adapter.NewGoMetrics(reg, "s3_object_size_in_bytes", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.s3ObjectSizeInBytes)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "s3_events_per_object", adapter.Accept).
+	adapter.NewGoMetrics(reg, "s3_events_per_object", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.s3EventsPerObject)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
 	if maxWorkers > 0 {

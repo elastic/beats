@@ -63,7 +63,7 @@ func newJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, objectURI
 ) *job {
 	if metrics == nil {
 		// metrics are optional, initialize a stub if not provided
-		metrics = newInputMetrics(monitoring.NewRegistry())
+		metrics = newInputMetrics(monitoring.NewRegistry(), log)
 	}
 	return &job{
 		bucket:    bucket,

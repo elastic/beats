@@ -142,7 +142,7 @@ func (f *logFile) startFileMonitoringIfNeeded() {
 			return nil
 		})
 		if err != nil {
-			f.log.Errorf("failed to start file monitoring: %w", err)
+			f.log.Errorf("failed to start file monitoring: %v", err)
 		}
 	}
 

@@ -160,7 +160,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 		// Merge config template with the configs from the annotations
 		// AppendValues option is used to append arrays from annotations to existing arrays while merging
 		if err := config.MergeWithOpts(tempCfg, ucfg.AppendValues); err != nil {
-			l.log.Debugf("hints.builder", "config merge failed with error: %v", err)
+			l.log.Named("hints.builder").Debugf("config merge failed with error: %v", err)
 			continue
 		}
 		module := l.getModule(hints)

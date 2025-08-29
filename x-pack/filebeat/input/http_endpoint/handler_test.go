@@ -597,7 +597,7 @@ func Test_apiResponse(t *testing.T) {
 				tc.setup(t)
 			}
 			pub := new(publisher)
-			metrics := newInputMetrics(monitoring.NewRegistry())
+			metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
 			apiHandler := newHandler(ctx, newTracerConfig(tc.name, tc.conf, *withTraces), nil, pub.Publish, nil, logp.NewLogger("http_endpoint.test"), metrics)
 
 			// Execute handler.
