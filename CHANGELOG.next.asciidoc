@@ -93,6 +93,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix setting unique registry for non beat receivers {issue}42288[42288] {pull}42292[42292]
 - The Kafka output now drops events when there is an authorisation error {issue}42343[42343] {pull}42401[42401]
 - Fix autodiscovery memory leak related to metadata of start events {pull}41748[41748]
+- 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
+- Fix `dns` processor to handle IPv6 server addresses properly. {pull}44526[44526]
+- Fix an issue where the Kafka output could get stuck if a proxied connection to the Kafka cluster was reset. {issue}44606[44606]
+- Use Debian 11 to build linux/arm to match linux/amd64. Upgrades linux/arm64's statically linked glibc from 2.28 to 2.31. {issue}44816[44816]
+- The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
+- Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
+- Fix a race condition during metrics initialization which could cause a panic. {issue}45822[45822] {pull}46054[46054]
 
 *Auditbeat*
 
