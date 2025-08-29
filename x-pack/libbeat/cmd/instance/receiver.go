@@ -44,9 +44,6 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 	// stats.system
 	systemReg := statsReg.GetOrCreateRegistry("system")
 
-<<<<<<< HEAD
-	err = metricreport.SetupMetrics(logp.L().Named("metrics"), b.Info.Beat, version.GetDefaultVersion(), metricreport.WithProcessRegistry(processReg), metricreport.WithSystemRegistry(systemReg))
-=======
 	err = metricreport.SetupMetricsOptions(metricreport.MetricOptions{
 		Logger:         b.Info.Logger.Named("metrics"),
 		Name:           b.Info.Name,
@@ -55,7 +52,6 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 		ProcessMetrics: processReg,
 	})
 
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error setting up metrics report: %w", err)
 	}

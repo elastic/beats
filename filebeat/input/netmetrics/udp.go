@@ -64,12 +64,8 @@ func NewUDP(reg *monitoring.Registry, device string, buflen uint64, poll time.Du
 		arrivalPeriod:   metrics.NewUniformSample(1024),
 		processingTime:  metrics.NewUniformSample(1024),
 	}
-<<<<<<< HEAD
-	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
-=======
 
 	_ = adapter.NewGoMetrics(reg, "arrival_period", log, adapter.Accept).
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
 	_ = adapter.NewGoMetrics(reg, "processing_time", log, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))

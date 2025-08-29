@@ -69,11 +69,6 @@ func NewMetrics(reg *monitoring.Registry, logger *logp.Logger) *Metrics {
 	}
 	_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(m.ProcessingTime))
-<<<<<<< HEAD
-=======
-	_ = adapter.NewGoMetrics(reg, "gzip_processing_time", logger, adapter.Accept).
-		Register("histogram", metrics.NewHistogram(m.ProcessingGZIPTime))
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	return &m
 }
