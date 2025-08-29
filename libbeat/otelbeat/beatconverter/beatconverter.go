@@ -23,11 +23,9 @@ import (
 
 	"go.opentelemetry.io/collector/confmap"
 
-	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/outputs/logstash"
-
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	elasticsearchtranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate/outputs/elasticsearch"
+	logstashstranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate/outputs/logstash"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -93,21 +91,8 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 					}
 				}
 
-				lsHostWorker := struct {
-					outputs.HostWorkerCfg `config:",inline"`
-					logstash.Config       `config:",inline"`
-				}{
-					Config: logstash.DefaultConfig(),
-				}
-
-				// unpack and validate LS config
-				if err := lsOutputConfig.Unpack(&lsHostWorker); err != nil {
-					return fmt.Errorf("failed unpacking logstash config: %w", err)
-				}
-
-				lsConfig := config.MustNewConfigFrom(lsHostWorker)
-				var lsConfigMap map[string]any
-				if err := lsConfig.Unpack(&lsConfigMap); err != nil {
+				lsConfigMap, err := logstashstranslate.ToMap(lsOutputConfig)
+				if err != nil {
 					return err
 				}
 
