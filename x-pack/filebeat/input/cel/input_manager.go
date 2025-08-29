@@ -5,13 +5,7 @@
 package cel
 
 import (
-	"context"
-	"fmt"
-	"net/http"
-	"regexp"
-
 	"github.com/elastic/go-concert/unison"
-	"github.com/elastic/mito/lib"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -45,15 +39,13 @@ func cursorConfigure(cfg *conf.C, logger *logp.Logger) ([]inputcursor.Source, in
 	if err := cfg.Unpack(&src.cfg); err != nil {
 		return nil, nil, err
 	}
-	err := src.cfg.checkUnsupportedParams(logger)
-	if err != nil {
-		return nil, nil, err
-	}
+	src.cfg.checkUnsupportedParams(logger)
+
 	return []inputcursor.Source{src}, input{}, nil
 }
 
 // checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
-func (c config) checkUnsupportedParams(logger *logp.Logger) error {
+func (c config) checkUnsupportedParams(logger *logp.Logger) {
 	if c.RecordCoverage {
 		logger.Named("cel").Warn("execution coverage enabled: " +
 			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-record-coverage")
@@ -62,17 +54,6 @@ func (c config) checkUnsupportedParams(logger *logp.Logger) error {
 		logger.Named("cel").Warn("missing recommended 'redact' configuration: " +
 			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-state-redact")
 	}
-
-	var patterns map[string]*regexp.Regexp
-	if len(c.Regexps) != 0 {
-		patterns = map[string]*regexp.Regexp{".": nil}
-	}
-	wantDump := c.FailureDump.enabled() && c.FailureDump.Filename != ""
-	_, _, _, err := newProgram(context.Background(), c.Program, root, nil, &http.Client{}, lib.HTTPOptions{}, patterns, c.XSDs, logger.Named("input.cel"), nil, wantDump, false)
-	if err != nil {
-		return fmt.Errorf("failed to check program: %w", err)
-	}
-	return nil
 }
 
 type source struct{ cfg config }
