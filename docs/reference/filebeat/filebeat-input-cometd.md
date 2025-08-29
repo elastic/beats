@@ -23,7 +23,7 @@ filebeat.inputs:
     client.id: my-client-id
     client.secret: my-client-secret
     token_url: https://login.salesforce.com/services/oauth2/token
-    user: my.email@mail.com
+    user: my.email@example.com
     password: my-password
 ```
 
