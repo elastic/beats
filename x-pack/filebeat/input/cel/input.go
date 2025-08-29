@@ -862,7 +862,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	}
 
 	if reg != nil {
-		c.Transport = httpmon.NewMetricsRoundTripper(c.Transport, reg)
+		c.Transport = httpmon.NewMetricsRoundTripper(c.Transport, reg, log)
 	}
 
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
@@ -916,6 +916,7 @@ func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings, log *
 		fallthrough
 	case !ok:
 		return []httpcommon.TransportOption{
+			httpcommon.WithLogger(log),
 			httpcommon.WithAPMHTTPInstrumentation(),
 			keepalive,
 		}
@@ -1304,9 +1305,10 @@ func newInputMetrics(id string) (*inputMetrics, *monitoring.Registry) {
 		celProcessingTime:   metrics.NewUniformSample(1024),
 		batchProcessingTime: metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "cel_processing_time", adapter.Accept).
+	logger := logp.NewLogger("")
+	_ = adapter.NewGoMetrics(reg, "cel_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.celProcessingTime))
-	_ = adapter.NewGoMetrics(reg, "batch_processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
 
 	return out, reg

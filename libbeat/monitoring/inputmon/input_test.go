@@ -316,7 +316,7 @@ func TestNewMetricsRegistry_duplicatedInputID(t *testing.T) {
 	assert.Equal(t, parent.GetRegistry(inputID), got)
 	// register a metric to the registry
 	monitoring.NewInt(got, metricName)
-	adapter.NewGoMetrics(got, goMetricsRegistryName, adapter.Accept)
+	adapter.NewGoMetrics(got, goMetricsRegistryName, logp.NewNopLogger(), adapter.Accept)
 
 	// 2nd call, return an unregistered registry
 	got = NewMetricsRegistry(
@@ -330,7 +330,7 @@ func TestNewMetricsRegistry_duplicatedInputID(t *testing.T) {
 	assert.NotPanics(t, func() {
 		// register the same metric again
 		monitoring.NewInt(got, metricName)
-		adapter.NewGoMetrics(got, goMetricsRegistryName, adapter.Accept)
+		adapter.NewGoMetrics(got, goMetricsRegistryName, logp.NewNopLogger(), adapter.Accept)
 	}, "the registry should be a new and empty registry")
 }
 

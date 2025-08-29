@@ -353,7 +353,7 @@ func (in *sqsReaderInput) logConfigSummary() {
 
 func (in *sqsReaderInput) createEventProcessor() (sqsProcessor, error) {
 	fileSelectors := in.config.getFileSelectors()
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(in.metrics, in.s3, fileSelectors, in.config.BackupConfig)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(in.metrics, in.s3, fileSelectors, in.config.BackupConfig, in.log)
 
 	script, err := newScriptFromConfig(in.log.Named("sqs_script"), in.config.SQSScript)
 	if err != nil {

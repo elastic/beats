@@ -8,6 +8,7 @@ import (
 	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -53,15 +54,16 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 		sourceLagTime:                   metrics.NewUniformSample(1024),
 	}
 
-	adapter.NewGoMetrics(reg, "abs_blob_processing_time", adapter.Accept).
+	logger := logp.NewLogger("")
+	adapter.NewGoMetrics(reg, "abs_blob_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.absBlobProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "abs_blob_size_in_bytes", adapter.Accept).
+	adapter.NewGoMetrics(reg, "abs_blob_size_in_bytes", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.absBlobSizeInBytes)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "abs_events_per_blob", adapter.Accept).
+	adapter.NewGoMetrics(reg, "abs_events_per_blob", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.absEventsPerBlob)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "abs_jobs_scheduled_after_validation", adapter.Accept).
+	adapter.NewGoMetrics(reg, "abs_jobs_scheduled_after_validation", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.absJobsScheduledAfterValidation)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "source_lag_time", adapter.Accept).
+	adapter.NewGoMetrics(reg, "source_lag_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sourceLagTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
 	return out

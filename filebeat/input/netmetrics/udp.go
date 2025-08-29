@@ -71,9 +71,10 @@ func NewUDP(inputName string, id string, device string, buflen uint64, poll time
 		arrivalPeriod:   metrics.NewUniformSample(1024),
 		processingTime:  metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
+
+	_ = adapter.NewGoMetrics(reg, "arrival_period", log, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
-	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", log, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))
 
 	out.device.Set(device)
