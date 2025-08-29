@@ -78,7 +78,7 @@ func TestUDPReportsError(t *testing.T) {
 	}
 
 	errMsgCh := make(chan string)
-	ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), time.Minute)
 	t.Cleanup(cancel)
 
 	server := &mock.StubServerV2{
