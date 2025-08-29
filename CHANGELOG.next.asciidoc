@@ -323,6 +323,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
 - Preserve queries for debugging when `merge_results: true` in SQL module {pull}42271[42271]
 - Collect more fields from ES node/stats metrics and only those that are necessary {pull}42421[42421]
+- Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
 
 *Metricbeat*
 
