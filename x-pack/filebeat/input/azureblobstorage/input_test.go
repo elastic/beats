@@ -28,11 +28,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/mock"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-<<<<<<< HEAD
-=======
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/monitoring"
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 )
 
 const (
@@ -910,16 +905,9 @@ func newV2Context(t *testing.T) (v2.Context, func()) {
 		t.Fatalf("failed to generate random id: %v", err)
 	}
 	return v2.Context{
-<<<<<<< HEAD
 		Logger:      logp.NewLogger("abs_test"),
 		ID:          "abs_test-" + id,
 		Cancelation: ctx,
-=======
-		Logger:          logptest.NewTestingLogger(t, "abs_test"),
-		ID:              "abs_test-" + id,
-		Cancelation:     ctx,
-		MetricsRegistry: monitoring.NewRegistry(),
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	}, cancel
 }
 

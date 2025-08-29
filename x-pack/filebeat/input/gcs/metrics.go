@@ -7,11 +7,8 @@ package gcs
 import (
 	"github.com/rcrowley/go-metrics"
 
-<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
-=======
 	"github.com/elastic/elastic-agent-libs/logp"
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -39,12 +36,8 @@ type inputMetrics struct {
 	sourceLagTime                   metrics.Sample   // Histogram of the time between the source (Updated) timestamp and the time the object was read.
 }
 
-<<<<<<< HEAD
 func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
 	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
-=======
-func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	out := &inputMetrics{
 		unregister:        unreg,
 		url:               monitoring.NewString(reg, "url"),
@@ -67,6 +60,7 @@ func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetric
 		sourceLagTime:                   metrics.NewUniformSample(1024),
 	}
 
+	logger := logp.NewLogger("")
 	adapter.NewGoMetrics(reg, "gcs_object_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.gcsObjectProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	adapter.NewGoMetrics(reg, "gcs_object_size_in_bytes", logger, adapter.Accept).

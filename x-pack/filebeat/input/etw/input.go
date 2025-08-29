@@ -115,12 +115,8 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	}
 	e.etwSession.Callback = e.consumeEvent
 	e.publisher = publisher
-<<<<<<< HEAD
 	e.metrics = newInputMetrics(e.etwSession.Name, ctx.ID)
 	defer e.metrics.unregister()
-=======
-	e.metrics = newInputMetrics(e.etwSession.Name, ctx.MetricsRegistry, ctx.Logger)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	// Set up logger with session information
 	e.log = ctx.Logger.With("session", e.etwSession.Name)
@@ -316,12 +312,8 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for windows ETW.
 // If id is empty, a nil inputMetric is returned.
-<<<<<<< HEAD
 func newInputMetrics(session, id string) *inputMetrics {
 	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
-=======
-func newInputMetrics(session string, reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	out := &inputMetrics{
 		unregister:     unreg,
 		name:           monitoring.NewString(reg, "session"),
@@ -333,6 +325,7 @@ func newInputMetrics(session string, reg *monitoring.Registry, logger *logp.Logg
 		processingTime: metrics.NewUniformSample(1024),
 	}
 	out.name.Set(session)
+	logger := logp.NewLogger("")
 	_ = adapter.NewGoMetrics(reg, "source_lag_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sourceLag))
 	_ = adapter.NewGoMetrics(reg, "arrival_period", logger, adapter.Accept).

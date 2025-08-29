@@ -432,12 +432,8 @@ func TestServerPool(t *testing.T) {
 				fails = make(chan error, 1)
 			)
 			ctx, cancel := newCtx("server_pool_test", test.name)
-<<<<<<< HEAD
 			metrics := newInputMetrics("")
 			defer metrics.Close()
-=======
-			metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 			var wg sync.WaitGroup
 			for _, cfg := range test.cfgs {
 				cfg := cfg

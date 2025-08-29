@@ -65,12 +65,7 @@ func New(
 	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
-<<<<<<< HEAD
 	cfgwarn.Beta("packetbeat SIP protocol is used")
-=======
-	// TODO: https://github.com/elastic/ingest-dev/issues/6000
-	logp.NewLogger("").Warn(cfgwarn.Beta("packetbeat SIP protocol is used"))
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	isDebug = logp.IsDebug("sip")
 	isDetailed = logp.IsDebug("sipdetailed")

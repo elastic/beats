@@ -13,11 +13,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
-<<<<<<< HEAD:x-pack/filebeat/input/azureblobstorage/input_stateless.go
-=======
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054)):x-pack/filebeat/input/azureblobstorage/input_stateless_test.go
 )
 
 type statelessInput struct {
@@ -71,14 +67,8 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		st := newState()
 		currentSource := source.(*Source)
 		log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container", currentSource.ContainerName)
-<<<<<<< HEAD:x-pack/filebeat/input/azureblobstorage/input_stateless.go
 		// create a new inputMetrics instance
 		metrics := newInputMetrics(inputCtx.ID+":"+currentSource.ContainerName, nil)
-=======
-		// use a new metrics registry associated to no parent. No metrics will
-		// be published.
-		metrics := newInputMetrics(monitoring.NewRegistry(), in.logger)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054)):x-pack/filebeat/input/azureblobstorage/input_stateless_test.go
 		metrics.url.Set(in.serviceURL + currentSource.ContainerName)
 		defer metrics.Close()
 

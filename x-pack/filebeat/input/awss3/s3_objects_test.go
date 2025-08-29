@@ -363,13 +363,8 @@ func TestProcessObjectMetricCollection(t *testing.T) {
 			)
 
 			// metric recorder with zero workers
-<<<<<<< HEAD
 			metricRecorder := newInputMetrics(test.name, nil, 0)
-			objFactory := newS3ObjectProcessorFactory(metricRecorder, mockS3API, nil, backupConfig{})
-=======
-			metricRecorder := newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger())
 			objFactory := newS3ObjectProcessorFactory(metricRecorder, mockS3API, nil, backupConfig{}, logp.NewNopLogger())
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 			objHandler := objFactory.Create(ctx, s3Event)
 
 			// when

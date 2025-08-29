@@ -146,11 +146,7 @@ func TestS3Poller(t *testing.T) {
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",
-<<<<<<< HEAD
 			metrics:         newInputMetrics("", nil, 0),
-=======
-			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 			filterProvider:  newFilterProvider(&cfg),
 			status:          &statusReporterHelperMock{},
 		}
@@ -298,11 +294,7 @@ func TestS3Poller(t *testing.T) {
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",
-<<<<<<< HEAD
 			metrics:         newInputMetrics("", nil, 0),
-=======
-			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 			filterProvider:  newFilterProvider(&cfg),
 			status:          &statusReporterHelperMock{},
 		}
@@ -533,11 +525,7 @@ func Test_S3StateHandling(t *testing.T) {
 				pipeline:        newFakePipeline(),
 				s3ObjectHandler: mockObjHandler,
 				states:          s3States,
-<<<<<<< HEAD
 				metrics:         newInputMetrics("state-test: "+test.name, nil, 0),
-=======
-				metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 				filterProvider:  newFilterProvider(test.config),
 				status:          &statusReporterHelperMock{},
 			}

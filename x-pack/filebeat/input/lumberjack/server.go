@@ -44,11 +44,7 @@ func newServer(c config, log *logp.Logger, pub func(beat.Event), stat status.Sta
 	}
 
 	if metrics == nil {
-<<<<<<< HEAD
 		metrics = newInputMetrics("", monitoring.NewRegistry())
-=======
-		metrics = newInputMetrics(monitoring.NewRegistry(), log)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	}
 
 	bindURI := "tcp://" + bindAddress

@@ -127,11 +127,7 @@ func (in *sqsReaderInput) setup(
 
 	in.s3 = newAWSs3API(s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier))
 
-<<<<<<< HEAD
 	in.metrics = newInputMetrics(inputContext.ID, nil, in.config.NumberOfWorkers)
-=======
-	in.metrics = newInputMetrics(inputContext.MetricsRegistry, in.config.NumberOfWorkers, logp.NewNopLogger())
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	var err error
 	in.msgHandler, err = in.createEventProcessor()

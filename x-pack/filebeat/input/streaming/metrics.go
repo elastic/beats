@@ -7,11 +7,8 @@ package streaming
 import (
 	"github.com/rcrowley/go-metrics"
 
-<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
-=======
 	"github.com/elastic/elastic-agent-libs/logp"
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -34,12 +31,8 @@ type inputMetrics struct {
 	pongMessageReceivedTime metrics.Sample     // histogram of the elapsed successful pong message receive times in nanoseconds
 }
 
-<<<<<<< HEAD
 func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
 	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
-=======
-func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	out := &inputMetrics{
 		unregister:              unreg,
 		url:                     monitoring.NewString(reg, "url"),
@@ -56,6 +49,7 @@ func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetric
 		pingMessageSendTime:     metrics.NewUniformSample(1024),
 		pongMessageReceivedTime: metrics.NewUniformSample(1024),
 	}
+	logger := logp.NewLogger("")
 	_ = adapter.NewGoMetrics(reg, "cel_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.celProcessingTime))
 	_ = adapter.NewGoMetrics(reg, "batch_processing_time", logger, adapter.Accept).

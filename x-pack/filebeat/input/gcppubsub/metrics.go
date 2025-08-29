@@ -26,15 +26,8 @@ type inputMetrics struct {
 	processingTime          metrics.Sample   // Histogram of the elapsed time for processing an event in nanoseconds.
 }
 
-<<<<<<< HEAD
 func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
 	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
-=======
-func newInputMetrics(id string, optionalParent *monitoring.Registry, logger *logp.Logger) *inputMetrics {
-	// It's a v1 input, thus it does not have access to the v2.Context with the
-	// metrics registry.
-	reg, unreg := inputmon.NewDeprecatedMetricsRegistry(inputName, id, optionalParent)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	out := &inputMetrics{
 		unregister:              unreg,
@@ -44,7 +37,7 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry, logger *log
 		bytesProcessedTotal:     monitoring.NewUint(reg, "bytes_processed_total"),
 		processingTime:          metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", logp.NewLogger(""), adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))
 
 	return out

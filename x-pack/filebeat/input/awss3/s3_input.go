@@ -95,24 +95,14 @@ func (in *s3PollerInput) Run(
 		return err
 	}
 
-<<<<<<< HEAD
 	in.metrics = newInputMetrics(inputContext.ID, nil, in.config.NumberOfWorkers)
-=======
-	in.metrics = newInputMetrics(inputContext.MetricsRegistry, in.config.NumberOfWorkers, in.log)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	defer in.metrics.Close()
 
 	in.s3ObjectHandler = newS3ObjectProcessorFactory(
 		in.metrics,
 		in.s3,
 		in.config.getFileSelectors(),
-<<<<<<< HEAD
-		in.config.BackupConfig)
-=======
-		in.config.BackupConfig,
-		in.log,
-	)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
+		in.config.BackupConfig, in.log)
 
 	in.run(ctx)
 

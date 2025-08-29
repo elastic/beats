@@ -97,11 +97,7 @@ func TestSQSReceiver(t *testing.T) {
 		sqsReader := newSQSReaderInput(config{NumberOfWorkers: workerCount}, aws.Config{})
 		sqsReader.log = logger
 		sqsReader.sqs = mockSQS
-<<<<<<< HEAD
 		sqsReader.metrics = newInputMetrics("", nil, 0)
-=======
-		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger())
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 		sqsReader.pipeline = &fakePipeline{}
 		sqsReader.msgHandler = mockMsgHandler
 		sqsReader.status = &statusReporterHelperMock{}
@@ -151,11 +147,7 @@ func TestSQSReceiver(t *testing.T) {
 		sqsReader.log = logp.NewLogger(inputName)
 		sqsReader.sqs = mockSQS
 		sqsReader.msgHandler = mockMsgHandler
-<<<<<<< HEAD
 		sqsReader.metrics = newInputMetrics("", nil, 0)
-=======
-		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger())
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 		sqsReader.pipeline = &fakePipeline{}
 		sqsReader.status = &statusReporterHelperMock{}
 		sqsReader.run(ctx)
@@ -332,11 +324,7 @@ func TestReadSQSMessagesStatusUpdates(t *testing.T) {
 	statusReporter := &statusReporterHelperMock{}
 	log := logp.NewLogger("awss3_test")
 	ctx := context.Background()
-<<<<<<< HEAD
 	metrics := newInputMetrics("", nil, 0)
-=======
-	metrics := newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger())
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	// assuming we're entering this function with a running state from outside the func
 	startingRunningMsg := "We've started running somewhere else"

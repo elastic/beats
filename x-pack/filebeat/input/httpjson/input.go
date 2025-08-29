@@ -201,14 +201,9 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 		}
 	}
 
-<<<<<<< HEAD
-	metrics := newInputMetrics(reg)
+	metrics := newInputMetrics(reg, ctx.Logger)
 
 	client, err := newHTTPClient(stdCtx, cfg, stat, log, reg)
-=======
-	metrics := newInputMetrics(reg, ctx.Logger)
-	client, err := newHTTPClient(stdCtx, cfg.Auth, cfg.Request, stat, log, reg, nil)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	if err != nil {
 		stat.UpdateStatus(status.Failed, "failed to create HTTP client: "+err.Error())
 		return err
