@@ -6,6 +6,7 @@ package instance
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -64,7 +65,6 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 			b.Monitoring.StateRegistry(),
 			b.Monitoring.StatsRegistry(),
 			b.Monitoring.InputsRegistry())
-
 		if err != nil {
 			return BeatReceiver{}, fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
@@ -88,14 +88,27 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		groupReporter := status.NewGroupStatusReporter(host)
 		w.WithOtelFactoryWrapper(status.StatusReporterFactory(groupReporter))
 	}
+	defer func() {
+		br.beat.Instrumentation.Tracer().Close()
+		proc := br.beat.GetProcessors()
+		if err := proc.Close(); err != nil {
+			br.beat.Info.Logger.Warnf("failed to close global processing: %s", err)
+		}
+	}()
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
 		return fmt.Errorf("beat receiver run error: %w", err)
 	}
+
 	return nil
 }
 
 // BeatReceiver.Stop() stops beat receiver.
 func (br *BeatReceiver) Shutdown() error {
+	if c, ok := br.beat.Publisher.(io.Closer); ok {
+		if err := c.Close(); err != nil {
+			return fmt.Errorf("error closing beat receiver publisher: %w", err)
+		}
+	}
 	br.beater.Stop()
 	if err := br.stopMonitoring(); err != nil {
 		return fmt.Errorf("error stopping monitoring server: %w", err)

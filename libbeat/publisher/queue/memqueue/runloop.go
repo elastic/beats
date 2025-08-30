@@ -130,6 +130,7 @@ func (l *runLoop) runIteration() {
 		close(l.broker.closingChan)
 		// Get requests are handled immediately during shutdown
 		l.maybeUnblockGetRequest()
+		l.broker.ctxCancel()
 
 	case <-l.broker.ctx.Done():
 		// The queue is fully shut down, do nothing
