@@ -268,8 +268,10 @@ winlogbeat.event_logs:
   - name: Application
   - name: System 
   - name: Sysmon
-    ignore_missing_channel: true
+    ignore_missing_channel: false
 ```
+
+In this example, if the Sysmon channel is missing, Winlogbeat will stop with an error, which may be desired for critical monitoring components.
 
 
 ### `tags` [_tags_29]
