@@ -313,6 +313,7 @@ func TestLogBatchDrop(t *testing.T) {
 	batch.Drop()
 
 	assert.True(t, batch.result.Dropped)
+	assert.Nil(t, batch.Events())
 	assert.False(t, batch.result.Acked)
 	assert.False(t, batch.result.Retry)
 	assert.False(t, batch.result.Cancelled)

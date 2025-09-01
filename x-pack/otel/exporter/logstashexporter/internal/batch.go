@@ -61,6 +61,7 @@ func (b *LogBatch) ACK() {
 }
 
 func (b *LogBatch) Drop() {
+	b.pendingEvents = nil
 	b.result.Dropped = true
 }
 
