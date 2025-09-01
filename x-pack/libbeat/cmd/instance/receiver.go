@@ -107,6 +107,9 @@ func (br *BeatReceiver) Shutdown() error {
 	if err := br.stopMonitoring(); err != nil {
 		return fmt.Errorf("error stopping monitoring server: %w", err)
 	}
+	if err := br.beat.Info.Logger.Close(); err != nil {
+		return fmt.Errorf("error closing beat receiver logging: %w", err)
+	}
 	return nil
 }
 
