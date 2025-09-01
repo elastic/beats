@@ -99,7 +99,6 @@ func TestNewLogBatch(t *testing.T) {
 				assert.False(t, batch.result.Acked)
 				assert.False(t, batch.result.Dropped)
 				assert.False(t, batch.result.Retry)
-				assert.False(t, batch.result.Split)
 				assert.False(t, batch.result.Cancelled)
 				assert.Equal(t, 0, batch.result.Retries)
 
@@ -303,7 +302,6 @@ func TestLogBatchACK(t *testing.T) {
 	assert.True(t, batch.result.Acked)
 	assert.False(t, batch.result.Dropped)
 	assert.False(t, batch.result.Retry)
-	assert.False(t, batch.result.Split)
 	assert.False(t, batch.result.Cancelled)
 }
 
@@ -317,7 +315,6 @@ func TestLogBatchDrop(t *testing.T) {
 	assert.True(t, batch.result.Dropped)
 	assert.False(t, batch.result.Acked)
 	assert.False(t, batch.result.Retry)
-	assert.False(t, batch.result.Split)
 	assert.False(t, batch.result.Cancelled)
 }
 
@@ -356,44 +353,6 @@ func TestLogBatchRetryEvents(t *testing.T) {
 	assert.Equal(t, 1, batch.result.Retries)
 }
 
-func TestLogBatchSplitRetry(t *testing.T) {
-	tests := []struct {
-		name       string
-		eventCount int
-		wantSplit  bool
-	}{
-		{
-			name:       "enough events to split",
-			eventCount: 3,
-			wantSplit:  true,
-		},
-		{
-			name:       "minimum events to split",
-			eventCount: 2,
-			wantSplit:  true,
-		},
-		{
-			name:       "not enough events to split - one event",
-			eventCount: 1,
-			wantSplit:  false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			batch := &LogBatch{
-				pendingEvents: make([]publisher.Event, tt.eventCount),
-				result:        &LogBatchResult{},
-			}
-
-			canSplit := batch.SplitRetry()
-
-			assert.Equal(t, tt.wantSplit, canSplit)
-			assert.Equal(t, tt.wantSplit, batch.result.Split)
-		})
-	}
-}
-
 func TestLogBatchCancelled(t *testing.T) {
 	batch := &LogBatch{
 		result: &LogBatchResult{},
@@ -405,7 +364,6 @@ func TestLogBatchCancelled(t *testing.T) {
 	assert.False(t, batch.result.Acked)
 	assert.False(t, batch.result.Dropped)
 	assert.False(t, batch.result.Retry)
-	assert.False(t, batch.result.Split)
 }
 
 func TestLogBatchResult(t *testing.T) {
@@ -413,7 +371,6 @@ func TestLogBatchResult(t *testing.T) {
 		Acked:     true,
 		Dropped:   false,
 		Retry:     true,
-		Split:     false,
 		Cancelled: false,
 		Retries:   2,
 	}

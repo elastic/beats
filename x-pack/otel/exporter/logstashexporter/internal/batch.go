@@ -16,7 +16,6 @@ type LogBatchResult struct {
 	Acked     bool
 	Dropped   bool
 	Retry     bool
-	Split     bool
 	Cancelled bool
 	Retries   int
 }
@@ -75,12 +74,9 @@ func (b *LogBatch) RetryEvents(events []publisher.Event) {
 	b.Retry()
 }
 
+// SplitRetry is not used by Logstash clients currently
 func (b *LogBatch) SplitRetry() bool {
-	if len(b.pendingEvents) < 2 {
-		return false
-	}
-	b.result.Split = true
-	return true
+	return false
 }
 
 func (b *LogBatch) Cancelled() {
