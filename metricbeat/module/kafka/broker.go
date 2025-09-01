@@ -183,7 +183,9 @@ func (b *Broker) PartitionOffset(
 	partition int32,
 	time int64,
 ) (int64, error) {
-	req := &sarama.OffsetRequest{}
+	req := &sarama.OffsetRequest{
+		Version: 1,
+	}
 	if replicaID != noID {
 		req.SetReplicaID(replicaID)
 	}

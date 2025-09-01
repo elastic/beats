@@ -10,6 +10,5 @@ languages, perspectives, and cultures, it's easy to lose something in
 translation. Respect cultural differences, and don't assume malice. We do not
 tolerate harassment or discrimination in any form.
 
-Please see Elastic's [Open Source Community Code of Conduct]
-(https://www.elastic.co/community/codeofconduct) for the full text of the
-code.
+Please see Elastic's [Open Source Community Code of Conduct](https://www.elastic.co/community/codeofconduct)
+for the full text of the code.
