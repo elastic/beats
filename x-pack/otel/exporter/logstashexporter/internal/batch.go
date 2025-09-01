@@ -7,8 +7,9 @@ package internal
 import (
 	"context"
 
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"go.opentelemetry.io/collector/pdata/plog"
+
+	"github.com/elastic/beats/v7/libbeat/publisher"
 )
 
 type LogBatchResult struct {

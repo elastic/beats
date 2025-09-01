@@ -9,11 +9,12 @@ import (
 	"errors"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"go.opentelemetry.io/collector/client"
 	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
 func parseEvent(ctx context.Context, logRecord *plog.LogRecord) (beat.Event, error) {
@@ -85,7 +86,9 @@ func isBeatsEvent(metadata map[string]any) bool {
 // If the version is not found, it returns an empty string.
 func GetBeatVersion(ctx context.Context) string {
 	if version, ok := parseEventMetadata(ctx)["version"]; ok {
-		return version.(string)
+		if versionStr, ok := version.(string); ok {
+			return versionStr
+		}
 	}
 	return ""
 }
