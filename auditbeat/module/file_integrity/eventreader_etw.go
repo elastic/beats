@@ -247,7 +247,7 @@ func (r *etwReader) Start(done <-chan struct{}) (<-chan Event, error) {
 	r.stopC = make(chan struct{})
 	go func() {
 		if err := r.etwSession.StartConsumer(); err != nil {
-			r.log.Errorf("failed running ETW consumer: %w", err)
+			r.log.Errorf("failed running ETW consumer: %v", err)
 		}
 	}()
 
@@ -641,7 +641,7 @@ func (r *etwReader) getUserInfo(sidStr string) *userInfo {
 	info.name, info.domain, use, err = sid.LookupAccount("")
 	if err != nil {
 		// we do not cache this one since it might be a temporary error
-		r.log.Errorf("failed to lookup account for SID %s: %w", sidStr, err)
+		r.log.Errorf("failed to lookup account for SID %s: %v", sidStr, err)
 		return &info
 	}
 
