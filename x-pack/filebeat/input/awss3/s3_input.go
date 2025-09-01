@@ -102,7 +102,7 @@ func (in *s3PollerInput) Run(
 		in.metrics,
 		in.s3,
 		in.config.getFileSelectors(),
-		in.config.BackupConfig)
+		in.config.BackupConfig, in.log)
 
 	in.run(ctx)
 

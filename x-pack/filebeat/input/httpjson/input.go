@@ -201,7 +201,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 		}
 	}
 
-	metrics := newInputMetrics(reg)
+	metrics := newInputMetrics(reg, ctx.Logger)
 
 	client, err := newHTTPClient(stdCtx, cfg, stat, log, reg)
 	if err != nil {
@@ -372,7 +372,7 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 	}
 
 	if reg != nil {
-		netHTTPClient.Transport = httpmon.NewMetricsRoundTripper(netHTTPClient.Transport, reg)
+		netHTTPClient.Transport = httpmon.NewMetricsRoundTripper(netHTTPClient.Transport, reg, log)
 	}
 
 	netHTTPClient.CheckRedirect = checkRedirect(cfg, log)

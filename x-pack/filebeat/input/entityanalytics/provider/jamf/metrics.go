@@ -8,6 +8,7 @@ import (
 	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -43,8 +44,9 @@ func newMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
 		updateProcessingTime: metrics.NewUniformSample(1024),
 	}
 
-	adapter.NewGoMetrics(reg, "sync_processing_time", adapter.Accept).Register("histogram", metrics.NewHistogram(out.syncProcessingTime))     //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "update_processing_time", adapter.Accept).Register("histogram", metrics.NewHistogram(out.updateProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	logger := logp.NewLogger("")
+	adapter.NewGoMetrics(reg, "sync_processing_time", logger, adapter.Accept).Register("histogram", metrics.NewHistogram(out.syncProcessingTime))     //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "update_processing_time", logger, adapter.Accept).Register("histogram", metrics.NewHistogram(out.updateProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
 	return &out
 }
