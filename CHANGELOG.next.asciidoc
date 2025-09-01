@@ -150,6 +150,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
 - Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
 - Fix a race condition during metrics initialization which could cause a panic. {issue}45822[45822] {pull}46054[46054]
+- Update github.com/go-viper/mapstructure/v2 to v2.4.0 {pull}46335[46335]
 
 *Auditbeat*
 
