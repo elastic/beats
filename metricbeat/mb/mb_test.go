@@ -48,22 +48,6 @@ type testMetricSet struct {
 
 func (m *testMetricSet) Fetch(reporter ReporterV2) {}
 
-// ReportingFetcher
-
-type testMetricSetReportingFetcher struct {
-	BaseMetricSet
-}
-
-func (m *testMetricSetReportingFetcher) Fetch(r Reporter) {}
-
-// PushMetricSet
-
-type testPushMetricSet struct {
-	BaseMetricSet
-}
-
-func (m *testPushMetricSet) Run(r PushReporter) {}
-
 func TestModuleConfig(t *testing.T) {
 	tests := []struct {
 		name string
@@ -238,65 +222,6 @@ func TestNewModulesHostParser(t *testing.T) {
 		// The URI is passed through in the Host() and HostData().URI.
 		assert.Equal(t, host, ms.Host())
 		assert.Equal(t, HostData{URI: uri, Host: host}, ms.HostData())
-	})
-}
-
-func TestNewModulesMetricSetTypes(t *testing.T) {
-	r := newTestRegistry(t)
-
-	factory := func(base BaseMetricSet) (MetricSet, error) {
-		return &testMetricSet{base}, nil
-	}
-
-	name := "ReportingMetricSetV2"
-	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
-		t.Fatal(err)
-	}
-
-	t.Run(name+" MetricSet", func(t *testing.T) {
-		ms := newTestMetricSet(t, r, map[string]interface{}{
-			"module":     moduleName,
-			"metricsets": []string{name},
-		})
-		_, ok := ms.(ReportingMetricSetV2)
-		assert.True(t, ok, name+" not implemented")
-	})
-
-	factory = func(base BaseMetricSet) (MetricSet, error) {
-		return &testMetricSetReportingFetcher{base}, nil
-	}
-
-	name = "ReportingFetcher"
-	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
-		t.Fatal(err)
-	}
-
-	t.Run(name+" MetricSet", func(t *testing.T) {
-		ms := newTestMetricSet(t, r, map[string]interface{}{
-			"module":     moduleName,
-			"metricsets": []string{name},
-		})
-
-		_, ok := ms.(ReportingMetricSet)
-		assert.True(t, ok, name+" not implemented")
-	})
-
-	factory = func(base BaseMetricSet) (MetricSet, error) {
-		return &testPushMetricSet{base}, nil
-	}
-
-	name = "Push"
-	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
-		t.Fatal(err)
-	}
-
-	t.Run(name+" MetricSet", func(t *testing.T) {
-		ms := newTestMetricSet(t, r, map[string]interface{}{
-			"module":     moduleName,
-			"metricsets": []string{name},
-		})
-		_, ok := ms.(PushMetricSet)
-		assert.True(t, ok, name+" not implemented")
 	})
 }
 

@@ -116,8 +116,6 @@ func TLSCommonToOTel(output *config.C, logger *logp.Logger) (map[string]any, err
 		}
 		caCerts = append(caCerts, string(d))
 	}
-	// We only include the system certificates if no CA is defined
-	includeSystemCACertsPool := len(caCerts) == 0
 
 	var (
 		certKeyPem string
@@ -153,7 +151,6 @@ func TLSCommonToOTel(output *config.C, logger *logp.Logger) (map[string]any, err
 		ciphersuites = append(ciphersuites, tls.CipherSuiteName(cs))
 	}
 
-	setIfNotNil(otelTLSConfig, "include_system_ca_certs_pool", includeSystemCACertsPool)
 	setIfNotNil(otelTLSConfig, "ca_pem", strings.Join(caCerts, "")) // ssl.certificate_authorities
 	setIfNotNil(otelTLSConfig, "cert_pem", certPem)                 // ssl.certificate
 	setIfNotNil(otelTLSConfig, "key_pem", certKeyPem)               // ssl.key
