@@ -149,6 +149,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Use Debian 11 to build linux/arm to match linux/amd64. Upgrades linux/arm64's statically linked glibc from 2.28 to 2.31. {issue}44816[44816]
 - The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
 - Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
+- Fix a race condition during metrics initialization which could cause a panic. {issue}45822[45822] {pull}46054[46054]
 
 *Auditbeat*
 
@@ -270,6 +271,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix reading journald messages with more than 4kb. {issue}45511[45511] {pull}46017[46017]
 - Restore the Streaming input on Windows. {pull}46031[46031]
 - Fix termination of input on API errors. {pull}45999[45999]
+- Fixed hints autodiscover for Docker when the configuration is only `hints.enabled: true`. {issue}45156[45156] {pull}45864[45864]
 
 *Heartbeat*
 
@@ -509,6 +511,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Updated the `parse_aws_vpc_flow_log` processor to handle AWS VPC flow log v6, v7, and v8 fields. {pull}45746[45746]
 - Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]
 - Clarify behavior in logging for starting periodic evaluations and for exceeding the maximum execution budget. {pull}45633[45633]
+- Add OAuth2 support for Okta provider in Entity Analytics input. {pull}45753[45753]
 - Add status reporting support for AWS CloudWatch input. {pull}45679[45679]
 - Add mechanism to allow HTTP JSON templates to terminate without logging an error. {issue}45664[45664] {pull}45810[45810]
 - Improve error reporting for schemeless URLs in HTTP JSON input. {pull}45953[45953]
@@ -591,6 +594,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Increase default polling period for MongoDB module from 10s to 60s {pull}44781[44781]
 - Upgrade github.com/microsoft/go-mssqldb from v1.7.2 to v1.8.2 {pull}44990[44990]
 - Add SSL support for sql module: drivers mysql, postgres, and mssql. {pull}44748[44748]
+- Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
 - Add NTP response validation for system/ntp module. {pull}46184[46184]
 
 *Metricbeat*

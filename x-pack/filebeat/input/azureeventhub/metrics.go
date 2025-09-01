@@ -9,12 +9,13 @@ package azureeventhub
 import (
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
 // newInputMetrics creates a new `*inputMetrics` to track input metrics.
-func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
+func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	inputMetrics := inputMetrics{
 		// Messages
 		receivedMessages:    monitoring.NewUint(reg, "received_messages_total"),
@@ -35,7 +36,7 @@ func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 		processorRestarts: monitoring.NewUint(reg, "processor_restarts_total"),
 	}
 	_ = adapter.
-		NewGoMetrics(reg, "processing_time", adapter.Accept).
+		NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(inputMetrics.processingTime))
 
 	return &inputMetrics

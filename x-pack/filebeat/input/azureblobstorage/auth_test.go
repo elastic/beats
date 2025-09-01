@@ -138,7 +138,7 @@ func Test_OAuth2(t *testing.T) {
 				Transport:                       httpClient.Transport.(*customTransporter),
 			}
 
-			input := newStatelessInput(conf, serv.URL+"/")
+			input := newStatelessInput(conf, serv.URL+"/", logp.NewNopLogger())
 
 			assert.Equal(t, "azure-blob-storage-stateless", input.Name())
 			assert.NoError(t, input.Test(v2.TestContext{}))
