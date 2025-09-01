@@ -7,6 +7,7 @@ package lumberjack
 import (
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -19,7 +20,7 @@ type inputMetrics struct {
 	batchProcessingTime   metrics.Sample     // Histogram of the elapsed batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
 }
 
-func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
+func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	out := &inputMetrics{
 		bindAddress:           monitoring.NewString(reg, "bind_address"),
 		batchesReceivedTotal:  monitoring.NewUint(reg, "batches_received_total"),
@@ -27,7 +28,7 @@ func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 		messagesReceivedTotal: monitoring.NewUint(reg, "messages_received_total"),
 		batchProcessingTime:   metrics.NewUniformSample(1024),
 	}
-	adapter.NewGoMetrics(reg, "batch_processing_time", adapter.Accept).
+	adapter.NewGoMetrics(reg, "batch_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
 	return out

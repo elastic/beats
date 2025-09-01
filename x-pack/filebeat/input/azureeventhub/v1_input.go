@@ -81,7 +81,7 @@ func (in *eventHubInputV1) Run(
 	defer in.pipelineClient.Close()
 
 	// Setup input metrics
-	in.metrics = newInputMetrics(inputContext.MetricsRegistry)
+	in.metrics = newInputMetrics(inputContext.MetricsRegistry, inputContext.Logger)
 
 	// Set up new and legacy sanitizers, if any.
 	sanitizers, err := newSanitizers(in.config.Sanitizers, in.config.LegacySanitizeOptions)

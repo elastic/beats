@@ -42,7 +42,7 @@ output.console:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
 	_, err := os.Stat(mockbeat.TempDir() + "/data/meta.json")
 	require.NoError(t, err)
 }
@@ -62,7 +62,7 @@ output.console:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
+	mockbeat.WaitLogsContains("mockbeat start running.", 60*time.Second)
 	stat, err := os.Stat(mockbeat.TempDir() + "/data/meta.json")
 	require.NoError(t, err)
 	require.Equal(t, stat.Mode().String(), "-rw-------")

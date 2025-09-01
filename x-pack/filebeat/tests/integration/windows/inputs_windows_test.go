@@ -21,7 +21,7 @@ import (
 func TestWinInputs(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
-	lbint.EnsureCompiled(ctx, t, "filebeat")
+	fbint.EnsureCompiled(ctx, t)
 
 	reportOptions := lbint.ReportOptions{
 		PrintLinesOnFail:  10,
@@ -73,7 +73,7 @@ output.console:
 		}
 		for name, tc := range tcs {
 			t.Run(name, func(t *testing.T) {
-				ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+				ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
 				defer cancel()
 
 				test := fbint.NewTest(t, fbint.TestOptions{
