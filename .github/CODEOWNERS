@@ -48,7 +48,7 @@ CHANGELOG*
 /filebeat/module/mysql @elastic/obs-infraobs-integrations
 /filebeat/module/nats @elastic/obs-infraobs-integrations
 /filebeat/module/nginx @elastic/obs-infraobs-integrations
-/filebeat/module/osquery @elastic/integration-experience
+/filebeat/module/osquery @elastic/sec-windows-platform
 /filebeat/module/pensando @elastic/integration-experience
 /filebeat/module/postgresql @elastic/obs-infraobs-integrations
 /filebeat/module/redis @elastic/obs-infraobs-integrations
@@ -78,6 +78,7 @@ CHANGELOG*
 /metricbeat/ @elastic/elastic-agent-data-plane
 /metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /metricbeat/helper/kubernetes @elastic/obs-ds-hosted-services
+/metricbeat/helper/sql @elastic/obs-infraobs-integrations
 /metricbeat/module/aerospike @elastic/obs-infraobs-integrations
 /metricbeat/module/apache @elastic/obs-infraobs-integrations
 /metricbeat/module/beat/ @elastic/stack-monitoring
@@ -108,6 +109,7 @@ CHANGELOG*
 /metricbeat/module/rabbitmq @elastic/obs-infraobs-integrations
 /metricbeat/module/redis @elastic/obs-infraobs-integrations
 /metricbeat/module/system/ @elastic/elastic-agent-data-plane
+/metricbeat/module/system/ntp @elastic/obs-infraobs-integrations
 /metricbeat/module/vsphere @elastic/obs-infraobs-integrations
 /metricbeat/module/windows/wmi @elastic/obs-infraobs-integrations
 /metricbeat/module/zookeeper @elastic/obs-infraobs-integrations
@@ -265,6 +267,6 @@ CHANGELOG*
 /x-pack/metricbeat/module/statsd @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/stan/ @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/tomcat @elastic/obs-infraobs-integrations
-/x-pack/osquerybeat/ @elastic/integration-experience
+/x-pack/osquerybeat/ @elastic/sec-windows-platform
 /x-pack/packetbeat/ @elastic/sec-linux-platform
 /x-pack/winlogbeat/ @elastic/sec-windows-platform
