@@ -133,7 +133,7 @@ func TestGetObjectSecurityInfoRobustness(t *testing.T) {
 			path, isDir, cleanup := tt.setupFile(t)
 			defer cleanup()
 
-			ownerSID, ownerName, groupName, err := getObjectSecurityInfo(path, isDir)
+			info, err := getObjectSecurityInfo(path, isDir)
 
 			if tt.expectError {
 				assert.Error(t, err)
@@ -143,22 +143,22 @@ func TestGetObjectSecurityInfoRobustness(t *testing.T) {
 			assert.NoError(t, err)
 
 			if tt.expectOwnerSID {
-				assert.NotEmpty(t, ownerSID, "Should have owner SID")
-				assert.Contains(t, ownerSID, "S-", "SID should start with S-")
+				assert.NotEmpty(t, info.sid, "Should have owner SID")
+				assert.Contains(t, info.sid, "S-", "SID should start with S-")
 			}
 
 			if tt.expectOwner {
-				assert.NotEmpty(t, ownerName, "Should have owner name")
+				assert.NotEmpty(t, info.name, "Should have owner name")
 			}
 
 			if tt.expectGroup {
 				// Group might be empty in some cases, but if present should be valid
-				if groupName != "" {
-					assert.NotEmpty(t, groupName, "Group name should not be empty string")
+				if info.groupName != "" {
+					assert.NotEmpty(t, info.groupName, "Group name should not be empty string")
 				}
 			}
 
-			t.Logf("Path: %s, SID: %s, Owner: %s, Group: %s", path, ownerSID, ownerName, groupName)
+			t.Logf("Path: %s, SID: %s, Owner: %s, Group: %s", path, info.sid, info.name, info.groupName)
 		})
 	}
 }
@@ -173,14 +173,14 @@ func TestGetSecurityInfoByPath(t *testing.T) {
 	defer os.Remove(tmpFile.Name())
 	tmpFile.Close()
 
-	ownerSID, ownerName, groupName, err := getSecurityInfoByPath(tmpFile.Name())
+	info, err := getSecurityInfoByPath(tmpFile.Name())
 
 	assert.NoError(t, err)
-	assert.NotEmpty(t, ownerSID, "Should have owner SID")
-	assert.Contains(t, ownerSID, "S-", "SID should start with S-")
-	assert.NotEmpty(t, ownerName, "Should have owner name")
+	assert.NotEmpty(t, info.sid, "Should have owner SID")
+	assert.Contains(t, info.sid, "S-", "SID should start with S-")
+	assert.NotEmpty(t, info.name, "Should have owner name")
 
-	t.Logf("ByPath - SID: %s, Owner: %s, Group: %s", ownerSID, ownerName, groupName)
+	t.Logf("ByPath - SID: %s, Owner: %s, Group: %s", info.sid, info.name, info.groupName)
 }
 
 // TestGetSecurityInfoFromHandle tests the handle-based security info method
@@ -213,14 +213,14 @@ func TestGetSecurityInfoFromHandle(t *testing.T) {
 	}
 	defer windows.CloseHandle(handle)
 
-	ownerSID, ownerName, groupName, err := getSecurityInfoFromHandle(handle, tmpFile.Name())
+	info, err := getSecurityInfoFromHandle(handle, tmpFile.Name())
 
 	assert.NoError(t, err)
-	assert.NotEmpty(t, ownerSID, "Should have owner SID")
-	assert.Contains(t, ownerSID, "S-", "SID should start with S-")
-	assert.NotEmpty(t, ownerName, "Should have owner name")
+	assert.NotEmpty(t, info.sid, "Should have owner SID")
+	assert.Contains(t, info.sid, "S-", "SID should start with S-")
+	assert.NotEmpty(t, info.name, "Should have owner name")
 
-	t.Logf("FromHandle - SID: %s, Owner: %s, Group: %s", ownerSID, ownerName, groupName)
+	t.Logf("FromHandle - SID: %s, Owner: %s, Group: %s", info.sid, info.name, info.groupName)
 }
 
 // TestExtractSecurityInfo tests the security descriptor parsing
@@ -243,14 +243,14 @@ func TestExtractSecurityInfo(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ownerSID, ownerName, groupName, err := extractSecurityInfo(secInfo, tmpFile.Name())
+	info, err := extractSecurityInfo(secInfo, tmpFile.Name())
 
 	assert.NoError(t, err)
-	assert.NotEmpty(t, ownerSID, "Should have owner SID")
-	assert.Contains(t, ownerSID, "S-", "SID should start with S-")
-	assert.NotEmpty(t, ownerName, "Should have owner name")
+	assert.NotEmpty(t, info.sid, "Should have owner SID")
+	assert.Contains(t, info.sid, "S-", "SID should start with S-")
+	assert.NotEmpty(t, info.name, "Should have owner name")
 
-	t.Logf("Extract - SID: %s, Owner: %s, Group: %s", ownerSID, ownerName, groupName)
+	t.Logf("Extract - SID: %s, Owner: %s, Group: %s", info.sid, info.name, info.groupName)
 }
 
 // TestSecurityInfoFallbackMechanisms tests various fallback scenarios
@@ -264,10 +264,10 @@ func TestSecurityInfoFallbackMechanisms(t *testing.T) {
 		tmpFile.Close()
 
 		// This should work even if group information fails
-		ownerSID, ownerName, _, err := getSecurityInfoByPath(tmpFile.Name())
+		info, err := getSecurityInfoByPath(tmpFile.Name())
 		assert.NoError(t, err)
-		assert.NotEmpty(t, ownerSID)
-		assert.NotEmpty(t, ownerName)
+		assert.NotEmpty(t, info.sid)
+		assert.NotEmpty(t, info.name)
 	})
 
 	t.Run("progressive_access_levels", func(t *testing.T) {
@@ -279,12 +279,12 @@ func TestSecurityInfoFallbackMechanisms(t *testing.T) {
 		tmpFile.Close()
 
 		// Test that the function works with our progressive access mechanism
-		ownerSID, ownerName, groupName, err := getObjectSecurityInfo(tmpFile.Name(), false)
+		info, err := getObjectSecurityInfo(tmpFile.Name(), false)
 		assert.NoError(t, err)
-		assert.NotEmpty(t, ownerSID)
-		assert.NotEmpty(t, ownerName)
+		assert.NotEmpty(t, info.sid)
+		assert.NotEmpty(t, info.name)
 
-		t.Logf("Progressive - SID: %s, Owner: %s, Group: %s", ownerSID, ownerName, groupName)
+		t.Logf("Progressive - SID: %s, Owner: %s, Group: %s", info.sid, info.name, info.groupName)
 	})
 }
 
@@ -338,13 +338,13 @@ func TestSecurityInfoWithDifferentFileTypes(t *testing.T) {
 			path, isDir, cleanup := tt.setupFn(t)
 			defer cleanup()
 
-			ownerSID, ownerName, groupName, err := getObjectSecurityInfo(path, isDir)
+			info, err := getObjectSecurityInfo(path, isDir)
 
 			assert.NoError(t, err, "Should handle %s without error", tt.fileType)
-			assert.NotEmpty(t, ownerSID, "Should have owner SID for %s", tt.fileType)
-			assert.NotEmpty(t, ownerName, "Should have owner name for %s", tt.fileType)
+			assert.NotEmpty(t, info.sid, "Should have owner SID for %s", tt.fileType)
+			assert.NotEmpty(t, info.name, "Should have owner name for %s", tt.fileType)
 
-			t.Logf("%s - SID: %s, Owner: %s, Group: %s", tt.fileType, ownerSID, ownerName, groupName)
+			t.Logf("%s - SID: %s, Owner: %s, Group: %s", tt.fileType, info.sid, info.name, info.groupName)
 		})
 	}
 }
@@ -353,18 +353,18 @@ func TestSecurityInfoWithDifferentFileTypes(t *testing.T) {
 func TestSecurityInfoErrorHandling(t *testing.T) {
 	t.Run("invalid_path", func(t *testing.T) {
 		invalidPath := "Z:\\completely\\invalid\\path\\that\\does\\not\\exist.txt"
-		_, _, _, err := getObjectSecurityInfo(invalidPath, false)
+		_, err := getObjectSecurityInfo(invalidPath, false)
 		assert.Error(t, err, "Should fail for invalid path")
 	})
 
 	t.Run("empty_path", func(t *testing.T) {
-		_, _, _, err := getObjectSecurityInfo("", false)
+		_, err := getObjectSecurityInfo("", false)
 		assert.Error(t, err, "Should fail for empty path")
 	})
 
 	t.Run("path_with_invalid_characters", func(t *testing.T) {
 		invalidPath := "test\x00file.txt" // null character
-		_, _, _, err := getObjectSecurityInfo(invalidPath, false)
+		_, err := getObjectSecurityInfo(invalidPath, false)
 		assert.Error(t, err, "Should fail for path with invalid characters")
 	})
 }

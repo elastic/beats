@@ -16,24 +16,25 @@
         ]
       },
       "file": {
-        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwrename-file1835027416\\001\\mainfile.txt"
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwrename-file4137984990\\001\\mainfile.txt"
       },
       "process": {
-        "pid": 135912,
+        "pid": 39336,
         "user": {
+          "domain": "tp",
           "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
-          "name": "tp\\Marc"
+          "name": "Marc"
         }
       }
     },
     "Index": "",
     "ID": "",
     "Namespace": "",
-    "Timestamp": "2025-08-11T09:49:04.5755794Z",
+    "Timestamp": "2025-09-01T10:30:54.3669999Z",
     "Error": null,
     "Host": "",
     "Service": "",
-    "Took": 536800,
+    "Took": 0,
     "Period": 0,
     "DisableTimeSeries": false
   },
@@ -54,39 +55,40 @@
         ]
       },
       "file": {
-        "accessed": "2025-08-11T09:48:56.2454911Z",
+        "accessed": "2025-09-01T10:30:46.1420606Z",
         "attributes": [
           "archive"
         ],
-        "created": "2025-08-11T09:48:56.2454911Z",
-        "ctime": "2025-08-11T09:48:56.2454911Z",
+        "created": "2025-09-01T10:30:46.1420606Z",
+        "ctime": "2025-09-01T10:30:46.1420606Z",
         "drive_letter": "C",
         "extension": "txt",
-        "inode": "11540474045606542",
-        "mtime": "2025-08-11T09:48:56.2454911Z",
+        "inode": "4222124650664829",
+        "mtime": "2025-09-01T10:30:46.1420606Z",
         "name": "renamed-file.txt",
         "owner": "tp\\Marc",
-        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwrename-file1835027416\\001\\renamed-file.txt",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwrename-file4137984990\\001\\renamed-file.txt",
         "size": 0,
         "type": "file",
         "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
       },
       "process": {
-        "pid": 135912,
+        "pid": 39336,
         "user": {
+          "domain": "tp",
           "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
-          "name": "tp\\Marc"
+          "name": "Marc"
         }
       }
     },
     "Index": "",
     "ID": "",
     "Namespace": "",
-    "Timestamp": "2025-08-11T09:49:04.5757676Z",
+    "Timestamp": "2025-09-01T10:30:54.3671549Z",
     "Error": null,
     "Host": "",
     "Service": "",
-    "Took": 507300,
+    "Took": 0,
     "Period": 0,
     "DisableTimeSeries": false
   }

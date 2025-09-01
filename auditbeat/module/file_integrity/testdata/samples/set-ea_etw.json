@@ -16,94 +16,39 @@
         ]
       },
       "file": {
-        "accessed": "2025-08-11T09:49:28.5999494Z",
+        "accessed": "2025-09-01T10:31:18.3861095Z",
         "attributes": [
           "archive"
         ],
-        "created": "2025-08-11T09:49:28.5999494Z",
-        "ctime": "2025-08-11T09:49:28.5999494Z",
+        "created": "2025-09-01T10:31:18.3861095Z",
+        "ctime": "2025-09-01T10:31:18.3861095Z",
         "drive_letter": "C",
         "extended_attributes": {
           "testea": "TestValue"
         },
         "extension": "txt",
-        "inode": "12384898975738523",
-        "mtime": "2025-08-11T09:49:28.5999494Z",
+        "inode": "5348024557507453",
+        "mtime": "2025-09-01T10:31:18.3861095Z",
         "name": "mainfile.txt",
         "owner": "tp\\Marc",
-        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwset-ea3540489267\\001\\mainfile.txt",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwset-ea3525572669\\001\\mainfile.txt",
         "size": 0,
         "type": "file",
         "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
       },
       "process": {
-        "pid": 99020,
+        "pid": 6228,
         "user": {
+          "domain": "tp",
           "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
-          "name": "tp\\Marc"
+          "name": "Marc"
         }
       }
     },
     "Index": "",
     "ID": "",
     "Namespace": "",
-    "Timestamp": "2025-08-11T09:49:36.8937222Z",
-    "Error": null,
-    "Host": "",
-    "Service": "",
-    "Took": 999900,
-    "Period": 0,
-    "DisableTimeSeries": false
-  },
-  {
-    "RootFields": null,
-    "ModuleFields": null,
-    "MetricSetFields": {
-      "event": {
-        "action": [
-          "created"
-        ],
-        "category": [
-          "file"
-        ],
-        "kind": "event",
-        "type": [
-          "creation"
-        ]
-      },
-      "file": {
-        "accessed": "2025-08-11T09:49:28.5999494Z",
-        "attributes": [
-          "archive"
-        ],
-        "created": "2025-08-11T09:49:28.5999494Z",
-        "ctime": "2025-08-11T09:49:28.5999494Z",
-        "drive_letter": "C",
-        "extended_attributes": {
-          "testea": "TestValue"
-        },
-        "extension": "txt",
-        "inode": "12384898975738523",
-        "mtime": "2025-08-11T09:49:28.5999494Z",
-        "name": "mainfile.txt",
-        "owner": "tp\\Marc",
-        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwset-ea3540489267\\001\\mainfile.txt",
-        "size": 0,
-        "type": "file",
-        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
-      },
-      "process": {
-        "pid": 99020,
-        "user": {
-          "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
-          "name": "tp\\Marc"
-        }
-      }
-    },
-    "Index": "",
-    "ID": "",
-    "Namespace": "",
-    "Timestamp": "2025-08-11T09:49:36.9140053Z",
+    "Timestamp": "2025-09-01T10:31:26.6589524Z",
     "Error": null,
     "Host": "",
     "Service": "",

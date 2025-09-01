@@ -16,39 +16,42 @@
         ]
       },
       "file": {
-        "accessed": "2025-08-11T09:45:01.2254635Z",
+        "accessed": "2025-09-01T10:26:52.3558257Z",
         "attributes": [
           "archive"
         ],
-        "created": "2025-08-09T09:45:09Z",
-        "ctime": "2025-08-09T09:45:09Z",
+        "created": "2025-08-30T10:27:00Z",
+        "ctime": "2025-08-30T10:27:00Z",
         "drive_letter": "C",
         "extension": "txt",
-        "inode": "9570149208631817",
-        "mtime": "2025-08-09T09:45:09Z",
+        "inode": "39125021762821847",
+        "mtime": "2025-08-30T10:27:00Z",
         "name": "mainfile.txt",
         "owner": "tp\\Marc",
-        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwchange-timestamps1034689288\\001\\mainfile.txt",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwchange-timestamps816047858\\001\\mainfile.txt",
         "size": 0,
         "type": "file",
         "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
       },
       "process": {
-        "pid": 67724,
+        "entity_id": "54848-1756722421499446600",
+        "name": "C:\\Windows\\System32\\Dism\\DismHost.exe",
+        "pid": 54848,
         "user": {
+          "domain": "tp",
           "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
-          "name": "tp\\Marc"
+          "name": "Marc"
         }
       }
     },
     "Index": "",
     "ID": "",
     "Namespace": "",
-    "Timestamp": "2025-08-11T09:45:09.4942282Z",
+    "Timestamp": "2025-09-01T10:27:01.5223202Z",
     "Error": null,
     "Host": "",
     "Service": "",
-    "Took": 1001900,
+    "Took": 2109400,
     "Period": 0,
     "DisableTimeSeries": false
   }

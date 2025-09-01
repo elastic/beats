@@ -151,6 +151,8 @@ type Process struct {
 	User struct {
 		// Unique identifier of the user.
 		ID string `json:"id,omitempty"`
+		// User domain.
+		Domain string `json:"domain,omitempty"`
 		// Short name or login of the user.
 		Name string `json:"name,omitempty"`
 	} `json:"user,omitempty"`
@@ -158,6 +160,8 @@ type Process struct {
 	Group struct {
 		// Unique identifier for the group on the system/platform.
 		ID string `json:"id,omitempty"`
+		// Group domain.
+		Domain string `json:"domain,omitempty"`
 		// Name of the group.
 		Name string `json:"name,omitempty"`
 	} `json:"group,omitempty"`
@@ -406,8 +410,10 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		setIfValid(process, "name", e.Process.Name)
 		setIfValid(process, "entity_id", e.Process.EntityID)
 		setIfValid(process, "user.id", e.Process.User.ID)
+		setIfValid(process, "user.domain", e.Process.User.Domain)
 		setIfValid(process, "user.name", e.Process.User.Name)
 		setIfValid(process, "group.id", e.Process.Group.ID)
+		setIfValid(process, "group.domain", e.Process.Group.Domain)
 		setIfValid(process, "group.name", e.Process.Group.Name)
 		out.MetricSetFields.Put("process", process)
 	}

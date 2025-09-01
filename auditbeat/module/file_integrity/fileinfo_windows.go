@@ -67,7 +67,19 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	}
 
 	var err error
-	if fileInfo.SID, fileInfo.Owner, fileInfo.Group, err = getObjectSecurityInfo(path, info.IsDir()); err != nil {
+	var secInfo userInfo
+	if secInfo, err = getObjectSecurityInfo(path, info.IsDir()); err == nil {
+		fileInfo.SID = secInfo.sid
+		fileInfo.Owner = secInfo.name
+		fileInfo.Group = secInfo.groupName
+		// For file.owner and file.group, use domain\name format since they don't have separate domain fields
+		if secInfo.domain != "" {
+			fileInfo.Owner = fmt.Sprintf("%s\\%s", secInfo.domain, secInfo.name)
+		}
+		if secInfo.groupDomain != "" {
+			fileInfo.Group = fmt.Sprintf("%s\\%s", secInfo.groupDomain, secInfo.groupName)
+		}
+	} else {
 		errs = append(errs, fmt.Errorf("getObjectSecurityInfo failed: %w", err))
 	}
 
@@ -77,11 +89,11 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	return fileInfo, errors.Join(errs...)
 }
 
-func getObjectSecurityInfo(path string, isDir bool) (ownerSID, ownerName, groupName string, err error) {
+func getObjectSecurityInfo(path string, isDir bool) (info userInfo, err error) {
 	var handle windows.Handle
 	pathPtr, err := windows.UTF16PtrFromString(path)
 	if err != nil {
-		return "", "", "", fmt.Errorf("failed to convert path to UTF16: %w", err)
+		return userInfo{}, fmt.Errorf("failed to convert path to UTF16: %w", err)
 	}
 
 	// Try multiple access levels, starting with least privilege
@@ -118,7 +130,7 @@ func getObjectSecurityInfo(path string, isDir bool) (ownerSID, ownerName, groupN
 }
 
 // getSecurityInfoByPath attempts to get security info without opening the file
-func getSecurityInfoByPath(path string) (ownerSID, ownerName, groupName string, err error) {
+func getSecurityInfoByPath(path string) (info userInfo, err error) {
 	requestedInfo := windows.SECURITY_INFORMATION(windows.OWNER_SECURITY_INFORMATION | windows.GROUP_SECURITY_INFORMATION)
 	secInfo, err := windows.GetNamedSecurityInfo(path, windows.SE_FILE_OBJECT, requestedInfo)
 	if err != nil {
@@ -126,7 +138,7 @@ func getSecurityInfoByPath(path string) (ownerSID, ownerName, groupName string, 
 		requestedInfo = windows.SECURITY_INFORMATION(windows.OWNER_SECURITY_INFORMATION)
 		secInfo, err = windows.GetNamedSecurityInfo(path, windows.SE_FILE_OBJECT, requestedInfo)
 		if err != nil {
-			return "", "", "", fmt.Errorf("GetNamedSecurityInfo failed for '%s': %w", path, err)
+			return userInfo{}, fmt.Errorf("GetNamedSecurityInfo failed for '%s': %w", path, err)
 		}
 	}
 
@@ -134,7 +146,7 @@ func getSecurityInfoByPath(path string) (ownerSID, ownerName, groupName string, 
 }
 
 // getSecurityInfoFromHandle gets security info from an open file handle
-func getSecurityInfoFromHandle(handle windows.Handle, path string) (ownerSID, ownerName, groupName string, err error) {
+func getSecurityInfoFromHandle(handle windows.Handle, path string) (info userInfo, err error) {
 	requestedInfo := windows.SECURITY_INFORMATION(windows.OWNER_SECURITY_INFORMATION | windows.GROUP_SECURITY_INFORMATION)
 	secInfo, err := windows.GetSecurityInfo(handle, windows.SE_FILE_OBJECT, requestedInfo)
 	if err != nil {
@@ -142,7 +154,7 @@ func getSecurityInfoFromHandle(handle windows.Handle, path string) (ownerSID, ow
 		requestedInfo = windows.SECURITY_INFORMATION(windows.OWNER_SECURITY_INFORMATION)
 		secInfo, err = windows.GetSecurityInfo(handle, windows.SE_FILE_OBJECT, requestedInfo)
 		if err != nil {
-			return "", "", "", fmt.Errorf("GetSecurityInfo failed for '%s': %w", path, err)
+			return userInfo{}, fmt.Errorf("GetSecurityInfo failed for '%s': %w", path, err)
 		}
 	}
 
@@ -150,46 +162,42 @@ func getSecurityInfoFromHandle(handle windows.Handle, path string) (ownerSID, ow
 }
 
 // extractSecurityInfo extracts owner and group information from security descriptor
-func extractSecurityInfo(secInfo *windows.SECURITY_DESCRIPTOR, path string) (ownerSID, ownerName, groupName string, err error) {
+func extractSecurityInfo(secInfo *windows.SECURITY_DESCRIPTOR, path string) (info userInfo, err error) {
 	// Get owner information
 	ownerSIDPtr, _, err := secInfo.Owner()
 	if err != nil {
-		return "", "", "", fmt.Errorf("failed to get owner for '%s': %w", path, err)
+		return userInfo{}, fmt.Errorf("failed to get owner for '%s': %w", path, err)
 	}
 
-	ownerSID = ownerSIDPtr.String()
+	info.sid = ownerSIDPtr.String()
 
 	// Try to resolve owner name - don't fail if this doesn't work
 	account, domain, use, err := ownerSIDPtr.LookupAccount("")
 	if err == nil && account != "" {
-		if domain != "" {
-			ownerName = fmt.Sprintf(`%s\%s`, domain, account)
-		} else {
-			ownerName = account
-		}
-
+		info.domain = domain
+		info.name = account
 		// Check if the SID_NAME_USE value indicates a group type
 		switch use {
 		case windows.SidTypeGroup, windows.SidTypeWellKnownGroup, windows.SidTypeAlias:
-			groupName = ownerName // If it's a group, use the same name
-			return ownerSID, ownerName, groupName, nil
+			// If it's a group, use the same info
+			info.groupSID = info.sid
+			info.groupDomain = info.domain
+			info.groupName = info.name
+			return info, nil
 		}
 	}
 
 	// Try to get group information - this might fail on some file systems or with limited permissions
 	groupSIDPtr, _, err := secInfo.Group()
 	if err == nil {
+		info.groupSID = groupSIDPtr.String()
 		account, domain, _, err := groupSIDPtr.LookupAccount("")
 		if err == nil && account != "" && account != "None" {
-			if domain != "" {
-				groupName = fmt.Sprintf(`%s\%s`, domain, account)
-			} else {
-				groupName = account
-			}
+			info.groupDomain = domain
+			info.groupName = account
 		}
 	}
-
-	return ownerSID, ownerName, groupName, nil
+	return info, nil
 }
 
 func attributesToStrings(attributes uint32) []string {

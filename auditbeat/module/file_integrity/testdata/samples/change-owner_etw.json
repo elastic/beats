@@ -16,40 +16,41 @@
         ]
       },
       "file": {
-        "accessed": "2025-08-11T09:44:28.9840994Z",
+        "accessed": "2025-09-01T10:26:20.2664287Z",
         "attributes": [
           "archive"
         ],
-        "created": "2025-08-11T09:44:28.9840994Z",
-        "ctime": "2025-08-11T09:44:28.9840994Z",
+        "created": "2025-09-01T10:26:20.2664287Z",
+        "ctime": "2025-09-01T10:26:20.2664287Z",
         "drive_letter": "C",
         "extension": "txt",
         "group": "NT AUTHORITY\\SYSTEM",
-        "inode": "9007199255191745",
-        "mtime": "2025-08-11T09:44:28.9840994Z",
+        "inode": "53198770598316232",
+        "mtime": "2025-09-01T10:26:20.2664287Z",
         "name": "mainfile.txt",
         "owner": "NT AUTHORITY\\SYSTEM",
-        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwchange-owner4243588941\\001\\mainfile.txt",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwchange-owner548181765\\001\\mainfile.txt",
         "size": 0,
         "type": "file",
         "uid": "S-1-5-18"
       },
       "process": {
-        "pid": 73600,
+        "pid": 36480,
         "user": {
+          "domain": "tp",
           "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
-          "name": "tp\\Marc"
+          "name": "Marc"
         }
       }
     },
     "Index": "",
     "ID": "",
     "Namespace": "",
-    "Timestamp": "2025-08-11T09:44:37.1420283Z",
+    "Timestamp": "2025-09-01T10:26:28.322324Z",
     "Error": null,
     "Host": "",
     "Service": "",
-    "Took": 1051200,
+    "Took": 656500,
     "Period": 0,
     "DisableTimeSeries": false
   }

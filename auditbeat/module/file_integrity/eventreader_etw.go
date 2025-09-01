@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -100,9 +99,12 @@ type processStartKey uint64
 
 // userInfo holds cached user and group information resolved from SIDs
 type userInfo struct {
-	name      string // Username (domain\username format)
-	groupSID  string // Primary group SID
-	groupName string // Primary group name (domain\groupname format)
+	sid         string
+	domain      string
+	name        string
+	groupSID    string
+	groupDomain string
+	groupName   string
 }
 
 type etwReader struct {
@@ -502,15 +504,11 @@ func (r *etwReader) fileInfoChanged(cached, current os.FileInfo) bool {
 		return true
 	}
 
-	if runtime.GOOS == "windows" {
-		cachedSys, okCached := cached.Sys().(*windows.Win32FileAttributeData)
-		currentSys, okCurrent := current.Sys().(*windows.Win32FileAttributeData)
-		if cachedSys != nil && currentSys != nil && okCached && okCurrent {
-			if *cachedSys != *currentSys {
-				return true
-			}
-		} else {
-			return false
+	cachedSys, okCached := cached.Sys().(*windows.Win32FileAttributeData)
+	currentSys, okCurrent := current.Sys().(*windows.Win32FileAttributeData)
+	if cachedSys != nil && currentSys != nil && okCached && okCurrent {
+		if *cachedSys != *currentSys {
+			return true
 		}
 	}
 
@@ -579,8 +577,10 @@ func (r *etwReader) handleProcessEvent(record *etw.EventRecord) uintptr {
 		process.User.ID = getStringExtendedData(&etwEvent, "SID")
 		userInfo := r.getUserInfo(process.User.ID)
 		if userInfo != nil {
+			process.User.Domain = userInfo.domain
 			process.User.Name = userInfo.name
 			process.Group.ID = userInfo.groupSID
+			process.Group.Domain = userInfo.groupDomain
 			process.Group.Name = userInfo.groupName
 		}
 		process.PID = getUint32Property(&etwEvent, "ProcessID")
@@ -600,8 +600,10 @@ func (r *etwReader) processFromOp(op *etwOp) *Process {
 	process.User.ID = op.sid
 	userInfo := r.getUserInfo(process.User.ID)
 	if userInfo != nil {
+		process.User.Domain = userInfo.domain
 		process.User.Name = userInfo.name
 		process.Group.ID = userInfo.groupSID
+		process.Group.Domain = userInfo.groupDomain
 		process.Group.Name = userInfo.groupName
 	}
 	return process
@@ -621,9 +623,11 @@ func (r *etwReader) getUserInfo(sidStr string) *userInfo {
 	if sidStr == "" {
 		return nil
 	}
+
 	if cachedInfo, found := r.sidCache.Get(sidStr); found {
 		return cachedInfo
 	}
+
 	sid, err := windows.StringToSid(sidStr)
 	if err != nil {
 		r.log.Errorf("failed to convert string %s to SID: %v", sid, err)
@@ -631,25 +635,31 @@ func (r *etwReader) getUserInfo(sidStr string) *userInfo {
 		_ = r.sidCache.Add(sidStr, nil)
 		return nil
 	}
-	account, domain, use, _ := sid.LookupAccount("")
-	var groupSID, groupName string
+	var info userInfo
+	info.sid = sidStr
+	var use uint32
+	info.name, info.domain, use, err = sid.LookupAccount("")
+	if err != nil {
+		// we do not cache this one since it might be a temporary error
+		r.log.Errorf("failed to lookup account for SID %s: %w", sidStr, err)
+		return &info
+	}
+
 	switch use {
 	case windows.SidTypeGroup, windows.SidTypeWellKnownGroup, windows.SidTypeAlias:
-		groupSID = sidStr   // If it's a group, use the same SID
-		groupName = account // If it's a group, use the same name
+		info.groupSID = info.sid       // If it's a group, use the same SID
+		info.groupDomain = info.domain // If it's a group, use the same domain
+		info.groupName = info.name     // If it's a group, use the same name
 	default:
-		groupSID, groupName = getPrimaryGroupForAccount(sidStr, account)
+		// Build the full account name for NetUserGetInfo API
+		fullAccountName := info.name
+		if info.domain != "" {
+			fullAccountName = fmt.Sprintf("%s\\%s", info.domain, info.name)
+		}
+		info.groupSID, info.groupDomain, info.groupName = getPrimaryGroupForAccount(sidStr, fullAccountName)
 	}
-	if domain != "" {
-		account = fmt.Sprintf("%s\\%s", domain, account)
-	}
-	ui := &userInfo{
-		name:      account,
-		groupSID:  groupSID,
-		groupName: groupName,
-	}
-	_ = r.sidCache.Add(sidStr, ui)
-	return ui
+	_ = r.sidCache.Add(sidStr, &info)
+	return &info
 }
 
 // userInfo4 is a Go representation of the C struct USER_INFO_4.
@@ -685,16 +695,16 @@ type userInfo4 struct {
 	PasswordExpired uint32
 }
 
-func getPrimaryGroupForAccount(sid, account string) (groupSID, groupName string) {
+func getPrimaryGroupForAccount(sid, account string) (groupSID, groupDomain, groupName string) {
 	accountPtr, err := windows.UTF16PtrFromString(account)
 	if err != nil {
-		return "", ""
+		return "", "", ""
 	}
 
 	var buf *byte
 	err = windows.NetUserGetInfo(nil, accountPtr, 4, &buf)
 	if err != nil {
-		return "", ""
+		return "", "", ""
 	}
 	defer windows.NetApiBufferFree(buf)
 
@@ -703,7 +713,7 @@ func getPrimaryGroupForAccount(sid, account string) (groupSID, groupName string)
 
 	lastHyphen := strings.LastIndex(sid, "-")
 	if lastHyphen == -1 {
-		return "", ""
+		return "", "", ""
 	}
 	domainSIDString := sid[:lastHyphen]
 	groupSID = fmt.Sprintf("%s-%d", domainSIDString, primaryGroupRID)
@@ -711,23 +721,19 @@ func getPrimaryGroupForAccount(sid, account string) (groupSID, groupName string)
 	primaryGroupSID, err := windows.StringToSid(groupSID)
 	if err != nil {
 		// If lookup fails, we can still return the SID string.
-		return groupSID, ""
+		return groupSID, "", ""
 	}
 
 	groupName, domain, _, err := primaryGroupSID.LookupAccount("")
 	if err != nil {
-		return groupSID, ""
+		return groupSID, "", ""
 	}
 
 	if groupName == "None" {
-		return "", ""
+		return "", "", ""
 	}
 
-	if domain != "" {
-		groupName = fmt.Sprintf("%s\\%s", domain, groupName)
-	}
-
-	return groupSID, groupName
+	return groupSID, domain, groupName
 }
 
 func skipFileEvent(event uint16) bool {

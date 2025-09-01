@@ -16,38 +16,39 @@
         ]
       },
       "file": {
-        "accessed": "2025-08-11T09:48:00.6237093Z",
+        "accessed": "2025-09-01T10:29:50.0107043Z",
         "attributes": [
           "archive",
           "reparse_point"
         ],
-        "created": "2025-08-11T09:48:00.6237093Z",
-        "ctime": "2025-08-11T09:48:00.6237093Z",
+        "created": "2025-09-01T10:29:50.0107043Z",
+        "ctime": "2025-09-01T10:29:50.0107043Z",
         "drive_letter": "C",
-        "inode": "14073748836002498",
-        "mtime": "2025-08-11T09:48:00.6237093Z",
+        "inode": "8444249302227445",
+        "mtime": "2025-09-01T10:29:50.0107043Z",
         "owner": "tp\\Marc",
-        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwcreate-symlink1205393342\\001\\symlink.txt",
-        "target_path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwcreate-symlink1205393342\\001\\mainfile.txt",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwcreate-symlink1313900954\\001\\symlink.txt",
+        "target_path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwcreate-symlink1313900954\\001\\mainfile.txt",
         "type": "symlink",
         "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
       },
       "process": {
-        "pid": 103756,
+        "pid": 17884,
         "user": {
+          "domain": "tp",
           "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
-          "name": "tp\\Marc"
+          "name": "Marc"
         }
       }
     },
     "Index": "",
     "ID": "",
     "Namespace": "",
-    "Timestamp": "2025-08-11T09:48:00.6240497Z",
+    "Timestamp": "2025-09-01T10:29:50.0157395Z",
     "Error": null,
     "Host": "",
     "Service": "",
-    "Took": 2070700,
+    "Took": 1635200,
     "Period": 0,
     "DisableTimeSeries": false
   }

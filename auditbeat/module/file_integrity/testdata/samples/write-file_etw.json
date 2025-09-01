@@ -16,41 +16,40 @@
         ]
       },
       "file": {
-        "accessed": "2025-08-11T09:50:41.0953874Z",
+        "accessed": "2025-09-01T10:32:30.4921831Z",
         "attributes": [
           "archive"
         ],
-        "created": "2025-08-11T09:50:33.005256Z",
-        "ctime": "2025-08-11T09:50:33.005256Z",
+        "created": "2025-09-01T10:32:22.4549559Z",
+        "ctime": "2025-09-01T10:32:22.4549559Z",
         "drive_letter": "C",
         "extension": "txt",
-        "inode": "11540474045606588",
-        "mtime": "2025-08-11T09:50:41.0953874Z",
+        "inode": "58828270132527366",
+        "mtime": "2025-09-01T10:32:30.4921831Z",
         "name": "mainfile.txt",
         "owner": "tp\\Marc",
-        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwwrite-file731698885\\001\\mainfile.txt",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwwrite-file2254555294\\001\\mainfile.txt",
         "size": 14,
         "type": "file",
         "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
       },
       "process": {
-        "entity_id": "154720-1754905840859904100",
-        "name": "C:\\Windows\\System32\\conhost.exe",
-        "pid": 154720,
+        "pid": 40548,
         "user": {
+          "domain": "tp",
           "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
-          "name": "tp\\Marc"
+          "name": "Marc"
         }
       }
     },
     "Index": "",
     "ID": "",
     "Namespace": "",
-    "Timestamp": "2025-08-11T09:50:41.0966083Z",
+    "Timestamp": "2025-09-01T10:32:30.4924614Z",
     "Error": null,
     "Host": "",
     "Service": "",
-    "Took": 1029900,
+    "Took": 1011600,
     "Period": 0,
     "DisableTimeSeries": false
   },
@@ -71,39 +70,40 @@
         ]
       },
       "file": {
-        "accessed": "2025-08-11T09:50:42.7933521Z",
+        "accessed": "2025-09-01T10:32:32.2044123Z",
         "attributes": [
           "archive"
         ],
-        "created": "2025-08-11T09:50:33.005256Z",
-        "ctime": "2025-08-11T09:50:33.005256Z",
+        "created": "2025-09-01T10:32:22.4549559Z",
+        "ctime": "2025-09-01T10:32:22.4549559Z",
         "drive_letter": "C",
         "extension": "txt",
-        "inode": "11540474045606588",
-        "mtime": "2025-08-11T09:50:41.0953874Z",
+        "inode": "58828270132527366",
+        "mtime": "2025-09-01T10:32:30.4921831Z",
         "name": "mainfile.txt",
         "owner": "tp\\Marc",
-        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwwrite-file731698885\\001\\mainfile.txt",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwwrite-file2254555294\\001\\mainfile.txt",
         "size": 14,
         "type": "file",
         "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
       },
       "process": {
-        "pid": 134444,
+        "pid": 40548,
         "user": {
+          "domain": "tp",
           "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
-          "name": "tp\\Marc"
+          "name": "Marc"
         }
       }
     },
     "Index": "",
     "ID": "",
     "Namespace": "",
-    "Timestamp": "2025-08-11T09:50:41.7658578Z",
+    "Timestamp": "2025-09-01T10:32:30.5694184Z",
     "Error": null,
     "Host": "",
     "Service": "",
-    "Took": 1011500,
+    "Took": 734900,
     "Period": 0,
     "DisableTimeSeries": false
   }
