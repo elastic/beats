@@ -27,7 +27,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
-	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
@@ -185,8 +184,4 @@ func (b *exponentialLimitedBackoff) backoff(ctx context.Context, err error) bool
 
 func (b *exponentialLimitedBackoff) reset() {
 	b.currentDelay = b.initialDelay
-}
-
-func mustIgnoreError(err error, api EventLog) bool {
-	return api.IgnoreMissingChannel() && errors.Is(err, win.ERROR_EVT_CHANNEL_NOT_FOUND)
 }
