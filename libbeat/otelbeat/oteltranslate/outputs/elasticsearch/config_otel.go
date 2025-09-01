@@ -21,7 +21,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"math"
 	"reflect"
 	"strings"
 
@@ -147,7 +146,6 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 				"sizer":    "items",
 			},
 			"enabled":           true,
-			"queue_size":        math.MaxInt,
 			"block_on_overflow": true,
 			"wait_for_result":   true,
 			"num_consumers":     escfg.NumWorkers(),
