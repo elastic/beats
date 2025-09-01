@@ -25,7 +25,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
+	"github.com/elastic/beats/v7/libbeat/reader/etw"
 )
 
 // newMockEvent creates a valid RenderedEtwEvent for testing.
