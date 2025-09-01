@@ -111,7 +111,11 @@ func newSet(cfg *conf.C, stat status.StatusReporter, log *logp.Logger) (set, err
 }
 
 func (set *set) run(ctx *transformContext, tr transformable) (transformable, error) {
-	value, err := set.value.Execute(ctx, tr, set.targetInfo.Name, set.defaultValue, set.status, set.log)
+	stat := set.status
+	if set.doNotLogFailure {
+		stat = ignoreEmptyValueReporter{stat}
+	}
+	value, err := set.value.Execute(ctx, tr, set.targetInfo.Name, set.defaultValue, stat, set.log)
 	if err != nil && set.failOnTemplateError {
 		if set.doNotLogFailure {
 			err = notLogged{err}

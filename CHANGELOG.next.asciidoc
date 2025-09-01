@@ -516,6 +516,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Improve error reporting for schemeless URLs in HTTP JSON input. {pull}45953[45953]
 - Add status reporting support for AWS S3 input. {pull}45748[45748]
 - Add `remaining_executions` global to the CEL input evaluation context. {pull}46210[46210]
+- Improve HTTP JSON health status logic for empty template results. {pull}46332[46332]
 
 *Auditbeat*
 

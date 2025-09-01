@@ -5,6 +5,7 @@
 package httpjson
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -22,6 +23,7 @@ func TestCursorUpdate(t *testing.T) {
 		trCtx         *transformContext
 		initialState  mapstr.M
 		expectedState mapstr.M
+		wantStatus    []string
 	}{
 		{
 			name: "update an unexisting value",
@@ -35,6 +37,7 @@ func TestCursorUpdate(t *testing.T) {
 			expectedState: mapstr.M{
 				"entry1": "v1",
 			},
+			wantStatus: nil,
 		},
 		{
 			name: "update an existing value with a template",
@@ -56,20 +59,36 @@ func TestCursorUpdate(t *testing.T) {
 			expectedState: mapstr.M{
 				"entry1": "v2",
 			},
+			wantStatus: nil,
 		},
 		{
 			name: "don't update an existing value if template result is empty",
 			baseConfig: map[string]interface{}{
 				"entry1": map[string]interface{}{
-					"value": "[[ .last_response.body.unknown ]]",
+					"value":              ``,
+					"do_not_log_failure": true,
 				},
 				"entry2": map[string]interface{}{
-					"value":              "[[ .last_response.body.unknown ]]",
+					"value":              ``,
 					"ignore_empty_value": true,
 				},
 				"entry3": map[string]interface{}{
-					"value":              "[[ .last_response.body.unknown ]]",
+					"value":              ``,
 					"ignore_empty_value": nil,
+				},
+				"entry4": map[string]interface{}{
+					"value":              ``,
+					"ignore_empty_value": false,
+					"do_not_log_failure": true,
+				},
+				"entry5": map[string]interface{}{
+					"value":              ``,
+					"ignore_empty_value": false,
+					"do_not_log_failure": false,
+				},
+				"entry6": map[string]interface{}{
+					"value":              ``,
+					"ignore_empty_value": false,
 				},
 			},
 			trCtx: emptyTransformContext(),
@@ -77,19 +96,29 @@ func TestCursorUpdate(t *testing.T) {
 				"entry1": "v1",
 				"entry2": "v2",
 				"entry3": "v3",
+				"entry4": "v4",
+				"entry5": "v5",
+				"entry6": "v6",
 			},
 			expectedState: mapstr.M{
 				"entry1": "v1",
 				"entry2": "v2",
 				"entry3": "v3",
+				"entry4": "",
+				"entry5": "",
+				"entry6": "",
+			},
+			wantStatus: []string{
+				"Degraded: failed to execute template entry5: the template result is empty",
 			},
 		},
 		{
 			name: "update an existing value if template result is empty and ignore_empty_value is false",
 			baseConfig: map[string]interface{}{
 				"entry1": map[string]interface{}{
-					"value":              "[[ .last_response.body.unknown ]]",
+					"value":              ``,
 					"ignore_empty_value": false,
+					"do_not_log_failure": true,
 				},
 			},
 			trCtx: emptyTransformContext(),
@@ -99,6 +128,7 @@ func TestCursorUpdate(t *testing.T) {
 			expectedState: mapstr.M{
 				"entry1": "",
 			},
+			wantStatus: nil,
 		},
 	}
 
@@ -110,10 +140,13 @@ func TestCursorUpdate(t *testing.T) {
 			conf := cursorConfig{}
 			require.NoError(t, cfg.Unpack(&conf))
 
-			c := newCursor(conf, noopReporter{}, logp.NewLogger("cursor-test"))
+			var stat testStatus
+			c := newCursor(conf, &stat, logp.NewLogger("cursor-test"))
 			c.state = tc.initialState
 			c.update(tc.trCtx)
 			assert.Equal(t, tc.expectedState, c.state)
+			sort.Strings(stat.updates) // Can happen out of order.
+			assert.Equal(t, tc.wantStatus, stat.updates)
 		})
 	}
 }

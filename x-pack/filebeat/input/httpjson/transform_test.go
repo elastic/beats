@@ -5,6 +5,7 @@
 package httpjson
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -173,5 +174,24 @@ func TestNewBasicTransformsFromConfig(t *testing.T) {
 				assert.EqualError(t, gotErr, tc.expectedErr)
 			}
 		})
+	}
+}
+
+type testStatus struct {
+	updates []string
+}
+
+func (s *testStatus) UpdateStatus(stat status.Status, msg string) {
+	s.updates = append(s.updates, fmt.Sprintf("%s: %s", stat, msg))
+}
+
+func sameError(a, b error) bool {
+	switch {
+	case a == b:
+		return true
+	case a == nil, b == nil:
+		return false
+	default:
+		return a.Error() == b.Error()
 	}
 }

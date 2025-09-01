@@ -125,7 +125,11 @@ func newAppend(cfg *conf.C, stat status.StatusReporter, log *logp.Logger) (appen
 }
 
 func (append *appendt) run(ctx *transformContext, tr transformable) (transformable, error) {
-	value, err := append.value.Execute(ctx, tr, append.targetInfo.Name, append.defaultValue, append.status, append.log)
+	stat := append.status
+	if append.doNotLogFailure {
+		stat = ignoreEmptyValueReporter{stat}
+	}
+	value, err := append.value.Execute(ctx, tr, append.targetInfo.Name, append.defaultValue, stat, append.log)
 	if err != nil && append.failOnTemplateError {
 		if append.doNotLogFailure {
 			err = notLogged{err}
