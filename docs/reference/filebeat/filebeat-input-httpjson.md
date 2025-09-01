@@ -1472,7 +1472,7 @@ Each cursor entry is formed by:
 * A `value` template, which will define the value to store when evaluated.
 * A `default` template, which will define the value to store when the value template fails or is empty.
 * An `ignore_empty_value` flag. When set to `true`, will not store empty values, preserving the previous one, if any. Default: `true`.
-* A `do_not_log_failure` flag. When set to true, will not signal a degraded Fleet health status. Default: `true`. {applies_to}`stack: ga 9.1.3, ga 9.0.7, ga 8.19.3, ga 8.18.7`
+* A `do_not_log_failure` flag. When set to `true`, will not signal a degraded Fleet health status. Default: `true`. {applies_to}`stack: ga 9.1.3, ga 9.0.7, ga 8.19.3, ga 8.18.7`
 
 Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`].
 
