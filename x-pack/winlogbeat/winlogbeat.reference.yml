@@ -31,7 +31,7 @@
 #
 # The supported keys are name, id, xml_query, tags, fields, fields_under_root,
 # forwarded, ignore_older, level, event_id, provider, include_xml, and 
-# ignore_missing_channels.
+# ignore_missing_channel.
 # The xml_query key requires an id and must not be used with the name,
 # ignore_older, level, event_id, or provider keys. Please visit the
 # documentation for the complete details of each option.
@@ -52,10 +52,6 @@ winlogbeat.event_logs:
 
   - name: Microsoft-Windows-PowerShell/Operational
     event_id: 4103, 4104, 4105, 4106
-
-  # Example: Ignore missing channels and continue monitoring other logs
-  - name: SomeOptionalChannel
-    ignore_missing_channels: true
 
   - name: ForwardedEvents
     tags: [forwarded]

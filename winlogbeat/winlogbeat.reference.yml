@@ -54,10 +54,6 @@ winlogbeat.event_logs:
   - name: Microsoft-Windows-PowerShell/Operational
     event_id: 4103, 4104, 4105, 4106
 
-  # Example: Ignore missing channels and continue monitoring other logs
-  - name: SomeOptionalChannel
-    ignore_missing_channel: true
-
 
 # ================================== General ===================================
 
