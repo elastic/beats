@@ -65,7 +65,7 @@ func New(
 	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
-	// TODO: use a local logger here
+	// TODO: https://github.com/elastic/ingest-dev/issues/6000
 	logp.NewLogger("").Warn(cfgwarn.Beta("packetbeat SIP protocol is used"))
 
 	isDebug = logp.IsDebug("sip")

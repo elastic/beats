@@ -79,7 +79,7 @@ logging.level: debug
 	filebeat.WriteConfigFile(fmt.Sprintf(configTemplate, inputs, tempDir))
 
 	// 3. Create the log file
-	integration.GenerateLogFile(t, logFilePath, 10, false)
+	integration.WriteLogFile(t, logFilePath, 10, false)
 
 	assert.NoError(t, os.WriteFile(filepath.Join(inputs, "filestream.yml"), []byte(fmt.Sprintf(inputConfig, logFilePath)), 0666))
 
@@ -99,16 +99,16 @@ logging.level: debug
 	}, 2*time.Minute, 10*time.Second)
 
 	// Ensure all log lines are ingested eventually
-	integration.AssertLinesInFile(t, outputFile, 10)
+	integration.WaitLineCountInFile(t, outputFile, 10)
 
 	assert.NoError(t, os.Rename(filepath.Join(inputs, "filestream.yml"), filepath.Join(inputs, "filestream.yml.disabled")))
-	filebeat.WaitForLogs("Runner: 'filestream' has stopped", 2*time.Minute)
+	filebeat.WaitLogsContains("Runner: 'filestream' has stopped", 2*time.Minute)
 
 	logFilePath2 := filepath.Join(tempDir, "log2.log")
-	integration.GenerateLogFile(t, logFilePath2, 10, false)
+	integration.WriteLogFile(t, logFilePath2, 10, false)
 	// bring another file up
 	assert.NoError(t, os.WriteFile(filepath.Join(inputs, "secondInput.yml"), []byte(fmt.Sprintf(inputConfig, logFilePath2)), 0666))
 
 	// Ensure all log lines are ingested eventually
-	integration.AssertLinesInFile(t, outputFile, 20)
+	integration.WaitLineCountInFile(t, outputFile, 20)
 }

@@ -25,7 +25,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -57,13 +56,12 @@ type msgRef struct {
 }
 
 func newAsyncClient(
-	beat beat.Info,
+	log *logp.Logger,
+	beatVersion string,
 	conn *transport.Client,
 	observer outputs.Observer,
 	config *Config,
 ) (*asyncClient, error) {
-
-	log := beat.Logger.Named("logstash")
 	c := &asyncClient{
 		log:      log,
 		Client:   conn,
@@ -78,7 +76,7 @@ func newAsyncClient(
 		log.Warn(`The async Logstash client does not support the "ttl" option`)
 	}
 
-	enc := makeLogstashEventEncoder(log, beat, config.EscapeHTML, config.Index)
+	enc := makeLogstashEventEncoder(log, beatVersion, config.EscapeHTML, config.Index)
 
 	queueSize := config.Pipelining - 1
 	timeout := config.Timeout

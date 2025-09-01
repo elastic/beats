@@ -10,7 +10,7 @@ mapped_pages:
 
 {{beats}} are open source data shippers that you install as agents on your servers to send operational data to [{{es}}](https://www.elastic.co/products/elasticsearch). 
 
-New to {{beats}}? Check out the [{{beats}} overview]https://www.elastic.co/beats [{{beats}} overview](https://www.elastic.co/beats) to see what {{beats}} can do for you.
+New to {{beats}}? Check out the [{{beats}} overview](https://www.elastic.co/beats) to see what {{beats}} can do for you.
 
 Elastic provides {{beats}} for capturing:
 

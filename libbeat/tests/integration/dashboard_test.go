@@ -93,7 +93,7 @@ queue.mem:
 	err := mockbeat.Cmd.Wait()
 	require.NoError(t, err)
 	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
-	mockbeat.WaitForLogs("Kibana dashboards successfully loaded", 30*time.Second)
+	mockbeat.WaitLogsContains("Kibana dashboards successfully loaded", 30*time.Second)
 }
 
 func TestDashboardLoadIndexOnly(t *testing.T) {
@@ -128,7 +128,7 @@ queue.mem:
 	err := mockbeat.Cmd.Wait()
 	require.NoError(t, err)
 	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
-	mockbeat.WaitForLogs("Kibana dashboards successfully loaded", 30*time.Second)
+	mockbeat.WaitLogsContains("Kibana dashboards successfully loaded", 30*time.Second)
 }
 
 func TestDashboardExportById(t *testing.T) {
@@ -163,7 +163,7 @@ queue.mem:
 	err := mockbeat.Cmd.Wait()
 	require.NoError(t, err)
 	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
-	mockbeat.WaitForLogs("Kibana dashboards successfully loaded", 30*time.Second)
+	mockbeat.WaitLogsContains("Kibana dashboards successfully loaded", 30*time.Second)
 
 	mockbeat.Start("export",
 		"dashboard",
