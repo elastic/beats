@@ -21,6 +21,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // all test files are read from/stored within the "testdata" directory
@@ -85,7 +86,7 @@ func TestParquetWithRandomData(t *testing.T) {
 
 // readAndValidateParquetFile reads the parquet file and validates the data
 func readAndValidateParquetFile(t *testing.T, cfg *Config, file *os.File, data map[string]bool) int {
-	sReader, err := NewBufferedReader(file, cfg, logp.NewNopLogger())
+	sReader, err := NewBufferedReader(file, cfg, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("failed to init stream reader: %v", err)
 	}
