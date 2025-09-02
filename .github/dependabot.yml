@@ -106,8 +106,6 @@ updates:
       - dependency-name: "github.com/PaloAltoNetworks/pango"
       # mongodb
       - dependency-name: "go.mongodb.org/mongo-driver"
-      # kafka
-      - dependency-name: "github.com/elastic/sarama"
     groups:
       windows:
         patterns:
