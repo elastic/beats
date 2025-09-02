@@ -9,11 +9,16 @@ package integration
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
+	"sync"
 	"testing"
 	"text/template"
 	"time"
@@ -26,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
 
@@ -693,4 +699,257 @@ processors:
 		require.Contains(t, out, expectedReceiver)
 		require.Contains(t, out, expectedService)
 	}, 10*time.Second, 500*time.Millisecond, "failed to get output of inspect command")
+}
+
+func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
+	tests := []struct {
+		name                     string
+		maxRetries               int
+		failuresPerEvent         int
+		bulkErrorCode            string
+		eventIDsToFail           []int
+		expectedIngestedEventIDs []int
+	}{
+		{
+			name:                     "bulk 429 with retries",
+			maxRetries:               3,
+			failuresPerEvent:         2,     // Fail 2 times, succeed on 3rd attempt
+			bulkErrorCode:            "429", // retryable error
+			eventIDsToFail:           []int{1, 3, 5, 7},
+			expectedIngestedEventIDs: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, // All events should eventually be ingested
+		},
+		{
+			name:                     "bulk exhausts retries",
+			maxRetries:               3,
+			failuresPerEvent:         5, // Fail more than max_retries
+			bulkErrorCode:            "429",
+			eventIDsToFail:           []int{2, 4, 6, 8},
+			expectedIngestedEventIDs: []int{0, 1, 3, 5, 7, 9}, // Only non-failing events should be ingested
+		},
+		{
+			name:                     "bulk with permanent mapping errors",
+			maxRetries:               3,
+			failuresPerEvent:         0, // Always fail (permanent failure)
+			bulkErrorCode:            "400",
+			eventIDsToFail:           []int{1, 4, 8},             // Only specific events fail
+			expectedIngestedEventIDs: []int{0, 2, 3, 5, 6, 7, 9}, // Only non-failing events should be ingested
+		},
+	}
+
+	const numTestEvents = 10
+	reEventLine := regexp.MustCompile(`"message":"Line (\d+)"`)
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var ingestedTestEvents []string
+			var mu sync.Mutex
+			eventFailureCounts := make(map[string]int)
+
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("X-Elastic-Product", "Elasticsearch")
+
+				if r.URL.Path != "/_bulk" {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte(`{}`))
+					return
+				}
+
+				body, err := io.ReadAll(r.Body)
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+
+				bodyStr := string(body)
+
+				mu.Lock()
+				defer mu.Unlock()
+
+				shouldEventFail := func(eventID int) bool {
+					for _, failID := range tt.eventIDsToFail {
+						if failID == eventID {
+							return true
+						}
+					}
+					return false
+				}
+
+				var items []string
+				for line := range strings.Lines(bodyStr) {
+					if strings.Contains(line, `"create":{`) {
+						// Ignore metadata lines
+						continue
+					}
+					if matches := reEventLine.FindStringSubmatch(line); len(matches) > 1 {
+						eventIDStr := matches[1]
+						eventID := 0
+						fmt.Sscanf(eventIDStr, "%d", &eventID)
+						eventKey := "Line " + eventIDStr
+
+						// Check if this event should fail
+						isFailingEvent := shouldEventFail(eventID)
+
+						var shouldFail bool
+						if isFailingEvent {
+							// This event is configured to fail
+							failureCount := eventFailureCounts[eventKey]
+
+							switch tt.bulkErrorCode {
+							case "400":
+								// Permanent errors always fail
+								shouldFail = true
+							case "429":
+								// Temporary errors fail until failuresPerEvent threshold
+								shouldFail = failureCount < tt.failuresPerEvent
+							}
+						} else {
+							// Events not in the fail list always succeed
+							shouldFail = false
+						}
+
+						if shouldFail {
+							eventFailureCounts[eventKey] = eventFailureCounts[eventKey] + 1
+							var errorResponse string
+							if tt.bulkErrorCode == "429" {
+								errorResponse = `{"create":{"_index":"logs","status":429,"error":{"type":"too_many_requests","reason":"queue capacity exceeded"}}}`
+							} else {
+								errorResponse = `{"create":{"_index":"logs","status":400,"error":{"type":"mapper_parsing_exception","reason":"failed to parse field"}}}`
+							}
+							items = append(items, errorResponse)
+						} else {
+							// Success - track ingested event
+							found := false
+							for _, existing := range ingestedTestEvents {
+								if existing == eventKey {
+									found = true
+									break
+								}
+							}
+							if !found {
+								ingestedTestEvents = append(ingestedTestEvents, eventKey)
+							}
+							items = append(items, `{"create":{"_index":"logs","status":201}}`)
+						}
+					}
+				}
+
+				response := fmt.Sprintf(`{"items":[%s]}`, strings.Join(items, ","))
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(response))
+			}))
+			defer server.Close()
+
+			filebeatOTel := integration.NewBeat(
+				t,
+				"filebeat-otel",
+				"../../filebeat.test",
+				"otel",
+			)
+
+			namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+			index := "logs-integration-" + namespace
+
+			beatsConfig := struct {
+				Index          string
+				InputFile      string
+				ESEndpoint     string
+				MaxRetries     int
+				MonitoringPort int
+			}{
+				Index:          index,
+				InputFile:      filepath.Join(filebeatOTel.TempDir(), "log.log"),
+				ESEndpoint:     server.URL,
+				MaxRetries:     tt.maxRetries,
+				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
+			}
+
+			cfg := `
+filebeat.inputs:
+  - type: filestream
+    id: filestream-input-id
+    enabled: true
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
+    paths:
+      - {{.InputFile}}
+output:
+  elasticsearch:
+    hosts:
+      - {{.ESEndpoint}}
+    username: admin
+    password: testing
+    index: {{.Index}}
+    compression_level: 0
+    max_retries: {{.MaxRetries}}
+logging.level: debug
+queue.mem.flush.timeout: 0s
+setup.template.enabled: false
+http.enabled: true
+http.host: localhost
+http.port: {{.MonitoringPort}}
+`
+			var configBuffer bytes.Buffer
+			require.NoError(t,
+				template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, beatsConfig))
+
+			filebeatOTel.WriteConfigFile(configBuffer.String())
+			writeEventsToLogFile(t, beatsConfig.InputFile, numTestEvents)
+			filebeatOTel.Start()
+			defer filebeatOTel.Stop()
+
+			// Wait for file input to be fully read
+			filebeatOTel.WaitStdErrContains(fmt.Sprintf("End of file reached: %s; Backoff now.", beatsConfig.InputFile), 30*time.Second)
+
+			// Wait for expected events to be ingested
+			require.EventuallyWithT(t, func(ct *assert.CollectT) {
+				mu.Lock()
+				defer mu.Unlock()
+
+				actualCount := len(ingestedTestEvents)
+				expectedCount := len(tt.expectedIngestedEventIDs)
+
+				assert.Equal(ct, expectedCount, actualCount, "expected _bulk events count to match")
+
+				// If we have the right count, validate the specific events
+				// Verify we have the correct events ingested
+				for _, expectedID := range tt.expectedIngestedEventIDs {
+					expectedEventKey := fmt.Sprintf("Line %d", expectedID)
+					found := false
+					for _, ingested := range ingestedTestEvents {
+						if ingested == expectedEventKey {
+							found = true
+							break
+						}
+					}
+					assert.True(ct, found, "expected _bulk event %s to be ingested", expectedEventKey)
+				}
+
+				// Verify we have valid line content for all ingested events
+				for _, ingested := range ingestedTestEvents {
+					assert.Regexp(ct, `^Line \d+$`, ingested, "unexpected ingested event format: %s", ingested)
+				}
+			}, 30*time.Second, 1*time.Second, "timed out waiting for expected event processing")
+
+			// Confirm filebeat agreed with our accounting of ingested events
+			require.EventuallyWithT(t, func(ct *assert.CollectT) {
+				address := fmt.Sprintf("http://localhost:%d", beatsConfig.MonitoringPort)
+				r, err := http.Get(address + "/stats") //nolint:noctx,bodyclose // fine for tests
+				assert.NoError(ct, err)
+				assert.Equal(ct, http.StatusOK, r.StatusCode, "incorrect status code")
+				var m mapstr.M
+				err = json.NewDecoder(r.Body).Decode(&m)
+				assert.NoError(ct, err)
+
+				m = m.Flatten()
+
+				// TODO: Beats stats are not tracking exporter metrics properly in otelconsumer, so it assumes all events were delivered since the batch was acked.
+				// There could have been failures within the batch that were retried and then dropped, only way to know for sure is to check the exporter metrics.
+				// require.Equal(t, float64(numTestEvents), m["libbeat.output.events.total"], "expected total events sent to output to match")
+				// require.Equal(t, float64(len(tt.expectedIngestedEventIDs)), m["libbeat.output.events.acked"], "expected events acked to match ingested count")
+				// require.Equal(t, float64(numTestEvents - len(tt.expectedIngestedEventIDs)), m["libbeat.output.events.dropped"], "expected events dropped to match ingested count")
+				assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.total"], "expected total events sent to output to match")
+				assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.acked"], "expected total events acked to match")
+			}, 10*time.Second, 100*time.Millisecond, "expected output stats to be available in monitoring endpoint")
+		})
+	}
 }
