@@ -22,6 +22,7 @@ package integration
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"testing"
 	"time"
 
@@ -53,8 +54,12 @@ output.elasticsearch:
 func TestESOutputRecoversFromNetworkError(t *testing.T) {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 
-	s, esIPPort, _, mr := StartMockES(t, ":4242", 0, 0, 0, 0, 0)
-	esAddr := "http://" + esIPPort
+	s, esAddr, _, mr := StartMockES(t, ":4242", 0, 0, 0, 0, 0)
+
+	esURL, err := url.Parse(esAddr)
+	if err != nil {
+		t.Fatalf("cannot parse mockES URL: %s", err)
+	}
 
 	mockbeat.WriteConfigFile(fmt.Sprintf(esCfg, esAddr))
 	mockbeat.Start()
@@ -68,12 +73,13 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 	}
 
 	// 3. Wait for connection error logs
-	mockbeat.WaitForLogs(
-		fmt.Sprintf(`Get \"%s\": dial tcp %s: connect: connection refused`, esAddr, esIPPort),
+	mockbeat.WaitLogsContains(
+		fmt.Sprintf(`Get \"%s\": dial tcp %s: connect: connection refused`, esAddr, esURL.Host),
+
 		2*time.Second,
 		"did not find connection refused error")
 
-	mockbeat.WaitForLogs(
+	mockbeat.WaitLogsContains(
 		fmt.Sprintf("Attempting to reconnect to backoff(elasticsearch(%s)) with 2 reconnect attempt(s)", esAddr),
 		2*time.Second,
 		"did not find two tries to reconnect")
@@ -82,7 +88,7 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 	s, _, _, mr = StartMockES(t, ":4242", 0, 0, 0, 0, 0)
 
 	// 5. Wait for reconnection logs
-	mockbeat.WaitForLogs(
+	mockbeat.WaitLogsContains(
 		fmt.Sprintf("Connection to backoff(elasticsearch(%s)) established", esAddr),
 		5*time.Second, // There is a backoff, so ensure we wait enough
 		"did not find re connection confirmation")

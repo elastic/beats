@@ -18,6 +18,7 @@ import (
 
 	"golang.org/x/oauth2/clientcredentials"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -44,13 +45,13 @@ type falconHoseStream struct {
 // NewFalconHoseFollower performs environment construction including CEL
 // program and regexp compilation, and input metrics set-up for a Crowdstrike
 // FalconHose stream follower.
-func NewFalconHoseFollower(ctx context.Context, id string, cfg config, cursor map[string]any, pub inputcursor.Publisher, stat status.StatusReporter, log *logp.Logger, now func() time.Time) (StreamFollower, error) {
+func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, cursor map[string]any, pub inputcursor.Publisher, stat status.StatusReporter, log *logp.Logger, now func() time.Time) (StreamFollower, error) {
 	if stat == nil {
 		stat = noopReporter{}
 	}
 	stat.UpdateStatus(status.Configuring, "")
 	s := falconHoseStream{
-		id:     id,
+		id:     env.ID,
 		cfg:    cfg,
 		cursor: cursor,
 		status: stat,
@@ -59,7 +60,7 @@ func NewFalconHoseFollower(ctx context.Context, id string, cfg config, cursor ma
 			pub:     pub,
 			log:     log,
 			redact:  cfg.Redact,
-			metrics: newInputMetrics(id, nil),
+			metrics: newInputMetrics(env.MetricsRegistry, log),
 		},
 		creds: &clientcredentials.Config{
 			ClientID:       cfg.Auth.OAuth2.ClientID,
@@ -100,7 +101,7 @@ func NewFalconHoseFollower(ctx context.Context, id string, cfg config, cursor ma
 
 	cfg.Transport.Timeout = 0
 	cfg.Transport.IdleConnTimeout = 0
-	s.plainClient, err = cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation())
+	s.plainClient, err = cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation(), httpcommon.WithLogger(log))
 	if err != nil {
 		stat.UpdateStatus(status.Failed, "failed to configure client: "+err.Error())
 		return nil, err
@@ -129,16 +130,14 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 	for {
 		state, err = s.followSession(ctx, cli, state)
 		if err != nil {
-			if !errors.Is(err, Warning{}) {
-				if errors.Is(err, context.Canceled) {
-					s.status.UpdateStatus(status.Stopping, "")
-					return nil
-				}
-				s.metrics.errorsTotal.Inc()
-				// Status for failures is handled within followSession.
-				return err
+			if errors.Is(err, context.Canceled) {
+				s.status.UpdateStatus(status.Stopping, "")
+				return nil
 			}
 			s.metrics.errorsTotal.Inc()
+			if errors.Is(err, hardError{}) {
+				return err
+			}
 			s.status.UpdateStatus(status.Degraded, err.Error())
 			s.log.Warnw("session warning", "error", err)
 			continue
@@ -150,9 +149,7 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, state map[string]any) (map[string]any, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.discoverURL, nil)
 	if err != nil {
-		err = fmt.Errorf("failed to prepare discover stream request: %w", err)
-		s.status.UpdateStatus(status.Degraded, err.Error())
-		return nil, err
+		return nil, fmt.Errorf("failed to prepare discover stream request: %w", err)
 	}
 	resp, err := cli.Do(req)
 	if err != nil {
@@ -166,9 +163,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		var buf bytes.Buffer
 		io.Copy(&buf, resp.Body)
 		s.log.Errorw("unsuccessful request", "status_code", resp.StatusCode, "status", resp.Status, "body", buf.String())
-		err := fmt.Errorf("unsuccessful request: %s: %s", resp.Status, &buf)
-		s.status.UpdateStatus(status.Degraded, err.Error())
-		return nil, err
+		return nil, fmt.Errorf("unsuccessful request: %s: %s", resp.Status, &buf)
 	}
 
 	dec := json.NewDecoder(resp.Body)
@@ -188,7 +183,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	}
 	err = dec.Decode(&body)
 	if err != nil {
-		return state, Warning{fmt.Errorf("failed to decode discover body: %w", err)}
+		return state, fmt.Errorf("failed to decode discover body: %w", err)
 	}
 	s.log.Debugw("stream discover metadata", logp.Namespace(s.ns), "meta", mapstr.M(body.Meta))
 
@@ -244,11 +239,11 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		if offset > 0 {
 			feedURL, err := url.Parse(r.FeedURL)
 			if err != nil {
-				return state, Warning{fmt.Errorf("failed to parse feed url: %w", err)}
+				return state, fmt.Errorf("failed to parse feed url: %w", err)
 			}
 			feedQuery, err := url.ParseQuery(feedURL.RawQuery)
 			if err != nil {
-				return state, Warning{fmt.Errorf("failed to parse feed query: %w", err)}
+				return state, fmt.Errorf("failed to parse feed query: %w", err)
 			}
 			feedQuery.Set("offset", strconv.Itoa(offset))
 			feedURL.RawQuery = feedQuery.Encode()
@@ -258,7 +253,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		s.log.Debugw("stream request", "url", r.FeedURL)
 		req, err := http.NewRequestWithContext(ctx, "GET", r.FeedURL, nil)
 		if err != nil {
-			return state, Warning{fmt.Errorf("failed to make firehose request to %s: %w", r.FeedURL, err)}
+			return state, fmt.Errorf("failed to make firehose request to %s: %w", r.FeedURL, err)
 		}
 		req.Header = make(http.Header)
 		req.Header.Add("Accept", "application/json")
@@ -266,7 +261,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 
 		resp, err := s.plainClient.Do(req)
 		if err != nil {
-			return state, Warning{fmt.Errorf("failed to get firehose from %s: %w", r.FeedURL, err)}
+			return state, fmt.Errorf("failed to get firehose from %s: %w", r.FeedURL, err)
 		}
 		defer resp.Body.Close()
 
@@ -284,7 +279,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 					s.log.Info("stream ended, restarting")
 					return state, nil
 				}
-				return state, Warning{fmt.Errorf("error decoding event: %w", err)}
+				return state, fmt.Errorf("error decoding event: %w", err)
 			}
 			s.metrics.receivedBytesTotal.Add(uint64(len(msg)))
 			state["response"] = []byte(msg)
@@ -293,25 +288,27 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 			if err != nil {
 				s.log.Errorw("failed to process and publish data", "error", err)
 				s.status.UpdateStatus(status.Failed, "failed to process and publish data: "+err.Error())
-				return nil, err
+				// Fail the input so that we do not attempt to progress
+				// while dropping data on the floor.
+				return nil, hardError{err}
 			}
 		}
 	}
 	return state, nil
 }
 
-// Warning is a warning-only error.
-type Warning struct {
+// hardError is an input-terminating error.
+type hardError struct {
 	error
 }
 
-// Is returns true if target is a Warning.
-func (e Warning) Is(target error) bool {
-	_, ok := target.(Warning)
+// Is returns true if target is a hardError.
+func (e hardError) Is(target error) bool {
+	_, ok := target.(hardError)
 	return ok
 }
 
-func (e Warning) Unwrap() error {
+func (e hardError) Unwrap() error {
 	return e.error
 }
 
@@ -324,7 +321,6 @@ func (s *falconHoseStream) now() time.Time {
 }
 
 func (s *falconHoseStream) Close() error {
-	s.metrics.Close()
 	return nil
 }
 

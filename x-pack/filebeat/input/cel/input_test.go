@@ -32,6 +32,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
@@ -2075,6 +2076,33 @@ var inputTests = []struct {
 		},
 	},
 
+	{
+		name: "max_executions_with_remaining_executions",
+		config: map[string]interface{}{
+			"interval":       1,
+			"max_executions": 5,
+			"program": `debug("STATE", int(state.n).as(n, {
+							"events": [{"n": n+1, "remaining_executions": remaining_executions}],
+							"n":          n+1,
+							"want_more":  remaining_executions != 0,
+						}))`,
+			"state": map[string]any{"n": 0},
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		want: []map[string]interface{}{
+			{"n": float64(1), "remaining_executions": float64(4)},
+			{"n": float64(2), "remaining_executions": float64(3)},
+			{"n": float64(3), "remaining_executions": float64(2)},
+			{"n": float64(4), "remaining_executions": float64(1)},
+			{"n": float64(5), "remaining_executions": float64(0)},
+			{"n": float64(6), "remaining_executions": float64(4)},
+			{"n": float64(7), "remaining_executions": float64(3)},
+		},
+	},
+
 	// Coverage
 	{
 		name: "coverage",
@@ -2199,10 +2227,11 @@ func TestInput(t *testing.T) {
 
 			id := "test_id:" + test.name
 			v2Ctx := v2.Context{
-				Logger:        logp.NewLogger("cel_test"),
-				ID:            id,
-				IDWithoutName: id,
-				Cancelation:   ctx,
+				Logger:          logp.NewLogger("cel_test"),
+				ID:              id,
+				IDWithoutName:   id,
+				Cancelation:     ctx,
+				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
 			client.done = func() {

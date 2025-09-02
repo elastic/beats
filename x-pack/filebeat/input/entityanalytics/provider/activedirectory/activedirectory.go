@@ -86,7 +86,7 @@ func (p *adInput) configure(cfg *config.C) (kvstore.Input, error) {
 		return nil, err
 	}
 	if p.cfg.TLS.IsEnabled() && u.Scheme == "ldaps" {
-		tlsConfig, err := tlscommon.LoadTLSConfig(p.cfg.TLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(p.cfg.TLS, p.logger)
 		if err != nil {
 			return nil, err
 		}
@@ -122,8 +122,7 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 	}
 	stat.UpdateStatus(status.Starting, "")
 	p.logger = inputCtx.Logger.With("provider", Name, "domain", p.cfg.URL)
-	p.metrics = newMetrics(inputCtx.ID, nil)
-	defer p.metrics.Close()
+	p.metrics = newMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
 
 	lastSyncTime, _ := getLastSync(store)
 	syncWaitTime := time.Until(lastSyncTime.Add(p.cfg.SyncInterval))

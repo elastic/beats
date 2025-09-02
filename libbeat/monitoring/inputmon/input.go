@@ -26,7 +26,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-// NewInputRegistry returns the *monitoring.Registry for metrics related to
+const (
+	MetricKeyID    = "id"
+	MetricKeyInput = "input"
+)
+
+// NewDeprecatedMetricsRegistry is deprecated and exists only for backwards
+// compatibility as there are v1 inputs registering metrics.
+// It returns the *monitoring.Registry for metrics related to
 // an input instance, identified by ID. If a registry with the given ID
 // already exists, it is returned. Otherwise, a new registry is created.
 //
@@ -40,8 +47,9 @@ import (
 // The returned cancel function *must* be called when the input stops to
 // unregister the metrics and prevent resource leaks.
 //
-// Deprecated. Use NewMetricsRegistry instead.
-func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
+// Deprecated. use NewMetricsRegistry instead.
+// There are still filebeat v1 inputs and other Beats that use this function.
+func NewDeprecatedMetricsRegistry(inputType, inputID string, optionalParent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
 	// Log the registration to ease tracking down duplicate ID registrations.
 	// Logged at INFO rather than DEBUG since it is not in a hot path and having
 	// the information available by default can short-circuit requests for debug
@@ -70,7 +78,7 @@ func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Regi
 	// that isn't at the top-level.
 	reg = findInputRegistryWithID(parentRegistry, inputID)
 	if reg == nil {
-		reg = parentRegistry.NewRegistry(registryID)
+		reg = parentRegistry.GetOrCreateRegistry(registryID)
 	} else {
 		log.Warnw(fmt.Sprintf(
 			"parent metrics registry already contains a %q registry, reusing it",
@@ -80,8 +88,8 @@ func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Regi
 			"registry_id", registryID)
 	}
 
-	monitoring.NewString(reg, "input").Set(inputType)
-	monitoring.NewString(reg, "id").Set(inputID)
+	monitoring.NewString(reg, MetricKeyInput).Set(inputType)
+	monitoring.NewString(reg, MetricKeyID).Set(inputID)
 
 	log.Infow("registering",
 		"input_type", inputType,
@@ -101,6 +109,9 @@ func sanitizeID(id string) string {
 	return strings.ReplaceAll(id, ".", "_")
 }
 
+// globalRegistry returns the metric registry for the global 'dataset'
+// monitoring namespace.
+// Deprecated: There is a v1 input registering metrics
 func globalRegistry() *monitoring.Registry {
 	return monitoring.GetNamespace("dataset").GetRegistry()
 }
@@ -143,7 +154,15 @@ func NewMetricsRegistry(
 	registryID := sanitizeID(inputID)
 	reg := parent.GetRegistry(registryID)
 	if reg == nil {
-		reg = parent.NewRegistry(registryID)
+		// Technically this is a race: the previous GetRegistry is not atomic with
+		// this GetOrCreateRegistry, so if someone else is adding the same id at this
+		// exact moment we might take this branch inappropriately. However, the
+		// consequences in that case are metrics for two inputs with the same id
+		// being inappropriately reported under the same registry, whereas the
+		// consequences if we called NewRegistry here are a panic.
+		// (We should also never have two inputs with the same id in the first
+		// place, but it's worth being cautious.)
+		reg = parent.GetOrCreateRegistry(registryID)
 	} else {
 		// Null route metrics for duplicated ID.
 		reg = monitoring.NewRegistry()
@@ -157,8 +176,8 @@ func NewMetricsRegistry(
 
 	// add the necessary information so the registry can be published by the
 	// HTTP monitoring endpoint.
-	monitoring.NewString(reg, "input").Set(inputType)
-	monitoring.NewString(reg, "id").Set(inputID)
+	monitoring.NewString(reg, MetricKeyInput).Set(inputType)
+	monitoring.NewString(reg, MetricKeyID).Set(inputID)
 
 	log.Named("metric_registry").Infow("registering",
 		"registry_id", registryID,

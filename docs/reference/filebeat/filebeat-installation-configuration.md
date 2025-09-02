@@ -98,6 +98,20 @@ tar xzvf filebeat-{{version.stack}}-linux-x86_64.tar.gz
 :::{note}
 If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-filebeat.ps1`.
 :::
+
+:::{important}
+```{applies_to}
+stack: ga 9.1.0, ga 9.0.6
+```
+The base folder has changed from `C:\ProgramData\` to `C:\Program Files\`
+because the latter has stricter permissions. The home path (base for
+state and logs) is now `C:\Program Files\Filebeat-Data`.
+
+The install script (`install-service-filebeat.ps1`) will check whether
+`C:\ProgramData\Filebeat` exits and move it to `C:\Program Files\Filebeat-Data`.
+For more details on the installation script refer to: [install script](/reference/filebeat/filebeat-installation-script.md).
+
+:::
 ::::::
 
 :::::::
@@ -358,8 +372,8 @@ visualizing your data. To load these assets:
     `-e` is optional and sends output to standard error instead of the configured log output.
 
 The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.1` `C:\Program Files\Filebeat-Data\Logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\filebeat\Logs`
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Filebeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\filebeat\logs`
 
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to {{es}} and deploys the sample dashboards for visualizing the data in {{kib}}.
 
@@ -442,8 +456,8 @@ PS C:\Program Files\filebeat> Start-Service filebeat
 ```
 
 The default location where Windows log files are stored varies:
-* {applies_to}`stack: ga 9.1` `C:\Program Files\Filebeat-Data\Logs`
-* {applies_to}`stack: ga 9.0` `C:\ProgramData\filebeat\Logs`
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Filebeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\filebeat\logs`
 ::::::
 
 :::::::

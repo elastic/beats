@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kafka-consumer.html
+
+applies_to:
+  stack: beta
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -17,7 +20,7 @@ This metricset periodically fetches JMX metrics from Kafka Consumers implemented
 
 ## Compatibility [_compatibility_28]
 
-The module has been tested with Kafka 2.1.1, 2.2.2 and 3.6.0. Other versions are expected to work.
+The module has been tested with Kafka 2.1.1, 2.2.2, 3.6.0 and 4.0.0. Other versions are expected to work.
 
 
 ## Usage [_usage_7]

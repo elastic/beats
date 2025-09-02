@@ -292,4 +292,92 @@ var vpcFlowFields = [...]vpcFlowField{
 		},
 	},
 	{Name: "traffic_path", Type: integerType},
+	// v6 - Transit Gateway Flow Logs
+	{Name: "resource_type", Type: stringType},
+	{Name: "tgw_id", Type: stringType},
+	{Name: "tgw_attachment_id", Type: stringType},
+	{Name: "tgw_src_vpc_account_id", Type: stringType},
+	{Name: "tgw_dst_vpc_account_id", Type: stringType},
+	{Name: "tgw_src_vpc_id", Type: stringType},
+	{Name: "tgw_dst_vpc_id", Type: stringType},
+	{Name: "tgw_src_subnet_id", Type: stringType},
+	{Name: "tgw_dst_subnet_id", Type: stringType},
+	{Name: "tgw_src_eni", Type: stringType},
+	{Name: "tgw_dst_eni", Type: stringType},
+	{Name: "tgw_src_az_id", Type: stringType},
+	{Name: "tgw_dst_az_id", Type: stringType},
+	{Name: "tgw_pair_attachment_id", Type: stringType},
+	{Name: "packets_lost_no_route", Type: longType},
+	{Name: "packets_lost_blackhole", Type: longType},
+	{Name: "packets_lost_mtu_exceeded", Type: longType},
+	{Name: "packets_lost_ttl_expired", Type: longType},
+	// v7
+	{
+		Name: "ecs_cluster_arn",
+		Type: stringType,
+		ECSMappings: []ecsFieldMapping{
+			{
+				Target: "orchestrator.cluster.id",
+			},
+		},
+	},
+	{
+		Name: "ecs_cluster_name",
+		Type: stringType,
+		ECSMappings: []ecsFieldMapping{
+			{Target: "orchestrator.cluster.name"},
+			{
+				Target: "orchestrator.type",
+				Transform: func(targetField string, _ interface{}, event *beat.Event) {
+					event.PutValue(targetField, "ecs") //nolint:errcheck // This can only fail if 'orchestrator' is not an object.
+				},
+			},
+		},
+	},
+	{
+		Name: "ecs_container_instance_arn",
+		Type: stringType,
+		ECSMappings: []ecsFieldMapping{
+			{Target: "orchestrator.resource.name"},
+			{
+				Target: "orchestrator.resource.type",
+				Transform: func(targetField string, _ interface{}, event *beat.Event) {
+					event.PutValue(targetField, "container") //nolint:errcheck // This can only fail if 'orchestrator.resource' is not an object.
+				},
+			},
+		},
+	},
+	{
+		Name: "ecs_container_instance_id",
+		Type: stringType,
+		ECSMappings: []ecsFieldMapping{
+			{Target: "orchestrator.resource.id"},
+		},
+	},
+	{
+		Name: "ecs_container_id",
+		Type: stringType,
+		ECSMappings: []ecsFieldMapping{
+			{Target: "container.id"},
+		},
+	},
+	{Name: "ecs_second_container_id", Type: stringType},
+	{
+		Name: "ecs_service_name",
+		Type: stringType,
+		ECSMappings: []ecsFieldMapping{
+			{Target: "service.name"},
+		},
+	},
+	{Name: "ecs_task_definition_arn", Type: stringType},
+	{Name: "ecs_task_arn", Type: stringType},
+	{Name: "ecs_task_id", Type: stringType},
+	// v8
+	{
+		Name: "reject_reason",
+		Type: stringType,
+		ECSMappings: []ecsFieldMapping{
+			{Target: "event.reason"},
+		},
+	},
 }

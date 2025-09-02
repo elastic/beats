@@ -25,14 +25,6 @@ import (
 
 type Schedule cronexpr.Expression
 
-func MustParse(in string) *Schedule {
-	s, err := Parse(in)
-	if err != nil {
-		panic(err)
-	}
-	return s
-}
-
 func Parse(in string) (*Schedule, error) {
 	expr, err := cronexpr.Parse(in)
 	return (*Schedule)(expr), err

@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const jobErrString = "job with jobId %s encountered an error: %v"
@@ -65,7 +66,7 @@ func newJob(client *blob.Client, blob *azcontainer.BlobItem, blobURL string,
 ) *job {
 	if metrics == nil {
 		// metrics are optional, initialize a stub if not provided
-		metrics = newInputMetrics("", nil)
+		metrics = newInputMetrics(monitoring.NewRegistry(), log)
 	}
 
 	return &job{

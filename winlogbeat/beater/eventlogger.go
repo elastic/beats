@@ -145,7 +145,7 @@ func (e *eventLogger) run(
 		client:     client,
 		eventACKer: eventACKer,
 	}
-	reg, _ := inputmon.NewInputRegistry("winlog", api.Name(), nil)
+	reg, _ := inputmon.NewDeprecatedMetricsRegistry("winlog", api.Name(), nil)
 	if err := eventlog.Run(noopReporter{}, ctx, reg, api, state, publisher, e.log); err != nil {
 		e.log.Error(err)
 	}

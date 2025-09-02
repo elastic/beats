@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
+	"github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -66,6 +67,7 @@ func OTelCmd(beatname string) *cobra.Command {
 	}
 
 	command.Flags().String("config", beatname+"-otel.yml", "path to "+beatname+" config file")
+	command.AddCommand(OTelInspectComand(beatname))
 	return command
 }
 
@@ -74,6 +76,13 @@ func getComponent() (otelcol.Factories, error) {
 	receivers, err := otelcol.MakeFactoryMap(
 		fbreceiver.NewFactory(),
 		mbreceiver.NewFactory(),
+	)
+	if err != nil {
+		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
+	}
+
+	processors, err := otelcol.MakeFactoryMap(
+		beatprocessor.NewFactory(),
 	)
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
@@ -88,8 +97,9 @@ func getComponent() (otelcol.Factories, error) {
 	}
 
 	return otelcol.Factories{
-		Receivers: receivers,
-		Exporters: exporters,
+		Receivers:  receivers,
+		Processors: processors,
+		Exporters:  exporters,
 	}, nil
 
 }

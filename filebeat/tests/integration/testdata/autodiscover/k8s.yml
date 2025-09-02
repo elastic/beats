@@ -1,0 +1,14 @@
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      node: {{.nodeName}}
+      kube_config: {{.kubeConfig}}
+      hints.enabled: true
+
+output.discard:
+  enabled: true
+
+logging:
+  level: debug
+  selectors:
+    - "*"

@@ -218,7 +218,7 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 	k.Producer.Timeout = config.BrokerTimeout
 	k.Producer.CompressionLevel = config.CompressionLevel
 
-	tls, err := tlscommon.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(config.TLS, log)
 	if err != nil {
 		return nil, err
 	}
@@ -313,6 +313,7 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 	k.MetricRegistry = adapter.GetGoMetrics(
 		monitoring.Default,
 		"libbeat.outputs",
+		log,
 		adapter.Rename("incoming-byte-rate", "read.bytes"),
 		adapter.Rename("outgoing-byte-rate", "write.bytes"),
 		adapter.Rename("request-latency-in-ms", "write.latency"),

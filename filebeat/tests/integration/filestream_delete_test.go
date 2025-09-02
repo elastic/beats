@@ -25,12 +25,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -128,7 +125,7 @@ func TestFilestreamDelete(t *testing.T) {
 			if runtime.GOOS == "windows" {
 				msgLogFilePath = strings.ReplaceAll(logFile, `\`, `\\`)
 			}
-			integration.GenerateLogFile(t, logFile, 100, false)
+			integration.WriteLogFile(t, logFile, 100, false)
 
 			vars := map[string]any{
 				"homePath":    workDir,
@@ -142,7 +139,7 @@ func TestFilestreamDelete(t *testing.T) {
 			filebeat.Start()
 
 			closeCondMsg := fmt.Sprintf(tc.closeCondMsg, msgLogFilePath)
-			filebeat.WaitForLogs(
+			filebeat.WaitLogsContains(
 				closeCondMsg,
 				10*time.Second,
 				"did not find close condition '%s' in the logs",
@@ -165,7 +162,7 @@ func TestFilestreamDelete(t *testing.T) {
 			} else {
 				// Wait for the file removed message
 				removedMsg := fmt.Sprintf("'%s' removed", msgLogFilePath)
-				filebeat.WaitForLogs(
+				filebeat.WaitLogsContains(
 					removedMsg,
 					30*time.Second,
 					"file removed log entry not found")
@@ -191,7 +188,7 @@ func testResourceNotFinished(
 				"closing harvester",
 			msgLogFilePath)
 		for i := range 2 {
-			filebeat.WaitForLogs(
+			filebeat.WaitLogsContains(
 				notFinishedMsg,
 				10*time.Second,
 				"[%d] Filebeat did not wait for the resource to be finished",
@@ -225,28 +222,28 @@ func testGracePeriod(
 			// This wait always takes 6.1s, I'm not quite sure why, probably it
 			// is caused by some backoff logic. Setting the backoff.* in the
 			// output is not enough. So we wait at least 10s here
-			filebeat.WaitForLogs(
+			filebeat.WaitLogsContains(
 				gracePeriodMsg,
 				10*time.Second,
 				"did not start waiting for grace period")
 
 			// Wait 1/2 of the grace period, then add data to the file
 			time.Sleep(gracePeriod / 2)
-			integration.GenerateLogFile(t, msgLogFilePath, 5, true)
+			integration.WriteLogFile(t, msgLogFilePath, 5, true)
 
 			// Wait for the message of file size changed
 			changedMsg := fmt.Sprintf("'%s' was updated, won't remove. Closing harvester", msgLogFilePath)
-			filebeat.WaitForLogs(changedMsg, time.Second, "filestream did detect the file change")
+			filebeat.WaitLogsContains(changedMsg, time.Second, "filestream did detect the file change")
 
 			// Make sure the harvester is closed
-			filebeat.WaitForLogs("Stopped harvester for file", time.Second, "harvester was not closed")
-			filebeat.WaitForLogs("Closing reader of filestream", time.Second, "reader was not closed")
+			filebeat.WaitLogsContains("Stopped harvester for file", time.Second, "harvester was not closed")
+			filebeat.WaitLogsContains("Closing reader of filestream", time.Second, "reader was not closed")
 		})
 	}
 
 	t.Run("grace period is respected", func(t *testing.T) {
 		msg := fmt.Sprintf("'%s' removed", msgLogFilePath)
-		filebeat.WaitForLogs(msg, 30*time.Second, "file removed log entry not found")
+		filebeat.WaitLogsContains(msg, 30*time.Second, "file removed log entry not found")
 		removedMsg := filebeat.GetLastLogLine(msg)
 
 		gracePeriodMsg := fmt.Sprintf(
@@ -310,7 +307,7 @@ func TestFilestreamDeleteEnabledOnExistingFiles(t *testing.T) {
 			if runtime.GOOS == "windows" {
 				msgLogFilePath = strings.ReplaceAll(logFile, `\`, `\\`)
 			}
-			integration.GenerateLogFile(t, logFile, 100, false)
+			integration.WriteLogFile(t, logFile, 100, false)
 
 			vars := map[string]any{
 				"homePath":    workDir,
@@ -324,7 +321,7 @@ func TestFilestreamDeleteEnabledOnExistingFiles(t *testing.T) {
 			filebeat.Start()
 
 			msg := fmt.Sprintf(tc.msg, msgLogFilePath)
-			filebeat.WaitForLogs(
+			filebeat.WaitLogsContains(
 				msg,
 				10*time.Second,
 				"did not find '%s' in the logs",
@@ -332,7 +329,7 @@ func TestFilestreamDeleteEnabledOnExistingFiles(t *testing.T) {
 			)
 
 			filebeat.Stop()
-			filebeat.WaitForLogs("filebeat stopped.", 2*time.Second, "Filebeat did not stop successfully")
+			filebeat.WaitLogsContains("filebeat stopped.", 2*time.Second, "Filebeat did not stop successfully")
 			filebeat.RemoveLogFiles()
 
 			if !fileExists(t, logFile) {
@@ -349,10 +346,10 @@ func TestFilestreamDeleteEnabledOnExistingFiles(t *testing.T) {
 				"all events from '%s' have been published, waiting for %s grace period",
 				msgLogFilePath,
 				tc.gracePeriod)
-			filebeat.WaitForLogs(gracePeriodMsg, 10*time.Second, "waiting for grace period log not found")
+			filebeat.WaitLogsContains(gracePeriodMsg, 10*time.Second, "waiting for grace period log not found")
 
 			msg = fmt.Sprintf("'%s' removed", msgLogFilePath)
-			filebeat.WaitForLogs(msg, 10*time.Second, "file removed log entry not found")
+			filebeat.WaitLogsContains(msg, 10*time.Second, "file removed log entry not found")
 
 			if fileExists(t, logFile) {
 				t.Fatalf("%q should have been removed", logFile)
@@ -407,23 +404,7 @@ func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
 	esURL := integration.GetESAdminURL(t, "http")
 
 	// Create and start the proxy server
-	proxy := integration.NewDisabledProxy(t, esURL.String())
-	server := &http.Server{
-		Addr:              "localhost:9201",
-		Handler:           proxy,
-		ReadHeaderTimeout: time.Second / 2,
-	}
-	go func() {
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			t.Errorf("Proxy server failed: %s", err)
-		}
-	}()
-	defer server.Close()
-
-	proxyURL, err := url.Parse(server.Addr)
-	if err != nil {
-		t.Fatalf("cannot parse proxy URL: %s", err)
-	}
+	proxy, proxyURL := integration.NewDisablingProxy(t, esURL.String())
 
 	user := esURL.User.Username()
 	pass, _ := esURL.User.Password()
@@ -431,7 +412,7 @@ func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
 		"homePath":    workDir,
 		"logfile":     logFile,
 		"testdata":    testDataPath,
-		"esHost":      proxyURL.String(),
+		"esHost":      proxyURL,
 		"user":        user,
 		"pass":        pass,
 		"index":       index,
@@ -445,7 +426,7 @@ func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
 	// Wait for data in ES
 	msgs := []string{}
 	require.Eventually(t, func() bool {
-		msgs = getEventsMsgFromES(t, index, 200)
+		msgs = integration.GetEventsMsgFromES(t, index, 200)
 		return len(msgs) == len(logFileLines)/2
 	}, time.Second*10, time.Millisecond*100, "not all log messages have been found on ES")
 
@@ -489,7 +470,7 @@ func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
 	require.Eventually(
 		t,
 		func() bool {
-			msgs = getEventsMsgFromES(t, index, 200)
+			msgs = integration.GetEventsMsgFromES(t, index, 200)
 			return len(msgs) == len(logFileLines)
 		},
 		// This is the maximum time we will wait for the documents to
@@ -628,56 +609,4 @@ func waitForDidNotChange(t *testing.T, filebeat *integration.BeatProc, files []s
 			"'File didn't change' log not found for %q", path,
 		)
 	}
-}
-
-// getEventsMsgFromES gets the 'message' field from all documents
-// in `index`. If Elasticsearch returns an status code other than 200
-// nil is returned. `size` sets the number of documents returned
-func getEventsMsgFromES(t *testing.T, index string, size int) []string {
-	t.Helper()
-	// Step 1: Get the Elasticsearch Admin URL so we can query any index
-	esURL := integration.GetESAdminURL(t, "http")
-
-	// Step 2: Format the search URL for the `foo` datastream
-	searchURL, err := integration.FormatDataStreamSearchURL(t, esURL, index)
-	require.NoError(t, err, "Failed to format datastream search URL")
-
-	// Step 3: Add query parameters
-	queryParams := searchURL.Query()
-
-	// Add the `size` (the number of documents returned) parameter
-	queryParams.Set("size", strconv.Itoa(size))
-	// Order the events in ascending order
-	queryParams.Set("sort", "@timestamp:asc")
-	// Only request the field we need
-	queryParams.Set("_source", "message")
-	searchURL.RawQuery = queryParams.Encode()
-
-	// Step 4: Perform the HTTP GET request using integration.HttpDo
-	statusCode, body, err := integration.HttpDo(t, "GET", searchURL)
-	require.NoError(t, err, "Failed to perform HTTP request")
-	if statusCode != 200 {
-		return nil
-	}
-
-	// Step 5: Parse the response body to extract events
-	var searchResult struct {
-		Hits struct {
-			Hits []struct {
-				Source struct {
-					Message string `json:"message"`
-				} `json:"_source"`
-			} `json:"hits"`
-		} `json:"hits"`
-	}
-	err = json.Unmarshal(body, &searchResult)
-	require.NoError(t, err, "Failed to parse response body")
-
-	// Step 6: Extract the `message` field from each event and return the messages
-	messages := []string{}
-	for _, hit := range searchResult.Hits.Hits {
-		messages = append(messages, hit.Source.Message)
-	}
-
-	return messages
 }
