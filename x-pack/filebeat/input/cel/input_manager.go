@@ -40,7 +40,6 @@ func cursorConfigure(cfg *conf.C, logger *logp.Logger) ([]inputcursor.Source, in
 		return nil, nil, err
 	}
 	src.cfg.checkUnsupportedParams(logger)
-
 	return []inputcursor.Source{src}, input{}, nil
 }
 
