@@ -140,7 +140,13 @@ func CreateReloadConfigFromInputs(raw []map[string]interface{}) ([]*reload.Confi
 // convinence method for wrapping all the stream transformations needed by the shipper and other inputs
 func createStreamRules(raw *proto.UnitExpectedConfig, streamSource map[string]interface{}, stream *proto.Stream, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) (map[string]interface{}, error) {
 
-	streamSource = injectIndexStream(defaultDataStreamType, raw, stream, streamSource)
+	// if the index explicitly set it takes precedence
+	if _, exists := streamSource["index"]; exists {
+		// we must delete the existing `data_stream` field, otherwise `index` is ignored.
+		delete(streamSource, "data_stream")
+	} else {
+		streamSource = injectIndexStream(defaultDataStreamType, raw, stream, streamSource)
+	}
 
 	// the order of building the processors is important
 	// prepend is used to ensure that the processors defined directly on the stream
@@ -153,13 +159,13 @@ func createStreamRules(raw *proto.UnitExpectedConfig, streamSource map[string]in
 	// 2. agentInfo
 	streamSource, err := injectAgentInfoRule(streamSource, agentInfo)
 	if err != nil {
-		return nil, fmt.Errorf("Error injecting agent processors: %w", err)
+		return nil, fmt.Errorf("error injecting agent processors: %w", err)
 	}
 
 	// 3. stream processors
 	streamSource, err = injectStreamProcessors(raw, defaultDataStreamType, stream, streamSource, defaultProcessors)
 	if err != nil {
-		return nil, fmt.Errorf("Error injecting stream processors: %w", err)
+		return nil, fmt.Errorf("error injecting stream processors: %w", err)
 	}
 
 	// now the order of the processors on this input is as follows

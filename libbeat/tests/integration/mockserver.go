@@ -17,6 +17,9 @@
 
 package integration
 
+// IMPORTANT: Do not add the 'integration' build tag to this file,
+// it is used in unit tests that do not have the 'integration' flag.
+
 import (
 	"testing"
 	"time"
