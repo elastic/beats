@@ -89,6 +89,25 @@ updates:
       - dependency-name: "github.com/microsoft/wmi"
       - dependency-name: "github.com/go-ole/go-ole"
       - dependency-name: "github.com/StackExchange/wmi"
+
+      # meraki
+      - dependency-name: "github.com/go-resty/resty/v2"
+      - dependency-name: "github.com/tomnomnom/linkheader"
+      - dependency-name: "github.com/meraki/dashboard-api-go/v3"
+      # haproxi
+      - dependency-name: "github.com/gocarina/gocsv"
+      # salesforce
+      - dependency-name: "github.com/elastic/go-sfdc"
+      # vsphere
+      - dependency-name: "github.com/vmware/govmomi"
+      # redis
+      - dependency-name: "github.com/gomodule/redigo"
+      # panw
+      - dependency-name: "github.com/PaloAltoNetworks/pango"
+      # mongodb
+      - dependency-name: "go.mongodb.org/mongo-driver"
+      # kafka
+      - dependency-name: "github.com/elastic/sarama"
     groups:
       windows:
         patterns:
