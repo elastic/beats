@@ -662,7 +662,7 @@ processors:
             block_on_overflow: true
             enabled: true
             num_consumers: 1
-            queue_size: 9223372036854775807
+            queue_size: 3200
             wait_for_result: true
         timeout: 1m30s
         user: admin`

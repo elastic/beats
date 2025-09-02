@@ -29,6 +29,7 @@ import (
 	oteltranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -146,6 +147,7 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 				"sizer":    "items",
 			},
 			"enabled":           true,
+			"queue_size":        getQueueSize(logger, output),
 			"block_on_overflow": true,
 			"wait_for_result":   true,
 			"num_consumers":     escfg.NumWorkers(),
@@ -232,4 +234,13 @@ func setIfNotNil(m map[string]any, key string, value any) {
 	default:
 		m[key] = value
 	}
+}
+
+func getQueueSize(logger *logp.Logger, output *config.C) int {
+	size, err := output.Int("queue.mem.events", -1)
+	if err != nil {
+		logger.Debugf("Failed to get queue size: %v", err)
+		return memqueue.DefaultEvents // return default queue.mem.events for sending_queue in case of an errr
+	}
+	return int(size)
 }
