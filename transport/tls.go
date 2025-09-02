@@ -216,7 +216,7 @@ func postVerifyTLSConnection(d testing.Driver, conn *tls.Conn, config *tlscommon
 	}
 
 	versions := config.Versions
-	if versions == nil {
+	if len(versions) == 0 {
 		versions = tlscommon.TLSDefaultVersions
 	}
 	versionOK := false
