@@ -133,7 +133,7 @@ func (m *NetworkMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 
 			triggeredAlarm, err := getTriggeredAlarm(ctx, pc, networks[i].TriggeredAlarmState)
 			if err != nil {
-				m.Logger().Errorf("Failed to retrieve alerts from network %s: %w", networks[i].Name, err)
+				m.Logger().Errorf("Failed to retrieve alerts from network %s: %v", networks[i].Name, err)
 			}
 
 			reporter.Event(mb.Event{
