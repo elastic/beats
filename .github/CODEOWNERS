@@ -72,7 +72,6 @@ CHANGELOG*
 /libbeat/processors/syslog/ @elastic/integration-experience
 /libbeat/processors/translate_ldap_attribute/ @elastic/sec-windows-platform
 /libbeat/processors/translate_sid/ @elastic/sec-windows-platform
-/libbeat/reader/etw/ @elastic/sec-windows-platform
 /libbeat/reader/syslog/ @elastic/integration-experience
 /libbeat/scripts @elastic/observablt-ci @elastic/observablt-ci-contractors
 /licenses/ @elastic/elastic-agent-data-plane
@@ -203,6 +202,7 @@ CHANGELOG*
 /x-pack/filebeat/processors/decode_cef/ @elastic/integration-experience
 /x-pack/heartbeat/ @elastic/obs-ds-hosted-services
 /x-pack/libbeat/reader/parquet/ @elastic/security-service-integrations
+/x-pack/libbeat/reader/etw/ @elastic/sec-windows-platform
 /x-pack/metricbeat/ @elastic/elastic-agent-data-plane
 /x-pack/metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /x-pack/metricbeat/module/activemq @elastic/obs-infraobs-integrations

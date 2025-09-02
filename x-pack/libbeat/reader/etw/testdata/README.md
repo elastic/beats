@@ -55,9 +55,9 @@ To measure the performance of the ETW reader, run the `BenchmarkETWCallbackRate`
 go test -run="^$" -bench=BenchmarkETWCallbackRate -benchtime=30s
 goos: windows
 goarch: amd64
-pkg: github.com/elastic/beats/v7/libbeat/reader/etw
+pkg: github.com/elastic/beats/v7/x-pack/libbeat/reader/etw
 cpu: 13th Gen Intel(R) Core(TM) i7-13700H
 BenchmarkETWCallbackRate-20           34        1000216150 ns/op               579.7 allocs/event            48558 bytes/event           1.000 duration_s           29644 events/s          30000 target_events/s        17189965 total_allocs_iter    1439854256 total_bytes_iter          29652 total_events_iter
 PASS
-ok      github.com/elastic/beats/v7/libbeat/reader/etw   74.197s
+ok      github.com/elastic/beats/v7/x-pack/libbeat/reader/etw   74.197s
 ```
