@@ -85,8 +85,15 @@ metricbeat.modules:
   #scope: node
 ```
 
-This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
+You cannot specify the `username`/`password` settings _and_ `api_key` at the same time.
 
+When used, the `api_key`  configuration can be specified as:
+
+* {applies_to}`stack: ga 9.2.0` The unencoded `id:api_key` format (`api_key: "foo:bar"`) or the Base64-encoded `id:api_key` format (`api_key: "Zm9vOmJhcgo="`)
+* {applies_to}`stack: ga 9.1.4` The unencoded `id:api_key` format (`api_key: "foo:bar"`) or the Base64-encoded `id:api_key` format (`api_key: "Zm9vOmJhcgo="`)
+* All earlier releases can only use the unencoded `id:api_key` format (`api_key: "foo:bar"`)
+
+This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 ## Metricsets [_metricsets]
 
