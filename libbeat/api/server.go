@@ -25,6 +25,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -69,19 +70,15 @@ func (s *Server) Start() {
 	go func(l net.Listener) {
 		defer s.wg.Done()
 		s.log.Infof("Metrics endpoint listening on: %s (configured: %s)", l.Addr().String(), s.config.Host)
-		srv := &http.Server{Handler: s.mux}
+		srv := &http.Server{Handler: s.mux, ReadHeaderTimeout: 10 * time.Second}
 		s.httpServer = srv
 		err := srv.Serve(l)
-		// err := http.Serve(l, s.mux) //nolint:gosec // Keep original behavior
 		s.log.Infof("Stats endpoint (%s) finished: %v", l.Addr().String(), err)
 	}(s.l)
 }
 
 // Stop stops the API server and free any resource associated with the process like unix sockets.
 func (s *Server) Stop() error {
-	if err := s.l.Close(); err != nil {
-		return fmt.Errorf("error closing monitoring server listener: %w", err)
-	}
 	if err := s.httpServer.Close(); err != nil {
 		return fmt.Errorf("error closing monitoring server: %w", err)
 	}
@@ -91,7 +88,7 @@ func (s *Server) Stop() error {
 
 // AttachHandler will attach a handler at the specified route. Routes are
 // matched in the order in which that are attached.
-// Attaching teh same route twice will panic
+// Attaching the same route twice will panic
 func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
 	s.mux.Handle(route, h)
 	if !strings.HasSuffix(route, "/") && !strings.HasSuffix(route, "{$}") {
