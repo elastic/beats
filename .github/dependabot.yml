@@ -112,6 +112,11 @@ updates:
           - "github.com/microsoft/wmi"
           - "github.com/go-ole/go-ole"
           - "github.com/StackExchange/wmi"
+      meraki:
+        patterns:
+          - "github.com/go-resty/resty/v2"
+          - "github.com/tomnomnom/linkheader"
+          - "github.com/meraki/dashboard-api-go/v3"
     open-pull-requests-limit: 5
 
   # Update integration test container images
