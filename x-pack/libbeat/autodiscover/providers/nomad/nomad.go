@@ -235,34 +235,15 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	// Beat specific.
 	e := bus.Event{}
 
-	var tags, container mapstr.M
+	var container mapstr.M
 	var meta, tasks mapstr.M
 
-	rawMeta, ok := event["meta"]
-	if ok {
-		meta, ok = rawMeta.(mapstr.M)
-		if !ok {
-			goto postMeta
-		}
-		if nomadMeta, ok := meta["nomad"]; ok {
-			meta, ok = nomadMeta.(mapstr.M)
-			if !ok {
-				goto postMeta
-			}
-		}
-
-		// The builder base config can configure any of the field values of nomad if need be.
-		e["nomad"] = meta
-		if rawAnn, ok := meta["tags"]; ok {
-			tags, ok = rawAnn.(mapstr.M)
-			if !ok {
-				goto postMeta
-			}
-
+	if nomadMeta, ok := extractMetaNomad(event); ok {
+		e["nomad"] = nomadMeta
+		if tags, ok := extractTags(nomadMeta); ok {
 			e["tags"] = tags
 		}
 	}
-postMeta:
 
 	if host, ok := event["host"]; ok {
 		e["host"] = host
@@ -296,4 +277,26 @@ postMeta:
 	_ = tasks.Delete(prefix)
 
 	return e
+}
+
+func extractMetaNomad(event bus.Event) (mapstr.M, bool) {
+	if rawMeta, ok := event["meta"]; ok {
+		if meta, ok := rawMeta.(mapstr.M); ok {
+			if nomadMeta, ok := meta["nomad"]; ok {
+				if mapstrNomadMeta, ok := nomadMeta.(mapstr.M); ok {
+					return mapstrNomadMeta, true
+				}
+			}
+		}
+	}
+	return nil, false
+}
+
+func extractTags(meta mapstr.M) (mapstr.M, bool) {
+	if tags, ok := meta["tags"]; ok {
+		if mapstrTags, ok := tags.(mapstr.M); ok {
+			return mapstrTags, true
+		}
+	}
+	return nil, false
 }
