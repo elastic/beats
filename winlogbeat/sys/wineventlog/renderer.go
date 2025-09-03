@@ -38,6 +38,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+<<<<<<< HEAD
 // Renderer is used for converting event log handles into complete events.
 type Renderer struct {
 	// Mutex to guard the metadataCache. The other members are immutable.
@@ -46,13 +47,27 @@ type Renderer struct {
 	metadataCache map[string]*PublisherMetadataStore
 
 	session       EvtHandle // Session handle if working with remote log.
+=======
+type EventRenderer interface {
+	Render(handle EvtHandle) (event *winevent.Event, xml string, err error)
+	Close() error
+}
+
+// Renderer is used for converting event log handles into complete events.
+type Renderer struct {
+	metadataCache *publisherMetadataCache
+>>>>>>> abcb373d9 ([winlogbeat] Fix forwarded event handling and add channel error resilience (#46190))
 	systemContext EvtHandle // Render context for system values.
 	userContext   EvtHandle // Render context for user values (event data).
 	log           *logp.Logger
 }
 
 // NewRenderer returns a new Renderer.
+<<<<<<< HEAD
 func NewRenderer(session EvtHandle, log *logp.Logger) (*Renderer, error) {
+=======
+func NewRenderer(locale uint32, session EvtHandle, log *logp.Logger) (*Renderer, error) {
+>>>>>>> abcb373d9 ([winlogbeat] Fix forwarded event handling and add channel error resilience (#46190))
 	systemContext, err := _EvtCreateRenderContext(0, nil, EvtRenderContextSystem)
 	if err != nil {
 		return nil, fmt.Errorf("failed in EvtCreateRenderContext for system context: %w", err)
@@ -64,8 +79,12 @@ func NewRenderer(session EvtHandle, log *logp.Logger) (*Renderer, error) {
 	}
 
 	return &Renderer{
+<<<<<<< HEAD
 		metadataCache: map[string]*PublisherMetadataStore{},
 		session:       session,
+=======
+		metadataCache: newPublisherMetadataCache(session, locale, rlog),
+>>>>>>> abcb373d9 ([winlogbeat] Fix forwarded event handling and add channel error resilience (#46190))
 		systemContext: systemContext,
 		userContext:   userContext,
 		log:           log.Named("renderer"),
@@ -108,7 +127,11 @@ func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, error) {
 	}
 
 	// Associate raw system properties to names (e.g. level=2 to Error).
+<<<<<<< HEAD
 	winevent.EnrichRawValuesWithNames(&md.WinMeta, event)
+=======
+	enrichRawValuesWithNames(&md.WinMeta, event)
+>>>>>>> abcb373d9 ([winlogbeat] Fix forwarded event handling and add channel error resilience (#46190))
 
 	eventData, fingerprint, err := r.renderUser(handle, event)
 	if err != nil {
@@ -125,6 +148,7 @@ func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, error) {
 		errs = append(errs, fmt.Errorf("failed to get the event message string: %w", err))
 	}
 
+<<<<<<< HEAD
 	if len(errs) > 0 {
 		return event, multierr.Combine(errs...)
 	}
@@ -169,6 +193,9 @@ func (r *Renderer) getPublisherMetadata(publisher string) (*PublisherMetadataSto
 	}
 
 	return md, err
+=======
+	return event, "", multierr.Combine(errs...)
+>>>>>>> abcb373d9 ([winlogbeat] Fix forwarded event handling and add channel error resilience (#46190))
 }
 
 // renderSystem writes all the system context properties into the event.
@@ -379,7 +406,12 @@ func (r *Renderer) formatMessage(publisherMeta *PublisherMetadataStore,
 	// metadata exists it will be preferred over the RenderedText. A config
 	// option might be desirable to control this behavior.
 	r.log.Debugf("Falling back to EvtFormatMessage for event ID %d.", eventID)
+<<<<<<< HEAD
 	return getMessageString(publisherMeta.Metadata, eventHandle, 0, nil)
+=======
+	metadata := publisherMeta
+	return getMessageString(metadata, eventHandle, 0, nil)
+>>>>>>> abcb373d9 ([winlogbeat] Fix forwarded event handling and add channel error resilience (#46190))
 }
 
 // formatMessageFromTemplate creates the message by executing the stored Go
@@ -394,3 +426,143 @@ func (r *Renderer) formatMessageFromTemplate(msgTmpl *template.Template, values 
 
 	return string(bb.Bytes()), nil
 }
+<<<<<<< HEAD
+=======
+
+// XMLRenderer is used for converting event log handles into complete events.
+type XMLRenderer struct {
+	isForwarded   bool
+	metadataCache *publisherMetadataCache
+	renderBuf     []byte
+	outBuf        *sys.ByteBuffer
+
+	render func(event EvtHandle, out io.Writer) error // Function for rendering the event to XML.
+
+	log *logp.Logger
+}
+
+// NewXMLRenderer returns a new Renderer.
+func NewXMLRenderer(locale uint32, isForwarded bool, session EvtHandle, log *logp.Logger) *XMLRenderer {
+	const renderBufferSize = 1 << 19 // 512KB, 256K wide characters
+	rlog := log.Named("xml_renderer")
+	r := &XMLRenderer{
+		isForwarded:   isForwarded,
+		renderBuf:     make([]byte, renderBufferSize),
+		outBuf:        sys.NewByteBuffer(renderBufferSize),
+		metadataCache: newPublisherMetadataCache(session, locale, rlog),
+		log:           rlog,
+	}
+	// Forwarded events should be rendered using RenderEventXML. It is more
+	// efficient and does not attempt to use local message files for rendering
+	// the event's message.
+	switch isForwarded {
+	case true:
+		r.render = func(event EvtHandle, out io.Writer) error {
+			return RenderEventXML(event, r.renderBuf, out)
+		}
+	case false:
+		r.render = func(event EvtHandle, out io.Writer) error {
+			get := func(providerName string) EvtHandle {
+				md, _ := r.metadataCache.getPublisherStore(providerName)
+				if md.Metadata != nil {
+					return md.Metadata.Handle
+				}
+				return NilHandle
+			}
+			return RenderEvent(event, locale, r.renderBuf, get, out)
+		}
+	}
+	return r
+}
+
+// Close closes all handles held by the Renderer.
+func (r *XMLRenderer) Close() error {
+	if r == nil {
+		return errors.New("closing nil renderer")
+	}
+	return r.metadataCache.close()
+}
+
+// Render renders the event handle into an Event.
+func (r *XMLRenderer) Render(handle EvtHandle) (*winevent.Event, string, error) {
+	// From this point on it will return both the event and any errors. It's
+	// critical to not drop data.
+	var errs []error
+
+	r.outBuf.Reset()
+	err := r.render(handle, r.outBuf)
+	if err != nil {
+		errs = append(errs, err)
+	}
+	outBytes := r.outBuf.Bytes()
+	event := r.buildEventFromXML(outBytes, err)
+
+	// For forwarded events, avoid publisher metadata cache to prevent pollution
+	// and version mismatches. Use static enrichment only.
+	if r.isForwarded {
+		enrichRawValuesWithNames(nil, event)
+		return event, string(outBytes), multierr.Combine(errs...)
+	}
+
+	// This always returns a non-nil value (even on error).
+	md, err := r.metadataCache.getPublisherStore(event.Provider.Name)
+	if err != nil {
+		errs = append(errs, err)
+	}
+
+	// Associate raw system properties to names (e.g. level=2 to Error).
+	enrichRawValuesWithNames(&md.WinMeta, event)
+
+	if event.Message == "" {
+		if event.Message, err = getMessageString(md.Metadata, handle, 0, nil); err != nil {
+			errs = append(errs, fmt.Errorf("failed to get the event message string: %w", err))
+		}
+	}
+
+	var pairs *[]winevent.KeyValue
+	if len(event.UserData.Pairs) > 0 {
+		pairs = &event.UserData.Pairs
+	} else if len(event.EventData.Pairs) > 0 {
+		pairs = &event.EventData.Pairs
+	}
+
+	if pairs != nil {
+		for i, pair := range *pairs {
+			(*pairs)[i].Value = expandMessageIDs(md, pair.Value)
+		}
+	}
+
+	return event, string(outBytes), multierr.Combine(errs...)
+}
+
+func (r *XMLRenderer) buildEventFromXML(x []byte, recoveredErr error) *winevent.Event {
+	e, err := winevent.UnmarshalXML(x)
+	if err != nil {
+		e.RenderErr = append(e.RenderErr, err.Error())
+	}
+
+	err = winevent.PopulateAccount(&e.User)
+	if err != nil {
+		r.log.Debugf("SID %s account lookup failed. %v",
+			e.User.Identifier, err)
+	}
+
+	if e.RenderErrorCode != 0 {
+		// Convert the render error code to an error message that can be
+		// included in the "error.message" field.
+		e.RenderErr = append(e.RenderErr, syscall.Errno(e.RenderErrorCode).Error())
+	} else if recoveredErr != nil {
+		e.RenderErr = append(e.RenderErr, recoveredErr.Error())
+	}
+
+	return &e
+}
+
+func enrichRawValuesWithNames(m *winevent.WinMeta, event *winevent.Event) {
+	winevent.EnrichRawValuesWithNames(m, event)
+	if event.Level == "" {
+		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
+		event.Level = EventLevel(event.LevelRaw).String()
+	}
+}
+>>>>>>> abcb373d9 ([winlogbeat] Fix forwarded event handling and add channel error resilience (#46190))

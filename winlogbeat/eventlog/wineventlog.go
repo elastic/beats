@@ -216,8 +216,13 @@ func newEventLogging(options *conf.C) (EventLog, error) {
 func newWinEventLog(options *conf.C) (EventLog, error) {
 	var err error
 
+<<<<<<< HEAD
 	c := defaultWinEventLogConfig
 	if err = readConfig(options, &c); err != nil {
+=======
+	c := defaultConfig()
+	if err := readConfig(options, &c); err != nil {
+>>>>>>> abcb373d9 ([winlogbeat] Fix forwarded event handling and add channel error resilience (#46190))
 		return nil, err
 	}
 
@@ -302,6 +307,24 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		}
 	}
 
+<<<<<<< HEAD
+=======
+	switch c.IncludeXML || l.isForwarded() {
+	case true:
+		l.renderer = win.NewXMLRenderer(
+			c.EventLanguage,
+			l.isForwarded(),
+			win.NilHandle, l.log)
+	case false:
+		l.renderer, err = win.NewRenderer(
+			c.EventLanguage,
+			win.NilHandle, l.log)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+>>>>>>> abcb373d9 ([winlogbeat] Fix forwarded event handling and add channel error resilience (#46190))
 	return l, nil
 }
 
@@ -325,9 +348,19 @@ func (l *winEventLog) IsFile() bool {
 	return l.file
 }
 
+<<<<<<< HEAD
 func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 	var bookmark win.EvtHandle
 	var err error
+=======
+// IgnoreMissingChannel returns true if missing channels should be ignored.
+func (l *winEventLog) IgnoreMissingChannel() bool {
+	return !l.file && (l.config.IgnoreMissingChannel == nil || *l.config.IgnoreMissingChannel)
+}
+
+func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
+	l.lastRead = state
+>>>>>>> abcb373d9 ([winlogbeat] Fix forwarded event handling and add channel error resilience (#46190))
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
 	if l.metrics == nil {

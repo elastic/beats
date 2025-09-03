@@ -1,4 +1,23 @@
-###################### Winlogbeat Configuration Example ########################
+---
+mapped_pages:
+  - https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-reference-yml.html
+applies_to:
+  stack: ga
+---
+
+# winlogbeat.reference.yml [winlogbeat-reference-yml]
+
+The following reference file is available with your Winlogbeat installation. It shows all non-deprecated Winlogbeat options. You can copy from this file and paste configurations into the `winlogbeat.yml` file to customize it.
+
+::::{tip}
+The reference file is located in the same directory as the `winlogbeat.yml` file. To locate the file, see [Directory layout](/reference/winlogbeat/directory-layout.md).
+::::
+
+
+The contents of the file are included here for your convenience.
+
+```yaml
+## Winlogbeat Configuration Example ########################
 
 # This file is an example configuration file highlighting only the most common
 # options. The winlogbeat.reference.yml file from the same directory contains
@@ -1067,7 +1086,7 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-  
+
   # Configure automatic file rotation on every startup. The default is true.
   #rotate_on_startup: true
 
@@ -1244,7 +1263,7 @@ setup.template.settings:
 
 # ======================== Data Stream Lifecycle (DSL) =========================
 
-# Configure Data Stream Lifecycle to manage data streams while connected to Serverless elasticsearch. 
+# Configure Data Stream Lifecycle to manage data streams while connected to Serverless elasticsearch.
 # These settings are mutually exclusive with ILM settings which are not supported in Serverless projects.
 
 # Enable DSL support. Valid values are true, or false.
@@ -1252,7 +1271,7 @@ setup.template.settings:
 
 # Set the lifecycle policy name or pattern. For DSL, this name must match the data stream that the lifecycle is for.
 # The default data stream pattern is winlogbeat-%{[agent.version]}"
-# The template string `%{[agent.version]}` will resolve to the current stack version. 
+# The template string `%{[agent.version]}` will resolve to the current stack version.
 # The other possible template value is `%{[beat.name]}`.
 #setup.dsl.data_stream_pattern: "winlogbeat-%{[agent.version]}"
 
@@ -1417,7 +1436,7 @@ logging.files:
   #permissions: 0600
 
   # Enable log file rotation on time intervals in addition to the size-based rotation.
-  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7\*24h, 30\*24h, and 365\*24h
   # are boundary-aligned with minutes, hours, days, weeks, months, and years as
   # reported by the local system clock. All other intervals are calculated from the
   # Unix epoch. Defaults to disabled.
@@ -1465,7 +1484,7 @@ logging.files:
   #permissions: 0600
 
   # Enable log file rotation on time intervals in addition to the size-based rotation.
-  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7\*24h, 30\*24h, and 365\*24h
   # are boundary-aligned with minutes, hours, days, weeks, months, and years as
   # reported by the local system clock. All other intervals are calculated from the
   # Unix epoch. Defaults to disabled.
@@ -1733,4 +1752,5 @@ logging.files:
 #features:
 #  fqdn:
 #    enabled: true
+```
 

@@ -30,3 +30,7 @@ func IsRecoverable(err error) bool {
 func IsChannelNotFound(err error) bool {
 	return false
 }
+
+func mustIgnoreError(error, EventLog) bool {
+	return false
+}
