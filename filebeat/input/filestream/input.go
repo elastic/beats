@@ -139,16 +139,7 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 
 	// Read the scan interval from the prospector so we can use during the
 	// grace period of the delete
-	if c.FileWatcher != nil {
-		tmpCfg := struct {
-			CheckInterval time.Duration `config:"check_interval"`
-		}{}
-		if err := c.FileWatcher.Config().Unpack(&tmpCfg); err != nil {
-			return nil, nil, fmt.Errorf("cannot unpack 'scanner.check_interval: %w'", err)
-		}
-
-		filestream.scannerCheckInterval = tmpCfg.CheckInterval
-	}
+	filestream.scannerCheckInterval = c.FileWatcher.Interval
 
 	return prospector, filestream, nil
 }

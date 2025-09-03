@@ -38,11 +38,11 @@ import (
 type config struct {
 	Reader readerConfig `config:",inline"`
 
-	ID           string          `config:"id"`
-	Paths        []string        `config:"paths"`
-	Close        closerConfig    `config:"close"`
-	FileWatcher  *conf.Namespace `config:"prospector"`
-	FileIdentity *conf.Namespace `config:"file_identity"`
+	ID           string            `config:"id"`
+	Paths        []string          `config:"paths"`
+	Close        closerConfig      `config:"close"`
+	FileWatcher  fileWatcherConfig `config:"prospector.scanner"`
+	FileIdentity *conf.Namespace   `config:"file_identity"`
 
 	// GZIPExperimental enables tech-preview support for ingesting GZIP files.
 	// When set to true the input will transparently stream-decompress GZIP files.
@@ -131,6 +131,7 @@ func defaultConfig() config {
 		HarvesterLimit: 0,
 		IgnoreOlder:    0,
 		Delete:         defaultDeleterConfig(),
+		FileWatcher:    defaultFileWatcherConfig(), // Config key: prospector.scanner
 	}
 }
 
@@ -186,7 +187,6 @@ func (c *config) Validate() error {
 			return fmt.Errorf(
 				"gzip_experimental=true requires file_identity to be 'fingerprint'")
 		}
-
 	}
 
 	if c.ID == "" && c.TakeOver.Enabled {

@@ -968,21 +968,15 @@ scanner:
 	})
 
 	t.Run("returns error when creating scanner with a fingerprint too small", func(t *testing.T) {
-		cfgStr := `
-scanner:
-  fingerprint:
-    enabled: true
-    offset: 0
-    length: 1
-`
-		cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
-		require.NoError(t, err)
-
-		ns := &conf.Namespace{}
-		err = ns.Unpack(cfg)
-		require.NoError(t, err)
-
-		_, err = newFileWatcher(logptest.NewTestingLogger(t, ""), paths, ns, false, false)
+		cfg := fileWatcherConfig{
+			Scanner: fileScannerConfig{
+				Fingerprint: fingerprintConfig{
+					Enabled: true,
+					Offset:  0,
+					Length:  1,
+				},
+			}}
+		_, err = newFileWatcher(logptest.NewTestingLogger(t, ""), paths, cfg, false, false)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
 	})
@@ -1044,14 +1038,17 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 }
 
 func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, cfgStr string) loginp.FSWatcher {
+	tmpCfg := struct {
+		Scaner fileWatcherConfig `config:"scanner"`
+	}{
+		Scaner: defaultFileWatcherConfig(),
+	}
 	cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
 	require.NoError(t, err)
 
-	ns := &conf.Namespace{}
-	err = ns.Unpack(cfg)
-	require.NoError(t, err)
+	cfg.Unpack(&tmpCfg)
 
-	fw, err := newFileWatcher(logger, paths, ns, false, false)
+	fw, err := newFileWatcher(logger, paths, tmpCfg.Scaner, false, false)
 	require.NoError(t, err)
 
 	return fw
