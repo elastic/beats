@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
@@ -18,6 +19,8 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/goleak"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 )
 
 func TestLeak(t *testing.T) {
@@ -67,16 +70,39 @@ func TestLeak(t *testing.T) {
 
 	factory := NewFactory()
 	var receiverSettings receiver.Settings
-	receiverSettings.Logger = zap.NewNop()
+	observedCore, observedLogs := observer.New(zapcore.DebugLevel)
+	receiverSettings.Logger = zap.New(observedCore)
 	receiverSettings.ID = component.NewIDWithName(factory.Type(), "r1")
 
 	var consumeLogs DummyConsumer
 	rec, err := factory.CreateLogs(t.Context(), receiverSettings, &config, &consumeLogs)
 	require.NoError(t, err)
 	require.NoError(t, rec.Start(t.Context(), nil))
-	time.Sleep(3 * time.Second)
+	if !assert.Eventually(t,
+		func() bool {
+			return observedLogs.FilterMessageSnippet("starting benchmark input thread").Len() >= 1
+		},
+		60*time.Second,
+		1*time.Second,
+		"receiver not started") {
+		for _, logLine := range observedLogs.TakeAll() {
+			t.Log(logLine)
+		}
+		t.Fatalf("receiver didn't start, see logs above")
+	}
 	require.NoError(t, rec.Shutdown(t.Context()))
-	time.Sleep(3 * time.Second)
+	if !assert.Eventually(t,
+		func() bool {
+			return observedLogs.FilterMessageSnippet("http: Server closed").Len() >= 1
+		},
+		60*time.Second,
+		1*time.Second,
+		"receiver not stopped") {
+		for _, logLine := range observedLogs.TakeAll() {
+			t.Log(logLine)
+		}
+		t.Fatalf("receiver didn't stop, see logs above")
+	}
 }
 
 type DummyConsumer struct {
