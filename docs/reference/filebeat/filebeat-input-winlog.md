@@ -254,7 +254,7 @@ Example:
 ### `ignore_missing_channel` [_ignore_missing_channel]
 
 ```{applies_to}
-stack: ga 9.2.0
+stack: ga 9.1.4
 ```
 
 Boolean option that controls whether Winlogbeat should ignore missing event log channels and continue monitoring other configured channels. When set to `true`, if a specified event log channel doesn't exist or cannot be accessed, Winlogbeat will log a warning and continue processing other event logs instead of stopping with an error. The default is `true`.
