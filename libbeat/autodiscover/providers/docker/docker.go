@@ -386,7 +386,8 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 	if labels, err := dockerMeta.GetValue("labels"); err == nil {
 		mstrLabels, ok := labels.(mapstr.M)
 		if !ok {
-			goto postLabels
+			// return
+			return e
 		}
 		hints, incorrecthints := utils.GenerateHints(mstrLabels, "", d.config.Prefix, true, AllSupportedHints)
 		// We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
@@ -395,7 +396,6 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 		}
 		e["hints"] = hints
 	}
-postLabels:
 	return e
 }
 
