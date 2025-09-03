@@ -94,7 +94,7 @@ updates:
       - dependency-name: "github.com/go-resty/resty/v2"
       - dependency-name: "github.com/tomnomnom/linkheader"
       - dependency-name: "github.com/meraki/dashboard-api-go/v3"
-      # haproxi
+      # haproxy
       - dependency-name: "github.com/gocarina/gocsv"
       # salesforce
       - dependency-name: "github.com/elastic/go-sfdc"
