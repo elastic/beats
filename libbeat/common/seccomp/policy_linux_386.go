@@ -46,6 +46,7 @@ func init() {
 					"epoll_create1",
 					"epoll_ctl",
 					"epoll_wait",
+					"eventfd2",
 					"execve",
 					"exit",
 					"exit_group",

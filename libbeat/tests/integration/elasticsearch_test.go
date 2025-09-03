@@ -23,12 +23,16 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
+
+	"github.com/elastic/elastic-agent-libs/testing/certutil"
 )
 
 var esCfg = `
@@ -98,6 +102,60 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 	s.Close()
 }
 
+func TestReloadCA(t *testing.T) {
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+
+	s, esAddr, _, _ := StartMockES(t, ":4242", 0, 0, 0, 0, 0)
+	defer s.Close()
+
+	_, _, pair, err := certutil.NewRootCA()
+	require.NoError(t, err, "could not generate root CA")
+	caPath := filepath.Join(os.TempDir(), "ca.pem")
+	err = os.WriteFile(caPath, pair.Cert, 0644)
+	require.NoError(t, err, "could not write CA")
+
+	mockbeat.WriteConfigFile(fmt.Sprintf(`
+output.elasticsearch:
+  allow_older_versions: true
+  hosts: ["%s"]
+  ssl:
+    certificate_authorities: "%s"
+    restart_on_cert_change.enabled: true
+    restart_on_cert_change.period: 1s
+logging.level: debug
+`, esAddr, caPath))
+
+	mockbeat.Start()
+
+	// 1. wait mockbeat to start
+	mockbeat.WaitLogsContains(
+		fmt.Sprint("mockbeat start running"),
+		10*time.Second,
+		"did not find 'mockbeat start running' log")
+
+	// 2. "rotate" the CA. Just write it again
+	err = os.WriteFile(caPath, pair.Cert, 0644)
+	require.NoError(t, err, "could not rotate CA")
+
+	// 3. Wait for cert change detection logs
+	mockbeat.WaitLogsContains(
+		fmt.Sprintf("some of the following files have been modified: [%s]", caPath),
+		10*time.Second,
+		"did not detect CA rotation")
+
+	// 4. Wait for CA load log
+	mockbeat.WaitLogsContains(
+		fmt.Sprintf("Successfully loaded CA certificate: %s", caPath),
+		10*time.Second,
+		"did not find 'Successfully loaded CA' log")
+
+	// 5. wait mockbeat to start again
+	mockbeat.WaitLogsContains(
+		fmt.Sprint("mockbeat start running"),
+		10*time.Second,
+		"did not find 'mockbeat start running' log again")
+}
+
 // waitForEventToBePublished waits for at least one event published
 // by inspecting the count for `bulk.create.total` in `mr`. Once
 // the counter is > 1, waitForEventToBePublished returns. If that
@@ -118,7 +176,7 @@ func waitForEventToBePublished(t *testing.T, rdr *sdkmetric.ManualReader) {
 			for _, m := range sm.Metrics {
 				if m.Name == "bulk.create.total" {
 					total := int64(0)
-					//nolint: errcheck // It's a test
+					//nolint:errcheck // It's a test
 					for _, dp := range m.Data.(metricdata.Sum[int64]).DataPoints {
 						total += dp.Value
 					}
