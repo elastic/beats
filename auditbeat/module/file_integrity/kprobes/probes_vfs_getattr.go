@@ -31,18 +31,19 @@ type vfsGetAttrSymbol struct {
 	filter     string
 }
 
-func loadVFSGetAttrSymbol(s *probeManager, e executor) error {
+// loadVFSGetAttrSymbol loads the vfs_* symbols into the probe manager
+func loadVFSGetAttrSymbol(probeMgr *probeManager, exec executor) error {
 	// get the vfs_getattr_nosec symbol information
-	symbolInfo, err := s.getSymbolInfoRuntime("vfs_getattr_nosec")
+	symbolInfo, err := probeMgr.getSymbolInfoRuntime("vfs_getattr_nosec")
 	if err != nil {
 		if !errors.Is(err, ErrSymbolNotFound) {
-			return err
-		}
+			return fmt.Errorf("vfs_getattr_nosec symbol does not exist: %w", err)
+		} // TODO: log other error cases
 
 		// for older kernel versions use the vfs_getattr symbol
-		symbolInfo, err = s.getSymbolInfoRuntime("vfs_getattr")
+		symbolInfo, err = probeMgr.getSymbolInfoRuntime("vfs_getattr")
 		if err != nil {
-			return err
+			return fmt.Errorf("vfs_getattr symbol does not exist: %w", err)
 		}
 	}
 
@@ -51,19 +52,19 @@ func loadVFSGetAttrSymbol(s *probeManager, e executor) error {
 		return fmt.Errorf("symbol %s is optimised", symbolInfo.symbolName)
 	}
 
-	s.buildChecks = append(s.buildChecks, func(spec *tkbtf.Spec) bool {
+	probeMgr.buildChecks = append(probeMgr.buildChecks, func(spec *tkbtf.Spec) bool {
 		return spec.ContainsSymbol(symbolInfo.symbolName)
 	})
 
-	s.symbols = append(s.symbols, &vfsGetAttrSymbol{
+	probeMgr.symbols = append(probeMgr.symbols, &vfsGetAttrSymbol{
 		symbolName: symbolInfo.symbolName,
-		filter:     fmt.Sprintf("common_pid==%d", e.GetTID()),
+		filter:     fmt.Sprintf("common_pid==%d", exec.GetTID()),
 	})
 
 	return nil
 }
 
-func (f *vfsGetAttrSymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, error) {
+func (sym *vfsGetAttrSymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, error) {
 	allocFunc := allocMonitorProbeEvent
 
 	probe := tkbtf.NewKProbe().AddFetchArgs(
@@ -74,12 +75,12 @@ func (f *vfsGetAttrSymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc,
 		tkbtf.NewFetchArg("pdmj", tkbtf.BitFieldTypeMask(devMajor)).FuncParamWithName("path", "dentry", "d_parent", "d_inode", "i_sb", "s_dev"),
 		tkbtf.NewFetchArg("pdmn", tkbtf.BitFieldTypeMask(devMinor)).FuncParamWithName("path", "dentry", "d_parent", "d_inode", "i_sb", "s_dev"),
 		tkbtf.NewFetchArg("fn", "string").FuncParamWithName("path", "dentry", "d_name", "name"),
-	).SetFilter(f.filter)
+	).SetFilter(sym.filter)
 
-	btfSymbol := tkbtf.NewSymbol(f.symbolName).AddProbes(probe)
+	btfSymbol := tkbtf.NewSymbol(sym.symbolName).AddProbes(probe)
 
 	if err := spec.BuildSymbol(btfSymbol); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error building vfs probes: %w", err)
 	}
 
 	return []*probeWithAllocFunc{
@@ -90,6 +91,6 @@ func (f *vfsGetAttrSymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc,
 	}, nil
 }
 
-func (f *vfsGetAttrSymbol) onErr(_ error) bool {
+func (sym *vfsGetAttrSymbol) onErr(_ error) bool {
 	return false
 }
