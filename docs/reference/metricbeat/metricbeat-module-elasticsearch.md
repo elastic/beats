@@ -26,7 +26,6 @@ The `elasticsearch` module collects metrics about {{es}}.
 
 The `elasticsearch` module works with {{es}} 6.7.0 and later.
 
-
 ## Usage for {{stack}} Monitoring [_usage_for_stack_monitoring_2]
 
 The `elasticsearch` module can be used to collect metrics shown in our {{stack-monitor-app}} UI in {{kib}}. To enable this usage, set `xpack.enabled: true` and remove any `metricsets` from the module’s configuration. Alternatively, run `metricbeat modules disable elasticsearch` and `metricbeat modules enable elasticsearch-xpack`.
@@ -54,6 +53,13 @@ Like other Metricbeat modules, the `elasticsearch` module accepts a `hosts` conf
 
 * If `scope` is set to `node` (default), each entry in the `hosts` list indicates a distinct node in an {{es}} cluster.
 * If `scope` is set to `cluster`, each entry in the `hosts` list indicates a single endpoint for a distinct {{es}} cluster (for example, a load-balancing proxy fronting the cluster).
+
+Also like some other modules, the `elasticsearch` module accepts either a `username`/`password` pair of settings or a single `api_key` setting. You cannot specify the `username`/`password` settings _and_ `api_key` at the same time.
+
+When used, the `api_key`  configuration can be specified as:
+
+* {applies_to}`stack: ga 9.1.4` The unencoded `id:api_key` format (`api_key: "foo:bar"`) or the Base64-encoded `id:api_key` format (`api_key: "Zm9vOmJhcgo="`).
+* All earlier releases can only use the unencoded `id:api_key` format (`api_key: "foo:bar"`)/
 
 
 ## Example configuration [_example_configuration]
@@ -85,15 +91,8 @@ metricbeat.modules:
   #scope: node
 ```
 
-You cannot specify the `username`/`password` settings _and_ `api_key` at the same time.
-
-When used, the `api_key`  configuration can be specified as:
-
-* {applies_to}`stack: ga 9.2.0` The unencoded `id:api_key` format (`api_key: "foo:bar"`) or the Base64-encoded `id:api_key` format (`api_key: "Zm9vOmJhcgo="`)
-* {applies_to}`stack: ga 9.1.4` The unencoded `id:api_key` format (`api_key: "foo:bar"`) or the Base64-encoded `id:api_key` format (`api_key: "Zm9vOmJhcgo="`)
-* All earlier releases can only use the unencoded `id:api_key` format (`api_key: "foo:bar"`)
-
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
+
 
 ## Metricsets [_metricsets]
 
