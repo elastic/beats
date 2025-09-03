@@ -265,7 +265,7 @@ CHANGELOG*
 /x-pack/metricbeat/module/redisenterprise @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/sql @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/statsd @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/stan/ @elastic/obs-ds-hosted-services
+/x-pack/metricbeat/module/stan/ @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/tomcat @elastic/obs-infraobs-integrations
 /x-pack/osquerybeat/ @elastic/sec-windows-platform
 /x-pack/packetbeat/ @elastic/sec-linux-platform
