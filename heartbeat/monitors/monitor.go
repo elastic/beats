@@ -23,7 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 
-	"github.com/mitchellh/hashstructure"
+	"github.com/gohugoio/hashstructure"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"

@@ -143,7 +143,7 @@ func TestTimesSeriesHashes(t *testing.T) {
 					"second": "word2",
 					"third":  "word3",
 				},
-				"timeseries": mapstr.M{"instance": uint64(10259802856000774733)},
+				"timeseries": mapstr.M{"instance": uint64(7532097560335212001)},
 			},
 		},
 		{
@@ -163,7 +163,7 @@ func TestTimesSeriesHashes(t *testing.T) {
 					"third":  "word3",
 				},
 				"not-a-dimension": 1000,
-				"timeseries":      mapstr.M{"instance": uint64(10259802856000774733)}, // same as above
+				"timeseries":      mapstr.M{"instance": uint64(7532097560335212001)}, // same as above
 			},
 		},
 		{
@@ -185,7 +185,7 @@ func TestTimesSeriesHashes(t *testing.T) {
 				},
 				"not-a-dimension":      1000,
 				"dimension-by-default": "dimension1",
-				"timeseries":           mapstr.M{"instance": uint64(17933311421196639387)},
+				"timeseries":           mapstr.M{"instance": uint64(16374068651038541136)},
 			},
 		},
 	} {
