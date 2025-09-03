@@ -25,3 +25,7 @@ package eventlog
 func IsRecoverable(error, bool) bool {
 	return false
 }
+
+func mustIgnoreError(error, EventLog) bool {
+	return false
+}

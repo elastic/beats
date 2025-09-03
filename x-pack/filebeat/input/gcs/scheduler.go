@@ -48,7 +48,7 @@ func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src 
 ) *scheduler {
 	if metrics == nil {
 		// metrics are optional, initialize a stub if not provided
-		metrics = newInputMetrics(monitoring.NewRegistry())
+		metrics = newInputMetrics(monitoring.NewRegistry(), log)
 	}
 	return &scheduler{
 		publisher: publisher,

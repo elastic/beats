@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build ech && requirefips
+//go:build integration && ech && requirefips
 
 package fips
 
@@ -41,7 +41,7 @@ func TestFilebeatFIPSSmoke(t *testing.T) {
 	// Generate logs
 	tempDir := t.TempDir()
 	logFilePath := path.Join(tempDir, "log.log")
-	integration.GenerateLogFile(t, logFilePath, 1000, false)
+	integration.WriteLogFile(t, logFilePath, 1000, false)
 
 	ech.RunSmokeTest(t,
 		"filebeat",

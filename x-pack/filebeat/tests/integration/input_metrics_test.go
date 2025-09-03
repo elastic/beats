@@ -143,12 +143,12 @@ logging.level: debug
 	filebeat.Start()
 
 	// 4. Wait for Filebeat to start scanning for files
-	filebeat.WaitForLogs(
+	filebeat.WaitLogsContains(
 		fmt.Sprintf("A new file %s has been found", logFilePath),
 		30*time.Second,
 		"Filebeat did not start looking for files to ingest")
 
-	filebeat.WaitForLogs(
+	filebeat.WaitLogsContains(
 		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePath),
 		10*time.Second, "Filebeat did not close the file")
 
@@ -332,9 +332,10 @@ func makeServer() *httptest.Server {
 func randomPort(t *testing.T) string {
 	t.Helper()
 
-	listener, err := net.Listen("tcp", ":0")
+	listener, err := net.Listen("tcp", ":0") //nolint:gosec // It's ok on a test
 	require.NoError(t, err, "could not create nte.Listener to find a free port")
 	defer listener.Close()
 
+	//nolint:errcheck // It's a test
 	return strconv.Itoa(listener.Addr().(*net.TCPAddr).Port)
 }

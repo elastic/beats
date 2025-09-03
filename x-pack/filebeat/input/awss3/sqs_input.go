@@ -127,7 +127,7 @@ func (in *sqsReaderInput) setup(
 
 	in.s3 = newAWSs3API(s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier))
 
-	in.metrics = newInputMetrics(inputContext.MetricsRegistry, in.config.NumberOfWorkers)
+	in.metrics = newInputMetrics(inputContext.MetricsRegistry, in.config.NumberOfWorkers, logp.NewNopLogger())
 
 	var err error
 	in.msgHandler, err = in.createEventProcessor()
@@ -353,7 +353,7 @@ func (in *sqsReaderInput) logConfigSummary() {
 
 func (in *sqsReaderInput) createEventProcessor() (sqsProcessor, error) {
 	fileSelectors := in.config.getFileSelectors()
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(in.metrics, in.s3, fileSelectors, in.config.BackupConfig)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(in.metrics, in.s3, fileSelectors, in.config.BackupConfig, in.log)
 
 	script, err := newScriptFromConfig(in.log.Named("sqs_script"), in.config.SQSScript)
 	if err != nil {

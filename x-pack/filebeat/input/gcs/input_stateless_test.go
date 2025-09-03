@@ -80,7 +80,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		log := inputCtx.Logger.With("project_id", currentSource.ProjectId).With("bucket", currentSource.BucketName)
 		// use a new metrics registry associated to no parent. No metrics will
 		// be published.
-		metrics := newInputMetrics(monitoring.NewRegistry())
+		metrics := newInputMetrics(monitoring.NewRegistry(), inputCtx.Logger)
 		metrics.url.Set("gs://" + currentSource.BucketName)
 
 		ctx, cancel := context.WithCancel(context.Background())

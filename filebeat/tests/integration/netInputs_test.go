@@ -22,14 +22,12 @@ package integration
 import (
 	_ "embed"
 	"fmt"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/filebeat/input/net/nettest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
@@ -66,7 +64,7 @@ func TestNetInputs(t *testing.T) {
 
 			filebeat.WriteConfigFile(cfg)
 			filebeat.Start()
-			filebeat.WaitForLogsAnyOrder(
+			filebeat.WaitLogsContainsAnyOrder(
 				[]string{
 					"[Worker 0] starting publish loop",
 					"[Worker 1] starting publish loop",
@@ -77,9 +75,9 @@ func TestNetInputs(t *testing.T) {
 
 			tc.runClientFn(t, addr, tc.data)
 
-			WaitPublishedEvents(t, filebeat, 3*time.Second, len(tc.data))
+			filebeat.WaitPublishedEvents(3*time.Second, len(tc.data))
 			filebeat.Stop()
-			filebeat.WaitForLogsAnyOrder(
+			filebeat.WaitLogsContainsAnyOrder(
 				[]string{
 					"[Worker 0] finished publish loop",
 					"[Worker 1] finished publish loop",
@@ -152,7 +150,7 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 
 			filebeat.WriteConfigFile(cfg)
 			filebeat.Start()
-			filebeat.WaitForLogsAnyOrder(
+			filebeat.WaitLogsContainsAnyOrder(
 				workerStartedMsgs,
 				5*time.Second,
 				"not all workers have started",
@@ -168,7 +166,7 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 			filebeat.WaitEventsInLogFile(expectedEvents, 3*time.Second)
 
 			// Ensure the output is not accepting events
-			filebeat.WaitForLogs(
+			filebeat.WaitLogsContains(
 				"Ping request failed with: 503 Service Unavailable: Proxy is disabled",
 				time.Second,
 				"cannot find output error in the logs")
@@ -204,27 +202,11 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 			filebeat.Stop()
 
 			// Ensure all workers are finished, no goroutine leak
-			filebeat.WaitForLogsAnyOrder(
+			filebeat.WaitLogsContainsAnyOrder(
 				workerDoneMsgs,
 				5*time.Second,
 				"not all workers have started",
 			)
 		})
 	}
-}
-
-// WaitPublishedEvents waits until the desired number of events
-// have been published. It assumes the file output is used, the filename
-// for the output is 'output' and 'path' is set to the TempDir.
-func WaitPublishedEvents(t *testing.T, filebeat *integration.BeatProc, timeout time.Duration, events int) {
-	t.Helper()
-
-	msg := strings.Builder{}
-	path := filepath.Join(filebeat.TempDir(), "output-*.ndjson")
-	assert.Eventually(t, func() bool {
-		got := filebeat.CountFileLines(path)
-		msg.Reset()
-		fmt.Fprintf(&msg, "expecting %d events, got %d", events, got)
-		return got == events
-	}, timeout, 200*time.Millisecond, &msg)
 }

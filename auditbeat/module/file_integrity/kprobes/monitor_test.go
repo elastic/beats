@@ -33,6 +33,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -42,10 +43,11 @@ import (
 
 type monitorTestSuite struct {
 	suite.Suite
+	*logp.Logger
 }
 
 func Test_Monitor(t *testing.T) {
-	suite.Run(t, new(monitorTestSuite))
+	suite.Run(t, &monitorTestSuite{Logger: logp.NewLogger("test_monitor")})
 }
 
 func (p *monitorTestSuite) TestDoubleClose() {
@@ -53,7 +55,7 @@ func (p *monitorTestSuite) TestDoubleClose() {
 	mockPerfChannel := &perfChannelMock{}
 	mockPerfChannel.On("Close").Return(nil)
 	exec := newFixedThreadExecutor(ctx)
-	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
+	m, err := newMonitor(ctx, true, mockPerfChannel, exec, p.Logger)
 	p.Require().NoError(err)
 	err = m.Close()
 	p.Require().NoError(err)
@@ -67,7 +69,7 @@ func (p *monitorTestSuite) TestPerfChannelClose() {
 	closeErr := errors.New("error closing perf channel")
 	mockPerfChannel.On("Close").Return(closeErr)
 	exec := newFixedThreadExecutor(ctx)
-	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
+	m, err := newMonitor(ctx, true, mockPerfChannel, exec, p.Logger)
 	p.Require().NoError(err)
 	err = m.Close()
 	p.Require().ErrorIs(err, closeErr)
@@ -81,7 +83,7 @@ func (p *monitorTestSuite) TestPerfChannelRunErr() {
 	mockPerfChannel.On("Close").Return(nil)
 
 	exec := newFixedThreadExecutor(ctx)
-	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
+	m, err := newMonitor(ctx, true, mockPerfChannel, exec, p.Logger)
 	p.Require().NoError(err)
 
 	err = m.Start()
@@ -105,7 +107,7 @@ func (p *monitorTestSuite) TestRunPerfChannelLost() {
 	mockPerfChannel.On("LostC").Return(perfLost)
 
 	exec := newFixedThreadExecutor(ctx)
-	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
+	m, err := newMonitor(ctx, true, mockPerfChannel, exec, p.Logger)
 	p.Require().NoError(err)
 
 	err = m.Start()
@@ -142,7 +144,7 @@ func (p *monitorTestSuite) TestRunPerfChannelErr() {
 	mockPerfChannel.On("LostC").Return(perfLost)
 
 	exec := newFixedThreadExecutor(ctx)
-	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
+	m, err := newMonitor(ctx, true, mockPerfChannel, exec, p.Logger)
 	p.Require().NoError(err)
 
 	err = m.Start()
@@ -180,7 +182,7 @@ func (p *monitorTestSuite) TestRunPathErr() {
 	mockPerfChannel.On("LostC").Return(perfLost)
 
 	exec := newFixedThreadExecutor(ctx)
-	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
+	m, err := newMonitor(ctx, true, mockPerfChannel, exec, p.Logger)
 	p.Require().NoError(err)
 
 	err = m.Start()
@@ -220,7 +222,7 @@ func (p *monitorTestSuite) TestRunUnknownEventType() {
 	mockPerfChannel.On("LostC").Return(perfLost)
 
 	exec := newFixedThreadExecutor(ctx)
-	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
+	m, err := newMonitor(ctx, true, mockPerfChannel, exec, p.Logger)
 	p.Require().NoError(err)
 
 	err = m.Start()
@@ -257,7 +259,7 @@ func (p *monitorTestSuite) TestRunPerfCloseEventChan() {
 	mockPerfChannel.On("LostC").Return(perfLost)
 
 	exec := newFixedThreadExecutor(ctx)
-	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
+	m, err := newMonitor(ctx, true, mockPerfChannel, exec, p.Logger)
 	p.Require().NoError(err)
 
 	err = m.Start()
@@ -290,7 +292,7 @@ func (p *monitorTestSuite) TestDoubleStart() {
 	mockPerfChannel.On("LostC").Return(perfLost)
 
 	exec := newFixedThreadExecutor(ctx)
-	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
+	m, err := newMonitor(ctx, true, mockPerfChannel, exec, p.Logger)
 	p.Require().NoError(err)
 	err = m.Start()
 	p.Require().NoError(err)
@@ -304,7 +306,7 @@ func (p *monitorTestSuite) TestAddPathNotStarted() {
 	mockPerfChannel := &perfChannelMock{}
 	mockPerfChannel.On("Close").Return(nil)
 	exec := newFixedThreadExecutor(ctx)
-	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
+	m, err := newMonitor(ctx, true, mockPerfChannel, exec, p.Logger)
 	p.Require().NoError(err)
 	err = m.Add("not-exist")
 	p.Require().Error(err)
@@ -327,7 +329,7 @@ func (p *monitorTestSuite) TestAddPathNotClosed() {
 	mockPerfChannel.On("LostC").Return(perfLost)
 
 	exec := newFixedThreadExecutor(ctx)
-	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
+	m, err := newMonitor(ctx, true, mockPerfChannel, exec, p.Logger)
 	p.Require().NoError(err)
 	err = m.Start()
 	p.Require().NoError(err)
@@ -352,9 +354,9 @@ func (p *monitorTestSuite) TestRunNoError() {
 	mockPerfChannel.On("LostC").Return(perfLost)
 
 	exec := newFixedThreadExecutor(ctx)
-	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
+	m, err := newMonitor(ctx, true, mockPerfChannel, exec, p.Logger)
 	p.Require().NoError(err)
-	m.eProc.d.Add(&dEntry{
+	m.eProc.cache.Add(&dEntry{
 		Parent:   nil,
 		Depth:    0,
 		Children: nil,
@@ -425,11 +427,11 @@ func (p *monitorTestSuite) TestRunEmitError() {
 	mockEmitter.On("Emit", mock.Anything, mock.Anything, mock.Anything).Return(emitErr)
 
 	exec := newFixedThreadExecutor(ctx)
-	m, err := newMonitor(ctx, true, mockPerfChannel, exec)
+	m, err := newMonitor(ctx, true, mockPerfChannel, exec, p.Logger)
 	p.Require().NoError(err)
 
-	m.eProc.e = mockEmitter
-	m.eProc.d.Add(&dEntry{
+	m.eProc.emitter = mockEmitter
+	m.eProc.cache.Add(&dEntry{
 		Parent:   nil,
 		Depth:    0,
 		Children: nil,
@@ -484,7 +486,7 @@ func (p *monitorTestSuite) TestNew() {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
-	m, err := New(true)
+	m, err := New(true, p.Logger)
 	p.Require().NoError(err)
 
 	tmpDir, err := os.MkdirTemp("", "kprobe_bench_test")
@@ -623,7 +625,7 @@ func BenchmarkMonitor(b *testing.B) {
 
 	tarFilePath := filepath.Join(tmpDir, "linux-6.6.7.tar.xz")
 
-	m, err := New(true)
+	m, err := New(true, logp.NewLogger("bench_monitor"))
 	require.NoError(b, err)
 
 	errChan := make(chan error)
@@ -680,7 +682,7 @@ func BenchmarkMonitor(b *testing.B) {
 	//   running "find . | wc -l"
 	// so the dcache entry should contain 1 (tmpDir) + 1 (linux-6.6.7.tar.xz archive)
 	//   + 87082 (folder + archive contents) dentries
-	require.Len(b, m.eProc.d.index, 87082+2)
+	require.Len(b, m.eProc.cache.index, 87082+2)
 
 	b.Logf("processed %d events", seenEvents)
 }

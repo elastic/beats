@@ -13,20 +13,22 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type statelessInput struct {
 	config     config
 	serviceURL string
+	logger     *logp.Logger
 }
 
 func (statelessInput) Name() string {
 	return "azure-blob-storage-stateless"
 }
 
-func newStatelessInput(config config, url string) *statelessInput {
-	return &statelessInput{config: config, serviceURL: url}
+func newStatelessInput(config config, url string, logger *logp.Logger) *statelessInput {
+	return &statelessInput{config: config, serviceURL: url, logger: logger}
 }
 
 func (in *statelessInput) Test(v2.TestContext) error {
@@ -68,7 +70,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container", currentSource.ContainerName)
 		// use a new metrics registry associated to no parent. No metrics will
 		// be published.
-		metrics := newInputMetrics(monitoring.NewRegistry())
+		metrics := newInputMetrics(monitoring.NewRegistry(), in.logger)
 		metrics.url.Set(in.serviceURL + currentSource.ContainerName)
 
 		ctx, cancel := context.WithCancel(context.Background())

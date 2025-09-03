@@ -10,6 +10,7 @@ import (
 	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -25,7 +26,7 @@ type inputMetrics struct {
 	processingTime          metrics.Sample   // Histogram of the elapsed time for processing an event in nanoseconds.
 }
 
-func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
+func newInputMetrics(id string, optionalParent *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	// It's a v1 input, thus it does not have access to the v2.Context with the
 	// metrics registry.
 	reg, unreg := inputmon.NewDeprecatedMetricsRegistry(inputName, id, optionalParent)
@@ -38,7 +39,7 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 		bytesProcessedTotal:     monitoring.NewUint(reg, "bytes_processed_total"),
 		processingTime:          metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))
 
 	return out

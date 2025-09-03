@@ -60,7 +60,7 @@ type winEventLog struct {
 func newWinEventLog(options *conf.C) (EventLog, error) {
 	var err error
 
-	c := config{BatchReadSize: 512}
+	c := defaultConfig()
 	if err := readConfig(options, &c); err != nil {
 		return nil, err
 	}
@@ -117,20 +117,15 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		}
 	}
 
-	switch c.IncludeXML {
+	switch c.IncludeXML || l.isForwarded() {
 	case true:
 		l.renderer = win.NewXMLRenderer(
-			win.RenderConfig{
-				IsForwarded: l.isForwarded(),
-				Locale:      c.EventLanguage,
-			},
+			c.EventLanguage,
+			l.isForwarded(),
 			win.NilHandle, l.log)
 	case false:
 		l.renderer, err = win.NewRenderer(
-			win.RenderConfig{
-				IsForwarded: l.isForwarded(),
-				Locale:      c.EventLanguage,
-			},
+			c.EventLanguage,
 			win.NilHandle, l.log)
 		if err != nil {
 			return nil, err
@@ -160,12 +155,17 @@ func (l *winEventLog) IsFile() bool {
 	return l.file
 }
 
+// IgnoreMissingChannel returns true if missing channels should be ignored.
+func (l *winEventLog) IgnoreMissingChannel() bool {
+	return !l.file && (l.config.IgnoreMissingChannel == nil || *l.config.IgnoreMissingChannel)
+}
+
 func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
 	l.lastRead = state
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
 	if l.metrics == nil && l.id != "" {
-		l.metrics = newInputMetrics(l.channelName, metricsRegistry)
+		l.metrics = newInputMetrics(l.channelName, metricsRegistry, l.log)
 	}
 
 	var err error
