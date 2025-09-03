@@ -43,10 +43,18 @@ exporters:
       max_retries: 3
     user: elastic
     timeout: 1m30s
-    batcher:
+    force_attempt_http2: false
+    max_conns_per_host: 1
+    sending_queue:
+      batch:
+        max_size: 1600
+        min_size: 0
+        sizer: items
+      block_on_overflow: true
       enabled: true
-      max_size: 1600
-      min_size: 0
+      num_consumers: 1
+      queue_size: 3200
+      wait_for_result: true
     mapping:
       mode: bodymap
     compression: gzip
@@ -187,10 +195,18 @@ exporters:
       max_retries: 3
     user: elastic-cloud
     timeout: 1m30s
-    batcher:
+    force_attempt_http2: false
+    max_conns_per_host: 1
+    sending_queue:
+      batch:
+        max_size: 1600
+        min_size: 0
+        sizer: items
+      block_on_overflow: true
       enabled: true
-      max_size: 1600
-      min_size: 0
+      num_consumers: 1
+      queue_size: 3200
+      wait_for_result: true
     mapping:
       mode: bodymap   
     compression: gzip
