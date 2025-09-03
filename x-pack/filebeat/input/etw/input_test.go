@@ -17,7 +17,7 @@ import (
 	"golang.org/x/sys/windows"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
+	"github.com/elastic/beats/v7/libbeat/reader/etw"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
