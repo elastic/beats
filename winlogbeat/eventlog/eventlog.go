@@ -53,6 +53,9 @@ type EventLog interface {
 
 	// IsFile returns true if the event log is an evtx file.
 	IsFile() bool
+
+	// IgnoreMissingChannel returns true if missing channels should be ignored.
+	IgnoreMissingChannel() bool
 }
 
 // Record represents a single event from the log.
