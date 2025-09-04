@@ -144,6 +144,20 @@ output.discard:
   enabled: true
 `,
 		},
+		"validation can be disabled": {
+			log: "Input 'filestream' starting",
+			cfg: `
+filebeat.inputs:
+- type: filestream
+  id: my-filestream-id
+  clean_inactive: 42h
+  disable_clean_inactive_checks: true
+  paths:
+    - /var/log/*.log
+output.discard:
+  enabled: true
+`,
+		},
 	}
 
 	for name, tc := range testCases {

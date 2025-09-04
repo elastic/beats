@@ -66,6 +66,10 @@ type config struct {
 	// AllowIDDuplication is used by InputManager.Create
 	// (see internal/input-logfile/manager.go).
 	AllowIDDuplication bool `config:"allow_deprecated_id_duplication"`
+
+	// DisableCleanInactiveChecks disables the clean_inactive validation,
+	// preserving the old behaviour.
+	DisableCleanInactiveChecks bool `config:"disable_clean_inactive_checks"`
 }
 
 type deleterConfig struct {
@@ -178,24 +182,27 @@ func (c *config) Validate() error {
 		return fmt.Errorf("no path is configured")
 	}
 
-	if c.IgnoreOlder == 0 && c.CleanInactive > 0 {
-		return errors.New("clean_inactive can only be enabled if ignore_older is also enabled")
-	}
-
-	// clean_inactive is only enabled if clean_inactive > 0
-	if c.CleanInactive > 0 {
-		if c.CleanInactive <= c.IgnoreOlder+c.FileWatcher.Interval {
-			return fmt.Errorf("clean_inactive must be greater than ignore_older + "+
-				"prospector.scanner.check_interval, however %s <= %s + %s",
-				c.CleanInactive.String(),
-				c.IgnoreOlder.String(),
-				c.FileWatcher.Interval.String())
+	if !c.DisableCleanInactiveChecks {
+		// clean_inactive can only be used if ignore_older is enabled
+		if c.IgnoreOlder == 0 && c.CleanInactive > 0 {
+			return errors.New("clean_inactive can only be enabled if ignore_older is also enabled")
 		}
-	}
 
-	if c.AllowIDDuplication && c.TakeOver.Enabled {
-		return errors.New("allow_deprecated_id_duplication and take_over " +
-			"cannot be enabled at the same time")
+		// clean_inactive is only enabled if clean_inactive > 0
+		if c.CleanInactive > 0 {
+			if c.CleanInactive <= c.IgnoreOlder+c.FileWatcher.Interval {
+				return fmt.Errorf("clean_inactive must be greater than ignore_older + "+
+					"prospector.scanner.check_interval, however %s <= %s + %s",
+					c.CleanInactive.String(),
+					c.IgnoreOlder.String(),
+					c.FileWatcher.Interval.String())
+			}
+		}
+
+		if c.AllowIDDuplication && c.TakeOver.Enabled {
+			return errors.New("allow_deprecated_id_duplication and take_over " +
+				"cannot be enabled at the same time")
+		}
 	}
 
 	if c.GZIPExperimental {
