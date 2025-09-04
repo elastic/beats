@@ -154,16 +154,12 @@ func (l *winEventLog) IsFile() bool {
 	return l.file
 }
 
-<<<<<<< HEAD
-func (l *winEventLog) Open(state checkpoint.EventLogState) error {
-=======
 // IgnoreMissingChannel returns true if missing channels should be ignored.
 func (l *winEventLog) IgnoreMissingChannel() bool {
 	return !l.file && (l.config.IgnoreMissingChannel == nil || *l.config.IgnoreMissingChannel)
 }
 
-func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
->>>>>>> abcb373d9 ([winlogbeat] Fix forwarded event handling and add channel error resilience (#46190))
+func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 	l.lastRead = state
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
