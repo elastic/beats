@@ -387,3 +387,4 @@ The following metricsets are available:
 * [metrics](/reference/metricbeat/metricbeat-metricset-gcp-metrics.md)
 * [pubsub](/reference/metricbeat/metricbeat-metricset-gcp-pubsub.md)
 * [storage](/reference/metricbeat/metricbeat-metricset-gcp-storage.md)
+* [vertexai_logs](/reference/metricbeat/metricbeat-metricset-gcp-vertexai_logs.md)  {applies_to}`stack: beta`
