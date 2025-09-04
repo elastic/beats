@@ -123,7 +123,7 @@ and both size and checksum validations happens. If either validation fails,
 Our benchmarks indicate that reading GZIP files has a negligible impact on the 
 throughput of Filebeat and its CPU usage.
 
-However, each harvester reading a GZIP file consumes approximately 100Kb of 
+However, each harvester reading a GZIP file consumes approximately 100KB of 
 additional memory. You should consider this memory increase when configuring the
 `harvester_limit`.
 
