@@ -39,12 +39,12 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/host"
 )
 
-const processorName = "add_host_metadata"
-const logName = "processor." + processorName
-
-var (
-	reg *monitoring.Registry
+const (
+	processorName = "add_host_metadata"
+	logName       = "processor." + processorName
 )
+
+var reg *monitoring.Registry
 
 func init() {
 	processors.RegisterPlugin(processorName, New)
@@ -67,6 +67,7 @@ type addHostMetadata struct {
 	config  Config
 	logger  *logp.Logger
 	metrics metrics
+	cbIDStr string
 }
 
 // New constructs a new add_host_metadata processor.
@@ -97,20 +98,19 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	}
 
 	// create a unique ID for this instance of the processor
-	var cbIDStr string
 	cbID, err := uuid.NewV4()
 	// if we fail, fall back to the processor name, hope for the best.
 	if err != nil {
 		p.logger.Errorf("error generating ID for FQDN callback, reverting to processor name: %v", err)
-		cbIDStr = processorName
+		p.cbIDStr = processorName
 	} else {
-		cbIDStr = cbID.String()
+		p.cbIDStr = cbID.String()
 	}
 
 	// this is safe as New() returns a pointer, not the actual object.
 	// This matters as other pieces of code in libbeat, like libbeat/processors/processor.go,
 	// will do weird stuff like copy the entire list of global processors.
-	err = features.AddFQDNOnChangeCallback(p.handleFQDNReportingChange, cbIDStr)
+	err = features.AddFQDNOnChangeCallback(p.handleFQDNReportingChange, p.cbIDStr)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"could not register callback for FQDN reporting onChange from %s processor: %w",
@@ -145,13 +145,12 @@ func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 // deregister the callback.  But processors that can be used with the
 // `script` processor are not allowed to implement the Closer
 // interface (@see https://github.com/elastic/beats/pull/16349).
-//func (p *addHostMetadata) Close() error {
-//	features.RemoveFQDNOnChangeCallback(processorName)
-//	return nil
-//}
+func (p *addHostMetadata) Close() error {
+	features.RemoveFQDNOnChangeCallback(p.cbIDStr)
+	return nil
+}
 
 func (p *addHostMetadata) expired() bool {
-
 	p.lastUpdate.Lock()
 	defer p.lastUpdate.Unlock()
 
@@ -201,7 +200,7 @@ func (p *addHostMetadata) loadData(checkCache bool, useFQDN bool) error {
 	data := host.MapHostInfo(h.Info(), hostname)
 	if p.config.NetInfoEnabled {
 		// IP-address and MAC-address
-		var ipList, hwList, err = util.GetNetInfo()
+		ipList, hwList, err := util.GetNetInfo()
 		if err != nil {
 			p.logger.Infof("Error when getting network information %v", err)
 		}
@@ -284,7 +283,6 @@ func (p *addHostMetadata) updateOrExpire(useFQDN bool) {
 			p.lastUpdate.Time = time.Now()
 		}
 	}
-
 }
 
 func skipAddingHostMetadata(event *beat.Event) bool {
