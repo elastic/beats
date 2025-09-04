@@ -14,21 +14,21 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/status"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	"github.com/elastic/elastic-agent-libs/logp"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
 	"go.opentelemetry.io/collector/component"
-	"go.uber.org/zap"
 )
 
 // BaseReceiver holds common configurations for beatreceivers.
 type BeatReceiver struct {
 	beat   *instance.Beat
 	beater beat.Beater
-	Logger *zap.Logger
+	Logger *logp.Logger
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
-func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger) (BeatReceiver, error) {
+func NewBeatReceiver(b *instance.Beat, creator beat.Creator) (BeatReceiver, error) {
 	beatConfig, err := b.BeatConfig()
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error getting beat config: %w", err)
@@ -51,7 +51,6 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 		SystemMetrics:  systemReg,
 		ProcessMetrics: processReg,
 	})
-
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error setting up metrics report: %w", err)
 	}
@@ -78,7 +77,7 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 	return BeatReceiver{
 		beat:   b,
 		beater: beater,
-		Logger: logger,
+		Logger: b.Info.Logger,
 	}, nil
 }
 
