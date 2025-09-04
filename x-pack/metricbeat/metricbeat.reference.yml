@@ -706,6 +706,8 @@ metricbeat.modules:
   credentials_file_path: "/path/to/service-account.json"
   # credentials_json: '{"type": "service_account", ...}'
 
+
+
 #-------------------------------- Golang Module --------------------------------
 - module: golang
   #metricsets:
