@@ -71,7 +71,10 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed password authentication for ACL users in the Redis input of Filebeat. {pull}44137[44137]
 - Add experimental GZIP file ingestion in filestream. {pull}45301[45301]
 -Change aws.cloudwatch.* field in awscloudwatch input to nested object. {pull}46357[46357]
-
+- Filestream's `clean_inactive` setting is now validated, if the validation fails, Filebeat exits with an error code. To keep the legacy behavior of not validating set `disable_clean_inactive_checks: true`. {issue}45601[45601]
+{pull}46373[46373]
+- In Filestream, setting `clean_inactive: 0` now disables `clean_inactive`. {issue}45601[45601]
+{pull}46373[46373]
 
 *Heartbeat*
 
@@ -273,6 +276,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Restore the Streaming input on Windows. {pull}46031[46031]
 - Fix termination of input on API errors. {pull}45999[45999]
 - Fixed hints autodiscover for Docker when the configuration is only `hints.enabled: true`. {issue}45156[45156] {pull}45864[45864]
+- In Filestream, setting `clean_inactive: 0` does not re-ingest all files on startup any more. {issue}45601[45601]
++{pull}46373[46373]
 
 *Heartbeat*
 

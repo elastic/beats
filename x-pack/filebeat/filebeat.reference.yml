@@ -2529,7 +2529,12 @@ filebeat.inputs:
 
   # Files for the modification data is older than clean_inactive the state from the registry is removed
   # By default this is disabled.
+  # Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
   #clean_inactive: -1
+
+  # Enable this to disable all checks regarding clean_inactive keeping the
+  # old behaviour of not validating the clean_inactive configuration.
+  #disable_clean_inactive_checks: false
 
   # Removes the state for files which cannot be found on disk anymore immediately
   #clean_removed: true
