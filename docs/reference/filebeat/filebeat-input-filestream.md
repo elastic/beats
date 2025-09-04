@@ -502,6 +502,17 @@ The `clean_inactive` configuration option is useful to reduce the size of the re
 
 This config option is also useful to prevent Filebeat problems resulting from inode reuse on Linux. For more information, see [Inode reuse causes Filebeat to skip lines](/reference/filebeat/inode-reuse-issue.md).
 
+To disable, set `clean_inactive: -1`. {applies_to}`stack: ga 9.2.0`Setting it to zero will also
+disable it.
+
+{applies_to}`stack: ga 9.2.0` Filebeat enforces the restrictions by
+failing to start if `clean_inactive <= ignore_older +
+prospector.scanner.check_interval` or if `ignore_older` is disabled.
+
+You can use time strings like `5m` (5 minutes), `2h45m` (2 hours and 45
+minutes), `48h`, etc. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". The
+default is `-1`.
+
 ::::{note}
 Every time a file is renamed, the file state is updated and the counter for `clean_inactive` starts at 0 again.
 ::::
