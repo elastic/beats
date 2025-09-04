@@ -7,6 +7,7 @@ package okta
 import (
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -22,7 +23,7 @@ type inputMetrics struct {
 }
 
 // newMetrics creates a new instance for gathering metrics.
-func newMetrics(reg *monitoring.Registry) *inputMetrics {
+func newMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	out := inputMetrics{
 		syncTotal:            monitoring.NewUint(reg, "sync_total"),
 		syncError:            monitoring.NewUint(reg, "sync_error"),
@@ -32,8 +33,8 @@ func newMetrics(reg *monitoring.Registry) *inputMetrics {
 		updateProcessingTime: metrics.NewUniformSample(1024),
 	}
 
-	adapter.NewGoMetrics(reg, "sync_processing_time", adapter.Accept).Register("histogram", metrics.NewHistogram(out.syncProcessingTime))     //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "update_processing_time", adapter.Accept).Register("histogram", metrics.NewHistogram(out.updateProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "sync_processing_time", logger, adapter.Accept).Register("histogram", metrics.NewHistogram(out.syncProcessingTime))     //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "update_processing_time", logger, adapter.Accept).Register("histogram", metrics.NewHistogram(out.updateProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
 	return &out
 }
