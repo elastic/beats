@@ -361,6 +361,15 @@ metricbeat.modules:
   exclude_labels: false
   period: 1m
   collect_dataproc_user_labels: true
+
+- module: gcp
+  metricsets:
+    - vertexai_logs
+  period: 300s  # 5 minutes
+  project_id: "your-project-id"
+  table_id: "your-project-id.dataset.id.table_name"
+  credentials_file_path: "/path/to/service-account.json"
+  # credentials_json: '{"type": "service_account", ...}'
 ```
 
 

@@ -1,0 +1,50 @@
+- name: vertexai_logs
+  description: Google Cloud Vertex AI Prompt Response Logs metrics
+  release: beta
+  type: group
+  fields:
+  - name: endpoint
+    type: keyword
+    description: The Vertex AI API endpoint URL used for the request.
+  - name: deployed_model_id
+    type: keyword
+    description: The ID of the deployed model that processed the request.
+  - name: logging_time
+    type: date
+    description: Timestamp when the AI interaction was logged.
+  - name: request_id
+    type: double
+    description: Unique identifier for the AI request.
+  - name: request_payload
+    type: text
+    index: false
+    description: Array of request payload strings containing user prompts and inputs.
+  - name: response_payload
+    type: text
+    index: false
+    description: Array of response payload strings containing AI model outputs.
+  - name: model
+    type: keyword
+    description: Name of the AI model used (e.g., gemini-2.5-pro).
+  - name: model_version
+    type: keyword
+    description: Version of the AI model used.
+  - name: api_method
+    type: keyword
+    description: The API method called (e.g., generateContent, predict).
+  - name: full_request
+    type: object
+    enabled: true
+    description: Complete request object containing all request details in JSON format.
+  - name: full_response
+    type: object
+    enabled: true
+    description: Complete response object containing all response details in JSON format.
+  - name: metadata
+    type: object
+    enabled: true
+    description: Additional metadata associated with the AI interaction in JSON format.
+  - name: otel_log
+    type: object
+    enabled: true
+    description: OpenTelemetry log data associated with the AI interaction in JSON format.

@@ -1201,3 +1201,93 @@ Google Cloud Storage metrics
     type: long
 
 
+## vertexai_logs [_vertexai_logs]
+
+```{applies_to}
+stack: beta
+```
+
+Google Cloud Vertex AI Prompt Response Logs metrics
+
+**`gcp.vertexai_logs.endpoint`**
+:   The Vertex AI API endpoint URL used for the request.
+
+    type: keyword
+
+
+**`gcp.vertexai_logs.deployed_model_id`**
+:   The ID of the deployed model that processed the request.
+
+    type: keyword
+
+
+**`gcp.vertexai_logs.logging_time`**
+:   Timestamp when the AI interaction was logged.
+
+    type: date
+
+
+**`gcp.vertexai_logs.request_id`**
+:   Unique identifier for the AI request.
+
+    type: double
+
+
+**`gcp.vertexai_logs.request_payload`**
+:   Array of request payload strings containing user prompts and inputs.
+
+    type: text
+
+Field is not indexed.
+
+
+**`gcp.vertexai_logs.response_payload`**
+:   Array of response payload strings containing AI model outputs.
+
+    type: text
+
+Field is not indexed.
+
+
+**`gcp.vertexai_logs.model`**
+:   Name of the AI model used (e.g., gemini-2.5-pro).
+
+    type: keyword
+
+
+**`gcp.vertexai_logs.model_version`**
+:   Version of the AI model used.
+
+    type: keyword
+
+
+**`gcp.vertexai_logs.api_method`**
+:   The API method called (e.g., generateContent, predict).
+
+    type: keyword
+
+
+**`gcp.vertexai_logs.full_request`**
+:   Complete request object containing all request details in JSON format.
+
+    type: object
+
+
+**`gcp.vertexai_logs.full_response`**
+:   Complete response object containing all response details in JSON format.
+
+    type: object
+
+
+**`gcp.vertexai_logs.metadata`**
+:   Additional metadata associated with the AI interaction in JSON format.
+
+    type: object
+
+
+**`gcp.vertexai_logs.otel_log`**
+:   OpenTelemetry log data associated with the AI interaction in JSON format.
+
+    type: object
+
+
