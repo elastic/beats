@@ -93,7 +93,6 @@ updates:
       # meraki
       - dependency-name: "github.com/go-resty/resty/v2"
       - dependency-name: "github.com/tomnomnom/linkheader"
-      - dependency-name: "github.com/meraki/dashboard-api-go/v3"
       # haproxy
       - dependency-name: "github.com/gocarina/gocsv"
       # salesforce
@@ -116,7 +115,6 @@ updates:
         patterns:
           - "github.com/go-resty/resty/v2"
           - "github.com/tomnomnom/linkheader"
-          - "github.com/meraki/dashboard-api-go/v3"
     open-pull-requests-limit: 5
 
   # Update integration test container images
