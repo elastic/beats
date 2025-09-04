@@ -59,6 +59,7 @@ example below:
     enabled: true
     var.input: httpjson
     var.url: https://urlhaus-api.abuse.ch/v1/urls/recent/
+    var.api_token: <api_token>
     var.interval: 60m
 ----
 
@@ -67,6 +68,10 @@ include::../include/var-paths.asciidoc[]
 *`var.url`*::
 
 The URL of the API endpoint to connect with.
+
+*`var.api_token`*::
+
+The Authentication key to access the API endpoint.
 
 *`var.interval`*::
 
@@ -103,6 +108,7 @@ example below:
     enabled: true
     var.input: httpjson
     var.url: https://urlhaus-api.abuse.ch/v1/payloads/recent/
+    var.api_token: <api_token>
     var.interval: 60m
 ----
 
@@ -111,6 +117,10 @@ include::../include/var-paths.asciidoc[]
 *`var.url`*::
 
 The URL of the API endpoint to connect with.
+
+*`var.api_token`*::
+
+The Authentication key to access the API endpoint.
 
 *`var.interval`*::
 
@@ -147,6 +157,7 @@ example below:
     enabled: true
     var.input: httpjson
     var.url: https://mb-api.abuse.ch/api/v1/
+    var.api_token: <api_token>
     var.interval: 10m
 ----
 
@@ -155,6 +166,10 @@ include::../include/var-paths.asciidoc[]
 *`var.url`*::
 
 The URL of the API endpoint to connect with.
+
+*`var.api_token`*::
+
+The Authentication key to access the API endpoint.
 
 *`var.interval`*::
 
