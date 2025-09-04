@@ -236,7 +236,7 @@ func readJSONFromFile(t *testing.T, filepath string) (map[int]string, int) {
 
 // readAndCompareParquetFile reads the parquet file and compares the data with the input data
 func readAndCompareParquetFile(t *testing.T, cfg *Config, file *os.File, data map[int]string, rows int, maxRowsToCompare int) {
-	sReader, err := NewBufferedReader(file, cfg, logp.NewNopLogger())
+	sReader, err := NewBufferedReader(file, cfg, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("failed to init stream reader: %v", err)
 	}
