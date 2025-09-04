@@ -325,7 +325,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
 - Fix EvtVarTypeAnsiString conversion {pull}44026[44026]
 - Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
-
+- Fix EventLog reset logic to not close renderers. {pull}46376[46376] {issue}45750{45750}
 
 *Elastic Logging Plugin*
 
