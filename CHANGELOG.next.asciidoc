@@ -270,6 +270,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix reading journald messages with more than 4kb. {issue}45511[45511] {pull}46017[46017]
 - Restore the Streaming input on Windows. {pull}46031[46031]
 - Fix termination of input on API errors. {pull}45999[45999]
+- Fix race condition that could cause Filebeat to hang during shutdown after failing to startup {issue}45034[45034] {pull}46331[46331]
 
 *Heartbeat*
 
