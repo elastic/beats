@@ -306,7 +306,7 @@ func (in *eventHubInputV2) run(ctx context.Context) error {
 				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Event Hub not found, although cause could be network partition: %s", err.Error()))
 			} else {
 				// Update input status to degraded with a more generic issue
-				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Processor error: %s", err))
+				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("Error in event processing: %s", err))
 			}
 
 			in.log.Infow("waiting before retrying starting the processor")
