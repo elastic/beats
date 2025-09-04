@@ -152,7 +152,7 @@ func (f *logFile) startFileMonitoringIfNeeded() {
 			return nil
 		})
 		if err != nil {
-			f.log.Errorf("failed to schedule a file close: %w", err)
+			f.log.Errorf("failed to schedule a file close: %v", err)
 		}
 	}
 }

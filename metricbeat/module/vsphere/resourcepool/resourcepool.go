@@ -136,7 +136,7 @@ func (m *ResourcePoolMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV
 
 			triggeredAlarm, err := getTriggeredAlarm(ctx, pc, rps[i].TriggeredAlarmState)
 			if err != nil {
-				m.Logger().Errorf("Failed to retrieve alerts from resource pool %s: %w", rps[i].Name, err)
+				m.Logger().Errorf("Failed to retrieve alerts from resource pool %s: %v", rps[i].Name, err)
 			}
 
 			reporter.Event(mb.Event{
