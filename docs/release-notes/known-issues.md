@@ -19,7 +19,7 @@ Known issues are significant defects or limitations that may impact your impleme
 % **Resolved**
 % On [Month/Day/Year], this issue was resolved.
 
-:::
+% :::
 
 :::{dropdown} Winlogbeat and Filebeat `winlog` input can crash the Event Log on Windows Server 2025.
 **Details** 
