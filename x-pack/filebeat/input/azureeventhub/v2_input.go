@@ -477,21 +477,7 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 	// 1/3 [BEGIN] Initialize any partition specific resources for your application.
 	pipelineClient, err := initializePartitionResources(ctx, partitionClient, in.pipeline, in.log)
 	if err != nil {
-		if shouldReport, count := in.partitionFailureTracker.TrackFailure(partitionID); shouldReport {
-			// TODO: check if this handles network faults
-			in.status.UpdateStatus(status.Degraded,
-				fmt.Sprintf("Partition %s has encountered %d consecutive failures. Current failure: %s",
-					partitionID, count, err.Error()))
-		}
 		return err
-	}
-	in.partitionFailureTracker.TrackSuccess(partitionID)
-
-	if !in.partitionFailureTracker.HasFailingPartitions() {
-		// we have received events with no error.
-		// Report Running in case we are
-		// currently transitioning from degraded back to healthy
-		in.status.UpdateStatus(status.Running, "Input is running")
 	}
 
 	defer func() {
@@ -535,10 +521,6 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 
 		err = in.processReceivedEvents(events, partitionID, pipelineClient)
 		if err != nil {
-			in.status.UpdateStatus(status.Degraded,
-				fmt.Sprintf(
-					"Error processing received events for partition %s: %s",
-					partitionID, err.Error()))
 			return fmt.Errorf("error processing received events: %w", err)
 		}
 	}
