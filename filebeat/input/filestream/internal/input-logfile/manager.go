@@ -151,11 +151,12 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 
 	settings := struct {
 		// All those values are duplicated from the Filestream configuration
-		ID                 string         `config:"id"`
-		CleanInactive      time.Duration  `config:"clean_inactive" validate:"min=-1"`
-		HarvesterLimit     uint64         `config:"harvester_limit"`
-		AllowIDDuplication bool           `config:"allow_deprecated_id_duplication"`
-		TakeOver           TakeOverConfig `config:"take_over"`
+		ID                  string         `config:"id"`
+		CleanInactive       time.Duration  `config:"clean_inactive" validate:"min=-1"`
+		HarvesterLimit      uint64         `config:"harvester_limit"`
+		AllowIDDuplication  bool           `config:"allow_deprecated_id_duplication"`
+		TakeOver            TakeOverConfig `config:"take_over"`
+		LegacyCleanInactive bool           `config:"legacy_clean_inactive"`
 	}{
 		CleanInactive: cim.DefaultCleanTimeout,
 	}
@@ -171,7 +172,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	// zero must also disable clean_inactive, see:
 	// https://github.com/elastic/beats/issues/45601
 	// for more details.
-	if settings.CleanInactive == 0 {
+	if !settings.LegacyCleanInactive && settings.CleanInactive == 0 {
 		settings.CleanInactive = -1
 	}
 

@@ -67,9 +67,11 @@ type config struct {
 	// (see internal/input-logfile/manager.go).
 	AllowIDDuplication bool `config:"allow_deprecated_id_duplication"`
 
-	// DisableCleanInactiveChecks disables the clean_inactive validation,
-	// preserving the old behaviour.
-	DisableCleanInactiveChecks bool `config:"disable_clean_inactive_checks"`
+	// LegacyCleanInactive disables the clean_inactive validation,
+	// and allows it to be set to 0, re-ingesting all files on restart,
+	// effectively preserving the old, buggy, behaviour.
+	// (see internal/input-logfile/manager.go)
+	LegacyCleanInactive bool `config:"legacy_clean_inactive"`
 }
 
 type deleterConfig struct {
@@ -182,7 +184,7 @@ func (c *config) Validate() error {
 		return fmt.Errorf("no path is configured")
 	}
 
-	if !c.DisableCleanInactiveChecks {
+	if !c.LegacyCleanInactive {
 		// clean_inactive can only be used if ignore_older is enabled
 		if c.IgnoreOlder == 0 && c.CleanInactive > 0 {
 			return errors.New("clean_inactive can only be enabled if ignore_older is also enabled")

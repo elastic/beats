@@ -848,9 +848,10 @@ filebeat.inputs:
   # Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
   #clean_inactive: -1
 
-  # Enable this to disable all checks regarding clean_inactive keeping the
-  # old behaviour of not validating the clean_inactive configuration.
-  #disable_clean_inactive_checks: false
+  # Enable this to disable all checks regarding clean_inactive and re-ingest
+  # all data when clean_inactive: 0, effectively keeping the
+  # old behaviour.
+  #legacy_clean_inactive: false
 
   # Removes the state for files which cannot be found on disk anymore immediately
   #clean_removed: true
