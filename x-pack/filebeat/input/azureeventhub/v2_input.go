@@ -45,14 +45,6 @@ const (
 	// processorRestartMaxBackoff is the maximum backoff time before
 	// restarting the processor.
 	processorRestartMaxBackoff = 120 * time.Second
-	// partitionInitFailureThreshold is the number of consecutive initialization
-	// failures for a single partition (along with the failure window)
-	// before we consider it a persistent problem.
-	partitionInitFailureThreshold = 3
-	// partitionMinFailureWindow is the minimum time window in which consecutive
-	// initialization failures (along with the failure threshold)
-	// for a single partition are considered a persistent problem.
-	partitionMinFailureWindow = 30 * time.Second
 )
 
 // azureInputConfig the Azure Event Hub input v2,
