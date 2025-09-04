@@ -70,6 +70,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 - Fixed password authentication for ACL users in the Redis input of Filebeat. {pull}44137[44137]
 - Add experimental GZIP file ingestion in filestream. {pull}45301[45301]
+-Change aws.cloudwatch.* field in awscloudwatch input to nested object. {pull}46357[46357]
 
 
 *Heartbeat*
@@ -149,6 +150,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Use Debian 11 to build linux/arm to match linux/amd64. Upgrades linux/arm64's statically linked glibc from 2.28 to 2.31. {issue}44816[44816]
 - The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
 - Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
+- Fix a race condition during metrics initialization which could cause a panic. {issue}45822[45822] {pull}46054[46054]
 
 *Auditbeat*
 
@@ -271,6 +273,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Restore the Streaming input on Windows. {pull}46031[46031]
 - Fix termination of input on API errors. {pull}45999[45999]
 - Fix race condition that could cause Filebeat to hang during shutdown after failing to startup {issue}45034[45034] {pull}46331[46331]
+- Fixed hints autodiscover for Docker when the configuration is only `hints.enabled: true`. {issue}45156[45156] {pull}45864[45864]
 
 *Heartbeat*
 
@@ -322,6 +325,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Implement backoff on error retrial. {pull}42826[42826]
 - Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
 - Fix EvtVarTypeAnsiString conversion {pull}44026[44026]
+- Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
 
 
 *Elastic Logging Plugin*
@@ -510,6 +514,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Updated the `parse_aws_vpc_flow_log` processor to handle AWS VPC flow log v6, v7, and v8 fields. {pull}45746[45746]
 - Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]
 - Clarify behavior in logging for starting periodic evaluations and for exceeding the maximum execution budget. {pull}45633[45633]
+- Add OAuth2 support for Okta provider in Entity Analytics input. {pull}45753[45753]
 - Add status reporting support for AWS CloudWatch input. {pull}45679[45679]
 - Add mechanism to allow HTTP JSON templates to terminate without logging an error. {issue}45664[45664] {pull}45810[45810]
 - Improve error reporting for schemeless URLs in HTTP JSON input. {pull}45953[45953]
