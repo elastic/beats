@@ -125,11 +125,14 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 		"timeout":           escfg.Transport.Timeout,         // timeout
 		"idle_conn_timeout": escfg.Transport.IdleConnTimeout, // idle_connection_timeout
 
-		// For libbeat ES output, the "workers" setting controls the number of concurrent connections per ES host.
-		// For elasticsearchexporter, we can achieve the same concurrency by specifying "max_conns_per_host" setting
-		// as our otelconsumer sends data parallelly to the consumer.
-		// Also, we use http/1 in libbeat. To achieve parity, disable force_attempt_http2
-		"max_conns_per_host":  escfg.NumWorkers(),
+		// max_conns_per_host is a "hard" limit on number of open connections.
+		// Ideally, escfg.NumWorkers() should map to num_consumer, but we had a bug in upstream
+		// where it could spin as many goroutines as it liked.
+		// Given that batcher implementation can change and it has a history of such changes,
+		// let's keep max_conns_per_host setting for now and remove it once exporterhelper is stable.
+		"max_conns_per_host": escfg.NumWorkers(),
+
+		// we use http/1 in libbeat. To achieve parity, disable force_attempt_http2
 		"force_attempt_http2": false,
 
 		// Retry
