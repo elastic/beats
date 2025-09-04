@@ -119,8 +119,7 @@ By default, all events contain `host.name`. This option can be set to `true` to 
 
 ## Active Directory (`activedirectory`) [provider-activedirectory]
 
-The `activedirectory` provider allows the input to retrieve users, with group memberships, from Active Directory.
-
+The `activedirectory` provider allows the input to retrieve users and devices, with group memberships, from Active Directory.
 
 ### Setup [_setup]
 
@@ -132,14 +131,14 @@ A user with appropriate permissions must be set up in the Active Directory Serve
 
 #### Overview [_overview]
 
-The Active Directory provider periodically queries the Active Directory server, retrieving updates for users and groups, updates its internal cache of user and group metadata and group membership information, and ships updated user metadata to Elasticsearch.
+The Active Directory provider periodically queries the Active Directory server, retrieving updates for users, devices, and groups, updates its internal cache of user, device, and group metadata and group membership information, and ships updated user and device metadata to Elasticsearch.
 
-Fetching and shipping updates occurs in one of two processes: **full synchronizations** and **incremental updates**. Full synchronizations will send the entire list of users and group membership in state, along with write markers to indicate the start and end of the synchronization event. Incremental updates will only send data for changed users during that event. Changes on a user can come in many forms, whether it be a change to the user metadata, a user was added or modified, or group membership was changed.
+Fetching and shipping updates occurs in one of two processes: **full synchronizations** and **incremental updates**. Full synchronizations will send the entire list of users, devices, and group membership in state, along with write markers to indicate the start and end of the synchronization event. Incremental updates will only send data for changed users and devices during that event. Changes on a user or device can come in many forms, whether it be a change to the user or device metadata, a user or device was added or modified, or group membership was changed.
 
 
 #### Sending User and Device Metadata to Elasticsearch [_sending_user_and_device_metadata_to_elasticsearch]
 
-During a full synchronization, all users and groups stored in state will be sent to the output, while incremental updates will only send users and group that have been updated. Full synchronizations will be bounded on either side by write marker documents, which will look something like this:
+During a full synchronization, all users, devices, and groups stored in state will be sent to the output, while incremental updates will only send users, devices, and groups that have been updated. Full synchronizations will be bounded on either side by write marker documents, which will look something like this:
 
 ```json
 {
@@ -216,6 +215,71 @@ Example user document:
 }
 ```
 
+Device documents will show the current state of the device.
+
+Example device document:
+
+```json
+{
+    "@timestamp": "2024-02-05T06:37:40.876026-05:00",
+    "event": {
+        "action": "device-discovered",
+    },
+    "activedirectory": {
+        "id": "CN=DESKTOP-ABC123,CN=Computers,DC=testserver,DC=local",
+        "user": {
+            "accountExpires": "2185-07-21T23:34:33.709551516Z",
+            "badPasswordTime": "0",
+            "badPwdCount": "0",
+            "cn": "DESKTOP-ABC123",
+            "codePage": "0",
+            "countryCode": "0",
+            "dSCorePropagationData": [
+                "2024-01-22T06:37:40Z",
+                "1601-01-01T00:00:01Z"
+            ],
+            "description": "Computer account",
+            "distinguishedName": "CN=DESKTOP-ABC123,CN=Computers,DC=testserver,DC=local",
+            "instanceType": "4",
+            "isCriticalSystemObject": false,
+            "lastLogoff": "0",
+            "lastLogon": "2185-07-21T23:34:33.709551616Z",
+            "logonCount": "0",
+            "memberOf": "CN=Domain Computers,CN=Users,DC=testserver,DC=local",
+            "name": "DESKTOP-ABC123",
+            "objectCategory": "CN=Computer,CN=Schema,CN=Configuration,DC=testserver,DC=local",
+            "objectClass": [
+                "top",
+                "person",
+                "organizationalPerson",
+                "user",
+                "computer"
+            ],
+            "objectGUID": "hSt/40XJQU6cf+J2XoYMHw==",
+            "objectSid": "AQUAAAAAAAUVAAAA0JU2Fq1k30YZ7UPx9QEAAA==",
+            "operatingSystem": "Windows 10 Enterprise",
+            "operatingSystemVersion": "10.0 (19041)",
+            "primaryGroupID": "515",
+            "pwdLastSet": "2185-07-21T23:34:33.709551616Z",
+            "sAMAccountName": "DESKTOP-ABC123$",
+            "sAMAccountType": "805306369",
+            "uSNChanged": "8197",
+            "uSNCreated": "8197",
+            "userAccountControl": "4096",
+            "whenChanged": "2024-01-22T06:36:59Z",
+            "whenCreated": "2024-01-22T06:36:59Z"
+        },
+        "whenChanged": "2024-01-22T06:36:59Z"
+    },
+    "device": {
+        "id": "CN=DESKTOP-ABC123,CN=Computers,DC=testserver,DC=local"
+    },
+    "labels": {
+        "identity_source": "activedirectory-1"
+    }
+}
+```
+
 
 ### Configuration [_configuration_2]
 
@@ -227,6 +291,7 @@ filebeat.inputs:
   enabled: true
   id: activedirectory-1
   provider: activedirectory
+  dataset: "all"
   sync_interval: "12h"
   update_interval: "30m"
   ad_url: "ldaps://host.domain.tld"
@@ -235,7 +300,7 @@ filebeat.inputs:
   ad_password: "PASSWORD"
 ```
 
-The `azure-ad` provider supports the following configuration:
+The `activedirectory` provider supports the following configuration:
 
 
 #### `ad_url` [_ad_url]
@@ -272,6 +337,9 @@ The number of records to request from the Active Directory server for each page,
 
 The client’s password, used for authentication. Field is required.
 
+#### `dataset` [_ad_dataset]
+
+The datasets to collect from Active Directory. This can be one of "all", "users" or "devices", or may be left empty for the default behavior which is to collect all entities. When the `dataset` is set to "devices", some user entity data is collected in order to populate the registered users and registered owner fields for each device.
 
 #### `sync_interval` [_sync_interval]
 
