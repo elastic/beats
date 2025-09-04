@@ -70,6 +70,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 - Fixed password authentication for ACL users in the Redis input of Filebeat. {pull}44137[44137]
 - Add experimental GZIP file ingestion in filestream. {pull}45301[45301]
+-Change aws.cloudwatch.* field in awscloudwatch input to nested object. {pull}46357[46357]
 
 
 *Heartbeat*
@@ -323,6 +324,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Implement backoff on error retrial. {pull}42826[42826]
 - Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
 - Fix EvtVarTypeAnsiString conversion {pull}44026[44026]
+- Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
 
 
 *Elastic Logging Plugin*
