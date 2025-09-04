@@ -236,13 +236,9 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 // setup.
 func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	if b.Config.Output.Name() != "elasticsearch" {
-<<<<<<< HEAD
-		logp.Warn(pipelinesWarning)
-=======
 		if !b.Manager.Enabled() {
-			fb.logger.Warn(pipelinesWarning)
+			logp.Warn(pipelinesWarning)
 		}
->>>>>>> fbfcceb31 (Do not show 'ingest pipeline' warning when managed by Elastic Agent (#46260))
 		return nil
 	}
 
@@ -364,13 +360,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	if b.Config.Output.Name() == "elasticsearch" {
 		pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config())
 	} else {
-<<<<<<< HEAD
-		logp.Warn(pipelinesWarning)
-=======
 		if !b.Manager.Enabled() {
-			fb.logger.Warn(pipelinesWarning)
+			logp.Warn(pipelinesWarning)
 		}
->>>>>>> fbfcceb31 (Do not show 'ingest pipeline' warning when managed by Elastic Agent (#46260))
 	}
 	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
 	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once)
