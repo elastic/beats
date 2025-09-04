@@ -50,4 +50,4 @@ Also like some other modules, the `elasticsearch` module accepts either a `usern
 When used, the `api_key`  configuration can be specified as:
 
 * {applies_to}`stack: ga 9.1.4` The unencoded `id:api_key` format (`api_key: "foo:bar"`) or the Base64-encoded `id:api_key` format (`api_key: "Zm9vOmJhcgo="`).
-* All earlier releases can only use the unencoded `id:api_key` format (`api_key: "foo:bar"`)/
+* All earlier releases can only use the unencoded `id:api_key` format (`api_key: "foo:bar"`).
