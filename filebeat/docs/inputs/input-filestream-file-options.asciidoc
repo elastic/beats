@@ -439,6 +439,9 @@ prevent a potential <<inode-reuse-issue,inode reuse issue>>.
 WARNING: Only use this option if you understand that data loss is a potential
 side effect.
 
+WARNING: Filestream does not validate the restrictions for `clean_inactive` using an invalid
+configuration can lead to data duplication.
+
 When this option is enabled, {beatname_uc} removes the state of a file after the
 specified period of inactivity has elapsed. The state can only be removed if
 the file is already ignored by {beatname_uc} (the file is older than
@@ -455,6 +458,10 @@ day.
 
 This config option is also useful to prevent {beatname_uc} problems resulting
 from inode reuse on Linux. For more information, see <<inode-reuse-issue>>.
+
+You can use time strings like `5m` (5 minutes), `2h45m` (2 hours and 45
+minutes), `48h`, etc. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". The
+default is `-1` (disabled).
 
 NOTE: Every time a file is renamed, the file state is updated and the counter
 for `clean_inactive` starts at 0 again.

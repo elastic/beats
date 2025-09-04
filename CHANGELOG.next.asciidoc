@@ -364,47 +364,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 ==== Known Issues
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0` Filestream will clean the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable it.
