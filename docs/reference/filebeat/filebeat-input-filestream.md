@@ -16,7 +16,7 @@ a different length for the fingerprint by setting the
 value.
 ::::
 
-Use the `filestream` input to read lines from active log files. It is the new, improved alternative to the `log` input. It comes with various improvements to the existing input:
+Use the `filestream` input to read lines from log files. It is the improved alternative to the `log` input. It comes with various improvements to the existing input:
 
 * The default behavior is to identify files based on their contents using [`fingerprint`](#filebeat-input-filestream-file-identity-fingerprint) [`file_identity`](#filebeat-input-filestream-file-identity). This solves data duplication caused by inode reuse.
 * Validation of `close.on_state_change.*` options happens out of band. If an output is blocked, Filebeat can close the reader and avoid keeping too many files open.
@@ -26,6 +26,7 @@ Use the `filestream` input to read lines from active log files. It is the new, i
 * Only the most recent updates are serialized to the registry. In contrast, the `log` input has to serialize the complete registry on each ACK from the outputs. This makes the registry updates much quicker with this input.
 * The input ensures that only offsets updates are written to the registry append only log. The `log` writes the complete file state.
 * Stale entries can be removed from the registry, even if there is no active input.
+* {applies_to}`stack: preview 9.2.0` As a technical preview feature, it can read GZIP files.
 
 
 To configure this input, specify a list of glob-based [`paths`](#filestream-input-paths) that must be crawled to locate and fetch the log lines.
@@ -68,6 +69,63 @@ filebeat.inputs:
 1. Harvests lines from two files:  `system.log` and `wifi.log`.
 2. Harvests lines from every file in the `apache2` directory, and uses the `fields` configuration option to add a field called `apache` to the output.
 
+## Reading GZIP files
+
+```{applies_to}
+stack: preview 9.2.0
+```
+
+::::{warning}
+This functionality is in technical preview and may be changed or removed in a future release. Elastic will work to fix any issues, but features in technical preview are not subject to the support SLA of official GA features.
+::::
+
+The `filestream` input can ingest GZIP files as a **technical preview** feature.
+A GZIP file is treated like any other file, with the same guarantees `filestream`
+offers. This includes offset tracking and resuming from partially read files.
+
+Filestream decompresses GZIP files in memory as data is read. It
+respects [`buffer_size`](#_buffer_size), reading up to `buffer_size` of decompressed data.
+
+To enable it, set `gzip_experimental` to `true`.
+
+```yaml
+filebeat.inputs:
+  - type: filestream
+    id: "test-filestream"
+    paths:
+      - /var/some-app/app.log*
+    gzip_experimental: true
+```
+
+Reading GZIP files requires the [`file_identity`](#filebeat-input-filestream-file-identity)
+to be [`fingerprint`](#filebeat-input-filestream-file-identity-fingerprint), which is the default behaviour.
+
+The fingerprinting is done on the decompressed data, and log rotation is handled automatically.
+
+::::{important}
+Do not configure the [`copytruncate` strategy](#_rotation_external_strategy_copytruncate) for log rotation
+when ingesting GZIP files, as this may lead to data loss. The default mechanisms are sufficient.
+::::
+
+GZIP files are considered immutable, meaning `filestream` does not expect new data to be appended
+to them. Once it reaches the end of the file, the harvester is closed, and `filestream` will not
+attempt to ingest new data.
+
+However, `filestream` correctly handles cases where it starts reading a GZIP
+file while it's still being written to disk. In this scenario, `filestream` will
+read the file until it successfully reaches the end. The end of the file is
+considered reached when the data is fully decompressed, the GZIP footer is read,
+and both size and checksum validations happens. If either validation fails,
+`filestream` logs an error and considers the file fully read.
+
+### Performance impact
+
+Our benchmarks indicate that reading GZIP files has a negligible impact on the 
+throughput of Filebeat and its CPU usage.
+
+However, each harvester reading a GZIP file consumes approximately 100KB of 
+additional memory. You should consider this memory increase when configuring the
+`harvester_limit`.
 
 ## Reading files on network shares and cloud providers [filestream-file-identity]
 
@@ -1046,8 +1104,10 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `processing_errors_total` | Total number of processing errors. |
 | `processing_time` | Histogram of the elapsed time to process messages (expressed in nanoseconds). |
 
-Note:
-
+Note: Each metric listed has a corresponding gzip_* counterpart (e.g.,
+`gzip_files_opened_total`, `gzip_messages_read_total`). These counterparts track
+the same data but exclusively for GZIP compressed files. The original metrics
+provide the total count, including both plain and GZIP files.
 
 ## Common options [filebeat-input-filestream-common-options]
 
