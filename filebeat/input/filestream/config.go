@@ -176,6 +176,17 @@ func (c *config) Validate() error {
 		return fmt.Errorf("no path is configured")
 	}
 
+	// clean_inactive is only enabled if clean_inactive > 0
+	if c.CleanInactive > 0 {
+		if c.CleanInactive <= c.IgnoreOlder+c.FileWatcher.Interval {
+			return fmt.Errorf("clean_inactive must be greater than ignore_older + "+
+				"prospector.scanner.check_interval, however %.2fs <= %.2fs + %.2fs",
+				c.CleanInactive.Seconds(),
+				c.IgnoreOlder.Seconds(),
+				c.FileWatcher.Interval.Seconds())
+		}
+	}
+
 	if c.AllowIDDuplication && c.TakeOver.Enabled {
 		return errors.New("allow_deprecated_id_duplication and take_over " +
 			"cannot be enabled at the same time")
