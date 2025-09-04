@@ -78,6 +78,7 @@ type BeatProc struct {
 	jobObject           proc.Job
 	stopOnce            sync.Once
 	Cmd                 *exec.Cmd
+	expectedErrorCode   int
 }
 
 type Meta struct {
@@ -350,6 +351,15 @@ func (b *BeatProc) stopNonsynced() {
 		defer b.waitingMutex.Unlock()
 		err := b.Cmd.Wait()
 		if err != nil {
+			if b.expectedErrorCode != 0 {
+				if b.Cmd.ProcessState.ExitCode() != b.expectedErrorCode {
+					b.t.Fatalf("expecting exit code %d, got %d",
+						b.expectedErrorCode,
+						b.Cmd.ProcessState.ExitCode())
+				}
+				return
+			}
+
 			b.t.Logf("[WARN] got an error waiting %s to stop: %v", b.beatName, err)
 			return
 		}
@@ -762,6 +772,13 @@ func (b *BeatProc) getEventLogFileGlob() string {
 	year := time.Now().Year()
 	glob := fmt.Sprintf("%s-events-data-%d*.ndjson", filepath.Join(b.tempDir, b.beatName), year)
 	return glob
+}
+
+// SetExpectedErrorCode sets the expected exit error code.
+// Setting this asserts the exit error code once the Beat
+// process exits.
+func (b *BeatProc) SetExpectedErrorCode(errorCode int) {
+	b.expectedErrorCode = errorCode
 }
 
 // createTempDir creates a temporary directory that will be

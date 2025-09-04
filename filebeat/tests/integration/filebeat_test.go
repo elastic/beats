@@ -92,3 +92,79 @@ func TestFilebeatRunsAndLogsJSONToFile(t *testing.T) {
 		count++
 	}
 }
+
+func TestCleanInactiveValidation(t *testing.T) {
+	testCases := map[string]struct {
+		cfg      string
+		log      string
+		exitCode int
+	}{
+		"clean_inactive smaller than ignore_older plus check_interval": {
+			log:      "clean_inactive must be greater than ignore_older + prospector.scanner.check_interval",
+			exitCode: 1,
+			cfg: `
+filebeat.inputs:
+- type: filestream
+  id: my-filestream-id
+  clean_inactive: 5m
+  ignore_older: 10m
+  paths:
+    - /var/log/*.log
+
+output.discard:
+  enabled: true
+`,
+		},
+		"clean_inactive can only be used if ignore_older is enabled": {
+			log:      "clean_inactive can only be enabled if ignore_older is also enabled",
+			exitCode: 1,
+			cfg: `
+filebeat.inputs:
+- type: filestream
+  id: my-filestream-id
+  clean_inactive: 42h
+  paths:
+    - /var/log/*.log
+output.discard:
+  enabled: true
+`,
+		},
+		"correct configuration": {
+			log: "Input 'filestream' starting",
+			cfg: `
+filebeat.inputs:
+- type: filestream
+  id: my-filestream-id
+  clean_inactive: 42h42m
+  ignore_older: 42h
+  paths:
+    - /var/log/*.log
+
+output.discard:
+  enabled: true
+`,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			filebeat := integration.NewBeat(
+				t,
+				"filebeat",
+				"../../filebeat.test",
+			)
+
+			filebeat.WriteConfigFile(tc.cfg)
+
+			// Set the expected exit code to 1 if we're expecting
+			//Filebeat to exit with an error
+			filebeat.SetExpectedErrorCode(tc.exitCode)
+
+			filebeat.Start()
+
+			if tc.log != "" {
+				filebeat.WaitLogsContains(tc.log, 10*time.Second)
+			}
+		})
+	}
+}
