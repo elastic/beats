@@ -913,3 +913,32 @@ output.discard:
 		})
 	}
 }
+
+func TestCleanInactiveLegacyBehaviour(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	logFilePath := filepath.Join(filebeat.TempDir(), "log.log")
+	integration.WriteLogFile(t, logFilePath, 42, false)
+	cfg := getConfig(
+		t,
+		map[string]any{
+			"logFilePath": logFilePath,
+		},
+		"",
+		"filestream_clean_inactive_legacy_behaviour.yml")
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	// Wait for the whole file to be ingested
+	filebeat.WaitPublishedEvents(20*time.Second, 42)
+	filebeat.Stop()
+
+	// Because legacy_clean_inactive: true, upon restart
+	// Filebeat will re-ingest all files.
+	filebeat.Start()
+	filebeat.WaitPublishedEvents(20*time.Second, 84)
+}
