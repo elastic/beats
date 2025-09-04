@@ -58,17 +58,16 @@ const (
 // azureInputConfig the Azure Event Hub input v2,
 // that uses the modern Azure Event Hub SDK for Go.
 type eventHubInputV2 struct {
-	config                  azureInputConfig
-	log                     *logp.Logger
-	metrics                 *inputMetrics
-	checkpointStore         *checkpoints.BlobStore
-	consumerClient          *azeventhubs.ConsumerClient
-	pipeline                beat.Pipeline
-	messageDecoder          messageDecoder
-	migrationAssistant      *migrationAssistant
-	setupFn                 func(ctx context.Context) error
-	status                  status.StatusReporter
-	partitionFailureTracker *partitionFailureTracker
+	config             azureInputConfig
+	log                *logp.Logger
+	metrics            *inputMetrics
+	checkpointStore    *checkpoints.BlobStore
+	consumerClient     *azeventhubs.ConsumerClient
+	pipeline           beat.Pipeline
+	messageDecoder     messageDecoder
+	migrationAssistant *migrationAssistant
+	setupFn            func(ctx context.Context) error
+	status             status.StatusReporter
 }
 
 // newEventHubInputV2 creates a new instance of the Azure Event Hub input v2,
@@ -99,7 +98,6 @@ func (in *eventHubInputV2) Run(
 
 	// Setting up the status reporter helper
 	in.status = statusreporterhelper.New(inputContext.StatusReporter, in.log, "Azure Event Hub")
-	in.partitionFailureTracker = newPartitionFailureTracker(partitionMinFailureWindow, partitionInitFailureThreshold)
 
 	// When the input is initializing before attempting to connect to Azure Event Hub.
 	in.status.UpdateStatus(status.Starting, "Input starting")
