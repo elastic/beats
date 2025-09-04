@@ -32,4 +32,3 @@ As a workaround, and to prevent crashes, Beats will ignore any filters provided 
 % On [Month/Day/Year], this issue was resolved.
 
 :::
-
