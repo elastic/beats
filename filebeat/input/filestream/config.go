@@ -34,7 +34,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// Config stores the options of a file stream.
+// config stores the options of a file stream.
 type config struct {
 	Reader readerConfig `config:",inline"`
 
@@ -49,7 +49,9 @@ type config struct {
 	// This feature is experimental and subject to change.
 	GZIPExperimental bool `config:"gzip_experimental"`
 
-	// -1 means that registry will never be cleaned
+	// -1 means that registry will never be cleaned, disabling clean_inactive.
+	// Setting it to 0 also disables clean_inactive
+	// "clean_inactive" is parsed, again, and used by internal/input-logfile/manager.go
 	CleanInactive  time.Duration      `config:"clean_inactive" validate:"min=-1"`
 	CleanRemoved   bool               `config:"clean_removed"`
 	HarvesterLimit uint32             `config:"harvester_limit" validate:"min=0"`
@@ -174,6 +176,10 @@ func defaultDeleterConfig() deleterConfig {
 func (c *config) Validate() error {
 	if len(c.Paths) == 0 {
 		return fmt.Errorf("no path is configured")
+	}
+
+	if c.IgnoreOlder == 0 && c.CleanInactive > 0 {
+		return errors.New("clean_inactive can only be enabled if ignore_older is also enabled")
 	}
 
 	// clean_inactive is only enabled if clean_inactive > 0

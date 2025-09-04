@@ -108,6 +108,13 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 		return nil, nil, err
 	}
 
+	// zero must also disable clean_inactive, see:
+	// https://github.com/elastic/beats/issues/45601
+	// for more details.
+	if c.CleanInactive == 0 {
+		c.CleanInactive = -1
+	}
+
 	// log warning if deprecated params are set
 	c.checkUnsupportedParams(log)
 
