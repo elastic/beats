@@ -186,10 +186,10 @@ func (c *config) Validate() error {
 	if c.CleanInactive > 0 {
 		if c.CleanInactive <= c.IgnoreOlder+c.FileWatcher.Interval {
 			return fmt.Errorf("clean_inactive must be greater than ignore_older + "+
-				"prospector.scanner.check_interval, however %.2fs <= %.2fs + %.2fs",
-				c.CleanInactive.Seconds(),
-				c.IgnoreOlder.Seconds(),
-				c.FileWatcher.Interval.Seconds())
+				"prospector.scanner.check_interval, however %s <= %s + %s",
+				c.CleanInactive.String(),
+				c.IgnoreOlder.String(),
+				c.FileWatcher.Interval.String())
 		}
 	}
 
