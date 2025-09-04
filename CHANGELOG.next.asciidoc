@@ -196,6 +196,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Fix message handling in the experimental api. {issue}19338[19338] {pull}41730[41730]
+- Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
 
 
 *Elastic Logging Plugin*
