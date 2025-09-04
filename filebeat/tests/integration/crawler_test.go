@@ -68,7 +68,7 @@ output.file:
 	filebeat.Start()
 
 	// 3. Create the log file
-	integration.GenerateLogFile(t, filepath.Join(tempDir, "log.log"), 10, false)
+	integration.WriteLogFile(t, filepath.Join(tempDir, "log.log"), 10, false)
 
 	// wait for output file to exist
 	var outputFile string
@@ -83,7 +83,7 @@ output.file:
 	}, 2*time.Minute, 10*time.Second)
 
 	// Ensure all log lines are ingested eventually
-	integration.AssertLinesInFile(t, outputFile, 10)
+	integration.WaitLineCountInFile(t, outputFile, 10)
 
 	// append a line without \n and ensure it is not crawled
 	logFile, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
@@ -98,7 +98,7 @@ output.file:
 	}
 
 	// Ensure number of lines has not increased
-	integration.AssertLinesInFile(t, outputFile, 10)
+	integration.WaitLineCountInFile(t, outputFile, 10)
 
 	// add \n to logfile
 	_, err = logFile.Write([]byte("\n"))
@@ -107,20 +107,20 @@ output.file:
 	}
 
 	// Add one more line to make sure it keeps reading
-	integration.GenerateLogFile(t, filepath.Join(tempDir, "log.log"), 1, true)
+	integration.WriteLogFile(t, filepath.Join(tempDir, "log.log"), 1, true)
 
 	// Ensure all logs are ingested
-	integration.AssertLinesInFile(t, outputFile, 12)
+	integration.WaitLineCountInFile(t, outputFile, 12)
 
 	// rename the file
 	assert.NoError(t, os.Rename(logFilePath, filepath.Join(tempDir, "newlog.log")))
 
 	// using 6 events to have a separate log line that we can
 	// grep for.
-	integration.GenerateLogFile(t, filepath.Join(tempDir, "newlog.log"), 6, true)
+	integration.WriteLogFile(t, filepath.Join(tempDir, "newlog.log"), 6, true)
 
 	// Ensure all logs are ingested
-	integration.AssertLinesInFile(t, outputFile, 18)
+	integration.WaitLineCountInFile(t, outputFile, 18)
 
 }
 
@@ -159,9 +159,9 @@ output.file:
 
 	// 3. Create the log file
 	iterations := 20
-	integration.GenerateLogFile(t, logFilePath, iterations, false, "DBG: a simple debug message")
-	integration.GenerateLogFile(t, logFilePath, iterations, true, "ERR: a simple error message")
-	integration.GenerateLogFile(t, logFilePath, iterations, true, "WARNING: a simple warning message")
+	integration.WriteLogFile(t, logFilePath, iterations, false, "DBG: a simple debug message")
+	integration.WriteLogFile(t, logFilePath, iterations, true, "ERR: a simple error message")
+	integration.WriteLogFile(t, logFilePath, iterations, true, "WARNING: a simple warning message")
 
 	// wait for output file to exist
 	var outputFile string
@@ -176,7 +176,7 @@ output.file:
 	}, 2*time.Minute, 10*time.Second)
 
 	// Ensure include_lines only events are ingested
-	integration.AssertLinesInFile(t, outputFile, 2*iterations)
+	integration.WaitLineCountInFile(t, outputFile, 2*iterations)
 }
 
 // Checks log lines defined by exclude_lines are excluded
@@ -214,9 +214,9 @@ output.file:
 
 	// 3. Create the log file
 	iterations := 20
-	integration.GenerateLogFile(t, logFilePath, iterations, false, "DBG: a simple debug message")
-	integration.GenerateLogFile(t, logFilePath, iterations, true, "ERR: a simple error message")
-	integration.GenerateLogFile(t, logFilePath, iterations, true, "WARNING: a simple warning message")
+	integration.WriteLogFile(t, logFilePath, iterations, false, "DBG: a simple debug message")
+	integration.WriteLogFile(t, logFilePath, iterations, true, "ERR: a simple error message")
+	integration.WriteLogFile(t, logFilePath, iterations, true, "WARNING: a simple warning message")
 
 	// wait for output file to exist
 	var outputFile string
@@ -230,5 +230,5 @@ output.file:
 		return true
 	}, 2*time.Minute, 10*time.Second)
 
-	integration.AssertLinesInFile(t, outputFile, 2*iterations)
+	integration.WaitLineCountInFile(t, outputFile, 2*iterations)
 }

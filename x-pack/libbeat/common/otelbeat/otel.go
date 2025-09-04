@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
+	"github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -80,6 +81,13 @@ func getComponent() (otelcol.Factories, error) {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
 	}
 
+	processors, err := otelcol.MakeFactoryMap(
+		beatprocessor.NewFactory(),
+	)
+	if err != nil {
+		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
+	}
+
 	exporters, err := otelcol.MakeFactoryMap(
 		debugexporter.NewFactory(),
 		elasticsearchexporter.NewFactory(),
@@ -89,8 +97,9 @@ func getComponent() (otelcol.Factories, error) {
 	}
 
 	return otelcol.Factories{
-		Receivers: receivers,
-		Exporters: exporters,
+		Receivers:  receivers,
+		Processors: processors,
+		Exporters:  exporters,
 	}, nil
 
 }

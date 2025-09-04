@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-system-ntp.html
 
 applies_to:
-  stack: beta
+  stack: beta 9.2.0
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -30,6 +30,9 @@ This metricset is available on:
 
 **`ntp.version`**
 :   Version of the NTP protocol to use. Must be one of "3" or "4". Defaults to "4".
+
+**`ntp.validate`**
+:   Whether to validate the NTP response if it is suitable for time synchronization purposes. If not, the response will be skipped. Must be one of "true" or "false". Defaults to "true".
 
 ## Fields [_fields]
 
