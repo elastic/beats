@@ -39,6 +39,56 @@ The logs include detailed information about:
   table_id: "your_project.your_dataset.your_vertex_ai_logs_table"
 ```
 
+## Sample Event
+
+Here is a sample event for `vertexai_logs`:
+
+```json
+{
+  "@timestamp": "2023-12-01T10:30:45.000Z",
+  "cloud": {
+    "provider": "gcp",
+    "project": {
+      "id": "my-gcp-project"
+    }
+  },
+  "gcp": {
+    "vertexai_logs": {
+      "endpoint": "https://us-central1-aiplatform.googleapis.com",
+      "deployed_model_id": "1234567890123456789",
+      "logging_time": "2023-12-01T10:30:45.000Z",
+      "request_id": 98765432101234567,
+      "request_payload": ["What is machine learning?"],
+      "response_payload": ["Machine learning is a subset of artificial intelligence..."],
+      "model": "gemini-2.5-pro",
+      "model_version": "1.0",
+      "api_method": "generateContent",
+      "full_request": {
+        "inputs": ["What is machine learning?"],
+        "parameters": {
+          "temperature": 0.7
+        }
+      },
+      "full_response": {
+        "outputs": ["Machine learning is a subset of artificial intelligence..."],
+        "usage": {
+          "input_tokens": 5,
+          "output_tokens": 50
+        }
+      },
+      "metadata": {
+        "user_id": "user123",
+        "session_id": "session456"
+      },
+      "otel_log": {
+        "trace_id": "abc123def456",
+        "span_id": "789ghi012jkl"
+      }
+    }
+  }
+}
+```
+
 ## Fields [_fields]
 
 For a description of each field in the metricset, see the [exported fields](/reference/metricbeat/exported-fields-gcp.md) section.
