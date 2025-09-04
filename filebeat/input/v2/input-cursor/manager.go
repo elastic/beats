@@ -125,10 +125,11 @@ func (cim *InputManager) Init(group unison.Group) error {
 	cleaner := &cleaner{log: log}
 	store.Retain()
 	// TL;DR: If Filebeat shuts down too quickly, the function passed to
-	// `group.Go` will never run, therefore this instance of InputManager
-	// will never be shutdown, locking Filebeat's shutdown process.
+	// `group.Go` will never run, therefore this instance of store will
+	// never be released, locking Filebeat's shutdown process.
 	//
 	// To circumvent that, we wait for `group.Go` to start our function.
+	// See https://github.com/elastic/beats/issues/45034#issuecomment-3238261126
 	waitRunning := make(chan struct{})
 	err := group.Go(func(canceler context.Context) error {
 		waitRunning <- struct{}{}
