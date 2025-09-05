@@ -19,7 +19,7 @@ Known issues are significant defects or limitations that may impact your impleme
 % **Resolved**
 % On [Month/Day/Year], this issue was resolved.
 
-:::
+% :::
 
 :::{dropdown} Winlogbeat and Filebeat `winlog` input can crash the Event Log on Windows Server 2025.
 **Details** 
@@ -32,6 +32,7 @@ As a workaround, and to prevent crashes, Beats will ignore any filters provided 
 % On [Month/Day/Year], this issue was resolved.
 
 :::
+
 
 :::{dropdown} Filebeat's Filestream input does not validate `clean_inactive`.
 **Applies to**: Filebeat < 9.2.0
@@ -55,3 +56,4 @@ on start up, effectively re-ingesting all files on restart.
 large value. For example, use `clean_inactive: 43800h0m0s`, which is 5 years.
 
 **Fixed in**: 9.2.0
+:::
