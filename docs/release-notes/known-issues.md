@@ -30,5 +30,148 @@ As a workaround, and to prevent crashes, Beats will ignore any filters provided 
 
 % **Resolved**
 % On [Month/Day/Year], this issue was resolved.
+:::
+
+:::{dropdown} Beats panic on restart when "restart_on_cert_change" is enabled on Linux
+
+**Details**
+A known issue was discovered where Beats running on Linux with `restart_on_cert_change` enabled panic during a restart. This occurs because the default seccomp policy does not include the `eventfd2` syscall, which is used by Go runtime versions 1.23.0. While the initial launch is successful, subsequent restarts fail as the seccomp policy is already active, blocking the required syscall.
+
+This affects versions v8.16.6+, v8.17.3+, v8.18.0+, v8.19.0+, v9.0.0+, and v9.1.0+.
+
+**Workaround**
+Add a custom seccomp policy to the beat configuration file that explicitly includes the eventfd2 syscall. This custom policy overrides the default, so it must contain a complete list of all required syscalls.
+```
+seccomp:
+  syscalls:
+    - action: allow
+      names:
+        - accept
+        - accept4
+        - access
+        - arch_prctl
+        - bind
+        - brk
+        - capget
+        - chmod
+        - chown
+        - clock_gettime
+        - clock_nanosleep
+        - clone
+        - clone3
+        - close
+        - connect
+        - dup
+        - dup2
+        - dup3
+        - epoll_create
+        - epoll_create1
+        - epoll_ctl
+        - epoll_pwait
+        - epoll_wait
+        - eventfd2
+        - execve
+        - exit
+        - exit_group
+        - faccessat
+        - faccessat2
+        - fchdir
+        - fchmod
+        - fchmodat
+        - fchown
+        - fchownat
+        - fcntl
+        - fdatasync
+        - flock
+        - fstat
+        - fstatfs
+        - fsync
+        - ftruncate
+        - futex
+        - getcwd
+        - getdents
+        - getdents64
+        - geteuid
+        - getgid
+        - getpeername
+        - getpid
+        - getppid
+        - getrandom
+        - getrlimit
+        - getrusage
+        - getsockname
+        - getsockopt
+        - gettid
+        - gettimeofday
+        - getuid
+        - inotify_add_watch
+        - inotify_init1
+        - inotify_rm_watch
+        - ioctl
+        - kill
+        - listen
+        - lseek
+        - lstat
+        - madvise
+        - mincore
+        - mkdirat
+        - mmap
+        - mprotect
+        - munmap
+        - nanosleep
+        - newfstatat
+        - open
+        - openat
+        - pipe
+        - pipe2
+        - poll
+        - ppoll
+        - prctl
+        - pread64
+        - pselect6
+        - pwrite64
+        - read
+        - readlink
+        - readlinkat
+        - recvfrom
+        - recvmmsg
+        - recvmsg
+        - rename
+        - renameat
+        - rseq
+        - rt_sigaction
+        - rt_sigprocmask
+        - rt_sigreturn
+        - sched_getaffinity
+        - sched_yield
+        - sendfile
+        - sendmmsg
+        - sendmsg
+        - sendto
+        - set_robust_list
+        - setitimer
+        - setrlimit
+        - setsockopt
+        - shutdown
+        - sigaltstack
+        - socket
+        - splice
+        - stat
+        - statfs
+        - sysinfo
+        - tgkill
+        - time
+        - tkill
+        - uname
+        - unlink
+        - unlinkat
+        - wait4
+        - waitid
+        - write
+        - writev
+```
+
+% **Resolved**
+% This issue was resolved by updating the default seccomp policy to include the `eventfd2` syscall. To apply the fix, please upgrade to version 8.18.7, 8.19.4, 9.0.7, 9.1.4, or any subsequent release.
 
 :::
