@@ -245,6 +245,7 @@ require (
 	go.opentelemetry.io/collector/processor/processorhelper v0.130.0
 	go.opentelemetry.io/collector/receiver/receivertest v0.130.0
 	go.opentelemetry.io/otel/sdk/metric v1.37.0
+	go.uber.org/goleak v1.3.0
 	sigs.k8s.io/kind v0.29.0
 )
 

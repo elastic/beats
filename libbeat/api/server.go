@@ -33,11 +33,12 @@ import (
 // Server takes care of correctly starting the HTTP component of the API
 // and will answer all the routes defined in the received ServeMux.
 type Server struct {
-	log    *logp.Logger
-	mux    *http.ServeMux
-	l      net.Listener
-	config Config
-	wg     sync.WaitGroup
+	log        *logp.Logger
+	mux        *http.ServeMux
+	l          net.Listener
+	config     Config
+	wg         sync.WaitGroup
+	httpServer *http.Server
 }
 
 // New creates a new API Server with no routes attached.
@@ -68,16 +69,17 @@ func (s *Server) Start() {
 	go func(l net.Listener) {
 		defer s.wg.Done()
 		s.log.Infof("Metrics endpoint listening on: %s (configured: %s)", l.Addr().String(), s.config.Host)
-		err := http.Serve(l, s.mux) //nolint:gosec // Keep original behavior
+		srv := &http.Server{Handler: s.mux} //nolint:gosec // Keep original behavior
+		s.httpServer = srv
+		err := srv.Serve(l)
 		s.log.Infof("Stats endpoint (%s) finished: %v", l.Addr().String(), err)
 	}(s.l)
 }
 
 // Stop stops the API server and free any resource associated with the process like unix sockets.
 func (s *Server) Stop() error {
-	err := s.l.Close()
-	if err != nil {
-		return fmt.Errorf("error stopping monitoring server: %w", err)
+	if err := s.httpServer.Close(); err != nil {
+		return fmt.Errorf("error closing monitoring server: %w", err)
 	}
 	s.wg.Wait()
 	return nil
@@ -85,7 +87,7 @@ func (s *Server) Stop() error {
 
 // AttachHandler will attach a handler at the specified route. Routes are
 // matched in the order in which that are attached.
-// Attaching teh same route twice will panic
+// Attaching the same route twice will panic
 func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
 	s.mux.Handle(route, h)
 	if !strings.HasSuffix(route, "/") && !strings.HasSuffix(route, "{$}") {
