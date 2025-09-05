@@ -108,6 +108,14 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 		return nil, nil, err
 	}
 
+	// zero must also disable clean_inactive, see:
+	// https://github.com/elastic/beats/issues/45601
+	// for more details. At the same time we need to allow
+	// users to keep the old behaviour.
+	if !c.LegacyCleanInactive && c.CleanInactive == 0 {
+		c.CleanInactive = -1
+	}
+
 	// log warning if deprecated params are set
 	c.checkUnsupportedParams(log)
 
@@ -139,16 +147,7 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 
 	// Read the scan interval from the prospector so we can use during the
 	// grace period of the delete
-	if c.FileWatcher != nil {
-		tmpCfg := struct {
-			CheckInterval time.Duration `config:"check_interval"`
-		}{}
-		if err := c.FileWatcher.Config().Unpack(&tmpCfg); err != nil {
-			return nil, nil, fmt.Errorf("cannot unpack 'scanner.check_interval: %w'", err)
-		}
-
-		filestream.scannerCheckInterval = tmpCfg.CheckInterval
-	}
+	filestream.scannerCheckInterval = c.FileWatcher.Interval
 
 	return prospector, filestream, nil
 }

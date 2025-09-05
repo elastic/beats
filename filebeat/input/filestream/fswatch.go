@@ -35,7 +35,6 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	commonfile "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -50,6 +49,7 @@ var (
 	errFileTooSmall = errors.New("file size is too small for ingestion")
 )
 
+// fileWatcherConfig is the prospector.scanner configuration
 type fileWatcherConfig struct {
 	// Interval is the time between two scans.
 	Interval time.Duration `config:"check_interval"`
@@ -73,24 +73,7 @@ type fileWatcher struct {
 	events  chan loginp.FSEvent
 }
 
-func newFileWatcher(logger *logp.Logger, paths []string, ns *conf.Namespace, gzipAllowed bool, sendNotChanged bool) (loginp.FSWatcher, error) {
-	var config *conf.C
-	if ns == nil {
-		config = conf.NewConfig()
-	} else {
-		config = ns.Config()
-	}
-
-	return newScannerWatcher(logger, paths, config, gzipAllowed, sendNotChanged)
-}
-
-func newScannerWatcher(logger *logp.Logger, paths []string, c *conf.C, gzipAllowed bool, sendNotChanged bool) (loginp.FSWatcher, error) {
-	config := defaultFileWatcherConfig()
-	err := c.Unpack(&config)
-	if err != nil {
-		return nil, err
-	}
-
+func newFileWatcher(logger *logp.Logger, paths []string, config fileWatcherConfig, gzipAllowed bool, sendNotChanged bool) (loginp.FSWatcher, error) {
 	config.SendNotChanged = sendNotChanged
 	scanner, err := newFileScanner(logger, paths, config.Scanner, gzipAllowed)
 	if err != nil {

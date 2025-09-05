@@ -118,22 +118,10 @@ func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 }
 
 func checkConfigCompatibility(config config) error {
-	var fwCfg struct {
-		Fingerprint struct {
-			Enabled bool `config:"enabled"`
-		} `config:"fingerprint"`
-	}
-
-	if config.FileWatcher != nil &&
-		config.FileIdentity != nil &&
-		config.FileIdentity.Name() == fingerprintName {
-		err := config.FileWatcher.Config().Unpack(&fwCfg)
-		if err != nil {
-			return fmt.Errorf("failed to parse file watcher configuration: %w", err)
-		}
-		if !fwCfg.Fingerprint.Enabled {
-			return fmt.Errorf("fingerprint file identity can be used only when fingerprint is enabled in the scanner")
-		}
+	if config.FileIdentity != nil &&
+		config.FileIdentity.Name() == fingerprintName &&
+		!config.FileWatcher.Scanner.Fingerprint.Enabled {
+		return fmt.Errorf("fingerprint file identity can be used only when fingerprint is enabled in the scanner")
 	}
 
 	return nil
