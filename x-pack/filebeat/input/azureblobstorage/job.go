@@ -65,7 +65,7 @@ func newJob(client *blob.Client, blob *azcontainer.BlobItem, blobURL string,
 ) *job {
 	if metrics == nil {
 		// metrics are optional, initialize a stub if not provided
-		metrics = newInputMetrics(monitoring.NewRegistry())
+		metrics = newInputMetrics(monitoring.NewRegistry(), log)
 	}
 
 	return &job{

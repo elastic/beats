@@ -105,7 +105,7 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	}
 	stat.UpdateStatus(status.Starting, "")
 	p.logger = inputCtx.Logger.With("provider", Name, "domain", p.cfg.OktaDomain)
-	p.metrics = newMetrics(inputCtx.MetricsRegistry)
+	p.metrics = newMetrics(inputCtx.MetricsRegistry, p.logger)
 
 	lastSyncTime, _ := getLastSync(store)
 	syncWaitTime := time.Until(lastSyncTime.Add(p.cfg.SyncInterval))

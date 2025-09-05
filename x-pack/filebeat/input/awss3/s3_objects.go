@@ -66,10 +66,15 @@ const (
 // retry backoff until the connection is healthy again.
 var errS3DownloadFailed = errors.New("S3 download failure")
 
-func newS3ObjectProcessorFactory(metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
+func newS3ObjectProcessorFactory(metrics *inputMetrics,
+	s3 s3API,
+	sel []fileSelectorConfig,
+	backupConfig backupConfig,
+	logger *logp.Logger,
+) *s3ObjectProcessorFactory {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
-		metrics = newInputMetrics(monitoring.NewRegistry(), 0)
+		metrics = newInputMetrics(monitoring.NewRegistry(), 0, logger)
 	}
 	if len(sel) == 0 {
 		sel = []fileSelectorConfig{

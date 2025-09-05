@@ -24,8 +24,8 @@ import (
 	"strconv"
 	"sync/atomic"
 
+	"github.com/gohugoio/hashstructure"
 	"github.com/jonboulle/clockwork"
-	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"

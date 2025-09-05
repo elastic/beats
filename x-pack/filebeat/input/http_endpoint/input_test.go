@@ -433,7 +433,7 @@ func TestServerPool(t *testing.T) {
 				fails = make(chan error, 1)
 			)
 			ctx, cancel := newCtx("server_pool_test", test.name)
-			metrics := newInputMetrics(monitoring.NewRegistry())
+			metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
 			var wg sync.WaitGroup
 			for _, cfg := range test.cfgs {
 				cfg := cfg

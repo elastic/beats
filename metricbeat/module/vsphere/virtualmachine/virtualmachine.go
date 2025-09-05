@@ -242,7 +242,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 		triggeredAlarm, err := getTriggeredAlarm(ctx, pc, vm.TriggeredAlarmState)
 		if err != nil {
-			m.Logger().Errorf("Failed to retrieve alerts from VM %s: %w", vm.Name, err)
+			m.Logger().Errorf("Failed to retrieve alerts from VM %s: %v", vm.Name, err)
 		}
 
 		data := VMData{

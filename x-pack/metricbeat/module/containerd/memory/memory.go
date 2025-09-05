@@ -127,17 +127,17 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 		if m.calcPct {
 			inactiveFiles, err := event.GetValue("inactiveFiles")
 			if err != nil {
-				m.Logger().Debugf("memoryUsagePct calculation skipped. inactiveFiles not present in the event: %w", err)
+				m.Logger().Debugf("memoryUsagePct calculation skipped. inactiveFiles not present in the event: %v", err)
 				continue
 			}
 			usageTotal, err := event.GetValue("usage.total")
 			if err != nil {
-				m.Logger().Debugf("memoryUsagePct calculation skipped. usage.total not present in the event: %w", err)
+				m.Logger().Debugf("memoryUsagePct calculation skipped. usage.total not present in the event: %v", err)
 				continue
 			}
 			memoryLimit, err := event.GetValue("usage.limit")
 			if err != nil {
-				m.Logger().Debugf("memoryUsagePct calculation skipped. usage.limit not present in the event: %w", err)
+				m.Logger().Debugf("memoryUsagePct calculation skipped. usage.limit not present in the event: %v", err)
 				continue
 			}
 			mLfloat, ok := memoryLimit.(float64)

@@ -39,7 +39,7 @@ that data will span multiple requests. Specifically the fields `http.rtt.content
 [[monitor-http-proxy-url]]
 ==== `proxy_url`
 
-The HTTP proxy URL. This setting is optional. Example `http://proxy.mydomain.com:3128`
+The HTTP proxy URL. This setting is optional. Example `http://proxy.example.com:3128`
 
 [float]
 [[monitor-http-proxy-headers]]

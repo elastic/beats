@@ -995,7 +995,7 @@ func (cm *BeatV2Manager) handleDebugYaml() []byte {
 
 	data, err := yaml.Marshal(beatCfg)
 	if err != nil {
-		cm.logger.Errorf("error generating YAML for input debug callback: %w", err)
+		cm.logger.Errorf("error generating YAML for input debug callback: %v", err)
 		return nil
 	}
 	return data

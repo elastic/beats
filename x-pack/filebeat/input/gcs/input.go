@@ -137,7 +137,7 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 	log := inputCtx.Logger.With("project_id", currentSource.ProjectId).With("bucket", currentSource.BucketName)
 	log.Infof("Running google cloud storage for project: %s", input.config.ProjectId)
 	// create a new inputMetrics instance
-	metrics := newInputMetrics(inputCtx.MetricsRegistry)
+	metrics := newInputMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
 	metrics.url.Set("gs://" + currentSource.BucketName)
 
 	var cp *Checkpoint

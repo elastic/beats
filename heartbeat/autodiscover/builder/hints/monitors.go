@@ -124,7 +124,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 
 		h, err := hb.getHostsWithPort(monitor, port, podEvent)
 		if err != nil {
-			hb.logger.Warnf("unable to find valid hosts for %+v: %w", monitor, err)
+			hb.logger.Warnf("unable to find valid hosts for %+v: %v", monitor, err)
 			continue
 		}
 
@@ -135,7 +135,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 			hb.logger.Debugf("unable to create config from MapStr %+v", tempCfg)
 			return []*conf.C{}
 		}
-		hb.logger.Debugf("hints.builder", "generated config %+v", config)
+		hb.logger.Debugf("generated config %+v", config)
 		configs = append(configs, config)
 	}
 

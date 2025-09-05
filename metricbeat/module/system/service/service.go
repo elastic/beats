@@ -24,7 +24,7 @@ import (
 	"path/filepath"
 
 	"github.com/coreos/go-systemd/v22/dbus"
-	"github.com/mitchellh/mapstructure"
+	"github.com/go-viper/mapstructure/v2"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
