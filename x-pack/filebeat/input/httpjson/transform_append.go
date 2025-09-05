@@ -122,7 +122,15 @@ func newAppend(cfg *conf.C, log *logp.Logger) (appendt, error) {
 }
 
 func (append *appendt) run(ctx *transformContext, tr transformable) (transformable, error) {
+<<<<<<< HEAD
 	value, err := append.value.Execute(ctx, tr, append.targetInfo.Name, append.defaultValue, append.log)
+=======
+	stat := append.status
+	if append.doNotLogFailure {
+		stat = ignoreEmptyValueReporter{stat}
+	}
+	value, err := append.value.Execute(ctx, tr, append.targetInfo.Name, append.defaultValue, stat, append.log)
+>>>>>>> 64617f5fe (x-pack/filebeat/input/httpjson: improve/fix logic for health status updates (#46332))
 	if err != nil && append.failOnTemplateError {
 		if append.doNotLogFailure {
 			err = notLogged{err}

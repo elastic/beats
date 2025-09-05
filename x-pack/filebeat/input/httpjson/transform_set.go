@@ -108,7 +108,15 @@ func newSet(cfg *conf.C, log *logp.Logger) (set, error) {
 }
 
 func (set *set) run(ctx *transformContext, tr transformable) (transformable, error) {
+<<<<<<< HEAD
 	value, err := set.value.Execute(ctx, tr, set.targetInfo.Name, set.defaultValue, set.log)
+=======
+	stat := set.status
+	if set.doNotLogFailure {
+		stat = ignoreEmptyValueReporter{stat}
+	}
+	value, err := set.value.Execute(ctx, tr, set.targetInfo.Name, set.defaultValue, stat, set.log)
+>>>>>>> 64617f5fe (x-pack/filebeat/input/httpjson: improve/fix logic for health status updates (#46332))
 	if err != nil && set.failOnTemplateError {
 		if set.doNotLogFailure {
 			err = notLogged{err}

@@ -50,7 +50,15 @@ func (c *cursor) update(trCtx *transformContext) {
 	}
 
 	for k, cfg := range c.cfg {
+<<<<<<< HEAD
 		v, _ := cfg.Value.Execute(trCtx, transformable{}, k, cfg.Default, c.log)
+=======
+		stat := c.status
+		if cfg.doNotLogFailure() || cfg.mustIgnoreEmptyValue() {
+			stat = ignoreEmptyValueReporter{stat}
+		}
+		v, _ := cfg.Value.Execute(trCtx, transformable{}, k, cfg.Default, stat, c.log)
+>>>>>>> 64617f5fe (x-pack/filebeat/input/httpjson: improve/fix logic for health status updates (#46332))
 		if v != "" || !cfg.mustIgnoreEmptyValue() {
 			_, _ = c.state.Put(k, v)
 			c.log.Debugf("cursor.%s stored with %s", k, v)
