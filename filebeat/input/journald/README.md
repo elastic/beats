@@ -3,6 +3,7 @@
 The Journald input reads journal entries by calling `journalctl`.
 
 ## Adding entries to the journal
+### Using `systemd-cat`
 The easiest way to add entries to the journal is to use `systemd-cat`:
 ```
 root@vagrant-debian-12:~/filebeat# echo "Hello Journal!" | systemd-cat
@@ -15,6 +16,84 @@ The syslog identifier can be specified with the `-t` parameter:
 root@vagrant-debian-12:~/filebeat# echo "Hello Journal!" | systemd-cat -t my-test
 root@vagrant-debian-12:~/filebeat# journalctl -n 1
 Oct 02 04:17:50 vagrant-debian-12 my-test[1924]: Hello Journal!
+```
+
+### Writing to Journald's socket
+The following Go program will write directly to Journald's socket
+using the method that supports `\n` and binary data.
+```go
+package main
+
+import (
+	"bytes"
+	"encoding/binary"
+	"fmt"
+	"log"
+	"net"
+)
+
+func main() {
+	jd, err := newJdWriter("experiment")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer jd.Close()
+
+	messges := [][]byte{
+		{0, 2, 4, 8, 10, 12, 14, 16, 18},
+		{0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100},
+		[]byte(`FOO\nBAR\nFOO`),
+	}
+
+	for _, msg := range messges {
+		written, err := jd.Write(msg)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("%d bytes written to Journald socket\n", written)
+	}
+
+}
+
+type jdWriter struct {
+	id   string
+	conn net.Conn
+}
+
+func newJdWriter(id string) (jdWriter, error) {
+	conn, err := net.Dial("unixgram", "/run/systemd/journal/socket")
+	if err != nil {
+		return jdWriter{}, fmt.Errorf("cannot open unix socket: %w", err)
+	}
+
+	jd := jdWriter{
+		id:   id,
+		conn: conn,
+	}
+
+	return jd, nil
+}
+
+func (j jdWriter) Write(msg []byte) (int, error) {
+	w := &bytes.Buffer{}
+
+	fmt.Fprintf(w, "SYSLOG_IDENTIFIER=%s\n", j.id)
+	w.WriteString("MESSAGE")
+	w.WriteString("\n")
+	l := len(msg)
+	if err := binary.Write(w, binary.LittleEndian, uint64(l)); err != nil {
+		log.Fatal(err)
+	}
+
+	w.Write(msg)
+	w.WriteString("\n")
+
+	return j.conn.Write(w.Bytes())
+}
+
+func (j jdWriter) Close() error {
+	return j.conn.Close()
+}
 ```
 
 ## Crafting a journal file
