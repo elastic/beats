@@ -16,10 +16,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-<<<<<<< HEAD
-=======
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
->>>>>>> 64617f5fe (x-pack/filebeat/input/httpjson: improve/fix logic for health status updates (#46332))
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
