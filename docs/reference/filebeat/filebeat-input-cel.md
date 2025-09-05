@@ -246,6 +246,8 @@ The CEL environment enables the [optional types](https://pkg.go.dev/github.com/g
 
 Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2.
 
+As described in Mito's [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) documentation, configuration for Basic Authentication or token authentication will only affect direct HEAD, GET and POST method calls, not explicity constructed requests run with `.do_request()`. Configuration for Digest Authentication or OAuth2 will be used for all requests made from CEL.
+
 Example configurations with authentication:
 
 ```yaml
@@ -432,6 +434,9 @@ When set to `false`, disables the basic auth configuration. Default: `true`.
 Basic auth settings are disabled if either `enabled` is set to `false` or the `auth.basic` section is missing.
 ::::
 
+::::{note}
+Basic auth settings do not affect requests run with `.do_request()`, as explained in [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP).
+::::
 
 
 ### `auth.basic.user` [_auth_basic_user]
@@ -627,6 +632,33 @@ Only one of the credentials settings can be set at once. For more information pl
 
 
 
+<<<<<<< HEAD
+=======
+### `auth.token.enabled` [_auth_token_enabled]
+
+When set to `false`, disables the token authentication configuration. Default: `true`.
+
+::::{note}
+Token authentication settings are disabled if either `enabled` is set to `false` or the `auth.token` section is missing.
+::::
+
+::::{note}
+Token authentication settings do not affect requests run with `.do_request()`, as explained in [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP).
+::::
+
+
+### `auth.token.type` [_auth_token_type]
+
+The type of token to authenticate with, for example "Token" or "Bearer".
+
+
+### `auth.token.value` [_auth_token_value]
+
+The token value to use.
+
+
+
+>>>>>>> f942e8540 (docs/refrence/filebeat/filebeat-input-cel.md Explain application of auth configuration (#46253))
 ### `resource.url` [resource-parameters]
 
 The URL of the HTTP API. Required.
