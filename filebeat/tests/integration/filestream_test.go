@@ -902,7 +902,7 @@ output.discard:
 			filebeat.WriteConfigFile(tc.cfg)
 
 			// Set the expected exit code to 1 if we're expecting
-			//Filebeat to exit with an error
+			// Filebeat to exit with an error
 			filebeat.SetExpectedErrorCode(tc.exitCode)
 
 			filebeat.Start()
