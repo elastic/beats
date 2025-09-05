@@ -275,6 +275,8 @@ Additionally, it supports authentication via:
 
 As described in Mito's [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) documentation, configuration for Basic Authentication or token authentication will only affect direct HEAD, GET and POST method calls, not explicity constructed requests run with `.do_request()`. Configuration for Digest Authentication or OAuth2 will be used for all requests made from CEL.
 
+As described in Mito's [HTTP](https://pkg.go.dev/github.com/elastic/mito@v1.19.0#HTTP) documentation, configuration for Basic Authentication will only affect direct HEAD, GET and POST method calls, not explicity constructed requests run with `.do_request()`. Configuration for Digest Authentication or OAuth2 will be used for all requests made from CEL.
+
 Example configurations with authentication:
 
 ```yaml
@@ -491,7 +493,11 @@ Basic auth settings are disabled if either `enabled` is set to `false` or the `a
 ::::
 
 ::::{note}
+<<<<<<< HEAD
 Basic auth settings do not affect requests run with `.do_request()`, as explained in [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP).
+=======
+Basic auth settings do not affect requests run with `.do_request()`, as explained in [HTTP](https://pkg.go.dev/github.com/elastic/mito@v1.19.0#HTTP).
+>>>>>>> 0f484d83c ([9.0](backport #46253) docs/refrence/filebeat/filebeat-input-cel.md Explain application of auth configuration (#46409))
 ::::
 
 
