@@ -52,7 +52,6 @@ func main() {
 		}
 		fmt.Printf("%d bytes written to Journald socket\n", written)
 	}
-
 }
 
 type jdWriter struct {
