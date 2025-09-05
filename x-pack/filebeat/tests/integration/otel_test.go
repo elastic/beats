@@ -750,7 +750,8 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 
 				if r.URL.Path != "/_bulk" {
 					w.WriteHeader(http.StatusOK)
-					w.Write([]byte(`{}`))
+					_, err := w.Write([]byte(`{}`))
+					require.NoError(t, err)
 					return
 				}
 
@@ -783,7 +784,8 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 					if matches := reEventLine.FindStringSubmatch(line); len(matches) > 1 {
 						eventIDStr := matches[1]
 						eventID := 0
-						fmt.Sscanf(eventIDStr, "%d", &eventID)
+						_, err := fmt.Sscanf(eventIDStr, "%d", &eventID)
+						require.NoErrorf(t, err, "failed to parse event ID from line: %s", line)
 						eventKey := "Line " + eventIDStr
 
 						// Check if this event should fail
@@ -835,7 +837,8 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 
 				response := fmt.Sprintf(`{"items":[%s]}`, strings.Join(items, ","))
 				w.WriteHeader(http.StatusOK)
-				w.Write([]byte(response))
+				_, err = w.Write([]byte(response))
+				require.NoError(t, err)
 			}))
 			defer server.Close()
 
