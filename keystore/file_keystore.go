@@ -19,7 +19,9 @@ package keystore
 
 import (
 	"bytes"
+	"crypto/pbkdf2"
 	"crypto/rand"
+	"crypto/sha512"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -135,6 +137,10 @@ func (k *FileKeystore) Retrieve(key string) (*SecureString, error) {
 		return nil, ErrKeyDoesntExists
 	}
 	return NewSecureString(secret.Value), nil
+}
+
+func (k *FileKeystore) hashPassword(password string, salt []byte) ([]byte, error) {
+	return pbkdf2.Key(sha512.New, password, salt, iterationsCount, keyLength)
 }
 
 // Store add the key pair to the secret store and mark the store as dirty.
