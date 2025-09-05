@@ -45,17 +45,17 @@ func (d DialerFunc) DialContext(ctx context.Context, network, address string) (n
 }
 
 func DialContext(ctx context.Context, c Config, network, address string) (net.Conn, error) {
-	d, err := MakeDialer(c, logp.NewLogger(""))
+	d, err := MakeDialer(c)
 	if err != nil {
 		return nil, err
 	}
 	return d.DialContext(ctx, network, address)
 }
 
-func MakeDialer(c Config, logger *logp.Logger) (Dialer, error) {
+func MakeDialer(c Config) (Dialer, error) {
 	var err error
 	dialer := NetDialer(c.Timeout)
-	dialer, err = ProxyDialer(logger.Named(logSelector), c.Proxy, dialer)
+	dialer, err = ProxyDialer(logp.NewLogger(logSelector), c.Proxy, dialer)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func MakeDialer(c Config, logger *logp.Logger) (Dialer, error) {
 	}
 
 	if c.TLS != nil {
-		return TLSDialer(dialer, c.TLS, c.Timeout, logger), nil
+		return TLSDialer(dialer, c.TLS, c.Timeout), nil
 	}
 	return dialer, nil
 }

@@ -185,9 +185,8 @@ func (settings *HTTPTransportSettings) Unpack(cfg *config.C) error {
 		return err
 	}
 
-	// we use no-op logger here because we are only testing for errors
-	// if any while loading ssl config
-	_, err := tlscommon.LoadTLSConfig(tmp.TLS, logp.NewNopLogger())
+	// TODO: use local logger here
+	_, err := tlscommon.LoadTLSConfig(tmp.TLS, logp.NewLogger(""))
 	if err != nil {
 		return err
 	}
@@ -215,8 +214,9 @@ func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) (ht
 		}
 	}
 
-	if extra.logger == nil {
-		extra.logger = logp.NewLogger("")
+	logger := logp.NewLogger("")
+	if log := extra.logger; log != nil {
+		logger = log
 	}
 
 	for _, opt := range opts {
@@ -229,12 +229,12 @@ func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) (ht
 		dialer = transport.NetDialer(settings.Timeout)
 	}
 
-	tls, err := tlscommon.LoadTLSConfig(settings.TLS, extra.logger)
+	tls, err := tlscommon.LoadTLSConfig(settings.TLS, logger)
 	if err != nil {
 		return nil, err
 	}
 
-	tlsDialer := transport.TLSDialer(dialer, tls, settings.Timeout, extra.logger)
+	tlsDialer := transport.TLSDialer(dialer, tls, settings.Timeout)
 	for _, opt := range opts {
 		if dialOpt, ok := opt.(dialerModOption); ok {
 			dialer = dialOpt.applyDialer(settings, dialer)

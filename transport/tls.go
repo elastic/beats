@@ -26,13 +26,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/testing"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
-func TLSDialer(forward Dialer, config *tlscommon.TLSConfig, timeout time.Duration, logger *logp.Logger) Dialer {
-	return TestTLSDialer(testing.NullDriver, forward, config, timeout, logger)
+func TLSDialer(forward Dialer, config *tlscommon.TLSConfig, timeout time.Duration) Dialer {
+	return TestTLSDialer(testing.NullDriver, forward, config, timeout)
 }
 
 func TestTLSDialer(
@@ -40,7 +39,6 @@ func TestTLSDialer(
 	forward Dialer,
 	config *tlscommon.TLSConfig,
 	timeout time.Duration,
-	logger *logp.Logger,
 ) Dialer {
 	var lastTLSConfig *tls.Config
 	var lastNetwork string
@@ -65,12 +63,7 @@ func TestTLSDialer(
 			tlsConfig = lastTLSConfig
 		}
 		if tlsConfig == nil {
-			// if tlsconfig is nil, set provided logger
-			if config == nil {
-				tlsConfig = config.BuildModuleClientConfig(host, tlscommon.WithLogger(logger))
-			} else {
-				tlsConfig = config.BuildModuleClientConfig(host)
-			}
+			tlsConfig = config.BuildModuleClientConfig(host)
 			lastNetwork = network
 			lastAddress = address
 			lastTLSConfig = tlsConfig

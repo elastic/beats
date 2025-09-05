@@ -48,7 +48,7 @@ type Config struct {
 	Stats   IOStatser
 }
 
-func NewClient(c Config, network, host string, defaultPort int, logger *logp.Logger) (*Client, error) {
+func NewClient(c Config, network, host string, defaultPort int) (*Client, error) {
 	// do some sanity checks regarding network and Config matching +
 	// address being parseable
 	switch network {
@@ -62,15 +62,15 @@ func NewClient(c Config, network, host string, defaultPort int, logger *logp.Log
 		return nil, fmt.Errorf("unsupported network type %v", network)
 	}
 
-	dialer, err := MakeDialer(c, logger)
+	dialer, err := MakeDialer(c)
 	if err != nil {
 		return nil, err
 	}
 
-	return NewClientWithDialer(dialer, c, network, host, defaultPort, logger)
+	return NewClientWithDialer(dialer, c, network, host, defaultPort)
 }
 
-func NewClientWithDialer(d Dialer, c Config, network, host string, defaultPort int, logger *logp.Logger) (*Client, error) {
+func NewClientWithDialer(d Dialer, c Config, network, host string, defaultPort int) (*Client, error) {
 	// check address being parseable
 	host = fullAddress(host, defaultPort)
 	_, _, err := net.SplitHostPort(host)
@@ -79,7 +79,7 @@ func NewClientWithDialer(d Dialer, c Config, network, host string, defaultPort i
 	}
 
 	client := &Client{
-		log:     logger.Named(logSelector),
+		log:     logp.NewLogger(logSelector),
 		dialer:  d,
 		network: network,
 		host:    host,
@@ -231,7 +231,7 @@ func (c *Client) Test(d testing.Driver) {
 		} else {
 			d.Run("TLS", func(d testing.Driver) {
 				netDialer := NetDialer(c.config.Timeout)
-				tlsDialer := TestTLSDialer(d, netDialer, c.config.TLS, c.config.Timeout, c.log)
+				tlsDialer := TestTLSDialer(d, netDialer, c.config.TLS, c.config.Timeout)
 				_, err := tlsDialer.DialContext(context.Background(), "tcp", c.host)
 				d.Fatal("dial up", err)
 			})
