@@ -69,9 +69,12 @@ type runLoop struct {
 	// workaround for an external project that no longer exists. At this point
 	// they just complicate the API and should be removed.
 	nextEntryID queue.EntryID
+
+	// immediateShutdown determines if the queue will try to flush entries before shutting down
+	immediateShutdown bool
 }
 
-func newRunLoop(broker *broker, observer queue.Observer) *runLoop {
+func newRunLoop(broker *broker, observer queue.Observer, immediateShutdown bool) *runLoop {
 	var timer *time.Timer
 
 	// Create the timer we'll use for get requests, but stop it until a
@@ -83,9 +86,10 @@ func newRunLoop(broker *broker, observer queue.Observer) *runLoop {
 		}
 	}
 	return &runLoop{
-		broker:   broker,
-		observer: observer,
-		getTimer: timer,
+		broker:            broker,
+		observer:          observer,
+		getTimer:          timer,
+		immediateShutdown: immediateShutdown,
 	}
 }
 
@@ -130,6 +134,9 @@ func (l *runLoop) runIteration() {
 		close(l.broker.closingChan)
 		// Get requests are handled immediately during shutdown
 		l.maybeUnblockGetRequest()
+		if l.immediateShutdown {
+			l.broker.ctxCancel()
+		}
 
 	case <-l.broker.ctx.Done():
 		// The queue is fully shut down, do nothing
