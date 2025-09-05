@@ -32,3 +32,28 @@ As a workaround, and to prevent crashes, Beats will ignore any filters provided 
 % On [Month/Day/Year], this issue was resolved.
 
 :::
+
+
+:::{dropdown} Filebeat's Filestream input does not validate `clean_inactive`.
+**Applies to**: Filebeat < 9.2.0
+
+The Filestream input does not enforce the restrictions documented for
+the `clean_inactive` option, thus allowing configurations that can
+lead to data re-ingestion issues.
+
+**Fixed in**: 9.2.0
+:::
+
+:::{dropdown} Setting `clean_inactive` to `0` in Filebeat's Filestream input will cause data to be re-ingested on every restart.
+**Applies to**: Filebeat >= 8.14.0 and < 9.2.0
+
+When `clean_inactive` is set to `0`, Filestream will clean the state of all files
+on start up, effectively re-ingesting all files on restart.
+
+**Workaround**
+- For Filestream >= 8.16.0 and < 9.2.0: disable `clean_inactive` by setting `clean_inactive: -1`.
+- For Filestream >= 8.14.0 and < 8.16.0 set `clean_inactive` to a very
+large value. For example, use `clean_inactive: 43800h0m0s`, which is 5 years.
+
+**Fixed in**: 9.2.0
+:::
