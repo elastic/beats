@@ -18,15 +18,15 @@
         
     -   **Map Resources to Client**: Maps the retrieved resources to the client's resource list.
         
-    -   **Collect Metric Definitions**: For each resource, calls the provided mapping function (`mapMetrics`) to collect metric definitions. Refer to the **mapMetrics Function**.
+    -   **Collect Metric Definitions**: For each resource, calls the provided mapping function (`concurrentMapMetrics`) to collect metric definitions concurrently. Refer to the **concurrentMapMetrics Function**.
         
     -   **Close Channels**: Once all goroutines complete, it closes the `MetricDefinitionsChan` and `ErrorChan` channels. This signals that all metric definitions of all resources in the configuration are collected.
         
-2.  **mapMetrics Function**:
+2.  **concurrentMapMetrics Function**:
     
     -   **Start Goroutine**: Starts a new goroutine for each resource to collect its metric definitions.
         
-    -   **Retrieve Metric Definitions**: Calls `getMappedResourceDefinitions` to retrieve and map metric definitions for each resource. Refer to the **getMappedResourceDefinitions Function**.
+    -   **Retrieve Metric Definitions**: Calls the shared `getMappedResourceDefinitions` function to retrieve and map metric definitions for each resource. Refer to the **getMappedResourceDefinitions Function**.
         
     -   **Check for Errors**: In case `getMappedResourceDefinitions` returns an error, it is sent to the `ErrorChan`. This will cause the data collection to stop.
         
@@ -34,11 +34,15 @@
         
 3.  **getMappedResourceDefinitions Function**:
     
+    -   **Shared Logic**: This function contains the core logic for processing metrics for a single resource and is used by both the concurrent and standard collection methods.
+        
     -   **Avoid Redundant Calls**: Uses a map to avoid calling the metric definitions function multiple times for the same namespace and resource.
         
     -   **Retrieve Metric Definitions**: Retrieves metric definitions from Azure Monitor for the specified resource.
         
     -   **Filter Supported Metrics**: Validates and filters the metric names and aggregations based on the supported metrics.
+        
+    -   **Handle Timegrain**: If a `timegrain` is not specified by the user, it uses the first available timegrain reported by the Azure API.
         
     -   **Map Dimensions**: Maps dimensions to the metrics as specified in the resource configuration.
         
