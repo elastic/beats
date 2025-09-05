@@ -345,7 +345,18 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	reg := b.Monitoring.StatsRegistry().GetOrCreateRegistry("libbeat")
 
-	err = metricreport.SetupMetrics(b.Info.Logger.Named("metrics"), b.Info.Beat, version.GetDefaultVersion())
+	ephemeralID, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+	err = metricreport.SetupMetricsOptions(metricreport.MetricOptions{
+		Name:           b.Info.Beat,
+		Version:        version.GetDefaultVersion(),
+		EphemeralID:    ephemeralID.String(),
+		Logger:         b.Info.Logger.Named("metrics"),
+		SystemMetrics:  monitoring.Default.GetOrCreateRegistry("system"),
+		ProcessMetrics: monitoring.Default.GetOrCreateRegistry("beat"),
+	})
 	if err != nil {
 		return nil, err
 	}
