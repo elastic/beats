@@ -35,7 +35,7 @@ type input struct {
 	id           string
 	manager      *Manager
 	managedInput Input
-	path         *paths.Path
+	path         *paths.Path // required, input may panic if this is not set
 }
 
 // Name returns the name of this input.
