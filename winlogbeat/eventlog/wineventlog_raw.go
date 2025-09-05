@@ -137,20 +137,15 @@ func newWinEventLogRaw(options *conf.C) (EventLog, error) {
 		}
 	}
 
-	switch c.IncludeXML {
+	switch c.IncludeXML || l.isForwarded() {
 	case true:
 		l.renderer = win.NewXMLRenderer(
-			win.RenderConfig{
-				IsForwarded: l.isForwarded(),
-				Locale:      c.EventLanguage,
-			},
+			c.EventLanguage,
+			l.isForwarded(),
 			win.NilHandle, l.log)
 	case false:
 		l.renderer, err = win.NewRenderer(
-			win.RenderConfig{
-				IsForwarded: l.isForwarded(),
-				Locale:      c.EventLanguage,
-			},
+			c.EventLanguage,
 			win.NilHandle, l.log)
 		if err != nil {
 			return nil, err
@@ -178,6 +173,11 @@ func (l *winEventLogRaw) Channel() string {
 // IsFile returns true if the event log is an evtx file.
 func (l *winEventLogRaw) IsFile() bool {
 	return l.file
+}
+
+// IgnoreMissingChannel returns true if missing channels should be ignored.
+func (l *winEventLogRaw) IgnoreMissingChannel() bool {
+	return !l.file && (l.config.IgnoreMissingChannel == nil || *l.config.IgnoreMissingChannel)
 }
 
 func (l *winEventLogRaw) Open(state checkpoint.EventLogState) error {
