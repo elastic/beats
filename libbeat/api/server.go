@@ -25,7 +25,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -70,7 +69,7 @@ func (s *Server) Start() {
 	go func(l net.Listener) {
 		defer s.wg.Done()
 		s.log.Infof("Metrics endpoint listening on: %s (configured: %s)", l.Addr().String(), s.config.Host)
-		srv := &http.Server{Handler: s.mux, ReadHeaderTimeout: 10 * time.Second}
+		srv := &http.Server{Handler: s.mux} //nolint:gosec // Keep original behavior
 		s.httpServer = srv
 		err := srv.Serve(l)
 		s.log.Infof("Stats endpoint (%s) finished: %v", l.Addr().String(), err)

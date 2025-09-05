@@ -67,6 +67,13 @@ func TestLeak(t *testing.T) {
 			"http.enabled":            true,
 			"http.host":               monitorHost,
 			"queue.mem.flush.timeout": "0s",
+			"processors": []map[string]any{
+				{
+					"add_host_metadata": map[string]any{
+						"when.not.contains.tags": "forwarded",
+					},
+				},
+			},
 		},
 	}
 
