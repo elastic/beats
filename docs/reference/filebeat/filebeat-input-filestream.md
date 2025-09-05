@@ -574,7 +574,7 @@ prospector.scanner.check_interval` or if `ignore_older` is disabled.
 
 {applies_to}`stack: ga 9.2.0` To restore the old behaviour of not enforcing the
 configuration restricition and re-ingesting files if `clean_inactive:
-0`, set `legacy_clean_inactive`.
+0`, set `legacy_clean_inactive: true`.
 
 You can use time strings like `5m` (5 minutes), `2h45m` (2 hours and 45
 minutes), `48h`, etc. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". The
