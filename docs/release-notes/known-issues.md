@@ -43,10 +43,10 @@ lead to data re-ingestion issues.
 **Fixed in**: 9.2.0
 :::
 
-:::{dropdown} Setting clean_inactive: 0 in Filebeat's Filestream input will cause data to be re-ingested on every restart.
+:::{dropdown} Setting `clean_inactive` to `0` in Filebeat's Filestream input will cause data to be re-ingested on every restart.
 **Applies to**: Filebeat >= 8.14.0 and < 9.2.0
 
-When `clean_inactive: 0` Filestream will clean the state of all files
+When `clean_inactive` is set to `0`, Filestream will clean the state of all files
 on start up, effectively re-ingesting all files on restart.
 
 **Workaround**
