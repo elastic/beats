@@ -46,9 +46,11 @@ type RenderedEtwEvent struct {
 
 func (e *RenderedEtwEvent) GetProperty(name string) any {
 	if e.propertiesMap == nil {
-		return nil
+		e.propertiesMap = make(map[string]int)
+		for i, prop := range e.Properties {
+			e.propertiesMap[prop.Name] = i
+		}
 	}
-
 	if idx, found := e.propertiesMap[name]; found {
 		return e.Properties[idx].Value
 	}
@@ -57,7 +59,10 @@ func (e *RenderedEtwEvent) GetProperty(name string) any {
 
 func (e *RenderedEtwEvent) GetExtendedData(extType string) any {
 	if e.extendedDataMap == nil {
-		return nil
+		e.extendedDataMap = make(map[string]int)
+		for i, data := range e.ExtendedData {
+			e.extendedDataMap[data.ExtType] = i
+		}
 	}
 
 	if idx, found := e.extendedDataMap[extType]; found {
