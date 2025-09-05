@@ -94,6 +94,26 @@ var (
 	ErrMissingPeerCertificate = errors.New("missing peer certificates")
 )
 
+type tlsOptFunc func(t *TLSSettings)
+
+func (t tlsOptFunc) apply(c *TLSSettings) {
+	t(c)
+}
+
+type TLSOption interface {
+	apply(t *TLSSettings)
+}
+
+type TLSSettings struct {
+	logger *logp.Logger
+}
+
+func WithLogger(logger *logp.Logger) TLSOption {
+	return tlsOptFunc(func(t *TLSSettings) {
+		t.logger = logger
+	})
+}
+
 // ToConfig generates a tls.Config object. Note, you must use BuildModuleClientConfig to generate a config with
 // ServerName set, use that method for servers with SNI.
 // By default VerifyConnection is set to client mode.
@@ -126,7 +146,16 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 }
 
 // BuildModuleClientConfig takes the TLSConfig and transform it into a `tls.Config`.
-func (c *TLSConfig) BuildModuleClientConfig(host string) *tls.Config {
+func (c *TLSConfig) BuildModuleClientConfig(host string, options ...TLSOption) *tls.Config {
+	var settings TLSSettings
+	for _, opt := range options {
+		opt.apply(&settings)
+	}
+
+	if settings.logger == nil {
+		settings.logger = logp.NewLogger("")
+	}
+
 	if c == nil {
 		// use default TLS settings, if config is empty.
 		return &tls.Config{
@@ -135,7 +164,7 @@ func (c *TLSConfig) BuildModuleClientConfig(host string) *tls.Config {
 			VerifyConnection: makeVerifyConnection(&TLSConfig{
 				Verification: VerifyFull,
 				ServerName:   host,
-			}, logp.NewLogger("tls")),
+			}, settings.logger.Named("tls")),
 		}
 	}
 
