@@ -24,7 +24,7 @@ func TestDecodeRecords(t *testing.T) {
 	decoder := messageDecoder{
 		config:  config,
 		log:     log,
-		metrics: newInputMetrics(monitoring.NewRegistry()),
+		metrics: newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger()),
 	}
 
 	msgs := []string{
@@ -92,7 +92,7 @@ func TestDecodeRecordsWithSanitization(t *testing.T) {
 	config := defaultConfig()
 	config.LegacySanitizeOptions = []string{"SINGLE_QUOTES", "NEW_LINES"}
 	log := logp.NewLogger(fmt.Sprintf("%s test for input", inputName))
-	metrics := newInputMetrics(monitoring.NewRegistry())
+	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
 
 	sanitizers, err := newSanitizers(config.Sanitizers, config.LegacySanitizeOptions)
 	require.NoError(t, err)
