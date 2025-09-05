@@ -233,6 +233,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
 - Allow empty HTTPJSON cursor template value evaluations to be ignored by Fleet health status updates. {pull}45361[45361]
 - Improve HTTP JSON health status logic for empty template results. {pull}46332[46332]
+- Improve CEL input documentation of authentication options. {pull}46253[46253]
 
 *Auditbeat*
 

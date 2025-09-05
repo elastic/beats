@@ -246,6 +246,8 @@ The CEL environment enables the [optional types](https://pkg.go.dev/github.com/g
 
 Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2.
 
+As described in Mito's [HTTP](https://pkg.go.dev/github.com/elastic/mito@v1.19.0#HTTP) documentation, configuration for Basic Authentication will only affect direct HEAD, GET and POST method calls, not explicity constructed requests run with `.do_request()`. Configuration for Digest Authentication or OAuth2 will be used for all requests made from CEL.
+
 Example configurations with authentication:
 
 ```yaml
@@ -432,6 +434,9 @@ When set to `false`, disables the basic auth configuration. Default: `true`.
 Basic auth settings are disabled if either `enabled` is set to `false` or the `auth.basic` section is missing.
 ::::
 
+::::{note}
+Basic auth settings do not affect requests run with `.do_request()`, as explained in [HTTP](https://pkg.go.dev/github.com/elastic/mito@v1.19.0#HTTP).
+::::
 
 
 ### `auth.basic.user` [_auth_basic_user]
