@@ -16,14 +16,14 @@ import (
 func TestGenerateQuery(t *testing.T) {
 	m := &MetricSet{
 		config: config{
-			TableID: "project-123.dataset.table_name",
+			TableID: "project-1233.dataset.table_name",
 		},
 	}
 
 	query := m.generateQuery()
 
 	// verify that table name quoting is in effect
-	assert.Contains(t, query, "`project-123.dataset.table_name`")
+	assert.Contains(t, query, "`project-1233.dataset.table_name`")
 	// verify WHERE clause is present
 	assert.Contains(t, query, "WHERE")
 	assert.Contains(t, query, "logging_time IS NOT NULL")
