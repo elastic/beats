@@ -272,6 +272,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix reading journald messages with more than 4kb. {issue}45511[45511] {pull}46017[46017]
 - Restore the Streaming input on Windows. {pull}46031[46031]
 - Fix termination of input on API errors. {pull}45999[45999]
+- Fix race condition that could cause Filebeat to hang during shutdown after failing to startup {issue}45034[45034] {pull}46331[46331]
 - Fixed hints autodiscover for Docker when the configuration is only `hints.enabled: true`. {issue}45156[45156] {pull}45864[45864]
 
 *Heartbeat*
@@ -519,6 +520,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Improve error reporting for schemeless URLs in HTTP JSON input. {pull}45953[45953]
 - Add status reporting support for AWS S3 input. {pull}45748[45748]
 - Add `remaining_executions` global to the CEL input evaluation context. {pull}46210[46210]
+- Improve HTTP JSON health status logic for empty template results. {pull}46332[46332]
 
 *Auditbeat*
 
