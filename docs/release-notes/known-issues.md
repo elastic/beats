@@ -31,4 +31,8 @@ As a workaround, and to prevent crashes, Beats will ignore any filters provided 
 % **Resolved**
 % On [Month/Day/Year], this issue was resolved.
 
+<<<<<<< HEAD
 :::
+=======
+:::
+>>>>>>> dfad6ace5 ([9.1] Docs: Fix formatting and typo in known issues file (#46388))
