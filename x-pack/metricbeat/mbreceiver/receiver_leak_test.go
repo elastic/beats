@@ -26,7 +26,7 @@ import (
 func TestLeak(t *testing.T) {
 	// opencensus goroutine comes from init in cloud.google.com/go/pubsub and filebeat/input/gcppubsub
 	defer goleak.VerifyNone(t,
-		goleak.IgnoreAnyFunction("github.com/Microsoft/go-winio.initIO"),
+		goleak.IgnoreAnyFunction("github.com/Microsoft/go-winio.getQueuedCompletionStatus"),
 		goleak.IgnoreAnyFunction("go.opencensus.io/stats/view.(*worker).start"))
 
 	monitorSocket := genSocketPath()
