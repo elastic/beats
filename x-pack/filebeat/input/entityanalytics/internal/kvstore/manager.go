@@ -8,6 +8,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -23,6 +24,8 @@ type Manager struct {
 	// Configure returns a configured Input instance and a slice of Sources
 	// that will be used to collect events.
 	Configure func(cfg *config.C) (Input, error)
+
+	Path *paths.Path
 }
 
 // managerConfig contains parameters needed to configure the Manager.
@@ -52,5 +55,6 @@ func (m *Manager) Create(c *config.C) (v2.Input, error) {
 		id:           settings.ID,
 		manager:      m,
 		managedInput: inp,
+		path:         m.Path,
 	}, nil
 }

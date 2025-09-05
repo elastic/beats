@@ -147,7 +147,8 @@ func TestInput_Test(t *testing.T) {
 func TestInput_Run(t *testing.T) {
 	tmpDataDir := t.TempDir()
 
-	paths.Paths = &paths.Path{Data: tmpDataDir}
+	tempPath := paths.New()
+	tempPath.Data = tmpDataDir
 
 	t.Run("run-ok", func(t *testing.T) {
 		called := false
@@ -158,6 +159,7 @@ func TestInput_Run(t *testing.T) {
 					return nil
 				},
 			},
+			path: tempPath,
 		}
 
 		err := inp.Run(
@@ -181,6 +183,7 @@ func TestInput_Run(t *testing.T) {
 					return errors.New("test error")
 				},
 			},
+			path: tempPath,
 		}
 
 		err := inp.Run(
@@ -204,6 +207,7 @@ func TestInput_Run(t *testing.T) {
 					panic("test panic")
 				},
 			},
+			path: tempPath,
 		}
 
 		err := inp.Run(
