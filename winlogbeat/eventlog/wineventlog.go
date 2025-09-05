@@ -85,13 +85,14 @@ func init() {
 }
 
 type winEventLogConfig struct {
-	ConfigCommon  `config:",inline"`
-	BatchReadSize int                `config:"batch_read_size"` // Maximum number of events that Read will return.
-	IncludeXML    bool               `config:"include_xml"`
-	Forwarded     *bool              `config:"forwarded"`
-	SimpleQuery   query              `config:",inline"`
-	NoMoreEvents  NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
-	EventLanguage uint32             `config:"language"`
+	ConfigCommon         `config:",inline"`
+	BatchReadSize        int                `config:"batch_read_size"` // Maximum number of events that Read will return.
+	IncludeXML           bool               `config:"include_xml"`
+	Forwarded            *bool              `config:"forwarded"`
+	SimpleQuery          query              `config:",inline"`
+	NoMoreEvents         NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
+	EventLanguage        uint32             `config:"language"`
+	IgnoreMissingChannel *bool              `config:"ignore_missing_channel"` // Ignore missing channels and continue reading.
 
 	// FIXME: This is for a WS2025 known issue so we can bypass the workaround
 	// and will be removed in the future.
@@ -322,6 +323,11 @@ func (l *winEventLog) Channel() string {
 // IsFile returns true if the event log is an evtx file.
 func (l *winEventLog) IsFile() bool {
 	return l.file
+}
+
+// IgnoreMissingChannel returns true if missing channels should be ignored.
+func (l *winEventLog) IgnoreMissingChannel() bool {
+	return !l.file && (l.config.IgnoreMissingChannel == nil || *l.config.IgnoreMissingChannel)
 }
 
 func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
