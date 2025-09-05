@@ -30,27 +30,27 @@ type fsNotifyNameRemoveSymbol struct {
 	symbolName string
 }
 
-func loadFsNotifyNameRemoveSymbol(s *probeManager) error {
-	symbolInfo, err := s.getSymbolInfoRuntime("fsnotify_nameremove")
+func loadFsNotifyNameRemoveSymbol(probeMgr *probeManager) error {
+	symbolInfo, err := probeMgr.getSymbolInfoRuntime("fsnotify_nameremove")
 	if err != nil {
 		if errors.Is(err, ErrSymbolNotFound) {
-			s.buildChecks = append(s.buildChecks, func(spec *tkbtf.Spec) bool {
+			probeMgr.buildChecks = append(probeMgr.buildChecks, func(spec *tkbtf.Spec) bool {
 				return !spec.ContainsSymbol("fsnotify_nameremove")
 			})
 			return nil
 		}
-		return err
+		return fmt.Errorf("error getting fsnotify_nameremove symbol: %w", err)
 	}
 
 	if symbolInfo.isOptimised {
 		return fmt.Errorf("symbol %s is optimised", symbolInfo.symbolName)
 	}
 
-	s.buildChecks = append(s.buildChecks, func(spec *tkbtf.Spec) bool {
+	probeMgr.buildChecks = append(probeMgr.buildChecks, func(spec *tkbtf.Spec) bool {
 		return spec.ContainsSymbol(symbolInfo.symbolName)
 	})
 
-	s.symbols = append(s.symbols, &fsNotifyNameRemoveSymbol{
+	probeMgr.symbols = append(probeMgr.symbols, &fsNotifyNameRemoveSymbol{
 		symbolName: symbolInfo.symbolName,
 	})
 
@@ -74,7 +74,7 @@ func (f *fsNotifyNameRemoveSymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAl
 	btfSymbol := tkbtf.NewSymbol(f.symbolName).AddProbes(probe)
 
 	if err := spec.BuildSymbol(btfSymbol); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error building fsnotify_nameremove symbol: %w", err)
 	}
 
 	return []*probeWithAllocFunc{
