@@ -1046,7 +1046,8 @@ func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, 
 	cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
 	require.NoError(t, err)
 
-	cfg.Unpack(&tmpCfg)
+	err = cfg.Unpack(&tmpCfg)
+	require.NoError(t, err, "cannot unpack file watcher config")
 
 	fw, err := newFileWatcher(logger, paths, tmpCfg.Scaner, false, false)
 	require.NoError(t, err)
