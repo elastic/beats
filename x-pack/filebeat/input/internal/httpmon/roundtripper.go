@@ -11,6 +11,7 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -52,14 +53,14 @@ type httpMetrics struct {
 // responses metrics to the provided input monitoring registry.
 // It will register all http related metrics into the provided registry, but it is not responsible
 // for its lifecyle.
-func NewMetricsRoundTripper(next http.RoundTripper, reg *monitoring.Registry) *MetricsRoundTripper {
+func NewMetricsRoundTripper(next http.RoundTripper, reg *monitoring.Registry, logger *logp.Logger) *MetricsRoundTripper {
 	return &MetricsRoundTripper{
 		transport: next,
-		metrics:   newHTTPMetrics(reg),
+		metrics:   newHTTPMetrics(reg, logger),
 	}
 }
 
-func newHTTPMetrics(reg *monitoring.Registry) *httpMetrics {
+func newHTTPMetrics(reg *monitoring.Registry, logger *logp.Logger) *httpMetrics {
 	if reg == nil {
 		return nil
 	}
@@ -88,11 +89,11 @@ func newHTTPMetrics(reg *monitoring.Registry) *httpMetrics {
 		roundTripTime: metrics.NewUniformSample(1024),
 	}
 
-	_ = adapter.GetGoMetrics(reg, "http_request_body_bytes", adapter.Accept).
+	_ = adapter.GetGoMetrics(reg, "http_request_body_bytes", logger, adapter.Accept).
 		GetOrRegister("histogram", metrics.NewHistogram(out.reqsSize))
-	_ = adapter.GetGoMetrics(reg, "http_response_body_bytes", adapter.Accept).
+	_ = adapter.GetGoMetrics(reg, "http_response_body_bytes", logger, adapter.Accept).
 		GetOrRegister("histogram", metrics.NewHistogram(out.respsSize))
-	_ = adapter.GetGoMetrics(reg, "http_round_trip_time", adapter.Accept).
+	_ = adapter.GetGoMetrics(reg, "http_round_trip_time", logger, adapter.Accept).
 		GetOrRegister("histogram", metrics.NewHistogram(out.roundTripTime))
 
 	return out

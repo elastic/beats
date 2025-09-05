@@ -20,6 +20,7 @@ package input_logfile
 import (
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -62,7 +63,7 @@ type Metrics struct {
 	HarvesterOpenGZIPFiles *monitoring.Int
 }
 
-func NewMetrics(reg *monitoring.Registry) *Metrics {
+func NewMetrics(reg *monitoring.Registry, logger *logp.Logger) *Metrics {
 	// The log input creates the `filebeat.harvester` registry as a package
 	// variable, so it should always exist before this function runs.
 	// However, at least on testing scenarios this does not hold true, so
@@ -100,9 +101,9 @@ func NewMetrics(reg *monitoring.Registry) *Metrics {
 		HarvesterGZIPRunning:   monitoring.NewInt(harvesterMetrics, "gzip_running"),
 		HarvesterOpenGZIPFiles: monitoring.NewInt(harvesterMetrics, "gzip_open_files"),
 	}
-	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(m.ProcessingTime))
-	_ = adapter.NewGoMetrics(reg, "gzip_processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "gzip_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(m.ProcessingGZIPTime))
 
 	return &m

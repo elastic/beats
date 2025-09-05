@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -22,7 +23,7 @@ func TestNewInputMetricsInstance(t *testing.T) {
 		ID:              "streaming-metric-test",
 		MetricsRegistry: reg,
 	}
-	metrics := newInputMetrics(env.MetricsRegistry)
+	metrics := newInputMetrics(env.MetricsRegistry, logp.NewNopLogger())
 
 	assert.NotNil(t,
 		metrics.errorsTotal,
