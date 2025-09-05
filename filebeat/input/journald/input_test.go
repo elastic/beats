@@ -420,7 +420,7 @@ func TestBinaryDataIsCorrectlyHandled(t *testing.T) {
 	env.waitUntilEventCount(len(expectedBinaryMessges))
 	events := env.pipeline.GetAllEvents()
 	for i, evt := range events {
-		msg := []byte(evt.Fields["message"].(string))
+		msg := []byte(evt.Fields["message"].(string)) //nolint:errcheck // we know it's a string.
 		if !bytes.Equal(expectedBinaryMessges[i], msg) {
 			t.Errorf("expecting entry %d to be:\n%#v\ngot:\n%#v", i, expectedBinaryMessges[i], msg)
 		}
