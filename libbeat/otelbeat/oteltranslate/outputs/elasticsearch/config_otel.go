@@ -143,11 +143,15 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 		"mapping": map[string]any{
 			"mode": "bodymap",
 		},
+	}
 
-		"compression": "gzip",
-		"compression_params": map[string]any{
+	// Compression
+	otelYAMLCfg["compression"] = "none"
+	if escfg.CompressionLevel > 0 {
+		otelYAMLCfg["compression"] = "gzip"
+		otelYAMLCfg["compression_params"] = map[string]any{
 			"level": escfg.CompressionLevel,
-		},
+		}
 	}
 
 	// Authentication
