@@ -9,7 +9,7 @@ https://github.com/elastic/beats/compare/v8.16.5\...v8.16.6[View commits]
 
 ==== Known issues
 
-- `restart_on_cert_change` causes panic due to seccomp policy. In versions 8.16.6 and later, enabling this option causes the Beat to panic on restart. This is due to the `eventfd2` syscall missing from the default seccomp policy. To fix this, add `eventfd2` to a custom seccomp policy. Check our https://www.elastic.co/docs/reference/beats/filebeat/linux-seccomp[docs] for further details on how to configure a seccomp policy.
+- `restart_on_cert_change` causes panic due to seccomp policy. In versions 8.16.6 and later, enabling this option causes the Beat to panic on restart. This is due to the `eventfd2` syscall missing from the default seccomp policy. To fix this, add `eventfd2` to a custom seccomp policy. For more details, refer to <<linux-seccomp>>.
 
 [%collapsible]
 .Click to view the policy
