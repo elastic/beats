@@ -1,6 +1,8 @@
 - name: vertexai_logs
   description: Google Cloud Vertex AI Prompt Response Logs metrics
   release: beta
+  version:  
+    beta: 9.2.0  
   type: group
   fields:
   - name: endpoint

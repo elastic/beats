@@ -1204,7 +1204,7 @@ Google Cloud Storage metrics
 ## vertexai_logs [_vertexai_logs]
 
 ```{applies_to}
-stack: beta
+stack: beta 9.2.0
 ```
 
 Google Cloud Vertex AI Prompt Response Logs metrics
