@@ -52,6 +52,7 @@ type GoTestArgs struct {
 	CoverageProfileFile string            // Test coverage profile file (enables -cover).
 	Dir                 string            // The directory the test should run from
 	Output              io.Writer         // Write stderr and stdout to Output if set
+	Timeout             string            // Timeout for tests (-timeout flag)
 }
 
 // TestBinaryArgs are the arguments used when building binary for testing.
@@ -217,6 +218,9 @@ func GoTestIntegrationArgsForPackage(pkg string) GoTestArgs {
 	args := makeGoTestArgsForPackage("Integration", pkg)
 
 	args.Tags = append(args.Tags, "integration")
+	// some test build docker images which download artifacts, and it can take a
+	// long time.
+	args.Timeout = "2h"
 
 	// add the requirefips tag when doing fips140 testing
 	if v, ok := os.LookupEnv("GODEBUG"); ok && strings.Contains(v, "fips140=only") {
@@ -390,6 +394,9 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 			"-covermode=atomic",
 			"-coverprofile="+params.CoverageProfileFile,
 		)
+	}
+	if params.Timeout != "" {
+		testArgs = append(testArgs, "-timeout="+params.Timeout)
 	}
 	testArgs = append(testArgs, params.ExtraFlags...)
 	testArgs = append(testArgs, params.Packages...)
