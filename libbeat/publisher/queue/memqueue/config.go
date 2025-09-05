@@ -59,7 +59,7 @@ func SettingsForUserConfig(cfg *c.C) (Settings, error) {
 		}
 	}
 	//nolint:gosimple // Actually want this conversion to be explicit since the types aren't definitionally equal.
-	return Settings{
+	return Settings{ //nolint:staticcheck // Actually want this conversion to be explicit since the types aren't definitionally equal.
 		Events:            config.Events,
 		MaxGetRequest:     config.MaxGetRequest,
 		FlushTimeout:      config.FlushTimeout,
