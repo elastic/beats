@@ -121,7 +121,7 @@ func TestCreateEventWithInvalidJSON(t *testing.T) {
 	event, err := CreateEvent(row, projectID, logger)
 
 	assert.NoError(err) // Should not error, but log warning
-	
+
 	// Invalid JSON should be stored as raw string
 	fullRequestField, err := event.MetricSetFields.GetValue("full_request.raw")
 	assert.NoError(err)
@@ -195,4 +195,3 @@ func TestEventsMapping(t *testing.T) {
 	assert.Equal("model-123456", events[0].MetricSetFields["deployed_model_id"])
 	assert.Equal("model-789012", events[1].MetricSetFields["deployed_model_id"])
 }
-
