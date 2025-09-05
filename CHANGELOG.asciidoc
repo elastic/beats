@@ -108,6 +108,147 @@ https://github.com/elastic/beats/compare/v8.17.7\...v8.17.8[View commits]
 === Beats version 8.17.7
 https://github.com/elastic/beats/compare/v8.17.6\...v8.17.7[View commits]
 
+==== Known issues
+
+// tag::known-issue-8.17-restart_on_cert_change[]
+- `restart_on_cert_change` causes panic due to seccomp policy. In versions 8.17.3 and later, enabling this option causes the Beat to panic on restart. This is due to the `eventfd2` syscall missing from the default seccomp policy. To fix this, add `eventfd2` to a custom seccomp policy. To fix this, add `eventfd2` to a custom seccomp policy. For more details, refer to {filebeat-ref}/linux-seccomp.html[Use Linux Secure Computing Mode (seccomp)].
+
+[%collapsible]
+.Click to view the policy
+====
+[source,yaml]
+----
+seccomp:
+  syscalls:
+    - action: allow
+      names:
+        - accept
+        - accept4
+        - access
+        - arch_prctl
+        - bind
+        - brk
+        - capget
+        - chmod
+        - chown
+        - clock_gettime
+        - clock_nanosleep
+        - clone
+        - clone3
+        - close
+        - connect
+        - dup
+        - dup2
+        - dup3
+        - epoll_create
+        - epoll_create1
+        - epoll_ctl
+        - epoll_pwait
+        - epoll_wait
+        - eventfd2
+        - execve
+        - exit
+        - exit_group
+        - faccessat
+        - faccessat2
+        - fchdir
+        - fchmod
+        - fchmodat
+        - fchown
+        - fchownat
+        - fcntl
+        - fdatasync
+        - flock
+        - fstat
+        - fstatfs
+        - fsync
+        - ftruncate
+        - futex
+        - getcwd
+        - getdents
+        - getdents64
+        - geteuid
+        - getgid
+        - getpeername
+        - getpid
+        - getppid
+        - getrandom
+        - getrlimit
+        - getrusage
+        - getsockname
+        - getsockopt
+        - gettid
+        - gettimeofday
+        - getuid
+        - inotify_add_watch
+        - inotify_init1
+        - inotify_rm_watch
+        - ioctl
+        - kill
+        - listen
+        - lseek
+        - lstat
+        - madvise
+        - mincore
+        - mkdirat
+        - mmap
+        - mprotect
+        - munmap
+        - nanosleep
+        - newfstatat
+        - open
+        - openat
+        - pipe
+        - pipe2
+        - poll
+        - ppoll
+        - prctl
+        - pread64
+        - pselect6
+        - pwrite64
+        - read
+        - readlink
+        - readlinkat
+        - recvfrom
+        - recvmmsg
+        - recvmsg
+        - rename
+        - renameat
+        - rseq
+        - rt_sigaction
+        - rt_sigprocmask
+        - rt_sigreturn
+        - sched_getaffinity
+        - sched_yield
+        - sendfile
+        - sendmmsg
+        - sendmsg
+        - sendto
+        - set_robust_list
+        - setitimer
+        - setrlimit
+        - setsockopt
+        - shutdown
+        - sigaltstack
+        - socket
+        - splice
+        - stat
+        - statfs
+        - sysinfo
+        - tgkill
+        - time
+        - tkill
+        - uname
+        - unlink
+        - unlinkat
+        - wait4
+        - waitid
+        - write
+        - writev
+----
+====
+// end::known-issue-8.17-restart_on_cert_change[]
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -136,6 +277,10 @@ https://github.com/elastic/beats/compare/v8.17.6\...v8.17.7[View commits]
 === Beats version 8.17.6
 https://github.com/elastic/beats/compare/v8.17.5\...v8.17.6[View commits]
 
+==== Known issues
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.17-restart_on_cert_change]
+
 ==== Bugfixes
 
 *Filebeat*
@@ -153,6 +298,10 @@ https://github.com/elastic/beats/compare/v8.17.5\...v8.17.6[View commits]
 [[release-notes-8.17.5]]
 === Beats version 8.17.5
 https://github.com/elastic/beats/compare/v8.17.4\...v8.17.5[View commits]
+
+==== Known issues
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.17-restart_on_cert_change]
 
 ==== Breaking changes
 
@@ -193,6 +342,10 @@ https://github.com/elastic/beats/compare/v8.17.4\...v8.17.5[View commits]
 [[release-notes-8.17.4]]
 === Beats version 8.17.4
 https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
+
+==== Known issues
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.17-restart_on_cert_change]
 
 ==== Breaking changes
 
@@ -239,6 +392,10 @@ https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
 [[release-notes-8.17.3]]
 === Beats version 8.17.3
 https://github.com/elastic/beats/compare/v8.17.2\...v8.17.3[View commits]
+
+==== Known issues
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.17-restart_on_cert_change]
 
 ==== Bugfixes
 
