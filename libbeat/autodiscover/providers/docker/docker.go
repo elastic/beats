@@ -41,9 +41,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
 
-func init() {
-	_ = autodiscover.Registry.AddProvider("docker", AutodiscoverBuilder)
-}
+// ProviderName is the name that should be used when Get/Set the provider in a registry
+const ProviderName = "docker"
 
 // Provider implements autodiscover provider for docker containers
 type Provider struct {
@@ -70,6 +69,7 @@ func AutodiscoverBuilder(
 	c *config.C,
 	keystore keystore.Keystore,
 	logger *logp.Logger,
+	r *autodiscover.Registry,
 ) (autodiscover.Provider, error) {
 	logger = logger.Named("docker")
 
@@ -96,12 +96,12 @@ func AutodiscoverBuilder(
 		return nil, errWrap(fmt.Errorf("no configs or hints defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil, r)
 	if err != nil {
 		return nil, errWrap(err)
 	}
 
-	appenders, err := autodiscover.NewAppenders(config.Appenders)
+	appenders, err := autodiscover.NewAppenders(config.Appenders, r)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -384,7 +384,12 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 		e["ports"] = ports
 	}
 	if labels, err := dockerMeta.GetValue("labels"); err == nil {
-		hints, incorrecthints := utils.GenerateHints(labels.(mapstr.M), "", d.config.Prefix, true, AllSupportedHints)
+		mstrLabels, ok := labels.(mapstr.M)
+		if !ok {
+			// return
+			return e
+		}
+		hints, incorrecthints := utils.GenerateHints(mstrLabels, "", d.config.Prefix, true, AllSupportedHints)
 		// We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
 		for _, value := range incorrecthints {
 			d.logger.Debugf("provided hint: %s/%s is not in the supported list", d.config.Prefix, value)

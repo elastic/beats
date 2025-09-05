@@ -65,6 +65,7 @@ type Autodiscover struct {
 	listener        bus.Listener
 	logger          *logp.Logger
 	debouncePeriod  time.Duration
+	registry        *Registry
 }
 
 // NewAutodiscover instantiates and returns a new Autodiscover manager
@@ -76,6 +77,7 @@ func NewAutodiscover(
 	c *Config,
 	keystore keystore.Keystore,
 	logger *logp.Logger,
+	registry *Registry,
 ) (*Autodiscover, error) {
 	logger = logger.Named("autodiscover")
 
@@ -85,7 +87,7 @@ func NewAutodiscover(
 	// Init providers
 	var providers []Provider
 	for _, providerCfg := range c.Providers {
-		provider, err := Registry.BuildProvider(name, bus, providerCfg, keystore)
+		provider, err := registry.BuildProvider(name, bus, providerCfg, keystore)
 		if err != nil {
 			return nil, fmt.Errorf("error in autodiscover provider settings: %w", err)
 		}
@@ -104,6 +106,7 @@ func NewAutodiscover(
 		meta:            meta.NewMap(),
 		logger:          logger,
 		debouncePeriod:  defaultDebouncePeriod,
+		registry:        registry,
 	}, nil
 }
 
