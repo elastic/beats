@@ -12,6 +12,8 @@ import (
 	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/exporter/exporterhelper"
 	"go.opentelemetry.io/collector/pdata/plog"
+
+	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter/internal"
 )
 
 var (
@@ -45,6 +47,11 @@ func createLogsExporter(
 	)
 }
 
-func pushLogData(context.Context, plog.Logs) error {
+func pushLogData(ctx context.Context, ld plog.Logs) error {
+	_, err := internal.NewLogBatch(ctx, ld)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
