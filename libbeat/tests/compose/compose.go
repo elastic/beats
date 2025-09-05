@@ -197,6 +197,7 @@ func getComposeProject(name string, logger *logp.Logger) (*Project, error) {
 	if err != nil {
 		return nil, err
 	}
+	logger.Infof("project: %s, compose path: %s", name, path)
 
 	return NewProject(
 		name,
