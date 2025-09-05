@@ -165,7 +165,7 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 	}
 
 	// try to create a dec from the using the codec config
-	dec, err := decoder.NewDecoder(p.readerConfig.Decoding, streamReader)
+	dec, err := decoder.NewDecoder(p.readerConfig.Decoding, streamReader, log)
 	if err != nil {
 		return err
 	}
