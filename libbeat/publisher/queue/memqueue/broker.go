@@ -105,6 +105,10 @@ type Settings struct {
 	// If positive, the amount of time the queue will wait to fill up
 	// a batch if a Get request asks for more events than we have.
 	FlushTimeout time.Duration
+
+	// ImmediateShutdown controls wether or not the queue will try
+	// to empty after receiving a close or will immediately close.
+	ImmediateShutdown bool
 }
 
 type queueEntry struct {
@@ -231,7 +235,7 @@ func newQueue(
 	}
 	b.ctx, b.ctxCancel = context.WithCancel(context.Background())
 
-	b.runLoop = newRunLoop(b, observer)
+	b.runLoop = newRunLoop(b, observer, settings.ImmediateShutdown)
 	b.ackLoop = newACKLoop(b)
 
 	observer.MaxEvents(settings.Events)
@@ -275,7 +279,8 @@ func (b *broker) Get(count int) (queue.Batch, error) {
 	case <-b.ctx.Done():
 		return nil, io.EOF
 	case b.getChan <- getRequest{
-		entryCount: count, responseChan: responseChan}:
+		entryCount: count, responseChan: responseChan,
+	}:
 	}
 
 	// if request has been sent, we have to wait for a response

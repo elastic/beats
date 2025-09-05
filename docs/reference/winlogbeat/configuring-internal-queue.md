@@ -74,6 +74,11 @@ Maximum wait time for event requests from the output to be fulfilled. If set to 
 
 The default value is 10s.
 
+#### `immediate_shutdown` [queue-mem-flush-timeout-option]
+
+If set to true the queue will close immediately and not try to send any events that are still in the queue or process any acknowledgments.  
+
+The default value is false.
 
 ## Configure the disk queue [configuration-internal-queue-disk]
 

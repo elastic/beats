@@ -75,6 +75,13 @@ Maximum wait time for event requests from the output to be fulfilled. If set to 
 The default value is 10s.
 
 
+#### `immediate_shutdown` [queue-mem-flush-timeout-option]
+
+If set to true the queue will close immediately and not try to send any events that are still in the queue or process any acknowledgments.  
+
+The default value is false.
+
+
 ## Configure the disk queue [configuration-internal-queue-disk]
 
 The disk queue stores pending events on the disk rather than main memory. This allows Beats to queue a larger number of events than is possible with the memory queue, and to save events when a Beat or device is restarted. This increased reliability comes with a performance tradeoff, as every incoming event must be written and read from the device’s disk. However, for setups where the disk is not the main bottleneck, the disk queue gives a simple and relatively low-overhead way to add a layer of robustness to incoming event data.

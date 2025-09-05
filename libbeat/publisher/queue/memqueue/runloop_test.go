@@ -246,3 +246,85 @@ func assertRegistryUint(t *testing.T, reg *monitoring.Registry, key string, expe
 	}
 	assert.Equal(t, expected, value.Get(), message)
 }
+
+func TestImmediateShutdownTrue(t *testing.T) {
+	broker := newQueue(
+		logptest.NewTestingLogger(t, ""),
+		nil,
+		Settings{
+			Events:            10,
+			MaxGetRequest:     5,
+			FlushTimeout:      10 * time.Second,
+			ImmediateShutdown: true,
+		},
+		10, nil)
+
+	producer := newProducer(broker, nil, nil)
+	rl := broker.runLoop
+
+	go rl.runIteration()
+	_, ok := producer.Publish("some event")
+	require.True(t, ok, "Queue publish call failed")
+	// Event in the queue, now close it
+	go broker.Close()
+	rl.runIteration()
+
+	// Calling Get on the queue now should immediately return io.EOF, since
+	// immediate close of queue should cancel its context and terminate its
+	// run loop, even with events in it.
+	resultChan := make(chan error)
+	go func() {
+		_, err := broker.Get(1)
+		resultChan <- err
+	}()
+	rl.runIteration()
+	select {
+	case err := <-resultChan:
+		assert.Equal(t, err, io.EOF, "Closed queue should return io.EOF on Get requests")
+	case <-time.After(10 * time.Second):
+		require.Fail(t, "Get requests to a closed queue should not block")
+	}
+	require.True(t, rl.consumedCount == 0, "Consumed count should be 0")
+	require.Error(t, rl.broker.ctx.Err(), "broker context should be closed")
+}
+
+func TestImmediateShutdownFalse(t *testing.T) {
+	broker := newQueue(
+		logptest.NewTestingLogger(t, ""),
+		nil,
+		Settings{
+			Events:            10,
+			MaxGetRequest:     5,
+			FlushTimeout:      10 * time.Second,
+			ImmediateShutdown: false,
+		},
+		10, nil)
+
+	producer := newProducer(broker, nil, nil)
+	rl := broker.runLoop
+
+	go rl.runIteration()
+	_, ok := producer.Publish("some event")
+	require.True(t, ok, "Queue publish call failed")
+	// Event in the queue, now close it
+	go broker.Close()
+	rl.runIteration()
+
+	// Calling Get on the queue now should immediately return io.EOF, since
+	// immediate close of queue should cancel its context and terminate its
+	// run loop, even with events in it.
+	resultChan := make(chan error)
+	go func() {
+		_, err := broker.Get(1)
+		resultChan <- err
+	}()
+	rl.runIteration()
+	select {
+	case err := <-resultChan:
+		assert.NoError(t, err, "Should still be able to get from a closing queue with entries")
+	case <-time.After(10 * time.Second):
+		require.Fail(t, "Get requests to a closed queue should not block")
+	}
+	require.True(t, rl.consumedCount == 1, "Consumed count should be 1")
+	require.NoError(t, rl.broker.ctx.Err(), "broker context shouldn't be closed")
+}

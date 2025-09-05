@@ -31,8 +31,9 @@ type config struct {
 	// a maximum on the number of events a Get request can return, but the
 	// user-exposed name is "flush.min_events" for backwards compatibility,
 	// since it used to control buffer size in the internal buffer chain.
-	MaxGetRequest int           `config:"flush.min_events" validate:"min=0"`
-	FlushTimeout  time.Duration `config:"flush.timeout"`
+	MaxGetRequest     int           `config:"flush.min_events" validate:"min=0"`
+	FlushTimeout      time.Duration `config:"flush.timeout"`
+	ImmediateShutdown bool          `config:"immediate_shutdown"`
 }
 
 var defaultConfig = config{
@@ -59,8 +60,9 @@ func SettingsForUserConfig(cfg *c.C) (Settings, error) {
 	}
 	//nolint:gosimple // Actually want this conversion to be explicit since the types aren't definitionally equal.
 	return Settings{
-		Events:        config.Events,
-		MaxGetRequest: config.MaxGetRequest,
-		FlushTimeout:  config.FlushTimeout,
+		Events:            config.Events,
+		MaxGetRequest:     config.MaxGetRequest,
+		FlushTimeout:      config.FlushTimeout,
+		ImmediateShutdown: config.ImmediateShutdown,
 	}, nil
 }
