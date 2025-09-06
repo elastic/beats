@@ -144,20 +144,6 @@ func HandleFlags() error {
 	return nil
 }
 
-// Deprecated: Please use Load().
-//
-// Read reads the configuration from a YAML file into the given interface
-// structure. If path is empty this method reads from the configuration
-// file specified by the '-c' command line flag.
-func Read(out interface{}, path string) error {
-	config, err := Load(path, nil)
-	if err != nil {
-		return err
-	}
-
-	return config.Unpack(out)
-}
-
 // Load reads the configuration from a YAML file structure. If path is empty
 // this method reads from the configuration file specified by the '-c' command
 // line flag.
@@ -227,8 +213,8 @@ func Load(path string, beatOverrides []ConditionalOverride) (*config.C, error) {
 }
 
 // LoadList loads a list of configs data from the given file.
-func LoadList(file string) ([]*config.C, error) {
-	logp.Debug("cfgfile", "Load config from file: %s", file)
+func LoadList(file string, logger *logp.Logger) ([]*config.C, error) {
+	logger.Named("cfgfile").Debugf("Load config from file: %s", file)
 	rawConfig, err := common.LoadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf("invalid config: %w", err)

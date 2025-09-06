@@ -80,7 +80,7 @@ type Manager interface {
 }
 
 // ManagerFactory is the factory type for creating a config manager
-type ManagerFactory func(*config.C, *reload.Registry) (Manager, error)
+type ManagerFactory func(*config.C, *reload.Registry, *logp.Logger) (Manager, error)
 
 // If managerFactory is non-nil, NewManager will use it to create the
 // beats manager. managerFactoryLock must be held to access managerFactory.
@@ -93,16 +93,16 @@ var managerFactoryLock sync.Mutex
 // it returns a placeholder.
 // Tests can call SetManagerFactory to instead use a mocked manager,
 // see x-pack/libbeat/management/tests/init.go.
-func NewManager(cfg *config.C, registry *reload.Registry) (Manager, error) {
+func NewManager(cfg *config.C, registry *reload.Registry, logger *logp.Logger) (Manager, error) {
 	if cfg.Enabled() {
 		managerFactoryLock.Lock()
 		defer managerFactoryLock.Unlock()
 		if managerFactory != nil {
-			return managerFactory(cfg, registry)
+			return managerFactory(cfg, registry, logger)
 		}
 	}
 	return &fallbackManager{
-		logger: logp.NewLogger("mgmt"),
+		logger: logger.Named("mgmt"),
 		status: status.Unknown,
 		msg:    "",
 	}, nil

@@ -10,9 +10,11 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os/exec"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -23,10 +25,11 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -43,7 +46,7 @@ var (
 	timeNow = time.Now
 )
 
-func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Stable,
@@ -79,7 +82,7 @@ type input struct {
 	metrics *inputMetrics
 }
 
-func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
+func cursorConfigure(cfg *conf.C, _ *logp.Logger) ([]inputcursor.Source, inputcursor.Input, error) {
 	conf := defaultConfig()
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, nil, err
@@ -104,9 +107,7 @@ func (input input) Test(src inputcursor.Source, _ v2.TestContext) error {
 
 // Run starts the input and blocks until it ends the execution.
 func (input *input) Run(ctxt v2.Context, src inputcursor.Source, resumeCursor inputcursor.Cursor, pub inputcursor.Publisher) error {
-	reg, unreg := inputmon.NewInputRegistry(input.Name(), ctxt.ID, nil)
-	defer unreg()
-	input.metrics = newInputMetrics(reg)
+	reg := ctxt.MetricsRegistry
 
 	stdCtx := ctxtool.FromCanceller(ctxt.Cancelation)
 	log := ctxt.Logger.With("source", src.Name())
@@ -119,10 +120,11 @@ func (input *input) Run(ctxt v2.Context, src inputcursor.Source, resumeCursor in
 		input.ShowConfig.Start = startFrom
 	}
 
-	return input.runWithMetrics(stdCtx, pub, log)
+	return input.runWithMetrics(stdCtx, pub, reg, log)
 }
 
-func (input *input) runWithMetrics(ctx context.Context, pub inputcursor.Publisher, log *logp.Logger) error {
+func (input *input) runWithMetrics(ctx context.Context, pub inputcursor.Publisher, reg *monitoring.Registry, log *logp.Logger) error {
+	input.metrics = newInputMetrics(reg)
 	// we create a wrapped publisher for the streaming go routine.
 	// It will notify the backfilling goroutine with the end date of the
 	// backfilling period and avoid updating the stored date to resume
@@ -171,7 +173,7 @@ func (input *input) runWithMetrics(ctx context.Context, pub inputcursor.Publishe
 // mustStream returns true in case a stream command is needed.
 // This is the default case and the only exceptions are when an archive file or an end date are set.
 func (input *input) mustStream() bool {
-	return !(input.ShowConfig.ArchiveFile != "" || input.ShowConfig.TraceFile != "" || input.ShowConfig.End != "")
+	return input.ShowConfig.ArchiveFile == "" && input.ShowConfig.TraceFile == "" && input.ShowConfig.End == ""
 }
 
 // mustBackfill returns true in case a show command is needed.
@@ -211,7 +213,7 @@ func (input *input) runLogCmd(ctx context.Context, logCmd *exec.Cmd, pub inputcu
 }
 
 func (input *input) processLogs(stdout io.Reader, pub inputcursor.Publisher, log *logp.Logger) error {
-	scanner := bufio.NewScanner(stdout)
+	reader := bufio.NewReader(stdout)
 
 	var (
 		event         beat.Event
@@ -221,8 +223,18 @@ func (input *input) processLogs(stdout io.Reader, pub inputcursor.Publisher, log
 		err           error
 	)
 
-	for scanner.Scan() {
-		line = scanner.Text()
+	for {
+		line, err = reader.ReadString('\n')
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				return nil
+			}
+			input.metrics.errs.Add(1)
+			return err
+		}
+		if line = strings.Trim(line, " \n\t\r"); line == "" {
+			continue
+		}
 		if err = json.Unmarshal([]byte(line), &logRecordLine); err != nil {
 			log.Errorf("invalid json log: %v", err)
 			input.metrics.errs.Add(1)
@@ -247,12 +259,6 @@ func (input *input) processLogs(stdout io.Reader, pub inputcursor.Publisher, log
 			continue
 		}
 	}
-	if err = scanner.Err(); err != nil {
-		input.metrics.errs.Add(1)
-		return fmt.Errorf("scanning stdout: %w", err)
-	}
-
-	return nil
 }
 
 // wrappedPublisher wraps a publisher and stores the first published event date.
@@ -279,7 +285,7 @@ func newWrappedPublisher(updateCursor bool, inner inputcursor.Publisher) *wrappe
 
 func (pub *wrappedPublisher) Publish(event beat.Event, cursor interface{}) error {
 	pub.firstTimeOnce.Do(func() {
-		pub.firstProcessedTime = cursor.(time.Time)
+		pub.firstProcessedTime, _ = cursor.(time.Time)
 		close(pub.firstTimeC)
 	})
 	if !pub.updateCursor.Load() {

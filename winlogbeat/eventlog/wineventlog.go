@@ -20,18 +20,21 @@
 package eventlog
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
-	"go.uber.org/multierr"
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	wininfo "github.com/elastic/go-sysinfo/providers/windows"
 )
 
 // winEventLog implements the EventLog interface for reading from the Windows
@@ -55,12 +58,9 @@ type winEventLog struct {
 // newWinEventLog creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
 func newWinEventLog(options *conf.C) (EventLog, error) {
-	var xmlQuery string
 	var err error
-	var isFile bool
-	var log *logp.Logger
 
-	c := config{BatchReadSize: 512}
+	c := defaultConfig()
 	if err := readConfig(options, &c); err != nil {
 		return nil, err
 	}
@@ -70,59 +70,63 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		id = c.Name
 	}
 
+	l := &winEventLog{
+		config:      c,
+		id:          id,
+		channelName: c.Name,
+		maxRead:     c.BatchReadSize,
+		log:         logp.NewLogger("wineventlog").With("id", id),
+	}
+
 	if c.XMLQuery != "" {
-		xmlQuery = c.XMLQuery
-		log = logp.NewLogger("wineventlog").With("id", id)
+		if l.skipQueryFilters() {
+			l.log.Warn("you are using a custom XML query with Windows Server 2025 and forwarded events, " +
+				"this is not recommended due to a known issue with that can crash the Event Log service if using" +
+				" query filters. Please use a custom query without filters or use the default query")
+		}
+		l.query = c.XMLQuery
 	} else {
+		l.log = l.log.With("channel", c.Name)
 		queryLog := c.Name
 		if info, err := os.Stat(c.Name); err == nil && info.Mode().IsRegular() {
 			path, err := filepath.Abs(c.Name)
 			if err != nil {
 				return nil, err
 			}
-			isFile = true
+			l.file = true
 			queryLog = "file://" + path
 		}
 
-		xmlQuery, err = win.Query{
-			Log:         queryLog,
-			IgnoreOlder: c.SimpleQuery.IgnoreOlder,
-			Level:       c.SimpleQuery.Level,
-			EventID:     c.SimpleQuery.EventID,
-			Provider:    c.SimpleQuery.Provider,
-		}.Build()
+		winQuery := win.Query{
+			Log: queryLog,
+		}
+
+		if !l.skipQueryFilters() {
+			winQuery.IgnoreOlder = c.SimpleQuery.IgnoreOlder
+			winQuery.Level = c.SimpleQuery.Level
+			winQuery.EventID = c.SimpleQuery.EventID
+			winQuery.Provider = c.SimpleQuery.Provider
+		} else {
+			l.log.Warn("skipping query filters for Windows Server 2025 due to known issue" +
+				" with Event Log API and forwarded events")
+		}
+
+		l.query, err = winQuery.Build()
 		if err != nil {
 			return nil, err
 		}
-
-		log = logp.NewLogger("wineventlog").With("id", id).With("channel", c.Name)
 	}
 
-	l := &winEventLog{
-		config:      c,
-		query:       xmlQuery,
-		id:          id,
-		channelName: c.Name,
-		file:        isFile,
-		maxRead:     c.BatchReadSize,
-		log:         log,
-	}
-
-	switch c.IncludeXML {
+	switch c.IncludeXML || l.isForwarded() {
 	case true:
 		l.renderer = win.NewXMLRenderer(
-			win.RenderConfig{
-				IsForwarded: l.isForwarded(),
-				Locale:      c.EventLanguage,
-			},
-			win.NilHandle, log)
+			c.EventLanguage,
+			l.isForwarded(),
+			win.NilHandle, l.log)
 	case false:
 		l.renderer, err = win.NewRenderer(
-			win.RenderConfig{
-				IsForwarded: l.isForwarded(),
-				Locale:      c.EventLanguage,
-			},
-			win.NilHandle, log)
+			c.EventLanguage,
+			win.NilHandle, l.log)
 		if err != nil {
 			return nil, err
 		}
@@ -151,12 +155,17 @@ func (l *winEventLog) IsFile() bool {
 	return l.file
 }
 
-func (l *winEventLog) Open(state checkpoint.EventLogState) error {
+// IgnoreMissingChannel returns true if missing channels should be ignored.
+func (l *winEventLog) IgnoreMissingChannel() bool {
+	return !l.file && (l.config.IgnoreMissingChannel == nil || *l.config.IgnoreMissingChannel)
+}
+
+func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
 	l.lastRead = state
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
-	if l.metrics == nil {
-		l.metrics = newInputMetrics(l.channelName, l.id)
+	if l.metrics == nil && l.id != "" {
+		l.metrics = newInputMetrics(l.channelName, metricsRegistry, l.log)
 	}
 
 	var err error
@@ -364,8 +373,24 @@ func (l *winEventLog) close() error {
 	if l.iterator == nil {
 		return l.renderer.Close()
 	}
-	return multierr.Combine(
+	return errors.Join(
 		l.iterator.Close(),
 		l.renderer.Close(),
 	)
+}
+
+// FIXME: Windows Server 2025 has a bug in the Windows Event Log API that causes
+// the Event Log Service to crash when using some combinations of filters with
+// forwarded events. This is a workaround to skip the query filters for
+// Windows Server 2025 in such scenarios.
+func (l *winEventLog) skipQueryFilters() bool {
+	if l.config.Bypass2025Workaround {
+		return false
+	}
+	osinfo, err := wininfo.OperatingSystem()
+	if err != nil {
+		l.log.Warnf("failed to get OS info: %v", err)
+		return false
+	}
+	return l.isForwarded() && strings.Contains(osinfo.Name, "2025")
 }

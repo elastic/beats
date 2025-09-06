@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -64,7 +64,7 @@ func init() {
 }
 
 // NewReplaceString returns a new replace processor.
-func NewReplaceString(c *conf.C) (beat.Processor, error) {
+func NewReplaceString(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := replaceStringConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -76,7 +76,7 @@ func NewReplaceString(c *conf.C) (beat.Processor, error) {
 
 	f := &replaceString{
 		config: config,
-		log:    logp.NewLogger("replace"),
+		log:    log.Named("replace"),
 	}
 	return f, nil
 }

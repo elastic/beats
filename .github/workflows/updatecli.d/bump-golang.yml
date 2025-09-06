@@ -11,8 +11,9 @@ scms:
       user: '{{ requiredEnv "GITHUB_ACTOR" }}'
       username: '{{ requiredEnv "GITHUB_ACTOR" }}'
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
-      branch: main
+      branch: '{{ .scm.branch }}'
       commitusingapi: true
+      force: false
 
 actions:
   beats:
@@ -99,15 +100,6 @@ targets:
       content: '{{ source "latestGoVersion" }}'
       file: .go-version
       matchpattern: '\d+.\d+.\d+'
-  update-golang.ci:
-    name: "Update .golangci.yml"
-    sourceid: latestGoVersion
-    scmid: githubConfig
-    kind: file
-    spec:
-      content: '{{ source "latestGoVersion" }}'
-      file: .golangci.yml
-      matchpattern: '\d+.\d+.\d+'
   update-version.asciidoc:
     name: "Update version.asciidoc"
     sourceid: latestGoVersion
@@ -166,16 +158,6 @@ targets:
         keyword: "FROM"
         matcher: "golang"
       file: ./packetbeat/Dockerfile
-  update-nats-module-dockerfile:
-    name: "Update NATS module Dockerfile"
-    sourceid: latestGoVersion
-    scmid: githubConfig
-    kind: dockerfile
-    spec:
-      instruction:
-        keyword: "FROM"
-        matcher: "golang"
-      file: ./metricbeat/module/nats/_meta/Dockerfile
   update-http-module-dockerfile:
     name: "Update HTTP module Dockerfile"
     sourceid: latestGoVersion

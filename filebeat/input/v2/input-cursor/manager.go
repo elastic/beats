@@ -48,8 +48,8 @@ import (
 type InputManager struct {
 	Logger *logp.Logger
 
-	// StateStore gives the InputManager access to the persitent key value store.
-	StateStore StateStore
+	// StateStore gives the InputManager access to the persistent key value store.
+	StateStore statestore.States
 
 	// Type must contain the name of the input type. It is used to create the key name
 	// for all sources the inputs collect from.
@@ -61,7 +61,7 @@ type InputManager struct {
 
 	// Configure returns an array of Sources, and a configured Input instances
 	// that will be used to collect events from each source.
-	Configure func(cfg *conf.C) ([]Source, Input, error)
+	Configure func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error)
 
 	initedFull bool
 	initErr    error
@@ -79,12 +79,6 @@ var (
 	errNoSourceConfigured = errors.New("no source has been configured")
 	errNoInputRunner      = errors.New("no input runner available")
 )
-
-// StateStore interface and configurations used to give the Manager access to the persistent store.
-type StateStore interface {
-	Access(typ string) (*statestore.Store, error)
-	CleanupInterval() time.Duration
-}
 
 // init initializes the state store
 // This function is called from:
@@ -130,7 +124,15 @@ func (cim *InputManager) Init(group unison.Group) error {
 	store := cim.store
 	cleaner := &cleaner{log: log}
 	store.Retain()
+	// TL;DR: If Filebeat shuts down too quickly, the function passed to
+	// `group.Go` will never run, therefore this instance of store will
+	// never be released, locking Filebeat's shutdown process.
+	//
+	// To circumvent that, we wait for `group.Go` to start our function.
+	// See https://github.com/elastic/beats/issues/45034#issuecomment-3238261126
+	waitRunning := make(chan struct{})
 	err := group.Go(func(canceler context.Context) error {
+		waitRunning <- struct{}{}
 		defer cim.shutdown()
 		defer store.Release()
 		interval := cim.StateStore.CleanupInterval()
@@ -146,6 +148,7 @@ func (cim *InputManager) Init(group unison.Group) error {
 		return fmt.Errorf("Can not start registry cleanup process: %w", err)
 	}
 
+	<-waitRunning
 	return nil
 }
 
@@ -168,7 +171,7 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	sources, inp, err := cim.Configure(config)
+	sources, inp, err := cim.Configure(config, cim.Logger)
 	if err != nil {
 		return nil, err
 	}

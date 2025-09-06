@@ -55,7 +55,7 @@ func NewWithRetry(beatInfo beat.Info, retryCount int, retrySleep time.Duration) 
 		fileLock:   flock.New(lockfilePath),
 		retryCount: retryCount,
 		retrySleep: retrySleep,
-		logger:     logp.L(),
+		logger:     beatInfo.Logger,
 	}
 }
 

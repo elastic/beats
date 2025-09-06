@@ -1,0 +1,42 @@
+filebeat.inputs:
+  - type: filestream
+    id: delete-on-close
+    index: "{{ .index }}"
+    paths:
+      - {{ .logfile }}
+    close.reader.on_eof: true
+    delete:
+      enabled: true
+      grace_period: {{ .gracePeriod }}
+
+    prospector:
+      scanner:
+        fingerprint:
+          enabled: true
+          length: 64
+        check_interval: 0.1s
+
+path.home: {{ .homePath }}
+queue.mem:
+  flush.timeout: 0
+
+output.elasticsearch:
+  hosts:
+    - {{ .esHost }}
+  username: {{ .user }}
+  password: {{ .pass }}
+  allow_older_versions: true
+  backoff:
+    init: 100ms
+    max: 100ms
+
+logging:
+  level: debug
+  selectors:
+    - input
+    - input.filestream
+    - input.harvester
+    - prospector
+
+metrics:
+  enabled: false

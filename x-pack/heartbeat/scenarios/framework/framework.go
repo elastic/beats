@@ -241,7 +241,7 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, meta ScenarioRunMeta, 
 	}
 
 	// make a pipeline
-	pipe := &monitors.MockPipeline{}
+	pipe := &mockPipeline{}
 	// pass it to the factory
 	f, sched, closeFactory := setupFactoryAndSched(location, stateLoader)
 	conf, err := config.NewConfigFrom(monitorConfig)
@@ -285,7 +285,6 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 		FirstStart:      time.Now(),
 		StartTime:       time.Now(),
 	}
-	info.Monitoring.DefaultUsername = "test"
 
 	sched = scheduler.Create(
 		1,

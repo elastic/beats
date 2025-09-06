@@ -22,9 +22,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mitchellh/hashstructure"
+	"github.com/gohugoio/hashstructure"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -42,7 +43,7 @@ var identifierFactories = map[string]IdentifierFactory{
 	inodeMarkerName: newINodeMarkerIdentifier,
 }
 
-type IdentifierFactory func(*conf.C) (StateIdentifier, error)
+type IdentifierFactory func(*conf.C, *logp.Logger) (StateIdentifier, error)
 
 // StateIdentifier generates an ID for a State.
 type StateIdentifier interface {
@@ -51,9 +52,9 @@ type StateIdentifier interface {
 }
 
 // NewStateIdentifier creates a new state identifier for a log input.
-func NewStateIdentifier(ns *conf.Namespace) (StateIdentifier, error) {
+func NewStateIdentifier(ns *conf.Namespace, logger *logp.Logger) (StateIdentifier, error) {
 	if ns == nil {
-		return newINodeDeviceIdentifier(nil)
+		return newINodeDeviceIdentifier(nil, logger)
 	}
 
 	identifierType := ns.Name()
@@ -62,14 +63,14 @@ func NewStateIdentifier(ns *conf.Namespace) (StateIdentifier, error) {
 		return nil, fmt.Errorf("no such file_identity generator: %s", identifierType)
 	}
 
-	return f(ns.Config())
+	return f(ns.Config(), logger)
 }
 
 type inodeDeviceIdentifier struct {
 	name string
 }
 
-func newINodeDeviceIdentifier(_ *conf.C) (StateIdentifier, error) {
+func newINodeDeviceIdentifier(_ *conf.C, _ *logp.Logger) (StateIdentifier, error) {
 	return &inodeDeviceIdentifier{
 		name: nativeName,
 	}, nil
@@ -84,7 +85,7 @@ type pathIdentifier struct {
 	name string
 }
 
-func newPathIdentifier(_ *conf.C) (StateIdentifier, error) {
+func newPathIdentifier(_ *conf.C, _ *logp.Logger) (StateIdentifier, error) {
 	return &pathIdentifier{
 		name: pathName,
 	}, nil
@@ -112,8 +113,3 @@ func genIDWithHash(meta map[string]string, fileID string) string {
 
 	return b.String()
 }
-
-// mockIdentifier is used for testing
-type MockIdentifier struct{}
-
-func (m *MockIdentifier) GenerateID(s State) (string, string) { return s.Id, "mock" }

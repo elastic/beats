@@ -138,7 +138,7 @@ func Test_OAuth2(t *testing.T) {
 				Transport:                       httpClient.Transport.(*customTransporter),
 			}
 
-			input := newStatelessInput(conf, serv.URL+"/")
+			input := newStatelessInput(conf, serv.URL+"/", logp.NewNopLogger())
 
 			assert.Equal(t, "azure-blob-storage-stateless", input.Name())
 			assert.NoError(t, input.Test(v2.TestContext{}))
@@ -146,7 +146,7 @@ func Test_OAuth2(t *testing.T) {
 			chanClient := beattest.NewChanClient(len(tt.expected))
 			t.Cleanup(func() { _ = chanClient.Close() })
 
-			ctx, cancel := newV2Context()
+			ctx, cancel := newV2Context(t)
 			t.Cleanup(cancel)
 			ctx.ID += tt.name
 

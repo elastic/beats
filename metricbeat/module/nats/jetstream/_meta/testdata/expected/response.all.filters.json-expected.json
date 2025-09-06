@@ -1,0 +1,208 @@
+[
+    {
+        "event": {
+            "dataset": "nats.jetstream",
+            "duration": 115000,
+            "module": "nats"
+        },
+        "metricset": {
+            "name": "jetstream",
+            "period": 10000
+        },
+        "nats": {
+            "jetstream": {
+                "category": "consumer",
+                "consumer": {
+                    "account": {
+                        "id": "account-2",
+                        "name": "account-2"
+                    },
+                    "ack_floor": {
+                        "consumer_seq": 0,
+                        "last_active": "0001-01-01T00:00:00.000Z",
+                        "stream_seq": 0
+                    },
+                    "cluster": {
+                        "leader": "us-south-nats-demo"
+                    },
+                    "config": {
+                        "ack_policy": "explicit",
+                        "ack_wait": 300000,
+                        "deliver_policy": "all",
+                        "durable_name": "test-stream-2-consumer-2",
+                        "filter_subject": "",
+                        "max_ack_pending": 1000,
+                        "max_deliver": -1,
+                        "max_waiting": 512,
+                        "name": "test-stream-2-consumer-2",
+                        "num_replicas": 0,
+                        "replay_policy": "original"
+                    },
+                    "created": "2025-03-10T12:57:13.975Z",
+                    "delivered": {
+                        "consumer_seq": 0,
+                        "last_active": "0001-01-01T00:00:00.000Z",
+                        "stream_seq": 0
+                    },
+                    "last_active_time": "2025-03-15T12:37:22.942Z",
+                    "name": "test-stream-2-consumer-2",
+                    "num_ack_pending": 0,
+                    "num_pending": 0,
+                    "num_redelivered": 0,
+                    "num_waiting": 0,
+                    "stream": {
+                        "name": "test-stream-2"
+                    }
+                }
+            },
+            "server": {
+                "id": "NAGGEW65XCMGPSNNQQF6FGKDGQCCXZFMHDI264FXBLT5MURRVDAAKII3",
+                "time": "2025-03-15T12:37:22.942Z"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "nats"
+        }
+    },
+    {
+        "event": {
+            "dataset": "nats.jetstream",
+            "duration": 115000,
+            "module": "nats"
+        },
+        "metricset": {
+            "name": "jetstream",
+            "period": 10000
+        },
+        "nats": {
+            "jetstream": {
+                "category": "stats",
+                "stats": {
+                    "accounts": 1,
+                    "bytes": 1475169733,
+                    "config": {
+                        "max_memory": 10737418240,
+                        "max_storage": 440234147840,
+                        "store_dir": "/var/jetstream/jetstream",
+                        "sync_interval": 120000000000
+                    },
+                    "consumers": 151,
+                    "memory": 2738,
+                    "messages": 7180741,
+                    "reserved_memory": 0,
+                    "reserved_storage": 3800263736,
+                    "storage": 1475166995,
+                    "streams": 290
+                }
+            },
+            "server": {
+                "id": "NAGGEW65XCMGPSNNQQF6FGKDGQCCXZFMHDI264FXBLT5MURRVDAAKII3",
+                "time": "2025-03-15T12:37:22.942Z"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "nats"
+        }
+    },
+    {
+        "event": {
+            "dataset": "nats.jetstream",
+            "duration": 115000,
+            "module": "nats"
+        },
+        "metricset": {
+            "name": "jetstream",
+            "period": 10000
+        },
+        "nats": {
+            "jetstream": {
+                "account": {
+                    "accounts": 0,
+                    "api": {
+                        "errors": 3,
+                        "total": 0
+                    },
+                    "high_availability_assets": 0,
+                    "id": "account-2",
+                    "memory": 1234,
+                    "name": "account-2",
+                    "reserved_memory": 8589934592,
+                    "reserved_storage": 429496729600,
+                    "storage": 4567
+                },
+                "category": "account"
+            },
+            "server": {
+                "id": "NAGGEW65XCMGPSNNQQF6FGKDGQCCXZFMHDI264FXBLT5MURRVDAAKII3",
+                "time": "2025-03-15T12:37:22.942Z"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "nats"
+        }
+    },
+    {
+        "event": {
+            "dataset": "nats.jetstream",
+            "duration": 115000,
+            "module": "nats"
+        },
+        "metricset": {
+            "name": "jetstream",
+            "period": 10000
+        },
+        "nats": {
+            "jetstream": {
+                "category": "stream",
+                "stream": {
+                    "account": {
+                        "id": "account-2",
+                        "name": "account-2"
+                    },
+                    "cluster": {
+                        "leader": "us-south-nats-demo"
+                    },
+                    "config": {
+                        "description": "",
+                        "max_age": 604800000000000,
+                        "max_bytes": -1,
+                        "max_consumers": -1,
+                        "max_msg_size": -1,
+                        "max_msgs": -1,
+                        "max_msgs_per_subject": -1,
+                        "num_replicas": 1,
+                        "retention": "limits",
+                        "storage": "file",
+                        "subjects": [
+                            "test"
+                        ]
+                    },
+                    "created": "2025-03-10T12:57:12.913Z",
+                    "name": "test-stream-2",
+                    "state": {
+                        "bytes": 0,
+                        "consumer_count": 2,
+                        "first_seq": 0,
+                        "first_ts": "0001-01-01T00:00:00.000Z",
+                        "last_seq": 0,
+                        "last_ts": "0001-01-01T00:00:00.000Z",
+                        "messages": 0,
+                        "num_deleted": 0,
+                        "num_subjects": 0
+                    }
+                }
+            },
+            "server": {
+                "id": "NAGGEW65XCMGPSNNQQF6FGKDGQCCXZFMHDI264FXBLT5MURRVDAAKII3",
+                "time": "2025-03-15T12:37:22.942Z"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "nats"
+        }
+    }
+]

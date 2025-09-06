@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build integration
+//go:build integration && !requirefips
 
 package integration
 
@@ -39,6 +39,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 const translateguidCfg = `
@@ -98,7 +99,7 @@ func TestTranslateGUIDWithLDAP(t *testing.T) {
 
 	// 1. Generate the log file path
 	logFilePath := path.Join(tempDir, "log.log")
-	integration.GenerateLogFile(t, logFilePath, 1, false)
+	integration.WriteLogFile(t, logFilePath, 1, false)
 
 	// 2. Write configuration file and start Filebeat
 	filebeat.WriteConfigFile(
@@ -129,7 +130,7 @@ func TestTranslateGUIDWithLDAP(t *testing.T) {
 
 func startOpenldapContainer(t *testing.T) {
 	ctx := context.Background()
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

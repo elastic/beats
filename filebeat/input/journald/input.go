@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -72,7 +73,7 @@ const localSystemJournalID = "LOCAL_SYSTEM_JOURNAL"
 const pluginName = "journald"
 
 // Plugin creates a new journald input plugin for creating a stateful input.
-func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Stable,
@@ -94,7 +95,7 @@ var cursorVersion = 1
 
 func (p pathSource) Name() string { return string(p) }
 
-func Configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
+func Configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
@@ -190,7 +191,7 @@ func (inp *journald) Run(
 			converter:          journalfield.NewConverter(ctx.Logger, nil),
 			canceler:           ctx.Cancelation,
 			saveRemoteHostname: inp.SaveRemoteHostname,
-		})
+		}, logger)
 
 	ctx.UpdateStatus(status.Running, "Running")
 	for {
@@ -215,7 +216,7 @@ func (inp *journald) Run(
 		if err := publisher.Publish(event, event.Private); err != nil {
 			msg := fmt.Sprintf("could not publish event: %s", err)
 			ctx.UpdateStatus(status.Failed, msg)
-			logger.Errorf(msg)
+			logger.Errorf("%s", msg)
 			return err
 		}
 	}

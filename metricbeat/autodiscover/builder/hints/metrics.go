@@ -70,7 +70,7 @@ func InitializeModule() {
 }
 
 // NewMetricHints builds a new metrics builder based on hints
-func NewMetricHints(cfg *conf.C) (autodiscover.Builder, error) {
+func NewMetricHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 
@@ -78,7 +78,7 @@ func NewMetricHints(cfg *conf.C) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	return &metricHints{config.Key, config.Registry, logp.NewLogger("hints.builder")}, nil
+	return &metricHints{config.Key, config.Registry, logger.Named("hints.builder")}, nil
 }
 
 // Create configs based on hints passed from providers
@@ -111,9 +111,9 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 				configs = append(configs, config)
 			}
 		}
-		logp.Debug("hints.builder", "generated config %+v", configs)
+		m.logger.Debugf("generated config %+v", configs)
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs, options...)
+		return template.ApplyConfigTemplate(event, configs, m.logger, options...)
 
 	}
 
@@ -176,14 +176,14 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 				mod := moduleConfig.Clone()
 				mod["hosts"] = []string{h}
 
-				logp.Debug("hints.builder", "generated config: %v", mod)
+				m.logger.Debugf("generated config: %v", mod)
 
 				// Create config object
 				cfg := m.generateConfig(mod)
 				configs = append(configs, cfg)
 			}
 		} else {
-			logp.Debug("hints.builder", "generated config: %v", moduleConfig)
+			m.logger.Debugf("generated config: %v", moduleConfig)
 
 			// Create config object
 			cfg := m.generateConfig(moduleConfig)
@@ -195,15 +195,15 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 	// Apply information in event to the template to generate the final config
 	// This especially helps in a scenario where endpoints are configured as:
 	// co.elastic.metrics/hosts= "${data.host}:9090"
-	return template.ApplyConfigTemplate(event, configs, options...)
+	return template.ApplyConfigTemplate(event, configs, m.logger, options...)
 }
 
 func (m *metricHints) generateConfig(mod mapstr.M) *conf.C {
 	cfg, err := conf.NewConfigFrom(mod)
 	if err != nil {
-		logp.Debug("hints.builder", "config merge failed with error: %v", err)
+		m.logger.Debugf("config merge failed with error: %v", err)
 	}
-	logp.Debug("hints.builder", "generated config: %+v", conf.DebugString(cfg, true))
+	m.logger.Debugf("generated config: %+v", conf.DebugString(cfg, true))
 	return cfg
 }
 
@@ -322,11 +322,11 @@ func (m *metricHints) getMetricsFilters(hints mapstr.M) mapstr.M {
 }
 
 func (m *metricHints) getModuleConfigs(hints mapstr.M) []mapstr.M {
-	return utils.GetHintAsConfigs(hints, m.Key)
+	return utils.GetHintAsConfigs(hints, m.Key, m.logger)
 }
 
 func (m *metricHints) getProcessors(hints mapstr.M) []mapstr.M {
-	return utils.GetProcessors(hints, m.Key)
+	return utils.GetProcessors(hints, m.Key, m.logger)
 
 }
 

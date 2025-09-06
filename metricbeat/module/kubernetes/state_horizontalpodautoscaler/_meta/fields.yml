@@ -1,0 +1,40 @@
+- name: horizontalpodautoscaler
+  type: group
+  description: >
+    kubernetes horizontalpodautoscaler metrics
+  release: beta
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        The Kubernetes Horizontal Pod Autoscaler name
+    - name: replicas
+      type: group
+      description: >
+        Kubernetes HPA replicas metrics
+      fields:
+        - name: max
+          type: integer
+          description: >
+            Kubernetes HPA maximum replicas from spec
+        - name: min
+          type: integer
+          description: >
+            Kubernetes HPA minimum replicas from spec
+        - name: current
+          type: integer
+          description: >
+            Kubernetes HPA current replicas from status
+        - name: desired
+          type: integer
+          description: >
+            Kubernetes HPA desired replicas from status
+    - name: status
+      type: group
+      description: >
+        Kubernetes HPA status metrics
+      fields:
+        - name: condition
+          type: keyword
+          description: >
+            Kubernetes HPA scaling condition

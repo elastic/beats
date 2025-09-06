@@ -37,6 +37,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -207,7 +208,8 @@ func doClientPing(t *testing.T) {
 
 		clientSettings.connection.Transport.Proxy.URL = &proxyURL
 	}
-	client, err := NewClient(clientSettings, nil)
+	logger := logptest.NewTestingLogger(t, "")
+	client, err := NewClient(clientSettings, nil, logger)
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithCancel(context.Background())

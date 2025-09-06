@@ -5,6 +5,8 @@
 package info
 
 import (
+	"errors"
+
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -26,12 +28,13 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	counter        uint
 	eventsPerFetch uint
+	degrade        bool
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The benchmark info metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The benchmark info metricset is beta."))
 
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -42,6 +45,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet:  base,
 		counter:        1,
 		eventsPerFetch: config.Count,
+		degrade:        config.Degrade,
 	}, nil
 }
 
@@ -56,6 +60,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			},
 		})
 		m.counter++
+	}
+
+	if m.degrade {
+		return errors.New("benchmark input degraded")
 	}
 
 	return nil

@@ -176,6 +176,7 @@ data:
                     - state_persistentvolume
                     - state_persistentvolumeclaim
                     - state_storageclass
+                    # - state_horizontalpodautoscaler
                   # If `https` is used to access `kube-state-metrics`, uncomment following settings:
                   # bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
                   # ssl.certificate_authorities:

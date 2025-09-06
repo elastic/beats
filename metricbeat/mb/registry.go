@@ -389,7 +389,7 @@ func (r *Register) ProcessorsForMetricSet(module, name string) (*processors.Proc
 	if exists {
 		_, exists := metricSets[name]
 		if exists {
-			return processors.NewList(nil), nil // Standard metricsets don't have processor definitions.
+			return processors.NewList(r.log), nil // Standard metricsets don't have processor definitions.
 		}
 	}
 

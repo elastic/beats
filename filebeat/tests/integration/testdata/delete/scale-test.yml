@@ -1,0 +1,31 @@
+filebeat.inputs:
+  - type: filestream
+    id: delete-on-eof
+    paths:
+      - {{ .dir }}/*
+    close.reader.on_eof: true
+    delete:
+      enabled: true
+      grace_period: 0
+
+    prospector:
+      scanner:
+        check_interval: 1s
+
+path.home: {{ .homePath }}
+queue.mem:
+  flush.timeout: 0s
+
+output.discard:
+  enabled: true
+
+logging:
+  level: debug
+  selectors:
+    - input
+    - input.filestream
+    - input.harvester
+    - prospector
+
+metrics:
+  enabled: false

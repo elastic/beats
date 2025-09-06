@@ -20,10 +20,49 @@
 package kprobes
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/cilium/ebpf/btf"
 	"github.com/stretchr/testify/require"
 )
+
+func Test_fsNotifyDataTypeBTF(t *testing.T) {
+	// fetch the data types ourselves for comparison
+	dentry := ""
+	inode := ""
+	path := ""
+	rawSpec, err := btf.LoadKernelSpec()
+	require.NoError(t, err)
+
+	var knownBtf *btf.Enum
+	err = rawSpec.TypeByName("fsnotify_data_type", &knownBtf)
+	require.NoError(t, err)
+	for _, enumType := range knownBtf.Values {
+		switch enumType.Name {
+		case "FSNOTIFY_EVENT_PATH":
+			path = fmt.Sprintf("dt==%d", enumType.Value)
+		case "FSNOTIFY_EVENT_INODE":
+			inode = fmt.Sprintf("dt==%d", enumType.Value)
+		case "FSNOTIFY_EVENT_DENTRY":
+			dentry = fmt.Sprintf("dt==%d", enumType.Value)
+		}
+	}
+
+	// now the actual test
+	rawBtf, err := loadAllSpecs()
+	require.NoError(t, err)
+
+	fsNotify := fsNotifySymbol{}
+
+	err = fsNotify.setKprobeFiltersFromBTF(rawBtf[0])
+	require.NoError(t, err)
+
+	require.Contains(t, fsNotify.dentryProbeFilter, dentry, "could not verify dentry filter")
+	require.Contains(t, fsNotify.inodeProbeFilter, inode, "could not verify inode filter")
+	require.Contains(t, fsNotify.pathProbeFilter, path, "could not verify path filter")
+
+}
 
 func Test_fsNotifySymbol_buildProbes(t *testing.T) {
 	specs, err := loadEmbeddedSpecs()
@@ -36,7 +75,6 @@ func Test_fsNotifySymbol_buildProbes(t *testing.T) {
 	}
 
 	for _, spec := range specs {
-
 		if !spec.ContainsSymbol("fsnotify") {
 			t.FailNow()
 		}

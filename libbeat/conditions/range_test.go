@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -33,7 +34,7 @@ func TestRangeCreateNumeric(t *testing.T) {
 			"gtr": 0.3,
 		}},
 	}
-	_, err := NewCondition(&config)
+	_, err := NewCondition(&config, logptest.NewTestingLogger(t, ""))
 	assert.Error(t, err)
 }
 
@@ -43,7 +44,7 @@ func TestRangeCreateLexicographic(t *testing.T) {
 			"gt": "fdfdd",
 		}},
 	}
-	_, err := NewCondition(&config)
+	_, err := NewCondition(&config, logptest.NewTestingLogger(t, ""))
 	assert.Error(t, err)
 }
 

@@ -78,7 +78,7 @@ func setup(b *testing.B, compress bool, protobuf bool) (*diskQueue, queue.Produc
 	s.Path = b.TempDir()
 
 	s.UseCompression = compress
-	q, err := NewQueue(logp.L(), nil, s, nil)
+	q, err := NewQueue(logp.NewNopLogger(), nil, s, nil)
 	if err != nil {
 		panic(err)
 	}

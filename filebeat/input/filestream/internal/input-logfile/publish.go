@@ -71,7 +71,7 @@ func (op *updateOp) Key() string {
 
 // Publish publishes an event. Publish returns false if the inputs cancellation context has been marked as done.
 // If cursorUpdate is not nil, Publish updates the in memory state and create and updateOp for the pending update.
-// It overwrite event.Private with the update operation, before finally sending the event.
+// It overwrites event.Private with the update operation, before finally sending the event.
 // The ACK ordering in the publisher pipeline guarantees that update operations
 // will be ACKed and executed in the correct order.
 func (c *cursorPublisher) Publish(event beat.Event, cursorUpdate interface{}) error {
@@ -134,7 +134,7 @@ func (op *updateOp) Execute(store *store, n uint) {
 	} else {
 		err := typeconv.Convert(&resource.cursor, op.delta)
 		if err != nil {
-			store.log.Errorf("failed to perform type conversion: %w", err)
+			store.log.Errorf("failed to perform type conversion: %v", err)
 		}
 	}
 

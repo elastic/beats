@@ -1,0 +1,33 @@
+{
+    "persistent": {
+        "cluster": {
+            "routing": {
+                "allocation": {
+                    "cluster_concurrent_rebalance": "0"
+                }
+            },
+            "indices": {
+                "close": {
+                    "enable": "true"
+                }
+            },
+            "metadata": {
+                "display_name": "my-cluster"
+            },
+            "max_shards_per_node": "4000"
+        },
+        "indices": {
+            "lifecycle": {
+                "poll_interval": "35m"
+            }
+        },
+        "action": {
+            "auto_create_index": ".ent-search-*-logs-*,-.ent-search-*,+*"
+        }
+    },
+    "transient": {
+        "action": {
+            "auto_create_index": ".ent-search-*-logs-*,-.ent-search-*,+*"
+        }
+    }
+}

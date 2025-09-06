@@ -29,7 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -52,19 +52,19 @@ type processor struct {
 
 // New returns a new translate_sid processor for converting windows SID values
 // to names.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the translate_sid configuration: %w", err)
 	}
 
-	return newFromConfig(c)
+	return newFromConfig(c, log)
 }
 
-func newFromConfig(c config) (*processor, error) {
+func newFromConfig(c config, log *logp.Logger) (*processor, error) {
 	return &processor{
 		config: c,
-		log:    logp.NewLogger(logName),
+		log:    log.Named(logName),
 	}, nil
 }
 

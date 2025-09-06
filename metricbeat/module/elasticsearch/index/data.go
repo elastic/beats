@@ -19,9 +19,8 @@ package index
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
@@ -43,9 +42,9 @@ type Index struct {
 
 	Index          string     `json:"index"`
 	Status         string     `json:"status"`
-	TierPreference string     `json:"tier_preference"`
-	CreationDate   string     `json:"creation_date"`
-	Version        string     `json:"version"`
+	TierPreference string     `json:"tier_preference,omitempty"`
+	CreationDate   string     `json:"creation_date,omitempty"`
+	Version        string     `json:"version,omitempty"`
 	Shards         shardStats `json:"shards"`
 }
 
@@ -182,9 +181,13 @@ type bulkStats struct {
 	AvgSizeInBytes    int `json:"avg_size_in_bytes"`
 }
 
-var logger = logp.NewLogger("elasticsearch.index")
-
-func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte, isXpack bool) error {
+func eventsMapping(
+	r mb.ReporterV2,
+	httpClient *helper.HTTP,
+	info elasticsearch.Info,
+	content []byte,
+	isXpack bool,
+	log *logp.Logger) error {
 	clusterStateMetrics := []string{"routing_table"}
 	clusterStateFilterPaths := []string{"routing_table"}
 	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics, clusterStateFilterPaths)
@@ -192,7 +195,7 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		return fmt.Errorf("failure retrieving cluster state from Elasticsearch: %w", err)
 	}
 
-	indicesSettingsPattern := "*,.*"
+	indicesSettingsPattern := "*,-.*"
 	indicesSettingsFilterPaths := []string{"*.settings.index.creation_date", "*.settings.index.**._tier_preference", "*.settings.index.version.created"}
 	indicesSettings, err := elasticsearch.GetIndexSettings(httpClient, httpClient.GetURI(), indicesSettingsPattern, indicesSettingsFilterPaths)
 	if err != nil {
@@ -207,7 +210,7 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		return fmt.Errorf("failure parsing Indices Stats Elasticsearch API response: %w", err)
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	for name := range indicesStats.Indices {
 		event := mb.Event{
 			ModuleFields: mapstr.M{},
@@ -226,7 +229,7 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		if err != nil {
 			// Failure to add index settings is sometimes expected and won't be breaking,
 			// so we log it as debug and carry on with regular processing.
-			logger.Debugf("failure adding index settings: %v", err)
+			log.Named("elasticsearch.index").Debugf("failure adding index settings: %v", err)
 		}
 
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
@@ -259,7 +262,7 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		r.Event(event)
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func parseAPIResponse(content []byte, indicesStats *stats) error {

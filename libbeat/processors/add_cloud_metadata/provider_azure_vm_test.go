@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package add_cloud_metadata
 
 import (
@@ -38,6 +40,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -175,7 +178,7 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := New(config)
+	p, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -201,7 +204,8 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 			"service": mapstr.M{
 				"name": "Virtual Machines",
 			},
-			"region": "eastus",
+			"region":            "eastus",
+			"availability_zone": "3",
 		},
 		"orchestrator": mapstr.M{
 			"cluster": mapstr.M{

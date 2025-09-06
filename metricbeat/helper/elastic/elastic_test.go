@@ -26,7 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestMakeXPackMonitoringIndexName(t *testing.T) {
@@ -38,22 +38,22 @@ func TestMakeXPackMonitoringIndexName(t *testing.T) {
 		{
 			"Elasticsearch monitoring index",
 			Elasticsearch,
-			".monitoring-es-9-mb",
+			".monitoring-es-8-mb",
 		},
 		{
 			"Kibana monitoring index",
 			Kibana,
-			".monitoring-kibana-9-mb",
+			".monitoring-kibana-8-mb",
 		},
 		{
 			"Logstash monitoring index",
 			Logstash,
-			".monitoring-logstash-9-mb",
+			".monitoring-logstash-8-mb",
 		},
 		{
 			"Beats monitoring index",
 			Beats,
-			".monitoring-beats-9-mb",
+			".monitoring-beats-8-mb",
 		},
 	}
 
@@ -211,7 +211,7 @@ func TestConfigureModule(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(test.initConfig)
-			m, _, err := mb.NewModule(cfg, mockRegistry)
+			m, _, err := mb.NewModule(cfg, mockRegistry, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			bm, ok := m.(*mb.BaseModule)
@@ -219,7 +219,7 @@ func TestConfigureModule(t *testing.T) {
 				require.Fail(t, "expecting module to be base module")
 			}
 
-			newM, err := NewModule(bm, test.xpackEnabledMetricsets, test.optionalXpackMetricsets, logp.L())
+			newM, err := NewModule(bm, test.xpackEnabledMetricsets, test.optionalXpackMetricsets, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			var newConfig metricSetConfig

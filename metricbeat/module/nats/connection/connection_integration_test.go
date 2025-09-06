@@ -22,28 +22,33 @@ package connection
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	service := compose.EnsureUp(t, "nats")
-	compose.EnsureUp(t, "nats-routes")
+	compose.EnsureUp(t, "nats")
+	service := compose.EnsureUp(t, "nats-routes")
 
 	m := mbtest.NewFetcher(t, getConfig(service.Host()))
 	m.WriteEvents(t, "")
 }
 
 func TestFetch(t *testing.T) {
-	service := compose.EnsureUp(t, "nats")
-	compose.EnsureUp(t, "nats-routes")
+	compose.EnsureUp(t, "nats")
+	service := compose.EnsureUp(t, "nats-routes")
 
 	reporter := &mbtest.CapturingReporterV2{}
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
-	metricSet.Fetch(reporter)
+	err := metricSet.Fetch(reporter)
+	assert.NoError(t, err)
 
-	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
+	events := reporter.GetEvents()
+
+	e := mbtest.StandardizeEvent(metricSet, events[0])
 	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 }
 

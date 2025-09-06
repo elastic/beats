@@ -77,17 +77,17 @@ func genRegistry(reg *monitoring.Registry, base string) *monitoring.Registry {
 		regName = fmt.Sprintf("%s.%d", base, id)
 	}
 
-	metricsReg := reg.NewRegistry(regName)
+	metricsReg := reg.GetOrCreateRegistry(regName)
 	return metricsReg
 }
 
-func New(cfg *cfg.C) (beat.Processor, error) {
+func New(cfg *cfg.C, log *logp.Logger) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
-	logger := logp.NewLogger(logName)
+	logger := log.Named(logName)
 	procDBReg := genRegistry(monitoring.Default, regNameProcessDB)
 	ctx, cancel := context.WithCancel(context.Background())
 	reader := procfs.NewProcfsReader(*logger)

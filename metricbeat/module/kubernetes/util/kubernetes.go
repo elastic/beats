@@ -118,19 +118,20 @@ const selector = "kubernetes"
 const StateMetricsetPrefix = "state_"
 
 const (
-	PodResource                   = "pod"
-	ServiceResource               = "service"
-	DeploymentResource            = "deployment"
-	ReplicaSetResource            = "replicaset"
-	StatefulSetResource           = "statefulset"
-	DaemonSetResource             = "daemonset"
-	JobResource                   = "job"
-	NodeResource                  = "node"
-	CronJobResource               = "cronjob"
-	PersistentVolumeResource      = "persistentvolume"
-	PersistentVolumeClaimResource = "persistentvolumeclaim"
-	StorageClassResource          = "storageclass"
-	NamespaceResource             = "state_namespace"
+	PodResource                     = "pod"
+	ServiceResource                 = "service"
+	DeploymentResource              = "deployment"
+	ReplicaSetResource              = "replicaset"
+	StatefulSetResource             = "statefulset"
+	DaemonSetResource               = "daemonset"
+	JobResource                     = "job"
+	NodeResource                    = "node"
+	CronJobResource                 = "cronjob"
+	PersistentVolumeResource        = "persistentvolume"
+	PersistentVolumeClaimResource   = "persistentvolumeclaim"
+	StorageClassResource            = "storageclass"
+	NamespaceResource               = "state_namespace"
+	HorizontalPodAutoscalerResource = "horizontalpodautoscaler"
 )
 
 func NewWatchers() *Watchers {
@@ -253,6 +254,12 @@ func getExtraWatchers(resourceName string, addResourceMetadata *metadata.AddReso
 		return []string{}
 	case NamespaceResource:
 		return []string{}
+	case HorizontalPodAutoscalerResource:
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	default:
 		return []string{}
 	}
@@ -314,7 +321,9 @@ func createWatcher(
 	resourceWatchers *Watchers,
 	metricsRepo *MetricsRepo,
 	namespace string,
-	extraWatcher bool) (bool, error) {
+	extraWatcher bool,
+	logger *logp.Logger,
+) (bool, error) {
 
 	// We need to check the node scope to decide on whether a watcher should be updated or not.
 	nodeScope := false
@@ -346,7 +355,7 @@ func createWatcher(
 			if isNamespaced(resourceName) {
 				options.Namespace = namespace
 			}
-			restartWatcher, err := kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil)
+			restartWatcher, err := kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil, logger)
 			if err != nil {
 				return false, err
 			}
@@ -378,9 +387,10 @@ func createWatcher(
 			options,
 			nil,
 			transformReplicaSetMetadata,
+			logger,
 		)
 	default:
-		watcher, err = kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil)
+		watcher, err = kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil, logger)
 	}
 	if err != nil {
 		return false, fmt.Errorf("error creating watcher for %T: %w", resource, err)
@@ -573,7 +583,7 @@ func createAllWatchers(
 	// Create the main watcher for the given resource.
 	// For example pod metricset's main watcher will be pod watcher.
 	// If it fails, we return an error, so we can stop the extra watchers from creating.
-	created, err := createWatcher(resourceName, res, *options, client, metadataClient, resourceWatchers, metricsRepo, config.Namespace, false)
+	created, err := createWatcher(resourceName, res, *options, client, metadataClient, resourceWatchers, metricsRepo, config.Namespace, false, log)
 	if err != nil {
 		return fmt.Errorf("error initializing Kubernetes watcher %s, required by %s: %w", resourceName, metricsetName, err)
 	} else if created {
@@ -588,7 +598,7 @@ func createAllWatchers(
 	for _, extra := range extraWatchers {
 		extraRes := getResource(extra)
 		if extraRes != nil {
-			created, err = createWatcher(extra, extraRes, *options, client, metadataClient, resourceWatchers, metricsRepo, config.Namespace, true)
+			created, err = createWatcher(extra, extraRes, *options, client, metadataClient, resourceWatchers, metricsRepo, config.Namespace, true, log)
 			if err != nil {
 				log.Errorf("Error initializing Kubernetes watcher %s, required by %s: %s", extra, metricsetName, err)
 			} else {
@@ -701,7 +711,7 @@ func NewResourceMetadataEnricher(
 	metricsRepo *MetricsRepo,
 	resourceWatchers *Watchers,
 	nodeScope bool) Enricher {
-	log := logp.NewLogger(selector)
+	log := base.Logger().Named(selector)
 
 	// metricset configuration
 	config, err := GetValidatedConfig(base)
@@ -824,7 +834,7 @@ func NewContainerMetadataEnricher(
 	resourceWatchers *Watchers,
 	nodeScope bool) Enricher {
 
-	log := logp.NewLogger(selector)
+	log := base.Logger().Named(selector)
 
 	config, err := GetValidatedConfig(base)
 	if err != nil {
@@ -879,7 +889,7 @@ func NewContainerMetadataEnricher(
 
 		pod, ok := r.(*kubernetes.Pod)
 		if !ok {
-			base.Logger().Debugf("Error while casting event: %s", ok)
+			base.Logger().Debugf("Error while casting event, got %T", r)
 		}
 		pmeta := metaGen.Generate(pod)
 
@@ -918,7 +928,7 @@ func NewContainerMetadataEnricher(
 		ids := make([]string, 0)
 		pod, ok := r.(*kubernetes.Pod)
 		if !ok {
-			base.Logger().Debugf("Error while casting event: %s", ok)
+			log.Debugf("Error while casting event, got %T", r)
 		}
 
 		for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
@@ -950,13 +960,13 @@ func NewContainerMetadataEnricher(
 func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
 	config, err := GetConfig(base)
 	if err != nil {
-		logp.Err("Error while getting config: %v", err)
+		base.Logger().Errorf("Error while getting config: %v", err)
 		return nil, err
 	}
 
 	config, err = validateConfig(config)
 	if err != nil {
-		logp.Err("Error while validating config: %v", err)
+		base.Logger().Errorf("Error while validating config: %v", err)
 		return nil, err
 	}
 	return config, nil
@@ -1140,7 +1150,7 @@ func (e *enricher) Enrich(events []mapstr.M) {
 			ecsMeta := meta
 			err = ecsMeta.Delete("kubernetes")
 			if err != nil {
-				logp.Debug("kubernetes", "Failed to delete field '%s': %s", "kubernetes", err)
+				e.log.Named("kubernetes").Debugf("Failed to delete field '%s': %s", "kubernetes", err)
 			}
 
 			event.DeepUpdate(mapstr.M{
@@ -1246,18 +1256,18 @@ func GetClusterECSMeta(cfg *conf.C, client k8sclient.Interface, logger *logp.Log
 func AddClusterECSMeta(base mb.BaseMetricSet) mapstr.M {
 	config, err := GetValidatedConfig(base)
 	if err != nil {
-		logp.Info("could not retrieve validated config")
+		base.Logger().Info("could not retrieve validated config")
 		return mapstr.M{}
 	}
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
-		logp.Err("fail to get kubernetes client: %s", err)
+		base.Logger().Errorf("fail to get kubernetes client: %s", err)
 		return mapstr.M{}
 	}
 	cfg, _ := conf.NewConfigFrom(&config)
 	ecsClusterMeta, err := GetClusterECSMeta(cfg, client, base.Logger())
 	if err != nil {
-		logp.Info("could not retrieve cluster metadata: %s", err)
+		base.Logger().Infof("could not retrieve cluster metadata: %s", err)
 		return mapstr.M{}
 	}
 	return ecsClusterMeta

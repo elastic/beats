@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -571,7 +572,7 @@ func TestCache(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				p, err := New(config)
+				p, err := New(config, logptest.NewTestingLogger(t, ""))
 				if !sameError(err, test.wantInitErr) {
 					t.Errorf("unexpected error from New: got:%v want:%v", err, test.wantInitErr)
 				}

@@ -22,6 +22,8 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"testing"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -212,5 +214,44 @@ func TestQueryFetchEventContentString(t *testing.T) {
 	for _, event := range events {
 		e := mbtest.StandardizeEvent(metricSet, event)
 		t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
+	}
+}
+
+func TestHTTPErrorCodeHandling(t *testing.T) {
+	statusCode := 400
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(statusCode)
+		_, _ = w.Write([]byte("Client sent an HTTP request to an HTTPS server."))
+	}))
+	defer server.Close()
+
+	config := map[string]interface{}{
+		"module":     "prometheus",
+		"metricsets": []string{"query"},
+		"hosts":      []string{server.URL},
+		// queries do not have an actual role here since all http responses are mocked
+		"queries": []mapstr.M{
+			mapstr.M{
+				"name": "string",
+				"path": "/api/v1/query",
+				"params": mapstr.M{
+					"query": "some",
+				},
+			},
+		},
+	}
+	reporter := &mbtest.CapturingReporterV2{}
+
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+	_ = metricSet.Fetch(reporter)
+
+	errs := reporter.GetErrors()
+	if len(errs) != 1 {
+		t.Fatalf("Expected 1 error, had %d: %v\n", len(errs), errs)
+	}
+
+	if !strings.Contains(errs[0].Error(), strconv.Itoa(statusCode)) {
+		t.Fatalf("Expected error to contain HTTP response code %d, got error: %s\n", statusCode, errs[0])
 	}
 }

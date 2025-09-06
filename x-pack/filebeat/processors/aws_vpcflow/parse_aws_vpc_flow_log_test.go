@@ -17,6 +17,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -38,7 +40,7 @@ func TestProcessorRun(t *testing.T) {
 		}
 		c.Mode = ecsAndOriginalMode
 
-		p, err := newParseAWSVPCFlowLog(c)
+		p, err := newParseAWSVPCFlowLog(c, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 
 		assert.Contains(t, p.String(), procName+"=")
@@ -164,7 +166,7 @@ func TestGoldenFile(t *testing.T) {
 				c.Mode = *tc.Mode
 			}
 
-			p, err := newParseAWSVPCFlowLog(c)
+			p, err := newParseAWSVPCFlowLog(c, logp.NewNopLogger())
 			require.NoError(t, err)
 
 			observed := make([]mapstr.M, 0, len(tc.Samples))
@@ -270,7 +272,7 @@ func BenchmarkProcessorRun(b *testing.B) {
 			c.Format = []string{benchmark.format}
 			c.Mode = benchmark.mode
 
-			p, err := newParseAWSVPCFlowLog(c)
+			p, err := newParseAWSVPCFlowLog(c, logp.NewNopLogger())
 			require.NoError(b, err)
 
 			evt := beat.Event{

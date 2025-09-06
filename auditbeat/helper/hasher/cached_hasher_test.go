@@ -30,8 +30,6 @@ import (
 
 type pattern struct {
 	text     []byte
-	md5      string
-	sha1     string
 	sha256   string
 	sha512   string
 	sha3_384 string
@@ -39,8 +37,6 @@ type pattern struct {
 
 var patternA = pattern{
 	text:     []byte("Rather than love, than money, than fame, give me truth.\n"),
-	md5:      "572698a28f439d3c2647c67df75ed22f",
-	sha1:     "511c4040962d493ba9cb2c0748137c11e42eb46b",
 	sha256:   "19c76b22dd0bf97b0bf064e6587961938ba9f4ab73d034b0edac6c2c2829c0cd",
 	sha512:   "e339322ed81208f930047e8b94db504f40a3e8bb2af75511925e3469488104edcd8eb8c613ea7fd0b08199a4d7061690512a05f66b50b4427470d6c8cf2d74a3",
 	sha3_384: "9961640983a079920f74f2503feb5ce63325d6a6cd0138905e9419c4307043fa324217587062ac8648cbf43138a33034",
@@ -48,15 +44,13 @@ var patternA = pattern{
 
 var patternB = pattern{
 	text:     []byte("From womb to tomb, in kindness and crime.\n"),
-	md5:      "e3d72a80f13b9c1e4b07a7182b934502",
-	sha1:     "90da69d7b93ef792e8e4506543506975018df980",
 	sha256:   "67606f88f25357b2b101e94bd02fc5da8dd2993391b88596c15bea77780a6a77",
 	sha512:   "23c3779d7c6a8d4be2ca7a0bf412a2c99ea2f8a95ac21f56e3b9cb1bd0c0427bf2db91bbb484128f53ef48fbbfc97e525b328e1c4c0f8d24dd8a3f438c449736",
 	sha3_384: "2034d02ad7b46831b9f2bf09b2eaa77bfcf70ebd136f29b95e6723cc6bf94d0fb7aae972dd2297b5507bb568cb65563b",
 }
 
 var config = Config{
-	HashTypes:        []HashType{MD5, SHA1, SHA256, SHA512, SHA3_384},
+	HashTypes:        []HashType{SHA256, SHA512, SHA3_384},
 	MaxFileSize:      "1 KiB",
 	MaxFileSizeBytes: 1024,
 }
@@ -141,9 +135,7 @@ func writePattern(t *testing.T, file *os.File, p pattern) {
 func (ch *CachedHasher) checkState(t *testing.T, path string, p pattern, stats CachedHasherStats) {
 	hashes, err := ch.HashFile(path)
 	require.NoError(t, err)
-	require.Len(t, hashes, 5)
-	require.Equal(t, p.md5, hashes["md5"].String())
-	require.Equal(t, p.sha1, hashes["sha1"].String())
+	require.Len(t, hashes, 3)
 	require.Equal(t, p.sha256, hashes["sha256"].String())
 	require.Equal(t, p.sha512, hashes["sha512"].String())
 	require.Equal(t, p.sha3_384, hashes["sha3_384"].String())

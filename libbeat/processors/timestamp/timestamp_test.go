@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -41,7 +42,7 @@ func TestParsePatterns(t *testing.T) {
 	c.Field = "ts"
 	c.Layouts = append(c.Layouts, time.ANSIC, time.RFC3339Nano, time.RFC3339)
 
-	p, err := newFromConfig(c)
+	p, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -121,7 +122,7 @@ func TestParseNoYear(t *testing.T) {
 	c.Layouts = append(c.Layouts, time.StampMilli)
 	c.Timezone = cfgtype.MustNewTimezone("EST")
 
-	p, err := newFromConfig(c)
+	p, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -149,7 +150,7 @@ func TestIgnoreMissing(t *testing.T) {
 	c.Field = "ts"
 	c.Layouts = append(c.Layouts, time.RFC3339)
 
-	p, err := newFromConfig(c)
+	p, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -171,7 +172,7 @@ func TestIgnoreFailure(t *testing.T) {
 	c.Field = "ts"
 	c.Layouts = append(c.Layouts, time.RFC3339)
 
-	p, err := newFromConfig(c)
+	p, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -197,7 +198,7 @@ func TestBuiltInTest(t *testing.T) {
 		"2015-03-07T11:06:39Z",
 	}
 
-	_, err := newFromConfig(c)
+	_, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
 	if assert.Error(t, err) {
 		assert.Contains(t, err.Error(), "failed to parse test timestamp")
 	}
@@ -280,7 +281,7 @@ func TestTimezone(t *testing.T) {
 				"layouts":  []string{time.ANSIC},
 			})
 
-			processor, err := New(config)
+			processor, err := New(config, logptest.NewTestingLogger(t, ""))
 			if c.Error {
 				require.Error(t, err)
 				return
@@ -312,7 +313,7 @@ func TestMetadataTarget(t *testing.T) {
 	c.Layouts = append(c.Layouts, time.RFC3339)
 	c.Timezone = cfgtype.MustNewTimezone("EST")
 
-	p, err := newFromConfig(c)
+	p, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

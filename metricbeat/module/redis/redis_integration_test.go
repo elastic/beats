@@ -29,6 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	_ "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestFetchRedisInfo(t *testing.T) {
@@ -42,7 +43,7 @@ func TestFetchRedisInfo(t *testing.T) {
 	defer conn.Close()
 
 	t.Run("default info", func(t *testing.T) {
-		info, err := FetchRedisInfo("default", conn)
+		info, err := FetchRedisInfo("default", conn, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 
 		_, ok := info["redis_version"]
@@ -53,7 +54,7 @@ func TestFetchRedisInfo(t *testing.T) {
 		conn.Do("FLUSHALL")
 		conn.Do("SET", "foo", "bar")
 
-		info, err := FetchRedisInfo("keyspace", conn)
+		info, err := FetchRedisInfo("keyspace", conn, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 
 		dbFound := false
@@ -210,7 +211,7 @@ func TestFetchKeyInfo(t *testing.T) {
 				conn.Do("EXPIRE", c.Key, c.Expire)
 			}
 
-			info, err := FetchKeyInfo(conn, c.Key)
+			info, err := FetchKeyInfo(conn, c.Key, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 			require.Equal(t, c.Expected, info)
 		})

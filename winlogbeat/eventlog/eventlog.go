@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // EventLog is an interface to a Windows Event Log.
@@ -31,7 +32,7 @@ type EventLog interface {
 	// Open the event log. state points to the last successfully read event
 	// in this event log. Read will resume from the next record. To start reading
 	// from the first event specify a zero-valued EventLogState.
-	Open(state checkpoint.EventLogState) error
+	Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error
 
 	// Read records from the event log. If io.EOF is returned you should stop
 	// reading and close the log.
@@ -53,6 +54,9 @@ type EventLog interface {
 
 	// IsFile returns true if the event log is an evtx file.
 	IsFile() bool
+
+	// IgnoreMissingChannel returns true if missing channels should be ignored.
+	IgnoreMissingChannel() bool
 }
 
 // Record represents a single event from the log.

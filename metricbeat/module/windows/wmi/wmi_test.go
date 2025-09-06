@@ -28,54 +28,54 @@ import (
 func TestShouldSkipNilOrEmptyValue(t *testing.T) {
 	tests := []struct {
 		key                string
-		fieldValue         interface{}
+		propertyValue      interface{}
 		includeNull        bool
 		includeEmptyString bool
 		expectedShouldSkip bool
 	}{
-		// Test Case 1: fieldValue is nil, and IncludeNull is false
+		// Test Case 1: propertyValue is nil, and IncludeNullProperties is false
 		{
-			key:                "Skip nil value with IncludeNull false",
-			fieldValue:         nil,
+			key:                "Skip nil value with IncludeNullProperties false",
+			propertyValue:      nil,
 			includeNull:        false,
 			includeEmptyString: false,
-			expectedShouldSkip: true, // Should skip because IncludeNull is false
+			expectedShouldSkip: true, // Should skip because IncludeNullProperties is false
 		},
 
-		// Test Case 2: fieldValue is an empty string, and IncludeEmptyString is false
+		// Test Case 2: propertyValue is an empty string, and IncludeEmptyStringProperties is false
 		{
-			key:                "Skip Empty string with IncludeEmptyString false",
-			fieldValue:         "",
+			key:                "Skip Empty string with IncludeEmptyStringProperties false",
+			propertyValue:      "",
 			includeNull:        false,
 			includeEmptyString: false,
-			expectedShouldSkip: true, // Should skip because IncludeEmptyString is false
+			expectedShouldSkip: true, // Should skip because IncludeEmptyStringProperties is false
 		},
 
-		// Test Case 3: fieldValue is nil, and IncludeNull is true
+		// Test Case 3: propertyValue is nil, and IncludeNullProperties is true
 		{
-			key:                "Don't skip Nil value with IncludeNull true",
-			fieldValue:         nil,
+			key:                "Don't skip Nil value with IncludeNullProperties true",
+			propertyValue:      nil,
 			includeNull:        true,
 			includeEmptyString: false,
-			expectedShouldSkip: false, // Should not skip because IncludeNull is true
+			expectedShouldSkip: false, // Should not skip because IncludeNullProperties is true
 		},
 
-		// Test Case 4: fieldValue is a non-empty string, and IncludeEmptyString is false
+		// Test Case 4: propertyValue is a non-empty string, and IncludeEmptyStringProperties is false
 		{
-			key:                "Don't skip Non-empty string with IncludeEmptyString false",
-			fieldValue:         "non-empty",
+			key:                "Don't skip Non-empty string with IncludeEmptyStringProperties false",
+			propertyValue:      "non-empty",
 			includeNull:        false,
 			includeEmptyString: false,
 			expectedShouldSkip: false, // Should not skip because the string is non-empty
 		},
 
-		// Test Case 5: fieldValue is a non-empty string, and IncludeEmptyString is true
+		// Test Case 5: propertyValue is a non-empty string, and IncludeEmptyStringProperties is true
 		{
-			key:                "Non-empty string with IncludeEmptyString true",
-			fieldValue:         "non-empty",
+			key:                "Non-empty string with IncludeEmptyStringProperties true",
+			propertyValue:      "non-empty",
 			includeNull:        true,
 			includeEmptyString: true,
-			expectedShouldSkip: false, // Should not skip because IncludeEmptyString is true
+			expectedShouldSkip: false, // Should not skip because IncludeEmptyStringProperties is true
 		},
 	}
 
@@ -84,16 +84,16 @@ func TestShouldSkipNilOrEmptyValue(t *testing.T) {
 
 			// Arrange: Create a MetricSet with the configuration based on the test case
 			config := Config{
-				IncludeNull:        test.includeNull,
-				IncludeEmptyString: test.includeEmptyString,
+				IncludeNullProperties:        test.includeNull,
+				IncludeEmptyStringProperties: test.includeEmptyString,
 			}
 
 			metricSet := &MetricSet{
 				config: config,
 			}
 
-			// Act: Call shouldSkipNilOrEmptyValue with the test case fieldValue
-			result := metricSet.shouldSkipNilOrEmptyValue(test.fieldValue)
+			// Act: Call shouldSkipNilOrEmptyValue with the test case propertyValue
+			result := metricSet.shouldSkipNilOrEmptyValue(test.propertyValue)
 
 			// Assert: Check if the result matches the expected result
 			assert.Equal(t, test.expectedShouldSkip, result)

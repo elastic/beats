@@ -6,52 +6,46 @@ package awss3
 
 import (
 	"errors"
+	"sync"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/stretchr/testify/assert"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-func TestGetProviderFromDomain(t *testing.T) {
-	tests := []struct {
-		endpoint string
-		override string
-		want     string
-	}{
-		{endpoint: "", override: "", want: "aws"},
-		{endpoint: "c2s.ic.gov", want: "aws"},
-		{endpoint: "abc.com", override: "abc", want: "abc"},
-		{endpoint: "oraclecloud.com", override: "xyz", want: "xyz"},
-		{endpoint: "amazonaws.com", want: "aws"},
-		{endpoint: "c2s.sgov.gov", want: "aws"},
-		{endpoint: "c2s.ic.gov", want: "aws"},
-		{endpoint: "amazonaws.com.cn", want: "aws"},
-		{endpoint: "https://backblazeb2.com", want: "backblaze"},
-		{endpoint: "https://1234567890.r2.cloudflarestorage.com", want: "cloudflare"},
-		{endpoint: "https://wasabisys.com", want: "wasabi"},
-		{endpoint: "https://digitaloceanspaces.com", want: "digitalocean"},
-		{endpoint: "https://dream.io", want: "dreamhost"},
-		{endpoint: "https://scw.cloud", want: "scaleway"},
-		{endpoint: "https://googleapis.com", want: "gcp"},
-		{endpoint: "https://cloud.it", want: "arubacloud"},
-		{endpoint: "https://linodeobjects.com", want: "linode"},
-		{endpoint: "https://vultrobjects.com", want: "vultr"},
-		{endpoint: "https://appdomain.cloud", want: "ibm"},
-		{endpoint: "https://aliyuncs.com", want: "alibaba"},
-		{endpoint: "https://oraclecloud.com", want: "oracle"},
-		{endpoint: "https://exo.io", want: "exoscale"},
-		{endpoint: "https://upcloudobjects.com", want: "upcloud"},
-		{endpoint: "https://ilandcloud.com", want: "iland"},
-		{endpoint: "https://zadarazios.com", want: "zadara"},
-	}
+// statusReporterHelperMock is a thread-safe mock of a status reporter that
+// behaves like StatusReporterHelper
+type statusReporterHelperMock struct {
+	mu       sync.Mutex
+	statuses []mgmtStatusUpdate
+	current  status.Status
+}
 
-	for _, test := range tests {
-		assert.Equal(t, test.want, getProviderFromDomain(test.endpoint, test.override),
-			"for endpoint=%q and override=%q", test.endpoint, test.override)
+type mgmtStatusUpdate struct {
+	status status.Status
+	msg    string
+}
+
+func (r *statusReporterHelperMock) getStatuses() []mgmtStatusUpdate {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	s := make([]mgmtStatusUpdate, len(r.statuses))
+	copy(s, r.statuses)
+	return s
+}
+
+func (r *statusReporterHelperMock) UpdateStatus(s status.Status, msg string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	// Imitate behavior of statusReporterHelper. Only record if the new status is different.
+	if s != r.current {
+		r.current = s
+		r.statuses = append(r.statuses, mgmtStatusUpdate{status: s, msg: msg})
 	}
 }
 
@@ -149,10 +143,12 @@ func TestRegionSelection(t *testing.T) {
 			}
 			in := newSQSReaderInput(config, awssdk.Config{})
 			inputCtx := v2.Context{
-				Logger: logp.NewLogger("awss3_test"),
-				ID:     "test_id",
+				Logger:          logp.NewLogger("awss3_test"),
+				ID:              "test_id",
+				MetricsRegistry: monitoring.NewRegistry(),
 			}
 
+			in.status = &statusReporterHelperMock{}
 			// Run setup and verify that it put the correct region in awsConfig.Region
 			err := in.setup(inputCtx, &fakePipeline{})
 			in.cleanup()

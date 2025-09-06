@@ -16,4 +16,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws/ec2"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws/elb"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/nomad"
+
+	// register outputs
+	_ "github.com/elastic/beats/v7/x-pack/libbeat/outputs/otelconsumer"
 )

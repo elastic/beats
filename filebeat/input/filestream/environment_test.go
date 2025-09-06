@@ -20,8 +20,8 @@
 package filestream
 
 import (
+	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -38,6 +38,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -46,10 +47,13 @@ import (
 )
 
 type inputTestingEnvironment struct {
-	t          *testing.T
-	workingDir string
-	stateStore loginp.StateStore
-	pipeline   *mockPipelineConnector
+	logger       *logp.Logger
+	loggerBuffer *bytes.Buffer
+	t            *testing.T
+	workingDir   string
+	stateStore   statestore.States
+	pipeline     *mockPipelineConnector
+	monitoring   beat.Monitoring
 
 	pluginInitOnce sync.Once
 	plugin         v2.Plugin
@@ -62,35 +66,48 @@ type registryEntry struct {
 	Cursor struct {
 		Offset int `json:"offset"`
 	} `json:"cursor"`
-	Meta interface{} `json:"meta,omitempty"`
+	Meta any `json:"meta,omitempty"`
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
-	logp.DevelopmentSetup(logp.ToObserverOutput())
+	// logp.NewInMemoryLocal will always use a console encoder, passing a
+	// JSONEncoderConfig will only change the keys, not the final encoding.
+	logger, buff := logp.NewInMemoryLocal("", logp.ConsoleEncoderConfig())
 
 	t.Cleanup(func() {
 		if t.Failed() {
-			t.Logf("Debug Logs:\n")
-			for _, log := range logp.ObserverLogs().TakeAll() {
-				data, err := json.Marshal(log)
-				if err != nil {
-					t.Errorf("failed encoding log as JSON: %s", err)
-				}
-				t.Logf("%s", string(data))
+			pattern := strings.ReplaceAll(t.Name()+"-*", "/", "_")
+			f, err := os.CreateTemp("", pattern)
+			if err != nil {
+				t.Errorf("cannot create temp file for logs: %s", err)
+				return
 			}
+
+			defer f.Close()
+
+			data := buff.Bytes()
+			t.Logf("Debug Logs:%s\n", string(data))
+			t.Logf("Logs written to %s", f.Name())
+			if _, err := f.Write(data); err != nil {
+				t.Logf("could not write log file for debugging: %s", err)
+			}
+
 			return
 		}
 	})
 
 	return &inputTestingEnvironment{
-		t:          t,
-		workingDir: t.TempDir(),
-		stateStore: openTestStatestore(),
-		pipeline:   &mockPipelineConnector{},
+		logger:       logger,
+		loggerBuffer: buff,
+		t:            t,
+		workingDir:   t.TempDir(),
+		stateStore:   openTestStatestore(),
+		pipeline:     &mockPipelineConnector{},
+		monitoring:   beat.NewMonitoring(),
 	}
 }
 
-func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{}) v2.Input {
+func (e *inputTestingEnvironment) mustCreateInput(config map[string]any) v2.Input {
 	e.t.Helper()
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
@@ -103,7 +120,7 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 	return inp
 }
 
-func (e *inputTestingEnvironment) createInput(config map[string]interface{}) (v2.Input, error) {
+func (e *inputTestingEnvironment) createInput(config map[string]any) (v2.Input, error) {
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
 	_ = manager.Init(&e.grp)
@@ -118,17 +135,32 @@ func (e *inputTestingEnvironment) createInput(config map[string]interface{}) (v2
 
 func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	e.pluginInitOnce.Do(func() {
-		e.plugin = Plugin(logp.L(), e.stateStore)
+		e.plugin = Plugin(e.logger, e.stateStore)
 	})
 	return e.plugin.Manager
 }
 
-func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) {
+func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp v2.Input) {
 	e.wg.Add(1)
 	go func(wg *sync.WaitGroup, grp *unison.TaskGroup) {
 		defer wg.Done()
 		defer func() { _ = grp.Stop() }()
-		inputCtx := v2.Context{Logger: logp.L(), Cancelation: ctx, ID: "fake-ID"}
+
+		logger, _ := logp.NewDevelopmentLogger("")
+		reg := inputmon.NewMetricsRegistry(
+			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
+		defer inputmon.CancelMetricsRegistry(
+			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
+
+		inputCtx := v2.Context{
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
+			Cancelation:     ctx,
+			StatusReporter:  nil,
+			MetricsRegistry: reg,
+			Logger:          e.logger,
+		}
 		_ = inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
 }
@@ -137,12 +169,15 @@ func (e *inputTestingEnvironment) waitUntilInputStops() {
 	e.wg.Wait()
 }
 
-func (e *inputTestingEnvironment) mustWriteToFile(filename string, data []byte) {
+// mustWriteToFile writes data to file and returns the full path
+func (e *inputTestingEnvironment) mustWriteToFile(filename string, data []byte) string {
 	path := e.abspath(filename)
 	err := os.WriteFile(path, data, 0o644)
 	if err != nil {
 		e.t.Fatalf("failed to write file '%s': %+v", path, err)
 	}
+
+	return path
 }
 
 func (e *inputTestingEnvironment) mustAppendToFile(filename string, data []byte) {
@@ -194,7 +229,7 @@ func (e *inputTestingEnvironment) abspath(filename string) string {
 }
 
 func (e *inputTestingEnvironment) requireRegistryEntryCount(expectedCount int) {
-	inputStore, _ := e.stateStore.Access("")
+	inputStore, _ := e.stateStore.StoreFor("")
 
 	actual := 0
 	err := inputStore.Each(func(_ string, _ statestore.ValueDecoder) (bool, error) {
@@ -331,7 +366,7 @@ func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename, inputID str
 		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
 	}
 
-	inputStore, _ := e.stateStore.Access("")
+	inputStore, _ := e.stateStore.StoreFor("")
 	id := getIDFromPath(filepath, inputID, fi)
 
 	var entry registryEntry
@@ -352,7 +387,7 @@ func (e *inputTestingEnvironment) requireOffsetInRegistryByID(key string, expect
 }
 
 func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, error) {
-	inputStore, _ := e.stateStore.Access("")
+	inputStore, _ := e.stateStore.StoreFor("")
 
 	var entry registryEntry
 	err := inputStore.Get(key, &entry)
@@ -373,7 +408,7 @@ func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, e
 }
 
 func getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
-	identifier, _ := newINodeDeviceIdentifier(nil)
+	identifier, _ := newINodeDeviceIdentifier(nil, nil)
 	src := identifier.GetSource(loginp.FSEvent{
 		Descriptor: loginp.FileDescriptor{
 			Info: file.ExtendFileInfo(fi),
@@ -500,6 +535,7 @@ func (e *inputTestingEnvironment) getOutputMessages() []string {
 	messages := make([]string, 0)
 	for _, c := range e.pipeline.clients {
 		for _, evt := range c.GetEvents() {
+			//nolint:errcheck // It's a test, we can force the type cast
 			messages = append(messages, evt.Fields["message"].(string))
 		}
 	}
@@ -539,11 +575,26 @@ func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
 	require.True(e.t, selectedEvent.Timestamp.Equal(tm), "got: %s, expected: %s", selectedEvent.Timestamp.String(), tm.String())
 }
 
+// logContains ensures s is a sub string on any log line.
+// If s is not found, the test fails
+func (e *inputTestingEnvironment) logContains(s string) {
+	logs := e.loggerBuffer.String()
+	for _, line := range strings.Split(logs, "\n") {
+		if strings.Contains(line, s) {
+			return
+		}
+	}
+
+	e.t.Fatalf("%q not found in logs", s)
+}
+
+var _ statestore.States = (*testInputStore)(nil)
+
 type testInputStore struct {
 	registry *statestore.Registry
 }
 
-func openTestStatestore() loginp.StateStore {
+func openTestStatestore() statestore.States {
 	return &testInputStore{
 		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
 	}
@@ -553,7 +604,7 @@ func (s *testInputStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testInputStore) Access(_ string) (*statestore.Store, error) {
+func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
 }
 
@@ -675,7 +726,7 @@ func newMockACKHandler(starter context.Context, blocking bool, config beat.Clien
 }
 
 func blockingACKer(starter context.Context) beat.EventListener {
-	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
+	return acker.EventPrivateReporter(func(acked int, private []any) {
 		for starter.Err() == nil {
 		}
 	})

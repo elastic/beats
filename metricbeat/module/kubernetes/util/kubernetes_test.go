@@ -40,6 +40,8 @@ import (
 	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/require"
@@ -47,11 +49,10 @@ import (
 	k8smetafake "k8s.io/client-go/metadata/fake"
 
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestWatchOptions(t *testing.T) {
-	log := logp.NewLogger("test")
+	log := logptest.NewTestingLogger(t, "test")
 
 	client := k8sfake.NewSimpleClientset()
 	config := &kubernetesConfig{
@@ -82,7 +83,7 @@ func TestCreateWatcher(t *testing.T) {
 		SyncPeriod: time.Minute,
 		Node:       "test-node",
 	}
-	log := logp.NewLogger("test")
+	log := logptest.NewTestingLogger(t, "test")
 
 	options, err := getWatchOptions(config, false, client, log)
 	require.NoError(t, err)
@@ -96,7 +97,9 @@ func TestCreateWatcher(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false)
+		false,
+		logptest.NewTestingLogger(t, ""),
+	)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -114,7 +117,9 @@ func TestCreateWatcher(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		true)
+		true,
+		logptest.NewTestingLogger(t, ""),
+	)
 	require.False(t, created)
 	require.NoError(t, err)
 
@@ -132,7 +137,7 @@ func TestCreateWatcher(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false)
+		false, logptest.NewTestingLogger(t, ""))
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -154,7 +159,7 @@ func TestAddToMetricsetsUsing(t *testing.T) {
 		SyncPeriod: time.Minute,
 		Node:       "test-node",
 	}
-	log := logp.NewLogger("test")
+	log := logptest.NewTestingLogger(t, "test")
 
 	options, err := getWatchOptions(config, false, client, log)
 	require.NoError(t, err)
@@ -168,7 +173,7 @@ func TestAddToMetricsetsUsing(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false)
+		false, logptest.NewTestingLogger(t, ""))
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -201,7 +206,7 @@ func TestRemoveFromMetricsetsUsing(t *testing.T) {
 		SyncPeriod: time.Minute,
 		Node:       "test-node",
 	}
-	log := logp.NewLogger("test")
+	log := logptest.NewTestingLogger(t, "test")
 
 	options, err := getWatchOptions(config, false, client, log)
 	require.NoError(t, err)
@@ -216,7 +221,9 @@ func TestRemoveFromMetricsetsUsing(t *testing.T) {
 		resourceWatchers,
 		metricsRepo,
 		config.Namespace,
-		false)
+		false,
+		logptest.NewTestingLogger(t, ""),
+	)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -388,7 +395,7 @@ func TestCreateAllWatchers(t *testing.T) {
 			Deployment: true,
 		},
 	}
-	log := logp.NewLogger("test")
+	log := logptest.NewTestingLogger(t, "test")
 
 	// Start watchers based on a resource that does not exist should cause an error
 	err := createAllWatchers(
@@ -439,7 +446,8 @@ func TestCreateMetaGen(t *testing.T) {
 	commonConfig, err := conf.NewConfigFrom(&commonMetaConfig)
 	require.NoError(t, err)
 
-	log := logp.NewLogger("test")
+	log := logptest.NewTestingLogger(t, "test")
+
 	config := &kubernetesConfig{
 		Namespace:  "test-ns",
 		SyncPeriod: time.Minute,
@@ -483,7 +491,7 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 	commonConfig, err := conf.NewConfigFrom(&commonMetaConfig)
 	require.NoError(t, err)
 
-	log := logp.NewLogger("test")
+	log := logptest.NewTestingLogger(t, "test")
 
 	namespaceConfig, err := conf.NewConfigFrom(map[string]interface{}{
 		"enabled": true,
@@ -586,7 +594,7 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 		},
 	}
 
-	log := logp.NewLogger(selector)
+	log := logptest.NewTestingLogger(t, selector)
 
 	enricherNamespace := buildMetadataEnricher(
 		metricsetNamespace,
@@ -669,7 +677,7 @@ func TestBuildMetadataEnricher_Start_Stop_SameResources(t *testing.T) {
 		},
 	}
 
-	log := logp.NewLogger(selector)
+	log := logptest.NewTestingLogger(t, selector)
 	enricherPod := buildMetadataEnricher(metricsetPod, PodResource, resourceWatchers, config,
 		funcs.update, funcs.delete, funcs.index, log)
 	resourceWatchers.lock.Lock()
@@ -746,7 +754,7 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	}
 
 	metricset := "pod"
-	log := logp.NewLogger(selector)
+	log := logptest.NewTestingLogger(t, selector)
 
 	enricher := buildMetadataEnricher(metricset, PodResource, resourceWatchers, config,
 		funcs.update, funcs.delete, funcs.index, log)
@@ -879,7 +887,7 @@ func TestBuildMetadataEnricher_PartialMetadata(t *testing.T) {
 	}
 
 	metricset := "replicaset"
-	log := logp.NewLogger(selector)
+	log := logptest.NewTestingLogger(t, selector)
 
 	commonMetaConfig := metadata.Config{}
 	commonConfig, _ := conf.NewConfigFrom(&commonMetaConfig)

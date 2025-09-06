@@ -21,31 +21,49 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestDeadlockListener(t *testing.T) {
-	const timeout = 5 * time.Millisecond
-	log := logp.NewLogger("test")
-	listener := newDeadlockListener(log, timeout)
+	const timeout = time.Second
+	var currentTime time.Time
+	getTime := func() time.Time { return currentTime }
+
+	logger := logptest.NewTestingLogger(t, "")
+	dl := idleDeadlockListener(logger, timeout, getTime)
+
+	// Channels get a buffer so we can trigger them deterministically in
+	// one goroutine.
+	tickerChan := make(chan time.Time, 1)
+	dl.tickerChan = tickerChan
+	dl.ackChan = make(chan int, 1)
 
 	// Verify that the listener doesn't trigger when receiving regular acks
 	for i := 0; i < 5; i++ {
-		time.Sleep(timeout / 2)
-		listener.ack(1)
-	}
-	select {
-	case <-listener.doneChan:
-		require.Fail(t, "Deadlock listener should not trigger unless there is no progress for the configured time interval")
-	case <-time.After(timeout / 2):
+		// Advance the "current time" and ping the ticker channel to refresh
+		// the timeout check, then send an ack and confirm that it hasn't timed
+		// out yet.
+		currentTime = currentTime.Add(timeout - 1)
+		tickerChan <- currentTime
+		dl.runIteration()
+
+		dl.ack(1)
+		dl.runIteration()
+		assert.Equal(t, currentTime, dl.lastTime)
+		assert.Nil(t, dl.ctx.Err(), "Deadlock listener context shouldn't expire until the timeout is reached")
 	}
 
 	// Verify that the listener does trigger when the acks stop
+	currentTime = currentTime.Add(timeout)
+	tickerChan <- currentTime
+	dl.runIteration()
+
 	select {
-	case <-time.After(timeout):
+	case <-dl.ctx.Done():
+	default:
 		require.Fail(t, "Deadlock listener should trigger when there is no progress for the configured time interval")
-	case <-listener.doneChan:
 	}
 }

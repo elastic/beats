@@ -62,7 +62,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("Invalid host format, expected hostname:port: %w", err)
 	}
 
-	clientPolicy, err := aerospike.ParseClientPolicy(config)
+	clientPolicy, err := aerospike.ParseClientPolicy(config, base.Logger())
 	if err != nil {
 		return nil, fmt.Errorf("could not initialize aerospike client policy: %w", err)
 	}
@@ -86,14 +86,14 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	for _, node := range m.client.GetNodes() {
 		info, err := node.RequestInfo(m.infoPolicy, "namespaces")
 		if err != nil {
-			m.Logger().Error("Failed to retrieve namespaces from node %s", node.GetName())
+			m.Logger().Errorf("Failed to retrieve namespaces from node %s", node.GetName())
 			continue
 		}
 
 		for _, namespace := range strings.Split(info["namespaces"], ";") {
 			info, err := node.RequestInfo(m.infoPolicy, "namespace/"+namespace)
 			if err != nil {
-				m.Logger().Error("Failed to retrieve metrics for namespace %s from node %s", namespace, node.GetName())
+				m.Logger().Errorf("Failed to retrieve metrics for namespace %s from node %s", namespace, node.GetName())
 				continue
 			}
 

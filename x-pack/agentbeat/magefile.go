@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"time"
 
 	"github.com/magefile/mage/sh"
@@ -32,16 +33,6 @@ import (
 	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
-
-// beats are the beats the agentbeat combines
-var beats = []string{
-	"auditbeat",
-	"filebeat",
-	"heartbeat",
-	"metricbeat",
-	"osquerybeat",
-	"packetbeat",
-}
 
 func init() {
 	common.RegisterCheckDeps(Update)
@@ -78,12 +69,15 @@ func BuildSystemTestBinary() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	if err := xpacketbeat.CopyNPCAPInstaller("../packetbeat/npcap/installer/"); err != nil {
-		return err
+	args := devtools.DefaultGolangCrossBuildArgs()
+	if slices.Contains(getIncludedBeats(), "packetbeat") {
+		if err := xpacketbeat.CopyNPCAPInstaller("../packetbeat/npcap/installer/"); err != nil {
+			return err
+		}
+		// need packetbeat build arguments as it address the requirements for libpcap
+		args = packetbeat.GolangCrossBuildArgs()
 	}
 
-	// need packetbeat build arguments as it address the requirements for libpcap
-	args := packetbeat.GolangCrossBuildArgs()
 	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 
 	return multierr.Combine(
@@ -94,9 +88,12 @@ func GolangCrossBuild() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return devtools.CrossBuild(
-		devtools.ImageSelector(xpacketbeat.ImageSelector),
-	)
+	if slices.Contains(getIncludedBeats(), "packetbeat") {
+		return devtools.CrossBuild(
+			devtools.ImageSelector(xpacketbeat.ImageSelector),
+		)
+	}
+	return devtools.CrossBuild()
 }
 
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
@@ -108,7 +105,11 @@ func AssembleDarwinUniversal() error {
 
 // CrossBuildDeps cross-builds the required dependencies.
 func CrossBuildDeps() error {
-	return callForBeat("crossBuildExt", "osquerybeat")
+	if slices.Contains(getIncludedBeats(), "osquerybeat") {
+		return callForBeat("crossBuildExt", "osquerybeat")
+	}
+
+	return nil
 }
 
 // PrepareLightModules prepares the module packaging.
@@ -126,19 +127,30 @@ func PrepareLightModules() error {
 func Package() error {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
+	fmt.Printf(">> Packaging agentbeat that includes %v\n", getIncludedBeats())
 
-	// specific packaging just for agentbeat
-	devtools.MustUsePackaging("agentbeat", "x-pack/agentbeat/dev-tools/packaging/packages.yml")
-
-	// Add osquery distro binaries, required for the osquerybeat subcommand.
-	osquerybeat.CustomizePackaging()
+	if devtools.FIPSBuild {
+		// FIPS specific packaging spec
+		devtools.MustUsePackaging("agentbeat_fips", "x-pack/agentbeat/dev-tools/packaging/packages.yml")
+	} else {
+		// specific packaging just for agentbeat
+		devtools.MustUsePackaging("agentbeat", "x-pack/agentbeat/dev-tools/packaging/packages.yml")
+	}
 
 	// Add metricbeat lightweight modules.
 	if err := metricbeat.CustomizeLightModulesPackaging(); err != nil {
 		return err
 	}
 
-	mg.SerialDeps(Update, PrepareLightModules, osquerybeat.FetchOsqueryDistros, CrossBuildDeps, CrossBuild, devtools.Package, TestPackages)
+	mg.SerialDeps(Update, PrepareLightModules)
+
+	if slices.Contains(getIncludedBeats(), "osquerybeat") {
+		// Add osquery distro binaries, required for the osquerybeat subcommand.
+		osquerybeat.CustomizePackaging()
+		mg.SerialDeps(osquerybeat.FetchOsqueryDistros)
+	}
+
+	mg.SerialDeps(CrossBuildDeps, CrossBuild, devtools.Package, TestPackages)
 
 	return nil
 }
@@ -162,7 +174,7 @@ func Update() {
 }
 
 func callForEachBeat(target string) error {
-	for _, beat := range beats {
+	for _, beat := range getIncludedBeats() {
 		err := callForBeat(target, beat)
 		if err != nil {
 			return fmt.Errorf("failed to perform mage %s for beat %s: %w", target, beat, err)
@@ -205,7 +217,13 @@ func GoIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
 	args := devtools.DefaultGoTestIntegrationFromHostArgs()
 	args.Tags = append(args.Tags, "agentbeat")
-	args.Packages = append(args.Packages, "../auditbeat/...", "../filebeat/...", "../heartbeat/...", "../osquerybeat/...", "../packetbeat/...")
+	for _, beat := range getIncludedBeats() {
+		// matricbeat integration test TestIndexTotalFieldsLimitNotReached fails with
+		// `unable to find file "../../metricbeat.test"` error when invoked from agentbeat, skip it
+		if beat != "metricbeat" {
+			args.Packages = append(args.Packages, "../"+beat+"/...")
+		}
+	}
 	return devtools.GoIntegTestFromHost(ctx, args)
 }
 
@@ -216,11 +234,40 @@ func PythonIntegTest(ctx context.Context) error {
 }
 
 func SystemTest(ctx context.Context) error {
-	mg.SerialDeps(xpacketbeat.GetNpcapInstallerFn("../packetbeat"), Update, devtools.BuildSystemTestBinary)
+	if slices.Contains(getIncludedBeats(), "packetbeat") {
+		mg.SerialDeps(xpacketbeat.GetNpcapInstallerFn("../packetbeat"), Update, devtools.BuildSystemTestBinary)
 
-	args := devtools.DefaultGoTestIntegrationArgs()
-	args.Packages = []string{"../packetbeat/tests/system/..."}
-	args.Tags = append(args.Tags, "agentbeat")
+		args := devtools.DefaultGoTestIntegrationArgs()
+		args.Packages = []string{"../packetbeat/tests/system/..."}
+		args.Tags = append(args.Tags, "agentbeat")
 
-	return devtools.GoTest(ctx, args)
+		return devtools.GoTest(ctx, args)
+	}
+	return nil
+}
+
+func getIncludedBeats() []string {
+	// beats are all the beats the agentbeat can combine
+	includedBeats := []string{
+		"auditbeat",
+		"filebeat",
+		"heartbeat",
+		"metricbeat",
+		"osquerybeat",
+		"packetbeat",
+	}
+
+	if devtools.FIPSBuild {
+		// If a FIPS-capable version of agentbeat is being built, restrict the list of beats to the fips-capable ones.
+		// This helps producing a FIPS-capable agentbeat by excluding code from beats that are not required to be FIPS-capable.
+		fipsCapableBeats := make([]string, 0, len(includedBeats))
+		for _, beat := range includedBeats {
+			if slices.Contains(devtools.FIPSConfig.Beats, beat) {
+				fipsCapableBeats = append(fipsCapableBeats, beat)
+			}
+		}
+		return fipsCapableBeats
+	}
+
+	return includedBeats
 }

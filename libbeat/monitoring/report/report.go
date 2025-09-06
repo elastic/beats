@@ -39,7 +39,7 @@ type Reporter interface {
 	Stop()
 }
 
-type ReporterFactory func(beat.Info, Settings, *conf.C) (Reporter, error)
+type ReporterFactory func(beat.Info, beat.Monitoring, Settings, *conf.C) (Reporter, error)
 
 type hostsCfg struct {
 	Hosts []string `config:"hosts"`
@@ -60,6 +60,7 @@ func RegisterReporterFactory(name string, f ReporterFactory) {
 
 func New(
 	beat beat.Info,
+	mon beat.Monitoring,
 	settings Settings,
 	cfg *conf.C,
 	outputs conf.Namespace,
@@ -74,7 +75,7 @@ func New(
 		return nil, fmt.Errorf("unknown reporter type '%v'", name)
 	}
 
-	return f(beat, settings, cfg)
+	return f(beat, mon, settings, cfg)
 }
 
 func getReporterConfig(

@@ -23,7 +23,9 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
@@ -52,7 +54,7 @@ func (pub *publisher) Publish(records []eventlog.Record) error {
 type winlogInput struct{}
 
 // Plugin create a stateful input Plugin collecting logs from Windows Event Logs.
-func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Beta,
@@ -68,7 +70,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
 	}
 }
 
-func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
+func configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, error) {
 	// TODO: do we want to allow to read multiple eventLogs using a single config
 	//       as is common for other inputs?
 	eventLog, err := eventlog.New(cfg)
@@ -84,7 +86,7 @@ func (winlogInput) Name() string { return pluginName }
 
 func (in winlogInput) Test(source cursor.Source, ctx input.TestContext) error {
 	api, _ := source.(eventlog.EventLog)
-	err := api.Open(checkpoint.EventLogState{})
+	err := api.Open(checkpoint.EventLogState{}, monitoring.NewRegistry())
 	if err != nil {
 		return fmt.Errorf("failed to open %q: %w", api.Channel(), err)
 	}
@@ -100,7 +102,9 @@ func (in winlogInput) Run(
 	api, _ := source.(eventlog.EventLog)
 	log := ctx.Logger.With("eventlog", source.Name(), "channel", api.Channel())
 	return eventlog.Run(
+		&ctx,
 		ctxtool.FromCanceller(ctx.Cancelation),
+		ctx.MetricsRegistry,
 		api,
 		initCheckpoint(log, cursor),
 		&publisher{cursorPub: pub},

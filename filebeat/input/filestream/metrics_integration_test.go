@@ -23,8 +23,10 @@ import (
 	"context"
 	"testing"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -32,8 +34,9 @@ func TestFilestreamMetrics(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                     "fake-ID",
+		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "24h",
 		"close.on_state_change.check_interval":   "100ms",
@@ -59,13 +62,13 @@ func TestFilestreamMetrics(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 	env.waitUntilHarvesterIsDone()
 
-	checkMetrics(t, "fake-ID", expectedMetrics{
+	checkMetrics(t, env.monitoring, id, expectedMetrics{
 		FilesOpened:       1,
 		FilesClosed:       1,
 		FilesActive:       0,
@@ -84,8 +87,9 @@ func TestFilestreamMessageMaxBytesTruncatedMetric(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                     "fake-ID",
+		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "24h",
 		"close.on_state_change.check_interval":   "100ms",
@@ -99,13 +103,13 @@ func TestFilestreamMessageMaxBytesTruncatedMetric(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(4)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 	env.waitUntilHarvesterIsDone()
 
-	checkMetrics(t, "fake-ID", expectedMetrics{
+	checkMetrics(t, env.monitoring, id, expectedMetrics{
 		FilesOpened:       1,
 		FilesClosed:       1,
 		FilesActive:       0,
@@ -124,8 +128,9 @@ func TestFilestreamMultilineMaxLinesTruncatedMetric(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                     "fake-ID",
+		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "24h",
 		"close.on_state_change.check_interval":   "100ms",
@@ -150,13 +155,13 @@ func TestFilestreamMultilineMaxLinesTruncatedMetric(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 	env.waitUntilHarvesterIsDone()
 
-	checkMetrics(t, "fake-ID", expectedMetrics{
+	checkMetrics(t, env.monitoring, id, expectedMetrics{
 		FilesOpened:       1,
 		FilesClosed:       1,
 		FilesActive:       0,
@@ -182,8 +187,8 @@ type expectedMetrics struct {
 	ProcessingErrors  uint64
 }
 
-func checkMetrics(t *testing.T, id string, expected expectedMetrics) {
-	reg, ok := monitoring.GetNamespace("dataset").GetRegistry().Get(id).(*monitoring.Registry)
+func checkMetrics(t *testing.T, mon beat.Monitoring, id string, expected expectedMetrics) {
+	reg, ok := mon.InputsRegistry().Get(id).(*monitoring.Registry)
 	require.True(t, ok, "registry not found")
 
 	require.Equal(t, id, reg.Get("id").(*monitoring.String).Get(), "id")

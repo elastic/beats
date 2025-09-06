@@ -210,8 +210,8 @@ func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user strin
 	return getDetails[User](ctx, cli, u, endpoint, key, user == "", omit, lim, log)
 }
 
-// GetUserFactors returns Okta group roles using the groups API endpoint. host is the
-// Okta user domain and key is the API token to use for the query. group must not be empty.
+// GetUserFactors returns Okta user factors using the users API endpoint. host is the
+// Okta user domain and key is the API token to use for the query. user must not be empty.
 //
 // See GetUserDetails for details of the query and rate limit parameters.
 //
@@ -232,8 +232,8 @@ func GetUserFactors(ctx context.Context, cli *http.Client, host, key, user strin
 	return getDetails[Factor](ctx, cli, u, endpoint, key, true, OmitNone, lim, log)
 }
 
-// GetUserRoles returns Okta group roles using the groups API endpoint. host is the
-// Okta user domain and key is the API token to use for the query. group must not be empty.
+// GetUserRoles returns Okta user roles using the users API endpoint. host is the
+// Okta user domain and key is the API token to use for the query. user must not be empty.
 //
 // See GetUserDetails for details of the query and rate limit parameters.
 //
@@ -287,7 +287,7 @@ func GetGroupRoles(ctx context.Context, cli *http.Client, host, key, group strin
 		return nil, nil, errors.New("no group specified")
 	}
 
-	const endpoint = "/api/v1/groups/{group}/rules"
+	const endpoint = "/api/v1/groups/{group}/roles"
 	path := strings.Replace(endpoint, "{group}", group, 1)
 
 	u := &url.URL{
@@ -395,7 +395,13 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, end
 			contentType += "; " + omit.String()
 		}
 		req.Header.Set("Content-Type", contentType)
-		req.Header.Set("Authorization", fmt.Sprintf("SSWS %s", key))
+
+		// Set Authorization header based on authentication method
+		if key != "" {
+			// API token authentication
+			req.Header.Set("Authorization", fmt.Sprintf("SSWS %s", key))
+		}
+		// For OAuth2, the Authorization header is automatically set by the OAuth2 client
 
 		err = lim.Wait(ctx, endpoint, u, log)
 		if err != nil {

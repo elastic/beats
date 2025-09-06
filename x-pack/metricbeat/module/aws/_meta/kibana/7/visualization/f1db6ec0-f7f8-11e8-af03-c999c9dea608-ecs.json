@@ -38,13 +38,13 @@
                             "language": "kuery",
                             "query": ""
                         },
-                        "formatter": "number",
+                        "formatter": "bytes",
                         "id": "61ca57f1-469d-11e7-af02-69e470af7417",
                         "label": "AWS EC2 DiskIO Read Bytes",
                         "line_width": "2",
                         "metrics": [
                             {
-                                "field": "aws.ec2.diskio.read.bytes",
+                                "field": "host.disk.read.bytes",
                                 "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "type": "avg"
                             }
