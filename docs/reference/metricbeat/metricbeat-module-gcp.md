@@ -361,6 +361,15 @@ metricbeat.modules:
   exclude_labels: false
   period: 1m
   collect_dataproc_user_labels: true
+
+- module: gcp
+  metricsets:
+    - vertexai_logs
+  period: 300s  # 5 minutes
+  project_id: "your-project-id"
+  table_id: "your-project-id.dataset.id.table_name"
+  credentials_file_path: "/path/to/service-account.json"
+  # credentials_json: '{"type": "service_account", ...}'
 ```
 
 
@@ -378,3 +387,4 @@ The following metricsets are available:
 * [metrics](/reference/metricbeat/metricbeat-metricset-gcp-metrics.md)
 * [pubsub](/reference/metricbeat/metricbeat-metricset-gcp-pubsub.md)
 * [storage](/reference/metricbeat/metricbeat-metricset-gcp-storage.md)
+* [vertexai_logs](/reference/metricbeat/metricbeat-metricset-gcp-vertexai_logs.md)  {applies_to}`stack: beta 9.2.0`
