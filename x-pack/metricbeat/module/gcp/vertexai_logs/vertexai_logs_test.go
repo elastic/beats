@@ -32,6 +32,7 @@ func TestGenerateQuery(t *testing.T) {
 	// verify CAST for request_id
 	assert.Contains(t, query, "CAST(IFNULL(request_id, 0) AS FLOAT64)")
 }
+
 func TestCreateEvent(t *testing.T) {
 	assert := assert.New(t)
 	testTime := time.Date(2023, 12, 1, 10, 30, 45, 0, time.UTC)
@@ -82,6 +83,7 @@ func TestCreateEvent(t *testing.T) {
 	assert.NotEmpty(event.ID)
 	assert.Len(event.ID, 20) // generateEventID returns 20 character hash
 }
+
 func TestCreateEventWithInvalidJSON(t *testing.T) {
 	assert := assert.New(t)
 	testTime := time.Date(2023, 12, 1, 10, 30, 45, 0, time.UTC)
@@ -109,6 +111,7 @@ func TestCreateEventWithInvalidJSON(t *testing.T) {
 	assert.NoError(err)
 	assert.Equal(`{"invalid": json}`, fullRequestField)
 }
+
 func TestGenerateEventID(t *testing.T) {
 	testTime := time.Date(2023, 12, 1, 10, 30, 45, 0, time.UTC)
 	row := VertexAILogRow{
@@ -126,6 +129,7 @@ func TestGenerateEventID(t *testing.T) {
 	id3 := generateEventID(row)
 	assert.NotEqual(t, id1, id3)
 }
+
 func TestEventsMapping(t *testing.T) {
 	assert := assert.New(t)
 	testTime := time.Date(2023, 12, 1, 10, 30, 45, 0, time.UTC)
