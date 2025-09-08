@@ -33,7 +33,7 @@
     -   **Send to Channel**: Sends the retrieved metric definitions to the `MetricDefinitionsChan` channel.
         
 3.  **getMappedResourceDefinitions Function**:
-        
+    
     -   **Avoid Redundant Calls**: Uses a map to avoid calling the metric definitions function multiple times for the same namespace and resource.
         
     -   **Retrieve Metric Definitions**: Retrieves metric definitions from Azure Monitor for the specified resource.
