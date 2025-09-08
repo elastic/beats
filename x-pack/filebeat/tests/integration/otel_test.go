@@ -946,12 +946,13 @@ http.port: {{.MonitoringPort}}
 				m = m.Flatten()
 
 				// TODO: Beats stats are not tracking exporter metrics properly in otelconsumer, so it assumes all events were delivered since the batch was acked.
-				// There could have been failures within the batch that were retried and then dropped, only way to know for sure is to check the exporter metrics.
+				// There could have been failures within the batch that were retried and then dropped by the exporter, only way to know for sure is to check the exporter metrics.
 				// require.Equal(t, float64(numTestEvents), m["libbeat.output.events.total"], "expected total events sent to output to match")
 				// require.Equal(t, float64(len(tt.expectedIngestedEventIDs)), m["libbeat.output.events.acked"], "expected events acked to match ingested count")
 				// require.Equal(t, float64(numTestEvents - len(tt.expectedIngestedEventIDs)), m["libbeat.output.events.dropped"], "expected events dropped to match ingested count")
 				assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.total"], "expected total events sent to output to match")
 				assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.acked"], "expected total events acked to match")
+				assert.Equal(ct, float64(0), m["libbeat.output.events.dropped"], "expected total events dropped to match")
 			}, 10*time.Second, 100*time.Millisecond, "expected output stats to be available in monitoring endpoint")
 		})
 	}
