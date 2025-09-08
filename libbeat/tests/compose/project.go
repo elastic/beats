@@ -254,26 +254,26 @@ func (c *Project) Inspect(service string) (string, error) {
 // alive to avoid deadlocks on unexpected finalizations.
 func (c *Project) Lock() {
 	timeout := time.Now().Add(300 * time.Second)
-	// infoShown := false
+	infoShown := false
 	for time.Now().Before(timeout) {
 		if acquireLock(c.LockFile()) {
-			// if infoShown {
-			c.logger.Infof("lock acquired: %s", c.LockFile())
-			// }
+			if infoShown {
+				c.logger.Infof("%s lock acquired", c.LockFile())
+			}
 			return
 		}
 
 		if stalledLock(c.LockFile()) {
 			if err := os.Remove(c.LockFile()); err == nil {
-				c.logger.Infof("Stalled lockfile removed: %s", c.LockFile())
+				c.logger.Infof("Stalled lockfile %s removed", c.LockFile())
 				continue
 			}
 		}
 
-		// if !infoShown {
-		c.logger.Infof("locked, waiting: %s", c.LockFile())
-		// infoShown = true
-		// }
+		if !infoShown {
+			c.logger.Infof("%s is locked, waiting", c.LockFile())
+			infoShown = true
+		}
 		time.Sleep(1 * time.Second)
 	}
 

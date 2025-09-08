@@ -402,7 +402,6 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	testArgs = append(testArgs, params.Packages...)
 
 	args := append(gotestsumArgs, append([]string{"--"}, testArgs...)...)
-	args = append(args, "-timeout=15m")
 
 	goTest := makeCommand(ctx, params.Env, "gotestsum", args...)
 
