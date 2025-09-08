@@ -560,20 +560,19 @@ The `clean_inactive` configuration option is useful to reduce the size of the re
 
 This config option is also useful to prevent Filebeat problems resulting from inode reuse on Linux. For more information, see [Inode reuse causes Filebeat to skip lines](/reference/filebeat/inode-reuse-issue.md).
 
-To disable, set `clean_inactive: -1`. {applies_to}`stack: ga 9.2.0`Setting it to zero will also
-disable it.
-
-::::{warning}
-For versions `<= 9.2.0` setting `clean_inactive: 0` will cause
-Filebeat to re-ingest all files on restart.
-::::
+To disable, set `clean_inactive` to either:
+* `-1` (recommended)
+* {applies_to}`stack: ga 9.2.0` `0`
+  ::::{warning}
+  In earlier versions, setting `clean_inactive: 0` will cause
+  Filebeat to re-ingest all files on restart.
+  ::::
 
 {applies_to}`stack: ga 9.2.0` Filebeat enforces the restrictions by
 failing to start if `clean_inactive <= ignore_older +
 prospector.scanner.check_interval` or if `ignore_older` is disabled.
-
-{applies_to}`stack: ga 9.2.0` To restore the old behaviour of not enforcing the
-configuration restricition and re-ingesting files if `clean_inactive:
+To restore the old behaviour of not enforcing the
+configuration restriction and re-ingesting files if `clean_inactive:
 0`, set `legacy_clean_inactive: true`.
 
 You can use time strings like `5m` (5 minutes), `2h45m` (2 hours and 45
