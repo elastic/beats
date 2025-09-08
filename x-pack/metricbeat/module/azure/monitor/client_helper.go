@@ -141,22 +141,8 @@ func filterOnSupportedAggregations(
 	metricGroups := make(map[compositeKey][]*armmonitor.MetricDefinition)
 	metricDefs := getMetricDefinitionsByNames(metricDefinitions, metricNames)
 
-	if len(metricConfig.Aggregations) == 0 {
-		for _, metricDef := range metricDefs {
-			var timeGrain string
-			if metricConfig.Timegrain != "" {
-				timeGrain = metricConfig.Timegrain
-			} else {
-				// only fall back to timegrain from metric definition if user did not provide one
-				timeGrain = *metricDef.MetricAvailabilities[0].TimeGrain
-			}
-			currCompositeKey := compositeKey{
-				aggregations: string(*metricDef.PrimaryAggregationType),
-				timegrain:    timeGrain,
-			}
-			metricGroups[currCompositeKey] = append(metricGroups[currCompositeKey], metricDef)
-		}
-	} else {
+	var serializedConfiguredAggs string
+	if len(metricConfig.Aggregations) > 0 {
 		supportedAggregations, unsupportedAggregations = filterAggregations(metricConfig.Aggregations, metricDefs)
 		if len(unsupportedAggregations) > 0 {
 			return nil, fmt.Errorf("the aggregations configured : %s are not supported for some of the metrics selected %s ",
@@ -166,19 +152,29 @@ func filterOnSupportedAggregations(
 			return nil, fmt.Errorf("no aggregations were found based on the aggregation values configured or supported between the metrics : %s",
 				strings.Join(metricNames, ","))
 		}
-		serializedSupportedAggs := strings.Join(supportedAggregations, ",")
+		serializedConfiguredAggs = strings.Join(supportedAggregations, ",")
+	}
+
+	for _, metricDef := range metricDefs {
 		var timeGrain string
 		if metricConfig.Timegrain != "" {
 			timeGrain = metricConfig.Timegrain
 		} else {
 			// only fall back to timegrain from metric definition if user did not provide one
-			timeGrain = *metricDefs[0].MetricAvailabilities[0].TimeGrain
+			timeGrain = *metricDef.MetricAvailabilities[0].TimeGrain
+		}
+		var aggs string
+		if serializedConfiguredAggs != "" {
+			aggs = serializedConfiguredAggs
+		} else {
+			// only fall back to primary aggregation from metric definition if user did not provide one
+			aggs = string(*metricDef.PrimaryAggregationType)
 		}
 		currCompositeKey := compositeKey{
-			aggregations: serializedSupportedAggs,
+			aggregations: aggs,
 			timegrain:    timeGrain,
 		}
-		metricGroups[currCompositeKey] = append(metricGroups[currCompositeKey], metricDefs...)
+		metricGroups[currCompositeKey] = append(metricGroups[currCompositeKey], metricDef)
 	}
 	return metricGroups, nil
 }
