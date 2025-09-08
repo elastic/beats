@@ -19,19 +19,11 @@ type parquetDecoder struct {
 
 // newParquetDecoder creates a new parquet decoder. It uses the libbeat parquet reader under the hood.
 // It returns an error if the parquet reader cannot be created.
-<<<<<<< HEAD:x-pack/filebeat/input/awss3/decoding_parquet.go
-func newParquetDecoder(config decoderConfig, r io.Reader) (decoder, error) {
+func newParquetDecoder(config decoderConfig, r io.Reader, logger *logp.Logger) (decoder, error) {
 	reader, err := parquet.NewBufferedReader(r, &parquet.Config{
 		ProcessParallel: config.Codec.Parquet.ProcessParallel,
 		BatchSize:       config.Codec.Parquet.BatchSize,
-	})
-=======
-func NewParquetDecoder(config ParquetCodecConfig, r io.Reader, logger *logp.Logger) (Decoder, error) {
-	reader, err := parquet.NewBufferedReader(r, &parquet.Config{
-		ProcessParallel: config.ProcessParallel,
-		BatchSize:       config.BatchSize,
 	}, logger)
->>>>>>> 0788d61a1 (Accomodate logger changes from  `tlscommon` package (#46308)):x-pack/libbeat/reader/decoder/parquet.go
 	if err != nil {
 		return nil, fmt.Errorf("failed to create parquet decoder: %w", err)
 	}
