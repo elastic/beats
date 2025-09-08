@@ -536,7 +536,6 @@ processors:
             level: 1
         endpoints:
             - http://localhost:9200
-        idle_conn_timeout: 3s
         logs_index: index
         mapping:
             mode: bodymap
@@ -546,7 +545,6 @@ processors:
             initial_interval: 1s
             max_interval: 1m0s
             max_retries: 3
-        timeout: 1m30s
         user: admin`
 	expectedReceiver := `receivers:
     metricbeatreceiver:
