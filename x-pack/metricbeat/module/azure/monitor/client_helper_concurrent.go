@@ -74,18 +74,18 @@ func getMappedResourceDefinitions(client *azure.BatchClient, resourceId string, 
 		}
 
 		// map dimensions
-		var dim []azure.Dimension
+		var dimensions []azure.Dimension
 		if len(metricConfig.Dimensions) > 0 {
 			for _, dimension := range metricConfig.Dimensions {
-				dim = append(dim, azure.Dimension(dimension))
+				dimensions = append(dimensions, azure.Dimension(dimension))
 			}
 		}
-		for key, metricGroup := range metricGroups {
+		for compositeKey, metricGroup := range metricGroups {
 			var metricNames []string
 			for _, metricName := range metricGroup {
 				metricNames = append(metricNames, *metricName.Name.Value)
 			}
-			metrics = append(metrics, client.CreateMetric(resourceId, "", metricConfig.Namespace, location, subscriptionId, metricNames, key, dim, metricConfig.Timegrain))
+			metrics = append(metrics, client.CreateMetric(resourceId, "", metricConfig.Namespace, location, subscriptionId, metricNames, compositeKey.aggregations, dimensions, compositeKey.timegrain))
 		}
 	}
 	return metrics, nil

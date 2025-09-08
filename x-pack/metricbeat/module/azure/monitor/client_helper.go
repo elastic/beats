@@ -64,18 +64,18 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 			}
 
 			// map dimensions
-			var dim []azure.Dimension
+			var dimensions []azure.Dimension
 			if len(metricConfig.Dimensions) > 0 {
 				for _, dimension := range metricConfig.Dimensions {
-					dim = append(dim, azure.Dimension(dimension))
+					dimensions = append(dimensions, azure.Dimension(dimension))
 				}
 			}
-			for key, metricGroup := range metricGroups {
+			for compositeKey, metricGroup := range metricGroups {
 				var metricNames []string
 				for _, metricName := range metricGroup {
 					metricNames = append(metricNames, *metricName.Name.Value)
 				}
-				metrics = append(metrics, client.CreateMetric(*resource.ID, "", metricConfig.Namespace, metricNames, key, dim, metricConfig.Timegrain))
+				metrics = append(metrics, client.CreateMetric(*resource.ID, "", metricConfig.Namespace, metricNames, compositeKey.aggregations, dimensions, compositeKey.timegrain))
 			}
 		}
 	}
@@ -125,20 +125,36 @@ func filterConfiguredMetrics(selectedRange []string, allRange []*armmonitor.Metr
 	return inRange, notInRange
 }
 
+type compositeKey struct {
+	aggregations string
+	timegrain    string
+}
+
 // filterOnSupportedAggregations will verify if the aggregation values entered are supported and will also return the corresponding list of aggregations
 func filterOnSupportedAggregations(
 	metricNames []string,
 	metricConfig azure.MetricConfig,
 	metricDefinitions []*armmonitor.MetricDefinition,
-) (map[string][]*armmonitor.MetricDefinition, error) {
+) (map[compositeKey][]*armmonitor.MetricDefinition, error) {
 	var supportedAggregations []string
 	var unsupportedAggregations []string
-	metricGroups := make(map[string][]*armmonitor.MetricDefinition)
+	metricGroups := make(map[compositeKey][]*armmonitor.MetricDefinition)
 	metricDefs := getMetricDefinitionsByNames(metricDefinitions, metricNames)
 
 	if len(metricConfig.Aggregations) == 0 {
 		for _, metricDef := range metricDefs {
-			metricGroups[string(*metricDef.PrimaryAggregationType)] = append(metricGroups[string(*metricDef.PrimaryAggregationType)], metricDef)
+			var timeGrain string
+			if metricConfig.Timegrain != "" {
+				timeGrain = metricConfig.Timegrain
+			} else {
+				// only fall back to timegrain from metric definition if user did not provide one
+				timeGrain = *metricDef.MetricAvailabilities[0].TimeGrain
+			}
+			currCompositeKey := compositeKey{
+				aggregations: string(*metricDef.PrimaryAggregationType),
+				timegrain:    timeGrain,
+			}
+			metricGroups[currCompositeKey] = append(metricGroups[currCompositeKey], metricDef)
 		}
 	} else {
 		supportedAggregations, unsupportedAggregations = filterAggregations(metricConfig.Aggregations, metricDefs)
@@ -150,8 +166,19 @@ func filterOnSupportedAggregations(
 			return nil, fmt.Errorf("no aggregations were found based on the aggregation values configured or supported between the metrics : %s",
 				strings.Join(metricNames, ","))
 		}
-		key := strings.Join(supportedAggregations, ",")
-		metricGroups[key] = append(metricGroups[key], metricDefs...)
+		serializedSupportedAggs := strings.Join(supportedAggregations, ",")
+		var timeGrain string
+		if metricConfig.Timegrain != "" {
+			timeGrain = metricConfig.Timegrain
+		} else {
+			// only fall back to timegrain from metric definition if user did not provide one
+			timeGrain = *metricDefs[0].MetricAvailabilities[0].TimeGrain
+		}
+		currCompositeKey := compositeKey{
+			aggregations: serializedSupportedAggs,
+			timegrain:    timeGrain,
+		}
+		metricGroups[currCompositeKey] = append(metricGroups[currCompositeKey], metricDefs...)
 	}
 	return metricGroups, nil
 }
