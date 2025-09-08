@@ -183,7 +183,8 @@ func filterOnSupportedAggregations(
 		if serializedConfiguredAggs != "" {
 			aggs = serializedConfiguredAggs
 		} else {
-			// only fall back to primary aggregation from metric definition if user did not provide one
+			// no configured aggregations
+			// fall back to primary aggregation from metric definition
 			aggs = string(*metricDef.PrimaryAggregationType)
 		}
 		currCompositeKey := compositeKey{
