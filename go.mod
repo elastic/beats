@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.24.5
+go 1.24.7
 
 require (
 	cloud.google.com/go/bigquery v1.67.0
@@ -176,7 +176,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.7.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.0
-	github.com/elastic/elastic-agent-libs v0.23.0
+	github.com/elastic/elastic-agent-libs v0.24.0
 	github.com/elastic/elastic-agent-system-metrics v0.13.2
 	github.com/elastic/go-elasticsearch/v8 v8.18.1
 	github.com/elastic/go-freelru v0.16.0
@@ -240,6 +240,7 @@ require (
 	github.com/cilium/ebpf v0.16.0
 	go.opentelemetry.io/collector/client v1.36.0
 	go.opentelemetry.io/collector/exporter v0.130.0
+	go.opentelemetry.io/collector/exporter/exportertest v0.130.0
 	go.opentelemetry.io/collector/pipeline v0.130.0
 	go.opentelemetry.io/collector/processor v1.36.0
 	go.opentelemetry.io/collector/processor/processorhelper v0.130.0
@@ -444,7 +445,6 @@ require (
 	go.opentelemetry.io/collector/consumer/consumertest v0.130.0 // indirect
 	go.opentelemetry.io/collector/consumer/xconsumer v0.130.0 // indirect
 	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.130.0 // indirect
-	go.opentelemetry.io/collector/exporter/exportertest v0.130.0 // indirect
 	go.opentelemetry.io/collector/exporter/xexporter v0.130.0 // indirect
 	go.opentelemetry.io/collector/extension v1.36.0 // indirect
 	go.opentelemetry.io/collector/extension/extensionauth v1.36.0 // indirect
