@@ -62,11 +62,12 @@ type addHostMetadata struct {
 		time.Time
 		sync.Mutex
 	}
-	data    mapstr.Pointer
-	geoData mapstr.M
-	config  Config
-	logger  *logp.Logger
-	metrics metrics
+	data       mapstr.Pointer
+	geoData    mapstr.M
+	config     Config
+	logger     *logp.Logger
+	metrics    metrics
+	callbackId string
 }
 
 // New constructs a new add_host_metadata processor.
@@ -97,20 +98,21 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	}
 
 	// create a unique ID for this instance of the processor
-	var cbIDStr string
 	cbID, err := uuid.NewV4()
 	// if we fail, fall back to the processor name, hope for the best.
+	// this should never happen in practice, as crypto/rand.Read cannot return errors, but in principle the uuid
+	// implementation might change
 	if err != nil {
 		p.logger.Errorf("error generating ID for FQDN callback, reverting to processor name: %v", err)
-		cbIDStr = processorName
+		p.callbackId = processorName
 	} else {
-		cbIDStr = cbID.String()
+		p.callbackId = cbID.String()
 	}
 
 	// this is safe as New() returns a pointer, not the actual object.
 	// This matters as other pieces of code in libbeat, like libbeat/processors/processor.go,
 	// will do weird stuff like copy the entire list of global processors.
-	err = features.AddFQDNOnChangeCallback(p.handleFQDNReportingChange, cbIDStr)
+	err = features.AddFQDNOnChangeCallback(p.handleFQDNReportingChange, p.callbackId)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"could not register callback for FQDN reporting onChange from %s processor: %w",
@@ -119,6 +121,11 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	}
 
 	return p, nil
+}
+
+func (p *addHostMetadata) Close() error {
+	features.RemoveFQDNOnChangeCallback(p.callbackId)
+	return nil
 }
 
 // Run enriches the given event with the host metadata

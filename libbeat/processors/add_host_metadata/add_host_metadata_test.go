@@ -486,7 +486,10 @@ func TestFQDNEventSync(t *testing.T) {
 			A: []string{"1.1.1.1"},
 		},
 	}, false)
-	defer srv.Close()
+	defer func() {
+		closeErr := srv.Close()
+		assert.NoError(t, closeErr)
+	}()
 
 	srv.PatchNet(net.DefaultResolver)
 	defer mockdns.UnpatchNet(net.DefaultResolver)
@@ -517,6 +520,7 @@ func TestFQDNEventSync(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		checkWait.Add(1)
 		go func() {
+			defer checkWait.Done()
 			resp, err := p.Run(&beat.Event{
 				Fields: mapstr.M{},
 			})
@@ -524,11 +528,30 @@ func TestFQDNEventSync(t *testing.T) {
 			name, err := resp.Fields.GetValue("host.name")
 			require.NoError(t, err)
 			require.Equal(t, "foo.bar.baz", name)
-			checkWait.Done()
 		}()
 	}
 	t.Logf("Waiting for runners to return...")
 	checkWait.Wait()
+}
+
+func TestClose(t *testing.T) {
+	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
+		"cache.ttl": "5m",
+	})
+
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	proc, ok := p.(*addHostMetadata)
+	require.True(t, ok)
+
+	err = proc.Close()
+	require.NoError(t, err)
+
+	// check that we unregistered the fqdn update callback
+	err = features.AddFQDNOnChangeCallback(nil, proc.callbackId)
+	require.NoError(t, err)
+	features.RemoveFQDNOnChangeCallback(proc.callbackId)
 }
 
 func TestFQDNLookup(t *testing.T) {
