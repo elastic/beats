@@ -33,7 +33,6 @@ exporters:
   elasticsearch:
     endpoints:
       - https://localhost:9200
-    idle_conn_timeout: 3s
     logs_index: form-otel-exporter
     password: changeme
     retry:
@@ -42,7 +41,6 @@ exporters:
       max_interval: 1m0s
       max_retries: 3
     user: elastic
-    timeout: 1m30s
     batcher:
       enabled: true
       max_size: 1600
@@ -177,7 +175,6 @@ exporters:
   elasticsearch:
     endpoints:
       - https://es-hostname.elastic.co:443
-    idle_conn_timeout: 3s
     logs_index: form-otel-exporter
     password: password
     retry:
@@ -186,7 +183,6 @@ exporters:
       max_interval: 1m0s
       max_retries: 3
     user: elastic-cloud
-    timeout: 1m30s
     batcher:
       enabled: true
       max_size: 1600

@@ -29,7 +29,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
-	oteltranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -111,18 +110,13 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 		hosts = append(hosts, esURL)
 	}
 
-	// convert ssl configuration
-	otelTLSConfg, err := oteltranslate.TLSCommonToOTel(output, logger)
-	if err != nil {
-		return nil, fmt.Errorf("cannot convert SSL config into OTel: %w", err)
-	}
-
 	otelYAMLCfg := map[string]any{
 		"endpoints": hosts, // hosts, protocol, path, port
 
-		// ClientConfig
-		"timeout":           escfg.Transport.Timeout,         // timeout
-		"idle_conn_timeout": escfg.Transport.IdleConnTimeout, // idle_connection_timeout
+		// below settings are handled by beatsauthextension, hence are commented out
+
+		// "timeout":           escfg.Transport.Timeout,         // timeout
+		// "idle_conn_timeout": escfg.Transport.IdleConnTimeout, // idle_connection_timeout
 
 		// Retry
 		"retry": map[string]any{
@@ -154,13 +148,15 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 	setIfNotNil(otelYAMLCfg, "user", escfg.Username)                                             // username
 	setIfNotNil(otelYAMLCfg, "password", escfg.Password)                                         // password
 	setIfNotNil(otelYAMLCfg, "api_key", base64.StdEncoding.EncodeToString([]byte(escfg.APIKey))) // api_key
-
-	setIfNotNil(otelYAMLCfg, "headers", escfg.Headers)    // headers
-	setIfNotNil(otelYAMLCfg, "tls", otelTLSConfg)         // tls config
-	setIfNotNil(otelYAMLCfg, "proxy_url", escfg.ProxyURL) // proxy_url
-	setIfNotNil(otelYAMLCfg, "pipeline", escfg.Pipeline)  // pipeline
+	setIfNotNil(otelYAMLCfg, "headers", escfg.Headers)                                           // headers
+	setIfNotNil(otelYAMLCfg, "pipeline", escfg.Pipeline)                                         // pipeline
 	// Dynamic routing is disabled if output.elasticsearch.index is set
 	setIfNotNil(otelYAMLCfg, "logs_index", escfg.Index) // index
+
+	// below settings are handled by beatsauthextension, hence are commented out
+
+	// setIfNotNil(otelYAMLCfg, "tls", otelTLSConfg)         // tls config
+	// setIfNotNil(otelYAMLCfg, "proxy_url", escfg.ProxyURL) // proxy_url
 
 	if err := typeSafetyCheck(otelYAMLCfg); err != nil {
 		return nil, err
