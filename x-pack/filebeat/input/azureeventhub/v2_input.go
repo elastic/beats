@@ -427,6 +427,7 @@ func (in *eventHubInputV2) workersLoop(ctx context.Context, processor *azeventhu
 			// return `nil` (signals the processor has stopped).
 			break
 		}
+		in.status.UpdateStatus(status.Running, "Input is running")
 
 		partitionID := processorPartitionClient.PartitionID()
 
