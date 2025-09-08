@@ -141,6 +141,7 @@ func filterOnSupportedAggregations(
 	metricGroups := make(map[compositeKey][]*armmonitor.MetricDefinition)
 	metricDefs := getMetricDefinitionsByNames(metricDefinitions, metricNames)
 
+	// validate and prepare configured aggregations (if configured)
 	var serializedConfiguredAggs string
 	if len(metricConfig.Aggregations) > 0 {
 		supportedAggregations, unsupportedAggregations = filterAggregations(metricConfig.Aggregations, metricDefs)
@@ -157,6 +158,7 @@ func filterOnSupportedAggregations(
 
 	for _, metricDef := range metricDefs {
 		var timeGrain string
+		// validate and prepare configured timegrain (if configured)
 		if metricConfig.Timegrain != "" {
 			// check if the timegrain is supported by the metric definition.
 			// If not, error
@@ -175,7 +177,8 @@ func filterOnSupportedAggregations(
 					metricConfig.Timegrain, strings.Join(metricNames, ","))
 			}
 		} else {
-			// only fall back to first (and smallest) timegrain from metric
+			// timegrain not configured:
+			// fall back to first (and smallest) timegrain from metric
 			// definition if user did not provide one
 			timeGrain = *metricDef.MetricAvailabilities[0].TimeGrain
 		}
