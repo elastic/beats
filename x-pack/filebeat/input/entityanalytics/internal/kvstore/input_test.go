@@ -153,13 +153,15 @@ func TestInput_Run(t *testing.T) {
 	t.Run("run-ok", func(t *testing.T) {
 		called := false
 		inp := input{
+			manager: &Manager{
+				Path: tempPath,
+			},
 			managedInput: &testInput{
 				runFn: func(inputCtx v2.Context, store *Store, client beat.Client) error {
 					called = true
 					return nil
 				},
 			},
-			path: tempPath,
 		}
 
 		err := inp.Run(
@@ -177,13 +179,15 @@ func TestInput_Run(t *testing.T) {
 	t.Run("run-err", func(t *testing.T) {
 		called := false
 		inp := input{
+			manager: &Manager{
+				Path: tempPath,
+			},
 			managedInput: &testInput{
 				runFn: func(inputCtx v2.Context, store *Store, client beat.Client) error {
 					called = true
 					return errors.New("test error")
 				},
 			},
-			path: tempPath,
 		}
 
 		err := inp.Run(
@@ -201,13 +205,15 @@ func TestInput_Run(t *testing.T) {
 	t.Run("run-panic", func(t *testing.T) {
 		called := false
 		inp := input{
+			manager: &Manager{
+				Path: tempPath,
+			},
 			managedInput: &testInput{
 				runFn: func(inputCtx v2.Context, store *Store, client beat.Client) error {
 					called = true
 					panic("test panic")
 				},
 			},
-			path: tempPath,
 		}
 
 		err := inp.Run(

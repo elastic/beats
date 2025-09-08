@@ -25,7 +25,7 @@ type Manager struct {
 	// that will be used to collect events.
 	Configure func(cfg *config.C) (Input, error)
 
-	Path *paths.Path
+	Path *paths.Path // Required, otherwise the input may panic
 }
 
 // managerConfig contains parameters needed to configure the Manager.
@@ -55,6 +55,5 @@ func (m *Manager) Create(c *config.C) (v2.Input, error) {
 		id:           settings.ID,
 		manager:      m,
 		managedInput: inp,
-		path:         m.Path,
 	}, nil
 }
