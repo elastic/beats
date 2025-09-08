@@ -26,15 +26,13 @@
     
     -   **Start Goroutine**: Starts a new goroutine for each resource to collect its metric definitions.
         
-    -   **Retrieve Metric Definitions**: Calls the shared `getMappedResourceDefinitions` function to retrieve and map metric definitions for each resource. Refer to the **getMappedResourceDefinitions Function**.
+    -   **Retrieve Metric Definitions**: Calls `getMappedResourceDefinitions` to retrieve and map metric definitions for each resource. Refer to the **getMappedResourceDefinitions Function**.
         
     -   **Check for Errors**: In case `getMappedResourceDefinitions` returns an error, it is sent to the `ErrorChan`. This will cause the data collection to stop.
         
     -   **Send to Channel**: Sends the retrieved metric definitions to the `MetricDefinitionsChan` channel.
         
 3.  **getMappedResourceDefinitions Function**:
-    
-    -   **Shared Logic**: This function contains the core logic for processing metrics for a single resource and is used by both the concurrent and standard collection methods.
         
     -   **Avoid Redundant Calls**: Uses a map to avoid calling the metric definitions function multiple times for the same namespace and resource.
         
