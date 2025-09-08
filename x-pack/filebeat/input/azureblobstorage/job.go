@@ -188,11 +188,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 	if err != nil {
 		return fmt.Errorf("failed to add gzip decoder to blob: %s, with error: %w", *j.blob.Name, err)
 	}
-<<<<<<< HEAD
 	dec, err := newDecoder(j.src.ReaderConfig.Decoding, r)
-=======
-	dec, err := decoder.NewDecoder(j.src.ReaderConfig.Decoding, r, j.log)
->>>>>>> 0788d61a1 (Accomodate logger changes from  `tlscommon` package (#46308))
 	if err != nil {
 		return err
 	}
