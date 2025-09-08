@@ -38,6 +38,7 @@ type Server struct {
 	l          net.Listener
 	config     Config
 	wg         sync.WaitGroup
+	mutex      sync.Mutex
 	httpServer *http.Server
 }
 
@@ -64,20 +65,27 @@ func New(log *logp.Logger, config *config.C) (*Server, error) {
 
 // Start starts the HTTP server and accepting new connection.
 func (s *Server) Start() {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
 	s.log.Info("Starting stats endpoint")
 	s.wg.Add(1)
+	s.httpServer = &http.Server{Handler: s.mux} //nolint:gosec // Keep original behavior
 	go func(l net.Listener) {
 		defer s.wg.Done()
 		s.log.Infof("Metrics endpoint listening on: %s (configured: %s)", l.Addr().String(), s.config.Host)
-		srv := &http.Server{Handler: s.mux} //nolint:gosec // Keep original behavior
-		s.httpServer = srv
-		err := srv.Serve(l)
+
+		err := s.httpServer.Serve(l)
 		s.log.Infof("Stats endpoint (%s) finished: %v", l.Addr().String(), err)
 	}(s.l)
 }
 
 // Stop stops the API server and free any resource associated with the process like unix sockets.
 func (s *Server) Stop() error {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	if s.httpServer == nil {
+		return nil
+	}
 	if err := s.httpServer.Close(); err != nil {
 		return fmt.Errorf("error closing monitoring server: %w", err)
 	}
