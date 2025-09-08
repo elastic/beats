@@ -248,6 +248,11 @@ require (
 	github.com/cilium/ebpf v0.16.0
 	go.opentelemetry.io/collector/pipeline v0.130.0
 	go.opentelemetry.io/collector/receiver/receivertest v0.130.0
+<<<<<<< HEAD
+=======
+	go.opentelemetry.io/otel/sdk/metric v1.37.0
+	go.uber.org/goleak v1.3.0
+>>>>>>> bfa7d8d50 ([beatreceiver] shutdown processors and publisher on stop (#46305))
 	sigs.k8s.io/kind v0.29.0
 )
 
