@@ -158,9 +158,25 @@ func filterOnSupportedAggregations(
 	for _, metricDef := range metricDefs {
 		var timeGrain string
 		if metricConfig.Timegrain != "" {
-			timeGrain = metricConfig.Timegrain
+			// check if the timegrain is supported by the metric definition.
+			// If not, error
+			configuredTimegrainSupported := false
+			for _, availability := range metricDef.MetricAvailabilities {
+				if metricConfig.Timegrain == *availability.TimeGrain {
+					configuredTimegrainSupported = true
+					break
+				}
+			}
+			if configuredTimegrainSupported {
+				timeGrain = metricConfig.Timegrain
+			} else {
+				return nil, fmt.Errorf("the timegrain configured : %s is not "+
+					"supported for some by some of the metrics selected: %s ",
+					metricConfig.Timegrain, strings.Join(metricNames, ","))
+			}
 		} else {
-			// only fall back to timegrain from metric definition if user did not provide one
+			// only fall back to first (and smallest) timegrain from metric
+			// definition if user did not provide one
 			timeGrain = *metricDef.MetricAvailabilities[0].TimeGrain
 		}
 		var aggs string
