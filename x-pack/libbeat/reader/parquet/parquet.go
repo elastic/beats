@@ -30,8 +30,8 @@ type BufferedReader struct {
 // It will return an error if the parquet data stream cannot be read.
 // Note: As io.ReadAll is used, the entire data stream would be read into memory, so very large data streams
 // may cause memory bottleneck issues.
-func NewBufferedReader(r io.Reader, cfg *Config) (*BufferedReader, error) {
-	log := logp.L().Named("reader.parquet")
+func NewBufferedReader(r io.Reader, cfg *Config, logger *logp.Logger) (*BufferedReader, error) {
+	log := logger.Named("reader.parquet")
 
 	if cfg.BatchSize == 0 {
 		cfg.BatchSize = 1
@@ -52,7 +52,7 @@ func NewBufferedReader(r io.Reader, cfg *Config) (*BufferedReader, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create parquet reader: %w", err)
 	}
-	log.Debugw("created parquet reader")
+	log.Debug("created parquet reader")
 
 	// constructs a reader for converting to Arrow objects from an existing parquet file reader object
 	reader, err := pqarrow.NewFileReader(pf, pqarrow.ArrowReadProperties{
@@ -62,14 +62,14 @@ func NewBufferedReader(r io.Reader, cfg *Config) (*BufferedReader, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create pqarrow parquet reader: %w", err)
 	}
-	log.Debugw("created pqarrow parquet reader")
+	log.Debug("created pqarrow parquet reader")
 
 	// constructs a record reader that is capable of reding entire sets of arrow records
 	rr, err := reader.GetRecordReader(context.Background(), nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create parquet record reader: %w", err)
 	}
-	log.Debugw("initialization process completed")
+	log.Debug("initialization process completed")
 
 	return &BufferedReader{
 		cfg:          cfg,
