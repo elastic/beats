@@ -68,7 +68,7 @@ func getMappedResourceDefinitions(client *azure.BatchClient, resourceId string, 
 		}
 
 		//validate aggregations and filter on supported aggregations
-		metricGroups, err := filterOnSupportedAggregations(supportedMetricNames, metricConfig, metricDefinitions.Value)
+		metricGroups, err := validateAndGroupByConfiguredAggsAndTimegrain(supportedMetricNames, metricConfig, metricDefinitions.Value)
 		if err != nil {
 			return nil, err
 		}

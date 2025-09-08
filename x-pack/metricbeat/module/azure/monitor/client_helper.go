@@ -58,7 +58,7 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 			}
 
 			//validate aggregations and filter on supported aggregations
-			metricGroups, err := filterOnSupportedAggregations(supportedMetricNames, metricConfig, metricDefinitions.Value)
+			metricGroups, err := validateAndGroupByConfiguredAggsAndTimegrain(supportedMetricNames, metricConfig, metricDefinitions.Value)
 			if err != nil {
 				return nil, err
 			}
@@ -130,8 +130,13 @@ type compositeKey struct {
 	timegrain    string
 }
 
-// filterOnSupportedAggregations will verify if the aggregation values entered are supported and will also return the corresponding list of aggregations
-func filterOnSupportedAggregations(
+// validateAndGroupByConfiguredAggsAndTimegrain will:
+//   - verify if the aggregation values entered are supported by the metric
+//     names passed in
+//   - verify if the timegrain entered is supported by the metric names passed
+//     in
+//   - return the metrics grouped by aggregation(s) and timegrain
+func validateAndGroupByConfiguredAggsAndTimegrain(
 	metricNames []string,
 	metricConfig azure.MetricConfig,
 	metricDefinitions []*armmonitor.MetricDefinition,
