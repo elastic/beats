@@ -20,7 +20,6 @@ package registrar
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -47,9 +46,10 @@ type Migrator struct {
 	dataPath    string
 	migrateFile string
 	permissions os.FileMode
+	logger      *logp.Logger
 }
 
-func NewMigrator(cfg config.Registry) *Migrator {
+func NewMigrator(cfg config.Registry, logger *logp.Logger) *Migrator {
 	path := paths.Resolve(paths.Data, cfg.Path)
 	migrateFile := cfg.MigrateFile
 	if migrateFile != "" {
@@ -60,6 +60,7 @@ func NewMigrator(cfg config.Registry) *Migrator {
 		dataPath:    path,
 		migrateFile: migrateFile,
 		permissions: cfg.Permissions,
+		logger:      logger,
 	}
 }
 
@@ -68,18 +69,18 @@ func NewMigrator(cfg config.Registry) *Migrator {
 func (m *Migrator) Run() error {
 	migrateFile := m.migrateFile
 	if migrateFile == "" {
-		if isFile(m.dataPath) {
+		if isFile(m.dataPath, m.logger) {
 			migrateFile = m.dataPath
 		}
 	}
 
 	fbRegHome := filepath.Join(m.dataPath, "filebeat")
-	version, err := readVersion(fbRegHome, migrateFile)
+	version, err := readVersion(fbRegHome, migrateFile, m.logger)
 	if err != nil {
 		return err
 	}
 
-	logp.Debug("registrar", "Registry type '%v' found", version)
+	m.logger.Named("registrar").Debugf("Registry type '%v' found", version)
 
 	for {
 		switch version {
@@ -100,7 +101,7 @@ func (m *Migrator) Run() error {
 			// format to the current version. If so continue with
 			// the migration and try again.
 			backupFile := migrateFile + ".bak"
-			if isFile(backupFile) {
+			if isFile(backupFile, m.logger) {
 				migrateFile = backupFile
 				version = legacyVersion
 				break
@@ -124,29 +125,29 @@ func (m *Migrator) Run() error {
 // NOTE: The oldest known filebeat registry file format this was tested with is from Filebeat 6.3.
 // Support for older Filebeat versions is best effort.
 func (m *Migrator) updateToVersion0(regHome, migrateFile string) error {
-	logp.Info("Migrate registry file to registry directory")
+	m.logger.Info("Migrate registry file to registry directory")
 
 	if m.dataPath == migrateFile {
 		backupFile := migrateFile + ".bak"
-		if isFile(migrateFile) {
-			logp.Info("Move registry file to backup file: %v", backupFile)
+		if isFile(migrateFile, m.logger) {
+			m.logger.Infof("Move registry file to backup file: %v", backupFile)
 			if err := helper.SafeFileRotate(backupFile, migrateFile); err != nil {
 				return err
 			}
 			migrateFile = backupFile
-		} else if isFile(backupFile) {
-			logp.Info("Old registry backup file found, continue migration")
+		} else if isFile(backupFile, m.logger) {
+			m.logger.Info("Old registry backup file found, continue migration")
 			migrateFile = backupFile
 		}
 	}
 
-	if err := initVersion0Registry(regHome, m.permissions); err != nil {
+	if err := initVersion0Registry(regHome, m.permissions, m.logger); err != nil {
 		return err
 	}
 
 	dataFile := filepath.Join(regHome, "data.json")
-	if !isFile(dataFile) && isFile(migrateFile) {
-		logp.Info("Migrate old registry file to new data file")
+	if !isFile(dataFile, m.logger) && isFile(migrateFile, m.logger) {
+		m.logger.Info("Migrate old registry file to new data file")
 		err := helper.SafeFileRotate(dataFile, migrateFile)
 		if err != nil {
 			return err
@@ -156,17 +157,17 @@ func (m *Migrator) updateToVersion0(regHome, migrateFile string) error {
 	return nil
 }
 
-func initVersion0Registry(regHome string, perm os.FileMode) error {
-	if !isDir(regHome) {
-		logp.Info("No registry home found. Create: %v", regHome)
+func initVersion0Registry(regHome string, perm os.FileMode, logger *logp.Logger) error {
+	if !isDir(regHome, logger) {
+		logger.Infof("No registry home found. Create: %v", regHome)
 		if err := os.MkdirAll(regHome, 0o750); err != nil {
 			return fmt.Errorf("failed to create registry dir '%v': %w", regHome, err)
 		}
 	}
 
 	metaFile := filepath.Join(regHome, "meta.json")
-	if !isFile(metaFile) {
-		logp.Info("Initialize registry meta file")
+	if !isFile(metaFile, logger) {
+		logger.Info("Initialize registry meta file")
 		err := safeWriteFile(metaFile, []byte(`{"version": "0"}`), perm)
 		if err != nil {
 			return fmt.Errorf("failed writing registry meta.json: %w", err)
@@ -180,10 +181,10 @@ func initVersion0Registry(regHome string, perm os.FileMode) error {
 // only. Version 1 is based on the implementation of version 1 in
 // libbeat/statestore/backend/memlog.
 func (m *Migrator) updateToVersion1(regHome string) error {
-	logp.Info("Migrate registry version 0 to version 1")
+	m.logger.Info("Migrate registry version 0 to version 1")
 
 	origDataFile := filepath.Join(regHome, "data.json")
-	if !isFile(origDataFile) {
+	if !isFile(origDataFile, m.logger) {
 		return fmt.Errorf("missing original data file at: %v", origDataFile)
 	}
 
@@ -206,9 +207,9 @@ func (m *Migrator) updateToVersion1(regHome string) error {
 		return err
 	}
 
-	states = resetStates(fixStates(states))
+	states = resetStates(fixStates(states, m.logger))
 
-	registryBackend, err := memlog.New(logp.NewLogger("migration"), memlog.Settings{
+	registryBackend, err := memlog.New(m.logger.Named("migration"), memlog.Settings{
 		Root:               m.dataPath,
 		FileMode:           m.permissions,
 		Checkpoint:         func(sz uint64) bool { return false },
@@ -240,28 +241,28 @@ func (m *Migrator) updateToVersion1(regHome string) error {
 		return fmt.Errorf("migration complete but failed to remove original data file: %v: %w", origDataFile, err)
 	}
 
-	if err := ioutil.WriteFile(filepath.Join(regHome, "meta.json"), []byte(`{"version": "1"}`), m.permissions); err != nil {
+	if err := os.WriteFile(filepath.Join(regHome, "meta.json"), []byte(`{"version": "1"}`), m.permissions); err != nil {
 		return fmt.Errorf("failed to update the meta.json file: %w", err)
 	}
 
 	return nil
 }
 
-func readVersion(regHome, migrateFile string) (registryVersion, error) {
-	if isFile(migrateFile) {
+func readVersion(regHome, migrateFile string, log *logp.Logger) (registryVersion, error) {
+	if isFile(migrateFile, log) {
 		return legacyVersion, nil
 	}
 
-	if !isDir(regHome) {
+	if !isDir(regHome, log) {
 		return noRegistry, nil
 	}
 
 	metaFile := filepath.Join(regHome, "meta.json")
-	if !isFile(metaFile) {
+	if !isFile(metaFile, log) {
 		return noRegistry, nil
 	}
 
-	tmp, err := ioutil.ReadFile(metaFile)
+	tmp, err := os.ReadFile(metaFile)
 	if err != nil {
 		return noRegistry, fmt.Errorf("failed to open meta file: %w", err)
 	}
@@ -274,17 +275,17 @@ func readVersion(regHome, migrateFile string) (registryVersion, error) {
 	return registryVersion(meta.Version), nil
 }
 
-func isDir(path string) bool {
+func isDir(path string, log *logp.Logger) bool {
 	fi, err := os.Stat(path)
 	exists := err == nil && fi.IsDir()
-	logp.Debug("test", "isDir(%v) -> %v", path, exists)
+	log.Named("test").Debugf("isDir(%v) -> %v", path, exists)
 	return exists
 }
 
-func isFile(path string) bool {
+func isFile(path string, log *logp.Logger) bool {
 	fi, err := os.Stat(path)
 	exists := err == nil && fi.Mode().IsRegular()
-	logp.Debug("test", "isFile(%v) -> %v", path, exists)
+	log.Named("test").Debugf("isFile(%v) -> %v", path, exists)
 	return exists
 }
 
@@ -316,7 +317,7 @@ func safeWriteFile(path string, data []byte, perm os.FileMode) error {
 
 // fixStates cleans up the registry states when updating from an older version
 // of filebeat potentially writing invalid entries.
-func fixStates(states []file.State) []file.State {
+func fixStates(states []file.State, logger *logp.Logger) []file.State {
 	if len(states) == 0 {
 		return states
 	}
@@ -325,7 +326,7 @@ func fixStates(states []file.State) []file.State {
 	idx := map[string]*file.State{}
 	for i := range states {
 		state := &states[i]
-		fixState(state)
+		fixState(state, logger)
 
 		old, exists := idx[state.Id]
 		if !exists {
@@ -351,13 +352,13 @@ func fixStates(states []file.State) []file.State {
 // fixState updates a read state to fullfil required invariantes:
 // - "Meta" must be nil if len(Meta) == 0
 // - "Id" must be initialized
-func fixState(st *file.State) {
+func fixState(st *file.State, logger *logp.Logger) {
 	if len(st.Meta) == 0 {
 		st.Meta = nil
 	}
 
 	if len(st.IdentifierName) == 0 {
-		identifier, _ := file.NewStateIdentifier(nil)
+		identifier, _ := file.NewStateIdentifier(nil, logger)
 		st.Id, st.IdentifierName = identifier.GenerateID(*st)
 	}
 }

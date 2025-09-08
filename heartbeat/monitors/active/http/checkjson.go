@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/conditions"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -67,8 +68,11 @@ func checkJson(checks []*jsonResponseCheck) (bodyValidator, error) {
 				source:      check.Expression,
 			})
 		} else if check.Condition != nil {
-			cfgwarn.Deprecate("8.0.0", "JSON conditions are deprecated, use 'expression' instead.")
-			cond, err := conditions.NewCondition(check.Condition)
+			// TODO: use local logger here
+			logger := logp.NewLogger("")
+			logger.Warn(cfgwarn.Deprecate("8.0.0", "JSON conditions are deprecated, use 'expression' instead."))
+			// TODO: use local logger here
+			cond, err := conditions.NewCondition(check.Condition, logger)
 			if err != nil {
 				return nil, fmt.Errorf("could not load JSON condition '%s': %w", check.Description, err)
 			}

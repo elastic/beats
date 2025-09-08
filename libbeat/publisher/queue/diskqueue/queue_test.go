@@ -19,22 +19,19 @@ package diskqueue
 
 import (
 	"flag"
-	"io/ioutil"
-	"math/rand"
-	"os"
+	"math/rand/v2"
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var seed int64
 
 type testQueue struct {
 	*diskQueue
-	teardown func()
 }
 
 func init() {
@@ -45,10 +42,10 @@ func TestProduceConsumer(t *testing.T) {
 	maxEvents := 1024
 	minEvents := 32
 
-	rand.Seed(seed)
-	events := rand.Intn(maxEvents-minEvents) + minEvents
-	batchSize := rand.Intn(events-8) + 4
-	bufferSize := rand.Intn(batchSize*2) + 4
+	r := rand.New(rand.NewPCG(uint64(seed), 0)) //nolint:gosec //Safe to ignore in tests
+	events := r.IntN(maxEvents-minEvents) + minEvents
+	batchSize := r.IntN(events-8) + 4
+	bufferSize := r.IntN(batchSize*2) + 4
 
 	// events := 4
 	// batchSize := 1
@@ -77,24 +74,18 @@ func TestProduceConsumer(t *testing.T) {
 
 func makeTestQueue() queuetest.QueueFactory {
 	return func(t *testing.T) queue.Queue {
-		dir, err := ioutil.TempDir("", "diskqueue_test")
-		if err != nil {
-			t.Fatal(err)
-		}
+		dir := t.TempDir()
 		settings := DefaultSettings()
 		settings.Path = dir
-		queue, _ := NewQueue(logp.L(), nil, settings, nil)
+		logger := logptest.NewTestingLogger(t, "")
+		queue, _ := NewQueue(logger, nil, settings, nil)
 		return testQueue{
 			diskQueue: queue,
-			teardown: func() {
-				os.RemoveAll(dir)
-			},
 		}
 	}
 }
 
 func (t testQueue) Close() error {
 	err := t.diskQueue.Close()
-	t.teardown()
 	return err
 }

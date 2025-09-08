@@ -16,6 +16,7 @@ import (
 type Source struct {
 	ContainerName            string
 	AccountName              string
+	BatchSize                int
 	MaxWorkers               int
 	Poll                     bool
 	PollInterval             time.Duration
@@ -23,6 +24,7 @@ type Source struct {
 	FileSelectors            []fileSelectorConfig
 	ReaderConfig             readerConfig
 	ExpandEventListFromField string
+	PathPrefix               string
 }
 
 func (s *Source) Name() string {
@@ -37,6 +39,7 @@ const (
 	octetType            = "application/octet-stream"
 	ndJsonType           = "application/x-ndjson"
 	gzType               = "application/x-gzip"
+	csvType              = "text/csv"
 	encodingGzip         = "gzip"
 )
 
@@ -59,4 +62,5 @@ var allowedContentTypes = map[string]bool{
 	octetType:  true,
 	ndJsonType: true,
 	gzType:     true,
+	csvType:    true,
 }

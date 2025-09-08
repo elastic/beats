@@ -39,6 +39,10 @@
       type: long
       description: >
         Available CPU in Mhz.
+    - name: cpu.usage.percent
+      type: scaled_float
+      description: >
+        CPU usage as a percentage.
     - name: memory.used.guest.bytes
       type: long
       description: >
@@ -59,6 +63,10 @@
       description: >
         Free memory of Guest in bytes.
       format: bytes
+    - name: memory.usage.percent
+      type: scaled_float
+      description: >
+        Memory usage as percent of total configured or available memory.
     - name: custom_fields
       type: object
       object_type: keyword
@@ -113,3 +121,26 @@
       object_type: keyword
       description: >
         List of all the triggered alarms.
+    - name: disk
+      type: group
+      fields:
+        - name: average.bytes
+          type: long
+          description: >
+            Aggregated disk I/O rate.
+        - name: read.average.bytes
+          type: long
+          description: >
+            Rate at which data is read from each virtual disk on the virtual machine.
+        - name: write.average.bytes
+          type: long
+          description: >
+            Rate at which data is written to each virtual disk on the virtual machine.
+        - name: numberRead.count
+          type: long
+          description: >
+            Number of times data was read.
+        - name: numberWrite.count
+          type: long
+          description: >
+            Number of disk writes.

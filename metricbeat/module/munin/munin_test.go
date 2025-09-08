@@ -24,13 +24,16 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func dummyNode(response string) *Node {
+	logger, _ := logp.NewDevelopmentLogger("")
 	return &Node{
 		writer: &bytes.Buffer{},
 		reader: bufio.NewReader(bytes.NewBuffer([]byte(response))),
+		logger: logger,
 	}
 }
 

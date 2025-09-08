@@ -20,11 +20,6 @@ type TestLogWriter struct {
 	testing.TB
 }
 
-func (t TestLogWriter) Write(buf []byte) (int, error) {
-	t.Log(string(buf))
-	return len(buf), nil
-}
-
 func MakeAddress(t testing.TB, ipPortPair string) net.Addr {
 	ip, portS, err := net.SplitHostPort(ipPortPair)
 	if err != nil {

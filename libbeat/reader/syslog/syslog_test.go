@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -145,6 +146,7 @@ func TestNewParser(t *testing.T) {
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	for name, tc := range tests {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
@@ -156,7 +158,7 @@ func TestNewParser(t *testing.T) {
 				messages:      tc.in,
 				referenceTime: referenceTime,
 			}
-			parser := NewParser(r, &tc.config)
+			parser := NewParser(r, &tc.config, logger)
 
 			var err error
 			var msg reader.Message

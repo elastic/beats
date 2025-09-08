@@ -43,6 +43,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
+const (
+	moduleNameField  = "_module_name"
+	filesetNameField = "_fileset_name"
+)
+
 // Fileset struct is the representation of a fileset.
 type Fileset struct {
 	name        string
@@ -52,6 +57,7 @@ type Fileset struct {
 	manifest    *manifest
 	vars        map[string]interface{}
 	pipelineIDs []string
+	logger      *logp.Logger
 }
 
 type pipeline struct {
@@ -59,12 +65,19 @@ type pipeline struct {
 	contents map[string]interface{}
 }
 
+// CheckIfModuleInput checks if the input configuration was created by a module
+func CheckIfModuleInput(cfg *conf.C) bool {
+	return cfg.HasField(moduleNameField)
+}
+
 // New allocates a new Fileset object with the given configuration.
 func New(
 	modulesPath string,
 	name string,
 	mname string,
-	fcfg *FilesetConfig) (*Fileset, error,
+	fcfg *FilesetConfig,
+	logger *logp.Logger,
+) (*Fileset, error,
 ) {
 	modulePath := filepath.Join(modulesPath, mname)
 	if _, err := os.Stat(modulePath); os.IsNotExist(err) {
@@ -76,6 +89,7 @@ func New(
 		mname:      mname,
 		fcfg:       fcfg,
 		modulePath: modulePath,
+		logger:     logger,
 	}, nil
 }
 
@@ -220,11 +234,11 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 				return vars, fmt.Errorf("Error parsing version %s: %w", minESVersion["version"].(string), err)
 			}
 
-			logp.Debug("fileset", "Comparing ES version %s with requirement of %s", esVersion.String(), minVersion)
+			fs.logger.Named("fileset").Debugf("Comparing ES version %s with requirement of %s", esVersion.String(), minVersion)
 
 			if esVersion.LessThan(minVersion) {
 				retVars[name] = minESVersion["value"]
-				logp.Info("Setting var %s (%s) to %v because Elasticsearch version is %s", name, fs, minESVersion["value"], esVersion.String())
+				fs.logger.Infof("Setting var %s (%s) to %v because Elasticsearch version is %s", name, fs, minESVersion["value"], esVersion.String())
 			}
 		}
 	}
@@ -393,11 +407,11 @@ func (fs *Fileset) getInputConfig() (*conf.C, error) {
 	}
 
 	// force our the module/fileset name
-	err = cfg.SetString("_module_name", -1, fs.mname)
+	err = cfg.SetString(moduleNameField, -1, fs.mname)
 	if err != nil {
 		return nil, fmt.Errorf("Error setting the _module_name cfg in the input config: %w", err)
 	}
-	err = cfg.SetString("_fileset_name", -1, fs.name)
+	err = cfg.SetString(filesetNameField, -1, fs.name)
 	if err != nil {
 		return nil, fmt.Errorf("Error setting the _fileset_name cfg in the input config: %w", err)
 	}

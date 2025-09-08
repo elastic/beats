@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -33,13 +32,12 @@ import (
 
 // Evil package level globals
 var (
-	once                            sync.Once
-	configfiles                     *config.StringsFlag
-	overwrites                      *config.C
-	defaults                        *config.C
-	homePath                        *string
-	configPath                      *string
-	allowedBackwardsCompatibleFlags []string
+	once        sync.Once
+	configfiles *config.StringsFlag
+	overwrites  *config.C
+	defaults    *config.C
+	homePath    *string
+	configPath  *string
 )
 
 func Initialize() {
@@ -49,9 +47,7 @@ func Initialize() {
 		// created. See ChangeDefaultCfgfileFlag which should
 		// be called prior to flags.Parse().
 		configfiles = config.StringArrFlag(nil, "c", "beat.yml", "Configuration file, relative to path.config")
-		AddAllowedBackwardsCompatibleFlag("c")
 		overwrites = config.SettingFlag(nil, "E", "Configuration overwrite")
-		AddAllowedBackwardsCompatibleFlag("E")
 		defaults = config.MustNewConfigFrom(map[string]interface{}{
 			"path": map[string]interface{}{
 				"home":   ".", // to be initialized by beat
@@ -61,42 +57,10 @@ func Initialize() {
 			},
 		})
 		homePath = config.ConfigOverwriteFlag(nil, overwrites, "path.home", "path.home", "", "Home path")
-		AddAllowedBackwardsCompatibleFlag("path.home")
 		configPath = config.ConfigOverwriteFlag(nil, overwrites, "path.config", "path.config", "", "Configuration path")
-		AddAllowedBackwardsCompatibleFlag("path.config")
 		_ = config.ConfigOverwriteFlag(nil, overwrites, "path.data", "path.data", "", "Data path")
-		AddAllowedBackwardsCompatibleFlag("path.data")
 		_ = config.ConfigOverwriteFlag(nil, overwrites, "path.logs", "path.logs", "", "Logs path")
-		AddAllowedBackwardsCompatibleFlag("path.logs")
 	})
-}
-
-func isAllowedBackwardsCompatibleFlag(f string) bool {
-	for _, existing := range allowedBackwardsCompatibleFlags {
-		if existing == f {
-			return true
-		}
-	}
-	return false
-}
-
-func AddAllowedBackwardsCompatibleFlag(f string) {
-	if isAllowedBackwardsCompatibleFlag(f) {
-		return
-	}
-	allowedBackwardsCompatibleFlags = append(allowedBackwardsCompatibleFlags, f)
-}
-
-func ConvertFlagsForBackwardsCompatibility() {
-	// backwards compatibility workaround, convert -flags to --flags:
-	for i, arg := range os.Args[1:] {
-		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") {
-			candidate, _, _ := strings.Cut(strings.TrimPrefix(arg, "-"), "=")
-			if isAllowedBackwardsCompatibleFlag(candidate) {
-				os.Args[1+i] = "-" + arg
-			}
-		}
-	}
 }
 
 // OverrideChecker checks if a config should be overwritten.
@@ -180,20 +144,6 @@ func HandleFlags() error {
 	return nil
 }
 
-// Deprecated: Please use Load().
-//
-// Read reads the configuration from a YAML file into the given interface
-// structure. If path is empty this method reads from the configuration
-// file specified by the '-c' command line flag.
-func Read(out interface{}, path string) error {
-	config, err := Load(path, nil)
-	if err != nil {
-		return err
-	}
-
-	return config.Unpack(out)
-}
-
 // Load reads the configuration from a YAML file structure. If path is empty
 // this method reads from the configuration file specified by the '-c' command
 // line flag.
@@ -263,8 +213,8 @@ func Load(path string, beatOverrides []ConditionalOverride) (*config.C, error) {
 }
 
 // LoadList loads a list of configs data from the given file.
-func LoadList(file string) ([]*config.C, error) {
-	logp.Debug("cfgfile", "Load config from file: %s", file)
+func LoadList(file string, logger *logp.Logger) ([]*config.C, error) {
+	logger.Named("cfgfile").Debugf("Load config from file: %s", file)
 	rawConfig, err := common.LoadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf("invalid config: %w", err)

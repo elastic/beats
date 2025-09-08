@@ -1972,12 +1972,6 @@
 
 # renames to match Windows Event Log naming
 
-- from: type
-  to: winlog.api
-  alias: true
-  beat: winlogbeat
-  rename: false
-
 - from: log_name
   to: winlog.channel
   alias: true

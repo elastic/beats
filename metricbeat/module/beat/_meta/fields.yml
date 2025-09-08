@@ -477,9 +477,48 @@
                 - name: unset
                   type: alias
                   path: beat.stats.apm_server.root.unset
-            - name: sampling.transactions_dropped
-              type: alias
-              path: beat.stats.apm_server.sampling.transactions_dropped
+            - name: sampling
+              type: group
+              fields:
+                - name: tail
+                  type: group
+                  fields:
+                    - name: dynamic_service_groups
+                      type: alias
+                      path: beat.stats.apm_server.sampling.tail.dynamic_service_groups
+                    - name: events
+                      type: group
+                      fields:
+                        - name: dropped
+                          type: alias
+                          path: beat.stats.apm_server.sampling.tail.events.dropped
+                        - name: failed_writes
+                          type: alias
+                          path: beat.stats.apm_server.sampling.tail.events.failed_writes
+                        - name: head_unsampled
+                          type: alias
+                          path: beat.stats.apm_server.sampling.tail.events.head_unsampled
+                        - name: processed
+                          type: alias
+                          path: beat.stats.apm_server.sampling.tail.events.processed
+                        - name: sampled
+                          type: alias
+                          path: beat.stats.apm_server.sampling.tail.events.sampled
+                        - name: stored
+                          type: alias
+                          path: beat.stats.apm_server.sampling.tail.events.stored
+                    - name: storage
+                      type: group
+                      fields:
+                        - name: lsm_size
+                          type: alias
+                          path: beat.stats.apm_server.sampling.tail.storage.lsm_size
+                        - name: value_log_size
+                          type: alias
+                          path: beat.stats.apm_server.sampling.tail.storage.value_log_size
+                - name: transactions_dropped
+                  type: alias
+                  path: beat.stats.apm_server.sampling.transactions_dropped
             - name: server
               type: group
               fields:

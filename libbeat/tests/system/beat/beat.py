@@ -269,10 +269,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if output is None:
             output = self.beat_name + "-" + self.today + ".ndjson"
 
-        args = [cmd, "-systemTest"]
+        args = [cmd, "--systemTest"]
         if os.getenv("TEST_COVERAGE") == "true":
             args += [
-                "-test.coverprofile",
+                "--test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
             ]
 
@@ -281,7 +281,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             path_home = home
 
         args += [
-            "-path.home", path_home,
+            "--path.home", path_home,
             "-c", os.path.join(self.working_dir, config),
         ]
 
@@ -446,6 +446,12 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 print("Test has failed, here are the Beat logs")
                 for l in self.get_log_lines():
                     print(l)
+                if self.output_lines() == 0:
+                    print("\n\nBeat had no output file")
+                else:
+                    print("\n\nHere is the beat's output file:")
+                    for entry in self.read_output():
+                        print(entry)
                 raise WaitTimeoutError(
                     f"Timeout waiting for condition '{name}'. Waited {max_timeout} seconds: {err_msg}")
             time.sleep(poll_interval)

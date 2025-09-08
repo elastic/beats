@@ -25,7 +25,7 @@ const (
 	defaultTimeout = 1 * time.Minute
 
 	// The longest the query is allowed to run. Since queries are run one at a time, this will block all other queries until this query completes.
-	defaultMaxTimeout     = 15 * time.Minute
+	defaultMaxTimeout     = 24 * time.Hour
 	defaultConnectRetries = 10
 )
 

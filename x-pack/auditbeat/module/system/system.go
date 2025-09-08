@@ -7,7 +7,6 @@ package system
 import (
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-sysinfo"
 )
 
@@ -54,7 +53,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		return nil, err
 	}
 
-	log := logp.NewLogger(ModuleName)
+	log := base.Logger.Named(ModuleName)
 
 	var hostID string
 	if hostInfo, err := sysinfo.Host(); err != nil {

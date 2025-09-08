@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	config2 "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -59,7 +60,7 @@ func TestDropFieldRun(t *testing.T) {
 			},
 		)
 
-		p, err := newDropFields(c)
+		p, err := newDropFields(c, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 		process, ok := p.(*dropFields)
 		assert.True(t, ok)
@@ -117,7 +118,7 @@ func TestNewDropFields(t *testing.T) {
 			"fields": []string{"/field_.*1/", "/second/", "third"},
 		})
 
-		procInt, err := newDropFields(c)
+		procInt, err := newDropFields(c, logptest.NewTestingLogger(t, ""))
 		assert.NoError(t, err)
 
 		processor, ok := procInt.(*dropFields)
@@ -132,7 +133,7 @@ func TestNewDropFields(t *testing.T) {
 			"fields": []string{"/[//"},
 		})
 
-		_, err := newDropFields(c)
+		_, err := newDropFields(c, logptest.NewTestingLogger(t, ""))
 
 		assert.Equal(t, "wrong configuration in drop_fields[0]=/[//. error parsing regexp: missing closing ]: `[/`", err.Error())
 	})

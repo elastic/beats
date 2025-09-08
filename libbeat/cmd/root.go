@@ -80,30 +80,18 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 
 	// Persistent flags, common across all subcommands
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("E"))
-	cfgfile.AddAllowedBackwardsCompatibleFlag("E")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("c"))
-	cfgfile.AddAllowedBackwardsCompatibleFlag("c")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("d"))
-	cfgfile.AddAllowedBackwardsCompatibleFlag("d")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("v"))
-	cfgfile.AddAllowedBackwardsCompatibleFlag("v")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("e"))
-	cfgfile.AddAllowedBackwardsCompatibleFlag("e")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("environment"))
-	cfgfile.AddAllowedBackwardsCompatibleFlag("environment")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.config"))
-	cfgfile.AddAllowedBackwardsCompatibleFlag("path.config")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.data"))
-	cfgfile.AddAllowedBackwardsCompatibleFlag("path.data")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.logs"))
-	cfgfile.AddAllowedBackwardsCompatibleFlag("path.logs")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.home"))
-	cfgfile.AddAllowedBackwardsCompatibleFlag("path.home")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("strict.perms"))
-	cfgfile.AddAllowedBackwardsCompatibleFlag("strict.perms")
 	if f := flag.CommandLine.Lookup("plugin"); f != nil {
 		rootCmd.PersistentFlags().AddGoFlag(f)
-		cfgfile.AddAllowedBackwardsCompatibleFlag("plugin")
 	}
 
 	// Inherit root flags from run command
@@ -117,7 +105,9 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	rootCmd.AddCommand(rootCmd.CompletionCmd)
 	rootCmd.AddCommand(rootCmd.ExportCmd)
 	rootCmd.AddCommand(rootCmd.TestCmd)
-	rootCmd.AddCommand(rootCmd.KeystoreCmd)
+	if rootCmd.KeystoreCmd != nil {
+		rootCmd.AddCommand(rootCmd.KeystoreCmd)
+	}
 
 	return rootCmd
 }

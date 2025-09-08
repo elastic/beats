@@ -21,6 +21,9 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	_ "embed"
 	"encoding/base64"
 	"fmt"
 	"io"
@@ -29,10 +32,14 @@ import (
 	"strings"
 	"testing"
 
+	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestAPIKeyEncoding(t *testing.T) {
@@ -41,7 +48,7 @@ func TestAPIKeyEncoding(t *testing.T) {
 
 	conn, err := NewConnection(ConnectionSettings{
 		APIKey: apiKey,
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	httpClient := newMockClient()
@@ -102,7 +109,7 @@ func TestHeaders(t *testing.T) {
 	} {
 		conn, err := NewConnection(ConnectionSettings{
 			Headers: td.input,
-		})
+		}, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 
 		httpClient := newMockClient()
@@ -160,7 +167,7 @@ func TestUserAgentHeader(t *testing.T) {
 			}))
 			defer server.Close()
 			testCase.connSettings.URL = server.URL
-			conn, err := NewConnection(testCase.connSettings)
+			conn, err := NewConnection(testCase.connSettings, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
@@ -208,7 +215,7 @@ func BenchmarkExecHTTPRequest(b *testing.B) {
 							"Accept":       "application/vnd.elasticsearch+json;compatible-with=7",
 							"Content-Type": "application/vnd.elasticsearch+json;compatible-with=7",
 						},
-					})
+					}, logptest.NewTestingLogger(b, ""))
 					require.NoError(b, err)
 
 					httpClient := newMockClient()
@@ -231,4 +238,85 @@ func BenchmarkExecHTTPRequest(b *testing.B) {
 			}
 		})
 	}
+}
+
+// TestConnectionTLS tries to connect to a test HTTPS server (pretending
+// to be an Elasticsearch cluster), that deliberately presents TLS options
+// that are not FIPS-compliant.
+// - If the test is running with a FIPS-capable build, the client, being FIPS-
+// capable, should fail the TLS handshake. Concretely, the conn.Connect() method
+// should return an error.
+// - If the test is not running with a FIPS-capable build, the client should
+// complete the TLS handshake successfully. Concretely, the conn.Connect() method
+// should not return an error.
+func TestConnectionTLS(t *testing.T) {
+	server := startTLSServer(t)
+	defer server.Close()
+
+	transportSettings := `
+ssl:
+  enabled: true
+`
+
+	var transport httpcommon.HTTPTransportSettings
+	err := transport.Unpack(cfg.MustNewConfigFrom(transportSettings))
+	require.NoError(t, err)
+
+	transport.TLS.CAs = []string{string(caCertPEM)}
+
+	log := logptest.NewTestingLogger(t, "TestConnectionTLS")
+	conn, err := NewConnection(ConnectionSettings{
+		URL:       server.URL,
+		Transport: transport,
+	}, log)
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	err = conn.Connect(ctx)
+
+	if version.FIPSDistribution {
+		require.ErrorContains(t, err, "tls: internal error")
+	} else {
+		require.NoError(t, err)
+	}
+}
+
+//go:embed testdata/ca.crt
+var caCertPEM []byte
+
+//go:embed testdata/fips_invalid.key
+var serverKeyPEM []byte // RSA key with length = 1024 bits
+
+//go:embed testdata/fips_invalid.crt
+var serverCertPEM []byte
+
+//go:embed testdata/es_ping_response.json
+var esPingResponse []byte
+
+func startTLSServer(t *testing.T) *httptest.Server {
+	// Configure server and start it
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCertPEM)
+
+	// Create HTTPS server
+	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write(esPingResponse) //nolint:errcheck // used in tests
+	}))
+
+	serverCert, err := tls.X509KeyPair(serverCertPEM, serverKeyPEM)
+	require.NoError(t, err)
+
+	server.TLS = &tls.Config{
+		MinVersion:   tls.VersionTLS12,
+		RootCAs:      caCertPool,
+		Certificates: []tls.Certificate{serverCert},
+		ClientCAs:    caCertPool,
+		ClientAuth:   tls.NoClientCert,
+	}
+
+	server.StartTLS()
+
+	return server
 }

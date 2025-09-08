@@ -19,10 +19,9 @@ package fileset
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/version"
@@ -100,14 +99,14 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 				// Rollback pipelines and return errors
 				// TODO: Instead of attempting to load all pipelines and then rolling back loaded ones when there's an
 				// error, validate all pipelines before loading any of them. This requires https://github.com/elastic/elasticsearch/issues/35495.
-				errs := multierror.Errors{err}
+				errs := []error{err}
 				for _, pipelineID := range pipelineIDsLoaded {
 					err = DeletePipeline(esClient, pipelineID)
 					if err != nil {
 						errs = append(errs, err)
 					}
 				}
-				return errs.Err()
+				return errors.Join(errs...)
 			}
 		}
 	}

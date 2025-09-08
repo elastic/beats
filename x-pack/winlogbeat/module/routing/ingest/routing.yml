@@ -16,6 +16,7 @@ processors:
   - pipeline:
       name: '{< IngestPipeline "powershell_operational" >}'
       if: ctx.winlog?.channel instanceof String && ctx.winlog.channel.toLowerCase() == 'microsoft-windows-powershell/operational'
+
   - set:
       field: host.os.type
       value: windows
@@ -25,8 +26,39 @@ processors:
       value: windows
       override: false
 
+  # Get user details from the translate_sid processor enrichment
+  # if they are available and we don't already have them.
+  - rename:
+      field: winlog.event_data._MemberUserName
+      target_field: user.name
+      ignore_failure: true
+      ignore_missing: true
+  - rename:
+      field: winlog.event_data._MemberDomain
+      target_field: user.domain
+      ignore_failure: true
+      ignore_missing: true
+  - append:
+      value: '{{{winlog.event_data._MemberAccountType}}}'
+      field: user.roles
+      ignore_failure: true
+      allow_duplicates: false
+      if: ctx.winlog?.event_data?._MemberAccountType != null
+  - remove:
+      field: winlog.event_data._MemberAccountType
+      ignore_missing: true
+      ignore_failure: true
+      if: ctx.user?.roles != null && ctx.winlog?.event_data?._MemberAccountType != null && ctx.user.roles.contains(ctx.winlog.event_data._MemberAccountType)
+
+  - convert:
+      field: error.code
+      type: string
+      ignore_missing: true
+
 on_failure:
   - set:
+      field: event.kind
+      value: pipeline_error
+  - append:
       field: error.message
-      value: |-
-        Processor "{{ _ingest.on_failure_processor_type }}" with tag "{{ _ingest.on_failure_processor_tag }}" in pipeline "{{ _ingest.on_failure_pipeline }}" failed with message "{{ _ingest.on_failure_message }}"
+      value: "{{{ _ingest.on_failure_message }}}"

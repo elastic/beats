@@ -1,5 +1,5 @@
 - key: panw
-  title: panw
+  title: Palo Alto Networks
   description: >
     Module for Palo Alto Networks (PAN-OS)
   fields:

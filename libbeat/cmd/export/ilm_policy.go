@@ -20,7 +20,6 @@ package export
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
@@ -58,9 +57,7 @@ func GenGetILMPolicyCmd(settings instance.Settings) *cobra.Command {
 	}
 
 	genTemplateConfigCmd.Flags().String("es.version", settings.Version, "Elasticsearch version")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("es.version")
 	genTemplateConfigCmd.Flags().String("dir", "", "Specify directory for printing policy files. By default policies are printed to stdout.")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("dir")
 
 	return genTemplateConfigCmd
 }

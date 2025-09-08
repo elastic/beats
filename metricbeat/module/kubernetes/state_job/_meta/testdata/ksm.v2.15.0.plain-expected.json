@@ -1,0 +1,46 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "completions": {
+                    "desired": 1
+                },
+                "name": "hello-29068597",
+                "owner": {
+                    "is_controller": "true",
+                    "kind": "CronJob",
+                    "name": "hello"
+                },
+                "parallelism": {
+                    "desired": 1
+                },
+                "pods": {
+                    "active": 0,
+                    "failed": 0,
+                    "succeeded": 1
+                },
+                "status": {
+                    "complete": "true"
+                },
+                "time": {
+                    "completed": "2025-04-08T12:37:03.000Z",
+                    "created": "2025-04-08T12:37:00.000Z"
+                }
+            },
+            "namespace": "default"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]

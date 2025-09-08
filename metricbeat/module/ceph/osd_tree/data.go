@@ -54,11 +54,11 @@ type OsdTreeRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventsMapping(content []byte) ([]mapstr.M, error) {
+func eventsMapping(content []byte, logger *logp.Logger) ([]mapstr.M, error) {
 	var d OsdTreeRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		logp.Err("Error: %+v", err)
+		logger.Errorf("Error: %+v", err)
 		return nil, err
 	}
 

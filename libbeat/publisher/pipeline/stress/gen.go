@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"runtime/pprof"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -29,7 +30,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 type generateConfig struct {
@@ -62,12 +62,13 @@ func generate(
 	config generateConfig,
 	id int,
 	errors func(err error),
+	logger *logp.Logger,
 ) error {
 	settings := beat.ClientConfig{
 		WaitClose: config.WaitClose,
 	}
 
-	logger := logp.NewLogger("publisher_pipeline_stress_generate")
+	logger = logger.Named("publisher_pipeline_stress_generate")
 	if config.ACK {
 		settings.EventListener = acker.Counting(func(n int) {
 			logger.Infof("Pipeline client (%v) ACKS; %v", id, n)
@@ -77,7 +78,7 @@ func generate(
 	if m := config.PublishMode; m != "" {
 		mode, exists := publishModes[m]
 		if !exists {
-			err := fmt.Errorf("Unknown publish mode '%v'", mode)
+			err := fmt.Errorf("unknown publish mode '%v'", mode)
 			if errors != nil {
 				errors(err)
 			}
@@ -97,7 +98,7 @@ func generate(
 	done := make(chan struct{})
 	defer close(done)
 
-	count := atomic.MakeUint64(0)
+	var count atomic.Uint64
 
 	var wg sync.WaitGroup
 	defer wg.Wait()
@@ -148,7 +149,7 @@ func generate(
 			Fields: mapstr.M{
 				"id":    id,
 				"hello": "world",
-				"count": count,
+				"count": count.Load(),
 
 				// TODO: more custom event generation?
 			},
@@ -156,7 +157,7 @@ func generate(
 
 		client.Publish(event)
 
-		total := count.Inc()
+		total := count.Add(1)
 		if config.MaxEvents > 0 && total == config.MaxEvents {
 			break
 		}

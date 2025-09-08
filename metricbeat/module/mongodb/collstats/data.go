@@ -25,15 +25,17 @@ import (
 )
 
 func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
-	names := strings.SplitN(key, ".", 2)
-
-	if len(names) < 2 {
-		return nil, errors.New("collection name invalid")
+	names, err := splitKey(key)
+	if err != nil {
+		return nil, err
 	}
 
+	// NOTE: splitKey handles the case where the collection can have "." in the name
+	database, collection := names[0], names[1]
+
 	event := mapstr.M{
-		"db":         names[0],
-		"collection": names[1],
+		"db":         database,
+		"collection": collection,
 		"name":       key,
 		"total": mapstr.M{
 			"time": mapstr.M{
@@ -91,6 +93,16 @@ func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
 			},
 			"count": mustGetMapStrValue(data, "commands.count"),
 		},
+		"stats": mapstr.M{
+			"size":           mustGetMapStrValue(data, "stats.size"),
+			"count":          mustGetMapStrValue(data, "stats.count"),
+			"avgObjSize":     mustGetMapStrValue(data, "stats.avgObjSize"),
+			"storageSize":    mustGetMapStrValue(data, "stats.storageSize"),
+			"totalIndexSize": mustGetMapStrValue(data, "stats.totalIndexSize"),
+			"totalSize":      mustGetMapStrValue(data, "stats.totalSize"),
+			"max":            mustGetMapStrValue(data, "stats.max"),
+			"nindexes":       mustGetMapStrValue(data, "stats.nindexes"),
+		},
 	}
 
 	return event, nil
@@ -99,4 +111,14 @@ func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
 func mustGetMapStrValue(m mapstr.M, key string) interface{} {
 	v, _ := m.GetValue(key)
 	return v
+}
+
+func splitKey(key string) ([]string, error) {
+	dbColl := strings.SplitN(key, ".", 2)
+
+	if len(dbColl) < 2 {
+		return nil, errors.New("collection name invalid")
+	}
+
+	return dbColl, nil
 }

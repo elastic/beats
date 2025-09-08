@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestConfigUnpack(t *testing.T) {
@@ -93,7 +94,7 @@ format:
 			require.NoError(t, err)
 
 			// Make sure valid configs produce processors.
-			p, err := New(rawConfig)
+			p, err := New(rawConfig, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 			require.NotNil(t, p)
 		})

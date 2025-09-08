@@ -21,7 +21,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/proc"
+	"github.com/elastic/beats/v7/libbeat/common/proc"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
@@ -46,7 +46,7 @@ const (
 	configurationRefreshIntervalSecs = 60
 
 	osqueryTimeout    = 1 * time.Minute
-	osqueryMaxTimeout = 15 * time.Minute
+	osqueryMaxTimeout = 24 * time.Hour
 )
 
 const (

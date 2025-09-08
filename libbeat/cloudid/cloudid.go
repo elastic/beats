@@ -27,7 +27,6 @@ import (
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const defaultCloudPort = "443"
@@ -148,7 +147,6 @@ func (c *CloudID) decodeCloudAuth() error {
 // settings.
 func OverwriteSettings(cfg *config.C) error {
 
-	logger := logp.NewLogger("cloudid")
 	cloudID, _ := cfg.String("cloud.id", -1)
 	cloudAuth, _ := cfg.String("cloud.auth", -1)
 
@@ -157,7 +155,6 @@ func OverwriteSettings(cfg *config.C) error {
 		return nil
 	}
 
-	logger.Debugf("cloud.id: %s, cloud.auth: %s", cloudID, cloudAuth)
 	if cloudID == "" {
 		return errors.New("cloud.auth specified but cloud.id is empty. Please specify both")
 	}
@@ -167,8 +164,6 @@ func OverwriteSettings(cfg *config.C) error {
 	if err != nil {
 		return fmt.Errorf("Error decoding cloud.id: %w", err)
 	}
-
-	logger.Infof("Setting Elasticsearch and Kibana URLs based on the cloud id: output.elasticsearch.hosts=%s and setup.kibana.host=%s", cid.esURL, cid.kibURL)
 
 	esURLConfig, err := config.NewConfigFrom([]string{cid.ElasticsearchURL()})
 	if err != nil {

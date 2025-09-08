@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package query
 
 import (
@@ -143,10 +145,16 @@ func dbSelector(driver, dbName string) string {
 	return ""
 }
 
-func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.ReporterV2, queries []query) (bool, error) {
+func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.ReporterV2, queries []query) (_ bool, fetchErr error) {
+	defer func() {
+		fetchErr = sql.SanitizeError(fetchErr, m.HostData().URI)
+	}()
+
 	var ok bool
 	merged := make(mapstr.M, 0)
+	storeQueries := make([]string, 0, len(queries))
 	for _, q := range queries {
+		storeQueries = append(storeQueries, q.Query)
 		if q.ResponseFormat == tableResponseFormat {
 			// Table format
 			mss, err := db.FetchTableMode(ctx, q.Query)
@@ -196,7 +204,7 @@ func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.Rep
 
 	if m.Config.MergeResults {
 		// Report here for merged case.
-		ok = m.reportEvent(merged, reporter, "")
+		ok = m.reportEvent(merged, reporter, storeQueries...)
 	}
 
 	return ok, nil
@@ -207,7 +215,11 @@ func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.Rep
 // of an error set the Error field of mb.Event or simply call report.Error().
 // It calls m.fetchTableMode() or m.fetchVariableMode() depending on the response
 // format of the query.
-func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
+func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (fetchErr error) {
+	defer func() {
+		fetchErr = sql.SanitizeError(fetchErr, m.HostData().URI)
+	}()
+
 	db, err := sql.NewDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
 	if err != nil {
 		return fmt.Errorf("cannot open connection: %w", err)
@@ -296,7 +308,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 // reportEvent using 'user' mode with keys under `sql.metrics.*` or using Raw data mode (module and metricset key spaces
 // provided by the user)
-func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2, qry string) bool {
+func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2, qry ...string) bool {
 	var ok bool
 	if m.Config.RawData.Enabled {
 		// New usage.

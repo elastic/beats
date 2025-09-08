@@ -23,7 +23,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"os"
 	"strconv"
 	"sync"
@@ -31,6 +31,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/sarama"
 
@@ -42,6 +45,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -56,9 +60,8 @@ type eventInfo struct {
 }
 
 func TestKafkaPublish(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("kafka"))
 
-	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	id := strconv.Itoa(rand.Int())
 	testTopic := fmt.Sprintf("test-libbeat-%s", id)
 	logType := fmt.Sprintf("log-type-%s", id)
 
@@ -274,7 +277,8 @@ func TestKafkaPublish(t *testing.T) {
 		}
 
 		t.Run(name, func(t *testing.T) {
-			grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat"}, outputs.NewNilObserver(), cfg)
+			logger := logptest.NewTestingLogger(t, "")
+			grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat", Logger: logger}, outputs.NewNilObserver(), cfg)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -319,7 +323,7 @@ func TestKafkaPublish(t *testing.T) {
 
 			validate := validateJSON
 			if fmt, exists := test.config["codec.format.string"]; exists {
-				validate = makeValidateFmtStr(fmt.(string))
+				validate = makeValidateFmtStr(fmt.(string)) //nolint:errcheck //This is a test file
 			}
 
 			cfgHeaders, headersSet := test.config["headers"]
@@ -345,6 +349,100 @@ func TestKafkaPublish(t *testing.T) {
 			assert.Equal(t, len(expected), len(seenMsgs))
 		})
 	}
+}
+
+func TestKafkaErrors(t *testing.T) {
+	id := strconv.Itoa(rand.Int())
+	testTopic := fmt.Sprintf("test-libbeat-%s", id)
+
+	tests := []struct {
+		title        string
+		config       map[string]interface{}
+		topic        string
+		events       []eventInfo
+		errorMessage string
+	}{
+		{
+			"message of size large than `max_message_bytes` must be dropped",
+			map[string]interface{}{
+				"max_message_bytes": "10",
+			},
+			testTopic,
+			single(mapstr.M{
+				"host":    "test-host-random-message-which-is-long-enough",
+				"message": id,
+			}),
+			"dropping message as it exceeds max_mesage_bytes",
+		},
+	}
+
+	defaultConfig := map[string]interface{}{
+		"hosts":   []string{getTestKafkaHost()},
+		"topic":   testTopic,
+		"timeout": "1s",
+	}
+
+	for _, test := range tests {
+
+		cfg := makeConfig(t, defaultConfig)
+		if test.config != nil {
+			err := cfg.Merge(makeConfig(t, test.config))
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+
+		observed, zapLogs := observer.New(zapcore.DebugLevel)
+		logger, err := logp.ConfigureWithCoreLocal(logp.Config{}, observed)
+		require.NoError(t, err)
+
+		grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat", Logger: logger}, outputs.NewNilObserver(), cfg)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		output, ok := grp.Clients[0].(*client)
+		assert.True(t, ok, "grp.Clients[0] didn't contain a ptr to client")
+		if err := output.Connect(context.Background()); err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, output.index, "testbeat")
+		defer output.Close()
+
+		// publish test events
+		var wg sync.WaitGroup
+		for i := range test.events {
+			batch := outest.NewBatch(test.events[i].events...)
+			batch.OnSignal = func(_ outest.BatchSignal) {
+				wg.Done()
+			}
+
+			wg.Add(1)
+			err := output.Publish(context.Background(), batch)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+
+		// wait for all published batches to be ACKed
+		wg.Wait()
+
+		t.Cleanup(func() {
+			if t.Failed() {
+				t.Logf("Debug Logs:\n")
+				for _, log := range zapLogs.TakeAll() {
+					data, err := json.Marshal(log)
+					if err != nil {
+						t.Errorf("failed encoding log as JSON: %s", err)
+					}
+					t.Logf("%s", string(data))
+				}
+				return
+			}
+		})
+		assert.GreaterOrEqual(t, zapLogs.FilterMessageSnippet(test.errorMessage).Len(), 1)
+	}
+
 }
 
 func validateJSON(t *testing.T, value []byte, events []beat.Event) string {

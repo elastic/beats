@@ -23,28 +23,32 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 )
 
 type config struct {
 	APITimeout         time.Duration        `config:"api_timeout"`
-	VisibilityTimeout  time.Duration        `config:"visibility_timeout"`
-	SQSWaitTime        time.Duration        `config:"sqs.wait_time"`         // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
-	SQSMaxReceiveCount int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
-	SQSScript          *scriptConfig        `config:"sqs.notification_parsing_script"`
-	QueueURL           string               `config:"queue_url"`
-	RegionName         string               `config:"region"`
-	BucketARN          string               `config:"bucket_arn"`
+	AWSConfig          awscommon.ConfigAWS  `config:",inline"`
 	AccessPointARN     string               `config:"access_point_arn"`
-	NonAWSBucketName   string               `config:"non_aws_bucket_name"`
+	BackupConfig       backupConfig         `config:",inline"`
+	BucketARN          string               `config:"bucket_arn"`
 	BucketListInterval time.Duration        `config:"bucket_list_interval"`
 	BucketListPrefix   string               `config:"bucket_list_prefix"`
-	NumberOfWorkers    int                  `config:"number_of_workers"`
-	AWSConfig          awscommon.ConfigAWS  `config:",inline"`
 	FileSelectors      []fileSelectorConfig `config:"file_selectors"`
-	ReaderConfig       readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
+	IgnoreOlder        time.Duration        `config:"ignore_older"`
+	NonAWSBucketName   string               `config:"non_aws_bucket_name"`
+	NumberOfWorkers    int                  `config:"number_of_workers"`
 	PathStyle          bool                 `config:"path_style"`
 	ProviderOverride   string               `config:"provider"`
-	BackupConfig       backupConfig         `config:",inline"`
+	QueueURL           string               `config:"queue_url"`
+	ReaderConfig       readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
+	RegionName         string               `config:"region"`
+	SQSMaxReceiveCount int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
+	SQSScript          *scriptConfig        `config:"sqs.notification_parsing_script"`
+	SQSWaitTime        time.Duration        `config:"sqs.wait_time"`           // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
+	SQSGraceTime       time.Duration        `config:"sqs.shutdown_grace_time"` // The time that the processing loop will wait for messages before shutting down.
+	StartTimestamp     string               `config:"start_timestamp"`
+	VisibilityTimeout  time.Duration        `config:"visibility_timeout"`
 }
 
 func defaultConfig() config {
@@ -54,6 +58,7 @@ func defaultConfig() config {
 		BucketListInterval: 120 * time.Second,
 		BucketListPrefix:   "",
 		SQSWaitTime:        20 * time.Second,
+		SQSGraceTime:       20 * time.Second,
 		SQSMaxReceiveCount: 5,
 		NumberOfWorkers:    5,
 		PathStyle:          false,
@@ -99,6 +104,10 @@ func (c *config) Validate() error {
 			"less than or equal to 20s", c.SQSWaitTime)
 	}
 
+	if c.QueueURL != "" && c.SQSGraceTime < 0 {
+		return fmt.Errorf("shutdown_grace_time <%v> must not be negative", c.SQSGraceTime)
+	}
+
 	if c.QueueURL != "" && c.APITimeout < c.SQSWaitTime {
 		return fmt.Errorf("api_timeout <%v> must be greater than the sqs.wait_time <%v",
 			c.APITimeout, c.SQSWaitTime)
@@ -142,6 +151,13 @@ func (c *config) Validate() error {
 		}
 	}
 
+	if c.StartTimestamp != "" {
+		_, err := time.Parse(time.RFC3339, c.StartTimestamp)
+		if err != nil {
+			return fmt.Errorf("invalid input for start_timestamp: %w", err)
+		}
+	}
+
 	return nil
 }
 
@@ -176,7 +192,7 @@ type readerConfig struct {
 	LineTerminator           readfile.LineTerminator `config:"line_terminator"`
 	MaxBytes                 cfgtype.ByteSize        `config:"max_bytes"`
 	Parsers                  parser.Config           `config:",inline"`
-	Decoding                 decoderConfig           `config:"decoding"`
+	Decoding                 decoder.Config          `config:"decoding"`
 }
 
 func (rc *readerConfig) Validate() error {
@@ -295,6 +311,7 @@ func (c config) sqsConfigModifier(o *sqs.Options) {
 		o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 	}
 	if c.AWSConfig.Endpoint != "" {
+		//nolint:staticcheck // not changing through this PR
 		o.EndpointResolver = sqs.EndpointResolverFromURL(c.AWSConfig.Endpoint)
 	}
 }

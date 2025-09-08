@@ -589,7 +589,7 @@ filebeat.modules:
       # based on zone egress and ingress
       #var.external_zones: [ "External" ]
 
-#------------------------------ Checkpoint Module ------------------------------
+#----------------------------- Check Point Module -----------------------------
 - module: checkpoint
   firewall:
     enabled: false
@@ -744,7 +744,7 @@ filebeat.modules:
     # Overriding the default request timeout, optional.
     #var.request_timeout: 60s
 
-#------------------------------- Coredns Module -------------------------------
+#------------------------------- CoreDNS Module -------------------------------
 - module: coredns
   # Fileset for native deployment
   log: 
@@ -754,7 +754,7 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#----------------------------- Crowdstrike Module -----------------------------
+#----------------------------- CrowdStrike Module -----------------------------
 - module: crowdstrike
   
   falcon:
@@ -764,7 +764,7 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#----------------------------- CyberArk PAS Module -----------------------------
+#----------------------------- Cyberark PAS Module -----------------------------
 - module: cyberarkpas
   audit:
     enabled: false
@@ -940,7 +940,7 @@ filebeat.modules:
     # the subscription.
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
-#--------------------------- Google_workspace Module ---------------------------
+#--------------------------- Google Workspace Module ---------------------------
 - module: google_workspace
   saml:
     enabled: false
@@ -1005,7 +1005,7 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#-------------------------------- Ibmmq Module --------------------------------
+#-------------------------------- IBM MQ Module --------------------------------
 - module: ibmmq
   # All logs
   errorlog:
@@ -1208,7 +1208,7 @@ filebeat.modules:
     # You can also pass SSL options. For example:
     #var.ssl.verification_mode: none
 
-#------------------------------- Mongodb Module -------------------------------
+#------------------------------- MongoDB Module -------------------------------
 #- module: mongodb
   # Logs
   #log:
@@ -1222,7 +1222,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#-------------------------------- Mssql Module --------------------------------
+#-------------------------------- MSSQL Module --------------------------------
 - module: mssql
   # Fileset for native deployment
   log:
@@ -1410,7 +1410,7 @@ filebeat.modules:
     # of the document. The default is true.
     #var.use_namespace: true
 
-#--------------------------------- Panw Module ---------------------------------
+#-------------------------- Palo Alto Networks Module --------------------------
 - module: panw
   panos:
     enabled: false
@@ -1778,7 +1778,7 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#----------------------------- Threatintel Module -----------------------------
+#----------------------------- Threat Intel Module -----------------------------
 - module: threatintel
   abuseurl:
     enabled: false
@@ -1964,7 +1964,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#--------------------------------- Zeek Module ---------------------------------
+#------------------------------ Zeek (Bro) Module ------------------------------
 - module: zeek
   capture_loss:
     enabled: false
@@ -2400,7 +2400,7 @@ filebeat.inputs:
   # If enabled, instead of relying on the device ID and inode values when comparing files,
   # compare hashes of the given byte ranges in files. A file becomes an ingest target
   # when its size grows larger than offset+length (see below). Until then it's ignored.
-  #prospector.scanner.fingerprint.enabled: false
+  #prospector.scanner.fingerprint.enabled: true
 
   # If fingerprint mode is enabled, sets the offset from the beginning of the file
   # for the byte range used for computing the fingerprint value.
@@ -2535,8 +2535,9 @@ filebeat.inputs:
   #clean_removed: true
 
   # Method to determine if two files are the same or not. By default
-  # the Beat considers two files the same if their inode and device id are the same.
-  #file_identity.native: ~
+  # a fingerprint is generated using the first 1024 bytes of the file,
+  # if the fingerprints match, then the files are considered equal.
+  #file_identity.fingerprint: ~
 
   # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
@@ -2562,10 +2563,18 @@ filebeat.inputs:
   # Available options: since_first_start, since_last_start.
   #ignore_inactive: ""
 
-  # If `take_over` is set to `true`, this `filestream` will take over all files
-  # from `log` inputs if they match at least one of the `paths` set in the `filestream`.
+  # When `take_over.enabled` is set to `true` this `filestream` input
+  # will take over files from `log` or `filestream` (need to set `from_ids`) inputs.
+  # Taking over states of active `log` or `filestream` inputs is not
+  # supported and will lead to inconsistent data ingestion (data
+  # duplication or data loss).
   # This functionality is still in beta.
-  #take_over: false
+  #take_over:
+  #  enabled: true
+  #  If `from_ids` is set, then the files are taken over
+  #  from `filestream` inputs that were assigned these IDs.
+  #  Taking over from `log` inputs is disabled when `from_ids` is set.
+  #  from_ids: ["foo", "bar"]
 
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
@@ -2611,7 +2620,8 @@ filebeat.inputs:
   # When enabling this option, a file handler is closed immediately in case a file can't be found
   # any more. In case the file shows up again later, harvesting will continue at the last known position
   # after scan_frequency.
-  #close.on_state_change.removed: true
+  # By default, it's `true` on Windows and `false` on the rest of the platforms.
+  #close.on_state_change.removed: false
 
   # Closes the file handler as soon as the harvesters reaches the end of the file.
   # By default this option is disabled.
@@ -2623,6 +2633,20 @@ filebeat.inputs:
   # By default this option is disabled.
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close.reader.after_interval: 0
+
+  ### File deleting options
+  # Filestream cam delete the file after it has been acknowledged by the output,
+  # has reached EOF or became inactive.
+
+  # Enable deleting the file after the reader is closed
+  # and all events have been ingested.
+  #delete.enabled: false
+
+  # Grace period to wait before trying to remove a file.
+  # If data is added during the grace, deletion is cancelled.
+  # The grace period will re-start next time the close condition
+  # is reached.
+  #delete.grace_period: 30m
 
 #----------------------------- Stdin input -------------------------------
 # Configuration to use stdin input
@@ -2656,6 +2680,9 @@ filebeat.inputs:
 #- type: udp
   #enabled: false
 
+  # Number of pipeline workers
+  #number_of_workers: 1
+
   # Maximum size of the message received over UDP
   #max_message_size: 10KiB
 
@@ -2673,6 +2700,9 @@ filebeat.inputs:
 
   # Character used to split new message
   #line_delimiter: "\n"
+
+  # Number of pipeline workers
+  #number_of_workers: 1
 
   # Maximum size in bytes of the message received over TCP
   #max_message_size: 20MiB
@@ -2867,25 +2897,65 @@ filebeat.inputs:
 # Journald input is experimental.
 #- type: journald
   #enabled: true
-  #id: service-foo
 
-  # You may wish to have separate inputs for each service. You can use
-  # include_matches.or to specify a list of filter expressions that are
-  # applied as a logical OR. You may specify filter
-  #include_matches.match:
-    #- _SYSTEMD_UNIT=foo.service
+  # Unique ID among all inputs, if the ID changes, all entries
+  # will be re-ingested
+  id: my-journald-id
+
+  # Specify paths to read from custom journal files.
+  # Leave it unset to read the system's journal
+  # Glob based paths.
+  #paths:
+    #- /var/log/custom.journal
+
+  # The position to start reading from the journal, valid options are:
+  #  - head: Starts reading at the beginning of the journal.
+  #  - tail: Starts reading at the end of the journal.
+  #    This means that no events will be sent until a new message is written.
+  #  - since: Use also the `since` option to determine when to start reading from.
+  #seek: head
+
+  # A time offset from the current time to start reading from.
+  # To use since, seek option must be set to since.
+  #since: -24h
+
+  # Collect events from the service and messages about the service,
+  # including coredumps.
+  #units:
+    #- docker.service
 
   # List of syslog identifiers
   #syslog_identifiers: ["audit"]
 
-  # Collect events from the service and messages about the service,
-  # including coredumps.
-  #units: ["docker.service"]
-
   # The list of transports (_TRANSPORT field of journald entries)
   #transports: ["audit"]
 
-  # Parsers are also supported, here is an example of the multiline
+  # Filter logs by facilities, they must be specified using their numeric code.
+  #facilities:
+    #- 1
+    #- 2
+
+  # You may wish to have separate inputs for each service. You can use
+  # include_matches.match to define a list of filters, each event needs
+  # to match all filters defined.
+  #include_matches.match:
+    #- _SYSTEMD_UNIT=foo.service
+
+  # To create a disjunction (logical OR) use the `+` character between
+  # the filters
+  #include_matches:
+    #match:
+      #- "systemd.transport=kernel"
+      #- "+"
+      #- "journald.process.name=systemd"
+
+  # Uses the original hostname of the entry instead of the one
+  # from the host running jounrald
+  #save_remote_hostname: false
+
+  # Parsers are also supported, the possible parsers are:
+  # container, include_message, multiline, ndjson, syslog.
+  # Here is an example of the multiline
   # parser.
   #parsers:
   #- multiline:
@@ -3017,6 +3087,16 @@ filebeat.inputs:
 
   # Controls deletion of objects after backing them up
   #delete_after_backup: false
+
+  # Ignore bucket entries older than the given timespan.
+  # Timespan is calculated from current time to processing object's last modified timestamp.
+  # This is disabled by default(value 0) and can be configured to a time duration like "48h" or "2h30m".
+  #ignore_older: 0
+
+  # Accept bucket entries with last modified timestamp newer than the given timestamp.
+  # Accepts a timestamp in YYYY-MM-DDTHH:MM:SSZ format and default is empty.
+  # For example, "2024-11-20T20:00:00Z" (UTC) or "2024-11-20T22:30:00+02:30" (with zone offset).
+  #start_timestamp:
 
 #------------------------------ AWS CloudWatch input --------------------------------
 # Beta: Config options for AWS CloudWatch input
@@ -3185,6 +3265,8 @@ filebeat.inputs:
 # batch of events has been published successfully. The default value is 1s.
 #filebeat.registry.flush: 1s
 
+# The interval which to run the registry clean up
+#filebeat.registry.cleanup_interval: 5m
 
 # Starting with Filebeat 7.0, the registry uses a new directory format to store
 # Filebeat state. After you upgrade, Filebeat will automatically migrate a 6.x
@@ -4612,7 +4694,7 @@ logging.files:
   #path: /var/log/filebeat
 
   # The name of the files where the logs are written to.
-  #name: filebeat-event-data
+  #name: filebeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.

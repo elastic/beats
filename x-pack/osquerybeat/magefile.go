@@ -186,11 +186,6 @@ func GolangCrossBuild() error {
 	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
 	// Building osquerybeat
@@ -204,11 +199,6 @@ func CrossBuild() error {
 // CrossBuildExt cross-builds the osquery-extension.
 func CrossBuildExt() error {
 	return devtools.CrossBuild(devtools.InDir("x-pack", "osquerybeat", "ext", "osquery-extension"))
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
 }
 
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
@@ -232,7 +222,7 @@ func Package() {
 	osquerybeat.CustomizePackaging()
 
 	mg.Deps(Update, osquerybeat.FetchOsqueryDistros)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 

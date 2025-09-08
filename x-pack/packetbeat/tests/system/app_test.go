@@ -24,7 +24,7 @@ import (
 )
 
 // Keep in sync with NpcapVersion in magefile.go.
-const NpcapVersion = "1.79"
+const NpcapVersion = "1.80"
 
 func TestWindowsNpcapInstaller(t *testing.T) {
 	if runtime.GOOS != "windows" {
@@ -65,7 +65,26 @@ func TestDevices(t *testing.T) {
 	}
 	t.Log("Expect interfaces:\n", expected)
 
+ifcsLoop:
 	for _, ifc := range ifcs {
-		assert.Contains(t, stdout, ifc.Name)
+		if strings.Contains(stdout, ifc.Name) {
+			continue ifcsLoop
+		}
+		addrs, err := ifc.Addrs()
+		assert.NoError(t, err)
+		maddrs, err := ifc.MulticastAddrs()
+		assert.NoError(t, err)
+		addrs = append(addrs, maddrs...)
+		for _, addr := range addrs {
+			s := addr.String()
+			// remove the network mask suffix
+			if idx := strings.Index(s, "/"); idx > -1 {
+				s = s[:idx]
+			}
+			if strings.Contains(stdout, s) {
+				continue ifcsLoop
+			}
+		}
+		t.Errorf("interface %q not found", ifc.Name)
 	}
 }

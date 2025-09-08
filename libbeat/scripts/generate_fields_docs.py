@@ -8,46 +8,64 @@ import requests
 import yaml
 
 
-def document_fields(output, section, sections, path):
+def document_fields(output, section, sections, path, beat):
     if "skipdocs" in section:
         return
     if "anchor" in section:
-        output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
-
-    if "prefix" in section:
-        output.write("{}\n".format(section["prefix"]))
+        output.write('---\n')
+        output.write('mapped_pages:\n')
+        output.write(
+            '  - https://www.elastic.co/guide/en/beats/{}/current/exported-fields-{}.html\n'.format(beat, section["anchor"]))
+        # Build a docs-builder applies_to directive
+        applies_to = get_applies_to(section)
+        if len(applies_to) > 0:
+            output.write('applies_to:\n')
+            output.write('  stack: ')
+            output.write(', '.join(applies_to))
+            output.write('\n')
+        output.write('---\n\n')
+        output.write('% This file is generated! See scripts/generate_fields_docs.py\n\n')
 
     # Intermediate level titles
-    if ("description" in section and "prefix" not in section and
-            "anchor" not in section):
-        output.write("[float]\n")
+    # if ("description" in section and "prefix" not in section and
+    #         "anchor" not in section):
+    #     output.write("[float]\n")
 
     if "description" in section:
+        if section["description"] is None:
+            section["description"] = "None"
         if "anchor" in section and section["name"] == "ECS":
-            output.write("== {} fields\n\n".format(section["name"]))
-            output.write("""
-This section defines Elastic Common Schema (ECS) fields—a common set of fields
-to be used when storing event data in {es}.
+            output.write("# {} fields [exported-fields-ecs]\n\n".format(section["name"]))
+            output.write("""This section defines Elastic Common Schema (ECS) fields—a common set of fields
+to be used when storing event data in {{{{es}}}}.
 
 This is an exhaustive list, and fields listed here are not necessarily used by {beatname_uc}.
-The goal of ECS is to enable and encourage users of {es} to normalize their event data,
+The goal of ECS is to enable and encourage users of {{{{es}}}} to normalize their event data,
 so that they can better analyze, visualize, and correlate the data represented in their events.
 
-See the {ecs-ref}[ECS reference] for more information.
-""")
+See the [ECS reference](ecs://reference/index.md) for more information.
+""".format_map({"beatname_uc": beat.title()}))
         elif "anchor" in section:
-            output.write("== {} fields\n\n".format(section["name"]))
-            output.write("{}\n\n".format(section["description"]))
+            output.write("# {} fields [exported-fields-{}]\n\n".format(section["title"], section["anchor"]))
+            output.write("{}\n\n".format(section["description"].strip()))
         else:
-            output.write("=== {}\n\n".format(section["name"]))
-            output.write("{}\n\n".format(section["description"]))
+            output.write("## {} [_{}]\n\n".format(section["name"], section["name"]))
+
+            # Build a docs-builder applies_to directive
+            applies_to = get_applies_to(section)
+            if len(applies_to) > 0:
+                output.write("```{applies_to}\nstack: ")
+                output.write(", ".join(applies_to))
+                output.write("\n```\n\n")
+
+            output.write("{}\n\n".format(section["description"].strip()))
 
     if "fields" not in section or not section["fields"]:
         return
 
-    output.write("\n")
     for field in section["fields"]:
-
+        if "description" in field and field["description"] is None:
+            field["description"] = "None"
         # Skip entries which do not define a name
         if "name" not in field:
             continue
@@ -58,7 +76,7 @@ See the {ecs-ref}[ECS reference] for more information.
             newpath = path + "." + field["name"]
 
         if "type" in field and field["type"] == "group":
-            document_fields(output, field, sections, newpath)
+            document_fields(output, field, sections, newpath, beat)
         else:
             document_field(output, field, newpath)
 
@@ -68,23 +86,31 @@ def document_field(output, field, field_path):
     if "field_path" not in field:
         field["field_path"] = field_path
 
-    output.write("*`{}`*::\n+\n--\n".format(field["field_path"]))
+    output.write("**`{}`**".format(field["field_path"]))
 
-    if "deprecated" in field:
-        output.write("\ndeprecated:[{}]\n\n".format(field["deprecated"]))
+    # Build a docs-builder applies_to directive
+    applies_to = get_applies_to(field)
+    if len(applies_to) > 0:
+        output.write(" {applies_to}`stack: ")
+        output.write(", ".join(applies_to))
+        output.write("`")
 
-    if "description" in field:
-        output.write("{}\n\n".format(field["description"]))
+    output.write("\n:   ")
+
+    if "description" in field and field["description"] is not None and len(field["description"].strip()) > 0:
+        output.write("{}".format(" ".join(x for x in field["description"].split("\n") if x)).strip()+"\n\n")
     if "type" in field:
+        if "description" in field:
+            output.write("    ")
         output.write("type: {}\n\n".format(field["type"]))
     if "example" in field:
-        output.write("example: {}\n\n".format(field["example"]))
+        output.write("    example: {}\n\n".format(field["example"]))
     if "format" in field:
-        output.write("format: {}\n\n".format(field["format"]))
+        output.write("    format: {}\n\n".format(field["format"]))
     if "required" in field:
-        output.write("required: {}\n\n".format(field["required"]))
+        output.write("    required: {}\n\n".format(field["required"]))
     if "path" in field:
-        output.write("alias to: {}\n\n".format(field["path"]))
+        output.write("    alias to: {}\n\n".format(field["path"]))
 
     # For Apm-Server docs only
     # Assign an ECS badge for ECS fields
@@ -100,12 +126,41 @@ def document_field(output, field, field_path):
         if not field["enabled"]:
             output.write("{}\n\n".format("Object is not enabled."))
 
-    output.write("--\n\n")
+    output.write("\n")
 
     if "multi_fields" in field:
         for subfield in field["multi_fields"]:
             document_field(output, subfield, field_path + "." +
                            subfield["name"])
+
+# Build the applies_to string: a comma-separated list
+# of all available lifecycles and versions
+# NOTE: There's almost certainly a more efficient way
+# to accomplish this.
+
+
+def get_applies_to(item):
+    applies_to = []
+    if "version" in item:
+        if "preview" in item["version"]:
+            applies_to.append("preview {}".format(item["version"]["preview"]))
+        if "beta" in item["version"]:
+            applies_to.append("beta {}".format(item["version"]["beta"]))
+        if "ga" in item["version"]:
+            applies_to.append("ga {}".format(item["version"]["ga"]))
+        if "deprecated" in item["version"]:
+            applies_to.append("deprecated {}".format(item["version"]["deprecated"]))
+        if "removed" in item["version"]:
+            applies_to.append("removed {}".format(item["version"]["removed"]))
+    # Add `deprecated` to applies_to if not already added via `version`
+    if "deprecated" in item:
+        if "version" not in item or ("version" in item and "deprecated" not in item["version"]):
+            applies_to.append("deprecated {}".format(item["deprecated"]))
+    # Add `release` to applies_to if not already added via `version`
+    if "release" in item:
+        if "version" not in item and item["release"] != "ga":
+            applies_to.append(item["release"])
+    return applies_to
 
 
 @lru_cache(maxsize=None)
@@ -121,25 +176,21 @@ def ecs_fields():
     return yaml.load(resp.content, Loader=yaml.FullLoader)
 
 
-def fields_to_asciidoc(input, output, beat):
+def fields_to_asciidoc(input, output_path, beat):
+    output = open(os.path.join(output_path, "exported-fields.md"), 'w', encoding='utf-8')
 
-    dict = {'beat': beat}
+    dict = {'beat': beat, 'title': beat.title()}
 
-    output.write("""
-////
-This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
-////
+    output.write("""---
+mapped_pages:
+  - https://www.elastic.co/guide/en/beats/{beat}/current/exported-fields.html
+---
 
-:edit_url:
+% This file is generated! See scripts/generate_fields_docs.py
 
-[[exported-fields]]
-= Exported fields
+# Exported fields [exported-fields]
 
-[partintro]
-
---
-This document describes the fields that are exported by {beat}. They are
-grouped in the following categories:
+This document describes the fields that are exported by {title}. They are grouped in the following categories:
 
 """.format(**dict))
 
@@ -175,17 +226,21 @@ grouped in the following categories:
             section["anchor"] = section["key"]
 
         if "skipdocs" not in section:
-            output.write("* <<exported-fields-{}>>\n".format(section["anchor"]))
-    output.write("\n--\n")
-
+            output.write(
+                "* [*{} fields*](/reference/{}/exported-fields-{}.md)\n".format(section["title"], beat, section["anchor"]))
+    output.close()
     # Sort alphabetically by key
     for section in sorted(docs, key=lambda field: field["key"]):
         section["name"] = section["title"]
         if "anchor" not in section:
             section["anchor"] = section["key"]
-        document_fields(output, section, sections, "")
-
-    output.write(":edit_url!:")
+        if "description" not in section:
+            section["description"] = section["key"]
+        if "fields" not in section or not section["fields"]:
+            continue
+        output_fields = open(os.path.join(
+            output_path, "exported-fields-{}.md".format(section["anchor"])), 'w', encoding='utf-8')
+        document_fields(output_fields, section, sections, "", beat)
 
 
 if __name__ == "__main__":
@@ -202,16 +257,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     fields_yml = args.fields
-    beat_title = args.beattitle.title()
+    beat_title = args.beattitle
     es_beats = args.es_beats
 
     # Read fields.yml
     with open(fields_yml, encoding='utf-8') as f:
         fields = f.read()
 
-    output = open(os.path.join(args.output_path, "docs/fields.asciidoc"), 'w', encoding='utf-8')
-
-    try:
-        fields_to_asciidoc(fields, output, beat_title)
-    finally:
-        output.close()
+    fields_to_asciidoc(fields, args.output_path, beat_title)

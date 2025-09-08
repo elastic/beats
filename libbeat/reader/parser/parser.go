@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/readjson"
 	"github.com/elastic/beats/v7/libbeat/reader/syslog"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
@@ -141,7 +142,7 @@ func NewConfig(pCfg CommonConfig, parsers []config.Namespace) (*Config, error) {
 
 }
 
-func (c *Config) Create(in reader.Reader) Parser {
+func (c *Config) Create(in reader.Reader, log *logp.Logger) Parser {
 	p := in
 	for _, ns := range c.parsers {
 		name := ns.Name()
@@ -153,7 +154,7 @@ func (c *Config) Create(in reader.Reader) Parser {
 			if err != nil {
 				return p
 			}
-			p, err = multiline.New(p, "\n", int(c.pCfg.MaxBytes), &config)
+			p, err = multiline.New(p, "\n", int(c.pCfg.MaxBytes), &config, log)
 			if err != nil {
 				return p
 			}
@@ -164,7 +165,7 @@ func (c *Config) Create(in reader.Reader) Parser {
 			if err != nil {
 				return p
 			}
-			p = readjson.NewJSONParser(p, &config)
+			p = readjson.NewJSONParser(p, &config, log)
 		case "container":
 			config := readjson.DefaultContainerConfig()
 			cfg := ns.Config()
@@ -172,7 +173,7 @@ func (c *Config) Create(in reader.Reader) Parser {
 			if err != nil {
 				return p
 			}
-			p = readjson.NewContainerParser(p, &config)
+			p = readjson.NewContainerParser(p, &config, log)
 		case "syslog":
 			config := syslog.DefaultConfig()
 			cfg := ns.Config()
@@ -180,7 +181,7 @@ func (c *Config) Create(in reader.Reader) Parser {
 			if err != nil {
 				return p
 			}
-			p = syslog.NewParser(p, &config)
+			p = syslog.NewParser(p, &config, log)
 		case "include_message":
 			config := filter.DefaultConfig()
 			cfg := ns.Config()
@@ -188,7 +189,7 @@ func (c *Config) Create(in reader.Reader) Parser {
 			if err != nil {
 				return p
 			}
-			p = filter.NewParser(p, &config)
+			p = filter.NewParser(p, &config, log)
 		default:
 			return p
 		}

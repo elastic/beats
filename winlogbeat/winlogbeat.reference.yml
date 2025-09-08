@@ -30,7 +30,8 @@
 # dictionaries.
 #
 # The supported keys are name, id, xml_query, tags, fields, fields_under_root,
-# forwarded, ignore_older, level, event_id, provider, and include_xml.
+# forwarded, ignore_older, level, event_id, provider, include_xml, and 
+# ignore_missing_channel.
 # The xml_query key requires an id and must not be used with the name,
 # ignore_older, level, event_id, or provider keys. Please visit the
 # documentation for the complete details of each option.
@@ -1450,7 +1451,7 @@ logging.files:
   #path: /var/log/winlogbeat
 
   # The name of the files where the logs are written to.
-  #name: winlogbeat-event-data
+  #name: winlogbeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.

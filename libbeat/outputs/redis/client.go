@@ -75,9 +75,10 @@ func newClient(
 	pass string,
 	db int, key outil.Selector, dt redisDataType,
 	index string, codec codec.Codec,
+	logger *logp.Logger,
 ) *client {
 	return &client{
-		log:      logp.NewLogger("redis"),
+		log:      logger.Named("redis"),
 		Client:   tc,
 		observer: observer,
 		timeout:  timeout,

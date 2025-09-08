@@ -1,0 +1,160 @@
+{
+    "nodes": {
+        "Hwq8Kg1eRNaFnFJKrKoqjA": {
+            "indices": {
+                "docs": {
+                    "count": 1730135320,
+                    "deleted": 0,
+                    "total_size_in_bytes": 388140418237
+                },
+                "store": {
+                    "size_in_bytes": 388140454876,
+                    "total_data_set_size_in_bytes": 388140454876
+                },
+                "indexing": {
+                    "index_total": 0,
+                    "index_time_in_millis": 0
+                },
+                "search": {
+                    "query_total": 1595587408,
+                    "query_time_in_millis": 461298337
+                },
+                "bulk": {
+                    "total_operations": 0,
+                    "total_time_in_millis": 0,
+                    "total_size_in_bytes": 0,
+                    "avg_time_in_millis": 0,
+                    "avg_size_in_bytes": 0
+                }
+            }
+        },
+        "ZmPOU7owRnOR4kTkRahVUg": {
+            "indices": {
+                "docs": {
+                    "count": 1770383894,
+                    "deleted": 0,
+                    "total_size_in_bytes": 402572306308
+                },
+                "store": {
+                    "size_in_bytes": 402572342569,
+                    "total_data_set_size_in_bytes": 402572342569
+                },
+                "indexing": {
+                    "index_total": 0,
+                    "index_time_in_millis": 0
+                },
+                "search": {
+                    "query_total": 1468260676,
+                    "query_time_in_millis": 417207984
+                },
+                "segments": {
+                    "count": 90,
+                    "memory_in_bytes": 0
+                },
+                "bulk": {
+                    "total_operations": 0,
+                    "total_time_in_millis": 0,
+                    "total_size_in_bytes": 0,
+                    "avg_time_in_millis": 0,
+                    "avg_size_in_bytes": 0
+                }
+            }
+        },
+        "5lbmiBszSxahvsDAs8jwUg": {
+            "indices": {
+                "docs": {
+                    "count": 1422510642,
+                    "deleted": 7521,
+                    "total_size_in_bytes": 277974136298
+                },
+                "store": {
+                    "size_in_bytes": 278444418475,
+                    "total_data_set_size_in_bytes": 278444418475
+                },
+                "indexing": {
+                    "index_total": 17581495402,
+                    "index_time_in_millis": 1621090717
+                },
+                "search": {
+                    "query_total": 1464783588,
+                    "query_time_in_millis": 1634551313
+                },
+                "segments": {
+                    "count": 3802,
+                    "memory_in_bytes": 0
+                },
+                "bulk": {
+                    "total_operations": 29982373,
+                    "total_time_in_millis": 1658665229,
+                    "total_size_in_bytes": 28791047343797,
+                    "avg_time_in_millis": 0,
+                    "avg_size_in_bytes": 938940
+                }
+            }
+        },
+        "5rnp4uRrScygfEv1At_NuQ": {
+            "indices": {
+                "docs": {
+                    "count": 1245022583,
+                    "deleted": 15098,
+                    "total_size_in_bytes": 246021449595
+                },
+                "store": {
+                    "size_in_bytes": 246053805084,
+                    "total_data_set_size_in_bytes": 246053805084
+                },
+                "indexing": {
+                    "index_total": 19072011163,
+                    "index_time_in_millis": 1839353503
+                },
+                "search": {
+                    "query_total": 1717052931,
+                    "query_time_in_millis": 1657131632
+                },
+                "segments": {
+                    "count": 3411,
+                    "memory_in_bytes": 0
+                },
+                "bulk": {
+                    "total_operations": 31937349,
+                    "total_time_in_millis": 1876634225,
+                    "total_size_in_bytes": 31286022361033,
+                    "avg_time_in_millis": 0,
+                    "avg_size_in_bytes": 968960
+                }
+            }
+        },
+        "E5Y9e0ZTRNmMhlL-XBPzcw": {
+            "indices": {
+                "docs": {
+                    "count": 1862733068,
+                    "deleted": 908,
+                    "total_size_in_bytes": 371144474256
+                },
+                "store": {
+                    "size_in_bytes": 371761434261,
+                    "total_data_set_size_in_bytes": 371761434261
+                },
+                "indexing": {
+                    "index_total": 19947260965,
+                    "index_time_in_millis": 1900153213
+                },
+                "search": {
+                    "query_total": 1653197593,
+                    "query_time_in_millis": 1677860331
+                },
+                "segments": {
+                    "count": 3890,
+                    "memory_in_bytes": 0
+                },
+                "bulk": {
+                    "total_operations": 34665061,
+                    "total_time_in_millis": 1937237991,
+                    "total_size_in_bytes": 32589352616465,
+                    "avg_time_in_millis": 0,
+                    "avg_size_in_bytes": 922777
+                }
+            }
+        }
+    }
+}

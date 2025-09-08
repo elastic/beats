@@ -23,7 +23,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -40,7 +40,7 @@ Proposal sizes last/min/max: -3/-999/-1
 `
 
 func TestParser(t *testing.T) {
-	logger := logp.NewLogger("zookeeper.server")
+	logger := logptest.NewTestingLogger(t, "zookeeper.server")
 	mapStr, versionID, err := parseSrvr(bytes.NewReader([]byte(srvrTestInput)), logger)
 	if err != nil {
 		t.Fatal(err)

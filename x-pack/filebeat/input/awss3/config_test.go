@@ -39,6 +39,7 @@ func TestConfig(t *testing.T) {
 			VisibilityTimeout:  300 * time.Second,
 			SQSMaxReceiveCount: 5,
 			SQSWaitTime:        20 * time.Second,
+			SQSGraceTime:       20 * time.Second,
 			BucketListInterval: 120 * time.Second,
 			BucketListPrefix:   "",
 			PathStyle:          false,
@@ -595,6 +596,39 @@ func TestConfig(t *testing.T) {
 			},
 			expectedErr: "backup_to_bucket_prefix cannot be the same as bucket_list_prefix, this will create an infinite loop",
 			expectedCfg: nil,
+		},
+		{
+			name:     "validate ignore_older and start_timestamp configurations",
+			s3Bucket: s3Bucket,
+			config: mapstr.M{
+				"bucket_arn":      s3Bucket,
+				"ignore_older":    "24h",
+				"start_timestamp": "2024-11-20T20:00:00Z",
+			},
+			expectedCfg: func(queueURL, s3Bucket, s3AccessPoint, nonAWSS3Bucket string) config {
+				c := makeConfig(queueURL, s3Bucket, s3AccessPoint, nonAWSS3Bucket)
+				c.IgnoreOlder = 24 * time.Hour
+				c.StartTimestamp = "2024-11-20T20:00:00Z"
+				return c
+			},
+		},
+		{
+			name:     "ignore_older only accepts valid duration - unit valid with ParseDuration",
+			s3Bucket: s3Bucket,
+			config: mapstr.M{
+				"bucket_arn":   s3Bucket,
+				"ignore_older": "24D",
+			},
+			expectedErr: "time: unknown unit \"D\" in duration \"24D\" accessing 'ignore_older'",
+		},
+		{
+			name:     "start_timestamp accepts a valid timestamp of format - YYYY-MM-DDTHH:MM:SSZ",
+			s3Bucket: s3Bucket,
+			config: mapstr.M{
+				"bucket_arn":      s3Bucket,
+				"start_timestamp": "2024-11-20 20:20:00",
+			},
+			expectedErr: "invalid input for start_timestamp: parsing time \"2024-11-20 20:20:00\" as \"2006-01-02T15:04:05Z07:00\": cannot parse \" 20:20:00\" as \"T\" accessing config",
 		},
 	}
 

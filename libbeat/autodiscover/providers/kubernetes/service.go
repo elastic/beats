@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !aix
+//go:build linux || darwin || windows
 
 package kubernetes
 
@@ -48,8 +48,14 @@ type service struct {
 }
 
 // NewServiceEventer creates an eventer that can discover and process service objects
-func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
-	logger := logp.NewLogger("autodiscover.service")
+func NewServiceEventer(
+	uuid uuid.UUID,
+	cfg *conf.C,
+	client k8s.Interface,
+	publish func(event []bus.Event),
+	logger *logp.Logger,
+) (Eventer, error) {
+	logger = logger.Named("service")
 
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
@@ -57,11 +63,14 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 		return nil, err
 	}
 
+	// log warning about any unsupported params
+	config.checkUnsupportedParams(logger)
+
 	watcher, err := kubernetes.NewNamedWatcher("service", client, &kubernetes.Service{}, kubernetes.WatchOptions{
 		SyncTimeout:  config.SyncPeriod,
 		Namespace:    config.Namespace,
 		HonorReSyncs: true,
-	}, nil)
+	}, nil, logger)
 
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Service{}, err)
@@ -82,7 +91,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 			SyncTimeout:  config.SyncPeriod,
 			Namespace:    config.Namespace,
 			HonorReSyncs: true,
-		}, nil)
+		}, nil, logger)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Namespace{}, err)
 		}

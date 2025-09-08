@@ -5,49 +5,57 @@
 package device_health
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
-	meraki "github.com/meraki/dashboard-api-go/v3/sdk"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/meraki"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	sdk "github.com/meraki/dashboard-api-go/v3/sdk"
 )
 
 type uplink struct {
 	lastReportedAt        string
-	status                *meraki.ResponseItemApplianceGetOrganizationApplianceUplinkStatusesUplinks
-	cellularGatewayStatus *meraki.ResponseItemCellularGatewayGetOrganizationCellularGatewayUplinkStatusesUplinks
-	lossAndLatency        *meraki.ResponseItemOrganizationsGetOrganizationDevicesUplinksLossAndLatency
+	status                *sdk.ResponseItemApplianceGetOrganizationApplianceUplinkStatusesUplinks
+	cellularGatewayStatus *sdk.ResponseItemCellularGatewayGetOrganizationCellularGatewayUplinkStatusesUplinks
+	lossAndLatency        *sdk.ResponseItemOrganizationsGetOrganizationDevicesUplinksLossAndLatency
 }
 
-func getDeviceUplinks(client *meraki.Client, organizationID string, devices map[Serial]*Device, period time.Duration) error {
+func getDeviceUplinks(client *sdk.Client, organizationID string, devices map[Serial]*Device, period time.Duration) error {
 	// there are two separate APIs for uplink statuses depending on the type of device (MG or MX/Z).
 	// there is a single API for getting the loss and latency metrics regardless of the type of device.
 	// in this function we combine loss and latency metrics with device-specific status information,
 	// and attach it to the relevant device in the supplied `devices` data structure.
-	applicanceUplinks, res, err := client.Appliance.GetOrganizationApplianceUplinkStatuses(organizationID, &meraki.GetOrganizationApplianceUplinkStatusesQueryParams{})
+	applicanceUplinks, res, err := client.Appliance.GetOrganizationApplianceUplinkStatuses(organizationID, &sdk.GetOrganizationApplianceUplinkStatusesQueryParams{})
 	if err != nil {
-		return fmt.Errorf("GetOrganizationApplianceUplinkStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
-	}
-
-	cellularGatewayUplinks, res, err := client.CellularGateway.GetOrganizationCellularGatewayUplinkStatuses(organizationID, &meraki.GetOrganizationCellularGatewayUplinkStatusesQueryParams{})
-	if err != nil {
-		return fmt.Errorf("GetOrganizationCellularGatewayUplinkStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		if res != nil {
+			return fmt.Errorf("GetOrganizationApplianceUplinkStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		}
+		return fmt.Errorf("GetOrganizationApplianceUplinkStatuses failed; %w", err)
 	}
 
 	lossAndLatency, res, err := client.Organizations.GetOrganizationDevicesUplinksLossAndLatency(
 		organizationID,
-		&meraki.GetOrganizationDevicesUplinksLossAndLatencyQueryParams{
+		&sdk.GetOrganizationDevicesUplinksLossAndLatencyQueryParams{
 			Timespan: period.Seconds(),
 		},
 	)
 	if err != nil {
-		return fmt.Errorf("GetOrganizationDevicesUplinksLossAndLatency failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		if res != nil {
+			return fmt.Errorf("GetOrganizationDevicesUplinksLossAndLatency failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		}
+		return fmt.Errorf("GetOrganizationDevicesUplinksLossAndLatency failed; %w", err)
+	}
+
+	if applicanceUplinks == nil || lossAndLatency == nil {
+		return errors.New("unexpected response from Meraki API: applicanceUplinks or lossAndLatency is nil")
 	}
 
 	for _, device := range *applicanceUplinks {
-		if device.HighAvailability != nil {
+		deviceObj, ok := devices[Serial(device.Serial)]
+		if device.HighAvailability != nil && ok && deviceObj != nil {
 			devices[Serial(device.Serial)].haStatus = device.HighAvailability
 		}
 
@@ -71,8 +79,22 @@ func getDeviceUplinks(client *meraki.Client, organizationID string, devices map[
 				uplinks = append(uplinks, uplink)
 			}
 
-			devices[Serial(device.Serial)].uplinks = uplinks
+			if ok && deviceObj != nil {
+				devices[Serial(device.Serial)].uplinks = uplinks
+			}
 		}
+	}
+
+	cellularGatewayUplinks, res, err := client.CellularGateway.GetOrganizationCellularGatewayUplinkStatuses(organizationID, &sdk.GetOrganizationCellularGatewayUplinkStatusesQueryParams{})
+	if err != nil {
+		if res != nil {
+			return fmt.Errorf("GetOrganizationCellularGatewayUplinkStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		}
+		return fmt.Errorf("GetOrganizationCellularGatewayUplinkStatuses failed; %w", err)
+	}
+
+	if cellularGatewayUplinks == nil {
+		return errors.New("unexpected response from Meraki API: cellularGatewayUplinks is nil")
 	}
 
 	for _, device := range *cellularGatewayUplinks {
@@ -99,7 +121,10 @@ func getDeviceUplinks(client *meraki.Client, organizationID string, devices map[
 			uplinks = append(uplinks, uplink)
 		}
 
-		devices[Serial(device.Serial)].uplinks = uplinks
+		deviceObj, ok := devices[Serial(device.Serial)]
+		if ok && deviceObj != nil {
+			devices[Serial(device.Serial)].uplinks = uplinks
+		}
 	}
 
 	return nil
@@ -108,11 +133,14 @@ func getDeviceUplinks(client *meraki.Client, organizationID string, devices map[
 func reportUplinkMetrics(reporter mb.ReporterV2, organizationID string, devices map[Serial]*Device) {
 	metrics := []mapstr.M{}
 	for _, device := range devices {
-		if len(device.uplinks) == 0 {
+		if device == nil || device.details == nil || len(device.uplinks) == 0 {
 			continue
 		}
 
 		for _, uplink := range device.uplinks {
+			if uplink == nil {
+				continue
+			}
 			if uplink.lossAndLatency != nil {
 				// each loss and latency metric can have multiple values per collection.
 				// we report each value as it's own (smaller) metric event, containing
@@ -173,5 +201,5 @@ func reportUplinkMetrics(reporter mb.ReporterV2, organizationID string, devices 
 		}
 	}
 
-	reportMetricsForOrganization(reporter, organizationID, metrics)
+	meraki.ReportMetricsForOrganization(reporter, organizationID, metrics)
 }

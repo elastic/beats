@@ -36,6 +36,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestHTTPServers(t *testing.T) {
@@ -128,6 +129,7 @@ func getHTTPServer(t *testing.T, host string, port int, connectionType string) (
 		eventQueue: make(chan server.Event, 1),
 		ctx:        ctx,
 		stop:       cancel,
+		logger:     logptest.NewTestingLogger(t, ""),
 	}
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort(host, strconv.Itoa(int(port))),

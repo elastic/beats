@@ -1,4 +1,13 @@
 version: 2
+component_files:
+ - certs/*
+ - lenses/*
+ - module/*
+ - "osquery-extension.ext"
+ - "osquery-extension.exe"
+ - osqueryd
+ - "osqueryd.exe"
+ - "osquery.app/*"
 inputs:
   - name: audit/auditd
     description: "Auditd"
@@ -233,6 +242,11 @@ inputs:
     platforms: *platforms
     outputs: *outputs
     command: *filebeat_command
+  - name: unifiedlogs
+    description: "macOS Unified logs"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
   - name: unix
     description: "Unix Socket"
     platforms: *platforms
@@ -332,6 +346,11 @@ inputs:
         - "logging.event_data.to_stderr=true"
         - "-E"
         - "logging.event_data.to_files=false"
+  - name: autoops_es/metrics
+    description: "AutoOps Elasticsearch metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
   - name: docker/metrics
     description: "Docker metrics"
     platforms: *platforms
@@ -339,11 +358,6 @@ inputs:
     command: *metricbeat_command
   - name: elasticsearch/metrics
     description: "Elasticsearch metrics"
-    platforms: *platforms
-    outputs: *outputs
-    command: *metricbeat_command
-  - name: enterprisesearch/metrics
-    description: "Enterprise search metrics"
     platforms: *platforms
     outputs: *outputs
     command: *metricbeat_command
@@ -507,6 +521,11 @@ inputs:
     platforms: *platforms
     outputs: *outputs
     command: *metricbeat_command
+  - name: openai/metrics
+    description: "OpenAI metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
   - name: panw/metrics
     description: "Palo Alto Networks metrics"
     platforms: *platforms
@@ -549,6 +568,11 @@ inputs:
     command: *metricbeat_command
   - name: zookeeper/metrics
     description: "ZooKeeper metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: aerospike/metrics
+    description: "Aerospike metrics"
     platforms: *platforms
     outputs: *outputs
     command: *metricbeat_command

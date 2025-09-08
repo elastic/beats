@@ -52,18 +52,20 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	// the output to receive the event and then close the source file.
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                   id,
-		"paths":                                []string{env.abspath(testlogName) + "*"},
-		"prospector.scanner.check_interval":    "10ms",
-		"close.on_state_change.check_interval": "1ms",
-		"close.on_state_change.renamed":        "true",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName) + "*"},
+		"prospector.scanner.check_interval":      "10ms",
+		"close.on_state_change.check_interval":   "1ms",
+		"close.on_state_change.renamed":          "true",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	testlines := []byte("first log line\n")
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
@@ -94,16 +96,35 @@ func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                id,
-		"paths":                             []string{env.abspath(testlogName) + "*"},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName) + "*"},
+		"prospector.scanner.check_interval":      "1ms",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
+		// For some reason this test became flaky, the root of the flakiness
+		// is not on the test, it is on how a rename operation is detected.
+		// Even though this test uses `os.Rename`, it does not seem to be an atomic
+		// operation. https://www.man7.org/linux/man-pages/man2/rename.2.html
+		// does not make it clear whether 'renameat' (used by `os.Rename`) is
+		// atomic.
+		//
+		// On a flaky execution, the file is actually perceived as removed
+		// and then a new file is created, both with the same inode. This
+		// happens on a system that does not reuse inodes as soon they're
+		// freed. Because the file is detected as removed, it's state is also
+		// removed. Then when more data is added, only the offset of the new
+		// data is tracked by the registry, causing the test to fail.
+		//
+		// A workaround for this is to not remove the state when the file is
+		// removed, hence `clean_removed: false` is set here.
+		"clean_removed": false,
 	})
 
 	testline := []byte("log line\n")
 	env.mustWriteToFile(testlogName, testline)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
 	env.waitUntilMetaInRegistry(testlogName, id, fileMeta{Source: env.abspath(testlogName), IdentifierName: "native"})
@@ -132,18 +153,20 @@ func TestFilestreamCloseRemoved(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                   id,
-		"paths":                                []string{env.abspath(testlogName) + "*"},
-		"prospector.scanner.check_interval":    "24h",
-		"close.on_state_change.check_interval": "1ms",
-		"close.on_state_change.removed":        "true",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName) + "*"},
+		"prospector.scanner.check_interval":      "24h",
+		"close.on_state_change.check_interval":   "1ms",
+		"close.on_state_change.removed":          "true",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	testlines := []byte("first log line\n")
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
@@ -173,10 +196,12 @@ func TestFilestreamCloseEOF(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                id,
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "24h",
-		"close.reader.on_eof":               "true",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "24h",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
+		"close.reader.on_eof":                    "true",
 	})
 
 	testlines := []byte("first log line\n")
@@ -184,7 +209,7 @@ func TestFilestreamCloseEOF(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
@@ -209,13 +234,15 @@ func TestFilestreamEmptyLine(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                id,
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	testlines := []byte("first log line\nnext is an empty line\n")
 	env.mustWriteToFile(testlogName, testlines)
@@ -248,13 +275,15 @@ func TestFilestreamEmptyLinesOnly(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                id,
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	testlines := []byte("\n\n\n")
 	env.mustWriteToFile(testlogName, testlines)
@@ -272,8 +301,10 @@ func TestFilestreamBOMUTF8(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":    id,
-		"paths": []string{env.abspath(testlogName)},
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	// BOM: 0xEF,0xBB,0xBF
@@ -288,7 +319,7 @@ func TestFilestreamBOMUTF8(t *testing.T) {
 	env.mustWriteToFile(testlogName, lines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(7)
 
@@ -315,21 +346,23 @@ func TestFilestreamUTF16BOMs(t *testing.T) {
 			testlogName := "test.log"
 			id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 			inp := env.mustCreateInput(map[string]interface{}{
-				"id":       id,
-				"paths":    []string{env.abspath(testlogName)},
-				"encoding": name,
+				"id":                                     id,
+				"paths":                                  []string{env.abspath(testlogName)},
+				"encoding":                               name,
+				"prospector.scanner.fingerprint.enabled": false,
+				"file_identity.native":                   map[string]any{},
 			})
 
 			line := []byte("first line\n")
 			buf := bytes.NewBuffer(nil)
 			writer := transform.NewWriter(buf, encoder)
-			writer.Write(line)
+			_, _ = writer.Write(line)
 			writer.Close()
 
 			env.mustWriteToFile(testlogName, buf.Bytes())
 
 			ctx, cancelInput := context.WithCancel(context.Background())
-			env.startInput(ctx, inp)
+			env.startInput(ctx, id, inp)
 
 			env.waitUntilEventCount(1)
 
@@ -348,18 +381,20 @@ func TestFilestreamCloseTimeout(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                   id,
-		"paths":                                []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval":    "24h",
-		"close.on_state_change.check_interval": "100ms",
-		"close.reader.after_interval":          "500ms",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "24h",
+		"close.on_state_change.check_interval":   "100ms",
+		"close.reader.after_interval":            "500ms",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	testlines := []byte("first line\n")
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
@@ -382,18 +417,20 @@ func TestFilestreamCloseAfterInterval(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                   id,
-		"paths":                                []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval":    "24h",
-		"close.on_state_change.check_interval": "100ms",
-		"close.on_state_change.inactive":       "2s",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "24h",
+		"close.on_state_change.check_interval":   "100ms",
+		"close.on_state_change.inactive":         "2s",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
@@ -417,14 +454,16 @@ func TestFilestreamCloseAfterIntervalRemoved(t *testing.T) {
 		"close.on_state_change.inactive":       "100ms",
 		// reader is not stopped when file is removed to see if the reader can still detect
 		// if the file has been inactive even if it have been removed in the meantime
-		"close.on_state_change.removed": "false",
+		"close.on_state_change.removed":          "false",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
@@ -450,14 +489,16 @@ func TestFilestreamCloseAfterIntervalRenamed(t *testing.T) {
 		"close.on_state_change.inactive":       "100ms",
 		// reader is not stopped when file is removed to see if the reader can still detect
 		// if the file has been inactive even if it have been removed in the meantime
-		"close.on_state_change.removed": "false",
+		"close.on_state_change.removed":          "false",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
@@ -485,14 +526,16 @@ func TestFilestreamCloseAfterIntervalRotatedAndRemoved(t *testing.T) {
 		"close.on_state_change.inactive":       "100ms",
 		// reader is not stopped when file is removed to see if the reader can still detect
 		// if the file has been inactive even if it have been removed in the meantime
-		"close.on_state_change.removed": "false",
+		"close.on_state_change.removed":          "false",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
@@ -514,11 +557,13 @@ func TestFilestreamCloseAfterIntervalRotatedAndNewRemoved(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                   id,
-		"paths":                                []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval":    "1ms",
-		"close.on_state_change.check_interval": "10ms",
-		"close.on_state_change.inactive":       "100ms",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": "false",
+		"prospector.scanner.check_interval":      "1ms",
+		"close.on_state_change.check_interval":   "10ms",
+		"close.on_state_change.inactive":         "100ms",
 		// reader is not stopped when file is removed to see if the reader can still detect
 		// if the file has been inactive even if it have been removed in the meantime
 		"close.on_state_change.removed": "false",
@@ -528,7 +573,7 @@ func TestFilestreamCloseAfterIntervalRotatedAndNewRemoved(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
@@ -558,14 +603,16 @@ func TestFilestreamTruncatedFileOpen(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                 id,
-		"paths":                              []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval":  "1ms",
-		"prospector.scanner.resend_on_touch": "true",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"prospector.scanner.resend_on_touch":     "true",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
 	env.mustWriteToFile(testlogName, testlines)
@@ -592,15 +639,17 @@ func TestFilestreamTruncatedFileClosed(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                 id,
-		"paths":                              []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval":  "1ms",
-		"prospector.scanner.resend_on_touch": "true",
-		"close.reader.on_eof":                "true",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"prospector.scanner.resend_on_touch":     "true",
+		"close.reader.on_eof":                    "true",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
 	env.mustWriteToFile(testlogName, testlines)
@@ -635,9 +684,11 @@ func TestFilestreamTruncateWithSymlink(t *testing.T) {
 			env.abspath(testlogName),
 			env.abspath(symlinkName),
 		},
-		"prospector.scanner.check_interval":  "1ms",
-		"prospector.scanner.resend_on_touch": "true",
-		"prospector.scanner.symlinks":        "true",
+		"prospector.scanner.check_interval":      "1ms",
+		"prospector.scanner.resend_on_touch":     "true",
+		"prospector.scanner.symlinks":            "true",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	lines := []byte("first line\nsecond line\nthird line\n")
@@ -646,7 +697,7 @@ func TestFilestreamTruncateWithSymlink(t *testing.T) {
 	env.mustSymlink(testlogName, symlinkName)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 
@@ -675,14 +726,16 @@ func TestFilestreamTruncateBigScannerInterval(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                 id,
-		"paths":                              []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval":  "5s",
-		"prospector.scanner.resend_on_touch": "true",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "5s",
+		"prospector.scanner.resend_on_touch":     "true",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
 	env.mustWriteToFile(testlogName, testlines)
@@ -707,14 +760,16 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                 id,
-		"paths":                              []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval":  "1ms",
-		"prospector.scanner.resend_on_touch": "true",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"prospector.scanner.resend_on_touch":     "true",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
 	env.mustWriteToFile(testlogName, testlines)
@@ -737,16 +792,18 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                id,
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "200ms",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "200ms",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	testlines := []byte("first line\nsecond line\n")
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	for env.pipeline.clientsCount() != 1 {
 		time.Sleep(10 * time.Millisecond)
@@ -792,7 +849,9 @@ func TestFilestreamSymlinksEnabled(t *testing.T) {
 		"paths": []string{
 			env.abspath(symlinkName),
 		},
-		"prospector.scanner.symlinks": "true",
+		"prospector.scanner.symlinks":            "true",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	testlines := []byte("first line\n")
@@ -801,7 +860,7 @@ func TestFilestreamSymlinksEnabled(t *testing.T) {
 	env.mustSymlink(testlogName, symlinkName)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
 
@@ -824,10 +883,12 @@ func TestFilestreamSymlinkRotated(t *testing.T) {
 		"paths": []string{
 			env.abspath(symlinkName),
 		},
-		"prospector.scanner.check_interval": "1ms",
-		"prospector.scanner.symlinks":       "true",
-		"close.on_state_change.removed":     "false",
-		"clean_removed":                     "false",
+		"prospector.scanner.check_interval":      "1ms",
+		"prospector.scanner.symlinks":            "true",
+		"close.on_state_change.removed":          "false",
+		"clean_removed":                          "false",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	commonLine := "first line in file "
@@ -838,7 +899,7 @@ func TestFilestreamSymlinkRotated(t *testing.T) {
 	env.mustSymlink(firstTestlogName, symlinkName)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
 
@@ -874,10 +935,12 @@ func TestFilestreamSymlinkRemoved(t *testing.T) {
 		"paths": []string{
 			env.abspath(symlinkName),
 		},
-		"prospector.scanner.check_interval": "1ms",
-		"prospector.scanner.symlinks":       "true",
-		"close.on_state_change.removed":     "false",
-		"clean_removed":                     "false",
+		"prospector.scanner.check_interval":      "1ms",
+		"prospector.scanner.symlinks":            "true",
+		"close.on_state_change.removed":          "false",
+		"clean_removed":                          "false",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	line := []byte("first line\n")
@@ -886,7 +949,7 @@ func TestFilestreamSymlinkRemoved(t *testing.T) {
 	env.mustSymlink(testlogName, symlinkName)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
 
@@ -918,9 +981,11 @@ func TestFilestreamTruncate(t *testing.T) {
 		"paths": []string{
 			env.abspath("*"),
 		},
-		"prospector.scanner.check_interval":  "1ms",
-		"prospector.scanner.resend_on_touch": "true",
-		"prospector.scanner.symlinks":        "true",
+		"prospector.scanner.check_interval":      "1ms",
+		"prospector.scanner.resend_on_touch":     "true",
+		"prospector.scanner.symlinks":            "true",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	lines := []byte("first line\nsecond line\nthird line\n")
@@ -929,7 +994,7 @@ func TestFilestreamTruncate(t *testing.T) {
 	env.mustSymlink(testlogName, symlinkName)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 
@@ -971,18 +1036,21 @@ func TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded(t *testing.T) {
 			lf.path, []byte(strings.Join(lf.lines, "\n")+"\n"))
 	}
 
+	id := "TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                  "TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded",
+		"id":                  id,
 		"harvester_limit":     1,
 		"close.reader.on_eof": true,
 		"paths": []string{
 			env.abspath(logFiles[0].path),
 			env.abspath(logFiles[1].path)},
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCountCtx(ctx, 4)
 
@@ -994,8 +1062,10 @@ func TestGlobalIDCannotBeUsed(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 	testlogName := "test.log"
 	_, err := env.createInput(map[string]interface{}{
-		"id":    ".global",
-		"paths": []string{env.abspath(testlogName) + "*"},
+		"id":                                     ".global",
+		"paths":                                  []string{env.abspath(testlogName) + "*"},
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 	if err == nil {
 		t.Fatal("expecting an error because '.global' cannot be used as input ID")
@@ -1013,14 +1083,16 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 		"paths": []string{
 			env.abspath("*"),
 		},
-		"prospector.scanner.check_interval":    "100ms",
-		"close.on_state_change.check_interval": "1s",
-		"close.on_state_change.inactive":       "5s",
-		"ignore_older":                         "10s",
+		"prospector.scanner.check_interval":      "100ms",
+		"close.on_state_change.check_interval":   "1s",
+		"close.on_state_change.inactive":         "5s",
+		"ignore_older":                           "10s",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	time.Sleep(1 * time.Second)
 
@@ -1034,7 +1106,7 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 		}
 		n := 0
 		for n <= iterations {
-			f.Write([]byte(fmt.Sprintf("hello world %d\n", r*iterations+n)))
+			fmt.Fprintf(f, "hello world %d\n", r*iterations+n)
 			n += 1
 			time.Sleep(100 * time.Millisecond)
 		}
@@ -1060,14 +1132,16 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 		"paths": []string{
 			env.abspath("*"),
 		},
-		"prospector.scanner.check_interval":    "1ms",
-		"close.on_state_change.check_interval": "1ms",
-		"close.on_state_change.inactive":       "1s",
-		"ignore_older":                         "10s",
+		"prospector.scanner.check_interval":      "1ms",
+		"close.on_state_change.check_interval":   "1ms",
+		"close.on_state_change.inactive":         "1s",
+		"ignore_older":                           "10s",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	time.Sleep(1 * time.Second)
 

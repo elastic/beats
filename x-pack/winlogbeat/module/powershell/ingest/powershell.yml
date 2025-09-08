@@ -9,35 +9,65 @@ processors:
       trim_key: "\n\t"
       trim_value: "\n\t"
       value_split: "="
-      if: ctx?.winlog?.event_id == "800"
-  - kv:
-      description: Split Events 4xx and 600 event data fields.
-      field: winlog.event_data.param3
-      target_field: winlog.event_data
-      field_split: "\n\t"
-      trim_key: "\n\t"
-      trim_value: "\n\t"
-      value_split: "="
-      if: ctx?.winlog?.event_id != "800"
+      if: ctx.winlog?.event_id == "800"
+  - script:
+      description: |-
+        Split Events 4xx and 600 event data fields.
+        Some events can contain multiline values containing also '\n', '\s', and '=' characters,
+        for this reason a simple KV processor is not reliable enough and we need a more specific parsing.
+      lang: painless
+      if: ctx.winlog?.event_id != "800" && ctx.winlog?.event_data?.param3 != null
+      params:
+        field: param3
+      source: |-
+        def p = ctx.winlog?.event_data[params["field"]];
+        // Define the pattern that will match all keys
+        def pat = /(^|(^[\n]?))?\t([^\s\W]+)=/m;
+        def m = pat.matcher(p);
+
+        // we position ourselves in the first matching key
+        m.find();
+        def key = m.group(3).trim();
+        def previousEnd = m.end();
+
+        // while new keys are found, we add everything between one key and the next
+        // as the value, regardless of its contents
+        while(m.find())
+        {
+            ctx.winlog.event_data[key] = p.substring(previousEnd, m.start()).trim();
+            previousEnd = m.end();
+            key = m.group(3).trim();
+        }
+
+        // add remaining value
+        ctx.winlog.event_data[key] = p.substring(previousEnd).trim();
 
   ## ECS and Event fields.
 
   - set:
       field: ecs.version
-      value: '1.12.0'
+      value: '8.17.0'
   - set:
       field: log.level
       copy_from: winlog.level
       ignore_empty_value: true
       ignore_failure: true
-      if: ctx?.winlog?.level != ""
+      if: ctx.winlog?.level != ""
   - date:
       field: winlog.time_created
+      tag: "time_created_date"
       formats:
         - ISO8601
-      ignore_failure: true
-      if: ctx?.winlog?.time_created != null
-
+      if: ctx.winlog?.time_created != null
+      on_failure:
+        - remove:
+            field: winlog.time_created
+            ignore_failure: true
+        - append:
+            field: error.message
+            value: "fail-{{{ _ingest.on_failure_processor_tag }}}"
+        - fail:
+            message: "Processor {{ _ingest.on_failure_processor_type }} with tag {{ _ingest.on_failure_processor_tag }} in pipeline {{ _ingest.on_failure_pipeline }} failed with message: {{ _ingest.on_failure_message }}"
   - set:
       field: event.module
       value: powershell
@@ -49,19 +79,19 @@ processors:
       value: '{{winlog.event_id}}'
   - set:
       field: event.category
-      value: process
+      value: ["process"]
   - set:
       field: event.type
-      value: start
-      if: ctx?.event.code == "400"
+      value: ["start"]
+      if: ctx.event.code == "400"
   - set:
       field: event.type
-      value: end
-      if: ctx?.event.code == "403"
+      value: ["end"]
+      if: ctx.event.code == "403"
   - set:
       field: event.type
-      value: info
-      if: ctx?.event?.type == null
+      value: ["info"]
+      if: ctx.event?.type == null
   - convert:
       field: winlog.event_data.SequenceNumber
       target_field: event.sequence
@@ -81,19 +111,19 @@ processors:
       target_field: process.entity_id
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.HostId != ""
+      if: ctx.winlog?.event_data?.HostId != ""
   - rename:
       field: winlog.event_data.HostApplication
       target_field: process.command_line
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.HostApplication != ""
+      if: ctx.winlog?.event_data?.HostApplication != ""
   - rename:
       field: winlog.event_data.HostName
       target_field: process.title
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.HostName != ""
+      if: ctx.winlog?.event_data?.HostName != ""
 
   ## User fields.
 
@@ -101,25 +131,48 @@ processors:
       field: winlog.event_data.UserId
       target_field: "_temp.user_parts"
       separator: '\\'
-      if: ctx?.winlog?.event_data?.UserId != null
+      if: ctx.winlog?.event_data?.UserId != null
   - set:
       field: user.domain
       value: "{{_temp.user_parts.0}}"
       ignore_failure: true
       ignore_empty_value: true
-      if: ctx?._temp?.user_parts != null && ctx._temp.user_parts.size() == 2
+      if: ctx._temp?.user_parts != null && ctx._temp.user_parts.size() == 2
   - set:
       field: user.name
       value: "{{_temp.user_parts.1}}"
       ignore_failure: true
       ignore_empty_value: true
-      if: ctx?._temp?.user_parts != null && ctx._temp.user_parts.size() == 2
+      if: ctx._temp?.user_parts != null && ctx._temp.user_parts.size() == 2
   - append:
       field: related.user
       value: "{{user.name}}"
       ignore_failure: true
       allow_duplicates: false
-      if: ctx?.user?.name != null
+      if: ctx.user?.name != null
+  # Get user details from the translate_sid processor enrichment
+  # if they are available and we don't already have them.
+  - rename:
+      field: winlog.event_data._MemberUserName
+      target_field: user.name
+      ignore_failure: true
+      ignore_missing: true
+  - rename:
+      field: winlog.event_data._MemberDomain
+      target_field: user.domain
+      ignore_failure: true
+      ignore_missing: true
+  - append:
+      value: '{{{winlog.event_data._MemberAccountType}}}'
+      field: user.roles
+      ignore_failure: true
+      allow_duplicates: false
+      if: ctx.winlog?.event_data?._MemberAccountType != null
+  - remove:
+      field: winlog.event_data._MemberAccountType
+      ignore_missing: true
+      ignore_failure: true
+      if: ctx.user?.roles != null && ctx.winlog?.event_data?._MemberAccountType != null && ctx.user.roles.contains(ctx.winlog.event_data._MemberAccountType)   
 
   ## PowerShell fields.
 
@@ -128,87 +181,87 @@ processors:
       target_field: powershell.engine.new_state
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.NewEngineState != ""
+      if: ctx.winlog?.event_data?.NewEngineState != ""
   - rename:
       field: winlog.event_data.PreviousEngineState
       target_field: powershell.engine.previous_state
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.PreviousEngineState != ""
+      if: ctx.winlog?.event_data?.PreviousEngineState != ""
   - rename:
       field: winlog.event_data.NewProviderState
       target_field: powershell.provider.new_state
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.NewProviderState != ""
+      if: ctx.winlog?.event_data?.NewProviderState != ""
   - rename:
       field: winlog.event_data.ProviderName
       target_field: powershell.provider.name
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.ProviderName != ""
+      if: ctx.winlog?.event_data?.ProviderName != ""
   - convert:
       field: winlog.event_data.DetailTotal
       target_field: powershell.total
       type: long
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.DetailTotal != ""
+      if: ctx.winlog?.event_data?.DetailTotal != ""
   - convert:
       field: winlog.event_data.DetailSequence
       target_field: powershell.sequence
       type: long
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.DetailSequence != ""
+      if: ctx.winlog?.event_data?.DetailSequence != ""
   - rename:
       field: winlog.event_data.EngineVersion
       target_field: powershell.engine.version
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.EngineVersion != ""
+      if: ctx.winlog?.event_data?.EngineVersion != ""
   - rename:
       field: winlog.event_data.PipelineId
       target_field: powershell.pipeline_id
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.PipelineId != ""
+      if: ctx.winlog?.event_data?.PipelineId != ""
   - rename:
       field: winlog.event_data.RunspaceId
       target_field: powershell.runspace_id
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.RunspaceId != ""
+      if: ctx.winlog?.event_data?.RunspaceId != ""
   - rename:
       field: winlog.event_data.HostVersion
       target_field: powershell.process.executable_version
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.HostVersion != ""
+      if: ctx.winlog?.event_data?.HostVersion != ""
   - rename:
       field: winlog.event_data.CommandLine
       target_field: powershell.command.value
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.CommandLine != ""
+      if: ctx.winlog?.event_data?.CommandLine != ""
   - rename:
       field: winlog.event_data.CommandPath
       target_field: powershell.command.path
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.CommandPath != ""
+      if: ctx.winlog?.event_data?.CommandPath != ""
   - rename:
       field: winlog.event_data.CommandName
       target_field: powershell.command.name
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.CommandName != ""
+      if: ctx.winlog?.event_data?.CommandName != ""
   - rename:
       field: winlog.event_data.CommandType
       target_field: powershell.command.type
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.CommandType != ""
+      if: ctx.winlog?.event_data?.CommandType != ""
 
   - split:
       description: Split Event 800 command invocation details.
@@ -276,7 +329,7 @@ processors:
             ];
         }
 
-        if (ctx?._temp == null) {
+        if (ctx._temp == null) {
             ctx._temp = new HashMap();
         }
 
@@ -284,7 +337,7 @@ processors:
             ctx._temp.details = new ArrayList();
         }
 
-        def values = ctx?.winlog?.event_data[params["field"]];
+        def values = ctx.winlog?.event_data[params["field"]];
         if (values != null && values.length > 0) {
             for (v in values) {
                 ctx._temp.details.add(parseRawDetail(v));
@@ -293,12 +346,12 @@ processors:
   - rename:
       field: _temp.details
       target_field: powershell.command.invocation_details
-      if: ctx?._temp?.details != null && ctx?._temp?.details.length > 0
+      if: ctx._temp?.details != null && ctx._temp?.details.length > 0
 
   - script:
       description: Implements Windows-like SplitCommandLine
       lang: painless
-      if: ctx?.process?.command_line != null && ctx.process.command_line != ""
+      if: ctx.process?.command_line != null && ctx.process.command_line != ""
       source: |-
         // appendBSBytes appends n '\\' bytes to b and returns the resulting slice.
         def appendBSBytes(StringBuilder b, int n) {
@@ -377,12 +430,12 @@ processors:
   - script:
       description: Adds file information.
       lang: painless
-      if: ctx?.winlog?.event_data?.ScriptName != null && ctx.winlog.event_data.ScriptName.length() > 1
+      if: ctx.winlog?.event_data?.ScriptName != null && ctx.winlog.event_data.ScriptName.length() > 1
       source: |-
         def path = ctx.winlog.event_data.ScriptName;
         def idx = path.lastIndexOf("\\");
         if (idx > -1) {
-            if (ctx?.file == null) {
+            if (ctx.file == null) {
                 ctx.file = new HashMap();
             }
             ctx.file.name = path.substring(idx+1);
@@ -398,7 +451,12 @@ processors:
       target_field: file.path
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.ScriptName != ""
+      if: ctx.winlog?.event_data?.ScriptName != ""
+
+  - convert:
+      field: error.code
+      type: string
+      ignore_missing: true
 
   ## Cleanup.
 
@@ -419,15 +477,19 @@ processors:
   - script:
       description: Remove all empty values from event_data.
       lang: painless
-      source: ctx?.winlog?.event_data?.entrySet().removeIf(entry -> entry.getValue() == null || entry.getValue().equals(""));
+      source: ctx.winlog?.event_data?.entrySet().removeIf(entry -> entry.getValue() == null || entry.getValue().equals(""));
+      if: ctx.winlog?.event_data != null
   - remove:
       description: Remove empty event data.
       field: winlog.event_data
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data != null && ctx.winlog.event_data.size() == 0
+      if: ctx.winlog?.event_data != null && ctx.winlog.event_data.size() == 0
 
 on_failure:
   - set:
-      field: "error.message"
-      value: "{{ _ingest.on_failure_message }}"
+      field: event.kind
+      value: pipeline_error
+  - append:
+      field: error.message
+      value: "{{{ _ingest.on_failure_message }}}"

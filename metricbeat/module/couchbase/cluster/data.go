@@ -57,14 +57,14 @@ type Data struct {
 	MaxBucketCount       int64         `json:"maxBucketCount"`
 }
 
-func eventMapping(content []byte) mapstr.M {
+func eventMapping(content []byte, logger *logp.Logger) mapstr.M {
 	var d Data
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		logp.Err("Error: %+v", err)
+		logger.Errorf("Error: %+v", err)
 	}
 
-	logp.Info("Printing Data:")
+	logger.Info("Printing Data:")
 	event := mapstr.M{
 		"hdd": mapstr.M{
 			"quota": mapstr.M{

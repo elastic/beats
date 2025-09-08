@@ -17,6 +17,12 @@
       type: keyword
     - name: status
       type: keyword
+    - name: tier_preference
+      type: keyword
+    - name: creation_date
+      type: date
+    - name: version
+      type: keyword
     - name: name
       type: keyword
       description: >

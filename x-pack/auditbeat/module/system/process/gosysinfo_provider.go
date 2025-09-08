@@ -20,7 +20,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
@@ -33,10 +32,9 @@ const (
 
 // SysinfoMetricSet collects data about the host.
 type SysInfoMetricSet struct {
-	system.SystemMetricSet
 	MetricSet
 	hasher    *hasher.FileHasher
-	cache     *cache.Cache
+	cache     *cache.Cache[*Process]
 	bucket    datastore.Bucket
 	lastState time.Time
 
@@ -81,7 +79,7 @@ func (p Process) toMapStr() mapstr.M {
 }
 
 // NewFromSysInfo constructs a new MetricSet backed by go-sysinfo.
-func NewFromSysInfo(base mb.BaseMetricSet, ms MetricSet) (mb.MetricSet, error) {
+func NewFromSysInfo(ms MetricSet) (mb.MetricSet, error) {
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
@@ -117,12 +115,11 @@ func NewFromSysInfo(base mb.BaseMetricSet, ms MetricSet) (mb.MetricSet, error) {
 	}
 
 	sm := &SysInfoMetricSet{
-		SystemMetricSet: system.NewSystemMetricSet(base),
-		MetricSet:       ms,
-		cache:           cache.New(),
-		bucket:          bucket,
-		lastState:       lastState,
-		hasher:          hasher,
+		MetricSet: ms,
+		cache:     cache.New[*Process](),
+		bucket:    bucket,
+		lastState: lastState,
+		hasher:    hasher,
 	}
 
 	return sm, nil
@@ -189,7 +186,7 @@ func (ms *SysInfoMetricSet) reportState(report mb.ReporterV2) error {
 
 	if ms.cache != nil {
 		// This will initialize the cache with the current processes
-		ms.cache.DiffAndUpdateCache(convertToCacheable(processes))
+		ms.cache.DiffAndUpdateCache(processes)
 	}
 
 	// Save time so we know when to send the state again (config.StatePeriod)
@@ -213,13 +210,9 @@ func (ms *SysInfoMetricSet) reportChanges(report mb.ReporterV2) error {
 	}
 	ms.log.Debugf("Found %v processes", len(processes))
 
-	started, stopped := ms.cache.DiffAndUpdateCache(convertToCacheable(processes))
+	started, stopped := ms.cache.DiffAndUpdateCache(processes)
 
-	for _, cacheValue := range started {
-		p, ok := cacheValue.(*Process)
-		if !ok {
-			return fmt.Errorf("cache type error")
-		}
+	for _, p := range started {
 		ms.enrichProcess(p)
 
 		if p.Error == nil {
@@ -230,12 +223,7 @@ func (ms *SysInfoMetricSet) reportChanges(report mb.ReporterV2) error {
 		}
 	}
 
-	for _, cacheValue := range stopped {
-		p, ok := cacheValue.(*Process)
-		if !ok {
-			return fmt.Errorf("cache type error")
-		}
-
+	for _, p := range stopped {
 		if p.Error == nil {
 			report.Event(ms.processEvent(p, eventTypeEvent, eventActionProcessStopped))
 		}
@@ -351,37 +339,12 @@ func putIfNotEmpty(mapstr *mapstr.M, key string, value string) {
 }
 
 func processMessage(process *Process, action eventAction) string {
-	if process.Error != nil {
-		return fmt.Sprintf("ERROR for PID %d: %v", process.Info.PID, process.Error)
-	}
-
-	var actionString string
-	switch action {
-	case eventActionProcessStarted:
-		actionString = "STARTED"
-	case eventActionProcessStopped:
-		actionString = "STOPPED"
-	case eventActionExistingProcess:
-		actionString = "is RUNNING"
-	}
-
-	var userString string
+	var username string
 	if process.User != nil {
-		userString = fmt.Sprintf(" by user %v", process.User.Username)
+		username = process.User.Username
 	}
 
-	return fmt.Sprintf("Process %v (PID: %d)%v %v",
-		process.Info.Name, process.Info.PID, userString, actionString)
-}
-
-func convertToCacheable(processes []*Process) []cache.Cacheable {
-	c := make([]cache.Cacheable, 0, len(processes))
-
-	for _, p := range processes {
-		c = append(c, p)
-	}
-
-	return c
+	return makeMessage(process.Info.PID, action, process.Info.Name, username, process.Error)
 }
 
 func (ms *SysInfoMetricSet) getProcesses() ([]*Process, error) {

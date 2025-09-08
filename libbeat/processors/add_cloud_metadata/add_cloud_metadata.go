@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -58,19 +58,19 @@ type initData struct {
 }
 
 // New constructs a new add_cloud_metadata processor.
-func New(c *cfg.C) (beat.Processor, error) {
+func New(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := c.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("failed to unpack add_cloud_metadata config: %w", err)
 	}
 
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, log)
 	if err != nil {
 		return nil, fmt.Errorf("TLS configuration load: %w", err)
 	}
 
 	initProviders := selectProviders(config.Providers, cloudMetaProviders)
-	fetchers, err := setupFetchers(initProviders, c)
+	fetchers, err := setupFetchers(initProviders, c, log)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func New(c *cfg.C) (beat.Processor, error) {
 			tlsConfig: tlsConfig,
 			overwrite: config.Overwrite,
 		},
-		logger: logp.NewLogger("add_cloud_metadata"),
+		logger: log.Named("add_cloud_metadata"),
 	}
 
 	go p.init()
