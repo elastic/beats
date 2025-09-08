@@ -164,7 +164,11 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 	}
 
 	// try to create a dec from the using the codec config
+<<<<<<< HEAD
 	dec, err := newDecoder(p.readerConfig.Decoding, streamReader)
+=======
+	dec, err := decoder.NewDecoder(p.readerConfig.Decoding, streamReader, log)
+>>>>>>> 0788d61a1 (Accomodate logger changes from  `tlscommon` package (#46308))
 	if err != nil {
 		return err
 	}
