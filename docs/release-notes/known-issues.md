@@ -34,10 +34,10 @@ As a workaround, and to prevent crashes, Beats will ignore any filters provided 
 
 :::{dropdown} Beats panic on restart when "restart_on_cert_change" is enabled on Linux
 
+**Applies to**: v8.16.6+, v8.17.3+, v8.18.0+, v8.19.0+, v9.0.0+, and v9.1.0+
+
 **Details**
 A known issue was discovered where Beats running on Linux with `restart_on_cert_change` enabled panic during a restart. This occurs because the default seccomp policy does not include the `eventfd2` syscall, which is used by Go runtime versions 1.23.0. While the initial launch is successful, subsequent restarts fail as the seccomp policy is already active, blocking the required syscall.
-
-This affects versions v8.16.6+, v8.17.3+, v8.18.0+, v8.19.0+, v9.0.0+, and v9.1.0+.
 
 **Workaround**
 Add a custom seccomp policy to the beat configuration file that explicitly includes the eventfd2 syscall. This custom policy overrides the default, so it must contain a complete list of all required syscalls.
