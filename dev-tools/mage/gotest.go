@@ -51,6 +51,7 @@ type GoTestArgs struct {
 	JUnitReportFile     string            // File to write a JUnit XML test report to.
 	CoverageProfileFile string            // Test coverage profile file (enables -cover).
 	Output              io.Writer         // Write stderr and stdout to Output if set
+	Timeout             string            // Timeout for tests (-timeout flag)
 }
 
 // TestBinaryArgs are the arguments used when building binary for testing.
@@ -176,6 +177,17 @@ func GoTestIntegrationArgsForPackage(pkg string) GoTestArgs {
 	args := makeGoTestArgsForPackage("Integration", pkg)
 
 	args.Tags = append(args.Tags, "integration")
+<<<<<<< HEAD
+=======
+	// some test build docker images which download artifacts, and it can take a
+	// long time.
+	args.Timeout = "2h"
+
+	// add the requirefips tag when doing fips140 testing
+	if v, ok := os.LookupEnv("GODEBUG"); ok && strings.Contains(v, "fips140=only") {
+		args.Tags = append(args.Tags, "requirefips")
+	}
+>>>>>>> c7a84ee27 (devtools: add GoTestArgs.Timeout and set module timeout to 2h (#46414))
 	return args
 }
 
@@ -344,6 +356,9 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 			"-covermode=atomic",
 			"-coverprofile="+params.CoverageProfileFile,
 		)
+	}
+	if params.Timeout != "" {
+		testArgs = append(testArgs, "-timeout="+params.Timeout)
 	}
 	testArgs = append(testArgs, params.ExtraFlags...)
 	testArgs = append(testArgs, params.Packages...)
