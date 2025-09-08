@@ -39,7 +39,7 @@ type Appenders []Appender
 type AppenderBuilder func(c *config.C, logger *logp.Logger) (Appender, error)
 
 // AddBuilder registers a new AppenderBuilder
-func (r *registry) AddAppender(name string, appender AppenderBuilder) error {
+func (r *Registry) AddAppender(name string, appender AppenderBuilder) error {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 
@@ -62,7 +62,7 @@ func (r *registry) AddAppender(name string, appender AppenderBuilder) error {
 }
 
 // GetAppender returns the appender with the giving name, nil if it doesn't exist
-func (r *registry) GetAppender(name string) AppenderBuilder {
+func (r *Registry) GetAppender(name string) AppenderBuilder {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 
@@ -71,7 +71,7 @@ func (r *registry) GetAppender(name string) AppenderBuilder {
 }
 
 // BuildAppender reads provider configuration and instantiate one
-func (r *registry) BuildAppender(c *config.C) (Appender, error) {
+func (r *Registry) BuildAppender(c *config.C) (Appender, error) {
 	var config AppenderConfig
 	err := c.Unpack(&config)
 	if err != nil {
@@ -94,10 +94,10 @@ func (a Appenders) Append(event bus.Event) {
 }
 
 // NewAppenders instances and returns the given list of appenders.
-func NewAppenders(aConfigs []*config.C) (Appenders, error) {
+func NewAppenders(aConfigs []*config.C, r *Registry) (Appenders, error) {
 	var appenders Appenders
 	for _, acfg := range aConfigs {
-		appender, err := Registry.BuildAppender(acfg)
+		appender, err := r.BuildAppender(acfg)
 		if err != nil {
 			return nil, err
 		}

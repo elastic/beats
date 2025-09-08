@@ -56,9 +56,9 @@ type logHints struct {
 	log      *logp.Logger
 }
 
-// InitializeModule initializes this module.
-func InitializeModule() {
-	_ = autodiscover.Registry.AddBuilder("hints", NewLogHints)
+// Setup initializes this module.
+func Setup(r *autodiscover.Registry) error {
+	return r.AddBuilder("hints", NewLogHints)
 }
 
 // NewLogHints builds a log hints builder
@@ -155,7 +155,6 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 			} else {
 				shouldPut(tempCfg, json, jsonOpts, l.log)
 			}
-
 		}
 		// Merge config template with the configs from the annotations
 		// AppendValues option is used to append arrays from annotations to existing arrays while merging

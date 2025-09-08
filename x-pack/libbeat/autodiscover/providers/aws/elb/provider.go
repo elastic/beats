@@ -22,9 +22,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func init() {
-	_ = autodiscover.Registry.AddProvider("aws_elb", AutodiscoverBuilder)
-}
+// ProviderName is the name that should be used when Get/Set the provider in a registry
+const ProviderName = "aws_elb"
 
 // Provider implements autodiscover provider for aws ELBs.
 type Provider struct {
@@ -44,6 +43,7 @@ func AutodiscoverBuilder(
 	c *conf.C,
 	keystore keystore.Keystore,
 	logger *logp.Logger,
+	_ *autodiscover.Registry,
 ) (autodiscover.Provider, error) {
 	logger.Warn(cfgwarn.Deprecate("", "aws_elb autodiscover is now deprecated and will be removed in a future release."))
 
@@ -59,7 +59,6 @@ func AutodiscoverBuilder(
 		SessionToken:    config.AWSConfig.SessionToken,
 		ProfileName:     config.AWSConfig.ProfileName,
 	}, logger)
-
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +69,6 @@ func AutodiscoverBuilder(
 			if config.AWSConfig.FIPSEnabled {
 				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 			}
-
 		})
 
 		completeRegionsList, err := awsauto.GetRegions(svcEC2)
@@ -97,7 +95,6 @@ func AutodiscoverBuilder(
 			if config.AWSConfig.FIPSEnabled {
 				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 			}
-
 		}))
 	}
 
