@@ -16682,11 +16682,11 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 --------------------------------------------------------------------------------
 Dependency : github.com/go-viper/mapstructure/v2
-Version: v2.3.0
+Version: v2.4.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/go-viper/mapstructure/v2@v2.3.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/go-viper/mapstructure/v2@v2.4.0/LICENSE:
 
 The MIT License (MIT)
 
