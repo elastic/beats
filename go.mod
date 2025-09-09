@@ -75,12 +75,8 @@ require (
 	github.com/fsnotify/fsevents v0.1.1
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
-<<<<<<< HEAD
-	github.com/go-sql-driver/mysql v1.6.0
-=======
 	github.com/go-sql-driver/mysql v1.9.3
-	github.com/go-viper/mapstructure/v2 v2.4.0
->>>>>>> 988b09132 (update github.com/go-viper/mapstructure/v2 to v2.4.0 (#46335))
+	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 	github.com/godbus/dbus/v5 v5.1.0
 	github.com/godror/godror v0.33.2
@@ -247,6 +243,7 @@ require (
 	cloud.google.com/go/iam v1.1.12 // indirect
 	cloud.google.com/go/longrunning v0.5.11 // indirect
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/Azure/azure-amqp-common-go/v4 v4.2.0 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.3 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.10.0 // indirect
@@ -310,7 +307,6 @@ require (
 	github.com/go-openapi/jsonpointer v0.20.2 // indirect
 	github.com/go-openapi/jsonreference v0.20.4 // indirect
 	github.com/go-openapi/swag v0.22.9 // indirect
-	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/godror/knownpb v0.1.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
