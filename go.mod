@@ -234,8 +234,6 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
-require filippo.io/edwards25519 v1.1.0 // indirect
-
 require (
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
 	cel.dev/expr v0.19.1 // indirect
@@ -245,6 +243,7 @@ require (
 	cloud.google.com/go/iam v1.2.2 // indirect
 	cloud.google.com/go/longrunning v0.6.2 // indirect
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/Azure/azure-amqp-common-go/v4 v4.2.0 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.3 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.10.0 // indirect
