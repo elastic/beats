@@ -11,23 +11,20 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver"
-	"go.uber.org/goleak"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 )
 
 func TestLeak(t *testing.T) {
-	// opencensus goroutine comes from init in cloud.google.com/go/pubsub and filebeat/input/gcppubsub
-	defer goleak.VerifyNone(t,
-		goleak.IgnoreAnyFunction("github.com/Microsoft/go-winio.getQueuedCompletionStatus"),
-		goleak.IgnoreAnyFunction("go.opencensus.io/stats/view.(*worker).start"))
+	defer oteltest.VerifyNoLeaks(t)
 
 	monitorSocket := genSocketPath()
 	var monitorHost string
