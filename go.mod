@@ -237,25 +237,9 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
-require (
-<<<<<<< HEAD
-=======
-	github.com/cilium/ebpf v0.16.0
-	go.opentelemetry.io/collector/client v1.36.0
-	go.opentelemetry.io/collector/exporter v0.130.0
-	go.opentelemetry.io/collector/exporter/exportertest v0.130.0
-	go.opentelemetry.io/collector/pipeline v0.130.0
-	go.opentelemetry.io/collector/processor v1.36.0
-	go.opentelemetry.io/collector/processor/processorhelper v0.130.0
-	go.opentelemetry.io/collector/receiver/receivertest v0.130.0
-	go.opentelemetry.io/otel/sdk/metric v1.37.0
-	go.uber.org/goleak v1.3.0
-	sigs.k8s.io/kind v0.29.0
-)
+require go.uber.org/goleak v1.3.0
 
 require (
-	al.essio.dev/pkg/shellescape v1.5.1 // indirect
->>>>>>> bfa7d8d50 ([beatreceiver] shutdown processors and publisher on stop (#46305))
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
 	cel.dev/expr v0.23.1 // indirect
 	cloud.google.com/go/auth v0.16.2 // indirect

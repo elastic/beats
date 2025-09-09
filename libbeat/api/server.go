@@ -34,21 +34,13 @@ import (
 // Server takes care of correctly starting the HTTP component of the API
 // and will answer all the routes defined in the received ServeMux.
 type Server struct {
-<<<<<<< HEAD
-	log    *logp.Logger
-	mux    *mux.Router
-	l      net.Listener
-	config Config
-	wg     sync.WaitGroup
-=======
 	log        *logp.Logger
-	mux        *http.ServeMux
+	mux        *mux.Router
 	l          net.Listener
 	config     Config
 	wg         sync.WaitGroup
 	mutex      sync.Mutex
 	httpServer *http.Server
->>>>>>> bfa7d8d50 ([beatreceiver] shutdown processors and publisher on stop (#46305))
 }
 
 // New creates a new API Server with no routes attached.
@@ -104,10 +96,7 @@ func (s *Server) Stop() error {
 
 // AttachHandler will attach a handler at the specified route. Routes are
 // matched in the order in which that are attached.
-<<<<<<< HEAD
-=======
 // Attaching the same route twice will panic
->>>>>>> bfa7d8d50 ([beatreceiver] shutdown processors and publisher on stop (#46305))
 func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
 	if err := s.mux.Handle(route, h).GetError(); err != nil {
 		return err
