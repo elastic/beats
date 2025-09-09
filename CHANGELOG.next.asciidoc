@@ -151,6 +151,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - The Elasticsearch output now correctly applies exponential backoff when being throttled by 429s ("too many requests") from Elasticsarch. {issue}36926[36926] {pull}45073[45073]
 - Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
 - Fix a race condition during metrics initialization which could cause a panic. {issue}45822[45822] {pull}46054[46054]
+- Fixed a panic when the beat restarts itself by adding 'eventfd2' to default seccomp policy {issue}46372[46372]
+- Update Go version to 1.24.7 {pull}46070[46070].
 - Update github.com/docker/docker to v28.3.3 {pull}46334[46334]
 
 *Auditbeat*
@@ -523,6 +525,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add `remaining_executions` global to the CEL input evaluation context. {pull}46210[46210]
 - Improve HTTP JSON health status logic for empty template results. {pull}46332[46332]
 - Improve CEL input documentation of authentication options. {pull}46253[46253]
+- Add status reporting support for Azure Event Hub v2 input. {pull}44846[44846]
 
 *Auditbeat*
 
