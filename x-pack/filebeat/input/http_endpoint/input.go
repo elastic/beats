@@ -50,6 +50,7 @@ type httpEndpoint struct {
 	config    config
 	addr      string
 	tlsConfig *tls.Config
+	logger    *logp.Logger
 }
 
 func Plugin(log *logp.Logger) v2.Plugin {
@@ -90,6 +91,7 @@ func newHTTPEndpoint(config config, logger *logp.Logger) (*httpEndpoint, error) 
 		config:    config,
 		tlsConfig: tlsConfig,
 		addr:      addr,
+		logger:    logger,
 	}, nil
 }
 
@@ -107,7 +109,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	ctx.UpdateStatus(status.Starting, "")
 	ctx.UpdateStatus(status.Configuring, "")
 
-	metrics := newInputMetrics(ctx.MetricsRegistry)
+	metrics := newInputMetrics(ctx.MetricsRegistry, ctx.Logger)
 
 	if e.config.Tracer != nil {
 		id := sanitizeFileName(ctx.IDWithoutName)
@@ -464,7 +466,7 @@ type inputMetrics struct {
 	batchACKTime        metrics.Sample     // histogram of the elapsed successful batch acking times in nanoseconds (time of handler start to time of ACK for non-empty batches).
 }
 
-func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
+func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	out := &inputMetrics{
 		bindAddr:            monitoring.NewString(reg, "bind_address"),
 		route:               monitoring.NewString(reg, "route"),
@@ -479,13 +481,13 @@ func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 		batchProcessingTime: metrics.NewUniformSample(1024),
 		batchACKTime:        metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "size", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "size", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.contentLength))
-	_ = adapter.NewGoMetrics(reg, "batch_size", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_size", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchSize))
-	_ = adapter.NewGoMetrics(reg, "batch_processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
-	_ = adapter.NewGoMetrics(reg, "batch_ack_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_ack_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchACKTime))
 
 	return out

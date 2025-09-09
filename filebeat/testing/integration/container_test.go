@@ -46,6 +46,7 @@ func TestContainerInput(t *testing.T) {
 	config := `
 filebeat.inputs:
 - type: filestream
+  id: test-container
   file_identity.native: ~
   prospector.scanner.fingerprint.enabled: false	
   paths:
@@ -82,7 +83,6 @@ queue.mem.flush.timeout: 0s
 			ExpectStart().
 			Start(ctx).
 			Wait()
-
 	})
 
 	t.Run(" Test container input with CRI format", func(t *testing.T) {
@@ -102,7 +102,6 @@ queue.mem.flush.timeout: 0s
 			ExpectStart().
 			Start(ctx).
 			Wait()
-
 	})
 
 	t.Run(" Test container input properly updates registry offset in case of unparsable lines", func(t *testing.T) {
@@ -129,10 +128,14 @@ queue.mem.flush.timeout: 0s
 
 		registryLogFile := filepath.Join(test.GetTempDir(), "data/registry/filebeat/log.json")
 
-		time.Sleep(1 * time.Minute)
 		// bytes of healthy file are 2244 so for the corrupted one should
 		// be 2244-1=2243 since we removed one character
-		AssertLastOffset(t, registryLogFile, 2243)
-
+		require.Eventually(
+			t,
+			func() bool {
+				return AssertLastOffset(t, registryLogFile, 2243)
+			},
+			20*time.Second,
+			250*time.Millisecond, "did not find the expected registry offset of 2243")
 	})
 }

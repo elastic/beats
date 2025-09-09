@@ -280,7 +280,7 @@ func (p *copyTruncateFileProspector) onFSEvent(
 
 		err := updater.ResetCursor(src, state{Offset: 0})
 		if err != nil {
-			log.Errorf("failed to reset file cursor: %w", err)
+			log.Errorf("failed to reset file cursor: %v", err)
 		}
 		group.Restart(ctx, src)
 

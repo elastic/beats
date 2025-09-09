@@ -77,7 +77,7 @@ func genRegistry(reg *monitoring.Registry, base string) *monitoring.Registry {
 		regName = fmt.Sprintf("%s.%d", base, id)
 	}
 
-	metricsReg := reg.NewRegistry(regName)
+	metricsReg := reg.GetOrCreateRegistry(regName)
 	return metricsReg
 }
 

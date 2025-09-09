@@ -249,6 +249,9 @@ steps:
         env:
           ASDF_TERRAFORM_VERSION: "1.9.3"
           ASDF_PYTHON_VERSION: "3.9.13" # Not needed by ECH tests, but needed by VM
+          EC_ENDPOINT: "https://api.staging.elastic-gov.com"
+          TF_VAR_ech_region: "us-gov-east-1"
+          TF_VAR_deployment_template_id: "aws-general-purpose"
         command: |
           .buildkite/scripts/custom_fips_ech_test.sh x-pack/metricbeat
         retry:
@@ -271,7 +274,7 @@ steps:
               branches: "main"
               debug: true
           - elastic/vault-secrets#v0.1.0:
-              path: "kv/ci-shared/platform-ingest/platform-ingest-ec-prod"
+              path: "kv/ci-shared/platform-ingest/platform-ingest-ec-staging-gov"
               field: "apiKey"
               env_var: "EC_API_KEY"
         notify:

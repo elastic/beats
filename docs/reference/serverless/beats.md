@@ -9,12 +9,12 @@ mapped_pages:
 
 | Data | {{beats}} |
 | --- | --- |
-| Audit data | [Auditbeat](https://www.elastic.co/products/beats/auditbeat) |
-| Log files and journals | [Filebeat](https://www.elastic.co/products/beats/filebeat) |
-| Availability | [Heartbeat](https://www.elastic.co/products/beats/heartbeat) |
-| Metrics | [Metricbeat](https://www.elastic.co/products/beats/metricbeat) |
-| Network traffic | [Packetbeat](https://www.elastic.co/products/beats/packetbeat) |
-| Windows event logs | [Winlogbeat](https://www.elastic.co/products/beats/winlogbeat) |
+| Audit data | [Auditbeat](/reference/auditbeat/index.md) |
+| Log files and journals | [Filebeat](/reference/filebeat/index.md) |
+| Availability | [Heartbeat](/reference/heartbeat/index.md) |
+| Metrics | [Metricbeat](/reference/metricbeat/index.md) |
+| Network traffic | [Packetbeat](/reference/packetbeat/index.md) |
+| Windows event logs | [Winlogbeat](/reference/winlogbeat/index.md) |
 
 {{beats}} can send data to {{es}} directly or through {{ls}}, where you can further process and enhance the data before visualizing it in {{kib}}.
 

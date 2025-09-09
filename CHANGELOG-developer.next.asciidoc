@@ -117,6 +117,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fixed flaky zookeeper integration tests. {pull}43638[43638]
 - Fixed Fileebat GCP Pub/Sub input integration tests. {pull}45150[45150]
 - `mage BuildSystemTestBinary` now build Otel enabled binaries for Filebeat and Metricbeat {pull}45824[45824]
+- testing/environments/docker/cometd: update base img version {pull}45889[45889]
 
 ==== Added
 
@@ -240,6 +241,7 @@ unregister input metrics without relaying on the global 'dataset' namespace.{pul
 - Make `x-pack/libbeat/management.BeatV2Manager.UpdateStatus` a no-op if there is no change in state. {pull}44716[44716]
 - Remove usages of `inputmon.NewInputRegistry` on filebeat v2 inputs. {pull}43862[43862] {issue}43860[43860]
 - Filebeat filebeat/testing/integration test framework ExpectEOF accounts for closed files and allows to choose to pretty print or not the output. {pull}45023[45023]
+- Update `dependabot.yml` to include dependencies for Meraki, Haproxy, Salesforce, Vsphere, Redis, Panw, mongodb. {pull}46348[46348]
 
 ==== Deprecated
 
