@@ -187,7 +187,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 	if err != nil {
 		return fmt.Errorf("failed to add gzip decoder to object: %s, with error: %w", j.object.Name, err)
 	}
-	dec, err := decoder.NewDecoder(j.src.ReaderConfig.Decoding, r)
+	dec, err := decoder.NewDecoder(j.src.ReaderConfig.Decoding, r, j.log)
 	if err != nil {
 		return err
 	}
