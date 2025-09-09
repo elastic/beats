@@ -174,7 +174,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.7.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.0
-	github.com/elastic/elastic-agent-libs v0.23.0
+	github.com/elastic/elastic-agent-libs v0.24.0
 	github.com/elastic/elastic-agent-system-metrics v0.13.2
 	github.com/elastic/go-elasticsearch/v8 v8.18.1
 	github.com/elastic/go-freelru v0.16.0
@@ -248,6 +248,7 @@ require (
 	github.com/cilium/ebpf v0.16.0
 	go.opentelemetry.io/collector/pipeline v0.130.0
 	go.opentelemetry.io/collector/receiver/receivertest v0.130.0
+	go.uber.org/goleak v1.3.0
 	sigs.k8s.io/kind v0.29.0
 )
 
