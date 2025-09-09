@@ -314,6 +314,8 @@ func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
 // - Random permanent error. We expect the batch to be dropped.
 // - Random error. We expect the batch to be retried or dropped based on the error type.
 func TestConsumeContract(t *testing.T) {
+	defer oteltest.VerifyNoLeaks(t)
+
 	tmpDir := t.TempDir()
 	const logsPerTest = 100
 
