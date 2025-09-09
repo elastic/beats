@@ -32,8 +32,6 @@ As a workaround, and to prevent crashes, Beats will ignore any filters provided 
 % On [Month/Day/Year], this issue was resolved.
 :::
 
-<<<<<<< HEAD
-=======
 :::{dropdown} Beats panic on restart when "restart_on_cert_change" is enabled on Linux
 
 **Applies to**: v8.16.6+, v8.17.3+, v8.18.0+, v8.19.0+, v9.0.0+, and v9.1.0+
@@ -176,5 +174,4 @@ seccomp:
 % **Resolved**
 % This issue was resolved by updating the default seccomp policy to include the `eventfd2` syscall. To apply the fix, please upgrade to version 8.18.7, 8.19.4, 9.0.7, 9.1.4, or any subsequent release.
 
->>>>>>> ab1a9e52a (add known issue for restart_on_cert_change panic (#46404))
 :::
