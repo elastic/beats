@@ -12,7 +12,7 @@ The logs include detailed information about:
 
 ## Metricset-specific configuration notes [_metricset_specific_configuration_notes_14]
 
-* **table_id**: (Required) Full table identifier in the format `project_id.dataset_id.table_name` that contains the Vertex AI logs data. You can copy this from "Details" tab under 
+* **table_id**: (Required) Full table identifier in the format `project_id.dataset_id.table_name` that contains the Vertex AI logs data. You can copy this from the "Details" tab when viewing your table in the BigQuery web console, under the "Table ID" field.
 
 
 ## Configuration example [_configuration_example_22]
