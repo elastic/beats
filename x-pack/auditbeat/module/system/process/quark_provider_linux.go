@@ -7,19 +7,27 @@
 package process
 
 import (
-	"fmt"
-	"os/user"
-	"strconv"
-	"time"
+    "bufio"
+    "encoding/json"
+    "fmt"
+    "io"
+    "os"
+    "os/exec"
+    "os/user"
+    "path/filepath"
+    "strconv"
+    "strings"
+    "syscall"
+    "time"
 
-	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
-	"github.com/elastic/beats/v7/auditbeat/helper/tty"
-	"github.com/elastic/beats/v7/libbeat/common/capabilities"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+    "github.com/elastic/beats/v7/auditbeat/helper/hasher"
+    "github.com/elastic/beats/v7/auditbeat/helper/tty"
+    "github.com/elastic/beats/v7/libbeat/common/capabilities"
+    "github.com/elastic/beats/v7/metricbeat/mb"
+    "github.com/elastic/elastic-agent-libs/mapstr"
+    "github.com/elastic/elastic-agent-libs/monitoring"
 
-	quark "github.com/elastic/go-quark"
+    quark "github.com/elastic/go-quark"
 )
 
 var quarkMetrics = struct {
@@ -99,53 +107,143 @@ func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 // The queue is owned by this goroutine and should not be touched
 // from outside as there is no synchronization.
 func (ms *QuarkMetricSet) Run(r mb.PushReporterV2) {
-	ms.log.Info("Quark running")
+    // HACK: Disable built-in quark queue and use external quark-mon.
+    if ms.queue != nil {
+        ms.log.Info("Closing built-in quark queue; using external quark-mon")
+        ms.queue.Close()
+        ms.queue = nil
+    } else {
+        ms.log.Info("Using external quark-mon (no built-in queue)")
+    }
 
-	metricsStamp := time.Now()
+    // Resolve quark-mon path relative to the running auditbeat binary.
+    exePath, err := os.Executable()
+    if err != nil {
+        ms.log.Errorf("failed to resolve executable path: %v", err)
+        return
+    }
+    exeDir := filepath.Dir(exePath)
+    quarkMonPath := filepath.Join(exeDir, "quark-mon")
 
+    // Prepare command: -E for ECS JSON, -s to silence non-JSON output.
+    cmd := exec.Command(quarkMonPath, "-E", "-s")
+    cmd.Stderr = io.Discard // Silence stderr as requested.
+    stdout, err := cmd.StdoutPipe()
+    if err != nil {
+        ms.log.Errorf("failed to get stdout pipe from quark-mon: %v", err)
+        return
+    }
+
+    if err := cmd.Start(); err != nil {
+        ms.log.Errorf("failed to start quark-mon: %v", err)
+        return
+    }
+    ms.log.Infof("started quark-mon at %s", quarkMonPath)
+
+    // Scanner goroutine to read NDJSON lines.
+    linesCh := make(chan []byte, 128)
+    scanDone := make(chan struct{})
+    go func() {
+        defer close(linesCh)
+        defer close(scanDone)
+        scanner := bufio.NewScanner(stdout)
+        // Increase buffer for potentially large JSON lines.
+        buf := make([]byte, 0, 1024*64)
+        scanner.Buffer(buf, 1024*1024) // up to 1MB per line
+        for scanner.Scan() {
+            b := append([]byte(nil), scanner.Bytes()...) // copy
+            // Skip empty lines silently
+            if len(b) == 0 {
+                continue
+            }
+            linesCh <- b
+        }
+        if err := scanner.Err(); err != nil && err != io.EOF {
+            ms.log.Warnf("quark-mon scanner error: %v", err)
+        }
+    }()
+
+    // Event loop: forward JSON events from quark-mon to reporter.
+    sent := 0
 MainLoop:
-	for {
-		// Poll for done
-		select {
-		case <-r.Done():
-			break MainLoop
-		default:
-		}
+    for {
+        select {
+        case <-r.Done():
+            break MainLoop
+        case line, ok := <-linesCh:
+            if !ok {
+                // quark-mon exited or pipe closed; stop without retry.
+                ms.log.Info("quark-mon output closed; stopping metricset")
+                break MainLoop
+            }
+            var root map[string]interface{}
+            if err := json.Unmarshal(line, &root); err != nil {
+                // Not valid JSON; skip but log at debug.
+                ms.log.Debugf("invalid JSON from quark-mon: %v; line=%q", err, string(line))
+                continue
+            }
+            // Push as root fields; no transformation.
+            r.Event(mb.Event{RootFields: mapstr.M(root)})
+            sent++
+            if sent%10 == 0 {
+                // Extract last event action/type for brief logging.
+                lastAction := "unknown"
+                lastType := "unknown"
+                if evAny, ok := root["event"]; ok {
+                    if evMap, ok := evAny.(map[string]interface{}); ok {
+                        if a, ok := evMap["action"].(string); ok && a != "" {
+                            lastAction = a
+                        }
+                        switch t := evMap["type"].(type) {
+                        case string:
+                            if t != "" {
+                                lastType = t
+                            }
+                        case []interface{}:
+                            parts := make([]string, 0, len(t))
+                            for _, v := range t {
+                                if s, ok := v.(string); ok && s != "" {
+                                    parts = append(parts, s)
+                                }
+                            }
+                            if len(parts) > 0 {
+                                lastType = strings.Join(parts, ",")
+                            }
+                        }
+                    }
+                }
+                ms.log.Infof("forwarded %d events from quark-mon (last action=%s type=%s)", sent, lastAction, lastType)
+            }
+        }
+    }
 
-		ms.maybeUpdateMetrics(&metricsStamp)
+    // Try graceful shutdown of quark-mon on exit.
+    killTimer := time.NewTimer(3 * time.Second)
+    if cmd.Process != nil {
+        // Send SIGTERM; ignore error if process already exited.
+        _ = cmd.Process.Signal(syscall.SIGTERM)
 
-		x := time.Now()
-		quarkEvents, err := ms.queue.GetEvents()
-		if len(quarkEvents) == 1 {
-			ms.log.Debugf("getevents took %v", time.Since(x))
-		}
-		if err != nil {
-			ms.log.Error("quark GetEvents, unrecoverable error", err)
-			break MainLoop
-		}
-		if len(quarkEvents) == 0 {
-			err = ms.queue.Block()
-			if err != nil {
-				ms.log.Error("quark Block, unrecoverable error", err)
-				break MainLoop
-			}
-			continue
-		}
-		for _, quarkEvent := range quarkEvents {
-			if !wantedEvent(quarkEvent) {
-				continue
-			}
-			if event, ok := ms.toEvent(quarkEvent); ok {
-				r.Event(event)
-			}
-		}
-	}
+        waitCh := make(chan error, 1)
+        go func() { waitCh <- cmd.Wait() }()
 
-	// Queue is owned by this goroutine, if we ever access it from
-	// outside, we need to consider synchronization.
-	ms.cachedHasher.Close()
-	ms.queue.Close()
-	ms.queue = nil
+        select {
+        case <-waitCh:
+            // done
+        case <-killTimer.C:
+            // Force kill if it didn't exit in time.
+            _ = cmd.Process.Kill()
+            <-waitCh // ensure reaped
+        }
+    }
+    if !killTimer.Stop() {
+        <-killTimer.C
+    }
+
+    // Ensure scanner goroutine is finished.
+    <-scanDone
+
+    // Cleanup resources we own.
+    ms.cachedHasher.Close()
 }
 
 // toEvent converts a quark.Event to a mb.Event, returns true if we
