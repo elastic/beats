@@ -10849,11 +10849,19 @@ third-party archives.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/docker/docker
+<<<<<<< HEAD
 Version: v27.3.1+incompatible
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/docker/docker@v27.3.1+incompatible/LICENSE:
+=======
+Version: v28.3.3+incompatible
+Licence type (autodetected): Apache-2.0
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/docker/docker@v28.3.3+incompatible/LICENSE:
+>>>>>>> b5d012c10 (update github.com/docker/docker to v28.3.3 (#46334))
 
 
                                  Apache License

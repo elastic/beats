@@ -48,7 +48,11 @@ require (
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f
 	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2
 	github.com/digitalocean/go-libvirt v0.0.0-20240709142323-d8406205c752
+<<<<<<< HEAD
 	github.com/docker/docker v27.3.1+incompatible
+=======
+	github.com/docker/docker v28.3.3+incompatible
+>>>>>>> b5d012c10 (update github.com/docker/docker to v28.3.3 (#46334))
 	github.com/docker/go-connections v0.5.0
 	github.com/docker/go-plugins-helpers v0.0.0-20181025120712-1e6269c305b8
 	github.com/docker/go-units v0.5.0
