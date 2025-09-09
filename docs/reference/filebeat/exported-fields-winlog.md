@@ -21,7 +21,7 @@ All fields specific to the Windows Event Tracing are defined here.
     required: False
 
 
-**`winlog.activity_id_name`**
+**`winlog.activity_id_name`** {applies_to}`stack: ga 9.2.0`
 :   The name of the activity that is associated with the activity_id. This is typically used to provide a human-readable name for the activity.
 
     type: keyword
@@ -53,7 +53,7 @@ All fields specific to the Windows Event Tracing are defined here.
     required: False
 
 
-**`winlog.flags_raw`**
+**`winlog.flags_raw`** {applies_to}`stack: ga 9.2.0`
 :   The bitmap of flags that provide information about the event such as the type of session it was logged to and if the event contains extended data.
 
     type: keyword
@@ -69,7 +69,7 @@ All fields specific to the Windows Event Tracing are defined here.
     required: False
 
 
-**`winlog.keywords_raw`**
+**`winlog.keywords_raw`** {applies_to}`stack: ga 9.2.0`
 :   The bitmap of keywords that are used to indicate an event's membership in a set of event categories.
 
     type: keyword
@@ -85,7 +85,7 @@ All fields specific to the Windows Event Tracing are defined here.
     required: False
 
 
-**`winlog.level_raw`**
+**`winlog.level_raw`** {applies_to}`stack: ga 9.2.0`
 :   Numeric value of the level of severity. Level values 0 through 5 are defined by Microsoft. Level values 6 through 15 are reserved. Level values 16 through 255 can be defined by the event provider.
 
     type: long
@@ -101,7 +101,7 @@ All fields specific to the Windows Event Tracing are defined here.
     required: False
 
 
-**`winlog.opcode_raw`**
+**`winlog.opcode_raw`** {applies_to}`stack: ga 9.2.0`
 :   Numeric value of the opcode defined in the event. This is used to identify the location in the application from where the event was logged.
 
     type: long
@@ -117,7 +117,7 @@ All fields specific to the Windows Event Tracing are defined here.
     required: False
 
 
-**`winlog.provider`**
+**`winlog.provider`** {applies_to}`stack: ga 9.2.0`
 :   The source of the event log record (the application or service that logged the record).
 
     type: keyword
@@ -133,7 +133,7 @@ All fields specific to the Windows Event Tracing are defined here.
     required: False
 
 
-**`winlog.provider_message`**
+**`winlog.provider_message`** {applies_to}`stack: ga 9.2.0`
 :   The message that is associated with the provider. This is typically used to provide a human-readable name for the provider.
 
     type: keyword
@@ -141,7 +141,7 @@ All fields specific to the Windows Event Tracing are defined here.
     required: False
 
 
-**`winlog.related_activity_id_name`**
+**`winlog.related_activity_id_name`** {applies_to}`stack: ga 9.2.0`
 :   The name of the related activity.
 
     type: keyword
@@ -173,7 +173,7 @@ All fields specific to the Windows Event Tracing are defined here.
     required: False
 
 
-**`winlog.task_raw`**
+**`winlog.task_raw`** {applies_to}`stack: ga 9.2.0`
 :   Numeric value of the task defined in the event. This is used to identify the location in the application from where the event was logged.
 
     type: long
