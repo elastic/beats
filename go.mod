@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.24.5
+go 1.24.7
 
 require (
 	cloud.google.com/go/bigquery v1.67.0
@@ -76,7 +76,7 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/go-sql-driver/mysql v1.9.3
-	github.com/go-viper/mapstructure/v2 v2.3.0
+	github.com/go-viper/mapstructure/v2 v2.4.0
 	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 	github.com/godbus/dbus/v5 v5.1.0
 	github.com/godror/godror v0.33.2
@@ -176,7 +176,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.7.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.0
-	github.com/elastic/elastic-agent-libs v0.23.0
+	github.com/elastic/elastic-agent-libs v0.24.0
 	github.com/elastic/elastic-agent-system-metrics v0.13.2
 	github.com/elastic/go-elasticsearch/v8 v8.18.1
 	github.com/elastic/go-freelru v0.16.0
@@ -189,7 +189,7 @@ require (
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/go-ldap/ldap/v3 v3.4.6
-	github.com/go-ole/go-ole v1.2.6
+	github.com/go-ole/go-ole v1.3.0
 	github.com/go-resty/resty/v2 v2.16.5
 	github.com/gofrs/uuid/v5 v5.2.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
@@ -203,7 +203,7 @@ require (
 	github.com/klauspost/compress v1.18.0
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
 	github.com/microsoft/go-mssqldb v1.9.2
-	github.com/microsoft/wmi v0.25.1
+	github.com/microsoft/wmi v0.34.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.130.0
 	github.com/pierrec/lz4/v4 v4.1.22
 	github.com/pkg/xattr v0.4.9
@@ -240,11 +240,13 @@ require (
 	github.com/cilium/ebpf v0.16.0
 	go.opentelemetry.io/collector/client v1.36.0
 	go.opentelemetry.io/collector/exporter v0.130.0
+	go.opentelemetry.io/collector/exporter/exportertest v0.130.0
 	go.opentelemetry.io/collector/pipeline v0.130.0
 	go.opentelemetry.io/collector/processor v1.36.0
 	go.opentelemetry.io/collector/processor/processorhelper v0.130.0
 	go.opentelemetry.io/collector/receiver/receivertest v0.130.0
 	go.opentelemetry.io/otel/sdk/metric v1.37.0
+	go.uber.org/goleak v1.3.0
 	sigs.k8s.io/kind v0.29.0
 )
 
@@ -444,7 +446,6 @@ require (
 	go.opentelemetry.io/collector/consumer/consumertest v0.130.0 // indirect
 	go.opentelemetry.io/collector/consumer/xconsumer v0.130.0 // indirect
 	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.130.0 // indirect
-	go.opentelemetry.io/collector/exporter/exportertest v0.130.0 // indirect
 	go.opentelemetry.io/collector/exporter/xexporter v0.130.0 // indirect
 	go.opentelemetry.io/collector/extension v1.36.0 // indirect
 	go.opentelemetry.io/collector/extension/extensionauth v1.36.0 // indirect
