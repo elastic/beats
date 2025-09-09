@@ -21,8 +21,11 @@ package integration
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -30,6 +33,7 @@ import (
 	"github.com/rcrowley/go-metrics"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/testing/certutil"
 	"github.com/elastic/mock-es/pkg/api"
 )
 
@@ -92,6 +96,61 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 	// 6. Ensure one new call to _bulk is made
 	waitForEventToBePublished(t, mr)
 	s.Close()
+}
+
+func TestReloadCA(t *testing.T) {
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+
+	esAddr := "localhost:4242"
+	s, _ := startMockES(t, esAddr)
+	defer s.Close()
+
+	_, _, pair, err := certutil.NewRootCA()
+	require.NoError(t, err, "could not generate root CA")
+	caPath := filepath.Join(os.TempDir(), "ca.pem")
+	err = os.WriteFile(caPath, pair.Cert, 0644)
+	require.NoError(t, err, "could not write CA")
+
+	mockbeat.WriteConfigFile(fmt.Sprintf(`
+output.elasticsearch:
+  allow_older_versions: true
+  hosts: ["%s"]
+  ssl:
+    certificate_authorities: "%s"
+    restart_on_cert_change.enabled: true
+    restart_on_cert_change.period: 1s
+logging.level: debug
+`, esAddr, caPath))
+
+	mockbeat.Start()
+
+	// 1. wait mockbeat to start
+	mockbeat.WaitForLogs(
+		fmt.Sprint("mockbeat start running"),
+		10*time.Second,
+		"did not find 'mockbeat start running' log")
+
+	// 2. "rotate" the CA. Just write it again
+	err = os.WriteFile(caPath, pair.Cert, 0644)
+	require.NoError(t, err, "could not rotate CA")
+
+	// 3. Wait for cert change detection logs
+	mockbeat.WaitForLogs(
+		fmt.Sprintf("some of the following files have been modified: [%s]", caPath),
+		10*time.Second,
+		"did not detect CA rotation")
+
+	// 4. Wait for CA load log
+	mockbeat.WaitForLogs(
+		fmt.Sprintf("Successfully loaded CA certificate: %s", caPath),
+		10*time.Second,
+		"did not find 'Successfully loaded CA' log")
+
+	// 5. wait mockbeat to start again
+	mockbeat.WaitForLogs(
+		fmt.Sprint("mockbeat start running"),
+		10*time.Second,
+		"did not find 'mockbeat start running' log again")
 }
 
 func startMockES(t *testing.T, addr string) (*http.Server, metrics.Registry) {
