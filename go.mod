@@ -248,6 +248,7 @@ require (
 	github.com/cilium/ebpf v0.16.0
 	go.opentelemetry.io/collector/pipeline v0.130.0
 	go.opentelemetry.io/collector/receiver/receivertest v0.130.0
+	go.uber.org/goleak v1.3.0
 	sigs.k8s.io/kind v0.29.0
 )
 
