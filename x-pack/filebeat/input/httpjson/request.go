@@ -34,6 +34,20 @@ type httpClient struct {
 	limiter *rateLimiter
 }
 
+// httpError represents an HTTP error with status code, message, and body.
+type httpError struct {
+	StatusCode int    // HTTP status code.
+	Status     string // HTTP status message.
+	Body       []byte // HTTP body.
+}
+
+func (e *httpError) Error() string {
+	if len(e.Body) == 0 {
+		return fmt.Sprintf("server responded with status code %s", e.Status)
+	}
+	return fmt.Sprintf("server responded with status code %s: %s", e.Status, e.Body)
+}
+
 func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publisher inputcursor.Publisher) error {
 	var (
 		n                       int
@@ -264,10 +278,11 @@ func (c *httpClient) do(ctx context.Context, req *http.Request) (*http.Response,
 
 	if resp.StatusCode >= http.StatusBadRequest {
 		body, _ := io.ReadAll(resp.Body)
-		if len(body) == 0 {
-			return nil, fmt.Errorf("server responded with status code %d", resp.StatusCode)
+		return nil, &httpError{
+			StatusCode: resp.StatusCode,
+			Status:     resp.Status,
+			Body:       body,
 		}
-		return nil, fmt.Errorf("server responded with status code %d: %s", resp.StatusCode, body)
 	}
 	return resp, nil
 }
@@ -399,8 +414,10 @@ func evaluateResponse(expression *valueTpl, data []byte, stat status.StatusRepor
 
 	val, err := expression.Execute(paramCtx, tr, "response_evaluation", nil, stat, log)
 	if err != nil {
-
 		return false, fmt.Errorf("error while evaluating expression: %w", err)
+	}
+	if val == "" {
+		return false, nil
 	}
 	result, err := strconv.ParseBool(val)
 	if err != nil {

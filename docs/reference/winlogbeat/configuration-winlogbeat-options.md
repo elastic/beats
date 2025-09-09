@@ -35,6 +35,10 @@ The name of the file where Winlogbeat stores information that it uses to resume 
 winlogbeat.registry_file: C:/Program Files/Winlogbeat-Data/.winlogbeat.yml
 ```
 
+The default location varies:
+* {applies_to}`stack: ga 9.1` `C:/Program Files/Winlogbeat-Data/.winlogbeat.yml`
+* {applies_to}`stack: ga 9.0` `C:/ProgramData/winlogbeat/.winlogbeat.yml`
+
 ::::{note}
 The forward slashes (/) in the path are automatically changed to backslashes (\) for Windows compatibility. You can use either forward or backslashes. Forward slashes are easier to work with in YAML because there is no need to escape them.
 ::::
@@ -283,6 +287,29 @@ winlogbeat.event_logs:
 ```
 
 * This can have a significant impact on performance that can vary depending on your system specs.
+
+
+### `event_logs.ignore_missing_channel` [_event_logs_ignore_missing_channel]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+Boolean option that controls whether Winlogbeat should ignore missing event log channels and continue monitoring other configured channels. When set to `true`, if a specified event log channel doesn't exist or cannot be accessed, Winlogbeat will log a warning and continue processing other event logs instead of stopping with an error. The default is `true`.
+
+This option is useful when deploying Winlogbeat configurations across multiple systems where certain event log channels may not be available on all machines, or when monitoring optional channels that may not always be present.
+
+Example:
+
+```yaml
+winlogbeat.event_logs:
+  - name: Application
+  - name: System 
+  - name: Sysmon
+    ignore_missing_channel: false
+```
+
+In this example, if the Sysmon channel is missing, Winlogbeat will stop with an error, which may be desired for critical monitoring components.
 
 
 ### `event_logs.tags` [_event_logs_tags]

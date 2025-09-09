@@ -51,7 +51,7 @@ const WMIDefaultNamespace = "root\\cimv2"
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The windows wmi metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The windows wmi metricset is beta."))
 
 	config := NewDefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {

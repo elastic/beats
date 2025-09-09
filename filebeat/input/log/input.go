@@ -107,7 +107,7 @@ func NewInput(
 	cleanupIfNeeded := func(f func() error) {
 		if cleanupNeeded {
 			if err := f(); err != nil {
-				logger.Named("input.log").Errorf("clean up function returned an error: %w", err)
+				logger.Named("input.log").Errorf("clean up function returned an error: %v", err)
 			}
 		}
 	}
@@ -117,6 +117,9 @@ func NewInput(
 	if err := cfg.Unpack(&inputConfig); err != nil {
 		return nil, err
 	}
+
+	inputConfig.checkUnsupportedParams(logger)
+
 	if err := inputConfig.resolveRecursiveGlobs(logger); err != nil {
 		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %w", err) //nolint:staticcheck //Keep old behavior
 	}

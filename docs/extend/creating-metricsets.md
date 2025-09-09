@@ -50,7 +50,7 @@ To create a new metricset:
 After running the mage commands, you’ll find the metricset, along with its generated files, under `module/{{module}}/{metricset}`. This directory contains the following files:
 
 * `\{{metricset}}.go`
-* `_meta/docs.asciidoc`
+* `_meta/docs.md`
 * `_meta/data.json`
 * `_meta/fields.yml`
 
@@ -94,7 +94,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The {module} {metricset} metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The {module} {metricset} metricset is beta."))
 
 	config := struct{}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {

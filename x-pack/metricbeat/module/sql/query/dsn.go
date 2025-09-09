@@ -14,7 +14,9 @@ import (
 	"github.com/godror/godror"
 	"github.com/godror/godror/dsn"
 
+	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -30,7 +32,19 @@ type ConnectionDetails struct {
 const mysqlTLSConfigKey = "custom"
 
 // ParseDSN tries to parse the host
-func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
+func ParseDSN(mod mb.Module, host string) (_ mb.HostData, fetchErr error) {
+	defer func() {
+		fetchErr = sql.SanitizeError(fetchErr, host)
+	}()
+
+	logger := logp.NewLogger("")
+	// At the time of writing, mod always is of type *mb.BaseModule.
+	// If this assumption is ever broken, we use global logger then
+	sqlModule, ok := mod.(*mb.BaseModule)
+	if ok {
+		logger = sqlModule.Logger
+	}
+
 	// TODO: Add support for `username` and `password` as module options
 	config := ConnectionDetails{}
 	if err := mod.UnpackConfig(&config); err != nil {
@@ -42,15 +56,15 @@ func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 	}
 
 	if config.Driver == "mysql" {
-		return mysqlParseDSN(config, host)
+		return mysqlParseDSN(config, host, logger)
 	}
 
 	if config.Driver == "postgres" {
-		return postgresParseDSN(config, host)
+		return postgresParseDSN(config, host, logger)
 	}
 
 	if config.Driver == "mssql" {
-		return mssqlParseDSN(config, host)
+		return mssqlParseDSN(config, host, logger)
 	}
 
 	return defaultParseDSN(config, host)
@@ -96,7 +110,7 @@ func oracleParseDSN(config ConnectionDetails, host string) (mb.HostData, error) 
 	}, nil
 }
 
-func mysqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
+func mysqlParseDSN(config ConnectionDetails, host string, logger *logp.Logger) (mb.HostData, error) {
 	c, err := mysql.ParseDSN(host)
 
 	if err != nil {
@@ -108,7 +122,7 @@ func mysqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
 	if config.TLS.IsEnabled() {
 		c.TLSConfig = mysqlTLSConfigKey
 
-		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, logger)
 		if err != nil {
 			return mb.HostData{}, fmt.Errorf("could not load provided TLS configuration: %w", err)
 		}
@@ -125,14 +139,14 @@ func mysqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
 	}, nil
 }
 
-func postgresParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
+func postgresParseDSN(config ConnectionDetails, host string, logger *logp.Logger) (mb.HostData, error) {
 	if config.TLS.IsEnabled() {
 		u, err := url.Parse(host)
 		if err != nil {
-			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", sanitizeError(err, host))
+			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", err)
 		}
 
-		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, logger)
 		if err != nil {
 			return mb.HostData{}, fmt.Errorf("could not load provided TLS configuration: %w", err)
 		}
@@ -196,14 +210,14 @@ func postgresTranslateVerificationMode(mode tlscommon.TLSVerificationMode) (sslm
 	}
 }
 
-func mssqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
+func mssqlParseDSN(config ConnectionDetails, host string, logger *logp.Logger) (mb.HostData, error) {
 	if config.TLS.IsEnabled() {
 		u, err := url.Parse(host)
 		if err != nil {
-			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", sanitizeError(err, host))
+			return mb.HostData{}, fmt.Errorf("error parsing URL: %w", err)
 		}
 
-		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, logger)
 		if err != nil {
 			return mb.HostData{}, fmt.Errorf("could not load provided TLS configuration: %w", err)
 		}

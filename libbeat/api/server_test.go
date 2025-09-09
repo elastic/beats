@@ -215,12 +215,11 @@ func TestAttachHandler(t *testing.T) {
 	s.mux.ServeHTTP(resp, req)
 	assert.Equal(t, "test!", resp.Body.String())
 
-	// Handlers are matched in order so the first one will take precedence.
-	err = s.AttachHandler("/test", newTestHandler("NOT test!"))
-	require.NoError(t, err)
+	// Test the handler redirects properly.
+	req = httptest.NewRequest(http.MethodGet, "http://"+s.l.Addr().String()+"/test/", nil)
 	resp = httptest.NewRecorder()
 	s.mux.ServeHTTP(resp, req)
-	assert.Equal(t, "test!", resp.Body.String())
+	assert.Equal(t, http.StatusMovedPermanently, resp.Result().StatusCode)
 }
 
 func newTestHandler(response string) http.Handler {

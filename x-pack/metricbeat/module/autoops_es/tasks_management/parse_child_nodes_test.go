@@ -8,10 +8,11 @@
 package tasks_management
 
 import (
+	"maps"
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"golang.org/x/exp/maps"
 )
 
 // Expect an empty array to return an empty map.
@@ -42,7 +43,7 @@ func TestParseChildNodesReturnsNodeIdsWithDuplicates(t *testing.T) {
 		},
 	}
 
-	require.ElementsMatch(t, []string{"node1", "node2"}, maps.Keys(parseChildNodes(children, true)))
+	require.ElementsMatch(t, []string{"node1", "node2"}, slices.Collect(maps.Keys(parseChildNodes(children, true))))
 }
 
 // Expect an empty array to returns node IDs without recursion.
@@ -56,7 +57,7 @@ func TestParseChildNodesReturnsFlatNodeIds(t *testing.T) {
 		},
 	}
 
-	require.ElementsMatch(t, []string{"node1", "node2"}, maps.Keys(parseChildNodes(children, true)))
+	require.ElementsMatch(t, []string{"node1", "node2"}, slices.Collect(maps.Keys(parseChildNodes(children, true))))
 }
 
 // Expect an empty array to returns node IDs with recursion.
@@ -83,7 +84,7 @@ func TestParseChildNodesReturnsRecursiveNodeIds(t *testing.T) {
 		},
 	}
 
-	require.ElementsMatch(t, []string{"node1", "node2", "node3", "node4", "node5"}, maps.Keys(parseChildNodes(children, true)))
+	require.ElementsMatch(t, []string{"node1", "node2", "node3", "node4", "node5"}, slices.Collect(maps.Keys(parseChildNodes(children, true))))
 }
 
 // Expect an empty array to returns node IDs with recursion and ignores unspecified node IDs.
@@ -110,5 +111,5 @@ func TestParseChildNodesIgnoresEmptyNodeId(t *testing.T) {
 		},
 	}
 
-	require.ElementsMatch(t, []string{"node1", "node2", "node3", "node4"}, maps.Keys(parseChildNodes(children, true)))
+	require.ElementsMatch(t, []string{"node1", "node2", "node3", "node4"}, slices.Collect(maps.Keys(parseChildNodes(children, true))))
 }

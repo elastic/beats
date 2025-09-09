@@ -139,6 +139,21 @@ tar xzvf packetbeat-{{version.stack}}-linux-x86_64.tar.gz
 :::{note}
 If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-packetbeat.ps1`.
 :::
+
+:::{important}
+```{applies_to}
+stack: ga 9.1.0, ga 9.0.6
+```
+The base folder has changed from `C:\ProgramData\` to `C:\Program Files\`
+because the latter has stricter permissions. The home path (base for
+state and logs) is now `C:\Program Files\Packetbeat-Data`.
+
+The install script (`install-service-packetbeat.ps1`) will check whether
+`C:\ProgramData\Packetbeat` exits and move it to `C:\Program Files\Packetbeat-Data`.
+For more details on the installation script refer to: [install script](/reference/packetbeat/packetbeat-installation-script.md).
+
+:::
+
 ::::::
 
 :::::::
@@ -387,8 +402,9 @@ Packetbeat comes with predefined assets for parsing, indexing, and visualizing y
 
     `-e` is optional and sends output to standard error instead of the configured log output.
 
-By default, Windows log files are stored under `C:\Program Files\Packetbeat-Data\logs`.
-For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\packetbeat\Logs`.
+The default location where Windows log files are stored varies:
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Packetbeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\packetbeat\logs`
 
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to Elasticsearch and deploys the sample dashboards for visualizing the data in Kibana.
 
@@ -459,8 +475,9 @@ sudo ./packetbeat -e
 PS C:\Program Files\packetbeat> Start-Service packetbeat
 ```
 
-By default, Windows log files are stored under `C:\Program Files\Packetbeat-Data\Logs`.
-For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\packetbeat\Logs`.
+The default location where Windows log files are stored varies:
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Packetbeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\packetbeat\logs`
 ::::::
 
 :::::::

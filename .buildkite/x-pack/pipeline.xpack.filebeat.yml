@@ -10,6 +10,7 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  IMAGE_UBUNTU_X86_64_FIPS: "platform-ingest-beats-ubuntu-2204-fips"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
@@ -207,6 +208,42 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Go fips140=only Integration Tests"
 
+      - label: ":ubuntu: x-pack/filebeat: FIPS ECH Integration Tests"
+        env:
+          ASDF_TERRAFORM_VERSION: "1.9.3"
+          ASDF_PYTHON_VERSION: "3.9.13" # Not needed by ECH tests, but needed by VM
+          EC_ENDPOINT: "https://api.staging.elastic-gov.com"
+          TF_VAR_ech_region: "us-gov-east-1"
+          TF_VAR_deployment_template_id: "aws-general-purpose"
+        command: |
+          .buildkite/scripts/custom_fips_ech_test.sh x-pack/filebeat
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_X86_64_FIPS}"
+          instanceType: "m5.xlarge"
+        artifact_paths:
+          - "x-pack/filebeat/build/*.xml"
+          - "x-pack/filebeat/build/*.json"
+          - "x-pack/filebeat/build/integration-tests/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/data/**/*"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/filebeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+          - elastic/vault-secrets#v0.1.0:
+              path: "kv/ci-shared/platform-ingest/platform-ingest-ec-staging-gov"
+              field: "apiKey"
+              env_var: "EC_API_KEY"
+        notify:
+          - github_commit_status:
+              context: "x-pack/filebeat: FIPS ECH Integration Tests / Ubuntu x86_64"
+
       - label: ":ubuntu: x-pack/filebeat: Python Integration Tests"
         key: "x-pack-filebeat-mandatory-python-int-test"
         command: |
@@ -234,6 +271,33 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: Python Integration Tests"
+
+      - label: ":windows: x-pack/filebeat: Go Windows Integration Tests"
+        command: |
+          cd x-pack/filebeat
+          mage goWindowsIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/filebeat/build/*.xml"
+          - "x-pack/filebeat/build/*.json"
+          - "x-pack/filebeat/build/integration-tests/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/data/**/*"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/filebeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/filebeat: Go Windows Integration Tests"
 
       - label: ":windows: x-pack/filebeat: Win 2022 Unit Tests"
         command: |

@@ -57,13 +57,17 @@ func NewEncodeReader(r io.ReadCloser, config Config, logger *logp.Logger) (Encod
 }
 
 // Next reads the next line from it's initial io.Reader
-// This converts a io.Reader to a reader.reader
+// This converts a io.Reader to a reader.reader.
+//
+// Lines that have a [BOM] ("\uFEFF") prefix will have that prefix removed.
+//
+// [BOM]: https://unicode.org/faq/utf_bom.html#bom5
 func (r EncoderReader) Next() (reader.Message, error) {
 	c, sz, err := r.reader.Next()
 	// Creating message object
 	return reader.Message{
 		Ts:      time.Now(),
-		Content: bytes.Trim(c, "\xef\xbb\xbf"),
+		Content: bytes.TrimPrefix(c, []byte("\uFEFF")),
 		Bytes:   sz,
 		Fields:  mapstr.M{},
 	}, err

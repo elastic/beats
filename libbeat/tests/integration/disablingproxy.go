@@ -23,26 +23,33 @@ package integration
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"net/http/httputil"
 	"net/url"
 	"sync"
 	"testing"
 )
 
-// NewDisabledProxy returns an enabled `DisablingProxy` that proxies
-// requests to `target`.
-func NewDisabledProxy(t *testing.T, target string) *DisablingProxy {
+// NewDisablingProxy returns an enabled `DisablingProxy` that proxies
+// requests to `target` its URL.
+// It used the httptest.Server and closes it at the end of the test.
+func NewDisablingProxy(t *testing.T, target string) (*DisablingProxy, string) {
 	t.Helper()
 
 	serverURL, err := url.Parse(target)
 	if err != nil {
-		t.Fatalf("could not parse targetan URL: %s", err)
+		t.Fatalf("could not parse target URL: %s", err)
 	}
 
-	return &DisablingProxy{
+	proxy := &DisablingProxy{
 		target:  serverURL,
 		enabled: true,
 	}
+
+	server := httptest.NewServer(proxy)
+	t.Cleanup(func() { server.Close() })
+
+	return proxy, server.URL
 }
 
 // DisablingProxy is a HTTP proxy that can be disabled/enabled at runtime

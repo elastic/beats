@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 
-	"github.com/mitchellh/hashstructure"
+	"github.com/gohugoio/hashstructure"
 
 	// include all metricbeat specific builders
 	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
@@ -73,9 +73,9 @@ func WithModuleOptions(options ...module.Option) Option {
 
 // WithLightModules enables light modules support
 func WithLightModules() Option {
-	return func(*Metricbeat) {
+	return func(m *Metricbeat) {
 		path := paths.Resolve(paths.Home, "module")
-		mb.Registry.SetSecondarySource(mb.NewLightModulesSource(path))
+		mb.Registry.SetSecondarySource(mb.NewLightModulesSource(m.logger, path))
 	}
 }
 

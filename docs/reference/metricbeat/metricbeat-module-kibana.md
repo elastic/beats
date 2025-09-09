@@ -64,9 +64,9 @@ This module supports TLS connections when using `ssl` config field, as described
 
 The following metricsets are available:
 
-* [cluster_actions](/reference/metricbeat/metricbeat-metricset-kibana-cluster_actions.md)
-* [cluster_rules](/reference/metricbeat/metricbeat-metricset-kibana-cluster_rules.md)
-* [node_actions](/reference/metricbeat/metricbeat-metricset-kibana-node_actions.md)
-* [node_rules](/reference/metricbeat/metricbeat-metricset-kibana-node_rules.md)
+* [cluster_actions](/reference/metricbeat/metricbeat-metricset-kibana-cluster_actions.md)  {applies_to}`stack: beta`
+* [cluster_rules](/reference/metricbeat/metricbeat-metricset-kibana-cluster_rules.md)  {applies_to}`stack: beta`
+* [node_actions](/reference/metricbeat/metricbeat-metricset-kibana-node_actions.md)  {applies_to}`stack: beta`
+* [node_rules](/reference/metricbeat/metricbeat-metricset-kibana-node_rules.md)  {applies_to}`stack: beta`
 * [stats](/reference/metricbeat/metricbeat-metricset-kibana-stats.md)
 * [status](/reference/metricbeat/metricbeat-metricset-kibana-status.md)

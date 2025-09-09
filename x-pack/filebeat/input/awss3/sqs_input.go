@@ -18,6 +18,8 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -44,6 +46,9 @@ type sqsReaderInput struct {
 
 	// workerWg is used to wait on worker goroutines during shutdown
 	workerWg sync.WaitGroup
+
+	// health status reporting
+	status status.StatusReporter
 }
 
 // Simple wrapper to handle creation of internal channels
@@ -66,9 +71,14 @@ func (in *sqsReaderInput) Run(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
 ) error {
+	in.status = statusreporterhelper.New(inputContext.StatusReporter, inputContext.Logger, "S3 via SQS")
+	defer in.status.UpdateStatus(status.Stopped, "")
+	in.status.UpdateStatus(status.Starting, "Input starting")
+
 	// Initialize everything for this run
 	err := in.setup(inputContext, pipeline)
 	if err != nil {
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failure: %s", err.Error()))
 		return err
 	}
 
@@ -90,6 +100,7 @@ func (in *sqsReaderInput) setup(
 	in.log = inputContext.Logger.With("queue_url", in.config.QueueURL)
 	in.pipeline = pipeline
 
+	in.status.UpdateStatus(status.Configuring, "Configuring input")
 	in.detectedRegion = getRegionFromQueueURL(in.config.QueueURL)
 	if in.config.RegionName != "" {
 		// Configured region always takes precedence
@@ -116,7 +127,7 @@ func (in *sqsReaderInput) setup(
 
 	in.s3 = newAWSs3API(s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier))
 
-	in.metrics = newInputMetrics(inputContext.ID, nil, in.config.NumberOfWorkers)
+	in.metrics = newInputMetrics(inputContext.MetricsRegistry, in.config.NumberOfWorkers, logp.NewNopLogger())
 
 	var err error
 	in.msgHandler, err = in.createEventProcessor()
@@ -189,7 +200,7 @@ func (in *sqsReaderInput) readerLoop(ctx context.Context) {
 		// Block to wait for more requests if requestCount is zero
 		requestCount += channelRequestCount(ctx, in.workRequestChan, requestCount == 0)
 
-		msgs := readSQSMessages(ctx, in.log, in.sqs, in.metrics, requestCount)
+		msgs := readSQSMessages(ctx, in.log, in.status, in.sqs, in.metrics, requestCount, in.config.QueueURL)
 
 		for _, msg := range msgs {
 			select {
@@ -303,6 +314,10 @@ func (w *sqsWorker) processMessage(ctx context.Context, msg types.Message) {
 }
 
 func (in *sqsReaderInput) startWorkers(ctx, graceCtx context.Context) {
+	// setting to a "running" state here before async worker launches commence.
+	// this is so a degraded state during async launch doesn't get overwritten by a "running" state.
+	in.status.UpdateStatus(status.Running, "Input is running")
+
 	// Start the worker goroutines that will fetch messages via workRequestChan
 	// and workResponseChan until the input shuts down.
 	for i := 0; i < in.config.NumberOfWorkers; i++ {
@@ -311,6 +326,8 @@ func (in *sqsReaderInput) startWorkers(ctx, graceCtx context.Context) {
 			worker, err := in.newSQSWorker()
 			if err != nil {
 				in.log.Error(err)
+				// will likely cover auth failures, network connectivity errors
+				in.status.UpdateStatus(status.Degraded, fmt.Sprintf("An SQS worker's setup failed, error: %s", err.Error()))
 				return
 			}
 			go worker.run(ctx, graceCtx)
@@ -336,13 +353,15 @@ func (in *sqsReaderInput) logConfigSummary() {
 
 func (in *sqsReaderInput) createEventProcessor() (sqsProcessor, error) {
 	fileSelectors := in.config.getFileSelectors()
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(in.metrics, in.s3, fileSelectors, in.config.BackupConfig)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(in.metrics, in.s3, fileSelectors, in.config.BackupConfig, in.log)
 
 	script, err := newScriptFromConfig(in.log.Named("sqs_script"), in.config.SQSScript)
 	if err != nil {
 		return nil, err
 	}
-	return newSQSS3EventProcessor(in.log.Named("sqs_s3_event"), in.metrics, in.sqs, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, s3EventHandlerFactory), nil
+	return newSQSS3EventProcessor(in.log.Named("sqs_s3_event"), in.metrics,
+		in.sqs, script, in.config.VisibilityTimeout,
+		in.config.SQSMaxReceiveCount, s3EventHandlerFactory, in.status), nil
 }
 
 // Read all pending requests and return their count. If block is true,

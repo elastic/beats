@@ -53,10 +53,10 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [conntrack](/reference/metricbeat/metricbeat-metricset-linux-conntrack.md)
-* [iostat](/reference/metricbeat/metricbeat-metricset-linux-iostat.md)
-* [ksm](/reference/metricbeat/metricbeat-metricset-linux-ksm.md)
-* [memory](/reference/metricbeat/metricbeat-metricset-linux-memory.md)
-* [pageinfo](/reference/metricbeat/metricbeat-metricset-linux-pageinfo.md)
-* [pressure](/reference/metricbeat/metricbeat-metricset-linux-pressure.md)
-* [rapl](/reference/metricbeat/metricbeat-metricset-linux-rapl.md)
+* [conntrack](/reference/metricbeat/metricbeat-metricset-linux-conntrack.md)  {applies_to}`stack: beta`
+* [iostat](/reference/metricbeat/metricbeat-metricset-linux-iostat.md)  {applies_to}`stack: beta`
+* [ksm](/reference/metricbeat/metricbeat-metricset-linux-ksm.md)  {applies_to}`stack: beta`
+* [memory](/reference/metricbeat/metricbeat-metricset-linux-memory.md)  {applies_to}`stack: beta`
+* [pageinfo](/reference/metricbeat/metricbeat-metricset-linux-pageinfo.md)  {applies_to}`stack: beta`
+* [pressure](/reference/metricbeat/metricbeat-metricset-linux-pressure.md)  {applies_to}`stack: beta`
+* [rapl](/reference/metricbeat/metricbeat-metricset-linux-rapl.md)  {applies_to}`stack: beta`

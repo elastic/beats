@@ -12,13 +12,13 @@ NFS v4/3 specific event fields.
 **`nfs.version`**
 :   NFS protocol version number.
 
-type: long
+    type: long
 
 
 **`nfs.minor_version`**
 :   NFS protocol minor version number.
 
-type: long
+    type: long
 
 
 **`nfs.tag`**
@@ -52,13 +52,13 @@ ONC RPC specific event fields.
 **`rpc.cred.uid`**
 :   RPC caller's user id, in case of auth-unix.
 
-type: long
+    type: long
 
 
 **`rpc.cred.gid`**
 :   RPC caller's group id, in case of auth-unix.
 
-type: long
+    type: long
 
 
 **`rpc.cred.gids`**
@@ -68,7 +68,7 @@ type: long
 **`rpc.cred.stamp`**
 :   Arbitrary ID which the caller machine may generate.
 
-type: long
+    type: long
 
 
 **`rpc.cred.machinename`**
@@ -78,16 +78,16 @@ type: long
 **`rpc.call_size`**
 :   RPC call size with argument.
 
-type: alias
+    type: alias
 
-alias to: source.bytes
+    alias to: source.bytes
 
 
 **`rpc.reply_size`**
 :   RPC reply size with argument.
 
-type: alias
+    type: alias
 
-alias to: destination.bytes
+    alias to: destination.bytes
 
 

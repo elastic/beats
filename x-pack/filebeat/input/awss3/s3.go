@@ -7,7 +7,6 @@ package awss3
 import (
 	"context"
 	"fmt"
-	"net/url"
 	"strings"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -81,50 +80,4 @@ func getBucketNameFromARN(bucketARN string) string {
 	bucketMetadata := strings.Split(bucketARN, ":")
 	bucketName := bucketMetadata[len(bucketMetadata)-1]
 	return bucketName
-}
-
-func getProviderFromDomain(endpoint string, ProviderOverride string) string {
-	if ProviderOverride != "" {
-		return ProviderOverride
-	}
-	if endpoint == "" {
-		return "aws"
-	}
-	// List of popular S3 SaaS providers
-	providers := map[string]string{
-		"amazonaws.com":          "aws",
-		"c2s.sgov.gov":           "aws",
-		"c2s.ic.gov":             "aws",
-		"amazonaws.com.cn":       "aws",
-		"backblazeb2.com":        "backblaze",
-		"cloudflarestorage.com":  "cloudflare",
-		"wasabisys.com":          "wasabi",
-		"digitaloceanspaces.com": "digitalocean",
-		"dream.io":               "dreamhost",
-		"scw.cloud":              "scaleway",
-		"googleapis.com":         "gcp",
-		"cloud.it":               "arubacloud",
-		"linodeobjects.com":      "linode",
-		"vultrobjects.com":       "vultr",
-		"appdomain.cloud":        "ibm",
-		"aliyuncs.com":           "alibaba",
-		"oraclecloud.com":        "oracle",
-		"exo.io":                 "exoscale",
-		"upcloudobjects.com":     "upcloud",
-		"ilandcloud.com":         "iland",
-		"zadarazios.com":         "zadara",
-	}
-
-	parsedEndpoint, _ := url.Parse(endpoint)
-	for key, provider := range providers {
-		// support endpoint with and without scheme (http(s)://abc.xyz, abc.xyz)
-		constraint := parsedEndpoint.Hostname()
-		if len(parsedEndpoint.Scheme) == 0 {
-			constraint = parsedEndpoint.Path
-		}
-		if strings.HasSuffix(constraint, key) {
-			return provider
-		}
-	}
-	return "unknown"
 }

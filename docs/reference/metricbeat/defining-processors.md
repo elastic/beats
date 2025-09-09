@@ -109,7 +109,7 @@ The supported processors are:
 * [`fingerprint`](/reference/metricbeat/fingerprint.md)
 * [`include_fields`](/reference/metricbeat/include-fields.md)
 * [`move-fields`](/reference/metricbeat/move-fields.md)
-* [`now`](/reference/metricbeat/now.md)
+* [`now`](/reference/metricbeat/now.md) {applies_to}`stack: ga 9.1.0`
 * [`rate_limit`](/reference/metricbeat/rate-limit.md)
 * [`registered_domain`](/reference/metricbeat/processor-registered-domain.md)
 * [`rename`](/reference/metricbeat/rename-fields.md)

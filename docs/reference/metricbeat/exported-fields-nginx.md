@@ -20,60 +20,60 @@ Nginx server status metrics collected from various modules.
 **`nginx.stubstatus.hostname`**
 :   Nginx hostname.
 
-type: keyword
+    type: keyword
 
 
 **`nginx.stubstatus.active`**
 :   The current number of active client connections including Waiting connections.
 
-type: long
+    type: long
 
 
 **`nginx.stubstatus.accepts`**
 :   The total number of accepted client connections.
 
-type: long
+    type: long
 
 
 **`nginx.stubstatus.handled`**
 :   The total number of handled client connections.
 
-type: long
+    type: long
 
 
 **`nginx.stubstatus.dropped`**
 :   The total number of dropped client connections.
 
-type: long
+    type: long
 
 
 **`nginx.stubstatus.requests`**
 :   The total number of client requests.
 
-type: long
+    type: long
 
 
 **`nginx.stubstatus.current`**
 :   The current number of client requests.
 
-type: long
+    type: long
 
 
 **`nginx.stubstatus.reading`**
 :   The current number of connections where Nginx is reading the request header.
 
-type: long
+    type: long
 
 
 **`nginx.stubstatus.writing`**
 :   The current number of connections where Nginx is writing the response back to the client.
 
-type: long
+    type: long
 
 
 **`nginx.stubstatus.waiting`**
 :   The current number of idle client connections waiting for a request.
 
-type: long
+    type: long
 
 

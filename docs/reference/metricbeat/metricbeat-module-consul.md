@@ -48,4 +48,4 @@ This module supports TLS connections when using `ssl` config field, as described
 
 The following metricsets are available:
 
-* [agent](/reference/metricbeat/metricbeat-metricset-consul-agent.md)
+* [agent](/reference/metricbeat/metricbeat-metricset-consul-agent.md)  {applies_to}`stack: beta`

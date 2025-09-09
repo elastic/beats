@@ -46,24 +46,24 @@ import (
 const pluginName = "kafka"
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
-func Plugin() input.Plugin {
+func Plugin(log *logp.Logger) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "Kafka input",
 		Doc:        "The Kafka input consumes events from topics by connecting to the configured kafka brokers",
-		Manager:    input.ConfigureWith(configure),
+		Manager:    input.ConfigureWith(configure, log),
 	}
 }
 
-func configure(cfg *conf.C) (input.Input, error) {
+func configure(cfg *conf.C, logger *logp.Logger) (input.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
-	saramaConfig, err := newSaramaConfig(config)
+	saramaConfig, err := newSaramaConfig(config, logger)
 	if err != nil {
 		return nil, fmt.Errorf("initializing Sarama config: %w", err)
 	}

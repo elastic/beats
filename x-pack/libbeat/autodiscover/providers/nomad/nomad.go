@@ -56,7 +56,7 @@ func AutodiscoverBuilder(
 	keystore keystore.Keystore,
 	logger *logp.Logger,
 ) (autodiscover.Provider, error) {
-	cfgwarn.Experimental("The nomad autodiscover provider is experimental.")
+	logger.Warn(cfgwarn.Experimental("The nomad autodiscover provider is experimental."))
 
 	config := defaultConfig()
 	if err := c.Unpack(&config); err != nil {
@@ -114,7 +114,7 @@ func AutodiscoverBuilder(
 		options.Node = node
 	}
 
-	watcher, err := nomad.NewWatcher(client, options)
+	watcher, err := nomad.NewWatcher(client, options, logger)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize nomad watcher: %w", err)
 	}

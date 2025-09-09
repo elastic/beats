@@ -23,6 +23,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
@@ -88,8 +89,9 @@ func (im *bwcIncludeMatches) Unpack(c *ucfg.Config) error {
 		im.Matches = append(im.Matches, matches...)
 
 		includeMatchesWarnOnce.Do(func() {
-			cfgwarn.Deprecate("", "Please migrate your journald input's "+
-				"include_matches config to the new more expressive format.")
+			// TODO: use a local logger here
+			logp.NewLogger("journald").Warn(cfgwarn.Deprecate("", "Please migrate your journald input's "+
+				"include_matches config to the new more expressive format."))
 		})
 		return nil
 	}

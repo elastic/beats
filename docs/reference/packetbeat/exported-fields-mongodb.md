@@ -20,19 +20,19 @@ MongoDB-specific event fields. These fields mirror closely the fields for the Mo
 **`mongodb.numberToSkip`**
 :   Sets the number of documents to omit - starting from the first document in the resulting dataset - when returning the result of the query.
 
-type: long
+    type: long
 
 
 **`mongodb.numberToReturn`**
 :   The requested maximum number of documents to be returned.
 
-type: long
+    type: long
 
 
 **`mongodb.numberReturned`**
 :   The number of documents in the reply.
 
-type: long
+    type: long
 
 
 **`mongodb.startingFrom`**

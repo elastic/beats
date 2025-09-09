@@ -12,25 +12,25 @@ Stats scraped from a Prometheus endpoint.
 **`metrics_count`**
 :   Number of metrics per Elasticsearch document.
 
-type: long
+    type: long
 
 
 **`prometheus.labels.*`**
 :   Prometheus metric labels
 
-type: object
+    type: object
 
 
 **`prometheus.metrics.*`**
 :   Prometheus metric
 
-type: object
+    type: object
 
 
 **`prometheus.query.*`**
 :   Prometheus value resulted from PromQL
 
-type: object
+    type: object
 
 
 ## query [_query]

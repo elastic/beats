@@ -16,15 +16,15 @@ Host lookup fields.
 **`resolve.host`**
 :   Hostname of service being monitored.
 
-type: alias
+    type: alias
 
-alias to: url.domain
+    alias to: url.domain
 
 
 **`resolve.ip`**
 :   IP address found for the given host.
 
-type: ip
+    type: ip
 
 
 ## rtt [_rtt]
@@ -34,6 +34,6 @@ Duration required to resolve an IP from hostname.
 **`resolve.rtt.us`**
 :   Duration in microseconds
 
-type: long
+    type: long
 
 
