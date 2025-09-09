@@ -281,6 +281,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - The Filestream input now uses the `fingerprint` file identity by default. The state from files are automatically migrated if the previous file identity was `native` (the default) or `path`. If the `file_identity` is explicitly set, there is no change in behaviour. {issue}40197[40197] {pull}41762[41762]
 - Improve HTTP JSON health status logic for empty template results. {pull}46332[46332]
 - Improve CEL input documentation of authentication options. {pull}46253[46253]
+- Add status reporting support for Azure Event Hub v2 input. {pull}44846[44846]
 
 *Auditbeat*
 
