@@ -159,6 +159,34 @@ func TestMapMetricWithConfiguredTimegrain(t *testing.T) {
 	})
 }
 
+func TestInvalidConfiguredTimegrain(t *testing.T) {
+	resource := MockResourceExpanded()
+	metricDefinitions := armmonitor.MetricDefinitionCollection{
+		Value: MockMetricDefinitions(),
+	}
+	metricConfig := azure.MetricConfig{Namespace: "namespace",
+		Dimensions: []azure.DimensionConfig{{Name: "location", Value: "West Europe"}},
+		// one-minute timegrain is not supported by some metrics
+		Timegrain: oneMinuteDuration}
+	resourceConfig := azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
+	client := azure.NewMockClient(logptest.NewTestingLogger(t, ""))
+
+	m := &azure.MockService{}
+	m.On("GetMetricDefinitionsWithRetry", mock.Anything,
+		mock.Anything).Return(metricDefinitions, nil)
+	client.AzureMonitorService = m
+	metricConfig.Name = []string{"*"}
+	resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
+	metrics, err := mapMetrics(client,
+		[]*armresources.GenericResourceExpanded{resource}, resourceConfig)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(),
+		fmt.Sprintf("the timegrain configured : %s is not supported", oneMinuteDuration))
+	assert.Equal(t, metrics, []azure.Metric(nil))
+	m.AssertExpectations(t)
+}
+
 func TestMapMetricNoConfiguredTimegrain(t *testing.T) {
 	resource := MockResourceExpanded()
 	metricDefinitions := armmonitor.MetricDefinitionCollection{
