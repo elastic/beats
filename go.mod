@@ -232,9 +232,6 @@ require (
 	go.uber.org/mock v0.5.0
 	golang.org/x/term v0.34.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822
-	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6
-	golang.org/x/term v0.32.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20250519155744-55703ea1f237
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
 )
