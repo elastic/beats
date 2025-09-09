@@ -174,13 +174,13 @@ func validateAndGroupByConfiguredAggsAndTimegrain(
 					break
 				}
 			}
-			if configuredTimegrainSupported {
-				timeGrain = metricConfig.Timegrain
-			} else {
+			if !configuredTimegrainSupported {
 				return nil, fmt.Errorf("the timegrain configured : %s is not "+
 					"supported for some by some of the metrics selected: %s ",
 					metricConfig.Timegrain, strings.Join(metricNames, ","))
 			}
+			// Configured timegrain is supported, i.e. compatible
+			timeGrain = metricConfig.Timegrain
 		} else {
 			// timegrain not configured:
 			// fall back to first (and smallest) timegrain from metric
