@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.24.5
+go 1.24.7
 
 require (
 	cloud.google.com/go/bigquery v1.67.0
@@ -236,6 +236,8 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
 )
+
+require go.uber.org/goleak v1.3.0
 
 require (
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
