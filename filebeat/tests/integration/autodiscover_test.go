@@ -62,7 +62,7 @@ func TestHintsDocker(t *testing.T) {
 
 	// By ensuring the Filestream input started with the correct ID, we're
 	// testing that the whole autodiscover + hints is working as expected.
-	filebeat.WaitForLogs(
+	filebeat.WaitLogsContains(
 		fmt.Sprintf(
 			`"message":"Input 'filestream' starting","service.name":"filebeat","id":"container-logs-%s"`,
 			containerID,
@@ -93,7 +93,7 @@ func TestHintsKubernetes(t *testing.T) {
 
 	// By ensuring the Filestream input started with the correct ID, we're
 	// testing that the whole autodiscover + hints is working as expected.
-	filebeat.WaitForLogs(
+	filebeat.WaitLogsContains(
 		fmt.Sprintf(
 			`"message":"Input 'filestream' starting","service.name":"filebeat","id":"container-logs-%s"`,
 			containerID,

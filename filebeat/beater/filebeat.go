@@ -239,7 +239,9 @@ func (fb *Filebeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
 // setup.
 func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	if b.Config.Output.Name() != "elasticsearch" {
-		fb.logger.Warn(pipelinesWarning)
+		if !b.Manager.Enabled() {
+			fb.logger.Warn(pipelinesWarning)
+		}
 		return nil
 	}
 
@@ -399,7 +401,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	if b.Config.Output.Name() == "elasticsearch" {
 		pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), fb.logger)
 	} else {
-		fb.logger.Warn(pipelinesWarning)
+		if !b.Manager.Enabled() {
+			fb.logger.Warn(pipelinesWarning)
+		}
 	}
 	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
 	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once, fb.logger)

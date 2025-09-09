@@ -113,7 +113,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	}
 	e.etwSession.Callback = e.consumeEvent
 	e.publisher = publisher
-	e.metrics = newInputMetrics(e.etwSession.Name, ctx.MetricsRegistry)
+	e.metrics = newInputMetrics(e.etwSession.Name, ctx.MetricsRegistry, ctx.Logger)
 
 	// Set up logger with session information
 	e.log = ctx.Logger.With("session", e.etwSession.Name)
@@ -373,7 +373,7 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for windows ETW.
 // If id is empty, a nil inputMetric is returned.
-func newInputMetrics(session string, reg *monitoring.Registry) *inputMetrics {
+func newInputMetrics(session string, reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	out := &inputMetrics{
 		name:           monitoring.NewString(reg, "session"),
 		events:         monitoring.NewUint(reg, "received_events_total"),
@@ -384,11 +384,11 @@ func newInputMetrics(session string, reg *monitoring.Registry) *inputMetrics {
 		processingTime: metrics.NewUniformSample(1024),
 	}
 	out.name.Set(session)
-	_ = adapter.NewGoMetrics(reg, "source_lag_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "source_lag_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sourceLag))
-	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "arrival_period", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
-	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))
 
 	return out
