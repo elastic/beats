@@ -23,6 +23,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"golang.org/x/sync/errgroup"
 
@@ -40,12 +42,19 @@ func init() {
 	)
 }
 
+// CollStatsOptions holds configuration options for collecting collection statistics
+type CollStatsOptions struct {
+	Scale int `config:"scale"` // Scale factor for size values (default: 1)
+}
+
 // Metricset type defines all fields of the Metricset
 // As a minimum it must inherit the mb.BaseMetricSet fields, but can be extended with
 // additional entries. These variables can be used to persist data or configuration between
 // multiple fetch calls.
 type Metricset struct {
 	*mongodb.Metricset
+	mongoVersion string           // cached MongoDB version
+	options      CollStatsOptions // configuration options
 }
 
 // New creates a new instance of the Metricset
@@ -57,7 +66,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("could not create mongodb metricset: %w", err)
 	}
 
-	return &Metricset{ms}, nil
+	// Parse collstats-specific configuration
+	var options CollStatsOptions
+	if err := base.Module().UnpackConfig(&options); err != nil {
+		return nil, fmt.Errorf("could not parse collstats config: %w", err)
+	}
+
+	// Set defaults
+	if options.Scale == 0 {
+		options.Scale = 1 // no scaling; for example if Scale = 1024, then metrics come with the unit KiB
+	}
+
+	return &Metricset{
+		Metricset:    ms,
+		mongoVersion: "",
+		options:      options,
+	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -74,6 +98,18 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 			m.Logger().Warn("client disconnection did not happen gracefully")
 		}
 	}()
+
+	// Get MongoDB version if not cached
+	if m.mongoVersion == "" {
+		version, err := getMongoDBVersion(client)
+		if err != nil {
+			m.Logger().Warnf("Failed to get MongoDB version, using legacy mode: %v", err)
+			m.mongoVersion = "unknown"
+		} else {
+			m.mongoVersion = version
+			m.Logger().Debugf("Detected MongoDB version: %s", version)
+		}
+	}
 
 	// This info is only stored in 'admin' database
 	db := client.Database("admin")
@@ -127,7 +163,8 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 
 			database, collection := names[0], names[1]
 
-			collStats, err := fetchCollStats(client, database, collection)
+			// Use appropriate method based on MongoDB version
+			collStats, err := m.fetchCollStatsWithVersion(client, database, collection)
 			if err != nil {
 				reporter.Error(fmt.Errorf("fetching collStats failed: %w", err))
 
@@ -160,9 +197,91 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 	return nil
 }
 
-func fetchCollStats(client *mongo.Client, dbName, collectionName string) (map[string]interface{}, error) {
+// fetchCollStatsWithVersion selects the appropriate method based on MongoDB version
+func (m *Metricset) fetchCollStatsWithVersion(client *mongo.Client, dbName, collectionName string) (map[string]interface{}, error) {
+	// For MongoDB 6.2+, try aggregation first with fallback to command
+	if isVersionAtLeast(m.mongoVersion, "6.2.0") {
+		stats, err := m.fetchCollStatsAggregation(client, dbName, collectionName)
+		if err == nil {
+			return m.applyOptionsToStats(stats)
+		}
+		// Log the error and fallback to command
+		m.Logger().Debugf("Aggregation failed, falling back to command: %v", err)
+	}
+
+	// Use legacy command for older versions or as fallback
+	stats, err := m.fetchCollStatsCommand(client, dbName, collectionName)
+	if err != nil {
+		return nil, err
+	}
+	return m.applyOptionsToStats(stats)
+}
+
+// fetchCollStatsAggregation uses the $collStats aggregation stage (MongoDB 6.2+)
+func (m *Metricset) fetchCollStatsAggregation(client *mongo.Client, dbName, collectionName string) (map[string]interface{}, error) {
+	collection := client.Database(dbName).Collection(collectionName)
+	ctx := context.Background()
+
+	// Build $collStats stage dynamically (reference: mongosh capabilities)
+	storageStatsOptions := bson.D{}
+	if m.options.Scale != 1 && m.options.Scale != 0 {
+		storageStatsOptions = append(storageStatsOptions, bson.E{Key: "scale", Value: m.options.Scale})
+	}
+
+	collStatsOptions := bson.D{{Key: "storageStats", Value: storageStatsOptions}}
+	// Always request count (fast doc count path)
+	collStatsOptions = append(collStatsOptions, bson.E{Key: "count", Value: bson.D{}})
+
+	// Build aggregation pipeline with $collStats as first stage. The output structure differs
+	// from the legacy collStats command (most fields are nested under storageStats). We will
+	// flatten the result afterwards to keep the rest of the pipeline unchanged.
+	pipeline := mongo.Pipeline{{{Key: "$collStats", Value: collStatsOptions}}}
+
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, fmt.Errorf("aggregation failed for database=%s, collection=%s: %w", dbName, collectionName, err)
+	}
+	defer cursor.Close(ctx)
+
+	var results []map[string]interface{}
+	if err := cursor.All(ctx, &results); err != nil {
+		return nil, fmt.Errorf("could not decode aggregation results: %w", err)
+	}
+
+	if len(results) == 0 {
+		return nil, fmt.Errorf("no results from collStats aggregation")
+	}
+
+	// Handle sharded collections by merging statistics from multiple shards
+	// Flatten each result (handles both sharded and non-sharded outputs)
+	for i := range results {
+		results[i] = flattenAggregationResult(results[i])
+	}
+
+	if len(results) == 1 {
+		return results[0], nil
+	}
+
+	mergedResult, err := mergeShardedCollStats(results)
+	if err != nil {
+		return nil, fmt.Errorf("failed to merge sharded collection stats: %w", err)
+	}
+	return mergedResult, nil
+}
+
+// fetchCollStatsCommand uses the legacy collStats command (pre-6.2 and fallback)
+func (m *Metricset) fetchCollStatsCommand(client *mongo.Client, dbName, collectionName string) (map[string]interface{}, error) {
 	db := client.Database(dbName)
-	collStats := db.RunCommand(context.Background(), bson.M{"collStats": collectionName})
+
+	// Build command with options
+	command := bson.M{"collStats": collectionName}
+
+	// Add scale parameter if not default
+	if m.options.Scale != 1 {
+		command["scale"] = m.options.Scale
+	}
+
+	collStats := db.RunCommand(context.Background(), command)
 	if err := collStats.Err(); err != nil {
 		return nil, fmt.Errorf("collStats command failed: %w", err)
 	}
@@ -172,4 +291,359 @@ func fetchCollStats(client *mongo.Client, dbName, collectionName string) (map[st
 	}
 
 	return statsRes, nil
+}
+
+// applyOptionsToStats applies post-processing options to collected statistics
+func (m *Metricset) applyOptionsToStats(stats map[string]interface{}) (map[string]interface{}, error) {
+	if stats == nil {
+		return stats, nil
+	}
+
+	// We rely on server-side scaling only; do NOT re-scale client side to avoid double scaling.
+	// Ensure avgObjSize remains untouched (server always reports real value).
+	return stats, nil
+}
+
+// mergeShardedCollStats merges collection statistics from multiple shards
+func mergeShardedCollStats(shardResults []map[string]interface{}) (map[string]interface{}, error) {
+	if len(shardResults) == 0 {
+		return nil, fmt.Errorf("no shard results to merge")
+	}
+
+	// Start with the first shard's result as the base
+	merged := make(map[string]interface{})
+	for key, value := range shardResults[0] {
+		merged[key] = value
+	}
+
+	// Fields that should be summed across shards
+	sumFields := []string{
+		"count", "size", "storageSize", "totalIndexSize", "totalSize",
+		"indexSizes", "numOrphanDocs",
+	}
+
+	// Fields that should be averaged across shards (weighted by count if available)
+	avgFields := []string{
+		"avgObjSize",
+	}
+
+	// Fields that should be taken from the maximum across shards
+	maxFields := []string{
+		"maxSize", "max",
+	}
+
+	// Fields that represent shard-specific information to be preserved
+	shardSpecificFields := []string{
+		"shard", "host", "localTime",
+	}
+
+	// Initialize counters for summable fields
+	sums := make(map[string]float64)
+	counts := make(map[string]int)
+	maxValues := make(map[string]float64)
+	totalDocCount := float64(0)
+
+	// Collect shard information for detailed breakdown
+	shards := make([]map[string]interface{}, 0, len(shardResults))
+
+	// Process each shard result
+	for _, shardResult := range shardResults {
+		// Store shard-specific information
+		shardInfo := make(map[string]interface{})
+		for _, field := range shardSpecificFields {
+			if value, exists := shardResult[field]; exists {
+				shardInfo[field] = value
+			}
+		}
+
+		// Add key statistics to shard info
+		if count, exists := shardResult["count"]; exists {
+			shardInfo["count"] = count
+		}
+		if size, exists := shardResult["size"]; exists {
+			shardInfo["size"] = size
+		}
+		if storageSize, exists := shardResult["storageSize"]; exists {
+			shardInfo["storageSize"] = storageSize
+		}
+
+		shards = append(shards, shardInfo)
+
+		// Sum the summable fields
+		for _, field := range sumFields {
+			if value, exists := shardResult[field]; exists {
+				if numValue, ok := convertToFloat64(value); ok {
+					sums[field] += numValue
+					counts[field]++
+				}
+			}
+		}
+
+		// Track max values
+		for _, field := range maxFields {
+			if value, exists := shardResult[field]; exists {
+				if numValue, ok := convertToFloat64(value); ok {
+					if numValue > maxValues[field] {
+						maxValues[field] = numValue
+					}
+				}
+			}
+		}
+
+		// Track document count for averaging
+		if count, exists := shardResult["count"]; exists {
+			if numCount, ok := convertToFloat64(count); ok {
+				totalDocCount += numCount
+			}
+		}
+	}
+
+	// Apply summed values to merged result
+	for field, sum := range sums {
+		if counts[field] > 0 {
+			// Convert back to appropriate type (int64 for counts, float64 for sizes)
+			switch field {
+			case "count", "numOrphanDocs":
+				merged[field] = int64(sum)
+			default:
+				merged[field] = sum
+			}
+		}
+	}
+
+	// Apply max values
+	for field, maxVal := range maxValues {
+		merged[field] = maxVal
+	}
+
+	// Calculate weighted averages
+	for _, field := range avgFields {
+		if totalDocCount > 0 {
+			weightedSum := float64(0)
+			for _, shardResult := range shardResults {
+				if avgValue, exists := shardResult[field]; exists {
+					if count, countExists := shardResult["count"]; countExists {
+						if numAvg, ok1 := convertToFloat64(avgValue); ok1 {
+							if numCount, ok2 := convertToFloat64(count); ok2 {
+								weightedSum += numAvg * numCount
+							}
+						}
+					}
+				}
+			}
+			merged[field] = weightedSum / totalDocCount
+		} else {
+			// Align with mongosh behavior: set 0 when there are no documents across shards
+			merged[field] = 0
+		}
+	}
+
+	// Handle indexSizes specially (it's typically a sub-document)
+	if len(shardResults) > 0 {
+		if indexSizes, exists := shardResults[0]["indexSizes"]; exists {
+			if _, ok := indexSizes.(map[string]interface{}); ok {
+				mergedIndexSizes := make(map[string]interface{})
+
+				// Get all unique index names
+				allIndexes := make(map[string]bool)
+				for _, shardResult := range shardResults {
+					if shardIndexSizes, exists := shardResult["indexSizes"]; exists {
+						if shardIndexMap, ok := shardIndexSizes.(map[string]interface{}); ok {
+							for indexName := range shardIndexMap {
+								allIndexes[indexName] = true
+							}
+						}
+					}
+				}
+
+				// Sum each index size across shards
+				for indexName := range allIndexes {
+					indexSum := float64(0)
+					for _, shardResult := range shardResults {
+						if shardIndexSizes, exists := shardResult["indexSizes"]; exists {
+							if shardIndexMap, ok := shardIndexSizes.(map[string]interface{}); ok {
+								if indexSize, indexExists := shardIndexMap[indexName]; indexExists {
+									if numSize, ok := convertToFloat64(indexSize); ok {
+										indexSum += numSize
+									}
+								}
+							}
+						}
+					}
+					mergedIndexSizes[indexName] = indexSum
+				}
+				merged["indexSizes"] = mergedIndexSizes
+			}
+		}
+	}
+
+	// Add shard breakdown information
+	merged["shards"] = shards
+	merged["shardCount"] = len(shardResults)
+
+	// Remove shard-specific fields from the merged result (they're in the shards array now)
+	for _, field := range shardSpecificFields {
+		delete(merged, field)
+	}
+
+	return merged, nil
+}
+
+// convertToFloat64 safely converts various numeric types to float64
+func convertToFloat64(value interface{}) (float64, bool) {
+	switch v := value.(type) {
+	case float64:
+		return v, true
+	case float32:
+		return float64(v), true
+	case int:
+		return float64(v), true
+	case int8:
+		return float64(v), true
+	case int16:
+		return float64(v), true
+	case int32:
+		return float64(v), true
+	case int64:
+		return float64(v), true
+	case uint:
+		return float64(v), true
+	case uint8:
+		return float64(v), true
+	case uint16:
+		return float64(v), true
+	case uint32:
+		return float64(v), true
+	case uint64:
+		return float64(v), true
+	default:
+		return 0, false
+	}
+}
+
+// flattenAggregationResult flattens the $collStats aggregation output (storageStats sub-document)
+// to resemble the legacy collStats command result expected by existing mapping logic.
+func flattenAggregationResult(result map[string]interface{}) map[string]interface{} {
+	if result == nil {
+		return result
+	}
+
+	storageStatsRaw, ok := result["storageStats"]
+	if !ok {
+		return result // already flat (legacy or unexpected format)
+	}
+
+	storageStats, ok := storageStatsRaw.(map[string]interface{})
+	if !ok {
+		return result
+	}
+
+	// Copy selected known fields up if not already present.
+	keysToLift := []string{
+		"size", "count", "avgObjSize", "storageSize", "totalIndexSize", "totalSize",
+		"max", "maxSize", "nindexes", "indexDetails", "indexSizes", "scaleFactor",
+		// Newly lifted optional fields
+		"freeStorageSize", "capped", "numOrphanDocs",
+	}
+	for _, k := range keysToLift {
+		if _, exists := result[k]; !exists {
+			if v, ok2 := storageStats[k]; ok2 {
+				result[k] = v
+			}
+		}
+	}
+
+	// Some deployments provide count only via storageStats; ensure top-level count.
+	if _, exists := result["count"]; !exists {
+		if v, ok := storageStats["count"]; ok {
+			result["count"] = v
+		}
+	}
+
+	// Add scaleFactor if absent
+	// MongoDB 6.2+ $collStats aggregation with scale parameter includes scaleFactor in the output
+	if _, exists := result["scaleFactor"]; !exists {
+		// Check if scaleFactor exists in storageStats (when scale is used in aggregation)
+		if sf, ok := storageStats["scaleFactor"]; ok {
+			result["scaleFactor"] = sf
+		} else {
+			// Default to 1 if no scale was applied
+			result["scaleFactor"] = 1
+		}
+	}
+
+	return result
+}
+
+// getMongoDBVersion retrieves the MongoDB server version
+func getMongoDBVersion(client *mongo.Client) (string, error) {
+	db := client.Database("admin")
+	result := db.RunCommand(context.Background(), bson.M{"buildInfo": 1})
+	if err := result.Err(); err != nil {
+		return "", fmt.Errorf("buildInfo command failed: %w", err)
+	}
+
+	var buildInfo map[string]interface{}
+	if err := result.Decode(&buildInfo); err != nil {
+		return "", fmt.Errorf("could not decode buildInfo: %w", err)
+	}
+
+	version, ok := buildInfo["version"].(string)
+	if !ok {
+		return "", fmt.Errorf("version field not found in buildInfo")
+	}
+
+	return version, nil
+}
+
+// isVersionAtLeast checks if the current version is at least the target version
+func isVersionAtLeast(current, target string) bool {
+	// Handle unknown or error cases
+	if current == "" || current == "unknown" {
+		return false
+	}
+
+	currentParts := parseVersion(current)
+	targetParts := parseVersion(target)
+
+	// Compare major, minor, patch
+	for i := 0; i < 3 && i < len(currentParts) && i < len(targetParts); i++ {
+		if currentParts[i] > targetParts[i] {
+			return true
+		}
+		if currentParts[i] < targetParts[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// parseVersion extracts major, minor, patch numbers from version string
+func parseVersion(version string) []int {
+	// Remove any pre-release or build metadata (e.g., "6.2.0-rc1" -> "6.2.0")
+	if idx := strings.IndexAny(version, "-+"); idx != -1 {
+		version = version[:idx]
+	}
+
+	parts := strings.Split(version, ".")
+	result := make([]int, 0, 3)
+
+	for i, part := range parts {
+		if i >= 3 {
+			break
+		}
+		if num, err := strconv.Atoi(part); err == nil {
+			result = append(result, num)
+		} else {
+			result = append(result, 0)
+		}
+	}
+
+	// Pad with zeros if needed
+	for len(result) < 3 {
+		result = append(result, 0)
+	}
+
+	return result
 }
