@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -86,6 +87,9 @@ type diskQueue struct {
 	// The channel to report that shutdown is finished, used by
 	// (*diskQueue).Done.
 	done chan struct{}
+
+	// Ensure we only close the close channel once, even when Close is called multiple times.
+	closeOnce sync.Once
 }
 
 // FactoryForSettings is a simple wrapper around NewQueue so a concrete
@@ -248,10 +252,14 @@ func NewQueue(
 // diskQueue implementation of the queue.Queue interface
 //
 
-func (dq *diskQueue) Close() error {
+func (dq *diskQueue) Close(_ bool) error {
 	// Closing the done channel signals to the core loop that it should
 	// shut down the other helper goroutines and wrap everything up.
-	close(dq.close)
+	dq.closeOnce.Do(
+		func() {
+			close(dq.close)
+		},
+	)
 
 	return nil
 }

@@ -126,10 +126,12 @@ func (l *runLoop) runIteration() {
 
 	select {
 	case <-l.broker.closeChan:
-		l.closing = true
-		close(l.broker.closingChan)
-		// Get requests are handled immediately during shutdown
-		l.maybeUnblockGetRequest()
+		if !l.closing {
+			l.closing = true
+			close(l.broker.closingChan)
+			// Get requests are handled immediately during shutdown
+			l.maybeUnblockGetRequest()
+		}
 
 	case <-l.broker.ctx.Done():
 		// The queue is fully shut down, do nothing

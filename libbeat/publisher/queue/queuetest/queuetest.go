@@ -199,7 +199,7 @@ func runTestCases(t *testing.T, tests []testCase, queueFactory QueueFactory) {
 
 			queue := queueFactory(t)
 			defer func() {
-				err := queue.Close()
+				err := queue.Close(false)
 				if err != nil {
 					t.Error(err)
 				}

@@ -141,7 +141,7 @@ func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
 	// has successfully sent a request to the queue, it must wait for
 	// the response unless the queue shuts down, otherwise the pipeline
 	// event totals will be wrong.
-	q.Close()
+	q.Close(false)
 
 	require.Eventually(
 		t,
@@ -225,7 +225,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 	// to unblock any helpers and verify that the final active event
 	// count isn't negative.
 	time.Sleep(10 * time.Millisecond)
-	q.Close()
+	q.Close(false)
 	assert.False(t, activeEvents.Load() < 0, "active event count should never be negative")
 }
 

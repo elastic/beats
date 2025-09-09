@@ -39,7 +39,10 @@ type Entry interface{}
 type Queue interface {
 	// Close signals the queue to shut down, but it may keep handling requests
 	// and acknowledgments for events that are already in progress.
-	Close() error
+	// Passing force=true causes the queue to drop in-flight events and acks
+	// and free all resources immediately.
+	// Close is idempotent and can be called multiple times safely.
+	Close(force bool) error
 
 	// Done returns a channel that unblocks when the queue is closed and all
 	// its events are persisted or acknowledged.

@@ -239,8 +239,14 @@ func newQueue(
 	return b
 }
 
-func (b *broker) Close() error {
-	b.closeChan <- struct{}{}
+func (b *broker) Close(force bool) error {
+	select {
+	case b.closeChan <- struct{}{}:
+	default:
+	}
+	if force {
+		b.ctxCancel()
+	}
 	return nil
 }
 

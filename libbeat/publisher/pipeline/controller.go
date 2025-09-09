@@ -193,7 +193,7 @@ func (c *outputController) closeQueue(timeout time.Duration) {
 	c.queueLock.Lock()
 	defer c.queueLock.Unlock()
 	if c.queue != nil {
-		c.queue.Close()
+		c.queue.Close(false)
 		select {
 		case <-c.queue.Done():
 		case <-time.After(timeout):
