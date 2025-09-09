@@ -89,12 +89,32 @@ updates:
       - dependency-name: "github.com/microsoft/wmi"
       - dependency-name: "github.com/go-ole/go-ole"
       - dependency-name: "github.com/StackExchange/wmi"
+
+      # meraki
+      - dependency-name: "github.com/go-resty/resty/v2"
+      - dependency-name: "github.com/tomnomnom/linkheader"
+      # haproxy
+      - dependency-name: "github.com/gocarina/gocsv"
+      # salesforce
+      - dependency-name: "github.com/elastic/go-sfdc"
+      # vsphere
+      - dependency-name: "github.com/vmware/govmomi"
+      # redis
+      - dependency-name: "github.com/gomodule/redigo"
+      # panw
+      - dependency-name: "github.com/PaloAltoNetworks/pango"
+      # mongodb
+      - dependency-name: "go.mongodb.org/mongo-driver"
     groups:
       windows:
         patterns:
           - "github.com/microsoft/wmi"
           - "github.com/go-ole/go-ole"
           - "github.com/StackExchange/wmi"
+      meraki:
+        patterns:
+          - "github.com/go-resty/resty/v2"
+          - "github.com/tomnomnom/linkheader"
     open-pull-requests-limit: 5
 
   # Update integration test container images

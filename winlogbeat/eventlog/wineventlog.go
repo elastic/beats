@@ -60,7 +60,7 @@ type winEventLog struct {
 func newWinEventLog(options *conf.C) (EventLog, error) {
 	var err error
 
-	c := config{BatchReadSize: 512}
+	c := defaultConfig()
 	if err := readConfig(options, &c); err != nil {
 		return nil, err
 	}
@@ -117,20 +117,15 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		}
 	}
 
-	switch c.IncludeXML {
+	switch c.IncludeXML || l.isForwarded() {
 	case true:
 		l.renderer = win.NewXMLRenderer(
-			win.RenderConfig{
-				IsForwarded: l.isForwarded(),
-				Locale:      c.EventLanguage,
-			},
+			c.EventLanguage,
+			l.isForwarded(),
 			win.NilHandle, l.log)
 	case false:
 		l.renderer, err = win.NewRenderer(
-			win.RenderConfig{
-				IsForwarded: l.isForwarded(),
-				Locale:      c.EventLanguage,
-			},
+			c.EventLanguage,
 			win.NilHandle, l.log)
 		if err != nil {
 			return nil, err
@@ -158,6 +153,11 @@ func (l *winEventLog) Channel() string {
 // IsFile returns true if the event log is an evtx file.
 func (l *winEventLog) IsFile() bool {
 	return l.file
+}
+
+// IgnoreMissingChannel returns true if missing channels should be ignored.
+func (l *winEventLog) IgnoreMissingChannel() bool {
+	return !l.file && (l.config.IgnoreMissingChannel == nil || *l.config.IgnoreMissingChannel)
 }
 
 func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
