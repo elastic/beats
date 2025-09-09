@@ -71,7 +71,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches disk IO metrics from the OS.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	stats, err := diskio.IOCounters(m.includeDevices...)
+	stats, err := diskio.IOCounters(m.Logger(), m.includeDevices...)
 	if err != nil {
 		return fmt.Errorf("disk io counters: %w", err)
 	}

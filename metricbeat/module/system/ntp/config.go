@@ -23,16 +23,18 @@ import (
 )
 
 type config struct {
-	Servers []string      `config:"ntp.servers,replace"`
-	Timeout time.Duration `config:"ntp.timeout"`
-	Version int           `config:"ntp.version"`
+	Servers  []string      `config:"ntp.servers,replace"`
+	Timeout  time.Duration `config:"ntp.timeout"`
+	Version  int           `config:"ntp.version"`
+	Validate bool          `config:"ntp.validate"`
 }
 
 func defaultConfig() config {
 	return config{
-		Servers: []string{"pool.ntp.org"},
-		Timeout: 5 * time.Second,
-		Version: 4,
+		Servers:  []string{"pool.ntp.org"},
+		Timeout:  5 * time.Second,
+		Version:  4,
+		Validate: true,
 	}
 }
 

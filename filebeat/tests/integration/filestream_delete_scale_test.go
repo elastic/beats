@@ -28,7 +28,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit"
 	"github.com/fsnotify/fsnotify"
 	"github.com/stretchr/testify/require"
 
@@ -65,7 +64,7 @@ func testLargeScaleFilestreamDelete(t *testing.T, timeout time.Duration, nFiles,
 	fb := integration.NewBeat(t, "filebeat", "../../filebeat.test")
 	start := time.Now()
 
-	dir := generateLogFilesScale(t, fb.TempDir(), nFiles, lines)
+	dir := integration.WriteNLogFiles(t, fb.TempDir(), nFiles, lines)
 	elapsed := time.Since(start)
 
 	t.Logf("%d files with %d lines each generated in %s", nFiles, lines, elapsed)
@@ -100,34 +99,8 @@ func testLargeScaleFilestreamDelete(t *testing.T, timeout time.Duration, nFiles,
 		count := deletedCount.Load()
 		fmt.Fprintf(&buff, "%d", count)
 
-		return count == uint64(nFiles) // nolint:gosec // it is always positive
+		return count == uint64(nFiles) //nolint:gosec // it is always positive
 	}, timeout, time.Millisecond*100, "expecting %d deleted files, got: %s", nFiles, &buff)
 
 	t.Logf("Filebeat took %s to remove %d files", time.Since(fbStarted), nFiles)
-}
-
-func generateLogFilesScale(t *testing.T, tempDir string, files, lines int) string {
-	basePath := filepath.Join(tempDir, "logs")
-	if err := os.MkdirAll(basePath, 0777); err != nil {
-		t.Fatalf("cannot create folder to store logs: %s", err)
-	}
-
-	for fCount := range files {
-		path := filepath.Join(basePath, fmt.Sprintf("%06d.log", fCount))
-		f, err := os.Create(path)
-		if err != nil {
-			t.Errorf("cannot create file: %s", err)
-		}
-		for range lines {
-			_, _ = f.WriteString(gofakeit.HackerPhrase() + "\n")
-		}
-		if err := f.Sync(); err != nil {
-			t.Errorf("cannot sync %q: %s", path, err)
-		}
-		if err := f.Close(); err != nil {
-			t.Errorf("cannot close %q: %s", path, err)
-		}
-	}
-
-	return basePath
 }
