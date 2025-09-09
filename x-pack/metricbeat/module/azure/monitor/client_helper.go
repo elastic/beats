@@ -176,7 +176,7 @@ func validateAndGroupByConfiguredAggsAndTimegrain(
 			}
 			if !configuredTimegrainSupported {
 				return nil, fmt.Errorf("the timegrain configured : %s is not "+
-					"supported for some by some of the metrics selected: %s ",
+					"supported by some of the metrics selected: %s ",
 					metricConfig.Timegrain, strings.Join(metricNames, ","))
 			}
 			// Configured timegrain is supported, i.e. compatible
