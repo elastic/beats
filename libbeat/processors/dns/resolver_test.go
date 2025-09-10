@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -38,7 +39,7 @@ func TestNewMiekgResolverWithIPv6(t *testing.T) {
 	const addr = `fe80::1%en0` // Example IPv6 address with zone index.
 
 	reg := monitoring.NewRegistry()
-	_, err := newMiekgResolver(reg.NewRegistry(logName), 0, "udp", addr)
+	_, err := newMiekgResolver(reg.NewRegistry(logName), 0, "udp", logp.NewNopLogger(), addr)
 	assert.NoError(t, err)
 }
 
@@ -52,7 +53,7 @@ func TestMiekgResolverLookupPTR(t *testing.T) {
 	}()
 
 	reg := monitoring.NewRegistry()
-	res, err := newMiekgResolver(reg.NewRegistry(logName), 0, "udp", addr)
+	res, err := newMiekgResolver(reg.NewRegistry(logName), 0, "udp", logp.NewNopLogger(), addr)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,7 +104,7 @@ func TestMiekgResolverLookupPTRTLS(t *testing.T) {
 
 	reg := monitoring.NewRegistry()
 
-	res, err := newMiekgResolver(reg.NewRegistry(logName), 0, "tls", addr)
+	res, err := newMiekgResolver(reg.NewRegistry(logName), 0, "tls", logp.NewNopLogger(), addr)
 	if err != nil {
 		t.Fatal(err)
 	}

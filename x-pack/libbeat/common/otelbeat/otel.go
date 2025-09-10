@@ -7,6 +7,7 @@ package otelbeat
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/spf13/cobra"
@@ -14,6 +15,7 @@ import (
 	"go.opentelemetry.io/collector/confmap"
 	"go.opentelemetry.io/collector/exporter/debugexporter"
 	"go.opentelemetry.io/collector/otelcol"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/fbprovider"
@@ -21,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var schemeMap = map[string]string{
@@ -50,6 +53,7 @@ func OTelCmd(beatname string) *cobra.Command {
 	}
 
 	command.Flags().String("config", beatname+"-otel.yml", "path to "+beatname+" config file")
+	command.AddCommand(OTelInspectComand(beatname))
 	return command
 }
 
@@ -76,6 +80,27 @@ func getComponent() (otelcol.Factories, error) {
 		Exporters: exporters,
 	}, nil
 
+}
+
+func isOtelConfigFile(path string) (bool, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return false, fmt.Errorf("error opening file %s: %w", path, err)
+	}
+	defer f.Close()
+
+	var m mapstr.M
+	if err = yaml.NewDecoder(f).Decode(&m); err != nil {
+		return false, fmt.Errorf("error decoding file %s: %w", path, err)
+	}
+
+	for _, k := range []string{"receivers", "exporters", "service"} {
+		if _, ok := m[k]; ok {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
 
 func getCollectorSettings(filename string) otelcol.CollectorSettings {

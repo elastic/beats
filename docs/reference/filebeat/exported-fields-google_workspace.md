@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# google_workspace fields [exported-fields-google_workspace]
+# Google Workspace fields [exported-fields-google_workspace]
 
 Google Workspace Module
 

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-mongodb.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # MongoDB module [filebeat-module-mongodb]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -84,7 +86,6 @@ This module comes with one sample dashboard including error and regular logs.
 % TO DO: Use `:class: screenshot`
 ![filebeat mongodb overview](images/filebeat-mongodb-overview.png)
 
-
-## Fields [_fields_31]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-mongodb.md) section.

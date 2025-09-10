@@ -53,10 +53,10 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the translate_ldap_attribute configuration: %w", err)
 	}
 
-	return newFromConfig(c)
+	return newFromConfig(c, log)
 }
 
-func newFromConfig(c config) (*processor, error) {
+func newFromConfig(c config, logger *logp.Logger) (*processor, error) {
 	ldapConfig := &ldapConfig{
 		address:         c.LDAPAddress,
 		baseDN:          c.LDAPBaseDN,
@@ -67,7 +67,7 @@ func newFromConfig(c config) (*processor, error) {
 		searchTimeLimit: c.LDAPSearchTimeLimit,
 	}
 	if c.LDAPTLS != nil {
-		tlsConfig, err := tlscommon.LoadTLSConfig(c.LDAPTLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(c.LDAPTLS, logger)
 		if err != nil {
 			return nil, fmt.Errorf("could not load provided LDAP TLS configuration: %w", err)
 		}

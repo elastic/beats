@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-mysqlenterprise.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # MySQL Enterprise module [filebeat-module-mysqlenterprise]
 
 ::::{warning}
@@ -77,7 +79,6 @@ MySQL Enterprise Audit fields are mapped to ECS in the following way:
 | connection_attributes._pid | process.pid |
 | timestamp | @timestamp |
 
-
-## Fields [_fields_34]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-mysqlenterprise.md) section.

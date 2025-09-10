@@ -9,7 +9,6 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/ccm"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 )
@@ -66,7 +65,7 @@ func newAutoOpsMetricSet[T any](base mb.BaseMetricSet, routePath string, mapper 
 	if !checkedCloudConnectedMode {
 		checkedCloudConnectedMode = true
 
-		if err := ccm.MaybeRegisterCloudConnectedCluster(ms, GetInfo); err != nil {
+		if err := maybeRegisterCloudConnectedCluster(ms, GetInfo); err != nil {
 			return nil, fmt.Errorf("failed to register Cloud Connected Mode: %w", err)
 		}
 	}

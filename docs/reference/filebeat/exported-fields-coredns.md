@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# Coredns fields [exported-fields-coredns]
+# CoreDNS fields [exported-fields-coredns]
 
 Module for handling logs produced by coredns
 

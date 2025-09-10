@@ -6,6 +6,8 @@ applies_to:
   stack: beta
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Istio istiod metricset [metricbeat-metricset-istio-istiod]
 
 ::::{warning}
@@ -17,8 +19,7 @@ This is the istiod metricset of the module istio. This metricset collects metric
 
 Tested with Istio 1.7
 
-## Fields [_fields_122]
+## Fields [_fields]
 
 For a description of each field in the metricset, see the [exported fields](/reference/metricbeat/exported-fields-istio.md) section.
-
 

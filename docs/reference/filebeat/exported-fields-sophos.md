@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# sophos fields [exported-fields-sophos]
+# Sophos fields [exported-fields-sophos]
 
 sophos Module
 

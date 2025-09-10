@@ -104,7 +104,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		err = getDeviceVPNStatuses(m.client, org, devices)
 		if err != nil {
-			m.logger.Errorf("GetVPNStatuses failed; %w", err)
+			m.logger.Errorf("GetVPNStatuses failed; %v", err)
 			// continue so we still report the rest of the device health metrics
 		}
 

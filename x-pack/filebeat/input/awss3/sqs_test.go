@@ -20,6 +20,7 @@ import (
 	"go.uber.org/mock/gomock"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -31,8 +32,6 @@ var (
 )
 
 func TestSQSReceiver(t *testing.T) {
-	err := logp.TestingSetup()
-	require.NoError(t, err)
 
 	const workerCount = 5
 
@@ -101,6 +100,7 @@ func TestSQSReceiver(t *testing.T) {
 		sqsReader.metrics = newInputMetrics("", nil, 0)
 		sqsReader.pipeline = &fakePipeline{}
 		sqsReader.msgHandler = mockMsgHandler
+		sqsReader.status = &statusReporterHelperMock{}
 		sqsReader.run(ctx)
 
 		select {
@@ -149,13 +149,12 @@ func TestSQSReceiver(t *testing.T) {
 		sqsReader.msgHandler = mockMsgHandler
 		sqsReader.metrics = newInputMetrics("", nil, 0)
 		sqsReader.pipeline = &fakePipeline{}
+		sqsReader.status = &statusReporterHelperMock{}
 		sqsReader.run(ctx)
 	})
 }
 
 func TestGetApproximateMessageCount(t *testing.T) {
-	err := logp.TestingSetup()
-	require.NoError(t, err)
 
 	const count = 500
 	attrName := []types.QueueAttributeName{sqsApproximateNumberOfMessages}
@@ -316,4 +315,40 @@ func TestCancelWithGrace(t *testing.T) {
 	if waited.Round(tol) != wait {
 		t.Errorf("unexpected wait time between parent and child cancellation: got=%v want=%v", waited, wait)
 	}
+}
+
+func TestReadSQSMessagesStatusUpdates(t *testing.T) {
+	ctrl := gomock.NewController(t)
+
+	mockSQS := NewMockSQSAPI(ctrl)
+	statusReporter := &statusReporterHelperMock{}
+	log := logp.NewLogger("awss3_test")
+	ctx := context.Background()
+	metrics := newInputMetrics("", nil, 0)
+
+	// assuming we're entering this function with a running state from outside the func
+	startingRunningMsg := "We've started running somewhere else"
+	statusReporter.UpdateStatus(status.Running, startingRunningMsg)
+
+	// First call to ReceiveMessage returns an error, status should become Degraded
+	mockSQS.EXPECT().ReceiveMessage(ctx, 1).Return(nil, errors.New("fake connectivity issue"))
+
+	// Second call to ReceiveMessage succeeds, status should become Running
+	// contains 2 empty messages
+	mockSQS.EXPECT().ReceiveMessage(ctx, 1).Return([]types.Message{{}, {}}, nil)
+
+	readSQSMessages(ctx, log, statusReporter, mockSQS, metrics, 1, "test-queue")
+	statuses := statusReporter.getStatuses()
+	assert.Len(t, statuses, 3)
+
+	// assert each of the 3 statuses and their messages
+	assert.Equal(t, status.Running, statuses[0].status)
+	assert.Equal(t, startingRunningMsg, statuses[0].msg)
+
+	assert.Equal(t, status.Degraded, statuses[1].status)
+	assert.Contains(t, statuses[1].msg, "Retryable SQS fetching error for queue")
+	assert.Contains(t, statuses[1].msg, "fake connectivity issue")
+
+	assert.Equal(t, status.Running, statuses[2].status)
+	assert.Equal(t, "Input is running", statuses[2].msg)
 }

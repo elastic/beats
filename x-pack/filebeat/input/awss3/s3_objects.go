@@ -65,7 +65,12 @@ const (
 // retry backoff until the connection is healthy again.
 var errS3DownloadFailed = errors.New("S3 download failure")
 
-func newS3ObjectProcessorFactory(metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
+func newS3ObjectProcessorFactory(metrics *inputMetrics,
+	s3 s3API,
+	sel []fileSelectorConfig,
+	backupConfig backupConfig,
+	logger *logp.Logger,
+) *s3ObjectProcessorFactory {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
 		metrics = newInputMetrics("", nil, 0)
@@ -159,7 +164,7 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 	}
 
 	// try to create a dec from the using the codec config
-	dec, err := newDecoder(p.readerConfig.Decoding, streamReader)
+	dec, err := newDecoder(p.readerConfig.Decoding, streamReader, log)
 	if err != nil {
 		return err
 	}

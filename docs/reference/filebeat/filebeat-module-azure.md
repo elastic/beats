@@ -3,7 +3,13 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-azure.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Azure module [filebeat-module-azure]
+
+::::{warning}
+This module is not available in FIPS-capable Filebeat.
+::::
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/azure/index.md).
@@ -121,8 +127,6 @@ The azure module comes with several predefined dashboards for general cloud over
 
 ![filebeat azure overview](images/filebeat-azure-overview.png)
 
-
-## Fields [_fields_8]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-azure.md) section.
-

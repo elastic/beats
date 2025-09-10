@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# CyberArk PAS fields [exported-fields-cyberarkpas]
+# Cyberark PAS fields [exported-fields-cyberarkpas]
 
 cyberarkpas fields.
 

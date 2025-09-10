@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# Zeek fields [exported-fields-zeek]
+# Zeek (Bro) fields [exported-fields-zeek]
 
 Module for handling logs produced by Zeek/Bro
 

@@ -784,7 +784,7 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
 func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry) (*http.Client, *httplog.LoggingRoundTripper, error) {
-	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings())...)
+	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings(), log)...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -862,7 +862,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	}
 
 	if reg != nil {
-		c.Transport = httpmon.NewMetricsRoundTripper(c.Transport, reg)
+		c.Transport = httpmon.NewMetricsRoundTripper(c.Transport, reg, log)
 	}
 
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
@@ -908,7 +908,7 @@ func wantClient(cfg config) bool {
 
 // clientOption returns constructed client configuration options, including
 // setting up http+unix and http+npipe transports if requested.
-func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []httpcommon.TransportOption {
+func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings, log *logp.Logger) []httpcommon.TransportOption {
 	scheme, trans, ok := strings.Cut(u.Scheme, "+")
 	var dialer transport.Dialer
 	switch {
@@ -916,6 +916,7 @@ func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []htt
 		fallthrough
 	case !ok:
 		return []httpcommon.TransportOption{
+			httpcommon.WithLogger(log),
 			httpcommon.WithAPMHTTPInstrumentation(),
 			keepalive,
 		}
@@ -934,6 +935,7 @@ func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []htt
 	}
 	u.Scheme = scheme
 	return []httpcommon.TransportOption{
+		httpcommon.WithLogger(log),
 		httpcommon.WithAPMHTTPInstrumentation(),
 		keepalive,
 		httpcommon.WithBaseDialer(dialer),
@@ -1303,9 +1305,10 @@ func newInputMetrics(id string) (*inputMetrics, *monitoring.Registry) {
 		celProcessingTime:   metrics.NewUniformSample(1024),
 		batchProcessingTime: metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "cel_processing_time", adapter.Accept).
+	logger := logp.NewLogger("")
+	_ = adapter.NewGoMetrics(reg, "cel_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.celProcessingTime))
-	_ = adapter.NewGoMetrics(reg, "batch_processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
 
 	return out, reg

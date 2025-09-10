@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# ibmmq fields [exported-fields-ibmmq]
+# IBM MQ fields [exported-fields-ibmmq]
 
 ibmmq Module
 

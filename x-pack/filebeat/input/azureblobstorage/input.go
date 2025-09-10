@@ -24,6 +24,7 @@ import (
 type azurebsInput struct {
 	config     config
 	serviceURL string
+	logger     *logp.Logger
 }
 
 // defines the valid range for Unix timestamps for 64 bit integers
@@ -80,6 +81,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 			ExpandEventListFromField: container.ExpandEventListFromField,
 			FileSelectors:            container.FileSelectors,
 			ReaderConfig:             container.ReaderConfig,
+			PathPrefix:               container.PathPrefix,
 		})
 	}
 
@@ -92,7 +94,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	} else {
 		urL = "https://" + config.AccountName + ".blob.core.windows.net/"
 	}
-	return sources, &azurebsInput{config: config, serviceURL: urL}, nil
+	return sources, &azurebsInput{config: config, serviceURL: urL, logger: logp.NewLogger("")}, nil
 }
 
 // tryOverrideOrDefault, overrides global values with local
@@ -153,6 +155,11 @@ func tryOverrideOrDefault(cfg config, c container) container {
 	// and container level is not supported, it's an either or scenario.
 	if reflect.DeepEqual(c.ReaderConfig, defaultReaderConfig) {
 		c.ReaderConfig = cfg.ReaderConfig
+	}
+
+	// If the container level PathPrefix is empty, use the global PathPrefix.
+	if c.PathPrefix == "" {
+		c.PathPrefix = cfg.PathPrefix
 	}
 
 	return c

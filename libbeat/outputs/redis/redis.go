@@ -100,7 +100,7 @@ func makeRedis(
 		return outputs.Fail(err)
 	}
 
-	tls, err := tlscommon.LoadTLSConfig(rConfig.TLS)
+	tls, err := tlscommon.LoadTLSConfig(rConfig.TLS, beat.Logger)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -144,7 +144,7 @@ func makeRedis(
 			}
 		}
 
-		conn, err := transport.NewClient(transp, "tcp", hostUrl.Host, defaultPort)
+		conn, err := transport.NewClient(transp, "tcp", hostUrl.Host, defaultPort, beat.Logger)
 		if err != nil {
 			return outputs.Fail(err)
 		}

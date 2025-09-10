@@ -47,7 +47,7 @@ func (p *paginator[T]) GetAllPages() error {
 		val, res, err := p.doRequest()
 
 		if err != nil {
-			p.logger.Debugf("onError; err: %w, res: %s", err, res)
+			p.logger.Debugf("onError; err: %v, res: %s", err, res)
 			return p.onError(err, res)
 		}
 

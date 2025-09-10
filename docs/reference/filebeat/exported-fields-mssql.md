@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# mssql fields [exported-fields-mssql]
+# MSSQL fields [exported-fields-mssql]
 
 MS SQL Filebeat Module
 

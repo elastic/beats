@@ -119,7 +119,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 		return err
 	}
 
-	log.Debugf("%s Input '%v' initialized", s.config.Config.SocketType, ctx.ID)
+	log.Debugf("%v Input '%v' initialized", s.config.Config.SocketType, ctx.ID)
 
 	err = server.Run(ctxtool.FromCanceller(ctx.Cancelation))
 
@@ -158,9 +158,9 @@ func newInputMetrics(id, path string, log *logp.Logger) *inputMetrics {
 		arrivalPeriod:  metrics.NewUniformSample(1024),
 		processingTime: metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "arrival_period", log, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
-	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", log, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))
 
 	out.path.Set(path)

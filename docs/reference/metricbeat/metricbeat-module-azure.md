@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-azure.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Azure module [metricbeat-module-azure]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -153,7 +155,7 @@ Costs: Metric queries are charged based on the number of standard API calls. Mor
 Authentication: we are handling authentication on our side (creating/renewing the authentication token), so we advise users to use dedicated credentials for metricbeat only.
 
 
-### Example configuration [_example_configuration_7]
+## Example configuration [_example_configuration]
 
 The Azure module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -274,7 +276,7 @@ metricbeat.modules:
 ```
 
 
-### Metricsets [_metricsets_11]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
@@ -289,15 +291,3 @@ The following metricsets are available:
 * [database_account](/reference/metricbeat/metricbeat-metricset-azure-database_account.md)
 * [monitor](/reference/metricbeat/metricbeat-metricset-azure-monitor.md)
 * [storage](/reference/metricbeat/metricbeat-metricset-azure-storage.md)
-
-
-
-
-
-
-
-
-
-
-
-

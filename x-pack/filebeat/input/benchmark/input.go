@@ -172,7 +172,7 @@ func newInputMetrics(ctx v2.Context) *inputMetrics {
 		publishingTime:  metrics.NewUniformSample(1024),
 	}
 
-	_ = adapter.NewGoMetrics(ctx.MetricsRegistry, "publishing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(ctx.MetricsRegistry, "publishing_time", ctx.Logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.publishingTime))
 
 	return out

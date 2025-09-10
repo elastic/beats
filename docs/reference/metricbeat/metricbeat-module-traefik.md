@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-traefik.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Traefik module [metricbeat-module-traefik]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -25,7 +27,7 @@ This module periodically fetches metrics from a [Traefik](https://traefik.io/) i
 The Traefik metricsets were tested with Traefik 1.6.
 
 
-## Example configuration [_example_configuration_65]
+## Example configuration [_example_configuration]
 
 The Traefik module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -40,10 +42,8 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_75]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [health](/reference/metricbeat/metricbeat-metricset-traefik-health.md)
-
-

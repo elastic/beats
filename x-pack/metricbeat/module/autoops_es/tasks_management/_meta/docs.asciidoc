@@ -1,3 +1,0 @@
-The `tasks_management` metricset.
-
-Main API: https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-tasks-list

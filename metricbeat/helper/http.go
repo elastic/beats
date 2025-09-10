@@ -26,6 +26,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
 
@@ -58,11 +59,11 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 		return nil, err
 	}
 
-	return NewHTTPFromConfig(config, base.HostData())
+	return NewHTTPFromConfig(config, base.HostData(), base.Logger())
 }
 
 // NewHTTPFromConfig newHTTPWithConfig creates a new http helper from some configuration
-func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
+func NewHTTPFromConfig(config Config, hostData mb.HostData, logger *logp.Logger) (*HTTP, error) {
 	headers := http.Header{}
 	if config.Headers == nil {
 		config.Headers = map[string]string{}
@@ -83,6 +84,8 @@ func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
 	}
 
 	client, err := config.Transport.Client(
+		// also sets a local logger for use by http transport
+		httpcommon.WithLogger(logger),
 		httpcommon.WithBaseDialer(dialer),
 		httpcommon.WithAPMHTTPInstrumentation(),
 		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),

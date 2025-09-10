@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# mongodb fields [exported-fields-mongodb]
+# MongoDB fields [exported-fields-mongodb]
 
 Module for parsing MongoDB log files.
 

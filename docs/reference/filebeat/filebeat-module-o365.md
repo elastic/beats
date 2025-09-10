@@ -3,12 +3,17 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-o365.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Office 365 module [filebeat-module-o365]
 
 ::::{warning}
 This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
 ::::
 
+::::{warning}
+This module is not available in FIPS-capable Filebeat.
+::::
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/o365/index.md).
@@ -187,7 +192,6 @@ This module comes with a sample dashboard:
 % TO DO: Use `:class: screenshot`
 ![filebeat o365 audit](images/filebeat-o365-audit.png)
 
-
-## Fields [_fields_38]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-o365.md) section.

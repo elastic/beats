@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-jolokia.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Jolokia module [metricbeat-module-jolokia]
 
 This module collects metrics from [Jolokia agents](https://jolokia.org/reference/html/agents.md) running on a target JMX server or dedicated proxy server. The default metricset is `jmx`.
@@ -15,7 +17,7 @@ To collect metrics, Metricbeat communicates with a Jolokia HTTP/REST endpoint th
 The Jolokia module is tested with Jolokia 1.5.0. It should work with version 1.2.2 and later.
 
 
-## Example configuration [_example_configuration_34]
+## Example configuration [_example_configuration]
 
 The Jolokia module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -55,10 +57,8 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_40]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [jmx](/reference/metricbeat/metricbeat-metricset-jolokia-jmx.md)
-
-

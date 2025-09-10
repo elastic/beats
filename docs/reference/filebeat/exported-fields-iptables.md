@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# iptables fields [exported-fields-iptables]
+# Iptables fields [exported-fields-iptables]
 
 Module for handling the iptables logs.
 

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-activemq.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # ActiveMQ module [filebeat-module-activemq]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -106,7 +108,6 @@ The ActiveMQ module comes with several predefined dashboards for application and
 
 ![filebeat activemq audit events](images/filebeat-activemq-audit-events.png)
 
-
-## Fields [_fields_3]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-activemq.md) section.

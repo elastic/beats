@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-panw.html
 ---
 
+% This file is generated! See scripts/docs_collector.py
+
 # Palo Alto Networks module [filebeat-module-panw]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -196,7 +198,6 @@ This module comes with two sample dashboards:
 % TO DO: Use `:class: screenshot`
 ![filebeat panw threat](images/filebeat-panw-threat.png)
 
-
-## Fields [_fields_42]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-panw.md) section.
