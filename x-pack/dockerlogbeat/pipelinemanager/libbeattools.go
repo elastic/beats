@@ -42,7 +42,7 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 		return nil, fmt.Errorf("unpacking config failed: %w", err)
 	}
 
-	info, err := getBeatInfo(logOptsConfig, hostname)
+	info, err := getBeatInfo(logOptsConfig, hostname, log)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 }
 
 // getBeatInfo returns the beat.Info type needed to start the pipeline
-func getBeatInfo(pluginOpts ContainerOutputConfig, hostname string) (beat.Info, error) {
+func getBeatInfo(pluginOpts ContainerOutputConfig, hostname string, logger *logp.Logger) (beat.Info, error) {
 	vers := version.GetDefaultVersion()
 
 	eid, err := uuid.NewV4()
@@ -113,6 +113,7 @@ func getBeatInfo(pluginOpts ContainerOutputConfig, hostname string) (beat.Info, 
 		Version:     vers,
 		EphemeralID: eid,
 		ID:          id,
+		Logger:      logger,
 	}
 
 	return info, nil
