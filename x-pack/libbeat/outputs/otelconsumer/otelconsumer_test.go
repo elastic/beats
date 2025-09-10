@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"go.opentelemetry.io/collector/client"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/client"
@@ -36,6 +38,8 @@ func TestPublish(t *testing.T) {
 	event3 := beat.Event{Fields: mapstr.M{"field": 3}}
 	event4 := beat.Event{Meta: mapstr.M{"_id": "abc123"}}
 
+	beatInfo := beat.Info{Name: "testbeat", Version: "0.0.0"}
+
 	makeOtelConsumer := func(t *testing.T, consumeFn func(ctx context.Context, ld plog.Logs) error) *otelConsumer {
 		t.Helper()
 
@@ -45,7 +49,7 @@ func TestPublish(t *testing.T) {
 		consumer := &otelConsumer{
 			observer:     outputs.NewNilObserver(),
 			logsConsumer: logConsumer,
-			beatInfo:     beat.Info{},
+			beatInfo:     beatInfo,
 			log:          logger.Named("otelconsumer"),
 		}
 		return consumer
