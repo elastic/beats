@@ -15,6 +15,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const missingMetricDefinitions = "no metric definitions were found for resource %s and namespace %s. Verify if the namespace is spelled correctly or if it is supported by the resource in case"
@@ -58,7 +59,8 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 			}
 
 			//validate aggregations and filter on supported aggregations
-			metricGroups, err := validateAndGroupByConfiguredAggsAndTimegrain(supportedMetricNames, metricConfig, metricDefinitions.Value)
+			metricGroups, err := validateAndGroupByConfiguredAggsAndTimegrain(
+				supportedMetricNames, metricConfig, metricDefinitions.Value, client.Log)
 			if err != nil {
 				return nil, err
 			}
@@ -140,6 +142,7 @@ func validateAndGroupByConfiguredAggsAndTimegrain(
 	metricNames []string,
 	metricConfig azure.MetricConfig,
 	metricDefinitions []*armmonitor.MetricDefinition,
+	logger *logp.Logger,
 ) (map[compositeKey][]*armmonitor.MetricDefinition, error) {
 	var supportedAggregations []string
 	var unsupportedAggregations []string
