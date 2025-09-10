@@ -126,7 +126,23 @@ func (ms *QuarkMetricSet) Run(r mb.PushReporterV2) {
     quarkMonPath := filepath.Join(exeDir, "quark-mon")
 
     // Prepare command: -E for ECS JSON, -s to silence non-JSON output.
-    cmd := exec.Command(quarkMonPath, "-E", "-s")
+    // Also pass -K if KUBECONFIG is available or default kubeconfig exists.
+    args := []string{"-E", "-s"}
+    kubeConfig := os.Getenv("KUBECONFIG")
+    if kubeConfig == "" {
+        if home := os.Getenv("HOME"); home != "" {
+            def := filepath.Join(home, ".kube", "config")
+            if _, err := os.Stat(def); err == nil {
+                kubeConfig = def
+            }
+        }
+    }
+    if kubeConfig != "" {
+        args = append(args, "-K", kubeConfig)
+    }
+    cmd := exec.Command(quarkMonPath, args...)
+    // Inherit the parent env, so external auth helpers/plugins can be found.
+    cmd.Env = os.Environ()
     cmd.Stderr = io.Discard // Silence stderr as requested.
     stdout, err := cmd.StdoutPipe()
     if err != nil {
@@ -182,8 +198,11 @@ MainLoop:
                 ms.log.Debugf("invalid JSON from quark-mon: %v; line=%q", err, string(line))
                 continue
             }
+            // Massage fields to be ECS/mapping-friendly (dates, args, user, etc.).
+            rootM := mapstr.M(root)
+            ms.tuneQuarkMonEvent(rootM)
             // Push as root fields; no transformation.
-            r.Event(mb.Event{RootFields: mapstr.M(root)})
+            r.Event(mb.Event{RootFields: rootM})
             sent++
             if sent%10 == 0 {
                 // Extract last event action/type for brief logging.
@@ -244,6 +263,194 @@ MainLoop:
 
     // Cleanup resources we own.
     ms.cachedHasher.Close()
+}
+
+// tuneQuarkMonEvent massages quark-mon JSON into shapes/types expected by ECS/mappings.
+// - Converts ctime-like strings in process.start/end to time.Time
+// - Maps process.command_line (array) to ECS fields: process.command_line (string) and process.args (array)
+// - Ensures process.args_count is set
+// - Copies process.user.* into root user.* fields (id, name, group, real, saved)
+// - Adds event.category: ["process"]
+// - Computes process.entity_id if HostID and start are available
+func (ms *QuarkMetricSet) tuneQuarkMonEvent(root mapstr.M) {
+    // Ensure event.category
+    if ev, err := root.GetValue("event"); err == nil {
+        if _, ok := ev.(map[string]interface{}); ok {
+            // Only set category if not present.
+            if _, err := root.GetValue("event.category"); err != nil {
+                root.Put("event.category", []string{"process"})
+            }
+        }
+    }
+
+    // Process object handling
+    pAny, err := root.GetValue("process")
+    if err != nil {
+        return
+    }
+    pMap, ok := pAny.(map[string]interface{})
+    if !ok {
+        return
+    }
+    p := mapstr.M(pMap)
+
+    // Parse process.start / process.end if they are ctime-like strings.
+    if v, err := p.GetValue("start"); err == nil {
+        if s, ok := v.(string); ok && s != "" {
+            if ts, ok := parseCTimeLike(s); ok {
+                root.Put("process.start", ts)
+            }
+        }
+    }
+    if v, err := p.GetValue("end"); err == nil {
+        if s, ok := v.(string); ok && s != "" {
+            if ts, ok := parseCTimeLike(s); ok {
+                root.Put("process.end", ts)
+            }
+        }
+    }
+
+    // Map command_line array -> ECS fields
+    if v, err := p.GetValue("command_line"); err == nil {
+        switch vv := v.(type) {
+        case []interface{}:
+            args := make([]string, 0, len(vv))
+            for _, a := range vv {
+                if s, ok := a.(string); ok {
+                    args = append(args, s)
+                }
+            }
+            if len(args) > 0 {
+                // ECS: process.command_line string
+                root.Put("process.command_line", strings.Join(args, " "))
+                // ECS: process.args array
+                root.Put("process.args", args)
+                // ECS: process.args_count
+                root.Put("process.args_count", len(args))
+            }
+        case string:
+            if vv != "" {
+                root.Put("process.command_line", vv)
+            }
+        }
+    }
+
+    // Copy selected process.user fields to root user.*
+    if uAny, err := p.GetValue("user"); err == nil {
+        if uMap, ok := uAny.(map[string]interface{}); ok {
+            u := mapstr.M(uMap)
+            if v, err := u.GetValue("id"); err == nil {
+                root.Put("user.id", v)
+            }
+            if v, err := u.GetValue("name"); err == nil {
+                if s, ok := v.(string); ok && s != "" {
+                    root.Put("user.name", s)
+                }
+            }
+            if gAny, err := u.GetValue("group"); err == nil {
+                if gMap, ok := gAny.(map[string]interface{}); ok {
+                    g := mapstr.M(gMap)
+                    if v, err := g.GetValue("id"); err == nil {
+                        root.Put("user.group.id", v)
+                    }
+                    if v, err := g.GetValue("name"); err == nil {
+                        root.Put("user.group.name", v)
+                    }
+                }
+            }
+            if ruAny, err := u.GetValue("real_user"); err == nil {
+                if ruMap, ok := ruAny.(map[string]interface{}); ok {
+                    ru := mapstr.M(ruMap)
+                    if v, err := ru.GetValue("id"); err == nil {
+                        root.Put("user.real.id", v)
+                    }
+                    if v, err := ru.GetValue("name"); err == nil {
+                        root.Put("user.real.name", v)
+                    }
+                }
+            }
+            if rgAny, err := u.GetValue("real_group"); err == nil {
+                if rgMap, ok := rgAny.(map[string]interface{}); ok {
+                    rg := mapstr.M(rgMap)
+                    if v, err := rg.GetValue("id"); err == nil {
+                        root.Put("user.real.group.id", v)
+                    }
+                    if v, err := rg.GetValue("name"); err == nil {
+                        root.Put("user.real.group.name", v)
+                    }
+                }
+            }
+            if suAny, err := u.GetValue("saved_user"); err == nil {
+                if suMap, ok := suAny.(map[string]interface{}); ok {
+                    su := mapstr.M(suMap)
+                    if v, err := su.GetValue("id"); err == nil {
+                        root.Put("user.saved.id", v)
+                    }
+                    if v, err := su.GetValue("name"); err == nil {
+                        root.Put("user.saved.name", v)
+                    }
+                }
+            }
+            if sgAny, err := u.GetValue("saved_group"); err == nil {
+                if sgMap, ok := sgAny.(map[string]interface{}); ok {
+                    sg := mapstr.M(sgMap)
+                    if v, err := sg.GetValue("id"); err == nil {
+                        root.Put("user.saved.group.id", v)
+                    }
+                    if v, err := sg.GetValue("name"); err == nil {
+                        root.Put("user.saved.group.name", v)
+                    }
+                }
+            }
+        }
+    }
+
+    // Compute process.entity_id if possible
+    var pidInt int
+    if v, err := p.GetValue("pid"); err == nil {
+        switch t := v.(type) {
+        case int:
+            pidInt = t
+        case int32:
+            pidInt = int(t)
+        case int64:
+            pidInt = int(t)
+        case float64:
+            pidInt = int(t)
+        }
+    }
+    if pidInt != 0 {
+        if v, err := root.GetValue("process.start"); err == nil {
+            if ts, ok := v.(time.Time); ok {
+                if ms.HostID() != "" {
+                    root.Put("process.entity_id", entityID(ms.HostID(), pidInt, ts))
+                }
+            }
+        }
+    }
+}
+
+// parseCTimeLike tries multiple layouts to parse strings like "Tue Sep  9 18:51:21 2025".
+func parseCTimeLike(s string) (time.Time, bool) {
+    layouts := []string{
+        "Mon Jan _2 15:04:05 2006",
+        "Mon Jan 2 15:04:05 2006",
+        time.RFC3339,
+        time.RFC822Z,
+        time.RFC822,
+    }
+    for _, l := range layouts {
+        if l == "Mon Jan _2 15:04:05 2006" || l == "Mon Jan 2 15:04:05 2006" {
+            if t, err := time.ParseInLocation(l, s, time.Local); err == nil {
+                return t, true
+            }
+        } else {
+            if t, err := time.Parse(l, s); err == nil {
+                return t, true
+            }
+        }
+    }
+    return time.Time{}, false
 }
 
 // toEvent converts a quark.Event to a mb.Event, returns true if we
