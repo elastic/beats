@@ -17,7 +17,7 @@ docker plugin enable dockerlogbeat
 ```
 
 2. To start the plugin
-`docker run --log-driver=elastic/elastic-logging-plugin:8.0.0 --log-opt hosts="172.18.0.2:9200" -it debian:jessie /bin/bash`
+`docker run --log-driver=dockerlogbeat --log-opt hosts="172.18.0.2:9200" -it debian:jessie /bin/bash`
 
 
 ## Config Options
