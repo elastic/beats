@@ -131,16 +131,12 @@ http.port: %d
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
-<<<<<<< HEAD
-	assertMonitoring(t, 5066)
-=======
 
 	assert.Equal(t, "filebeatreceiver", otelDoc.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
 	assert.Equal(t, "receiver", otelDoc.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
 	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in filebeat log record")
 	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in filebeat log record")
-	assertMonitoring(t, otelMonitoringPort)
->>>>>>> fafbdcbd8 (otel: add otel-specific fields to ingested docs (#45242))
+	assertMonitoring(t, 5066)
 }
 
 func TestHTTPJSONInputOTel(t *testing.T) {

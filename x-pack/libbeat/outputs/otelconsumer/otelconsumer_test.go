@@ -230,8 +230,6 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 	})
-<<<<<<< HEAD
-=======
 	t.Run("sets otel specific-fields", func(t *testing.T) {
 		testCases := []struct {
 			name                  string
@@ -279,19 +277,4 @@ func TestPublish(t *testing.T) {
 			})
 		}
 	})
-	t.Run("sets the client context metadata with the beat info", func(t *testing.T) {
-		batch := outest.NewBatch(event1)
-		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
-			cm := client.FromContext(ctx).Metadata
-			assert.Equal(t, beatInfo.Beat, cm.Get(beatNameCtxKey)[0])
-			assert.Equal(t, beatInfo.Version, cm.Get(beatVersionCtxtKey)[0])
-			return nil
-		})
-
-		err := otelConsumer.Publish(ctx, batch)
-		assert.NoError(t, err)
-		assert.Len(t, batch.Signals, 1)
-		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
-	})
->>>>>>> fafbdcbd8 (otel: add otel-specific fields to ingested docs (#45242))
 }
