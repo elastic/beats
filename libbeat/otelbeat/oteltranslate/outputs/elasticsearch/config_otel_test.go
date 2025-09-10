@@ -18,9 +18,11 @@
 package elasticsearchtranslate
 
 import (
+	"bytes"
 	_ "embed"
 	"fmt"
 	"testing"
+	"text/template"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -340,16 +342,22 @@ sending_queue:
   wait_for_result: true
 mapping:
   mode: bodymap
+{{ if gt . 0 }}
 compression: gzip
 compression_params:
-  level: %d`
+  level: {{ . }}
+{{ else }}
+compression: none
+{{ end }}`
 
 	for level := range 9 {
 		t.Run(fmt.Sprintf("compression-level-%d", level), func(t *testing.T) {
 			cfg := config.MustNewConfigFrom(fmt.Sprintf(compressionConfig, level))
 			got, err := ToOTelConfig(cfg, logp.NewNopLogger())
 			require.NoError(t, err, "error translating elasticsearch output to ES exporter config")
-			expOutput := newFromYamlString(t, fmt.Sprintf(otelConfig, level))
+			var otelBuffer bytes.Buffer
+			require.NoError(t, template.Must(template.New("config").Parse(otelConfig)).Execute(&otelBuffer, level))
+			expOutput := newFromYamlString(t, otelBuffer.String())
 			compareAndAssert(t, expOutput, confmap.NewFromStringMap(got))
 		})
 	}
