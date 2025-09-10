@@ -132,9 +132,6 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 		// let's keep max_conns_per_host setting for now and remove it once exporterhelper is stable.
 		"max_conns_per_host": escfg.NumWorkers(),
 
-		// we use http/1 in libbeat. To achieve parity, disable force_attempt_http2
-		"force_attempt_http2": false,
-
 		// Retry
 		"retry": map[string]any{
 			"enabled":          true,

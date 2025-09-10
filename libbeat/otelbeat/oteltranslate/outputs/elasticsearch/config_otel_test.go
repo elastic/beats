@@ -61,7 +61,6 @@ headers:
 endpoints:
   - http://localhost:9200/foo/bar
   - http://localhost:9300/foo/bar
-force_attempt_http2: false
 idle_conn_timeout: 3s
 logs_index: some-index
 max_conns_per_host: 30
@@ -113,7 +112,6 @@ api_key: "TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA"
 		OTelCfg := `
 endpoints:
   - http://localhost:9200
-force_attempt_http2: false
 idle_conn_timeout: 3s
 logs_index: some-index
 retry:
@@ -172,7 +170,6 @@ logs_index: some-index
 password: changeme
 user: elastic
 timeout: 1m30s
-force_attempt_http2: false
 mapping:
   mode: bodymap 
 compression: gzip
@@ -230,7 +227,6 @@ retry:
   max_retries: 3
 logs_index: some-index
 password: changeme
-force_attempt_http2: false
 user: elastic
 timeout: 1m30s
 idle_conn_timeout: 1s
@@ -327,7 +323,6 @@ retry:
   max_interval: 1m0s
   max_retries: 3
 timeout: 1m30s
-force_attempt_http2: false
 max_conns_per_host: 1
 user: elastic
 sending_queue:

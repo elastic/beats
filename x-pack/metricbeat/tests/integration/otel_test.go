@@ -532,7 +532,6 @@ processors:
             level: 1
         endpoints:
             - http://localhost:9200
-        force_attempt_http2: false
         idle_conn_timeout: 3s
         logs_index: index
         mapping:

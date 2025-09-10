@@ -43,7 +43,6 @@ exporters:
       max_retries: 3
     user: elastic
     timeout: 1m30s
-    force_attempt_http2: false
     max_conns_per_host: 1
     sending_queue:
       batch:
@@ -195,7 +194,6 @@ exporters:
       max_retries: 3
     user: elastic-cloud
     timeout: 1m30s
-    force_attempt_http2: false
     max_conns_per_host: 1
     sending_queue:
       batch:
