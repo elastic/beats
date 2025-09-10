@@ -274,6 +274,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improve HTTP JSON health status logic for empty template results. {pull}46332[46332]
 - Improve CEL input documentation of authentication options. {pull}46253[46253]
 - Add status reporting support for Azure Event Hub v2 input. {pull}44846[44846]
+- Add documentation for device collection in Entity Analytics Active Directory Filebeat's input. {pull}46363[46363]
 
 *Auditbeat*
 
