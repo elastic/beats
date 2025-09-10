@@ -25,7 +25,7 @@ import (
 
 func TestAddrs(t *testing.T) {
 	t.Run("ipv4", func(t *testing.T) {
-		addr4, addr6, err := addrs("0.0.0.0:9001", logptest.NewTestingLogger(t, ""))
+		addr4, addr6, err := addrs("0.0.0.0:65535", logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}

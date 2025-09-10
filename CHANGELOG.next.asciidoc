@@ -159,6 +159,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
 - Fix race condition that could cause Filebeat to hang during shutdown after failing to startup {issue}45034[45034] {pull}46331[46331]
 - Fixed hints autodiscover for Docker when the configuration is only `hints.enabled: true`. {issue}45156[45156] {pull}45864[45864]
+- Fix metrics from TCP & UDP inputs when the port number is > 32767 {pull}46486[46486]
 
 *Heartbeat*
 
