@@ -40,7 +40,7 @@ The Filestream input does not enforce the restrictions documented for
 the `clean_inactive` option, thus allowing configurations that can
 lead to data re-ingestion issues.
 
-**Fixed planned in**: 9.2.0 by [PR #46373](https://github.com/elastic/beats/pull/46373)
+**Fix planned in**: 9.2.0 by [PR #46373](https://github.com/elastic/beats/pull/46373)
 :::
 
 :::{dropdown} Setting `clean_inactive` to `0` in Filebeat's Filestream input will cause data to be re-ingested on every restart.
@@ -54,7 +54,7 @@ on start up, effectively re-ingesting all files on restart.
 - For Filestream >= 8.14.0 and < 8.16.0 set `clean_inactive` to a very
 large value. For example, use `clean_inactive: 43800h0m0s`, which is 5 years.
 
-**Fixed planned in**: 9.2.0 by [PR #46373](https://github.com/elastic/beats/pull/46373)
+**Fix planned in**: 9.2.0 by [PR #46373](https://github.com/elastic/beats/pull/46373)
 :::
 
 :::{dropdown} Beats panic on restart when "restart_on_cert_change" is enabled on Linux
