@@ -824,20 +824,20 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 						} else {
 							return http.StatusBadRequest
 						}
-					} else {
-						// Success - track ingested event
-						found := false
-						for _, existing := range ingestedTestEvents {
-							if existing == eventKey {
-								found = true
-								break
-							}
-						}
-						if !found {
-							ingestedTestEvents = append(ingestedTestEvents, eventKey)
-						}
-						return http.StatusOK
 					}
+
+					// track ingested event
+					found := false
+					for _, existing := range ingestedTestEvents {
+						if existing == eventKey {
+							found = true
+							break
+						}
+					}
+					if !found {
+						ingestedTestEvents = append(ingestedTestEvents, eventKey)
+					}
+					return http.StatusOK
 				}
 
 				return http.StatusOK
