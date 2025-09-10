@@ -48,7 +48,7 @@ require (
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f
 	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2
 	github.com/digitalocean/go-libvirt v0.0.0-20240709142323-d8406205c752
-	github.com/docker/docker v28.2.2+incompatible
+	github.com/docker/docker v28.3.3+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/docker/go-plugins-helpers v0.0.0-20181025120712-1e6269c305b8
 	github.com/docker/go-units v0.5.0
@@ -76,7 +76,7 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/go-sql-driver/mysql v1.9.3
-	github.com/go-viper/mapstructure/v2 v2.3.0
+	github.com/go-viper/mapstructure/v2 v2.4.0
 	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 	github.com/godbus/dbus/v5 v5.1.0
 	github.com/godror/godror v0.33.2
@@ -107,7 +107,7 @@ require (
 	github.com/osquery/osquery-go v0.0.0-20231108163517-e3cde127e724
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/prometheus/client_model v0.6.2
+	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.65.0
 	github.com/prometheus/procfs v0.16.1
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
@@ -189,7 +189,7 @@ require (
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/go-ldap/ldap/v3 v3.4.6
-	github.com/go-ole/go-ole v1.2.6
+	github.com/go-ole/go-ole v1.3.0
 	github.com/go-resty/resty/v2 v2.16.5
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.2.2
@@ -203,7 +203,7 @@ require (
 	github.com/klauspost/compress v1.18.0
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
 	github.com/microsoft/go-mssqldb v1.9.2
-	github.com/microsoft/wmi v0.25.1
+	github.com/microsoft/wmi v0.34.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.130.0
 	github.com/pierrec/lz4/v4 v4.1.22
 	github.com/pkg/xattr v0.4.9
@@ -246,6 +246,7 @@ require (
 	go.opentelemetry.io/collector/processor/processorhelper v0.130.0
 	go.opentelemetry.io/collector/receiver/receivertest v0.130.0
 	go.opentelemetry.io/otel/sdk/metric v1.38.0
+	go.uber.org/goleak v1.3.0
 	sigs.k8s.io/kind v0.29.0
 )
 
@@ -518,11 +519,18 @@ require (
 
 replace (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption => github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0-elastic
+
 	github.com/apoydence/eachers => github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 //indirect, see https://github.com/elastic/beats/pull/29780 for details.
+
 	github.com/dop251/goja => github.com/elastic/goja v0.0.0-20190128172624-dd2ac4456e20
+
 	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
+
 	github.com/fsnotify/fsnotify => github.com/elastic/fsnotify v1.6.1-0.20240920222514-49f82bdbc9e3
+
 	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6
+
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
+
 	github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20250616163611-a325b49669a4
 )
