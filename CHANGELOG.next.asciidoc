@@ -84,6 +84,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix a race condition during metrics initialization which could cause a panic. {issue}45822[45822] {pull}46054[46054]
 - Update Go version to 1.24.7 {pull}46070[46070].
 - Fixed a panic when the beat restarts itself by adding 'eventfd2' to default seccomp policy {issue}46372[46372]
+- Update github.com/go-viper/mapstructure/v2 to v2.4.0 {pull}46335[46335]
 
 *Auditbeat*
 
