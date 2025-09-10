@@ -180,10 +180,15 @@ func TestInvalidConfiguredTimegrain(t *testing.T) {
 	metrics, err := mapMetrics(client,
 		[]*armresources.GenericResourceExpanded{resource}, resourceConfig)
 
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(),
-		fmt.Sprintf("the timegrain configured : %s is not supported", oneMinuteDuration))
-	assert.Equal(t, metrics, []azure.Metric(nil))
+	assert.NoError(t, err)
+
+	assert.Len(t, metrics, 1)
+	assert.Equal(t, metrics[0].ResourceId, "123")
+	assert.Equal(t, metrics[0].Namespace, "namespace")
+	assert.Equal(t, metrics[0].Names, []string{"Capacity"})
+	assert.Equal(t, metrics[0].Aggregations, "Average")
+	assert.Equal(t, metrics[0].Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+	assert.Equal(t, metrics[0].TimeGrain, oneMinuteDuration)
 	m.AssertExpectations(t)
 }
 
