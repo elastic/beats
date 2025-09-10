@@ -16,15 +16,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-
-	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
-<<<<<<< HEAD
-
-	conf "github.com/elastic/elastic-agent-libs/config"
-=======
->>>>>>> 46ae1217a (dgram.Listener return error on connection failure (#46302))
 )
 
 func TestLogStatusReporter(t *testing.T) {
@@ -93,31 +87,10 @@ func TestLogStatusReporter(t *testing.T) {
 	require.NoError(t, server.Start())
 	defer server.Stop()
 
-<<<<<<< HEAD
-	// start the client
-	client := client.NewV2(fmt.Sprintf(":%d", server.Port), token, client.VersionInfo{
-		Name: "program",
-	}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
-
-	lbmanagement.SetManagerFactory(func(cfg *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
-		c := management.DefaultConfig()
-		if err := cfg.Unpack(&c); err != nil {
-			return nil, err
-		}
-		return management.NewV2AgentManagerWithClient(c, registry, client, management.WithStopOnEmptyUnits)
-	})
-
-	go func() {
-		t.Logf("Running beats...")
-		err := cmd.Filebeat().Execute()
-		require.NoError(t, err)
-	}()
-=======
 	filebeat.Start(
 		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
 		"-E", "management.enabled=true",
 	)
->>>>>>> 46ae1217a (dgram.Listener return error on connection failure (#46302))
 
 	scenarios := []struct {
 		expectedStatus proto.State
