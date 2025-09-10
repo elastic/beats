@@ -196,10 +196,11 @@ SELECT
 FROM
 	%s
 WHERE
-	logging_time IS NOT NULL
+	_PARTITIONDATE >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+	AND logging_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR)
+	AND logging_time IS NOT NULL
 ORDER BY
-	logging_time DESC
-LIMIT 10000;`,
+	logging_time ASC`,
 		escapedTableID)
 
 	return query

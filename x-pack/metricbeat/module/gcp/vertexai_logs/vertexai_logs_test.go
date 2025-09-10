@@ -24,11 +24,15 @@ func TestGenerateQuery(t *testing.T) {
 	// verify WHERE clause is present
 	assert.Contains(t, query, "WHERE")
 	assert.Contains(t, query, "logging_time IS NOT NULL")
-	// verify ORDER BY is present
+	// verify partition filter is present
+	assert.Contains(t, query, "_PARTITIONDATE >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)")
+	// verify timestamp filter is present
+	assert.Contains(t, query, "logging_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR)")
+	// verify ORDER BY is present (should be ASC now)
 	assert.Contains(t, query, "ORDER BY")
-	assert.Contains(t, query, "logging_time DESC")
-	// verify LIMIT is present
-	assert.Contains(t, query, "LIMIT 10000")
+	assert.Contains(t, query, "logging_time ASC")
+	// verify LIMIT is NOT present (removed for no data loss)
+	assert.NotContains(t, query, "LIMIT")
 	// verify CAST for request_id
 	assert.Contains(t, query, "CAST(IFNULL(request_id, 0) AS FLOAT64)")
 }
