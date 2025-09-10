@@ -30,11 +30,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
-<<<<<<< HEAD
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
-=======
 	"github.com/elastic/beats/v7/libbeat/management/status"
->>>>>>> 46ae1217a (dgram.Listener return error on connection failure (#46302))
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"

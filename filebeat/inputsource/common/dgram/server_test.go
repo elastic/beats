@@ -21,8 +21,6 @@ import (
 	"errors"
 	"net"
 	"testing"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestListenerRunReturnsErrorWhenConnectionFails(t *testing.T) {
@@ -34,7 +32,6 @@ func TestListenerRunReturnsErrorWhenConnectionFails(t *testing.T) {
 			return nil, errors.New("some error")
 		},
 		&ListenerConfig{},
-		logp.NewNopLogger(),
 	)
 
 	if err := l.Run(t.Context()); err == nil {
