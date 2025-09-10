@@ -11,12 +11,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
+	"github.com/elastic/mock-es/pkg/api"
 )
 
 func TestFilebeatOTelE2E(t *testing.T) {
@@ -745,101 +746,93 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 			var mu sync.Mutex
 			eventFailureCounts := make(map[string]int)
 
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Header().Set("X-Elastic-Product", "Elasticsearch")
-
-				if r.URL.Path != "/_bulk" {
-					w.WriteHeader(http.StatusOK)
-					_, err := w.Write([]byte(`{}`))
-					require.NoError(t, err)
-					return
+			deterministicHandler := func(action api.Action, event []byte) int {
+				// Handle non-bulk requests
+				if action.Action != "create" {
+					return http.StatusOK
 				}
 
-				body, err := io.ReadAll(r.Body)
-				if err != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-
-				bodyStr := string(body)
-
-				mu.Lock()
-				defer mu.Unlock()
-
-				shouldEventFail := func(eventID int) bool {
-					for _, failID := range tt.eventIDsToFail {
-						if failID == eventID {
-							return true
-						}
+				// Extract event ID from the event data
+				if matches := reEventLine.FindSubmatch(event); len(matches) > 1 {
+					eventIDStr := string(matches[1])
+					eventID, err := strconv.Atoi(eventIDStr)
+					if err != nil {
+						return http.StatusInternalServerError
 					}
-					return false
-				}
 
-				var items []string
-				for line := range strings.Lines(bodyStr) {
-					if strings.Contains(line, `"create":{`) {
-						// Ignore metadata lines
-						continue
-					}
-					if matches := reEventLine.FindStringSubmatch(line); len(matches) > 1 {
-						eventIDStr := matches[1]
-						eventID := 0
-						_, err := fmt.Sscanf(eventIDStr, "%d", &eventID)
-						require.NoErrorf(t, err, "failed to parse event ID from line: %s", line)
-						eventKey := "Line " + eventIDStr
+					eventKey := "Line " + eventIDStr
 
-						// Check if this event should fail
-						isFailingEvent := shouldEventFail(eventID)
+					mu.Lock()
+					defer mu.Unlock()
 
-						var shouldFail bool
-						if isFailingEvent {
-							// This event is configured to fail
-							failureCount := eventFailureCounts[eventKey]
-
-							switch tt.bulkErrorCode {
-							case "400":
-								// Permanent errors always fail
-								shouldFail = true
-							case "429":
-								// Temporary errors fail until failuresPerEvent threshold
-								shouldFail = failureCount < tt.failuresPerEvent
+					// Check if this event should fail
+					shouldEventFail := func(eventID int) bool {
+						for _, failID := range tt.eventIDsToFail {
+							if failID == eventID {
+								return true
 							}
+						}
+						return false
+					}
+
+					isFailingEvent := shouldEventFail(eventID)
+
+					var shouldFail bool
+					if isFailingEvent {
+						// This event is configured to fail
+						failureCount := eventFailureCounts[eventKey]
+
+						switch tt.bulkErrorCode {
+						case "400":
+							// Permanent errors always fail
+							shouldFail = true
+						case "429":
+							// Temporary errors fail until failuresPerEvent threshold
+							shouldFail = failureCount < tt.failuresPerEvent
+						}
+					} else {
+						// Events not in the fail list always succeed
+						shouldFail = false
+					}
+
+					if shouldFail {
+						eventFailureCounts[eventKey] = eventFailureCounts[eventKey] + 1
+						if tt.bulkErrorCode == "429" {
+							return http.StatusTooManyRequests
 						} else {
-							// Events not in the fail list always succeed
-							shouldFail = false
+							return http.StatusBadRequest
 						}
-
-						if shouldFail {
-							eventFailureCounts[eventKey] = eventFailureCounts[eventKey] + 1
-							var errorResponse string
-							if tt.bulkErrorCode == "429" {
-								errorResponse = `{"create":{"_index":"logs","status":429,"error":{"type":"too_many_requests","reason":"queue capacity exceeded"}}}`
-							} else {
-								errorResponse = `{"create":{"_index":"logs","status":400,"error":{"type":"mapper_parsing_exception","reason":"failed to parse field"}}}`
+					} else {
+						// Success - track ingested event
+						found := false
+						for _, existing := range ingestedTestEvents {
+							if existing == eventKey {
+								found = true
+								break
 							}
-							items = append(items, errorResponse)
-						} else {
-							// Success - track ingested event
-							found := false
-							for _, existing := range ingestedTestEvents {
-								if existing == eventKey {
-									found = true
-									break
-								}
-							}
-							if !found {
-								ingestedTestEvents = append(ingestedTestEvents, eventKey)
-							}
-							items = append(items, `{"create":{"_index":"logs","status":201}}`)
 						}
+						if !found {
+							ingestedTestEvents = append(ingestedTestEvents, eventKey)
+						}
+						return http.StatusCreated
 					}
 				}
 
-				response := fmt.Sprintf(`{"items":[%s]}`, strings.Join(items, ","))
-				w.WriteHeader(http.StatusOK)
-				_, err = w.Write([]byte(response))
-				require.NoError(t, err)
-			}))
+				return http.StatusOK
+			}
+
+			mux := http.NewServeMux()
+			mux.Handle("/", api.NewDeterministicAPIHandler(
+				uuid.Must(uuid.NewV4()),
+				"",
+				nil,
+				time.Now().Add(24*time.Hour),
+				0,
+				0,
+				deterministicHandler,
+			))
+
+			server := httptest.NewServer(mux)
 			defer server.Close()
 
 			filebeatOTel := integration.NewBeat(
@@ -948,8 +941,10 @@ http.port: {{.MonitoringPort}}
 				// TODO: Beats stats are not tracking exporter metrics properly in otelconsumer, so it assumes all events were delivered since the batch was acked.
 				// There could have been failures within the batch that were retried and then dropped by the exporter, only way to know for sure is to check the exporter metrics.
 				// require.Equal(t, float64(numTestEvents), m["libbeat.output.events.total"], "expected total events sent to output to match")
-				// require.Equal(t, float64(len(tt.expectedIngestedEventIDs)), m["libbeat.output.events.acked"], "expected events acked to match ingested count")
-				// require.Equal(t, float64(numTestEvents - len(tt.expectedIngestedEventIDs)), m["libbeat.output.events.dropped"], "expected events dropped to match ingested count")
+				// require.Equal(t, float64(len(tt.expectedIngestedEventIDs)), m["libbeat.output.events.acked"], "expected events acked to match")
+				// require.Equal(t, float64(numTestEvents - len(tt.expectedIngestedEventIDs)), m["libbeat.output.events.dropped"], "expected events dropped to match")
+
+				// Currently otelconsumer ACKs the entire batch and has no visibility into individual event failures within the batch.
 				assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.total"], "expected total events sent to output to match")
 				assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.acked"], "expected total events acked to match")
 				assert.Equal(ct, float64(0), m["libbeat.output.events.dropped"], "expected total events dropped to match")
