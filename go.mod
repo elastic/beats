@@ -48,7 +48,7 @@ require (
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f
 	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2
 	github.com/digitalocean/go-libvirt v0.0.0-20240709142323-d8406205c752
-	github.com/docker/docker v28.1.1+incompatible
+	github.com/docker/docker v28.3.3+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/docker/go-plugins-helpers v0.0.0-20181025120712-1e6269c305b8
 	github.com/docker/go-units v0.5.0
@@ -137,7 +137,7 @@ require (
 	golang.org/x/tools v0.33.0
 	google.golang.org/api v0.214.0
 	google.golang.org/genproto v0.0.0-20241118233622-e639e219e697 // indirect
-	google.golang.org/grpc v1.72.0
+	google.golang.org/grpc v1.72.2
 	google.golang.org/protobuf v1.36.6
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/yaml.v2 v2.4.0
@@ -282,6 +282,8 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20250121191232-2f005788dc42 // indirect
 	github.com/containerd/containerd/v2 v2.1.0 // indirect
+	github.com/containerd/errdefs v1.0.0 // indirect
+	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20180511133405-39ca1b05acc7 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.5 // indirect
