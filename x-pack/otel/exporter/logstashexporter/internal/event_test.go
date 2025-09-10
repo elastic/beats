@@ -29,7 +29,7 @@ func TestParseEvent(t *testing.T) {
 		{
 			name: "valid beats event with timestamp",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
 						"beat_name":    {"filebeat"},
@@ -53,7 +53,7 @@ func TestParseEvent(t *testing.T) {
 		{
 			name: "valid beats event without timestamp",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
 						"beat_name":    {"filebeat"},
@@ -77,7 +77,7 @@ func TestParseEvent(t *testing.T) {
 		{
 			name: "invalid beats event metadata - missing beat name",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
 						"beat_version": {"8.0.0"},
@@ -99,7 +99,7 @@ func TestParseEvent(t *testing.T) {
 		{
 			name: "invalid beats event metadata - empty beat name",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
 						"beat_name":    {""},
@@ -122,7 +122,7 @@ func TestParseEvent(t *testing.T) {
 		{
 			name: "invalid event body - not a map",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
 						"beat_name":    {"filebeat"},
@@ -293,7 +293,7 @@ func TestParseEventMetadata(t *testing.T) {
 		{
 			name: "complete metadata",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
 						"beat_name":    {"filebeat"},
@@ -310,7 +310,7 @@ func TestParseEventMetadata(t *testing.T) {
 		{
 			name: "missing beat name",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
 						"beat_version": {"8.0.0"},
@@ -326,7 +326,7 @@ func TestParseEventMetadata(t *testing.T) {
 		{
 			name: "missing beat version",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
 						"beat_name": {"filebeat"},
@@ -342,7 +342,7 @@ func TestParseEventMetadata(t *testing.T) {
 		{
 			name: "no metadata",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{}),
 				}
@@ -437,7 +437,7 @@ func TestGetBeatVersion(t *testing.T) {
 		{
 			name: "version exists",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
 						"beat_name":    {"filebeat"},
@@ -451,7 +451,7 @@ func TestGetBeatVersion(t *testing.T) {
 		{
 			name: "version missing",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
 						"beat_name": {"filebeat"},

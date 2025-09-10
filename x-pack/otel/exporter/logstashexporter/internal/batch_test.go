@@ -29,7 +29,7 @@ func TestNewLogBatch(t *testing.T) {
 		{
 			name: "valid logs batch",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
 						"beat_name":    {"filebeat"},
@@ -64,7 +64,7 @@ func TestNewLogBatch(t *testing.T) {
 		{
 			name: "empty logs batch",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
 						"beat_name":    {"filebeat"},
@@ -120,7 +120,7 @@ func TestCreateEvents(t *testing.T) {
 		{
 			name: "multiple resource logs with multiple scope logs",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
 						"beat_name":    {"filebeat"},
@@ -165,7 +165,7 @@ func TestCreateEvents(t *testing.T) {
 		{
 			name: "empty logs",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
 						"beat_name":    {"metricbeat"},
@@ -182,7 +182,7 @@ func TestCreateEvents(t *testing.T) {
 		{
 			name: "invalid beats event in logs",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
 						"beat_version": {"8.0.0"}, // Missing beat_name
@@ -207,7 +207,7 @@ func TestCreateEvents(t *testing.T) {
 		{
 			name: "invalid log record body",
 			setupCtx: func() context.Context {
-				ctx := context.Background()
+				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
 						"beat_name":    {"filebeat"},
