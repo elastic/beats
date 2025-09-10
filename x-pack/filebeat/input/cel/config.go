@@ -70,6 +70,38 @@ type config struct {
 	// RecordCoverage indicates whether a program should
 	// record and log execution coverage.
 	RecordCoverage bool `config:"record_coverage"`
+
+	Meta map[string]interface{} `config:"meta"`
+}
+
+func (c config) GetPackageName() string {
+	if c.Meta == nil {
+		return "unknown"
+	}
+	packageinfo, ok := c.Meta["package"]
+	if !ok {
+		return "unknown"
+	}
+	name, ok := packageinfo.(map[string]interface{})["name"]
+	if !ok {
+		return "unknown"
+	}
+	return name.(string)
+}
+
+func (c config) GetPackageVersion() string {
+	if c.Meta == nil {
+		return "unknown"
+	}
+	packageinfo, ok := c.Meta["package"]
+	if !ok {
+		return "unknown"
+	}
+	version, ok := packageinfo.(map[string]interface{})["version"]
+	if !ok {
+		return "unknown"
+	}
+	return version.(string)
 }
 
 type redact struct {

@@ -51,6 +51,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
+	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -179,7 +180,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
 	}
 
-	client, trace, err := newClient(ctx, cfg, log, reg)
+	client, trace, otelMetrics, err := newClient(ctx, cfg, log, reg, env)
 	if err != nil {
 		return err
 	}
@@ -268,6 +269,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	// from mito/lib, a global, useragent, is available to use
 	// in requests.
 	err = periodically(ctx, cfg.Interval, func() error {
+		log.Debug("Starting otel periodic")
+		otelMetrics.AddPeriodicRun(ctx, 1)
+		otelMetrics.StartPeriodic()
+		defer otelMetrics.EndPeriodic(ctx)
+
 		log.Info("process periodic request")
 		var (
 			budget    = *cfg.MaxExecutions
@@ -306,8 +312,10 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				log.Debugw("previous transaction", "transaction.id", trace.TxID())
 			}
 			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
+			otelMetrics.AddProgramExecution(ctx, 1)
 			metrics.executions.Add(1)
 			start := i.now().In(time.UTC)
+			defer otelMetrics.AddTotalDuration(ctx, time.Since(start))
 			state, err = evalWith(ctx, prg, ast, state, start, wantDump, budget-1)
 			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
@@ -333,6 +341,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			}
 			isDegraded = err != nil
 			metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
+			otelMetrics.AddCELDuration(ctx, time.Since(start))
 			if trace != nil {
 				log.Debugw("final transaction", "transaction.id", trace.TxID())
 			}
@@ -481,7 +490,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			// We have a non-empty batch of events to process.
 			metrics.batchesReceived.Add(1)
 			metrics.eventsReceived.Add(uint64(len(events)))
-
+			otelMetrics.AddEvents(ctx, int64(len(events)))
+			otelMetrics.AddBatch(ctx, 1)
 			// Drop events from state. If we fail during the publication,
 			// we will re-request these events.
 			delete(state, "events")
@@ -558,8 +568,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				}
 				if i == 0 {
 					metrics.batchesPublished.Add(1)
+					otelMetrics.AddPublishedBatch(ctx, 1)
+
 				}
 				metrics.eventsPublished.Add(1)
+				otelMetrics.AddPublishedEvents(ctx, 1)
 
 				err = ctx.Err()
 				if err != nil {
@@ -572,11 +585,12 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			}
 
 			metrics.batchProcessingTime.Update(time.Since(start).Nanoseconds())
-
+			otelMetrics.AddPublishDuration(ctx, time.Since(start))
 			// Advance the cursor to the final state if there was no error during
 			// publications. This is needed to transition to the next set of events.
 			if !hadPublicationError {
 				goodCursor = cursor
+				otelMetrics.AddProgramSuccessExecution(ctx, 1)
 			}
 
 			// Replace the last known good cursor.
@@ -603,6 +617,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		log.Infof("input stopped because context was cancelled with: %v", err)
 		err = nil
 	}
+	otelMetrics.Shutdown(ctx)
 	return err
 }
 
@@ -827,10 +842,10 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 // https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
 const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
-func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry) (*http.Client, *httplog.LoggingRoundTripper, error) {
+func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry, env v2.Context) (*http.Client, *httplog.LoggingRoundTripper, *otel.OTELCELMetrics, error) {
 	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings(), log)...)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	if cfg.Auth.Digest.isEnabled() {
@@ -941,19 +956,46 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	}
 
 	if cfg.Auth.OAuth2.isEnabled() {
-		authClient, err := cfg.Auth.OAuth2.client(ctx, c)
+		c, err = cfg.Auth.OAuth2.client(ctx, c)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
-		return authClient, trace, nil
+
+		//return authClient, trace, nil, nil
+	} else {
+
+		c.Transport = userAgentDecorator{
+			UserAgent: userAgent,
+			Transport: c.Transport,
+		}
 	}
 
-	c.Transport = userAgentDecorator{
-		UserAgent: userAgent,
-		Transport: c.Transport,
-	}
+	resource := resource.NewWithAttributes(
+		semconv.SchemaURL,
+		semconv.ServiceInstanceID(env.IDWithoutName),
+		semconv.ServiceNameKey.String(cfg.GetPackageName()),
+		semconv.ServiceVersionKey.String(cfg.GetPackageVersion()),
+		attribute.String("agent.version", env.Agent.Version),
+		attribute.String("agent.componentID", env.Agent.ComponentID),
+		attribute.String("agent.id", env.Agent.ID.String()),
+		attribute.String("agent.version", env.Agent.Version),
+		attribute.String("agent.componentID", env.Agent.ComponentID),
+	)
 
-	return c, trace, nil
+	log.Infof("created cel input resource", resource.String())
+	exporterType := otel.GetExporterTypeFromEnv()
+	exporter, err := otel.NewExporterFactory(log).NewExporter(ctx, exporterType)
+	if err != nil {
+		log.Errorw("failed to get exporter", "error", err)
+	}
+	exportInterval, err := otel.GetCollectionPeriodFromEnvironment(ctx, cfg.Interval)
+	if err != nil {
+		log.Errorw("failed to get collection period", "error", err)
+	}
+	log.Infof("created OTEL cel input exporter %s for input %s", exporterType, env.IDWithoutName)
+	otelMetrics, otelTransport, err := otel.NewOTELCELMetrics(log, env.Agent.UserAgent, *resource, c.Transport, exporter, exportInterval)
+	c.Transport = otelTransport
+	return c, trace, otelMetrics, nil
 }
 
 func wantClient(cfg config) bool {

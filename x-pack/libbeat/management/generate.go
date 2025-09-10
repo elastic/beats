@@ -111,7 +111,9 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamTyp
 		if err != nil {
 			return nil, fmt.Errorf("error creating stream rules: %w", err)
 		}
-
+		if raw.Meta != nil {
+			streamSource["meta"] = *raw.Meta
+		}
 		inputs[iter] = streamSource
 	}
 
