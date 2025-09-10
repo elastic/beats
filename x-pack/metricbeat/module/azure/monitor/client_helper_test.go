@@ -160,6 +160,8 @@ func TestMapMetricWithConfiguredTimegrain(t *testing.T) {
 }
 
 func TestInvalidConfiguredTimegrain(t *testing.T) {
+	// expected behavior is to simply skip the metrics that
+	// are not compatible with the configured timegrain
 	resource := MockResourceExpanded()
 	metricDefinitions := armmonitor.MetricDefinitionCollection{
 		Value: MockMetricDefinitions(),
