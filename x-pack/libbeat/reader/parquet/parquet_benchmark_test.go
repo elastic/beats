@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"sync"
 	"testing"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // parquetFile is a struct that contains the name of the parquet
@@ -241,7 +243,7 @@ func BenchmarkReadParquet(b *testing.B) {
 
 // readParquetFile reads entire parquet file
 func readParquetFile(b *testing.B, cfg *Config, file *os.File) {
-	sReader, err := NewBufferedReader(file, cfg)
+	sReader, err := NewBufferedReader(file, cfg, logp.NewNopLogger())
 	if err != nil {
 		b.Fatalf("failed to init stream reader: %v", err)
 	}
@@ -260,7 +262,7 @@ func readParquetFile(b *testing.B, cfg *Config, file *os.File) {
 
 // readParquetSingleRow reads only the first row of parquet files
 func readParquetSingleRow(b *testing.B, cfg *Config, file *os.File) {
-	sReader, err := NewBufferedReader(file, cfg)
+	sReader, err := NewBufferedReader(file, cfg, logp.NewNopLogger())
 	if err != nil {
 		b.Fatalf("failed to init stream reader: %v", err)
 	}
@@ -279,7 +281,7 @@ func readParquetSingleRow(b *testing.B, cfg *Config, file *os.File) {
 
 // constructBufferedReader constructs a stream reader for reading parquet files
 func constructBufferedReader(b *testing.B, cfg *Config, file *os.File) {
-	sReader, err := NewBufferedReader(file, cfg)
+	sReader, err := NewBufferedReader(file, cfg, logp.NewNopLogger())
 	if err != nil {
 		b.Fatalf("failed to init stream reader: %v", err)
 	}

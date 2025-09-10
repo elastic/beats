@@ -26,8 +26,15 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/ctxtool"
 )
+
+func init() {
+	if err := provider.Register(Name, New); err != nil {
+		panic(err)
+	}
+}
 
 // Name of this provider.
 const Name = "azure-ad"
@@ -52,6 +59,21 @@ type azure struct {
 	fetcher fetcher.Fetcher
 
 	ctx v2.Context
+}
+
+// New creates a new instance of an Azure Active Directory identity provider.
+func New(logger *logp.Logger, path *paths.Path) (provider.Provider, error) {
+	p := azure{
+		conf: defaultConf(),
+	}
+	p.Manager = &kvstore.Manager{
+		Logger:    logger,
+		Type:      FullName,
+		Configure: p.configure,
+		Path:      path,
+	}
+
+	return &p, nil
 }
 
 // Name returns the name of this provider.
@@ -608,24 +630,4 @@ func (p *azure) configure(cfg *config.C) (kvstore.Input, error) {
 	}
 	p.cfg = cfg
 	return p, nil
-}
-
-// New creates a new instance of an Azure Active Directory identity provider.
-func New(logger *logp.Logger) (provider.Provider, error) {
-	p := azure{
-		conf: defaultConf(),
-	}
-	p.Manager = &kvstore.Manager{
-		Logger:    logger,
-		Type:      FullName,
-		Configure: p.configure,
-	}
-
-	return &p, nil
-}
-
-func init() {
-	if err := provider.Register(Name, New); err != nil {
-		panic(err)
-	}
 }
