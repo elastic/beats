@@ -66,8 +66,22 @@ func TestNewReceiver(t *testing.T) {
 		},
 		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
+<<<<<<< HEAD
 			require.Lenf(t, logs["r1"], 1, "expected 1 log, got %d", len(logs["r1"]))
 			assert.Condition(t, func() bool {
+=======
+			require.Lenf(c, logs["r1"], 1, "expected 1 log, got %d", len(logs["r1"]))
+			assert.Equal(c, "filebeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
+			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
+			var lastError strings.Builder
+			assert.Conditionf(c, func() bool {
+				return getFromSocket(t, &lastError, monitorSocket, "stats")
+			}, "failed to connect to monitoring socket, stats endpoint, last error was: %s", &lastError)
+			assert.Conditionf(c, func() bool {
+				return getFromSocket(t, &lastError, monitorSocket, "inputs")
+			}, "failed to connect to monitoring socket, inputs endpoint, last error was: %s", &lastError)
+			assert.Condition(c, func() bool {
+>>>>>>> fafbdcbd8 (otel: add otel-specific fields to ingested docs (#45242))
 				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
 					FilterMessageSnippet("add_host_metadata").
 					FilterMessageSnippet("add_cloud_metadata").
@@ -183,6 +197,11 @@ func TestMultipleReceivers(t *testing.T) {
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			require.Greater(c, len(logs["r1"]), 0, "receiver r1 does not have any logs")
 			require.Greater(c, len(logs["r2"]), 0, "receiver r2 does not have any logs")
+
+			assert.Equal(c, "filebeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r1 log record")
+			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in r1 log record")
+			assert.Equal(c, "filebeatreceiver/r2", logs["r2"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r2 log record")
+			assert.Equal(c, "receiver", logs["r2"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in r2 log record")
 
 			// Make sure that each receiver has a separate logger
 			// instance and does not interfere with others. Previously, the

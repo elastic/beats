@@ -51,6 +51,7 @@ type Info struct {
 		StatsRegistry *monitoring.Registry
 	}
 	LogConsumer          consumer.Logs // otel log consumer
+	ComponentID          string        // otel component id from the collector config e.g. "filebeatreceiver/logs"
 	UseDefaultProcessors bool          // Whether to use the default processors
 }
 
