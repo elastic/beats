@@ -17,7 +17,7 @@ def document_fields(output, section, sections, path, beat):
         output.write(
             '  - https://www.elastic.co/guide/en/beats/{}/current/exported-fields-{}.html\n'.format(beat, section["anchor"]))
         # Build a docs-builder applies_to directive
-        applies_to = get_applies_to(section)
+        applies_to = get_applies_to(section, True)
         if len(applies_to) > 0:
             output.write('applies_to:\n')
             output.write('  stack: ')
@@ -52,7 +52,7 @@ See the [ECS reference](ecs://reference/index.md) for more information.
             output.write("## {} [_{}]\n\n".format(section["name"], section["name"]))
 
             # Build a docs-builder applies_to directive
-            applies_to = get_applies_to(section)
+            applies_to = get_applies_to(section, False)
             if len(applies_to) > 0:
                 output.write("```{applies_to}\nstack: ")
                 output.write(", ".join(applies_to))
@@ -89,7 +89,7 @@ def document_field(output, field, field_path):
     output.write("**`{}`**".format(field["field_path"]))
 
     # Build a docs-builder applies_to directive
-    applies_to = get_applies_to(field)
+    applies_to = get_applies_to(field, False)
     if len(applies_to) > 0:
         output.write(" {applies_to}`stack: ")
         output.write(", ".join(applies_to))
@@ -139,7 +139,7 @@ def document_field(output, field, field_path):
 # to accomplish this.
 
 
-def get_applies_to(item):
+def get_applies_to(item, pageLevel):
     applies_to = []
     if "version" in item:
         if "preview" in item["version"]:
@@ -152,14 +152,21 @@ def get_applies_to(item):
             applies_to.append("deprecated {}".format(item["version"]["deprecated"]))
         if "removed" in item["version"]:
             applies_to.append("removed {}".format(item["version"]["removed"]))
+    # Add `release` to applies_to if not already added via `version`
+    elif "release" in item:
+        # Always include at the page level
+        if pageLevel:
+            applies_to.append(item["release"])
+        # Only include at the section or line level if not "ga"
+        elif item["release"] != "ga":
+            applies_to.append(item["release"])
+    # Assume GA if no lifecycle/version is provided
+    elif pageLevel:
+        applies_to.append("ga")
     # Add `deprecated` to applies_to if not already added via `version`
     if "deprecated" in item:
         if "version" not in item or ("version" in item and "deprecated" not in item["version"]):
             applies_to.append("deprecated {}".format(item["deprecated"]))
-    # Add `release` to applies_to if not already added via `version`
-    if "release" in item:
-        if "version" not in item and item["release"] != "ga":
-            applies_to.append(item["release"])
     return applies_to
 
 
@@ -184,6 +191,8 @@ def fields_to_asciidoc(input, output_path, beat):
     output.write("""---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/{beat}/current/exported-fields.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
