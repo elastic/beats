@@ -25,7 +25,11 @@ import (
 
 func TestAddrs(t *testing.T) {
 	t.Run("ipv4", func(t *testing.T) {
+<<<<<<< HEAD
 		addr4, addr6, err := addrs("0.0.0.0:9001", logp.L())
+=======
+		addr4, addr6, err := addrs("0.0.0.0:65535", logptest.NewTestingLogger(t, ""))
+>>>>>>> 8ee768567 (Fix TCP & UDP input metricsets for ports > 32767 (#46486))
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
