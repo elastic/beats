@@ -25,6 +25,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 
 	"github.com/gofrs/uuid/v5"
 
@@ -814,18 +816,21 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 						if !found {
 							ingestedTestEvents = append(ingestedTestEvents, eventKey)
 						}
-						return http.StatusCreated
+						return http.StatusOK
 					}
 				}
 
 				return http.StatusOK
 			}
 
+			reader := metric.NewManualReader()
+			provider := metric.NewMeterProvider(metric.WithReader(reader))
+
 			mux := http.NewServeMux()
 			mux.Handle("/", api.NewDeterministicAPIHandler(
 				uuid.Must(uuid.NewV4()),
 				"",
-				nil,
+				provider,
 				time.Now().Add(24*time.Hour),
 				0,
 				0,
@@ -901,10 +906,23 @@ http.port: {{.MonitoringPort}}
 				mu.Lock()
 				defer mu.Unlock()
 
-				actualCount := len(ingestedTestEvents)
-				expectedCount := len(tt.expectedIngestedEventIDs)
-
-				assert.Equal(ct, expectedCount, actualCount, "expected _bulk events count to match")
+				// collect mock-es metrics
+				rm := metricdata.ResourceMetrics{}
+				err := reader.Collect(context.Background(), &rm)
+				assert.NoError(ct, err, "failed to collect metrics from mock-es")
+				metrics := make(map[string]int64)
+				for _, sm := range rm.ScopeMetrics {
+					for _, m := range sm.Metrics {
+						if sum, ok := m.Data.(metricdata.Sum[int64]); ok {
+							var total int64
+							for _, dp := range sum.DataPoints {
+								total += dp.Value
+							}
+							metrics[m.Name] = total
+						}
+					}
+				}
+				assert.Equal(ct, int64(len(tt.expectedIngestedEventIDs)), metrics["bulk.create.ok"], "expected bulk.create.ok metric to match ingested events")
 
 				// If we have the right count, validate the specific events
 				// Verify we have the correct events ingested
