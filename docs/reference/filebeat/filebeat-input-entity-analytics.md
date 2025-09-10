@@ -131,7 +131,13 @@ A user with appropriate permissions must be set up in the Active Directory Serve
 
 #### Overview [_overview]
 
-The Active Directory provider periodically queries the Active Directory server, retrieving updates for users, devices, and groups, updates its internal cache of user, device, and group metadata and group membership information, and ships updated user and device metadata to Elasticsearch.
+The Active Directory provider periodically:
+
+* Queries the Active Directory server, retrieving updates for users, devices, and groups.
+
+* Updates its internal cache of user, device, and group metadata and group membership information.
+
+* Ships updated user and device metadata to Elasticsearch.
 
 Fetching and shipping updates occurs in one of two processes: **full synchronizations** and **incremental updates**. Full synchronizations will send the entire list of users, devices, and group membership in state, along with write markers to indicate the start and end of the synchronization event. Incremental updates will only send data for changed users and devices during that event. Changes on a user or device can come in many forms, whether it be a change to the user or device metadata, a user or device was added or modified, or group membership was changed.
 
@@ -339,7 +345,7 @@ The client’s password, used for authentication. Field is required.
 
 #### `dataset` [_ad_dataset]
 
-The datasets to collect from Active Directory. This can be one of "all", "users" or "devices", or may be left empty for the default behavior which is to collect all entities. When the `dataset` is set to "devices", some user entity data is collected in order to populate the registered users and registered owner fields for each device.
+The datasets to collect from Active Directory. This can be one of "all", "users" or "devices", or may be left empty for the default behavior, which is to collect all entities. When the `dataset` is set to "devices", some user entity data is collected in order to populate the registered users and registered owner fields for each device.
 
 #### `sync_interval` [_sync_interval]
 
@@ -374,7 +380,13 @@ For a full guide on how to set up the necessary App Registration, permission gra
 
 #### Overview [_overview_2]
 
-The Azure AD provider periodically contacts Azure Active Directory, retrieving updates for users, devices and groups, updates its internal cache of user and device metadata and group membership information, and ships updated user metadata to Elasticsearch.
+The Azure AD provider periodically:
+
+* Contacts Azure Active Directory, retrieving updates for users, devices and groups.
+
+* Updates its internal cache of user and device metadata and group membership information.
+
+* Ships updated user metadata to Elasticsearch.
 
 Fetching and shipping updates occurs in one of two processes: **full synchronizations** and **incremental updates**. Full synchronizations will send the entire list of users and devices in state, along with write markers to indicate the start and end of the synchronization event. Incremental updates will only send data for changed users and devices during that event. Changes on a user or device can come in many forms, whether it be a change to the user or device metadata, a user/device was added or deleted, or group membership was changed (either direct or transitive).
 
@@ -655,7 +667,13 @@ The `jamf` provider allows the input to retrieve computer records from the Jamf 
 
 #### Overview [_overview_3]
 
-The Jamf provider periodically contacts the Jamf API, retrieving updates for computers, updates its internal cache of managed computer metadata, and ships updated metadata to Elasticsearch.
+The Jamf provider periodically:
+
+* Contacts the Jamf API, retrieving updates for computers.
+
+* Updates its internal cache of managed computer metadata.
+
+* Ships updated metadata to Elasticsearch.
 
 Fetching and shipping updates occurs in one of two processes: **full synchronizations** and **incremental updates**. Full synchronizations will send the entire list of computers in state, along with write markers to indicate the start and end of the synchronization event. Incremental updates will only send data for changed computers records during that event. Changes on a user or device can come in many forms, whether it be a change to the user’s metadata, or a user was added or deleted.
 
@@ -845,7 +863,13 @@ The necessary API permissions need to be granted in Okta in order for the provid
 
 #### Overview [_overview_4]
 
-The Okta provider periodically contacts the Okta API, retrieving updates for users and devices, updates its internal cache of user metadata, and ships updated user/device metadata to Elasticsearch.
+The Okta provider periodically:
+
+* Contacts the Okta API, retrieving updates for users and devices.
+
+* Updates its internal cache of user metadata.
+
+* Ships updated user/device metadata to Elasticsearch.
 
 Fetching and shipping updates occurs in one of two processes: **full synchronizations** and **incremental updates**. Full synchronizations will send the entire list of users and devices in state, along with write markers to indicate the start and end of the synchronization event. Incremental updates will only send data for changed users and devices during that event. Changes on a user or device can come in many forms, whether it be a change to the user’s metadata, or a user was added or deleted.
 
