@@ -239,7 +239,6 @@ require (
 
 require (
 	cloud.google.com/go/compute/metadata v0.7.0 // indirect
-	go.opentelemetry.io/collector/client v1.36.0 // indirect
 	go.opentelemetry.io/collector/exporter v0.130.0 // indirect
 	go.opentelemetry.io/collector/processor v1.36.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.37.0 // indirect
