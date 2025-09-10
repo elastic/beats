@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html
+applies_to:
+  stack: ga
 ---
 
 # Modules [filebeat-modules]
@@ -15,32 +17,32 @@ While {{filebeat}} modules are still supported, we recommend {{agent}} integrati
 
 
 * [*Modules overview*](/reference/filebeat/filebeat-modules-overview.md)
-* [*ActiveMQ module*](/reference/filebeat/filebeat-module-activemq.md)
+* [*ActiveMQ module*](/reference/filebeat/filebeat-module-activemq.md) {applies_to}`stack: ga`
 * [*Apache module*](/reference/filebeat/filebeat-module-apache.md)
 * [*Auditd module*](/reference/filebeat/filebeat-module-auditd.md)
-* [*AWS module*](/reference/filebeat/filebeat-module-aws.md)
+* [*AWS module*](/reference/filebeat/filebeat-module-aws.md) {applies_to}`stack: ga`
 * [*AWS Fargate module*](/reference/filebeat/filebeat-module-awsfargate.md) {applies_to}`stack: beta`
-* [*Azure module*](/reference/filebeat/filebeat-module-azure.md)
+* [*Azure module*](/reference/filebeat/filebeat-module-azure.md) {applies_to}`stack: ga`
 * [*CEF module*](/reference/filebeat/filebeat-module-cef.md)
 * [*Check Point module*](/reference/filebeat/filebeat-module-checkpoint.md)
 * [*Cisco module*](/reference/filebeat/filebeat-module-cisco.md)
 * [*CoreDNS module*](/reference/filebeat/filebeat-module-coredns.md)
 * [*CrowdStrike module*](/reference/filebeat/filebeat-module-crowdstrike.md) {applies_to}`stack: beta`
 * [*Cyberark PAS module*](/reference/filebeat/filebeat-module-cyberarkpas.md)
-* [*Elasticsearch module*](/reference/filebeat/filebeat-module-elasticsearch.md)
+* [*Elasticsearch module*](/reference/filebeat/filebeat-module-elasticsearch.md) {applies_to}`stack: ga`
 * [*Envoyproxy module*](/reference/filebeat/filebeat-module-envoyproxy.md)
 * [*Fortinet module*](/reference/filebeat/filebeat-module-fortinet.md)
 * [*Google Cloud Platform (GCP) module*](/reference/filebeat/filebeat-module-gcp.md)
 * [*Google Workspace module*](/reference/filebeat/filebeat-module-google_workspace.md)
 * [*HAProxy module*](/reference/filebeat/filebeat-module-haproxy.md)
-* [*IBM MQ module*](/reference/filebeat/filebeat-module-ibmmq.md)
+* [*IBM MQ module*](/reference/filebeat/filebeat-module-ibmmq.md) {applies_to}`stack: ga`
 * [*Icinga module*](/reference/filebeat/filebeat-module-icinga.md)
 * [*IIS module*](/reference/filebeat/filebeat-module-iis.md)
 * [*Iptables module*](/reference/filebeat/filebeat-module-iptables.md)
 * [*Juniper JUNOS module*](/reference/filebeat/filebeat-module-juniper.md)
 * [*Kafka module*](/reference/filebeat/filebeat-module-kafka.md)
-* [*Kibana module*](/reference/filebeat/filebeat-module-kibana.md)
-* [*Logstash module*](/reference/filebeat/filebeat-module-logstash.md)
+* [*Kibana module*](/reference/filebeat/filebeat-module-kibana.md) {applies_to}`stack: ga`
+* [*Logstash module*](/reference/filebeat/filebeat-module-logstash.md) {applies_to}`stack: ga`
 * [*Microsoft module*](/reference/filebeat/filebeat-module-microsoft.md)
 * [*MISP module*](/reference/filebeat/filebeat-module-misp.md)
 * [*MongoDB module*](/reference/filebeat/filebeat-module-mongodb.md)
@@ -65,7 +67,7 @@ While {{filebeat}} modules are still supported, we recommend {{agent}} integrati
 * [*Sophos module*](/reference/filebeat/filebeat-module-sophos.md)
 * [*Suricata module*](/reference/filebeat/filebeat-module-suricata.md)
 * [*System module*](/reference/filebeat/filebeat-module-system.md)
-* [*Threat Intel module*](/reference/filebeat/filebeat-module-threatintel.md)
+* [*Threat Intel module*](/reference/filebeat/filebeat-module-threatintel.md) {applies_to}`stack: ga`
 * [*Traefik module*](/reference/filebeat/filebeat-module-traefik.md)
 * [*Zeek (Bro) module*](/reference/filebeat/filebeat-module-zeek.md)
 * [*ZooKeeper module*](/reference/filebeat/filebeat-module-zookeeper.md) {applies_to}`stack: beta`
