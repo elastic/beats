@@ -213,14 +213,19 @@ func CreatePool(host, username, password string, dbNumber int, config *Config, c
 		MaxIdle:     config.MaxConn,
 		IdleTimeout: config.IdleTimeout,
 		Dial: func() (rd.Conn, error) {
-			dialOptions := []rd.DialOption{
-				rd.DialUsername(username),
+			dialOptions := []rd.DialOption{}
+
+			if username != "" {
+				dialOptions = append(dialOptions, rd.DialUsername(username))
+			}
+
+			dialOptions = append(dialOptions,
 				rd.DialPassword(password),
 				rd.DialDatabase(dbNumber),
 				rd.DialConnectTimeout(connTimeout),
 				rd.DialReadTimeout(connTimeout),
 				rd.DialWriteTimeout(connTimeout),
-			}
+			)
 
 			if config.TLS.IsEnabled() {
 				dialOptions = append(dialOptions,
