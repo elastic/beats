@@ -12,7 +12,7 @@ import (
 	"go.opentelemetry.io/collector/client"
 )
 
-func TestParseEventMetadata(t *testing.T) {
+func TestGetBeatEventMeta(t *testing.T) {
 	tests := []struct {
 		name     string
 		setupCtx func() context.Context
