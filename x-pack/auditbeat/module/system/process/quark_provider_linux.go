@@ -127,7 +127,7 @@ func (ms *QuarkMetricSet) Run(r mb.PushReporterV2) {
 
     // Prepare command: -E for ECS JSON, -s to silence non-JSON output.
     // Also pass -K if KUBECONFIG is available or default kubeconfig exists.
-    args := []string{"-E", "-s"}
+    args := []string{"-ENSF", "-s"}
     kubeConfig := os.Getenv("KUBECONFIG")
     if kubeConfig == "" {
         if home := os.Getenv("HOME"); home != "" {
