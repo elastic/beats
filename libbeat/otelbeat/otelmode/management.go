@@ -46,7 +46,7 @@ func NewOtelManager(cfg *config.C) (management.Manager, error) {
 	return &management.FallbackManager{}, nil
 }
 
-// otelManager, fallback when no manager is present
+// otelManager is the main manager for managing beatreceivers
 type otelManager struct {
 	logger *logp.Logger
 	lock   sync.Mutex
@@ -69,7 +69,7 @@ func (n *otelManager) SetStopCallback(func()) {
 
 func (n *otelManager) Stop() {}
 
-// We return false here because many places inside beats call manager.Enabled() for various purposes
+// Enabled returns false because many places inside beats call manager.Enabled() for various purposes
 // Returning true might lead to side effects.
 func (n *otelManager) Enabled() bool                         { return false }
 func (n *otelManager) AgentInfo() client.AgentInfo           { return client.AgentInfo{} }
