@@ -210,10 +210,6 @@ func CheckReceivers(params CheckReceiversParams) {
 // VerifyNoLeaks fails the test if any goroutines are leaked during the test.
 func VerifyNoLeaks(t *testing.T) {
 	skipped := []goleak.Option{
-		// Skip known leaks:
-		// Possibly fixed by https://github.com/elastic/beats/pull/46417
-		goleak.IgnoreAnyFunction("github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue.(*ackLoop).run"),
-		goleak.IgnoreAnyFunction("github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue.(*runLoop).runIteration"),
 		// See https://github.com/microsoft/go-winio/issues/272
 		goleak.IgnoreAnyFunction("github.com/Microsoft/go-winio.getQueuedCompletionStatus"),
 		// False positive, from init in cloud.google.com/go/pubsub and filebeat/input/gcppubsub.
@@ -228,4 +224,17 @@ func VerifyNoLeaks(t *testing.T) {
 	}
 
 	goleak.VerifyNone(t, skipped...)
+}
+
+type DummyConsumer struct {
+	context.Context
+	ConsumeError error
+}
+
+func (d *DummyConsumer) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
+	return d.ConsumeError
+}
+
+func (d *DummyConsumer) Capabilities() consumer.Capabilities {
+	return consumer.Capabilities{}
 }
