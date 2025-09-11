@@ -60,28 +60,13 @@ func (n *otelManager) UpdateStatus(status status.Status, msg string) {
 	}
 }
 
-func (n *otelManager) SetStopCallback(f func()) {
-	n.lock.Lock()
-	n.stopFunc = f
-	n.lock.Unlock()
+func (n *otelManager) SetStopCallback(func()) {
 }
 
-func (n *otelManager) Stop() {
-	n.lock.Lock()
-	defer n.lock.Unlock()
-	if n.stopFunc != nil {
-		// I'm not sure we really need the sync.Once here, but
-		// because different Beats can have different requirements
-		// for their stop function, it's better to make sure it will
-		// only be called once.
-		n.stopOnce.Do(func() {
-			n.stopFunc()
-		})
-	}
-}
+func (n *otelManager) Stop() {}
 
 // We return false here because many places inside beats call manager.Enabled() for various purposes
-// This might lead to side effects.
+// Returning true might lead to side effects.
 func (n *otelManager) Enabled() bool                         { return false }
 func (n *otelManager) AgentInfo() client.AgentInfo           { return client.AgentInfo{} }
 func (n *otelManager) Start() error                          { return nil }
