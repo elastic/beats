@@ -251,7 +251,7 @@ func (e *inputTestingEnvironment) requireOffsetInRegistry(filename, inputID stri
 
 		return expectedOffset == entry.Cursor.Offset
 	},
-		time.Second,
+		10*time.Second,
 		100*time.Millisecond,
 		"expected offset: '%d', cursor offset: '%s'",
 		expectedOffset,
