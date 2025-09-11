@@ -124,15 +124,15 @@ require (
 	go.etcd.io/bbolt v1.4.0
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.39.0
-	golang.org/x/mod v0.25.0
-	golang.org/x/net v0.41.0
+	golang.org/x/crypto v0.41.0
+	golang.org/x/mod v0.26.0
+	golang.org/x/net v0.43.0
 	golang.org/x/oauth2 v0.30.0
-	golang.org/x/sync v0.15.0
-	golang.org/x/sys v0.33.0
-	golang.org/x/text v0.26.0
+	golang.org/x/sync v0.16.0
+	golang.org/x/sys v0.35.0
+	golang.org/x/text v0.28.0
 	golang.org/x/time v0.12.0
-	golang.org/x/tools v0.33.0
+	golang.org/x/tools v0.35.0
 	google.golang.org/api v0.238.0
 	google.golang.org/genproto v0.0.0-20250505200425-f936aa4a68b2 // indirect
 	google.golang.org/grpc v1.75.0
@@ -202,16 +202,9 @@ require (
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/klauspost/compress v1.18.0
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
-<<<<<<< HEAD
-	github.com/microsoft/go-mssqldb v1.8.2
-	github.com/microsoft/wmi v0.25.1
-	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.129.0
-	github.com/otiai10/copy v1.12.0
-=======
 	github.com/microsoft/go-mssqldb v1.9.2
 	github.com/microsoft/wmi v0.25.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.132.0
->>>>>>> 02b596f4a ([beatreceiver] - Disable `force_attempt_http2` and map ES config to elasticsearchexporter (#46111))
 	github.com/pierrec/lz4/v4 v4.1.22
 	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/prometheus v0.304.3-0.20250703114031-419d436a447a
@@ -225,22 +218,6 @@ require (
 	go.elastic.co/apm/module/apmhttp/v2 v2.7.1
 	go.elastic.co/apm/v2 v2.7.1
 	go.mongodb.org/mongo-driver v1.17.4
-<<<<<<< HEAD
-	go.opentelemetry.io/collector/component v1.35.0
-	go.opentelemetry.io/collector/component/componentstatus v0.129.0
-	go.opentelemetry.io/collector/config/configtls v1.35.0
-	go.opentelemetry.io/collector/confmap v1.35.0
-	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.35.0
-	go.opentelemetry.io/collector/consumer v1.35.0
-	go.opentelemetry.io/collector/consumer/consumererror v0.129.0
-	go.opentelemetry.io/collector/exporter/debugexporter v0.129.0
-	go.opentelemetry.io/collector/otelcol v0.129.0
-	go.opentelemetry.io/collector/pdata v1.35.0
-	go.opentelemetry.io/collector/receiver v1.35.0
-	go.uber.org/mock v0.5.0
-	golang.org/x/term v0.32.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822
-=======
 	go.opentelemetry.io/collector/component v1.38.0
 	go.opentelemetry.io/collector/component/componentstatus v0.132.0
 	go.opentelemetry.io/collector/config/configtls v1.38.0
@@ -255,25 +232,13 @@ require (
 	go.uber.org/mock v0.5.0
 	golang.org/x/term v0.34.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250707201910-8d1bb00bc6a7
->>>>>>> 02b596f4a ([beatreceiver] - Disable `force_attempt_http2` and map ES config to elasticsearchexporter (#46111))
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-<<<<<<< HEAD
-	go.opentelemetry.io/collector/client v1.35.0
-=======
-	github.com/cilium/ebpf v0.16.0
+	github.com/otiai10/copy v1.14.1
 	go.opentelemetry.io/collector/client v1.38.0
-	go.opentelemetry.io/collector/exporter v0.132.0
-	go.opentelemetry.io/collector/exporter/exportertest v0.132.0
-	go.opentelemetry.io/collector/pipeline v1.38.0
-	go.opentelemetry.io/collector/processor v1.38.0
-	go.opentelemetry.io/collector/processor/processorhelper v0.132.0
-	go.opentelemetry.io/collector/receiver/receivertest v0.132.0
-	go.opentelemetry.io/otel/sdk/metric v1.37.0
->>>>>>> 02b596f4a ([beatreceiver] - Disable `force_attempt_http2` and map ES config to elasticsearchexporter (#46111))
 	go.uber.org/goleak v1.3.0
 )
 
@@ -298,12 +263,7 @@ require (
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.4.2 // indirect
-<<<<<<< HEAD
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.27.0 // indirect
-=======
-	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.29.0 // indirect
->>>>>>> 02b596f4a ([beatreceiver] - Disable `force_attempt_http2` and map ES config to elasticsearchexporter (#46111))
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.50.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.50.0 // indirect
 	github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c // indirect
@@ -326,16 +286,9 @@ require (
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bluekeyes/go-gitdiff v0.7.1 // indirect
-<<<<<<< HEAD
-	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
-	github.com/cenkalti/backoff/v5 v5.0.2 // indirect
-	github.com/cespare/xxhash v1.1.0 // indirect
-	github.com/cilium/ebpf v0.16.0 // indirect
-	github.com/cncf/xds/go v0.0.0-20250326154945-ae57f3c0d45f // indirect
-=======
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
+	github.com/cilium/ebpf v0.16.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20250501225837-2ac532fd4443 // indirect
->>>>>>> 02b596f4a ([beatreceiver] - Disable `force_attempt_http2` and map ES config to elasticsearchexporter (#46111))
 	github.com/containerd/containerd/v2 v2.1.0 // indirect
 	github.com/containerd/errdefs v1.0.0 // indirect
 	github.com/containerd/errdefs/pkg v0.3.0 // indirect
@@ -436,15 +389,11 @@ require (
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
-<<<<<<< HEAD
-	github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.129.0 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.129.0 // indirect
-=======
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.132.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.132.0 // indirect
->>>>>>> 02b596f4a ([beatreceiver] - Disable `force_attempt_http2` and map ES config to elasticsearchexporter (#46111))
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
+	github.com/otiai10/mint v1.6.3 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
@@ -468,50 +417,6 @@ require (
 	go.elastic.co/fastjson v1.5.1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
-<<<<<<< HEAD
-	go.opentelemetry.io/collector/component/componenttest v0.129.0 // indirect
-	go.opentelemetry.io/collector/config/configauth v0.129.0 // indirect
-	go.opentelemetry.io/collector/config/configcompression v1.35.0 // indirect
-	go.opentelemetry.io/collector/config/confighttp v0.129.0 // indirect
-	go.opentelemetry.io/collector/config/configmiddleware v0.129.0 // indirect
-	go.opentelemetry.io/collector/config/configopaque v1.35.0 // indirect
-	go.opentelemetry.io/collector/config/configretry v1.35.0 // indirect
-	go.opentelemetry.io/collector/config/configtelemetry v0.129.0 // indirect
-	go.opentelemetry.io/collector/confmap/xconfmap v0.129.0 // indirect
-	go.opentelemetry.io/collector/connector v0.129.0 // indirect
-	go.opentelemetry.io/collector/connector/connectortest v0.129.0 // indirect
-	go.opentelemetry.io/collector/connector/xconnector v0.129.0 // indirect
-	go.opentelemetry.io/collector/consumer/consumererror/xconsumererror v0.129.0 // indirect
-	go.opentelemetry.io/collector/consumer/consumertest v0.129.0 // indirect
-	go.opentelemetry.io/collector/consumer/xconsumer v0.129.0 // indirect
-	go.opentelemetry.io/collector/exporter v0.129.0 // indirect
-	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.129.0 // indirect
-	go.opentelemetry.io/collector/exporter/exportertest v0.129.0 // indirect
-	go.opentelemetry.io/collector/exporter/xexporter v0.129.0 // indirect
-	go.opentelemetry.io/collector/extension v1.35.0 // indirect
-	go.opentelemetry.io/collector/extension/extensionauth v1.35.0 // indirect
-	go.opentelemetry.io/collector/extension/extensioncapabilities v0.129.0 // indirect
-	go.opentelemetry.io/collector/extension/extensionmiddleware v0.129.0 // indirect
-	go.opentelemetry.io/collector/extension/extensiontest v0.129.0 // indirect
-	go.opentelemetry.io/collector/extension/xextension v0.129.0 // indirect
-	go.opentelemetry.io/collector/featuregate v1.35.0 // indirect
-	go.opentelemetry.io/collector/internal/fanoutconsumer v0.129.0 // indirect
-	go.opentelemetry.io/collector/internal/telemetry v0.129.0 // indirect
-	go.opentelemetry.io/collector/pdata/pprofile v0.129.0 // indirect
-	go.opentelemetry.io/collector/pdata/testdata v0.129.0 // indirect
-	go.opentelemetry.io/collector/pdata/xpdata v0.129.0 // indirect
-	go.opentelemetry.io/collector/pipeline v0.129.0 // indirect
-	go.opentelemetry.io/collector/pipeline/xpipeline v0.129.0 // indirect
-	go.opentelemetry.io/collector/processor v1.35.0 // indirect
-	go.opentelemetry.io/collector/processor/processortest v0.129.0 // indirect
-	go.opentelemetry.io/collector/processor/xprocessor v0.129.0 // indirect
-	go.opentelemetry.io/collector/receiver/receivertest v0.129.0 // indirect
-	go.opentelemetry.io/collector/receiver/xreceiver v0.129.0 // indirect
-	go.opentelemetry.io/collector/service v0.129.0 // indirect
-	go.opentelemetry.io/collector/service/hostcapabilities v0.129.0 // indirect
-	go.opentelemetry.io/contrib/bridges/otelzap v0.11.0 // indirect
-	go.opentelemetry.io/contrib/detectors/gcp v1.35.0 // indirect
-=======
 	go.opentelemetry.io/collector/component/componenttest v0.132.0 // indirect
 	go.opentelemetry.io/collector/config/configauth v0.132.0 // indirect
 	go.opentelemetry.io/collector/config/configcompression v1.38.0 // indirect
@@ -528,7 +433,9 @@ require (
 	go.opentelemetry.io/collector/consumer/consumererror/xconsumererror v0.132.0 // indirect
 	go.opentelemetry.io/collector/consumer/consumertest v0.132.0 // indirect
 	go.opentelemetry.io/collector/consumer/xconsumer v0.132.0 // indirect
+	go.opentelemetry.io/collector/exporter v0.132.0 // indirect
 	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.132.0 // indirect
+	go.opentelemetry.io/collector/exporter/exportertest v0.132.0 // indirect
 	go.opentelemetry.io/collector/exporter/xexporter v0.132.0 // indirect
 	go.opentelemetry.io/collector/extension v1.38.0 // indirect
 	go.opentelemetry.io/collector/extension/extensionauth v1.38.0 // indirect
@@ -542,17 +449,19 @@ require (
 	go.opentelemetry.io/collector/pdata/pprofile v0.132.0 // indirect
 	go.opentelemetry.io/collector/pdata/testdata v0.132.0 // indirect
 	go.opentelemetry.io/collector/pdata/xpdata v0.132.0 // indirect
+	go.opentelemetry.io/collector/pipeline v1.38.0 // indirect
 	go.opentelemetry.io/collector/pipeline/xpipeline v0.132.0 // indirect
+	go.opentelemetry.io/collector/processor v1.38.0 // indirect
 	go.opentelemetry.io/collector/processor/processortest v0.132.0 // indirect
 	go.opentelemetry.io/collector/processor/xprocessor v0.132.0 // indirect
+	go.opentelemetry.io/collector/receiver/receivertest v0.132.0 // indirect
 	go.opentelemetry.io/collector/receiver/xreceiver v0.132.0 // indirect
 	go.opentelemetry.io/collector/service v0.132.0 // indirect
 	go.opentelemetry.io/collector/service/hostcapabilities v0.132.0 // indirect
 	go.opentelemetry.io/contrib/bridges/otelzap v0.12.0 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.36.0 // indirect
->>>>>>> 02b596f4a ([beatreceiver] - Disable `force_attempt_http2` and map ES config to elasticsearchexporter (#46111))
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.61.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.61.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.62.0 // indirect
 	go.opentelemetry.io/contrib/otelconf v0.16.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.36.0 // indirect
 	go.opentelemetry.io/ebpf-profiler v0.0.0-20250212075250-7bf12d3f962f // indirect
@@ -577,7 +486,7 @@ require (
 	go.opentelemetry.io/proto/otlp v1.7.0 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
-	go.yaml.in/yaml/v3 v3.0.3 // indirect
+	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	gonum.org/v1/gonum v0.16.0 // indirect

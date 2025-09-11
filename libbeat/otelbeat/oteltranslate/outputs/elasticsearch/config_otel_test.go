@@ -62,7 +62,7 @@ endpoints:
   - http://localhost:9300/foo/bar
 idle_conn_timeout: 3s
 logs_index: some-index
-max_conns_per_host: 30
+max_conns_per_host: 1
 password: changeme
 pipeline: some-ingest-pipeline
 proxy_url: https://proxy.url
@@ -78,7 +78,7 @@ sending_queue:
     sizer: items
   block_on_overflow: true
   enabled: true
-  num_consumers: 30
+  num_consumers: 1
   queue_size: 3200
   wait_for_result: true
 timeout: 1m30s
