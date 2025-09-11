@@ -20,6 +20,7 @@ package oteltest
 
 import (
 	"context"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -208,13 +209,21 @@ func CheckReceivers(params CheckReceiversParams) {
 
 // VerifyNoLeaks fails the test if any goroutines are leaked during the test.
 func VerifyNoLeaks(t *testing.T) {
-	goleak.VerifyNone(t,
+	skipped := []goleak.Option{
 		// See https://github.com/microsoft/go-winio/issues/272
 		goleak.IgnoreAnyFunction("github.com/Microsoft/go-winio.getQueuedCompletionStatus"),
 		// False positive, from init in cloud.google.com/go/pubsub and filebeat/input/gcppubsub.
 		// See https://github.com/googleapis/google-cloud-go/issues/10948
 		// and https://github.com/census-instrumentation/opencensus-go/issues/1191
-		goleak.IgnoreAnyFunction("go.opencensus.io/stats/view.(*worker).start"))
+		goleak.IgnoreAnyFunction("go.opencensus.io/stats/view.(*worker).start"),
+	}
+
+	if runtime.GOOS == "linux" && runtime.GOARCH == "arm64" {
+		// On arm64, some HTTP transport goroutines are leaked while still dialing.
+		skipped = append(skipped, goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked"))
+	}
+
+	goleak.VerifyNone(t, skipped...)
 }
 
 type DummyConsumer struct {
