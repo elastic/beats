@@ -207,17 +207,32 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 						// timegrain config scenario. Therefore, we should not
 						// continue with data returned from the latest API call,
 						// because this data could be bad
-						client.MetricRegistry.Update(metricsDefinitions[i], MetricCollectionInfo{
-							timeGrain: *response[i].Interval,
-							timestamp: referenceTime,
-						})
-						values := mapBatchMetricValues(client, v)
-						metricsDefinitions[i].Values = append(metricsDefinitions[i].Values, values...)
-						if metricsDefinitions[i].TimeGrain == "" {
-							// this should not be hit because we always set a timegrain during
-							// fetching definitions
-							metricsDefinitions[i].TimeGrain = *response[i].Interval
+						err = fmt.Errorf(
+							"error while listing some metric values by resource ID"+
+								" %s and namespace %s: The returned"+
+								"interval (timegrain) for batch %v of responses is empty.",
+							metricsDefinitions[0].ResourceSubId,
+							metricsDefinitions[0].Namespace,
+							i,
+						)
+
+						client.Log.Error(err.Error())
+						if resp, err := response[i].MarshalJSON(); err != nil {
+							jsonResp := string(resp)
+							client.Log.Debugf("JSON of errored batch %v: %s", i, jsonResp)
 						}
+						continue // skip the errored batch
+					}
+					client.MetricRegistry.Update(metricsDefinitions[i], MetricCollectionInfo{
+						timeGrain: *response[i].Interval,
+						timestamp: referenceTime,
+					})
+					values := mapBatchMetricValues(client, v)
+					metricsDefinitions[i].Values = append(metricsDefinitions[i].Values, values...)
+					if metricsDefinitions[i].TimeGrain == "" {
+						// this should not be hit because we always set a timegrain during
+						// fetching definitions
+						metricsDefinitions[i].TimeGrain = *response[i].Interval
 					}
 				}
 
