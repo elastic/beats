@@ -22,6 +22,9 @@ import (
 	"sync"
 	"sync/atomic"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
@@ -72,6 +75,29 @@ func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
 	for _, c := range clients {
 		c.Close()
 	}
+}
+
+func TestPipelineWaitCloseThenForce(t *testing.T) {
+	closed := make(chan struct{})
+	forceClosed := make(chan struct{})
+	mockQueue := &testQueue{
+		close: func(force bool) error {
+			if force {
+				close(forceClosed)
+			} else {
+				close(closed)
+			}
+			return nil
+		},
+	}
+	settings := Settings{
+		WaitCloseMode: WaitOnPipelineCloseThenForce,
+		WaitClose:     time.Millisecond,
+	}
+	pipeline := makePipeline(t, settings, mockQueue)
+	require.NoError(t, pipeline.Close())
+	<-closed
+	<-forceClosed
 }
 
 // makeDiscardQueue returns a queue that always discards all events
