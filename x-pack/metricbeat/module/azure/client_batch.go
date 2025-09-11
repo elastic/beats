@@ -210,7 +210,7 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 						err = fmt.Errorf(
 							"error while listing some metric values by resource ID"+
 								" %s and namespace %s: The returned"+
-								"interval (timegrain) for batch %v of responses is empty.",
+								"interval (timegrain) for batch %v of responses is empty",
 							metricsDefinitions[0].ResourceSubId,
 							metricsDefinitions[0].Namespace,
 							i,
