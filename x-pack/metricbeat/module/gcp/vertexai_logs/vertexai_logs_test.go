@@ -7,34 +7,42 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGenerateQuery(t *testing.T) {
+	// Test initial query (no watermark)
 	m := &MetricSet{
 		config: config{
-			TableID: "project-1233.dataset.table_name",
+			TableID:           "project-1233.dataset.table_name",
+			TimeLookbackHours: 2,
 		},
+		logger: logp.NewLogger("test"),
 	}
+
 	query := m.generateQuery()
 	// verify that table name quoting is in effect
 	assert.Contains(t, query, "`project-1233.dataset.table_name`")
 	// verify WHERE clause is present
 	assert.Contains(t, query, "WHERE")
 	assert.Contains(t, query, "logging_time IS NOT NULL")
-	// verify partition filter is present
-	assert.Contains(t, query, "_PARTITIONDATE >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)")
-	// verify timestamp filter is present
-	assert.Contains(t, query, "logging_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR)")
-	// verify ORDER BY is present (should be ASC now)
+	// verify timestamp filter is present for initial query
+	assert.Contains(t, query, "logging_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 2 HOUR)")
+	// verify ORDER BY is present (should be ASC for incremental)
 	assert.Contains(t, query, "ORDER BY")
 	assert.Contains(t, query, "logging_time ASC")
-	// verify LIMIT is NOT present (removed for no data loss)
-	assert.NotContains(t, query, "LIMIT")
 	// verify CAST for request_id
 	assert.Contains(t, query, "CAST(IFNULL(request_id, 0) AS FLOAT64)")
+	// Test incremental query (with watermark)
+	lastTime := time.Date(2023, 12, 1, 10, 0, 0, 0, time.UTC)
+	m.lastLoggingTime = &lastTime
+
+	queryIncremental := m.generateQuery()
+	// verify incremental query uses logging_time filter
+	assert.Contains(t, queryIncremental, "logging_time > TIMESTAMP('2023-12-01 10:00:00.000000')")
 }
 
 func TestCreateEvent(t *testing.T) {
@@ -175,4 +183,46 @@ func TestEventsMapping(t *testing.T) {
 	assert.Len(events, 2)
 	assert.Equal("model-123456", events[0].MetricSetFields["deployed_model_id"])
 	assert.Equal("model-789012", events[1].MetricSetFields["deployed_model_id"])
+}
+
+func TestUpdateLastLoggingTime(t *testing.T) {
+	logger := logp.NewLogger("test")
+	m := &MetricSet{
+		logger: logger,
+	}
+
+	testTime1 := time.Date(2023, 12, 1, 10, 0, 0, 0, time.UTC)
+	testTime2 := time.Date(2023, 12, 1, 11, 0, 0, 0, time.UTC)
+	testTime3 := time.Date(2023, 12, 1, 9, 0, 0, 0, time.UTC)
+
+	// Test with empty events
+	m.updateLastLoggingTime([]mb.Event{})
+	assert.Nil(t, m.lastLoggingTime)
+
+	// Test with single event
+	events1 := []mb.Event{{
+		Timestamp:       testTime1,
+		MetricSetFields: mapstr.M{"logging_time": testTime1},
+	}}
+	m.updateLastLoggingTime(events1)
+	assert.NotNil(t, m.lastLoggingTime)
+	assert.Equal(t, testTime1, *m.lastLoggingTime)
+
+	// Test with multiple events - should pick the latest
+	events2 := []mb.Event{
+		{Timestamp: testTime1, MetricSetFields: mapstr.M{"logging_time": testTime1}},
+		{Timestamp: testTime2, MetricSetFields: mapstr.M{"logging_time": testTime2}},
+		{Timestamp: testTime3, MetricSetFields: mapstr.M{"logging_time": testTime3}},
+	}
+	m.updateLastLoggingTime(events2)
+	assert.Equal(t, testTime2, *m.lastLoggingTime)
+
+	// Test with zero timestamps (should be skipped)
+	events3 := []mb.Event{
+		{Timestamp: time.Time{}, MetricSetFields: mapstr.M{"logging_time": time.Time{}}},
+		{Timestamp: testTime1, MetricSetFields: mapstr.M{"logging_time": testTime1}},
+	}
+	m.lastLoggingTime = nil
+	m.updateLastLoggingTime(events3)
+	assert.Equal(t, testTime1, *m.lastLoggingTime)
 }

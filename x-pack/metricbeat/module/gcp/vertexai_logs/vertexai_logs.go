@@ -30,8 +30,9 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	config config
-	logger *logp.Logger
+	config          config
+	logger          *logp.Logger
+	lastLoggingTime *time.Time
 }
 
 type config struct {
@@ -40,6 +41,7 @@ type config struct {
 	TableID             string        `config:"table_id" validate:"required"`
 	CredentialsFilePath string        `config:"credentials_file_path"`
 	CredentialsJSON     string        `config:"credentials_json"`
+	TimeLookbackHours   int           `config:"time_lookback_hours"`
 }
 
 func (c config) Validate() error {
@@ -60,6 +62,10 @@ func (c config) Validate() error {
 		return fmt.Errorf("table_id must be in format 'project_id.dataset_id.table_name', got: %s", c.TableID)
 	}
 
+	if c.TimeLookbackHours < 0 {
+		return errors.New("time_lookback_hours must be non-negative")
+	}
+
 	return nil
 }
 
@@ -73,8 +79,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("unpack vertexai_logs config failed: %w", err)
 	}
 
-	m.logger.Debugf("metricset config: project_id=%s, dataset_id=%s, table_name=%s",
-		m.config.ProjectID, getDatasetID(m.config.TableID), getTableName(m.config.TableID))
+	// Set defaults
+	if m.config.TimeLookbackHours == 0 {
+		m.config.TimeLookbackHours = 1 // Default: 1 hour
+	}
+
+	m.logger.Debugf("metricset config: project_id=%s, dataset_id=%s, table_name=%s, time_lookback=%dh",
+		m.config.ProjectID, getDatasetID(m.config.TableID), getTableName(m.config.TableID),
+		m.config.TimeLookbackHours)
 	return m, nil
 }
 
@@ -129,6 +141,9 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		reporter.Event(event)
 	}
 
+	// Update watermark with latest logging_time from events
+	m.updateLastLoggingTime(events)
+
 	return nil
 }
 
@@ -178,6 +193,19 @@ func (m *MetricSet) queryVertexAILogs(ctx context.Context, client *bigquery.Clie
 func (m *MetricSet) generateQuery() string {
 	escapedTableID := fmt.Sprintf("`%s`", m.config.TableID)
 
+	var whereClause string
+	if m.lastLoggingTime != nil {
+		// Incremental query: get records after last processed time
+		whereClause = fmt.Sprintf("logging_time > TIMESTAMP('%s')",
+			m.lastLoggingTime.Format("2006-01-02 15:04:05.000000"))
+		m.logger.Debugf("Using incremental query from logging_time: %s", m.lastLoggingTime.Format(time.RFC3339))
+	} else {
+		// First run: use timestamp filter with lookback
+		whereClause = fmt.Sprintf("logging_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL %d HOUR)",
+			m.config.TimeLookbackHours)
+		m.logger.Debugf("Using initial query with timestamp filter: %d hours", m.config.TimeLookbackHours)
+	}
+
 	query := fmt.Sprintf(`
 SELECT
 	IFNULL(endpoint, '') AS endpoint,
@@ -196,12 +224,38 @@ SELECT
 FROM
 	%s
 WHERE
-	_PARTITIONDATE >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
-	AND logging_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR)
+	%s
 	AND logging_time IS NOT NULL
 ORDER BY
 	logging_time ASC`,
-		escapedTableID)
+		escapedTableID, whereClause)
 
 	return query
+}
+
+// updateLastLoggingTime updates the watermark with the latest logging_time from events
+
+func (m *MetricSet) updateLastLoggingTime(events []mb.Event) {
+	if len(events) == 0 {
+		return
+	}
+
+	var latestTime *time.Time
+	for _, event := range events {
+		// Get logging_time from the event's MetricSetFields
+		if loggingTimeField, exists := event.MetricSetFields["logging_time"]; exists {
+			if loggingTime, ok := loggingTimeField.(time.Time); ok {
+				if !loggingTime.IsZero() && (latestTime == nil || loggingTime.After(*latestTime)) {
+					latestTime = &loggingTime
+				}
+			}
+		}
+	}
+
+	if latestTime != nil {
+		// Store in UTC for consistency
+		utcTime := latestTime.UTC()
+		m.lastLoggingTime = &utcTime
+		m.logger.Debugf("Updated last logging time to: %s", latestTime.Format(time.RFC3339))
+	}
 }

@@ -91,5 +91,6 @@
   table_id: "your-project-id.dataset.id.table_name"
   credentials_file_path: "/path/to/service-account.json"
   # credentials_json: '{"type": "service_account", ...}'
+  time_lookback_hours: 1  # How many hours back to look for initial data fetch
 
 
