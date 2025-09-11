@@ -217,7 +217,7 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 						)
 
 						client.Log.Error(err.Error())
-						if resp, err := response[i].MarshalJSON(); err != nil {
+						if resp, err := response[i].MarshalJSON(); err == nil {
 							jsonResp := string(resp)
 							client.Log.Debugf("JSON of errored batch %v: %s", i, jsonResp)
 						}
