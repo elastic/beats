@@ -125,12 +125,15 @@ func (l *runLoop) runIteration() {
 	}
 
 	select {
-	case <-l.broker.closeChan:
+	case force := <-l.broker.closeChan:
 		if !l.closing {
 			l.closing = true
 			close(l.broker.closingChan)
 			// Get requests are handled immediately during shutdown
 			l.maybeUnblockGetRequest()
+		}
+		if force {
+			l.broker.ctxCancel()
 		}
 
 	case <-l.broker.ctx.Done():

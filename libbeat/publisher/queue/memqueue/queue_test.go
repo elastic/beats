@@ -229,6 +229,41 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 	assert.False(t, activeEvents.Load() < 0, "active event count should never be negative")
 }
 
+func TestDoubleClose(t *testing.T) {
+	q := NewQueue(logp.NewNopLogger(), nil,
+		Settings{
+			Events:        3, // Queue size
+			MaxGetRequest: 3,
+			FlushTimeout:  10 * time.Millisecond,
+		}, 1, nil)
+
+	p := q.Producer(queue.ProducerConfig{})
+
+	// Write some events to the queue synchronously
+	for i := 0; i < 3; i++ {
+		event := i
+		_, ok := p.Publish(event)
+		assert.True(t, ok)
+	}
+
+	// Keep writing to the queue as long as we're successful
+	var wgProducer sync.WaitGroup
+	wgProducer.Add(1)
+	go func() {
+		queueOpen := true
+		for queueOpen {
+			_, queueOpen = p.Publish(0)
+		}
+		wgProducer.Done()
+	}()
+
+	// Close the queue without force, then with it enabled
+	// Both should succeed
+	require.NoError(t, q.Close(false))
+	require.NoError(t, q.Close(true))
+	<-q.Done()
+}
+
 func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
 	return func(t *testing.T) queue.Queue {
 		return NewQueue(logptest.NewTestingLogger(t, ""), nil, Settings{

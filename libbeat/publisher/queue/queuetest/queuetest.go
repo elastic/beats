@@ -21,6 +21,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -200,9 +202,11 @@ func runTestCases(t *testing.T, tests []testCase, queueFactory QueueFactory) {
 			queue := queueFactory(t)
 			defer func() {
 				err := queue.Close(false)
-				if err != nil {
-					t.Error(err)
-				}
+				require.NoError(t, err)
+				// close again to verify this doesn't cause any issues
+				err = queue.Close(true)
+				require.NoError(t, err)
+				<-queue.Done()
 			}()
 
 			var wg sync.WaitGroup

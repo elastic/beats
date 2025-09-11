@@ -310,6 +310,9 @@ func (dq *diskQueue) handleShutdown() {
 		dq.handleDeleterLoopResponse(response)
 	}
 	close(dq.deleterLoop.requestChan)
+
+	// signal that we're done closing
+	close(dq.done)
 }
 
 // If the pendingFrames list is nonempty, and there are no outstanding
