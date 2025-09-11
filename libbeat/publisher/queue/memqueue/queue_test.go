@@ -18,10 +18,11 @@
 package memqueue
 
 import (
+	"encoding/binary"
 	"flag"
 	"fmt"
 	"math"
-	"math/rand"
+	"math/rand/v2"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -46,10 +47,13 @@ func TestProduceConsumer(t *testing.T) {
 	maxEvents := 1024
 	minEvents := 32
 
-	randGen := rand.New(rand.NewSource(seed))
-	events := randGen.Intn(maxEvents-minEvents) + minEvents
-	batchSize := randGen.Intn(events-8) + 4
-	bufferSize := randGen.Intn(batchSize*2) + 4
+	var seedBytes [32]byte
+	_, err := binary.Encode(seedBytes[:], binary.NativeEndian, seed)
+	require.NoError(t, err)
+	randGen := rand.New(rand.NewChaCha8(seedBytes))
+	events := randGen.IntN(maxEvents-minEvents) + minEvents
+	batchSize := randGen.IntN(events-8) + 4
+	bufferSize := randGen.IntN(batchSize*2) + 4
 
 	// events := 4
 	// batchSize := 1

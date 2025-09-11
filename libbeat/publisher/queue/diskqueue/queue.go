@@ -128,7 +128,7 @@ func NewQueue(
 				"twice the segment size (%v)",
 			settings.MaxBufferSize, settings.MaxSegmentSize)
 	}
-	observer.MaxBytes(int(settings.MaxBufferSize))
+	observer.MaxBytes(int(settings.MaxBufferSize)) //nolint:gosec // G115 Conversion from uint64 to int is safe here.
 
 	// Create the given directory path if it doesn't exist.
 	err := os.MkdirAll(settings.directoryPath(), os.ModePerm)
@@ -182,7 +182,7 @@ func NewQueue(
 	for _, segment := range initialSegments {
 		initialEventCount += int(segment.frameCount)
 		// Event metrics for the queue observer don't include segment headser size
-		initialByteCount += int(segment.byteCount - segment.headerSize())
+		initialByteCount += int(segment.byteCount - segment.headerSize()) //nolint:gosec // G115 Conversion from uint64 to int is safe here.
 	}
 	observer.Restore(initialEventCount, initialByteCount)
 
@@ -207,7 +207,7 @@ func NewQueue(
 	for _, segment := range initialSegments {
 		activeFrameCount += int(segment.frameCount)
 	}
-	activeFrameCount -= int(nextReadPosition.frameIndex)
+	activeFrameCount -= int(nextReadPosition.frameIndex) //nolint:gosec // G115 Conversion from uint64 to int is safe here.
 	logger.Infof("Found %v queued events consuming %v bytes, %v events still pending", initialEventCount, initialByteCount, activeFrameCount)
 
 	var encoder queue.Encoder
