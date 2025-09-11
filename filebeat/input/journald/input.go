@@ -291,7 +291,9 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 	case string:
 		content = []byte(msg)
 	case []any:
-		// Safely convert the data to a []byte
+		// MESSAGE can be a byte array, in its JSON representation, it is a
+		// []any where all elements are floag64.
+		// Safely convert it to a []byte
 		content = make([]byte, len(msg))
 		for i, v := range msg {
 			if b, ok := v.(float64); ok {
@@ -302,6 +304,8 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 			}
 		}
 	default:
+		// This should never happen, but just in case we fall back to just
+		// getting a string representation using the `fmt` package.
 		failed = true
 	}
 
