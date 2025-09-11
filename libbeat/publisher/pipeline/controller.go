@@ -136,8 +136,12 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	// create new output group with the shared work queue
 	clients := outGrp.Clients
 	c.workers = make([]outputWorker, len(clients))
+	logger := c.beat.Logger.Named("publisher_pipeline_output")
 	for i, client := range clients {
+<<<<<<< HEAD
 		logger := logp.NewLogger("publisher_pipeline_output")
+=======
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 		c.workers[i] = makeClientWorker(c.workerChan, client, logger, c.monitors.Tracer)
 	}
 

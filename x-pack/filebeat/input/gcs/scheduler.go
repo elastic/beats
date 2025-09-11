@@ -47,7 +47,11 @@ func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src 
 ) *scheduler {
 	if metrics == nil {
 		// metrics are optional, initialize a stub if not provided
+<<<<<<< HEAD
 		metrics = newInputMetrics("", nil)
+=======
+		metrics = newInputMetrics(monitoring.NewRegistry(), log)
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	}
 	return &scheduler{
 		publisher: publisher,

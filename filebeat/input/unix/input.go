@@ -98,8 +98,12 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	log.Info("Starting Unix socket input")
 	defer log.Info("Unix socket input stopped")
 
+<<<<<<< HEAD
 	metrics := newInputMetrics(ctx.ID, s.config.Path, log)
 	defer metrics.close()
+=======
+	metrics := newInputMetrics(ctx.ID, ctx.MetricsRegistry, s.config.Path, ctx.Logger)
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	server, err := unix.New(log, &s.config.Config, func(data []byte, _ inputsource.NetworkMetadata) {
 		log.Debugw("Data received", "bytes", len(data))
@@ -145,7 +149,11 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for the unix socket processor. If id is empty
 // a nil inputMetric is returned.
+<<<<<<< HEAD
 func newInputMetrics(id, path string, log *logp.Logger) *inputMetrics {
+=======
+func newInputMetrics(id string, reg *monitoring.Registry, path string, logger *logp.Logger) *inputMetrics {
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	if id == "" {
 		return nil
 	}
@@ -158,9 +166,9 @@ func newInputMetrics(id, path string, log *logp.Logger) *inputMetrics {
 		arrivalPeriod:  metrics.NewUniformSample(1024),
 		processingTime: metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "arrival_period", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
-	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))
 
 	out.path.Set(path)
