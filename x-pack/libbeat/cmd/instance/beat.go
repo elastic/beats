@@ -19,11 +19,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmode"
 	"github.com/elastic/beats/v7/libbeat/plugin"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/otelmanager"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -183,7 +183,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	// initialize config manager
-	m, err := otelmode.NewOtelManager(cfg)
+	m, err := otelmanager.NewOtelManager(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new manager: %w", err)
 	}
