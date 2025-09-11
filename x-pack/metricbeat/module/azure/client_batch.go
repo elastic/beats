@@ -207,7 +207,8 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 						// timegrain config scenario. Therefore, we should not
 						// continue with data returned from the latest API call,
 						// because this data could be bad
-						err = fmt.Errorf(
+
+						client.Log.Error(
 							"error while listing some metric values by resource ID"+
 								" %s and namespace %s: The returned"+
 								"interval (timegrain) for batch %v of responses is empty",
@@ -215,13 +216,33 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 							metricsDefinitions[0].Namespace,
 							i,
 						)
-
-						client.Log.Error(err.Error())
 						if resp, err := response[i].MarshalJSON(); err == nil {
 							jsonResp := string(resp)
 							client.Log.Debugf("JSON of errored batch %v: %s", i, jsonResp)
 						}
-						continue // skip the errored batch
+						continue // we do not record this data as it may be corrupted
+					} else if *response[i].Interval != criteria.TimeGrain {
+						// note that the SDK says
+						// the interval "may be adjusted in the future and returned back
+						// from what was originally requested"
+						// Reference: https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor@v0.8.0#Response
+						client.Log.Warnf(
+							"error while listing some metric values by resource ID"+
+								" %s and namespace %s: The "+
+								"interval (timegrain) in the response for batch %v of "+
+								"responses does not match the requested timegrain %s",
+							metricsDefinitions[0].ResourceSubId,
+							metricsDefinitions[0].Namespace,
+							i,
+							*response[i].Interval)
+						if resp, err := response[i].MarshalJSON(); err == nil {
+							jsonResp := string(resp)
+							client.Log.Debugf("JSON of errored batch %v: %s", i, jsonResp)
+						}
+						// we leverage the modified response interval
+						// as the SDK mentioned this adjusted interval
+						// is possible and therefore can be expected at times
+						// Reference: https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor@v0.8.0#Response
 					}
 					client.MetricRegistry.Update(metricsDefinitions[i], MetricCollectionInfo{
 						timeGrain: *response[i].Interval,
