@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
 
@@ -120,8 +121,9 @@ http.port: %d
 		},
 		2*time.Minute, 1*time.Second, "expected at least %d events for both filebeat and otel", numEvents)
 
-	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
-	otelDoc := otelDocs.Hits.Hits[0].Source
+	var filebeatDoc, otelDoc mapstr.M
+	filebeatDoc = filebeatDocs.Hits.Hits[0].Source
+	otelDoc = otelDocs.Hits.Hits[0].Source
 	ignoredFields := []string{
 		// Expected to change between agentDocs and OtelDocs
 		"@timestamp",
@@ -129,9 +131,17 @@ http.port: %d
 		"agent.id",
 		"log.file.inode",
 		"log.file.path",
+		// only present in beats receivers
+		"agent.otelcol.component.id",
+		"agent.otelcol.component.kind",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+
+	assert.Equal(t, "filebeatreceiver", otelDoc.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
+	assert.Equal(t, "receiver", otelDoc.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
+	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in filebeat log record")
+	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in filebeat log record")
 	assertMonitoring(t, otelMonitoringPort)
 }
 
@@ -252,6 +262,9 @@ processors:
 		"agent.ephemeral_id",
 		"agent.id",
 		"event.created",
+		// only present in beats receivers
+		"agent.otelcol.component.id",
+		"agent.otelcol.component.kind",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
@@ -325,7 +338,7 @@ func TestFilebeatOTelReceiverE2E(t *testing.T) {
 	}
 
 	cfg := `receivers:
-  filebeatreceiver:
+  filebeatreceiver/filestream:
     filebeat:
       inputs:
         - type: filestream
@@ -366,7 +379,7 @@ service:
   pipelines:
     logs:
       receivers:
-        - filebeatreceiver
+        - filebeatreceiver/filestream
       exporters:
         - elasticsearch/log
         - debug
@@ -452,8 +465,9 @@ http.port: %d
 		},
 		2*time.Minute, 1*time.Second, "expected at least %d events for both filebeat and otel", wantEvents)
 
-	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
-	otelDoc := otelDocs.Hits.Hits[0].Source
+	var filebeatDoc, otelDoc mapstr.M
+	filebeatDoc = filebeatDocs.Hits.Hits[0].Source
+	otelDoc = otelDocs.Hits.Hits[0].Source
 	ignoredFields := []string{
 		// Expected to change between agentDocs and OtelDocs
 		"@timestamp",
@@ -461,9 +475,16 @@ http.port: %d
 		"agent.id",
 		"log.file.inode",
 		"log.file.path",
+		// only present in beats receivers
+		"agent.otelcol.component.id",
+		"agent.otelcol.component.kind",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+	assert.Equal(t, "filebeatreceiver/filestream", otelDoc.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
+	assert.Equal(t, "receiver", otelDoc.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
+	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in filebeat log record")
+	assert.NotContains(t, filebeatDoc.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in filebeat log record")
 	assertMonitoring(t, otelConfig.MonitoringPort)
 	assertMonitoring(t, filebeatMonitoringPort) // filebeat
 }
@@ -637,10 +658,6 @@ processors:
 `
 	expectedExporter := `exporters:
     elasticsearch:
-        batcher:
-            enabled: true
-            max_size: 1600
-            min_size: 0
         compression: gzip
         compression_params:
             level: 1
@@ -650,12 +667,23 @@ processors:
         logs_index: index
         mapping:
             mode: bodymap
+        max_conns_per_host: 1
         password: testing
         retry:
             enabled: true
             initial_interval: 1s
             max_interval: 1m0s
             max_retries: 3
+        sending_queue:
+            batch:
+                max_size: 1600
+                min_size: 0
+                sizer: items
+            block_on_overflow: true
+            enabled: true
+            num_consumers: 1
+            queue_size: 3200
+            wait_for_result: true
         timeout: 1m30s
         user: admin`
 	expectedReceiver := `receivers:
@@ -688,9 +716,9 @@ processors:
 
 	require.EventuallyWithT(t, func(collect *assert.CollectT) {
 		out, err := filebeatOTel.ReadStdout()
-		require.NoError(t, err)
-		require.Contains(t, out, expectedExporter)
-		require.Contains(t, out, expectedReceiver)
-		require.Contains(t, out, expectedService)
+		require.NoError(collect, err)
+		require.Contains(collect, out, expectedExporter)
+		require.Contains(collect, out, expectedReceiver)
+		require.Contains(collect, out, expectedService)
 	}, 10*time.Second, 500*time.Millisecond, "failed to get output of inspect command")
 }
