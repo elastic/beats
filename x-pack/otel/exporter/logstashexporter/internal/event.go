@@ -14,7 +14,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/x-pack/libbeat/outputs/otelctx"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
 )
 
 func parseEvent(ctx context.Context, logRecord *plog.LogRecord) (beat.Event, error) {

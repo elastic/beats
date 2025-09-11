@@ -22,9 +22,9 @@ import (
 	"go.opentelemetry.io/collector/receiver/receivertest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
-	"github.com/elastic/beats/v7/x-pack/libbeat/outputs/otelctx"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
