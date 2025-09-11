@@ -211,7 +211,7 @@ SELECT
 	IFNULL(endpoint, '') AS endpoint,
 	IFNULL(deployed_model_id, '') AS deployed_model_id,
 	logging_time,
-	CAST(IFNULL(request_id, 0) AS FLOAT64) AS request_id,
+	IFNULL(CAST(request_id AS STRING), '') AS request_id,
 	IFNULL(request_payload, []) AS request_payload,
 	IFNULL(response_payload, []) AS response_payload,
 	IFNULL(model, '') AS model,

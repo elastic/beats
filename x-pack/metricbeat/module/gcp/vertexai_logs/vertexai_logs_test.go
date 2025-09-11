@@ -36,7 +36,7 @@ func TestGenerateQuery(t *testing.T) {
 	assert.Contains(t, query, "ORDER BY")
 	assert.Contains(t, query, "logging_time ASC")
 	// verify CAST for request_id
-	assert.Contains(t, query, "CAST(IFNULL(request_id, 0) AS FLOAT64)")
+	assert.Contains(t, query, "IFNULL(CAST(request_id AS STRING), '')")
 	// Test incremental query (with watermark)
 	lastTime := time.Date(2023, 12, 1, 10, 0, 0, 0, time.UTC)
 	m.lastLoggingTime = &lastTime
@@ -53,7 +53,7 @@ func TestCreateEvent(t *testing.T) {
 		Endpoint:        "https://us-central1-aiplatform.googleapis.com",
 		DeployedModelID: "model-123456",
 		LoggingTime:     testTime,
-		RequestID:       12345.67,
+		RequestID:       "12345.67",
 		RequestPayload:  []string{"prompt1", "prompt2"},
 		ResponsePayload: []string{"response1", "response2"},
 		Model:           "gemini-2.5-pro",
@@ -74,7 +74,7 @@ func TestCreateEvent(t *testing.T) {
 		"endpoint":          "https://us-central1-aiplatform.googleapis.com",
 		"deployed_model_id": "model-123456",
 		"logging_time":      testTime,
-		"request_id":        12345.67,
+		"request_id":        "12345.67",
 		"request_payload":   []string{"prompt1", "prompt2"},
 		"response_payload":  []string{"response1", "response2"},
 		"model":             "gemini-2.5-pro",
@@ -104,7 +104,7 @@ func TestCreateEventWithInvalidJSON(t *testing.T) {
 		Endpoint:        "https://us-central1-aiplatform.googleapis.com",
 		DeployedModelID: "model-123456",
 		LoggingTime:     testTime,
-		RequestID:       12345.67,
+		RequestID:       "12345.67",
 		RequestPayload:  []string{"prompt1"},
 		ResponsePayload: []string{"response1"},
 		Model:           "gemini-2.5-pro",
@@ -129,7 +129,7 @@ func TestGenerateEventID(t *testing.T) {
 	testTime := time.Date(2023, 12, 1, 10, 30, 45, 0, time.UTC)
 	row := VertexAILogRow{
 		LoggingTime:    testTime,
-		RequestID:      12345.67,
+		RequestID:      "12345.67",
 		RequestPayload: []string{"prompt1", "prompt2"},
 	}
 	id1 := generateEventID(row)
@@ -138,7 +138,7 @@ func TestGenerateEventID(t *testing.T) {
 	assert.Equal(t, id1, id2)
 	assert.Len(t, id1, 20)
 	// Different input should produce different ID
-	row.RequestID = 98765.43
+	row.RequestID = "98765.43"
 	id3 := generateEventID(row)
 	assert.NotEqual(t, id1, id3)
 }
@@ -151,7 +151,7 @@ func TestEventsMapping(t *testing.T) {
 			Endpoint:        "https://us-central1-aiplatform.googleapis.com",
 			DeployedModelID: "model-123456",
 			LoggingTime:     testTime,
-			RequestID:       12345.67,
+			RequestID:       "12345.67",
 			RequestPayload:  []string{"prompt1"},
 			ResponsePayload: []string{"response1"},
 			Model:           "gemini-2.5-pro",
@@ -166,7 +166,7 @@ func TestEventsMapping(t *testing.T) {
 			Endpoint:        "https://us-west1-aiplatform.googleapis.com",
 			DeployedModelID: "model-789012",
 			LoggingTime:     testTime.Add(time.Hour),
-			RequestID:       67890.12,
+			RequestID:       "67890.12",
 			RequestPayload:  []string{"prompt2"},
 			ResponsePayload: []string{"response2"},
 			Model:           "gemini-1.5-pro",

@@ -21,7 +21,7 @@ type VertexAILogRow struct {
 	Endpoint        string    `bigquery:"endpoint"`
 	DeployedModelID string    `bigquery:"deployed_model_id"`
 	LoggingTime     time.Time `bigquery:"logging_time"`
-	RequestID       float64   `bigquery:"request_id"`
+	RequestID       string    `bigquery:"request_id"`
 	RequestPayload  []string  `bigquery:"request_payload"`
 	ResponsePayload []string  `bigquery:"response_payload"`
 	Model           string    `bigquery:"model"`
@@ -102,7 +102,7 @@ func processJSONField(jsonStr, fieldName string, fields mapstr.M, logger *logp.L
 
 // generateEventID creates a unique event ID based on row data
 func generateEventID(row VertexAILogRow) string {
-	eventData := fmt.Sprintf("%d_%.0f_%d",
+	eventData := fmt.Sprintf("%d_%s_%d",
 		row.LoggingTime.Unix(),
 		row.RequestID,
 		len(row.RequestPayload))
