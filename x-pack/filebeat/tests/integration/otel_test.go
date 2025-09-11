@@ -759,8 +759,8 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 		{
 			name:                     "bulk with permanent mapping errors",
 			maxRetries:               3,
-			failuresPerEvent:         0, // Always fail (permanent failure)
-			bulkErrorCode:            "400",
+			failuresPerEvent:         0,                          // always fail
+			bulkErrorCode:            "400",                      // never retried
 			eventIDsToFail:           []int{1, 4, 8},             // Only specific events fail
 			expectedIngestedEventIDs: []int{0, 2, 3, 5, 6, 7, 9}, // Only non-failing events should be ingested
 		},
@@ -983,13 +983,8 @@ http.port: {{.MonitoringPort}}
 
 				m = m.Flatten()
 
-				// TODO: Beats stats are not tracking exporter metrics properly in otelconsumer, so it assumes all events were delivered since the batch was acked.
-				// There could have been failures within the batch that were retried and then dropped by the exporter, only way to know for sure is to check the exporter metrics.
-				// require.Equal(t, float64(numTestEvents), m["libbeat.output.events.total"], "expected total events sent to output to match")
-				// require.Equal(t, float64(len(tt.expectedIngestedEventIDs)), m["libbeat.output.events.acked"], "expected events acked to match")
-				// require.Equal(t, float64(numTestEvents - len(tt.expectedIngestedEventIDs)), m["libbeat.output.events.dropped"], "expected events dropped to match")
-
-				// Currently otelconsumer ACKs the entire batch and has no visibility into individual event failures within the batch.
+				// Currently, otelconsumer either ACKs or fails the entire batch and has no visibility into individual event failures within the exporter.
+				// From otelconsumer's perspective, the whole batch is considered successful as long as ConsumeLogs returns no error.
 				assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.total"], "expected total events sent to output to match")
 				assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.acked"], "expected total events acked to match")
 				assert.Equal(ct, float64(0), m["libbeat.output.events.dropped"], "expected total events dropped to match")
