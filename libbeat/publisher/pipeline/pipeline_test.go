@@ -80,15 +80,18 @@ func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
 func TestPipelineWaitCloseThenForce(t *testing.T) {
 	closed := make(chan struct{})
 	forceClosed := make(chan struct{})
+	queueDone := make(chan struct{})
 	mockQueue := &testQueue{
 		close: func(force bool) error {
 			if force {
 				close(forceClosed)
+				close(queueDone)
 			} else {
 				close(closed)
 			}
 			return nil
 		},
+		done: queueDone,
 	}
 	settings := Settings{
 		WaitCloseMode: WaitOnPipelineCloseThenForce,
@@ -144,6 +147,7 @@ type testQueue struct {
 	bufferConfig func() queue.BufferConfig
 	producer     func(queue.ProducerConfig) queue.Producer
 	get          func(sz int) (queue.Batch, error)
+	done         chan struct{}
 }
 
 type testProducer struct {
@@ -159,7 +163,7 @@ func (q *testQueue) Close(force bool) error {
 }
 
 func (q *testQueue) Done() <-chan struct{} {
-	return nil
+	return q.done
 }
 
 func (q *testQueue) QueueType() string {
