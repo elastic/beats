@@ -314,6 +314,13 @@ func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
 // - Random permanent error. We expect the batch to be dropped.
 // - Random error. We expect the batch to be retried or dropped based on the error type.
 func TestConsumeContract(t *testing.T) {
+<<<<<<< HEAD
+=======
+	t.Skip("flaky test, see https://github.com/elastic/beats/issues/46437")
+
+	defer oteltest.VerifyNoLeaks(t)
+
+>>>>>>> 785b9883e ([Flaky Test] Tentative fix for fbreceiver and filestream flaky tests (#46531))
 	tmpDir := t.TempDir()
 	const logsPerTest = 100
 

@@ -20,6 +20,11 @@ package oteltest
 
 import (
 	"context"
+<<<<<<< HEAD
+=======
+	"runtime"
+	"strings"
+>>>>>>> 785b9883e ([Flaky Test] Tentative fix for fbreceiver and filestream flaky tests (#46531))
 	"sync"
 	"testing"
 	"time"
@@ -200,3 +205,38 @@ func CheckReceivers(params CheckReceiversParams) {
 	}, 2*time.Minute, 100*time.Millisecond,
 		"timeout waiting for logger fields from the OTel collector are present in the logs and other assertions to be met")
 }
+<<<<<<< HEAD
+=======
+
+// VerifyNoLeaks fails the test if any goroutines are leaked during the test.
+func VerifyNoLeaks(t *testing.T) {
+	skipped := []goleak.Option{
+		// See https://github.com/microsoft/go-winio/issues/272
+		goleak.IgnoreAnyFunction("github.com/Microsoft/go-winio.getQueuedCompletionStatus"),
+		// False positive, from init in cloud.google.com/go/pubsub and filebeat/input/gcppubsub.
+		// See https://github.com/googleapis/google-cloud-go/issues/10948
+		// and https://github.com/census-instrumentation/opencensus-go/issues/1191
+		goleak.IgnoreAnyFunction("go.opencensus.io/stats/view.(*worker).start"),
+	}
+
+	if runtime.GOOS == "linux" && runtime.GOARCH == "arm64" {
+		// On arm64, some HTTP transport goroutines are leaked while still dialing.
+		skipped = append(skipped, goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked"))
+	}
+
+	goleak.VerifyNone(t, skipped...)
+}
+
+type DummyConsumer struct {
+	context.Context
+	ConsumeError error
+}
+
+func (d *DummyConsumer) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
+	return d.ConsumeError
+}
+
+func (d *DummyConsumer) Capabilities() consumer.Capabilities {
+	return consumer.Capabilities{}
+}
+>>>>>>> 785b9883e ([Flaky Test] Tentative fix for fbreceiver and filestream flaky tests (#46531))
