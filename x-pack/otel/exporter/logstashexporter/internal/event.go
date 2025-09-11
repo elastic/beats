@@ -9,16 +9,16 @@ import (
 	"errors"
 	"time"
 
-	"go.opentelemetry.io/collector/client"
 	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/x-pack/libbeat/outputs/otelctx"
 )
 
 func parseEvent(ctx context.Context, logRecord *plog.LogRecord) (beat.Event, error) {
-	metadata := parseEventMetadata(ctx)
+	metadata := otelctx.GetBeatEventMeta(ctx)
 	if !isBeatsEvent(metadata) {
 		return beat.Event{}, consumererror.NewPermanent(errors.New("invalid beats event metadata"))
 	}
@@ -62,33 +62,7 @@ func parseEventTimestamp(logRecordBody map[string]any) (time.Time, bool) {
 	return time.Time{}, false
 }
 
-func parseEventMetadata(ctx context.Context) map[string]any {
-	ctxData := client.FromContext(ctx)
-	var beatName, beatVersion string
-	if v := ctxData.Metadata.Get("beat_name"); len(v) > 0 {
-		beatName = v[0]
-	}
-	if v := ctxData.Metadata.Get("beat_version"); len(v) > 0 {
-		beatVersion = v[0]
-	}
-	return map[string]any{
-		"beat":    beatName,
-		"version": beatVersion,
-	}
-}
-
 func isBeatsEvent(metadata map[string]any) bool {
 	v, ok := metadata["beat"]
 	return ok && v != nil && v != ""
-}
-
-// GetBeatVersion retrieves the version of the beat from the context metadata.
-// If the version is not found, it returns an empty string.
-func GetBeatVersion(ctx context.Context) string {
-	if version, ok := parseEventMetadata(ctx)["version"]; ok {
-		if versionStr, ok := version.(string); ok {
-			return versionStr
-		}
-	}
-	return ""
 }
