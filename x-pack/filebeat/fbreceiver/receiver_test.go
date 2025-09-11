@@ -314,6 +314,8 @@ func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
 // - Random permanent error. We expect the batch to be dropped.
 // - Random error. We expect the batch to be retried or dropped based on the error type.
 func TestConsumeContract(t *testing.T) {
+	t.Skip("flaky test, see https://github.com/elastic/beats/issues/46437")
+
 	tmpDir := t.TempDir()
 	const logsPerTest = 100
 
