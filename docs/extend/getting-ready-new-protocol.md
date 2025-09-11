@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/getting-ready-new-protocol.html
+applies_to:
+  stack: ga
 ---
 
 # Getting Ready [getting-ready-new-protocol]
