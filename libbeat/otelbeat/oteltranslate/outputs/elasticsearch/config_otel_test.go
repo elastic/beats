@@ -63,6 +63,7 @@ endpoints:
   - http://localhost:9300/foo/bar
 idle_conn_timeout: 3s
 logs_index: some-index
+max_conns_per_host: 30
 password: changeme
 pipeline: some-ingest-pipeline
 proxy_url: https://proxy.url
@@ -71,15 +72,21 @@ retry:
   initial_interval: 42s
   max_interval: 7m0s
   max_retries: 3
+sending_queue:
+  batch:
+    max_size: 1600
+    min_size: 0
+    sizer: items
+  block_on_overflow: true
+  enabled: true
+  num_consumers: 30
+  queue_size: 3200
+  wait_for_result: true
 timeout: 1m30s
 user: elastic
 headers:
   X-Header-1: foo
   X-Bar-Header: bar
-batcher:
-  enabled: true
-  max_size: 1600
-  min_size: 0
 mapping:
   mode: bodymap
 compression: gzip
@@ -113,12 +120,19 @@ retry:
   max_interval: 1m0s
   max_retries: 3
 timeout: 1m30s
-batcher:
+sending_queue:
+  batch:
+    max_size: 1600
+    min_size: 0
+    sizer: items
+  block_on_overflow: true
   enabled: true
-  max_size: 1600
-  min_size: 0
+  num_consumers: 1
+  queue_size: 3200
+  wait_for_result: true
 mapping:
   mode: bodymap  
+max_conns_per_host: 1
 api_key: VGlOQUdHNEJhYU1kYUgxdFJmdVU6S25SNnlFNDFSclNvd2Iwa1EwSFdvQQ==
 compression: gzip
 compression_params:
@@ -171,20 +185,34 @@ compression_params:
 				presetName: "balanced",
 				output: commonOTelCfg + `
 idle_conn_timeout: 3s
-batcher:
+max_conns_per_host: 1
+sending_queue:
+  batch:
+    max_size: 1600
+    min_size: 0
+    sizer: items
+  block_on_overflow: true
   enabled: true
-  max_size: 1600
-  min_size: 0
+  num_consumers: 1
+  queue_size: 3200
+  wait_for_result: true
  `,
 			},
 			{
 				presetName: "throughput",
 				output: commonOTelCfg + `
 idle_conn_timeout: 15s
-batcher:
+max_conns_per_host: 4
+sending_queue:
+  batch:
+    max_size: 1600
+    min_size: 0
+    sizer: items
+  block_on_overflow: true
   enabled: true
-  max_size: 1600
-  min_size: 0
+  num_consumers: 4
+  queue_size: 12800
+  wait_for_result: true
  `,
 			},
 			{
@@ -202,10 +230,17 @@ password: changeme
 user: elastic
 timeout: 1m30s
 idle_conn_timeout: 1s
-batcher:
+max_conns_per_host: 1
+sending_queue:
+  batch:
+    max_size: 1600
+    min_size: 0
+    sizer: items
+  block_on_overflow: true
   enabled: true
-  max_size: 1600
-  min_size: 0
+  num_consumers: 1
+  queue_size: 3200
+  wait_for_result: true
 mapping:
   mode: bodymap    
 compression: gzip
@@ -217,20 +252,34 @@ compression_params:
 				presetName: "latency",
 				output: commonOTelCfg + `
 idle_conn_timeout: 1m0s
-batcher:
+max_conns_per_host: 1
+sending_queue:
+  batch:
+    max_size: 50
+    min_size: 0
+    sizer: items
+  block_on_overflow: true
   enabled: true
-  max_size: 50
-  min_size: 0
+  num_consumers: 1
+  queue_size: 4100
+  wait_for_result: true
  `,
 			},
 			{
 				presetName: "custom",
 				output: commonOTelCfg + `
 idle_conn_timeout: 3s
-batcher:
+max_conns_per_host: 1
+sending_queue:
+  batch:
+    max_size: 1600
+    min_size: 0
+    sizer: items
+  block_on_overflow: true
   enabled: true
-  max_size: 1600
-  min_size: 0
+  num_consumers: 1
+  queue_size: 3200
+  wait_for_result: true
  `,
 			},
 		}
@@ -274,11 +323,18 @@ retry:
   max_interval: 1m0s
   max_retries: 3
 timeout: 1m30s
+max_conns_per_host: 1
 user: elastic
-batcher:
+sending_queue:
+  batch:
+    max_size: 1600
+    min_size: 0
+    sizer: items
+  block_on_overflow: true
   enabled: true
-  max_size: 1600
-  min_size: 0
+  num_consumers: 1
+  queue_size: 3200
+  wait_for_result: true
 mapping:
   mode: bodymap
 {{ if gt . 0 }}
