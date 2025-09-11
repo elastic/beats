@@ -202,16 +202,23 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 
 				// Process the response as needed
 				for i, v := range response {
-					client.MetricRegistry.Update(metricsDefinitions[i], MetricCollectionInfo{
-						timeGrain: *response[i].Interval,
-						timestamp: referenceTime,
-					})
-					values := mapBatchMetricValues(client, v)
-					metricsDefinitions[i].Values = append(metricsDefinitions[i].Values, values...)
-					if metricsDefinitions[i].TimeGrain == "" {
-						metricsDefinitions[i].TimeGrain = *response[i].Interval
+					if response[i].Interval == nil || *response[i].Interval == "" {
+						// this should not happen because we have handled the wildcard
+						// timegrain config scenario. Therefore, we should not
+						// continue with data returned from the latest API call,
+						// because this data could be bad
+						client.MetricRegistry.Update(metricsDefinitions[i], MetricCollectionInfo{
+							timeGrain: *response[i].Interval,
+							timestamp: referenceTime,
+						})
+						values := mapBatchMetricValues(client, v)
+						metricsDefinitions[i].Values = append(metricsDefinitions[i].Values, values...)
+						if metricsDefinitions[i].TimeGrain == "" {
+							// this should not be hit because we always set a timegrain during
+							// fetching definitions
+							metricsDefinitions[i].TimeGrain = *response[i].Interval
+						}
 					}
-
 				}
 
 				result = append(result, metricsDefinitions...)

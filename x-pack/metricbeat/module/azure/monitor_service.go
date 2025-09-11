@@ -419,9 +419,9 @@ func (service *MonitorService) GetMetricValues(resourceId string, namespace stri
 
 		if resp.Interval == nil || *resp.Interval == "" {
 			// this should not happen because we have handled the wildcard
-			// timegrain config scenario. We should not continue with data
-			// returned from the latest API call, because this data
-			// could be bad
+			// timegrain config scenario. Therefore, we should not
+			// continue with data returned from the latest API call,
+			// because this data could be bad
 			err = fmt.Errorf(
 				"the returned interval (timegrain) for the list operation "+
 					"response is empty. Skipping this data. Query "+
