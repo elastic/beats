@@ -60,11 +60,7 @@ endpoints:
   - http://localhost:9300/foo/bar
 idle_conn_timeout: 3s
 logs_index: some-index
-<<<<<<< HEAD
-num_workers: 30
-=======
 max_conns_per_host: 30
->>>>>>> 02b596f4a ([beatreceiver] - Disable `force_attempt_http2` and map ES config to elasticsearchexporter (#46111))
 password: changeme
 pipeline: some-ingest-pipeline
 proxy_url: https://proxy.url
@@ -116,7 +112,6 @@ endpoints:
   - http://localhost:9200
 idle_conn_timeout: 3s
 logs_index: some-index
-num_workers: 1
 retry:
   enabled: true
   initial_interval: 1s
@@ -189,10 +184,6 @@ compression_params:
 				presetName: "balanced",
 				output: commonOTelCfg + `
 idle_conn_timeout: 3s
-<<<<<<< HEAD
-num_workers: 1
-batcher:
-=======
 max_conns_per_host: 1
 sending_queue:
   batch:
@@ -200,7 +191,6 @@ sending_queue:
     min_size: 0
     sizer: items
   block_on_overflow: true
->>>>>>> 02b596f4a ([beatreceiver] - Disable `force_attempt_http2` and map ES config to elasticsearchexporter (#46111))
   enabled: true
   num_consumers: 1
   queue_size: 3200
@@ -211,10 +201,6 @@ sending_queue:
 				presetName: "throughput",
 				output: commonOTelCfg + `
 idle_conn_timeout: 15s
-<<<<<<< HEAD
-num_workers: 4
-batcher:
-=======
 max_conns_per_host: 4
 sending_queue:
   batch:
@@ -222,7 +208,6 @@ sending_queue:
     min_size: 0
     sizer: items
   block_on_overflow: true
->>>>>>> 02b596f4a ([beatreceiver] - Disable `force_attempt_http2` and map ES config to elasticsearchexporter (#46111))
   enabled: true
   num_consumers: 4
   queue_size: 12800
@@ -244,10 +229,6 @@ password: changeme
 user: elastic
 timeout: 1m30s
 idle_conn_timeout: 1s
-<<<<<<< HEAD
-num_workers: 1
-batcher:
-=======
 max_conns_per_host: 1
 sending_queue:
   batch:
@@ -255,7 +236,6 @@ sending_queue:
     min_size: 0
     sizer: items
   block_on_overflow: true
->>>>>>> 02b596f4a ([beatreceiver] - Disable `force_attempt_http2` and map ES config to elasticsearchexporter (#46111))
   enabled: true
   num_consumers: 1
   queue_size: 3200
@@ -271,10 +251,6 @@ compression_params:
 				presetName: "latency",
 				output: commonOTelCfg + `
 idle_conn_timeout: 1m0s
-<<<<<<< HEAD
-num_workers: 1
-batcher:
-=======
 max_conns_per_host: 1
 sending_queue:
   batch:
@@ -282,7 +258,6 @@ sending_queue:
     min_size: 0
     sizer: items
   block_on_overflow: true
->>>>>>> 02b596f4a ([beatreceiver] - Disable `force_attempt_http2` and map ES config to elasticsearchexporter (#46111))
   enabled: true
   num_consumers: 1
   queue_size: 4100
@@ -293,10 +268,6 @@ sending_queue:
 				presetName: "custom",
 				output: commonOTelCfg + `
 idle_conn_timeout: 3s
-<<<<<<< HEAD
-num_workers: 1
-batcher:
-=======
 max_conns_per_host: 1
 sending_queue:
   batch:
@@ -304,7 +275,6 @@ sending_queue:
     min_size: 0
     sizer: items
   block_on_overflow: true
->>>>>>> 02b596f4a ([beatreceiver] - Disable `force_attempt_http2` and map ES config to elasticsearchexporter (#46111))
   enabled: true
   num_consumers: 1
   queue_size: 3200
@@ -347,7 +317,6 @@ endpoints:
 idle_conn_timeout: 3s
 logs_index: some-index
 password: changeme
-num_workers: 1
 retry:
   enabled: true
   initial_interval: 1s

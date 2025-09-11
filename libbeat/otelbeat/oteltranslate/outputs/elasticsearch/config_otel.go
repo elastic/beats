@@ -125,15 +125,9 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 		return nil, fmt.Errorf("cannot convert SSL config into OTel: %w", err)
 	}
 
-	// get number of workers
-	workers := 1 // Default value is 1
-	if escfg.NumWorkers() > 1 {
-		workers = escfg.NumWorkers()
-	}
 	otelYAMLCfg := map[string]any{
-		"logs_index":  escfg.Index, // index
-		"endpoints":   hosts,       // hosts, protocol, path, port
-		"num_workers": workers,     // worker/workers
+		"logs_index": escfg.Index, // index
+		"endpoints":  hosts,       // hosts, protocol, path, port
 
 		// ClientConfig
 		"timeout":           escfg.Transport.Timeout,         // timeout
@@ -161,7 +155,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 				"sizer":    "items",
 			},
 			"enabled":           true,
-			"queue_size":        getQueueSize(logger, output),
+			"queue_size":        getQueueSize(output),
 			"block_on_overflow": true,
 			"wait_for_result":   true,
 			"num_consumers":     escfg.NumWorkers(),
@@ -192,52 +186,6 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	setIfNotNil(otelYAMLCfg, "pipeline", escfg.Pipeline)  // pipeline
 
 	return otelYAMLCfg, nil
-}
-
-<<<<<<< HEAD
-// For type safety check
-func typeSafetyCheck(value map[string]any) error {
-	// the  value should match `elasticsearchexporter.Config` type.
-	// it throws an error if non existing key names  are set
-	var result elasticsearchexporter.Config
-	d, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		Squash:      true,
-		Result:      &result,
-		ErrorUnused: true,
-	})
-
-	err := d.Decode(value)
-	if err != nil {
-		return err
-	}
-	return err
-=======
-// log warning for unsupported config
-func checkUnsupportedConfig(cfg *config.C, logger *logp.Logger) error {
-	// check if unsupported configuration is provided
-	temp := unsupportedConfig{}
-	if err := cfg.Unpack(&temp); err != nil {
-		return err
-	}
-
-	if !isStructEmpty(temp) {
-		return fmt.Errorf("these configuration parameters are not supported %+v: %w", temp, errors.ErrUnsupported)
-	}
-
-	// check for dictionary like parameters that we do not support yet
-	if cfg.HasField("indices") {
-		return fmt.Errorf("indices is currently not supported: %w", errors.ErrUnsupported)
-	} else if cfg.HasField("pipelines") {
-		return fmt.Errorf("pipelines is currently not supported: %w", errors.ErrUnsupported)
-	} else if cfg.HasField("parameters") {
-		return fmt.Errorf("parameters is currently not supported: %w", errors.ErrUnsupported)
-	} else if cfg.HasField("proxy_headers") {
-		return fmt.Errorf("proxy_headers is currently not supported: %w", errors.ErrUnsupported)
-	} else if value, err := cfg.Bool("allow_older_versions", -1); err == nil && !value {
-		return fmt.Errorf("allow_older_versions:false is currently not supported: %w", errors.ErrUnsupported)
-	}
-	return nil
->>>>>>> 02b596f4a ([beatreceiver] - Disable `force_attempt_http2` and map ES config to elasticsearchexporter (#46111))
 }
 
 // Helper function to check if a struct is empty
@@ -271,10 +219,9 @@ func setIfNotNil(m map[string]any, key string, value any) {
 	}
 }
 
-func getQueueSize(logger *logp.Logger, output *config.C) int {
+func getQueueSize(output *config.C) int {
 	size, err := output.Int("queue.mem.events", -1)
 	if err != nil {
-		logger.Debugf("Failed to get queue size: %v", err)
 		return memqueue.DefaultEvents // return default queue.mem.events for sending_queue in case of an errr
 	}
 	return int(size)

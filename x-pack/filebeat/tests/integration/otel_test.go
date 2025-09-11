@@ -200,8 +200,6 @@ func assertMonitoring(t *testing.T, port int) {
 	require.NoError(t, err)
 	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }
-<<<<<<< HEAD
-=======
 
 func TestFilebeatOTelReceiverE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
@@ -619,4 +617,3 @@ processors:
 		require.Contains(collect, out, expectedService)
 	}, 10*time.Second, 500*time.Millisecond, "failed to get output of inspect command")
 }
->>>>>>> 02b596f4a ([beatreceiver] - Disable `force_attempt_http2` and map ES config to elasticsearchexporter (#46111))
