@@ -23,14 +23,12 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/go-viper/mapstructure/v2"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	oteltranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -67,6 +65,9 @@ var defaultOptions = esToOTelOptions{
 	Pipeline: "",
 	ProxyURL: "",
 	Preset:   "custom", // default is custom if not set
+	HostWorkerCfg: outputs.HostWorkerCfg{
+		Workers: 1,
+	},
 }
 
 // ToOTelConfig converts a Beat config into OTel elasticsearch exporter config
@@ -138,20 +139,32 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 		"timeout":           escfg.Transport.Timeout,         // timeout
 		"idle_conn_timeout": escfg.Transport.IdleConnTimeout, // idle_connection_timeout
 
+		// max_conns_per_host is a "hard" limit on number of open connections.
+		// Ideally, escfg.NumWorkers() should map to num_consumer, but we had a bug in upstream
+		// where it could spin as many goroutines as it liked.
+		// Given that batcher implementation can change and it has a history of such changes,
+		// let's keep max_conns_per_host setting for now and remove it once exporterhelper is stable.
+		"max_conns_per_host": escfg.NumWorkers(),
+
 		// Retry
 		"retry": map[string]any{
 			"enabled":          true,
 			"initial_interval": escfg.Backoff.Init, // backoff.init
 			"max_interval":     escfg.Backoff.Max,  // backoff.max
 			"max_retries":      escfg.MaxRetries,   // max_retries
-
 		},
 
-		// Batcher is experimental
-		"batcher": map[string]any{
-			"enabled":  true,
-			"max_size": escfg.BulkMaxSize, // bulk_max_size
-			"min_size": 0,                 // 0 means immediately trigger a flush
+		"sending_queue": map[string]any{
+			"batch": map[string]any{
+				"max_size": escfg.BulkMaxSize, // bulk_max_size
+				"min_size": 0,                 // 0 means immediately trigger a flush
+				"sizer":    "items",
+			},
+			"enabled":           true,
+			"queue_size":        getQueueSize(logger, output),
+			"block_on_overflow": true,
+			"wait_for_result":   true,
+			"num_consumers":     escfg.NumWorkers(),
 		},
 
 		"mapping": map[string]any{
@@ -178,13 +191,10 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	setIfNotNil(otelYAMLCfg, "proxy_url", escfg.ProxyURL) // proxy_url
 	setIfNotNil(otelYAMLCfg, "pipeline", escfg.Pipeline)  // pipeline
 
-	if err := typeSafetyCheck(otelYAMLCfg); err != nil {
-		return nil, err
-	}
-
 	return otelYAMLCfg, nil
 }
 
+<<<<<<< HEAD
 // For type safety check
 func typeSafetyCheck(value map[string]any) error {
 	// the  value should match `elasticsearchexporter.Config` type.
@@ -201,6 +211,33 @@ func typeSafetyCheck(value map[string]any) error {
 		return err
 	}
 	return err
+=======
+// log warning for unsupported config
+func checkUnsupportedConfig(cfg *config.C, logger *logp.Logger) error {
+	// check if unsupported configuration is provided
+	temp := unsupportedConfig{}
+	if err := cfg.Unpack(&temp); err != nil {
+		return err
+	}
+
+	if !isStructEmpty(temp) {
+		return fmt.Errorf("these configuration parameters are not supported %+v: %w", temp, errors.ErrUnsupported)
+	}
+
+	// check for dictionary like parameters that we do not support yet
+	if cfg.HasField("indices") {
+		return fmt.Errorf("indices is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("pipelines") {
+		return fmt.Errorf("pipelines is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("parameters") {
+		return fmt.Errorf("parameters is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("proxy_headers") {
+		return fmt.Errorf("proxy_headers is currently not supported: %w", errors.ErrUnsupported)
+	} else if value, err := cfg.Bool("allow_older_versions", -1); err == nil && !value {
+		return fmt.Errorf("allow_older_versions:false is currently not supported: %w", errors.ErrUnsupported)
+	}
+	return nil
+>>>>>>> 02b596f4a ([beatreceiver] - Disable `force_attempt_http2` and map ES config to elasticsearchexporter (#46111))
 }
 
 // Helper function to check if a struct is empty
@@ -232,4 +269,13 @@ func setIfNotNil(m map[string]any, key string, value any) {
 	default:
 		m[key] = value
 	}
+}
+
+func getQueueSize(logger *logp.Logger, output *config.C) int {
+	size, err := output.Int("queue.mem.events", -1)
+	if err != nil {
+		logger.Debugf("Failed to get queue size: %v", err)
+		return memqueue.DefaultEvents // return default queue.mem.events for sending_queue in case of an errr
+	}
+	return int(size)
 }
