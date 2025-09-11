@@ -39,7 +39,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	otelmode "github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/management"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmode"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"

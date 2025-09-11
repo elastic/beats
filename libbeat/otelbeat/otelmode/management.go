@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package management
+package otelmode
 
 import (
 	"fmt"
@@ -17,6 +17,8 @@ import (
 )
 
 var otelManagementEnabled atomic.Bool
+
+var _ management.Manager = (*otelManager)(nil)
 
 func SetOtelMode(enabled bool) {
 	otelManagementEnabled.Store(enabled)
@@ -46,12 +48,10 @@ func NewOtelManager(cfg *config.C) (management.Manager, error) {
 
 // otelManager, fallback when no manager is present
 type otelManager struct {
-	logger   *logp.Logger
-	lock     sync.Mutex
-	status   status.Status
-	msg      string
-	stopFunc func()
-	stopOnce sync.Once
+	logger *logp.Logger
+	lock   sync.Mutex
+	status status.Status
+	msg    string
 }
 
 func (n *otelManager) UpdateStatus(status status.Status, msg string) {
