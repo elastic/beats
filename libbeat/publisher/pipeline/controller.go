@@ -199,6 +199,7 @@ func (c *outputController) closeQueue(timeout time.Duration, force bool) {
 		case <-time.After(timeout):
 			if force {
 				c.queue.Close(force)
+				<-c.queue.Done()
 			}
 		}
 	}
