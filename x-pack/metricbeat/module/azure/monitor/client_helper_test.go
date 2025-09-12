@@ -21,6 +21,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
+var (
+	oneMinuteDuration    = `PT1M`
+	thirtyMinuteDuration = `PT30M`
+	oneHrDuration        = `PT1H`
+	sixHrDuration        = `PT6H`
+)
+
 func MockResourceExpanded() *armresources.GenericResourceExpanded {
 	id := "123"
 	name := "resourceName"
@@ -58,6 +65,11 @@ func MockMetricDefinitions() []*armmonitor.MetricDefinition {
 				&aggregationTypeTotal,
 				&aggregationTypeAverage,
 			},
+			MetricAvailabilities: []*armmonitor.MetricAvailability{
+				{TimeGrain: &thirtyMinuteDuration},
+				{TimeGrain: &oneHrDuration},
+				{TimeGrain: &sixHrDuration},
+			}, // TODO: pick up here and add to other defs as well
 		},
 		{
 			Name:                   &armmonitor.LocalizableString{Value: &metric2},
@@ -66,6 +78,11 @@ func MockMetricDefinitions() []*armmonitor.MetricDefinition {
 				&aggregationTypeAverage,
 				&aggregationTypeCount,
 				&aggregationTypeMinimum,
+			},
+			MetricAvailabilities: []*armmonitor.MetricAvailability{
+				{TimeGrain: &oneMinuteDuration},
+				{TimeGrain: &oneHrDuration},
+				{TimeGrain: &sixHrDuration},
 			},
 		},
 		{
@@ -76,17 +93,24 @@ func MockMetricDefinitions() []*armmonitor.MetricDefinition {
 				&aggregationTypeCount,
 				&aggregationTypeMinimum,
 			},
+			MetricAvailabilities: []*armmonitor.MetricAvailability{
+				{TimeGrain: &thirtyMinuteDuration},
+				{TimeGrain: &oneHrDuration},
+				{TimeGrain: &sixHrDuration},
+			},
 		},
 	}
 	return defs
 }
 
-func TestMapMetric(t *testing.T) {
+func TestMapMetricWithConfiguredTimegrain(t *testing.T) {
 	resource := MockResourceExpanded()
 	metricDefinitions := armmonitor.MetricDefinitionCollection{
 		Value: MockMetricDefinitions(),
 	}
-	metricConfig := azure.MetricConfig{Namespace: "namespace", Dimensions: []azure.DimensionConfig{{Name: "location", Value: "West Europe"}}}
+	metricConfig := azure.MetricConfig{Namespace: "namespace",
+		Dimensions: []azure.DimensionConfig{{Name: "location", Value: "West Europe"}},
+		Timegrain:  oneHrDuration}
 	resourceConfig := azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
 	client := azure.NewMockClient(logptest.NewTestingLogger(t, ""))
 	t.Run("return error when no metric definitions were found", func(t *testing.T) {
@@ -111,6 +135,7 @@ func TestMapMetric(t *testing.T) {
 		assert.Equal(t, metrics[0].Names, []string{"TotalRequests", "Capacity", "BytesRead"})
 		assert.Equal(t, metrics[0].Aggregations, "Average")
 		assert.Equal(t, metrics[0].Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+		assert.Equal(t, metrics[0].TimeGrain, oneHrDuration)
 		m.AssertExpectations(t)
 	})
 	t.Run("return all metrics when specific metric names and aggregations were configured", func(t *testing.T) {
@@ -129,6 +154,134 @@ func TestMapMetric(t *testing.T) {
 		assert.Equal(t, metrics[0].Names, []string{"TotalRequests", "Capacity"})
 		assert.Equal(t, metrics[0].Aggregations, "Average")
 		assert.Equal(t, metrics[0].Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+		assert.Equal(t, metrics[0].TimeGrain, oneHrDuration)
+		m.AssertExpectations(t)
+	})
+}
+
+func TestInvalidConfiguredTimegrain(t *testing.T) {
+	// expected behavior is to simply skip the metrics that
+	// are not compatible with the configured timegrain
+	resource := MockResourceExpanded()
+	metricDefinitions := armmonitor.MetricDefinitionCollection{
+		Value: MockMetricDefinitions(),
+	}
+	metricConfig := azure.MetricConfig{Namespace: "namespace",
+		Dimensions: []azure.DimensionConfig{{Name: "location", Value: "West Europe"}},
+		// one-minute timegrain is not supported by some metrics
+		Timegrain: oneMinuteDuration}
+	resourceConfig := azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
+	client := azure.NewMockClient(logptest.NewTestingLogger(t, ""))
+
+	m := &azure.MockService{}
+	m.On("GetMetricDefinitionsWithRetry", mock.Anything,
+		mock.Anything).Return(metricDefinitions, nil)
+	client.AzureMonitorService = m
+	metricConfig.Name = []string{"*"}
+	resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
+	metrics, err := mapMetrics(client,
+		[]*armresources.GenericResourceExpanded{resource}, resourceConfig)
+
+	assert.NoError(t, err)
+
+	assert.Len(t, metrics, 1)
+	assert.Equal(t, metrics[0].ResourceId, "123")
+	assert.Equal(t, metrics[0].Namespace, "namespace")
+	assert.Equal(t, metrics[0].Names, []string{"Capacity"})
+	assert.Equal(t, metrics[0].Aggregations, "Average")
+	assert.Equal(t, metrics[0].Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+	assert.Equal(t, metrics[0].TimeGrain, oneMinuteDuration)
+	m.AssertExpectations(t)
+}
+
+func TestMapMetricNoConfiguredTimegrain(t *testing.T) {
+	resource := MockResourceExpanded()
+	metricDefinitions := armmonitor.MetricDefinitionCollection{
+		Value: MockMetricDefinitions(),
+	}
+	metricConfig := azure.MetricConfig{Namespace: "namespace", Dimensions: []azure.DimensionConfig{{Name: "location", Value: "West Europe"}}}
+	resourceConfig := azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
+	client := azure.NewMockClient(logptest.NewTestingLogger(t, ""))
+	t.Run("return error when no metric definitions were found", func(t *testing.T) {
+		m := &azure.MockService{}
+		m.On("GetMetricDefinitionsWithRetry", mock.Anything, mock.Anything).Return(armmonitor.MetricDefinitionCollection{}, fmt.Errorf("invalid resource ID"))
+		client.AzureMonitorService = m
+		metric, err := mapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig)
+		assert.Error(t, err)
+		assert.Equal(t, metric, []azure.Metric(nil))
+		m.AssertExpectations(t)
+	})
+	t.Run("return all metrics when all metric names and aggregations were configured", func(t *testing.T) {
+		m := &azure.MockService{}
+		m.On("GetMetricDefinitionsWithRetry", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
+		client.AzureMonitorService = m
+		metricConfig.Name = []string{"*"}
+		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
+		metrics, err := mapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig)
+		assert.NoError(t, err)
+
+		// we should have two groups, one per first timegrain value
+		assert.Len(t, metrics, 2)
+		// this for loop with the switch statement is necessary because the ordering of timegrains is non-deterministic
+		// due to map iteration. Without a configured timegrain, we are iterating over a map
+		for _, metric := range metrics {
+			switch metric.TimeGrain {
+			case oneMinuteDuration:
+				assert.Equal(t, metric.ResourceId, "123")
+				assert.Equal(t, metric.Namespace, "namespace")
+				assert.Equal(t, metric.Names, []string{"Capacity"})
+				assert.Equal(t, metric.Aggregations, "Average")
+				assert.Equal(t, metric.Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+			case thirtyMinuteDuration:
+				assert.Equal(t, metric.ResourceId, "123")
+				assert.Equal(t, metric.Namespace, "namespace")
+				assert.Equal(t, metric.Names, []string{"TotalRequests", "BytesRead"})
+				assert.Equal(t, metric.Aggregations, "Average")
+				assert.Equal(t, metric.Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+			default:
+				// cannot have any other cases
+				t.FailNow()
+			}
+		}
+
+		m.AssertExpectations(t)
+	})
+	t.Run("return all metrics when specific metric names and aggregations were configured", func(t *testing.T) {
+		m := &azure.MockService{}
+		m.On("GetMetricDefinitionsWithRetry", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
+		client.AzureMonitorService = m
+		metricConfig.Name = []string{"TotalRequests", "Capacity"}
+		metricConfig.Aggregations = []string{"Average"}
+		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
+		metrics, err := mapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig)
+		assert.NoError(t, err)
+
+		assert.True(t, len(metrics) > 0)
+
+		// we should have two groups, one per first timegrain value
+		assert.Len(t, metrics, 2)
+		// this for loop with the switch statement is necessary because the ordering of timegrains is non-deterministic
+		// due to map iteration. Without a configured timegrain, we are iterating over a map
+		for _, metric := range metrics {
+			switch metric.TimeGrain {
+			case oneMinuteDuration:
+				assert.Equal(t, metric.ResourceId, "123")
+				assert.Equal(t, metric.Namespace, "namespace")
+				assert.Equal(t, metric.Names, []string{"Capacity"})
+				assert.Equal(t, metric.Aggregations, "Average")
+				assert.Equal(t, metric.Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+			case thirtyMinuteDuration:
+				assert.Equal(t, metric.ResourceId, "123")
+				assert.Equal(t, metric.Namespace, "namespace")
+				assert.Equal(t, metric.Names, []string{"TotalRequests"})
+				assert.Equal(t, metric.Aggregations, "Average")
+				assert.Equal(t, metric.Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
+			default:
+				// cannot have any other cases
+				t.FailNow()
+			}
+		}
+
 		m.AssertExpectations(t)
 	})
 }

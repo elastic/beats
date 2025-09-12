@@ -15,6 +15,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const missingMetricDefinitions = "no metric definitions were found for resource %s and namespace %s. Verify if the namespace is spelled correctly or if it is supported by the resource in case"
@@ -29,53 +30,54 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 		// multiple times.
 		namespaceMetrics := make(map[string]armmonitor.MetricDefinitionCollection)
 
-		for _, metric := range resourceConfig.Metrics {
+		for _, metricConfig := range resourceConfig.Metrics {
 
 			var err error
 
-			metricDefinitions, exists := namespaceMetrics[metric.Namespace]
+			metricDefinitions, exists := namespaceMetrics[metricConfig.Namespace]
 			if !exists {
-				metricDefinitions, err = client.AzureMonitorService.GetMetricDefinitionsWithRetry(*resource.ID, metric.Namespace)
+				metricDefinitions, err = client.AzureMonitorService.GetMetricDefinitionsWithRetry(*resource.ID, metricConfig.Namespace)
 				if err != nil {
 					return nil, err
 				}
-				namespaceMetrics[metric.Namespace] = metricDefinitions
+				namespaceMetrics[metricConfig.Namespace] = metricDefinitions
 			}
 
 			if len(metricDefinitions.Value) == 0 {
-				if metric.IgnoreUnsupported {
-					client.Log.Infof(missingMetricDefinitions, *resource.ID, metric.Namespace)
+				if metricConfig.IgnoreUnsupported {
+					client.Log.Infof(missingMetricDefinitions, *resource.ID, metricConfig.Namespace)
 					continue
 				}
 
-				return nil, fmt.Errorf(missingMetricDefinitions, *resource.ID, metric.Namespace)
+				return nil, fmt.Errorf(missingMetricDefinitions, *resource.ID, metricConfig.Namespace)
 			}
 
 			// validate metric names and filter on the supported metrics
-			supportedMetricNames, err := filterMetricNames(*resource.ID, metric, metricDefinitions.Value)
+			supportedMetricNames, err := filterMetricNames(*resource.ID, metricConfig, metricDefinitions.Value)
 			if err != nil {
 				return nil, err
 			}
 
 			//validate aggregations and filter on supported aggregations
-			metricGroups, err := filterOnSupportedAggregations(supportedMetricNames, metric, metricDefinitions.Value)
+			metricGroups, err := validateAndGroupByConfiguredAggsAndTimegrain(
+				supportedMetricNames, metricConfig, metricDefinitions.Value, client.Log)
 			if err != nil {
 				return nil, err
 			}
 
 			// map dimensions
-			var dim []azure.Dimension
-			if len(metric.Dimensions) > 0 {
-				for _, dimension := range metric.Dimensions {
-					dim = append(dim, azure.Dimension(dimension))
+			var dimensions []azure.Dimension
+			if len(metricConfig.Dimensions) > 0 {
+				for _, dimension := range metricConfig.Dimensions {
+					dimensions = append(dimensions, azure.Dimension(dimension))
 				}
 			}
-			for key, metricGroup := range metricGroups {
+			for compositeKey, metricGroup := range metricGroups {
 				var metricNames []string
 				for _, metricName := range metricGroup {
 					metricNames = append(metricNames, *metricName.Name.Value)
 				}
-				metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, metric.Timegrain))
+				metrics = append(metrics, client.CreateMetric(*resource.ID, "", metricConfig.Namespace, metricNames, compositeKey.aggregations, dimensions, compositeKey.timegrain))
 			}
 		}
 	}
@@ -125,22 +127,31 @@ func filterConfiguredMetrics(selectedRange []string, allRange []*armmonitor.Metr
 	return inRange, notInRange
 }
 
-// filterOnSupportedAggregations will verify if the aggregation values entered are supported and will also return the corresponding list of aggregations
-func filterOnSupportedAggregations(
+type compositeKey struct {
+	aggregations string
+	timegrain    string
+}
+
+// validateAndGroupByConfiguredAggsAndTimegrain will:
+//   - verify if the aggregation values entered are supported by the metric
+//     names passed in
+//   - verify if the timegrain entered is supported by the metric names passed
+//     in
+//   - return the metrics grouped by aggregation(s) and timegrain
+func validateAndGroupByConfiguredAggsAndTimegrain(
 	metricNames []string,
 	metricConfig azure.MetricConfig,
 	metricDefinitions []*armmonitor.MetricDefinition,
-) (map[string][]*armmonitor.MetricDefinition, error) {
+	logger *logp.Logger,
+) (map[compositeKey][]*armmonitor.MetricDefinition, error) {
 	var supportedAggregations []string
 	var unsupportedAggregations []string
-	metricGroups := make(map[string][]*armmonitor.MetricDefinition)
+	metricGroups := make(map[compositeKey][]*armmonitor.MetricDefinition)
 	metricDefs := getMetricDefinitionsByNames(metricDefinitions, metricNames)
 
-	if len(metricConfig.Aggregations) == 0 {
-		for _, metricDef := range metricDefs {
-			metricGroups[string(*metricDef.PrimaryAggregationType)] = append(metricGroups[string(*metricDef.PrimaryAggregationType)], metricDef)
-		}
-	} else {
+	// validate and prepare configured aggregations (if configured)
+	var serializedConfiguredAggs string
+	if len(metricConfig.Aggregations) > 0 {
 		supportedAggregations, unsupportedAggregations = filterAggregations(metricConfig.Aggregations, metricDefs)
 		if len(unsupportedAggregations) > 0 {
 			return nil, fmt.Errorf("the aggregations configured : %s are not supported for some of the metrics selected %s ",
@@ -150,8 +161,49 @@ func filterOnSupportedAggregations(
 			return nil, fmt.Errorf("no aggregations were found based on the aggregation values configured or supported between the metrics : %s",
 				strings.Join(metricNames, ","))
 		}
-		key := strings.Join(supportedAggregations, ",")
-		metricGroups[key] = append(metricGroups[key], metricDefs...)
+		serializedConfiguredAggs = strings.Join(supportedAggregations, ",")
+	}
+
+	for _, metricDef := range metricDefs {
+		var timeGrain string
+		// validate and prepare configured timegrain (if configured)
+		if metricConfig.Timegrain != "" {
+			// check if the timegrain is supported by the metric definition.
+			// If not, error
+			configuredTimegrainSupported := false
+			for _, availability := range metricDef.MetricAvailabilities {
+				if metricConfig.Timegrain == *availability.TimeGrain {
+					configuredTimegrainSupported = true
+					break
+				}
+			}
+			if !configuredTimegrainSupported {
+				logger.Warnf("The configured timegrain %s is not "+
+					"supported by the metric %s",
+					metricConfig.Timegrain, *metricDef.Name.Value)
+				continue // do not collect - will result in error
+			}
+			// Configured timegrain is supported, i.e. compatible
+			timeGrain = metricConfig.Timegrain
+		} else {
+			// timegrain not configured:
+			// fall back to first (and smallest) timegrain from metric
+			// definition if user did not provide one
+			timeGrain = *metricDef.MetricAvailabilities[0].TimeGrain
+		}
+		var aggs string
+		if serializedConfiguredAggs != "" {
+			aggs = serializedConfiguredAggs
+		} else {
+			// no configured aggregations
+			// fall back to primary aggregation from metric definition
+			aggs = string(*metricDef.PrimaryAggregationType)
+		}
+		currCompositeKey := compositeKey{
+			aggregations: aggs,
+			timegrain:    timeGrain,
+		}
+		metricGroups[currCompositeKey] = append(metricGroups[currCompositeKey], metricDef)
 	}
 	return metricGroups, nil
 }
