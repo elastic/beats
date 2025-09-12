@@ -51,7 +51,7 @@ on start up, effectively re-ingesting all files on restart.
 
 **Workaround**
 - For Filestream >= 8.16.0 and < 9.2.0: disable `clean_inactive` by setting `clean_inactive: -1`.
-- For Filestream >= 8.14.0 and < 8.16.0 set `clean_inactive` to a very
+- For Filestream >= 8.14.0 and < 8.15.0 set `clean_inactive` to a very
 large value. For example, use `clean_inactive: 43800h0m0s`, which is 5 years.
 
 **Fix planned in**: 9.2.0 by [PR #46373](https://github.com/elastic/beats/pull/46373)
