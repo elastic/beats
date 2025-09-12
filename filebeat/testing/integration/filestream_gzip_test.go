@@ -127,7 +127,7 @@ output.file:
 		}
 	})
 
-	t.Run("TechPreviewWarning", func(t *testing.T) {
+	t.Run("BetaWarning", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
@@ -162,8 +162,9 @@ output.console:
 			WithReportOptions(reportOptions).
 			ExpectStart().
 			ExpectOutput(
-				"EXPERIMENTAL: filestream: experimental gzip support enabled").
-			Start(ctx).Wait()
+				"BETA: filestream: beta gzip support enabled").
+			Start(ctx).
+			Wait()
 	})
 }
 
