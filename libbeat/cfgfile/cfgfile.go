@@ -25,7 +25,8 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
+	"github.com/elastic/beats/v7/libbeat/management"
+	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -129,7 +130,7 @@ func HandleFlags() error {
 	var managementSettings management
 	cfgFlag := flag.Lookup("E")
 	if cfgFlag == nil {
-		fleetmode.SetAgentMode(false)
+		lbmanagement.SetUnderAgent(false)
 		return nil
 	}
 	cfgObject, _ := cfgFlag.Value.(*config.SettingsFlag)
@@ -137,10 +138,10 @@ func HandleFlags() error {
 
 	err = cliCfg.Unpack(&managementSettings)
 	if err != nil {
-		fleetmode.SetAgentMode(false)
+		lbmanagement.SetUnderAgent(false)
 		return nil //nolint:nilerr // unpacking failing isn't an error for this case
 	}
-	fleetmode.SetAgentMode(managementSettings.Enabled)
+	lbmanagement.SetUnderAgent(managementSettings.Enabled)
 	return nil
 }
 
@@ -155,7 +156,7 @@ func Load(path string, beatOverrides []ConditionalOverride) (*config.C, error) {
 
 	cfgpath := GetPathConfig()
 
-	if !fleetmode.Enabled() {
+	if !management.UnderAgent() {
 		if path == "" {
 			list := []string{}
 			for _, cfg := range configfiles.List() {
