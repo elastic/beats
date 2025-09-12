@@ -123,6 +123,14 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 	if len(metrics) == 0 {
 		client.Log.Debug("no resources were found based on all the configurations options entered")
 	}
+	if client.Log.IsDebug() {
+		metricCount := 0
+		for _, metric := range metrics {
+			metricCount += len(metric.Names)
+		}
+		client.Log.Debugf("unique metric definition count: %v", metricCount)
+	}
+
 	client.ResourceConfigurations.Metrics = metrics
 
 	return nil
@@ -215,6 +223,7 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 				// In this case, we track the time grain returned by the API. Azure
 				// provides a default time grain for each metric.
 				if client.ResourceConfigurations.Metrics[i].TimeGrain == "" {
+					// this should not be hit anymore - we grab the first timegrain reported
 					client.ResourceConfigurations.Metrics[i].TimeGrain = timeGrain
 				}
 
