@@ -222,10 +222,6 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 						}
 						continue // we do not record this data as it may be corrupted
 					} else if *response[i].Interval != criteria.TimeGrain {
-						// note that the SDK says
-						// the interval "may be adjusted in the future and returned back
-						// from what was originally requested"
-						// Reference: https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor@v0.8.0#Response
 						client.Log.Warnf(
 							"error while listing some metric values by resource ID"+
 								" %s and namespace %s: The "+
@@ -240,9 +236,6 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 							client.Log.Debugf("JSON of errored batch %v: %s", i, jsonResp)
 						}
 						// we leverage the modified response interval
-						// as the SDK mentioned this adjusted interval
-						// is possible and therefore can be expected at times
-						// Reference: https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor@v0.8.0#Response
 					}
 					client.MetricRegistry.Update(metricsDefinitions[i], MetricCollectionInfo{
 						timeGrain: *response[i].Interval,
