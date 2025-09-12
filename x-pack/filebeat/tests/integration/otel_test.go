@@ -7,12 +7,10 @@
 package integration
 
 import (
+	"bytes"
 	"context"
-<<<<<<< HEAD
 	"crypto/tls"
-=======
 	"encoding/json"
->>>>>>> 29488865a (otel: add test for otelconsumer + elasticsearchexporter document-level retries (#46413))
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -24,6 +22,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"text/template"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
@@ -38,11 +37,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
-<<<<<<< HEAD
 	"github.com/elastic/go-elasticsearch/v8"
-=======
 	"github.com/elastic/mock-es/pkg/api"
->>>>>>> 29488865a (otel: add test for otelconsumer + elasticsearchexporter document-level retries (#46413))
 )
 
 var beatsCfgFile = `
