@@ -60,12 +60,12 @@ var (
 	errDeprecated = errors.New("Log input is deprecated. Use Filestream input instead. Follow our migration guide https://www.elastic.co/guide/en/beats/filebeat/current/migrate-to-filestream.html")
 )
 
-func init() {
-	err := input.Register("log", NewInput)
-	if err != nil {
-		panic(err)
-	}
-}
+// func init() {
+// 	err := input.Register("log", NewInput)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// }
 
 // Input contains the input and its config
 type Input struct {
