@@ -19,6 +19,7 @@ package kafka
 
 import (
 	"context"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -69,6 +70,13 @@ func TestClientShutdownPanic(t *testing.T) {
 			Fields:     map[string]any{"msg": "message 2"},
 			Private:    nil,
 			TimeSeries: false,
+		},
+		beat.Event{
+			Timestamp:  time.Time{},
+			Meta:       nil,
+			Fields:     map[string]any{"msg": "message 3"},
+			Private:    nil,
+			TimeSeries: false,
 		})
 
 	ch := make(chan *sarama.ProducerMessage)
@@ -104,8 +112,11 @@ func TestClientShutdownPanic(t *testing.T) {
 	wc.Wait()
 
 	// 5th. assert the event dropped log is there:
-	assert.Contains(t, buff.String(), "output closing, dropping event",
+	logs := buff.String()
+	assert.Contains(t, logs,
+		"output closing, dropping last 2/3 events from batch",
 		"event dropped log not found")
+	assert.Equal(t, 1, strings.Count(logs, "output closing, dropping last"))
 }
 
 type producerMock struct {
