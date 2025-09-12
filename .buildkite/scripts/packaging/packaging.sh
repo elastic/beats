@@ -11,6 +11,7 @@ BEAT_DIR=${1:?-"Error: Beat directory must be specified."}
 source .buildkite/scripts/qemu.sh
 
 cd $BEAT_DIR
+export MAGEFILE_DEBUG=1
 mage package
 
 echo "Generated packages in ${BEAT_DIR}/build/distributions:"
