@@ -16,6 +16,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -794,17 +795,7 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 					mu.Lock()
 					defer mu.Unlock()
 
-					// Check if this event should fail
-					shouldEventFail := func(eventID int) bool {
-						for _, failID := range tt.eventIDsToFail {
-							if failID == eventID {
-								return true
-							}
-						}
-						return false
-					}
-
-					isFailingEvent := shouldEventFail(eventID)
+					isFailingEvent := slices.Contains(tt.eventIDsToFail, eventID)
 
 					var shouldFail bool
 					if isFailingEvent {
