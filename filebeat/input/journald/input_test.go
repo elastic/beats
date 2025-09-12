@@ -331,35 +331,6 @@ func TestReaderAdapterCanHandleNonStringFields(t *testing.T) {
 	}
 }
 
-<<<<<<< HEAD
-=======
-func TestInputCanReportStatus(t *testing.T) {
-	out := decompress(t, filepath.Join("testdata", "multiple-boots.journal.gz"))
-
-	env := newInputTestingEnvironment(t)
-	cfg := mapstr.M{
-		"paths": []string{out},
-	}
-	inp := env.mustCreateInput(cfg)
-
-	ctx, cancelInput := context.WithCancel(context.Background())
-	t.Cleanup(cancelInput)
-
-	env.startInput(ctx, inp)
-	env.waitUntilEventCount(6)
-
-	env.RequireStatuses([]statusUpdate{
-		{
-			state: status.Starting,
-			msg:   "Starting",
-		},
-		{
-			state: status.Running,
-			msg:   "Running",
-		},
-	})
-}
-
 var expectedBinaryMessges = [][]byte{
 	{
 		0, 2, 4, 8, 10, 12, 14, 16, 18,
@@ -422,7 +393,6 @@ func TestBinaryDataIsCorrectlyHandled(t *testing.T) {
 	}
 }
 
->>>>>>> f8907e340 ([Filebeat/Jourrnald] Convert binary blob to string (#46415))
 func decompress(t *testing.T, namegz string) string {
 	t.Helper()
 
