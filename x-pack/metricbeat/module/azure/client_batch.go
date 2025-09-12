@@ -202,6 +202,41 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 
 				// Process the response as needed
 				for i, v := range response {
+					if response[i].Interval == nil || *response[i].Interval == "" {
+						// this should not happen because we have handled the wildcard
+						// timegrain config scenario. Therefore, we should not
+						// continue with data returned from the latest API call,
+						// because this data could be bad
+
+						client.Log.Error(
+							"error while listing some metric values by resource ID"+
+								" %s and namespace %s: The returned"+
+								"interval (timegrain) for batch %v of responses is empty",
+							metricsDefinitions[0].ResourceSubId,
+							metricsDefinitions[0].Namespace,
+							i,
+						)
+						if resp, err := response[i].MarshalJSON(); err == nil {
+							jsonResp := string(resp)
+							client.Log.Debugf("JSON of errored batch %v: %s", i, jsonResp)
+						}
+						continue // we do not record this data as it may be corrupted
+					} else if *response[i].Interval != criteria.TimeGrain {
+						client.Log.Warnf(
+							"error while listing some metric values by resource ID"+
+								" %s and namespace %s: The "+
+								"interval (timegrain) in the response for batch %v of "+
+								"responses does not match the requested timegrain %s",
+							metricsDefinitions[0].ResourceSubId,
+							metricsDefinitions[0].Namespace,
+							i,
+							*response[i].Interval)
+						if resp, err := response[i].MarshalJSON(); err == nil {
+							jsonResp := string(resp)
+							client.Log.Debugf("JSON of errored batch %v: %s", i, jsonResp)
+						}
+						// we leverage the modified response interval
+					}
 					client.MetricRegistry.Update(metricsDefinitions[i], MetricCollectionInfo{
 						timeGrain: *response[i].Interval,
 						timestamp: referenceTime,
@@ -209,9 +244,10 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 					values := mapBatchMetricValues(client, v)
 					metricsDefinitions[i].Values = append(metricsDefinitions[i].Values, values...)
 					if metricsDefinitions[i].TimeGrain == "" {
+						// this should not be hit because we always set a timegrain during
+						// fetching definitions
 						metricsDefinitions[i].TimeGrain = *response[i].Interval
 					}
-
 				}
 
 				result = append(result, metricsDefinitions...)
