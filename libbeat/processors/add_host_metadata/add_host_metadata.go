@@ -21,6 +21,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -75,7 +76,7 @@ type addHostMetadata struct {
 	logger          *logp.Logger
 	metrics         metrics
 	hostInfoFactory hostInfoFactory
-	useFQDN         bool
+	useFQDN         atomic.Bool
 }
 
 // New constructs a new add_host_metadata processor.
@@ -92,9 +93,9 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 		metrics: metrics{
 			FQDNLookupFailed: monitoring.NewInt(reg, "fqdn_lookup_failed"),
 		},
-		useFQDN:         features.FQDN(),
 		hostInfoFactory: func() (hostInfo, error) { return sysinfo.Host() },
 	}
+	p.useFQDN.Store(features.FQDN())
 	if err := p.loadData(true); err != nil {
 		return nil, fmt.Errorf("failed to load data: %w", err)
 	}
@@ -119,8 +120,8 @@ func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 
 	// check if the FQDN setting changed, and we need to invalidate the cache
 	useFQDNNew := features.FQDN()
-	if p.useFQDN != useFQDNNew {
-		p.useFQDN = useFQDNNew
+	useFQDNOld := p.useFQDN.Load()
+	if p.useFQDN.CompareAndSwap(useFQDNOld, useFQDNNew) {
 		go p.updateOrExpire()
 	}
 
@@ -174,7 +175,7 @@ func (p *addHostMetadata) loadData(checkCache bool) error {
 	}
 
 	hostname := h.Info().Hostname
-	if p.useFQDN {
+	if p.useFQDN.Load() {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 		defer cancel()
 

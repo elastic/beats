@@ -633,9 +633,9 @@ func newWithHostInfoFactory(cfg *conf.C, log *logp.Logger, factory hostInfoFacto
 		metrics: metrics{
 			FQDNLookupFailed: monitoring.NewInt(reg, "fqdn_lookup_failed"),
 		},
-		useFQDN:         features.FQDN(),
 		hostInfoFactory: factory,
 	}
+	p.useFQDN.Store(features.FQDN())
 	if err := p.loadData(true); err != nil {
 		return nil, fmt.Errorf("failed to load data: %w", err)
 	}
