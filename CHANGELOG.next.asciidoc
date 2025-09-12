@@ -89,11 +89,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
-- Fix a race condition during metrics initialization which could cause a panic. {issue}45822[45822] {pull}46054[46054]
-- Fixed a panic when the beat restarts itself by adding 'eventfd2' to default seccomp policy {issue}46372[46372]
-- Update github.com/go-viper/mapstructure/v2 to v2.4.0 {pull}46335[46335]
-- Update Go version to 1.24.7 {pull}46070[46070].
-- Update github.com/docker/docker to v28.3.3 {pull}46334[46334]
 
 *Auditbeat*
 
@@ -138,7 +133,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
 - The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
 - Remove erroneous status reporting to Elastic-Agent from the Filestream input {pull}42435[42435]
-- Fix wrongly emitted missing input ID warning {issue}42969[42969] {pull}45747[45747]
 - Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42756]
 - Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
 - Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
@@ -152,13 +146,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added missing "text/csv" content-type filter support in azureblobsortorage input. {issue}44596[44596] {pull}44824[44824]
 - Fix unexpected EOF detection and improve memory usage. {pull}44813[44813]
 - Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
-- Fix handling of unnecessary BOM in UTF-8 text received by o365audit input. {issue}44327[44327] {pull}45739[45739]
-- Fix reading journald messages with more than 4kb. {issue}45511[45511] {pull}46017[46017]
-- Restore the Streaming input on Windows. {pull}46031[46031]
-- Fix termination of input on API errors. {pull}45999[45999]
-- Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
-- Fix race condition that could cause Filebeat to hang during shutdown after failing to startup {issue}45034[45034] {pull}46331[46331]
-- Fixed hints autodiscover for Docker when the configuration is only `hints.enabled: true`. {issue}45156[45156] {pull}45864[45864]
 - Fix metrics from TCP & UDP inputs when the port number is > 32767 {pull}46486[46486]
 
 *Heartbeat*
@@ -187,9 +174,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group. {pull}44576[44576]
 - Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
 - Fix histogram values of zero are filtered out on non-amd64 platforms for openmetrics and prometheus {pull}44750[44750]
-- Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. {pull}45761[45761]
-- Fix an issue where the conntrack metricset entries field reported a count inflated by a factor of the number of CPU cores. {issue}46138[46138] {pull}46140[46140]
-- Enhance behavior of sanitizeError: replace sensitive info even if it is escaped and add pattern-based sanitization {pull}45857[45857]
 - Do not log an error if metadata enrichment is disabled for K8's module {pull}46536
 
 *Osquerybeat*
@@ -203,7 +187,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Fix message handling in the experimental api. {issue}19338[19338] {pull}41730[41730]
-- Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
 
 
 *Elastic Logging Plugin*
@@ -284,10 +267,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
 - Filebeat's registry is now added to the Elastic-Agent diagnostics bundle {issue}33238[33238] {pull}41795[41795]
 - The Filestream input now uses the `fingerprint` file identity by default. The state from files are automatically migrated if the previous file identity was `native` (the default) or `path`. If the `file_identity` is explicitly set, there is no change in behaviour. {issue}40197[40197] {pull}41762[41762]
-- Improve HTTP JSON health status logic for empty template results. {pull}46332[46332]
-- Improve CEL input documentation of authentication options. {pull}46253[46253]
-- Add status reporting support for Azure Event Hub v2 input. {pull}44846[44846]
-- Add documentation for device collection in Entity Analytics Active Directory Filebeat's input. {pull}46363[46363]
 
 *Auditbeat*
 
@@ -337,7 +316,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
 - Preserve queries for debugging when `merge_results: true` in SQL module {pull}42271[42271]
 - Collect more fields from ES node/stats metrics and only those that are necessary {pull}42421[42421]
-- Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
 
 *Metricbeat*
 
@@ -389,6 +367,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
