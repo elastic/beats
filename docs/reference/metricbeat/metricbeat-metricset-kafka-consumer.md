@@ -1,7 +1,6 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kafka-consumer.html
-
 applies_to:
   stack: beta
 ---
