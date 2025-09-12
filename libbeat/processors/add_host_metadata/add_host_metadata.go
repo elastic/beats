@@ -121,11 +121,9 @@ func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	// check if the FQDN setting changed, and we need to invalidate the cache
 	useFQDNNew := features.FQDN()
 	useFQDNOld := p.useFQDN.Load()
-	if p.useFQDN.CompareAndSwap(useFQDNOld, useFQDNNew) {
-		go p.updateOrExpire()
-	}
+	fqdnValueChanged := p.useFQDN.CompareAndSwap(useFQDNOld, useFQDNNew)
 
-	err := p.loadData(true)
+	err := p.loadData(!fqdnValueChanged)
 	if err != nil {
 		return nil, fmt.Errorf("error loading data during event update: %w", err)
 	}
@@ -228,50 +226,6 @@ func (p *addHostMetadata) loadData(checkCache bool) error {
 func (p *addHostMetadata) String() string {
 	return fmt.Sprintf("%v=[netinfo.enabled=[%v], cache.ttl=[%v]]",
 		processorName, p.config.NetInfoEnabled, p.config.CacheTTL)
-}
-
-// updateOrExpire will attempt to update the data for the processor, or expire the cache
-// if the config update fails, or times out
-func (p *addHostMetadata) updateOrExpire() {
-	if p.config.CacheTTL <= 0 {
-		return
-	}
-
-	p.lastUpdate.Lock()
-	defer p.lastUpdate.Unlock()
-
-	// while holding the mutex, attempt to update loadData()
-	// doing this with the mutex means other events must wait until we have the correct host data, as we assume that
-	// a call to this function means something else wants to force an update, and thus all events must sync.
-
-	updateChanSuccess := make(chan bool)
-	timeout := time.After(p.config.ExpireUpdateTimeout)
-	go func() {
-		err := p.loadData(false)
-		if err != nil {
-			p.logger.Errorf("error updating data for processor: %v", err)
-			updateChanSuccess <- false
-			return
-		}
-		updateChanSuccess <- true
-	}()
-
-	// this additional timeout check is paranoid, but when it's method is called from handleFQDNReportingChange(),
-	// it's blocking, which means we can hold a mutex in features. In addition, we don't want to break the processor by
-	// having all the events wait for too long.
-	select {
-	case <-timeout:
-		p.logger.Errorf("got timeout while trying to update metadata")
-		p.lastUpdate.Time = time.Time{}
-	case success := <-updateChanSuccess:
-		// only expire the cache if update was failed
-		if !success {
-			p.lastUpdate.Time = time.Time{}
-		} else {
-			p.lastUpdate.Time = time.Now()
-		}
-	}
-
 }
 
 func skipAddingHostMetadata(event *beat.Event) bool {
