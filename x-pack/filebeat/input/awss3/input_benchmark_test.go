@@ -30,6 +30,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -219,7 +220,7 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 
 		config := makeBenchmarkConfig(t)
 		config.NumberOfWorkers = workerCount
-		sqsReader := newSQSReaderInput(config, aws.Config{})
+		sqsReader := newSQSReaderInput(config, aws.Config{}, paths.New())
 		sqsReader.log = log.Named("sqs")
 		sqsReader.status = &statusReporterHelperMock{}
 		sqsReader.pipeline = newFakePipeline()

@@ -17,6 +17,7 @@ import (
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // statusReporterHelperMock is a thread-safe mock of a status reporter that
@@ -181,7 +182,7 @@ func TestRegionSelection(t *testing.T) {
 				RegionName: test.regionName,
 				AWSConfig:  awscommon.ConfigAWS{Endpoint: test.endpoint},
 			}
-			in := newSQSReaderInput(config, awssdk.Config{})
+			in := newSQSReaderInput(config, awssdk.Config{}, paths.New())
 			inputCtx := v2.Context{
 				Logger:          logp.NewLogger("awss3_test"),
 				ID:              "test_id",
