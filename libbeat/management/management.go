@@ -102,7 +102,7 @@ func NewManager(cfg *config.C, registry *reload.Registry, logger *logp.Logger) (
 		}
 	}
 	return &FallbackManager{
-		logger: logp.NewLogger("mgmt"),
+		logger: logger.Named("mgmt"),
 		status: status.Unknown,
 		msg:    "",
 	}, nil
@@ -118,7 +118,7 @@ func SetManagerFactory(factory ManagerFactory) {
 	managerFactory = factory
 }
 
-// fallbackManager, fallback when no manager is present
+// FallbackManager, fallback when no manager is present
 type FallbackManager struct {
 	logger   *logp.Logger
 	lock     sync.Mutex

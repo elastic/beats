@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/plugin"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
@@ -182,8 +183,12 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		b.Info.FQDN = fqdn
 	}
 
+	// register NewOtelManager
+	management.SetManagerFactory(otelmanager.NewOtelManager)
+
 	// initialize config manager
-	m, err := otelmanager.NewOtelManager(cfg)
+	oCfg, _ := cfg.Child("management.otel", -1) //nolint:errcheck we can ignore the error. If the field is not set, we will default to FallbackManager anyhow.
+	m, err := management.NewManager(oCfg, b.Registry, logger)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new manager: %w", err)
 	}
