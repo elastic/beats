@@ -12,6 +12,7 @@ https://github.com/elastic/beats/compare/v8.19.2\...v8.19.3[View commits]
 *Filebeat*
  - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
  - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+// tag::known-issue-8.19-restart_on_cert_change[]
  - `restart_on_cert_change` causes panic due to seccomp policy. In versions 8.19.0 and later, enabling this option causes the Beat to panic on restart. This is due to the `eventfd2` syscall missing from the default seccomp policy. To fix this, add `eventfd2` to a custom seccomp policy. For more details, refer to {filebeat-ref}/linux-seccomp.html[Use Linux Secure Computing Mode (seccomp)].
 
 [%collapsible]
