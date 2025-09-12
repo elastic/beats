@@ -1,5 +1,3 @@
-version: '2.3'
-
 services:
   prometheus_base:
     image: docker.elastic.co/integrations-ci/beats-prometheus:${PROMETHEUS_VERSION:-2.6.0}-2
