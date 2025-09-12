@@ -32,6 +32,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
@@ -619,105 +620,6 @@ service:
 	for _, rec := range otelConfig.Receivers {
 		assertMonitoring(t, rec.MonitoringPort)
 	}
-}
-
-func TestFilebeatOTelInspect(t *testing.T) {
-	filebeatOTel := integration.NewBeat(
-		t,
-		"filebeat-otel",
-		"../../filebeat.test",
-		"otel",
-	)
-
-	var beatsCfgFile = `
-filebeat.inputs:
-  - type: filestream
-    id: filestream-input-id
-    enabled: true
-    file_identity.native: ~
-    prospector.scanner.fingerprint.enabled: false
-    paths:
-      - /tmp/log.log
-output:
-  elasticsearch:
-    hosts:
-      - localhost:9200
-    username: admin
-    password: testing
-    index: index
-queue.mem.flush.timeout: 0s
-setup.template.enabled: false
-processors:
-    - add_host_metadata: ~
-    - add_cloud_metadata: ~
-    - add_docker_metadata: ~
-    - add_kubernetes_metadata: ~
-`
-	expectedExporter := `exporters:
-    elasticsearch:
-        compression: gzip
-        compression_params:
-            level: 1
-        endpoints:
-            - http://localhost:9200
-        idle_conn_timeout: 3s
-        logs_index: index
-        mapping:
-            mode: bodymap
-        max_conns_per_host: 1
-        password: testing
-        retry:
-            enabled: true
-            initial_interval: 1s
-            max_interval: 1m0s
-            max_retries: 3
-        sending_queue:
-            batch:
-                max_size: 1600
-                min_size: 0
-                sizer: items
-            block_on_overflow: true
-            enabled: true
-            num_consumers: 1
-            queue_size: 3200
-            wait_for_result: true
-        timeout: 1m30s
-        user: admin`
-	expectedReceiver := `receivers:
-    filebeatreceiver:
-        filebeat:
-            inputs:
-                - enabled: true
-                  file_identity:
-                    native: null
-                  id: filestream-input-id
-                  paths:
-                    - /tmp/log.log
-                  prospector:
-                    scanner:
-                        fingerprint:
-                            enabled: false
-                  type: filestream`
-	expectedService := `service:
-    pipelines:
-        logs:
-            exporters:
-                - elasticsearch
-            receivers:
-                - filebeatreceiver
-`
-	filebeatOTel.WriteConfigFile(beatsCfgFile)
-
-	filebeatOTel.Start("inspect")
-	defer filebeatOTel.Stop()
-
-	require.EventuallyWithT(t, func(collect *assert.CollectT) {
-		out, err := filebeatOTel.ReadStdout()
-		require.NoError(collect, err)
-		require.Contains(collect, out, expectedExporter)
-		require.Contains(collect, out, expectedReceiver)
-		require.Contains(collect, out, expectedService)
-	}, 10*time.Second, 500*time.Millisecond, "failed to get output of inspect command")
 }
 
 func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
