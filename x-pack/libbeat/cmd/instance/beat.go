@@ -32,8 +32,13 @@ import (
 	"github.com/elastic/go-ucfg"
 )
 
+// This is the timeout for the beat's internal publishing pipeline to close when shutting down the receiver. Closing
+// requires flushing the event queue, and if this doesn't happen within the timeout, data may be lost depending on
+// input type.
+const receiverPublisherCloseTimeout = 5 * time.Second
+
 // NewBeatForReceiver creates a Beat that will be used in the context of an otel receiver
-func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, useDefaultProcessors bool, consumer consumer.Logs, core zapcore.Core) (*instance.Beat, error) {
+func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, useDefaultProcessors bool, consumer consumer.Logs, componentID string, core zapcore.Core) (*instance.Beat, error) {
 	b, err := instance.NewBeat(settings.Name,
 		settings.IndexPrefix,
 		settings.Version,
@@ -43,6 +48,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, err
 	}
 
+	b.Info.ComponentID = componentID
 	b.Info.LogConsumer = consumer
 
 	// begin code similar to configure
@@ -261,6 +267,8 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	pipelineSettings := pipeline.Settings{
 		Processors:     b.GetProcessors(),
 		InputQueueSize: b.InputQueueSize,
+		WaitCloseMode:  pipeline.WaitOnPipelineCloseThenForce,
+		WaitClose:      receiverPublisherCloseTimeout,
 	}
 	publisher, err := pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, pipelineSettings)
 	if err != nil {
