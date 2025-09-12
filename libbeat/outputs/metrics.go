@@ -22,6 +22,7 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -83,7 +84,7 @@ type Stats struct {
 // NewStats creates a new Stats instance using a backing monitoring registry.
 // This function will create and register a number of metrics with the registry passed.
 // The registry must not be null.
-func NewStats(reg *monitoring.Registry) *Stats {
+func NewStats(reg *monitoring.Registry, logger *logp.Logger) *Stats {
 	obj := &Stats{
 		eventsBatches:    monitoring.NewUint(reg, "events.batches"),
 		eventsTotal:      monitoring.NewUint(reg, "events.total"),
@@ -105,7 +106,12 @@ func NewStats(reg *monitoring.Registry) *Stats {
 
 		sendLatencyMillis: metrics.NewUniformSample(1024),
 	}
+<<<<<<< HEAD
 	_ = adapter.NewGoMetrics(reg, "write.latency", adapter.Accept).Register("histogram", metrics.NewHistogram(obj.sendLatencyMillis))
+=======
+	_ = adapter.NewGoMetrics(reg, "write.latency", logger, adapter.Accept).Register("histogram", metrics.NewHistogram(obj.sendLatencyLifetimeMillis))
+	_ = adapter.NewGoMetrics(reg, "write.latency_delta", logger, adapter.Accept).Register("histogram", adapter.NewClearOnVisitHistogram(obj.sendLatencyDeltaMillis))
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	return obj
 }
 

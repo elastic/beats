@@ -90,11 +90,32 @@ func TestPublish(t *testing.T) {
 		reg := monitoring.NewRegistry()
 		client, err := NewClient(
 			clientSettings{
-				observer:      outputs.NewStats(reg),
+				observer:      outputs.NewStats(reg, logp.NewNopLogger()),
 				connection:    eslegclient.ConnectionSettings{URL: url},
 				indexSelector: testIndexSelector{},
 			},
 			nil,
+<<<<<<< HEAD
+=======
+			logger,
+		)
+		require.NoError(t, err)
+		return client, reg
+	}
+	makePublishGzipTestClient := func(t *testing.T, url string, compressionLevel int) (*Client, *monitoring.Registry) {
+		reg := monitoring.NewRegistry()
+		client, err := NewClient(
+			clientSettings{
+				observer: outputs.NewStats(reg, logp.NewNopLogger()),
+				connection: eslegclient.ConnectionSettings{
+					URL:              url,
+					CompressionLevel: compressionLevel,
+				},
+				indexSelector: testIndexSelector{},
+			},
+			nil,
+			logger,
+>>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 		)
 		require.NoError(t, err)
 		return client, reg
