@@ -7,12 +7,13 @@ package instance
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/filebeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/otelmanager"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/collector/consumer/consumertest"
 	"go.uber.org/zap/zapcore"
+
+	"github.com/elastic/beats/v7/filebeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/otelmanager"
 )
 
 func TestManager(t *testing.T) {

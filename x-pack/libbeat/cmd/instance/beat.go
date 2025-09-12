@@ -187,7 +187,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	management.SetManagerFactory(otelmanager.NewOtelManager)
 
 	// initialize config manager
-	oCfg, _ := cfg.Child("management.otel", -1) //nolint:errcheck we can ignore the error. If the field is not set, we will default to FallbackManager anyhow.
+	oCfg, _ := cfg.Child("management.otel", -1)
 	m, err := management.NewManager(oCfg, b.Registry, logger)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new manager: %w", err)
