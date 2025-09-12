@@ -956,10 +956,6 @@ func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
 
 	config, err = validateConfig(config)
 	if err != nil {
-<<<<<<< HEAD
-		logp.Err("Error while validating config: %v", err)
-=======
->>>>>>> baf655879 ([metricbeat/module/K8's]  `metadata enrichment disabled`  should not be logged at error level (#46536))
 		return nil, err
 	}
 	return config, nil
