@@ -1,0 +1,41 @@
+[
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "deleted"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "deletion"
+        ]
+      },
+      "file": {
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwdelete-file3249886158\\001\\mainfile.txt"
+      },
+      "process": {
+        "pid": 51988,
+        "user": {
+          "domain": "tp",
+          "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
+          "name": "Marc"
+        }
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-09-01T10:30:22.235874Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 0,
+    "Period": 0,
+    "DisableTimeSeries": false
+  }
+]
