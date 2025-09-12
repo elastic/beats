@@ -9,11 +9,23 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/ccm"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
+	"os"
+	"sync"
 )
 
-const MODULE_NAME = "autoops_es"
+const (
+	MODULE_NAME              = "autoops_es"
+	SEND_CLUSTER_INFO_ERRORS = "AUTOOPS_SEND_CLUSTER_INFO_ERRORS"
+)
+
+var GetClusterInfoValue = func() func() string {
+	return sync.OnceValue(func() string {
+		return os.Getenv(SEND_CLUSTER_INFO_ERRORS)
+	})
+}
 
 var checkedCloudConnectedMode bool = false
 
@@ -65,7 +77,7 @@ func newAutoOpsMetricSet[T any](base mb.BaseMetricSet, routePath string, mapper 
 	if !checkedCloudConnectedMode {
 		checkedCloudConnectedMode = true
 
-		if err := maybeRegisterCloudConnectedCluster(ms, GetInfo); err != nil {
+		if err := ccm.MaybeRegisterCloudConnectedCluster(ms, GetInfo); err != nil {
 			return nil, fmt.Errorf("failed to register Cloud Connected Mode: %w", err)
 		}
 	}
@@ -93,7 +105,14 @@ func (m *AutoOpsMetricSet[T]) Fetch(r mb.ReporterV2) error {
 
 	if info, err = GetInfo(m.MetricSet); err != nil {
 		err = fmt.Errorf("failed to get cluster info from cluster, %v metricset %w", metricSetName, err)
-		events.LogAndSendErrorEventWithoutClusterInfo(err, r, metricSetName)
+
+		var sendClusterInfoValue = GetClusterInfoValue()()
+		if utils.GetBoolEnvParam(sendClusterInfoValue, true) {
+			events.LogAndSendErrorEventWithoutClusterInfo(err, r, metricSetName)
+		} else {
+			m.Logger().Errorf("Error fetching data for metricset %s: %s", metricSetName, err)
+		}
+
 		return nil
 	} else if data, err = utils.FetchAPIData[T](m.MetricSet, m.RoutePath); err != nil {
 		err = fmt.Errorf("failed to get data, %v metricset %w", metricSetName, err)
@@ -104,10 +123,11 @@ func (m *AutoOpsMetricSet[T]) Fetch(r mb.ReporterV2) error {
 	// nested mappers reuse the
 	if m.NestedMapper != nil {
 		if err = m.NestedMapper(m.MetricSet, r, info, data); err != nil {
-			return nil //nolint: nilerr // The error is reported by the mapper
+
+			return nil
 		}
 	} else if err = m.Mapper(r, info, data); err != nil {
-		return nil //nolint: nilerr // The error is reported by the mapper
+		return nil
 	}
 
 	m.Logger().Infof("completed fetching %v metricset", metricSetName)

@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package metricset
+package ccm
 
 import (
 	"bytes"
@@ -14,12 +14,6 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
-	"github.com/elastic/elastic-agent-libs/logp"
-)
-
-const (
-	licensePath   = "/_license"
-	licensePathV7 = "/_license?accept_enterprise"
 )
 
 // License information returned from `GET /_license`, contained within the "license" object.
@@ -65,8 +59,8 @@ var (
 	SUPPORTED_LICENSE_TYPES = []string{"enterprise", "trial"}
 )
 
-// maybeRegisterCloudConnectedCluster fetches cluster information and license details, then sets the global resource ID if applicable.
-func maybeRegisterCloudConnectedCluster(m *elasticsearch.MetricSet, getClusterInfo clusterInfoFetcher) error {
+// MaybeRegisterCloudConnectedCluster fetches cluster information and license details, then sets the global resource ID if applicable.
+func MaybeRegisterCloudConnectedCluster(m *elasticsearch.MetricSet, getClusterInfo clusterInfoFetcher) error {
 	// if resource ID is already set, then we don't need to check/register anything
 	if utils.GetAndSetResourceID() != "" {
 		return nil
@@ -89,15 +83,7 @@ func maybeRegisterCloudConnectedCluster(m *elasticsearch.MetricSet, getClusterIn
 	}
 
 	m.Logger().Debugf("Attempting to fetch license for Cloud Connected Mode...")
-	versionedLicensePath := licensePath
-
-	// TODO: Drop support for this when we drop support for 7.17
-	// For v7, it reports 'platinum' when the value is really 'enterprise' without specifying a query string param
-	if clusterInfo.Version.Number.Major == 7 {
-		versionedLicensePath = licensePathV7
-	}
-
-	licenseWrapper, err := utils.FetchAPIData[licenseWrapper](m, versionedLicensePath)
+	licenseWrapper, err := utils.FetchAPIData[licenseWrapper](m, "/_license")
 
 	if err != nil {
 		return fmt.Errorf("failed to load cluster license: %w", err)
@@ -108,13 +94,12 @@ func maybeRegisterCloudConnectedCluster(m *elasticsearch.MetricSet, getClusterIn
 	}
 
 	m.Logger().Debugf("Successfully fetched license for Cloud Connected Mode: UUID=%s License=%s", clusterInfo.ClusterID, licenseWrapper.License.UID)
-
-	return registerCloudConnectedCluster(cloudApiKey, clusterInfo, &licenseWrapper.License, m.Logger())
+	return registerCloudConnectedCluster(cloudApiKey, clusterInfo, &licenseWrapper.License)
 }
 
 // registerCloudConnectedCluster sends the cluster and license information to the CCM API.
 // It requires the MetricSet to use its configured HTTP client.
-func registerCloudConnectedCluster(cloudApiKey string, clusterInfo *utils.ClusterInfo, license *license, logger *logp.Logger) error {
+func registerCloudConnectedCluster(cloudApiKey string, clusterInfo *utils.ClusterInfo, license *license) error {
 	jsonData, err := json.Marshal(cloudConnectedCluster{
 		Cluster: selfManagedClusterInfo{
 			ID:      clusterInfo.ClusterID,
@@ -146,7 +131,6 @@ func registerCloudConnectedCluster(cloudApiKey string, clusterInfo *utils.Cluste
 
 	if err == nil {
 		utils.SetResourceID(data.ID)
-		logger.Infof("Registered cluster %s for Cloud Connected Mode: %s", clusterInfo.ClusterID, data.ID)
 		return nil
 	}
 
