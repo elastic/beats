@@ -620,8 +620,6 @@ service:
 		assertMonitoring(t, rec.MonitoringPort)
 	}
 }
-<<<<<<< HEAD
-=======
 
 func TestFilebeatOTelInspect(t *testing.T) {
 	filebeatOTel := integration.NewBeat(
@@ -973,4 +971,3 @@ http.port: {{.MonitoringPort}}
 		})
 	}
 }
->>>>>>> 29488865a (otel: add test for otelconsumer + elasticsearchexporter document-level retries (#46413))
