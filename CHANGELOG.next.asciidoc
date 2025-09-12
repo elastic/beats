@@ -69,7 +69,7 @@ already present as `container.id` and `container.log.tag` is dropped because it 
 otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 - Fixed password authentication for ACL users in the Redis input of Filebeat. {pull}44137[44137]
-- Add experimental GZIP file ingestion in filestream. {pull}45301[45301]
+- Add beta GZIP file ingestion in filestream. {pull}45301[45301]
 -Change aws.cloudwatch.* field in awscloudwatch input to nested object. {pull}46357[46357]
 - Filestream's `clean_inactive` setting is now validated, if the validation fails, Filebeat exits with an error code. To keep the legacy behavior of not validating set `legacy_clean_inactive: true`. {issue}45601[45601]
 {pull}46373[46373]
