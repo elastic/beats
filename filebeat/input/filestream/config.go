@@ -34,22 +34,24 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// Config stores the options of a file stream.
+// config stores the options of a file stream.
 type config struct {
 	Reader readerConfig `config:",inline"`
 
-	ID           string          `config:"id"`
-	Paths        []string        `config:"paths"`
-	Close        closerConfig    `config:"close"`
-	FileWatcher  *conf.Namespace `config:"prospector"`
-	FileIdentity *conf.Namespace `config:"file_identity"`
+	ID           string            `config:"id"`
+	Paths        []string          `config:"paths"`
+	Close        closerConfig      `config:"close"`
+	FileWatcher  fileWatcherConfig `config:"prospector.scanner"`
+	FileIdentity *conf.Namespace   `config:"file_identity"`
 
 	// GZIPExperimental enables tech-preview support for ingesting GZIP files.
 	// When set to true the input will transparently stream-decompress GZIP files.
 	// This feature is experimental and subject to change.
 	GZIPExperimental bool `config:"gzip_experimental"`
 
-	// -1 means that registry will never be cleaned
+	// -1 means that registry will never be cleaned, disabling clean_inactive.
+	// Setting it to 0 also disables clean_inactive
+	// "clean_inactive" is parsed, again, and used by internal/input-logfile/manager.go
 	CleanInactive  time.Duration      `config:"clean_inactive" validate:"min=-1"`
 	CleanRemoved   bool               `config:"clean_removed"`
 	HarvesterLimit uint32             `config:"harvester_limit" validate:"min=0"`
@@ -64,6 +66,12 @@ type config struct {
 	// AllowIDDuplication is used by InputManager.Create
 	// (see internal/input-logfile/manager.go).
 	AllowIDDuplication bool `config:"allow_deprecated_id_duplication"`
+
+	// LegacyCleanInactive disables the clean_inactive validation,
+	// and allows it to be set to 0, re-ingesting all files on restart,
+	// effectively preserving the old, buggy, behaviour.
+	// (see internal/input-logfile/manager.go)
+	LegacyCleanInactive bool `config:"legacy_clean_inactive"`
 }
 
 type deleterConfig struct {
@@ -131,6 +139,7 @@ func defaultConfig() config {
 		HarvesterLimit: 0,
 		IgnoreOlder:    0,
 		Delete:         defaultDeleterConfig(),
+		FileWatcher:    defaultFileWatcherConfig(), // Config key: prospector.scanner
 	}
 }
 
@@ -175,9 +184,27 @@ func (c *config) Validate() error {
 		return fmt.Errorf("no path is configured")
 	}
 
-	if c.AllowIDDuplication && c.TakeOver.Enabled {
-		return errors.New("allow_deprecated_id_duplication and take_over " +
-			"cannot be enabled at the same time")
+	if !c.LegacyCleanInactive {
+		// clean_inactive can only be used if ignore_older is enabled
+		if c.IgnoreOlder == 0 && c.CleanInactive > 0 {
+			return errors.New("clean_inactive can only be enabled if ignore_older is also enabled")
+		}
+
+		// clean_inactive is only enabled if clean_inactive > 0
+		if c.CleanInactive > 0 {
+			if c.CleanInactive <= c.IgnoreOlder+c.FileWatcher.Interval {
+				return fmt.Errorf("clean_inactive must be greater than ignore_older + "+
+					"prospector.scanner.check_interval, however %s <= %s + %s",
+					c.CleanInactive.String(),
+					c.IgnoreOlder.String(),
+					c.FileWatcher.Interval.String())
+			}
+		}
+
+		if c.AllowIDDuplication && c.TakeOver.Enabled {
+			return errors.New("allow_deprecated_id_duplication and take_over " +
+				"cannot be enabled at the same time")
+		}
 	}
 
 	if c.GZIPExperimental {
@@ -186,7 +213,6 @@ func (c *config) Validate() error {
 			return fmt.Errorf(
 				"gzip_experimental=true requires file_identity to be 'fingerprint'")
 		}
-
 	}
 
 	if c.ID == "" && c.TakeOver.Enabled {
