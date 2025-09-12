@@ -6,6 +6,8 @@ package events
 
 import (
 	"errors"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"testing"
 
@@ -14,8 +16,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/version"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 )
 
 func TestExtractPathAndQuery(t *testing.T) {
@@ -138,32 +138,32 @@ func TestGetResourceID(t *testing.T) {
 		expectedValue string
 	}{
 		{
-			name: "AUTOOPS_DEPLOYMENT_ID is set",
+			name: "DEPLOYMENT_ID is set",
 			envVars: map[string]string{
-				"AUTOOPS_DEPLOYMENT_ID": "deployment-123",
+				"DEPLOYMENT_ID": "deployment-123",
 			},
 			expectedValue: "deployment-123",
 		},
 		{
-			name: "AUTOOPS_PROJECT_ID is set",
+			name: "PROJECT_ID is set",
 			envVars: map[string]string{
-				"AUTOOPS_PROJECT_ID": "project-456",
+				"PROJECT_ID": "project-456",
 			},
 			expectedValue: "project-456",
 		},
 		{
-			name: "AUTOOPS_RESOURCE_ID is set",
+			name: "RESOURCE_ID is set",
 			envVars: map[string]string{
-				"AUTOOPS_RESOURCE_ID": "resource-789",
+				"RESOURCE_ID": "resource-789",
 			},
 			expectedValue: "resource-789",
 		},
 		{
 			name: "No environment variables are set",
 			envVars: map[string]string{
-				"AUTOOPS_DEPLOYMENT_ID": "",
-				"AUTOOPS_PROJECT_ID":    "",
-				"AUTOOPS_RESOURCE_ID":   "",
+				"DEPLOYMENT_ID": "",
+				"PROJECT_ID":    "",
+				"RESOURCE_ID":   "",
 			},
 			expectedValue: "",
 		},
