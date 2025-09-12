@@ -7,6 +7,13 @@
 === Beats version 8.19.3
 https://github.com/elastic/beats/compare/v8.19.2\...v8.19.3[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
+
 ==== Breaking changes
 
 *Affecting all Beats*
@@ -49,10 +56,23 @@ https://github.com/elastic/beats/compare/v8.19.2\...v8.19.3[View commits]
 === Beats version 8.19.2
 https://github.com/elastic/beats/compare/v8.19.1\...v8.19.2[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
 
 [[release-notes-8.19.1]]
 === Beats version 8.19.1
 https://github.com/elastic/beats/compare/v8.19.0\...v8.19.1[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
 
 ==== Bugfixes
 
@@ -76,6 +96,13 @@ https://github.com/elastic/beats/compare/v8.19.0\...v8.19.1[View commits]
 [[release-notes-8.19.0]]
 === Beats version 8.19.0
 https://github.com/elastic/beats/compare/v8.18.4\...v8.19.0[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
 
 ==== Breaking changes
 
@@ -157,6 +184,13 @@ https://github.com/elastic/beats/compare/v8.18.4\...v8.19.0[View commits]
 === Beats version 8.18.5
 https://github.com/elastic/beats/compare/v8.18.4\...v8.18.5[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
+
 ==== Bugfixes
 
 *Auditbeat*
@@ -180,6 +214,13 @@ https://github.com/elastic/beats/compare/v8.18.4\...v8.18.5[View commits]
 [[release-notes-8.18.4]]
 === Beats version 8.18.4
 https://github.com/elastic/beats/compare/v8.18.3\...v8.18.4[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
 
 ==== Breaking changes
 
@@ -220,6 +261,13 @@ https://github.com/elastic/beats/compare/v8.18.3\...v8.18.4[View commits]
 [[release-notes-8.18.3]]
 === Beats version 8.18.3
 https://github.com/elastic/beats/compare/v8.18.2\...v8.18.3[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
 
 ==== Bugfixes
 
@@ -270,6 +318,12 @@ https://github.com/elastic/beats/compare/v8.18.2\...v8.18.3[View commits]
 === Beats version 8.18.2
 https://github.com/elastic/beats/compare/v8.18.1\...v8.18.2[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -310,6 +364,13 @@ https://github.com/elastic/beats/compare/v8.18.1\...v8.18.2[View commits]
 === Beats version 8.18.1
 https://github.com/elastic/beats/compare/v8.18.0\...v8.18.1[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
+
 ==== Bugfixes
 
 *Filebeat*
@@ -330,6 +391,13 @@ https://github.com/elastic/beats/compare/v8.18.0\...v8.18.1[View commits]
 [[release-notes-8.18.0]]
 === Beats version 8.18.0
 https://github.com/elastic/beats/compare/v8.17.4\...v8.18.0[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
 
 ==== Breaking changes
 
@@ -455,6 +523,13 @@ https://github.com/elastic/beats/compare/v8.17.9\...v8.17.10[View commits]
 === Beats version 8.17.9
 https://github.com/elastic/beats/compare/v8.17.8\...v8.17.9[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
+
 ==== Breaking changes
 
 *Metricbeat*
@@ -488,6 +563,13 @@ https://github.com/elastic/beats/compare/v8.17.8\...v8.17.9[View commits]
 [[release-notes-8.17.8]]
 === Beats version 8.17.8
 https://github.com/elastic/beats/compare/v8.17.7\...v8.17.8[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
 
 ==== Bugfixes
 
@@ -530,6 +612,13 @@ https://github.com/elastic/beats/compare/v8.17.7\...v8.17.8[View commits]
 === Beats version 8.17.7
 https://github.com/elastic/beats/compare/v8.17.6\...v8.17.7[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -557,6 +646,13 @@ https://github.com/elastic/beats/compare/v8.17.6\...v8.17.7[View commits]
 === Beats version 8.17.6
 https://github.com/elastic/beats/compare/v8.17.5\...v8.17.6[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
+
 ==== Bugfixes
 
 *Filebeat*
@@ -574,6 +670,13 @@ https://github.com/elastic/beats/compare/v8.17.5\...v8.17.6[View commits]
 [[release-notes-8.17.5]]
 === Beats version 8.17.5
 https://github.com/elastic/beats/compare/v8.17.4\...v8.17.5[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
 
 ==== Breaking changes
 
@@ -614,6 +717,13 @@ https://github.com/elastic/beats/compare/v8.17.4\...v8.17.5[View commits]
 [[release-notes-8.17.4]]
 === Beats version 8.17.4
 https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
 
 ==== Breaking changes
 
@@ -660,6 +770,13 @@ https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
 === Beats version 8.17.3
 https://github.com/elastic/beats/compare/v8.17.2\...v8.17.3[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -703,6 +820,13 @@ https://github.com/elastic/beats/compare/v8.17.2\...v8.17.3[View commits]
 === Beats version 8.17.2
 https://github.com/elastic/beats/compare/v8.17.1\...v8.17.2[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -740,6 +864,13 @@ https://github.com/elastic/beats/compare/v8.17.1\...v8.17.2[View commits]
 [[release-notes-8.17.1]]
 === Beats version 8.17.1
 https://github.com/elastic/beats/compare/v8.17.0\...v8.17.1[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
 
 ==== Breaking changes
 
@@ -797,6 +928,13 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.17.0[View commits]
 ==== Known issue
 
 - Standalone Beats docker image will not start if `-e` option is not added {issue}42038[42038].
+
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
 
 ==== Breaking changes
 
@@ -880,6 +1018,13 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.17.0[View commits]
 === Beats version 8.16.5
 https://github.com/elastic/beats/compare/v8.16.4\...v8.16.5[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
+
 ==== Bugfixes
 
 *Filebeat*
@@ -909,6 +1054,12 @@ https://github.com/elastic/beats/compare/v8.16.4\...v8.16.5[View commits]
 === Beats version 8.16.4
 https://github.com/elastic/beats/compare/v8.16.3\...v8.16.4[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
 ==== Bugfixes
 
 *Filebeat*
@@ -931,6 +1082,13 @@ https://github.com/elastic/beats/compare/v8.16.3\...v8.16.4[View commits]
 [[release-notes-8.16.3]]
 === Beats version 8.16.3
 https://github.com/elastic/beats/compare/v8.16.2\...v8.16.3[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
 
 ==== Breaking changes
 
@@ -976,6 +1134,12 @@ https://github.com/elastic/beats/compare/v8.16.2\...v8.16.3[View commits]
 [[release-notes-8.16.2]]
 === Beats version 8.16.2
 https://github.com/elastic/beats/compare/v8.16.1\...v8.16.2[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
 
 ==== Bugfixes
 
@@ -1032,6 +1196,12 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.16.2[View commits]
 === Beats version 8.16.1
 https://github.com/elastic/beats/compare/v8.16.0\...v8.16.1[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
 ==== Breaking changes
 
 *Packetbeat*
@@ -1065,6 +1235,9 @@ filebeat.inputs:
   number_of_workers: 5
   bucket_arn: 'arn:aws:s3:::test1'
 ----
+
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
 
 ==== Breaking changes
 
@@ -1158,6 +1331,12 @@ filebeat.inputs:
 === Beats version 8.15.5
 https://github.com/elastic/beats/compare/v8.15.4\...v8.15.5[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive` to a very large value. For example, use `clean_inactive: 43800h0m0s`, which is 5 years.
+
 ==== Breaking changes
 
 *Packetbeat*
@@ -1178,6 +1357,12 @@ https://github.com/elastic/beats/compare/v8.15.4\...v8.15.5[View commits]
 [[release-notes-8.15.4]]
 === Beats version 8.15.4
 https://github.com/elastic/beats/compare/v8.15.3\...v8.15.4[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive` to a very large value. For example, use `clean_inactive: 43800h0m0s`, which is 5 years.
 
 ==== Breaking changes
 
@@ -1225,6 +1410,12 @@ https://github.com/elastic/beats/compare/v8.15.3\...v8.15.4[View commits]
 [[release-notes-8.15.3]]
 === Beats version 8.15.3
 https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive` to a very large value. For example, use `clean_inactive: 43800h0m0s`, which is 5 years.
 
 ==== Breaking changes
 
@@ -1274,6 +1465,10 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.2[View commits]
 
 - Beats Docker images do not log to stderr by default. The workaround is to pass the CLI flag `-e` or to set `logging.to_stderr: true` in the configuration file. {issue}41118[41118]
 
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive` to a very large value. For example, use `clean_inactive: 43800h0m0s`, which is 5 years.
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -1294,6 +1489,11 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.1[View commits]
 *Affecting all Beats*
 
 - Beats stop publishing data after a network error unless restarted. Avoid upgrading to 8.15.1. Affected Beats log `Get \"https://${ELASTICSEARCH_HOST}:443\": context canceled` repeatedly. {issue}40705{40705}
+
+*Filebeat*
+
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
 
 ==== Bugfixes
 
@@ -1363,6 +1563,9 @@ filebeat.inputs:
   number_of_workers: 5
   bucket_arn: 'arn:aws:s3:::test1'
 ----
+
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
 
 ==== Breaking changes
 
@@ -1454,6 +1657,13 @@ filebeat.inputs:
 === Beats version 8.14.3
 https://github.com/elastic/beats/compare/v8.14.2\...v8.14.3[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive` to a very large value. For example, use `clean_inactive: 43800h0m0s`, which is 5 years.
+
+
 ==== Bugfixes
 
 *Filebeat*
@@ -1482,6 +1692,13 @@ https://github.com/elastic/beats/compare/v8.14.2\...v8.14.3[View commits]
 [[release-notes-8.14.2]]
 === Beats version 8.14.2
 https://github.com/elastic/beats/compare/v8.14.1\...v8.14.2[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive` to a very large value. For example, use `clean_inactive: 43800h0m0s`, which is 5 years.
+
 
 ==== Breaking changes
 
@@ -1519,6 +1736,12 @@ https://github.com/elastic/beats/compare/v8.14.1\...v8.14.2[View commits]
 === Beats version 8.14.1
 https://github.com/elastic/beats/compare/v8.14.0\...v8.14.1[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive` to a very large value. For example, use `clean_inactive: 43800h0m0s`, which is 5 years.
+
 ==== Bugfixes
 
 *Heartbeat*
@@ -1529,6 +1752,12 @@ https://github.com/elastic/beats/compare/v8.14.0\...v8.14.1[View commits]
 [[release-notes-8.14.0]]
 === Beats version 8.14.0
 https://github.com/elastic/beats/compare/v8.13.4\...v8.14.0[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
 
 ==== Breaking changes
 
