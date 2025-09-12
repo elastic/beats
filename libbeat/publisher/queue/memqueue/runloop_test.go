@@ -133,7 +133,7 @@ func TestClosedEmptyQueueDoesNotBlockGet(t *testing.T) {
 	rl := broker.runLoop
 
 	// Signal close, and execute the run loop to make sure it's processed
-	go broker.Close()
+	go broker.Close(false)
 	rl.runIteration()
 
 	// Calling Get on the queue now should immediately return io.EOF, since
