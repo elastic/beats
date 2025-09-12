@@ -30,6 +30,7 @@ import (
 	_ "github.com/elastic/beats/v7/filebeat/input/container"
 	_ "github.com/elastic/beats/v7/filebeat/input/filestream"
 	_ "github.com/elastic/beats/v7/filebeat/input/log"
+	_ "github.com/elastic/beats/v7/filebeat/input/logv2"
 	_ "github.com/elastic/beats/v7/filebeat/input/mqtt"
 	_ "github.com/elastic/beats/v7/filebeat/input/redis"
 	_ "github.com/elastic/beats/v7/filebeat/input/stdin"
