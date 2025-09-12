@@ -53,14 +53,14 @@ type entry struct {
 	value map[string]interface{}
 }
 
-// openStore opens a store from the home path.
+// OpenStore opens a store from the home path.
 // The directory and intermediate directories will be created if it does not exist.
 // The open routine loads the full key-value store into memory by first reading the data file and finally applying all outstanding updates
 // from the update log file.
 // If an error in in the log file is detected, the store opening routine continues from the last known valid state and will trigger a checkpoint
 // operation on subsequent writes, also truncating the log file.
 // Old data files are scheduled for deletion later.
-func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, ignoreVersionCheck bool, checkpoint CheckpointPredicate) (*store, error) {
+func OpenStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, ignoreVersionCheck bool, checkpoint CheckpointPredicate) (*store, error) {
 	fi, err := os.Stat(home)
 	if os.IsNotExist(err) {
 		err = os.MkdirAll(home, os.ModeDir|0770)
