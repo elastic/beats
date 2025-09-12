@@ -121,51 +121,41 @@ func (p producerMock) Input() chan<- *sarama.ProducerMessage {
 }
 
 func (p producerMock) Close() error {
-	// TODO implement me
 	panic("implement me")
 }
 
 func (p producerMock) Successes() <-chan *sarama.ProducerMessage {
-	// TODO implement me
 	panic("implement me")
 }
 
 func (p producerMock) Errors() <-chan *sarama.ProducerError {
-	// TODO implement me
 	panic("implement me")
 }
 
 func (p producerMock) IsTransactional() bool {
-	// TODO implement me
 	panic("implement me")
 }
 
 func (p producerMock) TxnStatus() sarama.ProducerTxnStatusFlag {
-	// TODO implement me
 	panic("implement me")
 }
 
 func (p producerMock) BeginTxn() error {
-	// TODO implement me
 	panic("implement me")
 }
 
 func (p producerMock) CommitTxn() error {
-	// TODO implement me
 	panic("implement me")
 }
 
 func (p producerMock) AbortTxn() error {
-	// TODO implement me
 	panic("implement me")
 }
 
 func (p producerMock) AddOffsetsToTxn(offsets map[string][]*sarama.PartitionOffsetMetadata, groupId string) error {
-	// TODO implement me
 	panic("implement me")
 }
 
 func (p producerMock) AddMessageToTxn(msg *sarama.ConsumerMessage, groupId string, metadata *string) error {
-	// TODO implement me
 	panic("implement me")
 }
