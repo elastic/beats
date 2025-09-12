@@ -114,9 +114,15 @@ require (
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
 	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
 	github.com/shopspring/decimal v1.3.1 // indirect
+<<<<<<< HEAD
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/pflag v1.0.9
 	github.com/stretchr/testify v1.11.1
+=======
+	github.com/spf13/cobra v1.9.1
+	github.com/spf13/pflag v1.0.6
+	github.com/stretchr/testify v1.11.0
+>>>>>>> b7c5a8509 ([libbeat][chore]: Updated "apache/arrow" library used in parquet reader to v18 (#45574))
 	github.com/ugorji/go/codec v1.1.8
 	github.com/vmware/govmomi v0.51.0
 	go.elastic.co/ecszap v1.0.2
@@ -135,8 +141,13 @@ require (
 	golang.org/x/tools v0.36.0
 	google.golang.org/api v0.238.0
 	google.golang.org/genproto v0.0.0-20250505200425-f936aa4a68b2 // indirect
+<<<<<<< HEAD
 	google.golang.org/grpc v1.75.1
 	google.golang.org/protobuf v1.36.9
+=======
+	google.golang.org/grpc v1.75.0
+	google.golang.org/protobuf v1.36.8
+>>>>>>> b7c5a8509 ([libbeat][chore]: Updated "apache/arrow" library used in parquet reader to v18 (#45574))
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/gotestsum v1.7.0
@@ -148,7 +159,7 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.120.0
+	cloud.google.com/go v0.121.0
 	cloud.google.com/go/compute v1.37.0
 	cloud.google.com/go/redis v1.18.2
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.18.0
@@ -163,7 +174,11 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.6.0
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/aerospike/aerospike-client-go/v7 v7.7.1
+<<<<<<< HEAD
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.1
+=======
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.32
+>>>>>>> b7c5a8509 ([libbeat][chore]: Updated "apache/arrow" library used in parquet reader to v18 (#45574))
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.79
 	github.com/aws/aws-sdk-go-v2/service/apigateway v1.31.3
 	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.28.3
@@ -235,6 +250,7 @@ require (
 )
 
 require (
+<<<<<<< HEAD
 	github.com/apache/arrow/go/v17 v17.0.0
 	github.com/cilium/ebpf v0.19.0
 	github.com/otiai10/copy v1.14.1
@@ -248,6 +264,18 @@ require (
 
 require (
 	go.opentelemetry.io/collector/processor v1.41.0
+=======
+	github.com/apache/arrow-go/v18 v18.4.1
+	github.com/cilium/ebpf v0.16.0
+	go.opentelemetry.io/collector/client v1.38.0
+	go.opentelemetry.io/collector/exporter v0.132.0
+	go.opentelemetry.io/collector/exporter/exportertest v0.132.0
+	go.opentelemetry.io/collector/pipeline v1.38.0
+	go.opentelemetry.io/collector/processor v1.38.0
+	go.opentelemetry.io/collector/processor/processorhelper v0.132.0
+	go.opentelemetry.io/collector/receiver/receivertest v0.132.0
+	go.opentelemetry.io/otel/sdk/metric v1.37.0
+>>>>>>> b7c5a8509 ([libbeat][chore]: Updated "apache/arrow" library used in parquet reader to v18 (#45574))
 	go.uber.org/goleak v1.3.0
 	sigs.k8s.io/kind v0.29.0
 )
@@ -276,13 +304,18 @@ require (
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.4.2 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.29.0 // indirect
+<<<<<<< HEAD
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.50.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.50.0 // indirect
 	github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c // indirect
+=======
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.51.0 // indirect
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.51.0 // indirect
+>>>>>>> b7c5a8509 ([libbeat][chore]: Updated "apache/arrow" library used in parquet reader to v18 (#45574))
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/apache/arrow/go/v15 v15.0.2 // indirect
-	github.com/apache/thrift v0.20.0 // indirect
+	github.com/apache/thrift v0.22.0 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.0 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.1 // indirect
@@ -412,7 +445,11 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/prometheus/client_golang v1.22.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
+<<<<<<< HEAD
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
+=======
+	github.com/rogpeppe/go-internal v1.13.1 // indirect
+>>>>>>> b7c5a8509 ([libbeat][chore]: Updated "apache/arrow" library used in parquet reader to v18 (#45574))
 	github.com/rs/cors v1.11.1 // indirect
 	github.com/segmentio/fasthash v1.0.3 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
@@ -512,7 +549,7 @@ require (
 )
 
 require (
-	cloud.google.com/go/storage v1.50.0
+	cloud.google.com/go/storage v1.52.0
 	github.com/PaloAltoNetworks/pango v0.10.2
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
