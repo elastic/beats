@@ -69,7 +69,7 @@ already present as `container.id` and `container.log.tag` is dropped because it 
 otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 - Fixed password authentication for ACL users in the Redis input of Filebeat. {pull}44137[44137]
-- Add experimental GZIP file ingestion in filestream. {pull}45301[45301]
+- Add beta GZIP file ingestion in filestream. {pull}45301[45301]
 -Change aws.cloudwatch.* field in awscloudwatch input to nested object. {pull}46357[46357]
 - Filestream's `clean_inactive` setting is now validated, if the validation fails, Filebeat exits with an error code. To keep the legacy behavior of not validating set `legacy_clean_inactive: true`. {issue}45601[45601]
 {pull}46373[46373]
@@ -319,6 +319,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. {pull}45761[45761]
 - Fix an issue where the conntrack metricset entries field reported a count inflated by a factor of the number of CPU cores. {issue}46138[46138] {pull}46140[46140]
 - Enhance behavior of sanitizeError: replace sensitive info even if it is escaped and add pattern-based sanitization {pull}45857[45857]
+- Do not log an error if metadata enrichment is disabled for K8's module {pull}46536
 
 *Osquerybeat*
 
