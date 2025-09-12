@@ -938,7 +938,6 @@ func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
 
 	config, err = validateConfig(config)
 	if err != nil {
-		logp.Err("Error while validating config: %v", err)
 		return nil, err
 	}
 	return config, nil
