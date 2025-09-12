@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cel"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cloudfoundry"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcpbigquery"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/http_endpoint"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson"
@@ -38,6 +39,7 @@ func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States, p *p
 		cel.Plugin(log, store),
 		cloudfoundry.Plugin(),
 		entityanalytics.Plugin(log, p),
+		gcpbigquery.Plugin(log, store),
 		gcs.Plugin(log, store),
 		http_endpoint.Plugin(log),
 		httpjson.Plugin(log, store),

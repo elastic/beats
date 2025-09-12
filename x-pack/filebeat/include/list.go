@@ -19,6 +19,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/azureeventhub"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/cometd"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/etw"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/gcpbigquery"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/gcppubsub"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/gcs"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/lumberjack"
