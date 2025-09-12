@@ -39,7 +39,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmode"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -88,7 +87,7 @@ type Input struct {
 // AllowDeprecatedUse returns true if the configuration allows using the deprecated log input
 func AllowDeprecatedUse(cfg *conf.C) bool {
 	allow, _ := cfg.Bool(allowDeprecatedUseField, -1)
-	return allow || fleetmode.Enabled() || fileset.CheckIfModuleInput(cfg) || otelmode.Enabled()
+	return allow || fleetmode.Enabled() || fileset.CheckIfModuleInput(cfg)
 }
 
 // NewInput instantiates a new Log
