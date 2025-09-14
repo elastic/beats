@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -57,6 +58,64 @@ func TestProcessorRun(t *testing.T) {
 				"observer.version": "1.2.3",
 				"source.ip":        "10.52.116.160",
 				"source.user.name": "admin",
+			},
+		},
+		"empty_field_values": {
+			config: func() config {
+				c := defaultConfig()
+				c.TargetField = ""
+				c.IgnoreEmptyValues = true
+				return c
+			},
+			message: "CEF:1|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|3|src= suser= target=admin msg=User signed in from 2001:db8::5",
+			fields: mapstr.M{
+				"version":               "1",
+				"device.event_class_id": "600",
+				"device.product":        "Deep Security Manager",
+				"device.vendor":         "Trend Micro",
+				"device.version":        "1.2.3",
+				"name":                  "User Signed In",
+				"severity":              "3",
+				"event.severity":        3,
+				"extensions.message":    "User signed in from 2001:db8::5",
+				"extensions.target":     "admin",
+				// ECS
+				"event.code":       "600",
+				"message":          "User signed in from 2001:db8::5",
+				"observer.product": "Deep Security Manager",
+				"observer.vendor":  "Trend Micro",
+				"observer.version": "1.2.3",
+			},
+		},
+		"key_with_dash": {
+			config: func() config {
+				c := defaultConfig()
+				c.TargetField = ""
+				c.IgnoreEmptyValues = true
+				return c
+			},
+			message: "CEF:0|Palo Alto Networks|LF|2.0|TRAFFIC|end|3|src=127.0.0.1 dst=0.0.0.0 PanOSX-Forwarded-ForIP=0.0.0.0 ",
+			fields: mapstr.M{
+				"version":                           "0",
+				"device.event_class_id":             "TRAFFIC",
+				"device.product":                    "LF",
+				"device.vendor":                     "Palo Alto Networks",
+				"device.version":                    "2.0",
+				"severity":                          "3",
+				"event.severity":                    3,
+				"extensions.sourceAddress":          "127.0.0.1",
+				"extensions.destinationAddress":     "0.0.0.0",
+				"extensions.PanOSX-Forwarded-ForIP": "0.0.0.0",
+				"name":                              "end",
+
+				// ECS
+				"event.code":       "TRAFFIC",
+				"destination.ip":   "0.0.0.0",
+				"message":          "end",
+				"observer.product": "LF",
+				"observer.vendor":  "Palo Alto Networks",
+				"observer.version": "2.0",
+				"source.ip":        "127.0.0.1",
 			},
 		},
 		"parse_errors": {
@@ -131,7 +190,8 @@ func TestProcessorRun(t *testing.T) {
 		},
 	}
 
-	dec, err := newDecodeCEF(defaultConfig())
+	logger := logp.NewNopLogger()
+	dec, err := newDecodeCEF(defaultConfig(), logger)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -140,7 +200,7 @@ func TestProcessorRun(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			dec := dec
 			if tc.config != nil {
-				dec, err = newDecodeCEF(tc.config())
+				dec, err = newDecodeCEF(tc.config(), logger)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -221,7 +281,7 @@ func readCEFSamples(t testing.TB, source string) []mapstr.M {
 
 	conf := defaultConfig()
 	conf.Field = "event.original"
-	dec, err := newDecodeCEF(conf)
+	dec, err := newDecodeCEF(conf, logp.NewNopLogger())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -321,7 +381,7 @@ func assertEqual(t testing.TB, expected, actual interface{}) bool {
 }
 
 func BenchmarkProcessorRun(b *testing.B) {
-	dec, err := newDecodeCEF(defaultConfig())
+	dec, err := newDecodeCEF(defaultConfig(), logp.NewNopLogger())
 	if err != nil {
 		b.Fatal(err)
 	}

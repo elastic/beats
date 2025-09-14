@@ -1,5 +1,5 @@
 # To export all dashboards use:
-# go run ../../../../dev-tools/cmd/dashboards/export_dashboards.go -yml dashboards.yml
+# go run ../../../../dev-tools/cmd/dashboards/export_dashboards.go --yml dashboards.yml
 
 dashboards:
   - id: d401ef40-a7d5-11e9-a422-d144027429da

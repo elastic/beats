@@ -22,10 +22,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -60,15 +60,15 @@ type cache struct {
 }
 
 // Resulting processor implements `Close()` to release the cache resources.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unpack the %s configuration: %w", name, err)
 	}
 	// Logging (each processor instance has a unique ID).
-	id := int(instanceID.Inc())
-	log := logp.NewLogger(name).With("instance_id", id)
+	id := int(instanceID.Add(1))
+	log = log.Named(name).With("instance_id", id)
 
 	src, cancel, err := getStoreFor(config, log)
 	if err != nil {

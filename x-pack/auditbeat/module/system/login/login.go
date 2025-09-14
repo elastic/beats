@@ -91,7 +91,7 @@ type MetricSet struct {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The %v/%v dataset is beta", system.ModuleName, metricsetName)
+	base.Logger().Warn(cfgwarn.Beta("The %v/%v dataset is beta", system.ModuleName, metricsetName))
 
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -106,7 +106,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms := &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
-		log:           logp.NewLogger(metricsetName),
+		log:           base.Logger().Named(metricsetName),
 	}
 
 	ms.utmpReader, err = NewUtmpFileReader(ms.log, bucket, config)

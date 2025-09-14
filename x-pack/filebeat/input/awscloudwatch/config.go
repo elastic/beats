@@ -6,27 +6,35 @@ package awscloudwatch
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
+const (
+	beginning = "beginning"
+	end       = "end"
+	lastSync  = "lastSync"
+)
+
 type config struct {
-	harvester.ForwarderConfig `config:",inline"`
-	LogGroupARN               string              `config:"log_group_arn"`
-	LogGroupName              string              `config:"log_group_name"`
-	LogGroupNamePrefix        string              `config:"log_group_name_prefix"`
-	RegionName                string              `config:"region_name"`
-	LogStreams                []*string           `config:"log_streams"`
-	LogStreamPrefix           string              `config:"log_stream_prefix"`
-	StartPosition             string              `config:"start_position" default:"beginning"`
-	ScanFrequency             time.Duration       `config:"scan_frequency" validate:"min=0,nonzero"`
-	APITimeout                time.Duration       `config:"api_timeout" validate:"min=0,nonzero"`
-	APISleep                  time.Duration       `config:"api_sleep" validate:"min=0,nonzero"`
-	Latency                   time.Duration       `config:"latency"`
-	NumberOfWorkers           int                 `config:"number_of_workers"`
-	AWSConfig                 awscommon.ConfigAWS `config:",inline"`
+	harvester.ForwarderConfig          `config:",inline"`
+	LogGroupARN                        string              `config:"log_group_arn"`
+	LogGroupName                       string              `config:"log_group_name"`
+	LogGroupNamePrefix                 string              `config:"log_group_name_prefix"`
+	IncludeLinkedAccountsForPrefixMode bool                `config:"include_linked_accounts_for_prefix_mode"`
+	RegionName                         string              `config:"region_name"`
+	LogStreams                         []*string           `config:"log_streams"`
+	LogStreamPrefix                    string              `config:"log_stream_prefix"`
+	StartPosition                      string              `config:"start_position" default:"beginning"`
+	ScanFrequency                      time.Duration       `config:"scan_frequency" validate:"min=0,nonzero"`
+	APITimeout                         time.Duration       `config:"api_timeout" validate:"min=0,nonzero"`
+	APISleep                           time.Duration       `config:"api_sleep" validate:"min=0,nonzero"`
+	Latency                            time.Duration       `config:"latency"`
+	NumberOfWorkers                    int                 `config:"number_of_workers"`
+	AWSConfig                          awscommon.ConfigAWS `config:",inline"`
 }
 
 func defaultConfig() config {
@@ -34,8 +42,8 @@ func defaultConfig() config {
 		ForwarderConfig: harvester.ForwarderConfig{
 			Type: "aws-cloudwatch",
 		},
-		StartPosition:   "beginning",
-		ScanFrequency:   10 * time.Second,
+		StartPosition:   beginning,
+		ScanFrequency:   60 * time.Second,
 		APITimeout:      120 * time.Second,
 		APISleep:        200 * time.Millisecond, // FilterLogEvents has a limit of 5 transactions per second (TPS)/account/Region: 1s / 5 = 200 ms
 		NumberOfWorkers: 1,
@@ -43,9 +51,8 @@ func defaultConfig() config {
 }
 
 func (c *config) Validate() error {
-	if c.StartPosition != "beginning" && c.StartPosition != "end" {
-		return errors.New("start_position config parameter can only be " +
-			"either 'beginning' or 'end'")
+	if c.StartPosition != beginning && c.StartPosition != end && c.StartPosition != lastSync {
+		return fmt.Errorf("start_position config parameter can only be one of %s, %s or %s", beginning, end, lastSync)
 	}
 
 	if c.LogGroupARN == "" && c.LogGroupName == "" && c.LogGroupNamePrefix == "" {

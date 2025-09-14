@@ -17,8 +17,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/natefinch/lumberjack.v2"
 
@@ -143,11 +143,11 @@ var deviceUserResponses = map[string]apiUserResponse{
 var groupsResponse1 = apiGroupResponse{
 	Groups: []groupAPI{
 		{
-			ID:          uuid.MustParse("331676df-b8fd-4492-82ed-02b927f8dd80"),
+			ID:          uuid.Must(uuid.FromString("331676df-b8fd-4492-82ed-02b927f8dd80")),
 			DisplayName: "group1",
 			MembersDelta: []memberAPI{
 				{
-					ID:   uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+					ID:   uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 					Type: apiUserType,
 				},
 			},
@@ -158,15 +158,15 @@ var groupsResponse1 = apiGroupResponse{
 var groupsResponse2 = apiGroupResponse{
 	Groups: []groupAPI{
 		{
-			ID:          uuid.MustParse("d140978f-d641-4f01-802f-4ecc1acf8935"),
+			ID:          uuid.Must(uuid.FromString("d140978f-d641-4f01-802f-4ecc1acf8935")),
 			DisplayName: "group2",
 			MembersDelta: []memberAPI{
 				{
-					ID:   uuid.MustParse("331676df-b8fd-4492-82ed-02b927f8dd80"),
+					ID:   uuid.Must(uuid.FromString("331676df-b8fd-4492-82ed-02b927f8dd80")),
 					Type: apiGroupType,
 				},
 				{
-					ID:      uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+					ID:      uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 					Type:    apiGroupType,
 					Removed: &removed{Reason: "changed"},
 				},
@@ -288,25 +288,25 @@ func TestGraph_Groups(t *testing.T) {
 	wantDeltaLink := "http://" + testSrv.addr + "/groups/delta?$deltatoken=test"
 	wantGroups := []*fetcher.Group{
 		{
-			ID:   uuid.MustParse("331676df-b8fd-4492-82ed-02b927f8dd80"),
+			ID:   uuid.Must(uuid.FromString("331676df-b8fd-4492-82ed-02b927f8dd80")),
 			Name: "group1",
 			Members: []fetcher.Member{
 				{
-					ID:   uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+					ID:   uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 					Type: fetcher.MemberUser,
 				},
 			},
 		},
 		{
-			ID:   uuid.MustParse("d140978f-d641-4f01-802f-4ecc1acf8935"),
+			ID:   uuid.Must(uuid.FromString("d140978f-d641-4f01-802f-4ecc1acf8935")),
 			Name: "group2",
 			Members: []fetcher.Member{
 				{
-					ID:   uuid.MustParse("331676df-b8fd-4492-82ed-02b927f8dd80"),
+					ID:   uuid.Must(uuid.FromString("331676df-b8fd-4492-82ed-02b927f8dd80")),
 					Type: fetcher.MemberGroup,
 				},
 				{
-					ID:      uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+					ID:      uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 					Type:    fetcher.MemberGroup,
 					Deleted: true,
 				},
@@ -347,7 +347,7 @@ func TestGraph_Users(t *testing.T) {
 	wantDeltaLink := "http://" + testSrv.addr + "/users/delta?$deltatoken=test"
 	wantUsers := []*fetcher.User{
 		{
-			ID: uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+			ID: uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 			Fields: map[string]interface{}{
 				"userPrincipalName": "user.one@example.com",
 				"mail":              "user.one@example.com",
@@ -362,7 +362,7 @@ func TestGraph_Users(t *testing.T) {
 			},
 		},
 		{
-			ID: uuid.MustParse("d897d560-3d17-4dae-81b3-c898fe82bf84"),
+			ID: uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")),
 			Fields: map[string]interface{}{
 				"userPrincipalName": "user.two@example.com",
 				"mail":              "user.two@example.com",
@@ -411,7 +411,7 @@ func TestGraph_Devices(t *testing.T) {
 	wantDeltaLink := "http://" + testSrv.addr + "/devices/delta?$deltatoken=test"
 	wantDevices := []*fetcher.Device{
 		{
-			ID: uuid.MustParse("6a59ea83-02bd-468f-a40b-f2c3d1821983"),
+			ID: uuid.Must(uuid.FromString("6a59ea83-02bd-468f-a40b-f2c3d1821983")),
 			Fields: map[string]interface{}{
 				"accountEnabled":         true,
 				"deviceId":               "eab73519-780d-4d43-be6d-a4a89af2a348",
@@ -434,15 +434,15 @@ func TestGraph_Devices(t *testing.T) {
 				},
 			},
 			RegisteredOwners: collections.NewUUIDSet(
-				uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+				uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 			),
 			RegisteredUsers: collections.NewUUIDSet(
-				uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
-				uuid.MustParse("d897d560-3d17-4dae-81b3-c898fe82bf84"),
+				uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
+				uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")),
 			),
 		},
 		{
-			ID: uuid.MustParse("adbbe40a-0627-4328-89f1-88cac84dbc7f"),
+			ID: uuid.Must(uuid.FromString("adbbe40a-0627-4328-89f1-88cac84dbc7f")),
 			Fields: map[string]interface{}{
 				"accountEnabled":         true,
 				"deviceId":               "2fbbb8f9-ff67-4a21-b867-a344d18a4198",
@@ -465,10 +465,10 @@ func TestGraph_Devices(t *testing.T) {
 				},
 			},
 			RegisteredOwners: collections.NewUUIDSet(
-				uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+				uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 			),
 			RegisteredUsers: collections.NewUUIDSet(
-				uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+				uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 			),
 		},
 	}
@@ -518,6 +518,85 @@ func TestGraph_Devices(t *testing.T) {
 				t.Errorf("unexpected result:\n--- got\n--- want\n%s", cmp.Diff(wantDevices, gotDevices, exporter))
 			}
 			require.Equal(t, wantDeltaLink, gotDeltaLink)
+		})
+	}
+}
+
+var formatQueryTests = []struct {
+	name   string
+	query  []string
+	deflt  string
+	expand map[string][]string
+	want   string
+}{
+	{
+		name:   "default",
+		query:  nil,
+		deflt:  defaultUsersQuery,
+		expand: nil,
+		want:   "$select=accountEnabled,userPrincipalName,mail,displayName,givenName,surname,jobTitle,officeLocation,mobilePhone,businessPhones",
+	},
+	{
+		name:   "defined_query_no_expand",
+		query:  []string{"id", "displayName"},
+		deflt:  defaultUsersQuery,
+		expand: nil,
+		want:   "$select=id,displayName",
+	},
+	{
+		name:   "defined_query_empty_expand",
+		query:  []string{"id", "displayName"},
+		deflt:  defaultUsersQuery,
+		expand: map[string][]string{},
+		want:   "$select=id,displayName",
+	},
+	{
+		name:   "default_manager_default",
+		query:  nil,
+		deflt:  defaultUsersQuery,
+		expand: map[string][]string{"manager": {}},
+		want:   "$expand=manager($select=accountEnabled,userPrincipalName,mail,displayName,givenName,surname,jobTitle,officeLocation,mobilePhone,businessPhones)&$select=accountEnabled,userPrincipalName,mail,displayName,givenName,surname,jobTitle,officeLocation,mobilePhone,businessPhones",
+	},
+	{
+		name:   "default_manager_id",
+		query:  nil,
+		deflt:  defaultUsersQuery,
+		expand: map[string][]string{"manager": {"id"}},
+		want:   "$expand=manager($select=id)&$select=accountEnabled,userPrincipalName,mail,displayName,givenName,surname,jobTitle,officeLocation,mobilePhone,businessPhones",
+	},
+	{
+		name:   "defined_manager_id",
+		query:  []string{"id", "displayName"},
+		deflt:  defaultUsersQuery,
+		expand: map[string][]string{"manager": {"id"}},
+		want:   "$expand=manager($select=id)&$select=id,displayName",
+	},
+	{
+		name:   "defined_manager_default",
+		query:  []string{"id", "displayName"},
+		deflt:  defaultUsersQuery,
+		expand: map[string][]string{"manager": {}},
+		want:   "$expand=manager($select=id,displayName)&$select=id,displayName",
+	},
+	{
+		name:   "expand_two",
+		query:  []string{"id", "displayName"},
+		deflt:  defaultUsersQuery,
+		expand: map[string][]string{"manager": {}, "directReports": {}},
+		want:   "$expand=directReports($select=id,displayName),manager($select=id,displayName)&$select=id,displayName",
+	},
+}
+
+func TestFormatQuery(t *testing.T) {
+	for _, test := range formatQueryTests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := formatQuery(queryName, test.query, test.deflt, test.expand)
+			if err != nil {
+				t.Fatalf("unexpected error from formatQuery: %v", err)
+			}
+			if got != test.want {
+				t.Errorf("unexpected query string: got=%q want=%q", got, test.want)
+			}
 		})
 	}
 }

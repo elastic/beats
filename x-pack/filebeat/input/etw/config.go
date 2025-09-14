@@ -51,19 +51,42 @@ type config struct {
 	MatchAllKeyword uint64 `config:"match_all_keyword"`
 	// Session is the name of an existing session to read from.
 	// Run 'logman query -ets' to list existing sessions.
-	Session string `config:"session"`
+	Session        string      `config:"session"`
+	EnableProperty []string    `config:"enable_property"`
+	EventFilter    EventFilter `config:"event_filters"`
+	BufferSize     uint32      `config:"buffer_size"`
+	MinimumBuffers uint32      `config:"minimum_buffers"`
+	MaximumBuffers uint32      `config:"maximum_buffers"`
+}
+
+type EventFilter struct {
+	EventIDs []uint16 `config:"event_ids"` // Event IDs to filter
+	FilterIn bool     `config:"filter_in"` // Whether to include or exclude these event IDs
 }
 
 func convertConfig(cfg config) etw.Config {
+	// we might want to add support for multiple providers in the future
 	return etw.Config{
-		Logfile:         cfg.Logfile,
-		ProviderGUID:    cfg.ProviderGUID,
-		ProviderName:    cfg.ProviderName,
-		SessionName:     cfg.SessionName,
-		TraceLevel:      cfg.TraceLevel,
-		MatchAnyKeyword: cfg.MatchAnyKeyword,
-		MatchAllKeyword: cfg.MatchAllKeyword,
-		Session:         cfg.Session,
+		Logfile:        cfg.Logfile,
+		SessionName:    cfg.SessionName,
+		Session:        cfg.Session,
+		BufferSize:     cfg.BufferSize,
+		MinimumBuffers: cfg.MinimumBuffers,
+		MaximumBuffers: cfg.MaximumBuffers,
+		Providers: []etw.ProviderConfig{
+			{
+				GUID:            cfg.ProviderGUID,
+				Name:            cfg.ProviderName,
+				TraceLevel:      cfg.TraceLevel,
+				MatchAnyKeyword: cfg.MatchAnyKeyword,
+				MatchAllKeyword: cfg.MatchAllKeyword,
+				EnableProperty:  cfg.EnableProperty,
+				EventFilter: etw.EventFilter{
+					EventIDs: cfg.EventFilter.EventIDs,
+					FilterIn: cfg.EventFilter.FilterIn,
+				},
+			},
+		},
 	}
 }
 
@@ -71,6 +94,7 @@ func defaultConfig() config {
 	return config{
 		TraceLevel:      "verbose",
 		MatchAnyKeyword: 0xffffffffffffffff,
+		BufferSize:      64,
 	}
 }
 

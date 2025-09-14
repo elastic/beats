@@ -27,6 +27,9 @@
 {{ end -}}
 
 {{- if .Reference }}
+  # Detect changes to files included in subdirectories. Disabled by default.
+  recursive: false
+  
   # List of regular expressions to filter out notifications for unwanted files.
   # Wrap in single quotes to workaround YAML escaping rules. By default no files
   # are ignored.
@@ -34,15 +37,27 @@
   exclude_files:
   - '\.DS_Store$'
   - '\.swp$'
+
+  # If recursive is set to true, subdirectories can also be excluded here by
+  #  specifying them.
+  # - '(?i)/tmp/'
   {{- else if eq .GOOS "windows" }}
   exclude_files:
   - '(?i)\.lnk$'
   - '(?i)\.swp$'
+
+  # If recursive is set to true, subdirectories can also be excluded here by
+  #  specifying them.
+  #  - '(?i)\\temp\\'
   {{- else }}
   exclude_files:
   - '(?i)\.sw[nop]$'
   - '~$'
   - '/\.git($|/)'
+
+  # If recursive is set to true, subdirectories can also be excluded here by
+  #  specifying them.
+  # - '(?i)/tmp/'
   {{- end }}
 
   # List of regular expressions used to explicitly include files. When configured,
@@ -79,9 +94,6 @@
   # sha512, sha512_224, sha512_256, sha3_224, sha3_256, sha3_384, sha3_512, and xxh64.
   # Default is sha1.
   hash_types: [sha1]
-
-  # Detect changes to files included in subdirectories. Disabled by default.
-  recursive: false
 
   # Set to true to publish fields with null values in events.
   #keep_null: false

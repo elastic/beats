@@ -28,6 +28,6 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "50.0."
+        "user_agent.version": "50.0"
     }
 ]

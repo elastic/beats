@@ -2,26 +2,9 @@
 set -euo pipefail
 
 REPO_DIR=$(pwd)
-AWS_SERVICE_ACCOUNT_SECRET_PATH="kv/ci-shared/platform-ingest/aws_account_auth"
-
-exportAwsSecrets() {
-  local awsSecretKey
-  local awsAccessKey
-
-  awsSecretKey=$(retry -t 5 -- vault kv get -field secret_key "${AWS_SERVICE_ACCOUNT_SECRET_PATH}")
-  awsAccessKey=$(retry -t 5 -- vault kv get -field access_key "${AWS_SERVICE_ACCOUNT_SECRET_PATH}")
-
-  echo "~~~ Exporting AWS secrets"
-  export AWS_ACCESS_KEY_ID=$awsAccessKey
-  export AWS_SECRET_ACCESS_KEY=$awsSecretKey
-
-  # AWS_REGION is not set here, since AWS region is taken from beat corresponding *.tf file:
-  # - x-pack/metricbeat/module/aws/terraform.tf
-  # - x-pack/filebeat/input/awscloudwatch/_meta/terraform/variables.tf
-}
 
 terraformApply() {
-  echo "Exporting Terraform Env Vars"
+  echo "~~~ Exporting Terraform Env Vars"
   TF_VAR_BRANCH=$(echo "${BUILDKITE_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
   TF_VAR_CREATED_DATE=$(date +%s)
   export TF_VAR_BUILD_ID="${BUILDKITE_BUILD_ID}"
@@ -30,10 +13,10 @@ terraformApply() {
   export TF_VAR_BRANCH
   export TF_VAR_CREATED_DATE
 
-  echo "Terraform Init on $MODULE_DIR"
+  echo "~~~ Terraform Init on $MODULE_DIR"
   terraform -chdir="$MODULE_DIR" init
 
-  echo "Terraform Apply on $MODULE_DIR"
+  echo "~~~ Terraform Apply on $MODULE_DIR"
   terraform -chdir="$MODULE_DIR" apply -auto-approve
 }
 
@@ -102,6 +85,5 @@ teardown() {
 
 trap 'teardown' EXIT
 
-exportAwsSecrets
 dockerUp
 terraformSetup

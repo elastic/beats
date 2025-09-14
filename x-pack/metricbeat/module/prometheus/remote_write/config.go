@@ -10,6 +10,7 @@ import (
 )
 
 type config struct {
+	MetricsCount  bool          `config:"metrics_count"`
 	UseTypes      bool          `config:"use_types"`
 	RateCounters  bool          `config:"rate_counters"`
 	TypesPatterns TypesPatterns `config:"types_patterns" yaml:"types_patterns,omitempty"`

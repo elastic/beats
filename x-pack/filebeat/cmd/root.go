@@ -28,7 +28,7 @@ const Name = fbcmd.Name
 
 // Filebeat build the beat root command for executing filebeat and it's subcommands.
 func Filebeat() *cmd.BeatsRootCmd {
-	settings := fbcmd.FilebeatSettings()
+	settings := fbcmd.FilebeatSettings("")
 	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
 	if err != nil { // these are hard-coded, shouldn't fail
 		panic(fmt.Errorf("error creating global processors: %w", err))
@@ -40,6 +40,7 @@ func Filebeat() *cmd.BeatsRootCmd {
 	command.PersistentPreRun = func(cmd *cobra.Command, args []string) {
 		management.ConfigTransform.SetTransform(filebeatCfg)
 	}
+	addOTelCommand(command)
 	return command
 }
 

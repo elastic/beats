@@ -28,11 +28,10 @@ import (
 	sqsTypes "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/dustin/go-humanize"
 
-	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -47,27 +46,29 @@ type constantSQS struct {
 
 var _ sqsAPI = (*constantSQS)(nil)
 
-func newConstantSQS() *constantSQS {
-	return &constantSQS{
-		msgs: []sqsTypes.Message{
-			newSQSMessage(newS3Event(filepath.Base(cloudtrailTestFile))),
-		},
+func newConstantSQS() (*constantSQS, error) {
+	event, err := newSQSMessage(newS3Event(filepath.Base(cloudtrailTestFile)))
+	if err != nil {
+		return nil, err
 	}
+	return &constantSQS{
+		msgs: []sqsTypes.Message{event},
+	}, nil
 }
 
-func (c *constantSQS) ReceiveMessage(ctx context.Context, maxMessages int) ([]sqsTypes.Message, error) {
+func (c *constantSQS) ReceiveMessage(context.Context, int) ([]sqsTypes.Message, error) {
 	return c.msgs, nil
 }
 
-func (*constantSQS) DeleteMessage(ctx context.Context, msg *sqsTypes.Message) error {
+func (*constantSQS) DeleteMessage(context.Context, *sqsTypes.Message) error {
 	return nil
 }
 
-func (*constantSQS) ChangeMessageVisibility(ctx context.Context, msg *sqsTypes.Message, timeout time.Duration) error {
+func (*constantSQS) ChangeMessageVisibility(context.Context, *sqsTypes.Message, time.Duration) error {
 	return nil
 }
 
-func (c *constantSQS) GetQueueAttributes(ctx context.Context, attr []sqsTypes.QueueAttributeName) (map[string]string, error) {
+func (c *constantSQS) GetQueueAttributes(context.Context, []sqsTypes.QueueAttributeName) (map[string]string, error) {
 	return map[string]string{}, nil
 }
 
@@ -85,7 +86,7 @@ func (c *s3PagerConstant) HasMorePages() bool {
 	return c.currentIndex < len(c.objects)
 }
 
-func (c *s3PagerConstant) NextPage(ctx context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+func (c *s3PagerConstant) NextPage(context.Context, ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
 	if !c.HasMorePages() {
 		return nil, errors.New("no more pages")
 	}
@@ -144,29 +145,36 @@ func newConstantS3(t testing.TB) *constantS3 {
 	}
 }
 
-func (c constantS3) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error) {
+func (c constantS3) GetObject(context.Context, string, string, string) (*s3.GetObjectOutput, error) {
 	return newS3GetObjectResponse(c.filename, c.data, c.contentType), nil
 }
 
-func (c constantS3) CopyObject(ctx context.Context, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error) {
+func (c constantS3) CopyObject(context.Context, string, string, string, string, string) (*s3.CopyObjectOutput, error) {
 	return nil, nil
 }
 
-func (c constantS3) DeleteObject(ctx context.Context, bucket, key string) (*s3.DeleteObjectOutput, error) {
+func (c constantS3) DeleteObject(context.Context, string, string, string) (*s3.DeleteObjectOutput, error) {
 	return nil, nil
 }
 
-func (c constantS3) ListObjectsPaginator(bucket, prefix string) s3Pager {
+func (c constantS3) ListObjectsPaginator(string, string) s3Pager {
 	return c.pagerConstant
 }
 
 var _ beat.Pipeline = (*fakePipeline)(nil)
 
 // fakePipeline returns new ackClients.
-type fakePipeline struct{}
+type fakePipeline struct {
+}
 
-func (c *fakePipeline) ConnectWith(clientConfig beat.ClientConfig) (beat.Client, error) {
-	return &ackClient{}, nil
+func newFakePipeline() *fakePipeline {
+	return &fakePipeline{}
+}
+
+func (c *fakePipeline) ConnectWith(config beat.ClientConfig) (beat.Client, error) {
+	return &ackClient{
+		eventListener: config.EventListener,
+	}, nil
 }
 
 func (c *fakePipeline) Connect() (beat.Client, error) {
@@ -176,13 +184,15 @@ func (c *fakePipeline) Connect() (beat.Client, error) {
 var _ beat.Client = (*ackClient)(nil)
 
 // ackClient is a fake beat.Client that ACKs the published messages.
-type ackClient struct{}
+type ackClient struct {
+	eventListener beat.EventListener
+}
 
 func (c *ackClient) Close() error { return nil }
 
 func (c *ackClient) Publish(event beat.Event) {
-	// Fake the ACK handling.
-	event.Private.(*awscommon.EventACKTracker).ACK()
+	c.eventListener.AddEvent(event, true)
+	go c.eventListener.ACKEvents(1)
 }
 
 func (c *ackClient) PublishAll(event []beat.Event) {
@@ -207,25 +217,28 @@ file_selectors:
 	return inputConfig
 }
 
-func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkResult {
+func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
 		var err error
-		pipeline := &fakePipeline{}
 
-		conf := makeBenchmarkConfig(t)
-		conf.MaxNumberOfMessages = maxMessagesInflight
-		sqsReader := newSQSReaderInput(conf, aws.Config{})
+		config := makeBenchmarkConfig(t)
+		config.NumberOfWorkers = workerCount
+		sqsReader := newSQSReaderInput(config, aws.Config{}, paths.New())
 		sqsReader.log = log.Named("sqs")
-		sqsReader.metrics = newInputMetrics("test_id", monitoring.NewRegistry(), maxMessagesInflight)
-		sqsReader.sqs = newConstantSQS()
+		sqsReader.status = &statusReporterHelperMock{}
+		sqsReader.pipeline = newFakePipeline()
+		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), workerCount, logp.NewNopLogger())
+		sqsReader.sqs, err = newConstantSQS()
+		require.NoError(t, err)
 		sqsReader.s3 = newConstantS3(t)
-		sqsReader.msgHandler, err = sqsReader.createEventProcessor(pipeline)
+		sqsReader.msgHandler, err = sqsReader.createEventProcessor()
 		require.NoError(t, err, "createEventProcessor must succeed")
 
 		ctx, cancel := context.WithCancel(context.Background())
 		b.Cleanup(cancel)
 
 		go func() {
+			//nolint:gosec // not going to have anywhere near uint64 overflow number of received messages
 			for sqsReader.metrics.sqsMessagesReceivedTotal.Get() < uint64(b.N) {
 				time.Sleep(5 * time.Millisecond)
 			}
@@ -238,7 +251,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		b.StopTimer()
 		elapsed := time.Since(start)
 
-		b.ReportMetric(float64(maxMessagesInflight), "max_messages_inflight")
+		b.ReportMetric(float64(workerCount), "number_of_workers")
 		b.ReportMetric(elapsed.Seconds(), "sec")
 
 		b.ReportMetric(float64(sqsReader.metrics.s3EventsCreatedTotal.Get()), "events")
@@ -253,7 +266,6 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 }
 
 func TestBenchmarkInputSQS(t *testing.T) {
-	logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputSQS(t, 1),
@@ -300,16 +312,8 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		log := logp.NewLogger(inputName)
 		log.Infof("benchmark with %d number of workers", numberOfWorkers)
 
-		metricRegistry := monitoring.NewRegistry()
-		metrics := newInputMetrics("test_id", metricRegistry, numberOfWorkers)
-
-		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
-			event.Private.(*awscommon.EventACKTracker).ACK()
-		})
-
-		defer func() {
-			_ = client.Close()
-		}()
+		metrics := newInputMetrics(monitoring.NewRegistry(), numberOfWorkers, logp.NewNopLogger())
+		pipeline := newFakePipeline()
 
 		config := makeBenchmarkConfig(t)
 		config.NumberOfWorkers = numberOfWorkers
@@ -338,19 +342,21 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				s3API.pagerConstant = newS3PagerConstant(curConfig.BucketListPrefix)
 				store := openTestStatestore()
 
-				states, err := newStates(nil, store)
+				states, err := newStates(nil, store, "")
 				assert.NoError(t, err, "states creation should succeed")
 
-				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, config.FileSelectors, backupConfig{})
+				s3EventHandlerFactory := newS3ObjectProcessorFactory(metrics, s3API, config.FileSelectors, backupConfig{}, logp.NewNopLogger())
 				s3Poller := &s3PollerInput{
 					log:             logp.NewLogger(inputName),
 					config:          config,
 					metrics:         metrics,
 					s3:              s3API,
-					client:          client,
+					pipeline:        pipeline,
 					s3ObjectHandler: s3EventHandlerFactory,
 					states:          states,
 					provider:        "provider",
+					filterProvider:  newFilterProvider(&config),
+					status:          &statusReporterHelperMock{},
 				}
 
 				s3Poller.run(ctx)
@@ -391,7 +397,6 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 }
 
 func TestBenchmarkInputS3(t *testing.T) {
-	logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputS3(t, 1),

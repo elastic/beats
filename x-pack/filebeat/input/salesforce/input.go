@@ -30,8 +30,11 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -57,7 +60,7 @@ type salesforceInput struct {
 // var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
 // Plugin returns the input plugin.
-func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:      inputName,
 		Stability: feature.Stable,
@@ -74,24 +77,34 @@ func (s *salesforceInput) Test(_ inputcursor.Source, _ v2.TestContext) error {
 // Run starts the input and blocks until it ends completes. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
 func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inputcursor.Cursor, pub inputcursor.Publisher) (err error) {
+
+	env.UpdateStatus(status.Starting, "Initializing Salesforce input")
 	st := &state{}
 	if !cursor.IsNew() {
 		if err = cursor.Unpack(&st); err != nil {
+			env.UpdateStatus(status.Failed, fmt.Sprintf("Failed to set up Salesforce input: %v", err))
 			return err
 		}
 	}
 
+	env.UpdateStatus(status.Configuring, "Configuring Salesforce input")
 	if err = s.Setup(env, src, st, pub); err != nil {
+		env.UpdateStatus(status.Failed, fmt.Sprintf("Failed to set up Salesforce input: %v", err))
 		return err
 	}
-
-	return s.run()
+	env.UpdateStatus(status.Running, "Salesforce input setup complete. Monitoring events.")
+	return s.run(env)
 }
 
 // Setup sets up the input. It will create a new SOQL resource and all other
 // necessary configurations.
 func (s *salesforceInput) Setup(env v2.Context, src inputcursor.Source, cursor *state, pub inputcursor.Publisher) (err error) {
-	cfg := src.(*source).cfg
+	srcSource, ok := src.(*source)
+	if !ok {
+		return fmt.Errorf("failed to assert src as *source")
+	}
+
+	cfg := srcSource.cfg
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 	childCtx, cancel := context.WithCancelCause(ctx)
@@ -118,18 +131,28 @@ func (s *salesforceInput) Setup(env v2.Context, src inputcursor.Source, cursor *
 // run is the main loop of the input. It will run until the context is cancelled
 // and based on the configuration, it will run the different methods -- EventLogFile
 // or Object to collect events at defined intervals.
-func (s *salesforceInput) run() error {
+func (s *salesforceInput) run(env v2.Context) error {
+	s.log.Info("Starting Salesforce input run")
+	defer func() {
+		env.UpdateStatus(status.Stopped, "Salesforce input stopped")
+	}()
 	if s.srcConfig.EventMonitoringMethod.EventLogFile.isEnabled() {
 		err := s.RunEventLogFile()
 		if err != nil {
+			env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running EventLogFile collection: %v", err))
 			s.log.Errorf("Problem running EventLogFile collection: %s", err)
+		} else {
+			s.log.Info("Initial EventLogFile collection completed successfully")
 		}
 	}
 
 	if s.srcConfig.EventMonitoringMethod.Object.isEnabled() {
 		err := s.RunObject()
 		if err != nil {
+			env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running Object collection: %v", err))
 			s.log.Errorf("Problem running Object collection: %s", err)
+		} else {
+			s.log.Info("Initial Object collection completed successfully")
 		}
 	}
 
@@ -152,20 +175,32 @@ func (s *salesforceInput) run() error {
 		// another ticker making the channel ready.
 		select {
 		case <-s.ctx.Done():
+			env.UpdateStatus(status.Stopping, "Salesforce input stopping")
 			return s.isError(s.ctx.Err())
 		default:
 		}
 
 		select {
 		case <-s.ctx.Done():
+			env.UpdateStatus(status.Stopping, "Salesforce input stopping")
 			return s.isError(s.ctx.Err())
 		case <-eventLogFileTicker.C:
+			s.log.Info("Running EventLogFile collection")
 			if err := s.RunEventLogFile(); err != nil {
+				env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running EventLogFile collection: %v", err))
 				s.log.Errorf("Problem running EventLogFile collection: %s", err)
+			} else {
+				env.UpdateStatus(status.Running, "EventLogFile collection completed successfully")
+				s.log.Info("EventLogFile collection completed successfully")
 			}
 		case <-objectMethodTicker.C:
+			s.log.Info("Running Object collection")
 			if err := s.RunObject(); err != nil {
+				env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running Object collection: %v", err))
 				s.log.Errorf("Problem running Object collection: %s", err)
+			} else {
+				env.UpdateStatus(status.Running, "Object collection completed successfully")
+				s.log.Info("Object collection completed successfully")
 			}
 		}
 	}
@@ -181,6 +216,7 @@ func (s *salesforceInput) isError(err error) error {
 }
 
 func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
+	s.log.Info("Setting up Salesforce client connection")
 	if s.sfdcConfig == nil {
 		return nil, errors.New("internal error: salesforce configuration is not set properly")
 	}
@@ -188,8 +224,9 @@ func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
 	// Open creates a session using the configuration.
 	session, err := session.Open(*s.sfdcConfig)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open salesforce connection: %w", err)
 	}
+	s.log.Info("Salesforce session opened successfully")
 
 	// Set clientSession for re-use.
 	s.clientSession = session
@@ -209,8 +246,6 @@ func (s *salesforceInput) FormQueryWithCursor(queryConfig *QueryConfig, cursor m
 		return nil, err
 	}
 
-	s.log.Infof("Salesforce query: %s", qr)
-
 	return &querier{Query: qr}, err
 }
 
@@ -222,10 +257,10 @@ func isZero[T comparable](v T) bool {
 
 // RunObject runs the Object method of the Event Monitoring API to collect events.
 func (s *salesforceInput) RunObject() error {
-	s.log.Debugf("scrape object(s) every %s", s.srcConfig.EventMonitoringMethod.Object.Interval)
+	s.log.Infof("Running Object collection with interval: %s", s.srcConfig.EventMonitoringMethod.Object.Interval)
 
 	var cursor mapstr.M
-	if !(isZero(s.cursor.Object.FirstEventTime) && isZero(s.cursor.Object.LastEventTime)) {
+	if !isZero(s.cursor.Object.FirstEventTime) || !isZero(s.cursor.Object.LastEventTime) {
 		object := make(mapstr.M)
 		if !isZero(s.cursor.Object.FirstEventTime) {
 			object.Put("first_event_time", s.cursor.Object.FirstEventTime)
@@ -236,10 +271,12 @@ func (s *salesforceInput) RunObject() error {
 		cursor = mapstr.M{"object": object}
 	}
 
-	query, err := s.FormQueryWithCursor(s.config.EventMonitoringMethod.Object.Query, cursor)
+	query, err := s.FormQueryWithCursor(s.EventMonitoringMethod.Object.Query, cursor)
 	if err != nil {
 		return fmt.Errorf("error forming query based on cursor: %w", err)
 	}
+
+	s.log.Infof("Query formed: %s", query.Query)
 
 	res, err := s.soqlr.Query(query, false)
 	if err != nil {
@@ -258,7 +295,7 @@ func (s *salesforceInput) RunObject() error {
 				return err
 			}
 
-			if timestamp, ok := val[s.config.EventMonitoringMethod.Object.Cursor.Field].(string); ok {
+			if timestamp, ok := val[s.EventMonitoringMethod.Object.Cursor.Field].(string); ok {
 				if firstEvent {
 					s.cursor.Object.FirstEventTime = timestamp
 				}
@@ -282,7 +319,7 @@ func (s *salesforceInput) RunObject() error {
 			return err
 		}
 	}
-	s.log.Debugf("Total events: %d", totalEvents)
+	s.log.Infof("Total events: %d", totalEvents)
 
 	return nil
 }
@@ -290,10 +327,10 @@ func (s *salesforceInput) RunObject() error {
 // RunEventLogFile runs the EventLogFile method of the Event Monitoring API to
 // collect events.
 func (s *salesforceInput) RunEventLogFile() error {
-	s.log.Debugf("scrape eventLogFile(s) every %s", s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
+	s.log.Infof("Running EventLogFile collection with interval: %s", s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
 
 	var cursor mapstr.M
-	if !(isZero(s.cursor.EventLogFile.FirstEventTime) && isZero(s.cursor.EventLogFile.LastEventTime)) {
+	if !isZero(s.cursor.EventLogFile.FirstEventTime) || !isZero(s.cursor.EventLogFile.LastEventTime) {
 		eventLogFile := make(mapstr.M)
 		if !isZero(s.cursor.EventLogFile.FirstEventTime) {
 			eventLogFile.Put("first_event_time", s.cursor.EventLogFile.FirstEventTime)
@@ -304,10 +341,12 @@ func (s *salesforceInput) RunEventLogFile() error {
 		cursor = mapstr.M{"event_log_file": eventLogFile}
 	}
 
-	query, err := s.FormQueryWithCursor(s.config.EventMonitoringMethod.EventLogFile.Query, cursor)
+	query, err := s.FormQueryWithCursor(s.EventMonitoringMethod.EventLogFile.Query, cursor)
 	if err != nil {
 		return fmt.Errorf("error forming query based on cursor: %w", err)
 	}
+
+	s.log.Infof("Query formed: %s", query.Query)
 
 	res, err := s.soqlr.Query(query, false)
 	if err != nil {
@@ -324,9 +363,14 @@ func (s *salesforceInput) RunEventLogFile() error {
 	totalEvents, firstEvent := 0, true
 	for res.TotalSize() > 0 {
 		for _, rec := range res.Records() {
-			req, err := http.NewRequestWithContext(s.ctx, http.MethodGet, s.config.URL+rec.Record().Fields()["LogFile"].(string), nil)
+			logfile, ok := rec.Record().Fields()["LogFile"].(string)
+			if !ok {
+				return fmt.Errorf("LogFile field not found or not a string in Salesforce event log file: %v", rec.Record().Fields())
+			}
+
+			req, err := http.NewRequestWithContext(s.ctx, http.MethodGet, s.URL+logfile, nil)
 			if err != nil {
-				return err
+				return fmt.Errorf("error creating request for log file: %w", err)
 			}
 
 			s.clientSession.AuthorizationHeader(req)
@@ -341,22 +385,26 @@ func (s *salesforceInput) RunEventLogFile() error {
 
 			resp, err := s.sfdcConfig.Client.Do(req)
 			if err != nil {
-				return err
+				return fmt.Errorf("error fetching log file: %w", err)
+			}
+
+			if resp.StatusCode != http.StatusOK {
+				resp.Body.Close()
+				return fmt.Errorf("unexpected status code %d for log file", resp.StatusCode)
 			}
 
 			body, err := io.ReadAll(resp.Body)
-			if err != nil {
-				resp.Body.Close()
-				return err
-			}
 			resp.Body.Close()
-
-			recs, err := decodeAsCSV(body)
 			if err != nil {
-				return err
+				return fmt.Errorf("error reading log file body: %w", err)
 			}
 
-			if timestamp, ok := rec.Record().Fields()[s.config.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
+			recs, err := s.decodeAsCSV(body)
+			if err != nil {
+				return fmt.Errorf("error decoding CSV: %w", err)
+			}
+
+			if timestamp, ok := rec.Record().Fields()[s.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
 				if firstEvent {
 					s.cursor.EventLogFile.FirstEventTime = timestamp
 				}
@@ -366,12 +414,11 @@ func (s *salesforceInput) RunEventLogFile() error {
 			for _, val := range recs {
 				jsonStrEvent, err := json.Marshal(val)
 				if err != nil {
-					return err
+					return fmt.Errorf("error json marshaling event: %w", err)
 				}
 
-				err = publishEvent(s.publisher, s.cursor, jsonStrEvent, "EventLogFile")
-				if err != nil {
-					return err
+				if err := publishEvent(s.publisher, s.cursor, jsonStrEvent, "EventLogFile"); err != nil {
+					return fmt.Errorf("error publishing event: %w", err)
 				}
 				totalEvents++
 			}
@@ -384,10 +431,10 @@ func (s *salesforceInput) RunEventLogFile() error {
 
 		res, err = res.Next()
 		if err != nil {
-			return err
+			return fmt.Errorf("error getting next page: %w", err)
 		}
 	}
-	s.log.Debugf("Total events: %d", totalEvents)
+	s.log.Infof("Total events processed: %d", totalEvents)
 
 	return nil
 }
@@ -405,6 +452,7 @@ func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error
 
 	switch {
 	case cfg.Auth.OAuth2.JWTBearerFlow != nil && cfg.Auth.OAuth2.JWTBearerFlow.isEnabled():
+		s.log.Info("Using JWT Bearer Flow for authentication")
 		pemBytes, err := os.ReadFile(cfg.Auth.OAuth2.JWTBearerFlow.ClientKeyPath)
 		if err != nil {
 			return nil, fmt.Errorf("problem with client key path for JWT auth: %w", err)
@@ -428,6 +476,7 @@ func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error
 		}
 
 	case cfg.Auth.OAuth2.UserPasswordFlow != nil && cfg.Auth.OAuth2.UserPasswordFlow.isEnabled():
+		s.log.Info("Using User Password Flow for authentication")
 		passCreds := credentials.PasswordCredentials{
 			URL:          cfg.Auth.OAuth2.UserPasswordFlow.TokenURL,
 			Username:     cfg.Auth.OAuth2.UserPasswordFlow.Username,
@@ -488,7 +537,7 @@ func retryErrorHandler(max int, log *logp.Logger) retryablehttp.ErrorHandler {
 }
 
 func newClient(cfg config, log *logp.Logger) (*http.Client, error) {
-	c, err := cfg.Resource.Transport.Client()
+	c, err := cfg.Resource.Transport.Client(httpcommon.WithLogger(log))
 	if err != nil {
 		return nil, err
 	}
@@ -533,21 +582,29 @@ type textContextError struct {
 	body []byte
 }
 
-// decodeAsCSV decodes p as a headed CSV document into dst.
-func decodeAsCSV(p []byte) ([]map[string]string, error) {
+// decodeAsCSV decodes the provided byte slice as a CSV and returns a slice of
+// maps, where each map represents a row in the CSV with the header fields as
+// keys and the row values as values.
+func (s *salesforceInput) decodeAsCSV(p []byte) ([]map[string]string, error) {
 	r := csv.NewReader(bytes.NewReader(p))
 
 	// To share the backing array for performance.
 	r.ReuseRecord = true
 
+	// Lazy quotes are enabled to allow for quoted fields with commas. More flexible
+	// in handling CSVs.
+	// NOTE(shmsr): Although, we didn't face any issue with LazyQuotes == false, but I
+	// think we should keep it enabled to avoid any issues in the future.
+	r.LazyQuotes = true
+
 	// Header row is always expected, otherwise we can't map values to keys in
 	// the event.
 	header, err := r.Read()
 	if err != nil {
-		if err == io.EOF { //nolint:errorlint // csv.Reader never wraps io.EOF.
+		if errors.Is(err, io.EOF) {
 			return nil, nil
 		}
-		return nil, err
+		return nil, fmt.Errorf("failed to read CSV header: %w", err)
 	}
 
 	// As buffer reuse is enabled, copying header is important.
@@ -561,22 +618,21 @@ func decodeAsCSV(p []byte) ([]map[string]string, error) {
 	// so that future records must have the same field count.
 	// So, if len(header) != len(event), the Read will return an error and hence
 	// we need not put an explicit check.
-	event, err := r.Read()
-	for ; err == nil; event, err = r.Read() {
+	for {
+		record, err := r.Read()
 		if err != nil {
-			continue
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			s.log.Errorf("failed to read CSV record: %v\n%s", err, p)
+			return nil, textContextError{error: fmt.Errorf("failed to read CSV record: %w for: %v", err, record), body: p}
 		}
-		o := make(map[string]string, len(header))
-		for i, h := range header {
-			o[h] = event[i]
-		}
-		results = append(results, o)
-	}
 
-	if err != nil {
-		if err != io.EOF { //nolint:errorlint // csv.Reader never wraps io.EOF.
-			return nil, textContextError{error: err, body: p}
+		event := make(map[string]string, len(header))
+		for i, h := range header {
+			event[h] = record[i]
 		}
+		results = append(results, event)
 	}
 
 	return results, nil

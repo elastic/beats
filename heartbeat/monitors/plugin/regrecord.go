@@ -53,7 +53,7 @@ type CountersRecorder struct {
 }
 
 func NewPluginCountersRecorder(pluginName string, rootRegistry *monitoring.Registry) RegistryRecorder {
-	pluginRegistry := rootRegistry.NewRegistry(pluginName)
+	pluginRegistry := rootRegistry.GetOrCreateRegistry(pluginName)
 	return CountersRecorder{
 		monitoring.NewInt(pluginRegistry, "monitor_starts"),
 		monitoring.NewInt(pluginRegistry, "monitor_stops"),
@@ -87,7 +87,7 @@ func newRootGaugeRecorder(r *monitoring.Registry) RegistryRecorder {
 }
 
 func newPluginGaugeRecorder(pluginName string, rootRegistry *monitoring.Registry) RegistryRecorder {
-	pluginRegistry := rootRegistry.NewRegistry(pluginName)
+	pluginRegistry := rootRegistry.GetOrCreateRegistry(pluginName)
 	return newRootGaugeRecorder(pluginRegistry)
 }
 

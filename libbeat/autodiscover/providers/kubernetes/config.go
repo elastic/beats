@@ -37,6 +37,7 @@ var AllSupportedHints = []string{"enabled", "module", "metricsets", "hosts", "pe
 type Config struct {
 	KubeConfig        string                       `config:"kube_config"`
 	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
+	KubeAdm           bool                         `config:"use_kubeadm"`
 
 	Namespace      string        `config:"namespace"`
 	SyncPeriod     time.Duration `config:"sync_period"`
@@ -71,6 +72,7 @@ var DefaultCleanupTimeout time.Duration = 0
 func defaultConfig() *Config {
 	return &Config{
 		SyncPeriod:          10 * time.Minute,
+		KubeAdm:             true,
 		Resource:            "pod",
 		CleanupTimeout:      DefaultCleanupTimeout,
 		Prefix:              "co.elastic",
@@ -111,9 +113,13 @@ func (c *Config) Validate() error {
 	if c.Scope != "node" && c.Scope != "cluster" {
 		return fmt.Errorf("invalid `scope` configured. supported values are `node` and `cluster`")
 	}
-	if c.Unique && c.Scope != "cluster" {
-		logp.L().Warnf("can only set `unique` when scope is `cluster`")
-	}
 
 	return nil
+}
+
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+func (c Config) checkUnsupportedParams(logger *logp.Logger) {
+	if c.Unique && c.Scope != "cluster" {
+		logger.Warn("can only set `unique` when scope is `cluster`")
+	}
 }

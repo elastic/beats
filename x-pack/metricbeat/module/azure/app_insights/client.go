@@ -2,13 +2,15 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package app_insights
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
 
@@ -23,8 +25,8 @@ type Client struct {
 }
 
 // NewClient instantiates the an Azure monitoring client
-func NewClient(config Config) (*Client, error) {
-	service, err := NewService(config)
+func NewClient(config Config, logger *logp.Logger) (*Client, error) {
+	service, err := NewService(config, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -40,6 +42,7 @@ func (client *Client) GetMetricValues() (insights.ListMetricsResultsItem, error)
 	var bodyMetrics []insights.MetricsPostBodySchema
 	var result insights.ListMetricsResultsItem
 	for _, metrics := range client.Config.Metrics {
+		metrics := metrics
 		var aggregations []insights.MetricsAggregation
 		var segments []insights.MetricsSegment
 		for _, agg := range metrics.Aggregation {

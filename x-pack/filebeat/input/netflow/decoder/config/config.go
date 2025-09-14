@@ -5,10 +5,10 @@
 package config
 
 import (
-	"io"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type ActiveSessionsMetric interface {
@@ -19,28 +19,31 @@ type ActiveSessionsMetric interface {
 // Config stores the configuration used by the NetFlow Collector.
 type Config struct {
 	protocols            []string
-	logOutput            io.Writer
+	logOutput            *logp.Logger
 	expiration           time.Duration
 	detectReset          bool
 	fields               fields.FieldDict
 	sharedTemplates      bool
+	withCache            bool
 	activeSessionsMetric ActiveSessionsMetric
-}
-
-var defaultCfg = Config{
-	protocols:       []string{},
-	logOutput:       io.Discard,
-	expiration:      time.Hour,
-	detectReset:     true,
-	sharedTemplates: false,
 }
 
 // Defaults returns a configuration object with defaults settings:
 // - no protocols are enabled.
-// - log output is discarded
+// - log output is set to the logger that is passed in.
 // - session expiration is checked once every hour.
-func Defaults() Config {
-	return defaultCfg
+// - resets are detected.
+// - templates are not shared.
+// - cache is disabled.
+func Defaults(logger *logp.Logger) Config {
+	return Config{
+		protocols:       []string{},
+		logOutput:       logger,
+		expiration:      time.Hour,
+		detectReset:     true,
+		sharedTemplates: false,
+		withCache:       false,
+	}
 }
 
 // WithProtocols modifies an existing configuration object to enable the
@@ -50,17 +53,22 @@ func (c *Config) WithProtocols(protos ...string) *Config {
 	return c
 }
 
-// WithLogOutput sets the output io.Writer for logging.
-func (c *Config) WithLogOutput(output io.Writer) *Config {
-	c.logOutput = output
-	return c
-}
-
 // WithExpiration configures the expiration timeout for sessions and templates.
 // A value of zero disables expiration.
 func (c *Config) WithExpiration(timeout time.Duration) *Config {
 	c.expiration = timeout
 	return c
+}
+
+// WithCache toggles the packet cache.
+func (c *Config) WithCache(enabled bool) *Config {
+	c.withCache = enabled
+	return c
+}
+
+// Cache returns if the packet cache is enabled.
+func (c *Config) Cache() bool {
+	return c.withCache
 }
 
 // WithSequenceResetEnabled allows to toggle the detection of reset sequences,
@@ -108,7 +116,7 @@ func (c *Config) Protocols() []string {
 }
 
 // LogOutput returns the io.Writer where logs are to be written.
-func (c *Config) LogOutput() io.Writer {
+func (c *Config) LogOutput() *logp.Logger {
 	return c.logOutput
 }
 
@@ -121,6 +129,11 @@ func (c *Config) ExpirationTimeout() time.Duration {
 // SequenceResetEnabled returns if sequence reset detection is enabled.
 func (c *Config) SequenceResetEnabled() bool {
 	return c.detectReset
+}
+
+// ShareTemplatesEnabled returns if template sharing is enabled.
+func (c *Config) ShareTemplatesEnabled() bool {
+	return c.sharedTemplates
 }
 
 // Fields returns the configured fields.

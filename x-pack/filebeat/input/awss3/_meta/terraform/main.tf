@@ -147,3 +147,74 @@ resource "aws_sns_topic_subscription" "filebeat-integtest-sns" {
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.filebeat-integtest-sns.arn
 }
+
+resource "aws_s3_bucket" "filebeat-integtest-eventbridge" {
+  bucket        = "filebeat-s3-integtest-eventbridge-${random_string.random.result}"
+  force_destroy = true
+}
+
+resource "aws_sqs_queue" "filebeat-integtest-eventbridge" {
+  name = "filebeat-s3-integtest-eventbridge-${random_string.random.result}"
+}
+
+data "aws_iam_policy_document" "sqs_queue_policy" {
+  statement {
+    effect  = "Allow"
+    actions = ["sqs:SendMessage"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+
+    resources = [aws_sqs_queue.filebeat-integtest-eventbridge.arn]
+  }
+}
+
+resource "aws_sqs_queue_policy" "filebeat-integtest-eventbridge" {
+  queue_url = aws_sqs_queue.filebeat-integtest-eventbridge.id
+  policy    = data.aws_iam_policy_document.sqs_queue_policy.json
+}
+
+resource "aws_cloudwatch_event_rule" "sqs" {
+  name        = "capture-s3-notification"
+  description = "Capture s3 changes"
+
+  event_pattern = jsonencode({
+      source = [
+          "aws.s3"
+      ],
+      detail-type = [
+          "Object Created"
+      ]
+      detail = {
+        bucket = {
+            name = [ aws_s3_bucket.filebeat-integtest-eventbridge.id ]
+        }
+      }
+  })
+
+  depends_on = [
+      aws_s3_bucket.filebeat-integtest-eventbridge
+  ]
+}
+
+resource "aws_cloudwatch_event_target" "sqs" {
+  rule      = aws_cloudwatch_event_rule.sqs.name
+  target_id = "SendToSQS"
+  arn       = aws_sqs_queue.filebeat-integtest-eventbridge.arn
+
+  depends_on = [
+   aws_cloudwatch_event_rule.sqs
+  ]
+}
+
+resource "aws_s3_bucket_notification" "bucket_notification-eventbridge" {
+  bucket = aws_s3_bucket.filebeat-integtest-eventbridge.id
+  eventbridge = true
+
+  depends_on = [
+    aws_cloudwatch_event_target.sqs
+  ]
+}
+

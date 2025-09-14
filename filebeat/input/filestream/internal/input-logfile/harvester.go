@@ -134,13 +134,11 @@ type defaultHarvesterGroup struct {
 // be started. Start does not block.
 func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 	sourceName := hg.identifier.ID(src)
-
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
-	ctx.Logger.Debug("Starting harvester for file")
 
 	if err := hg.tg.Go(startHarvester(ctx, hg, src, false, hg.metrics)); err != nil {
 		ctx.Logger.Warnf(
-			"tried to start harvester with task group already closed",
+			"tried to start harvester for %s with task group already closed",
 			ctx.ID)
 	}
 }
@@ -175,7 +173,7 @@ func startHarvester(
 ) func(context.Context) error {
 	srcID := hg.identifier.ID(src)
 
-	return func(canceler context.Context) error {
+	return func(canceler context.Context) (err error) {
 		defer func() {
 			if v := recover(); v != nil {
 				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
@@ -188,7 +186,6 @@ func startHarvester(
 			// stop previous harvester
 			hg.readers.remove(srcID)
 		}
-		defer ctx.Logger.Debug("Stopped harvester for file")
 
 		harvesterCtx, cancelHarvester, err := hg.readers.newContext(srcID, canceler)
 		if err != nil {
@@ -202,11 +199,19 @@ func startHarvester(
 			// only thing it does is to log the error. So to avoid unnecessary errors,
 			// we just return nil.
 			if errors.Is(err, ErrHarvesterAlreadyRunning) {
+				ctx.Logger.Debug("Harvester already running")
 				return nil
 			}
-
 			return fmt.Errorf("error while adding new reader to the bookkeeper %w", err)
 		}
+
+		defer func() {
+			if err != nil {
+				ctx.Logger.Debugf("Stopped harvester for file due to an error: %s", err)
+				return
+			}
+			ctx.Logger.Debugf("Stopped harvester for file")
+		}()
 
 		ctx.Cancelation = harvesterCtx
 		defer cancelHarvester()
@@ -231,6 +236,7 @@ func startHarvester(
 		cursor := makeCursor(resource)
 		publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
 
+		ctx.Logger.Debug("Starting harvester for file")
 		err = hg.harvester.Run(ctx, src, cursor, publisher, metrics)
 		if err != nil && !errors.Is(err, context.Canceled) {
 			hg.readers.remove(srcID)

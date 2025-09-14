@@ -14,7 +14,6 @@ import (
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 
-	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
@@ -108,29 +107,6 @@ func TestLightweightSummaries(t *testing.T) {
 			lastEvent.Fields)
 
 		requireOneSummaryPerAttempt(t, all)
-	})
-}
-
-func TestBrowserSummaries(t *testing.T) {
-	t.Parallel()
-	scenarioDB.RunTagWithSeparateTwists(t, "browser", StdAttemptTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
-		all := mtr.Events()
-		lastEvent := all[len(all)-1]
-
-		testslike.Test(t,
-			lookslike.Compose(
-				SummaryValidatorForStatus(mtr.Meta.Status),
-				hbtest.URLChecks(t, mtr.Meta.URL),
-			),
-			lastEvent.Fields)
-
-		monStatus, _ := lastEvent.GetValue("monitor.status")
-		summaryIface, _ := lastEvent.GetValue("summary")
-		summary := summaryIface.(*jobsummary.JobSummary)
-		require.Equal(t, string(summary.Status), monStatus, "expected summary status and mon status to be equal in event: %v", lastEvent.Fields)
-
-		requireOneSummaryPerAttempt(t, all)
-
 	})
 }
 

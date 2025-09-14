@@ -42,9 +42,6 @@ const (
 	Name = "metricbeat"
 )
 
-// RootCmd to handle beats cli
-var RootCmd *cmd.BeatsRootCmd
-
 // withECSVersion is a modifier that adds ecs.version to events.
 var withECSVersion = processing.WithFields(mapstr.M{
 	"ecs": mapstr.M{
@@ -53,8 +50,13 @@ var withECSVersion = processing.WithFields(mapstr.M{
 })
 
 // MetricbeatSettings contains the default settings for metricbeat
-func MetricbeatSettings() instance.Settings {
-	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
+// moduleNameSpace allows you to override the default setting of
+// "module" for the module metrics to avoid name collisions.
+func MetricbeatSettings(moduleNameSpace string) instance.Settings {
+	if moduleNameSpace == "" {
+		moduleNameSpace = "module"
+	}
+	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
 	return instance.Settings{
 		RunFlags:      runFlags,
@@ -63,7 +65,7 @@ func MetricbeatSettings() instance.Settings {
 		Processing:    processing.MakeDefaultSupport(true, nil, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 		Initialize: []func(){
 			include.InitializeModule,
-			module.RegisterMonitoringModules,
+			func() { module.RegisterMonitoringModules(moduleNameSpace) },
 		},
 	}
 }
@@ -74,8 +76,4 @@ func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 	rootCmd.AddCommand(cmd.GenModulesCmd(Name, "", BuildModulesManager))
 	rootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
 	return rootCmd
-}
-
-func init() {
-	RootCmd = Initialize(MetricbeatSettings())
 }

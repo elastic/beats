@@ -2,6 +2,7 @@
 
 set -euo pipefail
 
+WORKSPACE=$(pwd)
 export KUBECONFIG="${WORKSPACE}/kubecfg"
 export BIN="${WORKSPACE}/bin"
 

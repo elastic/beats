@@ -1474,3 +1474,43 @@ kube_storageclass_created{storageclass="standard"} 1.713862186e+09
 # TYPE kube_storageclass_annotations gauge
 # HELP kube_storageclass_labels [STABLE] Kubernetes labels converted to Prometheus labels.
 # TYPE kube_storageclass_labels gauge
+# TYPE kube_horizontalpodautoscaler_info gauge
+kube_horizontalpodautoscaler_info{namespace="default",horizontalpodautoscaler="cpu",scaletargetref_api_version="apps/v1",scaletargetref_kind="Deployment",scaletargetref_name="helloweb"} 1
+# HELP kube_horizontalpodautoscaler_metadata_generation [STABLE] The generation observed by the HorizontalPodAutoscaler controller.
+# TYPE kube_horizontalpodautoscaler_metadata_generation gauge
+kube_horizontalpodautoscaler_metadata_generation{namespace="default",horizontalpodautoscaler="cpu"} 0
+# HELP kube_horizontalpodautoscaler_spec_max_replicas [STABLE] Upper limit for the number of pods that can be set by the autoscaler; cannot be smaller than MinReplicas.
+# TYPE kube_horizontalpodautoscaler_spec_max_replicas gauge
+kube_horizontalpodautoscaler_spec_max_replicas{namespace="default",horizontalpodautoscaler="cpu"} 5
+# HELP kube_horizontalpodautoscaler_spec_min_replicas [STABLE] Lower limit for the number of pods that can be set by the autoscaler, default 1.
+# TYPE kube_horizontalpodautoscaler_spec_min_replicas gauge
+kube_horizontalpodautoscaler_spec_min_replicas{namespace="default",horizontalpodautoscaler="cpu"} 1
+# HELP kube_horizontalpodautoscaler_spec_target_metric The metric specifications used by this autoscaler when calculating the desired replica count.
+# TYPE kube_horizontalpodautoscaler_spec_target_metric gauge
+kube_horizontalpodautoscaler_spec_target_metric{namespace="default",horizontalpodautoscaler="cpu",metric_name="cpu",metric_target_type="utilization"} 30
+# HELP kube_horizontalpodautoscaler_status_target_metric The current metric status used by this autoscaler when calculating the desired replica count.
+# TYPE kube_horizontalpodautoscaler_status_target_metric gauge
+kube_horizontalpodautoscaler_status_target_metric{namespace="default",horizontalpodautoscaler="cpu",metric_name="cpu",metric_target_type="value"} 0.001
+kube_horizontalpodautoscaler_status_target_metric{namespace="default",horizontalpodautoscaler="cpu",metric_name="cpu",metric_target_type="average"} 0.001
+kube_horizontalpodautoscaler_status_target_metric{namespace="default",horizontalpodautoscaler="cpu",metric_name="cpu",metric_target_type="utilization"} 1
+# HELP kube_horizontalpodautoscaler_status_current_replicas [STABLE] Current number of replicas of pods managed by this autoscaler.
+# TYPE kube_horizontalpodautoscaler_status_current_replicas gauge
+kube_horizontalpodautoscaler_status_current_replicas{namespace="default",horizontalpodautoscaler="cpu"} 1
+# HELP kube_horizontalpodautoscaler_status_desired_replicas [STABLE] Desired number of replicas of pods managed by this autoscaler.
+# TYPE kube_horizontalpodautoscaler_status_desired_replicas gauge
+kube_horizontalpodautoscaler_status_desired_replicas{namespace="default",horizontalpodautoscaler="cpu"} 1
+# HELP kube_horizontalpodautoscaler_annotations Kubernetes annotations converted to Prometheus labels.
+# TYPE kube_horizontalpodautoscaler_annotations gauge
+# HELP kube_horizontalpodautoscaler_labels [STABLE] Kubernetes labels converted to Prometheus labels.
+# TYPE kube_horizontalpodautoscaler_labels gauge
+# HELP kube_horizontalpodautoscaler_status_condition [STABLE] The condition of this autoscaler.
+# TYPE kube_horizontalpodautoscaler_status_condition gauge
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="AbleToScale",status="true"} 1
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="AbleToScale",status="false"} 0
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="AbleToScale",status="unknown"} 0
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="ScalingActive",status="true"} 1
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="ScalingActive",status="false"} 0
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="ScalingActive",status="unknown"} 0
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="ScalingLimited",status="true"} 0
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="ScalingLimited",status="false"} 1
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="ScalingLimited",status="unknown"} 0

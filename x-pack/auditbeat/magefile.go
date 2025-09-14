@@ -8,7 +8,10 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"time"
+
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 
 	"github.com/magefile/mage/mg"
 	"go.uber.org/multierr"
@@ -25,8 +28,6 @@ import (
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
 	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
-	//mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
@@ -55,16 +56,6 @@ func GolangCrossBuild() error {
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
 	return devtools.CrossBuild()
-}
-
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
 }
 
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
@@ -96,7 +87,7 @@ func Package() {
 	auditbeat.CustomizePackaging(auditbeat.XPackPackaging)
 
 	mg.SerialDeps(Update)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -150,4 +141,13 @@ func ExportDashboard() error {
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
 	return devtools.KibanaDashboards(devtools.OSSBeatDir("module"), "module")
+}
+
+// Test runs all available tests (unitTest + integTest)
+func Test() {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
+	test.Test()
 }

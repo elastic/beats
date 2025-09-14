@@ -65,7 +65,7 @@
         "user_agent.os.full": "Mac OS X 10.14",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.14",
-        "user_agent.version": "72.0."
+        "user_agent.version": "72.0"
     },
     {
         "@timestamp": "2020-02-07T16:43:53.000Z",
@@ -133,7 +133,7 @@
         "user_agent.os.full": "Mac OS X 10.14",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.14",
-        "user_agent.version": "72.0."
+        "user_agent.version": "72.0"
     },
     {
         "@timestamp": "2020-02-07T16:43:53.000Z",
@@ -201,7 +201,7 @@
         "user_agent.os.full": "Mac OS X 10.14",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.14",
-        "user_agent.version": "72.0."
+        "user_agent.version": "72.0"
     },
     {
         "@timestamp": "2020-02-07T16:43:53.000Z",
@@ -269,6 +269,6 @@
         "user_agent.os.full": "Mac OS X 10.14",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.14",
-        "user_agent.version": "72.0."
+        "user_agent.version": "72.0"
     }
 ]

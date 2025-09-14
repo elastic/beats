@@ -41,7 +41,7 @@ func Generate(module, modulesPath, beatsPath string) error {
 	templatesPath := path.Join(beatsPath, "scripts", "module")
 	filesToCopy := []string{
 		path.Join("_meta", "fields.yml"),
-		path.Join("_meta", "docs.asciidoc"),
+		path.Join("_meta", "docs.md"),
 		path.Join("_meta", "config.yml"),
 		"module.yml",
 	}

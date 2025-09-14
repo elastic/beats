@@ -7,10 +7,11 @@ package cel
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
-	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -31,6 +32,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
@@ -46,6 +48,7 @@ var inputTests = []struct {
 	want          []map[string]interface{}
 	wantCursor    []map[string]interface{}
 	wantErr       error
+	prepare       func() error
 	wantFile      string
 	wantNoFile    string
 }{
@@ -55,6 +58,20 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program":  `{"events":[{"message":"Hello, World!"}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "Hello, World!"},
+		},
+	},
+	{
+		name: "hello_world_sprintf",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":sprintf("Hello, %s!", ["World"])}]}`,
 			"state":    nil,
 			"resource": map[string]interface{}{
 				"url": "",
@@ -80,6 +97,49 @@ var inputTests = []struct {
 				"Hello, World!": "2010-02-08T00:00:00Z",
 			},
 		}},
+	},
+	{
+		name: "hello_world_sum",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":string(sum([1,2,3,4]))}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{{
+			"message": "10",
+		}},
+	},
+	{
+		name: "hello_world_bytes",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":string(hex_decode("68656c6c6f20776f726c64"))}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{{
+			"message": "hello world",
+		}},
+	},
+	{
+		name: "hello_world_front_and_tail_2",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":front([1,2,3,4,5],2)}, {"message":tail([1,2,3,4,5],2)}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": []any{1.0, 2.0}},
+			{"message": []any{3.0, 4.0, 5.0}},
+		},
 	},
 	{
 		name: "bad_events_type",
@@ -365,6 +425,113 @@ var inputTests = []struct {
 			{"message": "Hello, Void!"},
 		},
 	},
+	{
+		name: "env_var_static",
+		config: map[string]interface{}{
+			"interval": 1,
+			"allowed_environment": []string{
+				"CELTESTENVVAR",
+				"NONCELTESTENVVAR",
+			},
+			"program": `{"events":[
+				{"message":env.?CELTESTENVVAR.orValue("not present")},
+				{"message":env.?NONCELTESTENVVAR.orValue("not present")},
+				{"message":env.?DISALLOWEDCELTESTENVVAR.orValue("not present")},
+			]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "TESTVALUE"},
+			{"message": "not present"},
+			{"message": "not present"},
+		},
+	},
+	{
+		name: "env_var_dynamic",
+		config: map[string]interface{}{
+			"interval": 1,
+			"allowed_environment": []string{
+				"CELTESTENVVAR",
+				"NONCELTESTENVVAR",
+			},
+			"program": `{"events": ["CELTESTENVVAR","NONCELTESTENVVAR","DISALLOWEDCELTESTENVVAR"].map(k,
+				{"message":env[?k].orValue("not present")}
+			)}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "TESTVALUE"},
+			{"message": "not present"},
+			{"message": "not present"},
+		},
+	},
+	{
+		// This test exists purely to demonstrate that the lib is available.
+		name: "aws_signing_static",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `{"events": [{
+				"message": post_request("http://www.example.com/", "text/plain", "request data").sign_aws_from_static(
+					"id", "long_enough_secret", "token", // secret must be longer than 112 bits for FIPS140 tests to pass.
+					{
+						"service": "service",
+						"region": "region",
+						"sign_time": timestamp("2009-11-10T23:00:00Z"),
+						"no_hoist": false,
+						"no_escape": false,
+						"disable_session_token": false,
+					}
+				).Header.Authorization[?0].orValue("nope")
+			}]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "AWS4-HMAC-SHA256 Credential=id/20091110/region/service/aws4_request, SignedHeaders=content-length;content-type;host;x-amz-date;x-amz-security-token, Signature=ad27046c0009e06c6626e6009ba2af96027f4893b7a190ab67aaec85becb25cd"},
+		},
+	},
+	{
+		// This test exists purely to demonstrate that the lib is available.
+		name: "optional_types_v2",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `{"events": [{
+				"message": optional.unwrap([optional.of(42), optional.none()]).encode_json(),
+			}]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "[42]"},
+		},
+	},
+	{
+		// This test exists purely to demonstrate that the lib is available.
+		name: "two_var_comprehension_v2",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `{"events": [{
+				"message": {'hello': 'world'}.transformMap(k, v, v + '!').encode_json(),
+			}]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": `{"hello":"world!"}`},
+		},
+	},
 
 	// FS-based tests.
 	{
@@ -645,6 +812,74 @@ var inputTests = []struct {
 							},
 						},
 					},
+				},
+			},
+		},
+	},
+	{
+		name:   "GET_headers",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval":         1,
+			"resource.headers": http.Header{"foo": {"bar"}},
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			enc := json.NewEncoder(w)
+			enc.Encode(map[string][]any{"events": {r.Header.Get("foo")}})
+		},
+		want: []map[string]interface{}{
+			{
+				"events": []any{"bar"},
+			},
+		},
+	},
+	{
+		name:   "GET_max_body_size_ok",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval":               1,
+			"resource.max_body_size": int64(6),
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [{"message": string(body)}]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("hello"))
+		},
+		want: []map[string]interface{}{
+			{
+				"message": "hello",
+			},
+		},
+	},
+	{
+		name:   "GET_max_body_size_too_big",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval":               1,
+			"resource.max_body_size": int64(4),
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [string(body)]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("hello"))
+		},
+		want: []map[string]interface{}{
+			{
+				"error": map[string]any{
+					"message": `failed eval: ERROR: <input>:3:21: response body too big
+ |   "events": [string(body)]
+ | ....................^`,
 				},
 			},
 		},
@@ -1345,6 +1580,136 @@ var inputTests = []struct {
 
 	// Authenticated access tests.
 	{
+		name: "basic_accept",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":            1,
+			"auth.basic.user":     "test_client",
+			"auth.basic.password": "secret_password",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test_client:secret_password"))),
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name: "basic_reject",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":            1,
+			"auth.basic.user":     "test_client",
+			"auth.basic.password": "pleeassssee",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test_client:secret_password"))),
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"error": "not authorized",
+			},
+		},
+	},
+	{
+		name: "token_accept",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":         1,
+			"auth.token.type":  "Token",
+			"auth.token.value": "sssh_super_secret_token",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			"Token sssh_super_secret_token",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name: "token_reject",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":         1,
+			"auth.token.type":  "Token",
+			"auth.token.value": "leaked_but_rolled_over_token_found_on_github",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			"Token sssh_super_secret_token",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"error": "not authorized",
+			},
+		},
+	},
+	{
 		name: "digest_accept",
 		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 			s := httptest.NewServer(h)
@@ -1550,26 +1915,45 @@ var inputTests = []struct {
 
 	// Programmer error.
 	{
-		name:   "type_error_message",
+		name:   "type_error_message_compile_time",
 		server: newChainTestServer(httptest.NewServer),
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-	bytes(get(state.url).Body).decode_json().records.map(r,
-		bytes(get(state.url+'/'+r.id).Body).decode_json()).as(events, {
-	//                          ^~~~ r.id not converted to string: can't add integer to string.
+	get(state.url).Body.decode_json().records.map(r,
+		get(state.url+'/'+int(r.id)).Body.decode_json()).as(events, {
+	//                    ^~~~ r.id converted to incorrect type.
+			"events": events,
+	})
+	`,
+		},
+		handler: defaultHandler(http.MethodGet, ""),
+		wantErr: fmt.Errorf(`failed to check program: failed compilation: ERROR: <input>:3:20: found no matching overload for '_+_' applied to '(string, int)'
+ |   get(state.url+'/'+int(r.id)).Body.decode_json()).as(events, {
+ | ...................^ accessing config`),
+	},
+	{
+		name:   "type_error_message_run_time",
+		server: newChainTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	get(state.url).Body.decode_json().records.map(r,
+		get(state.url+'/'+r.id).Body.decode_json()).as(events, {
+	//                    ^~~~ r.id not converted to string: can't add integer to string.
 			"events": events,
 	})
 	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
 		want: []map[string]interface{}{
+			// Loss of location information here is a result of changes in the runtime.
+			// We no longer look into macros at all. This is a huge loss for debugging.
 			{
 				"error": map[string]interface{}{
-					// This is the best we get for some errors from CEL.
-					"message": `failed eval: ERROR: <input>:3:56: no such overload
- |   bytes(get(state.url+'/'+r.id).Body).decode_json()).as(events, {
- | .......................................................^`,
+					"message": `failed eval: ERROR: <input>:5:14: no such overload
+ |    "events": events,
+ | .............^`,
 				},
 			},
 		},
@@ -1609,6 +1993,158 @@ var inputTests = []struct {
 			},
 		}},
 	},
+	{
+		name: "dump_no_error",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"value": try(debug("divide by zero", 0/0))}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+			"failure_dump": map[string]interface{}{
+				"enabled":  true,
+				"filename": "failure_dumps/dump.json",
+			},
+		},
+		time:       func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
+		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-08T00-00-00.000.json"),
+		want: []map[string]interface{}{{
+			"message": map[string]interface{}{
+				"value": "division by zero",
+			},
+		}},
+	},
+	{
+		name: "dump_error",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+			"failure_dump": map[string]interface{}{
+				"enabled":  true,
+				"filename": "failure_dumps/dump.json",
+			},
+		},
+		time:     func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		wantFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		want: []map[string]interface{}{
+			{
+				"error": map[string]interface{}{
+					"message": `failed eval: ERROR: <input>:1:58: division by zero
+ | {"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}
+ | .........................................................^`,
+				},
+			},
+		},
+	},
+	{
+		name: "dump_error_delete",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+			"failure_dump": map[string]interface{}{
+				"enabled":  false, // We have a name but are disabled, so delete.
+				"filename": "failure_dumps/dump.json",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		prepare: func() error {
+			// Make a file that the configuration should delete.
+			err := os.MkdirAll("failure_dumps", 0o700)
+			if err != nil {
+				return err
+			}
+			return os.WriteFile(filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), nil, 0o600)
+		},
+		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		want: []map[string]interface{}{
+			{
+				"error": map[string]interface{}{
+					"message": `failed eval: ERROR: <input>:1:58: division by zero
+ | {"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}
+ | .........................................................^`,
+				},
+			},
+		},
+	},
+
+	{
+		name: "max_executions_with_remaining_executions",
+		config: map[string]interface{}{
+			"interval":       1,
+			"max_executions": 5,
+			"program": `debug("STATE", int(state.n).as(n, {
+							"events": [{"n": n+1, "remaining_executions": remaining_executions}],
+							"n":          n+1,
+							"want_more":  remaining_executions != 0,
+						}))`,
+			"state": map[string]any{"n": 0},
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		want: []map[string]interface{}{
+			{"n": float64(1), "remaining_executions": float64(4)},
+			{"n": float64(2), "remaining_executions": float64(3)},
+			{"n": float64(3), "remaining_executions": float64(2)},
+			{"n": float64(4), "remaining_executions": float64(1)},
+			{"n": float64(5), "remaining_executions": float64(0)},
+			{"n": float64(6), "remaining_executions": float64(4)},
+			{"n": float64(7), "remaining_executions": float64(3)},
+		},
+	},
+
+	// Coverage
+	{
+		name: "coverage",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `int(state.n).as(n, {
+							"events": [{"n": n+1}],
+							"n":          n+1,
+							"want_more":  n+1 < 5,
+							"probe":      n < 2 ?
+								"little"
+							:
+								"big",
+							"fail_probe": n < 0 ?
+								"negative"
+							:
+								"non-negative",
+						})`,
+			"record_coverage": true,
+			"state":           map[string]any{"n": 0},
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		// The program will be evaluated five times in the first periodic
+		// run and then once for all subsequent runs. We depend here on
+		// the test construction that asks that we get at least as many
+		// results from the input as there are elements in the want slice
+		// and then stop.
+		want: []map[string]interface{}{
+			// First periodic run.
+			{"n": float64(1)},
+			{"n": float64(2)},
+			{"n": float64(3)},
+			{"n": float64(4)},
+			{"n": float64(5)},
+			// Second and subsequent periodic runs.
+			{"n": float64(6)},
+			{"n": float64(7)},
+		},
+	},
 
 	// not yet done from httpjson (some are redundant since they are compositional products).
 	//
@@ -1628,7 +2164,15 @@ func TestInput(t *testing.T) {
 		"ndjson_log_file_simple_file_scheme": "Path handling on Windows is incompatible with url.Parse/url.URL.String. See go.dev/issue/6027.",
 	}
 
-	logp.TestingSetup()
+	// Set a var that is available to test env look-up.
+	os.Setenv("CELTESTENVVAR", "TESTVALUE")
+	os.Setenv("DISALLOWEDCELTESTENVVAR", "DISALLOWEDTESTVALUE")
+
+	err := os.RemoveAll("failure_dumps")
+	if err != nil {
+		t.Fatalf("failed to remove failure_dumps directory: %v", err)
+	}
+
 	for _, test := range inputTests {
 		t.Run(test.name, func(t *testing.T) {
 			if reason, skip := skipOnWindows[test.name]; runtime.GOOS == "windows" && skip {
@@ -1636,6 +2180,13 @@ func TestInput(t *testing.T) {
 			}
 			if test.remote && !*runRemote {
 				t.Skip("skipping remote endpoint test")
+			}
+
+			if test.prepare != nil {
+				err := test.prepare()
+				if err != nil {
+					t.Fatalf("unexpected from prepare(): %v", err)
+				}
 			}
 
 			if test.server != nil {
@@ -1648,7 +2199,10 @@ func TestInput(t *testing.T) {
 			conf.Redact = &redact{} // Make sure we pass the redact requirement.
 			err := cfg.Unpack(&conf)
 			if err != nil {
-				t.Fatalf("unexpected error unpacking config: %v", err)
+				if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+					t.Fatalf("unexpected error unpacking config: %v", err)
+				}
+				return
 			}
 
 			var tempDir string
@@ -1670,10 +2224,13 @@ func TestInput(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 
+			id := "test_id:" + test.name
 			v2Ctx := v2.Context{
-				Logger:      logp.NewLogger("cel_test"),
-				ID:          "test_id:" + test.name,
-				Cancelation: ctx,
+				Logger:          logp.NewLogger("cel_test"),
+				ID:              id,
+				IDWithoutName:   id,
+				Cancelation:     ctx,
+				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
 			client.done = func() {
@@ -1684,6 +2241,20 @@ func TestInput(t *testing.T) {
 			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client)
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
+			}
+			if test.wantFile != "" {
+				if _, err := os.Stat(filepath.Join(tempDir, test.wantFile)); err != nil {
+					t.Errorf("expected log file not found: %v", err)
+				}
+			}
+			if test.wantNoFile != "" {
+				paths, err := filepath.Glob(filepath.Join(tempDir, test.wantNoFile))
+				if err != nil {
+					t.Fatalf("unexpected error calling filepath.Glob(%q): %v", test.wantNoFile, err)
+				}
+				if len(paths) != 0 {
+					t.Errorf("unexpected files found: %v", paths)
+				}
 			}
 			if test.wantErr != nil {
 				return
@@ -1711,24 +2282,10 @@ func TestInput(t *testing.T) {
 				t.Errorf("unexpected number of cursors events: got:%d want at least:%d", len(client.cursors), len(test.wantCursor))
 				test.wantCursor = test.wantCursor[:len(client.published)]
 			}
-			client.published = client.published[:len(test.want)]
+			client.cursors = client.cursors[:len(test.wantCursor)]
 			for i, got := range client.cursors {
 				if !reflect.DeepEqual(mapstr.M(got), mapstr.M(test.wantCursor[i])) {
 					t.Errorf("unexpected cursor for event %d: got:- want:+\n%s", i, cmp.Diff(got, test.wantCursor[i]))
-				}
-			}
-			if test.wantFile != "" {
-				if _, err := os.Stat(filepath.Join(tempDir, test.wantFile)); err != nil {
-					t.Errorf("expected log file not found: %v", err)
-				}
-			}
-			if test.wantNoFile != "" {
-				paths, err := filepath.Glob(filepath.Join(tempDir, test.wantNoFile))
-				if err != nil {
-					t.Fatalf("unexpected error calling filepath.Glob(%q): %v", test.wantNoFile, err)
-				}
-				if len(paths) != 0 {
-					t.Errorf("unexpected files found: %v", paths)
 				}
 			}
 		})
@@ -1875,8 +2432,22 @@ func retryHandler() http.HandlerFunc {
 			w.Write([]byte(`{"hello":"world"}`))
 			return
 		}
-		w.WriteHeader(rand.Intn(100) + 500)
+		// Any 5xx except 501 will result in a retry.
+		w.WriteHeader(500)
 		count++
+	}
+}
+
+//nolint:errcheck // No point checking errors in test server.
+func tokenAuthHandler(want string, handle http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		auth := r.Header.Get("Authorization")
+		if auth != want {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusBadRequest)
+			return
+		}
+
+		handle(w, r)
 	}
 }
 
@@ -1885,7 +2456,7 @@ func digestAuthHandler(user, pass, realm, nonce string, handle http.HandlerFunc)
 	chal := &digest.Challenge{
 		Realm:     realm,
 		Nonce:     nonce,
-		Algorithm: "MD5",
+		Algorithm: "SHA-256",
 		QOP:       []string{"auth"},
 	}
 	return func(w http.ResponseWriter, r *http.Request) {

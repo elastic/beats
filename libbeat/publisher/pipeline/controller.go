@@ -28,7 +28,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -102,10 +101,10 @@ func newOutputController(
 	return controller, nil
 }
 
-func (c *outputController) WaitClose(timeout time.Duration) error {
+func (c *outputController) WaitClose(timeout time.Duration, force bool) error {
 	// First: signal the queue that we're shutting down, and wait up to the
 	// given duration for it to drain and process ACKs.
-	c.closeQueue(timeout)
+	c.closeQueue(timeout, force)
 
 	// We've drained the queue as much as we can, signal eventConsumer to
 	// close, and wait for it to finish. After consumer.close returns,
@@ -113,11 +112,7 @@ func (c *outputController) WaitClose(timeout time.Duration) error {
 	c.consumer.close()
 	close(c.workerChan)
 
-	// Signal the output workers to close. This step is a hint, and carries
-	// no guarantees. For example, on close the Elasticsearch output workers
-	// will close idle connections, but will not change any behavior for
-	// active connections, giving any remaining events a chance to ingest
-	// before we terminate.
+	// Signal the output workers to close.
 	for _, out := range c.workers {
 		out.Close()
 	}
@@ -140,8 +135,8 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	// create new output group with the shared work queue
 	clients := outGrp.Clients
 	c.workers = make([]outputWorker, len(clients))
+	logger := c.beat.Logger.Named("publisher_pipeline_output")
 	for i, client := range clients {
-		logger := logp.NewLogger("publisher_pipeline_output")
 		c.workers[i] = makeClientWorker(c.workerChan, client, logger, c.monitors.Tracer)
 	}
 
@@ -194,14 +189,18 @@ func (c *outputController) Reload(
 
 // Close the queue, waiting up to the specified timeout for pending events
 // to complete.
-func (c *outputController) closeQueue(timeout time.Duration) {
+func (c *outputController) closeQueue(timeout time.Duration, force bool) {
 	c.queueLock.Lock()
 	defer c.queueLock.Unlock()
 	if c.queue != nil {
-		c.queue.Close()
+		c.queue.Close(false)
 		select {
 		case <-c.queue.Done():
 		case <-time.After(timeout):
+			if force {
+				c.queue.Close(force)
+				<-c.queue.Done()
+			}
 		}
 	}
 	for _, req := range c.pendingRequests {
@@ -209,11 +208,6 @@ func (c *outputController) closeQueue(timeout time.Duration) {
 		// pipeline but it was shut down before any output was set.
 		// In this case, return nil and Pipeline.ConnectWith will pass on a
 		// real error to the caller.
-		// NOTE: under the current shutdown process, Pipeline.Close (and hence
-		// outputController.Close) is ~never called. So even if we did have
-		// blocked callers here, in a real shutdown they will never be woken
-		// up. But in hopes of a day when the shutdown process is more robust,
-		// I've decided to do the right thing here anyway.
 		req.responseChan <- nil
 	}
 }
@@ -274,10 +268,7 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 	// Queue metrics are reported under the pipeline namespace
 	var pipelineMetrics *monitoring.Registry
 	if c.monitors.Metrics != nil {
-		pipelineMetrics := c.monitors.Metrics.GetRegistry("pipeline")
-		if pipelineMetrics == nil {
-			pipelineMetrics = c.monitors.Metrics.NewRegistry("pipeline")
-		}
+		pipelineMetrics = c.monitors.Metrics.GetOrCreateRegistry("pipeline")
 	}
 	queueObserver := queue.NewQueueObserver(pipelineMetrics)
 
@@ -290,7 +281,7 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 	c.queue = queue
 
 	if c.monitors.Telemetry != nil {
-		queueReg := c.monitors.Telemetry.NewRegistry("queue")
+		queueReg := c.monitors.Telemetry.GetOrCreateRegistry("queue")
 		monitoring.NewString(queueReg, "name").Set(c.queue.QueueType())
 	}
 

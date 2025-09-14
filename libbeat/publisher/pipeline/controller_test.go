@@ -20,12 +20,12 @@ package pipeline
 import (
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"testing/quick"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -33,6 +33,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	//"github.com/elastic/beats/v7/libbeat/tests/resources"
 
@@ -63,15 +65,16 @@ func TestOutputReload(t *testing.T) {
 					fmt.Sprintf("mem.events: %v", numEventsToPublish))
 				_ = queueConfig.Unpack(conf)
 
-				var publishedCount atomic.Uint
+				var publishedCount atomic.Uint64
 				countingPublishFn := func(batch publisher.Batch) error {
-					publishedCount.Add(uint(len(batch.Events())))
+					publishedCount.Add(uint64(len(batch.Events())))
 					return nil
 				}
 
+				logger := logptest.NewTestingLogger(t, "")
 				pipeline, err := New(
-					beat.Info{},
-					Monitors{},
+					beat.Info{Logger: logger},
+					Monitors{Logger: logger},
 					queueConfig,
 					outputs.Group{},
 					Settings{},
@@ -107,7 +110,7 @@ func TestOutputReload(t *testing.T) {
 
 				timeout := 20 * time.Second
 				return waitUntilTrue(timeout, func() bool {
-					return numEventsToPublish == publishedCount.Load()
+					return uint64(numEventsToPublish) == publishedCount.Load()
 				})
 			}, &quick.Config{MaxCount: 25})
 
@@ -122,6 +125,9 @@ func TestSetEmptyOutputsSendsNilChannel(t *testing.T) {
 	// Just fill out enough to confirm what's sent to the event consumer,
 	// we don't want to start up real helper routines.
 	controller := outputController{
+		beat: beat.Info{
+			Logger: logptest.NewTestingLogger(t, ""),
+		},
 		consumer: &eventConsumer{
 			targetChan: make(chan consumerTarget, 2),
 		},
@@ -140,6 +146,7 @@ func TestSetEmptyOutputsSendsNilChannel(t *testing.T) {
 }
 
 func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	controller := outputController{
 		// Set event limit to 1 so we can easily tell if our settings
 		// were used to create the queue.
@@ -152,6 +159,9 @@ func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
 			// send configuration updates without blocking.
 			targetChan:    make(chan consumerTarget, 4),
 			retryObserver: nilObserver,
+		},
+		beat: beat.Info{
+			Logger: logger,
 		},
 	}
 	// Set to an empty output group. This should not create a queue.
@@ -166,6 +176,7 @@ func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
 }
 
 func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	// If there are queue settings provided by both the pipeline and
 	// the output, the output settings should be used.
 	controller := outputController{
@@ -175,6 +186,9 @@ func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 		consumer: &eventConsumer{
 			targetChan:    make(chan consumerTarget, 4),
 			retryObserver: nilObserver,
+		},
+		beat: beat.Info{
+			Logger: logger,
 		},
 	}
 	controller.Set(outputs.Group{
@@ -192,6 +206,7 @@ func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 	failedFactory := func(_ *logp.Logger, _ queue.Observer, _ int, _ queue.EncoderFactory) (queue.Queue, error) {
 		return nil, fmt.Errorf("This queue creation intentionally failed")
 	}
+	logger := logptest.NewTestingLogger(t, "")
 	controller := outputController{
 		queueFactory: failedFactory,
 		consumer: &eventConsumer{
@@ -199,7 +214,10 @@ func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 			retryObserver: nilObserver,
 		},
 		monitors: Monitors{
-			Logger: logp.NewLogger("tests"),
+			Logger: logger.Named("tests"),
+		},
+		beat: beat.Info{
+			Logger: logger,
 		},
 	}
 	controller.Set(outputs.Group{
@@ -210,29 +228,36 @@ func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 }
 
 func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	controller := outputController{
 		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1}),
 		consumer: &eventConsumer{
 			targetChan:    make(chan consumerTarget, 4),
 			retryObserver: nilObserver,
 		},
+		beat: beat.Info{
+			Logger: logger,
+		},
 	}
 	// Send producer requests from different goroutines. They should all
 	// block, because there is no queue, but they should become unblocked
 	// once we set a nonempty output.
 	const producerCount = 10
-	remaining := atomic.MakeInt(producerCount)
+	var remaining atomic.Int64
+	remaining.Store(producerCount)
 	for i := 0; i < producerCount; i++ {
 		go func() {
 			controller.queueProducer(queue.ProducerConfig{})
-			remaining.Dec()
+			remaining.Add(-1)
 		}()
 	}
 	allStarted := waitUntilTrue(time.Second, func() bool {
+		controller.queueLock.Lock()
+		defer controller.queueLock.Unlock()
 		return len(controller.pendingRequests) == producerCount
 	})
 	assert.True(t, allStarted, "All queueProducer requests should be saved as pending requests by outputController")
-	assert.Equal(t, producerCount, remaining.Load(), "No queueProducer request should return before an output is set")
+	assert.Equal(t, int64(producerCount), remaining.Load(), "No queueProducer request should return before an output is set")
 
 	// Set the output, then ensure that it unblocks all the waiting goroutines.
 	controller.Set(outputs.Group{
@@ -242,4 +267,31 @@ func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 		return remaining.Load() == 0
 	})
 	assert.True(t, allFinished, "All queueProducer requests should be unblocked once an output is set")
+}
+
+func TestQueueMetrics(t *testing.T) {
+	// More thorough testing of queue metrics are in the queue package,
+	// here we just want to make sure that they appear under the right
+	// monitoring namespace.
+	reg := monitoring.NewRegistry()
+	logger := logptest.NewTestingLogger(t, "")
+	controller := outputController{
+		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1000}),
+		consumer: &eventConsumer{
+			targetChan:    make(chan consumerTarget, 4),
+			retryObserver: nilObserver,
+		},
+		monitors: Monitors{Metrics: reg},
+		beat: beat.Info{
+			Logger: logger,
+		},
+	}
+	controller.Set(outputs.Group{
+		Clients: []outputs.Client{newMockClient(nil)},
+	})
+	entry := reg.Get("pipeline.queue.max_events")
+	require.NotNil(t, entry, "pipeline.queue.max_events must exist")
+	value, ok := entry.(*monitoring.Uint)
+	require.True(t, ok, "pipeline.queue.max_events must be a *monitoring.Uint")
+	assert.Equal(t, uint64(1000), value.Get(), "pipeline.queue.max_events should match the events configuration key")
 }

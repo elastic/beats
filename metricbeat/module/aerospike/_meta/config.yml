@@ -7,6 +7,16 @@
   # Aerospike Cluster Name
   #cluster_name: myclustername
 
+  # Username of hosts. Empty by default.
+  #username: root
+
+  # Password of hosts. Empty by default.
+  #password: secret
+
+  # Authentication modes: https://aerospike.com/docs/server/guide/security/access-control
+  # Possible values: internal (default), external, pki
+  #auth_mode: internal
+
   # Optional SSL/TLS (disabled by default)
   #ssl.enabled: true
 

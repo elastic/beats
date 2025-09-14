@@ -23,8 +23,8 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-
-	"github.com/gorilla/mux"
+	"strings"
+	"sync"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -33,18 +33,17 @@ import (
 // Server takes care of correctly starting the HTTP component of the API
 // and will answer all the routes defined in the received ServeMux.
 type Server struct {
-	log    *logp.Logger
-	mux    *mux.Router
-	l      net.Listener
-	config Config
+	log        *logp.Logger
+	mux        *http.ServeMux
+	l          net.Listener
+	config     Config
+	wg         sync.WaitGroup
+	mutex      sync.Mutex
+	httpServer *http.Server
 }
 
 // New creates a new API Server with no routes attached.
 func New(log *logp.Logger, config *config.C) (*Server, error) {
-	if log == nil {
-		log = logp.NewLogger("")
-	}
-
 	cfg := DefaultConfig
 	err := config.Unpack(&cfg)
 	if err != nil {
@@ -57,7 +56,7 @@ func New(log *logp.Logger, config *config.C) (*Server, error) {
 	}
 
 	return &Server{
-		mux:    mux.NewRouter().StrictSlash(true),
+		mux:    http.NewServeMux(),
 		l:      l,
 		config: cfg,
 		log:    log.Named("api"),
@@ -66,31 +65,52 @@ func New(log *logp.Logger, config *config.C) (*Server, error) {
 
 // Start starts the HTTP server and accepting new connection.
 func (s *Server) Start() {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
 	s.log.Info("Starting stats endpoint")
+	s.wg.Add(1)
+	s.httpServer = &http.Server{Handler: s.mux} //nolint:gosec // Keep original behavior
 	go func(l net.Listener) {
+		defer s.wg.Done()
 		s.log.Infof("Metrics endpoint listening on: %s (configured: %s)", l.Addr().String(), s.config.Host)
-		err := http.Serve(l, s.mux)
+
+		err := s.httpServer.Serve(l)
 		s.log.Infof("Stats endpoint (%s) finished: %v", l.Addr().String(), err)
 	}(s.l)
 }
 
 // Stop stops the API server and free any resource associated with the process like unix sockets.
 func (s *Server) Stop() error {
-	return s.l.Close()
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	if s.httpServer == nil {
+		return nil
+	}
+	if err := s.httpServer.Close(); err != nil {
+		return fmt.Errorf("error closing monitoring server: %w", err)
+	}
+	s.wg.Wait()
+	return nil
 }
 
 // AttachHandler will attach a handler at the specified route. Routes are
 // matched in the order in which that are attached.
+// Attaching the same route twice will panic
 func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
-	if err := s.mux.Handle(route, h).GetError(); err != nil {
-		return err
+	s.mux.Handle(route, h)
+	if !strings.HasSuffix(route, "/") && !strings.HasSuffix(route, "{$}") {
+		// register /route/ handler
+		s.mux.Handle(route+"/{$}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// redirect /route/ to /route
+			http.Redirect(w, r, strings.TrimSuffix(r.URL.String(), "/"), http.StatusMovedPermanently)
+		}))
 	}
 	s.log.Debugf("Attached handler at %q to server.", route)
 	return nil
 }
 
 // Router returns the mux.Router that handles all request to the server.
-func (s *Server) Router() *mux.Router {
+func (s *Server) Router() *http.ServeMux {
 	return s.mux
 }
 

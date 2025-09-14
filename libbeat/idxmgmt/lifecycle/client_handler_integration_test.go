@@ -20,12 +20,13 @@
 package lifecycle
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -33,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	libversion "github.com/elastic/elastic-agent-libs/version"
@@ -136,12 +138,14 @@ func newRawESClient(t *testing.T) ESClient {
 		Password:         getPass(),
 		CompressionLevel: 3,
 		Transport:        transport,
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err := client.Connect(); err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	if err := client.Connect(ctx); err != nil {
 		t.Fatalf("Failed to connect to Test Elasticsearch instance: %v", err)
 	}
 

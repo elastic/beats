@@ -23,7 +23,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-sysinfo"
@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -50,7 +50,7 @@ func init() {
 	processors.RegisterPlugin(processorName, New)
 	jsprocessor.RegisterPlugin("AddHostMetadata", New)
 
-	reg = monitoring.Default.NewRegistry(logName, monitoring.DoNotReport)
+	reg = monitoring.Default.GetOrCreateRegistry(logName, monitoring.DoNotReport)
 }
 
 type metrics struct {
@@ -70,7 +70,7 @@ type addHostMetadata struct {
 }
 
 // New constructs a new add_host_metadata processor.
-func New(cfg *config.C) (beat.Processor, error) {
+func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
@@ -79,7 +79,7 @@ func New(cfg *config.C) (beat.Processor, error) {
 	p := &addHostMetadata{
 		config: c,
 		data:   mapstr.NewPointer(nil),
-		logger: logp.NewLogger(logName),
+		logger: log.Named(logName),
 		metrics: metrics{
 			FQDNLookupFailed: monitoring.NewInt(reg, "fqdn_lookup_failed"),
 		},
@@ -101,7 +101,7 @@ func New(cfg *config.C) (beat.Processor, error) {
 	cbID, err := uuid.NewV4()
 	// if we fail, fall back to the processor name, hope for the best.
 	if err != nil {
-		p.logger.Errorf("error generating ID for FQDN callback, reverting to processor name: %w", err)
+		p.logger.Errorf("error generating ID for FQDN callback, reverting to processor name: %v", err)
 		cbIDStr = processorName
 	} else {
 		cbIDStr = cbID.String()
@@ -262,7 +262,7 @@ func (p *addHostMetadata) updateOrExpire(useFQDN bool) {
 	go func() {
 		err := p.loadData(false, useFQDN)
 		if err != nil {
-			p.logger.Errorf("error updating data for processor: %w")
+			p.logger.Errorf("error updating data for processor: %v", err)
 			updateChanSuccess <- false
 			return
 		}

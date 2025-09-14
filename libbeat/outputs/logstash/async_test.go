@@ -25,9 +25,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport"
 )
 
@@ -51,10 +51,14 @@ func TestAsyncStructuredEvent(t *testing.T) {
 }
 
 func makeAsyncTestClient(conn *transport.Client) testClientDriver {
-	config := defaultConfig()
+	config := DefaultConfig()
 	config.Timeout = 1 * time.Second
 	config.Pipelining = 3
-	client, err := newAsyncClient(beat.Info{}, conn, outputs.NewNilObserver(), &config)
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		panic(err)
+	}
+	client, err := newAsyncClient(logger, "beat_version", conn, outputs.NewNilObserver(), &config)
 	if err != nil {
 		panic(err)
 	}
@@ -72,6 +76,8 @@ func newAsyncTestDriver(client outputs.NetworkClient) *testAsyncDriver {
 	go func() {
 		defer driver.wg.Done()
 
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
 		for {
 			cmd, ok := <-driver.ch
 			if !ok {
@@ -82,7 +88,7 @@ func newAsyncTestDriver(client outputs.NetworkClient) *testAsyncDriver {
 			case driverCmdQuit:
 				return
 			case driverCmdConnect:
-				driver.client.Connect()
+				driver.client.Connect(ctx)
 			case driverCmdClose:
 				driver.client.Close()
 			case driverCmdPublish:

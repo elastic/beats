@@ -64,9 +64,6 @@ type Settings struct {
 	RetryInterval    time.Duration
 	MaxRetryInterval time.Duration
 
-	// EncryptionKey is used to encrypt data if SchemaVersion 2 is used.
-	EncryptionKey []byte
-
 	// UseCompression enables or disables LZ4 compression
 	UseCompression bool
 }

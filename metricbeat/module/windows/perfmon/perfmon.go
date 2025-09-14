@@ -46,14 +46,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-	reader, err := NewReader(config)
+	reader, err := NewReader(config, base.Logger())
 	if err != nil {
 		return nil, fmt.Errorf("initialization of reader failed: %w", err)
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
 		reader:        reader,
-		log:           logp.NewLogger(metricsetName),
+		log:           base.Logger().Named(metricsetName),
 	}, nil
 }
 

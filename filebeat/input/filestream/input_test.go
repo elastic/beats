@@ -18,6 +18,8 @@
 package filestream
 
 import (
+	"bytes"
+	"compress/gzip"
 	"context"
 	"fmt"
 	"os"
@@ -26,16 +28,22 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/filebeat/testing/gziptest"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func BenchmarkFilestream(b *testing.B) {
@@ -50,6 +58,7 @@ func BenchmarkFilestream(b *testing.B) {
 			cfg := `
 type: filestream
 prospector.scanner.check_interval: 1s
+prospector.scanner.fingerprint.enabled: false
 paths:
     - ` + filename + `
 `
@@ -91,6 +100,7 @@ paths:
 			cfg := `
 type: filestream
 prospector.scanner.check_interval: 1s
+prospector.scanner.fingerprint.enabled: false
 paths:
     - ` + ingestPath + `
 `
@@ -145,8 +155,10 @@ func TestTakeOverTags(t *testing.T) {
 			filename := generateFile(t, t.TempDir(), 5)
 			cfg := fmt.Sprintf(`
 type: filestream
+id: foo
 prospector.scanner.check_interval: 1s
-take_over: %t
+prospector.scanner.fingerprint.enabled: false
+take_over.enabled: %t
 paths:
     - %s`, testCase.takeOver, filename)
 			runner := createFilestreamTestRunner(context.Background(), t, testCase.name, cfg, 5, true)
@@ -155,6 +167,152 @@ paths:
 				testCase.testFunc(t, event)
 			}
 		})
+	}
+}
+
+func TestNewFile(t *testing.T) {
+	tempDir := t.TempDir()
+
+	plainFileContent := "this is a plain file"
+	plainFilePath := filepath.Join(tempDir, "plain.txt")
+	err := os.WriteFile(plainFilePath, []byte(plainFileContent), 0644)
+	require.NoError(t, err, "could not write plain file")
+
+	gzipFileContent := "this is a gzipped file"
+	var gzipBuf bytes.Buffer
+	gzipWriter := gzip.NewWriter(&gzipBuf)
+	_, err = gzipWriter.Write([]byte(gzipFileContent))
+	require.NoError(t, err)
+	err = gzipWriter.Close()
+	require.NoError(t, err)
+	gzippedFilePath := filepath.Join(tempDir, "test.gz")
+	err = os.WriteFile(gzippedFilePath, gzipBuf.Bytes(), 0644)
+	require.NoError(t, err)
+
+	testCases := map[string]struct {
+		gzipEnabled   bool
+		filePath      string
+		expectedType  interface{}
+		expectError   bool
+		errorContains string
+		setup         func(t *testing.T, filePath string) *os.File
+	}{
+		"gzip_disabled_returns_plain_file": {
+			gzipEnabled:  false,
+			filePath:     plainFilePath,
+			expectedType: &plainFile{},
+		},
+		"gzip_enabled_with_plain_file_returns_plain_file": {
+			gzipEnabled:  true,
+			filePath:     plainFilePath,
+			expectedType: &plainFile{},
+		},
+		"gzip_enabled_with_gzip_file_returns_gzip_reader": {
+			gzipEnabled:  true,
+			filePath:     gzippedFilePath,
+			expectedType: &gzipSeekerReader{},
+		},
+		"gzip_enabled_with_unreadable_file_returns_error": {
+			gzipEnabled: true,
+			filePath:    plainFilePath, // content doesn't matter
+			setup: func(t *testing.T, filePath string) *os.File {
+				// Return a file that is already closed to trigger a read error
+				// in IsGZIP
+				f, err := os.Open(filePath)
+				require.NoError(t, err)
+				f.Close()
+				return f
+			},
+			expectError:   true,
+			errorContains: "gzip detection error",
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			inp := &filestream{
+				gzipExperimental: tc.gzipEnabled,
+				readerConfig:     defaultReaderConfig(),
+			}
+
+			var rawFile *os.File
+			if tc.setup != nil {
+				rawFile = tc.setup(t, tc.filePath)
+			} else {
+				var err error
+				rawFile, err = os.Open(tc.filePath)
+				require.NoError(t, err)
+			}
+			defer rawFile.Close()
+
+			file, err := inp.newFile(rawFile)
+
+			if tc.expectError {
+				require.Error(t, err)
+				if tc.errorContains != "" {
+					assert.Contains(t, err.Error(), tc.errorContains)
+				}
+				assert.Nil(t, file)
+			} else {
+				require.NoError(t, err)
+				assert.NotNil(t, file)
+				assert.IsType(t, tc.expectedType, file)
+			}
+		})
+	}
+}
+
+func TestOpenFile_GZIPNeverTruncated(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "", zap.AddStacktrace(zapcore.ErrorLevel+1))
+
+	tempDir := t.TempDir()
+	plainData := []byte("some plain data\n")
+
+	plainPath := filepath.Join(tempDir, "plain.txt")
+	err := os.WriteFile(plainPath, plainData, 0644)
+	require.NoError(t, err, "could not save plain file")
+
+	data := gziptest.Compress(t, plainData, gziptest.CorruptNone)
+	gzPath := filepath.Join(tempDir, "test.gz")
+	err = os.WriteFile(gzPath, data, 0644)
+	require.NoError(t, err, "could not save gzip file")
+
+	tcs := []struct {
+		name             string
+		gzipExperimental bool
+		path             string
+		want             bool
+		errMsg           string
+	}{
+		{
+			name:             "plain file is truncated",
+			gzipExperimental: false,
+			path:             plainPath,
+			want:             true,
+			errMsg:           "plain file should be considered truncated",
+		},
+		{
+			name:             "GZIP file is never truncated",
+			gzipExperimental: true,
+			path:             gzPath,
+			want:             false,
+			errMsg:           "GZIP file skips truncated validation",
+		},
+	}
+
+	for _, tc := range tcs {
+		inp := filestream{
+			gzipExperimental: tc.gzipExperimental,
+			encodingFactory:  encoding.Plain,
+			readerConfig:     readerConfig{BufferSize: 32},
+		}
+
+		f, _, truncated, err := inp.openFile(
+			log, tc.path, int64(len(plainData)*2))
+		require.NoError(t, err, "unexpected error")
+		f.Close()
+
+		assert.Equal(t, tc.want, truncated, tc.errMsg)
 	}
 }
 
@@ -176,7 +334,7 @@ func runFilestreamBenchmark(b *testing.B, testID string, cfg string, expEventCou
 // with the given configuration and event limit.
 // `testID` must be unique for each test run
 // `cfg` must be a valid YAML string containing valid filestream configuration
-// `eventLimit` is an amount of produced events after which the filestream will shutdown
+// `eventLimit` is an amount of produced events after which the filestream will shut down
 // `collectEvents` if `true` the runner will return a list of all events produced by the filestream input.
 // Events should not be collected in benchmarks due to high extra costs of using the channel.
 //
@@ -191,10 +349,15 @@ func createFilestreamTestRunner(ctx context.Context, b testing.TB, testID string
 	require.NoError(b, err)
 
 	ctx, cancel := context.WithCancel(ctx)
-	context := v2.Context{
-		Logger:      logger,
-		ID:          testID,
-		Cancelation: ctx,
+	v2ctx := v2.Context{
+		ID:              testID,
+		IDWithoutName:   testID,
+		Name:            "filestream-test",
+		Agent:           beat.Info{},
+		Cancelation:     ctx,
+		StatusReporter:  nil,
+		MetricsRegistry: monitoring.NewRegistry(),
+		Logger:          logger,
 	}
 
 	connector, events := newTestPipeline(eventLimit, collectEvents)
@@ -212,7 +375,7 @@ func createFilestreamTestRunner(ctx context.Context, b testing.TB, testID string
 	}()
 
 	return func(t testing.TB) []beat.Event {
-		err := input.Run(context, connector)
+		err := input.Run(v2ctx, connector)
 		require.NoError(b, err)
 
 		return out
@@ -232,9 +395,11 @@ func generateFile(t testing.TB, dir string, lineCount int) string {
 	return filename
 }
 
-func createTestStore(t testing.TB) loginp.StateStore {
+func createTestStore(t testing.TB) statestore.States {
 	return &testStore{registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend())}
 }
+
+var _ statestore.States = (*testStore)(nil)
 
 type testStore struct {
 	registry *statestore.Registry
@@ -244,7 +409,7 @@ func (s *testStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testStore) Access() (*statestore.Store, error) {
+func (s *testStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filestream-benchmark")
 }
 

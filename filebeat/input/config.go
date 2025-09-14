@@ -22,6 +22,7 @@ import (
 
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var defaultConfig = inputConfig{
@@ -37,8 +38,13 @@ type inputConfig struct {
 
 func (c *inputConfig) Validate() error {
 	if c.InputType != "" {
-		cfgwarn.Deprecate("6.0.0", "input_type input config is deprecated. Use type instead.")
 		c.Type = c.InputType
 	}
 	return nil
+}
+
+func (c *inputConfig) checkUnsupportedConfig(logger *logp.Logger) {
+	if c.InputType != "" {
+		logger.Warn(cfgwarn.Deprecate("6.0.0", "input_type input config is deprecated. Use type instead."))
+	}
 }

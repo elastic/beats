@@ -6,6 +6,7 @@ package billing
 
 import (
 	"context"
+	"crypto/fips140"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -62,6 +63,7 @@ type MetricSet struct {
 	*aws.MetricSet
 	logger             *logp.Logger
 	CostExplorerConfig CostExplorerConfig `config:"cost_explorer_config"`
+	PreviousEndTime    time.Time
 }
 
 // CostExplorerConfig holds a configuration specific for billing metricset.
@@ -73,7 +75,7 @@ type CostExplorerConfig struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := logp.NewLogger(metricsetName)
+	logger := base.Logger().Named(metricsetName)
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, fmt.Errorf("error creating aws metricset: %w", err)
@@ -117,11 +119,21 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return err
 	}
+
+	// Starting from Go 1.24, when FIPS 140-3 mode is active, fips140.Enabled() will return true.
+	// So, regardless of whether `fips_enabled` is set to true or false, when FIPS 140-3 mode is active, the
+	// resolver will resolve to the FIPS endpoint.
+	// See: https://go.dev/doc/security/fips140#fips-140-3-mode
+	if fips140.Enabled() {
+		config.AWSConfig.FIPSEnabled = true
+	}
+
 	// Get startDate and endDate
 	startDate, endDate := getStartDateEndDate(m.Period)
 
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency, m.PreviousEndTime)
+	m.PreviousEndTime = endTime
 
 	// get cost metrics from cost explorer
 	awsBeatsConfig := m.MetricSet.AwsConfig.Copy()
@@ -170,7 +182,7 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 	endTime time.Time) []mb.Event {
 	var events []mb.Event
 	namespace := "AWS/Billing"
-	listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, m.IncludeLinkedAccounts, m.MonitoringAccountID, svcCloudwatch)
+	listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, svcCloudwatch)
 	if err != nil {
 		m.Logger().Error(err.Error())
 		return nil
@@ -225,6 +237,15 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 	if err != nil {
 		return nil
 	}
+
+	// Starting from Go 1.24, when FIPS 140-3 mode is active, fips140.Enabled() will return true.
+	// So, regardless of whether `fips_enabled` is set to true or false, when FIPS 140-3 mode is active, the
+	// resolver will resolve to the FIPS endpoint.
+	// See: https://go.dev/doc/security/fips140#fips-140-3-mode
+	if fips140.Enabled() {
+		config.AWSConfig.FIPSEnabled = true
+	}
+
 	if ok, _ := aws.StringInSlice("LINKED_ACCOUNT", groupByDimKeys); ok {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 
@@ -267,7 +288,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 		groupByOutput, err := svcCostExplorer.GetCostAndUsage(context.Background(), &groupByCostInput)
 		if err != nil {
 			err = fmt.Errorf("costexplorer GetCostAndUsageRequest failed: %w", err)
-			m.Logger().Errorf(err.Error())
+			m.Logger().Error(err.Error())
 			return nil
 		}
 
@@ -326,7 +347,7 @@ func (m *MetricSet) addCostMetrics(metrics map[string]costexplorertypes.MetricVa
 		costFloat, err := strconv.ParseFloat(*cost.Amount, 64)
 		if err != nil {
 			err = fmt.Errorf("strconv ParseFloat failed: %w", err)
-			m.Logger().Errorf(err.Error())
+			m.Logger().Error(err.Error())
 			continue
 		}
 

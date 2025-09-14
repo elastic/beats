@@ -20,18 +20,24 @@
 package instance
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-ucfg/yaml"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -57,7 +63,6 @@ func TestNewInstance(t *testing.T) {
 	}
 	assert.Equal(t, "testbeat", b.Info.Beat)
 	assert.Equal(t, "testbeat", b.Info.IndexPrefix)
-
 }
 
 func TestNewInstanceUUID(t *testing.T) {
@@ -119,6 +124,8 @@ func TestInitKibanaConfig(t *testing.T) {
 
 func TestEmptyMetaJson(t *testing.T) {
 	b, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
+	logger := logptest.NewTestingLogger(t, "")
+	b.Info.Logger = logger
 	if err != nil {
 		panic(err)
 	}
@@ -132,7 +139,7 @@ func TestEmptyMetaJson(t *testing.T) {
 	defer os.Remove(metaPath)
 
 	// load metadata
-	err = b.loadMeta(metaPath)
+	err = b.LoadMeta(metaPath)
 
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
 	assert.NotEqual(t, uuid.Nil, b.Info.ID, "Beats UUID is not set")
@@ -140,6 +147,8 @@ func TestEmptyMetaJson(t *testing.T) {
 
 func TestMetaJsonWithTimestamp(t *testing.T) {
 	firstBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
+	logger := logptest.NewTestingLogger(t, "")
+	firstBeat.Info.Logger = logger
 	if err != nil {
 		panic(err)
 	}
@@ -152,15 +161,16 @@ func TestMetaJsonWithTimestamp(t *testing.T) {
 	metaFile.Close()
 	defer os.Remove(metaPath)
 
-	err = firstBeat.loadMeta(metaPath)
+	err = firstBeat.LoadMeta(metaPath)
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
 
 	secondBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
+	secondBeat.Info.Logger = logger
 	assert.False(t, firstStart.Equal(secondBeat.Info.FirstStart), "Before meta.json is loaded, first start must be different")
-	err = secondBeat.loadMeta(metaPath)
+	err = secondBeat.LoadMeta(metaPath)
 	require.NoError(t, err)
 
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
@@ -247,7 +257,7 @@ elasticsearch:
 
 		update := &reload.ConfigWithMeta{Config: c}
 		m := &outputReloaderMock{}
-		reloader := b.makeOutputReloader(m)
+		reloader := b.MakeOutputReloader(m)
 
 		require.False(t, b.Config.Output.IsSet(), "the output should not be set yet")
 		require.True(t, b.isConnectionToOlderVersionAllowed(), "allow_older_versions flag should be true from 8.11")
@@ -327,10 +337,18 @@ output:
 			err = cfg.Unpack(&config)
 			require.NoError(t, err)
 
-			err = promoteOutputQueueSettings(&config)
+			logger := logptest.NewTestingLogger(t, "")
+
+			b := &Beat{Config: config, Beat: beat.Beat{
+				Info: beat.Info{
+					Logger: logger,
+				},
+			}}
+
+			err = PromoteOutputQueueSettings(b)
 			require.NoError(t, err)
 
-			ms, err := memqueue.SettingsForUserConfig(config.Pipeline.Queue.Config())
+			ms, err := memqueue.SettingsForUserConfig(b.Config.Pipeline.Queue.Config())
 			require.NoError(t, err)
 			require.Equalf(t, tc.memEvents, ms.Events, "config was: %v", config.Pipeline.Queue.Config())
 		})
@@ -433,3 +451,60 @@ output:
 		})
 	}
 }
+
+func TestLogSystemInfo(t *testing.T) {
+	tcs := []struct {
+		name     string
+		managed  bool
+		assertFn func(*testing.T, *bytes.Buffer)
+	}{
+		{
+			name: "managed mode", managed: true,
+			assertFn: func(t *testing.T, b *bytes.Buffer) {
+				assert.Empty(t, b, "logSystemInfo should not have produced any log")
+			},
+		},
+		{
+			name: "stand alone", managed: false,
+			assertFn: func(t *testing.T, b *bytes.Buffer) {
+				logs := b.String()
+				assert.Contains(t, logs, "Beat info")
+				assert.Contains(t, logs, "Build info")
+				assert.Contains(t, logs, "Go runtime info")
+			},
+		},
+	}
+	log, buff := logp.NewInMemoryLocal("beat", logp.ConsoleEncoderConfig())
+	log.WithOptions()
+
+	b, err := NewBeat("testingbeat", "test-idx", "42", false, nil)
+	b.Info.Logger = log
+	require.NoError(t, err, "could not create beat")
+
+	for _, tc := range tcs {
+		buff.Reset()
+
+		b.Manager = mockManager{enabled: tc.managed}
+		b.logSystemInfo(log)
+
+		tc.assertFn(t, buff)
+	}
+}
+
+type mockManager struct {
+	enabled bool
+}
+
+func (m mockManager) AgentInfo() client.AgentInfo         { return client.AgentInfo{} }
+func (m mockManager) CheckRawConfig(cfg *config.C) error  { return nil }
+func (m mockManager) Enabled() bool                       { return m.enabled }
+func (m mockManager) RegisterAction(action client.Action) {}
+func (m mockManager) RegisterDiagnosticHook(name, description, filename, contentType string, hook client.DiagnosticHook) {
+}
+func (m mockManager) SetPayload(payload map[string]interface{})     {}
+func (m mockManager) SetStopCallback(f func())                      {}
+func (m mockManager) Start() error                                  { return nil }
+func (m mockManager) Status() status.Status                         { return status.Status(-42) }
+func (m mockManager) Stop()                                         {}
+func (m mockManager) UnregisterAction(action client.Action)         {}
+func (m mockManager) UpdateStatus(status status.Status, msg string) {}

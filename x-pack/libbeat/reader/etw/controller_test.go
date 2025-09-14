@@ -102,6 +102,13 @@ func TestCreateRealtimeSession_EnableTraceError(t *testing.T) {
 		properties:  &EventTraceProperties{},
 		startTrace:  startTrace,
 		enableTrace: enableTrace,
+		config: Config{
+			Providers: []ProviderConfig{
+				{
+					Name: "Microsoft-Windows-Kernel-Process",
+				},
+			},
+		},
 	}
 
 	err := session.CreateRealtimeSession()

@@ -15,13 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux && cgo && withjournald
+//go:build linux
 
 package journald
 
 import (
 	"context"
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -31,31 +31,73 @@ import (
 // it only tests a single parser, but that is enough to ensure
 // we're correctly using the parsers
 func TestInputParsers(t *testing.T) {
-	inputParsersExpected := []string{"1st line\n2nd line\n3rd line", "4th line\n5th line\n6th line"}
-	env := newInputTestingEnvironment(t)
+	// If this test fails, uncomment the lopg setup line
+	// to send logs to stderr
+	// logp.DevelopmentSetup()
+	out := decompress(t, filepath.Join("testdata", "ndjson-parser.journal.gz"))
 
+	env := newInputTestingEnvironment(t)
 	inp := env.mustCreateInput(mapstr.M{
-		"paths":                 []string{path.Join("testdata", "input-multiline-parser.journal")},
-		"include_matches.match": []string{"_SYSTEMD_USER_UNIT=log-service.service"},
+		"paths": []string{out},
 		"parsers": []mapstr.M{
 			{
-				"multiline": mapstr.M{
-					"type":        "count",
-					"count_lines": 3,
+				"ndjson": mapstr.M{
+					"target": "",
 				},
 			},
 		},
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	t.Cleanup(cancelInput)
 	env.startInput(ctx, inp)
-	env.waitUntilEventCount(len(inputParsersExpected))
+	env.waitUntilEventCount(1)
+	event := env.pipeline.clients[0].GetEvents()[0]
 
-	for idx, event := range env.pipeline.clients[0].GetEvents() {
-		if got, expected := event.Fields["message"], inputParsersExpected[idx]; got != expected {
-			t.Errorf("expecting event message %q, got %q", expected, got)
-		}
+	foo, isString := event.Fields["foo"].(string)
+	if !isString {
+		t.Errorf("expecting field 'foo' to be string, got %T", event.Fields["foo"])
 	}
 
-	cancelInput()
+	answer, isInt := event.Fields["answer"].(int64)
+	if !isInt {
+		t.Errorf("expecting field 'answer' to be int64, got %T", event.Fields["answer"])
+	}
+
+	// The JSON in the test journal is: '{"foo": "bar", "answer":42}'
+	expectedFoo := "bar"
+	expectedAnswer := int64(42)
+	if foo != expectedFoo {
+		t.Errorf("expecting 'foo' from the Journal JSON to be '%s' got '%s' instead", expectedFoo, foo)
+	}
+	if answer != expectedAnswer {
+		t.Errorf("expecting 'answer' from the Journal JSON to be '%d' got '%d' instead", expectedAnswer, answer)
+	}
+}
+
+func TestPartialMessageTag(t *testing.T) {
+	out := decompress(t, filepath.Join("testdata", "ndjson-parser.journal.gz"))
+	env := newInputTestingEnvironment(t)
+	inp := env.mustCreateInput(mapstr.M{
+		"paths": []string{out},
+	})
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	t.Cleanup(cancelInput)
+	env.startInput(ctx, inp)
+	env.waitUntilEventCount(1)
+	event := env.pipeline.clients[0].GetEvents()[0]
+
+	tags, err := event.Fields.GetValue("tags")
+	if err != nil {
+		t.Fatalf("'tags' not found in event: %s", err)
+	}
+
+	tagsStrSlice, ok := tags.([]string)
+	if !ok {
+		t.Fatalf("expecting 'tags' to be []string, got %T instead", tags)
+	}
+	if tagsStrSlice[0] != "partial_message" {
+		t.Fatalf("expecting the tag 'partial_message', got %v instead", tagsStrSlice)
+	}
 }

@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
@@ -237,6 +238,28 @@ func TestPackageDatabaseMigration(t *testing.T) {
 				Type:        "brew",
 			}, pkg)
 		}
+	}
+}
+
+// TestPackageDatabaseMigrationWithEmptyPackageV1Bucket verifies that an
+// empty package.v1 bucket can be migrated to the new schema without errors.
+//
+// This is a reproduction of https://github.com/elastic/beats/issues/44294.
+func TestPackageDatabaseMigrationWithEmptyPackageV1Bucket(t *testing.T) {
+	// Create empty package.v1 bucket.
+	dbPath := filepath.Join(t.TempDir(), "beat.db")
+	ds := datastore.New(dbPath, 0o600)
+
+	bucket, err := ds.OpenBucket("package.v1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = bucket.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := ds.Update(migrateDatastoreSchema); err != nil {
+		t.Fatal(err)
 	}
 }
 

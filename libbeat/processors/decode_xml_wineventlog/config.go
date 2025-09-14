@@ -24,6 +24,7 @@ type config struct {
 	MapECSFields  bool   `config:"map_ecs_fields"`
 	IgnoreMissing bool   `config:"ignore_missing"`
 	IgnoreFailure bool   `config:"ignore_failure"`
+	Language      uint32 `config:"language"`
 }
 
 func defaultConfig() config {

@@ -9,22 +9,20 @@ package azureeventhub
 import (
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
 // newInputMetrics creates a new `*inputMetrics` to track input metrics.
-func newInputMetrics(id string, parentRegistry *monitoring.Registry) *inputMetrics {
-	reg, unregister := inputmon.NewInputRegistry(inputName, id, parentRegistry)
+func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	inputMetrics := inputMetrics{
-		unregister: unregister,
-
 		// Messages
-		receivedMessages:  monitoring.NewUint(reg, "received_messages_total"),
-		receivedBytes:     monitoring.NewUint(reg, "received_bytes_total"),
-		sanitizedMessages: monitoring.NewUint(reg, "sanitized_messages_total"),
-		processedMessages: monitoring.NewUint(reg, "processed_messages_total"),
+		receivedMessages:    monitoring.NewUint(reg, "received_messages_total"),
+		receivedBytes:       monitoring.NewUint(reg, "received_bytes_total"),
+		invalidJSONMessages: monitoring.NewUint(reg, "invalid_json_messages_total"),
+		sanitizedMessages:   monitoring.NewUint(reg, "sanitized_messages_total"),
+		processedMessages:   monitoring.NewUint(reg, "processed_messages_total"),
 
 		// Events
 		receivedEvents: monitoring.NewUint(reg, "received_events_total"),
@@ -33,9 +31,12 @@ func newInputMetrics(id string, parentRegistry *monitoring.Registry) *inputMetri
 		// General
 		processingTime: metrics.NewUniformSample(1024), // TODO: set a reasonable value for the sample size.
 		decodeErrors:   monitoring.NewUint(reg, "decode_errors_total"),
+
+		// Processor
+		processorRestarts: monitoring.NewUint(reg, "processor_restarts_total"),
 	}
 	_ = adapter.
-		NewGoMetrics(reg, "processing_time", adapter.Accept).
+		NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(inputMetrics.processingTime))
 
 	return &inputMetrics
@@ -65,15 +66,12 @@ func newInputMetrics(id string, parentRegistry *monitoring.Registry) *inputMetri
 //	  "test": "this is some message"
 //	}
 type inputMetrics struct {
-	// unregister is the cancel function to call when the input is
-	// stopping.
-	unregister func()
-
 	// Messages
-	receivedMessages  *monitoring.Uint // receivedMessages tracks the number of messages received from eventhub.
-	receivedBytes     *monitoring.Uint // receivedBytes tracks the number of bytes received from eventhub.
-	sanitizedMessages *monitoring.Uint // sanitizedMessages tracks the number of messages that were sanitized successfully.
-	processedMessages *monitoring.Uint // processedMessages tracks the number of messages that were processed successfully.
+	receivedMessages    *monitoring.Uint // receivedMessages tracks the number of messages received from eventhub.
+	receivedBytes       *monitoring.Uint // receivedBytes tracks the number of bytes received from eventhub.
+	invalidJSONMessages *monitoring.Uint // invalidJSONMessages tracks the number of messages containing invalid JSON.
+	sanitizedMessages   *monitoring.Uint // sanitizedMessages tracks the number of messages containing invalid JSON that were sanitized.
+	processedMessages   *monitoring.Uint // processedMessages tracks the number of messages that were processed successfully.
 
 	// Events
 	receivedEvents *monitoring.Uint // receivedEvents tracks the number of events received decoding messages.
@@ -82,11 +80,7 @@ type inputMetrics struct {
 	// General
 	processingTime metrics.Sample   // processingTime tracks the time it takes to process a message.
 	decodeErrors   *monitoring.Uint // decodeErrors tracks the number of errors that occurred while decoding a message.
-}
 
-// Close unregisters the metrics from the registry.
-func (m *inputMetrics) Close() {
-	if m.unregister != nil {
-		m.unregister()
-	}
+	// Processor
+	processorRestarts *monitoring.Uint // processorRestarts tracks the number of times the processor has restarted.
 }

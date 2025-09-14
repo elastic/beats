@@ -21,11 +21,13 @@ import (
 	"github.com/elastic/go-sfdc"
 	"github.com/elastic/go-sfdc/soql"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
@@ -64,7 +66,7 @@ const (
 )
 
 func TestFormQueryWithCursor(t *testing.T) {
-	logp.TestingSetup()
+	logptest.NewTestingLogger(t, "")
 
 	mockTimeNow(time.Date(2023, time.May, 18, 12, 0, 0, 0, time.UTC))
 	t.Cleanup(resetTimeNow)
@@ -211,7 +213,7 @@ var (
 )
 
 func TestInput(t *testing.T) {
-	logp.TestingSetup()
+	logptest.NewTestingLogger(t, "")
 
 	tests := []struct {
 		setupServer      func(testing.TB, http.HandlerFunc, map[string]interface{})
@@ -333,6 +335,10 @@ func TestInput(t *testing.T) {
 			if tc.timeout != 0 {
 				timeout = tc.timeout
 			}
+			inputCtx := v2.Context{
+				Logger: logp.NewLogger("salesforce"),
+				ID:     "test_id",
+			}
 
 			ctx, cancel := context.WithTimeout(context.Background(), timeout)
 			defer cancel()
@@ -370,7 +376,7 @@ func TestInput(t *testing.T) {
 				return
 			}
 
-			err = salesforceInput.run()
+			err = salesforceInput.run(inputCtx)
 			if err != nil && !tc.wantErr {
 				t.Errorf("unexpected error from running input: %v", err)
 			}
@@ -429,7 +435,9 @@ func newTestServer(newServer func(http.Handler) *httptest.Server) func(testing.T
 	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 		server := newServer(h)
 		config["url"] = server.URL
-		config["auth.oauth2"].(map[string]interface{})["user_password_flow"].(map[string]interface{})["token_url"] = server.URL
+		authOAuth2, _ := config["auth.oauth2"].(map[string]interface{})
+		userPasswordFlow, _ := authOAuth2["user_password_flow"].(map[string]interface{})
+		userPasswordFlow["token_url"] = server.URL
 		t.Cleanup(server.Close)
 	}
 }
@@ -467,7 +475,9 @@ func TestDecodeAsCSV(t *testing.T) {
 "Login","20231218054831.655","4u6LyuMrDvb_G-l1cJIQk-","00D5j00000DgAYG","0055j00000AT6I1","1219","127","/services/oauth2/token","","bY5Wfv8t/Ith7WVE","Standard","","1051271151","i","Go-http-client/1.1","","9998.0","salesforceinstance@devtest.in","TLSv1.2","ECDHE-RSA-AES256-GCM-SHA384","","","2023-12-18T05:48:31.655Z","0055j00000AT6I1AAL","Salesforce.com IP","","LOGIN_NO_ERROR","103.108.207.58"
 "Login","20231218054832.003","4u6LyuHSDv8LLVl1cJOqGV","00D5j00000DgAYG","0055j00000AT6I1","1277","104","/services/oauth2/token","","u60el7VqW8CSSKcW","Standard","","674857427","i","Go-http-client/1.1","","9998.0","salesforceinstance@devtest.in","TLSv1.2","ECDHE-RSA-AES256-GCM-SHA384","","","2023-12-18T05:48:32.003Z","0055j00000AT6I1AAL","103.108.207.58","","LOGIN_NO_ERROR","103.108.207.58"`
 
-	mp, err := decodeAsCSV([]byte(sampleELF))
+	s := &salesforceInput{log: logp.NewLogger("salesforceInput")}
+
+	mp, err := s.decodeAsCSV([]byte(sampleELF))
 	assert.NoError(t, err)
 
 	wantNumOfEvents := 2

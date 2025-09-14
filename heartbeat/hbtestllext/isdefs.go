@@ -74,7 +74,7 @@ var IsMonitorStateInLocation = func(locName string) isdef.IsDef {
 		}
 
 		if !stateIdMatch.MatchString(s.ID) {
-			return llresult.SimpleResult(path, false, fmt.Sprintf("ID %s does not match regexp pattern /%s/", s.ID, locPattern))
+			return llresult.SimpleResult(path, false, "ID %s does not match regexp pattern /%s/", s.ID, locPattern)
 		}
 		return llresult.ValidResult(path)
 	})

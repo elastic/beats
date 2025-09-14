@@ -15,18 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
+
 package docker
 
 import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 
 	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 )
 
@@ -36,8 +38,8 @@ type Client struct {
 }
 
 // NewClient builds and returns a docker Client
-func NewClient() (Client, error) {
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
+func NewClient(logger *logp.Logger) (Client, error) {
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logger)
 	return Client{cli: c}, err
 }
 
@@ -58,7 +60,7 @@ func (c Client) ContainerStart(image string, cmd []string, labels map[string]str
 		return "", fmt.Errorf("creating container: %w", err)
 	}
 
-	if err := c.cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
+	if err := c.cli.ContainerStart(ctx, resp.ID, container.StartOptions{}); err != nil {
 		return "", fmt.Errorf("starting container: %w", err)
 	}
 
@@ -66,25 +68,25 @@ func (c Client) ContainerStart(image string, cmd []string, labels map[string]str
 }
 
 // imagePull pulls an image
-func (c Client) imagePull(image string) (err error) {
+func (c Client) imagePull(img string) (err error) {
 	ctx := context.Background()
-	_, _, err = c.cli.ImageInspectWithRaw(ctx, image)
+	_, err = c.cli.ImageInspect(ctx, img)
 	if err == nil {
 		// Image already available, do nothing
 		return nil
 	}
 	for retry := 0; retry < 3; retry++ {
 		err = func() error {
-			respBody, err := c.cli.ImagePull(ctx, image, types.ImagePullOptions{})
+			respBody, err := c.cli.ImagePull(ctx, img, image.PullOptions{})
 			if err != nil {
-				return fmt.Errorf("pullling image %s: %w", image, err)
+				return fmt.Errorf("pullling image %s: %w", img, err)
 			}
 			defer respBody.Close()
 
 			// Read all the response, to be sure that the pull has finished before returning.
-			_, err = io.Copy(ioutil.Discard, respBody)
+			_, err = io.Copy(io.Discard, respBody)
 			if err != nil {
-				return fmt.Errorf("reading response for image %s: %w", image, err)
+				return fmt.Errorf("reading response for image %s: %w", img, err)
 			}
 			return nil
 		}()
@@ -108,7 +110,7 @@ func (c Client) ContainerWait(ID string) error {
 }
 
 // ContainerInspect recovers information of the container
-func (c Client) ContainerInspect(ID string) (types.ContainerJSON, error) {
+func (c Client) ContainerInspect(ID string) (container.InspectResponse, error) {
 	ctx := context.Background()
 	return c.cli.ContainerInspect(ctx, ID)
 }
@@ -122,7 +124,7 @@ func (c Client) ContainerKill(ID string) error {
 // ContainerRemove kills and removes the given container
 func (c Client) ContainerRemove(ID string) error {
 	ctx := context.Background()
-	return c.cli.ContainerRemove(ctx, ID, types.ContainerRemoveOptions{
+	return c.cli.ContainerRemove(ctx, ID, container.RemoveOptions{
 		RemoveVolumes: true,
 		Force:         true,
 	})

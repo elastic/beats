@@ -8,7 +8,7 @@ package pkg
 
 import "errors"
 
-func listRPMPackages() ([]*Package, error) {
+func listRPMPackages(_ bool) ([]*Package, error) {
 	return nil, errors.New("listing RPM packages is only supported on Linux")
 }
 

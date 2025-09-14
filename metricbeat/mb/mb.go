@@ -27,10 +27,10 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -62,9 +62,11 @@ const (
 
 // Module is the common interface for all Module implementations.
 type Module interface {
-	Name() string                      // Name returns the name of the Module.
-	Config() ModuleConfig              // Config returns the ModuleConfig used to create the Module.
-	UnpackConfig(to interface{}) error // UnpackConfig unpacks the raw module config to the given object.
+	Name() string                                           // Name returns the name of the Module.
+	Config() ModuleConfig                                   // Config returns the ModuleConfig used to create the Module.
+	UnpackConfig(to interface{}) error                      // UnpackConfig unpacks the raw module config to the given object.
+	UpdateStatus(status status.Status, msg string)          // UpdateStatus updates the status of the module. Reflected on elastic-agent.
+	SetStatusReporter(statusReporter status.StatusReporter) // SetStatusReporter updates the status reporter for the given module.
 }
 
 // BaseModule implements the Module interface.
@@ -73,9 +75,11 @@ type Module interface {
 // MetricSets, it can embed this type into another struct to satisfy the
 // Module interface requirements.
 type BaseModule struct {
-	name      string
-	config    ModuleConfig
-	rawConfig *conf.C
+	name           string
+	config         ModuleConfig
+	rawConfig      *conf.C
+	statusReporter status.StatusReporter
+	Logger         *logp.Logger
 }
 
 func (m *BaseModule) String() string {
@@ -93,6 +97,18 @@ func (m *BaseModule) Config() ModuleConfig { return m.config }
 // UnpackConfig unpacks the raw module config to the given object.
 func (m *BaseModule) UnpackConfig(to interface{}) error {
 	return m.rawConfig.Unpack(to)
+}
+
+// UpdateStatus updates the status of the module. Reflected on elastic-agent.
+func (m *BaseModule) UpdateStatus(status status.Status, msg string) {
+	if m.statusReporter != nil {
+		m.statusReporter.UpdateStatus(status, msg)
+	}
+}
+
+// SetStatusReporter sets the status repoter of the module.
+func (m *BaseModule) SetStatusReporter(statusReporter status.StatusReporter) {
+	m.statusReporter = statusReporter
 }
 
 // WithConfig re-configures the module with the given raw configuration and returns a
@@ -120,6 +136,7 @@ func (m *BaseModule) WithConfig(config conf.C) (*BaseModule, error) {
 	newBM := &BaseModule{
 		name:      m.name,
 		rawConfig: &config,
+		Logger:    m.Logger,
 	}
 
 	if err := config.Unpack(&newBM.config); err != nil {
@@ -150,50 +167,6 @@ type MetricSet interface {
 // cleanup any resources it has open at shutdown.
 type Closer interface {
 	Close() error
-}
-
-// Reporter is used by a MetricSet to report events, errors, or errors with
-// metadata. The methods return false if and only if publishing failed because
-// the MetricSet is being closed.
-//
-// Deprecated: Use ReporterV2.
-type Reporter interface {
-	Event(event mapstr.M) bool               // Event reports a single successful event.
-	ErrorWith(err error, meta mapstr.M) bool // ErrorWith reports a single error event with the additional metadata.
-	Error(err error) bool                    // Error reports a single error event.
-}
-
-// ReportingMetricSet is a MetricSet that reports events or errors through the
-// Reporter interface. Fetch is called periodically to collect events.
-//
-// Deprecated: Use ReportingMetricSetV2.
-type ReportingMetricSet interface {
-	MetricSet
-	Fetch(r Reporter)
-}
-
-// PushReporter is used by a MetricSet to report events, errors, or errors with
-// metadata. It provides a done channel used to signal that reporter should
-// stop.
-//
-// Deprecated: Use PushReporterV2.
-type PushReporter interface {
-	Reporter
-
-	// Done returns a channel that's closed when work done on behalf of this
-	// reporter should be canceled.
-	Done() <-chan struct{}
-}
-
-// PushMetricSet is a MetricSet that pushes events (rather than pulling them
-// periodically via a Fetch callback). Run is invoked to start the event
-// subscription and it should block until the MetricSet is ready to stop or
-// the PushReporter's done channel is closed.
-//
-// Deprecated: Use PushMetricSetV2.
-type PushMetricSet interface {
-	MetricSet
-	Run(r PushReporter)
 }
 
 // V2 Interfaces

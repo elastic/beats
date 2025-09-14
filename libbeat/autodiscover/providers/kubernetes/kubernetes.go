@@ -29,7 +29,7 @@ import (
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -95,8 +95,9 @@ func AutodiscoverBuilder(
 	uuid uuid.UUID,
 	c *config.C,
 	keystore keystore.Keystore,
+	logger *logp.Logger,
 ) (autodiscover.Provider, error) {
-	logger := logp.NewLogger("autodiscover")
+	logger = logger.Named("kubernetes")
 
 	errWrap := func(err error) error {
 		return fmt.Errorf("error setting up kubernetes autodiscover provider: %w", err)
@@ -109,6 +110,9 @@ func AutodiscoverBuilder(
 		return nil, errWrap(err)
 	}
 
+	// log warning about any unsupported params
+	config.checkUnsupportedParams(logger)
+
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
 		return nil, errWrap(err)
@@ -116,7 +120,7 @@ func AutodiscoverBuilder(
 
 	k8sKeystoreProvider := k8skeystore.NewKubernetesKeystoresRegistry(logger, client)
 
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, k8sKeystoreProvider)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, k8sKeystoreProvider, logger)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -143,7 +147,7 @@ func AutodiscoverBuilder(
 	if p.config.Unique {
 		p.eventManager, err = NewLeaderElectionManager(uuid, config, client, p.startLeading, p.stopLeading, logger)
 	} else {
-		p.eventManager, err = NewEventerManager(uuid, c, config, client, p.publish)
+		p.eventManager, err = NewEventerManager(uuid, c, config, client, p.publish, logger)
 	}
 
 	if err != nil {
@@ -236,16 +240,17 @@ func NewEventerManager(
 	cfg *Config,
 	client k8s.Interface,
 	publish func(event []bus.Event),
+	logger *logp.Logger,
 ) (EventManager, error) {
 	var err error
 	em := &eventerManager{}
 	switch cfg.Resource {
 	case "pod":
-		em.eventer, err = NewPodEventer(uuid, c, client, publish)
+		em.eventer, err = NewPodEventer(uuid, c, client, publish, logger)
 	case "node":
-		em.eventer, err = NewNodeEventer(uuid, c, client, publish)
+		em.eventer, err = NewNodeEventer(uuid, c, client, publish, logger)
 	case "service":
-		em.eventer, err = NewServiceEventer(uuid, c, client, publish)
+		em.eventer, err = NewServiceEventer(uuid, c, client, publish, logger)
 	default:
 		return nil, fmt.Errorf("unsupported autodiscover resource %s", cfg.Resource)
 	}
@@ -350,7 +355,7 @@ func (p *leaderElectionManager) GenerateHints(event bus.Event) bus.Event {
 func (p *leaderElectionManager) startLeaderElectorIndefinitely(ctx context.Context, lec leaderelection.LeaderElectionConfig) {
 	le, err := leaderelection.NewLeaderElector(lec)
 	if err != nil {
-		p.logger.Errorf("error while creating Leader Elector: %w", err)
+		p.logger.Errorf("error while creating Leader Elector: %v", err)
 	}
 	p.logger.Debugf("Starting Leader Elector")
 

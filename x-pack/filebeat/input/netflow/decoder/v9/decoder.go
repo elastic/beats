@@ -10,9 +10,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
@@ -29,18 +30,18 @@ type Decoder interface {
 	ReadSetHeader(*bytes.Buffer) (SetHeader, error)
 	ReadTemplateSet(setID uint16, buf *bytes.Buffer) ([]*template.Template, error)
 	ReadFieldDefinition(*bytes.Buffer) (field fields.Key, length uint16, err error)
-	GetLogger() *log.Logger
+	GetLogger() *logp.Logger
 	GetFields() fields.FieldDict
 }
 
 type DecoderV9 struct {
-	Logger *log.Logger
+	Logger *logp.Logger
 	Fields fields.FieldDict
 }
 
 var _ Decoder = (*DecoderV9)(nil)
 
-func (d DecoderV9) GetLogger() *log.Logger {
+func (d DecoderV9) GetLogger() *logp.Logger {
 	return d.Logger
 }
 
@@ -124,10 +125,10 @@ func ReadFields(d Decoder, buf *bytes.Buffer, count int) (record template.Templa
 			if length == template.VariableLength || min <= field.Length && field.Length <= max {
 				field.Info = fieldInfo
 			} else if logger != nil {
-				logger.Printf("Size of field %s in template is out of bounds (size=%d, min=%d, max=%d)", fieldInfo.Name, field.Length, min, max)
+				logger.Debugf("Size of field %s in template is out of bounds (size=%d, min=%d, max=%d)", fieldInfo.Name, field.Length, min, max)
 			}
 		} else if logger != nil {
-			logger.Printf("Field %v in template not found", key)
+			logger.Debugf("Field %v in template not found", key)
 		}
 		record.Fields[i] = field
 	}

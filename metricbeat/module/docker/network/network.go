@@ -49,7 +49,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	client, err := docker.NewDockerClient(base.HostData().URI, config)
+	client, err := docker.NewDockerClient(base.HostData().URI, config, base.Logger())
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch methods creates a list of network events for each container.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout)
+	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout, false, m.Logger())
 	if err != nil {
 		return fmt.Errorf("failed to get docker stats: %w", err)
 	}

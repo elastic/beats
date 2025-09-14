@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/gofrs/uuid"
-	"github.com/mitchellh/hashstructure"
+	"github.com/gofrs/uuid/v5"
+	"github.com/gohugoio/hashstructure"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -37,9 +37,9 @@ var moduleList = monitoring.NewUniqueList()
 var moduleListMetricsOnce sync.Once
 
 // RegisterMonitoringModules registers the modules list with the monitoring system.
-func RegisterMonitoringModules() {
+func RegisterMonitoringModules(namespace string) {
 	moduleListMetricsOnce.Do(func() {
-		monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", moduleList.Report, monitoring.Report)
+		monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), namespace, moduleList.Report, monitoring.Report)
 	})
 }
 
@@ -111,7 +111,7 @@ func (f *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, e
 		pipelineLoaderFactory: f.pipelineLoaderFactory,
 		pipelineCallbackID:    f.pipelineCallbackID,
 		overwritePipelines:    f.overwritePipelines,
-		log:                   logp.NewLogger(logName),
+		log:                   f.beatInfo.Logger.Named(logName),
 	}, nil
 }
 
@@ -168,7 +168,7 @@ func (p *inputsRunner) Start() {
 		}
 
 		// Register callback to try to load pipelines when connecting to ES.
-		callback := func(esClient *eslegclient.Connection) error {
+		callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
 			return p.moduleRegistry.LoadPipelines(esClient, p.overwritePipelines)
 		}
 		p.pipelineCallbackID, err = elasticsearch.RegisterConnectCallback(callback)

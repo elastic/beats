@@ -22,8 +22,6 @@ package summarizertesthelper
 // prevent import cycles.
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/go-lookslike"
@@ -46,11 +44,11 @@ func summaryIsdef(up uint16, down uint16) isdef.IsDef {
 	return isdef.Is("summary", func(path llpath.Path, v interface{}) *llresult.Results {
 		js, ok := v.(jobsummary.JobSummary)
 		if !ok {
-			return llresult.SimpleResult(path, false, fmt.Sprintf("expected a *jobsummary.JobSummary, got %v", v))
+			return llresult.SimpleResult(path, false, "expected a *jobsummary.JobSummary, got %v", v)
 		}
 
 		if js.Up != up || js.Down != down {
-			return llresult.SimpleResult(path, false, fmt.Sprintf("expected up/down to be %d/%d, got %d/%d", up, down, js.Up, js.Down))
+			return llresult.SimpleResult(path, false, "expected up/down to be %d/%d, got %d/%d", up, down, js.Up, js.Down)
 		}
 
 		return llresult.ValidResult(path)

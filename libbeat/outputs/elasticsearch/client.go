@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -35,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/periodic"
 	"github.com/elastic/elastic-agent-libs/testing"
 	"github.com/elastic/elastic-agent-libs/version"
 )
@@ -42,7 +44,11 @@ import (
 var (
 	errPayloadTooLarge = errors.New("the bulk payload is too large for the server. Consider to adjust `http.max_content_length` parameter in Elasticsearch or `bulk_max_size` in the beat. The batch has been dropped")
 
-	ErrTooOld = errors.New("Elasticsearch is too old. Please upgrade the instance. If you would like to connect to older instances set output.elasticsearch.allow_older_versions to true.")
+	ErrTooOld = errors.New("Elasticsearch is too old. Please upgrade the instance. If you would like to connect to older instances set output.elasticsearch.allow_older_versions to true") //nolint:staticcheck //false positive (Elasticsearch should be capitalized)
+
+	errTooMany = errors.New("Elasticsearch returned error 429 Too Many Requests, throttling connection") //nolint:staticcheck //false positive (Elasticsearch should be capitalized)
+
+	HeaderEventCount = "X-Elastic-Event-Count"
 )
 
 // Client is an elasticsearch client.
@@ -58,7 +64,10 @@ type Client struct {
 	// forwarded to this index. Otherwise, they will be dropped.
 	deadLetterIndex string
 
-	log *logp.Logger
+	log                    *logp.Logger
+	pLogIndex              *periodic.Doer
+	pLogIndexTryDeadLetter *periodic.Doer
+	pLogDeadLetter         *periodic.Doer
 }
 
 // clientSettings contains the settings for a client.
@@ -118,23 +127,24 @@ var bulkRequestParams = map[string]string{
 func NewClient(
 	s clientSettings,
 	onConnect *callbacksRegistry,
+	logger *logp.Logger,
 ) (*Client, error) {
 	pipeline := s.pipelineSelector
 	if pipeline != nil && pipeline.IsEmpty() {
 		pipeline = nil
 	}
 
-	conn, err := eslegclient.NewConnection(s.connection)
+	conn, err := eslegclient.NewConnection(s.connection, logger)
 	if err != nil {
 		return nil, err
 	}
 
-	conn.OnConnectCallback = func() error {
+	conn.OnConnectCallback = func(conn *eslegclient.Connection) error {
 		globalCallbackRegistry.mutex.Lock()
 		defer globalCallbackRegistry.mutex.Unlock()
 
 		for _, callback := range globalCallbackRegistry.callbacks {
-			err := callback(conn)
+			err := callback(conn, logger)
 			if err != nil {
 				return err
 			}
@@ -145,7 +155,7 @@ func NewClient(
 			defer onConnect.mutex.Unlock()
 
 			for _, callback := range onConnect.callbacks {
-				err := callback(conn)
+				err := callback(conn, logger)
 				if err != nil {
 					return err
 				}
@@ -154,12 +164,31 @@ func NewClient(
 		return nil
 	}
 
-	// Make sure there's a non-nil obser
+	// Make sure there's a non-nil observer
 	observer := s.observer
 	if observer == nil {
 		observer = outputs.NewNilObserver()
 	}
 
+	pLogDeadLetter := periodic.NewDoer(10*time.Second,
+		func(count uint64, d time.Duration) {
+			logger.Errorf(
+				"Failed to deliver to dead letter index %d events in last %s. Look at the event log to view the event and cause.", count, d)
+		})
+	pLogIndex := periodic.NewDoer(10*time.Second, func(count uint64, d time.Duration) {
+		logger.Warnf(
+			"Failed to index %d events in last %s: events were dropped! Look at the event log to view the event and cause.",
+			count, d)
+	})
+	pLogIndexTryDeadLetter := periodic.NewDoer(10*time.Second, func(count uint64, d time.Duration) {
+		logger.Warnf(
+			"Failed to index %d events in last %s: tried dead letter index. Look at the event log to view the event and cause.",
+			count, d)
+	})
+
+	pLogDeadLetter.Start()
+	pLogIndex.Start()
+	pLogIndexTryDeadLetter.Start()
 	client := &Client{
 		conn:             *conn,
 		indexSelector:    s.indexSelector,
@@ -167,7 +196,10 @@ func NewClient(
 		observer:         observer,
 		deadLetterIndex:  s.deadLetterIndex,
 
-		log: logp.NewLogger("elasticsearch"),
+		log:                    logger,
+		pLogDeadLetter:         pLogDeadLetter,
+		pLogIndex:              pLogIndex,
+		pLogIndexTryDeadLetter: pLogIndexTryDeadLetter,
 	}
 
 	return client, nil
@@ -208,6 +240,7 @@ func (client *Client) Clone() *Client {
 			deadLetterIndex:  client.deadLetterIndex,
 		},
 		nil, // XXX: do not pass connection callback?
+		client.log,
 	)
 	return c
 }
@@ -239,6 +272,15 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 	} else {
 		batch.ACK()
 	}
+	return publishResultForStats(stats)
+}
+
+func publishResultForStats(stats bulkResultStats) error {
+	if stats.tooMany > 0 {
+		// We're being throttled by Elasticsearch, return an error so we
+		// retry the connection with exponential backoff
+		return errTooMany
+	}
 	return nil
 }
 
@@ -265,8 +307,10 @@ func (client *Client) doBulkRequest(
 	// If we encoded any events, send the network request.
 	if len(result.events) > 0 {
 		begin := time.Now()
+		h := make(http.Header)
+		h.Set(HeaderEventCount, strconv.Itoa(len(result.events)))
 		result.status, result.response, result.connErr =
-			client.conn.Bulk(ctx, "", "", bulkRequestParams, bulkItems)
+			client.conn.Bulk(ctx, "", "", h, bulkRequestParams, bulkItems)
 		if result.connErr == nil {
 			duration := time.Since(begin)
 			client.observer.ReportLatency(duration)
@@ -323,7 +367,7 @@ func (client *Client) bulkEncodePublishRequest(version version.V, data []publish
 			client.log.Error("Elasticsearch output received unencoded publisher.Event")
 			continue
 		}
-		event := data[i].EncodedEvent.(*encodedEvent)
+		event := data[i].EncodedEvent.(*encodedEvent) //nolint:errcheck //safe to ignore type check
 		if event.err != nil {
 			// This means there was an error when encoding the event and it isn't
 			// ingestable, so report the error and continue.
@@ -449,7 +493,7 @@ func (client *Client) applyItemStatus(
 	itemMessage []byte,
 	stats *bulkResultStats,
 ) bool {
-	encodedEvent := event.EncodedEvent.(*encodedEvent)
+	encodedEvent := event.EncodedEvent.(*encodedEvent) //nolint:errcheck //safe to ignore type check
 	if itemStatus < 300 {
 		if encodedEvent.deadLetter {
 			// This was ingested into the dead letter index, not the original target
@@ -478,15 +522,15 @@ func (client *Client) applyItemStatus(
 		if encodedEvent.deadLetter {
 			// Fatal error while sending an already-failed event to the dead letter
 			// index, drop.
-			client.log.Errorf("Can't deliver to dead letter index event (status=%v). Look at the event log to view the event and cause.", itemStatus)
-			client.log.Errorw(fmt.Sprintf("Can't deliver to dead letter index event %#v (status=%v): %s", event, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
+			client.pLogDeadLetter.Add()
+			client.log.Errorw(fmt.Sprintf("Can't deliver to dead letter index event '%s' (status=%v): %s", encodedEvent, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
 			stats.nonIndexable++
 			return false
 		}
 		if client.deadLetterIndex == "" {
 			// Fatal error and no dead letter index, drop.
-			client.log.Warnf("Cannot index event (status=%v): dropping event! Look at the event log to view the event and cause.", itemStatus)
-			client.log.Warnw(fmt.Sprintf("Cannot index event %#v (status=%v): %s, dropping event!", event, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
+			client.pLogIndex.Add()
+			client.log.Warnw(fmt.Sprintf("Cannot index event '%s' (status=%v): %s, dropping event!", encodedEvent, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
 			stats.nonIndexable++
 			return false
 		}
@@ -494,8 +538,8 @@ func (client *Client) applyItemStatus(
 		// We count this as a "retryable failure", and then if the dead letter
 		// ingestion succeeds it is counted in the "deadLetter" counter
 		// rather than the "acked" counter.
-		client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Look at the event log to view the event and cause.", itemStatus)
-		client.log.Warnw(fmt.Sprintf("Cannot index event %#v (status=%v): %s, trying dead letter index", event, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
+		client.pLogIndexTryDeadLetter.Add()
+		client.log.Warnw(fmt.Sprintf("Cannot index event '%s' (status=%v): %s, trying dead letter index", encodedEvent, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
 		encodedEvent.setDeadLetter(client.deadLetterIndex, itemStatus, string(itemMessage))
 	}
 
@@ -504,8 +548,8 @@ func (client *Client) applyItemStatus(
 	return true
 }
 
-func (client *Client) Connect() error {
-	return client.conn.Connect()
+func (client *Client) Connect(ctx context.Context) error {
+	return client.conn.Connect(ctx)
 }
 
 func (client *Client) Close() error {

@@ -25,7 +25,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -69,8 +69,9 @@ func AutodiscoverBuilder(
 	uuid uuid.UUID,
 	c *config.C,
 	keystore keystore.Keystore,
+	logger *logp.Logger,
 ) (autodiscover.Provider, error) {
-	logger := logp.NewLogger("docker")
+	logger = logger.Named("docker")
 
 	errWrap := func(err error) error {
 		return fmt.Errorf("error setting up docker autodiscover provider: %w", err)
@@ -87,7 +88,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(err)
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil, logger)
 	if err != nil {
 		return nil, errWrap(err)
 	}

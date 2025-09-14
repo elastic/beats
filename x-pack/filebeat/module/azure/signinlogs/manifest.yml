@@ -10,11 +10,23 @@ var:
   - name: connection_string
   - name: storage_account
   - name: storage_account_key
+  - name: storage_account_connection_string
   - name: storage_account_container
   - name: resource_manager_endpoint
   - name: tags
     default: [forwarded]
-
+  - name: migrate_checkpoint
+    default: yes
+  - name: processor_version
+    default: "v1"
+  - name: processor_update_interval
+    default: "10s"
+  - name: processor_start_position
+    default: "earliest"
+  - name: partition_receive_timeout
+    default: "5s"
+  - name: partition_receive_count
+    default: 100
 ingest_pipeline:
   - ingest/pipeline.yml
   - ../azure-shared-pipeline.yml

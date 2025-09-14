@@ -58,9 +58,9 @@ func TestFilebeatRunsAndLogsJSONToFile(t *testing.T) {
 	logFilePath := path.Join(tempDir, "log.log")
 
 	// 2. Create the log file
-	integration.GenerateLogFile(t, logFilePath, 10, false)
+	integration.WriteLogFile(t, logFilePath, 10, false)
 
-	// 3. Write configuration file ans start Filebeat
+	// 3. Write configuration file and start Filebeat
 	filebeat.WriteConfigFile(fmt.Sprintf(filebeatBasicConfig, logFilePath, tempDir))
 	filebeat.Start()
 
@@ -78,7 +78,7 @@ func TestFilebeatRunsAndLogsJSONToFile(t *testing.T) {
 	require.Eventuallyf(t, func() bool {
 		f, err = os.Open(filebeatLogFile)
 		return err == nil
-	}, 10*time.Second, time.Millisecond, "could not read log file '%s'", filebeatLogFile)
+	}, 10*time.Second, 100*time.Millisecond, "could not read log file '%s'", filebeatLogFile)
 	defer f.Close()
 
 	r := bufio.NewScanner(f)
@@ -87,7 +87,7 @@ func TestFilebeatRunsAndLogsJSONToFile(t *testing.T) {
 		line := r.Bytes()
 		m := map[string]any{}
 		if err := json.Unmarshal(line, &m); err != nil {
-			t.Fatalf("line %d is not a valid JSON: %s", count, err)
+			t.Fatalf("line %d is not a valid JSON: %s: %s", count, err, string(line))
 		}
 		count++
 	}

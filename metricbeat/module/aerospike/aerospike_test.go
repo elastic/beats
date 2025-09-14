@@ -19,13 +19,15 @@ package aerospike
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
-	as "github.com/aerospike/aerospike-client-go"
+	as "github.com/aerospike/aerospike-client-go/v7"
 )
 
 func TestParseHost(t *testing.T) {
@@ -105,13 +107,33 @@ func pointer[T any](d T) *T {
 
 func TestParseClientPolicy(t *testing.T) {
 	sampleClusterName := "TestCluster"
+	sampleUser := "TestUser"
+	samplePassword := "MySecretPassword"
 
 	TLSPolicy := as.NewClientPolicy()
-	tlsconfig, _ := tlscommon.LoadTLSConfig(&tlscommon.Config{Enabled: pointer(true)})
+	tlsconfig, _ := tlscommon.LoadTLSConfig(&tlscommon.Config{Enabled: pointer(true)}, logptest.NewTestingLogger(t, ""))
 	TLSPolicy.TlsConfig = tlsconfig.ToConfig()
 
 	ClusterNamePolicy := as.NewClientPolicy()
 	ClusterNamePolicy.ClusterName = sampleClusterName
+
+	UserPasswordClientPolicy := as.NewClientPolicy()
+	UserPasswordClientPolicy.User = sampleUser
+	UserPasswordClientPolicy.Password = samplePassword
+
+	UserPasswordTLSPolicy := as.NewClientPolicy()
+	UserPasswordTLSPolicy.User = sampleUser
+	UserPasswordTLSPolicy.Password = samplePassword
+	UserPasswordTLSPolicy.TlsConfig = tlsconfig.ToConfig()
+
+	ExternalAuthModePolicy := as.NewClientPolicy()
+	ExternalAuthModePolicy.AuthMode = as.AuthModeExternal
+
+	PKIAuthModePolicy := as.NewClientPolicy()
+	PKIAuthModePolicy.AuthMode = as.AuthModePKI
+
+	InternalAuthModePolicy := as.NewClientPolicy()
+	InternalAuthModePolicy.AuthMode = as.AuthModeInternal
 
 	tests := []struct {
 		Name                 string
@@ -143,10 +165,70 @@ func TestParseClientPolicy(t *testing.T) {
 			expectedClientPolicy: ClusterNamePolicy,
 			expectedErr:          nil,
 		},
+		{
+			Name: "Username and password are honored",
+			Config: Config{
+				User:     sampleUser,
+				Password: samplePassword,
+			},
+			expectedClientPolicy: UserPasswordClientPolicy,
+			expectedErr:          nil,
+		},
+		{
+			Name: "Username is set and password is not set",
+			Config: Config{
+				User: sampleUser,
+			},
+			expectedClientPolicy: as.NewClientPolicy(),
+			expectedErr:          fmt.Errorf("if username is set, password should be set too"),
+		},
+		{
+			Name: "Password is set and user is not set",
+			Config: Config{
+				Password: samplePassword,
+			},
+			expectedClientPolicy: as.NewClientPolicy(),
+			expectedErr:          fmt.Errorf("if password is set, username should be set too"),
+		},
+		{
+			Name: "TLS and Basic Auth",
+			Config: Config{
+				TLS: &tlscommon.Config{
+					Enabled: pointer(true),
+				},
+				User:     sampleUser,
+				Password: samplePassword,
+			},
+			expectedClientPolicy: UserPasswordTLSPolicy,
+			expectedErr:          nil,
+		},
+		{
+			Name: "Unsupported Authentication Mode",
+			Config: Config{
+				AuthMode: "doesnotexist",
+			},
+			expectedErr: fmt.Errorf("unknown authentication mode 'doesnotexist'"),
+		},
+		{
+			Name: "External Authentication Mode",
+			Config: Config{
+				AuthMode: AUTH_MODE_EXTERNAL,
+			},
+			expectedClientPolicy: ExternalAuthModePolicy,
+			expectedErr:          fmt.Errorf("unknown authentication mode 'doesnotexist'"),
+		},
+		{
+			Name: "Internal Authentication Mode",
+			Config: Config{
+				AuthMode: AUTH_MODE_INTERNAL,
+			},
+			expectedClientPolicy: InternalAuthModePolicy,
+			expectedErr:          fmt.Errorf("unknown authentication mode 'doesnotexist'"),
+		},
 	}
 
 	for _, test := range tests {
-		result, err := ParseClientPolicy(test.Config)
+		result, err := ParseClientPolicy(test.Config, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			if test.expectedErr != nil {
 				assert.Equalf(t, test.expectedErr.Error(), err.Error(),
@@ -158,6 +240,16 @@ func TestParseClientPolicy(t *testing.T) {
 		}
 		assert.Equalf(t, test.expectedClientPolicy.ClusterName, result.ClusterName,
 			"Aerospike policy cluster name is wrong. Got '%s' expected '%s'", result.ClusterName, test.expectedClientPolicy.ClusterName)
+
+		assert.Equalf(t, test.expectedClientPolicy.User, result.User,
+			"Aerospike policy username is wrong. Got '%s' expected '%s'", result.User, test.expectedClientPolicy.User)
+
+		assert.Equalf(t, test.expectedClientPolicy.Password, result.Password,
+			"Aerospike policy password is wrong. Got '%s' expected '%s'", result.Password, test.expectedClientPolicy.Password)
+
+		assert.Equalf(t, test.expectedClientPolicy.AuthMode, result.AuthMode,
+			"Aerospike policy authentication mode is wrong. Got '%s' expected '%s'", result.AuthMode, test.expectedClientPolicy.AuthMode)
+
 		if test.Config.TLS.IsEnabled() {
 			assert.NotNil(t, result.TlsConfig, "Aerospike policy: TLS is not set even though TLS is specified in the configuration")
 		}

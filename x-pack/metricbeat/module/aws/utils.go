@@ -11,7 +11,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
+	"github.com/aws/aws-sdk-go-v2/service/apigateway"
+	"github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
+
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
@@ -31,10 +35,17 @@ const DefaultApiTimeout = 5 * time.Second
 // If durations are configured in non-whole minute periods, they are rounded up to the next minute e.g. 90s becomes 120s.
 //
 // If `latency` is configured, the period is shifted back in time by specified duration (before period alignment).
-func GetStartTimeEndTime(now time.Time, period time.Duration, latency time.Duration) (time.Time, time.Time) {
+// If endTime of the previous collection period is recorded, then use this endTime as the new startTime. This will guarantee no gap between collection timestamps.
+func GetStartTimeEndTime(now time.Time, period time.Duration, latency time.Duration, previousEndTime time.Time) (time.Time, time.Time) {
 	periodInMinutes := (period + time.Second*29).Round(time.Second * 60)
-	endTime := now.Add(latency * -1).Truncate(periodInMinutes)
-	startTime := endTime.Add(periodInMinutes * -1)
+	var startTime, endTime time.Time
+	if !previousEndTime.IsZero() {
+		startTime = previousEndTime
+		endTime = startTime.Add(periodInMinutes)
+	} else {
+		endTime = now.Add(latency * -1).Truncate(periodInMinutes)
+		startTime = endTime.Add(periodInMinutes * -1)
+	}
 	return startTime, endTime
 }
 
@@ -51,13 +62,20 @@ type MetricWithID struct {
 // API call per metric name and set of dimensions. This will increase API cost.
 // IncludeLinkedAccounts is set to true for ListMetrics API to include metrics from source accounts in addition to the
 // monitoring account.
-func GetListMetricsOutput(namespace string, regionName string, period time.Duration, includeLinkedAccounts bool, monitoringAccountID string, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]MetricWithID, error) {
+// OwningAccount works alongside IncludeLinkedAccounts as a filter mechanism to extract metrics specific to a linked account.
+func GetListMetricsOutput(namespace string, regionName string, period time.Duration, includeLinkedAccounts bool,
+	owningAccount string, monitoringAccountID string, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]MetricWithID, error) {
+
 	var metricWithAccountID []MetricWithID
 	var nextToken *string
 
 	listMetricsInput := &cloudwatch.ListMetricsInput{
 		NextToken:             nextToken,
 		IncludeLinkedAccounts: &includeLinkedAccounts,
+	}
+
+	if owningAccount != "" {
+		listMetricsInput.OwningAccount = &owningAccount
 	}
 
 	// To filter the results to show only metrics that have had data points published
@@ -80,16 +98,63 @@ func GetListMetricsOutput(namespace string, regionName string, period time.Durat
 			return metricWithAccountID, fmt.Errorf("error ListMetrics with Paginator, skipping region %s: %w", regionName, err)
 		}
 
-		// when IncludeLinkedAccounts is set to false, ListMetrics API does not return any OwningAccounts
 		for i, metric := range page.Metrics {
-			owningAccount := monitoringAccountID
-			if page.OwningAccounts != nil {
-				owningAccount = page.OwningAccounts[i]
+			if page.OwningAccounts == nil {
+				// When IncludeLinkedAccounts is set to false, ListMetrics API does not return any OwningAccounts.
+				// Hence, account ID is set to the monitoring account ID
+				metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, monitoringAccountID})
+			} else {
+				metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, page.OwningAccounts[i]})
 			}
-			metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, owningAccount})
 		}
 	}
 	return metricWithAccountID, nil
+}
+
+// GetAPIGatewayRestAPIOutput function gets results from apigw api.
+// GetRestApis Apigateway API is used to retrieve only the REST API specified info. This returns a map with the names and ids of RestAPIs configured
+// Limit variable defines maximum number of returned results per page. The default value is 25 and the maximum value is 500.
+func GetAPIGatewayRestAPIOutput(svcRestApi *apigateway.Client, limit *int32) (map[string]string, error) {
+	input := &apigateway.GetRestApisInput{}
+	if limit != nil {
+		input = &apigateway.GetRestApisInput{
+			Limit: limit,
+		}
+	}
+	ctx, cancel := getContextWithTimeout(DefaultApiTimeout)
+	defer cancel()
+	result, err := svcRestApi.GetRestApis(ctx, input)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving GetRestApis %w", err)
+	}
+
+	// Iterate and display the APIs
+	infoRestAPImap := make(map[string]string, len(result.Items))
+	for _, api := range result.Items {
+		infoRestAPImap[aws.ToString(api.Name)] = aws.ToString(api.Id)
+	}
+	return infoRestAPImap, nil
+}
+
+// GetAPIGatewayAPIOutput function gets results from apigatewayv2 api.
+// GetApis Apigateway API is used to retrieve the HTTP and WEBSOCKET specified info. This returns a map with the names and ids of relevant APIs configured
+func GetAPIGatewayAPIOutput(svcHttpApi *apigatewayv2.Client) (map[string]string, error) {
+	input := &apigatewayv2.GetApisInput{}
+
+	ctx, cancel := getContextWithTimeout(DefaultApiTimeout)
+	defer cancel()
+	result, err := svcHttpApi.GetApis(ctx, input)
+
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving GetApis %w", err)
+	}
+
+	// Iterate and display the APIs
+	infoAPImap := make(map[string]string, len(result.Items))
+	for _, api := range result.Items {
+		infoAPImap[aws.ToString(api.Name)] = aws.ToString(api.ApiId)
+	}
+	return infoAPImap, nil
 }
 
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.

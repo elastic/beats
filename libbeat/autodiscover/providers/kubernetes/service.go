@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !aix
+//go:build linux || darwin || windows
 
 package kubernetes
 
@@ -25,7 +25,7 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/utils"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
@@ -48,8 +48,14 @@ type service struct {
 }
 
 // NewServiceEventer creates an eventer that can discover and process service objects
-func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
-	logger := logp.NewLogger("autodiscover.service")
+func NewServiceEventer(
+	uuid uuid.UUID,
+	cfg *conf.C,
+	client k8s.Interface,
+	publish func(event []bus.Event),
+	logger *logp.Logger,
+) (Eventer, error) {
+	logger = logger.Named("service")
 
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
@@ -57,11 +63,14 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 		return nil, err
 	}
 
+	// log warning about any unsupported params
+	config.checkUnsupportedParams(logger)
+
 	watcher, err := kubernetes.NewNamedWatcher("service", client, &kubernetes.Service{}, kubernetes.WatchOptions{
 		SyncTimeout:  config.SyncPeriod,
 		Namespace:    config.Namespace,
 		HonorReSyncs: true,
-	}, nil)
+	}, nil, logger)
 
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Service{}, err)
@@ -71,13 +80,18 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 	var namespaceWatcher kubernetes.Watcher
 
 	metaConf := config.AddResourceMetadata
+	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
+	err = metaConf.Namespace.SetBool("use_kubeadm", -1, config.KubeAdm)
+	if err != nil {
+		logger.Errorf("couldn't set kubeadm variable for namespace due to error %+v", err)
+	}
 
 	if metaConf.Namespace.Enabled() || config.Hints.Enabled() {
 		namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
 			SyncTimeout:  config.SyncPeriod,
 			Namespace:    config.Namespace,
 			HonorReSyncs: true,
-		}, nil)
+		}, nil, logger)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Namespace{}, err)
 		}

@@ -22,8 +22,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gofrs/uuid"
-	"github.com/joeshaw/multierror"
+	"github.com/gofrs/uuid/v5"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -47,12 +46,12 @@ var (
 // will be unpacked into ModuleConfig structs). r is the Register where the
 // ModuleFactory's and MetricSetFactory's will be obtained from. This method
 // returns a Module and its configured MetricSets or an error.
-func NewModule(config *conf.C, r *Register) (Module, []MetricSet, error) {
+func NewModule(config *conf.C, r *Register, logger *logp.Logger) (Module, []MetricSet, error) {
 	if !config.Enabled() {
 		return nil, nil, ErrModuleDisabled
 	}
 
-	bm, err := newBaseModuleFromConfig(config)
+	bm, err := newBaseModuleFromConfig(config, logger)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -62,7 +61,7 @@ func NewModule(config *conf.C, r *Register) (Module, []MetricSet, error) {
 		return nil, nil, err
 	}
 
-	metricsets, err := initMetricSets(r, module)
+	metricsets, err := initMetricSets(r, module, logger)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -72,10 +71,11 @@ func NewModule(config *conf.C, r *Register) (Module, []MetricSet, error) {
 
 // newBaseModuleFromConfig creates a new BaseModule from config. The returned
 // BaseModule's name will always be lower case.
-func newBaseModuleFromConfig(rawConfig *conf.C) (BaseModule, error) {
+func newBaseModuleFromConfig(rawConfig *conf.C, logger *logp.Logger) (BaseModule, error) {
 	baseModule := BaseModule{
 		config:    DefaultModuleConfig(),
 		rawConfig: rawConfig,
+		Logger:    logger,
 	}
 	err := rawConfig.Unpack(&baseModule.config)
 	if err != nil {
@@ -106,17 +106,17 @@ func createModule(r *Register, bm BaseModule) (Module, error) {
 	return f(bm)
 }
 
-func initMetricSets(r *Register, m Module) ([]MetricSet, error) {
+func initMetricSets(r *Register, m Module, logger *logp.Logger) ([]MetricSet, error) {
 	var (
-		errs       multierror.Errors
-		metricsets []MetricSet
+		errs []error
 	)
 
-	bms, err := newBaseMetricSets(r, m)
+	bms, err := newBaseMetricSets(r, m, logger)
 	if err != nil {
 		return nil, err
 	}
 
+	metricsets := make([]MetricSet, 0, len(bms))
 	for _, bm := range bms {
 		registration, err := r.metricSetRegistration(bm.Module().Name(), bm.Name())
 		if err != nil {
@@ -151,13 +151,13 @@ func initMetricSets(r *Register, m Module) ([]MetricSet, error) {
 		metricsets = append(metricsets, metricSet)
 	}
 
-	return metricsets, errs.Err()
+	return metricsets, errors.Join(errs...)
 }
 
 // newBaseMetricSets creates a new BaseMetricSet for all MetricSets defined
 // in the module's config. An error is returned if no MetricSets are specified
 // in the module's config and no default MetricSet is defined.
-func newBaseMetricSets(r *Register, m Module) ([]BaseMetricSet, error) {
+func newBaseMetricSets(r *Register, m Module, logger *logp.Logger) ([]BaseMetricSet, error) {
 	hosts := []string{""}
 	if l := m.Config().Hosts; len(l) > 0 {
 		hosts = l
@@ -198,7 +198,7 @@ func newBaseMetricSets(r *Register, m Module) ([]BaseMetricSet, error) {
 				monitoring.NewString(metrics, "id").Set(msID)
 			}
 
-			logger := logp.NewLogger(m.Name() + "." + name)
+			logger := logger.Named(m.Name() + "." + name)
 			if m.Config().ID != "" {
 				logger = logger.With("id", m.Config().ID)
 			}
@@ -230,14 +230,6 @@ func mustHaveModule(ms MetricSet, base BaseMetricSet) error {
 // of them.
 func mustImplementFetcher(ms MetricSet) error {
 	var ifcs []string
-	if _, ok := ms.(ReportingMetricSet); ok {
-		ifcs = append(ifcs, "ReportingMetricSet")
-	}
-
-	if _, ok := ms.(PushMetricSet); ok {
-		ifcs = append(ifcs, "PushMetricSet")
-	}
-
 	if _, ok := ms.(ReportingMetricSetV2); ok {
 		ifcs = append(ifcs, "ReportingMetricSetV2")
 	}

@@ -14,7 +14,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/joeshaw/multierror"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -155,8 +154,8 @@ func init() {
 // NewV2AgentManager returns a remote config manager for the agent V2 protocol.
 // This is registered as the manager factory in init() so that calls to
 // lbmanagement.NewManager will be forwarded here.
-func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
-	logger := logp.NewLogger(lbmanagement.DebugK).Named("V2-manager")
+func NewV2AgentManager(config *conf.C, registry *reload.Registry, logger *logp.Logger) (lbmanagement.Manager, error) {
+	logger = logger.Named(lbmanagement.DebugK).Named("V2-manager")
 	c := DefaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
@@ -194,12 +193,12 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 	// debug log messages are only outputted when running in trace mode
 	lbmanagement.SetUnderAgent(true)
 
-	return NewV2AgentManagerWithClient(c, registry, agentClient)
+	return NewV2AgentManagerWithClient(c, registry, agentClient, logger)
 }
 
 // NewV2AgentManagerWithClient actually creates the manager instance used by the rest of the beats.
-func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agentClient client.V2, opts ...func(*BeatV2Manager)) (lbmanagement.Manager, error) {
-	log := logp.NewLogger(lbmanagement.DebugK)
+func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agentClient client.V2, logger *logp.Logger, opts ...func(*BeatV2Manager)) (lbmanagement.Manager, error) {
+	log := logger.Named(lbmanagement.DebugK)
 	if config.RestartOnOutputChange {
 		log.Infof("Output reload is enabled, the beat will restart as needed on change of output config")
 	}
@@ -250,7 +249,9 @@ func (cm *BeatV2Manager) RegisterDiagnosticHook(name string, description string,
 func (cm *BeatV2Manager) UpdateStatus(status status.Status, msg string) {
 	cm.mx.Lock()
 	defer cm.mx.Unlock()
-
+	if cm.status == status && cm.message == msg {
+		return
+	}
 	cm.status = status
 	cm.message = msg
 	cm.updateStatuses()
@@ -285,6 +286,7 @@ func (cm *BeatV2Manager) Start() error {
 	}
 	ctx, canceller := context.WithCancel(ctx)
 	cm.errCanceller = canceller
+
 	go cm.watchErrChan(ctx)
 	cm.client.RegisterDiagnosticHook(
 		"beat-rendered-config",
@@ -463,8 +465,8 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case err := <-cm.client.Errors():
-			// Don't print the context canceled errors that happen normally during shutdown, restart, etc
-			if !errors.Is(context.Canceled, err) {
+			// Don't print the context cancelled errors that happen normally during shutdown, restart, etc
+			if !errors.Is(err, context.Canceled) {
 				cm.logger.Errorf("elastic-agent-client error: %s", err)
 			}
 
@@ -639,9 +641,8 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 	}
 
 	// set the new log level (if nothing has changed is a noop)
-	ll, trace := getZapcoreLevel(lowestLevel)
+	ll := getZapcoreLevel(lowestLevel)
 	logp.SetLevel(ll)
-	lbmanagement.SetUnderAgentTrace(trace)
 
 	// reload the output configuration
 	restartBeat, err := cm.reloadOutput(outputUnit)
@@ -682,15 +683,65 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 	// in v2 only a single input type will be started per component, so we don't need to
 	// worry about getting multiple re-loaders (we just need the one for the type)
 	if err := cm.reloadInputs(inputUnits); err != nil {
-		merror := &multierror.MultiError{}
-		if errors.As(err, &merror) {
-			for _, err := range merror.Errors {
-				unitErr := cfgfile.UnitError{}
-				if errors.As(err, &unitErr) {
-					unitErrors[unitErr.UnitID] = append(unitErrors[unitErr.UnitID], unitErr.Err)
-					delete(healthyInputs, unitErr.UnitID)
+		type errList interface {
+			Unwrap() []error
+		}
+
+		type errWrapper interface {
+			Unwrap() error
+		}
+
+		//nolint:errorlint // Custom error wrapping, not suitable for errors.As
+		switch e := err.(type) {
+		// cfgfile.UnitError implements errWrapper, but we don't want to unwrap
+		// it, so we keep it as the first case
+		case cfgfile.UnitError:
+			// cm.reloadInputs failed when generating the Beat config, diffing
+			// the inputs to reload was not possible. So we set the error for
+			// the failed unit, set the whole Beat as failed and return
+			unitErrors[e.UnitID] = append(unitErrors[e.UnitID], e.Err)
+			cm.UpdateStatus(status.Failed, fmt.Sprintf("cannot process %q configuration: %s", e.UnitID, e.Error()))
+			return
+
+		case errWrapper:
+			// cm.reloadInputs will use fmt.Errorf and join an error slice
+			// using errors.Join, when reloading inputs fail. So to access
+			// the individual errors, we need to fist call Unwrap, to get
+			// the errors list, then call Unwrap on the list to get each error
+			// instance.
+			//
+			// When reloading inputs fail, cm.reloadInputs will get the list
+			// of errors, join it using errors.Join, then wrap the list using
+			// fmt.Errorf to add more context. So to access each individual
+			// error we need to call Unwrap and ensure it is an error list.
+			// Then we can finally access each individual error
+			e2 := errors.Unwrap(err)
+			//nolint:errorlint // Custom error wrapping, not suitable for errors.As
+			switch e3 := e2.(type) {
+			case errList:
+				for _, err := range e3.Unwrap() {
+					unitErr := cfgfile.UnitError{}
+					if errors.As(err, &unitErr) {
+						unitErrors[unitErr.UnitID] = append(unitErrors[unitErr.UnitID], unitErr.Err)
+						delete(healthyInputs, unitErr.UnitID)
+					}
 				}
+				return
+
+			default:
+				// That is not one of the cases we know how to handle, hard stop
+				// with generic error.
+				cm.logger.Errorf("unexpected error reloading units: %s", err)
+				cm.UpdateStatus(status.Failed, fmt.Sprintf("cannot reload inputs: %s", err))
+				return
 			}
+
+		default:
+			// That is not one of the cases we know how to handle, hard stop
+			// with generic error.
+			cm.logger.Errorf("unexpected error reloading units: %s", err)
+			cm.UpdateStatus(status.Failed, fmt.Sprintf("cannot reload inputs: %s", err))
+			return
 		}
 	}
 
@@ -794,12 +845,18 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		expected := unit.Expected()
 		if expected.Config == nil {
 			// should not happen; hard stop
-			return fmt.Errorf("input unit %s has no config", unit.ID())
+			return cfgfile.UnitError{
+				UnitID: unit.ID(),
+				Err:    fmt.Errorf("input unit %q has no config", unit.ID()),
+			}
 		}
 
 		inputCfg, err := generateBeatConfig(expected.Config, agentInfo)
 		if err != nil {
-			return fmt.Errorf("failed to generate configuration for unit %s: %w", unit.ID(), err)
+			return cfgfile.UnitError{
+				UnitID: unit.ID(),
+				Err:    fmt.Errorf("failed to generate configuration for unit %q: %w", unit.ID(), err),
+			}
 		}
 		// add diag callbacks for unit
 		// we want to add the diagnostic handler that's specific to the unit, and not the gobal diagnostic handler
@@ -824,8 +881,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 	}
 
 	if err := obj.Reload(inputBeatCfgs); err != nil {
-		merror := &multierror.MultiError{}
-		realErrors := multierror.Errors{}
+		var errs []error
 
 		// At the moment this logic is tightly bound to the current RunnerList
 		// implementation from libbeat/cfgfile/list.go and Input.loadStates from
@@ -833,8 +889,12 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		// If they change the way they report errors, this will break.
 		// TODO (Tiago): update all layers to use the most recent features from
 		// the standard library errors package.
-		if errors.As(err, &merror) {
-			for _, err := range merror.Errors {
+		type unwrapList interface {
+			Unwrap() []error
+		}
+		errList, isErrList := err.(unwrapList)
+		if isErrList {
+			for _, err := range errList.Unwrap() {
 				causeErr := errors.Unwrap(err)
 				// A Log input is only marked as finished when all events it
 				// produced are acked by the acker so when we see this error,
@@ -850,12 +910,12 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 				}
 
 				// This is an error that cannot be ignored, so we report it
-				realErrors = append(realErrors, err)
+				errs = append(errs, err)
 			}
 		}
 
-		if len(realErrors) != 0 {
-			return fmt.Errorf("failed to reload inputs: %w", realErrors.Err())
+		if len(errs) != 0 {
+			return fmt.Errorf("failed to reload inputs: %w", errors.Join(errs...))
 		}
 	} else {
 		// If there was no error reloading input and forceReload was
@@ -893,6 +953,13 @@ func (cm *BeatV2Manager) reloadAPM(unit *agentUnit) {
 			apmConfig = expected.APMConfig
 		}
 	}
+
+	if (cm.lastAPMCfg == nil && apmConfig == nil) || (cm.lastAPMCfg != nil && gproto.Equal(cm.lastAPMCfg, apmConfig)) {
+		// configuration for the APM tracing did not change; do nothing
+		cm.logger.Debug("Skipped reloading APM tracing; configuration didn't change")
+		return
+	}
+
 	if apmConfig == nil {
 		// APM tracing is being stopped
 		cm.logger.Debug("Stopping APM tracing")
@@ -904,12 +971,6 @@ func (cm *BeatV2Manager) reloadAPM(unit *agentUnit) {
 		cm.lastAPMCfg = nil
 		cm.lastBeatAPMCfg = nil
 		cm.logger.Debug("Stopped APM tracing")
-		return
-	}
-
-	if cm.lastAPMCfg != nil && gproto.Equal(cm.lastAPMCfg, apmConfig) {
-		// configuration for the APM tracing did not change; do nothing
-		cm.logger.Debug("Skipped reloading APM tracing; configuration didn't change")
 		return
 	}
 
@@ -990,30 +1051,30 @@ func (cm *BeatV2Manager) handleDebugYaml() []byte {
 
 	data, err := yaml.Marshal(beatCfg)
 	if err != nil {
-		cm.logger.Errorf("error generating YAML for input debug callback: %w", err)
+		cm.logger.Errorf("error generating YAML for input debug callback: %v", err)
 		return nil
 	}
 	return data
 }
 
-func getZapcoreLevel(ll client.UnitLogLevel) (zapcore.Level, bool) {
+func getZapcoreLevel(ll client.UnitLogLevel) zapcore.Level {
 	switch ll {
 	case client.UnitLogLevelError:
-		return zapcore.ErrorLevel, false
+		return zapcore.ErrorLevel
 	case client.UnitLogLevelWarn:
-		return zapcore.WarnLevel, false
+		return zapcore.WarnLevel
 	case client.UnitLogLevelInfo:
-		return zapcore.InfoLevel, false
+		return zapcore.InfoLevel
 	case client.UnitLogLevelDebug:
-		return zapcore.DebugLevel, false
+		return zapcore.DebugLevel
 	case client.UnitLogLevelTrace:
 		// beats doesn't support trace
 		// but we do allow the "Publish event:" debug logs
 		// when trace mode is enabled
-		return zapcore.DebugLevel, true
+		return zapcore.DebugLevel
 	}
 	// info level for fallback
-	return zapcore.InfoLevel, false
+	return zapcore.InfoLevel
 }
 
 func didChange(previous map[string]*proto.UnitExpectedConfig, latest map[string]*proto.UnitExpectedConfig) bool {

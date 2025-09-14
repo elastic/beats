@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/hashicorp/nomad/api"
 	"github.com/stretchr/testify/assert"
 
@@ -21,7 +21,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -89,7 +89,7 @@ func TestGenerateHints(t *testing.T) {
 
 	p := Provider{
 		config: cfg,
-		logger: logp.NewLogger("nomad"),
+		logger: logptest.NewTestingLogger(t, "nomad"),
 	}
 	for _, test := range tests {
 		assert.Equal(t, test.result, p.generateHints(test.event))
@@ -149,12 +149,10 @@ func TestEmitEvent(t *testing.T) {
 									},
 									Services: []*api.Service{
 										{
-											Id:   "service-a",
 											Name: "web",
 											Tags: []string{"tag-a", "tag-b"},
 										},
 										{
-											Id:   "service-b",
 											Name: "nginx",
 											Tags: []string{"tag-c", "tag-d"},
 										},
@@ -257,12 +255,10 @@ func TestEmitEvent(t *testing.T) {
 									},
 									Services: []*api.Service{
 										{
-											Id:   "service-a",
 											Name: "web",
 											Tags: []string{"tag-a", "tag-b"},
 										},
 										{
-											Id:   "service-b",
 											Name: "nginx",
 											Tags: []string{"tag-c", "tag-d"},
 										},
@@ -297,10 +293,12 @@ func TestEmitEvent(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
+
 	for _, test := range tests {
 		test := test
 		t.Run(test.Message, func(t *testing.T) {
-			mapper, err := template.NewConfigMapper(nil, nil, nil)
+			mapper, err := template.NewConfigMapper(nil, nil, nil, logger)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -312,11 +310,11 @@ func TestEmitEvent(t *testing.T) {
 
 			p := &Provider{
 				config:    defaultConfig(),
-				bus:       bus.New(logp.NewLogger("bus"), "test"),
+				bus:       bus.New(logger.Named("bus"), "test"),
 				metagen:   metaGen,
 				templates: mapper,
 				uuid:      UUID,
-				logger:    logp.NewLogger("nomad"),
+				logger:    logger.Named("nomad"),
 			}
 
 			listener := p.bus.Subscribe()

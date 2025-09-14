@@ -28,6 +28,7 @@ import (
 	"golang.org/x/sync/semaphore"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
+	"github.com/elastic/beats/v7/heartbeat/monitors/maintwin"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/timerqueue"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -161,11 +162,11 @@ func (s *Scheduler) WaitForRunOnce() {
 // has already stopped.
 var ErrAlreadyStopped = errors.New("attempted to add job to already stopped scheduler")
 
-type AddTask func(sched Schedule, id string, entrypoint TaskFunc, jobType string) (removeFn context.CancelFunc, err error)
+type AddTask func(sched Schedule, pmws []maintwin.ParsedMaintWin, id string, entrypoint TaskFunc, jobType string) (removeFn context.CancelFunc, err error)
 
 // Add adds the given TaskFunc to the current scheduler. Will return an error if the scheduler
 // is done.
-func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc, jobType string) (removeFn context.CancelFunc, err error) {
+func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id string, entrypoint TaskFunc, jobType string) (removeFn context.CancelFunc, err error) {
 	if errors.Is(s.ctx.Err(), context.Canceled) {
 		return nil, ErrAlreadyStopped
 	}
@@ -178,7 +179,7 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc, jobType 
 
 	var taskFn timerqueue.TimerTaskFn
 
-	taskFn = func(_ time.Time) {
+	taskFn = func(now time.Time) {
 		select {
 		case <-jobCtx.Done():
 			debugf("Job '%v' canceled", id)
@@ -189,7 +190,22 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc, jobType 
 		debugf("Job '%s' started", id)
 		sj := newSchedJob(jobCtx, s, id, jobType, entrypoint)
 
-		lastRanAt := sj.run()
+		var activeMainWin *maintwin.ParsedMaintWin
+		for _, pmw := range pmws {
+			if pmw.IsActive(now) {
+				pmwCopy := pmw
+				activeMainWin = &pmwCopy
+				break
+			}
+		}
+
+		var lastRanAt time.Time
+		if activeMainWin == nil {
+			lastRanAt = sj.run()
+		} else {
+			logp.L().Infof("Job '%s' is in maintenance window '%s' , skipping", id, activeMainWin.Rule)
+			lastRanAt = now
+		}
 		s.stats.activeJobs.Dec()
 
 		if s.runOnce {

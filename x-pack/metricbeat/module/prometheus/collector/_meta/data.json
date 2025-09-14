@@ -5,13 +5,14 @@
         "duration": 115000,
         "module": "prometheus"
     },
+    "metrics_count": 1,
     "metricset": {
         "name": "collector",
         "period": 10000
     },
     "prometheus": {
         "labels": {
-            "device": "br-4e623477470e",
+            "device": "br-0cb306323b90",
             "job": "prometheus"
         },
         "node_network_carrier": {

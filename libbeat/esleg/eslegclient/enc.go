@@ -19,16 +19,25 @@ package eslegclient
 
 import (
 	"bytes"
-	"compress/gzip"
+	"strconv"
+
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/klauspost/compress/gzip"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-structform/gotype"
 	"github.com/elastic/go-structform/json"
+)
+
+var (
+	headerContentEncoding    = "Content-Encoding"
+	headerContentType        = "Content-Type"
+	HeaderUncompressedLength = "X-Elastic-Uncompressed-Request-Length"
 )
 
 type BodyEncoder interface {
@@ -49,6 +58,28 @@ type BulkWriter interface {
 	AddRaw(raw interface{}) error
 }
 
+type countingWriter struct {
+	w            io.Writer
+	WrittenBytes int64
+}
+
+func (cw *countingWriter) Write(p []byte) (int, error) {
+	written, err := cw.w.Write(p)
+	cw.WrittenBytes += int64(written)
+	return written, err
+}
+func (cw *countingWriter) Reset() {
+	cw.WrittenBytes = 0
+}
+
+// writerWithCounter wraps a writer with a proxy that counts the amount of written bytes.
+func writerWithCounter(w io.Writer) *countingWriter {
+	return &countingWriter{
+		w:            w,
+		WrittenBytes: 0,
+	}
+}
+
 type jsonEncoder struct {
 	buf    *bytes.Buffer
 	folder *gotype.Iterator
@@ -57,9 +88,10 @@ type jsonEncoder struct {
 }
 
 type gzipEncoder struct {
-	buf    *bytes.Buffer
-	gzip   *gzip.Writer
-	folder *gotype.Iterator
+	buf     *bytes.Buffer
+	gzip    *gzip.Writer
+	counter *countingWriter
+	folder  *gotype.Iterator
 
 	escapeHTML bool
 }
@@ -97,7 +129,8 @@ func (b *jsonEncoder) resetState() {
 }
 
 func (b *jsonEncoder) AddHeader(header *http.Header) {
-	header.Add("Content-Type", "application/json; charset=UTF-8")
+	header.Add(headerContentType, "application/json; charset=UTF-8")
+	header.Add(HeaderUncompressedLength, strconv.Itoa(b.buf.Len()))
 }
 
 func (b *jsonEncoder) Reader() io.Reader {
@@ -134,7 +167,6 @@ func (b *jsonEncoder) AddRaw(obj interface{}) error {
 	}
 
 	b.buf.WriteByte('\n')
-
 	return err
 }
 
@@ -159,15 +191,19 @@ func NewGzipEncoder(level int, buf *bytes.Buffer, escapeHTML bool) (*gzipEncoder
 	if err != nil {
 		return nil, err
 	}
-
-	g := &gzipEncoder{buf: buf, gzip: w, escapeHTML: escapeHTML}
+	g := &gzipEncoder{
+		buf:        buf,
+		gzip:       w,
+		counter:    writerWithCounter(w),
+		escapeHTML: escapeHTML,
+	}
 	g.resetState()
 	return g, nil
 }
 
 func (g *gzipEncoder) resetState() {
 	var err error
-	visitor := json.NewVisitor(g.gzip)
+	visitor := json.NewVisitor(g.counter)
 	visitor.SetEscapeHTML(g.escapeHTML)
 
 	g.folder, err = gotype.NewIterator(visitor,
@@ -182,6 +218,7 @@ func (g *gzipEncoder) resetState() {
 func (g *gzipEncoder) Reset() {
 	g.buf.Reset()
 	g.gzip.Reset(g.buf)
+	g.counter.Reset()
 }
 
 func (g *gzipEncoder) Reader() io.Reader {
@@ -190,8 +227,9 @@ func (g *gzipEncoder) Reader() io.Reader {
 }
 
 func (g *gzipEncoder) AddHeader(header *http.Header) {
-	header.Add("Content-Type", "application/json; charset=UTF-8")
-	header.Add("Content-Encoding", "gzip")
+	header.Add(headerContentType, "application/json; charset=UTF-8")
+	header.Add(headerContentEncoding, "gzip")
+	header.Add(HeaderUncompressedLength, strconv.FormatInt(g.counter.WrittenBytes, 10))
 }
 
 func (g *gzipEncoder) Marshal(obj interface{}) error {
@@ -209,16 +247,17 @@ func (g *gzipEncoder) AddRaw(obj interface{}) error {
 	case *beat.Event:
 		err = g.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
 	case RawEncoding:
-		_, err = g.gzip.Write(v.Encoding)
+		_, err = g.counter.Write(v.Encoding)
 	default:
 		err = g.folder.Fold(obj)
+
 	}
 
 	if err != nil {
 		g.resetState()
 	}
 
-	_, err = g.gzip.Write(nl)
+	_, err = g.counter.Write(nl)
 	if err != nil {
 		g.resetState()
 	}
