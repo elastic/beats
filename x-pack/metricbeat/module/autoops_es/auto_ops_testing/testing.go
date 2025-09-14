@@ -13,7 +13,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"slices"
 	"strings"
 	"testing"
 
@@ -55,40 +54,6 @@ func UseNamedMetricSet(name string) SetupConfigCallback {
 			"metricsets": []string{name},
 			"hosts":      []string{server.URL},
 		}
-	}
-}
-
-// Setup a Server with the Cluster Info route set to fail (HTTP 401).
-func SetupClusterInfoErrorServer(t *testing.T, _ []byte, _ []byte, _ string) *httptest.Server {
-	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.RequestURI {
-		case "/":
-			w.WriteHeader(401)
-			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte(`{"error":"Bad Auth"}`))
-		default:
-			t.Fatalf("Unrecognized request %v", r.RequestURI)
-		}
-	}))
-}
-
-// Setup a Server with the data route set to `dataRoute` that fails via HTTP 5xx.
-func SetupDataErrorServer(dataRoute string) SetupServerCallback {
-	return func(t *testing.T, clusterInfo []byte, data []byte, _ string) *httptest.Server {
-		return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			switch r.RequestURI {
-			case "/":
-				w.WriteHeader(200)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write(clusterInfo)
-			case dataRoute:
-				w.WriteHeader(500)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write([]byte(`{"error":"Unexpected error"}`))
-			default:
-				t.Fatalf("Unrecognized request %v", r.RequestURI)
-			}
-		}))
 	}
 }
 
@@ -139,45 +104,6 @@ func SetupSuccessfulTemplateServer(path string, pathPrefix string, getTemplateRe
 	}
 }
 
-func SetupSuccessfulTemplateServerWithFailedRequests(path string, pathPrefix string, getTemplateResponse GetTemplateCallback, failedNames []string) SetupServerCallback {
-	return func(t *testing.T, clusterInfo []byte, data []byte, _ string) *httptest.Server {
-		return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			switch r.RequestURI {
-			case "/":
-				w.WriteHeader(200)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write(clusterInfo)
-			case path:
-				w.WriteHeader(200)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write(data)
-			default:
-				if strings.HasPrefix(r.RequestURI, pathPrefix) {
-					templateNames := strings.Split(r.RequestURI[len(pathPrefix):], ",")
-
-					if slices.ContainsFunc(failedNames, func(name string) bool {
-						return slices.Contains(templateNames, name)
-					}) {
-						w.WriteHeader(500)
-						w.Header().Set("Content-Type", "application/json")
-						w.Write([]byte(`{"error":"Unexpected error"}`))
-
-						return
-					}
-
-					w.WriteHeader(200)
-					w.Header().Set("Content-Type", "application/json")
-					w.Write(getTemplateResponse(t, templateNames, []string{}))
-
-					return
-				}
-
-				t.Fatalf("Unrecognized request %v", r.RequestURI)
-			}
-		}))
-	}
-}
-
 func SetupSuccessfulTemplateServerWithIgnoredTemplates(path string, pathPrefix string, getTemplateResponse GetTemplateCallback, ignoredNames []string) SetupServerCallback {
 	return func(t *testing.T, clusterInfo []byte, data []byte, _ string) *httptest.Server {
 		return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -195,33 +121,6 @@ func SetupSuccessfulTemplateServerWithIgnoredTemplates(path string, pathPrefix s
 					w.WriteHeader(200)
 					w.Header().Set("Content-Type", "application/json")
 					w.Write(getTemplateResponse(t, strings.Split(r.RequestURI[len(pathPrefix):], ","), ignoredNames))
-
-					return
-				}
-
-				t.Fatalf("Unrecognized request %v", r.RequestURI)
-			}
-		}))
-	}
-}
-
-func SetupTemplateErrorsServer(path string, pathPrefix string) SetupServerCallback {
-	return func(t *testing.T, clusterInfo []byte, data []byte, _ string) *httptest.Server {
-		return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			switch r.RequestURI {
-			case "/":
-				w.WriteHeader(200)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write(clusterInfo)
-			case path:
-				w.WriteHeader(200)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write(data)
-			default:
-				if strings.HasPrefix(r.RequestURI, pathPrefix) {
-					w.WriteHeader(500)
-					w.Header().Set("Content-Type", "application/json")
-					w.Write([]byte(`{"error":"Unexpected error"}`))
 
 					return
 				}

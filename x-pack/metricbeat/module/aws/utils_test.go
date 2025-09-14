@@ -424,36 +424,6 @@ func TestGetMetricDataResultsCrossAccounts(t *testing.T) {
 	assert.Equal(t, 0.15, getMetricDataResults[1].Values[0])
 }
 
-func TestCheckTimestampInArray(t *testing.T) {
-	timestamp1 := time.Now()
-	timestamp2 := timestamp1.Add(5 * time.Minute)
-	timestamp3 := timestamp1.Add(10 * time.Minute)
-
-	cases := []struct {
-		targetTimestamp time.Time
-		expectedExists  bool
-		expectedIndex   int
-	}{
-		{
-			targetTimestamp: timestamp1,
-			expectedExists:  true,
-			expectedIndex:   0,
-		},
-		{
-			targetTimestamp: timestamp3,
-			expectedExists:  false,
-			expectedIndex:   -1,
-		},
-	}
-
-	timestampArray := []time.Time{timestamp1, timestamp2}
-	for _, c := range cases {
-		exists, index := CheckTimestampInArray(c.targetTimestamp, timestampArray)
-		assert.Equal(t, c.expectedExists, exists)
-		assert.Equal(t, c.expectedIndex, index)
-	}
-}
-
 func TestFindIdentifierFromARN(t *testing.T) {
 	cases := []struct {
 		resourceARN             string

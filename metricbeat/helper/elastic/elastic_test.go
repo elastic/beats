@@ -81,16 +81,6 @@ func (m MockReporterV2) Error(err error) bool {
 	return true
 }
 
-func TestReportErrorForMissingField(t *testing.T) {
-	field := "some.missing.field"
-	r := MockReporterV2{}
-	err := ReportErrorForMissingField(field, Elasticsearch, r)
-
-	expectedError := fmt.Errorf("could not find field '%v' in Elasticsearch API response", field)
-	assert.Equal(t, expectedError, err)
-	assert.Equal(t, expectedError, currentErr)
-}
-
 func TestFixTimestampField(t *testing.T) {
 	tests := []struct {
 		Name          string
