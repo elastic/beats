@@ -198,8 +198,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "x-pack/auditbeat/build/*.xml"
           - "x-pack/auditbeat/build/*.json"
@@ -225,8 +223,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_2025}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "x-pack/auditbeat/build/*.xml"
           - "x-pack/auditbeat/build/*.json"
@@ -252,8 +248,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "x-pack/auditbeat/build/*.xml"
           - "x-pack/auditbeat/build/*.json"
@@ -284,8 +278,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "x-pack/auditbeat/build/*.xml"
           - "x-pack/auditbeat/build/*.json"
@@ -311,8 +303,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "x-pack/auditbeat/build/*.xml"
           - "x-pack/auditbeat/build/*.json"
@@ -338,8 +328,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "x-pack/auditbeat/build/*.xml"
           - "x-pack/auditbeat/build/*.json"
@@ -409,8 +397,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         notify:
           - github_commit_status:
               context: "x-pack/auditbeat: Packaging Linux"
@@ -448,8 +434,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         notify:
           - github_commit_status:
               context: "x-pack/auditbeat: Packaging Linux amd64 FIPS"

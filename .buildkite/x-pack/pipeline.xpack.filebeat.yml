@@ -310,9 +310,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
@@ -337,9 +335,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
@@ -370,8 +366,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
@@ -397,8 +391,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
@@ -424,8 +416,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
@@ -532,8 +522,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: Packaging Linux"
@@ -571,8 +559,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: Packaging Linux amd64 FIPS"
