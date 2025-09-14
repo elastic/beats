@@ -31,13 +31,15 @@ func TestDefaultConfig(t *testing.T) {
 	assert.Equal(t, 5*time.Second, cfg.Timeout)
 	assert.Equal(t, 4, cfg.Version)
 	assert.Equal(t, []string{"pool.ntp.org"}, cfg.Servers)
+	assert.True(t, cfg.Validate)
 }
 
 func TestValidateConfig_Valid(t *testing.T) {
 	cfg := config{
-		Servers: []string{"localhost:123"},
-		Timeout: 5 * time.Second,
-		Version: 4,
+		Servers:  []string{"localhost:123"},
+		Timeout:  5 * time.Second,
+		Version:  4,
+		Validate: false,
 	}
 	assert.NoError(t, validateConfig(&cfg))
 }

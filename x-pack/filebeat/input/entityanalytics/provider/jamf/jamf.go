@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -66,7 +67,7 @@ type jamfInput struct {
 }
 
 // New creates a new instance of an Jamf entity provider.
-func New(logger *logp.Logger) (provider.Provider, error) {
+func New(logger *logp.Logger, path *paths.Path) (provider.Provider, error) {
 	p := jamfInput{
 		cfg: defaultConfig(),
 	}
@@ -74,6 +75,7 @@ func New(logger *logp.Logger) (provider.Provider, error) {
 		Logger:    logger,
 		Type:      FullName,
 		Configure: p.configure,
+		Path:      path,
 	}
 
 	return &p, nil
@@ -103,7 +105,7 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	}
 	stat.UpdateStatus(status.Starting, "")
 	p.logger = inputCtx.Logger.With("provider", Name, "tenant", p.cfg.JamfTenant)
-	p.metrics = newMetrics(inputCtx.MetricsRegistry)
+	p.metrics = newMetrics(inputCtx.MetricsRegistry, p.logger)
 
 	lastSyncTime, _ := getLastSync(store)
 	syncWaitTime := time.Until(lastSyncTime.Add(p.cfg.SyncInterval))

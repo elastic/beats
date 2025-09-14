@@ -352,3 +352,23 @@ func TestProcessExpression(t *testing.T) {
 		assert.Equal(t, test.want, got)
 	}
 }
+
+func defaultChainConfig() config {
+	chaincfg := defaultConfig()
+	chaincfg.Chain = []chainConfig{
+		{
+			While: &whileConfig{
+				Auth:     chaincfg.Auth,
+				Request:  chaincfg.Request,
+				Response: &responseChainConfig{},
+			},
+			Step: &stepConfig{
+				Auth:     chaincfg.Auth,
+				Request:  chaincfg.Request,
+				Response: &responseChainConfig{},
+			},
+		},
+	}
+
+	return chaincfg
+}

@@ -641,9 +641,8 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 	}
 
 	// set the new log level (if nothing has changed is a noop)
-	ll, trace := getZapcoreLevel(lowestLevel)
+	ll := getZapcoreLevel(lowestLevel)
 	logp.SetLevel(ll)
-	lbmanagement.SetUnderAgentTrace(trace)
 
 	// reload the output configuration
 	restartBeat, err := cm.reloadOutput(outputUnit)
@@ -1052,30 +1051,30 @@ func (cm *BeatV2Manager) handleDebugYaml() []byte {
 
 	data, err := yaml.Marshal(beatCfg)
 	if err != nil {
-		cm.logger.Errorf("error generating YAML for input debug callback: %w", err)
+		cm.logger.Errorf("error generating YAML for input debug callback: %v", err)
 		return nil
 	}
 	return data
 }
 
-func getZapcoreLevel(ll client.UnitLogLevel) (zapcore.Level, bool) {
+func getZapcoreLevel(ll client.UnitLogLevel) zapcore.Level {
 	switch ll {
 	case client.UnitLogLevelError:
-		return zapcore.ErrorLevel, false
+		return zapcore.ErrorLevel
 	case client.UnitLogLevelWarn:
-		return zapcore.WarnLevel, false
+		return zapcore.WarnLevel
 	case client.UnitLogLevelInfo:
-		return zapcore.InfoLevel, false
+		return zapcore.InfoLevel
 	case client.UnitLogLevelDebug:
-		return zapcore.DebugLevel, false
+		return zapcore.DebugLevel
 	case client.UnitLogLevelTrace:
 		// beats doesn't support trace
 		// but we do allow the "Publish event:" debug logs
 		// when trace mode is enabled
-		return zapcore.DebugLevel, true
+		return zapcore.DebugLevel
 	}
 	// info level for fallback
-	return zapcore.InfoLevel, false
+	return zapcore.InfoLevel
 }
 
 func didChange(previous map[string]*proto.UnitExpectedConfig, latest map[string]*proto.UnitExpectedConfig) bool {

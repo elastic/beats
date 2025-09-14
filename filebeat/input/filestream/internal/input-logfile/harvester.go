@@ -138,7 +138,7 @@ func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 
 	if err := hg.tg.Go(startHarvester(ctx, hg, src, false, hg.metrics)); err != nil {
 		ctx.Logger.Warnf(
-			"tried to start harvester with task group already closed",
+			"tried to start harvester for %s with task group already closed",
 			ctx.ID)
 	}
 }

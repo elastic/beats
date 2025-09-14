@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/event-fields-yml.html
+applies_to:
+  stack: ga
 ---
 
 # Defining field mappings [event-fields-yml]
