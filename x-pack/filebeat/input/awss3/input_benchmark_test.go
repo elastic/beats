@@ -299,7 +299,7 @@ func TestBenchmarkInputSQS(t *testing.T) {
 		})
 	}
 
-	w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', tabwriter.Debug)
+	w := tabwriter.NewWriter(t.Output(), 1, 1, 1, ' ', tabwriter.Debug)
 	fmt.Fprintln(w, strings.Join(headers, "\t"))
 	for _, d := range data {
 		fmt.Fprintln(w, strings.Join(d, "\t"))
