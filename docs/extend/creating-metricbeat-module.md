@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/creating-metricbeat-module.html
+applies_to:
+  stack: ga
 ---
 
 # Creating a Metricbeat Module [creating-metricbeat-module]

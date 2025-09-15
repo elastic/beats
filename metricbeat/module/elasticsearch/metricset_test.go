@@ -17,29 +17,39 @@
 
 //go:build !integration
 
-package common
+package elasticsearch
 
 import (
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
-func TestIsLoopback(t *testing.T) {
-	check, err := IsLoopback("127.0.0.1")
+func TestGetEnv(t *testing.T) {
+	tests := []struct {
+		name      string
+		key       string
+		backupKey string
+		expected  string
+		useBackup bool
+	}{
+		{"both set", "TEST_KEY", "BACKUP_KEY", "test_value", false},
+		{"only key set", "TEST_KEY", "BACKUP_KEY", "test_value", false},
+		{"only backup key set", "NOT_SET", "BACKUP_KEY", "backup_value", true},
+		{"neither set", "NOT_SET", "BACKUP_KEY", "", false},
+	}
 
-	assert.NoError(t, err)
-	assert.True(t, check)
-}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.useBackup {
+				t.Setenv(tt.backupKey, tt.expected)
+			} else if tt.expected != "" {
+				t.Setenv(tt.key, tt.expected)
+			}
 
-func TestIsLoopback_false(t *testing.T) {
-	check, err := IsLoopback("192.168.1.1")
-	assert.NoError(t, err)
-	assert.False(t, check)
-}
+			result := getEnv(tt.key, tt.backupKey)
 
-func TestIsLoopback_error(t *testing.T) {
-	check, err := IsLoopback("19216811")
-	assert.Error(t, err)
-	assert.False(t, check)
+			if result != tt.expected {
+				t.Errorf("expected %s, got %s", tt.expected, result)
+			}
+		})
+	}
 }
