@@ -351,7 +351,7 @@ func (service *MonitorService) QueryResources(
 			return nil, err
 		}
 
-		resp = append(resp, r.MetricResults.Values...)
+		resp = append(resp, r.Values...)
 	}
 
 	return resp, nil
@@ -415,6 +415,41 @@ func (service *MonitorService) GetMetricValues(resourceId string, namespace stri
 			return metrics, "", err
 		}
 
+		if resp.Interval == nil || *resp.Interval == "" {
+			// this should not happen because we have handled the wildcard
+			// timegrain config scenario. Therefore, we should not
+			// continue with data returned from the latest API call,
+			// because this data could be bad
+			err = fmt.Errorf(
+				"the returned interval (timegrain) in the list operation "+
+					"response is empty. Skipping this data. Query "+
+					"parameters: Aggregation: '%v', Filter: '%v', "+
+					"Metric Names: '%v', Timespan: '%v', "+
+					"Requested Timegrain: '%v', Result Type: '%v'",
+				aggregations, metricsFilter, metricNames, timespan,
+				timegrain, resultTypeData,
+			)
+			service.log.Error(err.Error())
+
+			return metrics, "", err // we do not record this data as it may be corrupted
+		} else if *resp.Interval != timegrain {
+			// note that the SDK says
+			// the interval "may be adjusted in the future and returned back
+			// from what was originally requested"
+			// Reference: https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor@v0.8.0#Response
+			service.log.Warnf(
+				"the interval (timegrain) in the list operation response ( %v ) "+
+					"does not match the requested timegrain ( %v ). Query "+
+					"parameters: Aggregation: '%v', Filter: '%v', "+
+					"Metric Names: '%v', Timespan: '%v', Result Type: '%v'",
+				*resp.Interval, timegrain, aggregations, metricsFilter,
+				metricNames, timespan, resultTypeData,
+			)
+			// we leverage the modified response interval
+			// as the SDK mentioned this adjusted interval
+			// is possible and therefore can be expected at times
+			// Reference: https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor@v0.8.0#Response
+		}
 		interval = *resp.Interval
 
 		for _, v := range resp.Value {
