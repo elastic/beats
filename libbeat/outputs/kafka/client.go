@@ -181,7 +181,6 @@ func (c *client) Publish(_ context.Context, batch publisher.Batch) error {
 	}
 
 	ch := c.producer.Input()
-LOOP:
 	for i := range events {
 		d := &events[i]
 		msg, err := c.getEventMessage(d)
@@ -196,11 +195,9 @@ LOOP:
 		msg.initProducerMessage()
 		select {
 		case <-c.done:
-			dropped := len(events) - i
-			c.log.Errorf("output closing, dropping last %d/%d events from batch",
-				dropped, len(events))
-			c.observer.PermanentErrors(dropped)
-			break LOOP
+			c.log.Errorf("output closing, dropping event")
+			ref.done()
+			c.observer.PermanentErrors(1)
 		case ch <- &msg.msg:
 		}
 	}
