@@ -545,35 +545,42 @@ func TestDataReload(t *testing.T) {
 	require.NoError(t, err)
 
 	// we should have a single data reload during creation
-	assert.Equal(t, 1, info.HostInfoRequestCount)
-	assert.Equal(t, 0, info.FQDNRequestCount)
+	assert.Equal(t, int64(1), info.HostInfoRequestCount.Load())
+	assert.Equal(t, int64(0), info.FQDNRequestCount.Load())
 
-	closeCh := make(chan struct{})
+	eventCount := atomic.Int32{} // this is used to ensure some events get processed before we do our assertions
+	var finished atomic.Bool
 	wg := &sync.WaitGroup{}
 	t.Cleanup(func() {
-		close(closeCh)
+		finished.Store(true)
 		wg.Wait()
 	})
-	eventCount := atomic.Int32{} // this is used to ensure some events get processed before we do our assertions
 	// start some goroutines enriching events in an infinite loop
+	processEvents := func() {
+		defer wg.Done()
+		for !finished.Load() {
+			_, err := p.Run(&beat.Event{
+				Fields: mapstr.M{},
+			})
+			require.NoError(t, err)
+			eventCount.Add(1)
+		}
+	}
+	// Start several goroutines to call the processor in parallel
 	for range processingGoroutineCount {
 		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for {
-				select {
-				case <-closeCh:
-					return
-				default:
-				}
-				_, err := p.Run(&beat.Event{
-					Fields: mapstr.M{},
-				})
-				require.NoError(t, err)
-				eventCount.Add(1)
-			}
-		}()
+		go processEvents()
 	}
+
+	// Wait until at least some events have gone through.
+	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		assert.Greater(collect, eventCount.Load(), int32(0))
+	}, time.Second*5, time.Millisecond)
+
+	// we should still have a single data reload since any requests should
+	// use the cache until the FQDN flag changes.
+	assert.Equal(t, int64(1), info.HostInfoRequestCount.Load())
+	assert.Equal(t, int64(0), info.FQDNRequestCount.Load())
 
 	var previousEventCount = eventCount.Load()
 	// update
@@ -588,9 +595,12 @@ func TestDataReload(t *testing.T) {
 	// note that with fqdn enabled, we still fetch the host info
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		assert.Greater(collect, eventCount.Load(), previousEventCount+processingGoroutineCount)
-		assert.Equal(collect, 2, info.HostInfoRequestCount)
-		assert.Equal(collect, 1, info.FQDNRequestCount)
 	}, time.Second*5, time.Millisecond)
+
+	// The FQDN flag has changed to true, there should be an additional host
+	// info request for the FQDN case, as well as an FQDN request.
+	assert.Equal(t, int64(2), info.HostInfoRequestCount.Load())
+	assert.Equal(t, int64(1), info.FQDNRequestCount.Load())
 
 	// update back to the original value
 	previousEventCount = eventCount.Load()
@@ -602,9 +612,12 @@ func TestDataReload(t *testing.T) {
 	// we should have reloaded the data once more
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		assert.Greater(collect, eventCount.Load(), previousEventCount+processingGoroutineCount)
-		assert.Equal(collect, 3, info.HostInfoRequestCount)
-		assert.Equal(collect, 1, info.FQDNRequestCount)
 	}, time.Second*5, time.Millisecond)
+
+	// Both values should be unchanged, including host info requests, because
+	// it can still use the cached value from the original non-FQDN lookup.
+	assert.Equal(t, int64(2), info.HostInfoRequestCount.Load())
+	assert.Equal(t, int64(1), info.FQDNRequestCount.Load())
 }
 
 func TestFQDNLookup(t *testing.T) {
@@ -686,14 +699,14 @@ type mockHostInfo struct {
 	FQDN                 string
 	Hostname             string
 	FQDNErr              error
-	FQDNRequestCount     int
-	HostInfoRequestCount int
+	FQDNRequestCount     atomic.Int64
+	HostInfoRequestCount atomic.Int64
 }
 
 var _ hostInfo = &mockHostInfo{}
 
 func (m *mockHostInfo) Info() types.HostInfo {
-	m.HostInfoRequestCount++
+	m.HostInfoRequestCount.Add(1)
 	return types.HostInfo{
 		Hostname: m.Hostname,
 		OS:       &types.OSInfo{},
@@ -701,7 +714,7 @@ func (m *mockHostInfo) Info() types.HostInfo {
 }
 
 func (m *mockHostInfo) FQDNWithContext(_ context.Context) (string, error) {
-	m.FQDNRequestCount++
+	m.FQDNRequestCount.Add(1)
 	if m.FQDNErr != nil {
 		return "", m.FQDNErr
 	}
