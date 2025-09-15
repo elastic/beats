@@ -44,7 +44,7 @@ type config struct {
 	FileWatcher  fileWatcherConfig `config:"prospector.scanner"`
 	FileIdentity *conf.Namespace   `config:"file_identity"`
 
-	// GZIPExperimental enables tech-preview support for ingesting GZIP files.
+	// GZIPExperimental enables beta support for ingesting GZIP files.
 	// When set to true the input will transparently stream-decompress GZIP files.
 	// This feature is experimental and subject to change.
 	GZIPExperimental bool `config:"gzip_experimental"`
@@ -231,8 +231,8 @@ func (c config) checkUnsupportedParams(logger *logp.Logger) {
 				"highly discouraged.")
 	}
 	if c.GZIPExperimental {
-		logger.Named("filestream").Warn(cfgwarn.Experimental(
-			"filestream: experimental gzip support enabled"))
+		logger.Named("filestream").Warn(cfgwarn.Beta(
+			"filestream: beta gzip support enabled"))
 	}
 }
 
