@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -524,6 +525,7 @@ func TestFQDNEventSync(t *testing.T) {
 }
 
 func TestDataReload(t *testing.T) {
+	var processingGoroutineCount int32 = 10
 	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
 		"cache.ttl": "5m",
 	})
@@ -552,8 +554,9 @@ func TestDataReload(t *testing.T) {
 		close(closeCh)
 		wg.Wait()
 	})
+	eventCount := atomic.Int32{} // this is used to ensure some events get processed before we do our assertions
 	// start some goroutines enriching events in an infinite loop
-	for range 10 {
+	for range processingGoroutineCount {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -567,10 +570,12 @@ func TestDataReload(t *testing.T) {
 					Fields: mapstr.M{},
 				})
 				require.NoError(t, err)
+				eventCount.Add(1)
 			}
 		}()
 	}
 
+	var previousEventCount = eventCount.Load()
 	// update
 	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
 		"features.fqdn.enabled": true,
@@ -582,11 +587,13 @@ func TestDataReload(t *testing.T) {
 	// we should have reloaded the data once
 	// note that with fqdn enabled, we still fetch the host info
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		assert.Greater(collect, eventCount.Load(), previousEventCount+processingGoroutineCount)
 		assert.Equal(collect, 2, info.HostInfoRequestCount)
 		assert.Equal(collect, 1, info.FQDNRequestCount)
 	}, time.Second*5, time.Millisecond)
 
 	// update back to the original value
+	previousEventCount = eventCount.Load()
 	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
 		"features.fqdn.enabled": false,
 	}))
@@ -594,6 +601,7 @@ func TestDataReload(t *testing.T) {
 
 	// we should have reloaded the data once more
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		assert.Greater(collect, eventCount.Load(), previousEventCount+processingGoroutineCount)
 		assert.Equal(collect, 3, info.HostInfoRequestCount)
 		assert.Equal(collect, 1, info.FQDNRequestCount)
 	}, time.Second*5, time.Millisecond)
