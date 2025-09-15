@@ -45,6 +45,6 @@ func GetIntEnvParam(name string, defaultValue int) int {
 	return intDefault(os.Getenv(name), defaultValue)
 }
 
-func GetBoolEnvParam(a string, defaults bool) bool {
-	return boolDefault(a, defaults)
+func GetBoolEnvParam(name string, defaults bool) bool {
+	return boolDefault(name, defaults)
 }

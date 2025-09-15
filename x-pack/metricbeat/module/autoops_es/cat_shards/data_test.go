@@ -8,13 +8,13 @@
 package cat_shards
 
 import (
+	"maps"
 	"slices"
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
 
 	"github.com/stretchr/testify/require"
-	"golang.org/x/exp/maps"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricset"
@@ -72,7 +72,7 @@ func TestSendNodeShardsEvent(t *testing.T) {
 func TestSendNodeIndexShardsEventInBatch(t *testing.T) {
 	reporter := &mbtest.CapturingReporterV2{}
 	info := auto_ops_testing.CreateClusterInfo("8.15.3")
-	nodeIndexShards := maps.Values(getNodeIndexShards())
+	nodeIndexShards := slices.Collect(maps.Values(getNodeIndexShards()))
 	transactionId := "xyz"
 
 	sendNodeIndexShardsEvent(reporter, &info, nodeIndexShards, transactionId)
@@ -92,7 +92,7 @@ func TestSendNodeIndexShardsEvent(t *testing.T) {
 
 	reporter := &mbtest.CapturingReporterV2{}
 	info := auto_ops_testing.CreateClusterInfo("8.15.3")
-	nodeIndexShards := maps.Values(getNodeIndexShards())
+	nodeIndexShards := slices.Collect(maps.Values(getNodeIndexShards()))
 	transactionId := "xyz"
 
 	sendNodeIndexShardsEvent(reporter, &info, nodeIndexShards, transactionId)
