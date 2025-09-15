@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/build-dashboards.html
+applies_to:
+  stack: ga
 ---
 
 # Building Your Own Beat Dashboards [build-dashboards]
