@@ -11,13 +11,15 @@ Filebeat supports reading from rotating log files. However, some log rotation st
 
 * **Avoid log rotation strategies that copy and truncate log files**
 
-    Log rotation strategies that copy and truncate the input log file can result in Filebeat sending duplicate events. This happens because Filebeat identifies files by inode and device name. During log rotation, lines that Filebeat has already processed are moved to a new file. When Filebeat encounters the new file, it reads from the beginning because the previous state information (the offset and read timestamp) is associated with the inode and device name of the old file.
+    In Filebeat versions prior to 9.0.0, log rotation strategies that copy and truncate the input log file can result in Filebeat sending duplicate events. In these versions, Filebeat identifies files by inode and device ID because the [file identity configuration](filebeat-input-filestream.md#filebeat-input-filestream-file-identity) of the `filestream` input is set to `native` by default. During log rotation, lines that Filebeat has already processed are moved to a new file. If the file identity is set to `native`, when Filebeat encounters the new file, it starts reading it from the beginning because the previous state information (the offset and read timestamp) is associated with the inode and device ID of the old file.
+
+    In Filebeat 9.0.0 and later versions, the default file identity is `fingerprint`, where Filebeat identifies files using file fingerprints produced by the scanner component of the `filestream` input. When using Filebeat 9.0.0 or a later version, changing the default file identity configuration may result in duplicated events in the output.
 
     Furthermore, strategies that copy and truncate the input log file can result in lost events if lines are written to the log file after it’s copied, but before it’s truncated.
 
 * **Make sure Filebeat is configured to read from all rotated logs**
 
-    When an input log file is moved or renamed during log rotation, Filebeat is able to recognize that the file has already been read. After the file is rotated, a new log file is created, and the application continues logging. Filebeat picks up the new file during the next scan. Because the file has a new inode and device name, Filebeat starts reading it from the beginning.
+    When an input log file is moved or renamed during log rotation, Filebeat is able to recognize that the file has already been read. After the file is rotated, a new log file is created, and the application continues logging. Filebeat picks up the new file during the next scan. If the file identity configuration of the `filestream` input is set to `native` (default in Filebeat versions prior to 9.0.0), Filebeat starts reading the new file from the beginning because it has a new inode and device ID.
 
     To avoid missing events from a rotated file, configure the input to read from the log file and all the rotated files. For examples, see [Example configurations](#log-rotate-example).
 
