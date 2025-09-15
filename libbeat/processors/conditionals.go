@@ -18,6 +18,7 @@
 package processors
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -74,6 +75,10 @@ func (r *WhenProcessor) Run(event *beat.Event) (*beat.Event, error) {
 
 func (r *WhenProcessor) String() string {
 	return fmt.Sprintf("%v, condition=%v", r.p.String(), r.condition.String())
+}
+
+func (r *WhenProcessor) Close() error {
+	return Close(r.p)
 }
 
 func addCondition(
@@ -158,6 +163,17 @@ func (p *IfThenElseProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		return p.els.Run(event)
 	}
 	return event, nil
+}
+
+func (p *IfThenElseProcessor) Close() error {
+	var err error
+	for _, proc := range p.then.List {
+		err = errors.Join(err, Close(proc))
+	}
+	for _, proc := range p.els.List {
+		err = errors.Join(err, Close(proc))
+	}
+	return err
 }
 
 func (p *IfThenElseProcessor) String() string {
