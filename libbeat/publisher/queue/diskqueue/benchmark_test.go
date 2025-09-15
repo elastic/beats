@@ -85,7 +85,7 @@ func setup(b *testing.B, compress bool, protobuf bool) (*diskQueue, queue.Produc
 	p := q.Producer(queue.ProducerConfig{})
 
 	b.Cleanup(func() {
-		err := q.Close()
+		err := q.Close(false)
 		if err != nil {
 			panic(err)
 		}

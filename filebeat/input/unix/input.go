@@ -30,7 +30,9 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
@@ -96,7 +98,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	log.Info("Starting Unix socket input")
 	defer log.Info("Unix socket input stopped")
 
-	metrics := newInputMetrics(ctx.ID, ctx.MetricsRegistry, s.config.Path)
+	metrics := newInputMetrics(ctx.ID, ctx.MetricsRegistry, s.config.Path, ctx.Logger)
 
 	server, err := unix.New(log, &s.config.Config, func(data []byte, _ inputsource.NetworkMetadata) {
 		log.Debugw("Data received", "bytes", len(data))
@@ -124,6 +126,11 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {
 		err = ctxerr
 	}
+
+	if err != nil {
+		ctx.UpdateStatus(status.Failed, err.Error())
+	}
+
 	return err
 }
 
@@ -140,7 +147,7 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for the unix socket processor. If id is empty
 // a nil inputMetric is returned.
-func newInputMetrics(id string, reg *monitoring.Registry, path string) *inputMetrics {
+func newInputMetrics(id string, reg *monitoring.Registry, path string, logger *logp.Logger) *inputMetrics {
 	if id == "" {
 		return nil
 	}
@@ -151,9 +158,9 @@ func newInputMetrics(id string, reg *monitoring.Registry, path string) *inputMet
 		arrivalPeriod:  metrics.NewUniformSample(1024),
 		processingTime: metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "arrival_period", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
-	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))
 
 	out.path.Set(path)

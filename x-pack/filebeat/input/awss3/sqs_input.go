@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type sqsReaderInput struct {
@@ -49,15 +50,18 @@ type sqsReaderInput struct {
 
 	// health status reporting
 	status status.StatusReporter
+
+	path *paths.Path
 }
 
 // Simple wrapper to handle creation of internal channels
-func newSQSReaderInput(config config, awsConfig awssdk.Config) *sqsReaderInput {
+func newSQSReaderInput(config config, awsConfig awssdk.Config, p *paths.Path) *sqsReaderInput {
 	return &sqsReaderInput{
 		config:           config,
 		awsConfig:        awsConfig,
 		workRequestChan:  make(chan struct{}, config.NumberOfWorkers),
 		workResponseChan: make(chan types.Message),
+		path:             p,
 	}
 }
 
@@ -127,7 +131,7 @@ func (in *sqsReaderInput) setup(
 
 	in.s3 = newAWSs3API(s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier))
 
-	in.metrics = newInputMetrics(inputContext.MetricsRegistry, in.config.NumberOfWorkers)
+	in.metrics = newInputMetrics(inputContext.MetricsRegistry, in.config.NumberOfWorkers, logp.NewNopLogger())
 
 	var err error
 	in.msgHandler, err = in.createEventProcessor()
@@ -353,9 +357,9 @@ func (in *sqsReaderInput) logConfigSummary() {
 
 func (in *sqsReaderInput) createEventProcessor() (sqsProcessor, error) {
 	fileSelectors := in.config.getFileSelectors()
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(in.metrics, in.s3, fileSelectors, in.config.BackupConfig)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(in.metrics, in.s3, fileSelectors, in.config.BackupConfig, in.log)
 
-	script, err := newScriptFromConfig(in.log.Named("sqs_script"), in.config.SQSScript)
+	script, err := newScriptFromConfig(in.log.Named("sqs_script"), in.config.SQSScript, in.path)
 	if err != nil {
 		return nil, err
 	}

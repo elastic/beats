@@ -96,7 +96,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			if m.config.Validate {
 				err = m.queryProvider.validate(response)
 				if err != nil {
-					m.Logger().Warnf("invalid NTP response from %s: %w", server, err)
+					m.Logger().Warnf("invalid NTP response from %s: %v", server, err)
 					return
 				}
 			}

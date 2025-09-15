@@ -64,7 +64,7 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 
 	log = log.Named(logName).With("instance_id", id)
 	log.Debugf("DNS processor config: %+v", c)
-	resolver, err := newMiekgResolver(metrics, c.Timeout, c.Transport, c.Nameservers...)
+	resolver, err := newMiekgResolver(metrics, c.Timeout, c.Transport, log, c.Nameservers...)
 	if err != nil {
 		return nil, err
 	}
