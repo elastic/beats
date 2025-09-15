@@ -108,7 +108,7 @@ While {{filebeat}} modules are still supported, we recommend {{agent}} integrati
         title = details["title"]
         applies_to = details["applies_to"]
         module_list_output += "* [*{} module*](/reference/filebeat/filebeat-module-{}.md)".format(title, m)
-        if applies_to and applies_to is not "ga":
+        if applies_to and applies_to != "ga":
             module_list_output += " {{applies_to}}`stack: {}`".format(applies_to)
         module_list_output += "\n"
 
