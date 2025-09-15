@@ -59,17 +59,17 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	// Logging and metrics (each processor instance has a unique ID).
 	var (
 		id      = int(instanceID.Add(1))
-		metrics = monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
+		metrics = monitoring.Default.GetOrCreateRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
 	)
 
 	log = log.Named(logName).With("instance_id", id)
 	log.Debugf("DNS processor config: %+v", c)
-	resolver, err := newMiekgResolver(metrics, c.Timeout, c.Transport, c.Nameservers...)
+	resolver, err := newMiekgResolver(metrics, c.Timeout, c.Transport, log, c.Nameservers...)
 	if err != nil {
 		return nil, err
 	}
 
-	cache, err := newLookupCache(metrics.NewRegistry("cache"), c.cacheConfig, resolver)
+	cache, err := newLookupCache(metrics.GetOrCreateRegistry("cache"), c.cacheConfig, resolver)
 	if err != nil {
 		return nil, err
 	}

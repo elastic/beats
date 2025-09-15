@@ -43,15 +43,22 @@ exporters:
       max_retries: 3
     user: elastic
     timeout: 1m30s
-    batcher:
+    max_conns_per_host: 1
+    sending_queue:
+      batch:
+        max_size: 1600
+        min_size: 0
+        sizer: items
+      block_on_overflow: true
       enabled: true
-      max_size: 1600
-      min_size: 0
+      num_consumers: 1
+      queue_size: 3200
+      wait_for_result: true
     mapping:
       mode: bodymap
     compression: gzip
     compression_params:
-      level: 1       
+      level: 1
 `
 
 func TestConverter(t *testing.T) {
@@ -70,7 +77,7 @@ receivers:
         - type: log
           enabled: true
           paths:
-            - /var/log/*.log	
+            - /var/log/*.log
     output:
       elasticsearch:
         hosts: ["https://localhost:9200"]
@@ -97,7 +104,7 @@ receivers:
         - type: log
           enabled: true
           paths:
-            - /var/log/*.log		  
+            - /var/log/*.log
     output:
       otelconsumer: null
 service:
@@ -128,10 +135,10 @@ receivers:
           enabled: true
           id: filestream-input-id
           paths:
-            - /tmp/flog.log		
+            - /tmp/flog.log
     output:
-      kafka: 
-        enabled: true 
+      kafka:
+        enabled: true
 
 service:
   pipelines:
@@ -187,15 +194,22 @@ exporters:
       max_retries: 3
     user: elastic-cloud
     timeout: 1m30s
-    batcher:
+    max_conns_per_host: 1
+    sending_queue:
+      batch:
+        max_size: 1600
+        min_size: 0
+        sizer: items
+      block_on_overflow: true
       enabled: true
-      max_size: 1600
-      min_size: 0
+      num_consumers: 1
+      queue_size: 3200
+      wait_for_result: true
     mapping:
-      mode: bodymap   
+      mode: bodymap
     compression: gzip
     compression_params:
-      level: 1    
+      level: 1
 receivers:
   filebeatreceiver:
     filebeat:
@@ -204,7 +218,7 @@ receivers:
           id: filestream-input-id
           paths:
             - /tmp/flog.log
-          type: filestream  
+          type: filestream
     output:
       otelconsumer: null
     cloud: null
@@ -261,7 +275,7 @@ receivers:
         events: 3200
         flush:
           min_events: 1600
-          timeout: 10s    	  
+          timeout: 10s
     output:
       otelconsumer: null
 service:
@@ -279,6 +293,197 @@ service:
 
 		expOutput := newFromYamlString(t, expectedOutput)
 		compareAndAssert(t, expOutput, input)
+
+	})
+
+	t.Run("test logstash exporter", func(t *testing.T) {
+		var supportedInput = `
+receivers:
+  filebeatreceiver:
+    output:
+      logstash:
+        bulk_max_size: 1024
+        backoff:
+          init: 2s
+          max: 2m0s
+        compression_level: 9
+        escape_html: true
+        hosts: ["https://localhost:5044"]
+        index: "filebeat"
+        loadbalance: true
+        max_retries: 2
+        pipelining: 0
+        proxy_url: "socks5://user:password@socks5-proxy:2233"
+        proxy_use_local_resolver: true
+        slow_start: true
+        # timeout: 30s
+        # ttl: 10s
+        workers: 2
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
+
+		var expectedOutput = `
+exporters:
+  logstash:
+    bulk_max_size: 1024
+    backoff:
+      init: 2s
+      max: 2m0s
+    compression_level: 9
+    escape_html: true
+    hosts: ["https://localhost:5044"]
+    index: "filebeat"
+    loadbalance: true
+    max_retries: 2
+    pipelining: 0
+    proxy_url: "socks5://user:password@socks5-proxy:2233"
+    proxy_use_local_resolver: true
+    slow_start: true
+    timeout: 30s
+    ttl: 0s
+    worker: 0
+    workers: 2
+receivers:
+  filebeatreceiver:
+    output:
+      otelconsumer: null
+service:
+  pipelines:
+    logs:
+      exporters:
+        - logstash
+      receivers:
+        - filebeatreceiver
+`
+		input := newFromYamlString(t, supportedInput)
+		err := c.Convert(context.Background(), input)
+		require.NoError(t, err, "error converting beats logstash-output config")
+
+		expOutput := newFromYamlString(t, expectedOutput)
+		compareAndAssert(t, expOutput, input)
+	})
+
+	t.Run("logstash config tests queue setting is promoted to global level", func(t *testing.T) {
+		var supportedInput = `
+receivers:
+  filebeatreceiver:
+    output:
+      logstash:
+        hosts: ["https://localhost:5044"]
+        queue:
+          mem:
+            events: 3200
+            flush:
+              min_events: 1600
+              timeout: 10s
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
+
+		var expectedOutput = `
+exporters:
+  logstash:
+    bulk_max_size: 2048
+    backoff:
+      init: 1s
+      max: 1m0s
+    compression_level: 3
+    escape_html: false
+    hosts: ["https://localhost:5044"]
+    index: ""
+    loadbalance: false
+    max_retries: 3
+    pipelining: 2
+    proxy_url: ""
+    proxy_use_local_resolver: false
+    slow_start: false
+    timeout: 30s
+    ttl: 0s
+    worker: 0
+    workers: 0
+receivers:
+  filebeatreceiver:
+    queue:
+      mem:
+        events: 3200
+        flush:
+          min_events: 1600
+          timeout: 10s
+    output:
+      otelconsumer: null
+service:
+  pipelines:
+    logs:
+      exporters:
+        - logstash
+      receivers:
+        - filebeatreceiver
+`
+		input := newFromYamlString(t, supportedInput)
+		err := c.Convert(context.Background(), input)
+		require.NoError(t, err, "error converting beats logstash-output config")
+
+		expOutput := newFromYamlString(t, expectedOutput)
+		compareAndAssert(t, expOutput, input)
+	})
+
+	t.Run("test logstash exporter with enabled false", func(t *testing.T) {
+		var supportedInput = `
+receivers:
+  filebeatreceiver:
+    output:
+      logstash:
+        enabled: false
+        hosts: ["https://localhost:5044"]
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
+
+		var expectedOutput = `
+receivers:
+  filebeatreceiver:
+    output:
+      otelconsumer: null
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+`
+		input := newFromYamlString(t, supportedInput)
+		err := c.Convert(context.Background(), input)
+		require.NoError(t, err, "error converting beats logstash-output config")
+
+		expOutput := newFromYamlString(t, expectedOutput)
+		compareAndAssert(t, expOutput, input)
+	})
+
+	t.Run("test Logstash failure if host is empty", func(t *testing.T) {
+		var unsupportedOutputConfig = `
+receivers:
+  filebeatreceiver:
+    output:
+      logstash:
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
+
+		input := newFromYamlString(t, unsupportedOutputConfig)
+		err := c.Convert(context.Background(), input)
+		require.ErrorContains(t, err, "failed unpacking logstash config: missing required field accessing 'hosts'")
 
 	})
 }
@@ -327,7 +532,7 @@ func TestLogLevel(t *testing.T) {
 			supportedInput := fmt.Sprintf(`
       receivers:
         filebeatreceiver:
-          logging: 
+          logging:
             level: %s
           filebeat:
             inputs:

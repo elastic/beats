@@ -77,7 +77,7 @@ func (i *lumberjackInput) Run(inputCtx inputv2.Context, pipeline beat.Pipeline) 
 
 	setGoLumberLogger(inputCtx.Logger.Named("go-lumber"))
 
-	metrics := newInputMetrics(inputCtx.MetricsRegistry)
+	metrics := newInputMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
 
 	s, err := newServer(i.config, inputCtx.Logger, client.Publish, inputCtx.StatusReporter, metrics)
 	if err != nil {

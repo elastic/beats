@@ -15,6 +15,8 @@ toc:
   - file: auditbeat/index.md
     children:
       - file: auditbeat/auditbeat-installation-configuration.md
+        children:
+          - file: auditbeat/auditbeat-installation-script.md
       - file: auditbeat/setting-up-running.md
         children:
           - file: auditbeat/directory-layout.md
@@ -181,6 +183,8 @@ toc:
   - file: filebeat/index.md
     children:
       - file: filebeat/filebeat-installation-configuration.md
+        children:
+          - file: filebeat/filebeat-installation-script.md
       - file: filebeat/setting-up-running.md
         children:
           - file: filebeat/directory-layout.md
@@ -521,6 +525,8 @@ toc:
   - file: heartbeat/index.md
     children:
       - file: heartbeat/heartbeat-installation-configuration.md
+        children:
+          - file: heartbeat/heartbeat-installation-script.md
       - file: heartbeat/setting-up-running.md
         children:
           - file: heartbeat/directory-layout.md
@@ -686,6 +692,8 @@ toc:
   - file: metricbeat/index.md
     children:
       - file: metricbeat/metricbeat-installation-configuration.md
+        children:
+          - file: metricbeat/metricbeat-installation-script.md
       - file: metricbeat/setting-up-running.md
         children:
           - file: metricbeat/directory-layout.md
@@ -1321,6 +1329,8 @@ toc:
   - file: packetbeat/index.md
     children:
       - file: packetbeat/packetbeat-installation-configuration.md
+        children:
+          - file: packetbeat/packetbeat-installation-script.md
       - file: packetbeat/setting-up-running.md
         children:
           - file: packetbeat/directory-layout.md
@@ -1517,6 +1527,8 @@ toc:
   - file: winlogbeat/index.md
     children:
       - file: winlogbeat/winlogbeat-installation-configuration.md
+        children:
+          - file: winlogbeat/winlogbeat-installation-script.md
       - file: winlogbeat/setting-up-running.md
         children:
           - file: winlogbeat/directory-layout.md
