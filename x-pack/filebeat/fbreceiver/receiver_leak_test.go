@@ -79,7 +79,6 @@ func TestLeak(t *testing.T) {
 		startAndStopReceiver(t, factory, &consumeLogs, &config)
 	})
 	t.Run("unhealthy consumer", func(t *testing.T) {
-		t.Skip("See https://github.com/elastic/ingest-dev/issues/6063")
 		defer oteltest.VerifyNoLeaks(t)
 		consumeLogs := oteltest.DummyConsumer{ConsumeError: errors.New("cannot publish data")}
 		startAndStopReceiver(t, factory, &consumeLogs, &config)

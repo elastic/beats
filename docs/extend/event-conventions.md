@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/event-conventions.html
+applies_to:
+  stack: ga
 ---
 
 # Naming Conventions [event-conventions]
