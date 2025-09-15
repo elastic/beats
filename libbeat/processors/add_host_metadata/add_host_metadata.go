@@ -170,6 +170,7 @@ func (p *addHostMetadata) loadData(useFQDN bool) (mapstr.M, error) {
 	data := cache.data.Get()
 	var err error
 	if data == nil || timestampExpired(cache.lastUpdate, p.config.CacheTTL) {
+		// Data is absent or expired, refresh it.
 		data, err = p.fetchData(useFQDN)
 		if err == nil {
 			cache.data.Set(data)
