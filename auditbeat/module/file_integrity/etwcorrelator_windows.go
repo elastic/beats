@@ -23,7 +23,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
+	"github.com/elastic/beats/v7/libbeat/reader/etw"
 )
 
 // Event Correlation System
