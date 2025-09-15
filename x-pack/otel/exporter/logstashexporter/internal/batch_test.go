@@ -94,7 +94,7 @@ func TestNewLogBatch(t *testing.T) {
 				require.NoError(t, err)
 				assert.NotNil(t, batch)
 				assert.NotNil(t, batch.resultCh)
-				assert.Equal(t, 0, batch.NumRetries())
+				assert.Equal(t, uint64(0), batch.NumRetries())
 
 				// Verify events count matches input
 				expectedEventCount := logs.LogRecordCount()
@@ -300,7 +300,7 @@ func TestLogBatchACK(t *testing.T) {
 	}
 
 	assert.Equal(t, LogBatchResultACK, result)
-	assert.Equal(t, 0, batch.NumRetries())
+	assert.Equal(t, uint64(0), batch.NumRetries())
 }
 
 func TestLogBatchDrop(t *testing.T) {
@@ -317,7 +317,7 @@ func TestLogBatchDrop(t *testing.T) {
 	}
 
 	assert.Equal(t, LogBatchResultDrop, result)
-	assert.Equal(t, 0, batch.NumRetries())
+	assert.Equal(t, uint64(0), batch.NumRetries())
 }
 
 func TestLogBatchRetry(t *testing.T) {
@@ -335,7 +335,7 @@ func TestLogBatchRetry(t *testing.T) {
 	}
 
 	assert.Equal(t, LogBatchResultRetry, result)
-	assert.Equal(t, 1, batch.NumRetries())
+	assert.Equal(t, uint64(1), batch.NumRetries())
 
 	// Second retry
 	batch.Retry()
@@ -347,7 +347,7 @@ func TestLogBatchRetry(t *testing.T) {
 	}
 
 	assert.Equal(t, LogBatchResultRetry, result)
-	assert.Equal(t, 2, batch.NumRetries())
+	assert.Equal(t, uint64(2), batch.NumRetries())
 }
 
 func TestLogBatchRetryEvents(t *testing.T) {
@@ -373,7 +373,7 @@ func TestLogBatchRetryEvents(t *testing.T) {
 
 	assert.Equal(t, LogBatchResultRetry, result)
 	assert.Equal(t, retryEvents, batch.Events())
-	assert.Equal(t, 1, batch.NumRetries())
+	assert.Equal(t, uint64(1), batch.NumRetries())
 }
 
 func TestLogBatchCancelled(t *testing.T) {
@@ -390,7 +390,7 @@ func TestLogBatchCancelled(t *testing.T) {
 	}
 
 	assert.Equal(t, LogBatchResultCancelled, result)
-	assert.Equal(t, 0, batch.NumRetries())
+	assert.Equal(t, uint64(0), batch.NumRetries())
 }
 
 func TestSplitRetry(t *testing.T) {
@@ -404,7 +404,7 @@ func TestAddRetry(t *testing.T) {
 		name     string
 		current  uint64
 		delta    int
-		expected int
+		expected uint64
 	}{
 		{"add zero", 5, 0, 5},
 		{"add to zero", 3, 0, 3},

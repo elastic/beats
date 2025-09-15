@@ -76,7 +76,7 @@ func (w *worker) close() {
 }
 
 func (w *clientWorker) Close() error {
-	w.worker.close()
+	w.close()
 	return w.client.Close()
 }
 
@@ -92,7 +92,7 @@ func (w *clientWorker) run(ctx context.Context) {
 }
 
 func (w *netClientWorker) Close() error {
-	w.worker.close()
+	w.close()
 	return w.client.Close()
 }
 

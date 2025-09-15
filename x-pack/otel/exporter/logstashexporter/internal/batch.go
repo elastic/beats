@@ -93,8 +93,8 @@ func (b *LogBatch) SplitRetry() bool {
 	return false
 }
 
-func (b *LogBatch) NumRetries() int {
-	return int(b.retries.Load())
+func (b *LogBatch) NumRetries() uint64 {
+	return b.retries.Load()
 }
 
 func (b *LogBatch) Result() chan LogBatchResult {
@@ -119,17 +119,19 @@ func (b *LogBatch) AddRetry(delta int) {
 		b.retries.Add(uint64(delta))
 		return
 	}
+	sub := uint64(-delta) // safe: delta < 0, so -delta > 0
 	for {
 		oldValue := b.retries.Load()
 		if oldValue == 0 {
 			return
 		}
-		newValue := int(oldValue) + delta // delta is negative
-		if newValue <= 0 {
-			b.retries.Store(0)
-			return
+		var newValue uint64
+		if oldValue <= sub {
+			newValue = 0
+		} else {
+			newValue = oldValue - sub
 		}
-		if b.retries.CompareAndSwap(oldValue, uint64(newValue)) {
+		if b.retries.CompareAndSwap(oldValue, newValue) {
 			return
 		}
 	}
