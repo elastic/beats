@@ -11,9 +11,11 @@ Filebeat supports reading from rotating log files. However, some log rotation st
 
 * **Avoid log rotation strategies that copy and truncate log files**
 
-    In Filebeat versions prior to 9.0.0, log rotation strategies that copy and truncate the input log file can result in Filebeat sending duplicate events. In these versions, Filebeat identifies files by inode and device ID because the [file identity configuration](filebeat-input-filestream.md#filebeat-input-filestream-file-identity) of the `filestream` input is set to `native` by default. During log rotation, lines that Filebeat has already processed are moved to a new file. If the file identity is set to `native`, when Filebeat encounters the new file, it starts reading it from the beginning because the previous state information (the offset and read timestamp) is associated with the inode and device ID of the old file.
+    The default file identity of the `filestream` input is `fingerprint`, where Filebeat identifies files using file fingerprints produced by the scanner component of the `filestream` input. Changing the default file identity configuration may result in duplicated events in the output.
 
-    In Filebeat 9.0.0 and later versions, the default file identity is `fingerprint`, where Filebeat identifies files using file fingerprints produced by the scanner component of the `filestream` input. When using Filebeat 9.0.0 or a later version, changing the default file identity configuration may result in duplicated events in the output.
+    :::{note}
+    In Filebeat versions prior to 9.0.0, log rotation strategies that copy and truncate the input log file can result in Filebeat sending duplicate events. In these versions, Filebeat identifies files by inode and device ID because the [file identity configuration](filebeat-input-filestream.md#filebeat-input-filestream-file-identity) of the `filestream` input is set to `native` by default. During log rotation, lines that Filebeat has already processed are moved to a new file. If the file identity is set to `native`, when Filebeat encounters the new file, it starts reading it from the beginning because the previous state information (the offset and read timestamp) is associated with the inode and device ID of the old file.
+    :::
 
     Furthermore, strategies that copy and truncate the input log file can result in lost events if lines are written to the log file after it’s copied, but before it’s truncated.
 
