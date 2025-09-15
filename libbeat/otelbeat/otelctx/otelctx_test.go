@@ -37,8 +37,8 @@ func TestGetBeatEventMeta(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
-						BeatNameCtxKey:    {"filebeat"},
-						BeatVersionCtxKey: {"8.0.0"},
+						BeatIndexPrefixCtxKey: {"filebeat"},
+						BeatVersionCtxKey:     {"8.0.0"},
 					}),
 				}
 				return client.NewContext(ctx, info)
@@ -70,7 +70,7 @@ func TestGetBeatEventMeta(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
-						BeatNameCtxKey: {"filebeat"},
+						BeatIndexPrefixCtxKey: {"filebeat"},
 					}),
 				}
 				return client.NewContext(ctx, info)
@@ -213,6 +213,54 @@ func TestGetBeatName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := tt.setupCtx()
 			name := GetBeatName(ctx)
+			assert.Equal(t, tt.expected, name)
+		})
+	}
+}
+
+func TestGetBeatIndexPrefix(t *testing.T) {
+	tests := []struct {
+		name     string
+		setupCtx func() context.Context
+		expected string
+	}{
+		{
+			name: "prefix exists",
+			setupCtx: func() context.Context {
+				ctx := t.Context()
+				info := client.Info{
+					Metadata: client.NewMetadata(map[string][]string{
+						BeatIndexPrefixCtxKey: {"filebeat"},
+					}),
+				}
+				return client.NewContext(ctx, info)
+			},
+			expected: "filebeat",
+		},
+		{
+			name: "prefix missing",
+			setupCtx: func() context.Context {
+				ctx := t.Context()
+				info := client.Info{
+					Metadata: client.NewMetadata(map[string][]string{}),
+				}
+				return client.NewContext(ctx, info)
+			},
+			expected: "",
+		},
+		{
+			name: "no client info",
+			setupCtx: func() context.Context {
+				return t.Context()
+			},
+			expected: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := tt.setupCtx()
+			name := GetBeatIndexPrefix(ctx)
 			assert.Equal(t, tt.expected, name)
 		})
 	}

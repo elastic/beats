@@ -26,18 +26,20 @@ import (
 )
 
 const (
-	BeatNameCtxKey    = "beat_name"
-	BeatVersionCtxKey = "beat_version"
+	BeatNameCtxKey        = "beat_name"
+	BeatVersionCtxKey     = "beat_version"
+	BeatIndexPrefixCtxKey = "beat_index_prefix"
 )
 
 // NewConsumerContext creates a new context.Context adding the beats metadata
-// to the client.Info. This is used to pass the beat name and version to the
+// to the client.Info. This is used to pass the beat name, version and index prefix to the
 // Collector, so it can be used by the components to access that data.
 func NewConsumerContext(ctx context.Context, beatInfo beat.Info) context.Context {
 	clientInfo := client.Info{
 		Metadata: client.NewMetadata(map[string][]string{
-			BeatNameCtxKey:    {beatInfo.Beat},
-			BeatVersionCtxKey: {beatInfo.Version},
+			BeatNameCtxKey:        {beatInfo.Beat},
+			BeatVersionCtxKey:     {beatInfo.Version},
+			BeatIndexPrefixCtxKey: {beatInfo.IndexPrefix},
 		}),
 	}
 	return client.NewContext(ctx, clientInfo)
@@ -63,18 +65,30 @@ func GetBeatVersion(ctx context.Context) string {
 	return ""
 }
 
+// GetBeatIndexPrefix retrieves the beat index prefix from the context metadata
+// If it is not found, it returns an empty string.
+func GetBeatIndexPrefix(ctx context.Context) string {
+	clientInfo := client.FromContext(ctx)
+	if values := clientInfo.Metadata.Get(BeatIndexPrefixCtxKey); len(values) > 0 {
+		return values[0]
+	}
+	return ""
+}
+
 // GetBeatEventMeta gives beat.Event.Meta from the context metadata
+// The value of `[@metadata][beat]` is taken from the `Index` option of logstash output.
+// In Elastic Agent, `Index` option is not available, hence, the value is derived from `IndexPrefix` field of beat.Info
 func GetBeatEventMeta(ctx context.Context) map[string]any {
 	ctxData := client.FromContext(ctx)
-	var beatName, beatVersion string
-	if v := ctxData.Metadata.Get(BeatNameCtxKey); len(v) > 0 {
-		beatName = v[0]
+	var beatIndexPrefix, beatVersion string
+	if v := ctxData.Metadata.Get(BeatIndexPrefixCtxKey); len(v) > 0 {
+		beatIndexPrefix = v[0]
 	}
 	if v := ctxData.Metadata.Get(BeatVersionCtxKey); len(v) > 0 {
 		beatVersion = v[0]
 	}
 	return map[string]any{
-		"beat":    beatName,
+		"beat":    beatIndexPrefix,
 		"version": beatVersion,
 	}
 }
