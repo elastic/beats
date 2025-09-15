@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/otelmanager"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -183,12 +182,8 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		b.Info.FQDN = fqdn
 	}
 
-	// register NewOtelManager
-	management.SetManagerFactory(otelmanager.NewOtelManager)
-
 	// initialize config manager
-	oCfg, _ := cfg.Child("management.otel", -1)
-	m, err := management.NewManager(oCfg, b.Registry, logger)
+	m, err := management.NewManager(b.Config.Management, b.Registry, logger)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new manager: %w", err)
 	}
