@@ -26,7 +26,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
-	oteltranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
@@ -40,7 +39,6 @@ type unsupportedConfig struct {
 	NonIndexablePolicy *config.Namespace `config:"non_indexable_policy"`
 	EscapeHTML         bool              `config:"escape_html"`
 	Kerberos           *kerberos.Config  `config:"kerberos"`
-	ProxyDisable       bool              `config:"proxy_disable"`
 }
 
 type esToOTelOptions struct {
@@ -49,7 +47,6 @@ type esToOTelOptions struct {
 
 	Index    string `config:"index"`
 	Pipeline string `config:"pipeline"`
-	ProxyURL string `config:"proxy_url"`
 	Preset   string `config:"preset"`
 }
 
@@ -58,7 +55,6 @@ var defaultOptions = esToOTelOptions{
 
 	Index:    "", // Dynamic routing is disabled if index is set
 	Pipeline: "",
-	ProxyURL: "",
 	Preset:   "custom", // default is custom if not set
 	HostWorkerCfg: outputs.HostWorkerCfg{
 		Workers: 1,
@@ -112,18 +108,8 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 		hosts = append(hosts, esURL)
 	}
 
-	// convert ssl configuration
-	otelTLSConfg, err := oteltranslate.TLSCommonToOTel(output, logger)
-	if err != nil {
-		return nil, fmt.Errorf("cannot convert SSL config into OTel: %w", err)
-	}
-
 	otelYAMLCfg := map[string]any{
 		"endpoints": hosts, // hosts, protocol, path, port
-
-		// ClientConfig
-		"timeout":           escfg.Transport.Timeout,         // timeout
-		"idle_conn_timeout": escfg.Transport.IdleConnTimeout, // idle_connection_timeout
 
 		// max_conns_per_host is a "hard" limit on number of open connections.
 		// Ideally, escfg.NumWorkers() should map to num_consumer, but we had a bug in upstream
@@ -172,12 +158,14 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 	setIfNotNil(otelYAMLCfg, "password", escfg.Password)                                         // password
 	setIfNotNil(otelYAMLCfg, "api_key", base64.StdEncoding.EncodeToString([]byte(escfg.APIKey))) // api_key
 
-	setIfNotNil(otelYAMLCfg, "headers", escfg.Headers)    // headers
-	setIfNotNil(otelYAMLCfg, "tls", otelTLSConfg)         // tls config
-	setIfNotNil(otelYAMLCfg, "proxy_url", escfg.ProxyURL) // proxy_url
-	setIfNotNil(otelYAMLCfg, "pipeline", escfg.Pipeline)  // pipeline
+	setIfNotNil(otelYAMLCfg, "headers", escfg.Headers)   // headers
+	setIfNotNil(otelYAMLCfg, "pipeline", escfg.Pipeline) // pipeline
 	// Dynamic routing is disabled if output.elasticsearch.index is set
 	setIfNotNil(otelYAMLCfg, "logs_index", escfg.Index) // index
+
+	// idle_connection_timeout, timeout, ssl block,
+	// proxy_url, proxy_headers, proxy_disable are handled by beatsauthextension https://github.com/elastic/opentelemetry-collector-components/tree/main/extension/beatsauthextension
+	// caller of this method should take care of integrating the extension
 
 	return otelYAMLCfg, nil
 }
@@ -201,8 +189,6 @@ func checkUnsupportedConfig(cfg *config.C, logger *logp.Logger) error {
 		return fmt.Errorf("pipelines is currently not supported: %w", errors.ErrUnsupported)
 	} else if cfg.HasField("parameters") {
 		return fmt.Errorf("parameters is currently not supported: %w", errors.ErrUnsupported)
-	} else if cfg.HasField("proxy_headers") {
-		return fmt.Errorf("proxy_headers is currently not supported: %w", errors.ErrUnsupported)
 	} else if value, err := cfg.Bool("allow_older_versions", -1); err == nil && !value {
 		return fmt.Errorf("allow_older_versions:false is currently not supported: %w", errors.ErrUnsupported)
 	}
