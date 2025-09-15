@@ -170,7 +170,7 @@ func TestInvalidConfiguredTimegrain(t *testing.T) {
 		// one-minute timegrain is not supported by some metrics
 		Timegrain: oneMinuteDuration}
 	resourceConfig := azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
-	client := azure.NewMockClient(logptest.NewTestingLogger(t, ""))
+	client := azure.NewMockClient()
 
 	m := &azure.MockService{}
 	m.On("GetMetricDefinitionsWithRetry", mock.Anything,
@@ -200,7 +200,7 @@ func TestMapMetricNoConfiguredTimegrain(t *testing.T) {
 	}
 	metricConfig := azure.MetricConfig{Namespace: "namespace", Dimensions: []azure.DimensionConfig{{Name: "location", Value: "West Europe"}}}
 	resourceConfig := azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
-	client := azure.NewMockClient(logptest.NewTestingLogger(t, ""))
+	client := azure.NewMockClient()
 	t.Run("return error when no metric definitions were found", func(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitionsWithRetry", mock.Anything, mock.Anything).Return(armmonitor.MetricDefinitionCollection{}, fmt.Errorf("invalid resource ID"))
