@@ -189,7 +189,7 @@ func TestConcurrentMapMetricsNoConfiguredTimegrain(t *testing.T) {
 	metricConfig := azure.MetricConfig{Namespace: "namespace",
 		Dimensions: []azure.DimensionConfig{{Name: "location", Value: "West Europe"}}}
 	resourceConfig := azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
-	client := azure.NewMockBatchClient(logptest.NewTestingLogger(t, ""))
+	client := azure.NewMockBatchClient()
 	t.Run("return error when no metric definitions were found", func(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitionsWithRetry", mock.Anything, mock.Anything).Return(armmonitor.MetricDefinitionCollection{}, fmt.Errorf("invalid resource ID"))
