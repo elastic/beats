@@ -158,7 +158,7 @@ func timestampExpired(timestamp time.Time, ttl time.Duration) bool {
 	if ttl <= 0 {
 		return true
 	}
-	return timestamp.Add(ttl).Before((time.Now()))
+	return timestamp.Add(ttl).Before(time.Now())
 }
 
 // loadData update's the processor's associated host metadata
