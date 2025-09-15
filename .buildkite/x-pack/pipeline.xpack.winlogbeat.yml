@@ -295,3 +295,21 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/winlogbeat: Packaging Linux"
+
+      - label: ":ubuntu: x-pack/winlogbeat: Packaging Linux"
+        key: "packaging-arm"
+        env:
+          PLATFORMS: "+all windows/amd64"
+        command: |
+          .buildkite/scripts/packaging/packaging.sh x-pack/winlogbeat
+        retry:
+          automatic:
+            - limit: 1
+        timeout_in_minutes: 20
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "x-pack/winlogbeat: Packaging Linux arm64"
