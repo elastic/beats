@@ -138,9 +138,19 @@ http.port: {{.MonitoringPort}}
 		},
 		1*time.Minute, 1*time.Second, "expected at least 1 log for metricbeat and otel receiver")
 
-	otelDoc := otelDocs.Hits.Hits[0]
-	metricbeatDoc := metricbeatDocs.Hits.Hits[0]
-	assertMapstrKeysEqual(t, otelDoc.Source, metricbeatDoc.Source, []string{}, "expected documents keys to be equal")
+	var metricbeatDoc, otelDoc mapstr.M
+	otelDoc = otelDocs.Hits.Hits[0].Source
+	metricbeatDoc = metricbeatDocs.Hits.Hits[0].Source
+	ignoredFields := []string{
+		// only present in beats receivers
+		"agent.otelcol.component.id",
+		"agent.otelcol.component.kind",
+	}
+	assert.Equal(t, "metricbeatreceiver", otelDoc.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
+	assert.Equal(t, "receiver", otelDoc.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
+	assert.NotContains(t, metricbeatDoc.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in metricbeat log record")
+	assert.NotContains(t, metricbeatDoc.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in metricbeat log record")
+	assertMapstrKeysEqual(t, otelDoc, metricbeatDoc, ignoredFields, "expected documents keys to be equal")
 	assertMonitoring(t, optionsValue.MonitoringPort)
 }
 
@@ -308,7 +318,12 @@ processors:
 		1*time.Minute, 1*time.Second, "expected at least a single log for metricbeat and otel mode")
 	otelDoc := otelDocs.Hits.Hits[0]
 	metricbeatDoc := metricbeatDocs.Hits.Hits[0]
-	assertMapstrKeysEqual(t, otelDoc.Source, metricbeatDoc.Source, []string{}, "expected documents keys to be equal")
+	ignoredFields := []string{
+		// only present in beats receivers
+		"agent.otelcol.component.id",
+		"agent.otelcol.component.kind",
+	}
+	assertMapstrKeysEqual(t, otelDoc.Source, metricbeatDoc.Source, ignoredFields, "expected documents keys to be equal")
 }
 
 func TestMetricbeatOTelMultipleReceiversE2E(t *testing.T) {
@@ -464,8 +479,13 @@ service:
 			assert.GreaterOrEqualf(ct, r0Docs.Hits.Total.Value, 1, "expected at least 1 log for receiver 0, got %d", r0Docs.Hits.Total.Value)
 			assert.GreaterOrEqualf(ct, r1Docs.Hits.Total.Value, 1, "expected at least 1 log for receiver 1, got %d", r1Docs.Hits.Total.Value)
 		},
-		1*time.Minute, 100*time.Millisecond, "expected to found receiver logs")
-	assertMapstrKeysEqual(t, r0Docs.Hits.Hits[0].Source, r1Docs.Hits.Hits[0].Source, []string{}, "expected documents keys to be equal")
+		1*time.Minute, 100*time.Millisecond, "expected at least 1 log for each receiver")
+	ignoredFields := []string{
+		// only present in beats receivers
+		"agent.otelcol.component.id",
+		"agent.otelcol.component.kind",
+	}
+	assertMapstrKeysEqual(t, r0Docs.Hits.Hits[0].Source, r1Docs.Hits.Hits[0].Source, ignoredFields, "expected documents keys to be equal")
 	for _, rec := range otelConfig.Receivers {
 		assertMonitoring(t, rec.MonitoringPort)
 	}
@@ -527,24 +547,33 @@ processors:
 `
 	expectedExporter := `exporters:
     elasticsearch:
-        batcher:
-            enabled: true
-            max_size: 1600
-            min_size: 0
         compression: gzip
         compression_params:
             level: 1
         endpoints:
             - http://localhost:9200
+        idle_conn_timeout: 3s
         logs_index: index
         mapping:
             mode: bodymap
+        max_conns_per_host: 1
         password: testing
         retry:
             enabled: true
             initial_interval: 1s
             max_interval: 1m0s
             max_retries: 3
+        sending_queue:
+            batch:
+                max_size: 1600
+                min_size: 0
+                sizer: items
+            block_on_overflow: true
+            enabled: true
+            num_consumers: 1
+            queue_size: 3200
+            wait_for_result: true
+        timeout: 1m30s
         user: admin`
 	expectedReceiver := `receivers:
     metricbeatreceiver:

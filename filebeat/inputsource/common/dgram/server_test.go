@@ -15,18 +15,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package util
+package dgram
 
 import (
-	dto "github.com/prometheus/client_model/go"
+	"errors"
+	"net"
+	"testing"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// GetLabel returns desired label from the given metric, or "" if not present
-func GetLabel(m *dto.Metric, label string) string {
-	for _, l := range m.GetLabel() {
-		if l.GetName() == label {
-			return l.GetValue()
-		}
+func TestListenerRunReturnsErrorWhenConnectionFails(t *testing.T) {
+	l := NewListener(
+		"test family",
+		"not used",
+		nil,
+		func() (net.PacketConn, error) {
+			return nil, errors.New("some error")
+		},
+		&ListenerConfig{},
+		logp.NewNopLogger(),
+	)
+
+	if err := l.Run(t.Context()); err == nil {
+		t.Fatal("expecting an error from Listener.Run")
 	}
-	return ""
 }

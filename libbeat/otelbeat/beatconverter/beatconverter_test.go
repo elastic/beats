@@ -33,6 +33,7 @@ exporters:
   elasticsearch:
     endpoints:
       - https://localhost:9200
+    idle_conn_timeout: 3s
     logs_index: form-otel-exporter
     password: changeme
     retry:
@@ -41,10 +42,18 @@ exporters:
       max_interval: 1m0s
       max_retries: 3
     user: elastic
-    batcher:
+    timeout: 1m30s
+    max_conns_per_host: 1
+    sending_queue:
+      batch:
+        max_size: 1600
+        min_size: 0
+        sizer: items
+      block_on_overflow: true
       enabled: true
-      max_size: 1600
-      min_size: 0
+      num_consumers: 1
+      queue_size: 3200
+      wait_for_result: true
     mapping:
       mode: bodymap
     compression: gzip
@@ -175,6 +184,7 @@ exporters:
   elasticsearch:
     endpoints:
       - https://es-hostname.elastic.co:443
+    idle_conn_timeout: 3s
     logs_index: form-otel-exporter
     password: password
     retry:
@@ -183,10 +193,18 @@ exporters:
       max_interval: 1m0s
       max_retries: 3
     user: elastic-cloud
-    batcher:
+    timeout: 1m30s
+    max_conns_per_host: 1
+    sending_queue:
+      batch:
+        max_size: 1600
+        min_size: 0
+        sizer: items
+      block_on_overflow: true
       enabled: true
-      max_size: 1600
-      min_size: 0
+      num_consumers: 1
+      queue_size: 3200
+      wait_for_result: true
     mapping:
       mode: bodymap
     compression: gzip

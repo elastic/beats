@@ -5,7 +5,7 @@
 package fbreceiver
 
 import (
-	"context"
+	"errors"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -15,20 +15,15 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
-	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver"
-	"go.uber.org/goleak"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
+
+	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 )
 
 func TestLeak(t *testing.T) {
-	// opencensus goroutine comes from init in cloud.google.com/go/pubsub and filebeat/input/gcppubsub
-	defer goleak.VerifyNone(t,
-		goleak.IgnoreAnyFunction("github.com/Microsoft/go-winio.getQueuedCompletionStatus"),
-		goleak.IgnoreAnyFunction("go.opencensus.io/stats/view.(*worker).start"))
-
 	monitorSocket := genSocketPath()
 	var monitorHost string
 	if runtime.GOOS == "windows" {
@@ -63,10 +58,9 @@ func TestLeak(t *testing.T) {
 					"*",
 				},
 			},
-			"path.home":               t.TempDir(),
-			"http.enabled":            true,
-			"http.host":               monitorHost,
-			"queue.mem.flush.timeout": "0s",
+			"path.home":    t.TempDir(),
+			"http.enabled": true,
+			"http.host":    monitorHost,
 			"processors": []map[string]any{
 				{
 					"add_host_metadata": map[string]any{
@@ -78,13 +72,30 @@ func TestLeak(t *testing.T) {
 	}
 
 	factory := NewFactory()
+
+	t.Run("healthy consumer", func(t *testing.T) {
+		defer oteltest.VerifyNoLeaks(t)
+		var consumeLogs oteltest.DummyConsumer
+		startAndStopReceiver(t, factory, &consumeLogs, &config)
+	})
+	t.Run("unhealthy consumer", func(t *testing.T) {
+		defer oteltest.VerifyNoLeaks(t)
+		consumeLogs := oteltest.DummyConsumer{ConsumeError: errors.New("cannot publish data")}
+		startAndStopReceiver(t, factory, &consumeLogs, &config)
+	})
+
+}
+
+// StartAndStopReceiver creates a receiver using the provided parameters, starts it, verifies that the expected logs
+// are output, then shuts it down, and verifies the logs again.
+func startAndStopReceiver(t *testing.T, factory receiver.Factory, consumer consumer.Logs, config component.Config) {
+	t.Helper()
 	var receiverSettings receiver.Settings
 	observedCore, observedLogs := observer.New(zapcore.DebugLevel)
 	receiverSettings.Logger = zap.New(observedCore)
 	receiverSettings.ID = component.NewIDWithName(factory.Type(), "r1")
 
-	var consumeLogs DummyConsumer
-	rec, err := factory.CreateLogs(t.Context(), receiverSettings, &config, &consumeLogs)
+	rec, err := factory.CreateLogs(t.Context(), receiverSettings, config, consumer)
 	require.NoError(t, err)
 	require.NoError(t, rec.Start(t.Context(), nil))
 	if !assert.Eventually(t,
@@ -112,16 +123,4 @@ func TestLeak(t *testing.T) {
 		}
 		t.Fatalf("receiver didn't stop, see logs above")
 	}
-}
-
-type DummyConsumer struct {
-	context.Context
-}
-
-func (d *DummyConsumer) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
-	return nil
-}
-
-func (d *DummyConsumer) Capabilities() consumer.Capabilities {
-	return consumer.Capabilities{}
 }
