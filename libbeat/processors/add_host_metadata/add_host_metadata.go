@@ -21,7 +21,6 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -65,18 +64,20 @@ type hostInfo interface {
 
 type hostInfoFactory func() (hostInfo, error)
 
+type hostMetadataCache struct {
+	sync.Mutex
+	lastUpdate time.Time
+	data       mapstr.Pointer
+}
+
 type addHostMetadata struct {
-	lastUpdate struct {
-		time.Time
-		sync.Mutex
-	}
-	data            mapstr.Pointer
+	// One cache for standard hostname, one for FQDN
+	caches          [2]hostMetadataCache
 	geoData         mapstr.M
 	config          Config
 	logger          *logp.Logger
 	metrics         metrics
 	hostInfoFactory hostInfoFactory
-	useFQDN         atomic.Bool
 }
 
 // New constructs a new add_host_metadata processor.
@@ -87,16 +88,19 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	}
 
 	p := &addHostMetadata{
+		caches: [2]hostMetadataCache{
+			{data: mapstr.NewPointer(nil)},
+			{data: mapstr.NewPointer(nil)},
+		},
 		config: c,
-		data:   mapstr.NewPointer(nil),
 		logger: log.Named(logName),
 		metrics: metrics{
 			FQDNLookupFailed: monitoring.NewInt(reg, "fqdn_lookup_failed"),
 		},
 		hostInfoFactory: func() (hostInfo, error) { return sysinfo.Host() },
 	}
-	p.useFQDN.Store(features.FQDN())
-	if err := p.loadData(true); err != nil {
+	// Fetch and cache the initial host data.
+	if _, err := p.loadData(features.FQDN()); err != nil {
 		return nil, fmt.Errorf("failed to load data: %w", err)
 	}
 
@@ -118,18 +122,15 @@ func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	// check if the FQDN setting changed, and we need to invalidate the cache
-	useFQDNNew := features.FQDN()
-	useFQDNOld := p.useFQDN.Load()
-	noSwapConflict := p.useFQDN.CompareAndSwap(useFQDNOld, useFQDNNew)
-	invalidateCache := noSwapConflict && useFQDNNew != useFQDNOld
-
-	err := p.loadData(!invalidateCache)
+	data, err := p.loadData(features.FQDN())
 	if err != nil {
 		return nil, fmt.Errorf("error loading data during event update: %w", err)
 	}
 
-	event.Fields.DeepUpdate(p.data.Get().Clone())
+	// Superficially this clone seems unnecessary, but it seems to have been
+	// applied as a fix a long time ago -- possibly there can be later processors
+	// or changes to an event that would affect the cached data?
+	event.Fields.DeepUpdate(data.Clone())
 
 	if len(p.geoData) > 0 {
 		event.Fields.DeepUpdate(p.geoData)
@@ -146,36 +147,50 @@ func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 //	return nil
 //}
 
-func (p *addHostMetadata) expired() bool {
+func (p *addHostMetadata) cacheForFQDN(useFQDN bool) *hostMetadataCache {
+	if useFQDN {
+		return &p.caches[1]
+	}
+	return &p.caches[0]
+}
 
-	p.lastUpdate.Lock()
-	defer p.lastUpdate.Unlock()
-
-	if p.config.CacheTTL <= 0 {
+func timestampExpired(timestamp time.Time, ttl time.Duration) bool {
+	if ttl <= 0 {
 		return true
 	}
-
-	if p.lastUpdate.Add(p.config.CacheTTL).After(time.Now()) {
-		return false
-	}
-	p.lastUpdate.Time = time.Now()
-	return true
+	return timestamp.Add(ttl).Before((time.Now()))
 }
 
 // loadData update's the processor's associated host metadata
-func (p *addHostMetadata) loadData(checkCache bool) error {
-	if checkCache && !p.expired() {
-		return nil
-	}
+func (p *addHostMetadata) loadData(useFQDN bool) (mapstr.M, error) {
+	cache := p.cacheForFQDN(useFQDN)
+	cache.Lock()
+	defer cache.Unlock()
 
+	data := cache.data.Get()
+	var err error
+	if data == nil || timestampExpired(cache.lastUpdate, p.config.CacheTTL) {
+		data, err = p.fetchData(useFQDN)
+		if err == nil {
+			cache.data.Set(data)
+		}
+		// Backwards compatibility (for now): cache timestamp is updated even if
+		// the update fails (falls back on the last successful update, and avoids
+		// blocking the pipeline when there are issues with the hostname).
+		cache.lastUpdate = time.Now()
+	}
+	return data, err
+}
+
+func (p *addHostMetadata) fetchData(useFQDN bool) (mapstr.M, error) {
 	h, err := p.hostInfoFactory()
 	if err != nil {
-		return fmt.Errorf("error collecting host info: %w", err)
+		return nil, fmt.Errorf("error collecting host info: %w", err)
 	}
 
 	hInfo := h.Info()
 	hostname := hInfo.Hostname
-	if p.useFQDN.Load() {
+	if useFQDN {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 		defer cancel()
 
@@ -205,24 +220,23 @@ func (p *addHostMetadata) loadData(checkCache bool) error {
 
 		if len(ipList) > 0 {
 			if _, err := data.Put("host.ip", ipList); err != nil {
-				return fmt.Errorf("could not set host.ip: %w", err)
+				return nil, fmt.Errorf("could not set host.ip: %w", err)
 			}
 		}
 		if len(hwList) > 0 {
 			if _, err := data.Put("host.mac", hwList); err != nil {
-				return fmt.Errorf("could not set host.mac: %w", err)
+				return nil, fmt.Errorf("could not set host.mac: %w", err)
 			}
 		}
 	}
 
 	if p.config.Name != "" {
 		if _, err := data.Put("host.name", p.config.Name); err != nil {
-			return fmt.Errorf("could not set host.name: %w", err)
+			return nil, fmt.Errorf("could not set host.name: %w", err)
 		}
 	}
 
-	p.data.Set(data)
-	return nil
+	return data, nil
 }
 
 func (p *addHostMetadata) String() string {

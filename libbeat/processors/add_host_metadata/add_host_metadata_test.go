@@ -717,15 +717,17 @@ func newWithHostInfoFactory(cfg *conf.C, log *logp.Logger, factory hostInfoFacto
 
 	p := &addHostMetadata{
 		config: c,
-		data:   mapstr.NewPointer(nil),
+		caches: [2]hostMetadataCache{
+			{data: mapstr.NewPointer(nil)},
+			{data: mapstr.NewPointer(nil)},
+		},
 		logger: log.Named(logName),
 		metrics: metrics{
 			FQDNLookupFailed: monitoring.NewInt(reg, "fqdn_lookup_failed"),
 		},
 		hostInfoFactory: factory,
 	}
-	p.useFQDN.Store(features.FQDN())
-	if err := p.loadData(true); err != nil {
+	if _, err := p.loadData(features.FQDN()); err != nil {
 		return nil, fmt.Errorf("failed to load data: %w", err)
 	}
 
