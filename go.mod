@@ -239,7 +239,6 @@ require (
 require (
 	github.com/cilium/ebpf v0.16.0
 	go.opentelemetry.io/collector/client v1.38.0
-	go.opentelemetry.io/collector/consumer/consumertest v0.132.0
 	go.opentelemetry.io/collector/exporter v0.132.0
 	go.opentelemetry.io/collector/exporter/exportertest v0.132.0
 	go.opentelemetry.io/collector/pipeline v1.38.0
@@ -443,6 +442,7 @@ require (
 	go.opentelemetry.io/collector/connector/connectortest v0.132.0 // indirect
 	go.opentelemetry.io/collector/connector/xconnector v0.132.0 // indirect
 	go.opentelemetry.io/collector/consumer/consumererror/xconsumererror v0.132.0 // indirect
+	go.opentelemetry.io/collector/consumer/consumertest v0.132.0 // indirect
 	go.opentelemetry.io/collector/consumer/xconsumer v0.132.0 // indirect
 	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.132.0 // indirect
 	go.opentelemetry.io/collector/exporter/xexporter v0.132.0 // indirect
