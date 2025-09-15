@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"runtime"
+	"sync"
 	"testing"
 	"time"
 
@@ -522,6 +523,82 @@ func TestFQDNEventSync(t *testing.T) {
 	}, time.Second*3600, time.Millisecond*10)
 }
 
+func TestDataReload(t *testing.T) {
+	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
+		"cache.ttl": "5m",
+	})
+
+	// Start with FQDN off
+	err := features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+		"features.fqdn.enabled": false,
+	}))
+	require.NoError(t, err)
+
+	info := &mockHostInfo{}
+	factory := func() (hostInfo, error) {
+		return info, nil
+	}
+
+	p, err := newWithHostInfoFactory(testConfig, logptest.NewTestingLogger(t, ""), factory)
+	require.NoError(t, err)
+
+	// we should have a single data reload during creation
+	assert.Equal(t, 1, info.HostInfoRequestCount)
+	assert.Equal(t, 0, info.FQDNRequestCount)
+
+	closeCh := make(chan struct{})
+	wg := &sync.WaitGroup{}
+	t.Cleanup(func() {
+		close(closeCh)
+		wg.Wait()
+	})
+	// start some goroutines enriching events in an infinite loop
+	for range 10 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for {
+				select {
+				case <-closeCh:
+					return
+				default:
+				}
+				_, err := p.Run(&beat.Event{
+					Fields: mapstr.M{},
+				})
+				require.NoError(t, err)
+			}
+		}()
+	}
+
+	// update
+	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+		"features.fqdn.enabled": true,
+	}))
+	require.NoError(t, err)
+
+	t.Logf("updated FQDN")
+
+	// we should have reloaded the data once
+	// note that with fqdn enabled, we still fetch the host info
+	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		assert.Equal(collect, 2, info.HostInfoRequestCount)
+		assert.Equal(collect, 1, info.FQDNRequestCount)
+	}, time.Second*5, time.Millisecond)
+
+	// update back to the original value
+	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+		"features.fqdn.enabled": false,
+	}))
+	require.NoError(t, err)
+
+	// we should have reloaded the data once more
+	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		assert.Equal(collect, 3, info.HostInfoRequestCount)
+		assert.Equal(collect, 1, info.FQDNRequestCount)
+	}, time.Second*5, time.Millisecond)
+}
+
 func TestFQDNLookup(t *testing.T) {
 	hostname := "placeholder"
 
@@ -598,14 +675,17 @@ func fqdnFeatureFlagConfig(fqdnEnabled bool) *conf.C {
 }
 
 type mockHostInfo struct {
-	FQDN     string
-	Hostname string
-	FQDNErr  error
+	FQDN                 string
+	Hostname             string
+	FQDNErr              error
+	FQDNRequestCount     int
+	HostInfoRequestCount int
 }
 
 var _ hostInfo = &mockHostInfo{}
 
 func (m *mockHostInfo) Info() types.HostInfo {
+	m.HostInfoRequestCount++
 	return types.HostInfo{
 		Hostname: m.Hostname,
 		OS:       &types.OSInfo{},
@@ -613,6 +693,7 @@ func (m *mockHostInfo) Info() types.HostInfo {
 }
 
 func (m *mockHostInfo) FQDNWithContext(_ context.Context) (string, error) {
+	m.FQDNRequestCount++
 	if m.FQDNErr != nil {
 		return "", m.FQDNErr
 	}

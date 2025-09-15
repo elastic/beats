@@ -121,9 +121,10 @@ func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	// check if the FQDN setting changed, and we need to invalidate the cache
 	useFQDNNew := features.FQDN()
 	useFQDNOld := p.useFQDN.Load()
-	fqdnValueChanged := p.useFQDN.CompareAndSwap(useFQDNOld, useFQDNNew)
+	noSwapConflict := p.useFQDN.CompareAndSwap(useFQDNOld, useFQDNNew)
+	invalidateCache := noSwapConflict && useFQDNNew != useFQDNOld
 
-	err := p.loadData(!fqdnValueChanged)
+	err := p.loadData(!invalidateCache)
 	if err != nil {
 		return nil, fmt.Errorf("error loading data during event update: %w", err)
 	}
@@ -172,7 +173,8 @@ func (p *addHostMetadata) loadData(checkCache bool) error {
 		return fmt.Errorf("error collecting host info: %w", err)
 	}
 
-	hostname := h.Info().Hostname
+	hInfo := h.Info()
+	hostname := hInfo.Hostname
 	if p.useFQDN.Load() {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 		defer cancel()
@@ -193,7 +195,7 @@ func (p *addHostMetadata) loadData(checkCache bool) error {
 		}
 	}
 
-	data := host.MapHostInfo(h.Info(), hostname)
+	data := host.MapHostInfo(hInfo, hostname)
 	if p.config.NetInfoEnabled {
 		// IP-address and MAC-address
 		var ipList, hwList, err = util.GetNetInfo()
