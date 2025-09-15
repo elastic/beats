@@ -109,7 +109,7 @@ func adjustFleetEvent(event mb.Event) mb.Event {
 	// Convert apache.status.total_kbytes to apache.status.total_bytes
 	totalKBytes, err := adjusted.MetricSetFields.GetValue("total_kbytes")
 	if err == nil {
-		adjusted.MetricSetFields.Put("total_bytes", totalKBytes.(int64)*1024)
+		_, _ = adjusted.MetricSetFields.Put("total_bytes", totalKBytes.(int64)*1024)
 		adjusted.MetricSetFields.Delete("total_kbytes")
 	}
 
