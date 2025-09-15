@@ -6,23 +6,28 @@ package internal
 
 import (
 	"context"
+	"sync"
+	"sync/atomic"
 
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
 )
 
-type LogBatchResult struct {
-	Acked     bool
-	Dropped   bool
-	Retry     bool
-	Cancelled bool
-	Retries   int
-}
+type LogBatchResult uint
+
+const (
+	LogBatchResultACK LogBatchResult = 1 << iota
+	LogBatchResultDrop
+	LogBatchResultRetry
+	LogBatchResultCancelled
+)
 
 type LogBatch struct {
+	retries       atomic.Uint64
 	pendingEvents []publisher.Event
-	result        *LogBatchResult
+	resultCh      chan LogBatchResult
+	mu            sync.RWMutex
 }
 
 func NewLogBatch(ctx context.Context, logs plog.Logs) (*LogBatch, error) {
@@ -32,7 +37,7 @@ func NewLogBatch(ctx context.Context, logs plog.Logs) (*LogBatch, error) {
 	}
 	return &LogBatch{
 		pendingEvents: events,
-		result:        &LogBatchResult{},
+		resultCh:      make(chan LogBatchResult, 1),
 	}, nil
 }
 
@@ -53,26 +58,34 @@ func createEvents(ctx context.Context, logs *plog.Logs) ([]publisher.Event, erro
 }
 
 func (b *LogBatch) Events() []publisher.Event {
+	b.mu.RLock()
+	defer b.mu.RUnlock()
 	return b.pendingEvents
 }
 
 func (b *LogBatch) ACK() {
-	b.result.Acked = true
+	b.notifyResult(LogBatchResultACK)
 }
 
 func (b *LogBatch) Drop() {
-	b.pendingEvents = nil
-	b.result.Dropped = true
+	b.notifyResult(LogBatchResultDrop)
 }
 
 func (b *LogBatch) Retry() {
-	b.result.Retry = true
-	b.result.Retries++
+	b.AddRetry(1)
+	b.notifyResult(LogBatchResultRetry)
 }
 
 func (b *LogBatch) RetryEvents(events []publisher.Event) {
+	b.AddRetry(1)
+	b.mu.Lock()
 	b.pendingEvents = events
-	b.Retry()
+	b.mu.Unlock()
+	b.notifyResult(LogBatchResultRetry)
+}
+
+func (b *LogBatch) Cancelled() {
+	b.notifyResult(LogBatchResultCancelled)
 }
 
 // SplitRetry is not used by Logstash clients currently
@@ -80,10 +93,44 @@ func (b *LogBatch) SplitRetry() bool {
 	return false
 }
 
-func (b *LogBatch) Cancelled() {
-	b.result.Cancelled = true
+func (b *LogBatch) NumRetries() int {
+	return int(b.retries.Load())
 }
 
-func (b *LogBatch) Result() *LogBatchResult {
-	return b.result
+func (b *LogBatch) Result() chan LogBatchResult {
+	return b.resultCh
+}
+
+func (b *LogBatch) notifyResult(result LogBatchResult) {
+	select {
+	case b.resultCh <- result:
+	default:
+		// already signaled
+	}
+}
+
+// AddRetry adds delta to the number of retries for this batch.
+// If delta is negative, it will decrease the number of retries but not below zero.
+func (b *LogBatch) AddRetry(delta int) {
+	if delta == 0 {
+		return
+	}
+	if delta > 0 {
+		b.retries.Add(uint64(delta))
+		return
+	}
+	for {
+		oldValue := b.retries.Load()
+		if oldValue == 0 {
+			return
+		}
+		newValue := int(oldValue) + delta // delta is negative
+		if newValue <= 0 {
+			b.retries.Store(0)
+			return
+		}
+		if b.retries.CompareAndSwap(oldValue, uint64(newValue)) {
+			return
+		}
+	}
 }
