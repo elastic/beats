@@ -43,7 +43,7 @@ func TestGenerateQuery(t *testing.T) {
 
 	queryIncremental := m.generateQuery()
 	// verify incremental query uses logging_time filter
-	assert.Contains(t, queryIncremental, "logging_time > TIMESTAMP('2023-12-01 10:00:00.000000')")
+	assert.Contains(t, queryIncremental, "logging_time >= TIMESTAMP('2023-12-01 10:00:00.000000')")
 }
 
 func TestCreateEvent(t *testing.T) {
@@ -209,11 +209,11 @@ func TestUpdateLastLoggingTime(t *testing.T) {
 	assert.NotNil(t, m.lastLoggingTime)
 	assert.Equal(t, testTime1, *m.lastLoggingTime)
 
-	// Test with multiple events - should pick the latest
+	// Test with multiple events - should pick the last one (assumes sorted by logging_time ASC)
 	events2 := []mb.Event{
+		{Timestamp: testTime3, MetricSetFields: mapstr.M{"logging_time": testTime3}},
 		{Timestamp: testTime1, MetricSetFields: mapstr.M{"logging_time": testTime1}},
 		{Timestamp: testTime2, MetricSetFields: mapstr.M{"logging_time": testTime2}},
-		{Timestamp: testTime3, MetricSetFields: mapstr.M{"logging_time": testTime3}},
 	}
 	m.updateLastLoggingTime(events2)
 	assert.Equal(t, testTime2, *m.lastLoggingTime)

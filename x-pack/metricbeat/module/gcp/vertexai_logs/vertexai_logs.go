@@ -196,7 +196,7 @@ func (m *MetricSet) generateQuery() string {
 	var whereClause string
 	if m.lastLoggingTime != nil {
 		// Incremental query: get records after last processed time
-		whereClause = fmt.Sprintf("logging_time > TIMESTAMP('%s')",
+		whereClause = fmt.Sprintf("logging_time >= TIMESTAMP('%s')",
 			m.lastLoggingTime.Format("2006-01-02 15:04:05.000000"))
 		m.logger.Debugf("Using incremental query from logging_time: %s", m.lastLoggingTime.Format(time.RFC3339))
 	} else {
@@ -240,22 +240,14 @@ func (m *MetricSet) updateLastLoggingTime(events []mb.Event) {
 		return
 	}
 
-	var latestTime *time.Time
-	for _, event := range events {
-		// Get logging_time from the event's MetricSetFields
-		if loggingTimeField, exists := event.MetricSetFields["logging_time"]; exists {
-			if loggingTime, ok := loggingTimeField.(time.Time); ok {
-				if !loggingTime.IsZero() && (latestTime == nil || loggingTime.After(*latestTime)) {
-					latestTime = &loggingTime
-				}
-			}
+	// Since query is sorted by logging_time ASC, the last event has the latest time
+	lastEvent := events[len(events)-1]
+	if loggingTimeField, exists := lastEvent.MetricSetFields["logging_time"]; exists {
+		if loggingTime, ok := loggingTimeField.(time.Time); ok && !loggingTime.IsZero() {
+			// Store in UTC for consistency
+			utcTime := loggingTime.UTC()
+			m.lastLoggingTime = &utcTime
+			m.logger.Debugf("Updated last logging time to: %s", loggingTime.Format(time.RFC3339))
 		}
-	}
-
-	if latestTime != nil {
-		// Store in UTC for consistency
-		utcTime := latestTime.UTC()
-		m.lastLoggingTime = &utcTime
-		m.logger.Debugf("Updated last logging time to: %s", latestTime.Format(time.RFC3339))
 	}
 }
