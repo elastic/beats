@@ -3,6 +3,45 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-9.0.7]]
+=== Beats version 9.0.7
+https://github.com/elastic/beats/compare/v9.0.6\...v9.0.7[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
+- Fix a race condition during metrics initialization which could cause a panic. {issue}45822[45822] {pull}46054[46054]
+- Update Go version to 1.24.7 {pull}46070[46070].
+- Fixed a panic when the beat restarts itself by adding 'eventfd2' to default seccomp policy {issue}46372[46372]
+- Update github.com/go-viper/mapstructure/v2 to v2.4.0 {pull}46335[46335]
+
+*Filebeat*
+
+- Fix wrongly emitted missing input ID warning {issue}42969[42969] {pull}45747[45747]
+- Fix race condition that could cause Filebeat to hang during shutdown after failing to startup {issue}45034[45034] {pull}46331[46331]
+
+*Metricbeat*
+
+- Fix an issue where the conntrack metricset entries field reported a count inflated by a factor of the number of CPU cores. {issue}46138[46138] {pull}46140[46140]
+
+*Winlogbeat*
+
+- Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
+
+==== Added
+
+*Filebeat*
+
+- Improve HTTP JSON health status logic for empty template results. {pull}46332[46332]
+- Improve CEL input documentation of authentication options. {pull}46253[46253]
+- Add documentation for device collection in Entity Analytics Active Directory Filebeat's input. {pull}46363[46363]
+
+*Metricbeat*
+
+- Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
+
 [[release-notes-9.0.6]]
 === Beats version 9.0.6
 https://github.com/elastic/beats/compare/v9.0.5\...v9.0.6[View commits]
