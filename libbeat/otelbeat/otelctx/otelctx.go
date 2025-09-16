@@ -29,6 +29,10 @@ const (
 	BeatNameCtxKey        = "beat_name"
 	BeatVersionCtxKey     = "beat_version"
 	BeatIndexPrefixCtxKey = "beat_index_prefix"
+
+	MetadataBeatKey        = "beat"
+	MetadataVersionKey     = "version"
+	MetadataIndexPrefixKey = "index_prefix"
 )
 
 // NewConsumerContext creates a new context.Context adding the beats metadata
@@ -76,19 +80,21 @@ func GetBeatIndexPrefix(ctx context.Context) string {
 }
 
 // GetBeatEventMeta gives beat.Event.Meta from the context metadata
-// The value of `[@metadata][beat]` is taken from the `Index` option of logstash output.
-// In Elastic Agent, `Index` option is not available, hence, the value is derived from `IndexPrefix` field of beat.Info
 func GetBeatEventMeta(ctx context.Context) map[string]any {
 	ctxData := client.FromContext(ctx)
-	var beatIndexPrefix, beatVersion string
-	if v := ctxData.Metadata.Get(BeatIndexPrefixCtxKey); len(v) > 0 {
-		beatIndexPrefix = v[0]
+	var beatName, beatVersion, beatIndexPrefix string
+	if v := ctxData.Metadata.Get(BeatNameCtxKey); len(v) > 0 {
+		beatName = v[0]
 	}
 	if v := ctxData.Metadata.Get(BeatVersionCtxKey); len(v) > 0 {
 		beatVersion = v[0]
 	}
+	if v := ctxData.Metadata.Get(BeatIndexPrefixCtxKey); len(v) > 0 {
+		beatIndexPrefix = v[0]
+	}
 	return map[string]any{
-		"beat":    beatIndexPrefix,
-		"version": beatVersion,
+		MetadataBeatKey:        beatName,
+		MetadataVersionKey:     beatVersion,
+		MetadataIndexPrefixKey: beatIndexPrefix,
 	}
 }

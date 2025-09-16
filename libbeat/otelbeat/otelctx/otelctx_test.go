@@ -37,7 +37,7 @@ func TestGetBeatEventMeta(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
-						BeatNameCtxKey:        {"filebeat"},
+						BeatNameCtxKey:        {"something"},
 						BeatIndexPrefixCtxKey: {"filebeat"},
 						BeatVersionCtxKey:     {"8.0.0"},
 					}),
@@ -45,8 +45,9 @@ func TestGetBeatEventMeta(t *testing.T) {
 				return client.NewContext(ctx, info)
 			},
 			expected: map[string]any{
-				"beat":    "filebeat",
-				"version": "8.0.0",
+				MetadataBeatKey:        "something",
+				MetadataVersionKey:     "8.0.0",
+				MetadataIndexPrefixKey: "filebeat",
 			},
 		},
 		{
@@ -62,8 +63,9 @@ func TestGetBeatEventMeta(t *testing.T) {
 				return client.NewContext(ctx, info)
 			},
 			expected: map[string]any{
-				"beat":    "filebeat",
-				"version": "8.0.0",
+				MetadataBeatKey:        "",
+				MetadataVersionKey:     "8.0.0",
+				MetadataIndexPrefixKey: "filebeat",
 			},
 		},
 		{
@@ -79,8 +81,9 @@ func TestGetBeatEventMeta(t *testing.T) {
 				return client.NewContext(ctx, info)
 			},
 			expected: map[string]any{
-				"beat":    "",
-				"version": "8.0.0",
+				MetadataBeatKey:        "filebeat",
+				MetadataVersionKey:     "8.0.0",
+				MetadataIndexPrefixKey: "",
 			},
 		},
 		{
@@ -89,14 +92,16 @@ func TestGetBeatEventMeta(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
+						BeatNameCtxKey:        {"something"},
 						BeatIndexPrefixCtxKey: {"filebeat"},
 					}),
 				}
 				return client.NewContext(ctx, info)
 			},
 			expected: map[string]any{
-				"beat":    "filebeat",
-				"version": "",
+				MetadataBeatKey:        "something",
+				MetadataVersionKey:     "",
+				MetadataIndexPrefixKey: "filebeat",
 			},
 		},
 		{
@@ -109,8 +114,9 @@ func TestGetBeatEventMeta(t *testing.T) {
 				return client.NewContext(ctx, info)
 			},
 			expected: map[string]any{
-				"beat":    "",
-				"version": "",
+				MetadataBeatKey:        "",
+				MetadataVersionKey:     "",
+				MetadataIndexPrefixKey: "",
 			},
 		},
 		{
@@ -119,8 +125,9 @@ func TestGetBeatEventMeta(t *testing.T) {
 				return t.Context()
 			},
 			expected: map[string]any{
-				"beat":    "",
-				"version": "",
+				MetadataBeatKey:        "",
+				MetadataVersionKey:     "",
+				MetadataIndexPrefixKey: "",
 			},
 		},
 	}

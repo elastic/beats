@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/client"
@@ -32,8 +33,9 @@ func TestNewLogBatch(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
-						"beat_name":    {"filebeat"},
-						"beat_version": {"8.0.0"},
+						otelctx.BeatNameCtxKey:        {"filebeat"},
+						otelctx.BeatVersionCtxKey:     {"8.0.0"},
+						otelctx.BeatIndexPrefixCtxKey: {"filebeat"},
 					}),
 				}
 				return client.NewContext(ctx, info)
@@ -67,8 +69,9 @@ func TestNewLogBatch(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
-						"beat_name":    {"filebeat"},
-						"beat_version": {"8.0.0"},
+						otelctx.BeatNameCtxKey:        {"filebeat"},
+						otelctx.BeatVersionCtxKey:     {"8.0.0"},
+						otelctx.BeatIndexPrefixCtxKey: {"filebeat"},
 					}),
 				}
 				return client.NewContext(ctx, info)
@@ -123,8 +126,9 @@ func TestCreateEvents(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
-						"beat_name":    {"filebeat"},
-						"beat_version": {"9.0.0"},
+						otelctx.BeatNameCtxKey:        {"filebeat"},
+						otelctx.BeatVersionCtxKey:     {"9.0.0"},
+						otelctx.BeatIndexPrefixCtxKey: {"filebeat"},
 					}),
 				}
 				return client.NewContext(ctx, info)

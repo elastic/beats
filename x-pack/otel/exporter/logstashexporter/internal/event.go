@@ -18,7 +18,7 @@ import (
 )
 
 func parseEvent(ctx context.Context, logRecord *plog.LogRecord) (beat.Event, error) {
-	metadata := otelctx.GetBeatEventMeta(ctx)
+	metadata := GetEventMeta(ctx)
 	if !isBeatsEvent(metadata) {
 		return beat.Event{}, consumererror.NewPermanent(errors.New("invalid beats event metadata"))
 	}
@@ -65,4 +65,15 @@ func parseEventTimestamp(logRecordBody map[string]any) (time.Time, bool) {
 func isBeatsEvent(metadata map[string]any) bool {
 	v, ok := metadata["beat"]
 	return ok && v != nil && v != ""
+}
+
+// GetEventMeta gives beat.Event.Meta from the context metadata
+// The value of `[@metadata][beat]` is taken from the `Index` option of logstash output.
+// In Elastic Agent, `Index` option is not available, hence, the value of `[@metadata][beat]` is derived from `IndexPrefix`
+func GetEventMeta(ctx context.Context) map[string]any {
+	metadata := otelctx.GetBeatEventMeta(ctx)
+	return map[string]any{
+		otelctx.MetadataBeatKey:    metadata[otelctx.MetadataIndexPrefixKey],
+		otelctx.MetadataVersionKey: metadata[otelctx.MetadataVersionKey],
+	}
 }

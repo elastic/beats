@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/client"
@@ -32,8 +33,9 @@ func TestParseEvent(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
-						"beat_name":    {"filebeat"},
-						"beat_version": {"8.0.0"},
+						otelctx.BeatNameCtxKey:        {"filebeat"},
+						otelctx.BeatVersionCtxKey:     {"8.0.0"},
+						otelctx.BeatIndexPrefixCtxKey: {"filebeat"},
 					}),
 				}
 				return client.NewContext(ctx, info)
@@ -56,8 +58,9 @@ func TestParseEvent(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
-						"beat_name":    {"filebeat"},
-						"beat_version": {"8.0.0"},
+						otelctx.BeatNameCtxKey:        {"filebeat"},
+						otelctx.BeatVersionCtxKey:     {"8.0.0"},
+						otelctx.BeatIndexPrefixCtxKey: {"filebeat"},
 					}),
 				}
 				return client.NewContext(ctx, info)
@@ -332,6 +335,77 @@ func TestIsBeatsEvent(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := isBeatsEvent(tt.metadata)
 			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestGetEventMeta(t *testing.T) {
+	tests := []struct {
+		name     string
+		setupCtx func() context.Context
+		expected map[string]any
+	}{
+		{
+			name: "index prefix exists",
+			setupCtx: func() context.Context {
+				ctx := t.Context()
+				info := client.Info{
+					Metadata: client.NewMetadata(map[string][]string{
+						otelctx.BeatNameCtxKey:        {"something"},
+						otelctx.BeatVersionCtxKey:     {"8.0.0"},
+						otelctx.BeatIndexPrefixCtxKey: {"filebeat"},
+					}),
+				}
+				return client.NewContext(ctx, info)
+			},
+			expected: map[string]any{
+				otelctx.MetadataBeatKey:    "filebeat",
+				otelctx.MetadataVersionKey: "8.0.0",
+			},
+		},
+		{
+			name: "index prefix missing",
+			setupCtx: func() context.Context {
+				ctx := t.Context()
+				info := client.Info{
+					Metadata: client.NewMetadata(map[string][]string{
+						otelctx.BeatNameCtxKey:    {"something"},
+						otelctx.BeatVersionCtxKey: {"8.0.0"},
+					}),
+				}
+				return client.NewContext(ctx, info)
+			},
+			expected: map[string]any{
+				otelctx.MetadataBeatKey:    "",
+				otelctx.MetadataVersionKey: "8.0.0",
+			},
+		},
+		{
+			name: "no client info",
+			setupCtx: func() context.Context {
+				ctx := t.Context()
+				info := client.Info{
+					Metadata: client.NewMetadata(map[string][]string{
+						otelctx.BeatNameCtxKey:    {""},
+						otelctx.BeatVersionCtxKey: {""},
+					}),
+				}
+				return client.NewContext(ctx, info)
+			},
+			expected: map[string]any{
+				otelctx.MetadataBeatKey:    "",
+				otelctx.MetadataVersionKey: "",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := tt.setupCtx()
+
+			version := GetEventMeta(ctx)
+
+			assert.Equal(t, tt.expected, version)
 		})
 	}
 }
