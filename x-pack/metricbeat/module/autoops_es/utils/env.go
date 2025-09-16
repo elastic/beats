@@ -26,8 +26,8 @@ func intDefault(a string, defaults int) int {
 	return int(b)
 }
 
-func boolDefault(a string, defaults bool) bool {
-	val, err := strconv.ParseBool(a)
+func boolDefault(boolString string, defaults bool) bool {
+	val, err := strconv.ParseBool(boolString)
 
 	if err != nil {
 		return defaults

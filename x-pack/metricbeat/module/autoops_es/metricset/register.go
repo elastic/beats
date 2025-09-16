@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package ccm
+package metricset
 
 import (
 	"bytes"
@@ -59,8 +59,8 @@ var (
 	SUPPORTED_LICENSE_TYPES = []string{"enterprise", "trial"}
 )
 
-// MaybeRegisterCloudConnectedCluster fetches cluster information and license details, then sets the global resource ID if applicable.
-func MaybeRegisterCloudConnectedCluster(m *elasticsearch.MetricSet, getClusterInfo clusterInfoFetcher) error {
+// maybeRegisterCloudConnectedCluster fetches cluster information and license details, then sets the global resource ID if applicable.
+func maybeRegisterCloudConnectedCluster(m *elasticsearch.MetricSet, getClusterInfo clusterInfoFetcher) error {
 	// if resource ID is already set, then we don't need to check/register anything
 	if utils.GetAndSetResourceID() != "" {
 		return nil

@@ -6,14 +6,13 @@ package metricset
 
 import (
 	"fmt"
+	"os"
+	"sync"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/ccm"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
-	"os"
-	"sync"
 )
 
 const (
@@ -77,7 +76,7 @@ func newAutoOpsMetricSet[T any](base mb.BaseMetricSet, routePath string, mapper 
 	if !checkedCloudConnectedMode {
 		checkedCloudConnectedMode = true
 
-		if err := ccm.MaybeRegisterCloudConnectedCluster(ms, GetInfo); err != nil {
+		if err := maybeRegisterCloudConnectedCluster(ms, GetInfo); err != nil {
 			return nil, fmt.Errorf("failed to register Cloud Connected Mode: %w", err)
 		}
 	}
@@ -123,11 +122,10 @@ func (m *AutoOpsMetricSet[T]) Fetch(r mb.ReporterV2) error {
 	// nested mappers reuse the
 	if m.NestedMapper != nil {
 		if err = m.NestedMapper(m.MetricSet, r, info, data); err != nil {
-
-			return nil
+			return nil //nolint: nilerr // The error is reported by the mapper
 		}
 	} else if err = m.Mapper(r, info, data); err != nil {
-		return nil
+		return nil //nolint: nilerr // The error is reported by the mapper
 	}
 
 	m.Logger().Infof("completed fetching %v metricset", metricSetName)

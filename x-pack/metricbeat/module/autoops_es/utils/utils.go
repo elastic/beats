@@ -5,8 +5,9 @@
 package utils
 
 import (
+	"maps"
 	"net/url"
-	"sort"
+	"slices"
 	"strings"
 )
 
@@ -96,13 +97,9 @@ func PartitionByMaxValue[T any](limit int, items []T, valueExtractor func(T) int
 		itemKey := valueExtractor(item)
 		sortedValues[itemKey] = append(sortedValues[itemKey], item)
 	}
-
-	allKeys := make([]int, 0, len(sortedValues))
-	for key := range sortedValues {
-		allKeys = append(allKeys, key)
-	}
-	sort.Ints(allKeys)
-
+	
+	allKeys := slices.Collect(maps.Keys(sortedValues))
+	slices.Sort(allKeys)
 	var sortedItems = make(map[int][]T)
 	currentCapacity := 0
 	cursor := 0
