@@ -7,6 +7,8 @@ import (
 
 	"cloud.google.com/go/bigquery"
 	"github.com/cespare/xxhash/v2"
+	"google.golang.org/api/option"
+
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -16,7 +18,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"google.golang.org/api/option"
 )
 
 const inputName = "gcpbigquery"
@@ -110,7 +111,7 @@ func (bq *bigQueryInput) Run(ctx v2.Context, src cursor.Source, cur cursor.Curso
 		opts = append(opts, option.WithCredentialsFile(bq.config.CredentialsFile))
 	}
 
-	source := src.(*bigQuerySource)
+	source, _ := src.(*bigQuerySource)
 	client, err := bigquery.NewClient(cancelCtx, source.ProjectID, opts...)
 	if err != nil {
 		err := fmt.Errorf("failed to create bigquery client: %w", err)
@@ -225,7 +226,8 @@ func (bq *bigQueryInput) publishEvent(src *bigQuerySource, publisher cursor.Publ
 		timestamp = time.Now()
 	}
 
-	publisher.Publish(beat.Event{
+	// the only error case is if the publisher is closed, which means everything is shutting down anyway
+	_ = publisher.Publish(beat.Event{
 		Timestamp: timestamp,
 		Fields: mapstr.M{
 			// nest everything for now to avoid mapping conflicts in standalone mode

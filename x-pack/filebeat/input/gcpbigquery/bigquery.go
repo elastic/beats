@@ -3,14 +3,16 @@ package gcpbigquery
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/big"
 	"time"
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/civil"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"google.golang.org/api/iterator"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // internal interfaces for testing
@@ -33,7 +35,7 @@ type realClient struct {
 }
 
 func (r *realClient) query(queryString string) query {
-	return &realQuery{r.Client.Query(queryString)}
+	return &realQuery{r.Query(queryString)}
 }
 
 type realQuery struct {
@@ -41,7 +43,7 @@ type realQuery struct {
 }
 
 func (r *realQuery) read(ctx context.Context) (rowIterator, error) {
-	it, err := r.Query.Read(ctx)
+	it, err := r.Read(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -53,11 +55,11 @@ type realRowIterator struct {
 }
 
 func (r *realRowIterator) next(row *[]bigquery.Value) error {
-	return r.RowIterator.Next(row)
+	return r.Next(row)
 }
 
 func (r *realRowIterator) schema() bigquery.Schema {
-	return r.RowIterator.Schema
+	return r.Schema
 }
 
 func runQuery(ctx context.Context, logger *logp.Logger, client *bigquery.Client, queryString string, publish func(bigquery.Schema, []bigquery.Value)) error {
@@ -76,7 +78,7 @@ func runQueryInternal(ctx context.Context, logger *logp.Logger, client client, q
 	for {
 		var row []bigquery.Value
 		err := it.next(&row)
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 

@@ -9,10 +9,11 @@ import (
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/civil"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/api/iterator"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestCursorState_Set_StringFieldType(t *testing.T) {
