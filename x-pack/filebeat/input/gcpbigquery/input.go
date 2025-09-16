@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/bigquery"
+	"github.com/cespare/xxhash/v2"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -45,10 +46,18 @@ func configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input,
 
 	var sources []cursor.Source
 	for _, query := range config.Queries {
+		// defaults to true
+		expandJSON := true
+		if query.ExpandJsonStrings != nil {
+			expandJSON = *query.ExpandJsonStrings
+		}
+
 		sources = append(sources, &bigQuerySource{
-			ProjectID:   config.ProjectID,
-			Query:       query,
-			CursorField: config.CursorField,
+			ProjectID:      config.ProjectID,
+			Query:          query.Query,
+			CursorField:    query.CursorField,
+			TimestampField: query.TimestampField,
+			ExpandJson:     expandJSON,
 		})
 	}
 
@@ -63,13 +72,19 @@ func updateStatus(ctx v2.Context, status status.Status, msg string) {
 
 // bigQuerySource defines the configuration for a single BigQuery query.
 type bigQuerySource struct {
-	ProjectID   string
-	Query       string
-	CursorField string
+	ProjectID      string
+	Query          string
+	CursorField    string
+	TimestampField string
+	ExpandJson     bool
 }
 
 func (s *bigQuerySource) Name() string {
-	return fmt.Sprintf("%s-%s-%s", s.ProjectID, s.Query, s.CursorField)
+	// this string uniquely identifies the source in the state store.
+	// configuration that doesn't affect the query/cursor itself should not be included.
+	name := fmt.Sprintf("%s-%s-%s", s.ProjectID, s.Query, s.CursorField)
+	// hash it to avoid unintentionally leaching queries into logs/files
+	return fmt.Sprintf("%d", xxhash.Sum64String(name))
 }
 
 type bigQueryInput struct {
@@ -171,33 +186,30 @@ func (bq *bigQueryInput) publishEvent(src *bigQuerySource, publisher cursor.Publ
 		field := schema[i]
 
 		if src.CursorField != "" && field.Name == src.CursorField {
-			bq.logger.Debugf("setting cursor state from field %s", field.Name)
-
 			cursorState := &cursorState{}
 			err := cursorState.set(field, v)
 			if err == nil {
+				bq.logger.Debugf("setting cursor state from field %s", field.Name)
 				state = cursorState
 			} else {
 				bq.logger.Error(fmt.Errorf("failed to set cursor state from field '%s': %w", field.Name, err))
 			}
 		}
 
-		if bq.config.TimestampField != "" && field.Name == bq.config.TimestampField {
-			bq.logger.Debugf("setting timestamp from field %s", field.Name)
-
+		if src.TimestampField != "" && field.Name == src.TimestampField {
 			ts, err := getTimestamp(field, v)
 			if err == nil {
+				bq.logger.Debugf("setting timestamp from field %s", field.Name)
 				timestamp = ts
 			} else {
 				bq.logger.Error(fmt.Errorf("failed to get timestamp from field '%s': %w", field.Name, err))
 			}
 		}
 
-		if bq.config.ExpandJsonStrings {
-			bq.logger.Debugf("expanding JSON from field %s", field.Name)
-
+		if src.ExpandJson {
 			val, err := expandJSON(field, v)
 			if err == nil {
+				bq.logger.Debugf("expanding JSON from field %s", field.Name)
 				v = val
 			} else {
 				// on error, still expand into a nested object with the original string to avoid mapping conflicts
