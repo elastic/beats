@@ -154,23 +154,9 @@ func (m *MetricSet) queryVertexAILogs(ctx context.Context, client *bigquery.Clie
 	q := client.Query(query)
 	q.Location = location
 
-	job, err := q.Run(ctx)
+	it, err := q.Read(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("bigquery Run failed: %w", err)
-	}
-
-	status, err := job.Wait(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("bigquery Wait failed: %w", err)
-	}
-
-	if err := status.Err(); err != nil {
-		return nil, fmt.Errorf("bigquery status error: %w", err)
-	}
-
-	it, err := job.Read(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("reading from bigquery job failed: %w", err)
+		return nil, fmt.Errorf("bigquery Read failed: %w", err)
 	}
 
 	var rows []VertexAILogRow
