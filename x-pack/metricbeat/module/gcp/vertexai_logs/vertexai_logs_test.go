@@ -156,7 +156,7 @@ func TestEventsMapping(t *testing.T) {
 			FullRequest:     `{}`,
 			FullResponse:    `{}`,
 			Metadata:        `{}`,
-			},
+		},
 		{
 			Endpoint:        "https://us-west1-aiplatform.googleapis.com",
 			DeployedModelID: "model-789012",
@@ -170,7 +170,7 @@ func TestEventsMapping(t *testing.T) {
 			FullRequest:     `{}`,
 			FullResponse:    `{}`,
 			Metadata:        `{}`,
-			},
+		},
 	}
 	projectID := "test-project"
 	logger := logp.NewLogger("test")
