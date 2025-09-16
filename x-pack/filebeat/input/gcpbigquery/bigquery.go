@@ -13,18 +13,69 @@ import (
 	"google.golang.org/api/iterator"
 )
 
+// internal interfaces for testing
+type client interface {
+	query(string) query
+}
+
+type query interface {
+	read(context.Context) (rowIterator, error)
+}
+
+type rowIterator interface {
+	next(*[]bigquery.Value) error
+	schema() bigquery.Schema
+}
+
+// adapter for the real BigQuery client
+type realClient struct {
+	*bigquery.Client
+}
+
+func (r *realClient) query(queryString string) query {
+	return &realQuery{r.Client.Query(queryString)}
+}
+
+type realQuery struct {
+	*bigquery.Query
+}
+
+func (r *realQuery) read(ctx context.Context) (rowIterator, error) {
+	it, err := r.Query.Read(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &realRowIterator{it}, nil
+}
+
+type realRowIterator struct {
+	*bigquery.RowIterator
+}
+
+func (r *realRowIterator) next(row *[]bigquery.Value) error {
+	return r.RowIterator.Next(row)
+}
+
+func (r *realRowIterator) schema() bigquery.Schema {
+	return r.RowIterator.Schema
+}
+
 func runQuery(ctx context.Context, logger *logp.Logger, client *bigquery.Client, queryString string, publish func(bigquery.Schema, []bigquery.Value)) error {
+	return runQueryInternal(ctx, logger, &realClient{client}, queryString, publish)
+}
+
+func runQueryInternal(ctx context.Context, logger *logp.Logger, client client, queryString string, publish func(bigquery.Schema, []bigquery.Value)) error {
 	logger.Debugf("executing query: %s", queryString)
 
-	query := client.Query(queryString)
-	it, err := query.Read(ctx)
+	query := client.query(queryString)
+	it, err := query.read(ctx)
 	if err != nil {
 		return err
 	}
 
 	for {
 		var row []bigquery.Value
-		err := it.Next(&row)
+		err := it.next(&row)
 		if err == iterator.Done {
 			break
 		}
@@ -34,7 +85,7 @@ func runQuery(ctx context.Context, logger *logp.Logger, client *bigquery.Client,
 			return err
 		}
 
-		publish(it.Schema, row)
+		publish(it.schema(), row)
 	}
 
 	return nil

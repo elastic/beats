@@ -1,14 +1,18 @@
 package gcpbigquery
 
 import (
+	"context"
+	"fmt"
 	"math/big"
 	"testing"
 	"time"
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/civil"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/api/iterator"
 )
 
 func TestCursorState_Set_StringFieldType(t *testing.T) {
@@ -985,6 +989,245 @@ func TestExpandJSON(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 				assert.Equal(t, tt.expected, result)
+			}
+		})
+	}
+}
+
+// Mock implementations for testing runQuery
+type mockBigQueryClient struct {
+	queryFunc func(string) query
+}
+
+func (m *mockBigQueryClient) query(queryString string) query {
+	return m.queryFunc(queryString)
+}
+
+type mockBigQueryQuery struct {
+	readFunc func(context.Context) (rowIterator, error)
+}
+
+func (m *mockBigQueryQuery) read(ctx context.Context) (rowIterator, error) {
+	return m.readFunc(ctx)
+}
+
+type mockBigQueryIterator struct {
+	nextFunc   func(*[]bigquery.Value) error
+	schemaFunc func() bigquery.Schema
+	callCount  int
+}
+
+func (m *mockBigQueryIterator) next(row *[]bigquery.Value) error {
+	m.callCount++
+	return m.nextFunc(row)
+}
+
+func (m *mockBigQueryIterator) schema() bigquery.Schema {
+	return m.schemaFunc()
+}
+
+func TestRunQuery(t *testing.T) {
+	tests := []struct {
+		name           string
+		queryString    string
+		mockSetup      func() *mockBigQueryClient
+		expectedRows   int
+		expectedError  string
+		expectLogError bool
+	}{
+		{
+			name:        "successful query with multiple rows",
+			queryString: "SELECT * FROM test_table",
+			mockSetup: func() *mockBigQueryClient {
+				schema := bigquery.Schema{
+					{Name: "id", Type: bigquery.IntegerFieldType},
+					{Name: "name", Type: bigquery.StringFieldType},
+				}
+
+				rows := [][]bigquery.Value{
+					{int64(1), "Alice"},
+					{int64(2), "Bob"},
+					{int64(3), "Charlie"},
+				}
+
+				return &mockBigQueryClient{
+					queryFunc: func(q string) query {
+						assert.Equal(t, "SELECT * FROM test_table", q)
+						return &mockBigQueryQuery{
+							readFunc: func(ctx context.Context) (rowIterator, error) {
+								rowIndex := 0
+								return &mockBigQueryIterator{
+									nextFunc: func(row *[]bigquery.Value) error {
+										if rowIndex >= len(rows) {
+											return iterator.Done
+										}
+										*row = rows[rowIndex]
+										rowIndex++
+										return nil
+									},
+									schemaFunc: func() bigquery.Schema {
+										return schema
+									},
+								}, nil
+							},
+						}
+					},
+				}
+			},
+			expectedRows: 3,
+		},
+		{
+			name:        "successful query with no rows",
+			queryString: "SELECT * FROM empty_table",
+			mockSetup: func() *mockBigQueryClient {
+				schema := bigquery.Schema{
+					{Name: "id", Type: bigquery.IntegerFieldType},
+				}
+
+				return &mockBigQueryClient{
+					queryFunc: func(q string) query {
+						return &mockBigQueryQuery{
+							readFunc: func(ctx context.Context) (rowIterator, error) {
+								return &mockBigQueryIterator{
+									nextFunc: func(row *[]bigquery.Value) error {
+										return iterator.Done // Immediately done
+									},
+									schemaFunc: func() bigquery.Schema {
+										return schema
+									},
+								}, nil
+							},
+						}
+					},
+				}
+			},
+			expectedRows: 0,
+		},
+		{
+			name:        "query.Read() returns error",
+			queryString: "SELECT * FROM invalid_table",
+			mockSetup: func() *mockBigQueryClient {
+				return &mockBigQueryClient{
+					queryFunc: func(q string) query {
+						return &mockBigQueryQuery{
+							readFunc: func(ctx context.Context) (rowIterator, error) {
+								return nil, fmt.Errorf("table not found: invalid_table")
+							},
+						}
+					},
+				}
+			},
+			expectedRows:  0,
+			expectedError: "table not found: invalid_table",
+		},
+		{
+			name:        "iterator.Next() returns error after some rows",
+			queryString: "SELECT * FROM flaky_table",
+			mockSetup: func() *mockBigQueryClient {
+				schema := bigquery.Schema{
+					{Name: "id", Type: bigquery.IntegerFieldType},
+				}
+
+				return &mockBigQueryClient{
+					queryFunc: func(q string) query {
+						return &mockBigQueryQuery{
+							readFunc: func(ctx context.Context) (rowIterator, error) {
+								callCount := 0
+								return &mockBigQueryIterator{
+									nextFunc: func(row *[]bigquery.Value) error {
+										callCount++
+										if callCount == 1 {
+											*row = []bigquery.Value{int64(1)}
+											return nil
+										}
+										if callCount == 2 {
+											*row = []bigquery.Value{int64(2)}
+											return nil
+										}
+										// Third call returns error
+										return fmt.Errorf("connection lost")
+									},
+									schemaFunc: func() bigquery.Schema {
+										return schema
+									},
+								}, nil
+							},
+						}
+					},
+				}
+			},
+			expectedRows:   2,
+			expectedError:  "connection lost",
+			expectLogError: true,
+		},
+		{
+			name:        "single row query",
+			queryString: "SELECT COUNT(*) FROM table",
+			mockSetup: func() *mockBigQueryClient {
+				schema := bigquery.Schema{
+					{Name: "count", Type: bigquery.IntegerFieldType},
+				}
+
+				return &mockBigQueryClient{
+					queryFunc: func(q string) query {
+						return &mockBigQueryQuery{
+							readFunc: func(ctx context.Context) (rowIterator, error) {
+								called := false
+								return &mockBigQueryIterator{
+									nextFunc: func(row *[]bigquery.Value) error {
+										if called {
+											return iterator.Done
+										}
+										called = true
+										*row = []bigquery.Value{int64(42)}
+										return nil
+									},
+									schemaFunc: func() bigquery.Schema {
+										return schema
+									},
+								}, nil
+							},
+						}
+					},
+				}
+			},
+			expectedRows: 1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup
+			ctx := context.Background()
+			logger := logp.NewLogger("test")
+			mockClient := tt.mockSetup()
+
+			var publishedRows [][]bigquery.Value
+			var publishedSchemas []bigquery.Schema
+			publishFunc := func(schema bigquery.Schema, row []bigquery.Value) {
+				publishedSchemas = append(publishedSchemas, schema)
+				publishedRows = append(publishedRows, row)
+			}
+
+			// Execute
+			err := runQueryInternal(ctx, logger, mockClient, tt.queryString, publishFunc)
+
+			// Assert
+			if tt.expectedError != "" {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tt.expectedError)
+			} else {
+				assert.NoError(t, err)
+			}
+
+			assert.Len(t, publishedRows, tt.expectedRows)
+			assert.Len(t, publishedSchemas, tt.expectedRows)
+
+			// Verify that all published rows have consistent schema
+			if len(publishedSchemas) > 1 {
+				for i := 1; i < len(publishedSchemas); i++ {
+					assert.Equal(t, publishedSchemas[0], publishedSchemas[i], "all schemas should be the same")
+				}
 			}
 		})
 	}
