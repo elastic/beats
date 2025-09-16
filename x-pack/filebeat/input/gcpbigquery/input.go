@@ -55,6 +55,12 @@ func configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input,
 	return sources, &bigQueryInput{config: config, logger: logger}, nil
 }
 
+func updateStatus(ctx v2.Context, status status.Status, msg string) {
+	if ctx.StatusReporter != nil {
+		ctx.StatusReporter.UpdateStatus(status, msg)
+	}
+}
+
 // bigQuerySource defines the configuration for a single BigQuery query.
 type bigQuerySource struct {
 	ProjectID   string
@@ -80,7 +86,9 @@ func (bq *bigQueryInput) Test(src cursor.Source, _ v2.TestContext) error {
 }
 
 func (bq *bigQueryInput) Run(ctx v2.Context, src cursor.Source, cur cursor.Cursor, publisher cursor.Publisher) error {
-	bq.logger.Infof("Starting BigQuery input") // how to reference the source without logging the query?
+	bq.logger.Infof("starting BigQuery input") // how to reference the source without logging the query?
+	updateStatus(ctx, status.Starting, "")
+
 	cancelCtx := v2.GoContextFromCanceler(ctx.Cancelation)
 
 	var opts []option.ClientOption
@@ -92,23 +100,25 @@ func (bq *bigQueryInput) Run(ctx v2.Context, src cursor.Source, cur cursor.Curso
 	client, err := bigquery.NewClient(cancelCtx, source.ProjectID, opts...)
 	if err != nil {
 		err := fmt.Errorf("failed to create bigquery client: %w", err)
-		ctx.StatusReporter.UpdateStatus(status.Failed, err.Error())
+		updateStatus(ctx, status.Failed, err.Error())
 		return err
 	}
 	defer client.Close()
 
+	updateStatus(ctx, status.Running, "")
 	ticker := time.NewTicker(bq.config.Period)
 	defer ticker.Stop()
 
 	for {
 		err := bq.querySource(cancelCtx, source, cur, publisher, client)
 		if err != nil {
-			ctx.StatusReporter.UpdateStatus(status.Degraded, err.Error())
+			updateStatus(ctx, status.Degraded, err.Error())
 			bq.logger.Error(err.Error())
 		}
 
 		select {
 		case <-ctx.Cancelation.Done():
+			updateStatus(ctx, status.Stopping, "")
 			return nil
 		case <-ticker.C:
 			continue
