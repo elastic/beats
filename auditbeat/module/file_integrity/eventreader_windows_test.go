@@ -26,12 +26,11 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
-	"slices"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/reader/etw"
@@ -684,7 +683,6 @@ func testFSNotifyReaderOperation(
 		if setup != nil {
 			t.Logf("Running setup for operation: %s", operation)
 			setup(t, dir)
-			time.Sleep(inactivityTimeout)
 		}
 
 		fsNotifyR, err := NewEventReader(Config{
@@ -697,7 +695,6 @@ func testFSNotifyReaderOperation(
 
 		eventsFS, err := fsNotifyR.Start(done)
 		require.NoError(t, err)
-		time.Sleep(2 * time.Second)
 
 		var (
 			rcvdFSEvents []any
@@ -719,7 +716,17 @@ func testFSNotifyReaderOperation(
 		wg.Wait()
 
 		close(done)
-		time.Sleep(2 * time.Second)
+
+		// Wait for the event channel to close, indicating the producer has shut down
+		assert.Eventually(t, func() bool {
+			select {
+			case _, ok := <-eventsFS:
+				return !ok // Channel is closed when ok is false
+			default:
+				return false // Channel is still open
+			}
+		}, 10*time.Second, 100*time.Millisecond, "event channel should close after done signal")
+
 		os.RemoveAll(dir)
 
 		writeSamples(t, rcvdFSEvents, fmt.Sprintf("%s_fsnotify.json", operation))
@@ -738,7 +745,6 @@ func testETWReaderOperation(
 		if setup != nil {
 			t.Logf("Running setup for operation: %s", operation)
 			setup(t, dir)
-			time.Sleep(inactivityTimeout)
 		}
 
 		etwR, err := newETWReader(Config{
@@ -755,7 +761,6 @@ func testETWReaderOperation(
 
 		eventsETW, err := etwR.Start(done)
 		require.NoError(t, err)
-		time.Sleep(2 * time.Second)
 
 		var (
 			rcvdETWEvents         []any
@@ -784,7 +789,17 @@ func testETWReaderOperation(
 		wg.Wait()
 
 		close(done)
-		time.Sleep(2 * time.Second)
+
+		// Wait for the event channel to close, indicating the producer has shut down
+		assert.Eventually(t, func() bool {
+			select {
+			case _, ok := <-eventsETW:
+				return !ok // Channel is closed when ok is false
+			default:
+				return false // Channel is still open
+			}
+		}, 10*time.Second, 100*time.Millisecond, "event channel should close after done signal")
+
 		os.RemoveAll(dir)
 
 		// Process and compare/update golden files
@@ -858,26 +873,10 @@ func writeSamples(t *testing.T, receivedEvents []any, filename string) {
 
 // runPowershell executes a given command string in PowerShell and fails the test on error.
 func runPowershell(t *testing.T, command string) {
-	cmd := exec.Command("powershell.exe", "-NoProfile", "-NonInteractive", "-Command", fmt.Sprintf("%s\nStart-Sleep -Milliseconds 500\n", command))
+	cmd := exec.Command("powershell.exe", "-NoProfile", "-NonInteractive", "-Command", fmt.Sprintf("%s\nStart-Sleep -Milliseconds 100\n", command))
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		// Log the command and its output for easier debugging on failure.
 		t.Fatalf("Powershell command failed: %v\nOutput:\n%s\n\nCommand:\n%s", err, string(output), command)
 	}
-}
-
-// tempDirPattern is used to match and remove the temporary directory part of file paths.
-var tempDirPattern = regexp.MustCompile(`C:\\Users\\[^\\]+\\AppData\\Local\\Temp\\Test[A-Za-z]+[0-9]+\\[^\\]*\\`)
-
-// timeFields, idFields, and pathFields are slices that store the names of fields
-// to be handled specially during comparison.
-var (
-	timeFields = []string{"ctime", "mtime", "atime", "Timestamp", "timestamp", "@timestamp"}
-	idFields   = []string{"inode", "pid", "Took", "uid", "entity_id", "session_id", "process_id"}
-	pathFields = []string{"path", "target_path", "executable", "working_directory"}
-)
-
-// isSpecialField checks if a given key is in a list of special-cased keys.
-func isSpecialField(key string, fieldList []string) bool {
-	return slices.Contains(fieldList, key)
 }
