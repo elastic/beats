@@ -30,7 +30,6 @@ type VertexAILogRow struct {
 	FullRequest     string    `bigquery:"full_request"`
 	FullResponse    string    `bigquery:"full_response"`
 	Metadata        string    `bigquery:"metadata"`
-	OtelLog         string    `bigquery:"otel_log"`
 }
 
 // CreateEvent creates a single mb.Event from a VertexAILogRow
@@ -63,10 +62,6 @@ func CreateEvent(row VertexAILogRow, projectID string, logger *logp.Logger) (mb.
 
 	if err := processJSONField(row.Metadata, "metadata", fields, logger); err != nil {
 		logger.Warnf("failed to process metadata: %v", err)
-	}
-
-	if err := processJSONField(row.OtelLog, "otel_log", fields, logger); err != nil {
-		logger.Warnf("failed to process otel_log: %v", err)
 	}
 
 	event.MetricSetFields = fields

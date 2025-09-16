@@ -1285,9 +1285,3 @@ Field is not indexed.
     type: object
 
 
-**`gcp.vertexai_logs.otel_log`**
-:   OpenTelemetry log data associated with the AI interaction in JSON format.
-
-    type: object
-
-

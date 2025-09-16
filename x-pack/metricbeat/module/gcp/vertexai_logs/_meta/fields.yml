@@ -46,7 +46,3 @@
     type: object
     enabled: true
     description: Additional metadata associated with the AI interaction in JSON format.
-  - name: otel_log
-    type: object
-    enabled: true
-    description: OpenTelemetry log data associated with the AI interaction in JSON format.

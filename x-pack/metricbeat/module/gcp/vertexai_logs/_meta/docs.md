@@ -6,7 +6,6 @@ The logs include detailed information about:
 - API endpoints and deployed models
 - Request and response payloads
 - Model versions and API methods used
-- OpenTelemetry trace data
 - Request metadata and timing information
 
 
@@ -67,10 +66,6 @@ Here is a sample event for `vertexai_logs`:
       "metadata": {
         "user_id": "user123",
         "session_id": "session456"
-      },
-      "otel_log": {
-        "trace_id": "abc123def456",
-        "span_id": "789ghi012jkl"
       }
     }
   }

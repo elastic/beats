@@ -219,8 +219,7 @@ SELECT
 	IFNULL(api_method, '') AS api_method,
 	IFNULL(TO_JSON_STRING(full_request), '{}') AS full_request,
 	IFNULL(TO_JSON_STRING(full_response), '{}') AS full_response,
-	IFNULL(TO_JSON_STRING(metadata), '{}') AS metadata,
-	IFNULL(TO_JSON_STRING(otel_log), '{}') AS otel_log
+	IFNULL(TO_JSON_STRING(metadata), '{}') AS metadata
 FROM
 	%s
 WHERE

@@ -62,7 +62,6 @@ func TestCreateEvent(t *testing.T) {
 		FullRequest:     `{"inputs": ["test"]}`,
 		FullResponse:    `{"outputs": ["result"]}`,
 		Metadata:        `{"user_id": "user123"}`,
-		OtelLog:         `{"trace_id": "abc123"}`,
 	}
 	projectID := "test-project"
 	logger := logp.NewLogger("test")
@@ -83,7 +82,6 @@ func TestCreateEvent(t *testing.T) {
 		"full_request":      map[string]interface{}{"inputs": []interface{}{"test"}},
 		"full_response":     map[string]interface{}{"outputs": []interface{}{"result"}},
 		"metadata":          map[string]interface{}{"user_id": "user123"},
-		"otel_log":          map[string]interface{}{"trace_id": "abc123"},
 	}
 	assert.Equal(expectedFields, event.MetricSetFields)
 	// Check RootFields
@@ -113,7 +111,6 @@ func TestCreateEventWithInvalidJSON(t *testing.T) {
 		FullRequest:     `{"invalid": json}`, // Invalid JSON
 		FullResponse:    `{}`,
 		Metadata:        `{}`,
-		OtelLog:         `{}`,
 	}
 	projectID := "test-project"
 	logger := logp.NewLogger("test")
@@ -160,8 +157,7 @@ func TestEventsMapping(t *testing.T) {
 			FullRequest:     `{}`,
 			FullResponse:    `{}`,
 			Metadata:        `{}`,
-			OtelLog:         `{}`,
-		},
+			},
 		{
 			Endpoint:        "https://us-west1-aiplatform.googleapis.com",
 			DeployedModelID: "model-789012",
@@ -175,8 +171,7 @@ func TestEventsMapping(t *testing.T) {
 			FullRequest:     `{}`,
 			FullResponse:    `{}`,
 			Metadata:        `{}`,
-			OtelLog:         `{}`,
-		},
+			},
 	}
 	projectID := "test-project"
 	logger := logp.NewLogger("test")
