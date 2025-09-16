@@ -954,6 +954,7 @@ toc:
               - file: metricbeat/metricbeat-metricset-gcp-metrics.md
               - file: metricbeat/metricbeat-metricset-gcp-pubsub.md
               - file: metricbeat/metricbeat-metricset-gcp-storage.md
+              - file: metricbeat/metricbeat-metricset-gcp-vertexai_logs.md
           - file: metricbeat/metricbeat-module-golang.md
             children:
               - file: metricbeat/metricbeat-metricset-golang-expvar.md
