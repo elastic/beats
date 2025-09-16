@@ -34,20 +34,20 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 **Affecting all Beats**
 
-- Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] [45733]({{beats-pull}}45733)
-- Fix a race condition during metrics initialization which could cause a panic. {issue}45822[45822] [46054]({{beats-pull}}46054)
+- Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. [43118]({{beats-issue}}43118) [45733]({{beats-pull}}45733)
+- Fix a race condition during metrics initialization which could cause a panic. [45822]({{beats-issue}}45822) [46054]({{beats-pull}}46054)
 - Update Go version to 1.24.7 [46070]({{beats-pull}}46070).
-- Fixed a panic when the beat restarts itself by adding 'eventfd2' to default seccomp policy {issue}46372[46372]
+- Fixed a panic when the beat restarts itself by adding 'eventfd2' to default seccomp policy [46372]({{beats-issue}}46372)
 - Update github.com/go-viper/mapstructure/v2 to v2.4.0 [46335]({{beats-pull}}46335)
 
 **Filebeat**
 
-- Fix wrongly emitted missing input ID warning {issue}42969[42969] [45747]({{beats-pull}}45747)
-- Fix race condition that could cause Filebeat to hang during shutdown after failing to startup {issue}45034[45034] [46331]({{beats-pull}}46331)
+- Fix wrongly emitted missing input ID warning [42969]({{beats-issue}}42969) [45747]({{beats-pull}}45747)
+- Fix race condition that could cause Filebeat to hang during shutdown after failing to startup [45034]({{beats-issue}}45034) [46331]({{beats-pull}}46331)
 
 **Metricbeat**
 
-- Fix an issue where the conntrack metricset entries field reported a count inflated by a factor of the number of CPU cores. {issue}46138[46138] [46140]({{beats-pull}}46140)
+- Fix an issue where the conntrack metricset entries field reported a count inflated by a factor of the number of CPU cores. [46138]({{beats-issue}}46138) [46140]({{beats-pull}}46140)
 
 **Winlogbeat**
 
