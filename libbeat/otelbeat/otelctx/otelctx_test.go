@@ -37,6 +37,7 @@ func TestGetBeatEventMeta(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
+						BeatNameCtxKey:        {"filebeat"},
 						BeatIndexPrefixCtxKey: {"filebeat"},
 						BeatVersionCtxKey:     {"8.0.0"},
 					}),
@@ -54,6 +55,24 @@ func TestGetBeatEventMeta(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
+						BeatIndexPrefixCtxKey: {"filebeat"},
+						BeatVersionCtxKey:     {"8.0.0"},
+					}),
+				}
+				return client.NewContext(ctx, info)
+			},
+			expected: map[string]any{
+				"beat":    "filebeat",
+				"version": "8.0.0",
+			},
+		},
+		{
+			name: "missing beat index prefix",
+			setupCtx: func() context.Context {
+				ctx := t.Context()
+				info := client.Info{
+					Metadata: client.NewMetadata(map[string][]string{
+						BeatNameCtxKey:    {"filebeat"},
 						BeatVersionCtxKey: {"8.0.0"},
 					}),
 				}
