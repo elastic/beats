@@ -93,6 +93,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fixed a panic when the beat restarts itself by adding 'eventfd2' to default seccomp policy {issue}46372[46372]
 - Update github.com/go-viper/mapstructure/v2 to v2.4.0 {pull}46335[46335]
 - Update Go version to 1.24.7 {pull}46070[46070].
+- 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
 - Update github.com/docker/docker to v28.3.3 {pull}46334[46334]
 
 *Auditbeat*
@@ -159,6 +160,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
 - Fix race condition that could cause Filebeat to hang during shutdown after failing to startup {issue}45034[45034] {pull}46331[46331]
 - Fixed hints autodiscover for Docker when the configuration is only `hints.enabled: true`. {issue}45156[45156] {pull}45864[45864]
+- Fix publishing Okta entity analytics enrichments. {pull}44483[44483]
 - Fix metrics from TCP & UDP inputs when the port number is > 32767 {pull}46486[46486]
 
 *Heartbeat*
@@ -289,6 +291,14 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improve CEL input documentation of authentication options. {pull}46253[46253]
 - Add status reporting support for Azure Event Hub v2 input. {pull}44846[44846]
 - Add documentation for device collection in Entity Analytics Active Directory Filebeat's input. {pull}46363[46363]
+- Add support for OPTIONS request to HTTP Endpoint input. {issue}43930[43930] {pull}44387[44387]
+- Add Fleet status update functionality to lumberjack input. {issue}44283[44283] {pull}44339[44339]
+- Add Fleet status updating to HTTP Endpoint input. {issue}44281[44281] {pull}44310[44310]
+- Add Fleet status updating to streaming input. {issue}44284[44284] {pull}44340[44340]
+- Add Fleet status update functionality to gcppubsub input. {issue}44272[44272] {pull}44507[44507]
+- Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
+- Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
+- Allow empty HTTPJSON cursor template value evaluations to be ignored by Fleet health status updates. {pull}45361[45361]
 
 *Auditbeat*
 
@@ -339,6 +349,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Preserve queries for debugging when `merge_results: true` in SQL module {pull}42271[42271]
 - Collect more fields from ES node/stats metrics and only those that are necessary {pull}42421[42421]
 - Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
+- Add new metrics to vSphere Virtual Machine dataset (CPU usage percentage, disk average usage, disk read/write rate, number of disk reads/writes, memory usage percentage). {pull}44205[44205]
 
 *Metricbeat*
 

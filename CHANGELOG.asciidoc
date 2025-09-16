@@ -3,9 +3,122 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+<<<<<<< HEAD
 [[release-notes-9.1.3]]
 === Beats version 9.1.3
 https://github.com/elastic/beats/compare/v9.1.2\...v9.1.3[View commits]
+=======
+[[release-notes-9.0.7]]
+=== Beats version 9.0.7
+https://github.com/elastic/beats/compare/v9.0.6\...v9.0.7[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
+- Fix a race condition during metrics initialization which could cause a panic. {issue}45822[45822] {pull}46054[46054]
+- Update Go version to 1.24.7 {pull}46070[46070].
+- Fixed a panic when the beat restarts itself by adding 'eventfd2' to default seccomp policy {issue}46372[46372]
+- Update github.com/go-viper/mapstructure/v2 to v2.4.0 {pull}46335[46335]
+
+*Filebeat*
+
+- Fix wrongly emitted missing input ID warning {issue}42969[42969] {pull}45747[45747]
+- Fix race condition that could cause Filebeat to hang during shutdown after failing to startup {issue}45034[45034] {pull}46331[46331]
+
+*Metricbeat*
+
+- Fix an issue where the conntrack metricset entries field reported a count inflated by a factor of the number of CPU cores. {issue}46138[46138] {pull}46140[46140]
+
+*Winlogbeat*
+
+- Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
+
+==== Added
+
+*Filebeat*
+
+- Improve HTTP JSON health status logic for empty template results. {pull}46332[46332]
+- Improve CEL input documentation of authentication options. {pull}46253[46253]
+- Add documentation for device collection in Entity Analytics Active Directory Filebeat's input. {pull}46363[46363]
+
+*Metricbeat*
+
+- Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
+
+[[release-notes-9.0.6]]
+=== Beats version 9.0.6
+https://github.com/elastic/beats/compare/v9.0.5\...v9.0.6[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- The default data and logs path for the Windows service installation has changed from `C:\ProgramData\<Beat>` and `C:\ProgramData\<Beat>\logs`, respectively to `C:\Program Files\<Beat>-Data` and `C:\Program Files\<Beat>-Data\logs`. See 'Quick start -> Installation script' from each Beat for more details. {pull}45946{45946}.
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix handling of unnecessary BOM in UTF-8 text received by o365audit input. {issue}44327[44327] {pull}45739[45739]
+- Fix reading journald messages with more than 4kb. {issue}45511[45511] {pull}46017[46017]
+- Restore the Streaming input on Windows. {pull}46031[46031]
+- Fix termination of input on API errors. {pull}45999[45999]
+- Fix filestream registry entries being prematurely removed, which could cause files to be re-ingested after Filebeat restarts. {issue}46007[46007] {pull}46032[46032]
+
+
+*Metricbeat*
+
+- Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. {pull}45761[45761]
+- Enhance behavior of sanitizeError: replace sensitive info even if it is escaped and add pattern-based sanitization {pull}45857[45857]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.24.5. {pull}45403[45403]
+
+*Filebeat*
+
+- Add mechanism to allow HTTP JSON templates to terminate without logging an error. {issue}45664[45664] {pull}45810[45810]
+
+*Winlogbeat*
+
+- Render data values in xml renderer. {pull}44132[44132]
+
+
+[[release-notes-9.0.5]]
+=== Beats version 9.0.5
+https://github.com/elastic/beats/compare/v9.0.4\...v9.0.5[View commits]
+
+
+*Auditbeat*
+
+- auditd: Request status from a separate socket to avoid data congestion {pull}41207[41207]
+- Fix potential data loss in add_session_metadata. {pull}42795[42795]
+
+
+*Metricbeat*
+
+- Fix URL construction to handle query parameters properly in GET requests for Jolokia {pull}45620[45620]
+
+
+==== Added
+
+*Filebeat*
+
+- Enhanced HTTPJSON input error logging with structured error metadata conforming to Elastic Common Schema (ECS) conventions. {pull}45653[45653]
+
+*Metricbeat*
+
+- Improve error messages in AWS Health {pull}45408[45408]
+
+
+[[release-notes-9.0.4]]
+=== Beats version 9.0.4
+https://github.com/elastic/beats/compare/v9.0.3\...v9.0.4[View commits]
+>>>>>>> 825a707bf (docs: Prepare Changelog for 9.0.7 (#46612))
 
 ==== Breaking changes
 
