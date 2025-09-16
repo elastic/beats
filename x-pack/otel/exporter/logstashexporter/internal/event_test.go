@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/client"
@@ -18,6 +17,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
 )
 
 func TestParseEvent(t *testing.T) {
@@ -83,7 +83,7 @@ func TestParseEvent(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
-						"beat_version": {"8.0.0"},
+						otelctx.BeatVersionCtxKey: {"8.0.0"},
 					}),
 				}
 				return client.NewContext(ctx, info)
@@ -105,8 +105,8 @@ func TestParseEvent(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
-						"beat_name":    {""},
-						"beat_version": {"8.0.0"},
+						otelctx.BeatIndexPrefixCtxKey: {""},
+						otelctx.BeatVersionCtxKey:     {"8.0.0"},
 					}),
 				}
 				return client.NewContext(ctx, info)
@@ -128,8 +128,8 @@ func TestParseEvent(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
-						"beat_name":    {"filebeat"},
-						"beat_version": {"8.0.0"},
+						otelctx.BeatNameCtxKey:    {"filebeat"},
+						otelctx.BeatVersionCtxKey: {"8.0.0"},
 					}),
 				}
 				return client.NewContext(ctx, info)
@@ -296,31 +296,31 @@ func TestIsBeatsEvent(t *testing.T) {
 		{
 			name: "valid beats event",
 			metadata: map[string]any{
-				"beat":    "filebeat",
-				"version": "8.0.0",
+				otelctx.MetadataBeatKey:    "filebeat",
+				otelctx.MetadataVersionKey: "8.0.0",
 			},
 			expected: true,
 		},
 		{
 			name: "missing beat field",
 			metadata: map[string]any{
-				"version": "8.0.0",
+				otelctx.MetadataVersionKey: "8.0.0",
 			},
 			expected: false,
 		},
 		{
 			name: "nil beat field",
 			metadata: map[string]any{
-				"beat":    nil,
-				"version": "8.0.0",
+				otelctx.MetadataBeatKey:    nil,
+				otelctx.MetadataVersionKey: "8.0.0",
 			},
 			expected: false,
 		},
 		{
 			name: "empty beat field",
 			metadata: map[string]any{
-				"beat":    "",
-				"version": "8.0.0",
+				otelctx.MetadataBeatKey:    "",
+				otelctx.MetadataVersionKey: "8.0.0",
 			},
 			expected: false,
 		},

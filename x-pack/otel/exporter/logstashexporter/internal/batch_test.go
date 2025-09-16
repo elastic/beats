@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/client"
@@ -17,6 +16,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 )
 
