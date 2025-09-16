@@ -7,40 +7,6 @@
 === Beats version 9.0.7
 https://github.com/elastic/beats/compare/v9.0.6\...v9.0.7[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -51,51 +17,20 @@ https://github.com/elastic/beats/compare/v9.0.6\...v9.0.7[View commits]
 - Fixed a panic when the beat restarts itself by adding 'eventfd2' to default seccomp policy {issue}46372[46372]
 - Update github.com/go-viper/mapstructure/v2 to v2.4.0 {pull}46335[46335]
 
-*Auditbeat*
-
-
 *Filebeat*
 
 - Fix wrongly emitted missing input ID warning {issue}42969[42969] {pull}45747[45747]
 - Fix race condition that could cause Filebeat to hang during shutdown after failing to startup {issue}45034[45034] {pull}46331[46331]
 
-*Heartbeat*
-
-
-
 *Metricbeat*
 
 - Fix an issue where the conntrack metricset entries field reported a count inflated by a factor of the number of CPU cores. {issue}46138[46138] {pull}46140[46140]
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
 
 *Winlogbeat*
 
 - Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
 
-
-*Elastic Logging Plugin*
-
-
 ==== Added
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Auditbeat*
-
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
@@ -103,78 +38,9 @@ https://github.com/elastic/beats/compare/v9.0.6\...v9.0.7[View commits]
 - Improve CEL input documentation of authentication options. {pull}46253[46253]
 - Add documentation for device collection in Entity Analytics Active Directory Filebeat's input. {pull}46363[46363]
 
-*Auditbeat*
-
-
-*Libbeat*
-
-
-
-*Heartbeat*
-
-
 *Metricbeat*
 
 - Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
-
-
-
-
-
 
 [[release-notes-9.0.6]]
 === Beats version 9.0.6
