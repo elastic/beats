@@ -69,7 +69,7 @@ type bigQuerySource struct {
 }
 
 func (s *bigQuerySource) Name() string {
-	return fmt.Sprintf("%s-%s", s.ProjectID, s.Query)
+	return fmt.Sprintf("%s-%s-%s", s.ProjectID, s.Query, s.CursorField)
 }
 
 type bigQueryInput struct {
@@ -86,7 +86,6 @@ func (bq *bigQueryInput) Test(src cursor.Source, _ v2.TestContext) error {
 }
 
 func (bq *bigQueryInput) Run(ctx v2.Context, src cursor.Source, cur cursor.Cursor, publisher cursor.Publisher) error {
-	bq.logger.Infof("starting BigQuery input") // how to reference the source without logging the query?
 	updateStatus(ctx, status.Starting, "")
 
 	cancelCtx := v2.GoContextFromCanceler(ctx.Cancelation)
