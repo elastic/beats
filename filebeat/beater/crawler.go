@@ -69,7 +69,7 @@ func (c *crawler) Start(
 ) error {
 	log := c.log
 
-	log.Infof("Loading Inputs: %d", len(c.inputConfigs))
+	log.Infof("Loading static inputs: %d", len(c.inputConfigs))
 
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, inputConfig := range c.inputConfigs {
@@ -104,7 +104,12 @@ func (c *crawler) Start(
 		}()
 	}
 
-	log.Infof("Loading and starting Inputs completed. Enabled inputs: %d", len(c.inputs))
+	// Log the current state accurately depending on whether dynamic config loading is enabled
+	if c.inputReloader != nil || c.modulesReloader != nil {
+		log.Infof("Loading and starting Inputs completed. Static inputs enabled: %d. Dynamic config loading enabled.", len(c.inputs))
+	} else {
+		log.Infof("Loading and starting Inputs completed. Enabled inputs: %d", len(c.inputs))
+	}
 
 	return nil
 }
