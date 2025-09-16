@@ -403,9 +403,9 @@ func TestGetEventMeta(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := tt.setupCtx()
 
-			version := GetEventMeta(ctx)
+			metadata := getEventMeta(ctx)
 
-			assert.Equal(t, tt.expected, version)
+			assert.Equal(t, tt.expected, metadata)
 		})
 	}
 }
