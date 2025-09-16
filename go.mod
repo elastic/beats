@@ -79,7 +79,7 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.4.0
 	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 	github.com/godbus/dbus/v5 v5.1.0
-	github.com/godror/godror v0.33.2
+	github.com/godror/godror v0.49.0
 	github.com/gofrs/flock v0.8.1
 	github.com/gogo/protobuf v1.3.2
 	github.com/gohugoio/hashstructure v0.5.0
@@ -256,6 +256,7 @@ require (
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
+<<<<<<< HEAD
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.4.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.26.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.48.1 // indirect
@@ -263,6 +264,16 @@ require (
 	github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
+=======
+	github.com/AzureAD/microsoft-authentication-library-for-go v1.4.2 // indirect
+	github.com/BurntSushi/toml v1.4.0 // indirect
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.29.0 // indirect
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.51.0 // indirect
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.51.0 // indirect
+	github.com/VictoriaMetrics/easyproto v0.1.4 // indirect
+	github.com/andybalholm/brotli v1.2.0 // indirect
+	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
+>>>>>>> a9ad90861 (build(deps): bump github.com/godror/godror from 0.33.2 to 0.49.0 (#45181))
 	github.com/apache/arrow/go/v15 v15.0.2 // indirect
 	github.com/apache/thrift v0.20.0 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
@@ -318,8 +329,14 @@ require (
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.20.4 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
+<<<<<<< HEAD
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/godror/knownpb v0.1.0 // indirect
+=======
+	github.com/gobwas/glob v0.2.3 // indirect
+	github.com/goccy/go-json v0.10.5 // indirect
+	github.com/godror/knownpb v0.3.0 // indirect
+>>>>>>> a9ad90861 (build(deps): bump github.com/godror/godror from 0.33.2 to 0.49.0 (#45181))
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
