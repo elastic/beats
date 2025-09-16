@@ -30,11 +30,22 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// trieNode represents a node in the trie structure used to map device paths to drive letters.
+// Each node can have children for the next character in the path, and terminal nodes
+// store the complete drive path mapping.
 type trieNode struct {
 	children  map[rune]*trieNode
 	drivePath string // Set only for terminal nodes that represent complete device paths
 }
 
+// deviceResolver converts Windows device paths (like \Device\HarddiskVolume1\path) to
+// standard drive letter paths (like C:\path). It maintains a trie structure for efficient
+// prefix matching and uses an LRU cache to speed up frequent translations.
+//
+// The resolver handles the complexity of Windows device path resolution by:
+// - Building a trie of device-to-drive mappings at startup
+// - Caching translation results for performance
+// - Thread-safe concurrent access
 type deviceResolver struct {
 	mu               sync.RWMutex
 	root             *trieNode

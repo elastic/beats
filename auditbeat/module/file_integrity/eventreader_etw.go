@@ -237,8 +237,9 @@ func newETWReader(c Config, l *logp.Logger) (EventProducer, error) {
 			return nil, fmt.Errorf("unable to retrieve handler: %w", err)
 		}
 		r.log.Debug("attached to existing session")
+	} else {
+		r.log.Debug("created new session")
 	}
-	r.log.Debug("created new session")
 	return r, nil
 }
 
@@ -255,9 +256,6 @@ func (r *etwReader) Start(done <-chan struct{}) (<-chan Event, error) {
 	flushWg.Add(1)
 	go func() {
 		interval := r.config.FlushInterval
-		if interval <= 0 {
-			interval = time.Minute
-		}
 		timer := time.NewTicker(interval)
 		defer timer.Stop()
 		defer flushWg.Done()
@@ -347,7 +345,7 @@ func (r *etwReader) handleFileEvent(record *etw.EventRecord) uintptr {
 		if errors.Is(err, etw.ErrUnprocessableEvent) {
 			return 0
 		}
-		r.log.Errorf("failed to render ETW event: %v", err)
+		r.log.Errorw("failed to render ETW event", "error", err)
 		return 1
 	}
 
@@ -630,7 +628,7 @@ func (r *etwReader) getUserInfo(sidStr string) *userInfo {
 
 	sid, err := windows.StringToSid(sidStr)
 	if err != nil {
-		r.log.Errorf("failed to convert string %s to SID: %v", sid, err)
+		r.log.Errorw("failed to convert string to SID", "sid_string", sidStr, "error", err)
 		// we cache failed ones also to avoid repeated lookups
 		_ = r.sidCache.Add(sidStr, nil)
 		return nil
@@ -641,7 +639,7 @@ func (r *etwReader) getUserInfo(sidStr string) *userInfo {
 	info.name, info.domain, use, err = sid.LookupAccount("")
 	if err != nil {
 		// we do not cache this one since it might be a temporary error
-		r.log.Errorf("failed to lookup account for SID %s: %v", sidStr, err)
+		r.log.Errorw("failed to lookup account for SID", "sid", sidStr, "error", err)
 		return &info
 	}
 

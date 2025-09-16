@@ -100,7 +100,7 @@ type Config struct {
 	ExcludeFiles        []match.Matcher `config:"exclude_files"`
 	IncludeFiles        []match.Matcher `config:"include_files"`
 	Backend             Backend         `config:"backend"`
-	FlushInterval       time.Duration   `config:"flush_interval"` // Only used with ETW backend.
+	FlushInterval       time.Duration   `config:"flush_interval"` // Interval for flushing expired operations (ETW backend only). Default: 1m, minimum: 1s.
 }
 
 // Validate validates the config data and return an error explaining all the
@@ -193,6 +193,11 @@ nextHash:
 		}
 	}
 
+	// Validate flush_interval for ETW backend
+	if c.Backend == BackendETW && c.FlushInterval < time.Second {
+		errs = append(errs, fmt.Errorf("flush_interval must be at least 1 second, got %v", c.FlushInterval))
+	}
+
 	return errors.Join(errs...)
 }
 
@@ -241,4 +246,5 @@ var defaultConfig = Config{
 	MaxFileSizeBytes: 100 * 1024 * 1024,
 	ScanAtStart:      true,
 	ScanRatePerSec:   "50 MiB",
+	FlushInterval:    time.Minute, // Default flush interval for ETW backend
 }
