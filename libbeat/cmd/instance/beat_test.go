@@ -520,18 +520,6 @@ func TestManager(t *testing.T) {
 	// initialize the flags.
 	cfgfile.Initialize()
 
-	// create a simple configuration.
-	file, err := os.CreateTemp(t.TempDir(), "beat.yml")
-	require.NoError(t, err)
-	_, err = file.WriteString(`
-filebeat.inputs:
-  - type: filestream
-    id: "filestream"
-    enabled: true
-    paths: [/var/*.log]
-output.console:
-  enabled: true
-`)
 	t.Run("management.enabled=true", func(t *testing.T) {
 		defer func() {
 			// Since standard beats rely on global registries, we must reset them between test cases
@@ -552,9 +540,8 @@ output.console:
 			monitoring.GetNamespace("state").SetRegistry(nil)
 			monitoring.GetNamespace("info").SetRegistry(nil)
 		}()
-		require.NoError(t, err)
 		flag.Set("E", "management.enabled=false")
-		flag.Set("c", file.Name())
+		flag.Set("c", "testdata/mockbeat.yml")
 		b, err := NewInitializedBeat(Settings{})
 		require.NoError(t, err)
 		require.NotNil(t, b)
@@ -566,9 +553,8 @@ output.console:
 			monitoring.GetNamespace("state").SetRegistry(nil)
 			monitoring.GetNamespace("info").SetRegistry(nil)
 		}()
-		require.NoError(t, err)
 		flag.Set("E", "management.enabled=false")
-		flag.Set("c", file.Name())
+		flag.Set("c", "testdata/mockbeat.yml")
 		b, err := NewInitializedBeat(Settings{})
 		require.NoError(t, err)
 		require.NotNil(t, b)
