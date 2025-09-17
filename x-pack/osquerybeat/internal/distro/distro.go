@@ -53,7 +53,7 @@ const (
 	osqueryDistroLinuxSHA256      = "4617173d9df4459335fffcc9973496d55a410874b5509378add63afb9545bb00"
 	osqueryDistroLinuxARMSHA256   = "a056d66f9683f491e4829a23651a7001492bb636d9eecc4814dee3dca7e306c6"
 	osqueryDistroWindowsSHA256    = "ba4c5def84e35ef101fc4ec3f47dd2124c66d736f0f124acdb18c7b29df253fe"
-	osqueryDistroWindowsZipSHA256 = "ccb96244a43acfbad638659856e68209e62a95d369aa3352e4840e2a629d0f9a"
+	osqueryDistroWindowsZipSHA256 = "0dba2c42679ba1eae71d666ce0014cf01d26c328723065ef6e84a9a5270e9743"
 )
 
 type OSArch struct {
