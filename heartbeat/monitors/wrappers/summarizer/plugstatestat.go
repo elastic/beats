@@ -143,7 +143,9 @@ func (ssp *commonSSP) BeforeEach(event *beat.Event, err error) {
 }
 
 func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
-	if ssp.js.Down > 0 {
+	if skippedReason, _ := event.GetValue("internal.synthetics.skipped_reason"); skippedReason != nil {
+		ssp.js.Status = monitorstate.StatusSkipped
+	} else if ssp.js.Down > 0 {
 		ssp.js.Status = monitorstate.StatusDown
 	} else {
 		ssp.js.Status = monitorstate.StatusUp
@@ -153,6 +155,7 @@ func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 	// determine if a retry is needed
 	lastStatus := ssp.stateTracker.GetCurrentStatus(ssp.sf)
 
+	curCheckSkipped := ssp.js.Status == monitorstate.StatusSkipped
 	curCheckDown := ssp.js.Status == monitorstate.StatusDown
 	lastStateUpOrEmpty := lastStatus == monitorstate.StatusUp || lastStatus == monitorstate.StatusEmpty
 	hasAttemptsRemaining := ssp.js.Attempt < ssp.js.MaxAttempts
@@ -160,7 +163,8 @@ func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 	// retry if...
 	retry := curCheckDown && // the current check is down
 		lastStateUpOrEmpty && // we were previously up or had no previous state, if we were previously down we just check once
-		hasAttemptsRemaining // and we are configured to actually make multiple attempts
+		hasAttemptsRemaining && // and we are configured to actually make multiple attempts
+		!curCheckSkipped // skipped monitors will not be retried
 	// if we aren't retrying this is the final attempt
 	ssp.js.FinalAttempt = !retry
 
