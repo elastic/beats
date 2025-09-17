@@ -3,9 +3,46 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+<<<<<<< HEAD
 [[release-notes-8.19.3]]
 === Beats version 8.19.3
 https://github.com/elastic/beats/compare/v8.19.2\...v8.19.3[View commits]
+=======
+[[release-notes-8.18.7]]
+=== Beats version 8.18.7
+https://github.com/elastic/beats/compare/v8.18.6\...v8.18.7[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Update github.com/go-viper/mapstructure/v2 version to v2.4.0 {pull}46335[46335]
+- Fixed a panic when the beat restarts itself by adding 'eventfd2' to default seccomp policy. {issue}46372[46372]
+- Update Go version to 1.24.7 {pull}46070[46070].
+
+*Filebeat*
+
+- Fix race condition that could cause Filebeat to hang during shutdown after failing to startup {issue}45034[45034] {pull}46331[46331]
+
+*Metricbeat*
+
+- Fix an issue where the conntrack metricset entries field reported a count inflated by a factor of the number of CPU cores. {issue}46138[46138] {pull}46140[46140]
+
+*Winlogbeat*
+
+- Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
+
+==== Added
+
+*Filebeat*
+
+- Improve CEL input documentation of authentication options. {pull}46253[46253]
+
+
+[[release-notes-8.18.6]]
+=== Beats version 8.18.6
+https://github.com/elastic/beats/compare/v8.18.5\...v8.18.6[View commits]
+>>>>>>> e923fc103 (docs: Prepare Changelog for 8.18.7 (#46586))
 
 ==== Known Issues
 

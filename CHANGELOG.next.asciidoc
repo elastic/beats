@@ -101,6 +101,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Auditbeat*
 
+- 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
 
 *Auditbeat*
 
@@ -212,6 +213,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
 - Fix an issue where the conntrack metricset entries field reported a count inflated by a factor of the number of CPU cores. {issue}46138[46138] {pull}46140[46140]
 - Enhance behavior of sanitizeError: replace sensitive info even if it is escaped and add pattern-based sanitization {pull}45857[45857]
+- Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
+- Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices {pull}43637[43637]
 - Do not log an error if metadata enrichment is disabled for K8's module {pull}46536
 - Fix Azure Monitor wildcard metrics names timegrain issue by using the first, smallest timegrain; fix nil pointer issue {pull}46145[46145]
 
@@ -224,7 +227,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
-- Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
 
 
 *Elastic Logging Plugin*
@@ -417,3 +419,50 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Filebeat*
  - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
  - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
