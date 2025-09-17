@@ -460,7 +460,10 @@ func TestPathIsFolder(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	for i := range 3 {
-		os.Rename(srcFiles[i], dstFiles[i])
+		if err := os.Rename(srcFiles[i], dstFiles[i]); err != nil {
+			t.Fatalf("cannot move file: %s", err)
+		}
+
 		env.waitUntilEventCount(10 + i*10)
 	}
 }
