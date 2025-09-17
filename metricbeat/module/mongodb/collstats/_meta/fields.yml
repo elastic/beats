@@ -150,10 +150,6 @@
           type: long
           description: >
             Scale factor applied to size-related metrics (e.g. 1 or 1024). Use to derive raw byte counts if metrics are scaled.
-        - name: shards
-          type: nested
-          description: >
-            Detailed statistics per shard (sharded collections only). Contains per-shard breakdown of storage and performance metrics.
         - name: shardCount
           type: long
           description: >
@@ -162,9 +158,3 @@
           type: long
           description: >
             Number of orphaned documents in the collection (MongoDB 6.0+). Orphaned documents exist on shards but are not owned by those shards.
-        - name: indexSizes
-          type: object
-          object_type: long
-          object_type_mapping_type: '*'
-          description: >
-            Per-index size breakdown (bytes) merged across shards when sharded. Keys are index names.

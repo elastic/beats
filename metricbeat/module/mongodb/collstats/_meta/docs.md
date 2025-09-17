@@ -1,6 +1,17 @@
 This is the `collstats` metricset of the module mongodb.
 
-It primarily uses the `top` administrative command to return usage statistics for each collection. On MongoDB 6.2+ it will attempt to enrich collection statistics via the `$collStats` aggregation stage (with server–side scaling and a fallback to the legacy `collStats` command if aggregation is not available). It provides the amount of time, in microseconds, used and a count of operations for the following types:
+## Overview
+
+The `collstats` metricset collects collection-level operational and storage statistics from MongoDB. It transparently uses either the deprecated `collStats` database command (legacy) or the `$collStats` aggregation stage (MongoDB 6.2+) depending on server version and feature availability.
+
+Notes:
+- For sharded clusters, stats from multiple shards are merged. The metricset reports an aggregate view and exposes a `shardCount` summary. It does not emit a per-shard breakdown (no `shards.*`).
+- Index size details (the `indexSizes.*` map) are intentionally not collected at this time.
+
+## Features
+
+### Operation Statistics
+It uses the `top` administrative command to return usage statistics for each collection. It provides the amount of time, in microseconds, used and a count of operations for the following types:
 
 * total
 * readLock
@@ -15,27 +26,13 @@ It primarily uses the `top` administrative command to return usage statistics fo
 It requires the following privileges, which is covered by the [`clusterMonitor` role](https://docs.mongodb.com/manual/reference/built-in-roles/#clusterMonitor):
 
 * [`top` action](https://docs.mongodb.com/manual/reference/privilege-actions/#top) on [`cluster` resource](https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource)
+* [`collStats` action](https://docs.mongodb.com/manual/reference/privilege-actions/#collStats) on collection resources
+* [`aggregate` action](https://docs.mongodb.com/manual/reference/privilege-actions/#aggregate) on collection resources (for MongoDB 6.2+)
 
-### Additional collection statistics (MongoDB 6.2+)
+On mongos routers, the `top` command is not available. In such cases, only storage statistics are populated; operation counters (total/read/write/query, etc.) may be absent.
 
-When connected to MongoDB 6.2 or later, Metricbeat will:
+## Configuration
 
-* Detect server version during the first fetch.
-* Try `$collStats` aggregation with a dynamic stage including `storageStats` (with optional scale), `count` (fast metadata count)
-* Fall back to the legacy `collStats` command if the aggregation stage fails (e.g. older server, view, permissions, or feature restrictions such as Queryable Encryption redaction).
+Optional settings for this metricset:
 
-### Configuration options
-
-The following optional settings control the output (default scale `1`):
-
-```
-	# Scale factor for size values reported inside stats.* (1 = bytes, 1024 = KiB, etc.).
-	# Only applied server‑side; Metricbeat does not rescale client‑side.
-	#scale: 1
-```
-
-Notes:
-* Sharded collections returned by `$collStats` produce one doc per shard; the metricset merges these and adds `stats.shards[]` plus `stats.shardCount`.
-* The server’s reported sizes (e.g. `storageSize`, `totalIndexSize`) already reflect the `scale` value supplied; no additional scaling is performed.
-
-Backward compatibility: For MongoDB < 6.2 the behavior remains identical to previous versions, using only the legacy command path.
+- `scale` (integer, default: 1): Server-side scale factor for size values reported by `collStats`/`$collStats` (for example, set to `1024` to receive sizes in KiB). Values are not rescaled client-side.

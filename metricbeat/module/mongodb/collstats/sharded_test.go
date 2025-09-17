@@ -77,7 +77,7 @@ func TestMergeShardedCollStats(t *testing.T) {
 			expectedErr:   false,
 		},
 		{
-			name: "shards with index sizes",
+			name: "shards with index sizes (ignored)",
 			shardResults: []map[string]interface{}{
 				{
 					"ns":    "test.collection",
@@ -85,10 +85,7 @@ func TestMergeShardedCollStats(t *testing.T) {
 					"host":  "shard01:27017",
 					"count": int64(1000),
 					"size":  float64(50000),
-					"indexSizes": map[string]interface{}{
-						"_id_":       float64(10000),
-						"name_index": float64(5000),
-					},
+					// indexSizes will be ignored
 				},
 				{
 					"ns":    "test.collection",
@@ -96,11 +93,7 @@ func TestMergeShardedCollStats(t *testing.T) {
 					"host":  "shard02:27017",
 					"count": int64(2000),
 					"size":  float64(120000),
-					"indexSizes": map[string]interface{}{
-						"_id_":        float64(20000),
-						"name_index":  float64(12000),
-						"email_index": float64(8000),
-					},
+					// indexSizes will be ignored
 				},
 			},
 			expectedCount: 3000,
@@ -138,51 +131,15 @@ func TestMergeShardedCollStats(t *testing.T) {
 				assert.Equal(t, tt.expectedSize, size)
 			}
 
-			// For multi-shard tests, verify shard information is preserved
+			// For multi-shard tests, verify shardCount reported but no shards breakdown
 			if len(tt.shardResults) > 1 {
-				shards, exists := result["shards"]
-				assert.True(t, exists)
-
-				shardArray, ok := shards.([]map[string]interface{})
-				assert.True(t, ok)
-				assert.Len(t, shardArray, len(tt.shardResults))
-
 				// Verify shard count
 				shardCount, exists := result["shardCount"]
 				assert.True(t, exists)
 				assert.Equal(t, len(tt.shardResults), shardCount)
-
-				// Check that shard-specific fields are removed from main result
-				_, shardExists := result["shard"]
-				assert.False(t, shardExists, "shard field should be removed from merged result")
-			}
-
-			// For index size tests, verify merged index sizes
-			if len(tt.shardResults) > 0 {
-				if _, hasIndexSizes := tt.shardResults[0]["indexSizes"]; hasIndexSizes {
-					mergedIndexSizes, exists := result["indexSizes"]
-					assert.True(t, exists)
-
-					indexMap, ok := mergedIndexSizes.(map[string]interface{})
-					assert.True(t, ok)
-
-					// Verify _id_ index is merged correctly
-					if idIndexSize, exists := indexMap["_id_"]; exists {
-						expectedIdSize := float64(0)
-						for _, shard := range tt.shardResults {
-							if shardIndexes, hasIdx := shard["indexSizes"]; hasIdx {
-								if shardIdxMap, ok := shardIndexes.(map[string]interface{}); ok {
-									if idSize, hasId := shardIdxMap["_id_"]; hasId {
-										if numSize, ok := convertToFloat64(idSize); ok {
-											expectedIdSize += numSize
-										}
-									}
-								}
-							}
-						}
-						assert.Equal(t, expectedIdSize, idIndexSize)
-					}
-				}
+				// No shards breakdown should be present
+				_, exists = result["shards"]
+				assert.False(t, exists)
 			}
 		})
 	}

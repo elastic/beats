@@ -71,11 +71,7 @@ func TestEventMappingOptionalFields(t *testing.T) {
 			"freeStorageSize": 4096,
 			"capped":          false,
 			"scaleFactor":     1024,
-			"shards": []interface{}{
-				map[string]interface{}{"shard": "shardA", "count": 2},
-				map[string]interface{}{"shard": "shardB", "count": 3},
-			},
-			"indexSizes": map[string]interface{}{"_id_": 256, "user_1": 256},
+			// shards breakdown and indexSizes omitted
 		},
 	}
 
@@ -88,7 +84,8 @@ func TestEventMappingOptionalFields(t *testing.T) {
 	assert.Equal(t, 4096, stats["freeStorageSize"].(int))
 	assert.Equal(t, false, stats["capped"].(bool))
 	assert.Equal(t, 1024, stats["scaleFactor"].(int))
-	assert.NotNil(t, stats["indexSizes"])
+	_, hasIndexSizes := stats["indexSizes"]
+	assert.False(t, hasIndexSizes)
 }
 
 func TestMergeShardedCollStats_WeightedAndIndexMerge(t *testing.T) {
@@ -97,7 +94,6 @@ func TestMergeShardedCollStats_WeightedAndIndexMerge(t *testing.T) {
 		"size":        float64(1000),
 		"storageSize": float64(2000),
 		"avgObjSize":  float64(100),
-		"indexSizes":  map[string]interface{}{"_id_": float64(300)},
 		"shard":       "shard1",
 		"host":        "host1",
 	}
@@ -106,7 +102,6 @@ func TestMergeShardedCollStats_WeightedAndIndexMerge(t *testing.T) {
 		"size":        float64(3000),
 		"storageSize": float64(4000),
 		"avgObjSize":  float64(150),
-		"indexSizes":  map[string]interface{}{"_id_": float64(500), "user_1": float64(100)},
 		"shard":       "shard2",
 		"host":        "host2",
 	}
@@ -117,14 +112,13 @@ func TestMergeShardedCollStats_WeightedAndIndexMerge(t *testing.T) {
 	assert.Equal(t, float64(4000), merged["size"].(float64))
 	// Weighted avg: (100*10 + 150*20)/30 = (1000 + 3000)/30 = 133.333...
 	assert.InDelta(t, 133.33, merged["avgObjSize"].(float64), 0.01)
-	// Index sizes merged
-	idx := merged["indexSizes"].(map[string]interface{})
-	assert.Equal(t, float64(800), idx["_id_"].(float64))
-	assert.Equal(t, float64(100), idx["user_1"].(float64))
-	// Shard metadata
+	// No indexSizes collected
+	_, hasIdx := merged["indexSizes"]
+	assert.False(t, hasIdx)
+	// Shard metadata only: shardCount present, no shards breakdown
 	assert.Equal(t, 2, merged["shardCount"].(int))
-	shards := merged["shards"].([]map[string]interface{})
-	assert.Len(t, shards, 2)
+	_, hasShards := merged["shards"]
+	assert.False(t, hasShards)
 }
 
 func TestFlattenAggregationResult(t *testing.T) {

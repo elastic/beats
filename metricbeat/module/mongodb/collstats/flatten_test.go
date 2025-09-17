@@ -34,16 +34,13 @@ func TestFlattenAggregationResult_NoStorageStats(t *testing.T) {
 func TestFlattenAggregationResult_WithStorageStats(t *testing.T) {
 	input := map[string]interface{}{
 		"storageStats": map[string]interface{}{
-			"size":           float64(1000),
-			"count":          int64(50),
-			"avgObjSize":     float64(20),
-			"storageSize":    float64(2000),
-			"totalIndexSize": float64(3000),
-			"totalSize":      float64(5000),
-			"nindexes":       int64(3),
-			"indexSizes": map[string]interface{}{
-				"_id_": float64(100),
-			},
+			"size":            float64(1000),
+			"count":           int64(50),
+			"avgObjSize":      float64(20),
+			"storageSize":     float64(2000),
+			"totalIndexSize":  float64(3000),
+			"totalSize":       float64(5000),
+			"nindexes":        int64(3),
 			"freeStorageSize": float64(10),
 			"capped":          false,
 			"numOrphanDocs":   int64(0),
@@ -58,8 +55,8 @@ func TestFlattenAggregationResult_WithStorageStats(t *testing.T) {
 	if _, ok := out["count"]; !ok {
 		t.Fatalf("count not lifted")
 	}
-	if _, ok := out["indexSizes"]; !ok {
-		t.Fatalf("indexSizes not lifted")
+	if _, ok := out["indexSizes"]; ok {
+		t.Fatalf("indexSizes should not be lifted")
 	}
 	if _, ok := out["freeStorageSize"]; !ok {
 		t.Fatalf("freeStorageSize not lifted")
