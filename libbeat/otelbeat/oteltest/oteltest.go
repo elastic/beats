@@ -20,6 +20,8 @@ package oteltest
 
 import (
 	"context"
+	"runtime"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -33,6 +35,7 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver"
+	"go.uber.org/goleak"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest"
@@ -83,6 +86,8 @@ func CheckReceivers(params CheckReceiversParams) {
 	t := params.T
 	ctx := context.Background()
 
+	defer VerifyNoLeaks(t)
+
 	var logsMu sync.Mutex
 	logs := make(map[string][]mapstr.M)
 
@@ -104,17 +109,17 @@ func CheckReceivers(params CheckReceiversParams) {
 		require.NotEmpty(t, rc.Beat, "receiver beat must not be empty")
 
 		var receiverSettings receiver.Settings
+		receiverSettings.ID = component.NewIDWithName(rc.Factory.Type(), rc.Name)
 
 		// Replicate the behavior of the collector logger
 		receiverCore := core.
 			With([]zapcore.Field{
-				zap.String("otelcol.component.id", rc.Name),
+				zap.String("otelcol.component.id", receiverSettings.ID.String()),
 				zap.String("otelcol.component.kind", "receiver"),
 				zap.String("otelcol.signal", "logs"),
 			})
 
 		receiverSettings.Logger = zap.New(receiverCore)
-		receiverSettings.ID = component.NewIDWithName(rc.Factory.Type(), rc.Name)
 
 		logConsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
 			for _, rl := range ld.ResourceLogs().All() {
@@ -157,9 +162,9 @@ func CheckReceivers(params CheckReceiversParams) {
 		}
 	})
 
-	beatForCompID := func(compID string) string {
+	beatForCompName := func(compName string) string {
 		for _, rec := range params.Receivers {
-			if rec.Name == compID {
+			if rec.Name == compName {
 				return rec.Beat
 			}
 		}
@@ -180,8 +185,9 @@ func CheckReceivers(params CheckReceiversParams) {
 			require.Contains(ct, zl.ContextMap(), "otelcol.component.id")
 			compID, ok := zl.ContextMap()["otelcol.component.id"].(string)
 			require.True(ct, ok, "otelcol.component.id should be a string")
+			compName := strings.Split(compID, "/")[1]
 			require.Contains(ct, zl.ContextMap(), "service.name")
-			require.Equal(ct, beatForCompID(compID), zl.ContextMap()["service.name"])
+			require.Equal(ct, beatForCompName(compName), zl.ContextMap()["service.name"])
 			break
 		}
 		require.NotNilf(ct, host.Evt, "expected not nil nil, got %v", host.Evt)
@@ -199,4 +205,36 @@ func CheckReceivers(params CheckReceiversParams) {
 		}
 	}, 2*time.Minute, 100*time.Millisecond,
 		"timeout waiting for logger fields from the OTel collector are present in the logs and other assertions to be met")
+}
+
+// VerifyNoLeaks fails the test if any goroutines are leaked during the test.
+func VerifyNoLeaks(t *testing.T) {
+	skipped := []goleak.Option{
+		// See https://github.com/microsoft/go-winio/issues/272
+		goleak.IgnoreAnyFunction("github.com/Microsoft/go-winio.getQueuedCompletionStatus"),
+		// False positive, from init in cloud.google.com/go/pubsub and filebeat/input/gcppubsub.
+		// See https://github.com/googleapis/google-cloud-go/issues/10948
+		// and https://github.com/census-instrumentation/opencensus-go/issues/1191
+		goleak.IgnoreAnyFunction("go.opencensus.io/stats/view.(*worker).start"),
+	}
+
+	if runtime.GOOS == "linux" && runtime.GOARCH == "arm64" {
+		// On arm64, some HTTP transport goroutines are leaked while still dialing.
+		skipped = append(skipped, goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked"))
+	}
+
+	goleak.VerifyNone(t, skipped...)
+}
+
+type DummyConsumer struct {
+	context.Context
+	ConsumeError error
+}
+
+func (d *DummyConsumer) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
+	return d.ConsumeError
+}
+
+func (d *DummyConsumer) Capabilities() consumer.Capabilities {
+	return consumer.Capabilities{}
 }
