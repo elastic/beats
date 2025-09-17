@@ -6,7 +6,6 @@ package zip
 
 import (
 	"archive/zip"
-	"compress/gzip"
 	"fmt"
 	"io"
 	"os"
@@ -33,20 +32,6 @@ func shouldExtract(name string, files ...string) bool {
 		}
 	}
 	return false
-}
-
-func ExtractFile(fp string, destinationDir string, files ...string) error {
-	f, err := os.Open(fp)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	zr, err := gzip.NewReader(f)
-	if err != nil {
-		return err
-	}
-
-	return Extract(zr, destinationDir, files...)
 }
 
 // UnzipFile is a wrapper for Unzip
