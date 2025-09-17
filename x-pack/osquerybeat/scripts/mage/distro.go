@@ -97,6 +97,8 @@ func checkCacheAndFetch(osarch distro.OSArch, spec distro.Spec) (fetched bool, e
 	fp := spec.DistroFilepath(dir)
 	specHash := spec.SHA256Hash
 
+	fmt.Printf("XXX Download URL: [%s] Filepath: [%s]\n", url, fp)
+
 	// Check if file already exists in the cache
 	f, err := os.Open(fp)
 	if err != nil {
@@ -141,6 +143,7 @@ const (
 	suffixTarGz = ".tar.gz"
 	suffixPkg   = ".pkg"
 	suffixMsi   = ".msi"
+	suffixZip   = ".zip"
 )
 
 func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
@@ -159,14 +162,15 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 		return devtools.Copy(src, dst)
 	}
 
-	if !strings.HasSuffix(src, suffixTarGz) && !strings.HasSuffix(src, suffixPkg) && !strings.HasSuffix(src, suffixMsi) {
+	if !strings.HasSuffix(src, suffixTarGz) && !strings.HasSuffix(src, suffixPkg) && !strings.HasSuffix(src, suffixMsi) && !strings.HasSuffix(src, suffixZip) {
 		return fmt.Errorf("unsupported file: %s", src)
 	}
 	tmpdir, err := os.MkdirTemp(distro.DataDir, "")
 	if err != nil {
 		return err
 	}
-	defer os.RemoveAll(tmpdir)
+	//defer os.RemoveAll(tmpdir)
+	fmt.Printf("XXX NOT REMOVING TMPDIR: [%s]\n", tmpdir)
 
 	var (
 		osdp  string
@@ -217,6 +221,22 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 		if err != nil {
 			return err
 		}
+	}
+	if strings.HasSuffix(src, suffixZip) {
+		fmt.Printf("XXX Downloading ZIPPY!: [%s]\n", src)
+		log.Printf("Extract .zip from %v", src)
+
+		osdp = filepath.Join("Program Files", "osquery", "osqueryd", "osqueryd.exe")
+		osdcp = distro.OsquerydCertsWindowsZipDistroPath()
+		distp = distro.OsquerydPathForOS(osarch.OS, dir)
+
+		fmt.Println("XXX ABOUT TO MSIEXTRACT")
+		// Msiutil expand full
+		err = msiutil.Expand(src, tmpdir)
+		if err != nil {
+			return err
+		}
+		fmt.Println("XXX DONE TRYING TO MSIEXTRACT")
 	}
 
 	// Copy over certs directory

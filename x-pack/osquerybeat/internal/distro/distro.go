@@ -22,19 +22,22 @@ var (
 	DataCacheDir   = filepath.Join(DataDir, "cache")
 )
 
+// Windows ARM URL: https://github.com/osquery/osquery/releases/download/5.15.0/osquery-5.15.0.windows_arm64.zip
 const (
-	osqueryDownloadBaseURL = "https://pkg.osquery.io"
-	osqueryName            = "osquery"
-	osqueryDName           = "osqueryd"
-	osqueryDarwinApp       = "osquery.app"
-	osqueryDarwinPath      = "opt/osquery/lib/" + osqueryDarwinApp
+	osqueryDownloadBaseURL       = "https://pkg.osquery.io"
+	osqueryDownloadGithubBaseURL = "https://github.com/osquery/osquery/releases/download"
+	osqueryName                  = "osquery"
+	osqueryDName                 = "osqueryd"
+	osqueryDarwinApp             = "osquery.app"
+	osqueryDarwinPath            = "opt/osquery/lib/" + osqueryDarwinApp
 
-	osqueryCertsPEM         = "certs.pem"
-	osqueryCertsPath        = "certs/" + osqueryCertsPEM
-	osqueryLinuxPath        = "opt/osquery/bin"
-	osqueryCertsLinuxPath   = "opt/osquery/share/osquery/certs/" + osqueryCertsPEM
-	osqueryCertsDarwinPath  = "private/var/osquery/certs/" + osqueryCertsPEM
-	osqueryCertsWindowsPath = "osquery/certs/" + osqueryCertsPEM
+	osqueryCertsPEM            = "certs.pem"
+	osqueryCertsPath           = "certs/" + osqueryCertsPEM
+	osqueryLinuxPath           = "opt/osquery/bin"
+	osqueryCertsLinuxPath      = "opt/osquery/share/osquery/certs/" + osqueryCertsPEM
+	osqueryCertsDarwinPath     = "private/var/osquery/certs/" + osqueryCertsPEM
+	osqueryCertsWindowsPath    = "osquery/certs/" + osqueryCertsPEM
+	osqueryCertsWindowsZipPath = "Program Files/" + osqueryCertsWindowsPath
 
 	osqueryLensesLinuxDir  = "opt/osquery/share/osquery/lenses"
 	osqueryLensesDarwinDir = "private/var/osquery/lenses"
@@ -44,11 +47,13 @@ const (
 	osqueryVersion = "5.15.0"
 	osqueryMSIExt  = ".msi"
 	osqueryPkgExt  = ".pkg"
+	osqueryZipExt  = ".zip"
 
-	osqueryDistroDarwinSHA256   = "5044ba8207a68cd756ef01ffcb408e558cf4e28eab7793cce0337095c9499bac"
-	osqueryDistroLinuxSHA256    = "9bc11806afba259a5d25bf937fbf6c16337abc672c1a5b09369226c2abe8dcd3"
-	osqueryDistroLinuxARMSHA256 = "ca6e92e4d60cf2990d346c98362c171e9ce3d43aa050db79f0bc2b03949800d3"
-	osqueryDistroWindowsSHA256  = "9c06dd0b8fbe76129cff5bebc79277044213d5cddccb9ddfe2179606908a817e"
+	osqueryDistroDarwinSHA256     = "5044ba8207a68cd756ef01ffcb408e558cf4e28eab7793cce0337095c9499bac"
+	osqueryDistroLinuxSHA256      = "9bc11806afba259a5d25bf937fbf6c16337abc672c1a5b09369226c2abe8dcd3"
+	osqueryDistroLinuxARMSHA256   = "ca6e92e4d60cf2990d346c98362c171e9ce3d43aa050db79f0bc2b03949800d3"
+	osqueryDistroWindowsSHA256    = "9c06dd0b8fbe76129cff5bebc79277044213d5cddccb9ddfe2179606908a817e"
+	osqueryDistroWindowsZipSHA256 = "ccb96244a43acfbad638659856e68209e62a95d369aa3352e4840e2a629d0f9a"
 )
 
 type OSArch struct {
@@ -119,6 +124,10 @@ func OsquerydCertsWindowsDistroPath() string {
 	return osqueryCertsWindowsPath
 }
 
+func OsquerydCertsWindowsZipDistroPath() string {
+	return osqueryCertsWindowsZipPath
+}
+
 func OsquerydLensesLinuxDistroDir() string {
 	return osqueryLensesLinuxDir
 }
@@ -148,6 +157,10 @@ type Spec struct {
 }
 
 func (s Spec) DistroFilename() string {
+	if s.PackSuffix == osqueryZipExt {
+		// Currently the only file that's a zip is the Windows ARM64 one
+		return osqueryName + "-" + osqueryVersion + ".windows_arm64" + s.PackSuffix
+	}
 	return osqueryName + "-" + osqueryVersion + s.PackSuffix
 }
 
@@ -169,7 +182,11 @@ func (s Spec) InstalledMode() os.FileMode {
 	return 0644
 }
 
+// Windows ARM URL: https://github.com/osquery/osquery/releases/download/5.15.0/osquery-5.15.0.windows_arm64.zip
 func (s Spec) URL(osname string) string {
+	if s.PackSuffix == osqueryZipExt {
+		return osqueryDownloadGithubBaseURL + "/" + osqueryVersion + "/" + s.DistroFilename()
+	}
 	return osqueryDownloadBaseURL + "/" + osname + "/" + s.DistroFilename()
 }
 
@@ -179,6 +196,7 @@ var specs = map[OSArch]Spec{
 	{"darwin", "amd64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, true},
 	{"darwin", "arm64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, true},
 	{"windows", "amd64"}: {osqueryMSIExt, osqueryDistroWindowsSHA256, true},
+	{"windows", "arm64"}: {osqueryZipExt, osqueryDistroWindowsZipSHA256, true},
 }
 
 func GetSpec(osarch OSArch) (spec Spec, err error) {
