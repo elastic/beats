@@ -84,7 +84,7 @@ require (
 	github.com/gogo/protobuf v1.3.2
 	github.com/gohugoio/hashstructure v0.5.0
 	github.com/golang/snappy v1.0.0
-	github.com/gomodule/redigo v1.8.3
+	github.com/gomodule/redigo v1.9.2
 	github.com/google/flatbuffers v25.2.10+incompatible
 	github.com/google/go-cmp v0.7.0
 	github.com/google/gopacket v1.1.19
@@ -117,7 +117,7 @@ require (
 	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.11.1
 	github.com/ugorji/go/codec v1.1.8
-	github.com/vmware/govmomi v0.51.0
+	github.com/vmware/govmomi v0.52.0
 	go.elastic.co/ecszap v1.0.2
 	go.elastic.co/go-licence-detector v0.7.0
 	go.etcd.io/bbolt v1.4.0
