@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/msiutil"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pkgutil"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/tar"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/zip"
 )
 
 // FetchOsqueryDistros fetches Osquery official distros as a part of the build
@@ -226,17 +227,20 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 		fmt.Printf("XXX Downloading ZIPPY!: [%s]\n", src)
 		log.Printf("Extract .zip from %v", src)
 
-		osdp = filepath.Join("Program Files", "osquery", "osqueryd", "osqueryd.exe")
+		//osdp = filepath.Join("Program Files", "osquery", "osqueryd", "osqueryd.exe")
+		osdp = distro.OsquerydWindowsZipPath()
 		osdcp = distro.OsquerydCertsWindowsZipDistroPath()
 		distp = distro.OsquerydPathForOS(osarch.OS, dir)
 
-		fmt.Println("XXX ABOUT TO MSIEXTRACT")
+		fmt.Printf("XXX distp?? [%s]\n", distp)
+
+		fmt.Println("XXX ABOUT TO UNZIP")
 		// Msiutil expand full
-		err = msiutil.Expand(src, tmpdir)
+		err = zip.UnzipFile(src, tmpdir, osdp, osdcp)
 		if err != nil {
 			return err
 		}
-		fmt.Println("XXX DONE TRYING TO MSIEXTRACT")
+		fmt.Println("XXX DONE TRYING TO UNZIP")
 	}
 
 	// Copy over certs directory

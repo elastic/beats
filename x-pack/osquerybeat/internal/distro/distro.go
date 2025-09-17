@@ -96,6 +96,10 @@ func OsquerydPath(dir string) string {
 	return OsquerydPathForOS(runtime.GOOS, dir)
 }
 
+func OsquerydWindowsZipPath() string {
+	return filepath.Join(osqueryName+"-"+osqueryVersion+".windows_arm64", "Program Files", "osquery", "osqueryd", "osqueryd.exe")
+}
+
 func OsquerydCertsPath(dir string) string {
 	return filepath.Join(dir, osqueryCertsPath)
 }
@@ -125,7 +129,7 @@ func OsquerydCertsWindowsDistroPath() string {
 }
 
 func OsquerydCertsWindowsZipDistroPath() string {
-	return osqueryCertsWindowsZipPath
+	return osqueryName + "-" + osqueryVersion + ".windows_arm64" + "/" + osqueryCertsWindowsZipPath
 }
 
 func OsquerydLensesLinuxDistroDir() string {
@@ -158,7 +162,7 @@ type Spec struct {
 
 func (s Spec) DistroFilename() string {
 	if s.PackSuffix == osqueryZipExt {
-		// Currently the only file that's a zip is the Windows ARM64 one
+		// Currently the only file whose source is a zip is the Windows ARM64 one
 		return osqueryName + "-" + osqueryVersion + ".windows_arm64" + s.PackSuffix
 	}
 	return osqueryName + "-" + osqueryVersion + s.PackSuffix

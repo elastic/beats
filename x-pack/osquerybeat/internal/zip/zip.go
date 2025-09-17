@@ -1,0 +1,109 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+package zip
+
+import (
+	"archive/zip"
+	"compress/gzip"
+	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"strings"
+)
+
+func shouldExtract(name string, files ...string) bool {
+	if files == nil {
+		return true
+	}
+
+	fmt.Printf("XXX Initial name: [%s]\n", name)
+	// Clean the file path/name from the tar.gz archive
+	// In the osquery 4.9.0 version the paths started to be prefixed with "./"
+	// which caused the osqueryd binary not found/extracted from the archive.
+	name = filepath.Clean(name)
+	for _, f := range files {
+		fmt.Printf("XXX checking shouldExtract file [%s] vs [%s]\n", name, f)
+		if strings.HasPrefix(name, f) ||
+			strings.HasPrefix(f, name) {
+			fmt.Printf("XXX YES file should extract [%s]\n", f)
+			return true
+		}
+	}
+	return false
+}
+
+func ExtractFile(fp string, destinationDir string, files ...string) error {
+	f, err := os.Open(fp)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	zr, err := gzip.NewReader(f)
+	if err != nil {
+		return err
+	}
+
+	return Extract(zr, destinationDir, files...)
+}
+
+// UnzipFile is a wrapper for Unzip
+func UnzipFile(fp string, destinationDir string, files ...string) error {
+	r, err := zip.OpenReader(fp)
+	if err != nil {
+		return err
+	}
+	defer r.Close()
+
+	return Unzip(r, destinationDir, files...)
+}
+
+// Unzip extracts certain files from a zip to a destination directory
+func Unzip(r *zip.ReadCloser, destinationDir string, files ...string) error {
+
+	for _, file := range r.File {
+
+		shouldExtract := shouldExtract(file.Name, files...)
+		if !shouldExtract {
+			continue
+		}
+
+		path := filepath.Join(destinationDir, file.Name)
+		// Check for directory traversal vulnerabilities.
+		if !strings.HasPrefix(path, destinationDir+string(os.PathSeparator)) {
+			return fmt.Errorf("illegal file path: %s", path)
+		}
+		if !strings.HasPrefix(path, filepath.Clean(destinationDir)) {
+			return fmt.Errorf("illegal file path in tar: %v", file.Name)
+		}
+
+		if file.FileInfo().IsDir() {
+			fmt.Printf("XXX Creating directory [%s]\n", path)
+			// It's a directory
+			if err := os.MkdirAll(path, file.Mode()); err != nil {
+				return err
+			}
+		} else {
+			fmt.Printf("XXX Unzipping/extracting file [%s] to [%s]\n", file.Name, path)
+			// It's a file
+			outFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
+			if err != nil {
+				return err
+			}
+			defer outFile.Close()
+
+			rc, err := file.Open()
+			if err != nil {
+				return err
+			}
+			defer rc.Close()
+
+			if _, err := io.Copy(outFile, rc); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
