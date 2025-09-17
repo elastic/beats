@@ -153,8 +153,10 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 		}
 
 		collStatsErrGroup.Go(func() error {
+			m.Logger().Debugf("collstats: processing group=%q", group)
 			names, err := splitKey(group)
 			if err != nil {
+				m.Logger().Debugf("collstats: splitKey failed for group=%q: %v", group, err)
 				reporter.Error(fmt.Errorf("splitting a collection key failed: %w", err))
 
 				// the error is captured by reporter. no need to return it (to avoid double reporting of the same error)
@@ -166,6 +168,7 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 			// Use appropriate method based on MongoDB version
 			collStats, err := m.fetchCollStatsWithVersion(client, database, collection)
 			if err != nil {
+				m.Logger().Debugf("collstats: fetch failed for %s.%s: %v", database, collection, err)
 				reporter.Error(fmt.Errorf("fetching collStats failed: %w", err))
 
 				// the error is captured by reporter. no need to return it (to avoid double reporting of the same error)
@@ -176,6 +179,7 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 
 			event, err := eventMapping(group, infoMap)
 			if err != nil {
+				m.Logger().Debugf("collstats: event mapping failed for %s.%s: %v", database, collection, err)
 				reporter.Error(fmt.Errorf("mapping of the event data failed: %w", err))
 
 				// the error is captured by reporter. no need to return it (to avoid double reporting of the same error)
@@ -186,6 +190,8 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 				MetricSetFields: event,
 			})
 
+			m.Logger().Debugf("collstats: completed %s.%s", database, collection)
+
 			return nil
 		})
 	}
@@ -193,7 +199,6 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 	if err := collStatsErrGroup.Wait(); err != nil {
 		return fmt.Errorf("error processing mongodb collstats: %w", err)
 	}
-
 	return nil
 }
 
@@ -201,15 +206,16 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 func (m *Metricset) fetchCollStatsWithVersion(client *mongo.Client, dbName, collectionName string) (map[string]interface{}, error) {
 	// For MongoDB 6.2+, try aggregation first with fallback to command
 	if isVersionAtLeast(m.mongoVersion, "6.2.0") {
+		m.Logger().Debugf("collstats: using $collStats aggregation for %s.%s (scale=%d)", dbName, collectionName, m.options.Scale)
 		stats, err := m.fetchCollStatsAggregation(client, dbName, collectionName)
 		if err == nil {
 			return m.applyOptionsToStats(stats)
 		}
-		// Log the error and fallback to command
-		m.Logger().Debugf("Aggregation failed, falling back to command: %v", err)
+		m.Logger().Debugf("collstats: aggregation failed for %s.%s, falling back to collStats command: %v", dbName, collectionName, err)
 	}
 
 	// Use legacy command for older versions or as fallback
+	m.Logger().Debugf("collstats: using collStats command for %s.%s (scale=%d)", dbName, collectionName, m.options.Scale)
 	stats, err := m.fetchCollStatsCommand(client, dbName, collectionName)
 	if err != nil {
 		return nil, err
@@ -237,6 +243,7 @@ func (m *Metricset) fetchCollStatsAggregation(client *mongo.Client, dbName, coll
 	// flatten the result afterwards to keep the rest of the pipeline unchanged.
 	pipeline := mongo.Pipeline{{{Key: "$collStats", Value: collStatsOptions}}}
 
+	m.Logger().Debugf("collstats: running aggregation pipeline on %s.%s: %v", dbName, collectionName, pipeline)
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, fmt.Errorf("aggregation failed for database=%s, collection=%s: %w", dbName, collectionName, err)
@@ -266,6 +273,7 @@ func (m *Metricset) fetchCollStatsAggregation(client *mongo.Client, dbName, coll
 	if err != nil {
 		return nil, fmt.Errorf("failed to merge sharded collection stats: %w", err)
 	}
+	m.Logger().Debugf("collstats: merged sharded stats for %s.%s (shards=%d)", dbName, collectionName, len(results))
 	return mergedResult, nil
 }
 
@@ -281,6 +289,7 @@ func (m *Metricset) fetchCollStatsCommand(client *mongo.Client, dbName, collecti
 		command["scale"] = m.options.Scale
 	}
 
+	m.Logger().Debugf("collstats: running collStats command on %s.%s: %v", dbName, collectionName, command)
 	collStats := db.RunCommand(context.Background(), command)
 	if err := collStats.Err(); err != nil {
 		return nil, fmt.Errorf("collStats command failed: %w", err)
