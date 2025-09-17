@@ -113,6 +113,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Upgrade to osquery 5.12.1. {pull}40368[40368]
 - Upgrade to osquery 5.13.1. {pull}40849[40849]
 - Upgrade to osquery 5.15.0 {pull}43426[43426]
+- Upgrade to osquery 5.18.1 {pull}46624[46624]
 
 
 *Packetbeat*
@@ -674,8 +675,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 
 ==== Known Issues
-
-
 
 
 

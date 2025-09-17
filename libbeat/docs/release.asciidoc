@@ -8,18 +8,8 @@ This section summarizes the changes in each release. Also read
 <<breaking-changes>> for more detail about changes that affect
 upgrade.
 
-<<<<<<< HEAD
 * <<release-notes-9.0.0-rc1>>
 * <<release-notes-9.0.0-beta1>>
-=======
-* <<release-notes-9.0.7>>
-* <<release-notes-9.0.6>>
-* <<release-notes-9.0.5>>
-* <<release-notes-9.0.4>>
-* <<release-notes-9.0.3>>
-* <<release-notes-9.0.2>>
-* <<release-notes-9.0.1>>
->>>>>>> 825a707bf (docs: Prepare Changelog for 9.0.7 (#46612))
 * <<release-notes-9.0.0>>
 * <<release-notes-9.0.0-rc1>>
 * <<release-notes-9.0.0-beta1>>
