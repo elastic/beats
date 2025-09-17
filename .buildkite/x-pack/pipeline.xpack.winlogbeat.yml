@@ -2,6 +2,9 @@
 name: "beats-xpack-winlogbeat"
 
 env:
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
@@ -296,7 +299,7 @@ steps:
           - github_commit_status:
               context: "x-pack/winlogbeat: Packaging Linux"
 
-      - label: ":ubuntu: x-pack/winlogbeat: Packaging Linux"
+      - label: ":ubuntu: x-pack/winlogbeat: Packaging Linux arm64"
         key: "packaging-arm"
         env:
           PLATFORMS: "+all windows/amd64"
