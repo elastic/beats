@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/logstash"
+	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter/internal"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -73,6 +74,11 @@ func createLogsExporter(
 	)
 }
 
-func (l *logstashExporter) pushLogData(context.Context, plog.Logs) error {
+func (l *logstashExporter) pushLogData(ctx context.Context, ld plog.Logs) error {
+	_, err := internal.NewLogBatch(ctx, ld)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
