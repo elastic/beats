@@ -113,6 +113,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Upgrade to osquery 5.12.1. {pull}40368[40368]
 - Upgrade to osquery 5.13.1. {pull}40849[40849]
 - Upgrade to osquery 5.15.0 {pull}43426[43426]
+- Upgrade to osquery 5.18.1 {pull}46624[46624]
 
 
 *Packetbeat*
@@ -159,6 +160,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Update Go version to 1.24.7 {pull}46070[46070].
 - Update github.com/go-viper/mapstructure/v2 to v2.4.0 {pull}46335[46335]
 - Update github.com/docker/docker to v28.3.3 {pull}46334[46334]
+- Make data updates in add_host_metadata processor synchronous {pull}46546[46546]
 
 *Auditbeat*
 
@@ -618,6 +620,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add SSL support for sql module: drivers mysql, postgres, and mssql. {pull}44748[44748]
 - Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
 - Add NTP response validation for system/ntp module. {pull}46184[46184]
+- Add vertexai_logs metricset to GCP for prompt response collection from VertexAI service. {pull}46383[46383]
 
 *Metricbeat*
 
