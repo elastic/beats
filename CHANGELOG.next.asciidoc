@@ -32,8 +32,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
 - Redis: Added replication role as a field to submitted slowlogs
 - Change log.file.path field in awscloudwatch input to nested object. {pull}41099[41099]
-
-
+- Journald input now converts byte-encoded messages to string. {issue}40479[40479] {pull}46415[46415]
 
 *Heartbeat*
 
@@ -159,6 +158,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
 - Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
 - Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
+- Journald input now works on Docker containers, all image variants except Wolfi. {issue}41278[41278] {issue}44040[44040] {pull}46625[46625]
 - Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
 - Fix publishing Okta entity analytics enrichments. {pull}44483[44483]
 - Fix status reporting panic in GCP Pub/Sub input. {issue}44624[44624] {pull}44625[44625]
@@ -225,7 +225,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
-
+- Fix EventLog reset logic to not close renderers. {pull}46376[46376] {issue}45750{45750}
 
 *Elastic Logging Plugin*
 - Fix for unable to run elastic-logging plugin
