@@ -175,6 +175,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
 - Fix histogram values of zero are filtered out on non-amd64 platforms for openmetrics and prometheus {pull}44750[44750]
 - Do not log an error if metadata enrichment is disabled for K8's module {pull}46536
+- Fix Azure Monitor wildcard metrics names timegrain issue by using the first, smallest timegrain; fix nil pointer issue {pull}46145[46145]
 
 *Osquerybeat*
 
@@ -187,7 +188,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Fix message handling in the experimental api. {issue}19338[19338] {pull}41730[41730]
-
+- Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
+- Fix EventLog reset logic to not close renderers. {pull}46376[46376] {issue}45750{45750}
 
 *Elastic Logging Plugin*
 - Fix for unable to run elastic-logging plugin
