@@ -223,7 +223,6 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 	if strings.HasSuffix(src, suffixZip) {
 		log.Printf("Extract .zip from %v", src)
 
-		//osdp = filepath.Join("Program Files", "osquery", "osqueryd", "osqueryd.exe")
 		osdp = distro.OsquerydWindowsZipPath()
 		osdcp = distro.OsquerydCertsWindowsZipDistroPath()
 		distp = distro.OsquerydPathForOS(osarch.OS, dir)
