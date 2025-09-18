@@ -153,6 +153,40 @@ seccomp:
 ----
 ====
 // end::known-issue-8.19-restart_on_cert_change[]
+// tag::known-issue-8.19-journalctl[]
+- `journalctl` is not present in the Docker images, thus the Journald input will fail with `cannot start journalctl: exec: "journalctl": executable file not found in $PATH`
+
+[%collapsible]
+.Click to view the workaround
+====
+Install the `systemd` package in the Docker image. Create a new `Dockerfile` (update the base image version to match the version you want to fix):
+[source,dockerfile]
+----
+FROM docker.elastic.co/beats/filebeat:8.19.3
+USER root
+RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+    && apt-get install -y systemd \
+    && apt-get clean all
+USER 1000
+----
+
+Build it:
+[source,sh]
+----
+docker build . -t "filebeat:8.19.3-journald"
+----
+
+Test:
+[source,sh]
+----
+docker run --rm -it --entrypoint journalctl filebeat:8.19.3-journald
+No journal files were found.
+-- No entries --
+----
+
+Use the image `filebeat:8.19.3-journald` you have just built.
+====
+// end::known-issue-8.19-journalctl[]
 
 ==== Breaking changes
 
@@ -202,6 +236,7 @@ https://github.com/elastic/beats/compare/v8.19.1\...v8.19.2[View commits]
 
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-journalctl]
 
 
 [[release-notes-8.19.1]]
@@ -214,6 +249,7 @@ https://github.com/elastic/beats/compare/v8.19.0\...v8.19.1[View commits]
 
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-journalctl]
 
 
 ==== Bugfixes
@@ -245,6 +281,7 @@ https://github.com/elastic/beats/compare/v8.18.4\...v8.19.0[View commits]
 
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-journalctl]
 
 ==== Breaking changes
 
@@ -518,7 +555,7 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 
 *Filebeat*
 
-- Journald input now works on Docker containers (except Wolfi). {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
+- Journald input now works on Docker containers (only ubi variant). {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
 - Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
 - [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
 - Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
