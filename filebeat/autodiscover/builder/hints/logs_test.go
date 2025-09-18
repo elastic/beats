@@ -149,6 +149,7 @@ func TestGenerateHints(t *testing.T) {
 							},
 						},
 					},
+					"close.on_state_change.removed": false,
 					"file_identity": map[string]any{
 						"fingerprint": nil,
 					},
@@ -225,6 +226,7 @@ func TestGenerateHints(t *testing.T) {
 							},
 						},
 					},
+					"close.on_state_change.removed": false,
 					"file_identity": map[string]any{
 						"fingerprint": nil,
 					},
@@ -461,6 +463,7 @@ func TestGenerateHints(t *testing.T) {
 							},
 						},
 					},
+					"close.on_state_change.removed": false,
 					"file_identity": map[string]interface{}{
 						"fingerprint": nil,
 					},
@@ -519,6 +522,7 @@ func TestGenerateHints(t *testing.T) {
 							},
 						},
 					},
+					"close.on_state_change.removed": false,
 					"file_identity": map[string]interface{}{
 						"fingerprint": nil,
 					},
