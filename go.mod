@@ -58,7 +58,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eapache/go-resiliency v1.7.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
-	github.com/elastic/elastic-agent-client/v7 v7.15.0
+	github.com/elastic/elastic-agent-client/v7 v7.17.2
 	github.com/elastic/go-concert v0.3.0
 	github.com/elastic/go-libaudit/v2 v2.6.2
 	github.com/elastic/go-licenser v0.4.2
@@ -205,7 +205,7 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.22
 	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/prometheus v0.304.3-0.20250703114031-419d436a447a
-	github.com/shirou/gopsutil/v4 v4.25.7
+	github.com/shirou/gopsutil/v4 v4.25.8
 	github.com/teambition/rrule-go v1.8.2
 	github.com/tklauser/go-sysconf v0.3.15
 	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80
@@ -236,6 +236,7 @@ require (
 require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.16.0
+	github.com/elastic/opentelemetry-collector-components/extension/elasticdiagnosticsextension v0.0.0-00010101000000-000000000000
 	go.opentelemetry.io/collector/client v1.38.0
 	go.opentelemetry.io/collector/consumer/consumertest v0.132.0
 	go.opentelemetry.io/collector/exporter v0.132.0
@@ -405,7 +406,7 @@ require (
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
-	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
+	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/prometheus/client_golang v1.22.0 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/rs/cors v1.11.1 // indirect
@@ -480,7 +481,7 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout/stdoutlog v0.13.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.37.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.37.0 // indirect
-	go.opentelemetry.io/otel/log v0.13.0 // indirect
+	go.opentelemetry.io/otel/log v0.14.0 // indirect
 	go.opentelemetry.io/otel/metric v1.38.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.38.0 // indirect
 	go.opentelemetry.io/otel/sdk/log v0.13.0 // indirect
@@ -523,3 +524,5 @@ replace (
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20250616163611-a325b49669a4
 )
+
+replace github.com/elastic/opentelemetry-collector-components/extension/elasticdiagnosticsextension => /Users/vihas/Desktop/Vihas/Elastic/opentelemetry-collector-components/extension/elasticdiagnosticsextension

@@ -198,6 +198,18 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 // that a single unresponsive host cannot inadvertently block other hosts
 // within the same Module and MetricSet from collection.
 func (bt *Metricbeat) Run(b *beat.Beat) error {
+	if b.Manager != nil {
+		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
+			"input_metrics.json", "application/json", func() []byte {
+				data, err := inputmon.MetricSnapshotJSON(b.Monitoring.InputsRegistry())
+				if err != nil {
+					b.Info.Logger.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					return []byte(err.Error())
+				}
+				return data
+			})
+	}
+
 	moduleOptions := append(
 		[]module.Option{module.WithMaxStartDelay(bt.config.MaxStartDelay)},
 		bt.moduleOptions...)

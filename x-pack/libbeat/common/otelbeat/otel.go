@@ -30,6 +30,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter"
 	"github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/elastic/opentelemetry-collector-components/extension/elasticdiagnosticsextension"
 )
 
 var schemeMap = map[string]string{
@@ -99,10 +101,15 @@ func getComponent() (otelcol.Factories, error) {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
 	}
 
+	extensions, err := otelcol.MakeFactoryMap(
+		elasticdiagnosticsextension.NewFactory(),
+	)
+
 	return otelcol.Factories{
 		Receivers:  receivers,
 		Processors: processors,
 		Exporters:  exporters,
+		Extensions: extensions,
 	}, nil
 
 }

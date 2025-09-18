@@ -5,6 +5,7 @@
 package instance
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -12,9 +13,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/otelmanager"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/status"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
 	"go.opentelemetry.io/collector/component"
@@ -86,6 +89,25 @@ func (br *BeatReceiver) Start(host component.Host) error {
 	if w, ok := br.beater.(cfgfile.WithOtelFactoryWrapper); ok {
 		groupReporter := status.NewGroupStatusReporter(host)
 		w.WithOtelFactoryWrapper(status.StatusReporterFactory(groupReporter))
+	}
+
+	extensions := host.GetExtensions()
+	for _, ext := range extensions {
+		if diagExt, ok := ext.(otelmanager.DiagnosticExtension); ok {
+			if m, ok := br.beat.Manager.(otelmanager.WithDiagnosticExtension); ok {
+				m.SetDiagnosticExtension(br.beat.Info.ComponentID, diagExt)
+			}
+
+			diagExt.RegisterDiagnosticHook(br.beat.Info.ComponentID, "Metrics from the default monitoring namespace and expvar.",
+				"beat_metrics.json", "application/json", func() []byte {
+					m := monitoring.CollectStructSnapshot((br.beat.Monitoring.StatsRegistry()), monitoring.Full, true)
+					data, err := json.MarshalIndent(m, "", "  ")
+					if err != nil {
+						return fmt.Appendf(nil, "Failed to collect beat metric snapshot for Agent diagnostics: %v", err)
+					}
+					return data
+				})
+		}
 	}
 
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
