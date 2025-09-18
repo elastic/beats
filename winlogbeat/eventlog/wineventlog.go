@@ -595,8 +595,22 @@ func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, 
 }
 
 func (l *winEventLog) Reset() error {
+<<<<<<< HEAD
 	debugf("%s Closing handle for reset", l.logPrefix)
 	return win.Close(l.subscription)
+=======
+	l.log.Debug("Closing event log reader handles for reset.")
+	// Only close the iterator, keep the renderer alive to avoid
+	// unnecessarily recreating render contexts. The renderer's
+	// systemContext and userContext should remain valid across
+	// session resets since they were created independently.
+	if l.iterator == nil {
+		return nil
+	}
+	err := l.iterator.Close()
+	l.iterator = nil
+	return err
+>>>>>>> c5e8d26ec ([winlogbeat] Fix EventLog reset logic to avoid closing renderers (#46376))
 }
 
 func (l *winEventLog) Close() error {
