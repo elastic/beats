@@ -514,7 +514,7 @@ func (m mockManager) UpdateStatus(status status.Status, msg string) {}
 
 func TestManager(t *testing.T) {
 	// set the mockManger factory.
-	management.SetManagerFactory(func(c *config.C, r *reload.Registry, l *logp.Logger) (management.Manager, error) {
+	management.SetManagerFactory(func(c *config.C, r *reload.Registry) (management.Manager, error) {
 		return mockManager{true}, nil
 	})
 	// initialize the flags.
