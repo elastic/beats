@@ -53,7 +53,7 @@ metricbeat:
      processes:
       - '.*'
      metricsets:
-      - cpu		
+      - cpu
 output:
   elasticsearch:
     hosts:
@@ -69,7 +69,7 @@ processors:
     - add_docker_metadata: ~
     - add_kubernetes_metadata: ~
 http.host: localhost
-http.port: {{.MonitoringPort}}	
+http.port: {{.MonitoringPort}}
 `
 
 	// start metricbeat in otel mode
@@ -177,3 +177,108 @@ func assertMapstrKeysEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string
 
 	require.Zero(t, cmp.Diff(flatM1, flatM2), msg)
 }
+<<<<<<< HEAD
+=======
+
+func TestMetricbeatOTelInspect(t *testing.T) {
+	mbOTel := integration.NewBeat(
+		t,
+		"metricbeat-otel",
+		"../../metricbeat.test",
+		"otel",
+	)
+
+	var beatsCfgFile = `
+metricbeat:
+   modules:
+   - module: system
+     enabled: true
+     period: 1s
+     processes:
+      - '.*'
+     metricsets:
+      - cpu
+output:
+  elasticsearch:
+    hosts:
+      - localhost:9200
+    username: admin
+    password: testing
+    index: index
+queue.mem.flush.timeout: 0s
+setup.template.enabled: false
+processors:
+    - add_host_metadata: ~
+    - add_cloud_metadata: ~
+    - add_docker_metadata: ~
+    - add_kubernetes_metadata: ~
+`
+	expectedExporter := `exporters:
+    elasticsearch:
+        compression: gzip
+        compression_params:
+            level: 1
+        endpoints:
+            - http://localhost:9200
+        idle_conn_timeout: 3s
+        logs_index: index
+        mapping:
+            mode: bodymap
+        max_conns_per_host: 1
+        password: testing
+        retry:
+            enabled: true
+            initial_interval: 1s
+            max_interval: 1m0s
+            max_retries: 3
+        sending_queue:
+            batch:
+                flush_timeout: 10s
+                max_size: 1600
+                min_size: 0
+                sizer: items
+            block_on_overflow: true
+            enabled: true
+            num_consumers: 1
+            queue_size: 3200
+            wait_for_result: true
+        timeout: 1m30s
+        user: admin`
+	expectedReceiver := `receivers:
+    metricbeatreceiver:
+        logging:
+            files:
+                rotateeverybytes: 104857600
+                rotateonstartup: false
+            to_files: true
+        metricbeat:
+            modules:
+                - enabled: true
+                  metricsets:
+                    - cpu
+                  module: system
+                  period: 1s
+                  processes:
+                    - .*`
+	expectedService := `service:
+    pipelines:
+        logs:
+            exporters:
+                - elasticsearch
+            receivers:
+                - metricbeatreceiver
+`
+	mbOTel.WriteConfigFile(beatsCfgFile)
+
+	mbOTel.Start("inspect")
+	defer mbOTel.Stop()
+
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		out, err := mbOTel.ReadStdout()
+		require.NoError(collect, err)
+		require.Contains(collect, out, expectedExporter)
+		require.Contains(collect, out, expectedReceiver)
+		require.Contains(collect, out, expectedService)
+	}, 10*time.Second, 500*time.Millisecond, "failed to get output of inspect command")
+}
+>>>>>>> 16c4d9a1a (chore: update OTel Collector libraries to `v1.41.0`/`v0.135.0` (#46464))
