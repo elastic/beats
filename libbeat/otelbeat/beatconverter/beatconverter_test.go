@@ -761,7 +761,8 @@ exporters:
 			err := c.Convert(t.Context(), cfg)
 			require.NoError(t, err, "error converting beats output config")
 			expOutput := newFromYamlString(t, test.output)
-			commonOTeMap.Merge(expOutput)
+			err = commonOTeMap.Merge(expOutput)
+			require.NoError(t, err)
 			compareAndAssert(t, commonOTeMap, cfg)
 		})
 	}

@@ -130,7 +130,7 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 				// get beatsauth config
 				authConfig, err := getBeatsAuthExtensionConfig(esConfig)
 				if err != nil {
-					return fmt.Errorf("cannot translate http settings on beatsauth extension: %v", err)
+					return fmt.Errorf("cannot translate http settings on beatsauth extension: %w", err)
 				}
 
 				// set authenticator name on ES exporter
