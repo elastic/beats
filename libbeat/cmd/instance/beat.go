@@ -237,6 +237,11 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 		return nil, err
 	}
 
+	ephemeralID, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+
 	b := beat.Beat{
 		Info: beat.Info{
 			Beat:             name,
@@ -248,7 +253,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			ID:               id,
 			FirstStart:       time.Now(),
 			StartTime:        time.Now(),
-			EphemeralID:      metricreport.EphemeralID(),
+			EphemeralID:      ephemeralID,
 			FIPSDistribution: version.FIPSDistribution,
 		},
 		Fields:   fields,
