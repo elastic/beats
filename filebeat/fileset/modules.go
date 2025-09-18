@@ -28,7 +28,7 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
+	"github.com/elastic/beats/v7/libbeat/management"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -149,7 +149,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, f
 	stat, err := os.Stat(modulesPath)
 	if err != nil || !stat.IsDir() {
 		log := beatInfo.Logger.Named(logName)
-		if !fleetmode.Enabled() {
+		if !management.UnderAgent() {
 			// When run under agent via agentbeat there is no modules directory and this is expected.
 			log.Errorf("Not loading modules. Module directory not found: %s", modulesPath)
 		}

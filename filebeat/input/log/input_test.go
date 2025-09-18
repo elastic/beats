@@ -35,8 +35,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -84,15 +84,15 @@ _module_name: "module"
 	}
 
 	t.Run("allowed under the agent", func(t *testing.T) {
-		currentMode := fleetmode.Enabled()
+		currentMode := management.UnderAgent()
 		t.Cleanup(func() {
-			fleetmode.SetAgentMode(currentMode)
+			management.SetUnderAgent(currentMode)
 		})
 		yaml := `type: "log"`
 		cfg, err := conf.NewConfigFrom(yaml)
 		require.NoError(t, err)
 		require.False(t, AllowDeprecatedUse(cfg), "Not in Fleet mode")
-		fleetmode.SetAgentMode(true)
+		management.SetUnderAgent(true)
 		require.True(t, AllowDeprecatedUse(cfg), "Should be allowed in Fleet mode")
 	})
 }
