@@ -30,6 +30,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -211,33 +212,26 @@ func (e *inputTestingEnvironment) requireRegistryEntryCount(expectedCount int) {
 // requireOffsetInRegistry checks if the expected offset is set for a file.
 func (e *inputTestingEnvironment) requireOffsetInRegistry(filename, inputID string, expectedOffset int) {
 	e.t.Helper()
-	var offsetStr strings.Builder
+	require.EventuallyWithT(e.t, func(ct *assert.CollectT) {
+		var offsetStr strings.Builder
 
-	filepath := e.abspath(filename)
-	fi, err := os.Stat(filepath)
-	if err != nil {
-		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
-	}
+		filepath := e.abspath(filename)
+		fi, err := os.Stat(filepath)
+		assert.NoError(ct, err, "cannot stat file when checking for offset")
 
-	id := getIDFromPath(filepath, inputID, fi)
-	var entry registryEntry
-	require.Eventuallyf(e.t, func() bool {
+		id := getIDFromPath(filepath, inputID, fi)
+		var entry registryEntry
 		offsetStr.Reset()
 
 		entry, err = e.getRegistryState(id)
-		if err != nil {
-			e.t.Fatalf("could not get state for '%s' from registry, err: %s", id, err)
-		}
+		assert.NoError(ct, err, "error getting state for ID '%s' from the registry", id)
 
 		fmt.Fprint(&offsetStr, entry.Cursor.Offset)
-
-		return expectedOffset == entry.Cursor.Offset
+		assert.Equal(ct, expectedOffset, entry.Cursor.Offset, "expected offset does not match")
 	},
-		time.Second,
+		10*time.Second,
 		100*time.Millisecond,
-		"expected offset: '%d', cursor offset: '%s'",
-		expectedOffset,
-		&offsetStr)
+		"failed to get expected registry offset")
 }
 
 // requireMetaInRegistry checks if the expected metadata is saved to the registry.

@@ -4,14 +4,16 @@
 
 package task_stats
 
-import "github.com/docker/docker/api/types"
+import (
+	dcontainer "github.com/docker/docker/api/types/container"
+)
 
 type networkStats struct {
 	NameInterface string
-	Total         types.NetworkStats
+	Total         dcontainer.NetworkStats
 }
 
-func getNetworkStats(taskStats types.StatsJSON) []networkStats {
+func getNetworkStats(taskStats dcontainer.StatsResponse) []networkStats {
 	var networks []networkStats
 	for nameInterface, rawNetStats := range taskStats.Networks {
 		networks = append(networks, networkStats{

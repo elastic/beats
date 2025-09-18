@@ -28,6 +28,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Removed deprecated Cylance from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
 - Removed deprecated Bluecoat from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
 - Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
+- Journald input now converts byte-encoded messages to string. {issue}40479[40479] {pull}46415[46415]
 
 *Heartbeat*
 
@@ -80,11 +81,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 - 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
-- Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
-- Fix a race condition during metrics initialization which could cause a panic. {issue}45822[45822] {pull}46054[46054]
-- Update Go version to 1.24.7 {pull}46070[46070].
-- Fixed a panic when the beat restarts itself by adding 'eventfd2' to default seccomp policy {issue}46372[46372]
-- Update github.com/go-viper/mapstructure/v2 to v2.4.0 {pull}46335[46335]
+- Update github.com/docker/docker to v28.3.3 {pull}46334[46334]
 
 *Auditbeat*
 
@@ -128,6 +125,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - The UDP input now fails if it cannot bind to the configured port and its status is set to failed when running under Elastic Agent. {issue}37216[37216] {pull}46302[46302]
 - The Unix input now fails on errors listening to the socket and its status is set to failed when running under Elastic Agent. {pull}46302[46302]
 - Fix race condition that could cause Filebeat to hang during shutdown after failing to startup {issue}45034[45034] {pull}46331[46331]
+- Fix metrics from TCP & UDP inputs when the port number is > 32767 {pull}46486[46486]
 
 *Heartbeat*
 
@@ -152,6 +150,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Changed Kafka protocol version from 3.6.0 to 2.1.0 to fix compatibility with Kafka 2.x brokers. {pull}45761[45761]
 - Fix an issue where the conntrack metricset entries field reported a count inflated by a factor of the number of CPU cores. {issue}46138[46138] {pull}46140[46140]
 - Enhance behavior of sanitizeError: replace sensitive info even if it is escaped and add pattern-based sanitization {pull}45857[45857]
+- Do not log an error if metadata enrichment is disabled for K8's module {pull}46536
+- Fix Azure Monitor wildcard metrics names timegrain issue by using the first, smallest timegrain; fix nil pointer issue {pull}46145[46145]
 
 *Osquerybeat*
 
@@ -163,8 +163,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
-- Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
-
+- Fix EventLog reset logic to not close renderers. {pull}46376[46376] {issue}45750{45750}
 
 *Elastic Logging Plugin*
 
@@ -238,8 +237,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
 - Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
 - Allow empty HTTPJSON cursor template value evaluations to be ignored by Fleet health status updates. {pull}45361[45361]
-- Improve HTTP JSON health status logic for empty template results. {pull}46332[46332]
-- Improve CEL input documentation of authentication options. {pull}46253[46253]
 
 *Auditbeat*
 
@@ -268,7 +265,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
 - Add new metrics to vSphere Virtual Machine dataset (CPU usage percentage, disk average usage, disk read/write rate, number of disk reads/writes, memory usage percentage). {pull}44205[44205]
-- Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
 
 *Metricbeat*
 
@@ -319,6 +315,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 

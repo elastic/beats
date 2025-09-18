@@ -129,7 +129,7 @@ func getRelease(rel string) (string, error) {
 	case "":
 		return "", fmt.Errorf("Missing a release string")
 	default:
-		return "", fmt.Errorf("unknown release tag %s", rel)
+		return "ga", fmt.Errorf("unknown release tag %s", rel)
 	}
 }
 
