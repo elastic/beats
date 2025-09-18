@@ -35,12 +35,70 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+<<<<<<< HEAD
+=======
+func TestDeprecatedUse(t *testing.T) {
+	cases := []struct {
+		name     string
+		yaml     string
+		expected bool
+	}{
+		{
+			name: "allow when the input configuration has the flag",
+			yaml: `
+type: "log"
+allow_deprecated_use: true
+`,
+			expected: true,
+		},
+		{
+			name: "ignore a non-boolean value",
+			yaml: `
+type: "log"
+allow_deprecated_use: "string"
+`,
+			expected: false,
+		},
+		{
+			name: "allow if the input is created by a module",
+			yaml: `
+type: "log"
+_module_name: "module"
+`,
+			expected: true,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg, err := conf.NewConfigFrom(tc.yaml)
+			require.NoError(t, err)
+			require.Equal(t, AllowDeprecatedUse(cfg), tc.expected)
+		})
+	}
+
+	t.Run("allowed under the agent", func(t *testing.T) {
+		currentMode := management.UnderAgent()
+		t.Cleanup(func() {
+			management.SetUnderAgent(currentMode)
+		})
+		yaml := `type: "log"`
+		cfg, err := conf.NewConfigFrom(yaml)
+		require.NoError(t, err)
+		require.False(t, AllowDeprecatedUse(cfg), "Not in Fleet mode")
+		management.SetUnderAgent(true)
+		require.True(t, AllowDeprecatedUse(cfg), "Should be allowed in Fleet mode")
+	})
+}
+
+>>>>>>> 3b14f2cae ([libbeat] - Refactor `fleetmode` and consolidate the logic into `management` package (#46622))
 func TestInputFileExclude(t *testing.T) {
 	p := Input{
 		config: config{

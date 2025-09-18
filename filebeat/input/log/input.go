@@ -36,7 +36,11 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+=======
+	"github.com/elastic/beats/v7/libbeat/management"
+>>>>>>> 3b14f2cae ([libbeat] - Refactor `fleetmode` and consolidate the logic into `management` package (#46622))
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -82,6 +86,15 @@ type Input struct {
 	getStatusReporter   input.GetStatusReporter
 }
 
+<<<<<<< HEAD
+=======
+// AllowDeprecatedUse returns true if the configuration allows using the deprecated log input
+func AllowDeprecatedUse(cfg *conf.C) bool {
+	allow, _ := cfg.Bool(allowDeprecatedUseField, -1)
+	return allow || management.UnderAgent() || fileset.CheckIfModuleInput(cfg)
+}
+
+>>>>>>> 3b14f2cae ([libbeat] - Refactor `fleetmode` and consolidate the logic into `management` package (#46622))
 // NewInput instantiates a new Log
 func NewInput(
 	cfg *conf.C,
