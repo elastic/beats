@@ -236,6 +236,7 @@ require (
 require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.16.0
+	github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.2.0
 	go.opentelemetry.io/collector/client v1.38.0
 	go.opentelemetry.io/collector/exporter v0.132.0
 	go.opentelemetry.io/collector/exporter/exportertest v0.132.0
