@@ -80,9 +80,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 - 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
-- Update github.com/go-viper/mapstructure/v2 to v2.4.0 {pull}46335[46335]
-- Fixed a panic when the beat restarts itself by adding 'eventfd2' to default seccomp policy {issue}46372[46372]
-- Update Go version to 1.24.7 {pull}46070[46070].
 
 *Auditbeat*
 
@@ -159,9 +156,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 - Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices {pull}43637[43637]
-- Fix an issue where the conntrack metricset entries field reported a count inflated by a factor of the number of CPU cores. {issue}46138[46138] {pull}46140[46140]
-- Enhance behavior of sanitizeError: replace sensitive info even if it is escaped and add pattern-based sanitization {pull}45857[45857]
 - Do not log an error if metadata enrichment is disabled for K8's module {pull}46536
+- Fix Azure Monitor wildcard metrics names timegrain issue by using the first, smallest timegrain; fix nil pointer issue {pull}46145[46145]
 
 *Osquerybeat*
 
@@ -171,9 +167,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
-- Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
-
-
+- Fix EventLog reset logic to not close renderers. {pull}46376[46376] {issue}45750{45750}
 
 *Elastic Logging Plugin*
 
@@ -249,7 +243,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Jounrald input now supports filtering by facilities {pull}41061[41061]
 - Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
-- Improve CEL input documentation of authentication options. {pull}46253[46253]
 
 *Auditbeat*
 
@@ -348,6 +341,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
