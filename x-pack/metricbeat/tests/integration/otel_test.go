@@ -137,9 +137,19 @@ http.port: {{.MonitoringPort}}
 		},
 		1*time.Minute, 1*time.Second, "expected at least 1 log for metricbeat and otel receiver")
 
-	otelDoc := otelDocs.Hits.Hits[0]
-	metricbeatDoc := metricbeatDocs.Hits.Hits[0]
-	assertMapstrKeysEqual(t, otelDoc.Source, metricbeatDoc.Source, []string{}, "expected documents keys to be equal")
+	var metricbeatDoc, otelDoc mapstr.M
+	otelDoc = otelDocs.Hits.Hits[0].Source
+	metricbeatDoc = metricbeatDocs.Hits.Hits[0].Source
+	ignoredFields := []string{
+		// only present in beats receivers
+		"agent.otelcol.component.id",
+		"agent.otelcol.component.kind",
+	}
+	assert.Equal(t, "metricbeatreceiver", otelDoc.Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
+	assert.Equal(t, "receiver", otelDoc.Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
+	assert.NotContains(t, metricbeatDoc.Flatten(), "agent.otelcol.component.id", "expected agent.otelcol.component.id field not to be present in metricbeat log record")
+	assert.NotContains(t, metricbeatDoc.Flatten(), "agent.otelcol.component.kind", "expected agent.otelcol.component.kind field not to be present in metricbeat log record")
+	assertMapstrKeysEqual(t, otelDoc, metricbeatDoc, ignoredFields, "expected documents keys to be equal")
 	assertMonitoring(t, optionsValue.MonitoringPort)
 }
 
@@ -214,10 +224,6 @@ processors:
 `
 	expectedExporter := `exporters:
     elasticsearch:
-        batcher:
-            enabled: true
-            max_size: 1600
-            min_size: 0
         compression: gzip
         compression_params:
             level: 1
@@ -227,12 +233,23 @@ processors:
         logs_index: index
         mapping:
             mode: bodymap
+        max_conns_per_host: 1
         password: testing
         retry:
             enabled: true
             initial_interval: 1s
             max_interval: 1m0s
             max_retries: 3
+        sending_queue:
+            batch:
+                max_size: 1600
+                min_size: 0
+                sizer: items
+            block_on_overflow: true
+            enabled: true
+            num_consumers: 1
+            queue_size: 3200
+            wait_for_result: true
         timeout: 1m30s
         user: admin`
 	expectedReceiver := `receivers:
