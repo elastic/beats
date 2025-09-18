@@ -79,12 +79,12 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.4.0
 	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 	github.com/godbus/dbus/v5 v5.1.0
-	github.com/godror/godror v0.33.2
+	github.com/godror/godror v0.49.0
 	github.com/gofrs/flock v0.8.1
 	github.com/gogo/protobuf v1.3.2
 	github.com/gohugoio/hashstructure v0.5.0
 	github.com/golang/snappy v1.0.0
-	github.com/gomodule/redigo v1.8.3
+	github.com/gomodule/redigo v1.9.2
 	github.com/google/flatbuffers v25.2.10+incompatible
 	github.com/google/go-cmp v0.7.0
 	github.com/google/gopacket v1.1.19
@@ -117,7 +117,7 @@ require (
 	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.11.1
 	github.com/ugorji/go/codec v1.1.8
-	github.com/vmware/govmomi v0.51.0
+	github.com/vmware/govmomi v0.52.0
 	go.elastic.co/ecszap v1.0.2
 	go.elastic.co/go-licence-detector v0.7.0
 	go.etcd.io/bbolt v1.4.0
@@ -275,6 +275,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.29.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.51.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.51.0 // indirect
+	github.com/VictoriaMetrics/easyproto v0.1.4 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/apache/arrow/go/v15 v15.0.2 // indirect
@@ -334,7 +335,7 @@ require (
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
-	github.com/godror/knownpb v0.1.0 // indirect
+	github.com/godror/knownpb v0.3.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect

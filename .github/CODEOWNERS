@@ -236,6 +236,7 @@ CHANGELOG*
 /x-pack/metricbeat/module/coredns @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/enterprisesearch @elastic/app-search-team
 /x-pack/metricbeat/module/gcp @elastic/obs-ds-hosted-services @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/gcp/vertexai_logs @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/gcp/billing @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/gcp/cloudrun_metrics @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/gcp/cloudsql_mysql @elastic/obs-infraobs-integrations
