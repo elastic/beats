@@ -521,6 +521,7 @@ toc:
               - file: filebeat/monitoring-shows-fewer-than-expected-beats.md
               - file: filebeat/could-not-locate-index-pattern.md
               - file: filebeat/madvdontneed-rss.md
+              - file: filebeat/kubernetes-autodiscover.md
       - file: filebeat/contributing-to-beats.md
   - file: heartbeat/index.md
     children:

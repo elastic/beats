@@ -156,6 +156,7 @@ filebeat.autodiscover.providers:
     hints.default_config:
       type: filestream
       id: container-${data.container.id}
+      close.on_state_change.removed: false # Docker can remove the file before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
       prospector.scanner.symlinks: true
       parsers:
         - container: ~
@@ -167,6 +168,7 @@ filebeat.autodiscover.providers:
             docker.container.labels.type: "pipeline"
         config:
           - type: filestream
+            close.on_state_change.removed: false
             id: container-${data.docker.container.id}
             prospector.scanner.symlinks: true
             parsers:
@@ -200,6 +202,7 @@ filebeat.autodiscover:
       hints.default_config:
         type: filestream
         id: container-${data.container.id}
+        close.on_state_change.removed: false # Kubernetes can remove the file before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
         prospector.scanner.symlinks: true
         parsers:
           - container: ~
@@ -290,6 +293,7 @@ filebeat.autodiscover:
       hints.default_config:
         type: filestream
         id: container-${data.container.id}
+        close.on_state_change.removed: false # Docker can remove the file before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
         prospector.scanner.symlinks: true
         parsers:
           - container: ~
@@ -347,6 +351,7 @@ filebeat.autodiscover:
       hints.default_config:
         type: filestream
         id: ${data.nomad.task.name}-${data.nomad.allocation.id} # unique ID required
+        close.on_state_change.removed: false # The file cn be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
         paths:
           - /opt/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
 ```
@@ -362,6 +367,7 @@ filebeat.autodiscover:
         enabled: false
         type: filestream
         id: ${data.nomad.task.name}-${data.nomad.allocation.id} # unique ID required
+        close.on_state_change.removed: false # The file cn be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
         paths:
           - /opt/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
 ```
@@ -391,14 +397,15 @@ filebeat.autodiscover:
         id: ${data.nomad.task.name}-${data.nomad.allocation.id} <2>
         paths:
           - /opt/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
+        close.on_state_change.removed: false # <3>
         processors:
-          - add_fields: <3>
+          - add_fields: <4>
               target: nomad
               fields:
                 allocation.id: ${data.nomad.allocation.id}
 
 processors:
-  - add_nomad_metadata: <4>
+  - add_nomad_metadata: <5>
       when.has_fields.fields: [nomad.allocation.id]
       address: https://localhost:4646
       default_indexers.enabled: false
@@ -413,5 +420,6 @@ processors:
 
 1. The default config is disabled meaning any task without the `"co.elastic.logs/enabled" = "true"` metadata will be ignored.
 2. Unique ID is required.
-3. The `add_fields` processor populates the `nomad.allocation.id` field with the Nomad allocation UUID.
-4. The `add_nomad_metadata` processor is configured at the global level so that it is only instantiated one time which saves resources.
+3. The file can be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
+4. The `add_fields` processor populates the `nomad.allocation.id` field with the Nomad allocation UUID.
+5. The `add_nomad_metadata` processor is configured at the global level so that it is only instantiated one time which saves resources.
