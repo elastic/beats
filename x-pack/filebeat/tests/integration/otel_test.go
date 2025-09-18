@@ -692,7 +692,13 @@ processors:
             num_consumers: 1
             queue_size: 3200
             wait_for_result: true
-        user: admin`
+        user: admin
+        extensions:
+            beatsauth:
+                idle_connection_timeout: 3s
+                proxy_disable: false
+                timeout: 1m30s
+`
 	expectedReceiver := `receivers:
     filebeatreceiver:
         filebeat:
