@@ -186,7 +186,6 @@ func (s Spec) InstalledMode() os.FileMode {
 	return 0644
 }
 
-// Windows ARM URL: https://github.com/osquery/osquery/releases/download/5.15.0/osquery-5.15.0.windows_arm64.zip
 func (s Spec) URL(osname string) string {
 	if s.PackSuffix == osqueryZipExt {
 		return osqueryDownloadGithubBaseURL + "/" + osqueryVersion + "/" + s.DistroFilename()

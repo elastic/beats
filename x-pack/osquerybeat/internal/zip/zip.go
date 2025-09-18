@@ -18,16 +18,13 @@ func shouldExtract(name string, files ...string) bool {
 		return true
 	}
 
-	fmt.Printf("XXX Initial name: [%s]\n", name)
 	// Clean the file path/name from the tar.gz archive
 	// In the osquery 4.9.0 version the paths started to be prefixed with "./"
 	// which caused the osqueryd binary not found/extracted from the archive.
 	name = filepath.Clean(name)
 	for _, f := range files {
-		fmt.Printf("XXX checking shouldExtract file [%s] vs [%s]\n", name, f)
 		if strings.HasPrefix(name, f) ||
 			strings.HasPrefix(f, name) {
-			fmt.Printf("XXX YES file should extract [%s]\n", f)
 			return true
 		}
 	}
@@ -65,13 +62,11 @@ func Unzip(r *zip.ReadCloser, destinationDir string, files ...string) error {
 		}
 
 		if file.FileInfo().IsDir() {
-			fmt.Printf("XXX Creating directory [%s]\n", path)
 			// It's a directory
 			if err := os.MkdirAll(path, file.Mode()); err != nil {
 				return err
 			}
 		} else {
-			fmt.Printf("XXX Unzipping/extracting file [%s] to [%s]\n", file.Name, path)
 			// It's a file
 			outFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
 			if err != nil {

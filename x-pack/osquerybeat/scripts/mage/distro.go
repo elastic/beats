@@ -98,8 +98,6 @@ func checkCacheAndFetch(osarch distro.OSArch, spec distro.Spec) (fetched bool, e
 	fp := spec.DistroFilepath(dir)
 	specHash := spec.SHA256Hash
 
-	fmt.Printf("XXX Download URL: [%s] Filepath: [%s]\n", url, fp)
-
 	// Check if file already exists in the cache
 	f, err := os.Open(fp)
 	if err != nil {
@@ -170,8 +168,7 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 	if err != nil {
 		return err
 	}
-	//defer os.RemoveAll(tmpdir)
-	fmt.Printf("XXX NOT REMOVING TMPDIR: [%s]\n", tmpdir)
+	defer os.RemoveAll(tmpdir)
 
 	var (
 		osdp  string
@@ -224,7 +221,6 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 		}
 	}
 	if strings.HasSuffix(src, suffixZip) {
-		fmt.Printf("XXX Downloading ZIPPY!: [%s]\n", src)
 		log.Printf("Extract .zip from %v", src)
 
 		//osdp = filepath.Join("Program Files", "osquery", "osqueryd", "osqueryd.exe")
@@ -232,15 +228,11 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 		osdcp = distro.OsquerydCertsWindowsZipDistroPath()
 		distp = distro.OsquerydPathForOS(osarch.OS, dir)
 
-		fmt.Printf("XXX distp?? [%s]\n", distp)
-
-		fmt.Println("XXX ABOUT TO UNZIP")
-		// Msiutil expand full
+		// Unzip
 		err = zip.UnzipFile(src, tmpdir, osdp, osdcp)
 		if err != nil {
 			return err
 		}
-		fmt.Println("XXX DONE TRYING TO UNZIP")
 	}
 
 	// Copy over certs directory

@@ -579,15 +579,7 @@ inputs:
     command: *metricbeat_command
   - name: osquery
     description: "Osquery"
-#    platforms: *platforms
-    platforms:
-      - linux/amd64
-      - linux/arm64
-      - darwin/amd64
-      - darwin/arm64
-      - windows/amd64
-      - container/amd64
-      - container/arm64
+    platforms: *platforms
     outputs: *outputs
     command:
       restart_monitoring_period: 5s
