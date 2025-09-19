@@ -41,3 +41,8 @@ func Deprecate(version string, format string, v ...interface{}) string {
 func Experimental(format string, v ...interface{}) string {
 	return fmt.Sprintf("EXPERIMENTAL: "+format, v...)
 }
+
+// Preview returns a "usage of a preview feature" message.
+func Preview(format string, v ...interface{}) string {
+	return fmt.Sprintf("PREVIEW: "+format, v...)
+}
