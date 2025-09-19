@@ -1,0 +1,42 @@
+# `@metadata` is an internal field in Logstash, so we need to rename it to `metadata`
+# in order for it to be visible for comparison
+- pipeline.id: fb_classic
+  pipeline.workers: 1
+  pipeline.ordered: true
+  config.string: |
+    input {
+      beats {
+        port => "5044"
+        enrich => "none"
+      }
+    }
+    filter {
+      mutate {
+        rename => ["@metadata", "metadata"]
+      }
+    }
+    output {
+      file {
+        path => "/usr/share/logstash/testdata/%{testcase}_fb.json"
+      }
+    }
+- pipeline.id: fb_otel
+  pipeline.workers: 1
+  pipeline.ordered: true
+  config.string: |
+    input {
+      beats {
+        port => "5055"
+        enrich => "none"
+      }
+    }
+    filter {
+      mutate {
+        rename => ["@metadata", "metadata"]
+      }
+    }
+    output {
+      file {
+        path => "/usr/share/logstash/testdata/%{testcase}_otel.json"
+      }
+    }

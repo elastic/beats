@@ -58,3 +58,13 @@ services:
       - http-server
       - --addr=:8090
       - --config=/files/config.yaml
+
+  logstash:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${STACK_ENVIRONMENT}.yml
+      service: logstash
+    volumes:
+      - ./tests/integration/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - ./tests/integration/logstash/testdata/:/usr/share/logstash/testdata
+    ports:
+      - 9600:9600
