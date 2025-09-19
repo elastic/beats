@@ -83,6 +83,14 @@ specs:
     # Elastic Licensed Packages
     ###
     - os: windows
+      arch: amd64
+      types: [zip]
+      spec:
+        <<: *windows_binary_spec
+        <<: *elastic_license_for_binaries
+
+    - os: windows
+      arch: arm64
       types: [zip]
       spec:
         <<: *windows_binary_spec

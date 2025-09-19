@@ -158,7 +158,7 @@ steps:
       - label: ":ubuntu: x-pack/dockerlogbeat: Packaging Linux arm64"
         key: "auditbeat-package-linux-arm"
         env:
-          PLATFORMS: "+all linux/arm64 darwin/arm64"
+          PLATFORMS: "+all linux/arm64 darwin/arm64 windows/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/dockerlogbeat
         retry:

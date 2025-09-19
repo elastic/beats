@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/msiutil"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pkgutil"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/tar"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/zip"
 )
 
 // FetchOsqueryDistros fetches Osquery official distros as a part of the build
@@ -141,6 +142,7 @@ const (
 	suffixTarGz = ".tar.gz"
 	suffixPkg   = ".pkg"
 	suffixMsi   = ".msi"
+	suffixZip   = ".zip"
 )
 
 func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
@@ -159,7 +161,7 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 		return devtools.Copy(src, dst)
 	}
 
-	if !strings.HasSuffix(src, suffixTarGz) && !strings.HasSuffix(src, suffixPkg) && !strings.HasSuffix(src, suffixMsi) {
+	if !strings.HasSuffix(src, suffixTarGz) && !strings.HasSuffix(src, suffixPkg) && !strings.HasSuffix(src, suffixMsi) && !strings.HasSuffix(src, suffixZip) {
 		return fmt.Errorf("unsupported file: %s", src)
 	}
 	tmpdir, err := os.MkdirTemp(distro.DataDir, "")
@@ -214,6 +216,19 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 
 		// Msiutil expand full
 		err = msiutil.Expand(src, tmpdir)
+		if err != nil {
+			return err
+		}
+	}
+	if strings.HasSuffix(src, suffixZip) {
+		log.Printf("Extract .zip from %v", src)
+
+		osdp = distro.OsquerydWindowsZipPath()
+		osdcp = distro.OsquerydCertsWindowsZipDistroPath()
+		distp = distro.OsquerydPathForOS(osarch.OS, dir)
+
+		// Unzip
+		err = zip.UnzipFile(src, tmpdir, osdp, osdcp)
 		if err != nil {
 			return err
 		}

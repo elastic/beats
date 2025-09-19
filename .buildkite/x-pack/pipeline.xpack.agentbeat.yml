@@ -151,6 +151,30 @@ steps:
         notify:
           - github_commit_status:
               context: "agentbeat: Packaging linux/arm64 FIPS"
+      - label: ":linux: Agentbeat packaging windows/arm64"
+        key: "agentbeat-package-windows-arm"
+        depends_on:
+          - mandatory-win-2022-system-tests
+        env:
+          PLATFORMS: "+all windows/arm64"
+          SNAPSHOT: true
+        command: |
+          .buildkite/scripts/packaging/packaging.sh x-pack/agentbeat
+        artifact_paths:
+          - x-pack/agentbeat/build/distributions/**/*
+          - "x-pack/agentbeat/build/*.xml"
+          - "x-pack/agentbeat/build/*.json"
+        retry:
+          automatic:
+            - limit: 2
+        timeout_in_minutes: 60
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "agentbeat: Packaging windows/arm64"
 
       - label: ":linux: Agentbeat/Integration tests Linux"
         key: "agentbeat-it-linux"
