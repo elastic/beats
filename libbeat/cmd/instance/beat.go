@@ -44,7 +44,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/locks"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
@@ -419,7 +418,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path. This is disabled under elastic-agent.
-	if !fleetmode.Enabled() {
+	if !management.UnderAgent() {
 		bl := locks.New(b.Info)
 		err := bl.Lock()
 		if err != nil {
