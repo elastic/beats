@@ -148,6 +148,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix unexpected EOF detection and improve memory usage. {pull}44813[44813]
 - Added missing "text/csv" content-type filter support in GCS input. {issue}44922[44922] {pull}44923[44923]
 - Fix metrics from TCP & UDP inputs when the port number is > 32767 {pull}46486[46486]
+- [Journald input] Fix reading all files in a folder and watching for new ones. {issue}46657[46657] {pull}46682[46682]
 
 *Heartbeat*
 
