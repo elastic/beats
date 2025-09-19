@@ -15,18 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package feature
+//go:build !windows
 
-//go:generate stringer -type=Stability
+package file_integrity
 
-// Stability defines the stability of the feature, this value can be used to filter a bundler.
-type Stability int
+import (
+	"errors"
 
-// List all the available stability for a feature.
-const (
-	Undefined Stability = iota
-	Stable
-	Beta
-	Experimental
-	Preview
+	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+func newETWReader(Config, *logp.Logger) (EventProducer, error) {
+	return nil, errors.New("etw reader is not implemented on this system")
+}
