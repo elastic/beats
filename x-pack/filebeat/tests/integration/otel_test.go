@@ -685,6 +685,7 @@ processors:
             max_retries: 3
         sending_queue:
             batch:
+                flush_timeout: 10s
                 max_size: 1600
                 min_size: 0
                 sizer: items
