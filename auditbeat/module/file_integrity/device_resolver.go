@@ -43,9 +43,9 @@ type trieNode struct {
 // prefix matching and uses an LRU cache to speed up frequent translations.
 //
 // The resolver handles the complexity of Windows device path resolution by:
-//  - Building a trie of device-to-drive mappings at startup
-//  - Caching translation results for performance
-//  - Thread-safe concurrent access
+//   - Building a trie of device-to-drive mappings at startup
+//   - Caching translation results for performance
+//   - Thread-safe concurrent access
 type deviceResolver struct {
 	mu               sync.RWMutex
 	root             *trieNode
