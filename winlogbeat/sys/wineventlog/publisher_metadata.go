@@ -20,11 +20,11 @@
 package wineventlog
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"syscall"
 
-	"go.uber.org/multierr"
 	"golang.org/x/sys/windows"
 )
 
@@ -563,7 +563,7 @@ func NewEventMetadataIterator(publisher *PublisherMetadata) (*EventMetadataItera
 }
 
 func (itr *EventMetadataIterator) Close() error {
-	return multierr.Combine(
+	return errors.Join(
 		_EvtClose(itr.eventMetadataEnumHandle),
 		_EvtClose(itr.currentEvent),
 	)
