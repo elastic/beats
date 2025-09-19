@@ -25,6 +25,7 @@ type OtelManager struct{}
 
 func (n *OtelManager) UpdateStatus(_ status.Status, _ string) {
 	// a stub implemtation for now.
+	// TODO(@VihasMakwana): Explore the option to tidy and refactor the status reporting for beatsreceivers and
 }
 
 func (n *OtelManager) SetStopCallback(func()) {
