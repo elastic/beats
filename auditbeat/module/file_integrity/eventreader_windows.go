@@ -15,18 +15,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package feature
+//go:build windows
 
-//go:generate stringer -type=Stability
+package file_integrity
 
-// Stability defines the stability of the feature, this value can be used to filter a bundler.
-type Stability int
+import (
+	"errors"
 
-// List all the available stability for a feature.
-const (
-	Undefined Stability = iota
-	Stable
-	Beta
-	Experimental
-	Preview
+	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+func NewEventReader(c Config, logger *logp.Logger) (EventProducer, error) {
+	if c.Backend == BackendAuto || c.Backend == BackendFSNotify || c.Backend == "" {
+		// Auto and unset defaults to fsnotify
+		l := logger.Named("fsnotify")
+		l.Info("selected backend: fsnotify")
+		return &fsNotifyReader{
+			config:  c,
+			log:     l,
+			parsers: FileParsers(c),
+		}, nil
+	}
+
+	if c.Backend == BackendETW {
+		l := logger.Named("etw")
+		l.Info("selected backend: etw")
+		return newETWReader(c, l)
+	}
+
+	// unimplemented
+	return nil, errors.ErrUnsupported
+}
