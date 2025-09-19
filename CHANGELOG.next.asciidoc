@@ -97,6 +97,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update Go version to 1.24.7 {pull}46070[46070].
 - Update github.com/go-viper/mapstructure/v2 to v2.4.0 {pull}46335[46335]
 - Update github.com/docker/docker to v28.3.3 {pull}46334[46334]
+- Make data updates in add_host_metadata processor synchronous {pull}46546[46546]
+- Fixed a panic in the Kafka output that could occur when shutting down while final events were being published. {issue}46109[46109] {pull}46446[46446]
 
 *Auditbeat*
 
