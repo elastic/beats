@@ -149,6 +149,11 @@ func TestGenerateHints(t *testing.T) {
 							},
 						},
 					},
+					"close": map[string]any{
+						"on_state_change": map[string]any{
+							"removed": false,
+						},
+					},
 					"file_identity": map[string]any{
 						"fingerprint": nil,
 					},
@@ -223,6 +228,11 @@ func TestGenerateHints(t *testing.T) {
 							"fingerprint": map[string]any{
 								"enabled": true,
 							},
+						},
+					},
+					"close": map[string]any{
+						"on_state_change": map[string]any{
+							"removed": false,
 						},
 					},
 					"file_identity": map[string]any{
@@ -898,6 +908,11 @@ func TestGenerateHints(t *testing.T) {
 								"/var/log/containers/*-abc.log",
 								"/var/lib/docker/containers/abc/*-json.log",
 							},
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
+							},
 							"parsers": []any{
 								map[string]any{
 									"container": map[string]any{
@@ -931,6 +946,11 @@ func TestGenerateHints(t *testing.T) {
 							"paths": []any{
 								"/var/log/containers/*-abc.log",
 								"/var/lib/docker/containers/abc/*-json.log",
+							},
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
 							},
 							"parsers": []any{
 								map[string]any{
@@ -1003,6 +1023,11 @@ func TestGenerateHints(t *testing.T) {
 									},
 								},
 							},
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
+							},
 							"prospector": map[string]any{
 								"scanner": map[string]any{
 									"symlinks": true,
@@ -1035,6 +1060,11 @@ func TestGenerateHints(t *testing.T) {
 										"format": "auto",
 										"stream": "all",
 									},
+								},
+							},
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
 								},
 							},
 							"prospector": map[string]any{
@@ -1089,6 +1119,11 @@ func TestGenerateHints(t *testing.T) {
 						"enabled": true,
 						"input": map[string]any{
 							"id": "container-logs-abc",
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
+							},
 							"paths": []any{
 								"/var/log/containers/*-abc.log",
 								"/var/lib/docker/containers/abc/*-json.log",
@@ -1127,6 +1162,11 @@ func TestGenerateHints(t *testing.T) {
 								"/var/log/containers/*-abc.log",
 								"/var/lib/docker/containers/abc/*-json.log",
 							},
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
+							},
 							"parsers": []any{
 								map[string]any{
 									"container": map[string]any{
@@ -1159,31 +1199,33 @@ func TestGenerateHints(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		// Configure path for modules access
-		abs, _ := filepath.Abs("../../..")
-		require.NoError(t, paths.InitPaths(&paths.Path{
-			Home: abs,
-		}))
+		t.Run(test.msg, func(t *testing.T) {
+			// Configure path for modules access
+			abs, _ := filepath.Abs("../../..")
+			require.NoError(t, paths.InitPaths(&paths.Path{
+				Home: abs,
+			}))
 
-		logger := logptest.NewTestingLogger(t, "")
-		l, err := NewLogHints(test.config, logger)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		cfgs := l.CreateConfig(test.event)
-		assert.Equal(t, test.len, len(cfgs), test.msg)
-		configs := make([]mapstr.M, 0)
-		for _, cfg := range cfgs {
-			config := mapstr.M{}
-			err := cfg.Unpack(&config)
-			ok := assert.Nil(t, err, test.msg)
-			if !ok {
-				break
+			logger := logptest.NewTestingLogger(t, "")
+			l, err := NewLogHints(test.config, logger)
+			if err != nil {
+				t.Fatal(err)
 			}
-			configs = append(configs, config)
-		}
-		assert.Equal(t, test.result, configs, test.msg)
+
+			cfgs := l.CreateConfig(test.event)
+			assert.Equal(t, test.len, len(cfgs), test.msg)
+			configs := make([]mapstr.M, 0)
+			for _, cfg := range cfgs {
+				config := mapstr.M{}
+				err := cfg.Unpack(&config)
+				ok := assert.Nil(t, err, test.msg)
+				if !ok {
+					break
+				}
+				configs = append(configs, config)
+			}
+			assert.Equal(t, test.result, configs, test.msg)
+		})
 	}
 }
 
