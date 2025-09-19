@@ -32,8 +32,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
 - Redis: Added replication role as a field to submitted slowlogs
 - Change log.file.path field in awscloudwatch input to nested object. {pull}41099[41099]
-
-
+- Journald input now converts byte-encoded messages to string. {issue}40479[40479] {pull}46415[46415]
 
 *Heartbeat*
 
@@ -138,6 +137,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
 - Further rate limiting fix in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41977[41977]
 - Remove erroneous status reporting to Elastic-Agent from the Filestream input {pull}42435[42435]
+- Journald input now works on Docker containers, all image variants except Wolfi. {issue}41278[41278] {issue}44040[44040] {pull}46625[46625]
 - Fix metrics from TCP & UDP inputs when the port number is > 32767 {pull}46486[46486]
 
 *Heartbeat*
@@ -168,6 +168,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - [K8s Integration] Enhance HTTP authentication in case of token updates for Apiserver, Controllermanager and Scheduler metricsets  {issue}41910[41910] {pull}42016[42016]
 - Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
 - Do not log an error if metadata enrichment is disabled for K8's module {pull}46536
+- Fix Azure Monitor wildcard metrics names timegrain issue by using the first, smallest timegrain; fix nil pointer issue {pull}46145[46145]
 
 *Osquerybeat*
 
@@ -178,7 +179,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
-
+- Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
+- Fix EventLog reset logic to not close renderers. {pull}46376[46376] {issue}45750{45750}
 
 *Elastic Logging Plugin*
 - Fix for unable to run elastic-logging plugin
@@ -363,50 +365,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 ==== Known Issues
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+*Filebeat*
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
