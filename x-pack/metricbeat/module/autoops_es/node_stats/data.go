@@ -164,6 +164,7 @@ var (
 			"search":     c.Dict("search", threadPoolStatsSchema, c.DictOptional),
 			"watcher":    c.Dict("watcher", threadPoolStatsSchema, c.DictOptional),
 			"write":      c.Dict("write", threadPoolStatsSchema, c.DictOptional),
+			"snapshot":   c.Dict("snapshot", threadPoolStatsSchema, c.DictOptional),
 		}),
 		"fs": c.Dict("fs", s.Schema{
 			"total": c.Dict("total", s.Schema{

@@ -6,6 +6,8 @@ package metricset
 
 import (
 	"fmt"
+	"os"
+	"sync"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
@@ -13,7 +15,16 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 )
 
-const MODULE_NAME = "autoops_es"
+const (
+	MODULE_NAME              = "autoops_es"
+	SEND_CLUSTER_INFO_ERRORS = "AUTOOPS_SEND_CLUSTER_INFO_ERRORS"
+)
+
+var GetClusterInfoValue = func() func() string {
+	return sync.OnceValue(func() string {
+		return os.Getenv(SEND_CLUSTER_INFO_ERRORS)
+	})
+}
 
 var checkedCloudConnectedMode bool = false
 
@@ -93,7 +104,14 @@ func (m *AutoOpsMetricSet[T]) Fetch(r mb.ReporterV2) error {
 
 	if info, err = GetInfo(m.MetricSet); err != nil {
 		err = fmt.Errorf("failed to get cluster info from cluster, %v metricset %w", metricSetName, err)
-		events.LogAndSendErrorEventWithoutClusterInfo(err, r, metricSetName)
+
+		var sendClusterInfoValue = GetClusterInfoValue()()
+		if utils.GetBoolEnvParam(sendClusterInfoValue, true) {
+			events.LogAndSendErrorEventWithoutClusterInfo(err, r, metricSetName)
+		} else {
+			m.Logger().Errorf("Error fetching data for metricset %s: %s", metricSetName, err)
+		}
+
 		return nil
 	} else if data, err = utils.FetchAPIData[T](m.MetricSet, m.RoutePath); err != nil {
 		err = fmt.Errorf("failed to get data, %v metricset %w", metricSetName, err)

@@ -8,6 +8,7 @@
 package metricset
 
 import (
+	"net/http/httptest"
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
@@ -77,4 +78,45 @@ func TestSuccessfulFetch(t *testing.T) {
 		require.Equal(t, "obj2", GetObjectValue(event2.MetricSetFields, "name"))
 		require.EqualValues(t, 2, GetObjectValue(event2.MetricSetFields, "value"))
 	})
+}
+
+func TestErrorClusterInfoFetch(t *testing.T) {
+	setupClusterInfoErrorServer := func(t *testing.T, clusterInfo []byte, data []byte, _ string) *httptest.Server {
+		return auto_ops_testing.SetupClusterInfoErrorServer(t, []byte{}, []byte{}, "")
+	}
+
+	testCases := []struct {
+		testName string
+		value    string
+		expected int
+	}{
+		{
+			testName: "Case 1: send errors is true",
+			value:    "true",
+			expected: 1,
+		},
+		{
+			testName: "Case 2: send errors is false",
+			value:    "false",
+			expected: 0,
+		},
+		{
+			testName: "Case 3: no boolean value",
+			value:    "",
+			expected: 1,
+		},
+	}
+
+	for _, testcase := range testCases {
+		t.Run(testcase.testName, func(t *testing.T) {
+			t.Setenv(SEND_CLUSTER_INFO_ERRORS, testcase.value)
+
+			RunTestsForFetcherWithGlobFiles(t, "./_meta/test/success.*.json", setupClusterInfoErrorServer, useTestMetricSet, func(t *testing.T, data FetcherData[testObjectType]) {
+				require.NoError(t, data.Error)
+
+				require.Equal(t, testcase.expected, len(data.Reporter.GetEvents()))
+			})
+		})
+	}
+
 }
