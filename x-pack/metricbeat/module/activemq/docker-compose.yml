@@ -1,5 +1,3 @@
-version: '2.3'
-
 services:
   activemq:
     image: docker.elastic.co/integrations-ci/beats-activemq:${ACTIVEMQ_VERSION:-5.15.9}-1

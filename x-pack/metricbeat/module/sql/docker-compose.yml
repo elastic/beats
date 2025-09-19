@@ -1,5 +1,3 @@
-version: '2.3'
-
 services:
   mysql:
     extends:
@@ -10,7 +8,7 @@ services:
     extends:
       file: ../../../../metricbeat/module/postgresql/docker-compose.yml
       service: postgresql
-  
+
   oracle:
     extends:
       file: ../../../../x-pack/metricbeat/module/oracle/docker-compose.yml
