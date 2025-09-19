@@ -100,7 +100,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 		return &mock, nil
 	}
 
-	reader, err := New(logp.L(), ctx, nil, nil, nil, journalfield.IncludeMatches{}, []int{}, SeekHead, "", 0, "", factory)
+	reader, err := New(logp.L(), ctx, nil, nil, nil, journalfield.IncludeMatches{}, []int{}, SeekHead, "", 0, "", false, factory)
 	if err != nil {
 		t.Fatalf("cannot instantiate journalctl reader: %s", err)
 	}
