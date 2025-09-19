@@ -192,7 +192,13 @@ func (c *client) Publish(_ context.Context, batch publisher.Batch) error {
 
 		msg.ref = ref
 		msg.initProducerMessage()
-		ch <- &msg.msg
+		select {
+		case <-c.done:
+			c.log.Errorf("output closing, dropping event")
+			ref.done()
+			c.observer.PermanentErrors(1)
+		case ch <- &msg.msg:
+		}
 	}
 
 	return nil
