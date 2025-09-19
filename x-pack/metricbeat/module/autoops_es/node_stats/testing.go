@@ -43,24 +43,3 @@ func setupSuccessfulServer() auto_ops_testing.SetupServerCallback {
 		}))
 	}
 }
-
-func setupMasterNodeErrorServer(t *testing.T, clusterInfo []byte, data []byte, _ string) *httptest.Server {
-	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.RequestURI {
-		case "/":
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			w.Write(clusterInfo)
-		case NodesStatsPath:
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			w.Write(data)
-		case ClusterStateMasterNodePath:
-			w.WriteHeader(500)
-			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte(`{"error":"Unexpected error"}`))
-		default:
-			t.Fatalf("Unknown request to %v", r.RequestURI)
-		}
-	}))
-}
