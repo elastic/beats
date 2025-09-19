@@ -290,6 +290,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - In Filestream, setting `clean_inactive: 0` does not re-ingest all files on startup any more. {issue}45601[45601]
 +{pull}46373[46373]
 - Fix metrics from TCP & UDP inputs when the port number is > 32767 {pull}46486[46486]
+- [Journald input] Fix reading all files in a folder and watching for new ones. {issue}46657[46657] {pull}46682[46682]
 
 *Heartbeat*
 
