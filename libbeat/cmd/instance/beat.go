@@ -237,6 +237,11 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 		return nil, err
 	}
 
+	ephemeralID, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+
 	b := beat.Beat{
 		Info: beat.Info{
 			Beat:             name,
@@ -248,7 +253,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			ID:               id,
 			FirstStart:       time.Now(),
 			StartTime:        time.Now(),
-			EphemeralID:      metricreport.EphemeralID(),
+			EphemeralID:      ephemeralID,
 			FIPSDistribution: version.FIPSDistribution,
 		},
 		Fields:   fields,
@@ -344,7 +349,18 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	reg := b.Monitoring.StatsRegistry().GetOrCreateRegistry("libbeat")
 
-	err = metricreport.SetupMetrics(b.Info.Logger.Named("metrics"), b.Info.Beat, version.GetDefaultVersion())
+	ephemeralID, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+	err = metricreport.SetupMetricsOptions(metricreport.MetricOptions{
+		Name:           b.Info.Beat,
+		Version:        version.GetDefaultVersion(),
+		EphemeralID:    ephemeralID.String(),
+		Logger:         b.Info.Logger.Named("metrics"),
+		SystemMetrics:  monitoring.Default.GetOrCreateRegistry("system"),
+		ProcessMetrics: monitoring.Default.GetOrCreateRegistry("beat"),
+	})
 	if err != nil {
 		return nil, err
 	}
