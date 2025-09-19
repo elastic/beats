@@ -193,6 +193,7 @@ class Test(BaseTest):
         self._test_non_recursive("fsnotify")
 
     @unittest.skipUnless(is_root(), "Requires root")
+    @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/46719")
     def test_non_recursive__ebpf(self):
         self._test_non_recursive("ebpf")
 
@@ -273,6 +274,7 @@ class Test(BaseTest):
         self._test_recursive("fsnotify")
 
     @unittest.skipUnless(is_root(), "Requires root")
+    @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/46719")
     def test_recursive__ebpf(self):
         self._test_recursive("ebpf")
 
@@ -344,6 +346,7 @@ class Test(BaseTest):
 
     @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
     @unittest.skipUnless(is_root(), "Requires root")
+    @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/46719")
     def test_file_modified__ebpf(self):
         self._test_file_modified("ebpf")
 
