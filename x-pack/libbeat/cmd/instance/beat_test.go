@@ -74,5 +74,11 @@ type: "log"`)
 		assert.NotNil(t, beat.Manager)
 		assert.IsType(t, beat.Manager, &management.FallbackManager{})
 		assert.False(t, management.UnderAgent())
+
+		// test if log input is disabled
+		cfg, err := conf.NewConfigFrom(`
+type: "log"`)
+		require.NoError(t, err)
+		assert.False(t, log.AllowDeprecatedUse(cfg))
 	})
 }
