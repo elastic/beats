@@ -105,6 +105,29 @@ func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
 		},
 	}
 
+	// Optionally enrich stats with extended fields if present
+	statsMap := event["stats"].(mapstr.M)
+	// For each optional key, only set if present in source data
+	optionalKeys := []string{
+		"stats.numOrphanDocs",
+		"stats.shardCount",
+		"stats.indexSizes",
+		"stats.freeStorageSize",
+		"stats.capped",
+		"stats.scaleFactor",
+	}
+	for _, k := range optionalKeys {
+		if v, err := data.GetValue(k); err == nil && v != nil {
+			leaf := k[strings.LastIndex(k, ".")+1:]
+			statsMap[leaf] = v
+		}
+	}
+
+	// shards (expected slice) and complex nested groups
+	if v, err := data.GetValue("stats.shards"); err == nil && v != nil {
+		statsMap["shards"] = v
+	}
+
 	return event, nil
 }
 
