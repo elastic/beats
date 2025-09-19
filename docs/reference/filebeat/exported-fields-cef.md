@@ -932,7 +932,7 @@ Collection of key-value pairs carried in the CEF extension field.
 
 
 **`cef.extensions.sourceHostName`**
-:   Identifies the source that an event refers to in an IP network. The format should be a fully qualified domain name (FQDN) associated with the source node, when a mode is available. Examples: 'host' or 'host.domain.com'.
+:   Identifies the source that an event refers to in an IP network. The format should be a fully qualified domain name (FQDN) associated with the source node, when a mode is available. Examples: 'host' or 'host.example.com'.
 
     type: keyword
 
