@@ -25,6 +25,10 @@ func NewWork(batch publisher.Batch) *Work {
 	}
 }
 
+func (w *Work) Batch() publisher.Batch {
+	return w.batch
+}
+
 func (w *Work) Result() chan error {
 	return w.result
 }
