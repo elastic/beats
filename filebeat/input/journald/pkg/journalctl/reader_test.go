@@ -25,6 +25,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"sync/atomic"
 	"testing"
 
@@ -100,7 +101,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 		return &mock, nil
 	}
 
-	reader, err := New(logp.L(), ctx, nil, nil, nil, journalfield.IncludeMatches{}, []int{}, SeekHead, "", 0, "", factory)
+	reader, err := New(logp.L(), ctx, nil, nil, nil, journalfield.IncludeMatches{}, []int{}, SeekHead, "", 0, "", false, factory)
 	if err != nil {
 		t.Fatalf("cannot instantiate journalctl reader: %s", err)
 	}
@@ -156,5 +157,37 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 		if isEntryEmpty(entry) {
 			t.Fatal("the second and third calls to Next must succeed")
 		}
+	}
+}
+
+func TestNewUsesMergeFlag(t *testing.T) {
+	f := func(_ input.Canceler, _ *logp.Logger, _ string, s ...string) (Jctl, error) {
+		return nil, nil
+	}
+	r, err := New(
+		logp.NewNopLogger(),
+		t.Context(),
+		nil,
+		nil,
+		nil,
+		journalfield.IncludeMatches{},
+		nil,
+		SeekHead,
+		"",
+		0,
+		"",
+		true,
+		f)
+
+	if err != nil {
+		t.Fatalf("did not expect an error when calling New: %s", err)
+	}
+
+	if r == nil {
+		t.Fatal("the returned reader cannot be nil")
+	}
+
+	if !slices.Contains(r.args, "--merge") {
+		t.Fatalf("did not find '--merge' in the arguments to journalctl. Args: %s", r.args)
 	}
 }

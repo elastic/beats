@@ -2914,6 +2914,9 @@ filebeat.inputs:
   #paths:
     #- /var/log/custom.journal
 
+  # When enable entries from all journals will be read, including remote ones.
+  #merge: false
+
   # The position to start reading from the journal, valid options are:
   #  - head: Starts reading at the beginning of the journal.
   #  - tail: Starts reading at the end of the journal.

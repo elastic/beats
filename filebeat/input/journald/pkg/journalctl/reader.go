@@ -178,6 +178,7 @@ func New(
 	cursor string,
 	since time.Duration,
 	file string,
+	merge bool,
 	newJctl JctlFactory,
 ) (*Reader, error) {
 
@@ -196,6 +197,10 @@ func New(
 		} else {
 			args = append(args, "--file", file)
 		}
+	}
+
+	if merge {
+		args = append(args, "--merge")
 	}
 
 	for _, u := range units {
