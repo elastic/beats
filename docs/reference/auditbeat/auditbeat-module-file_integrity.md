@@ -98,7 +98,7 @@ This module also supports the [standard configuration options](#module-standard-
 :   A list of `file_integrity` fields under `file` that will be populated by file format parsers. The available fields that can be analysed are listed in the auditbeat.reference.yml file. File parsers are run on all files within the `max_file_size` limit in the configured paths during a scan or when a file event involves the file. Files that are not targets of the specific file parser are only sniffed to examine whether analysis should proceed. This will usually only involve reading a small number of bytes.
 
 **`backend`**
-:   Select the backend which will be used to source events. The available backends vary by operating system:
+:   Select the backend that will be used to source events. The available backends vary by operating system:
     
     * **Linux:** `auto`, `fsnotify`, `kprobes`, `ebpf`. Default: `fsnotify`.
     * {applies_to}`stack: ga 9.2.0` **Windows:** `auto`, `fsnotify`, `etw`. Default: `fsnotify`.
