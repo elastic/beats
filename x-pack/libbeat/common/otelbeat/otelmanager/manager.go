@@ -5,8 +5,6 @@
 package otelmanager
 
 import (
-	"sync"
-
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -23,21 +21,10 @@ func NewOtelManager(cfg *config.C, registry *reload.Registry, logger *logp.Logge
 }
 
 // OtelManager is the main manager for managing beatreceivers
-type OtelManager struct {
-	logger *logp.Logger
-	lock   sync.Mutex
-	status status.Status
-	msg    string
-}
+type OtelManager struct{}
 
-func (n *OtelManager) UpdateStatus(status status.Status, msg string) {
-	n.lock.Lock()
-	defer n.lock.Unlock()
-	if n.status != status || n.msg != msg {
-		n.status = status
-		n.msg = msg
-		n.logger.Infof("Status changed to %s: %s", status, msg)
-	}
+func (n *OtelManager) UpdateStatus(_ status.Status, _ string) {
+	// a stub implemtation for now.
 }
 
 func (n *OtelManager) SetStopCallback(func()) {
