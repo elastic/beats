@@ -215,7 +215,6 @@ steps:
           EC_ENDPOINT: "https://api.staging.elastic-gov.com"
           TF_VAR_ech_region: "us-gov-east-1"
           TF_VAR_deployment_template_id: "aws-general-purpose"
-          TF_LOG: "debug"
         command: |
           .buildkite/scripts/custom_fips_ech_test.sh x-pack/filebeat
         retry:
