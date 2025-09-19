@@ -267,7 +267,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	pipelineSettings := pipeline.Settings{
 		Processors:     b.GetProcessors(),
 		InputQueueSize: b.InputQueueSize,
-		WaitCloseMode:  pipeline.WaitOnPipelineClose,
+		WaitCloseMode:  pipeline.WaitOnPipelineCloseThenForce,
 		WaitClose:      receiverPublisherCloseTimeout,
 	}
 	publisher, err := pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, pipelineSettings)

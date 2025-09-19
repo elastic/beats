@@ -7,8 +7,14 @@
 === Beats version 8.19.3
 https://github.com/elastic/beats/compare/v8.19.2\...v8.19.3[View commits]
 
-==== Known issues
+==== Known Issues
 
+*Filebeat*
+
+// tag::known-issue-8.19-filestream-clean-inactive-1[]
+- The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+- When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+// end::known-issue-8.19-filestream-clean-inactive-1[]
 // tag::known-issue-8.19-restart_on_cert_change[]
 - `restart_on_cert_change` causes panic due to seccomp policy. In versions 8.19.0 and later, enabling this option causes the Beat to panic on restart. This is due to the `eventfd2` syscall missing from the default seccomp policy. To fix this, add `eventfd2` to a custom seccomp policy. For more details, refer to {filebeat-ref}/linux-seccomp.html[Use Linux Secure Computing Mode (seccomp)].
 
@@ -147,6 +153,40 @@ seccomp:
 ----
 ====
 // end::known-issue-8.19-restart_on_cert_change[]
+// tag::known-issue-8.19-journalctl[]
+- `journalctl` is not present in the Docker images, thus the Journald input will fail with `cannot start journalctl: exec: "journalctl": executable file not found in $PATH`
+
+[%collapsible]
+.Click to view the workaround
+====
+Install the `systemd` package in the Docker image. Create a new `Dockerfile` (update the base image version to match the version you want to fix):
+[source,dockerfile]
+----
+FROM docker.elastic.co/beats/filebeat:8.19.3
+USER root
+RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+    && apt-get install -y systemd \
+    && apt-get clean all
+USER 1000
+----
+
+Build it:
+[source,sh]
+----
+docker build . -t "filebeat:8.19.3-journald"
+----
+
+Test:
+[source,sh]
+----
+docker run --rm -it --entrypoint journalctl filebeat:8.19.3-journald
+No journal files were found.
+-- No entries --
+----
+
+Use the image `filebeat:8.19.3-journald` you have just built.
+====
+// end::known-issue-8.19-journalctl[]
 
 ==== Breaking changes
 
@@ -192,15 +232,25 @@ https://github.com/elastic/beats/compare/v8.19.1\...v8.19.2[View commits]
 
 ==== Known issues
 
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-journalctl]
+
 
 [[release-notes-8.19.1]]
 === Beats version 8.19.1
 https://github.com/elastic/beats/compare/v8.19.0\...v8.19.1[View commits]
 
-==== Known issues
+==== Known Issues
 
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-journalctl]
+
 
 ==== Bugfixes
 
@@ -225,9 +275,13 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
 === Beats version 8.19.0
 https://github.com/elastic/beats/compare/v8.18.4\...v8.19.0[View commits]
 
-==== Known issues
+==== Known Issues
 
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-journalctl]
 
 ==== Breaking changes
 
@@ -309,6 +363,13 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-restart_on_cert_change]
 === Beats version 8.18.5
 https://github.com/elastic/beats/compare/v8.18.4\...v8.18.5[View commits]
 
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
+
 ==== Bugfixes
 
 *Auditbeat*
@@ -332,6 +393,14 @@ https://github.com/elastic/beats/compare/v8.18.4\...v8.18.5[View commits]
 [[release-notes-8.18.4]]
 === Beats version 8.18.4
 https://github.com/elastic/beats/compare/v8.18.3\...v8.18.4[View commits]
+
+==== Known Issues
+
+*Filebeat*
+
+- The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+- When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
 
 ==== Breaking changes
 
@@ -372,6 +441,13 @@ https://github.com/elastic/beats/compare/v8.18.3\...v8.18.4[View commits]
 [[release-notes-8.18.3]]
 === Beats version 8.18.3
 https://github.com/elastic/beats/compare/v8.18.2\...v8.18.3[View commits]
+
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
 
 ==== Bugfixes
 
@@ -422,6 +498,12 @@ https://github.com/elastic/beats/compare/v8.18.2\...v8.18.3[View commits]
 === Beats version 8.18.2
 https://github.com/elastic/beats/compare/v8.18.1\...v8.18.2[View commits]
 
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -462,11 +544,18 @@ https://github.com/elastic/beats/compare/v8.18.1\...v8.18.2[View commits]
 === Beats version 8.18.1
 https://github.com/elastic/beats/compare/v8.18.0\...v8.18.1[View commits]
 
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
+
 ==== Bugfixes
 
 *Filebeat*
 
-- Journald input now works on Docker containers (except Wolfi). {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
+- Journald input now works on Docker containers (only ubi variant). {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
 - Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
 - [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
 - Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
@@ -482,6 +571,13 @@ https://github.com/elastic/beats/compare/v8.18.0\...v8.18.1[View commits]
 [[release-notes-8.18.0]]
 === Beats version 8.18.0
 https://github.com/elastic/beats/compare/v8.17.4\...v8.18.0[View commits]
+
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
 
 ==== Breaking changes
 
@@ -583,6 +679,10 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 === Beats version 8.17.10
 https://github.com/elastic/beats/compare/v8.17.9\...v8.17.10[View commits]
 
+==== Known Issues
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
 ==== Bugfixes
 
 *Filebeat*
@@ -606,6 +706,13 @@ https://github.com/elastic/beats/compare/v8.17.9\...v8.17.10[View commits]
 [[release-notes-8.17.9]]
 === Beats version 8.17.9
 https://github.com/elastic/beats/compare/v8.17.8\...v8.17.9[View commits]
+
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
 
 ==== Breaking changes
 
@@ -640,6 +747,13 @@ https://github.com/elastic/beats/compare/v8.17.8\...v8.17.9[View commits]
 [[release-notes-8.17.8]]
 === Beats version 8.17.8
 https://github.com/elastic/beats/compare/v8.17.7\...v8.17.8[View commits]
+
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
 
 ==== Bugfixes
 
@@ -682,6 +796,13 @@ https://github.com/elastic/beats/compare/v8.17.7\...v8.17.8[View commits]
 === Beats version 8.17.7
 https://github.com/elastic/beats/compare/v8.17.6\...v8.17.7[View commits]
 
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -709,6 +830,13 @@ https://github.com/elastic/beats/compare/v8.17.6\...v8.17.7[View commits]
 === Beats version 8.17.6
 https://github.com/elastic/beats/compare/v8.17.5\...v8.17.6[View commits]
 
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
+
 ==== Bugfixes
 
 *Filebeat*
@@ -726,6 +854,13 @@ https://github.com/elastic/beats/compare/v8.17.5\...v8.17.6[View commits]
 [[release-notes-8.17.5]]
 === Beats version 8.17.5
 https://github.com/elastic/beats/compare/v8.17.4\...v8.17.5[View commits]
+
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
 
 ==== Breaking changes
 
@@ -766,6 +901,13 @@ https://github.com/elastic/beats/compare/v8.17.4\...v8.17.5[View commits]
 [[release-notes-8.17.4]]
 === Beats version 8.17.4
 https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
+
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
 
 ==== Breaking changes
 
@@ -812,6 +954,13 @@ https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
 === Beats version 8.17.3
 https://github.com/elastic/beats/compare/v8.17.2\...v8.17.3[View commits]
 
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -855,6 +1004,13 @@ https://github.com/elastic/beats/compare/v8.17.2\...v8.17.3[View commits]
 === Beats version 8.17.2
 https://github.com/elastic/beats/compare/v8.17.1\...v8.17.2[View commits]
 
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -892,6 +1048,13 @@ https://github.com/elastic/beats/compare/v8.17.1\...v8.17.2[View commits]
 [[release-notes-8.17.1]]
 === Beats version 8.17.1
 https://github.com/elastic/beats/compare/v8.17.0\...v8.17.1[View commits]
+
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
 
 ==== Breaking changes
 
@@ -949,6 +1112,13 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.17.0[View commits]
 ==== Known issue
 
 - Standalone Beats docker image will not start if `-e` option is not added {issue}42038[42038].
+
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
 
 ==== Breaking changes
 
@@ -1032,6 +1202,13 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.17.0[View commits]
 === Beats version 8.16.5
 https://github.com/elastic/beats/compare/v8.16.4\...v8.16.5[View commits]
 
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
+
 ==== Bugfixes
 
 *Filebeat*
@@ -1061,6 +1238,12 @@ https://github.com/elastic/beats/compare/v8.16.4\...v8.16.5[View commits]
 === Beats version 8.16.4
 https://github.com/elastic/beats/compare/v8.16.3\...v8.16.4[View commits]
 
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
 ==== Bugfixes
 
 *Filebeat*
@@ -1083,6 +1266,13 @@ https://github.com/elastic/beats/compare/v8.16.3\...v8.16.4[View commits]
 [[release-notes-8.16.3]]
 === Beats version 8.16.3
 https://github.com/elastic/beats/compare/v8.16.2\...v8.16.3[View commits]
+
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
 
 ==== Breaking changes
 
@@ -1128,6 +1318,12 @@ https://github.com/elastic/beats/compare/v8.16.2\...v8.16.3[View commits]
 [[release-notes-8.16.2]]
 === Beats version 8.16.2
 https://github.com/elastic/beats/compare/v8.16.1\...v8.16.2[View commits]
+
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 
 ==== Bugfixes
 
@@ -1184,6 +1380,12 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.16.2[View commits]
 === Beats version 8.16.1
 https://github.com/elastic/beats/compare/v8.16.0\...v8.16.1[View commits]
 
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
+
 ==== Breaking changes
 
 *Packetbeat*
@@ -1217,6 +1419,9 @@ filebeat.inputs:
   number_of_workers: 5
   bucket_arn: 'arn:aws:s3:::test1'
 ----
+
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
 
 ==== Breaking changes
 
@@ -1310,6 +1515,15 @@ filebeat.inputs:
 === Beats version 8.15.5
 https://github.com/elastic/beats/compare/v8.15.4\...v8.15.5[View commits]
 
+==== Known Issues
+
+*Filebeat*
+
+// tag::known-issue-8.19-filestream-clean-inactive-long-value[]
+- The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+- When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive` to a very large value. For example, use `clean_inactive: 43800h0m0s`, which is 5 years.
+// end::known-issue-8.19-filestream-clean-inactive-long-value[]
+
 ==== Breaking changes
 
 *Packetbeat*
@@ -1330,6 +1544,12 @@ https://github.com/elastic/beats/compare/v8.15.4\...v8.15.5[View commits]
 [[release-notes-8.15.4]]
 === Beats version 8.15.4
 https://github.com/elastic/beats/compare/v8.15.3\...v8.15.4[View commits]
+
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-long-value]
 
 ==== Breaking changes
 
@@ -1377,6 +1597,12 @@ https://github.com/elastic/beats/compare/v8.15.3\...v8.15.4[View commits]
 [[release-notes-8.15.3]]
 === Beats version 8.15.3
 https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
+
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-long-value]
 
 ==== Breaking changes
 
@@ -1426,6 +1652,10 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.2[View commits]
 
 - Beats Docker images do not log to stderr by default. The workaround is to pass the CLI flag `-e` or to set `logging.to_stderr: true` in the configuration file. {issue}41118[41118]
 
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-long-value]
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -1446,6 +1676,11 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.1[View commits]
 *Affecting all Beats*
 
 - Beats stop publishing data after a network error unless restarted. Avoid upgrading to 8.15.1. Affected Beats log `Get \"https://${ELASTICSEARCH_HOST}:443\": context canceled` repeatedly. {issue}40705{40705}
+
+*Filebeat*
+
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
 
 ==== Bugfixes
 
@@ -1515,6 +1750,9 @@ filebeat.inputs:
   number_of_workers: 5
   bucket_arn: 'arn:aws:s3:::test1'
 ----
+
+ - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
+ - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
 
 ==== Breaking changes
 
@@ -1606,6 +1844,13 @@ filebeat.inputs:
 === Beats version 8.14.3
 https://github.com/elastic/beats/compare/v8.14.2\...v8.14.3[View commits]
 
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-long-value]
+
+
 ==== Bugfixes
 
 *Filebeat*
@@ -1634,6 +1879,13 @@ https://github.com/elastic/beats/compare/v8.14.2\...v8.14.3[View commits]
 [[release-notes-8.14.2]]
 === Beats version 8.14.2
 https://github.com/elastic/beats/compare/v8.14.1\...v8.14.2[View commits]
+
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-long-value]
+
 
 ==== Breaking changes
 
@@ -1671,6 +1923,12 @@ https://github.com/elastic/beats/compare/v8.14.1\...v8.14.2[View commits]
 === Beats version 8.14.1
 https://github.com/elastic/beats/compare/v8.14.0\...v8.14.1[View commits]
 
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-long-value]
+
 ==== Bugfixes
 
 *Heartbeat*
@@ -1681,6 +1939,12 @@ https://github.com/elastic/beats/compare/v8.14.0\...v8.14.1[View commits]
 [[release-notes-8.14.0]]
 === Beats version 8.14.0
 https://github.com/elastic/beats/compare/v8.13.4\...v8.14.0[View commits]
+
+==== Known Issues
+
+*Filebeat*
+
+include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-long-value]
 
 ==== Breaking changes
 
@@ -1719,11 +1983,13 @@ https://github.com/elastic/beats/compare/v8.13.4\...v8.14.0[View commits]
 ==== Bugfixes
 
 *Auditbeat*
+
 - Set field types to correctly match ECS in sessionmd processor. {issue}38955[38955] {pull}38994[38994]
 - Fix failing to enrich process events in sessionmd processor. {issue}38955[38955] {pull}39173[39173] {pull}39243[39243]
 - Fix seccomp policy of FIM kprobes backend on arm64. {pull}39759[39759]
 
 *Filebeat*
+
 - Fix handling of endpoint for custom domains and ensure region, default_region, and region parsed from queue_url are applied in the order specified in the documentation for the awss3 input. {pull}39709[39709]
 - Prevent HTTPJSON holding response bodies between executions. {issue}35219[35219] {pull}38116[38116]
 - Fix the incorrect values generated by the uri_parts processor. {pull}38216[38216]
