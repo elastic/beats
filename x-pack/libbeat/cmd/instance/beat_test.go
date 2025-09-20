@@ -5,6 +5,7 @@
 package instance
 
 import (
+	"maps"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -46,12 +47,13 @@ func TestManager(t *testing.T) {
 		assert.False(t, management.UnderAgent())
 	})
 	t.Run("otel management enabled", func(t *testing.T) {
-		cfg["management.otel.enabled"] = true
+		tmpCfg := map[string]any{}
+		maps.Copy(tmpCfg, cfg)
+		tmpCfg["management.otel.enabled"] = true
 		defer func() {
-			delete(cfg, "management.otel.enabled")
 			management.SetUnderAgent(false) // reset to false
 		}()
-		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), cfg, false, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), tmpCfg, false, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
 		assert.NoError(t, err)
 		assert.NotNil(t, beat.Manager)
 		assert.IsType(t, beat.Manager, &otelmanager.OtelManager{})
@@ -64,12 +66,13 @@ type: "log"`)
 		assert.True(t, log.AllowDeprecatedUse(cfg))
 	})
 	t.Run("otel management disabled", func(t *testing.T) {
-		cfg["management.otel.enabled"] = false
+		tmpCfg := map[string]any{}
+		maps.Copy(tmpCfg, cfg)
+		tmpCfg["management.otel.enabled"] = false
 		defer func() {
-			delete(cfg, "management.otel.enabled")
 			management.SetUnderAgent(false) // reset to false
 		}()
-		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), cfg, false, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), tmpCfg, false, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
 		assert.NoError(t, err)
 		assert.NotNil(t, beat.Manager)
 		assert.IsType(t, beat.Manager, &management.FallbackManager{})
