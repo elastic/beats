@@ -108,3 +108,12 @@ func TestMetricProcessorProcess(t *testing.T) {
 	assert.NotNil(t, event["stats"])
 	assert.Equal(t, event["stats"], float64(42))
 }
+
+func FuzzProcess(f *testing.F) {
+	f.Add("test.localhost.bash.stats 42 1500934723")
+
+	f.Fuzz(func(t *testing.T, message string) {
+		processor := GetMetricProcessor()
+		_, _ = processor.Process(message)
+	})
+}
