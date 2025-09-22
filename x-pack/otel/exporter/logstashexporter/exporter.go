@@ -53,7 +53,9 @@ func newLogstashExporter(settings exporter.Settings, cfg component.Config) (*log
 		return nil, err
 	}
 
-	// Same as the number of outputs.Client created by the otelconsumer
+	// The work queue size should be the same as the number of outputs.Client created by the
+	// otelconsumer.makeOtelConsumer. A lower size will cause backpressure, and it might lead
+	// to starvation of some batches if the queue is always full.
 	workQueueSize := runtime.NumCPU()
 
 	return &logstashExporter{
@@ -145,7 +147,7 @@ func (l *logstashExporter) processWorkResult(
 
 		case <-time.After(defaultDeadlockTimeout):
 			// See logstash.deadlockListener for reasoning behind this log.
-			l.logger.Warnf("Logstash worker hasn't complete processing in the last %v", defaultDeadlockTimeout)
+			l.logger.Warnf("Logstash worker hasn't completed processing in the last %v", defaultDeadlockTimeout)
 		}
 	}
 }
@@ -167,7 +169,7 @@ func (l *logstashExporter) processBatchResult(
 
 		case <-time.After(defaultDeadlockTimeout):
 			// See logstash.deadlockListener for reasoning behind this log.
-			l.logger.Warnf("Logstash batch hasn't complete processing in the last %v.", defaultDeadlockTimeout)
+			l.logger.Warnf("Logstash batch hasn't completed processing in the last %v.", defaultDeadlockTimeout)
 		}
 	}
 }
@@ -212,8 +214,9 @@ func (l *logstashExporter) handleRetry(
 ) (bool, error) {
 	// Connection errors don't count against retry limit. The Logstash clients might close
 	// the connection for different reasons, and workers don't have access to the internal
-	// client's state to properly determined when the connection was closed.
+	// client's state to properly determine when the connection was closed.
 	if workRes != nil && errors.Is(workRes, transport.ErrNotConnected) {
+		// Decrement the number of retries to not count this against the max retries.
 		batch.AddRetry(-1)
 		if err := l.enqueueWork(ctx, work); err != nil {
 			return true, consumererror.NewLogs(fmt.Errorf("failed to requeue batch after connection error: %w", err), ld)
