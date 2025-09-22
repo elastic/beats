@@ -57,6 +57,7 @@ func TestValidate(t *testing.T) {
 
 func TestValidateConnectionStringV1(t *testing.T) {
 	t.Run("Connection string contains entity path", func(t *testing.T) {
+		// Check the Validate() function
 		config := defaultConfig()
 		config.ProcessorVersion = "v1"
 		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;EntityPath=my-event-hub;"
@@ -64,13 +65,17 @@ func TestValidateConnectionStringV1(t *testing.T) {
 		config.SAName = "teststorageaccount"
 		config.SAKey = "my-secret"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
-
 		require.NoError(t, config.Validate())
-		require.NotNil(t, config.ConnectionStringProperties.EntityPath)
-		assert.Equal(t, config.EventHubName, *config.ConnectionStringProperties.EntityPath)
+
+		// Check the parseConnectionString() function
+		connectionStringProperties, err := parseConnectionString(config.ConnectionString)
+		require.NoError(t, err)
+		require.NotNil(t, connectionStringProperties.EntityPath)
+		assert.Equal(t, config.EventHubName, *connectionStringProperties.EntityPath)
 	})
 
 	t.Run("Connection string does not contain entity path", func(t *testing.T) {
+		// Check the Validate() function
 		config := defaultConfig()
 		config.ProcessorVersion = "v1"
 		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret"
@@ -78,14 +83,18 @@ func TestValidateConnectionStringV1(t *testing.T) {
 		config.SAName = "teststorageaccount"
 		config.SAKey = "my-secret"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
-
 		require.NoError(t, config.Validate())
-		require.Nil(t, config.ConnectionStringProperties.EntityPath)
+
+		// Check the parseConnectionString() function
+		connectionStringProperties, err := parseConnectionString(config.ConnectionString)
+		require.NoError(t, err)
+		require.Nil(t, connectionStringProperties.EntityPath)
 	})
 }
 
 func TestValidateConnectionStringV2(t *testing.T) {
 	t.Run("Connection string contains entity path", func(t *testing.T) {
+		// Check the Validate() function
 		config := defaultConfig()
 		config.ProcessorVersion = "v2"
 		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;EntityPath=my-event-hub"
@@ -93,13 +102,17 @@ func TestValidateConnectionStringV2(t *testing.T) {
 		config.SAName = "teststorageaccount"
 		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-secret;EndpointSuffix=core.windows.net"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
-
 		require.NoError(t, config.Validate())
-		require.NotNil(t, config.ConnectionStringProperties.EntityPath)
-		require.Equal(t, config.EventHubName, *config.ConnectionStringProperties.EntityPath)
+
+		// Check the parseConnectionString() function
+		connectionStringProperties, err := parseConnectionString(config.ConnectionString)
+		require.NoError(t, err)
+		require.NotNil(t, connectionStringProperties.EntityPath)
+		require.Equal(t, config.EventHubName, *connectionStringProperties.EntityPath)
 	})
 
 	t.Run("Connection string does not contain entity path", func(t *testing.T) {
+		// Check the Validate() function
 		config := defaultConfig()
 		config.ProcessorVersion = "v2"
 		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;"
@@ -107,9 +120,12 @@ func TestValidateConnectionStringV2(t *testing.T) {
 		config.SAName = "teststorageaccount"
 		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-secret;EndpointSuffix=core.windows.net"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
-
 		require.NoError(t, config.Validate())
-		require.Nil(t, config.ConnectionStringProperties.EntityPath)
+
+		// Check the parseConnectionString() function
+		connectionStringProperties, err := parseConnectionString(config.ConnectionString)
+		require.NoError(t, err)
+		require.Nil(t, connectionStringProperties.EntityPath)
 	})
 
 	t.Run("Connection string contains entity path but does not match event hub name", func(t *testing.T) {
@@ -124,8 +140,5 @@ func TestValidateConnectionStringV2(t *testing.T) {
 		err := config.Validate()
 		require.Error(t, err)
 		assert.ErrorContains(t, err, "invalid config: the entity path (my-event-hub) in the connection string does not match event hub name (not-my-event-hub)")
-
-		require.NotNil(t, config.ConnectionStringProperties.EntityPath)
-		require.NotEqual(t, *config.ConnectionStringProperties.EntityPath, config.EventHubName)
 	})
 }

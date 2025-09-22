@@ -199,7 +199,12 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	//
 	// We need to handle both cases.
 	eventHubName := in.config.EventHubName
-	if in.config.ConnectionStringProperties.EntityPath != nil {
+
+	connectionStringProperties, err := parseConnectionString(in.config.ConnectionString)
+	if err != nil {
+		return fmt.Errorf("failed to parse connection string: %w", err)
+	}
+	if connectionStringProperties.EntityPath != nil {
 		// If the connection string contains an entity path, we need to
 		// set the event hub name to an empty string.
 		//

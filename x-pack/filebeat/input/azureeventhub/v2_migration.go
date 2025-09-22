@@ -78,12 +78,17 @@ func (m *migrationAssistant) checkAndMigrate(ctx context.Context, eventHubConnec
 		return err
 	}
 
+	connectionStringProperties, err := parseConnectionString(m.config.ConnectionString)
+	if err != nil {
+		return fmt.Errorf("migration assistant: failed to parse connection string: %w", err)
+	}
+
 	for _, partitionID := range eventHubProperties.PartitionIDs {
 		err = m.checkAndMigratePartition(
 			ctx,
 			blobs,
 			partitionID,
-			m.config.ConnectionStringProperties.FullyQualifiedNamespace,
+			connectionStringProperties.FullyQualifiedNamespace,
 			eventHubProperties.Name,
 			consumerGroup,
 		)
