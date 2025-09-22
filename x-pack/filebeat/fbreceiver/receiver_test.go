@@ -265,6 +265,9 @@ func TestMultipleReceivers(t *testing.T) {
 }
 
 func TestReceiverDegraded(t *testing.T) {
+	if runtime.GOARCH == "arm64" && runtime.GOOS == "linux" {
+		t.Skip("flaky test on Ubuntu arm64, see https://github.com/elastic/beats/issues/46437")
+	}
 	testCases := []struct {
 		name            string
 		status          oteltest.ExpectedStatus

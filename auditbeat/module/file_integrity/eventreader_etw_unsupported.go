@@ -15,20 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package fleetmode
+//go:build !windows
 
-var managementEnabled bool
+package file_integrity
 
-// SetAgentMode stores if the Beat is running under Elastic Agent.
-// Normally this is called when the command line flags are parsed.
-// This is stored as a package level variable because some components
-// (like filebeat/metricbeat modules) don't have access to the
-// configuration information to determine this on their own.
-func SetAgentMode(enabled bool) {
-	managementEnabled = enabled
-}
+import (
+	"errors"
 
-// Enabled returns true if the Beat is running under Elastic Agent.
-func Enabled() bool {
-	return managementEnabled
+	"github.com/elastic/elastic-agent-libs/logp"
+)
+
+func newETWReader(Config, *logp.Logger) (EventProducer, error) {
+	return nil, errors.New("etw reader is not implemented on this system")
 }
