@@ -96,7 +96,7 @@ If no paths are specified, Filebeat reads from the default journal.
 stack: ga 9.2.0
 ```
 
-When enable entries from all journals will be read, including remote
+When enabled, entries from all journals will be read, including remote
 ones. This option is disabled by default.
 
 
