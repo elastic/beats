@@ -5,14 +5,14 @@ applies_to:
   stack: ga
 ---
 
-# Files are not fully ingested when using autodiscover (Kubernetes, Docker, etc)[kube-foo]
+# Files are not fully ingested when using autodiscover [kube-foo]
 
-By default Filebeat closes files as soon as they are removed, this can
+By default Filebeat closes files as soon as they are removed. This can
 cause Filebeat not to ingest the last log lines if files are removed
 shortly after the last entries were written. This is a common cause of
 data loss when using Kubernetes autodiscover.
 
-To prevent this from happening set:
+To prevent this from happening, set:
 - `close.on_state_change.removed: false` for the Filestream input
 - `close_removed: false` for the Log or Container input.
 
