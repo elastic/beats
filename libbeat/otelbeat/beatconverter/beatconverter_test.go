@@ -671,6 +671,7 @@ exporters:
   elasticsearch:
     sending_queue:
       batch:
+        flush_timeout: 10s
         max_size: 1600
       num_consumers: 1
       queue_size: 3200
@@ -695,6 +696,7 @@ exporters:
   elasticsearch:
     sending_queue:
       batch:
+        flush_timeout: 10s
         max_size: 1600
       num_consumers: 4
       queue_size: 12800
@@ -719,6 +721,7 @@ exporters:
   elasticsearch:
     sending_queue:
       batch:
+        flush_timeout: 10s
         max_size: 1600
       num_consumers: 1
       queue_size: 3200
@@ -746,6 +749,7 @@ exporters:
   elasticsearch:
     sending_queue:
       batch:
+        flush_timeout: 10s
         max_size: 50
       num_consumers: 1
       queue_size: 4100

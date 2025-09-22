@@ -547,6 +547,8 @@ processors:
 `
 	expectedExporter := `exporters:
     elasticsearch:
+        auth:
+            authenticator: beatsauth
         compression: gzip
         compression_params:
             level: 1
@@ -574,11 +576,11 @@ processors:
             queue_size: 3200
             wait_for_result: true
         user: admin
-        extensions:
-            beatsauth:
-                idle_connection_timeout: 3s
-                proxy_disable: false
-                timeout: 1m30s
+extensions:
+    beatsauth:
+        idle_connection_timeout: 3s
+        proxy_disable: false
+        timeout: 1m30s
 `
 	expectedReceiver := `receivers:
     metricbeatreceiver:
@@ -595,8 +597,12 @@ processors:
                   module: system
                   period: 1s
                   processes:
-                    - .*`
+                    - .*
+`
+
 	expectedService := `service:
+    extensions:
+        - beatsauth
     pipelines:
         logs:
             exporters:
