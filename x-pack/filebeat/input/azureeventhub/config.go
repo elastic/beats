@@ -147,6 +147,7 @@ func (conf *azureInputConfig) Validate() error {
 		return errors.New("no storage account configured (config: storage_account)")
 	}
 	if conf.SAContainer == "" {
+		// side effect: set the default storage account container name
 		conf.SAContainer = fmt.Sprintf("%s-%s", ephContainerName, conf.EventHubName)
 	}
 
@@ -161,6 +162,8 @@ func (conf *azureInputConfig) Validate() error {
 		//
 		// So instead of throwing an error to the user, we decided to replace
 		// underscores (_) characters with hyphens (-).
+
+		// side effect: replace underscores (_) with hyphens (-) in the storage account container name
 		conf.SAContainer = strings.ReplaceAll(conf.SAContainer, "_", "-")
 		logger.Warnf("replaced underscores (_) with hyphens (-) in the storage account container name (before: %s, now: %s", originalValue, conf.SAContainer)
 	}
