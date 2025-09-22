@@ -2,6 +2,7 @@ package util
 
 import (
 	"regexp"
+	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -39,7 +40,7 @@ func EnrichWorkloadInfo(fields mapstr.M, podNameKey string, event mb.Event) {
 
 	podNameValue, _ := fields.GetValue(podNameKey)
 	if podName, ok := podNameValue.(string); ok {
-		workloadName = ExtractWorkloadName(podName)
+		workloadName = ExtractWorkloadNameWithEvent(podName, event)
 	}
 
 	event.ModuleFields.DeepUpdate(mapstr.M{
@@ -59,4 +60,46 @@ func DuplicateWorkloadInfo(fields mapstr.M, workloadNameKey string, event mb.Eve
 			"name": workloadName,
 		},
 	})
+}
+
+// ExtractWorkloadNameWithEvent 基于 event.ModuleFields 中的工作负载类型优先选择对应正则；
+// 如未识别到明确类型则回退到原有的通用提取逻辑。
+func ExtractWorkloadNameWithEvent(podName string, event mb.Event) string {
+	if kind, ok := detectWorkloadKind(event.ModuleFields); ok {
+		switch kind {
+		case "deployment", "replicaset":
+			if m := regexp.MustCompile(`^(.*)-[a-z0-9]{8,10}-[a-z0-9]{5}$`).FindStringSubmatch(podName); m != nil {
+				return m[1]
+			}
+		case "statefulset":
+			if m := regexp.MustCompile(`^(.*)-\d+$`).FindStringSubmatch(podName); m != nil {
+				return m[1]
+			}
+		case "daemonset", "job", "cronjob":
+			if m := regexp.MustCompile(`^(.*)-[a-z0-9]{5,}$`).FindStringSubmatch(podName); m != nil {
+				return m[1]
+			}
+		}
+		// 若按类型的正则未匹配，则回退到通用逻辑
+		return ExtractWorkloadName(podName)
+	}
+	// 未能识别出类型，使用通用逻辑
+	return ExtractWorkloadName(podName)
+}
+
+// detectWorkloadKind 扫描 map，判断是否包含目标工作负载类型字段名
+// 返回 (类型小写, 是否找到)
+func detectWorkloadKind(m mapstr.M) (string, bool) {
+	if m == nil {
+		return "", false
+	}
+	// 扁平检查当前层的键名
+	for k := range m {
+		lk := strings.ToLower(k)
+		switch lk {
+		case "deployment", "replicaset", "daemonset", "job", "cronjob", "statefulset":
+			return lk, true
+		}
+	}
+	return "", false
 }
