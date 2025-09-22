@@ -966,11 +966,11 @@ func addFileToTar(ar *tar.Writer, baseDir string, pkgFile PackageFile) error {
 
 		// Check header.Mode overflow outside of Verbose so we don't mask
 		// an error
-		var headerMode int
-		if header.Mode > math.MaxInt {
-			return fmt.Errorf("Error: header.Mode [%o] exceeds int capacity for file [%s]", header.Mode, header.Name)
+		var headerMode uint32
+		if header.Mode > math.MaxUint32 {
+			return fmt.Errorf("Error: header.Mode [%o] exceeds uint32 capacity for file [%s]", header.Mode, header.Name)
 		} else {
-			headerMode = int(header.Mode)
+			headerMode = uint32(header.Mode)
 		}
 		if mg.Verbose() {
 			log.Println("Adding", os.FileMode(headerMode), header.Name)

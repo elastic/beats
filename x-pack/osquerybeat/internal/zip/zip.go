@@ -52,6 +52,7 @@ func Unzip(r *zip.ReadCloser, destinationDir string, files ...string) error {
 			continue
 		}
 
+		//nolint:gosec // file path is checked below
 		path := filepath.Join(destinationDir, file.Name)
 		// Check for directory traversal vulnerabilities.
 		if !strings.HasPrefix(path, filepath.Clean(destinationDir)+string(os.PathSeparator)) {
@@ -77,6 +78,7 @@ func Unzip(r *zip.ReadCloser, destinationDir string, files ...string) error {
 			}
 			defer rc.Close()
 
+			//nolint:gosec // used during build only, check sums are validated beforehand, the size of distro is predicatable
 			if _, err := io.Copy(outFile, rc); err != nil {
 				return err
 			}
