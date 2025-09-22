@@ -89,12 +89,17 @@ func TestNewConnectionStringProperties(t *testing.T) {
 
 	t.Run("WithoutEndpoint", func(t *testing.T) {
 		_, err := parseConnectionString("NoEndpoint=Blah")
-		require.EqualError(t, err, "key \"Endpoint\" must not be empty")
+		require.EqualError(t, err, "key \"Endpoint\" must not be empty\nkey \"SharedAccessKeyName\" and \"SharedAccessSignature\" must not be empty\nkey \"SharedAccessKey\" or \"SharedAccessSignature\" cannot both be empty")
 	})
 
 	t.Run("NoSASOrKeyName", func(t *testing.T) {
 		_, err := parseConnectionString("Endpoint=sb://" + namespace + ".servicebus.windows.net/")
-		require.EqualError(t, err, "key \"SharedAccessKeyName\" must not be empty")
+		require.EqualError(t, err, "key \"SharedAccessKeyName\" and \"SharedAccessSignature\" must not be empty\nkey \"SharedAccessKey\" or \"SharedAccessSignature\" cannot both be empty")
+	})
+
+	t.Run("EmptySASOrKeyName", func(t *testing.T) {
+		_, err := parseConnectionString("Endpoint=sb://" + namespace + ".servicebus.windows.net/;SharedAccessKeyName=;SharedAccessKey=;SharedAccessSignature=")
+		require.EqualError(t, err, "key \"SharedAccessKeyName\" and \"SharedAccessSignature\" must not be empty\nkey \"SharedAccessKey\" or \"SharedAccessSignature\" cannot both be empty")
 	})
 
 	t.Run("NoSASOrKeyValue", func(t *testing.T) {

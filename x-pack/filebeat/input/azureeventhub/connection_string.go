@@ -1,6 +1,14 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
+
+// This code is a modified version of the code from the Azure SDK for Go.
+//
+// The original code is available at:
+// https://github.com/Azure/azure-sdk-for-go/blob/main/sdk/messaging/azeventhubs/internal/exported/connection_string_properties.go
 
 //go:build !aix
 
@@ -60,6 +68,7 @@ func parseConnectionString(connStr string) (ConnectionStringProperties, error) {
 		sharedAccessSignatureKey = "SharedAccessSignature"
 		useEmulator              = "UseDevelopmentEmulator"
 	)
+	var errs []error
 
 	csp := ConnectionStringProperties{}
 
@@ -112,20 +121,27 @@ func parseConnectionString(connStr string) (ConnectionStringProperties, error) {
 			// there should always be at least two parts "sb:" and "//<emulator hostname>"
 			// with an optional 3rd piece that's the port "1111".
 			// (we don't need to validate it's a valid host since it's been through url.Parse() above)
-			return ConnectionStringProperties{}, fmt.Errorf("UseDevelopmentEmulator=true can only be used with sb://<emulator hostname> or sb://<emulator hostname>:<port number>, not %s", csp.Endpoint)
+			// return ConnectionStringProperties{}, fmt.Errorf("UseDevelopmentEmulator=true can only be used with sb://<emulator hostname> or sb://<emulator hostname>:<port number>, not %s", csp.Endpoint)
+			errs = append(errs, fmt.Errorf("UseDevelopmentEmulator=true can only be used with sb://<emulator hostname> or sb://<emulator hostname>:<port number>, not %s", csp.Endpoint))
 		}
 	}
 
 	if csp.FullyQualifiedNamespace == "" {
-		return ConnectionStringProperties{}, fmt.Errorf("key %q must not be empty", endpointKey)
+		errs = append(errs, fmt.Errorf("key %q must not be empty", endpointKey))
 	}
 
-	if csp.SharedAccessSignature == nil && csp.SharedAccessKeyName == nil {
-		return ConnectionStringProperties{}, fmt.Errorf("key %q must not be empty", sharedAccessKeyNameKey)
+	if (csp.SharedAccessSignature == nil || *csp.SharedAccessSignature == "") && (csp.SharedAccessKeyName == nil || *csp.SharedAccessKeyName == "") {
+		// return ConnectionStringProperties{}, fmt.Errorf("key %q must not be empty", sharedAccessKeyNameKey)
+		errs = append(errs, fmt.Errorf("key %q and %q must not be empty", sharedAccessKeyNameKey, sharedAccessSignatureKey))
 	}
 
-	if csp.SharedAccessKey == nil && csp.SharedAccessSignature == nil {
-		return ConnectionStringProperties{}, fmt.Errorf("key %q or %q cannot both be empty", sharedAccessKeyKey, sharedAccessSignatureKey)
+	if (csp.SharedAccessSignature == nil || *csp.SharedAccessSignature == "") && (csp.SharedAccessKey == nil || *csp.SharedAccessKey == "") {
+		// return ConnectionStringProperties{}, fmt.Errorf("key %q or %q cannot both be empty", sharedAccessKeyKey, sharedAccessSignatureKey)
+		errs = append(errs, fmt.Errorf("key %q or %q cannot both be empty", sharedAccessKeyKey, sharedAccessSignatureKey))
+	}
+
+	if len(errs) > 0 {
+		return ConnectionStringProperties{}, errors.Join(errs...)
 	}
 
 	return csp, nil
