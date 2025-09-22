@@ -211,43 +211,23 @@ func (conf *azureInputConfig) Validate() error {
 }
 
 // checkUnsupportedParams checks if unsupported/deprecated/discouraged parameters are set and logs a warning
-func (c *azureInputConfig) checkUnsupportedParams(logger *logp.Logger) {
+func (conf *azureInputConfig) checkUnsupportedParams(logger *logp.Logger) {
 	logger = logger.Named("azureeventhub.config")
 
 	// log a warning for each sanitization option not supported
-	for _, opt := range c.LegacySanitizeOptions {
+	for _, opt := range conf.LegacySanitizeOptions {
 		logger.Warnw("legacy sanitization `sanitize_options` options are deprecated and will be removed in the 9.0 release; use the `sanitizers` option instead", "option", opt)
 		err := sanitizeOptionsValidate(opt)
 		if err != nil {
 			logger.Warnf("%s: %v", opt, err)
 		}
 	}
-	if c.ProcessorVersion == processorV2 {
-		if c.SAKey != "" {
+	if conf.ProcessorVersion == processorV2 {
+		if conf.SAKey != "" {
 			logger.Warnf("storage_account_key is not used in processor v2, please remove it from the configuration (config: storage_account_key)")
 		}
 	}
 }
-
-// validateConnectionStringV2 validates the connection string for processor v2.
-// func (conf *azureInputConfig) validateConnectionStringV2(props ConnectionStringProperties) error {
-// First, check if the connection string is valid. We need to parse it
-// to get the endpoint and the entity path.
-// // validateConnectionStringV2 validates the connection string for processor v2.
-// func (conf *azureInputConfig) validateConnectionStringV2(props ConnectionStringProperties) error {
-// 	// First, check if the connection string is valid. We need to parse it
-// 	// to get the endpoint and the entity path.
-
-// 	if props.EntityPath != nil {
-// 		if *props.EntityPath != conf.EventHubName {
-// 			return fmt.Errorf("invalid connection string: entity path (%s) does not match event hub name (%s)", *props.EntityPath, conf.EventHubName)
-// 		}
-
-// 		conf.ConnectionStringContainsEntityPath = true
-// 	}
-
-// 	return nil
-// }
 
 // storageContainerValidate validated the storage_account_container to make sure it is conforming to all the Azure
 // naming rules.
