@@ -131,12 +131,10 @@ func parseConnectionString(connStr string) (ConnectionStringProperties, error) {
 	}
 
 	if (csp.SharedAccessSignature == nil || *csp.SharedAccessSignature == "") && (csp.SharedAccessKeyName == nil || *csp.SharedAccessKeyName == "") {
-		// return ConnectionStringProperties{}, fmt.Errorf("key %q must not be empty", sharedAccessKeyNameKey)
 		errs = append(errs, fmt.Errorf("key %q and %q must not be empty", sharedAccessKeyNameKey, sharedAccessSignatureKey))
 	}
 
 	if (csp.SharedAccessSignature == nil || *csp.SharedAccessSignature == "") && (csp.SharedAccessKey == nil || *csp.SharedAccessKey == "") {
-		// return ConnectionStringProperties{}, fmt.Errorf("key %q or %q cannot both be empty", sharedAccessKeyKey, sharedAccessSignatureKey)
 		errs = append(errs, fmt.Errorf("key %q or %q cannot both be empty", sharedAccessKeyKey, sharedAccessSignatureKey))
 	}
 
