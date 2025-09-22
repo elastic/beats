@@ -49,6 +49,7 @@ exporters:
     max_conns_per_host: 1
     sending_queue:
       batch:
+        flush_timeout: 10s
         max_size: 1600
         min_size: 0
         sizer: items
@@ -207,6 +208,7 @@ exporters:
     max_conns_per_host: 1
     sending_queue:
       batch:
+        flush_timeout: 10s
         max_size: 1600
         min_size: 0
         sizer: items

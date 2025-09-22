@@ -128,9 +128,10 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 
 		"sending_queue": map[string]any{
 			"batch": map[string]any{
-				"max_size": escfg.BulkMaxSize, // bulk_max_size
-				"min_size": 0,                 // 0 means immediately trigger a flush
-				"sizer":    "items",
+				"flush_timeout": "10s",
+				"max_size":      escfg.BulkMaxSize, // bulk_max_size
+				"min_size":      0,                 // 0 means immediately trigger a flush
+				"sizer":         "items",
 			},
 			"enabled":           true,
 			"queue_size":        getQueueSize(logger, output),
