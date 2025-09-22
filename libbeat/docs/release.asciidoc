@@ -8,14 +8,6 @@ This section summarizes the changes in each release. Also read
 <<breaking-changes>> for more detail about changes that affect
 upgrade.
 
-<<<<<<< HEAD
-=======
-* <<release-notes-9.1.4>>
-* <<release-notes-9.1.3>>
-* <<release-notes-9.1.2>>
-* <<release-notes-9.1.1>>
-* <<release-notes-9.1.0>>
->>>>>>> ecb59a5be (docs: Prepare Changelog for 9.1.4 (#46618))
 * <<release-notes-9.0.0-rc1>>
 * <<release-notes-9.0.0-beta1>>
 * <<release-notes-9.0.0>>
