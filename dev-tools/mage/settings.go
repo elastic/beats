@@ -46,7 +46,6 @@ const (
 	beatsFPMImage = "docker.elastic.co/beats-dev/fpm"
 	// BeatsCrossBuildImage is the image used for crossbuilding Beats.
 	BeatsCrossBuildImage = "docker.elastic.co/beats-dev/golang-crossbuild"
-	//BeatsCrossBuildImage = "docker.elastic.co/observability-ci/golang-crossbuild"
 
 	elasticBeatsImportPath = "github.com/elastic/beats"
 
@@ -482,7 +481,7 @@ func getBuildVariableSources() *BuildVariableSources {
 
 	panic(fmt.Errorf("magefile must call devtools.SetBuildVariableSources() "+
 		"because it is not an elastic beat (repo=%+v)", repo.RootImportPath))
-} //nolint:typecheck // typecheck linter complains about missing return here, however this is unreachable code with the panic() above
+}
 
 // BuildVariableSources is used to explicitly define what files contain build
 // variables and how to parse the values from that file. This removes ambiguity

@@ -250,6 +250,7 @@ func (list BuildPlatformList) Remove(name string) BuildPlatformList {
 	}
 
 	return list.filter(func(bp BuildPlatform) bool {
+		//nolint:staticcheck // leaving as-is since some find it easier to read
 		return !(bp.GOOS() == attrs.GOOS && bp.Arch() == attrs.Arch)
 	})
 }
