@@ -50,9 +50,8 @@ func TestClientShutdownPanic(t *testing.T) {
 		nil,
 		beat.Info{
 			Beat:        "libbeat",
-			IndexPrefix: "testbeat",
-			Logger:      logger},
-		outputs.NewStats(monitoring.NewRegistry(), logger), cfg)
+			IndexPrefix: "testbeat"},
+		outputs.NewStats(monitoring.NewRegistry()), cfg)
 	require.NoError(t, err, "could not create kafka output")
 
 	b := outest.NewBatch(
@@ -76,7 +75,7 @@ func TestClientShutdownPanic(t *testing.T) {
 
 	c, ok := outGroup.Clients[0].(*client)
 	require.Truef(t, ok, "Expected output to be of type %T", &client{})
-
+	c.log = logger
 	c.producer = producerMock{input: ch}
 
 	// 1st: Publish and block on channel send
