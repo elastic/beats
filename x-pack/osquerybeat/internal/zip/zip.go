@@ -54,11 +54,8 @@ func Unzip(r *zip.ReadCloser, destinationDir string, files ...string) error {
 
 		path := filepath.Join(destinationDir, file.Name)
 		// Check for directory traversal vulnerabilities.
-		if !strings.HasPrefix(path, destinationDir+string(os.PathSeparator)) {
-			return fmt.Errorf("illegal file path: %s", path)
-		}
-		if !strings.HasPrefix(path, filepath.Clean(destinationDir)) {
-			return fmt.Errorf("illegal file path in tar: %v", file.Name)
+		if !strings.HasPrefix(path, filepath.Clean(destinationDir)+string(os.PathSeparator)) {
+			return fmt.Errorf("illegal file path in zip: %s", path)
 		}
 
 		if file.FileInfo().IsDir() {
