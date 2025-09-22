@@ -71,6 +71,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed password authentication for ACL users in the Redis input of Filebeat. {pull}44137[44137]
 - Add beta GZIP file ingestion in filestream. {pull}45301[45301]
 -Change aws.cloudwatch.* field in awscloudwatch input to nested object. {pull}46357[46357]
+- Journald input now converts byte-encoded messages to string. {issue}40479[40479] {pull}46415[46415]
 - Filestream's `clean_inactive` setting is now validated, if the validation fails, Filebeat exits with an error code. To keep the legacy behavior of not validating set `legacy_clean_inactive: true`. {issue}45601[45601]
 {pull}46373[46373]
 - In Filestream, setting `clean_inactive: 0` now disables `clean_inactive`. To keep the legacy behavior of re-ingesting all files on restart set `legacy_clean_inactive: true`{issue}45601[45601]
@@ -112,6 +113,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Upgrade to osquery 5.12.1. {pull}40368[40368]
 - Upgrade to osquery 5.13.1. {pull}40849[40849]
 - Upgrade to osquery 5.15.0 {pull}43426[43426]
+- Upgrade to osquery 5.18.1 {pull}46624[46624]
 
 
 *Packetbeat*
@@ -158,6 +160,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Update Go version to 1.24.7 {pull}46070[46070].
 - Update github.com/go-viper/mapstructure/v2 to v2.4.0 {pull}46335[46335]
 - Update github.com/docker/docker to v28.3.3 {pull}46334[46334]
+- Make data updates in add_host_metadata processor synchronous {pull}46546[46546]
+- Fixed a panic in the Kafka output that could occur when shutting down while final events were being published. {issue}46109[46109] {pull}46446[46446]
 
 *Auditbeat*
 
@@ -286,6 +290,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - In Filestream, setting `clean_inactive: 0` does not re-ingest all files on startup any more. {issue}45601[45601]
 +{pull}46373[46373]
 - Fix metrics from TCP & UDP inputs when the port number is > 32767 {pull}46486[46486]
+- [Journald input] Fix reading all files in a folder and watching for new ones. {issue}46657[46657] {pull}46682[46682]
 
 *Heartbeat*
 
@@ -320,6 +325,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix an issue where the conntrack metricset entries field reported a count inflated by a factor of the number of CPU cores. {issue}46138[46138] {pull}46140[46140]
 - Enhance behavior of sanitizeError: replace sensitive info even if it is escaped and add pattern-based sanitization {pull}45857[45857]
 - Do not log an error if metadata enrichment is disabled for K8's module {pull}46536
+- Fix Azure Monitor wildcard metrics names timegrain issue by using the first, smallest timegrain; fix nil pointer issue {pull}46145[46145]
 
 *Osquerybeat*
 
@@ -339,7 +345,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
 - Fix EvtVarTypeAnsiString conversion {pull}44026[44026]
 - Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
-
+- Fix EventLog reset logic to not close renderers. {pull}46376[46376] {issue}45750{45750}
 
 *Elastic Logging Plugin*
 - Fix for unable to run elastic-logging plugin
@@ -376,6 +382,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add linux capabilities to processes in the system/process. {pull}37453[37453]
 - Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
 - Split module/system/process into common and provider bits. {pull}41868[41868]
+- Add new ETW FIM backend for Windows. {pull}45887[45887]
 
 *Auditbeat*
 
@@ -616,6 +623,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add SSL support for sql module: drivers mysql, postgres, and mssql. {pull}44748[44748]
 - Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
 - Add NTP response validation for system/ntp module. {pull}46184[46184]
+- Add vertexai_logs metricset to GCP for prompt response collection from VertexAI service. {pull}46383[46383]
 
 *Metricbeat*
 
