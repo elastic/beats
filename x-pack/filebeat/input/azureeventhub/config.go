@@ -210,7 +210,7 @@ func (conf *azureInputConfig) Validate() error {
 	return nil
 }
 
-// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged parameters are set and logs a warning
 func (c *azureInputConfig) checkUnsupportedParams(logger *logp.Logger) {
 	logger = logger.Named("azureeventhub.config")
 
