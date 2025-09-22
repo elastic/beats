@@ -1,0 +1,45 @@
+[
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "created"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "creation"
+        ]
+      },
+      "file": {
+        "accessed": "2025-08-11T09:45:54.5690996Z",
+        "attributes": [
+          "directory"
+        ],
+        "created": "2025-08-11T09:45:54.5690996Z",
+        "ctime": "2025-08-11T09:45:54.5690996Z",
+        "drive_letter": "C",
+        "inode": "9007199255210508",
+        "mtime": "2025-08-11T09:45:54.5690996Z",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesfsnotifycreate-directory2013080278\\001\\MySubDir",
+        "type": "dir",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-08-11T09:45:54.5690996Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 1509600,
+    "Period": 0,
+    "DisableTimeSeries": false
+  }
+]
