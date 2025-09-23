@@ -134,12 +134,16 @@ func TestMTLS(t *testing.T) {
 
 		for _, sm := range rm.ScopeMetrics {
 			for _, m := range sm.Metrics {
-				switch d := m.Data.(type) {
-				case metricdata.Sum[int64]:
-					if len(d.DataPoints) >= 1 {
-						return true
+				// bulk.create.ok is incremented only when the event is accepted
+				if m.Name == "bulk.create.ok" {
+					switch d := m.Data.(type) {
+					case metricdata.Sum[int64]:
+						if len(d.DataPoints) >= 1 {
+							return true
+						}
 					}
 				}
+
 			}
 		}
 		return false
@@ -204,10 +208,13 @@ func TestCATrustedFingerPrint(t *testing.T) {
 
 		for _, sm := range rm.ScopeMetrics {
 			for _, m := range sm.Metrics {
-				switch d := m.Data.(type) {
-				case metricdata.Sum[int64]:
-					if len(d.DataPoints) >= 1 {
-						return true
+				// bulk.create.ok is incremented only when the event is accepted
+				if m.Name == "bulk.create.ok" {
+					switch d := m.Data.(type) {
+					case metricdata.Sum[int64]:
+						if len(d.DataPoints) >= 1 {
+							return true
+						}
 					}
 				}
 			}
@@ -405,12 +412,16 @@ func TestVerificationMode(t *testing.T) {
 
 				for _, sm := range rm.ScopeMetrics {
 					for _, m := range sm.Metrics {
-						switch d := m.Data.(type) {
-						case metricdata.Sum[int64]:
-							if len(d.DataPoints) >= 1 {
-								return true
+						// bulk.create.ok is incremented only when the event is accepted
+						if m.Name == "bulk.create.ok" {
+							switch d := m.Data.(type) {
+							case metricdata.Sum[int64]:
+								if len(d.DataPoints) >= 1 {
+									return true
+								}
 							}
 						}
+
 					}
 				}
 				return false
