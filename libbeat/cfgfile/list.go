@@ -240,11 +240,8 @@ func createRunner(factory RunnerFactory, pipeline beat.PipelineConnector, cfg *r
 	c, _ := config.NewConfigFrom(cfg.Config)
 	if run, ok := factory.(RunnerFactoryWithStatusReporter); ok && cfg.StatusReporter != nil {
 		return run.CreateWithReporter(pipetool.WithDynamicFields(pipeline, cfg.Meta), c, cfg.StatusReporter)
-
-	} else {
-		return factory.Create(pipetool.WithDynamicFields(pipeline, cfg.Meta), c)
-	}
-
+	} 
+	return factory.Create(pipetool.WithDynamicFields(pipeline, cfg.Meta), c)
 }
 
 type UnitError struct {

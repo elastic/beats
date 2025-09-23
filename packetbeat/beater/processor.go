@@ -139,11 +139,7 @@ func (p *processorFactory) CreateWithReporter(pipeline beat.PipelineConnector, c
 
 // Create returns a new module runner that publishes to the provided pipeline, configured from cfg.
 func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) (cfgfile.Runner, error) {
-	duration, publisher, flows, sniffer, errChan, err := p.create(pipeline, cfg, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create packetbeat processor: %w", err)
-	}
-	return newProcessor(duration, publisher, flows, sniffer, errChan, nil), nil
+	return p.CreateWithReporter(pipeline, cfg, nil)
 }
 
 func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, reporter status.StatusReporter) (time.Duration, *publish.TransactionPublisher, *flows.Flows, *sniffer.Sniffer, chan error, error) {
