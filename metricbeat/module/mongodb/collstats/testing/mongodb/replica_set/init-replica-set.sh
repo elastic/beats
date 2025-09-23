@@ -53,23 +53,29 @@ echo "Using MongoDB shell: $SHELL_CMD"
 echo "Waiting for MongoDB to be ready..."
 retry docker exec "$PRIMARY" $SHELL_CMD --quiet --eval "db.adminCommand('ping')"
 
-# Initialize replica set
+# Ensure all members' mongod are up before initiating (avoids quorum failures)
+echo "Checking members readiness..."
+retry docker exec "$SECONDARY1" $SHELL_CMD --quiet --eval "db.adminCommand('ping')"
+retry docker exec "$SECONDARY2" $SHELL_CMD --quiet --eval "db.adminCommand('ping')"
+retry docker exec "$ARBITER"    $SHELL_CMD --quiet --eval "db.adminCommand('ping')"
+
+# Initialize replica set using service names for stable DNS within the compose network
 echo "Initializing replica set '$RS_NAME'..."
 cat <<JS | docker exec -i "$PRIMARY" $SHELL_CMD --quiet
 rs.initiate({
     _id: "$RS_NAME",
     members: [
-        { _id: 0, host: "${PRIMARY}:27017", priority: 2 },
-        { _id: 1, host: "${SECONDARY1}:27017", priority: 1 },
-        { _id: 2, host: "${SECONDARY2}:27017", priority: 1 },
-        { _id: 3, host: "${ARBITER}:27017", priority: 0, arbiterOnly: true }
+        { _id: 0, host: "mongo-primary:27017",   priority: 2 },
+        { _id: 1, host: "mongo-secondary1:27017", priority: 1 },
+        { _id: 2, host: "mongo-secondary2:27017", priority: 1 },
+        { _id: 3, host: "mongo-arbiter:27017",    priority: 0, arbiterOnly: true }
     ]
 })
 JS
 
-# Wait for primary election
+# Wait for primary election (ensure this node is writable primary)
 echo "Waiting for primary election to complete..."
-retry docker exec "$PRIMARY" $SHELL_CMD --quiet --eval "rs.status().members.find(m => m.stateStr === 'PRIMARY')"
+retry docker exec "$PRIMARY" $SHELL_CMD --quiet --eval "var h = (typeof db.hello === 'function') ? db.hello() : db.isMaster(); if (!(h.isWritablePrimary || h.ismaster === true)) { quit(1) }"
 
 # Seed test data
 echo "Seeding test data into mbtest database..."

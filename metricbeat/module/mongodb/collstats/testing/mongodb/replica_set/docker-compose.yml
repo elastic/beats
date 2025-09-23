@@ -45,7 +45,7 @@ services:
 
   mongo-arbiter:
     image: *mongo_image
-    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--smallfiles", "--nojournal"]
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
     ports:
       - "27020:27017"
     volumes:
