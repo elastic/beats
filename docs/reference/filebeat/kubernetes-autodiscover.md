@@ -16,9 +16,15 @@ To prevent this from happening set:
 - `close.on_state_change.removed: false` for the Filestream input
 - `close_removed: false` for the Log or Container input.
 
-If using hints, this also needs to be set for:
- - <= 9.0.7 if running Filebeat 8.x or 9.0.x
- - <= 9.1.4 if running Filebeat 9.1.x
+{applies_to}`ga: 9.2.0` The hints based autodiscover configuration includes the
+`close.on_state_change.removed` setting, set to `false` by default.
+
+:::{note}
+In Filebeat versions 8.x and between versions 9.0.0 - 9.0.7 and
+9.1.0 - 9.1.4, this setting isn't specified by default, so you must
+add it to the configuration manually.
+:::
+
 
 Here is an example of setting `close.on_state_change.removed: false`
 when using hints on Kubernetes:

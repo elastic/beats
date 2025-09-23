@@ -397,7 +397,7 @@ filebeat.autodiscover:
         id: ${data.nomad.task.name}-${data.nomad.allocation.id} <2>
         paths:
           - /opt/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
-        close.on_state_change.removed: false # <3>
+        close.on_state_change.removed: false <3>
         processors:
           - add_fields: <4>
               target: nomad
