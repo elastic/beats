@@ -121,11 +121,16 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 	// Try top command first (works on mongod), fall back to listCollections (works on mongos)
 	collections, err := m.getCollectionsFromTop(client)
 	if err != nil {
-		m.Logger().Debugf("top command failed (likely mongos), falling back to listCollections: %v", err)
-		collections, err = m.getCollectionsList(client)
-		if err != nil {
-			return fmt.Errorf("failed to get collections using fallback method: %w", err)
-		}
+		return fmt.Errorf("top command failed (likely) mongos: %v", err)
+
+		// NOTE(shmsr): This is a specialized feature that is supposed to be for mongos, we will be in adding it
+		// after discussion in later commits. However, disabling the feature for now.
+		//
+		// m.Logger().Debugf("top command failed (likely mongos), falling back to listCollections: %v", err)
+		// collections, err = m.getCollectionsList(client)
+		// if err != nil {
+		// 	return fmt.Errorf("failed to get collections using fallback method: %w", err)
+		// }
 	}
 
 	collStatsErrGroup := &errgroup.Group{}
@@ -670,33 +675,36 @@ func (m *Metricset) getCollectionsFromTop(client *mongo.Client) ([]CollectionInf
 	return collections, nil
 }
 
-// getCollectionsList gets all collections from all databases (mongos compatible)
-func (m *Metricset) getCollectionsList(client *mongo.Client) ([]CollectionInfo, error) {
-	// Get list of database names
-	dbNames, err := client.ListDatabaseNames(context.Background(), bson.D{})
-	if err != nil {
-		return nil, fmt.Errorf("could not retrieve database names: %w", err)
-	}
+// // getCollectionsList gets all collections from all databases (mongos compatible)
+// // See: https://www.mongodb.com/docs/manual/reference/command/top/
+// // The 'top' command must be run against a mongod instance and running top against a mongos
+// // instance returns an error and hence a mongos compatible implementation is required.
+// func (m *Metricset) getCollectionsList(client *mongo.Client) ([]CollectionInfo, error) {
+// 	// Get list of database names
+// 	dbNames, err := client.ListDatabaseNames(context.Background(), bson.D{})
+// 	if err != nil {
+// 		return nil, fmt.Errorf("could not retrieve database names: %w", err)
+// 	}
 
-	var collections []CollectionInfo
+// 	var collections []CollectionInfo
 
-	for _, dbName := range dbNames {
-		db := client.Database(dbName)
-		collNames, err := db.ListCollectionNames(context.Background(), bson.D{})
-		if err != nil {
-			m.Logger().Debugf("Failed to list collections for database %s: %v", dbName, err)
-			continue
-		}
+// 	for _, dbName := range dbNames {
+// 		db := client.Database(dbName)
+// 		collNames, err := db.ListCollectionNames(context.Background(), bson.D{})
+// 		if err != nil {
+// 			m.Logger().Debugf("Failed to list collections for database %s: %v", dbName, err)
+// 			continue
+// 		}
 
-		for _, collName := range collNames {
-			collections = append(collections, CollectionInfo{
-				Database:   dbName,
-				Collection: collName,
-				TopInfo:    nil, // No top info available when using listCollections
-			})
-		}
-	}
+// 		for _, collName := range collNames {
+// 			collections = append(collections, CollectionInfo{
+// 				Database:   dbName,
+// 				Collection: collName,
+// 				TopInfo:    nil, // No top info available when using listCollections
+// 			})
+// 		}
+// 	}
 
-	m.Logger().Debugf("Found %d collections across %d databases using listCollections", len(collections), len(dbNames))
-	return collections, nil
-}
+// 	m.Logger().Debugf("Found %d collections across %d databases using listCollections", len(collections), len(dbNames))
+// 	return collections, nil
+// }
