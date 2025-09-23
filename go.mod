@@ -236,6 +236,27 @@ require (
 )
 
 require (
+<<<<<<< HEAD
+=======
+	github.com/apache/arrow-go/v18 v18.4.1
+	github.com/cilium/ebpf v0.19.0
+	github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.2.0
+	go.opentelemetry.io/collector/client v1.41.0
+	go.opentelemetry.io/collector/exporter v0.135.0
+	go.opentelemetry.io/collector/exporter/exporterhelper v0.135.0
+	go.opentelemetry.io/collector/exporter/exportertest v0.135.0
+	go.opentelemetry.io/collector/pipeline v1.41.0
+	go.opentelemetry.io/collector/processor v1.41.0
+	go.opentelemetry.io/collector/processor/processorhelper v0.135.0
+	go.opentelemetry.io/collector/receiver/receivertest v0.135.0
+	go.opentelemetry.io/otel/sdk/metric v1.38.0
+	go.uber.org/goleak v1.3.0
+	sigs.k8s.io/kind v0.29.0
+)
+
+require (
+	al.essio.dev/pkg/shellescape v1.5.1 // indirect
+>>>>>>> d3be9bf15 (Remove settings on ES exporter config that no longer function (#46428))
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
 	cel.dev/expr v0.20.0 // indirect
 	cloud.google.com/go/auth v0.13.0 // indirect

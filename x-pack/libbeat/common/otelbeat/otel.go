@@ -18,7 +18,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/fbprovider"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
+<<<<<<< HEAD
 	"github.com/elastic/elastic-agent-libs/logp"
+=======
+	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
+	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter"
+	"github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension"
+>>>>>>> d3be9bf15 (Remove settings on ES exporter config that no longer function (#46428))
 )
 
 var schemeMap = map[string]string{
@@ -56,6 +64,24 @@ func OTelCmd(beatname string) *cobra.Command {
 func getComponent() (otelcol.Factories, error) {
 	receivers, err := otelcol.MakeFactoryMap(
 		fbreceiver.NewFactory(),
+<<<<<<< HEAD
+=======
+		mbreceiver.NewFactory(),
+	)
+	if err != nil {
+		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
+	}
+
+	extensions, err := otelcol.MakeFactoryMap(
+		beatsauthextension.NewFactory(),
+	)
+	if err != nil {
+		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
+	}
+
+	processors, err := otelcol.MakeFactoryMap(
+		beatprocessor.NewFactory(),
+>>>>>>> d3be9bf15 (Remove settings on ES exporter config that no longer function (#46428))
 	)
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
@@ -70,8 +96,15 @@ func getComponent() (otelcol.Factories, error) {
 	}
 
 	return otelcol.Factories{
+<<<<<<< HEAD
 		Receivers: receivers,
 		Exporters: exporters,
+=======
+		Receivers:  receivers,
+		Processors: processors,
+		Exporters:  exporters,
+		Extensions: extensions,
+>>>>>>> d3be9bf15 (Remove settings on ES exporter config that no longer function (#46428))
 	}, nil
 
 }

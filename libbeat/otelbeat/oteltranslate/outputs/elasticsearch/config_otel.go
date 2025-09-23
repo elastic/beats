@@ -27,14 +27,13 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
-	oteltranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+<<<<<<< HEAD
 // TODO: add  following unuspported params to below struct
 // indices
 // pipelines
@@ -50,13 +49,14 @@ type unsupportedConfig struct {
 	Kerberos           *kerberos.Config  `config:"kerberos"`
 }
 
+=======
+>>>>>>> d3be9bf15 (Remove settings on ES exporter config that no longer function (#46428))
 type esToOTelOptions struct {
 	elasticsearch.ElasticsearchConfig `config:",inline"`
 	outputs.HostWorkerCfg             `config:",inline"`
 
 	Index    string `config:"index"`
 	Pipeline string `config:"pipeline"`
-	ProxyURL string `config:"proxy_url"`
 	Preset   string `config:"preset"`
 }
 
@@ -65,7 +65,6 @@ var defaultOptions = esToOTelOptions{
 
 	Index:    "filebeat-9.0.0", // TODO. Default value should be filebeat-%{[agent.version]}
 	Pipeline: "",
-	ProxyURL: "",
 	Preset:   "custom", // default is custom if not set
 }
 
@@ -118,6 +117,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 		hosts = append(hosts, esURL)
 	}
 
+<<<<<<< HEAD
 	// convert ssl configuration
 	otelTLSConfg, err := oteltranslate.TLSCommonToOTel(escfg.Transport.TLS)
 	if err != nil {
@@ -129,14 +129,25 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	if escfg.NumWorkers() > 1 {
 		workers = escfg.NumWorkers()
 	}
+=======
+>>>>>>> d3be9bf15 (Remove settings on ES exporter config that no longer function (#46428))
 	otelYAMLCfg := map[string]any{
 		"logs_index":  escfg.Index, // index
 		"endpoints":   hosts,       // hosts, protocol, path, port
 		"num_workers": workers,     // worker/workers
 
+<<<<<<< HEAD
 		// ClientConfig
 		"timeout":           escfg.Transport.Timeout,         // timeout
 		"idle_conn_timeout": escfg.Transport.IdleConnTimeout, // idle_connection_timeout
+=======
+		// max_conns_per_host is a "hard" limit on number of open connections.
+		// Ideally, escfg.NumWorkers() should map to num_consumer, but we had a bug in upstream
+		// where it could spin as many goroutines as it liked.
+		// Given that batcher implementation can change and it has a history of such changes,
+		// let's keep max_conns_per_host setting for now and remove it once exporterhelper is stable.
+		"max_conns_per_host": escfg.NumWorkers(),
+>>>>>>> d3be9bf15 (Remove settings on ES exporter config that no longer function (#46428))
 
 		// Retry
 		"retry": map[string]any{
@@ -173,6 +184,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	setIfNotNil(otelYAMLCfg, "password", escfg.Password)                                         // password
 	setIfNotNil(otelYAMLCfg, "api_key", base64.StdEncoding.EncodeToString([]byte(escfg.APIKey))) // api_key
 
+<<<<<<< HEAD
 	setIfNotNil(otelYAMLCfg, "headers", escfg.Headers)    // headers
 	setIfNotNil(otelYAMLCfg, "tls", otelTLSConfg)         // tls config
 	setIfNotNil(otelYAMLCfg, "proxy_url", escfg.ProxyURL) // proxy_url
@@ -181,10 +193,21 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	if err := typeSafetyCheck(otelYAMLCfg); err != nil {
 		return nil, err
 	}
+=======
+	setIfNotNil(otelYAMLCfg, "headers", escfg.Headers)   // headers
+	setIfNotNil(otelYAMLCfg, "pipeline", escfg.Pipeline) // pipeline
+	// Dynamic routing is disabled if output.elasticsearch.index is set
+	setIfNotNil(otelYAMLCfg, "logs_index", escfg.Index) // index
+>>>>>>> d3be9bf15 (Remove settings on ES exporter config that no longer function (#46428))
+
+	// idle_connection_timeout, timeout, ssl block,
+	// proxy_url, proxy_headers, proxy_disable are handled by beatsauthextension https://github.com/elastic/opentelemetry-collector-components/tree/main/extension/beatsauthextension
+	// caller of this method should take care of integrating the extension
 
 	return otelYAMLCfg, nil
 }
 
+<<<<<<< HEAD
 // For type safety check
 func typeSafetyCheck(value map[string]any) error {
 	// the  value should match `elasticsearchexporter.Config` type.
@@ -201,6 +224,29 @@ func typeSafetyCheck(value map[string]any) error {
 		return err
 	}
 	return err
+=======
+// log warning for unsupported config
+func checkUnsupportedConfig(cfg *config.C, logger *logp.Logger) error {
+	if cfg.HasField("indices") {
+		return fmt.Errorf("indices is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("pipelines") {
+		return fmt.Errorf("pipelines is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("parameters") {
+		return fmt.Errorf("parameters is currently not supported: %w", errors.ErrUnsupported)
+	} else if value, err := cfg.Bool("allow_older_versions", -1); err == nil && !value {
+		return fmt.Errorf("allow_older_versions:false is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("loadbalance") {
+		return fmt.Errorf("loadbalance is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("non_indexable_policy") {
+		return fmt.Errorf("non_indexable_policy is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("escape_html") {
+		return fmt.Errorf("escape_html is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("kerberos") {
+		return fmt.Errorf("kerberos is currently not supported: %w", errors.ErrUnsupported)
+	}
+
+	return nil
+>>>>>>> d3be9bf15 (Remove settings on ES exporter config that no longer function (#46428))
 }
 
 // Helper function to check if a struct is empty
