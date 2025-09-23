@@ -21,9 +21,20 @@ package feature
 
 import "strconv"
 
-const _Stability_name = "UndefinedStableBetaExperimental"
+func _() {
+	// An "invalid array index" compiler error signifies that the constant values have changed.
+	// Re-run the stringer command to generate them again.
+	var x [1]struct{}
+	_ = x[Undefined-0]
+	_ = x[Stable-1]
+	_ = x[Beta-2]
+	_ = x[Experimental-3]
+	_ = x[Preview-4]
+}
 
-var _Stability_index = [...]uint8{0, 9, 15, 19, 31}
+const _Stability_name = "UndefinedStableBetaExperimentalPreview"
+
+var _Stability_index = [...]uint8{0, 9, 15, 19, 31, 38}
 
 func (i Stability) String() string {
 	if i < 0 || i >= Stability(len(_Stability_index)-1) {
