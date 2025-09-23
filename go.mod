@@ -237,11 +237,7 @@ require (
 require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.19.0
-	github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.2.0
 	go.opentelemetry.io/collector/client v1.41.0
-	go.opentelemetry.io/collector/config/configauth v0.135.0
-	go.opentelemetry.io/collector/config/confighttp v0.135.0
-	go.opentelemetry.io/collector/config/configoptional v0.135.0
 	go.opentelemetry.io/collector/confmap/xconfmap v0.135.0
 	go.opentelemetry.io/collector/exporter v0.135.0
 	go.opentelemetry.io/collector/exporter/exporterhelper v0.135.0
@@ -435,9 +431,12 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.0 // indirect
 	go.opentelemetry.io/collector/component/componenttest v0.135.0 // indirect
+	go.opentelemetry.io/collector/config/configauth v0.135.0 // indirect
 	go.opentelemetry.io/collector/config/configcompression v1.41.0 // indirect
+	go.opentelemetry.io/collector/config/confighttp v0.135.0 // indirect
 	go.opentelemetry.io/collector/config/configmiddleware v1.41.0 // indirect
 	go.opentelemetry.io/collector/config/configopaque v1.41.0 // indirect
+	go.opentelemetry.io/collector/config/configoptional v0.135.0 // indirect
 	go.opentelemetry.io/collector/config/configretry v1.41.0 // indirect
 	go.opentelemetry.io/collector/config/configtelemetry v0.135.0 // indirect
 	go.opentelemetry.io/collector/connector v0.135.0 // indirect
