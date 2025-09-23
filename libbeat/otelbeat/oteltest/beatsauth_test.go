@@ -82,9 +82,6 @@ func TestMTLS(t *testing.T) {
 		Type:  "CERTIFICATE",
 		Bytes: caCert.Leaf.Raw}), 0o777)
 
-	certPool := x509.NewCertPool()
-	certPool.AddCert(caCert.Leaf)
-
 	// create server certificates
 	serverCerts, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "server", []string{"localhost"}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
 	if err != nil {
@@ -95,6 +92,9 @@ func TestMTLS(t *testing.T) {
 	clientCertificate, clientKey := getClientCerts(t, caCert)
 
 	// start test server with given server and root certs
+	certPool := x509.NewCertPool()
+	certPool.AddCert(caCert.Leaf)
+
 	serverName, metricReader := startTestServer(t, &tls.Config{
 		// NOTE: client certificates are not verified  unless ClientAuth is set to RequireAndVerifyClientCert.
 		ClientAuth:   tls.RequireAndVerifyClientCert,
@@ -126,10 +126,11 @@ receivers:
 				ClientKey:     clientKey,
 			}))
 
+	// translate beat to beatreceiver config
 	output := getTranslatedConf(t, otelConfigBuffer.Bytes())
 
-	// get new test exporter with auth
-	exp := newTestESExporterWithAuth(t, output)
+	// get new test exporter
+	exp := newTestESExporter(t, output)
 
 	// get new beats authenticator
 	beatsauth := newAuthenticator(t, beatsauthextension.Config{
@@ -148,7 +149,7 @@ receivers:
 	// send logs
 	require.NoError(t, mustSendLogs(t, exp, getLogRecord(t)), "error sending logs")
 
-	// check if data has reached
+	// check if data has reached ES
 	assertReceivedLogRecord(t, metricReader)
 }
 
@@ -189,10 +190,11 @@ receivers:
 				CATrustedFingerPrint: fingerprint,
 			}))
 
+	// translate beat to beatreceiver config
 	output := getTranslatedConf(t, otelConfigBuffer.Bytes())
 
-	// get new test exporter with authenticator set
-	exp := newTestESExporterWithAuth(t, output)
+	// get new test exporter
+	exp := newTestESExporter(t, output)
 
 	// get new beats authenticator
 	beatsauth := newAuthenticator(t, beatsauthextension.Config{
@@ -211,7 +213,7 @@ receivers:
 	// send logs
 	require.NoError(t, mustSendLogs(t, exp, getLogRecord(t)), "error sending logs")
 
-	// check if data has reached
+	// check if data has reached ES
 	assertReceivedLogRecord(t, metricReader)
 }
 
@@ -348,7 +350,7 @@ func TestVerificationMode(t *testing.T) {
 				Certificates: []tls.Certificate{certs},
 			})
 
-			u, _ := url.Parse(serverName) //nolint: errcheck // this is test
+			u, _ := url.Parse(serverName)
 			_, port, _ := net.SplitHostPort(u.Host)
 
 			inputConfig := `
@@ -373,10 +375,11 @@ receivers:
 						VerificationMode: test.verificationMode,
 					}))
 
+			// translate beat to beatreceiver config
 			output := getTranslatedConf(t, otelConfigBuffer.Bytes())
 
 			// get an instance of es exporter
-			exp := newTestESExporterWithAuth(t, output)
+			exp := newTestESExporter(t, output)
 
 			authConfig := beatsauthextension.Config{
 				BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any),
@@ -406,7 +409,7 @@ receivers:
 				return
 			}
 
-			// check if data has reached
+			// check if data has reached ES
 			assertReceivedLogRecord(t, metricReader)
 
 		})
@@ -436,9 +439,8 @@ func newAuthenticator(t *testing.T, config beatsauthextension.Config) extension.
 	return extension
 }
 
-// newTestESExporterWithAuth returns a test exporter with authenticator set
-// It returns unstarted instance of ES exporter and observer that captures the internal logs
-func newTestESExporterWithAuth(t *testing.T, conf *confmap.Conf) (ESexporter exporter.Logs) {
+// newTestESExporterWithAuth returns a test exporter
+func newTestESExporter(t *testing.T, conf *confmap.Conf) (ESexporter exporter.Logs) {
 
 	f := elasticsearchexporter.NewFactory()
 	cfg := &elasticsearchexporter.Config{
