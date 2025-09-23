@@ -109,18 +109,6 @@ func getDevicePerformanceScores(logger *logp.Logger, client *sdk.Client, devices
 	}
 }
 
-type NetworkHealthService interface {
-	GetNetworkNetworkHealthChannelUtilization(networkID string, getNetworkNetworkHealthChannelUtilizationQueryParams *sdk.GetNetworkNetworkHealthChannelUtilizationQueryParams) (*sdk.ResponseNetworksGetNetworkNetworkHealthChannelUtilization, *resty.Response, error)
-}
-
-type NetworkHealthServiceWrapper struct {
-	service *sdk.NetworksService
-}
-
-func (w *NetworkHealthServiceWrapper) GetNetworkNetworkHealthChannelUtilization(networkID string, getNetworkNetworkHealthChannelUtilizationQueryParams *sdk.GetNetworkNetworkHealthChannelUtilizationQueryParams) (*sdk.ResponseNetworksGetNetworkNetworkHealthChannelUtilization, *resty.Response, error) {
-	return w.service.GetNetworkNetworkHealthChannelUtilization(networkID, getNetworkNetworkHealthChannelUtilizationQueryParams)
-}
-
 type DeviceService interface {
 	GetOrganizationWirelessDevicesChannelUtilizationByDevice(organizationID string, getOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams *sdk.GetOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams) (*resty.Response, error)
 }
