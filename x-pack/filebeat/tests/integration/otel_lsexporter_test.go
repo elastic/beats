@@ -10,7 +10,8 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"math/rand"
+	"math"
+	"math/rand/v2"
 	"os"
 	"path/filepath"
 	"sort"
@@ -18,13 +19,13 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type event struct {
@@ -148,27 +149,30 @@ func generateEvents(numEvents int) []string {
 	events := make([]string, 0, numEvents)
 	for i := 0; i < numEvents; i++ {
 		// Generate mixed-type array field
-		arrayField := make([]interface{}, 5)
+		arrayField := make([]interface{}, 9)
 		arrayField[0] = gofakeit.Word()
-		arrayField[1] = gofakeit.Number(1, 1000)
-		arrayField[2] = gofakeit.Float64Range(0, 100)
-		arrayField[3] = rand.Intn(2) == 0 // bool
+		arrayField[1] = gofakeit.Int64()
+		arrayField[2] = gofakeit.Float64()
+		arrayField[3] = rand.IntN(2) == 0 // bool
 		arrayField[4] = gofakeit.Name()
+		arrayField[5] = math.MaxInt
+		arrayField[6] = math.MinInt
+		arrayField[7] = math.MaxFloat64
+		arrayField[8] = math.SmallestNonzeroFloat64
 
-		// Generate mixed-type array for kv_field
 		kvArrayField := make([]interface{}, 4)
 		kvArrayField[0] = gofakeit.Color()
 		kvArrayField[1] = gofakeit.Number(-100, 100)
 		kvArrayField[2] = gofakeit.Float32Range(0, 50)
-		kvArrayField[3] = rand.Intn(2) == 0 // bool
+		kvArrayField[3] = rand.IntN(2) == 0 // bool
 
 		ev := event{
 			ID:           uuid.Must(uuid.NewV4()).String(),
 			Timestamp:    time.Now().Format(time.RFC3339Nano),
 			StringField:  gofakeit.Sentence(2),
-			NumberField:  rand.Intn(1000),
+			NumberField:  rand.IntN(1000),
 			FloatField:   rand.Float64() * 100,
-			BooleanField: rand.Intn(2) == 0,
+			BooleanField: rand.IntN(2) == 0,
 			ArrayField:   arrayField,
 			ObjectField: map[string]interface{}{
 				"nested_key":    "nested_value",
@@ -177,10 +181,10 @@ func generateEvents(numEvents int) []string {
 			KVField: map[string]interface{}{
 				"key_string": gofakeit.Word(),
 				"key_number": gofakeit.Number(1, 5000),
-				"key_bool":   rand.Intn(2) == 0,
+				"key_bool":   rand.IntN(2) == 0,
 				"key_array":  kvArrayField,
 				"key_object": map[string]interface{}{
-					"inner1": rand.Intn(2) == 0,
+					"inner1": rand.IntN(2) == 0,
 					"inner2": gofakeit.Float64Range(0, 10),
 					"inner_obj": map[string]interface{}{
 						"deep_key": gofakeit.HipsterSentence(3),
@@ -275,7 +279,7 @@ func readAllEvents(filePath string) ([]eventWithID, error) {
 		// parse json line
 		outerData, err := parseJson(line)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse outer JSON at line %d: %v", lineNumber, err)
+			return nil, fmt.Errorf("failed to parse outer JSON at line %d: %w", lineNumber, err)
 		}
 
 		// extract the message field
@@ -292,7 +296,7 @@ func readAllEvents(filePath string) ([]eventWithID, error) {
 		// parse original event
 		innerData, err := parseJson(messageStr)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse inner JSON from message field at line %d: %v", lineNumber, err)
+			return nil, fmt.Errorf("failed to parse inner JSON from message field at line %d: %w", lineNumber, err)
 		}
 
 		// extract original event id
