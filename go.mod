@@ -238,6 +238,7 @@ require (
 	github.com/cilium/ebpf v0.19.0
 	github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.2.0
 	go.opentelemetry.io/collector/client v1.41.0
+	go.opentelemetry.io/collector/consumer/consumertest v0.135.0
 	go.opentelemetry.io/collector/exporter v0.135.0
 	go.opentelemetry.io/collector/exporter/exporterhelper v0.135.0
 	go.opentelemetry.io/collector/exporter/exportertest v0.135.0
@@ -441,7 +442,6 @@ require (
 	go.opentelemetry.io/collector/connector/connectortest v0.135.0 // indirect
 	go.opentelemetry.io/collector/connector/xconnector v0.135.0 // indirect
 	go.opentelemetry.io/collector/consumer/consumererror/xconsumererror v0.135.0 // indirect
-	go.opentelemetry.io/collector/consumer/consumertest v0.135.0 // indirect
 	go.opentelemetry.io/collector/consumer/xconsumer v0.135.0 // indirect
 	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.135.0 // indirect
 	go.opentelemetry.io/collector/exporter/xexporter v0.135.0 // indirect
