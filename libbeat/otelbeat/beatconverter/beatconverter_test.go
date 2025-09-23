@@ -61,13 +61,9 @@ exporters:
       mode: bodymap
     compression: gzip
     compression_params:
-<<<<<<< HEAD
-      level: 1       
-=======
       level: 1 
     auth:
       authenticator: beatsauth  
->>>>>>> d3be9bf15 (Remove settings on ES exporter config that no longer function (#46428))
 `
 
 func TestConverter(t *testing.T) {
@@ -223,13 +219,9 @@ exporters:
       mode: bodymap   
     compression: gzip
     compression_params:
-<<<<<<< HEAD
-      level: 1    
-=======
       level: 1
     auth:
       authenticator: beatsauth  
->>>>>>> d3be9bf15 (Remove settings on ES exporter config that no longer function (#46428))
 receivers:
   filebeatreceiver:
     filebeat:
