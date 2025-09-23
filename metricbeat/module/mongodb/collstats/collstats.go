@@ -80,7 +80,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	// Set defaults
-	if options.Scale == 0 {
+	if options.Scale <= 0 {
 		options.Scale = 1 // no scaling; for example if Scale = 1024, then metrics come with the unit KiB
 	}
 
@@ -216,7 +216,7 @@ func (m *Metricset) fetchCollStatsAggregation(client *mongo.Client, dbName, coll
 
 	// Build $collStats stage dynamically (reference: mongosh capabilities)
 	storageStatsOptions := bson.D{}
-	if m.options.Scale != 1 && m.options.Scale != 0 {
+	if m.options.Scale > 1 {
 		storageStatsOptions = append(storageStatsOptions, bson.E{Key: "scale", Value: m.options.Scale})
 	}
 
@@ -400,24 +400,33 @@ func mergeShardedCollStats(shardResults []map[string]interface{}) (map[string]in
 
 	// Calculate weighted averages
 	for _, field := range avgFields {
-		if totalDocCount > 0 {
-			weightedSum := float64(0)
-			for _, shardResult := range shardResults {
-				if avgValue, exists := shardResult[field]; exists {
-					if count, countExists := shardResult["count"]; countExists {
-						if numAvg, ok1 := convertToFloat64(avgValue); ok1 {
-							if numCount, ok2 := convertToFloat64(count); ok2 {
-								weightedSum += numAvg * numCount
-							}
-						}
-					}
-				}
-			}
-			merged[field] = weightedSum / totalDocCount
-		} else {
+		if totalDocCount == 0 {
 			// Align with mongosh behavior: set 0 when there are no documents across shards
 			merged[field] = 0
+			continue
 		}
+
+		var weightedSum float64
+		for _, shardResult := range shardResults {
+			avgValue, exists := shardResult[field]
+			if !exists {
+				continue
+			}
+			count, countExists := shardResult["count"]
+			if !countExists {
+				continue
+			}
+			numAvg, ok := convertToFloat64(avgValue)
+			if !ok {
+				continue
+			}
+			numCount, ok := convertToFloat64(count)
+			if !ok {
+				continue
+			}
+			weightedSum += numAvg * numCount
+		}
+		merged[field] = weightedSum / totalDocCount
 	}
 
 	// Add shard count information only (shards breakdown excluded)
