@@ -539,12 +539,17 @@ func getMongoDBVersion(client *mongo.Client) (string, error) {
 		return "", fmt.Errorf("could not decode buildInfo: %w", err)
 	}
 
-	version, ok := buildInfo["version"].(string)
+	version, ok := buildInfo["version"]
 	if !ok {
 		return "", fmt.Errorf("version field not found in buildInfo")
 	}
 
-	return version, nil
+	versionStr, ok := version.(string)
+	if !ok {
+		return "", fmt.Errorf("version field not a valid string: %v (%T)", version, version)
+	}
+
+	return versionStr, nil
 }
 
 // isVersionAtLeast checks if the current version is at least the target version
@@ -572,6 +577,12 @@ func isVersionAtLeast(current, target string) bool {
 
 // parseVersion extracts major, minor, patch numbers from version string
 func parseVersion(version string) []int {
+	// See: https://www.mongodb.com/docs/manual/reference/command/buildInfo/#mongodb-data-buildInfo.version
+	// """
+	// This string will take the format <major>.<minor>.<patch> in the case of a release, but development
+	// builds may contain additional information.
+	// """
+	//
 	// Remove any pre-release or build metadata (e.g., "6.2.0-rc1" -> "6.2.0")
 	if idx := strings.IndexAny(version, "-+"); idx != -1 {
 		version = version[:idx]
