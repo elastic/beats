@@ -1230,7 +1230,8 @@ filebeat.inputs:
   #paths:
     #- /var/log/custom.journal
 
-  # When enabled, entries from all journals will be read, including remote ones.
+  # When enabled, log entries will be ingested interleaved from all
+  # available journals, including remote ones.
   #merge: false
 
   # The position to start reading from the journal, valid options are:

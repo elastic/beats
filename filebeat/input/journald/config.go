@@ -73,7 +73,8 @@ type config struct {
 	// Parsers configuration
 	Parsers parser.Config `config:",inline"`
 
-	// Allow reading from all journals, including remote ones
+	// Allow ingesting log entries interleaved from all available journals,
+	// including remote ones.
 	Merge bool `config:"merge"`
 }
 
