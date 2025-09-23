@@ -66,7 +66,7 @@ metricbeat:
      processes:
       - '.*'
      metricsets:
-      - cpu		
+      - cpu
 output:
   elasticsearch:
     hosts:
@@ -82,7 +82,7 @@ processors:
     - add_docker_metadata: ~
     - add_kubernetes_metadata: ~
 http.host: localhost
-http.port: {{.MonitoringPort}}	
+http.port: {{.MonitoringPort}}
 `
 
 	// start metricbeat in otel mode
@@ -529,7 +529,7 @@ metricbeat:
      processes:
       - '.*'
      metricsets:
-      - cpu		
+      - cpu
 output:
   elasticsearch:
     hosts:
@@ -547,12 +547,13 @@ processors:
 `
 	expectedExporter := `exporters:
     elasticsearch:
+        auth:
+            authenticator: beatsauth
         compression: gzip
         compression_params:
             level: 1
         endpoints:
             - http://localhost:9200
-        idle_conn_timeout: 3s
         logs_index: index
         mapping:
             mode: bodymap
@@ -565,6 +566,7 @@ processors:
             max_retries: 3
         sending_queue:
             batch:
+                flush_timeout: 10s
                 max_size: 1600
                 min_size: 0
                 sizer: items
@@ -573,8 +575,13 @@ processors:
             num_consumers: 1
             queue_size: 3200
             wait_for_result: true
+        user: admin
+extensions:
+    beatsauth:
+        idle_connection_timeout: 3s
+        proxy_disable: false
         timeout: 1m30s
-        user: admin`
+`
 	expectedReceiver := `receivers:
     metricbeatreceiver:
         logging:
@@ -590,8 +597,12 @@ processors:
                   module: system
                   period: 1s
                   processes:
-                    - .*`
+                    - .*
+`
+
 	expectedService := `service:
+    extensions:
+        - beatsauth
     pipelines:
         logs:
             exporters:
