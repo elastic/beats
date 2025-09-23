@@ -18,6 +18,7 @@
 package oteltest
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
 	"crypto/x509"
@@ -30,18 +31,17 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"text/template"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
-	"go.opentelemetry.io/collector/config/configauth"
-	"go.opentelemetry.io/collector/config/confighttp"
-	"go.opentelemetry.io/collector/config/configoptional"
+	"go.opentelemetry.io/collector/confmap"
 	"go.opentelemetry.io/collector/confmap/xconfmap"
 	"go.opentelemetry.io/collector/exporter"
-	"go.opentelemetry.io/collector/exporter/exporterhelper"
 	"go.opentelemetry.io/collector/exporter/exportertest"
 	"go.opentelemetry.io/collector/extension"
 	"go.opentelemetry.io/collector/extension/extensiontest"
@@ -50,9 +50,8 @@ import (
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-	"go.uber.org/zap/zaptest/observer"
 
+	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 	mockes "github.com/elastic/mock-es/pkg/api"
 	"github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension"
@@ -63,14 +62,25 @@ import (
 var beatsAuthName = "beatsauth"
 var esExporterName = "elasticsearch"
 
+// create root certificate
+var caCert, _ = tlscommontest.GenCA()
+
+type options struct {
+	Host                 string
+	CACertificate        string
+	ClientCert           string
+	ClientKey            string
+	CATrustedFingerPrint string
+	VerificationMode     string
+}
+
 // tests mutual TLS
 func TestMTLS(t *testing.T) {
-
-	// create root certificate
-	caCert, err := tlscommontest.GenCA()
-	if err != nil {
-		t.Fatalf("could not generate root CA certificate: %s", err)
-	}
+	// write ca.pem to a file
+	caFilePath := filepath.Join(t.TempDir(), "ca.pem")
+	os.WriteFile(caFilePath, pem.EncodeToMemory(&pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: caCert.Leaf.Raw}), 0o777)
 
 	certPool := x509.NewCertPool()
 	certPool.AddCert(caCert.Leaf)
@@ -85,7 +95,6 @@ func TestMTLS(t *testing.T) {
 	clientCertificate, clientKey := getClientCerts(t, caCert)
 
 	// start test server with given server and root certs
-
 	serverName, metricReader := startTestServer(t, &tls.Config{
 		// NOTE: client certificates are not verified  unless ClientAuth is set to RequireAndVerifyClientCert.
 		ClientAuth:   tls.RequireAndVerifyClientCert,
@@ -93,24 +102,38 @@ func TestMTLS(t *testing.T) {
 		Certificates: []tls.Certificate{serverCerts},
 	})
 
+	inputConfig := `
+receivers:
+  filebeatreceiver:	
+    output:
+      elasticsearch:
+        hosts: {{ .Host }}
+        ssl: 
+          enabled: true
+          certificate_authorities:
+            - {{ .CACertificate }}
+          certificate: {{ .ClientCert }}
+          key: {{ .ClientKey }}
+`
+
+	var otelConfigBuffer bytes.Buffer
+	require.NoError(t,
+		template.Must(template.New("otelConfig").Parse(inputConfig)).Execute(&otelConfigBuffer,
+			options{
+				Host:          serverName,
+				CACertificate: caFilePath,
+				ClientCert:    clientCertificate,
+				ClientKey:     clientKey,
+			}))
+
+	output := getTranslatedConf(t, otelConfigBuffer.Bytes())
+
 	// get new test exporter with auth
-	exp, _ := newTestESExporterWithAuth(t, serverName)
+	exp := newTestESExporterWithAuth(t, output)
 
 	// get new beats authenticator
 	beatsauth := newAuthenticator(t, beatsauthextension.Config{
-		BeatAuthconfig: map[string]any{
-			"ssl": map[string]any{
-				"enabled": true,
-				"certificate_authorities": []string{
-					string(
-						pem.EncodeToMemory(&pem.Block{
-							Type:  "CERTIFICATE",
-							Bytes: caCert.Leaf.Raw,
-						}))},
-				"certificate": clientCertificate,
-				"key":         clientKey,
-			},
-		},
+		BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any),
 	})
 
 	// start extension
@@ -123,41 +146,14 @@ func TestMTLS(t *testing.T) {
 	require.NoError(t, err, "could not start exporter")
 
 	// send logs
-	mustSendLogs(t, exp, getLogRecord(t))
+	require.NoError(t, mustSendLogs(t, exp, getLogRecord(t)), "error sending logs")
 
 	// check if data has reached
-	require.Eventually(t, func() bool {
-		rm := metricdata.ResourceMetrics{}
-		if err := metricReader.Collect(context.Background(), &rm); err != nil {
-			t.Fatalf("could not collect metrics")
-		}
-
-		for _, sm := range rm.ScopeMetrics {
-			for _, m := range sm.Metrics {
-				// bulk.create.ok is incremented only when the event is accepted
-				if m.Name == "bulk.create.ok" {
-					switch d := m.Data.(type) {
-					case metricdata.Sum[int64]:
-						if len(d.DataPoints) >= 1 {
-							return true
-						}
-					}
-				}
-
-			}
-		}
-		return false
-	}, 1*time.Minute, 10*time.Second, "did not receive record")
+	assertReceivedLogRecord(t, metricReader)
 }
 
+// tests ca_trusted_fingerprint
 func TestCATrustedFingerPrint(t *testing.T) {
-
-	// create root certificate
-	caCert, err := tlscommontest.GenCA()
-	if err != nil {
-		t.Fatalf("could not generate root CA certificate: %s", err)
-	}
-
 	// create server certificates
 	serverCerts, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "server", []string{"localhost"}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
 	if err != nil {
@@ -174,17 +170,33 @@ func TestCATrustedFingerPrint(t *testing.T) {
 		Certificates: []tls.Certificate{serverCerts},
 	})
 
+	inputConfig := `
+receivers:
+  filebeatreceiver:	
+    output:
+      elasticsearch:
+        hosts: {{ .Host }}
+        ssl: 
+          enabled: true
+          ca_trusted_fingerprint: {{ .CATrustedFingerPrint }} 
+`
+
+	var otelConfigBuffer bytes.Buffer
+	require.NoError(t,
+		template.Must(template.New("otelConfig").Parse(inputConfig)).Execute(&otelConfigBuffer,
+			options{
+				Host:                 serverName,
+				CATrustedFingerPrint: fingerprint,
+			}))
+
+	output := getTranslatedConf(t, otelConfigBuffer.Bytes())
+
 	// get new test exporter with authenticator set
-	exp, _ := newTestESExporterWithAuth(t, serverName)
+	exp := newTestESExporterWithAuth(t, output)
 
 	// get new beats authenticator
 	beatsauth := newAuthenticator(t, beatsauthextension.Config{
-		BeatAuthconfig: map[string]any{
-			"ssl": map[string]any{
-				"enabled":                true,
-				"ca_trusted_fingerprint": fingerprint,
-			},
-		},
+		BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any),
 	})
 
 	// start extension
@@ -197,33 +209,14 @@ func TestCATrustedFingerPrint(t *testing.T) {
 	require.NoError(t, err, "could not start exporter")
 
 	// send logs
-	mustSendLogs(t, exp, getLogRecord(t))
+	require.NoError(t, mustSendLogs(t, exp, getLogRecord(t)), "error sending logs")
 
 	// check if data has reached
-	require.Eventually(t, func() bool {
-		rm := metricdata.ResourceMetrics{}
-		if err := metricReader.Collect(context.Background(), &rm); err != nil {
-			t.Fatalf("could not collect metrics")
-		}
-
-		for _, sm := range rm.ScopeMetrics {
-			for _, m := range sm.Metrics {
-				// bulk.create.ok is incremented only when the event is accepted
-				if m.Name == "bulk.create.ok" {
-					switch d := m.Data.(type) {
-					case metricdata.Sum[int64]:
-						if len(d.DataPoints) >= 1 {
-							return true
-						}
-					}
-				}
-			}
-		}
-		return false
-	}, 1*time.Minute, 10*time.Second, "did not receive record")
+	assertReceivedLogRecord(t, metricReader)
 }
 
-// The test scenarios are taken from https://github.com/khushijain21/elastic-agent-libs/blob/tlsglobal3/transport/tlscommon/tls_config_test.go#L495
+// tests verification mode
+// The test scenarios are taken from https://github.com/elastic/elastic-agent-libs/blob/main/transport/tlscommon/tls_config_test.go#L495
 func TestVerificationMode(t *testing.T) {
 
 	testcases := map[string]struct {
@@ -337,11 +330,10 @@ func TestVerificationMode(t *testing.T) {
 		},
 	}
 
-	// create root certificate
-	caCert, err := tlscommontest.GenCA()
-	if err != nil {
-		t.Fatalf("could not generate root CA certificate: %s", err)
-	}
+	caFilePath := filepath.Join(t.TempDir(), "ca.pem")
+	os.WriteFile(caFilePath, pem.EncodeToMemory(&pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: caCert.Leaf.Raw}), 0o777)
 
 	for name, test := range testcases {
 		t.Run(name, func(t *testing.T) {
@@ -359,22 +351,35 @@ func TestVerificationMode(t *testing.T) {
 			u, _ := url.Parse(serverName) //nolint: errcheck // this is test
 			_, port, _ := net.SplitHostPort(u.Host)
 
-			// get new test exporter with authenticator set
-			exp, zapLogs := newTestESExporterWithAuth(t, fmt.Sprintf("https://%s:%s", test.hostname, port))
+			inputConfig := `
+receivers:
+  filebeatreceiver:	
+    output:
+      elasticsearch:
+        hosts: {{ .Host }}
+        ssl: 
+          enabled: true
+          certificate_authorities:
+            - {{ .CACertificate }}
+          verification_mode: {{ .VerificationMode }}
+`
+
+			var otelConfigBuffer bytes.Buffer
+			require.NoError(t,
+				template.Must(template.New("otelConfig").Parse(inputConfig)).Execute(&otelConfigBuffer,
+					options{
+						Host:             fmt.Sprintf("https://%s:%s", test.hostname, port),
+						CACertificate:    caFilePath,
+						VerificationMode: test.verificationMode,
+					}))
+
+			output := getTranslatedConf(t, otelConfigBuffer.Bytes())
+
+			// get an instance of es exporter
+			exp := newTestESExporterWithAuth(t, output)
 
 			authConfig := beatsauthextension.Config{
-				BeatAuthconfig: map[string]any{
-					"ssl": map[string]any{
-						"enabled":           true,
-						"verification_mode": test.verificationMode,
-						"certificate_authorities": []string{
-							string(
-								pem.EncodeToMemory(&pem.Block{
-									Type:  "CERTIFICATE",
-									Bytes: caCert.Leaf.Raw,
-								}))},
-					},
-				},
+				BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any),
 			}
 
 			if test.ignoreCerts {
@@ -394,38 +399,15 @@ func TestVerificationMode(t *testing.T) {
 			require.NoError(t, err, "could not start exporter")
 
 			// send logs
-			mustSendLogs(t, exp, getLogRecord(t))
+			err = mustSendLogs(t, exp, getLogRecord(t))
 
 			if test.expectingError {
-				require.Eventually(t, func() bool {
-					return zapLogs.FilterMessageSnippet("bulk indexer flush error").Len() >= 1
-				}, 1*time.Minute, 10*time.Second, "did not receive expected error")
+				require.Error(t, err, "expected error got none")
 				return
 			}
 
 			// check if data has reached
-			require.Eventually(t, func() bool {
-				rm := metricdata.ResourceMetrics{}
-				if err := metricReader.Collect(context.Background(), &rm); err != nil {
-					t.Fatalf("could not collect metrics")
-				}
-
-				for _, sm := range rm.ScopeMetrics {
-					for _, m := range sm.Metrics {
-						// bulk.create.ok is incremented only when the event is accepted
-						if m.Name == "bulk.create.ok" {
-							switch d := m.Data.(type) {
-							case metricdata.Sum[int64]:
-								if len(d.DataPoints) >= 1 {
-									return true
-								}
-							}
-						}
-
-					}
-				}
-				return false
-			}, 1*time.Minute, 10*time.Second, "did not receive record")
+			assertReceivedLogRecord(t, metricReader)
 
 		})
 	}
@@ -455,33 +437,26 @@ func newAuthenticator(t *testing.T, config beatsauthextension.Config) extension.
 }
 
 // newTestESExporterWithAuth returns a test exporter with authenticator set
-func newTestESExporterWithAuth(t *testing.T, url string, fns ...func(*elasticsearchexporter.Config)) (ESexporter exporter.Logs, logs *observer.ObservedLogs) {
-	testauthID := component.NewID(component.MustNewType(beatsAuthName))
+// It returns unstarted instance of ES exporter and observer that captures the internal logs
+func newTestESExporterWithAuth(t *testing.T, conf *confmap.Conf) (ESexporter exporter.Logs) {
 
 	f := elasticsearchexporter.NewFactory()
-	queueConfig := exporterhelper.NewDefaultQueueConfig()
-	queueConfig.Batch = configoptional.Some(exporterhelper.BatchConfig{
-		Sizer:        exporterhelper.RequestSizerTypeItems,
-		MinSize:      0,
-		FlushTimeout: 1 * time.Second,
-	})
-
 	cfg := &elasticsearchexporter.Config{
-		Endpoints: []string{url},
-		ClientConfig: confighttp.ClientConfig{
-			Auth:        configoptional.Some(configauth.Config{AuthenticatorID: testauthID}),
-			Compression: "none",
-		},
 		Mapping: elasticsearchexporter.MappingsSettings{
+			// we have to set allowed modes
+			// this is set on default config in ES exporter but it is not a public type
 			Mode:         "bodymap",
 			AllowedModes: []string{"bodymap", "ecs", "none", "otel", "raw"},
 		},
-		QueueBatchConfig: queueConfig,
 	}
 
-	for _, fn := range fns {
-		fn(cfg)
-	}
+	esCfg := conf.Get("exporters::elasticsearch")
+	esConf := confmap.NewFromStringMap(esCfg.(map[string]any))
+
+	// unmarshall user config into ES exporter config
+	require.NoError(t, esConf.Unmarshal(cfg), "error unmarshalling user config into ES config")
+
+	// validate the config
 	require.NoError(t, xconfmap.Validate(cfg))
 
 	settings := exportertest.NewNopSettings(component.MustNewType(esExporterName))
@@ -491,16 +466,11 @@ func newTestESExporterWithAuth(t *testing.T, url string, fns ...func(*elasticsea
 	logConfig.DisableStacktrace = true
 	devLog, err := logConfig.Build()
 	require.NoError(t, err, "could not create logger")
-
-	// capture ES exporter logs
-	observed, zapLogs := observer.New(zapcore.DebugLevel)
-	core := zapcore.NewTee(devLog.Core(), observed)
-	settings.Logger = zap.New(core)
+	settings.Logger = devLog
 
 	exp, err := f.CreateLogs(context.Background(), settings, cfg)
-
-	require.NoError(t, err)
-	return exp, zapLogs
+	require.NoError(t, err, "could not create exporter.Logs ")
+	return exp
 }
 
 type extensionsMap map[component.ID]component.Component
@@ -550,10 +520,10 @@ func getLogRecord(t *testing.T) plog.Logs {
 }
 
 // sends log to given exporter
-func mustSendLogs(t *testing.T, exporter exporter.Logs, logs plog.Logs) {
+func mustSendLogs(t *testing.T, exporter exporter.Logs, logs plog.Logs) error {
 	logs.MarkReadOnly()
 	err := exporter.ConsumeLogs(t.Context(), logs)
-	require.NoError(t, err)
+	return err
 }
 
 // getClientCerts creates client certificates, writes them to a file and return the path of certificate and key
@@ -588,4 +558,42 @@ func getClientCerts(t *testing.T, caCert tls.Certificate) (certificate string, k
 	}
 
 	return clientCertPath, clientKeyPath
+}
+
+func getTranslatedConf(t *testing.T, input []byte) *confmap.Conf {
+	c := beatconverter.Converter{}
+
+	conf, err := confmap.NewRetrievedFromYAML(input)
+	require.NoError(t, err, "error retrieving config")
+	finalConf, err := conf.AsConf()
+	require.NoError(t, err, "error transforming config")
+
+	err = c.Convert(t.Context(), finalConf)
+	require.NoError(t, err, "error translating config")
+	return finalConf
+}
+
+func assertReceivedLogRecord(t *testing.T, metricReader *sdkmetric.ManualReader) {
+	assert.Eventually(t, func() bool {
+		rm := metricdata.ResourceMetrics{}
+		if err := metricReader.Collect(context.Background(), &rm); err != nil {
+			t.Fatalf("could not collect metrics")
+		}
+
+		for _, sm := range rm.ScopeMetrics {
+			for _, m := range sm.Metrics {
+				// bulk.create.ok is incremented only when the event is accepted
+				if m.Name == "bulk.create.ok" {
+					switch d := m.Data.(type) {
+					case metricdata.Sum[int64]:
+						if len(d.DataPoints) >= 1 {
+							return true
+						}
+					}
+				}
+
+			}
+		}
+		return false
+	}, 1*time.Minute, 10*time.Second, "did not receive record")
 }
