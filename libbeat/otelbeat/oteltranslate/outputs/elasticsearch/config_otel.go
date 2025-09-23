@@ -25,21 +25,12 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
-
-// setup.ilm.* -> supported but the logic is not in place yet
-type unsupportedConfig struct {
-	LoadBalance        bool              `config:"loadbalance"`
-	NonIndexablePolicy *config.Namespace `config:"non_indexable_policy"`
-	EscapeHTML         bool              `config:"escape_html"`
-	Kerberos           *kerberos.Config  `config:"kerberos"`
-}
 
 type esToOTelOptions struct {
 	elasticsearch.ElasticsearchConfig `config:",inline"`
@@ -173,17 +164,6 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 
 // log warning for unsupported config
 func checkUnsupportedConfig(cfg *config.C, logger *logp.Logger) error {
-	// check if unsupported configuration is provided
-	temp := unsupportedConfig{}
-	if err := cfg.Unpack(&temp); err != nil {
-		return err
-	}
-
-	if !isStructEmpty(temp) {
-		return fmt.Errorf("these configuration parameters are not supported %+v: %w", temp, errors.ErrUnsupported)
-	}
-
-	// check for dictionary like parameters that we do not support yet
 	if cfg.HasField("indices") {
 		return fmt.Errorf("indices is currently not supported: %w", errors.ErrUnsupported)
 	} else if cfg.HasField("pipelines") {
@@ -192,7 +172,16 @@ func checkUnsupportedConfig(cfg *config.C, logger *logp.Logger) error {
 		return fmt.Errorf("parameters is currently not supported: %w", errors.ErrUnsupported)
 	} else if value, err := cfg.Bool("allow_older_versions", -1); err == nil && !value {
 		return fmt.Errorf("allow_older_versions:false is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("loadbalance") {
+		return fmt.Errorf("loadbalance is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("non_indexable_policy") {
+		return fmt.Errorf("non_indexable_policy is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("escape_html") {
+		return fmt.Errorf("escape_html is currently not supported: %w", errors.ErrUnsupported)
+	} else if cfg.HasField("kerberos") {
+		return fmt.Errorf("kerberos is currently not supported: %w", errors.ErrUnsupported)
 	}
+
 	return nil
 }
 
