@@ -237,8 +237,23 @@ require (
 )
 
 require (
+<<<<<<< HEAD
 	github.com/otiai10/copy v1.14.1
 	go.opentelemetry.io/collector/client v1.38.0
+=======
+	github.com/apache/arrow-go/v18 v18.4.1
+	github.com/cilium/ebpf v0.19.0
+	github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.2.0
+	go.opentelemetry.io/collector/client v1.41.0
+	go.opentelemetry.io/collector/exporter v0.135.0
+	go.opentelemetry.io/collector/exporter/exporterhelper v0.135.0
+	go.opentelemetry.io/collector/exporter/exportertest v0.135.0
+	go.opentelemetry.io/collector/pipeline v1.41.0
+	go.opentelemetry.io/collector/processor v1.41.0
+	go.opentelemetry.io/collector/processor/processorhelper v0.135.0
+	go.opentelemetry.io/collector/receiver/receivertest v0.135.0
+	go.opentelemetry.io/otel/sdk/metric v1.38.0
+>>>>>>> d3be9bf15 (Remove settings on ES exporter config that no longer function (#46428))
 	go.uber.org/goleak v1.3.0
 )
 
