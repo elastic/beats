@@ -68,8 +68,6 @@ func getComponent() (otelcol.Factories, error) {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
 	}
 
-<<<<<<< HEAD
-=======
 	extensions, err := otelcol.MakeFactoryMap(
 		beatsauthextension.NewFactory(),
 	)
@@ -84,7 +82,6 @@ func getComponent() (otelcol.Factories, error) {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
 	}
 
->>>>>>> d3be9bf15 (Remove settings on ES exporter config that no longer function (#46428))
 	exporters, err := otelcol.MakeFactoryMap(
 		debugexporter.NewFactory(),
 		elasticsearchexporter.NewFactory(),
@@ -94,15 +91,10 @@ func getComponent() (otelcol.Factories, error) {
 	}
 
 	return otelcol.Factories{
-<<<<<<< HEAD
-		Receivers: receivers,
-		Exporters: exporters,
-=======
 		Receivers:  receivers,
 		Processors: processors,
 		Exporters:  exporters,
 		Extensions: extensions,
->>>>>>> d3be9bf15 (Remove settings on ES exporter config that no longer function (#46428))
 	}, nil
 
 }

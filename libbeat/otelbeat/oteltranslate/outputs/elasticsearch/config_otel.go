@@ -162,22 +162,7 @@ func ToOTelConfig(output *config.C, logger *logp.Logger) (map[string]any, error)
 }
 
 // log warning for unsupported config
-<<<<<<< HEAD
-func checkUnsupportedConfig(cfg *config.C) error {
-	// check if unsupported configuration is provided
-	temp := unsupportedConfig{}
-	if err := cfg.Unpack(&temp); err != nil {
-		return err
-	}
-
-	if !isStructEmpty(temp) {
-		return fmt.Errorf("these configuration parameters are not supported %+v: %w", temp, errors.ErrUnsupported)
-	}
-
-	// check for dictionary like parameters that we do not support yet
-=======
 func checkUnsupportedConfig(cfg *config.C, logger *logp.Logger) error {
->>>>>>> d3be9bf15 (Remove settings on ES exporter config that no longer function (#46428))
 	if cfg.HasField("indices") {
 		return fmt.Errorf("indices is currently not supported: %w", errors.ErrUnsupported)
 	} else if cfg.HasField("pipelines") {

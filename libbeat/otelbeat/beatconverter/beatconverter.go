@@ -25,11 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	elasticsearchtranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate/outputs/elasticsearch"
-<<<<<<< HEAD
-=======
-	logstashstranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate/outputs/logstash"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
->>>>>>> d3be9bf15 (Remove settings on ES exporter config that no longer function (#46428))
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
