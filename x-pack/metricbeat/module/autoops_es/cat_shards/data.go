@@ -6,12 +6,19 @@ package cat_shards
 
 import (
 	"encoding/json"
+<<<<<<< HEAD
 	"fmt"
+=======
+>>>>>>> b2f1a5849 ([AutoOps] Update  module `autoops_es` (#46573))
 	"math"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
 
+<<<<<<< HEAD
 	"golang.org/x/exp/maps"
+=======
+	"maps"
+>>>>>>> b2f1a5849 ([AutoOps] Update  module `autoops_es` (#46573))
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -87,9 +94,9 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 	indexMetadata, err := getResolvedIndices(m)
 
 	if err != nil {
-		indexMetadata = map[string]IndexMetadata{}
-		err = fmt.Errorf("failed to load resolved index details %w", err)
+		m.Logger().Errorf("failed to load resolved index details %v", err)
 		events.LogAndSendErrorEvent(err, info, r, CatShardsMetricSet, CatShardsPath, transactionID)
+		return nil
 	}
 
 	sendNodeIndexShardsEvent(r, info, convertToNodeIndexShards(indexToShardList, indexMetadata), transactionID)

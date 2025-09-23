@@ -98,8 +98,14 @@ func PartitionByMaxValue[T any](limit int, items []T, valueExtractor func(T) int
 		itemKey := valueExtractor(item)
 		sortedValues[itemKey] = append(sortedValues[itemKey], item)
 	}
+<<<<<<< HEAD
 	allKeys := maps.Keys(sortedValues)
 	sort.Ints(allKeys)
+=======
+
+	allKeys := slices.Collect(maps.Keys(sortedValues))
+	slices.Sort(allKeys)
+>>>>>>> b2f1a5849 ([AutoOps] Update  module `autoops_es` (#46573))
 	var sortedItems = make(map[int][]T)
 	currentCapacity := 0
 	cursor := 0

@@ -11,12 +11,16 @@ import (
 	"slices"
 	"testing"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricset"
 
 	"github.com/stretchr/testify/require"
+<<<<<<< HEAD
 	"golang.org/x/exp/maps"
+=======
+
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricset"
+>>>>>>> b2f1a5849 ([AutoOps] Update  module `autoops_es` (#46573))
 )
 
 var (

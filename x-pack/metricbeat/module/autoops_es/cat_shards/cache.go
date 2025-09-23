@@ -101,19 +101,26 @@ func enrichNodeIndexShards(nodeIndexShardsMap map[string]NodeIndexShards, indexM
 		timestampDiff = &diff
 	}
 
+<<<<<<< HEAD
 	nodeIndexShardsList := maps.Values(nodeIndexShardsMap)
 
 	for i := range nodeIndexShardsList {
 		nodeIndexShardsList[i].TotalFractions = size
+=======
+	nodeIndexShardsList := make([]NodeIndexShards, 0, len(nodeIndexShardsMap))
+	for _, v := range nodeIndexShardsMap {
+		v.TotalFractions = size
+>>>>>>> b2f1a5849 ([AutoOps] Update  module `autoops_es` (#46573))
 
 		if timestampDiff != nil {
-			if prevNodeIndexShards, exists := cache.PreviousCache[nodeIndexShardsList[i].IndexNode]; exists {
-				utils.EnrichObject(&nodeIndexShardsList[i], &prevNodeIndexShards, cache)
-				nodeIndexShardsList[i].TimestampDiff = timestampDiff
+			if prevNodeIndexShards, exists := cache.PreviousCache[v.IndexNode]; exists {
+				utils.EnrichObject(&v, &prevNodeIndexShards, cache)
+				v.TimestampDiff = timestampDiff
 			}
 		}
 
-		enrichIndexMetadata(&nodeIndexShardsList[i], indexMetadata)
+		enrichIndexMetadata(&v, indexMetadata)
+		nodeIndexShardsList = append(nodeIndexShardsList, v)
 	}
 
 	return nodeIndexShardsList
