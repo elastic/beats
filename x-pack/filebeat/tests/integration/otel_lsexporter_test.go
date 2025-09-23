@@ -52,8 +52,7 @@ func TestDataShapeOTelVSClassicE2E(t *testing.T) {
 	// ensure the size of events is big enough (1024b) for filebeat to ingest
 	numEvents := 3
 
-	// 1. setting worker to 1 does not ensure the order of events, as otelconsumer spawns multiple workers based on CPU count
-	// 2. Agent does not support `index` setting, while beats does.
+	// Agent does not support `index` setting, while beats does.
 	//	Our focus is on agent classic vs otel mode comparison, so we do not test `index` for filebeat
 	var beatsCfgFile = `
 filebeat.inputs:
