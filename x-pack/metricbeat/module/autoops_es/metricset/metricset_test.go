@@ -89,32 +89,48 @@ func TestErrorClusterInfoFetch(t *testing.T) {
 		testName string
 		value    string
 		expected int
+		injectFn func() func() string
 	}{
 		{
 			testName: "Case 1: send errors is true",
 			value:    "true",
 			expected: 1,
+			injectFn: func() func() string {
+				return func() string {
+					return "true"
+				}
+			},
 		},
 		{
 			testName: "Case 2: send errors is false",
 			value:    "false",
 			expected: 0,
+			injectFn: func() func() string {
+				return func() string {
+					return "false"
+				}
+			},
 		},
 		{
 			testName: "Case 3: no boolean value",
 			value:    "",
+			injectFn: func() func() string {
+				return func() string {
+					return ""
+				}
+			},
 			expected: 1,
 		},
 	}
 
-	for _, testcase := range testCases {
-		t.Run(testcase.testName, func(t *testing.T) {
-			t.Setenv(SEND_CLUSTER_INFO_ERRORS, testcase.value)
+	for _, testCase := range testCases {
+		t.Run(testCase.testName, func(t *testing.T) {
+			GetClusterInfoValue = testCase.injectFn
 
 			RunTestsForFetcherWithGlobFiles(t, "./_meta/test/success.*.json", setupClusterInfoErrorServer, useTestMetricSet, func(t *testing.T, data FetcherData[testObjectType]) {
 				require.NoError(t, data.Error)
 
-				require.Equal(t, testcase.expected, len(data.Reporter.GetEvents()))
+				require.Equal(t, testCase.expected, len(data.Reporter.GetEvents()))
 			})
 		})
 	}
