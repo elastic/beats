@@ -1,0 +1,60 @@
+version: "3.8"
+
+# Generic replica set configuration that works with MongoDB 5.0 - 7.0+
+# Usage: MONGO_VERSION=6.2 docker-compose -f docker-compose.yml up -d
+
+x-mongo-image: &mongo_image ${MONGO_IMAGE:-mongo}:${MONGO_VERSION:-7.0}
+
+x-mongo-command: &mongo_command
+  command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+
+services:
+  mongo-primary:
+    image: *mongo_image
+    <<: *mongo_command
+    ports:
+      - "27017:27017"
+    volumes:
+      - primary_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  mongo-secondary1:
+    image: *mongo_image
+    <<: *mongo_command
+    ports:
+      - "27018:27017"
+    volumes:
+      - secondary1_data:/data/db
+    depends_on:
+      - mongo-primary
+
+  mongo-secondary2:
+    image: *mongo_image
+    <<: *mongo_command
+    ports:
+      - "27019:27017"
+    volumes:
+      - secondary2_data:/data/db
+    depends_on:
+      - mongo-primary
+
+  mongo-arbiter:
+    image: *mongo_image
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--smallfiles", "--nojournal"]
+    ports:
+      - "27020:27017"
+    volumes:
+      - arbiter_data:/data/db
+    depends_on:
+      - mongo-primary
+
+volumes:
+  primary_data:
+  secondary1_data:
+  secondary2_data:
+  arbiter_data:

@@ -1,0 +1,30 @@
+version: "3.8"
+
+# Generic standalone MongoDB configuration for versions 5.0 - 7.0+
+# Usage: MONGO_VERSION=6.2 docker-compose -f docker-compose.yml up -d
+
+x-mongo-image: &mongo_image ${MONGO_IMAGE:-mongo}:${MONGO_VERSION:-7.0}
+
+services:
+  mongodb:
+    image: *mongo_image
+    ports:
+      - "27017:27017"
+    environment:
+      # Optional: Set root credentials
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-}
+      MONGO_INITDB_DATABASE: mbtest
+    volumes:
+      - mongodb_data:/data/db
+      - ./init-scripts:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    command: ["mongod", "--bind_ip_all"]
+
+volumes:
+  mongodb_data:

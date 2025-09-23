@@ -1,0 +1,121 @@
+version: "3.8"
+
+# Generic sharded cluster configuration for MongoDB 5.0 - 7.0+
+# Usage: MONGO_VERSION=6.2 docker-compose -f docker-compose.yml up -d
+
+x-mongo-image: &mongo_image ${MONGO_IMAGE:-mongo}:${MONGO_VERSION:-7.0}
+
+x-healthcheck: &mongo_healthcheck
+  healthcheck:
+    test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+    interval: 5s
+    timeout: 5s
+    retries: 10
+    start_period: 10s
+
+services:
+  # Config servers (3 nodes for production-like setup)
+  config1:
+    image: *mongo_image
+    command: ["mongod", "--configsvr", "--replSet", "cfgRS", "--port", "27019", "--bind_ip_all"]
+    ports:
+      - "27019:27019"
+    volumes:
+      - config1_data:/data/db
+    <<: *mongo_healthcheck
+
+  config2:
+    image: *mongo_image
+    command: ["mongod", "--configsvr", "--replSet", "cfgRS", "--port", "27019", "--bind_ip_all"]
+    volumes:
+      - config2_data:/data/db
+
+  config3:
+    image: *mongo_image
+    command: ["mongod", "--configsvr", "--replSet", "cfgRS", "--port", "27019", "--bind_ip_all"]
+    volumes:
+      - config3_data:/data/db
+
+  # Shard 1 (replica set with 3 nodes)
+  shard1-primary:
+    image: *mongo_image
+    command: ["mongod", "--shardsvr", "--replSet", "shard01", "--port", "27018", "--bind_ip_all"]
+    ports:
+      - "27021:27018"
+    volumes:
+      - shard1_primary_data:/data/db
+    <<: *mongo_healthcheck
+
+  shard1-secondary:
+    image: *mongo_image
+    command: ["mongod", "--shardsvr", "--replSet", "shard01", "--port", "27018", "--bind_ip_all"]
+    volumes:
+      - shard1_secondary_data:/data/db
+
+  shard1-arbiter:
+    image: *mongo_image
+    command: ["mongod", "--shardsvr", "--replSet", "shard01", "--port", "27018", "--bind_ip_all"]
+    volumes:
+      - shard1_arbiter_data:/data/db
+
+  # Shard 2 (replica set with 3 nodes)
+  shard2-primary:
+    image: *mongo_image
+    command: ["mongod", "--shardsvr", "--replSet", "shard02", "--port", "27018", "--bind_ip_all"]
+    ports:
+      - "27022:27018"
+    volumes:
+      - shard2_primary_data:/data/db
+    <<: *mongo_healthcheck
+
+  shard2-secondary:
+    image: *mongo_image
+    command: ["mongod", "--shardsvr", "--replSet", "shard02", "--port", "27018", "--bind_ip_all"]
+    volumes:
+      - shard2_secondary_data:/data/db
+
+  shard2-arbiter:
+    image: *mongo_image
+    command: ["mongod", "--shardsvr", "--replSet", "shard02", "--port", "27018", "--bind_ip_all"]
+    volumes:
+      - shard2_arbiter_data:/data/db
+
+  # Mongos router (2 instances for high availability)
+  mongos1:
+    image: *mongo_image
+    depends_on:
+      - config1
+      - config2
+      - config3
+      - shard1-primary
+      - shard2-primary
+    command: ["mongos", "--configdb", "cfgRS/config1:27019,config2:27019,config3:27019", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    <<: *mongo_healthcheck
+
+  mongos2:
+    image: *mongo_image
+    depends_on:
+      - config1
+      - config2
+      - config3
+      - shard1-primary
+      - shard2-primary
+    command: ["mongos", "--configdb", "cfgRS/config1:27019,config2:27019,config3:27019", "--bind_ip_all"]
+    ports:
+      - "27018:27017"
+
+volumes:
+  # Config server volumes
+  config1_data:
+  config2_data:
+  config3_data:
+  # Shard 1 volumes
+  shard1_primary_data:
+  shard1_secondary_data:
+  shard1_arbiter_data:
+  # Shard 2 volumes
+  shard2_primary_data:
+  shard2_secondary_data:
+  shard2_arbiter_data:

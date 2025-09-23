@@ -299,7 +299,7 @@ func (m *Metricset) applyOptionsToStats(stats map[string]interface{}) (map[strin
 		return stats, nil
 	}
 
-	// NOTE: Intentionally exclude shards.* and indexSizes.* for now.
+	// NOTE(shmsr): Intentionally exclude shards.* and indexSizes.* for now.
 	// This keeps parity with the legacy collstats output and avoids emitting many
 	// dynamic sub-fields. If/when needed, we can add explicit support later.
 	//
