@@ -845,7 +845,13 @@ filebeat.inputs:
 
   # Files for the modification data is older than clean_inactive the state from the registry is removed
   # By default this is disabled.
+  # Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
   #clean_inactive: -1
+
+  # Enable this to disable all checks regarding clean_inactive and re-ingest
+  # all data when clean_inactive: 0, effectively keeping the
+  # old behaviour.
+  #legacy_clean_inactive: false
 
   # Removes the state for files which cannot be found on disk anymore immediately
   #clean_removed: true
@@ -996,6 +1002,9 @@ filebeat.inputs:
 #- type: udp
   #enabled: false
 
+  # Number of pipeline workers
+  #number_of_workers: 1
+
   # Maximum size of the message received over UDP
   #max_message_size: 10KiB
 
@@ -1013,6 +1022,9 @@ filebeat.inputs:
 
   # Character used to split new message
   #line_delimiter: "\n"
+
+  # Number of pipeline workers
+  #number_of_workers: 1
 
   # Maximum size in bytes of the message received over TCP
   #max_message_size: 20MiB

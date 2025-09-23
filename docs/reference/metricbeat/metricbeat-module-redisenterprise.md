@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-redisenterprise.html
+applies_to:
+  stack: beta
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -58,5 +60,5 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [node](/reference/metricbeat/metricbeat-metricset-redisenterprise-node.md)
-* [proxy](/reference/metricbeat/metricbeat-metricset-redisenterprise-proxy.md)
+* [node](/reference/metricbeat/metricbeat-metricset-redisenterprise-node.md)  {applies_to}`stack: beta`
+* [proxy](/reference/metricbeat/metricbeat-metricset-redisenterprise-proxy.md)  {applies_to}`stack: beta`

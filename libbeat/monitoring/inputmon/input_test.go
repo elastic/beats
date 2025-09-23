@@ -66,7 +66,7 @@ func TestNewInputMonitor(t *testing.T) {
 			tc.ID != "", tc.Input != "", tc.OptionalParent != nil, tc.PublicMetrics)
 
 		t.Run(testName, func(t *testing.T) {
-			reg, unreg := NewInputRegistry(tc.Input, tc.ID, tc.OptionalParent)
+			reg, unreg := NewDeprecatedMetricsRegistry(tc.Input, tc.ID, tc.OptionalParent)
 			defer unreg()
 			assert.NotNil(t, reg)
 
@@ -105,9 +105,9 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	monitoring.NewInt(reg, "events_pipeline_total").Set(10)
 
 	// simulate a duplicated ID in the local and global namespace.
-	reg = globalRegistry().NewRegistry(inputID)
-	monitoring.NewString(reg, "id").Set(inputID)
-	monitoring.NewString(reg, "input").Set(inputType)
+	reg = globalRegistry().GetOrCreateRegistry(inputID)
+	monitoring.NewString(reg, MetricKeyID).Set(inputID)
+	monitoring.NewString(reg, MetricKeyInput).Set(inputType)
 	monitoring.NewBool(reg, "should_be_overwritten").Set(true)
 
 	// =========== Input using new API and legacy, global namespace ===========
@@ -121,8 +121,8 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	defer globalRegistry().Remove(inputID)
 
 	// now the input also register its metrics with the deprecated
-	// NewInputRegistry.
-	reg, cancel := NewInputRegistry(
+	// NewDeprecatedMetricsRegistry.
+	reg, cancel := NewDeprecatedMetricsRegistry(
 		inputType, inputID, nil)
 	defer cancel()
 	monitoring.NewInt(reg, "foo_total").Set(20)
@@ -132,20 +132,20 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	// input which does not use the metrics registry from filebeat
 	// input/v2.Context.
 	inputOldAPI := "input-without-pipeline-metrics"
-	reg, cancel = NewInputRegistry(
+	reg, cancel = NewDeprecatedMetricsRegistry(
 		inputType, inputOldAPI, nil)
 	defer cancel()
 	monitoring.NewInt(reg, "foo_total").Set(30)
 
 	// ==== registries in the global registries which aren't input metrics ===
 	// unrelated registry in the global namespace, should be ignored.
-	reg = globalRegistry().NewRegistry("another-registry")
+	reg = globalRegistry().GetOrCreateRegistry("another-registry")
 	monitoring.NewInt(reg, "foo3_total").Set(100)
 	defer globalRegistry().Remove("another-registry")
 
 	// another input registry missing required information.
-	reg = globalRegistry().NewRegistry("yet-another-registry")
-	monitoring.NewString(reg, "id").Set("some-id")
+	reg = globalRegistry().GetOrCreateRegistry("yet-another-registry")
+	monitoring.NewString(reg, MetricKeyID).Set("some-id")
 	monitoring.NewInt(reg, "foo3_total").Set(100)
 	defer globalRegistry().Remove("yet-another-registry")
 
@@ -294,8 +294,8 @@ func TestNewMetricsRegistry(t *testing.T) {
 	assert.Equal(t, parent.GetRegistry(inputID), got)
 
 	vals := monitoring.CollectFlatSnapshot(got, monitoring.Full, false)
-	assert.Equal(t, inputID, vals.Strings["id"])
-	assert.Equal(t, inputType, vals.Strings["input"])
+	assert.Equal(t, inputID, vals.Strings[MetricKeyID])
+	assert.Equal(t, inputType, vals.Strings[MetricKeyInput])
 }
 
 func TestNewMetricsRegistry_duplicatedInputID(t *testing.T) {
@@ -316,7 +316,7 @@ func TestNewMetricsRegistry_duplicatedInputID(t *testing.T) {
 	assert.Equal(t, parent.GetRegistry(inputID), got)
 	// register a metric to the registry
 	monitoring.NewInt(got, metricName)
-	adapter.NewGoMetrics(got, goMetricsRegistryName, adapter.Accept)
+	adapter.NewGoMetrics(got, goMetricsRegistryName, logp.NewNopLogger(), adapter.Accept)
 
 	// 2nd call, return an unregistered registry
 	got = NewMetricsRegistry(
@@ -330,7 +330,7 @@ func TestNewMetricsRegistry_duplicatedInputID(t *testing.T) {
 	assert.NotPanics(t, func() {
 		// register the same metric again
 		monitoring.NewInt(got, metricName)
-		adapter.NewGoMetrics(got, goMetricsRegistryName, adapter.Accept)
+		adapter.NewGoMetrics(got, goMetricsRegistryName, logp.NewNopLogger(), adapter.Accept)
 	}, "the registry should be a new and empty registry")
 }
 
@@ -339,7 +339,7 @@ func TestCancelMetricsRegistry(t *testing.T) {
 	inputID := "input-ID"
 	inputType := "input-type"
 
-	_ = parent.NewRegistry(inputID)
+	_ = parent.GetOrCreateRegistry(inputID)
 	got := parent.GetRegistry(inputID)
 	require.NotNil(t, got, "metrics registry not found on parent")
 

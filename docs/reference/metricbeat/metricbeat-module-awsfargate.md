@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-awsfargate.html
+applies_to:
+  stack: beta
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -71,4 +73,4 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [task_stats](/reference/metricbeat/metricbeat-metricset-awsfargate-task_stats.md)
+* [task_stats](/reference/metricbeat/metricbeat-metricset-awsfargate-task_stats.md)  {applies_to}`stack: beta`

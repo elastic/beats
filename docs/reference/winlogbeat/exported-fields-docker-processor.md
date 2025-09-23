@@ -12,24 +12,24 @@ Docker stats collected from Docker.
 **`docker.container.id`**
 :   type: alias
 
-alias to: container.id
+    alias to: container.id
 
 
 **`docker.container.image`**
 :   type: alias
 
-alias to: container.image.name
+    alias to: container.image.name
 
 
 **`docker.container.name`**
 :   type: alias
 
-alias to: container.name
+    alias to: container.name
 
 
 **`docker.container.labels`**
 :   Image labels.
 
-type: object
+    type: object
 
 

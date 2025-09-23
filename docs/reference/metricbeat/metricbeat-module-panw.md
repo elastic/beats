@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-panw.html
+applies_to:
+  stack: beta
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -132,7 +134,7 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [interfaces](/reference/metricbeat/metricbeat-metricset-panw-interfaces.md)
-* [routing](/reference/metricbeat/metricbeat-metricset-panw-routing.md)
-* [system](/reference/metricbeat/metricbeat-metricset-panw-system.md)
-* [vpn](/reference/metricbeat/metricbeat-metricset-panw-vpn.md)
+* [interfaces](/reference/metricbeat/metricbeat-metricset-panw-interfaces.md)  {applies_to}`stack: beta`
+* [routing](/reference/metricbeat/metricbeat-metricset-panw-routing.md)  {applies_to}`stack: beta`
+* [system](/reference/metricbeat/metricbeat-metricset-panw-system.md)  {applies_to}`stack: beta`
+* [vpn](/reference/metricbeat/metricbeat-metricset-panw-vpn.md)  {applies_to}`stack: beta`

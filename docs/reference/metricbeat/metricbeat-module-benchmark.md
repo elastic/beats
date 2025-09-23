@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-benchmark.html
+applies_to:
+  stack: beta
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -69,4 +71,4 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* [info](/reference/metricbeat/metricbeat-metricset-benchmark-info.md)
+* [info](/reference/metricbeat/metricbeat-metricset-benchmark-info.md)  {applies_to}`stack: beta`

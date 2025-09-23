@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const jobErrString = "job with jobId %s encountered an error: %v"
@@ -65,7 +66,7 @@ func newJob(client *blob.Client, blob *azcontainer.BlobItem, blobURL string,
 ) *job {
 	if metrics == nil {
 		// metrics are optional, initialize a stub if not provided
-		metrics = newInputMetrics("", nil)
+		metrics = newInputMetrics(monitoring.NewRegistry(), log)
 	}
 
 	return &job{
@@ -188,7 +189,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 	if err != nil {
 		return fmt.Errorf("failed to add gzip decoder to blob: %s, with error: %w", *j.blob.Name, err)
 	}
-	dec, err := decoder.NewDecoder(j.src.ReaderConfig.Decoding, r)
+	dec, err := decoder.NewDecoder(j.src.ReaderConfig.Decoding, r, j.log)
 	if err != nil {
 		return err
 	}

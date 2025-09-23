@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-ibmmq.html
+applies_to:
+  stack: beta
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -60,4 +62,4 @@ This module supports TLS connections when using `ssl` config field, as described
 
 The following metricsets are available:
 
-* [qmgr](/reference/metricbeat/metricbeat-metricset-ibmmq-qmgr.md)
+* [qmgr](/reference/metricbeat/metricbeat-metricset-ibmmq-qmgr.md)  {applies_to}`stack: beta`

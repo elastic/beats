@@ -101,7 +101,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfg, _ := conf.NewConfigFrom(&config)
 	ecsClusterMeta, err := util.GetClusterECSMeta(cfg, client, ms.Logger())
 	if err != nil {
-		ms.Logger().Debugf("could not retrieve cluster metadata: %w", err)
+		ms.Logger().Debugf("could not retrieve cluster metadata: %v", err)
 	}
 	if ecsClusterMeta != nil {
 		ms.clusterMeta = ecsClusterMeta
@@ -127,7 +127,7 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 		FilterFunc: func(obj interface{}) bool {
 			eve, ok := obj.(*kubernetes.Event)
 			if !ok {
-				m.Logger().Debugf("Error while casting event: %s", ok)
+				m.Logger().Debugf("Error while casting event. Got type: %T", obj)
 			}
 			// if fields are null they are decoded to `0001-01-01 00:00:00 +0000 UTC`
 			// so we need to check if they are valid first
@@ -148,7 +148,7 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	// start event watcher
 	err := m.watcher.Start()
 	if err != nil {
-		m.Logger().Debugf("Unable to start watcher: %w", err)
+		m.Logger().Debugf("Unable to start watcher: %v", err)
 	}
 	<-reporter.Done()
 	m.watcher.Stop()

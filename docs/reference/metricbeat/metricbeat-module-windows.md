@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-windows.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -84,4 +86,4 @@ The following metricsets are available:
 
 * [perfmon](/reference/metricbeat/metricbeat-metricset-windows-perfmon.md)
 * [service](/reference/metricbeat/metricbeat-metricset-windows-service.md)
-* [wmi](/reference/metricbeat/metricbeat-metricset-windows-wmi.md)
+* [wmi](/reference/metricbeat/metricbeat-metricset-windows-wmi.md)  {applies_to}`stack: beta 9.1.0`

@@ -160,7 +160,7 @@ Fields exported by the EVE JSON logs
 **`suricata.eve.alert.metadata`**
 :   Metadata about the alert.
 
-type: flattened
+    type: flattened
 
 
 **`suricata.eve.alert.category`**

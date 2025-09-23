@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-gcp.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -361,6 +363,16 @@ metricbeat.modules:
   exclude_labels: false
   period: 1m
   collect_dataproc_user_labels: true
+
+- module: gcp
+  metricsets:
+    - vertexai_logs
+  period: 300s  # 5 minutes
+  project_id: "your-project-id"
+  table_id: "your-project-id.dataset.id.table_name"
+  credentials_file_path: "/path/to/service-account.json"
+  # credentials_json: '{"type": "service_account", ...}'
+  time_lookback_hours: 1  # How many hours back to look for initial data fetch
 ```
 
 
@@ -369,7 +381,7 @@ metricbeat.modules:
 The following metricsets are available:
 
 * [billing](/reference/metricbeat/metricbeat-metricset-gcp-billing.md)
-* [carbon](/reference/metricbeat/metricbeat-metricset-gcp-carbon.md)
+* [carbon](/reference/metricbeat/metricbeat-metricset-gcp-carbon.md)  {applies_to}`stack: beta`
 * [compute](/reference/metricbeat/metricbeat-metricset-gcp-compute.md)
 * [dataproc](/reference/metricbeat/metricbeat-metricset-gcp-dataproc.md)
 * [firestore](/reference/metricbeat/metricbeat-metricset-gcp-firestore.md)
@@ -378,3 +390,4 @@ The following metricsets are available:
 * [metrics](/reference/metricbeat/metricbeat-metricset-gcp-metrics.md)
 * [pubsub](/reference/metricbeat/metricbeat-metricset-gcp-pubsub.md)
 * [storage](/reference/metricbeat/metricbeat-metricset-gcp-storage.md)
+* [vertexai_logs](/reference/metricbeat/metricbeat-metricset-gcp-vertexai_logs.md)  {applies_to}`stack: beta 9.2.0`

@@ -11,14 +11,18 @@ import (
 	"testing"
 	"time"
 
+	"go.opentelemetry.io/collector/client"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
+	"go.opentelemetry.io/collector/receiver/receivertest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -34,6 +38,8 @@ func TestPublish(t *testing.T) {
 	event3 := beat.Event{Fields: mapstr.M{"field": 3}}
 	event4 := beat.Event{Meta: mapstr.M{"_id": "abc123"}}
 
+	beatInfo := beat.Info{Name: "testbeat", Version: "0.0.0"}
+
 	makeOtelConsumer := func(t *testing.T, consumeFn func(ctx context.Context, ld plog.Logs) error) *otelConsumer {
 		t.Helper()
 
@@ -43,7 +49,7 @@ func TestPublish(t *testing.T) {
 		consumer := &otelConsumer{
 			observer:     outputs.NewNilObserver(),
 			logsConsumer: logConsumer,
-			beatInfo:     beat.Info{},
+			beatInfo:     beatInfo,
 			log:          logger.Named("otelconsumer"),
 		}
 		return consumer
@@ -113,7 +119,7 @@ func TestPublish(t *testing.T) {
 		})
 
 		err := otelConsumer.Publish(ctx, batch)
-		assert.Error(t, err)
+		assert.NoError(t, err)
 		assert.False(t, consumererror.IsPermanent(err))
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
@@ -127,8 +133,7 @@ func TestPublish(t *testing.T) {
 		})
 
 		err := otelConsumer.Publish(ctx, batch)
-		assert.Error(t, err)
-		assert.True(t, consumererror.IsPermanent(err))
+		assert.NoError(t, err)
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchDrop, batch.Signals[0].Tag)
 	})
@@ -141,8 +146,7 @@ func TestPublish(t *testing.T) {
 		})
 
 		err := otelConsumer.Publish(ctx, batch)
-		assert.Error(t, err)
-		assert.ErrorIs(t, err, context.Canceled)
+		assert.NoError(t, err)
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
 	})
@@ -165,6 +169,27 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 		assert.Equal(t, event4.Meta["_id"], docID)
+	})
+
+	t.Run("sets the receivertest doc id attribute", func(t *testing.T) {
+		batch := outest.NewBatch(event4)
+
+		var receivertestID string
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			attr, ok := record.Attributes().Get(receivertest.UniqueIDAttrName)
+			require.True(t, ok, "document ID attribute should be set")
+			receivertestID = attr.AsString()
+
+			return nil
+		})
+		otelConsumer.isReceiverTest = true
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+		assert.Equal(t, event4.Meta["_id"], receivertestID, "receivertest ID should match the event ID")
 	})
 
 	t.Run("sets the @timestamp field with the correct format", func(t *testing.T) {
@@ -222,6 +247,67 @@ func TestPublish(t *testing.T) {
 			recordTimestamp = record.Timestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
 			observedTimestamp = record.ObservedTimestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
 			assert.Equal(t, recordTimestamp, observedTimestamp, "observed timestamp should match log record timestamp")
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+	})
+	t.Run("sets otel specific-fields", func(t *testing.T) {
+		testCases := []struct {
+			name                  string
+			componentID           string
+			componentKind         string
+			expectedComponentID   string
+			expectedComponentKind string
+		}{
+			{
+				name:                  "sets beat component ID",
+				componentID:           "filebeatreceiver/1",
+				expectedComponentID:   "filebeatreceiver/1",
+				expectedComponentKind: "receiver",
+			},
+		}
+
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				event := beat.Event{
+					Fields: mapstr.M{
+						"field": 1,
+						"agent": mapstr.M{},
+					},
+					Meta: mapstr.M{
+						"_id": "abc123",
+					},
+				}
+				batch := outest.NewBatch(event)
+				var countLogs int
+				otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+					countLogs = countLogs + ld.LogRecordCount()
+					return nil
+				})
+				otelConsumer.beatInfo.ComponentID = tc.componentID
+				err := otelConsumer.Publish(ctx, batch)
+				assert.NoError(t, err)
+				assert.Len(t, batch.Signals, 1)
+				assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+				assert.Equal(t, len(batch.Events()), countLogs, "all events should be consumed")
+				for _, event := range batch.Events() {
+					beatEvent := event.Content.Fields.Flatten()
+					assert.Equal(t, tc.expectedComponentID, beatEvent["agent."+otelComponentIDKey], "expected agent.otelcol.component.id field in log record")
+					assert.Equal(t, tc.expectedComponentKind, beatEvent["agent."+otelComponentKindKey], "expected agent.otelcol.component.kind field in log record")
+				}
+			})
+		}
+	})
+	t.Run("sets the client context metadata with the beat info", func(t *testing.T) {
+		batch := outest.NewBatch(event1)
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			cm := client.FromContext(ctx).Metadata
+			assert.Equal(t, beatInfo.Beat, cm.Get(otelctx.BeatNameCtxKey)[0])
+			assert.Equal(t, beatInfo.Version, cm.Get(otelctx.BeatVersionCtxKey)[0])
 			return nil
 		})
 

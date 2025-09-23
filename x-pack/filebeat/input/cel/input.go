@@ -47,7 +47,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
@@ -142,8 +141,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 
-	metrics, reg := newInputMetrics(env.ID)
-	defer metrics.Close()
+	metrics, reg := newInputMetrics(env.MetricsRegistry, env.Logger)
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
@@ -280,7 +278,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			metrics.executions.Add(1)
 			start := i.now().In(time.UTC)
-			state, err = evalWith(ctx, prg, ast, state, start, wantDump)
+			state, err = evalWith(ctx, prg, ast, state, start, wantDump, budget-1)
 			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
 				var dump dumpError
@@ -787,7 +785,7 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
 func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry) (*http.Client, *httplog.LoggingRoundTripper, error) {
-	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings())...)
+	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings(), log)...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -865,7 +863,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	}
 
 	if reg != nil {
-		c.Transport = httpmon.NewMetricsRoundTripper(c.Transport, reg)
+		c.Transport = httpmon.NewMetricsRoundTripper(c.Transport, reg, log)
 	}
 
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
@@ -911,7 +909,7 @@ func wantClient(cfg config) bool {
 
 // clientOption returns constructed client configuration options, including
 // setting up http+unix and http+npipe transports if requested.
-func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []httpcommon.TransportOption {
+func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings, log *logp.Logger) []httpcommon.TransportOption {
 	scheme, trans, ok := strings.Cut(u.Scheme, "+")
 	var dialer transport.Dialer
 	switch {
@@ -919,6 +917,7 @@ func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []htt
 		fallthrough
 	case !ok:
 		return []httpcommon.TransportOption{
+			httpcommon.WithLogger(log),
 			httpcommon.WithAPMHTTPInstrumentation(),
 			keepalive,
 		}
@@ -937,6 +936,7 @@ func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []htt
 	}
 	u.Scheme = scheme
 	return []httpcommon.TransportOption{
+		httpcommon.WithLogger(log),
 		httpcommon.WithAPMHTTPInstrumentation(),
 		keepalive,
 		httpcommon.WithBaseDialer(dialer),
@@ -1106,8 +1106,9 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 		lib.HTTPWithContextOpts(ctx, client, httpOptions),
 		lib.Limit(limitPolicies),
 		lib.Globals(map[string]interface{}{
-			"useragent": userAgent,
-			"env":       vars,
+			"useragent":            userAgent,
+			"env":                  vars,
+			"remaining_executions": 0, // placeholder
 		}),
 	}
 	if len(patterns) != 0 {
@@ -1156,7 +1157,7 @@ func debug(log *logp.Logger, trace *httplog.LoggingRoundTripper) func(string, an
 	}
 }
 
-func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time, details bool) (map[string]interface{}, error) {
+func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time, details bool, budget int) (map[string]interface{}, error) {
 	out, det, err := prg.ContextEval(ctx, map[string]interface{}{
 		// Replace global program "now" with current time. This is necessary
 		// as the lib.Time now global is static at program instantiation time
@@ -1168,7 +1169,11 @@ func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[stri
 		// compatibility between CEL programs developed in mito with programs
 		// run in the input.
 		"now": now,
-		root:  state,
+		// remaining_executions allows a program to identify when it is on
+		// or approaching the last available execution to avoid logging
+		// exceeding maximum number of CEL executions failures.
+		"remaining_executions": budget,
+		root:                   state,
 	})
 	if err != nil {
 		err = lib.DecoratedError{AST: ast, Err: err}
@@ -1281,8 +1286,6 @@ func test(url *url.URL) error {
 
 // inputMetrics handles the input's metric reporting.
 type inputMetrics struct {
-	unregister func()
-
 	resource            *monitoring.String // URL-ish of input resource
 	executions          *monitoring.Uint   // times the CEL program has been executed
 	batchesReceived     *monitoring.Uint   // number of event arrays received
@@ -1293,10 +1296,8 @@ type inputMetrics struct {
 	batchProcessingTime metrics.Sample     // histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
 }
 
-func newInputMetrics(id string) (*inputMetrics, *monitoring.Registry) {
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
+func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) (*inputMetrics, *monitoring.Registry) {
 	out := &inputMetrics{
-		unregister:          unreg,
 		resource:            monitoring.NewString(reg, "resource"),
 		executions:          monitoring.NewUint(reg, "cel_executions"),
 		batchesReceived:     monitoring.NewUint(reg, "batches_received_total"),
@@ -1306,16 +1307,12 @@ func newInputMetrics(id string) (*inputMetrics, *monitoring.Registry) {
 		celProcessingTime:   metrics.NewUniformSample(1024),
 		batchProcessingTime: metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "cel_processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "cel_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.celProcessingTime))
-	_ = adapter.NewGoMetrics(reg, "batch_processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
 
 	return out, reg
-}
-
-func (m *inputMetrics) Close() {
-	m.unregister()
 }
 
 // redactor implements lazy field redaction of sets of a mapstr.M.

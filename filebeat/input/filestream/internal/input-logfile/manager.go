@@ -118,7 +118,15 @@ func (cim *InputManager) Init(group unison.Group) error {
 
 	store := cim.getRetainedStore()
 	cleaner := &cleaner{log: log}
+	// TL;DR: If Filebeat shuts down too quickly, the function passed to
+	// `group.Go` will never run, therefore this instance of store will
+	// never be released, locking Filebeat's shutdown process.
+	//
+	// To circumvent that, we wait for `group.Go` to start our function.
+	// See https://github.com/elastic/beats/issues/45034#issuecomment-3238261126
+	waitRunning := make(chan struct{})
 	err := group.Go(func(canceler context.Context) error {
+		waitRunning <- struct{}{}
 		defer cim.shutdown()
 		defer store.Release()
 		interval := cim.StateStore.CleanupInterval()
@@ -133,7 +141,7 @@ func (cim *InputManager) Init(group unison.Group) error {
 		cim.shutdown()
 		return fmt.Errorf("Can not start registry cleanup process: %w", err)
 	}
-
+	<-waitRunning
 	return nil
 }
 
@@ -151,11 +159,12 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 
 	settings := struct {
 		// All those values are duplicated from the Filestream configuration
-		ID                 string         `config:"id"`
-		CleanInactive      time.Duration  `config:"clean_inactive"`
-		HarvesterLimit     uint64         `config:"harvester_limit"`
-		AllowIDDuplication bool           `config:"allow_deprecated_id_duplication"`
-		TakeOver           TakeOverConfig `config:"take_over"`
+		ID                  string         `config:"id"`
+		CleanInactive       time.Duration  `config:"clean_inactive" validate:"min=-1"`
+		HarvesterLimit      uint64         `config:"harvester_limit"`
+		AllowIDDuplication  bool           `config:"allow_deprecated_id_duplication"`
+		TakeOver            TakeOverConfig `config:"take_over"`
+		LegacyCleanInactive bool           `config:"legacy_clean_inactive"`
 	}{
 		CleanInactive: cim.DefaultCleanTimeout,
 	}
@@ -166,6 +175,13 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 
 	if settings.ID == "" {
 		cim.Logger.Warn("filestream input without ID is discouraged, please add an ID and restart Filebeat")
+	}
+
+	// zero must also disable clean_inactive, see:
+	// https://github.com/elastic/beats/issues/45601
+	// for more details.
+	if !settings.LegacyCleanInactive && settings.CleanInactive == 0 {
+		settings.CleanInactive = -1
 	}
 
 	idAlreadyInUse := false

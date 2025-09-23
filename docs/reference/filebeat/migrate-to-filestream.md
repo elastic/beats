@@ -145,7 +145,10 @@ filebeat.inputs:
 
 ### Step 2: The "take over" mode [step_2]
 
-In order to indicate that the new `filestream` inputs are supposed to take over the files from the previously defined `log` or `container` inputs and continue where they left off, we need to activate the "take over" mode by adding `take_over.enabled: true` to each new `filestream`.
+In order to indicate that the new `filestream` inputs are supposed to take over the files from the previously defined `log` or `container` inputs and continue where they left off, activate the [take over](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-take-over) mode in each new `filestream` using:
+
+* {applies_to}`stack: ga 9.1` `take_over.enabled: true`
+* {applies_to}`stack: ga 9.0` `take_over: true`
 
 ::::{important}
 For the "take over" mode to work the `paths` list in each new `filestream` inputs must match the `paths` list in each old `log` or `container` inputs accordingly.
@@ -153,6 +156,10 @@ For the "take over" mode to work the `paths` list in each new `filestream` input
 
 After enabling the "take over" mode the configuration should look like this:
 
+::::{tab-set}
+:group: versions
+:::{tab-item} 9.1.0
+:sync: 9.1.0
 ```yaml
 filebeat.inputs:
  - type: filestream
@@ -187,6 +194,41 @@ filebeat.inputs:
    paths:
      - /var/log/my-old-files*.log
 ```
+:::
+:::{tab-item} 9.0.0
+:sync: 9.0.0
+```yaml
+filebeat.inputs:
+ - type: filestream
+   enabled: true
+   id: my-java-collector
+   take_over: true
+   paths:
+     - /var/log/java-exceptions*.log
+
+ - type: filestream
+   enabled: true
+   id: my-container-input
+   take_over: true
+   paths:
+     - /var/lib/docker/containers/*.log
+
+ - type: filestream
+   enabled: true
+   id: my-application-input
+   take_over: true
+   paths:
+     - /var/log/my-application*.json
+
+ - type: filestream
+   enabled: true
+   id: my-old-files
+   take_over: true
+   paths:
+     - /var/log/my-old-files*.log
+```
+:::
+::::
 
 ### Step 3: Migrate additional parameters if necessary [step_3]
 
@@ -219,6 +261,10 @@ Furthermore, the `json` parser was renamed to [`ndjson`](/reference/filebeat/fil
 
 The example configuration shown earlier needs to be adjusted according to the changes described in the table above:
 
+::::{tab-set}
+:group: versions
+:::{tab-item} 9.1.0
+:sync: 9.1.0
 ```yaml
 filebeat.inputs:
  - type: filestream
@@ -239,9 +285,9 @@ filebeat.inputs:
  - type: filestream
    enabled: true
    id: my-container-input
-   prospector.scanner.symlinks: true # container logs often use symlinks, they should be enabled
+   prospector.scanner.symlinks: true <1>
    parsers:
-     - container: ~ # the container parser replaces everything the container input did before
+     - container: ~ <2>
    take_over:
      enabled: true
    paths:
@@ -268,6 +314,60 @@ filebeat.inputs:
      - /var/log/my-old-files*.log
    ignore_inactive: since_last_start
 ```
+1. Container logs often use symlinks, they should be enabled.
+2. The container parser replaces everything the container input did before.
+:::
+:::{tab-item} 9.0.0
+:sync: 9.0.0
+```yaml
+filebeat.inputs:
+ - type: filestream
+   enabled: true
+   id: my-java-collector
+   take_over: true
+   paths:
+     - /var/log/java-exceptions*.log
+   parsers:
+     - multiline:
+         pattern: '^\['
+         negate: true
+         match: after
+   close.on_state_change.removed: true
+   close.on_state_change.renamed: true
+
+ - type: filestream
+   enabled: true
+   id: my-container-input
+   prospector.scanner.symlinks: true <1>
+   parsers:
+     - container: ~ <2>
+   take_over: true
+   paths:
+     - /var/lib/docker/containers/*.log
+
+ - type: filestream
+   enabled: true
+   id: my-application-input
+   take_over: true
+   paths:
+     - /var/log/my-application*.json
+   prospector.scanner.check_interval: 1m
+   parsers:
+     - ndjson:
+         keys_under_root: true
+
+ - type: filestream
+   enabled: true
+   id: my-old-files
+   take_over: true
+   paths:
+     - /var/log/my-old-files*.log
+   ignore_inactive: since_last_start
+```
+1. Container logs often use symlinks, they should be enabled.
+2. The container parser replaces everything the container input did before.
+:::
+::::
 
 Now you finally have your configuration fully migrated to using `filestream` inputs instead of `log` and `container` inputs.
 
@@ -282,8 +382,8 @@ Double-check that:
 
 Start Filebeat with the new migrated configuration.
 
-All the events produced by a `filestream` input with `take_over.enabled: true` contain the `take_over` tag. You can filter on this tag in Kibana Discover and see all the events which came from filestreams in the "take over" mode.
+All the events produced by a `filestream` input with [take over](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-take-over) mode enabled contain the `take_over` tag. You can filter on this tag in Kibana Discover and see all the events which came from filestreams in the "take over" mode.
 
-Once you start receiving events with this tag and validate that all new `filestream` inputs behave correctly, you can remove `take_over.enabled: true` and restart Filebeat again.
+Once you start receiving events with this tag and validate that all new `filestream` inputs behave correctly, you can stop using take over mode and restart Filebeat again.
 
 Congratulations, you've completed the migration process.

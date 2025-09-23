@@ -8,7 +8,7 @@ This metricset periodically fetches JMX metrics from Kafka Broker JMX.
 
 ## Compatibility [_compatibility_27]
 
-The module has been tested with Kafka 2.1.1, 2.2.2 and 3.6.0. Other versions are expected to work.
+The module has been tested with Kafka 2.1.1, 2.2.2, 3.6.0 and 4.0.0. Other versions are expected to work.
 
 
 ## Usage [_usage_6]

@@ -20,16 +20,17 @@ package inputs
 import (
 	"github.com/elastic/beats/v7/filebeat/input/filestream"
 	"github.com/elastic/beats/v7/filebeat/input/kafka"
-	"github.com/elastic/beats/v7/filebeat/input/tcp"
-	"github.com/elastic/beats/v7/filebeat/input/udp"
+	"github.com/elastic/beats/v7/filebeat/input/net/tcp"
+	"github.com/elastic/beats/v7/filebeat/input/net/udp"
 	"github.com/elastic/beats/v7/filebeat/input/unix"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-func Init(info beat.Info, log *logp.Logger, components statestore.States) []v2.Plugin {
+func Init(info beat.Info, log *logp.Logger, components statestore.States, path *paths.Path) []v2.Plugin {
 	return append(
 		genericInputs(log, components),
 		osInputs(info, log, components)...,

@@ -16,16 +16,16 @@ coredns fields after normalization
 **`coredns.query.size`**
 :   size of the DNS query
 
-type: integer
+    type: integer
 
-format: bytes
+    format: bytes
 
 
 **`coredns.response.size`**
 :   size of the DNS response
 
-type: integer
+    type: integer
 
-format: bytes
+    format: bytes
 
 

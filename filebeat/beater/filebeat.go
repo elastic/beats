@@ -21,7 +21,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"path/filepath"
 	"strings"
 	"sync"
 
@@ -48,6 +47,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/unison"
 
 	// Add filebeat level processors
@@ -77,7 +77,7 @@ type Filebeat struct {
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 }
 
-type PluginFactory func(beat.Info, *logp.Logger, statestore.States) []v2.Plugin
+type PluginFactory func(beat.Info, *logp.Logger, statestore.States, *paths.Path) []v2.Plugin
 
 // New creates a new Filebeat pointer instance.
 func New(plugins PluginFactory) beat.Creator {
@@ -96,6 +96,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		rawConfig,
 		"prospectors",
 		"config.prospectors",
+		"config_dir",
 		"registry_file",
 		"registry_file_permissions",
 		"registry_flush",
@@ -116,10 +117,6 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 	moduleInputs, err := moduleRegistry.GetInputConfigs()
 	if err != nil {
-		return nil, err
-	}
-
-	if err := config.FetchConfigs(b.Info.Logger); err != nil {
 		return nil, err
 	}
 
@@ -243,7 +240,9 @@ func (fb *Filebeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
 // setup.
 func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	if b.Config.Output.Name() != "elasticsearch" {
-		fb.logger.Warn(pipelinesWarning)
+		if !b.Manager.Enabled() {
+			fb.logger.Warn(pipelinesWarning)
+		}
 		return nil
 	}
 
@@ -365,7 +364,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	pipelineConnector := channel.NewOutletFactory(outDone).Create
 
 	inputsLogger := fb.logger.Named("input")
-	v2Inputs := fb.pluginFactory(b.Info, inputsLogger, stateStore)
+	v2Inputs := fb.pluginFactory(b.Info, inputsLogger, stateStore, paths.Paths)
 	v2InputLoader, err := v2.NewLoader(inputsLogger, v2Inputs, "type", cfg.DefaultType)
 	if err != nil {
 		panic(err) // loader detected invalid state.
@@ -403,7 +402,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	if b.Config.Output.Name() == "elasticsearch" {
 		pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), fb.logger)
 	} else {
-		fb.logger.Warn(pipelinesWarning)
+		if !b.Manager.Enabled() {
+			fb.logger.Warn(pipelinesWarning)
+		}
 	}
 	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
 	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once, fb.logger)
@@ -553,48 +554,4 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, logger *log
 		return esClient, nil
 	}
 	return pipelineLoaderFactory
-}
-
-// fetches all the defined input configuration available at Filebeat startup including external files.
-func fetchInputConfiguration(config *cfg.Config, logger *logp.Logger) (inputs []*conf.C, err error) {
-	if len(config.Inputs) == 0 {
-		inputs = []*conf.C{}
-	} else {
-		inputs = config.Inputs
-	}
-
-	// reading external input configuration if defined
-	var dynamicInputCfg cfgfile.DynamicConfig
-	if config.ConfigInput != nil {
-		err = config.ConfigInput.Unpack(&dynamicInputCfg)
-		if err != nil {
-			return nil, fmt.Errorf("failed to unpack the dynamic input configuration: %w", err)
-		}
-	}
-	if dynamicInputCfg.Path == "" {
-		return inputs, nil
-	}
-
-	cfgPaths, err := filepath.Glob(dynamicInputCfg.Path)
-	if err != nil {
-		return nil, fmt.Errorf("failed to resolve external input configuration paths: %w", err)
-	}
-
-	if len(cfgPaths) == 0 {
-		return inputs, nil
-	}
-
-	// making a copy so we can safely extend the slice
-	inputs = make([]*conf.C, len(config.Inputs))
-	copy(inputs, config.Inputs)
-
-	for _, p := range cfgPaths {
-		externalInputs, err := cfgfile.LoadList(p, logger)
-		if err != nil {
-			return nil, fmt.Errorf("failed to load external input configuration: %w", err)
-		}
-		inputs = append(inputs, externalInputs...)
-	}
-
-	return inputs, nil
 }

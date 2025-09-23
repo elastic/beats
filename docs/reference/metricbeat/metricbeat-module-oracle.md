@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-oracle.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -134,5 +136,5 @@ metricbeat.modules:
 The following metricsets are available:
 
 * [performance](/reference/metricbeat/metricbeat-metricset-oracle-performance.md)
-* [sysmetric](/reference/metricbeat/metricbeat-metricset-oracle-sysmetric.md)
+* [sysmetric](/reference/metricbeat/metricbeat-metricset-oracle-sysmetric.md)  {applies_to}`stack: beta`
 * [tablespace](/reference/metricbeat/metricbeat-metricset-oracle-tablespace.md)

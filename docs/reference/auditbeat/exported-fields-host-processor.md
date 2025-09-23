@@ -12,22 +12,22 @@ Info collected for the host machine.
 **`host.containerized`**
 :   If the host is a container.
 
-type: boolean
+    type: boolean
 
 
 **`host.os.build`**
 :   OS build information.
 
-type: keyword
+    type: keyword
 
-example: 18D109
+    example: 18D109
 
 
 **`host.os.codename`**
 :   OS codename, if any.
 
-type: keyword
+    type: keyword
 
-example: stretch
+    example: stretch
 
 

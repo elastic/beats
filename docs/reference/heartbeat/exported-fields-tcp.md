@@ -16,9 +16,9 @@ TCP network layer related fields.
 **`tcp.port`**
 :   Service port number.
 
-type: alias
+    type: alias
 
-alias to: url.port
+    alias to: url.port
 
 
 ## rtt [_rtt]
@@ -32,7 +32,7 @@ Duration required to establish a TCP connection based on already available IP ad
 **`tcp.rtt.connect.us`**
 :   Duration in microseconds
 
-type: long
+    type: long
 
 
 ## validate [_validate]
@@ -42,6 +42,6 @@ Duration of validation step based on existing TCP connection.
 **`tcp.rtt.validate.us`**
 :   Duration in microseconds
 
-type: long
+    type: long
 
 

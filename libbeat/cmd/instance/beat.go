@@ -44,7 +44,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/locks"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
@@ -351,7 +350,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 
 	// Report central management state
-	mgmt := b.Monitoring.StateRegistry().NewRegistry("management")
+	mgmt := b.Monitoring.StateRegistry().GetOrCreateRegistry("management")
 	monitoring.NewBool(mgmt, "enabled").Set(b.Manager.Enabled())
 
 	log.Debug("Initializing output plugins")
@@ -419,7 +418,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path. This is disabled under elastic-agent.
-	if !fleetmode.Enabled() {
+	if !management.UnderAgent() {
 		bl := locks.New(b.Info)
 		err := bl.Lock()
 		if err != nil {
@@ -1281,7 +1280,7 @@ func (b *Beat) registerClusterUUIDFetching() {
 
 // Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
 func (b *Beat) clusterUUIDFetchingCallback() elasticsearch.ConnectCallback {
-	elasticsearchRegistry := b.Monitoring.StateRegistry().NewRegistry("outputs.elasticsearch")
+	elasticsearchRegistry := b.Monitoring.StateRegistry().GetOrCreateRegistry("outputs.elasticsearch")
 	clusterUUIDRegVar := monitoring.NewString(elasticsearchRegistry, "cluster_uuid")
 
 	callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
@@ -1318,7 +1317,7 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 
 	// Expose monitoring.cluster_uuid in state API
 	if monitoringClusterUUID != "" {
-		monitoringRegistry := b.Monitoring.StateRegistry().NewRegistry("monitoring")
+		monitoringRegistry := b.Monitoring.StateRegistry().GetOrCreateRegistry("monitoring")
 		clusterUUIDRegVar := monitoring.NewString(monitoringRegistry, "cluster_uuid")
 		clusterUUIDRegVar.Set(monitoringClusterUUID)
 	}

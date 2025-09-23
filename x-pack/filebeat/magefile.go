@@ -50,7 +50,7 @@ func BuildOTel() error {
 
 // BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
 func BuildSystemTestBinary() error {
-	return devtools.BuildSystemTestBinary()
+	return devtools.BuildSystemTestOTelBinary()
 }
 
 // GolangCrossBuild builds the Beat binary inside of the golang-builder.
@@ -193,6 +193,11 @@ func GoFIPSOnlyIntegTest(ctx context.Context) error {
 	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
 	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
 	return devtools.GoIntegTestFromHost(ctx, args)
+}
+
+// GoWindowsIntegTest executes the Go windows integration tests.
+func GoWindowsIntegTest(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultGoWindowsTestIntegrationArgs())
 }
 
 // PythonIntegTest starts the docker containers and executes the Python integration tests.

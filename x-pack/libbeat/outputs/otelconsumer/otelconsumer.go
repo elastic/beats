@@ -7,11 +7,13 @@ package otelconsumer
 import (
 	"context"
 	"fmt"
+	"os"
 	"runtime"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -23,11 +25,16 @@ import (
 	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
+	"go.opentelemetry.io/collector/receiver/receivertest"
 )
 
 const (
 	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
 	esDocumentIDAttribute = "elasticsearch.document_id"
+	// otelComponentIDKey is the key used to store the Beat receiver's component id in the beat event.
+	otelComponentIDKey = "otelcol.component.id"
+	// otelComponentKindKey is the key used to store the Beat receiver's component kind in the beat event. This is always "receiver".
+	otelComponentKindKey = "otelcol.component.kind"
 )
 
 func init() {
@@ -35,10 +42,11 @@ func init() {
 }
 
 type otelConsumer struct {
-	observer     outputs.Observer
-	logsConsumer consumer.Logs
-	beatInfo     beat.Info
-	log          *logp.Logger
+	observer       outputs.Observer
+	logsConsumer   consumer.Logs
+	beatInfo       beat.Info
+	log            *logp.Logger
+	isReceiverTest bool // whether we are running in receivertest context
 }
 
 func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
@@ -47,14 +55,17 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		return outputs.Fail(err)
 	}
 
+	isReceiverTest := os.Getenv("OTELCONSUMER_RECEIVERTEST") == "1"
+
 	// Default to runtime.NumCPU() workers
 	clients := make([]outputs.Client, 0, runtime.NumCPU())
 	for range runtime.NumCPU() {
 		clients = append(clients, &otelConsumer{
-			observer:     observer,
-			logsConsumer: beat.LogConsumer,
-			beatInfo:     beat,
-			log:          beat.Logger.Named("otelconsumer"),
+			observer:       observer,
+			logsConsumer:   beat.LogConsumer,
+			beatInfo:       beat,
+			log:            beat.Logger.Named("otelconsumer"),
+			isReceiverTest: isReceiverTest,
 		})
 	}
 
@@ -104,6 +115,13 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			switch id := id.(type) {
 			case string:
 				logRecord.Attributes().PutStr(esDocumentIDAttribute, id)
+
+				// The receivertest package needs a unique attribute to track generated ids.
+				// When receivertest allows this to be customized we can remove this condition.
+				// See https://github.com/open-telemetry/opentelemetry-collector/issues/12003.
+				if out.isReceiverTest {
+					logRecord.Attributes().PutStr(receivertest.UniqueIDAttrName, id)
+				}
 			}
 		}
 
@@ -128,6 +146,15 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		}
 		logRecord.SetObservedTimestamp(observedTimestamp)
 
+		if agent, _ := beatEvent.GetValue("agent"); agent != nil {
+			switch agent := agent.(type) {
+			case mapstr.M:
+				agent[otelComponentIDKey] = out.beatInfo.ComponentID
+				agent[otelComponentKindKey] = "receiver"
+				beatEvent["agent"] = agent
+			}
+		}
+
 		otelmap.ConvertNonPrimitive(beatEvent)
 
 		// if data_stream field is set on beatEvent. Add it to logrecord.Attributes to support dynamic indexing
@@ -150,7 +177,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		}
 	}
 
-	err := out.logsConsumer.ConsumeLogs(ctx, pLogs)
+	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
 	if err != nil {
 		// Permanent errors shouldn't be retried. This tipically means
 		// the data cannot be serialized by the exporter that is attached
@@ -166,7 +193,8 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Retry()
 		}
 
-		return fmt.Errorf("failed to send batch events to otel collector: %w", err)
+		out.log.Errorf("failed to send batch events to otel collector: %v", err)
+		return nil
 	}
 
 	batch.ACK()

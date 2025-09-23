@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-docker.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -94,4 +96,4 @@ The following metricsets are available:
 * [info](/reference/metricbeat/metricbeat-metricset-docker-info.md)
 * [memory](/reference/metricbeat/metricbeat-metricset-docker-memory.md)
 * [network](/reference/metricbeat/metricbeat-metricset-docker-network.md)
-* [network_summary](/reference/metricbeat/metricbeat-metricset-docker-network_summary.md)
+* [network_summary](/reference/metricbeat/metricbeat-metricset-docker-network_summary.md)  {applies_to}`stack: beta`
