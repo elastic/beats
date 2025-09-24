@@ -408,10 +408,10 @@ func newExporterWithDefaultsWith(t *testing.T, extraConfig map[string]any) *logs
 	settings := exportertest.NewNopSettings(Type)
 	defaultConfig := createDefaultConfig()
 	var cfg Config
-	if c, ok := defaultConfig.(*Config); ok {
-		cfg = *c
+	if c, ok := defaultConfig.(Config); ok {
+		cfg = c
 	} else {
-		t.Fatal("default config is not of type *Config")
+		t.Fatal("default config is not of type Config")
 	}
 	cfg["hosts"] = []string{"localhost:9999"}
 	cfg["max_retries"] = 10
