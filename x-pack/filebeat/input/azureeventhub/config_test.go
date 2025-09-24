@@ -90,6 +90,19 @@ func TestValidateConnectionStringV1(t *testing.T) {
 		require.NoError(t, err)
 		require.Nil(t, connectionStringProperties.EntityPath)
 	})
+
+	t.Run("Connection string contains entity path but does not match event hub name", func(t *testing.T) {
+		config := defaultConfig()
+		config.ProcessorVersion = "v1"
+		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;EntityPath=my-event-hub"
+		config.EventHubName = "not-my-event-hub"
+		config.SAName = "teststorageaccount"
+		config.SAKey = "my-secret"
+		config.SAContainer = "filebeat-activitylogs-event_hub_00"
+
+		err := config.Validate()
+		assert.ErrorContains(t, err, "invalid config: the entity path (my-event-hub) in the connection string does not match event hub name (not-my-event-hub)")
+	})
 }
 
 func TestValidateConnectionStringV2(t *testing.T) {
