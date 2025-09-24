@@ -94,10 +94,13 @@ func (br *BeatReceiver) Start(host component.Host) error {
 	extensions := host.GetExtensions()
 	for _, ext := range extensions {
 		if diagExt, ok := ext.(otelmanager.DiagnosticExtension); ok {
+			// if the manager also implements WithDiagnosticExtension interface then set the extension.
 			if m, ok := br.beat.Manager.(otelmanager.WithDiagnosticExtension); ok {
 				m.SetDiagnosticExtension(br.beat.Info.ComponentID, diagExt)
 			}
 
+			// Register a diagnostic hook to collect beat metrics.
+			// This is registered once per beat receiver.
 			diagExt.RegisterDiagnosticHook(br.beat.Info.ComponentID, "Metrics from the default monitoring namespace and expvar.",
 				"beat_metrics.json", "application/json", func() []byte {
 					m := monitoring.CollectStructSnapshot((br.beat.Monitoring.StatsRegistry()), monitoring.Full, true)

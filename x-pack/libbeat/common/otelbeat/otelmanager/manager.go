@@ -24,6 +24,7 @@ type WithDiagnosticExtension interface {
 }
 
 var _ management.Manager = (*OtelManager)(nil)
+var _ WithDiagnosticExtension = (*OtelManager)(nil)
 
 func NewOtelManager(cfg *config.C, registry *reload.Registry, logger *logp.Logger) (management.Manager, error) {
 	management.SetUnderAgent(true)
@@ -31,8 +32,8 @@ func NewOtelManager(cfg *config.C, registry *reload.Registry, logger *logp.Logge
 }
 
 // OtelManager is the main manager for managing beatreceivers
-type OtelManager struct{
-	ext DiagnosticExtension
+type OtelManager struct {
+	ext          DiagnosticExtension
 	receiverName string
 }
 
@@ -64,4 +65,3 @@ func (n *OtelManager) SetDiagnosticExtension(receiverName string, ext Diagnostic
 	n.ext = ext
 	n.receiverName = receiverName
 }
-
