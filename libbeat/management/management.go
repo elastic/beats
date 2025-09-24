@@ -101,13 +101,8 @@ func NewManager(cfg *config.C, registry *reload.Registry) (Manager, error) {
 			return managerFactory(cfg, registry)
 		}
 	}
-<<<<<<< HEAD
-	return &fallbackManager{
-		logger: logp.NewLogger("mgmt"),
-=======
 	return &FallbackManager{
-		logger: logger.Named("mgmt"),
->>>>>>> 4ba000d5c ([beatreceiver] - add manager for otel mode  (#46539))
+		logger: logp.NewLogger("mgmt"),
 		status: status.Unknown,
 		msg:    "",
 	}, nil
