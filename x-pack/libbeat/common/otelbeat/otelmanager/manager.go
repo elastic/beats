@@ -10,12 +10,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var _ management.Manager = (*OtelManager)(nil)
 
-func NewOtelManager(cfg *config.C, registry *reload.Registry, logger *logp.Logger) (management.Manager, error) {
+func NewOtelManager(cfg *config.C, registry *reload.Registry) (management.Manager, error) {
 	management.SetUnderAgent(true)
 	return &OtelManager{}, nil
 }
