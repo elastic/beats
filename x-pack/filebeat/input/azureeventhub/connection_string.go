@@ -91,7 +91,7 @@ func parseConnectionString(connStr string) (ConnectionStringProperties, error) {
 		case strings.EqualFold(endpointKey, key):
 			u, err := url.Parse(value)
 			if err != nil {
-				return ConnectionStringProperties{}, errors.New("failed parsing connection string due to an incorrectly formatted Endpoint value")
+				return ConnectionStringProperties{}, fmt.Errorf("failed parsing connection string due to an incorrectly formatted Endpoint value (%s): %w", value, err)
 			}
 			csp.Endpoint = value
 			csp.FullyQualifiedNamespace = u.Host

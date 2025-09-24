@@ -138,7 +138,6 @@ func TestValidateConnectionStringV2(t *testing.T) {
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 
 		err := config.Validate()
-		require.Error(t, err)
 		assert.ErrorContains(t, err, "invalid config: the entity path (my-event-hub) in the connection string does not match event hub name (not-my-event-hub)")
 	})
 }
