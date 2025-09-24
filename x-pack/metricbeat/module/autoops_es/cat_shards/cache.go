@@ -7,8 +7,6 @@ package cat_shards
 import (
 	"time"
 
-	"golang.org/x/exp/maps"
-
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 )
 
@@ -101,19 +99,19 @@ func enrichNodeIndexShards(nodeIndexShardsMap map[string]NodeIndexShards, indexM
 		timestampDiff = &diff
 	}
 
-	nodeIndexShardsList := maps.Values(nodeIndexShardsMap)
-
-	for i := range nodeIndexShardsList {
-		nodeIndexShardsList[i].TotalFractions = size
+	nodeIndexShardsList := make([]NodeIndexShards, 0, len(nodeIndexShardsMap))
+	for _, v := range nodeIndexShardsMap {
+		v.TotalFractions = size
 
 		if timestampDiff != nil {
-			if prevNodeIndexShards, exists := cache.PreviousCache[nodeIndexShardsList[i].IndexNode]; exists {
-				utils.EnrichObject(&nodeIndexShardsList[i], &prevNodeIndexShards, cache)
-				nodeIndexShardsList[i].TimestampDiff = timestampDiff
+			if prevNodeIndexShards, exists := cache.PreviousCache[v.IndexNode]; exists {
+				utils.EnrichObject(&v, &prevNodeIndexShards, cache)
+				v.TimestampDiff = timestampDiff
 			}
 		}
 
-		enrichIndexMetadata(&nodeIndexShardsList[i], indexMetadata)
+		enrichIndexMetadata(&v, indexMetadata)
+		nodeIndexShardsList = append(nodeIndexShardsList, v)
 	}
 
 	return nodeIndexShardsList
