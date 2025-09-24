@@ -53,3 +53,11 @@ type WithStatusReporter interface {
 	// SetStatusReporter sets the status reporter
 	SetStatusReporter(reporter StatusReporter)
 }
+
+// NoopReporter is a bare reporter interface
+type NoopReporter struct{}
+
+// UpdateStatus does nothing
+func (NoopReporter) UpdateStatus(_ Status, _ string) {
+
+}

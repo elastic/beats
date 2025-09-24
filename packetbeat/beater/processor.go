@@ -127,9 +127,10 @@ func newProcessorFactory(name string, err chan error, beat *beat.Beat, configura
 
 // / CreateWithReporter functions the same as Create, but also accepts a StatusReporter.
 func (p *processorFactory) CreateWithReporter(pipeline beat.PipelineConnector, cfg *conf.C, statusReporter status.StatusReporter) (cfgfile.Runner, error) {
-	if statusReporter != nil {
-		statusReporter.UpdateStatus(status.Configuring, "starting packetbeat processor configuration")
+	if statusReporter == nil {
+		statusReporter = status.NoopReporter{}
 	}
+	statusReporter.UpdateStatus(status.Configuring, "starting packetbeat processor configuration")
 	duration, publisher, flows, sniffer, errChan, err := p.create(pipeline, cfg, statusReporter)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create packetbeat processor: %w", err)
