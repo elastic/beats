@@ -147,12 +147,11 @@ func PythonTest(params PythonTestArgs) error {
 		"--timeout=90",
 		"--durations=20",
 		// Enable -x to stop at the first failing test
-		"-x",
-		"-rP",
+		// "-x",
 		// Enable --tb=long to produce long tracebacks
 		//"--tb=long",
 		// Enable -v to produce verbose output
-		"-v",
+		//"-v",
 		// Don't capture test output
 		//"-s",
 	}
@@ -185,7 +184,7 @@ func PythonTest(params PythonTestArgs) error {
 	if err != nil {
 		return err
 	}
-	testFiles = []string{"tests/system/test_file_integrity.py::Test::test_file_modified__ebpf"}
+
 	defer fmt.Println(">> python test:", params.TestName, "Testing Complete")
 	_, err = sh.Exec(pytestEnv, os.Stdout, os.Stderr, pytestPath, append(pytestOptions, testFiles...)...)
 	return err
