@@ -586,7 +586,7 @@ The clause `.parent_last_response.` should only be used from within chain steps 
   - type: httpjson
     enabled: true
     id: my-httpjson-id
-    request.url: http://xyz.com/services/data/v1.0/export_ids/page
+    request.url: http://example.com/services/data/v1.0/export_ids/page
     request.method: POST
     interval: 1h
     request.retry.max_attempts: 2
@@ -604,7 +604,7 @@ The clause `.parent_last_response.` should only be used from within chain steps 
           do_not_log_failure: true
     chain:
     - step:
-          request.url: http://xyz.com/services/data/v1.0/$.exportId/export_ids/$.files[:].id/info
+          request.url: http://example.com/services/data/v1.0/$.exportId/export_ids/$.files[:].id/info
           request.method: POST
           request.transforms:
           - set:
