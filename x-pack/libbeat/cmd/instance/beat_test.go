@@ -9,15 +9,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/consumer/consumertest"
 	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/filebeat/cmd"
-	"github.com/elastic/beats/v7/filebeat/input/log"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/otelmanager"
-	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestManager(t *testing.T) {
@@ -58,12 +55,6 @@ func TestManager(t *testing.T) {
 		assert.NotNil(t, beat.Manager)
 		assert.IsType(t, beat.Manager, &otelmanager.OtelManager{})
 		assert.True(t, management.UnderAgent())
-
-		// test if log input is enabled
-		cfg, err := conf.NewConfigFrom(`
-type: "log"`)
-		require.NoError(t, err)
-		assert.True(t, log.AllowDeprecatedUse(cfg))
 	})
 	t.Run("otel management disabled", func(t *testing.T) {
 		tmpCfg := map[string]any{}
@@ -77,11 +68,5 @@ type: "log"`)
 		assert.NotNil(t, beat.Manager)
 		assert.IsType(t, beat.Manager, &management.FallbackManager{})
 		assert.False(t, management.UnderAgent())
-
-		// test if log input is disabled
-		cfg, err := conf.NewConfigFrom(`
-type: "log"`)
-		require.NoError(t, err)
-		assert.False(t, log.AllowDeprecatedUse(cfg))
 	})
 }
