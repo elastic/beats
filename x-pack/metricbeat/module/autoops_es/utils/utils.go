@@ -97,6 +97,7 @@ func PartitionByMaxValue[T any](limit int, items []T, valueExtractor func(T) int
 		itemKey := valueExtractor(item)
 		sortedValues[itemKey] = append(sortedValues[itemKey], item)
 	}
+
 	allKeys := slices.Collect(maps.Keys(sortedValues))
 	slices.Sort(allKeys)
 	var sortedItems = make(map[int][]T)
