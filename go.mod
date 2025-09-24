@@ -239,6 +239,7 @@ require (
 require (
 	github.com/otiai10/copy v1.14.1
 	go.opentelemetry.io/collector/client v1.38.0
+	go.opentelemetry.io/collector/consumer/consumertest v0.132.0
 	go.uber.org/goleak v1.3.0
 )
 
@@ -431,7 +432,6 @@ require (
 	go.opentelemetry.io/collector/connector/connectortest v0.132.0 // indirect
 	go.opentelemetry.io/collector/connector/xconnector v0.132.0 // indirect
 	go.opentelemetry.io/collector/consumer/consumererror/xconsumererror v0.132.0 // indirect
-	go.opentelemetry.io/collector/consumer/consumertest v0.132.0 // indirect
 	go.opentelemetry.io/collector/consumer/xconsumer v0.132.0 // indirect
 	go.opentelemetry.io/collector/exporter v0.132.0 // indirect
 	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.132.0 // indirect
