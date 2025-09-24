@@ -536,38 +536,6 @@ func TestConsumeContract(t *testing.T) {
 	})
 }
 
-type mockHost struct {
-	component.Host
-	diagExt *mockDiagExtension
-}
-
-type hook struct {
-	description string
-	filename    string
-	contentType string
-	hook        func() []byte
-}
-
-type mockDiagExtension struct {
-	component.Component
-	hooks map[string][]hook
-}
-
-func (m *mockHost) GetExtensions() map[component.ID]component.Component {
-	return map[component.ID]component.Component{
-		component.MustNewIDWithName("mockdiagextension", ""): m.diagExt,
-	}
-}
-
-func (m *mockDiagExtension) RegisterDiagnosticHook(name string, description string, filename string, contentType string, fn func() []byte) {
-	m.hooks[name] = append(m.hooks[name], hook{
-		description: description,
-		filename:    filename,
-		contentType: contentType,
-		hook:        fn,
-	})
-}
-
 func TestReceiverHook(t *testing.T) {
 	cfg := Config{
 		Beatconfig: map[string]any{
