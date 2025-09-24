@@ -562,6 +562,7 @@ func TestReceiverHook(t *testing.T) {
 			Logger: zap.NewNop(),
 		},
 	}
-
+	// For filebeatreceiver, we expect 3 hooks to be registered:
+	// 	one for beat metrics, one for input metrics and one for getting the registry.
 	oteltest.TestReceiverHook(t, &cfg, NewFactory(), receiverSettings, 3)
 }

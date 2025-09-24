@@ -445,5 +445,7 @@ func TestReceiverHook(t *testing.T) {
 		},
 	}
 
+	// For metricbeatreceiver, we expect 2 hooks to be registered:
+	// 	one for beat metrics and one for input metrics.
 	oteltest.TestReceiverHook(t, &cfg, NewFactory(), receiverSettings, 2)
 }
