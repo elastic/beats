@@ -244,12 +244,13 @@ processors:
 `
 	expectedExporter := `exporters:
     elasticsearch:
+        auth:
+            authenticator: beatsauth
         compression: gzip
         compression_params:
             level: 1
         endpoints:
             - http://localhost:9200
-        idle_conn_timeout: 3s
         logs_index: index
         mapping:
             mode: bodymap
@@ -270,8 +271,14 @@ processors:
             num_consumers: 1
             queue_size: 3200
             wait_for_result: true
+        user: admin
+extensions:
+    beatsauth:
+        idle_connection_timeout: 3s
+        proxy_disable: false
         timeout: 1m30s
-        user: admin`
+`
+
 	expectedReceiver := `receivers:
     filebeatreceiver:
         filebeat:
@@ -288,6 +295,8 @@ processors:
                             enabled: false
                   type: filestream`
 	expectedService := `service:
+    extensions:
+        - beatsauth
     pipelines:
         logs:
             exporters:

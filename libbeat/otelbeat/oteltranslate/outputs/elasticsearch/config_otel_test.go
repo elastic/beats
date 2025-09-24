@@ -49,7 +49,6 @@ username: elastic
 password: changeme
 index: "some-index"
 pipeline: "some-ingest-pipeline"
-proxy_url: "https://proxy.url"
 backoff:
   init: 42s
   max: 420s
@@ -62,12 +61,10 @@ headers:
 endpoints:
   - http://localhost:9200/foo/bar
   - http://localhost:9300/foo/bar
-idle_conn_timeout: 3s
 logs_index: some-index
 max_conns_per_host: 30
 password: changeme
 pipeline: some-ingest-pipeline
-proxy_url: https://proxy.url
 retry:
   enabled: true
   initial_interval: 42s
@@ -83,7 +80,6 @@ sending_queue:
   num_consumers: 30
   queue_size: 3200
   wait_for_result: true
-timeout: 1m30s
 user: elastic
 headers:
   X-Header-1: foo
@@ -113,14 +109,12 @@ api_key: "TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA"
 		OTelCfg := `
 endpoints:
   - http://localhost:9200
-idle_conn_timeout: 3s
 logs_index: some-index
 retry:
   enabled: true
   initial_interval: 1s
   max_interval: 1m0s
   max_retries: 3
-timeout: 1m30s
 sending_queue:
   batch:
     max_size: 1600
@@ -147,7 +141,8 @@ compression_params:
 
 	})
 
-	// when preset is configured, we only test worker, bulk_max_size, idle_connection_timeout here
+	// when preset is configured, we only test worker, bulk_max_size
+	// idle_connection_timeout should be correctly configured on beatsauthextension
 	// es-exporter sets compression level to 1 by default
 	t.Run("check preset config translation", func(t *testing.T) {
 		commonBeatCfg := `
@@ -170,7 +165,6 @@ retry:
 logs_index: some-index
 password: changeme
 user: elastic
-timeout: 1m30s
 mapping:
   mode: bodymap 
 compression: gzip
@@ -185,7 +179,6 @@ compression_params:
 			{
 				presetName: "balanced",
 				output: commonOTelCfg + `
-idle_conn_timeout: 3s
 max_conns_per_host: 1
 sending_queue:
   batch:
@@ -202,7 +195,6 @@ sending_queue:
 			{
 				presetName: "throughput",
 				output: commonOTelCfg + `
-idle_conn_timeout: 15s
 max_conns_per_host: 4
 sending_queue:
   batch:
@@ -229,8 +221,6 @@ retry:
 logs_index: some-index
 password: changeme
 user: elastic
-timeout: 1m30s
-idle_conn_timeout: 1s
 max_conns_per_host: 1
 sending_queue:
   batch:
@@ -252,7 +242,6 @@ compression_params:
 			{
 				presetName: "latency",
 				output: commonOTelCfg + `
-idle_conn_timeout: 1m0s
 max_conns_per_host: 1
 sending_queue:
   batch:
@@ -269,7 +258,6 @@ sending_queue:
 			{
 				presetName: "custom",
 				output: commonOTelCfg + `
-idle_conn_timeout: 3s
 max_conns_per_host: 1
 sending_queue:
   batch:
@@ -315,7 +303,6 @@ compression_level: %d`
 endpoints:
   - http://localhost:9200/foo/bar
   - http://localhost:9300/foo/bar
-idle_conn_timeout: 3s
 logs_index: some-index
 password: changeme
 retry:
@@ -323,7 +310,6 @@ retry:
   initial_interval: 1s
   max_interval: 1m0s
   max_retries: 3
-timeout: 1m30s
 max_conns_per_host: 1
 user: elastic
 sending_queue:
