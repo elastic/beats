@@ -51,11 +51,12 @@ import (
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	"go.uber.org/zap/zaptest"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 	mockes "github.com/elastic/mock-es/pkg/api"
 	"github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension"
-	"gopkg.in/yaml.v2"
 )
 
 // This test package tests ES exporter + beatsauth extension together
@@ -79,9 +80,9 @@ type options struct {
 func TestMTLS(t *testing.T) {
 	// write ca.pem to a file
 	caFilePath := filepath.Join(t.TempDir(), "ca.pem")
-	os.WriteFile(caFilePath, pem.EncodeToMemory(&pem.Block{
+	require.NoError(t, os.WriteFile(caFilePath, pem.EncodeToMemory(&pem.Block{
 		Type:  "CERTIFICATE",
-		Bytes: caCert.Leaf.Raw}), 0o777)
+		Bytes: caCert.Leaf.Raw}), 0o777), "error writing ca pem blocks to a file")
 
 	// create server certificates
 	serverCerts, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "server", []string{"localhost"}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
@@ -334,9 +335,9 @@ func TestVerificationMode(t *testing.T) {
 	}
 
 	caFilePath := filepath.Join(t.TempDir(), "ca.pem")
-	os.WriteFile(caFilePath, pem.EncodeToMemory(&pem.Block{
+	require.NoError(t, os.WriteFile(caFilePath, pem.EncodeToMemory(&pem.Block{
 		Type:  "CERTIFICATE",
-		Bytes: caCert.Leaf.Raw}), 0o777)
+		Bytes: caCert.Leaf.Raw}), 0o777), "error writing ca pem blocks to a file")
 
 	for name, test := range testcases {
 		t.Run(name, func(t *testing.T) {
@@ -573,6 +574,8 @@ func getTranslatedConf(t *testing.T, input []byte) *confmap.Conf {
 	return finalConf
 }
 
+// assertReceivedLogRecord takes a metric reader and asserts if an event has been successfully indexed
+// to mock-es
 func assertReceivedLogRecord(t *testing.T, metricReader *sdkmetric.ManualReader) {
 	assert.Eventually(t, func() bool {
 		rm := metricdata.ResourceMetrics{}
