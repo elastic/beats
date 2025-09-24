@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"time"
 
@@ -177,6 +178,7 @@ func New(
 	cursor string,
 	since time.Duration,
 	file string,
+	merge bool,
 	newJctl JctlFactory,
 ) (*Reader, error) {
 
@@ -185,7 +187,20 @@ func New(
 	args := []string{"--utc", "--output=json", "--no-pager", "--all"}
 
 	if file != "" && file != localSystemJournalID {
-		args = append(args, "--file", file)
+		st, err := os.Stat(file)
+		if err != nil {
+			return nil, fmt.Errorf("cannot stat path: %w", err)
+		}
+
+		if st.IsDir() {
+			args = append(args, "--directory", file)
+		} else {
+			args = append(args, "--file", file)
+		}
+	}
+
+	if merge {
+		args = append(args, "--merge")
 	}
 
 	for _, u := range units {

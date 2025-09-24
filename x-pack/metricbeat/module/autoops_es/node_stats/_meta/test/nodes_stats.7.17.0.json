@@ -315,6 +315,14 @@
                     "rejected": 0,
                     "largest": 2,
                     "completed": 1777
+                },
+                "snapshot": {
+                    "threads": 1,
+                    "queue": 0,
+                    "active": 0,
+                    "rejected": 0,
+                    "largest": 10,
+                    "completed": 397269
                 }
             },
             "fs": {
