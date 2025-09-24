@@ -47,7 +47,7 @@ filebeat.inputs:
 
     file_identity.native: ~
     prospector.scanner.fingerprint.enabled: false
-    clean_inactive: 3s
+    clean_inactive: 3.1s
     ignore_older: 2s
     close.on_state_change.inactive: 1s
     prospector.scanner.check_interval: 1s
@@ -822,4 +822,123 @@ func assertRegistry(t *testing.T, workDir, testdataDir, registry, msg string) {
 	}
 
 	assert.Equal(t, expectedRegistry, reg, msg)
+}
+
+func TestCleanInactiveValidation(t *testing.T) {
+	testCases := map[string]struct {
+		cfg      string
+		log      string
+		exitCode int
+	}{
+		"clean_inactive smaller than ignore_older plus check_interval": {
+			log:      "clean_inactive must be greater than ignore_older + prospector.scanner.check_interval",
+			exitCode: 1,
+			cfg: `
+filebeat.inputs:
+- type: filestream
+  id: my-filestream-id
+  clean_inactive: 5m
+  ignore_older: 10m
+  paths:
+    - /var/log/*.log
+
+output.discard:
+  enabled: true
+`,
+		},
+		"clean_inactive can only be used if ignore_older is enabled": {
+			log:      "clean_inactive can only be enabled if ignore_older is also enabled",
+			exitCode: 1,
+			cfg: `
+filebeat.inputs:
+- type: filestream
+  id: my-filestream-id
+  clean_inactive: 42h
+  paths:
+    - /var/log/*.log
+output.discard:
+  enabled: true
+`,
+		},
+		"correct configuration": {
+			log: "Input 'filestream' starting",
+			cfg: `
+filebeat.inputs:
+- type: filestream
+  id: my-filestream-id
+  clean_inactive: 42h42m
+  ignore_older: 42h
+  paths:
+    - /var/log/*.log
+
+output.discard:
+  enabled: true
+`,
+		},
+		"validation can be disabled": {
+			log: "Input 'filestream' starting",
+			cfg: `
+filebeat.inputs:
+- type: filestream
+  id: my-filestream-id
+  clean_inactive: 42h
+  legacy_clean_inactive: true
+  paths:
+    - /var/log/*.log
+output.discard:
+  enabled: true
+`,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			filebeat := integration.NewBeat(
+				t,
+				"filebeat",
+				"../../filebeat.test",
+			)
+
+			filebeat.WriteConfigFile(tc.cfg)
+
+			// Set the expected exit code to 1 if we're expecting
+			// Filebeat to exit with an error
+			filebeat.SetExpectedErrorCode(tc.exitCode)
+
+			filebeat.Start()
+
+			if tc.log != "" {
+				filebeat.WaitLogsContains(tc.log, 10*time.Second)
+			}
+		})
+	}
+}
+
+func TestCleanInactiveLegacyBehaviour(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	logFilePath := filepath.Join(filebeat.TempDir(), "log.log")
+	integration.WriteLogFile(t, logFilePath, 42, false)
+	cfg := getConfig(
+		t,
+		map[string]any{
+			"logFilePath": logFilePath,
+		},
+		"",
+		"filestream_clean_inactive_legacy_behaviour.yml")
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	// Wait for the whole file to be ingested
+	filebeat.WaitPublishedEvents(20*time.Second, 42)
+	filebeat.Stop()
+
+	// Because legacy_clean_inactive: true, upon restart
+	// Filebeat will re-ingest all files.
+	filebeat.Start()
+	filebeat.WaitPublishedEvents(20*time.Second, 84)
 }

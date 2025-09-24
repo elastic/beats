@@ -26,7 +26,7 @@ Use the `filestream` input to read lines from log files. It is the improved alte
 * Only the most recent updates are serialized to the registry. In contrast, the `log` input has to serialize the complete registry on each ACK from the outputs. This makes the registry updates much quicker with this input.
 * The input ensures that only offsets updates are written to the registry append only log. The `log` writes the complete file state.
 * Stale entries can be removed from the registry, even if there is no active input.
-* {applies_to}`stack: preview 9.2.0` As a technical preview feature, it can read GZIP files.
+* {applies_to}`stack: beta 9.2.0` As a beta feature, it can read GZIP files.
 
 
 To configure this input, specify a list of glob-based [`paths`](#filestream-input-paths) that must be crawled to locate and fetch the log lines.
@@ -72,14 +72,14 @@ filebeat.inputs:
 ## Reading GZIP files
 
 ```{applies_to}
-stack: preview 9.2.0
+stack: beta 9.2.0
 ```
 
 ::::{warning}
-This functionality is in technical preview and may be changed or removed in a future release. Elastic will work to fix any issues, but features in technical preview are not subject to the support SLA of official GA features.
+This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
 ::::
 
-The `filestream` input can ingest GZIP files as a **technical preview** feature.
+The `filestream` input can ingest GZIP files as a **beta** feature.
 A GZIP file is treated like any other file, with the same guarantees `filestream`
 offers. This includes offset tracking and resuming from partially read files.
 
@@ -560,6 +560,25 @@ The `clean_inactive` configuration option is useful to reduce the size of the re
 
 This config option is also useful to prevent Filebeat problems resulting from inode reuse on Linux. For more information, see [Inode reuse causes Filebeat to skip lines](/reference/filebeat/inode-reuse-issue.md).
 
+To disable, set `clean_inactive` to either:
+* `-1` (recommended)
+* {applies_to}`stack: ga 9.2.0` `0`
+  ::::{warning}
+  In earlier versions, setting `clean_inactive: 0` will cause
+  Filebeat to re-ingest all files on restart.
+  ::::
+
+{applies_to}`stack: ga 9.2.0` Filebeat enforces the restrictions by
+failing to start if `clean_inactive <= ignore_older +
+prospector.scanner.check_interval` or if `ignore_older` is disabled.
+To restore the old behaviour of not enforcing the
+configuration restriction and re-ingesting files if `clean_inactive:
+0`, set `legacy_clean_inactive: true`.
+
+You can use time strings like `5m` (5 minutes), `2h45m` (2 hours and 45
+minutes), `48h`, etc. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". The
+default is `-1`.
+
 ::::{note}
 Every time a file is renamed, the file state is updated and the counter for `clean_inactive` starts at 0 again.
 ::::
@@ -627,7 +646,7 @@ Any unsupported change in `file_identity` methods between runs may result in dup
 $$$filebeat-input-filestream-file-identity-fingerprint$$$
 
 **`fingerprint`**
-:   The default behaviour of Filebeat is to identify files based on content by hashing a specific range (0 to 1024 bytes by default).
+:   The default behavior of Filebeat is to identify files based on content by hashing a specific range (0 to 1024 bytes by default).
 
 ::::{warning}
 In order to use this file identity option, you must enable the [fingerprint option in the scanner](#filebeat-input-filestream-scan-fingerprint). Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
@@ -641,11 +660,11 @@ file_identity.fingerprint: ~
 ```
 
 **`native`**
-:   Differentiates between files using their inodes and device ids.
+:   Differentiates between files using their inodes and device IDs. This is the default file identity in Filebeat versions prior to 9.0.0.
 
-    In some cases these values can change during the lifetime of a file. For example, when using the Linux [LVM](https://en.wikipedia.org/wiki/Logical_Volume_Manager_%28Linux%29) (Logical Volume Manager), device numbers are allocated dynamically at module load (refer to [Persistent Device Numbers](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/logical_volume_manager_administration/lv#persistent_numbers) in the Red Hat Enterprise Linux documentation). To avoid the possibility of data duplication in this case, you can set `file_identity` to `fingerprint` rather than the default `native`.
+    In some cases, the inode and device ID values can change during the lifetime of a file. For example, when using the Linux [LVM](https://en.wikipedia.org/wiki/Logical_Volume_Manager_%28Linux%29) (Logical Volume Manager), device numbers are allocated dynamically at module load (refer to [Persistent Device Numbers](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/logical_volume_manager_administration/lv#persistent_numbers) in the Red Hat Enterprise Linux documentation). To avoid the possibility of data duplication in this case, you can set `file_identity` to `fingerprint` rather than `native`.
 
-    The states of files generated by `native` file identity can be migrated to `fingerprint`.
+    The states of files generated by the `native` file identity can be migrated to `fingerprint`.
 
 
 ```yaml

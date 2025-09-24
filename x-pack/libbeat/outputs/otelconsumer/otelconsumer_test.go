@@ -22,6 +22,7 @@ import (
 	"go.opentelemetry.io/collector/receiver/receivertest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -254,13 +255,59 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 	})
+	t.Run("sets otel specific-fields", func(t *testing.T) {
+		testCases := []struct {
+			name                  string
+			componentID           string
+			componentKind         string
+			expectedComponentID   string
+			expectedComponentKind string
+		}{
+			{
+				name:                  "sets beat component ID",
+				componentID:           "filebeatreceiver/1",
+				expectedComponentID:   "filebeatreceiver/1",
+				expectedComponentKind: "receiver",
+			},
+		}
 
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				event := beat.Event{
+					Fields: mapstr.M{
+						"field": 1,
+						"agent": mapstr.M{},
+					},
+					Meta: mapstr.M{
+						"_id": "abc123",
+					},
+				}
+				batch := outest.NewBatch(event)
+				var countLogs int
+				otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+					countLogs = countLogs + ld.LogRecordCount()
+					return nil
+				})
+				otelConsumer.beatInfo.ComponentID = tc.componentID
+				err := otelConsumer.Publish(ctx, batch)
+				assert.NoError(t, err)
+				assert.Len(t, batch.Signals, 1)
+				assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+				assert.Equal(t, len(batch.Events()), countLogs, "all events should be consumed")
+				for _, event := range batch.Events() {
+					beatEvent := event.Content.Fields.Flatten()
+					assert.Equal(t, tc.expectedComponentID, beatEvent["agent."+otelComponentIDKey], "expected agent.otelcol.component.id field in log record")
+					assert.Equal(t, tc.expectedComponentKind, beatEvent["agent."+otelComponentKindKey], "expected agent.otelcol.component.kind field in log record")
+				}
+			})
+		}
+	})
 	t.Run("sets the client context metadata with the beat info", func(t *testing.T) {
 		batch := outest.NewBatch(event1)
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			cm := client.FromContext(ctx).Metadata
-			assert.Equal(t, beatInfo.Beat, cm.Get(beatNameCtxKey)[0])
-			assert.Equal(t, beatInfo.Version, cm.Get(beatVersionCtxtKey)[0])
+			assert.Equal(t, beatInfo.Beat, cm.Get(otelctx.BeatNameCtxKey)[0])
+			assert.Equal(t, beatInfo.Version, cm.Get(otelctx.BeatVersionCtxKey)[0])
 			return nil
 		})
 
