@@ -6,25 +6,15 @@ package cat_shards
 
 import (
 	"encoding/json"
-<<<<<<< HEAD
-	"fmt"
-=======
->>>>>>> b2f1a5849 ([AutoOps] Update  module `autoops_es` (#46573))
-	"math"
-
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
-
-<<<<<<< HEAD
-	"golang.org/x/exp/maps"
-=======
 	"maps"
->>>>>>> b2f1a5849 ([AutoOps] Update  module `autoops_es` (#46573))
-
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"math"
+	"slices"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -89,7 +79,7 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 
 	transactionID := utils.NewUUIDV4()
 
-	sendNodeShardsEvent(r, info, maps.Values(nodeShards), transactionID)
+	sendNodeShardsEvent(r, info, slices.Collect(maps.Values(nodeShards)), transactionID)
 
 	indexMetadata, err := getResolvedIndices(m)
 
