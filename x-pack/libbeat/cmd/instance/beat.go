@@ -20,7 +20,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/plugin"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -53,10 +52,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	b.Info.LogConsumer = consumer
 
 	// begin code similar to configure
-	if err = plugin.Initialize(); err != nil {
-		return nil, fmt.Errorf("error initializing plugins: %w", err)
-	}
-
 	b.InputQueueSize = settings.InputQueueSize
 
 	cfOpts := []ucfg.Option{

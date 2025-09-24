@@ -58,7 +58,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/v7/libbeat/plugin"
 	"github.com/elastic/beats/v7/libbeat/pprof"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
@@ -262,10 +261,6 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 func (b *Beat) InitWithSettings(settings Settings) error {
 	err := b.handleFlags()
 	if err != nil {
-		return err
-	}
-
-	if err := plugin.Initialize(); err != nil {
 		return err
 	}
 
