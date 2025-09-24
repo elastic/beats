@@ -91,6 +91,8 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		w.WithOtelFactoryWrapper(status.StatusReporterFactory(groupReporter))
 	}
 
+	// We go through all extensions to find any that implement the DiagnosticExtension interface.
+	// This is done so that we can register a diagnostic hook to collect beat metrics.
 	extensions := host.GetExtensions()
 	for _, ext := range extensions {
 		if diagExt, ok := ext.(otelmanager.DiagnosticExtension); ok {
