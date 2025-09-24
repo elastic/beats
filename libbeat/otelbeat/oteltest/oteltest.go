@@ -33,6 +33,7 @@ import (
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/consumer/consumertest"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/goleak"
@@ -237,4 +238,54 @@ func (d *DummyConsumer) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
 
 func (d *DummyConsumer) Capabilities() consumer.Capabilities {
 	return consumer.Capabilities{}
+}
+
+type mockHost struct {
+	component.Host
+	diagExt *mockDiagExtension
+}
+
+type hook struct {
+	description string
+	filename    string
+	contentType string
+	hook        func() []byte
+}
+
+type mockDiagExtension struct {
+	component.Component
+	hooks map[string][]hook
+}
+
+func (m *mockHost) GetExtensions() map[component.ID]component.Component {
+	return map[component.ID]component.Component{
+		component.MustNewIDWithName("mockdiagextension", ""): m.diagExt,
+	}
+}
+
+func (m *mockDiagExtension) RegisterDiagnosticHook(name string, description string, filename string, contentType string, fn func() []byte) {
+	m.hooks[name] = append(m.hooks[name], hook{
+		description: description,
+		filename:    filename,
+		contentType: contentType,
+		hook:        fn,
+	})
+}
+
+func TestReceiverHook(t *testing.T, config component.Config, factory receiver.Factory, set receiver.Settings, expectedHooks int) {
+
+	logs, err := factory.CreateLogs(context.Background(), set, config, consumertest.NewNop())
+	diagExt := &mockDiagExtension{
+		hooks: make(map[string][]hook),
+	}
+	require.NoError(t, err)
+	require.NotNil(t, logs)
+	require.NoError(t, logs.Start(context.Background(), &mockHost{diagExt: diagExt}))
+
+	defer logs.Shutdown(context.Background())
+
+	assert.EventuallyWithT(t, func(c *assert.CollectT) {
+		assert.Contains(c, diagExt.hooks, set.ID.String())
+		assert.Len(c, diagExt.hooks[set.ID.String()], expectedHooks)
+	}, 5*time.Second, 100*time.Millisecond, "expected hook to be registered")
 }
