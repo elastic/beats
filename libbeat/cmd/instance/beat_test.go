@@ -21,6 +21,7 @@ package instance
 
 import (
 	"bytes"
+	"flag"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -28,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
@@ -35,6 +37,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-ucfg/yaml"
 
 	"github.com/gofrs/uuid/v5"
@@ -508,3 +511,54 @@ func (m mockManager) Status() status.Status                         { return sta
 func (m mockManager) Stop()                                         {}
 func (m mockManager) UnregisterAction(action client.Action)         {}
 func (m mockManager) UpdateStatus(status status.Status, msg string) {}
+
+func TestManager(t *testing.T) {
+	// set the mockManger factory.
+	management.SetManagerFactory(func(c *config.C, r *reload.Registry) (management.Manager, error) {
+		return mockManager{true}, nil
+	})
+	// initialize the flags.
+	cfgfile.Initialize()
+
+	t.Run("management.enabled=true", func(t *testing.T) {
+		defer func() {
+			// Since standard beats rely on global registries, we must reset them between test cases
+			// to prevent duplicate registrations and avoid runtime panics.
+			monitoring.GetNamespace("state").SetRegistry(nil)
+			monitoring.GetNamespace("info").SetRegistry(nil)
+		}()
+		flag.Set("E", "management.enabled=true")
+		b, err := NewInitializedBeat(Settings{})
+		require.NoError(t, err)
+		require.NotNil(t, b)
+		require.True(t, b.Manager.Enabled())
+		require.True(t, management.UnderAgent())
+		require.IsType(t, mockManager{}, b.Manager)
+	})
+	t.Run("management.enabled=false", func(t *testing.T) {
+		defer func() {
+			monitoring.GetNamespace("state").SetRegistry(nil)
+			monitoring.GetNamespace("info").SetRegistry(nil)
+		}()
+		flag.Set("E", "management.enabled=false")
+		flag.Set("c", "testdata/mockbeat.yml")
+		b, err := NewInitializedBeat(Settings{})
+		require.NoError(t, err)
+		require.NotNil(t, b)
+		require.False(t, b.Manager.Enabled())
+		require.False(t, management.UnderAgent())
+	})
+	t.Run("management.enabled not set", func(t *testing.T) {
+		defer func() {
+			monitoring.GetNamespace("state").SetRegistry(nil)
+			monitoring.GetNamespace("info").SetRegistry(nil)
+		}()
+		flag.Set("E", "management.enabled=false")
+		flag.Set("c", "testdata/mockbeat.yml")
+		b, err := NewInitializedBeat(Settings{})
+		require.NoError(t, err)
+		require.NotNil(t, b)
+		require.False(t, b.Manager.Enabled())
+		require.False(t, management.UnderAgent())
+	})
+}
