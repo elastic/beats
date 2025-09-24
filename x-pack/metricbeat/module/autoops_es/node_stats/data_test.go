@@ -86,6 +86,8 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 		require.EqualValues(t, 50, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.segments.count"))
 		require.EqualValues(t, 2, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.write.threads"))
 		require.EqualValues(t, 1777, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.write.completed"))
+		require.EqualValues(t, 1, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.snapshot.threads"))
+		require.EqualValues(t, 397269, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.snapshot.completed"))
 	} else if data.Version == "8.15.3" {
 		require.Equal(t, 59, len(nodeStatsEvents))
 		require.EqualValues(t, 59, nodeStatsEvents[0].ModuleFields["total_amount_of_fractions"])
@@ -107,6 +109,8 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 		require.EqualValues(t, 5358, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.segments.count"))
 		require.EqualValues(t, 32, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.write.threads"))
 		require.EqualValues(t, 24175874622, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.write.completed"))
+		require.EqualValues(t, 1, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.snapshot.threads"))
+		require.EqualValues(t, 383009, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.snapshot.completed"))
 	}
 
 	// some ignored values
