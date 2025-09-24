@@ -164,13 +164,12 @@ func BenchmarkFactory(b *testing.B) {
 }
 
 func TestMultipleReceivers(t *testing.T) {
-	t.Skip("flaky test, see https://github.com/elastic/beats/issues/43832")
 	// This test verifies that multiple receivers can be instantiated
 	// in isolation, started, and can ingest logs without interfering
 	// with each other.
 
 	// Receivers need distinct home directories so wrap the config in a function.
-	config := func(monitorSocket string) *Config {
+	config := func(monitorSocket string, homePath string) *Config {
 		var monitorHost string
 		if runtime.GOOS == "windows" {
 			monitorHost = "npipe:///" + filepath.Base(monitorSocket)
@@ -204,7 +203,7 @@ func TestMultipleReceivers(t *testing.T) {
 						"*",
 					},
 				},
-				"path.home":    t.TempDir(),
+				"path.home":    homePath,
 				"http.enabled": true,
 				"http.host":    monitorHost,
 			},
@@ -214,19 +213,21 @@ func TestMultipleReceivers(t *testing.T) {
 	factory := NewFactory()
 	monitorSocket1 := genSocketPath()
 	monitorSocket2 := genSocketPath()
+	dir1 := t.TempDir()
+	dir2 := t.TempDir()
 	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
 		T: t,
 		Receivers: []oteltest.ReceiverConfig{
 			{
 				Name:    "r1",
 				Beat:    "filebeat",
-				Config:  config(monitorSocket1),
+				Config:  config(monitorSocket1, dir1),
 				Factory: factory,
 			},
 			{
 				Name:    "r2",
 				Beat:    "filebeat",
-				Config:  config(monitorSocket2),
+				Config:  config(monitorSocket2, dir2),
 				Factory: factory,
 			},
 		},
@@ -243,10 +244,23 @@ func TestMultipleReceivers(t *testing.T) {
 			// instance and does not interfere with others. Previously, the
 			// logger in Beats was global, causing logger fields to be
 			// overwritten when multiple receivers started in the same process.
-			r1StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "r1"))
+			r1StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/r1"))
 			assert.Equal(c, 1, r1StartLogs.Len(), "r1 should have a single start log")
-			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "r2"))
+			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/r2"))
 			assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
+
+			meta1Path := filepath.Join(dir1, "/data/meta.json")
+			assert.FileExists(c, meta1Path, "dir1/data/meta.json should exist")
+			meta1Data, err := os.ReadFile(meta1Path)
+			assert.NoError(c, err)
+
+			meta2Path := filepath.Join(dir2, "/data/meta.json")
+			assert.FileExists(c, meta2Path, "dir2/data/meta.json should exist")
+			meta2Data, err := os.ReadFile(meta2Path)
+			assert.NoError(c, err)
+
+			assert.NotEqual(c, meta1Data, meta2Data, "meta data files should be different")
+
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket1, "stats")
