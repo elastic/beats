@@ -432,12 +432,12 @@ require (
 	go.opentelemetry.io/collector/connector v0.132.0 // indirect
 	go.opentelemetry.io/collector/connector/connectortest v0.132.0 // indirect
 	go.opentelemetry.io/collector/connector/xconnector v0.132.0 // indirect
-	go.opentelemetry.io/collector/consumer/consumererror/xconsumererror v0.132.0 // indirect
+	go.opentelemetry.io/collector/consumer/consumererror/xconsumererror v0.135.0 // indirect
 	go.opentelemetry.io/collector/consumer/consumertest v0.135.0 // indirect
 	go.opentelemetry.io/collector/consumer/xconsumer v0.135.0 // indirect
 	go.opentelemetry.io/collector/exporter v0.135.0 // indirect
 	go.opentelemetry.io/collector/exporter/exporterhelper v0.135.0 // indirect
-	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.132.0 // indirect
+	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.135.0 // indirect
 	go.opentelemetry.io/collector/exporter/exportertest v0.135.0 // indirect
 	go.opentelemetry.io/collector/exporter/xexporter v0.135.0 // indirect
 	go.opentelemetry.io/collector/extension v1.41.0 // indirect
@@ -453,7 +453,7 @@ require (
 	go.opentelemetry.io/collector/pdata/testdata v0.135.0 // indirect
 	go.opentelemetry.io/collector/pdata/xpdata v0.135.0 // indirect
 	go.opentelemetry.io/collector/pipeline v1.41.0 // indirect
-	go.opentelemetry.io/collector/pipeline/xpipeline v0.132.0 // indirect
+	go.opentelemetry.io/collector/pipeline/xpipeline v0.135.0 // indirect
 	go.opentelemetry.io/collector/processor v1.41.0 // indirect
 	go.opentelemetry.io/collector/processor/processortest v0.135.0 // indirect
 	go.opentelemetry.io/collector/processor/xprocessor v0.135.0 // indirect
