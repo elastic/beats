@@ -30,7 +30,11 @@ func NewOtelManager(cfg *config.C, registry *reload.Registry, logger *logp.Logge
 	return &OtelManager{}, nil
 }
 
-type OtelManager struct{}
+// OtelManager is the main manager for managing beatreceivers
+type OtelManager struct{
+	ext DiagnosticExtension
+	receiverName string
+}
 
 func (n *OtelManager) UpdateStatus(_ status.Status, _ string) {
 	// a stub implemtation for now.
@@ -59,3 +63,5 @@ func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filen
 func (n *OtelManager) SetDiagnosticExtension(receiverName string, ext DiagnosticExtension) {
 	n.ext = ext
 	n.receiverName = receiverName
+}
+
