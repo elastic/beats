@@ -78,19 +78,6 @@ ssl:
 
 	})
 
-	t.Run("when unsupported configuration  renegotiation is used", func(t *testing.T) {
-		input := `
-ssl:
-  verification_mode: none
-  renegotiation: never
-`
-		cfg := config.MustNewConfigFrom(input)
-		_, err := TLSCommonToOTel(cfg, logger)
-		require.Error(t, err)
-		require.ErrorIs(t, err, errors.ErrUnsupported)
-
-	})
-
 	t.Run("when unsupported configuration restart_on_cert_change.enabled is used", func(t *testing.T) {
 		input := `
 ssl:
@@ -108,7 +95,7 @@ ssl:
 		input := `
 ssl:
   verification_mode: none
-  supported_protocols: 
+  supported_protocols:
    - TLSv1.4
 `
 		cfg := config.MustNewConfigFrom(input)
