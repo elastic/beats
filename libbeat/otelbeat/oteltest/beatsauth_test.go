@@ -49,12 +49,13 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
-	"go.uber.org/zap"
+	"go.uber.org/zap/zaptest"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 	mockes "github.com/elastic/mock-es/pkg/api"
 	"github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension"
+	"gopkg.in/yaml.v2"
 )
 
 // This test package tests ES exporter + beatsauth extension together
@@ -424,13 +425,9 @@ func newAuthenticator(t *testing.T, config beatsauthextension.Config) extension.
 	settings := extensiontest.NewNopSettings(beatsauth.Type())
 	var err error
 
-	// we use development logger for debugging purposes
-	logConfig := zap.NewDevelopmentConfig()
-	logConfig.DisableStacktrace = true
-	devLog, err := logConfig.Build()
-	require.NoError(t, err, "could not create logger")
+	//use testing logger for debugging purposes
+	settings.Logger = zaptest.NewLogger(t)
 
-	settings.Logger = devLog
 	extension, err := beatsauth.Create(t.Context(), settings, &config)
 	if err != nil {
 		t.Fatalf("could not create extension: %v", err)
@@ -463,12 +460,8 @@ func newTestESExporter(t *testing.T, conf *confmap.Conf) (ESexporter exporter.Lo
 
 	settings := exportertest.NewNopSettings(component.MustNewType(esExporterName))
 
-	// development logger
-	logConfig := zap.NewDevelopmentConfig()
-	logConfig.DisableStacktrace = true
-	devLog, err := logConfig.Build()
-	require.NoError(t, err, "could not create logger")
-	settings.Logger = devLog
+	// use testing logger for debugging
+	settings.Logger = zaptest.NewLogger(t)
 
 	exp, err := f.CreateLogs(context.Background(), settings, cfg)
 	require.NoError(t, err, "could not create exporter.Logs ")
@@ -572,6 +565,11 @@ func getTranslatedConf(t *testing.T, input []byte) *confmap.Conf {
 
 	err = c.Convert(t.Context(), finalConf)
 	require.NoError(t, err, "error translating config")
+
+	translatedYAML, err := yaml.Marshal(finalConf.ToStringMap())
+	require.NoError(t, err)
+	t.Logf("Translated configuration:\n%s", translatedYAML)
+
 	return finalConf
 }
 
