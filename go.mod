@@ -236,7 +236,7 @@ require (
 )
 
 require (
-	github.com/cilium/ebpf v0.19.0
+	github.com/cilium/ebpf v0.16.0
 	github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.2.0
 	github.com/otiai10/copy v1.14.1
 	go.opentelemetry.io/collector/client v1.41.0
