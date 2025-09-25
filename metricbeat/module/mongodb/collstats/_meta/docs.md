@@ -11,7 +11,7 @@ Notes:
 ## Features
 
 ### Operation Statistics
-It uses the `top` administrative command to return usage statistics for each collection. It provides the amount of time, in microseconds, used and a count of operations for the following types:
+The `collstats` metricset uses the `top` administrative command to return usage statistics for each collection. It provides the amount of time, in microseconds, used and a count of operations for the following types:
 
 * total
 * readLock
