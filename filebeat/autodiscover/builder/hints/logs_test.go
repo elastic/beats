@@ -146,7 +146,16 @@ func TestGenerateHints(t *testing.T) {
 							},
 						},
 					},
+<<<<<<< HEAD
 					"file_identity": map[string]interface{}{
+=======
+					"close": map[string]any{
+						"on_state_change": map[string]any{
+							"removed": false,
+						},
+					},
+					"file_identity": map[string]any{
+>>>>>>> 4ed5e357a ([Filebeat] set `close.on_state_change.removed: false` in hints default config (#46695))
 						"fingerprint": nil,
 					},
 					"type": "filestream",
@@ -215,7 +224,16 @@ func TestGenerateHints(t *testing.T) {
 							},
 						},
 					},
+<<<<<<< HEAD
 					"file_identity": map[string]interface{}{
+=======
+					"close": map[string]any{
+						"on_state_change": map[string]any{
+							"removed": false,
+						},
+					},
+					"file_identity": map[string]any{
+>>>>>>> 4ed5e357a ([Filebeat] set `close.on_state_change.removed: false` in hints default config (#46695))
 						"fingerprint": nil,
 					},
 					"exclude_lines": []interface{}{"^test2", "^test3"},
@@ -878,12 +896,29 @@ func TestGenerateHints(t *testing.T) {
 					"module": "apache",
 					"error": map[string]interface{}{
 						"enabled": true,
+<<<<<<< HEAD
 						"input": map[string]interface{}{
 							"id":    "kubernetes-container-logs-abc",
 							"paths": []interface{}{"/var/log/containers/*-abc.log"},
 							"parsers": []interface{}{
 								map[string]interface{}{
 									"container": map[string]interface{}{
+=======
+						"input": map[string]any{
+							"id": "container-logs-abc",
+							"paths": []any{
+								"/var/log/containers/*-abc.log",
+								"/var/lib/docker/containers/abc/*-json.log",
+							},
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
+							},
+							"parsers": []any{
+								map[string]any{
+									"container": map[string]any{
+>>>>>>> 4ed5e357a ([Filebeat] set `close.on_state_change.removed: false` in hints default config (#46695))
 										"format": "auto",
 										"stream": "all",
 									},
@@ -905,12 +940,29 @@ func TestGenerateHints(t *testing.T) {
 					},
 					"access": map[string]interface{}{
 						"enabled": true,
+<<<<<<< HEAD
 						"input": map[string]interface{}{
 							"id":    "kubernetes-container-logs-abc",
 							"paths": []interface{}{"/var/log/containers/*-abc.log"},
 							"parsers": []interface{}{
 								map[string]interface{}{
 									"container": map[string]interface{}{
+=======
+						"input": map[string]any{
+							"id": "container-logs-abc",
+							"paths": []any{
+								"/var/log/containers/*-abc.log",
+								"/var/lib/docker/containers/abc/*-json.log",
+							},
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
+							},
+							"parsers": []any{
+								map[string]any{
+									"container": map[string]any{
+>>>>>>> 4ed5e357a ([Filebeat] set `close.on_state_change.removed: false` in hints default config (#46695))
 										"format": "auto",
 										"stream": "all",
 									},
@@ -972,8 +1024,18 @@ func TestGenerateHints(t *testing.T) {
 									},
 								},
 							},
+<<<<<<< HEAD
 							"prospector": map[string]interface{}{
 								"scanner": map[string]interface{}{
+=======
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
+							},
+							"prospector": map[string]any{
+								"scanner": map[string]any{
+>>>>>>> 4ed5e357a ([Filebeat] set `close.on_state_change.removed: false` in hints default config (#46695))
 									"symlinks": true,
 									"fingerprint": map[string]interface{}{
 										"enabled": true,
@@ -999,8 +1061,18 @@ func TestGenerateHints(t *testing.T) {
 									},
 								},
 							},
+<<<<<<< HEAD
 							"prospector": map[string]interface{}{
 								"scanner": map[string]interface{}{
+=======
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
+							},
+							"prospector": map[string]any{
+								"scanner": map[string]any{
+>>>>>>> 4ed5e357a ([Filebeat] set `close.on_state_change.removed: false` in hints default config (#46695))
 									"symlinks": true,
 									"fingerprint": map[string]interface{}{
 										"enabled": true,
@@ -1045,12 +1117,29 @@ func TestGenerateHints(t *testing.T) {
 					"module": "apache",
 					"access": map[string]interface{}{
 						"enabled": true,
+<<<<<<< HEAD
 						"input": map[string]interface{}{
 							"id":    "kubernetes-container-logs-abc",
 							"paths": []interface{}{"/var/log/containers/*-abc.log"},
 							"parsers": []interface{}{
 								map[string]interface{}{
 									"container": map[string]interface{}{
+=======
+						"input": map[string]any{
+							"id": "container-logs-abc",
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
+							},
+							"paths": []any{
+								"/var/log/containers/*-abc.log",
+								"/var/lib/docker/containers/abc/*-json.log",
+							},
+							"parsers": []any{
+								map[string]any{
+									"container": map[string]any{
+>>>>>>> 4ed5e357a ([Filebeat] set `close.on_state_change.removed: false` in hints default config (#46695))
 										"format": "auto",
 										"stream": "stdout",
 									},
@@ -1072,12 +1161,29 @@ func TestGenerateHints(t *testing.T) {
 					},
 					"error": map[string]interface{}{
 						"enabled": true,
+<<<<<<< HEAD
 						"input": map[string]interface{}{
 							"id":    "kubernetes-container-logs-abc",
 							"paths": []interface{}{"/var/log/containers/*-abc.log"},
 							"parsers": []interface{}{
 								map[string]interface{}{
 									"container": map[string]interface{}{
+=======
+						"input": map[string]any{
+							"id": "container-logs-abc",
+							"paths": []any{
+								"/var/log/containers/*-abc.log",
+								"/var/lib/docker/containers/abc/*-json.log",
+							},
+							"close": map[string]any{
+								"on_state_change": map[string]any{
+									"removed": false,
+								},
+							},
+							"parsers": []any{
+								map[string]any{
+									"container": map[string]any{
+>>>>>>> 4ed5e357a ([Filebeat] set `close.on_state_change.removed: false` in hints default config (#46695))
 										"format": "auto",
 										"stream": "stderr",
 									},
@@ -1103,31 +1209,33 @@ func TestGenerateHints(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		// Configure path for modules access
-		abs, _ := filepath.Abs("../../..")
-		require.NoError(t, paths.InitPaths(&paths.Path{
-			Home: abs,
-		}))
+		t.Run(test.msg, func(t *testing.T) {
+			// Configure path for modules access
+			abs, _ := filepath.Abs("../../..")
+			require.NoError(t, paths.InitPaths(&paths.Path{
+				Home: abs,
+			}))
 
-		logger := logptest.NewTestingLogger(t, "")
-		l, err := NewLogHints(test.config, logger)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		cfgs := l.CreateConfig(test.event)
-		assert.Equal(t, test.len, len(cfgs), test.msg)
-		configs := make([]mapstr.M, 0)
-		for _, cfg := range cfgs {
-			config := mapstr.M{}
-			err := cfg.Unpack(&config)
-			ok := assert.Nil(t, err, test.msg)
-			if !ok {
-				break
+			logger := logptest.NewTestingLogger(t, "")
+			l, err := NewLogHints(test.config, logger)
+			if err != nil {
+				t.Fatal(err)
 			}
-			configs = append(configs, config)
-		}
-		assert.Equal(t, test.result, configs, test.msg)
+
+			cfgs := l.CreateConfig(test.event)
+			assert.Equal(t, test.len, len(cfgs), test.msg)
+			configs := make([]mapstr.M, 0)
+			for _, cfg := range cfgs {
+				config := mapstr.M{}
+				err := cfg.Unpack(&config)
+				ok := assert.Nil(t, err, test.msg)
+				if !ok {
+					break
+				}
+				configs = append(configs, config)
+			}
+			assert.Equal(t, test.result, configs, test.msg)
+		})
 	}
 }
 
