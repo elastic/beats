@@ -126,25 +126,6 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		}
 	}
 
-	if b.Manager != nil {
-		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
-			"input_metrics.json", "application/json", func() []byte {
-				data, err := inputmon.MetricSnapshotJSON(b.Monitoring.InputsRegistry())
-				if err != nil {
-					b.Info.Logger.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
-					return []byte(err.Error())
-				}
-				return data
-			})
-
-		b.Manager.RegisterDiagnosticHook(
-			"registry",
-			"Filebeat's registry",
-			"registry.tar.gz",
-			"application/octet-stream",
-			gzipRegistry(b.Info.Logger))
-	}
-
 	// Add inputs created by the modules
 	config.Inputs = append(config.Inputs, moduleInputs...)
 
@@ -265,6 +246,25 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 func (fb *Filebeat) Run(b *beat.Beat) error {
 	var err error
 	config := fb.config
+
+	if b.Manager != nil {
+		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
+			"input_metrics.json", "application/json", func() []byte {
+				data, err := inputmon.MetricSnapshotJSON(b.Monitoring.InputsRegistry())
+				if err != nil {
+					b.Info.Logger.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					return []byte(err.Error())
+				}
+				return data
+			})
+
+		b.Manager.RegisterDiagnosticHook(
+			"registry",
+			"Filebeat's registry",
+			"registry.tar.gz",
+			"application/octet-stream",
+			gzipRegistry(b.Info.Logger))
+	}
 
 	if !fb.moduleRegistry.Empty() {
 		err = fb.loadModulesPipelines(b)

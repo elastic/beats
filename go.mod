@@ -238,6 +238,7 @@ require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.19.0
 	go.opentelemetry.io/collector/client v1.41.0
+	go.opentelemetry.io/collector/component/componenttest v0.135.0
 	go.opentelemetry.io/collector/confmap/xconfmap v0.135.0
 	go.opentelemetry.io/collector/consumer/consumertest v0.135.0
 	go.opentelemetry.io/collector/exporter v0.135.0
@@ -431,7 +432,6 @@ require (
 	go.elastic.co/fastjson v1.5.1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.0 // indirect
-	go.opentelemetry.io/collector/component/componenttest v0.135.0 // indirect
 	go.opentelemetry.io/collector/config/configauth v0.135.0 // indirect
 	go.opentelemetry.io/collector/config/configcompression v1.41.0 // indirect
 	go.opentelemetry.io/collector/config/confighttp v0.135.0 // indirect
