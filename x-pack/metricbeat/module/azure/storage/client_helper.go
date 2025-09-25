@@ -58,7 +58,7 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 			}
 
 			// some metrics do not support the default PT5M timegrain so they will have to be grouped in a different API call, else call will fail
-			groupedMetrics := groupOnTimeGrain(filteredMetricDefinitions)
+			groupedMetrics := groupOnTimeGrain(filteredMetricDefinitions, client.Config.DefaultTimeGrain)
 
 			for time, groupedMetricList := range groupedMetrics {
 				// metrics will have to be grouped by allowed dimensions
@@ -80,11 +80,11 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 }
 
 // groupOnTimeGrain - some metrics do not support the default timegrain value so the closest supported timegrain will be selected
-func groupOnTimeGrain(list []armmonitor.MetricDefinition) map[string][]armmonitor.MetricDefinition {
+func groupOnTimeGrain(list []armmonitor.MetricDefinition, defaultTimeGrain string) map[string][]armmonitor.MetricDefinition {
 	var groupedList = make(map[string][]armmonitor.MetricDefinition)
 
 	for _, metric := range list {
-		timegrain := retrieveSupportedMetricAvailability(metric.MetricAvailabilities)
+		timegrain := retrieveSupportedMetricAvailability(metric.MetricAvailabilities, defaultTimeGrain)
 		if _, ok := groupedList[timegrain]; !ok {
 			groupedList[timegrain] = make([]armmonitor.MetricDefinition, 0)
 		}
@@ -94,21 +94,21 @@ func groupOnTimeGrain(list []armmonitor.MetricDefinition) map[string][]armmonito
 }
 
 // retrieveSupportedMetricAvailability func will return the default timegrain if supported, else will return the next timegrain
-func retrieveSupportedMetricAvailability(availabilities []*armmonitor.MetricAvailability) string {
+func retrieveSupportedMetricAvailability(availabilities []*armmonitor.MetricAvailability, defaultTimeGrain string) string {
 	// common case in metrics supported by storage account - one availability
 	if len(availabilities) == 1 {
 		return *availabilities[0].TimeGrain
 	}
 	// check if the default timegrain is supported
 	for _, availability := range availabilities {
-		if *availability.TimeGrain == azure.DefaultTimeGrain {
-			return azure.DefaultTimeGrain
+		if *availability.TimeGrain == defaultTimeGrain {
+			return defaultTimeGrain
 		}
 	}
-	// select first timegrain, should be bigger than the min timegrain of 1M, timegrains are returned in asc order
-	if *availabilities[0].TimeGrain != "PT1M" {
-		return *availabilities[0].TimeGrain
-	}
+	// // select first timegrain, should be bigger than the min timegrain of 1M, timegrains are returned in asc order
+	// if *availabilities[0].TimeGrain != "PT1M" {
+	// 	return *availabilities[0].TimeGrain
+	// }
 	return *availabilities[1].TimeGrain
 }
 
