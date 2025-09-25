@@ -126,6 +126,7 @@
           type: long
           description: >
             The total size of all indexes (in bytes).
+            In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.totalIndexSize`.
         - name: totalSize
           type: long
           description: >
