@@ -124,6 +124,7 @@
           type: long
           description: >
             The total amount of storage allocated to this collection for document storage (in bytes).
+            In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.storageSize`.
         - name: totalIndexSize
           type: long
           description: >
