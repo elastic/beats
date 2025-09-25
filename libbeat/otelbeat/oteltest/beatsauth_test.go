@@ -102,6 +102,7 @@ func TestMTLS(t *testing.T) {
 		ClientAuth:   tls.RequireAndVerifyClientCert,
 		ClientCAs:    certPool,
 		Certificates: []tls.Certificate{serverCerts},
+		MinVersion:   tls.VersionTLS12,
 	})
 
 	inputConfig := `
@@ -136,7 +137,7 @@ receivers:
 
 	// get new beats authenticator
 	beatsauth := newAuthenticator(t, beatsauthextension.Config{
-		BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any),
+		BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
 	})
 
 	// start extension
@@ -171,6 +172,7 @@ func TestCATrustedFingerPrint(t *testing.T) {
 	// start test server with given server and root certs
 	serverName, metricReader := startTestServer(t, &tls.Config{
 		Certificates: []tls.Certificate{serverCerts},
+		MinVersion:   tls.VersionTLS12,
 	})
 
 	inputConfig := `
@@ -200,7 +202,7 @@ receivers:
 
 	// get new beats authenticator
 	beatsauth := newAuthenticator(t, beatsauthextension.Config{
-		BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any),
+		BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
 	})
 
 	// start extension
@@ -350,6 +352,7 @@ func TestVerificationMode(t *testing.T) {
 			// start test server with given server and root certs
 			serverName, metricReader := startTestServer(t, &tls.Config{
 				Certificates: []tls.Certificate{certs},
+				MinVersion:   tls.VersionTLS12,
 			})
 
 			u, _ := url.Parse(serverName)
@@ -384,7 +387,7 @@ receivers:
 			exp := newTestESExporter(t, output)
 
 			authConfig := beatsauthextension.Config{
-				BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any),
+				BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
 			}
 
 			if test.ignoreCerts {
