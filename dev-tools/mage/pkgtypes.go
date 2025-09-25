@@ -691,7 +691,6 @@ func PackageTarGz(spec PackageSpec) error {
 	return nil
 }
 
-
 // PackageDeb packages a deb file. This requires Docker to execute FPM.
 func PackageDeb(spec PackageSpec) error {
 	return runFPM(spec, Deb)
