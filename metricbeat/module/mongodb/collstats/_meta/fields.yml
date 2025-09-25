@@ -158,5 +158,7 @@
             Number of shards for this collection (sharded collections only). Indicates how data is distributed across the cluster.
         - name: numOrphanDocs
           type: long
+          version:
+            ga: 9.2.0
           description: >
             Number of orphaned documents in the collection (MongoDB 6.0+). Orphaned documents exist on shards but are not owned by those shards.
