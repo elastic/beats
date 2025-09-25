@@ -20,8 +20,8 @@
 package tcp
 
 import (
-	"fmt"
 	"net"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,7 +31,7 @@ import (
 )
 
 func GetTestTcpServer(host string, port int) (server.Server, error) {
-	addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", host, port))
+	addr, err := net.ResolveTCPAddr("tcp", net.JoinHostPort(host, strconv.Itoa(int(port))))
 
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func TestTcpServer(t *testing.T) {
 }
 
 func writeToServer(t *testing.T, message, host string, port int) {
-	servAddr := fmt.Sprintf("%s:%d", host, port)
+	servAddr := net.JoinHostPort(host, strconv.Itoa(int(port)))
 	tcpAddr, err := net.ResolveTCPAddr("tcp", servAddr)
 	if err != nil {
 		t.Error(err)
