@@ -135,6 +135,7 @@
           type: long
           description: >
             The sum of the storageSize and totalIndexSize (in bytes).
+            In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.totalSize`.
         - name: max
           type: long
           description: >
