@@ -544,6 +544,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Improve CEL input documentation of authentication options. {pull}46253[46253]
 - Add status reporting support for Azure Event Hub v2 input. {pull}44846[44846]
 - Add documentation for device collection in Entity Analytics Active Directory Filebeat's input. {pull}46363[46363]
+- Hints based autodiscover now sets `close.on_state_change.removed: false` in the default configuration to avoid missing the last log lines from a container. {issue}34789[34789] {pull}46695[46695]
 - Journald input now supports reading from multiple journals, including remote ones {issue}46656[46656] {pull}46722[46722]
 
 *Auditbeat*
