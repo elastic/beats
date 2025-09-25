@@ -299,7 +299,7 @@ steps:
           - github_commit_status:
               context: "x-pack/winlogbeat: Packaging Linux"
 
-      - label: ":ubuntu: x-pack/winlogbeat: Packaging Linux arm64"
+      - label: ":ubuntu: x-pack/winlogbeat: Packaging Windows arm64"
         key: "packaging-arm"
         env:
           PLATFORMS: "+all windows/arm64"
