@@ -691,16 +691,6 @@ func PackageTarGz(spec PackageSpec) error {
 	return nil
 }
 
-// This function call was commented out in the above PackageTarGz() function.
-// Leave it here in case it gets used again in the future.
-//
-//func replaceFileArch(filename string, pkgFile PackageFile, arch string) (string, PackageFile) {
-//	filename = strings.ReplaceAll(filename, "universal", arch)
-//	pkgFile.Source = strings.ReplaceAll(pkgFile.Source, "universal", arch)
-//	pkgFile.Target = strings.ReplaceAll(pkgFile.Target, "universal", arch)
-//
-//	return filename, pkgFile
-//}
 
 // PackageDeb packages a deb file. This requires Docker to execute FPM.
 func PackageDeb(spec PackageSpec) error {
