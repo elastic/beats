@@ -16,7 +16,7 @@ To prevent this from happening, set:
 - `close.on_state_change.removed: false` for the Filestream input
 - `close_removed: false` for the Log or Container input.
 
-{applies_to}`stack: ga 9.0.8, ga 9.1.5` The hints based autodiscover configuration includes the
+{applies_to}`stack: ga 9.0.8` {applies_to}`stack: ga 9.1.5` The hints based autodiscover configuration includes the
 `close.on_state_change.removed` setting, set to `false` by default.
 
 :::{note}
