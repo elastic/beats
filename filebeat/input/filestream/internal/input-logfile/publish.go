@@ -18,6 +18,7 @@
 package input_logfile
 
 import (
+	"strings"
 	"time"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -121,8 +122,14 @@ func (op *updateOp) Execute(store *store, n uint) {
 
 	resource.stateMutex.Lock()
 	defer resource.stateMutex.Unlock()
+	isFingerprint := strings.Contains(resource.key, "fingerprint")
 
-	if resource.lockedVersion != op.resource.version || resource.isDeleted() {
+	// if it's fingerprint, we want to save the cursor, even if the file is
+	// deleted.
+	// How would it interfere with ResetCursor?
+	updateFingerprintDeleted := isFingerprint && resource.lockedVersion != op.resource.version && resource.isDeleted()
+	if !updateFingerprintDeleted &&
+		(resource.lockedVersion != op.resource.version || resource.isDeleted()) {
 		return
 	}
 

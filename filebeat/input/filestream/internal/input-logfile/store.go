@@ -852,6 +852,12 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 			cursor:     st.Cursor,
 			cursorMeta: st.Meta,
 		}
+		if st.TTL == 0 &&
+			strings.Contains(key, "fingerprint") {
+			// keep fingerprint for deleted file for 5 min in case they were
+			// rotated and filebeat is now watching the rotated files as well.
+			resource.internalState.TTL = 5 * time.Minute
+		}
 		states.table[resource.key] = resource
 
 		return true, nil
