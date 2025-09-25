@@ -239,6 +239,7 @@ require (
 require (
 	github.com/otiai10/copy v1.14.1
 	go.opentelemetry.io/collector/client v1.38.0
+	go.opentelemetry.io/collector/component/componenttest v0.132.0
 	go.opentelemetry.io/collector/consumer/consumertest v0.132.0
 	go.uber.org/goleak v1.3.0
 )
@@ -418,7 +419,6 @@ require (
 	go.elastic.co/fastjson v1.5.1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
-	go.opentelemetry.io/collector/component/componenttest v0.132.0 // indirect
 	go.opentelemetry.io/collector/config/configauth v0.132.0 // indirect
 	go.opentelemetry.io/collector/config/configcompression v1.38.0 // indirect
 	go.opentelemetry.io/collector/config/confighttp v0.132.0 // indirect
