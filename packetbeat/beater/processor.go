@@ -41,6 +41,12 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
+// noopReporter is a bare reporter interface
+type noopReporter struct{}
+
+// UpdateStatus does nothing.
+func (noopReporter) UpdateStatus(status.Status, string) {}
+
 type processor struct {
 	wg              sync.WaitGroup
 	publisher       *publish.TransactionPublisher
@@ -128,7 +134,7 @@ func newProcessorFactory(name string, err chan error, beat *beat.Beat, configura
 // / CreateWithReporter functions the same as Create, but also accepts a StatusReporter.
 func (p *processorFactory) CreateWithReporter(pipeline beat.PipelineConnector, cfg *conf.C, statusReporter status.StatusReporter) (cfgfile.Runner, error) {
 	if statusReporter == nil {
-		statusReporter = status.NoopReporter{}
+		statusReporter = noopReporter{}
 	}
 	statusReporter.UpdateStatus(status.Configuring, "starting packetbeat processor configuration")
 	duration, publisher, flows, sniffer, errChan, err := p.create(pipeline, cfg, statusReporter)
