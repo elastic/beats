@@ -391,7 +391,7 @@ receivers:
 			}
 
 			if test.ignoreCerts {
-				delete(authConfig.BeatAuthconfig["ssl"].(map[string]any), "certificate_authorities")
+				delete(authConfig.BeatAuthconfig["ssl"].(map[string]any), "certificate_authorities") //nolint: errcheck // it is a test
 			}
 
 			// get new beats authenticator
@@ -454,7 +454,7 @@ func newTestESExporter(t *testing.T, conf *confmap.Conf) (ESexporter exporter.Lo
 	}
 
 	esCfg := conf.Get("exporters::elasticsearch")
-	esConf := confmap.NewFromStringMap(esCfg.(map[string]any))
+	esConf := confmap.NewFromStringMap(esCfg.(map[string]any)) //nolint: errcheck // it is a test
 
 	// unmarshall user config into ES exporter config
 	require.NoError(t, esConf.Unmarshal(cfg), "error unmarshalling user config into ES config")
