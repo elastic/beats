@@ -5,8 +5,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 //
-// This code is a modified version of the code from the Azure SDK for Go.
 // Check NOTICE.txt for full licence details.
+
+// Please note that this code is a modified version of the code from
+// the Azure SDK for Go.
+//
+// We made some minor modifications to the code to improve the following aspects:
+//
+// - Returns all the errors instead of returning the first error.
+// - Checks the connection string keys for empty values instead of
+//   checking for nil values.
 //
 // The original code is available at:
 // https://github.com/Azure/azure-sdk-for-go/blob/main/sdk/messaging/azeventhubs/internal/exported/connection_string_properties.go
