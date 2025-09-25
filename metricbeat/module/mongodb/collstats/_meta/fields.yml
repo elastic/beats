@@ -115,6 +115,7 @@
           type: long
           description: >
             The number of objects or documents in this collection.
+            In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.count`.
         - name: avgObjSize
           type: long
           description: >
