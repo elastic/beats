@@ -531,7 +531,7 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: Packaging Linux"
 
-      - label: ":ubuntu: x-pack/metricbeat: Packaging linux arm64"
+      - label: ":ubuntu: x-pack/metricbeat: Packaging arm64"
         key: "packaging-arm"
         env:
           PLATFORMS: "+all linux/arm64 darwin/arm64 windows/arm64"
