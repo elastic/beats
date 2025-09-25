@@ -148,6 +148,8 @@
             In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.nindexes`.
         - name: freeStorageSize
           type: long
+          version:
+            ga: 9.2.0
           description: >
             Unused but allocated space (in bytes) for the collection; can be used to estimate fragmentation. Present in newer MongoDB versions only.
         - name: capped
