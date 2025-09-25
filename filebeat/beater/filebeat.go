@@ -266,7 +266,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			"Filebeat's registry",
 			"registry.tar.gz",
 			"application/octet-stream",
-			gzipRegistry(b.Info.Logger))
+			gzipRegistry)
 	}
 
 	if !fb.moduleRegistry.Empty() {
