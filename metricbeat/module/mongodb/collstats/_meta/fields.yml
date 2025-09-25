@@ -153,6 +153,8 @@
             Indicates whether the collection is capped (fixed-size, circular behavior).
         - name: scaleFactor
           type: long
+          version:
+            ga: 9.2.0
           description: >
             Scale factor applied to size-related metrics (e.g. 1 or 1024). Use to derive raw byte counts if metrics are scaled.
         - name: shardCount
