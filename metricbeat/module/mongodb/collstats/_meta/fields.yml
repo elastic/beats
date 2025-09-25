@@ -118,6 +118,7 @@
           type: long
           description: >
             The average size of an object in the collection (in bytes).
+            In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.avgObjSize`.
         - name: storageSize
           type: long
           description: >
