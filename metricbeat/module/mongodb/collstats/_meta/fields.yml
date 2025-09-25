@@ -145,6 +145,7 @@
           type: long
           description: >
             The number of indexes on the collection. All collections have at least one index on the _id field.
+            In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.nindexes`.
         - name: freeStorageSize
           type: long
           description: >
