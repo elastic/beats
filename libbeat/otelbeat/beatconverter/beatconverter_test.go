@@ -90,7 +90,7 @@ receivers:
         username: elastic
         password: changeme
         index: form-otel-exporter
-
+        proxy_url: https://tikugfk
 service:
   pipelines:
     logs:
