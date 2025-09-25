@@ -152,6 +152,8 @@
             Unused but allocated space (in bytes) for the collection; can be used to estimate fragmentation. Present in newer MongoDB versions only.
         - name: capped
           type: boolean
+          version:
+            ga: 9.2.0
           description: >
             Indicates whether the collection is capped (fixed-size, circular behavior).
         - name: scaleFactor
