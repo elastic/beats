@@ -140,6 +140,7 @@
           type: long
           description: >
             Shows the maximum number of documents that may be present in a capped collection.
+            In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.max`.
         - name: nindexes
           type: long
           description: >
