@@ -152,6 +152,8 @@
             Scale factor applied to size-related metrics (e.g. 1 or 1024). Use to derive raw byte counts if metrics are scaled.
         - name: shardCount
           type: long
+          version:
+            ga: 9.2.0
           description: >
             Number of shards for this collection (sharded collections only). Indicates how data is distributed across the cluster.
         - name: numOrphanDocs
