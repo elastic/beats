@@ -6,6 +6,7 @@
 // Licensed under the MIT License.
 //
 // This code is a modified version of the code from the Azure SDK for Go.
+// Check NOTICE.txt for full licence details.
 //
 // The original code is available at:
 // https://github.com/Azure/azure-sdk-for-go/blob/main/sdk/messaging/azeventhubs/internal/exported/connection_string_properties.go
