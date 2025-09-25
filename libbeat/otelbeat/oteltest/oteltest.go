@@ -282,7 +282,9 @@ func TestReceiverHook(t *testing.T, config component.Config, factory receiver.Fa
 	require.NotNil(t, logs)
 	require.NoError(t, logs.Start(context.Background(), &mockHost{diagExt: diagExt}))
 
-	defer logs.Shutdown(context.Background())
+	defer func() {
+		require.NoError(t, logs.Shutdown(context.Background()))
+	}()
 
 	assert.EventuallyWithT(t, func(c *assert.CollectT) {
 		assert.Contains(c, diagExt.hooks, set.ID.String())
