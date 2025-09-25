@@ -270,7 +270,7 @@ steps:
           - github_commit_status:
               context: "x-pack/osquerybeat: Packaging Linux"
 
-      - label: ":ubuntu: x-pack/osquerybeat: Packaging Linux arm64"
+      - label: ":ubuntu: x-pack/osquerybeat: Packaging arm64"
         key: "packaging-arm"
         env:
           PLATFORMS: "+all linux/arm64 darwin/arm64 windows/arm64"
