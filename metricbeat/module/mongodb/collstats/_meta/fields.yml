@@ -110,6 +110,7 @@
           type: long
           description: >
             The total uncompressed size in memory of all records in a collection.
+            In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.size`.
         - name: count
           type: long
           description: >
