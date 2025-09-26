@@ -7,8 +7,6 @@ package okta
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -21,8 +19,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/elastic/beats/v7/testing/testutils"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -370,7 +366,7 @@ func TestLocal(t *testing.T) {
 
 			query := make(url.Values)
 			query.Set("limit", "200")
-			got, h, err := test.fn(context.Background(), getTestClient(ts), host, key, test.id, query, limiter, logger)
+			got, h, err := test.fn(context.Background(), ts.Client(), host, key, test.id, query, limiter, logger)
 			if err != nil {
 				t.Fatalf("unexpected error from Get_Details: %v", err)
 			}
@@ -517,7 +513,7 @@ func TestRateLimitRetries(t *testing.T) {
 		// retry until there's a non-429 response
 		query := make(url.Values)
 		query.Set("limit", "200")
-		got, _, err := GetUserDetails(context.Background(), getTestClient(ts), host, key, "", query, OmitNone, limiter, logger)
+		got, _, err := GetUserDetails(context.Background(), ts.Client(), host, key, "", query, OmitNone, limiter, logger)
 		if err != nil {
 			t.Fatalf("unexpected error from Get_Details: %v", err)
 		}
@@ -528,7 +524,7 @@ func TestRateLimitRetries(t *testing.T) {
 		// stop trying after the maximum retries
 		query = make(url.Values)
 		query.Set("limit", "200")
-		_, _, err = GetUserDetails(context.Background(), getTestClient(ts), host, key, "", query, OmitNone, limiter, logger)
+		_, _, err = GetUserDetails(context.Background(), ts.Client(), host, key, "", query, OmitNone, limiter, logger)
 		expectedErrMsg := "maximum retries (5) finished without success"
 		if err == nil {
 			t.Errorf("expected the error '%s', but got no error", expectedErrMsg)
@@ -537,24 +533,4 @@ func TestRateLimitRetries(t *testing.T) {
 		}
 
 	})
-}
-
-func getTestClient(srv *httptest.Server) *http.Client {
-	client := srv.Client()
-	if testutils.IsFIPS140Only() {
-		// Exclude X25519 curves when in FIPS mode, otherwise we get the error:
-		// crypto/ecdh: use of X25519 is not allowed in FIPS 140-only mode
-		// Note that we only use FIPS 140-only mode, set via GODEBUG=fips140=only,
-		// while testing.
-		certpool := x509.NewCertPool()
-		certpool.AddCert(srv.Certificate())
-		client.Transport = &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs:          certpool,
-				CurvePreferences: []tls.CurveID{tls.CurveP256, tls.CurveP384, tls.CurveP521},
-			},
-		}
-	}
-
-	return client
 }
