@@ -47,6 +47,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/unison"
 
 	// Add filebeat level processors
@@ -76,7 +77,7 @@ type Filebeat struct {
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 }
 
-type PluginFactory func(beat.Info, *logp.Logger, statestore.States) []v2.Plugin
+type PluginFactory func(beat.Info, *logp.Logger, statestore.States, *paths.Path) []v2.Plugin
 
 // New creates a new Filebeat pointer instance.
 func New(plugins PluginFactory) beat.Creator {
@@ -126,25 +127,6 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		if err = inputmon.AttachHandler(b.API.Router(), b.Monitoring.InputsRegistry()); err != nil {
 			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
-	}
-
-	if b.Manager != nil {
-		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
-			"input_metrics.json", "application/json", func() []byte {
-				data, err := inputmon.MetricSnapshotJSON(b.Monitoring.InputsRegistry())
-				if err != nil {
-					b.Info.Logger.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
-					return []byte(err.Error())
-				}
-				return data
-			})
-
-		b.Manager.RegisterDiagnosticHook(
-			"registry",
-			"Filebeat's registry",
-			"registry.tar.gz",
-			"application/octet-stream",
-			gzipRegistry(b.Info.Logger))
 	}
 
 	// Add inputs created by the modules
@@ -268,6 +250,25 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	var err error
 	config := fb.config
 
+	if b.Manager != nil {
+		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
+			"input_metrics.json", "application/json", func() []byte {
+				data, err := inputmon.MetricSnapshotJSON(b.Monitoring.InputsRegistry())
+				if err != nil {
+					b.Info.Logger.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					return []byte(err.Error())
+				}
+				return data
+			})
+
+		b.Manager.RegisterDiagnosticHook(
+			"registry",
+			"Filebeat's registry",
+			"registry.tar.gz",
+			"application/octet-stream",
+			gzipRegistry(b.Info.Logger))
+	}
+
 	if !fb.moduleRegistry.Empty() {
 		err = fb.loadModulesPipelines(b)
 		if err != nil {
@@ -360,7 +361,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	pipelineConnector := channel.NewOutletFactory(outDone).Create
 
 	inputsLogger := fb.logger.Named("input")
-	v2Inputs := fb.pluginFactory(b.Info, inputsLogger, stateStore)
+	v2Inputs := fb.pluginFactory(b.Info, inputsLogger, stateStore, paths.Paths)
 	v2InputLoader, err := v2.NewLoader(inputsLogger, v2Inputs, "type", cfg.DefaultType)
 	if err != nil {
 		panic(err) // loader detected invalid state.
