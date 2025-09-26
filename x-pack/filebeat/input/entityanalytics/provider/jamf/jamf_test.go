@@ -6,7 +6,6 @@ package jamf
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -22,7 +21,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"gopkg.in/natefinch/lumberjack.v2"
 
-	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/internal/jamf"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -150,15 +148,5 @@ func testContext() (tenant string, username string, password string, client *htt
 	}
 	tenant = u.Host
 
-	cli := srv.Client()
-	if testutils.IsFIPS140Only() {
-		// Exclude X25519 curves when in FIPS mode, otherwise we get the error:
-		// crypto/ecdh: use of X25519 is not allowed in FIPS 140-only mode
-		// Note that we only use FIPS 140-only mode, set via GODEBUG=fips140=only,
-		// while testing.
-		transport := cli.Transport.(*http.Transport)
-		transport.TLSClientConfig.CurvePreferences = []tls.CurveID{tls.CurveP256, tls.CurveP384, tls.CurveP521}
-	}
-
-	return tenant, username, password, cli, srv.Close, nil
+	return tenant, username, password, srv.Client(), srv.Close, nil
 }
