@@ -1,5 +1,3 @@
-version: '2.3'
-
 services:
   postgresql:
     image: docker.elastic.co/integrations-ci/beats-postgresql:${POSTGRESQL_VERSION:-13.11}-2
