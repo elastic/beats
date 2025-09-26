@@ -423,69 +423,9 @@ receivers:
 
 }
 
-// TestHTTPProxy tests http proxy
-func TestHTTPProxy(t *testing.T) {
-	serverName, metricReader := startTestServer(t, nil)
-
-	proxy := proxytest.New(t,
-		proxytest.WithVerboseLog(),
-		proxytest.WithRequestLog("https", t.Logf),
-	)
-	require.NoErrorf(t, proxy.Start(), "error starting proxy server")
-
-	// set http_proxy
-	os.Setenv("HTTP_PROXY", proxy.URL)
-
-	inputConfig := `
-receivers:
-  filebeatreceiver:	
-    output:
-      elasticsearch:
-        hosts: {{ .Host }}
-        proxy_url: {{ .ProxyURL }}
-`
-
-	var otelConfigBuffer bytes.Buffer
-	require.NoError(t,
-		template.Must(template.New("otelConfig").Parse(inputConfig)).Execute(&otelConfigBuffer,
-			options{
-				Host:     serverName,
-				ProxyURL: proxy.URL,
-			}))
-
-	// translate beat to beatreceiver config
-	output := getTranslatedConf(t, otelConfigBuffer.Bytes())
-
-	// get new test exporter
-	exp := newTestESExporter(t, output)
-
-	// get new beats authenticator
-	beatsauth := newAuthenticator(t, beatsauthextension.Config{
-		BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any),
-	})
-
-	// start extension
-	host := extensionsMap{component.NewID(component.MustNewType(beatsAuthName)): beatsauth}
-	err := beatsauth.Start(t.Context(), host)
-	require.NoError(t, err, "could not start extension")
-
-	// start exporter
-	err = exp.Start(t.Context(), host)
-	require.NoError(t, err, "could not start exporter")
-
-	// send logs
-	require.NoError(t, mustSendLogs(t, exp, getLogRecord(t)), "error sending logs")
-
-	// check if data has reached ES
-	assertReceivedLogRecord(t, metricReader)
-
-	// assert if requests have gone via the proxy
-	assert.NotEmpty(t, proxy.ProxiedRequests(), "proxy should have captured at least 1 request")
-
-}
-
-// TestProxyHTTPS tests https proxy
-func TestProxyHTTPS(t *testing.T) {
+// TestProxyHTTPS tests proxy_url with http and https proxy server
+// It also tests proxy_disable configuration
+func TestProxyHTTP(t *testing.T) {
 
 	// caCert cert pool
 	certPool := x509.NewCertPool()
