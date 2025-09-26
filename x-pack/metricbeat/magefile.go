@@ -276,6 +276,15 @@ func GoIntegTest(ctx context.Context) error {
 // Use TEST_TAGS=tag1,tag2 to add additional build tags.
 // Use MODULE=module to run only tests for `module`.
 func GoFIPSOnlyIntegTest(ctx context.Context) error {
+	// We pre-cache go module dependencies before running the unit tests with
+	// GODEBUG=fips140=only.  Otherwise, the command that runs the unit tests
+	// will try to download the dependencies and could fail because the TLS
+	// negotiation with the Go module proxy could use a non-FIPS compliant
+	// key exchange protocol, e.g. X25519.
+	if err := sh.RunV(mg.GoCmd(), "mod", "download"); err != nil {
+		return err
+	}
+
 	os.Setenv("GODEBUG", "fips140=only")
 	return GoIntegTest(ctx)
 }
