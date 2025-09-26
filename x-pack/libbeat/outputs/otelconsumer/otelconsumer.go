@@ -59,12 +59,12 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 
 	// Default to runtime.NumCPU() workers
 	clients := make([]outputs.Client, 0, runtime.NumCPU())
-	for range runtime.NumCPU() {
+	for i := 0; i < runtime.NumCPU(); i++ {
 		clients = append(clients, &otelConsumer{
 			observer:       observer,
 			logsConsumer:   beat.LogConsumer,
 			beatInfo:       beat,
-			log:            beat.Logger.Named("otelconsumer"),
+			log:            beat.Logger.Named(fmt.Sprintf("otelconsumer-%d", i)),
 			isReceiverTest: isReceiverTest,
 		})
 	}
@@ -102,6 +102,8 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	// For example, the elasticsearchexporter has an encoding specifically for this.
 	// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/35444.
 	events := batch.Events()
+	out.log.Info("Consuming events: ", len(events))
+
 	for _, event := range events {
 		logRecord := logRecords.AppendEmpty()
 
@@ -177,6 +179,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		}
 	}
 
+	out.log.Info("Consuming log records: ", logRecords.Len())
 	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
 	if err != nil {
 		// Permanent errors shouldn't be retried. This tipically means
