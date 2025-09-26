@@ -173,7 +173,6 @@ func TestOktaDoFetch(t *testing.T) {
 			if err != nil {
 				t.Errorf("failed to parse server URL: %v", err)
 			}
-
 			rateLimiter := okta.NewRateLimiter(window, nil)
 			a := oktaInput{
 				cfg: conf{
