@@ -169,7 +169,7 @@ func TestMultipleReceivers(t *testing.T) {
 	// with each other.
 
 	// Receivers need distinct home directories so wrap the config in a function.
-	config := func(monitorSocket string, homePath string) *Config {
+	config := func(monitorSocket string, homePath string, ingestPath string) *Config {
 		var monitorHost string
 		if runtime.GOOS == "windows" {
 			monitorHost = "npipe:///" + filepath.Base(monitorSocket)
@@ -187,10 +187,11 @@ func TestMultipleReceivers(t *testing.T) {
 							"count":   1,
 						},
 						{
-							"type":    "filestream",
-							"enabled": true,
-							"id":      "must-be-unique",
-							"paths":   []string{"none"},
+							"type":                 "filestream",
+							"enabled":              true,
+							"id":                   "must-be-unique",
+							"paths":                []string{ingestPath},
+							"file_identity.native": nil,
 						},
 					},
 				},
@@ -215,23 +216,38 @@ func TestMultipleReceivers(t *testing.T) {
 	monitorSocket2 := genSocketPath()
 	dir1 := t.TempDir()
 	dir2 := t.TempDir()
+	ingest1 := filepath.Join(t.TempDir(), "test1.log")
+	ingest2 := filepath.Join(t.TempDir(), "test2.log")
 	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
-		T: t,
+		T:           t,
+		NumRestarts: 5,
 		Receivers: []oteltest.ReceiverConfig{
 			{
 				Name:    "r1",
 				Beat:    "filebeat",
-				Config:  config(monitorSocket1, dir1),
+				Config:  config(monitorSocket1, dir1, ingest1),
 				Factory: factory,
 			},
 			{
 				Name:    "r2",
 				Beat:    "filebeat",
-				Config:  config(monitorSocket2, dir2),
+				Config:  config(monitorSocket2, dir2, ingest2),
 				Factory: factory,
 			},
 		},
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
+			// Add data to be ingested with filestream
+			f1, err := os.OpenFile(ingest1, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+			require.NoError(c, err)
+			_, err = f1.WriteString("A log line\n")
+			require.NoError(c, err)
+			f1.Close()
+			f2, err := os.OpenFile(ingest2, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+			require.NoError(c, err)
+			_, err = f2.WriteString("A log line\n")
+			require.NoError(c, err)
+			f2.Close()
+
 			require.Greater(c, len(logs["r1"]), 0, "receiver r1 does not have any logs")
 			require.Greater(c, len(logs["r2"]), 0, "receiver r2 does not have any logs")
 
@@ -274,6 +290,20 @@ func TestMultipleReceivers(t *testing.T) {
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket2, "inputs")
 			}, "failed to connect to monitoring socket2, inputs endpoint, last error was: %s", &lastError)
+
+			reg1Path := filepath.Join(dir1, "/data/registry/filebeat/log.json")
+			require.FileExists(c, reg1Path, "receiver 1 filebeat registry should exist")
+			reg1Data, err := os.ReadFile(reg1Path)
+			require.NoError(c, err)
+			require.Containsf(c, string(reg1Data), ingest1, "receiver 1 registry should contain '%s', but was: %s", ingest1, string(reg1Data))
+			require.NotContainsf(c, string(reg1Data), ingest2, "receiver 1 registry should not contain '%s', but was: %s", ingest2, string(reg1Data))
+
+			reg2Path := filepath.Join(dir2, "/data/registry/filebeat/log.json")
+			require.FileExists(c, reg2Path, "receiver 2 filebeat registry should exist")
+			reg2Data, err := os.ReadFile(reg2Path)
+			require.NoError(c, err)
+			require.Containsf(c, string(reg2Data), ingest2, "receiver 2 registry should contain '%s', but was: %s", ingest2, string(reg2Data))
+			require.NotContainsf(c, string(reg2Data), ingest1, "receiver 2 registry should not contain '%s', but was: %s", ingest1, string(reg2Data))
 		},
 	})
 }
