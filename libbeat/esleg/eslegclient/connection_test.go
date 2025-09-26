@@ -34,13 +34,10 @@ import (
 
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -265,18 +262,6 @@ ssl:
 	require.NoError(t, err)
 
 	transport.TLS.CAs = []string{string(caCertPEM)}
-
-	if testutils.IsFIPS140Only() {
-		// Exclude X25519 curves when in FIPS mode, otherwise we get the error:
-		// crypto/ecdh: use of X25519 is not allowed in FIPS 140-only mode
-		// Note that we only use FIPS 140-only mode, set via GODEBUG=fips140=only,
-		// while testing.
-		transport.TLS.CurveTypes = []tlscommon.TLSCurveType{
-			tlscommon.TLSCurveType(tls.CurveP256),
-			tlscommon.TLSCurveType(tls.CurveP384),
-			tlscommon.TLSCurveType(tls.CurveP521),
-		}
-	}
 
 	log := logptest.NewTestingLogger(t, "TestConnectionTLS")
 	conn, err := NewConnection(ConnectionSettings{
