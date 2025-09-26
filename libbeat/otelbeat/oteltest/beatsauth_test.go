@@ -423,71 +423,13 @@ receivers:
 
 }
 
-// TestHTTPProxy tests http proxy
-func TestHTTPProxy(t *testing.T) {
-	serverName, metricReader := startTestServer(t, nil)
+// TestProxyHTTP tests proxy workings with http server, https server
+// also tests proxy_disable configuration
+func TestProxyHTTP(t *testing.T) {
 
-	proxy := proxytest.New(t,
-		proxytest.WithVerboseLog(),
-		proxytest.WithRequestLog("https", t.Logf),
-	)
-	require.NoErrorf(t, proxy.Start(), "error starting proxy server")
-
-	// set http_proxy
-	os.Setenv("HTTP_PROXY", proxy.URL)
-
-	inputConfig := `
-receivers:
-  filebeatreceiver:	
-    output:
-      elasticsearch:
-        hosts: {{ .Host }}
-        proxy_url: {{ .ProxyURL }}
-`
-
-	var otelConfigBuffer bytes.Buffer
-	require.NoError(t,
-		template.Must(template.New("otelConfig").Parse(inputConfig)).Execute(&otelConfigBuffer,
-			options{
-				Host:     serverName,
-				ProxyURL: proxy.URL,
-			}))
-
-	// translate beat to beatreceiver config
-	output := getTranslatedConf(t, otelConfigBuffer.Bytes())
-
-	// get new test exporter
-	exp := newTestESExporter(t, output)
-
-	// get new beats authenticator
-	beatsauth := newAuthenticator(t, beatsauthextension.Config{
-		BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any),
-	})
-
-	// start extension
-	host := extensionsMap{component.NewID(component.MustNewType(beatsAuthName)): beatsauth}
-	err := beatsauth.Start(t.Context(), host)
-	require.NoError(t, err, "could not start extension")
-
-	// start exporter
-	err = exp.Start(t.Context(), host)
-	require.NoError(t, err, "could not start exporter")
-
-	// send logs
-	require.NoError(t, mustSendLogs(t, exp, getLogRecord(t)), "error sending logs")
-
-	// check if data has reached ES
-	assertReceivedLogRecord(t, metricReader)
-
-	// assert if requests have gone via the proxy
-	assert.NotEmpty(t, proxy.ProxiedRequests(), "proxy should have captured at least 1 request")
-
-}
-
-// TestProxyHTTPS tests https proxy
-func TestProxyHTTPS(t *testing.T) {
-
-	// all certificates are issued by caCert
+	// caCert cert pool
+	certPool := x509.NewCertPool()
+	certPool.AddCert(caCert.Leaf)
 
 	// create server certificates
 	serverCerts, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "server", []string{"localhost"}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
@@ -501,37 +443,52 @@ func TestProxyHTTPS(t *testing.T) {
 		t.Fatalf("could not generate certificates: %s", err)
 	}
 
-	serverName, metricReader := startTestServer(t, &tls.Config{
-		Certificates: []tls.Certificate{serverCerts},
-		MinVersion:   tls.VersionTLS12,
-	})
-
-	// caCert cert pool
-	certPool := x509.NewCertPool()
-	certPool.AddCert(caCert.Leaf)
-
-	proxy := proxytest.New(t,
-		proxytest.WithVerboseLog(),
-		proxytest.WithRequestLog("https", t.Logf),
-		// we pass ca cert so that proxy server can hijack the incoming client connection
-		// create a proxy client that can trust the server's certificate
-		proxytest.WithMITMCA(caCert.PrivateKey, caCert.Leaf),
-		proxytest.WithHTTPClient(&http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					MinVersion: tls.VersionTLS13,
-					RootCAs:    certPool,
-				},
+	testcases := []struct {
+		name                  string
+		serverTLSConfig       *tls.Config
+		proxyOptions          []proxytest.Option
+		inputConfig           string
+		expectProxiedRequests bool // if the request should go via proxy server
+	}{
+		{
+			name:            "when http proxy url is set",
+			serverTLSConfig: nil,
+			proxyOptions: []proxytest.Option{proxytest.WithVerboseLog(),
+				proxytest.WithRequestLog("https", t.Logf)},
+			inputConfig: `
+receivers:
+  filebeatreceiver:	
+    output:
+      elasticsearch:
+        hosts: {{ .Host }}
+        proxy_url: {{ .ProxyURL }}
+`,
+			expectProxiedRequests: true,
+		},
+		{
+			name: "when http/s proxy url is set",
+			serverTLSConfig: &tls.Config{
+				Certificates: []tls.Certificate{serverCerts},
+				MinVersion:   tls.VersionTLS12,
 			},
-		}),
-		proxytest.WithServerTLSConfig(&tls.Config{
-			Certificates: []tls.Certificate{proxyCerts},
-			MinVersion:   tls.VersionTLS13,
-		}),
-	)
-	require.NoErrorf(t, proxy.StartTLS(), "error starting proxy server")
-
-	inputConfig := `
+			proxyOptions: []proxytest.Option{proxytest.WithVerboseLog(),
+				proxytest.WithRequestLog("https", t.Logf),
+				// we pass ca cert so that proxy server can hijack the incoming client connection
+				// create a proxy client that can trust the server's certificate
+				proxytest.WithMITMCA(caCert.PrivateKey, caCert.Leaf),
+				proxytest.WithHTTPClient(&http.Client{
+					Transport: &http.Transport{
+						TLSClientConfig: &tls.Config{
+							MinVersion: tls.VersionTLS13,
+							RootCAs:    certPool,
+						},
+					},
+				}),
+				proxytest.WithServerTLSConfig(&tls.Config{
+					Certificates: []tls.Certificate{proxyCerts},
+					MinVersion:   tls.VersionTLS13,
+				})},
+			inputConfig: `
 receivers:
   filebeatreceiver:	
     output:
@@ -540,46 +497,83 @@ receivers:
         proxy_url: {{ .ProxyURL }}
         ssl:
           certificate_authorities:
-            - {{ .CACertificate }}				
-`
+            - {{ .CACertificate }}
+`,
+			expectProxiedRequests: true,
+		},
+		{
+			name:            "when proxy disable is set",
+			serverTLSConfig: nil,
+			proxyOptions: []proxytest.Option{proxytest.WithVerboseLog(),
+				proxytest.WithRequestLog("https", t.Logf)},
+			inputConfig: `
+receivers:
+  filebeatreceiver:	
+    output:
+      elasticsearch:
+        hosts: {{ .Host }}
+        proxy_url: {{ .ProxyURL }}
+        proxy_disable: true
+`,
+			expectProxiedRequests: false,
+		},
+	}
 
-	var otelConfigBuffer bytes.Buffer
-	require.NoError(t,
-		template.Must(template.New("otelConfig").Parse(inputConfig)).Execute(&otelConfigBuffer,
-			options{
-				Host:          serverName,
-				ProxyURL:      proxy.URL,
-				CACertificate: caFilePath(t),
-			}))
+	for _, test := range testcases {
+		t.Run(test.name, func(t *testing.T) {
 
-	// translate beat to beatreceiver config
-	output := getTranslatedConf(t, otelConfigBuffer.Bytes())
+			serverName, metricReader := startTestServer(t, test.serverTLSConfig)
+			proxy := proxytest.New(t, test.proxyOptions...)
 
-	// get new test exporter
-	exp := newTestESExporter(t, output)
+			if test.serverTLSConfig != nil {
+				require.NoErrorf(t, proxy.StartTLS(), "error starting proxy server")
+			} else {
+				require.NoErrorf(t, proxy.Start(), "error starting proxy server")
+			}
 
-	// get new beats authenticator
-	beatsauth := newAuthenticator(t, beatsauthextension.Config{
-		BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any),
-	})
+			var otelConfigBuffer bytes.Buffer
+			require.NoError(t,
+				template.Must(template.New("otelConfig").Parse(test.inputConfig)).Execute(&otelConfigBuffer,
+					options{
+						Host:          serverName,
+						ProxyURL:      proxy.URL,
+						CACertificate: caFilePath(t),
+					}))
 
-	// start extension
-	host := extensionsMap{component.NewID(component.MustNewType(beatsAuthName)): beatsauth}
-	err = beatsauth.Start(t.Context(), host)
-	require.NoError(t, err, "could not start extension")
+			// translate beat to beatreceiver config
+			output := getTranslatedConf(t, otelConfigBuffer.Bytes())
 
-	// start exporter
-	err = exp.Start(t.Context(), host)
-	require.NoError(t, err, "could not start exporter")
+			// get new test exporter
+			exp := newTestESExporter(t, output)
 
-	// send logs
-	require.NoError(t, mustSendLogs(t, exp, getLogRecord(t)), "error sending logs")
+			// get new beats authenticator
+			beatsauth := newAuthenticator(t, beatsauthextension.Config{
+				BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any),
+			})
 
-	// check if data has reached ES
-	assertReceivedLogRecord(t, metricReader)
+			// start extension
+			host := extensionsMap{component.NewID(component.MustNewType(beatsAuthName)): beatsauth}
+			err = beatsauth.Start(t.Context(), host)
+			require.NoError(t, err, "could not start extension")
 
-	// assert if requests have gone via the proxy
-	assert.NotEmpty(t, proxy.ProxiedRequests(), "proxy should have captured at least 1 request")
+			// start exporter
+			err = exp.Start(t.Context(), host)
+			require.NoError(t, err, "could not start exporter")
+
+			// send logs
+			require.NoError(t, mustSendLogs(t, exp, getLogRecord(t)), "error sending logs")
+
+			// check if data has reached ES
+			assertReceivedLogRecord(t, metricReader)
+
+			if test.expectProxiedRequests {
+				// assert if requests have gone via the proxy
+				assert.NotEmpty(t, proxy.ProxiedRequests(), "proxy should have captured at least 1 request")
+			} else {
+				assert.Empty(t, proxy.ProxiedRequests(), "proxy should have captured at least 1 request")
+			}
+		})
+	}
 
 }
 
