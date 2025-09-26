@@ -19,9 +19,6 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 )
 
-// DefaultTimeGrain is set as default timegrain for the azure metrics
-const DefaultTimeGrain = "PT5M"
-
 var instanceIdRegex = regexp.MustCompile(`.*?(\d+)$`)
 
 // mapMetricValues should map the metric values
