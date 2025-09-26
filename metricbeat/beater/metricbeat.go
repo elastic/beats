@@ -177,7 +177,15 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
 	}
+	return metricbeat, nil
+}
 
+// Run starts the workers for Metricbeat and blocks until Stop is called
+// and the workers complete. Each host associated with a MetricSet is given its
+// own goroutine for fetching data. The ensures that each host is isolated so
+// that a single unresponsive host cannot inadvertently block other hosts
+// within the same Module and MetricSet from collection.
+func (bt *Metricbeat) Run(b *beat.Beat) error {
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
@@ -189,15 +197,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 				return data
 			})
 	}
-	return metricbeat, nil
-}
 
-// Run starts the workers for Metricbeat and blocks until Stop is called
-// and the workers complete. Each host associated with a MetricSet is given its
-// own goroutine for fetching data. The ensures that each host is isolated so
-// that a single unresponsive host cannot inadvertently block other hosts
-// within the same Module and MetricSet from collection.
-func (bt *Metricbeat) Run(b *beat.Beat) error {
 	moduleOptions := append(
 		[]module.Option{module.WithMaxStartDelay(bt.config.MaxStartDelay)},
 		bt.moduleOptions...)

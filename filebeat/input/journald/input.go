@@ -58,6 +58,7 @@ type journald struct {
 	SaveRemoteHostname bool
 	Parsers            parser.Config
 	Journalctl         bool
+	Merge              bool
 }
 
 type checkpoint struct {
@@ -122,6 +123,7 @@ func Configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, erro
 		Facilities:         config.Facilities,
 		SaveRemoteHostname: config.SaveRemoteHostname,
 		Parsers:            config.Parsers,
+		Merge:              config.Merge,
 	}, nil
 }
 
@@ -140,6 +142,7 @@ func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
 		"",
 		inp.Since,
 		src.Name(),
+		inp.Merge,
 		journalctl.Factory,
 	)
 	if err != nil {
@@ -175,6 +178,7 @@ func (inp *journald) Run(
 		pos,
 		inp.Since,
 		src.Name(),
+		inp.Merge,
 		journalctl.Factory,
 	)
 	if err != nil {

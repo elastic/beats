@@ -265,6 +265,9 @@ func TestMultipleReceivers(t *testing.T) {
 }
 
 func TestReceiverDegraded(t *testing.T) {
+	if runtime.GOARCH == "arm64" && runtime.GOOS == "linux" {
+		t.Skip("flaky test on Ubuntu arm64, see https://github.com/elastic/beats/issues/46437")
+	}
 	testCases := []struct {
 		name            string
 		status          oteltest.ExpectedStatus
@@ -531,4 +534,35 @@ func TestConsumeContract(t *testing.T) {
 		Generator:     gen,
 		GenerateCount: logsPerTest,
 	})
+}
+
+func TestReceiverHook(t *testing.T) {
+	cfg := Config{
+		Beatconfig: map[string]any{
+			"filebeat": map[string]any{
+				"inputs": []map[string]any{
+					{
+						"type":    "benchmark",
+						"enabled": true,
+						"message": "test",
+						"count":   1,
+					},
+				},
+			},
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
+			},
+			"management.otel.enabled": true,
+			"path.home":               t.TempDir(),
+		},
+	}
+	receiverSettings := receiver.Settings{
+		ID: component.MustNewID(Name),
+		TelemetrySettings: component.TelemetrySettings{
+			Logger: zap.NewNop(),
+		},
+	}
+	// For filebeatreceiver, we expect 3 hooks to be registered:
+	// 	one for beat metrics, one for input metrics and one for getting the registry.
+	oteltest.TestReceiverHook(t, &cfg, NewFactory(), receiverSettings, 3)
 }

@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
@@ -97,7 +98,7 @@ func startAndStopReceiver(t *testing.T, factory receiver.Factory, consumer consu
 
 	rec, err := factory.CreateLogs(t.Context(), receiverSettings, config, consumer)
 	require.NoError(t, err)
-	require.NoError(t, rec.Start(t.Context(), nil))
+	require.NoError(t, rec.Start(t.Context(), componenttest.NewNopHost()))
 	if !assert.Eventually(t,
 		func() bool {
 			return observedLogs.FilterMessageSnippet("starting benchmark input thread").Len() >= 1

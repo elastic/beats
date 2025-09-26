@@ -92,6 +92,7 @@ filebeat.autodiscover:
             - type: filestream
               id: container-${data.docker.container.id}
               prospector.scanner.symlinks: true
+              close.on_state_change.removed: false # The file can be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
               parsers:
                 - container: ~
               paths:
@@ -118,6 +119,7 @@ filebeat.autodiscover:
                   type: filestream
                   id: container-${data.docker.container.id}
                   prospector.scanner.symlinks: true
+                  close.on_state_change.removed: false # The file can be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
                   parsers:
                     - container: ~
                   paths:
@@ -157,6 +159,7 @@ autodiscover.providers:
         config:
           - type: filestream
             id: container-${data.docker.container.id}
+            close.on_state_change.removed: false # The file can be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
             paths:
               - "/mnt/logs/${data.docker.container.id}/*.log"
 ```
@@ -346,6 +349,7 @@ filebeat.autodiscover:
             - type: filestream
               id: container-${data.kubernetes.container.id}
               prospector.scanner.symlinks: true
+              close.on_state_change.removed: false # The file can be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
               parsers:
                 - container: ~
               paths:
@@ -372,6 +376,7 @@ filebeat.autodiscover:
                   type: filestream
                   id: container-${data.kubernetes.container.id}
                   prospector.scanner.symlinks: true
+                  close.on_state_change.removed: false # The file can be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
                   parsers:
                     - container: ~
                   paths:
@@ -564,6 +569,7 @@ filebeat.autodiscover:
           config:
             - type: filestream
               id: ${data.nomad.task.name}-${data.nomad.allocation.id} # unique ID required
+              close.on_state_change.removed: false # The file can be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
               paths:
                 - /var/lib/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.stderr.[0-9]*
               exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
@@ -587,6 +593,7 @@ filebeat.autodiscover:
                 input:
                   type: filestream
                   id: ${data.nomad.task.name}-${data.nomad.allocation.id} # unique ID required
+                  close.on_state_change.removed: false # The file can be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
                   paths:
                     - /var/lib/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
 ```

@@ -26,6 +26,7 @@ import (
 	"runtime"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/dustin/go-humanize"
 
@@ -70,13 +71,14 @@ const (
 	BackendFSNotify Backend = "fsnotify"
 	BackendKprobes  Backend = "kprobes"
 	BackendEBPF     Backend = "ebpf"
+	BackendETW      Backend = "etw" // Windows only
 	BackendAuto     Backend = "auto"
 )
 
 func (b *Backend) Unpack(v string) error {
 	*b = Backend(v)
 	switch *b {
-	case BackendFSNotify, BackendKprobes, BackendEBPF, BackendAuto:
+	case BackendFSNotify, BackendKprobes, BackendEBPF, BackendETW, BackendAuto:
 		return nil
 	default:
 		return fmt.Errorf("invalid backend: %q", v)
@@ -98,6 +100,7 @@ type Config struct {
 	ExcludeFiles        []match.Matcher `config:"exclude_files"`
 	IncludeFiles        []match.Matcher `config:"include_files"`
 	Backend             Backend         `config:"backend"`
+	FlushInterval       time.Duration   `config:"flush_interval"` // Interval for flushing expired operations (ETW backend only). Default: 1m, minimum: 1s.
 }
 
 // Validate validates the config data and return an error explaining all the
@@ -173,8 +176,26 @@ nextHash:
 		errs = append(errs, fmt.Errorf("invalid scan_rate_per_sec value: %w", err))
 	}
 
-	if c.Backend != "" && c.Backend != BackendAuto && runtime.GOOS != "linux" {
-		errs = append(errs, errors.New("backend can only be specified on linux"))
+	if c.Backend != "" {
+		switch runtime.GOOS {
+		case "linux":
+			if c.Backend == BackendETW {
+				errs = append(errs, errors.New("backend etw is not supported on linux"))
+			}
+		case "windows":
+			if c.Backend != BackendETW && c.Backend != BackendAuto {
+				errs = append(errs, errors.New("windows only supports etw or auto backend"))
+			}
+		default:
+			if c.Backend != BackendAuto {
+				errs = append(errs, errors.New("backend can only be specified on linux or windows"))
+			}
+		}
+	}
+
+	// Validate flush_interval for ETW backend
+	if c.Backend == BackendETW && c.FlushInterval < time.Second {
+		errs = append(errs, fmt.Errorf("flush_interval must be at least 1 second, got %v", c.FlushInterval))
 	}
 
 	return errors.Join(errs...)
@@ -225,4 +246,5 @@ var defaultConfig = Config{
 	MaxFileSizeBytes: 100 * 1024 * 1024,
 	ScanAtStart:      true,
 	ScanRatePerSec:   "50 MiB",
+	FlushInterval:    time.Minute, // Default flush interval for ETW backend
 }

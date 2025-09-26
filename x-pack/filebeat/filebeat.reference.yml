@@ -2914,6 +2914,10 @@ filebeat.inputs:
   #paths:
     #- /var/log/custom.journal
 
+  # When enabled, log entries will be ingested interleaved from all
+  # available journals, including remote ones.
+  #merge: false
+
   # The position to start reading from the journal, valid options are:
   #  - head: Starts reading at the beginning of the journal.
   #  - tail: Starts reading at the end of the journal.

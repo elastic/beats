@@ -26,14 +26,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	elasticsearchtranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate/outputs/elasticsearch"
 	logstashstranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate/outputs/logstash"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // list of supported beatreceivers
-var supportedReceivers = []string{"filebeatreceiver", "metricbeatreceiver"} // Add more beat receivers to this list when we add support
+var (
+	supportedReceivers = []string{"filebeatreceiver", "metricbeatreceiver"} // Add more beat receivers to this list when we add support
+	beatsAuthName      = "beatsauth"
+)
 
-type converter struct{}
+type Converter struct{}
 
 // NewFactory returns a factory for a  confmap.Converter,
 func NewFactory() confmap.ConverterFactory {
@@ -41,11 +45,11 @@ func NewFactory() confmap.ConverterFactory {
 }
 
 func newConverter(set confmap.ConverterSettings) confmap.Converter {
-	return converter{}
+	return Converter{}
 }
 
 // Convert converts [beatreceiver].output to OTel config here
-func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
+func (c Converter) Convert(_ context.Context, conf *confmap.Conf) error {
 
 	for _, beatreceiver := range supportedReceivers {
 		var out map[string]any
@@ -123,10 +127,25 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 					}
 				}
 
+				// get beatsauth config
+				authConfig, err := getBeatsAuthExtensionConfig(esConfig)
+				if err != nil {
+					return fmt.Errorf("cannot translate http settings on beatsauth extension: %w", err)
+				}
+
+				// set authenticator name on ES exporter
+				esOTelConfig["auth"] = map[string]any{
+					"authenticator": beatsAuthName,
+				}
+
 				out = map[string]any{
 					"service::pipelines::logs::exporters": []string{"elasticsearch"},
+					"service::extensions":                 []interface{}{beatsAuthName},
 					"exporters": map[string]any{
 						"elasticsearch": esOTelConfig,
+					},
+					"extensions": map[string]any{
+						beatsAuthName: authConfig,
 					},
 				}
 				err = conf.Merge(confmap.NewFromStringMap(out))
@@ -229,4 +248,27 @@ func promoteOutputQueueSettings(beatReceiverConfigKey string, outputConfig *conf
 	}
 
 	return nil
+}
+
+// getBeatsAuthExtensionConfig sets http transport settings on beatsauth
+// currently this is only supported for elasticsearch output
+func getBeatsAuthExtensionConfig(cfg *config.C) (map[string]any, error) {
+	defaultTransportSettings := elasticsearch.ESDefaultTransportSettings()
+	err := cfg.Unpack(&defaultTransportSettings)
+	if err != nil {
+		return nil, err
+	}
+
+	newConfig, err := config.NewConfigFrom(defaultTransportSettings)
+	if err != nil {
+		return nil, err
+	}
+
+	var newMap map[string]any
+	err = newConfig.Unpack(&newMap)
+	if err != nil {
+		return nil, err
+	}
+
+	return newMap, nil
 }

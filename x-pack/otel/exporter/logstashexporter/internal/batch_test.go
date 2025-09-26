@@ -96,17 +96,11 @@ func TestNewLogBatch(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 				assert.NotNil(t, batch)
-				assert.NotNil(t, batch.result)
-
-				// Verify result is initialized correctly
-				assert.False(t, batch.result.Acked)
-				assert.False(t, batch.result.Dropped)
-				assert.False(t, batch.result.Retry)
-				assert.False(t, batch.result.Cancelled)
-				assert.Equal(t, 0, batch.result.Retries)
+				assert.NotNil(t, batch.resultCh)
+				assert.Equal(t, uint64(0), batch.NumRetries())
 
 				// Verify events count matches input
-				expectedEventCount := countLogRecords(logs)
+				expectedEventCount := logs.LogRecordCount()
 				assert.Len(t, batch.pendingEvents, expectedEventCount)
 			}
 		})
@@ -247,7 +241,7 @@ func TestCreateEvents(t *testing.T) {
 				assert.Nil(t, events)
 			} else {
 				require.NoError(t, err)
-				assert.Len(t, events, countLogRecords(logs))
+				assert.Len(t, events, logs.LogRecordCount())
 
 				ctxData := client.FromContext(ctx)
 				eventIndex := 0
@@ -282,12 +276,12 @@ func TestCreateEvents(t *testing.T) {
 }
 
 func TestLogBatchEvents(t *testing.T) {
-	batch := &LogBatch{
-		pendingEvents: []publisher.Event{
-			{Content: beat.Event{Fields: map[string]any{"message": "test1"}}},
-			{Content: beat.Event{Fields: map[string]any{"message": "test2"}}},
-		},
-		result: &LogBatchResult{},
+	batch, err := NewLogBatch(t.Context(), plog.NewLogs())
+	require.NoError(t, err)
+
+	batch.pendingEvents = []publisher.Event{
+		{Content: beat.Event{Fields: map[string]any{"message": "test1"}}},
+		{Content: beat.Event{Fields: map[string]any{"message": "test2"}}},
 	}
 
 	events := batch.Events()
@@ -297,46 +291,67 @@ func TestLogBatchEvents(t *testing.T) {
 }
 
 func TestLogBatchACK(t *testing.T) {
-	batch := &LogBatch{
-		result: &LogBatchResult{},
-	}
+	batch, err := NewLogBatch(t.Context(), plog.NewLogs())
+	require.NoError(t, err)
 
 	batch.ACK()
 
-	assert.True(t, batch.result.Acked)
-	assert.False(t, batch.result.Dropped)
-	assert.False(t, batch.result.Retry)
-	assert.False(t, batch.result.Cancelled)
+	var result LogBatchResult
+	select {
+	case result = <-batch.Result():
+	default:
+		t.Fatal("no ACK result received")
+	}
+
+	assert.Equal(t, LogBatchResultACK, result)
+	assert.Equal(t, uint64(0), batch.NumRetries())
 }
 
 func TestLogBatchDrop(t *testing.T) {
-	batch := &LogBatch{
-		result: &LogBatchResult{},
-	}
+	batch, err := NewLogBatch(t.Context(), plog.NewLogs())
+	require.NoError(t, err)
 
 	batch.Drop()
 
-	assert.True(t, batch.result.Dropped)
-	assert.Nil(t, batch.Events())
-	assert.False(t, batch.result.Acked)
-	assert.False(t, batch.result.Retry)
-	assert.False(t, batch.result.Cancelled)
+	var result LogBatchResult
+	select {
+	case result = <-batch.Result():
+	default:
+		t.Fatal("no Drop result received")
+	}
+
+	assert.Equal(t, LogBatchResultDrop, result)
+	assert.Equal(t, uint64(0), batch.NumRetries())
 }
 
 func TestLogBatchRetry(t *testing.T) {
-	batch := &LogBatch{
-		result: &LogBatchResult{},
-	}
+	var result LogBatchResult
+	batch, err := NewLogBatch(t.Context(), plog.NewLogs())
+	require.NoError(t, err)
 
 	// First retry
 	batch.Retry()
-	assert.True(t, batch.result.Retry)
-	assert.Equal(t, 1, batch.result.Retries)
+
+	select {
+	case result = <-batch.Result():
+	default:
+		t.Fatal("first Retry result not received")
+	}
+
+	assert.Equal(t, LogBatchResultRetry, result)
+	assert.Equal(t, uint64(1), batch.NumRetries())
 
 	// Second retry
 	batch.Retry()
-	assert.True(t, batch.result.Retry)
-	assert.Equal(t, 2, batch.result.Retries)
+
+	select {
+	case result = <-batch.Result():
+	default:
+		t.Fatal("second Retry result not received")
+	}
+
+	assert.Equal(t, LogBatchResultRetry, result)
+	assert.Equal(t, uint64(2), batch.NumRetries())
 }
 
 func TestLogBatchRetryEvents(t *testing.T) {
@@ -345,48 +360,74 @@ func TestLogBatchRetryEvents(t *testing.T) {
 		{Content: beat.Event{Fields: map[string]any{"message": "test2"}}},
 	}
 
-	batch := &LogBatch{
-		pendingEvents: events,
-		result:        &LogBatchResult{},
-	}
+	batch, err := NewLogBatch(t.Context(), plog.NewLogs())
+	require.NoError(t, err)
+
+	batch.pendingEvents = events
 
 	retryEvents := []publisher.Event{events[1]}
 	batch.RetryEvents(retryEvents)
 
-	assert.Equal(t, retryEvents, batch.pendingEvents)
-	assert.True(t, batch.result.Retry)
-	assert.Equal(t, 1, batch.result.Retries)
+	var result LogBatchResult
+	select {
+	case result = <-batch.Result():
+	default:
+		t.Fatal("no RetryEvents result received")
+	}
+
+	assert.Equal(t, LogBatchResultRetry, result)
+	assert.Equal(t, retryEvents, batch.Events())
+	assert.Equal(t, uint64(1), batch.NumRetries())
 }
 
 func TestLogBatchCancelled(t *testing.T) {
-	batch := &LogBatch{
-		result: &LogBatchResult{},
-	}
+	batch, err := NewLogBatch(t.Context(), plog.NewLogs())
+	require.NoError(t, err)
 
 	batch.Cancelled()
 
-	assert.True(t, batch.result.Cancelled)
-	assert.False(t, batch.result.Acked)
-	assert.False(t, batch.result.Dropped)
-	assert.False(t, batch.result.Retry)
+	var result LogBatchResult
+	select {
+	case result = <-batch.Result():
+	default:
+		t.Fatal("no Cancelled result received")
+	}
+
+	assert.Equal(t, LogBatchResultCancelled, result)
+	assert.Equal(t, uint64(0), batch.NumRetries())
 }
 
-func TestLogBatchResult(t *testing.T) {
-	expectedResult := &LogBatchResult{
-		Acked:     true,
-		Dropped:   false,
-		Retry:     true,
-		Cancelled: false,
-		Retries:   2,
+func TestSplitRetry(t *testing.T) {
+	batch, err := NewLogBatch(t.Context(), plog.NewLogs())
+	require.NoError(t, err)
+	assert.False(t, batch.SplitRetry())
+}
+
+func TestAddRetry(t *testing.T) {
+	tests := []struct {
+		name     string
+		current  uint64
+		delta    int
+		expected uint64
+	}{
+		{"add zero", 5, 0, 5},
+		{"add to zero", 3, 0, 3},
+		{"add to non-zero", 5, 5, 10},
+		{"sub from zero", 0, -1, 0},
+		{"sub from non-zero", 2, -1, 1},
+		{"sub from smaller value", 2, -5, 0},
 	}
 
-	batch := &LogBatch{
-		result: expectedResult,
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			batch, err := NewLogBatch(t.Context(), plog.NewLogs())
+			require.NoError(t, err)
+
+			batch.retries.Store(tt.current)
+			batch.AddRetry(tt.delta)
+			assert.Equal(t, tt.expected, batch.NumRetries())
+		})
 	}
-
-	result := batch.Result()
-
-	assert.Equal(t, expectedResult, result)
 }
 
 func mustParseTime(timeStr string) time.Time {
@@ -395,14 +436,4 @@ func mustParseTime(timeStr string) time.Time {
 		panic(err)
 	}
 	return t
-}
-
-func countLogRecords(logs plog.Logs) int {
-	count := 0
-	for _, rl := range logs.ResourceLogs().All() {
-		for _, sl := range rl.ScopeLogs().All() {
-			count += sl.LogRecords().Len()
-		}
-	}
-	return count
 }
