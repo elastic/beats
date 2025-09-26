@@ -273,6 +273,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
 - Filebeat's registry is now added to the Elastic-Agent diagnostics bundle {issue}33238[33238] {pull}41795[41795]
 - The Filestream input now uses the `fingerprint` file identity by default. The state from files are automatically migrated if the previous file identity was `native` (the default) or `path`. If the `file_identity` is explicitly set, there is no change in behaviour. {issue}40197[40197] {pull}41762[41762]
+- Hints based autodiscover now sets `close.on_state_change.removed: false` in the default configuration to avoid missing the last log lines from a container. {issue}34789[34789] {pull}46695[46695]
 
 *Auditbeat*
 
