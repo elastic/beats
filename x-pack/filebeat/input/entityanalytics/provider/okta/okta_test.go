@@ -6,6 +6,8 @@ package okta
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -20,6 +22,7 @@ import (
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
+	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -173,6 +176,23 @@ func TestOktaDoFetch(t *testing.T) {
 			if err != nil {
 				t.Errorf("failed to parse server URL: %v", err)
 			}
+
+			client := ts.Client()
+			if testutils.IsFIPS140Only() {
+				// Exclude X25519 curves when in FIPS mode, otherwise we get the error:
+				// crypto/ecdh: use of X25519 is not allowed in FIPS 140-only mode
+				// Note that we only use FIPS 140-only mode, set via GODEBUG=fips140=only,
+				// while testing.
+				certpool := x509.NewCertPool()
+				certpool.AddCert(ts.Certificate())
+				client.Transport = &http.Transport{
+					TLSClientConfig: &tls.Config{
+						RootCAs:          certpool,
+						CurvePreferences: []tls.CurveID{tls.CurveP256, tls.CurveP384, tls.CurveP521},
+					},
+				}
+			}
+
 			rateLimiter := okta.NewRateLimiter(window, nil)
 			a := oktaInput{
 				cfg: conf{
@@ -181,7 +201,7 @@ func TestOktaDoFetch(t *testing.T) {
 					Dataset:    test.dataset,
 					EnrichWith: test.enrichWith,
 				},
-				client: ts.Client(),
+				client: client,
 				lim:    rateLimiter,
 				logger: logp.L(),
 			}
