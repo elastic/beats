@@ -19,6 +19,8 @@ package add_kubernetes_metadata
 
 import (
 	"fmt"
+	"net"
+	"strconv"
 	"testing"
 
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
@@ -468,12 +470,12 @@ func TestIpPortIndexer(t *testing.T) {
 	indexers = ipIndexer.GetMetadata(&pod)
 	assert.Equal(t, 2, len(indexers))
 	assert.Equal(t, ip, indexers[0].Index)
-	assert.Equal(t, fmt.Sprintf("%s:%d", ip, port), indexers[1].Index)
+	assert.Equal(t, net.JoinHostPort(ip, strconv.Itoa(int(port))), indexers[1].Index)
 
 	indices = ipIndexer.GetIndexes(&pod)
 	assert.Equal(t, 2, len(indices))
 	assert.Equal(t, ip, indices[0])
-	assert.Equal(t, fmt.Sprintf("%s:%d", ip, port), indices[1])
+	assert.Equal(t, net.JoinHostPort(ip, strconv.Itoa(int(port))), indices[1])
 
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
 	expected.Put("kubernetes.container",
