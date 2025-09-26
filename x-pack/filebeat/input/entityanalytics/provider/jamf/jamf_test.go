@@ -7,7 +7,6 @@ package jamf
 import (
 	"context"
 	"crypto/tls"
-	"crypto/x509"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -157,14 +156,8 @@ func testContext() (tenant string, username string, password string, client *htt
 		// crypto/ecdh: use of X25519 is not allowed in FIPS 140-only mode
 		// Note that we only use FIPS 140-only mode, set via GODEBUG=fips140=only,
 		// while testing.
-		certpool := x509.NewCertPool()
-		certpool.AddCert(srv.Certificate())
-		cli.Transport = &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs:          certpool,
-				CurvePreferences: []tls.CurveID{tls.CurveP256, tls.CurveP384, tls.CurveP521},
-			},
-		}
+		transport := cli.Transport.(*http.Transport)
+		transport.TLSClientConfig.CurvePreferences = []tls.CurveID{tls.CurveP256, tls.CurveP384, tls.CurveP521}
 	}
 
 	return tenant, username, password, cli, srv.Close, nil
