@@ -12,7 +12,18 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
+type DiagnosticExtension interface {
+	RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook func() []byte)
+}
+
+type WithDiagnosticExtension interface {
+	// name is the beat name
+	// ext is the extension that implements the DiagnosticExtension interface
+	SetDiagnosticExtension(name string, ext DiagnosticExtension)
+}
+
 var _ management.Manager = (*OtelManager)(nil)
+var _ WithDiagnosticExtension = (*OtelManager)(nil)
 
 func NewOtelManager(cfg *config.C, registry *reload.Registry) (management.Manager, error) {
 	management.SetUnderAgent(true)
@@ -20,7 +31,10 @@ func NewOtelManager(cfg *config.C, registry *reload.Registry) (management.Manage
 }
 
 // OtelManager is the main manager for managing beatreceivers
-type OtelManager struct{}
+type OtelManager struct {
+	ext          DiagnosticExtension
+	receiverName string
+}
 
 func (n *OtelManager) UpdateStatus(_ status.Status, _ string) {
 	// a stub implemtation for now.
@@ -41,5 +55,12 @@ func (n *OtelManager) CheckRawConfig(cfg *config.C) error    { return nil }
 func (n *OtelManager) RegisterAction(action client.Action)   {}
 func (n *OtelManager) UnregisterAction(action client.Action) {}
 func (n *OtelManager) SetPayload(map[string]interface{})     {}
-func (n *OtelManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ client.DiagnosticHook) {
+func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filename string, contentType string, hook client.DiagnosticHook) {
+	if n.ext != nil {
+		n.ext.RegisterDiagnosticHook(n.receiverName, description, filename, contentType, hook)
+	}
+}
+func (n *OtelManager) SetDiagnosticExtension(receiverName string, ext DiagnosticExtension) {
+	n.ext = ext
+	n.receiverName = receiverName
 }
