@@ -249,7 +249,12 @@ func GoFIPSOnlyIntegTest(ctx context.Context) error {
 		return err
 	}
 
-	os.Setenv("GODEBUG", "fips140=only")
+	// We also set GODEBUG=tlsmlkem=0 to disable the X25519MLKEM768 TLS key
+	// exchange mechanism; without this setting and with the GODEBUG=fips140=only
+	// setting, we get errors in tests like so:
+	// Failed to connect: crypto/ecdh: use of X25519 is not allowed in FIPS 140-only mode
+	// Note that we are only disabling this TLS key exchange mechanism in tests!
+	os.Setenv("GODEBUG", "fips140=only,tlsmlkem=0")
 	return devtools.GoTestIntegrationForModule(ctx)
 }
 

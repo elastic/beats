@@ -26,16 +26,10 @@ import (
 // SkipIfFIPSOnly will mark the passed test as skipped if GODEBUG=fips140=only is detected.
 // If GODEBUG=fips140=on, go may call non-compliant algorithms and the test does not need to be skipped.
 func SkipIfFIPSOnly(t *testing.T, msg string) {
-	if IsFIPS140Only() {
-		t.Skip("GODEBUG=fips140=only detected, skipping test:", msg)
-	}
-}
-
-// IsFIPS140Only returns true if GODEBUG=fips140=only is set. Note that
-// we only set GODEBUG=fips140=only while testing.
-func IsFIPS140Only() bool {
 	// NOTE: This only checks env var; at the time of writing fips140 can only be set via env
 	// other GODEBUG settings can be set via embedded comments or in go.mod, we may need to account for this in the future.
 	s := os.Getenv("GODEBUG")
-	return strings.Contains(s, "fips140=only")
+	if strings.Contains(s, "fips140=only") {
+		t.Skip("GODEBUG=fips140=only detected, skipping test:", msg)
+	}
 }

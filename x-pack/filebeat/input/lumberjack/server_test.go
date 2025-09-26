@@ -19,7 +19,6 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	client "github.com/elastic/go-lumber/client/v2"
@@ -216,19 +215,10 @@ func tlsSetup(t *testing.T) (clientConfig *tls.Config, serverConfig *tlscommon.S
 	certPool := x509.NewCertPool()
 	certPool.AppendCertsFromPEM(certData.ca.CertPEM(t))
 
-	var tlsPreferredCurves []tls.CurveID
-	if testutils.IsFIPS140Only() {
-		// Exclude X25519 curves when in FIPS mode, otherwise we get the error:
-		// crypto/ecdh: use of X25519 is not allowed in FIPS 140-only mode
-		// Note that we only use FIPS 140-only mode, set via GODEBUG=fips140=only,
-		// while testing.
-		tlsPreferredCurves = []tls.CurveID{tls.CurveP256, tls.CurveP384, tls.CurveP521}
-	}
 	clientConfig = &tls.Config{
-		RootCAs:          certPool,
-		Certificates:     []tls.Certificate{certData.client.TLSCertificate(t)},
-		MinVersion:       tls.VersionTLS12,
-		CurvePreferences: tlsPreferredCurves,
+		RootCAs:      certPool,
+		Certificates: []tls.Certificate{certData.client.TLSCertificate(t)},
+		MinVersion:   tls.VersionTLS12,
 	}
 
 	var clientAuth = tlscommon.TLSClientAuthRequired
