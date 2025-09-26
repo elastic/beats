@@ -34,6 +34,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -68,7 +69,7 @@ func NewLogHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error)
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{Logger: logger}, false, fileset.FilesetOverrides{})
+	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{Logger: logger}, false, fileset.FilesetOverrides{}, paths.Paths)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +156,6 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 			} else {
 				shouldPut(tempCfg, json, jsonOpts, l.log)
 			}
-
 		}
 		// Merge config template with the configs from the annotations
 		// AppendValues option is used to append arrays from annotations to existing arrays while merging

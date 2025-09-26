@@ -83,7 +83,11 @@ func TestNewModuleRegistry(t *testing.T) {
 	}
 
 	logger := logptest.NewTestingLogger(t, "")
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger}, FilesetOverrides{})
+	beatPaths := paths.New()
+	beatPaths.Home = t.TempDir()
+	err = beatPaths.InitPaths(beatPaths)
+	require.NoError(t, err)
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger}, FilesetOverrides{}, beatPaths)
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -151,7 +155,11 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 	}
 
 	logger := logptest.NewTestingLogger(t, "")
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger}, FilesetOverrides{})
+	beatPaths := paths.New()
+	beatPaths.Home = t.TempDir()
+	err = beatPaths.InitPaths(beatPaths)
+	require.NoError(t, err)
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger}, FilesetOverrides{}, beatPaths)
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -178,7 +186,11 @@ func TestMovedModule(t *testing.T) {
 	}
 
 	logger := logptest.NewTestingLogger(t, "")
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger}, FilesetOverrides{})
+	beatPaths := paths.New()
+	beatPaths.Home = t.TempDir()
+	err = beatPaths.InitPaths(beatPaths)
+	require.NoError(t, err)
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger}, FilesetOverrides{}, beatPaths)
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 }
@@ -441,16 +453,15 @@ func TestMcfgFromConfig(t *testing.T) {
 }
 
 func TestMissingModuleFolder(t *testing.T) {
-	home := paths.Paths.Home
-	paths.Paths.Home = "/no/such/path"
-	defer func() { paths.Paths.Home = home }()
+	p := paths.New()
+	p.Home = "/no/such/path"
 
 	configs := []*conf.C{
 		load(t, map[string]interface{}{"module": "nginx"}),
 	}
 
 	logger := logptest.NewTestingLogger(t, "")
-	reg, err := NewModuleRegistry(configs, beat.Info{Version: "5.2.0", Logger: logger}, true, FilesetOverrides{})
+	reg, err := NewModuleRegistry(configs, beat.Info{Version: "5.2.0", Logger: logger}, true, FilesetOverrides{}, p)
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 

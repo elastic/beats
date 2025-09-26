@@ -71,13 +71,29 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	cfg := (*config.C)(tmp)
-	if err := instance.InitPaths(cfg); err != nil {
-		return nil, fmt.Errorf("error initializing paths: %w", err)
+	if settings.Name == "filebeat" {
+		partialConfig := struct {
+			Path paths.Path `config:"path"`
+		}{}
+
+		if err := cfg.Unpack(&partialConfig); err != nil {
+			return nil, fmt.Errorf("error extracting default paths: %w", err)
+		}
+		p := paths.New()
+		if err := p.InitPaths(&partialConfig.Path); err != nil {
+			return nil, fmt.Errorf("error initializing default paths: %w", err)
+		}
+		b.Paths = p
+	} else {
+		if err := instance.InitPaths(cfg); err != nil {
+			return nil, fmt.Errorf("error initializing paths: %w", err)
+		}
+		b.Paths = paths.Paths
 	}
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
-	store, err := instance.LoadKeystore(cfg, b.Info.Beat)
+	store, err := instance.LoadKeystore(cfg, b.Info.Beat, b.Paths)
 	if err != nil {
 		return nil, fmt.Errorf("could not initialize the keystore: %w", err)
 	}
@@ -159,9 +175,9 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	// log paths values to help with troubleshooting
-	logger.Infof("%s", paths.Paths.String())
+	logger.Infof("%s", b.Paths.String())
 
-	metaPath := paths.Resolve(paths.Data, "meta.json")
+	metaPath := b.Paths.Resolve(paths.Data, "meta.json")
 	err = b.LoadMeta(metaPath)
 	if err != nil {
 		return nil, fmt.Errorf("error loading meta data: %w", err)

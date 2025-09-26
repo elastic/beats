@@ -32,6 +32,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func TestReloader(t *testing.T) {
@@ -59,7 +60,7 @@ func TestReloader(t *testing.T) {
 	})
 	// config.C{}
 
-	reloader := NewReloader(logptest.NewTestingLogger(t, "cfgfile-test.reload"), nil, config)
+	reloader := NewReloader(logptest.NewTestingLogger(t, "cfgfile-test.reload"), nil, config, paths.Paths)
 	retryCount := 10
 
 	go reloader.Run(nil)
@@ -90,7 +91,7 @@ func TestReloader(t *testing.T) {
 
 	// Write a file to the reloader path to trigger a real reload
 	content := []byte("test\n")
-	err = os.WriteFile(filepath.Join(dir, "config1.yml"), content, 0644)
+	err = os.WriteFile(filepath.Join(dir, "config1.yml"), content, 0o644)
 	assert.NoError(t, err)
 
 	// Wait for the number of scans to increase at least twice. This is somewhat
