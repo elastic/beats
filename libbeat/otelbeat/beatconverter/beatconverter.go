@@ -32,7 +32,7 @@ import (
 // list of supported beatreceivers
 var supportedReceivers = []string{"filebeatreceiver", "metricbeatreceiver"} // Add more beat receivers to this list when we add support
 
-type converter struct{}
+type Converter struct{}
 
 // NewFactory returns a factory for a  confmap.Converter,
 func NewFactory() confmap.ConverterFactory {
@@ -40,11 +40,11 @@ func NewFactory() confmap.ConverterFactory {
 }
 
 func newConverter(set confmap.ConverterSettings) confmap.Converter {
-	return converter{}
+	return Converter{}
 }
 
 // Convert converts [beatreceiver].output to OTel config here
-func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
+func (c Converter) Convert(_ context.Context, conf *confmap.Conf) error {
 
 	for _, beatreceiver := range supportedReceivers {
 		var out map[string]any
