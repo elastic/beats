@@ -23,6 +23,7 @@ import (
 	"os/exec"
 
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
@@ -55,6 +56,15 @@ func UnitTest() {
 func GoFIPSOnlyUnitTest() error {
 	ctx := context.Background()
 	mg.SerialCtxDeps(ctx, goTestDeps...)
+
+	// We pre-cache go module dependencies before running the unit tests with
+	// GODEBUG=fips140=only.  Otherwise, the command that runs the unit tests
+	// will try to download the dependencies and could fail because the TLS
+	// negotiation with the Go module proxy could use a non-FIPS compliant
+	// key exchange protocol, e.g. X25519.
+	if err := sh.RunV(mg.GoCmd(), "mod", "download"); err != nil {
+		return err
+	}
 
 	fipsArgs := devtools.DefaultGoFIPSOnlyTestArgs()
 	return devtools.GoTest(ctx, fipsArgs)
