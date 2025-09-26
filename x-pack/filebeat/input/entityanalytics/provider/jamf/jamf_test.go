@@ -148,5 +148,7 @@ func testContext() (tenant string, username string, password string, client *htt
 	}
 	tenant = u.Host
 
-	return tenant, username, password, srv.Client(), srv.Close, nil
+	cli := srv.Client()
+
+	return tenant, username, password, cli, srv.Close, nil
 }
