@@ -627,15 +627,13 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add NTP response validation for system/ntp module. {pull}46184[46184]
 - Add vertexai_logs metricset to GCP for prompt response collection from VertexAI service. {pull}46383[46383]
 
-*Metricbeat*
-
-
 *Osquerybeat*
 
 
 *Packetbeat*
 - Optionally ignore MAC address in flow matching {pull}44965[44965]
 - Add `tls.server.ja3s` tls fingerprint {pull}43284[43284]
+- Add pflog support. {pull}35265[35265]
 
 *Winlogbeat*
 

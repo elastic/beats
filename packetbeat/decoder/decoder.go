@@ -41,6 +41,7 @@ type Decoder struct {
 	sll       layers.LinuxSLL
 	lo        layers.Loopback
 	eth       layers.Ethernet
+	pf        layers.PFLog
 	d1q       [2]layers.Dot1Q
 	ip4       [2]layers.IPv4
 	ip6       [2]layers.IPv6
@@ -135,6 +136,9 @@ func New(f *flows.Flows, datalink layers.LinkType, icmp4 icmp.ICMPv4Processor, i
 	case layers.LinkTypeEthernet:
 		d.linkLayerDecoder = &d.eth
 		d.linkLayerType = layers.LayerTypeEthernet
+	case layers.LinkTypePFLog: // pflog(4)
+		d.linkLayerDecoder = &d.pf
+		d.linkLayerType = layers.LayerTypePFLog
 	case layers.LinkTypeNull: // loopback on OSx
 		d.linkLayerDecoder = &d.lo
 		d.linkLayerType = layers.LayerTypeLoopback

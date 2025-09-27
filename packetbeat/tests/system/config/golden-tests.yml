@@ -45,3 +45,15 @@ test_cases:
     pcap: pcaps/http_basicauth.pcap
     config:
       http_send_all_headers: true
+
+  - name: PF pass outbound ICMP
+    pcap: pcaps/pf_pass_outbound_icmp.pcap
+    config: {}
+
+  - name: PF block outbound ICMP
+    pcap: pcaps/pf_block_outbound_icmp.pcap
+    config: {}
+
+  - name: PF block inbound TCP
+    pcap: pcaps/pf_block_inbound_tcp.pcap
+    config: {}
