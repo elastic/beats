@@ -22,7 +22,7 @@ Notes:
 ## Features
 
 ### Operation Statistics
-It uses the `top` administrative command to return usage statistics for each collection. It provides the amount of time, in microseconds, used and a count of operations for the following types:
+The `collstats` metricset uses the `top` administrative command to return usage statistics for each collection. It provides the amount of time, in microseconds, used and a count of operations for the following types:
 
 * total
 * readLock
@@ -40,7 +40,7 @@ It requires the following privileges, which is covered by the [`clusterMonitor` 
 * [`collStats` action](https://docs.mongodb.com/manual/reference/privilege-actions/#collStats) on collection resources
 * [`aggregate` action](https://docs.mongodb.com/manual/reference/privilege-actions/#aggregate) on collection resources (for MongoDB 6.2+)
 
-On mongos routers, the `top` command is not available. In such cases, only storage statistics are populated; operation counters (total/read/write/query, etc.) may be absent.
+On `mongos` routers, the `top` command is not available. In such cases, only storage statistics are populated. Operation counters (for example: total, read, write, and query) may be absent.
 
 ## Configuration
 
