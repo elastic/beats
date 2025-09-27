@@ -102,7 +102,7 @@ func testLoadVersion1Case(t *testing.T, dataPath string) {
 
 	logger := logptest.NewTestingLogger(t, "")
 	// load store:
-	store, err := openStore(logger.Named("test"), path, 0660, 4096, true, func(_ uint64) bool {
+	store, err := OpenStore(logger.Named("test"), path, 0660, 4096, true, func(_ uint64) bool {
 		return false
 	})
 	if err != nil {
