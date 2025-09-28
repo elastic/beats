@@ -48,22 +48,33 @@ retry() {
   local n=0
   until "$@"; do
     n=$((n+1))
+    echo "[DEBUG] Retry attempt $n/30 for command: $*"
     if [ $n -ge 30 ]; then
+      echo "[ERROR] Command failed after 30 attempts: $*"
       return 1
     fi
     sleep 2
   done
+  echo "[DEBUG] Command succeeded on attempt $n: $*"
 }
 
 shell_cmd() {
   local cn=$1; shift
+  echo "[DEBUG] Detecting shell command for container: $cn"
   # Try mongosh first (MongoDB 5.0+)
   if docker exec "$cn" which mongosh >/dev/null 2>&1; then
+    echo "[DEBUG] Found mongosh in container"
     echo "mongosh"
     return
   fi
   # Fall back to mongo for older versions
-  echo "mongo"
+  if docker exec "$cn" which mongo >/dev/null 2>&1; then
+    echo "[DEBUG] Found mongo in container"
+    echo "mongo"
+    return
+  fi
+  echo "[ERROR] Neither mongosh nor mongo found in container"
+  return 1
 }
 
 echo "[INFO] Seeding MongoDB standalone instance"
@@ -72,7 +83,11 @@ echo "[INFO] Database: $DB_NAME"
 
 # Detect shell command
 echo "[DEBUG] Detecting MongoDB shell command..."
-SHELL_CMD=$(shell_cmd "$CONTAINER_NAME")
+if ! SHELL_CMD=$(shell_cmd "$CONTAINER_NAME"); then
+    echo "[ERROR] Failed to detect MongoDB shell command"
+    docker exec "$CONTAINER_NAME" ls -la /usr/bin/ | grep -E "mongo|mongosh" || true
+    exit 1
+fi
 echo "[INFO] Using shell: $SHELL_CMD"
 
 # Wait for MongoDB

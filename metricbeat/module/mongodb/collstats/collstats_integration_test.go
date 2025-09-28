@@ -184,8 +184,12 @@ func TestFetchStandaloneVersions(t *testing.T) {
 			mongoHostStr := fmt.Sprintf("mongodb://localhost:%s", tc.port)
 			t.Logf("MongoDB container started and healthy, host: %s", mongoHostStr)
 
-			t.Logf("Running seed script...")
+			t.Logf("Running seed script from: %s", seedScript)
+			t.Logf("Seed script working directory: %s", absStandaloneDir)
+			seedStart := time.Now()
 			if err := runSeedScript(seedScript, absStandaloneDir, cleanupEnv); err != nil {
+				t.Logf("Seed script failed after %v", time.Since(seedStart))
+
 				// List running containers for debugging
 				listCmd := exec.Command("docker", "ps", "-a", "--format", "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}")
 				listOutput, _ := listCmd.CombinedOutput()
@@ -199,7 +203,7 @@ func TestFetchStandaloneVersions(t *testing.T) {
 
 				require.NoError(t, err, "seed standalone database")
 			}
-			t.Logf("Seed script completed successfully")
+			t.Logf("Seed script completed successfully in %v", time.Since(seedStart))
 
 			t.Logf("Creating metricset with config for host: %s", mongoHostStr)
 			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(mongoHostStr))
@@ -422,9 +426,62 @@ func runSeedScript(scriptPath, dir string, env []string) error {
 	cmd.Dir = dir
 	cmd.Env = append(os.Environ(), env...)
 
-	output, err := cmd.CombinedOutput()
+	// Create pipes for stdout and stderr to see real-time output
+	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return fmt.Errorf("seed script failed: %w (output: %s)", err, string(output))
+		return fmt.Errorf("failed to create stdout pipe: %w", err)
+	}
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return fmt.Errorf("failed to create stderr pipe: %w", err)
+	}
+
+	// Start the command
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("failed to start seed script: %w", err)
+	}
+
+	// Read output
+	var outputBuf, errorBuf strings.Builder
+	go func() {
+		buf := make([]byte, 1024)
+		for {
+			n, err := stdout.Read(buf)
+			if n > 0 {
+				outputBuf.Write(buf[:n])
+			}
+			if err != nil {
+				break
+			}
+		}
+	}()
+	go func() {
+		buf := make([]byte, 1024)
+		for {
+			n, err := stderr.Read(buf)
+			if n > 0 {
+				errorBuf.Write(buf[:n])
+			}
+			if err != nil {
+				break
+			}
+		}
+	}()
+
+	// Wait for the command to finish with a timeout
+	done := make(chan error)
+	go func() {
+		done <- cmd.Wait()
+	}()
+
+	select {
+	case err := <-done:
+		if err != nil {
+			return fmt.Errorf("seed script failed: %w (stdout: %s, stderr: %s)", err, outputBuf.String(), errorBuf.String())
+		}
+	case <-time.After(60 * time.Second):
+		cmd.Process.Kill()
+		return fmt.Errorf("seed script timed out after 60 seconds (stdout: %s, stderr: %s)", outputBuf.String(), errorBuf.String())
 	}
 
 	return nil
