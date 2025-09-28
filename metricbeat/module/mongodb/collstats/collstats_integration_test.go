@@ -111,6 +111,8 @@ func TestFetchStandaloneVersions(t *testing.T) {
 	for _, tc := range cases {
 		tc := tc
 		t.Run("mongo_"+strings.ReplaceAll(tc.version, ".", "_"), func(t *testing.T) {
+			t.Logf("Starting test for MongoDB %s on port %s", tc.version, tc.port)
+
 			require.NoError(t, os.Chdir(absStandaloneDir))
 			t.Cleanup(func() {
 				if err := os.Chdir(originalWD); err != nil {
@@ -119,29 +121,62 @@ func TestFetchStandaloneVersions(t *testing.T) {
 			})
 
 			projectName := fmt.Sprintf("mbcollstatsstandalone%s", strings.ReplaceAll(tc.version, ".", ""))
+			t.Logf("Using project name: %s", projectName)
+			t.Logf("Setting environment variables:")
+			t.Logf("  DOCKER_COMPOSE_PROJECT_NAME=%s", projectName)
+			t.Logf("  COMPOSE_PROJECT_NAME=%s", projectName)
+			t.Logf("  MONGO_VERSION=%s", tc.version)
+			t.Logf("  MONGO_PORT=%s", tc.port)
+
 			t.Setenv("DOCKER_COMPOSE_PROJECT_NAME", projectName)
 			t.Setenv("COMPOSE_PROJECT_NAME", projectName)
 			t.Setenv("MONGO_VERSION", tc.version)
 			t.Setenv("MONGO_PORT", tc.port)
 
 			cleanupEnv := buildComposeEnv(projectName, tc.version, tc.port)
+			t.Logf("Compose environment: %v", cleanupEnv)
 
 			t.Cleanup(func() {
+				t.Logf("Cleaning up Docker Compose project %s", projectName)
 				downArgs := append([]string{"down", "-v"})
 				if err := runComposeCommand(cmdName, prefixArgs, absStandaloneDir, cleanupEnv, downArgs...); err != nil {
 					t.Logf("failed to tear down compose project %s: %v", projectName, err)
 				}
 			})
 
+			t.Logf("Starting MongoDB container...")
 			mongoHost := compose.EnsureUp(t, "mongodb")
 			require.NotNil(t, mongoHost, "mongodb host info should not be nil")
+			t.Logf("MongoDB container started, host: %s", mongoHost.Host())
 
-			require.NoError(t, runSeedScript(seedScript, absStandaloneDir, cleanupEnv), "seed standalone database")
+			t.Logf("Running seed script...")
+			if err := runSeedScript(seedScript, absStandaloneDir, cleanupEnv); err != nil {
+				// List running containers for debugging
+				listCmd := exec.Command("docker", "ps", "-a", "--format", "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}")
+				listOutput, _ := listCmd.CombinedOutput()
+				t.Logf("Current Docker containers:\n%s", string(listOutput))
 
+				// Show compose logs for debugging
+				logsCmd := append([]string{}, prefixArgs...)
+				logsCmd = append(logsCmd, "logs", "--tail=50")
+				composeLogs, _ := runComposeCommandOutput(cmdName, prefixArgs, absStandaloneDir, cleanupEnv, logsCmd...)
+				t.Logf("Docker Compose logs:\n%s", composeLogs)
+
+				require.NoError(t, err, "seed standalone database")
+			}
+			t.Logf("Seed script completed successfully")
+
+			t.Logf("Creating metricset with config for host: %s", mongoHost.Host())
 			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(mongoHost.Host()))
+
+			t.Logf("Fetching collstats events...")
 			events, errs := mbtest.ReportingFetchV2Error(f)
+			if len(errs) > 0 {
+				t.Logf("Fetch errors: %v", errs)
+			}
 			require.Empty(t, errs, "expected no fetch errors")
 			require.NotEmpty(t, events, "expected collstats events")
+			t.Logf("Fetched %d collstats events", len(events))
 
 			verifyStandaloneEvents(t, events, tc.expectExtendedStats)
 		})
@@ -333,6 +368,18 @@ func runComposeCommand(cmdName string, prefixArgs []string, dir string, env []st
 	}
 
 	return nil
+}
+
+func runComposeCommandOutput(cmdName string, prefixArgs []string, dir string, env []string, args ...string) (string, error) {
+	commandArgs := append([]string{}, prefixArgs...)
+	commandArgs = append(commandArgs, args...)
+
+	cmd := exec.Command(cmdName, commandArgs...)
+	cmd.Dir = dir
+	cmd.Env = append(os.Environ(), env...)
+
+	output, err := cmd.CombinedOutput()
+	return string(output), err
 }
 
 func runSeedScript(scriptPath, dir string, env []string) error {
