@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/current/config-file-format-type.html
+applies_to:
+  stack: ga
 ---
 
 # Config file data types [config-file-format-type]

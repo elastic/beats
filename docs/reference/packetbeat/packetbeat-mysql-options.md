@@ -2,6 +2,8 @@
 navigation_title: "MySQL"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-mysql-options.html
+applies_to:
+  stack: ga
 ---
 
 # Capture MySQL traffic [packetbeat-mysql-options]

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-autodiscover.html
+applies_to:
+  stack: ga
 ---
 
 # Autodiscover [configuration-autodiscover]

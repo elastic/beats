@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-panw.html
+applies_to:
+  stack: beta
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Panw module [metricbeat-module-panw]
 
@@ -111,7 +115,8 @@ This metricset reports temperature for various slots on the device and reports o
 This metricset enumerates ipsec tunnels and their status.
 
 
-### Example configuration [_example_configuration_52]
+
+## Example configuration [_example_configuration]
 
 The Panw module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -125,11 +130,11 @@ metricbeat.modules:
 ```
 
 
-### Metricsets [_metricsets_61]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
-* [interfaces](/reference/metricbeat/metricbeat-metricset-panw-interfaces.md)
-* [routing](/reference/metricbeat/metricbeat-metricset-panw-routing.md)
-* [system](/reference/metricbeat/metricbeat-metricset-panw-system.md)
-* [vpn](/reference/metricbeat/metricbeat-metricset-panw-vpn.md)
+* [interfaces](/reference/metricbeat/metricbeat-metricset-panw-interfaces.md)  {applies_to}`stack: beta`
+* [routing](/reference/metricbeat/metricbeat-metricset-panw-routing.md)  {applies_to}`stack: beta`
+* [system](/reference/metricbeat/metricbeat-metricset-panw-system.md)  {applies_to}`stack: beta`
+* [vpn](/reference/metricbeat/metricbeat-metricset-panw-vpn.md)  {applies_to}`stack: beta`

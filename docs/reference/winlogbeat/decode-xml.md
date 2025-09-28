@@ -2,6 +2,8 @@
 navigation_title: "decode_xml"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/decode-xml.html
+applies_to:
+  stack: ga
 ---
 
 # Decode XML [decode-xml]

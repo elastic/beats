@@ -70,41 +70,44 @@ func getRegexpsForRegistryFiles() ([]*regexp.Regexp, error) {
 	return registryFileRegExps, nil
 }
 
-func gzipRegistry() []byte {
-	logger := logp.L().Named("diagnostics")
-	buf := bytes.Buffer{}
-	dataPath := paths.Resolve(paths.Data, "")
-	registryPath := filepath.Join(dataPath, "registry")
-	f, err := os.CreateTemp("", "filebeat-registry-*.tar")
-	if err != nil {
-		logger.Errorw("cannot create temporary registry archive", "error.message", err)
-	}
-	// Close the file, we just need the empty file created to use it later
-	f.Close()
-	defer logger.Debug("finished gziping Filebeat's registry")
+func gzipRegistry(logger *logp.Logger) func() []byte {
+	logger = logger.Named("diagnostics")
 
-	defer func() {
-		if err := os.Remove(f.Name()); err != nil {
-			logger.Warnf("cannot remove temporary registry archive '%s': '%s'", f.Name(), err)
+	return func() []byte {
+		buf := bytes.Buffer{}
+		dataPath := paths.Resolve(paths.Data, "")
+		registryPath := filepath.Join(dataPath, "registry")
+		f, err := os.CreateTemp("", "filebeat-registry-*.tar")
+		if err != nil {
+			logger.Errorw("cannot create temporary registry archive", "error.message", err)
 		}
-	}()
+		// Close the file, we just need the empty file created to use it later
+		f.Close()
+		defer logger.Debug("finished gziping Filebeat's registry")
 
-	logger.Debugf("temporary file '%s' created", f.Name())
-	if err := tarFolder(logger, registryPath, f.Name()); err != nil {
-		logger.Errorw(fmt.Sprintf("cannot archive Filebeat's registry at '%s'", f.Name()), "error.message", err)
+		defer func() {
+			if err := os.Remove(f.Name()); err != nil {
+				logger.Warnf("cannot remove temporary registry archive '%s': '%s'", f.Name(), err)
+			}
+		}()
+
+		logger.Debugf("temporary file '%s' created", f.Name())
+		if err := tarFolder(logger, registryPath, f.Name()); err != nil {
+			logger.Errorw(fmt.Sprintf("cannot archive Filebeat's registry at '%s'", f.Name()), "error.message", err)
+		}
+
+		if err := gzipFile(logger, f.Name(), &buf); err != nil {
+			logger.Errorw("cannot gzip Filebeat's registry", "error.message", err)
+		}
+
+		// if the final file is too large, skip it
+		if buf.Len() >= 20_000_000 { // 20 Mb
+			logger.Warnf("registry is too large for diagnostics, %dmb bytes > 20mb", buf.Len()/1_000_000)
+			return nil
+		}
+
+		return buf.Bytes()
 	}
-
-	if err := gzipFile(logger, f.Name(), &buf); err != nil {
-		logger.Errorw("cannot gzip Filebeat's registry", "error.message", err)
-	}
-
-	// if the final file is too large, skip it
-	if buf.Len() >= 20_000_000 { // 20 Mb
-		logger.Warnf("registry is too large for diagnostics, %dmb bytes > 20mb", buf.Len()/1_000_000)
-		return nil
-	}
-
-	return buf.Bytes()
 }
 
 // gzipFile gzips src writing the compressed data to dst

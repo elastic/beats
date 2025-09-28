@@ -2,6 +2,8 @@
 navigation_title: "include_fields"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/include-fields.html
+applies_to:
+  stack: ga
 ---
 
 # Keep fields from events [include-fields]

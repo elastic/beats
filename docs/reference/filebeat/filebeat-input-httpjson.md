@@ -2,6 +2,8 @@
 navigation_title: "HTTP JSON"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-httpjson.html
+applies_to:
+  stack: ga
 ---
 
 # HTTP JSON input [filebeat-input-httpjson]
@@ -197,7 +199,7 @@ Some built-in helper functions are provided to work with the input state inside 
 * `base64Decode`: Decodes the base64 string. Any binary output will be converted to a UTF8 string.
 * `base64EncodeNoPad`: Joins and base64 encodes all supplied strings without padding. Example `[[base64EncodeNoPad "string1" "string2"]]`
 * `base64Encode`: Joins and base64 encodes all supplied strings. Example `[[base64Encode "string1" "string2"]]`
-* `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns _{{version}}_.
+* `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns _{{version.stack}}_.
 * `div`: does the integer division of two integer values.
 * `formatDate`: formats a `time.Time`. By default the format layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. It will default to UTC timezone when formatting, but you can specify a different timezone. If the timezone is incorrect, it will default to UTC. Example: `[[ formatDate (now) "UnixDate" ]]`, `[[ formatDate (now) "UnixDate" "America/New_York" ]]`.
 * `getRFC5988Link`: extracts a specific relation from a list of [RFC5988](https://tools.ietf.org/html/rfc5988) links. It is useful when parsing header values for pagination. Example: `[[ getRFC5988Link "next" .last_response.header.Link ]]`.
@@ -219,6 +221,7 @@ Some built-in helper functions are provided to work with the input state inside 
 * `parseTimestamp`: parses a timestamp in seconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732]]` returns `2020-11-05 13:25:32 +0000 UTC`.
 * `replaceAll(old, new, s)`: replaces all non-overlapping instances of `old` with `new` in `s`. Example: `[[ replaceAll "some" "my" "some value" ]]` returns `my value`.
 * `sprintf`: formats according to a format specifier and returns the resulting string. Refer to [the Go docs](https://pkg.go.dev/fmt#Sprintf) for usage. Example: `[[sprintf "%d:%q" 34 "quote this"]]`
+* `terminate`: exits the template without falling back to the default value and without causing an error. It takes a single string argument that is logged in debug logging. {applies_to}`stack: ga 9.1.2, ga 9.0.6, ga 8.19.2, ga 8.18.6`
 * `toInt`: converts a value of any type to an integer when possible. Returns 0 if the conversion fails.
 * `toJSON`: converts a value to a JSON string. This can be used with `value_type: json` to create an object from a template. Example: `[[ toJSON .last_response.body.pagingIdentifiers ]]`.
 * `urlEncode`: URL encodes the supplied string. Example `[[urlEncode "string1"]]`. Example `[[urlEncode "<string1>"]]` will return `%3Cstring1%3E`.
@@ -583,7 +586,7 @@ The clause `.parent_last_response.` should only be used from within chain steps 
   - type: httpjson
     enabled: true
     id: my-httpjson-id
-    request.url: http://xyz.com/services/data/v1.0/export_ids/page
+    request.url: http://example.com/services/data/v1.0/export_ids/page
     request.method: POST
     interval: 1h
     request.retry.max_attempts: 2
@@ -601,7 +604,7 @@ The clause `.parent_last_response.` should only be used from within chain steps 
           do_not_log_failure: true
     chain:
     - step:
-          request.url: http://xyz.com/services/data/v1.0/$.exportId/export_ids/$.files[:].id/info
+          request.url: http://example.com/services/data/v1.0/$.exportId/export_ids/$.files[:].id/info
           request.method: POST
           request.transforms:
           - set:
@@ -1469,6 +1472,7 @@ Each cursor entry is formed by:
 * A `value` template, which will define the value to store when evaluated.
 * A `default` template, which will define the value to store when the value template fails or is empty.
 * An `ignore_empty_value` flag. When set to `true`, will not store empty values, preserving the previous one, if any. Default: `true`.
+* A `do_not_log_failure` flag. When set to `true`, will not signal a degraded Fleet health status. Default: `true`. {applies_to}`stack: ga 9.1.4, ga 9.0.7, ga 8.19.4, ga 8.18.7`
 
 Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`].
 

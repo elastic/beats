@@ -2,6 +2,8 @@
 navigation_title: "decode_duration"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/decode-duration.html
+applies_to:
+  stack: ga
 ---
 
 # Decode duration [decode-duration]

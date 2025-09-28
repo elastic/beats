@@ -2,6 +2,8 @@
 navigation_title: "Secrets keystore"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/keystore.html
+applies_to:
+  stack: ga
 ---
 
 # Secrets keystore for secure settings [keystore]

@@ -27,6 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/receiver"
 
 	"go.uber.org/zap"
@@ -85,6 +86,8 @@ func TestNewReceiver(t *testing.T) {
 			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0
 			}, "expected at least one ingest log, got logs: %v", logs["r1"])
+			assert.Equal(c, "metricbeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
+			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket, "stats")
@@ -197,9 +200,13 @@ func TestMultipleReceivers(t *testing.T) {
 		},
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
-			assert.Conditionf(c, func() bool {
+			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
 			}, "expected at least one ingest log for each receiver, got logs: %v", logs)
+			assert.Equal(c, "metricbeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r1 log record")
+			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in r1 log record")
+			assert.Equal(c, "metricbeatreceiver/r2", logs["r2"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r2 log record")
+			assert.Equal(c, "receiver", logs["r2"][0].Flatten()["agent.otelcol.component.kind"], "expected otelcol.component.kind field in r2 log record")
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				tests := []string{monitorSocket1, monitorSocket2}
@@ -347,4 +354,98 @@ func BenchmarkFactory(b *testing.B) {
 		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
 		require.NoError(b, err)
 	}
+}
+
+func TestReceiverDegraded(t *testing.T) {
+	testCases := []struct {
+		name    string
+		status  oteltest.ExpectedStatus
+		degrade bool
+	}{
+		{
+			name: "degraded input",
+			status: oteltest.ExpectedStatus{
+				Status: componentstatus.StatusRecoverableError,
+				Error:  "benchmark input degraded",
+			},
+			degrade: true,
+		},
+		{
+			name: "running input",
+			status: oteltest.ExpectedStatus{
+				Status: componentstatus.StatusOK,
+				Error:  "",
+			},
+		},
+	}
+
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+			config := Config{
+				Beatconfig: map[string]any{
+					"metricbeat": map[string]any{
+						"max_start_delay": "0s",
+						"modules": []map[string]any{
+							{
+								"module":     "benchmark",
+								"enabled":    true,
+								"period":     "1s",
+								"degrade":    test.degrade,
+								"metricsets": []string{"info"},
+							},
+						},
+					},
+					"output": map[string]any{
+						"otelconsumer": map[string]any{},
+					},
+					"path.home": t.TempDir(),
+				},
+			}
+			oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+				T: t,
+				Receivers: []oteltest.ReceiverConfig{
+					{
+						Name:    "r1",
+						Beat:    "metricbeat",
+						Config:  &config,
+						Factory: NewFactory(),
+					},
+				},
+				Status: test.status,
+			})
+		})
+	}
+}
+
+func TestReceiverHook(t *testing.T) {
+	cfg := Config{
+		Beatconfig: map[string]any{
+			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
+				"modules": []map[string]any{
+					{
+						"module":     "benchmark",
+						"enabled":    true,
+						"period":     "1s",
+						"metricsets": []string{"info"},
+					},
+				},
+			},
+			"management.otel.enabled": true,
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
+			},
+			"path.home": t.TempDir(),
+		},
+	}
+	receiverSettings := receiver.Settings{
+		ID: component.MustNewID(Name),
+		TelemetrySettings: component.TelemetrySettings{
+			Logger: zap.NewNop(),
+		},
+	}
+
+	// For metricbeatreceiver, we expect 2 hooks to be registered:
+	// 	one for beat metrics and one for input metrics.
+	oteltest.TestReceiverHook(t, &cfg, NewFactory(), receiverSettings, 2)
 }

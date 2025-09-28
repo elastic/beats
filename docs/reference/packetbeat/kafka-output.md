@@ -2,6 +2,8 @@
 navigation_title: "Kafka"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/kafka-output.html
+applies_to:
+  stack: ga
 ---
 
 # Configure the Kafka output [kafka-output]

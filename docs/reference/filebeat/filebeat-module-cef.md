@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-cef.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # CEF module [filebeat-module-cef]
 
@@ -150,7 +154,6 @@ Check Point CEF extensions are mapped as follows:
 | outzone | - | observer.egress.zone | - |
 | product | - | observer.product | - |
 
-
-## Fields [_fields_9]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-cef.md) section.

@@ -2,6 +2,8 @@
 navigation_title: "Quick start"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-installation-configuration.html
+applies_to:
+  stack: ga
 ---
 
 # Metricbeat quick start: installation and configuration [metricbeat-installation-configuration]
@@ -51,38 +53,38 @@ To download and install Metricbeat, use the commands that work with your system:
 ::::::{tab-item} DEB
 :sync: deb
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{stack-version}}-amd64.deb
-sudo dpkg -i metricbeat-{{stack-version}}-amd64.deb
+curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{version.stack}}-amd64.deb
+sudo dpkg -i metricbeat-{{version.stack}}-amd64.deb
 ```
 ::::::
 
 ::::::{tab-item} RPM
 :sync: rpm
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{stack-version}}-x86_64.rpm
-sudo rpm -vi metricbeat-{{stack-version}}-x86_64.rpm
+curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{version.stack}}-x86_64.rpm
+sudo rpm -vi metricbeat-{{version.stack}}-x86_64.rpm
 ```
 ::::::
 
 ::::::{tab-item} MacOS
 :sync: macos
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{stack-version}}-darwin-x86_64.tar.gz
-tar xzvf metricbeat-{{stack-version}}-darwin-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{version.stack}}-darwin-x86_64.tar.gz
+tar xzvf metricbeat-{{version.stack}}-darwin-x86_64.tar.gz
 ```
 ::::::
 
 ::::::{tab-item} Linux
 :sync: linux
 ```shell subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{stack-version}}-linux-x86_64.tar.gz
-tar xzvf metricbeat-{{stack-version}}-linux-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{version.stack}}-linux-x86_64.tar.gz
+tar xzvf metricbeat-{{version.stack}}-linux-x86_64.tar.gz
 ```
 ::::::
 
 ::::::{tab-item} Windows
 :sync: windows
-1. Download the [Metricbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{stack-version}}-windows-x86_64.zip).
+1. Download the [Metricbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{version.stack}}-windows-x86_64.zip).
 
 2. Extract the contents of the zip file into `C:\Program Files`.
 
@@ -100,6 +102,21 @@ tar xzvf metricbeat-{{stack-version}}-linux-x86_64.tar.gz
 :::{note}
 If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-metricbeat.ps1`.
 :::
+
+:::{important}
+```{applies_to}
+stack: ga 9.1.0, ga 9.0.6
+```
+The base folder has changed from `C:\ProgramData\` to `C:\Program Files\`
+because the latter has stricter permissions. The home path (base for
+state and logs) is now `C:\Program Files\Metricbeat-Data`.
+
+The install script (`install-service-metricbeat.ps1`) will check whether
+`C:\ProgramData\Metricbeat` exits and move it to `C:\Program Files\Metricbeat-Data`.
+For more details on the installation script refer to: [install script](/reference/metricbeat/metricbeat-installation-script.md).
+
+:::
+
 ::::::
 
 :::::::
@@ -329,8 +346,9 @@ Metricbeat comes with predefined assets for parsing, indexing, and visualizing y
 
     `-e` is optional and sends output to standard error instead of the configured log output.
 
-By default, Windows log files are stored under `C:\Program Files\Metricbeat-Data\logs`.
-For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\metricbeat\Logs`.
+The default location where Windows log files are stored varies:
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Metricbeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\metricbeat\logs`
 
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to Elasticsearch and deploys the sample dashboards for visualizing the data in Kibana.
 
@@ -403,8 +421,9 @@ sudo ./metricbeat -e
 PS C:\Program Files\metricbeat> Start-Service metricbeat
 ```
 
-By default, Windows log files are stored under `C:\Program Files\Metricbeat-Data\Logs`.
-For versions lower than 9.1.0, logs are stored by default under `C:\ProgramData\metricbeat\Logs`.
+The default location where Windows log files are stored varies:
+* {applies_to}`stack: ga 9.0.6` `C:\Program Files\Metricbeat-Data\logs`
+* {applies_to}`stack: ga 9.0` `C:\ProgramData\metricbeat\logs`
 
 ::::{note}
 On Windows, statistics about system load and swap usage are currently not captured

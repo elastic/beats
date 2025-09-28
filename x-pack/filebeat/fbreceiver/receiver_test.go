@@ -18,7 +18,9 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
+	"sync/atomic"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
@@ -27,7 +29,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
+	"go.opentelemetry.io/collector/pipeline"
 	"go.opentelemetry.io/collector/receiver"
+	"go.opentelemetry.io/collector/receiver/receivertest"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
@@ -87,6 +92,8 @@ func TestNewReceiver(t *testing.T) {
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
 			require.Lenf(c, logs["r1"], 1, "expected 1 log, got %d", len(logs["r1"]))
+			assert.Equal(c, "filebeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in log record")
+			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in log record")
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket, "stats")
@@ -157,6 +164,7 @@ func BenchmarkFactory(b *testing.B) {
 }
 
 func TestMultipleReceivers(t *testing.T) {
+	t.Skip("flaky test, see https://github.com/elastic/beats/issues/43832")
 	// This test verifies that multiple receivers can be instantiated
 	// in isolation, started, and can ingest logs without interfering
 	// with each other.
@@ -226,6 +234,11 @@ func TestMultipleReceivers(t *testing.T) {
 			require.Greater(c, len(logs["r1"]), 0, "receiver r1 does not have any logs")
 			require.Greater(c, len(logs["r2"]), 0, "receiver r2 does not have any logs")
 
+			assert.Equal(c, "filebeatreceiver/r1", logs["r1"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r1 log record")
+			assert.Equal(c, "receiver", logs["r1"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in r1 log record")
+			assert.Equal(c, "filebeatreceiver/r2", logs["r2"][0].Flatten()["agent.otelcol.component.id"], "expected agent.otelcol.component.id field in r2 log record")
+			assert.Equal(c, "receiver", logs["r2"][0].Flatten()["agent.otelcol.component.kind"], "expected agent.otelcol.component.kind field in r2 log record")
+
 			// Make sure that each receiver has a separate logger
 			// instance and does not interfere with others. Previously, the
 			// logger in Beats was global, causing logger fields to be
@@ -249,6 +262,83 @@ func TestMultipleReceivers(t *testing.T) {
 			}, "failed to connect to monitoring socket2, inputs endpoint, last error was: %s", &lastError)
 		},
 	})
+}
+
+func TestReceiverDegraded(t *testing.T) {
+	if runtime.GOARCH == "arm64" && runtime.GOOS == "linux" {
+		t.Skip("flaky test on Ubuntu arm64, see https://github.com/elastic/beats/issues/46437")
+	}
+	testCases := []struct {
+		name            string
+		status          oteltest.ExpectedStatus
+		benchmarkStatus string
+	}{
+		{
+			name: "failed input",
+			status: oteltest.ExpectedStatus{
+				Status: componentstatus.StatusPermanentError,
+				Error:  "benchmark input failed",
+			},
+			benchmarkStatus: "failed",
+		},
+		{
+			name: "degraded input",
+			status: oteltest.ExpectedStatus{
+				Status: componentstatus.StatusRecoverableError,
+				Error:  "benchmark input degraded",
+			},
+			benchmarkStatus: "degraded",
+		},
+		{
+			name: "running input",
+			status: oteltest.ExpectedStatus{
+				Status: componentstatus.StatusOK,
+				Error:  "",
+			},
+		},
+	}
+
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+			config := Config{
+				Beatconfig: map[string]any{
+					"filebeat": map[string]any{
+						"inputs": []map[string]any{
+							{
+								"type":    "benchmark",
+								"enabled": true,
+								"message": "test",
+								"count":   1,
+								"status":  test.benchmarkStatus,
+							},
+						},
+					},
+					"output": map[string]any{
+						"otelconsumer": map[string]any{},
+					},
+					"logging": map[string]any{
+						"level": "debug",
+						"selectors": []string{
+							"*",
+						},
+					},
+					"path.home": t.TempDir(),
+				},
+			}
+			oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+				T: t,
+				Receivers: []oteltest.ReceiverConfig{
+					{
+						Name:    "r1",
+						Beat:    "filebeat",
+						Config:  &config,
+						Factory: NewFactory(),
+					},
+				},
+				Status: test.status,
+			})
+		})
+	}
 }
 
 func genSocketPath() string {
@@ -335,4 +425,144 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoin
 	}
 
 	return true
+}
+
+type logGenerator struct {
+	t           *testing.T
+	tmpDir      string
+	f           *os.File
+	filePattern string
+	sequenceNum int64
+}
+
+func newLogGenerator(t *testing.T, tmpDir string) *logGenerator {
+	return &logGenerator{
+		t:           t,
+		tmpDir:      tmpDir,
+		filePattern: "input-*.log",
+	}
+}
+
+func (g *logGenerator) Start() {
+	f, err := os.CreateTemp(g.tmpDir, g.filePattern)
+	require.NoError(g.t, err)
+	g.f = f
+}
+
+func (g *logGenerator) Stop() {
+	require.NoError(g.t, g.f.Close())
+}
+
+func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
+	id := receivertest.UniqueIDAttrVal(strconv.FormatInt(atomic.AddInt64(&g.sequenceNum, 1), 10))
+
+	_, err := fmt.Fprintln(g.f, `{"id": "`+id+`", "message": "log message"}`)
+	require.NoError(g.t, err, "failed to write log line to file")
+	require.NoError(g.t, g.f.Sync(), "failed to sync log file")
+
+	return []receivertest.UniqueIDAttrVal{id}
+}
+
+// TestConsumeContract tests the ConsumeLogs contract for otelconsumer.
+//
+// The following scenarios are tested:
+// - Always succeed. We expect all data passed to ConsumeLogs to be delivered.
+// - Random non-permanent error. We expect the batch to be retried.
+// - Random permanent error. We expect the batch to be dropped.
+// - Random error. We expect the batch to be retried or dropped based on the error type.
+func TestConsumeContract(t *testing.T) {
+	t.Skip("flaky test, see https://github.com/elastic/beats/issues/46437")
+
+	defer oteltest.VerifyNoLeaks(t)
+
+	tmpDir := t.TempDir()
+	const logsPerTest = 100
+
+	gen := newLogGenerator(t, tmpDir)
+
+	os.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
+
+	cfg := &Config{
+		Beatconfig: map[string]interface{}{
+			"queue.mem.flush.timeout": "0s",
+			"filebeat": map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":    "filestream",
+						"id":      "filestream-test",
+						"enabled": true,
+						"paths": []string{
+							filepath.Join(tmpDir, "input-*.log"),
+						},
+						"file_identity.native": map[string]interface{}{},
+						"prospector": map[string]interface{}{
+							"scanner": map[string]interface{}{
+								"fingerprint.enabled": false,
+								"check_interval":      "0.1s",
+							},
+						},
+						"parsers": []map[string]interface{}{
+							{
+								"ndjson": map[string]interface{}{
+									"document_id": "id",
+								},
+							},
+						},
+					},
+				},
+			},
+			"output": map[string]interface{}{
+				"otelconsumer": map[string]interface{}{},
+			},
+			"logging": map[string]interface{}{
+				"level": "debug",
+				"selectors": []string{
+					"*",
+				},
+			},
+			"path.home": tmpDir,
+			"path.logs": tmpDir,
+		},
+	}
+
+	// Run the contract checker. This will trigger test failures if any problems are found.
+	receivertest.CheckConsumeContract(receivertest.CheckConsumeContractParams{
+		T:             t,
+		Factory:       NewFactory(),
+		Signal:        pipeline.SignalLogs,
+		Config:        cfg,
+		Generator:     gen,
+		GenerateCount: logsPerTest,
+	})
+}
+
+func TestReceiverHook(t *testing.T) {
+	cfg := Config{
+		Beatconfig: map[string]any{
+			"filebeat": map[string]any{
+				"inputs": []map[string]any{
+					{
+						"type":    "benchmark",
+						"enabled": true,
+						"message": "test",
+						"count":   1,
+					},
+				},
+			},
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
+			},
+			"management.otel.enabled": true,
+			"path.home":               t.TempDir(),
+		},
+	}
+	receiverSettings := receiver.Settings{
+		ID: component.MustNewID(Name),
+		TelemetrySettings: component.TelemetrySettings{
+			Logger: zap.NewNop(),
+		},
+	}
+	// For filebeatreceiver, we expect 3 hooks to be registered:
+	// 	one for beat metrics, one for input metrics and one for getting the registry.
+	oteltest.TestReceiverHook(t, &cfg, NewFactory(), receiverSettings, 3)
 }

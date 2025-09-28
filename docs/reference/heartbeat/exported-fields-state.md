@@ -16,43 +16,43 @@ Present in the last event emitted during a check. If a monitor checks multiple e
 **`state.id`**
 :   ID of this state
 
-type: keyword
+    type: keyword
 
 
 **`state.started_at`**
 :   First time state with this ID was seen
 
-type: date
+    type: date
 
 
 **`state.duration_ms`**
 :   Length of time this state has existed in millis
 
-type: long
+    type: long
 
 
 **`state.status`**
 :   The current status, "up", "down", or "flapping" any state can change into flapping.
 
-type: keyword
+    type: keyword
 
 
 **`state.checks`**
 :   total checks run
 
-type: integer
+    type: integer
 
 
 **`state.up`**
 :   total up checks run
 
-type: integer
+    type: integer
 
 
 **`state.down`**
 :   total down checks run
 
-type: integer
+    type: integer
 
 
 **`state.flap_history`**
@@ -62,6 +62,6 @@ type: integer
 **`state.ends`**
 :   the state that was ended by this state
 
-type: object
+    type: object
 
 

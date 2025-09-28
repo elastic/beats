@@ -16,7 +16,7 @@ Fields from NetFlow and IPFIX.
 **`netflow.type`**
 :   The type of NetFlow record described by this event.
 
-type: keyword
+    type: keyword
 
 
 ## exporter [_exporter]
@@ -26,31 +26,31 @@ Metadata related to the exporter device that generated this record.
 **`netflow.exporter.address`**
 :   Exporter's network address in IP:port format.
 
-type: keyword
+    type: keyword
 
 
 **`netflow.exporter.source_id`**
 :   Observation domain ID to which this record belongs.
 
-type: long
+    type: long
 
 
 **`netflow.exporter.timestamp`**
 :   Time and date of export.
 
-type: date
+    type: date
 
 
 **`netflow.exporter.uptime_millis`**
 :   How long the exporter process has been running, in milliseconds.
 
-type: long
+    type: long
 
 
 **`netflow.exporter.version`**
 :   NetFlow version used.
 
-type: integer
+    type: integer
 
 
 **`netflow.absolute_error`**

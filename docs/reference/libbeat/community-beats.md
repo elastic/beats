@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/current/community-beats.html
+applies_to:
+  stack: deprecated 7.16.0, removed 8.0.0
 ---
 
 # Community Beats [community-beats]

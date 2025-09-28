@@ -54,6 +54,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
+	// log warning message related to config
+	config.checkUnsupportedConfig(base.Logger())
 
 	sys, ok := base.Module().(resolve.Resolver)
 	if !ok {
@@ -90,6 +92,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				RootfsMountpoint:  sys,
 				IgnoreRootCgroups: true,
 			},
+			Logger: base.Logger(),
 		},
 		perCPU:           config.IncludePerCPU,
 		degradeOnPartial: degradedConf.DegradeOnPartial,

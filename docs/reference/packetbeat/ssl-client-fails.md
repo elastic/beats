@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/ssl-client-fails.html
+applies_to:
+  stack: ga
 ---
 
 # SSL client fails to connect to Logstash [ssl-client-fails]

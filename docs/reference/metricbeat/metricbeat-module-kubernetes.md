@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-kubernetes.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Kubernetes module [metricbeat-module-kubernetes]
 
@@ -196,7 +200,7 @@ Kubernetes proxy example:
 ![metricbeat kubernetes proxy](images/metricbeat-kubernetes-proxy.png)
 
 
-## Example configuration [_example_configuration_37]
+## Example configuration [_example_configuration]
 
 The Kubernetes module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -383,7 +387,7 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_43]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
@@ -399,6 +403,7 @@ The following metricsets are available:
 * [state_cronjob](/reference/metricbeat/metricbeat-metricset-kubernetes-state_cronjob.md)
 * [state_daemonset](/reference/metricbeat/metricbeat-metricset-kubernetes-state_daemonset.md)
 * [state_deployment](/reference/metricbeat/metricbeat-metricset-kubernetes-state_deployment.md)
+* [state_horizontalpodautoscaler](/reference/metricbeat/metricbeat-metricset-kubernetes-state_horizontalpodautoscaler.md)  {applies_to}`stack: beta`
 * [state_job](/reference/metricbeat/metricbeat-metricset-kubernetes-state_job.md)
 * [state_node](/reference/metricbeat/metricbeat-metricset-kubernetes-state_node.md)
 * [state_persistentvolumeclaim](/reference/metricbeat/metricbeat-metricset-kubernetes-state_persistentvolumeclaim.md)
@@ -410,5 +415,3 @@ The following metricsets are available:
 * [state_storageclass](/reference/metricbeat/metricbeat-metricset-kubernetes-state_storageclass.md)
 * [system](/reference/metricbeat/metricbeat-metricset-kubernetes-system.md)
 * [volume](/reference/metricbeat/metricbeat-metricset-kubernetes-volume.md)
-
-

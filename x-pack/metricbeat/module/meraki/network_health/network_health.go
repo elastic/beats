@@ -27,9 +27,9 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The meraki network_health metricset is beta.")
 
 	logger := base.Logger().Named(base.FullyQualifiedName())
+	logger.Warn(cfgwarn.Beta("The meraki network_health metricset is beta."))
 
 	config := meraki.DefaultConfig()
 	if err := base.Module().UnpackConfig(config); err != nil {
@@ -61,7 +61,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	collectionPeriod := m.BaseMetricSet.Module().Config().Period
 
 	for _, org := range m.organizations {
-		stats, err := getNetworkVPNStats(m.client, org, collectionPeriod)
+		stats, err := getNetworkVPNStats(m.client, org, collectionPeriod, m.logger)
 		if err != nil {
 			return fmt.Errorf("getNetworkVPNStats failed; %w", err)
 		}

@@ -25,7 +25,15 @@ import (
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP Dataproc cluster
-func NewMetadataService(ctx context.Context, projectID string, regions []string, organizationID, organizationName string, projectName string, collectUserLabels bool, cacheRegistry *gcp.CacheRegistry, opt ...option.ClientOption) (gcp.MetadataService, error) {
+func NewMetadataService(
+	ctx context.Context,
+	projectID string,
+	regions []string,
+	organizationID, organizationName, projectName string,
+	collectUserLabels bool,
+	cacheRegistry *gcp.CacheRegistry,
+	logger *logp.Logger,
+	opt ...option.ClientOption) (gcp.MetadataService, error) {
 	mc := &metadataCollector{
 		projectID:         projectID,
 		projectName:       projectName,
@@ -35,7 +43,7 @@ func NewMetadataService(ctx context.Context, projectID string, regions []string,
 		collectUserLabels: collectUserLabels,
 		opt:               opt,
 		instanceCache:     cacheRegistry.Dataproc,
-		logger:            logp.NewLogger("metrics-dataproc"),
+		logger:            logger.Named("metrics-dataproc"),
 	}
 
 	// Freshen up the cache, later all we have to do is look up the instance

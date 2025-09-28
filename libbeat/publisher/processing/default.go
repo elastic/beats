@@ -22,7 +22,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/asset"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/management"
@@ -114,7 +113,7 @@ func MakeDefaultSupport(
 		// don't try to "merge" the two lists somehow, if the supportFactory caller requests its own processors, use those
 		// also makes it easier to disable global processors if needed, since they're otherwise hardcoded
 		var rawProcessors processors.PluginConfig
-		shouldLoadDefaultProcessors := info.UseDefaultProcessors || fleetmode.Enabled()
+		shouldLoadDefaultProcessors := info.UseDefaultProcessors || management.UnderAgent()
 
 		// don't check the array directly, use HasField, that way processors can easily be bypassed with -E processors=[]
 		if shouldLoadDefaultProcessors && !beatCfg.HasField("processors") {
@@ -125,8 +124,7 @@ func MakeDefaultSupport(
 			rawProcessors = cfg.Processors
 		}
 
-		// TODO: pass a local logger to processor.New
-		processors, err := processors.New(rawProcessors, nil)
+		processors, err := processors.New(rawProcessors, log)
 		if err != nil {
 			return nil, fmt.Errorf("error initializing processors: %w", err)
 		}
@@ -390,7 +388,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	// setup 9: time series metadata
 	if b.timeSeries {
-		processors.add(timeseries.NewTimeSeriesProcessor(b.timeseriesFields))
+		processors.add(timeseries.NewTimeSeriesProcessor(b.timeseriesFields, b.log))
 	}
 
 	// setup 10: debug print final event (P)

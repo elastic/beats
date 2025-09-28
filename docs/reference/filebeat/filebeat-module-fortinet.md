@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-fortinet.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Fortinet module [filebeat-module-fortinet]
 
@@ -190,7 +194,6 @@ This is a list of FortiOS fields that are mapped to ECS.
 | user | source.user.name |
 | xid | dns.id |
 
-
-## Fields [_fields_17]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-fortinet.md) section.

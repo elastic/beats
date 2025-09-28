@@ -2,6 +2,8 @@
 navigation_title: "add_tags"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/add-tags.html
+applies_to:
+  stack: ga
 ---
 
 # Add tags [add-tags]

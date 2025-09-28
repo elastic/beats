@@ -62,7 +62,7 @@ func defaultConfig() config {
 }
 
 // cursorConfigure configures the cursor input manager.
-func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
+func cursorConfigure(cfg *conf.C, _ *logp.Logger) ([]inputcursor.Source, inputcursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, fmt.Errorf("reading config: %w", err)

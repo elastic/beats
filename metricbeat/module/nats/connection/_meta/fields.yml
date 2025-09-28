@@ -8,6 +8,8 @@
       type: keyword
       description: >
         The ID of the connection
+      version:
+        ga: 9.1.0
     - name: name
       type: keyword
       description: >
@@ -16,34 +18,50 @@
       type: keyword
       description: >
         The kind of connection
+      version:
+        ga: 9.1.0
     - name: type
       type: keyword
       description: >
         The type of connection
+      version:
+        ga: 9.1.0
     - name: ip
       type: ip
       description: >
         The IP address of the connection
+      version:
+        ga: 9.1.0
     - name: port
       type: integer
       description: >
         The port of the connection
+      version:
+        ga: 9.1.0
     - name: lang
       type: keyword
       description: >
         The language of the client connection
+      version:
+        ga: 9.1.0
     - name: version
       type: keyword
       description: >
         The version of the client connection
+      version:
+        ga: 9.1.0
     - name: start
       type: date
       description: >
         The time the connection was started
+      version:
+        ga: 9.1.0
     - name: last_activity
       type: date
       description: >
         The last activity time of the connection
+      version:
+        ga: 9.1.0
     - name: subscriptions
       type: integer
       description: >

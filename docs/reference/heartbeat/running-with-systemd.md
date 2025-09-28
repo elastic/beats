@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/running-with-systemd.html
+applies_to:
+  stack: ga
 ---
 
 # Heartbeat and systemd [running-with-systemd]

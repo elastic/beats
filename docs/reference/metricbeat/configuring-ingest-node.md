@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/configuring-ingest-node.html
+applies_to:
+  stack: ga
 ---
 
 # Parse data using an ingest pipeline [configuring-ingest-node]

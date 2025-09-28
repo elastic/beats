@@ -114,7 +114,8 @@ func TestPrepareInputMetrics(t *testing.T) {
 		assert.NotNil(t, c, "client should not be nil")
 	}
 }
-func TestPrepareInputMetrics_reusedReg_deprecatedNewInputRegistry(t *testing.T) {
+
+func TestPrepareInputMetrics_reusedReg_deprecatedDeprecatedMetricsRegistry(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "TestPrepareInputMetrics")
 	inputID := "test_input_id"
 	inputType := "test_input_type"
@@ -129,7 +130,7 @@ func TestPrepareInputMetrics_reusedReg_deprecatedNewInputRegistry(t *testing.T) 
 	require.NotNil(t, reg, "input metrics registry should not be nil")
 	require.NotNil(t, wrappedconnector, "wrapped connector should not be nil")
 
-	got, cancel := inputmon.NewInputRegistry(inputType, inputID, parent)
+	got, cancel := inputmon.NewDeprecatedMetricsRegistry(inputType, inputID, parent)
 	defer cancel()
 	assert.Equal(t, reg, got, "metrics registry should be the same")
 }
@@ -176,6 +177,52 @@ func TestPrepareInputMetrics_safeConcurrentPipelineClientCreation(t *testing.T) 
 				}()
 			}
 			wg.Wait()
+		})
+	}
+}
+
+func TestContextMetricsRegistryOverride(t *testing.T) {
+	tcs := []struct {
+		name       string
+		field      string
+		overrideFn func(reg *monitoring.Registry, val string)
+		value      string
+	}{
+		{
+			name:       "MetricsRegistryOverrideID",
+			field:      inputmon.MetricKeyID,
+			overrideFn: MetricsRegistryOverrideID,
+			value:      "new-id",
+		},
+		{
+			name:       "MetricsRegistryOverrideInput",
+			field:      inputmon.MetricKeyInput,
+			overrideFn: MetricsRegistryOverrideInput,
+			value:      "new-input-name",
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			reg := monitoring.NewRegistry()
+			monitoring.NewString(reg, tc.field).Set("old-" + tc.field)
+
+			tc.overrideFn(reg, tc.value)
+			require.NotNil(t, reg)
+			assert.Equal(t, reg, reg)
+
+			var got string
+			reg.Visit(
+				monitoring.Full,
+				monitoring.NewKeyValueVisitor(func(key string, value any) {
+					if key == tc.field {
+						if s, ok := value.(string); ok {
+							got = s
+						}
+					}
+				}))
+			assert.Equal(t, tc.value, got,
+				"The %q variable in MetricsRegistry was not set correctly", tc.field)
 		})
 	}
 }

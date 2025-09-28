@@ -181,7 +181,6 @@ func (c *config) Validate() error {
 	}
 
 	if c.ScanSort != "" {
-		cfgwarn.Experimental("scan_sort is used.")
 
 		// Check input type
 		if _, ok := ValidScanSort[c.ScanSort]; !ok {
@@ -195,6 +194,13 @@ func (c *config) Validate() error {
 	}
 
 	return nil
+}
+
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+func (c config) checkUnsupportedParams(logger *logp.Logger) {
+	if c.ScanSort != "" {
+		logger.Warn(cfgwarn.Experimental("scan_sort is used."))
+	}
 }
 
 // resolveRecursiveGlobs expands `**` from the globs in multiple patterns

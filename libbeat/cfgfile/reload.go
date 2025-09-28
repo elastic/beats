@@ -270,7 +270,7 @@ func (rl *Reloader) loadConfigs(files []string) ([]*reload.ConfigWithMeta, error
 	result := []*reload.ConfigWithMeta{}
 	var errs []error
 	for _, file := range files {
-		configs, err := LoadList(file)
+		configs, err := LoadList(file, rl.logger)
 		if err != nil {
 			errs = append(errs, err)
 			rl.logger.Errorf("Error loading config from file '%s', error %v", file, err)

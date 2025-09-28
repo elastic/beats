@@ -142,7 +142,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	}
 
 	if b.Config.Output.Name() == "elasticsearch" {
-		callback := func(esClient *eslegclient.Connection) error {
+		callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
 			_, err := module.UploadPipelines(b.Info, esClient, eb.config.OverwritePipelines)
 			return err
 		}

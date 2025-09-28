@@ -12,24 +12,24 @@ Stats scraped from a Prometheus endpoint.
 **`prometheus.*.value`**
 :   Prometheus gauge metric
 
-type: object
+    type: object
 
 
 **`prometheus.*.counter`**
 :   Prometheus counter metric
 
-type: object
+    type: object
 
 
 **`prometheus.*.rate`**
 :   Prometheus rated counter metric
 
-type: object
+    type: object
 
 
 **`prometheus.*.histogram`**
 :   Prometheus histogram metric - release: ga
 
-type: object
+    type: object
 
 

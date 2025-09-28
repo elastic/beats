@@ -165,7 +165,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 
 	if !b.Manager.Enabled() {
 		if b.Config.Output.Name() == "elasticsearch" {
-			_, err := elasticsearch.RegisterConnectCallback(func(esClient *eslegclient.Connection) error {
+			_, err := elasticsearch.RegisterConnectCallback(func(esClient *eslegclient.Connection, _ *logp.Logger) error {
 				_, err := module.UploadPipelines(b.Info, esClient, pb.overwritePipelines)
 				return err
 			})

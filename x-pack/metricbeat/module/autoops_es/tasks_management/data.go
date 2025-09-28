@@ -7,10 +7,10 @@ package tasks_management
 import (
 	"errors"
 	"fmt"
+	"maps"
+	"slices"
 
 	e "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
-
-	"golang.org/x/exp/maps"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -22,16 +22,16 @@ import (
 const TASK_RUNTIME_THRESHOLD_IN_SECONDS_NAME = "TASK_RUNTIME_THRESHOLD_IN_SECONDS"
 
 var taskSchema = s.Schema{
-	"id":                 c.Int("id", s.Required),
-	"node":               c.Str("node", s.Required),
-	"taskType":           c.Str("type", s.Required),
-	"action":             c.Str("action", s.Required),
-	"startTimeInMillis":  c.Int("start_time_in_millis", s.Required),
-	"runningTimeInNanos": c.Int("running_time_in_nanos", s.Required),
-	"description":        c.Str("description", s.Optional),
-	"cancellable":        c.Bool("cancellable", s.Required),
-	"headers":            c.Ifc("headers", s.IgnoreAllErrors),
-	"children":           c.Ifc("children", s.IgnoreAllErrors),
+	"id":                    c.Int("id", s.Required),
+	"node":                  c.Str("node", s.Required),
+	"task_type":             c.Str("type", s.Required),
+	"action":                c.Str("action", s.Required),
+	"start_time_in_millis":  c.Int("start_time_in_millis", s.Required),
+	"running_time_in_nanos": c.Int("running_time_in_nanos", s.Required),
+	"description":           c.Str("description", s.Optional),
+	"cancellable":           c.Bool("cancellable", s.Required),
+	"headers":               c.Ifc("headers", s.IgnoreAllErrors),
+	"children":              c.Ifc("children", s.IgnoreAllErrors),
 }
 
 type GroupedTasks struct {
@@ -58,7 +58,7 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, nodeTasks *GroupedT
 		}
 
 		// the schema validated that the value exists as an integer
-		runningTimeInNanos, _ := task.GetValue("runningTimeInNanos")
+		runningTimeInNanos, _ := task.GetValue("running_time_in_nanos")
 
 		// skip anything not running long enough
 		if nanos, ok := runningTimeInNanos.(int64); !ok || nanos/1000000000 < taskRuntimeThresholdInSeconds {
@@ -85,14 +85,14 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, nodeTasks *GroupedT
 			// guarantee the parent node is in the list (it may not be)
 			nodeMap[node] = true
 
-			task["node"] = maps.Keys(nodeMap)
+			task["node"] = slices.Collect(maps.Keys(nodeMap))
 
 			// remove the children node
 			delete(task, "children")
 		}
 
 		// note: the task ID is not a part of the payload, so we have to add it
-		task["taskId"] = taskId
+		task["task_id"] = taskId
 
 		tasks = append(tasks, mapstr.M{"task": task})
 	}
@@ -103,8 +103,8 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, nodeTasks *GroupedT
 	err := errors.Join(errs...)
 
 	if err != nil {
-		e.SendErrorEvent(err, info, r, TasksMetricSet, TasksPath, transactionId)
+		e.LogAndSendErrorEvent(err, info, r, TasksMetricSet, TasksPath, transactionId)
 	}
 
-	return err
+	return nil
 }

@@ -33,6 +33,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var (
@@ -74,9 +75,10 @@ type TestResult struct {
 func newV2Context(id string) (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
-		Logger:      logp.NewLogger("netflow_test"),
-		ID:          id,
-		Cancelation: ctx,
+		Logger:          logp.NewLogger("netflow_test"),
+		ID:              id,
+		Cancelation:     ctx,
+		MetricsRegistry: monitoring.NewRegistry(),
 	}, cancel
 }
 

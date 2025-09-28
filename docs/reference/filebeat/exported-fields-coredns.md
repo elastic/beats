@@ -5,7 +5,7 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# Coredns fields [exported-fields-coredns]
+# CoreDNS fields [exported-fields-coredns]
 
 Module for handling logs produced by coredns
 
@@ -16,16 +16,16 @@ coredns fields after normalization
 **`coredns.query.size`**
 :   size of the DNS query
 
-type: integer
+    type: integer
 
-format: bytes
+    format: bytes
 
 
 **`coredns.response.size`**
 :   size of the DNS response
 
-type: integer
+    type: integer
 
-format: bytes
+    format: bytes
 
 

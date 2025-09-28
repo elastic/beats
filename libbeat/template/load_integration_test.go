@@ -41,7 +41,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -545,17 +544,13 @@ func path(t *testing.T, fileElems []string) string {
 	return fieldsPath
 }
 
-func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
-	logger, err := logp.NewDevelopmentLogger("")
-	if err != nil {
-		t.Fatal(err)
-	}
+func getTestingElasticsearch(t *testing.T) *eslegclient.Connection {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:       eslegtest.GetURL(),
 		Transport: httpcommon.DefaultHTTPTransportSettings(),
 		Username:  eslegtest.GetUser(),
 		Password:  eslegtest.GetPass(),
-	}, logger)
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 		panic(err) // panic in case TestLogger did not stop test

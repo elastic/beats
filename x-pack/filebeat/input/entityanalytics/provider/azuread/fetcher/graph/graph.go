@@ -369,7 +369,7 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 		c.Tracer.Filename = strings.ReplaceAll(c.Tracer.Filename, "*", id)
 	}
 
-	client, err := c.Transport.Client()
+	client, err := c.Transport.Client(httpcommon.WithLogger(logger))
 	if err != nil {
 		return nil, fmt.Errorf("unable to create HTTP client: %w", err)
 	}

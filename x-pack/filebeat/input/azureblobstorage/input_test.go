@@ -28,6 +28,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/mock"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -606,6 +608,109 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesContainer_csv[1]: true,
 			},
 		},
+		{
+			name: "BatchSizeGlobal",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"batch_size":                          3,
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_ata_json:      true,
+				mock.Beatscontainer_blob_data3_json:    true,
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
+		{
+			name: "BatchContainberLevel",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":       beatsContainer,
+						"batch_size": 3,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_ata_json:      true,
+				mock.Beatscontainer_blob_data3_json:    true,
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
+		{
+			name: "FilterByPathPrefix_NotFoundErr",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"path_prefix":                         "docs/",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer2,
+					},
+				},
+			},
+			mockHandler:   mock.AzureStorageServer,
+			expected:      map[string]bool{},
+			expectedError: mock.NotFoundErr,
+		},
+		{
+			name: "FilterByPathPrefix_RootLevel",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"path_prefix":                         "docs/",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
+		{
+			name: "FilterByPathPrefix_ContainerLevel",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":        beatsContainer,
+						"path_prefix": "docs/",
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -619,7 +724,7 @@ func Test_StorageClient(t *testing.T) {
 				assert.EqualError(t, err, tt.expectedError.Error())
 				return
 			}
-			input := newStatelessInput(conf, serv.URL+"/")
+			input := newStatelessInput(conf, serv.URL+"/", logp.NewNopLogger())
 
 			assert.Equal(t, "azure-blob-storage-stateless", input.Name())
 			assert.NoError(t, input.Test(v2.TestContext{}))
@@ -688,7 +793,7 @@ func Test_StorageClient(t *testing.T) {
 	}
 }
 
-func Test_Concurrency(t *testing.T) {
+func TestConcurrency(t *testing.T) {
 	for _, workers := range []int{100, 1000, 2000} {
 		t.Run(fmt.Sprintf("TestConcurrency_%d_Workers", workers), func(t *testing.T) {
 			const expectedLen = mock.TotalRandomDataSets
@@ -802,9 +907,10 @@ func newV2Context(t *testing.T) (v2.Context, func()) {
 		t.Fatalf("failed to generate random id: %v", err)
 	}
 	return v2.Context{
-		Logger:      logp.NewLogger("abs_test"),
-		ID:          "abs_test-" + id,
-		Cancelation: ctx,
+		Logger:          logptest.NewTestingLogger(t, "abs_test"),
+		ID:              "abs_test-" + id,
+		Cancelation:     ctx,
+		MetricsRegistry: monitoring.NewRegistry(),
 	}, cancel
 }
 

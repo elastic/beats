@@ -32,6 +32,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 
+	"github.com/gohugoio/hashstructure"
+
 	// include all metricbeat specific builders
 	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
 
@@ -44,12 +46,13 @@ import (
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done         chan struct{}    // Channel used to initiate shutdown.
-	stopOnce     sync.Once        // wraps the Stop() method
-	runners      []cfgfile.Runner // Active list of module runners.
-	config       Config
-	registry     *mb.Register
-	autodiscover *autodiscover.Autodiscover
+	done                     chan struct{} // Channel used to initiate shutdown.
+	stopOnce                 sync.Once     // wraps the Stop() method
+	config                   Config
+	registry                 *mb.Register
+	autodiscover             *autodiscover.Autodiscover
+	dynamicCfgEnabled        bool
+	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 
 	// Options
 	moduleOptions []module.Option
@@ -70,9 +73,9 @@ func WithModuleOptions(options ...module.Option) Option {
 
 // WithLightModules enables light modules support
 func WithLightModules() Option {
-	return func(*Metricbeat) {
+	return func(m *Metricbeat) {
 		path := paths.Resolve(paths.Home, "module")
-		mb.Registry.SetSecondarySource(mb.NewLightModulesSource(path))
+		mb.Registry.SetSecondarySource(mb.NewLightModulesSource(m.logger, path))
 	}
 }
 
@@ -150,10 +153,11 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 	}
 
 	metricbeat := &Metricbeat{
-		done:     make(chan struct{}),
-		config:   config,
-		registry: registry,
-		logger:   b.Info.Logger,
+		done:              make(chan struct{}),
+		config:            config,
+		registry:          registry,
+		logger:            b.Info.Logger,
+		dynamicCfgEnabled: dynamicCfgEnabled,
 	}
 
 	for _, applyOption := range options {
@@ -173,7 +177,15 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
 	}
+	return metricbeat, nil
+}
 
+// Run starts the workers for Metricbeat and blocks until Stop is called
+// and the workers complete. Each host associated with a MetricSet is given its
+// own goroutine for fetching data. The ensures that each host is isolated so
+// that a single unresponsive host cannot inadvertently block other hosts
+// within the same Module and MetricSet from collection.
+func (bt *Metricbeat) Run(b *beat.Beat) error {
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
@@ -187,56 +199,63 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 	}
 
 	moduleOptions := append(
-		[]module.Option{module.WithMaxStartDelay(config.MaxStartDelay)},
-		metricbeat.moduleOptions...)
+		[]module.Option{module.WithMaxStartDelay(bt.config.MaxStartDelay)},
+		bt.moduleOptions...)
 
-	factory := module.NewFactory(b.Info, b.Monitoring, registry, moduleOptions...)
+	factory := module.NewFactory(b.Info, b.Monitoring, bt.registry, moduleOptions...)
 
-	for _, moduleCfg := range config.Modules {
+	if bt.otelStatusFactoryWrapper != nil {
+		factory = bt.otelStatusFactoryWrapper(factory)
+	}
+
+	runners := make(map[uint64]cfgfile.Runner) // Active list of module runners.
+
+	for _, moduleCfg := range bt.config.Modules {
 		if !moduleCfg.Enabled() {
 			continue
 		}
 
-		runner, err := factory.Create(b.Publisher, moduleCfg)
+		var h map[string]interface{}
+		err := moduleCfg.Unpack(&h)
 		if err != nil {
-			return nil, err
+			return fmt.Errorf("could not unpack config: %w", err)
+		}
+		id, err := hashstructure.Hash(h, nil)
+		if err != nil {
+			return fmt.Errorf("can not compute id from configuration: %w", err)
 		}
 
-		metricbeat.runners = append(metricbeat.runners, runner)
+		runner, err := factory.Create(b.Publisher, moduleCfg)
+		if err != nil {
+			return err
+		}
+
+		runners[id] = runner
 	}
 
-	if len(metricbeat.runners) == 0 && !dynamicCfgEnabled {
-		return nil, mb.ErrAllModulesDisabled
+	if len(runners) == 0 && !bt.dynamicCfgEnabled {
+		return mb.ErrAllModulesDisabled
 	}
 
-	if config.Autodiscover != nil {
+	if bt.config.Autodiscover != nil {
 		var err error
-		metricbeat.autodiscover, err = autodiscover.NewAutodiscover(
+		bt.autodiscover, err = autodiscover.NewAutodiscover(
 			"metricbeat",
 			b.Publisher,
 			factory, autodiscover.QueryConfig(),
-			config.Autodiscover,
+			bt.config.Autodiscover,
 			b.Keystore,
 			b.Info.Logger,
 		)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 
-	return metricbeat, nil
-}
-
-// Run starts the workers for Metricbeat and blocks until Stop is called
-// and the workers complete. Each host associated with a MetricSet is given its
-// own goroutine for fetching data. The ensures that each host is isolated so
-// that a single unresponsive host cannot inadvertently block other hosts
-// within the same Module and MetricSet from collection.
-func (bt *Metricbeat) Run(b *beat.Beat) error {
 	var wg sync.WaitGroup
 
 	// Static modules (metricbeat.runners)
-	for _, r := range bt.runners {
+	for _, r := range runners {
 		r.Start()
 		wg.Add(1)
 
@@ -249,7 +268,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	// Centrally managed modules
-	factory := module.NewFactory(b.Info, b.Monitoring, bt.registry, bt.moduleOptions...)
+	factory = module.NewFactory(b.Info, b.Monitoring, bt.registry, bt.moduleOptions...)
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher, bt.logger)
 	b.Registry.MustRegisterInput(modules)
 	wg.Add(1)
@@ -297,6 +316,10 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	wg.Wait()
 
 	return nil
+}
+
+func (bt *Metricbeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
+	bt.otelStatusFactoryWrapper = wrapper
 }
 
 // Stop signals to Metricbeat that it should stop. It closes the "done" channel

@@ -20,6 +20,8 @@ package oteltest
 
 import (
 	"context"
+	"runtime"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -29,14 +31,29 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/consumer/consumertest"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver"
+	"go.uber.org/goleak"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest"
 	"go.uber.org/zap/zaptest/observer"
 )
+
+type MockHost struct {
+	Evt *componentstatus.Event
+}
+
+func (*MockHost) GetExtensions() map[component.ID]component.Component {
+	return nil
+}
+
+func (h *MockHost) Report(evt *componentstatus.Event) {
+	h.Evt = evt
+}
 
 type ReceiverConfig struct {
 	// Name is the unique identifier for the component
@@ -49,6 +66,11 @@ type ReceiverConfig struct {
 	Factory receiver.Factory
 }
 
+type ExpectedStatus struct {
+	Status componentstatus.Status
+	Error  string
+}
+
 type CheckReceiversParams struct {
 	T *testing.T
 	// Receivers is a list of receiver configurations to create.
@@ -56,6 +78,8 @@ type CheckReceiversParams struct {
 	// AssertFunc is a function that asserts the test conditions.
 	// The function is called periodically until the assertions are met or the timeout is reached.
 	AssertFunc func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs)
+
+	Status ExpectedStatus
 }
 
 // CheckReceivers creates receivers using the provided configuration.
@@ -63,8 +87,12 @@ func CheckReceivers(params CheckReceiversParams) {
 	t := params.T
 	ctx := t.Context()
 
+	defer VerifyNoLeaks(t)
+
 	var logsMu sync.Mutex
 	logs := make(map[string][]mapstr.M)
+
+	host := &MockHost{}
 
 	zapCore := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
@@ -82,17 +110,17 @@ func CheckReceivers(params CheckReceiversParams) {
 		require.NotEmpty(t, rc.Beat, "receiver beat must not be empty")
 
 		var receiverSettings receiver.Settings
+		receiverSettings.ID = component.NewIDWithName(rc.Factory.Type(), rc.Name)
 
 		// Replicate the behavior of the collector logger
 		receiverCore := core.
 			With([]zapcore.Field{
-				zap.String("otelcol.component.id", rc.Name),
+				zap.String("otelcol.component.id", receiverSettings.ID.String()),
 				zap.String("otelcol.component.kind", "receiver"),
 				zap.String("otelcol.signal", "logs"),
 			})
 
 		receiverSettings.Logger = zap.New(receiverCore)
-		receiverSettings.ID = component.NewIDWithName(rc.Factory.Type(), rc.Name)
 
 		logConsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
 			for _, rl := range ld.ResourceLogs().All() {
@@ -120,7 +148,7 @@ func CheckReceivers(params CheckReceiversParams) {
 	}
 
 	for i, r := range receivers {
-		err := r.Start(ctx, nil)
+		err := r.Start(ctx, host)
 		require.NoErrorf(t, err, "Error starting receiver %d", i)
 		defer func() {
 			require.NoErrorf(t, r.Shutdown(ctx), "Error shutting down receiver %d", i)
@@ -135,9 +163,9 @@ func CheckReceivers(params CheckReceiversParams) {
 		}
 	})
 
-	beatForCompID := func(compID string) string {
+	beatForCompName := func(compName string) string {
 		for _, rec := range params.Receivers {
-			if rec.Name == compID {
+			if rec.Name == compName {
 				return rec.Beat
 			}
 		}
@@ -151,19 +179,115 @@ func CheckReceivers(params CheckReceiversParams) {
 
 		// Ensure the logger fields from the otel collector are present
 		for _, zl := range zapLogs.All() {
-			require.Contains(t, zl.ContextMap(), "otelcol.component.kind")
-			require.Equal(t, "receiver", zl.ContextMap()["otelcol.component.kind"])
-			require.Contains(t, zl.ContextMap(), "otelcol.signal")
-			require.Equal(t, "logs", zl.ContextMap()["otelcol.signal"])
-			require.Contains(t, zl.ContextMap(), "otelcol.component.id")
+			require.Contains(ct, zl.ContextMap(), "otelcol.component.kind")
+			require.Equal(ct, "receiver", zl.ContextMap()["otelcol.component.kind"])
+			require.Contains(ct, zl.ContextMap(), "otelcol.signal")
+			require.Equal(ct, "logs", zl.ContextMap()["otelcol.signal"])
+			require.Contains(ct, zl.ContextMap(), "otelcol.component.id")
 			compID, ok := zl.ContextMap()["otelcol.component.id"].(string)
-			require.True(t, ok, "otelcol.component.id should be a string")
-			require.Contains(t, zl.ContextMap(), "service.name")
-			require.Equal(t, beatForCompID(compID), zl.ContextMap()["service.name"])
+			require.True(ct, ok, "otelcol.component.id should be a string")
+			compName := strings.Split(compID, "/")[1]
+			require.Contains(ct, zl.ContextMap(), "service.name")
+			require.Equal(ct, beatForCompName(compName), zl.ContextMap()["service.name"])
 			break
 		}
+		require.NotNil(ct, host.Evt, "expected not nil, got nil")
 
-		params.AssertFunc(ct, logs, zapLogs)
+		if params.Status.Error == "" {
+			require.Equalf(ct, host.Evt.Status(), componentstatus.StatusOK, "expected %v, got %v", params.Status.Status, host.Evt.Status())
+			require.Nilf(ct, host.Evt.Err(), "expected nil, got %v", host.Evt.Err())
+		} else {
+			require.Equalf(ct, host.Evt.Status(), params.Status.Status, "expected %v, got %v", params.Status.Status, host.Evt.Status())
+			require.ErrorContainsf(ct, host.Evt.Err(), params.Status.Error, "expected error to contain '%v': %v", params.Status.Error, host.Evt.Err())
+		}
+
+		if params.AssertFunc != nil {
+			params.AssertFunc(ct, logs, zapLogs)
+		}
 	}, 2*time.Minute, 100*time.Millisecond,
 		"timeout waiting for logger fields from the OTel collector are present in the logs and other assertions to be met")
+}
+
+// VerifyNoLeaks fails the test if any goroutines are leaked during the test.
+func VerifyNoLeaks(t *testing.T) {
+	skipped := []goleak.Option{
+		// See https://github.com/microsoft/go-winio/issues/272
+		goleak.IgnoreAnyFunction("github.com/Microsoft/go-winio.getQueuedCompletionStatus"),
+		// False positive, from init in cloud.google.com/go/pubsub and filebeat/input/gcppubsub.
+		// See https://github.com/googleapis/google-cloud-go/issues/10948
+		// and https://github.com/census-instrumentation/opencensus-go/issues/1191
+		goleak.IgnoreAnyFunction("go.opencensus.io/stats/view.(*worker).start"),
+	}
+
+	if runtime.GOOS == "linux" && runtime.GOARCH == "arm64" {
+		// On arm64, some HTTP transport goroutines are leaked while still dialing.
+		skipped = append(skipped, goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked"))
+	}
+
+	goleak.VerifyNone(t, skipped...)
+}
+
+type DummyConsumer struct {
+	context.Context
+	ConsumeError error
+}
+
+func (d *DummyConsumer) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
+	return d.ConsumeError
+}
+
+func (d *DummyConsumer) Capabilities() consumer.Capabilities {
+	return consumer.Capabilities{}
+}
+
+type mockHost struct {
+	component.Host
+	diagExt *mockDiagExtension
+}
+
+type hook struct {
+	description string
+	filename    string
+	contentType string
+	hook        func() []byte
+}
+
+type mockDiagExtension struct {
+	component.Component
+	hooks map[string][]hook
+}
+
+func (m *mockHost) GetExtensions() map[component.ID]component.Component {
+	return map[component.ID]component.Component{
+		component.MustNewIDWithName("mockdiagextension", ""): m.diagExt,
+	}
+}
+
+func (m *mockDiagExtension) RegisterDiagnosticHook(name string, description string, filename string, contentType string, fn func() []byte) {
+	m.hooks[name] = append(m.hooks[name], hook{
+		description: description,
+		filename:    filename,
+		contentType: contentType,
+		hook:        fn,
+	})
+}
+
+func TestReceiverHook(t *testing.T, config component.Config, factory receiver.Factory, set receiver.Settings, expectedHooks int) {
+
+	logs, err := factory.CreateLogs(context.Background(), set, config, consumertest.NewNop())
+	diagExt := &mockDiagExtension{
+		hooks: make(map[string][]hook),
+	}
+	require.NoError(t, err)
+	require.NotNil(t, logs)
+	require.NoError(t, logs.Start(context.Background(), &mockHost{diagExt: diagExt}))
+
+	defer func() {
+		require.NoError(t, logs.Shutdown(context.Background()))
+	}()
+
+	assert.EventuallyWithT(t, func(c *assert.CollectT) {
+		assert.Contains(c, diagExt.hooks, set.ID.String())
+		assert.Len(c, diagExt.hooks[set.ID.String()], expectedHooks)
+	}, 5*time.Second, 100*time.Millisecond, "expected hook to be registered")
 }

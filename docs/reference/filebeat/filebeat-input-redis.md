@@ -2,6 +2,8 @@
 navigation_title: "Redis"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-redis.html
+applies_to:
+  stack: preview
 ---
 
 # Redis input [filebeat-input-redis]

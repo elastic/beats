@@ -1,13 +1,15 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/running-on-cloudfoundry.html
+applies_to:
+  stack: ga
 ---
 
 # Run Filebeat on Cloud Foundry [running-on-cloudfoundry]
 
 You can use Filebeat on Cloud Foundry to retrieve and ship logs.
 
-% However, version {{stack-version}} of Filebeat has not yet been released, no build is currently available for this version.
+% However, version {{version.stack}} of Filebeat has not yet been released, no build is currently available for this version.
 
 ## Create Cloud Foundry credentials [_create_cloud_foundry_credentials]
 
@@ -31,11 +33,11 @@ You deploy Filebeat as an application with no route.
 Cloud Foundry requires that 3 files exist inside of a directory to allow Filebeat to be pushed. The commands below provide the basic steps for getting it up and running.
 
 ```sh subs=true
-curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{stack-version}}-linux-x86_64.tar.gz
-tar xzvf filebeat-{{stack-version}}-linux-x86_64.tar.gz
-cd filebeat-{{stack-version}}-linux-x86_64
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/cloudfoundry/filebeat/filebeat.yml
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/cloudfoundry/filebeat/manifest.yml
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{version.stack}}-linux-x86_64.tar.gz
+tar xzvf filebeat-{{version.stack}}-linux-x86_64.tar.gz
+cd filebeat-{{version.stack}}-linux-x86_64
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.M }}/deploy/cloudfoundry/filebeat/filebeat.yml
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.M }}/deploy/cloudfoundry/filebeat/manifest.yml
 ```
 
 You need to modify the `filebeat.yml` file to set the `api_address`, `client_id` and `client_secret`.

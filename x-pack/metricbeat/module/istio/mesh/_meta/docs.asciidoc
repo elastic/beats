@@ -1,1 +1,0 @@
-This is the mesh metricset of the module istio. This metricset collects all Mixer-generated metrics.

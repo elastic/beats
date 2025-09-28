@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-uwsgi.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # uWSGI module [metricbeat-module-uwsgi]
 
@@ -23,7 +27,7 @@ The uwsgi module comes with a predefined dashboard. For example:
 ![uwsgi dashboard](images/uwsgi_dashboard.png)
 
 
-## Example configuration [_example_configuration_66]
+## Example configuration [_example_configuration]
 
 The uWSGI module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -37,10 +41,8 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_76]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [status](/reference/metricbeat/metricbeat-metricset-uwsgi-status.md)
-
-

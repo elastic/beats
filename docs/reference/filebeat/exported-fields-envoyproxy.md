@@ -16,38 +16,38 @@ Fields from envoy proxy logs after normalization
 **`envoyproxy.log_type`**
 :   Envoy log type, normally ACCESS
 
-type: keyword
+    type: keyword
 
 
 **`envoyproxy.response_flags`**
 :   Response flags
 
-type: keyword
+    type: keyword
 
 
 **`envoyproxy.upstream_service_time`**
 :   Upstream service time in nanoseconds
 
-type: long
+    type: long
 
-format: duration
+    format: duration
 
 
 **`envoyproxy.request_id`**
 :   ID of the request
 
-type: keyword
+    type: keyword
 
 
 **`envoyproxy.authority`**
 :   Envoy proxy authority field
 
-type: keyword
+    type: keyword
 
 
 **`envoyproxy.proxy_type`**
 :   Envoy proxy type, tcp or http
 
-type: keyword
+    type: keyword
 
 

@@ -2,6 +2,8 @@
 navigation_title: "Logging"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/configuration-logging.html
+applies_to:
+  stack: ga
 ---
 
 # Configure logging [configuration-logging]
@@ -170,7 +172,10 @@ Enable log file rotation on time intervals in addition to size-based rotation. I
 If the log file already exists on startup, immediately rotate it and start writing to a new file instead of appending to the existing one. Defaults to true.
 
 
-### `logging.files.redirect_stderr` [preview] [_logging_files_redirect_stderr]
+### `logging.files.redirect_stderr` [_logging_files_redirect_stderr]
+```{applies_to}
+stack: preview
+```
 
 When true, diagnostic messages printed to Filebeat’s standard error output will also be logged to the log file. This can be helpful in situations were Filebeat terminates unexpectedly because an error has been detected by Go’s runtime but diagnostic information is not present in the log file. This feature is only available when logging to files (`logging.to_files` is true). Disabled by default.
 

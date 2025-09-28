@@ -1,5 +1,5 @@
 - key: crowdstrike
-  title: "Crowdstrike"
+  title: CrowdStrike
   release: beta
   description: >
     Module for collecting Crowdstrike events.

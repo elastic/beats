@@ -24,8 +24,8 @@ import (
 	"strconv"
 	"sync/atomic"
 
+	"github.com/gohugoio/hashstructure"
 	"github.com/jonboulle/clockwork"
-	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -72,7 +72,7 @@ func new(cfg *c.C, log *logp.Logger) (beat.Processor, error) {
 		limit:  config.Limit,
 		config: *config.Algorithm.Config(),
 	}
-	algo, err := factory(config.Algorithm.Name(), algoConfig)
+	algo, err := factory(config.Algorithm.Name(), algoConfig, log)
 	if err != nil {
 		return nil, fmt.Errorf("could not construct rate limiting algorithm: %w", err)
 	}
@@ -80,7 +80,7 @@ func new(cfg *c.C, log *logp.Logger) (beat.Processor, error) {
 	// Logging and metrics (each processor instance has a unique ID).
 	var (
 		id  = int(instanceID.Add(1))
-		reg = monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
+		reg = monitoring.Default.GetOrCreateRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
 	)
 
 	log = log.Named(logName).With("instance_id", id)

@@ -2,6 +2,8 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/heartbeat-overview.html
   - https://www.elastic.co/guide/en/beats/heartbeat/current/index.html
+applies_to:
+  stack: ga
 ---
 
 # Heartbeat

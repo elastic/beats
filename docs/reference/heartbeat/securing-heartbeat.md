@@ -2,6 +2,8 @@
 navigation_title: "Secure"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/securing-heartbeat.html
+applies_to:
+  stack: ga
 ---
 
 # Secure Heartbeat [securing-heartbeat]

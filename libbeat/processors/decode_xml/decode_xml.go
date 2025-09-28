@@ -70,10 +70,10 @@ func New(c *config.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the "+procName+" processor configuration: %s", err)
 	}
 
-	return newDecodeXML(config)
+	return newDecodeXML(config, log)
 }
 
-func newDecodeXML(config decodeXMLConfig) (beat.Processor, error) {
+func newDecodeXML(config decodeXMLConfig, logger *logp.Logger) (beat.Processor, error) {
 	// Default target to overwriting field.
 	if config.Target == nil {
 		config.Target = &config.Field
@@ -81,7 +81,7 @@ func newDecodeXML(config decodeXMLConfig) (beat.Processor, error) {
 
 	return &decodeXML{
 		decodeXMLConfig: config,
-		log:             logp.NewLogger(logName),
+		log:             logger.Named(logName),
 	}, nil
 }
 

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/monitor-http-options.html
+applies_to:
+  stack: ga
 ---
 
 # HTTP options [monitor-http-options]
@@ -34,7 +36,7 @@ When this option is set to a value greater than zero the `monitor.ip` field will
 
 ### `proxy_url` [monitor-http-proxy-url]
 
-The HTTP proxy URL. This setting is optional. Example `http://proxy.mydomain.com:3128`
+The HTTP proxy URL. This setting is optional. Example `http://proxy.example.com:3128`
 
 
 ### `proxy_headers` [monitor-http-proxy-headers]
@@ -139,7 +141,7 @@ Example configuration: This monitor POSTs an `x-www-form-urlencoded` string to t
     headers:
       'Content-Type': 'application/x-www-form-urlencoded'
     # urlencode the body:
-    body: "name=first&email=someemail%40someemailprovider.com"
+    body: "name=first&email=someemail%40example.com"
   check.response:
     status: [200]
     body:
@@ -171,7 +173,7 @@ Example configuration: This monitor examines the response body for the strings `
     headers:
       'Content-Type': 'application/x-www-form-urlencoded'
     # urlencode the body:
-    body: "name=first&email=someemail%40someemailprovider.com"
+    body: "name=first&email=someemail%40example.com"
   check.response:
     status: [200, 201]
     body:
@@ -194,7 +196,7 @@ Example configuration: This monitor examines the response body for the strings *
     headers:
       'Content-Type': 'application/x-www-form-urlencoded'
     # urlencode the body:
-    body: "name=first&email=someemail%40someemailprovider.com"
+    body: "name=first&email=someemail%40example.com"
   check.response:
     body:
       positive:
@@ -215,7 +217,7 @@ Example configuration: This monitor examines match successfully if there is no *
     headers:
       'Content-Type': 'application/x-www-form-urlencoded'
     # urlencode the body:
-    body: "name=first&email=someemail%40someemailprovider.com"
+    body: "name=first&email=someemail%40example.com"
   check.response:
     status: [200, 201]
     body:
