@@ -121,7 +121,7 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 	// Try top command first (works on mongod), fall back to listCollections (works on mongos)
 	collections, err := m.getCollectionsFromTop(client)
 	if err != nil {
-		return fmt.Errorf("top command failed (likely) mongos: %v", err)
+		return fmt.Errorf("top command failed (likely) mongos: %w", err)
 
 		// NOTE(shmsr): This is a specialized feature that is supposed to be for mongos, we will be in adding it
 		// after discussion in later commits. However, disabling the feature for now.

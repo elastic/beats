@@ -28,6 +28,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -53,10 +54,10 @@ func TestFetch(t *testing.T) {
 		metricsetFields := event.MetricSetFields
 
 		// Check a few event Fields
-		db := metricsetFields["db"].(string)
+		db, _ := metricsetFields["db"].(string)
 		assert.NotEqual(t, db, "")
 
-		collection := metricsetFields["collection"].(string)
+		collection, _ := metricsetFields["collection"].(string)
 		assert.NotEqual(t, collection, "")
 	}
 }
@@ -138,16 +139,50 @@ func TestFetchStandaloneVersions(t *testing.T) {
 
 			t.Cleanup(func() {
 				t.Logf("Cleaning up Docker Compose project %s", projectName)
-				downArgs := append([]string{"down", "-v"})
+				downArgs := []string{"-f", "docker-compose.yml", "down", "-v"}
 				if err := runComposeCommand(cmdName, prefixArgs, absStandaloneDir, cleanupEnv, downArgs...); err != nil {
 					t.Logf("failed to tear down compose project %s: %v", projectName, err)
 				}
 			})
 
 			t.Logf("Starting MongoDB container...")
-			mongoHost := compose.EnsureUp(t, "mongodb")
-			require.NotNil(t, mongoHost, "mongodb host info should not be nil")
-			t.Logf("MongoDB container started, host: %s", mongoHost.Host())
+			// Start the container using docker-compose
+			upArgs := []string{"-f", "docker-compose.yml", "up", "-d"}
+			if err := runComposeCommand(cmdName, prefixArgs, absStandaloneDir, cleanupEnv, upArgs...); err != nil {
+				t.Fatalf("failed to start compose project %s: %v", projectName, err)
+			}
+
+			// Wait for container to be healthy
+			t.Logf("Waiting for MongoDB to be healthy...")
+			var containerReady bool
+			for i := 0; i < 30; i++ {
+				healthCmd := exec.Command("docker", "ps", "--filter", fmt.Sprintf("name=%s", projectName), "--filter", "health=healthy", "--format", "{{.Names}}")
+				output, _ := healthCmd.CombinedOutput()
+				if strings.TrimSpace(string(output)) != "" {
+					containerReady = true
+					break
+				}
+				time.Sleep(2 * time.Second)
+			}
+
+			if !containerReady {
+				// Show container status for debugging
+				statusCmd := exec.Command("docker", "ps", "-a", "--filter", fmt.Sprintf("name=%s", projectName), "--format", "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}")
+				statusOutput, _ := statusCmd.CombinedOutput()
+				t.Logf("Container status:\n%s", string(statusOutput))
+
+				// Show logs
+				logsCmd := append([]string{}, prefixArgs...)
+				logsCmd = append(logsCmd, "-f", "docker-compose.yml", "logs", "--tail=50")
+				composeLogs, _ := runComposeCommandOutput(cmdName, prefixArgs, absStandaloneDir, cleanupEnv, logsCmd...)
+				t.Logf("Docker Compose logs:\n%s", composeLogs)
+
+				t.Fatalf("MongoDB container failed to become healthy")
+			}
+
+			// Construct the host string
+			mongoHostStr := fmt.Sprintf("mongodb://localhost:%s", tc.port)
+			t.Logf("MongoDB container started and healthy, host: %s", mongoHostStr)
 
 			t.Logf("Running seed script...")
 			if err := runSeedScript(seedScript, absStandaloneDir, cleanupEnv); err != nil {
@@ -158,7 +193,7 @@ func TestFetchStandaloneVersions(t *testing.T) {
 
 				// Show compose logs for debugging
 				logsCmd := append([]string{}, prefixArgs...)
-				logsCmd = append(logsCmd, "logs", "--tail=50")
+				logsCmd = append(logsCmd, "-f", "docker-compose.yml", "logs", "--tail=50")
 				composeLogs, _ := runComposeCommandOutput(cmdName, prefixArgs, absStandaloneDir, cleanupEnv, logsCmd...)
 				t.Logf("Docker Compose logs:\n%s", composeLogs)
 
@@ -166,8 +201,8 @@ func TestFetchStandaloneVersions(t *testing.T) {
 			}
 			t.Logf("Seed script completed successfully")
 
-			t.Logf("Creating metricset with config for host: %s", mongoHost.Host())
-			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(mongoHost.Host()))
+			t.Logf("Creating metricset with config for host: %s", mongoHostStr)
+			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(mongoHostStr))
 
 			t.Logf("Fetching collstats events...")
 			events, errs := mbtest.ReportingFetchV2Error(f)

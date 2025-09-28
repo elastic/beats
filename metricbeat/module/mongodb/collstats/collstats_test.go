@@ -30,7 +30,8 @@ func TestFlattenAggregationResult_NoStorageStats(t *testing.T) {
 		"size": float64(10),
 	}
 	out := flattenAggregationResult(input)
-	if out["size"].(float64) != 10 {
+	sizef, ok := out["size"].(float64)
+	if ok && sizef != 10 {
 		t.Fatalf("expected size 10, got %v", out["size"])
 	}
 }
@@ -71,7 +72,9 @@ func TestFlattenAggregationResult_WithStorageStats(t *testing.T) {
 	if _, ok := out["numOrphanDocs"]; !ok {
 		t.Fatalf("numOrphanDocs not lifted")
 	}
-	if out["scaleFactor"].(int) != 1 {
+
+	scaleFactorInt, ok := out["scaleFactor"].(int)
+	if ok && scaleFactorInt != 1 {
 		t.Fatalf("expected scaleFactor=1, got %v", out["scaleFactor"])
 	}
 }
@@ -84,7 +87,8 @@ func TestFlattenAggregationResult_DoesNotOverrideExisting(t *testing.T) {
 		},
 	}
 	out := flattenAggregationResult(input)
-	if out["count"].(int64) != 999 {
+	countInt, ok := out["count"].(int64)
+	if ok && countInt != 999 {
 		t.Fatalf("expected existing count 999 preserved, got %v", out["count"])
 	}
 }
