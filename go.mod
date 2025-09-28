@@ -19,7 +19,7 @@ require (
 	github.com/PaesslerAG/gval v1.2.2
 	github.com/PaesslerAG/jsonpath v0.1.1
 	github.com/StackExchange/wmi v1.2.1
-	github.com/akavel/rsrc v0.8.0 // indirect
+	github.com/akavel/rsrc v0.10.2 // indirect
 	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-sdk-go-v2 v1.37.1
@@ -96,7 +96,7 @@ require (
 	github.com/hectane/go-acl v0.0.0-20190604041725-da78bae5fc95
 	github.com/insomniacslk/dhcp v0.0.0-20220119180841-3c283ff8b7dd
 	github.com/jonboulle/clockwork v0.2.2
-	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
+	github.com/josephspurrier/goversioninfo v1.5.0
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/lib/pq v1.10.9
 	github.com/magefile/mage v1.15.0
@@ -182,6 +182,7 @@ require (
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.22.0
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
+	github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.3.0
 	github.com/elastic/sarama v1.19.1-0.20250603175145-7672917f26b6
 	github.com/elastic/tk-btf v0.2.0
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
@@ -236,12 +237,14 @@ require (
 require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.19.0
-	github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.2.0
 	go.opentelemetry.io/collector/client v1.41.0
+	go.opentelemetry.io/collector/component/componenttest v0.135.0
+	go.opentelemetry.io/collector/confmap/xconfmap v0.135.0
 	go.opentelemetry.io/collector/consumer/consumertest v0.135.0
 	go.opentelemetry.io/collector/exporter v0.135.0
-	go.opentelemetry.io/collector/exporter/exporterhelper v0.135.0
 	go.opentelemetry.io/collector/exporter/exportertest v0.135.0
+	go.opentelemetry.io/collector/extension v1.41.0
+	go.opentelemetry.io/collector/extension/extensiontest v0.135.0
 	go.opentelemetry.io/collector/pipeline v1.41.0
 	go.opentelemetry.io/collector/processor v1.41.0
 	go.opentelemetry.io/collector/processor/processorhelper v0.135.0
@@ -428,7 +431,6 @@ require (
 	go.elastic.co/fastjson v1.5.1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.0 // indirect
-	go.opentelemetry.io/collector/component/componenttest v0.135.0 // indirect
 	go.opentelemetry.io/collector/config/configauth v0.135.0 // indirect
 	go.opentelemetry.io/collector/config/configcompression v1.41.0 // indirect
 	go.opentelemetry.io/collector/config/confighttp v0.135.0 // indirect
@@ -437,19 +439,17 @@ require (
 	go.opentelemetry.io/collector/config/configoptional v0.135.0 // indirect
 	go.opentelemetry.io/collector/config/configretry v1.41.0 // indirect
 	go.opentelemetry.io/collector/config/configtelemetry v0.135.0 // indirect
-	go.opentelemetry.io/collector/confmap/xconfmap v0.135.0 // indirect
 	go.opentelemetry.io/collector/connector v0.135.0 // indirect
 	go.opentelemetry.io/collector/connector/connectortest v0.135.0 // indirect
 	go.opentelemetry.io/collector/connector/xconnector v0.135.0 // indirect
 	go.opentelemetry.io/collector/consumer/consumererror/xconsumererror v0.135.0 // indirect
 	go.opentelemetry.io/collector/consumer/xconsumer v0.135.0 // indirect
+	go.opentelemetry.io/collector/exporter/exporterhelper v0.135.0 // indirect
 	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.135.0 // indirect
 	go.opentelemetry.io/collector/exporter/xexporter v0.135.0 // indirect
-	go.opentelemetry.io/collector/extension v1.41.0 // indirect
 	go.opentelemetry.io/collector/extension/extensionauth v1.41.0 // indirect
 	go.opentelemetry.io/collector/extension/extensioncapabilities v0.135.0 // indirect
 	go.opentelemetry.io/collector/extension/extensionmiddleware v0.135.0 // indirect
-	go.opentelemetry.io/collector/extension/extensiontest v0.135.0 // indirect
 	go.opentelemetry.io/collector/extension/xextension v0.135.0 // indirect
 	go.opentelemetry.io/collector/featuregate v1.41.0 // indirect
 	go.opentelemetry.io/collector/internal/fanoutconsumer v0.135.0 // indirect

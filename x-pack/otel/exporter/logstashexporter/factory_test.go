@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/exporter/exportertest"
 
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -24,7 +23,7 @@ func TestCreateExporter(t *testing.T) {
 			Hosts: []string{"localhost:5044"},
 		},
 	}
-	params := exportertest.NewNopSettings(component.MustNewType(Name))
+	params := exportertest.NewNopSettings(Type)
 	exporter, err := factory.CreateLogs(context.Background(), params, cfg)
 	require.NoError(t, err)
 	require.NotNil(t, exporter)
