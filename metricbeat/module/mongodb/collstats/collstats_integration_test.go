@@ -101,8 +101,8 @@ func TestFetchStandaloneVersions(t *testing.T) {
 		port                string
 		expectExtendedStats bool
 	}{
-		{version: "5.0", port: "27117", expectExtendedStats: false},
-		{version: "7.0", port: "27217", expectExtendedStats: true},
+		{version: "5.0", port: "27518", expectExtendedStats: false},
+		{version: "7.0", port: "27519", expectExtendedStats: true},
 	}
 
 	originalWD, err := os.Getwd()

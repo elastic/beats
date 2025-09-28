@@ -9,7 +9,7 @@ services:
   mongodb:
     image: *mongo_image
     ports:
-      - "27017:27017"
+      - "${MONGO_PORT:-27017}:27017"
     environment:
       # Optional: Set root credentials
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-}
