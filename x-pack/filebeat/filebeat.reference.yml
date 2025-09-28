@@ -2529,7 +2529,13 @@ filebeat.inputs:
 
   # Files for the modification data is older than clean_inactive the state from the registry is removed
   # By default this is disabled.
+  # Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
   #clean_inactive: -1
+
+  # Enable this to disable all checks regarding clean_inactive and re-ingest
+  # all data when clean_inactive: 0, effectively keeping the
+  # old behaviour.
+  #legacy_clean_inactive: false
 
   # Removes the state for files which cannot be found on disk anymore immediately
   #clean_removed: true
@@ -2907,6 +2913,10 @@ filebeat.inputs:
   # Glob based paths.
   #paths:
     #- /var/log/custom.journal
+
+  # When enabled, log entries will be ingested interleaved from all
+  # available journals, including remote ones.
+  #merge: false
 
   # The position to start reading from the journal, valid options are:
   #  - head: Starts reading at the beginning of the journal.

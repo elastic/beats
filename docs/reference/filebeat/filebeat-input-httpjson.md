@@ -586,7 +586,7 @@ The clause `.parent_last_response.` should only be used from within chain steps 
   - type: httpjson
     enabled: true
     id: my-httpjson-id
-    request.url: http://xyz.com/services/data/v1.0/export_ids/page
+    request.url: http://example.com/services/data/v1.0/export_ids/page
     request.method: POST
     interval: 1h
     request.retry.max_attempts: 2
@@ -604,7 +604,7 @@ The clause `.parent_last_response.` should only be used from within chain steps 
           do_not_log_failure: true
     chain:
     - step:
-          request.url: http://xyz.com/services/data/v1.0/$.exportId/export_ids/$.files[:].id/info
+          request.url: http://example.com/services/data/v1.0/$.exportId/export_ids/$.files[:].id/info
           request.method: POST
           request.transforms:
           - set:
@@ -1472,6 +1472,7 @@ Each cursor entry is formed by:
 * A `value` template, which will define the value to store when evaluated.
 * A `default` template, which will define the value to store when the value template fails or is empty.
 * An `ignore_empty_value` flag. When set to `true`, will not store empty values, preserving the previous one, if any. Default: `true`.
+* A `do_not_log_failure` flag. When set to `true`, will not signal a degraded Fleet health status. Default: `true`. {applies_to}`stack: ga 9.1.4, ga 9.0.7, ga 8.19.4, ga 8.18.7`
 
 Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`].
 
