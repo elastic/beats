@@ -98,6 +98,22 @@ tar xzvf filebeat-{{version.stack}}-linux-x86_64.tar.gz
 :::{note}
 If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-filebeat.ps1`.
 :::
+<<<<<<< HEAD
+=======
+
+:::{important}
+{applies_to}`stack: ga 9.1.0` {applies_to}`stack: ga 9.0.6`
+
+The base folder has changed from `C:\ProgramData\` to `C:\Program Files\`
+because the latter has stricter permissions. The home path (base for
+state and logs) is now `C:\Program Files\Filebeat-Data`.
+
+The install script (`install-service-filebeat.ps1`) will check whether
+`C:\ProgramData\Filebeat` exits and move it to `C:\Program Files\Filebeat-Data`.
+For more details on the installation script refer to: [install script](/reference/filebeat/filebeat-installation-script.md).
+
+:::
+>>>>>>> 22a9a05db (Fix applies_to tags for same lifecycle, multiple versions (#46782))
 ::::::
 
 :::::::
