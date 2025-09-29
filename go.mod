@@ -19,7 +19,7 @@ require (
 	github.com/PaesslerAG/gval v1.2.2
 	github.com/PaesslerAG/jsonpath v0.1.1
 	github.com/StackExchange/wmi v1.2.1
-	github.com/akavel/rsrc v0.8.0 // indirect
+	github.com/akavel/rsrc v0.10.2 // indirect
 	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-sdk-go-v2 v1.37.1
@@ -96,7 +96,7 @@ require (
 	github.com/hectane/go-acl v0.0.0-20190604041725-da78bae5fc95
 	github.com/insomniacslk/dhcp v0.0.0-20220119180841-3c283ff8b7dd
 	github.com/jonboulle/clockwork v0.2.2
-	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
+	github.com/josephspurrier/goversioninfo v1.5.0
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/lib/pq v1.10.9
 	github.com/magefile/mage v1.15.0
