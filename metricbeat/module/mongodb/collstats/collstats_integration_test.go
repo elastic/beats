@@ -185,9 +185,23 @@ func TestFetchStandaloneVersions(t *testing.T) {
 
 			t.Logf("Running seed script from: %s", seedScript)
 			t.Logf("Seed script working directory: %s", absStandaloneDir)
+
+			// Check if bash is available
+			if _, err := exec.LookPath("bash"); err != nil {
+				t.Logf("Warning: bash not found in PATH: %v", err)
+			}
+
+			// Check if seed script is executable
+			if info, err := os.Stat(seedScript); err != nil {
+				t.Logf("Warning: cannot stat seed script: %v", err)
+			} else {
+				t.Logf("Seed script permissions: %v", info.Mode())
+			}
+
 			seedStart := time.Now()
 			if err := runSeedScript(seedScript, absStandaloneDir, cleanupEnv); err != nil {
 				t.Logf("Seed script failed after %v", time.Since(seedStart))
+				t.Logf("Seed script error: %v", err)
 
 				// List running containers for debugging
 				listCmd := exec.Command("docker", "ps", "-a", "--format", "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}")
@@ -420,7 +434,14 @@ func runComposeCommandOutput(cmdName string, prefixArgs []string, dir string, en
 }
 
 func runSeedScript(scriptPath, dir string, env []string) error {
-	cmd := exec.Command("bash", scriptPath)
+	// Try to use bash, fall back to sh if not available
+	shell := "bash"
+	if _, err := exec.LookPath("bash"); err != nil {
+		shell = "sh"
+	}
+
+	// Create the command - use absolute path to be safe
+	cmd := exec.Command(shell, scriptPath)
 	cmd.Dir = dir
 	cmd.Env = append(os.Environ(), env...)
 
@@ -436,12 +457,16 @@ func runSeedScript(scriptPath, dir string, env []string) error {
 
 	// Start the command
 	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("failed to start seed script: %w", err)
+		return fmt.Errorf("failed to start seed script with %s: %w", shell, err)
 	}
 
 	// Read output
 	var outputBuf, errorBuf strings.Builder
+	var wg sync.WaitGroup
+	wg.Add(2)
+
 	go func() {
+		defer wg.Done()
 		buf := make([]byte, 1024)
 		for {
 			n, err := stdout.Read(buf)
@@ -453,7 +478,9 @@ func runSeedScript(scriptPath, dir string, env []string) error {
 			}
 		}
 	}()
+
 	go func() {
+		defer wg.Done()
 		buf := make([]byte, 1024)
 		for {
 			n, err := stderr.Read(buf)
@@ -474,12 +501,15 @@ func runSeedScript(scriptPath, dir string, env []string) error {
 
 	select {
 	case err := <-done:
+		// Wait for output goroutines to finish
+		wg.Wait()
 		if err != nil {
-			return fmt.Errorf("seed script failed: %w (stdout: %s, stderr: %s)", err, outputBuf.String(), errorBuf.String())
+			return fmt.Errorf("seed script failed with %s: %w\nSTDOUT:\n%s\nSTDERR:\n%s", shell, err, outputBuf.String(), errorBuf.String())
 		}
 	case <-time.After(120 * time.Second):
 		cmd.Process.Kill()
-		return fmt.Errorf("seed script timed out after 120 seconds (stdout: %s, stderr: %s)", outputBuf.String(), errorBuf.String())
+		wg.Wait()
+		return fmt.Errorf("seed script timed out after 120 seconds with %s\nSTDOUT:\n%s\nSTDERR:\n%s", shell, outputBuf.String(), errorBuf.String())
 	}
 
 	return nil

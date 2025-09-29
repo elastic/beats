@@ -2,10 +2,19 @@
 set -euo pipefail
 
 echo "[DEBUG] Starting seed-standalone.sh script"
+echo "[DEBUG] Shell: $SHELL"
+echo "[DEBUG] Script: $0"
 echo "[DEBUG] Environment variables:"
 echo "[DEBUG]   COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-<not set>}"
 echo "[DEBUG]   MONGO_PORT=${MONGO_PORT:-<not set>}"
 echo "[DEBUG]   PWD=$(pwd)"
+echo "[DEBUG]   PATH=$PATH"
+
+# Check if docker is available
+if ! command -v docker >/dev/null 2>&1; then
+    echo "[ERROR] docker command not found in PATH"
+    exit 1
+fi
 
 # Detect Docker Compose project prefix - defaults to current directory name
 if [ -z "${COMPOSE_PROJECT_NAME:-}" ]; then
