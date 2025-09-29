@@ -127,9 +127,9 @@ processors:
 				checkURLHasContent(ct, url)
 			}
 		},
-		2*time.Minute, 1*time.Second, "expected Logstash to write files for both filebeat and otel mode")
+		30*time.Second, 1*time.Second, "expected Nginx to serve json files over HTTP")
 
-	// download files from Nginx into temp files
+	// download files from Nginx into testdata directory
 	fbFilePath := downloadToTestData(t, outFileURL, fmt.Sprintf("%s_fb.json", testCaseName))
 	otelFilePath := downloadToTestData(t, outOTelFileURL, fmt.Sprintf("%s_otel.json", testCaseName))
 
@@ -145,7 +145,7 @@ processors:
 		"agent.otelcol.component.kind",
 	}
 
-	compareOutputFilesSorted(t, fbFilePath, otelFilePath, ignoredFields)
+	compareOutputFiles(t, fbFilePath, otelFilePath, ignoredFields)
 }
 
 func generateEvents(numEvents int) []string {
@@ -233,20 +233,15 @@ func parseJson(jsonStr string) (mapstr.M, error) {
 	return data, nil
 }
 
-func compareOutputFilesSorted(t *testing.T, fbFilePath, otelFilePath string, ignoredFields []string) {
+func compareOutputFiles(t *testing.T, fbFilePath, otelFilePath string, ignoredFields []string) {
 	fbEvents, err := readAllEvents(fbFilePath)
-	if err != nil {
-		t.Fatalf("failed to read filebeat events: %v", err)
-	}
+	require.NoError(t, err, "failed to read filebeat events")
 
 	otelEvents, err := readAllEvents(otelFilePath)
-	if err != nil {
-		t.Fatalf("failed to read otel events: %v", err)
-	}
+	require.NoError(t, err, "failed to read otel events")
 
-	if len(fbEvents) != len(otelEvents) {
-		t.Fatalf("different number of events: filebeat=%d, otel=%d", len(fbEvents), len(otelEvents))
-	}
+	require.Equal(t, len(fbEvents), len(otelEvents),
+		"different number of events: filebeat=%d, otel=%d", len(fbEvents), len(otelEvents))
 
 	sortEventsByID(fbEvents)
 	sortEventsByID(otelEvents)
