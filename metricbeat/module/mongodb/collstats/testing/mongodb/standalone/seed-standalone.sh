@@ -60,20 +60,20 @@ retry() {
 
 shell_cmd() {
   local cn=$1; shift
-  echo "[DEBUG] Detecting shell command for container: $cn"
+  echo "[DEBUG] Detecting shell command for container: $cn" >&2
   # Try mongosh first (MongoDB 5.0+)
   if docker exec "$cn" which mongosh >/dev/null 2>&1; then
-    echo "[DEBUG] Found mongosh in container"
+    echo "[DEBUG] Found mongosh in container" >&2
     echo "mongosh"
     return
   fi
   # Fall back to mongo for older versions
   if docker exec "$cn" which mongo >/dev/null 2>&1; then
-    echo "[DEBUG] Found mongo in container"
+    echo "[DEBUG] Found mongo in container" >&2
     echo "mongo"
     return
   fi
-  echo "[ERROR] Neither mongosh nor mongo found in container"
+  echo "[ERROR] Neither mongosh nor mongo found in container" >&2
   return 1
 }
 

@@ -172,9 +172,8 @@ func TestFetchStandaloneVersions(t *testing.T) {
 				t.Logf("Container status:\n%s", string(statusOutput))
 
 				// Show logs
-				logsCmd := append([]string{}, prefixArgs...)
-				logsCmd = append(logsCmd, "-f", "docker-compose.yml", "logs", "--tail=50")
-				composeLogs, _ := runComposeCommandOutput(cmdName, prefixArgs, absStandaloneDir, cleanupEnv, logsCmd...)
+				logsArgs := []string{"-f", "docker-compose.yml", "logs", "--tail=50"}
+				composeLogs, _ := runComposeCommandOutput(cmdName, prefixArgs, absStandaloneDir, cleanupEnv, logsArgs...)
 				t.Logf("Docker Compose logs:\n%s", composeLogs)
 
 				t.Fatalf("MongoDB container failed to become healthy")
@@ -196,9 +195,8 @@ func TestFetchStandaloneVersions(t *testing.T) {
 				t.Logf("Current Docker containers:\n%s", string(listOutput))
 
 				// Show compose logs for debugging
-				logsCmd := append([]string{}, prefixArgs...)
-				logsCmd = append(logsCmd, "-f", "docker-compose.yml", "logs", "--tail=50")
-				composeLogs, _ := runComposeCommandOutput(cmdName, prefixArgs, absStandaloneDir, cleanupEnv, logsCmd...)
+				logsArgs := []string{"-f", "docker-compose.yml", "logs", "--tail=50"}
+				composeLogs, _ := runComposeCommandOutput(cmdName, prefixArgs, absStandaloneDir, cleanupEnv, logsArgs...)
 				t.Logf("Docker Compose logs:\n%s", composeLogs)
 
 				require.NoError(t, err, "seed standalone database")
@@ -479,9 +477,9 @@ func runSeedScript(scriptPath, dir string, env []string) error {
 		if err != nil {
 			return fmt.Errorf("seed script failed: %w (stdout: %s, stderr: %s)", err, outputBuf.String(), errorBuf.String())
 		}
-	case <-time.After(60 * time.Second):
+	case <-time.After(120 * time.Second):
 		cmd.Process.Kill()
-		return fmt.Errorf("seed script timed out after 60 seconds (stdout: %s, stderr: %s)", outputBuf.String(), errorBuf.String())
+		return fmt.Errorf("seed script timed out after 120 seconds (stdout: %s, stderr: %s)", outputBuf.String(), errorBuf.String())
 	}
 
 	return nil
