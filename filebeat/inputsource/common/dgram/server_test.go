@@ -15,26 +15,26 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build unix
-
-package instance
+package dgram
 
 import (
-	"fmt"
-	"os"
-
-	"golang.org/x/sys/unix"
+	"errors"
+	"net"
+	"testing"
 )
 
-func (b *Beat) doReexec() error {
-	binary, err := os.Executable()
-	if err != nil {
-		return fmt.Errorf("could not get working directory: %w", err)
-	}
+func TestListenerRunReturnsErrorWhenConnectionFails(t *testing.T) {
+	l := NewListener(
+		"test family",
+		"not used",
+		nil,
+		func() (net.PacketConn, error) {
+			return nil, errors.New("some error")
+		},
+		&ListenerConfig{},
+	)
 
-	if err := unix.Exec(binary, os.Args, os.Environ()); err != nil {
-		return fmt.Errorf("could not exec '%s', err: %w", binary, err)
+	if err := l.Run(t.Context()); err == nil {
+		t.Fatal("expecting an error from Listener.Run")
 	}
-
-	return nil
 }

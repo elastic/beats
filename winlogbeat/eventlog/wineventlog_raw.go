@@ -381,7 +381,16 @@ func (l *winEventLogRaw) createBookmarkFromEvent(evtHandle win.EvtHandle) (strin
 
 func (l *winEventLogRaw) Reset() error {
 	l.log.Debug("Closing event log reader handles for reset.")
-	return l.close()
+	// Only close the iterator, keep the renderer alive to avoid
+	// unnecessarily recreating render contexts. The renderer's
+	// systemContext and userContext should remain valid across
+	// session resets since they were created independently.
+	if l.iterator == nil {
+		return nil
+	}
+	err := l.iterator.Close()
+	l.iterator = nil
+	return err
 }
 
 func (l *winEventLogRaw) Close() error {
