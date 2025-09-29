@@ -39,12 +39,7 @@ func TestNewMiekgResolverWithIPv6(t *testing.T) {
 	const addr = `fe80::1%en0` // Example IPv6 address with zone index.
 
 	reg := monitoring.NewRegistry()
-<<<<<<< HEAD
-	_, err := newMiekgResolver(reg.NewRegistry(logName), 0, "udp", addr)
-=======
-
-	_, err := newMiekgResolver(reg.GetOrCreateRegistry(logName), 0, "udp", logp.NewNopLogger(), addr)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
+	_, err := newMiekgResolver(reg.NewRegistry(logName), 0, "udp", logp.NewNopLogger(), addr)
 	assert.NoError(t, err)
 }
 
@@ -58,11 +53,7 @@ func TestMiekgResolverLookupPTR(t *testing.T) {
 	}()
 
 	reg := monitoring.NewRegistry()
-<<<<<<< HEAD
-	res, err := newMiekgResolver(reg.NewRegistry(logName), 0, "udp", addr)
-=======
-	res, err := newMiekgResolver(reg.GetOrCreateRegistry(logName), 0, "udp", logp.NewNopLogger(), addr)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
+	res, err := newMiekgResolver(reg.NewRegistry(logName), 0, "udp", logp.NewNopLogger(), addr)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -113,11 +104,7 @@ func TestMiekgResolverLookupPTRTLS(t *testing.T) {
 
 	reg := monitoring.NewRegistry()
 
-<<<<<<< HEAD
-	res, err := newMiekgResolver(reg.NewRegistry(logName), 0, "tls", addr)
-=======
-	res, err := newMiekgResolver(reg.GetOrCreateRegistry(logName), 0, "tls", logp.NewNopLogger(), addr)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
+	res, err := newMiekgResolver(reg.NewRegistry(logName), 0, "tls", logp.NewNopLogger(), addr)
 	if err != nil {
 		t.Fatal(err)
 	}

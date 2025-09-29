@@ -110,12 +110,8 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	ctx.UpdateStatus(status.Starting, "")
 	ctx.UpdateStatus(status.Configuring, "")
 
-<<<<<<< HEAD
 	metrics := newInputMetrics(ctx.ID)
 	defer metrics.Close()
-=======
-	metrics := newInputMetrics(ctx.MetricsRegistry, ctx.Logger)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	if e.config.Tracer != nil {
 		id := sanitizeFileName(ctx.IDWithoutName)
@@ -474,12 +470,8 @@ type inputMetrics struct {
 	batchACKTime        metrics.Sample     // histogram of the elapsed successful batch acking times in nanoseconds (time of handler start to time of ACK for non-empty batches).
 }
 
-<<<<<<< HEAD
 func newInputMetrics(id string) *inputMetrics {
 	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
-=======
-func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	out := &inputMetrics{
 		unregister:          unreg,
 		bindAddr:            monitoring.NewString(reg, "bind_address"),
@@ -495,6 +487,7 @@ func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetric
 		batchProcessingTime: metrics.NewUniformSample(1024),
 		batchACKTime:        metrics.NewUniformSample(1024),
 	}
+	logger := logp.NewLogger("")
 	_ = adapter.NewGoMetrics(reg, "size", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.contentLength))
 	_ = adapter.NewGoMetrics(reg, "batch_size", logger, adapter.Accept).

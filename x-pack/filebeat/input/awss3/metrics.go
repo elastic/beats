@@ -14,11 +14,8 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
-=======
 	"github.com/elastic/elastic-agent-libs/logp"
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/go-concert/timed"
@@ -151,12 +148,8 @@ func (m *inputMetrics) updateSqsWorkerUtilization() {
 	m.sqsWorkerUtilizationLastUpdate = now
 }
 
-<<<<<<< HEAD
 func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers int) *inputMetrics {
 	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
-=======
-func newInputMetrics(reg *monitoring.Registry, maxWorkers int, logger *logp.Logger) *inputMetrics {
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	ctx, cancel := context.WithCancel(context.Background())
 
 	out := &inputMetrics{
@@ -191,6 +184,7 @@ func newInputMetrics(reg *monitoring.Registry, maxWorkers int, logger *logp.Logg
 	// Initializing the sqs_messages_waiting_gauge value to -1 so that we can distinguish between no messages waiting (0) and never collected / error collecting (-1).
 	out.sqsMessagesWaiting.Set(int64(-1))
 
+	logger := logp.NewLogger("")
 	adapter.NewGoMetrics(reg, "sqs_message_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sqsMessageProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	adapter.NewGoMetrics(reg, "sqs_lag_time", logger, adapter.Accept).

@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -96,7 +97,7 @@ func NewFromConfig(c Config, reg *monitoring.Registry) (beat.Processor, error) {
 		sessionPool: pool,
 		sourceProg:  prog,
 		sourceFile:  sourceFile,
-		stats:       getStats(c.Tag, reg, logger),
+		stats:       getStats(c.Tag, reg, logp.NewLogger("")),
 	}, nil
 }
 

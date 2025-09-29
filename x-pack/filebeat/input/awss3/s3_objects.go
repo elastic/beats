@@ -73,11 +73,7 @@ func newS3ObjectProcessorFactory(metrics *inputMetrics,
 ) *s3ObjectProcessorFactory {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
-<<<<<<< HEAD
 		metrics = newInputMetrics("", nil, 0)
-=======
-		metrics = newInputMetrics(monitoring.NewRegistry(), 0, logger)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	}
 	if len(sel) == 0 {
 		sel = []fileSelectorConfig{

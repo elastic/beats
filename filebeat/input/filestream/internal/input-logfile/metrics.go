@@ -20,11 +20,8 @@ package input_logfile
 import (
 	"github.com/rcrowley/go-metrics"
 
-<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
-=======
 	"github.com/elastic/elastic-agent-libs/logp"
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -50,7 +47,6 @@ type Metrics struct {
 	HarvesterOpenFiles *monitoring.Int
 }
 
-<<<<<<< HEAD
 func (m *Metrics) Close() {
 	if m == nil {
 		return
@@ -60,9 +56,6 @@ func (m *Metrics) Close() {
 }
 
 func NewMetrics(id string) *Metrics {
-=======
-func NewMetrics(reg *monitoring.Registry, logger *logp.Logger) *Metrics {
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	// The log input creates the `filebeat.harvester` registry as a package
 	// variable, so it should always exist before this function runs.
 	// However at least on testing scenarios this does not hold true, so
@@ -90,13 +83,8 @@ func NewMetrics(reg *monitoring.Registry, logger *logp.Logger) *Metrics {
 		HarvesterRunning:   monitoring.NewInt(harvesterMetrics, "running"),
 		HarvesterOpenFiles: monitoring.NewInt(harvesterMetrics, "open_files"),
 	}
-	_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", logp.NewLogger(""), adapter.Accept).
 		Register("histogram", metrics.NewHistogram(m.ProcessingTime))
-<<<<<<< HEAD
-=======
-	_ = adapter.NewGoMetrics(reg, "gzip_processing_time", logger, adapter.Accept).
-		Register("histogram", metrics.NewHistogram(m.ProcessingGZIPTime))
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	return &m
 }

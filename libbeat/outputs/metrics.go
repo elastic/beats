@@ -106,12 +106,7 @@ func NewStats(reg *monitoring.Registry, logger *logp.Logger) *Stats {
 
 		sendLatencyMillis: metrics.NewUniformSample(1024),
 	}
-<<<<<<< HEAD
-	_ = adapter.NewGoMetrics(reg, "write.latency", adapter.Accept).Register("histogram", metrics.NewHistogram(obj.sendLatencyMillis))
-=======
-	_ = adapter.NewGoMetrics(reg, "write.latency", logger, adapter.Accept).Register("histogram", metrics.NewHistogram(obj.sendLatencyLifetimeMillis))
-	_ = adapter.NewGoMetrics(reg, "write.latency_delta", logger, adapter.Accept).Register("histogram", adapter.NewClearOnVisitHistogram(obj.sendLatencyDeltaMillis))
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
+	_ = adapter.NewGoMetrics(reg, "write.latency", logger, adapter.Accept).Register("histogram", metrics.NewHistogram(obj.sendLatencyMillis))
 	return obj
 }
 

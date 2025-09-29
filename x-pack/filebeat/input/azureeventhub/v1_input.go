@@ -81,12 +81,8 @@ func (in *eventHubInputV1) Run(
 	defer in.pipelineClient.Close()
 
 	// Setup input metrics
-<<<<<<< HEAD
 	in.metrics = newInputMetrics(inputContext.ID, nil)
 	defer in.metrics.Close()
-=======
-	in.metrics = newInputMetrics(inputContext.MetricsRegistry, inputContext.Logger)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	// Set up new and legacy sanitizers, if any.
 	sanitizers, err := newSanitizers(in.config.Sanitizers, in.config.LegacySanitizeOptions)

@@ -9,11 +9,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-<<<<<<< HEAD
-=======
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/elastic-agent-libs/logp"
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -37,15 +32,7 @@ func TestInputMetricsClose(t *testing.T) {
 // a getter is invoked on any uninitialized metric.
 func TestNewInputMetricsInstance(t *testing.T) {
 	reg := monitoring.NewRegistry()
-<<<<<<< HEAD
 	metrics := newInputMetrics("streaming-metric-test", reg)
-=======
-	env := v2.Context{
-		ID:              "streaming-metric-test",
-		MetricsRegistry: reg,
-	}
-	metrics := newInputMetrics(env.MetricsRegistry, logp.NewNopLogger())
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	assert.NotNil(t,
 		metrics.errorsTotal,
