@@ -291,19 +291,24 @@ func TestMultipleReceivers(t *testing.T) {
 				return getFromSocket(t, &lastError, monitorSocket2, "inputs")
 			}, "failed to connect to monitoring socket2, inputs endpoint, last error was: %s", &lastError)
 
+			ingest1Json, err := json.Marshal(ingest1)
+			require.NoError(c, err)
+			ingest2Json, err := json.Marshal(ingest2)
+			require.NoError(c, err)
+
 			reg1Path := filepath.Join(dir1, "/data/registry/filebeat/log.json")
 			require.FileExists(c, reg1Path, "receiver 1 filebeat registry should exist")
 			reg1Data, err := os.ReadFile(reg1Path)
 			require.NoError(c, err)
-			require.Containsf(c, string(reg1Data), ingest1, "receiver 1 registry should contain '%s', but was: %s", ingest1, string(reg1Data))
-			require.NotContainsf(c, string(reg1Data), ingest2, "receiver 1 registry should not contain '%s', but was: %s", ingest2, string(reg1Data))
+			require.Containsf(c, string(reg1Data), string(ingest1Json), "receiver 1 registry should contain '%s', but was: %s", string(ingest1Json), string(reg1Data))
+			require.NotContainsf(c, string(reg1Data), string(ingest2Json), "receiver 1 registry should not contain '%s', but was: %s", string(ingest2Json), string(reg1Data))
 
 			reg2Path := filepath.Join(dir2, "/data/registry/filebeat/log.json")
 			require.FileExists(c, reg2Path, "receiver 2 filebeat registry should exist")
 			reg2Data, err := os.ReadFile(reg2Path)
 			require.NoError(c, err)
-			require.Containsf(c, string(reg2Data), ingest2, "receiver 2 registry should contain '%s', but was: %s", ingest2, string(reg2Data))
-			require.NotContainsf(c, string(reg2Data), ingest1, "receiver 2 registry should not contain '%s', but was: %s", ingest1, string(reg2Data))
+			require.Containsf(c, string(reg2Data), string(ingest2Json), "receiver 2 registry should contain '%s', but was: %s", string(ingest2Json), string(reg2Data))
+			require.NotContainsf(c, string(reg2Data), string(ingest1Json), "receiver 2 registry should not contain '%s', but was: %s", string(ingest1Json), string(reg2Data))
 		},
 	})
 }
