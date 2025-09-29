@@ -50,7 +50,7 @@ func TestFetch(t *testing.T) {
 	assert.NotEmpty(t, events)
 
 	for _, event := range events {
-		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+		logIfVerbose(t, "%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 		metricsetFields := event.MetricSetFields
 
 		// Check a few event Fields
@@ -112,7 +112,7 @@ func TestFetchStandaloneVersions(t *testing.T) {
 	for _, tc := range cases {
 		tc := tc
 		t.Run("mongo_"+strings.ReplaceAll(tc.version, ".", "_"), func(t *testing.T) {
-			t.Logf("Starting test for MongoDB %s on port %s", tc.version, tc.port)
+			logIfVerbose(t, "Starting test for MongoDB %s on port %s", tc.version, tc.port)
 
 			require.NoError(t, os.Chdir(absStandaloneDir))
 			t.Cleanup(func() {
@@ -122,12 +122,12 @@ func TestFetchStandaloneVersions(t *testing.T) {
 			})
 
 			projectName := fmt.Sprintf("mbcollstatsstandalone%s", strings.ReplaceAll(tc.version, ".", ""))
-			t.Logf("Using project name: %s", projectName)
-			t.Logf("Setting environment variables:")
-			t.Logf("  DOCKER_COMPOSE_PROJECT_NAME=%s", projectName)
-			t.Logf("  COMPOSE_PROJECT_NAME=%s", projectName)
-			t.Logf("  MONGO_VERSION=%s", tc.version)
-			t.Logf("  MONGO_PORT=%s", tc.port)
+			logIfVerbose(t, "Using project name: %s", projectName)
+			logIfVerbose(t, "Setting environment variables:")
+			logIfVerbose(t, "  DOCKER_COMPOSE_PROJECT_NAME=%s", projectName)
+			logIfVerbose(t, "  COMPOSE_PROJECT_NAME=%s", projectName)
+			logIfVerbose(t, "  MONGO_VERSION=%s", tc.version)
+			logIfVerbose(t, "  MONGO_PORT=%s", tc.port)
 
 			t.Setenv("DOCKER_COMPOSE_PROJECT_NAME", projectName)
 			t.Setenv("COMPOSE_PROJECT_NAME", projectName)
@@ -135,17 +135,17 @@ func TestFetchStandaloneVersions(t *testing.T) {
 			t.Setenv("MONGO_PORT", tc.port)
 
 			cleanupEnv := buildComposeEnv(projectName, tc.version, tc.port)
-			t.Logf("Compose environment: %v", cleanupEnv)
+			logIfVerbose(t, "Compose environment: %v", cleanupEnv)
 
 			t.Cleanup(func() {
-				t.Logf("Cleaning up Docker Compose project %s", projectName)
+				logIfVerbose(t, "Cleaning up Docker Compose project %s", projectName)
 				downArgs := []string{"-f", "docker-compose.yml", "down", "-v"}
 				if err := runComposeCommand(cmdName, prefixArgs, absStandaloneDir, cleanupEnv, downArgs...); err != nil {
 					t.Logf("failed to tear down compose project %s: %v", projectName, err)
 				}
 			})
 
-			t.Logf("Starting MongoDB container...")
+			logIfVerbose(t, "Starting MongoDB container...")
 			// Start the container using docker-compose
 			upArgs := []string{"-f", "docker-compose.yml", "up", "-d"}
 			if err := runComposeCommand(cmdName, prefixArgs, absStandaloneDir, cleanupEnv, upArgs...); err != nil {
@@ -153,10 +153,10 @@ func TestFetchStandaloneVersions(t *testing.T) {
 			}
 
 			// Wait for container to be healthy
-			t.Logf("Waiting for MongoDB to be healthy...")
+			logIfVerbose(t, "Waiting for MongoDB to be healthy...")
 			var containerReady bool
 			for i := 0; i < 30; i++ {
-				healthCmd := exec.Command("docker", "ps", "--filter", fmt.Sprintf("name=%s", projectName), "--filter", "health=healthy", "--format", "{{.Names}}")
+				healthCmd := exec.Command("docker", "ps", "--filter", fmt.Sprintf("name=%s", projectName), "--filter", "health=healthy", "--format", "{{.Names}}") //nolint:gosec // safe integration test
 				output, _ := healthCmd.CombinedOutput()
 				if strings.TrimSpace(string(output)) != "" {
 					containerReady = true
@@ -167,7 +167,7 @@ func TestFetchStandaloneVersions(t *testing.T) {
 
 			if !containerReady {
 				// Show container status for debugging
-				statusCmd := exec.Command("docker", "ps", "-a", "--filter", fmt.Sprintf("name=%s", projectName), "--format", "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}")
+				statusCmd := exec.Command("docker", "ps", "-a", "--filter", fmt.Sprintf("name=%s", projectName), "--format", "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}") //nolint:gosec // safe integration test
 				statusOutput, _ := statusCmd.CombinedOutput()
 				t.Logf("Container status:\n%s", string(statusOutput))
 
@@ -181,10 +181,10 @@ func TestFetchStandaloneVersions(t *testing.T) {
 
 			// Construct the host string
 			mongoHostStr := fmt.Sprintf("mongodb://localhost:%s", tc.port)
-			t.Logf("MongoDB container started and healthy, host: %s", mongoHostStr)
+			logIfVerbose(t, "MongoDB container started and healthy, host: %s", mongoHostStr)
 
-			t.Logf("Running seed script from: %s", seedScript)
-			t.Logf("Seed script working directory: %s", absStandaloneDir)
+			logIfVerbose(t, "Running seed script from: %s", seedScript)
+			logIfVerbose(t, "Seed script working directory: %s", absStandaloneDir)
 
 			// Check if bash is available
 			if _, err := exec.LookPath("bash"); err != nil {
@@ -195,7 +195,7 @@ func TestFetchStandaloneVersions(t *testing.T) {
 			if info, err := os.Stat(seedScript); err != nil {
 				t.Logf("Warning: cannot stat seed script: %v", err)
 			} else {
-				t.Logf("Seed script permissions: %v", info.Mode())
+				logIfVerbose(t, "Seed script permissions: %v", info.Mode())
 			}
 
 			seedStart := time.Now()
@@ -215,19 +215,19 @@ func TestFetchStandaloneVersions(t *testing.T) {
 
 				require.NoError(t, err, "seed standalone database")
 			}
-			t.Logf("Seed script completed successfully in %v", time.Since(seedStart))
+			logIfVerbose(t, "Seed script completed successfully in %v", time.Since(seedStart))
 
-			t.Logf("Creating metricset with config for host: %s", mongoHostStr)
+			logIfVerbose(t, "Creating metricset with config for host: %s", mongoHostStr)
 			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(mongoHostStr))
 
-			t.Logf("Fetching collstats events...")
+			logIfVerbose(t, "Fetching collstats events...")
 			events, errs := mbtest.ReportingFetchV2Error(f)
 			if len(errs) > 0 {
 				t.Logf("Fetch errors: %v", errs)
 			}
 			require.Empty(t, errs, "expected no fetch errors")
 			require.NotEmpty(t, events, "expected collstats events")
-			t.Logf("Fetched %d collstats events", len(events))
+			logIfVerbose(t, "Fetched %d collstats events", len(events))
 
 			verifyStandaloneEvents(t, events, tc.expectExtendedStats)
 		})
@@ -507,12 +507,33 @@ func runSeedScript(scriptPath, dir string, env []string) error {
 			return fmt.Errorf("seed script failed with %s: %w\nSTDOUT:\n%s\nSTDERR:\n%s", shell, err, outputBuf.String(), errorBuf.String())
 		}
 	case <-time.After(120 * time.Second):
-		cmd.Process.Kill()
+		_ = cmd.Process.Kill()
 		wg.Wait()
 		return fmt.Errorf("seed script timed out after 120 seconds with %s\nSTDOUT:\n%s\nSTDERR:\n%s", shell, outputBuf.String(), errorBuf.String())
 	}
 
 	return nil
+}
+
+func logIfVerbose(t *testing.T, format string, args ...interface{}) {
+	if !shouldLogVerbose() {
+		return
+	}
+
+	t.Helper()
+	t.Logf(format, args...)
+}
+
+func shouldLogVerbose() bool {
+	if v := strings.ToLower(os.Getenv("METRICBEAT_COLLSTATS_LOGS")); v == "1" || v == "true" || v == "yes" {
+		return true
+	}
+
+	if os.Getenv("CI") != "" {
+		return false
+	}
+
+	return testing.Verbose()
 }
 
 func buildComposeEnv(projectName, version, port string) []string {

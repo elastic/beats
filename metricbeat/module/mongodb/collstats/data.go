@@ -19,6 +19,7 @@ package collstats
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -106,7 +107,14 @@ func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
 	}
 
 	// Optionally enrich stats with extended fields if present
-	statsMap := event["stats"].(mapstr.M)
+	statsValue, ok := event["stats"]
+	if !ok {
+		return nil, errors.New("event stats section is missing")
+	}
+	statsMap, ok := statsValue.(mapstr.M)
+	if !ok {
+		return nil, fmt.Errorf("event stats has unexpected type %T", statsValue)
+	}
 
 	// For each optional key, only set if present in source data
 	optionalKeys := []string{

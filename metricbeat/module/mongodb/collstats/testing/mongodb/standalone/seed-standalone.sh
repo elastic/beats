@@ -1,14 +1,35 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "[DEBUG] Starting seed-standalone.sh script"
-echo "[DEBUG] Shell: $SHELL"
-echo "[DEBUG] Script: $0"
-echo "[DEBUG] Environment variables:"
-echo "[DEBUG]   COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-<not set>}"
-echo "[DEBUG]   MONGO_PORT=${MONGO_PORT:-<not set>}"
-echo "[DEBUG]   PWD=$(pwd)"
-echo "[DEBUG]   PATH=$PATH"
+COLLSTATS_VERBOSE=0
+case "${METRICBEAT_COLLSTATS_LOGS:-}" in
+    1|true|TRUE|yes|YES)
+        COLLSTATS_VERBOSE=1
+        ;;
+esac
+
+if [ -z "${METRICBEAT_COLLSTATS_LOGS:-}" ] && [ -z "${CI:-}" ]; then
+    COLLSTATS_VERBOSE=1
+fi
+
+log_info() {
+    printf '[INFO] %s\n' "$*"
+}
+
+log_debug() {
+    if [ "$COLLSTATS_VERBOSE" = "1" ]; then
+        printf '[DEBUG] %s\n' "$*" >&2
+    fi
+}
+
+log_debug "Starting seed-standalone.sh script"
+log_debug "Shell: ${SHELL:-<unknown>}"
+log_debug "Script: $0"
+log_debug "Environment variables:"
+log_debug "  COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-<not set>}"
+log_debug "  MONGO_PORT=${MONGO_PORT:-<not set>}"
+log_debug "  PWD=$(pwd)"
+log_debug "  PATH=$PATH"
 
 # Check if docker is available
 if ! command -v docker >/dev/null 2>&1; then
@@ -19,31 +40,32 @@ fi
 # Detect Docker Compose project prefix - defaults to current directory name
 if [ -z "${COMPOSE_PROJECT_NAME:-}" ]; then
     PROJECT_PREFIX=$(basename "$(pwd)")
-    echo "[DEBUG] Using directory name for PROJECT_PREFIX: $PROJECT_PREFIX"
+    log_debug "Using directory name for PROJECT_PREFIX: $PROJECT_PREFIX"
 else
     PROJECT_PREFIX="$COMPOSE_PROJECT_NAME"
-    echo "[DEBUG] Using COMPOSE_PROJECT_NAME for PROJECT_PREFIX: $PROJECT_PREFIX"
+    log_debug "Using COMPOSE_PROJECT_NAME for PROJECT_PREFIX: $PROJECT_PREFIX"
 fi
 
 # Try both naming conventions (Docker Compose v1 uses underscores, v2 uses hyphens)
 CONTAINER_NAME_HYPHEN="${PROJECT_PREFIX}-mongodb-1"
 CONTAINER_NAME_UNDERSCORE="${PROJECT_PREFIX}_mongodb_1"
 
-echo "[DEBUG] Looking for container with names:"
-echo "[DEBUG]   Hyphen format: ${CONTAINER_NAME_HYPHEN}"
-echo "[DEBUG]   Underscore format: ${CONTAINER_NAME_UNDERSCORE}"
+log_debug "Looking for container with names:"
+log_debug "  Hyphen format: ${CONTAINER_NAME_HYPHEN}"
+log_debug "  Underscore format: ${CONTAINER_NAME_UNDERSCORE}"
 
-# List all containers for debugging
-echo "[DEBUG] Current Docker containers:"
-docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" 2>/dev/null | head -20 || true
+if [ "$COLLSTATS_VERBOSE" = "1" ]; then
+  log_debug "Current Docker containers:"
+  docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" 2>/dev/null | head -20 || true
+fi
 
 # Check which container name exists (try underscore first as it's more common in CI)
 if docker ps -a --format "{{.Names}}" 2>/dev/null | grep -q "^${CONTAINER_NAME_UNDERSCORE}$"; then
     CONTAINER_NAME="${CONTAINER_NAME_UNDERSCORE}"
-    echo "[DEBUG] Found container with underscore format: ${CONTAINER_NAME}"
+    log_debug "Found container with underscore format: ${CONTAINER_NAME}"
 elif docker ps -a --format "{{.Names}}" 2>/dev/null | grep -q "^${CONTAINER_NAME_HYPHEN}$"; then
     CONTAINER_NAME="${CONTAINER_NAME_HYPHEN}"
-    echo "[DEBUG] Found container with hyphen format: ${CONTAINER_NAME}"
+    log_debug "Found container with hyphen format: ${CONTAINER_NAME}"
 else
     echo "[ERROR] Could not find container with name ${CONTAINER_NAME_HYPHEN} or ${CONTAINER_NAME_UNDERSCORE}"
     echo "[ERROR] Available containers:"
@@ -57,62 +79,62 @@ retry() {
   local n=0
   until "$@" 2>/dev/null; do
     n=$((n+1))
-    echo "[DEBUG] Retry attempt $n/30 for command: $*" >&2
+        log_debug "Retry attempt $n/30 for command: $*"
     if [ $n -ge 30 ]; then
       echo "[ERROR] Command failed after 30 attempts: $*" >&2
       return 1
     fi
     sleep 2
   done
-  echo "[DEBUG] Command succeeded on attempt $n: $*" >&2
+    log_debug "Command succeeded on attempt $n: $*"
 }
 
 shell_cmd() {
   local cn=$1; shift
-  echo "[DEBUG] Detecting shell command for container: $cn" >&2
+    log_debug "Detecting shell command for container: $cn"
   # Try mongosh first (MongoDB 5.0+)
   if docker exec "$cn" which mongosh >/dev/null 2>&1; then
-    echo "[DEBUG] Found mongosh in container" >&2
+        log_debug "Found mongosh in container"
     echo "mongosh"
     return
   fi
   # Fall back to mongo for older versions
   if docker exec "$cn" which mongo >/dev/null 2>&1; then
-    echo "[DEBUG] Found mongo in container" >&2
+        log_debug "Found mongo in container"
     echo "mongo"
     return
   fi
-  echo "[ERROR] Neither mongosh nor mongo found in container" >&2
+    echo "[ERROR] Neither mongosh nor mongo found in container" >&2
   return 1
 }
 
-echo "[INFO] Seeding MongoDB standalone instance"
-echo "[INFO] Container: $CONTAINER_NAME"
-echo "[INFO] Database: $DB_NAME"
+log_info "Seeding MongoDB standalone instance"
+log_info "Container: $CONTAINER_NAME"
+log_info "Database: $DB_NAME"
 
 # Detect shell command
-echo "[DEBUG] Detecting MongoDB shell command..."
+log_debug "Detecting MongoDB shell command..."
 if ! SHELL_CMD=$(shell_cmd "$CONTAINER_NAME"); then
     echo "[ERROR] Failed to detect MongoDB shell command"
     docker exec "$CONTAINER_NAME" ls -la /usr/bin/ | grep -E "mongo|mongosh" || true
     exit 1
 fi
-echo "[INFO] Using shell: $SHELL_CMD"
+log_info "Using shell: $SHELL_CMD"
 
 # Wait for MongoDB
-echo "[INFO] Waiting for MongoDB to be ready..."
-echo "[DEBUG] Testing connection with: docker exec $CONTAINER_NAME $SHELL_CMD --quiet --eval \"db.adminCommand('ping')\""
+log_info "Waiting for MongoDB to be ready..."
+log_debug "Testing connection with: docker exec $CONTAINER_NAME $SHELL_CMD --quiet --eval \"db.adminCommand('ping')\""
 if ! retry docker exec "$CONTAINER_NAME" $SHELL_CMD --quiet --eval "db.adminCommand('ping')"; then
     echo "[ERROR] MongoDB failed to become ready after 30 attempts"
     echo "[DEBUG] Container logs:"
     docker logs "$CONTAINER_NAME" --tail=50
     exit 1
 fi
-echo "[INFO] MongoDB is ready"
+log_info "MongoDB is ready"
 
 # Seed database
-echo "[INFO] Seeding database '$DB_NAME'..."
-echo "[DEBUG] Running seed commands via: docker exec -i $CONTAINER_NAME $SHELL_CMD --quiet"
+log_info "Seeding database '$DB_NAME'..."
+log_debug "Running seed commands via: docker exec -i $CONTAINER_NAME $SHELL_CMD --quiet"
 cat <<'JS' | docker exec -i "$CONTAINER_NAME" $SHELL_CMD --quiet
 use mbtest
 
@@ -178,7 +200,7 @@ for (let i = 1; i <= 5000; i++) {
 print("Database seeded successfully");
 JS
 
-echo "[INFO] Seeding completed successfully!"
-echo "[INFO] MongoDB is available at: localhost:${MONGO_PORT:-27017}"
-echo "[INFO] Database: $DB_NAME"
-echo "[DEBUG] Script completed successfully"
+log_info "Seeding completed successfully!"
+log_info "MongoDB is available at: localhost:${MONGO_PORT:-27017}"
+log_info "Database: $DB_NAME"
+log_debug "Script completed successfully"
