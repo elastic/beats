@@ -8,6 +8,7 @@ package integration
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -16,6 +17,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"testing"
 	"time"
@@ -122,20 +124,14 @@ processors:
 	require.EventuallyWithTf(t,
 		func(ct *assert.CollectT) {
 			for _, url := range []string{outFileURL, outOTelFileURL} {
-				resp, err := http.Head(url) // nolint:gosec // local Nginx in integration test
-				if !assert.NoError(ct, err, "URL %s should exist", url) {
-					return
-				}
-				if !assert.Equal(ct, http.StatusOK, resp.StatusCode, "URL %s should return HTTP 200", url) {
-					return
-				}
+				checkURLHasContent(ct, url)
 			}
 		},
 		2*time.Minute, 1*time.Second, "expected Logstash to write files for both filebeat and otel mode")
 
 	// download files from Nginx into temp files
-	fbFilePath := downloadToTempFile(t, outFileURL, fmt.Sprintf("%s_fb.json", testCaseName))
-	otelFilePath := downloadToTempFile(t, outOTelFileURL, fmt.Sprintf("%s_otel.json", testCaseName))
+	fbFilePath := downloadToTestData(t, outFileURL, fmt.Sprintf("%s_fb.json", testCaseName))
+	otelFilePath := downloadToTestData(t, outOTelFileURL, fmt.Sprintf("%s_otel.json", testCaseName))
 
 	ignoredFields := []string{
 		// Expected to change between agentDocs and OtelDocs
@@ -333,19 +329,60 @@ func sortEventsByID(events []eventWithID) {
 	})
 }
 
-func downloadToTempFile(t *testing.T, url string, filename string) string {
-	resp, err := http.Get(url) // nolint:gosec // local Nginx in integration test
-	require.NoError(t, err, "failed to GET %s", url)
+func checkURLHasContent(ct *assert.CollectT, url string) {
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, url, nil)
+	if !assert.NoError(ct, err, "failed to create request for URL %s", url) {
+		return
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if !assert.NoError(ct, err, "URL %s should exist", url) {
+		return
+	}
 	defer resp.Body.Close()
 
-	require.Equal(t, http.StatusOK, resp.StatusCode, "GET %s returned %d", url, resp.StatusCode)
+	if !assert.Equal(ct, http.StatusOK, resp.StatusCode, "URL %s should return HTTP 200", url) {
+		return
+	}
 
-	tmpFile, err := os.CreateTemp("", filename)
-	require.NoError(t, err, "failed to create temp file")
-	defer tmpFile.Close()
+	body, err := io.ReadAll(resp.Body)
+	if !assert.NoError(ct, err, "failed to read body from %s", url) {
+		return
+	}
 
-	_, err = io.Copy(tmpFile, resp.Body)
+	if !assert.Greater(ct, len(body), 0, "URL %s should have content", url) {
+		return
+	}
+}
+
+func downloadToTestData(t *testing.T, url string, filename string) string {
+	// get http response
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, url, nil)
+	require.NoError(t, err, "error creating request")
+
+	resp, err := http.DefaultClient.Do(req)
+	require.NoError(t, err, "calling nginx endpoint")
+	defer resp.Body.Close()
+
+	// get path to current file
+	_, currentFile, _, ok := runtime.Caller(0)
+	require.True(t, ok, "failed to get current file path")
+
+	// create testdata directory
+	filePath := filepath.Join(filepath.Dir(currentFile), "logstash", "testdata", filename)
+	err = os.MkdirAll(filepath.Dir(filePath), 0o755)
+	require.NoError(t, err, "failed to create testdata directory")
+
+	// create file
+	file, err := os.Create(filePath)
+	require.NoError(t, err, "failed to create file %s", filePath)
+	defer file.Close()
+
+	_, err = io.Copy(file, resp.Body)
 	require.NoError(t, err, "failed to copy data from %s", url)
 
-	return tmpFile.Name()
+	err = file.Sync()
+	require.NoError(t, err, "failed to sync file %s", filePath)
+
+	return filePath
 }
