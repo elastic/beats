@@ -33,7 +33,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
@@ -65,7 +64,7 @@ func newWrapperDriver() (*wrapperDriver, error) {
 }
 
 type wrapperContainer struct {
-	info types.Container
+	info container.Summary
 }
 
 func (c *wrapperContainer) ServiceName() string {
@@ -236,7 +235,7 @@ func writeToContainer(ctx context.Context, cli *client.Client, id, filename, con
 		return fmt.Errorf("failed to close tar: %w", err)
 	}
 
-	opts := types.CopyToContainerOptions{}
+	opts := container.CopyToContainerOptions{}
 	err = cli.CopyToContainer(ctx, id, filepath.Dir(filename), bytes.NewReader(buf.Bytes()), opts)
 	if err != nil {
 		return fmt.Errorf("failed to copy environment to container %s: %w", id, err)
@@ -329,7 +328,7 @@ func (d *wrapperDriver) Containers(ctx context.Context, projectFilter Filter, fi
 	return ids, nil
 }
 
-func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, filter ...string) ([]types.Container, error) {
+func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, filter ...string) ([]container.Summary, error) {
 	var serviceFilters []filters.Args
 	if len(filter) == 0 {
 		f := makeFilter(d.Name, "", projectFilter)
@@ -346,7 +345,7 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 		return nil, fmt.Errorf("failed to get container list: %w", err)
 	}
 
-	var containers []types.Container
+	var containers []container.Summary
 	for _, f := range serviceFilters {
 		list, err := d.client.ContainerList(ctx, container.ListOptions{
 			All:     true,
@@ -420,7 +419,7 @@ func (d *wrapperDriver) Inspect(ctx context.Context, serviceName string) (string
 	}
 
 	var found bool
-	var c types.Container
+	var c container.Summary
 	for _, container := range list {
 		aServiceName, ok := container.Labels[labelComposeService]
 		if ok && serviceName == aServiceName {
