@@ -337,10 +337,10 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: Packaging Linux"
 
-      - label: ":ubuntu: x-pack/heartbeat: Packaging Linux arm64"
+      - label: ":ubuntu: x-pack/heartbeat: Packaging arm64"
         key: "packaging-arm"
         env:
-          PLATFORMS: "+all linux/arm64 darwin/arm64"
+          PLATFORMS: "+all linux/arm64 darwin/arm64 windows/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/heartbeat
         retry:
