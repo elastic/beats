@@ -33,6 +33,7 @@ extensions:
   beatsauth:
     idle_connection_timeout: 3s
     proxy_disable: false
+    proxy_url: https://tikugfk.example
     timeout: 1m30s
 exporters:
   elasticsearch:
@@ -90,7 +91,7 @@ receivers:
         username: elastic
         password: changeme
         index: form-otel-exporter
-        proxy_url: https://tikugfk
+        proxy_url: https://tikugfk.example
 service:
   pipelines:
     logs:
@@ -268,6 +269,7 @@ receivers:
         hosts: ["https://localhost:9200"]
         username: elastic
         password: changeme
+        proxy_url: https://tikugfk.example        
         index: form-otel-exporter
         queue:
           mem:
