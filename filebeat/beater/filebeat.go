@@ -109,7 +109,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		EnableAllFilesets:         enableAllFilesets,
 		ForceEnableModuleFilesets: forceEnableModuleFilesets,
 	}
-	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true, filesetOverrides)
+	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true, filesetOverrides, b.Paths)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +197,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 			ForceEnableModuleFilesets: forceEnableModuleFilesets,
 		}
 
-		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory, filesetOverrides)
+		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory, filesetOverrides, b.Paths)
 		if fb.config.ConfigModules.Enabled() {
 			if enableAllFilesets {
 				// All module configs need to be loaded to enable all the filesets
@@ -207,7 +207,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 				newPath := strings.TrimSuffix(origPath, ".yml")
 				_ = fb.config.ConfigModules.SetString("path", -1, newPath)
 			}
-			modulesLoader := cfgfile.NewReloader(fb.logger.Named("module.reloader"), fb.pipeline, fb.config.ConfigModules)
+			modulesLoader := cfgfile.NewReloader(fb.logger.Named("module.reloader"), fb.pipeline, fb.config.ConfigModules, b.Paths)
 			modulesLoader.Load(modulesFactory)
 		}
 
@@ -266,7 +266,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			"Filebeat's registry",
 			"registry.tar.gz",
 			"application/octet-stream",
+<<<<<<< HEAD
 			gzipRegistry)
+=======
+			gzipRegistry(b.Info.Logger, b.Paths))
+>>>>>>> e55e0bedd ([fbreceiver] partial fix for global paths (#46779))
 	}
 
 	if !fb.moduleRegistry.Empty() {
@@ -288,7 +292,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	finishedLogger := newFinishedLogger(wgEvents)
 
-	registryMigrator := registrar.NewMigrator(config.Registry, fb.logger)
+	registryMigrator := registrar.NewMigrator(config.Registry, fb.logger, b.Paths)
 	if err := registryMigrator.Run(); err != nil {
 		fb.logger.Errorf("Failed to migrate registry file: %+v", err)
 		return err
@@ -301,7 +305,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		cn()
 	}()
 
-	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry)
+	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry, b.Paths)
 	if err != nil {
 		fb.logger.Errorf("Failed to open state store: %+v", err)
 		return err
@@ -367,7 +371,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	pipelineConnector := channel.NewOutletFactory(outDone).Create
 
 	inputsLogger := fb.logger.Named("input")
+<<<<<<< HEAD
 	v2Inputs := fb.pluginFactory(b.Info, inputsLogger, stateStore)
+=======
+	v2Inputs := fb.pluginFactory(b.Info, inputsLogger, stateStore, b.Paths)
+>>>>>>> e55e0bedd ([fbreceiver] partial fix for global paths (#46779))
 	v2InputLoader, err := v2.NewLoader(inputsLogger, v2Inputs, "type", cfg.DefaultType)
 	if err != nil {
 		panic(err) // loader detected invalid state.
@@ -409,8 +417,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			fb.logger.Warn(pipelinesWarning)
 		}
 	}
-	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
-	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once, fb.logger)
+	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines, b.Paths)
+	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once, fb.logger, b.Paths)
 	if err != nil {
 		fb.logger.Errorf("Could not init crawler: %v", err)
 		return err

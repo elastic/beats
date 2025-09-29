@@ -287,7 +287,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 	// Dynamic file based modules (metricbeat.config.modules)
 	if bt.config.ConfigModules.Enabled() {
-		moduleReloader := cfgfile.NewReloader(bt.logger.Named("module.reload"), b.Publisher, bt.config.ConfigModules)
+		moduleReloader := cfgfile.NewReloader(bt.logger.Named("module.reload"), b.Publisher, bt.config.ConfigModules, b.Paths)
 
 		if err := moduleReloader.Check(factory); err != nil {
 			return err
@@ -329,7 +329,6 @@ func (bt *Metricbeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
 // result in undefined behavior.
 func (bt *Metricbeat) Stop() {
 	bt.stopOnce.Do(func() { close(bt.done) })
-
 }
 
 // Modules return a list of all configured modules.
