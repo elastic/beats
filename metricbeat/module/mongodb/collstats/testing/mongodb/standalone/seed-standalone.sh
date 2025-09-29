@@ -35,19 +35,19 @@ echo "[DEBUG]   Underscore format: ${CONTAINER_NAME_UNDERSCORE}"
 
 # List all containers for debugging
 echo "[DEBUG] Current Docker containers:"
-docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | head -20
+docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" 2>/dev/null | head -20 || true
 
-# Check which container name exists
-if docker ps -a --format "{{.Names}}" | grep -q "^${CONTAINER_NAME_HYPHEN}$"; then
-    CONTAINER_NAME="${CONTAINER_NAME_HYPHEN}"
-    echo "[DEBUG] Found container with hyphen format: ${CONTAINER_NAME}"
-elif docker ps -a --format "{{.Names}}" | grep -q "^${CONTAINER_NAME_UNDERSCORE}$"; then
+# Check which container name exists (try underscore first as it's more common in CI)
+if docker ps -a --format "{{.Names}}" 2>/dev/null | grep -q "^${CONTAINER_NAME_UNDERSCORE}$"; then
     CONTAINER_NAME="${CONTAINER_NAME_UNDERSCORE}"
     echo "[DEBUG] Found container with underscore format: ${CONTAINER_NAME}"
+elif docker ps -a --format "{{.Names}}" 2>/dev/null | grep -q "^${CONTAINER_NAME_HYPHEN}$"; then
+    CONTAINER_NAME="${CONTAINER_NAME_HYPHEN}"
+    echo "[DEBUG] Found container with hyphen format: ${CONTAINER_NAME}"
 else
     echo "[ERROR] Could not find container with name ${CONTAINER_NAME_HYPHEN} or ${CONTAINER_NAME_UNDERSCORE}"
     echo "[ERROR] Available containers:"
-    docker ps -a --format "{{.Names}}" | grep -i "${PROJECT_PREFIX}" || echo "[ERROR] No containers matching project prefix: ${PROJECT_PREFIX}"
+    docker ps -a --format "{{.Names}}" 2>/dev/null | grep -i "${PROJECT_PREFIX}" || echo "[ERROR] No containers matching project prefix: ${PROJECT_PREFIX}"
     exit 1
 fi
 
@@ -55,16 +55,16 @@ DB_NAME="${DB_NAME:-mbtest}"
 
 retry() {
   local n=0
-  until "$@"; do
+  until "$@" 2>/dev/null; do
     n=$((n+1))
-    echo "[DEBUG] Retry attempt $n/30 for command: $*"
+    echo "[DEBUG] Retry attempt $n/30 for command: $*" >&2
     if [ $n -ge 30 ]; then
-      echo "[ERROR] Command failed after 30 attempts: $*"
+      echo "[ERROR] Command failed after 30 attempts: $*" >&2
       return 1
     fi
     sleep 2
   done
-  echo "[DEBUG] Command succeeded on attempt $n: $*"
+  echo "[DEBUG] Command succeeded on attempt $n: $*" >&2
 }
 
 shell_cmd() {
