@@ -62,7 +62,7 @@ func TestNamedPipe(t *testing.T) {
 	assert.Equal(t, "ehlo!", string(body))
 }
 
-func TestCreateListener(t *testing.T) {
+func TestCreateListenerSamePipe(t *testing.T) {
 	name := "npipe:///testpipe"
 
 	cfg := config.MustNewConfigFrom(map[string]interface{}{
