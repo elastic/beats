@@ -6,10 +6,12 @@ package gcpbigquery
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
+	"strconv"
 	"time"
 
 	"cloud.google.com/go/bigquery"
@@ -21,15 +23,15 @@ import (
 
 // internal interfaces for testing
 type client interface {
-	query(string) query
+	query(query string, params map[string]interface{}) query
 }
 
 type query interface {
-	read(context.Context) (rowIterator, error)
+	read(ctx context.Context) (rowIterator, error)
 }
 
 type rowIterator interface {
-	next(*[]bigquery.Value) error
+	next(val *[]bigquery.Value) error
 	schema() bigquery.Schema
 }
 
@@ -38,8 +40,16 @@ type realClient struct {
 	*bigquery.Client
 }
 
-func (r *realClient) query(queryString string) query {
-	return &realQuery{r.Query(queryString)}
+func (r *realClient) query(queryString string, params map[string]interface{}) query {
+	q := r.Query(queryString)
+	for k, v := range params {
+		q.Parameters = append(q.Parameters, bigquery.QueryParameter{
+			Name:  k,
+			Value: v,
+		})
+	}
+	return &realQuery{q}
+
 }
 
 type realQuery struct {
@@ -66,14 +76,14 @@ func (r *realRowIterator) schema() bigquery.Schema {
 	return r.Schema
 }
 
-func runQuery(ctx context.Context, logger *logp.Logger, client *bigquery.Client, queryString string, publish func(bigquery.Schema, []bigquery.Value)) error {
-	return runQueryInternal(ctx, logger, &realClient{client}, queryString, publish)
+func runQuery(ctx context.Context, logger *logp.Logger, client *bigquery.Client, queryString string, params map[string]interface{}, publish func(bigquery.Schema, []bigquery.Value)) error {
+	return runQueryInternal(ctx, logger, &realClient{client}, queryString, params, publish)
 }
 
-func runQueryInternal(ctx context.Context, logger *logp.Logger, client client, queryString string, publish func(bigquery.Schema, []bigquery.Value)) error {
-	logger.Debugf("executing query: %s", queryString)
+func runQueryInternal(ctx context.Context, logger *logp.Logger, client client, queryString string, params map[string]interface{}, publish func(bigquery.Schema, []bigquery.Value)) error {
+	logger.Debugf("executing query: '%s' with params: %v", queryString, params)
 
-	query := client.query(queryString)
+	query := client.query(queryString, params)
 	it, err := query.read(ctx)
 	if err != nil {
 		return err
@@ -97,28 +107,30 @@ func runQueryInternal(ctx context.Context, logger *logp.Logger, client client, q
 	return nil
 }
 
-func expandJSON(field *bigquery.FieldSchema, value bigquery.Value) (interface{}, error) {
+func expandJSON(field *bigquery.FieldSchema, value bigquery.Value) (interface{}, bool, error) {
+	expanded := false
 	if value == nil {
-		return nil, nil
+		return nil, expanded, nil
 	}
 
 	stringVal, ok := (value).(string)
 
 	if !ok {
-		return value, nil
+		return value, expanded, nil
 	}
 
 	if field.Type != bigquery.JSONFieldType {
-		return value, nil
+		return value, expanded, nil
 	}
 
 	// For JSON fields, parse the string into a map or slice.
 	var jsonData interface{}
 	if err := json.Unmarshal([]byte(stringVal), &jsonData); err != nil {
-		return nil, err
+		return nil, expanded, err
 	}
 
-	return jsonData, nil
+	expanded = true
+	return jsonData, expanded, nil
 }
 
 func getTimestamp(field *bigquery.FieldSchema, value bigquery.Value) (time.Time, error) {
@@ -136,78 +148,91 @@ func getTimestamp(field *bigquery.FieldSchema, value bigquery.Value) (time.Time,
 	return timestamp, nil
 }
 
-// cursorState holds the stringified last cursor value
+// cursorState holds the last cursor value
 type cursorState struct {
-	WhereVal string
+	FieldType string
+	StringVal string
 }
 
 func (c *cursorState) set(field *bigquery.FieldSchema, value bigquery.Value) error {
-	errorMsg := "expected %s value for %s field, got %T"
+	var stringVal string
+	var err error
 
 	switch field.Type {
 	case bigquery.StringFieldType:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf(errorMsg, "string", field.Type, value)
-		}
-		c.WhereVal = fmt.Sprintf("\"%s\"", v)
+		stringVal, err = serialize(value, field.Type, func(v string) string { return v })
 	case bigquery.IntegerFieldType:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf(errorMsg, "int64", field.Type, value)
-		}
-		c.WhereVal = fmt.Sprintf("%d", v)
+		stringVal, err = serialize(value, field.Type, func(v int64) string { return strconv.FormatInt(v, 10) })
 	case bigquery.FloatFieldType:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf(errorMsg, "float64", field.Type, value)
-		}
-		c.WhereVal = fmt.Sprintf("%f", v)
+		stringVal, err = serialize(value, field.Type, func(v float64) string { return strconv.FormatFloat(v, 'g', -1, 64) })
 	case bigquery.BytesFieldType:
-		v, ok := value.([]byte)
-		if !ok {
-			return fmt.Errorf(errorMsg, "[]byte", field.Type, value)
-		}
-		c.WhereVal = fmt.Sprintf("B\"%s\"", v)
+		stringVal, err = serialize(value, field.Type, func(v []byte) string { return base64.StdEncoding.EncodeToString(v) })
 	case bigquery.TimestampFieldType:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf(errorMsg, "time.Time", field.Type, value)
-		}
-		c.WhereVal = fmt.Sprintf("TIMESTAMP '%s'", v.UTC().Format("2006-01-02T15:04:05.999999Z"))
+		stringVal, err = serialize(value, field.Type, func(v time.Time) string { return v.UTC().Format(time.RFC3339Nano) })
 	case bigquery.DateFieldType:
-		v, ok := value.(civil.Date)
-		if !ok {
-			return fmt.Errorf(errorMsg, "civil.Date", field.Type, value)
-		}
-		c.WhereVal = fmt.Sprintf("DATE '%s'", v.String())
+		stringVal, err = serialize(value, field.Type, func(v civil.Date) string { return v.String() })
 	case bigquery.TimeFieldType:
-		v, ok := value.(civil.Time)
-		if !ok {
-			return fmt.Errorf(errorMsg, "civil.Time", field.Type, value)
-		}
-		c.WhereVal = fmt.Sprintf("TIME '%s'", bigquery.CivilTimeString(v))
+		stringVal, err = serialize(value, field.Type, func(v civil.Time) string { return v.String() })
 	case bigquery.DateTimeFieldType:
-		v, ok := value.(civil.DateTime)
-		if !ok {
-			return fmt.Errorf(errorMsg, "civil.DateTime", field.Type, value)
-		}
-		c.WhereVal = fmt.Sprintf("DATETIME '%s'", bigquery.CivilDateTimeString(v))
-	case bigquery.NumericFieldType:
-		v, ok := value.(*big.Rat)
-		if !ok {
-			return fmt.Errorf(errorMsg, "*big.Rat", field.Type, value)
-		}
-		c.WhereVal = fmt.Sprintf("NUMERIC '%s'", bigquery.NumericString(v))
-	case bigquery.BigNumericFieldType:
-		v, ok := value.(*big.Rat)
-		if !ok {
-			return fmt.Errorf(errorMsg, "*big.Rat", field.Type, value)
-		}
-		c.WhereVal = fmt.Sprintf("BIGNUMERIC '%s'", bigquery.BigNumericString(v))
+		stringVal, err = serialize(value, field.Type, func(v civil.DateTime) string { return v.String() })
+	case bigquery.NumericFieldType, bigquery.BigNumericFieldType:
+		stringVal, err = serialize(value, field.Type, func(v *big.Rat) string { return v.String() })
 	default:
-		return fmt.Errorf("unsupported cursor field type: %s", field.Type)
+		err = fmt.Errorf("unsupported field type: %s", field.Type)
 	}
 
+	if err != nil {
+		return fmt.Errorf("cannot serialize cursor value: %w", err)
+	}
+
+	c.StringVal = stringVal
+	c.FieldType = string(field.Type)
 	return nil
+}
+
+func (c *cursorState) get() (bigquery.Value, error) {
+	var val bigquery.Value
+	var err error
+
+	switch bigquery.FieldType(c.FieldType) {
+	case bigquery.StringFieldType:
+		val = c.StringVal
+	case bigquery.IntegerFieldType:
+		val, err = strconv.ParseInt(c.StringVal, 10, 64)
+	case bigquery.FloatFieldType:
+		val, err = strconv.ParseFloat(c.StringVal, 64)
+	case bigquery.BytesFieldType:
+		val, err = base64.StdEncoding.DecodeString(c.StringVal)
+	case bigquery.TimestampFieldType:
+		val, err = time.Parse(time.RFC3339Nano, c.StringVal)
+	case bigquery.DateFieldType:
+		val, err = civil.ParseDate(c.StringVal)
+	case bigquery.TimeFieldType:
+		val, err = civil.ParseTime(c.StringVal)
+	case bigquery.DateTimeFieldType:
+		val, err = civil.ParseDateTime(c.StringVal)
+	case bigquery.NumericFieldType, bigquery.BigNumericFieldType:
+		v := new(big.Rat)
+		if _, ok := v.SetString(c.StringVal); ok {
+			val = v
+		} else {
+			err = fmt.Errorf("invalid big.Rat")
+		}
+	default:
+		err = fmt.Errorf("unsupported field type")
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot deserialize cursor value '%s' as %s: %w", c.StringVal, c.FieldType, err)
+	}
+
+	return val, nil
+}
+
+func serialize[T any](value bigquery.Value, t bigquery.FieldType, converter func(T) string) (string, error) {
+	if v, ok := value.(T); ok {
+		return converter(v), nil
+	}
+
+	return "", fmt.Errorf("unexpected type for %s field, got %T (%v)", t, value, value)
 }

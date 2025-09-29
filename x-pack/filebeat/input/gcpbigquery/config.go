@@ -5,6 +5,7 @@
 package gcpbigquery
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/go-ucfg"
@@ -13,36 +14,46 @@ import (
 var _ ucfg.Validator = (*config)(nil)
 
 type config struct {
+	// Period specifies how often to run the input.
 	Period time.Duration `config:"period" validate:"required,positive"`
 
-	// The ID of the GCP project that owns the BigQuery dataset.
+	// Project ID is the ID of the GCP project that owns the BigQuery dataset.
 	ProjectID string `config:"project_id" validate:"required"`
 
-	// JSON file containing authentication credentials and key.
+	// CredentialsFile specifies a JSON file containing authentication credentials and key.
 	CredentialsFile string `config:"credentials_file"`
 
-	// The BigQuery queries to execute, along with options for each.
+	// Queries contains the BigQuery queries to execute, along with options for each.
 	Queries []queryConfig `config:"queries" validate:"required"`
 }
 
 type queryConfig struct {
-	// The SQL query to execute.
+	// Query is the SQL query to execute.
 	Query string `config:"query" validate:"required"`
 
-	// The name of a field in the target BigQuery table that can be used to simulate cursor pagination, e.g. an incremental ID or timestamp.
-	// The following field types are supported: BIGNUMERIC, BYTES, DATE, DATETIME, FLOAT, INTEGER, NUMERIC, STRING, TIME, TIMESTAMP.
-	// If not specified, the input will run the configured queries as-is on every poll. If specified, the input will add a WHERE clause
-	// to each query to only select rows where the cursor field's value is greater than the last seen value.
-	CursorField string `config:"cursor_field"`
+	// Cursor configures how state is tracked between queries to simulate cursor behavior.
+	Cursor *cursorConfig `config:"cursor"`
 
-	// A TIMESTAMP field in the target BigQuery table to use as the event's @timestamp value.
+	// TimestampField is a field of type TIMESTAMP in the query result to use as the event's @timestamp value.
 	TimestampField string `config:"timestamp_field"`
 
-	// Whether to attempt to parse fields of type JSON into objects/arrays instead of leaving them as strings.
-	// In the event of parsing failures, we still expand the field into a JSON object with a single field named
-	// "original" containing the original string value; this avoids mapping conflicts in Elasticsearch.
-	// Defaults to true.
+	// ExpandJsonStrings determines whether to attempt to parse fields of type JSON into objects/arrays instead of
+	// leaving them as strings. In the event of parsing failures, we still expand the field into a JSON object with a
+	// single field named "original" containing the original string value; this avoids mapping conflicts in
+	// Elasticsearch. Defaults to true.
 	ExpandJsonStrings *bool `config:"expand_json_strings"`
+}
+
+type cursorConfig struct {
+	// Field specifies a field in the query result to use for tracking state between queries.
+	// This field must be of a type that supports ordering comparisons - the following types are supported:
+	// BIGNUMERIC, BYTES, DATE, DATETIME, FLOAT, INTEGER, NUMERIC, STRING, TIME, TIMESTAMP.
+	Field string `config:"field"`
+
+	// InitialValue is the starting value for the cursor parameter when there is no previous state.
+	// Can be a literal BigQuery value or an expression which returns a single value of the appropriate type.
+	// e.g.	"2025-10-01", "123.456789012", "TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 DAY)".
+	InitialValue string `config:"initial_value"`
 }
 
 func defaultConfig() config {
@@ -52,5 +63,10 @@ func defaultConfig() config {
 }
 
 func (c *config) Validate() error {
+	for i, query := range c.Queries {
+		if query.Cursor != nil && query.Cursor.Field == "" {
+			return fmt.Errorf("queries[%d]: cursor field is required", i)
+		}
+	}
 	return nil
 }

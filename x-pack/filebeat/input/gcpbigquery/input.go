@@ -51,19 +51,23 @@ func configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input,
 
 	var sources []cursor.Source
 	for _, query := range config.Queries {
-		// defaults to true
-		expandJSON := true
-		if query.ExpandJsonStrings != nil {
-			expandJSON = *query.ExpandJsonStrings
-		}
-
-		sources = append(sources, &bigQuerySource{
+		source := bigQuerySource{
 			ProjectID:      config.ProjectID,
 			Query:          query.Query,
-			CursorField:    query.CursorField,
 			TimestampField: query.TimestampField,
-			ExpandJson:     expandJSON,
-		})
+			ExpandJson:     true,
+		}
+
+		if query.ExpandJsonStrings != nil {
+			source.ExpandJson = *query.ExpandJsonStrings
+		}
+
+		if query.Cursor != nil {
+			source.CursorField = query.Cursor.Field
+			source.CursorInitialValue = query.Cursor.InitialValue
+		}
+
+		sources = append(sources, &source)
 	}
 
 	return sources, &bigQueryInput{config: config, logger: logger}, nil
@@ -77,11 +81,12 @@ func updateStatus(ctx v2.Context, status status.Status, msg string) {
 
 // bigQuerySource defines the configuration for a single BigQuery query.
 type bigQuerySource struct {
-	ProjectID      string
-	Query          string
-	CursorField    string
-	TimestampField string
-	ExpandJson     bool
+	ProjectID          string
+	Query              string
+	CursorField        string
+	CursorInitialValue string
+	TimestampField     string
+	ExpandJson         bool
 }
 
 func (s *bigQuerySource) Name() string {
@@ -146,29 +151,40 @@ func (bq *bigQueryInput) Run(ctx v2.Context, src cursor.Source, cur cursor.Curso
 }
 
 func (bq *bigQueryInput) querySource(ctx context.Context, src *bigQuerySource, cur cursor.Cursor, publisher cursor.Publisher, client *bigquery.Client) error {
-	query := src.Query
+	params := make(map[string]interface{})
 
 	if src.CursorField != "" {
-		where := ""
-		sort := fmt.Sprintf("ORDER BY %s ASC", src.CursorField)
+		var cursorVal interface{}
 
-		if !cur.IsNew() {
+		if cur.IsNew() {
+			if src.CursorInitialValue != "" {
+				cursorVal = src.CursorInitialValue
+
+				// we support expressions in initial cursor values e.g. "TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR)".
+				// we can't pass this directly as a parameter to BigQuery, so we have to evaluate it first.
+				// we ignore errors here; either the value is a literal, or if the expression is invalid the query will fail later anyway.
+				query := fmt.Sprintf("SELECT %s AS cursor", src.CursorInitialValue)
+				_ = runQuery(ctx, bq.logger, client, query, nil, func(_ bigquery.Schema, row []bigquery.Value) {
+					cursorVal = row[0]
+				})
+			}
+		} else {
 			lastCursorValue := &cursorState{}
 			if err := cur.Unpack(&lastCursorValue); err != nil {
 				return fmt.Errorf("failed to unpack cursor: %w", err)
 			}
 
-			if lastCursorValue.WhereVal != "" {
-				where = fmt.Sprintf("WHERE %s > %s", src.CursorField, lastCursorValue.WhereVal)
+			if val, err := lastCursorValue.get(); err != nil {
+				return fmt.Errorf("failed to get cursor value: %w", err)
+			} else {
+				cursorVal = val
 			}
 		}
 
-		// this is not efficient but allows us to wrap arbitrary queries.
-		// perhaps later we can properly parse and modify the SQL AST
-		query = fmt.Sprintf("SELECT * FROM (%s) %s %s", src.Query, where, sort)
+		params["cursor"] = cursorVal
 	}
 
-	err := runQuery(ctx, bq.logger, client, query, func(schema bigquery.Schema, row []bigquery.Value) {
+	err := runQuery(ctx, bq.logger, client, src.Query, params, func(schema bigquery.Schema, row []bigquery.Value) {
 		bq.publishEvent(src, publisher, schema, row)
 	})
 	if err != nil {
@@ -192,12 +208,12 @@ func (bq *bigQueryInput) publishEvent(src *bigQuerySource, publisher cursor.Publ
 
 		if src.CursorField != "" && field.Name == src.CursorField {
 			cursorState := &cursorState{}
-			err := cursorState.set(field, v)
-			if err == nil {
+			if err := cursorState.set(field, v); err != nil {
+				bq.logger.Error(fmt.Errorf("failed to set cursor state from field '%s': %w", field.Name, err))
+
+			} else {
 				bq.logger.Debugf("setting cursor state from field %s", field.Name)
 				state = cursorState
-			} else {
-				bq.logger.Error(fmt.Errorf("failed to set cursor state from field '%s': %w", field.Name, err))
 			}
 		}
 
@@ -212,10 +228,12 @@ func (bq *bigQueryInput) publishEvent(src *bigQuerySource, publisher cursor.Publ
 		}
 
 		if src.ExpandJson {
-			val, err := expandJSON(field, v)
+			val, ok, err := expandJSON(field, v)
 			if err == nil {
-				bq.logger.Debugf("expanding JSON from field %s", field.Name)
-				v = val
+				if ok {
+					bq.logger.Debugf("expanding JSON from field %s", field.Name)
+					v = val
+				}
 			} else {
 				// on error, still expand into a nested object with the original string to avoid mapping conflicts
 				v = map[string]interface{}{"original": v}
