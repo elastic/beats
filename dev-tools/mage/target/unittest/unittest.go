@@ -22,9 +22,10 @@ import (
 	"fmt"
 	"os/exec"
 
+	"github.com/magefile/mage/mg"
+
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
-	"github.com/magefile/mage/mg"
 )
 
 func init() {

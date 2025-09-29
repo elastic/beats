@@ -26,9 +26,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/magefile/mage/mg"
+
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
-	"github.com/magefile/mage/mg"
 
 	// register kubernetes runner
 	_ "github.com/elastic/beats/v7/dev-tools/mage/kubernetes"
