@@ -122,7 +122,7 @@ processors:
 	require.EventuallyWithTf(t,
 		func(ct *assert.CollectT) {
 			for _, url := range []string{outFileURL, outOTelFileURL} {
-				resp, err := http.Head(url)
+				resp, err := http.Head(url) // nolint:gosec // local Nginx in integration test
 				if !assert.NoError(ct, err, "URL %s should exist", url) {
 					return
 				}
@@ -334,7 +334,7 @@ func sortEventsByID(events []eventWithID) {
 }
 
 func downloadToTempFile(t *testing.T, url string, filename string) string {
-	resp, err := http.Get(url)
+	resp, err := http.Get(url) // nolint:gosec // local Nginx in integration test
 	require.NoError(t, err, "failed to GET %s", url)
 	defer resp.Body.Close()
 
