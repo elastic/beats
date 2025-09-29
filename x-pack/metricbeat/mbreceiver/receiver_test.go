@@ -416,3 +416,36 @@ func TestReceiverDegraded(t *testing.T) {
 		})
 	}
 }
+
+func TestReceiverHook(t *testing.T) {
+	cfg := Config{
+		Beatconfig: map[string]any{
+			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
+				"modules": []map[string]any{
+					{
+						"module":     "benchmark",
+						"enabled":    true,
+						"period":     "1s",
+						"metricsets": []string{"info"},
+					},
+				},
+			},
+			"management.otel.enabled": true,
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
+			},
+			"path.home": t.TempDir(),
+		},
+	}
+	receiverSettings := receiver.Settings{
+		ID: component.MustNewID(Name),
+		TelemetrySettings: component.TelemetrySettings{
+			Logger: zap.NewNop(),
+		},
+	}
+
+	// For metricbeatreceiver, we expect 2 hooks to be registered:
+	// 	one for beat metrics and one for input metrics.
+	oteltest.TestReceiverHook(t, &cfg, NewFactory(), receiverSettings, 2)
+}

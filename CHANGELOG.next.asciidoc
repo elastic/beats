@@ -113,6 +113,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Upgrade to osquery 5.12.1. {pull}40368[40368]
 - Upgrade to osquery 5.13.1. {pull}40849[40849]
 - Upgrade to osquery 5.15.0 {pull}43426[43426]
+- Upgrade to osquery 5.18.1 {pull}46624[46624]
 
 
 *Packetbeat*
@@ -159,6 +160,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Update Go version to 1.24.7 {pull}46070[46070].
 - Update github.com/go-viper/mapstructure/v2 to v2.4.0 {pull}46335[46335]
 - Update github.com/docker/docker to v28.3.3 {pull}46334[46334]
+- Make data updates in add_host_metadata processor synchronous {pull}46546[46546]
+- Fixed a panic in the Kafka output that could occur when shutting down while final events were being published. {issue}46109[46109] {pull}46446[46446]
 
 *Auditbeat*
 
@@ -287,6 +290,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - In Filestream, setting `clean_inactive: 0` does not re-ingest all files on startup any more. {issue}45601[45601]
 +{pull}46373[46373]
 - Fix metrics from TCP & UDP inputs when the port number is > 32767 {pull}46486[46486]
+- [Journald input] Fix reading all files in a folder and watching for new ones. {issue}46657[46657] {pull}46682[46682]
 
 *Heartbeat*
 
@@ -341,7 +345,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
 - Fix EvtVarTypeAnsiString conversion {pull}44026[44026]
 - Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
-
+- Fix EventLog reset logic to not close renderers. {pull}46376[46376] {issue}45750{45750}
 
 *Elastic Logging Plugin*
 - Fix for unable to run elastic-logging plugin
@@ -378,6 +382,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add linux capabilities to processes in the system/process. {pull}37453[37453]
 - Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
 - Split module/system/process into common and provider bits. {pull}41868[41868]
+- Add new ETW FIM backend for Windows. {pull}45887[45887]
 
 *Auditbeat*
 
@@ -539,6 +544,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Improve CEL input documentation of authentication options. {pull}46253[46253]
 - Add status reporting support for Azure Event Hub v2 input. {pull}44846[44846]
 - Add documentation for device collection in Entity Analytics Active Directory Filebeat's input. {pull}46363[46363]
+- Hints based autodiscover now sets `close.on_state_change.removed: false` in the default configuration to avoid missing the last log lines from a container. {issue}34789[34789] {pull}46695[46695]
+- Journald input now supports reading from multiple journals, including remote ones {issue}46656[46656] {pull}46722[46722]
 
 *Auditbeat*
 
@@ -618,6 +625,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add SSL support for sql module: drivers mysql, postgres, and mssql. {pull}44748[44748]
 - Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
 - Add NTP response validation for system/ntp module. {pull}46184[46184]
+- Add vertexai_logs metricset to GCP for prompt response collection from VertexAI service. {pull}46383[46383]
 
 *Metricbeat*
 
@@ -628,6 +636,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 *Packetbeat*
 - Optionally ignore MAC address in flow matching {pull}44965[44965]
 - Add `tls.server.ja3s` tls fingerprint {pull}43284[43284]
+- Bump Windows Npcap version to v1.83. {pull}46809[46809]
 
 *Winlogbeat*
 

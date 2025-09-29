@@ -24,7 +24,7 @@ actions:
     spec:
       labels:
         - dependencies
-        - backport-skip
+        - backport-active-all
 
 sources:
   minor:

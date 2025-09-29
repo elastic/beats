@@ -521,6 +521,7 @@ toc:
               - file: filebeat/monitoring-shows-fewer-than-expected-beats.md
               - file: filebeat/could-not-locate-index-pattern.md
               - file: filebeat/madvdontneed-rss.md
+              - file: filebeat/kubernetes-autodiscover.md
       - file: filebeat/contributing-to-beats.md
   - file: heartbeat/index.md
     children:
@@ -955,6 +956,7 @@ toc:
               - file: metricbeat/metricbeat-metricset-gcp-metrics.md
               - file: metricbeat/metricbeat-metricset-gcp-pubsub.md
               - file: metricbeat/metricbeat-metricset-gcp-storage.md
+              - file: metricbeat/metricbeat-metricset-gcp-vertexai_logs.md
           - file: metricbeat/metricbeat-module-golang.md
             children:
               - file: metricbeat/metricbeat-metricset-golang-expvar.md
