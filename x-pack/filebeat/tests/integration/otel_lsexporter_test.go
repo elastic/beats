@@ -10,8 +10,10 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"math"
 	"math/rand/v2"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
@@ -45,9 +47,14 @@ type eventWithID struct {
 	data mapstr.M
 }
 
-// TestDataShapeOTelVSClassicE2E tests that data shape of filebeat in otel mode is the same as filebeat.
-// The beats pipeline send data to logstash. Logstash runs two pipelines on port 5044 and 5055 (otel) respectively,
-// and writes to x-pack/filebeat/tests/integration/logstash/testdata. The test compares the output files
+// TestDataShapeOTelVSClassicE2E verifies that the event data shape of filebeat in otel mode is the same as filebeat.
+// Two Filebeat instances are started:
+//
+//	one configured for classic mode sending to Logstash on port 5044 and
+//	one for Otel mode sending to Logstash on port 5055.
+//
+// Logstash runs two pipelines listening on those ports and writes the resulting events into a shared Docker volume.
+// Nginx container serves that volume over HTTP so the test can fetch the generated files without relying on host filesystem permissions.
 func TestDataShapeOTelVSClassicE2E(t *testing.T) {
 	// ensure the size of events is big enough (1024b) for filebeat to ingest
 	numEvents := 3
@@ -106,26 +113,29 @@ processors:
 	filebeat.Start()
 	defer filebeat.Stop()
 
-	// logstash output files
-	outFilePath := filepath.Join("logstash", "testdata", testCaseName+"_fb.json")
-	outOTelFilePath := filepath.Join("logstash", "testdata", testCaseName+"_otel.json")
-	lsOutFiles := []string{outFilePath, outOTelFilePath}
+	// Nginx endpoint URLs
+	baseURL := "http://localhost:8081"
+	outFileURL := fmt.Sprintf("%s/%s_fb.json", baseURL, testCaseName)
+	outOTelFileURL := fmt.Sprintf("%s/%s_otel.json", baseURL, testCaseName)
 
-	// wait for logs to be published
+	// wait for logs to be published over HTTP
 	require.EventuallyWithTf(t,
 		func(ct *assert.CollectT) {
-			for _, f := range lsOutFiles {
-				fileInfo, err := os.Stat(f)
-				if !assert.NoError(ct, err, "file %s should exist", f) {
+			for _, url := range []string{outFileURL, outOTelFileURL} {
+				resp, err := http.Head(url)
+				if !assert.NoError(ct, err, "URL %s should exist", url) {
 					return
 				}
-				if !assert.True(ct, fileInfo.ModTime().Before(time.Now().Add(-3*time.Second)),
-					"file last update time %s should be older than 3 seconds", f) {
+				if !assert.Equal(ct, http.StatusOK, resp.StatusCode, "URL %s should return HTTP 200", url) {
 					return
 				}
 			}
 		},
 		2*time.Minute, 1*time.Second, "expected Logstash to write files for both filebeat and otel mode")
+
+	// download files from Nginx into temp files
+	fbFilePath := downloadToTempFile(t, outFileURL, fmt.Sprintf("%s_fb.json", testCaseName))
+	otelFilePath := downloadToTempFile(t, outOTelFileURL, fmt.Sprintf("%s_otel.json", testCaseName))
 
 	ignoredFields := []string{
 		// Expected to change between agentDocs and OtelDocs
@@ -139,7 +149,7 @@ processors:
 		"agent.otelcol.component.kind",
 	}
 
-	compareOutputFilesSorted(t, outFilePath, outOTelFilePath, ignoredFields)
+	compareOutputFilesSorted(t, fbFilePath, otelFilePath, ignoredFields)
 }
 
 func generateEvents(numEvents int) []string {
@@ -321,4 +331,21 @@ func sortEventsByID(events []eventWithID) {
 	sort.Slice(events, func(i, j int) bool {
 		return events[i].id < events[j].id
 	})
+}
+
+func downloadToTempFile(t *testing.T, url string, filename string) string {
+	resp, err := http.Get(url)
+	require.NoError(t, err, "failed to GET %s", url)
+	defer resp.Body.Close()
+
+	require.Equal(t, http.StatusOK, resp.StatusCode, "GET %s returned %d", url, resp.StatusCode)
+
+	tmpFile, err := os.CreateTemp("", filename)
+	require.NoError(t, err, "failed to create temp file")
+	defer tmpFile.Close()
+
+	_, err = io.Copy(tmpFile, resp.Body)
+	require.NoError(t, err, "failed to copy data from %s", url)
+
+	return tmpFile.Name()
 }
