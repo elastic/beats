@@ -43,12 +43,6 @@ var tlsVersions = map[uint16]string{
 func validateUnsupportedConfig(output *config.C) error {
 
 	if sslConfig, err := output.Child("ssl", -1); err == nil {
-		if sslConfig.HasField("curve_type") {
-			return fmt.Errorf("ssl.curve_types is currently not supported: %w", errors.ErrUnsupported)
-		} else if sslConfig.HasField("renegotiation") {
-			return fmt.Errorf("ssl.renegotiation is currently not supported: %w", errors.ErrUnsupported)
-		}
-
 		if reloadCfg, err := sslConfig.Child("restart_on_cert_change", -1); err == nil {
 			if reloadCfg.HasField("enabled") {
 				return fmt.Errorf("ssl.restart_on_cert_change.enabled is currently not supported: %w", errors.ErrUnsupported)
