@@ -28,10 +28,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-<<<<<<< HEAD
-=======
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 )
 
 const (
@@ -253,11 +249,6 @@ func runTestWithACKer(t *testing.T, cfg *conf.C, onEvent eventHandler, run func(
 	}
 	//nolint:errcheck // ignore
 	pubsubInput := in.(*pubsubInput)
-<<<<<<< HEAD
-=======
-	// Initialize metrics explicitly for tests
-	pubsubInput.metrics = newInputMetrics("", nil, logp.NewNopLogger())
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	defer pubsubInput.Stop()
 
 	run(client, pubsubInput, eventOutlet, t)

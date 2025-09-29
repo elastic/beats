@@ -9,7 +9,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -32,12 +31,8 @@ func TestInputMetricsClose(t *testing.T) {
 // when a newInputMetrics method is invoked. This avoids nil hit panics when
 // a getter is invoked on any uninitialized metric.
 func TestNewInputMetricsInstance(t *testing.T) {
-<<<<<<< HEAD
 	reg := monitoring.NewRegistry()
 	metrics := newInputMetrics("gcs-new-metric-test", reg)
-=======
-	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	assert.NotNil(t, metrics.errorsTotal,
 		metrics.decodeErrorsTotal,

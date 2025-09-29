@@ -222,13 +222,8 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 		sqsReader := newSQSReaderInput(config, aws.Config{})
 		sqsReader.log = log.Named("sqs")
 		sqsReader.pipeline = newFakePipeline()
-<<<<<<< HEAD
 		sqsReader.metrics = newInputMetrics("test_id", monitoring.NewRegistry(), workerCount)
 		sqsReader.sqs = newConstantSQS()
-=======
-		sqsReader.metrics = newInputMetrics(monitoring.NewRegistry(), workerCount, logp.NewNopLogger())
-		sqsReader.sqs, err = newConstantSQS()
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 		require.NoError(t, err)
 		sqsReader.s3 = newConstantS3(t)
 		sqsReader.msgHandler, err = sqsReader.createEventProcessor()
@@ -310,12 +305,8 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		log := logp.NewLogger(inputName)
 		log.Infof("benchmark with %d number of workers", numberOfWorkers)
 
-<<<<<<< HEAD
 		metricRegistry := monitoring.NewRegistry()
 		metrics := newInputMetrics("test_id", metricRegistry, numberOfWorkers)
-=======
-		metrics := newInputMetrics(monitoring.NewRegistry(), numberOfWorkers, logp.NewNopLogger())
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 		pipeline := newFakePipeline()
 
 		config := makeBenchmarkConfig(t)

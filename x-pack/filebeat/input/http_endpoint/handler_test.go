@@ -542,14 +542,9 @@ func Test_apiResponse(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup
 			pub := new(publisher)
-<<<<<<< HEAD
 			metrics := newInputMetrics("")
 			defer metrics.Close()
 			apiHandler := newHandler(ctx, newTracerConfig(tc.name, tc.conf, *withTraces), nil, pub.Publish, logp.NewLogger("http_endpoint.test"), metrics)
-=======
-			metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
-			apiHandler := newHandler(ctx, newTracerConfig(tc.name, tc.conf, *withTraces), nil, pub.Publish, nil, logp.NewLogger("http_endpoint.test"), metrics)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 			// Execute handler.
 			respRec := httptest.NewRecorder()

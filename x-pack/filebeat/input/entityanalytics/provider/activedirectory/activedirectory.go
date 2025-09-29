@@ -116,12 +116,8 @@ func (*adInput) Test(v2.TestContext) error { return nil }
 // Run will start data collection on this provider.
 func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
 	p.logger = inputCtx.Logger.With("provider", Name, "domain", p.cfg.URL)
-<<<<<<< HEAD
 	p.metrics = newMetrics(inputCtx.ID, nil)
 	defer p.metrics.Close()
-=======
-	p.metrics = newMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	lastSyncTime, _ := getLastSync(store)
 	syncWaitTime := time.Until(lastSyncTime.Add(p.cfg.SyncInterval))

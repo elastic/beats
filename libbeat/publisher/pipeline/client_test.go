@@ -37,10 +37,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-<<<<<<< HEAD
-=======
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -280,76 +276,11 @@ func TestClientWaitClose(t *testing.T) {
 }
 
 func TestMonitoring(t *testing.T) {
-<<<<<<< HEAD
 	const (
 		maxEvents  = 123
 		batchSize  = 456
 		numClients = 42
 	)
-=======
-	t.Run("output metrics", func(t *testing.T) {
-		const (
-			maxEvents  = 123
-			batchSize  = 456
-			numClients = 42
-		)
-		var config Config
-		err := conf.MustNewConfigFrom(map[string]interface{}{
-			"queue.mem.events":           maxEvents,
-			"queue.mem.flush.min_events": 1,
-		}).Unpack(&config)
-		require.NoError(t, err)
-
-		metrics := monitoring.NewRegistry()
-		telemetry := monitoring.NewRegistry()
-		beatInfo := beat.Info{Logger: logptest.NewTestingLogger(t, "")}
-		pipeline, err := Load(
-			beatInfo,
-			Monitors{
-				Metrics:   metrics,
-				Telemetry: telemetry,
-				Logger:    logp.NewNopLogger(),
-			},
-			config,
-			processing.Supporter(nil),
-			func(outputs.Observer) (string, outputs.Group, error) {
-				clients := make([]outputs.Client, numClients)
-				for i := range clients {
-					clients[i] = newMockClient(func(publisher.Batch) error {
-						return nil
-					})
-				}
-				return "output_name", outputs.Group{
-					BatchSize: batchSize,
-					Clients:   clients,
-				}, nil
-			},
-		)
-
-		require.NoError(t, err)
-		defer pipeline.Close()
-
-		telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
-		assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])
-		assert.Equal(t, int64(batchSize), telemetrySnapshot.Ints["output.batch_size"])
-		assert.Equal(t, int64(numClients), telemetrySnapshot.Ints["output.clients"])
-	})
-
-	t.Run("input metrics", func(t *testing.T) {
-		testInputMetrics(t,
-			beat.Info{},
-			beat.ClientConfig{ClientListener: &mockClientListener{}})
-	})
-
-	t.Run("no input metrics - nil ClientConfig", func(t *testing.T) {
-		testInputMetrics(
-			t, beat.Info{}, beat.ClientConfig{})
-	})
-}
-
-func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientConfig) {
-
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	var config Config
 	err := conf.MustNewConfigFrom(map[string]interface{}{
 		"queue.mem.events":           maxEvents,

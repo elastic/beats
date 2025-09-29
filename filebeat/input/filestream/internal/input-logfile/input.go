@@ -64,12 +64,8 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
-<<<<<<< HEAD
 	metrics := NewMetrics(inp.metricsID)
 	defer metrics.Close()
-=======
-	metrics := NewMetrics(ctx.MetricsRegistry, inp.manager.Logger)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,

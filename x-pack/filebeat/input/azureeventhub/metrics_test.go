@@ -125,12 +125,8 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 			LegacySanitizeOptions: tc.sanitizationOption,
 		}
 
-<<<<<<< HEAD
 		reg := monitoring.NewRegistry()
 		metrics := newInputMetrics("test", reg)
-=======
-		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 		fakeClient := fakeClient{}
 

@@ -38,10 +38,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-<<<<<<< HEAD
-=======
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -82,12 +78,7 @@ func TestClientPublishEventKerberosAware(t *testing.T) {
 }
 
 func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
-<<<<<<< HEAD
 	output, client := connectTestEsWithStats(t, cfg, index)
-=======
-	registry := monitoring.NewRegistry()
-	output, client := connectTestEs(t, cfg, outputs.NewStats(registry, logp.NewNopLogger()))
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 
 	// drop old index preparing test
 	_, _, _ = client.conn.Delete(index, "", "", nil)

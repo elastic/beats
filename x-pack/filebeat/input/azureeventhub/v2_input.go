@@ -84,12 +84,8 @@ func (in *eventHubInputV2) Run(
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
 	// Setup input metrics
-<<<<<<< HEAD
 	inputMetrics := newInputMetrics(inputContext.ID, nil)
 	defer inputMetrics.Close()
-=======
-	inputMetrics := newInputMetrics(inputContext.MetricsRegistry, in.log)
->>>>>>> a601b44f7 ([Chore] Accomodate breaking from `elastic-agent-libs` and `elastic-agent-system-metrics` (#46054))
 	in.metrics = inputMetrics
 
 	// Initialize the components needed to process events.
