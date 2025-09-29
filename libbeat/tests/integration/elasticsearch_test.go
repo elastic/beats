@@ -168,11 +168,11 @@ func startMockES(t *testing.T, addr string) (*http.Server, metrics.Registry) {
 	require.Eventually(t, func() bool {
 		resp, err := http.Get("http://" + addr) //nolint:noctx // It's just a test
 		if err != nil {
-			//nolint:errcheck // We're just draining the body, we can ignore the error
-			io.Copy(io.Discard, resp.Body)
-			resp.Body.Close()
 			return false
 		}
+		//nolint:errcheck // We're just draining the body, we can ignore the error
+		io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
 		return true
 	},
 		time.Second, time.Millisecond, "mock-es server did not start on '%s'", addr)
