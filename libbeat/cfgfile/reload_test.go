@@ -31,6 +31,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func TestReloader(t *testing.T) {
@@ -50,7 +51,12 @@ func TestReloader(t *testing.T) {
 		},
 	})
 	// config.C{}
+<<<<<<< HEAD:libbeat/cfgfile/reload_test.go
 	reloader := NewReloader(logptest.NewTestingLogger(t, "cfgfile-test.reload"), nil, config)
+=======
+
+	reloader := NewReloader(logptest.NewTestingLogger(t, "cfgfile-test.reload"), nil, config, paths.Paths)
+>>>>>>> e55e0bedd ([fbreceiver] partial fix for global paths (#46779)):libbeat/cfgfile/reload_integration_test.go
 	retryCount := 10
 
 	go reloader.Run(nil)
@@ -75,7 +81,11 @@ func TestReloader(t *testing.T) {
 
 	// Write a file to the reloader path to trigger a real reload
 	content := []byte("test\n")
+<<<<<<< HEAD:libbeat/cfgfile/reload_test.go
 	err = ioutil.WriteFile(dir+"/config1.yml", content, 0644)
+=======
+	err = os.WriteFile(filepath.Join(dir, "config1.yml"), content, 0o644)
+>>>>>>> e55e0bedd ([fbreceiver] partial fix for global paths (#46779)):libbeat/cfgfile/reload_integration_test.go
 	assert.NoError(t, err)
 
 	// Wait for the number of scans to increase at least twice. This is somewhat
