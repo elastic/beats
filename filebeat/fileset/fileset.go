@@ -40,6 +40,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
@@ -58,6 +59,7 @@ type Fileset struct {
 	vars        map[string]interface{}
 	pipelineIDs []string
 	logger      *logp.Logger
+	beatPaths   *paths.Path
 }
 
 type pipeline struct {
@@ -77,6 +79,7 @@ func New(
 	mname string,
 	fcfg *FilesetConfig,
 	logger *logp.Logger,
+	beatPaths *paths.Path,
 ) (*Fileset, error,
 ) {
 	modulePath := filepath.Join(modulesPath, mname)
@@ -90,6 +93,7 @@ func New(
 		fcfg:       fcfg,
 		modulePath: modulePath,
 		logger:     logger,
+		beatPaths:  beatPaths,
 	}, nil
 }
 
@@ -178,7 +182,7 @@ func (fs *Fileset) evaluateVars(info beat.Info) (map[string]interface{}, error) 
 		var exists bool
 		name, exists := vals["name"].(string)
 		if !exists {
-			return nil, fmt.Errorf("Variable doesn't have a string 'name' key")
+			return nil, fmt.Errorf("variable doesn't have a string 'name' key")
 		}
 
 		// Variables are not required to have a default. Templates should
@@ -217,28 +221,31 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 	}
 
 	if !esVersion.IsValid() {
-		return vars, errors.New("Unknown Elasticsearch version")
+		return vars, errors.New("unknown Elasticsearch version")
 	}
 
 	for _, vals := range fs.manifest.Vars {
 		var ok bool
 		name, ok := vals["name"].(string)
 		if !ok {
-			return nil, fmt.Errorf("Variable doesn't have a string 'name' key")
+			return nil, fmt.Errorf("variable doesn't have a string 'name' key")
 		}
 
 		minESVersion, ok := vals["min_elasticsearch_version"].(map[string]interface{})
 		if ok {
-			minVersion, err := version.New(minESVersion["version"].(string))
-			if err != nil {
-				return vars, fmt.Errorf("Error parsing version %s: %w", minESVersion["version"].(string), err)
-			}
+			versionString, ok := minESVersion["version"].(string)
+			if ok {
+				minVersion, err := version.New(versionString)
+				if err != nil {
+					return vars, fmt.Errorf("Error parsing version %s: %w", versionString, err)
+				}
 
-			fs.logger.Named("fileset").Debugf("Comparing ES version %s with requirement of %s", esVersion.String(), minVersion)
+				fs.logger.Named("fileset").Debugf("Comparing ES version %s with requirement of %s", esVersion.String(), minVersion)
 
-			if esVersion.LessThan(minVersion) {
-				retVars[name] = minESVersion["value"]
-				fs.logger.Infof("Setting var %s (%s) to %v because Elasticsearch version is %s", name, fs, minESVersion["value"], esVersion.String())
+				if esVersion.LessThan(minVersion) {
+					retVars[name] = minESVersion["value"]
+					fs.logger.Infof("Setting var %s (%s) to %v because Elasticsearch version is %s", name, fs, minESVersion["value"], esVersion.String())
+				}
 			}
 		}
 	}
@@ -322,11 +329,11 @@ func getTemplateFunctions(vars map[string]interface{}) (template.FuncMap, error)
 		},
 		"IngestPipeline": func(shortID string) string {
 			return FormatPipelineID(
-				builtinVars["prefix"].(string),
-				builtinVars["module"].(string),
-				builtinVars["fileset"].(string),
+				builtinVars["prefix"].(string),  //nolint:errcheck //keep behavior for now
+				builtinVars["module"].(string),  //nolint:errcheck //keep behavior for now
+				builtinVars["fileset"].(string), //nolint:errcheck //keep behavior for now
 				shortID,
-				builtinVars["beatVersion"].(string),
+				builtinVars["beatVersion"].(string), //nolint:errcheck //keep behavior for now
 			)
 		},
 	}, nil
@@ -378,7 +385,7 @@ func (fs *Fileset) getInputConfig() (*conf.C, error) {
 		return nil, fmt.Errorf("Error reading input config: %w", err)
 	}
 
-	cfg, err = mergePathDefaults(cfg)
+	cfg, err = mergePathDefaults(cfg, fs.beatPaths)
 	if err != nil {
 		return nil, err
 	}
@@ -471,7 +478,7 @@ func (fs *Fileset) GetPipelines(esVersion version.V) (pipelines []pipeline, err 
 			}
 			newContent, err := FixYAMLMaps(content)
 			if err != nil {
-				return nil, fmt.Errorf("Failed to sanitize the YAML pipeline file: %s: %w", path, err)
+				return nil, fmt.Errorf("failed to sanitize the YAML pipeline file: %s: %w", path, err)
 			}
 			var ok bool
 			content, ok = newContent.(map[string]interface{})
@@ -479,7 +486,7 @@ func (fs *Fileset) GetPipelines(esVersion version.V) (pipelines []pipeline, err 
 				return nil, errors.New("cannot convert newContent to map[string]interface{}")
 			}
 		default:
-			return nil, fmt.Errorf("Unsupported extension '%s' for pipeline file: %s", extension, path)
+			return nil, fmt.Errorf("unsupported extension '%s' for pipeline file: %s", extension, path)
 		}
 
 		pipelineID := fs.pipelineIDs[idx]
