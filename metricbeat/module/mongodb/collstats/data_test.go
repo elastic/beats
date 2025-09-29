@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !integration
+//go:build !requirefips && integration
 
 package collstats
 
@@ -30,7 +30,6 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-
 	content, err := os.ReadFile("./_meta/test/input.json")
 	assert.NoError(t, err)
 
