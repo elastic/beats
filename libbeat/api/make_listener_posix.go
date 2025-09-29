@@ -26,9 +26,10 @@ import (
 	"os"
 
 	"github.com/elastic/beats/v7/libbeat/api/npipe"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func makeListener(cfg Config) (net.Listener, error) {
+func makeListener(_ *logp.Logger, cfg Config) (net.Listener, error) {
 	if len(cfg.User) > 0 {
 		return nil, errors.New("specifying a user is not supported under this platform")
 	}

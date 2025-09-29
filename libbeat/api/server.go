@@ -50,7 +50,7 @@ func New(log *logp.Logger, config *config.C) (*Server, error) {
 		return nil, err
 	}
 
-	l, err := makeListener(cfg)
+	l, err := makeListener(log, cfg)
 	if err != nil {
 		return nil, err
 	}

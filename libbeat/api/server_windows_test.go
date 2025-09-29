@@ -61,3 +61,21 @@ func TestNamedPipe(t *testing.T) {
 
 	assert.Equal(t, "ehlo!", string(body))
 }
+
+func TestCreateListener(t *testing.T) {
+	name := "npipe:///testpipe"
+
+	cfg := config.MustNewConfigFrom(map[string]interface{}{
+		"host": name,
+	})
+
+	// try creating and closing servers with same name multiple times
+	for range 1000 {
+		s, err := New(nil, cfg)
+		require.NoError(t, err)
+		go s.Start()
+		defer func() {
+			require.NoError(t, s.Stop())
+		}()
+	}
+}
