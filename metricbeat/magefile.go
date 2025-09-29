@@ -26,11 +26,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
-
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
+	"github.com/magefile/mage/mg"
 
 	// register kubernetes runner
 	_ "github.com/elastic/beats/v7/dev-tools/mage/kubernetes"
@@ -238,15 +236,6 @@ func GoFIPSOnlyIntegTest(ctx context.Context) error {
 
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
-	}
-
-	// We pre-cache go module dependencies before running the unit tests with
-	// GODEBUG=fips140=only.  Otherwise, the command that runs the unit tests
-	// will try to download the dependencies and could fail because the TLS
-	// negotiation with the Go module proxy could use a non-FIPS compliant
-	// key exchange protocol, e.g. X25519.
-	if err := sh.RunV(mg.GoCmd(), "mod", "download"); err != nil {
-		return err
 	}
 
 	// We also set GODEBUG=tlsmlkem=0 to disable the X25519MLKEM768 TLS key
