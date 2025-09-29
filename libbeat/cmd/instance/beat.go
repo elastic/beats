@@ -27,6 +27,7 @@ import (
 	"net"
 	"os"
 	"os/user"
+	"path/filepath"
 	"runtime"
 	"runtime/debug"
 	"strconv"
@@ -978,8 +979,8 @@ func (b *Beat) LoadMeta(metaPath string) error {
 
 	// file does not exist or ID is invalid or first start time is not defined, let's create a new one
 
-	// write temporary file first
-	tmpFile, err := os.CreateTemp("", "beat_meta")
+	// write temporary file first, use same dir as destination to avoid invalid cross-device links
+	tmpFile, err := os.CreateTemp(filepath.Dir(metaPath), "new")
 	if err != nil {
 		return fmt.Errorf("failed to create temporary Beat meta file: %w", err)
 	}
