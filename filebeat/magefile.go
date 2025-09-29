@@ -24,12 +24,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
-
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	filebeat "github.com/elastic/beats/v7/filebeat/scripts/mage"
+	"github.com/magefile/mage/mg"
 
 	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
@@ -212,7 +210,7 @@ func GoFIPSOnlyIntegTest(ctx context.Context) error {
 	if err := sh.RunV(mg.GoCmd(), "mod", "download"); err != nil {
 		return err
 	}
-	
+
 	return devtools.GoIntegTestFromHost(ctx, devtools.FIPSOnlyGoTestIntegrationFromHostArgs(ctx))
 }
 
