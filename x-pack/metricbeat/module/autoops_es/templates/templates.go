@@ -67,6 +67,13 @@ var defaultExcludedTemplatePatterns = []string{
 	"synthetics*",
 	"traces-apm*",
 	".entities*",
+	".adhoc*",
+	".preview*",
+	"metrics-elastic_agent*",
+	"enterprise_search-ecs*",
+	".items*",
+	"elastic-cloud-logs-*",
+	".metrics-endpoint*",
 }
 
 const (

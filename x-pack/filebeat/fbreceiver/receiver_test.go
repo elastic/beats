@@ -164,13 +164,12 @@ func BenchmarkFactory(b *testing.B) {
 }
 
 func TestMultipleReceivers(t *testing.T) {
-	t.Skip("flaky test, see https://github.com/elastic/beats/issues/43832")
 	// This test verifies that multiple receivers can be instantiated
 	// in isolation, started, and can ingest logs without interfering
 	// with each other.
 
 	// Receivers need distinct home directories so wrap the config in a function.
-	config := func(monitorSocket string) *Config {
+	config := func(monitorSocket string, homePath string, ingestPath string) *Config {
 		var monitorHost string
 		if runtime.GOOS == "windows" {
 			monitorHost = "npipe:///" + filepath.Base(monitorSocket)
@@ -188,10 +187,11 @@ func TestMultipleReceivers(t *testing.T) {
 							"count":   1,
 						},
 						{
-							"type":    "filestream",
-							"enabled": true,
-							"id":      "must-be-unique",
-							"paths":   []string{"none"},
+							"type":                 "filestream",
+							"enabled":              true,
+							"id":                   "must-be-unique",
+							"paths":                []string{ingestPath},
+							"file_identity.native": nil,
 						},
 					},
 				},
@@ -204,7 +204,7 @@ func TestMultipleReceivers(t *testing.T) {
 						"*",
 					},
 				},
-				"path.home":    t.TempDir(),
+				"path.home":    homePath,
 				"http.enabled": true,
 				"http.host":    monitorHost,
 			},
@@ -214,23 +214,40 @@ func TestMultipleReceivers(t *testing.T) {
 	factory := NewFactory()
 	monitorSocket1 := genSocketPath()
 	monitorSocket2 := genSocketPath()
+	dir1 := t.TempDir()
+	dir2 := t.TempDir()
+	ingest1 := filepath.Join(t.TempDir(), "test1.log")
+	ingest2 := filepath.Join(t.TempDir(), "test2.log")
 	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
-		T: t,
+		T:           t,
+		NumRestarts: 5,
 		Receivers: []oteltest.ReceiverConfig{
 			{
 				Name:    "r1",
 				Beat:    "filebeat",
-				Config:  config(monitorSocket1),
+				Config:  config(monitorSocket1, dir1, ingest1),
 				Factory: factory,
 			},
 			{
 				Name:    "r2",
 				Beat:    "filebeat",
-				Config:  config(monitorSocket2),
+				Config:  config(monitorSocket2, dir2, ingest2),
 				Factory: factory,
 			},
 		},
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
+			// Add data to be ingested with filestream
+			f1, err := os.OpenFile(ingest1, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+			require.NoError(c, err)
+			_, err = f1.WriteString("A log line\n")
+			require.NoError(c, err)
+			f1.Close()
+			f2, err := os.OpenFile(ingest2, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+			require.NoError(c, err)
+			_, err = f2.WriteString("A log line\n")
+			require.NoError(c, err)
+			f2.Close()
+
 			require.Greater(c, len(logs["r1"]), 0, "receiver r1 does not have any logs")
 			require.Greater(c, len(logs["r2"]), 0, "receiver r2 does not have any logs")
 
@@ -243,10 +260,23 @@ func TestMultipleReceivers(t *testing.T) {
 			// instance and does not interfere with others. Previously, the
 			// logger in Beats was global, causing logger fields to be
 			// overwritten when multiple receivers started in the same process.
-			r1StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "r1"))
+			r1StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/r1"))
 			assert.Equal(c, 1, r1StartLogs.Len(), "r1 should have a single start log")
-			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "r2"))
+			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "filebeatreceiver/r2"))
 			assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
+
+			meta1Path := filepath.Join(dir1, "/data/meta.json")
+			assert.FileExists(c, meta1Path, "dir1/data/meta.json should exist")
+			meta1Data, err := os.ReadFile(meta1Path)
+			assert.NoError(c, err)
+
+			meta2Path := filepath.Join(dir2, "/data/meta.json")
+			assert.FileExists(c, meta2Path, "dir2/data/meta.json should exist")
+			meta2Data, err := os.ReadFile(meta2Path)
+			assert.NoError(c, err)
+
+			assert.NotEqual(c, meta1Data, meta2Data, "meta data files should be different")
+
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket1, "stats")
@@ -260,6 +290,25 @@ func TestMultipleReceivers(t *testing.T) {
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket2, "inputs")
 			}, "failed to connect to monitoring socket2, inputs endpoint, last error was: %s", &lastError)
+
+			ingest1Json, err := json.Marshal(ingest1)
+			require.NoError(c, err)
+			ingest2Json, err := json.Marshal(ingest2)
+			require.NoError(c, err)
+
+			reg1Path := filepath.Join(dir1, "/data/registry/filebeat/log.json")
+			require.FileExists(c, reg1Path, "receiver 1 filebeat registry should exist")
+			reg1Data, err := os.ReadFile(reg1Path)
+			require.NoError(c, err)
+			require.Containsf(c, string(reg1Data), string(ingest1Json), "receiver 1 registry should contain '%s', but was: %s", string(ingest1Json), string(reg1Data))
+			require.NotContainsf(c, string(reg1Data), string(ingest2Json), "receiver 1 registry should not contain '%s', but was: %s", string(ingest2Json), string(reg1Data))
+
+			reg2Path := filepath.Join(dir2, "/data/registry/filebeat/log.json")
+			require.FileExists(c, reg2Path, "receiver 2 filebeat registry should exist")
+			reg2Data, err := os.ReadFile(reg2Path)
+			require.NoError(c, err)
+			require.Containsf(c, string(reg2Data), string(ingest2Json), "receiver 2 registry should contain '%s', but was: %s", string(ingest2Json), string(reg2Data))
+			require.NotContainsf(c, string(reg2Data), string(ingest1Json), "receiver 2 registry should not contain '%s', but was: %s", string(ingest1Json), string(reg2Data))
 		},
 	})
 }
@@ -534,4 +583,35 @@ func TestConsumeContract(t *testing.T) {
 		Generator:     gen,
 		GenerateCount: logsPerTest,
 	})
+}
+
+func TestReceiverHook(t *testing.T) {
+	cfg := Config{
+		Beatconfig: map[string]any{
+			"filebeat": map[string]any{
+				"inputs": []map[string]any{
+					{
+						"type":    "benchmark",
+						"enabled": true,
+						"message": "test",
+						"count":   1,
+					},
+				},
+			},
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
+			},
+			"management.otel.enabled": true,
+			"path.home":               t.TempDir(),
+		},
+	}
+	receiverSettings := receiver.Settings{
+		ID: component.MustNewID(Name),
+		TelemetrySettings: component.TelemetrySettings{
+			Logger: zap.NewNop(),
+		},
+	}
+	// For filebeatreceiver, we expect 3 hooks to be registered:
+	// 	one for beat metrics, one for input metrics and one for getting the registry.
+	oteltest.TestReceiverHook(t, &cfg, NewFactory(), receiverSettings, 3)
 }
