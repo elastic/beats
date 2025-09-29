@@ -17,7 +17,8 @@ def document_fields(output, section, sections, path, beat):
         output.write(
             '  - https://www.elastic.co/guide/en/beats/{}/current/exported-fields-{}.html\n'.format(beat, section["anchor"]))
         # Build a docs-builder applies_to directive
-        applies_to = get_applies_to(section, True)
+        pageLevelEnabled = True
+        applies_to = get_applies_to(section, pageLevelEnabled)
         if len(applies_to) > 0:
             output.write('applies_to:\n')
             output.write('  stack: ')
@@ -52,7 +53,8 @@ See the [ECS reference](ecs://reference/index.md) for more information.
             output.write("## {} [_{}]\n\n".format(section["name"], section["name"]))
 
             # Build a docs-builder applies_to directive
-            applies_to = get_applies_to(section, False)
+            pageLevelEnabled = False
+            applies_to = get_applies_to(section, pageLevelEnabled)
             if len(applies_to) > 0:
                 output.write("```{applies_to}\nstack: ")
                 output.write(", ".join(applies_to))
@@ -89,7 +91,8 @@ def document_field(output, field, field_path):
     output.write("**`{}`**".format(field["field_path"]))
 
     # Build a docs-builder applies_to directive
-    applies_to = get_applies_to(field, False)
+    pageLevelEnabled = False
+    applies_to = get_applies_to(field, pageLevelEnabled)
     if len(applies_to) > 0:
         output.write(" {applies_to}`stack: ")
         output.write(", ".join(applies_to))
@@ -139,7 +142,7 @@ def document_field(output, field, field_path):
 # to accomplish this.
 
 
-def get_applies_to(item, pageLevel):
+def get_applies_to(item, pageLevelEnabled):
     applies_to = []
     if "version" in item:
         if "preview" in item["version"]:
@@ -155,13 +158,13 @@ def get_applies_to(item, pageLevel):
     # Add `release` to applies_to if not already added via `version`
     elif "release" in item:
         # Always include at the page level
-        if pageLevel:
+        if pageLevelEnabled:
             applies_to.append(item["release"])
         # Only include at the section or line level if not "ga"
         elif item["release"] != "ga":
             applies_to.append(item["release"])
     # Assume GA if no lifecycle/version is provided
-    elif pageLevel:
+    elif pageLevelEnabled:
         applies_to.append("ga")
     # Add `deprecated` to applies_to if not already added via `version`
     if "deprecated" in item:
