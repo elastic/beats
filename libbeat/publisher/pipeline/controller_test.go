@@ -123,9 +123,7 @@ func TestSetEmptyOutputsSendsNilChannel(t *testing.T) {
 	// Just fill out enough to confirm what's sent to the event consumer,
 	// we don't want to start up real helper routines.
 	controller := outputController{
-		beat: beat.Info{
-			Logger: logptest.NewTestingLogger(t, ""),
-		},
+		beat: beat.Info{},
 		consumer: &eventConsumer{
 			targetChan: make(chan consumerTarget, 2),
 		},

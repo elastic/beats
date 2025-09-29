@@ -51,7 +51,7 @@ func TestClientShutdownPanic(t *testing.T) {
 		beat.Info{
 			Beat:        "libbeat",
 			IndexPrefix: "testbeat"},
-		outputs.NewStats(monitoring.NewRegistry()), cfg)
+		outputs.NewStats(monitoring.NewRegistry(), logp.NewNopLogger()), cfg)
 	require.NoError(t, err, "could not create kafka output")
 
 	b := outest.NewBatch(

@@ -250,7 +250,7 @@ func runTestWithACKer(t *testing.T, cfg *conf.C, onEvent eventHandler, run func(
 	//nolint:errcheck // ignore
 	pubsubInput := in.(*pubsubInput)
 	// Initialize metrics explicitly for tests
-	pubsubInput.metrics = newInputMetrics("", nil, logp.NewNopLogger())
+	pubsubInput.metrics = newInputMetrics("", nil)
 	defer pubsubInput.Stop()
 
 	run(client, pubsubInput, eventOutlet, t)

@@ -154,7 +154,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 			GetObject(gomock.Any(), gomock.Eq("us-east-1"), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, nil, backupConfig{})
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, nil, backupConfig{}, logp.NewNopLogger())
 		err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(logp.NewLogger(inputName), func(_ beat.Event) {})
 		require.Error(t, err)
 		assert.True(t, errors.Is(err, errS3DownloadFailed), "expected errS3DownloadFailed")
@@ -201,7 +201,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 			GetObject(gomock.Any(), gomock.Eq("us-east-1"), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
 			Return(nil, nil)
 
-		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, nil, backupConfig{})
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, nil, backupConfig{}, logp.NewNopLogger())
 		err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(logp.NewLogger(inputName), func(_ beat.Event) {})
 		require.Error(t, err)
 	})
@@ -222,7 +222,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 		)
 
 		var events []beat.Event
-		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, nil, backupConfig{})
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, nil, backupConfig{}, logp.NewNopLogger())
 		err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(logp.NewLogger(inputName), func(event beat.Event) {
 			events = append(events, event)
 		})
@@ -364,7 +364,7 @@ func TestProcessObjectMetricCollection(t *testing.T) {
 
 			// metric recorder with zero workers
 			metricRecorder := newInputMetrics(test.name, nil, 0)
-			objFactory := newS3ObjectProcessorFactory(metricRecorder, mockS3API, nil, backupConfig{})
+			objFactory := newS3ObjectProcessorFactory(metricRecorder, mockS3API, nil, backupConfig{}, logp.NewNopLogger())
 			objHandler := objFactory.Create(ctx, s3Event)
 
 			// when
