@@ -105,10 +105,6 @@ func retrieveSupportedMetricAvailability(availabilities []*armmonitor.MetricAvai
 			return defaultTimeGrain
 		}
 	}
-	// // select first timegrain, should be bigger than the min timegrain of 1M, timegrains are returned in asc order
-	// if *availabilities[0].TimeGrain != "PT1M" {
-	// 	return *availabilities[0].TimeGrain
-	// }
 	return *availabilities[1].TimeGrain
 }
 
