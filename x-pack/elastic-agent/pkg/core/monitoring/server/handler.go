@@ -39,9 +39,9 @@ func (h *apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func unexpectedErrorWithReason(reason string, args ...interface{}) errResponse {
+func unexpectedErrorWithReason(reason string) errResponse {
 	return errResponse{
 		Type:   errTypeUnexpected,
-		Reason: fmt.Sprintf(reason, args...),
+		Reason: fmt.Sprint(reason),
 	}
 }
