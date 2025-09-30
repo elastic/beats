@@ -84,7 +84,7 @@ services:
     volumes:
       - logstash_testdata:/usr/share/nginx/html:ro
     ports:
-      - 8081:80
+      - 8082:80
 
 volumes:
   logstash_testdata:

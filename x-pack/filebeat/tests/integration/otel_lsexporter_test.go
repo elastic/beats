@@ -116,7 +116,7 @@ processors:
 	defer filebeat.Stop()
 
 	// Nginx endpoint URLs
-	baseURL := "http://localhost:8081"
+	baseURL := "http://localhost:8082"
 	outFileURL := fmt.Sprintf("%s/%s_fb.json", baseURL, testCaseName)
 	outOTelFileURL := fmt.Sprintf("%s/%s_otel.json", baseURL, testCaseName)
 
