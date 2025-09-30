@@ -74,8 +74,6 @@ func TestCreateListenerSamePipe(t *testing.T) {
 		s, err := New(nil, cfg)
 		require.NoError(t, err)
 		go s.Start()
-		defer func() {
-			require.NoError(t, s.Stop())
-		}()
+		require.NoError(t, s.Stop())
 	}
 }

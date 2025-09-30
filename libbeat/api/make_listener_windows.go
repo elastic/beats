@@ -24,12 +24,24 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/api/npipe"
 )
 
-func makeListener(ctx context.Context, cfg Config) (net.Listener, error) {
+func makeListener(cfg Config) (net.Listener, error) {
+	ctx, cancel := context.WithCancel(context.Background())
+	// On termination signals, stop the listener creation retries
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	go func() {
+		<-sigc
+		cancel()
+	}()
+
 	if len(cfg.User) > 0 && len(cfg.SecurityDescriptor) > 0 {
 		return nil, errors.New("user and security_descriptor are mutually exclusive, define only one of them")
 	}
