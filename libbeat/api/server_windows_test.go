@@ -20,7 +20,7 @@
 package api
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -52,11 +52,11 @@ func TestNamedPipe(t *testing.T) {
 		},
 	}
 
-	r, err := c.Get("http://npipe/echo-hello")
+	r, err := c.Get("http://npipe/echo-hello") //nolint:noctx // context not needed in test
 	require.NoError(t, err)
 	defer r.Body.Close()
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	require.NoError(t, err)
 
 	assert.Equal(t, "ehlo!", string(body))
