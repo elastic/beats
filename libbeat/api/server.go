@@ -33,13 +33,15 @@ import (
 // Server takes care of correctly starting the HTTP component of the API
 // and will answer all the routes defined in the received ServeMux.
 type Server struct {
-	log        *logp.Logger
-	mux        *http.ServeMux
-	l          net.Listener
-	config     Config
-	wg         sync.WaitGroup
-	mutex      sync.Mutex
-	httpServer *http.Server
+	log         *logp.Logger
+	mux         *http.ServeMux
+	l           net.Listener
+	config      Config
+	wg          sync.WaitGroup
+	mutex       sync.Mutex
+	httpServer  *http.Server
+	startCalled bool
+	stopCalled  bool
 }
 
 // New creates a new API Server with no routes attached.
@@ -67,6 +69,17 @@ func New(log *logp.Logger, config *config.C) (*Server, error) {
 func (s *Server) Start() {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
+
+	// only need to call Start once
+	if s.startCalled {
+		return
+	}
+	s.startCalled = true
+
+	if s.stopCalled {
+		s.log.Info("Not starting stating stats endpoint since stop was already called")
+		return
+	}
 	s.log.Info("Starting stats endpoint")
 	s.wg.Add(1)
 	s.httpServer = &http.Server{Handler: s.mux} //nolint:gosec // Keep original behavior
@@ -83,12 +96,23 @@ func (s *Server) Start() {
 func (s *Server) Stop() error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
+	// only need to call Stop once
+	if s.stopCalled {
+		return nil
+	}
+	s.stopCalled = true
+
 	if s.httpServer == nil {
+		// New always creates a listener, need to close it even if the server hasn't started
+		if err := s.l.Close(); err != nil {
+			s.log.Infof("Error closing stats endpoint (%s): %v", s.l.Addr().String(), err)
+		}
 		return nil
 	}
 	if err := s.httpServer.Close(); err != nil {
 		return fmt.Errorf("error closing monitoring server: %w", err)
 	}
+
 	s.wg.Wait()
 	return nil
 }
