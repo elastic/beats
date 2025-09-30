@@ -52,11 +52,12 @@ type eventWithID struct {
 // TestDataShapeOTelVSClassicE2E verifies that the event data shape of filebeat in otel mode is the same as filebeat.
 // Two Filebeat instances are started:
 //
-//	one configured for classic mode sending to Logstash on port 5044 and
+//	one for classic mode sending to Logstash on port 5044 and
 //	one for Otel mode sending to Logstash on port 5055.
 //
 // Logstash runs two pipelines listening on those ports and writes the resulting events into a shared Docker volume.
 // Nginx container serves that volume over HTTP so the test can fetch the generated files without relying on host filesystem permissions.
+// Finally, the test downloads both files to ./tests/integration/logstash/testdata and compares the sorted events line by line.
 func TestDataShapeOTelVSClassicE2E(t *testing.T) {
 	// ensure the size of events is big enough (1024b) for filebeat to ingest
 	numEvents := 3
