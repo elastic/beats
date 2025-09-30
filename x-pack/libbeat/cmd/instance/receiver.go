@@ -5,14 +5,17 @@
 package instance
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/otelmanager"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/status"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
@@ -31,7 +34,7 @@ type BeatReceiver struct {
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
-func NewBeatReceiver(b *instance.Beat, creator beat.Creator) (BeatReceiver, error) {
+func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator) (BeatReceiver, error) {
 	beatConfig, err := b.BeatConfig()
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error getting beat config: %w", err)
@@ -59,6 +62,7 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator) (BeatReceiver, erro
 	}
 
 	if b.Config.HTTP.Enabled() {
+<<<<<<< HEAD
 		var err error
 		b.API, err = api.NewWithDefaultRoutes(
 			logp.L().Named("metrics.http"),
@@ -67,10 +71,27 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator) (BeatReceiver, erro
 			b.Monitoring.StateRegistry(),
 			b.Monitoring.StatsRegistry(),
 			b.Monitoring.InputsRegistry())
+=======
+		retryer := backoff.NewRetryer(50, 100*time.Millisecond, 1*time.Second)
+		err := retryer.Retry(ctx, func() error {
+			var err error
+			b.API, err = api.NewWithDefaultRoutes(
+				b.Info.Logger.Named("metrics.http"),
+				b.Config.HTTP,
+				b.Monitoring.InfoRegistry(),
+				b.Monitoring.StateRegistry(),
+				b.Monitoring.StatsRegistry(),
+				b.Monitoring.InputsRegistry())
+			if err != nil {
+				return fmt.Errorf("could not start the HTTP server for the API: %w", err)
+			}
+			b.API.Start()
+			return nil
+		})
+>>>>>>> 32b5e5a5e (fix: add retry for listener creation in libbeat (#46846))
 		if err != nil {
-			return BeatReceiver{}, fmt.Errorf("could not start the HTTP server for the API: %w", err)
+			return BeatReceiver{}, fmt.Errorf("error creating api listener after 100 retries: %w", err)
 		}
-		b.API.Start()
 	}
 
 	beater, err := creator(&b.Beat, beatConfig)
