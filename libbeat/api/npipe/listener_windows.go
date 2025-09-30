@@ -24,7 +24,6 @@ import (
 	"context"
 	"net"
 	"os/user"
-	"runtime/debug"
 	"strings"
 
 	winio "github.com/Microsoft/go-winio"
@@ -75,37 +74,6 @@ func Dial(npipe string) func(string, string) (net.Conn, error) {
 	}
 }
 
-func oldSD(forUser string) (string, error) {
-	var u *user.User
-	var err error
-	// No user configured we fallback to the current running user.
-	if len(forUser) == 0 {
-		u, err = user.Current()
-		if err != nil {
-			return "", errors.Wrap(err, "failed to retrieve the current user")
-		}
-	} else {
-		u, err = user.Lookup(forUser)
-		if err != nil {
-			return "", errors.Wrapf(err, "failed to retrieve the user %s", forUser)
-		}
-	}
-
-	// Named pipe security and access rights.
-	// We create the pipe and the specific users should only be able to write to it.
-	// See docs: https://docs.microsoft.com/en-us/windows/win32/ipc/named-pipe-security-and-access-rights
-	// String definition: https://docs.microsoft.com/en-us/windows/win32/secauthz/ace-strings
-	// Give generic read/write access to the specified user.
-	descriptor := "D:P(A;;GA;;;" + u.Uid + ")"
-	if u.Username == "NT AUTHORITY\\SYSTEM" {
-		// running as SYSTEM, include Administrators group so Administrators can talk over
-		// the named pipe to the running Elastic Agent system process
-		// https://support.microsoft.com/en-us/help/243330/well-known-security-identifiers-in-windows-operating-systems
-		descriptor += "(A;;GA;;;S-1-5-32-544)" // Administrators group
-	}
-	return descriptor, nil
-}
-
 // DefaultSD returns a default SecurityDescriptor which is the minimal required permissions to be
 // able to write to the named pipe. The security descriptor is returned in SDDL format.
 //
@@ -113,11 +81,6 @@ func oldSD(forUser string) (string, error) {
 func DefaultSD(forUser string) (string, error) {
 	var u *user.User
 	var err error
-	logger := logp.L().Named("npipe")
-
-	bi, ok := debug.ReadBuildInfo()
-	logger.Infof("==================== Go version: %s. OK? %t", bi.GoVersion, ok)
-	logger.Infof("==================== forUser: %q", forUser)
 
 	// No user configured we fallback to the current running user.
 	if len(forUser) == 0 {
@@ -125,24 +88,11 @@ func DefaultSD(forUser string) (string, error) {
 		if err != nil {
 			return "", errors.Wrap(err, "failed to retrieve the current user")
 		}
-		logger.Infof("==================== user.Current: Username: %q, Name: %q, Uid: %q Gid: %q, HomeDir: %q",
-			u.Username,
-			u.Name,
-			u.Uid,
-			u.Gid,
-			u.HomeDir)
 	} else {
 		u, err = user.Lookup(forUser)
 		if err != nil {
 			return "", errors.Wrapf(err, "failed to retrieve the user %s", forUser)
 		}
-		logger.Infof("==================== user.Lookup(%s): Username: %q, Name: %q, Uid: %q Gid: %q, HomeDir: %q",
-			forUser,
-			u.Username,
-			u.Name,
-			u.Uid,
-			u.Gid,
-			u.HomeDir)
 	}
 
 	// Named pipe security and access rights.
@@ -156,17 +106,13 @@ func DefaultSD(forUser string) (string, error) {
 		// do not fail, agent would end up in a loop, continue with limited permissions
 		logp.Warn("failed to detect Administrator: %v", err)
 	}
-	logger.Infof("==================== isAdmin: %t", isAdmin)
+
 	if isAdmin {
 		// running as SYSTEM, include Administrators group so Administrators can talk over
 		// the named pipe to the running Elastic Agent system process
 		// https://support.microsoft.com/en-us/help/243330/well-known-security-identifiers-in-windows-operating-systems
 		descriptor += "(A;;GA;;;S-1-5-32-544)" // Administrators group
 	}
-
-	old, err := oldSD(forUser)
-	logger.Infof("============================== descriptor: %q", descriptor)
-	logger.Infof("============================== Old Descriptor: %q. Error: %s", old, err)
 
 	return descriptor, nil
 }
