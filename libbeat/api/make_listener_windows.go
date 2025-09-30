@@ -20,7 +20,6 @@
 package api
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net"
@@ -33,15 +32,6 @@ import (
 )
 
 func makeListener(cfg Config) (net.Listener, error) {
-	ctx, cancel := context.WithCancel(context.Background())
-	// On termination signals, stop the listener creation retries
-	sigc := make(chan os.Signal, 1)
-	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
-	go func() {
-		<-sigc
-		cancel()
-	}()
-
 	if len(cfg.User) > 0 && len(cfg.SecurityDescriptor) > 0 {
 		return nil, errors.New("user and security_descriptor are mutually exclusive, define only one of them")
 	}
@@ -58,7 +48,7 @@ func makeListener(cfg Config) (net.Listener, error) {
 		} else {
 			sd = cfg.SecurityDescriptor
 		}
-		return createListenerWithRetry(ctx, pipe, sd)
+		return createListenerWithRetry(pipe, sd)
 	}
 
 	network, path, err := parse(cfg.Host, cfg.Port)
@@ -76,7 +66,11 @@ func makeListener(cfg Config) (net.Listener, error) {
 	return net.Listen(network, path)
 }
 
-func createListenerWithRetry(ctx context.Context, pipe string, sd string) (net.Listener, error) {
+func createListenerWithRetry(pipe string, sd string) (net.Listener, error) {
+	// On termination signals, stop the listener creation retries
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+
 	retryDuration := 30 * time.Second
 	backoffDelay := 500 * time.Millisecond
 
@@ -85,8 +79,8 @@ func createListenerWithRetry(ctx context.Context, pipe string, sd string) (net.L
 
 	for time.Now().Before(deadline) {
 		select {
-		case <-ctx.Done():
-			return nil, fmt.Errorf("context canceled while trying to create npipe listener: %w", ctx.Err())
+		case <-sigc:
+			return nil, errors.New("received termination signal while trying to create npipe listener")
 		default:
 		}
 		lis, err := npipe.NewListener(pipe, sd)
