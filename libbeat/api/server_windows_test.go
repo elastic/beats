@@ -20,7 +20,7 @@
 package api
 
 import (
-	"io"
+	"io/ioutil"
 	"net/http"
 	"testing"
 
@@ -52,28 +52,12 @@ func TestNamedPipe(t *testing.T) {
 		},
 	}
 
-	r, err := c.Get("http://npipe/echo-hello") //nolint:noctx // context not needed in test
+	r, err := c.Get("http://npipe/echo-hello")
 	require.NoError(t, err)
 	defer r.Body.Close()
 
-	body, err := io.ReadAll(r.Body)
+	body, err := ioutil.ReadAll(r.Body)
 	require.NoError(t, err)
 
 	assert.Equal(t, "ehlo!", string(body))
-}
-
-func TestCreateListenerSamePipe(t *testing.T) {
-	name := "npipe:///testpipe"
-
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
-		"host": name,
-	})
-
-	// try creating and closing servers with same name multiple times
-	for range 1000 {
-		s, err := New(nil, cfg)
-		require.NoError(t, err)
-		go s.Start()
-		require.NoError(t, s.Stop())
-	}
 }

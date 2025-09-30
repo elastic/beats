@@ -23,10 +23,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/api/npipe"
 )
@@ -48,7 +44,7 @@ func makeListener(cfg Config) (net.Listener, error) {
 		} else {
 			sd = cfg.SecurityDescriptor
 		}
-		return createListenerWithRetry(pipe, sd)
+		return npipe.NewListener(pipe, sd)
 	}
 
 	network, path, err := parse(cfg.Host, cfg.Port)
@@ -64,31 +60,4 @@ func makeListener(cfg Config) (net.Listener, error) {
 	}
 
 	return net.Listen(network, path)
-}
-
-func createListenerWithRetry(pipe string, sd string) (net.Listener, error) {
-	// On termination signals, stop the listener creation retries
-	sigc := make(chan os.Signal, 1)
-	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
-
-	retryDuration := 30 * time.Second
-	backoffDelay := 500 * time.Millisecond
-
-	deadline := time.Now().Add(retryDuration)
-	var lastErr error
-
-	for time.Now().Before(deadline) {
-		select {
-		case <-sigc:
-			return nil, errors.New("received termination signal while trying to create npipe listener")
-		default:
-		}
-		lis, err := npipe.NewListener(pipe, sd)
-		if err == nil {
-			return lis, nil
-		}
-		lastErr = err
-		time.Sleep(backoffDelay)
-	}
-	return nil, fmt.Errorf("failed to create npipe listener after %s: %w", retryDuration, lastErr)
 }
