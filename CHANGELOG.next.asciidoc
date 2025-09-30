@@ -627,6 +627,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
 - Add NTP response validation for system/ntp module. {pull}46184[46184]
 - Add vertexai_logs metricset to GCP for prompt response collection from VertexAI service. {pull}46383[46383]
+- Add default timegrain to Azure Storage Account metricset. {pull}46786[46786]
 
 *Metricbeat*
 
