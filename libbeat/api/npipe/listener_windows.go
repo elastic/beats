@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	winio "github.com/Microsoft/go-winio"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/pkg/errors"
 )
 
@@ -99,7 +100,12 @@ func DefaultSD(forUser string) (string, error) {
 	// String definition: https://docs.microsoft.com/en-us/windows/win32/secauthz/ace-strings
 	// Give generic read/write access to the specified user.
 	descriptor := "D:P(A;;GA;;;" + u.Uid + ")"
-	if u.Username == "NT AUTHORITY\\SYSTEM" {
+	isAdmin, err := hasRoot()
+	if err != nil {
+		// do not fail, agent would end up in a loop, continue with limited permissions
+		logp.Warn("failed to detect Administrator: %v", err)
+	}
+	if isAdmin {
 		// running as SYSTEM, include Administrators group so Administrators can talk over
 		// the named pipe to the running Elastic Agent system process
 		// https://support.microsoft.com/en-us/help/243330/well-known-security-identifiers-in-windows-operating-systems
