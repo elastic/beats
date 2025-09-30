@@ -1,5 +1,3 @@
-version: '2.3'
-
 services:
   logstash:
     image: docker.elastic.co/integrations-ci/beats-logstash:${LOGSTASH_VERSION:-8.1.0-aa69d697-SNAPSHOT}-1
