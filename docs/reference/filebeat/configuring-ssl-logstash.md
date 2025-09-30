@@ -17,10 +17,10 @@ To use SSL mutual authentication:
     If you are using {{security-features}}, you can use the [elasticsearch-certutil tool](elasticsearch://reference/elasticsearch/command-line-tools/certutil.md) to generate certificates.
     ::::
 
-2. Configure Filebeat to use SSL. In the `filebeat.yml` config file, specify the following settings under `ssl`:
+2. Configure Filebeat to use SSL. In the `filebeat.yml` config file, specify these settings under `ssl`:
 
-    * `certificate_authorities`: Configures Filebeat to trust any certificates signed by the specified CA. If `certificate_authorities` is empty or not set, the trusted certificate authorities of the host system are used.
-    * `certificate` and `key`: Specifies the certificate and key that Filebeat uses to authenticate with Logstash.
+    * `certificate_authorities`. Configures Filebeat to trust any certificates signed by the specified CA. If `certificate_authorities` is empty or not set, the trusted certificate authorities of the host system are used.
+    * `certificate` and `key`. Specifies the certificate and key that Filebeat uses to authenticate with Logstash.
 
         For example:
 
@@ -34,12 +34,12 @@ To use SSL mutual authentication:
 
         For more information about these configuration options, see [SSL](/reference/filebeat/configuration-ssl.md).
 
-3. Configure Logstash to use SSL. In the Logstash config file, specify the following settings for the [Beats input plugin for Logstash](logstash-docs-md://lsr/plugins-inputs-beats.md):
+3. Configure Logstash to use SSL. In the Logstash config file, specify these settings for the [Beats input plugin for Logstash](logstash-docs-md://lsr/plugins-inputs-beats.md):
 
-    * `ssl`: When set to true, enables Logstash to use SSL/TLS.
-    * `ssl_certificate_authorities`: Configures Logstash to trust any certificates signed by the specified CA.
-    * `ssl_certificate` and `ssl_key`: Specify the certificate and key that Logstash uses to authenticate with the client.
-    * `ssl_verify_mode`: Specifies whether the Logstash server verifies the client certificate against the CA. You need to specify either `peer` or `force_peer` to make the server ask for the certificate and validate it. If you specify `force_peer`, and Filebeat doesn’t provide a certificate, the Logstash connection will be closed. If you choose not to use [certutil](elasticsearch://reference/elasticsearch/command-line-tools/certutil.md), the certificates that you obtain must allow for both `clientAuth` and `serverAuth` if the extended key usage extension is present.
+    * `ssl`. When set to true, enables Logstash to use SSL/TLS.
+    * `ssl_certificate_authorities`. Configures Logstash to trust any certificates signed by the specified CA.
+    * `ssl_certificate` and `ssl_key`. Specify the certificate and key that Logstash uses to authenticate with the client.
+    * `ssl_client_authentication`. Specifies whether the Logstash server verifies the client certificate against the CA. You need to specify either `required` or `optional` to make the server ask for the certificate and validate it. If you specify `required`, and Filebeat doesn’t provide a certificate, the Logstash connection will be closed. If you choose not to use [certutil](elasticsearch://reference/elasticsearch/command-line-tools/certutil.md), the certificates that you obtain must allow for both `clientAuth` and `serverAuth` if the extended key usage extension is present.
 
         For example:
 
@@ -47,11 +47,11 @@ To use SSL mutual authentication:
         input {
           beats {
             port => 5044
-            ssl => true
+            ssl_enabled => true
             ssl_certificate_authorities => ["/etc/ca.crt"]
             ssl_certificate => "/etc/server.crt"
             ssl_key => "/etc/server.key"
-            ssl_verify_mode => "force_peer"
+            ssl_client_authentication => "required"
           }
         }
         ```
@@ -74,7 +74,7 @@ If the test is successful, you’ll receive an empty response error. Here's an e
 * Rebuilt URL to: https://logs.example.com:5044/
 *   Trying 192.168.99.100...
 * Connected to logs.example.com (192.168.99.100) port 5044 (#0)
-* TLS 1.2 connection using TLS_DHE_RSA_WITH_AES_256_CBC_SHA
+* SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384
 * Server certificate: logs.example.com
 * Server certificate: example.com
 > GET / HTTP/1.1
@@ -87,7 +87,7 @@ If the test is successful, you’ll receive an empty response error. Here's an e
 curl: (52) Empty reply from server
 ```
 
-The following example uses the IP address rather than the hostname to validate the certificate:
+This example uses the IP address rather than the hostname to validate the certificate:
 
 ```shell
 curl -v --cacert ca.crt https://192.168.99.100:5044
