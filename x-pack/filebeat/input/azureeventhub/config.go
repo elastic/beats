@@ -18,6 +18,7 @@ import (
 
 const ephContainerName = "filebeat"
 
+// azureInputConfig is the configuration for the azureeventhub input.
 type azureInputConfig struct {
 	// EventHubName is the name of the event hub to connect to.
 	EventHubName string `config:"eventhub" validate:"required"`
@@ -32,6 +33,7 @@ type azureInputConfig struct {
 	// SAConnectionString is used to connect to the storage account (processor v2 only)
 	SAConnectionString string `config:"storage_account_connection_string"`
 	// SAContainer is the name of the storage account container to store
+
 	// partition ownership and checkpoint information.
 	SAContainer string `config:"storage_account_container"`
 	// by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
@@ -66,6 +68,11 @@ type azureInputConfig struct {
 	// Sanitizers is a list of sanitizers to apply to messages that
 	// contain invalid JSON.
 	Sanitizers []SanitizerSpec `config:"sanitizers"`
+
+	// ---------------------------------------
+	// input v2 specific configuration options
+	// ---------------------------------------
+
 	// MigrateCheckpoint controls if the input should perform the checkpoint information
 	// migration from v1 to v2 (processor v2 only). Default is false.
 	MigrateCheckpoint bool `config:"migrate_checkpoint"`
@@ -117,9 +124,22 @@ func defaultConfig() azureInputConfig {
 // Validate validates the config.
 func (conf *azureInputConfig) Validate() error {
 	logger := logp.NewLogger("azureeventhub.config")
-	if conf.ConnectionString == "" {
-		return errors.New("no connection string configured")
+
+	connectionStringProperties, err := parseConnectionString(conf.ConnectionString)
+	if err != nil {
+		return fmt.Errorf("invalid connection string: %w", err)
 	}
+
+	// If the connection string contains an entity path, we need to double
+	// check that it matches the event hub name.
+	if connectionStringProperties.EntityPath != nil && *connectionStringProperties.EntityPath != conf.EventHubName {
+		return fmt.Errorf(
+			"invalid config: the entity path (%s) in the connection string does not match event hub name (%s)",
+			*connectionStringProperties.EntityPath,
+			conf.EventHubName,
+		)
+	}
+
 	if conf.EventHubName == "" {
 		return errors.New("no event hub name configured")
 	}
@@ -127,6 +147,7 @@ func (conf *azureInputConfig) Validate() error {
 		return errors.New("no storage account configured (config: storage_account)")
 	}
 	if conf.SAContainer == "" {
+		// side effect: set the default storage account container name
 		conf.SAContainer = fmt.Sprintf("%s-%s", ephContainerName, conf.EventHubName)
 	}
 	if strings.Contains(conf.SAContainer, "_") {
@@ -140,11 +161,12 @@ func (conf *azureInputConfig) Validate() error {
 		//
 		// So instead of throwing an error to the user, we decided to replace
 		// underscores (_) characters with hyphens (-).
+
+		// side effect: replace underscores (_) with hyphens (-) in the storage account container name
 		conf.SAContainer = strings.ReplaceAll(conf.SAContainer, "_", "-")
 		logger.Warnf("replaced underscores (_) with hyphens (-) in the storage account container name (before: %s, now: %s", originalValue, conf.SAContainer)
 	}
-	err := storageContainerValidate(conf.SAContainer)
-	if err != nil {
+	if err := storageContainerValidate(conf.SAContainer); err != nil {
 		return err
 	}
 
@@ -220,13 +242,14 @@ func storageContainerValidate(name string) error {
 		return fmt.Errorf("storage_account_container (%s) must end with a lowercase letter or number", name)
 	}
 	for i := 0; i < length; i++ {
-		if !unicode.IsLower(runes[i]) && !unicode.IsNumber(runes[i]) && !(runes[i] == '-') {
-			return fmt.Errorf("rune %d of storage_account_container (%s) is not a lowercase letter, number or dash", i, name)
+		if !unicode.IsLower(runes[i]) && !unicode.IsNumber(runes[i]) && runes[i] != '-' {
+			return fmt.Errorf("rune (%d) of storage_account_container (%s) is not a lowercase letter, number or dash", i, name)
 		}
 		if runes[i] == '-' && previousRune == runes[i] {
 			return fmt.Errorf("consecutive dashes ('-') are not permitted in storage_account_container (%s)", name)
 		}
 		previousRune = runes[i]
 	}
+
 	return nil
 }
