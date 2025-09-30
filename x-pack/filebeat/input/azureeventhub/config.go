@@ -221,28 +221,6 @@ func (conf *azureInputConfig) Validate() error {
 	return nil
 }
 
-<<<<<<< HEAD
-=======
-// checkUnsupportedParams checks if unsupported/deprecated/discouraged parameters are set and logs a warning
-func (conf *azureInputConfig) checkUnsupportedParams(logger *logp.Logger) {
-	logger = logger.Named("azureeventhub.config")
-
-	// log a warning for each sanitization option not supported
-	for _, opt := range conf.LegacySanitizeOptions {
-		logger.Warnw("legacy sanitization `sanitize_options` options are deprecated and will be removed in the 9.0 release; use the `sanitizers` option instead", "option", opt)
-		err := sanitizeOptionsValidate(opt)
-		if err != nil {
-			logger.Warnf("%s: %v", opt, err)
-		}
-	}
-	if conf.ProcessorVersion == processorV2 {
-		if conf.SAKey != "" {
-			logger.Warnf("storage_account_key is not used in processor v2, please remove it from the configuration (config: storage_account_key)")
-		}
-	}
-}
-
->>>>>>> 06f8670ca ([azure-eventhub] Fix handling of connection strings with entity path (#43716))
 // storageContainerValidate validated the storage_account_container to make sure it is conforming to all the Azure
 // naming rules.
 // To learn more, please check the Azure documentation visiting:
