@@ -81,6 +81,7 @@ func Dial(npipe string) func(string, string) (net.Conn, error) {
 func DefaultSD(forUser string) (string, error) {
 	var u *user.User
 	var err error
+	logger := logp.L().Named("npipe")
 
 	// No user configured we fallback to the current running user.
 	if len(forUser) == 0 {
@@ -104,7 +105,7 @@ func DefaultSD(forUser string) (string, error) {
 	isAdmin, err := hasRoot()
 	if err != nil {
 		// do not fail, agent would end up in a loop, continue with limited permissions
-		logp.Warn("failed to detect Administrator: %v", err)
+		logger.Warn("failed to detect Administrator: %v", err)
 	}
 
 	if isAdmin {
