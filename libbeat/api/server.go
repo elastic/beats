@@ -18,6 +18,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -28,6 +29,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/service"
 )
 
 // Server takes care of correctly starting the HTTP component of the API
@@ -50,7 +52,10 @@ func New(log *logp.Logger, config *config.C) (*Server, error) {
 		return nil, err
 	}
 
-	l, err := makeListener(log, cfg)
+	ctx, cancel := context.WithCancel(context.Background())
+	service.HandleSignals(func() {}, cancel)
+
+	l, err := makeListener(ctx, cfg)
 	if err != nil {
 		return nil, err
 	}

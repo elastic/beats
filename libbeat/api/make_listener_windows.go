@@ -20,16 +20,16 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/api/npipe"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func makeListener(log *logp.Logger, cfg Config) (net.Listener, error) {
+func makeListener(ctx context.Context, cfg Config) (net.Listener, error) {
 	if len(cfg.User) > 0 && len(cfg.SecurityDescriptor) > 0 {
 		return nil, errors.New("user and security_descriptor are mutually exclusive, define only one of them")
 	}
@@ -46,7 +46,7 @@ func makeListener(log *logp.Logger, cfg Config) (net.Listener, error) {
 		} else {
 			sd = cfg.SecurityDescriptor
 		}
-		return createListenerWithRetry(log, pipe, sd)
+		return createListenerWithRetry(ctx, pipe, sd)
 	}
 
 	network, path, err := parse(cfg.Host, cfg.Port)
@@ -64,21 +64,23 @@ func makeListener(log *logp.Logger, cfg Config) (net.Listener, error) {
 	return net.Listen(network, path)
 }
 
-func createListenerWithRetry(log *logp.Logger, pipe string, sd string) (net.Listener, error) {
-	retryDuration := 5 * time.Second
-	backoffDelay := 200 * time.Millisecond
+func createListenerWithRetry(ctx context.Context, pipe string, sd string) (net.Listener, error) {
+	retryDuration := 30 * time.Second
+	backoffDelay := 500 * time.Millisecond
 
 	deadline := time.Now().Add(retryDuration)
 	var lastErr error
 
 	for time.Now().Before(deadline) {
+		select {
+		case <-ctx.Done():
+			return nil, fmt.Errorf("context canceled while trying to create npipe listener: %w", ctx.Err())
+		default:
+		}
 		lis, err := npipe.NewListener(pipe, sd)
 		if err == nil {
 			return lis, nil
 		}
-
-		// Log and backoff before retrying
-		log.Warnf("failed to create npipe listener, retrying...: %v", err)
 		lastErr = err
 		time.Sleep(backoffDelay)
 	}
