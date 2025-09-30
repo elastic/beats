@@ -348,7 +348,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	err = metricreport.SetupMetricsOptions(metricreport.MetricOptions{
 		Name:           b.Info.Beat,
 		Version:        version.GetDefaultVersion(),
-		EphemeralID:    metricreport.EphemeralID().String(), // nolint:staticcheck //keep behavior for now
+		EphemeralID:    metricreport.EphemeralID().String(), //nolint:staticcheck //keep behavior for now
 		Logger:         b.Info.Logger.Named("metrics"),
 		SystemMetrics:  monitoring.Default.GetOrCreateRegistry("system"),
 		ProcessMetrics: monitoring.Default.GetOrCreateRegistry("beat"),
