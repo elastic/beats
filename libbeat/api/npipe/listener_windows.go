@@ -27,8 +27,9 @@ import (
 	"strings"
 
 	winio "github.com/Microsoft/go-winio"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // NewListener creates a new Listener receiving events over a named pipe.
