@@ -23,6 +23,7 @@ package udp
 import (
 	"fmt"
 	"net"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -74,7 +75,7 @@ func TestUdpServer(t *testing.T) {
 }
 
 func writeToServer(t *testing.T, message, host string, port int) {
-	servAddr := fmt.Sprintf("%s:%d", host, port)
+	servAddr := net.JoinHostPort(host, strconv.Itoa(port))
 	conn, err := net.Dial("udp", servAddr)
 	if err != nil {
 		t.Error(err)
