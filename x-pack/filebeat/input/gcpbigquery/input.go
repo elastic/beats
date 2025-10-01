@@ -7,6 +7,9 @@ package gcpbigquery
 import (
 	"context"
 	"fmt"
+	"maps"
+	"slices"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/bigquery"
@@ -55,6 +58,7 @@ func configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input,
 			ProjectID:      config.ProjectID,
 			Query:          query.Query,
 			TimestampField: query.TimestampField,
+			IdFields:       query.IdFields,
 			ExpandJson:     true,
 		}
 
@@ -86,6 +90,7 @@ type bigQuerySource struct {
 	CursorField        string
 	CursorInitialValue string
 	TimestampField     string
+	IdFields           []string
 	ExpandJson         bool
 }
 
@@ -94,7 +99,7 @@ func (s *bigQuerySource) Name() string {
 	// configuration that doesn't affect the query/cursor itself should not be included.
 	name := fmt.Sprintf("%s-%s-%s", s.ProjectID, s.Query, s.CursorField)
 	// hash it to avoid unintentionally leaching queries into logs/files
-	return fmt.Sprintf("%d", xxhash.Sum64String(name))
+	return fmt.Sprintf("%x", xxhash.Sum64String(name))
 }
 
 type bigQueryInput struct {
@@ -198,6 +203,7 @@ func (bq *bigQueryInput) publishEvent(src *bigQuerySource, publisher cursor.Publ
 	fields := make(map[string]interface{}, len(row))
 	var timestamp time.Time
 	var state *cursorState
+	idVals := make(map[string]interface{})
 
 	for i, v := range row {
 		if v == nil {
@@ -241,6 +247,10 @@ func (bq *bigQueryInput) publishEvent(src *bigQuerySource, publisher cursor.Publ
 			}
 		}
 
+		if slices.Contains(src.IdFields, field.Name) {
+			idVals[field.Name] = v
+		}
+
 		fields[field.Name] = v
 	}
 
@@ -248,12 +258,38 @@ func (bq *bigQueryInput) publishEvent(src *bigQuerySource, publisher cursor.Publ
 		timestamp = time.Now()
 	}
 
-	// the only error case is if the publisher is closed, which means everything is shutting down anyway
-	_ = publisher.Publish(beat.Event{
+	event := beat.Event{
 		Timestamp: timestamp,
 		Fields: mapstr.M{
 			// nest everything for now to avoid mapping conflicts in standalone mode
 			"bigquery": fields,
 		},
-	}, state)
+	}
+
+	if len(src.IdFields) != 0 {
+		// only set the event ID if we have all the specified fields
+		if len(src.IdFields) == len(idVals) {
+			id := generateEventID(idVals)
+			bq.logger.Debugf("setting event ID '%s' from fields %v", id, idVals)
+			event.SetID(id)
+		} else {
+			bq.logger.Warnf("id_fields is configured (%v), but the required fields are not present "+
+				"in the query result; falling back to auto-generated ID", src.IdFields)
+		}
+	}
+
+	// the only error case is if the publisher is closed, which means everything is shutting down anyway
+	_ = publisher.Publish(event, state)
+}
+
+// generateEventID creates a deterministic ID from the specified fields.
+func generateEventID(fields map[string]interface{}) string {
+	sorted := slices.Sorted(maps.Keys(fields))
+
+	parts := make([]string, len(fields))
+	for i, k := range sorted {
+		parts[i] = fmt.Sprintf("%s:%v", k, fields[k])
+	}
+
+	return fmt.Sprintf("%x", xxhash.Sum64String(strings.Join(parts, "|")))
 }

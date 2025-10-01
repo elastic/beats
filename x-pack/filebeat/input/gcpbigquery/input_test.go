@@ -120,6 +120,31 @@ func TestConfigure(t *testing.T) {
 		assert.True(t, source.ExpandJson)
 	})
 
+	t.Run("valid config with id fields", func(t *testing.T) {
+		configMap := map[string]interface{}{
+			"period":     "1m",
+			"project_id": "test-project",
+			"queries": []map[string]interface{}{
+				{
+					"query":     "SELECT id, name FROM test_table",
+					"id_fields": []string{"id", "name"},
+				},
+			},
+		}
+
+		cfg, err := conf.NewConfigFrom(configMap)
+		require.NoError(t, err)
+
+		sources, input, err := configure(cfg, logger)
+		require.NoError(t, err)
+		require.NotNil(t, input)
+		require.Len(t, sources, 1)
+
+		// Check that IdFields are properly configured
+		source := sources[0].(*bigQuerySource)
+		assert.Equal(t, []string{"id", "name"}, source.IdFields)
+	})
+
 	t.Run("invalid config - missing required fields", func(t *testing.T) {
 		configMap := map[string]interface{}{
 			"period": "1m",
@@ -365,3 +390,150 @@ func TestBigQueryInput(t *testing.T) {
 // 		CursorField: "id",
 // 	}
 // }
+
+func TestGenerateEventID(t *testing.T) {
+	t.Run("basic ID generation", func(t *testing.T) {
+		tests := []struct {
+			name   string
+			fields map[string]interface{}
+		}{
+			{
+				name: "single field",
+				fields: map[string]interface{}{
+					"id": 123,
+				},
+			},
+			{
+				name: "multiple fields",
+				fields: map[string]interface{}{
+					"name": "test",
+					"id":   123,
+				},
+			},
+			{
+				name: "different data types",
+				fields: map[string]interface{}{
+					"str_field":   "test",
+					"int_field":   42,
+					"float_field": 3.14,
+				},
+			},
+			{
+				name: "empty string field",
+				fields: map[string]interface{}{
+					"empty": "",
+					"id":    1,
+				},
+			},
+			{
+				name: "nil field value",
+				fields: map[string]interface{}{
+					"nil_field": nil,
+					"id":        42,
+				},
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				got := generateEventID(tt.fields)
+				assert.NotEmpty(t, got, "expected non-empty ID")
+			})
+		}
+	})
+
+	t.Run("deterministic behavior", func(t *testing.T) {
+		tests := []struct {
+			name   string
+			fields map[string]interface{}
+		}{
+			{
+				name: "simple fields",
+				fields: map[string]interface{}{
+					"id":   123,
+					"name": "test",
+				},
+			},
+			{
+				name: "complex fields",
+				fields: map[string]interface{}{
+					"str":   "hello world",
+					"int":   987654321,
+					"float": 123.456789,
+					"bool":  true,
+				},
+			},
+			{
+				name: "single field",
+				fields: map[string]interface{}{
+					"unique_id": "abc123",
+				},
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				id1 := generateEventID(tt.fields)
+				id2 := generateEventID(tt.fields)
+
+				assert.Equal(t, id1, id2, "generateEventID should be deterministic")
+				assert.NotEmpty(t, id1, "ID should not be empty")
+			})
+		}
+	})
+
+	t.Run("field ordering independence", func(t *testing.T) {
+		tests := []struct {
+			name    string
+			fields1 map[string]interface{}
+			fields2 map[string]interface{}
+		}{
+			{
+				name: "two fields swapped",
+				fields1: map[string]interface{}{
+					"id":   123,
+					"name": "test",
+				},
+				fields2: map[string]interface{}{
+					"name": "test",
+					"id":   123,
+				},
+			},
+			{
+				name: "multiple fields different order",
+				fields1: map[string]interface{}{
+					"a": 1,
+					"b": 2,
+					"c": 3,
+				},
+				fields2: map[string]interface{}{
+					"c": 3,
+					"a": 1,
+					"b": 2,
+				},
+			},
+			{
+				name: "complex values different order",
+				fields1: map[string]interface{}{
+					"str":   "hello",
+					"int":   42,
+					"float": 3.14,
+				},
+				fields2: map[string]interface{}{
+					"float": 3.14,
+					"str":   "hello",
+					"int":   42,
+				},
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				id1 := generateEventID(tt.fields1)
+				id2 := generateEventID(tt.fields2)
+
+				assert.Equal(t, id1, id2, "field order should not affect generated ID")
+			})
+		}
+	})
+}

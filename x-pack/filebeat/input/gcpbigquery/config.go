@@ -37,6 +37,11 @@ type queryConfig struct {
 	// TimestampField is a field of type TIMESTAMP in the query result to use as the event's @timestamp value.
 	TimestampField string `config:"timestamp_field"`
 
+	// IdFields is a list of fields in the query result to use to generate a deterministic ID.
+	// This can be useful to avoid duplication when queries may return overlapping results.
+	// Note: the ID is only generated if _all_ specified fields are present in the query result.
+	IdFields []string `config:"id_fields"`
+
 	// ExpandJsonStrings determines whether to attempt to parse fields of type JSON into objects/arrays instead of
 	// leaving them as strings. In the event of parsing failures, we still expand the field into a JSON object with a
 	// single field named "original" containing the original string value; this avoids mapping conflicts in
