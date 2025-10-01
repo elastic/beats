@@ -86,10 +86,10 @@ func (s *Server) Start() {
 		s.httpServer = &http.Server{Handler: s.mux} //nolint:gosec // Keep original behavior
 		go func(l net.Listener) {
 			defer s.wg.Done()
-			s.log.Infof("metrics endpoint listening on: %s (configured: %s)", l.Addr().String(), s.config.Host)
+			s.log.Infof("Metrics endpoint listening on: %s (configured: %s)", l.Addr().String(), s.config.Host)
 
 			err := s.httpServer.Serve(l)
-			s.log.Infof("stats endpoint (%s) finished: %v", l.Addr().String(), err)
+			s.log.Infof("Stats endpoint (%s) finished: %v", l.Addr().String(), err)
 		}(s.l)
 		return
 	case stateStarted:
