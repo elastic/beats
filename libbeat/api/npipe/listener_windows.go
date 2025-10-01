@@ -105,7 +105,7 @@ func DefaultSD(forUser string) (string, error) {
 	descriptor := "D:P(A;;GA;;;" + u.Uid + ")"
 	isAdmin, err := hasRoot()
 	if err != nil {
-		// do not fail, agent would end up in a loop, continue with limited permissions
+		// do not fail, continue with limited permissions
 		logger.Warn("failed to detect Administrator: %v", err)
 	}
 
