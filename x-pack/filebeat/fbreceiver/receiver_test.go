@@ -164,7 +164,11 @@ func BenchmarkFactory(b *testing.B) {
 }
 
 func TestMultipleReceivers(t *testing.T) {
+<<<<<<< HEAD
 	t.Skip("flaky test, see https://github.com/elastic/beats/issues/43832")
+=======
+	t.Skip("flaky test, renable after https://github.com/elastic/beats/pull/46846 and https://github.com/elastic/beats/pull/46844 are merged")
+>>>>>>> de6b5ee39 (Skip filebeatreceiver TestMultipleReceivers for now (#46864))
 	// This test verifies that multiple receivers can be instantiated
 	// in isolation, started, and can ingest logs without interfering
 	// with each other.
