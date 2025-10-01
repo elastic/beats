@@ -31,10 +31,13 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-var moduleList = monitoring.NewUniqueList()
-var moduleListMetricsOnce sync.Once
+var (
+	moduleList            = monitoring.NewUniqueList()
+	moduleListMetricsOnce sync.Once
+)
 
 // RegisterMonitoringModules registers the modules list with the monitoring system.
 func RegisterMonitoringModules(namespace string) {
@@ -50,6 +53,7 @@ type Factory struct {
 	overwritePipelines    bool
 	pipelineCallbackID    uuid.UUID
 	inputFactory          cfgfile.RunnerFactory
+	beatPaths             *paths.Path
 }
 
 // Wrap an array of inputs and implements cfgfile.Runner interface
@@ -69,6 +73,7 @@ func NewFactory(
 	beatInfo beat.Info,
 	pipelineLoaderFactory PipelineLoaderFactory,
 	overwritePipelines bool,
+	beatPaths *paths.Path,
 ) *Factory {
 	return &Factory{
 		inputFactory:          inputFactory,
@@ -76,6 +81,7 @@ func NewFactory(
 		pipelineLoaderFactory: pipelineLoaderFactory,
 		pipelineCallbackID:    uuid.Nil,
 		overwritePipelines:    overwritePipelines,
+		beatPaths:             beatPaths,
 	}
 }
 
@@ -134,7 +140,7 @@ func (f *Factory) CheckConfig(c *conf.C) error {
 // createRegistry starts a registry for a set of filesets, it returns the registry and
 // its input configurations
 func (f *Factory) createRegistry(c *conf.C) (*ModuleRegistry, []*conf.C, error) {
-	m, err := NewModuleRegistry([]*conf.C{c}, f.beatInfo, false, FilesetOverrides{})
+	m, err := NewModuleRegistry([]*conf.C{c}, f.beatInfo, false, FilesetOverrides{}, f.beatPaths)
 	if err != nil {
 		return nil, nil, err
 	}

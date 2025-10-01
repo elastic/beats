@@ -291,6 +291,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 +{pull}46373[46373]
 - Fix metrics from TCP & UDP inputs when the port number is > 32767 {pull}46486[46486]
 - [Journald input] Fix reading all files in a folder and watching for new ones. {issue}46657[46657] {pull}46682[46682]
+- [azure-eventhub] Fix handling of connection strings with entity path. {issue}43715[43715] {pull}43716[43716]
 
 *Heartbeat*
 
@@ -626,6 +627,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
 - Add NTP response validation for system/ntp module. {pull}46184[46184]
 - Add vertexai_logs metricset to GCP for prompt response collection from VertexAI service. {pull}46383[46383]
+- Add default timegrain to Azure Storage Account metricset. {pull}46786[46786]
 
 *Metricbeat*
 
@@ -636,6 +638,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 *Packetbeat*
 - Optionally ignore MAC address in flow matching {pull}44965[44965]
 - Add `tls.server.ja3s` tls fingerprint {pull}43284[43284]
+- Bump Windows Npcap version to v1.83. {pull}46809[46809]
 
 *Winlogbeat*
 
