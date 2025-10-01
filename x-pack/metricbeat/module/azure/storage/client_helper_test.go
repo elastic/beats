@@ -162,7 +162,7 @@ func TestFilterOnTimeGrain(t *testing.T) {
 		{MetricAvailabilities: availability2},
 		{MetricAvailabilities: availability3},
 	}
-	response := groupOnTimeGrain(list)
+	response := groupOnTimeGrain(list, "PT5M")
 	assert.Equal(t, len(response), 2)
 	result := [][]armmonitor.MetricDefinition{
 		{
@@ -180,11 +180,11 @@ func TestFilterOnTimeGrain(t *testing.T) {
 }
 
 func TestRetrieveSupportedMetricAvailability(t *testing.T) {
-	response := retrieveSupportedMetricAvailability(availability1)
+	response := retrieveSupportedMetricAvailability(availability1, "PT5M")
 	assert.Equal(t, response, time2)
-	response = retrieveSupportedMetricAvailability(availability2)
+	response = retrieveSupportedMetricAvailability(availability2, "PT5M")
 	assert.Equal(t, response, time3)
-	response = retrieveSupportedMetricAvailability(availability3)
+	response = retrieveSupportedMetricAvailability(availability3, "PT5M")
 	assert.Equal(t, response, time3)
 }
 
