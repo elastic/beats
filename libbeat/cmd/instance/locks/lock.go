@@ -36,21 +36,19 @@ type Locker struct {
 	logger     *logp.Logger
 }
 
-var (
-	// ErrAlreadyLocked is returned when a lock on the data path is attempted but
-	// unsuccessful because another Beat instance already has the lock on the same
-	// data path.
-	ErrAlreadyLocked = fmt.Errorf("data path already locked by another beat. Please make sure that multiple beats are not sharing the same data path (path.data)")
-)
+// ErrAlreadyLocked is returned when a lock on the data path is attempted but
+// unsuccessful because another Beat instance already has the lock on the same
+// data path.
+var ErrAlreadyLocked = fmt.Errorf("data path already locked by another beat. Please make sure that multiple beats are not sharing the same data path (path.data)")
 
 // New returns a new file locker
-func New(beatInfo beat.Info) *Locker {
-	return NewWithRetry(beatInfo, 4, time.Millisecond*400)
+func New(beatInfo beat.Info, beatPaths *paths.Path) *Locker {
+	return NewWithRetry(beatInfo, beatPaths, 4, time.Millisecond*400)
 }
 
 // NewWithRetry returns a new file locker with the given settings
-func NewWithRetry(beatInfo beat.Info, retryCount int, retrySleep time.Duration) *Locker {
-	lockfilePath := paths.Resolve(paths.Data, beatInfo.Beat+".lock")
+func NewWithRetry(beatInfo beat.Info, beatPaths *paths.Path, retryCount int, retrySleep time.Duration) *Locker {
+	lockfilePath := beatPaths.Resolve(paths.Data, beatInfo.Beat+".lock")
 	return &Locker{
 		fileLock:   flock.New(lockfilePath),
 		retryCount: retryCount,

@@ -5,16 +5,22 @@
 package instance
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/otelmanager"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/status"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
 	"go.opentelemetry.io/collector/component"
@@ -28,7 +34,7 @@ type BeatReceiver struct {
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
-func NewBeatReceiver(b *instance.Beat, creator beat.Creator) (BeatReceiver, error) {
+func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator) (BeatReceiver, error) {
 	beatConfig, err := b.BeatConfig()
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error getting beat config: %w", err)
@@ -56,18 +62,25 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator) (BeatReceiver, erro
 	}
 
 	if b.Config.HTTP.Enabled() {
-		var err error
-		b.API, err = api.NewWithDefaultRoutes(
-			b.Info.Logger.Named("metrics.http"),
-			b.Config.HTTP,
-			b.Monitoring.InfoRegistry(),
-			b.Monitoring.StateRegistry(),
-			b.Monitoring.StatsRegistry(),
-			b.Monitoring.InputsRegistry())
+		retryer := backoff.NewRetryer(50, 100*time.Millisecond, 1*time.Second)
+		err := retryer.Retry(ctx, func() error {
+			var err error
+			b.API, err = api.NewWithDefaultRoutes(
+				b.Info.Logger.Named("metrics.http"),
+				b.Config.HTTP,
+				b.Monitoring.InfoRegistry(),
+				b.Monitoring.StateRegistry(),
+				b.Monitoring.StatsRegistry(),
+				b.Monitoring.InputsRegistry())
+			if err != nil {
+				return fmt.Errorf("could not start the HTTP server for the API: %w", err)
+			}
+			b.API.Start()
+			return nil
+		})
 		if err != nil {
-			return BeatReceiver{}, fmt.Errorf("could not start the HTTP server for the API: %w", err)
+			return BeatReceiver{}, fmt.Errorf("error creating api listener after 100 retries: %w", err)
 		}
-		b.API.Start()
 	}
 
 	beater, err := creator(&b.Beat, beatConfig)
@@ -86,6 +99,30 @@ func (br *BeatReceiver) Start(host component.Host) error {
 	if w, ok := br.beater.(cfgfile.WithOtelFactoryWrapper); ok {
 		groupReporter := status.NewGroupStatusReporter(host)
 		w.WithOtelFactoryWrapper(status.StatusReporterFactory(groupReporter))
+	}
+
+	// We go through all extensions to find any that implement the DiagnosticExtension interface.
+	// This is done so that we can register a diagnostic hook to collect beat metrics.
+	extensions := host.GetExtensions()
+	for _, ext := range extensions {
+		if diagExt, ok := ext.(otelmanager.DiagnosticExtension); ok {
+			// if the manager also implements WithDiagnosticExtension interface then set the extension.
+			if m, ok := br.beat.Manager.(otelmanager.WithDiagnosticExtension); ok {
+				m.SetDiagnosticExtension(br.beat.Info.ComponentID, diagExt)
+			}
+
+			// Register a diagnostic hook to collect beat metrics.
+			// This is registered once per beat receiver.
+			diagExt.RegisterDiagnosticHook(br.beat.Info.ComponentID, "Metrics from the default monitoring namespace and expvar.",
+				"beat_metrics.json", "application/json", func() []byte {
+					m := monitoring.CollectStructSnapshot((br.beat.Monitoring.StatsRegistry()), monitoring.Full, true)
+					data, err := json.MarshalIndent(m, "", "  ")
+					if err != nil {
+						return fmt.Appendf(nil, "Failed to collect beat metric snapshot for Agent diagnostics: %v", err)
+					}
+					return data
+				})
+		}
 	}
 
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
