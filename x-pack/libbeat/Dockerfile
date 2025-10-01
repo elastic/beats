@@ -16,7 +16,7 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN pip3 install --upgrade pip==20.1.1
+RUN pip3 install --upgrade pip==25.1.1
 
 # Setup work environment
 ENV LIBBEAT_PATH /go/src/github.com/elastic/beats/x-pack/libbeat
