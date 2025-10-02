@@ -57,3 +57,33 @@ services:
       - http-server
       - --addr=:8090
       - --config=/files/config.yaml
+
+  init-logstash:
+    image: busybox:latest
+    user: "0:0"
+    command: ["sh", "-c", "chown -R 1000:1000 /data"]
+    volumes:
+      - logstash_testdata:/data
+    restart: "no"
+  logstash:
+    depends_on:
+      - init-logstash
+    extends:
+      file: ${ES_BEATS}/testing/environments/${STACK_ENVIRONMENT}.yml
+      service: logstash
+    volumes:
+      - ./tests/integration/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - logstash_testdata:/usr/share/logstash/testdata
+    ports:
+      - 9600:9600
+  nginx:
+    image: nginx:alpine
+    depends_on:
+      - init-logstash
+    volumes:
+      - logstash_testdata:/usr/share/nginx/html:ro
+    ports:
+      - 8082:80
+
+volumes:
+  logstash_testdata:
