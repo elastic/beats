@@ -56,7 +56,6 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 
 	// The fields array must be sorted, to guarantee that we always
 	// get the same hash for a similar set of configured keys.
-	// The call `ToSlice` always returns a sorted slice.
 	slices.Sort(config.Fields)
 	fields := slices.Compact(config.Fields)
 
