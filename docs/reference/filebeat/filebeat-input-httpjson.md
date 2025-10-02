@@ -221,7 +221,7 @@ Some built-in helper functions are provided to work with the input state inside 
 * `parseTimestamp`: parses a timestamp in seconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732]]` returns `2020-11-05 13:25:32 +0000 UTC`.
 * `replaceAll(old, new, s)`: replaces all non-overlapping instances of `old` with `new` in `s`. Example: `[[ replaceAll "some" "my" "some value" ]]` returns `my value`.
 * `sprintf`: formats according to a format specifier and returns the resulting string. Refer to [the Go docs](https://pkg.go.dev/fmt#Sprintf) for usage. Example: `[[sprintf "%d:%q" 34 "quote this"]]`
-* `terminate`: exits the template without falling back to the default value and without causing an error. It takes a single string argument that is logged in debug logging. {applies_to}`stack: ga 9.1.2, ga 9.0.6, ga 8.19.2, ga 8.18.6`
+* `terminate`: exits the template without falling back to the default value and without causing an error. It takes a single string argument that is logged in debug logging. {applies_to}`stack: ga 9.1.2` {applies_to}`stack: ga 9.0.6` {applies_to}`stack: ga 8.19.2` {applies_to}`stack: ga 8.18.6`
 * `toInt`: converts a value of any type to an integer when possible. Returns 0 if the conversion fails.
 * `toJSON`: converts a value to a JSON string. This can be used with `value_type: json` to create an object from a template. Example: `[[ toJSON .last_response.body.pagingIdentifiers ]]`.
 * `urlEncode`: URL encodes the supplied string. Example `[[urlEncode "string1"]]`. Example `[[urlEncode "<string1>"]]` will return `%3Cstring1%3E`.
@@ -1472,7 +1472,7 @@ Each cursor entry is formed by:
 * A `value` template, which will define the value to store when evaluated.
 * A `default` template, which will define the value to store when the value template fails or is empty.
 * An `ignore_empty_value` flag. When set to `true`, will not store empty values, preserving the previous one, if any. Default: `true`.
-* A `do_not_log_failure` flag. When set to `true`, will not signal a degraded Fleet health status. Default: `true`. {applies_to}`stack: ga 9.1.4, ga 9.0.7, ga 8.19.4, ga 8.18.7`
+* A `do_not_log_failure` flag. When set to `true`, will not signal a degraded Fleet health status. Default: `true`. {applies_to}`stack: ga 9.1.4` {applies_to}`stack: ga 9.0.7` {applies_to}`stack: ga 8.19.4` {applies_to}`stack: ga 8.18.7`
 
 Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`].
 
