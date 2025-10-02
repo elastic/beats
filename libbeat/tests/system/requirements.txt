@@ -35,7 +35,7 @@ py==1.11.0
 pycodestyle==2.6.0
 pyparsing==2.4.7
 pyrsistent==0.16.0
-pytest==8.4.2
+pytest==7.3.2
 pytest-rerunfailures==9.1.1
 pytest-timeout==2.4.0
 PyYAML==5.3.1
