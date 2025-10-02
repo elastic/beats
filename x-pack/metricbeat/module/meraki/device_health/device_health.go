@@ -124,15 +124,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			return fmt.Errorf("getDeviceSwitchports failed; %w", err)
 		}
 
-<<<<<<< HEAD
-=======
-		err = getDeviceVPNStatuses(m.client, org, devices, m.logger)
-		if err != nil {
-			m.logger.Errorf("GetVPNStatuses failed; %v", err)
-			// continue so we still report the rest of the device health metrics
-		}
-
->>>>>>> a5be2a856 (chore: fix formatting issues in logp printf-style calls (#45944))
 		// Once we have collected _all_ the data and associated it with the correct device
 		// we can report the various device health metrics. These functions are split up
 		// in this way primarily to allow better separation of the code, but also because

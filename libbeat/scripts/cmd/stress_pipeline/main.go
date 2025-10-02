@@ -67,11 +67,7 @@ func run() error {
 	flag.Parse()
 
 	files := flag.Args()
-<<<<<<< HEAD
 	fmt.Println("load config files:", files)
-=======
-	logger.Infof("load config files: %v", files)
->>>>>>> a5be2a856 (chore: fix formatting issues in logp printf-style calls (#45944))
 
 	cfg, err := common.LoadFiles(files...)
 	if err != nil {
