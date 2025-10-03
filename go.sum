@@ -767,8 +767,8 @@ github.com/mdlayher/socket v0.5.1 h1:VZaqt6RkGkt2OE9l3GcC6nZkqD3xKeQLyfleW/uBcos
 github.com/mdlayher/socket v0.5.1/go.mod h1:TjPLHI1UgwEv5J1B5q0zTZq12A/6H7nKmtTanQE37IQ=
 github.com/microsoft/go-mssqldb v1.9.2 h1:nY8TmFMQOHpm2qVWo6y4I2mAmVdZqlGiMGAYt64Ibbs=
 github.com/microsoft/go-mssqldb v1.9.2/go.mod h1:GBbW9ASTiDC+mpgWDGKdm3FnFLTUsLYN3iFL90lQ+PA=
-github.com/microsoft/wmi v0.34.0 h1:1OqBM8Ha8CWMbKYDH6EqUmozgxZ0IuoYwtLkgsJj2zc=
-github.com/microsoft/wmi v0.34.0/go.mod h1:uImvBuQss3NEnzU5bcwq0DsUh54seU3Sl//oBn62LDw=
+github.com/microsoft/wmi v0.37.0 h1:TQ0+JHz8ogtl6twPOOQXA2ON2ErUS8WyInSq+yY4AT4=
+github.com/microsoft/wmi v0.37.0/go.mod h1:XF+cfluA15xGnSCYkJIYuj2vWzdm2YrNuvqlC+baWY0=
 github.com/miekg/dns v1.1.66 h1:FeZXOS3VCVsKnEAd+wBkjMC3D2K+ww66Cq3VnCINuJE=
 github.com/miekg/dns v1.1.66/go.mod h1:jGFzBsSNbJw6z1HYut1RKBKHA9PBdxeHrZG8J+gC2WE=
 github.com/mileusna/useragent v1.3.5 h1:SJM5NzBmh/hO+4LGeATKpaEX9+b4vcGg2qXGLiNGDws=
