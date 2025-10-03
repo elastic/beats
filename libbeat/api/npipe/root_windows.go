@@ -28,8 +28,9 @@ import (
 // administratorSID is the SID for the Administrator user.
 const administratorSID = "S-1-5-32-544"
 
-// hasRoot returns true if the user has Administrator/SYSTEM permissions.
-func hasRoot() (bool, error) {
+// hasAdmin returns true if the user has Administrator/SYSTEM permissions.
+// Source: https://github.com/elastic/elastic-agent/blob/92d5c1daa23ee0e01f7fe68fe1f47b51ebdd79a3/pkg/utils/root_windows.go
+func hasAdmin() (bool, error) {
 	var sid *windows.SID
 	// See https://docs.microsoft.com/en-us/windows/desktop/api/securitybaseapi/nf-securitybaseapi-checktokenmembership for more on the api
 	err := windows.AllocateAndInitializeSid(
