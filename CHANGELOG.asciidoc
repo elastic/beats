@@ -3,6 +3,202 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-9.1.5]]
+=== Beats version 9.1.5
+https://github.com/elastic/beats/compare/v9.1.4\...v9.1.5[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Journald input now converts byte-encoded messages to string. {issue}40479[40479] {pull}46415[46415]
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+
+*Packetbeat*
+
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fixed a panic in the Kafka output that could occur when shutting down while final events were being published. {issue}46109[46109] {pull}46446[46446]
+
+*Auditbeat*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- [Journald input] Fix reading all files in a folder and watching for new ones. {issue}46657[46657] {pull}46682[46682]
+- The UDP input now fails if it cannot bind to the configured port and its status is set to failed when running under Elastic Agent. {issue}37216[37216] {pull}46302[46302]
+- The Unix input now fails on errors listening to the socket and its status is set to failed when running under Elastic Agent. {pull}46302[46302]
+- In Filestream, setting `clean_inactive: 0` does not re-ingest all files on startup any more. {issue}45601[45601]
++{pull}46373[46373]
+- Fix metrics from TCP & UDP inputs when the port number is > 32767 {pull}46486[46486]
+- [Journald input] Fix reading all files in a folder and watching for new ones. {issue}46657[46657] {pull}46682[46682]
+- [azure-eventhub] Fix handling of connection strings with entity path. {issue}43715[43715] {pull}43716[43716]
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+
+*Winlogbeat*
+
+- Fix EventLog reset logic to not close renderers. {pull}46376[46376] {issue}45750{45750}
+
+*Elastic Logging Plugin*
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Auditbeat*
+
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Hints based autodiscover now sets `close.on_state_change.removed: false` in the default configuration to avoid missing the last log lines from a container. {issue}34789[34789] {pull}46695[46695]
+
+*Auditbeat*
+
+
+*Libbeat*
+
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Log every 401 response from Kubernetes API Server {pull}42714[42714]
+- Add new metrics to vSphere Virtual Machine dataset (CPU usage percentage, disk average usage, disk read/write rate, number of disk reads/writes, memory usage percentage). {pull}44205[44205]
+- Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
+- Add latency config option to Azure Monitor module. {pull}44366[44366]
+- Increase default polling period for MongoDB module from 10s to 60s {pull}44781[44781]
+- Upgrade github.com/microsoft/go-mssqldb from v1.7.2 to v1.8.2 {pull}44990[44990]
+- Add NTP response validation for system/ntp module. {pull}46184[46184]
+- Add vertexai_logs metricset to GCP for prompt response collection from VertexAI service. {pull}46383[46383]
+- Add default timegrain to Azure Storage Account metricset. {pull}46786[46786]
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Log Driver*
+*Elastic Logging Plugin*
+
+
+==== Deprecated
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Known Issues
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [[release-notes-9.1.4]]
 === Beats version 9.1.4
 https://github.com/elastic/beats/compare/v9.1.3\...v9.1.4[View commits]
