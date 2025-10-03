@@ -181,6 +181,23 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	}, 5*time.Second, 10*time.Millisecond, &msg)
 }
 
+// waitUntilEventCount waits until total count events arrive to the client.
+func (e *inputTestingEnvironment) waitUntilEventsPublished(published int) {
+	e.t.Helper()
+	msg := strings.Builder{}
+	require.Eventually(e.t, func() bool {
+		sum := len(e.pipeline.GetAllEvents())
+		if sum >= published {
+			return true
+		}
+
+		msg.Reset()
+		fmt.Fprintf(&msg, "too few events; expected: %d, actual: %d", published, sum)
+
+		return false
+	}, 5*time.Second, 10*time.Millisecond, &msg)
+}
+
 func (e *inputTestingEnvironment) RequireStatuses(expected []statusUpdate) {
 	t := e.t
 	t.Helper()
