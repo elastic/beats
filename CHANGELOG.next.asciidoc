@@ -32,7 +32,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
 - Redis: Added replication role as a field to submitted slowlogs
 - Change log.file.path field in awscloudwatch input to nested object. {pull}41099[41099]
-- Journald input now converts byte-encoded messages to string. {issue}40479[40479] {pull}46415[46415]
 
 *Heartbeat*
 
@@ -92,12 +91,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix setting unique registry for non beat receivers {issue}42288[42288] {pull}42292[42292]
 - The Kafka output now drops events when there is an authorisation error {issue}42343[42343] {pull}42401[42401]
 - Fix autodiscovery memory leak related to metadata of start events {pull}41748[41748]
-- Fix a race condition during metrics initialization which could cause a panic. {issue}45822[45822] {pull}46054[46054]
 - Fixed a panic when the beat restarts itself by adding 'eventfd2' to default seccomp policy {issue}46372[46372]
 - Update Go version to 1.24.7 {pull}46070[46070].
 - Update github.com/go-viper/mapstructure/v2 to v2.4.0 {pull}46335[46335]
 - Update github.com/docker/docker to v28.3.3 {pull}46334[46334]
-- Fixed a panic in the Kafka output that could occur when shutting down while final events were being published. {issue}46109[46109] {pull}46446[46446]
 
 *Auditbeat*
 
@@ -143,10 +140,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
 - Further rate limiting fix in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41977[41977]
 - Remove erroneous status reporting to Elastic-Agent from the Filestream input {pull}42435[42435]
-- Journald input now works on Docker containers, all image variants except Wolfi. {issue}41278[41278] {issue}44040[44040] {pull}46625[46625]
 - Fix metrics from TCP & UDP inputs when the port number is > 32767 {pull}46486[46486]
-- [Journald input] Fix reading all files in a folder and watching for new ones. {issue}46657[46657] {pull}46682[46682]
-- [azure-eventhub] Fix handling of connection strings with entity path. {issue}43715[43715] {pull}43716[43716]
 
 *Heartbeat*
 
@@ -187,8 +181,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
-- Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
-- Fix EventLog reset logic to not close renderers. {pull}46376[46376] {issue}45750{45750}
 
 *Elastic Logging Plugin*
 - Fix for unable to run elastic-logging plugin
@@ -320,27 +312,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
 - Preserve queries for debugging when `merge_results: true` in SQL module {pull}42271[42271]
 - Collect more fields from ES node/stats metrics and only those that are necessary {pull}42421[42421]
-- Add new metricset wmi for the windows module. {pull}42017[42017]
-- Update beat module with apm-server tail sampling monitoring metrics fields {pull}42569[42569]
-- Log every 401 response from Kubernetes API Server {pull}42714[42714]
-- Add a new `match_by_parent_instance` option to `perfmon` module. {pull}43002[43002]
-- Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
-- Changed the Elasticsearch module behavior to only pull settings from non-system indices. {pull}43243[43243]
-- Exclude dotted indices from settings pull in Elasticsearch module. {pull}43306[43306]
-- Add a `jetstream` metricset to the NATS module {pull}43310[43310]
-- Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
-- Upgrade Prometheus Library to v0.300.1. {pull}43540[43540]
-- Add GCP Dataproc metadata collector in GCP module. {pull}43518[43518]
-- Add new metrics to vSphere Virtual Machine dataset (CPU usage percentage, disk average usage, disk read/write rate, number of disk reads/writes, memory usage percentage). {pull}44205[44205]
-- Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
-- Add latency config option to Azure Monitor module. {pull}44366[44366]
-- Increase default polling period for MongoDB module from 10s to 60s {pull}44781[44781]
-- Upgrade github.com/microsoft/go-mssqldb from v1.7.2 to v1.8.2 {pull}44990[44990]
-- Add SSL support for sql module: drivers mysql, postgres, and mssql. {pull}44748[44748]
-- Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
-- Add NTP response validation for system/ntp module. {pull}46184[46184]
-- Add vertexai_logs metricset to GCP for prompt response collection from VertexAI service. {pull}46383[46383]
-- Add default timegrain to Azure Storage Account metricset. {pull}46786[46786]
 
 *Metricbeat*
 
@@ -395,5 +366,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 ==== Known Issues
 
 *Filebeat*
- - The Filestream input does not enforce the restrictions documented for the `clean_inactive` option, thus allowing configurations that can lead to data re-ingestion issues.
- - When `clean_inactive: 0`, Filestream cleans the state of all files on start up, effectively re-ingesting all files on restart. Set `clean_inactive: -1` to disable this behavior.
+
+
+
