@@ -62,21 +62,11 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 	}
 
 	if b.Config.HTTP.Enabled() {
-<<<<<<< HEAD
-		var err error
-		b.API, err = api.NewWithDefaultRoutes(
-			logp.L().Named("metrics.http"),
-			b.Config.HTTP,
-			b.Monitoring.InfoRegistry(),
-			b.Monitoring.StateRegistry(),
-			b.Monitoring.StatsRegistry(),
-			b.Monitoring.InputsRegistry())
-=======
 		retryer := backoff.NewRetryer(50, 100*time.Millisecond, 1*time.Second)
 		err := retryer.Retry(ctx, func() error {
 			var err error
 			b.API, err = api.NewWithDefaultRoutes(
-				b.Info.Logger.Named("metrics.http"),
+				logp.L().Named("metrics.http"),
 				b.Config.HTTP,
 				b.Monitoring.InfoRegistry(),
 				b.Monitoring.StateRegistry(),
@@ -88,7 +78,6 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 			b.API.Start()
 			return nil
 		})
->>>>>>> 32b5e5a5e (fix: add retry for listener creation in libbeat (#46846))
 		if err != nil {
 			return BeatReceiver{}, fmt.Errorf("error creating api listener after 100 retries: %w", err)
 		}
