@@ -71,7 +71,6 @@ func (in *s3PollerInput) Run(
 	in.log = inputContext.Logger.Named("s3")
 
 	in.status = statusreporterhelper.New(inputContext.StatusReporter, in.log, "S3")
-	defer in.status.UpdateStatus(status.Stopped, "")
 	in.status.UpdateStatus(status.Starting, "Input starting")
 
 	in.pipeline = pipeline
@@ -107,7 +106,7 @@ func (in *s3PollerInput) Run(
 	)
 
 	in.run(ctx)
-
+	in.status.UpdateStatus(status.Stopped, "Input execution ended")
 	return nil
 }
 
