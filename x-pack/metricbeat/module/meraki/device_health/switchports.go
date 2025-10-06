@@ -11,7 +11,9 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/meraki"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/go-resty/resty/v2"
 
 	sdk "github.com/meraki/dashboard-api-go/v3/sdk"
 )
@@ -21,54 +23,72 @@ type switchport struct {
 	portStatus *sdk.ResponseItemSwitchGetDeviceSwitchPortsStatuses
 }
 
-func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map[Serial]*Device, period time.Duration) error {
-	switches, res, err := client.Switch.GetOrganizationSwitchPortsBySwitch(organizationID, &sdk.GetOrganizationSwitchPortsBySwitchQueryParams{})
-	if err != nil {
+func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map[Serial]*Device, period time.Duration, logger *logp.Logger) error {
+	params := &sdk.GetOrganizationSwitchPortsBySwitchQueryParams{}
+	setStart := func(s string) { params.StartingAfter = s }
+
+	doRequest := func() (*sdk.ResponseSwitchGetOrganizationSwitchPortsBySwitch, *resty.Response, error) {
+		return client.Switch.GetOrganizationSwitchPortsBySwitch(organizationID, params)
+	}
+
+	onError := func(err error, res *resty.Response) error {
 		if res != nil {
 			return fmt.Errorf("GetOrganizationSwitchPortsBySwitch failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
 		}
 		return fmt.Errorf("GetOrganizationSwitchPortsBySwitch failed; %w", err)
 	}
 
-	if switches == nil {
-		return errors.New("GetOrganizationSwitchPortsBySwitch returned nil")
-	}
-
-	for _, device := range *switches {
-		if device.Ports == nil {
-			continue
+	onSuccess := func(switches *sdk.ResponseSwitchGetOrganizationSwitchPortsBySwitch) error {
+		if switches == nil {
+			return errors.New("GetOrganizationSwitchPortsBySwitch returned nil")
 		}
 
-		var switchports []*switchport
-		for i := range *device.Ports {
-			switchports = append(switchports, &switchport{port: &(*device.Ports)[i]})
-		}
-
-		statuses, res, err := client.Switch.GetDeviceSwitchPortsStatuses(device.Serial, &sdk.GetDeviceSwitchPortsStatusesQueryParams{
-			Timespan: period.Seconds(),
-		})
-		if err != nil {
-			if res != nil {
-				return fmt.Errorf("GetDeviceSwitchPortsStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		for _, device := range *switches {
+			if device.Ports == nil {
+				continue
 			}
-			return fmt.Errorf("GetDeviceSwitchPortsStatuses failed; %w", err)
-		}
 
-		// match status to the port attributes found earlier using the shared port ID
-		for i := range *statuses {
-			status := (*statuses)[i]
-			for _, switchport := range switchports {
-				if switchport.port.PortID == status.PortID {
-					switchport.portStatus = &status
-					break
+			var switchports []*switchport
+			for i := range *device.Ports {
+				switchports = append(switchports, &switchport{port: &(*device.Ports)[i]})
+			}
+
+			statuses, res, err := client.Switch.GetDeviceSwitchPortsStatuses(device.Serial, &sdk.GetDeviceSwitchPortsStatusesQueryParams{
+				Timespan: period.Seconds(),
+			})
+			if err != nil {
+				if res != nil {
+					return fmt.Errorf("GetDeviceSwitchPortsStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+				}
+				return fmt.Errorf("GetDeviceSwitchPortsStatuses failed; %w", err)
+			}
+
+			// match status to the port attributes found earlier using the shared port ID
+			for i := range *statuses {
+				status := (*statuses)[i]
+				for _, switchport := range switchports {
+					if switchport.port.PortID == status.PortID {
+						switchport.portStatus = &status
+						break
+					}
 				}
 			}
+
+			devices[Serial(device.Serial)].switchports = switchports
 		}
 
-		devices[Serial(device.Serial)].switchports = switchports
+		return nil
 	}
 
-	return nil
+	err := meraki.NewPaginator(
+		setStart,
+		doRequest,
+		onError,
+		onSuccess,
+		logger,
+	).GetAllPages()
+
+	return err
 }
 
 func reportSwitchportMetrics(reporter mb.ReporterV2, organizationID string, devices map[Serial]*Device) {
