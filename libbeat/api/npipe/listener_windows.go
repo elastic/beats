@@ -28,6 +28,8 @@ import (
 
 	winio "github.com/Microsoft/go-winio"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // NewListener creates a new Listener receiving events over a named pipe.
@@ -80,6 +82,8 @@ func Dial(npipe string) func(string, string) (net.Conn, error) {
 func DefaultSD(forUser string) (string, error) {
 	var u *user.User
 	var err error
+	logger := logp.L().Named("npipe")
+
 	// No user configured we fallback to the current running user.
 	if len(forUser) == 0 {
 		u, err = user.Current()
@@ -99,11 +103,18 @@ func DefaultSD(forUser string) (string, error) {
 	// String definition: https://docs.microsoft.com/en-us/windows/win32/secauthz/ace-strings
 	// Give generic read/write access to the specified user.
 	descriptor := "D:P(A;;GA;;;" + u.Uid + ")"
-	if u.Username == "NT AUTHORITY\\SYSTEM" {
+	isAdmin, err := hasAdmin()
+	if err != nil {
+		// do not fail, continue with limited permissions
+		logger.Warn("failed to detect Administrator: %v", err)
+	}
+
+	if isAdmin {
 		// running as SYSTEM, include Administrators group so Administrators can talk over
 		// the named pipe to the running Elastic Agent system process
 		// https://support.microsoft.com/en-us/help/243330/well-known-security-identifiers-in-windows-operating-systems
 		descriptor += "(A;;GA;;;S-1-5-32-544)" // Administrators group
 	}
+
 	return descriptor, nil
 }

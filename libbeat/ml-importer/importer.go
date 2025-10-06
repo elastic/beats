@@ -243,7 +243,7 @@ func checkResponse(r []byte) error {
 				logp.Debug("machine-learning", "Datafeed already exists: %s, error: %s", feed.ID, feed.Error.Msg)
 				continue
 			}
-			errs = append(errs, errors.Errorf(feed.Error.Msg))
+			errs = append(errs, errors.New(feed.Error.Msg))
 		}
 	}
 	for _, job := range resp.Jobs {
@@ -252,7 +252,7 @@ func checkResponse(r []byte) error {
 			continue
 		}
 		if !job.Success {
-			errs = append(errs, errors.Errorf(job.Error.Msg))
+			errs = append(errs, errors.New(job.Error.Msg))
 		}
 	}
 	for _, dashboard := range resp.Kibana.Dashboard {

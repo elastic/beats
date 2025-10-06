@@ -6,6 +6,7 @@ package awss3
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -251,7 +252,7 @@ func getRegionFromQueueURL(queueURL string, endpoint string) (string, error) {
 	// Example: https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs
 	url, err := url.Parse(queueURL)
 	if err != nil {
-		return "", fmt.Errorf(queueURL + " is not a valid URL")
+		return "", errors.New(queueURL + " is not a valid URL")
 	}
 	if url.Scheme == "https" && url.Host != "" {
 		queueHostSplit := strings.Split(url.Host, ".")
