@@ -31,7 +31,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
 - Redis: Added replication role as a field to submitted slowlogs
 - Change log.file.path field in awscloudwatch input to nested object. {pull}41099[41099]
-- Journald input now converts byte-encoded messages to string. {issue}40479[40479] {pull}46415[46415]
 
 *Heartbeat*
 
@@ -80,8 +79,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 - 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
-- Fixed a panic in the Kafka output that could occur when shutting down while final events were being published. {issue}46109[46109] {pull}46446[46446]
-- Update github.com/docker/docker to v28.3.3 {pull}46334[46334]
 
 *Auditbeat*
 
@@ -123,12 +120,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Journald input now works on Docker containers (except Wolfi) {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
 - Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
 - Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
-- The UDP input now fails if it cannot bind to the configured port and its status is set to failed when running under Elastic Agent. {issue}37216[37216] {pull}46302[46302]
-- The Unix input now fails on errors listening to the socket and its status is set to failed when running under Elastic Agent. {pull}46302[46302]
 
-- Fix metrics from TCP & UDP inputs when the port number is > 32767 {pull}46486[46486]
-- [Journald input] Fix reading all files in a folder and watching for new ones. {issue}46657[46657] {pull}46682[46682]
-- [azure-eventhub] Fix handling of connection strings with entity path. {issue}43715[43715] {pull}43716[43716]
 
 *Heartbeat*
 
@@ -159,8 +151,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 - Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices {pull}43637[43637]
-- Do not log an error if metadata enrichment is disabled for K8's module {pull}46536
-- Fix Azure Monitor wildcard metrics names timegrain issue by using the first, smallest timegrain; fix nil pointer issue {pull}46145[46145]
 
 *Osquerybeat*
 
@@ -170,7 +160,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
-- Fix EventLog reset logic to not close renderers. {pull}46376[46376] {issue}45750{45750}
 
 *Elastic Logging Plugin*
 
@@ -293,14 +282,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
 - Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
 - Add `enable_batch_api` option in azure monitor to allow metrics collection of multiple resources using azure batch Api {pull}41790[41790]
-- Add latency config option to Azure Monitor module. {pull}44366[44366]
-- Increase default polling period for MongoDB module from 10s to 60s {pull}44781[44781]
-- Upgrade github.com/microsoft/go-mssqldb from v1.7.2 to v1.8.2 {pull}44990[44990]
-- Add SSL support for sql module: drivers mysql, postgres, and mssql. {pull}44748[44748]
-- Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
-- Add NTP response validation for system/ntp module. {pull}46184[46184]
-- Add vertexai_logs metricset to GCP for prompt response collection from VertexAI service. {pull}46383[46383]
-- Add default timegrain to Azure Storage Account metricset. {pull}46786[46786]
 
 *Metricbeat*
 
@@ -352,6 +333,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
