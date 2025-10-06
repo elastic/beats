@@ -477,7 +477,7 @@ steps:
       - label: ":ubuntu: Auditbeat: Packaging Linux arm64"
         key: "auditbeat-package-linux-arm64"
         env:
-          PLATFORMS: "+all linux/arm64 darwin/arm64"
+          PLATFORMS: "+all linux/arm64 darwin/arm64 windows/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh auditbeat
         retry:

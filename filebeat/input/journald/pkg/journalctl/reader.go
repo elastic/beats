@@ -178,6 +178,7 @@ func New(
 	cursor string,
 	since time.Duration,
 	file string,
+	merge bool,
 	newJctl JctlFactory,
 ) (*Reader, error) {
 
@@ -186,16 +187,22 @@ func New(
 	args := []string{"--utc", "--output=json", "--no-pager", "--all"}
 
 	if file != "" && file != localSystemJournalID {
+
 		st, err := os.Stat(file)
 		if err != nil {
-			return nil, fmt.Errorf("cannot stat path: %w", err)
-		}
-
-		if st.IsDir() {
-			args = append(args, "--directory", file)
-		} else {
+			logger.Debugf("cannot stat file: %s. Using '--file %s'", err, file)
 			args = append(args, "--file", file)
+		} else {
+			if st.IsDir() {
+				args = append(args, "--directory", file)
+			} else {
+				args = append(args, "--file", file)
+			}
 		}
+	}
+
+	if merge {
+		args = append(args, "--merge")
 	}
 
 	for _, u := range units {
