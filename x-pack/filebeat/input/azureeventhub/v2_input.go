@@ -152,7 +152,6 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		in.config.SAContainer,
 		&container.ClientOptions{
 			ClientOptions: azcore.ClientOptions{
-				// FIXME: check more pipelineClient creation options.
 				Cloud: cloud.AzurePublic,
 			},
 		},
@@ -190,10 +189,36 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	}
 	in.checkpointStore = checkpointStore
 
+	// There is a mismatch between how the azure-eventhub input and the new
+	// Event Hub SDK expect the event hub name in the connection string.
+	//
+	// The azure-eventhub input was designed to work with the old Event Hub SDK,
+	// which worked using the event hub name in the connection string.
+	//
+	// The new Event Hub SDK expects clients to pass the event hub name as a
+	// parameter, or in the connection string as the entity path.
+	//
+	// We need to handle both cases.
+	eventHubName := in.config.EventHubName
+
+	connectionStringProperties, err := parseConnectionString(in.config.ConnectionString)
+	if err != nil {
+		return fmt.Errorf("failed to parse connection string: %w", err)
+	}
+	if connectionStringProperties.EntityPath != nil {
+		// If the connection string contains an entity path, we need to
+		// set the event hub name to an empty string.
+		//
+		// This is a requirement of the new Event Hub SDK.
+		//
+		// See: https://github.com/Azure/azure-sdk-for-go/blob/4ece3e50652223bba502f2b73e7f297de34a799c/sdk/messaging/azeventhubs/producer_client.go#L304-L306
+		eventHubName = ""
+	}
+
 	// Create the event hub consumerClient to receive events.
 	consumerClient, err := azeventhubs.NewConsumerClientFromConnectionString(
 		in.config.ConnectionString,
-		in.config.EventHubName,
+		eventHubName,
 		in.config.ConsumerGroup,
 		nil,
 	)
@@ -205,6 +230,7 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	// Manage the migration of the checkpoint information
 	// from the old Event Hub SDK to the new Event Hub SDK.
 	in.migrationAssistant = newMigrationAssistant(
+		in.config,
 		in.log,
 		consumerClient,
 		containerClient,
@@ -237,7 +263,6 @@ func (in *eventHubInputV2) run(ctx context.Context) error {
 		err := in.migrationAssistant.checkAndMigrate(
 			ctx,
 			in.config.ConnectionString,
-			in.config.EventHubName,
 			in.config.ConsumerGroup,
 		)
 		if err != nil {
