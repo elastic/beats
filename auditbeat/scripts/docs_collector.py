@@ -50,8 +50,9 @@ def collect(base_paths):
                     versions.append(f"{key} {value}")
                 applies_to = ", ".join(versions)
             elif "release" in fields[0]:
-                if fields[0]["release"] != "ga":
-                    applies_to = fields[0]["release"]
+                applies_to = fields[0]["release"]
+            else:
+                applies_to = "ga"
 
         module_file = """---
 mapped_pages:
@@ -167,6 +168,8 @@ The following datasets are available:\n\n"""
     module_list_output = """---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-modules.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -181,7 +184,7 @@ This section contains detailed information about the metric collecting modules c
         title = details["title"]
         applies_to = details["applies_to"]
         module_list_output += "* [{}](/reference/auditbeat/auditbeat-module-{}.md)".format(title, m)
-        if applies_to:
+        if applies_to and applies_to is not "ga":
             module_list_output += " {{applies_to}}`stack: {}`".format(applies_to)
         module_list_output += "\n"
 
