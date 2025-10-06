@@ -510,7 +510,7 @@ func TestDoubleStarCanBeUsed(t *testing.T) {
 
 	env.startInput(ctx, inp)
 	// Wait for at least 11 events, this means more than one journal file
-	// has been read ingested.
+	// has been read and ingested.
 	//
 	// When many small journal files are ingested, the journalctl process
 	// may exit before the input has fully read its stdout, which makes us
