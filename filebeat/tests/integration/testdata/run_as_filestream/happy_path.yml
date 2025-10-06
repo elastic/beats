@@ -1,0 +1,23 @@
+filebeat.inputs:
+  - type: log
+    id: test-run-as-filestream
+    run_as_filestream: true
+    allow_deprecated_use: true
+    paths:
+      - {{ .logfile }}
+
+output.file:
+  path: ${path.home}
+  filename: "output-file"
+  rotate_on_startup: false
+
+queue.mem:
+  flush.timeout: 0
+
+logging:
+  level: debug
+  selectors:
+    - input
+    - input.filestream
+    - input.harvester
+    - fswatcher
