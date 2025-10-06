@@ -9,11 +9,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/go-resty/resty/v2"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/meraki"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/go-resty/resty/v2"
 
 	sdk "github.com/meraki/dashboard-api-go/v3/sdk"
 )

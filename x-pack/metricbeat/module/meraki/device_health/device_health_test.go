@@ -13,11 +13,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/go-resty/resty/v2"
 	meraki "github.com/meraki/dashboard-api-go/v3/sdk"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestGetDeviceChannelUtilization(t *testing.T) {
