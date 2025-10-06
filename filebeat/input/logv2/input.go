@@ -48,10 +48,10 @@ func newV1Input(
 	context v1.Context,
 	logger *logp.Logger,
 ) (v1.Input, error) {
-	if ok, _ := cfg.Has("be_filestream", -1); ok {
-		beFilestream, err := cfg.Bool("be_filestream", -1)
+	if ok, _ := cfg.Has("run_as_filestream", -1); ok {
+		beFilestream, err := cfg.Bool("run_as_filestream", -1)
 		if err != nil {
-			return nil, fmt.Errorf("newV1Input: cannot parse 'be_filestream': %w", err)
+			return nil, fmt.Errorf("newV1Input: cannot parse 'run_as_filestream': %w", err)
 		}
 
 		if beFilestream {
@@ -102,10 +102,10 @@ func (m manager) Init(grp unison.Group) error {
 }
 
 func (m manager) Create(cfg *config.C) (v2.Input, error) {
-	if ok, _ := cfg.Has("be_filestream", -1); ok {
-		beFilestream, err := cfg.Bool("be_filestream", -1)
+	if ok, _ := cfg.Has("run_as_filestream", -1); ok {
+		beFilestream, err := cfg.Bool("run_as_filestream", -1)
 		if err != nil {
-			return nil, fmt.Errorf("manager.Create: cannot parse 'be_filestream': %w", err)
+			return nil, fmt.Errorf("manager.Create: cannot parse 'run_as_filestream': %w", err)
 		}
 
 		if beFilestream {
