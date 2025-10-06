@@ -16,7 +16,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/go-resty/resty/v2"
 	meraki "github.com/meraki/dashboard-api-go/v3/sdk"
-	sdk "github.com/meraki/dashboard-api-go/v3/sdk"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -237,13 +236,13 @@ func newMockOrganizationsClient(totalPages, devicesPerPage int) *mockOrganizatio
 	}
 }
 
-func (m *mockOrganizationsClient) GetOrganizationDevices(organizationID string, params *sdk.GetOrganizationDevicesQueryParams) (*sdk.ResponseOrganizationsGetOrganizationDevices, *resty.Response, error) {
+func (m *mockOrganizationsClient) GetOrganizationDevices(organizationID string, params *meraki.GetOrganizationDevicesQueryParams) (*meraki.ResponseOrganizationsGetOrganizationDevices, *resty.Response, error) {
 	m.callCount++
 
-	devices := make(sdk.ResponseOrganizationsGetOrganizationDevices, 0, m.devicesPerPage)
+	devices := make(meraki.ResponseOrganizationsGetOrganizationDevices, 0, m.devicesPerPage)
 	for i := 0; i < m.devicesPerPage; i++ {
 		serial := fmt.Sprintf("SERIAL-%d-%d", m.callCount, i)
-		devices = append(devices, sdk.ResponseItemOrganizationsGetOrganizationDevices{
+		devices = append(devices, meraki.ResponseItemOrganizationsGetOrganizationDevices{
 			Serial: serial,
 			Name:   fmt.Sprintf("Device %s", serial),
 		})
