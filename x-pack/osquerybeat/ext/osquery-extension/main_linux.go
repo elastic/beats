@@ -13,8 +13,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables"
 )
 
-func RegisterTables(server *osquery.ExtensionManagerServer) {
+func RegisterTables(server *osquery.ExtensionManagerServer, log func(m string, kvs ...any)) {
 	server.RegisterPlugin(table.NewPlugin("host_users", tables.HostUsersColumns(), tables.GetHostUsersGenerateFunc()))
 	server.RegisterPlugin(table.NewPlugin("host_groups", tables.HostGroupsColumns(), tables.GetHostGroupsGenerateFunc()))
 	server.RegisterPlugin(table.NewPlugin("host_processes", tables.HostProcessesColumns(), tables.GetHostProcessesGenerateFunc()))
+	server.RegisterPlugin(table.NewPlugin("browser_history", tables.BrowserHistoryColumns(), tables.GetBrowserHistoryGenerateFunc(log)))
 }
