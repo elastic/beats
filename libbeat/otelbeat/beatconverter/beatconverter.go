@@ -192,3 +192,44 @@ func promoteOutputQueueSettings(beatReceiverConfigKey string, outputConfig *conf
 
 	return nil
 }
+<<<<<<< HEAD
+=======
+
+// getBeatsAuthExtensionConfig sets http transport settings on beatsauth
+// currently this is only supported for elasticsearch output
+func getBeatsAuthExtensionConfig(cfg *config.C) (map[string]any, error) {
+	defaultTransportSettings := elasticsearch.ESDefaultTransportSettings()
+	err := cfg.Unpack(&defaultTransportSettings)
+	if err != nil {
+		return nil, err
+	}
+
+	newConfig, err := config.NewConfigFrom(defaultTransportSettings)
+	if err != nil {
+		return nil, err
+	}
+
+	// proxy_url on newConfig is of type *url.URL which is not understood by beatsauth extension
+	// this logic here converts it into string type similar to what a user would set on filebeat config
+	if defaultTransportSettings.Proxy.URL != nil {
+		proxyURL, err := config.NewConfigFrom(map[string]any{
+			"proxy_url": defaultTransportSettings.Proxy.URL.String(),
+		})
+		if err != nil {
+			return nil, fmt.Errorf("error translating proxy_url: %w", err)
+		}
+		err = newConfig.Merge(proxyURL)
+		if err != nil {
+			return nil, fmt.Errorf("error merging proxy_url: %w", err)
+		}
+	}
+
+	var newMap map[string]any
+	err = newConfig.Unpack(&newMap)
+	if err != nil {
+		return nil, err
+	}
+
+	return newMap, nil
+}
+>>>>>>> b5c515868 (Add proxy tests to beatsauth extension  (#46791))
