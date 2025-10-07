@@ -50,6 +50,7 @@ type httpEndpoint struct {
 	config    config
 	addr      string
 	tlsConfig *tls.Config
+	logger    *logp.Logger
 }
 
 func Plugin() v2.Plugin {
@@ -90,6 +91,7 @@ func newHTTPEndpoint(config config, logger *logp.Logger) (*httpEndpoint, error) 
 		config:    config,
 		tlsConfig: tlsConfig,
 		addr:      addr,
+		logger:    logger,
 	}, nil
 }
 
@@ -456,13 +458,14 @@ func newInputMetrics(id string) *inputMetrics {
 		batchProcessingTime: metrics.NewUniformSample(1024),
 		batchACKTime:        metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "size", adapter.Accept).
+	logger := logp.NewLogger("")
+	_ = adapter.NewGoMetrics(reg, "size", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.contentLength))
-	_ = adapter.NewGoMetrics(reg, "batch_size", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_size", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchSize))
-	_ = adapter.NewGoMetrics(reg, "batch_processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
-	_ = adapter.NewGoMetrics(reg, "batch_ack_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_ack_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchACKTime))
 
 	return out

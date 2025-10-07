@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
@@ -171,7 +172,7 @@ func newInputMetrics(ctx v2.Context) *inputMetrics {
 		publishingTime:  metrics.NewUniformSample(1024),
 	}
 
-	_ = adapter.NewGoMetrics(reg, "publishing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "publishing_time", logp.NewLogger(""), adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.publishingTime))
 
 	return out

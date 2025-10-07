@@ -21,6 +21,7 @@ import (
 type azurebsInput struct {
 	config     config
 	serviceURL string
+	logger     *logp.Logger
 }
 
 // defines the valid range for Unix timestamps for 64 bit integers
@@ -84,7 +85,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	} else {
 		urL = "https://" + config.AccountName + ".blob.core.windows.net/"
 	}
-	return sources, &azurebsInput{config: config, serviceURL: urL}, nil
+	return sources, &azurebsInput{config: config, serviceURL: urL, logger: logp.NewLogger("")}, nil
 }
 
 // tryOverrideOrDefault, overrides global values with local

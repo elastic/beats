@@ -21,6 +21,7 @@ import (
 	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -82,7 +83,7 @@ func NewMetrics(id string) *Metrics {
 		HarvesterRunning:   monitoring.NewInt(harvesterMetrics, "running"),
 		HarvesterOpenFiles: monitoring.NewInt(harvesterMetrics, "open_files"),
 	}
-	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", logp.NewNopLogger(), adapter.Accept).
 		Register("histogram", metrics.NewHistogram(m.ProcessingTime))
 
 	return &m
