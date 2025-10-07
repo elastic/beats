@@ -20,14 +20,20 @@
 package journald
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"go.elastic.co/ecszap"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -47,6 +53,9 @@ type inputTestingEnvironment struct {
 
 	pluginInitOnce sync.Once
 	plugin         v2.Plugin
+
+	inputLogger *logp.Logger
+	logBuffer   *bytes.Buffer
 
 	wg  sync.WaitGroup
 	grp unison.TaskGroup
@@ -87,6 +96,39 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 
 func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) {
 	e.wg.Add(1)
+	t := e.t
+
+	e.inputLogger, e.logBuffer = newInMemoryJSON()
+	e.t.Cleanup(func() {
+		if t.Failed() {
+			folder := filepath.Join("..", "..", "build", "input-test")
+			if err := os.MkdirAll(folder, 0o750); err != nil {
+				t.Logf("cannot create folder for error logs: %s", err)
+				return
+			}
+
+			cleanTestName := strings.Replace(t.Name(), "\\", "_", -1)
+
+			f, err := os.CreateTemp(folder, cleanTestName+"-*")
+			if err != nil {
+				t.Logf("cannot create file for error logs: %s", err)
+				return
+			}
+			defer f.Close()
+			fullLogPath, err := filepath.Abs(f.Name())
+			if err != nil {
+				t.Logf("cannot get full path from log file: %s", err)
+			}
+
+			if _, err := f.Write(e.logBuffer.Bytes()); err != nil {
+				t.Logf("cannot write to file: %s", err)
+				return
+			}
+
+			t.Logf("Test Failed, logs from input at %q", fullLogPath)
+		}
+	})
+
 	go func(wg *sync.WaitGroup, grp *unison.TaskGroup) {
 		defer wg.Done()
 		defer func() {
@@ -95,7 +137,20 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 			}
 		}()
 
+<<<<<<< HEAD
 		inputCtx := v2.Context{Logger: logp.L(), Cancelation: ctx}
+=======
+		id := uuid.Must(uuid.NewV4()).String()
+		inputCtx := v2.Context{
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
+			Cancelation:     ctx,
+			StatusReporter:  e.statusReporter,
+			MetricsRegistry: monitoring.NewRegistry(),
+			Logger:          e.inputLogger,
+		}
+>>>>>>> f13a0bd03 ([Filebeat/Journald] Fix flakiness from TestDoubleStarCanBeUsed (#46913))
 		if err := inp.Run(inputCtx, e.pipeline); err != nil {
 			e.t.Errorf("input 'Run' method returned an error: %s", err)
 		}
@@ -125,6 +180,45 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	}, 5*time.Second, 10*time.Millisecond, &msg)
 }
 
+<<<<<<< HEAD
+=======
+// waitUntilEventCount waits until total count events arrive to the client.
+func (e *inputTestingEnvironment) waitUntilEventsPublished(published int) {
+	e.t.Helper()
+	msg := strings.Builder{}
+	require.Eventually(e.t, func() bool {
+		sum := len(e.pipeline.GetAllEvents())
+		if sum >= published {
+			return true
+		}
+
+		msg.Reset()
+		fmt.Fprintf(&msg, "too few events; expected: %d, actual: %d", published, sum)
+
+		return false
+	}, 5*time.Second, 10*time.Millisecond, &msg)
+}
+
+func (e *inputTestingEnvironment) RequireStatuses(expected []statusUpdate) {
+	t := e.t
+	t.Helper()
+	got := e.statusReporter.GetUpdates()
+	if len(got) != len(expected) {
+		t.Fatalf("expecting %d updates, got %d", len(expected), len(got))
+	}
+
+	for i := range expected {
+		g, e := got[i], expected[i]
+		if g != e {
+			t.Errorf(
+				"expecting [%d] status update to be {state:%s, msg:%s}, got  {state:%s, msg:%s}",
+				i, e.state.String(), e.msg, g.state.String(), g.msg,
+			)
+		}
+	}
+}
+
+>>>>>>> f13a0bd03 ([Filebeat/Journald] Fix flakiness from TestDoubleStarCanBeUsed (#46913))
 var _ statestore.States = (*testInputStore)(nil)
 
 type testInputStore struct {
@@ -253,3 +347,49 @@ func blockingACKer(starter context.Context) beat.EventListener {
 		}
 	})
 }
+<<<<<<< HEAD
+=======
+
+type statusUpdate struct {
+	state status.Status
+	msg   string
+}
+
+type mockStatusReporter struct {
+	mutex   sync.RWMutex
+	updates []statusUpdate
+}
+
+func (m *mockStatusReporter) UpdateStatus(status status.Status, msg string) {
+	m.mutex.Lock()
+	m.updates = append(m.updates, statusUpdate{status, msg})
+	m.mutex.Unlock()
+}
+
+func (m *mockStatusReporter) GetUpdates() []statusUpdate {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+	return append([]statusUpdate{}, m.updates...)
+}
+
+func newInMemoryJSON() (*logp.Logger, *bytes.Buffer) {
+	buff := bytes.Buffer{}
+	encoderConfig := ecszap.ECSCompatibleEncoderConfig(logp.JSONEncoderConfig())
+	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	encoder := zapcore.NewJSONEncoder(encoderConfig)
+
+	core := zapcore.NewCore(
+		encoder,
+		zapcore.Lock(zapcore.AddSync(&buff)),
+		zap.NewAtomicLevelAt(zap.DebugLevel))
+	ecszap.ECSCompatibleEncoderConfig(logp.ConsoleEncoderConfig())
+
+	logger, _ := logp.NewDevelopmentLogger(
+		"journald",
+		zap.WrapCore(func(in zapcore.Core) zapcore.Core {
+			return core
+		}))
+
+	return logger, &buff
+}
+>>>>>>> f13a0bd03 ([Filebeat/Journald] Fix flakiness from TestDoubleStarCanBeUsed (#46913))
