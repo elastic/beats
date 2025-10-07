@@ -53,7 +53,7 @@ metricbeat:
      processes:
       - '.*'
      metricsets:
-      - cpu		
+      - cpu
 output:
   elasticsearch:
     hosts:
@@ -69,7 +69,7 @@ processors:
     - add_docker_metadata: ~
     - add_kubernetes_metadata: ~
 http.host: localhost
-http.port: {{.MonitoringPort}}	
+http.port: {{.MonitoringPort}}
 `
 
 	// start metricbeat in otel mode
