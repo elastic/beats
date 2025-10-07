@@ -36,7 +36,7 @@ const (
 
 var experimentalWarning sync.Once
 
-func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
+func newProspector(config Config, log *logp.Logger) (loginp.Prospector, error) {
 	logger := log.With("filestream_id", config.ID)
 	err := checkConfigCompatibility(config)
 	if err != nil {
@@ -117,7 +117,7 @@ func newProspector(config config, log *logp.Logger) (loginp.Prospector, error) {
 	return nil, fmt.Errorf("no such rotation method: %s", rotationMethod)
 }
 
-func checkConfigCompatibility(config config) error {
+func checkConfigCompatibility(config Config) error {
 	if config.FileIdentity != nil &&
 		config.FileIdentity.Name() == fingerprintName &&
 		!config.FileWatcher.Scanner.Fingerprint.Enabled {

@@ -71,7 +71,7 @@ var (
 type Input struct {
 	cfg                 *conf.C
 	logger              *logp.Logger
-	config              config
+	config              Config
 	states              *file.States
 	harvesters          *harvester.Registry
 	outlet              channel.Outleter
@@ -112,7 +112,7 @@ func NewInput(
 		}
 	}
 
-	inputConfig := defaultConfig()
+	inputConfig := DefaultConfig()
 
 	if err := cfg.Unpack(&inputConfig); err != nil {
 		return nil, err

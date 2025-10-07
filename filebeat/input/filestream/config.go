@@ -34,8 +34,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// config stores the options of a file stream.
-type config struct {
+// Config stores the options of a file stream.
+type Config struct {
 	Reader readerConfig `config:",inline"`
 
 	ID           string            `config:"id"`
@@ -129,8 +129,8 @@ type commonRotationConfig struct {
 
 type copyTruncateConfig commonRotationConfig
 
-func defaultConfig() config {
-	return config{
+func DefaultConfig() Config {
+	return Config{
 		Reader:         defaultReaderConfig(),
 		Paths:          []string{},
 		Close:          defaultCloserConfig(),
@@ -179,7 +179,7 @@ func defaultDeleterConfig() deleterConfig {
 	}
 }
 
-func (c *config) Validate() error {
+func (c *Config) Validate() error {
 	if len(c.Paths) == 0 {
 		return fmt.Errorf("no path is configured")
 	}
@@ -223,7 +223,7 @@ func (c *config) Validate() error {
 }
 
 // checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
-func (c config) checkUnsupportedParams(logger *logp.Logger) {
+func (c Config) checkUnsupportedParams(logger *logp.Logger) {
 	if c.AllowIDDuplication {
 		logger.Named("filestream").Warn(
 			"setting `allow_deprecated_id_duplication` will lead to data " +

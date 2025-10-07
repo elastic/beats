@@ -23,10 +23,12 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	v1 "github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/filestream"
+	"github.com/elastic/beats/v7/filebeat/input/log"
 	loginput "github.com/elastic/beats/v7/filebeat/input/log"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/reader/readjson"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -143,13 +145,172 @@ func (m manager) Create(cfg *config.C) (v2.Input, error) {
 	}
 
 	if asFilestream {
-		if err := cfg.SetBool("take_over.enabled", -1, true); err != nil {
-			return nil, fmt.Errorf("cannot set 'take_over.enabled': %w", err)
+		newCfg, err := translateCfg(cfg)
+		if err != nil {
+			return nil, fmt.Errorf("cannot translate log config to filestream: %s", err)
 		}
 
 		m.logger.Debug("Log input running as Filestream input")
-		return m.next.Create(cfg)
+		return m.next.Create(newCfg)
 	}
 
 	return nil, v2.ErrUnknownInput
+}
+
+func translateCfg(cfg *config.C) (*config.C, error) {
+	fsCfg := filestream.DefaultConfig()
+	logCfg := log.DefaultConfig()
+	if err := cfg.Unpack(&logCfg); err != nil {
+		return nil, fmt.Errorf("cannot unpack log input config: %w", err)
+	}
+
+	// The config translation follows the order they appear in the Log input
+	// [documentation](https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-log)
+	// and the comments are in the format:
+	// log-input-config -> filestream-inpur-config
+
+	// paths -> paths
+	fsCfg.Paths = logCfg.Paths
+
+	// recursive_glob.enabled -> prospector.scanner.recursive_glob
+	fsCfg.FileWatcher.Scanner.RecursiveGlob = logCfg.RecursiveGlob
+
+	// encoding -> encoding
+	fsCfg.Reader.Encoding = logCfg.Encoding
+
+	// exclude_lines -> exclude_lines
+	fsCfg.Reader.ExcludeLines = logCfg.ExcludeLines
+
+	// include_lines -> include_lines
+	fsCfg.Reader.IncludeLines = logCfg.IncludeLines
+
+	// harvester_buffer_size -> buffer_size
+	fsCfg.Reader.BufferSize = logCfg.BufferSize
+
+	// max_bytes -> message_max_bytes
+	fsCfg.Reader.MaxBytes = logCfg.MaxBytes
+
+	// exclude_files -> prospector.scanner.exclude_files
+	fsCfg.FileWatcher.Scanner.ExcludedFiles = logCfg.ExcludeFiles
+
+	// ignore_older -> ignore_older
+	fsCfg.IgnoreOlder = logCfg.IgnoreOlder
+
+	// close_inactive -> close.on_state_change.inactive
+	fsCfg.Close.OnStateChange.Inactive = logCfg.CloseInactive
+
+	// close_renamed -> close.on_state_change.renamed
+	fsCfg.Close.OnStateChange.Renamed = logCfg.CloseRenamed
+
+	// close_removed -> close.on_state_change.removed
+	fsCfg.Close.OnStateChange.Removed = logCfg.CloseRemoved
+
+	// close_eof -> close.reader.on_eof
+	fsCfg.Close.Reader.OnEOF = logCfg.CloseEOF
+
+	// close_timeout -> close.reader.after_interval
+	fsCfg.Close.Reader.AfterInterval = logCfg.CloseTimeout
+
+	// clean_inactive -> clean_inactive
+	fsCfg.CleanInactive = logCfg.CleanInactive
+
+	// clean_removed -> clean_removed
+	fsCfg.CleanRemoved = logCfg.CleanRemoved
+
+	// scan_frequency -> prospector.scanner.check_interval
+	fsCfg.FileWatcher.Interval = logCfg.ScanFrequency
+
+	// scan.sort -> NOT SUPPORTED
+	// scan.order -> NOT SUPPORTED
+
+	// symlinks -> prospector.scanner.symlinks
+	fsCfg.FileWatcher.Scanner.Symlinks = logCfg.Symlinks
+
+	// backoff ->backoff.init
+	fsCfg.Reader.Backoff.Init = logCfg.Backoff
+
+	// max_backoff -> backoff.max
+	fsCfg.Reader.Backoff.Max = logCfg.MaxBackoff
+
+	// backoff_factor -> NOT SUPPORTED
+
+	// harvester_limit -> harvester_limit
+	fsCfg.HarvesterLimit = logCfg.HarvesterLimit
+
+	// file_identity -> file_identity
+	fsCfg.FileIdentity = logCfg.FileIdentity
+
+	// ==================================================
+	// Undocumented options
+	// ==================================================
+	fsCfg.Reader.LineTerminator = logCfg.LineTerminator
+
+	// ==================================================
+	// Options that cannot be directly set
+	// ==================================================
+	newCfg := config.MustNewConfigFrom(fsCfg)
+
+	// This comes from the default config, remove if not set in the log input
+	if _, err := newCfg.Remove("ignore_inactive", -1); err != nil {
+		return nil, fmt.Errorf("cannot remove old ignore_inactive value: %s", err)
+	}
+	if logCfg.TailFiles {
+		if err := newCfg.SetString("ignore_inactive", -1, "since_last_start"); err != nil {
+			return nil, fmt.Errorf("cannot set ignore_inactive in new config: %s", err)
+		}
+	}
+
+	// json -> parsers[0]
+	parsers := []any{}
+	if logCfg.JSON != nil {
+		ndjson := readjson.ParserConfig{
+			Config: *logCfg.JSON,
+		}
+		// ndjson := map[string]any{
+		// 	// json.overwrite_keys -> overwrite_keys
+		// 	"overwrite_keys": logCfg.JSON.OverwriteKeys,
+
+		// 	// json.expand_keys -> expand_keys
+		// 	"expand_keys": logCfg.JSON.ExpandKeys,
+
+		// 	// json.add_error_key -> add_error_key
+		// 	"add_error_key": logCfg.JSON.AddErrorKey,
+
+		// 	// json.message_key -> message_key
+		// 	"message_key": logCfg.JSON.MessageKey,
+
+		// 	// json.document_id -> document_id
+		// 	"document_id": logCfg.JSON.DocumentID,
+
+		// 	// json.ignore_decoding_error -> ignore_decoding_error
+		// 	"ignore_decoding_error": logCfg.JSON.IgnoreDecodingError,
+		// }
+
+		// if logCfg.JSON.KeysUnderRoot {
+		// 	ndjson["target"] = ""
+		// }
+
+		parsers = append(parsers, map[string]any{
+			"ndjson": ndjson,
+		})
+	}
+
+	// multiline -> parsers[1]
+	if logCfg.Multiline != nil {
+		parsers = append(parsers, map[string]any{
+			"multiline": logCfg.Multiline,
+		})
+	}
+
+	newCfg.Remove("line_terminator", -1)
+
+	if err := newCfg.Merge(cfg); err != nil {
+		return nil, fmt.Errorf("cannot merge source and translated config: %s", err)
+	}
+
+	if err := newCfg.SetBool("take_over.enabled", -1, true); err != nil {
+		return nil, fmt.Errorf("cannot set 'take_over.enabled': %w", err)
+	}
+
+	return newCfg, nil
 }
