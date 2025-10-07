@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport"
+
 	"github.com/stretchr/testify/require"
 )
 
