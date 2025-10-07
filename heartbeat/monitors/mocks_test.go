@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 	"sync"
@@ -77,6 +78,7 @@ func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 			PipelineClientFactory: func(pipeline beat.Pipeline) (beat.Client, error) {
 				return pipeline.Connect()
 			},
+			MonitorsContext: context.Background(),
 		}),
 		sched,
 		sched.Stop
@@ -169,6 +171,14 @@ func (pc *MockPipeline) PublishedEvents() []*beat.Event {
 	return events
 }
 
+func (pc *MockPipeline) Close() error {
+	for _, c := range pc.Clients {
+		c.Close()
+	}
+
+	return nil
+}
+
 func baseMockEventMonitorValidator(id string, name string, status string) validator.Validator {
 	var idMatcher isdef.IsDef
 	if id == "" {
@@ -220,7 +230,7 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int64, *atomic.Int64) {
 	return plugin.PluginFactory{
 			Name:    "test",
 			Aliases: []string{"testAlias"},
-			Make: func(s string, config *config.C) (plugin.Plugin, error) {
+			Make: func(s string, _ context.Context, config *config.C) (plugin.Plugin, error) {
 				built.Add(1)
 				// Declare a real config block with a required attr so we can see what happens when it doesn't work
 				unpacked := struct {
