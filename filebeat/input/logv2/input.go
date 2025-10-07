@@ -26,6 +26,7 @@ import (
 	loginput "github.com/elastic/beats/v7/filebeat/input/log"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -41,6 +42,37 @@ func init() {
 	}
 }
 
+// runAsFilestream checks whether the configuration should be run as
+// Filestream input, on any error the boolean value must be ignore and
+// no input started. runAsFilestream also sets the input type accordingly.
+func runAsFilestream(cfg *config.C) (bool, error) {
+	if !management.UnderAgent() {
+		return false, nil
+	}
+
+	// ID is required to run as Filestream input
+	if !cfg.HasField("id") {
+		return false, nil
+	}
+
+	if ok := cfg.HasField("run_as_filestream"); ok {
+		runAsFilestream, err := cfg.Bool("run_as_filestream", -1)
+		if err != nil {
+			return false, fmt.Errorf("newV1Input: cannot parse 'run_as_filestream': %w", err)
+		}
+
+		if runAsFilestream {
+			if err := cfg.SetString("type", -1, "filestream"); err != nil {
+				return false, fmt.Errorf("cannot set 'type': %w", err)
+			}
+
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
 // newV1Input creates a new log input
 func newV1Input(
 	cfg *config.C,
@@ -48,19 +80,17 @@ func newV1Input(
 	context v1.Context,
 	logger *logp.Logger,
 ) (v1.Input, error) {
-	if ok, _ := cfg.Has("run_as_filestream", -1); ok {
-		beFilestream, err := cfg.Bool("run_as_filestream", -1)
-		if err != nil {
-			return nil, fmt.Errorf("newV1Input: cannot parse 'run_as_filestream': %w", err)
-		}
+	// Inputs V2 should be tried last, so if this function is run we are
+	// supposed to be running as the Log input. However not to rely on the
+	// factory implementation, also check whether to run as Log or Filestream
+	// inputs.
+	asFilestream, err := runAsFilestream(cfg)
+	if err != nil {
+		return nil, err
+	}
 
-		if beFilestream {
-			if err := cfg.SetString("type", -1, "filestream"); err != nil {
-				return nil, fmt.Errorf("cannot set 'type': %w", err)
-			}
-
-			return nil, v2.ErrUnknownInput
-		}
+	if asFilestream {
+		return nil, v2.ErrUnknownInput
 	}
 
 	inp, err := loginput.NewInput(cfg, outlet, context, logger)
@@ -68,6 +98,7 @@ func newV1Input(
 		return nil, fmt.Errorf("cannot create log input: %w", err)
 	}
 
+	logger.Debug("Log input running as Log input")
 	return inp, err
 }
 
@@ -79,13 +110,14 @@ func PluginV2(logger *logp.Logger, store statestore.States) v2.Plugin {
 	filestreamPlugin := filestream.Plugin(logger, store)
 
 	m := manager{
-		next: filestreamPlugin.Manager,
+		next:   filestreamPlugin.Manager,
+		logger: logger,
 	}
 	filestreamPlugin.Manager = m
 
 	p := v2.Plugin{
 		Name:      pluginName,
-		Stability: feature.Experimental,
+		Stability: feature.Stable,
 		Info:      "log input running filestream",
 		Doc:       "Log input running Filestream input",
 		Manager:   m,
@@ -94,7 +126,8 @@ func PluginV2(logger *logp.Logger, store statestore.States) v2.Plugin {
 }
 
 type manager struct {
-	next v2.InputManager
+	next   v2.InputManager
+	logger *logp.Logger
 }
 
 func (m manager) Init(grp unison.Group) error {
@@ -102,23 +135,20 @@ func (m manager) Init(grp unison.Group) error {
 }
 
 func (m manager) Create(cfg *config.C) (v2.Input, error) {
-	if ok, _ := cfg.Has("run_as_filestream", -1); ok {
-		beFilestream, err := cfg.Bool("run_as_filestream", -1)
-		if err != nil {
-			return nil, fmt.Errorf("manager.Create: cannot parse 'run_as_filestream': %w", err)
+	// When inputs are created, inputs V2 are tried first, so if we
+	// are supposed to run as the Log input, return v2.ErrUnknownInput
+	asFilestream, err := runAsFilestream(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	if asFilestream {
+		if err := cfg.SetBool("take_over.enabled", -1, true); err != nil {
+			return nil, fmt.Errorf("cannot set 'take_over.enabled': %w", err)
 		}
 
-		if beFilestream {
-			if err := cfg.SetString("type", -1, "filestream"); err != nil {
-				return nil, fmt.Errorf("cannot set 'type': %w", err)
-			}
-
-			if err := cfg.SetBool("take_over.enabled", -1, true); err != nil {
-				return nil, fmt.Errorf("cannot set 'take_over.enabled': %w", err)
-			}
-
-			return m.next.Create(cfg)
-		}
+		m.logger.Debug("Log input running as Filestream input")
+		return m.next.Create(cfg)
 	}
 
 	return nil, v2.ErrUnknownInput

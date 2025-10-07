@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
-func TestLogInputRunAsFilestream(t *testing.T) {
+func TestStandaloneLogInputIgnoresRunAsFilestream(t *testing.T) {
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
@@ -52,9 +52,9 @@ func TestLogInputRunAsFilestream(t *testing.T) {
 
 	// Ensure the Filestream input is started
 	filebeat.WaitLogsContains(
-		"Input 'filestream' starting",
+		"Log input running as Log input",
 		10*time.Second,
-		"Filestream input did not start",
+		"Log input did not start",
 	)
 
 	events := integration.GetEventsFromFileOutput[BeatEvent](filebeat, eventsCount, true)
@@ -63,8 +63,8 @@ func TestLogInputRunAsFilestream(t *testing.T) {
 			t.Errorf("Event %d expecting type 'log', got %q", i, ev.Input.Type)
 		}
 
-		if len(ev.Log.File.Fingerprint) == 0 {
-			t.Errorf("Event %d fingerprint cannot be empty", i)
+		if len(ev.Log.File.Fingerprint) != 0 {
+			t.Errorf("Event %d fingerprint must be empty", i)
 		}
 	}
 }

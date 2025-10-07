@@ -12,12 +12,9 @@ output.file:
   rotate_on_startup: false
 
 queue.mem:
-  flush.timeout: 0
+  flush.min_events: 50
 
 logging:
   level: debug
   selectors:
-    - input
-    - input.filestream
-    - input.harvester
-    - fswatcher
+    - "*"
