@@ -178,20 +178,11 @@ func translateCfg(cfg *config.C) (*config.C, error) {
 	// encoding -> encoding
 	fsCfg.Reader.Encoding = logCfg.Encoding
 
-	// exclude_lines -> exclude_lines
-	fsCfg.Reader.ExcludeLines = logCfg.ExcludeLines
-
-	// include_lines -> include_lines
-	fsCfg.Reader.IncludeLines = logCfg.IncludeLines
-
 	// harvester_buffer_size -> buffer_size
 	fsCfg.Reader.BufferSize = logCfg.BufferSize
 
 	// max_bytes -> message_max_bytes
 	fsCfg.Reader.MaxBytes = logCfg.MaxBytes
-
-	// exclude_files -> prospector.scanner.exclude_files
-	fsCfg.FileWatcher.Scanner.ExcludedFiles = logCfg.ExcludeFiles
 
 	// ignore_older -> ignore_older
 	fsCfg.IgnoreOlder = logCfg.IgnoreOlder
@@ -228,6 +219,9 @@ func translateCfg(cfg *config.C) (*config.C, error) {
 
 	// backoff ->backoff.init
 	fsCfg.Reader.Backoff.Init = logCfg.Backoff
+	if _, err := cfg.Remove("backoff", -1); err != nil {
+		return nil, fmt.Errorf("cannot remove 'backoff' from source config: %s", err)
+	}
 
 	// max_backoff -> backoff.max
 	fsCfg.Reader.Backoff.Max = logCfg.MaxBackoff
@@ -254,10 +248,24 @@ func translateCfg(cfg *config.C) (*config.C, error) {
 	if _, err := newCfg.Remove("ignore_inactive", -1); err != nil {
 		return nil, fmt.Errorf("cannot remove old ignore_inactive value: %s", err)
 	}
+	// tail_files -> ignore_inactive: "since_last_start"
 	if logCfg.TailFiles {
 		if err := newCfg.SetString("ignore_inactive", -1, "since_last_start"); err != nil {
 			return nil, fmt.Errorf("cannot set ignore_inactive in new config: %s", err)
 		}
+	}
+
+	// Same config key and type can be kept
+	// exclude_lines -> exclude_lines
+	// include_lines -> include_lines
+
+	// exclude_files -> prospector.scanner.exclude_files
+	if cfg.HasField("exclude_files") {
+		child, err := cfg.Child("exclude_files", -1)
+		if err != nil {
+			return nil, fmt.Errorf("cannot read 'exclude_files': %s", err)
+		}
+		newCfg.SetChild("prospector.scanner.exclude_files", -1, child)
 	}
 
 	// json -> parsers[0]
@@ -266,29 +274,6 @@ func translateCfg(cfg *config.C) (*config.C, error) {
 		ndjson := readjson.ParserConfig{
 			Config: *logCfg.JSON,
 		}
-		// ndjson := map[string]any{
-		// 	// json.overwrite_keys -> overwrite_keys
-		// 	"overwrite_keys": logCfg.JSON.OverwriteKeys,
-
-		// 	// json.expand_keys -> expand_keys
-		// 	"expand_keys": logCfg.JSON.ExpandKeys,
-
-		// 	// json.add_error_key -> add_error_key
-		// 	"add_error_key": logCfg.JSON.AddErrorKey,
-
-		// 	// json.message_key -> message_key
-		// 	"message_key": logCfg.JSON.MessageKey,
-
-		// 	// json.document_id -> document_id
-		// 	"document_id": logCfg.JSON.DocumentID,
-
-		// 	// json.ignore_decoding_error -> ignore_decoding_error
-		// 	"ignore_decoding_error": logCfg.JSON.IgnoreDecodingError,
-		// }
-
-		// if logCfg.JSON.KeysUnderRoot {
-		// 	ndjson["target"] = ""
-		// }
 
 		parsers = append(parsers, map[string]any{
 			"ndjson": ndjson,
@@ -296,21 +281,109 @@ func translateCfg(cfg *config.C) (*config.C, error) {
 	}
 
 	// multiline -> parsers[1]
-	if logCfg.Multiline != nil {
-		parsers = append(parsers, map[string]any{
-			"multiline": logCfg.Multiline,
-		})
+	// map of key -> type
+	multilineFields := map[string]string{
+		"count_lines":   "int",
+		"flush_pattern": "obj", // *match.Matcher
+		"match":         "string",
+		"max_lines":     "int", // pointer
+		"negate":        "bool",
+		"pattern":       "string", // *match.Matcher
+		"skip_newline":  "bool",
+		"timeout":       "obj", // time.duration
+		"type":          "string",
+	}
+	mutilineCfg := config.NewConfig()
+	for key, kind := range multilineFields {
+		mKey := "multiline." + key
+
+		ok, err := cfg.Has(mKey, -1)
+		if err != nil {
+			return nil, fmt.Errorf("cannot read %q: %s", mKey, err)
+		}
+
+		if ok {
+			switch kind {
+			case "obj":
+				child, err := cfg.Child(mKey, -1)
+				if err != nil {
+					return nil, fmt.Errorf("cannot get %q: %s", mKey, err)
+				}
+				mutilineCfg.SetChild(mKey, -1, child)
+			case "int":
+				child, err := cfg.Int(mKey, -1)
+				if err != nil {
+					return nil, fmt.Errorf("cannot get %q: %s", mKey, err)
+				}
+				mutilineCfg.SetInt(mKey, -1, child)
+			case "bool":
+				child, err := cfg.Bool(mKey, -1)
+				if err != nil {
+					return nil, fmt.Errorf("cannot get %q: %s", mKey, err)
+				}
+				mutilineCfg.SetBool(mKey, -1, child)
+			case "string":
+				child, err := cfg.String(mKey, -1)
+				if err != nil {
+					return nil, fmt.Errorf("cannot get %q: %s", mKey, err)
+				}
+				mutilineCfg.SetString(mKey, -1, child)
+			}
+		}
 	}
 
-	newCfg.Remove("line_terminator", -1)
+	parsers = append(parsers, mutilineCfg)
+	parsersCfg, err := config.NewConfigFrom(parsers)
+	if err != nil {
+		return nil, fmt.Errorf("cannot convert 'parsers' to config: %s", err)
+	}
+
+	newCfg.SetChild("parsers", -1, parsersCfg)
 
 	if err := newCfg.Merge(cfg); err != nil {
 		return nil, fmt.Errorf("cannot merge source and translated config: %s", err)
 	}
 
+	// Not documented, remove
+	// line_terminator -> line_terminator
+	newCfg.Remove("line_terminator", -1)
+
+	// Enable take_over
 	if err := newCfg.SetBool("take_over.enabled", -1, true); err != nil {
 		return nil, fmt.Errorf("cannot set 'take_over.enabled': %w", err)
 	}
 
+	// Remove all keys from the log input
+	// TODO (Tiaog): Decide if keep or remove this block
+	// for _, key := range logInputExclusiveKeys {
+	// 	removed, err := newCfg.Remove(key, -1)
+	// 	if err != nil {
+	// 		return nil, fmt.Errorf("cannot remove '%s': %s", key, err)
+	// 	}
+	// 	if removed {
+	// 		fmt.Printf("========== %q REMOVED\n", key)
+	// 	}
+	// }
+
 	return newCfg, nil
+}
+
+var logInputExclusiveKeys = []string{
+	"recursive_glob.enabled",
+	"harvester_buffer_size",
+	"max_bytes",
+	"close_inactive",
+	"close_renamed",
+	"close_removed",
+	"close_eof",
+	"close_timeout",
+	"scan_frequency",
+	"scan", // not supported
+	"symlinks",
+	"max_backoff",
+	"backoff_factor", // not supported
+	"exclude_files",
+	"json",
+	"multiline",
+	"tail_files",
 }
