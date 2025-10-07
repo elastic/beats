@@ -22,8 +22,9 @@ package instance
 import (
 	"bytes"
 	"flag"
-	"io/ioutil"
 	"os"
+	"path/filepath"
+	"sync"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -134,7 +135,7 @@ func TestEmptyMetaJson(t *testing.T) {
 	}
 
 	// prepare empty meta file
-	metaFile, err := ioutil.TempFile("../test", "meta.json")
+	metaFile, err := os.CreateTemp("../test", "meta.json")
 	assert.Equal(t, nil, err, "Unable to create temporary meta file")
 
 	metaPath := metaFile.Name()
@@ -157,7 +158,7 @@ func TestMetaJsonWithTimestamp(t *testing.T) {
 	}
 	firstStart := firstBeat.Info.FirstStart
 
-	metaFile, err := ioutil.TempFile("../test", "meta.json")
+	metaFile, err := os.CreateTemp("../test", "meta.json")
 	assert.Equal(t, nil, err, "Unable to create temporary meta file")
 
 	metaPath := metaFile.Name()
@@ -504,7 +505,7 @@ func (m mockManager) Enabled() bool                       { return m.enabled }
 func (m mockManager) RegisterAction(action client.Action) {}
 func (m mockManager) RegisterDiagnosticHook(name, description, filename, contentType string, hook client.DiagnosticHook) {
 }
-func (m mockManager) SetPayload(payload map[string]interface{})     {}
+func (m mockManager) SetPayload(payload map[string]any)             {}
 func (m mockManager) SetStopCallback(f func())                      {}
 func (m mockManager) Start() error                                  { return nil }
 func (m mockManager) Status() status.Status                         { return status.Status(-42) }
@@ -561,4 +562,22 @@ func TestManager(t *testing.T) {
 		require.False(t, b.Manager.Enabled())
 		require.False(t, management.UnderAgent())
 	})
+}
+
+func TestMultipleLoadMeta(t *testing.T) {
+	metaFile := filepath.Join(t.TempDir(), "meta.json")
+	var wg sync.WaitGroup
+	for range 64 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			testBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
+			require.NoError(t, err)
+			logger := logptest.NewTestingLogger(t, "")
+			testBeat.Info.Logger = logger
+			err = testBeat.LoadMeta(metaFile)
+			require.NoError(t, err)
+		}()
+	}
+	wg.Wait()
 }
