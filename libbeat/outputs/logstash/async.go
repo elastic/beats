@@ -36,12 +36,15 @@ type asyncClient struct {
 	log *logp.Logger
 	*transport.Client
 	observer outputs.Observer
-	client   *v2.AsyncClient
-	win      *window
+
+	client *v2.AsyncClient
+	win    *window
 
 	connect func() error
 
-	mutex sync.Mutex
+	// connMu protects connection operations (connect/close/send).
+	// RLock must be held when sending and Lock when connecting/closing.
+	connMu sync.RWMutex
 }
 
 type msgRef struct {
@@ -116,13 +119,16 @@ func makeClientFactory(
 }
 
 func (c *asyncClient) Connect(ctx context.Context) error {
+	c.connMu.Lock()
+	defer c.connMu.Unlock()
+
 	c.log.Debug("connect")
 	return c.connect()
 }
 
 func (c *asyncClient) Close() error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+	c.connMu.Lock()
+	defer c.connMu.Unlock()
 
 	c.log.Debug("close connection")
 
@@ -210,7 +216,11 @@ func (c *asyncClient) publishWindowed(
 }
 
 func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
-	client := c.getClient()
+	c.connMu.RLock()
+	defer c.connMu.RUnlock()
+
+	client := c.client
+
 	if client == nil {
 		return errors.New("connection closed")
 	}
@@ -221,13 +231,6 @@ func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
 	ref.count.Add(1)
 
 	return client.Send(ref.customizedCallback(), window)
-}
-
-func (c *asyncClient) getClient() *v2.AsyncClient {
-	c.mutex.Lock()
-	client := c.client
-	c.mutex.Unlock()
-	return client
 }
 
 func (r *msgRef) customizedCallback() func(uint32, error) {
