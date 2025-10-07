@@ -21,7 +21,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -29,7 +29,7 @@ import (
 
 var cpuService CPUService
 
-func cpuUsageFor(stats types.StatsJSON) *CPUUsage {
+func cpuUsageFor(stats container.StatsResponse) *CPUUsage {
 	u := CPUUsage{
 		Stat:        &docker.Stat{Stats: stats},
 		systemDelta: 1000000000, // Nanoseconds in a second
@@ -40,7 +40,7 @@ func cpuUsageFor(stats types.StatsJSON) *CPUUsage {
 func TestCPUService_PerCpuUsage(t *testing.T) {
 	oldPerCpuValuesTest := [][]uint64{{1, 9, 9, 5}, {1, 2, 3, 4}, {0, 0, 0, 0}}
 	newPerCpuValuesTest := [][]uint64{{100000001, 900000009, 900000009, 500000005}, {101, 202, 303, 404}, {0, 0, 0, 0}}
-	var statsList = make([]types.StatsJSON, 3)
+	var statsList = make([]container.StatsResponse, 3)
 	var onlineCPUS = uint32(4)
 	for index := range statsList {
 		statsList[index].PreCPUStats.CPUUsage.PercpuUsage = oldPerCpuValuesTest[index]
@@ -48,7 +48,7 @@ func TestCPUService_PerCpuUsage(t *testing.T) {
 		statsList[index].CPUStats.OnlineCPUs = onlineCPUS
 	}
 	testCase := []struct {
-		given    types.StatsJSON
+		given    container.StatsResponse
 		expected mapstr.M
 	}{
 		{statsList[0], mapstr.M{
@@ -86,7 +86,7 @@ func TestCPUService_PerCpuUsage(t *testing.T) {
 func TestCPUService_TotalUsage(t *testing.T) {
 	oldTotalValuesTest := []uint64{100, 50, 10}
 	totalValuesTest := []uint64{2, 500000050, 10}
-	var statsList = make([]types.StatsJSON, 3)
+	var statsList = make([]container.StatsResponse, 3)
 	var onlineCPUS = uint32(4)
 	for index := range statsList {
 		statsList[index].PreCPUStats.CPUUsage.TotalUsage = oldTotalValuesTest[index]
@@ -94,7 +94,7 @@ func TestCPUService_TotalUsage(t *testing.T) {
 		statsList[index].CPUStats.OnlineCPUs = onlineCPUS
 	}
 	testCase := []struct {
-		given    types.StatsJSON
+		given    container.StatsResponse
 		expected float64
 	}{
 		{statsList[0], -1},
@@ -113,7 +113,7 @@ func TestCPUService_TotalUsage(t *testing.T) {
 func TestCPUService_TotalUsageNormalized(t *testing.T) {
 	oldTotalValuesTest := []uint64{100, 50, 10}
 	totalValuesTest := []uint64{2, 500000050, 10}
-	var statsList = make([]types.StatsJSON, 3)
+	var statsList = make([]container.StatsResponse, 3)
 	var onlineCPUS = uint32(4)
 	for index := range statsList {
 		statsList[index].PreCPUStats.CPUUsage.TotalUsage = oldTotalValuesTest[index]
@@ -121,7 +121,7 @@ func TestCPUService_TotalUsageNormalized(t *testing.T) {
 		statsList[index].CPUStats.OnlineCPUs = onlineCPUS
 	}
 	testCase := []struct {
-		given    types.StatsJSON
+		given    container.StatsResponse
 		expected float64
 	}{
 		{statsList[0], -1},
@@ -140,7 +140,7 @@ func TestCPUService_TotalUsageNormalized(t *testing.T) {
 func TestCPUService_UsageInKernelmode(t *testing.T) {
 	usageOldValuesTest := []uint64{100, 10, 500000050}
 	usageValuesTest := []uint64{3, 500000010, 500000050}
-	var statsList = make([]types.StatsJSON, 3)
+	var statsList = make([]container.StatsResponse, 3)
 	var onlineCPUS = uint32(4)
 	for index := range statsList {
 		statsList[index].PreCPUStats.CPUUsage.UsageInKernelmode = usageOldValuesTest[index]
@@ -148,7 +148,7 @@ func TestCPUService_UsageInKernelmode(t *testing.T) {
 		statsList[index].CPUStats.OnlineCPUs = onlineCPUS
 	}
 	testCase := []struct {
-		given    types.StatsJSON
+		given    container.StatsResponse
 		expected float64
 	}{
 		{statsList[0], -1},
@@ -167,7 +167,7 @@ func TestCPUService_UsageInKernelmode(t *testing.T) {
 func TestCPUService_UsageInKernelmodeNormalized(t *testing.T) {
 	usageOldValuesTest := []uint64{100, 10, 500000050}
 	usageValuesTest := []uint64{3, 500000010, 500000050}
-	var statsList = make([]types.StatsJSON, 3)
+	var statsList = make([]container.StatsResponse, 3)
 	var onlineCPUS = uint32(4)
 	for index := range statsList {
 		statsList[index].PreCPUStats.CPUUsage.UsageInKernelmode = usageOldValuesTest[index]
@@ -175,7 +175,7 @@ func TestCPUService_UsageInKernelmodeNormalized(t *testing.T) {
 		statsList[index].CPUStats.OnlineCPUs = onlineCPUS
 	}
 	testCase := []struct {
-		given    types.StatsJSON
+		given    container.StatsResponse
 		expected float64
 	}{
 		{statsList[0], -1},
@@ -194,7 +194,7 @@ func TestCPUService_UsageInKernelmodeNormalized(t *testing.T) {
 func TestCPUService_UsageInUsermode(t *testing.T) {
 	usageOldValuesTest := []uint64{0, 1965, 500}
 	usageValuesTest := []uint64{500000000, 325, 1000000500}
-	var statsList = make([]types.StatsJSON, 3)
+	var statsList = make([]container.StatsResponse, 3)
 	var onlineCPUS = uint32(4)
 	for index := range statsList {
 		statsList[index].PreCPUStats.CPUUsage.UsageInUsermode = usageOldValuesTest[index]
@@ -202,7 +202,7 @@ func TestCPUService_UsageInUsermode(t *testing.T) {
 		statsList[index].CPUStats.OnlineCPUs = onlineCPUS
 	}
 	testCase := []struct {
-		given    types.StatsJSON
+		given    container.StatsResponse
 		expected float64
 	}{
 		{statsList[0], 2},
@@ -221,7 +221,7 @@ func TestCPUService_UsageInUsermode(t *testing.T) {
 func TestCPUService_UsageInUsermodeNormalized(t *testing.T) {
 	usageOldValuesTest := []uint64{0, 1965, 500}
 	usageValuesTest := []uint64{500000000, 325, 1000000500}
-	var statsList = make([]types.StatsJSON, 3)
+	var statsList = make([]container.StatsResponse, 3)
 	var onlineCPUS = uint32(4)
 	for index := range statsList {
 		statsList[index].PreCPUStats.CPUUsage.UsageInUsermode = usageOldValuesTest[index]
@@ -229,7 +229,7 @@ func TestCPUService_UsageInUsermodeNormalized(t *testing.T) {
 		statsList[index].CPUStats.OnlineCPUs = onlineCPUS
 	}
 	testCase := []struct {
-		given    types.StatsJSON
+		given    container.StatsResponse
 		expected float64
 	}{
 		{statsList[0], 0.5},
