@@ -21,12 +21,13 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
 
-func TestFoo(t *testing.T) {
+func TestLogInputRunAsFilestreamEA(t *testing.T) {
 	filebeat := NewFilebeat(t)
 	finalStateReached := atomic.Bool{}
 
+	eventsCount := 50
 	logfile := filepath.Join(filebeat.TempDir(), "log.log")
-	integration.WriteLogFile(t, logfile, 50, false, "")
+	integration.WriteLogFile(t, logfile, eventsCount, false, "")
 
 	output := proto.UnitExpected{
 		Id:             "output-unit",
@@ -36,12 +37,13 @@ func TestFoo(t *testing.T) {
 		LogLevel:       proto.UnitLogLevel_DEBUG,
 		Config: &proto.UnitExpectedConfig{
 			Id:   "default",
-			Type: "discard",
-			Name: "discard",
+			Type: "file",
+			Name: "file",
 			Source: integration.RequireNewStruct(t,
 				map[string]any{
-					"type":  "discard",
-					"hosts": []any{"http://localhost:9200"},
+					"type":     "file",
+					"path":     filebeat.TempDir(),
+					"filename": "output-file",
 				}),
 		},
 	}
@@ -63,7 +65,7 @@ func TestFoo(t *testing.T) {
 						"id":                   "run-as-filestream",
 						"enabled":              true,
 						"type":                 "log",
-						"paths":                logfile,
+						"paths":                []any{logfile},
 						"run_as_filestream":    true,
 						"allow_deprecated_use": true,
 					}),
@@ -109,4 +111,26 @@ func TestFoo(t *testing.T) {
 		10*time.Second,
 		"Filestream input did not start",
 	)
+
+	events := integration.GetEventsFromFileOutput[BeatEvent](filebeat, eventsCount, true)
+	for i, ev := range events {
+		if ev.Input.Type != "log" {
+			t.Errorf("Event %d expecting type 'log', got %q", i, ev.Input.Type)
+		}
+
+		if len(ev.Log.File.Fingerprint) == 0 {
+			t.Errorf("Event %d fingerprint cannot be empty", i)
+		}
+	}
+}
+
+type BeatEvent struct {
+	Input struct {
+		Type string `json:"type"`
+	} `json:"input"`
+	Log struct {
+		File struct {
+			Fingerprint string `json:"fingerprint"`
+		} `json:"file"`
+	} `json:"log"`
 }

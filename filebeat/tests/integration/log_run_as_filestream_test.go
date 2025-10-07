@@ -33,8 +33,10 @@ func TestLogInputRunAsFilestream(t *testing.T) {
 		"filebeat",
 		"../../filebeat.test",
 	)
+
+	eventsCount := 50
 	logfile := filepath.Join(filebeat.TempDir(), "log.log")
-	integration.WriteLogFile(t, logfile, 50, false, "")
+	integration.WriteLogFile(t, logfile, eventsCount, false, "")
 
 	cfg := getConfig(
 		t,
@@ -55,7 +57,7 @@ func TestLogInputRunAsFilestream(t *testing.T) {
 		"Filestream input did not start",
 	)
 
-	events := integration.GetEventsFromFileOutput[BeatEvent](filebeat, 50, true)
+	events := integration.GetEventsFromFileOutput[BeatEvent](filebeat, eventsCount, true)
 	for i, ev := range events {
 		if ev.Input.Type != "log" {
 			t.Errorf("Event %d expecting type 'log', got %q", i, ev.Input.Type)
