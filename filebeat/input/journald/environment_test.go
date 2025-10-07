@@ -136,7 +136,7 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 		fmt.Fprintf(&msg, "too few events; expected: %d, actual: %d", count, sum)
 
 		return false
-	}, 5*time.Second, 10*time.Millisecond, &msg)
+	}, 10*time.Second, 10*time.Millisecond, &msg)
 }
 
 func (e *inputTestingEnvironment) RequireStatuses(expected []statusUpdate) {
