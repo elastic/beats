@@ -579,7 +579,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 					continue
 				}
 
-				identifierValue := labels[aws.LabelConst.IdentifierValueIdx] + fmt.Sprint("-", valI)
+				identifierValue := labels[aws.LabelConst.AccountIdIdx] + "-" + labels[aws.LabelConst.IdentifierValueIdx] + fmt.Sprint("-", valI)
 				if _, ok := events[identifierValue]; !ok {
 					events[identifierValue] = aws.InitEvent(regionName, labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], metricDataResult.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
 				}
@@ -640,7 +640,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				}
 
 				identifierValue := labels[aws.LabelConst.IdentifierValueIdx]
-				uniqueIdentifierValue := identifierValue + fmt.Sprint("-", valI)
+				uniqueIdentifierValue := labels[aws.LabelConst.AccountIdIdx] + "-" + identifierValue + fmt.Sprint("-", valI)
 
 				// add tags to event based on identifierValue
 				// Check if identifier includes dimensionSeparator (comma in this case),
