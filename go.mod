@@ -175,11 +175,20 @@ require (
 	github.com/cilium/ebpf v0.16.0
 	github.com/dgraph-io/badger/v4 v4.6.0
 	github.com/elastic/bayeux v1.0.5
+<<<<<<< HEAD
 	github.com/elastic/ebpfevents v0.7.0
 	github.com/elastic/elastic-agent-autodiscover v0.9.2
 	github.com/elastic/elastic-agent-libs v0.21.5
 	github.com/elastic/elastic-agent-system-metrics v0.11.11
 	github.com/elastic/go-elasticsearch/v8 v8.17.1
+=======
+	github.com/elastic/ebpfevents v0.8.0
+	github.com/elastic/elastic-agent-autodiscover v0.10.0
+	github.com/elastic/elastic-agent-libs v0.24.1
+	github.com/elastic/elastic-agent-system-metrics v0.13.2
+	github.com/elastic/go-elasticsearch/v8 v8.19.0
+	github.com/elastic/go-freelru v0.16.0
+>>>>>>> b5c515868 (Add proxy tests to beatsauth extension  (#46791))
 	github.com/elastic/go-quark v0.3.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.19.0

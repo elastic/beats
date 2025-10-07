@@ -29,6 +29,15 @@ import (
 )
 
 var esCommonOutput = `
+<<<<<<< HEAD
+=======
+extensions:
+  beatsauth:
+    idle_connection_timeout: 3s
+    proxy_disable: false
+    proxy_url: https://tikugfk.example
+    timeout: 1m30s
+>>>>>>> b5c515868 (Add proxy tests to beatsauth extension  (#46791))
 exporters:
   elasticsearch:
     endpoints:
@@ -78,7 +87,7 @@ receivers:
         username: elastic
         password: changeme
         index: form-otel-exporter
-
+        proxy_url: https://tikugfk.example
 service:
   pipelines:
     logs:
@@ -240,6 +249,7 @@ receivers:
         hosts: ["https://localhost:9200"]
         username: elastic
         password: changeme
+        proxy_url: https://tikugfk.example        
         index: form-otel-exporter
         queue:
           mem:
