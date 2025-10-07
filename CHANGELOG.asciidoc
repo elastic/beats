@@ -3,6 +3,46 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.18.8]]
+=== Beats version 8.18.8
+https://github.com/elastic/beats/compare/v8.18.7\...v8.18.8[View commits]
+
+==== Breaking changes
+
+*Filebeat*
+
+- Journald input now converts byte-encoded messages to string. {issue}40479[40479] {pull}46415[46415]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fixed a panic in the Kafka output that could occur when shutting down while final events were being published. {issue}46109[46109] {pull}46446[46446]
+
+*Filebeat*
+
+- The UDP input now fails if it cannot bind to the configured port and its status is set to failed when running under Elastic Agent. {issue}37216[37216] {pull}46302[46302]
+- The Unix input now fails on errors listening to the socket and its status is set to failed when running under Elastic Agent. {pull}46302[46302]
+- Fix metrics from TCP & UDP inputs when the port number is > 32767 {pull}46486[46486]
+- [Journald input] Fix reading all files in a folder and watching for new ones. {issue}46657[46657] {pull}46682[46682]
+- [azure-eventhub] Fix handling of connection strings with entity path. {issue}43715[43715] {pull}43716[43716]
+
+*Metricbeat*
+
+- Do not log an error if metadata enrichment is disabled for K8's module {pull}46536
+- Fix Azure Monitor wildcard metrics names timegrain issue by using the first, smallest timegrain; fix nil pointer issue {pull}46145[46145]
+
+*Winlogbeat*
+
+- Fix EventLog reset logic to not close renderers. {pull}46376[46376] {issue}45750{45750}
+
+==== Added
+
+*Metricbeat*
+
+- Add default timegrain to Azure Storage Account metricset. {pull}46786[46786]
+
+
 [[release-notes-8.18.7]]
 === Beats version 8.18.7
 https://github.com/elastic/beats/compare/v8.18.6\...v8.18.7[View commits]

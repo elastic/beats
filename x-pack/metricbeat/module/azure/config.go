@@ -49,6 +49,22 @@ type Config struct {
 	BillingScopeAccountId  string `config:"billing_scope_account_id"` // retrieve usage details from billing account ID scope
 	// Use BatchApi for metric values collection
 	EnableBatchApi bool `config:"enable_batch_api"` // defaults to false
+	// DefaultTimeGrain sets the default time interval when the resource config
+	// doesn't specify one. If no time grain is configured, this value will be
+	// used whenever possible.
+	//
+	// When the metric definition doesn't support this time grain, we fall back
+	// to the smallest supported interval.
+	//
+	// Note: currently, this is only used for the storage metricset.
+	DefaultTimeGrain string `config:"default_timegrain"` // defaults to PT5M
+}
+
+// createDefaultConfig creates a default config for the metricset.
+func createDefaultConfig() Config {
+	return Config{
+		DefaultTimeGrain: "PT5M",
+	}
 }
 
 // ResourceConfig contains resource and metric list specific configuration.
