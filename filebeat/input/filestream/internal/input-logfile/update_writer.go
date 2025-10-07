@@ -66,7 +66,7 @@ func newUpdateWriter(store *store, ch *updateChan) *updateWriter {
 		return nil
 	})
 	if err != nil {
-		store.log.Errorf("failed to schedule the update writer routine: %w", err)
+		store.log.Errorf("failed to schedule the update writer routine: %v", err)
 	}
 
 	return w
@@ -77,7 +77,7 @@ func newUpdateWriter(store *store, ch *updateChan) *updateWriter {
 func (w *updateWriter) Close() {
 	err := w.tg.Stop()
 	if err != nil {
-		w.store.log.Errorf("failed to stop the update writer routine: %w", err)
+		w.store.log.Errorf("failed to stop the update writer routine: %v", err)
 	}
 	w.syncStates(w.ch.TryRecv())
 }
