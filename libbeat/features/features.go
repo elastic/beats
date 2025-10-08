@@ -39,6 +39,8 @@ type fflags struct {
 	// TODO: Refactor to generalize for other feature flags
 	fqdnEnabled   atomic.Bool
 	fqdnCallbacks map[string]boolValueOnChangeCallback
+
+	logRunAsFilestream atomic.Bool
 }
 
 // NewConfigFromProto converts the given *proto.Features object to
@@ -75,7 +77,8 @@ func UpdateFromConfig(c *conf.C) error {
 
 	type cfg struct {
 		Features struct {
-			FQDN *conf.C `json:"fqdn" yaml:"fqdn" config:"fqdn"`
+			FQDN               *conf.C `json:"fqdn" yaml:"fqdn" config:"fqdn"`
+			LogRunAsFilestream *conf.C `json:"log_input_run_as_filestream" config:"log_input_run_as_filestream"`
 		} `json:"features" yaml:"features" config:"features"`
 	}
 
@@ -85,6 +88,7 @@ func UpdateFromConfig(c *conf.C) error {
 	}
 
 	flags.SetFQDNEnabled(parsedFlags.Features.FQDN.Enabled())
+	flags.SetLogInputRunFilestream(parsedFlags.Features.LogRunAsFilestream.Enabled())
 
 	return nil
 }
@@ -97,7 +101,6 @@ func (f *fflags) SetFQDNEnabled(newValue bool) {
 	for _, cb := range f.fqdnCallbacks {
 		cb(newValue, oldValue)
 	}
-
 }
 
 // FQDN reports if FQDN should be used instead of hostname for host.name.
@@ -135,4 +138,12 @@ func RemoveFQDNOnChangeCallback(id string) {
 	defer flags.callbackMut.Unlock()
 
 	delete(flags.fqdnCallbacks, id)
+}
+
+func LogInputRunFilestream() bool {
+	return flags.logRunAsFilestream.Load()
+}
+
+func (f *fflags) SetLogInputRunFilestream(v bool) {
+	f.logRunAsFilestream.Store(v)
 }

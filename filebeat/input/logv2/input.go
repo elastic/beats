@@ -27,6 +27,7 @@ import (
 	loginput "github.com/elastic/beats/v7/filebeat/input/log"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/reader/readjson"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -48,6 +49,10 @@ func init() {
 // Filestream input, on any error the boolean value must be ignore and
 // no input started. runAsFilestream also sets the input type accordingly.
 func runAsFilestream(cfg *config.C) (bool, error) {
+	if features.LogInputRunFilestream() {
+		return true, nil
+	}
+
 	if !management.UnderAgent() {
 		return false, nil
 	}
