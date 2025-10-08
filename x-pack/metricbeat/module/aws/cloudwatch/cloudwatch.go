@@ -170,7 +170,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if len(listMetricDetailTotal.metricsWithStats) != 0 {
 		for _, regionName := range m.RegionsList {
 			m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
-			beatsConfig := m.MetricSet.AwsConfig.Copy()
+			beatsConfig := m.AwsConfig.Copy()
 			beatsConfig.Region = regionName
 			APIClients, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
 			if err != nil {
@@ -192,9 +192,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	// Create events based on namespaceDetailTotal from configuration
-	for _, regionName := range m.MetricSet.RegionsList {
+	for _, regionName := range m.RegionsList {
 		m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
-		beatsConfig := m.MetricSet.AwsConfig.Copy()
+		beatsConfig := m.AwsConfig.Copy()
 		beatsConfig.Region = regionName
 
 		APIClients, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
@@ -420,14 +420,14 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 			}
 
 			if config.ResourceType != "" {
-				resourceTypesWithTags[config.ResourceType] = m.MetricSet.TagsFilter
+				resourceTypesWithTags[config.ResourceType] = m.TagsFilter
 			}
 			continue
 		}
 
 		configPerNamespace := namespaceDetail{
 			names:              config.MetricName,
-			tags:               m.MetricSet.TagsFilter,
+			tags:               m.TagsFilter,
 			statistics:         config.Statistic,
 			resourceTypeFilter: config.ResourceType,
 			dimensions:         cloudwatchDimensions,
