@@ -42,8 +42,6 @@ recursive_glob.enabled: false
 
 symlinks: true
 
-
-
 json:
   keys_under_root: true
   overwrite_keys: true
@@ -52,6 +50,7 @@ json:
   message_key: "message"
   document_id: "the_id_key"
   ignore_decoding_error: true
+
 multiline.type: pattern
 multiline.pattern: "reg exp goes here"
 multiline.negate: true
