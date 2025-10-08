@@ -237,6 +237,7 @@ require (
 
 require (
 	github.com/apache/arrow/go/v17 v17.0.0
+	github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension v0.3.0
 	github.com/otiai10/copy v1.14.1
 	go.opentelemetry.io/collector/client v1.41.0
 	go.opentelemetry.io/collector/component/componenttest v0.135.0
