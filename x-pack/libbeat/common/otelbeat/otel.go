@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension"
 )
 
 var schemeMap = map[string]string{
@@ -79,6 +80,13 @@ func getComponent() (otelcol.Factories, error) {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
 	}
 
+	extensions, err := otelcol.MakeFactoryMap(
+		beatsauthextension.NewFactory(),
+	)
+	if err != nil {
+		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
+	}
+
 	exporters, err := otelcol.MakeFactoryMap(
 		debugexporter.NewFactory(),
 		elasticsearchexporter.NewFactory(),
@@ -88,8 +96,9 @@ func getComponent() (otelcol.Factories, error) {
 	}
 
 	return otelcol.Factories{
-		Receivers: receivers,
-		Exporters: exporters,
+		Receivers:  receivers,
+		Exporters:  exporters,
+		Extensions: extensions,
 	}, nil
 
 }
