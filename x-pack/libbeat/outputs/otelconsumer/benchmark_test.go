@@ -36,7 +36,7 @@ func makeTestOtelConsumer(t testing.TB, consumeFn func(ctx context.Context, ld p
 func BenchmarkPublish(b *testing.B) {
 	events := make([]beat.Event, 0, b.N)
 	for i := 0; i < b.N; i++ {
-		events = append(events, beat.Event{Fields: mapstr.M{"field": i}})
+		events = append(events, beat.Event{Fields: mapstr.M{"field": i, "fieldX.X": i, "fieldX.Y": i}})
 	}
 	batch := outest.NewBatch(events...)
 	var countLogs int

@@ -73,18 +73,17 @@ func ConvertNonPrimitive[T mapstrOrMap](m T, bodyMap pcommon.Map) {
 		case []time.Time:
 			s := bodyMap.PutEmptySlice(key)
 			for _, i := range x {
-				s.AppendEmpty().FromRaw(i.UTC().Format("2006-01-02T15:04:05.000Z"))
+				s.AppendEmpty().SetStr(i.UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
 		case []common.Time:
 			s := bodyMap.PutEmptySlice(key)
 			for _, i := range x {
-				s.AppendEmpty().FromRaw(time.Time(i).UTC().Format("2006-01-02T15:04:05.000Z"))
+				s.AppendEmpty().SetStr(time.Time(i).UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
 		case encoding.TextMarshaler:
 			text, err := x.MarshalText()
 			if err != nil {
-				bodyMap.PutStr(key, fmt.Sprintf("error converting %T to string: %s", x, err))
-				continue
+				text = fmt.Appendf(nil, "error converting %T to string: %s", x, err)
 			}
 			bodyMap.PutStr(key, string(text))
 		case []bool, []string, []float32, []float64, []int, []int8, []int16, []int32, []int64,
@@ -102,14 +101,13 @@ func ConvertNonPrimitive[T mapstrOrMap](m T, bodyMap pcommon.Map) {
 				var im map[string]any
 				err := marshalUnmarshal(x, &im)
 				if err != nil {
-					m[key] = fmt.Sprintf("error encoding struct to map: %s", err)
-					continue
+					bodyMap.PutStr(key, fmt.Sprintf("error encoding struct to map: %s", err))
+					break
 				}
 				ConvertNonPrimitive(im, bodyMap.PutEmptyMap(key))
 				break
 			}
 			if ref.Kind() == reflect.Slice || ref.Kind() == reflect.Array {
-				// s := make([]any, ref.Len())
 				s := bodyMap.PutEmptySlice(key)
 				for i := 0; i < ref.Len(); i++ {
 					elem := ref.Index(i).Interface()
