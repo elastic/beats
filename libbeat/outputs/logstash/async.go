@@ -39,7 +39,7 @@ type asyncClient struct {
 	client   *v2.AsyncClient
 	win      *window
 
-	connect func() error
+	connect func(ctx context.Context) error
 
 	// mutex protects client and connect/close/send
 	mutex sync.Mutex
@@ -90,8 +90,8 @@ func newAsyncClient(
 		return nil, err
 	}
 
-	c.connect = func() error {
-		err := c.ConnectContext(context.Background())
+	c.connect = func(ctx context.Context) error {
+		err := c.ConnectContext(ctx)
 		if err == nil {
 			c.client, err = clientFactory(c.Client)
 		}
@@ -121,7 +121,7 @@ func (c *asyncClient) Connect(ctx context.Context) error {
 	defer c.mutex.Unlock()
 
 	c.log.Debug("connect")
-	return c.connect()
+	return c.connect(ctx)
 }
 
 func (c *asyncClient) Close() error {
