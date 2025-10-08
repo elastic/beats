@@ -7,85 +7,18 @@ package browserhistory
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/go-multierror"
 	"github.com/osquery/osquery-go/plugin/table"
 )
 
-type chromiumHistoryEntry struct {
-	url               string
-	title             string
-	visitCount        int64
-	typedCount        int64
-	lastVisitTime     int64
-	transitionType    int64
-	visitChainID      int64
-	priorVisitChainID int64
-	visitDuration     int64
-	referringURL      string
-	path              string
-	browserName       string
-}
-
-func chromiumParser(ctx context.Context, queryContext table.QueryContext, browser, pathPattern string, log func(m string, kvs ...any)) ([]map[string]string, error) {
-	var results []map[string]string
-
-	var merr *multierror.Error
-	for _, profilePath := range expandProfilePaths(pathPattern, log) {
-		log("processing profile", "browser", browser, "path", profilePath)
-
-		entries, err := readChromiumHistoryFromPath(ctx, profilePath, browser, log)
-		if err != nil {
-			err = fmt.Errorf("failed to read history: %w", err)
-			log(err.Error(), "path", profilePath)
-			merr = multierror.Append(merr, err)
-			continue
-		}
-
-		for _, entry := range entries {
-			row := chromiumEntryToRow(entry)
-			results = append(results, row)
-		}
-	}
-
-	return results, nil
-}
-
-// expandProfilePaths expands the {profile} placeholder to find all available profiles
-func expandProfilePaths(pathPattern string, log func(m string, kvs ...any)) []string {
-	var profilePaths []string
-
-	if !strings.Contains(pathPattern, "{profile}") {
-		return []string{pathPattern}
-	}
-
-	globPattern := strings.ReplaceAll(pathPattern, "{profile}", "*")
-	if matches, err := filepath.Glob(globPattern); err == nil {
-		for _, match := range matches {
-			if info, err := os.Stat(match); err == nil && !info.IsDir() {
-				log("valid profile file found", "path", match)
-				profilePaths = append(profilePaths, match)
-			} else if err != nil {
-				log("error stating file", "path", match, "error", err)
-			} else {
-				log("skipping directory", "path", match)
-			}
-		}
-	} else {
-		log("glob pattern failed", "error", err)
-	}
-
-	return profilePaths
-}
-
-func readChromiumHistoryFromPath(ctx context.Context, historyPath, browserName string, log func(m string, kvs ...any)) ([]chromiumHistoryEntry, error) {
-	// Open database as read-only with no lock
-	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", historyPath)
+func chromiumParser(ctx context.Context, queryContext table.QueryContext, profilePath, browserName string, log func(m string, kvs ...any)) ([]*row, error) {
+	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", filepath.Join(profilePath, "History"))
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
 		log("failed to open database", "error", err)
@@ -99,15 +32,19 @@ func readChromiumHistoryFromPath(ctx context.Context, historyPath, browserName s
 			urls.title,
 			urls.visit_count,
 			urls.typed_count,
-			urls.last_visit_time,
-			visits.transition,
+			urls.hidden,
 			visits.visit_time,
+			visits.transition,
+			visits.id as visit_id,
 			visits.from_visit,
 			visits.visit_duration,
+			visit_source.source,
 			ref_urls.url as referring_url
 		FROM urls
-		LEFT JOIN visits ON urls.id = visits.url
-		LEFT JOIN urls ref_urls ON visits.from_visit = ref_urls.id
+		JOIN visits ON urls.id = visits.url
+		LEFT JOIN visit_source ON visits.id = visit_source.id
+		LEFT JOIN visits ref_visits ON visits.from_visit = ref_visits.id
+		LEFT JOIN urls ref_urls ON ref_visits.url = ref_urls.id
 		ORDER BY visits.visit_time DESC
 	`
 
@@ -119,80 +56,92 @@ func readChromiumHistoryFromPath(ctx context.Context, historyPath, browserName s
 	}
 	defer rows.Close()
 
-	var entries []chromiumHistoryEntry
+	user := extractUserFromPath(profilePath, func(m string, kvs ...any) {})
+	profileName := extractChromiumProfileName(profilePath, func(m string, kvs ...any) {})
+
+	var entries []*row
 	rowCount := 0
 	for rows.Next() {
 		rowCount++
-		var entry chromiumHistoryEntry
-		var referringURL sql.NullString
-		var transition sql.NullInt64
-		var visitTime sql.NullInt64
-		var fromVisit sql.NullInt64
-		var visitDuration sql.NullInt64
+		entry := rawHistoryEntry{
+			user:        user,
+			profile:     profileName,
+			path:        profilePath,
+			browserName: browserName,
+		}
 
 		err := rows.Scan(
 			&entry.url,
 			&entry.title,
 			&entry.visitCount,
 			&entry.typedCount,
+			&entry.isHidden,
 			&entry.lastVisitTime,
-			&transition,
-			&visitTime,
-			&fromVisit,
-			&visitDuration,
-			&referringURL,
+			&entry.transitionType,
+			&entry.visitID,
+			&entry.fromVisitID,
+			&entry.chVisitDuration,
+			&entry.visitSource,
+			&entry.referringURL,
 		)
 		if err != nil {
 			log("failed to scan row", "rowNumber", rowCount, "error", err)
 			continue
 		}
-		if referringURL.Valid {
-			entry.referringURL = referringURL.String
-		}
-		if transition.Valid {
-			entry.transitionType = transition.Int64
-		}
-		if visitTime.Valid {
-			entry.visitChainID = visitTime.Int64
-		}
-		if fromVisit.Valid {
-			entry.priorVisitChainID = fromVisit.Int64
-		}
-		if visitDuration.Valid {
-			entry.visitDuration = visitDuration.Int64
-		}
-
-		entry.path = historyPath
-		entry.browserName = browserName
-
-		entries = append(entries, entry)
+		entries = append(entries, chromiumEntryToRow(entry))
 	}
 
-	log("completed reading history", "totalRows", rowCount, "validEntries", len(entries), "historyPath", historyPath)
+	log("completed reading history", "totalRows", rowCount, "validEntries", len(entries), "historyPath", profilePath)
 	return entries, rows.Err()
 }
 
-// chromiumEntryToRow converts a Chromium history entry to the standardized row format
-func chromiumEntryToRow(entry chromiumHistoryEntry) map[string]string {
-	// Convert Chromium timestamp (microseconds since Jan 1, 1601) to Unix timestamp
-	unixTimestamp := chromiumTimeToUnix(entry.lastVisitTime)
+func extractChromiumProfileName(profilePath string, log func(m string, kvs ...any)) string {
+	profileFolderName := filepath.Base(profilePath)
+	userDataDir := filepath.Dir(profilePath)
+	localStatePath := filepath.Join(userDataDir, "Local State")
+	if data, err := os.ReadFile(localStatePath); err == nil {
+		var localState struct {
+			Profile struct {
+				InfoCache map[string]struct {
+					Name string `json:"name"`
+				} `json:"info_cache"`
+			} `json:"profile"`
+		}
 
-	// Map Chromium transition types to human-readable strings
-	transitionType := mapChromiumTransitionType(entry.transitionType)
+		if err := json.Unmarshal(data, &localState); err == nil {
+			if profileInfo, exists := localState.Profile.InfoCache[profileFolderName]; exists && profileInfo.Name != "" {
+				log("extracted profile name from Local State", "name", profileInfo.Name, "folder", profileFolderName)
+				return profileInfo.Name
+			}
+		}
+	}
+	log("using folder name as profile name", "name", profileFolderName)
+	return profileFolderName
+}
 
-	return map[string]string{
-		"timestamp":            strconv.FormatInt(unixTimestamp, 10),
-		"url":                  entry.url,
-		"title":                entry.title,
-		"browser":              entry.browserName,
-		"transition_type":      transitionType,
-		"referring_url":        entry.referringURL,
-		"visit_chain_id":       strconv.FormatInt(entry.visitChainID, 10),
-		"prior_visit_chain_id": strconv.FormatInt(entry.priorVisitChainID, 10),
-		"visit_duration_ms":    strconv.FormatInt(entry.visitDuration/1000, 10), // Convert microseconds to milliseconds
-		"visit_count":          strconv.FormatInt(entry.visitCount, 10),
-		"typed_count":          strconv.FormatInt(entry.typedCount, 10),
-		"source_path":          entry.path,
+func chromiumEntryToRow(entry rawHistoryEntry) *row {
+	return &row{
+		Timestamp: formatNullInt64(entry.lastVisitTime, func(value int64) string {
+			return strconv.FormatInt(chromiumTimeToUnix(value), 10)
+		}),
+		URL:            stringFromNullString(entry.url),
+		Title:          stringFromNullString(entry.title),
+		Browser:        entry.browserName,
+		Parser:         "chromium",
+		User:           entry.user,
+		ProfileName:    entry.profile,
+		TransitionType: mapChromiumTransitionType(entry.transitionType),
+		ReferringURL:   stringFromNullString(entry.referringURL),
+		VisitID:        decimalStringFromNullInt(entry.visitID),
+		FromVisitID:    decimalStringFromNullInt(entry.fromVisitID),
+		VisitCount:     decimalStringFromNullInt(entry.visitCount),
+		TypedCount:     decimalStringFromNullInt(entry.typedCount),
+		VisitSource:    mapChromiumVisitSource(entry.visitSource),
+		IsHidden:       boolStringFromNullInt(entry.isHidden),
+		SourcePath:     entry.path,
+		ChVisitDurationMs: formatNullInt64(entry.chVisitDuration, func(value int64) string {
+			return strconv.FormatInt(value/1000, 10)
+		}),
 	}
 }
 
@@ -210,25 +159,30 @@ func chromiumTimeToUnix(chromiumTime int64) int64 {
 
 // Chromium transition qualifiers (bit flags in upper bits)
 const (
-	TransitionBlocked        = 0x00800000 // Navigation was blocked
-	TransitionForwardBack    = 0x01000000 // User used back/forward button
-	TransitionFromAddressBar = 0x02000000 // Navigation from address bar
-	TransitionHomePage       = 0x04000000 // Navigation to home page
-	TransitionFromAPI        = 0x08000000 // Navigation from browser API
-	TransitionChainStart     = 0x10000000 // Start of navigation chain
-	TransitionChainEnd       = 0x20000000 // End of navigation chain
-	TransitionClientRedirect = 0x40000000 // Client-side redirect
-	TransitionServerRedirect = 0x80000000 // Server-side redirect
+	transitionBlocked        = 0x00800000 // Navigation was blocked
+	transitionForwardBack    = 0x01000000 // User used back/forward button
+	transitionFromAddressBar = 0x02000000 // Navigation from address bar
+	transitionHomePage       = 0x04000000 // Navigation to home page
+	transitionFromAPI        = 0x08000000 // Navigation from browser API
+	transitionChainStart     = 0x10000000 // Start of navigation chain
+	transitionChainEnd       = 0x20000000 // End of navigation chain
+	transitionClientRedirect = 0x40000000 // Client-side redirect
+	transitionServerRedirect = 0x80000000 // Server-side redirect
 )
 
 // mapChromiumTransitionType maps Chromium transition types to human-readable strings
 // Extracts both core transition type (lower 8 bits) and qualifiers (upper bits)
-func mapChromiumTransitionType(transitionType int64) string {
+func mapChromiumTransitionType(transitionType sql.NullInt64) string {
+	if !transitionType.Valid {
+		return ""
+	}
+
+	value := transitionType.Int64
 	// Extract core transition type (lower 8 bits)
-	coreType := transitionType & 0xFF
+	coreType := value & 0xFF
 
 	// Extract qualifiers (upper bits)
-	qualifiers := transitionType & 0xFFFFFF00
+	qualifiers := value & 0xFFFFFF00
 
 	// Map core transition type
 	var typeStr string
@@ -261,31 +215,31 @@ func mapChromiumTransitionType(transitionType int64) string {
 
 	// Extract and append qualifiers for forensic analysis
 	var quals []string
-	if qualifiers&TransitionBlocked != 0 {
+	if qualifiers&transitionBlocked != 0 {
 		quals = append(quals, "BLOCKED")
 	}
-	if qualifiers&TransitionForwardBack != 0 {
+	if qualifiers&transitionForwardBack != 0 {
 		quals = append(quals, "BACK_FORWARD")
 	}
-	if qualifiers&TransitionFromAddressBar != 0 {
+	if qualifiers&transitionFromAddressBar != 0 {
 		quals = append(quals, "FROM_ADDRESS_BAR")
 	}
-	if qualifiers&TransitionHomePage != 0 {
+	if qualifiers&transitionHomePage != 0 {
 		quals = append(quals, "HOME_PAGE")
 	}
-	if qualifiers&TransitionFromAPI != 0 {
+	if qualifiers&transitionFromAPI != 0 {
 		quals = append(quals, "FROM_API")
 	}
-	if qualifiers&TransitionChainStart != 0 {
+	if qualifiers&transitionChainStart != 0 {
 		quals = append(quals, "CHAIN_START")
 	}
-	if qualifiers&TransitionChainEnd != 0 {
+	if qualifiers&transitionChainEnd != 0 {
 		quals = append(quals, "CHAIN_END")
 	}
-	if qualifiers&TransitionClientRedirect != 0 {
+	if qualifiers&transitionClientRedirect != 0 {
 		quals = append(quals, "CLIENT_REDIRECT")
 	}
-	if qualifiers&TransitionServerRedirect != 0 {
+	if qualifiers&transitionServerRedirect != 0 {
 		quals = append(quals, "SERVER_REDIRECT")
 	}
 
@@ -294,4 +248,29 @@ func mapChromiumTransitionType(transitionType int64) string {
 		return typeStr + "|" + strings.Join(quals, "|")
 	}
 	return typeStr
+}
+
+// mapChromiumVisitSource maps visit source ID to human-readable string
+// Based on Chromium's VisitSource enum
+func mapChromiumVisitSource(source sql.NullInt64) string {
+	if !source.Valid {
+		return "" // null
+	}
+
+	switch source.Int64 {
+	case 0:
+		return "synced" // SOURCE_SYNCED
+	case 1:
+		return "browsed" // SOURCE_BROWSED (local browsing)
+	case 2:
+		return "extension" // SOURCE_EXTENSION
+	case 3:
+		return "firefox_imported" // SOURCE_FIREFOX_IMPORTED
+	case 4:
+		return "ie_imported" // SOURCE_IE_IMPORTED
+	case 5:
+		return "safari_imported" // SOURCE_SAFARI_IMPORTED
+	default:
+		return "source_unknown"
+	}
 }
