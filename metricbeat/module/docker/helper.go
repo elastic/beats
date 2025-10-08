@@ -18,7 +18,7 @@
 package docker
 
 import (
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 
 	helpers "github.com/elastic/elastic-agent-autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -54,7 +54,7 @@ func (c *Container) ToMapStr() mapstr.M {
 // NewContainer converts Docker API container to an internal structure, it applies
 // dedot to container labels if dedot is true, or stores them in a nested way if it's
 // false
-func NewContainer(container *types.Container, dedot bool) *Container {
+func NewContainer(container *container.Summary, dedot bool) *Container {
 	return &Container{
 		ID:     container.ID,
 		Name:   helpers.ExtractContainerName(container.Names),

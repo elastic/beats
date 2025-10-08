@@ -21,7 +21,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -39,7 +38,7 @@ var defaultLabels = map[string]string{
 	"label2.foo": "val3",
 }
 
-var defaultContainerStats = types.Container{
+var defaultContainerStats = container.Summary{
 	ID:         defaultContainerID,
 	Image:      "image",
 	Command:    "command",
@@ -139,10 +138,8 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 func TestMemoryServiceBadData(t *testing.T) {
 
 	badMemStats := container.StatsResponse{
-		Stats: container.Stats{
-			Read:        time.Now(),
-			MemoryStats: container.MemoryStats{}, //Test for cases where this is empty
-		},
+		Read:        time.Now(),
+		MemoryStats: container.MemoryStats{}, //Test for cases where this is empty
 	}
 
 	memoryService := &MemoryService{}
@@ -154,27 +151,25 @@ func TestMemoryServiceBadData(t *testing.T) {
 
 func TestMemoryMath(t *testing.T) {
 	memStats := container.StatsResponse{
-		Stats: container.Stats{
-			Read: time.Now(),
-			PreCPUStats: container.CPUStats{
-				CPUUsage: container.CPUUsage{
-					TotalUsage: 200,
-				},
+		Read: time.Now(),
+		PreCPUStats: container.CPUStats{
+			CPUUsage: container.CPUUsage{
+				TotalUsage: 200,
 			},
-			MemoryStats: container.MemoryStats{
-				Limit: 5,
-				Usage: 5000,
-				Stats: map[string]uint64{
-					"total_inactive_file": 1000, // CGV1
-					"inactive_file":       900,
-				},
-			}, //Test for cases where this is empty
 		},
+		MemoryStats: container.MemoryStats{
+			Limit: 5,
+			Usage: 5000,
+			Stats: map[string]uint64{
+				"total_inactive_file": 1000, // CGV1
+				"inactive_file":       900,
+			},
+		}, //Test for cases where this is empty
 	}
 
 	memoryService := &MemoryService{}
 	memoryRawStats := []docker.Stat{
-		{Stats: memStats, Container: &types.Container{Names: []string{"test-container"}, Labels: map[string]string{}}},
+		{Stats: memStats, Container: &container.Summary{Names: []string{"test-container"}, Labels: map[string]string{}}},
 	}
 	rawStats := memoryService.getMemoryStatsList(memoryRawStats, false)
 	assert.Equal(t, float64(800), rawStats[0].UsageP) // 5000-900 /5
@@ -183,15 +178,13 @@ func TestMemoryMath(t *testing.T) {
 func getMemoryStats(read time.Time, number uint64, rssExists bool) container.StatsResponse {
 
 	myMemoryStats := container.StatsResponse{
-		Stats: container.Stats{
-			Read: read,
-			MemoryStats: container.MemoryStats{
-				MaxUsage: number,
-				Usage:    number * 2,
-				Failcnt:  number * 3,
-				Limit:    number * 4,
-				Stats:    map[string]uint64{},
-			},
+		Read: read,
+		MemoryStats: container.MemoryStats{
+			MaxUsage: number,
+			Usage:    number * 2,
+			Failcnt:  number * 3,
+			Limit:    number * 4,
+			Stats:    map[string]uint64{},
 		},
 	}
 

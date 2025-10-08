@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -30,13 +31,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventsMapping(r mb.ReporterV2, containersList []types.Container, dedot bool, logger *logp.Logger) {
+func eventsMapping(r mb.ReporterV2, containersList []container.Summary, dedot bool, logger *logp.Logger) {
 	for i := range containersList {
 		eventMapping(r, &containersList[i], dedot, logger)
 	}
 }
 
-func eventMapping(r mb.ReporterV2, cont *types.Container, dedot bool, logger *logp.Logger) {
+func eventMapping(r mb.ReporterV2, cont *container.Summary, dedot bool, logger *logp.Logger) {
 	event := mapstr.M{
 		"container": mapstr.M{
 			"id": cont.ID,
