@@ -161,22 +161,23 @@ func (m manager) Create(cfg *config.C) (v2.Input, error) {
 }
 
 var logInputExclusiveKeys = []string{
-	"recursive_glob.enabled",
-	"harvester_buffer_size",
-	"max_bytes",
-	"close_inactive",
-	"close_renamed",
-	"close_removed",
-	"close_eof",
-	"close_timeout",
-	"scan_frequency",
-	"scan", // not supported
-	"symlinks",
-	"max_backoff",
+	"backoff",
 	"backoff_factor", // not supported
+	"close_eof",
+	"close_inactive",
+	"close_removed",
+	"close_renamed",
+	"close_timeout",
 	"exclude_files",
+	"harvester_buffer_size",
 	"json",
+	"max_backoff",
+	"max_bytes",
 	"multiline",
+	"recursive_glob.enabled",
+	"scan", // not supported
+	"scan_frequency",
+	"symlinks",
 	"tail_files",
 }
 
@@ -232,6 +233,21 @@ var convTable = map[string]configField{
 
 func translateCfg(cfg *config.C) (*config.C, error) {
 	newCfg := config.NewConfig()
+
+	// Merge operations overwrites everything that is in the destination
+	// config, so we first merge both configs to ensure shared and common
+	// fields are passed to the new one.
+	if err := newCfg.Merge(cfg); err != nil {
+		return nil, fmt.Errorf("cannot merge configurations: %w", err)
+	}
+
+	// Then we remove the log input exclusive keys from the new config,
+	// this also removes any key that has a different type, like backoff
+	for _, key := range logInputExclusiveKeys {
+		if _, err := newCfg.Remove(key, -1); err != nil {
+			return nil, fmt.Errorf("cannot remove %q: %w", key, err)
+		}
+	}
 
 	// Convert all the "static" configuration, those are the fields that
 	// can easily be translated by name
@@ -379,6 +395,8 @@ func translateCfg(cfg *config.C) (*config.C, error) {
 		// TODO: handle existing parsers
 	}
 
+	// Add final fields
+	newCfg.SetString("type", -1, "filestream")
 	return newCfg, nil
 }
 
