@@ -71,12 +71,14 @@ func getDevices(client OrganizationsClient, organizationID string, logger *logp.
 	}
 
 	onSuccess := func(val *sdk.ResponseOrganizationsGetOrganizationDevices) error {
-		if val != nil {
-			for i := range *val {
-				device := (*val)[i]
-				devices[Serial(device.Serial)] = &Device{
-					details: &device,
-				}
+		if val == nil {
+			return errors.New("GetOrganizationDevices returned nil response")
+		}
+
+		for i := range *val {
+			device := (*val)[i]
+			devices[Serial(device.Serial)] = &Device{
+				details: &device,
 			}
 		}
 		return nil
