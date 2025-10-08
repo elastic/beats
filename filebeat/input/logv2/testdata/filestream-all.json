@@ -8,15 +8,15 @@
   "clean_removed": false,
   "close": {
     "on_state_change": {
-      "inactive": "3h"
+      "inactive": "3h",
+      "removed": false,
+      "renamed": true
     },
     "reader": {
-      "after_interval": "42s"
+      "after_interval": "42s",
+      "on_eof": true
     }
   },
-  "close_eof": true,
-  "close_removed": false,
-  "close_renamed": true,
   "encoding": "utf-8",
   "exclude_lines": [
     "foo-exclude"
@@ -59,11 +59,10 @@
       "check_interval": "50s",
       "exclude_files": [
         "excluded-file glob goes here"
-      ]
+      ],
+      "recursive_glob": false,
+      "symlinks": true
     }
   },
-  "recursive_glob": {
-    "enabled": false
-  },
-  "symlinks": true
+  "type": "filestream"
 }

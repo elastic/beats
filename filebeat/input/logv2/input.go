@@ -255,7 +255,7 @@ func translateCfg(cfg *config.C) (*config.C, error) {
 				if err != nil {
 					return nil, fmt.Errorf("cannot read %q as boolean: %w", key, err)
 				}
-				newCfg.SetBool(key, -1, v)
+				newCfg.SetBool(kind.fsName, -1, v)
 
 			case ConfTypeInt:
 				v, err := cfg.Int(key, -1)
