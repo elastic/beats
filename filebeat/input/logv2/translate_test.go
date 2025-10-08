@@ -20,10 +20,14 @@ package logv2
 import (
 	_ "embed"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 //go:embed testdata/log-input-all.yaml
@@ -41,10 +45,10 @@ func TestTranslateCfg(t *testing.T) {
 
 	gotJson := config.DebugString(newCfg, false)
 	defer func() {
-		// if t.Failed() {
-		t.Log("Final config as JSON:")
-		t.Log(gotJson)
-		// }
+		if t.Failed() {
+			t.Log("Final config as JSON:")
+			t.Log(gotJson)
+		}
 	}()
 	require.JSONEq(
 		t,
@@ -52,4 +56,38 @@ func TestTranslateCfg(t *testing.T) {
 		gotJson,
 		"configuration was not correctly converted from Log to Filestream",
 	)
+
+	store := openTestStatestore()
+	newCfg.SetBool("run_as_filestream", -1, true)
+	newCfg.SetString("type", -1, "filestream")
+	p := PluginV2(logp.NewNopLogger(), store)
+	m := p.Manager.(manager)
+
+	if _, err := m.next.Create(newCfg); err != nil {
+		t.Fatalf("Filestream input cannot be created from config: %s", err)
+	}
+}
+
+var _ statestore.States = (*testInputStore)(nil)
+
+type testInputStore struct {
+	registry *statestore.Registry
+}
+
+func openTestStatestore() *testInputStore {
+	return &testInputStore{
+		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
+	}
+}
+
+func (s *testInputStore) Close() {
+	s.registry.Close()
+}
+
+func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
+	return s.registry.Get("filebeat")
+}
+
+func (s *testInputStore) CleanupInterval() time.Duration {
+	return 24 * time.Hour
 }

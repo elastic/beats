@@ -350,6 +350,23 @@ func translateCfg(cfg *config.C) (*config.C, error) {
 		})
 	}
 
+	// Handle json now.
+	// json has simpler types, so we can use the config directly
+	hasJson, err := cfg.Has("json", -1)
+	if err != nil {
+		return nil, fmt.Errorf("cannot read 'json': %w", err)
+	}
+
+	if hasJson {
+		jsonCfg, err := cfg.Child("json", -1)
+		if err != nil {
+			return nil, fmt.Errorf("cannot get 'json': %w", err)
+		}
+
+		parsers = append(parsers, map[string]any{"ndjson": jsonCfg})
+	}
+
+	// If any parsers was created, set it into the new config
 	if len(parsers) != 0 {
 		parsersCfg, err := config.NewConfigFrom(parsers)
 		if err != nil {
@@ -358,6 +375,8 @@ func translateCfg(cfg *config.C) (*config.C, error) {
 		if err := newCfg.SetChild("parsers", -1, parsersCfg); err != nil {
 			return nil, fmt.Errorf("cannot set parsers: %w", err)
 		}
+
+		// TODO: handle existing parsers
 	}
 
 	return newCfg, nil

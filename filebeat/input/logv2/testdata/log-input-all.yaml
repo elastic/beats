@@ -36,7 +36,7 @@ paths:
 scan_frequency: 50s
 
 exclude_files:
-  - "*.excluded-file"
+  - "excluded-file glob goes here"
 
 recursive_glob.enabled: false
 

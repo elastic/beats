@@ -37,6 +37,17 @@
         "pattern": "reg exp goes here",
         "type": "pattern"
       }
+    },
+    {
+      "ndjson": {
+        "add_error_key": true,
+        "document_id": "the_id_key",
+        "expand_keys": true,
+        "ignore_decoding_error": true,
+        "keys_under_root": true,
+        "message_key": "message",
+        "overwrite_keys": true
+      }
     }
   ],
   "paths": [
@@ -47,7 +58,7 @@
     "scanner": {
       "check_interval": "50s",
       "exclude_files": [
-        "*.excluded-file"
+        "excluded-file glob goes here"
       ]
     }
   },
