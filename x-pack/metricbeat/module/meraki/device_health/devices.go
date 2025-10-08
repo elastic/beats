@@ -59,6 +59,7 @@ func getDevices(client OrganizationsClient, organizationID string, logger *logp.
 	setStart := func(s string) { params.StartingAfter = s }
 
 	doRequest := func() (*sdk.ResponseOrganizationsGetOrganizationDevices, *resty.Response, error) {
+		logger.Debugf("calling GetOrganizationDevices with params: %+v", params)
 		return client.GetOrganizationDevices(organizationID, params)
 	}
 
@@ -97,6 +98,7 @@ func getDeviceStatuses(client *sdk.Client, organizationID string, devices map[Se
 	setStart := func(s string) { params.StartingAfter = s }
 
 	doRequest := func() (*sdk.ResponseOrganizationsGetOrganizationDevicesStatuses, *resty.Response, error) {
+		logger.Debugf("calling GetOrganizationDevicesStatuses with params: %+v", params)
 		return client.Organizations.GetOrganizationDevicesStatuses(organizationID, params)
 	}
 
@@ -240,6 +242,7 @@ func getDeviceLicenses(client *sdk.Client, organizationID string, devices map[Se
 	setStart := func(s string) { params.StartingAfter = s }
 
 	doRequest := func() (*sdk.ResponseOrganizationsGetOrganizationLicenses, *resty.Response, error) {
+		logger.Debugf("calling GetOrganizationLicenses with params: %+v", params)
 		return client.Organizations.GetOrganizationLicenses(organizationID, params)
 	}
 

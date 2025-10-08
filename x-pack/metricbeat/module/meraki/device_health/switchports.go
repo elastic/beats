@@ -29,6 +29,7 @@ func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map
 	setStart := func(s string) { params.StartingAfter = s }
 
 	doRequest := func() (*sdk.ResponseSwitchGetOrganizationSwitchPortsBySwitch, *resty.Response, error) {
+		logger.Debugf("calling GetOrganizationSwitchPortsBySwitch with params: %+v", params)
 		return client.Switch.GetOrganizationSwitchPortsBySwitch(organizationID, params)
 	}
 
