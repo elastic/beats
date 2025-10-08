@@ -349,7 +349,18 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		reg = monitoring.Default.NewRegistry("libbeat")
 	}
 
+<<<<<<< HEAD
 	err = metricreport.SetupMetrics(logp.NewLogger("metrics"), b.Info.Beat, version.GetDefaultVersion())
+=======
+	err = metricreport.SetupMetricsOptions(metricreport.MetricOptions{
+		Name:           b.Info.Beat,
+		Version:        version.GetDefaultVersion(),
+		EphemeralID:    metricreport.EphemeralID().String(), //nolint:staticcheck //keep behavior for now
+		Logger:         b.Info.Logger.Named("metrics"),
+		SystemMetrics:  monitoring.Default.GetOrCreateRegistry("system"),
+		ProcessMetrics: monitoring.Default.GetOrCreateRegistry("beat"),
+	})
+>>>>>>> 2d5086e12 ([libbeat] use SetupMetricsOptions instead of SetupMetrics (#46313))
 	if err != nil {
 		return nil, err
 	}
