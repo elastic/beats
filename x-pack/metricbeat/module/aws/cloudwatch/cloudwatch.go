@@ -168,7 +168,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// Create events based on listMetricDetailTotal from configuration
 	if len(listMetricDetailTotal.metricsWithStats) != 0 {
-		for _, regionName := range m.MetricSet.RegionsList {
+		for _, regionName := range m.RegionsList {
 			m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
 			beatsConfig := m.MetricSet.AwsConfig.Copy()
 			beatsConfig.Region = regionName
