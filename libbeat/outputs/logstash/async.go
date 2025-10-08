@@ -141,6 +141,13 @@ func (c *asyncClient) Close() error {
 }
 
 func (c *asyncClient) Publish(_ context.Context, batch publisher.Batch) error {
+	c.connMu.RLock()
+	defer c.connMu.RUnlock()
+
+	if c.client == nil {
+		return errors.New("connection closed")
+	}
+
 	st := c.observer
 	events := batch.Events()
 	st.NewBatch(len(events))
@@ -216,21 +223,13 @@ func (c *asyncClient) publishWindowed(
 }
 
 func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
-	c.connMu.RLock()
-	defer c.connMu.RUnlock()
-
-	client := c.client
-
-	if client == nil {
-		return errors.New("connection closed")
-	}
 	window := make([]interface{}, len(events))
 	for i := range events {
 		window[i] = &events[i].Content
 	}
 	ref.count.Add(1)
 
-	return client.Send(ref.customizedCallback(), window)
+	return c.client.Send(ref.customizedCallback(), window)
 }
 
 func (r *msgRef) customizedCallback() func(uint32, error) {

@@ -81,20 +81,18 @@ func TestClientSendCloseDoesNotPanic(t *testing.T) {
 func testClientSendCloseDoesNotPanic(t *testing.T) {
 	server := transptest.NewMockServerTCP(t, 50*time.Millisecond, "", nil)
 	defer server.Close()
+
 	transp, err := server.Connect()
-	if err != nil {
-		t.Fatalf("Failed to connect: %v", err)
-	}
+	require.NoError(t, err)
 	defer transp.Close()
+
 	config := DefaultConfig()
 	logger, err := logp.NewDevelopmentLogger("")
-	if err != nil {
-		t.Fatalf("Failed to create logger: %v", err)
-	}
+	require.NoError(t, err)
+
 	asyncClient, err := newAsyncClient(logger, "beat_version", transp, outputs.NewNilObserver(), &config)
-	if err != nil {
-		t.Fatalf("Failed to create async client: %v", err)
-	}
+	require.NoError(t, err)
+
 	event := beat.Event{
 		Fields: mapstr.M{
 			"message": "test event",
