@@ -1,0 +1,58 @@
+{
+  "backoff": {
+    "init": "20s",
+    "max": "200s"
+  },
+  "buffer_size": 42000,
+  "clean_inactive": "20h",
+  "clean_removed": false,
+  "close": {
+    "on_state_change": {
+      "inactive": "3h"
+    },
+    "reader": {
+      "after_interval": "42s"
+    }
+  },
+  "close_eof": true,
+  "close_removed": false,
+  "close_renamed": true,
+  "encoding": "utf-8",
+  "exclude_lines": [
+    "foo-exclude"
+  ],
+  "harvester_limit": 10000,
+  "ignore_inactive": "since_last_start",
+  "ignore_older": "10h",
+  "include_lines": [
+    "foo-include",
+    "bar-include"
+  ],
+  "message_max_bytes": 44000,
+  "parsers": [
+    {
+      "multiline": {
+        "match": "after",
+        "negate": true,
+        "pattern": "reg exp goes here",
+        "type": "pattern"
+      }
+    }
+  ],
+  "paths": [
+    "/var/log/*.log",
+    "/foo/bar.log"
+  ],
+  "prospector": {
+    "scanner": {
+      "check_interval": "50s",
+      "exclude_files": [
+        "*.excluded-file"
+      ]
+    }
+  },
+  "recursive_glob": {
+    "enabled": false
+  },
+  "symlinks": true
+}

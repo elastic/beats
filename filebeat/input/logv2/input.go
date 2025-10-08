@@ -23,13 +23,11 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	v1 "github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/filestream"
-	"github.com/elastic/beats/v7/filebeat/input/log"
 	loginput "github.com/elastic/beats/v7/filebeat/input/log"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/reader/readjson"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -162,220 +160,6 @@ func (m manager) Create(cfg *config.C) (v2.Input, error) {
 	return nil, v2.ErrUnknownInput
 }
 
-func translateCfg(cfg *config.C) (*config.C, error) {
-	fsCfg := filestream.DefaultConfig()
-	logCfg := log.DefaultConfig()
-	if err := cfg.Unpack(&logCfg); err != nil {
-		return nil, fmt.Errorf("cannot unpack log input config: %w", err)
-	}
-
-	// The config translation follows the order they appear in the Log input
-	// [documentation](https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-log)
-	// and the comments are in the format:
-	// log-input-config -> filestream-inpur-config
-
-	// paths -> paths
-	fsCfg.Paths = logCfg.Paths
-
-	// recursive_glob.enabled -> prospector.scanner.recursive_glob
-	fsCfg.FileWatcher.Scanner.RecursiveGlob = logCfg.RecursiveGlob
-
-	// encoding -> encoding
-	fsCfg.Reader.Encoding = logCfg.Encoding
-
-	// harvester_buffer_size -> buffer_size
-	fsCfg.Reader.BufferSize = logCfg.BufferSize
-
-	// max_bytes -> message_max_bytes
-	fsCfg.Reader.MaxBytes = logCfg.MaxBytes
-
-	// ignore_older -> ignore_older
-	fsCfg.IgnoreOlder = logCfg.IgnoreOlder
-
-	// close_inactive -> close.on_state_change.inactive
-	fsCfg.Close.OnStateChange.Inactive = logCfg.CloseInactive
-
-	// close_renamed -> close.on_state_change.renamed
-	fsCfg.Close.OnStateChange.Renamed = logCfg.CloseRenamed
-
-	// close_removed -> close.on_state_change.removed
-	fsCfg.Close.OnStateChange.Removed = logCfg.CloseRemoved
-
-	// close_eof -> close.reader.on_eof
-	fsCfg.Close.Reader.OnEOF = logCfg.CloseEOF
-
-	// close_timeout -> close.reader.after_interval
-	fsCfg.Close.Reader.AfterInterval = logCfg.CloseTimeout
-
-	// clean_inactive -> clean_inactive
-	fsCfg.CleanInactive = logCfg.CleanInactive
-
-	// clean_removed -> clean_removed
-	fsCfg.CleanRemoved = logCfg.CleanRemoved
-
-	// scan_frequency -> prospector.scanner.check_interval
-	fsCfg.FileWatcher.Interval = logCfg.ScanFrequency
-
-	// scan.sort -> NOT SUPPORTED
-	// scan.order -> NOT SUPPORTED
-
-	// symlinks -> prospector.scanner.symlinks
-	fsCfg.FileWatcher.Scanner.Symlinks = logCfg.Symlinks
-
-	// backoff ->backoff.init
-	fsCfg.Reader.Backoff.Init = logCfg.Backoff
-	if _, err := cfg.Remove("backoff", -1); err != nil {
-		return nil, fmt.Errorf("cannot remove 'backoff' from source config: %s", err)
-	}
-
-	// max_backoff -> backoff.max
-	fsCfg.Reader.Backoff.Max = logCfg.MaxBackoff
-
-	// backoff_factor -> NOT SUPPORTED
-
-	// harvester_limit -> harvester_limit
-	fsCfg.HarvesterLimit = logCfg.HarvesterLimit
-
-	// file_identity -> file_identity
-	fsCfg.FileIdentity = logCfg.FileIdentity
-
-	// ==================================================
-	// Undocumented options
-	// ==================================================
-	fsCfg.Reader.LineTerminator = logCfg.LineTerminator
-
-	// ==================================================
-	// Options that cannot be directly set
-	// ==================================================
-	newCfg := config.MustNewConfigFrom(fsCfg)
-
-	// This comes from the default config, remove if not set in the log input
-	if _, err := newCfg.Remove("ignore_inactive", -1); err != nil {
-		return nil, fmt.Errorf("cannot remove old ignore_inactive value: %s", err)
-	}
-	// tail_files -> ignore_inactive: "since_last_start"
-	if logCfg.TailFiles {
-		if err := newCfg.SetString("ignore_inactive", -1, "since_last_start"); err != nil {
-			return nil, fmt.Errorf("cannot set ignore_inactive in new config: %s", err)
-		}
-	}
-
-	// Same config key and type can be kept
-	// exclude_lines -> exclude_lines
-	// include_lines -> include_lines
-
-	// exclude_files -> prospector.scanner.exclude_files
-	if cfg.HasField("exclude_files") {
-		child, err := cfg.Child("exclude_files", -1)
-		if err != nil {
-			return nil, fmt.Errorf("cannot read 'exclude_files': %s", err)
-		}
-		newCfg.SetChild("prospector.scanner.exclude_files", -1, child)
-	}
-
-	// json -> parsers[0]
-	parsers := []any{}
-	if logCfg.JSON != nil {
-		ndjson := readjson.ParserConfig{
-			Config: *logCfg.JSON,
-		}
-
-		parsers = append(parsers, map[string]any{
-			"ndjson": ndjson,
-		})
-	}
-
-	// multiline -> parsers[1]
-	// map of key -> type
-	multilineFields := map[string]string{
-		"count_lines":   "int",
-		"flush_pattern": "obj", // *match.Matcher
-		"match":         "string",
-		"max_lines":     "int", // pointer
-		"negate":        "bool",
-		"pattern":       "string", // *match.Matcher
-		"skip_newline":  "bool",
-		"timeout":       "obj", // time.duration
-		"type":          "string",
-	}
-	mutilineCfg := config.NewConfig()
-	for key, kind := range multilineFields {
-		mKey := "multiline." + key
-
-		ok, err := cfg.Has(mKey, -1)
-		if err != nil {
-			return nil, fmt.Errorf("cannot read %q: %s", mKey, err)
-		}
-
-		if ok {
-			switch kind {
-			case "obj":
-				child, err := cfg.Child(mKey, -1)
-				if err != nil {
-					return nil, fmt.Errorf("cannot get %q: %s", mKey, err)
-				}
-				mutilineCfg.SetChild(mKey, -1, child)
-			case "int":
-				child, err := cfg.Int(mKey, -1)
-				if err != nil {
-					return nil, fmt.Errorf("cannot get %q: %s", mKey, err)
-				}
-				mutilineCfg.SetInt(mKey, -1, child)
-			case "bool":
-				child, err := cfg.Bool(mKey, -1)
-				if err != nil {
-					return nil, fmt.Errorf("cannot get %q: %s", mKey, err)
-				}
-				mutilineCfg.SetBool(mKey, -1, child)
-			case "string":
-				child, err := cfg.String(mKey, -1)
-				if err != nil {
-					return nil, fmt.Errorf("cannot get %q: %s", mKey, err)
-				}
-				mutilineCfg.SetString(mKey, -1, child)
-			}
-		}
-	}
-
-	parsers = append(parsers, mutilineCfg)
-	parsersCfg, err := config.NewConfigFrom(parsers)
-	if err != nil {
-		return nil, fmt.Errorf("cannot convert 'parsers' to config: %s", err)
-	}
-
-	// Only set the parsers if needed
-	if len(parsers) != 0 {
-		newCfg.SetChild("parsers", -1, parsersCfg)
-	}
-
-	if err := newCfg.Merge(cfg); err != nil {
-		return nil, fmt.Errorf("cannot merge source and translated config: %s", err)
-	}
-
-	// Not documented, remove
-	// line_terminator -> line_terminator
-	newCfg.Remove("line_terminator", -1)
-
-	// Enable take_over
-	if err := newCfg.SetBool("take_over.enabled", -1, true); err != nil {
-		return nil, fmt.Errorf("cannot set 'take_over.enabled': %w", err)
-	}
-
-	// Remove all keys from the log input
-	// TODO (Tiaog): Decide if keep or remove this block
-	// for _, key := range logInputExclusiveKeys {
-	// 	removed, err := newCfg.Remove(key, -1)
-	// 	if err != nil {
-	// 		return nil, fmt.Errorf("cannot remove '%s': %s", key, err)
-	// 	}
-	// 	if removed {
-	// 		fmt.Printf("========== %q REMOVED\n", key)
-	// 	}
-	// }
-
-	return newCfg, nil
-}
-
 var logInputExclusiveKeys = []string{
 	"recursive_glob.enabled",
 	"harvester_buffer_size",
@@ -394,4 +178,199 @@ var logInputExclusiveKeys = []string{
 	"json",
 	"multiline",
 	"tail_files",
+}
+
+type configType int
+
+const (
+	Unknwon configType = iota
+	NotSupported
+	ConfTypeBool
+	ConfTypeInt
+	ConfTypeFloat
+	ConfTypeStringArray // Could this be just array?
+	ConfTypeString
+	ConfTypeMap
+	ConfTypeConstant
+	ConfTypeConvString
+)
+
+type configField struct {
+	fsName string
+	fsVal  string
+	kind   configType
+}
+
+var convTable = map[string]configField{
+	"paths":                  {fsName: "paths", kind: ConfTypeStringArray},
+	"recursive_glob.enabled": {fsName: "prospector.scanner.recursive_glob", kind: ConfTypeBool},
+	"encoding":               {fsName: "encoding", kind: ConfTypeString},
+	"harvester_buffer_size":  {fsName: "buffer_size", kind: ConfTypeInt},
+	"max_bytes":              {fsName: "message_max_bytes", kind: ConfTypeInt},
+	"ignore_older":           {fsName: "ignore_older", kind: ConfTypeString},
+	"close_inactive":         {fsName: "close.on_state_change.inactive", kind: ConfTypeString},
+	"close_renamed":          {fsName: "close.on_state_change.renamed", kind: ConfTypeBool},
+	"close_removed":          {fsName: "close.on_state_change.removed", kind: ConfTypeBool},
+	"close_eof":              {fsName: "close.reader.on_eof", kind: ConfTypeBool},
+	"close_timeout":          {fsName: "close.reader.after_interval", kind: ConfTypeString},
+	"clean_inactive":         {fsName: "clean_inactive", kind: ConfTypeString},
+	"clean_removed":          {fsName: "clean_removed", kind: ConfTypeBool},
+	"scan_frequency":         {fsName: "prospector.scanner.check_interval", kind: ConfTypeString},
+	"symlinks":               {fsName: "prospector.scanner.symlinks", kind: ConfTypeBool},
+	"backoff":                {fsName: "backoff.init", kind: ConfTypeString},
+	"max_backoff":            {fsName: "backoff.max", kind: ConfTypeString},
+	"harvester_limit":        {fsName: "harvester_limit", kind: ConfTypeInt},
+	"file_identity":          {fsName: "file_identity", kind: ConfTypeMap},
+	"exclude_lines":          {fsName: "exclude_lines", kind: ConfTypeStringArray},
+	"include_lines":          {fsName: "include_lines", kind: ConfTypeStringArray},
+	"exclude_files":          {fsName: "prospector.scanner.exclude_files", kind: ConfTypeStringArray},
+	"tail_files":             {fsName: "ignore_inactive", fsVal: "since_last_start", kind: ConfTypeConstant},
+	// "scan.sort":              "NOT SUPPORTED",
+	// "scan.order":             "NOT SUPPORTED",
+	// "backoff_factor": {fsName: "NOT SUPPORTED", kind: NotSupported},
+}
+
+func translateCfg(cfg *config.C) (*config.C, error) {
+	newCfg := config.NewConfig()
+
+	// Convert all the "static" configuration, those are the fields that
+	// can easily be translated by name
+	for key, kind := range convTable {
+		has, err := cfg.Has(key, -1)
+		if err != nil {
+			return nil, fmt.Errorf("cannot read %q: %w", key, err)
+		}
+
+		if has {
+			switch kind.kind {
+			case ConfTypeString:
+				v, err := cfg.String(key, -1)
+				if err != nil {
+					return nil, fmt.Errorf("cannot read %q as string: %s", key, err)
+				}
+				newCfg.SetString(kind.fsName, -1, v)
+
+			case ConfTypeBool:
+				v, err := cfg.Bool(key, -1)
+				if err != nil {
+					return nil, fmt.Errorf("cannot read %q as boolean: %w", key, err)
+				}
+				newCfg.SetBool(key, -1, v)
+
+			case ConfTypeInt:
+				v, err := cfg.Int(key, -1)
+				if err != nil {
+					return nil, fmt.Errorf("cannot read %q as integer: %w", key, err)
+				}
+				newCfg.SetInt(kind.fsName, -1, v)
+
+			case ConfTypeFloat:
+				v, err := cfg.Float(key, -1)
+				if err != nil {
+					return nil, fmt.Errorf("cannot read %q as float: %w", key, err)
+				}
+				newCfg.SetFloat(kind.fsName, -1, v)
+
+			case ConfTypeMap:
+				child, err := cfg.Child(key, -1)
+				if err != nil {
+					return nil, fmt.Errorf("cannot read %q as map: %w", key, err)
+				}
+				newCfg.SetChild(kind.fsName, -1, child)
+
+			case ConfTypeStringArray:
+				child, err := cfg.Child(key, -1)
+				if err != nil {
+					return nil, fmt.Errorf("cannot read %q as map: %w", key, err)
+				}
+				newCfg.SetChild(kind.fsName, -1, child)
+
+			case ConfTypeConstant:
+				v, err := cfg.Bool(key, -1)
+				if err != nil {
+					return nil, fmt.Errorf("cannot read %q as boolean: %w", key, err)
+				}
+				if v {
+					newCfg.SetString(kind.fsName, -1, kind.fsVal)
+				}
+			}
+		}
+	}
+
+	// Now handle the trick bits, starting with parsers
+	// The first parser is JSON, then Multiline
+
+	hasMultiline, err := cfg.Has("json", -1)
+	if err != nil {
+		return nil, fmt.Errorf("cannot access 'json' field: %w", err)
+	}
+
+	parsers := []any{}
+	if hasMultiline {
+		multilineCfg := config.NewConfig()
+		multilineChild, err := cfg.Child("multiline", -1)
+		if err != nil {
+			return nil, fmt.Errorf("cannot access 'multiline': %w", err)
+		}
+
+		for key, kind := range multilineConvTable {
+			has, err := multilineChild.Has(key, -1)
+			if err != nil {
+				return nil, fmt.Errorf("cannot read 'multiline.%s': %w", key, err)
+			}
+
+			if has {
+				switch kind.kind {
+				case ConfTypeString, ConfTypeConvString:
+					v, err := multilineChild.String(key, -1)
+					if err != nil {
+						return nil, fmt.Errorf("cannot read %q as string: %s", key, err)
+					}
+					multilineCfg.SetString(kind.fsName, -1, v)
+
+				case ConfTypeBool:
+					v, err := multilineChild.Bool(key, -1)
+					if err != nil {
+						return nil, fmt.Errorf("cannot read %q as boolean: %w", key, err)
+					}
+					multilineCfg.SetBool(key, -1, v)
+
+				case ConfTypeInt:
+					v, err := multilineChild.Int(key, -1)
+					if err != nil {
+						return nil, fmt.Errorf("cannot read %q as integer: %w", key, err)
+					}
+					multilineCfg.SetInt(kind.fsName, -1, v)
+				}
+			}
+		}
+
+		parsers = append(parsers, map[string]any{
+			"multiline": multilineCfg,
+		})
+	}
+
+	if len(parsers) != 0 {
+		parsersCfg, err := config.NewConfigFrom(parsers)
+		if err != nil {
+			return nil, fmt.Errorf("cannot convert 'json' config to parser: %w", err)
+		}
+		if err := newCfg.SetChild("parsers", -1, parsersCfg); err != nil {
+			return nil, fmt.Errorf("cannot set parsers: %w", err)
+		}
+	}
+
+	return newCfg, nil
+}
+
+var multilineConvTable = map[string]configField{
+	"type":          {fsName: "type", kind: ConfTypeConvString},
+	"negate":        {fsName: "negate", kind: ConfTypeBool},
+	"match":         {fsName: "match", kind: ConfTypeString},
+	"max_lines":     {fsName: "max_lines", kind: ConfTypeInt},
+	"pattern":       {fsName: "pattern", kind: ConfTypeString},
+	"timeout":       {fsName: "timeout", kind: ConfTypeString},
+	"flush_pattern": {fsName: "flush_pattern", kind: ConfTypeString},
+	"count_lines":   {fsName: "count_lines", kind: ConfTypeInt},
+	"skip_newline":  {fsName: "skip_newline", kind: ConfTypeBool},
 }
