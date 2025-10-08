@@ -38,7 +38,7 @@ var filestreamAllJson string
 
 func TestTranslateCfg(t *testing.T) {
 	cfg := config.MustNewConfigFrom(logInputAllYaml)
-	newCfg, err := translateCfg(cfg)
+	newCfg, err := convertConfig(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
