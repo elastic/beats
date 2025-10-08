@@ -34,11 +34,11 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/elastic/pkcs8"
 	"github.com/gofrs/uuid/v5"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/youmark/pkcs8"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
 	"go.opentelemetry.io/collector/confmap/xconfmap"
