@@ -34,7 +34,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/elastic/pkcs8"
 	"github.com/gofrs/uuid/v5"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/stretchr/testify/assert"
@@ -51,6 +50,8 @@ import (
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	"go.uber.org/zap/zaptest"
+
+	"github.com/elastic/pkcs8"
 
 	"gopkg.in/yaml.v2"
 
