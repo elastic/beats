@@ -41,7 +41,7 @@ func TestEventMapping(t *testing.T) {
 
 	event, _ := eventMapping("unit.test", data)
 
-	assert.Equal(t, event["total"].(mapstr.M)["count"], float64(1))
+	assert.Equal(t, event["total"].(mapstr.M)["count"], float64(1)) //nolint:errcheck // safe
 }
 
 func TestEventMappingOptionalFields(t *testing.T) {
@@ -77,12 +77,12 @@ func TestEventMappingOptionalFields(t *testing.T) {
 	event, err := eventMapping("dbX.collY", data)
 	assert.NoError(t, err)
 
-	stats := event["stats"].(mapstr.M)
-	assert.Equal(t, int(1), stats["numOrphanDocs"].(int))
-	assert.Equal(t, int(2), stats["shardCount"].(int))
-	assert.Equal(t, 4096, stats["freeStorageSize"].(int))
-	assert.Equal(t, false, stats["capped"].(bool))
-	assert.Equal(t, 1024, stats["scaleFactor"].(int))
+	stats := event["stats"].(mapstr.M)                    //nolint:errcheck // safe
+	assert.Equal(t, int(1), stats["numOrphanDocs"].(int)) //nolint:errcheck // safe
+	assert.Equal(t, int(2), stats["shardCount"].(int))    //nolint:errcheck // safe
+	assert.Equal(t, 4096, stats["freeStorageSize"].(int)) //nolint:errcheck // safe
+	assert.Equal(t, false, stats["capped"].(bool))        //nolint:errcheck // safe
+	assert.Equal(t, 1024, stats["scaleFactor"].(int))     //nolint:errcheck // safe
 	_, hasIndexSizes := stats["indexSizes"]
 	assert.False(t, hasIndexSizes)
 }
