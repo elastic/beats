@@ -343,7 +343,10 @@ func translateCfg(cfg *config.C) (*config.C, error) {
 		return nil, fmt.Errorf("cannot convert 'parsers' to config: %s", err)
 	}
 
-	newCfg.SetChild("parsers", -1, parsersCfg)
+	// Only set the parsers if needed
+	if len(parsers) != 0 {
+		newCfg.SetChild("parsers", -1, parsersCfg)
+	}
 
 	if err := newCfg.Merge(cfg); err != nil {
 		return nil, fmt.Errorf("cannot merge source and translated config: %s", err)
