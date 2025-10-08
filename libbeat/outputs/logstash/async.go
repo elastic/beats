@@ -36,15 +36,13 @@ type asyncClient struct {
 	log *logp.Logger
 	*transport.Client
 	observer outputs.Observer
-
-	client *v2.AsyncClient
-	win    *window
+	client   *v2.AsyncClient
+	win      *window
 
 	connect func() error
 
-	// connMu protects connection operations (connect/close/send).
-	// RLock must be held when sending and Lock when connecting/closing.
-	connMu sync.RWMutex
+	// mutex protects client and connect/close/send
+	mutex sync.Mutex
 }
 
 type msgRef struct {
@@ -119,16 +117,16 @@ func makeClientFactory(
 }
 
 func (c *asyncClient) Connect(ctx context.Context) error {
-	c.connMu.Lock()
-	defer c.connMu.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
 	c.log.Debug("connect")
 	return c.connect()
 }
 
 func (c *asyncClient) Close() error {
-	c.connMu.Lock()
-	defer c.connMu.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
 	c.log.Debug("close connection")
 
@@ -141,13 +139,6 @@ func (c *asyncClient) Close() error {
 }
 
 func (c *asyncClient) Publish(_ context.Context, batch publisher.Batch) error {
-	c.connMu.RLock()
-	defer c.connMu.RUnlock()
-
-	if c.client == nil {
-		return errors.New("connection closed")
-	}
-
 	st := c.observer
 	events := batch.Events()
 	st.NewBatch(len(events))
@@ -223,6 +214,12 @@ func (c *asyncClient) publishWindowed(
 }
 
 func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	if c.client == nil {
+		return errors.New("connection closed")
+	}
 	window := make([]interface{}, len(events))
 	for i := range events {
 		window[i] = &events[i].Content
