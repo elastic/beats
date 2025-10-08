@@ -2,6 +2,8 @@
 navigation_title: "Configure"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/configuring-howto-filebeat.html
+applies_to:
+  stack: ga
 ---
 
 # Configure Filebeat [configuring-howto-filebeat]

@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-memcached.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Memcached module [metricbeat-module-memcached]
 
@@ -15,7 +19,7 @@ The default metricset is `stats`.
 The memcached module is tested with memcached 1.4.35.
 
 
-## Example configuration [_example_configuration_41]
+## Example configuration [_example_configuration]
 
 The Memcached module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -29,10 +33,8 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_47]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [stats](/reference/metricbeat/metricbeat-metricset-memcached-stats.md)
-
-

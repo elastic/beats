@@ -2,6 +2,8 @@
 navigation_title: "add_cloud_metadata"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/add-cloud-metadata.html
+applies_to:
+  stack: ga
 ---
 
 # Add cloud metadata [add-cloud-metadata]
@@ -64,7 +66,7 @@ For example, configuration below only utilize `aws` metadata retrival mechanism,
 processors:
   - add_cloud_metadata:
       providers:
-        aws
+        - aws
 ```
 
 The third optional configuration setting is `overwrite`. When `overwrite` is `true`, `add_cloud_metadata` overwrites existing `cloud.*` fields (`false` by default).

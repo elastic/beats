@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-missing-transactions.html
+applies_to:
+  stack: ga
 ---
 
 # Packetbeat is missing long running transactions [packetbeat-missing-transactions]

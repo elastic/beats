@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/troubleshooting.html
+applies_to:
+  stack: ga
 ---
 
 # Troubleshoot [troubleshooting]

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-synthetics.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -24,7 +26,7 @@ Synthetics related fields.
 **`synthetics.index`**
 :   Index count used for creating total order of all events during invocation.
 
-type: integer
+    type: integer
 
 
 **`synthetics.payload`**
@@ -36,13 +38,13 @@ Object is not enabled.
 **`synthetics.blob`**
 :   binary data payload
 
-type: binary
+    type: binary
 
 
 **`synthetics.blob_mime`**
 :   mime type of blob data
 
-type: keyword
+    type: keyword
 
 
 **`synthetics.step.name`**
@@ -68,7 +70,7 @@ Duration required to complete the step.
 **`synthetics.step.duration.us`**
 :   Duration in microseconds
 
-type: integer
+    type: integer
 
 
 **`synthetics.journey.name`**
@@ -82,7 +84,7 @@ type: integer
 **`synthetics.journey.tags`**
 :   Tags used for grouping journeys
 
-type: keyword
+    type: keyword
 
 
 ## duration [_duration]
@@ -92,7 +94,7 @@ Duration required to complete the journey.
 **`synthetics.journey.duration.us`**
 :   Duration in microseconds
 
-type: integer
+    type: integer
 
 
 **`synthetics.error.name`**
@@ -110,13 +112,13 @@ type: integer
 **`synthetics.screenshot_ref.width`**
 :   Width of the full screenshot in pixels.
 
-type: integer
+    type: integer
 
 
 **`synthetics.screenshot_ref.height`**
 :   Height of the full screenshot in pixels
 
-type: integer
+    type: integer
 
 
 ## blocks [_blocks]
@@ -126,6 +128,6 @@ Attributes representing individual screenshot blocks. Only hash is indexed since
 **`synthetics.screenshot_ref.blocks.hash`**
 :   Hash that uniquely identifies this image by content. Corresponds to block document id.
 
-type: keyword
+    type: keyword
 
 

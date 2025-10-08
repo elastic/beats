@@ -30,6 +30,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -76,9 +77,11 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 
 	t.Cleanup(func() {
 		if t.Failed() {
-			f, err := os.CreateTemp("", t.Name()+"-*")
+			pattern := strings.ReplaceAll(t.Name()+"-*", "/", "_")
+			f, err := os.CreateTemp("", pattern)
 			if err != nil {
 				t.Errorf("cannot create temp file for logs: %s", err)
+				return
 			}
 
 			defer f.Close()
@@ -167,12 +170,15 @@ func (e *inputTestingEnvironment) waitUntilInputStops() {
 	e.wg.Wait()
 }
 
-func (e *inputTestingEnvironment) mustWriteToFile(filename string, data []byte) {
+// mustWriteToFile writes data to file and returns the full path
+func (e *inputTestingEnvironment) mustWriteToFile(filename string, data []byte) string {
 	path := e.abspath(filename)
 	err := os.WriteFile(path, data, 0o644)
 	if err != nil {
 		e.t.Fatalf("failed to write file '%s': %+v", path, err)
 	}
+
+	return path
 }
 
 func (e *inputTestingEnvironment) mustAppendToFile(filename string, data []byte) {
@@ -241,33 +247,26 @@ func (e *inputTestingEnvironment) requireRegistryEntryCount(expectedCount int) {
 // requireOffsetInRegistry checks if the expected offset is set for a file.
 func (e *inputTestingEnvironment) requireOffsetInRegistry(filename, inputID string, expectedOffset int) {
 	e.t.Helper()
-	var offsetStr strings.Builder
+	require.EventuallyWithT(e.t, func(ct *assert.CollectT) {
+		var offsetStr strings.Builder
 
-	filepath := e.abspath(filename)
-	fi, err := os.Stat(filepath)
-	if err != nil {
-		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
-	}
+		filepath := e.abspath(filename)
+		fi, err := os.Stat(filepath)
+		assert.NoError(ct, err, "cannot stat file when checking for offset")
 
-	id := getIDFromPath(filepath, inputID, fi)
-	var entry registryEntry
-	require.Eventuallyf(e.t, func() bool {
+		id := getIDFromPath(filepath, inputID, fi)
+		var entry registryEntry
 		offsetStr.Reset()
 
 		entry, err = e.getRegistryState(id)
-		if err != nil {
-			e.t.Fatalf("could not get state for '%s' from registry, err: %s", id, err)
-		}
+		assert.NoError(ct, err, "error getting state for ID '%s' from the registry", id)
 
 		fmt.Fprint(&offsetStr, entry.Cursor.Offset)
-
-		return expectedOffset == entry.Cursor.Offset
+		assert.Equal(ct, expectedOffset, entry.Cursor.Offset, "expected offset does not match")
 	},
-		time.Second,
+		10*time.Second,
 		100*time.Millisecond,
-		"expected offset: '%d', cursor offset: '%s'",
-		expectedOffset,
-		&offsetStr)
+		"failed to get expected registry offset")
 }
 
 // requireMetaInRegistry checks if the expected metadata is saved to the registry.
@@ -568,6 +567,19 @@ func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
 
 	selectedEvent := events[nr]
 	require.True(e.t, selectedEvent.Timestamp.Equal(tm), "got: %s, expected: %s", selectedEvent.Timestamp.String(), tm.String())
+}
+
+// logContains ensures s is a sub string on any log line.
+// If s is not found, the test fails
+func (e *inputTestingEnvironment) logContains(s string) {
+	logs := e.loggerBuffer.String()
+	for _, line := range strings.Split(logs, "\n") {
+		if strings.Contains(line, s) {
+			return
+		}
+	}
+
+	e.t.Fatalf("%q not found in logs", s)
 }
 
 var _ statestore.States = (*testInputStore)(nil)

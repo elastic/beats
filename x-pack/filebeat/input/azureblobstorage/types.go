@@ -24,6 +24,7 @@ type Source struct {
 	FileSelectors            []fileSelectorConfig
 	ReaderConfig             readerConfig
 	ExpandEventListFromField string
+	PathPrefix               string
 }
 
 func (s *Source) Name() string {

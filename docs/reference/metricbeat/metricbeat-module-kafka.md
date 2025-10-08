@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-kafka.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Kafka module [metricbeat-module-kafka]
 
@@ -36,7 +40,7 @@ kafka-acls --authorizer-properties zookeeper.connect=localhost:2181 --add --allo
 
 ## Compatibility [_compatibility_26]
 
-This module is tested with Kafka 0.10.2.1, 1.1.0, 2.1.1, 2.2.2 and 3.6.0.
+This module is tested with Kafka 0.10.2.1, 1.1.0, 2.1.1, 2.2.2, 3.6.0 and 4.0.0.
 
 The Broker, Producer, Consumer metricsets require [Jolokia](/reference/metricbeat/metricbeat-module-jolokia.md) to fetch JMX metrics. Refer to the link for Jolokia’s compatibility notes.
 
@@ -53,7 +57,7 @@ The Kafka module comes with a predefined dashboard. For example:
 ![metricbeat kafka dashboard](images/metricbeat_kafka_dashboard.png)
 
 
-## Example configuration [_example_configuration_35]
+## Example configuration [_example_configuration]
 
 The Kafka module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -118,18 +122,12 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_41]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
-* [broker](/reference/metricbeat/metricbeat-metricset-kafka-broker.md)
-* [consumer](/reference/metricbeat/metricbeat-metricset-kafka-consumer.md)
+* [broker](/reference/metricbeat/metricbeat-metricset-kafka-broker.md)  {applies_to}`stack: beta`
+* [consumer](/reference/metricbeat/metricbeat-metricset-kafka-consumer.md)  {applies_to}`stack: beta`
 * [consumergroup](/reference/metricbeat/metricbeat-metricset-kafka-consumergroup.md)
 * [partition](/reference/metricbeat/metricbeat-metricset-kafka-partition.md)
-* [producer](/reference/metricbeat/metricbeat-metricset-kafka-producer.md)
-
-
-
-
-
-
+* [producer](/reference/metricbeat/metricbeat-metricset-kafka-producer.md)  {applies_to}`stack: beta`

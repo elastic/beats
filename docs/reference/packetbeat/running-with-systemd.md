@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/running-with-systemd.html
+applies_to:
+  stack: ga
 ---
 
 # Packetbeat and systemd [running-with-systemd]

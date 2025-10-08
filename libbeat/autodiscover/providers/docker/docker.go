@@ -88,7 +88,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(err)
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil, logger)
 	if err != nil {
 		return nil, errWrap(err)
 	}

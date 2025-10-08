@@ -2,6 +2,8 @@
 navigation_title: "Logstash"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/logstash-output.html
+applies_to:
+  stack: ga
 ---
 
 # Configure the Logstash output [logstash-output]
@@ -38,7 +40,7 @@ Every event sent to {{ls}} contains the following metadata fields that you can u
     ...
     "@metadata": { <1>
       "beat": "heartbeat", <2>
-      "version": "{{stack-version}}" <3>
+      "version": "{{version.stack}}" <3>
     }
 }
 ```

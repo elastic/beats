@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-iptables.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Iptables module [filebeat-module-iptables]
 
@@ -103,7 +107,6 @@ and one specific for Ubiquiti Firewall logs:
 % TO DO: Use `:class: screenshot`
 ![kibana iptables ubiquiti](images/kibana-iptables-ubiquiti.png)
 
-
-## Fields [_fields_24]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-iptables.md) section.

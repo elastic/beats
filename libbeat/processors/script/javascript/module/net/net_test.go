@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/net"
@@ -48,7 +49,7 @@ function process(evt) {
 }
 `
 
-	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
+	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,7 +87,7 @@ function process(evt) {
 }
 `
 
-	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
+	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

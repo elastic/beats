@@ -20,9 +20,13 @@
 package elasticsearch
 
 import (
-	"io/ioutil"
+	"encoding/json"
+	"fmt"
+	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require"
 
@@ -43,7 +47,7 @@ func TestMapper(t *testing.T, glob string, mapper func(mb.ReporterV2, []byte) er
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			input, err := ioutil.ReadFile(f)
+			input, err := os.ReadFile(f)
 			require.NoError(t, err)
 
 			reporter := &mbtest.CapturingReporterV2{}
@@ -60,7 +64,7 @@ func TestMapperWithInfo(t *testing.T, glob string, mapper func(mb.ReporterV2, In
 	files, err := filepath.Glob(glob)
 	require.NoError(t, err)
 	// Makes sure glob matches at least 1 file
-	require.True(t, len(files) > 0)
+	require.True(t, len(files) > 0, "Glob should match at least one file")
 
 	info := Info{
 		ClusterID:   "1234",
@@ -69,16 +73,83 @@ func TestMapperWithInfo(t *testing.T, glob string, mapper func(mb.ReporterV2, In
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			input, err := ioutil.ReadFile(f)
+			input, err := os.ReadFile(f)
 			require.NoError(t, err)
 
 			reporter := &mbtest.CapturingReporterV2{}
 			err = mapper(reporter, info, input, true)
 			require.NoError(t, err)
+
 			require.True(t, len(reporter.GetEvents()) >= 1)
 			require.Equal(t, 0, len(reporter.GetErrors()))
 		})
 	}
+}
+
+func TestMapperWithExpectedEvents(
+	t *testing.T,
+	inputPath string,
+	expectedFiles []string,
+	info Info,
+	isXPack bool,
+	mapper func(mb.ReporterV2, Info, []byte, bool) error,
+) {
+	input, err := os.ReadFile(inputPath)
+	require.NoError(t, err)
+
+	reporter := &mbtest.CapturingReporterV2{}
+	err = mapper(reporter, info, input, isXPack)
+	require.NoError(t, err)
+
+	events := reporter.GetEvents()
+
+	expected := loadExpectedEventsFromFiles(t, expectedFiles)
+	require.Equal(t, len(expected), len(events), "Number of events mismatch")
+
+	for i, ev := range events {
+		actualBytes, err := json.Marshal(ev)
+		require.NoError(t, err)
+
+		var actual map[string]interface{}
+		err = json.Unmarshal(actualBytes, &actual)
+		require.NoError(t, err)
+
+		assert.Equal(t, expected[i], actual, fmt.Sprintf("Mismatch in event #%d", i))
+	}
+}
+
+func TestMapperExpectingError(
+	t *testing.T,
+	inputPath string,
+	info Info,
+	isXPack bool,
+	errorMessage string,
+	mapper func(mb.ReporterV2, Info, []byte, bool) error,
+) {
+	input, err := os.ReadFile(inputPath)
+	require.NoError(t, err)
+
+	reporter := &mbtest.CapturingReporterV2{}
+	err = mapper(reporter, info, input, isXPack)
+	require.ErrorContains(t, err, errorMessage)
+
+	events := reporter.GetEvents()
+	require.Equal(t, 0, len(events), "Number of events mismatch")
+}
+
+func loadExpectedEventsFromFiles(t *testing.T, files []string) []map[string]interface{} {
+	expected := make([]map[string]interface{}, 0, len(files))
+	for _, f := range files {
+		content, err := os.ReadFile(f)
+		require.NoError(t, err)
+
+		var ev map[string]interface{}
+		err = json.Unmarshal(content, &ev)
+		require.NoError(t, err)
+
+		expected = append(expected, ev)
+	}
+	return expected
 }
 
 // TestMapperWithMetricSetAndInfo tests mapping methods with Info fields
@@ -95,7 +166,7 @@ func TestMapperWithMetricSetAndInfo(t *testing.T, glob string, ms MetricSetAPI, 
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			input, err := ioutil.ReadFile(f)
+			input, err := os.ReadFile(f)
 			require.NoError(t, err)
 
 			reporter := &mbtest.CapturingReporterV2{}
@@ -127,7 +198,7 @@ func TestMapperWithHttpHelper(t *testing.T, glob string, httpClient *helper.HTTP
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			input, err := ioutil.ReadFile(f)
+			input, err := os.ReadFile(f)
 			require.NoError(t, err)
 
 			reporter := &mbtest.CapturingReporterV2{}

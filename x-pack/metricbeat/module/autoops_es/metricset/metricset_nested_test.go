@@ -11,7 +11,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
 
 	"github.com/stretchr/testify/require"
@@ -70,23 +69,5 @@ func TestNestedSuccessfulFetch(t *testing.T) {
 
 		require.Equal(t, "obj2", GetObjectValue(event2.MetricSetFields, "name"))
 		require.EqualValues(t, 2, GetObjectValue(event2.MetricSetFields, "value"))
-	})
-}
-
-func TestNestedFailedClusterInfoFetch(t *testing.T) {
-	RunTestsForFetcherWithGlobFiles(t, "./_meta/test/success.*.json", auto_ops_testing.SetupClusterInfoErrorServer, useNestedTestMetricSet, func(t *testing.T, data FetcherData[testObjectType]) {
-		require.ErrorContains(t, data.Error, "failed to get cluster info from cluster, "+NESTED_NAME+" metricset")
-	})
-}
-
-func TestNestedFailedClusterDataFetch(t *testing.T) {
-	RunTestsForFetcherWithGlobFiles(t, "./_meta/test/success.*.json", setupClusterSettingsErrorServer, useNestedTestMetricSet, func(t *testing.T, data FetcherData[testObjectType]) {
-		require.ErrorContains(t, data.Error, "failed to get data, "+NESTED_NAME+" metricset")
-	})
-}
-
-func TestNestedFailedClusterDataFetchEventsMapping(t *testing.T) {
-	RunTestsForFetcherWithGlobFiles(t, "./_meta/test/no_*.error.*.json", setupSuccessfulServer, useNestedTestMetricSet, func(t *testing.T, data FetcherData[testObjectType]) {
-		require.Error(t, data.Error)
 	})
 }

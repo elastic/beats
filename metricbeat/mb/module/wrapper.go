@@ -31,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/testing"
 )
@@ -48,8 +47,6 @@ const (
 )
 
 var (
-	debugf = logp.MakeDebug("module")
-
 	fetchesLock = sync.Mutex{}
 	fetches     = map[string]*stats{}
 )
@@ -66,6 +63,7 @@ type Wrapper struct {
 	// Options
 	maxStartDelay  time.Duration
 	eventModifiers []mb.EventModifier
+	logger         *logp.Logger
 }
 
 // metricSetWrapper contains the MetricSet and the private data associated with
@@ -95,19 +93,20 @@ func NewWrapper(config *conf.C, r *mb.Register, logger *logp.Logger, monitoring 
 	if err != nil {
 		return nil, err
 	}
-	return createWrapper(module, metricSets, monitoring, options...)
+	return createWrapper(module, metricSets, monitoring, logger, options...)
 }
 
 // NewWrapperForMetricSet creates a wrapper for the selected module and metricset.
-func NewWrapperForMetricSet(module mb.Module, metricSet mb.MetricSet, monitoring beat.Monitoring, options ...Option) (*Wrapper, error) {
-	return createWrapper(module, []mb.MetricSet{metricSet}, monitoring, options...)
+func NewWrapperForMetricSet(module mb.Module, metricSet mb.MetricSet, monitoring beat.Monitoring, logger *logp.Logger, options ...Option) (*Wrapper, error) {
+	return createWrapper(module, []mb.MetricSet{metricSet}, monitoring, logger, options...)
 }
 
-func createWrapper(module mb.Module, metricSets []mb.MetricSet, monitoring beat.Monitoring, options ...Option) (*Wrapper, error) {
+func createWrapper(module mb.Module, metricSets []mb.MetricSet, monitoring beat.Monitoring, logger *logp.Logger, options ...Option) (*Wrapper, error) {
 	wrapper := &Wrapper{
 		Module:     module,
 		metricSets: make([]*metricSetWrapper, len(metricSets)),
 		monitoring: monitoring,
+		logger:     logger,
 	}
 
 	for _, applyOption := range options {
@@ -153,7 +152,7 @@ func createWrapper(module mb.Module, metricSets []mb.MetricSet, monitoring beat.
 //
 // Start should be called only once in the life of a Wrapper.
 func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
-	debugf("Starting %s", mw)
+	mw.logger.Named("module").Debugf("Starting %s", mw)
 
 	out := make(chan beat.Event, 1)
 
@@ -182,7 +181,7 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 	go func() {
 		wg.Wait()
 		close(out)
-		debugf("Stopped %s", mw)
+		mw.logger.Named("module").Debugf("Stopped %s", mw)
 	}()
 
 	return out
@@ -208,7 +207,7 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 	// Start each metricset randomly over a period of MaxDelayPeriod.
 	if msw.module.maxStartDelay > 0 {
 		delay := rand.N(msw.module.maxStartDelay)
-		debugf("%v/%v will start after %v", msw.module.Name(), msw.Name(), delay)
+		msw.Logger().Named("module").Debugf("%v/%v will start after %v", msw.module.Name(), msw.Name(), delay)
 		select {
 		case <-done:
 			return
@@ -227,13 +226,11 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 	}
 
 	switch ms := msw.MetricSet.(type) {
-	case mb.PushMetricSet: //nolint:staticcheck // PushMetricSet is deprecated but not removed
-		ms.Run(reporter.V1())
 	case mb.PushMetricSetV2:
 		ms.Run(reporter.V2())
 	case mb.PushMetricSetV2WithContext:
 		ms.Run(&channelContext{done}, reporter.V2())
-	case mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext: //nolint:staticcheck // ReportingMetricSet is deprecated but not removed
+	case mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext:
 		msw.startPeriodicFetching(&channelContext{done}, reporter)
 	default:
 		// Earlier startup stages prevent this from happening.
@@ -270,9 +267,6 @@ func (msw *metricSetWrapper) startPeriodicFetching(ctx context.Context, reporter
 // and log a stack track if one occurs.
 func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 	switch fetcher := msw.MetricSet.(type) {
-	case mb.ReportingMetricSet: //nolint:staticcheck // ReportingMetricSet is deprecated but not removed
-		reporter.StartFetchTimer()
-		fetcher.Fetch(reporter.V1())
 	case mb.ReportingMetricSetV2:
 		reporter.StartFetchTimer()
 		fetcher.Fetch(reporter.V2())
@@ -323,7 +317,7 @@ func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporte
 		msw.stats.consecutiveFailures.Set(0)
 		// mark module as running if metrics are partially available and display the error message
 		msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.Name(), err))
-		logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+		msw.Logger().Errorf("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
 
 	default:
 		reporter.Error(err)
@@ -339,7 +333,6 @@ func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporte
 
 type reporter interface {
 	StartFetchTimer()
-	V1() mb.PushReporter //nolint:staticcheck // PushReporter is deprecated but not removed
 	V2() mb.PushReporterV2
 }
 
@@ -355,10 +348,7 @@ type eventReporter struct {
 
 // startFetchTimer demarcates the start of a new fetch. The elapsed time of a
 // fetch is computed based on the time of this call.
-func (r *eventReporter) StartFetchTimer() { r.start = time.Now() }
-func (r *eventReporter) V1() mb.PushReporter { //nolint:staticcheck // PushReporter is deprecated but not removed
-	return reporterV1{v2: r.V2(), module: r.msw.module.Name()}
-}
+func (r *eventReporter) StartFetchTimer()      { r.start = time.Now() }
 func (r *eventReporter) V2() mb.PushReporterV2 { return reporterV2{r} }
 
 // channelContext implements context.Context by wrapping a channel
@@ -377,23 +367,6 @@ func (r *channelContext) Err() error {
 	}
 }
 func (r *channelContext) Value(key interface{}) interface{} { return nil }
-
-// reporterV1 wraps V2 to provide a v1 interface.
-type reporterV1 struct {
-	v2     mb.PushReporterV2
-	module string
-}
-
-func (r reporterV1) Done() <-chan struct{}     { return r.v2.Done() }
-func (r reporterV1) Event(event mapstr.M) bool { return r.ErrorWith(nil, event) }
-func (r reporterV1) Error(err error) bool      { return r.ErrorWith(err, nil) }
-func (r reporterV1) ErrorWith(err error, meta mapstr.M) bool {
-	// Skip nil events without error
-	if err == nil && meta == nil {
-		return true
-	}
-	return r.v2.Event(mb.TransformMapStrToEvent(r.module, meta, err))
-}
 
 type reporterV2 struct {
 	*eventReporter
@@ -462,7 +435,7 @@ func getMetricSetStats(mon beat.Monitoring, module, name string) *stats {
 		return s
 	}
 
-	reg := mon.StatsRegistry().NewRegistry(key)
+	reg := mon.StatsRegistry().GetOrCreateRegistry(key)
 	s := &stats{
 		key:                 key,
 		ref:                 1,

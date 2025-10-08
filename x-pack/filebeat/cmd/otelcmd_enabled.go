@@ -7,11 +7,10 @@
 package cmd
 
 import (
-	fbcmd "github.com/elastic/beats/v7/filebeat/cmd"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat"
 )
 
 func addOTelCommand(command *cmd.BeatsRootCmd) {
-	command.AddCommand(otelbeat.OTelCmd(fbcmd.Name))
+	command.AddCommand(otelbeat.OTelCmd(Name))
 }

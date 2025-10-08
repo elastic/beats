@@ -2,6 +2,8 @@
 navigation_title: "add_session_metadata"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/add-session-metadata.html
+applies_to:
+  stack: ga
 ---
 
 # Add session metadata [add-session-metadata]

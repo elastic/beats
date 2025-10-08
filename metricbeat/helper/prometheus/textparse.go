@@ -32,6 +32,7 @@ import (
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/model/textparse"
 	"github.com/prometheus/prometheus/model/timestamp"
+	"github.com/prometheus/prometheus/schema"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -116,12 +117,12 @@ func (m *Quantile) GetValue() float64 {
 }
 
 type Summary struct {
-	SampleCount *uint64
+	SampleCount *float64
 	SampleSum   *float64
 	Quantile    []*Quantile
 }
 
-func (m *Summary) GetSampleCount() uint64 {
+func (m *Summary) GetSampleCount() float64 {
 	if m != nil && m.SampleCount != nil {
 		return *m.SampleCount
 	}
@@ -154,12 +155,12 @@ func (m *Unknown) GetValue() float64 {
 }
 
 type Bucket struct {
-	CumulativeCount *uint64
+	CumulativeCount *float64
 	UpperBound      *float64
 	Exemplar        *exemplar.Exemplar
 }
 
-func (m *Bucket) GetCumulativeCount() uint64 {
+func (m *Bucket) GetCumulativeCount() float64 {
 	if m != nil && m.CumulativeCount != nil {
 		return *m.CumulativeCount
 	}
@@ -174,13 +175,13 @@ func (m *Bucket) GetUpperBound() float64 {
 }
 
 type Histogram struct {
-	SampleCount      *uint64
+	SampleCount      *float64
 	SampleSum        *float64
 	Bucket           []*Bucket
 	IsGaugeHistogram bool
 }
 
-func (m *Histogram) GetSampleCount() uint64 {
+func (m *Histogram) GetSampleCount() float64 {
 	if m != nil && m.SampleCount != nil {
 		return *m.SampleCount
 	}
@@ -371,8 +372,7 @@ func summaryMetricName(name string, s float64, qv string, lbls string, summaries
 
 	switch {
 	case isCount(name):
-		u := uint64(s)
-		summary.SampleCount = &u
+		summary.SampleCount = &s
 		name = strings.TrimSuffix(name, suffixCount)
 	case isSum(name):
 		summary.SampleSum = &s
@@ -423,15 +423,13 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 
 	switch {
 	case isCount(name):
-		u := uint64(s)
-		histogram.SampleCount = &u
+		histogram.SampleCount = &s
 		name = strings.TrimSuffix(name, suffixCount)
 	case isSum(name):
 		histogram.SampleSum = &s
 		name = strings.TrimSuffix(name, suffixSum)
 	case isGaugeHistogram && isGCount(name):
-		u := uint64(s)
-		histogram.SampleCount = &u
+		histogram.SampleCount = &s
 		name = strings.TrimSuffix(name, suffixGCount)
 	case isGaugeHistogram && isGSum(name):
 		histogram.SampleSum = &s
@@ -441,9 +439,8 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 		if err != nil {
 			f = math.MaxUint64
 		}
-		cnt := uint64(s)
 		bkt.UpperBound = &f
-		bkt.CumulativeCount = &cnt
+		bkt.CumulativeCount = &s
 
 		if e != nil {
 			if !e.HasTs {
@@ -480,7 +477,7 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 }
 
 func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
-	parser, err := textparse.New(b, contentType, ContentTypeTextFormat, false, false, labels.NewSymbolTable()) // Fallback protocol set to ContentTypeTextFormat
+	parser, err := textparse.New(b, contentType, ContentTypeTextFormat, false, false, false, labels.NewSymbolTable()) // Fallback protocol set to ContentTypeTextFormat
 	if err != nil {
 		return nil, err
 	}
@@ -567,25 +564,22 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		t := defTime
 		_, tp, v := parser.Series()
 
-		var (
-			lset labels.Labels
-			mets string
-		)
+		var lset labels.Labels
+		parser.Labels(&lset)
+		metadata := schema.NewMetadataFromLabels(lset)
+		metricName := metadata.Name
 
-		mets = parser.Metric(&lset)
-
-		if !lset.Has(labels.MetricName) {
+		if metricName == "" {
 			// missing metric name from labels.MetricName, skip.
 			break
 		}
 
 		var lbls strings.Builder
-		lbls.Grow(len(mets))
 		var labelPairs = []*labels.Label{}
 		var qv string // value of le or quantile label
-		for _, l := range lset.Copy() {
+		lset.Range(func(l labels.Label) {
 			if l.Name == labels.MetricName {
-				continue
+				return
 			}
 
 			switch l.Name {
@@ -605,11 +599,9 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 				Name:  n,
 				Value: v,
 			})
-		}
+		})
 
 		var metric *OpenMetric
-
-		metricName := lset.Get(labels.MetricName)
 
 		// lookupMetricName will have the suffixes removed
 		lookupMetricName := metricName

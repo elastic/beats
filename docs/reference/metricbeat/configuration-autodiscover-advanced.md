@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-autodiscover-advanced.html
+applies_to:
+  stack: ga
 ---
 
 # Advanced usage [configuration-autodiscover-advanced]

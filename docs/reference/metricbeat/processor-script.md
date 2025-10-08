@@ -2,6 +2,8 @@
 navigation_title: "script"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/processor-script.html
+applies_to:
+  stack: ga
 ---
 
 # Script Processor [processor-script]

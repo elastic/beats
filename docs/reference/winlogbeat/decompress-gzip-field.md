@@ -2,6 +2,8 @@
 navigation_title: "decompress_gzip_field"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/decompress-gzip-field.html
+applies_to:
+  stack: ga
 ---
 
 # Decompress gzip fields [decompress-gzip-field]

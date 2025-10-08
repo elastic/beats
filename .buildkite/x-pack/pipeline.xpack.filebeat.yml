@@ -10,6 +10,7 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  IMAGE_UBUNTU_X86_64_FIPS: "platform-ingest-beats-ubuntu-2204-fips"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
@@ -207,6 +208,51 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Go fips140=only Integration Tests"
 
+      - label: ":ubuntu: x-pack/filebeat: FIPS ECH Integration Tests"
+        env:
+          ASDF_TERRAFORM_VERSION: "1.9.3"
+          ASDF_PYTHON_VERSION: "3.9.13" # Not needed by ECH tests, but needed by VM
+# We are temporarily using the Production CFT environment instead of the Staging GovCloud
+# one.  This is being done until issues with creating deployments in Staging GovCloud are
+# fixed. Once this happens, uncomment the lines below and delete the gcp-us-west2 line.
+#          EC_ENDPOINT: "https://api.staging.elastic-gov.com"
+#          TF_VAR_ech_region: "us-gov-east-1"
+#          TF_VAR_deployment_template_id: "aws-general-purpose"
+          TF_VAR_ech_region: "gcp-us-west2"
+        command: |
+          .buildkite/scripts/custom_fips_ech_test.sh x-pack/filebeat
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_X86_64_FIPS}"
+          instanceType: "m5.xlarge"
+        artifact_paths:
+          - "x-pack/filebeat/build/*.xml"
+          - "x-pack/filebeat/build/*.json"
+          - "x-pack/filebeat/build/integration-tests/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/data/**/*"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/filebeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+          - elastic/vault-secrets#v0.1.0:
+# We are temporarily using the Production CFT environment API key instead of the
+# Staging GovCloud one.  This is being done until issues with creating deployments in
+# Staging GovCloud are fixed. Once this happens, uncomment the line below and delete
+# the vault_ec_key_prod line.
+#              path: "kv/ci-shared/platform-ingest/platform-ingest-ec-staging-gov"
+              path: "kv/ci-shared/platform-ingest/platform-ingest-ec-prod"
+              field: "apiKey"
+              env_var: "EC_API_KEY"
+        notify:
+          - github_commit_status:
+              context: "x-pack/filebeat: FIPS ECH Integration Tests / Ubuntu x86_64"
+
       - label: ":ubuntu: x-pack/filebeat: Python Integration Tests"
         key: "x-pack-filebeat-mandatory-python-int-test"
         command: |
@@ -234,6 +280,33 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: Python Integration Tests"
+
+      - label: ":windows: x-pack/filebeat: Go Windows Integration Tests"
+        command: |
+          cd x-pack/filebeat
+          mage goWindowsIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/filebeat/build/*.xml"
+          - "x-pack/filebeat/build/*.json"
+          - "x-pack/filebeat/build/integration-tests/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/data/**/*"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/filebeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/filebeat: Go Windows Integration Tests"
 
       - label: ":windows: x-pack/filebeat: Win 2022 Unit Tests"
         command: |
@@ -477,7 +550,7 @@ steps:
       - label: ":linux: x-pack/filebeat: Packaging arm64"
         key: "packaging-arm"
         env:
-          PLATFORMS: "+all linux/arm64 darwin/arm64"
+          PLATFORMS: "+all linux/arm64 darwin/arm64 windows/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/filebeat
         retry:

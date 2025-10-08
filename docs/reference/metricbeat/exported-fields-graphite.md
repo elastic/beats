@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-graphite.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -20,6 +22,6 @@ server
 **`graphite.server.example`**
 :   Example field
 
-type: keyword
+    type: keyword
 
 

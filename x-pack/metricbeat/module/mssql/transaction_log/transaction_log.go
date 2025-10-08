@@ -191,7 +191,7 @@ func (m *MetricSet) getDbsNames() ([]dbInfo, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error doing query 'SELECT name, database_id FROM sys.databases': %w", err)
 	}
-	defer closeRows(rows)
+	defer closeRows(rows, m.log)
 
 	for rows.Next() {
 		var row dbInfo
@@ -205,8 +205,8 @@ func (m *MetricSet) getDbsNames() ([]dbInfo, error) {
 	return res, nil
 }
 
-func closeRows(rows *sql.Rows) {
+func closeRows(rows *sql.Rows, logger *logp.Logger) {
 	if err := rows.Close(); err != nil {
-		logp.Err("error closing rows: %s", err)
+		logger.Errorf("error closing rows: %s", err)
 	}
 }

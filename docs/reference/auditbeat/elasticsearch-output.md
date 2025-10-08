@@ -2,6 +2,8 @@
 navigation_title: "Elasticsearch"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/elasticsearch-output.html
+applies_to:
+  stack: ga
 ---
 
 # Configure the Elasticsearch output [elasticsearch-output]

@@ -22,7 +22,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/mitchellh/hashstructure"
+	"github.com/gohugoio/hashstructure"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
@@ -201,7 +201,7 @@ func (noopReporter) UpdateStatus(status.Status, string) {}
 // will ever start the pubsub worker.
 func (in *pubsubInput) Run() {
 	in.workerOnce.Do(func() {
-		in.metrics = newInputMetrics(in.id, nil)
+		in.metrics = newInputMetrics(in.id, nil, in.log)
 		in.workerWg.Add(1)
 		go func() {
 			in.log.Info("Pub/Sub input worker has started.")

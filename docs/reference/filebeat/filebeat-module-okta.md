@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-okta.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Okta module [filebeat-module-okta]
 
@@ -106,8 +110,6 @@ This module comes with a sample dashboard:
 % TO DO: Use `:class: screenshot`
 ![filebeat okta dashboard](images/filebeat-okta-dashboard.png)
 
-
-## Fields [_fields_39]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-okta.md) section.
-

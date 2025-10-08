@@ -2,6 +2,8 @@
 navigation_title: "Console"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/console-output.html
+applies_to:
+  stack: ga
 ---
 
 # Configure the Console output [console-output]

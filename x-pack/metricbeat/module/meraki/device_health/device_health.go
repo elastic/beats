@@ -27,9 +27,9 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The meraki device_health metricset is beta.")
 
 	logger := base.Logger().Named(base.FullyQualifiedName())
+	logger.Warn(cfgwarn.Beta("The meraki device_health metricset is beta."))
 
 	config := meraki.DefaultConfig()
 	if err := base.Module().UnpackConfig(config); err != nil {
@@ -102,9 +102,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			return fmt.Errorf("getDeviceSwitchports failed; %w", err)
 		}
 
-		err = getDeviceVPNStatuses(m.client, org, devices)
+		err = getDeviceVPNStatuses(m.client, org, devices, m.logger)
 		if err != nil {
-			m.logger.Errorf("GetVPNStatuses failed; %w", err)
+			m.logger.Errorf("GetVPNStatuses failed; %v", err)
 			// continue so we still report the rest of the device health metrics
 		}
 

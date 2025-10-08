@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
+
 package add_kubernetes_metadata
 
 import (
@@ -35,7 +37,8 @@ func TestAnnotatorSkipped(t *testing.T) {
 	cfg := config.MustNewConfigFrom(map[string]interface{}{
 		"lookup_fields": []string{"kubernetes.pod.name"},
 	})
-	matcher, err := NewFieldMatcher(*cfg)
+	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
+
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,7 +98,7 @@ func TestAnnotatorWithNoKubernetesAvailable(t *testing.T) {
 	cfg := config.MustNewConfigFrom(map[string]interface{}{
 		"lookup_fields": []string{"kubernetes.pod.name"},
 	})
-	matcher, err := NewFieldMatcher(*cfg)
+	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

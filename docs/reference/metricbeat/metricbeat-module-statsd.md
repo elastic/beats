@@ -1,12 +1,15 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-statsd.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Statsd module [metricbeat-module-statsd]
 
 The `statsd` module is a Metricbeat module which spawns a UDP server and listens for metrics in StatsD compatible format.
-
 
 ## Metric types [_metric_types]
 
@@ -52,7 +55,7 @@ The `statsd` module has these additional config options:
 **`ttl`**
 :   It defines how long a metric will be reported after it was last recorded. Irrespective of the given ttl, metrics will be reported at least once. A ttl of zero means metrics will never expire.
 
-**`statsd.mapping`**
+**`statsd.mappings`**
 :   It defines how metrics will mapped from the original metric label to the event json. Here’s an example configuration:
 
 ```yaml
@@ -74,5 +77,22 @@ statsd.mappings:
 4. `label[].field`, required when using named label placeholder field name where to save the named label placeholder value from the template in the event json
 
 
+## Example configuration [_example_configuration]
+
+The Statsd module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
+
+```yaml
+metricbeat.modules:
+- module: statsd
+  host: "localhost"
+  port: "8125"
+  enabled: false
+  #ttl: "30s"
+```
 
 
+## Metricsets [_metricsets]
+
+The following metricsets are available:
+
+* [server](/reference/metricbeat/metricbeat-metricset-statsd-server.md)

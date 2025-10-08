@@ -2,6 +2,8 @@
 navigation_title: "Redis"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-redis-options.html
+applies_to:
+  stack: ga
 ---
 
 # Capture Redis traffic [packetbeat-redis-options]

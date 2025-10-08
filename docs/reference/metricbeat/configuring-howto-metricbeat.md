@@ -2,6 +2,8 @@
 navigation_title: "Configure"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/configuring-howto-metricbeat.html
+applies_to:
+  stack: ga
 ---
 
 # Configure Metricbeat [configuring-howto-metricbeat]

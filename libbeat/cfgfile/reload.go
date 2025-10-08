@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -78,6 +79,13 @@ type RunnerFactory interface {
 	CheckConfig(config *config.C) error
 }
 
+// RunnerFactoryWithStatusReporter extends the RunnerFactory Create() method accept a StatusReporter interface.
+// This is helpful for cases where a given runner is capable of taking the status reporter during init,
+// and in turn can use that to set the `Configuring` state.
+type RunnerFactoryWithStatusReporter interface {
+	CreateWithReporter(b beat.PipelineConnector, config *config.C, statusReporter status.StatusReporter) (Runner, error)
+}
+
 // Runner is a simple interface providing a simple way to
 // Start and Stop Reloader
 type Runner interface {
@@ -103,13 +111,13 @@ type Reloader struct {
 }
 
 // NewReloader creates new Reloader instance for the given config
-func NewReloader(logger *logp.Logger, pipeline beat.PipelineConnector, cfg *config.C) *Reloader {
+func NewReloader(logger *logp.Logger, pipeline beat.PipelineConnector, cfg *config.C, beatPaths *paths.Path) *Reloader {
 	conf := DefaultDynamicConfig
 	_ = cfg.Unpack(&conf)
 
 	path := conf.Path
 	if !filepath.IsAbs(path) {
-		path = paths.Resolve(paths.Config, path)
+		path = beatPaths.Resolve(paths.Config, path)
 	}
 
 	return &Reloader{
@@ -270,7 +278,7 @@ func (rl *Reloader) loadConfigs(files []string) ([]*reload.ConfigWithMeta, error
 	result := []*reload.ConfigWithMeta{}
 	var errs []error
 	for _, file := range files {
-		configs, err := LoadList(file)
+		configs, err := LoadList(file, rl.logger)
 		if err != nil {
 			errs = append(errs, err)
 			rl.logger.Errorf("Error loading config from file '%s', error %v", file, err)

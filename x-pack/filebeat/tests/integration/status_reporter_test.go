@@ -15,32 +15,22 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
-	"github.com/elastic/beats/v7/libbeat/common/reload"
-	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/x-pack/filebeat/cmd"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
-
-	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestLogStatusReporter(t *testing.T) {
+	filebeat := NewFilebeat(t)
+
 	unitOneID := mock.NewID()
 	unitOutID := mock.NewID()
-	token := mock.NewID()
 
-	tests.InitBeatsForTest(t, cmd.Filebeat())
-	tmpDir := t.TempDir()
+	tmpDir := filebeat.TempDir()
 	filename := fmt.Sprintf("test-%d", time.Now().Unix())
 	outPath := filepath.Join(tmpDir, filename)
-	t.Logf("writing output to file %s", outPath)
 	err := os.Mkdir(outPath, 0775)
 	require.NoError(t, err)
 
@@ -96,26 +86,12 @@ func TestLogStatusReporter(t *testing.T) {
 		},
 	}
 	require.NoError(t, server.Start())
-	defer server.Stop()
+	t.Cleanup(server.Stop)
 
-	// start the client
-	client := client.NewV2(fmt.Sprintf(":%d", server.Port), token, client.VersionInfo{
-		Name: "program",
-	}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
-
-	lbmanagement.SetManagerFactory(func(cfg *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
-		c := management.DefaultConfig()
-		if err := cfg.Unpack(&c); err != nil {
-			return nil, err
-		}
-		return management.NewV2AgentManagerWithClient(c, registry, client, management.WithStopOnEmptyUnits)
-	})
-
-	go func() {
-		t.Logf("Running beats...")
-		err := cmd.Filebeat().Execute()
-		require.NoError(t, err)
-	}()
+	filebeat.Start(
+		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
+		"-E", "management.enabled=true",
+	)
 
 	scenarios := []struct {
 		expectedStatus proto.State

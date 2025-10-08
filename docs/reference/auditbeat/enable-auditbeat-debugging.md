@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/enable-auditbeat-debugging.html
+applies_to:
+  stack: ga
 ---
 
 # Debug [enable-auditbeat-debugging]

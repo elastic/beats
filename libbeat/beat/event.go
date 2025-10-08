@@ -50,11 +50,15 @@ const (
 // The `Meta`-fields can be used to pass additional meta-data to the outputs.
 // Output can optionally publish a subset of Meta, or ignore Meta.
 type Event struct {
-	Timestamp  time.Time
-	Meta       mapstr.M
-	Fields     mapstr.M
-	Private    interface{} // for beats private use
-	TimeSeries bool        // true if the event contains timeseries data
+	Timestamp time.Time
+	Meta      mapstr.M
+	Fields    mapstr.M
+
+	// Private is for input-specific data. The input that populates this field
+	// is fully responsible for its management. No guarantees are given about
+	// the content of this field as other components are able to modify it.
+	Private    interface{}
+	TimeSeries bool // true if the event contains timeseries data
 }
 
 var (

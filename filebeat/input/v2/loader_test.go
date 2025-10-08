@@ -23,8 +23,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -45,9 +45,9 @@ func TestLoader_New(t *testing.T) {
 		"ok": {
 			setup: loaderConfig{
 				Plugins: []Plugin{
-					{Name: "a", Stability: feature.Stable, Manager: ConfigureWith(nil)},
-					{Name: "b", Stability: feature.Stable, Manager: ConfigureWith(nil)},
-					{Name: "c", Stability: feature.Stable, Manager: ConfigureWith(nil)},
+					{Name: "a", Stability: feature.Stable, Manager: ConfigureWith(nil, logp.NewNopLogger())},
+					{Name: "b", Stability: feature.Stable, Manager: ConfigureWith(nil, logp.NewNopLogger())},
+					{Name: "c", Stability: feature.Stable, Manager: ConfigureWith(nil, logp.NewNopLogger())},
 				},
 			},
 			check: expectNoError,
@@ -55,8 +55,8 @@ func TestLoader_New(t *testing.T) {
 		"duplicate": {
 			setup: loaderConfig{
 				Plugins: []Plugin{
-					{Name: "a", Stability: feature.Stable, Manager: ConfigureWith(nil)},
-					{Name: "a", Stability: feature.Stable, Manager: ConfigureWith(nil)},
+					{Name: "a", Stability: feature.Stable, Manager: ConfigureWith(nil, logp.NewNopLogger())},
+					{Name: "a", Stability: feature.Stable, Manager: ConfigureWith(nil, logp.NewNopLogger())},
 				},
 			},
 			check: expectError,
@@ -124,7 +124,7 @@ func TestLoader_Init(t *testing.T) {
 
 func TestLoader_Configure(t *testing.T) {
 	createManager := func(name string) InputManager {
-		return ConfigureWith(makeConfigFakeInput(fakeInput{Type: name}))
+		return ConfigureWith(makeConfigFakeInput(fakeInput{Type: name}), logp.NewNopLogger())
 	}
 	createPlugin := func(name string) Plugin {
 		return Plugin{Name: name, Stability: feature.Stable, Manager: createManager(name)}
@@ -165,9 +165,9 @@ func TestLoader_Configure(t *testing.T) {
 			setup: defaultSetup.WithPlugins(Plugin{
 				Name:      "a",
 				Stability: feature.Beta,
-				Manager: ConfigureWith(func(_ *conf.C) (Input, error) {
+				Manager: ConfigureWith(func(_ *conf.C, _ *logp.Logger) (Input, error) {
 					return nil, errors.New("oops")
-				}),
+				}, logp.NewNopLogger()),
 			}),
 			config: map[string]interface{}{"type": "a"},
 			check:  failSetup,
@@ -189,9 +189,9 @@ func TestLoader_ConfigureFIPS(t *testing.T) {
 			{
 				Name:      "a",
 				Stability: feature.Stable,
-				Manager: ConfigureWith(func(_ *conf.C) (Input, error) {
+				Manager: ConfigureWith(func(_ *conf.C, _ *logp.Logger) (Input, error) {
 					return nil, nil
-				}),
+				}, logp.NewNopLogger()),
 				ExcludeFromFIPS: true,
 			},
 		},
@@ -202,12 +202,12 @@ func TestLoader_ConfigureFIPS(t *testing.T) {
 	input, err := loader.Configure(conf.MustNewConfigFrom(map[string]any{"type": "a"}))
 	require.Nil(t, input)
 
-	if common.FIPSMode {
+	if version.FIPSDistribution {
 		require.Error(t, err)
 	} else {
 		require.NoError(t, err)
 	}
-	t.Logf("FIPS mode = %v; err = %v", common.FIPSMode, err)
+	t.Logf("FIPS distribution = %v; err = %v", version.FIPSDistribution, err)
 }
 
 func (b loaderConfig) MustNewLoader() *Loader {

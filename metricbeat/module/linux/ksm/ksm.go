@@ -46,7 +46,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The linux pageinfo metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The linux pageinfo metricset is beta."))
 
 	sys := base.Module().(resolve.Resolver)
 

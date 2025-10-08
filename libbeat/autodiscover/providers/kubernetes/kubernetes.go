@@ -110,6 +110,9 @@ func AutodiscoverBuilder(
 		return nil, errWrap(err)
 	}
 
+	// log warning about any unsupported params
+	config.checkUnsupportedParams(logger)
+
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
 		return nil, errWrap(err)
@@ -117,7 +120,7 @@ func AutodiscoverBuilder(
 
 	k8sKeystoreProvider := k8skeystore.NewKubernetesKeystoresRegistry(logger, client)
 
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, k8sKeystoreProvider)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, k8sKeystoreProvider, logger)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -352,7 +355,7 @@ func (p *leaderElectionManager) GenerateHints(event bus.Event) bus.Event {
 func (p *leaderElectionManager) startLeaderElectorIndefinitely(ctx context.Context, lec leaderelection.LeaderElectionConfig) {
 	le, err := leaderelection.NewLeaderElector(lec)
 	if err != nil {
-		p.logger.Errorf("error while creating Leader Elector: %w", err)
+		p.logger.Errorf("error while creating Leader Elector: %v", err)
 	}
 	p.logger.Debugf("Starting Leader Elector")
 

@@ -2,6 +2,8 @@
 navigation_title: "Monitor"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/monitoring.html
+applies_to:
+  stack: ga
 ---
 
 # Monitor Metricbeat [monitoring]

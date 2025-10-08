@@ -109,6 +109,16 @@ func TestConfigMustFailWithInvalidURL(t *testing.T) {
 	assert.EqualError(t, err, `parse "::invalid::": missing protocol scheme accessing 'request.url'`)
 }
 
+func TestConfigMustFailWithSchemelessURL(t *testing.T) {
+	m := map[string]interface{}{
+		"request.url": "host.name/path/to/endpoint",
+	}
+	cfg := conf.MustNewConfigFrom(m)
+	conf := defaultConfig()
+	err := cfg.Unpack(&conf)
+	assert.EqualError(t, err, `url "host.name/path/to/endpoint" is missing scheme accessing 'request.url'`)
+}
+
 func TestConfigOauth2Validation(t *testing.T) {
 	cases := []struct {
 		name        string
@@ -563,7 +573,7 @@ LNV/bIgMHOMoxiGrwyjAhg==
 				defer c.teardown()
 			}
 
-			c.input["request.url"] = "localhost"
+			c.input["request.url"] = "http://localhost"
 			cfg := conf.MustNewConfigFrom(c.input)
 			conf := defaultConfig()
 			err := cfg.Unpack(&conf)
@@ -643,7 +653,7 @@ var keepAliveTests = []struct {
 func TestKeepAliveSetting(t *testing.T) {
 	for _, test := range keepAliveTests {
 		t.Run(test.name, func(t *testing.T) {
-			test.input["request.url"] = "localhost"
+			test.input["request.url"] = "htts://localhost"
 			cfg := conf.MustNewConfigFrom(test.input)
 			conf := defaultConfig()
 			err := cfg.Unpack(&conf)

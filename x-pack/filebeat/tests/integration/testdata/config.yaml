@@ -1,0 +1,9 @@
+rules:
+    - path: "/test"
+      methods: ["GET"]
+      responses:
+      - headers:
+          x-foo: ["test"]
+        status_code: 200
+        body: |-
+          {"next": "http://{{ hostname }}"}

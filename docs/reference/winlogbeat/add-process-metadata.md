@@ -2,6 +2,8 @@
 navigation_title: "add_process_metadata"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/add-process-metadata.html
+applies_to:
+  stack: ga
 ---
 
 # Add process metadata [add-process-metadata]

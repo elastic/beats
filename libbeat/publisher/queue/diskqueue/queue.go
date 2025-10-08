@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -86,6 +87,9 @@ type diskQueue struct {
 	// The channel to report that shutdown is finished, used by
 	// (*diskQueue).Done.
 	done chan struct{}
+
+	// Ensure we only close the close channel once, even when Close is called multiple times.
+	closeOnce sync.Once
 }
 
 // FactoryForSettings is a simple wrapper around NewQueue so a concrete
@@ -124,7 +128,7 @@ func NewQueue(
 				"twice the segment size (%v)",
 			settings.MaxBufferSize, settings.MaxSegmentSize)
 	}
-	observer.MaxBytes(int(settings.MaxBufferSize))
+	observer.MaxBytes(int(settings.MaxBufferSize)) //nolint:gosec // G115 Conversion from uint64 to int is safe here.
 
 	// Create the given directory path if it doesn't exist.
 	err := os.MkdirAll(settings.directoryPath(), os.ModePerm)
@@ -178,7 +182,7 @@ func NewQueue(
 	for _, segment := range initialSegments {
 		initialEventCount += int(segment.frameCount)
 		// Event metrics for the queue observer don't include segment headser size
-		initialByteCount += int(segment.byteCount - segment.headerSize())
+		initialByteCount += int(segment.byteCount - segment.headerSize()) //nolint:gosec // G115 Conversion from uint64 to int is safe here.
 	}
 	observer.Restore(initialEventCount, initialByteCount)
 
@@ -203,7 +207,7 @@ func NewQueue(
 	for _, segment := range initialSegments {
 		activeFrameCount += int(segment.frameCount)
 	}
-	activeFrameCount -= int(nextReadPosition.frameIndex)
+	activeFrameCount -= int(nextReadPosition.frameIndex) //nolint:gosec // G115 Conversion from uint64 to int is safe here.
 	logger.Infof("Found %v queued events consuming %v bytes, %v events still pending", initialEventCount, initialByteCount, activeFrameCount)
 
 	var encoder queue.Encoder
@@ -248,10 +252,14 @@ func NewQueue(
 // diskQueue implementation of the queue.Queue interface
 //
 
-func (dq *diskQueue) Close() error {
+func (dq *diskQueue) Close(_ bool) error {
 	// Closing the done channel signals to the core loop that it should
 	// shut down the other helper goroutines and wrap everything up.
-	close(dq.close)
+	dq.closeOnce.Do(
+		func() {
+			close(dq.close)
+		},
+	)
 
 	return nil
 }

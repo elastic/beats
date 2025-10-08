@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 )
 
 type config struct {
@@ -191,7 +192,7 @@ type readerConfig struct {
 	LineTerminator           readfile.LineTerminator `config:"line_terminator"`
 	MaxBytes                 cfgtype.ByteSize        `config:"max_bytes"`
 	Parsers                  parser.Config           `config:",inline"`
-	Decoding                 decoderConfig           `config:"decoding"`
+	Decoding                 decoder.Config          `config:"decoding"`
 }
 
 func (rc *readerConfig) Validate() error {

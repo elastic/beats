@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/enable-filebeat-debugging.html
+applies_to:
+  stack: ga
 ---
 
 # Debug [enable-filebeat-debugging]

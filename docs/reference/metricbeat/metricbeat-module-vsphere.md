@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-vsphere.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # vSphere module [metricbeat-module-vsphere]
 
@@ -82,7 +86,7 @@ The vSphere module includes a predefined dashboard. For example:
 ![metricbeat vsphere vm dashboard](images/metricbeat_vsphere_vm_dashboard.png)
 
 
-## Example configuration [_example_configuration_67]
+## Example configuration [_example_configuration]
 
 The vSphere module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -91,7 +95,7 @@ metricbeat.modules:
 - module: vsphere
   enabled: true
   metricsets: ["cluster", "datastore", "datastorecluster", "host", "network", "resourcepool", "virtualmachine"]
-
+  
   # Real-time data collection – An ESXi Server collects data for each performance counter every 20 seconds by default.
   # Supported Periods:
   # The Datastore and Host metricsets support performance data collection using the vSphere performance API.
@@ -114,22 +118,14 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_77]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
-* [cluster](/reference/metricbeat/metricbeat-metricset-vsphere-cluster.md)
+* [cluster](/reference/metricbeat/metricbeat-metricset-vsphere-cluster.md)  {applies_to}`stack: beta`
 * [datastore](/reference/metricbeat/metricbeat-metricset-vsphere-datastore.md)
-* [datastorecluster](/reference/metricbeat/metricbeat-metricset-vsphere-datastorecluster.md)
+* [datastorecluster](/reference/metricbeat/metricbeat-metricset-vsphere-datastorecluster.md)  {applies_to}`stack: beta`
 * [host](/reference/metricbeat/metricbeat-metricset-vsphere-host.md)
-* [network](/reference/metricbeat/metricbeat-metricset-vsphere-network.md)
-* [resourcepool](/reference/metricbeat/metricbeat-metricset-vsphere-resourcepool.md)
+* [network](/reference/metricbeat/metricbeat-metricset-vsphere-network.md)  {applies_to}`stack: beta`
+* [resourcepool](/reference/metricbeat/metricbeat-metricset-vsphere-resourcepool.md)  {applies_to}`stack: beta`
 * [virtualmachine](/reference/metricbeat/metricbeat-metricset-vsphere-virtualmachine.md)
-
-
-
-
-
-
-
-

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-event-structure.html
+applies_to:
+  stack: ga
 ---
 
 # Event structure [metricbeat-event-structure]

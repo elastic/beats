@@ -101,7 +101,7 @@ func TestCache(t *testing.T) {
 		assert.EqualValues(t, 3, c.stats.Miss.Get()) // Cache miss.
 	}
 
-	minTTL := defaultConfig().cacheConfig.SuccessCache.MinTTL
+	minTTL := defaultConfig().SuccessCache.MinTTL
 	// Initial success returned TTL=0 with MinTTL.
 	r, err = c.Lookup(gatewayIP+"2", typePTR)
 	if assert.NoError(t, err) {
@@ -124,5 +124,32 @@ func TestCache(t *testing.T) {
 		assert.InDelta(t, minTTL/time.Second, r.TTL, 1)
 		assert.EqualValues(t, 4, c.stats.Hit.Get())
 		assert.EqualValues(t, 4, c.stats.Miss.Get())
+	}
+}
+
+func TestDisabledCache(t *testing.T) {
+	config := defaultConfig().cacheConfig
+	config.SuccessCache.Enabled = false
+	config.FailureCache.Enabled = false
+
+	c, err := newLookupCache(
+		monitoring.NewRegistry(),
+		config,
+		&stubResolver{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Initial success query.
+	var r *result
+	r, err = c.Lookup(gatewayIP, typePTR)
+	if assert.NoError(t, err) {
+		assert.EqualValues(t, []string{gatewayName}, r.Data)
+	}
+	r, err = c.Lookup(gatewayIP, typePTR)
+	if assert.NoError(t, err) {
+		assert.EqualValues(t, []string{gatewayName}, r.Data)
+		assert.EqualValues(t, 0, c.stats.Hit.Get())
+		assert.EqualValues(t, 2, c.stats.Miss.Get())
 	}
 }

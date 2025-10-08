@@ -1,11 +1,13 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/running-on-docker.html
+applies_to:
+  stack: ga
 ---
 
 # Run Metricbeat on Docker [running-on-docker]
 
-Docker images for Metricbeat are available from the Elastic Docker registry. The base image is [centos:7](https://hub.docker.com/_/centos/).
+Docker images for Metricbeat are available from the Elastic Docker registry. The base image is [Red Hat Universal Base Image 9 Minimal](https://hub.docker.com/r/redhat/ubi9-minimal).
 
 A list of all published Docker images and tags is available at [www.docker.elastic.co](https://www.docker.elastic.co).
 
@@ -16,12 +18,12 @@ These images are free to use under the Elastic license. They contain open source
 Obtaining Metricbeat for Docker is as simple as issuing a `docker pull` command against the Elastic Docker registry.
 
 % ::::{warning} subs=true
-% Version {{stack-version}} of Metricbeat has not yet been released. No Docker image is currently available for Metricbeat {{stack-version}}.
+% Version {{version.stack}} of Metricbeat has not yet been released. No Docker image is currently available for Metricbeat {{version.stack}}.
 % ::::
 
 
 ```sh subs=true
-docker pull docker.elastic.co/beats/metricbeat:{{stack-version}}
+docker pull docker.elastic.co/beats/metricbeat:{{version.stack}}
 ```
 
 Alternatively, you can download other Docker images that contain only features available under the Apache 2.0 license. To download the images, go to [www.docker.elastic.co](https://www.docker.elastic.co).
@@ -29,7 +31,7 @@ Alternatively, you can download other Docker images that contain only features a
 As another option, you can use the hardened [Wolfi](https://wolfi.dev/) image. Using Wolfi images requires Docker version 20.10.10 or higher. For details about why the Wolfi images have been introduced, refer to our article [Reducing CVEs in Elastic container images](https://www.elastic.co/blog/reducing-cves-in-elastic-container-images).
 
 ```bash subs=true
-docker pull docker.elastic.co/beats/metricbeat-wolfi:{{stack-version}}
+docker pull docker.elastic.co/beats/metricbeat-wolfi:{{version.stack}}
 ```
 
 
@@ -38,19 +40,19 @@ docker pull docker.elastic.co/beats/metricbeat-wolfi:{{stack-version}}
 You can use the [Cosign application](https://docs.sigstore.dev/cosign/installation/) to verify the Metricbeat Docker image signature.
 
 % ::::{warning}
-% Version {{stack-version}} of Metricbeat has not yet been released. No Docker image is currently available for Metricbeat {{stack-version}}.
+% Version {{version.stack}} of Metricbeat has not yet been released. No Docker image is currently available for Metricbeat {{version.stack}}.
 % ::::
 
 
 ```sh subs=true
 wget https://artifacts.elastic.co/cosign.pub
-cosign verify --key cosign.pub docker.elastic.co/beats/metricbeat:{{stack-version}}
+cosign verify --key cosign.pub docker.elastic.co/beats/metricbeat:{{version.stack}}
 ```
 
 The `cosign` command prints the check results and the signature payload in JSON format:
 
 ```sh subs=true
-Verification for docker.elastic.co/beats/metricbeat:{{stack-version}} --
+Verification for docker.elastic.co/beats/metricbeat:{{version.stack}} --
 The following checks were performed on each of these signatures:
   - The cosign claims were validated
   - Existence of the claims in the transparency log was verified offline
@@ -69,19 +71,18 @@ Running Metricbeat with the setup command will create the index pattern and load
 
 ```sh subs=true
 docker run --rm \
-docker.elastic.co/beats/metricbeat:{{stack-version}} \
+docker.elastic.co/beats/metricbeat:{{version.stack}} \
 setup -E setup.kibana.host=kibana:5601 \
--E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+-E output.elasticsearch.hosts=["elasticsearch:9200"] <1>
 ```
+1. Substitute your {{kib}} and {{es}} hosts and ports.
 
-1. Substitute your Kibana and Elasticsearch hosts and ports.
-2. If you are using the {{ech}}, replace the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password using this syntax:
+   If you are using {{ech}}, replace the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password using this syntax:
 
-
-```shell
--E cloud.id=<Cloud ID from Elastic Cloud Hosted> \
--E cloud.auth=elastic:<elastic password>
-```
+   ```sh
+   -E cloud.id=<Cloud ID from Elastic Cloud Hosted> \
+   -E cloud.auth=elastic:<elastic password>
+  ```
 
 
 ## Run Metricbeat on a read-only file system [_run_metricbeat_on_a_read_only_file_system]
@@ -94,7 +95,7 @@ For example:
 docker run --rm \
   --mount type=bind,source=$(pwd)/data,destination=/usr/share/metricbeat/data \
   --read-only \
-  docker.elastic.co/beats/metricbeat:{{stack-version}}
+  docker.elastic.co/beats/metricbeat:{{version.stack}}
 ```
 
 
@@ -107,7 +108,7 @@ The Docker image provides several methods for configuring Metricbeat. The conven
 Download this example configuration file as a starting point:
 
 ```sh subs=true
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/docker/metricbeat.docker.yml
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{ version.stack | M.M }}/deploy/docker/metricbeat.docker.yml
 ```
 
 
@@ -124,13 +125,12 @@ docker run -d \
   --volume="/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro" \
   --volume="/proc:/hostfs/proc:ro" \
   --volume="/:/hostfs:ro" \
-  docker.elastic.co/beats/metricbeat:{{stack-version}} metricbeat -e \
-  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+  docker.elastic.co/beats/metricbeat:{{version.stack}} metricbeat -e \
+  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1>
 ```
+1. Substitute your {{es}} hosts and ports.
 
-1. Substitute your Elasticsearch hosts and ports.
-2. If you are using the {{ech}}, replace the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password using the syntax shown earlier.
-
+   If you are using {{ech}}, replace the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password using the syntax shown earlier.
 
 
 ### Customize your configuration [_customize_your_configuration]
@@ -157,7 +157,7 @@ docker run \
 It’s possible to embed your Metricbeat configuration in a custom image. Here is an example Dockerfile to achieve this:
 
 ```dockerfile subs=true
-FROM docker.elastic.co/beats/metricbeat:{{stack-version}}
+FROM docker.elastic.co/beats/metricbeat:{{version.stack}}
 COPY --chown=root:metricbeat metricbeat.yml /usr/share/metricbeat/metricbeat.yml
 ```
 
@@ -177,7 +177,7 @@ docker run \
   --env DBUS_SYSTEM_BUS_ADDRESS='unix:path=/hostfs/var/run/dbus/system_bus_socket' \ <4>
   --net=host \ <5>
   --cgroupns=host \ <6>
-  docker.elastic.co/beats/metricbeat:{{stack-version}} -e --system.hostfs=/hostfs
+  docker.elastic.co/beats/metricbeat:{{version.stack}} -e --system.hostfs=/hostfs
 ```
 
 1. Metricbeat’s [system module](/reference/metricbeat/metricbeat-module-system.md) collects much of its data through the Linux proc filesystem, which is normally located at `/proc`. Because containers are isolated as much as possible from the host, the data inside of the container’s `/proc` is different than the host’s `/proc`. To account for this, you can mount the host’s `/proc` filesystem inside of the container and tell Metricbeat to look inside the `/hostfs` directory when looking for `/proc` by using the `hostfs=/hostfs` config value.
@@ -208,7 +208,7 @@ Next, let’s look at an example of monitoring a containerized service from a Me
 docker run \
   --network=mysqlnet \ <1>
   -e MYSQL_PASSWORD=secret \ <2>
-  docker.elastic.co/beats/metricbeat:{{stack-version}}
+  docker.elastic.co/beats/metricbeat:{{version.stack}}
 ```
 
 1. Placing the Metricbeat and MySQL containers on the same Docker network allows Metricbeat access to the exposed ports of the MySQL container, and makes the hostname `mysql` resolvable to Metricbeat.

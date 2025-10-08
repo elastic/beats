@@ -4,12 +4,20 @@
 This code is a working MVP for a [docker logging plugin](https://docs.docker.com/engine/extend/plugins_logging/). With the proper config, it can send logs to elasticsearch.
 ## Build and install
 
-To build and install, just run `mage Package`. The build process happens entire within docker. The only external dependencies are [mage](https://github.com/magefile/mage#installation) and golang.
+To build and install, just run `mage package`. The build process happens entirely within docker. The only external dependencies are [mage](https://github.com/magefile/mage#installation) and Go.
 
+## How to start the plugin
 
-## Running
+1. To create and enable the plugin, follow below steps 
+```
+cd x-pack/dockerlogbeat/build/distribution
+tar -xvf elastic-logging-plugin-9.2.0-docker-plugin-arm64.tar.gz ## unpack the tar ball
+docker plugin create dockerlogbeat ./elastic-logging-plugin
+docker plugin enable dockerlogbeat
+```
 
-`docker run --log-driver=elastic/elastic-logging-plugin:8.0.0 --log-opt hosts="172.18.0.2:9200" -it debian:jessie /bin/bash`
+2. To start the plugin
+`docker run --log-driver=dockerlogbeat --log-opt hosts="172.18.0.2:9200" -it debian:jessie /bin/bash`
 
 
 ## Config Options

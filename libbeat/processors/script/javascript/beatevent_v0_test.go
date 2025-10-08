@@ -28,6 +28,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -179,7 +181,7 @@ func TestBeatEventV0(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			reg := monitoring.NewRegistry()
 
-			p, err := NewFromConfig(Config{Tag: tc.name, Source: header + tc.source + footer}, reg)
+			p, err := NewFromConfig(Config{Tag: tc.name, Source: header + tc.source + footer}, reg, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -212,7 +214,7 @@ func BenchmarkBeatEventV0(b *testing.B) {
 
 	benchTest := func(tc testCase, timeout time.Duration) func(b *testing.B) {
 		return func(b *testing.B) {
-			p, err := NewFromConfig(Config{Source: header + tc.source + footer, Timeout: timeout}, nil)
+			p, err := NewFromConfig(Config{Source: header + tc.source + footer, Timeout: timeout}, nil, logp.NewNopLogger())
 			if err != nil {
 				b.Fatal(err)
 			}

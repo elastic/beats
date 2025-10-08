@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build integration
+//go:build (linux || darwin || windows) && integration
 
 package docker
 
@@ -39,7 +39,7 @@ import (
 func TestDockerStart(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "docker")
 
-	d, err := dk.NewClient()
+	d, err := dk.NewClient(log)
 	if err != nil {
 		t.Fatal(err)
 	}
