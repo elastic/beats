@@ -396,7 +396,14 @@ func translateCfg(cfg *config.C) (*config.C, error) {
 	}
 
 	// Add final fields
-	newCfg.SetString("type", -1, "filestream")
+	if err := newCfg.SetString("type", -1, "filestream"); err != nil {
+		return nil, fmt.Errorf("cannot set 'type': %w", err)
+	}
+
+	if err := newCfg.SetBool("take_over.enabled", -1, true); err != nil {
+		return nil, fmt.Errorf("cannot set 'take_over.enabled': %s", err)
+	}
+
 	return newCfg, nil
 }
 

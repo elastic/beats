@@ -19,6 +19,8 @@ exclude_lines:
 
 harvester_limit: 10000
 
+id: foo
+
 tail_files: true
 
 ignore_older: 10h
