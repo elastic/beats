@@ -145,28 +145,36 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 				if err != nil {
 					return nil, fmt.Errorf("cannot read %q as string: %w", key, err)
 				}
-				newCfg.SetString(kind.fsName, -1, v)
+				if err := newCfg.SetString(kind.fsName, -1, v); err != nil {
+					return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+				}
 
 			case ConfTypeBool:
 				v, err := cfg.Bool(key, -1)
 				if err != nil {
 					return nil, fmt.Errorf("cannot read %q as boolean: %w", key, err)
 				}
-				newCfg.SetBool(kind.fsName, -1, v)
+				if err := newCfg.SetBool(kind.fsName, -1, v); err != nil {
+					return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+				}
 
 			case ConfTypeInt:
 				v, err := cfg.Int(key, -1)
 				if err != nil {
 					return nil, fmt.Errorf("cannot read %q as integer: %w", key, err)
 				}
-				newCfg.SetInt(kind.fsName, -1, v)
+				if err := newCfg.SetInt(kind.fsName, -1, v); err != nil {
+					return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+				}
 
 			case ConfTypeMap:
 				child, err := cfg.Child(key, -1)
 				if err != nil {
 					return nil, fmt.Errorf("cannot read %q as map/array: %w", key, err)
 				}
-				newCfg.SetChild(kind.fsName, -1, child)
+				if err := newCfg.SetChild(kind.fsName, -1, child); err != nil {
+					return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+				}
 
 			case ConfTypeConstant:
 				v, err := cfg.Bool(key, -1)
@@ -174,7 +182,9 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 					return nil, fmt.Errorf("cannot read %q as boolean: %w", key, err)
 				}
 				if v {
-					newCfg.SetString(kind.fsName, -1, kind.fsVal)
+					if err := newCfg.SetString(kind.fsName, -1, kind.fsVal); err != nil {
+						return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+					}
 				}
 			}
 		}
@@ -207,23 +217,29 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 				case ConfTypeString:
 					v, err := multilineChild.String(key, -1)
 					if err != nil {
-						return nil, fmt.Errorf("cannot read %q as string: %s", key, err)
+						return nil, fmt.Errorf("cannot read %q as string: %w", key, err)
 					}
-					multilineCfg.SetString(kind.fsName, -1, v)
+					if err := multilineCfg.SetString(kind.fsName, -1, v); err != nil {
+						return nil, fmt.Errorf("cannot set %q: %w", key, err)
+					}
 
 				case ConfTypeBool:
 					v, err := multilineChild.Bool(key, -1)
 					if err != nil {
 						return nil, fmt.Errorf("cannot read %q as boolean: %w", key, err)
 					}
-					multilineCfg.SetBool(kind.fsName, -1, v)
+					if err := multilineCfg.SetBool(kind.fsName, -1, v); err != nil {
+						return nil, fmt.Errorf("cannot set %q: %w", key, err)
+					}
 
 				case ConfTypeInt:
 					v, err := multilineChild.Int(key, -1)
 					if err != nil {
 						return nil, fmt.Errorf("cannot read %q as integer: %w", key, err)
 					}
-					multilineCfg.SetInt(kind.fsName, -1, v)
+					if err := multilineCfg.SetInt(kind.fsName, -1, v); err != nil {
+						return nil, fmt.Errorf("cannot set %q: %w", key, err)
+					}
 				}
 			}
 		}
@@ -301,7 +317,7 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 	} else {
 		has, err := cfg.Has("file_identity.fingerprint", -1)
 		if err != nil {
-			return nil, fmt.Errorf("cannot read 'file_identity.fingerprint': %s", err)
+			return nil, fmt.Errorf("cannot read 'file_identity.fingerprint': %w", err)
 		}
 		disableFingeprint = !has
 	}
@@ -319,7 +335,7 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 	}
 
 	if err := newCfg.SetBool("take_over.enabled", -1, true); err != nil {
-		return nil, fmt.Errorf("cannot set 'take_over.enabled': %s", err)
+		return nil, fmt.Errorf("cannot set 'take_over.enabled': %w", err)
 	}
 
 	return newCfg, nil
