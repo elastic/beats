@@ -92,13 +92,8 @@ func newAsyncClient(
 		return nil, err
 	}
 
-<<<<<<< HEAD
-	c.connect = func() error {
-		err := c.Client.ConnectContext(context.Background())
-=======
 	c.connect = func(ctx context.Context) error {
 		err := c.ConnectContext(ctx)
->>>>>>> 415d74d69 (fix(libbeat): fix race between Send and Close in Logstash output (#46960))
 		if err == nil {
 			c.client, err = clientFactory(c.Client)
 		}
