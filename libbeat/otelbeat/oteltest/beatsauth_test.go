@@ -182,7 +182,7 @@ func TestKeyPassPhrase(t *testing.T) {
 	certPool.AddCert(caCert.Leaf)
 
 	serverName, metricReader := startTestServer(t, &tls.Config{
-		// NOTE: client certificates are not verified  unless ClientAuth is set to RequireAndVerifyClientCert.
+		// NOTE: client certificates are not verified unless ClientAuth is set to RequireAndVerifyClientCert.
 		ClientAuth:   tls.RequireAndVerifyClientCert,
 		ClientCAs:    certPool,
 		Certificates: []tls.Certificate{serverCerts},
