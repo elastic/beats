@@ -53,6 +53,107 @@ func TestTranslateCfgAllLogInputConfigs(t *testing.T) {
 	}
 }
 
+func TestConvertHandlesFileIdentityCorrectly(t *testing.T) {
+	testCases := map[string]struct {
+		logYamlCfg      string
+		expectedJsonCfg string
+	}{
+		"file_identity is not set": {
+			logYamlCfg: `
+id: foo
+paths:
+  - /tmp/foo
+`,
+			expectedJsonCfg: `
+		{
+		  "file_identity": {
+		    "native": null
+		  },
+		  "id": "foo",
+		  "paths": [
+		    "/tmp/foo"
+		  ],
+		  "prospector": {
+		    "scanner": {
+		      "fingerprint": {
+		        "enabled": false
+		      }
+		    }
+		  },
+		  "take_over": {
+		    "enabled": true
+		  },
+		  "type": "filestream"
+		}
+		`,
+		},
+		"file_identiy is non default": {
+			logYamlCfg: `
+id: foo
+paths:
+   - /tmp/foo
+file_identity.path: ~
+`,
+			expectedJsonCfg: `
+		{
+		  "file_identity": {
+		    "path": null
+		  },
+		  "id": "foo",
+		  "paths": [
+		    "/tmp/foo"
+		  ],
+		  "prospector": {
+		    "scanner": {
+		      "fingerprint": {
+		        "enabled": false
+		      }
+		    }
+		  },
+		  "take_over": {
+		    "enabled": true
+		  },
+		  "type": "filestream"
+		}
+		`,
+		},
+		"file_identiy is fingerprint": {
+			logYamlCfg: `
+id: foo
+paths:
+ - /tmp/foo
+file_identity.fingerprint: ~
+`,
+			expectedJsonCfg: `
+{
+  "file_identity": {
+    "fingerprint": null
+  },
+  "id": "foo",
+  "paths": [
+    "/tmp/foo"
+  ],
+  "take_over": {
+    "enabled": true
+  },
+  "type": "filestream"
+}
+`,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			cfg, err := convertConfig(config.MustNewConfigFrom(tc.logYamlCfg))
+			if err != nil {
+				t.Fatalf("cannot convert Log input config to Filestream: %s", err)
+			}
+
+			validateConfig(t, cfg, tc.expectedJsonCfg)
+		})
+	}
+}
+
 func validateConfig(t *testing.T, cfg *config.C, expected string) {
 	t.Helper()
 

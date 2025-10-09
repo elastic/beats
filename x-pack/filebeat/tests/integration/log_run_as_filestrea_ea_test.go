@@ -48,7 +48,7 @@ func TestLogInputRunAsFilestreamEA(t *testing.T) {
 		},
 	}
 
-	workingUnit := proto.UnitExpected{
+	input := proto.UnitExpected{
 		Id:             "log-input",
 		Type:           proto.UnitType_INPUT,
 		ConfigStateIdx: 1,
@@ -76,7 +76,7 @@ func TestLogInputRunAsFilestreamEA(t *testing.T) {
 
 	units := []*proto.UnitExpected{
 		&output,
-		&workingUnit,
+		&input,
 	}
 	server := &mock.StubServerV2{
 		// The Beat will call the check-in function multiple times:
@@ -116,10 +116,6 @@ func TestLogInputRunAsFilestreamEA(t *testing.T) {
 	for i, ev := range events {
 		if ev.Input.Type != "log" {
 			t.Errorf("Event %d expecting type 'log', got %q", i, ev.Input.Type)
-		}
-
-		if len(ev.Log.File.Fingerprint) == 0 {
-			t.Errorf("Event %d fingerprint cannot be empty", i)
 		}
 	}
 }

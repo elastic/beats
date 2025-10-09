@@ -262,6 +262,32 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 		// TODO: handle existing parsers
 	}
 
+	// Handle file identity
+	//  - If no file identity is set, default to 'native'
+	//  - If file identity is set, keep it as is
+	//  - If file identity is NOT fingerprint, disable fingerprint
+	//    in the scanner
+	disableFingeprint := true
+	if !cfg.HasField("file_identity") {
+		err := newCfg.SetChild("file_identity.native", -1, config.NewConfig())
+		if err != nil {
+			return nil, fmt.Errorf("cannot set 'file_identity.native': %w", err)
+		}
+	} else {
+		has, err := cfg.Has("file_identity.fingerprint", -1)
+		if err != nil {
+			return nil, fmt.Errorf("cannot read 'file_identity.fingerprint': %s", err)
+		}
+		disableFingeprint = !has
+	}
+
+	if disableFingeprint {
+		err := newCfg.SetBool("prospector.scanner.fingerprint.enabled", -1, false)
+		if err != nil {
+			return nil, fmt.Errorf("cannot set 'prospector.scanner.fingerprint.enalbed': %w", err)
+		}
+	}
+
 	// Add final fields
 	if err := newCfg.SetString("type", -1, "filestream"); err != nil {
 		return nil, fmt.Errorf("cannot set 'type': %w", err)

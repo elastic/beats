@@ -21,6 +21,9 @@
   "exclude_lines": [
     "foo-exclude"
   ],
+  "file_identity": {
+    "native": null
+  },
   "harvester_limit": 10000,
   "id": "foo",
   "ignore_inactive": "since_last_start",
@@ -61,6 +64,9 @@
       "exclude_files": [
         "excluded-file glob goes here"
       ],
+      "fingerprint": {
+        "enabled": false
+      },
       "recursive_glob": false,
       "symlinks": true
     }
