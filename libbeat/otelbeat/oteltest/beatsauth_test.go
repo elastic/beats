@@ -784,7 +784,7 @@ func getClientCerts(t *testing.T, caCert tls.Certificate, passphrase string) (ce
 		if err = os.WriteFile(clientKeyPath, pem.EncodeToMemory(&pem.Block{
 			Type:  "ENCRYPTED PRIVATE KEY",
 			Bytes: clientKey,
-		}), 0o777); err != nil {
+		}), 0400); err != nil {
 			t.Fatalf("could not write client key to file")
 		}
 	} else {
@@ -795,7 +795,7 @@ func getClientCerts(t *testing.T, caCert tls.Certificate, passphrase string) (ce
 		if err = os.WriteFile(clientKeyPath, pem.EncodeToMemory(&pem.Block{
 			Type:  "RSA PRIVATE KEY",
 			Bytes: clientKey,
-		}), 0o777); err != nil {
+		}), 0400); err != nil {
 			t.Fatalf("could not write client key to file")
 		}
 	}
@@ -803,7 +803,7 @@ func getClientCerts(t *testing.T, caCert tls.Certificate, passphrase string) (ce
 	if err = os.WriteFile(clientCertPath, pem.EncodeToMemory(&pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: clientCerts.Leaf.Raw,
-	}), 0o777); err != nil {
+	}), 0400); err != nil {
 		t.Fatalf("could not write client certificate to file")
 	}
 
