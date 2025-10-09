@@ -36,14 +36,27 @@ var logInputAllYaml string
 //go:embed testdata/filestream-all.json
 var filestreamAllJson string
 
-func TestTranslateCfg(t *testing.T) {
+func TestTranslateCfgAllLogInputConfigs(t *testing.T) {
 	cfg := config.MustNewConfigFrom(logInputAllYaml)
 	newCfg, err := convertConfig(cfg)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("could not convert Log config into Filestream: %s", err)
 	}
 
-	gotJson := config.DebugString(newCfg, false)
+	validateConfig(t, newCfg, filestreamAllJson)
+
+	store := openTestStatestore()
+	p := PluginV2(logp.NewNopLogger(), store)
+	m := p.Manager.(manager)
+	if _, err := m.next.Create(newCfg); err != nil {
+		t.Fatalf("Filestream input cannot be created from config: %s", err)
+	}
+}
+
+func validateConfig(t *testing.T, cfg *config.C, expected string) {
+	t.Helper()
+
+	gotJson := config.DebugString(cfg, false)
 	defer func() {
 		if t.Failed() {
 			t.Log("Final config as JSON:")
@@ -52,20 +65,10 @@ func TestTranslateCfg(t *testing.T) {
 	}()
 	require.JSONEq(
 		t,
-		filestreamAllJson,
+		expected,
 		gotJson,
 		"configuration was not correctly converted from Log to Filestream",
 	)
-
-	store := openTestStatestore()
-	newCfg.SetBool("run_as_filestream", -1, true)
-	newCfg.SetString("type", -1, "filestream")
-	p := PluginV2(logp.NewNopLogger(), store)
-	m := p.Manager.(manager)
-
-	if _, err := m.next.Create(newCfg); err != nil {
-		t.Fatalf("Filestream input cannot be created from config: %s", err)
-	}
 }
 
 var _ statestore.States = (*testInputStore)(nil)
