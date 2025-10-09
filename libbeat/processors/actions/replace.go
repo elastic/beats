@@ -91,7 +91,7 @@ func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
 	for _, field := range f.config.Fields {
 		err := f.replaceField(field.Field, field.Pattern, *field.Replacement, event)
 		if err != nil {
-			errMsg := fmt.Errorf("Failed to replace fields in processor: %w", err)
+			errMsg := fmt.Errorf("Failed to replace fields in processor: %w", err) //nolint:staticcheck //Keep old behavior
 			f.log.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
 
 			if f.config.FailOnError {
@@ -115,10 +115,15 @@ func (f *replaceString) replaceField(field string, pattern *regexp.Regexp, repla
 		return fmt.Errorf("could not fetch value for key: %s, Error: %w", field, err)
 	}
 
-	updatedString := pattern.ReplaceAllString(currentValue.(string), replacement)
+	currentValueString, ok := currentValue.(string)
+	if !ok {
+		return fmt.Errorf("value for key: %s is not a string: %v", field, currentValue)
+	}
+
+	updatedString := pattern.ReplaceAllString(currentValueString, replacement)
 	_, err = event.PutValue(field, updatedString)
 	if err != nil {
-		return fmt.Errorf("could not put value: %s: %v, %w", replacement, currentValue, err)
+		return fmt.Errorf("could not put value: %s: %s, %w", replacement, currentValueString, err)
 	}
 	return nil
 }
