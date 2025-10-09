@@ -2,6 +2,8 @@
 navigation_title: "timestamp"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/processor-timestamp.html
+applies_to:
+  stack: beta
 ---
 
 # Timestamp [processor-timestamp]

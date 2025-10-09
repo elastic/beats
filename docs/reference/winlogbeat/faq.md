@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/faq.html
+applies_to:
+  stack: ga
 ---
 
 # Common problems [faq]

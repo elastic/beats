@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/otelmanager"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -32,8 +33,13 @@ import (
 	"github.com/elastic/go-ucfg"
 )
 
+// This is the timeout for the beat's internal publishing pipeline to close when shutting down the receiver. Closing
+// requires flushing the event queue, and if this doesn't happen within the timeout, data may be lost depending on
+// input type.
+const receiverPublisherCloseTimeout = 5 * time.Second
+
 // NewBeatForReceiver creates a Beat that will be used in the context of an otel receiver
-func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, useDefaultProcessors bool, consumer consumer.Logs, core zapcore.Core) (*instance.Beat, error) {
+func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, useDefaultProcessors bool, consumer consumer.Logs, componentID string, core zapcore.Core) (*instance.Beat, error) {
 	b, err := instance.NewBeat(settings.Name,
 		settings.IndexPrefix,
 		settings.Version,
@@ -43,6 +49,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, err
 	}
 
+	b.Info.ComponentID = componentID
 	b.Info.LogConsumer = consumer
 
 	// begin code similar to configure
@@ -64,13 +71,29 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	cfg := (*config.C)(tmp)
-	if err := instance.InitPaths(cfg); err != nil {
-		return nil, fmt.Errorf("error initializing paths: %w", err)
+	if settings.Name == "filebeat" {
+		partialConfig := struct {
+			Path paths.Path `config:"path"`
+		}{}
+
+		if err := cfg.Unpack(&partialConfig); err != nil {
+			return nil, fmt.Errorf("error extracting default paths: %w", err)
+		}
+		p := paths.New()
+		if err := p.InitPaths(&partialConfig.Path); err != nil {
+			return nil, fmt.Errorf("error initializing default paths: %w", err)
+		}
+		b.Paths = p
+	} else {
+		if err := instance.InitPaths(cfg); err != nil {
+			return nil, fmt.Errorf("error initializing paths: %w", err)
+		}
+		b.Paths = paths.Paths
 	}
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
-	store, err := instance.LoadKeystore(cfg, b.Info.Beat)
+	store, err := instance.LoadKeystore(cfg, b.Info.Beat, b.Paths)
 	if err != nil {
 		return nil, fmt.Errorf("could not initialize the keystore: %w", err)
 	}
@@ -152,9 +175,9 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	// log paths values to help with troubleshooting
-	logger.Infof("%s", paths.Paths.String())
+	logger.Infof("%s", b.Paths.String())
 
-	metaPath := paths.Resolve(paths.Data, "meta.json")
+	metaPath := b.Paths.Resolve(paths.Data, "meta.json")
 	err = b.LoadMeta(metaPath)
 	if err != nil {
 		return nil, fmt.Errorf("error loading meta data: %w", err)
@@ -181,8 +204,12 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		b.Info.FQDN = fqdn
 	}
 
+	// register NewOtelManager
+	management.SetManagerFactory(otelmanager.NewOtelManager)
+
 	// initialize config manager
-	m, err := management.NewManager(b.Config.Management, b.Registry)
+	oCfg, _ := cfg.Child("management.otel", -1)
+	m, err := management.NewManager(oCfg, b.Registry, logger)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new manager: %w", err)
 	}
@@ -260,6 +287,8 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	pipelineSettings := pipeline.Settings{
 		Processors:     b.GetProcessors(),
 		InputQueueSize: b.InputQueueSize,
+		WaitCloseMode:  pipeline.WaitOnPipelineCloseThenForce,
+		WaitClose:      receiverPublisherCloseTimeout,
 	}
 	publisher, err := pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, pipelineSettings)
 	if err != nil {

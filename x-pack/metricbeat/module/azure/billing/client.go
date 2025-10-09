@@ -32,15 +32,15 @@ type Usage struct {
 }
 
 // NewClient builds a new client for the azure billing service
-func NewClient(config azure.Config) (*Client, error) {
-	usageService, err := NewService(config)
+func NewClient(config azure.Config, logger *logp.Logger) (*Client, error) {
+	usageService, err := NewService(config, logger)
 	if err != nil {
 		return nil, err
 	}
 	client := &Client{
 		BillingService: usageService,
 		Config:         config,
-		Log:            logp.NewLogger("azure billing client"),
+		Log:            logger.Named("azure billing client"),
 	}
 	return client, nil
 }

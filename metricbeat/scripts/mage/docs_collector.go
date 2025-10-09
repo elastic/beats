@@ -20,6 +20,7 @@ package mage
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -35,10 +36,14 @@ import (
 
 // moduleData provides module-level data that will be used to populate the module list
 type moduleData struct {
-	Path       string
-	Base       string
-	Title      string `yaml:"title"`
-	Release    string `yaml:"release"`
+	Path    string
+	Base    string
+	Title   string      `yaml:"title"`
+	Release string      `yaml:"release"`
+	Version versionData `yaml:"version"`
+	// Compile all info from `Version` into a single
+	// string to be passed to docs-builder's `applies_to`
+	Applies_to string
 	Dashboards bool
 	Settings   []string `yaml:"settings"`
 	CfgFile    string
@@ -48,13 +53,27 @@ type moduleData struct {
 }
 
 type metricsetData struct {
-	Doc        string
-	Title      string
-	Link       string
-	Release    string
+	Doc     string
+	Title   string
+	Link    string
+	Release string
+	Version versionData
+	// Compile all info from `Version` into a single
+	// string to be passed to docs-builder's `applies_to`
+	Applies_to string
 	DataExists bool
 	Data       string
 	IsDefault  bool
+}
+
+// Allow all product lifecycles to apply to a single
+// section or field
+type versionData struct {
+	Preview    string
+	Beta       string
+	Ga         string
+	Deprecated string
+	Removed    string
 }
 
 func writeTemplate(filename string, t *template.Template, args interface{}) error {
@@ -92,6 +111,16 @@ func checkXpack(path string) bool {
 
 }
 
+// setupDirectory clears and re-creates the docs/modules directory.
+func setupDirectory() error {
+	docpath := mage.OSSBeatDir("docs/modules")
+	err := os.RemoveAll(docpath)
+	if err != nil {
+		return err
+	}
+	return os.MkdirAll(docpath, 0755)
+}
+
 // getRelease gets the release tag, and errors out if one doesn't exist.
 func getRelease(rel string) (string, error) {
 	switch rel {
@@ -100,8 +129,13 @@ func getRelease(rel string) (string, error) {
 	case "":
 		return "", fmt.Errorf("Missing a release string")
 	default:
-		return "", fmt.Errorf("unknown release tag %s", rel)
+		return "ga", fmt.Errorf("unknown release tag %s", rel)
 	}
+}
+
+// createDocsPath creates the path for the entire docs/ folder
+func createDocsPath(module string) error {
+	return os.MkdirAll(mage.OSSBeatDir("docs/modules", module), 0755)
 }
 
 // testIfDocsInDir tests for a `_meta/docs.md` in a given directory
@@ -165,7 +199,10 @@ func loadModuleFields(file string) (moduleData, error) {
 	if err != nil {
 		return mod[0], fmt.Errorf("file %s is missing a release string: %w", file, err)
 	}
+	applies_to, err := getVersion(fd)
+
 	module.Release = rel
+	module.Applies_to = applies_to
 
 	return module, nil
 }
@@ -190,6 +227,52 @@ func getReleaseState(metricsetPath string) (string, error) {
 		return "", fmt.Errorf("metricset %s is missing a release tag: %w", metricsetPath, err)
 	}
 	return relString, nil
+}
+
+// Get `version` from `fields.yml` to be used in `applies_to`.
+// NOTE: I just copied and adjusted the `getReleaseState` function
+// above. I'm sure this could be improved!
+func getVersion(raw []byte) (string, error) {
+
+	type metricset struct {
+		Version versionData `yaml:"version"`
+		Release string      `yaml:"release"`
+		Path    string
+	}
+	var rel []metricset
+	yaml.Unmarshal(raw, &rel)
+	// Build the applies_to string: a comma-separated list
+	// of all available lifecycles and versions
+	// NOTE: There's almost certainly a more efficient way
+	// to accomplish this.
+	var versions []string
+	if rel[0].Version.Removed != "" {
+		versions = append(versions, fmt.Sprintf("removed %s", rel[0].Version.Removed))
+	}
+	if rel[0].Version.Deprecated != "" {
+		versions = append(versions, fmt.Sprintf("deprecated %s", rel[0].Version.Deprecated))
+	}
+	if rel[0].Version.Ga != "" {
+		versions = append(versions, fmt.Sprintf("ga %s", rel[0].Version.Ga))
+	}
+	if rel[0].Version.Beta != "" {
+		versions = append(versions, fmt.Sprintf("beta %s", rel[0].Version.Beta))
+	}
+	if rel[0].Version.Preview != "" {
+		versions = append(versions, fmt.Sprintf("preview %s", rel[0].Version.Preview))
+	}
+	// If there's no version specified, check if there's
+	// a release state and use that instead
+	if len(versions) == 0 {
+		relString, err := getRelease(rel[0].Release)
+		if err != nil {
+			return "", fmt.Errorf("metricset %s is missing a release tag: %w", rel[0].Path, err)
+		}
+		return relString, nil
+	} else {
+		applies_to := strings.Join(versions, ", ")
+		return applies_to, nil
+	}
 }
 
 // hasDashboards checks to see if the metricset has dashboards
@@ -217,7 +300,7 @@ func getConfigfile(modulePath string) (string, error) {
 		return "", fmt.Errorf("could not find a config file in %s", modulePath)
 	}
 
-	raw, err := os.ReadFile(goodPath)
+	raw, err := ioutil.ReadFile(goodPath)
 	return strings.TrimSpace(string(raw)), err
 
 }
@@ -243,6 +326,11 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 		}
 		metricsetName := filepath.Base(metricset)
 		release, err := getReleaseState(filepath.Join(metricset, "_meta/fields.yml"))
+		raw, err := os.ReadFile(filepath.Join(metricset, "_meta/fields.yml"))
+		if err != nil {
+			return nil, err
+		}
+		applies_to, err := getVersion(raw)
 		if err != nil {
 			return nil, err
 		}
@@ -274,6 +362,7 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 			Doc:        strings.TrimSpace(string(metricsetDoc)),
 			Title:      metricsetName,
 			Release:    release,
+			Applies_to: applies_to,
 			Link:       link,
 			DataExists: hasData,
 			Data:       strings.TrimSpace(string(data)),
@@ -294,7 +383,7 @@ func gatherData(modules []string) ([]moduleData, error) {
 		return nil, fmt.Errorf("error getting default metricsets: %w", err)
 	}
 	moduleList := make([]moduleData, 0)
-	// iterate over all the modules, checking to make sure we have a docs.md file
+	//iterate over all the modules, checking to make sure we have a docs.md file
 	for _, module := range modules {
 
 		isModule := testIfDocsInDir(module)
@@ -302,6 +391,11 @@ func gatherData(modules []string) ([]moduleData, error) {
 			continue
 		}
 		moduleName := filepath.Base(module)
+
+		err := createDocsPath(moduleName)
+		if err != nil {
+			return moduleList, err
+		}
 
 		fieldsm, err := loadModuleFields(filepath.Join(module, "_meta/fields.yml"))
 		if err != nil {
@@ -318,7 +412,7 @@ func gatherData(modules []string) ([]moduleData, error) {
 			return moduleList, err
 		}
 
-		// dump the contents of the module markdown
+		//dump the contents of the module markdown
 		moduleDoc, err := os.ReadFile(filepath.Join(module, "_meta/docs.md"))
 		if err != nil {
 			return moduleList, err
@@ -408,13 +502,10 @@ func writeDocs(modules []moduleData) error {
 		return fmt.Errorf("error writing metricset docs: %w", err)
 	}
 
-	// TODO: Uncomment following when all the asciidocs are converted to markdown
-	// As of now, this will not work and it will generate incomplete list.
-
-	// err = writeModuleList(modules, tmplList)
-	// if err != nil {
-	// 	return fmt.Errorf("error writing module list: %w", err)
-	// }
+	err = writeModuleList(modules, tmplList)
+	if err != nil {
+		return fmt.Errorf("error writing module list: %w", err)
+	}
 
 	return nil
 }
@@ -425,6 +516,12 @@ func writeDocs(modules []moduleData) error {
 // Generate the metricset-level docs
 // All these are 'collected' from the docs.md files under _meta/ in each module & metricset
 func CollectDocs() error {
+
+	//create the docs/modules dir
+	err := setupDirectory()
+	if err != nil {
+		return err
+	}
 	// collect modules that have an asciidoc file
 	beatsModuleGlob := mage.OSSBeatDir("module", "/*/")
 	modules, err := filepath.Glob(beatsModuleGlob)

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/could-not-locate-index-pattern.html
+applies_to:
+  stack: ga
 ---
 
 # Dashboard could not locate the index-pattern [could-not-locate-index-pattern]

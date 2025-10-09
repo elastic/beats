@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/connection-problem.html
+applies_to:
+  stack: ga
 ---
 
 # Logstash connection doesn't work [connection-problem]

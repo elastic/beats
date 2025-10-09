@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-snyk.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Snyk module [filebeat-module-snyk]
 
@@ -225,6 +229,6 @@ This is a list of Snyk Vulnerability fields that are mapped to ECS.
 | issue.severity | vulnerability.severity     |
 | issue.url | vulnerability.reference |
 
-## Fields [_fields_49]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-snyk.md) section.

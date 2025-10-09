@@ -432,7 +432,13 @@ filebeat.inputs:
 
   # Files for the modification data is older than clean_inactive the state from the registry is removed
   # By default this is disabled.
+  # Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
   #clean_inactive: -1
+
+  # Enable this to disable all checks regarding clean_inactive and re-ingest
+  # all data when clean_inactive: 0, effectively keeping the
+  # old behaviour.
+  #legacy_clean_inactive: false
 
   # Removes the state for files which cannot be found on disk anymore immediately
   #clean_removed: true
@@ -537,6 +543,20 @@ filebeat.inputs:
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close.reader.after_interval: 0
 
+  ### File deleting options
+  # Filestream cam delete the file after it has been acknowledged by the output,
+  # has reached EOF or became inactive.
+
+  # Enable deleting the file after the reader is closed
+  # and all events have been ingested.
+  #delete.enabled: false
+
+  # Grace period to wait before trying to remove a file.
+  # If data is added during the grace, deletion is cancelled.
+  # The grace period will re-start next time the close condition
+  # is reached.
+  #delete.grace_period: 30m
+
 #----------------------------- Stdin input -------------------------------
 # Configuration to use stdin input
 #- type: stdin
@@ -569,6 +589,9 @@ filebeat.inputs:
 #- type: udp
   #enabled: false
 
+  # Number of pipeline workers
+  #number_of_workers: 1
+
   # Maximum size of the message received over UDP
   #max_message_size: 10KiB
 
@@ -586,6 +609,9 @@ filebeat.inputs:
 
   # Character used to split new message
   #line_delimiter: "\n"
+
+  # Number of pipeline workers
+  #number_of_workers: 1
 
   # Maximum size in bytes of the message received over TCP
   #max_message_size: 20MiB
@@ -790,6 +816,10 @@ filebeat.inputs:
   # Glob based paths.
   #paths:
     #- /var/log/custom.journal
+
+  # When enabled, log entries will be ingested interleaved from all
+  # available journals, including remote ones.
+  #merge: false
 
   # The position to start reading from the journal, valid options are:
   #  - head: Starts reading at the beginning of the journal.

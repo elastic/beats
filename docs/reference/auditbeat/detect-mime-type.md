@@ -2,6 +2,8 @@
 navigation_title: "detect_mime_type"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/detect-mime-type.html
+applies_to:
+  stack: ga
 ---
 
 # Detect mime type [detect-mime-type]

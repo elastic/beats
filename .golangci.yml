@@ -42,6 +42,10 @@ linters:
           deny:
             - pkg: math/rand$
               desc: superseded by math/rand/v2
+            - pkg: golang.org/x/exp/maps$
+              desc: superseded by maps
+            - pkg: golang.org/x/exp/slices$
+              desc: superseded by slices
     errcheck:
       check-type-assertions: true
       check-blank: false

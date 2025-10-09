@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-logstash.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Logstash module [metricbeat-module-logstash]
 
@@ -34,8 +38,7 @@ When this module is used for {{stack}} Monitoring, it sends metrics to the monit
 ::::
 
 
-
-## Example configuration [_example_configuration_40]
+## Example configuration [_example_configuration]
 
 The Logstash module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -51,12 +54,9 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_46]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [node](/reference/metricbeat/metricbeat-metricset-logstash-node.md)
 * [node_stats](/reference/metricbeat/metricbeat-metricset-logstash-node_stats.md)
-
-
-

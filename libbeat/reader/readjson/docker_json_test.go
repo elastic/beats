@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -346,10 +347,11 @@ func TestDockerJSON(t *testing.T) {
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			r := &mockReader{messages: test.input}
-			json := New(r, test.stream, test.partial, test.format, test.criflags)
+			json := New(r, test.stream, test.partial, test.format, test.criflags, logger)
 			message, err := json.Next()
 
 			if test.expectedError != nil {

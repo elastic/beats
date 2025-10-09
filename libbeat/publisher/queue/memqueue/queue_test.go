@@ -18,10 +18,11 @@
 package memqueue
 
 import (
+	"encoding/binary"
 	"flag"
 	"fmt"
 	"math"
-	"math/rand"
+	"math/rand/v2"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -32,6 +33,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var seed int64
@@ -44,10 +47,13 @@ func TestProduceConsumer(t *testing.T) {
 	maxEvents := 1024
 	minEvents := 32
 
-	randGen := rand.New(rand.NewSource(seed))
-	events := randGen.Intn(maxEvents-minEvents) + minEvents
-	batchSize := randGen.Intn(events-8) + 4
-	bufferSize := randGen.Intn(batchSize*2) + 4
+	var seedBytes [32]byte
+	_, err := binary.Encode(seedBytes[:], binary.NativeEndian, seed)
+	require.NoError(t, err)
+	randGen := rand.New(rand.NewChaCha8(seedBytes))
+	events := randGen.IntN(maxEvents-minEvents) + minEvents
+	batchSize := randGen.IntN(events-8) + 4
+	bufferSize := randGen.IntN(batchSize*2) + 4
 
 	// events := 4
 	// batchSize := 1
@@ -86,7 +92,7 @@ func TestProduceConsumer(t *testing.T) {
 // than 2 events to it, p.Publish will block, once we call q.Close,
 // we ensure the 3rd event was not successfully published.
 func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
-	q := NewQueue(nil, nil,
+	q := NewQueue(logp.NewNopLogger(), nil,
 		Settings{
 			Events:        2, // Queue size
 			MaxGetRequest: 1, // make sure the queue won't buffer events
@@ -139,7 +145,7 @@ func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
 	// has successfully sent a request to the queue, it must wait for
 	// the response unless the queue shuts down, otherwise the pipeline
 	// event totals will be wrong.
-	q.Close()
+	q.Close(false)
 
 	require.Eventually(
 		t,
@@ -156,7 +162,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 
 	var activeEvents atomic.Int64
 
-	q := NewQueue(nil, nil,
+	q := NewQueue(logp.NewNopLogger(), nil,
 		Settings{
 			Events:        3, // Queue size
 			MaxGetRequest: 2,
@@ -223,13 +229,48 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 	// to unblock any helpers and verify that the final active event
 	// count isn't negative.
 	time.Sleep(10 * time.Millisecond)
-	q.Close()
+	q.Close(false)
 	assert.False(t, activeEvents.Load() < 0, "active event count should never be negative")
 }
 
+func TestDoubleClose(t *testing.T) {
+	q := NewQueue(logp.NewNopLogger(), nil,
+		Settings{
+			Events:        3, // Queue size
+			MaxGetRequest: 3,
+			FlushTimeout:  10 * time.Millisecond,
+		}, 1, nil)
+
+	p := q.Producer(queue.ProducerConfig{})
+
+	// Write some events to the queue synchronously
+	for i := 0; i < 3; i++ {
+		event := i
+		_, ok := p.Publish(event)
+		assert.True(t, ok)
+	}
+
+	// Keep writing to the queue as long as we're successful
+	var wgProducer sync.WaitGroup
+	wgProducer.Add(1)
+	go func() {
+		queueOpen := true
+		for queueOpen {
+			_, queueOpen = p.Publish(0)
+		}
+		wgProducer.Done()
+	}()
+
+	// Close the queue without force, then with it enabled
+	// Both should succeed
+	require.NoError(t, q.Close(false))
+	require.NoError(t, q.Close(true))
+	<-q.Done()
+}
+
 func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
-	return func(_ *testing.T) queue.Queue {
-		return NewQueue(nil, nil, Settings{
+	return func(t *testing.T) queue.Queue {
+		return NewQueue(logptest.NewTestingLogger(t, ""), nil, Settings{
 			Events:        sz,
 			MaxGetRequest: minEvents,
 			FlushTimeout:  flushTimeout,
@@ -272,7 +313,7 @@ func TestBatchFreeEntries(t *testing.T) {
 	// 4. Make sure only events 6-10 are nil
 	// 5. Call FreeEntries on the first batch
 	// 6. Make sure all events are nil
-	testQueue := NewQueue(nil, nil, Settings{Events: queueSize, MaxGetRequest: batchSize, FlushTimeout: time.Second}, 0, nil)
+	testQueue := NewQueue(logp.NewNopLogger(), nil, Settings{Events: queueSize, MaxGetRequest: batchSize, FlushTimeout: time.Second}, 0, nil)
 	producer := testQueue.Producer(queue.ProducerConfig{})
 	for i := 0; i < queueSize; i++ {
 		_, ok := producer.Publish(i)

@@ -16,16 +16,17 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/salesforce"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States) []v2.Plugin {
+func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States, path *paths.Path) []v2.Plugin {
 	return []v2.Plugin{
-		entityanalytics.Plugin(log),
-		http_endpoint.Plugin(),
+		entityanalytics.Plugin(log, path),
+		http_endpoint.Plugin(log),
 		httpjson.Plugin(log, store),
 		o365audit.Plugin(log, store),
-		awss3.Plugin(store),
-		lumberjack.Plugin(),
+		awss3.Plugin(log, store, path),
+		lumberjack.Plugin(log),
 		salesforce.Plugin(log, store),
 	}
 }

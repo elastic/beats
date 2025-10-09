@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-misp.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # MISP module [filebeat-module-misp]
 
@@ -38,8 +42,6 @@ This module comes with a sample dashboard. For example:
 % TO DO: Use `:class: screenshot`
 ![kibana misp](images/kibana-misp.png)
 
-
-## Fields [_fields_30]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-misp.md) section.
-

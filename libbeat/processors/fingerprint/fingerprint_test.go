@@ -484,8 +484,7 @@ func BenchmarkHashMethods(b *testing.B) {
 			"method": method,
 		})
 
-		logger, _ := logp.NewDevelopmentLogger(" ")
-		p, _ := New(testConfig, logger)
+		p, _ := New(testConfig, logp.NewNopLogger())
 
 		b.Run(method, func(b *testing.B) {
 			b.ResetTimer()

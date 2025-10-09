@@ -2,6 +2,8 @@
 navigation_title: "ETW"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-etw.html
+applies_to:
+  stack: ga
 ---
 
 # ETW input [filebeat-input-etw]
@@ -139,6 +141,103 @@ Run `logman query providers "<provider.name>"` to list the available keywords fo
 ### `session` [_session]
 
 Names an existing ETW session to read from. Existing sessions can be listed using `logman query -ets`.
+
+### `enable_property` [_enable_property]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+A [list of ETW session properties to enable](https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-enable_trace_parameters). These properties control advanced session behavior. See [EnableTraceEx2 documentation](https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-enabletraceex2) for details.
+
+Example:
+
+```yaml
+filebeat.inputs:
+- type: etw
+  enable_property:
+    - EVENT_ENABLE_PROPERTY_SID
+    - EVENT_ENABLE_PROPERTY_STACK
+```
+
+
+
+### `event_filter` [_event_filter]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+Configures event-level filtering for ETW providers using the [EVENT_FILTER_TYPE_EVENT_ID](https://learn.microsoft.com/en-us/windows/win32/api/evntprov/ns-evntprov-event_filter_descriptor) mechanism. This option allows you to specify a list of event IDs to include or exclude from the trace session.
+
+Example:
+
+```yaml
+filebeat.inputs:
+- type: etw
+  event_filter:
+    event_ids: [1, 2, 3]
+    filter_in: true   # Only include these event IDs
+```
+
+```yaml
+filebeat.inputs:
+- type: etw
+  event_filter:
+    event_ids: [10, 11]
+    filter_in: false  # Exclude these event IDs
+```
+
+
+### `buffer_size` [_buffer_size]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+Sets the size (in KB) of each buffer used by the ETW session. Default is 64 KB. Larger buffers may improve performance for high-volume event sources.
+
+Example:
+
+```yaml
+filebeat.inputs:
+- type: etw
+  buffer_size: 128
+```
+
+
+### `minimum_buffers` [_minimum_buffers]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+Sets the minimum number of buffers allocated for the ETW session. Increasing this value can help prevent data loss under heavy load.
+
+Example:
+
+```yaml
+filebeat.inputs:
+- type: etw
+  minimum_buffers: 8
+```
+
+
+### `maximum_buffers` [_maximum_buffers]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+Sets the maximum number of buffers allocated for the ETW session. This limits memory usage for the session.
+
+Example:
+
+```yaml
+filebeat.inputs:
+- type: etw
+  maximum_buffers: 256
+```
 
 
 ## Common options [filebeat-input-etw-common-options]

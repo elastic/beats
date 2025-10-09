@@ -2,6 +2,8 @@
 navigation_title: "Configure"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/configuring-howto-heartbeat.html
+applies_to:
+  stack: ga
 ---
 
 # Configure Heartbeat [configuring-howto-heartbeat]

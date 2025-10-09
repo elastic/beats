@@ -24,7 +24,7 @@ type AppInsightsService struct {
 }
 
 // NewService instantiates the Azure monitoring service
-func NewService(config Config) (*AppInsightsService, error) {
+func NewService(config Config, logger *logp.Logger) (*AppInsightsService, error) {
 	metricsClient := insights.NewMetricsClient()
 	metricsClient.Authorizer = autorest.NewAPIKeyAuthorizerWithHeaders(map[string]interface{}{
 		"x-api-key": config.ApiKey,
@@ -32,7 +32,7 @@ func NewService(config Config) (*AppInsightsService, error) {
 	service := &AppInsightsService{
 		metricsClient: &metricsClient,
 		context:       context.Background(),
-		log:           logp.NewLogger("app insights service"),
+		log:           logger.Named("app insights service"),
 	}
 	return service, nil
 }

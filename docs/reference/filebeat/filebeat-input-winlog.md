@@ -2,6 +2,8 @@
 navigation_title: "winlog"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-winlog.html
+applies_to:
+  stack: beta
 ---
 
 # winlog input [filebeat-input-winlog]
@@ -247,6 +249,29 @@ Example:
 ```
 
 * This can have a significant impact on performance that can vary depending on your system specs.
+
+
+### `ignore_missing_channel` [_ignore_missing_channel]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+Boolean option that controls whether Winlogbeat should ignore missing event log channels and continue monitoring other configured channels. When set to `true`, if a specified event log channel doesn't exist or cannot be accessed, Winlogbeat will log a warning and continue processing other event logs instead of stopping with an error. The default is `true`.
+
+This option is useful when deploying Winlogbeat configurations across multiple systems where certain event log channels may not be available on all machines, or when monitoring optional channels that may not always be present.
+
+Example:
+
+```yaml
+winlogbeat.event_logs:
+  - name: Application
+  - name: System 
+  - name: Sysmon
+    ignore_missing_channel: false
+```
+
+In this example, if the Sysmon channel is missing, Winlogbeat will stop with an error, which may be desired for critical monitoring components.
 
 
 ### `tags` [_tags_29]

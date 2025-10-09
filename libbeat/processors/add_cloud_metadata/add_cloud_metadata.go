@@ -64,13 +64,13 @@ func New(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, fmt.Errorf("failed to unpack add_cloud_metadata config: %w", err)
 	}
 
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, log)
 	if err != nil {
 		return nil, fmt.Errorf("TLS configuration load: %w", err)
 	}
 
 	initProviders := selectProviders(config.Providers, cloudMetaProviders)
-	fetchers, err := setupFetchers(initProviders, c)
+	fetchers, err := setupFetchers(initProviders, c, log)
 	if err != nil {
 		return nil, err
 	}

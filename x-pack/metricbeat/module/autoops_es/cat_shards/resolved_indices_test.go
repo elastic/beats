@@ -15,12 +15,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricset"
 )
 
-func TestGetResolvedIndicesError(t *testing.T) {
-	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/cat_shards.*.json", setupResolveErrorServer, useNamedMetricSet, func(t *testing.T, data metricset.FetcherData[[]JSONShard]) {
-		require.ErrorContains(t, data.Error, "failed to load resolved index details")
-	})
-}
-
 func TestGetResolvedIndicesReturnsResponse(t *testing.T) {
 	metricset.RunTestsForFetcherWithGlobFiles(t, "./_meta/test/cat_shards.*.json", setupSuccessfulServer, useNamedMetricSet, func(t *testing.T, data metricset.FetcherData[[]JSONShard]) {
 		require.NoError(t, data.Error)

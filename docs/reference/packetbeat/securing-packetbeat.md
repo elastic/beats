@@ -2,6 +2,8 @@
 navigation_title: "Secure"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/securing-packetbeat.html
+applies_to:
+  stack: ga
 ---
 
 # Secure Packetbeat [securing-packetbeat]

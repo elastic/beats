@@ -2,6 +2,8 @@
 navigation_title: "Use {{metricbeat}} collection"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/monitoring-metricbeat-collection.html
+applies_to:
+  stack: ga
 ---
 
 # Use {{metricbeat}} to send monitoring data [monitoring-metricbeat-collection]

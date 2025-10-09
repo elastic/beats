@@ -323,7 +323,7 @@ func TestEventNormalizationOverride(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		builder, err := newBuilder(beat.Info{}, logp.NewLogger(""), nil, mapstr.EventMetadata{}, nil, tc.skipNormalize, false)
+		builder, err := newBuilder(beat.Info{}, logp.NewNopLogger(), nil, mapstr.EventMetadata{}, nil, tc.skipNormalize, false)
 		require.NoError(t, err)
 
 		processor, err := builder.Create(beat.ProcessingConfig{EventNormalization: tc.normalizeOverride}, false)

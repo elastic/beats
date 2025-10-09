@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-modules.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -11,5 +13,5 @@ This section contains detailed information about the metric collecting modules c
 
 * [Auditd](/reference/auditbeat/auditbeat-module-auditd.md)
 * [File Integrity](/reference/auditbeat/auditbeat-module-file_integrity.md)
-* [System](/reference/auditbeat/auditbeat-module-system.md)
+* [System](/reference/auditbeat/auditbeat-module-system.md) {applies_to}`stack: beta`
 

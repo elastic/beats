@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-cpu.html
+applies_to:
+  stack: ga
 ---
 
 # Filebeat is using too much CPU [filebeat-cpu]

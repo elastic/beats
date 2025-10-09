@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -54,13 +55,13 @@ type fakeReportingFetcher struct {
 	mb.BaseMetricSet
 }
 
-func (ms *fakeReportingFetcher) Fetch(r mb.Reporter) {
+func (ms *fakeReportingFetcher) Fetch(r mb.ReporterV2) {
 	t, _ := time.Parse(time.RFC3339, "2016-05-10T23:27:58.485Z")
-	r.Event(mapstr.M{"@timestamp": common.Time(t), "metric": 1})
+	r.Event(mb.TransformMapStrToEvent(ms.Module().Name(), mapstr.M{"@timestamp": common.Time(t), "metric": 1}, nil))
 }
 
 func newFakeReportingFetcher(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	var r mb.ReportingMetricSet = &fakeReportingFetcher{BaseMetricSet: base}
+	var r mb.ReportingMetricSetV2 = &fakeReportingFetcher{BaseMetricSet: base}
 	return r, nil
 }
 
@@ -70,15 +71,15 @@ type fakePushMetricSet struct {
 	mb.BaseMetricSet
 }
 
-func (ms *fakePushMetricSet) Run(r mb.PushReporter) {
+func (ms *fakePushMetricSet) Run(r mb.PushReporterV2) {
 	t, _ := time.Parse(time.RFC3339, "2016-05-10T23:27:58.485Z")
 	event := mapstr.M{"@timestamp": common.Time(t), "metric": 1}
-	r.Event(event)
+	r.Event(mb.TransformMapStrToEvent(ms.Module().Name(), event, nil))
 	<-r.Done()
 }
 
 func newFakePushMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	var r mb.PushMetricSet = &fakePushMetricSet{BaseMetricSet: base}
+	var r mb.PushMetricSetV2 = &fakePushMetricSet{BaseMetricSet: base}
 	return r, nil
 }
 
@@ -236,10 +237,10 @@ func TestNewWrapperForMetricSet(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""))
+	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t), logp.NewNopLogger())
 	require.NoError(t, err)
 
-	m, err := module.NewWrapperForMetricSet(aModule, metricSets[0], beat.NewMonitoring(), module.WithMetricSetInfo())
+	m, err := module.NewWrapperForMetricSet(aModule, metricSets[0], beat.NewMonitoring(), logp.NewNopLogger(), module.WithMetricSetInfo())
 	require.NoError(t, err)
 
 	done := make(chan struct{})

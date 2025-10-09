@@ -2,6 +2,8 @@
 navigation_title: "add_kubernetes_metadata"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/add-kubernetes-metadata.html
+applies_to:
+  stack: ga
 ---
 
 # Add Kubernetes metadata [add-kubernetes-metadata]
@@ -53,7 +55,7 @@ The configuration below enables the processor on a Beat running as a process on 
 ```yaml
 processors:
   - add_kubernetes_metadata:
-      host: <hostname>
+      node: <kubernetes_node_name>
       # If kube_config is not set, KUBECONFIG environment variable will be checked
       # and if not present it will fall back to InCluster
       kube_config: $Packetbeat Reference/.kube/config
@@ -72,7 +74,7 @@ The configuration below has the default indexers and matchers disabled and enabl
 ```yaml
 processors:
   - add_kubernetes_metadata:
-      host: <hostname>
+      node: <kubernetes_node_name>
       # If kube_config is not set, KUBECONFIG environment variable will be checked
       # and if not present it will fall back to InCluster
       kube_config: ~/.kube/config
@@ -89,7 +91,7 @@ processors:
 
 The `add_kubernetes_metadata` processor has the following configuration settings:
 
-`host`
+`node`
 :   (Optional) Specify the node to scope packetbeat to in case it cannot be accurately detected, as when running packetbeat in host network mode.
 
 `scope`

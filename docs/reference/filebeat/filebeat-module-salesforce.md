@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-salesforce.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Salesforce module [filebeat-module-salesforce]
 
@@ -43,5 +47,6 @@ The default interval for collecting logs (`var.real_time_interval` or `var.elf_i
 
 ::::
 
+## Fields [_fields]
 
-
+For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-salesforce.md) section.

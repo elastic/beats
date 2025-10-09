@@ -2,6 +2,8 @@
 navigation_title: "{{ech}}"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/configure-cloud-id.html
+applies_to:
+  stack: ga
 ---
 
 # Configure the output for {{ech}} [configure-cloud-id]

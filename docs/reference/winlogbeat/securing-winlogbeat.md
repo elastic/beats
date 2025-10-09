@@ -2,6 +2,8 @@
 navigation_title: "Secure"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/securing-winlogbeat.html
+applies_to:
+  stack: ga
 ---
 
 # Secure Winlogbeat [securing-winlogbeat]

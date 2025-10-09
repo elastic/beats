@@ -71,7 +71,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches disk IO metrics from the OS.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	stats, err := diskio.IOCounters(m.includeDevices...)
+	stats, err := diskio.IOCounters(m.Logger(), m.includeDevices...)
 	if err != nil {
 		return fmt.Errorf("disk io counters: %w", err)
 	}
@@ -80,7 +80,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	err = m.statistics.OpenSampling()
 	// CPU sampling does not seem to be used by any of the diskio metrics we're using. Mostly used by iostat.
 	if err != nil {
-		m.Logger().Warnf("Error in CPU sampling for diskio: %w", err)
+		m.Logger().Warnf("Error in CPU sampling for diskio: %v", err)
 	}
 
 	// Store the last cpu counter when finished

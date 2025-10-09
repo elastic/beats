@@ -22,7 +22,6 @@ package look
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/reason"
@@ -56,12 +55,6 @@ func Reason(err error) mapstr.M {
 		return reason.Fail(r)
 	}
 	return reason.FailIO(err)
-}
-
-// Timestamp converts an event timestamp into an compatible event timestamp for
-// reporting.
-func Timestamp(t time.Time) common.Time {
-	return common.Time(t)
 }
 
 // Status creates a service status message from an error value.

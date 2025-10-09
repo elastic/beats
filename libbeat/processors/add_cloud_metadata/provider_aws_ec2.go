@@ -92,8 +92,9 @@ func fetchRawProviderMetadata(
 	ctx context.Context,
 	client http.Client,
 	result *result,
+	logger *logp.Logger,
 ) {
-	logger := logp.NewLogger("add_cloud_metadata")
+	logger = logger.Named("add_cloud_metadata")
 
 	// generate AWS specific client with overriding requirements
 	var awsHTTPClient awshttp.BuildableClient

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-kubernetes-metadata-error-extracting-container-id.html
+applies_to:
+  stack: ga
 ---
 
 # Error extracting container id while using Kubernetes metadata [filebeat-kubernetes-metadata-error-extracting-container-id]

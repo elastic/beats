@@ -24,6 +24,7 @@ import (
 type azurebsInput struct {
 	config     config
 	serviceURL string
+	logger     *logp.Logger
 }
 
 // defines the valid range for Unix timestamps for 64 bit integers
@@ -52,7 +53,7 @@ func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	}
 }
 
-func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
+func configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
@@ -62,7 +63,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	var sources []cursor.Source
 	// This is to maintain backward compatibility with the old config.
 	if config.BatchSize == 0 {
-		config.BatchSize = *config.MaxWorkers
+		config.BatchSize = config.MaxWorkers
 	}
 	for _, c := range config.Containers {
 		container := tryOverrideOrDefault(config, c)
@@ -80,6 +81,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 			ExpandEventListFromField: container.ExpandEventListFromField,
 			FileSelectors:            container.FileSelectors,
 			ReaderConfig:             container.ReaderConfig,
+			PathPrefix:               container.PathPrefix,
 		})
 	}
 
@@ -92,7 +94,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	} else {
 		urL = "https://" + config.AccountName + ".blob.core.windows.net/"
 	}
-	return sources, &azurebsInput{config: config, serviceURL: urL}, nil
+	return sources, &azurebsInput{config: config, serviceURL: urL, logger: logger}, nil
 }
 
 // tryOverrideOrDefault, overrides global values with local
@@ -101,8 +103,8 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 func tryOverrideOrDefault(cfg config, c container) container {
 	if c.MaxWorkers == nil {
 		maxWorkers := 1
-		if cfg.MaxWorkers != nil {
-			maxWorkers = *cfg.MaxWorkers
+		if cfg.MaxWorkers != 0 {
+			maxWorkers = cfg.MaxWorkers
 		}
 		c.MaxWorkers = &maxWorkers
 	}
@@ -155,6 +157,11 @@ func tryOverrideOrDefault(cfg config, c container) container {
 		c.ReaderConfig = cfg.ReaderConfig
 	}
 
+	// If the container level PathPrefix is empty, use the global PathPrefix.
+	if c.PathPrefix == "" {
+		c.PathPrefix = cfg.PathPrefix
+	}
+
 	return c
 }
 
@@ -197,9 +204,8 @@ func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state
 	log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container_name", currentSource.ContainerName)
 	log.Infof("Running azure blob storage for account: %s", input.config.AccountName)
 	// create a new inputMetrics instance
-	metrics := newInputMetrics(inputCtx.ID+":"+currentSource.ContainerName, nil)
+	metrics := newInputMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
 	metrics.url.Set(input.serviceURL + currentSource.ContainerName)
-	defer metrics.Close()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {

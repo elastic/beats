@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -254,7 +255,7 @@ func TestManagerV2(t *testing.T) {
 
 	m, err := NewV2AgentManagerWithClient(&Config{
 		Enabled: true,
-	}, r, client)
+	}, r, client, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	err = m.Start()
@@ -388,7 +389,7 @@ func TestManagerV2_ReloadCount(t *testing.T) {
 
 	m, err := NewV2AgentManagerWithClient(&Config{
 		Enabled: true,
-	}, r, client)
+	}, r, client, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	err = m.Start()
@@ -505,6 +506,7 @@ func TestOutputError(t *testing.T) {
 		},
 		r,
 		client,
+		logptest.NewTestingLogger(t, ""),
 	)
 	if err != nil {
 		t.Fatalf("could not instantiate ManagerV2: %s", err)
@@ -672,6 +674,7 @@ func TestErrorPerUnit(t *testing.T) {
 		},
 		r,
 		client,
+		logptest.NewTestingLogger(t, ""),
 	)
 	if err != nil {
 		t.Fatalf("could not instantiate ManagerV2: %s", err)

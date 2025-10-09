@@ -2,6 +2,8 @@
 navigation_title: "Multiline messages"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/multiline-examples.html
+applies_to:
+  stack: ga
 ---
 
 # Manage multiline messages [multiline-examples]

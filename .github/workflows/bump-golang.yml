@@ -20,7 +20,7 @@ jobs:
       matrix:
         file: ['bump-golang.yml', 'bump-golang-7.17.yml']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: elastic/oblt-actions/updatecli/run-and-notify@v1
         with:
@@ -29,6 +29,6 @@ jobs:
           slack-channel-id: "#ingest-notifications"
           slack-message: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, @robots-ci please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
           slack-send-when: "failure"
-          version-file: .tool-versions
+          version-file: .updatecli-version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

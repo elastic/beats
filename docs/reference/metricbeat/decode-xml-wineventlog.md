@@ -2,6 +2,8 @@
 navigation_title: "decode_xml_wineventlog"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/decode-xml-wineventlog.html
+applies_to:
+  stack: preview
 ---
 
 # Decode XML Wineventlog [decode-xml-wineventlog]

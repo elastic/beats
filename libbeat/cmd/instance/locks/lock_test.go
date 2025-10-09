@@ -30,7 +30,6 @@ import (
 )
 
 func TestMain(m *testing.M) {
-
 	tmp, err := os.MkdirTemp("", "pidfile_test")
 	defer os.RemoveAll(tmp)
 	if err != nil {
@@ -57,6 +56,12 @@ func TestMain(m *testing.M) {
 func TestLocker(t *testing.T) {
 	// Setup two beats with same name and data path
 	const beatName = "testbeat-testlocker"
+	tmpDir := t.TempDir()
+	tmpPaths := paths.New()
+	tmpPaths.Home = tmpDir
+	err := tmpPaths.InitPaths(tmpPaths)
+	require.NoError(t, err, "error initializaing paths")
+	fmt.Fprintf(os.Stderr, "paths was %s", tmpPaths)
 
 	logger := logptest.NewTestingLogger(t, "")
 
@@ -67,32 +72,36 @@ func TestLocker(t *testing.T) {
 	b2.Beat = beatName
 
 	// Try to get a lock for the first beat. Expect it to succeed.
-	bl1 := New(b1)
-	err := bl1.Lock()
+	bl1 := New(b1, tmpPaths)
+	err = bl1.Lock()
 	require.NoError(t, err)
 
 	// Try to get a lock for the second beat. Expect it to fail because the
 	// first beat already has the lock.
-	bl2 := New(b2)
+	bl2 := New(b2, tmpPaths)
 	err = bl2.Lock()
 	require.Error(t, err)
-
 }
 
 func TestUnlock(t *testing.T) {
 	const beatName = "testbeat-testunlock"
 	logger := logptest.NewTestingLogger(t, "")
+	tmpDir := t.TempDir()
+	tmpPaths := paths.New()
+	tmpPaths.Home = tmpDir
+	err := tmpPaths.InitPaths(tmpPaths)
+	require.NoError(t, err, "error initializaing paths")
 
 	b1 := beat.Info{Logger: logger}
 	b1.Beat = beatName
 
 	b2 := beat.Info{}
 	b2.Beat = beatName
-	bl2 := New(b2)
+	bl2 := New(b2, tmpPaths)
 
 	// Try to get a lock for the first beat. Expect it to succeed.
-	bl1 := New(b1)
-	err := bl1.Lock()
+	bl1 := New(b1, tmpPaths)
+	err = bl1.Lock()
 	require.NoError(t, err)
 
 	// now unlock
@@ -102,23 +111,27 @@ func TestUnlock(t *testing.T) {
 	// try with other lockfile
 	err = bl2.Lock()
 	require.NoError(t, err)
-
 }
 
 func TestUnlockWithRemainingFile(t *testing.T) {
 	const beatName = "testbeat-testunlockwithfile"
 	logger := logptest.NewTestingLogger(t, "")
+	tmpDir := t.TempDir()
+	tmpPaths := paths.New()
+	tmpPaths.Home = tmpDir
+	err := tmpPaths.InitPaths(tmpPaths)
+	require.NoError(t, err, "error initializaing paths")
 
 	b1 := beat.Info{Logger: logger}
 	b1.Beat = beatName
 
 	b2 := beat.Info{}
 	b2.Beat = beatName
-	bl2 := New(b2)
+	bl2 := New(b2, tmpPaths)
 
 	// Try to get a lock for the first beat. Expect it to succeed.
-	bl1 := New(b1)
-	err := bl1.Lock()
+	bl1 := New(b1, tmpPaths)
+	err = bl1.Lock()
 	require.NoError(t, err)
 
 	// unlock the underlying FD, so we don't remove the file

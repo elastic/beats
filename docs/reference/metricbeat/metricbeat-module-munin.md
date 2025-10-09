@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-munin.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Munin module [metricbeat-module-munin]
 
@@ -15,7 +19,7 @@ The default metricset is `node`.
 Munin module should be compatible with any implementation of the munin network protocol ([http://guide.munin-monitoring.org/en/latest/master/network-protocol.html](http://guide.munin-monitoring.org/en/latest/master/network-protocol.html)), it is tested with munin node 2.0.
 
 
-## Example configuration [_example_configuration_45]
+## Example configuration [_example_configuration]
 
 The Munin module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -38,10 +42,8 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_52]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [node](/reference/metricbeat/metricbeat-metricset-munin-node.md)
-
-

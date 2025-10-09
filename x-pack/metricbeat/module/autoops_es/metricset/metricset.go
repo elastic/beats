@@ -6,15 +6,25 @@ package metricset
 
 import (
 	"fmt"
+	"os"
+	"sync"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/ccm"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 )
 
-const MODULE_NAME = "autoops_es"
+const (
+	MODULE_NAME              = "autoops_es"
+	SEND_CLUSTER_INFO_ERRORS = "AUTOOPS_SEND_CLUSTER_INFO_ERRORS"
+)
+
+var GetClusterInfoValue = func() func() string {
+	return sync.OnceValue(func() string {
+		return os.Getenv(SEND_CLUSTER_INFO_ERRORS)
+	})
+}
 
 var checkedCloudConnectedMode bool = false
 
@@ -66,7 +76,7 @@ func newAutoOpsMetricSet[T any](base mb.BaseMetricSet, routePath string, mapper 
 	if !checkedCloudConnectedMode {
 		checkedCloudConnectedMode = true
 
-		if err := ccm.MaybeRegisterCloudConnectedCluster(ms, GetInfo); err != nil {
+		if err := maybeRegisterCloudConnectedCluster(ms, GetInfo); err != nil {
 			return nil, fmt.Errorf("failed to register Cloud Connected Mode: %w", err)
 		}
 	}
@@ -85,29 +95,37 @@ func (m *AutoOpsMetricSet[T]) Fetch(r mb.ReporterV2) error {
 
 	m.Logger().Infof("fetching %v metricset", metricSetName)
 
+	// because Fetch() is part ReporterV2 interface, we're purposely not returning an error
+	// we do not want to the metricset Error() method to be called, so we are returning nil to avoid duplicate errors sent and logger
+	// although metricsets are returning errors, they are not sent to the output, instead they are logged and sent as events
 	var err error
 	var info *utils.ClusterInfo
 	var data *T
 
 	if info, err = GetInfo(m.MetricSet); err != nil {
 		err = fmt.Errorf("failed to get cluster info from cluster, %v metricset %w", metricSetName, err)
-		events.SendErrorEventWithoutClusterInfo(err, r, metricSetName)
-		m.Logger().Errorf(err.Error())
-		return err
+
+		var sendClusterInfoValue = GetClusterInfoValue()()
+		if utils.GetBoolEnvParam(sendClusterInfoValue, true) {
+			events.LogAndSendErrorEventWithoutClusterInfo(err, r, metricSetName)
+		} else {
+			m.Logger().Errorf("Error fetching data for metricset %s: %s", metricSetName, err)
+		}
+
+		return nil
 	} else if data, err = utils.FetchAPIData[T](m.MetricSet, m.RoutePath); err != nil {
 		err = fmt.Errorf("failed to get data, %v metricset %w", metricSetName, err)
-		events.SendErrorEventWithoutClusterInfo(err, r, metricSetName)
-		m.Logger().Errorf(err.Error())
-		return err
+		events.LogAndSendErrorEventWithoutClusterInfo(err, r, metricSetName)
+		return nil
 	}
 
 	// nested mappers reuse the
 	if m.NestedMapper != nil {
 		if err = m.NestedMapper(m.MetricSet, r, info, data); err != nil {
-			return err
+			return nil //nolint: nilerr // The error is reported by the mapper
 		}
 	} else if err = m.Mapper(r, info, data); err != nil {
-		return err
+		return nil //nolint: nilerr // The error is reported by the mapper
 	}
 
 	m.Logger().Infof("completed fetching %v metricset", metricSetName)

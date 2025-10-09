@@ -2,6 +2,8 @@
 navigation_title: "Kafka"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/kafka-output.html
+applies_to:
+  stack: ga
 ---
 
 # Configure the Kafka output [kafka-output]
@@ -97,7 +99,21 @@ To use `GSSAPI` mechanism to authenticate with Kerberos, you must leave this fie
 
 The Kafka topic used for produced events.
 
-You can set the topic dynamically by using a format string to access any event field. For example, this configuration uses a custom field, `fields.log_topic`, to set the topic for each event:
+You can set a static topic, for example `winlogbeat`, or you can use a format string to set a topic dynamically based on one or more [Elastic Common Schema (ECS)](ecs://reference/index.md) fields. Available fields include:
+
+* `data_stream.type`
+* `data_stream.dataset`
+* `data_stream.namespace`
+* `@timestamp`
+* `event.dataset`
+
+For example:
+
+```yaml
+topic: '%{[data_stream.type]}-%{[data_stream.dataset]}-%{[data_stream.namespace]}'
+```
+
+You can also set a custom field. This is useful if you need to construct a more complex or structured topic name. For example, this configuration uses the `fields.log_topic` custom field to set the topic for each event:
 
 ```yaml
 topic: '%{[fields.log_topic]}'
@@ -107,6 +123,19 @@ topic: '%{[fields.log_topic]}'
 To learn how to add custom fields to events, see the [`fields`](/reference/winlogbeat/configuration-general-options.md#libbeat-configuration-fields) option.
 ::::
 
+To set a dynamic topic value for outputting {{winlogbeat}} data to Kafka, you can add the [`add_fields` processor](/reference/winlogbeat/add-fields.md) to {{winlogbeat}}'s input configuration settings.
+    
+For example, the following `add_fields` processor creates a dynamic topic value for the `fields.log_topic` field by combining multiple [ECS data stream fields](ecs://reference/ecs-data_stream.md):
+
+  ```yaml
+  - add_fields:
+      target: ''
+      fields:
+        log_topic: '%{[data_stream.type]}-%{[data_stream.dataset]}-%{[data_stream.namespace]}' <1>
+  ```
+  1. Depending on the values of the data stream fields, this generates topic names such as `logs-nginx.access-production` or `metrics-system.cpu-staging` as the value of the custom `log_topic` field.
+
+  For more information, refer to [Filter and enhance data with processors](/reference/winlogbeat/filtering-enhancing-data.md).
 
 See the [`topics`](#topics-option-kafka) setting for other ways to set the topic dynamically.
 

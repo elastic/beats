@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-couchbase.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Couchbase module [metricbeat-module-couchbase]
 
@@ -20,7 +24,7 @@ The Couchbase module comes with a predefined dashboard for Couchbase cluster, no
 ![metricbeat couchbase overview](images/metricbeat-couchbase-overview.png)
 
 
-## Example configuration [_example_configuration_16]
+## Example configuration [_example_configuration]
 
 The Couchbase module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -36,14 +40,10 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_22]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [bucket](/reference/metricbeat/metricbeat-metricset-couchbase-bucket.md)
 * [cluster](/reference/metricbeat/metricbeat-metricset-couchbase-cluster.md)
 * [node](/reference/metricbeat/metricbeat-metricset-couchbase-node.md)
-
-
-
-

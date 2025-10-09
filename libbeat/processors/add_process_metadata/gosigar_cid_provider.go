@@ -67,9 +67,9 @@ func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 	return cid, nil
 }
 
-func newCidProvider(cgroupPrefixes []string, cgroupRegex *regexp.Regexp, processCgroupPaths processors.CGReader, pidCidCache *common.Cache) gosigarCidProvider {
+func newCidProvider(cgroupPrefixes []string, cgroupRegex *regexp.Regexp, processCgroupPaths processors.CGReader, pidCidCache *common.Cache, logger *logp.Logger) gosigarCidProvider {
 	return gosigarCidProvider{
-		log:                logp.NewLogger(providerName),
+		log:                logger.Named(providerName),
 		cgroupPrefixes:     cgroupPrefixes,
 		cgroupRegex:        cgroupRegex,
 		processCgroupPaths: processCgroupPaths,

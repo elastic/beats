@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-kafka.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Kafka module [filebeat-module-kafka]
 
@@ -113,7 +117,6 @@ This module comes with a sample dashboard to see Kafka logs and stack traces.
 % TO DO: Use `:class: screenshot`
 ![filebeat kafka logs overview](images/filebeat-kafka-logs-overview.png)
 
-
-## Fields [_fields_26]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-kafka.md) section.

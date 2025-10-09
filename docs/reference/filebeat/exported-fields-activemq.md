@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-activemq.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -16,19 +18,19 @@ Module for parsing ActiveMQ log files.
 **`activemq.caller`**
 :   Name of the caller issuing the logging request (class or resource).
 
-type: keyword
+    type: keyword
 
 
 **`activemq.thread`**
 :   Thread that generated the logging event.
 
-type: keyword
+    type: keyword
 
 
 **`activemq.user`**
 :   User that generated the logging event.
 
-type: keyword
+    type: keyword
 
 
 ## audit [_audit]
