@@ -107,15 +107,15 @@ func TestMergeShardedCollStats_WeightedAndIndexMerge(t *testing.T) {
 	merged, err := mergeShardedCollStats([]map[string]interface{}{shard1, shard2})
 	assert.NoError(t, err)
 	// Summed fields
-	assert.Equal(t, int64(30), merged["count"].(int64))
-	assert.Equal(t, float64(4000), merged["size"].(float64))
+	assert.Equal(t, int64(30), merged["count"].(int64))      //nolint:errcheck // safe
+	assert.Equal(t, float64(4000), merged["size"].(float64)) //nolint:errcheck // safe
 	// Weighted avg: (100*10 + 150*20)/30 = (1000 + 3000)/30 = 133.333...
-	assert.InDelta(t, 133.33, merged["avgObjSize"].(float64), 0.01)
+	assert.InDelta(t, 133.33, merged["avgObjSize"].(float64), 0.01) //nolint:errcheck // safe
 	// No indexSizes collected
 	_, hasIdx := merged["indexSizes"]
 	assert.False(t, hasIdx)
 	// Shard metadata only: shardCount present, no shards breakdown
-	assert.Equal(t, 2, merged["shardCount"].(int))
+	assert.Equal(t, 2, merged["shardCount"].(int)) //nolint:errcheck // safe
 	_, hasShards := merged["shards"]
 	assert.False(t, hasShards)
 }
