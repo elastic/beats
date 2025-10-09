@@ -13,27 +13,30 @@ import (
 	"github.com/osquery/osquery-go/plugin/table"
 )
 
-type parserFunc func(context.Context, table.QueryContext, string, string, func(string, ...any)) ([]*row, error)
+type parserFunc func(ctx context.Context, queryContext table.QueryContext, browserName, profilePath string, log func(m string, kvs ...any)) ([]*row, error)
 
 type rawHistoryEntry struct {
-	user            string
-	profile         string
-	path            string
-	browserName     string
-	url             sql.NullString
-	title           sql.NullString
-	visitCount      sql.NullInt64
-	typedCount      sql.NullInt64
-	lastVisitTime   sql.NullInt64
-	transitionType  sql.NullInt64
-	visitID         sql.NullInt64
-	fromVisitID     sql.NullInt64
-	visitSource     sql.NullInt64
-	referringURL    sql.NullString
-	isHidden        sql.NullInt64
-	chVisitDuration sql.NullInt64
-	ffSessionID     sql.NullInt64
-	ffFrecency      sql.NullInt64
+	user              string
+	profile           string
+	path              string
+	browserName       string
+	url               sql.NullString
+	title             sql.NullString
+	visitCount        sql.NullInt64
+	typedCount        sql.NullInt64
+	visitTime         sql.NullInt64
+	transitionType    sql.NullInt64
+	visitID           sql.NullInt64
+	fromVisitID       sql.NullInt64
+	urlID             sql.NullInt64
+	visitSource       sql.NullInt64
+	referringURL      sql.NullString
+	isHidden          sql.NullInt64
+	chVisitDuration   sql.NullInt64
+	ffSessionID       sql.NullInt64
+	ffFrecency        sql.NullInt64
+	sfDomainExpansion sql.NullString
+	sfLoadSuccessful  sql.NullInt64
 }
 
 type row struct {
@@ -49,6 +52,7 @@ type row struct {
 	ReferringURL   string `osquery:"referring_url"`
 	VisitID        string `osquery:"visit_id"`
 	FromVisitID    string `osquery:"from_visit_id"`
+	UrlID          string `osquery:"url_id"`
 	VisitCount     string `osquery:"visit_count"`
 	TypedCount     string `osquery:"typed_count"`
 	VisitSource    string `osquery:"visit_source"`
@@ -62,9 +66,9 @@ type row struct {
 	FfSessionID string `osquery:"ff_session_id"` // Firefox session tracking
 	FfFrecency  string `osquery:"ff_frecency"`   // Firefox user interest algorithm
 
-	// Future Safari-specific fields (when implemented)
-	// SfDomainExpansion string `osquery:"sf_domain_expansion" json:"sf_domain_expansion"`  // Safari domain classification
-	// SfLoadSuccessful  string `osquery:"sf_load_successful" json:"sf_load_successful"`   // Whether page loaded successfully
+	// Safari-specific fields
+	SfDomainExpansion string `osquery:"sf_domain_expansion"` // Safari domain classification
+	SfLoadSuccessful  string `osquery:"sf_load_successful"`  // Whether page loaded successfully
 }
 
 func (entry *row) toMap() map[string]string {

@@ -91,8 +91,8 @@ func getParserFunc(basePath string, log func(m string, kvs ...any)) parserFunc {
 
 	safariPath := filepath.Join(basePath, "History.db")
 	if _, err := os.Stat(safariPath); err == nil {
-		log("detected webkit parser", "path", safariPath)
-		return nil
+		log("detected safari parser", "path", safariPath)
+		return safariParser
 	}
 	return nil
 }

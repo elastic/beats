@@ -26,6 +26,7 @@ func BrowserHistoryColumns() []table.ColumnDefinition {
 		table.TextColumn("referring_url"),
 		table.BigIntColumn("visit_id"),
 		table.BigIntColumn("from_visit_id"),
+		table.BigIntColumn("url_id"),
 		table.BigIntColumn("visit_count"),
 		table.IntegerColumn("typed_count"),
 		table.TextColumn("visit_source"),
@@ -39,9 +40,9 @@ func BrowserHistoryColumns() []table.ColumnDefinition {
 		table.BigIntColumn("ff_session_id"), // Firefox session tracking
 		table.BigIntColumn("ff_frecency"),   // Firefox user interest algorithm
 
-		// Future Safari-specific fields (when implemented)
-		// table.TextColumn("sf_domain_expansion"),    // Safari domain classification
-		// table.IntegerColumn("sf_load_successful"),  // Whether page loaded successfully
+		// Safari-specific fields
+		table.TextColumn("sf_domain_expansion"),   // Safari domain classification
+		table.IntegerColumn("sf_load_successful"), // Whether page loaded successfully
 	}
 }
 

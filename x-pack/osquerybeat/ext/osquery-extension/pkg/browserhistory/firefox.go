@@ -17,7 +17,7 @@ import (
 	"github.com/osquery/osquery-go/plugin/table"
 )
 
-func firefoxParser(ctx context.Context, queryContext table.QueryContext, profilePath, browserName string, log func(m string, kvs ...any)) ([]*row, error) {
+func firefoxParser(ctx context.Context, queryContext table.QueryContext, browserName, profilePath string, log func(m string, kvs ...any)) ([]*row, error) {
 	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", filepath.Join(profilePath, "places.sqlite"))
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
@@ -34,6 +34,7 @@ func firefoxParser(ctx context.Context, queryContext table.QueryContext, profile
 			p.hidden,
 			p.frecency,
 			p.typed,
+			p.id as place_id,
 			hv.visit_date,
 			hv.visit_type,
 			hv.id as visit_id,
@@ -57,8 +58,8 @@ func firefoxParser(ctx context.Context, queryContext table.QueryContext, profile
 	}
 	defer rows.Close()
 
-	user := extractUserFromPath(profilePath, func(m string, kvs ...any) {})
-	profileName := extractFirefoxProfileName(profilePath, func(m string, kvs ...any) {})
+	user := extractUserFromPath(profilePath, log)
+	profileName := extractFirefoxProfileName(profilePath, log)
 
 	var entries []*row
 	rowCount := 0
@@ -78,7 +79,8 @@ func firefoxParser(ctx context.Context, queryContext table.QueryContext, profile
 			&entry.isHidden,
 			&entry.ffFrecency,
 			&entry.typedCount,
-			&entry.lastVisitTime,
+			&entry.urlID,
+			&entry.visitTime,
 			&entry.transitionType,
 			&entry.visitID,
 			&entry.fromVisitID,
@@ -138,7 +140,7 @@ func extractFirefoxProfileName(profilePath string, log func(m string, kvs ...any
 
 func firefoxEntryToRow(entry rawHistoryEntry) *row {
 	return &row{
-		Timestamp: formatNullInt64(entry.lastVisitTime, func(value int64) string {
+		Timestamp: formatNullInt64(entry.visitTime, func(value int64) string {
 			return strconv.FormatInt(value/1000000, 10)
 		}),
 		URL:            stringFromNullString(entry.url),
@@ -156,6 +158,7 @@ func firefoxEntryToRow(entry rawHistoryEntry) *row {
 		VisitSource:    mapFirefoxVisitSource(entry.visitSource),
 		IsHidden:       boolStringFromNullInt(entry.isHidden),
 		SourcePath:     entry.path,
+		UrlID:          decimalStringFromNullInt(entry.urlID),
 		FfSessionID:    decimalStringFromNullInt(entry.ffSessionID),
 		FfFrecency:     decimalStringFromNullInt(entry.ffFrecency),
 	}

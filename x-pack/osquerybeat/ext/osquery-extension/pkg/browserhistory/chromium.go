@@ -17,7 +17,7 @@ import (
 	"github.com/osquery/osquery-go/plugin/table"
 )
 
-func chromiumParser(ctx context.Context, queryContext table.QueryContext, profilePath, browserName string, log func(m string, kvs ...any)) ([]*row, error) {
+func chromiumParser(ctx context.Context, queryContext table.QueryContext, browserName, profilePath string, log func(m string, kvs ...any)) ([]*row, error) {
 	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", filepath.Join(profilePath, "History"))
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
@@ -33,6 +33,7 @@ func chromiumParser(ctx context.Context, queryContext table.QueryContext, profil
 			urls.visit_count,
 			urls.typed_count,
 			urls.hidden,
+			urls.id as url_id,
 			visits.visit_time,
 			visits.transition,
 			visits.id as visit_id,
@@ -56,8 +57,8 @@ func chromiumParser(ctx context.Context, queryContext table.QueryContext, profil
 	}
 	defer rows.Close()
 
-	user := extractUserFromPath(profilePath, func(m string, kvs ...any) {})
-	profileName := extractChromiumProfileName(profilePath, func(m string, kvs ...any) {})
+	user := extractUserFromPath(profilePath, log)
+	profileName := extractChromiumProfileName(profilePath, log)
 
 	var entries []*row
 	rowCount := 0
@@ -76,7 +77,8 @@ func chromiumParser(ctx context.Context, queryContext table.QueryContext, profil
 			&entry.visitCount,
 			&entry.typedCount,
 			&entry.isHidden,
-			&entry.lastVisitTime,
+			&entry.urlID,
+			&entry.visitTime,
 			&entry.transitionType,
 			&entry.visitID,
 			&entry.fromVisitID,
@@ -121,7 +123,7 @@ func extractChromiumProfileName(profilePath string, log func(m string, kvs ...an
 
 func chromiumEntryToRow(entry rawHistoryEntry) *row {
 	return &row{
-		Timestamp: formatNullInt64(entry.lastVisitTime, func(value int64) string {
+		Timestamp: formatNullInt64(entry.visitTime, func(value int64) string {
 			return strconv.FormatInt(chromiumTimeToUnix(value), 10)
 		}),
 		URL:            stringFromNullString(entry.url),
@@ -139,6 +141,7 @@ func chromiumEntryToRow(entry rawHistoryEntry) *row {
 		VisitSource:    mapChromiumVisitSource(entry.visitSource),
 		IsHidden:       boolStringFromNullInt(entry.isHidden),
 		SourcePath:     entry.path,
+		UrlID:          decimalStringFromNullInt(entry.urlID),
 		ChVisitDurationMs: formatNullInt64(entry.chVisitDuration, func(value int64) string {
 			return strconv.FormatInt(value/1000, 10)
 		}),
