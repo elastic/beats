@@ -19,9 +19,8 @@ package file_integrity
 
 import (
 	"math/bits"
+	"slices"
 	"strings"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // Action is a description of the changes described by an event.
@@ -128,7 +127,9 @@ func (action Action) ECSTypes() []string {
 			list = append(list, name)
 		}
 	}
-	return common.MakeStringSet(list...).ToSlice()
+	slices.Sort(list)
+	list = slices.Compact(list)
+	return list
 }
 
 // MarshalText marshals the Action to a textual representation of itself.
@@ -211,5 +212,7 @@ func (actions ActionArray) ECSTypes() []string {
 	for _, action := range actions {
 		list = append(list, action.ECSTypes()...)
 	}
-	return common.MakeStringSet(list...).ToSlice()
+	slices.Sort(list)
+	list = slices.Compact(list)
+	return list
 }
