@@ -57,11 +57,3 @@ multiline.type: pattern
 multiline.pattern: "reg exp goes here"
 multiline.negate: true
 multiline.match: after
-
-
-
-
-
-
-
-

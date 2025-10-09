@@ -24,6 +24,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/filebeat/input/filestream"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -46,10 +47,9 @@ func TestTranslateCfgAllLogInputConfigs(t *testing.T) {
 	validateConfig(t, newCfg, filestreamAllJson)
 
 	store := openTestStatestore()
-	p := PluginV2(logp.NewNopLogger(), store)
-	m := p.Manager.(manager)
-	if _, err := m.next.Create(newCfg); err != nil {
-		t.Fatalf("Filestream input cannot be created from config: %s", err)
+	p := filestream.Plugin(logp.NewNopLogger(), store)
+	if _, err := p.Manager.Create(newCfg); err != nil {
+		t.Fatalf("Filestream input cannot be created from converted config: %s", err)
 	}
 }
 
@@ -87,6 +87,7 @@ paths:
 		}
 		`,
 		},
+
 		"file_identiy is non default": {
 			logYamlCfg: `
 id: foo
@@ -117,6 +118,7 @@ file_identity.path: ~
 		}
 		`,
 		},
+
 		"file_identiy is fingerprint": {
 			logYamlCfg: `
 id: foo
@@ -140,6 +142,7 @@ file_identity.fingerprint: ~
 }
 `,
 		},
+
 		"parsers are correctly added": {
 			logYamlCfg: `
 id: foo
@@ -176,6 +179,7 @@ parsers:
 		}
 		`,
 		},
+
 		"parsers are added after json": {
 			logYamlCfg: `
 id: foo
@@ -218,6 +222,7 @@ parsers:
 		}
 		`,
 		},
+
 		"parsers are added after multiine": {
 			logYamlCfg: `
 id: foo
@@ -260,6 +265,7 @@ parsers:
 		}
 		`,
 		},
+
 		"parsers are added after json and multiine": {
 			logYamlCfg: `
 id: foo

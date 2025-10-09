@@ -122,8 +122,8 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 		return nil, fmt.Errorf("cannot merge configurations: %w", err)
 	}
 
-	// Then we remove the log input exclusive keys from the new config,
-	// this also removes any key that has a different type, like backoff
+	// Then we remove the log input exclusive fields from the new config,
+	// this also removes any field that has a different type, like backoff
 	for _, key := range logInputExclusiveKeys {
 		if _, err := newCfg.Remove(key, -1); err != nil {
 			return nil, fmt.Errorf("cannot remove %q: %w", key, err)
@@ -131,7 +131,7 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 	}
 
 	// Convert all the "static" configuration, those are the fields that
-	// can easily be translated by name
+	// can easily be translated by name.
 	for key, kind := range inputConvTable {
 		has, err := cfg.Has(key, -1)
 		if err != nil {
@@ -143,30 +143,38 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 			case ConfTypeString:
 				v, err := cfg.String(key, -1)
 				if err != nil {
-					return nil, fmt.Errorf("cannot read %q as string: %s", key, err)
+					return nil, fmt.Errorf("cannot read %q as string: %w", key, err)
 				}
-				newCfg.SetString(kind.fsName, -1, v)
+				if err := newCfg.SetString(kind.fsName, -1, v); err != nil {
+					return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+				}
 
 			case ConfTypeBool:
 				v, err := cfg.Bool(key, -1)
 				if err != nil {
 					return nil, fmt.Errorf("cannot read %q as boolean: %w", key, err)
 				}
-				newCfg.SetBool(kind.fsName, -1, v)
+				if err := newCfg.SetBool(kind.fsName, -1, v); err != nil {
+					return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+				}
 
 			case ConfTypeInt:
 				v, err := cfg.Int(key, -1)
 				if err != nil {
 					return nil, fmt.Errorf("cannot read %q as integer: %w", key, err)
 				}
-				newCfg.SetInt(kind.fsName, -1, v)
+				if err := newCfg.SetInt(kind.fsName, -1, v); err != nil {
+					return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+				}
 
 			case ConfTypeMap:
 				child, err := cfg.Child(key, -1)
 				if err != nil {
 					return nil, fmt.Errorf("cannot read %q as map/array: %w", key, err)
 				}
-				newCfg.SetChild(kind.fsName, -1, child)
+				if err := newCfg.SetChild(kind.fsName, -1, child); err != nil {
+					return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+				}
 
 			case ConfTypeConstant:
 				v, err := cfg.Bool(key, -1)
@@ -174,14 +182,16 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 					return nil, fmt.Errorf("cannot read %q as boolean: %w", key, err)
 				}
 				if v {
-					newCfg.SetString(kind.fsName, -1, kind.fsVal)
+					if err := newCfg.SetString(kind.fsName, -1, kind.fsVal); err != nil {
+						return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+					}
 				}
 			}
 		}
 	}
 
 	// Now handle the trick bits, starting with parsers
-	// The first parser is JSON, then Multiline
+	// The first parser is Multiline, then JSON
 
 	hasMultiline, err := cfg.Has("multiline", -1)
 	if err != nil {
@@ -207,23 +217,29 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 				case ConfTypeString:
 					v, err := multilineChild.String(key, -1)
 					if err != nil {
-						return nil, fmt.Errorf("cannot read %q as string: %s", key, err)
+						return nil, fmt.Errorf("cannot read %q as string: %w", key, err)
 					}
-					multilineCfg.SetString(kind.fsName, -1, v)
+					if err := multilineCfg.SetString(kind.fsName, -1, v); err != nil {
+						return nil, fmt.Errorf("cannot set %q: %w", key, err)
+					}
 
 				case ConfTypeBool:
 					v, err := multilineChild.Bool(key, -1)
 					if err != nil {
 						return nil, fmt.Errorf("cannot read %q as boolean: %w", key, err)
 					}
-					multilineCfg.SetBool(key, -1, v)
+					if err := multilineCfg.SetBool(kind.fsName, -1, v); err != nil {
+						return nil, fmt.Errorf("cannot set %q: %w", key, err)
+					}
 
 				case ConfTypeInt:
 					v, err := multilineChild.Int(key, -1)
 					if err != nil {
 						return nil, fmt.Errorf("cannot read %q as integer: %w", key, err)
 					}
-					multilineCfg.SetInt(kind.fsName, -1, v)
+					if err := multilineCfg.SetInt(kind.fsName, -1, v); err != nil {
+						return nil, fmt.Errorf("cannot set %q: %w", key, err)
+					}
 				}
 			}
 		}
@@ -243,56 +259,55 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 	if hasJson {
 		jsonCfg, err := cfg.Child("json", -1)
 		if err != nil {
-			return nil, fmt.Errorf("cannot get 'json': %w", err)
+			return nil, fmt.Errorf("cannot access 'json': %w", err)
 		}
 
 		parsers = append(parsers, map[string]any{"ndjson": jsonCfg})
 	}
 
-	// If any parsers was created, set it into the new config.
-	// If the original config had an 'parsers' array, it is copied
+	// If any parsers were created, set them into the new config.
+	// If the original config had a 'parsers' array, it is copied
 	// after the multiline and ndjson parsers coming from the log config
 	// translation
 	if len(parsers) != 0 {
 		parsersCfg, err := config.NewConfigFrom(parsers)
 		if err != nil {
-			return nil, fmt.Errorf("cannot convert 'json' config to parser: %w", err)
+			return nil, fmt.Errorf("cannot process the converted parsers config: %w", err)
 		}
 
 		if cfg.HasField("parsers") {
 			logParers, err := cfg.Child("parsers", -1)
 			if err != nil {
-				return nil, fmt.Errorf("cannot get 'parsers' from config: %w", err)
+				return nil, fmt.Errorf("cannot access 'parsers' from config: %w", err)
 			}
 
 			lenParsers, err := logParers.CountField("")
 			if err != nil {
-				return nil, fmt.Errorf("cannot get the length of 'parsers': %w", err)
+				return nil, fmt.Errorf("cannot access the length of 'parsers': %w", err)
 			}
 
 			for i := range lenParsers {
 				el, err := logParers.Child("", i)
 				if err != nil {
-					return nil, fmt.Errorf("cannot get 'parsers.%d': %w", i, err)
+					return nil, fmt.Errorf("cannot access 'parsers.%d': %w", i, err)
 				}
 
 				idx := len(parsers) + i
 				if err := parsersCfg.SetChild("", idx, el); err != nil {
-					return nil, fmt.Errorf("cannot set 'parsers.%d' into new config: %w", idx, err)
+					return nil, fmt.Errorf("cannot set 'parsers.%d': %w", idx, err)
 				}
 			}
 		}
 
 		if err := newCfg.SetChild("parsers", -1, parsersCfg); err != nil {
-			return nil, fmt.Errorf("cannot set parsers: %w", err)
+			return nil, fmt.Errorf("cannot set 'parsers': %w", err)
 		}
 	}
 
 	// Handle file identity
 	//  - If no file identity is set, default to 'native'
 	//  - If file identity is set, keep it as is
-	//  - If file identity is NOT fingerprint, disable fingerprint
-	//    in the scanner
+	//  - If file identity is NOT fingerprint, disable fingerprint in the scanner
 	disableFingeprint := true
 	if !cfg.HasField("file_identity") {
 		err := newCfg.SetChild("file_identity.native", -1, config.NewConfig())
@@ -302,7 +317,7 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 	} else {
 		has, err := cfg.Has("file_identity.fingerprint", -1)
 		if err != nil {
-			return nil, fmt.Errorf("cannot read 'file_identity.fingerprint': %s", err)
+			return nil, fmt.Errorf("cannot read 'file_identity.fingerprint': %w", err)
 		}
 		disableFingeprint = !has
 	}
@@ -320,7 +335,7 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 	}
 
 	if err := newCfg.SetBool("take_over.enabled", -1, true); err != nil {
-		return nil, fmt.Errorf("cannot set 'take_over.enabled': %s", err)
+		return nil, fmt.Errorf("cannot set 'take_over.enabled': %w", err)
 	}
 
 	return newCfg, nil
