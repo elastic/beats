@@ -26,10 +26,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-<<<<<<< HEAD
-=======
 	"github.com/elastic/beats/v7/libbeat/common/transport/transptest"
->>>>>>> 415d74d69 (fix(libbeat): fix race between Send and Close in Logstash output (#46960))
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -89,11 +86,11 @@ func testClientSendCloseDoesNotPanic(t *testing.T) {
 	require.NoError(t, err)
 	defer transp.Close()
 
-	config := DefaultConfig()
+	config := defaultConfig()
 	logger, err := logp.NewDevelopmentLogger("")
 	require.NoError(t, err)
-
-	asyncClient, err := newAsyncClient(logger, "beat_version", transp, outputs.NewNilObserver(), &config)
+	info := beat.Info{Logger: logger, Version: "beat_version"}
+	asyncClient, err := newAsyncClient(info, transp, outputs.NewNilObserver(), &config)
 	require.NoError(t, err)
 
 	event := beat.Event{
