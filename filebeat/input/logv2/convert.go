@@ -183,7 +183,7 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 	// Now handle the trick bits, starting with parsers
 	// The first parser is JSON, then Multiline
 
-	hasMultiline, err := cfg.Has("json", -1)
+	hasMultiline, err := cfg.Has("multiline", -1)
 	if err != nil {
 		return nil, fmt.Errorf("cannot access 'json' field: %w", err)
 	}
@@ -249,17 +249,43 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 		parsers = append(parsers, map[string]any{"ndjson": jsonCfg})
 	}
 
-	// If any parsers was created, set it into the new config
+	// If any parsers was created, set it into the new config.
+	// If the original config had an 'parsers' array, it is copied
+	// after the multiline and ndjson parsers coming from the log config
+	// translation
 	if len(parsers) != 0 {
 		parsersCfg, err := config.NewConfigFrom(parsers)
 		if err != nil {
 			return nil, fmt.Errorf("cannot convert 'json' config to parser: %w", err)
 		}
+
+		if cfg.HasField("parsers") {
+			logParers, err := cfg.Child("parsers", -1)
+			if err != nil {
+				return nil, fmt.Errorf("cannot get 'parsers' from config: %w", err)
+			}
+
+			lenParsers, err := logParers.CountField("")
+			if err != nil {
+				return nil, fmt.Errorf("cannot get the length of 'parsers': %w", err)
+			}
+
+			for i := range lenParsers {
+				el, err := logParers.Child("", i)
+				if err != nil {
+					return nil, fmt.Errorf("cannot get 'parsers.%d': %w", i, err)
+				}
+
+				idx := len(parsers) + i
+				if err := parsersCfg.SetChild("", idx, el); err != nil {
+					return nil, fmt.Errorf("cannot set 'parsers.%d' into new config: %w", idx, err)
+				}
+			}
+		}
+
 		if err := newCfg.SetChild("parsers", -1, parsersCfg); err != nil {
 			return nil, fmt.Errorf("cannot set parsers: %w", err)
 		}
-
-		// TODO: handle existing parsers
 	}
 
 	// Handle file identity

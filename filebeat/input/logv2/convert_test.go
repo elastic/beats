@@ -53,7 +53,7 @@ func TestTranslateCfgAllLogInputConfigs(t *testing.T) {
 	}
 }
 
-func TestConvertHandlesFileIdentityCorrectly(t *testing.T) {
+func TestConvertHandlesSpecialCases(t *testing.T) {
 	testCases := map[string]struct {
 		logYamlCfg      string
 		expectedJsonCfg string
@@ -139,6 +139,174 @@ file_identity.fingerprint: ~
   "type": "filestream"
 }
 `,
+		},
+		"parsers are correctly added": {
+			logYamlCfg: `
+id: foo
+paths:
+  - /tmp/foo
+parsers:
+  - container: ~
+`,
+			expectedJsonCfg: `
+		{
+		  "file_identity": {
+		    "native": null
+		  },
+		  "id": "foo",
+          "parsers": [
+            {
+              "container": null
+            }
+          ],
+		  "paths": [
+		    "/tmp/foo"
+		  ],
+		  "prospector": {
+		    "scanner": {
+		      "fingerprint": {
+		        "enabled": false
+		      }
+		    }
+		  },
+		  "take_over": {
+		    "enabled": true
+		  },
+		  "type": "filestream"
+		}
+		`,
+		},
+		"parsers are added after json": {
+			logYamlCfg: `
+id: foo
+paths:
+  - /tmp/foo
+json.expand_keys: true
+parsers:
+  - container: ~
+`,
+			expectedJsonCfg: `
+		{
+		  "file_identity": {
+		    "native": null
+		  },
+		  "id": "foo",
+          "parsers": [
+            {
+              "ndjson": {
+                "expand_keys": true
+              }
+            },
+            {
+              "container": null
+            }
+          ],
+		  "paths": [
+		    "/tmp/foo"
+		  ],
+		  "prospector": {
+		    "scanner": {
+		      "fingerprint": {
+		        "enabled": false
+		      }
+		    }
+		  },
+		  "take_over": {
+		    "enabled": true
+		  },
+		  "type": "filestream"
+		}
+		`,
+		},
+		"parsers are added after multiine": {
+			logYamlCfg: `
+id: foo
+paths:
+  - /tmp/foo
+multiline.type: count
+parsers:
+  - container: ~
+`,
+			expectedJsonCfg: `
+		{
+		  "file_identity": {
+		    "native": null
+		  },
+		  "id": "foo",
+          "parsers": [
+            {
+              "multiline": {
+                "type": "count"
+              }
+            },
+            {
+              "container": null
+            }
+          ],
+		  "paths": [
+		    "/tmp/foo"
+		  ],
+		  "prospector": {
+		    "scanner": {
+		      "fingerprint": {
+		        "enabled": false
+		      }
+		    }
+		  },
+		  "take_over": {
+		    "enabled": true
+		  },
+		  "type": "filestream"
+		}
+		`,
+		},
+		"parsers are added after json and multiine": {
+			logYamlCfg: `
+id: foo
+paths:
+  - /tmp/foo
+json.expand_keys: true
+multiline.type: count
+parsers:
+  - container: ~
+`,
+			expectedJsonCfg: `
+		{
+		  "file_identity": {
+		    "native": null
+		  },
+		  "id": "foo",
+          "parsers": [
+            {
+              "multiline": {
+                "type": "count"
+              }
+            },
+            {
+              "ndjson": {
+                "expand_keys": true
+              }
+            },
+            {
+              "container": null
+            }
+          ],
+		  "paths": [
+		    "/tmp/foo"
+		  ],
+		  "prospector": {
+		    "scanner": {
+		      "fingerprint": {
+		        "enabled": false
+		      }
+		    }
+		  },
+		  "take_over": {
+		    "enabled": true
+		  },
+		  "type": "filestream"
+		}
+		`,
 		},
 	}
 
