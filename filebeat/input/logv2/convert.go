@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // configType is the type of the configuration value.
@@ -112,7 +113,7 @@ var logInputExclusiveKeys = []string{
 }
 
 // convertConfig convert the Log input configuration to Filestream.
-func convertConfig(cfg *config.C) (*config.C, error) {
+func convertConfig(logger *logp.Logger, cfg *config.C) (*config.C, error) {
 	newCfg := config.NewConfig()
 
 	// Merge operations overwrites everything that is in the destination
@@ -139,51 +140,8 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 		}
 
 		if has {
-			switch kind.kind {
-			// If there is any error reading the config as the correct type,
-			// either the config is empty or invalid, either way, it
-			// is safe to ignore it.
-			case ConfTypeString:
-				v, err := cfg.String(key, -1)
-				if err == nil && v != "null" {
-					if err := newCfg.SetString(kind.fsName, -1, v); err != nil {
-						return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
-					}
-				}
-
-			case ConfTypeBool:
-				v, err := cfg.Bool(key, -1)
-				if err == nil {
-					if err := newCfg.SetBool(kind.fsName, -1, v); err != nil {
-						return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
-					}
-				}
-
-			case ConfTypeInt:
-				v, err := cfg.Int(key, -1)
-				if err == nil {
-					if err := newCfg.SetInt(kind.fsName, -1, v); err != nil {
-						return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
-					}
-				}
-
-			case ConfTypeMap:
-				child, err := cfg.Child(key, -1)
-				if err == nil {
-					if err := newCfg.SetChild(kind.fsName, -1, child); err != nil {
-						return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
-					}
-				}
-
-			case ConfTypeConstant:
-				v, err := cfg.Bool(key, -1)
-				if err == nil {
-					if v {
-						if err := newCfg.SetString(kind.fsName, -1, kind.fsVal); err != nil {
-							return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
-						}
-					}
-				}
+			if err := translateField(logger, cfg, newCfg, key, kind); err != nil {
+				return nil, err
 			}
 		}
 	}
@@ -198,57 +156,36 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 
 	parsers := []any{}
 	if hasMultiline {
-		multilineCfg := config.NewConfig()
-		multilineChild, err := cfg.Child("multiline", -1)
+		newMultilineCfg := config.NewConfig()
+		multilineCfg, err := cfg.Child("multiline", -1)
 		if err != nil {
 			return nil, fmt.Errorf("cannot access 'multiline': %w", err)
 		}
 
-		count, err := multilineChild.CountField("")
+		count, err := multilineCfg.CountField("")
 		if err != nil {
-			// TODO: log error
+			logger.Warnf("cannot count elements from 'multiline': %s, ignoring malformed config entry", err)
+			// Set count to zero so we fully ignore multiline
+			count = 0
 		}
 
 		// Ensure multiline is not an empty entry
 		if count > 0 {
 			for key, kind := range multilineConvTable {
-				has, err := multilineChild.Has(key, -1)
+				has, err := multilineCfg.Has(key, -1)
 				if err != nil {
 					return nil, fmt.Errorf("cannot read 'multiline.%s': %w", key, err)
 				}
 
 				if has {
-					switch kind.kind {
-					// If there is any error reading the config as the correct type,
-					// either the config is empty or invalid, either way, it
-					// is safe to ignore it.
-					case ConfTypeString:
-						v, err := multilineChild.String(key, -1)
-						if err == nil {
-							if err := multilineCfg.SetString(kind.fsName, -1, v); err != nil {
-								return nil, fmt.Errorf("cannot set %q: %w", key, err)
-							}
-						}
-					case ConfTypeBool:
-						v, err := multilineChild.Bool(key, -1)
-						if err == nil {
-							if err := multilineCfg.SetBool(kind.fsName, -1, v); err != nil {
-								return nil, fmt.Errorf("cannot set %q: %w", key, err)
-							}
-						}
-					case ConfTypeInt:
-						v, err := multilineChild.Int(key, -1)
-						if err == nil {
-							if err := multilineCfg.SetInt(kind.fsName, -1, v); err != nil {
-								return nil, fmt.Errorf("cannot set %q: %w", key, err)
-							}
-						}
+					if err := translateField(logger, multilineCfg, newMultilineCfg, key, kind); err != nil {
+						return nil, err
 					}
 				}
 			}
 
 			parsers = append(parsers, map[string]any{
-				"multiline": multilineCfg,
+				"multiline": newMultilineCfg,
 			})
 		}
 	}
@@ -346,4 +283,68 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 	}
 
 	return newCfg, nil
+}
+
+// translateField translates a single field from the Log input syntax to Filestream.
+// If a config cannot be read as it specified type, it's either an empty key in the
+// YAML or it's actually an invalid value, either way, we just ignore it and return
+// no error. A warning log is generated.
+func translateField(logger *logp.Logger, cfg, newCfg *config.C, key string, kind configField) error {
+	switch kind.kind {
+	// If there is any error reading the config as the correct type,
+	// either the config is empty or invalid, either way, it
+	// is safe to ignore it.
+	case ConfTypeString:
+		v, err := cfg.String(key, -1)
+		if err != nil {
+			logger.Warnf("cannot read %q as string: %s, ignoring malformed config entry", key, err)
+			return nil
+		}
+		if v != "null" {
+			// empty config keys appear as the `null` string, we also ignore it
+			if err := newCfg.SetString(kind.fsName, -1, v); err != nil {
+				return fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+			}
+		}
+	case ConfTypeBool:
+		v, err := cfg.Bool(key, -1)
+		if err != nil {
+			logger.Warnf("cannot read %q as bool: %s, ignoring malformed config entry", key, err)
+			return nil
+		}
+		if err := newCfg.SetBool(kind.fsName, -1, v); err != nil {
+			return fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+		}
+	case ConfTypeInt:
+		v, err := cfg.Int(key, -1)
+		if err != nil {
+			logger.Warnf("cannot read %q as int: %s, ignoring malformed config entry", key, err)
+			return nil
+		}
+		if err := newCfg.SetInt(kind.fsName, -1, v); err != nil {
+			return fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+		}
+	case ConfTypeMap:
+		child, err := cfg.Child(key, -1)
+		if err != nil {
+			logger.Warnf("cannot read %q as map: %s, ignoring malformed config entry", key, err)
+			return nil
+		}
+		if err := newCfg.SetChild(kind.fsName, -1, child); err != nil {
+			return fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+		}
+	case ConfTypeConstant:
+		v, err := cfg.Bool(key, -1)
+		if err != nil {
+			logger.Warnf("cannot read %q as bool: %s", key, err)
+			return nil
+		}
+		if v {
+			if err := newCfg.SetString(kind.fsName, -1, kind.fsVal); err != nil {
+				return fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+			}
+		}
+	}
+
+	return nil
 }

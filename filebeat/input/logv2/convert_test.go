@@ -39,7 +39,7 @@ var filestreamAllJson string
 
 func TestTranslateCfgAllLogInputConfigs(t *testing.T) {
 	cfg := config.MustNewConfigFrom(logInputAllYaml)
-	newCfg, err := convertConfig(cfg)
+	newCfg, err := convertConfig(logp.NewNopLogger(), cfg)
 	if err != nil {
 		t.Fatalf("could not convert Log config into Filestream: %s", err)
 	}
@@ -353,7 +353,7 @@ multiline:
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			cfg, err := convertConfig(config.MustNewConfigFrom(tc.logYamlCfg))
+			cfg, err := convertConfig(logp.NewNopLogger(), config.MustNewConfigFrom(tc.logYamlCfg))
 			if err != nil {
 				t.Fatalf("cannot convert Log input config to Filestream: %s", err)
 			}

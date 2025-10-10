@@ -36,6 +36,7 @@
   "parsers": [
     {
       "multiline": {
+        "count_lines": 42,
         "match": "after",
         "negate": true,
         "pattern": "reg exp goes here",
