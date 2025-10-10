@@ -11,7 +11,7 @@ The `iis` module will periodically retrieve IIS related metrics using performanc
  - Web Service Cache counters in order to monitor user mode cache and output cache.
 
 
-The `iis` module mericsets are `webserver`, `website` and `application_pool`.
+The `iis` module metricsets are `webserver`, `website` and `application_pool`.
 
 [source,yaml]
 ----
