@@ -28,8 +28,7 @@ import (
 type configType int
 
 const (
-	Unknown configType = iota
-	ConfTypeBool
+	ConfTypeBool configType = iota
 	// ConfTypeConstant is used for types that are a boolean in the Log input,
 	// but a constant string needs to be set for Filestream
 	ConfTypeConstant
