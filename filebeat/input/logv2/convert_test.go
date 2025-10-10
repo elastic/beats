@@ -314,6 +314,41 @@ parsers:
 		}
 		`,
 		},
+		"empty values are ignored for all types": {
+			logYamlCfg: `
+# Bool
+close_eof:
+# String
+close_timeout:
+# Shared array
+paths:
+# Bool
+recursive_glob.enabled:
+# Constant
+tail_files:
+# Object
+json:
+multiline:
+`,
+			expectedJsonCfg: `
+{
+  "file_identity": {
+    "native": null
+  },
+  "prospector": {
+    "scanner": {
+      "fingerprint": {
+        "enabled": false
+      }
+    }
+  },
+  "take_over": {
+    "enabled": true
+  },
+  "type": "filestream"
+}
+`,
+		},
 	}
 
 	for name, tc := range testCases {

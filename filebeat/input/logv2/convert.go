@@ -140,50 +140,48 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 
 		if has {
 			switch kind.kind {
+			// If there is any error reading the config as the correct type,
+			// either the config is empty or invalid, either way, it
+			// is safe to ignore it.
 			case ConfTypeString:
 				v, err := cfg.String(key, -1)
-				if err != nil {
-					return nil, fmt.Errorf("cannot read %q as string: %w", key, err)
-				}
-				if err := newCfg.SetString(kind.fsName, -1, v); err != nil {
-					return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+				if err == nil && v != "null" {
+					if err := newCfg.SetString(kind.fsName, -1, v); err != nil {
+						return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+					}
 				}
 
 			case ConfTypeBool:
 				v, err := cfg.Bool(key, -1)
-				if err != nil {
-					return nil, fmt.Errorf("cannot read %q as boolean: %w", key, err)
-				}
-				if err := newCfg.SetBool(kind.fsName, -1, v); err != nil {
-					return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+				if err == nil {
+					if err := newCfg.SetBool(kind.fsName, -1, v); err != nil {
+						return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+					}
 				}
 
 			case ConfTypeInt:
 				v, err := cfg.Int(key, -1)
-				if err != nil {
-					return nil, fmt.Errorf("cannot read %q as integer: %w", key, err)
-				}
-				if err := newCfg.SetInt(kind.fsName, -1, v); err != nil {
-					return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+				if err == nil {
+					if err := newCfg.SetInt(kind.fsName, -1, v); err != nil {
+						return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+					}
 				}
 
 			case ConfTypeMap:
 				child, err := cfg.Child(key, -1)
-				if err != nil {
-					return nil, fmt.Errorf("cannot read %q as map/array: %w", key, err)
-				}
-				if err := newCfg.SetChild(kind.fsName, -1, child); err != nil {
-					return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+				if err == nil {
+					if err := newCfg.SetChild(kind.fsName, -1, child); err != nil {
+						return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+					}
 				}
 
 			case ConfTypeConstant:
 				v, err := cfg.Bool(key, -1)
-				if err != nil {
-					return nil, fmt.Errorf("cannot read %q as boolean: %w", key, err)
-				}
-				if v {
-					if err := newCfg.SetString(kind.fsName, -1, kind.fsVal); err != nil {
-						return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+				if err == nil {
+					if v {
+						if err := newCfg.SetString(kind.fsName, -1, kind.fsVal); err != nil {
+							return nil, fmt.Errorf("cannot set %q: %w", kind.fsName, err)
+						}
 					}
 				}
 			}
@@ -206,47 +204,53 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 			return nil, fmt.Errorf("cannot access 'multiline': %w", err)
 		}
 
-		for key, kind := range multilineConvTable {
-			has, err := multilineChild.Has(key, -1)
-			if err != nil {
-				return nil, fmt.Errorf("cannot read 'multiline.%s': %w", key, err)
-			}
+		count, err := multilineChild.CountField("")
+		if err != nil {
+			// TODO: log error
+		}
 
-			if has {
-				switch kind.kind {
-				case ConfTypeString:
-					v, err := multilineChild.String(key, -1)
-					if err != nil {
-						return nil, fmt.Errorf("cannot read %q as string: %w", key, err)
-					}
-					if err := multilineCfg.SetString(kind.fsName, -1, v); err != nil {
-						return nil, fmt.Errorf("cannot set %q: %w", key, err)
-					}
+		// Ensure multiline is not an empty entry
+		if count > 0 {
+			for key, kind := range multilineConvTable {
+				has, err := multilineChild.Has(key, -1)
+				if err != nil {
+					return nil, fmt.Errorf("cannot read 'multiline.%s': %w", key, err)
+				}
 
-				case ConfTypeBool:
-					v, err := multilineChild.Bool(key, -1)
-					if err != nil {
-						return nil, fmt.Errorf("cannot read %q as boolean: %w", key, err)
-					}
-					if err := multilineCfg.SetBool(kind.fsName, -1, v); err != nil {
-						return nil, fmt.Errorf("cannot set %q: %w", key, err)
-					}
-
-				case ConfTypeInt:
-					v, err := multilineChild.Int(key, -1)
-					if err != nil {
-						return nil, fmt.Errorf("cannot read %q as integer: %w", key, err)
-					}
-					if err := multilineCfg.SetInt(kind.fsName, -1, v); err != nil {
-						return nil, fmt.Errorf("cannot set %q: %w", key, err)
+				if has {
+					switch kind.kind {
+					// If there is any error reading the config as the correct type,
+					// either the config is empty or invalid, either way, it
+					// is safe to ignore it.
+					case ConfTypeString:
+						v, err := multilineChild.String(key, -1)
+						if err == nil {
+							if err := multilineCfg.SetString(kind.fsName, -1, v); err != nil {
+								return nil, fmt.Errorf("cannot set %q: %w", key, err)
+							}
+						}
+					case ConfTypeBool:
+						v, err := multilineChild.Bool(key, -1)
+						if err == nil {
+							if err := multilineCfg.SetBool(kind.fsName, -1, v); err != nil {
+								return nil, fmt.Errorf("cannot set %q: %w", key, err)
+							}
+						}
+					case ConfTypeInt:
+						v, err := multilineChild.Int(key, -1)
+						if err == nil {
+							if err := multilineCfg.SetInt(kind.fsName, -1, v); err != nil {
+								return nil, fmt.Errorf("cannot set %q: %w", key, err)
+							}
+						}
 					}
 				}
 			}
-		}
 
-		parsers = append(parsers, map[string]any{
-			"multiline": multilineCfg,
-		})
+			parsers = append(parsers, map[string]any{
+				"multiline": multilineCfg,
+			})
+		}
 	}
 
 	// Handle json now.
@@ -262,7 +266,10 @@ func convertConfig(cfg *config.C) (*config.C, error) {
 			return nil, fmt.Errorf("cannot access 'json': %w", err)
 		}
 
-		parsers = append(parsers, map[string]any{"ndjson": jsonCfg})
+		count, err := jsonCfg.CountField("")
+		if err == nil && count != 0 {
+			parsers = append(parsers, map[string]any{"ndjson": jsonCfg})
+		}
 	}
 
 	// If any parsers were created, set them into the new config.
