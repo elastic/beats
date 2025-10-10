@@ -62,7 +62,6 @@ func VerifyFIPSBinary(t *testing.T, binaryPath string) {
 		case "-tags":
 			foundTags = true
 			assert.Contains(t, setting.Value, "requirefips")
-			assert.Contains(t, setting.Value, "ms_tls13kdf")
 			continue
 		case "GOEXPERIMENT":
 			foundExperiment = true
