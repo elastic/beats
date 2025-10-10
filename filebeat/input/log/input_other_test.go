@@ -78,7 +78,7 @@ func TestMatchFile(t *testing.T) {
 	for _, test := range matchTests {
 
 		p := Input{
-			config: config{
+			config: Config{
 				Paths:        test.paths,
 				ExcludeFiles: test.excludeFiles,
 			},
@@ -147,7 +147,7 @@ func TestInit(t *testing.T) {
 	for _, test := range initStateTests {
 		p := Input{
 			logger: logptest.NewTestingLogger(t, "harvester"),
-			config: config{
+			config: Config{
 				Paths: test.paths,
 			},
 			states:              file.NewStates(logptest.NewTestingLogger(t, "")),

@@ -77,7 +77,7 @@ func TestReadLine(t *testing.T) {
 
 	h := Harvester{
 		logger: logptest.NewTestingLogger(t, "harvester"),
-		config: config{
+		config: Config{
 			LogConfig: LogConfig{
 				CloseInactive: 500 * time.Millisecond,
 				Backoff:       100 * time.Millisecond,

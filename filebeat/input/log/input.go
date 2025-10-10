@@ -60,18 +60,18 @@ var (
 	errDeprecated = errors.New("Log input is deprecated. Use Filestream input instead. Follow our migration guide https://www.elastic.co/guide/en/beats/filebeat/current/migrate-to-filestream.html")
 )
 
-func init() {
-	err := input.Register("log", NewInput)
-	if err != nil {
-		panic(err)
-	}
-}
+// func init() {
+// 	err := input.Register("log", NewInput)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// }
 
 // Input contains the input and its config
 type Input struct {
 	cfg                 *conf.C
 	logger              *logp.Logger
-	config              config
+	config              Config
 	states              *file.States
 	harvesters          *harvester.Registry
 	outlet              channel.Outleter
@@ -112,7 +112,7 @@ func NewInput(
 		}
 	}
 
-	inputConfig := defaultConfig()
+	inputConfig := DefaultConfig()
 
 	if err := cfg.Unpack(&inputConfig); err != nil {
 		return nil, err

@@ -103,7 +103,7 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 }
 
 func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvester, error) {
-	c := defaultConfig()
+	c := DefaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, nil, err
 	}

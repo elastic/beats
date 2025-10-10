@@ -83,7 +83,7 @@ type Harvester struct {
 	logger *logp.Logger
 
 	id     uuid.UUID
-	config config
+	config Config
 	source harvester.Source // the source being watched
 
 	// shutdown handling
@@ -140,7 +140,7 @@ func NewHarvester(
 	logger = logger.Named("harvester").With("harvester_id", id)
 	h := &Harvester{
 		logger:        logger,
-		config:        defaultConfig(),
+		config:        DefaultConfig(),
 		state:         state,
 		states:        states,
 		publishState:  publishState,
