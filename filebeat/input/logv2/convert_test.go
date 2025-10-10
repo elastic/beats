@@ -39,7 +39,7 @@ var filestreamAllJson string
 
 func TestTranslateCfgAllLogInputConfigs(t *testing.T) {
 	cfg := config.MustNewConfigFrom(logInputAllYaml)
-	newCfg, err := convertConfig(cfg)
+	newCfg, err := convertConfig(logp.NewNopLogger(), cfg)
 	if err != nil {
 		t.Fatalf("could not convert Log config into Filestream: %s", err)
 	}
@@ -314,11 +314,81 @@ parsers:
 		}
 		`,
 		},
+		"empty values are ignored for all types": {
+			logYamlCfg: `
+# Bool
+close_eof:
+# String
+close_timeout:
+# Shared array
+paths:
+# Bool
+recursive_glob.enabled:
+# Constant
+tail_files:
+# Object
+json:
+multiline:
+`,
+			expectedJsonCfg: `
+{
+  "file_identity": {
+    "native": null
+  },
+  "prospector": {
+    "scanner": {
+      "fingerprint": {
+        "enabled": false
+      }
+    }
+  },
+  "take_over": {
+    "enabled": true
+  },
+  "type": "filestream"
+}
+`,
+		},
+		"invalid types are ignored": {
+			logYamlCfg: `
+# Bool
+close_eof: 42
+# String
+close_timeout:
+  - a
+  - b
+# Bool
+recursive_glob.enabled: "not boolean"
+# Constant
+tail_files: "not boolean"
+# Object
+json: "foo"
+multiline: true
+`,
+			expectedJsonCfg: `
+{
+  "file_identity": {
+    "native": null
+  },
+  "prospector": {
+    "scanner": {
+      "fingerprint": {
+        "enabled": false
+      }
+    }
+  },
+  "take_over": {
+    "enabled": true
+  },
+  "type": "filestream"
+}
+`,
+		},
 	}
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			cfg, err := convertConfig(config.MustNewConfigFrom(tc.logYamlCfg))
+			cfg, err := convertConfig(logp.NewNopLogger(), config.MustNewConfigFrom(tc.logYamlCfg))
 			if err != nil {
 				t.Fatalf("cannot convert Log input config to Filestream: %s", err)
 			}
