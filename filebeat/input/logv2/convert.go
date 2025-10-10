@@ -28,7 +28,7 @@ import (
 type configType int
 
 const (
-	Unknwon configType = iota
+	Unknown configType = iota
 	ConfTypeBool
 	// ConfTypeConstant is used for types that are a boolean in the Log input,
 	// but a constant string needs to be set for Filestream
@@ -93,7 +93,7 @@ var multilineConvTable = map[string]configField{
 // configuration because they only exist in the Log input
 var logInputExclusiveKeys = []string{
 	"backoff",
-	"backoff_factor", // not supported
+	"backoff_factor",
 	"close_eof",
 	"close_inactive",
 	"close_removed",
@@ -106,7 +106,7 @@ var logInputExclusiveKeys = []string{
 	"max_bytes",
 	"multiline",
 	"recursive_glob.enabled",
-	"scan", // not supported
+	"scan",
 	"scan_frequency",
 	"symlinks",
 	"tail_files",
