@@ -148,7 +148,7 @@ func (m manager) Create(cfg *config.C) (v2.Input, error) {
 	}
 
 	if asFilestream {
-		newCfg, err := convertConfig(cfg)
+		newCfg, err := convertConfig(m.logger, cfg)
 		if err != nil {
 			return nil, fmt.Errorf("cannot translate log config to filestream: %s", err)
 		}
