@@ -4,7 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html
 sub:
   mito_docs: https://pkg.go.dev/github.com/elastic/mito
-  mito_version: v1.22.0
+  mito_version: v1.23.0
 applies_to:
   stack: ga 8.6.0
 ---
@@ -342,6 +342,17 @@ The `cel` input keeps a runtime state between requests. This state can be access
 The state must contain a `url` string and may contain any object the user wishes to store in it.
 
 All objects are stored at runtime, except `cursor`, which has values that are persisted between restarts.
+
+
+## HTTP rate limit handling [_cel_rate_limiting]
+
+CEL evaluations may return a `rate_limit` object as noted in the [Execution](#_execution) section.
+This can either be calculated explicitly in CEL code, or by using the
+[`rate_limit`]({{mito_docs}}@{{mito_version}}/lib#hdr-Rate_Limit-Limit) extension function.
+
+If the `rate_limit` extension is used, calculated rate limits are applied directly to the HTTP client
+used by the CEL input. This includes uses of `rate_limit` that do not return their results from the
+CEL context. {applies_to}`stack: ga 9.3.0`
 
 
 ## CEL input and handling numbers [_cel_input_and_numbers]
