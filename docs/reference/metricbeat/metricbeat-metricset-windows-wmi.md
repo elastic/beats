@@ -148,8 +148,7 @@ results should be returned without a row limit.
 
 **`wmi.schema_cache_size`**
 :   The maximum number of WMI class-property pairs that can be cached per single query. Every query keeps its own separate cache.
-This cache helps improve performance when dealing with queries that involve inheritance hierarchies. Read more in [WMI Type Support](#wmi-type-support). For example, if a superclass is queried, the cache
-might store one entry for each WMI concrete instance class (leaves of the class hierarchy) and properties to optimize subsequent operations.
+This cache helps improve performance when dealing with queries that involve inheritance hierarchies. Read more in [WMI Type Support](#wmi-type-support). For example, if a superclass is queried, the cache stores entries for each WMI concrete instance class (the leaves of the class hierarchy) and their associated properties. Therefore, querying a superclass that returns a result set containing instances of `10` different classes, each with `50` properties, will result in a cache size of `500` entries (`10×50`).
 The default value is `1000`.
 
 **`wmi.queries`**
