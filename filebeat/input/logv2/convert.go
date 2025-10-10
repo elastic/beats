@@ -146,8 +146,13 @@ func convertConfig(logger *logp.Logger, cfg *config.C) (*config.C, error) {
 		}
 	}
 
-	handleParsers(logger, cfg, newCfg)
-	handleFileIdentity(cfg, newCfg)
+	if err := handleParsers(logger, cfg, newCfg); err != nil {
+		return nil, err
+	}
+
+	if err := handleFileIdentity(cfg, newCfg); err != nil {
+		return nil, err
+	}
 
 	// Add final fields
 	if err := newCfg.SetString("type", -1, "filestream"); err != nil {
@@ -163,8 +168,8 @@ func convertConfig(logger *logp.Logger, cfg *config.C) (*config.C, error) {
 
 // translateField translates a single field from the Log input syntax to Filestream.
 // If a config cannot be read as it specified type, it's either an empty key in the
-// YAML or it's actually an invalid value, either way, we just ignore it and return
-// no error. A warning log is generated.
+// YAML or it's actually an invalid value, either way, we just ignore it, return
+// no error and log at warning level.
 func translateField(logger *logp.Logger, cfg, newCfg *config.C, key string, kind configField) error {
 	switch kind.kind {
 	// If there is any error reading the config as the correct type,
@@ -212,7 +217,7 @@ func translateField(logger *logp.Logger, cfg, newCfg *config.C, key string, kind
 	case ConfTypeConstant:
 		v, err := cfg.Bool(key, -1)
 		if err != nil {
-			logger.Warnf("cannot read %q as bool: %s", key, err)
+			logger.Warnf("cannot read %q as bool: %s, ignoring malformed config entry", key, err)
 			return nil
 		}
 		if v {
@@ -225,10 +230,13 @@ func translateField(logger *logp.Logger, cfg, newCfg *config.C, key string, kind
 	return nil
 }
 
+// handleMultilne converts the multiline configuration. There is at least one
+// field in the multiline configuration that cannot be directly copied, so
+// we have to call [translateField].
 func handleMultilne(logger *logp.Logger, cfg *config.C, parsers *[]any) error {
 	hasMultiline, err := cfg.Has("multiline", -1)
 	if err != nil {
-		return fmt.Errorf("cannot access 'json' field: %w", err)
+		return fmt.Errorf("cannot access 'multiline' field: %w", err)
 	}
 
 	if !hasMultiline {
@@ -256,45 +264,82 @@ func handleMultilne(logger *logp.Logger, cfg *config.C, parsers *[]any) error {
 				return fmt.Errorf("cannot read 'multiline.%s': %w", key, err)
 			}
 
-			if has {
-				if err := translateField(logger, multilineCfg, newMultilineCfg, key, kind); err != nil {
-					return err
-				}
+			if !has {
+				continue
+			}
+
+			if err := translateField(logger, multilineCfg, newMultilineCfg, key, kind); err != nil {
+				return err
 			}
 		}
 
 		*parsers = append(*parsers, map[string]any{
 			"multiline": multilineCfg,
 		})
+
 		return nil
 	}
 
 	return nil
 }
 
+// handleJSON copies the JSON configuration from the Log input into the
+// parsers array from Filestream
 func handleJSON(logger *logp.Logger, cfg *config.C, parsers *[]any) error {
-	// json has simpler types, so we can use the config directly
 	hasJson, err := cfg.Has("json", -1)
 	if err != nil {
 		return fmt.Errorf("cannot read 'json': %w", err)
 	}
 
-	if hasJson {
-		jsonCfg, err := cfg.Child("json", -1)
+	if !hasJson {
+		return nil
+	}
+
+	jsonCfg, err := cfg.Child("json", -1)
+	if err != nil {
+		logger.Warnf("cannot read 'json' as map: %s, ignoring malformed config entry ", err)
+		return nil
+	}
+
+	count, err := jsonCfg.CountField("")
+	if err == nil && count != 0 {
+		*parsers = append(*parsers, map[string]any{"ndjson": jsonCfg})
+	}
+
+	return nil
+}
+
+// copyParsers copies any existing 'parsers' from cfg into parsersCfg.
+// offset is the offset in parsersCfg to start adding the new ones.
+func copyParsers(cfg, parsersCfg *config.C, offset int) error {
+	logParers, err := cfg.Child("parsers", -1)
+	if err != nil {
+		return fmt.Errorf("cannot access 'parsers' from config: %w", err)
+	}
+
+	lenParsers, err := logParers.CountField("")
+	if err != nil {
+		return fmt.Errorf("cannot access the length of 'parsers': %w", err)
+	}
+
+	for i := range lenParsers {
+		el, err := logParers.Child("", i)
 		if err != nil {
-			logger.Warnf("cannot read 'json' as map: %s, ignoring malformed config entry ", err)
-			return nil
+			return fmt.Errorf("cannot access 'parsers.%d': %w", i, err)
 		}
 
-		count, err := jsonCfg.CountField("")
-		if err == nil && count != 0 {
-			*parsers = append(*parsers, map[string]any{"ndjson": jsonCfg})
+		idx := offset + i
+		if err := parsersCfg.SetChild("", idx, el); err != nil {
+			return fmt.Errorf("cannot set 'parsers.%d': %w", idx, err)
 		}
 	}
 
 	return nil
 }
 
+// handleParsers converts the multiline and JSON configuration by calling
+// [handleMultiline] and [handleJSON], adds them all into a parsers array
+// and finally copies any other parsers, if any, at the end of the array.
 func handleParsers(logger *logp.Logger, cfg, newCfg *config.C) error {
 	parsers := []any{}
 	if err := handleMultilne(logger, cfg, &parsers); err != nil {
@@ -305,72 +350,62 @@ func handleParsers(logger *logp.Logger, cfg, newCfg *config.C) error {
 		return err
 	}
 
-	// If any parsers were created, set them into the new config.
-	// If the original config had a 'parsers' array, it is copied
-	// after the multiline and ndjson parsers coming from the log config
-	// translation
-	if len(parsers) > 0 {
-		parsersCfg, err := config.NewConfigFrom(parsers)
-		if err != nil {
-			return fmt.Errorf("cannot process the converted parsers config: %w", err)
+	// If no parsers were created, return. Any pre-existing parsers
+	// entry will be maintained and passed as is to Filestream.
+	if len(parsers) <= 0 {
+		return nil
+	}
+
+	parsersCfg, err := config.NewConfigFrom(parsers)
+	if err != nil {
+		return fmt.Errorf("cannot process the converted parsers config: %w", err)
+	}
+
+	// If 'parsers' was also set in the Log input configuration, add them at the
+	// end of the new 'parsers' array.
+	if cfg.HasField("parsers") {
+		if err := copyParsers(cfg, parsersCfg, len(parsers)); err != nil {
+			return err
 		}
+	}
 
-		if cfg.HasField("parsers") {
-			logParers, err := cfg.Child("parsers", -1)
-			if err != nil {
-				return fmt.Errorf("cannot access 'parsers' from config: %w", err)
-			}
-
-			lenParsers, err := logParers.CountField("")
-			if err != nil {
-				return fmt.Errorf("cannot access the length of 'parsers': %w", err)
-			}
-
-			for i := range lenParsers {
-				el, err := logParers.Child("", i)
-				if err != nil {
-					return fmt.Errorf("cannot access 'parsers.%d': %w", i, err)
-				}
-
-				idx := len(parsers) + i
-				if err := parsersCfg.SetChild("", idx, el); err != nil {
-					return fmt.Errorf("cannot set 'parsers.%d': %w", idx, err)
-				}
-			}
-		}
-
-		if err := newCfg.SetChild("parsers", -1, parsersCfg); err != nil {
-			return fmt.Errorf("cannot set 'parsers': %w", err)
-		}
+	if err := newCfg.SetChild("parsers", -1, parsersCfg); err != nil {
+		return fmt.Errorf("cannot set 'parsers': %w", err)
 	}
 
 	return nil
 }
 
+// handleFileIdentity sets the file identity using the following rules:
+//   - If no file identity is set, default to 'native' (same as Log input)
+//   - If file identity is set, keep it as is
+//   - If file identity is NOT fingerprint, disable fingerprint in the scanner
 func handleFileIdentity(cfg, newCfg *config.C) error {
-	// Handle file identity
-	//  - If no file identity is set, default to 'native'
-	//  - If file identity is set, keep it as is
-	//  - If file identity is NOT fingerprint, disable fingerprint in the scanner
-	disableFingeprint := true
-	if !cfg.HasField("file_identity") {
-		err := newCfg.SetChild("file_identity.native", -1, config.NewConfig())
-		if err != nil {
-			return fmt.Errorf("cannot set 'file_identity.native': %w", err)
-		}
-	} else {
-		has, err := cfg.Has("file_identity.fingerprint", -1)
+	if cfg.HasField("file_identity") {
+		isFingerprint, err := cfg.Has("file_identity.fingerprint", -1)
 		if err != nil {
 			return fmt.Errorf("cannot read 'file_identity.fingerprint': %w", err)
 		}
-		disableFingeprint = !has
-	}
 
-	if disableFingeprint {
-		err := newCfg.SetBool("prospector.scanner.fingerprint.enabled", -1, false)
-		if err != nil {
+		if isFingerprint {
+			return nil
+		}
+
+		// If the file identity is not fingerprint,
+		// disable fingerprint in the scanner
+		if err := newCfg.SetBool("prospector.scanner.fingerprint.enabled", -1, false); err != nil {
 			return fmt.Errorf("cannot set 'prospector.scanner.fingerprint.enalbed': %w", err)
 		}
+
+		return nil
+	}
+
+	if err := newCfg.SetChild("file_identity.native", -1, config.NewConfig()); err != nil {
+		return fmt.Errorf("cannot set 'file_identity.native': %w", err)
+	}
+
+	if err := newCfg.SetBool("prospector.scanner.fingerprint.enabled", -1, false); err != nil {
+		return fmt.Errorf("cannot set 'prospector.scanner.fingerprint.enalbed': %w", err)
 	}
 
 	return nil
