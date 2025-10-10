@@ -117,7 +117,7 @@ func (f *replaceString) replaceField(field string, pattern *regexp.Regexp, repla
 
 	currentValueString, ok := currentValue.(string)
 	if !ok {
-		return fmt.Errorf("key '%s' expected type string, but got %T with value %v", field, currentValue, currentValue)
+		return fmt.Errorf("key '%s' expected type string, but got %T with value '%v'", field, currentValue, currentValue)
 	}
 
 	updatedString := pattern.ReplaceAllString(currentValueString, replacement)

@@ -232,7 +232,7 @@ func TestReplaceRun(t *testing.T) {
 			Output: mapstr.M{
 				"f": nil,
 				"error": mapstr.M{
-					"message": "Failed to replace fields in processor: value for key: f is not a string: <nil>",
+					"message": "Failed to replace fields in processor: key 'f' expected type string, but got <nil> with value '<nil>'",
 				},
 			},
 			error:         true,
@@ -254,7 +254,7 @@ func TestReplaceRun(t *testing.T) {
 			Output: mapstr.M{
 				"f": 123.45,
 				"error": mapstr.M{
-					"message": "Failed to replace fields in processor: value for key: f is not a string: 123.45",
+					"message": "Failed to replace fields in processor: key 'f' expected type string, but got float64 with value '123.45'",
 				},
 			},
 			error:         true,
@@ -276,7 +276,7 @@ func TestReplaceRun(t *testing.T) {
 			Output: mapstr.M{
 				"f": 123,
 				"error": mapstr.M{
-					"message": "Failed to replace fields in processor: value for key: f is not a string: 123",
+					"message": "Failed to replace fields in processor: key 'f' expected type string, but got int with value '123'",
 				},
 			},
 			error:         true,
