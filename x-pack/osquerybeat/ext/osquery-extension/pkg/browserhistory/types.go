@@ -6,7 +6,6 @@ package browserhistory
 
 import (
 	"context"
-	"database/sql"
 	"reflect"
 	"strconv"
 
@@ -14,30 +13,6 @@ import (
 )
 
 type parserFunc func(ctx context.Context, queryContext table.QueryContext, browserName, profilePath string, log func(m string, kvs ...any)) ([]*row, error)
-
-type rawHistoryEntry struct {
-	user              string
-	profile           string
-	path              string
-	browserName       string
-	url               sql.NullString
-	title             sql.NullString
-	visitCount        sql.NullInt64
-	typedCount        sql.NullInt64
-	visitTime         sql.NullInt64
-	transitionType    sql.NullInt64
-	visitID           sql.NullInt64
-	fromVisitID       sql.NullInt64
-	urlID             sql.NullInt64
-	visitSource       sql.NullInt64
-	referringURL      sql.NullString
-	isHidden          sql.NullInt64
-	chVisitDuration   sql.NullInt64
-	ffSessionID       sql.NullInt64
-	ffFrecency        sql.NullInt64
-	sfDomainExpansion sql.NullString
-	sfLoadSuccessful  sql.NullInt64
-}
 
 type row struct {
 	// Universal fields (available across all browsers)
@@ -69,6 +44,16 @@ type row struct {
 	// Safari-specific fields
 	SfDomainExpansion string `osquery:"sf_domain_expansion"` // Safari domain classification
 	SfLoadSuccessful  string `osquery:"sf_load_successful"`  // Whether page loaded successfully
+}
+
+func newHistoryRow(parser, browserName, user, profileName, sourcePath string) *row {
+	return &row{
+		Browser:     browserName,
+		Parser:      parser,
+		User:        user,
+		ProfileName: profileName,
+		SourcePath:  sourcePath,
+	}
 }
 
 func (entry *row) toMap() map[string]string {

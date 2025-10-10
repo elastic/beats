@@ -55,29 +55,46 @@ func safariParser(ctx context.Context, queryContext table.QueryContext, browserN
 	rowCount := 0
 	for rows.Next() {
 		rowCount++
-		entry := rawHistoryEntry{
-			user:        user,
-			profile:     profileName,
-			path:        profilePath,
-			browserName: browserName,
-		}
+
+		var (
+			url             sql.NullString
+			domainExpansion sql.NullString
+			visitCount      sql.NullInt64
+			title           sql.NullString
+			visitTime       sql.NullInt64
+			loadSuccessful  sql.NullInt64
+			itemID          sql.NullInt64
+			visitID         sql.NullInt64
+		)
 
 		err := rows.Scan(
-			&entry.url,
-			&entry.sfDomainExpansion,
-			&entry.visitCount,
-			&entry.title,
-			&entry.visitTime,
-			&entry.sfLoadSuccessful,
-			&entry.urlID,
-			&entry.visitID,
+			&url,
+			&domainExpansion,
+			&visitCount,
+			&title,
+			&visitTime,
+			&loadSuccessful,
+			&itemID,
+			&visitID,
 		)
 		if err != nil {
 			log("failed to scan row", "rowNumber", rowCount, "error", err)
 			continue
 		}
 
-		entries = append(entries, safariEntryToRow(&entry))
+		entry := newHistoryRow("safari", browserName, user, profileName, profilePath)
+		entry.Timestamp = formatNullInt64(visitTime, func(value int64) string {
+			return strconv.FormatInt(safariTimeToUnix(value), 10)
+		})
+		entry.URL = stringFromNullString(url)
+		entry.Title = stringFromNullString(title)
+		entry.VisitID = decimalStringFromNullInt(visitID)
+		entry.VisitCount = decimalStringFromNullInt(visitCount)
+		entry.UrlID = decimalStringFromNullInt(itemID)
+		entry.SfDomainExpansion = stringFromNullString(domainExpansion)
+		entry.SfLoadSuccessful = boolStringFromNullInt(loadSuccessful)
+
+		entries = append(entries, entry)
 	}
 
 	log("completed reading history", "totalRows", rowCount, "validEntries", len(entries), "historyPath", profilePath)
@@ -103,26 +120,6 @@ func extractSafariProfileName(profilePath string, log func(m string, kvs ...any)
 
 	log("using default Safari profile name")
 	return "Default"
-}
-
-func safariEntryToRow(entry *rawHistoryEntry) *row {
-	return &row{
-		Timestamp: formatNullInt64(entry.visitTime, func(value int64) string {
-			return strconv.FormatInt(safariTimeToUnix(value), 10)
-		}),
-		URL:               stringFromNullString(entry.url),
-		Title:             stringFromNullString(entry.title),
-		Browser:           entry.browserName,
-		Parser:            "safari",
-		User:              entry.user,
-		ProfileName:       entry.profile,
-		VisitID:           decimalStringFromNullInt(entry.visitID),
-		VisitCount:        decimalStringFromNullInt(entry.visitCount),
-		SourcePath:        entry.path,
-		UrlID:             decimalStringFromNullInt(entry.urlID),
-		SfDomainExpansion: stringFromNullString(entry.sfDomainExpansion),
-		SfLoadSuccessful:  boolStringFromNullInt(entry.sfLoadSuccessful),
-	}
 }
 
 // safariTimeToUnix converts Safari timestamp to Unix timestamp

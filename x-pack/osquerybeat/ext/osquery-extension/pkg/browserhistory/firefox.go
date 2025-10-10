@@ -65,35 +65,64 @@ func firefoxParser(ctx context.Context, queryContext table.QueryContext, browser
 	rowCount := 0
 	for rows.Next() {
 		rowCount++
-		entry := rawHistoryEntry{
-			user:        user,
-			profile:     profileName,
-			path:        profilePath,
-			browserName: browserName,
-		}
+
+		var (
+			url          sql.NullString
+			title        sql.NullString
+			visitCount   sql.NullInt64
+			isHidden     sql.NullInt64
+			ffFrecency   sql.NullInt64
+			typedCount   sql.NullInt64
+			urlID        sql.NullInt64
+			visitTime    sql.NullInt64
+			transition   sql.NullInt64
+			visitID      sql.NullInt64
+			fromVisitID  sql.NullInt64
+			ffSessionID  sql.NullInt64
+			visitSource  sql.NullInt64
+			referringURL sql.NullString
+		)
 
 		err := rows.Scan(
-			&entry.url,
-			&entry.title,
-			&entry.visitCount,
-			&entry.isHidden,
-			&entry.ffFrecency,
-			&entry.typedCount,
-			&entry.urlID,
-			&entry.visitTime,
-			&entry.transitionType,
-			&entry.visitID,
-			&entry.fromVisitID,
-			&entry.ffSessionID,
-			&entry.visitSource,
-			&entry.referringURL,
+			&url,
+			&title,
+			&visitCount,
+			&isHidden,
+			&ffFrecency,
+			&typedCount,
+			&urlID,
+			&visitTime,
+			&transition,
+			&visitID,
+			&fromVisitID,
+			&ffSessionID,
+			&visitSource,
+			&referringURL,
 		)
 		if err != nil {
 			log("failed to scan row", "rowNumber", rowCount, "error", err)
 			continue
 		}
 
-		entries = append(entries, firefoxEntryToRow(entry))
+		entry := newHistoryRow("firefox", browserName, user, profileName, profilePath)
+		entry.Timestamp = formatNullInt64(visitTime, func(value int64) string {
+			return strconv.FormatInt(value/1000000, 10)
+		})
+		entry.URL = stringFromNullString(url)
+		entry.Title = stringFromNullString(title)
+		entry.TransitionType = mapFirefoxTransitionType(transition)
+		entry.ReferringURL = stringFromNullString(referringURL)
+		entry.VisitID = decimalStringFromNullInt(visitID)
+		entry.FromVisitID = decimalStringFromNullInt(fromVisitID)
+		entry.VisitCount = decimalStringFromNullInt(visitCount)
+		entry.TypedCount = decimalStringFromNullInt(typedCount)
+		entry.VisitSource = mapFirefoxVisitSource(visitSource)
+		entry.IsHidden = boolStringFromNullInt(isHidden)
+		entry.UrlID = decimalStringFromNullInt(urlID)
+		entry.FfSessionID = decimalStringFromNullInt(ffSessionID)
+		entry.FfFrecency = decimalStringFromNullInt(ffFrecency)
+
+		entries = append(entries, entry)
 	}
 
 	log("completed reading history", "totalRows", rowCount, "validEntries", len(entries), "historyPath", profilePath)
@@ -136,32 +165,6 @@ func extractFirefoxProfileName(profilePath string, log func(m string, kvs ...any
 	}
 	log("using folder name as profile name", "name", profileFolderName)
 	return profileFolderName
-}
-
-func firefoxEntryToRow(entry rawHistoryEntry) *row {
-	return &row{
-		Timestamp: formatNullInt64(entry.visitTime, func(value int64) string {
-			return strconv.FormatInt(value/1000000, 10)
-		}),
-		URL:            stringFromNullString(entry.url),
-		Title:          stringFromNullString(entry.title),
-		Browser:        entry.browserName,
-		Parser:         "firefox",
-		User:           entry.user,
-		ProfileName:    entry.profile,
-		TransitionType: mapFirefoxTransitionType(entry.transitionType),
-		ReferringURL:   stringFromNullString(entry.referringURL),
-		VisitID:        decimalStringFromNullInt(entry.visitID),
-		FromVisitID:    decimalStringFromNullInt(entry.fromVisitID),
-		VisitCount:     decimalStringFromNullInt(entry.visitCount),
-		TypedCount:     decimalStringFromNullInt(entry.typedCount),
-		VisitSource:    mapFirefoxVisitSource(entry.visitSource),
-		IsHidden:       boolStringFromNullInt(entry.isHidden),
-		SourcePath:     entry.path,
-		UrlID:          decimalStringFromNullInt(entry.urlID),
-		FfSessionID:    decimalStringFromNullInt(entry.ffSessionID),
-		FfFrecency:     decimalStringFromNullInt(entry.ffFrecency),
-	}
 }
 
 // mapFirefoxVisitSource maps Firefox visit source values to human-readable strings

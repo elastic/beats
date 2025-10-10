@@ -64,33 +64,63 @@ func chromiumParser(ctx context.Context, queryContext table.QueryContext, browse
 	rowCount := 0
 	for rows.Next() {
 		rowCount++
-		entry := rawHistoryEntry{
-			user:        user,
-			profile:     profileName,
-			path:        profilePath,
-			browserName: browserName,
-		}
+
+		var (
+			url             sql.NullString
+			title           sql.NullString
+			visitCount      sql.NullInt64
+			typedCount      sql.NullInt64
+			isHidden        sql.NullInt64
+			urlID           sql.NullInt64
+			visitTime       sql.NullInt64
+			transitionType  sql.NullInt64
+			visitID         sql.NullInt64
+			fromVisitID     sql.NullInt64
+			chVisitDuration sql.NullInt64
+			visitSource     sql.NullInt64
+			referringURL    sql.NullString
+		)
 
 		err := rows.Scan(
-			&entry.url,
-			&entry.title,
-			&entry.visitCount,
-			&entry.typedCount,
-			&entry.isHidden,
-			&entry.urlID,
-			&entry.visitTime,
-			&entry.transitionType,
-			&entry.visitID,
-			&entry.fromVisitID,
-			&entry.chVisitDuration,
-			&entry.visitSource,
-			&entry.referringURL,
+			&url,
+			&title,
+			&visitCount,
+			&typedCount,
+			&isHidden,
+			&urlID,
+			&visitTime,
+			&transitionType,
+			&visitID,
+			&fromVisitID,
+			&chVisitDuration,
+			&visitSource,
+			&referringURL,
 		)
 		if err != nil {
 			log("failed to scan row", "rowNumber", rowCount, "error", err)
 			continue
 		}
-		entries = append(entries, chromiumEntryToRow(entry))
+
+		entry := newHistoryRow("chromium", browserName, user, profileName, profilePath)
+		entry.Timestamp = formatNullInt64(visitTime, func(value int64) string {
+			return strconv.FormatInt(chromiumTimeToUnix(value), 10)
+		})
+		entry.URL = stringFromNullString(url)
+		entry.Title = stringFromNullString(title)
+		entry.TransitionType = mapChromiumTransitionType(transitionType)
+		entry.ReferringURL = stringFromNullString(referringURL)
+		entry.VisitID = decimalStringFromNullInt(visitID)
+		entry.FromVisitID = decimalStringFromNullInt(fromVisitID)
+		entry.VisitCount = decimalStringFromNullInt(visitCount)
+		entry.TypedCount = decimalStringFromNullInt(typedCount)
+		entry.VisitSource = mapChromiumVisitSource(visitSource)
+		entry.IsHidden = boolStringFromNullInt(isHidden)
+		entry.UrlID = decimalStringFromNullInt(urlID)
+		entry.ChVisitDurationMs = formatNullInt64(chVisitDuration, func(value int64) string {
+			return strconv.FormatInt(value/1000, 10)
+		})
+
+		entries = append(entries, entry)
 	}
 
 	log("completed reading history", "totalRows", rowCount, "validEntries", len(entries), "historyPath", profilePath)
@@ -119,33 +149,6 @@ func extractChromiumProfileName(profilePath string, log func(m string, kvs ...an
 	}
 	log("using folder name as profile name", "name", profileFolderName)
 	return profileFolderName
-}
-
-func chromiumEntryToRow(entry rawHistoryEntry) *row {
-	return &row{
-		Timestamp: formatNullInt64(entry.visitTime, func(value int64) string {
-			return strconv.FormatInt(chromiumTimeToUnix(value), 10)
-		}),
-		URL:            stringFromNullString(entry.url),
-		Title:          stringFromNullString(entry.title),
-		Browser:        entry.browserName,
-		Parser:         "chromium",
-		User:           entry.user,
-		ProfileName:    entry.profile,
-		TransitionType: mapChromiumTransitionType(entry.transitionType),
-		ReferringURL:   stringFromNullString(entry.referringURL),
-		VisitID:        decimalStringFromNullInt(entry.visitID),
-		FromVisitID:    decimalStringFromNullInt(entry.fromVisitID),
-		VisitCount:     decimalStringFromNullInt(entry.visitCount),
-		TypedCount:     decimalStringFromNullInt(entry.typedCount),
-		VisitSource:    mapChromiumVisitSource(entry.visitSource),
-		IsHidden:       boolStringFromNullInt(entry.isHidden),
-		SourcePath:     entry.path,
-		UrlID:          decimalStringFromNullInt(entry.urlID),
-		ChVisitDurationMs: formatNullInt64(entry.chVisitDuration, func(value int64) string {
-			return strconv.FormatInt(value/1000, 10)
-		}),
-	}
 }
 
 // chromiumTimeToUnix converts Chromium timestamp to Unix timestamp
