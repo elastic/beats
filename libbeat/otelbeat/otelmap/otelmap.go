@@ -49,61 +49,53 @@ func ToMapstr(m pcommon.Map) mapstr.M {
 //     If you attempt to use other slice types (e.g., []string or []int),
 //     pcommon.Map.FromRaw(...) will return an "invalid type" error.
 //     To overcome this, we use "reflect" to transform []T into []any.
-func ConvertNonPrimitive[T mapstrOrMap](m T) {
+func ConvertNonPrimitive[T mapstrOrMap](m T, bodyMap pcommon.Map) {
 	for key, val := range m {
 		switch x := val.(type) {
 		case mapstr.M:
-			ConvertNonPrimitive(x)
-			m[key] = map[string]any(x)
+			ConvertNonPrimitive(map[string]any(x), bodyMap.PutEmptyMap(key))
 		case []mapstr.M:
-			s := make([]any, len(x))
-			for i, val := range x {
-				ConvertNonPrimitive(val)
-				s[i] = map[string]any(val)
+			s := bodyMap.PutEmptySlice(key)
+			for _, val := range x {
+				ConvertNonPrimitive(map[string]any(val), s.AppendEmpty().SetEmptyMap())
 			}
-			m[key] = s
 		case map[string]any:
-			ConvertNonPrimitive(x)
-			m[key] = x
+			ConvertNonPrimitive(x, bodyMap.PutEmptyMap(key))
 		case []map[string]any:
-			s := make([]any, len(x))
-			for i := range x {
-				ConvertNonPrimitive(x[i])
-				s[i] = x[i]
+			s := bodyMap.PutEmptySlice(key)
+			for _, val := range x {
+				ConvertNonPrimitive(val, s.AppendEmpty().SetEmptyMap())
 			}
-			m[key] = s
 		case time.Time:
-			m[key] = x.UTC().Format("2006-01-02T15:04:05.000Z")
+			bodyMap.PutStr(key, x.UTC().Format("2006-01-02T15:04:05.000Z"))
 		case common.Time:
-			m[key] = time.Time(x).UTC().Format("2006-01-02T15:04:05.000Z")
+			bodyMap.PutStr(key, time.Time(x).UTC().Format("2006-01-02T15:04:05.000Z"))
 		case []time.Time:
-			s := make([]any, 0, len(x))
+			s := bodyMap.PutEmptySlice(key)
 			for _, i := range x {
-				s = append(s, i.UTC().Format("2006-01-02T15:04:05.000Z"))
+				s.AppendEmpty().FromRaw(i.UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
-			m[key] = s
 		case []common.Time:
-			s := make([]any, 0, len(x))
+			s := bodyMap.PutEmptySlice(key)
 			for _, i := range x {
-				s = append(s, time.Time(i).UTC().Format("2006-01-02T15:04:05.000Z"))
+				s.AppendEmpty().FromRaw(time.Time(i).UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
-			m[key] = s
 		case encoding.TextMarshaler:
 			text, err := x.MarshalText()
 			if err != nil {
-				m[key] = fmt.Sprintf("error converting %T to string: %s", x, err)
+				bodyMap.PutStr(key, fmt.Sprintf("error converting %T to string: %s", x, err))
 				continue
 			}
-			m[key] = string(text)
+			bodyMap.PutStr(key, string(text))
 		case []bool, []string, []float32, []float64, []int, []int8, []int16, []int32, []int64,
 			[]uint, []uint8, []uint16, []uint32, []uint64:
 			ref := reflect.ValueOf(x)
-			s := make([]any, ref.Len())
+			s := bodyMap.PutEmptySlice(key)
 			for i := 0; i < ref.Len(); i++ {
-				s[i] = ref.Index(i).Interface()
+				s.AppendEmpty().FromRaw(ref.Index(i).Interface())
 			}
-			m[key] = s
 		case nil, string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, bool:
+			bodyMap.PutEmpty(key).FromRaw(x)
 		default:
 			ref := reflect.ValueOf(x)
 			if ref.Kind() == reflect.Struct {
@@ -113,28 +105,25 @@ func ConvertNonPrimitive[T mapstrOrMap](m T) {
 					m[key] = fmt.Sprintf("error encoding struct to map: %s", err)
 					continue
 				}
-				ConvertNonPrimitive(im)
-				m[key] = im
+				ConvertNonPrimitive(im, bodyMap.PutEmptyMap(key))
 				break
 			}
 			if ref.Kind() == reflect.Slice || ref.Kind() == reflect.Array {
-				s := make([]any, ref.Len())
+				// s := make([]any, ref.Len())
+				s := bodyMap.PutEmptySlice(key)
 				for i := 0; i < ref.Len(); i++ {
 					elem := ref.Index(i).Interface()
 					if mi, ok := elem.(map[string]any); ok {
-						ConvertNonPrimitive(mi)
-						s[i] = mi
+						ConvertNonPrimitive(mi, s.AppendEmpty().SetEmptyMap())
 					} else if mi, ok := elem.(mapstr.M); ok {
-						ConvertNonPrimitive(mi)
-						s[i] = map[string]any(mi)
+						ConvertNonPrimitive(map[string]any(mi), s.AppendEmpty().SetEmptyMap())
 					} else {
-						s[i] = elem
+						s.AppendEmpty().FromRaw(elem)
 					}
 				}
-				m[key] = s
 				break // we figured out the type, so we don't need the unknown type case
 			}
-			m[key] = fmt.Sprintf("unknown type: %T", x)
+			bodyMap.PutStr(key, fmt.Sprintf("unknown type: %T", x))
 		}
 	}
 }
