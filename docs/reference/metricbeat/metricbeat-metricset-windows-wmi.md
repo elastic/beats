@@ -13,12 +13,11 @@ applies_to:
 This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
 ::::
 
-
-The `wmi` metricset of the Windows module reads metrics via Windows Management Instrumentation  [(WMI)](https://learn.microsoft.com/en-us/windows/win32/wmisdk/about-wmi), a core management technology in the Windows Operating system.
+The `wmi` metricset of the Windows module reads metrics via [Windows Management Instrumentation](https://learn.microsoft.com/en-us/windows/win32/wmisdk/about-wmi) (WMI), a core management technology in the Windows Operating system.
 
 By leveraging WMI Query Language (WQL), this metricset allows you to extract detailed system information and metrics to monitor the health and performance of Windows Systems.
 
-This metricset leverages the [Microsoft WMI](https://github.com/microsoft/wmi), library a convenient wrapper around the [GO-OLE](https://github.com/go-ole) library which allows to invoke the WMI Api.
+This metricset leverages the [Microsoft WMI](https://github.com/microsoft/wmi) library, a convenient wrapper around the [GO-OLE](https://github.com/go-ole) library which allows to invoke the WMI API.
 
 ## WMI Query Language (WQL) Support
 
@@ -30,11 +29,14 @@ namespaces.
 Currently, the metricset supports queries with `SELECT`, `FROM` and
 `WHERE` clauses.
 
-When working with WMI queries, it is the user’s responsibility to ensure
+::::{warning}
+When working with WMI queries, it is the user's responsibility to ensure
 that queries are safe, efficient, and do not cause unintended side
 effects. A notorious example of a problematic WMI class is
-Win32\_Product. Read more in [Windows
-Documentation](https://support.microsoft.com/kb/974524).
+`Win32_Product`. Read more in the related [Windows
+documentation](https://learn.microsoft.com/en-us/troubleshoot/windows-server/admin-development/windows-installer-reconfigured-all-applications#more-information).
+::::
+
 
 ## WMI Arbitrator and Query Execution
 
@@ -54,28 +56,35 @@ fail, Metricbeat has a timeout mechanism that stops waiting for query
 results after a specified timeout. This is controlled by the
 `wmi.warning_threshold` setting.
 
+::::{note}
 While Metricbeat stops waiting for the result, the underlying WMI query
 may continue running until the WMI Arbitrator decides to stop execution.
+::::
 
 ## WMI Type support
 
 The `microsoft/wmi` library internally uses the WMI Scripting API. This API, as per the
 [official WMI Documentation](https://learn.microsoft.com/en-us/windows/win32/wmisdk/querying-wmi),
-does not provide direct type conversion for `uint64`, `sint64`, and `datetime` CIM types;
+does not provide direct type conversion for `uint64`, `sint64`, and `datetime`
+[Common Information Model](https://learn.microsoft.com/en-us/windows/win32/wmisdk/common-information-model) (CIM) types;
 instead, these values are returned as strings.
 
 To ensure the correct data type is reported, Metricbeat dynamically fetches the
-CIM type definitions for the properties of the WMI instance classes involved in the query,
+CIM type definitions for the properties of the WMI instance classes returned by the query,
 and then performs the necessary data type conversions.
 
 To optimize performance and avoid repeatedly fetching these schema definitions
 for every row and every request, an LRU cache is utilized. This cache stores
-the schema definition for each unique WMI class encountered. For queries involving
+the schema definition for each WMI class-property pair encountered. For queries involving
 superclasses, such as `CIM_LogicalDevice`, the cache will populate with individual entries
 for each specific derived class (leaf of the class hierarchy) whose instances are returned by the query (for example, `Win32_DiskDrive` or `Win32_NetworkAdapter`).
 
 ::::{note}
 The properties of type `CIM_Object` (embedded objects) are not yet supported and are ignored.
+::::
+
+::::{note}
+Properties of type `CIM_Reference` (references), which are used in [WMI Association Classes](https://learn.microsoft.com/en-us/windows/win32/wmisdk/declaring-an-association-class), are currently returned as string values exactly as reported by the [Microsoft WMI](https://github.com/microsoft/wmi) library.
 ::::
 
 ## Configuration
@@ -107,7 +116,7 @@ The properties of type `CIM_Object` (embedded objects) are not yet supported and
 
 **`wmi.namespace`**
 :   The default WMI namespace used for queries. This can be overridden per
-query. The default is `root\cimv2`.
+query. The default is `"root\\cimv2"`.
 
 **`wmi.warning_threshold`**
 :   The time threshold after which Metricbeat will stop waiting for the
@@ -138,9 +147,8 @@ The default value is `0`, which is a special value indicating that all fetched
 results should be returned without a row limit.
 
 **`wmi.schema_cache_size`**
-:   The maximum number of WMI class definitions that can be cached per single query. Every query keeps its own separate cache.  This cache helps improve performance when dealing with queries that involve inheritance hierarchies. Read more in [WMI Type Support](#wmi-type-support).
-For example, if a superclass is queried, the cache
-might store all its derived classes (leaves of the class hierarchy) to optimize subsequent operations.
+:   The maximum number of WMI class-property pairs that can be cached per single query. Every query keeps its own separate cache.
+This cache helps improve performance when dealing with queries that involve inheritance hierarchies. Read more in [WMI Type Support](#wmi-type-support). For example, if a superclass is queried, the cache stores entries for each WMI concrete instance class (the leaves of the class hierarchy) and their associated properties. Therefore, querying a superclass that returns a result set containing instances of `10` different classes, each with `50` properties, will result in a cache size of `500` entries (`10×50`).
 The default value is `1000`.
 
 **`wmi.queries`**
@@ -197,17 +205,19 @@ Equivalent YAML Configuration:
 
 - When possible, try querying concrete (leaf) classes or classes closer to the leaves of the WMI inheritance hierarchy. Querying abstract superclasses may require fetching and caching the schema definitions for numerous derived classes, which can lead to increased memory usage and potential performance penalties due to cache misses.
 
-- Set up alerts in Metricbeat for documents with the `error.message` field set.
+- Set up Kibana Alerts for documents generated by this metricset with the `error.message` field.
 
-- [Advanced] Configure collection of WMI-Activity Operational Logs (found in Event Viewer under `Applications and Services Logs/Microsoft/Windows/WMI-Activity/Operational`). These logs can be invaluable for correlating issues with Metricbeat WMI warnings or documents containing `error.message`.
+- Configure collection of WMI-Activity Operational Logs (found in Event Viewer under `Applications and Services Logs/Microsoft/Windows/WMI-Activity/Operational`). These logs can be invaluable for correlating issues with Metricbeat WMI warnings or documents containing `error.message`.
 
 ## Compatibility
 
-This module has been tested on the following platform:
+This module has been tested on the following platforms:
 
-- Operating System: Microsoft Windows Server 2019 Datacenter
+| Operating System                            | Architecture |
+|---------------------------------------------|--------------|
+| Microsoft Windows Server 2019 Datacenter    | x64          |
+| Microsoft Windows 11 Pro                    | x64          |
 
-- Architecture: x64
 
 Other Windows versions and architectures may also work but have not been
 explicitly tested.
