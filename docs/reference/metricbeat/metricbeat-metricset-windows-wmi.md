@@ -84,7 +84,7 @@ The properties of type `CIM_Object` (embedded objects) are not yet supported and
 ::::
 
 ::::{note}
-The properties of type `CIM_Reference` (references) used in [WMI Association Classes](https://learn.microsoft.com/en-us/windows/win32/wmisdk/declaring-an-association-class) are currently returned as strings as reported by the microsoft/wmi library.
+Properties of type `CIM_Reference` (references), which are used in [WMI Association Classes](https://learn.microsoft.com/en-us/windows/win32/wmisdk/declaring-an-association-class), are currently returned as string values exactly as reported by the [Microsoft WMI](https://github.com/microsoft/wmi) library.
 ::::
 
 ## Configuration
