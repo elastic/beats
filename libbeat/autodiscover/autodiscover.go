@@ -167,6 +167,9 @@ func (a *Autodiscover) worker() {
 				a.logger.Debugf("calling reload with %d config(s)", len(configs))
 				err := a.runners.Reload(configs)
 
+				// Cleanup metadata no longer in use
+				a.runMetadataGC()
+
 				// reset updated status
 				updated = false
 
@@ -288,14 +291,31 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 		updated = true
 	}
 
-	// Cleanup meta references for this eventID
-	for configHash := range a.configs[eventID] {
-		a.meta.Remove(configHash)
-	}
-
 	delete(a.configs, eventID)
 
 	return updated
+}
+
+// runMetadataGC removes metadata for config hashes that are no longer active
+func (a *Autodiscover) runMetadataGC() {
+	activeHashes := make(map[uint64]bool)
+	for _, configs := range a.configs {
+		for hash := range configs {
+			activeHashes[hash] = true
+		}
+	}
+
+	storedHashes := a.meta.Keys()
+	removedCount := 0
+	for _, hash := range storedHashes {
+		if !activeHashes[hash] {
+			a.meta.Remove(hash)
+			removedCount++
+		}
+	}
+
+	a.logger.Debugf("Metadata cleanup: %d active, %d stored, %d removed",
+		len(activeHashes), len(storedHashes), removedCount)
 }
 
 func (a *Autodiscover) getMeta(event bus.Event) mapstr.M {
