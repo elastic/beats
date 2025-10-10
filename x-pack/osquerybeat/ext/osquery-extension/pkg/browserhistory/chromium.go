@@ -26,7 +26,10 @@ func chromiumParser(ctx context.Context, queryContext table.QueryContext, browse
 	}
 	defer db.Close()
 
-	query := `
+	// Build timestamp filtering
+	timestampWhere := buildChromiumTimestampWhere(queryContext)
+
+	query := fmt.Sprintf(`
 		SELECT 
 			urls.url,
 			urls.title,
@@ -46,8 +49,9 @@ func chromiumParser(ctx context.Context, queryContext table.QueryContext, browse
 		LEFT JOIN visit_source ON visits.id = visit_source.id
 		LEFT JOIN visits ref_visits ON visits.from_visit = ref_visits.id
 		LEFT JOIN urls ref_urls ON ref_visits.url = ref_urls.id
+		WHERE 1=1%s
 		ORDER BY visits.visit_time DESC
-	`
+	`, timestampWhere)
 
 	log("executing SQL query", "query", query)
 	rows, err := db.QueryContext(ctx, query)
@@ -101,10 +105,7 @@ func chromiumParser(ctx context.Context, queryContext table.QueryContext, browse
 			continue
 		}
 
-		entry := newHistoryRow("chromium", browserName, user, profileName, profilePath)
-		entry.Timestamp = formatNullInt64(visitTime, func(value int64) string {
-			return strconv.FormatInt(chromiumTimeToUnix(value), 10)
-		})
+		entry := newHistoryRow("chromium", browserName, user, profileName, profilePath, chromiumTimeToUnix(visitTime.Int64))
 		entry.URL = stringFromNullString(url)
 		entry.Title = stringFromNullString(title)
 		entry.TransitionType = mapChromiumTransitionType(transitionType)
@@ -151,7 +152,7 @@ func extractChromiumProfileName(profilePath string, log func(m string, kvs ...an
 	return profileFolderName
 }
 
-// chromiumTimeToUnix converts Chromium timestamp to Unix timestamp
+// Unix timestamps are in seconds since January 1, 1970 UTC
 // Chromium timestamps are in microseconds since January 1, 1601 UTC
 func chromiumTimeToUnix(chromiumTime int64) int64 {
 	if chromiumTime == 0 {
@@ -161,6 +162,16 @@ func chromiumTimeToUnix(chromiumTime int64) int64 {
 	const epochDifference = 11644473600000000
 	// Convert to seconds by dividing by 1,000,000 (microseconds to seconds)
 	return (chromiumTime - epochDifference) / 1000000
+}
+
+func unixToChromiumTime(unixTime int64) int64 {
+	if unixTime == 0 {
+		return 0
+	}
+	// Difference between Jan 1, 1601 and Jan 1, 1970 in microseconds
+	const epochDifference = 11644473600000000
+	// Convert to microseconds and add epoch difference
+	return (unixTime * 1000000) + epochDifference
 }
 
 // Chromium transition qualifiers (bit flags in upper bits)
@@ -279,4 +290,35 @@ func mapChromiumVisitSource(source sql.NullInt64) string {
 	default:
 		return "source_unknown"
 	}
+}
+
+// buildChromiumTimestampWhere creates WHERE clause for Chromium-based browsers
+func buildChromiumTimestampWhere(queryContext table.QueryContext) string {
+	constraints := getTimestampConstraints(queryContext)
+	if len(constraints) == 0 {
+		return ""
+	}
+
+	var conditions []string
+	for _, constraint := range constraints {
+		chromiumTime := unixToChromiumTime(constraint.Value)
+
+		switch constraint.Operator {
+		case table.OperatorEquals:
+			conditions = append(conditions, fmt.Sprintf("visits.visit_time = %d", chromiumTime))
+		case table.OperatorGreaterThan:
+			conditions = append(conditions, fmt.Sprintf("visits.visit_time > %d", chromiumTime))
+		case table.OperatorLessThan:
+			conditions = append(conditions, fmt.Sprintf("visits.visit_time < %d", chromiumTime))
+		case table.OperatorGreaterThanOrEquals:
+			conditions = append(conditions, fmt.Sprintf("visits.visit_time >= %d", chromiumTime))
+		case table.OperatorLessThanOrEquals:
+			conditions = append(conditions, fmt.Sprintf("visits.visit_time <= %d", chromiumTime))
+		}
+	}
+
+	if len(conditions) > 0 {
+		return " AND (" + strings.Join(conditions, " AND ") + ")"
+	}
+	return ""
 }

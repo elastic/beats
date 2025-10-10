@@ -16,12 +16,14 @@ func BrowserHistoryColumns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
 		// Universal fields (available across all browsers)
 		table.BigIntColumn("timestamp"),
+		table.TextColumn("datetime"),
 		table.TextColumn("url"),
 		table.TextColumn("title"),
 		table.TextColumn("browser"),
 		table.TextColumn("parser"),
 		table.TextColumn("user"),
 		table.TextColumn("profile_name"),
+		table.TextColumn("profile_folder"),
 		table.TextColumn("transition_type"),
 		table.TextColumn("referring_url"),
 		table.BigIntColumn("visit_id"),

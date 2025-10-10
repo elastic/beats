@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/osquery/osquery-go/plugin/table"
@@ -26,7 +25,10 @@ func firefoxParser(ctx context.Context, queryContext table.QueryContext, browser
 	}
 	defer db.Close()
 
-	query := `
+	// Build timestamp filtering
+	timestampWhere := buildFirefoxTimestampWhere(queryContext)
+
+	query := fmt.Sprintf(`
 		SELECT 
 			p.url,
 			p.title,
@@ -46,9 +48,9 @@ func firefoxParser(ctx context.Context, queryContext table.QueryContext, browser
 		JOIN moz_historyvisits hv ON p.id = hv.place_id
 		LEFT JOIN moz_historyvisits ref_hv ON hv.from_visit = ref_hv.id
 		LEFT JOIN moz_places ref_p ON ref_hv.place_id = ref_p.id
-		WHERE p.visit_count > 0
+		WHERE p.visit_count > 0%s
 		ORDER BY hv.visit_date DESC
-	`
+	`, timestampWhere)
 
 	log("executing SQL query", "query", query)
 	rows, err := db.QueryContext(ctx, query)
@@ -104,10 +106,7 @@ func firefoxParser(ctx context.Context, queryContext table.QueryContext, browser
 			continue
 		}
 
-		entry := newHistoryRow("firefox", browserName, user, profileName, profilePath)
-		entry.Timestamp = formatNullInt64(visitTime, func(value int64) string {
-			return strconv.FormatInt(value/1000000, 10)
-		})
+		entry := newHistoryRow("firefox", browserName, user, profileName, profilePath, firefoxTimeToUnix(visitTime.Int64))
 		entry.URL = stringFromNullString(url)
 		entry.Title = stringFromNullString(title)
 		entry.TransitionType = mapFirefoxTransitionType(transition)
@@ -127,6 +126,23 @@ func firefoxParser(ctx context.Context, queryContext table.QueryContext, browser
 
 	log("completed reading history", "totalRows", rowCount, "validEntries", len(entries), "historyPath", profilePath)
 	return entries, rows.Err()
+}
+
+// Unix timestamps are in seconds since January 1, 1970 UTC
+// Firefox timestamps are in microseconds since January 1, 1970 UTC
+func firefoxTimeToUnix(firefoxTime int64) int64 {
+	if firefoxTime == 0 {
+		return 0
+	}
+	return firefoxTime / 1000000
+}
+
+func unixToFirefoxTime(unixTime int64) int64 {
+	if unixTime == 0 {
+		return 0
+	}
+	// Convert seconds to microseconds
+	return unixTime * 1000000
 }
 
 func extractFirefoxProfileName(profilePath string, log func(m string, kvs ...any)) string {
@@ -219,4 +235,35 @@ func mapFirefoxTransitionType(transitionType sql.NullInt64) string {
 	default:
 		return "UNKNOWN"
 	}
+}
+
+// buildFirefoxTimestampWhere creates WHERE clause for Firefox
+func buildFirefoxTimestampWhere(queryContext table.QueryContext) string {
+	constraints := getTimestampConstraints(queryContext)
+	if len(constraints) == 0 {
+		return ""
+	}
+
+	var conditions []string
+	for _, constraint := range constraints {
+		firefoxTime := unixToFirefoxTime(constraint.Value)
+
+		switch constraint.Operator {
+		case table.OperatorEquals:
+			conditions = append(conditions, fmt.Sprintf("hv.visit_date = %d", firefoxTime))
+		case table.OperatorGreaterThan:
+			conditions = append(conditions, fmt.Sprintf("hv.visit_date > %d", firefoxTime))
+		case table.OperatorLessThan:
+			conditions = append(conditions, fmt.Sprintf("hv.visit_date < %d", firefoxTime))
+		case table.OperatorGreaterThanOrEquals:
+			conditions = append(conditions, fmt.Sprintf("hv.visit_date >= %d", firefoxTime))
+		case table.OperatorLessThanOrEquals:
+			conditions = append(conditions, fmt.Sprintf("hv.visit_date <= %d", firefoxTime))
+		}
+	}
+
+	if len(conditions) > 0 {
+		return " AND (" + strings.Join(conditions, " AND ") + ")"
+	}
+	return ""
 }

@@ -9,7 +9,6 @@ import (
 	"database/sql"
 	"fmt"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/osquery/osquery-go/plugin/table"
@@ -24,7 +23,10 @@ func safariParser(ctx context.Context, queryContext table.QueryContext, browserN
 	}
 	defer db.Close()
 
-	query := `
+	// Build timestamp filtering
+	timestampWhere := buildSafariTimestampWhere(queryContext)
+
+	query := fmt.Sprintf(`
 		SELECT 
 			hi.url,
 			hi.domain_expansion,
@@ -36,9 +38,9 @@ func safariParser(ctx context.Context, queryContext table.QueryContext, browserN
 			hv.id as visit_id
 		FROM history_items hi
 		LEFT JOIN history_visits hv ON hi.id = hv.history_item
-		WHERE hi.url IS NOT NULL
+		WHERE hi.url IS NOT NULL%s
 		ORDER BY hv.visit_time DESC
-	`
+	`, timestampWhere)
 
 	log("executing SQL query", "query", query)
 	rows, err := db.QueryContext(ctx, query)
@@ -82,10 +84,7 @@ func safariParser(ctx context.Context, queryContext table.QueryContext, browserN
 			continue
 		}
 
-		entry := newHistoryRow("safari", browserName, user, profileName, profilePath)
-		entry.Timestamp = formatNullInt64(visitTime, func(value int64) string {
-			return strconv.FormatInt(safariTimeToUnix(value), 10)
-		})
+		entry := newHistoryRow("safari", browserName, user, profileName, profilePath, safariTimeToUnix(visitTime.Int64))
 		entry.URL = stringFromNullString(url)
 		entry.Title = stringFromNullString(title)
 		entry.VisitID = decimalStringFromNullInt(visitID)
@@ -122,12 +121,53 @@ func extractSafariProfileName(profilePath string, log func(m string, kvs ...any)
 	return "Default"
 }
 
-// safariTimeToUnix converts Safari timestamp to Unix timestamp
+// Unix timestamps are in seconds since January 1, 1970 UTC
+// Safari timestamps are in seconds since January 1, 2001 UTC (Mac OS X epoch)
 func safariTimeToUnix(time int64) int64 {
 	if time == 0 {
 		return 0
 	}
-	// Safari uses seconds since 2001-01-01 00:00:00 UTC (Mac OS X epoch)
+
 	const epochOffset = 978307200
 	return time + epochOffset
+}
+
+func unixToSafariTime(unixTime int64) int64 {
+	if unixTime == 0 {
+		return 0
+	}
+	// Convert from Unix epoch (1970) to Mac OS X epoch (2001)
+	const epochOffset = 978307200
+	return unixTime - epochOffset
+}
+
+// buildSafariTimestampWhere creates WHERE clause for Safari
+func buildSafariTimestampWhere(queryContext table.QueryContext) string {
+	constraints := getTimestampConstraints(queryContext)
+	if len(constraints) == 0 {
+		return ""
+	}
+
+	var conditions []string
+	for _, constraint := range constraints {
+		safariTime := unixToSafariTime(constraint.Value)
+
+		switch constraint.Operator {
+		case table.OperatorEquals:
+			conditions = append(conditions, fmt.Sprintf("hv.visit_time = %d", safariTime))
+		case table.OperatorGreaterThan:
+			conditions = append(conditions, fmt.Sprintf("hv.visit_time > %d", safariTime))
+		case table.OperatorLessThan:
+			conditions = append(conditions, fmt.Sprintf("hv.visit_time < %d", safariTime))
+		case table.OperatorGreaterThanOrEquals:
+			conditions = append(conditions, fmt.Sprintf("hv.visit_time >= %d", safariTime))
+		case table.OperatorLessThanOrEquals:
+			conditions = append(conditions, fmt.Sprintf("hv.visit_time <= %d", safariTime))
+		}
+	}
+
+	if len(conditions) > 0 {
+		return " AND (" + strings.Join(conditions, " AND ") + ")"
+	}
+	return ""
 }

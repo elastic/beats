@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -152,6 +153,34 @@ func getUserFilters(queryContext table.QueryContext) []string {
 
 func getBrowserFilters(queryContext table.QueryContext) []string {
 	return getConstraintFilters(queryContext, "browser", defaultBrowsers)
+}
+
+type timestampConstraint struct {
+	Operator table.Operator
+	Value    int64 // Unix timestamp in seconds
+}
+
+func getTimestampConstraints(queryContext table.QueryContext) []timestampConstraint {
+	clist, ok := queryContext.Constraints["timestamp"]
+	if !ok || len(clist.Constraints) == 0 {
+		return nil
+	}
+
+	var constraints []timestampConstraint
+	for _, c := range clist.Constraints {
+		// Parse and validate timestamp value
+		osqueryTimestamp, err := strconv.ParseInt(c.Expression, 10, 64)
+		if err != nil {
+			continue // Skip invalid timestamp values
+		}
+
+		constraints = append(constraints, timestampConstraint{
+			Operator: c.Operator,
+			Value:    osqueryTimestamp,
+		})
+	}
+
+	return constraints
 }
 
 // matchesFilter checks if a name matches any of the provided filters.

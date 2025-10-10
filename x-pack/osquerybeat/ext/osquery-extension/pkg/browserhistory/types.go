@@ -6,8 +6,10 @@ package browserhistory
 
 import (
 	"context"
+	"path/filepath"
 	"reflect"
 	"strconv"
+	"time"
 
 	"github.com/osquery/osquery-go/plugin/table"
 )
@@ -17,12 +19,14 @@ type parserFunc func(ctx context.Context, queryContext table.QueryContext, brows
 type row struct {
 	// Universal fields (available across all browsers)
 	Timestamp      string `osquery:"timestamp"`
+	Datetime       string `osquery:"datetime"`
 	URL            string `osquery:"url"`
 	Title          string `osquery:"title"`
 	Browser        string `osquery:"browser"`
 	Parser         string `osquery:"parser"`
 	User           string `osquery:"user"`
 	ProfileName    string `osquery:"profile_name"`
+	ProfileFolder  string `osquery:"profile_folder"`
 	TransitionType string `osquery:"transition_type"`
 	ReferringURL   string `osquery:"referring_url"`
 	VisitID        string `osquery:"visit_id"`
@@ -46,13 +50,16 @@ type row struct {
 	SfLoadSuccessful  string `osquery:"sf_load_successful"`  // Whether page loaded successfully
 }
 
-func newHistoryRow(parser, browserName, user, profileName, sourcePath string) *row {
+func newHistoryRow(parser, browserName, user, profileName, sourcePath string, timestamp int64) *row {
 	return &row{
-		Browser:     browserName,
-		Parser:      parser,
-		User:        user,
-		ProfileName: profileName,
-		SourcePath:  sourcePath,
+		Timestamp:     strconv.FormatInt(timestamp, 10),
+		Datetime:      time.Unix(timestamp, 0).UTC().Format(time.RFC3339),
+		Browser:       browserName,
+		Parser:        parser,
+		User:          user,
+		ProfileName:   profileName,
+		ProfileFolder: filepath.Base(sourcePath),
+		SourcePath:    sourcePath,
 	}
 }
 
