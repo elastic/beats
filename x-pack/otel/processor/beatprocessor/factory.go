@@ -6,10 +6,10 @@ package beatprocessor
 
 import (
 	"context"
+	"fmt"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
-	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/processor"
 	"go.opentelemetry.io/collector/processor/processorhelper"
 )
@@ -36,14 +36,19 @@ func createLogsProcessor(
 	cfg component.Config,
 	nextConsumer consumer.Logs,
 ) (processor.Logs, error) {
+	beatProcessorConfig, ok := cfg.(*Config)
+	if !ok {
+		return nil, fmt.Errorf("failed to cast component config to Beat processor config")
+	}
+	beatProcessor, err := newBeatProcessor(set, beatProcessorConfig)
+	if err != nil {
+		return nil, err
+	}
 	return processorhelper.NewLogs(
 		ctx,
 		set,
 		cfg,
 		nextConsumer,
-		func(_ context.Context, logs plog.Logs) (plog.Logs, error) {
-			// This is a placeholder for the actual processing logic.
-			return logs, nil
-		},
+		beatProcessor.ConsumeLogs,
 	)
 }
