@@ -75,7 +75,7 @@ and then performs the necessary data type conversions.
 
 To optimize performance and avoid repeatedly fetching these schema definitions
 for every row and every request, an LRU cache is utilized. This cache stores
-the schema definition for each WMI class, property pair encountered. For queries involving
+the schema definition for each WMI class-property pair encountered. For queries involving
 superclasses, such as `CIM_LogicalDevice`, the cache will populate with individual entries
 for each specific derived class (leaf of the class hierarchy) whose instances are returned by the query (for example, `Win32_DiskDrive` or `Win32_NetworkAdapter`).
 
