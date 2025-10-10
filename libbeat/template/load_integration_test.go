@@ -43,6 +43,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -71,7 +72,7 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 	}
 	handler := &mockClientHandler{serverless: false, mode: lifecycle.ILM}
 	logger := logptest.NewTestingLogger(t, "")
-	loader, err := NewESLoader(client, handler, logger)
+	loader, err := NewESLoader(client, handler, logger, paths.New())
 	require.NoError(t, err)
 	s := testSetup{t: t, client: client, loader: loader, config: cfg}
 	// don't care if the cleanup fails, since they might just return a 404
@@ -89,7 +90,7 @@ func newTestSetupWithESClient(t *testing.T, client ESClient, cfg TemplateConfig)
 	}
 	handler := &mockClientHandler{serverless: false, mode: lifecycle.ILM}
 	logger := logptest.NewTestingLogger(t, "")
-	loader, err := NewESLoader(client, handler, logger)
+	loader, err := NewESLoader(client, handler, logger, paths.New())
 	require.NoError(t, err)
 	return &testSetup{t: t, client: client, loader: loader, config: cfg}
 }
@@ -482,7 +483,6 @@ func TestTemplateWithData(t *testing.T) {
 		_, _, err := esClient.Index(setup.config.Name, "_doc", "", nil, test.data)
 		if test.error {
 			assert.Error(t, err)
-
 		} else {
 			assert.NoError(t, err)
 		}

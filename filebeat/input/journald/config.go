@@ -72,6 +72,10 @@ type config struct {
 
 	// Parsers configuration
 	Parsers parser.Config `config:",inline"`
+
+	// Allow ingesting log entries interleaved from all available journals,
+	// including remote ones.
+	Merge bool `config:"merge"`
 }
 
 // bwcIncludeMatches is a wrapper that accepts include_matches configuration
