@@ -1630,7 +1630,7 @@ func TestLinkedAccountsDeduplicationFix(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Sum"}}}
 	m.MetricSet = &aws.MetricSet{Period: 5, MonitoringAccountID: "123456789012"}
-	m.logger = logptest.NewTestingLogger(t, "test")
+	m.logger = logp.NewLogger("test")
 
 	mockCloudwatchSvc := &MockCloudWatchClientLinkedAccounts{}
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
