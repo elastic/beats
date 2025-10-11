@@ -45,7 +45,7 @@ recursive_glob.enabled: false
 symlinks: true
 
 json:
-  keys_under_root: true
+  keys_under_root: false
   overwrite_keys: true
   expand_keys: true
   add_error_key: true

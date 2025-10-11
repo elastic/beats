@@ -302,6 +302,18 @@ func handleJSON(logger *logp.Logger, cfg *config.C, parsers *[]any) error {
 
 	count, err := jsonCfg.CountField("")
 	if err == nil && count != 0 {
+		keysUnderRoot, err := jsonCfg.Bool("keys_under_root", -1)
+		if err != nil {
+			logger.Warnf(
+				"cannot read 'json.keys_under_root' as boolean: %s, ignoring malformed config entry ",
+				err,
+			)
+		}
+
+		if !keysUnderRoot {
+			jsonCfg.SetString("target", -1, "json")
+		}
+
 		*parsers = append(*parsers, map[string]any{"ndjson": jsonCfg})
 	}
 

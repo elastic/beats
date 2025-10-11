@@ -49,9 +49,10 @@
         "document_id": "the_id_key",
         "expand_keys": true,
         "ignore_decoding_error": true,
-        "keys_under_root": true,
+        "keys_under_root": false,
         "message_key": "message",
-        "overwrite_keys": true
+        "overwrite_keys": true,
+        "target": "json"
       }
     }
   ],
