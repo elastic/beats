@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/awss3"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcpbigquery"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/http_endpoint"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/lumberjack"
@@ -28,5 +29,6 @@ func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States, path
 		awss3.Plugin(log, store, path),
 		lumberjack.Plugin(log),
 		salesforce.Plugin(log, store),
+		gcpbigquery.Plugin(log, store),
 	}
 }
