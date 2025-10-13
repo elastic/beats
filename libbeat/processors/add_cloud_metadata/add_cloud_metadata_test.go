@@ -21,10 +21,11 @@ import (
 	"testing"
 	"time"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func Test_addCloudMetadata_String(t *testing.T) {
