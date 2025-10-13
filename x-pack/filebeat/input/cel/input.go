@@ -315,7 +315,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			otelMetrics.AddProgramExecution(ctx, 1)
 			metrics.executions.Add(1)
 			start := i.now().In(time.UTC)
-			defer otelMetrics.AddTotalDuration(ctx, time.Since(start))
+			defer func() {
+				otelMetrics.AddTotalDuration(ctx, time.Since(start))
+			}()
 			state, err = evalWith(ctx, prg, ast, state, start, wantDump, budget-1)
 			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
@@ -978,8 +980,6 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		attribute.String("agent.version", env.Agent.Version),
 		attribute.String("agent.componentID", env.Agent.ComponentID),
 		attribute.String("agent.id", env.Agent.ID.String()),
-		attribute.String("agent.version", env.Agent.Version),
-		attribute.String("agent.componentID", env.Agent.ComponentID),
 	)
 
 	log.Infof("created cel input resource", resource.String())

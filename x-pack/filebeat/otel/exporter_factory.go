@@ -125,11 +125,10 @@ func DeltaSelector(kind sdkmetric.InstrumentKind) metricdata.Temporality {
 		sdkmetric.InstrumentKindGauge,
 		sdkmetric.InstrumentKindHistogram,
 		sdkmetric.InstrumentKindObservableGauge,
-		sdkmetric.InstrumentKindObservableCounter:
-		return metricdata.DeltaTemporality
-	case sdkmetric.InstrumentKindUpDownCounter,
+		sdkmetric.InstrumentKindObservableCounter,
+		sdkmetric.InstrumentKindUpDownCounter,
 		sdkmetric.InstrumentKindObservableUpDownCounter:
-		return metricdata.CumulativeTemporality
+		return metricdata.DeltaTemporality
 	}
 	panic("unknown instrument kind")
 }
@@ -201,7 +200,7 @@ func GetCollectionPeriodFromEnvironment(ctx context.Context, period time.Duratio
 	if strings.ToLower(collectionType) == string(Fixed) {
 		collectionInterval, ok := os.LookupEnv("OTEL_EXPORTER_OTLP_METRICS_COLLECTION_PERIOD_INTERVAL")
 		if !ok || collectionInterval == "" {
-			return 0, errors.New("OTEL metrics collection period type is Fixed, but no interval defined in OTEL_EXPORTER_OTLP_METRICS_COLLECTION_PERIOD_INTERVAL. Using manual metrics")
+			return 0, nil
 		}
 		collectionPeriod, err := strconv.Atoi(collectionInterval)
 		if err != nil {
