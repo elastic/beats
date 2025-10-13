@@ -392,7 +392,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 **Filebeat**
 
 - Fix endpoint path typo in the Okta entity analytics provider. [44147]({{beats-pull}}44147)
-- Fix a WebSocket panic scenario that occured after exhausting the maximum number of retries. [44342]({{beats-pull}}44342)
+- Fix a WebSocket panic scenario that occurred after exhausting the maximum number of retries. [44342]({{beats-pull}}44342)
 
 **Metricbeat**
 
