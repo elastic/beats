@@ -69,7 +69,7 @@ var ec2MetadataFetcher = provider{
 	DefaultEnabled: true,
 
 	Create: func(_ string, config *conf.C) (metadataFetcher, error) {
-		ec2Schema := func(m map[string]interface{}) mapstr.M {
+		ec2Schema := func(m map[string]any) mapstr.M {
 			meta := mapstr.M{
 				"cloud": mapstr.M{
 					"service": mapstr.M{
@@ -188,7 +188,7 @@ func getTagsFromIMDS(ctx context.Context, client IMDSClient, logger *logp.Logger
 		return tags, false
 	}
 
-	for _, tag := range strings.Split(string(b), "\n") {
+	for tag := range strings.SplitSeq(string(b), "\n") {
 		tagPath := fmt.Sprintf("%s/%s", tagsCategory, tag)
 		b, err := getMetadataHelper(ctx, client, tagPath, logger)
 		if err != nil {
