@@ -57,8 +57,7 @@ func (parser *chromiumParser) parse(ctx context.Context, queryContext table.Quer
 }
 
 func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext table.QueryContext, profile *profile) ([]*visit, error) {
-	historyPath := filepath.Join(profile.path, "History")
-	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", historyPath)
+	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", profile.historyPath)
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
 		parser.log("failed to open database", "error", err)
@@ -142,7 +141,7 @@ func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext tab
 			continue
 		}
 
-		entry := newVisit("chromium", parser.browserName, profile.user, profile.name, historyPath, chromiumTimeToUnix(visitTime.Int64))
+		entry := newVisit("chromium", parser.browserName, profile, chromiumTimeToUnix(visitTime.Int64))
 		entry.URL = url.String
 		entry.Title = title.String
 		entry.TransitionType = mapChromiumTransitionType(transitionType)
@@ -158,8 +157,6 @@ func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext tab
 
 		entries = append(entries, entry)
 	}
-
-	parser.log("completed reading history", "totalRows", rowCount, "validEntries", len(entries), "historyPath", historyPath)
 	return entries, rows.Err()
 }
 
@@ -173,6 +170,7 @@ type localState struct {
 
 func getChromiumProfiles(basePath string, log func(m string, kvs ...any)) []*profile {
 	var profiles []*profile
+	user := extractUserFromPath(basePath, log)
 
 	entries, err := os.ReadDir(basePath)
 	if err != nil {
@@ -184,6 +182,11 @@ func getChromiumProfiles(basePath string, log func(m string, kvs ...any)) []*pro
 			continue
 		}
 
+		if entry.Name() == "User Data" {
+			profiles = append(profiles, getChromiumProfiles(filepath.Join(basePath, entry.Name()), log)...)
+			continue
+		}
+
 		profilePath := filepath.Join(basePath, entry.Name())
 		historyPath := filepath.Join(profilePath, "History")
 		if _, err := os.Stat(historyPath); err != nil {
@@ -192,9 +195,11 @@ func getChromiumProfiles(basePath string, log func(m string, kvs ...any)) []*pro
 		log("detected chromium History file", "path", historyPath)
 
 		profile := &profile{
-			name: entry.Name(),
-			user: extractUserFromPath(profilePath, log),
-			path: profilePath,
+			name:        entry.Name(),
+			user:        user,
+			profilePath: profilePath,
+			historyPath: historyPath,
+			searchPath:  basePath,
 		}
 
 		userDataDir := filepath.Dir(profilePath)

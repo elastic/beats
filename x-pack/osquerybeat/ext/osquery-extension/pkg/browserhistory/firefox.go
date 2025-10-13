@@ -67,7 +67,7 @@ func (parser *firefoxParser) parse(ctx context.Context, queryContext table.Query
 }
 
 func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext table.QueryContext, profile *profile) ([]*visit, error) {
-	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", filepath.Join(profile.path, "places.sqlite"))
+	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", profile.historyPath)
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
 		parser.log("failed to open database", "error", err)
@@ -153,7 +153,7 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 			continue
 		}
 
-		entry := newVisit("firefox", parser.browserName, profile.user, profile.name, profile.path, firefoxTimeToUnix(visitTime.Int64))
+		entry := newVisit("firefox", parser.browserName, profile, firefoxTimeToUnix(visitTime.Int64))
 		entry.URL = url.String
 		entry.Title = title.String
 		entry.TransitionType = mapFirefoxTransitionType(transition)
@@ -170,8 +170,6 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 
 		entries = append(entries, entry)
 	}
-
-	parser.log("completed reading history", "totalRows", rowCount, "validEntries", len(entries), "historyPath", profile.path)
 	return entries, rows.Err()
 }
 
@@ -189,21 +187,23 @@ func getFirefoxProfiles(file io.Reader, basePath string, log func(m string, kvs 
 			case "Name":
 				currentProfile.name = parts[1]
 			case "Path":
-				currentProfile.path = parts[1]
-				if !filepath.IsAbs(currentProfile.path) {
-					currentProfile.path = filepath.Join(basePath, currentProfile.path)
+				currentProfile.profilePath = parts[1]
+				if !filepath.IsAbs(currentProfile.profilePath) {
+					currentProfile.profilePath = filepath.Join(basePath, currentProfile.profilePath)
 				}
 			}
-			if currentProfile.name != "" && currentProfile.path != "" {
-				historyPath := filepath.Join(currentProfile.path, "places.sqlite")
+			if currentProfile.name != "" && currentProfile.profilePath != "" {
+				historyPath := filepath.Join(currentProfile.profilePath, "places.sqlite")
 				if _, err := os.Stat(historyPath); err != nil {
 					continue
 				}
 				log("detected firefox places.sqlite file", "path", historyPath)
 				profiles = append(profiles, &profile{
-					name: currentProfile.name,
-					user: extractUserFromPath(basePath, log),
-					path: currentProfile.path,
+					name:        currentProfile.name,
+					user:        extractUserFromPath(basePath, log),
+					profilePath: currentProfile.profilePath,
+					historyPath: historyPath,
+					searchPath:  basePath,
 				})
 				currentProfile = nil
 			}

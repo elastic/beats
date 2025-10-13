@@ -5,7 +5,6 @@
 package browserhistory
 
 import (
-	"path/filepath"
 	"reflect"
 	"strconv"
 	"time"
@@ -21,7 +20,7 @@ type visit struct {
 	Parser         string `osquery:"parser"`
 	User           string `osquery:"user"`
 	ProfileName    string `osquery:"profile_name"`
-	ProfileFolder  string `osquery:"profile_folder"`
+	SearchFolder   string `osquery:"search_folder"`
 	TransitionType string `osquery:"transition_type"`
 	ReferringURL   string `osquery:"referring_url"`
 	VisitID        int64  `osquery:"visit_id"`
@@ -31,7 +30,7 @@ type visit struct {
 	TypedCount     int    `osquery:"typed_count"`
 	VisitSource    string `osquery:"visit_source"`
 	IsHidden       bool   `osquery:"is_hidden"`
-	SourcePath     string `osquery:"source_path"`
+	HistoryPath    string `osquery:"history_path"`
 
 	// Chromium-specific fields (Chrome, Edge, Brave, etc.)
 	ChVisitDurationMs int64 `osquery:"ch_visit_duration_ms"` // Only available in Chromium-based browsers
@@ -45,16 +44,16 @@ type visit struct {
 	SfLoadSuccessful  bool   `osquery:"sf_load_successful"`  // Whether page loaded successfully
 }
 
-func newVisit(parser, browserName, user, profileName, sourcePath string, timestamp int64) *visit {
+func newVisit(parser, browserName string, profile *profile, timestamp int64) *visit {
 	return &visit{
-		Timestamp:     timestamp,
-		Datetime:      time.Unix(timestamp, 0).UTC().Format(time.RFC3339),
-		Browser:       browserName,
-		Parser:        parser,
-		User:          user,
-		ProfileName:   profileName,
-		ProfileFolder: filepath.Base(sourcePath),
-		SourcePath:    sourcePath,
+		Timestamp:    timestamp,
+		Datetime:     time.Unix(timestamp, 0).UTC().Format(time.RFC3339),
+		Browser:      browserName,
+		Parser:       parser,
+		User:         profile.user,
+		ProfileName:  profile.name,
+		SearchFolder: profile.searchPath,
+		HistoryPath:  profile.historyPath,
 	}
 }
 

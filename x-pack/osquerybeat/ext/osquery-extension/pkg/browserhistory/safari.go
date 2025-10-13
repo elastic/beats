@@ -56,7 +56,7 @@ func (parser *safariParser) parse(ctx context.Context, queryContext table.QueryC
 }
 
 func (parser *safariParser) parseProfile(ctx context.Context, queryContext table.QueryContext, profile *profile) ([]*visit, error) {
-	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", filepath.Join(profile.path, "History.db"))
+	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", profile.historyPath)
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
 		parser.log("failed to open database", "error", err)
@@ -122,7 +122,7 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 			continue
 		}
 
-		entry := newVisit("safari", parser.browserName, profile.user, profile.name, profile.path, safariTimeToUnix(visitTime.Int64))
+		entry := newVisit("safari", parser.browserName, profile, safariTimeToUnix(visitTime.Int64))
 		entry.URL = url.String
 		entry.Title = title.String
 		entry.VisitID = visitID.Int64
@@ -134,7 +134,6 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 		entries = append(entries, entry)
 	}
 
-	parser.log("completed reading history", "totalRows", rowCount, "validEntries", len(entries), "historyPath", profile.path)
 	return entries, rows.Err()
 }
 
@@ -155,15 +154,18 @@ func getSafariProfiles(basePath string, log func(m string, kvs ...any)) []*profi
 		if !entry.IsDir() {
 			continue
 		}
-		historyPath := filepath.Join(basePath, "Profiles", entry.Name(), "History.db")
+		profilePath := filepath.Join(basePath, "Profiles", entry.Name())
+		historyPath := filepath.Join(profilePath, "History.db")
 		if _, err := os.Stat(historyPath); err != nil {
 			return nil
 		}
 		log("detected safari History.db file", "path", historyPath)
 		profiles = append(profiles, &profile{
-			name: entry.Name(),
-			path: filepath.Dir(historyPath),
-			user: user,
+			name:        entry.Name(),
+			profilePath: profilePath,
+			historyPath: historyPath,
+			searchPath:  basePath,
+			user:        user,
 		})
 	}
 	if len(profiles) > 0 {
@@ -174,9 +176,11 @@ func getSafariProfiles(basePath string, log func(m string, kvs ...any)) []*profi
 		return nil
 	}
 	profiles = append(profiles, &profile{
-		name: "Default",
-		path: filepath.Dir(historyPath),
-		user: user,
+		name:        "Default",
+		profilePath: basePath,
+		historyPath: historyPath,
+		searchPath:  basePath,
+		user:        user,
 	})
 	return profiles
 }

@@ -23,7 +23,7 @@ func BrowserHistoryColumns() []table.ColumnDefinition {
 		table.TextColumn("parser"),
 		table.TextColumn("user"),
 		table.TextColumn("profile_name"),
-		table.TextColumn("profile_folder"),
+		table.TextColumn("search_folder"),
 		table.TextColumn("transition_type"),
 		table.TextColumn("referring_url"),
 		table.BigIntColumn("visit_id"),
@@ -33,7 +33,7 @@ func BrowserHistoryColumns() []table.ColumnDefinition {
 		table.IntegerColumn("typed_count"),
 		table.TextColumn("visit_source"),
 		table.IntegerColumn("is_hidden"),
-		table.TextColumn("source_path"),
+		table.TextColumn("history_path"),
 
 		// Chromium-specific fields (Chrome, Edge, Brave, etc.)
 		table.BigIntColumn("ch_visit_duration_ms"), // Only available in Chromium-based browsers

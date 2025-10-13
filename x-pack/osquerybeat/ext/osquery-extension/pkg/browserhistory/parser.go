@@ -17,9 +17,11 @@ var (
 )
 
 type profile struct {
-	name string
-	user string
-	path string
+	name        string
+	user        string
+	profilePath string
+	historyPath string
+	searchPath  string
 }
 
 type historyParser interface {
