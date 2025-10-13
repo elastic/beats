@@ -253,18 +253,24 @@ func getTables(ctx context.Context, client *bigquery.Client, datasetID string, t
 
 // row represents a structure for storing data obtained from a BigQuery standard or detailed cost usage result.
 type row struct {
-	InvoiceMonth       string  `bigquery:"invoice_month"`
-	ProjectId          string  `bigquery:"project_id"`
-	ProjectName        string  `bigquery:"project_name"`
-	BillingAccountId   string  `bigquery:"billing_account_id"`
-	CostType           string  `bigquery:"cost_type"`
-	SkuId              string  `bigquery:"sku_id"`
-	SkuDescription     string  `bigquery:"sku_description"`
-	ServiceId          string  `bigquery:"service_id"`
-	ServiceDescription string  `bigquery:"service_description"`
-	Tags               string  `bigquery:"tags_string"`
-	TotalExact         float64 `bigquery:"total_exact"`
-	EffectivePrice     float64 `bigquery:"effective_price"`
+	InvoiceMonth       string     `bigquery:"invoice_month"`
+	ProjectId          string     `bigquery:"project_id"`
+	ProjectName        string     `bigquery:"project_name"`
+	BillingAccountId   string     `bigquery:"billing_account_id"`
+	CostType           string     `bigquery:"cost_type"`
+	SkuId              string     `bigquery:"sku_id"`
+	SkuDescription     string     `bigquery:"sku_description"`
+	ServiceId          string     `bigquery:"service_id"`
+	ServiceDescription string     `bigquery:"service_description"`
+	Tags               string     `bigquery:"tags_string"`
+	Labels             string     `bigquery:"labels_string"`
+	UsageStartTime     *time.Time `bigquery:"usage_start_time"`
+	UsageEndTime       *time.Time `bigquery:"usage_end_time"`
+	LocationRegion     string     `bigquery:"location_region"`
+	LocationZone       string     `bigquery:"location_zone"`
+	LocationCountry    string     `bigquery:"location_country"`
+	TotalExact         float64    `bigquery:"total_exact"`
+	EffectivePrice     float64    `bigquery:"effective_price"`
 }
 
 func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, tableMeta tableMeta, month string, costType string) ([]mb.Event, error) {
@@ -365,6 +371,29 @@ func createEvents(row row, tableName, projectID string) mb.Event {
 		"service_id":          row.ServiceId,
 		"service_description": row.ServiceDescription,
 		"tags":                tags,
+		"labels":              row.Labels,
+	}
+
+	if row.UsageStartTime != nil {
+		_, _ = event.MetricSetFields.Put("usage_start_time", row.UsageStartTime.Format(time.RFC3339))
+	}
+	if row.UsageEndTime != nil {
+		_, _ = event.MetricSetFields.Put("usage_end_time", row.UsageEndTime.Format(time.RFC3339))
+	}
+
+	// Add location fields if available
+	locationFields := mapstr.M{}
+	if row.LocationRegion != "" {
+		locationFields["region"] = row.LocationRegion
+	}
+	if row.LocationZone != "" {
+		locationFields["zone"] = row.LocationZone
+	}
+	if row.LocationCountry != "" {
+		locationFields["country"] = row.LocationCountry
+	}
+	if len(locationFields) > 0 {
+		_, _ = event.MetricSetFields.Put("location", locationFields)
 	}
 
 	if isDetailedTable(tableName) {
@@ -393,6 +422,13 @@ func generateEventID(currentDate string, row row) string {
 	// create eventID using hash of current_date + invoice.month + project.id + project.name
 	// This will prevent more than one billing metric getting collected in the same day.
 	eventID := currentDate + row.InvoiceMonth + row.ProjectId + row.ProjectName + row.SkuId + row.ServiceId + row.Tags
+	// Add usage times to event ID if available
+	if row.UsageStartTime != nil {
+		eventID += row.UsageStartTime.Format(time.RFC3339)
+	}
+	if row.UsageEndTime != nil {
+		eventID += row.UsageEndTime.Format(time.RFC3339)
+	}
 	h := sha256.New()
 	h.Write([]byte(eventID))
 	prefix := hex.EncodeToString(h.Sum(nil))
@@ -432,6 +468,12 @@ SELECT
 	        CONCAT(t.key, ':', t.value)
 	    FROM
 	        UNNEST(tags) AS t), ',') AS tags_string,
+	TO_JSON_STRING(labels) AS labels_json,
+	usage_start_time,
+	usage_end_time,
+	IFNULL(location.region, '') AS location_region,
+	IFNULL(location.zone, '') AS location_zone,
+	IFNULL(location.country, '') AS location_country,
 	(SUM(CAST(cost * 1000000 AS int64)) + SUM(IFNULL((
 			SELECT
 				SUM(CAST(c.amount * 1000000 AS int64))
@@ -453,7 +495,13 @@ GROUP BY
 	sku_description,
 	service_id,
 	service_description,
-	tags_string
+	tags_string,
+	labels_json,
+	location_region,
+	location_zone,
+	location_country,
+	usage_start_time,
+	usage_end_time
 ORDER BY
 	invoice_month ASC,
 	project_id ASC,
@@ -464,7 +512,13 @@ ORDER BY
 	sku_description ASC,
 	service_id ASC,
 	service_description ASC,
-	tags_string ASC;`,
+	tags_string ASC,
+	labels_json ASC,
+	location_region ASC,
+	location_zone ASC,
+	location_country ASC,
+	usage_start_time ASC,
+	usage_end_time ASC;`,
 		escapedTableName, month, costType)
 
 	return query
@@ -494,6 +548,12 @@ SELECT
 	        CONCAT(t.key, ':', t.value)
 	    FROM
 	        UNNEST(tags) AS t), ',') AS tags_string,
+	TO_JSON_STRING(labels) AS labels_json,
+	usage_start_time,
+	usage_end_time,
+	IFNULL(location.region, '') AS location_region,
+	IFNULL(location.zone, '') AS location_zone,
+	IFNULL(location.country, '') AS location_country,
 	(SUM(CAST(cost * 1000000 AS int64)) + SUM(IFNULL((
 			SELECT
 				SUM(CAST(c.amount * 1000000 AS int64))
@@ -516,7 +576,13 @@ GROUP BY
 	service_id,
 	service_description,
 	effective_price,
-	tags_string
+	tags_string,
+	labels_string,
+	location_region,
+	location_zone,
+	location_country,
+	usage_start_time,
+	usage_end_time
 ORDER BY
 	invoice_month ASC,
 	project_id ASC,
@@ -528,7 +594,13 @@ ORDER BY
 	service_id ASC,
 	service_description ASC,
 	effective_price ASC,
-	tags_string ASC;`,
+	tags_string ASC,
+	labels_json ASC,
+	location_region ASC,
+	location_zone ASC,
+	location_country ASC,
+	usage_start_time ASC,
+	usage_end_time ASC;`,
 		escapedTableName, month, costType)
 
 	return query
