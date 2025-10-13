@@ -30,7 +30,7 @@ func createDefaultConfig() component.Config {
 	return &Config{}
 }
 
-func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.Config, consumer consumer.Logs) (receiver.Logs, error) {
+func createReceiver(ctx context.Context, set receiver.Settings, baseCfg component.Config, consumer consumer.Logs) (receiver.Logs, error) {
 	cfg, ok := baseCfg.(*Config)
 	if !ok {
 		return nil, fmt.Errorf("could not convert otel config to filebeat config")
@@ -51,7 +51,7 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 	}
 
 	beatCreator := beater.New(inputs.Init)
-	br, err := xpInstance.NewBeatReceiver(b, beatCreator)
+	br, err := xpInstance.NewBeatReceiver(ctx, b, beatCreator)
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s:%w", Name, err)
 	}
