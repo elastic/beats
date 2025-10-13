@@ -25,7 +25,7 @@ metricbeat.modules:
 1. You can configure the `socket` metricset separately to specify a different `period` value than the other metricsets.
 
 
-The metricset reports the process that has the socket open. To provide this information on Linux for all processes, Metricbeat must be run with `sys_ptrace` and `dac_read_search` capabilities. These permissions are usually granted when running as root, but they can and may need to be explictly added when running Metricbeat inside a container.
+The metricset reports the process that has the socket open. To provide this information on Linux for all processes, Metricbeat must be run with `sys_ptrace` and `dac_read_search` capabilities. These permissions are usually granted when running as root, but they can and may need to be explicitly added when running Metricbeat inside a container.
 
 
 ## Configuration [_configuration_15]

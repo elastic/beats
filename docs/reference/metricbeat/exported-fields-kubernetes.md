@@ -1680,7 +1680,7 @@ kubernetes deployment metrics
 
 
 **`kubernetes.deployment.status.progressing`**
-:   Deployment Progresing Condition status (true, false or unknown)
+:   Deployment Progressing Condition status (true, false or unknown)
 
     type: keyword
 

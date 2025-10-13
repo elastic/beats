@@ -127,7 +127,7 @@ Opened cursors statistic
 
 ## parse [_parse]
 
-Parses statistic information that occured in the current session
+Parses statistic information that occurred in the current session
 
 **`oracle.performance.cursors.parse.real`**
 :   Real number of parses that occurred: session cursor cache hits - parse count (total)

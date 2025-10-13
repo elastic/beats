@@ -82,7 +82,7 @@ Server metrics from the Etcd V3 /metrics endpoint
 
 
 **`etcd.server.proposals_committed.count`**
-:   Number of consensus proposals commited
+:   Number of consensus proposals committed
 
     type: long
 

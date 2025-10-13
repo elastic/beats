@@ -82,12 +82,12 @@ This metricset reports the number of user per GlobalProtect gateway and totals a
 
 ### `ha_interfaces` [_ha_interfaces]
 
-This metricset will collect metrics from the device on High Availabilty configuration for interfaces.
+This metricset will collect metrics from the device on High Availability configuration for interfaces.
 
 
 ### `licenses` [_licenses]
 
-This metricset reports on licenses for sofware features with expiration dates.
+This metricset reports on licenses for software features with expiration dates.
 
 
 ### `logical` [_logical]
@@ -102,7 +102,7 @@ This metricset reports power usage and alarms.
 
 ### `system` [_system]
 
-This metricset captures system informate such as uptime, user count, CPU, memory and swap: essentiallyl the first 5 lines of *top* output.
+This metricset captures system informative such as uptime, user count, CPU, memory and swap: essentiallyl the first 5 lines of *top* output.
 
 
 ### `temperature` [_temperature]

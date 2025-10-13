@@ -163,7 +163,7 @@ metricbeat.modules:
 
   # This option enables the use of performance counters to collect data for cpu/core metricset.
   # Only effective for Windows.
-  # You should use this option if running beats on machins with more than 64 cores.
+  # You should use this option if running beats on machines with more than 64 cores.
   #use_performance_counters: false
 
 #------------------------------ Aerospike Module ------------------------------
