@@ -52,14 +52,14 @@ duration of Load end event
 
 
 **`browser.experience.cls`**
-:   culumative layout shift score across all frames
+:   cumulative layout shift score across all frames
 
     type: integer
 
 
 ## relative_trace [_relative_trace]
 
-trace event with timing information that are realtive to journey timings in microseconds
+trace event with timing information that are relative to journey timings in microseconds
 
 **`browser.relative_trace.name`**
 :   name of the trace event
