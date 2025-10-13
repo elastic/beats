@@ -298,7 +298,7 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 
 // runMetadataGC removes metadata for config hashes that are no longer active
 func (a *Autodiscover) runMetadataGC() {
-	activeHashes := make(map[uint64]bool)
+	activeHashes := make(map[uint64]struct{})
 	for _, configs := range a.configs {
 		for hash := range configs {
 			activeHashes[hash] = true
