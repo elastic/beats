@@ -27,14 +27,18 @@ type firefoxParser struct {
 }
 
 func newFirefoxParser(browserName, basePath string, log func(m string, kvs ...any)) historyParser {
-	profilesIniPath := filepath.Join(basePath, "profiles.ini")
-	file, err := os.Open(profilesIniPath)
-	if err != nil {
-		return nil
-	}
-	defer file.Close()
+	var profiles []*profile
 
-	profiles := getFirefoxProfiles(file, basePath, log)
+	// First, try to parse profiles.ini
+	profilesIniPath := filepath.Join(basePath, "profiles.ini")
+	if file, err := os.Open(profilesIniPath); err == nil {
+		defer file.Close()
+		profiles = getFirefoxProfiles(file, basePath, log)
+		log("parsed profiles from profiles.ini", "count", len(profiles), "path", profilesIniPath)
+	} else {
+		log("profiles.ini not found, trying fallback", "path", profilesIniPath, "error", err)
+		profiles = getFirefoxProfilesFallback(basePath, log)
+	}
 
 	if len(profiles) > 0 {
 		return &firefoxParser{
@@ -213,6 +217,41 @@ func getFirefoxProfiles(file io.Reader, basePath string, log func(m string, kvs 
 		return profiles
 	}
 	return nil
+}
+
+// getFirefoxProfilesFallback scans the Profiles directory for Firefox profiles when profiles.ini is not available
+func getFirefoxProfilesFallback(basePath string, log func(m string, kvs ...any)) []*profile {
+	var profiles []*profile
+
+	// Look for "Profiles" folder and scan its subdirectories
+	profilesDir := filepath.Join(basePath, "Profiles")
+	entries, err := os.ReadDir(profilesDir)
+	if err != nil {
+		log("Profiles directory not found", "path", profilesDir, "error", err)
+		return nil
+	}
+
+	log("found Profiles directory, scanning subdirectories", "path", profilesDir)
+	for _, entry := range entries {
+		if entry.IsDir() {
+			profilePath := filepath.Join(profilesDir, entry.Name())
+			historyPath := filepath.Join(profilePath, "places.sqlite")
+
+			if _, err := os.Stat(historyPath); err == nil {
+				log("detected firefox places.sqlite file in fallback", "path", historyPath)
+				profiles = append(profiles, &profile{
+					name:        entry.Name(), // Use directory name as profile name
+					user:        extractUserFromPath(basePath, log),
+					profilePath: profilePath,
+					historyPath: historyPath,
+					searchPath:  basePath,
+				})
+			}
+		}
+	}
+
+	log("fallback profile discovery complete", "count", len(profiles))
+	return profiles
 }
 
 // Unix timestamps are in seconds since January 1, 1970 UTC
