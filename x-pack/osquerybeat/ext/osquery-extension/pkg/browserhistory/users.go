@@ -58,7 +58,7 @@ func discoverUsers(userFilters []string, log func(m string, kvs ...any)) []strin
 				}
 
 				// Apply user filters if provided
-				if len(userFilters) > 0 && !matchesFilter(username, userFilters) {
+				if len(userFilters) > 0 && !matchesFilters(username, userFilters) {
 					log("skipping filtered user", "username", username, "path", match)
 					continue
 				}

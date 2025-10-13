@@ -11,17 +11,57 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/osquery/osquery-go/plugin/table"
+	"go.uber.org/multierr"
 )
 
-func chromiumParser(ctx context.Context, queryContext table.QueryContext, browserName, profilePath string, log func(m string, kvs ...any)) ([]*row, error) {
-	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", filepath.Join(profilePath, "History"))
+var _ historyParser = &chromiumParser{}
+
+type chromiumParser struct {
+	browserName string
+	profiles    []*profile
+	log         func(m string, kvs ...any)
+}
+
+func newChromiumParser(browserName, basePath string, log func(m string, kvs ...any)) historyParser {
+	profiles := getChromiumProfiles(basePath, log)
+	if len(profiles) > 0 {
+		return &chromiumParser{
+			browserName: browserName,
+			profiles:    profiles,
+			log:         log,
+		}
+	}
+	return nil
+}
+
+func (parser *chromiumParser) parse(ctx context.Context, queryContext table.QueryContext, profileFilters []string) ([]*visit, error) {
+	var (
+		merr   error
+		visits []*visit
+	)
+	for _, profile := range parser.profiles {
+		if len(profileFilters) > 0 && !matchesFilters(profile.name, profileFilters) {
+			continue
+		}
+		vs, err := parser.parseProfile(ctx, queryContext, profile)
+		if err != nil {
+			merr = multierr.Append(merr, err)
+			continue
+		}
+		visits = append(visits, vs...)
+	}
+	return visits, merr
+}
+
+func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext table.QueryContext, profile *profile) ([]*visit, error) {
+	historyPath := filepath.Join(profile.path, "History")
+	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", historyPath)
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
-		log("failed to open database", "error", err)
+		parser.log("failed to open database", "error", err)
 		return nil, fmt.Errorf("failed to open Chromium history database: %w", err)
 	}
 	defer db.Close()
@@ -53,18 +93,15 @@ func chromiumParser(ctx context.Context, queryContext table.QueryContext, browse
 		ORDER BY visits.visit_time DESC
 	`, timestampWhere)
 
-	log("executing SQL query", "query", query)
+	parser.log("executing SQL query", "query", query)
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
-		log("failed to execute query", "error", err)
+		parser.log("failed to execute query", "error", err)
 		return nil, fmt.Errorf("failed to query Chromium history: %w", err)
 	}
 	defer rows.Close()
 
-	user := extractUserFromPath(profilePath, log)
-	profileName := extractChromiumProfileName(profilePath, log)
-
-	var entries []*row
+	var entries []*visit
 	rowCount := 0
 	for rows.Next() {
 		rowCount++
@@ -101,55 +138,83 @@ func chromiumParser(ctx context.Context, queryContext table.QueryContext, browse
 			&referringURL,
 		)
 		if err != nil {
-			log("failed to scan row", "rowNumber", rowCount, "error", err)
+			parser.log("failed to scan row", "rowNumber", rowCount, "error", err)
 			continue
 		}
 
-		entry := newHistoryRow("chromium", browserName, user, profileName, profilePath, chromiumTimeToUnix(visitTime.Int64))
-		entry.URL = stringFromNullString(url)
-		entry.Title = stringFromNullString(title)
+		entry := newVisit("chromium", parser.browserName, profile.user, profile.name, historyPath, chromiumTimeToUnix(visitTime.Int64))
+		entry.URL = url.String
+		entry.Title = title.String
 		entry.TransitionType = mapChromiumTransitionType(transitionType)
-		entry.ReferringURL = stringFromNullString(referringURL)
-		entry.VisitID = decimalStringFromNullInt(visitID)
-		entry.FromVisitID = decimalStringFromNullInt(fromVisitID)
-		entry.VisitCount = decimalStringFromNullInt(visitCount)
-		entry.TypedCount = decimalStringFromNullInt(typedCount)
+		entry.ReferringURL = referringURL.String
+		entry.VisitID = visitID.Int64
+		entry.FromVisitID = fromVisitID.Int64
+		entry.VisitCount = int(visitCount.Int64)
+		entry.TypedCount = int(typedCount.Int64)
 		entry.VisitSource = mapChromiumVisitSource(visitSource)
-		entry.IsHidden = boolStringFromNullInt(isHidden)
-		entry.UrlID = decimalStringFromNullInt(urlID)
-		entry.ChVisitDurationMs = formatNullInt64(chVisitDuration, func(value int64) string {
-			return strconv.FormatInt(value/1000, 10)
-		})
+		entry.IsHidden = func(v int64) bool { return v != 0 }(isHidden.Int64)
+		entry.UrlID = urlID.Int64
+		entry.ChVisitDurationMs = chVisitDuration.Int64 / 1000
 
 		entries = append(entries, entry)
 	}
 
-	log("completed reading history", "totalRows", rowCount, "validEntries", len(entries), "historyPath", profilePath)
+	parser.log("completed reading history", "totalRows", rowCount, "validEntries", len(entries), "historyPath", historyPath)
 	return entries, rows.Err()
 }
 
-func extractChromiumProfileName(profilePath string, log func(m string, kvs ...any)) string {
-	profileFolderName := filepath.Base(profilePath)
-	userDataDir := filepath.Dir(profilePath)
-	localStatePath := filepath.Join(userDataDir, "Local State")
-	if data, err := os.ReadFile(localStatePath); err == nil {
-		var localState struct {
-			Profile struct {
-				InfoCache map[string]struct {
-					Name string `json:"name"`
-				} `json:"info_cache"`
-			} `json:"profile"`
+type localState struct {
+	Profile struct {
+		InfoCache map[string]struct {
+			Name string `json:"name"`
+		} `json:"info_cache"`
+	} `json:"profile"`
+}
+
+func getChromiumProfiles(basePath string, log func(m string, kvs ...any)) []*profile {
+	var profiles []*profile
+
+	entries, err := os.ReadDir(basePath)
+	if err != nil {
+		return nil
+	}
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
 		}
 
+		profilePath := filepath.Join(basePath, entry.Name())
+		historyPath := filepath.Join(profilePath, "History")
+		if _, err := os.Stat(historyPath); err != nil {
+			continue
+		}
+		log("detected chromium History file", "path", historyPath)
+
+		profile := &profile{
+			name: entry.Name(),
+			user: extractUserFromPath(profilePath, log),
+			path: profilePath,
+		}
+
+		userDataDir := filepath.Dir(profilePath)
+		localStatePath := filepath.Join(userDataDir, "Local State")
+		data, err := os.ReadFile(localStatePath)
+		if err != nil {
+			profiles = append(profiles, profile)
+			continue
+		}
+
+		var localState localState
 		if err := json.Unmarshal(data, &localState); err == nil {
-			if profileInfo, exists := localState.Profile.InfoCache[profileFolderName]; exists && profileInfo.Name != "" {
-				log("extracted profile name from Local State", "name", profileInfo.Name, "folder", profileFolderName)
-				return profileInfo.Name
+			if profileInfo, exists := localState.Profile.InfoCache[entry.Name()]; exists && profileInfo.Name != "" {
+				profile.name = profileInfo.Name
 			}
 		}
+		profiles = append(profiles, profile)
 	}
-	log("using folder name as profile name", "name", profileFolderName)
-	return profileFolderName
+
+	return profiles
 }
 
 // Unix timestamps are in seconds since January 1, 1970 UTC

@@ -8,17 +8,58 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/osquery/osquery-go/plugin/table"
+	"go.uber.org/multierr"
 )
 
-func safariParser(ctx context.Context, queryContext table.QueryContext, browserName, profilePath string, log func(m string, kvs ...any)) ([]*row, error) {
-	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", filepath.Join(profilePath, "History.db"))
+var _ historyParser = &safariParser{}
+
+type safariParser struct {
+	browserName string
+	profiles    []*profile
+	log         func(m string, kvs ...any)
+}
+
+func newSafariParser(browserName, basePath string, log func(m string, kvs ...any)) historyParser {
+	profiles := getSafariProfiles(basePath, log)
+	if len(profiles) > 0 {
+		return &safariParser{
+			browserName: browserName,
+			profiles:    profiles,
+			log:         log,
+		}
+	}
+	return nil
+}
+
+func (parser *safariParser) parse(ctx context.Context, queryContext table.QueryContext, profileFilters []string) ([]*visit, error) {
+	var (
+		merr   error
+		visits []*visit
+	)
+	for _, profile := range parser.profiles {
+		if len(profileFilters) > 0 && !matchesFilters(profile.name, profileFilters) {
+			continue
+		}
+		vs, err := parser.parseProfile(ctx, queryContext, profile)
+		if err != nil {
+			merr = multierr.Append(merr, err)
+			continue
+		}
+		visits = append(visits, vs...)
+	}
+	return visits, merr
+}
+
+func (parser *safariParser) parseProfile(ctx context.Context, queryContext table.QueryContext, profile *profile) ([]*visit, error) {
+	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", filepath.Join(profile.path, "History.db"))
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
-		log("failed to open database", "error", err)
+		parser.log("failed to open database", "error", err)
 		return nil, fmt.Errorf("failed to open Safari history database: %w", err)
 	}
 	defer db.Close()
@@ -42,18 +83,15 @@ func safariParser(ctx context.Context, queryContext table.QueryContext, browserN
 		ORDER BY hv.visit_time DESC
 	`, timestampWhere)
 
-	log("executing SQL query", "query", query)
+	parser.log("executing SQL query", "query", query)
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
-		log("failed to execute query", "error", err)
+		parser.log("failed to execute query", "error", err)
 		return nil, fmt.Errorf("failed to query Safari history: %w", err)
 	}
 	defer rows.Close()
 
-	user := extractUserFromPath(profilePath, log)
-	profileName := extractSafariProfileName(profilePath, log)
-
-	var entries []*row
+	var entries []*visit
 	rowCount := 0
 	for rows.Next() {
 		rowCount++
@@ -80,45 +118,67 @@ func safariParser(ctx context.Context, queryContext table.QueryContext, browserN
 			&visitID,
 		)
 		if err != nil {
-			log("failed to scan row", "rowNumber", rowCount, "error", err)
+			parser.log("failed to scan row", "rowNumber", rowCount, "error", err)
 			continue
 		}
 
-		entry := newHistoryRow("safari", browserName, user, profileName, profilePath, safariTimeToUnix(visitTime.Int64))
-		entry.URL = stringFromNullString(url)
-		entry.Title = stringFromNullString(title)
-		entry.VisitID = decimalStringFromNullInt(visitID)
-		entry.VisitCount = decimalStringFromNullInt(visitCount)
-		entry.UrlID = decimalStringFromNullInt(itemID)
-		entry.SfDomainExpansion = stringFromNullString(domainExpansion)
-		entry.SfLoadSuccessful = boolStringFromNullInt(loadSuccessful)
+		entry := newVisit("safari", parser.browserName, profile.user, profile.name, profile.path, safariTimeToUnix(visitTime.Int64))
+		entry.URL = url.String
+		entry.Title = title.String
+		entry.VisitID = visitID.Int64
+		entry.VisitCount = int(visitCount.Int64)
+		entry.UrlID = itemID.Int64
+		entry.SfDomainExpansion = domainExpansion.String
+		entry.SfLoadSuccessful = func(v int64) bool { return v != 0 }(loadSuccessful.Int64)
 
 		entries = append(entries, entry)
 	}
 
-	log("completed reading history", "totalRows", rowCount, "validEntries", len(entries), "historyPath", profilePath)
+	parser.log("completed reading history", "totalRows", rowCount, "validEntries", len(entries), "historyPath", profile.path)
 	return entries, rows.Err()
 }
 
-func extractSafariProfileName(profilePath string, log func(m string, kvs ...any)) string {
+func getSafariProfiles(basePath string, log func(m string, kvs ...any)) []*profile {
 	// Modern Safari profiles: /Users/username/Library/Safari/Profiles/ProfileName
 	// Legacy Safari: /Users/username/Library/Safari
 
-	// Normalize path separators
-	normalizedPath := filepath.ToSlash(profilePath)
-	parts := strings.Split(normalizedPath, "/")
+	user := extractUserFromPath(basePath, log)
 
-	// Look for the Profiles directory in the path
-	for i, part := range parts {
-		if part == "Profiles" && i+1 < len(parts) {
-			profileName := parts[i+1]
-			log("extracted Safari profile name from Profiles directory", "name", profileName)
-			return profileName
-		}
+	var profiles []*profile
+
+	entries, err := os.ReadDir(filepath.Join(basePath, "Profiles"))
+	if err != nil {
+		return nil
 	}
 
-	log("using default Safari profile name")
-	return "Default"
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+		historyPath := filepath.Join(basePath, "Profiles", entry.Name(), "History.db")
+		if _, err := os.Stat(historyPath); err != nil {
+			return nil
+		}
+		log("detected safari History.db file", "path", historyPath)
+		profiles = append(profiles, &profile{
+			name: entry.Name(),
+			path: filepath.Dir(historyPath),
+			user: user,
+		})
+	}
+	if len(profiles) > 0 {
+		return profiles
+	}
+	historyPath := filepath.Join(basePath, "History.db")
+	if _, err := os.Stat(historyPath); err != nil {
+		return nil
+	}
+	profiles = append(profiles, &profile{
+		name: "Default",
+		path: filepath.Dir(historyPath),
+		user: user,
+	})
+	return profiles
 }
 
 // Unix timestamps are in seconds since January 1, 1970 UTC

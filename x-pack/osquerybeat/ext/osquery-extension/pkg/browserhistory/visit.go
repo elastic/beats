@@ -5,20 +5,15 @@
 package browserhistory
 
 import (
-	"context"
 	"path/filepath"
 	"reflect"
 	"strconv"
 	"time"
-
-	"github.com/osquery/osquery-go/plugin/table"
 )
 
-type parserFunc func(ctx context.Context, queryContext table.QueryContext, browserName, profilePath string, log func(m string, kvs ...any)) ([]*row, error)
-
-type row struct {
+type visit struct {
 	// Universal fields (available across all browsers)
-	Timestamp      string `osquery:"timestamp"`
+	Timestamp      int64  `osquery:"timestamp"`
 	Datetime       string `osquery:"datetime"`
 	URL            string `osquery:"url"`
 	Title          string `osquery:"title"`
@@ -29,30 +24,30 @@ type row struct {
 	ProfileFolder  string `osquery:"profile_folder"`
 	TransitionType string `osquery:"transition_type"`
 	ReferringURL   string `osquery:"referring_url"`
-	VisitID        string `osquery:"visit_id"`
-	FromVisitID    string `osquery:"from_visit_id"`
-	UrlID          string `osquery:"url_id"`
-	VisitCount     string `osquery:"visit_count"`
-	TypedCount     string `osquery:"typed_count"`
+	VisitID        int64  `osquery:"visit_id"`
+	FromVisitID    int64  `osquery:"from_visit_id"`
+	UrlID          int64  `osquery:"url_id"`
+	VisitCount     int    `osquery:"visit_count"`
+	TypedCount     int    `osquery:"typed_count"`
 	VisitSource    string `osquery:"visit_source"`
-	IsHidden       string `osquery:"is_hidden"`
+	IsHidden       bool   `osquery:"is_hidden"`
 	SourcePath     string `osquery:"source_path"`
 
 	// Chromium-specific fields (Chrome, Edge, Brave, etc.)
-	ChVisitDurationMs string `osquery:"ch_visit_duration_ms"` // Only available in Chromium-based browsers
+	ChVisitDurationMs int64 `osquery:"ch_visit_duration_ms"` // Only available in Chromium-based browsers
 
 	// Firefox-specific fields
-	FfSessionID string `osquery:"ff_session_id"` // Firefox session tracking
-	FfFrecency  string `osquery:"ff_frecency"`   // Firefox user interest algorithm
+	FfSessionID int `osquery:"ff_session_id"` // Firefox session tracking
+	FfFrecency  int `osquery:"ff_frecency"`   // Firefox user interest algorithm
 
 	// Safari-specific fields
 	SfDomainExpansion string `osquery:"sf_domain_expansion"` // Safari domain classification
-	SfLoadSuccessful  string `osquery:"sf_load_successful"`  // Whether page loaded successfully
+	SfLoadSuccessful  bool   `osquery:"sf_load_successful"`  // Whether page loaded successfully
 }
 
-func newHistoryRow(parser, browserName, user, profileName, sourcePath string, timestamp int64) *row {
-	return &row{
-		Timestamp:     strconv.FormatInt(timestamp, 10),
+func newVisit(parser, browserName, user, profileName, sourcePath string, timestamp int64) *visit {
+	return &visit{
+		Timestamp:     timestamp,
 		Datetime:      time.Unix(timestamp, 0).UTC().Format(time.RFC3339),
 		Browser:       browserName,
 		Parser:        parser,
@@ -63,7 +58,7 @@ func newHistoryRow(parser, browserName, user, profileName, sourcePath string, ti
 	}
 }
 
-func (entry *row) toMap() map[string]string {
+func (entry *visit) toMap() map[string]string {
 	result := make(map[string]string)
 
 	v := reflect.ValueOf(entry).Elem()
@@ -84,6 +79,12 @@ func (entry *row) toMap() map[string]string {
 		switch field.Kind() {
 		case reflect.String:
 			value = field.String()
+		case reflect.Bool:
+			if field.Bool() {
+				value = "1"
+			} else {
+				value = "0"
+			}
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			if field.Int() == 0 {
 				value = ""

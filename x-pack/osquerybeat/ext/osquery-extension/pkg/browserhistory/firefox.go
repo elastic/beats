@@ -9,18 +9,68 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/osquery/osquery-go/plugin/table"
+	"go.uber.org/multierr"
 )
 
-func firefoxParser(ctx context.Context, queryContext table.QueryContext, browserName, profilePath string, log func(m string, kvs ...any)) ([]*row, error) {
-	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", filepath.Join(profilePath, "places.sqlite"))
+var _ historyParser = &firefoxParser{}
+
+type firefoxParser struct {
+	browserName string
+	profiles    []*profile
+	log         func(m string, kvs ...any)
+}
+
+func newFirefoxParser(browserName, basePath string, log func(m string, kvs ...any)) historyParser {
+	profilesIniPath := filepath.Join(basePath, "profiles.ini")
+	file, err := os.Open(profilesIniPath)
+	if err != nil {
+		return nil
+	}
+	defer file.Close()
+
+	profiles := getFirefoxProfiles(file, basePath, log)
+
+	if len(profiles) > 0 {
+		return &firefoxParser{
+			browserName: browserName,
+			profiles:    profiles,
+			log:         log,
+		}
+	}
+
+	return nil
+}
+
+func (parser *firefoxParser) parse(ctx context.Context, queryContext table.QueryContext, profileFilters []string) ([]*visit, error) {
+	var (
+		merr   error
+		visits []*visit
+	)
+	for _, profile := range parser.profiles {
+		if len(profileFilters) > 0 && !matchesFilters(profile.name, profileFilters) {
+			continue
+		}
+		vs, err := parser.parseProfile(ctx, queryContext, profile)
+		if err != nil {
+			merr = multierr.Append(merr, err)
+			continue
+		}
+		visits = append(visits, vs...)
+	}
+	return visits, merr
+}
+
+func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext table.QueryContext, profile *profile) ([]*visit, error) {
+	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", filepath.Join(profile.path, "places.sqlite"))
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
-		log("failed to open database", "error", err)
+		parser.log("failed to open database", "error", err)
 		return nil, fmt.Errorf("failed to open Firefox history database: %w", err)
 	}
 	defer db.Close()
@@ -52,18 +102,15 @@ func firefoxParser(ctx context.Context, queryContext table.QueryContext, browser
 		ORDER BY hv.visit_date DESC
 	`, timestampWhere)
 
-	log("executing SQL query", "query", query)
+	parser.log("executing SQL query", "query", query)
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
-		log("failed to execute query", "error", err)
+		parser.log("failed to execute query", "error", err)
 		return nil, fmt.Errorf("failed to query Firefox history: %w", err)
 	}
 	defer rows.Close()
 
-	user := extractUserFromPath(profilePath, log)
-	profileName := extractFirefoxProfileName(profilePath, log)
-
-	var entries []*row
+	var entries []*visit
 	rowCount := 0
 	for rows.Next() {
 		rowCount++
@@ -102,30 +149,70 @@ func firefoxParser(ctx context.Context, queryContext table.QueryContext, browser
 			&referringURL,
 		)
 		if err != nil {
-			log("failed to scan row", "rowNumber", rowCount, "error", err)
+			parser.log("failed to scan row", "rowNumber", rowCount, "error", err)
 			continue
 		}
 
-		entry := newHistoryRow("firefox", browserName, user, profileName, profilePath, firefoxTimeToUnix(visitTime.Int64))
-		entry.URL = stringFromNullString(url)
-		entry.Title = stringFromNullString(title)
+		entry := newVisit("firefox", parser.browserName, profile.user, profile.name, profile.path, firefoxTimeToUnix(visitTime.Int64))
+		entry.URL = url.String
+		entry.Title = title.String
 		entry.TransitionType = mapFirefoxTransitionType(transition)
-		entry.ReferringURL = stringFromNullString(referringURL)
-		entry.VisitID = decimalStringFromNullInt(visitID)
-		entry.FromVisitID = decimalStringFromNullInt(fromVisitID)
-		entry.VisitCount = decimalStringFromNullInt(visitCount)
-		entry.TypedCount = decimalStringFromNullInt(typedCount)
+		entry.ReferringURL = referringURL.String
+		entry.VisitID = visitID.Int64
+		entry.FromVisitID = fromVisitID.Int64
+		entry.VisitCount = int(visitCount.Int64)
+		entry.TypedCount = int(typedCount.Int64)
 		entry.VisitSource = mapFirefoxVisitSource(visitSource)
-		entry.IsHidden = boolStringFromNullInt(isHidden)
-		entry.UrlID = decimalStringFromNullInt(urlID)
-		entry.FfSessionID = decimalStringFromNullInt(ffSessionID)
-		entry.FfFrecency = decimalStringFromNullInt(ffFrecency)
+		entry.IsHidden = func(v int64) bool { return v != 0 }(isHidden.Int64)
+		entry.UrlID = urlID.Int64
+		entry.FfSessionID = int(ffSessionID.Int64)
+		entry.FfFrecency = int(ffFrecency.Int64)
 
 		entries = append(entries, entry)
 	}
 
-	log("completed reading history", "totalRows", rowCount, "validEntries", len(entries), "historyPath", profilePath)
+	parser.log("completed reading history", "totalRows", rowCount, "validEntries", len(entries), "historyPath", profile.path)
 	return entries, rows.Err()
+}
+
+func getFirefoxProfiles(file io.Reader, basePath string, log func(m string, kvs ...any)) []*profile {
+	var profiles []*profile
+	scanner := bufio.NewScanner(file)
+	var currentProfile *profile
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if strings.HasPrefix(line, "[Profile") && strings.HasSuffix(line, "]") {
+			currentProfile = &profile{}
+		} else if currentProfile != nil {
+			parts := strings.SplitN(line, "=", 2)
+			switch parts[0] {
+			case "Name":
+				currentProfile.name = parts[1]
+			case "Path":
+				currentProfile.path = parts[1]
+				if !filepath.IsAbs(currentProfile.path) {
+					currentProfile.path = filepath.Join(basePath, currentProfile.path)
+				}
+			}
+			if currentProfile.name != "" && currentProfile.path != "" {
+				historyPath := filepath.Join(currentProfile.path, "places.sqlite")
+				if _, err := os.Stat(historyPath); err != nil {
+					continue
+				}
+				log("detected firefox places.sqlite file", "path", historyPath)
+				profiles = append(profiles, &profile{
+					name: currentProfile.name,
+					user: extractUserFromPath(basePath, log),
+					path: currentProfile.path,
+				})
+				currentProfile = nil
+			}
+		}
+	}
+	if len(profiles) > 0 {
+		return profiles
+	}
+	return nil
 }
 
 // Unix timestamps are in seconds since January 1, 1970 UTC
@@ -143,44 +230,6 @@ func unixToFirefoxTime(unixTime int64) int64 {
 	}
 	// Convert seconds to microseconds
 	return unixTime * 1000000
-}
-
-func extractFirefoxProfileName(profilePath string, log func(m string, kvs ...any)) string {
-	profileFolderName := filepath.Base(profilePath)
-	profilesDir := filepath.Dir(profilePath)
-	firefoxDir := filepath.Dir(profilesDir)
-	profilesIniPath := filepath.Join(firefoxDir, "profiles.ini")
-
-	if file, err := os.Open(profilesIniPath); err == nil {
-		defer file.Close()
-		scanner := bufio.NewScanner(file)
-
-		var currentProfile string
-		var profileName string
-		var profilePath string
-
-		for scanner.Scan() {
-			line := strings.TrimSpace(scanner.Text())
-			if strings.HasPrefix(line, "[Profile") && strings.HasSuffix(line, "]") {
-				currentProfile = line
-				profileName = ""
-				profilePath = ""
-			} else if currentProfile != "" {
-				if strings.HasPrefix(line, "Name=") {
-					profileName = strings.TrimPrefix(line, "Name=")
-				} else if strings.HasPrefix(line, "Path=") {
-					profilePath = strings.TrimPrefix(line, "Path=")
-					profilePath = strings.TrimPrefix(profilePath, "Profiles/")
-				}
-				if profileName != "" && profilePath != "" && profilePath == profileFolderName {
-					log("extracted profile name from profiles.ini", "name", profileName, "folder", profileFolderName)
-					return profileName
-				}
-			}
-		}
-	}
-	log("using folder name as profile name", "name", profileFolderName)
-	return profileFolderName
 }
 
 // mapFirefoxVisitSource maps Firefox visit source values to human-readable strings
