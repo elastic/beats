@@ -19,18 +19,18 @@ import (
 var _ historyParser = &safariParser{}
 
 type safariParser struct {
-	browserName string
-	profiles    []*profile
-	log         func(m string, kvs ...any)
+	location searchLocation
+	profiles []*profile
+	log      func(m string, kvs ...any)
 }
 
-func newSafariParser(browserName, basePath string, log func(m string, kvs ...any)) historyParser {
-	profiles := getSafariProfiles(basePath, log)
+func newSafariParser(location searchLocation, log func(m string, kvs ...any)) historyParser {
+	profiles := getSafariProfiles(location.path, log)
 	if len(profiles) > 0 {
 		return &safariParser{
-			browserName: browserName,
-			profiles:    profiles,
-			log:         log,
+			location: location,
+			profiles: profiles,
+			log:      log,
 		}
 	}
 	return nil
@@ -122,7 +122,7 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 			continue
 		}
 
-		entry := newVisit("safari", parser.browserName, profile, safariTimeToUnix(visitTime.Int64))
+		entry := newVisit("safari", parser.location, profile, safariTimeToUnix(visitTime.Int64))
 		entry.URL = url.String
 		entry.Title = title.String
 		entry.VisitID = visitID.Int64

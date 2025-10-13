@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	newParserFuncs = map[string]func(browserName, path string, log func(m string, kvs ...any)) historyParser{}
+	newParserFuncs = map[string]func(location searchLocation, log func(m string, kvs ...any)) historyParser{}
 	once           sync.Once
 )
 
@@ -34,9 +34,9 @@ func initParsers() {
 	newParserFuncs["safari"] = newSafariParser
 }
 
-func getParser(browserName, basePath string, log func(m string, kvs ...any)) historyParser {
+func getParser(location searchLocation, log func(m string, kvs ...any)) historyParser {
 	for parserName, newParser := range newParserFuncs {
-		if parser := newParser(browserName, basePath, log); parser != nil {
+		if parser := newParser(location, log); parser != nil {
 			log("created new parser", "parser", parserName)
 			return parser
 		}

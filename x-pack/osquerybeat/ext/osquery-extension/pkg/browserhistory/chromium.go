@@ -20,18 +20,18 @@ import (
 var _ historyParser = &chromiumParser{}
 
 type chromiumParser struct {
-	browserName string
-	profiles    []*profile
-	log         func(m string, kvs ...any)
+	location searchLocation
+	profiles []*profile
+	log      func(m string, kvs ...any)
 }
 
-func newChromiumParser(browserName, basePath string, log func(m string, kvs ...any)) historyParser {
-	profiles := getChromiumProfiles(basePath, log)
+func newChromiumParser(location searchLocation, log func(m string, kvs ...any)) historyParser {
+	profiles := getChromiumProfiles(location.path, log)
 	if len(profiles) > 0 {
 		return &chromiumParser{
-			browserName: browserName,
-			profiles:    profiles,
-			log:         log,
+			location: location,
+			profiles: profiles,
+			log:      log,
 		}
 	}
 	return nil
@@ -141,7 +141,7 @@ func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext tab
 			continue
 		}
 
-		entry := newVisit("chromium", parser.browserName, profile, chromiumTimeToUnix(visitTime.Int64))
+		entry := newVisit("chromium", parser.location, profile, chromiumTimeToUnix(visitTime.Int64))
 		entry.URL = url.String
 		entry.Title = title.String
 		entry.TransitionType = mapChromiumTransitionType(transitionType)

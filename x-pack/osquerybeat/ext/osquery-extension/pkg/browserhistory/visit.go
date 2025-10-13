@@ -20,7 +20,6 @@ type visit struct {
 	Parser         string `osquery:"parser"`
 	User           string `osquery:"user"`
 	ProfileName    string `osquery:"profile_name"`
-	SearchFolder   string `osquery:"search_folder"`
 	TransitionType string `osquery:"transition_type"`
 	ReferringURL   string `osquery:"referring_url"`
 	VisitID        int64  `osquery:"visit_id"`
@@ -42,19 +41,24 @@ type visit struct {
 	// Safari-specific fields
 	SfDomainExpansion string `osquery:"sf_domain_expansion"` // Safari domain classification
 	SfLoadSuccessful  bool   `osquery:"sf_load_successful"`  // Whether page loaded successfully
+
+	CustomDataDir string `osquery:"custom_data_dir"`
 }
 
-func newVisit(parser, browserName string, profile *profile, timestamp int64) *visit {
-	return &visit{
-		Timestamp:    timestamp,
-		Datetime:     time.Unix(timestamp, 0).UTC().Format(time.RFC3339),
-		Browser:      browserName,
-		Parser:       parser,
-		User:         profile.user,
-		ProfileName:  profile.name,
-		SearchFolder: profile.searchPath,
-		HistoryPath:  profile.historyPath,
+func newVisit(parser string, location searchLocation, profile *profile, timestamp int64) *visit {
+	v := &visit{
+		Timestamp:   timestamp,
+		Datetime:    time.Unix(timestamp, 0).UTC().Format(time.RFC3339),
+		Browser:     location.browser,
+		Parser:      parser,
+		User:        profile.user,
+		ProfileName: profile.name,
+		HistoryPath: profile.historyPath,
 	}
+	if location.isCustom {
+		v.CustomDataDir = location.path
+	}
+	return v
 }
 
 func (entry *visit) toMap() map[string]string {

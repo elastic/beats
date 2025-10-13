@@ -5,6 +5,7 @@
 package browserhistory
 
 import (
+	"errors"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -24,6 +25,28 @@ func getUserFilters(queryContext table.QueryContext) []string {
 
 func getBrowserFilters(queryContext table.QueryContext) []string {
 	return getConstraintFilters(queryContext, "browser", defaultBrowsers)
+}
+
+func getCustomDataDirFilters(queryContext table.QueryContext) ([]string, error) {
+	clist, ok := queryContext.Constraints["custom_data_dir"]
+	if !ok || len(clist.Constraints) == 0 {
+		return nil, nil
+	}
+
+	var results []string
+	for _, c := range clist.Constraints {
+		switch c.Operator {
+		case table.OperatorEquals, table.OperatorGlob:
+			results = append(results, c.Expression)
+		case table.OperatorLike:
+			// Convert SQL LIKE pattern to filepath.Match pattern
+			pattern := strings.ReplaceAll(c.Expression, "%", "*")
+			results = append(results, pattern)
+		case table.OperatorRegexp:
+			return nil, errors.New("regexp operator not supported for custom_data_dir")
+		}
+	}
+	return results, nil
 }
 
 func getConstraintFilters(queryContext table.QueryContext, fieldName string, validateAgainst []string) []string {

@@ -21,30 +21,30 @@ import (
 var _ historyParser = &firefoxParser{}
 
 type firefoxParser struct {
-	browserName string
-	profiles    []*profile
-	log         func(m string, kvs ...any)
+	location searchLocation
+	profiles []*profile
+	log      func(m string, kvs ...any)
 }
 
-func newFirefoxParser(browserName, basePath string, log func(m string, kvs ...any)) historyParser {
+func newFirefoxParser(location searchLocation, log func(m string, kvs ...any)) historyParser {
 	var profiles []*profile
 
 	// First, try to parse profiles.ini
-	profilesIniPath := filepath.Join(basePath, "profiles.ini")
+	profilesIniPath := filepath.Join(location.path, "profiles.ini")
 	if file, err := os.Open(profilesIniPath); err == nil {
 		defer file.Close()
-		profiles = getFirefoxProfiles(file, basePath, log)
+		profiles = getFirefoxProfiles(file, location.path, log)
 		log("parsed profiles from profiles.ini", "count", len(profiles), "path", profilesIniPath)
 	} else {
 		log("profiles.ini not found, trying fallback", "path", profilesIniPath, "error", err)
-		profiles = getFirefoxProfilesFallback(basePath, log)
+		profiles = getFirefoxProfilesFallback(location.path, log)
 	}
 
 	if len(profiles) > 0 {
 		return &firefoxParser{
-			browserName: browserName,
-			profiles:    profiles,
-			log:         log,
+			location: location,
+			profiles: profiles,
+			log:      log,
 		}
 	}
 
@@ -157,7 +157,7 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 			continue
 		}
 
-		entry := newVisit("firefox", parser.browserName, profile, firefoxTimeToUnix(visitTime.Int64))
+		entry := newVisit("firefox", parser.location, profile, firefoxTimeToUnix(visitTime.Int64))
 		entry.URL = url.String
 		entry.Title = title.String
 		entry.TransitionType = mapFirefoxTransitionType(transition)

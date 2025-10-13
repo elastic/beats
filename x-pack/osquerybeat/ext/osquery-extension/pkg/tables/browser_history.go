@@ -23,7 +23,6 @@ func BrowserHistoryColumns() []table.ColumnDefinition {
 		table.TextColumn("parser"),
 		table.TextColumn("user"),
 		table.TextColumn("profile_name"),
-		table.TextColumn("search_folder"),
 		table.TextColumn("transition_type"),
 		table.TextColumn("referring_url"),
 		table.BigIntColumn("visit_id"),
@@ -45,6 +44,8 @@ func BrowserHistoryColumns() []table.ColumnDefinition {
 		// Safari-specific fields
 		table.TextColumn("sf_domain_expansion"),   // Safari domain classification
 		table.IntegerColumn("sf_load_successful"), // Whether page loaded successfully
+
+		table.TextColumn("custom_data_dir"),
 	}
 }
 
