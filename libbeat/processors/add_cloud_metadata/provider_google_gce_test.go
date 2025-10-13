@@ -314,7 +314,7 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 	server := initGCETestServer(gceMetadataV1)
 	defer server.Close()
 
-	config, err := conf.NewConfigFrom(map[string]any{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"host": server.Listener.Addr().String(),
 	})
 	if err != nil {
@@ -363,7 +363,7 @@ func TestRetrieveGCEMetadataInK8s(t *testing.T) {
 	server := initGCETestServer(gceK8sMetadataV1)
 	defer server.Close()
 
-	config, err := conf.NewConfigFrom(map[string]any{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"host": server.Listener.Addr().String(),
 	})
 	if err != nil {
@@ -418,7 +418,7 @@ func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
 	server := initGCETestServer(gceK8sMetadataV1)
 	defer server.Close()
 
-	config, err := conf.NewConfigFrom(map[string]any{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"host": server.Listener.Addr().String(),
 	})
 	if err != nil {
@@ -484,7 +484,7 @@ func TestRetrieveGCEMetadataInK8sPartial(t *testing.T) {
 	server := initGCETestServer(gceK8sPartialMetadataV1)
 	defer server.Close()
 
-	config, err := conf.NewConfigFrom(map[string]any{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"host": server.Listener.Addr().String(),
 	})
 	if err != nil {

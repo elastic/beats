@@ -9,7 +9,7 @@ import "fmt"
 // Config is config settings for filebeat receiver.  The structure of
 // which is the same as the filebeat.yml configuration file.
 type Config struct {
-	Beatconfig map[string]any `mapstructure:",remain"`
+	Beatconfig map[string]interface{} `mapstructure:",remain"`
 }
 
 // Validate checks if the configuration in valid

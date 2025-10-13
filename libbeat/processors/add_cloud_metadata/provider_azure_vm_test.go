@@ -171,7 +171,7 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 	server := initAzureTestServer()
 	defer server.Close()
 
-	config, err := conf.NewConfigFrom(map[string]any{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"host": server.Listener.Addr().String(),
 	})
 	if err != nil {

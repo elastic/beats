@@ -408,7 +408,7 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 			}
 			defer func() { NewEC2Client = func(cfg awssdk.Config) EC2Client { return ec2.NewFromConfig(cfg) } }()
 
-			config, err := conf.NewConfigFrom(map[string]any{
+			config, err := conf.NewConfigFrom(map[string]interface{}{
 				"overwrite": tc.processorOverwrite,
 				"providers": []string{"aws"},
 			})

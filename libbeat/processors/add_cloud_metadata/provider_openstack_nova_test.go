@@ -60,7 +60,7 @@ func TestRetrieveOpenstackNovaMetadata(t *testing.T) {
 	server := httptest.NewServer(openstackNovaMetadataHandler())
 	defer server.Close()
 
-	config, err := conf.NewConfigFrom(map[string]any{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"host": server.Listener.Addr().String(),
 	})
 
@@ -77,7 +77,7 @@ func TestRetrieveOpenstackNovaMetadataWithHTTPS(t *testing.T) {
 	server := httptest.NewTLSServer(openstackNovaMetadataHandler())
 	defer server.Close()
 
-	config, err := conf.NewConfigFrom(map[string]any{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"host":                  server.Listener.Addr().String(),
 		"ssl.verification_mode": "none",
 	})

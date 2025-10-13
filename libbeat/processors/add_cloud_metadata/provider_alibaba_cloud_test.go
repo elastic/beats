@@ -56,7 +56,7 @@ func TestRetrieveAlibabaCloudMetadata(t *testing.T) {
 	server := initECSTestServer()
 	defer server.Close()
 
-	config, err := conf.NewConfigFrom(map[string]any{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"providers": []string{"alibaba"},
 		"host":      server.Listener.Addr().String(),
 	})

@@ -42,7 +42,7 @@ type httpMetadataFetcher struct {
 // to the result according the HTTP response.
 type responseHandler func(all []byte, res *result) error
 
-type schemaConv func(m map[string]any) mapstr.M
+type schemaConv func(m map[string]interface{}) mapstr.M
 
 // newMetadataFetcher return metadataFetcher with one pass JSON responseHandler.
 func newMetadataFetcher(

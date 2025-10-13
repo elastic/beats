@@ -44,38 +44,38 @@ func TestProvidersFilter(t *testing.T) {
 	}
 
 	cases := map[string]struct {
-		config   map[string]any
+		config   map[string]interface{}
 		env      string
 		fail     bool
 		expected []string
 	}{
 		"all with local access only if not configured": {
-			config:   map[string]any{},
+			config:   map[string]interface{}{},
 			expected: allLocal,
 		},
 		"BEATS_ADD_CLOUD_METADATA_PROVIDERS overrides default": {
-			config:   map[string]any{},
+			config:   map[string]interface{}{},
 			env:      "alibaba, digitalocean",
 			expected: []string{"alibaba", "digitalocean"},
 		},
 		"none if BEATS_ADD_CLOUD_METADATA_PROVIDERS is explicitly set to an empty list": {
-			config:   map[string]any{},
+			config:   map[string]interface{}{},
 			env:      " ",
 			expected: nil,
 		},
 		"fail to load if unknown name is used": {
-			config: map[string]any{
+			config: map[string]interface{}{
 				"providers": []string{"unknown"},
 			},
 			fail: true,
 		},
 		"only selected": {
-			config: map[string]any{
+			config: map[string]interface{}{
 				"providers": []string{"aws", "gcp", "digitalocean"},
 			},
 		},
 		"BEATS_ADD_CLOUD_METADATA_PROVIDERS overrides selected": {
-			config: map[string]any{
+			config: map[string]interface{}{
 				"providers": []string{"aws", "gcp", "digitalocean"},
 			},
 			env:      "alibaba, digitalocean",
@@ -128,21 +128,21 @@ func Test_priorityResult(t *testing.T) {
 	tLogger := logptest.NewTestingLogger(t, "add_cloud_metadata testing")
 	awsRsp := result{
 		provider: "aws",
-		metadata: map[string]any{
+		metadata: map[string]interface{}{
 			"id": "a-1",
 		},
 	}
 
 	openStackRsp := result{
 		provider: "openstack",
-		metadata: map[string]any{
+		metadata: map[string]interface{}{
 			"id": "o-1",
 		},
 	}
 
 	digitaloceanRsp := result{
 		provider: "digitalocean",
-		metadata: map[string]any{
+		metadata: map[string]interface{}{
 			"id": "d-1",
 		},
 	}

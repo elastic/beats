@@ -50,7 +50,7 @@ var gceMetadataFetcher = provider{
 	Create: func(provider string, config *conf.C) (metadataFetcher, error) {
 		gceMetadataURI := "/computeMetadata/v1/?recursive=true&alt=json"
 		gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
-		gceSchema := func(m map[string]any) mapstr.M {
+		gceSchema := func(m map[string]interface{}) mapstr.M {
 			cloud := mapstr.M{
 				"service": mapstr.M{
 					"name": "GCE",
@@ -70,7 +70,7 @@ var gceMetadataFetcher = provider{
 				_, _ = cloud.Put(key, path.Base(p))
 			}
 
-			if instance, ok := m["instance"].(map[string]any); ok {
+			if instance, ok := m["instance"].(map[string]interface{}); ok {
 				s.Schema{
 					"instance": s.Object{
 						"id":   c.StrFromNum("id"),
@@ -132,7 +132,7 @@ var gceMetadataFetcher = provider{
 				_ = meta.Delete("orchestrator")
 			}
 
-			if project, ok := m["project"].(map[string]any); ok {
+			if project, ok := m["project"].(map[string]interface{}); ok {
 				s.Schema{
 					"project": s.Object{
 						"id": c.Str("projectId"),
