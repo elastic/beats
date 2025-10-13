@@ -27,7 +27,7 @@ This is a module for Sophos Products, currently it accepts logs in syslog format
 
 To configure a remote syslog destination, please reference the [SophosXG/SFOS Documentation](https://docs.sophos.com/nsg/sophos-firewall/18.5/Help/en-us/webhelp/onlinehelp/nsg/tasks/SyslogServerAdd.md).
 
-The syslog format choosen in Sophos configuration should be `Central Reporting Format`.
+The syslog format chosen in Sophos configuration should be `Central Reporting Format`.
 
 ::::{tip}
 Read the [quick start](/reference/filebeat/filebeat-installation-configuration.md) to learn how to configure and run modules.

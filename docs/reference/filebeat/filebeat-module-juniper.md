@@ -90,7 +90,7 @@ The following processes and tags are supported:
 |  | AAMW_ACTION_LOG |
 | RT_SECINTEL | SECINTEL_ACTION_LOG |
 
-The syslog format choosen should be `Default`.
+The syslog format chosen should be `Default`.
 
 
 ## Compatibility [_compatibility_18]

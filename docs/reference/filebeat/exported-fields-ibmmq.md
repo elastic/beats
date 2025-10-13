@@ -52,7 +52,7 @@ IBM MQ error logs
 
 
 **`ibmmq.errorlog.explanation`**
-:   Explaines the error in more detail
+:   Explains the error in more detail
 
     type: keyword
 

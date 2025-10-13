@@ -1372,7 +1372,7 @@ Module for parsing Checkpoint syslog.
 
 
 **`checkpoint.inspection_settings_log`**
-:   Indicats that the log was released by inspection settings.
+:   Indicators that the log was released by inspection settings.
 
     type: keyword
 

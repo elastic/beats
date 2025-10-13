@@ -1689,7 +1689,7 @@ Fields exported by the Zeek RDP log.
 
 
 **`zeek.rdp.result`**
-:   Status result for the connection. It's a mix between RDP negotation failure messages and GCC server create response messages.
+:   Status result for the connection. It's a mix between RDP negotiation failure messages and GCC server create response messages.
 
     type: keyword
 
@@ -2551,7 +2551,7 @@ Cipher algorithms used in this session.
 
 
 **`zeek.ssh.auth.attempts`**
-:   The number of authentication attemps we observed. There's always at least one, since some servers might support no authentication at all. It's important to note that not all of these are failures, since some servers require two-factor auth (e.g. password AND pubkey).
+:   The number of authentication attempts we observed. There's always at least one, since some servers might support no authentication at all. It's important to note that not all of these are failures, since some servers require two-factor auth (e.g. password AND pubkey).
 
     type: integer
 

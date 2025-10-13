@@ -98,7 +98,7 @@ When you specify a setting at the command line, remember to prefix the setting w
 :   A boolean that when set to `true` will read logs from Journald. When Journald is used all events contain the tag `journald`.
 
 **`var.tags`**
-:   A list of tags to include in events. Including `forwarded` indicates that the events did not originate on this host and causes `host.name` to not be added to events. Include `preserve_orginal_event` causes the pipeline to retain the raw log in `event.original`. Defaults to `[]`.
+:   A list of tags to include in events. Including `forwarded` indicates that the events did not originate on this host and causes `host.name` to not be added to events. Include `preserve_original_event` causes the pipeline to retain the raw log in `event.original`. Defaults to `[]`.
 
 
 ### Time zone support [_time_zone_support_14]

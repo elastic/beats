@@ -140,7 +140,7 @@ Even worse, it does not even have to be the same filename; a different file can 
 1715023 y # same inode value for the second file with a different name
 ```
 
-As mentioned before, the problem of cached inode values is a common occurance in containerized environments and network shares. If you're planning to run Filebeat in such an environment, avoid using this file identity.
+As mentioned before, the problem of cached inode values is a common occurrence in containerized environments and network shares. If you're planning to run Filebeat in such an environment, avoid using this file identity.
 
 The `device ID` value used by this file identity can be unstable in some environments too: when using the Linux [LVM](https://en.wikipedia.org/wiki/Logical_Volume_Manager_%28Linux%29) (Logical Volume Manager), device numbers are allocated dynamically at module load (refer to [Persistent Device Numbers](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/logical_volume_manager_administration/lv#persistent_numbers) in the Red Hat Enterprise Linux documentation).
 

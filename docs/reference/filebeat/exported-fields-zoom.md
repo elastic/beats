@@ -832,19 +832,19 @@ Module for parsing Zoom API Webhooks.
 
 
 **`zoom.registrant.purchasing_time_frame`**
-:   Choosen purchase timeframe of the user registering to a meeting or webinar
+:   Chosen purchase timeframe of the user registering to a meeting or webinar
 
     type: keyword
 
 
 **`zoom.registrant.role_in_purchase_process`**
-:   Choosen role in a purchase process related to the user registering to a meeting or webinar
+:   Chosen role in a purchase process related to the user registering to a meeting or webinar
 
     type: keyword
 
 
 **`zoom.registrant.no_of_employees`**
-:   Number of employees choosen by the user registering to a meeting or webinar
+:   Number of employees chosen by the user registering to a meeting or webinar
 
     type: keyword
 

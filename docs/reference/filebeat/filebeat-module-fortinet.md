@@ -27,7 +27,7 @@ This is a module for Fortinet logs sent in the syslog format. It supports the fo
 
 To configure a remote syslog destination, please reference the [Fortigate/FortiOS Documentation](https://docs.fortinet.com/document/fortigate/6.0.0/cli-reference/260508/log-syslogd-syslogd2-syslogd3-syslogd4-setting).
 
-The syslog format choosen should be `Default`.
+The syslog format chosen should be `Default`.
 
 ::::{tip}
 Read the [quick start](/reference/filebeat/filebeat-installation-configuration.md) to learn how to configure and run modules.

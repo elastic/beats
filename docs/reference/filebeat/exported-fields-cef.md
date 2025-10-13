@@ -220,7 +220,7 @@ Collection of key-value pairs carried in the CEF extension field.
 
 
 **`cef.extensions.destinationMacAddress`**
-:   Six colon-seperated hexadecimal numbers.
+:   Six colon-separated hexadecimal numbers.
 
     type: keyword
 
@@ -1056,7 +1056,7 @@ Collection of key-value pairs carried in the CEF extension field.
 
 
 **`cef.extensions.categoryObject`**
-:   Object that the event is about. For example it can be an operating sytem, database, file, etc.
+:   Object that the event is about. For example it can be an operating system, database, file, etc.
 
     type: keyword
 
@@ -1086,7 +1086,7 @@ Collection of key-value pairs carried in the CEF extension field.
 
 
 **`cef.extensions.categoryOutcome`**
-:   Outcome of the event (e.g. sucess, failure, or attempt).
+:   Outcome of the event (e.g. success, failure, or attempt).
 
     type: keyword
 

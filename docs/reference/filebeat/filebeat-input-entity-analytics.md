@@ -1283,5 +1283,5 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `update_processing_time` | Histogram of the elapsed incremental updates times in nanoseconds (time of API contact to items sent to output). |
 
 ::::{note}
-This input is experimental and is under active developement. Configuration options and behaviors may change without warning. Use with caution and do not use in production environments.
+This input is experimental and is under active development. Configuration options and behaviors may change without warning. Use with caution and do not use in production environments.
 ::::

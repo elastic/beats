@@ -9,7 +9,7 @@ applies_to:
 # Azure Blob Storage Input [filebeat-input-azure-blob-storage]
 
 
-Use the `azure blob storage input` to read content from files stored in containers which reside on your Azure Cloud. The input can be configured to work with and without polling, though currently, if polling is disabled it will only perform a one time passthrough, list the file contents and end the process. Polling is generally recommented for most cases even though it can get expensive with dealing with a very large number of files.
+Use the `azure blob storage input` to read content from files stored in containers which reside on your Azure Cloud. The input can be configured to work with and without polling, though currently, if polling is disabled it will only perform a one time passthrough, list the file contents and end the process. Polling is generally recommended for most cases even though it can get expensive with dealing with a very large number of files.
 
 **To mitigate errors and ensure a stable processing environment, this input employs the following features :**
 

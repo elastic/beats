@@ -2322,7 +2322,7 @@ Module for parsing Fortinet syslog.
 
 
 **`fortinet.firewall.translationid`**
-:   DNS filter transaltion ID
+:   DNS filter translation ID
 
     type: keyword
 

@@ -156,7 +156,7 @@ This module supports custom endpoints for on-prem deployments as well as alterna
 
 #### Advanced configuration options [_advanced_configuration_options]
 
-The following configuration options are only recomended in case of problems. They must be nested under a single `var.api` key, like this:
+The following configuration options are only recommended in case of problems. They must be nested under a single `var.api` key, like this:
 
 ```yaml
     var.api:
