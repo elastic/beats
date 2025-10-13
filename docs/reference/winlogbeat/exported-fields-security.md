@@ -42,7 +42,7 @@ Data related to a Windows logon.
 
 
 **`winlog.logon.failure.sub_status`**
-:   Additional information about the logon failure. This is a textual description based on the value of the hexidecimal `SubStatus` field.
+:   Additional information about the logon failure. This is a textual description based on the value of the hexadecimal `SubStatus` field.
 
     type: keyword
 
