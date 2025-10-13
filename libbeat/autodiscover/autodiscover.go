@@ -314,8 +314,8 @@ func (a *Autodiscover) runMetadataGC() {
 		}
 	}
 
-	a.logger.Debugf("Metadata cleanup: %d active, %d stored, %d removed",
-		len(activeHashes), len(storedHashes), removedCount)
+	a.logger.Debugf("Metadata cleanup: %d before, %d after, %d removed",
+		len(storedHashes), len(activeHashes), removedCount)
 }
 
 func (a *Autodiscover) getMeta(event bus.Event) mapstr.M {
