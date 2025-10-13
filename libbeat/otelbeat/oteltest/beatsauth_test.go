@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package oteltest
 
 import (
@@ -51,9 +53,12 @@ import (
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	"go.uber.org/zap/zaptest"
 
+	"github.com/elastic/pkcs8"
+
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
+	"github.com/elastic/elastic-agent-libs/testing/proxytest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 	mockes "github.com/elastic/mock-es/pkg/api"
 	"github.com/elastic/opentelemetry-collector-components/extension/beatsauthextension"
@@ -67,6 +72,15 @@ var esExporterName = "elasticsearch"
 // create root certificate
 var caCert, _ = tlscommontest.GenCA()
 
+// writes ca_cert to a temp file and returns the path
+var caFilePath = func(t *testing.T) string {
+	caFilePath := filepath.Join(t.TempDir(), "ca.pem")
+	require.NoError(t, os.WriteFile(caFilePath, pem.EncodeToMemory(&pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: caCert.Leaf.Raw}), 0o777), "error writing ca pem blocks to a file")
+	return caFilePath
+}
+
 type options struct {
 	Host                 string
 	CACertificate        string
@@ -74,15 +88,11 @@ type options struct {
 	ClientKey            string
 	CATrustedFingerPrint string
 	VerificationMode     string
+	ProxyURL             string
 }
 
 // tests mutual TLS
 func TestMTLS(t *testing.T) {
-	// write ca.pem to a file
-	caFilePath := filepath.Join(t.TempDir(), "ca.pem")
-	require.NoError(t, os.WriteFile(caFilePath, pem.EncodeToMemory(&pem.Block{
-		Type:  "CERTIFICATE",
-		Bytes: caCert.Leaf.Raw}), 0o777), "error writing ca pem blocks to a file")
 
 	// create server certificates
 	serverCerts, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "server", []string{"localhost"}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
@@ -91,7 +101,7 @@ func TestMTLS(t *testing.T) {
 	}
 
 	// get client certificates paths
-	clientCertificate, clientKey := getClientCerts(t, caCert)
+	clientCertificate, clientKey := getClientCerts(t, caCert, "")
 
 	// start test server with given server and root certs
 	certPool := x509.NewCertPool()
@@ -124,7 +134,82 @@ receivers:
 		template.Must(template.New("otelConfig").Parse(inputConfig)).Execute(&otelConfigBuffer,
 			options{
 				Host:          serverName,
-				CACertificate: caFilePath,
+				CACertificate: caFilePath(t),
+				ClientCert:    clientCertificate,
+				ClientKey:     clientKey,
+			}))
+
+	// translate beat to beatreceiver config
+	output := getTranslatedConf(t, otelConfigBuffer.Bytes())
+
+	// get new test exporter
+	exp := newTestESExporter(t, output)
+
+	// get new beats authenticator
+	beatsauth := newAuthenticator(t, beatsauthextension.Config{
+		BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
+	})
+
+	// start extension
+	host := extensionsMap{component.NewID(component.MustNewType(beatsAuthName)): beatsauth}
+	err = beatsauth.Start(t.Context(), host)
+	require.NoError(t, err, "could not start extension")
+
+	// start exporter
+	err = exp.Start(t.Context(), host)
+	require.NoError(t, err, "could not start exporter")
+
+	// send logs
+	require.NoError(t, mustSendLogs(t, exp, getLogRecord(t)), "error sending logs")
+
+	// check if data has reached ES
+	assertReceivedLogRecord(t, metricReader)
+}
+
+func TestKeyPassPhrase(t *testing.T) {
+
+	// create server certificates
+	serverCerts, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "server", []string{"localhost"}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
+	if err != nil {
+		t.Fatalf("could not generate certificates: %s", err)
+	}
+
+	// get client certificates paths with key file encrypted in PKCS#8 format
+	clientCertificate, clientKey := getClientCerts(t, caCert, "your-password")
+
+	// start test server with given server and root certs
+	certPool := x509.NewCertPool()
+	certPool.AddCert(caCert.Leaf)
+
+	serverName, metricReader := startTestServer(t, &tls.Config{
+		// NOTE: client certificates are not verified unless ClientAuth is set to RequireAndVerifyClientCert.
+		ClientAuth:   tls.RequireAndVerifyClientCert,
+		ClientCAs:    certPool,
+		Certificates: []tls.Certificate{serverCerts},
+		MinVersion:   tls.VersionTLS12,
+	})
+
+	inputConfig := `
+receivers:
+  filebeatreceiver:	
+    output:
+      elasticsearch:
+        hosts: {{ .Host }}
+        ssl: 
+          enabled: true
+          certificate_authorities:
+            - {{ .CACertificate }}
+          certificate: {{ .ClientCert }}
+          key: {{ .ClientKey }}
+          key_passphrase: your-password		  
+`
+
+	var otelConfigBuffer bytes.Buffer
+	require.NoError(t,
+		template.Must(template.New("otelConfig").Parse(inputConfig)).Execute(&otelConfigBuffer,
+			options{
+				Host:          serverName,
+				CACertificate: caFilePath(t),
 				ClientCert:    clientCertificate,
 				ClientKey:     clientKey,
 			}))
@@ -336,11 +421,6 @@ func TestVerificationMode(t *testing.T) {
 		},
 	}
 
-	caFilePath := filepath.Join(t.TempDir(), "ca.pem")
-	require.NoError(t, os.WriteFile(caFilePath, pem.EncodeToMemory(&pem.Block{
-		Type:  "CERTIFICATE",
-		Bytes: caCert.Leaf.Raw}), 0o777), "error writing ca pem blocks to a file")
-
 	for name, test := range testcases {
 		t.Run(name, func(t *testing.T) {
 
@@ -376,7 +456,7 @@ receivers:
 				template.Must(template.New("otelConfig").Parse(inputConfig)).Execute(&otelConfigBuffer,
 					options{
 						Host:             fmt.Sprintf("https://%s:%s", test.hostname, port),
-						CACertificate:    caFilePath,
+						CACertificate:    caFilePath(t),
 						VerificationMode: test.verificationMode,
 					}))
 
@@ -422,6 +502,160 @@ receivers:
 
 }
 
+// TestProxyHTTPS tests proxy_url with http and https proxy server
+// It also tests proxy_disable configuration
+func TestProxyHTTP(t *testing.T) {
+
+	// caCert cert pool
+	certPool := x509.NewCertPool()
+	certPool.AddCert(caCert.Leaf)
+
+	// create server certificates
+	serverCerts, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "server", []string{"localhost"}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
+	if err != nil {
+		t.Fatalf("could not generate certificates: %s", err)
+	}
+
+	// create proxy certificates
+	proxyCerts, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "proxy", []string{"localhost"}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
+	if err != nil {
+		t.Fatalf("could not generate certificates: %s", err)
+	}
+
+	testcases := []struct {
+		name                  string
+		serverTLSConfig       *tls.Config
+		proxyOptions          []proxytest.Option
+		inputConfig           string
+		expectProxiedRequests bool // if the request should go via proxy server
+	}{
+		{
+			name:            "when http proxy url is set",
+			serverTLSConfig: nil,
+			proxyOptions: []proxytest.Option{proxytest.WithVerboseLog(),
+				proxytest.WithRequestLog("https", t.Logf)},
+			inputConfig: `
+receivers:
+  filebeatreceiver:	
+    output:
+      elasticsearch:
+        hosts: {{ .Host }}
+        proxy_url: {{ .ProxyURL }}
+`,
+			expectProxiedRequests: true,
+		},
+		{
+			name: "when http/s proxy url is set",
+			serverTLSConfig: &tls.Config{
+				Certificates: []tls.Certificate{serverCerts},
+				MinVersion:   tls.VersionTLS12,
+			},
+			proxyOptions: []proxytest.Option{proxytest.WithVerboseLog(),
+				proxytest.WithRequestLog("https", t.Logf),
+				// we pass ca cert so that proxy server can hijack the incoming client connection
+				// create a proxy client that can trust the server's certificate
+				proxytest.WithMITMCA(caCert.PrivateKey, caCert.Leaf),
+				proxytest.WithHTTPClient(&http.Client{
+					Transport: &http.Transport{
+						TLSClientConfig: &tls.Config{
+							MinVersion: tls.VersionTLS13,
+							RootCAs:    certPool,
+						},
+					},
+				}),
+				proxytest.WithServerTLSConfig(&tls.Config{
+					Certificates: []tls.Certificate{proxyCerts},
+					MinVersion:   tls.VersionTLS13,
+				})},
+			inputConfig: `
+receivers:
+  filebeatreceiver:	
+    output:
+      elasticsearch:
+        hosts: {{ .Host }}
+        proxy_url: {{ .ProxyURL }}
+        ssl:
+          certificate_authorities:
+            - {{ .CACertificate }}
+`,
+			expectProxiedRequests: true,
+		},
+		{
+			name:            "when proxy disable is set",
+			serverTLSConfig: nil,
+			proxyOptions: []proxytest.Option{proxytest.WithVerboseLog(),
+				proxytest.WithRequestLog("https", t.Logf)},
+			inputConfig: `
+receivers:
+  filebeatreceiver:	
+    output:
+      elasticsearch:
+        hosts: {{ .Host }}
+        proxy_url: {{ .ProxyURL }}
+        proxy_disable: true
+`,
+			expectProxiedRequests: false,
+		},
+	}
+
+	for _, test := range testcases {
+		t.Run(test.name, func(t *testing.T) {
+
+			serverName, metricReader := startTestServer(t, test.serverTLSConfig)
+			proxy := proxytest.New(t, test.proxyOptions...)
+
+			if test.serverTLSConfig != nil {
+				require.NoErrorf(t, proxy.StartTLS(), "error starting proxy server")
+			} else {
+				require.NoErrorf(t, proxy.Start(), "error starting proxy server")
+			}
+
+			var otelConfigBuffer bytes.Buffer
+			require.NoError(t,
+				template.Must(template.New("otelConfig").Parse(test.inputConfig)).Execute(&otelConfigBuffer,
+					options{
+						Host:          serverName,
+						ProxyURL:      proxy.URL,
+						CACertificate: caFilePath(t),
+					}))
+
+			// translate beat to beatreceiver config
+			output := getTranslatedConf(t, otelConfigBuffer.Bytes())
+
+			// get new test exporter
+			exp := newTestESExporter(t, output)
+
+			// get new beats authenticator
+			beatsauth := newAuthenticator(t, beatsauthextension.Config{
+				BeatAuthconfig: output.Get("extensions::beatsauth").(map[string]any), //nolint: errcheck // it is a test
+			})
+
+			// start extension
+			host := extensionsMap{component.NewID(component.MustNewType(beatsAuthName)): beatsauth}
+			err = beatsauth.Start(t.Context(), host)
+			require.NoError(t, err, "could not start extension")
+
+			// start exporter
+			err = exp.Start(t.Context(), host)
+			require.NoError(t, err, "could not start exporter")
+
+			// send logs
+			require.NoError(t, mustSendLogs(t, exp, getLogRecord(t)), "error sending logs")
+
+			// check if data has reached ES
+			assertReceivedLogRecord(t, metricReader)
+
+			if test.expectProxiedRequests {
+				// assert if requests have gone via the proxy
+				assert.NotEmpty(t, proxy.ProxiedRequests(), "proxy should have captured at least 1 request")
+			} else {
+				assert.Empty(t, proxy.ProxiedRequests(), "proxy should have captured at least 1 request")
+			}
+		})
+	}
+
+}
+
 // newAuthenticator returns a new beatsauth extension
 func newAuthenticator(t *testing.T, config beatsauthextension.Config) extension.Extension {
 	beatsauth := beatsauthextension.NewFactory()
@@ -433,9 +667,7 @@ func newAuthenticator(t *testing.T, config beatsauthextension.Config) extension.
 	settings.Logger = zaptest.NewLogger(t)
 
 	extension, err := beatsauth.Create(t.Context(), settings, &config)
-	if err != nil {
-		t.Fatalf("could not create extension: %v", err)
-	}
+	require.NoError(t, err, "could not create extension")
 
 	return extension
 }
@@ -494,9 +726,14 @@ func startTestServer(t *testing.T, tlsConifg *tls.Config) (serverURL string, met
 		0, 0, 0, 0, 0))
 
 	server := httptest.NewUnstartedServer(mux)
-	server.TLS = tlsConifg
 
-	server.StartTLS()
+	if tlsConifg != nil {
+		server.TLS = tlsConifg
+		server.StartTLS()
+	} else {
+		server.Start()
+	}
+
 	t.Cleanup(func() { server.Close() })
 
 	return server.URL, rdr
@@ -526,34 +763,48 @@ func mustSendLogs(t *testing.T, exporter exporter.Logs, logs plog.Logs) error {
 }
 
 // getClientCerts creates client certificates, writes them to a file and return the path of certificate and key
-func getClientCerts(t *testing.T, caCert tls.Certificate) (certificate string, key string) {
+// if passphrase is passed, it is used to encrypt the key file
+func getClientCerts(t *testing.T, caCert tls.Certificate, passphrase string) (certificate string, key string) {
 	// create client certificates
 	clientCerts, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "client", []string{"localhost"}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
 	if err != nil {
 		t.Fatalf("could not generate certificates: %s", err)
 	}
 
-	clientKey, err := x509.MarshalPKCS8PrivateKey(clientCerts.PrivateKey)
-	if err != nil {
-		t.Fatalf("could not marshal private key: %v", err)
-	}
-
 	tempDir := t.TempDir()
 	clientCertPath := filepath.Join(tempDir, "client-cert.pem")
 	clientKeyPath := filepath.Join(tempDir, "client-key.pem")
 
+	if passphrase != "" {
+		clientKey, err := pkcs8.MarshalPrivateKey(clientCerts.PrivateKey, []byte(passphrase), pkcs8.DefaultOpts)
+		if err != nil {
+			t.Fatalf("could not marshal private key: %v", err)
+		}
+
+		if err = os.WriteFile(clientKeyPath, pem.EncodeToMemory(&pem.Block{
+			Type:  "ENCRYPTED PRIVATE KEY",
+			Bytes: clientKey,
+		}), 0400); err != nil {
+			t.Fatalf("could not write client key to file")
+		}
+	} else {
+		clientKey, err := x509.MarshalPKCS8PrivateKey(clientCerts.PrivateKey)
+		if err != nil {
+			t.Fatalf("could not marshal private key: %v", err)
+		}
+		if err = os.WriteFile(clientKeyPath, pem.EncodeToMemory(&pem.Block{
+			Type:  "RSA PRIVATE KEY",
+			Bytes: clientKey,
+		}), 0400); err != nil {
+			t.Fatalf("could not write client key to file")
+		}
+	}
+
 	if err = os.WriteFile(clientCertPath, pem.EncodeToMemory(&pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: clientCerts.Leaf.Raw,
-	}), 0o777); err != nil {
+	}), 0400); err != nil {
 		t.Fatalf("could not write client certificate to file")
-	}
-
-	if err = os.WriteFile(clientKeyPath, pem.EncodeToMemory(&pem.Block{
-		Type:  "RSA PRIVATE KEY",
-		Bytes: clientKey,
-	}), 0o777); err != nil {
-		t.Fatalf("could not write client key to file")
 	}
 
 	return clientCertPath, clientKeyPath

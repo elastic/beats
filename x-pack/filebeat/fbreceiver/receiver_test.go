@@ -533,10 +533,10 @@ func TestConsumeContract(t *testing.T) {
 	os.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
 
 	cfg := &Config{
-		Beatconfig: map[string]interface{}{
+		Beatconfig: map[string]any{
 			"queue.mem.flush.timeout": "0s",
-			"filebeat": map[string]interface{}{
-				"inputs": []map[string]interface{}{
+			"filebeat": map[string]any{
+				"inputs": []map[string]any{
 					{
 						"type":    "filestream",
 						"id":      "filestream-test",
@@ -544,16 +544,16 @@ func TestConsumeContract(t *testing.T) {
 						"paths": []string{
 							filepath.Join(tmpDir, "input-*.log"),
 						},
-						"file_identity.native": map[string]interface{}{},
-						"prospector": map[string]interface{}{
-							"scanner": map[string]interface{}{
+						"file_identity.native": map[string]any{},
+						"prospector": map[string]any{
+							"scanner": map[string]any{
 								"fingerprint.enabled": false,
 								"check_interval":      "0.1s",
 							},
 						},
-						"parsers": []map[string]interface{}{
+						"parsers": []map[string]any{
 							{
-								"ndjson": map[string]interface{}{
+								"ndjson": map[string]any{
 									"document_id": "id",
 								},
 							},
@@ -561,10 +561,10 @@ func TestConsumeContract(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]interface{}{
-				"otelconsumer": map[string]interface{}{},
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
 			},
-			"logging": map[string]interface{}{
+			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
 					"*",
