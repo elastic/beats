@@ -2080,3 +2080,38 @@ func BenchmarkHttpLargeResponseBody(b *testing.B) {
 	}
 	b.ReportAllocs()
 }
+
+func FuzzParseStream(f *testing.F) {
+	data1 := "HTTP/1.1 200 OK\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Expires: -1\r\n" +
+		"Cache-Control: private, max-age=0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n" +
+		"Content-Encoding: gzip\r\n" +
+		"Server: gws\r\n" +
+		"Content-Length: 0\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n"
+
+	data2 := "GET /users/login HTTP/1.1\r\n" +
+		"HOST: www.example.com\r\n" +
+		"Content-Type: application/x-www-form-urlencoded\r\n" +
+		"Content-Length: 53\r\n" +
+		"\r\n" +
+		"password=my_secret_pass&Password=my_secret_password_2\r\n"
+
+	f.Add([]byte(data1))
+	f.Add([]byte(data2))
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		http := httpModForTests(nil)
+		http.parserConfig.sendHeaders = true
+		http.parserConfig.sendAllHeaders = true
+		http.parserConfig.includeRequestBodyFor = []string{"application/x-foo", "text/plain"}
+		http.parserConfig.includeResponseBodyFor = []string{"application/x-foo", "text/plain"}
+
+		st := &stream{data: data, message: new(message)}
+		_, _ = testParseStream(http, st, 0)
+	})
+}

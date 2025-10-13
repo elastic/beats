@@ -20,6 +20,7 @@
 package procs
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -147,4 +148,12 @@ func assertUint64ArraysAreEqual(t *testing.T, expected []uint64, result []uint64
 		}
 	}
 	return true
+}
+
+func FuzzParseProcNetProto(f *testing.F) {
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		_, _ = parseProcNetProto(bytes.NewReader(data), true)
+		_, _ = parseProcNetProto(bytes.NewReader(data), false)
+	})
 }

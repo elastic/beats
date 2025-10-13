@@ -218,3 +218,8 @@ build/distributions/dependencies.csv: $(PYTHON)
 ## test-mage : Test the mage installation used by the Unified Release process
 test-mage: mage
 	@mage dumpVariables
+
+## test-fuzz : Run fuzz tests
+.PHONY: test-fuzz
+test-fuzz:
+	sh ./script/test_fuzz.sh

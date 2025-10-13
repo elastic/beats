@@ -1177,3 +1177,23 @@ func TestAmqp_MultipleBodyFrames(t *testing.T) {
 	assert.Equal(t, "basic.publish", trans["method"])
 	assert.Equal(t, "***hello I like to publish big messages***", trans["request"])
 }
+
+func FuzzAmqpMessageParser(f *testing.F) {
+	data1, _ := hex.DecodeString("0100010000000f006e000c0000075465737447657401ce")
+	f.Add(data1)
+
+	data2, _ := hex.DecodeString("01000100000013003c00280000000a546573744865" +
+		"6164657200ce02000100000061003c0000000000000000001ab8e00a746578742f706c" +
+		"61696e0000002203796f70530000000468696869036e696c56066e756d626572644044" +
+		"40000000000002060a656c206d656e73616a650000000055f81dc00c6c6f7665206d65" +
+		"7373616765ce0300010000001a5465737420686561646572206669656c647320666f72" +
+		"65766572ce")
+	f.Add(data2)
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		_, amqp := amqpModForTests()
+
+		stream := &amqpStream{data: data, message: new(amqpMessage)}
+		_, _ = amqp.amqpMessageParser(stream)
+	})
+}

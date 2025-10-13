@@ -778,3 +778,12 @@ func TestSetUpdatedURL(t *testing.T) {
 		})
 	}
 }
+
+func FuzzParseMBeanName(f *testing.F) {
+	f.Add(`type=Runtime`)
+	f.Add(`java.lang:name=Foo,type=Runtime`)
+
+	f.Fuzz(func(t *testing.T, mBeanName string) {
+		_, _ = ParseMBeanName(mBeanName)
+	})
+}

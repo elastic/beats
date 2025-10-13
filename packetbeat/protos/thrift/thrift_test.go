@@ -1093,3 +1093,79 @@ func TestThrift_GapInStream_request(t *testing.T) {
 		// ok
 	}
 }
+
+func FuzzMessageParser(f *testing.F) {
+	data1, _ := hex.DecodeString("800100010000000470696e670000000000")
+	data2, _ := hex.DecodeString("800100010000000963616c63756c61746500000000080001000000010c00020800010000000108000200000000080003000000040000")
+	data3, _ := hex.DecodeString("80010002000000086563686f5f6d6170000000000d00000b060000000300000001610001000000016300030000000162000200")
+	data4, _ := hex.DecodeString("800100020000000963616c63756c617465000000000c0001080001000000040b00020000001243616e6e6f742064697669646520627920300000")
+
+	f.Add(data1)
+	f.Add(data2)
+	f.Add(data3)
+	f.Add(data4)
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		var stream thriftStream
+		var thrift thriftPlugin
+		thrift.InitDefaults()
+
+		stream = thriftStream{data: data, message: new(thriftMessage)}
+		_, _ = thrift.messageParser(&stream)
+	})
+}
+
+func FuzzParse(f *testing.F) {
+	data1, _ := hex.DecodeString("800100010000000470696e670000000000")
+	data2, _ := hex.DecodeString("0000001e800100010000000361646400000000080001000000010800020000000100")
+	data3, _ := hex.DecodeString("00000361646400000000080001000000010800020000000100")
+	data4, _ := hex.DecodeString("800100020000000963616c63756c617465000000000c0001080001000000040b00020000001243616e6e6f742064697669646520627920300000")
+
+	f.Add(data1)
+	f.Add(data2)
+	f.Add(data3)
+	f.Add(data4)
+
+	f.Fuzz(func(t *testing.T, payload []byte) {
+		pkt := &protos.Packet{
+			Payload: []byte(payload),
+		}
+
+		// One
+		thrift1 := thriftForTests()
+		thrift1.publishQueue = make(chan *thriftTransaction, 10)
+		tcptuple1 := testTCPTuple()
+
+		var private1 thriftPrivateData
+		thrift1.Parse(pkt, tcptuple1, 0, private1)
+
+		// Two
+		thrift2 := thriftForTests()
+		thrift2.publishQueue = make(chan *thriftTransaction, 10)
+		thrift2.TransportType = thriftTFramed
+		tcptuple2 := testTCPTuple()
+
+		var private2 thriftPrivateData
+		thrift2.Parse(pkt, tcptuple2, 0, private2)
+
+		// Three
+		thrift3 := thriftForTests()
+		thrift3.TransportType = thriftTFramed
+		thrift3.captureReply = false
+		thrift3.publishQueue = make(chan *thriftTransaction, 10)
+		tcptuple3 := testTCPTuple()
+
+		var private3 thriftPrivateData
+		thrift3.Parse(pkt, tcptuple3, 0, private3)
+
+		// Four
+		thrift4 := thriftForTests()
+		thrift4.TransportType = thriftTFramed
+		thrift4.obfuscateStrings = true
+		thrift4.publishQueue = make(chan *thriftTransaction, 10)
+		tcptuple4 := testTCPTuple()
+
+		var private4 thriftPrivateData
+		thrift4.Parse(pkt, tcptuple4, 0, private4)
+	})
+}

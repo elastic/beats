@@ -268,3 +268,22 @@ func normalizeEvent(t testing.TB, event beat.Event) interface{} {
 	}
 	return out
 }
+
+func FuzzParseDHCPv4(f *testing.F) {
+	f.Add(dhcpRequest)
+	f.Add(dhcpACK)
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		ipTuple := common.NewIPPortTuple(4, net.IP{0, 0, 0, 0}, 68, net.IP{255, 255, 255, 255}, 67)
+		pkt := &protos.Packet{
+			Ts:      time.Now(),
+			Tuple:   ipTuple,
+			Payload: data,
+		}
+
+		p, err := newPlugin(true, nil, &procs.ProcessesWatcher{}, nil)
+		if err == nil {
+			p.parseDHCPv4(pkt)
+		}
+	})
+}

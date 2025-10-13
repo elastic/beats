@@ -236,3 +236,12 @@ func Test_TextParseStatusResponse(t *testing.T) {
 	assert.Equal(t, "abc", msg.stats[0].Name.String())
 	assert.Equal(t, "5", msg.stats[0].Value.String())
 }
+
+func FuzzTextTryParse(f *testing.F) {
+	f.Add("quit noreply\r\n")
+	f.Add("set k 2 102 5 noreply\r\nvalue\r\n")
+
+	f.Fuzz(func(t *testing.T, input string) {
+		_, _ = textTryParse(t, input)
+	})
+}

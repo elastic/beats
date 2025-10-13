@@ -665,3 +665,28 @@ func BenchmarkParallelTcpParse(b *testing.B) {
 		}
 	})
 }
+
+func FuzzParseTcp(f *testing.F) {
+	f.Add(elasticATcp.request)
+	f.Add(elasticATcp.response)
+	f.Add(zoneAxfrTCP.request)
+	f.Add(zoneAxfrTCP.response)
+	f.Add(githubPtrTCP.request)
+	f.Add(githubPtrTCP.response)
+	f.Add(sophosTxtTCP.request)
+	f.Add(sophosTxtTCP.response)
+
+	f.Fuzz(func(t *testing.T, payload []byte) {
+		results := &eventStore{}
+		var private protos.ProtocolData
+		dns := newDNS(results, testing.Verbose())
+
+		defer dns.transactions.StopJanitor()
+
+		tcptuple := testTCPTuple()
+		packet := newPacket(forward, payload)
+
+		dns.Parse(packet, tcptuple, tcp.TCPDirectionReverse, private)
+		dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
+	})
+}

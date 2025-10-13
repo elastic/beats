@@ -173,3 +173,37 @@ func getVal(f beat.Event, k string) interface{} {
 	v, _ := f.GetValue(k)
 	return v
 }
+
+func FuzzParseURI(f *testing.F) {
+	f.Add("sip:test@10.0.2.15:5060")
+	f.Add("sips:test@10.0.2.15:5061 ; transport=udp")
+
+	f.Fuzz(func(t *testing.T, data string) {
+		_, _, _, _, _ = parseURI(common.NetString(data))
+	})
+}
+
+func FuzzParseFromToContact(f *testing.F) {
+	f.Add("test <sip:test@10.0.2.15:5060>;tag=QvN921")
+	f.Add(" \"Mr. Watson\" <mailto:watson@bell-telephone.com> ;q=0.1")
+
+	f.Fuzz(func(t *testing.T, data string) {
+		_, _, _ = parseFromToContact(common.NetString(data))
+	})
+}
+
+func FuzzParseUDP(f *testing.F) {
+	f.Add("INVITE sip:test@10.0.2.15:5060 SIP/2.0\r\nVia: SIP/2.0/UDP 10.0.2.20:5060;branch=z9hG4bK-2187-1-0\r\nFrom: \"DVI4/8000\" <sip:sipp@10.0.2.20:5060>;tag=1\r\nTo: test <sip:test@10.0.2.15:5060>\r\nCall-ID: 1-2187@10.0.2.20\r\nCSeq: 1 INVITE\r\nContact: sip:sipp@10.0.2.20:5060\r\nMax-Forwards: 70\r\nContent-Type: application/sdp\r\nContent-Length:   123\r\n\r\nv=0\r\no=- 42 42 IN IP4 10.0.2.20\r\ns=-\r\nc=IN IP4 10.0.2.20\r\nt=0 0\r\nm=audio 6000 RTP/AVP 5\r\na=rtpmap:5 DVI4/8000\r\na=recvonly\r\n")
+
+	f.Fuzz(func(t *testing.T, payload string) {
+		reporter := func(evt beat.Event) {}
+		p, _ := New(true, reporter, &procs.ProcessesWatcher{}, nil)
+		plugin := p.(*plugin)
+
+		plugin.ParseUDP(&protos.Packet{
+			Ts:      time.Now(),
+			Tuple:   common.IPPortTuple{},
+			Payload: []byte(payload),
+		})
+	})
+}

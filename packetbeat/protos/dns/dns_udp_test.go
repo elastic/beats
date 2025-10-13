@@ -1229,3 +1229,31 @@ func TestEDNS0(t *testing.T) {
 		t.Errorf("unexpected event result:\n--- got\n+++ want\n%s", cmp.Diff(got, want, ignoreTime))
 	}
 }
+
+func FuzzParseUDP(f *testing.F) {
+	f.Add(elasticA.request)
+	f.Add(elasticA.response)
+	f.Add(elasticNoIP.request)
+	f.Add(elasticNoIP.response)
+	f.Add(zoneIxfr.request)
+	f.Add(zoneIxfr.response)
+	f.Add(githubPtr.request)
+	f.Add(githubPtr.response)
+	f.Add(sophosTxt.request)
+	f.Add(sophosTxt.response)
+	f.Add(ednsSecA.request)
+	f.Add(ednsSecA.response)
+
+	f.Fuzz(func(t *testing.T, payload []byte) {
+		store := &eventStore{}
+		dns := newDNS(store, testing.Verbose())
+
+		defer dns.transactions.StopJanitor()
+
+		packet_r := newPacket(reverse, payload)
+		dns.ParseUDP(packet_r)
+
+		packet_f := newPacket(forward, payload)
+		dns.ParseUDP(packet_f)
+	})
+}

@@ -255,3 +255,15 @@ func BenchmarkParserArray2Passes(b *testing.B) {
 		st.parser.parse(&st.Buf)
 	}
 }
+
+func FuzzParse(f *testing.F) {
+	f.Add(noArgsRequest)
+	f.Add(arrayRequest)
+	f.Add(arrayResponse)
+	f.Add(arrayNestedMessage)
+	f.Add(array2PassesPart1)
+
+	f.Fuzz(func(t *testing.T, content []byte) {
+		_, _, _ = parse(content)
+	})
+}
