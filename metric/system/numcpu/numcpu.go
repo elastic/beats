@@ -40,11 +40,10 @@ func NumCPU() int {
 func NumCPUWithLogger(logger *logp.Logger) int {
 	count, exists, err := getCPU()
 	if err != nil {
-		logger.Debugf("Error fetching CPU count: %v", err)
+		logger.Debugf("Error fetching CPU count, using runtime.NumCPU: %v", err)
 		return runtime.NumCPU()
 	}
 	if !exists {
-		logger.Debugf("Accurate CPU counts not available on platform, falling back to runtime.NumCPU for metrics")
 		return runtime.NumCPU()
 	}
 
