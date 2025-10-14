@@ -1,0 +1,4 @@
+variants:
+  - COUCHDB_VERSION: 1.7
+  - COUCHDB_VERSION: 2.3
+  - COUCHDB_VERSION: 3.1

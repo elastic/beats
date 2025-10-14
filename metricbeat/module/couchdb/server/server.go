@@ -127,6 +127,8 @@ func (m *MetricSet) retrieveFetcher() (err error) {
 		m.fetcher = &V1{}
 	case 2:
 		m.fetcher = &V2{}
+	case 3:
+		m.fetcher = &V3{}
 	default:
 		m.fetcher = nil
 	}
