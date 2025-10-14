@@ -1,51 +1,3 @@
----
-navigation_title: Breaking changes
-products:
-  - id: beats
-applies_to:
-  stack: ga
-sub:
-  product: Beats
----
-
-# {{product}} breaking changes
-
-Breaking changes can impact your Elastic applications, potentially disrupting normal operations. Before you upgrade, carefully review the {{product}} breaking changes and take the necessary steps to mitigate any issues. To learn how to upgrade, check [Upgrade](docs-content://deploy-manage/upgrade.md).
-
-<<<<<<< HEAD
-% Description and impact of the breaking change.
-% For more information, check [PR #](PR link).
-
-## 9.0.6 [beats-9.0.6-breaking-changes]
-
-**All Beats**
-
-::::{dropdown} The default data and logs path for the Windows service installation has changed.
-The base folder has changed from `C:\ProgramData\` to
-`C:\ProgramFiles\` because the latter has stricter permissions. The state
-and logs are now stored in `C:\Program Files\<Beat Name>-Data`.
-
-When the installation script runs, it looks for the previous default
-data path. If the path is found, data is moved to the new path.
-The installation script accepts the parameter `-ForceLegacyPath` to
-force using the legacy data path.
-
-In a PowerShell prompt, use `Get-Help install-service-<Beat Name>.ps1
--detailed` to get detailed help.
-
-See 'Quick start -> Installation script' from each Beat for more
-details.
-
-::::
-
-## 9.0.4 [beats-9.0.4-breaking-changes]
-
-**Metricbeat**
-
-::::{dropdown} Change index summary metricset to use `_nodes/stats` API instead of `_stats` API to avoid data gaps.
-For more information, check  [#45049]({{beats-pull}}45049).
-::::
-
 ## 9.0.0 [beats-9.0.0-breaking-changes]
 
 % Description and impact of the breaking change.
@@ -112,7 +64,3 @@ For more information, check [#42915]({{beats-pull}}42915).
 ::::{dropdown} Allow faccessat(2) in seccomp.
 For more information, check [#43322]({{beats-pull}}43322).
 ::::
-=======
-:::{include} /release-notes/_snippets/breaking-changes.md
-:::
->>>>>>> b4b52fb88 ([docs] Restructure release notes (#47073))
