@@ -13,7 +13,7 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: [prometheus] Add a fix to handle blank content-type headers in HTTP responses
+summary: Add a fix to handle blank content-type headers in HTTP responses for Prometheus.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
