@@ -2,23 +2,27 @@
 navigation_title: Beats
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/current/release-notes.html
+products:
+  - id: beats
+applies_to:
+  stack: ga
+sub:
+  product: Beats
 ---
-
-# {{beats}} release notes [beats-release-notes]
-Review the changes, fixes, and more in each version of {{beats}}.
-
-To check for security updates, go to [Security announcements for the Elastic stack](https://discuss.elastic.co/c/announcements/security-announcements/31).
 
 % Release notes include only features, enhancements, and fixes. Add breaking changes, deprecations, and known issues to the applicable release notes sections.
 
-% ## version.next [beats-versionext-release-notes]
+# {{product}} release notes
 
-% ### Features and enhancements [beats-versionext-features-enhancements]
+Review the changes, fixes, and more in each version of {{product}}.
 
-% ### Fixes [beats-versionext-fixes]
+To check for security updates, go to [Security announcements for the Elastic Stack](https://discuss.elastic.co/c/announcements/security-announcements/31).
 
-## 9.1.4 [beats-9.1.4-release-notes]
+:::{admonition} Related release notes
+{{agent}} integrates and manages {{beats}} for data collection. For changes to {{agent}}, refer to the [{{agent}} release notes](elastic-agent://release-notes/index.md).
+:::
 
+<<<<<<< HEAD
 ### Features and enhancements [beats-9.1.4-features-enhancements]
 
 **Filebeat**
@@ -480,3 +484,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 * Reset EventLog if error EOF is encountered in Winlogbeat. [#42826]({{beats-pull}}42826)
 * Implement backoff on error retrial in Winlogbeat. [#42826]({{beats-pull}}42826)
 * Fix boolean key in security pipelines and sync pipelines with integration in Winlogbeat. [#43027]({{beats-pull}}43027)
+=======
+:::{include} /release-notes/_snippets/index.md
+:::
+>>>>>>> b4b52fb88 ([docs] Restructure release notes (#47073))
