@@ -478,7 +478,8 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 }
 
 func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
-	parser, err := textparse.New(b, contentType, textMediaType, false, false, false, labels.NewSymbolTable()) // Fallback protocol set to text/plain.
+	// Fallback to text/plain if content type is blank or unrecognized.
+	parser, err := textparse.New(b, contentType, textMediaType, false, false, false, labels.NewSymbolTable())
 	// This check allows to continue where the content type is blank but the parser is non-nil. Returns error on all other cases.
 	if err != nil && !strings.Contains(err.Error(), "non-compliant scrape target sending blank Content-Type, using fallback_scrape_protocol") {
 		return nil, err
