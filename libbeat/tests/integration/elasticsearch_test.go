@@ -20,21 +20,18 @@
 package integration
 
 import (
-	"errors"
+	"context"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
-	"github.com/rcrowley/go-metrics"
 	"github.com/stretchr/testify/require"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 
 	"github.com/elastic/elastic-agent-libs/testing/certutil"
-	"github.com/elastic/mock-es/pkg/api"
 )
 
 var esCfg = `
@@ -59,10 +56,10 @@ output.elasticsearch:
 
 func TestESOutputRecoversFromNetworkError(t *testing.T) {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
-	mockbeat.WriteConfigFile(esCfg)
 
-	s, mr := startMockES(t, "localhost:4242")
+	s, esAddr, _, mr := StartMockES(t, ":4242", 0, 0, 0, 0, 0)
 
+	mockbeat.WriteConfigFile(fmt.Sprintf(esCfg, esAddr))
 	mockbeat.Start()
 
 	// 1. Wait for one _bulk call
@@ -85,7 +82,7 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 		"did not find two tries to reconnect")
 
 	// 4. Restart mock-es on the same port
-	s, mr = startMockES(t, "localhost:4242")
+	s, _, _, mr = StartMockES(t, ":4242", 0, 0, 0, 0, 0)
 
 	// 5. Wait for reconnection logs
 	mockbeat.WaitForLogs(
@@ -101,8 +98,7 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 func TestReloadCA(t *testing.T) {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 
-	esAddr := "localhost:4242"
-	s, _ := startMockES(t, esAddr)
+	s, esAddr, _, _ := StartMockES(t, ":4242", 0, 0, 0, 0, 0)
 	defer s.Close()
 
 	_, _, pair, err := certutil.NewRootCA()
@@ -153,55 +149,38 @@ logging.level: debug
 		"did not find 'mockbeat start running' log again")
 }
 
-func startMockES(t *testing.T, addr string) (*http.Server, metrics.Registry) {
-	uid := uuid.Must(uuid.NewV4())
-	mr := metrics.NewRegistry()
-	es := api.NewAPIHandler(uid, "foo2", mr, time.Now().Add(24*time.Hour), 0, 0, 0, 0, 0)
-
-	s := http.Server{Addr: addr, Handler: es, ReadHeaderTimeout: time.Second}
-	go func() {
-		if err := s.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
-			t.Errorf("could not start mock-es server: %s", err)
-		}
-	}()
-
-	require.Eventually(t, func() bool {
-		resp, err := http.Get("http://" + addr) //nolint:noctx // It's just a test
-		if err != nil {
-			return false
-		}
-		//nolint:errcheck // We're just draining the body, we can ignore the error
-		io.Copy(io.Discard, resp.Body)
-		resp.Body.Close()
-		return true
-	},
-		time.Second, time.Millisecond, "mock-es server did not start on '%s'", addr)
-
-	return &s, mr
-}
-
 // waitForEventToBePublished waits for at least one event published
 // by inspecting the count for `bulk.create.total` in `mr`. Once
 // the counter is > 1, waitForEventToBePublished returns. If that
 // does not happen within 10min, then the test fails with a call to
 // t.Fatal.
-func waitForEventToBePublished(t *testing.T, mr metrics.Registry) {
+func waitForEventToBePublished(t *testing.T, rdr *sdkmetric.ManualReader) {
 	t.Helper()
+
 	require.Eventually(t, func() bool {
-		total := mr.Get("bulk.create.total")
-		if total == nil {
-			return false
+		rm := metricdata.ResourceMetrics{}
+		err := rdr.Collect(context.Background(), &rm)
+
+		if err != nil {
+			t.Fatalf("failed to collect metrics: %v", err)
 		}
 
-		sc, ok := total.(*metrics.StandardCounter)
-		if !ok {
-			t.Fatalf("expecting 'bulk.create.total' to be *metrics.StandardCounter, but got '%T' instead",
-				total,
-			)
+		for _, sm := range rm.ScopeMetrics {
+			for _, m := range sm.Metrics {
+				if m.Name == "bulk.create.total" {
+					total := int64(0)
+					//nolint:errcheck // It's a test
+					for _, dp := range m.Data.(metricdata.Sum[int64]).DataPoints {
+						total += dp.Value
+					}
+					return total >= 1
+				}
+			}
 		}
 
-		return sc.Count() > 1
+		return false
 	},
-		10*time.Second, 100*time.Millisecond,
+		10*time.Second,
+		100*time.Millisecond,
 		"at least one bulk request must be made")
 }
