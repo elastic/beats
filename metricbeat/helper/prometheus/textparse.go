@@ -21,13 +21,13 @@ import (
 	"errors"
 	"io"
 	"math"
-	"mime"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/prometheus/common/model"
+	"github.com/prometheus/prometheus/config"
 	"github.com/prometheus/prometheus/model/exemplar"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/model/textparse"
@@ -35,15 +35,6 @@ import (
 	"github.com/prometheus/prometheus/schema"
 
 	"github.com/elastic/elastic-agent-libs/logp"
-)
-
-const (
-	// The Content-Type values for the different wire protocols
-	hdrContentType               = "Content-Type"
-	TextVersion                  = "0.0.4"
-	OpenMetricsType              = `application/openmetrics-text`
-	ContentTypeTextFormat string = `text/plain; version=` + TextVersion + `; charset=utf-8`
-	textMediaType                = "text/plain"
 )
 
 type Gauge struct {
@@ -477,11 +468,11 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 	return name, metric
 }
 
-func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
-	// Fallback to text/plain if content type is blank or unrecognized.
-	parser, err := textparse.New(b, contentType, textMediaType, false, false, false, labels.NewSymbolTable())
-	// This check allows to continue where the content type is blank but the parser is non-nil. Returns error on all other cases.
-	if err != nil && !strings.Contains(err.Error(), "non-compliant scrape target sending blank Content-Type, using fallback_scrape_protocol") {
+func ParseMetricFamilies(b []byte, scrapeProtocol, fallbackScrapeProtocol config.ScrapeProtocol, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
+	parser, err := textparse.New(b, config.ScrapeProtocolsHeaders[scrapeProtocol], fallbackScrapeProtocol.HeaderMediaType(), false, false, false, labels.NewSymbolTable())
+
+	// textparse.New can return a non-nil error with a valid parser (?!), so we only error out if the parser is nil too.
+	if parser == nil && err != nil {
 		return nil, err
 	}
 
@@ -631,7 +622,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		// Suffixes - https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#suffixes
 		switch mt {
 		case model.MetricTypeCounter:
-			if contentType == OpenMetricsType && !isTotal(metricName) && !isCreated(metricName) {
+			if (scrapeProtocol == config.OpenMetricsText1_0_0 || scrapeProtocol == config.OpenMetricsText0_0_1) && !isTotal(metricName) && !isCreated(metricName) {
 				// Possible suffixes for counter in Open metrics are _created and _total.
 				// Otherwise, ignore.
 				// https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#counter-1
@@ -641,7 +632,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 			var counter = &Counter{Value: &v}
 			mn := lset.Get(labels.MetricName)
 			metric = &OpenMetric{Name: &mn, Counter: counter, Label: labelPairs}
-			if contentType == OpenMetricsType {
+			if scrapeProtocol == config.OpenMetricsText1_0_0 || scrapeProtocol == config.OpenMetricsText0_0_1 {
 				// Remove the two possible suffixes, _created and _total
 				if isTotal(metricName) {
 					lookupMetricName = strings.TrimSuffix(metricName, suffixTotal)
@@ -746,26 +737,17 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 	return families, nil
 }
 
-func GetContentType(h http.Header) string {
-	ct := h.Get(hdrContentType)
-
-	mediatype, params, err := mime.ParseMediaType(ct)
-	if err != nil {
+// GetScrapeProtocol returns the Prometheus scrape protocol parsed from the Content-Type header.
+func GetScrapeProtocol(headers http.Header) config.ScrapeProtocol {
+	contentTypeHeader := headers.Get("Content-Type")
+	if contentTypeHeader == "" {
 		return ""
 	}
 
-	switch mediatype {
-	case OpenMetricsType:
-		if e, ok := params["encoding"]; ok && e != "delimited" {
-			return ""
+	for k, v := range config.ScrapeProtocolsHeaders {
+		if contentTypeHeader == v {
+			return k
 		}
-		return OpenMetricsType
-
-	case textMediaType:
-		if v, ok := params["version"]; ok && v != TextVersion {
-			return ""
-		}
-		return ContentTypeTextFormat
 	}
 
 	return ""

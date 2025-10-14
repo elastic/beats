@@ -21,6 +21,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/prometheus/prometheus/config"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/require"
 
@@ -84,9 +85,9 @@ metric_without_suffix 10
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
+	result, err := ParseMetricFamilies([]byte(input[1:]), config.OpenMetricsText1_0_0, "", time.Now(), nil)
 	if err != nil {
-		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", config.OpenMetricsText1_0_0)
 	}
 	require.ElementsMatch(t, expected, result)
 }
@@ -133,9 +134,9 @@ process_cpu 20
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), nil)
+	result, err := ParseMetricFamilies([]byte(input), config.PrometheusText0_0_4, "", time.Now(), nil)
 	if err != nil {
-		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", config.PrometheusText0_0_4)
 	}
 	require.ElementsMatch(t, expected, result)
 }
@@ -293,9 +294,9 @@ nginx_sts_server_session_seconds{listen="TCP:8091:127.0.0.1",port="8091",protoco
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), nil)
+	result, err := ParseMetricFamilies([]byte(input), config.PrometheusText0_0_4, "", time.Now(), nil)
 	if err != nil {
-		t.Fatalf("ParseMetricFamilies for content type %s returned an error: %v", ContentTypeTextFormat, err)
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error: %v", config.PrometheusText0_0_4, err)
 	}
 	require.ElementsMatch(t, expected, result)
 }
@@ -347,9 +348,9 @@ second_metric 0
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
+	result, err := ParseMetricFamilies([]byte(input[1:]), config.OpenMetricsText1_0_0, "", time.Now(), nil)
 	if err != nil {
-		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", config.OpenMetricsText1_0_0)
 	}
 	require.ElementsMatch(t, expected, result)
 }
@@ -400,9 +401,9 @@ second_metric 0
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), ContentTypeTextFormat, time.Now(), nil)
+	result, err := ParseMetricFamilies([]byte(input[1:]), config.PrometheusText0_0_4, "", time.Now(), nil)
 	if err != nil {
-		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", config.PrometheusText0_0_4)
 	}
 	require.ElementsMatch(t, expected, result)
 }
@@ -450,9 +451,9 @@ metric_without_suffix 3
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
+	result, err := ParseMetricFamilies([]byte(input[1:]), config.OpenMetricsText1_0_0, "", time.Now(), nil)
 	if err != nil {
-		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", config.OpenMetricsText1_0_0)
 	}
 	require.ElementsMatch(t, expected, result)
 }
@@ -503,9 +504,9 @@ first_metric{label1="value1"} 1
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), logptest.NewTestingLogger(t, "test"))
+	result, err := ParseMetricFamilies([]byte(input), config.PrometheusText0_0_4, "", time.Now(), logptest.NewTestingLogger(t, "test"))
 	if err != nil {
-		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", config.PrometheusText0_0_4)
 	}
 	require.ElementsMatch(t, expected, result)
 }
@@ -553,9 +554,9 @@ a{a="foo"} 1.0
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
+	result, err := ParseMetricFamilies([]byte(input[1:]), config.OpenMetricsText1_0_0, "", time.Now(), nil)
 	if err != nil {
-		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", config.OpenMetricsText1_0_0)
 	}
 	require.ElementsMatch(t, expected, result)
 }
@@ -606,9 +607,9 @@ summary_metric_impossible 123
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
+	result, err := ParseMetricFamilies([]byte(input[1:]), config.OpenMetricsText1_0_0, "", time.Now(), nil)
 	if err != nil {
-		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", config.OpenMetricsText1_0_0)
 	}
 	require.ElementsMatch(t, expected, result)
 }
@@ -658,9 +659,9 @@ summary_metric_impossible 123
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), nil)
+	result, err := ParseMetricFamilies([]byte(input), config.PrometheusText0_0_4, "", time.Now(), nil)
 	if err != nil {
-		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", config.PrometheusText0_0_4)
 	}
 	require.ElementsMatch(t, expected, result)
 }
@@ -718,9 +719,9 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
+	result, err := ParseMetricFamilies([]byte(input[1:]), config.OpenMetricsText1_0_0, "", time.Now(), nil)
 	if err != nil {
-		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", config.OpenMetricsText1_0_0)
 	}
 	require.ElementsMatch(t, expected, result)
 }
@@ -777,9 +778,9 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), nil)
+	result, err := ParseMetricFamilies([]byte(input), config.PrometheusText0_0_4, "", time.Now(), nil)
 	if err != nil {
-		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", config.PrometheusText0_0_4)
 	}
 	require.ElementsMatch(t, expected, result)
 }
@@ -820,9 +821,9 @@ ggh 99
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
+	result, err := ParseMetricFamilies([]byte(input[1:]), config.OpenMetricsText1_0_0, "", time.Now(), nil)
 	if err != nil {
-		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", config.OpenMetricsText1_0_0)
 	}
 	require.ElementsMatch(t, expected, result)
 }
@@ -855,9 +856,9 @@ redis_connected_clients{instance="rough-snowflake-web"} 10.0
 			},
 		},
 	}
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
+	result, err := ParseMetricFamilies([]byte(input[1:]), config.OpenMetricsText1_0_0, "", time.Now(), nil)
 	if err != nil {
-		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", config.OpenMetricsText1_0_0)
 	}
 	require.ElementsMatch(t, expected, result)
 }
@@ -889,14 +890,14 @@ redis_connected_clients{instance="rough-snowflake-web"} 10.0`
 			},
 		},
 	}
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), nil)
+	result, err := ParseMetricFamilies([]byte(input), config.PrometheusText0_0_4, "", time.Now(), nil)
 	if err != nil {
-		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", config.PrometheusText0_0_4)
 	}
 	require.ElementsMatch(t, expected, result)
 }
 
-func TestBlankContentTypeHeader(t *testing.T) {
+func TestEmptyScrapeProtocol(t *testing.T) {
 	input := `
 # TYPE process_cpu_total counter
 # HELP process_cpu_total Some help.
@@ -921,9 +922,9 @@ process_cpu_total 4.20072246e+06
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input), "", time.Now(), nil)
+	result, err := ParseMetricFamilies([]byte(input), "", config.PrometheusText0_0_4, time.Now(), nil)
 	if err != nil {
-		t.Fatal("ParseMetricFamilies for blank content type returned an error.")
+		t.Fatal("ParseMetricFamilies for empty scrape protocol returned an error.")
 	}
 	require.ElementsMatch(t, expected, result)
 }

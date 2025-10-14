@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/prometheus/prometheus/config"
 )
 
 const acceptHeader = `text/plain;version=0.0.4;q=0.5,*/*;q=0.1`
@@ -107,13 +108,16 @@ func (p *prometheus) GetFamilies() ([]*MetricFamily, error) {
 		return nil, fmt.Errorf("unexpected status code %d from server", resp.StatusCode)
 	}
 
-	contentType := GetContentType(resp.Header)
 	appendTime := time.Now().Round(0)
 	b, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response: %w", err)
 	}
-	families, err := ParseMetricFamilies(b, contentType, appendTime, p.logger)
+
+	scrapeProtocol := GetScrapeProtocol(resp.Header)
+	fallbackScrapeProtocol := config.PrometheusText1_0_0
+
+	families, err := ParseMetricFamilies(b, scrapeProtocol, fallbackScrapeProtocol, appendTime, p.logger)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse families: %w", err)
 	}

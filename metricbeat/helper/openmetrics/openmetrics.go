@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/prometheus/prometheus/config"
 )
 
 const acceptHeader = `application/openmetrics-text; version=1.0.0; charset=utf-8,text/plain`
@@ -97,13 +98,16 @@ func (p *openmetrics) GetFamilies() ([]*prometheus.MetricFamily, error) {
 		return nil, fmt.Errorf("unexpected status code %d from server", resp.StatusCode)
 	}
 
-	contentType := prometheus.GetContentType(resp.Header)
 	appendTime := time.Now().Round(0)
 	b, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response: %w", err)
 	}
-	families, err := prometheus.ParseMetricFamilies(b, contentType, appendTime, p.logger)
+
+	scrapeProtocol := prometheus.GetScrapeProtocol(resp.Header)
+	fallbackScrapeProtocol := config.PrometheusText1_0_0
+
+	families, err := prometheus.ParseMetricFamilies(b, scrapeProtocol, fallbackScrapeProtocol, appendTime, p.logger)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse families: %w", err)
 	}
