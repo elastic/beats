@@ -72,6 +72,7 @@ retry:
   max_retries: 3
 sending_queue:
   batch:
+    flush_timeout: 10s
     max_size: 1600
     min_size: 0
     sizer: items
@@ -117,6 +118,7 @@ retry:
   max_retries: 3
 sending_queue:
   batch:
+    flush_timeout: 10s
     max_size: 1600
     min_size: 0
     sizer: items
@@ -126,7 +128,7 @@ sending_queue:
   queue_size: 3200
   wait_for_result: true
 mapping:
-  mode: bodymap  
+  mode: bodymap
 max_conns_per_host: 1
 api_key: VGlOQUdHNEJhYU1kYUgxdFJmdVU6S25SNnlFNDFSclNvd2Iwa1EwSFdvQQ==
 compression: gzip
@@ -166,7 +168,7 @@ logs_index: some-index
 password: changeme
 user: elastic
 mapping:
-  mode: bodymap 
+  mode: bodymap
 compression: gzip
 compression_params:
   level: 1
@@ -182,6 +184,7 @@ compression_params:
 max_conns_per_host: 1
 sending_queue:
   batch:
+    flush_timeout: 10s
     max_size: 1600
     min_size: 0
     sizer: items
@@ -198,6 +201,7 @@ sending_queue:
 max_conns_per_host: 4
 sending_queue:
   batch:
+    flush_timeout: 10s
     max_size: 1600
     min_size: 0
     sizer: items
@@ -224,6 +228,7 @@ user: elastic
 max_conns_per_host: 1
 sending_queue:
   batch:
+    flush_timeout: 10s
     max_size: 1600
     min_size: 0
     sizer: items
@@ -233,7 +238,7 @@ sending_queue:
   queue_size: 3200
   wait_for_result: true
 mapping:
-  mode: bodymap    
+  mode: bodymap
 compression: gzip
 compression_params:
   level: 1
@@ -245,6 +250,7 @@ compression_params:
 max_conns_per_host: 1
 sending_queue:
   batch:
+    flush_timeout: 10s
     max_size: 50
     min_size: 0
     sizer: items
@@ -261,6 +267,7 @@ sending_queue:
 max_conns_per_host: 1
 sending_queue:
   batch:
+    flush_timeout: 10s
     max_size: 1600
     min_size: 0
     sizer: items
@@ -314,6 +321,7 @@ max_conns_per_host: 1
 user: elastic
 sending_queue:
   batch:
+    flush_timeout: 10s
     max_size: 1600
     min_size: 0
     sizer: items

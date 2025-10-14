@@ -126,7 +126,7 @@ logging.level: debug
 
 	// 1. wait mockbeat to start
 	mockbeat.WaitForLogs(
-		fmt.Sprint("mockbeat start running"),
+		"mockbeat start running",
 		10*time.Second,
 		"did not find 'mockbeat start running' log")
 
@@ -148,7 +148,7 @@ logging.level: debug
 
 	// 5. wait mockbeat to start again
 	mockbeat.WaitForLogs(
-		fmt.Sprint("mockbeat start running"),
+		"mockbeat start running",
 		10*time.Second,
 		"did not find 'mockbeat start running' log again")
 }
@@ -160,7 +160,7 @@ func startMockES(t *testing.T, addr string) (*http.Server, metrics.Registry) {
 
 	s := http.Server{Addr: addr, Handler: es, ReadHeaderTimeout: time.Second}
 	go func() {
-		if err := s.ListenAndServe(); !errors.Is(http.ErrServerClosed, err) {
+		if err := s.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 			t.Errorf("could not start mock-es server: %s", err)
 		}
 	}()
@@ -168,11 +168,11 @@ func startMockES(t *testing.T, addr string) (*http.Server, metrics.Registry) {
 	require.Eventually(t, func() bool {
 		resp, err := http.Get("http://" + addr) //nolint:noctx // It's just a test
 		if err != nil {
-			//nolint:errcheck // We're just draining the body, we can ignore the error
-			io.Copy(io.Discard, resp.Body)
-			resp.Body.Close()
 			return false
 		}
+		//nolint:errcheck // We're just draining the body, we can ignore the error
+		io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
 		return true
 	},
 		time.Second, time.Millisecond, "mock-es server did not start on '%s'", addr)

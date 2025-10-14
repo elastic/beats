@@ -38,7 +38,7 @@ To use SSL mutual authentication:
 
     * `ssl`. When set to true, enables Logstash to use SSL/TLS.
     * `ssl_certificate_authorities`. Configures Logstash to trust any certificates signed by the specified CA.
-    * `ssl_certificate` and `ssl_key`. Specify the certificate and key that Logstash uses to authenticate with the client.
+    * `ssl_certificate` and `ssl_key`. Specifies the certificate and key that Logstash uses to authenticate with the client.
     * `ssl_client_authentication`. Specifies whether the Logstash server verifies the client certificate against the CA. You need to specify either `required` or `optional` to make the server ask for the certificate and validate it. If you specify `required`, and Auditbeat doesn’t provide a certificate, the Logstash connection will be closed. If you choose not to use [certutil](elasticsearch://reference/elasticsearch/command-line-tools/certutil.md), the certificates that you obtain must allow for both `clientAuth` and `serverAuth` if the extended key usage extension is present.
 
         For example:
@@ -65,10 +65,10 @@ To use SSL mutual authentication:
 Before running Auditbeat, you should validate the Logstash server’s certificate. You can use `curl` to validate the certificate even though the protocol used to communicate with Logstash is not based on HTTP. For example:
 
 ```shell
-curl -v --cacert ca.crt https://logs.example.com:5044 
+curl -v --cacert ca.crt https://logs.example.com:5044
 ```
 
-If the test is successful, you’ll receive an empty response error:
+If the test is successful, you’ll receive an empty response error. Here's an example response assuming the `HOST_URL` was `logs.example.com` and `PORT` was `5044`:
 
 ```shell
 * Rebuilt URL to: https://logs.example.com:5044/

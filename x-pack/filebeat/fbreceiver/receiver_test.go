@@ -483,10 +483,10 @@ func TestConsumeContract(t *testing.T) {
 	os.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
 
 	cfg := &Config{
-		Beatconfig: map[string]interface{}{
+		Beatconfig: map[string]any{
 			"queue.mem.flush.timeout": "0s",
-			"filebeat": map[string]interface{}{
-				"inputs": []map[string]interface{}{
+			"filebeat": map[string]any{
+				"inputs": []map[string]any{
 					{
 						"type":    "filestream",
 						"id":      "filestream-test",
@@ -494,16 +494,16 @@ func TestConsumeContract(t *testing.T) {
 						"paths": []string{
 							filepath.Join(tmpDir, "input-*.log"),
 						},
-						"file_identity.native": map[string]interface{}{},
-						"prospector": map[string]interface{}{
-							"scanner": map[string]interface{}{
+						"file_identity.native": map[string]any{},
+						"prospector": map[string]any{
+							"scanner": map[string]any{
 								"fingerprint.enabled": false,
 								"check_interval":      "0.1s",
 							},
 						},
-						"parsers": []map[string]interface{}{
+						"parsers": []map[string]any{
 							{
-								"ndjson": map[string]interface{}{
+								"ndjson": map[string]any{
 									"document_id": "id",
 								},
 							},
@@ -511,10 +511,10 @@ func TestConsumeContract(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]interface{}{
-				"otelconsumer": map[string]interface{}{},
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
 			},
-			"logging": map[string]interface{}{
+			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
 					"*",
@@ -534,4 +534,35 @@ func TestConsumeContract(t *testing.T) {
 		Generator:     gen,
 		GenerateCount: logsPerTest,
 	})
+}
+
+func TestReceiverHook(t *testing.T) {
+	cfg := Config{
+		Beatconfig: map[string]any{
+			"filebeat": map[string]any{
+				"inputs": []map[string]any{
+					{
+						"type":    "benchmark",
+						"enabled": true,
+						"message": "test",
+						"count":   1,
+					},
+				},
+			},
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
+			},
+			"management.otel.enabled": true,
+			"path.home":               t.TempDir(),
+		},
+	}
+	receiverSettings := receiver.Settings{
+		ID: component.MustNewID(Name),
+		TelemetrySettings: component.TelemetrySettings{
+			Logger: zap.NewNop(),
+		},
+	}
+	// For filebeatreceiver, we expect 3 hooks to be registered:
+	// 	one for beat metrics, one for input metrics and one for getting the registry.
+	oteltest.TestReceiverHook(t, &cfg, NewFactory(), receiverSettings, 3)
 }
