@@ -9,6 +9,7 @@ import (
 	"log"
 	"strconv"
 	"testing"
+	"time"
 
 	"cloud.google.com/go/bigquery"
 
@@ -110,6 +111,8 @@ func TestIsDetailedTable(t *testing.T) {
 func TestCreateEvents(t *testing.T) {
 	assert := assert.New(t)
 
+	now := time.Now()
+
 	t.Run("standard table", func(t *testing.T) {
 		row := row{
 			InvoiceMonth:       "202001",
@@ -123,6 +126,10 @@ func TestCreateEvents(t *testing.T) {
 			ServiceDescription: "Compute Engine",
 			Tags:               "tag1:value1,tag2.a.b/c:value2,tag3:",
 			TotalExact:         123.45,
+			LocationRegion:     "us-east-1",
+			UsageStartTime:     &now,
+			UsageEndTime:       &now,
+			Labels:             "",
 		}
 
 		date := getCurrentDate()
@@ -152,6 +159,10 @@ func TestCreateEvents(t *testing.T) {
 					{Key: "tag2.a.b/c", Value: "value2"},
 					{Key: "tag3", Value: ""},
 				},
+				"labels":           "",
+				"location":         mapstr.M{"region": "us-east-1"},
+				"usage_start_time": now.Format(time.RFC3339),
+				"usage_end_time":   now.Format(time.RFC3339),
 			},
 		}
 		event := createEvents(row, "project-123456.dataset.gcp_billing_export_v1_011702_58A742_BQB4E8", "project-123456")
