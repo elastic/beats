@@ -22,6 +22,7 @@ package integration
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"testing"
@@ -48,7 +49,7 @@ queue.mem:
 output.elasticsearch:
   allow_older_versions: true
   hosts:
-    - "http://localhost:4242"
+    - "%s"
   backoff:
     init: 0.1s
     max: 0.2s
@@ -58,6 +59,11 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 
 	s, esAddr, _, mr := StartMockES(t, ":4242", 0, 0, 0, 0, 0)
+
+	esURL, err := url.Parse(esAddr)
+	if err != nil {
+		t.Fatalf("cannot parse mockES URL: %s", err)
+	}
 
 	mockbeat.WriteConfigFile(fmt.Sprintf(esCfg, esAddr))
 	mockbeat.Start()
