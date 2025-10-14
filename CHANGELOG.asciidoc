@@ -3,6 +3,89 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-9.0.8]]
+=== Beats version 9.0.8
+https://github.com/elastic/beats/compare/v9.0.7\...v9.0.8[View commits]
+
+==== Breaking changes
+
+*Filebeat*
+
+- Journald input now converts byte-encoded messages to string. {issue}40479[40479] {pull}46415[46415]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Update github.com/docker/docker to v28.3.3 {pull}46334[46334]
+- Fixed a panic in the Kafka output that could occur when shutting down while final events were being published. {issue}46109[46109] {pull}46446[46446]
+
+*Filebeat*
+
+- The UDP input now fails if it cannot bind to the configured port and its status is set to failed when running under Elastic Agent. {issue}37216[37216] {pull}46302[46302]
+- The Unix input now fails on errors listening to the socket and its status is set to failed when running under Elastic Agent. {pull}46302[46302]
+- [Journald input] Fix reading all files in a folder and watching for new ones. {issue}46657[46657] {pull}46682[46682]
+- [azure-eventhub] Fix handling of connection strings with entity path. {issue}43715[43715] {pull}43716[43716]
+
+*Metricbeat*
+
+- Do not log an error if metadata enrichment is disabled for K8's module. {pull}46536[46536]
+- Fix Azure Monitor wildcard metrics names timegrain issue by using the first, smallest timegrain; fix nil pointer issue. {pull}46145[46145]
+
+*Winlogbeat*
+
+- Fix EventLog reset logic to not close renderers. {pull}46376[46376] {issue}45750{45750}
+
+==== Added
+
+*Metricbeat*
+
+- Upgrade github.com/microsoft/go-mssqldb version from v1.7.2 to v1.8.2. {pull}44990[44990]
+- Add SSL support for SQL modules: drivers Mysql, PostgreSQL, and MSSQL. {pull}44748[44748]
+- Add NTP response validation for system/ntp module. {pull}46184[46184]
+- Add vertexai_logs metricset to GCP for prompt response collection from VertexAI service. {pull}46383[46383]
+- Add default timegrain to Azure Storage Account metricset. {pull}46786[46786]
+
+
+[[release-notes-9.0.7]]
+=== Beats version 9.0.7
+https://github.com/elastic/beats/compare/v9.0.6\...v9.0.7[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fixed case where Beats would silently fail due to invalid input configuration, now the error is correctly reported. {issue}43118[43118] {pull}45733[45733]
+- Fix a race condition during metrics initialization which could cause a panic. {issue}45822[45822] {pull}46054[46054]
+- Update Go version to 1.24.7 {pull}46070[46070].
+- Fixed a panic when the beat restarts itself by adding 'eventfd2' to default seccomp policy {issue}46372[46372]
+- Update github.com/go-viper/mapstructure/v2 to v2.4.0 {pull}46335[46335]
+
+*Filebeat*
+
+- Fix wrongly emitted missing input ID warning {issue}42969[42969] {pull}45747[45747]
+- Fix race condition that could cause Filebeat to hang during shutdown after failing to startup {issue}45034[45034] {pull}46331[46331]
+
+*Metricbeat*
+
+- Fix an issue where the conntrack metricset entries field reported a count inflated by a factor of the number of CPU cores. {issue}46138[46138] {pull}46140[46140]
+
+*Winlogbeat*
+
+- Fix forwarded event handling and add channel error resilience. {pull}46190[46190]
+
+==== Added
+
+*Filebeat*
+
+- Improve HTTP JSON health status logic for empty template results. {pull}46332[46332]
+- Improve CEL input documentation of authentication options. {pull}46253[46253]
+- Add documentation for device collection in Entity Analytics Active Directory Filebeat's input. {pull}46363[46363]
+
+*Metricbeat*
+
+- Add support for Kafka 4.0 in the Kafka module. {pull}44723[44723]
+
 [[release-notes-9.0.6]]
 === Beats version 9.0.6
 https://github.com/elastic/beats/compare/v9.0.5\...v9.0.6[View commits]

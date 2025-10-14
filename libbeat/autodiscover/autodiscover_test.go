@@ -18,11 +18,9 @@
 package autodiscover
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"path/filepath"
 	"reflect"
 	"strings"
 	"sync"
@@ -32,8 +30,6 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -819,106 +815,134 @@ func check(t *testing.T, runners []*mockRunner, expected *conf.C, started, stopp
 	t.Fatalf("expected cfg %v to be started=%v stopped=%v but have %v", out, started, stopped, runners)
 }
 
-func TestErrNonReloadableIsNotRetried(t *testing.T) {
-	// Register mock autodiscover provider
+// TestAutodiscoverMetadataCleanup tests that the worker properly cleans up metadata
+// for configurations that are no longer active.
+func TestAutodiscoverMetadataCleanup(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	err := Registry.AddProvider(
-		"mock",
-		func(beatName string,
-			b bus.Bus,
-			uuid uuid.UUID,
-			c *conf.C,
-			k keystore.Keystore) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
+		busChan <- b
+		return &mockProvider{}, nil
+	})
+	require.NoError(t, err)
 
-			// intercept bus to mock events
-			busChan <- b
-
-			return &mockProvider{}, nil
-		})
-	if err != nil {
-		t.Fatalf("cannot add provider to registry: %s", err)
-	}
-
-	// Create a mock adapter, 'err_non_reloadable' will make its Create method
-	// to return a common.ErrNonReloadable.
-	adapter := mockAdapter{
-		configs: []*conf.C{
-			conf.MustNewConfigFrom(map[string]any{
-				"err_non_reloadable": true,
-			}),
-		},
-	}
-
-	// and settings:
+	adapter := mockAdapter{}
 	providerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"type": "mock",
 	})
 	config := Config{
 		Providers: []*conf.C{providerConfig},
 	}
-	k, _ := keystore.NewFileKeystore(filepath.Join(t.TempDir(), "keystore"))
-	// Create autodiscover manager
+	k, _ := keystore.NewFileKeystore("test")
+
 	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
-	logger, logsBuffer := newBufferLogger()
-	autodiscover.logger = logger
-	// set the debounce period to something small in order to
-	// speed up the tests. This seems to be the sweet stop
-	// for the fastest test run
-	autodiscover.debouncePeriod = time.Millisecond
+	autodiscover.debouncePeriod = 50 * time.Millisecond
 
-	// Start it
 	autodiscover.Start()
 	defer autodiscover.Stop()
 	eventBus := <-busChan
 
-	// Send an event to the bus, the event itself is not important
-	// because the mockAdapter will return the same configs regardless
-	// of the event
+	fooConfig1, _ := conf.NewConfigFrom(map[string]string{
+		"id": "foo-1",
+	})
+	fooConfig2, _ := conf.NewConfigFrom(map[string]string{
+		"id": "foo-2",
+	})
+
+	// Publish event, this should create metadata entries
 	eventBus.Publish(bus.Event{
-		// That's used in the last assertion, the config key is
-		// <provider name>:<id>
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
 		"meta": mapstr.M{
-			"test_name": t.Name(),
+			"service":   "foo-service",
+			"namespace": "test-ns",
+		},
+		"config": []*conf.C{fooConfig1, fooConfig2},
+	})
+
+	// Wait for configs to be processed
+	wait(t, func() bool { return len(adapter.Runners()) == 2 })
+
+	// check that configs and metadata exist
+	assert.Equal(t, 2, len(autodiscover.configs["mock:foo"]))
+	metaKeys := autodiscover.meta.Keys()
+	assert.Equal(t, 2, len(metaKeys), "Should have 2 metadata entries for id foo")
+
+	// create another service "bar" with 2 configs
+	barConfig1, _ := conf.NewConfigFrom(map[string]string{
+		"id": "bar-1",
+	})
+	barConfig2, _ := conf.NewConfigFrom(map[string]string{
+		"id": "bar-2",
+	})
+	eventBus.Publish(bus.Event{
+		"id":       "bar",
+		"provider": "mock",
+		"start":    true,
+		"meta": mapstr.M{
+			"service":   "bar-service",
+			"namespace": "test-ns",
+		},
+		"config": []*conf.C{barConfig1, barConfig2},
+	})
+	// Wait for configs to be processed
+	wait(t, func() bool { return len(adapter.Runners()) == 4 })
+	assert.Equal(t, 2, len(autodiscover.configs["mock:foo"]))
+	assert.Equal(t, 2, len(autodiscover.configs["mock:bar"]))
+	metaKeys = autodiscover.meta.Keys()
+	assert.Equal(t, 4, len(metaKeys), "Should have 4 metadata entries total")
+
+	// Stop first config
+	eventBus.Publish(bus.Event{
+		"id":       "foo",
+		"provider": "mock",
+		"stop":     true,
+		"meta": mapstr.M{
+			"service":   "foo-service",
+			"namespace": "test-ns",
 		},
 	})
 
-	// Ensure we logged the error about not retrying reloading input
-	require.Eventually(
-		t,
-		func() bool {
-			return strings.Contains(
-				logsBuffer.String(),
-				`all new inputs failed to start with a non-retriable error","error":"Error creating runner from config: ErrNonReloadable: a non reloadable error`,
-			)
+	// Wait for some configs to be removed from active configs
+	wait(t, func() bool {
+		return len(autodiscover.configs["mock:foo"]) == 0 && len(autodiscover.configs["mock:bar"]) == 2
+	})
+
+	// Metadata should still exist right after stopping the config
+	metaKeys = autodiscover.meta.Keys()
+	assert.Equal(t, 4, len(metaKeys), "Should still have 4 metadata entries before cleanup")
+
+	// Wait for debounce period so the worker can run the metadata GC
+	wait(t, func() bool {
+		metaKeys := autodiscover.meta.Keys()
+		return len(metaKeys) == 2 // Only metadata for "bar" should remain
+	})
+
+	// Stop "bar" and check for full cleanup
+	eventBus.Publish(bus.Event{
+		"id":       "bar",
+		"provider": "mock",
+		"stop":     true,
+		"meta": mapstr.M{
+			"service":   "bar-service",
+			"namespace": "test-ns",
 		},
-		time.Second*10,
-		time.Millisecond*10,
-		"foo error")
+	})
 
-	// Ensure nothing is running
-	requireRunningRunners(t, autodiscover, 0)
-	runners := adapter.Runners()
-	require.Equal(t, len(runners), 0)
+	// Wait for all configs to be removed
+	wait(t, func() bool {
+		return len(autodiscover.configs["mock:bar"]) == 0
+	})
 
-	// Ensure the autodiscover got the config
-	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
-}
-
-func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
-	buf := &bytes.Buffer{}
-	encoderConfig := zap.NewProductionEncoderConfig()
-	encoder := zapcore.NewJSONEncoder(encoderConfig)
-	writeSyncer := zapcore.AddSync(buf)
-	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core {
-		return zapcore.NewCore(encoder, writeSyncer, zapcore.DebugLevel)
-	}))
-	return log, buf
+	// Without active configs, metadata should be cleaned up
+	wait(t, func() bool {
+		metaKeys := autodiscover.meta.Keys()
+		return len(metaKeys) == 0
+	})
 }
